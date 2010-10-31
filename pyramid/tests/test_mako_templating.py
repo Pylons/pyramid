@@ -15,18 +15,22 @@ class Base(object):
         self.config.end()
 
 class Test_renderer_factory(Base, unittest.TestCase):
-    def _callFUT(self, path):
+    def _callFUT(self, info):
         from pyramid.mako_templating import renderer_factory
-        return renderer_factory(path)
+        return renderer_factory(info)
 
     def test_no_directories(self):
         from pyramid.exceptions import ConfigurationError
-        self.assertRaises(ConfigurationError, self._callFUT, 'path')
+        info = {'name':'helloworld.mak', 'package':None,
+                'registry':self.config.registry}
+        self.assertRaises(ConfigurationError, self._callFUT, info)
 
     def test_no_lookup(self):
         from pyramid.mako_templating import IMakoLookup
         self.config.add_settings({'mako.directories':self.templates_dir})
-        renderer = self._callFUT('helloworld.mak')
+        info = {'name':'helloworld.mak', 'package':None,
+                'registry':self.config.registry}
+        renderer = self._callFUT(info)
         lookup = self.config.registry.getUtility(IMakoLookup)
         self.assertEqual(lookup.directories, [self.templates_dir])
         self.assertEqual(lookup.filesystem_checks, False)
@@ -37,7 +41,9 @@ class Test_renderer_factory(Base, unittest.TestCase):
         from pyramid.mako_templating import IMakoLookup
         twice = self.templates_dir + '\n' + self.templates_dir
         self.config.add_settings({'mako.directories':twice})
-        self._callFUT('helloworld.mak')
+        info = {'name':'helloworld.mak', 'package':None,
+                'registry':self.config.registry}
+        self._callFUT(info)
         lookup = self.config.registry.getUtility(IMakoLookup)
         self.assertEqual(lookup.directories, [self.templates_dir]*2)
 
@@ -45,7 +51,9 @@ class Test_renderer_factory(Base, unittest.TestCase):
         from pyramid.mako_templating import IMakoLookup
         lookup = dict()
         self.config.registry.registerUtility(lookup, IMakoLookup)
-        renderer = self._callFUT('helloworld.mak')
+        info = {'name':'helloworld.mak', 'package':None,
+                'registry':self.config.registry}
+        renderer = self._callFUT(info)
         self.assertEqual(renderer.lookup, lookup)
         self.assertEqual(renderer.path, 'helloworld.mak')
 
@@ -163,8 +171,46 @@ class TestIntegration(unittest.TestCase):
     def test_template_not_found(self):
         from pyramid.renderers import render
         from mako.exceptions import TemplateLookupException
-        self.assertRaises(TemplateLookupException, render, 'helloworld_not_here.mak', {})
+        self.assertRaises(TemplateLookupException, render,
+                          'helloworld_not_here.mak', {})
 
+class TestPkgResourceTemplateLookup(unittest.TestCase):
+    def _makeOne(self, **kw):
+        from pyramid.mako_templating import PkgResourceTemplateLookup
+        return PkgResourceTemplateLookup(**kw)
+
+    def get_fixturedir(self):
+        import os
+        import pyramid.tests
+        return os.path.join(os.path.dirname(pyramid.tests.__file__), 'fixtures')
+
+    def test_adjust_uri_not_resource_spec(self):
+        inst = self._makeOne()
+        result = inst.adjust_uri('a', None)
+        self.assertEqual(result, '/a')
+
+    def test_adjust_uri_resource_spec(self):
+        inst = self._makeOne()
+        result = inst.adjust_uri('a:b', None)
+        self.assertEqual(result, 'a:b')
+
+    def test_get_template_not_resource_spec(self):
+        fixturedir = self.get_fixturedir()
+        inst = self._makeOne(directories=[fixturedir])
+        result = inst.get_template('helloworld.mak')
+        self.failIf(result is None)
+        
+    def test_get_template_resource_spec_with_filesystem_checks(self):
+        inst = self._makeOne(filesystem_checks=True)
+        result = inst.get_template('pyramid.tests:fixtures/helloworld.mak')
+        self.failIf(result is None)
+
+    def test_get_template_resource_spec_missing(self):
+        from mako.exceptions import TopLevelLookupException
+        fixturedir = self.get_fixturedir()
+        inst = self._makeOne(filesystem_checks=True, directories=[fixturedir])
+        self.assertRaises(TopLevelLookupException, inst.get_template,
+                          'pyramid.tests:fixtures/notthere.mak')
 
 class DummyLookup(object):
     def get_template(self, path):

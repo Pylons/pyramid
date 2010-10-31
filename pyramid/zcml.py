@@ -188,8 +188,9 @@ def view(
             raise ConfigurationError(
                 'request_type must be an interface, not %s' % request_type)
 
-    if renderer and '.' in renderer:
-        renderer = path_spec(_context, renderer)
+    if renderer is not None:
+        package = getattr(_context, 'package', None)
+        renderer = {'name':renderer, 'package':package}
 
     context = context or for_
 

@@ -70,7 +70,7 @@ def get_renderer(path):
        :func:`pyramid.renderers.get_renderer` instead.
     """
     package = caller_package()
-    factory = renderers.RendererHelper(path, package=package)
+    factory = renderers.RendererHelper(name=path, package=package)
     return factory.get_renderer()
 
 def get_template(path):
@@ -84,7 +84,7 @@ def get_template(path):
        :func:`pyramid.renderers.get_renderer` instead.
     """
     package = caller_package()
-    factory = renderers.RendererHelper(path, package=package)
+    factory = renderers.RendererHelper(name=path, package=package)
     return factory.get_renderer().implementation()
 
 def render_template(path, **kw):
@@ -100,7 +100,7 @@ def render_template(path, **kw):
     """
     package = caller_package()
     request = kw.pop('request', None)
-    renderer = renderers.RendererHelper(path, package=package)
+    renderer = renderers.RendererHelper(name=path, package=package)
     return renderer.render(kw, None, request=request)
 
 def render_template_to_response(path, **kw):
@@ -117,5 +117,5 @@ def render_template_to_response(path, **kw):
     """
     package = caller_package()
     request = kw.pop('request', None)
-    renderer = renderers.RendererHelper(path, package=package)
+    renderer = renderers.RendererHelper(name=path, package=package)
     return renderer.render_to_response(kw, None, request=request)

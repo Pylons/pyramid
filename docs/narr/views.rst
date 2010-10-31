@@ -738,9 +738,12 @@ following interface:
    :linenos:
 
    class RendererFactory:
-       def __init__(self, name):
-           """ Constructor: ``name`` may be an absolute path or a
-           resource specification """
+       def __init__(self, info):
+           """ Constructor: ``info`` will be a dictionary containing the
+           following keys: ``name`` (the renderer name), ``package``: the
+           package that was 'current' at the time the renderer was registered,
+           ``type``: the renderer type name, and ``registry``: the current
+           registry.  """
 
        def __call__(self, value, system):
            """ Call a the renderer implementation with the value and
@@ -752,18 +755,17 @@ following interface:
 
 There are essentially two different kinds of renderer factories:
 
-- A renderer factory which expects to accept a :term:`resource
-  specification` or an absolute path as the ``name`` value in its
-  constructor.  These renderer factories are registered with a
-  ``name`` value that begins with a dot (``.``).  These types of
-  renderer factories usually relate to a file on the filesystem, such
-  as a template.
+- A renderer factory which expects to accept a :term:`resource specification`
+  or an absolute path as the ``name`` value in the ``info`` value fed to its
+  constructor.  These renderer factories are registered with a ``name`` value
+  that begins with a dot (``.``).  These types of renderer factories usually
+  relate to a file on the filesystem, such as a template.
 
-- A renderer factory which expects to accept a token that does not
-  represent a filesystem path or a resource specification in its
-  constructor.  These renderer factories are registered with a
-  ``name`` value that does not begin with a dot.  These renderer
-  factories are typically object serializers.
+- A renderer factory which expects to accept a token that does not represent a
+  filesystem path or a resource specification in the ``name`` value of the
+  ``info`` dict fed to its constructor.  These renderer factories are
+  registered with a ``name`` value that does not begin with a dot.  These
+  renderer factories are typically object serializers.
 
 .. sidebar:: Resource Specifications
 
@@ -832,19 +834,17 @@ configuration`:
    def myview(request):
        return {'Hello':'world'}
 
-When a :term:`view configuration` which has a ``name`` attribute that
-does contain a dot, such as ``templates/mytemplate.jinja2`` above is
-encountered at startup time, the value of the name attribute is split
-on its final dot.  The second element of the split is typically the
-filename extension.  This extension is used to look up a renderer
-factory for the configured view.  Then the value of ``renderer`` is
-passed to the factory to create a renderer for the view.  In this
-case, the view configuration will create an instance of a
-``Jinja2Renderer`` for each view configuration which includes anything
-ending with ``.jinja2`` as its ``renderer`` value.  The ``name``
-passed to the ``Jinja2Renderer`` constructor will usually be a
-:term:`resource specification`, but may also be an absolute path; the
-renderer factory implementation should be able to deal with either.
+When a :term:`view configuration` which has a ``name`` attribute that does
+contain a dot, such as ``templates/mytemplate.jinja2`` above is encountered at
+startup time, the value of the name attribute is split on its final dot.  The
+second element of the split is typically the filename extension.  This
+extension is used to look up a renderer factory for the configured view.  Then
+the value of ``renderer`` is passed to the factory to create a renderer for the
+view.  In this case, the view configuration will create an instance of a
+``Jinja2Renderer`` for each view configuration which includes anything ending
+with ``.jinja2`` as its ``renderer`` value.  The ``name`` passed to the
+``Jinja2Renderer`` constructor will be whatever the user passed as
+``renderer=`` to the view configuration.
 
 See also :ref:`renderer_directive` and
 :meth:`pyramid.configuration.Configurator.add_renderer`.

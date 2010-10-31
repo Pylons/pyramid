@@ -306,18 +306,8 @@ class TestViewConfigDecorator(unittest.TestCase):
         settings = call_venusian(venusian)
         self.assertEqual(settings[0]['custom_predicates'], (1,))
 
-    def test_call_with_renderer_nodot(self):
-        decorator = self._makeOne(renderer='json')
-        venusian = DummyVenusian()
-        decorator.venusian = venusian
-        def foo(): pass
-        wrapped = decorator(foo)
-        self.failUnless(wrapped is foo)
-        settings = call_venusian(venusian)
-        self.assertEqual(len(settings), 1)
-        self.assertEqual(settings[0]['renderer'], 'json')
-
-    def test_call_with_renderer_relpath(self):
+    def test_call_with_renderer_string(self):
+        import pyramid.tests
         decorator = self._makeOne(renderer='fixtures/minimal.pt')
         venusian = DummyVenusian()
         decorator.venusian = venusian
@@ -326,12 +316,14 @@ class TestViewConfigDecorator(unittest.TestCase):
         self.failUnless(wrapped is foo)
         settings = call_venusian(venusian)
         self.assertEqual(len(settings), 1)
-        self.assertEqual(settings[0]['renderer'],
-                         'pyramid.tests:fixtures/minimal.pt')
+        renderer = settings[0]['renderer']
+        self.assertEqual(renderer,
+                         {'name':'fixtures/minimal.pt',
+                          'package':pyramid.tests,
+                          })
 
-    def test_call_with_renderer_pkgpath(self):
-        decorator = self._makeOne(
-            renderer='pyramid.tests:fixtures/minimal.pt')
+    def test_call_with_renderer_dict(self):
+        decorator = self._makeOne(renderer={'a':1})
         venusian = DummyVenusian()
         decorator.venusian = venusian
         def foo(): pass
@@ -339,8 +331,7 @@ class TestViewConfigDecorator(unittest.TestCase):
         self.failUnless(wrapped is foo)
         settings = call_venusian(venusian)
         self.assertEqual(len(settings), 1)
-        self.assertEqual(settings[0]['renderer'],
-                         'pyramid.tests:fixtures/minimal.pt')
+        self.assertEqual(settings[0]['renderer'], {'a':1})
 
 class Test_append_slash_notfound_view(BaseTest, unittest.TestCase):
     def _callFUT(self, context, request):

@@ -283,7 +283,7 @@ class Configurator(object):
         return resolve_resource_spec(path_or_spec, self.package_name)
 
     def _derive_view(self, view, permission=None, predicates=(),
-                     attr=None, renderer_name=None, wrapper_viewname=None,
+                     attr=None, renderer=None, wrapper_viewname=None,
                      viewname=None, accept=None, order=MAX_ORDER,
                      phash=DEFAULT_PHASH):
         view = self.maybe_dotted(view)
@@ -291,8 +291,7 @@ class Configurator(object):
         authz_policy = self.registry.queryUtility(IAuthorizationPolicy)
         settings = self.registry.queryUtility(ISettings)
         logger = self.registry.queryUtility(IDebugLogger)
-        mapped_view = _map_view(view, attr, renderer_name, self.registry,
-                                self.package)
+        mapped_view = _map_view(view, attr, renderer, self.registry)
         owrapped_view = _owrap_view(mapped_view, viewname, wrapper_viewname)
         secured_view = _secure_view(owrapped_view, permission,
                                     authn_policy, authz_policy)
@@ -543,7 +542,9 @@ class Configurator(object):
         supplied, the user-supplied view must itself return a
         :term:`response` object.  """
 
-        return self._derive_view(view, attr=attr, renderer_name=renderer)
+        if renderer is not None and not isinstance(renderer, dict):
+            renderer = {'name':renderer, 'package':self.package}
+        return self._derive_view(view, attr=attr, renderer=renderer)
 
     def add_subscriber(self, subscriber, iface=None, info=u''):
         """Add an event :term:`subscriber` for the event stream
@@ -1071,6 +1072,9 @@ class Configurator(object):
         if permission is None:
             # intent: will be None if no default permission is registered
             permission = self.registry.queryUtility(IDefaultPermission)
+
+        if renderer is not None and not isinstance(renderer, dict):
+            renderer = {'name':renderer, 'package':self.package}
 
         # NO_PERMISSION_REQUIRED handled by _secure_view
         derived_view = self._derive_view(view, permission, predicates, attr,
@@ -1687,7 +1691,9 @@ class Configurator(object):
         The ``wrapper`` argument should be the name of another view
         which will wrap this view when rendered (see the ``add_view``
         method's ``wrapper`` argument for a description)."""
-        view = self._derive_view(view, attr=attr, renderer_name=renderer)
+        if renderer is not None and not isinstance(renderer, dict):
+            renderer = {'name':renderer, 'package':self.package}
+        view = self._derive_view(view, attr=attr, renderer=renderer)
         def bwcompat_view(context, request):
             context = getattr(request, 'context', None)
             return view(context, request)
@@ -1724,7 +1730,9 @@ class Configurator(object):
         which will wrap this view when rendered (see the ``add_view``
         method's ``wrapper`` argument for a description).
         """
-        view = self._derive_view(view, attr=attr, renderer_name=renderer)
+        if renderer is not None and not isinstance(renderer, dict):
+            renderer = {'name':renderer, 'package':self.package}
+        view = self._derive_view(view, attr=attr, renderer=renderer)
         def bwcompat_view(context, request):
             context = getattr(request, 'context', None)
             return view(context, request)
@@ -2090,18 +2098,18 @@ class Configurator(object):
 
         """
         from pyramid.testing import DummyRendererFactory
-        helper = RendererHelper(path, registry=self.registry)
+        helper = RendererHelper(name=path, registry=self.registry)
         factory = helper.factory
         if not isinstance(factory, DummyRendererFactory):
-            factory = DummyRendererFactory(helper.renderer_type,
+            factory = DummyRendererFactory(helper.type,
                                            helper.factory)
             self.registry.registerUtility(factory, IRendererFactory,
-                                          name=helper.renderer_type)
+                                          name=helper.type)
 
         from pyramid.testing import DummyTemplateRenderer
         if renderer is None:
             renderer = DummyTemplateRenderer()
-        factory.add(helper.renderer_name, renderer)
+        factory.add(helper.name, renderer)
         return renderer
 
     testing_add_template = testing_add_renderer
@@ -2426,15 +2434,15 @@ def is_response(ob):
         return True
     return False
 
-def _map_view(view, attr=None, renderer_name=None, registry=None,
-              package=None):
+def _map_view(view, attr=None, renderer=None, registry=None):
     wrapped_view = view
 
     helper = None
-    if renderer_name:
-        helper = RendererHelper(renderer_name,
-                                registry=registry,
-                                package=package)
+
+    if renderer is not None:
+        helper = RendererHelper(renderer['name'],
+                                package=renderer['package'],
+                                registry=registry)
 
     if inspect.isclass(view):
         # If the object we've located is a class, turn it into a
@@ -2454,8 +2462,13 @@ def _map_view(view, attr=None, renderer_name=None, registry=None,
                     response = getattr(inst, attr)()
                 if helper is not None:
                     if not is_response(response):
-                        system = {'view':inst, 'renderer_name':renderer_name,
-                                  'context':context, 'request':request}
+                        system = {
+                            'view':inst,
+                            'renderer_name':renderer['name'], # b/c
+                            'renderer_info':renderer,
+                            'context':context,
+                            'request':request
+                            }
                         response = helper.render_to_response(response, system,
                                                              request=request)
                 return response
@@ -2470,8 +2483,12 @@ def _map_view(view, attr=None, renderer_name=None, registry=None,
                     response = getattr(inst, attr)()
                 if helper is not None:
                     if not is_response(response):
-                        system = {'view':inst, 'renderer_name':renderer_name,
-                                  'context':context, 'request':request}
+                        system = {'view':inst,
+                                  'renderer_name':renderer['name'], # b/c
+                                  'renderer_info':renderer,
+                                  'context':context,
+                                  'request':request
+                                  }
                         response = helper.render_to_response(response, system,
                                                              request=request)
                 return response
@@ -2488,8 +2505,13 @@ def _map_view(view, attr=None, renderer_name=None, registry=None,
 
             if helper is not None:
                 if not is_response(response):
-                    system = {'view':view, 'renderer_name':renderer_name,
-                              'context':context, 'request':request}
+                    system = {
+                        'view':view,
+                        'renderer_name':renderer['name'],
+                        'renderer_info':renderer,
+                        'context':context,
+                        'request':request
+                        }
                     response = helper.render_to_response(response, system,
                                                          request=request)
             return response
@@ -2500,8 +2522,13 @@ def _map_view(view, attr=None, renderer_name=None, registry=None,
             response = getattr(view, attr)(context, request)
             if helper is not None:
                 if not is_response(response):
-                    system = {'view':view, 'renderer_name':renderer_name,
-                              'context':context, 'request':request}
+                    system = {
+                        'view':view,
+                        'renderer_name':renderer['name'],
+                        'renderer_info':renderer,
+                        'context':context,
+                        'request':request
+                        }
                     response = helper.render_to_response(response, system,
                                                          request=request)
             return response
@@ -2511,8 +2538,13 @@ def _map_view(view, attr=None, renderer_name=None, registry=None,
         def _rendered_view(context, request):
             response = view(context, request)
             if not is_response(response):
-                system = {'view':view, 'renderer_name':renderer_name,
-                          'context':context, 'request':request}
+                system = {
+                    'view':view,
+                    'renderer_name':renderer['name'], # b/c
+                    'renderer_info':renderer,
+                    'context':context,
+                    'request':request
+                    }
                 response = helper.render_to_response(response, system,
                                                      request=request)
             return response

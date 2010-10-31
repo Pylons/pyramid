@@ -710,7 +710,8 @@ class DummyRendererFactory(object):
             package, relative = spec.split(':', 1)
             self.renderers[relative] = renderer
 
-    def __call__(self, spec):
+    def __call__(self, info):
+        spec = info['name']
         renderer = self.renderers.get(spec)
         if renderer is None:
             if ':' in spec:
@@ -718,7 +719,7 @@ class DummyRendererFactory(object):
                 renderer = self.renderers.get(relative)
             if renderer is None:
                 if self.factory:
-                    renderer = self.factory(spec)
+                    renderer = self.factory(info)
                 else:
                     raise KeyError('No testing renderer registered for %r' %
                                    spec)

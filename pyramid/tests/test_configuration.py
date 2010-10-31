@@ -13,8 +13,8 @@ class ConfiguratorTests(unittest.TestCase):
         from zope.interface import implements
         class Renderer:
             implements(ITemplateRenderer)
-            def __init__(self, path):
-                self.__class__.path = path
+            def __init__(self, info):
+                self.__class__.info = info
             def __call__(self, *arg):
                 return 'Hello!'
         config.registry.registerUtility(Renderer, IRendererFactory, name=name)
@@ -1353,6 +1353,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(ctx, request), 'view8')
 
     def test_add_view_with_template_renderer(self):
+        import pyramid.tests
         class view(object):
             def __init__(self, context, request):
                 self.request = request
@@ -1368,9 +1369,13 @@ class ConfiguratorTests(unittest.TestCase):
         request = self._makeRequest(config)
         result = wrapper(None, request)
         self.assertEqual(result.body, 'Hello!')
-        self.assertEqual(renderer.path, 'pyramid.tests:fixtures/minimal.txt')
+        self.assertEqual(renderer.info,
+                         {'registry':config.registry, 'type': '.txt',
+                          'name': 'pyramid.tests:fixtures/minimal.txt',
+                          'package': pyramid.tests})
 
     def test_add_view_with_template_renderer_no_callable(self):
+        import pyramid.tests
         config = self._makeOne()
         renderer = self._registerRenderer(config)
         fixture = 'pyramid.tests:fixtures/minimal.txt'
@@ -1379,7 +1384,12 @@ class ConfiguratorTests(unittest.TestCase):
         request = self._makeRequest(config)
         result = wrapper(None, request)
         self.assertEqual(result.body, 'Hello!')
-        self.assertEqual(renderer.path, 'pyramid.tests:fixtures/minimal.txt')
+        self.assertEqual(renderer.info,
+                         {'registry':config.registry,
+                          'type': '.txt',
+                          'name': 'pyramid.tests:fixtures/minimal.txt',
+                          'package':pyramid.tests}
+                         )
 
     def test_add_view_with_request_type_as_iface(self):
         from zope.interface import directlyProvides
@@ -3257,8 +3267,8 @@ class Test__map_view(unittest.TestCase):
     def test__map_view_as_function_with_attr_and_renderer(self):
         renderer = self._registerRenderer()
         view = lambda *arg: 'OK'
-        result = self._callFUT(view, attr='__name__',
-                               renderer_name=renderer.spec)
+        info = {'name':renderer.spec, 'package':None}
+        result = self._callFUT(view, attr='__name__', renderer=info)
         self.failIf(result is view)
         self.assertRaises(TypeError, result, None, None)
         
@@ -3316,7 +3326,8 @@ class Test__map_view(unittest.TestCase):
                 pass
             def index(self):
                 return {'a':'1'}
-        result = self._callFUT(view, attr='index', renderer_name=renderer.spec)
+        info = {'name':renderer.spec, 'package':None}
+        result = self._callFUT(view, attr='index', renderer=info)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -3357,7 +3368,8 @@ class Test__map_view(unittest.TestCase):
                 pass
             def index(self):
                 return {'a':'1'}
-        result = self._callFUT(view, attr='index', renderer_name=renderer.spec)
+        info = {'name':renderer.spec, 'package':None}
+        result = self._callFUT(view, attr='index', renderer=info)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -3398,7 +3410,8 @@ class Test__map_view(unittest.TestCase):
                 pass
             def index(self):
                 return {'a':'1'}
-        result = self._callFUT(view, attr='index', renderer_name=renderer.spec)
+        info = {'name':renderer.spec, 'package':None}
+        result = self._callFUT(view, attr='index', renderer=info)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -3439,7 +3452,8 @@ class Test__map_view(unittest.TestCase):
                 pass
             def index(self):
                 return {'a':'1'}
-        result = self._callFUT(view, attr='index', renderer_name=renderer.spec)
+        info = {'name':renderer.spec, 'package':None}
+        result = self._callFUT(view, attr='index', renderer=info)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -3471,7 +3485,8 @@ class Test__map_view(unittest.TestCase):
             def index(self, context, request):
                 return {'a':'1'}
         view = View()
-        result = self._callFUT(view, attr='index', renderer_name=renderer.spec)
+        info = {'name':renderer.spec, 'package':None}
+        result = self._callFUT(view, attr='index', renderer=info)
         self.failIf(result is view)
         request = self._makeRequest()
         self.assertEqual(result(None, request).body, 'Hello!')
@@ -3506,7 +3521,8 @@ class Test__map_view(unittest.TestCase):
             def index(self, request):
                 return {'a':'1'}
         view = View()
-        result = self._callFUT(view, attr='index', renderer_name=renderer.spec)
+        info = {'name':renderer.spec, 'package':None}
+        result = self._callFUT(view, attr='index', renderer=info)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -3518,7 +3534,8 @@ class Test__map_view(unittest.TestCase):
         renderer = self._registerRenderer()
         def view(context, request):
             return {'a':'1'}
-        result = self._callFUT(view, renderer_name=renderer.spec)
+        info = {'name':renderer.spec, 'package':None}
+        result = self._callFUT(view, renderer=info)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -3529,26 +3546,14 @@ class Test__map_view(unittest.TestCase):
         renderer = self._registerRenderer()
         def view(context, request):
             return {'a':'1'}
-        result = self._callFUT(view, renderer_name=renderer.spec,
+        info = {'name':renderer.spec, 'package':None}
+        result = self._callFUT(view, renderer=info,
                                registry=self.registry)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         request = self._makeRequest()
         self.assertEqual(result(None, request).body, 'Hello!')
-
-    def test__map_view_with_package(self):
-        renderer = self._registerRenderer()
-        def view(context, request):
-            return {'a':'1'}
-        result = self._callFUT(view, renderer_name=renderer.spec,
-                               package='pyramid')
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        request = self._makeRequest()
-        self.assertEqual(result(None, request).body, 'Hello!')
-        self.assertEqual(renderer.path, 'pyramid:abc.txt')
 
 class Test_decorate_view(unittest.TestCase):
     def _callFUT(self, wrapped, original):

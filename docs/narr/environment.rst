@@ -195,7 +195,7 @@ should be changed accordingly.
 +-----------------------------+
 | Config File Setting Name    |
 +=============================+
-|  ``mako.input_encoding``__  |
+|  ``mako.input_encoding``    |
 |                             |
 |                             |
 |                             |

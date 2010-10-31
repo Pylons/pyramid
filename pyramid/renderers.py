@@ -4,19 +4,18 @@ import threading
 
 from webob import Response
 
-from zope.deprecation import deprecated
-
 from pyramid.interfaces import IRendererGlobalsFactory
 from pyramid.interfaces import IRendererFactory
 from pyramid.interfaces import IResponseFactory
 from pyramid.interfaces import ITemplateRenderer
 
 from pyramid.compat import json
+from pyramid.decorator import reify
 from pyramid.path import caller_package
+from pyramid.path import package_path
+from pyramid.resource import resource_spec_from_abspath
 from pyramid.settings import get_settings
 from pyramid.threadlocal import get_current_registry
-from pyramid.resource import resolve_resource_spec
-from pyramid.decorator import reify
 
 # API
 
@@ -60,7 +59,8 @@ def render(renderer_name, value, request=None, package=None):
         registry = None
     if package is None:
         package = caller_package()
-    renderer = RendererHelper(renderer_name, package=package, registry=registry)
+    renderer = RendererHelper(name=renderer_name, package=package,
+                              registry=registry)
     return renderer.render(value, None, request=request)
 
 def render_to_response(renderer_name, value, request=None, package=None):
@@ -102,7 +102,8 @@ def render_to_response(renderer_name, value, request=None, package=None):
         registry = None
     if package is None:
         package = caller_package()
-    renderer = RendererHelper(renderer_name, package=package, registry=registry)
+    renderer = RendererHelper(name=renderer_name, package=package,
+                              registry=registry)
     return renderer.render_to_response(value, None, request=request)
 
 def get_renderer(renderer_name, package=None):
@@ -119,13 +120,13 @@ def get_renderer(renderer_name, package=None):
     """
     if package is None:
         package = caller_package()
-    renderer = RendererHelper(renderer_name, package=package)
+    renderer = RendererHelper(name=renderer_name, package=package)
     return renderer.get_renderer()
 
 
 # concrete renderer factory implementations (also API)
 
-def json_renderer_factory(name):
+def json_renderer_factory(info):
     def _render(value, system):
         request = system.get('request')
         if request is not None:
@@ -134,7 +135,7 @@ def json_renderer_factory(name):
         return json.dumps(value)
     return _render
 
-def string_renderer_factory(name):
+def string_renderer_factory(info):
     def _render(value, system):
         if not isinstance(value, basestring):
             value = str(value)
@@ -152,8 +153,19 @@ def string_renderer_factory(name):
 # at runtime, from more than a single thread.
 registry_lock = threading.Lock() 
 
-def template_renderer_factory(spec, impl, lock=registry_lock):
-    reg = get_current_registry()
+def template_renderer_factory(info, impl, lock=registry_lock):
+    reg = info['registry']
+    spec = info['name']
+    package = info['package']
+    isabs = os.path.isabs(spec)
+
+    if (not isabs) and (not ':' in spec) and package:
+        # relative resource spec
+        if not isabs:
+            pp = package_path(package)
+            spec = os.path.join(pp, spec)
+        spec = resource_spec_from_abspath(spec, package)
+    
     if os.path.isabs(spec):
         # 'spec' is an absolute filename
         if not os.path.exists(spec):
@@ -197,67 +209,39 @@ def _reload_resources():
     settings = get_settings()
     return settings and settings.get('reload_resources')
 
-def renderer_from_name(path, package=None):
-    return RendererHelper(path, package=package).get_renderer()
-
-def rendered_response(renderer, result, view, context, request, renderer_name):
-    # XXX: deprecated, left here only to not break old code; use
-    # render_to_response instead
-    if ( hasattr(result, 'app_iter') and hasattr(result, 'headerlist')
-         and hasattr(result, 'status') ):
-        return result
-
-    system = {'view':view, 'renderer_name':renderer_name,
-              'context':context, 'request':request}
-
-    helper = RendererHelper(renderer_name)
-    helper.renderer = renderer
-    return helper.render_to_response(result, system, request=request)
-
-deprecated('rendered_response',
-    "('pyramid.renderers.rendered_response' is not a public API; it is  "
-    "officially deprecated as of pyramid 1.0; "
-    "use pyramid.renderers.render_to_response instead')",
-    )
+def renderer_from_name(path, package=None): # XXX deprecate?
+    return RendererHelper(name=path, package=package).get_renderer()
 
 class RendererHelper(object):
-    def __init__(self, renderer_name, registry=None, package=None):
+    def __init__(self, name=None, package=None, registry=None):
         if registry is None:
             registry = get_current_registry()
-        self.registry = registry
-        self.package = package
-        if renderer_name is None:
-            factory = registry.queryUtility(IRendererFactory)
-            renderer_type = None
+
+        if name and '.' in name:
+            rtype = os.path.splitext(name)[1]
         else:
-            if '.' in renderer_name:
-                renderer_type = os.path.splitext(renderer_name)[1]
-                renderer_name = self.resolve_spec(renderer_name)
-            else:
-                renderer_type = renderer_name
-                renderer_name = renderer_name
-            factory = registry.queryUtility(IRendererFactory,
-                                            name=renderer_type)
-        self.renderer_name = renderer_name
-        self.renderer_type = renderer_type
+            rtype = name
+
+        factory = registry.queryUtility(IRendererFactory, name=rtype)
+
+        self.name = name
+        self.package = package
+        self.type = rtype
         self.factory = factory
+        self.registry = registry
 
     @reify
     def renderer(self):
         if self.factory is None:
-            raise ValueError('No such renderer factory %s' % str(self.renderer_type))
-        return self.factory(self.renderer_name)
-
-    def resolve_spec(self, path_or_spec):
-        if path_or_spec is None:
-            return path_or_spec
-
-        package, filename = resolve_resource_spec(path_or_spec,
-                                                  self.package)
-        if package is None:
-            return filename # absolute filename
-        return '%s:%s' % (package, filename)
-
+            raise ValueError(
+                'No such renderer factory %s' % str(self.type))
+        return self.factory({
+            'name':self.name,
+            'type':self.type,
+            'package':self.package,
+            'registry':self.registry
+            })
+    
     def get_renderer(self):
         return self.renderer
 
@@ -266,7 +250,9 @@ class RendererHelper(object):
         if system_values is None:
             system_values = {
                 'view':None,
-                'renderer_name':self.renderer_name,
+                'renderer_name':self.name,
+                'renderer_type':self.type,
+                'renderer_package':self.package,
                 'context':getattr(request, 'context', None),
                 'request':request,
                 }

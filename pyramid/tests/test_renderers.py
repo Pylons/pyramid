@@ -5,7 +5,7 @@ from pyramid import testing
 
 class TestTemplateRendererFactory(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        self.config = cleanUp()
 
     def tearDown(self):
         cleanUp()
@@ -18,7 +18,9 @@ class TestTemplateRendererFactory(unittest.TestCase):
         from pyramid.interfaces import ITemplateRenderer
         abspath = '/wont/exist'
         testing.registerUtility({}, ITemplateRenderer, name=abspath)
-        self.assertRaises(ValueError, self._callFUT, abspath, None)
+        info = {'name':abspath, 'package':None,
+                'registry':self.config.registry}
+        self.assertRaises(ValueError, self._callFUT, info, None)
 
     def test_abspath_alreadyregistered(self):
         from pyramid.interfaces import ITemplateRenderer
@@ -26,7 +28,9 @@ class TestTemplateRendererFactory(unittest.TestCase):
         abspath = os.path.abspath(__file__)
         renderer = {}
         testing.registerUtility(renderer, ITemplateRenderer, name=abspath)
-        result = self._callFUT(abspath, None)
+        info = {'name':abspath, 'package':None,
+                'registry':self.config.registry}
+        result = self._callFUT(info, None)
         self.failUnless(result is renderer)
 
     def test_abspath_notyetregistered(self):
@@ -35,26 +39,37 @@ class TestTemplateRendererFactory(unittest.TestCase):
         abspath = os.path.abspath(__file__)
         renderer = {}
         testing.registerUtility(renderer, ITemplateRenderer, name=abspath)
-        result = self._callFUT(abspath, None)
+        info = {'name':abspath, 'package':None,
+                'registry':self.config.registry}
+        result = self._callFUT(info, None)
         self.failUnless(result is renderer)
 
     def test_relpath_path_registered(self):
         renderer = {}
         from pyramid.interfaces import ITemplateRenderer
         testing.registerUtility(renderer, ITemplateRenderer, name='foo/bar')
-        result = self._callFUT('foo/bar', None)
+        spec = 'foo/bar'
+        info = {'name':spec, 'package':None,
+                'registry':self.config.registry}
+        result = self._callFUT(info, None)
         self.failUnless(renderer is result)
 
-    def test_relpath_is_package_registered(self):
+    def test_relpath_has_package_registered(self):
         renderer = {}
         from pyramid.interfaces import ITemplateRenderer
-        testing.registerUtility(renderer, ITemplateRenderer, name='foo:bar/baz')
-        result = self._callFUT('foo:bar/baz', None)
+        import pyramid.tests
+        spec = 'bar/baz'
+        testing.registerUtility(renderer, ITemplateRenderer,
+                                name='pyramid.tests:bar/baz')
+        info = {'name':spec, 'package':pyramid.tests,
+                'registry':self.config.registry}
+        result = self._callFUT(info, None)
         self.failUnless(renderer is result)
 
     def test_spec_notfound(self):
-        self.assertRaises(ValueError, self._callFUT,
-                          'pyramid.tests:wont/exist', None)
+        spec = 'pyramid.tests:wont/exist'
+        info = {'name':spec, 'package':None, 'registry':self.config.registry}
+        self.assertRaises(ValueError, self._callFUT, info, None)
 
     def test_spec_alreadyregistered(self):
         from pyramid.interfaces import ITemplateRenderer
@@ -62,9 +77,10 @@ class TestTemplateRendererFactory(unittest.TestCase):
         module_name = tests.__name__
         relpath = 'test_renderers.py'
         spec = '%s:%s' % (module_name, relpath)
+        info = {'name':spec, 'package':None, 'registry':self.config.registry}
         renderer = {}
         testing.registerUtility(renderer, ITemplateRenderer, name=spec)
-        result = self._callFUT(spec, None)
+        result = self._callFUT(info, None)
         self.failUnless(result is renderer)
 
     def test_spec_notyetregistered(self):
@@ -75,7 +91,8 @@ class TestTemplateRendererFactory(unittest.TestCase):
         renderer = {}
         factory = DummyFactory(renderer)
         spec = '%s:%s' % (module_name, relpath)
-        result = self._callFUT(spec, factory)
+        info = {'name':spec, 'package':None, 'registry':self.config.registry}
+        result = self._callFUT(info, factory)
         self.failUnless(result is renderer)
         path = os.path.abspath(__file__)
         if path.endswith('pyc'): # pragma: no cover
@@ -84,6 +101,7 @@ class TestTemplateRendererFactory(unittest.TestCase):
         self.assertEqual(factory.kw, {})
 
     def test_reload_resources_true(self):
+        import pyramid.tests
         from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import ISettings
         from pyramid.interfaces import ITemplateRenderer
@@ -91,7 +109,10 @@ class TestTemplateRendererFactory(unittest.TestCase):
         testing.registerUtility(settings, ISettings)
         renderer = {}
         factory = DummyFactory(renderer)
-        result = self._callFUT('pyramid.tests:test_renderers.py', factory)
+        spec = 'test_renderers.py'
+        info = {'name':spec, 'package':pyramid.tests,
+                'registry':self.config.registry}
+        result = self._callFUT(info, factory)
         self.failUnless(result is renderer)
         spec = '%s:%s' % ('pyramid.tests', 'test_renderers.py')
         reg = get_current_registry()
@@ -99,6 +120,7 @@ class TestTemplateRendererFactory(unittest.TestCase):
                          None)
 
     def test_reload_resources_false(self):
+        import pyramid.tests
         from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import ISettings
         from pyramid.interfaces import ITemplateRenderer
@@ -106,7 +128,10 @@ class TestTemplateRendererFactory(unittest.TestCase):
         testing.registerUtility(settings, ISettings)
         renderer = {}
         factory = DummyFactory(renderer)
-        result = self._callFUT('pyramid.tests:test_renderers.py', factory)
+        spec = 'test_renderers.py'
+        info = {'name':spec, 'package':pyramid.tests,
+                'registry':self.config.registry}
+        result = self._callFUT(info, factory)
         self.failUnless(result is renderer)
         spec = '%s:%s' % ('pyramid.tests', 'test_renderers.py')
         reg = get_current_registry()
@@ -125,24 +150,39 @@ class TestRendererFromName(unittest.TestCase):
         return renderer_from_name(path, package)
 
     def test_it(self):
+        from pyramid.threadlocal import get_current_registry
+        registry = get_current_registry()
         from pyramid.interfaces import IRendererFactory
         import os
         here = os.path.dirname(os.path.abspath(__file__))
         fixture = os.path.join(here, 'fixtures/minimal.pt')
-        def factory(path, **kw):
-            return path
+        def factory(info, **kw):
+            return info
         testing.registerUtility(factory, IRendererFactory, name='.pt')
         result = self._callFUT(fixture)
-        self.assertEqual(result, fixture)
+        self.assertEqual(result, {'registry':registry,
+                                  'type':'.pt',
+                                  'package':None,
+                                  'name':fixture,
+                                  })
 
-    def test_with_package(self):
+    def test_it_with_package(self):
+        import pyramid
+        from pyramid.threadlocal import get_current_registry
+        registry = get_current_registry()
         from pyramid.interfaces import IRendererFactory
-        def factory(path, **kw):
-            return path
+        import os
+        here = os.path.dirname(os.path.abspath(__file__))
+        fixture = os.path.join(here, 'fixtures/minimal.pt')
+        def factory(info, **kw):
+            return info
         testing.registerUtility(factory, IRendererFactory, name='.pt')
-        import pyramid.tests
-        result = self._callFUT('fixtures/minimal.pt', pyramid.tests)
-        self.assertEqual(result, 'pyramid.tests:fixtures/minimal.pt')
+        result = self._callFUT(fixture, pyramid)
+        self.assertEqual(result, {'registry':registry,
+                                  'type':'.pt',
+                                  'package':pyramid,
+                                  'name':fixture,
+                                  })
 
     def test_it_no_renderer(self):
         self.assertRaises(ValueError, self._callFUT, 'foo')
@@ -207,42 +247,6 @@ class Test_string_renderer_factory(unittest.TestCase):
         renderer(None, {'request':request})
         self.assertEqual(request.response_content_type, 'text/mishmash')
 
-class Test_rendered_response(unittest.TestCase):
-    def setUp(self):
-        testing.setUp()
-        from zope.deprecation import __show__
-        __show__.off()
-
-    def tearDown(self):
-        testing.tearDown()
-        from zope.deprecation import __show__
-        __show__.on()
-
-    def _callFUT(self, renderer, response, view=None,
-                 context=None, request=None, renderer_name=None):
-        from pyramid.renderers import rendered_response
-        if request is None:
-            request = testing.DummyRequest()
-        return rendered_response(renderer, response, view,
-                                 context, request, renderer_name)
-
-    def _makeRenderer(self):
-        def renderer(*arg):
-            return 'Hello!'
-        return renderer
-
-    def test_is_response(self):
-        renderer = self._makeRenderer()
-        response = DummyResponse()
-        result = self._callFUT(renderer, response)
-        self.assertEqual(result, response)
-
-    def test_calls_renderer(self):
-        renderer = self._makeRenderer()
-        response = {'a':'1'}
-        result = self._callFUT(renderer, response)
-        self.assertEqual(result.body, 'Hello!')
-
 
 class TestRendererHelper(unittest.TestCase):
     def setUp(self):
@@ -264,26 +268,6 @@ class TestRendererHelper(unittest.TestCase):
         self.config.registry.registerUtility(renderer, IRendererFactory,
                                              name='.foo')
         return renderer
-
-    def test_resolve_spec_path_is_None(self):
-        helper = self._makeOne('loo.foo')
-        result = helper.resolve_spec(None)
-        self.assertEqual(result, None)
-
-    def test_resolve_spec_package_is_None(self):
-        helper = self._makeOne('loo.foo')
-        result = helper.resolve_spec('/foo/bar')
-        self.assertEqual(result, '/foo/bar')
-
-    def test_resolve_spec_absolute(self):
-        helper = self._makeOne('loo.foo')
-        result = helper.resolve_spec('pyramid:flub')
-        self.assertEqual(result, 'pyramid:flub')
-
-    def test_resolve_spec_relative(self):
-        helper = self._makeOne('loo.foo', package='pyramid')
-        result = helper.resolve_spec('flub')
-        self.assertEqual(result, 'pyramid:flub')
 
     def test_render_to_response(self):
         self._registerRendererFactory()
@@ -314,8 +298,12 @@ class TestRendererHelper(unittest.TestCase):
         request.context = context
         helper = self._makeOne('loo.foo')
         result = helper.render('values', None, request=request)
-        system = {'request':request, 'context':context,
-                  'renderer_name':'loo.foo', 'view':None}
+        system = {'request':request,
+                  'context':context,
+                  'renderer_name':'loo.foo',
+                  'view':None,
+                  'renderer_type':'.foo',
+                  'renderer_package':None}
         self.assertEqual(result, ('values', system))
 
     def test_render_renderer_globals_factory_active(self):

@@ -655,22 +655,26 @@ class TestDummyRendererFactory(unittest.TestCase):
     def test_call(self):
         f = self._makeOne('name', None)
         f.renderers['spec'] = 'renderer'
-        self.assertEqual(f('spec'), 'renderer')
+        info = {'name':'spec'}
+        self.assertEqual(f(info), 'renderer')
         
     def test_call2(self):
         f = self._makeOne('name', None)
         f.renderers['spec'] = 'renderer'
-        self.assertEqual(f('spec:spec'), 'renderer')
+        info = {'name':'spec:spec'}
+        self.assertEqual(f(info), 'renderer')
 
     def test_call3(self):
         def factory(spec):
             return 'renderer'
         f = self._makeOne('name', factory)
-        self.assertEqual(f('spec'), 'renderer')
+        info = {'name':'spec'}
+        self.assertEqual(f(info), 'renderer')
 
     def test_call_miss(self):
         f = self._makeOne('name', None)
-        self.assertRaises(KeyError, f, 'spec')
+        info = {'name':'spec'}
+        self.assertRaises(KeyError, f, info)
 
 class TestMockTemplate(unittest.TestCase):
     def _makeOne(self, response):

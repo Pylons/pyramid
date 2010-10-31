@@ -1,5 +1,4 @@
 import mimetypes
-import os
 
 # See http://bugs.python.org/issue5853 which is a recursion bug
 # that seems to effect Python 2.6, Python 2.6.1, and 2.6.2 (a fix
@@ -21,8 +20,6 @@ from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
 
-from pyramid.path import package_path
-from pyramid.resource import resource_spec_from_abspath
 from pyramid.static import static_view as static # B/C
 from pyramid.threadlocal import get_current_registry
 
@@ -417,19 +414,10 @@ class view_config(object):
             if settings['attr'] is None:
                 settings['attr'] = wrapped.__name__
 
-        # try to convert the renderer provided into a fully qualified
-        # resource specification
-        abspath = settings.get('renderer')
-        if abspath is not None and '.' in abspath:
-            isabs = os.path.isabs(abspath)
-            if not (':' in abspath and not isabs):
-                # not already a resource spec
-                if not isabs:
-                    pp = package_path(info.module)
-                    abspath = os.path.join(pp, abspath)
-                resource = resource_spec_from_abspath(abspath, info.module)
-                settings['renderer'] = resource
-
+        renderer_name = settings.get('renderer')
+        if renderer_name is not None and not isinstance(renderer_name, dict):
+            settings['renderer'] = {'name':renderer_name,
+                                    'package':info.module}
         return wrapped
 
 bfg_view = view_config # permanent b/c
