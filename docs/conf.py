@@ -93,17 +93,20 @@ add_module_names = False
 #show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = book and 'bw' or 'tango'
+#pygments_style = book and 'bw' or 'tango'
 
 # Options for HTML output
 # -----------------------
 
-html_theme = "nature"
+# Add and use Pylons theme
+sys.path.append(os.path.abspath('_themes'))
+html_theme_path = ['_themes']
+html_theme = 'pylons'
 
 # The style sheet to use for HTML and HTML Help pages. A file of that name
 # must exist either in Sphinx' static/ path, or in one of the custom paths
 # given in html_static_path.
-html_style = 'pyramid.css'
+#html_style = 'pyramid.css'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -114,12 +117,12 @@ html_title = 'The Pyramid Web Application Development Framework v%s' % release
 
 # The name of an image file (within the static path) to place at the top of
 # the sidebar.
-html_logo = '_static/pyramid.png'
+#html_logo = '_static/pylons.png'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-#html_favicon = None
+#html_favicon = '_static/favicon.ico'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
