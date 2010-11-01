@@ -29,3 +29,6 @@ Other Interfaces
 
   .. autointerface:: ISessionFactory
 
+  .. autointerface:: IRendererInfo
+
+

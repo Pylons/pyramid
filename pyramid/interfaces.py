@@ -492,6 +492,9 @@ class ISession(Interface):
 NO_PERMISSION_REQUIRED = '__no_permission_required__'
 
 class IRendererInfo(Interface):
+    """ An object implementing this interface is passed to every
+    :term:`renderer factory` constructor as its only argument (conventionally
+    named ``info``)"""
     name = Attribute('The value passed by the user as the renderer name')
     package = Attribute('The "current package" when the renderer '
                         'configuration statement was found')
