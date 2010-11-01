@@ -306,6 +306,12 @@ class TestRendererHelper(unittest.TestCase):
         from pyramid.renderers import RendererHelper
         return RendererHelper(*arg, **kw)
 
+    def test_instance_conforms(self):
+        from zope.interface.verify import verifyObject
+        from pyramid.interfaces import IRendererInfo
+        helper = self._makeOne()
+        verifyObject(IRendererInfo, helper)
+
     def _registerRendererFactory(self):
         from pyramid.interfaces import IRendererFactory
         def renderer(*arg):

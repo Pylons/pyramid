@@ -4,11 +4,14 @@ import threading
 
 from webob import Response
 
+from zope.interface import implements
+
 from pyramid.interfaces import IRendererGlobalsFactory
 from pyramid.interfaces import IRendererFactory
 from pyramid.interfaces import IResponseFactory
 from pyramid.interfaces import ITemplateRenderer
 from pyramid.interfaces import ISettings
+from pyramid.interfaces import IRendererInfo
 
 from pyramid.compat import json
 from pyramid.decorator import reify
@@ -211,6 +214,7 @@ def renderer_from_name(path, package=None): # XXX deprecate?
     return RendererHelper(name=path, package=package).renderer
 
 class RendererHelper(object):
+    implements(IRendererInfo)
     def __init__(self, name=None, package=None, registry=None):
         if name and '.' in name:
             rtype = os.path.splitext(name)[1]

@@ -490,3 +490,13 @@ class ISession(Interface):
         """Return true if a key exists in the mapping."""
 
 NO_PERMISSION_REQUIRED = '__no_permission_required__'
+
+class IRendererInfo(Interface):
+    name = Attribute('The value passed by the user as the renderer name')
+    package = Attribute('The "current package" when the renderer '
+                        'configuration statement was found')
+    type = Attribute('The renderer type name')
+    registry = Attribute('The "current" application registry when the '
+                         'renderer was created')
+    settings = Attribute('The ISettings dictionary related to the current app')
+    

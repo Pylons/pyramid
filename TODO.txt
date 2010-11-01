@@ -66,8 +66,6 @@
 
 - .flash API on session.
 
-- Provide a webob.Response class facade for forward compat.
-
 - CRSF token machinery
 
 - ``add_handler`` documentation.
@@ -98,6 +96,8 @@
 
 - Remove references to 'WebOb' Response and just call it 'Response', and note
   that it is imported from pyramid. API docs can mention its inheritance from
-  webob.
+  webob (aka "Provide a webob.Response class facade for forward compat").
 
 - Add docs for httpexceptions.
+
+- RendererHelper -> RendererInfo?
