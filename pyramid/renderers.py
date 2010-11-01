@@ -212,10 +212,8 @@ def renderer_from_name(path, package=None): # XXX deprecate?
 
 class RendererHelper(object):
     def __init__(self, name=None, package=None, registry=None):
-        settings = None
         if registry is None:
             registry = get_current_registry()
-            settings = registry.queryUtility(ISettings)
 
         if name and '.' in name:
             rtype = os.path.splitext(name)[1]
@@ -229,10 +227,10 @@ class RendererHelper(object):
         self.type = rtype
         self.factory = factory
         self.registry = registry
-        self.settings = settings
 
     @reify
     def renderer(self):
+        settings = self.registry.queryUtility(ISettings)
         if self.factory is None:
             raise ValueError(
                 'No such renderer factory %s' % str(self.type))
@@ -241,7 +239,7 @@ class RendererHelper(object):
             'type':self.type,
             'package':self.package,
             'registry':self.registry,
-            'settings':self.settings,
+            'settings':settings,
             })
     
     def get_renderer(self):

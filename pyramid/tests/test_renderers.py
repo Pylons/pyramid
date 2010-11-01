@@ -290,7 +290,7 @@ class TestRendererHelper(unittest.TestCase):
         factory = self._registerRendererFactory()
         class DummyRegistry(object):
             def __init__(self):
-                self.responses = [factory, lambda *arg: {}]
+                self.responses = [factory, lambda *arg: {}, None]
             def queryUtility(self, iface, name=None):
                 self.queried = True
                 return self.responses.pop(0)

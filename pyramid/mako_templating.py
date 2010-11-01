@@ -63,7 +63,7 @@ def renderer_factory(info):
         input_encoding = settings.get('mako.input_encoding', 'utf-8')
         if directories is None:
             raise ConfigurationError(
-                'Mako template used without a lookup path')
+                'Mako template used without a ``mako.directories`` setting')
         directories = directories.splitlines()
         directories = [ abspath_from_resource_spec(d) for d in directories ]
         lookup = PkgResourceTemplateLookup(directories=directories,

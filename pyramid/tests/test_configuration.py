@@ -1354,6 +1354,7 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_view_with_template_renderer(self):
         import pyramid.tests
+        from pyramid.interfaces import ISettings
         class view(object):
             def __init__(self, context, request):
                 self.request = request
@@ -1369,14 +1370,16 @@ class ConfiguratorTests(unittest.TestCase):
         request = self._makeRequest(config)
         result = wrapper(None, request)
         self.assertEqual(result.body, 'Hello!')
+        settings = config.registry.queryUtility(ISettings)
         self.assertEqual(renderer.info,
                          {'registry':config.registry, 'type': '.txt',
                           'name': 'pyramid.tests:fixtures/minimal.txt',
                           'package': pyramid.tests,
-                          'settings':None})
+                          'settings':settings})
 
     def test_add_view_with_template_renderer_no_callable(self):
         import pyramid.tests
+        from pyramid.interfaces import ISettings
         config = self._makeOne()
         renderer = self._registerRenderer(config)
         fixture = 'pyramid.tests:fixtures/minimal.txt'
@@ -1385,12 +1388,13 @@ class ConfiguratorTests(unittest.TestCase):
         request = self._makeRequest(config)
         result = wrapper(None, request)
         self.assertEqual(result.body, 'Hello!')
+        settings = config.registry.queryUtility(ISettings)
         self.assertEqual(renderer.info,
                          {'registry':config.registry,
                           'type': '.txt',
                           'name': 'pyramid.tests:fixtures/minimal.txt',
                           'package':pyramid.tests,
-                          'settings':None,
+                          'settings':settings,
                           })
 
     def test_add_view_with_request_type_as_iface(self):
