@@ -349,8 +349,8 @@ class TestRendererHelper(unittest.TestCase):
                   'context':context,
                   'renderer_name':'loo.foo',
                   'view':None,
-                  'renderer_type':'.foo',
-                  'renderer_package':None}
+                  'renderer_info':helper
+                  }
         self.assertEqual(result, ('values', system))
 
     def test_render_renderer_globals_factory_active(self):

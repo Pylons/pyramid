@@ -246,9 +246,8 @@ class RendererHelper(object):
         if system_values is None:
             system_values = {
                 'view':None,
-                'renderer_name':self.name,
-                'renderer_type':self.type,
-                'renderer_package':self.package,
+                'renderer_name':self.name, # b/c
+                'renderer_info':self,
                 'context':getattr(request, 'context', None),
                 'request':request,
                 }
