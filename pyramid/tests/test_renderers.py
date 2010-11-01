@@ -19,7 +19,7 @@ class TestTemplateRendererFactory(unittest.TestCase):
         abspath = '/wont/exist'
         testing.registerUtility({}, ITemplateRenderer, name=abspath)
         info = {'name':abspath, 'package':None,
-                'registry':self.config.registry}
+                'registry':self.config.registry, 'settings':{}}
         self.assertRaises(ValueError, self._callFUT, info, None)
 
     def test_abspath_alreadyregistered(self):
@@ -29,7 +29,7 @@ class TestTemplateRendererFactory(unittest.TestCase):
         renderer = {}
         testing.registerUtility(renderer, ITemplateRenderer, name=abspath)
         info = {'name':abspath, 'package':None,
-                'registry':self.config.registry}
+                'registry':self.config.registry, 'settings':{}}
         result = self._callFUT(info, None)
         self.failUnless(result is renderer)
 
@@ -40,7 +40,7 @@ class TestTemplateRendererFactory(unittest.TestCase):
         renderer = {}
         testing.registerUtility(renderer, ITemplateRenderer, name=abspath)
         info = {'name':abspath, 'package':None,
-                'registry':self.config.registry}
+                'registry':self.config.registry, 'settings':{}}
         result = self._callFUT(info, None)
         self.failUnless(result is renderer)
 
@@ -50,7 +50,7 @@ class TestTemplateRendererFactory(unittest.TestCase):
         testing.registerUtility(renderer, ITemplateRenderer, name='foo/bar')
         spec = 'foo/bar'
         info = {'name':spec, 'package':None,
-                'registry':self.config.registry}
+                'registry':self.config.registry, 'settings':{}}
         result = self._callFUT(info, None)
         self.failUnless(renderer is result)
 
@@ -62,13 +62,14 @@ class TestTemplateRendererFactory(unittest.TestCase):
         testing.registerUtility(renderer, ITemplateRenderer,
                                 name='pyramid.tests:bar/baz')
         info = {'name':spec, 'package':pyramid.tests,
-                'registry':self.config.registry}
+                'registry':self.config.registry, 'settings':{}}
         result = self._callFUT(info, None)
         self.failUnless(renderer is result)
 
     def test_spec_notfound(self):
         spec = 'pyramid.tests:wont/exist'
-        info = {'name':spec, 'package':None, 'registry':self.config.registry}
+        info = {'name':spec, 'package':None, 'registry':self.config.registry,
+                'settings':{}}
         self.assertRaises(ValueError, self._callFUT, info, None)
 
     def test_spec_alreadyregistered(self):
@@ -77,7 +78,8 @@ class TestTemplateRendererFactory(unittest.TestCase):
         module_name = tests.__name__
         relpath = 'test_renderers.py'
         spec = '%s:%s' % (module_name, relpath)
-        info = {'name':spec, 'package':None, 'registry':self.config.registry}
+        info = {'name':spec, 'package':None, 'registry':self.config.registry,
+                'settings':{}}
         renderer = {}
         testing.registerUtility(renderer, ITemplateRenderer, name=spec)
         result = self._callFUT(info, None)
@@ -91,7 +93,8 @@ class TestTemplateRendererFactory(unittest.TestCase):
         renderer = {}
         factory = DummyFactory(renderer)
         spec = '%s:%s' % (module_name, relpath)
-        info = {'name':spec, 'package':None, 'registry':self.config.registry}
+        info = {'name':spec, 'package':None, 'registry':self.config.registry,
+                'settings':{}}
         result = self._callFUT(info, factory)
         self.failUnless(result is renderer)
         path = os.path.abspath(__file__)
@@ -111,7 +114,7 @@ class TestTemplateRendererFactory(unittest.TestCase):
         factory = DummyFactory(renderer)
         spec = 'test_renderers.py'
         info = {'name':spec, 'package':pyramid.tests,
-                'registry':self.config.registry}
+                'registry':self.config.registry, 'settings':{}}
         result = self._callFUT(info, factory)
         self.failUnless(result is renderer)
         spec = '%s:%s' % ('pyramid.tests', 'test_renderers.py')
@@ -122,15 +125,13 @@ class TestTemplateRendererFactory(unittest.TestCase):
     def test_reload_resources_false(self):
         import pyramid.tests
         from pyramid.threadlocal import get_current_registry
-        from pyramid.interfaces import ISettings
         from pyramid.interfaces import ITemplateRenderer
         settings = {'reload_resources':False}
-        testing.registerUtility(settings, ISettings)
         renderer = {}
         factory = DummyFactory(renderer)
         spec = 'test_renderers.py'
         info = {'name':spec, 'package':pyramid.tests,
-                'registry':self.config.registry}
+                'registry':self.config.registry, 'settings':settings}
         result = self._callFUT(info, factory)
         self.failUnless(result is renderer)
         spec = '%s:%s' % ('pyramid.tests', 'test_renderers.py')
@@ -151,7 +152,10 @@ class TestRendererFromName(unittest.TestCase):
 
     def test_it(self):
         from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import ISettings
         registry = get_current_registry()
+        settings = {}
+        registry.registerUtility(settings, ISettings)
         from pyramid.interfaces import IRendererFactory
         import os
         here = os.path.dirname(os.path.abspath(__file__))
@@ -164,12 +168,16 @@ class TestRendererFromName(unittest.TestCase):
                                   'type':'.pt',
                                   'package':None,
                                   'name':fixture,
+                                  'settings':settings,
                                   })
 
     def test_it_with_package(self):
         import pyramid
         from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import ISettings
         registry = get_current_registry()
+        settings = {}
+        registry.registerUtility(settings, ISettings)
         from pyramid.interfaces import IRendererFactory
         import os
         here = os.path.dirname(os.path.abspath(__file__))
@@ -182,6 +190,7 @@ class TestRendererFromName(unittest.TestCase):
                                   'type':'.pt',
                                   'package':pyramid,
                                   'name':fixture,
+                                  'settings':settings,
                                   })
 
     def test_it_no_renderer(self):

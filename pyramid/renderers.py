@@ -8,13 +8,13 @@ from pyramid.interfaces import IRendererGlobalsFactory
 from pyramid.interfaces import IRendererFactory
 from pyramid.interfaces import IResponseFactory
 from pyramid.interfaces import ITemplateRenderer
+from pyramid.interfaces import ISettings
 
 from pyramid.compat import json
 from pyramid.decorator import reify
 from pyramid.path import caller_package
 from pyramid.path import package_path
 from pyramid.resource import resource_spec_from_abspath
-from pyramid.settings import get_settings
 from pyramid.threadlocal import get_current_registry
 
 # API
@@ -157,6 +157,8 @@ def template_renderer_factory(info, impl, lock=registry_lock):
     reg = info['registry']
     spec = info['name']
     package = info['package']
+    settings = info['settings']
+
     isabs = os.path.isabs(spec)
 
     if (not isabs) and (not ':' in spec) and package:
@@ -195,7 +197,7 @@ def template_renderer_factory(info, impl, lock=registry_lock):
                 raise ValueError(
                     'Missing template resource: %s (%s)' % (spec, abspath))
             renderer = impl(abspath)
-            if not _reload_resources():
+            if settings and not settings.get('reload_resources'):
                 # cache the template
                 try:
                     lock.acquire()
@@ -205,17 +207,15 @@ def template_renderer_factory(info, impl, lock=registry_lock):
         
     return renderer
 
-def _reload_resources():
-    settings = get_settings()
-    return settings and settings.get('reload_resources')
-
 def renderer_from_name(path, package=None): # XXX deprecate?
     return RendererHelper(name=path, package=package).get_renderer()
 
 class RendererHelper(object):
     def __init__(self, name=None, package=None, registry=None):
+        settings = None
         if registry is None:
             registry = get_current_registry()
+            settings = registry.queryUtility(ISettings)
 
         if name and '.' in name:
             rtype = os.path.splitext(name)[1]
@@ -229,6 +229,7 @@ class RendererHelper(object):
         self.type = rtype
         self.factory = factory
         self.registry = registry
+        self.settings = settings
 
     @reify
     def renderer(self):
@@ -239,7 +240,8 @@ class RendererHelper(object):
             'name':self.name,
             'type':self.type,
             'package':self.package,
-            'registry':self.registry
+            'registry':self.registry,
+            'settings':self.settings,
             })
     
     def get_renderer(self):

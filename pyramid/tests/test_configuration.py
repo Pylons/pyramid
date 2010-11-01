@@ -1372,7 +1372,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(renderer.info,
                          {'registry':config.registry, 'type': '.txt',
                           'name': 'pyramid.tests:fixtures/minimal.txt',
-                          'package': pyramid.tests})
+                          'package': pyramid.tests,
+                          'settings':None})
 
     def test_add_view_with_template_renderer_no_callable(self):
         import pyramid.tests
@@ -1388,8 +1389,9 @@ class ConfiguratorTests(unittest.TestCase):
                          {'registry':config.registry,
                           'type': '.txt',
                           'name': 'pyramid.tests:fixtures/minimal.txt',
-                          'package':pyramid.tests}
-                         )
+                          'package':pyramid.tests,
+                          'settings':None,
+                          })
 
     def test_add_view_with_request_type_as_iface(self):
         from zope.interface import directlyProvides

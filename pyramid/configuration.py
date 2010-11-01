@@ -327,16 +327,18 @@ class Configurator(object):
 
     def _fix_registry(self):
         """ Fix up a ZCA component registry that is not a
-        pyramid.registry.Registry by adding analogues of
-        ``has_listeners`` and ``notify`` through monkey-patching."""
+        pyramid.registry.Registry by adding analogues of ``has_listeners``,
+        and ``notify`` through monkey-patching."""
 
-        if not hasattr(self.registry, 'notify'):
+        _registry = self.registry
+
+        if not hasattr(_registry, 'notify'):
             def notify(*events):
-                [ _ for _ in self.registry.subscribers(events, None) ]
-            self.registry.notify = notify
+                [ _ for _ in _registry.subscribers(events, None) ]
+            _registry.notify = notify
 
-        if not hasattr(self.registry, 'has_listeners'):
-            self.registry.has_listeners = True
+        if not hasattr(_registry, 'has_listeners'):
+            _registry.has_listeners = True
 
     # API
 

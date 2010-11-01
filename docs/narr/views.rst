@@ -739,11 +739,12 @@ following interface:
 
    class RendererFactory:
        def __init__(self, info):
-           """ Constructor: ``info`` will be a dictionary containing the
-           following keys: ``name`` (the renderer name), ``package``: the
-           package that was 'current' at the time the renderer was registered,
-           ``type``: the renderer type name, and ``registry``: the current
-           registry.  """
+           """ Constructor: ``info`` will be a dictionary containing 
+           the following keys: ``name`` (the renderer name), ``package`` 
+           (the package that was 'current' at the time the renderer was 
+           registered), ``type`` (the renderer type name), ``registry`` 
+           (the current application registry) and ``settings`` (the 
+           deployment settings dictionary)."""
 
        def __call__(self, value, system):
            """ Call a the renderer implementation with the value and

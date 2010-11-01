@@ -98,7 +98,8 @@ Backwards Incompatibilities (with BFG 1.3.X)
   specification or an absolute path.  The dictonary contains the following
   keys: ``name`` (the ``renderer=`` value), ``package`` (the 'current package'
   when the renderer configuration statement was found), ``type``: the renderer
-  type, and ``registry``: the current registry.
+  type, ``registry``: the current registry, and ``settings``: the deployment
+  settings dictionary.
 
   Third-party ``repoze.bfg`` renderer implementations that must be ported to
   Pyramid will need to account for this.

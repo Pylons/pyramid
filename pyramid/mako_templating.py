@@ -5,7 +5,6 @@ from zope.interface import Interface
 
 from pyramid.interfaces import ITemplateRenderer
 from pyramid.exceptions import ConfigurationError
-from pyramid.settings import get_settings
 from pyramid.resource import resolve_resource_spec
 from pyramid.resource import abspath_from_resource_spec
 
@@ -14,7 +13,6 @@ from mako import exceptions
 
 class IMakoLookup(Interface):
     pass
-
 
 class PkgResourceTemplateLookup(TemplateLookup):
     """TemplateLookup subclass that handles resource specification
@@ -56,9 +54,9 @@ class PkgResourceTemplateLookup(TemplateLookup):
 def renderer_factory(info):
     path = info['name']
     registry = info['registry']
+    settings = info['settings'] or {}
     lookup = registry.queryUtility(IMakoLookup)
     if lookup is None:
-        settings = get_settings() or {}
         reload_templates = settings.get('reload_templates', False)
         directories = settings.get('mako.directories')
         module_directory = settings.get('mako.module_directory')
