@@ -94,14 +94,15 @@ Backwards Incompatibilities (with BFG 1.3.X)
 - ``pyramid.renderers.rendered_response`` function removed; use
   ``render_pyramid.renderers.render_to_response`` instead.
 
-- Renderer factories now accept a *dictionary* rather than an absolute resource
-  specification or an absolute path.  The dictonary contains the following
-  keys: ``name`` (the ``renderer=`` value), ``package`` (the 'current package'
-  when the renderer configuration statement was found), ``type``: the renderer
-  type, ``registry``: the current registry, and ``settings``: the deployment
-  settings dictionary.
+- Renderer factories now accept an *info object* rather than an absolute
+  resource specification or an absolute path.  The object has the following
+  attributes: ``name`` (the ``renderer=`` value), ``package`` (the 'current
+  package' when the renderer configuration statement was found), ``type``: the
+  renderer type, ``registry``: the current registry, and ``settings``: the
+  deployment settings dictionary.
 
   Third-party ``repoze.bfg`` renderer implementations that must be ported to
   Pyramid will need to account for this.
 
-  This change was made to support more flexible Mako template rendering.
+  This change was made primarily to support more flexible Mako template
+  rendering.

@@ -52,9 +52,9 @@ class PkgResourceTemplateLookup(TemplateLookup):
 
 
 def renderer_factory(info):
-    path = info['name']
-    registry = info['registry']
-    settings = info['settings'] or {}
+    path = info.name
+    registry = info.registry
+    settings = info.settings
     lookup = registry.queryUtility(IMakoLookup)
     if lookup is None:
         reload_templates = settings.get('reload_templates', False)

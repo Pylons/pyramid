@@ -2101,17 +2101,16 @@ class Configurator(object):
         """
         from pyramid.testing import DummyRendererFactory
         helper = RendererHelper(name=path, registry=self.registry)
-        factory = helper.factory
+        factory = self.registry.queryUtility(IRendererFactory, name=helper.type)
         if not isinstance(factory, DummyRendererFactory):
-            factory = DummyRendererFactory(helper.type,
-                                           helper.factory)
+            factory = DummyRendererFactory(helper.type, factory)
             self.registry.registerUtility(factory, IRendererFactory,
                                           name=helper.type)
 
         from pyramid.testing import DummyTemplateRenderer
         if renderer is None:
             renderer = DummyTemplateRenderer()
-        factory.add(helper.name, renderer)
+        factory.add(path, renderer)
         return renderer
 
     testing_add_template = testing_add_renderer

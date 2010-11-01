@@ -739,8 +739,8 @@ following interface:
 
    class RendererFactory:
        def __init__(self, info):
-           """ Constructor: ``info`` will be a dictionary containing 
-           the following keys: ``name`` (the renderer name), ``package`` 
+           """ Constructor: ``info`` will be an object having the
+           the following attributes: ``name`` (the renderer name), ``package`` 
            (the package that was 'current' at the time the renderer was 
            registered), ``type`` (the renderer type name), ``registry`` 
            (the current application registry) and ``settings`` (the 
@@ -757,14 +757,14 @@ following interface:
 There are essentially two different kinds of renderer factories:
 
 - A renderer factory which expects to accept a :term:`resource specification`
-  or an absolute path as the ``name`` value in the ``info`` value fed to its
-  constructor.  These renderer factories are registered with a ``name`` value
-  that begins with a dot (``.``).  These types of renderer factories usually
-  relate to a file on the filesystem, such as a template.
+  or an absolute path as the ``name`` attribute of the ``info`` object fed to
+  its constructor.  These renderer factories are registered with a ``name``
+  value that begins with a dot (``.``).  These types of renderer factories
+  usually relate to a file on the filesystem, such as a template.
 
 - A renderer factory which expects to accept a token that does not represent a
-  filesystem path or a resource specification in the ``name`` value of the
-  ``info`` dict fed to its constructor.  These renderer factories are
+  filesystem path or a resource specification in the ``name`` attribute of the
+  ``info`` object fed to its constructor.  These renderer factories are
   registered with a ``name`` value that does not begin with a dot.  These
   renderer factories are typically object serializers.
 

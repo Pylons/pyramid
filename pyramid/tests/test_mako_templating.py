@@ -21,15 +21,23 @@ class Test_renderer_factory(Base, unittest.TestCase):
 
     def test_no_directories(self):
         from pyramid.exceptions import ConfigurationError
-        info = {'name':'helloworld.mak', 'package':None,
-                'registry':self.config.registry, 'settings':None}
+        info = DummyRendererInfo({
+            'name':'helloworld.mak',
+            'package':None,
+            'registry':self.config.registry,
+            'settings':{},
+            })
         self.assertRaises(ConfigurationError, self._callFUT, info)
 
     def test_no_lookup(self):
         from pyramid.mako_templating import IMakoLookup
         settings = {'mako.directories':self.templates_dir}
-        info = {'name':'helloworld.mak', 'package':None,
-                'registry':self.config.registry, 'settings':settings}
+        info = DummyRendererInfo({
+            'name':'helloworld.mak',
+            'package':None,
+            'registry':self.config.registry,
+            'settings':settings,
+            })
         renderer = self._callFUT(info)
         lookup = self.config.registry.getUtility(IMakoLookup)
         self.assertEqual(lookup.directories, [self.templates_dir])
@@ -41,8 +49,12 @@ class Test_renderer_factory(Base, unittest.TestCase):
         from pyramid.mako_templating import IMakoLookup
         twice = self.templates_dir + '\n' + self.templates_dir
         settings = {'mako.directories':twice}
-        info = {'name':'helloworld.mak', 'package':None,
-                'registry':self.config.registry, 'settings':settings}
+        info = DummyRendererInfo({
+            'name':'helloworld.mak',
+            'package':None,
+            'registry':self.config.registry,
+            'settings':settings,
+            })
         self._callFUT(info)
         lookup = self.config.registry.getUtility(IMakoLookup)
         self.assertEqual(lookup.directories, [self.templates_dir]*2)
@@ -51,8 +63,12 @@ class Test_renderer_factory(Base, unittest.TestCase):
         from pyramid.mako_templating import IMakoLookup
         lookup = dict()
         self.config.registry.registerUtility(lookup, IMakoLookup)
-        info = {'name':'helloworld.mak', 'package':None,
-                'registry':self.config.registry, 'settings':{}}
+        info = DummyRendererInfo({
+            'name':'helloworld.mak',
+            'package':None,
+            'registry':self.config.registry,
+            'settings':{},
+            })
         renderer = self._callFUT(info)
         self.assertEqual(renderer.lookup, lookup)
         self.assertEqual(renderer.path, 'helloworld.mak')
@@ -224,4 +240,8 @@ class DummyLookup(object):
     def render_unicode(self, **values):
         self.values = values
         return u'result'
+        
+class DummyRendererInfo(object):
+    def __init__(self, kw):
+        self.__dict__.update(kw)
         

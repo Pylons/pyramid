@@ -655,25 +655,25 @@ class TestDummyRendererFactory(unittest.TestCase):
     def test_call(self):
         f = self._makeOne('name', None)
         f.renderers['spec'] = 'renderer'
-        info = {'name':'spec'}
+        info = DummyRendererInfo({'name':'spec'})
         self.assertEqual(f(info), 'renderer')
         
     def test_call2(self):
         f = self._makeOne('name', None)
         f.renderers['spec'] = 'renderer'
-        info = {'name':'spec:spec'}
+        info = DummyRendererInfo({'name':'spec:spec'})
         self.assertEqual(f(info), 'renderer')
 
     def test_call3(self):
         def factory(spec):
             return 'renderer'
         f = self._makeOne('name', factory)
-        info = {'name':'spec'}
+        info = DummyRendererInfo({'name':'spec'})
         self.assertEqual(f(info), 'renderer')
 
     def test_call_miss(self):
         f = self._makeOne('name', None)
-        info = {'name':'spec'}
+        info = DummyRendererInfo({'name':'spec'})
         self.assertRaises(KeyError, f, info)
 
 class TestMockTemplate(unittest.TestCase):
@@ -714,4 +714,8 @@ class DummyRegistry(object):
     __name__ = 'name'
     def __init__(self, name=''):
         self.inited = self.inited + 1
+        
+class DummyRendererInfo(object):
+    def __init__(self, kw):
+        self.__dict__.update(kw)
         

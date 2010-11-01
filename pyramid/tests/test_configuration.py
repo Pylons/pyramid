@@ -1371,11 +1371,12 @@ class ConfiguratorTests(unittest.TestCase):
         result = wrapper(None, request)
         self.assertEqual(result.body, 'Hello!')
         settings = config.registry.queryUtility(ISettings)
-        self.assertEqual(renderer.info,
-                         {'registry':config.registry, 'type': '.txt',
-                          'name': 'pyramid.tests:fixtures/minimal.txt',
-                          'package': pyramid.tests,
-                          'settings':settings})
+        result = renderer.info
+        self.assertEqual(result.registry, config.registry)
+        self.assertEqual(result.type, '.txt')
+        self.assertEqual(result.package, pyramid.tests)
+        self.assertEqual(result.name, fixture)
+        self.assertEqual(result.settings, settings)
 
     def test_add_view_with_template_renderer_no_callable(self):
         import pyramid.tests
@@ -1389,13 +1390,12 @@ class ConfiguratorTests(unittest.TestCase):
         result = wrapper(None, request)
         self.assertEqual(result.body, 'Hello!')
         settings = config.registry.queryUtility(ISettings)
-        self.assertEqual(renderer.info,
-                         {'registry':config.registry,
-                          'type': '.txt',
-                          'name': 'pyramid.tests:fixtures/minimal.txt',
-                          'package':pyramid.tests,
-                          'settings':settings,
-                          })
+        result = renderer.info
+        self.assertEqual(result.registry, config.registry)
+        self.assertEqual(result.type, '.txt')
+        self.assertEqual(result.package, pyramid.tests)
+        self.assertEqual(result.name, fixture)
+        self.assertEqual(result.settings, settings)
 
     def test_add_view_with_request_type_as_iface(self):
         from zope.interface import directlyProvides

@@ -711,7 +711,7 @@ class DummyRendererFactory(object):
             self.renderers[relative] = renderer
 
     def __call__(self, info):
-        spec = info['name']
+        spec = info.name
         renderer = self.renderers.get(spec)
         if renderer is None:
             if ':' in spec:

@@ -59,9 +59,9 @@ def render(renderer_name, value, request=None, package=None):
         registry = None
     if package is None:
         package = caller_package()
-    renderer = RendererHelper(name=renderer_name, package=package,
-                              registry=registry)
-    return renderer.render(value, None, request=request)
+    helper = RendererHelper(name=renderer_name, package=package,
+                            registry=registry)
+    return helper.render(value, None, request=request)
 
 def render_to_response(renderer_name, value, request=None, package=None):
     """ Using the renderer specified as ``renderer_name`` (a template
@@ -102,9 +102,9 @@ def render_to_response(renderer_name, value, request=None, package=None):
         registry = None
     if package is None:
         package = caller_package()
-    renderer = RendererHelper(name=renderer_name, package=package,
-                              registry=registry)
-    return renderer.render_to_response(value, None, request=request)
+    helper = RendererHelper(name=renderer_name, package=package,
+                            registry=registry)
+    return helper.render_to_response(value, None, request=request)
 
 def get_renderer(renderer_name, package=None):
     """ Return the renderer object for the renderer named as
@@ -120,8 +120,8 @@ def get_renderer(renderer_name, package=None):
     """
     if package is None:
         package = caller_package()
-    renderer = RendererHelper(name=renderer_name, package=package)
-    return renderer.get_renderer()
+    helper = RendererHelper(name=renderer_name, package=package)
+    return helper.renderer
 
 
 # concrete renderer factory implementations (also API)
@@ -154,10 +154,9 @@ def string_renderer_factory(info):
 registry_lock = threading.Lock() 
 
 def template_renderer_factory(info, impl, lock=registry_lock):
-    reg = info['registry']
-    spec = info['name']
-    package = info['package']
-    settings = info['settings']
+    spec = info.name
+    reg = info.registry
+    package = info.package
 
     isabs = os.path.isabs(spec)
 
@@ -197,6 +196,7 @@ def template_renderer_factory(info, impl, lock=registry_lock):
                 raise ValueError(
                     'Missing template resource: %s (%s)' % (spec, abspath))
             renderer = impl(abspath)
+            settings = info.settings
             if settings and not settings.get('reload_resources'):
                 # cache the template
                 try:
@@ -208,43 +208,39 @@ def template_renderer_factory(info, impl, lock=registry_lock):
     return renderer
 
 def renderer_from_name(path, package=None): # XXX deprecate?
-    return RendererHelper(name=path, package=package).get_renderer()
+    return RendererHelper(name=path, package=package).renderer
 
 class RendererHelper(object):
     def __init__(self, name=None, package=None, registry=None):
-        if registry is None:
-            registry = get_current_registry()
-
         if name and '.' in name:
             rtype = os.path.splitext(name)[1]
         else:
             rtype = name
 
-        factory = registry.queryUtility(IRendererFactory, name=rtype)
+        if registry is None:
+            registry = get_current_registry()
 
         self.name = name
         self.package = package
         self.type = rtype
-        self.factory = factory
         self.registry = registry
 
     @reify
-    def renderer(self):
+    def settings(self):
         settings = self.registry.queryUtility(ISettings)
-        if self.factory is None:
+        return settings
+
+    @reify
+    def renderer(self):
+        factory = self.registry.queryUtility(IRendererFactory, name=self.type)
+        if factory is None:
             raise ValueError(
                 'No such renderer factory %s' % str(self.type))
-        return self.factory({
-            'name':self.name,
-            'type':self.type,
-            'package':self.package,
-            'registry':self.registry,
-            'settings':settings,
-            })
-    
+        return factory(self)
+
     def get_renderer(self):
         return self.renderer
-
+    
     def render(self, value, system_values, request=None):
         renderer = self.renderer
         if system_values is None:
