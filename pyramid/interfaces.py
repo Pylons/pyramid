@@ -81,12 +81,12 @@ class IBeforeRender(Interface):
     def __setitem__(name, value):
         """ Set a name/value pair into the dictionary which is passed to a
         renderer as the renderer globals dictionary.  If the ``name`` already
-        exists in the target dictionary, a :exc:`NameError` will be raised."""
+        exists in the target dictionary, a :exc:`KeyError` will be raised."""
 
     def update(d):
         """ Update the renderer globals dictionary with another dictionary
         ``d``.  If any of the key names in the source dictionary already exist
-        in the target dictionary, a :exc:`NameError` will be raised"""
+        in the target dictionary, a :exc:`KeyError` will be raised"""
 
     def __contains__(k):
         """ Return ``True`` if ``k`` exists in the renderer globals
