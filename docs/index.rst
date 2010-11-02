@@ -38,6 +38,7 @@ Narrative documentation in chapter form explaining how to use
    narr/urldispatch
    narr/hybrid
    narr/views
+   narr/handlers
    narr/static
    narr/webob
    narr/sessions
