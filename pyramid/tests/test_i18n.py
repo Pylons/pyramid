@@ -127,7 +127,7 @@ class Test_get_locale_name(unittest.TestCase):
 
     def test_name_on_request(self):
         request = DummyRequest()
-        request.bfg_locale_name = 'ie'
+        request.locale_name = 'ie'
         result = self._callFUT(request)
         self.assertEqual(result, 'ie')
 
@@ -136,7 +136,7 @@ class Test_get_locale_name(unittest.TestCase):
         request = DummyRequest()
         result = self._callFUT(request)
         self.assertEqual(result, 'bogus')
-        self.assertEqual(request.bfg_locale_name, 'bogus')
+        self.assertEqual(request.locale_name, 'bogus')
 
 class Test_get_localizer(unittest.TestCase):
     def setUp(self):
@@ -151,7 +151,7 @@ class Test_get_localizer(unittest.TestCase):
 
     def test_no_registry_on_request(self):
         request = DummyRequest()
-        request.bfg_localizer = '123'
+        request.localizer = '123'
         result = self._callFUT(request)
         self.assertEqual(result, '123')
 
@@ -159,14 +159,14 @@ class Test_get_localizer(unittest.TestCase):
         from pyramid.threadlocal import get_current_registry
         registry = get_current_registry()
         request = DummyRequest()
-        request.bfg_localizer = '123'
+        request.localizer = '123'
         request.registry = registry
         result = self._callFUT(request)
         self.assertEqual(result, '123')
 
     def test_locale_on_request(self):
         request = DummyRequest()
-        request.bfg_localizer = 'abc'
+        request.localizer = 'abc'
         result = self._callFUT(request)
         self.assertEqual(result, 'abc')
 
@@ -177,7 +177,7 @@ class Test_get_localizer(unittest.TestCase):
         locale = 'abc'
         registry.registerUtility(locale, ILocalizer, name='en')
         request = DummyRequest()
-        request.bfg_locale_name = 'en'
+        request.locale_name = 'en'
         result = self._callFUT(request)
         self.assertEqual(result, 'abc')
 
@@ -192,7 +192,7 @@ class Test_get_localizer(unittest.TestCase):
         localedirs = [localedir]
         registry.registerUtility(localedirs, ITranslationDirectories)
         request = DummyRequest()
-        request.bfg_locale_name = 'de'
+        request.locale_name = 'de'
         result = self._callFUT(request)
         self.assertEqual(result.__class__, Localizer)
         self.assertEqual(result.translate('Approve', 'deformsite'),
@@ -211,7 +211,7 @@ class Test_get_localizer(unittest.TestCase):
         localedirs = [localedir]
         registry.registerUtility(localedirs, ITranslationDirectories)
         request = DummyRequest()
-        request.bfg_locale_name = 'be'
+        request.locale_name = 'be'
         result = self._callFUT(request)
         self.assertEqual(result.__class__, Localizer)
         self.assertEqual(result.translate('Approve', 'deformsite'),

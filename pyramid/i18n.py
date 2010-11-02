@@ -140,16 +140,16 @@ def negotiate_locale_name(request):
 def get_locale_name(request):
     """ Return the :term:`locale name` associated with the current
     request (possibly cached)."""
-    locale_name = getattr(request, 'bfg_locale_name', None)
+    locale_name = getattr(request, 'locale_name', None)
     if locale_name is None:
         locale_name = negotiate_locale_name(request)
-        request.bfg_locale_name = locale_name
+        request.locale_name = locale_name
     return locale_name
 
 def get_localizer(request):
     """ Retrieve a :class:`pyramid.i18n.Localizer` object
     corresponding to the current request's locale name. """
-    localizer =  getattr(request, 'bfg_localizer', None)
+    localizer =  getattr(request, 'localizer', None)
 
     if localizer is None:
         # no locale object cached on request
@@ -188,7 +188,7 @@ def get_localizer(request):
                               translations=translations)
         registry.registerUtility(localizer, ILocalizer,
                                  name=current_locale_name)
-        request.bfg_localizer = localizer
+        request.localizer = localizer
 
     return localizer
                 

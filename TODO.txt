@@ -78,10 +78,6 @@
 
 - repoze.bfg.auth_tkt
 
-- bfg_locale_name
-
-- bfg_localizer
-
 - "BFG" in environ variables.
 
 - request.link (route_url)
