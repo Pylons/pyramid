@@ -819,3 +819,10 @@ Glossary
      `Mako <http://www.makotemplates.org/>`_ is a template language language
      which refines the familiar ideas of componentized layout and inheritance
      using Python with Python scoping and calling semantics.
+
+   View handler
+     A view handler ties together
+     :meth:`pyramid.configuration.Configurator.add_route` and
+     :meth:`pyramid.configuration.Configurator.add_view` to make it more
+     convenient to register a collection of views as a single class when
+     using :term:`url dispatch`.  See also :ref:`handlers_chapter`.

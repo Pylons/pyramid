@@ -3,28 +3,42 @@
 View Handlers
 =============
 
-View Handlers tie together
-:meth:`pyramid.configuration.Configurator.add_route` and
-:meth:`pyramid.configuration.Configurator.add_view` to register a collection
-of views in a single class. The View Handler also introduces the concept
-of an ``action``, which is used as a view predicate to control which method of
-the handler is called.
+Along with normal view callables, :mod:`pyramid` provides the concept of a
+:term:`view handler`.  Using a view handler instead of a plain :term:`view
+callable` makes it unnecessary to call
+:meth:`pyramid.configuration.Configurator.add_route` (and/or
+:meth:`pyramid.configuration.Configurator.add_view`) "by hand" multiple
+times, making it more pleasant to register a collection of views as a single
+class when using :term:`url dispatch`.  The view handler machinery also
+introduces the concept of an ``action``, which is used as a :term:`view
+predicate` to control which method of the handler is called.
 
-The handler class is initialized by :mod:`pyramid` in the same manner as a
-view class with its ``__init__`` called with a request object. A method of
-the class is then called depending on its configuration. The
-:meth:`pyramid.configuration.Configurator.add_handler` method will scan the
-handler class and automatically setup views for methods that are auto-exposed
-or have an ``__exposed__`` attribute. The :class:`~pyramid.view.action`
-decorator is used to setup additional view configuration information for
-individual class methods, and can be used repeatedly for a single method
-to register multiple view configurations that will call that view callable.
+..note:: 
 
-Here's an example handler class:
+   View handlers are not useful when using :term:`traversal`, only when using
+   :term:`url dispatch`.  The concept of a view handler is analogous to a
+   "controller" in Pylons 1.0.
+
+The view handler class is initialized by :mod:`pyramid` in the same manner as
+a view class.  Its ``__init__`` is called with a request object (see
+:ref:`class_as_view`) when a request enters the system which corresponds with
+a view handler registration made during configuration. A method of the view
+handler class is then called. The method which is called depends on the view
+handler configuration.
+
+The :meth:`pyramid.configuration.Configurator.add_handler` method will scan
+the handler class and automatically set up views for methods that are
+auto-exposed or have an ``__exposed__`` attribute. The
+:class:`~pyramid.view.action` decorator is used to setup additional view
+configuration information for individual class methods, and can be used
+repeatedly for a single method to register multiple view configurations that
+will call that view callable.
+
+Here's an example view handler class:
 
 .. code-block:: python
     
-    from webob import Response
+    from pyramid.response import Response
    
     from pyramid.view import action
    
@@ -39,8 +53,9 @@ Here's an example handler class:
         def bye(self):
             return {}
 
-A :meth:`~pyramid.configuration.Configurator.add_handler` setup for the
-handler:
+An accompanying call to the
+:meth:`~pyramid.configuration.Configurator.add_handler` for the handler must
+be performed in order to register it with the system:
 
 .. code-block:: python
 
@@ -60,7 +75,8 @@ specific ``action`` name:
 
 .. code-block:: python
     
-    config.add_handler('hello_index', '/hello/index', handler=Hello, action='index')
+    config.add_handler('hello_index', '/hello/index', 
+                       handler=Hello, action='index')
 
 This will result one of the methods that are configured for the ``action`` of
 'index' in the ``Hello`` handler class to be called. Other methods in the
@@ -77,22 +93,24 @@ but **cannot appear in both places**. Additional keyword arguments are passed
 directly through to :meth:`pyramid.configuration.Configurator.add_route`.
 
 Multiple :meth:`~pyramid.configuration.Configurator.add_handler` calls can
-specify the same handler, to register specific route name's for different
+specify the same handler, to register specific route names for different
 handler/action combinations. For example:
 
 .. code-block:: python
     
-    config.add_handler('hello_index', '/hello/index', handler=Hello, action='index')
-    config.add_handler('bye_index', '/hello/bye', handler=Hello, action='bye')
+    config.add_handler('hello_index', '/hello/index', 
+                       handler=Hello, action='index')
+    config.add_handler('bye_index', '/hello/bye', 
+                       handler=Hello, action='bye')
 
 
 View Setup in the Handler Class
 -------------------------------
 
 The handler class specified can have a single class level attribute called
-``__autoexpose__`` which should be a regular expression. It's used to
-determine which method names will result in additional view configurations
-being registered.
+``__autoexpose__`` which should be a regular expression or the value
+``None``. It's used to determine which method names will result in additional
+view configurations being registered.
 
 When :meth:`~pyramid.configuration.Configurator.add_handler` runs, every
 method in the handler class will be searched and a view registered if the
@@ -107,15 +125,14 @@ Auto-exposed Views
 Every method in the handler class that has a name meeting the
 ``_autoexpose__`` regular expression will have a view registered for an
 ``action`` name corresponding to the method name. This functionality can be
-disabled by setting an ``__autoexpose__`` regular expression to begin with a
-number:
+disabled by setting the ``__autoexpose__`` attribute to ``None``:
 
 .. code-block:: python
 
     from pyramid.view import action
    
     class Hello(object):
-        __autoexpose__ = r'^\d+'
+        __autoexpose__ = None
         
         def __init__(self, request):
             self.request = request

@@ -37,6 +37,7 @@ Narrative Documentation
    narr/urldispatch
    narr/hybrid
    narr/views
+   narr/handlers
    narr/static
    narr/webob
    narr/sessions
