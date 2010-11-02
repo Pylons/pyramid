@@ -5,7 +5,7 @@
 
 .. automodule:: pyramid.session
 
-  .. autofunction:: InsecureCookieSessionFactoryConfig
+  .. autofunction:: UnencryptedCookieSessionFactoryConfig
 
   .. autofunction:: signed_serialize
 

@@ -1,10 +1,10 @@
 import unittest
 from pyramid import testing
 
-class TestInsecureCookieSession(unittest.TestCase):
+class TestUnencryptedCookieSession(unittest.TestCase):
     def _makeOne(self, request, **kw):
-        from pyramid.session import InsecureCookieSessionFactoryConfig
-        return InsecureCookieSessionFactoryConfig('secret', **kw)(request)
+        from pyramid.session import UnencryptedCookieSessionFactoryConfig
+        return UnencryptedCookieSessionFactoryConfig('secret', **kw)(request)
 
     def test_ctor_no_cookie(self):
         request = testing.DummyRequest()

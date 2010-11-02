@@ -40,8 +40,8 @@ application by using the ``session_factory`` argument to the
 .. code-block:: python
    :linenos:
 
-   from pyramid.session import InsecureCookieSessionFactoryConfig
-   my_session_factory = InsecureCookieSessionFactoryConfig('itsaseekreet')
+   from pyramid.session import UnencryptedCookieSessionFactoryConfig
+   my_session_factory = UnencryptedCookieSessionFactoryConfig('itsaseekreet')
    
    from pyramid.configuration import Configurator
    config = Configurator(session_factory = my_session_factory)
@@ -49,15 +49,14 @@ application by using the ``session_factory`` argument to the
 .. warning:: 
 
    Note the very long, very explicit name for
-   ``InsecureCookieSessionFactoryConfig``.  It's trying to tell you
-   that this implementation is, by default, *insecure*.  You should
-   not use it when you keep sensitive information in the session
-   object, as the information can be easily read by both users of your
-   application and third parties who have access to your users'
-   network traffic.  Use a different session factory implementation
-   (preferably one which keeps session data on the server) for
-   anything but the most basic of applications where "session security
-   doesn't matter".
+   ``UnencryptedCookieSessionFactoryConfig``.  It's trying to tell you that
+   this implementation is, by default, *unencrypted*.  You should not use it
+   when you keep sensitive information in the session object, as the
+   information can be easily read by both users of your application and third
+   parties who have access to your users' network traffic.  Use a different
+   session factory implementation (preferably one which keeps session data on
+   the server) for anything but the most basic of applications where "session
+   security doesn't matter".
 
 Using a Session Object
 ----------------------

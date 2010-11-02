@@ -34,7 +34,7 @@ def manage_accessed(wrapped):
     accessed.__doc__ = wrapped.__doc__
     return accessed
 
-def InsecureCookieSessionFactoryConfig(
+def UnencryptedCookieSessionFactoryConfig(
     secret,
     timeout=1200,
     cookie_name='session',
@@ -46,7 +46,7 @@ def InsecureCookieSessionFactoryConfig(
     cookie_on_exception=False,
     ):
     """
-    Configure a :term:`session factory` which will provide insecure
+    Configure a :term:`session factory` which will provide unencrypted
     (but signed) cookie-based sessions.  The return value of this
     function is a :term:`session factory`, which may be provided as
     the ``session_factory`` argument of a
@@ -92,7 +92,7 @@ def InsecureCookieSessionFactoryConfig(
 
     """
 
-    class InsecureCookieSessionFactory(dict):
+    class UnencryptedCookieSessionFactory(dict):
         """ Dictionary-like session object """
         implements(ISession)
 
@@ -202,7 +202,7 @@ def InsecureCookieSessionFactoryConfig(
                 )
             return True
 
-    return InsecureCookieSessionFactory
+    return UnencryptedCookieSessionFactory
 
 def signed_serialize(data, secret):
     """ Serialize any pickleable structure (``data``) and sign it
