@@ -19,7 +19,6 @@ configuration.
 
 .. index::
    single: templates used directly
-   single: Mako
 
 .. _templates_used_directly:
 
@@ -75,6 +74,16 @@ usually just a simple relative pathname, a path named as a renderer
 can be absolute, starting with a slash on UNIX or a drive letter
 prefix on Windows.
 
+.. warning::
+
+   The ability for a template to be named as a renderer relative to the
+   location of the module in which the view callable is defined is limited to
+   :term:`Chameleon` templates.  Mako templates and other templating system
+   bindings work differently.  In particular, Mako templates use a "lookup
+   path" as defined by the ``mako.directories`` configuration file instead of
+   treating relative paths as relative to the current view module.  See
+   :ref:`mako_templates`.
+
 The path can alternately be a :term:`resource specification` in the
 form ``some.dotted.package_name:relative/path``, making it possible to
 address template resources which live in another package.  For
@@ -97,6 +106,13 @@ resource specification instead of a relative template name is usually
 a good idea, because calls to ``render_to_response`` using resource
 specifications will continue to work properly if you move the code
 containing them around.
+
+.. note::
+
+   Mako templating system bindings also respect absolute resource
+   specifications as an argument to any of the ``render*`` commands.  If a
+   template name defines a ``:`` (colon) character and is not an absolute
+   path, it is treated as an absolute resource specification.
 
 In the examples above we pass in a keyword argument named ``request``
 representing the current :mod:`pyramid` request. Passing a request
@@ -147,9 +163,8 @@ import its API functions into your views module, use those APIs to generate a
 string, then return that string as the body of a :mod:`pyramid`
 :term:`Response` object.
 
-For example, here's an example of using raw `Mako
-<http://www.makotemplates.org/>`_ from within a :mod:`pyramid`
-:term:`view`:
+For example, here's an example of using "raw" `Mako
+<http://www.makotemplates.org/>`_ from within a :mod:`pyramid` :term:`view`:
 
 .. ignore-next-block
 .. code-block:: python
@@ -215,6 +230,7 @@ of :func:`pyramid.renderers.render` (a string):
 
    from pyramid.renderers import render
    from pyramid.response import Response
+
    def sample_view(request):
        result = render('mypackage:templates/foo.pt',
                        {'foo':1, 'bar':2}, 
@@ -251,13 +267,17 @@ values are provided in a dictionary to the renderer and include:
   The renderer name used to perform the rendering,
   e.g. ``mypackage:templates/foo.pt``.
 
+``renderer_info`` An object implementing the
+  :class:`pyramid.interfaces.IRendererInfo` interface.  Basically, an object
+  with the following attributes: ``name``, ``package`` and ``type``.
+
 You can define more values which will be passed to every template
 executed as a result of rendering by defining :term:`renderer
 globals`.
 
-What any particular renderer does with them is up to the renderer
-itself, but most renderers, including al Chameleon renderers, make
-these names available as top-level template variables.
+What any particular renderer does with them is up to the renderer itself, but
+most template renderers, including Chameleon and Mako renderers, make these
+names available as top-level template variables.
 
 .. _templates_used_as_renderers:
 
@@ -302,32 +322,34 @@ template renderer:
    :func:`pyramid.renderers.render_to_response`.  This is handled
    automatically.
 
+.. warning::
+
+   The ``renderer`` argument to the ``@view_config`` configuration decorator
+   shown above is the template *path*.  In the example above, the path
+   ``templates/foo.pt`` is *relative*.  Relative to what, you ask?  Because
+   we're using a Chameleon renderer, it means "relative to the directory in
+   which the file which defines the view configuration lives".  In this case,
+   this is the directory containing the file that defines the ``my_view``
+   function.  View-configuration-relative resource specifications work only
+   in Chameleon, not in Mako templates.
+
 Similar renderer configuration can be done imperatively and via
 :term:`ZCML`.  See :ref:`views_which_use_a_renderer`.  See also
 :ref:`built_in_renderers`.
 
-The ``renderer`` argument to the ``@view_config`` configuration decorator
-shown above is the template *path*.  In the example above, the path
-``templates/foo.pt`` is *relative*.  Relative to what, you ask?
-Relative to the directory in which the file which defines the view
-configuration lives.  In this case, this is the directory containing
-the file that defines the ``my_view`` function.
+Although a renderer path is usually just a simple relative pathname, a path
+named as a renderer can be absolute, starting with a slash on UNIX or a drive
+letter prefix on Windows.  The path can alternately be a :term:`resource
+specification` in the form ``some.dotted.package_name:relative/path``, making
+it possible to address template resources which live in another package.
 
-Although a renderer path is usually just a simple relative pathname, a
-path named as a renderer can be absolute, starting with a slash on
-UNIX or a drive letter prefix on Windows.  The path can alternately be
-a :term:`resource specification` in the form
-``some.dotted.package_name:relative/path``, making it possible to
-address template resources which live in another package.
-
-Not just any template from any arbitrary templating system may be used
-as a renderer.  Bindings must exist specifically for :mod:`pyramid`
-to use a templating language template as a renderer.  Currently,
-:mod:`pyramid` has built-in support for two Chameleon templating
-languages: ZPT and text.  See :ref:`built_in_renderers` for a
-discussion of their details.  :mod:`pyramid` also supports the use
-of :term:`Jinja2` templates as renderers.  See
-:ref:`available_template_system_bindings`.
+Not just any template from any arbitrary templating system may be used as a
+renderer.  Bindings must exist specifically for :mod:`pyramid` to use a
+templating language template as a renderer.  Currently, :mod:`pyramid` has
+built-in support for two Chameleon templating languages: ZPT and text, and
+the Mako templating system.  See :ref:`built_in_renderers` for a discussion
+of their details.  :mod:`pyramid` also supports the use of :term:`Jinja2`
+templates as renderers.  See :ref:`available_template_system_bindings`.
 
 .. sidebar:: Why Use A Renderer via View Configuration
 
@@ -387,7 +409,8 @@ templates is available from `the Chameleon website
 
    :term:`Chameleon` only works on :term:`CPython` platforms and
    :term:`Google App Engine`.  On :term:`Jython` and other non-CPython
-   platforms, you should use ``repoze.bfg.jinja2`` instead.  See
+   platforms, you should use Mako (:ref:`mako_templates`) or
+   ``pyramid_jinja2`` instead.  See
    :ref:`available_template_system_bindings`.
 
 Given that there is a :term:`Chameleon` ZPT template named ``foo.pt``
@@ -577,46 +600,10 @@ Note that I always name my Chameleon ZPT template files with a ``.pt``
 extension and my Chameleon text template files with a ``.txt``
 extension so that these ``svn:ignore`` patterns work.
 
-.. index::
-   single: automatic reloading of templates
-   single: template automatic reload
-
-.. _reload_templates_section:
-
-Automatically Reloading Templates
----------------------------------
-
-It's often convenient to see changes you make to a template file
-appear immediately without needing to restart the application process.
-:mod:`pyramid` allows you to configure your application development
-environment so that a change to a template will be automatically
-detected, and the template will be reloaded on the next rendering.
-
-.. warning:: auto-template-reload behavior is not recommended for
-             production sites as it slows rendering slightly; it's
-             usually only desirable during development.
-
-In order to turn on automatic reloading of templates, you can use an
-environment variable setting or a configuration file setting.
-
-To use an environment variable, start your application under a shell
-using the ``BFG_RELOAD_TEMPLATES`` operating system environment
-variable set to ``1``, For example::
-
-  $ BFG_RELOAD_TEMPLATES=1 bin/paster serve myproject.ini
-
-To use a setting in the application ``.ini`` file for the same
-purpose, set the ``reload_templates`` key to ``true`` within the
-application's configuration section, e.g.::
-
-  [app:main]
-  use = egg:MyProject#app
-  reload_templates = true
-
 .. _debug_templates_section:
 
-Nicer Exceptions in Templates
------------------------------
+Nicer Exceptions in Chameleon Templates
+---------------------------------------
 
 The exceptions raised by Chameleon templates when a rendering fails
 are sometimes less than helpful.  :mod:`pyramid` allows you to
@@ -694,6 +681,112 @@ supporting internationalized units of text within :term:`Chameleon`
 templates.
 
 .. index::
+   single: Mako
+
+.. _mako_templates:
+
+Templating With Mako Templates
+------------------------------
+
+:term:`Mako` is a templating system written by Mike Bayer.  :mod:`pyramid`
+has built-in bindings for the Mako templating system.  The language
+definition documentation for Mako templates is available from `the Mako
+website <http://www.makotemplates.org/>`_.
+
+To use a Mako template, given that there is a :term:`Mako` ZPT template named
+``foo.mak`` in the ``templates`` subdirectory in your application package
+named ``mypackage``, you can render the template as a :term:`renderer` like
+so:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.view import view_config
+
+   @view_config(renderer='foo.mak')
+   def my_view(request):
+       return {'project':'my project'}
+
+For the above view callable to work, the following setting needs to be
+present in the application stanza of your configuration's ``ini`` file:
+
+.. code-block:: ini
+
+   mako.directories = mypackage:templates
+
+This lets the Mako templating system know that it should look for templates
+in the ``templates`` subdirectory of the ``mypackage`` Python package.  See
+:ref:`mako_template_renderer_settings` for more information about the
+``mako.directories`` setting and other Mako-related settings that can be
+placed into the application's ``ini`` file.
+
+A Sample Mako Template
+~~~~~~~~~~~~~~~~~~~~~~
+
+Here's what a simple :term:`Mako` template used under :mod:`pyramid` might
+look like:
+
+.. code-block:: xml
+   :linenos:
+
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml"
+          xmlns:tal="http://xml.zope.org/namespaces/tal">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <title>${project} Application</title>
+    </head>
+      <body>
+         <h1 class="title">Welcome to <code>${project}</code>, an
+	  application generated by the <a
+	  href="http://pylonshq.com/pyramid">pyramid</a> web
+	  application framework.</h1>
+      </body>
+    </html>
+
+This template doesn't use any advanced features of Mako, only the
+``${squiggly}`` replacement syntax for names that are passed in as
+:term:`renderer globals` values.  See the `the Mako documentation
+<http://www.makotemplates.org/>`_ to use more advanced features.
+
+.. index::
+   single: automatic reloading of templates
+   single: template automatic reload
+
+.. _reload_templates_section:
+
+Automatically Reloading Templates
+---------------------------------
+
+It's often convenient to see changes you make to a template file
+appear immediately without needing to restart the application process.
+:mod:`pyramid` allows you to configure your application development
+environment so that a change to a template will be automatically
+detected, and the template will be reloaded on the next rendering.
+
+.. warning:: auto-template-reload behavior is not recommended for
+             production sites as it slows rendering slightly; it's
+             usually only desirable during development.
+
+In order to turn on automatic reloading of templates, you can use an
+environment variable setting or a configuration file setting.
+
+To use an environment variable, start your application under a shell
+using the ``BFG_RELOAD_TEMPLATES`` operating system environment
+variable set to ``1``, For example::
+
+  $ BFG_RELOAD_TEMPLATES=1 bin/paster serve myproject.ini
+
+To use a setting in the application ``.ini`` file for the same
+purpose, set the ``reload_templates`` key to ``true`` within the
+application's configuration section, e.g.::
+
+  [app:main]
+  use = egg:MyProject#app
+  reload_templates = true
+
+.. index::
    single: template system bindings
    single: Jinja2
 
@@ -703,8 +796,9 @@ Available Add-On Template System Bindings
 -----------------------------------------
 
 Jinja2 template bindings are available for :mod:`pyramid` in the
-``repoze.bfg.jinja2`` package.  It lives in the Repoze Subversion
-repository at `http://svn.repoze.org/repoze.bfg.jinja2
-<http://svn.repoze.org/repoze.bfg.jinja2>`_; it is also available from
-:term:`PyPI`.
+``pyramid_jinja2`` package.  It lives in the Pylons version control
+repository at `http://github.com/Pylons/pyramid_jinja2
+<http://github.com/Pylons/pyramid_jinja2>`_.  At the time of this writing, it
+has not had a release, but by the time you read this it also might be
+available from :term:`PyPI`.
 
