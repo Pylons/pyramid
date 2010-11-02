@@ -201,14 +201,6 @@ Example:
         def __init__(self, request):
             self.request = request
         
-        @action(name='index', renderer='created.mak', request_method='POST')
-        def create(self):
-            return {}
-
-        @action(renderer="view_all.mak", request_method='GET')
-        def index(self):
-            return {}
-        
         @action(name='home', renderer='home.mak')
         @action(name='about', renderer='about.mak')
         def show_template(self):
