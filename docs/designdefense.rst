@@ -364,13 +364,13 @@ Pyramid Uses Interfaces Too Liberally
 
 In this `TOPP Engineering blog entry
 <http://www.coactivate.org/projects/topp-engineering/blog/2008/10/20/what-bothers-me-about-the-component-architecture/>`_,
-Ian Bicking asserts that the way :mod:`pyramid` uses a Zope
-interface to represent an HTTP request method adds too much
-indirection for not enough gain.  We agreed in general, and for this
-reason, :mod:`pyramid` version 1.1 added :term:`view predicate` and
-:term:`route predicate` modifiers to view configuration.  Predicates
-are request-specific (or :term:`context` -specific) matching narrowers
-which don't use interfaces.  Instead, each predicate uses a
+Ian Bicking asserts that the way :mod:`repoze.bfg` used a Zope interface to
+represent an HTTP request method added too much indirection for not enough
+gain.  We agreed in general, and for this reason, :mod:`repoze.bfg` version 1.1
+(and subsequent versions including :mod:`pyramid` 1.0+) added :term:`view
+predicate` and :term:`route predicate` modifiers to view configuration.
+Predicates are request-specific (or :term:`context` -specific) matching
+narrowers which don't use interfaces.  Instead, each predicate uses a
 domain-specific string as a match value.
 
 For example, to write a view configuration which matches only requests
@@ -393,8 +393,8 @@ response:
    :linenos:
 
    from pyramid.view import view_config
-   @view_config(name='post_view', request_method='POST', accept='application/json',
-             renderer='json')
+   @view_config(name='post_view', request_method='POST', 
+                accept='application/json', renderer='json')
    def post_view(request):
        return 'POSTed'
 
@@ -408,11 +408,11 @@ request method was ``POST`` and that the remote user agent passed
 For more information about predicates, see
 :ref:`view_predicates_in_1dot1` and :ref:`route_predicates_in_1dot1`.
 
-Many "prebaked" predicates exist.  However, use of only "prebaked"
-predicates, however, doesn't entirely meet Ian's criterion.  He would
-like to be able to match a request using a lambda or another function
-which interrogates the request imperatively.  In version 1.2, we
-acommodate this by allowing people to define "custom" view predicates:
+Many "prebaked" predicates exist.  However, use of only "prebaked" predicates,
+however, doesn't entirely meet Ian's criterion.  He would like to be able to
+match a request using a lambda or another function which interrogates the
+request imperatively.  In :mod:`repoze.bfg` version 1.2, we acommodate this by
+allowing people to define "custom" view predicates:
 
 .. code-block:: python
    :linenos:
@@ -435,25 +435,18 @@ The above view will only match when the first element of the request's
 Pyramid "Encourages Use of ZCML"
 --------------------------------
 
-:term:`ZCML` is a configuration language that can be used to configure
-the :term:`Zope Component Architecture` registry that
-:mod:`pyramid` uses as its application configuration.
+:term:`ZCML` is a configuration language that can be used to configure the
+:term:`Zope Component Architecture` registry that :mod:`pyramid` uses as its
+application configuration.  Often people claim that Pyramid "needs ZCML".
 
-Quick answer: well, it doesn't *really* encourage the use of ZCML.  In
-:mod:`pyramid` 1.0 and 1.1, application developers could use
-decorators for the most common form of configuration.  But, yes, a
-:mod:`pyramid` 1.0/1.1 application needed to possess a ZCML file
-for it to begin executing successfully even if its only contents were
-a ``<scan>`` directive that kicked off a scan to find decorated view
-callables.
-
-In the interest of completeness and in the spirit of providing a
-lowest common denominator, :mod:`pyramid` 1.2 includes a completely
-imperative mode for all configuration.  You will be able to make
-"single file" apps in this mode, which should help people who need to
-see everything done completely imperatively.  For example, the very
-most basic :mod:`pyramid` "helloworld" program has become
-something like:
+Quick answer: well, it doesn't. At least not anymore.  In :mod:`repoze.bfg`
+(the predecessor to Pyramid) versions 1.0 and and 1.1, an application needed to
+possess a ZCML file for it to begin executing successfully.  However,
+:mod:`repoze.bfg` 1.2 and greater (including :mod:`pyramid` 1.0) includes a
+completely imperative mode for all configuration.  You will be able to make
+"single file" apps in this mode, which should help people who need to see
+everything done completely imperatively.  For example, the very most basic
+:mod:`pyramid` "helloworld" program has become something like:
 
 .. code-block:: python
    :linenos:
@@ -473,19 +466,17 @@ something like:
        app = config.make_wsgi_app()
        serve(app)
 
-In this mode, no ZCML is required for end users.  Hopefully this mode
-will allow people who are used to doing everything imperatively feel
-more comfortable.
+In this mode, no ZCML is required at all.  Hopefully this mode will allow
+people who are used to doing everything imperatively feel more comfortable.
 
 Pyramid Uses ZCML; ZCML is XML and I Don't Like XML
 ---------------------------------------------------
 
-:term:`ZCML` is a configuration language in the XML syntax.  Due to
-the "imperative configuration" feature (new in :mod:`pyramid` 1.2),
-you don't need to use ZCML at all if you start a project from scratch.
-But if you really do want to perform declarative configuration,
-perhaps because you want to build an extensible application, you will
-need to use and understand it.
+:term:`ZCML` is a configuration language in the XML syntax.  Due to the
+"imperative configuration" feature (new in :mod:`repoze.bfg` 1.2), you don't
+need to use ZCML at all.  But if you really do want to perform declarative
+configuration, perhaps because you want to build an extensible application, you
+will need to use and understand it.
 
 :term:`ZCML` contains elements that are mostly singleton tags that are
 called *declarations*.  For an example:
@@ -784,7 +775,7 @@ pyramid/ (except for ``pyramd/tests and pyramid/paster_templates``)
 
 The actual :mod:`pyramid` runtime code is about 10% of the total size
 of the tarball omitting docs, helper templates used for package
-generation, and test code.  Of the approximately 13K lines of Python
+generation, and test code.  Of the approximately 19K lines of Python
 code in the package, the code that actually has a chance of executing
 during normal operation, excluding tests and paster template Python
 files, accounts for approximately 5K lines of Python code.  This is
@@ -796,7 +787,7 @@ Pyramid Has Too Many Dependencies
 
 This is true.  At the time of this writing, the total number of Python
 package distributions that :mod:`pyramid` depends upon transitively
-is 14 if you use Python 2.6 or 2.7, or 16 if you use Python 2.4 or
+is 18 if you use Python 2.6 or 2.7, or 16 if you use Python 2.4 or
 2.5.  This is a lot more than zero package distribution dependencies:
 a metric which various Python microframeworks and Django boast.
 
@@ -810,9 +801,9 @@ We'd prefer that these packages have fewer packages as transitive
 dependencies, and that much of the functionality of these packages was
 moved into a smaller *number* of packages.
 
-:mod:`pyramid` also has its own direct dependencies, such as
-:term:`Paste`, :term:`Chameleon`, and :term:`WebOb`, and some of these
-in turn have their own transitive dependencies.
+:mod:`pyramid` also has its own direct dependencies, such as :term:`Paste`,
+:term:`Chameleon`, :term:`Mako` and :term:`WebOb`, and some of these in turn
+have their own transitive dependencies.
 
 It should be noted that :mod:`pyramid` is positively lithe compared
 to :term:`Grok`, a different Zope-based framework.  As of this
@@ -1651,7 +1642,6 @@ where comments take into account what we've discussed in the
 Other Challenges
 ----------------
 
-Other challenges are encouraged to be sent to the `Repoze-Dev
-<http://lists.repoze.org/listinfo/repoze-dev>`_ maillist.  We'll try
-to address them by considering a design change, or at very least via
-exposition here.
+Other challenges are encouraged to be sent to the `Pylons-devel
+<http://groups.google.com/group/pylons-devel>`_ maillist.  We'll try to address
+them by considering a design change, or at very least via exposition here.
