@@ -218,7 +218,7 @@ Example:
     # in the config
     config.add_handler('hello', '/hello/:action', handler=Hello)
 
-With this configuration, the url '/hello/home' will find a view configuration
+With this configuration, the url ``/hello/home`` will find a view configuration
 that results in calling the ``show_template`` method, then rendering the
-template with ``home.mak``, and the url '/hello/about' will call the same
+template with ``home.mak``, and the url ``/hello/about`` will call the same
 method and render the ``about.mak`` template.
