@@ -16,7 +16,7 @@ about the following concepts within this tutorial:
 
 - Dublincore
 
-Please ask on the `Pylons-discuss maillist
-<http://groups.google.com/group/pylons-discuss>`_ or on the `#pylons IRC
+Please ask on the `Pylons-devel maillist
+<http://groups.google.com/group/pylons-devel>`_ or on the `#pylons IRC
 channel <http://irc.freenode.net#pylons>`_ about these topics.
 

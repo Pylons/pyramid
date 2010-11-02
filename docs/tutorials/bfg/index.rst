@@ -23,7 +23,7 @@ to find an analogue for each.  For example, by the time you read this,
 there will be a ``pyramid_jinja2`` package, which can be used instead
 of ``repoze.bfg.jinja2``.  If an analogue does not seem to exist for a
 ``repoze.bfg`` add-on package that your application uses, please email
-the `Pylons-discuss <http://groups.google.com/group/pylons-discuss>`_
+the `Pylons-devel <http://groups.google.com/group/pylons-devel>`_
 maillist; we'll convert the package to a :mod:`pyramid` analogue for
 you.
 

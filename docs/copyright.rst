@@ -74,8 +74,8 @@ Contacting The Publisher
 Please send documentation licensing inquiries, translation inquiries,
 and other business communications to `Agendaless Consulting
 <mailto:webmaster@agendaless.com>`_.  Please send software and other
-technical queries to the `Pylons-discuss maillist
-<http://groups.google.com/group/pylons-discuss>`_.
+technical queries to the `Pylons-devel maillist
+<http://groups.google.com/group/pylons-devel>`_.
 
 HTML Version and Source Code
 ----------------------------
