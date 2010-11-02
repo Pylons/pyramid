@@ -168,3 +168,40 @@ Example:
 
 This will register two views that require the ``action`` to be ``index``, with
 the additional view predicate requiring a specific request method.
+
+When a method is decorated multiple times with :class:`~pyramid.view.action`,
+a view configuration will be registered for each call, with the view callable
+being the method decorated. Used with a combination of ``name``, multiple
+URL's can result in different template renderings with the same data.
+
+Example:
+
+.. code-block:: python
+    
+    from pyramid.view import action
+   
+    class Hello(object):
+        def __init__(self, request):
+            self.request = request
+        
+        @action(name='index', renderer='created.mak', request_method='POST')
+        def create(self):
+            return {}
+
+        @action(renderer="view_all.mak", request_method='GET')
+        def index(self):
+            return {}
+        
+        @action(name='home', renderer='home.mak')
+        @action(name='about', renderer='about.mak')
+        def show_template(self):
+            # prep some template vars
+            return {}
+
+    # in the config
+    config.add_handler('hello', '/hello/:action', handler=Hello)
+
+With this configuration, the url '/hello/home' will find a view configuration
+that results in calling the ``show_template`` method, then rendering the
+template with ``home.mak``, and the url '/hello/about' will call the same
+method and render the ``about.mak`` template.
