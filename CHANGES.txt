@@ -72,8 +72,8 @@ Features (delta from BFG 1.3.X)
   keys added to the renderer globals dictionary by all subscribers and
   app-level globals factories must be unique.
 
-- New class: ``pyramid.response.Response`.  This is a pure facade for
-  ``webob.Response` (old code need not change to use this facade, it's
+- New class: ``pyramid.response.Response``.  This is a pure facade for
+  ``webob.Response`` (old code need not change to use this facade, it's
   existence is mostly for vanity and documentation-generation purposes).
 
 Documentation (delta from BFG 1.3)

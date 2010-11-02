@@ -39,6 +39,7 @@ Narrative Documentation
    narr/views
    narr/static
    narr/webob
+   narr/sessions
    narr/templates
    narr/models
    narr/security
@@ -87,12 +88,14 @@ API Reference
    api/configuration
    api/events
    api/exceptions
+   api/httpexceptions
    api/i18n
    api/interfaces
    api/location
    api/paster
    api/renderers
    api/request
+   api/response
    api/router
    api/scripting
    api/security
