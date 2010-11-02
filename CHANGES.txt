@@ -133,3 +133,8 @@ Backwards Incompatibilities (with BFG 1.3.X)
 
   This change was made primarily to support more flexible Mako template
   rendering.
+
+- The presence of the key ``repoze.bfg.message`` in the WSGI environment when
+  an exception occurs is now deprecated.  Instead, code which relies on this
+  environ value should use the ``exception`` attribute of the request
+  (e.g. ``request.exception[0]``) to retrieve the message.

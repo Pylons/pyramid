@@ -83,9 +83,10 @@ class Router(object):
                         info = self.routes_mapper(request)
                         match, route = info['match'], info['route']
                         if route is not None:
-                            # TODO: kill off bfg.routes.* environ keys
-                            # when traverser requires request arg, and
-                            # cant cope with environ anymore (likely 1.4+)
+                            # TODO: kill off bfg.routes.* environ keys when
+                            # traverser requires request arg, and cant cope
+                            # with environ anymore (they are docs-deprecated as
+                            # of BFG 1.3)
                             environ['bfg.routes.route'] = route 
                             environ['bfg.routes.matchdict'] = match
                             attrs['matchdict'] = match
@@ -132,8 +133,6 @@ class Router(object):
                             logger and logger.debug(msg)
                         else:
                             msg = request.path_info
-                        # XXX repoze.bfg.message should be deprecated
-                        environ['repoze.bfg.message'] = msg
                         raise NotFound(msg)
                     else:
                         response = view_callable(context, request)
@@ -150,11 +149,12 @@ class Router(object):
                     if view_callable is None:
                         raise
 
-                    # XXX r.b.message should be deprecated
                     try: 
                         msg = why[0]
                     except:
                         msg = ''
+
+                    # repoze.bfg.message docs-deprecated in Pyramid 1.0
                     environ['repoze.bfg.message'] = msg
 
                     response = view_callable(why, request)

@@ -72,13 +72,9 @@
 
 - ``handler`` ZCML directive.
 
-- ``repoze.bfg.message`` alias.
-
 - Try to get rid of Mako Beaker dependency.
 
 - ``docs`` directory for each paster template.
-
-- bfg.routes.matchdict and bfg.routes.route
 
 - repoze.bfg.auth_tkt
 

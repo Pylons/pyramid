@@ -43,11 +43,10 @@ class Forbidden(ExceptionResponse):
     this is a basic ``401`` page, but the forbidden view can be
     customized as necessary.  See :ref:`changing_the_forbidden_view`.
 
-    This exception's constructor accepts a single positional argument,
-    which should be a string.  The value of this string will be placed
-    into the WSGI environment by the router under the
-    ``repoze.bfg.message`` key, for availability to the
-    :term:`Forbidden View`.
+    This exception's constructor accepts a single positional argument, which
+    should be a string.  The value of this string will be placed onto the
+    request by the router as the ``exception_message`` attribute, for
+    availability to the :term:`Forbidden View`.
     """
     status = '401 Unauthorized'
 
@@ -58,11 +57,10 @@ class NotFound(ExceptionResponse):
     this is a basic ``404`` page, but the Not Found view can be
     customized as necessary.  See :ref:`changing_the_notfound_view`.
 
-    This exception's constructor accepts a single positional argument,
-    which should be a string.  The value of this string will be placed
-    into the WSGI environment by the router under the
-    ``repoze.bfg.message`` key, for availability to the :term:`Not Found
-    View`.
+    This exception's constructor accepts a single positional argument, which
+    should be a string.  The value of this string will be placed into the WSGI
+    environment by the router as the ``exception_message`` attribute, for
+    availability to the :term:`Not Found View`.
     """
     status = '404 Not Found'
 
