@@ -70,7 +70,7 @@ example:
 .. code-block:: python
    :linenos:
 
-   from webob import Response
+   from pyramid.response import Response
 
    def myview(request):
        session = request.session

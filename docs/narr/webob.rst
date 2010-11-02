@@ -186,9 +186,6 @@ If it is set, then ``req.POST``, ``req.GET``, ``req.params``, and
 corresponding ``req.str_*`` (like ``req.str_POST``) that is always
 ``str`` and never unicode.
 
-.. index::
-   single: response object
-
 More Details
 ++++++++++++
 
@@ -201,13 +198,17 @@ More detail about the request object API is available in:
   WebOb documentation will work against request objects created by
   :mod:`pyramid`.
 
+.. index::
+   single: response object
+
 Response
 ~~~~~~~~
 
-The response object looks a lot like the request object, though with
-some differences.  The request object wraps a single ``environ``
-object; the response object has three fundamental parts (based on
-WSGI):
+The :mod:`pyramid` response object can be imported as
+:class:`pyramid.response.Response`.  This import location is merely a facade
+for its original location: ``webob.Response``.
+
+A response object has three fundamental parts:
 
 ``response.status``:
     The response code plus message, like ``'200 OK'``.  To set the
@@ -230,22 +231,15 @@ WSGI):
 Everything else in the object derives from this underlying state.
 Here's the highlights:
 
-``response.content_type``:
+``response.content_type``
     The content type *not* including the ``charset`` parameter.
-    Typical use: ``response.content_type = 'text/html'``.  You can
-    subclass ``Response`` and add a class-level attribute
-    ``default_content_type`` to set this automatically on
-    instantiation.
+    Typical use: ``response.content_type = 'text/html'``.
 
 ``response.charset``:
     The ``charset`` parameter of the content-type, it also informs
     encoding in ``response.unicode_body``.
     ``response.content_type_params`` is a dictionary of all the
     parameters.
-
-``response.request``:
-    This optional attribute can point to the request object associated
-    with this response object.
 
 ``response.set_cookie(key, value, max_age=None, path='/', ...)``: 
     Set a cookie.  The keyword arguments control the various cookie
@@ -295,31 +289,30 @@ argument to the class; e.g.:
 
 .. code-block:: python
 
-  from webob import Response
-
+  from pyramid.response import Response
   response = Response(body='hello world!', content_type='text/plain')
 
-The status defaults to ``'200 OK'``.  The content_type does not
-default to anything, though if you subclass ``Response`` and set
+The status defaults to ``'200 OK'``.  The content_type does not default to
+anything, though if you subclass :class:`pyramid.response.Response` and set
 ``default_content_type`` you can override this behavior.
 
 .. index::
    single: response exceptions
 
-Exceptions
-++++++++++
+Exception Responses
++++++++++++++++++++
 
 To facilitate error responses like ``404 Not Found``, the module
-:mod:`webob.exc` contains classes for each kind of error response.
-These include boring but appropriate error bodies.  The exceptions
-exposed by this module, when used under :mod:`pyramid`, should be
-imported from the :mod:`pyramid.httpexceptions` "facade" module.
+:mod:`webob.exc` contains classes for each kind of error response.  These
+include boring but appropriate error bodies.  The exceptions exposed by this
+module, when used under :mod:`pyramid`, should be imported from the
+:mod:`pyramid.httpexceptions` "facade" module.  This import location is merely
+a facade for the original location of these exceptions: ``webob.exc``.
 
-Each class is named ``pyramid.httpexceptions.HTTP*``, where ``*`` is
-the reason for the error.  For instance,
-``pyramid.httpexceptions.HTTPNotFound``.  It subclasses ``Response``,
-so you can manipulate the instances in the same way.  A typical
-example is:
+Each class is named ``pyramid.httpexceptions.HTTP*``, where ``*`` is the reason
+for the error.  For instance, :class:`pyramid.httpexceptions.HTTPNotFound`.  It
+subclasses :class:`pyramid.Response`, so you can manipulate the instances in
+the same way.  A typical example is:
 
 .. ignore-next-block
 .. code-block:: python
@@ -359,13 +352,10 @@ objects.
 More Details
 ++++++++++++
 
-More details about the response object API are available in the `WebOb
-documentation <http://pythonpaste.org/webob>`_ .  All methods and
-attributes of a ``webob.Response`` documented within the WebOb
-documentation will work against response objects created by
-:mod:`pyramid`.  :mod:`pyramid` does not use a Webob Response
-object subclass to represent a response, it uses WebOb's Response
-class directly.
+More details about the response object API are available in the
+:mod:`pyramid.response` documentation.  More details about exception responses
+are in the :mod:`pyramid.httpexceptions` API documentation.  The `WebOb
+documentation <http://pythonpaste.org/webob>`_ is also useful.
 
 Multidict
 ~~~~~~~~~

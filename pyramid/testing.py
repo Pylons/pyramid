@@ -1,7 +1,5 @@
 import copy
 
-from webob import Response
-
 from zope.configuration.xmlconfig import _clearContext
 
 from zope.interface import implements
@@ -15,6 +13,7 @@ from pyramid.interfaces import IViewClassifier
 
 from pyramid.configuration import Configurator
 from pyramid.exceptions import Forbidden
+from pyramid.response import Response
 from pyramid.registry import Registry
 from pyramid.security import Authenticated
 from pyramid.security import Everyone

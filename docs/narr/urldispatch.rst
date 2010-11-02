@@ -871,7 +871,7 @@ The ``mypackage.views`` module referred to above might look like so:
 .. code-block:: python
    :linenos:
 
-   from webob import Response
+   from pyramid.response import Response
 
    def site_view(request):
        return Response(request.matchdict['id'])

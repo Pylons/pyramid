@@ -2,8 +2,6 @@ import os
 import pkg_resources
 import threading
 
-from webob import Response
-
 from zope.interface import implements
 
 from pyramid.interfaces import IRendererGlobalsFactory
@@ -18,6 +16,7 @@ from pyramid.decorator import reify
 from pyramid.events import BeforeRender
 from pyramid.path import caller_package
 from pyramid.path import package_path
+from pyramid.response import Response
 from pyramid.resource import resource_spec_from_abspath
 from pyramid.threadlocal import get_current_registry
 

@@ -72,7 +72,7 @@ callable:
 .. code-block:: python
    :linenos:
 
-   from webob.exc import HTTPNotFound
+   from pyramid.httpexceptions import HTTPNotFound
 
    def notfound_view(request):
        return HTTPNotFound()

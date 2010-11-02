@@ -23,6 +23,7 @@ documentation is organized alphabetically by module name.
    api/personality
    api/renderers
    api/request
+   api/response
    api/router
    api/scripting
    api/security

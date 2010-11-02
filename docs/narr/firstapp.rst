@@ -26,9 +26,9 @@ configured imperatively:
 .. code-block:: python
    :linenos:
 
-   from webob import Response
-   from paste.httpserver import serve
    from pyramid.configuration import Configurator
+   from pyramid.response import Response
+   from paste.httpserver import serve
 
    def hello_world(request):
        return Response('Hello world!')
@@ -64,26 +64,23 @@ The above script defines the following set of imports:
 .. code-block:: python
    :linenos:
 
-   from webob import Response
-   from paste.httpserver import serve
    from pyramid.configuration import Configurator
+   from pyramid.response import Response
+   from paste.httpserver import serve
 
-:mod:`pyramid` uses the :term:`WebOb` library as the basis for its
-:term:`request` and :term:`response` objects.  The script uses the
-:class:`webob.Response` class later in the script to create a
-:term:`response` object.
-
-Like many other Python web frameworks, :mod:`pyramid` uses the
-:term:`WSGI` protocol to connect an application and a web server
-together.  The :mod:`paste.httpserver` server is used in this example
-as a WSGI server for convenience, as the ``paste`` package is a
-dependency of :mod:`pyramid` itself.
-
-The script also imports the ``Configurator`` class from the
+The script imports the ``Configurator`` class from the
 ``pyramid.configuration`` module.  This class is used to configure
-:mod:`pyramid` for a particular application.  An instance of this
-class provides methods which help configure various parts of
-:mod:`pyramid` for a given application deployment.
+:mod:`pyramid` for a particular application.  An instance of this class
+provides methods which help configure various parts of :mod:`pyramid` for a
+given application deployment.
+
+The script uses the :class:`pyramid.response.Response` class later in the
+script to create a :term:`response` object.
+
+Like many other Python web frameworks, :mod:`pyramid` uses the :term:`WSGI`
+protocol to connect an application and a web server together.  The
+:mod:`paste.httpserver` server is used in this example as a WSGI server for
+convenience, as the ``paste`` package is a dependency of :mod:`pyramid` itself.
 
 View Callable Declarations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -117,14 +114,13 @@ A view callable is always called with a :term:`request` object.  A
 request object is a representation of an HTTP request sent to
 :mod:`pyramid` via the active :term:`WSGI` server.
 
-A view callable is required to return a :term:`response` object
-because a response object has all the information necessary to
-formulate an actual HTTP response; this object is then converted to
-text by the upstream :term:`WSGI` server and sent back to the
-requesting browser.  To return a response, each view callable creates
-an instance of the :class:`webob.Response` class.  In the
-``hello_world`` function, the string ``'Hello world!'`` is passed to
-the ``Response`` constructor as the *body* of the response.  In the
+A view callable is required to return a :term:`response` object because a
+response object has all the information necessary to formulate an actual HTTP
+response; this object is then converted to text by the upstream :term:`WSGI`
+server and sent back to the requesting browser.  To return a response, each
+view callable creates an instance of the :class:`pyramid.response.Response`
+class.  In the ``hello_world`` function, the string ``'Hello world!'`` is
+passed to the ``Response`` constructor as the *body* of the response.  In the
 ``goodbye_world`` function, the string ``'Goodbye world!'`` is passed.
 
 .. index::
@@ -385,9 +381,9 @@ To do so, first, create a file named ``helloworld.py``:
 .. code-block:: python
    :linenos:
 
-   from webob import Response
-   from paste.httpserver import serve
    from pyramid.configuration import Configurator
+   from pyramid.response import Response
+   from paste.httpserver import serve
 
    def hello_world(request):
        return Response('Hello world!')

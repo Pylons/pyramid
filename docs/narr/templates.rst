@@ -130,7 +130,7 @@ the body of the response:
    :linenos:
 
    from pyramid.renderers import render
-   from webob import Response
+   from pyramid.response import Response
 
    def sample_view(request):
        result = render('mypackage:templates/foo.pt', 
@@ -140,12 +140,11 @@ the body of the response:
        return response
 
 Because :term:`view callable` functions are typically the only code in
-:mod:`pyramid` that need to know anything about templates, and
-because view functions are very simple Python, you can use whatever
-templating system you're most comfortable with within
-:mod:`pyramid`.  Install the templating system, import its API
-functions into your views module, use those APIs to generate a string,
-then return that string as the body of a :term:`WebOb`
+:mod:`pyramid` that need to know anything about templates, and because view
+functions are very simple Python, you can use whatever templating system you're
+most comfortable with within :mod:`pyramid`.  Install the templating system,
+import its API functions into your views module, use those APIs to generate a
+string, then return that string as the body of a :mod:`pyramid`
 :term:`Response` object.
 
 For example, here's an example of using raw `Mako
@@ -157,7 +156,7 @@ For example, here's an example of using raw `Mako
    :linenos:
 
    from mako.template import Template
-   from webob import Response
+   from pyramid.response import Response
 
    def make_view(request):
        template = Template(filename='/templates/template.mak')
@@ -215,7 +214,7 @@ of :func:`pyramid.renderers.render` (a string):
    :linenos:
 
    from pyramid.renderers import render
-   from webob import Response
+   from pyramid.response import Response
    def sample_view(request):
        result = render('mypackage:templates/foo.pt',
                        {'foo':1, 'bar':2}, 

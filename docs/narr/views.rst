@@ -42,15 +42,16 @@ No matter how a view callable is eventually found, all view callables
 used by :mod:`pyramid` must be constructed in the same way, and
 must return the same kind of return value.
 
-Most view callables accept a single argument named ``request``.  This
-argument represents a :term:`WebOb` :term:`Request` object as
-represented to :mod:`pyramid` by the upstream :term:`WSGI` server.
+Most view callables accept a single argument named ``request``.  This argument
+represents a :mod:`pyramid` :term:`Request` object.  A request object
+encapsulates a WSGI environment as represented to :mod:`pyramid` by the
+upstream :term:`WSGI` server.
 
-A view callable may always return a :term:`WebOb` :term:`Response`
-object directly.  It may optionally return another arbitrary
-non-Response value: if a view callable returns a non-Response result,
-the result must be converted into a response by the :term:`renderer`
-associated with the :term:`view configuration` for the view.
+A view callable may always return a :mod:`Pyramid` :term:`Response` object
+directly.  It may optionally return another arbitrary non-Response value: if a
+view callable returns a non-Response result, the result must be converted into
+a response by the :term:`renderer` associated with the :term:`view
+configuration` for the view.
 
 View callables can be functions, instances, or classes.  View
 callables can optionally be defined with an alternate calling
@@ -73,7 +74,7 @@ callable implemented as a function:
 .. code-block:: python
    :linenos:
 
-   from webob import Response
+   from pyramid.response import Response
 
    def hello_world(request):
        return Response('Hello world!')
@@ -109,7 +110,7 @@ For example:
 .. code-block:: python
    :linenos:
 
-   from webob import Response
+   from pyramid.response import Response
 
    class MyView(object):
        def __init__(self, request):
@@ -149,7 +150,7 @@ context
   will be a :term:`model` object.
 
 request
-  A :term:`WebOb` Request object representing the current WSGI
+  A :mod:`pyramid` Request object representing the current WSGI
   request.
 
 The following types work as view callables in this style:
@@ -160,7 +161,7 @@ The following types work as view callables in this style:
    .. code-block:: python
       :linenos:
 
-      from webob import Response
+      from pyramid.response import Response
 
       def view(context, request):
           return Response('OK')
@@ -171,7 +172,7 @@ The following types work as view callables in this style:
    .. code-block:: python
       :linenos:
 
-      from webob import Response
+      from pyramid.response import Response
 
       class view(object):
           def __init__(self, context, request):
@@ -187,7 +188,7 @@ The following types work as view callables in this style:
    .. code-block:: python
       :linenos:
 
-      from webob import Response
+      from pyramid.response import Response
 
       class View(object):
           def __call__(self, context, request):
@@ -210,26 +211,25 @@ has access to the context via ``request.context``.
 View Callable Responses
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-A view callable may always return an object that implements the
-:term:`WebOb` :term:`Response` interface.  The easiest way to return
-something that implements the :term:`Response` interface is to return
-a :class:`webob.Response` object instance directly.  For example:
+A view callable may always return an object that implements the :mod:`pyramid`
+:term:`Response` interface.  The easiest way to return something that
+implements the :term:`Response` interface is to return a
+:class:`pyramid.response.Response` object instance directly.  For example:
 
 .. code-block:: python
    :linenos:
 
-   from webob import Response
+   from pyramid.response import Response
 
    def view(request):
        return Response('OK')
 
-You don't need to always use :class:`webob.Response` to represent a
-response.  :term:`WebOb` provides a range of different "exception"
-classes which can act as response objects too.  For example, an
-instance of the class :class:`webob.exc.HTTPFound` is also a valid
-response object (see :ref:`http_redirect`).  A view can actually any
-object that has the following attributes (these attributes form the
-notional "WebOb Response interface"):
+You don't need to always use :class:`pyramid.response.Response` to represent a
+response.  :mod:`pyramid` provides a range of different "exception" classes
+which can act as response objects too.  For example, an instance of the class
+:class:`pyramid.httpexceptions.HTTPFound` is also a valid response object (see
+:ref:`http_redirect`).  A view can actually any object that has the following
+attributes (these attributes form the notional "Pyramid Response interface"):
 
 status
   The HTTP status code (including the name) for the response as a string.
@@ -246,38 +246,36 @@ app_iter
   world!</body></html>']`` or it can be a file-like object, or any
   other sort of iterable.
 
-Furthermore, a view needn't *always* return a Response object.  If a
-view happens to return something which does not implement the WebOb
-Response interface, :mod:`pyramid` will attempt to use a
-:term:`renderer` to construct a response.  For example:
+Furthermore, a view needn't *always* return a Response object.  If a view
+happens to return something which does not implement the Pyramid Response
+interface, :mod:`pyramid` will attempt to use a :term:`renderer` to construct a
+response.  For example:
 
 .. code-block:: python
    :linenos:
 
-   from webob import Response
+   from pyramid.response import Response
    from pyramid.view import view_config
 
    @view_config(renderer='json')
    def hello_world(request):
        return {'content':'Hello!'}
 
-The above example returns a *dictionary* from the view callable.  A
-dictionary does not implement the :term:`WebOb` response interface, so
-you might believe that this example would fail.  However, since a
-``renderer`` is associated with the view callable through its
-:term:`view configuration` (in this case, using a ``renderer``
-argument passed to :func:`pyramid.view.view_config`), if the view does
-*not* return a Response object, the renderer will attempt to convert
-the result of the view to a response on the developer's behalf.  Of
-course, if no renderer is associated with a view's configuration,
-returning anything except an object which implements the WebOb
-Response interface will result in an error.  And, if a renderer *is*
-used, whatever is returned by the view must be compatible with the
-particular kind of renderer used, or an error may occur during view
-invocation.  One exception exists: it is *always* OK to return a WebOb
-Response object, even when a ``renderer`` is configured.  If a view
-callable returns a response object from a view that is configured with
-a renderer, the renderer is bypassed entirely.
+The above example returns a *dictionary* from the view callable.  A dictionary
+does not implement the Pyramid response interface, so you might believe that
+this example would fail.  However, since a ``renderer`` is associated with the
+view callable through its :term:`view configuration` (in this case, using a
+``renderer`` argument passed to :func:`pyramid.view.view_config`), if the view
+does *not* return a Response object, the renderer will attempt to convert the
+result of the view to a response on the developer's behalf.  Of course, if no
+renderer is associated with a view's configuration, returning anything except
+an object which implements the Response interface will result in an error.
+And, if a renderer *is* used, whatever is returned by the view must be
+compatible with the particular kind of renderer used, or an error may occur
+during view invocation.  One exception exists: it is *always* OK to return a
+Response object, even when a ``renderer`` is configured.  If a view callable
+returns a response object from a view that is configured with a renderer, the
+renderer is bypassed entirely.
 
 Various types of renderers exist, including serialization renderers
 and renderers which use templating systems.  See also
@@ -303,12 +301,11 @@ particular kind of response.
    def myview(request):
        return HTTPFound(location='http://example.com')
 
-All exception types from the :mod:`webob.exc` module implement the
-WebOb :term:`Response` interface; any can be returned as the response
-from a view.  See :mod:`pyramid.httpexceptions` for the documentation
-for the ``HTTPFound`` exception; it also includes other response types
-that imply other HTTP response codes, such as ``HTTPUnauthorized`` for
-``401 Unauthorized``.
+All exception types from the :mod:`pyramid.httpexceptions` module implement the
+:term:`Response` interface; any can be returned as the response from a view.
+See :mod:`pyramid.httpexceptions` for the documentation for the ``HTTPFound``
+exception; it also includes other response types that imply other HTTP response
+codes, such as ``HTTPUnauthorized`` for ``401 Unauthorized``.
 
 .. index::
    single: renderer
@@ -319,19 +316,17 @@ that imply other HTTP response codes, such as ``HTTPUnauthorized`` for
 Writing View Callables Which Use a Renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-View callables needn't always return a WebOb Response object.
-Instead, they may return an arbitrary Python object, with the
-expectation that a :term:`renderer` will convert that object into a
-response instance on behalf of the developer.  Some renderers use a
-templating system; other renderers use object serialization
-techniques.
+View callables needn't always return a Response object.  Instead, they may
+return an arbitrary Python object, with the expectation that a :term:`renderer`
+will convert that object into a response instance on behalf of the developer.
+Some renderers use a templating system; other renderers use object
+serialization techniques.
 
-If you do not define a ``renderer`` attribute in :term:`view
-configuration` for an associated :term:`view callable`, no renderer is
-associated with the view.  In such a configuration, an error is raised
-when a view callable does not return an object which implements the
-WebOb :term:`Response` interface, documented within
-:ref:`the_response`.
+If you do not define a ``renderer`` attribute in :term:`view configuration` for
+an associated :term:`view callable`, no renderer is associated with the view.
+In such a configuration, an error is raised when a view callable does not
+return an object which implements the :term:`Response` interface, documented
+within :ref:`the_response`.
 
 View configuration can vary the renderer associated with a view
 callable via the ``renderer`` attribute.  For example, this ZCML
@@ -353,18 +348,18 @@ Other built-in renderers include renderers which use the
 :term:`Chameleon` templating language to render a dictionary to a
 response.
 
-If the :term:`view callable` associated with a :term:`view
-configuration` returns a Response object directly (an object with the
-attributes ``status``, ``headerlist`` and ``app_iter``), any renderer
-associated with the view configuration is ignored, and the response is
-passed back to :mod:`pyramid` unmolested.  For example, if your
-view callable returns an instance of the :class:`webob.exc.HTTPFound`
-class as a response, no renderer will be employed.
+If the :term:`view callable` associated with a :term:`view configuration`
+returns a Response object directly (an object with the attributes ``status``,
+``headerlist`` and ``app_iter``), any renderer associated with the view
+configuration is ignored, and the response is passed back to :mod:`pyramid`
+unmolested.  For example, if your view callable returns an instance of the
+:class:`pyramid.httpexceptions.HTTPFound` class as a response, no renderer will
+be employed.
 
 .. code-block:: python
    :linenos:
 
-   from webob.exc import HTTPFound
+   from pyramid.httpexceptions import HTTPFound
 
    def view(request):
        return HTTPFound(location='http://example.com') # renderer avoided
@@ -410,7 +405,7 @@ representation of the dictionary:
 .. code-block:: python
    :linenos:
 
-   from webob import Response
+   from pyramid.response import Response
    from pyramid.view import view_config
 
    @view_config(renderer='string')
@@ -449,7 +444,7 @@ view will render the returned dictionary to a JSON serialization:
 .. code-block:: python
    :linenos:
 
-   from webob import Response
+   from pyramid.response import Response
    from pyramid.view import view_config
 
    @view_config(renderer='json')
@@ -1008,7 +1003,7 @@ exception view registration:
 
    from pyramid.view import view_config
    from pyramid.exceptions import NotFound
-   from webob.exc import HTTPNotFound
+   from pyramid.httpexceptions import HTTPNotFound
 
    @view_config(context=NotFound, route_name='home')
    def notfound_view(request):
@@ -1058,19 +1053,17 @@ implementations, and handling form submission data is a property of
 the request implementation.  Understanding WebOb's request API is the
 key to understanding how to process form submission data.
 
-There are some defaults that you need to be aware of when trying to
-handle form submission data in a :mod:`pyramid` view.  Because
-having high-order (non-ASCII) characters in data contained within form
-submissions is exceedingly common, and because the UTF-8 encoding is
-the most common encoding used on the web for non-ASCII character data,
-and because working and storing Unicode values is much saner than
-working with and storing bytestrings, :mod:`pyramid` configures the
-:term:`WebOb` request machinery to attempt to decode form submission
-values into Unicode from the UTF-8 character set implicitly.  This
-implicit decoding happens when view code obtains form field values via
-the :term:`WebOb` ``request.params``, ``request.GET``, or
-``request.POST`` APIs (see :ref:`request_module` for details about
-these APIs).
+There are some defaults that you need to be aware of when trying to handle form
+submission data in a :mod:`pyramid` view.  Because having high-order
+(non-ASCII) characters in data contained within form submissions is exceedingly
+common, and because the UTF-8 encoding is the most common encoding used on the
+web for non-ASCII character data, and because working and storing Unicode
+values is much saner than working with and storing bytestrings, :mod:`pyramid`
+configures the :term:`WebOb` request machinery to attempt to decode form
+submission values into Unicode from the UTF-8 character set implicitly.  This
+implicit decoding happens when view code obtains form field values via the
+``request.params``, ``request.GET``, or ``request.POST`` APIs (see
+:ref:`request_module` for details about these APIs).
 
 For example, let's assume that the following form page is served up to
 a browser client, and its ``action`` points at some :mod:`pyramid`
@@ -1119,35 +1112,32 @@ decode already-decoded (``unicode``) values obtained from
        firstname = request.params['firstname'].decode('utf-8')
        lastname = request.params['lastname'].decode('utf-8')
 
-For implicit decoding to work reliably, youshould ensure that every
-form you render that posts to a :mod:`pyramid` view is rendered via
-a response that has a ``;charset=UTF-8`` in its ``Content-Type``
-header; or, as in the form above, with a ``meta http-equiv`` tag that
-implies that the charset is UTF-8 within the HTML ``head`` of the page
-containing the form.  This must be done explicitly because all known
-browser clients assume that they should encode form data in the
-character set implied by ``Content-Type`` value of the response
-containing the form when subsequently submitting that form; there is
-no other generally accepted way to tell browser clients which charset
-to use to encode form data.  If you do not specify an encoding
-explicitly, the browser client will choose to encode form data in its
-default character set before submitting it.  The browser client may
-have a non-UTF-8 default encoding.  If such a request is handled by
-your view code, when the form submission data is encoded in a non-UTF8
-charset, eventually the WebOb request code accessed within your view
-will throw an error when it can't decode some high-order character
-encoded in another character set within form data e.g. when
+For implicit decoding to work reliably, youshould ensure that every form you
+render that posts to a :mod:`pyramid` view is rendered via a response that has
+a ``;charset=UTF-8`` in its ``Content-Type`` header; or, as in the form above,
+with a ``meta http-equiv`` tag that implies that the charset is UTF-8 within
+the HTML ``head`` of the page containing the form.  This must be done
+explicitly because all known browser clients assume that they should encode
+form data in the character set implied by ``Content-Type`` value of the
+response containing the form when subsequently submitting that form; there is
+no other generally accepted way to tell browser clients which charset to use to
+encode form data.  If you do not specify an encoding explicitly, the browser
+client will choose to encode form data in its default character set before
+submitting it.  The browser client may have a non-UTF-8 default encoding.  If
+such a request is handled by your view code, when the form submission data is
+encoded in a non-UTF8 charset, eventually the request code accessed within your
+view will throw an error when it can't decode some high-order character encoded
+in another character set within form data e.g. when
 ``request.params['somename']`` is accessed.
 
-If you are using the :class:`webob.Response` class to generate a
-response, or if you use the ``render_template_*`` templating APIs, the
-UTF-8 charset is set automatically as the default via the
-``Content-Type`` header.  If you return a ``Content-Type`` header
-without an explicit charset, a WebOb request will add a
-``;charset=utf-8`` trailer to the ``Content-Type`` header value for
+If you are using the :class:`pyramid.response.Response` class to generate a
+response, or if you use the ``render_template_*`` templating APIs, the UTF-8
+charset is set automatically as the default via the ``Content-Type`` header.
+If you return a ``Content-Type`` header without an explicit charset, a request
+will add a ``;charset=utf-8`` trailer to the ``Content-Type`` header value for
 you for response content types that are textual (e.g. ``text/html``,
-``application/xml``, etc) as it is rendered.  If you are using your
-own response object, you will need to ensure you do this yourself.
+``application/xml``, etc) as it is rendered.  If you are using your own
+response object, you will need to ensure you do this yourself.
 
 .. note:: Only the *values* of request params obtained via
    ``request.params``, ``request.GET`` or ``request.POST`` are decoded
@@ -1632,7 +1622,7 @@ All arguments to ``view_config`` may be omitted.  For example:
 .. code-block:: python
    :linenos:
 
-   from webob import Response
+   from pyramid.response import Response
    from pyramid.view import view_config
 
    @view_config()
@@ -1692,7 +1682,7 @@ decorator:
    :linenos:
 
    from pyramid.view import view_config
-   from webob import Response
+   from pyramid.response import Response
 
    @view_config(name='edit')
    def edit(request):
@@ -1707,7 +1697,7 @@ function.  For example:
 .. code-block:: python
    :linenos:
 
-   from webob import Response
+   from pyramid.response import Response
    from pyramid.view import view_config
 
    @view_config()
@@ -1725,7 +1715,7 @@ without the decorator syntactic sugar, if you wish:
 .. code-block:: python
    :linenos:
 
-   from webob import Response
+   from pyramid.response import Response
    from pyramid.view import view_config
 
    class MyView(object):
@@ -1745,7 +1735,7 @@ separate view registration.  For example:
    :linenos:
 
    from pyramid.view import view_config
-   from webob import Response
+   from pyramid.response import Response
 
    @view_config(name='edit')
    @view_config(name='change')
@@ -1759,7 +1749,7 @@ The decorator can also be used against class methods:
 .. code-block:: python
    :linenos:
 
-   from webob import Response
+   from pyramid.response import Response
    from pyramid.view import view_config
 
    class MyView(object):
@@ -1788,7 +1778,7 @@ equivalently as the below:
 .. code-block:: python
    :linenos:
 
-   from webob import Response
+   from pyramid.response import Response
    from pyramid.view import view_config
 
    @view_config(attr='amethod', name='hello')
@@ -1816,7 +1806,7 @@ example:
 .. code-block:: python
    :linenos:
 
-   from webob import Response
+   from pyramid.response import Response
 
    def hello_world(request):
        return Response('hello!')

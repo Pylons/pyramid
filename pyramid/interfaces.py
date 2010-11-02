@@ -153,10 +153,10 @@ class IStaticURLInfo(Interface):
 class IResponseFactory(Interface):
     """ A utility which generates a response factory """
     def __call__():
-        """ Return a response factory (e.g. a callable that returns an
-        object implementing IResponse, e.g. ``webob.Response``; it
-        should accept all the arguments that the webob.Response class
-        accepts)"""
+        """ Return a response factory (e.g. a callable that returns an object
+        implementing IResponse, e.g. :class:`pyramid.response.Response`). It
+        should accept all the arguments that the Pyramid Response class
+        accepts."""
 
 class IRequestFactory(Interface):
     """ A utility which generates a request """
@@ -166,7 +166,7 @@ class IRequestFactory(Interface):
 
     def blank(path):
         """ Return an empty request object (see
-        ``webob.Request.blank``)"""
+        :meth:`pyramid.request.Request.blank``)"""
 
 class IViewClassifier(Interface):
     """ *Internal only* marker interface for views."""

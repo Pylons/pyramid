@@ -52,9 +52,9 @@ imperatively:
 .. code-block:: python
    :linenos:
 
-   from webob import Response
    from paste.httpserver import serve
    from pyramid.configuration import Configurator
+   from pyramid.response import Response
 
    def hello_world(request):
        return Response('Hello world!')
@@ -98,8 +98,8 @@ In a file named ``helloworld.py``:
 .. code-block:: python
    :linenos:
 
-   from webob import Response
    from paste.httpserver import serve
+   from pyramid.response import Response
    from pyramid.configuration import Configurator
 
    def hello_world(request):
@@ -277,8 +277,8 @@ referred to by the declaration itself.  For example:
 .. code-block:: python
    :linenos:
 
+   from pyramid.response import Response
    from pyramid.view import view_config
-   from webob import Response
 
    @view_config(name='hello', request_method='GET')
    def hello(request):
@@ -306,8 +306,8 @@ and its subpackages.  For example:
       :linenos:
 
       from paste.httpserver import serve
+      from pyramid.response import Response
       from pyramid.view import view_config
-      from webob import Response
      
       @view_config()
       def hello(request):
@@ -334,8 +334,8 @@ directive, the package the ZCML file points to is scanned.
       # helloworld.py
 
       from paste.httpserver import serve
+      from pyramid.response import Response
       from pyramid.view import view_config
-      from webob import Response
      
       @view_config()
       def hello(request):

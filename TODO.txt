@@ -84,10 +84,6 @@
 
 - Test on GAE, Jython, PyPy, IronPython.
 
-- Remove references to 'WebOb' Response and just call it 'Response', and note
-  that it is imported from pyramid. API docs can mention its inheritance from
-  webob (aka "Provide a webob.Response class facade for forward compat").
-
 - Add docs for httpexceptions.
 
 - RendererHelper -> RendererInfo?

@@ -10,8 +10,6 @@ import mimetypes
 if hasattr(mimetypes, 'init'):
     mimetypes.init()
 
-from webob.exc import HTTPFound
-
 import venusian
 
 from zope.interface import providedBy
@@ -20,6 +18,7 @@ from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
 
+from pyramid.httpexceptions import HTTPFound
 from pyramid.static import static_view as static # B/C
 from pyramid.threadlocal import get_current_registry
 
@@ -291,7 +290,7 @@ class view_config(object):
     in Python 2.6 and better (Python 2.5 and below do not support
     class decorators)::
 
-        from webob import Response
+        from pyramid.response import Response
         from pyramid.view import view_config
 
         @view_config()
@@ -305,7 +304,7 @@ class view_config(object):
     In Python 2.5 and below, the ``view_config`` decorator can still be
     used against a class, although not in decorator form::
 
-        from webob import Response
+        from pyramid.response import Response
         from pyramid.view import view_config
 
         class MyView(object):
@@ -327,7 +326,7 @@ class view_config(object):
     The ``view_config`` decorator can also be used against a class
     method::
 
-        from webob import Response
+        from pyramid.response import Response
         from pyramid.view import view_config
 
         class MyView(object):
@@ -350,7 +349,7 @@ class view_config(object):
     decorator being used against the ``amethod`` method could be
     spelled equivalently as::
 
-        from webob import Response
+        from pyramid.response import Response
         from pyramid.view import view_config
 
         @view_config(attr='amethod', name='hello')
