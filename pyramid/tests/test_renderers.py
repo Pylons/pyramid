@@ -338,11 +338,15 @@ class TestRendererHelper(unittest.TestCase):
             def queryUtility(self, iface, name=None):
                 self.queried = True
                 return self.responses.pop(0)
+            def notify(self, event):
+                self.event = event
         reg = DummyRegistry()
         helper = self._makeOne('loo.foo', registry=reg)
         result = helper.render('value', {})
         self.assertEqual(result, ('value', {}))
         self.failUnless(reg.queried)
+        self.assertEqual(reg.event._system, {})
+        self.assertEqual(reg.event.__class__.__name__, 'BeforeRender')
 
     def test_render_system_values_is_None(self):
         self._registerRendererFactory()

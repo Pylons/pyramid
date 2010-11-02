@@ -16,6 +16,8 @@ Event-Related Interfaces
 
   .. autointerface:: INewResponse
 
+  .. autointerface:: IBeforeRender
+
 Other Interfaces
 ++++++++++++++++
 

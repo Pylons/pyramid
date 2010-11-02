@@ -15,6 +15,7 @@ from pyramid.interfaces import IRendererInfo
 
 from pyramid.compat import json
 from pyramid.decorator import reify
+from pyramid.events import BeforeRender
 from pyramid.path import caller_package
 from pyramid.path import package_path
 from pyramid.resource import resource_spec_from_abspath
@@ -263,6 +264,8 @@ class RendererHelper(object):
             renderer_globals = globals_factory(system_values)
             if renderer_globals:
                 system_values.update(renderer_globals)
+
+        registry.notify(BeforeRender(system_values))
 
         result = renderer(value, system_values)
         return result

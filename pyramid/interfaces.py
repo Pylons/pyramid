@@ -62,6 +62,44 @@ class IExceptionResponse(IException, IResponse):
     (:class:`pyramid.exceptions.NotFound` and
     :class:`pyramid.exceptions.Forbidden`)."""
 
+class IBeforeRender(Interface):
+    """
+    Subscribers to this event may introspect the and modify the set of
+    :term:`renderer globals` before they are passed to a :term:`renderer`.
+    This event object iself has a dictionary-like interface that can be used
+    for this purpose.  For example::
+
+      from repoze.events import subscriber
+      from pyramid.interfaces import IBeforeRender
+
+      @subscriber(IBeforeRender)
+      def add_global(event):
+          event['mykey'] = 'foo'
+
+    See also :ref:`beforerender_event`.
+    """
+    def __setitem__(name, value):
+        """ Set a name/value pair into the dictionary which is passed to a
+        renderer as the renderer globals dictionary.  If the ``name`` already
+        exists in the target dictionary, a :exc:`NameError` will be raised."""
+
+    def update(d):
+        """ Update the renderer globals dictionary with another dictionary
+        ``d``.  If any of the key names in the source dictionary already exist
+        in the target dictionary, a :exc:`NameError` will be raised"""
+
+    def __contains__(k):
+        """ Return ``True`` if ``k`` exists in the renderer globals
+        dictionary."""
+
+    def __getitem__(k):
+        """ Return the value for key ``k`` from the renderer globals
+        dictionary."""
+
+    def get(k, default=None):
+        """ Return the value for key ``k`` from the renderer globals
+        dictionary, or the default if no such value exists."""
+
 # internal interfaces
 
 class IRequest(Interface):
@@ -503,3 +541,4 @@ class IRendererInfo(Interface):
                          'renderer was created')
     settings = Attribute('The ISettings dictionary related to the current app')
     
+

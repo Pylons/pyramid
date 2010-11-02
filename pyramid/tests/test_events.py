@@ -154,6 +154,70 @@ class TestSubscriber(unittest.TestCase):
         self.assertEqual(dummy_venusian.attached,
                          [(foo, dec.register, 'pyramid')])
 
+class TestBeforeRender(unittest.TestCase):
+    def _makeOne(self, system):
+        from pyramid.events import BeforeRender
+        return BeforeRender(system)
+
+    def test_instance_conforms(self):
+        from zope.interface.verify import verifyObject
+        from pyramid.interfaces import IBeforeRender
+        event = self._makeOne({})
+        verifyObject(IBeforeRender, event)
+
+    def test_setitem_success(self):
+        system = {}
+        event = self._makeOne(system)
+        event['a'] = 1
+        self.assertEqual(system, {'a':1})
+
+    def test_setitem_fail(self):
+        system = {'a':1}
+        event = self._makeOne(system)
+        self.assertRaises(KeyError, event.__setitem__, 'a',  1)
+
+    def test_update_success(self):
+        system = {'a':1}
+        event = self._makeOne(system)
+        event.update({'b':2})
+        self.assertEqual(system, {'a':1, 'b':2})
+
+    def test_update_fail(self):
+        system = {'a':1}
+        event = self._makeOne(system)
+        self.assertRaises(KeyError, event.update, {'a':1})
+
+    def test__contains__True(self):
+        system = {'a':1}
+        event = self._makeOne(system)
+        self.failUnless('a' in event)
+
+    def test__contains__False(self):
+        system = {}
+        event = self._makeOne(system)
+        self.failIf('a' in event)
+
+    def test__getitem__success(self):
+        system = {'a':1}
+        event = self._makeOne(system)
+        self.assertEqual(event['a'], 1)
+
+    def test__getitem__fail(self):
+        system = {}
+        event = self._makeOne(system)
+        self.assertRaises(KeyError, event.__getitem__, 'a')
+
+    def test_get_success(self):
+        system = {'a':1}
+        event = self._makeOne(system)
+        self.assertEqual(event.get('a'), 1)
+
+    def test_get_fail(self):
+        system = {}
+        event = self._makeOne(system)
+        self.assertEqual(event.get('a'), None)
+
+
 class DummyConfigurator(object):
     def __init__(self):
         self.subscribed = []

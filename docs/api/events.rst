@@ -23,6 +23,9 @@ Event Types
 
 .. autoclass:: NewResponse
 
+.. autoclass:: BeforeRender
+   :members:
+
 See :ref:`events_chapter` for more information about how to register
 code which subscribes to these events.
 

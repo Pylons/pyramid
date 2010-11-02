@@ -49,6 +49,29 @@ Features (delta from BFG 1.3.X)
   is passed to renderer factory constructors (see "Backwards
   Incompatibilities").
 
+- New event type: ``pyramid.interfaces.IBeforeRender``.  An object of this type
+  is sent as an event before a renderer is invoked (but after the
+  application-level renderer globals factory added via
+  ``pyramid.configurator.configuration.set_renderer_globals_factory``, if any,
+  has injected its own keys).  Applications may now subscribe to the
+  ``IBeforeRender`` event type in order to introspect the and modify the set of
+  renderer globals before they are passed to a renderer.  The event object
+  iself has a dictionary-like interface that can be used for this purpose.  For
+  example::
+
+    from repoze.events import subscriber
+    from pyramid.interfaces import IRendererGlobalsEvent
+
+    @subscriber(IRendererGlobalsEvent)
+    def add_global(event):
+        event['mykey'] = 'foo'
+
+  If a subscriber attempts to add a key that already exist in the renderer
+  globals dictionary, a ``KeyError`` is raised.  This limitation is due to the
+  fact that subscribers cannot be ordered relative to each other.  The set of
+  keys added to the renderer globals dictionary by all subscribers and
+  app-level globals factories must be unique.
+
 Documentation (delta from BFG 1.3)
 -----------------------------------
 

@@ -446,6 +446,47 @@ method:
    config = Configurator()
    config.set_renderer_globals_factory(renderer_globals_factory)
 
+Another mechanism which allows event subscribers to add renderer global values
+exists in :ref:`beforerender_event`.
+
+.. _beforerender_event:
+
+Using The Before Render Event
+-----------------------------
+
+Subscribers to the :class:`repoze.interfaces.IBeforeRender` event may
+introspect the and modify the set of :term:`renderer globals` before they are
+passed to a :term:`renderer`.  This event object iself has a dictionary-like
+interface that can be used for this purpose.  For example:
+
+.. code-block:: python
+   :linenos:
+
+    from repoze.events import subscriber
+    from pyramid.interfaces import IBeforeRender
+
+    @subscriber(IBeforeRender)
+    def add_global(event):
+        event['mykey'] = 'foo'
+
+An object of this type is sent as an event just before a :term:`renderer` is
+invoked (but *after* the application-level renderer globals factory added via
+:class:`pyramid.configuration.Configurator.set_renderer_globals_factory`, if
+any, has injected its own keys into the renderer globals dictionary).
+
+If a subscriber attempts to add a key that already exist in the renderer
+globals dictionary, a :exc:`KeyError` is raised.  This limitation is enforced
+because event subscribers do not possess any relative ordering.  The set of
+keys added to the renderer globals dictionary by all
+:class:`pyramid.interfaces.IBeforeRender` subscribers and renderer globals
+factories must be unique.
+
+See the API documentation for the event interface
+:class:`pyramid.interfaces.IBeforeRender`.
+
+Another mechanism which allows event subscribers more control when adding
+renderer global values exists in :ref:`adding_renderer_globals`.
+
 .. _using_response_callbacks:
 
 Using Response Callbacks
