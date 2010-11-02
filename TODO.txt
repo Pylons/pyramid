@@ -76,8 +76,6 @@
 
 - ``docs`` directory for each paster template.
 
-- repoze.bfg.auth_tkt
-
 - "BFG" in environ variables.
 
 - request.link (route_url)

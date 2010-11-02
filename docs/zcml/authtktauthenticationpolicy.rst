@@ -25,7 +25,7 @@ Attributes
 
 ``cookie_name``
     The ``cookie_name`` is the name used for the cookie that contains
-    the user information.  It defaults to ``repoze.bfg.auth_tkt``.
+    the user information.  It defaults to ``auth_tkt``.
 
 ``secure``
     ``secure`` is a boolean value.  If it's set to "true", the cookie

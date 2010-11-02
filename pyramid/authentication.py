@@ -177,7 +177,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     ``cookie_name``
 
-       Default: ``repoze.bfg.auth_tkt``.  The cookie name used
+       Default: ``auth_tkt``.  The cookie name used
        (string).  Optional.
 
     ``secure``
@@ -242,7 +242,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
     def __init__(self,
                  secret,
                  callback=None,
-                 cookie_name='repoze.bfg.auth_tkt',
+                 cookie_name='auth_tkt',
                  secure=False,
                  include_ip=False,
                  timeout=None,

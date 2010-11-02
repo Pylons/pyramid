@@ -152,3 +152,9 @@ Backwards Incompatibilities (with BFG 1.3.X)
   during internationalization for caching purposes were never APIs.  These
   however have changed to ``localizer`` and ``locale_name``, respectively.
 
+- The default ``cookie_name`` value of the ``authtktauthenticationpolicy`` ZCML
+  now defaults to ``auth_tkt`` (it used to default to ``repoze.bfg.auth_tkt``).
+
+- The default ``cookie_name`` value of the
+  ``pyramid.authentication.AuthTktAuthenticationPolicy`` constructor now
+  defaults to ``auth_tkt`` (it used to default to ``repoze.bfg.auth_tkt``).

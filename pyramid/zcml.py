@@ -482,7 +482,7 @@ class IAuthTktAuthenticationPolicyDirective(Interface):
     secret = TextLine(title=u'secret', required=True)
     callback = GlobalObject(title=u'callback', required=False)
     cookie_name = ASCIILine(title=u'cookie_name', required=False,
-                            default='repoze.bfg.auth_tkt')
+                            default='auth_tkt')
     secure = Bool(title=u"secure", required=False, default=False)
     include_ip = Bool(title=u"include_ip", required=False, default=False)
     timeout = Int(title=u"timeout", required=False, default=None)
@@ -494,7 +494,7 @@ class IAuthTktAuthenticationPolicyDirective(Interface):
 def authtktauthenticationpolicy(_context,
                                 secret,
                                 callback=None,
-                                cookie_name='repoze.bfg.auth_tkt',
+                                cookie_name='auth_tkt',
                                 secure=False,
                                 include_ip=False,
                                 timeout=None,

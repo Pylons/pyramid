@@ -446,7 +446,7 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
         def callback(identity, request):
             """ """
         self._callFUT(context, 'sosecret', callback=callback,
-                      cookie_name='repoze.bfg.auth_tkt',
+                      cookie_name='auth_tkt',
                       secure=True, include_ip=True, timeout=100,
                       reissue_time=60, http_only=True, path="/sub/")
         actions = context.actions
@@ -469,7 +469,7 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
         self.assertRaises(ConfigurationError,
                           self._callFUT,
                           context, 'sosecret', callback=callback,
-                          cookie_name='repoze.bfg.auth_tkt',
+                          cookie_name='auth_tkt',
                           secure=True, include_ip=True, timeout=100,
                           reissue_time=500, http_only=True,
                           path="/cgi-bin/app.cgi/")
