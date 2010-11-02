@@ -31,6 +31,9 @@ class ZPTTemplateRenderer(object):
 
     @reify # avoid looking up reload_templates before manager pushed
     def template(self):
+        if sys.platform.startswith('java'): # pragma: no cover
+            raise RuntimeError(
+                'Chameleon templates are not compatible with Jython')
         settings = get_settings()
         debug = False
         auto_reload = False
