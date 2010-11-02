@@ -13,7 +13,7 @@ class when using :term:`url dispatch`.  The view handler machinery also
 introduces the concept of an ``action``, which is used as a :term:`view
 predicate` to control which method of the handler is called.
 
-..note:: 
+.. note:: 
 
    View handlers are not useful when using :term:`traversal`, only when using
    :term:`url dispatch`.  The concept of a view handler is analogous to a
