@@ -85,3 +85,6 @@
 - Add docs for httpexceptions.
 
 - RendererHelper -> RendererInfo?
+
+- Do something about ZODB session chapter: either remove or create a
+  pyramid_zodbsessions package.
