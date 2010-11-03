@@ -45,10 +45,16 @@ configured imperatively:
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
-When this code is inserted into a Python script named
-``helloworld.py`` and executed by a Python interpreter which has the
-:mod:`pyramid` software installed, an HTTP server is started on TCP
-port 8080.  When port 8080 is visited by a browser on the root URL
+When this code is inserted into a Python script named ``helloworld.py`` and
+executed by a Python interpreter which has the :mod:`pyramid` software
+installed, an HTTP server is started on TCP port 8080:
+
+.. code-block:: bash
+
+   $ python helloworld.py
+   serving on 0.0.0.0:8080 view at http://127.0.0.1:808
+
+When port 8080 is visited by a browser on the root URL
 (``/``), the server will simply serve up the text "Hello world!"  When
 visited by a browser on the URL ``/goodbye``, the server will serve up
 the text "Goodbye world!"
@@ -421,11 +427,16 @@ the previously created ``helloworld.py``:
    </configure>
 
 This pair of files forms an application functionally equivalent to the
-application we created earlier in :ref:`helloworld_imperative`.
-Let's examine the differences between the code in that section and the
-code above.
+application we created earlier in :ref:`helloworld_imperative`.  We can run
+it the same way.
 
-In :ref:`helloworld_imperative_appconfig`, we had the following lines
+.. code-block:: bash
+
+   $ python helloworld.py
+   serving on 0.0.0.0:8080 view at http://127.0.0.1:808
+
+Let's examine the differences between the code in that section and the code
+above.  In :ref:`helloworld_imperative_appconfig`, we had the following lines
 within the ``if __name__ == '__main__'`` section of ``helloworld.py``:
 
 .. code-block:: python
