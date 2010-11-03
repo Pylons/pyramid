@@ -330,13 +330,13 @@ One caveat exists to using :mod:`pyramid` under Jython: the
 :term:`Chameleon` templating engine, which is the default templating
 engine for :mod:`pyramid` does not work on Jython.
 
-The ``repoze.bfg.jinja2`` distribution provides templating for
+The ``pyramid_jinja2`` distribution provides templating for
 :mod:`pyramid` using the :term:`Jinja2` templating system.  You may
 install it like so using the ``easy_install`` command for Jython:
 
 .. code-block:: python
 
-   $ easy_install repoze.bfg.jinja2
+   $ easy_install pyramid_jinja2
 
 Once this is done, you can use this command to get started with a
 :mod:`pyramid` sample application that uses the Jinja2 templating
@@ -344,7 +344,7 @@ engine:
 
 .. code-block:: python
 
-   $ paster create -t bfg_jinja2_starter
+   $ paster create -t pyramid_jinja2_starter
 
 See the chapter entitled :ref:`project_narr` for more information
 about the ``paster create`` command.
