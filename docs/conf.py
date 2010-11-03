@@ -12,6 +12,7 @@
 # serve to show the default value.
 
 import sys, os
+import datetime
 
 # skip raw nodes
 from sphinx.writers.text import TextTranslator
@@ -36,6 +37,10 @@ for item in os.listdir(parent):
     if item.endswith('.egg'):
         sys.path.append(os.path.join(parent, item))
 
+import pkginfo
+
+pkg_info = pkginfo.Develop(os.path.join(os.path.dirname(__file__),'..'))
+
 # General configuration
 # ---------------------
 
@@ -55,13 +60,13 @@ master_doc = 'index'
 
 # General substitutions.
 project = 'The Pyramid Web Application Development Framework'
-copyright = '2008-2010, Agendaless Consulting'
+copyright = '%s, Agendaless Consulting' % datetime.datetime.now().year
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '1.0a1'
+version = pkg_info.version
 # The full version, including alpha/beta/rc tags.
 release = version
 

@@ -12,7 +12,7 @@
 #
 ##############################################################################
 
-__version__ = '1.0a1'
+__version__ = '0.0'
 
 import os
 import platform
@@ -48,7 +48,8 @@ if platform.system() == 'Java':
     tests_require = install_requires + ['twill']
 else:
     tests_require= install_requires + ['Sphinx', 'docutils', 'coverage',
-                                       'twill', 'repoze.sphinx.autointerface']
+                                       'twill', 'repoze.sphinx.autointerface',
+                                       'pkginfo']
 
 if sys.version_info[:2] < (2, 6):
     install_requires.append('simplejson')
@@ -67,7 +68,7 @@ setup(name='pyramid',
         ],
       keywords='web wsgi pylons pyramid bfg',
       author="Chris McDonough, Agendaless Consulting",
-      author_email="repoze-dev@lists.repoze.org",
+      author_email="pylons-devel@googlegroups.com",
       url="http://pylonshq.com",
       license="BSD-derived (http://www.repoze.org/LICENSE.txt)",
       packages=find_packages(),
