@@ -52,7 +52,7 @@ installed, an HTTP server is started on TCP port 8080:
 .. code-block:: bash
 
    $ python helloworld.py
-   serving on 0.0.0.0:8080 view at http://127.0.0.1:808
+   serving on 0.0.0.0:8080 view at http://127.0.0.1:8080
 
 When port 8080 is visited by a browser on the root URL
 (``/``), the server will simply serve up the text "Hello world!"  When
@@ -433,7 +433,7 @@ it the same way.
 .. code-block:: bash
 
    $ python helloworld.py
-   serving on 0.0.0.0:8080 view at http://127.0.0.1:808
+   serving on 0.0.0.0:8080 view at http://127.0.0.1:8080
 
 Let's examine the differences between the code in that section and the code
 above.  In :ref:`helloworld_imperative_appconfig`, we had the following lines
