@@ -961,7 +961,7 @@ point to an implementation of a :term:`renderer factory`.
 The ``name`` attribute is the renderer name.
 
 Registering a Renderer Factory
-++++++++++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 See :ref:`adding_a_renderer` for more information for the definition of a
 :term:`renderer factory`.  Here's an example of the registration of a simple
@@ -1026,7 +1026,7 @@ See also :ref:`renderer_directive` and
 
 
 Overriding an Existing Renderer
-+++++++++++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can associate more than one filename extension with the same
 existing renderer implementation as necessary if you need to use a
