@@ -5,5 +5,5 @@
 
 .. module:: pyramid.personality.pylons
 
-.. function:: renderer_globals_factory_config
+.. autofunction:: renderer_globals_factory_config
 
