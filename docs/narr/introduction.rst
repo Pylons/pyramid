@@ -95,7 +95,7 @@ Openness
   <http://repoze.org/license.html>`_.
 
 .. index::
-   single: Repoze
+   single: Pylons
    single: Agendaless Consulting
    single: repoze namespace package
 
@@ -106,6 +106,9 @@ What Is Pylons?
 under the :term:`Pylons` "brand".  :term:`Pylons` software is written
 by a loose-knit community of contributors.  The `Pylons website
 <http://pylonshq.com>`_ describes the Pylons brand in more detail.
+
+See `http://docs.pylonshq.com <http://docs.pylonshq.com>`_ for an overview of
+the Pyramid project and how it relates to Pylons.
 
 .. index::
    single: pyramid and other frameworks

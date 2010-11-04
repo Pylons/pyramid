@@ -31,11 +31,11 @@ variables using the following style:
 
 References to glossary terms are presented using the following style:
 
-  :term:`Repoze`
+  :term:`Pylons`
 
 URLs are presented using the following style:
 
-  `Repoze <http://repoze.org>`_
+  `Pylons <http://pylonshq.com>`_
 
 References to sections and chapters are presented using the following
 style:

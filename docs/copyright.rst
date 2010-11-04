@@ -9,11 +9,11 @@ by Chris McDonough
 
 Copyright |copy| 2008-2010, Agendaless Consulting.
 
-ISBN-10: 0615345379
+.. ISBN-10: 0615345379
 
-ISBN-13: 978-0-615-34537-6
+.. ISBN-13: 978-0-615-34537-6
 
-First print publishing: February, 2010
+.. First print publishing: February, 2010
 
 All rights reserved.  This material may be copied or distributed only
 subject to the terms and conditions set forth in the `Creative Commons
@@ -48,25 +48,22 @@ with respect to the use of the information contained herein.
 Attributions
 ------------
 
-Foreword:
-  Paul Everitt
+Contributors:
+  Ben Bangert, Blaise Laflamme, Carlos de la Guardia, Paul Everitt
 
-Technical Reviewer:
-  Andrew Sawyers
-
-Cover Designer:
-   Nat Hardwick of `Electrosoup <http://www.electrosoup.co.uk>`_.
+.. Cover Designer:
+..   Nat Hardwick of `Electrosoup <http://www.electrosoup.co.uk>`_.
 
 Used with permission:
    The :ref:`webob_chapter` chapter is adapted, with permission, from
    documentation originally written by Ian Bicking.
 
-Print Production
-----------------
+.. Print Production
+.. ----------------
 
-The print version of this book was produced using the `Sphinx
-<http://sphinx.pocoo.org/>`_ documentation generation system and the
-`LaTeX <http://www.latex-project.org/>`_ typesetting system.
+.. The print version of this book was produced using the `Sphinx
+.. <http://sphinx.pocoo.org/>`_ documentation generation system and the
+.. `LaTeX <http://www.latex-project.org/>`_ typesetting system.
 
 Contacting The Publisher
 ------------------------
@@ -81,7 +78,7 @@ HTML Version and Source Code
 ----------------------------
 
 An HTML version of this book is freely available via
-http://pylonshq.com/pyramid.
+http://docs.pylonshq.com
 
 The source code for the examples used in this book are available
 within the :mod:`pyramid` software distribution, always available
