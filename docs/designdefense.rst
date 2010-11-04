@@ -845,6 +845,14 @@ Pyramid Gets Its Terminology Wrong ("MVC")
 "I'm a MVC web framework user, and I'm confused.  :mod:`pyramid`
 calls the controller a view!  And it doesn't have any controllers."
 
+If you are in this camp, you might have come to expect things about how your
+existing "MVC" framework uses its terminology.  For example, you probably
+expect that models are ORM models, controllers are classes that have methods
+that map to URLs, and views are templates.  :mod:`pyramid` indeed has each of
+these concepts, and each probably *works* almost exactly like your existing
+"MVC" web framework. We just don't use the "MVC" terminology, as we can't
+square its usage in the web framework space with historical reality.
+
 People very much want to give web applications the same properties as
 common desktop GUI platforms by using similar terminology, and to
 provide some frame of reference for how various components in the
