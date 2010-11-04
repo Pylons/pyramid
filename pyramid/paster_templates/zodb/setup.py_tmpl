@@ -35,7 +35,7 @@ setup(name='{{project}}',
       test_suite="{{package}}",
       entry_points = """\
       [paste.app_factory]
-      app = {{package}}.run:app
+      app = {{package}}:app
       """
       )
 
