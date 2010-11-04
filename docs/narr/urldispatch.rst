@@ -42,7 +42,7 @@ dispatch`.
 
 .. note::
 
-  Route configuration may also be added to the system via term:`ZCML` (see
+  Route configuration may also be added to the system via :term:`ZCML` (see
   :ref:`zcml_route_configuration`).
 
 High-Level Operational Overview
