@@ -14,6 +14,11 @@ class StarterProjectTemplate(Template):
     summary = 'pyramid starter project'
     template_renderer = staticmethod(paste_script_template_renderer)
 
+class StarterZCMLProjectTemplate(Template):
+    _template_dir = 'paster_templates/starter_zcml'
+    summary = 'pyramid starter project (ZCML)'
+    template_renderer = staticmethod(paste_script_template_renderer)
+
 class ZODBProjectTemplate(Template):
     _template_dir = 'paster_templates/zodb'
     summary = 'pyramid ZODB starter project'

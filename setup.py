@@ -80,6 +80,7 @@ setup(name='pyramid',
       entry_points = """\
         [paste.paster_create_template]
         pyramid_starter=pyramid.paster:StarterProjectTemplate
+        pyramid_starter_zcml=pyramid.paster:StarterZCMLProjectTemplate
         pyramid_zodb=pyramid.paster:ZODBProjectTemplate
         pyramid_routesalchemy=pyramid.paster:RoutesAlchemyProjectTemplate
         pyramid_alchemy=pyramid.paster:AlchemyProjectTemplate

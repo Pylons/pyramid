@@ -7,12 +7,10 @@ def app(global_config, **settings):
     It is usually called by the PasteDeploy framework during 
     ``paster serve``.
     """
+    zcml_file = settings.get('configure_zcml', 'configure.zcml')
     config = Configurator(root_factory=get_root, settings=settings)
     config.begin()
-    config.add_view('{{package}}.views.my_view',
-                    context='{{package}}.models.MyModel',
-                    renderer='{{package}}:templates/mytemplate.pt')
-    config.add_static_view('static', '{{package}}:templates/static')
+    config.load_zcml(zcml_file)
     config.end()
     return config.make_wsgi_app()
 
