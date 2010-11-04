@@ -22,9 +22,9 @@ Making Edits to ``models.py``
   Python subpackage of your application package named ``models``) ,
   but this is only by convention.
 
-The first thing we want to do is remove the stock ``Model`` class from
-the generated ``models.py`` file.  The ``Model`` class is only a
-sample and we're not going to use it.
+The first thing we want to do is remove the stock ``MyModel`` class from the
+generated ``models.py`` file.  The ``MyModel`` class is only a sample and
+we're not going to use it.
 
 Then, we'll add a ``Page`` class.  Because this is a SQLAlchemy
 application, this class should inherit from an instance of
@@ -76,3 +76,5 @@ that ends with this exception:
 .. code-block:: text
 
    ImportError: cannot import name MyModel
+
+This will also happen if you attempt to run the tests.

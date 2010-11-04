@@ -90,3 +90,5 @@
   pyramid_zodbsessions package.
 
 - repoze.bfg.viewgroup in CMF tutorial
+
+- templates in tutorials.
