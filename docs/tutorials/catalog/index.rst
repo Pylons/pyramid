@@ -84,10 +84,10 @@ want the application to be based on :term:`traversal`.
     .. code-block:: text
 
        [chrism@snowpro sess]$ ../bin/paster --plugin=pyramid pshell \
-              myapp.ini myapp
+              development.ini myapp
        Python 2.5.4 (r254:67916, Sep  4 2009, 02:12:16) 
        [GCC 4.2.1 (Apple Inc. build 5646)] on darwin
-       Type "help" for more information. "root" is the BFG app root object.
+       Type "help" for more information. "root" is the Pyramid app root object.
        >>> from pyramid.traversal import model_path
        >>> from myapp.models import Document
        >>> root['name'] = Document('title')
@@ -106,7 +106,7 @@ object.  Whenever an index is added or removed, invoke the
 or from within a ``pshell`` session to update the set of indexes
 used by your application.
 
-In :term:`view` code, you should be able to get a hold of the root
+In :term:`view` code, you should be able to get a hold of he root
 object via the :func:`pyramid.traversal.find_root` API.  The
 ``catalog`` attribute of that root object will represent the catalog
 previously added.

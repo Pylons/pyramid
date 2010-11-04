@@ -15,12 +15,11 @@ server that accesses the database is running, and will also allow your
 application to run under multiprocess configurations, such as those
 exposed by :term:`mod_wsgi`.
 
-The easiest way to get started with ZODB in a :mod:`pyramid`
-application is to use the ZODB ``bfg_zodb`` paster template.  See
-:ref:`additional_paster_templates` for more information about using
-this template.  However, the Paster template does not set up a
-ZEO-capable application.  This chapter shows you how to do that "from
-scratch".
+The easiest way to get started with ZODB in a :mod:`pyramid` application is
+to use the ZODB ``pyramid_zodb`` paster template.  See
+:ref:`additional_paster_templates` for more information about using this
+template.  However, the Paster template does not set up a ZEO-capable
+application.  This chapter shows you how to do that "from scratch".
 
 Installing Dependencies
 -----------------------
@@ -60,12 +59,12 @@ Installing Dependencies
    setup.py develop``) to get these packages installed.  A number of
    packages will be installed, including ``ZODB``.  For the purposes
    of this tutorial, we'll assume that your "application" is actually
-   just the result of the ``bfg_starter`` Paster template.
+   just the result of the ``pyramid_starter`` Paster template.
 
 Configuration
 -------------
 
-#. Edit your application's Paste ``.ini`` file.
+#. Edit your application's Paste ``development.ini`` file.
 
    If you already have an ``app`` section in the ``.ini`` file named
    ``main``, rename this section to ``myapp`` (e.g. ``app:main`` ->
@@ -160,7 +159,7 @@ Configuration
                transaction.commit()
            return root['myapp']
 
-#.  Change your application's ``run.py`` to look something like the
+#.  Change your application's ``__init__.py`` to look something like the
     below:
 
     .. code-block:: python
@@ -182,6 +181,7 @@ Configuration
            def get_root(request):
                return finder(request.environ)
            config = Configurator(root_factory=get_root, settings=settings)
+           # .. other configuration statements ..
            return config.make_wsgi_app()
 
 Running
@@ -228,7 +228,7 @@ Running
               myapp.ini myapp
        Python 2.5.4 (r254:67916, Sep  4 2009, 02:12:16) 
        [GCC 4.2.1 (Apple Inc. build 5646)] on darwin
-       Type "help" for more information. "root" is the BFG app root object.
+       Type "help" for more information. "root" is the Pyramid app root object.
        >>> root
        <sess.models.MyModel object None at 0x16438f0>
        >>> root.foo = 'bar'
