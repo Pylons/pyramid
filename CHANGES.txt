@@ -92,6 +92,10 @@ Documentation (delta from BFG 1.3)
 - All documentation which previously referred to ``webob.Response`` now uses
   ``pyramid.response.Response`` instead.
 
+- The documentation has been overhauled to use imperative configuration,
+  moving declarative configuration (ZCML) explanations to a separate
+  narrative chapter ``declarative.rst``.
+
 Backwards Incompatibilities (with BFG 1.3.X)
 --------------------------------------------
 
@@ -158,3 +162,10 @@ Backwards Incompatibilities (with BFG 1.3.X)
 - The default ``cookie_name`` value of the
   ``pyramid.authentication.AuthTktAuthenticationPolicy`` constructor now
   defaults to ``auth_tkt`` (it used to default to ``repoze.bfg.auth_tkt``).
+
+- All preexisting paster templates now use "imperative" configuration
+  (``starter``, ``routesalchemy``, ``alchemy``, and ``zodb``).
+
+- A new paster template named ``pyramid_starter_zcml`` exists, which uses
+  declarative configuration.
+
