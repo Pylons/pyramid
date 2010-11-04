@@ -1092,9 +1092,6 @@ See also :ref:`renderer_directive` and
 .. Todo
 .. ----
 
-.. - ``narr/project.rst`` chapter describes execution of a paster template that
-..   is based on XML.
-
 .. - i18n chapter still has topics for ZCML
 
 .. - events chapter still has topics for ZCML

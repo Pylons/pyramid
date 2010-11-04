@@ -29,4 +29,4 @@ pipeline =
 [server:main]
 use = egg:Paste#http
 host = 0.0.0.0
-port = 5000
+port = 6543
