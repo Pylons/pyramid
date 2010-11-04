@@ -40,7 +40,7 @@ The presence of calls to the
 configuration within your application is a sign that you're using :term:`URL
 dispatch`.
 
-..note::
+.. note::
 
   Route configuration may also be added to the system via term:`ZCML` (see
   :ref:`zcml_route_configuration`).
