@@ -85,12 +85,12 @@ press ``return`` after running ``paster serve development.ini``.
    .. literalinclude:: MyProject/development.ini
       :linenos:
 
-   In this case, the ``myproject.run:app`` function referred to by the
-   entry point URI ``egg:MyProject#app`` (see :ref:`MyProject_ini` for
-   more information about entry point URIs, and how they relate to
-   callables), will receive the key/value pairs
-   ``{'reload_templates':'true', 'debug_authorization':'false',
-   'debug_notfound':'false'}``.
+   In this case, the ``myproject.run:app`` function referred to by the entry
+   point URI ``egg:MyProject#app`` (see :ref:`MyProject_ini` for more
+   information about entry point URIs, and how they relate to callables),
+   will receive the key/value pairs ``{'reload_templates':'true',
+   'debug_authorization':'false', 'debug_notfound':'false',
+   'debug_templates':'true', 'default_locale_name':'en'}``.
 
 #. The ``app`` function first constructs a
    :class:`pyramid.configuration.Configurator` instance, passing
@@ -102,11 +102,12 @@ press ``return`` after running ``paster serve development.ini``.
    request to retrieve the application root.  It is not called during
    startup, only when a request is handled.
 
-   The ``settings`` dictionary contains all the options in the
-   ``[app:main]`` section of our .ini file except the "use" option
-   (which is internal to paste).  In this case, ``**settings`` will be
-   something like ``{'reload_templates':'true',
-   'debug_authorization':'false', 'debug_notfound':'false'}``.
+   The ``settings`` dictionary contains all the options in the ``[app:main]``
+   section of our .ini file except the "use" option (which is internal to
+   paste).  In this case, ``**settings`` will be something like
+   ``{'reload_templates':'true', 'debug_authorization':'false',
+   'debug_notfound':'false', 'debug_templates':'true',
+   'default_locale_name':'en'}``.
 
 #. The ``app`` function then calls various methods on the an instance of the
    class :class:`pyramid.configuration.Configurator` method.  The intent of
