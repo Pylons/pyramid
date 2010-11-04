@@ -21,9 +21,3 @@ Python code (as opposed to resources), :term:`view` code combined with
 differing :term:`predicate` arguments can provide a good deal of
 the same sort of behavior.
 
-Relatedly, the `repoze.bfg.skins
-<http://svn.repoze.org/repoze.bfg.skins/>`_ package is an attempt to
-allow directories on disk to represent collections of views simply by
-adding templates to the directory.
-
-

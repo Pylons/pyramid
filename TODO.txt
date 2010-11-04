@@ -88,3 +88,5 @@
 
 - Do something about ZODB session chapter: either remove or create a
   pyramid_zodbsessions package.
+
+- repoze.bfg.viewgroup in CMF tutorial
