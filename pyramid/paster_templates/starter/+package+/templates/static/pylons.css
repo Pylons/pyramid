@@ -51,7 +51,7 @@ body h6{font-family:"Nobile","Lucida Grande",Lucida,Verdana,sans-serif;font-weig
 .wrapper{width:100%}
 #top,#bottom{width:100%;}
 #top{color:#888;background-color:#eee;height:300px;border-bottom:2px solid #ddd;}
-#bottom{color:#222;background-color:#ffffff;overflow:auto;padding-bottom:80px;}
+#bottom{color:#222;background-color:#ffffff;overflow:hidden;padding-bottom:80px;}
 .top,.bottom{width:700px;margin-right:auto;margin-left:auto;}
 .top{padding-top:100px;}
 .app-welcome{margin-top:25px;}
