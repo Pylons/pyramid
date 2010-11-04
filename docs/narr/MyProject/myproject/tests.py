@@ -17,3 +17,4 @@ class ViewTests(unittest.TestCase):
         info = my_view(request)
         self.assertEqual(info['project'], 'MyProject')
 
+

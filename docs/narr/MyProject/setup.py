@@ -6,6 +6,8 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
+requires = ['pyramid']
+
 setup(name='MyProject',
       version='0.0',
       description='MyProject',
@@ -19,20 +21,16 @@ setup(name='MyProject',
       author='',
       author_email='',
       url='',
-      keywords='web wsgi pylons pyramid bfg',
+      keywords='web wsgi bfg pyramid pylons',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      install_requires=[
-            'pyramid',
-            ],
-      tests_require=[
-            'pyramid',
-            ],
+      install_requires=requires,
+      tests_require=requires,
       test_suite="myproject",
       entry_points = """\
       [paste.app_factory]
-      app = myproject.run:app
+      app = myproject:app
       """
       )
 
