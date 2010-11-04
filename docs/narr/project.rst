@@ -18,6 +18,7 @@ templates".
 .. index::
    single: paster templates
    single: pyramid_starter paster template
+   single: pyramid_starter_zcml paster template
    single: pyramid_zodb paster template
    single: pyramid_alchemy paster template
    single: pyramid_routesalchemy paster template
@@ -44,6 +45,10 @@ The included templates are these:
 ``pyramid_starter``
   URL mapping via :term:`traversal` and no persistence mechanism.
 
+``pyramid_starter_zcml``
+  URL mapping via :term:`traversal` and no persistence mechanism, using
+  :term:`ZCML` (declarative configuration).
+
 ``pyramid_zodb``
   URL mapping via :term:`traversal` and persistence via :term:`ZODB`
 
@@ -67,19 +72,12 @@ The included templates are these:
   URL mapping via :term:`URL dispatch` and Pylons-style view handlers,
   some extra functionality, and SQLAlchemy set up.
 
-The project templates which start with ``pyramid_`` uses :term:`ZCML` (see
-:ref:`declarative_chapter`) instead of :term:`imperative configuration`.
-
-The project templates which start with ``pylons_`` use imperative
-configuration (the type of configuration which we've been showing so far in
-the book).
-
-Each also makes the assumption that you want your code to live in a Python
-:term:`package`.  Even if your application is extremely simple, it is useful
-to place code that drives the application within a package, because a package
-is more easily extended with new code.  An application that lives inside a
-package can also be distributed more easily than one which does not live
-within a package.
+Each paster template makes the assumption that you want your code to live in
+a Python :term:`package`.  Even if your application is extremely simple, it
+is useful to place code that drives the application within a package, because
+a package is more easily extended with new code.  An application that lives
+inside a package can also be distributed more easily than one which does not
+live within a package.
 
 .. index::
    single: creating a project
@@ -145,16 +143,15 @@ created in a directory named ``MyProject``.  That directory is a
 directory can be used to distribute your application, or install your
 application for deployment or development.
 
-A sample :term:`PasteDeploy` ``.ini`` file named ``MyProject.ini``
-will also be created in the project directory.  You will use this
-``.ini`` file to configure a server, to run your application, and to
-and debug your application.
+A :term:`PasteDeploy` ``.ini`` file named ``development.ini`` will also be
+created in the project directory.  You will use this ``.ini`` file to
+configure a server, to run your application, and to and debug your
+application.
 
-The ``MyProject`` project directory contains an additional
-subdirectory named ``myproject`` (note the case difference)
-representing a Python :term:`package` which holds very simple
-:mod:`pyramid` sample code.  This is where you'll edit your
-application's Python code and templates.
+The ``MyProject`` project directory contains an additional subdirectory named
+``myproject`` (note the case difference) representing a Python
+:term:`package` which holds very simple :mod:`pyramid` sample code.  This is
+where you'll edit your application's Python code and templates.
 
 .. index::
    single: setup.py develop
@@ -268,7 +265,7 @@ the name ``main`` as a section name:
 .. code-block::  text
 
    [chrism@vitaminf shellenv]$ ../bin/paster --plugin=pyramid \
-                               pshell MyProject.ini main
+                               pshell development.ini main
    Python 2.4.5 (#1, Aug 29 2008, 12:27:37) 
    [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
    Type "help" for more information. "root" is the Pyramid app root object.
@@ -289,7 +286,7 @@ Python interpreter shell unconditionally.
 .. code-block::  text
 
    [chrism@vitaminf shellenv]$ ../bin/paster --plugin=pyramid pshell \
-         --disable-ipython MyProject.ini main
+         --disable-ipython development.ini main
 
 You should always use a section name argument that refers to the
 actual ``app`` section within the Paste configuration file that points
@@ -319,7 +316,7 @@ The command you use to invoke the interactive shell should be:
 .. code-block::  text
 
    [chrism@vitaminf shellenv]$ ../bin/paster --plugin=pyramid pshell \
-         MyProject.ini myapp
+         development.ini myapp
 
 If you use ``main`` as the section name argument instead of ``myapp``
 against the above ``.ini`` file, an error will likely occur.  Use the
@@ -342,17 +339,17 @@ Running The Project Application
 Once a project is installed for development, you can run the
 application it represents using the ``paster serve`` command against
 the generated configuration file.  In our case, this file is named
-``MyProject.ini``:
+``development.ini``:
 
 .. code-block:: text
 
-   $ ../bin/paster serve MyProject.ini
+   $ ../bin/paster serve development.ini
 
 Here's sample output from a run of ``paster serve``:
 
 .. code-block:: text
 
-   $ ../bin/paster serve MyProject.ini
+   $ ../bin/paster serve development.ini
    Starting server in PID 16601.
    serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
 
@@ -370,7 +367,7 @@ For example:
 
 .. code-block:: text
 
-   $ ../bin/paster serve MyProject.ini --reload
+   $ ../bin/paster serve development.ini --reload
    Starting subprocess with file monitor
    Starting server in PID 16601.
    serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
@@ -427,30 +424,31 @@ This is the page shown by default when you visit an unmodified
 The Project Structure
 ---------------------
 
-Our generated :mod:`pyramid` ``pyramid_starter`` application is a
-setuptools :term:`project` (named ``MyProject``), which contains a
-Python :term:`package` (which is *also* named ``myproject``, but
-lowercased; the paster template generates a project which contains a
-package that shares its name except for case).  All :mod:`pyramid`
-``paster`` -generated projects share a similar structure.
+Our generated :mod:`pyramid` ``pyramid_starter`` application is a setuptools
+:term:`project` (named ``MyProject``), which contains a Python
+:term:`package` (which is *also* named ``myproject``, but lowercased; the
+paster template generates a project which contains a package that shares its
+name except for case).  All :mod:`pyramid` ``paster`` -generated projects
+share a similar structure.
 
 The ``MyProject`` project we've generated has the following directory
 structure::
 
-  MyProject/
+  MyProject
   |-- CHANGES.txt
-  |-- README.txt
+  |-- development.ini
   |-- myproject
   |   |-- __init__.py
-  |   |-- configure.zcml
   |   |-- models.py
-  |   |-- run.py
   |   |-- templates
   |   |   |-- mytemplate.pt
-  |   |   `-- static/
+  |   |   `-- static
+  |   |       |-- favicon.ico
+  |   |       |-- logo.png
+  |   |       `-- pylons.css
   |   |-- tests.py
   |   `-- views.py
-  |-- MyProject.ini
+  |-- README.txt
   |-- setup.cfg
   `-- setup.py
 
@@ -469,7 +467,7 @@ describe, run, and test your application.
 #. ``README.txt`` describes the application in general.  It is
    conventionally written in :term:`ReStructuredText` format.
 
-#. ``MyProject.ini`` is a :term:`PasteDeploy` configuration file that
+#. ``development.ini`` is a :term:`PasteDeploy` configuration file that
    can be used to execute your application.
 
 #. ``setup.cfg`` is a :term:`setuptools` configuration file used by
@@ -485,17 +483,16 @@ describe, run, and test your application.
 
 .. _MyProject_ini:
 
-``MyProject.ini``
-~~~~~~~~~~~~~~~~~
+``development.ini``
+~~~~~~~~~~~~~~~~~~~
 
-The ``MyProject.ini`` file is a :term:`PasteDeploy` configuration
-file.  Its purpose is to specify an application to run when you invoke
-``paster serve``, as well as the deployment settings provided to that
-application.
+The ``development.ini`` file is a :term:`PasteDeploy` configuration file.
+Its purpose is to specify an application to run when you invoke ``paster
+serve``, as well as the deployment settings provided to that application.
 
-The generated ``MyProject.ini`` file looks like so:
+The generated ``development.ini`` file looks like so:
 
-.. literalinclude:: MyProject/MyProject.ini
+.. literalinclude:: MyProject/development.ini
    :linenos:
 
 This file contains several "sections" including ``[DEFAULT]``,
@@ -531,15 +528,15 @@ indicates that this is an entry point *URI* specifier, where the
    file.  This string representation of an ``.ini`` file has a section
    named ``[paste.app_factory]``.  Within this section, there is a key
    named ``app`` (the entry point name) which has a value
-   ``myproject.run:app``.  The *key* ``app`` is what our
+   ``myproject:app``.  The *key* ``app`` is what our
    ``egg:MyProject#app`` value of the ``use`` section in our config
    file is pointing at.  The value represents a :term:`dotted Python
    name` path, which refers to a callable in our ``myproject``
-   package's ``run.py`` module.  In English, this entry point can thus
+   package's ``__init__.py`` module.  In English, this entry point can thus
    be referred to as a "Paste application factory in the ``MyProject``
    project which has the entry point named ``app`` where the entry
-   point refers to a ``app`` function in the ``mypackage.run``
-   module".  If indeed if you open up the ``run.py`` module generated
+   point refers to a ``app`` function in the ``mypackage``
+   module".  If indeed if you open up the ``__init__.py`` module generated
    within the ``myproject`` package, you'll see a ``app`` function.
    This is the function called by :term:`PasteDeploy` when the
    ``paster serve`` command is invoked against our application.  It
@@ -550,7 +547,7 @@ The ``use`` setting is the only setting required in the ``[app:main]``
 section unless you've changed the callable referred to by the
 ``MyProject#app`` entry point to accept more arguments: other settings
 you add to this section are passed as keywords arguments to the
-callable represented by this entry point (``app`` in our ``run.py``
+callable represented by this entry point (``app`` in our ``__init__.py``
 module).  You can provide startup-time configuration parameters to
 your application by requiring more settings in this section.
 
@@ -649,7 +646,7 @@ always unpack as a directory, which is more convenient.
 depends on the ``pyramid`` package.  ``test_suite`` points at the
 package for our application, which means all tests found in the
 package will be run when ``setup.py test`` is invoked.  We examined
-``entry_points`` in our discussion of the ``MyProject.ini`` file; this
+``entry_points`` in our discussion of the ``development.ini`` file; this
 file defines the ``app`` entry point that represents our project's
 application.
 
@@ -703,17 +700,11 @@ The ``myproject`` :term:`package` lives inside the ``MyProject``
 :term:`project`.  It contains:
 
 #. An ``__init__.py`` file which signifies that this is a Python
-   :term:`package`.  It is conventionally empty, save for a single
-   comment at the top.
-
-#. A ``configure.zcml`` is a :term:`ZCML` file which maps view names
-   to model types.  Its contents populate the :term:`application
-   registry` when loaded.
+   :term:`package`.  It also contains code that helps users run the
+   application, include an ``app`` function which is used as a Paste entry
+   point.
 
 #. A ``models.py`` module, which contains :term:`model` code.
-
-#. A ``run.py`` module, which contains code that helps users run the
-   application.
 
 #. A ``templates`` directory, which contains :term:`Chameleon` (or
    other types of) templates.
@@ -729,64 +720,52 @@ These are purely conventions established by the ``paster`` template:
 particular way.
 
 .. index::
-   single: configure.zcml
+   single: __init__.py
 
-``configure.zcml``
-~~~~~~~~~~~~~~~~~~
+``__init__.py``
+~~~~~~~~~~~~~~~
 
-The ``configure.zcml`` contains configuration statements that populate
-the :term:`application registry`. It looks like so:
+We need a small Python module that configures our application and which
+advertises an entry point for use by our :term:`PasteDeploy` ``.ini`` file.
+This is the file named ``__init__.py``.  The presence of an ``__init__.py``
+also informs Python that the directory which contains it is a *package*.
 
-.. literalinclude:: MyProject/myproject/configure.zcml
+.. literalinclude:: MyProject/myproject/__init__.py
    :linenos:
-   :language: xml
 
-#. Line 1 provides the root node and namespaces for the configuration
-   language.  ``http://pylonshq.com/pyramid`` is the default XML
-   namespace.  Add-on packages may require other namespaces.
+#. Line 1 imports the :term:`Configurator` class from
+   :mod:`pyramid.configuration` that we use later.
 
-#. Line 3 initializes :mod:`pyramid` -specific configuration
-   directives by including the ``pyramid.includes`` package.  This
-   causes all of the ZCML within the ``configure.zcml`` of the
-   ``pyramid.includes`` package to be "included" in this
-   configuration file's scope.  Effectively this means that we can use
-   (for this example) the ``view`` and ``static`` directives which
-   follow later in this file.
+#. Line 2 imports the ``get_root`` function from
+   :mod:`myproject.models` that we use later.
 
-#. Lines 5-9 register a "default view" (a view that has no ``name``
+#. Lines 4-17 define a function that returns a :mod:`pyramid`
+   WSGI application.  This function is meant to be called
+   by the :term:`PasteDeploy` framework as a result of running
+   ``paster serve``.
+
+   Within this function, configuration is performed.
+
+   Lines 12-14 register a "default view" (a view that has no ``name``
    attribute).  It is registered so that it will be found when the
    :term:`context` of the request is an instance of the
-   :class:`myproject.models.MyModel` class.  The ``view`` attribute
-   points at a Python function that does all the work for this view,
-   also known as a :term:`view callable`.  Note that the values of
-   both the ``context`` attribute and the ``view`` attribute begin
-   with a single period.  Names that begin with a period are
-   "shortcuts" which point at files relative to the :term:`package` in
-   which the ``configure.zcml`` file lives.  In this case, since the
-   ``configure.zcml`` file lives within the :mod:`myproject` package,
-   the shortcut ``.models.MyModel`` could also be spelled
-   ``myproject.models.MyModel`` (forming a full Python dotted-path
-   name to the ``MyModel`` class).  Likewise the shortcut
-   ``.views.my_view`` could be replaced with
-   ``myproject.views.my_view``.
+   :class:`myproject.models.MyModel` class.  The first argument to
+   ``add_view`` points at a Python function that does all the work for this
+   view, also known as a :term:`view callable` via a :term:`dotted Python
+   name`.  The view declaration also names a ``renderer``, which in this case
+   is a template that will be used to render the result of the view callable.
+   This particular view declaration points at
+   ``myproject:templates/mytemplate.pt``, which is a :term:`resource
+   specification` that specifies the ``mytemplate.pt`` file within the
+   ``templates`` directory of the ``myproject`` package.  The template file
+   it actually points to is a :term:`Chameleon` ZPT template file.
 
-   The view declaration also names a ``renderer``, which in this case
-   is a template that will be used to render the result of the view
-   callable.  This particular view declaration points at
-   ``templates/mytemplate.pt``, which is a *relative* file
-   specification; it's relative to the directory in which the
-   ``configure.zcml`` file lives.  The template file it points at is a
-   :term:`Chameleon` ZPT template file.
+   Line 15 registers a static view, which will serve up the files from the
+   ``mypackage:templates/static`` :term:`resource specification` (the
+   ``templates/static`` directory of the ``mypackage`` package).
 
-#. Lines 11-14 register a static view, which will register a view
-   which serves up the files from the ``templates/static`` directory
-   relative to the directory in which the ``configure.zcml`` file
-   lives.
-
-#. Line 16 ends the ``configure`` root tag.
-
-.. index::
-   single: views.py
+   Line 17 returns a :term:`WSGI` application to the caller of the function
+   (Paste).
 
 ``views.py``
 ~~~~~~~~~~~~
@@ -800,10 +779,10 @@ code which accepts a :term:`request` and which returns a
 .. literalinclude:: MyProject/myproject/views.py
    :linenos:
 
-This bit of code was registered as the view callable within
-``configure.zcml``.  ``configure.zcml`` said that the default URL for
-instances that are of the class :class:`myproject.models.MyModel`
-should run this :func:`myproject.views.my_view` function.
+This bit of code was registered as the view callable within ``__init__.py``
+(via ``add_view``).  ``add_view`` said that the default URL for instances
+that are of the class :class:`myproject.models.MyModel` should run this
+:func:`myproject.views.my_view` function.
 
 This view callable function is handed a single piece of information:
 the :term:`request`.  The *request* is an instance of the
@@ -811,16 +790,16 @@ the :term:`request`.  The *request* is an instance of the
 our server.
 
 This view returns a dictionary.  When this view is invoked, a
-:term:`renderer` converts the dictionary returned by the view into
-HTML, and returns the result as the :term:`response`.  This view is
-configured to invoke a renderer which uses a :term:`Chameleon` ZPT
-template (``templates/my_template.pt``, as specified in the
-``configure.zcml`` file).
+:term:`renderer` converts the dictionary returned by the view into HTML, and
+returns the result as the :term:`response`.  This view is configured to
+invoke a renderer which uses a :term:`Chameleon` ZPT template
+(``mypackage:templates/my_template.pt``, as specified in the ``__init__.py``
+file call to ``add_view``).
 
-See :ref:`views_which_use_a_renderer` for more information about how
-views, renderers, and templates relate and cooperate.
+See :ref:`views_which_use_a_renderer` for more information about how views,
+renderers, and templates relate and cooperate.
 
-.. note:: because our ``MyProject.ini`` has a ``reload_templates =
+.. note:: because our ``development.ini`` has a ``reload_templates =
    true`` directive indicating that templates should be reloaded when
    they change, you won't need to restart the application server to
    see changes you make to templates.  During development, this is
@@ -862,39 +841,14 @@ make any assumption about which sort of datastore you'll want to use,
 so the sample application uses an instance of
 :class:`myproject.models.MyModel` to represent the root.
 
-.. index::
-   single: run.py
-
-``run.py``
-~~~~~~~~~~
-
-We need a small Python module that configures our application and
-which advertises an entry point for use by our :term:`PasteDeploy`
-``.ini`` file.  This is the file named ``run.py``:
-
-.. literalinclude:: MyProject/myproject/run.py
-   :linenos:
-
-#. Line 1 imports the :term:`Configurator` class from
-   :mod:`pyramid.configuration` that we use later.
-
-#. Line 2 imports the ``get_root`` function from
-   :mod:`myproject.models` that we use later.
-
-#. Lines 4-13 define a function that returns a :mod:`pyramid`
-   WSGI application.  This function is meant to be called
-   by the :term:`PasteDeploy` framework as a result of running
-   ``paster serve``.
-
 ``templates/mytemplate.pt``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The single :term:`Chameleon` template exists in the project.  Its
-contents are too long to show here, but it displays a default page
-when rendered.  It is referenced by the ``view`` declaration's
-``renderer`` attribute in the ``configure.zcml`` file.  See
-:ref:`views_which_use_a_renderer` for more information about
-renderers.
+The single :term:`Chameleon` template exists in the project.  Its contents
+are too long to show here, but it displays a default page when rendered.  It
+is referenced by the call to ``add_view`` as the ``renderer`` attribute in
+the ``__init__`` file.  See :ref:`views_which_use_a_renderer` for more
+information about renderers.
 
 Templates are accessed and used by view configurations and sometimes
 by view functions themselves.  See :ref:`templates_used_directly` and

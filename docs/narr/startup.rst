@@ -31,13 +31,13 @@ the purposes of this discussion, we'll assume that you are using this
 command to run your :mod:`pyramid` application.
 
 Here's a high-level time-ordered overview of what happens when you
-press ``return`` after running ``paster serve MyProject.ini``.
+press ``return`` after running ``paster serve development.ini``.
 
 #. The :term:`PasteDeploy` ``paster`` command is invoked under your
-   shell with the arguments ``serve`` and ``MyProject.ini``.  As a
+   shell with the arguments ``serve`` and ``development.ini``.  As a
    result, the :term:`PasteDeploy` framework recognizes that it is
    meant to begin to run and serve an application using the
-   information contained within the ``MyProject.ini`` file.
+   information contained within the ``development.ini`` file.
 
 #. The PasteDeploy framework finds a section named either
    ``[app:main]``, ``[pipeline:main]``, or ``[composite::main]`` in
@@ -61,13 +61,13 @@ press ``return`` after running ``paster serve MyProject.ini``.
    constructor is meant to return a :term:`router` instance, which is
    a :term:`WSGI` application.
 
-   For :mod:`pyramid` applications, the constructor will be a
-   function named ``app`` in the ``run.py`` file within the
-   :term:`package` in which your application lives.  If this function
-   succeeds, it will return a :mod:`pyramid` :term:`router`
-   instance.  Here's the contents of an example ``run.py`` module:
+   For :mod:`pyramid` applications, the constructor will be a function named
+   ``app`` in the ``__init__.py`` file within the :term:`package` in which
+   your application lives.  If this function succeeds, it will return a
+   :mod:`pyramid` :term:`router` instance.  Here's the contents of an example
+   ``__init__.py`` module:
 
-   .. literalinclude:: MyProject/myproject/run.py
+   .. literalinclude:: MyProject/myproject/__init__.py
       :linenos:
 
    Note that the constructor function accepts a ``global_config``
@@ -80,9 +80,9 @@ press ``return`` after running ``paster serve MyProject.ini``.
    the ``use=`` setting) when this function is called by the
    :term:`PasteDeploy` framework when you run ``paster serve``.
 
-   Our generated ``MyProject.ini`` file looks like so:
+   Our generated ``development.ini`` file looks like so:
 
-   .. literalinclude:: MyProject/MyProject.ini
+   .. literalinclude:: MyProject/development.ini
       :linenos:
 
    In this case, the ``myproject.run:app`` function referred to by the
@@ -124,10 +124,10 @@ press ``return`` after running ``paster serve MyProject.ini``.
    emitted (see :ref:`events_chapter` for more information about
    events).
 
-#. Assuming there were no errors, the ``app`` function in
-   ``myproject`` returns the router instance created by
-   ``make_wsgi_app`` back to PasteDeploy.  As far as PasteDeploy is
-   concerned, it is "just another WSGI application".
+#. Assuming there were no errors, the ``app`` function in ``myproject``
+   returns the router instance created by ``make_wsgi_app`` back to
+   PasteDeploy.  As far as PasteDeploy is concerned, it is "just another WSGI
+   application".
 
 #. PasteDeploy starts the WSGI *server* defined within the
    ``[server:main]`` section.  In our case, this is the ``Paste#http``
