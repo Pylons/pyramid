@@ -31,23 +31,23 @@ system.
  
       $ export GAE_PATH=/usr/local/google_appengine
       $ python2.5 /path/to/appengine-monkey/appengine-homedir.py --gae \
-        $GAE_PATH bfgapp
+        $GAE_PATH pyramidapp
 
    Note that ``$GAE_PATH`` should be the path where you have unpacked
    the App Engine SDK.  (On Mac OS X at least,
    ``/usr/local/google_appengine`` is indeed where the installer puts
    it).
 
-   This will set up an environment in ``bfgapp/``, with some tools
-   installed in ``bfgapp/bin``. There will also be a directory
-   ``bfgapp/app/`` which is the directory you will upload to
+   This will set up an environment in ``pyramidapp/``, with some tools
+   installed in ``pyramidapp/bin``. There will also be a directory
+   ``pyramidapp/app/`` which is the directory you will upload to
    appengine.
 
 #. Install :mod:`pyramid` into the virtualenv
 
    .. code-block:: text
 
-      $ cd bfgapp/
+      $ cd pyramidapp/
       $ bin/easy_install pyramid
 
    This will install :mod:`pyramid` in the environment.
@@ -57,28 +57,28 @@ system.
    We'll use the standard way to create a :mod:`pyramid`
    application, but we'll have to move some files around when we are
    done.  The below commands assume your current working directory is
-   the ``bfgapp`` virtualenv directory you created in the third step
+   the ``pyramidapp`` virtualenv directory you created in the third step
    above:
 
    .. code-block:: text
 
       $ cd app
-      $ rm -rf bfgapp
-      $ bin/paster create -t bfg_starter bfgapp
-      $ mv bfgapp aside
-      $ mv aside/bfgapp .
+      $ rm -rf pyramidapp
+      $ bin/paster create -t pyramid_starter pyramidapp
+      $ mv pyramidapp aside
+      $ mv aside/pyramidapp .
       $ rm -rf aside
 
 #. Edit ``config.py``
 
    Edit the ``APP_NAME`` and ``APP_ARGS`` settings within
-   ``config.py``.  The ``APP_NAME`` must be ``bfgapp.run:app``, and
+   ``config.py``.  The ``APP_NAME`` must be ``pyramidapp:app``, and
    the APP_ARGS must be ``({},)``.  Any other settings in
    ``config.py`` should remain the same.
 
    .. code-block:: python
 
-      APP_NAME = 'bfgapp.run:app'
+      APP_NAME = 'pyramidapp:app'
       APP_ARGS = ({},)
 
 #. Edit ``runner.py``
@@ -119,22 +119,23 @@ system.
       :linenos:
 
       $ cd ../..
-      $ python2.5 /usr/local/bin/dev_appserver.py bfgapp/app/
+      $ python2.5 /usr/local/bin/dev_appserver.py pyramidapp/app/
 
    Startup success looks something like this:
 
    .. code-block:: text
 
-      [chrism@vitaminf bfg_gae]$ python2.5 /usr/local/bin/dev_appserver.py \
-              bfgapp/app/
+      [chrism@vitaminf pyramid_gae]$ python2.5 \
+                    /usr/local/bin/dev_appserver.py \
+                    pyramidapp/app/
       INFO     2009-05-03 22:23:13,887 appengine_rpc.py:157] # ... more... 
-      Running application bfgapp on port 8080: http://localhost:8080
+      Running application pyramidapp on port 8080: http://localhost:8080
 
    You may need to run "Make Symlinks" from the Google App Engine
    Launcher GUI application if your system doesn't already have the
    ``dev_appserver.py`` script sitting around somewhere.
 
-#. Hack on your bfg application, using a normal run, debug, restart
+#. Hack on your pyramid application, using a normal run, debug, restart
    process.  For tips on how to use the ``pdb`` module within Google
    App Engine, `see this blog post
    <http://jjinux.blogspot.com/2008/05/python-debugging-google-app-engine-apps.html>`_.
@@ -159,13 +160,13 @@ system.
 
    .. code-block:: yaml
 
-      application: mycoolbfgapp
+      application: mycoolpyramidapp
 
 #. Upload the application
 
    .. code-block:: text
 
-      $ python2.5 /usr/local/bin/appcfg.py update bfgapp/app
+      $ python2.5 /usr/local/bin/appcfg.py update pyramidapp/app
 
    You almost certainly won't hit the 3000-file GAE file number limit
    when invoking this command.  If you do, however, it will look like
@@ -187,8 +188,8 @@ system.
 
    .. code-block:: text
 
-      [chrism@vitaminf bfgapp]$ python2.5 /usr/local/bin/appcfg.py update \
-                ../bfgapp/app/
+      [chrism@vitaminf pyramidapp]$ python2.5 /usr/local/bin/appcfg.py \
+                                    update ../pyramidapp/app/
       Scanning files on local disk.
       Scanned 500 files.
       # ... more output ...
@@ -221,7 +222,7 @@ packages. You can zip a package like so:
 
    $ bin/pip zip pytz-2009g-py2.5.egg
 
-Note that it requires the whole egg file name.  For a BFG app, the
+Note that it requires the whole egg file name.  For a :mod:`pyramid` app, the
 following packages are good candidates to be zipped.
 
 - Chameleon
