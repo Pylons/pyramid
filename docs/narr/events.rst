@@ -3,7 +3,6 @@
    single: subscriber
    single: INewRequest
    single: INewResponse
-   pair: subscriber; ZCML directive
 
 .. _events_chapter:
 
@@ -30,12 +29,12 @@ subscriber is a function that accepts a single argument named `event`:
 The above is a subscriber that simply prints the event to the console
 when it's called.
 
-The mere existence of a subscriber function, however, is not
-sufficient to arrange for it to be called.  To arrange for the
-subscriber to be called, you'll need to use the
-:meth:`pyramid.configuration.Configurator.add_subscriber` method to
-register the subscriber imperatively, or via a decorator, or you'll
-need to use ZCML for the same purpose:
+The mere existence of a subscriber function, however, is not sufficient to
+arrange for it to be called.  To arrange for the subscriber to be called,
+you'll need to use the
+:meth:`pyramid.configuration.Configurator.add_subscriber` method or you'll
+need to use the :func:`pyramid.events.subscriber` decorator to decorate a
+function found via a :term:`scan`.
 
 .. topic:: Configuring an Event Listener Imperatively
 
@@ -81,23 +80,8 @@ need to use ZCML for the same purpose:
    decorated function for the decorator to have any effect.  See
    :func:`pyramid.subscriber` for more information.
 
-.. topic:: Configuring an Event Listener Through ZCML
-
-   You can configure an event listener by modifying your application's
-   ``configure.zcml``.  Here's an example of a bit of XML you can add
-   to the ``configure.zcml`` file which registers the above
-   ``mysubscriber`` function, which we assume lives in a
-   ``subscribers.py`` module within your application:
-
-   .. code-block:: xml
-      :linenos:
-
-      <subscriber
-         for="pyramid.interfaces.INewRequest"
-         handler=".subscribers.mysubscriber"
-       />
-
-   See also :ref:`subscriber_directive`.
+.. note:: You can also configure an event listener via ZCML.  See
+   :ref:`zcml_event_listener`.
 
 Either of the above registration examples implies that every time the
 :mod:`pyramid` framework emits an event object that supplies an
@@ -132,41 +116,18 @@ your application like so:
        print 'response', event.response
 
 You may configure these functions to be called at the appropriate
-times by adding the following ZCML to your application's
-``configure.zcml`` file:
+times by adding the following code to your application's
+configuration startup:
 
-.. code-block:: xml
-   :linenos:
-
-   <subscriber
-      for="pyramid.interfaces.INewRequest"
-      handler=".subscribers.handle_new_request"
-    />
-
-   <subscriber
-      for="pyramid.interfaces.INewResponse"
-      handler=".subscribers.handle_new_response"
-    />
-
-If you're not using ZCML, the
-:meth:`pyramid.configuration.Configurator.add_subscriber` method
-can alternately be used to perform the same job:
-
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
-   from pyramid.interfaces import INewRequest
-   from pyramid.interfaces import INewResponse
+   # config is an instance of pyramid.configuration.Configurator
 
-   from subscribers import handle_new_request
-   from subscribers import handle_new_response
-
-   # "config" below is assumed to be an instance of a 
-   # pyramid.configuration.Configurator object
-
-   config.add_subscriber(handle_new_request, INewRequest)
-   config.add_subscriber(handle_new_response, INewResponse)
+   config.add_subscriber('myproject.subscribers.handle_new_request',
+                         'pyramid.interfaces.INewRequest')
+   config.add_subscriber('myproject.subscribers.handle_new_response',
+                         'pyramid.interfaces.INewResponse')
 
 Either mechanism causes the functions in ``subscribers.py`` to be
 registered as event subscribers.  Under this configuration, when the

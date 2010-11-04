@@ -1128,10 +1128,32 @@ You can add a custom locale negotiator via ZCML by using the
 See also :ref:`custom_locale_negotiator` and
 :ref:`localenegotiator_directive`.
 
+.. index::
+   pair: subscriber; ZCML directive
+
+.. _zcml_event_listener:
+
+Configuring an Event Listener via ZCML
+--------------------------------------
+
+You can configure an :term:`subscriber` by modifying your application's
+``configure.zcml``.  Here's an example of a bit of XML you can add to the
+``configure.zcml`` file which registers the above ``mysubscriber`` function,
+which we assume lives in a ``subscribers.py`` module within your application:
+
+.. code-block:: xml
+   :linenos:
+
+   <subscriber
+      for="pyramid.interfaces.INewRequest"
+      handler=".subscribers.mysubscriber"
+    />
+
+See also :ref:`subscriber_directive` and :ref:`events_chapter`.
+
+
 .. Todo
 .. ----
-
-.. - events chapter still has topics for ZCML
 
 .. - hooks chapter still has topics for ZCML
 
