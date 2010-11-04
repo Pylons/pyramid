@@ -1089,10 +1089,47 @@ tag):
 See also :ref:`renderer_directive` and
 :meth:`pyramid.configuration.Configurator.add_renderer`.
 
+.. _zcml_adding_a_translation_directory:
+
+Adding a Translation Directory via ZCML
+---------------------------------------
+
+You can add a translation directory via ZCML by using the
+:ref:`translationdir_directive` ZCML directive:
+
+.. code-block:: xml
+   :linenos:
+
+   <translationdir dir="my.application:locale/"/>
+
+A message catalog in a translation directory added via
+:ref:`translationdir_directive` will be merged into translations from
+a message catalog added earlier if both translation directories
+contain translations for the same locale and :term:`translation
+domain`.
+
+See also :ref:`translationdir_directive` and
+:ref:`adding_a_translation_directory`.
+
+.. _zcml_adding_a_locale_negotiator:
+
+Adding a Custom Locale Negotiator via ZCML
+------------------------------------------
+
+You can add a custom locale negotiator via ZCML by using the
+:ref:`localenegotiator_directive` ZCML directive:
+
+.. code-block:: xml
+   :linenos:
+
+    <localenegotiator 
+       negotiator="my_application.my_module.my_locale_negotiator"/>
+
+See also :ref:`custom_locale_negotiator` and
+:ref:`localenegotiator_directive`.
+
 .. Todo
 .. ----
-
-.. - i18n chapter still has topics for ZCML
 
 .. - events chapter still has topics for ZCML
 

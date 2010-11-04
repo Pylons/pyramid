@@ -845,6 +845,8 @@ To turn translation on, you must:
 
 - ensure that your application sets the :term:`locale name` correctly.
 
+.. _adding_a_translation_directory:
+
 Adding a Translation Directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -863,48 +865,28 @@ found within all ``LC_MESSAGES`` directories within each locale
 directory in the translation directory) within your :mod:`pyramid`
 application to be available to use for translation services.
 
-You may add a translation directory to your application's
-configuration using either imperative configuration or ZCML.
+You can add a translation directory imperatively by using the
+:meth:`pyramid.configuration.Configurator.add_translation_dirs` during
+application startup.  For example:
 
-.. topic:: Using Imperative Configuration
+.. code-block:: python
+   :linenos:
 
-    You can add a translation directory imperatively by using the
-    :meth:`pyramid.configuration.Configurator.add_translation_dirs`
-    during application startup.
+   from pyramid.configuration import Configurator
+   config.begin()
+   config.add_translation_dirs('my.application:locale/', 
+                               'another.application:locale/')
+   ...
+   config.end()
 
-    For example:
+A message catalog in a translation directory added via
+:meth:`pyramid.configuration.Configurator.add_translation_dirs`
+will be merged into translations from a message catalog added earlier
+if both translation directories contain translations for the same
+locale and :term:`translation domain`.
 
-    .. code-block:: python
-       :linenos:
-
-       from pyramid.configuration import Configurator
-       config.begin()
-       config.add_translation_dirs('my.application:locale/', 
-                                   'another.application:locale/')
-       ...
-       config.end()
-
-    A message catalog in a translation directory added via
-    :meth:`pyramid.configuration.Configurator.add_translation_dirs`
-    will be merged into translations from a message catalog added earlier
-    if both translation directories contain translations for the same
-    locale and :term:`translation domain`.
-
-.. topic:: Using ZCML
-
-    You can add a translation directory via ZCML by using the
-    :ref:`translationdir_directive` ZCML directive:
-
-    .. code-block:: xml
-       :linenos:
-
-       <translationdir dir="my.application:locale/"/>
-
-    A message catalog in a translation directory added via
-    :ref:`translationdir_directive` will be merged into translations from
-    a message catalog added earlier if both translation directories
-    contain translations for the same locale and :term:`translation
-    domain`.
+.. note:: You can also add a translation directory via ZCML.  See
+   :ref:`zcml_adding_a_translation_directory`
 
 Setting the Locale
 ~~~~~~~~~~~~~~~~~~
@@ -1007,46 +989,32 @@ If a locale negotiator returns ``None``, it signifies to
 used.
 
 You may add your newly created locale negotiator to your application's
-configuration using either imperative configuration or ZCML.
+configuration by passing an object which can act as the negotiator (or a
+:term:`dotted Python name` referring to the object) as the
+``locale_negotiator`` argument of the
+:class:`pyramid.configuration.Configurator` instance during application
+startup.  For example:
 
-.. topic:: Using Imperative Configuration
+.. code-block:: python
+   :linenos:
 
-    Pass an object which can act as the negotiator (or a :term:`dotted
-    Python name` referring to the object) as the ``locale_negotiator``
-    argument of the :class:`pyramid.configuration.Configurator`
-    instance during application startup.
+   from pyramid.configuration import Configurator
+   config = Configurator(locale_negotiator=my_locale_negotiator)
 
-    For example:
+Alternately, use the
+:meth:`pyramid.configuration.Configurator.set_locale_negotiator`
+method.
 
-    .. code-block:: python
-       :linenos:
+For example:
 
-       from pyramid.configuration import Configurator
-       config = Configurator(locale_negotiator=my_locale_negotiator)
+.. code-block:: python
+   :linenos:
 
-    Alternately, use the
-    :meth:`pyramid.configuration.Configurator.set_locale_negotiator`
-    method.
+   from pyramid.configuration import Configurator
+   config = Configurator()
+   config.begin()
+   config.set_locale_negotiator(my_locale_negotiator)
+   config.end()
 
-    For example:
-
-    .. code-block:: python
-       :linenos:
-
-       from pyramid.configuration import Configurator
-       config = Configurator()
-       config.begin()
-       config.set_locale_negotiator(my_locale_negotiator)
-       config.end()
-
-.. topic:: Using ZCML
-
-    You can add a locale negotiator via ZCML by using the
-    :ref:`localenegotiator_directive` ZCML directive:
-
-    .. code-block:: xml
-       :linenos:
-
-       <localenegotiator 
-        negotiator="my_application.my_module.my_locale_negotiator"/>
-
+.. note:: You can also add a custom locale negotiator via ZCML.  See
+   :ref:`zcml_adding_a_locale_negotiator`
