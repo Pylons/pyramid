@@ -369,8 +369,11 @@ Our hello world application is one of the simplest possible
 that it's configured imperatively because the full power of Python is
 available to us as we perform configuration tasks.
 
-An example of using *declarative* configuration to perform the same task is
-available within :ref:`declarative_configuration`.
+.. note::
+
+  An example of using *declarative* configuration (:term:`ZCML`) instead of
+  imperative configuration to create a similar "hello world" is available
+  within :ref:`declarative_configuration`.
 
 References
 ----------
