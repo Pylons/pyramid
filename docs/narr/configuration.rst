@@ -24,13 +24,6 @@ itself.  When you plug code into the :mod:`pyramid` framework, you are
 "configuring" :mod:`pyramid` for the purpose of creating a particular
 application deployment.
 
-There are two different mechanisms you may use to configure :mod:`pyramid` to
-create an application: *imperative* configuration and *declarative*
-configuration.  We'll be using primarily the *imperative* configuration
-method in this book, for the sake of brevity and simplicity.  For information
-about how to define application configuration declaratively, see
-:ref:`declarative_chapter`.
-
 .. index::
    single: imperative configuration
 
