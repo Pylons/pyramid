@@ -328,20 +328,18 @@ In such a configuration, an error is raised when a view callable does not
 return an object which implements the :term:`Response` interface, documented
 within :ref:`the_response`.
 
-View configuration can vary the renderer associated with a view
-callable via the ``renderer`` attribute.  For example, this ZCML
-associates the ``json`` renderer with a view callable:
+View configuration can vary the renderer associated with a view callable via
+the ``renderer`` attribute.  For example, this call to
+:meth:`pyramid.configuration.Configurator.add_view` associates the ``json``
+renderer with a view callable:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <view
-     view=".views.my_view"
-     renderer="json"
-     />
+   config.add_view('myproject.views.my_view', renderer='json')
 
 When this configuration is added to an application, the
-``.views.my_view`` view callable will now use a ``json`` renderer,
+``myproject.views.my_view`` view callable will now use a ``json`` renderer,
 which renders view return values to a :term:`JSON` serialization.
 
 Other built-in renderers include renderers which use the
@@ -368,8 +366,8 @@ Views which use a renderer can vary non-body response attributes (such
 as headers and the HTTP status code) by attaching properties to the
 request.  See :ref:`response_request_attrs`.
 
-Additional renderers can be added to the system as necessary via a
-ZCML directive (see :ref:`adding_and_overriding_renderers`).
+Additional renderers can be added to the system as necessary (see
+:ref:`adding_and_overriding_renderers`).
 
 .. index::
    single: renderers (built-in)
@@ -462,18 +460,18 @@ representing the JSON serialization of the return value:
 The return value needn't be a dictionary, but the return value must
 contain values serializable by :func:`json.dumps`.
 
-You can configure a view to use the JSON renderer in ZCML by naming
-``json`` as the ``renderer`` attribute of a view configuration, e.g.:
+You can configure a view to use the JSON renderer by naming ``json`` as the
+``renderer`` argument of a view configuration, e.g. by using
+:meth:`pyramid.configuration.Configurator.add_view`:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <view
-       context=".models.Hello"
-       view=".views.hello_world"
-       name="hello"
-       renderer="json"
-       />
+   config.add_view('myproject.views.hello_world', 
+                    name='hello'
+                    context='myproject.models.Hello',
+                    renderer='json')
+    
 
 Views which use the JSON renderer can vary non-body response
 attributes by attaching properties to the request.  See
@@ -495,64 +493,60 @@ final path element with a filename extension of ``.pt``, the Chameleon
 ZPT renderer is used.  See :ref:`chameleon_zpt_templates` for more
 information about ZPT templates.
 
-If the ``renderer`` attribute of a view configuration is an absolute
-path, a source-file relative path, or a :term:`resource specification`
-which has a final path element with a filename extension of ``.txt``,
-the :term:`Chameleon` text renderer is used.  See
-:ref:`chameleon_zpt_templates` for more information about Chameleon
-text templates.
+If the ``renderer`` attribute of a view configuration is an absolute path or
+a :term:`resource specification` which has a final path element with a
+filename extension of ``.txt``, the :term:`Chameleon` text renderer is used.
+See :ref:`chameleon_zpt_templates` for more information about Chameleon text
+templates.
 
 The behavior of these renderers is the same, except for the engine
 used to render the template.
 
-When a ``renderer`` attribute that names a Chameleon template path
-(e.g. ``templates/foo.pt`` or ``templates/foo.txt``) is used, the view
-must return a Response object or a Python *dictionary*.  If the view
-callable with an associated template returns a Python dictionary, the
-named template will be passed the dictionary as its keyword arguments,
-and the template renderer implementation will return the resulting
-rendered template in a response to the user.  If the view callable
-returns anything but a Response object or a dictionary, an error will
-be raised.
+When a ``renderer`` attribute that names a template path or :term:`resource
+specification` (e.g. ``myproject:templates/foo.pt`` or
+``myproject:templates/foo.txt``) is used, the view must return a
+:term:`Response` object or a Python *dictionary*.  If the view callable with
+an associated template returns a Python dictionary, the named template will
+be passed the dictionary as its keyword arguments, and the template renderer
+implementation will return the resulting rendered template in a response to
+the user.  If the view callable returns anything but a Response object or a
+dictionary, an error will be raised.
 
-Before passing keywords to the template, the keywords derived from the
-dictionary returned by the view are augmented.  The callable object
--- whatever object was used to define the ``view`` -- will be
-automatically inserted into the set of keyword arguments passed to the
-template as the ``view`` keyword.  If the view callable was a class,
-the ``view`` keyword will be an instance of that class.  Also inserted
-into the keywords passed to the template are ``renderer_name`` (the
-name of the renderer, which may be a full path or a package-relative
-name, typically the full string used in the ``renderer`` attribute of
-the directive), ``context`` (the context of the view used to render
-the template), and ``request`` (the request passed to the view used to
+Before passing keywords to the template, the keyword arguments derived from
+the dictionary returned by the view are augmented.  The callable object --
+whatever object was used to define the ``view`` -- will be automatically
+inserted into the set of keyword arguments passed to the template as the
+``view`` keyword.  If the view callable was a class, the ``view`` keyword
+will be an instance of that class.  Also inserted into the keywords passed to
+the template are ``renderer_name`` (the string used in the ``renderer``
+attribute of the directive), ``renderer_info`` (an object containing
+renderer-related information), ``context`` (the context of the view used to
+render the template), and ``request`` (the request passed to the view used to
 render the template).
 
 Here's an example view configuration which uses a Chameleon ZPT
 renderer:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <view
-       context=".models.Hello"
-       view=".views.hello_world"
-       name="hello"
-       renderer="templates/foo.pt"
-       />
+    # config is an instance of pyramid.configuration.Configurator
+
+    config.add_view('myproject.views.hello_world',
+                    name='hello',
+                    context='myproject.models.Hello',
+                    renderer='myproject:templates/foo.pt')
 
 Here's an example view configuration which uses a Chameleon text
 renderer:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <view
-       context=".models.Hello"
-       view=".views.hello_world"
-       name="hello"
-       renderer="templates/foo.txt"
-       />
+    config.add_view('myproject.views.hello_world',
+                    name='hello',
+                    context='myproject.models.Hello',
+                    renderer='myproject:templates/foo.txt')
 
 Views which use a Chameleon renderer can vary response attributes by
 attaching properties to the request.  See
@@ -582,32 +576,35 @@ specification` if desired.
 
 Here's an example view configuration which uses a relative path:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <view
-       context=".models.Hello"
-       view=".views.hello_world"
-       name="hello"
-       renderer="foo.mak"
-       />
+    # config is an instance of pyramid.configuration.Configurator
 
-It's important to note that in Mako's case, the 'relative' path name is not
-relative to the package, but is relative the the directory configured for
-Mako.
+    config.add_view('myproject.views.hello_world',
+                    name='hello',
+                    context='myproject.models.Hello',
+                    renderer='foo.mak')
 
-Here's an example view configuration which uses a :term:`resource
+It's important to note that in Mako's case, the 'relative' path name
+``foo.mak`` above is not relative to the package, but is relative to the
+directory (or directories) configured for Mako via the ``mako.directories``
+configuration file setting.
+
+The renderer can also be provided in :term:`resource specification`
+format. Here's an example view configuration which uses a :term:`resource
 specification`:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <view
-       context=".models.Hello"
-       view=".views.hello_world"
-       name="hello"
-       renderer="some.package:templates/foo.mak"
-       />
+    config.add_view('myproject.views.hello_world',
+                    name='hello',
+                    context='myproject.models.Hello',
+                    renderer='mypackage:templates/foo.mak')
+
+The above configuration will use the file named ``foo.mak`` in the
+``templates`` directory of the ``mypackage`` package.
 
 The ``Mako`` template renderer can take additional arguments beyond the
 standard ``reload_templates`` setting, see the :ref:`environment_chapter` for
@@ -678,47 +675,33 @@ documentation in :ref:`request_module`.
 Adding and Overriding Renderers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-New templating systems and serializers can be associated with
-:mod:`pyramid` renderer names.  To this end, configuration
-declarations can be made which override an existing :term:`renderer
-factory` and which add a new renderer factory.
+New templating systems and serializers can be associated with :mod:`pyramid`
+renderer names.  To this end, configuration declarations can be made which
+override an existing :term:`renderer factory` and which add a new renderer
+factory.
 
-Adding or overriding a renderer is accomplished via :term:`ZCML` or
-via imperative configuration.  Renderers can be registered
-imperatively using the
-:meth:`pyramid.configuration.Configurator.add_renderer` API or via
-the :ref:`renderer_directive` ZCML directive.
+Renderers can be registered imperatively using the
+:meth:`pyramid.configuration.Configurator.add_renderer` API.
+
+.. note:: The tasks described in this section can also be performed via
+   :term:`declarative configuration`.  See
+   :ref:`zcml_adding_and_overriding_renderers`.
 
 For example, to add a renderer which renders views which have a
 ``renderer`` attribute that is a path that ends in ``.jinja2``:
 
-.. topic:: Via ZCML
+.. code-block:: python
+   :linenos:
 
-   .. code-block:: xml
-      :linenos:
-
-      <renderer
-        name=".jinja2"
-        factory="my.package.MyJinja2Renderer"/>
-
-   The ``factory`` attribute is a :term:`dotted Python name` that must
-   point to an implementation of a :term:`renderer factory`.
-
-   The ``name`` attribute is the renderer name.
-
-.. topic:: Via Imperative Configuration
-
-   .. code-block:: python
-      :linenos:
-
-      from my.package import MyJinja2Renderer
-      config.add_renderer('.jinja2', MyJinja2Renderer)
+   config.add_renderer('.jinja2', 'mypackage.MyJinja2Renderer')
 
    The first argument is the renderer name.
 
    The second argument is a reference to an implementation of a
    :term:`renderer factory` or a :term:`dotted Python name` referring
    to such an object.
+
+.. _adding_a_renderer:
 
 Adding a New Renderer
 +++++++++++++++++++++
@@ -777,18 +760,18 @@ There are essentially two different kinds of renderer factories:
    ``my.package`` Python :term:`package`.
 
 Here's an example of the registration of a simple renderer factory via
-ZCML:
+:meth:`pyramid.configuration.Configurator.add_renderer`:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <renderer
-     name="amf"
-     factory="my.package.MyAMFRenderer"/>
+   # config is an instance of pyramid.configuration.Configurator
 
-Adding the above ZCML to your application will allow you to use the
-``my.package.MyAMFRenderer`` renderer factory implementation in view
-configurations by referring to it as ``amf`` in the ``renderer``
+   config.add_renderer(name='amf', factory='my.package.MyAMFRenderer')
+
+Adding the above code to your application startup configuration will allow
+you to use the ``my.package.MyAMFRenderer`` renderer factory implementation
+in view configurations by referring to it as ``amf`` in the ``renderer``
 attribute of a :term:`view configuration`:
 
 .. code-block:: python
@@ -812,18 +795,16 @@ constructor will always be ``amf``.
 Here's an example of the registration of a more complicated renderer
 factory, which expects to be passed a filesystem path:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <renderer
-     name=".jinja2"
-     factory="my.package.MyJinja2Renderer"/>
+   config.add_renderer(name='.jinja2', 
+                       factory='my.package.MyJinja2Renderer')
 
-Adding the above ZCML to your application will allow you to use the
-``my.package.MyJinja2Renderer`` renderer factory implementation in
-view configurations by referring to any ``renderer`` which *ends in*
-``.jinja`` in the ``renderer`` attribute of a :term:`view
-configuration`:
+Adding the above code to your application startup will allow you to use the
+``my.package.MyJinja2Renderer`` renderer factory implementation in view
+configurations by referring to any ``renderer`` which *ends in* ``.jinja`` in
+the ``renderer`` attribute of a :term:`view configuration`:
 
 .. code-block:: python
    :linenos:
@@ -835,15 +816,15 @@ configuration`:
        return {'Hello':'world'}
 
 When a :term:`view configuration` which has a ``name`` attribute that does
-contain a dot, such as ``templates/mytemplate.jinja2`` above is encountered at
-startup time, the value of the name attribute is split on its final dot.  The
-second element of the split is typically the filename extension.  This
-extension is used to look up a renderer factory for the configured view.  Then
-the value of ``renderer`` is passed to the factory to create a renderer for the
-view.  In this case, the view configuration will create an instance of a
-``Jinja2Renderer`` for each view configuration which includes anything ending
-with ``.jinja2`` as its ``renderer`` value.  The ``name`` passed to the
-``Jinja2Renderer`` constructor will be whatever the user passed as
+contain a dot, such as ``templates/mytemplate.jinja2`` above is encountered
+at startup time, the value of the name attribute is split on its final dot.
+The second element of the split is typically the filename extension.  This
+extension is used to look up a renderer factory for the configured view.
+Then the value of ``renderer`` is passed to the factory to create a renderer
+for the view.  In this case, the view configuration will create an instance
+of a ``Jinja2Renderer`` for each view configuration which includes anything
+ending with ``.jinja2`` as its ``renderer`` value.  The ``name`` passed to
+the ``Jinja2Renderer`` constructor will be whatever the user passed as
 ``renderer=`` to the view configuration.
 
 See also :ref:`renderer_directive` and
@@ -852,66 +833,41 @@ See also :ref:`renderer_directive` and
 Overriding an Existing Renderer
 +++++++++++++++++++++++++++++++
 
-You can associate more than one filename extension with the same
-existing renderer implementation as necessary if you need to use a
-different file extension for the same kinds of templates.  For
-example, to associate the ``.zpt`` extension with the Chameleon ZPT
-renderer factory, use:
+You can associate more than one filename extension with the same existing
+renderer implementation as necessary if you need to use a different file
+extension for the same kinds of templates.  For example, to associate the
+``.zpt`` extension with the Chameleon ZPT renderer factory, use the
+:meth:`pyramid.configuration.Configurator.add_renderer` method:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <renderer
-      name=".zpt"
-      factory="pyramid.chameleon_zpt.renderer_factory"/>
+   config.add_renderer('.zpt', 'pyramid.chameleon_zpt.renderer_factory')
 
-After you do this, :mod:`pyramid` will treat templates ending in
-both the ``.pt`` and ``.zpt`` filename extensions as Chameleon ZPT
-templates.
+After you do this, :mod:`pyramid` will treat templates ending in both the
+``.pt`` and ``.zpt`` filename extensions as Chameleon ZPT templates.
 
-To override the default mapping in which files with a ``.pt``
-extension are rendered via a Chameleon ZPT page template renderer, use
-a variation on the following in your application's ZCML:
+To override the default mapping in which files with a ``.pt`` extension are
+rendered via a Chameleon ZPT page template renderer, use a variation on the
+following in your application's startup code:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <renderer
-      name=".pt"
-      factory="my.package.pt_renderer"/>
+   config.add_renderer('.pt', 'mypackage.pt_renderer')
 
 After you do this, the :term:`renderer factory` in
-``my.package.pt_renderer`` will be used to render templates which end
+``mypackage.pt_renderer`` will be used to render templates which end
 in ``.pt``, replacing the default Chameleon ZPT renderer.
 
-To override the default mapping in which files with a ``.txt``
-extension are rendered via a Chameleon text template renderer, use a
-variation on the following in your application's ZCML:
+To associate a *default* renderer with *all* view configurations (even ones
+which do not possess a ``renderer`` attribute), use a variation on the
+following (ie. pass ``None`` as the ``name`` attribute to the renderer tag):
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <renderer
-      name=".txt"
-      factory="my.package.text_renderer"/>
-
-After you do this, the :term:`renderer factory` in
-``my.package.text_renderer`` will be used to render templates which
-end in ``.txt``, replacing the default Chameleon text renderer.
-
-To associate a *default* renderer with *all* view configurations (even
-ones which do not possess a ``renderer`` attribute), use a variation
-on the following (ie. omit the ``name`` attribute to the renderer
-tag):
-
-.. code-block:: xml
-   :linenos:
-
-   <renderer
-      factory="pyramid.renderers.json_renderer_factory"/>
-
-See also :ref:`renderer_directive` and
-:meth:`pyramid.configuration.Configurator.add_renderer`.
+   config.add_renderer(None, 'mypackage.json_renderer_factory')
 
 .. index::
    single: view exceptions
@@ -1163,11 +1119,7 @@ the :term:`context` and in the :term:`request`, as well as the
 :term:`view name`.  These three pieces of information are known,
 collectively, as a :term:`triad`.
 
-View configuration is performed in one of three ways:
-
-- by adding a ``<view>`` declaration to :term:`ZCML` used by your
-  application as per :ref:`mapping_views_using_zcml_section` and
-  :ref:`view_directive`.
+View configuration is performed in one of these ways:
 
 - by running a :term:`scan` against application source code which has
   a :class:`pyramid.view.view_config` decorator attached to a Python
@@ -1178,39 +1130,40 @@ View configuration is performed in one of three ways:
   method as per :meth:`pyramid.configuration.Configurator.add_view`
   and :ref:`mapping_views_using_imperative_config_section`.
 
-Each of these mechanisms is completely equivalent to the other.
+Both of these mechanisms is completely equivalent to the other.
+
+.. note:: You can also add view configuration by adding a ``<view>``
+   declaration to :term:`ZCML` used by your application as per
+   :ref:`mapping_views_using_zcml_section` and :ref:`view_directive`.
 
 A view configuration might also be performed by virtue of :term:`route
-configuration`.  View configuration via route configuration is
-performed in one of the following two ways:
+configuration`.  View configuration via route configuration is performed by
+using the :meth:`pyramid.configuration.Configurator.add_route` method to
+create a route with a ``view`` argument.
 
-- by using the :meth:`pyramid.configuration.Configurator.add_route`
-  method to create a route with a ``view`` argument.
-
-- by adding a ``<route>`` declaration that uses a ``view`` attribute to
-  :term:`ZCML` used by your application as per :ref:`route_directive`.
+.. note:: ZCML users can use :ref:`route_directive` to perform the same task.
+   See also :ref:`zcml_route_configuration`.
 
 .. _view_configuration_parameters:
 
 View Configuration Parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-All forms of view configuration accept the same general types of
-arguments. 
+All forms of view configuration accept the same general types of arguments.
 
-Many arguments supplied during view configuration are :term:`view
-predicate` arguments.  View predicate arguments used during view
-configuration are used to narrow the set of circumstances in which
-:mod:`view lookup` will find a particular view callable.  In general,
-the fewer number of predicates which are supplied to a particular view
-configuration, the more likely it is that the associated view callable
-will be invoked.  The greater the number supplied, the less likely.
+Many arguments supplied during view configuration are :term:`view predicate`
+arguments.  View predicate arguments used during view configuration are used
+to narrow the set of circumstances in which :mod:`view lookup` will find a
+particular view callable.  In general, the fewer number of predicates which
+are supplied to a particular view configuration, the more likely it is that
+the associated view callable will be invoked.  The greater the number
+supplied, the less likely.
 
-Some view configuration arguments are non-predicate arguments.  These
-tend to modify the response of the view callable or prevent the view
-callable from being invoked due to an authorization policy.  The
-presence of non-predicate arguments in a view configuration does not
-narrow the circumstances in which the view callable will be invoked.
+Some view configuration arguments are non-predicate arguments.  These tend to
+modify the response of the view callable or prevent the view callable from
+being invoked due to an authorization policy.  The presence of non-predicate
+arguments in a view configuration does not narrow the circumstances in which
+the view callable will be invoked.
 
 Non-Predicate Arguments
 +++++++++++++++++++++++
@@ -1452,101 +1405,6 @@ Predicate Arguments
   used.
 
 .. index::
-   single: ZCML view configuration
-
-.. _mapping_views_using_zcml_section:
-
-View Configuration Via ZCML
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-You may associate a view with a URL by adding :ref:`view_directive`
-declarations via :term:`ZCML` in a ``configure.zcml`` file.  An
-example of a view declaration in ZCML is as follows:
-
-.. code-block:: xml
-   :linenos:
-
-   <view
-       context=".models.Hello"
-       view=".views.hello_world"
-       name="hello.html"
-       />
-
-The above maps the ``.views.hello_world`` view callable function to
-the following set of :term:`context finding` results:
-
-- A :term:`context` object which is an instance (or subclass) of the
-  Python class represented by ``.models.Hello``
-
-- A :term:`view name` equalling ``hello.html``.
-
-.. note:: Values prefixed with a period (``.``) for the ``context``
-   and ``view`` attributes of a ``view`` declaration (such as those
-   above) mean "relative to the Python package directory in which this
-   :term:`ZCML` file is stored".  So if the above ``view`` declaration
-   was made inside a ``configure.zcml`` file that lived in the
-   ``hello`` package, you could replace the relative ``.models.Hello``
-   with the absolute ``hello.models.Hello``; likewise you could
-   replace the relative ``.views.hello_world`` with the absolute
-   ``hello.views.hello_world``.  Either the relative or absolute form
-   is functionally equivalent.  It's often useful to use the relative
-   form, in case your package's name changes.  It's also shorter to
-   type.
-
-You can also declare a *default view callable* for a :term:`model`
-type:
-
-.. code-block:: xml
-   :linenos:
-
-   <view
-       context=".models.Hello"
-       view=".views.hello_world"
-       />
-
-A *default view callable* simply has no ``name`` attribute.  For the
-above registration, when a :term:`context` is found that is of the
-type ``.models.Hello`` and there is no :term:`view name` associated
-with the result of :term:`context finding`, the *default view
-callable* will be used.  In this case, it's the view at
-``.views.hello_world``.
-
-A default view callable can alternately be defined by using the empty
-string as its ``name`` attribute:
-
-.. code-block:: xml
-   :linenos:
-
-   <view
-       context=".models.Hello"
-       view=".views.hello_world"
-       name=""
-       />
-
-You may also declare that a view callable is good for any context type
-by using the special ``*`` character as the value of the ``context``
-attribute:
-
-.. code-block:: xml
-   :linenos:
-
-   <view
-       context="*"
-       view=".views.hello_world"
-       name="hello.html"
-       />
-
-This indicates that when :mod:`pyramid` identifies that the
-:term:`view name` is ``hello.html`` and the context is of any type,
-the ``.views.hello_world`` view callable will be invoked.
-
-A ZCML ``view`` declaration's ``view`` attribute can also name a
-class.  In this case, the rules described in :ref:`class_as_view`
-apply for the class which is named.
-
-See :ref:`view_directive` for complete ZCML directive documentation.
-
-.. index::
    single: view_config decorator
 
 .. _mapping_views_using_a_decorator_section:
@@ -1573,10 +1431,11 @@ configuration for the same purpose.
 Usage of the ``view_config`` decorator is a form of :term:`declarative
 configuration`, like ZCML, but in decorator form.
 :class:`pyramid.view.view_config` can be used to associate :term:`view
-configuration` information -- as done via the equivalent ZCML -- with
-a function that acts as a :mod:`pyramid` view callable.  All ZCML
-:ref:`view_directive` attributes (save for the ``view`` attribute) are
-available in decorator form and mean precisely the same thing.
+configuration` information -- as done via the equivalent imperative code or
+ZCML -- with a function that acts as a :mod:`pyramid` view callable.  All
+arguments to the :meth:`pyramid.configuration.Configurator.add_view` method
+(save for the ``view`` argument) are available in decorator form and mean
+precisely the same thing.
 
 An example of the :class:`pyramid.view.view_config` decorator might
 reside in a :mod:`pyramid` application module ``views.py``:
@@ -1594,22 +1453,8 @@ reside in a :mod:`pyramid` application module ``views.py``:
    def my_view(request):
        return {'a':1}
 
-Using this decorator as above replaces the need to add this ZCML to
-your application registry:
-
-.. code-block:: xml
-   :linenos:
-
-   <view
-    context=".models.MyModel"
-    view=".views.my_view"
-    name="my_view"
-    permission="read"
-    request_method="POST"
-    renderer="templates/my.pt"
-    />
-
-Or replaces the need to add this imperative configuration stanza:
+Using this decorator as above replaces the need to add this imperative
+configuration stanza:
 
 .. ignore-next-block
 .. code-block:: python
@@ -1636,38 +1481,28 @@ matches any model type, using no permission, registered against
 requests with any request method / request type / request param /
 route name / containment.
 
-The mere existence of a ``@view_config`` decorator doesn't suffice to
-perform view configuration.  To make :mod:`pyramid` process your
-:class:`pyramid.view.view_config` declarations, you *must* do one of
-the following:
+The mere existence of a ``@view_config`` decorator doesn't suffice to perform
+view configuration.  To make :mod:`pyramid` process your
+:class:`pyramid.view.view_config` declarations, you *must* do use the
+``scan`` method of a :class:`pyramid.configuration.Configurator`:
 
-- If you are using :term:`ZCML`, insert the following boilerplate into
-  your application's ``configure.zcml``:
+.. code-block:: python
 
-  .. code-block:: xml
+   # config is assumed to be an instance of the
+   # pyramid.configuration.Configurator class
+   config.scan()
 
-      <scan package="."/>
+.. note:: See :ref:`zcml_scanning` for information about how to invoke a scan
+   via ZCML (if you're not using imperative configuration).
 
-- If you are using :term:`imperative configuration`, use the ``scan``
-  method of a :class:`pyramid.configuration.Configurator`:
-
-  .. code-block:: python
-
-      # config is assumed to be an instance of the
-      # pyramid.configuration.Configurator class
-      config.scan()
-
-Please see :ref:`decorations_and_code_scanning` for detailed
-information about what happens when code is scanned for configuration
-declarations resulting from use of decorators like
-:class:`pyramid.view.view_config`.
+Please see :ref:`decorations_and_code_scanning` for detailed information
+about what happens when code is scanned for configuration declarations
+resulting from use of decorators like :class:`pyramid.view.view_config`.
 
 See :ref:`configuration_module` for additional API arguments to the
-:meth:`pyramid.configuration.Configurator.scan` method.  For
-example, the method allows you to supply a ``package`` argument to
-better control exactly *which* code will be scanned.  This is the same
-value implied by the ``package`` attribute of the ZCML ``<scan>``
-directive (see :ref:`scan_directive`).
+:meth:`pyramid.configuration.Configurator.scan` method.  For example, the
+method allows you to supply a ``package`` argument to better control exactly
+*which* code will be scanned.
 
 ``@view_config`` Placement
 ++++++++++++++++++++++++++
@@ -1883,37 +1718,34 @@ in such a way that the interface is attached to it.
        alsoProvides(hello, IHello)
        return hello
 
-Regardless of how you associate an interface with a model instance or
-a model class, the resulting ZCML to associate that interface with a
-view callable is the same.  Assuming the above code that defines an
-``IHello`` interface lives in the root of your application, and its
-module is named "models.py", the below interface declaration will
-associate the ``.views.hello_world`` view with models that implement
-(aka provide) this interface.
+Regardless of how you associate an interface with a model instance or a model
+class, the resulting code to associate that interface with a view callable is
+the same.  Assuming the above code that defines an ``IHello`` interface lives
+in the root of your application, and its module is named "models.py", the
+below interface declaration will associate the
+``mypackage.views.hello_world`` view with models that implement (aka provide)
+this interface.
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <view
-       context=".models.IHello"
-       view=".views.hello_world"
-       name="hello.html"
-       />
+   # config is an instance of pyramid.configuration.Configurator
 
-Any time a model that is determined to be the :term:`context` provides
-this interface, and a view named ``hello.html`` is looked up against
-it as per the URL, the ``.views.hello_world`` view callable will be
-invoked.
+   config.add_view('mypackage.views.hello_world', name='hello.html',
+                   context='mypackage.models.IHello')
 
-Note that views registered against a model class take precedence over
-views registered for any interface the model class implements when an
-ambiguity arises.  If a view is registered for both the class type of
-the context and an interface implemented by the context's class, the
-view registered for the context's class will "win".
+Any time a model that is determined to be the :term:`context` provides this
+interface, and a view named ``hello.html`` is looked up against it as per the
+URL, the ``mypackage.views.hello_world`` view callable will be invoked.
 
-For more information about defining models with interfaces for use
-within view configuration, see
-:ref:`models_which_implement_interfaces`.
+Note that views registered against a model class take precedence over views
+registered for any interface the model class implements when an ambiguity
+arises.  If a view is registered for both the class type of the context and
+an interface implemented by the context's class, the view registered for the
+context's class will "win".
+
+For more information about defining models with interfaces for use within
+view configuration, see :ref:`models_which_implement_interfaces`.
 
 .. index::
    single: view security
@@ -1924,29 +1756,26 @@ within view configuration, see
 Configuring View Security
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If a :term:`authorization policy` is active, any :term:`permission`
-attached to a :term:`view configuration` found during view lookup will
-be consulted to ensure that the currently authenticated user possesses
-that permission against the :term:`context` before the view function
-is actually called.  Here's an example of specifying a permission in a
-view configuration declaration in ZCML:
+If a :term:`authorization policy` is active, any :term:`permission` attached
+to a :term:`view configuration` found during view lookup will be consulted to
+ensure that the currently authenticated user possesses that permission
+against the :term:`context` before the view function is actually called.
+Here's an example of specifying a permission in a view configuration using
+:meth:`pyramid.configuration.Configurator.add_view`:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <view
-       context=".models.IBlog"
-       view=".views.add_entry"
-       name="add.html"
-       permission="add"
-       />
+   # config is an instance of pyramid.configuration.Configurator
 
-When an authentication policy is enabled, this view will be protected
-with the ``add`` permission.  The view will *not be called* if the
-user does not possess the ``add`` permission relative to the current
-:term:`context` and an authorization policy is enabled.  Instead the
-:term:`forbidden view` result will be returned to the client as per
-:ref:`protecting_views`.
+   config.add_view('myproject.views.add_entry', name='add.html',
+                   context='myproject.models.IBlog', permission='add')
+
+When an authentication policy is enabled, this view will be protected with
+the ``add`` permission.  The view will *not be called* if the user does not
+possess the ``add`` permission relative to the current :term:`context` and an
+authorization policy is enabled.  Instead the :term:`forbidden view` result
+will be returned to the client as per :ref:`protecting_views`.
 
 .. index::
    single: view lookup

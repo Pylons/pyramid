@@ -477,48 +477,50 @@ declaratively.  More information about this mode of configuration is
 available in :ref:`declarative_configuration` and within
 :ref:`zcml_reference`.
 
-Scanning
---------
+.. _zcml_scanning:
 
-:term:`ZCML` can also invoke a :term:`scan` via its ``<scan>``
-directive.  If a ZCML file is processed that contains a scan
-directive, the package the ZCML file points to is scanned.
+Scanning via ZCML
+-----------------
 
-.. topic:: Declaratively Starting a Scan
+:term:`ZCML` can invoke a :term:`scan` via its ``<scan>`` directive.  If a
+ZCML file is processed that contains a scan directive, the package the ZCML
+file points to is scanned.
 
-   .. code-block:: python
-      :linenos:
+.. code-block:: python
+   :linenos:
 
-      # helloworld.py
+   # helloworld.py
 
-      from paste.httpserver import serve
-      from pyramid.response import Response
-      from pyramid.view import view_config
-     
-      @view_config()
-      def hello(request):
-          return Response('Hello')
+   from paste.httpserver import serve
+   from pyramid.response import Response
+   from pyramid.view import view_config
+  
+   @view_config()
+   def hello(request):
+       return Response('Hello')
 
-      if __name__ == '__main__':
-          from pyramid.configuration import Configurator
-          config = Configurator()
-          config.begin()
-          config.load_zcml('configure.zcml')
-          config.end()
-          app = config.make_wsgi_app()
-          serve(app, host='0.0.0.0')
+   if __name__ == '__main__':
+       from pyramid.configuration import Configurator
+       config = Configurator()
+       config.begin()
+       config.load_zcml('configure.zcml')
+       config.end()
+       app = config.make_wsgi_app()
+       serve(app, host='0.0.0.0')
 
-   .. code-block:: xml
-      :linenos:
+.. code-block:: xml
+   :linenos:
 
-      <configure xmlns="http://namespaces.repoze.org">
+   <configure xmlns="http://namespaces.repoze.org">
 
-        <!-- configure.zcml -->
+     <!-- configure.zcml -->
 
-        <include package="pyramid.includes"/>
-        <scan package="."/>
+     <include package="pyramid.includes"/>
+     <scan package="."/>
 
-      </configure>
+   </configure>
+
+See also :ref:`scan_directive`.
 
 Which Mode Should I Use?
 ------------------------
@@ -537,6 +539,101 @@ However, imperative mode configuration can be simpler to understand,
 and the framework is not "opinionated" about the choice.  This book
 presents examples in both styles, mostly interchangeably.  You can
 choose the mode that best fits your brain as necessary.
+
+.. index::
+   single: ZCML view configuration
+
+.. _mapping_views_using_zcml_section:
+
+View Configuration Via ZCML
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You may associate a view with a URL by adding :ref:`view_directive`
+declarations via :term:`ZCML` in a ``configure.zcml`` file.  An
+example of a view declaration in ZCML is as follows:
+
+.. code-block:: xml
+   :linenos:
+
+   <view
+       context=".models.Hello"
+       view=".views.hello_world"
+       name="hello.html"
+       />
+
+The above maps the ``.views.hello_world`` view callable function to
+the following set of :term:`context finding` results:
+
+- A :term:`context` object which is an instance (or subclass) of the
+  Python class represented by ``.models.Hello``
+
+- A :term:`view name` equalling ``hello.html``.
+
+.. note:: Values prefixed with a period (``.``) for the ``context``
+   and ``view`` attributes of a ``view`` declaration (such as those
+   above) mean "relative to the Python package directory in which this
+   :term:`ZCML` file is stored".  So if the above ``view`` declaration
+   was made inside a ``configure.zcml`` file that lived in the
+   ``hello`` package, you could replace the relative ``.models.Hello``
+   with the absolute ``hello.models.Hello``; likewise you could
+   replace the relative ``.views.hello_world`` with the absolute
+   ``hello.views.hello_world``.  Either the relative or absolute form
+   is functionally equivalent.  It's often useful to use the relative
+   form, in case your package's name changes.  It's also shorter to
+   type.
+
+You can also declare a *default view callable* for a :term:`model`
+type:
+
+.. code-block:: xml
+   :linenos:
+
+   <view
+       context=".models.Hello"
+       view=".views.hello_world"
+       />
+
+A *default view callable* simply has no ``name`` attribute.  For the
+above registration, when a :term:`context` is found that is of the
+type ``.models.Hello`` and there is no :term:`view name` associated
+with the result of :term:`context finding`, the *default view
+callable* will be used.  In this case, it's the view at
+``.views.hello_world``.
+
+A default view callable can alternately be defined by using the empty
+string as its ``name`` attribute:
+
+.. code-block:: xml
+   :linenos:
+
+   <view
+       context=".models.Hello"
+       view=".views.hello_world"
+       name=""
+       />
+
+You may also declare that a view callable is good for any context type
+by using the special ``*`` character as the value of the ``context``
+attribute:
+
+.. code-block:: xml
+   :linenos:
+
+   <view
+       context="*"
+       view=".views.hello_world"
+       name="hello.html"
+       />
+
+This indicates that when :mod:`pyramid` identifies that the
+:term:`view name` is ``hello.html`` and the context is of any type,
+the ``.views.hello_world`` view callable will be invoked.
+
+A ZCML ``view`` declaration's ``view`` attribute can also name a
+class.  In this case, the rules described in :ref:`class_as_view`
+apply for the class which is named.
+
+See :ref:`view_directive` for complete ZCML directive documentation.
 
 .. index::
    single: ZCML directive; route
@@ -835,13 +932,168 @@ In other words, it has no configuration attributes; its existence in a
 
 See :ref:`aclauthorizationpolicy_directive` for detailed information.
 
+.. _zcml_adding_and_overriding_renderers:
+
+Adding and Overriding Renderers via ZCML
+----------------------------------------
+
+New templating systems and serializers can be associated with :mod:`pyramid`
+renderer names.  To this end, configuration declarations can be made which
+override an existing :term:`renderer factory` and which add a new renderer
+factory.
+
+Adding or overriding a renderer via ZCML is accomplished via the
+:ref:`renderer_directive` ZCML directive.
+
+For example, to add a renderer which renders views which have a
+``renderer`` attribute that is a path that ends in ``.jinja2``:
+
+.. code-block:: xml
+   :linenos:
+
+   <renderer
+     name=".jinja2"
+     factory="my.package.MyJinja2Renderer"/>
+
+The ``factory`` attribute is a :term:`dotted Python name` that must
+point to an implementation of a :term:`renderer factory`.
+
+The ``name`` attribute is the renderer name.
+
+Registering a Renderer Factory
+++++++++++++++++++++++++++++++
+
+See :ref:`adding_a_renderer` for more information for the definition of a
+:term:`renderer factory`.  Here's an example of the registration of a simple
+:term:`renderer factory` via ZCML:
+
+.. code-block:: xml
+   :linenos:
+
+   <renderer
+     name="amf"
+     factory="my.package.MyAMFRenderer"/>
+
+Adding the above ZCML to your application will allow you to use the
+``my.package.MyAMFRenderer`` renderer factory implementation in view
+configurations by subseqently referring to it as ``amf`` in the ``renderer``
+attribute of a :term:`view configuration`:
+
+.. code-block:: xml
+   :linenos:
+
+   <view
+    view="mypackage.views.my_view"
+    renderer="amf"/>
+
+Here's an example of the registration of a more complicated renderer
+factory, which expects to be passed a filesystem path:
+
+.. code-block:: xml
+   :linenos:
+
+   <renderer
+     name=".jinja2"
+     factory="my.package.MyJinja2Renderer"/>
+
+Adding the above ZCML to your application will allow you to use the
+``my.package.MyJinja2Renderer`` renderer factory implementation in
+view configurations by referring to any ``renderer`` which *ends in*
+``.jinja`` in the ``renderer`` attribute of a :term:`view
+configuration`:
+
+.. code-block:: xml
+   :linenos:
+
+   <view
+    view="mypackage.views.my_view"
+    renderer="templates/mytemplate.jinja2"/>
+
+When a :term:`view configuration` which has a ``name`` attribute that does
+contain a dot, such as ``templates/mytemplate.jinja2`` above is encountered at
+startup time, the value of the name attribute is split on its final dot.  The
+second element of the split is typically the filename extension.  This
+extension is used to look up a renderer factory for the configured view.  Then
+the value of ``renderer`` is passed to the factory to create a renderer for the
+view.  In this case, the view configuration will create an instance of a
+``Jinja2Renderer`` for each view configuration which includes anything ending
+with ``.jinja2`` as its ``renderer`` value.  The ``name`` passed to the
+``Jinja2Renderer`` constructor will be whatever the user passed as
+``renderer=`` to the view configuration.
+
+See also :ref:`renderer_directive` and
+:meth:`pyramid.configuration.Configurator.add_renderer`.
+
+
+Overriding an Existing Renderer
++++++++++++++++++++++++++++++++
+
+You can associate more than one filename extension with the same
+existing renderer implementation as necessary if you need to use a
+different file extension for the same kinds of templates.  For
+example, to associate the ``.zpt`` extension with the Chameleon ZPT
+renderer factory, use:
+
+.. code-block:: xml
+   :linenos:
+
+   <renderer
+      name=".zpt"
+      factory="pyramid.chameleon_zpt.renderer_factory"/>
+
+After you do this, :mod:`pyramid` will treat templates ending in
+both the ``.pt`` and ``.zpt`` filename extensions as Chameleon ZPT
+templates.
+
+To override the default mapping in which files with a ``.pt``
+extension are rendered via a Chameleon ZPT page template renderer, use
+a variation on the following in your application's ZCML:
+
+.. code-block:: xml
+   :linenos:
+
+   <renderer
+      name=".pt"
+      factory="my.package.pt_renderer"/>
+
+After you do this, the :term:`renderer factory` in
+``my.package.pt_renderer`` will be used to render templates which end
+in ``.pt``, replacing the default Chameleon ZPT renderer.
+
+To override the default mapping in which files with a ``.txt``
+extension are rendered via a Chameleon text template renderer, use a
+variation on the following in your application's ZCML:
+
+.. code-block:: xml
+   :linenos:
+
+   <renderer
+      name=".txt"
+      factory="my.package.text_renderer"/>
+
+After you do this, the :term:`renderer factory` in
+``my.package.text_renderer`` will be used to render templates which
+end in ``.txt``, replacing the default Chameleon text renderer.
+
+To associate a *default* renderer with *all* view configurations (even
+ones which do not possess a ``renderer`` attribute), use a variation
+on the following (ie. omit the ``name`` attribute to the renderer
+tag):
+
+.. code-block:: xml
+   :linenos:
+
+   <renderer
+      factory="pyramid.renderers.json_renderer_factory"/>
+
+See also :ref:`renderer_directive` and
+:meth:`pyramid.configuration.Configurator.add_renderer`.
+
 .. Todo
 .. ----
 
 .. - ``narr/project.rst`` chapter describes execution of a paster template that
 ..   is based on XML.
-
-.. - Skipped views chapter.
 
 .. - i18n chapter still has topics for ZCML
 
