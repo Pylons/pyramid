@@ -129,7 +129,8 @@ rather than an actual callable:
    # pyramid.configuration.Configurator class; "myview" is assumed
    # to be a "view callable" function
    from myproject.views import myview
-   config.add_route('myroute', '/prefix/:one/:two', 'myproject.views.myview')
+   config.add_route('myroute', '/prefix/:one/:two', 
+                    view='myproject.views.myview')
 
 When a route configuration names a ``view`` attribute, the :term:`view
 callable` named as that ``view`` attribute will always be found and
@@ -379,7 +380,7 @@ found via :term:`view lookup`.
 .. code-block:: python
    :linenos:
 
-   config.add_route('abc', '/abc', 'myproject.views.theview', 
+   config.add_route('abc', '/abc', view='myproject.views.theview', 
                     factory='myproject.models.root_factory')
 
 The factory can either be a Python object or a :term:`dotted Python name` (a
@@ -638,17 +639,18 @@ a route object).
 match.  For example:
 
 .. code-block:: python
+   :linenos:
 
-    def any_of(segment_name, *allowed):
-        def predicate(info, request):
-            if info['match'][segment_name] in allowed:
-                return True
-        return predicate
+   def any_of(segment_name, *allowed):
+       def predicate(info, request):
+           if info['match'][segment_name] in allowed:
+               return True
+       return predicate
 
-    num_one_two_or_three = any_of('num, 'one', 'two', 'three')
+   num_one_two_or_three = any_of('num', 'one', 'two', 'three')
 
-    config.add_route('num', '/:num', 
-                     custom_predicates=(num_one_two_or_three,))
+   config.add_route('num', '/:num', 
+                    custom_predicates=(num_one_two_or_three,))
 
 The above ``any_of`` function generates a predicate which ensures that
 the match value named ``segment_name`` is in the set of allowable
@@ -663,17 +665,18 @@ A custom route predicate may also *modify* the ``match`` dictionary.
 For instance, a predicate might do some type conversion of values:
 
 .. code-block:: python
+   :linenos:
 
-   def integers(*segment_names):
-       def predicate(info, request):
-           match = info['match']
-           for segment_name in segment_names:
-               try:
-                   match[segment_name] = int(match[segment_name])
-               except (TypeError, ValueError):
-                   pass
+    def integers(*segment_names):
+        def predicate(info, request):
+            match = info['match']
+            for segment_name in segment_names:
+                try:
+                    match[segment_name] = int(match[segment_name])
+                except (TypeError, ValueError):
+                    pass
             return True
-       return predicate
+        return predicate
 
     ymd_to_int = integers('year', 'month', 'day')
 
@@ -871,23 +874,20 @@ in these forms:
    /users/:user
    /tags/:tag
 
-- When a URL matches the pattern ``/ideas/:idea``, the view available
-  at the dotted Python pathname ``mypackage.views.idea_view`` will be
-  called.  For the specific URL ``/ideas/1``, the ``matchdict``
-  generated and attached to the :term:`request` will consist of
-  ``{'idea':'1'}``.  
+- When a URL matches the pattern ``/ideas/:idea``, the view callable
+  available at the dotted Python pathname ``mypackage.views.idea_view`` will
+  be called.  For the specific URL ``/ideas/1``, the ``matchdict`` generated
+  and attached to the :term:`request` will consist of ``{'idea':'1'}``.
 
-- When a URL matches the pattern ``/users/:user``, the view available
-  at the dotted Python pathname ``mypackage.views.user_view`` will be
-  called.  For the specific URL ``/users/1``, the ``matchdict``
-  generated and attached to the :term:`request` will consist of
-  ``{'user':'1'}``.
+- When a URL matches the pattern ``/users/:user``, the view callable
+  available at the dotted Python pathname ``mypackage.views.user_view`` will
+  be called.  For the specific URL ``/users/1``, the ``matchdict`` generated
+  and attached to the :term:`request` will consist of ``{'user':'1'}``.
 
-- When a URL matches the pattern ``/tags/:tag``, the view available
-  at the dotted Python pathname ``mypackage.views.tag_view`` will be
-  called.  For the specific URL ``/tags/1``, the ``matchdict``
-  generated and attached to the :term:`request` will consist of
-  ``{'tag':'1'}``.
+- When a URL matches the pattern ``/tags/:tag``, the view callable available
+  at the dotted Python pathname ``mypackage.views.tag_view`` will be called.
+  For the specific URL ``/tags/1``, the ``matchdict`` generated and attached
+  to the :term:`request` will consist of ``{'tag':'1'}``.
 
 In this example we've again associated each of our routes with a
 :term:`view callable` directly.  In all cases, the request, which will
@@ -970,17 +970,17 @@ It's not entirely obvious how to use a route pattern to match the root URL
 ("/").  To do so, give the empty string as a pattern in a call to
 :meth:`pyramid.configuration.Configurator.add_route`:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   config.add_route('root', '', 'mypackage.views.root_view')
+   config.add_route('root', '', view='mypackage.views.root_view')
 
 Or provide the literal string ``/`` as the pattern:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   config.add_route('root', '/', 'mypackage.views.root_view')
+   config.add_route('root', '/', view='mypackage.views.root_view')
 
 .. index::
    single: generating route URLs
@@ -1027,11 +1027,11 @@ Let's use an example, because this behavior is a bit magical. If the
 ``append_slash_notfound_view`` is configured in your application and
 your route configuration looks like so:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   config.add_route('noslash', 'no_slash', 'myproject.views.no_slash')
-   config.add_route('hasslash', 'has_slash/', 'myproject.views.has_slash')
+   config.add_route('noslash', 'no_slash', view='myproject.views.no_slash')
+   config.add_route('hasslash', 'has_slash/', view='myproject.views.has_slash')
 
 If a request enters the application with the ``PATH_INFO`` value of
 ``/no_slash``, the first route will match.  If a request enters the
@@ -1051,7 +1051,7 @@ a GET), so you shouldn't rely on this to redirect POST requests.
 To configure the slash-appending not found view in your application, change
 the application's startup configuration, adding the following stanza:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
    config.add_view(context='pyramid.exceptions.NotFound',
