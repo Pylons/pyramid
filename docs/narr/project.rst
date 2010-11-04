@@ -32,13 +32,15 @@ Paster Templates Included with :mod:`pyramid`
 ------------------------------------------------
 
 The convenience ``paster`` templates included with :mod:`pyramid`
-differ from each other on two axes:
+differ from each other on a number of axes:
 
 - the persistence mechanism they offer (no persistence mechanism,
   :term:`ZODB`, or :term:`SQLAlchemy`).
 
 - the mechanism they use to map URLs to code (:term:`traversal` or
   :term:`URL dispatch`).
+
+- the type of configuration used (:term:`ZCML` vs. imperative configuration).
 
 The included templates are these:
 
@@ -50,7 +52,8 @@ The included templates are these:
   :term:`ZCML` (declarative configuration).
 
 ``pyramid_zodb``
-  URL mapping via :term:`traversal` and persistence via :term:`ZODB`
+  URL mapping via :term:`traversal` and persistence via :term:`ZODB`, using
+  :term:`ZCML` (declarative configuration).
 
 ``pyramid_routesalchemy`` 
   URL mapping via :term:`URL dispatch` and persistence via
