@@ -17,9 +17,11 @@ def app(global_config, **settings):
     config = Configurator(settings=settings, root_factory=get_root)
     config.begin()
     config.add_static_view('static', 'templates/static')
-    config.add_view('.views.view_root', context='.models.MyApp', 
+    config.add_view('{{package}}.views.view_root', 
+                    context='{{package}}.models.MyApp', 
                     renderer="templates/root.pt")
-    config.add_view('.views.view_model', context='.models.MyModel',
+    config.add_view('{{package}}.views.view_model',
+                    context='{{package}}.models.MyModel',
                     renderer="templates/model.pt")
     config.end()
     return config.make_wsgi_app()

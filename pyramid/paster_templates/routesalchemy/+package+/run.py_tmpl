@@ -17,7 +17,7 @@ def app(global_config, **settings):
     config = Configurator(settings=settings)
     config.begin()
     config.add_static_view('static', 'templates/static')
-    config.add_route('home', '/', view='.views.my_view',
+    config.add_route('home', '/', view='{{package}}.views.my_view',
                      renderer='templates/mytemplate.pt')
     config.end()
     return config.make_wsgi_app()
