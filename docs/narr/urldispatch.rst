@@ -657,7 +657,7 @@ generate a predicate function named ``num_one_two_or_three``, which
 ensures that the ``num`` segment is one of the values ``one``,
 ``two``, or ``three`` , and use the result as a custom predicate by
 feeding it inside a tuple to the ``custom_predicates`` argument to
-:meth:`repoze.configuration.Configurator.add_route`.
+:meth:`pyramid.configuration.Configurator.add_route`.
 
 A custom route predicate may also *modify* the ``match`` dictionary.
 For instance, a predicate might do some type conversion of values:
