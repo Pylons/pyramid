@@ -16,7 +16,7 @@ def app(global_config, **settings):
     get_root = appmaker(db_string, asbool(db_echo))
     config = Configurator(settings=settings, root_factory=get_root)
     config.begin()
-    config.add_static_view('static', 'templates/static')
+    config.add_static_view('static', '{{package}}:templates/static')
     config.add_view('{{package}}.views.view_root', 
                     context='{{package}}.models.MyApp', 
                     renderer="templates/root.pt")

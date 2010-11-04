@@ -99,6 +99,9 @@ Documentation (delta from BFG 1.3)
 - The ZODB Wiki tutorial was updated to take into account changes to the
   ``pyramid_zodb`` paster template.
 
+- The SQL Wiki tutorial was updated to take into account changes to the
+  ``pyramid_routesalchemy`` paster template.
+
 Backwards Incompatibilities (with BFG 1.3.X)
 --------------------------------------------
 

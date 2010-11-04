@@ -266,11 +266,20 @@ Decisions the ``pyramid_routesalchemy`` Template Has Made For You
 =================================================================
 
 Creating a project using the ``pyramid_routesalchemy`` template makes
-the assumption that you are willing to use :term:`SQLAlchemy` as a
-database access tool and :term:`url dispatch` to map URLs to code.
-:mod:`pyramid` supports any persistent storage mechanism (e.g. object
-database or filesystem files, etc).  It also supports an additional
-mechanism to map URLs to code (:term:`traversal`).  However, for the
-purposes of this tutorial, we'll only be using url dispatch and
-SQLAlchemy.
+the following assumptions:
+
+- you are willing to use :term:`SQLAlchemy` as a database access tool
+
+- you are willing to use :term:`url dispatch` to map URLs to code.
+
+- you want to configure your application *imperatively* (no
+  :term:`declarative configuration` such as ZCML).
+
+.. note::
+
+   :mod:`pyramid` supports any persistent storage mechanism (e.g. object
+   database or filesystem files, etc).  It also supports an additional
+   mechanism to map URLs to code (:term:`traversal`).  However, for the
+   purposes of this tutorial, we'll only be using url dispatch and
+   SQLAlchemy.
 

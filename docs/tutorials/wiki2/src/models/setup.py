@@ -39,7 +39,7 @@ setup(name='tutorial',
       install_requires = requires,
       entry_points = """\
       [paste.app_factory]
-      app = tutorial.run:app
+      app = tutorial:app
       """
       )
 

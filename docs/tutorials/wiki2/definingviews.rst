@@ -20,15 +20,14 @@ assumed to return a :term:`response` object.
    view function that only takes the request as a single argument, you
    can obtain it via ``request.context``.
 
-The request passed to every view that is called as the result of a
-route match has an attribute named ``matchdict`` that contains the
-elements placed into the URL by the ``pattern`` of a ``route``
-statement.  For instance, if a route statement in ``configure.zcml``
-had the pattern ``:one/:two``, and the URL at
+The request passed to every view that is called as the result of a route
+match has an attribute named ``matchdict`` that contains the elements placed
+into the URL by the ``pattern`` of a ``route`` statement.  For instance, if a
+call to :meth:`pyramid.configuration.Configurator.add_route` in
+``__init__.py`` had the pattern ``:one/:two``, and the URL at
 ``http://example.com/foo/bar`` was invoked, matching this pattern, the
-matchdict dictionary attached to the request passed to the view would
-have a ``one`` key with the value ``foo`` and a ``two`` key with the
-value ``bar``.
+matchdict dictionary attached to the request passed to the view would have a
+``one`` key with the value ``foo`` and a ``two`` key with the value ``bar``.
 
 The source code for this tutorial stage can be browsed at
 `http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/views/
@@ -122,7 +121,7 @@ The fact that this view returns a dictionary (as opposed to a
 try to use a :term:`renderer` associated with the view configuration
 to render a template.  In our case, the template which will be
 rendered will be the ``templates/view.pt`` template, as per the
-configuration put into effect in ``configure.zcml``.
+configuration put into effect in ``__init__.py``.
 
 The ``add_page`` view function
 ------------------------------
@@ -258,56 +257,53 @@ available `online
 
 
 This CSS file will be accessed via
-e.g. ``http://localhost:6543/static/style.css`` by virtue of the
-``<static>`` directive we've defined in the ``configure.zcml`` file.
-Any number and type of static resources can be placed in this
-directory (or subdirectories) and are just referred to by URL within
+e.g. ``http://localhost:6543/static/style.css`` by virtue of the call we've
+made to :meth:`pyramid.configuration.Configurator.add_static_view` within our
+``__init__.py`` file.  Any number and type of static resources can be placed
+in this directory (or subdirectories) and are just referred to by URL within
 templates.
 
-Mapping Views to URLs in ``configure.zcml``
-===========================================
+Mapping Views to URLs in ``__init__.py``
+========================================
 
-The ``configure.zcml`` file contains ``route`` declarations (and a
-lone ``view`` declaration) which serve to map URLs via :term:`url
-dispatch` to view functions.  First, we’ll get rid of the existing
-``route`` created by the template using the name ``home``. It’s only
-an example and isn’t relevant to our application. 
+The ``__init__.py`` file contains
+:meth:`pyramid.configuration.Configurator.add_route` calls which serve to map
+URLs via :term:`url dispatch` to view functions.  First, we’ll get rid of the
+existing route created by the template using the name ``home``. It’s only an
+example and isn’t relevant to our application.
 
-We then need to add four ``route`` declarations to ``configure.zcml``.
-Note that the *ordering* of these declarations is very important.
-``route`` declarations are matched in the order they're found in the
-``configure.zcml`` file.
+We then need to add four calls to ``add_route``.  Note that the *ordering* of
+these declarations is very important.  ``route`` declarations are matched in
+the order they're found in the ``__init__.py`` file.
 
-#. Add a declaration which maps the empty pattern (signifying the root
-   URL) to the view named ``view_wiki`` in our ``views.py`` file with
-   the name ``view_wiki``.  This is the :term:`default view` for the
-   wiki.
+#. Add a declaration which maps the pattern ``/`` (signifying the root URL)
+   to the view named ``view_wiki`` in our ``views.py`` file with the name
+   ``view_wiki``.  This is the :term:`default view` for the wiki.
 
-#. Add a declaration which maps the pattern ``:pagename`` to the
-   view named ``view_page`` in our ``views.py`` file with the view
-   name ``view_page``.  This is the regular view for a page.
+#. Add a declaration which maps the pattern ``/:pagename`` to the view named
+   ``view_page`` in our ``views.py`` file with the view name ``view_page``.
+   This is the regular view for a page.
 
 #. Add a declaration which maps the pattern
-   ``:pagename/edit_page`` to the view named ``edit_page`` in our
-   ``views.py`` file with the name ``edit_page``.  This is the edit view
-   for a page.
-
-#. Add a declaration which maps the pattern
-   ``add_page/:pagename`` to the view named ``add_page`` in our
+   ``/add_page/:pagename`` to the view named ``add_page`` in our
    ``views.py`` file with the name ``add_page``.  This is the add view
    for a new page.
 
-As a result of our edits, the ``configure.zcml`` file should look
+#. Add a declaration which maps the pattern ``/:pagename/edit_page`` to the
+   view named ``edit_page`` in our ``views.py`` file with the name
+   ``edit_page``.  This is the edit view for a page.
+
+As a result of our edits, the ``__init__.py`` file should look
 something like so:
 
-.. literalinclude:: src/views/tutorial/configure.zcml
+.. literalinclude:: src/views/tutorial/__init__.py
    :linenos:
    :language: xml
 
 The WSGI Pipeline
 -----------------
 
-Within ``tutorial.ini``, note the existence of a ``[pipeline:main]``
+Within ``development.ini``, note the existence of a ``[pipeline:main]``
 section which specifies our WSGI pipeline.  This "pipeline" will be
 served up as our WSGI application.  As far as the WSGI server is
 concerned the pipeline *is* our application.  Simpler configurations
@@ -328,9 +324,9 @@ Let's add a piece of middleware to the WSGI pipeline.  We'll add
 the browser while you're developing (this is *not* recommended for
 deployment as it is a security risk).  Let's insert evalerror into the
 pipeline right above ``egg:repoze.tm2#tm``, making our resulting
-``tutorial.ini`` file look like so:
+``development.ini`` file look like so:
 
-.. literalinclude:: src/views/tutorial.ini
+.. literalinclude:: src/views/development.ini
    :linenos:
    :language: ini
 
