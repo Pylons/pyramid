@@ -132,11 +132,7 @@ Predicate Attributes
   representing the :term:`interface` that the :term:`request` must
   have in order for this view to be found and called.  The presence of
   this attribute is largely for backwards compatibility with
-  older iterations of this framework.  This value
-  may be an HTTP ``REQUEST_METHOD`` string, e.g.  ('GET', 'HEAD',
-  'PUT', 'POST', or 'DELETE').  Passing request method strings as a
-  ``request_type`` is deprecated.  Use the ``request_method``
-  attribute instead for maximum forward compatibility.
+  older iterations of this framework.  
 
 ``request_method``
   This value can either be one of the strings 'GET', 'POST', 'PUT',
