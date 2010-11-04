@@ -96,6 +96,9 @@ Documentation (delta from BFG 1.3)
   moving declarative configuration (ZCML) explanations to a separate
   narrative chapter ``declarative.rst``.
 
+- The ZODB Wiki tutorial was updated to take into account changes to the
+  ``pyramid_zodb`` paster template.
+
 Backwards Incompatibilities (with BFG 1.3.X)
 --------------------------------------------
 

@@ -11,12 +11,53 @@ The source code for this tutorial stage can be browsed via
 `http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/basiclayout/
 <http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/basiclayout/>`_.
 
-``__init__.py``
----------------
+App Startup with ``__init__.py``
+--------------------------------
 
-A directory on disk can be turned into a Python :term:`package` by
-containing an ``__init__.py`` file.  Even if empty, this marks a
-directory as a Python package.
+A directory on disk can be turned into a Python :term:`package` by containing
+an ``__init__.py`` file.  Even if empty, this marks a directory as a Python
+package.  Our application uses ``__init__.py`` as both a package marker, as
+well as to contain application configuration code.
+
+When you run the application using the ``paster`` command using the
+``development.ini`` generated config file, the application configuration
+points at an Setuptools *entry point* described as ``egg:tutorial#app``.  In
+our application, because the application's ``setup.py`` file says so, this
+entry point happens to be the ``app`` function within the file named
+``__init__.py``:
+
+   .. literalinclude:: src/basiclayout/tutorial/__init__.py
+      :linenos:
+      :language: py
+
+#. *Lines 1-2*.  Perform some dependency imports.
+
+#. *Line 12*. Get the ZODB configuration from the ``development.ini``
+   file's ``[app:main]`` section represented by the ``settings``
+   dictionary passed to our ``app`` function.  This will be a URI
+   (something like ``file:///path/to/Data.fs``).
+
+#. *Line 15*. We create a "finder" object using the
+   ``PersistentApplicationFinder`` helper class, passing it the ZODB
+   URI and the "appmaker" we've imported from ``models.py``.
+
+#. *Lines 16 - 17*.  We create a :term:`root factory` which uses the
+   finder to return a ZODB root object.
+
+#. *Line 18*.  We construct a :term:`Configurator` with a :term:`root
+   factory` and the settings keywords parsed by PasteDeploy.  The root
+   factory is named ``get_root``.
+
+#. *Lines 19-21*.  Begin configuration using the ``begin`` method of
+   the :meth:`pyramid.configuration.Configurator` class, load the
+   ``configure.zcml`` file from our package using the
+   :meth:`pyramid.configuration.Configurator.load_zcml` method, and
+   end configuration using the
+   :meth:`pyramid.configuration.Configurator.end` method.
+
+#. *Line 22*.  Use the
+   :meth:`pyramid.configuration.Configurator.make_wsgi_app` method
+   to return a :term:`WSGI` application.
 
 Configuration With ``configure.zcml``
 --------------------------------------
@@ -91,47 +132,4 @@ Here is the source for ``models.py``:
    application root.  If not, we make an instance, store it, and
    commit the transaction.  We then return the application root
    object.
-
-App Startup with ``run.py``
----------------------------
-
-When you run the application using the ``paster`` command using the
-``tutorial.ini`` generated config file, the application configuration
-points at an Setuptools *entry point* described as
-``egg:tutorial#app``.  In our application, because the application's
-``setup.py`` file says so, this entry point happens to be the ``app``
-function within the file named ``run.py``:
-
-   .. literalinclude:: src/basiclayout/tutorial/run.py
-      :linenos:
-      :language: py
-
-#. *Lines 1-2*.  Perform some dependency imports.
-
-#. *Line 12*. Get the ZODB configuration from the ``tutorial.ini``
-   file's ``[app:main]`` section represented by the ``settings``
-   dictionary passed to our ``app`` function.  This will be a URI
-   (something like ``file:///path/to/Data.fs``).
-
-#. *Line 15*. We create a "finder" object using the
-   ``PersistentApplicationFinder`` helper class, passing it the ZODB
-   URI and the "appmaker" we've imported from ``models.py``.
-
-#. *Lines 16 - 17*.  We create a :term:`root factory` which uses the
-   finder to return a ZODB root object.
-
-#. *Line 18*.  We construct a :term:`Configurator` with a :term:`root
-   factory` and the settings keywords parsed by PasteDeploy.  The root
-   factory is named ``get_root``.
-
-#. *Lines 19-21*.  Begin configuration using the ``begin`` method of
-   the :meth:`pyramid.configuration.Configurator` class, load the
-   ``configure.zcml`` file from our package using the
-   :meth:`pyramid.configuration.Configurator.load_zcml` method, and
-   end configuration using the
-   :meth:`pyramid.configuration.Configurator.end` method.
-
-#. *Line 22*.  Use the
-   :meth:`pyramid.configuration.Configurator.make_wsgi_app` method
-   to return a :term:`WSGI` application.
 

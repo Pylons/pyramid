@@ -75,7 +75,7 @@ Add an Appmaker
 ---------------
 
 We're using a mini-framework callable named
-``PersistentApplicationFinder`` in our application (see ``run.py``).
+``PersistentApplicationFinder`` in our application (see ``__init__.py``).
 A ``PersistentApplicationFinder`` accepts a ZODB URL as well as an
 "appmaker" callback.  This callback typically lives in the
 ``models.py`` file.

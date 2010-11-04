@@ -244,11 +244,19 @@ You will see the generated application's default page.
 Decisions the ``pyramid_zodb`` Template Has Made For You
 ========================================================
 
-Creating a project using the ``pyramid_zodb`` template makes the
-assumption that you are willing to use :term:`ZODB` as persistent
-storage and :term:`traversal` to map URLs to code.  :mod:`pyramid`
-supports any persistent storage mechanism (e.g. a SQL database or
-filesystem files, etc).  It also supports an additional mechanism to
-map URLs to code (:term:`URL dispatch`).  However, for the purposes of
-this tutorial, we'll only be using traversal and ZODB.
+Creating a project using the ``pyramid_zodb`` template makes the following
+assumptions:
+
+- you are willing to use :term:`ZODB` as persistent storage
+
+- you are willing to use :term:`traversal` to map URLs to code.
+
+- you want to use :term:`ZCML` to perform configuration.
+
+.. note::
+
+   :mod:`pyramid` supports any persistent storage mechanism (e.g. a SQL
+   database or filesystem files, etc).  :mod:`pyramid` also supports an
+   additional mechanism to map URLs to code (:term:`URL dispatch`).  However,
+   for the purposes of this tutorial, we'll only be using traversal and ZODB.
 

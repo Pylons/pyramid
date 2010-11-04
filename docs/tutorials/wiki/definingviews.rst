@@ -342,20 +342,20 @@ something like so:
    :linenos:
    :language: xml
 
-Examining ``tutorial.ini``
-==========================
+Examining ``development.ini``
+=============================
 
-Let's take a look at our ``tutorial.ini`` file.  The contents of the
+Let's take a look at our ``development.ini`` file.  The contents of the
 file are as follows:
 
-.. literalinclude:: src/models/tutorial.ini
+.. literalinclude:: src/models/development.ini
    :linenos:
    :language: ini
 
 The WSGI Pipeline
 -----------------
 
-Within ``tutorial.ini``, note the existence of a ``[pipeline:main]``
+Within ``development.ini``, note the existence of a ``[pipeline:main]``
 section which specifies our WSGI pipeline.  This "pipeline" will be
 served up as our WSGI application.  As far as the WSGI server is
 concerned the pipeline *is* our application.  Simpler configurations
@@ -377,10 +377,10 @@ Let's add a piece of middleware to the WSGI pipeline:
 ``egg:Paste#evalerror`` middleware which displays debuggable errors in
 the browser while you're developing (not recommended for deployment).
 Let's insert evalerror into the pipeline right below
-"egg:repoze.zodbconn#closer", making our resulting ``tutorial.ini``
+"egg:repoze.zodbconn#closer", making our resulting ``development.ini``
 file look like so:
 
-.. literalinclude:: src/views/tutorial.ini
+.. literalinclude:: src/views/development.ini
    :linenos:
    :language: ini
 

@@ -37,7 +37,7 @@ setup(name='tutorial',
       test_suite="tutorial",
       entry_points = """\
       [paste.app_factory]
-      app = tutorial.run:app
+      app = tutorial:app
       """
       )
 

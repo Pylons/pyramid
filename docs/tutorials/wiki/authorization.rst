@@ -51,7 +51,7 @@ Adding ``security.py``
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Add a ``security.py`` module within your package (in the same
-directory as ``run.py``, ``views.py``, etc) with the following
+directory as ``__init__.py``, ``views.py``, etc) with the following
 content:
 
 .. literalinclude:: src/authorization/tutorial/security.py
