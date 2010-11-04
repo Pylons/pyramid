@@ -43,14 +43,15 @@ body h3,
 body h4,
 body h5,
 body h6{font-family:"Nobile","Lucida Grande",Lucida,Verdana,sans-serif;font-weight:normal;color:#144fb2;font-style:normal;}
+#wrap {min-height: 100%;}
 #header,#footer{width:100%;color:#ffffff;height:40px;position:absolute;text-align:center;line-height:40px;overflow:hidden;font-size:12px;}
 #header{background-color:#e88f00;top:0;font-size:14px;}
-#footer{background-color:#000000;bottom:0;}
+#footer{background-color:#000000;bottom:0;position: relative;margin-top:-40px;clear:both;}
 .header,.footer{width:700px;margin-right:auto;margin-left:auto;}
 .wrapper{width:100%}
 #top,#bottom{width:100%;}
 #top{color:#888;background-color:#eee;height:300px;border-bottom:2px solid #ddd;}
-#bottom{color:#222;background-color:#ffffff;}
+#bottom{color:#222;background-color:#ffffff;overflow:auto;padding-bottom:80px;}
 .top,.bottom{width:700px;margin-right:auto;margin-left:auto;}
 .top{padding-top:100px;}
 .app-welcome{margin-top:25px;}
@@ -68,3 +69,5 @@ fieldset{border-style:none;}
 input{color:#222;border:1px solid #ccc;font-family:sans-serif;font-size:12px;line-height:16px;}
 input[type=text]{}
 input[type=submit]{background-color:#ddd;font-weight:bold;}
+/*Opera Fix*/
+body:before {content:"";height:100%;float:left;width:0;margin-top:-32767px;}
