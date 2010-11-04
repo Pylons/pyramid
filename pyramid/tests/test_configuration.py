@@ -640,19 +640,6 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertRaises(ConfigurationError, config.add_view, view, '', None,
                           None, True, True)
 
-    def test_add_view_with_request_type_methodname_string(self):
-        view = lambda *arg: 'OK'
-        config = self._makeOne()
-        config.add_view(view=view, request_type='GET')
-        wrapper = self._getViewCallable(config)
-        request = DummyRequest()
-        request.method = 'POST'
-        self._assertNotFound(wrapper, None, request)
-        request = DummyRequest()
-        request.method = 'GET'
-        result = wrapper(None, request)
-        self.assertEqual(result, 'OK')
-
     def test_add_view_with_request_type(self):
         from zope.interface import directlyProvides
         from pyramid.interfaces import IRequest

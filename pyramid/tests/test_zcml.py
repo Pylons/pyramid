@@ -20,68 +20,6 @@ class TestViewDirective(unittest.TestCase):
         from pyramid.zcml import view
         return view(*arg, **kw)
 
-    def test_request_type_ashttpmethod(self):
-        from pyramid.threadlocal import get_current_registry
-        from pyramid.interfaces import IView
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IRequest
-        context = DummyContext()
-        view = lambda *arg: None
-        self._callFUT(context, 'repoze.view', IDummy, view=view,
-                      request_type='GET')
-        actions = context.actions
-        self.assertEqual(len(actions), 1)
-        action = actions[0]
-        discrim = ('view', IDummy, '', None, IView, None, None, 'GET', None,
-                   None, False, None, None, None)
-        self.assertEqual(action['discriminator'], discrim)
-        register = action['callable']
-        register()
-        reg = get_current_registry()
-        wrapper = reg.adapters.lookup(
-            (IViewClassifier, IRequest, IDummy), IView, name='')
-        request = DummyRequest()
-        request.method = 'GET'
-        self.assertEqual(wrapper.__predicated__(None, request), True)
-        request.method = 'POST'
-        self.assertEqual(wrapper.__predicated__(None, request), False)
-        
-    def test_request_type_asinterfacestring(self):
-        from zope.interface import directlyProvides
-        from pyramid.threadlocal import get_current_registry
-        from pyramid.interfaces import IView
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IRequest
-        context = DummyContext(IDummy)
-        view = lambda *arg: 'OK'
-        self._callFUT(context, 'repoze.view', IDummy, view=view,
-                      request_type='whatever')
-        actions = context.actions
-        self.assertEqual(len(actions), 1)
-        discrim = ('view', IDummy, '', IDummy, IView, None, None, None, None,
-                   None, False, None, None, None)
-        self.assertEqual(actions[0]['discriminator'], discrim)
-        register = actions[0]['callable']
-        register()
-        reg = get_current_registry()
-        regview = reg.adapters.lookup(
-            (IViewClassifier, IRequest, IDummy), IView, name='')
-        self.assertNotEqual(view, regview)
-        request = DummyRequest()
-        directlyProvides(request, IDummy)
-        result = regview(None, request)
-        self.assertEqual(result, 'OK')
-        self.failIf(hasattr(view, '__call_permissive__'))
-
-    def test_request_type_asnoninterfacestring(self):
-        from pyramid.exceptions import ConfigurationError
-        context = DummyContext('notaninterface')
-        view = lambda *arg: 'OK'
-        self.assertRaises(ConfigurationError,
-                          self._callFUT,
-                          context, 'repoze.view', IDummy, view=view,
-                          request_type='whatever')
-
     def test_with_dotted_renderer(self):
         from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import IView

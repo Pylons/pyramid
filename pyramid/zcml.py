@@ -6,7 +6,6 @@ from zope.configuration.fields import GlobalInterface
 from zope.configuration.fields import GlobalObject
 from zope.configuration.fields import Tokens
 
-from zope.interface.interfaces import IInterface
 from zope.interface import Interface
 from zope.interface import implementedBy
 from zope.interface import providedBy
@@ -84,8 +83,8 @@ class IViewDirective(Interface):
         description = u'',
         required=False)
 
-    request_type = TextLine(
-        title=u"The request type string or dotted name interface for the view",
+    request_type = GlobalObject(
+        title=u"The dotted name interface for the request type",
         description=(u"The view will be called if the interface represented by "
                      u"'request_type' is implemented by the request.  The "
                      u"default request type is pyramid.interfaces.IRequest"),
@@ -103,9 +102,7 @@ class IViewDirective(Interface):
     request_method = TextLine(
         title = u'Request method name that must be matched (e.g. GET/POST)',
         description = (u'The view will be called if and only if the request '
-                       'method (``request.method``) matches this string. This'
-                       'functionality replaces the older ``request_type`` '
-                       'functionality.'),
+                       'method (``request.method``) matches this string.'),
         required=False)
 
     request_param = TextLine(
@@ -176,17 +173,6 @@ def view(
     ):
 
     reg = get_current_registry()
-
-    if request_type in ('GET', 'HEAD', 'PUT', 'POST', 'DELETE'):
-        # b/w compat for 1.0
-        request_method = request_type
-        request_type = None
-
-    if request_type is not None:
-        request_type = _context.resolve(request_type)
-        if not IInterface.providedBy(request_type):
-            raise ConfigurationError(
-                'request_type must be an interface, not %s' % request_type)
 
     if renderer is not None:
         package = getattr(_context, 'package', None)
