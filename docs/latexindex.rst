@@ -50,6 +50,7 @@ Narrative Documentation
    narr/environment
    narr/unittesting
    narr/hooks
+   narr/declarative
    narr/extending
    narr/resources
    narr/router

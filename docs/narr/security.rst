@@ -59,9 +59,6 @@ views are accessible by completely anonymous users.  In order to begin
 protecting views from execution based on security settings, you need
 to enable an authorization policy.
 
-You can enable an authorization policy imperatively, or declaratively
-via ZCML.
-
 Enabling an Authorization Policy Imperatively
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -110,46 +107,8 @@ See also the :mod:`pyramid.authorization` and
 :mod:`pyramid.authentication` modules for alternate implementations
 of authorization and authentication policies.  
 
-Enabling an Authorization Policy Via ZCML
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If you'd rather use :term:`ZCML` to specify an authorization policy
-than imperative configuration, modify the ZCML file loaded by your
-application (usually named ``configure.zcml``) to enable an
-authorization policy.
-
-For example, to enable a policy which compares the value of an "auth
-ticket" cookie passed in the request's environment which contains a
-reference to a single :term:`principal` against the principals present
-in any :term:`ACL` found in model data when attempting to call some
-:term:`view`, modify your ``configure.zcml`` to look something like
-this:
-
-.. code-block:: xml
-   :linenos:
-
-   <configure xmlns="http://pylonshq.com/pyramid">
-
-     <!-- views and other directives before this... -->
-
-     <authtktauthenticationpolicy
-          secret="iamsosecret"/>
-
-     <aclauthorizationpolicy/>
-
-    </configure>
-
-"Under the hood", these statements cause an instance of the class
-:class:`pyramid.authentication.AuthTktAuthenticationPolicy` to be
-injected as the :term:`authentication policy` used by this application
-and an instance of the class
-:class:`pyramid.authorization.ACLAuthorizationPolicy` to be
-injected as the :term:`authorization policy` used by this application.
-
-:mod:`pyramid` ships with a number of authorization and
-authentication policy ZCML directives that should prove useful.  See
-:ref:`authentication_policies_directives_section` and
-:ref:`authorization_policies_directives_section` for more information.
+You can also enable a security policy declaratively via ZCML.  See
+:ref:`zcml_authorization_policy`.
 
 .. index::
    single: permissions
@@ -166,19 +125,19 @@ security settings in a :term:`context`, you must pass a
 usually just strings, and they have no required composition: you can
 name permissions whatever you like.
 
-For example, the following declaration protects the view named
-``add_entry.html`` when invoked against a ``Blog`` context with the
-``add`` permission:
+For example, the following view declaration protects the view named
+``add_entry.html`` when invoked against a ``Blog`` context with the ``add``
+permission using the :meth:`pyramid.configuration.Configurator.add_view` API:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <view
-       context=".models.Blog"
-       view=".views.blog_entry_add_view"
-       name="add_entry.html"
-       permission="add"
-       />
+   # config is an instance of pyramid.configuration.Configurator
+
+   config.add_view('mypackage.views.blog_entry_add_view',
+                   name='add_entry.html', 
+                   context='mypackage.models.Blog',
+                   permission='add')
 
 The equivalent view registration including the ``add`` permission name
 may be performed via the ``@view_config`` decorator:
@@ -195,22 +154,15 @@ may be performed via the ``@view_config`` decorator:
        """ Add blog entry code goes here """
        pass
 
-Or the same thing can be done using the
-:meth:`pyramid.configuration.Configurator.add_view` method:
+Or the same thing can be done using the ``permission`` attribute of the ZCML
+:ref:`view_directive` directive.
 
-.. ignore-next-block
-.. code-block:: python
-   :linenos:
-
-   config.add_view(blog_entry_add_view,
-                   context=Blog, name='add_entry.html', permission='add')
-
-As a result of any of these various view configuration statements, if
-an authorization policy is in place when the view callable is found
-during normal application operations, the requesting user will need to
-possess the ``add`` permission against the :term:`context` to be able
-to invoke the ``blog_entry_add_view`` view.  If he does not, the
-:term:`Forbidden view` will be invoked.
+As a result of any of these various view configuration statements, if an
+authorization policy is in place when the view callable is found during
+normal application operations, the requesting user will need to possess the
+``add`` permission against the :term:`context` to be able to invoke the
+``blog_entry_add_view`` view.  If he does not, the :term:`Forbidden view`
+will be invoked.
 
 .. _setting_a_default_permission:
 
@@ -348,15 +300,14 @@ The first element of any ACE is either
 the ACE matches.  The second element is a :term:`principal`.  The
 third argument is a permission or sequence of permission names.
 
-A principal is usually a user id, however it also may be a group id if
-your authentication system provides group information and the
-effective :term:`authentication policy` policy is written to respect
-group information.  For example, the
-:class:`pyramid.authentication.RepozeWho1AuthenicationPolicy`
-enabled by the ``repozewho1authenticationpolicy`` ZCML directive
-respects group information if you configure it with a ``callback``.
-See :ref:`authentication_policies_directives_section` for more
-information about the ``callback`` attribute.
+A principal is usually a user id, however it also may be a group id if your
+authentication system provides group information and the effective
+:term:`authentication policy` policy is written to respect group information.
+For example, the
+:class:`pyramid.authentication.RepozeWho1AuthenicationPolicy` respects group
+information if you configure it with a ``callback``.  See
+:ref:`authentication_policies_directives_section` for more information about
+the ``callback`` attribute.
 
 Each ACE in an ACL is processed by an authorization policy *in the
 order dictated by the ACL*.  So if you have an ACL like this:
@@ -583,112 +534,6 @@ one of :data:`pyramid.security.ACLAllowed`,
 denied or allowed.  Introspecting this information in the debugger or
 via print statements when a call to
 :func:`pyramid.security.has_permission` fails is often useful.
-
-.. index::
-   pair: ZCML directive; authentication policy
-
-.. _authentication_policies_directives_section:
-
-Built-In Authentication Policy ZCML Directives
-----------------------------------------------
-
-Instead of configuring an authentication policy and authorization
-policy imperatively, :mod:`pyramid` ships with a few "pre-chewed"
-authentication policy ZCML directives that you can make use of within
-your application.
-
-``authtktauthenticationpolicy``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When this directive is used, authentication information is obtained
-from an "auth ticket" cookie value, assumed to be set by a custom
-login form.
-
-An example of its usage, with all attributes fully expanded:
-
-.. code-block:: xml
-   :linenos:
-
-   <authtktauthenticationpolicy
-    secret="goshiamsosecret"
-    callback=".somemodule.somefunc"
-    cookie_name="mycookiename"
-    secure="false"
-    include_ip="false"
-    timeout="86400"
-    reissue_time="600"
-    max_age="31536000"
-    path="/"
-    http_only="false"
-    />
-
-See :ref:`authtktauthenticationpolicy_directive` for details about
-this directive.
-
-``remoteuserauthenticationpolicy``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When this directive is used, authentication information is obtained
-from a ``REMOTE_USER`` key in the WSGI environment, assumed to
-be set by a WSGI server or an upstream middleware component.
-
-An example of its usage, with all attributes fully expanded:
-
-.. code-block:: xml
-   :linenos:
-
-   <remoteuserauthenticationpolicy
-    environ_key="REMOTE_USER"
-    callback=".somemodule.somefunc"
-    />
-
-See :ref:`remoteuserauthenticationpolicy_directive` for detailed
-information.
-
-``repozewho1authenticationpolicy``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When this directive is used, authentication information is obtained
-from a ``repoze.who.identity`` key in the WSGI environment, assumed to
-be set by :term:`repoze.who` middleware.
-
-An example of its usage, with all attributes fully expanded:
-
-.. code-block:: xml
-   :linenos:
-
-   <repozewho1authenticationpolicy
-    identifier_name="auth_tkt"
-    callback=".somemodule.somefunc"
-    />
-
-See :ref:`repozewho1authenticationpolicy_directive` for detailed
-information.
-
-.. index::
-   pair: ZCML directive; authorization policy
-
-.. _authorization_policies_directives_section:
-
-Built-In Authorization Policy ZCML Directives
----------------------------------------------
-
-``aclauthorizationpolicy``
-
-When this directive is used, authorization information is obtained
-from :term:`ACL` objects attached to model instances.
-
-An example of its usage, with all attributes fully expanded:
-
-.. code-block:: xml
-   :linenos:
-
-   <aclauthorizationpolicy/>
-
-In other words, it has no configuration attributes; its existence in a
-``configure.zcml`` file enables it.
-
-See :ref:`aclauthorizationpolicy_directive` for detailed information.
 
 .. index::
    single: authentication policy (creating)

@@ -33,33 +33,24 @@ in isolation before trying to combine them.
 URL Dispatch Only
 ~~~~~~~~~~~~~~~~~
 
-An application that uses :term:`url dispatch` exclusively to map URLs
-to code will often have declarations like this within :term:`ZCML`:
+An application that uses :term:`url dispatch` exclusively to map URLs to code
+will often have statements like this within your application startup
+configuration:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <route
-     pattern=":foo/:bar"
-     name="foobar"
-     view=".views.foobar"
-     />
+   # config is an instance of pyramid.configuration.Configurator
 
-   <route
-     pattern=":baz/:buz"
-     name="bazbuz"
-     view=".views.bazbuz"
-     />
+   config.add_route('foobar', ':foo/:bar', view='myproject.views.foobar')
+   config.add_route('bazbuz', ':baz/:buz', view='myproject.views.bazbuz')
 
 Each :term:`route` typically corresponds to a single view callable,
 and when that route is matched during a request, the view callable
 named by the ``view`` attribute is invoked.
 
-Typically, an application that uses only URL dispatch won't perform
-any configuration in ZCML that includes a ``<view>`` declaration and
-won't have any calls to
-:meth:`pyramid.configuration.Configurator.add_view` in its startup
-code.
+Typically, an application that uses only URL dispatch won't perform any calls
+to :meth:`pyramid.configuration.Configurator.add_view` in its startup code.
 
 Traversal Only
 ~~~~~~~~~~~~~~
@@ -67,28 +58,22 @@ Traversal Only
 An application that uses only traversal will have view configuration
 declarations that look like this:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <view
-     name="foobar"
-     view=".views.foobar"
-     />
+    # config is an instance of pyramid.configuration.Configurator
 
-   <view
-     name="bazbuz"
-     view=".views.bazbuz"
-     />
+    config.add_view('mypackage.views.foobar', name='foobar')
+    config.add_view('mypackage.views.bazbuz', name='bazbuz')
 
 When the above configuration is applied to an application, the
-``.views.foobar`` view callable above will be called when the URL
-``/foobar`` is visited.  Likewise, the view ``.views.bazbuz`` will be
-called when the URL ``/bazbuz`` is visited.
+``mypackage.views.foobar`` view callable above will be called when the URL
+``/foobar`` is visited.  Likewise, the view ``mypackage.views.bazbuz`` will
+be called when the URL ``/bazbuz`` is visited.
 
-An application that uses :term:`traversal` exclusively to map URLs to
-code usually won't have any ZCML ``<route>`` declarations nor will it
-make any calls to the
-:meth:`pyramid.configuration.Configurator.add_route` method.
+Typically, an application that uses traversal exclusively won't perform any
+calls to :meth:`pyramid.configuration.Configurator.add_route` in its startup
+code.
 
 Hybrid Applications
 -------------------
@@ -197,13 +182,10 @@ A hybrid application most often implies the inclusion of a route
 configuration that contains the special token ``*traverse`` at the end
 of a route's pattern:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <route
-     pattern=":foo/:bar/*traverse"
-     name="home"
-     />
+   config.add_route('home', ':foo/:bar/*traverse')
 
 A ``*traverse`` token at the end of the pattern in a route's
 configuration implies a "remainder" *capture* value.  When it is used,
@@ -215,13 +197,12 @@ remainder becomes the path used to perform traversal.
    The ``*remainder`` route pattern syntax is explained in more
    detail within :ref:`route_pattern_syntax`.
 
-Note that unlike the examples provided within
-:ref:`urldispatch_chapter`, the ``<route>`` configuration named
-previously does not name a ``view`` attribute.  This is because a
-hybrid mode application relies on :term:`traversal` to do
-:term:`context finding` and :term:`view lookup` instead of invariably
-invoking a specific view callable named directly within the matched
-route's configuration.
+Note that unlike the examples provided within :ref:`urldispatch_chapter`, the
+``add_route`` configuration statement named previously does not pass a
+``view`` argument.  This is because a hybrid mode application relies on
+:term:`traversal` to do :term:`context finding` and :term:`view lookup`
+instead of invariably invoking a specific view callable named directly within
+the matched route's configuration.
 
 Because the pattern of the above route ends with ``*traverse``, when this
 route configuration is matched during a request, :mod:`pyramid`
@@ -259,14 +240,11 @@ Above, we've defined a (bogus) graph here that can be traversed, and a
 ``root_factory`` function that can be used as part of a particular
 route configuration statement:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <route
-     pattern=":foo/:bar/*traverse"
-     name="home"
-     factory=".routes.root_factory"
-     />
+   config.add_route('home', ':foo/:bar/*traverse', 
+                    factory='mypackage.routes.root_factory')
 
 The ``factory`` above points at the function we've defined.  It
 will return an instance of the ``Traversable`` class as a root object
@@ -315,32 +293,26 @@ but with a caveat: in order for view lookup to work, we need to define
 a view configuration that will match when :term:`view lookup` is
 invoked after a route matches:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <route
-     pattern=":foo/:bar/*traverse"
-     name="home"
-     factory=".routes.root_factory"
-     />
+   config.add_route('home', ':foo/:bar/*traverse', 
+                    factory='mypackage.routes.root_factory')
+   config.add_view('mypackage.views.myview', route_name='home')
 
-   <view
-     route_name="home"
-     view=".views.myview"
-     />
+Note that the above call to
+:meth:`pyramid.configuration.Configurator.add_view` includes a ``route_name``
+argument.  View configurations that include a ``route_name`` argument are
+meant to associate a particular view declaration with a route, using the
+route's name, in order to indicate that the view should *only be invoked when
+the route matches*.
 
-Note that the above ``view`` declaration includes a ``route_name``
-argument.  Views that include a ``route_name`` argument are meant to
-associate a particular view declaration with a route, using the
-route's name, in order to indicate that the view should *only be
-invoked when the route matches*.
+Calls to :meth:`pyramid.configuration.Configurator.add_view` may pass a
+``route_name`` attribute which refers to the value of an existing route's
+``name`` argument.  In the above example, the route name is ``home``,
+referring to the name of the route defined above it.
 
-View configurations may have a ``route_name`` attribute which refers
-to the value of the ``<route>`` declaration's ``name`` attribute.  In
-the above example, the route name is ``home``, referring to the name
-of the route defined above it.
-
-The above ``.views.myview`` view will be invoked when:
+The above ``mypackage.views.myview`` view callable will be invoked when:
 
 - the route named "home" is matched
 
@@ -351,29 +323,18 @@ The above ``.views.myview`` view will be invoked when:
 It is also possible to declare alternate views that may be invoked
 when a hybrid route is matched:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <route
-     pattern=":foo/:bar/*traverse"
-     name="home"
-     factory=".routes.root_factory"
-     />
+   config.add_route('home', ':foo/:bar/*traverse', 
+                    factory='mypackage.routes.root_factory')
+   config.add_view('mypackage.views.myview', name='home')
+   config.add_view('mypackage.views.another_view', name='another', 
+                   route_name='home')
 
-   <view
-     route_name="home"
-     view=".views.myview"
-     />
-
-   <view
-     route_name="home"
-     name="another"
-     view=".views.another_view"
-     />
-
-The ``view`` declaration for ``.views.another_view`` above names a
-different view and, more importantly, a different :term:`view name`.
-The above ``.views.another_view`` view will be invoked when:
+The ``add_view`` call for ``mypackage.views.another_view`` above names a
+different view and, more importantly, a different :term:`view name`.  The
+above ``mypackage.views.another_view`` view will be invoked when:
 
 - the route named "home" is matched
 
@@ -381,10 +342,10 @@ The above ``.views.another_view`` view will be invoked when:
 
 - the :term:`context` is any object.
 
-For instance, if the URL ``http://example.com/one/two/a/another`` is
-provided to an application that uses the previously mentioned object
-graph, the ``.views.another`` view callable will be called instead of
-the ``.views.myview`` view callable because the :term:`view name` will
+For instance, if the URL ``http://example.com/one/two/a/another`` is provided
+to an application that uses the previously mentioned object graph, the
+``mypackage.views.another`` view callable will be called instead of the
+``mypackage.views.myview`` view callable because the :term:`view name` will
 be ``another`` instead of the empty string.
 
 More complicated matching can be composed.  All arguments to *route*
@@ -397,26 +358,21 @@ Using the ``traverse`` Argument In a Route Definition
 
 Rather than using the ``*traverse`` remainder marker in a pattern, you
 can use the ``traverse`` argument to the
-:meth:`pyramid.configuration.Configurator.add_route`` method or the
-``traverse`` attribute of the :ref:`route_directive` ZCML directive.
-(either method is equivalent).
+:meth:`pyramid.configuration.Configurator.add_route`` method.
 
 When you use the ``*traverse`` remainder marker, the traversal path is
 limited to being the remainder segments of a request URL when a route
 matches.  However, when you use the ``traverse`` argument or
 attribute, you have more control over how to compose a traversal path.
 
-Here's a use of the ``traverse`` pattern in a ZCML ``route``
-declaration:
+Here's a use of the ``traverse`` pattern in a call to
+:meth:`pyramid.configuration.Configurator.add_route`:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <route
-     name="abc"
-     pattern="/articles/:article/edit"
-     traverse="/articles/:article"
-     />
+   config.add_route('abc', '/articles/:article/edit',
+                    traverse='/articles/:article')
 
 The syntax of the ``traverse`` argument is the same as it is for
 ``pattern``.
@@ -446,28 +402,20 @@ with this route).
 Making Global Views Match
 +++++++++++++++++++++++++
 
-By default, view configurations that don't mention a ``route_name``
-will be not found by view lookup when a route that mentions a
-``*traverse`` in its pattern matches.  You can make these match forcibly
-by adding the ``use_global_views`` flag to the route definition.  For
-example, the ``views.bazbuz`` view below will be found if the route
-named ``abc`` below is matched and the ``PATH_INFO`` is
-``/abc/bazbuz``, even though the view configuration statement does not
-have the ``route_name="abc"`` attribute.
+By default, view configurations that don't mention a ``route_name`` will be
+not found by view lookup when a route that mentions a ``*traverse`` in its
+pattern matches.  You can make these match forcibly by adding the
+``use_global_views`` flag to the route definition.  For example, the
+``myproject.views.bazbuz`` view below will be found if the route named
+``abc`` below is matched and the ``PATH_INFO`` is ``/abc/bazbuz``, even
+though the view configuration statement does not have the
+``route_name="abc"`` attribute.
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <route
-     pattern="/abc/*traverse"
-     name="abc"
-     use_global_views="True"
-     />
-
-   <view
-     name="bazbuz"
-     view=".views.bazbuz"
-     />
+   config.add_route('abc', '/abc/*traverse', use_global_views=True)
+   config.add_view('myproject.views.bazbuz', name='bazbuz')
 
 .. index::
    single: route subpath
@@ -491,18 +439,15 @@ but the traversal algorithm will return a :term:`subpath` list implied
 by the capture value of ``*subpath``.  You'll see this pattern most
 commonly in route declarations that look like this:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <route
-    pattern="/static/*subpath"
-    name="static"
-    view=".views.static_view"
-    />
+   config.add_route('static', '/static/*subpath',
+                    view='mypackage.views.static_view')
 
-Where ``.views.static_view`` is an instance of
-:class:`pyramid.view.static`.  This effectively tells the static
-helper to traverse everything in the subpath as a filename.
+Where ``mypackage.views.static_view`` is an instance of
+:class:`pyramid.view.static`.  This effectively tells the static helper to
+traverse everything in the subpath as a filename.
 
 Corner Cases
 ------------
@@ -515,52 +460,35 @@ Registering a Default View for a Route That Has a ``view`` Attribute
 
 It is an error to provide *both* a ``view`` argument to a :term:`route
 configuration` *and* a :term:`view configuration` which names a
-``route_name`` that has no ``name`` value or the empty ``name`` value.
-For example, this pair of route/view ZCML declarations will generate a
-"conflict" error at startup time.
+``route_name`` that has no ``name`` value or the empty ``name`` value.  For
+example, this pair of declarations will generate a "conflict" error at
+startup time.
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <route
-     pattern=":foo/:bar/*traverse"
-     name="home"
-     view=".views.home"
-     />
+   config.add_route('home', ':foo/:bar/*traverse',
+                    view='myproject.views.home')
+   config.add_view('myproject.views.another', route_name='home')
 
-   <view
-     route_name="home"
-     view=".views.another"
-     />
+This is because the ``view`` argument to the
+:meth:`pyramid.configuration.Configurator.add_route` above is an *implicit*
+default view when that route matches.  ``add_route`` calls don't *need* to
+supply a view attribute.  For example, this ``add_route`` call:
 
-This is because the ``view`` attribute of the ``<route>`` statement
-above is an *implicit* default view when that route matches.
-``<route>`` declarations don't *need* to supply a view attribute.  For
-example, this ``<route>`` statement:
-
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <route
-     pattern=":foo/:bar/*traverse"
-     name="home"
-     view=".views.home"
-     />
+   config.add_route('home', ':foo/:bar/*traverse',
+                    view='myproject.views.home')
 
 Can also be spelled like so:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <route
-     pattern=":foo/:bar/*traverse"
-     name="home"
-     />
-
-   <view
-     route_name="home"
-     view=".views.home"
-     />
+   config.add_route('home', ':foo/:bar/*traverse')
+   config.add_view('myproject.views.home', route_name='home')
 
 The two spellings are logically equivalent.  In fact, the former is
 just a syntactical shortcut for the latter.
@@ -570,42 +498,26 @@ Binding Extra Views Against a Route Configuration that Doesn't Have a ``*travers
 
 Here's another corner case that just makes no sense.
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <route
-     pattern="/abc"
-     name="abc"
-     view=".views.abc"
-     />
+   config.add_route('abc', '/abc', view='myproject.views.abc')
+   config.add_view('myproject.views.bazbuz', name='bazbuz',
+                   route_name='abc')
 
-   <view
-     name="bazbuz"
-     view=".views.bazbuz"
-     route_name="abc"
-     />
+The above view declaration is useless, because it will never be matched when
+the route it references has matched.  Only the view associated with the route
+itself (``myproject.views.abc``) will ever be invoked when the route matches,
+because the default view is always invoked when a route matches and when no
+post-match traversal is performed.
 
-The above ``<view>`` declaration is useless, because it will never be
-matched when the route it references has matched.  Only the view
-associated with the route itself (``.views.abc``) will ever be invoked
-when the route matches, because the default view is always invoked
-when a route matches and when no post-match traversal is performed.
+To make the above view declaration non-useless, the special ``*traverse``
+token must end the route's pattern.  For example:
 
-To make the above ``<view>`` declaration non-useless, the special
-``*traverse`` token must end the route's pattern.  For example:
-
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <route
-     pattern="/abc/*traverse"
-     name="abc"
-     view=".views.abc"
-     />
-
-   <view
-     name="bazbuz"
-     view=".views.bazbuz"
-     route_name="abc"
-     />
+   config.add_route('abc', '/abc/*traverse', view='myproject.views.abc')
+   config.add_view('myproject.views.bazbuz', name='bazbuz',
+                   route_name='abc')
 

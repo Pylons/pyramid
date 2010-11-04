@@ -67,14 +67,19 @@ The included templates are these:
   URL mapping via :term:`URL dispatch` and Pylons-style view handlers,
   some extra functionality, and SQLAlchemy set up.
 
-Each of these project templates uses :term:`ZCML` instead of
-:term:`imperative configuration`.  Each also makes the assumption that
-you want your code to live in a Python :term:`package`.  Even if your
-application is extremely simple, it is useful to place code that
-drives the application within a package, because a package is more
-easily extended with new code.  An application that lives inside a
-package can also be distributed more easily than one which does not
-live within a package.
+The project templates which start with ``pyramid_`` uses :term:`ZCML` (see
+:ref:`declarative_chapter`) instead of :term:`imperative configuration`.
+
+The project templates which start with ``pylons_`` use imperative
+configuration (the type of configuration which we've been showing so far in
+the book).
+
+Each also makes the assumption that you want your code to live in a Python
+:term:`package`.  Even if your application is extremely simple, it is useful
+to place code that drives the application within a package, because a package
+is more easily extended with new code.  An application that lives inside a
+package can also be distributed more easily than one which does not live
+within a package.
 
 .. index::
    single: creating a project
