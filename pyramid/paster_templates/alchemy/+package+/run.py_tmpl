@@ -9,6 +9,7 @@ def app(global_config, **settings):
     It is usually called by the PasteDeploy framework during 
     ``paster serve``.
     """
+    zcml_file = settings.get('configure_zcml', 'configure.zcml')
     db_string = settings.get('db_string')
     if db_string is None:
         raise ValueError("No 'db_string' value in application configuration.")
@@ -16,11 +17,7 @@ def app(global_config, **settings):
     get_root = appmaker(db_string, asbool(db_echo))
     config = Configurator(settings=settings, root_factory=get_root)
     config.begin()
-    config.add_static_view('static', 'templates/static')
-    config.add_view('.views.view_root', context='.models.MyApp', 
-                    renderer="templates/root.pt")
-    config.add_view('.views.view_model', context='.models.MyModel',
-                    renderer="templates/model.pt")
+    config.load_zcml(zcml_file)
     config.end()
     return config.make_wsgi_app()
 
