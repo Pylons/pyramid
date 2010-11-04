@@ -91,4 +91,6 @@
 
 - repoze.bfg.viewgroup in CMF tutorial
 
-- templates in tutorials.
+- Update templates in tutorials.
+
+- Move static dir from pkg/templates/ to /pkg/ in pyramid_* paster templates.
