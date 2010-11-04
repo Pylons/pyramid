@@ -163,8 +163,8 @@ Backwards Incompatibilities (with BFG 1.3.X)
   ``pyramid.authentication.AuthTktAuthenticationPolicy`` constructor now
   defaults to ``auth_tkt`` (it used to default to ``repoze.bfg.auth_tkt``).
 
-- All preexisting paster templates now use "imperative" configuration
-  (``starter``, ``routesalchemy``, ``alchemy``, and ``zodb``).
+- All preexisting paster templates (except ``zodb``) now use "imperative"
+  configuration (``starter``, ``routesalchemy``, ``alchemy``).
 
 - A new paster template named ``pyramid_starter_zcml`` exists, which uses
   declarative configuration.
