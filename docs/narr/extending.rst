@@ -26,11 +26,11 @@ application through methods of the :term:`Configurator` (except for
 the :meth:`pyramid.configuration.Configurator.load_zcml` method).
 
 Instead, you must always use :term:`ZCML` for the equivalent
-purposes. :term:`ZCML` declarations that belong to an application can
-be "overridden" by integrators as necessary, but decorators and
-imperative code which perform the same tasks cannot.  Use only
-:term:`ZCML` to configure your application if you'd like it to be
-extensible.
+purposes. :term:`ZCML` declarations that belong to an application can be
+"overridden" by integrators as necessary, but decorators and imperative code
+which perform the same tasks cannot.  Use only :term:`ZCML` to configure your
+application if you'd like it to be extensible.  See
+:ref:`declarative_chapter` for information about using ZCML.
 
 Fundamental Plugpoints
 ~~~~~~~~~~~~~~~~~~~~~~

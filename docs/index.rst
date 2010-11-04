@@ -51,6 +51,7 @@ Narrative documentation in chapter form explaining how to use
    narr/environment
    narr/unittesting
    narr/hooks
+   narr/declarative
    narr/extending
    narr/resources
    narr/router

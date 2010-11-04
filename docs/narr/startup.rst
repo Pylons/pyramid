@@ -102,30 +102,23 @@ press ``return`` after running ``paster serve MyProject.ini``.
    request to retrieve the application root.  It is not called during
    startup, only when a request is handled.
 
-   ``settings`` dictionary contains all the options in the
+   The ``settings`` dictionary contains all the options in the
    ``[app:main]`` section of our .ini file except the "use" option
    (which is internal to paste).  In this case, ``**settings`` will be
    something like ``{'reload_templates':'true',
    'debug_authorization':'false', 'debug_notfound':'false'}``.
 
-#. The ``app`` function then calls the
-   :meth:`pyramid.configuration.Configurator.load_zcml` method,
-   passing in a ``zcml_file`` value.  ``zcml_file`` is the value of
-   the ``configure_zcml`` setting or a default of ``configure.zcml``.
-   This filename is relative to the run.py file that the ``app``
-   function lives in.  The ``load_zcml`` function processes each
-   :term:`ZCML declaration` in the ZCML file implied by the
-   ``zcml_file`` argument.  If ``load_zcml`` fails to parse the ZCML
-   file (or any file which is included by the ZCML file), a
-   ``XMLConfigurationError`` is raised and processing ends.  If it
-   succeeds, an :term:`application registry` is populated using all
-   the :term:`ZCML declaration` statements present in the file.
+#. The ``app`` function then calls various methods on the an instance of the
+   class :class:`pyramid.configuration.Configurator` method.  The intent of
+   calling these methods is to populate an :term:`application registry`,
+   which represents the :mod:`pyramid` configuration related to the
+   application.
 
-#. The :meth:`pyramid.configuration.Configurator.make_wsgi_app`
-   method is called.  The result is a :term:`router` instance.  The
-   router is associated with the :term:`application registry` implied
-   by the configurator previously populated by ZCML.  The router is a
-   WSGI application.
+#. The :meth:`pyramid.configuration.Configurator.make_wsgi_app` method is
+   called.  The result is a :term:`router` instance.  The router is
+   associated with the :term:`application registry` implied by the
+   configurator previously populated by other methods run against the
+   Configurator.  The router is a WSGI application.
 
 #. A :class:`pyramid.interfaces.IApplicationCreated` event is
    emitted (see :ref:`events_chapter` for more information about

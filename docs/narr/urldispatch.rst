@@ -35,11 +35,15 @@ hierarchy, URL dispatch is easier to use than traversal, and is often
 a more natural fit for creating an application that manipulates "flat"
 data.
 
-The presence of :ref:`route_directive` statements in a :term:`ZCML`
-file used by your application or the presence of calls to the
-:meth:`pyramid.configuration.Configurator.add_route` method in
-imperative configuration within your application is a sign that you're
-using :term:`URL dispatch`.
+The presence of calls to the
+:meth:`pyramid.configuration.Configurator.add_route` method in imperative
+configuration within your application is a sign that you're using :term:`URL
+dispatch`.
+
+..note::
+
+  Route configuration may also be added to the system via term:`ZCML` (see
+  :ref:`zcml_route_configuration`).
 
 High-Level Operational Overview
 -------------------------------
@@ -72,14 +76,11 @@ application to uniquely identify a particular route when generating a
 URL.  It also optionally has a ``factory``, a set of :term:`route
 predicate` parameters, and a set of :term:`view` parameters.
 
-A route configuration may be added to the system via :term:`imperative
-configuration` or via :term:`ZCML`.  Both are completely equivalent.
-
 .. index::
    single: add_route
 
-Configuring a Route Imperatively via The ``add_route`` Configurator Method
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Configuring a Route via The ``add_route`` Configurator Method
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The :meth:`pyramid.configuration.Configurator.add_route` method
 adds a single :term:`route configuration` to the :term:`application
@@ -95,42 +96,7 @@ registry`.  Here's an example:
    config.add_route('myroute', '/prefix/:one/:two', view=myview)
 
 .. index::
-   single: ZCML directive; route
-
-Configuring a Route via ZCML
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Instead of using the imperative
-:meth:`pyramid.configuration.Configurator.add_route` method to add
-a new route, you can alternately use :term:`ZCML`.  For example, the
-following :term:`ZCML declaration` causes a route to be added to the
-application.
-
-.. code-block:: xml
-   :linenos:
-
-   <route
-       name="myroute"
-       pattern="/prefix/:one/:two"
-       view=".views.myview"
-    />
-
-.. note::
-
-   Values prefixed with a period (``.``) within the values of ZCML
-   attributes such as the ``view`` attribute of a ``route`` mean
-   "relative to the Python package directory in which this
-   :term:`ZCML` file is stored".  So if the above ``route``
-   declaration was made inside a ``configure.zcml`` file that lived in
-   the ``hello`` package, you could replace the relative
-   ``.views.myview`` with the absolute ``hello.views.myview`` Either
-   the relative or absolute form is functionally equivalent.  It's
-   often useful to use the relative form, in case your package's name
-   changes.  It's also shorter to type.
-
-
-See :ref:`route_directive` for full ``route`` ZCML directive
-documentation.
+   single: route configuration; view callable
 
 Route Configuration That Names a View Callable
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -144,14 +110,26 @@ information about how to create view callables, see
 
 Here's an example route configuration that references a view callable:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <route
-       name="myroute"
-       pattern="/prefix/:one/:two"
-       view="mypackage.views.myview"
-    />
+   # "config" below is presumed to be an instance of the
+   # pyramid.configuration.Configurator class; "myview" is assumed
+   # to be a "view callable" function
+   from myproject.views import myview
+   config.add_route('myroute', '/prefix/:one/:two', view=myview)
+
+You can also pass a :term:`dotted Python name` as the ``view`` argument
+rather than an actual callable:
+
+.. code-block:: python
+   :linenos:
+
+   # "config" below is presumed to be an instance of the
+   # pyramid.configuration.Configurator class; "myview" is assumed
+   # to be a "view callable" function
+   from myproject.views import myview
+   config.add_route('myroute', '/prefix/:one/:two', 'myproject.views.myview')
 
 When a route configuration names a ``view`` attribute, the :term:`view
 callable` named as that ``view`` attribute will always be found and
@@ -365,15 +343,12 @@ they are added to the application at startup time.  This is unlike
 :term:`traversal`, which depends on emergent behavior which happens as
 a result of traversing a graph.
 
-The order that routes are evaluated when they are defined via
-:term:`ZCML` is the order in which they appear in the ZCML relative to
-each other.  For routes added via the
-:mod:`pyramid.configuration.Configurator.add_route` method, the
-order that routes are evaluated is the order in which they are added
-to the configuration imperatively.
+For routes added via the :mod:`pyramid.configuration.Configurator.add_route`
+method, the order that routes are evaluated is the order in which they are
+added to the configuration imperatively.
 
-For example, route configuration statements with the following
-patterns might be added in the following order:
+For example, route configuration statements with the following patterns might
+be added in the following order:
 
 .. code-block:: text
 
@@ -401,14 +376,14 @@ the route is used to generate a :term:`root` object.  This object will
 usually be used as the :term:`context` of the view callable ultimately
 found via :term:`view lookup`.
 
-.. code-block:: xml
+.. code-block:: python
+   :linenos:
 
-   <route
-    pattern="/abc"
-    name="abc"
-    view=".views.theview"
-    factory=".models.root_factory"
-    />
+   config.add_route('abc', '/abc', 'myproject.views.theview', 
+                    factory='myproject.models.root_factory')
+
+The factory can either be a Python object or a :term:`dotted Python name` (a
+string) which points to such a Python oject, as it is above.
 
 In this way, each route can use a different factory, making it
 possible to supply a different :term:`context` object to the view
@@ -425,7 +400,7 @@ within :ref:`hybrid_chapter`.
 Route Configuration Arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Route configuration statements may specify a large number of
+Route configuration ``add_route`` statements may specify a large number of
 arguments.
 
 Many of these arguments are :term:`route predicate` arguments.  A
@@ -647,11 +622,10 @@ represent neither predicates nor view configuration information.
 Custom Route Predicates
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Each of the predicate callables fed to the ``custom_predicates``
-argument of :meth:`pyramid.configuration.Configurator.add_route` or
-the ``custom_predicates`` ZCML attribute must be a callable accepting
-two arguments.  The first argument passed to a custom predicate is a
-dictionary conventionally named ``info``.  The second argument is the
+Each of the predicate callables fed to the ``custom_predicates`` argument of
+:meth:`pyramid.configuration.Configurator.add_route` must be a callable
+accepting two arguments.  The first argument passed to a custom predicate is
+a dictionary conventionally named ``info``.  The second argument is the
 current :term:`request` object.
 
 The ``info`` dictionary has a number of contained values: ``match`` is
@@ -825,10 +799,7 @@ Routing Examples
 
 Let's check out some examples of how route configuration statements
 might be commonly declared, and what will happen if they are matched
-by the information present in a request.  The examples that follow
-assume that :term:`ZCML` will be used to perform route configuration,
-although you can use :term:`imperative configuration` equivalently if
-you like.
+by the information present in a request.
 
 .. _urldispatch_example1:
 
@@ -838,14 +809,10 @@ Example 1
 The simplest route declaration which configures a route match to
 *directly* result in a particular view callable being invoked:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <route
-    name="idea"
-    pattern="site/:id"
-    view="mypackage.views.site_view"
-    />
+    config.add_route('idea', 'site/:id', view='mypackage.views.site_view')
 
 When a route configuration with a ``view`` attribute is added to the
 system, and an incoming request matches the *pattern* of the route
@@ -888,26 +855,12 @@ Example 2
 Below is an example of a more complicated set of route statements you
 might add to your application:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <route
-    name="idea"
-    pattern="ideas/:idea"
-    view="mypackage.views.idea_view"
-    />
-
-   <route
-    name="user"
-    pattern="users/:user"
-    view="mypackage.views.user_view"
-    />
-
-   <route 
-    name="tag" 
-    pattern="tags/:tag"
-    view="mypackage.views.tag_view"
-    />
+   config.add_route('idea', 'ideas/:idea', view='mypackage.views.idea_view')
+   config.add_route('user', 'users/:user', view='mypackage.views.user_view')
+   config.add_route('tag', 'tags/:tags', view='mypackage.views.tag_view')
 
 The above configuration will allow :mod:`pyramid` to service URLs
 in these forms:
@@ -944,28 +897,24 @@ URL by the process will be passed to the view callable.
 Example 3
 ~~~~~~~~~
 
-The context object passed in to a view found as the result of URL
-dispatch will, by default, be an instance of the object returned by
-the :term:`root factory` configured at startup time (the
-``root_factory`` argument to the :term:`Configurator` used to
-configure the application).
+The context object passed in to a view found as the result of URL dispatch
+will, by default, be an instance of the object returned by the :term:`root
+factory` configured at startup time (the ``root_factory`` argument to the
+:term:`Configurator` used to configure the application).
 
-You can override this behavior by passing in a ``factory`` argument to
-the ZCML directive for a particular route.  The ``factory`` should be
-a callable that accepts a :term:`request` and returns an instance of a
-class that will be the context used by the view.
+You can override this behavior by passing in a ``factory`` argument to the
+:meth:`pyramid.configuration.Configurator.add_route` method for a particular
+route.  The ``factory`` should be a callable that accepts a :term:`request`
+and returns an instance of a class that will be the context used by the view.
 
 An example of using a route with a factory:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <route
-    name="idea"
-    pattern="ideas/:idea"
-    view=".views.idea_view"
-    factory=".models.Idea"
-    />
+   config.add_route('idea', 'ideas/:idea', 
+                    view='myproject.views.idea_view',
+                    factory='myproject.models.Idea')
 
 The above route will manufacture an ``Idea`` model as a
 :term:`context`, assuming that ``mypackage.models.Idea`` resolves to a
@@ -988,31 +937,20 @@ It is possible to create a route declaration without a ``view``
 attribute, but associate the route with a :term:`view callable` using
 a ``view`` declaration.
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <route
-    name="idea"
-    pattern="site/:id"
-    />
-
-   <view
-    view="mypackage.views.site_view"
-    route_name="idea"
-    />
+   config.add_route('idea', 'site/:id')
+   config.add_view(route_name='idea', view='mypackage.views.site_view')
 
 This set of configuration parameters creates a configuration
 completely equivalent to this example provided in
 :ref:`urldispatch_example1`:
 
-.. code-block:: xml
+.. code-block:: python
    :linenos:
 
-   <route
-    name="idea"
-    pattern="site/:id"
-    view="mypackage.views.site_view"
-    />
+   config.add_route('idea', 'site/:id', view='mypackage.views.site_view')
 
 In fact, the spelling which names a ``view`` attribute is just
 syntactic sugar for the more verbose spelling which contains separate
@@ -1028,29 +966,21 @@ in :ref:`hybrid_chapter`.
 Matching the Root URL
 ---------------------
 
-It's not entirely obvious how to use a route pattern to match the root
-URL ("/").  To do so, give the empty string as a pattern in a ZCML
-``route`` declaration:
+It's not entirely obvious how to use a route pattern to match the root URL
+("/").  To do so, give the empty string as a pattern in a call to
+:meth:`pyramid.configuration.Configurator.add_route`:
 
 .. code-block:: xml
    :linenos:
 
-   <route
-       pattern=""
-       name="root"
-       view=".views.root_view"
-       />
+   config.add_route('root', '', 'mypackage.views.root_view')
 
 Or provide the literal string ``/`` as the pattern:
 
 .. code-block:: xml
    :linenos:
 
-   <route
-       pattern="/"
-       name="root"
-       view=".views.root_view"
-       />
+   config.add_route('root', '/', 'mypackage.views.root_view')
 
 .. index::
    single: generating route URLs
@@ -1059,10 +989,9 @@ Or provide the literal string ``/`` as the pattern:
 Generating Route URLs
 ---------------------
 
-Use the :func:`pyramid.url.route_url` function to generate URLs
-based on route patterns.  For example, if you've configured a route in
-ZCML with the ``name`` "foo" and the ``pattern`` ":a/:b/:c", you might
-do this.
+Use the :func:`pyramid.url.route_url` function to generate URLs based on
+route patterns.  For example, if you've configured a route with the ``name``
+"foo" and the ``pattern`` ":a/:b/:c", you might do this.
 
 .. ignore-next-block
 .. code-block:: python
@@ -1101,15 +1030,8 @@ your route configuration looks like so:
 .. code-block:: xml
    :linenos:
 
-   <route
-     view=".views.no_slash"
-     pattern="no_slash"
-    />
-
-   <route
-     view=".views.has_slash"
-     pattern="has_slash/"
-    />
+   config.add_route('noslash', 'no_slash', 'myproject.views.no_slash')
+   config.add_route('hasslash', 'has_slash/', 'myproject.views.has_slash')
 
 If a request enters the application with the ``PATH_INFO`` value of
 ``/no_slash``, the first route will match.  If a request enters the
@@ -1126,27 +1048,14 @@ redirect to ``/has_slash/`` will be returned to the user's browser.
 Note that this will *lose* ``POST`` data information (turning it into
 a GET), so you shouldn't rely on this to redirect POST requests.
 
-To configure the slash-appending not found view in your application,
-change the application's ``configure.zcml``, adding the following
-stanza:
+To configure the slash-appending not found view in your application, change
+the application's startup configuration, adding the following stanza:
 
 .. code-block:: xml
    :linenos:
 
-   <view
-     context="pyramid.exceptions.NotFound"
-     view="pyramid.view.append_slash_notfound_view"
-    />
-
-Or use the :meth:`pyramid.configuration.Configurator.add_view`
-method if you don't use ZCML:
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.exceptions import NotFound
-   from pyramid.view import append_slash_notfound_view
-   config.add_view(append_slash_notfound_view, context=NotFound)
+   config.add_view(context='pyramid.exceptions.NotFound',
+                   view='pyramid.view.append_slash_notfound_view')
 
 See :ref:`view_module` and :ref:`changing_the_notfound_view` for more
 information about the slash-appending not found view and for a more
@@ -1227,44 +1136,17 @@ following in the ``mypackage.run`` module:
         environ = event.request.environ
         environ['mypackage.sqlcleaner'] = Cleanup(DBSession.remove)
 
-Then in the ``configure.zcml`` of your package, inject the following:
-
-.. code-block:: xml
-
-  <subscriber for="pyramid.interfaces.INewRequest"
-    handler="mypackage.run.handle_teardown"/>
-
-Or, if you don't use ZCML, but you do use a :term:`scan` add a
-subscriber decorator:
+Then add an event subscriber in your startup configuration:
 
 .. code-block:: python
+   :linenos:
 
-   from pyramid.events import subscriber
-   from pyramid.interfaces import INewRequest
+   config.add_subscriber('mypackage.run.handle_teardown', 
+                         'pyramid.events.NewRequest')
 
-   @subscriber(INewRequest)
-   def handle_teardown(event):
-       environ = event.request.environ
-       environ['mypackage.sqlcleaner'] = Cleanup(DBSession.remove)
-
-Or finally, it can be done imperatively via the ``add_subscriber``
-method of a :term:`Configurator`.
-
-.. code-block:: python
-
-   from pyramid.interfaces import INewRequest
-   from pyramid.configuration imoport Configurator
-
-   def handle_teardown(event):
-       environ = event.request.environ
-       environ['mypackage.sqlcleaner'] = Cleanup(DBSession.remove)
-
-   config = Configurator()
-   config.add_subscriber(handle_teardown, INewRequest)
-
-Any of the above three ways to register a handle_teardown subscriber
-will cause the DBSession to be removed whenever the WSGI environment
-is destroyed (usually at the end of every request).
+Registering a handle_teardown subscriber will cause the DBSession to be
+removed whenever the WSGI environment is destroyed (usually at the end of
+every request).
 
 .. note:: This is only an example.  In particular, it is not necessary
    to cause ``DBSession.remove`` to be called as the result of an

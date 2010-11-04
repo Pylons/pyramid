@@ -1,0 +1,852 @@
+.. _declarative_chapter:
+
+Declarative Configuration
+=========================
+
+The mode of configuration most comprehensively detailed by examples in
+narrative chapters in this book is "imperative" configuration. This is the
+configuration mode in which a developer cedes the least amount of control to
+the framework; it's "imperative" because you express the configuration
+directly in Python code, and you have the full power of Python at your
+disposal as you issue configuration statements.  However, another mode of
+configuration exists within :mod:`pyramid`, which often provides better
+extensibility and configuration conflict detection.
+
+A complete listing of ZCML directives is available within
+:ref:`zcml_directives`.  This chapter provides an overview of how you might
+get started with ZCML and highlights some common tasks performed when you use
+ZCML.  You can get a better understanding of when it's appropriate to use
+ZCML from :ref:`extending_chapter`.
+
+.. index::
+   single: declarative configuration
+
+.. _declarative_configuration:
+
+Declarative Configuration
+-------------------------
+
+A :mod:`pyramid` application can be configured "declaratively", if so
+desired.  Declarative configuration relies on *declarations* made external to
+the code in a configuration file format named :term:`ZCML` (Zope
+Configuration Markup Language), an XML dialect.
+
+A :mod:`pyramid` application configured declaratively requires not
+one, but two files: a Python file and a :term:`ZCML` file.
+
+In a file named ``helloworld.py``:
+
+.. code-block:: python
+   :linenos:
+
+   from paste.httpserver import serve
+   from pyramid.response import Response
+   from pyramid.configuration import Configurator
+
+   def hello_world(request):
+       return Response('Hello world!')
+
+   if __name__ == '__main__':
+       config = Configurator()
+       config.begin()
+       config.load_zcml('configure.zcml')
+       config.end()
+       app = config.make_wsgi_app()
+       serve(app, host='0.0.0.0')
+
+In a file named ``configure.zcml`` in the same directory as the
+previously created ``helloworld.py``:
+
+.. code-block:: xml
+   :linenos:
+
+   <configure xmlns="http://pylonshq.com/pyramid">
+
+     <include package="pyramid.includes" />
+
+     <view
+        view="helloworld.hello_world"
+        />
+
+   </configure>
+
+This pair of files forms an application functionally equivalent to the
+application we created earlier in :ref:`imperative_configuration`.
+Let's examine the differences between that code listing and the code
+above.
+
+In :ref:`imperative_configuration`, we had the following lines within
+the ``if __name__ == '__main__'`` section of ``helloworld.py``:
+
+.. code-block:: python
+   :linenos:
+
+   if __name__ == '__main__':
+       config = Configurator()
+       config.begin()
+       config.add_view(hello_world)
+       config.end()
+       app = config.make_wsgi_app()
+       serve(app, host='0.0.0.0')
+
+In our "declarative" code, we've removed the call to ``add_view`` and
+replaced it with a call to the
+:meth:`pyramid.configuration.Configurator.load_zcml` method so that
+it now reads as:
+
+.. code-block:: python
+   :linenos:
+
+   if __name__ == '__main__':
+       config = Configurator()
+       config.begin()
+       config.load_zcml('configure.zcml')
+       config.end()
+       app = config.make_wsgi_app()
+       serve(app, host='0.0.0.0')
+
+Everything else is much the same.
+
+The ``config.load_zcml('configure.zcml')`` line tells the configurator
+to load configuration declarations from the file named
+``configure.zcml`` which sits next to ``helloworld.py`` on the
+filesystem.  Let's take a look at that ``configure.zcml`` file again:
+
+.. code-block:: xml
+   :linenos:
+
+   <configure xmlns="http://pylonshq.com/pyramid">
+
+      <include package="pyramid.includes" />
+
+      <view
+         view="helloworld.hello_world"
+         />
+
+   </configure>
+
+Note that this file contains some XML, and that the XML contains a
+``<view>`` :term:`configuration declaration` tag that references a
+:term:`dotted Python name`.  This dotted name refers to the
+``hello_world`` function that lives in our ``helloworld`` Python
+module.
+
+This ``<view>`` declaration tag performs the same function as the
+``add_view`` method that was employed within
+:ref:`imperative_configuration`.  In fact, the ``<view>`` tag is
+effectively a "macro" which calls the
+:meth:`pyramid.configuration.Configurator.add_view` method on your
+behalf.
+
+The ``<view>`` tag is an example of a :mod:`pyramid` declaration
+tag.  Other such tags include ``<route>`` and ``<scan>``.  Each of
+these tags is effectively a "macro" which calls methods of a
+:class:`pyramid.configuration.Configurator` object on your behalf.
+
+Essentially, using a :term:`ZCML` file and loading it from the
+filesystem allows us to put our configuration statements within this
+XML file rather as declarations, rather than representing them as
+method calls to a :term:`Configurator` object.  Otherwise, declarative
+and imperative configuration are functionally equivalent.
+
+Using declarative configuration has a number of benefits, the primary
+benefit being that applications configured declaratively can be
+*overridden* and *extended* by third parties without requiring the
+third party to change application code.  If you want to build a
+framework or an extensible application, using declarative
+configuration is a good idea.
+
+Declarative configuration has an obvious downside: you can't use
+plain-old-Python syntax you probably already know and understand to
+configure your application; instead you need to use :term:`ZCML`.
+
+.. index::
+   single: ZCML conflict detection
+
+ZCML Conflict Detection
+~~~~~~~~~~~~~~~~~~~~~~~
+
+A minor additional feature of ZCML is *conflict detection*.  If you
+define two declaration tags within the same ZCML file which logically
+"collide", an exception will be raised, and the application will not
+start.  For example, the following ZCML file has two conflicting
+``<view>`` tags:
+
+.. code-block:: xml
+   :linenos:
+
+    <configure xmlns="http://pylonshq.com/pyramid">
+
+      <include package="pyramid.includes" />
+
+      <view
+        view="helloworld.hello_world"
+        />
+
+      <view
+        view="helloworld.hello_world"
+        />
+
+    </configure>
+
+If you try to use this ZCML file as the source of ZCML for an
+application, an error will be raised when you attempt to start the
+application.  This error will contain information about which tags
+might have conflicted.
+
+.. index::
+   single: helloworld (declarative)
+
+.. _helloworld_declarative:
+
+Hello World, Goodbye World (Declarative)
+----------------------------------------
+
+Another almost entirely equivalent mode of application configuration
+exists named *declarative* configuration.  :mod:`pyramid` can be
+configured for the same "hello world" application "declaratively", if
+so desired.
+
+To do so, first, create a file named ``helloworld.py``:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.configuration import Configurator
+   from pyramid.response import Response
+   from paste.httpserver import serve
+
+   def hello_world(request):
+       return Response('Hello world!')
+
+   def goodbye_world(request):
+       return Response('Goodbye world!')
+
+   if __name__ == '__main__':
+       config = Configurator()
+       config.begin()
+       config.load_zcml('configure.zcml')
+       config.end()
+       app = config.make_wsgi_app()
+       serve(app, host='0.0.0.0')
+
+Then create a file named ``configure.zcml`` in the same directory as
+the previously created ``helloworld.py``:
+
+.. code-block:: xml
+   :linenos:
+
+   <configure xmlns="http://pylonshq.com/pyramid">
+
+     <include package="pyramid.includes" />
+
+     <view
+        view="helloworld.hello_world"
+        />
+
+     <view
+       name="goodbye"
+       view="helloworld.goodbye_world"
+       />
+
+   </configure>
+
+This pair of files forms an application functionally equivalent to the
+application we created earlier in :ref:`helloworld_imperative`.  We can run
+it the same way.
+
+.. code-block:: bash
+
+   $ python helloworld.py
+   serving on 0.0.0.0:8080 view at http://127.0.0.1:8080
+
+Let's examine the differences between the code in that section and the code
+above.  In :ref:`helloworld_imperative_appconfig`, we had the following lines
+within the ``if __name__ == '__main__'`` section of ``helloworld.py``:
+
+.. code-block:: python
+   :linenos:
+
+   if __name__ == '__main__':
+       config = Configurator()
+       config.begin()
+       config.add_view(hello_world)
+       config.add_view(goodbye_world, name='goodbye')
+       config.end()
+       app = config.make_wsgi_app()
+       serve(app, host='0.0.0.0')
+
+In our "declarative" code, we've added a call to the
+:meth:`pyramid.configuration.Configurator.load_zcml` method with
+the value ``configure.zcml``, and we've removed the lines which read
+``config.add_view(hello_world)`` and ``config.add_view(goodbye_world,
+name='goodbye')``, so that it now reads as:
+
+.. code-block:: python
+   :linenos:
+
+   if __name__ == '__main__':
+       config = Configurator()
+       config.begin()
+       config.load_zcml('configure.zcml')
+       config.end()
+       app = config.make_wsgi_app()
+       serve(app, host='0.0.0.0')
+
+Everything else is much the same.
+
+The ``config.load_zcml('configure.zcml')`` line tells the configurator
+to load configuration declarations from the ``configure.zcml`` file
+which sits next to ``helloworld.py``.  Let's take a look at the
+``configure.zcml`` file now:
+
+.. code-block:: xml
+   :linenos:
+
+   <configure xmlns="http://pylonshq.com/pyramid">
+
+      <include package="pyramid.includes" />
+
+      <view
+         view="helloworld.hello_world"
+         />
+
+      <view
+         name="goodbye"
+         view="helloworld.goodbye_world"
+         />
+
+   </configure>
+
+We already understand what the view code does, because the application
+is functionally equivalent to the application described in
+:ref:`helloworld_imperative`, but use of :term:`ZCML` is new.  Let's
+break that down tag-by-tag.
+
+The ``<configure>`` Tag
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``configure.zcml`` ZCML file contains this bit of XML:
+
+.. code-block:: xml
+   :linenos:
+
+    <configure xmlns="http://pylonshq.com/pyramid">
+
+       <!-- other directives -->
+
+    </configure>
+
+Because :term:`ZCML` is XML, and because XML requires a single root
+tag for each document, every ZCML file used by :mod:`pyramid` must
+contain a ``configure`` container directive, which acts as the root
+XML tag.  It is a "container" directive because its only job is to
+contain other directives.
+
+See also :ref:`configure_directive` and :ref:`word_on_xml_namespaces`.
+
+The ``<include>`` Tag
+~~~~~~~~~~~~~~~~~~~~~
+
+The ``configure.zcml`` ZCML file contains this bit of XML within the
+``<configure>`` root tag:
+
+.. code-block:: xml
+
+   <include package="pyramid.includes" />
+
+This self-closing tag instructs :mod:`pyramid` to load a ZCML file
+from the Python package with the :term:`dotted Python name`
+``pyramid.includes``, as specified by its ``package`` attribute.
+This particular ``<include>`` declaration is required because it
+actually allows subsequent declaration tags (such as ``<view>``, which
+we'll see shortly) to be recognized.  The ``<include>`` tag
+effectively just includes another ZCML file, causing its declarations
+to be executed.  In this case, we want to load the declarations from
+the file named ``configure.zcml`` within the
+:mod:`pyramid.includes` Python package.  We know we want to load
+the ``configure.zcml`` from this package because ``configure.zcml`` is
+the default value for another attribute of the ``<include>`` tag named
+``file``.  We could have spelled the include tag more verbosely, but
+equivalently as:
+
+.. code-block:: xml
+   :linenos:
+
+   <include package="pyramid.includes" 
+            file="configure.zcml"/>
+
+The ``<include>`` tag that includes the ZCML statements implied by the
+``configure.zcml`` file from the Python package named
+:mod:`pyramid.includes` is basically required to come before any
+other named declaration in an application's ``configure.zcml``.  If it
+is not included, subsequent declaration tags will fail to be
+recognized, and the configuration system will generate an error at
+startup.  However, the ``<include package="pyramid.includes"/>``
+tag needs to exist only in a "top-level" ZCML file, it needn't also
+exist in ZCML files *included by* a top-level ZCML file.
+
+See also :ref:`include_directive`.
+
+The ``<view>`` Tag
+~~~~~~~~~~~~~~~~~~
+
+The ``configure.zcml`` ZCML file contains these bits of XML *after* the
+``<include>`` tag, but *within* the ``<configure>`` root tag:
+
+.. code-block:: xml
+   :linenos:
+
+   <view
+     view="helloworld.hello_world"
+     />
+
+   <view
+     name="goodbye"
+     view="helloworld.goodbye_world"
+     />
+
+These ``<view>`` declaration tags direct :mod:`pyramid` to create
+two :term:`view configuration` registrations.  The first ``<view>``
+tag has an attribute (the attribute is also named ``view``), which
+points at a :term:`dotted Python name`, referencing the
+``hello_world`` function defined within the ``helloworld`` package.
+The second ``<view>`` tag has a ``view`` attribute which points at a
+:term:`dotted Python name`, referencing the ``goodbye_world`` function
+defined within the ``helloworld`` package.  The second ``<view>`` tag
+also has an attribute called ``name`` with a value of ``goodbye``.
+
+These effect of the ``<view>`` tag declarations we've put into our
+``configure.zcml`` is functionally equivalent to the effect of lines
+we've already seen in an imperatively-configured application.  We're
+just spelling things differently, using XML instead of Python.
+
+In our previously defined application, in which we added view
+configurations imperatively, we saw this code:
+
+.. ignore-next-block
+.. code-block:: python
+   :linenos:
+
+   config.add_view(hello_world)
+   config.add_view(goodbye_world, name='goodbye')
+
+Each ``<view>`` declaration tag encountered in a ZCML file effectively
+invokes the :meth:`pyramid.configuration.Configurator.add_view`
+method on the behalf of the developer.  Various attributes can be
+specified on the ``<view>`` tag which influence the :term:`view
+configuration` it creates.
+
+Since the relative ordering of calls to
+:meth:`pyramid.configuration.Configurator.add_view` doesn't matter
+(see the sidebar entitled *View Dispatch and Ordering* within
+:ref:`adding_configuration`), the relative order of ``<view>`` tags in
+ZCML doesn't matter either.  The following ZCML orderings are
+completely equivalent:
+
+.. topic:: Hello Before Goodbye
+
+  .. code-block:: xml
+     :linenos:
+
+     <view
+       view="helloworld.hello_world"
+       />
+
+     <view
+       name="goodbye"
+       view="helloworld.goodbye_world"
+       />
+
+.. topic:: Goodbye Before Hello
+
+  .. code-block:: xml
+     :linenos:
+
+     <view
+       name="goodbye"
+       view="helloworld.goodbye_world"
+       />
+
+     <view
+       view="helloworld.hello_world"
+       />
+
+We've now configured a :mod:`pyramid` helloworld application
+declaratively.  More information about this mode of configuration is
+available in :ref:`declarative_configuration` and within
+:ref:`zcml_reference`.
+
+Scanning
+--------
+
+:term:`ZCML` can also invoke a :term:`scan` via its ``<scan>``
+directive.  If a ZCML file is processed that contains a scan
+directive, the package the ZCML file points to is scanned.
+
+.. topic:: Declaratively Starting a Scan
+
+   .. code-block:: python
+      :linenos:
+
+      # helloworld.py
+
+      from paste.httpserver import serve
+      from pyramid.response import Response
+      from pyramid.view import view_config
+     
+      @view_config()
+      def hello(request):
+          return Response('Hello')
+
+      if __name__ == '__main__':
+          from pyramid.configuration import Configurator
+          config = Configurator()
+          config.begin()
+          config.load_zcml('configure.zcml')
+          config.end()
+          app = config.make_wsgi_app()
+          serve(app, host='0.0.0.0')
+
+   .. code-block:: xml
+      :linenos:
+
+      <configure xmlns="http://namespaces.repoze.org">
+
+        <!-- configure.zcml -->
+
+        <include package="pyramid.includes"/>
+        <scan package="."/>
+
+      </configure>
+
+Which Mode Should I Use?
+------------------------
+
+A combination of imperative configuration, declarative configuration
+via ZCML and scanning can be used to configure any application.  They
+are not mutually exclusive.
+
+The :mod:`pyramid` authors often recommend using mostly declarative
+configuration, because it's the more traditional form of configuration
+used in :mod:`pyramid` applications, it can be overridden and
+extended by third party deployers, and there are more examples for it
+"in the wild".
+
+However, imperative mode configuration can be simpler to understand,
+and the framework is not "opinionated" about the choice.  This book
+presents examples in both styles, mostly interchangeably.  You can
+choose the mode that best fits your brain as necessary.
+
+.. index::
+   single: ZCML directive; route
+
+.. _zcml_route_configuration:
+
+Configuring a Route via ZCML
+----------------------------
+
+Instead of using the imperative
+:meth:`pyramid.configuration.Configurator.add_route` method to add a new
+route, you can alternately use :term:`ZCML`.  :ref:`route_directive`
+statements in a :term:`ZCML` file used by your application is a sign that
+you're using :term:`URL dispatch`.  For example, the following :term:`ZCML
+declaration` causes a route to be added to the application.
+
+.. code-block:: xml
+   :linenos:
+
+   <route
+       name="myroute"
+       pattern="/prefix/:one/:two"
+       view=".views.myview"
+    />
+
+.. note::
+
+   Values prefixed with a period (``.``) within the values of ZCML
+   attributes such as the ``view`` attribute of a ``route`` mean
+   "relative to the Python package directory in which this
+   :term:`ZCML` file is stored".  So if the above ``route``
+   declaration was made inside a ``configure.zcml`` file that lived in
+   the ``hello`` package, you could replace the relative
+   ``.views.myview`` with the absolute ``hello.views.myview`` Either
+   the relative or absolute form is functionally equivalent.  It's
+   often useful to use the relative form, in case your package's name
+   changes.  It's also shorter to type.
+
+The order that routes are evaluated when declarative configuration is used
+is the order that they appear relative to each other in the ZCML file.
+
+See :ref:`route_directive` for full ``route`` ZCML directive
+documentation.
+
+.. index::
+   triple: view; zcml; static resource
+
+.. _zcml_static_resources_section:
+
+Serving Static Resources Using ZCML
+------------------------------------
+
+Use of the ``static`` ZCML directive makes static files available at a name
+relative to the application root URL, e.g. ``/static``.  
+
+Note that the ``path`` provided to the ``static`` ZCML directive may be a
+fully qualified :term:`resource specification`, a package-relative path, or
+an *absolute path*.  The ``path`` with the value ``a/b/c/static`` of a
+``static`` directive in a ZCML file that resides in the "mypackage" package
+will resolve to a package-qualified resource such as
+``some_package:a/b/c/static``.
+
+Here's an example of a ``static`` ZCML directive that will serve files
+up under the ``/static`` URL from the ``/var/www/static`` directory of
+the computer which runs the :mod:`pyramid` application using an
+absolute path.
+
+.. code-block:: xml
+   :linenos:
+
+   <static
+      name="static"
+      path="/var/www/static"
+      />
+
+Here's an example of a ``static`` directive that will serve files up
+under the ``/static`` URL from the ``a/b/c/static`` directory of the
+Python package named ``some_package`` using a fully qualified
+:term:`resource specification`.
+
+.. code-block:: xml
+   :linenos:
+
+   <static
+      name="static"
+      path="some_package:a/b/c/static"
+      />
+
+Here's an example of a ``static`` directive that will serve files up
+under the ``/static`` URL from the ``static`` directory of the Python
+package in which the ``configure.zcml`` file lives using a
+package-relative path.
+
+.. code-block:: xml
+   :linenos:
+
+   <static
+      name="static"
+      path="static"
+      />
+
+Whether you use for ``path`` a fully qualified resource specification,
+an absolute path, or a package-relative path, When you place your
+static files on the filesystem in the directory represented as the
+``path`` of the directive, you will then be able to view the static
+files in this directory via a browser at URLs prefixed with the
+directive's ``name``.  For instance if the ``static`` directive's
+``name`` is ``static`` and the static directive's ``path`` is
+``/path/to/static``, ``http://localhost:6543/static/foo.js`` will
+return the file ``/path/to/static/dir/foo.js``.  The static directory
+may contain subdirectories recursively, and any subdirectories may
+hold files; these will be resolved by the static view as you would
+expect.
+
+While the ``path`` argument can be a number of different things, the
+``name`` argument of the ``static`` ZCML directive can also be one of
+a number of things: a *view name* or a *URL*.  The above examples have
+shown usage of the ``name`` argument as a view name.  When ``name`` is
+a *URL* (or any string with a slash (``/``) in it), static resources
+can be served from an external webserver.  In this mode, the ``name``
+is used as the URL prefix when generating a URL using
+:func:`pyramid.url.static_url`.
+
+For example, the ``static`` ZCML directive may be fed a ``name``
+argument which is ``http://example.com/images``:
+
+.. code-block:: xml
+   :linenos:
+
+   <static
+      name="http://example.com/images"
+      path="mypackage:images"
+      />
+
+Because the ``static`` ZCML directive is provided with a ``name`` argument
+that is the URL prefix ``http://example.com/images``, subsequent calls to
+:func:`pyramid.url.static_url` with paths that start with the ``path``
+argument passed to :meth:`pyramid.url.static_url` will generate a URL
+something like ``http://example.com/logo.png``.  The external webserver
+listening on ``example.com`` must be itself configured to respond properly to
+such a request.  The :func:`pyramid.url.static_url` API is discussed in more
+detail later in this chapter.
+
+The :meth:`pyramid.configuration.Configurator.add_static_view` method offers
+an imperative equivalent to the ``static`` ZCML directive.  Use of the
+``add_static_view`` imperative configuration method is completely equivalent
+to using ZCML for the same purpose.  See :ref:`static_resources_section` for
+more information.
+
+.. _zcml_authorization_policy:
+
+Enabling an Authorization Policy Via ZCML
+-----------------------------------------
+
+If you'd rather use :term:`ZCML` to specify an authorization policy
+than imperative configuration, modify the ZCML file loaded by your
+application (usually named ``configure.zcml``) to enable an
+authorization policy.
+
+For example, to enable a policy which compares the value of an "auth
+ticket" cookie passed in the request's environment which contains a
+reference to a single :term:`principal` against the principals present
+in any :term:`ACL` found in model data when attempting to call some
+:term:`view`, modify your ``configure.zcml`` to look something like
+this:
+
+.. code-block:: xml
+   :linenos:
+
+   <configure xmlns="http://pylonshq.com/pyramid">
+
+     <!-- views and other directives before this... -->
+
+     <authtktauthenticationpolicy
+          secret="iamsosecret"/>
+
+     <aclauthorizationpolicy/>
+
+    </configure>
+
+"Under the hood", these statements cause an instance of the class
+:class:`pyramid.authentication.AuthTktAuthenticationPolicy` to be
+injected as the :term:`authentication policy` used by this application
+and an instance of the class
+:class:`pyramid.authorization.ACLAuthorizationPolicy` to be
+injected as the :term:`authorization policy` used by this application.
+
+:mod:`pyramid` ships with a number of authorization and
+authentication policy ZCML directives that should prove useful.  See
+:ref:`authentication_policies_directives_section` and
+:ref:`authorization_policies_directives_section` for more information.
+
+.. index::
+   pair: ZCML directive; authentication policy
+
+.. _authentication_policies_directives_section:
+
+Built-In Authentication Policy ZCML Directives
+----------------------------------------------
+
+Instead of configuring an authentication policy and authorization
+policy imperatively, :mod:`pyramid` ships with a few "pre-chewed"
+authentication policy ZCML directives that you can make use of within
+your application.
+
+``authtktauthenticationpolicy``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When this directive is used, authentication information is obtained
+from an "auth ticket" cookie value, assumed to be set by a custom
+login form.
+
+An example of its usage, with all attributes fully expanded:
+
+.. code-block:: xml
+   :linenos:
+
+   <authtktauthenticationpolicy
+    secret="goshiamsosecret"
+    callback=".somemodule.somefunc"
+    cookie_name="mycookiename"
+    secure="false"
+    include_ip="false"
+    timeout="86400"
+    reissue_time="600"
+    max_age="31536000"
+    path="/"
+    http_only="false"
+    />
+
+See :ref:`authtktauthenticationpolicy_directive` for details about
+this directive.
+
+``remoteuserauthenticationpolicy``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When this directive is used, authentication information is obtained
+from a ``REMOTE_USER`` key in the WSGI environment, assumed to
+be set by a WSGI server or an upstream middleware component.
+
+An example of its usage, with all attributes fully expanded:
+
+.. code-block:: xml
+   :linenos:
+
+   <remoteuserauthenticationpolicy
+    environ_key="REMOTE_USER"
+    callback=".somemodule.somefunc"
+    />
+
+See :ref:`remoteuserauthenticationpolicy_directive` for detailed
+information.
+
+``repozewho1authenticationpolicy``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When this directive is used, authentication information is obtained
+from a ``repoze.who.identity`` key in the WSGI environment, assumed to
+be set by :term:`repoze.who` middleware.
+
+An example of its usage, with all attributes fully expanded:
+
+.. code-block:: xml
+   :linenos:
+
+   <repozewho1authenticationpolicy
+    identifier_name="auth_tkt"
+    callback=".somemodule.somefunc"
+    />
+
+See :ref:`repozewho1authenticationpolicy_directive` for detailed
+information.
+
+.. index::
+   pair: ZCML directive; authorization policy
+
+.. _authorization_policies_directives_section:
+
+Built-In Authorization Policy ZCML Directives
+---------------------------------------------
+
+``aclauthorizationpolicy``
+
+When this directive is used, authorization information is obtained
+from :term:`ACL` objects attached to model instances.
+
+An example of its usage, with all attributes fully expanded:
+
+.. code-block:: xml
+   :linenos:
+
+   <aclauthorizationpolicy/>
+
+In other words, it has no configuration attributes; its existence in a
+``configure.zcml`` file enables it.
+
+See :ref:`aclauthorizationpolicy_directive` for detailed information.
+
+.. Todo
+.. ----
+
+.. - ``narr/project.rst`` chapter describes execution of a paster template that
+..   is based on XML.
+
+.. - Skipped views chapter.
+
+.. - i18n chapter still has topics for ZCML
+
+.. - events chapter still has topics for ZCML
+
+.. - hooks chapter still has topics for ZCML
+
+.. - resources chapter still has topics for ZCML
