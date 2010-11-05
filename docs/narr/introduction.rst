@@ -99,16 +99,13 @@ Openness
    single: Agendaless Consulting
    single: repoze namespace package
 
-What Is Pylons?
----------------
+What Is The Pylons Project?
+---------------------------
 
-:mod:`pyramid` is a member of the collection of software published
-under the :term:`Pylons` "brand".  :term:`Pylons` software is written
-by a loose-knit community of contributors.  The `Pylons website
-<http://pylonshq.com>`_ describes the Pylons brand in more detail.
-
-See `http://docs.pylonshq.com <http://docs.pylonshq.com>`_ for an overview of
-the Pyramid project and how it relates to Pylons.
+:mod:`pyramid` is a member of the collection of software published under the
+Pylons Project.  :Pylons software is written by a loose-knit community of
+contributors.  The `Pylons Project website <http://docs.pylonshq.com>`_
+includes details about how :mod:`pyramid` relates to the Pylons Project.
 
 .. index::
    single: pyramid and other frameworks
@@ -120,8 +117,8 @@ the Pyramid project and how it relates to Pylons.
 :mod:`pyramid` and Other Web Frameworks
 ------------------------------------------
 
-Until the end of 2010, :mod:`pyramid` was known as :mod:`repoze.bfg`;
-it was merged into the Pylons project at the end of 2010.
+Until the end of 2010, :mod:`pyramid` was known as :mod:`repoze.bfg`; it was
+merged into the Pylons project as :mod:`pyramid` in November of that year.
 
 :mod:`pyramid` was inspired by :term:`Zope`, :term:`Pylons` (version
 1.0) and :term:`Django`.  As a result, :mod:`pyramid` borrows several

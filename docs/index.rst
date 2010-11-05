@@ -5,9 +5,14 @@ The pyramid Web Application Development Framework
 =================================================
 
 :mod:`pyramid` is a small, fast, down-to-earth Python web application
-development framework.  It is developed as part of the `Pylons
-<http://pylonshq.com>`_ project.  It is licensed under a `BSD-like
-license <http://repoze.org/license.html>`_.
+development framework.  It is developed as part of the `Pylons Project
+<http://docs.pylonshq.com/>`_.  It is licensed under a `BSD-like license
+<http://repoze.org/license.html>`_.
+
+.. note::
+
+   Pyramid is the latest iteration of the web framework previously known as
+   :mod:`repoze.bfg`.
 
 Front Matter
 ============
@@ -161,8 +166,8 @@ commenting, and file uploads.  See the `KARL site
 Support and Development
 =======================
 
-The `Pyramid web site <http://pylonshq.com/pyramid>`_ is the main
-online source of :mod:`pyramid` support and development information.
+The `Pylons Project web site <http://docs.pylonshq.com/>`_ is the main online
+source of :mod:`pyramid` support and development information.
 
 To report bugs, use the `issue tracker
 <http://github.com/Pylons/pyramid/issues>`_.
