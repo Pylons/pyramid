@@ -202,7 +202,6 @@ class Configurator(object):
 
     manager = manager # for testing injection
     venusian = venusian # for testing injection
-    squiggly_route_re = re.compile(r'(/{[a-zA-Z]\w*})') # for add_route
 
     def __init__(self,
                  registry=None,
@@ -1525,23 +1524,6 @@ class Configurator(object):
             pattern = path
         if pattern is None:
             raise ConfigurationError('"pattern" argument may not be None')
-
-        # Support the ``/:colon`` syntax supported by BFG but also
-        # support the ``/{squiggly}`` segment syntax familiar to
-        # Pylons folks by transforming it (internally) into
-        # ``/:colon`` syntax.
-        
-        parts = self.squiggly_route_re.split(pattern)
-        npattern = []
-
-        for part in parts:
-            match = self.squiggly_route_re.match(part)
-            if match:
-                npattern.append('/:%s' % match.group()[2:-1])
-            else:
-                npattern.append(part)
-
-        pattern = ''.join(npattern)
         
         return mapper.connect(name, pattern, factory, predicates=predicates,
                               pregenerator=pregenerator)

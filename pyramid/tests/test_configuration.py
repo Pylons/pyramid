@@ -1784,7 +1784,7 @@ class ConfiguratorTests(unittest.TestCase):
         def dummy_add_view(**kw):
             views.append(kw)
         config.add_view = dummy_add_view
-        config.add_handler('name', '/{action}', DummyHandler)
+        config.add_handler('name', '/:action', DummyHandler)
         self._assertRoute(config, 'name', '/:action', 0)
         self.assertEqual(len(views), 2)
 
@@ -1820,7 +1820,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_view = dummy_add_view
         class MyView(DummyHandler):
             __autoexpose__ = None
-        config.add_handler('name', '/{action}', MyView)
+        config.add_handler('name', '/:action', MyView)
         self._assertRoute(config, 'name', '/:action', 0)
         self.assertEqual(len(views), 0)
 
@@ -1856,7 +1856,7 @@ class ConfiguratorTests(unittest.TestCase):
             def action(self): # pragma: no cover
                 return 'response'
             action.__exposed__ = [{'custom_predicates':(1,)}]
-        config.add_handler('name', '/{action}', MyView)
+        config.add_handler('name', '/:action', MyView)
         self._assertRoute(config, 'name', '/:action', 0)
         self.assertEqual(len(views), 1)
         view = views[0]
@@ -1876,7 +1876,7 @@ class ConfiguratorTests(unittest.TestCase):
             def action(self): # pragma: no cover
                 return 'response'
             action.__exposed__ = [{'name':'action3000'}]
-        config.add_handler('name', '/{action}', MyView)
+        config.add_handler('name', '/:action', MyView)
         self._assertRoute(config, 'name', '/:action', 0)
         self.assertEqual(len(views), 1)
         view = views[0]
@@ -1902,7 +1902,7 @@ class ConfiguratorTests(unittest.TestCase):
             def action(self): # pragma: no cover
                 return 'response'
             action.__exposed__ = [{'name':'^action3000$'}]
-        config.add_handler('name', '/{action}', MyView)
+        config.add_handler('name', '/:action', MyView)
         self._assertRoute(config, 'name', '/:action', 0)
         self.assertEqual(len(views), 1)
         view = views[0]
@@ -2283,11 +2283,6 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         route = config.add_route('name', 'pattern', pregenerator='123')
         self.assertEqual(route.pregenerator, '123')
-
-    def test_add_route_squiggly_syntax(self):
-        config = self._makeOne()
-        config.add_route('name', '/abc/{def}/:ghi/jkl/{mno}{/:p')
-        self._assertRoute(config, 'name', '/abc/:def/:ghi/jkl/:mno{/:p', 0)
 
     def test__override_not_yet_registered(self):
         from pyramid.interfaces import IPackageOverrides

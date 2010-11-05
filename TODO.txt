@@ -95,8 +95,6 @@
 
 - Move static dir from pkg/templates/ to /pkg/ in pyramid_* paster templates.
 
-- Remove squiggly routing syntax.
-
 - Use a IBeforeRender subscriber to add Pylons-paster-template renderer
   globals.
 
