@@ -11,6 +11,99 @@ describe future steps which will be taken to improve it; in some cases
 we just file the challenge as "noted", as obviously you can't please
 everyone all of the time.
 
+Pyramid Has Zope Things In It, So It's Too Complex
+--------------------------------------------------
+
+On occasion, someone will feel compelled to post a mailing list message that
+read something like this::
+
+   had a quick look at pyramid ... too complex to me and not really
+   understand for which benefits.. I feel should consider whether it's time
+   for me to step back to django .. I always hated zope (useless ?)
+   complexity and I love simple way of thinking
+
+(Paraphrased from a real email, actually.)
+
+Let's take this criticism point-by point.
+
+Too Complex
++++++++++++
+
+- If you can understand this hello world program, you can use Pyramid::
+
+   from paste.httpserver import serve
+   from pyramid.configuration import Configurator
+   from pyramid.response import Response
+
+   def hello_world(request):
+       return Response('Hello world!')
+
+   if __name__ == '__main__':
+       config = Configurator()
+       config.begin()
+       config.add_view(hello_world)
+       config.end()
+       app = config.make_wsgi_app()
+       serve(app)
+
+- Pyramid is 5,000 lines of runtime code.  Pylons 1.0 has about 3,000 lines
+  of runtime code.  Django has about 60,000 lines of runtime code.  You'd
+  practically need to bend the laws of space and time for Django to be
+  simpler than Pyramid.
+
+- It has 600 or more pages of documentation (printed), covering topics from
+  the very basic to the most advanced.  *Nothing* is left undocumented, quite
+  literally.
+
+- It has an *awesome*, very helpful community.  Visit the #repoze and/or
+  #pylons IRC channels on freenode.net and see.
+
+Hate Zope
++++++++++
+
+I'm sorry you feel that way.  The Zope brand has certainly taken its share of
+lumps over the years, and has a reputation for being insular and mysterious.
+But the word "Zope" is literally quite meaningless without qualification.
+What *part* of Zope do you hate?  "Zope" is a brand, not a technology.
+
+If it's Zope2-the-web-framework, Pyramid is not that.  The primary designers
+and developers of Pyramid, if anyone, should know.  We wrote Pyramid's
+predecessor (:mod:`repoze.bfg`), in part, because *we* knew that Zope 2 had
+usability issues and limitations.  :mod:`repoze.bfg` (and now :mod:`pyramid`)
+was written to address these issues.
+
+If it's Zope3-the-web-framework, Pyramid is *definitely* not that.  Making
+use of lots of Zope 3 technologies is territory already staked out by the
+:term:`Grok` project.  Save for the obvious fact that they're both web
+frameworks, :mod:`Pyramid` is very, very different than Grok.  Grok exposes
+lots of Zope technologies to end users.  On the other hand, if you need to
+understand a Zope-only concept while using Pyramid, then we've failed on some
+very basic axis.
+
+If it's just the word Zope: it's, charitably, only guilt by association.  You
+need to understand that just because a piece of software internally uses some
+package named ``zope.foo``, it doesn't turn the piece of software that uses
+it into "Zope".  There is a lot of *great* software written that has the word
+Zope in its name.  Zope is not some sort of monolithic thing, and a lot of
+its software is usable externally.
+
+Zope Is Useless
++++++++++++++++
+
+It's not really the job of this document to defend Zope.  But Zope has been
+around for over 10 years and has an incredibly large, active community.  If
+you don't believe this, http://taichino.appspot.com/pypi_ranking/authors is
+an eye-opening reality check.
+
+Love Simplicity
++++++++++++++++
+
+Years of effort have gone into honing this package and its documentation to
+make it as simple as humanly possible for developers to use.  Everything is a
+tradeoff, of course, and people have their own ideas about what "simple" is.
+You may have a style difference if you believe Pyramid is complex.  Its
+developers obviously disagree.
+
 Pyramid Uses A Zope Component Architecture ("ZCA") Registry
 -----------------------------------------------------------
 
