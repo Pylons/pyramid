@@ -10,41 +10,49 @@ from paste.util.template import paste_script_template_renderer
 from pyramid.scripting import get_root
 
 class StarterProjectTemplate(Template):
+    egg_plugins = [ 'Pyramid' ]
     _template_dir = 'paster_templates/starter'
     summary = 'pyramid starter project'
     template_renderer = staticmethod(paste_script_template_renderer)
 
 class StarterZCMLProjectTemplate(Template):
+    egg_plugins = [ 'Pyramid' ]
     _template_dir = 'paster_templates/starter_zcml'
     summary = 'pyramid starter project (ZCML)'
     template_renderer = staticmethod(paste_script_template_renderer)
 
 class ZODBProjectTemplate(Template):
+    egg_plugins = [ 'Pyramid' ]
     _template_dir = 'paster_templates/zodb'
     summary = 'pyramid ZODB starter project'
     template_renderer = staticmethod(paste_script_template_renderer)
 
 class RoutesAlchemyProjectTemplate(Template):
+    egg_plugins = [ 'Pyramid' ]
     _template_dir = 'paster_templates/routesalchemy'
     summary = 'pyramid SQLAlchemy project using Routes (no traversal)'
     template_renderer = staticmethod(paste_script_template_renderer)
 
 class AlchemyProjectTemplate(Template):
+    egg_plugins = [ 'Pyramid' ]
     _template_dir = 'paster_templates/alchemy'
     summary = 'pyramid SQLAlchemy project using traversal'
     template_renderer = staticmethod(paste_script_template_renderer)
 
 class PylonsBasicProjectTemplate(Template):
+    egg_plugins = [ 'Pyramid' ]
     _template_dir = 'paster_templates/pylons_basic'
     summary = 'Pylons basic project'
     template_renderer = staticmethod(paste_script_template_renderer)
 
 class PylonsMinimalProjectTemplate(Template):
+    egg_plugins = [ 'Pyramid' ]
     _template_dir = 'paster_templates/pylons_minimal'
     summary = 'Pylons minimal project'
     template_renderer = staticmethod(paste_script_template_renderer)
 
 class PylonsSQLAlchemyProjectTemplate(Template):
+    egg_plugins = [ 'Pyramid' ]
     _template_dir = 'paster_templates/pylons_sqla'
     summary = 'Pylons SQLAlchemy project'
     template_renderer = staticmethod(paste_script_template_renderer)
