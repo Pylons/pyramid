@@ -13,13 +13,6 @@ Features (delta from BFG 1.3.X)
 
 - Direct built-in support for the Mako templating language.
 
-- A "squiggly" (Pylons-style) route syntax is now supported by
-  ``pyramid.configuration.Configurator.add_route`` (and thus, by the
-  ``route`` ZCML directive too).  For example, the following route
-  patterns are equivalent: ``{foo}/{bar}`` and ``:foo/:bar``.  This is
-  purely a syntactic affordance to make route patterns more tolerable
-  for people coming from Pylons.
-
 - A new configurator method exists: ``add_handler``.  This method adds
   a Pylons-style "view handler" (such a thing used to be called a
   "controller" in Pylons 1.0).
@@ -30,9 +23,6 @@ Features (delta from BFG 1.3.X)
 
 - Using ``request.session`` now returns a (dictionary-like) session
   object if a session factory has been configured.
-
-- New module: ``pyramid.personality.pylons``: contains Pylons-specific
-  features.
 
 - The request now has a new attribute: ``tmpl_context`` for benefit of
   Pylons users.
@@ -132,10 +122,6 @@ Backwards Incompatibilities (with BFG 1.3.X)
   was removed.
 
 - The deprecated API named ``pyramid.view.NotFound`` was removed.
-
-- The literal pattern ``{<anything>}`` is no longer permitted in route
-  patterns (due to the addition of squiggly route pattern syntax
-  support).
 
 - The ``bfgshell`` paster command is now named ``pshell``.
 
