@@ -13,12 +13,6 @@ session.data_dir = %(here)s/data/sessions/data
 session.lock_dir = %(here)s/data/sessions/lock
 session.key = {{project}}
 session.secret = your_app_secret_string
-cache.regions = default_term, second, short_term, long_term
-cache.type = memory
-cache.second.expire = 1
-cache.short_term.expire = 60
-cache.default_term.expire = 300
-cache.long_term.expire = 3600
 
 [pipeline:main]
 pipeline =
