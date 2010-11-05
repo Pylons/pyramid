@@ -43,6 +43,7 @@ setup(name='{{project}}',
       entry_points = """\
       [paste.app_factory]
       main = {{package}}:main
-      """
+      """,
+      paster_plugins=['pyramid'],
       )
 
