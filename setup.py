@@ -22,7 +22,7 @@ from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
 try:
-    README = open(os.path.join(here, 'README.txt')).read()
+    README = open(os.path.join(here, 'README.rst')).read()
     CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 except IOError:
     README = CHANGES = ''
