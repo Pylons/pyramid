@@ -20,7 +20,6 @@ documentation is organized alphabetically by module name.
    api/interfaces
    api/location
    api/paster
-   api/personality
    api/renderers
    api/request
    api/response
