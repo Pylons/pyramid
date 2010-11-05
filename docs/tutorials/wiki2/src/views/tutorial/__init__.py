@@ -16,7 +16,7 @@ def app(global_config, **settings):
     initialize_sql(db_string, asbool(db_echo))
     config = Configurator(settings=settings)
     config.begin()
-    config.add_static_view('static', 'templates/static')
+    config.add_static_view('static', 'tutorial:static')
     config.add_route('home', '/', view='tutorial.views.view_wiki')
     config.add_route('view_page', '/:pagename',
                      view='tutorial.views.view_page',

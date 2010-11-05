@@ -95,7 +95,7 @@ following:
    static resources for us, in this case, at
    ``http://localhost:6543/static/`` and below.  The ``path`` element
    of this tag is a relative directory name, so it finds the resources
-   it should serve within the ``templates/static`` directory inside
+   it should serve within the ``static`` directory inside
    the ``tutorial`` package.
 
 Content Models with ``models.py``

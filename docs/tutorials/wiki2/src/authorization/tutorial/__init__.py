@@ -26,7 +26,7 @@ def app(global_config, **settings):
                           authentication_policy=authn_policy,
                           authorization_policy=authz_policy)
     config.begin()
-    config.add_static_view('static', 'templates/static')
+    config.add_static_view('static', 'tutorial:static')
     config.add_route('view_wiki', '/', view='tutorial.views.view_wiki')
     config.add_route('login', '/login',
                      view='tutorial.login.login',

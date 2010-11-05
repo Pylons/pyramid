@@ -11,7 +11,7 @@
 
   <static
      name="static"
-     path="templates/static"
+     path="static"
      />
 
 </configure>

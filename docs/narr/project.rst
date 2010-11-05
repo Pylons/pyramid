@@ -437,18 +437,18 @@ share a similar structure.
 The ``MyProject`` project we've generated has the following directory
 structure::
 
-  MyProject
+  MyProject/
   |-- CHANGES.txt
   |-- development.ini
   |-- myproject
   |   |-- __init__.py
   |   |-- models.py
+  |   |-- static
+  |   |   |-- favicon.ico
+  |   |   |-- logo.png
+  |   |   `-- pylons.css
   |   |-- templates
-  |   |   |-- mytemplate.pt
-  |   |   `-- static
-  |   |       |-- favicon.ico
-  |   |       |-- logo.png
-  |   |       `-- pylons.css
+  |   |   `-- mytemplate.pt
   |   |-- tests.py
   |   `-- views.py
   |-- README.txt
@@ -668,15 +668,14 @@ tarball to other people who want to use your application.
 
 .. warning::
 
-   By default, ``setup.py sdist`` does not place non-Python-source
-   files in generated tarballs.  This means, in this case, that the
-   ``templates/mytemplate.pt`` file and the files in the
-   ``templates/static`` directory are not packaged in the tarball.  To
-   allow this to happen, check all the files that you'd like to be
-   distributed along with your application's Python files into a
-   version control system such as Subversion.  After you do this, when
-   you rerun ``setup.py sdist``, all files checked into the version
-   control system will be included in the tarball.
+   By default, ``setup.py sdist`` does not place non-Python-source files in
+   generated tarballs.  This means, in this case, that the
+   ``templates/mytemplate.pt`` file and the files in the ``static`` directory
+   are not packaged in the tarball.  To allow this to happen, check all the
+   files that you'd like to be distributed along with your application's
+   Python files into a version control system such as Subversion.  After you
+   do this, when you rerun ``setup.py sdist``, all files checked into the
+   version control system will be included in the tarball.
 
 ``setup.cfg``
 ~~~~~~~~~~~~~
@@ -764,8 +763,8 @@ also informs Python that the directory which contains it is a *package*.
    it actually points to is a :term:`Chameleon` ZPT template file.
 
    Line 15 registers a static view, which will serve up the files from the
-   ``mypackage:templates/static`` :term:`resource specification` (the
-   ``templates/static`` directory of the ``mypackage`` package).
+   ``mypackage:static`` :term:`resource specification` (the ``static``
+   directory of the ``mypackage`` package).
 
    Line 17 returns a :term:`WSGI` application to the caller of the function
    (Paste).
@@ -844,6 +843,15 @@ make any assumption about which sort of datastore you'll want to use,
 so the sample application uses an instance of
 :class:`myproject.models.MyModel` to represent the root.
 
+``static``
+~~~~~~~~~~~~~~~~~~~~
+
+This directory contains static resources which support the
+``mytemplate.pt`` template.  It includes CSS and images.
+
+.. index::
+   single: tests.py
+
 ``templates/mytemplate.pt``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -856,15 +864,6 @@ information about renderers.
 Templates are accessed and used by view configurations and sometimes
 by view functions themselves.  See :ref:`templates_used_directly` and
 :ref:`templates_used_as_renderers`.
-
-``templates/static``
-~~~~~~~~~~~~~~~~~~~~
-
-This directory contains static resources which support the
-``mytemplate.pt`` template.  It includes CSS and images.
-
-.. index::
-   single: tests.py
 
 ``tests.py``
 ~~~~~~~~~~~~

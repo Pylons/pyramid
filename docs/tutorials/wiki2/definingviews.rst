@@ -248,12 +248,11 @@ the below:
 Static Resources
 ----------------
 
-Our templates name a single static resource named ``style.css``.  We
-need to create this and place it in a file named ``style.css`` within
-our package's ``templates/static`` directory.  This file is a little
-too long to replicate within the body of this guide, however it is
-available `online
-<http://github.com/Pylons/pyramid/blob/master/docs/tutorials/wiki2/src/views/tutorial/templates/static/style.css>`_.
+Our templates name a single static resource named ``style.css``.  We need to
+create this and place it in a file named ``style.css`` within our package's
+``static`` directory.  This file is a little too long to replicate within the
+body of this guide, however it is available `online
+<http://github.com/Pylons/pyramid/blob/master/docs/tutorials/wiki2/src/views/tutorial/static/style.css>`_.
 
 
 This CSS file will be accessed via

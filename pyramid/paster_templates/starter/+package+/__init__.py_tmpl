@@ -12,7 +12,7 @@ def app(global_config, **settings):
     config.add_view('{{package}}.views.my_view',
                     context='{{package}}.models.MyModel',
                     renderer='{{package}}:templates/mytemplate.pt')
-    config.add_static_view('static', '{{package}}:templates/static')
+    config.add_static_view('static', '{{package}}:static')
     config.end()
     return config.make_wsgi_app()
 

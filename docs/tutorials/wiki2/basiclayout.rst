@@ -57,10 +57,10 @@ entry point happens to be the ``app`` function within the file named
 
 #. *Line 19*.  We call
    :meth:`pyramid.configuration.Configurator.add_static_view` with the
-   arguments ``static`` (the name), and ``tutorial:templates/static``.  This
+   arguments ``static`` (the name), and ``tutorial:static`` (the path).  This
    registers a static resource view which will match any URL that starts with
    ``/static/``.  This will serve up static resources for us from within the
-   ``templates/static`` directory of our ``tutorial`` package, in this case,
+   ``static`` directory of our ``tutorial`` package, in this case,
    via ``http://localhost:6543/static/`` and below.  With this declaration,
    we're saying that any URL that starts with ``/static`` should go to the
    static view; any remainder of its path (e.g. the ``/foo`` in
