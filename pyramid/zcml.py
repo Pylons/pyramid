@@ -288,8 +288,6 @@ def route(_context,
 
     view_permission = view_permission or permission
     view_renderer = view_renderer or renderer
-    if view_renderer and '.' in view_renderer:
-        view_renderer = path_spec(_context, view_renderer)
 
     if pattern is None:
         pattern = path
@@ -368,9 +366,6 @@ def notfound(_context,
              renderer=None,
              wrapper=None):
 
-    if renderer and '.' in renderer:
-        renderer = path_spec(_context, renderer)
-
     def register():
         reg = get_current_registry()
         config = Configurator(reg, package=_context.package)
@@ -390,9 +385,6 @@ def forbidden(_context,
              attr=None,
              renderer=None,
              wrapper=None):
-
-    if renderer and '.' in renderer:
-        renderer = path_spec(_context, renderer)
 
     def register():
         reg = get_current_registry()
@@ -565,7 +557,6 @@ def static(_context, name, path, cache_max_age=3600,
            permission='__no_permission_required__'):
     """ Handle ``static`` ZCML directives
     """
-    path = path_spec(_context, path)
     reg = get_current_registry()
     config = Configurator(reg, package=_context.package)
 
