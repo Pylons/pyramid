@@ -1232,9 +1232,6 @@ class DummyContext:
     def path(self, path):
         return path
 
-    def resolve(self, dottedname):
-        return self.resolved
-
 class Dummy:
     pass
 
