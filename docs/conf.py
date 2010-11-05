@@ -37,10 +37,6 @@ for item in os.listdir(parent):
     if item.endswith('.egg'):
         sys.path.append(os.path.join(parent, item))
 
-import pkginfo
-
-pkg_info = pkginfo.Develop(os.path.join(os.path.dirname(__file__),'..'))
-
 # General configuration
 # ---------------------
 
@@ -66,7 +62,7 @@ copyright = '%s, Agendaless Consulting' % datetime.datetime.now().year
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = pkg_info.version
+version = '0.0'
 # The full version, including alpha/beta/rc tags.
 release = version
 
