@@ -238,14 +238,13 @@ Our templates name a single static resource named ``style.css``.  We need to
 create this and place it in a file named ``style.css`` within our package's
 ``static`` directory.  This file is a little too long to replicate within the
 body of this guide, however it is available `online
-<http://github.com/Pylons/pyramid/blob/master/docs/tutorials/wiki/src/views/tutorial/static/default.css>`_.
+<http://github.com/Pylons/pyramid/blob/master/docs/tutorials/wiki/src/views/tutorial/static/style.css>`_.
 
 This CSS file will be accessed via
-e.g. ``http://localhost:6543/static/style.css`` by virtue of the
-``static`` directive we've defined in the ``configure.zcml`` file.
-Any number and type of static resources can be placed in this
-directory (or subdirectories) and are just referred to by URL within
-templates.
+e.g. ``http://localhost:6543/static/style.css`` by virtue of the ``static``
+directive we've defined in the ``configure.zcml`` file.  Any number and type
+of static resources can be placed in this directory (or subdirectories) and
+are just referred to by URL within templates.
 
 Testing the Views
 =================
