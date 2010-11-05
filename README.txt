@@ -5,13 +5,15 @@ Pyramid
 development framework. It makes real-world web application development
 and deployment more fun, more predictable, and more productive.
 
-``pyramid`` is a `Pylons <http://pylonshq.com>`_ project, and
+``pyramid`` is a `Pylons <http://docs.pylonshq.com/>`_ project, and
 underlies the newest web frameworks produced by the Pylons community.
+
+``pyramid`` was previously known as `repoze.bfg <http://bfg.repoze.org>`_.
 
 Support and Documentation
 -------------------------
 
-See the `Pyramid website <http://pylonshq.com/pyramid>`_ to view
+See the `Pylons Project website <http://docs.pylonshq.com/>`_ to view
 documentation, report bugs, and obtain support.
 
 License
