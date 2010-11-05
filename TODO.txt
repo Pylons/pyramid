@@ -91,7 +91,4 @@
 
 - repoze.bfg.viewgroup in CMF tutorial
 
-- Use a IBeforeRender subscriber to add Pylons-paster-template renderer
-  globals.
-
 - translationdir ZCML directive use of ``path_spec`` should maybe die.
