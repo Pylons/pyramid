@@ -1,7 +1,7 @@
-Next release
-============
+1.0a1 (2010-11-05)
+==================
 
-Features (delta from BFG 1.3.X)
+Features (delta from BFG 1.3)
 -------------------------------
 
 - Mako templating renderer supports resource specification format for
@@ -98,8 +98,8 @@ Documentation (delta from BFG 1.3)
 - The SQL Wiki tutorial was updated to take into account changes to the
   ``pyramid_routesalchemy`` paster template.
 
-Backwards Incompatibilities (with BFG 1.3.X)
---------------------------------------------
+Backwards Incompatibilities (with BFG 1.3)
+------------------------------------------
 
 - There is no longer an ``IDebugLogger`` registered as a named utility
   with the name ``repoze.bfg.debug``.
