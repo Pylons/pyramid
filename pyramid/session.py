@@ -244,8 +244,8 @@ def signed_deserialize(serialized, secret, hmac=hmac):
 
     sig = hmac.new(secret, pickled, sha1).hexdigest()
 
-    # Avoid timing attacks (note that this is cadged from Pylons and I
-    # have no idea what it means)
+    # Avoid timing attacks (see
+    # http://seb.dbzteam.org/crypto/python-oauth-timing-hmac.pdf)
 
     if len(sig) != len(input_sig):
         raise ValueError('Wrong signature length')
