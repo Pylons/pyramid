@@ -212,7 +212,7 @@ response object returned by
 .. code-block:: python
    :linenos:
 
-   from pyramid.renderers.render_to_response
+   from pyramid.renderers import render_to_response
 
    def sample_view(request):
        response = render_to_response('templates/foo.pt',
@@ -380,7 +380,7 @@ within the view before returning the dictionary.  See
 :ref:`response_request_attrs` for more information.
 
 The same set of system values are provided to templates rendered via a
-rendere view configuration as those provided to templates rendered
+renderer view configuration as those provided to templates rendered
 imperatively.  See :ref:`renderer_system_values`.
 
 

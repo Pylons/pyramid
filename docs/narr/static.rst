@@ -120,7 +120,7 @@ imperative configuration for the same purpose.
 Generating Static Resource URLs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When a :meth:`pyramid.configuration.Configurator.add_static_view`` method is
+When a :meth:`pyramid.configuration.Configurator.add_static_view` method is
 used to register a static resource directory, a special helper API named
 :func:`pyramid.static_url` can be used to generate the appropriate URL for a
 package resource that lives in one of the directories named by the static

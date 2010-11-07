@@ -228,8 +228,9 @@ You don't need to always use :class:`pyramid.response.Response` to represent a
 response.  :mod:`pyramid` provides a range of different "exception" classes
 which can act as response objects too.  For example, an instance of the class
 :class:`pyramid.httpexceptions.HTTPFound` is also a valid response object (see
-:ref:`http_redirect`).  A view can actually any object that has the following
-attributes (these attributes form the notional "Pyramid Response interface"):
+:ref:`http_redirect`).  A view can actually return any object that has the
+following attributes (these attributes form the notional "Pyramid Response
+interface"):
 
 status
   The HTTP status code (including the name) for the response as a string.
@@ -695,11 +696,11 @@ For example, to add a renderer which renders views which have a
 
    config.add_renderer('.jinja2', 'mypackage.MyJinja2Renderer')
 
-   The first argument is the renderer name.
+The first argument is the renderer name.
 
-   The second argument is a reference to an implementation of a
-   :term:`renderer factory` or a :term:`dotted Python name` referring
-   to such an object.
+The second argument is a reference to an implementation of a
+:term:`renderer factory` or a :term:`dotted Python name` referring
+to such an object.
 
 .. _adding_a_renderer:
 
@@ -1068,7 +1069,7 @@ decode already-decoded (``unicode``) values obtained from
        firstname = request.params['firstname'].decode('utf-8')
        lastname = request.params['lastname'].decode('utf-8')
 
-For implicit decoding to work reliably, youshould ensure that every form you
+For implicit decoding to work reliably, you should ensure that every form you
 render that posts to a :mod:`pyramid` view is rendered via a response that has
 a ``;charset=UTF-8`` in its ``Content-Type`` header; or, as in the form above,
 with a ``meta http-equiv`` tag that implies that the charset is UTF-8 within
