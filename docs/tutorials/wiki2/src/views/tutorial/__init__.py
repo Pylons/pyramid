@@ -23,7 +23,7 @@ def app(global_config, **settings):
                      view_renderer='tutorial:templates/view.pt')
     config.add_route('add_page', '/add_page/:pagename',
                      view='tutorial.views.add_page',
-                     view_renderer='tutorial:templates/view.pt')
+                     view_renderer='tutorial:templates/edit.pt')
     config.add_route('edit_page', '/:pagename/edit_page',
                      view='tutorial.views.edit_page',
                      view_renderer='tutorial:templates/edit.pt')
