@@ -17,12 +17,12 @@ from pyramid.traversal import quote_path_segment
 def route_url(route_name, request, *elements, **kw):
     """Generates a fully qualified URL for a named :mod:`pyramid`
     :term:`route configuration`.
-    
+
     Use the route's ``name`` as the first positional argument.  Use a
     request object as the second positional argument.  Additional
     positional arguments are appended to the URL as path segments
     after it is generated.
-    
+
     Use keyword arguments to supply values which match any dynamic
     path elements in the route definition.  Raises a :exc:`KeyError`
     exception if the URL cannot be generated for any reason (not
@@ -34,9 +34,9 @@ def route_url(route_name, request, *elements, **kw):
         route_url('foobar', request, foo='1')          => <KeyError exception>
         route_url('foobar', request, foo='1', bar='2') => <KeyError exception>
         route_url('foobar', request, foo='1', bar='2',
-                   'traverse=('a','b'))                => http://e.com/1/2/a/b
+                  traverse=('a','b'))                  => http://e.com/1/2/a/b
         route_url('foobar', request, foo='1', bar='2',
-                   'traverse=('/a/b'))                 => http://e.com/1/2/a/b
+                  traverse='/a/b')                     => http://e.com/1/2/a/b
 
     Values replacing ``:segment`` arguments can be passed as strings
     or Unicode objects.  They will be encoded to UTF-8 and URL-quoted
