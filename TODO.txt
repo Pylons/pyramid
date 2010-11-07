@@ -46,8 +46,6 @@
 
 - Ability to use configurator as a context manager.
 
-- Switch tutorials and templates to non-ZCML.
-
 - Provide a response_cookies attribute on the request for rendered
   responses that can be used as input to response.set_cookie.
 
@@ -94,5 +92,4 @@
 - translationdir ZCML directive use of ``path_spec`` should maybe die.
 
 - Make settings an attribute of.. registry?  request?  Ugh.
-
 
