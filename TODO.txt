@@ -92,3 +92,7 @@
 - repoze.bfg.viewgroup in CMF tutorial
 
 - translationdir ZCML directive use of ``path_spec`` should maybe die.
+
+- Make settings an attribute of.. registry?  request?  Ugh.
+
+
