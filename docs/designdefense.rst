@@ -14,8 +14,8 @@ everyone all of the time.
 Pyramid Has Zope Things In It, So It's Too Complex
 --------------------------------------------------
 
-On occasion, someone will feel compelled to post a mailing list message that
-read something like this::
+On occasion, someone will feel compelled to post a mailing
+list message that reads something like this::
 
    had a quick look at pyramid ... too complex to me and not really
    understand for which benefits.. I feel should consider whether it's time
