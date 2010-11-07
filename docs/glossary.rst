@@ -240,11 +240,11 @@ Glossary
 
    authorization
      The act of determining whether a user can perform a specific
-     action.  In bfg terms, this means determining whether, for a given
-     context, any :term:`principal` (or principals) associated with the
-     request have the requisite :term:`permission` to allow the request
-     to continue.  Authorization in :mod:`pyramid` is performed via
-     its :term:`authorization policy`.
+     action.  In pyramid terms, this means determining whether, for a
+     given context, any :term:`principal` (or principals) associated
+     with the request have the requisite :term:`permission` to allow
+     the request to continue.  Authorization in :mod:`pyramid` is
+     performed via its :term:`authorization policy`.
 
    principal
      A *principal* is a string or unicode object representing a userid
