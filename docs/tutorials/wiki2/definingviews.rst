@@ -297,7 +297,7 @@ something like so:
 
 .. literalinclude:: src/views/tutorial/__init__.py
    :linenos:
-   :language: xml
+   :language: python
 
 The WSGI Pipeline
 -----------------
