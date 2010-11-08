@@ -70,7 +70,7 @@ class Request(WebobRequest):
         response object returned by :term:`view` code is invalid.
 
         All response callbacks are called *after* the
-        :class:`pyramid.interfaces.INewResponse` event is sent.
+        :class:`pyramid.events.NewResponse` event is sent.
 
         Errors raised by callbacks are not handled specially.  They
         will be propagated to the caller of the :mod:`pyramid`

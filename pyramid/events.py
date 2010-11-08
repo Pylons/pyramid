@@ -17,10 +17,10 @@ class subscriber(object):
 
     .. code-block:: python
     
-       from pyramid.interfaces import INewRequest
+       from pyramid.events import NewRequest
        from pyramid.events import subscriber
 
-       @subscriber(INewRequest)
+       @subscriber(NewRequest)
        def mysubscriber(event):
            event.request.foo = 1
 
@@ -28,10 +28,10 @@ class subscriber(object):
         
     .. code-block:: python
     
-       from pyramid.interfaces import INewRequest
+       from pyramid.events import NewRequest, NewResponse
        from pyramid.events import subscriber
 
-       @subscriber(INewRequest, INewResponse)
+       @subscriber(NewRequest, NewResponse)
        def mysubscriber(event):
            print event
 
@@ -40,7 +40,6 @@ class subscriber(object):
 
     .. code-block:: python
     
-       from pyramid.interfaces import INewRequest
        from pyramid.events import subscriber
 
        @subscriber()

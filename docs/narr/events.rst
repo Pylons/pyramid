@@ -3,6 +3,8 @@
    single: subscriber
    single: INewRequest
    single: INewResponse
+   single: NewRequest
+   single: NewResponse
 
 .. _events_chapter:
 
@@ -46,14 +48,14 @@ function found via a :term:`scan`.
    .. code-block:: python
       :linenos:
 
-      from pyramid.interfaces import INewRequest
+      from pyramid.events import NewRequest
 
       from subscribers import mysubscriber
 
       # "config" below is assumed to be an instance of a 
       # pyramid.configuration.Configurator object
 
-      config.add_subscriber(mysubscriber, INewRequest)
+      config.add_subscriber(mysubscriber, NewRequest)
 
    The first argument to
    :meth:`pyramid.configuration.Configurator.add_subscriber` is the
@@ -68,10 +70,10 @@ function found via a :term:`scan`.
    .. code-block:: python
       :linenos:
 
-      from pyramid.interfaces import INewRequest
+      from pyramid.events import NewRequest
       from pyramid.events import subscriber
 
-      @subscriber(INewRequest)
+      @subscriber(NewRequest)
       def mysubscriber(event):
           event.request.foo = 1
 
@@ -85,13 +87,16 @@ function found via a :term:`scan`.
 
 Either of the above registration examples implies that every time the
 :mod:`pyramid` framework emits an event object that supplies an
-:class:`pyramid.interfaces.INewRequest` interface, the
-``mysubscriber`` function will be called with an *event* object.
+:class:`pyramid.events.NewRequest` interface, the ``mysubscriber`` function
+will be called with an *event* object.
 
-As you can see, a subscription is made in terms of an
-:term:`interface`.  The event object sent to a subscriber will always
-be an object that possesses an interface.  The interface itself
-provides documentation of what attributes of the event are available.
+As you can see, a subscription is made in terms of a *class* (such as
+:class:`pyramid.events.NewResponse`).  The event object sent to a subscriber
+will always be an object that possesses an :term:`interface`.  For
+:class:`pyramid.events.NewResponse`, that interface is
+:class:`pyramid.interfaces.INewResponse`. The interface documentation
+provides information about available attributes and methods of the event
+objects.
 
 The return value of a subscriber function is ignored.  Subscribers to
 the same event type are not guaranteed to be called in any particular
@@ -125,9 +130,9 @@ configuration startup:
    # config is an instance of pyramid.configuration.Configurator
 
    config.add_subscriber('myproject.subscribers.handle_new_request',
-                         'pyramid.interfaces.INewRequest')
+                         'pyramid.events.NewRequest')
    config.add_subscriber('myproject.subscribers.handle_new_response',
-                         'pyramid.interfaces.INewResponse')
+                         'pyramid.events.NewResponse')
 
 Either mechanism causes the functions in ``subscribers.py`` to be
 registered as event subscribers.  Under this configuration, when the
@@ -138,14 +143,12 @@ Each of our subscriber functions accepts an ``event`` object and
 prints an attribute of the event object.  This begs the question: how
 can we know which attributes a particular event has?
 
-We know that :class:`pyramid.interfaces.INewRequest` event objects
-have a ``request`` attribute, which is a :term:`request` object,
-because the interface defined at
-:class:`pyramid.interfaces.INewRequest` says it must.  Likewise, we
-know that :class:`pyramid.interfaces.INewResponse` events have a
+We know that :class:`pyramid.events.NewRequest` event objects have a
+``request`` attribute, which is a :term:`request` object, because the
+interface defined at :class:`pyramid.interfaces.INewRequest` says it must.
+Likewise, we know that :class:`pyramid.interfaces.NewResponse` events have a
 ``response`` attribute, which is a response object constructed by your
 application, because the interface defined at
 :class:`pyramid.interfaces.INewResponse` says it must
-(:class:`pyramid.interfaces.INewResponse` objects also have a
-``request``).
+(:class:`pyramid.events.NewResponse` objects also have a ``request``).
 

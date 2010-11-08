@@ -454,18 +454,18 @@ exists in :ref:`beforerender_event`.
 Using The Before Render Event
 -----------------------------
 
-Subscribers to the :class:`repoze.interfaces.IBeforeRender` event may
-introspect the and modify the set of :term:`renderer globals` before they are
-passed to a :term:`renderer`.  This event object iself has a dictionary-like
-interface that can be used for this purpose.  For example:
+Subscribers to the :class:`pyramid.events.BeforeRender` event may introspect
+the and modify the set of :term:`renderer globals` before they are passed to
+a :term:`renderer`.  This event object iself has a dictionary-like interface
+that can be used for this purpose.  For example:
 
 .. code-block:: python
    :linenos:
 
-    from repoze.events import subscriber
-    from pyramid.interfaces import IBeforeRender
+    from pyramid.events import subscriber
+    from pyramid.events import BeforeRender
 
-    @subscriber(IBeforeRender)
+    @subscriber(BeforeRender)
     def add_global(event):
         event['mykey'] = 'foo'
 
@@ -478,11 +478,11 @@ If a subscriber attempts to add a key that already exist in the renderer
 globals dictionary, a :exc:`KeyError` is raised.  This limitation is enforced
 because event subscribers do not possess any relative ordering.  The set of
 keys added to the renderer globals dictionary by all
-:class:`pyramid.interfaces.IBeforeRender` subscribers and renderer globals
+:class:`pyramid.events.BeforeRender` subscribers and renderer globals
 factories must be unique.
 
-See the API documentation for the event interface
-:class:`pyramid.interfaces.IBeforeRender`.
+See the API documentation for the :class:`pyramid.events.BeforeRender` event
+interface at :class:`pyramid.interfaces.IBeforeRender`.
 
 Another mechanism which allows event subscribers more control when adding
 renderer global values exists in :ref:`adding_renderer_globals`.
@@ -521,16 +521,15 @@ response callback will be an exception object instead of its default
 value of ``None``.
 
 Response callbacks are called in the order they're added
-(first-to-most-recently-added).  All response callbacks are called
-*after* the :class:`pyramid.interfaces.INewResponse` event is sent.
-Errors raised by response callbacks are not handled specially.  They
-will be propagated to the caller of the :mod:`pyramid` router
-application.
+(first-to-most-recently-added).  All response callbacks are called *after*
+the :class:`pyramid.events.NewResponse` event is sent.  Errors raised by
+response callbacks are not handled specially.  They will be propagated to the
+caller of the :mod:`pyramid` router application.
 
-A response callback has a lifetime of a *single* request.  If you want
-a response callback to happen as the result of *every* request, you
-must re-register the callback into every new request (perhaps within a
-subscriber of a :class:`pyramid.interfaces.INewRequest` event).
+A response callback has a lifetime of a *single* request.  If you want a
+response callback to happen as the result of *every* request, you must
+re-register the callback into every new request (perhaps within a subscriber
+of a :class:`pyramid.events.NewRequest` event).
 
 .. _using_finished_callbacks:
 
@@ -587,10 +586,10 @@ Errors raised by finished callbacks are not handled specially.  They
 will be propagated to the caller of the :mod:`pyramid` router
 application.
 
-A finished callback has a lifetime of a *single* request.  If you want
-a finished callback to happen as the result of *every* request, you
-must re-register the callback into every new request (perhaps within a
-subscriber of a :class:`pyramid.interfaces.INewRequest` event).
+A finished callback has a lifetime of a *single* request.  If you want a
+finished callback to happen as the result of *every* request, you must
+re-register the callback into every new request (perhaps within a subscriber
+of a :class:`pyramid.events.NewRequest` event).
 
 .. _registering_configuration_decorators:
 

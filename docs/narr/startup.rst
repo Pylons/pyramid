@@ -121,9 +121,8 @@ press ``return`` after running ``paster serve development.ini``.
    configurator previously populated by other methods run against the
    Configurator.  The router is a WSGI application.
 
-#. A :class:`pyramid.interfaces.IApplicationCreated` event is
-   emitted (see :ref:`events_chapter` for more information about
-   events).
+#. A :class:`pyramid.events.ApplicationCreated` event is emitted (see
+   :ref:`events_chapter` for more information about events).
 
 #. Assuming there were no errors, the ``app`` function in ``myproject``
    returns the router instance created by ``make_wsgi_app`` back to

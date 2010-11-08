@@ -11,12 +11,11 @@ Attributes
 ~~~~~~~~~~
 
 ``for``
-   The class or :term:`interface` that you are subscribing the
-   listener for, e.g. :class:`pyramid.interfaces.INewRequest`.
-   Registering a subscriber for a specific class or interface limits
-   the event types that the subscriber will receive to those specified
-   by the interface or class.  Default: ``zope.interface.Interface``
-   (implying *any* event type).
+   The class or :term:`interface` that you are subscribing the listener for,
+   e.g. :class:`pyramid.events.NewRequest`.  Registering a subscriber for a
+   specific class or interface limits the event types that the subscriber
+   will receive to those specified by the interface or class.  Default:
+   ``zope.interface.Interface`` (implying *any* event type).
 
 ``handler``
    A :term:`dotted Python name` which references an event handler
@@ -30,7 +29,7 @@ Examples
    :linenos:
 
    <subscriber
-      for="pyramid.interfaces.INewRequest"
+      for="pyramid.events.NewRequest"
       handler=".subscribers.handle_new_request"
     />
 

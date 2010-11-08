@@ -1145,7 +1145,7 @@ which we assume lives in a ``subscribers.py`` module within your application:
    :linenos:
 
    <subscriber
-      for="pyramid.interfaces.INewRequest"
+      for="pyramid.events.NewRequest"
       handler=".subscribers.mysubscriber"
     />
 

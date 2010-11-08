@@ -617,7 +617,7 @@ class Configurator(object):
     def make_wsgi_app(self):
         """ Returns a :mod:`pyramid` WSGI application representing
         the current configuration state and sends a
-        :class:`pyramid.interfaces.IApplicationCreated`
+        :class:`pyramid.events.ApplicationCreated`
         event to all listeners."""
         from pyramid.router import Router # avoid circdep
         app = Router(self.registry)

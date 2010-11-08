@@ -101,6 +101,11 @@ Documentation (delta from BFG 1.3)
 - The SQL Wiki tutorial was updated to take into account changes to the
   ``pyramid_routesalchemy`` paster template.
 
+- All references to events by interface
+  (e.g. ``pyramid.interfaces.INewRequest``) have been changed to reference
+  their concrete classes (e.g. ``pyramid.events.NewRequest``) in
+  documentation about making subscriptions.
+
 Backwards Incompatibilities (with BFG 1.3)
 ------------------------------------------
 
