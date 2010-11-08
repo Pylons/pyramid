@@ -205,13 +205,13 @@ On UNIX:
 
 .. code-block:: text
 
-   $ ../bin/paster serve tutorial.ini --reload
+   $ ../bin/paster serve development.ini --reload
 
 On Windows:
 
 .. code-block:: text
 
-   c:\bifgfntut\tutorial> ..\Scripts\paster serve tutorial.ini --reload
+   c:\bifgfntut\tutorial> ..\Scripts\paster serve development.ini --reload
 
 Exposing Test Coverage Information
 ==================================
