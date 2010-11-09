@@ -3,7 +3,7 @@
 Using Hooks
 ===========
 
-"Hooks" can be used to influence the behavior of the :mod:`pyramid`
+"Hooks" can be used to influence the behavior of the :app:`Pyramid`
 framework in various ways.
 
 .. index::
@@ -14,7 +14,7 @@ framework in various ways.
 Changing the Not Found View
 ---------------------------
 
-When :mod:`pyramid` can't map a URL to view code, it invokes a
+When :app:`Pyramid` can't map a URL to view code, it invokes a
 :term:`not found view`, which is a :term:`view callable`. A default
 notfound view exists.  The default not found view can be overridden
 through application configuration.  This override can be done via
@@ -101,7 +101,7 @@ callable:
 Changing the Forbidden View
 ---------------------------
 
-When :mod:`pyramid` can't authorize execution of a view based on
+When :app:`Pyramid` can't authorize execution of a view based on
 the :term:`authorization policy` in use, it invokes a :term:`forbidden
 view`.  The default forbidden response has a 401 status code and is
 very plain, but the view which generates it can be overridden as
@@ -187,7 +187,7 @@ Here's some sample code that implements a minimal forbidden view:
 Changing the Traverser
 ----------------------
 
-The default :term:`traversal` algorithm that :mod:`pyramid` uses is
+The default :term:`traversal` algorithm that :app:`Pyramid` uses is
 explained in :ref:`traversal_algorithm`.  Though it is rarely
 necessary, this default algorithm can be swapped out selectively for a
 different traversal pattern via configuration.
@@ -256,10 +256,10 @@ traverser would be used.  For example:
       />
 
 If the above stanza was added to a ``configure.zcml`` file,
-:mod:`pyramid` would use the ``myapp.traversal.Traverser`` only
+:app:`Pyramid` would use the ``myapp.traversal.Traverser`` only
 when the application :term:`root factory` returned an instance of the
 ``myapp.models.MyRoot`` object.  Otherwise it would use the default
-:mod:`pyramid` traverser to do traversal.
+:app:`Pyramid` traverser to do traversal.
 
 .. index::
    single: url generator
@@ -327,13 +327,13 @@ the :term:`Pylons` GitHub Pyramid repository.
 Changing the Request Factory
 ----------------------------
 
-Whenever :mod:`pyramid` handles a :term:`WSGI` request, it creates
+Whenever :app:`Pyramid` handles a :term:`WSGI` request, it creates
 a :term:`request` object based on the WSGI environment it has been
 passed.  By default, an instance of the
 :class:`pyramid.request.Request` class is created to represent the
 request object.
 
-The class (aka "factory") that :mod:`pyramid` uses to create a
+The class (aka "factory") that :app:`Pyramid` uses to create a
 request object instance can be changed by passing a
 ``request_factory`` argument to the constructor of the
 :term:`configurator`.  This argument can be either a callable or a
@@ -385,7 +385,7 @@ method:
 Adding Renderer Globals
 -----------------------
 
-Whenever :mod:`pyramid` handles a request to perform a rendering
+Whenever :app:`Pyramid` handles a request to perform a rendering
 (after a view with a ``renderer=`` configuration attribute is invoked,
 or when the any of the methods beginning with ``render`` within the
 :mod:`pyramid.renderers` module are called), *renderer globals* can
@@ -395,7 +395,7 @@ values (such as ``request``, ``context``, and ``renderer_name``) are
 the only values present in the system dictionary passed to every
 renderer.
 
-A callback that :mod:`pyramid` will call every time a renderer is
+A callback that :app:`Pyramid` will call every time a renderer is
 invoked can be added by passing a ``renderer_globals_factory``
 argument to the constructor of the :term:`configurator`.  This
 callback can either be a callable object or a :term:`dotted Python
@@ -492,7 +492,7 @@ renderer global values exists in :ref:`adding_renderer_globals`.
 Using Response Callbacks
 ------------------------
 
-Unlike many other web frameworks, :mod:`pyramid` does not eagerly
+Unlike many other web frameworks, :app:`Pyramid` does not eagerly
 create a global response object.  Adding a :term:`response callback`
 allows an application to register an action to be performed against a
 response object once it is created, usually in order to mutate it.
@@ -524,7 +524,7 @@ Response callbacks are called in the order they're added
 (first-to-most-recently-added).  All response callbacks are called *after*
 the :class:`pyramid.events.NewResponse` event is sent.  Errors raised by
 response callbacks are not handled specially.  They will be propagated to the
-caller of the :mod:`pyramid` router application.
+caller of the :app:`Pyramid` router application.
 
 A response callback has a lifetime of a *single* request.  If you want a
 response callback to happen as the result of *every* request, you must
@@ -537,7 +537,7 @@ Using Finished Callbacks
 ------------------------
 
 A :term:`finished callback` is a function that will be called
-unconditionally by the :mod:`pyramid` :term:`router` at the very
+unconditionally by the :app:`Pyramid` :term:`router` at the very
 end of request processing.  A finished callback can be used to perform
 an action at the end of a request unconditionally.
 
@@ -583,7 +583,7 @@ enters a response callback will be an exception object instead of its
 default value of ``None``.
 
 Errors raised by finished callbacks are not handled specially.  They
-will be propagated to the caller of the :mod:`pyramid` router
+will be propagated to the caller of the :app:`Pyramid` router
 application.
 
 A finished callback has a lifetime of a *single* request.  If you want a
@@ -599,16 +599,16 @@ Registering Configuration Decorators
 Decorators such as :class:`pyramid.view.view_config` don't change the
 behavior of the functions or classes they're decorating.  Instead,
 when a :term:`scan` is performed, a modified version of the function
-or class is registered with :mod:`pyramid`.
+or class is registered with :app:`Pyramid`.
 
 You may wish to have your own decorators that offer such
 behaviour. This is possible by using the :term:`Venusian` package in
-the same way that it is used by :mod:`pyramid`.
+the same way that it is used by :app:`Pyramid`.
 
 By way of example, let's suppose you want to write a decorator that
 registers the function it wraps with a :term:`Zope Component
 Architecture` "utility" within the :term:`application registry`
-provided by :mod:`pyramid`. The application registry and the
+provided by :app:`Pyramid`. The application registry and the
 utility inside the registry is likely only to be available once your
 application's configuration is at least partially completed. A normal
 decorator would fail as it would be executed before the configuration

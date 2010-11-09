@@ -9,7 +9,7 @@ configuration mode in which a developer cedes the least amount of control to
 the framework; it's "imperative" because you express the configuration
 directly in Python code, and you have the full power of Python at your
 disposal as you issue configuration statements.  However, another mode of
-configuration exists within :mod:`pyramid`, which often provides better
+configuration exists within :app:`Pyramid`, which often provides better
 extensibility and configuration conflict detection.
 
 A complete listing of ZCML directives is available within
@@ -26,12 +26,12 @@ ZCML from :ref:`extending_chapter`.
 Declarative Configuration
 -------------------------
 
-A :mod:`pyramid` application can be configured "declaratively", if so
+A :app:`Pyramid` application can be configured "declaratively", if so
 desired.  Declarative configuration relies on *declarations* made external to
 the code in a configuration file format named :term:`ZCML` (Zope
 Configuration Markup Language), an XML dialect.
 
-A :mod:`pyramid` application configured declaratively requires not
+A :app:`Pyramid` application configured declaratively requires not
 one, but two files: a Python file and a :term:`ZCML` file.
 
 In a file named ``helloworld.py``:
@@ -138,7 +138,7 @@ effectively a "macro" which calls the
 :meth:`pyramid.configuration.Configurator.add_view` method on your
 behalf.
 
-The ``<view>`` tag is an example of a :mod:`pyramid` declaration
+The ``<view>`` tag is an example of a :app:`Pyramid` declaration
 tag.  Other such tags include ``<route>`` and ``<scan>``.  Each of
 these tags is effectively a "macro" which calls methods of a
 :class:`pyramid.configuration.Configurator` object on your behalf.
@@ -203,7 +203,7 @@ Hello World, Goodbye World (Declarative)
 ----------------------------------------
 
 Another almost entirely equivalent mode of application configuration
-exists named *declarative* configuration.  :mod:`pyramid` can be
+exists named *declarative* configuration.  :app:`Pyramid` can be
 configured for the same "hello world" application "declaratively", if
 so desired.
 
@@ -338,7 +338,7 @@ The ``configure.zcml`` ZCML file contains this bit of XML:
     </configure>
 
 Because :term:`ZCML` is XML, and because XML requires a single root
-tag for each document, every ZCML file used by :mod:`pyramid` must
+tag for each document, every ZCML file used by :app:`Pyramid` must
 contain a ``configure`` container directive, which acts as the root
 XML tag.  It is a "container" directive because its only job is to
 contain other directives.
@@ -355,7 +355,7 @@ The ``configure.zcml`` ZCML file contains this bit of XML within the
 
    <include package="pyramid.includes" />
 
-This self-closing tag instructs :mod:`pyramid` to load a ZCML file
+This self-closing tag instructs :app:`Pyramid` to load a ZCML file
 from the Python package with the :term:`dotted Python name`
 ``pyramid.includes``, as specified by its ``package`` attribute.
 This particular ``<include>`` declaration is required because it
@@ -406,7 +406,7 @@ The ``configure.zcml`` ZCML file contains these bits of XML *after* the
      view="helloworld.goodbye_world"
      />
 
-These ``<view>`` declaration tags direct :mod:`pyramid` to create
+These ``<view>`` declaration tags direct :app:`Pyramid` to create
 two :term:`view configuration` registrations.  The first ``<view>``
 tag has an attribute (the attribute is also named ``view``), which
 points at a :term:`dotted Python name`, referencing the
@@ -472,7 +472,7 @@ completely equivalent:
        view="helloworld.hello_world"
        />
 
-We've now configured a :mod:`pyramid` helloworld application
+We've now configured a :app:`Pyramid` helloworld application
 declaratively.  More information about this mode of configuration is
 available in :ref:`declarative_configuration` and within
 :ref:`zcml_reference`.
@@ -529,9 +529,9 @@ A combination of imperative configuration, declarative configuration
 via ZCML and scanning can be used to configure any application.  They
 are not mutually exclusive.
 
-The :mod:`pyramid` authors often recommend using mostly declarative
+The :app:`Pyramid` authors often recommend using mostly declarative
 configuration, because it's the more traditional form of configuration
-used in :mod:`pyramid` applications, it can be overridden and
+used in :app:`Pyramid` applications, it can be overridden and
 extended by third party deployers, and there are more examples for it
 "in the wild".
 
@@ -625,7 +625,7 @@ attribute:
        name="hello.html"
        />
 
-This indicates that when :mod:`pyramid` identifies that the
+This indicates that when :app:`Pyramid` identifies that the
 :term:`view name` is ``hello.html`` and the context is of any type,
 the ``.views.hello_world`` view callable will be invoked.
 
@@ -698,7 +698,7 @@ will resolve to a package-qualified resource such as
 
 Here's an example of a ``static`` ZCML directive that will serve files
 up under the ``/static`` URL from the ``/var/www/static`` directory of
-the computer which runs the :mod:`pyramid` application using an
+the computer which runs the :app:`Pyramid` application using an
 absolute path.
 
 .. code-block:: xml
@@ -821,7 +821,7 @@ and an instance of the class
 :class:`pyramid.authorization.ACLAuthorizationPolicy` to be
 injected as the :term:`authorization policy` used by this application.
 
-:mod:`pyramid` ships with a number of authorization and
+:app:`Pyramid` ships with a number of authorization and
 authentication policy ZCML directives that should prove useful.  See
 :ref:`authentication_policies_directives_section` and
 :ref:`authorization_policies_directives_section` for more information.
@@ -835,7 +835,7 @@ Built-In Authentication Policy ZCML Directives
 ----------------------------------------------
 
 Instead of configuring an authentication policy and authorization
-policy imperatively, :mod:`pyramid` ships with a few "pre-chewed"
+policy imperatively, :app:`Pyramid` ships with a few "pre-chewed"
 authentication policy ZCML directives that you can make use of within
 your application.
 
@@ -937,7 +937,7 @@ See :ref:`aclauthorizationpolicy_directive` for detailed information.
 Adding and Overriding Renderers via ZCML
 ----------------------------------------
 
-New templating systems and serializers can be associated with :mod:`pyramid`
+New templating systems and serializers can be associated with :app:`Pyramid`
 renderer names.  To this end, configuration declarations can be made which
 override an existing :term:`renderer factory` and which add a new renderer
 factory.
@@ -1041,7 +1041,7 @@ renderer factory, use:
       name=".zpt"
       factory="pyramid.chameleon_zpt.renderer_factory"/>
 
-After you do this, :mod:`pyramid` will treat templates ending in
+After you do this, :app:`Pyramid` will treat templates ending in
 both the ``.pt`` and ``.zpt`` filename extensions as Chameleon ZPT
 templates.
 

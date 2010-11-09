@@ -21,13 +21,13 @@ sessioning to your application.
    usage documentation <http://docs.repoze.org/session/usage.html>`_.
    If you don't want to use ZODB to do sessioning, you might choose to
    use a relational/filestorage sessioning system such as `Beaker
-   <http://pypi.python.org/pypi/Beaker>`_.  :mod:`pyramid` is fully
+   <http://pypi.python.org/pypi/Beaker>`_.  :app:`Pyramid` is fully
    compatible with this system too.
 
 Installing Dependencies
 -----------------------
 
-#. Edit your :mod:`pyramid` application's ``setup.py`` file, adding
+#. Edit your :app:`Pyramid` application's ``setup.py`` file, adding
    the following packages to the ``install_requires`` of the
    application:
 

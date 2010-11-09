@@ -101,15 +101,15 @@ Glossary
      traversal-based applications in which a :term:`context` is always
      very important.  A view callable is the primary mechanism by
      which a developer writes user interface code within
-     :mod:`pyramid`.  See :ref:`views_chapter` for more information
-     about :mod:`pyramid` view callables.
+     :app:`Pyramid`.  See :ref:`views_chapter` for more information
+     about :app:`Pyramid` view callables.
 
    view configuration
      View configuration is the act of associating a :term:`view
      callable` with configuration information.  This configuration
      information helps map a given :term:`request` to a particular view
      callable and it can influence the response of a view callable.
-     :mod:`pyramid` views can be configured via :term:`imperative
+     :app:`Pyramid` views can be configured via :term:`imperative
      configuration`, :term:`ZCML` or by a special ``@view_config``
      decorator coupled with a :term:`scan`.  See :ref:`views_chapter`
      for more information about view configuration.
@@ -138,12 +138,12 @@ Glossary
      :term:`context` of a :term:`view`.  If :mod:`url dispatch` is
      used, a single :term:`context` is generated for each request and
      is used as the context of a view: this object is also technically
-     a "model" in :mod:`pyramid` terms, although this terminology
+     a "model" in :app:`Pyramid` terms, although this terminology
      can be a bit confusing: see :ref:`model_traversal_confusion`.
 
    traversal
      The act of descending "down" a graph of model objects from a root
-     model in order to find a :term:`context`.  The :mod:`pyramid`
+     model in order to find a :term:`context`.  The :app:`Pyramid`
      :term:`router` performs traversal of model objects when a
      :term:`root factory` is specified.  See the
      :ref:`traversal_chapter` chapter for more information.  Traversal
@@ -153,15 +153,15 @@ Glossary
 
    router
      The :term:`WSGI` application created when you start a
-     :mod:`pyramid` application.  The router intercepts requests,
+     :app:`Pyramid` application.  The router intercepts requests,
      invokes traversal and/or URL dispatch, calls view functions, and
      returns responses to the WSGI server on behalf of your
-     :mod:`pyramid` application.
+     :app:`Pyramid` application.
 
    URL dispatch
      An alternative to graph traversal as a mechanism for locating a
      :term:`context` for a :term:`view`.  When you use a :term:`route`
-     in your :mod:`pyramid` application via a :term:`route
+     in your :app:`Pyramid` application via a :term:`route
      configuration`, you are using URL dispatch. See the
      :ref:`urldispatch_chapter` for more information.
 
@@ -178,10 +178,10 @@ Glossary
 
    application registry
      A registry of configuration information consulted by
-     :mod:`pyramid` while servicing an application.  An application
+     :app:`Pyramid` while servicing an application.  An application
      registry maps model types to views, as well as housing other
      application-specific component registrations.  Every
-     :mod:`pyramid` application has one (and only one) application
+     :app:`Pyramid` application has one (and only one) application
      registry.
 
    template
@@ -235,7 +235,7 @@ Glossary
    authentication
      The act of determining that the credentials a user presents
      during a particular request are "good".  Authentication in
-     :mod:`pyramid` is performed via an :term:`authentication
+     :app:`Pyramid` is performed via an :term:`authentication
      policy`.
 
    authorization
@@ -243,7 +243,7 @@ Glossary
      action.  In pyramid terms, this means determining whether, for a
      given context, any :term:`principal` (or principals) associated
      with the request have the requisite :term:`permission` to allow
-     the request to continue.  Authorization in :mod:`pyramid` is
+     the request to continue.  Authorization in :app:`Pyramid` is
      performed via its :term:`authorization policy`.
 
    principal
@@ -256,14 +256,14 @@ Glossary
      "group foo" and "group bar".
 
    authorization policy
-     An authorization policy in :mod:`pyramid` terms is a bit of
+     An authorization policy in :app:`Pyramid` terms is a bit of
      code which has an API which determines whether or not the
      principals associated with the request can perform an action
      associated with a permission, based on the information found on the
      :term:`context`.
 
    authentication policy
-     An authentication policy in :mod:`pyramid` terms is a bit of
+     An authentication policy in :app:`Pyramid` terms is a bit of
      code which has an API which determines the current
      :term:`principal` (or principals) associated with a request.
 
@@ -318,7 +318,7 @@ Glossary
 
    PasteDeploy
      `PasteDeploy <http://pythonpaste.org>`_ is a library used by
-     :mod:`pyramid` which makes it possible to configure
+     :app:`Pyramid` which makes it possible to configure
      :term:`WSGI` components together declaratively within an ``.ini``
      file.  It was developed by Ian Bicking as part of :term:`Paste`.
 
@@ -329,7 +329,7 @@ Glossary
      maintained by Malthe Borch.  It has several extensions, such as
      the ability to use bracketed (Genshi-style) ``${name}`` syntax,
      even within ZPT.  It is also much faster than the reference
-     implementations of both ZPT and Genshi.  :mod:`pyramid` offers
+     implementations of both ZPT and Genshi.  :app:`Pyramid` offers
      Chameleon templating out of the box in ZPT and text flavors.
 
    ZPT
@@ -352,7 +352,7 @@ Glossary
    Routes
      A `system by Ben Bangert <http://routes.groovie.org/>`_ which
      parses URLs and compares them against a number of user defined
-     mappings. The URL pattern matching syntax in :mod:`pyramid` is
+     mappings. The URL pattern matching syntax in :app:`Pyramid` is
      inspired by the Routes syntax (which was inspired by Ruby On
      Rails pattern syntax).
 
@@ -372,11 +372,11 @@ Glossary
    ZCML
      `Zope Configuration Markup Language
      <http://www.muthukadan.net/docs/zca.html#zcml>`_, an XML dialect
-     used by Zope and :mod:`pyramid` for configuration tasks.  ZCML
+     used by Zope and :app:`Pyramid` for configuration tasks.  ZCML
      is capable of performing different types of :term:`configuration
-     declaration`, but its primary purpose in :mod:`pyramid` is to
+     declaration`, but its primary purpose in :app:`Pyramid` is to
      perform :term:`view configuration` and :term:`route configuration`
-     within the ``configure.zcml`` file in a :mod:`pyramid`
+     within the ``configure.zcml`` file in a :app:`Pyramid`
      application.  You can use ZCML as an alternative to
      :term:`imperative configuration`.
 
@@ -391,7 +391,7 @@ Glossary
      <http://www.muthukadan.net/docs/zca.html>`_ (aka ZCA) is a system
      which allows for application pluggability and complex dispatching
      based on objects which implement an :term:`interface`.
-     :mod:`pyramid` uses the ZCA "under the hood" to perform view
+     :app:`Pyramid` uses the ZCA "under the hood" to perform view
      dispatching and other application configuration tasks.
 
    reStructuredText
@@ -402,7 +402,7 @@ Glossary
 
    root
      The object at which :term:`traversal` begins when
-     :mod:`pyramid` searches for a :term:`context` (for :term:`URL
+     :app:`Pyramid` searches for a :term:`context` (for :term:`URL
      Dispatch`, the root is *always* the context).
 
    subpath
@@ -415,26 +415,26 @@ Glossary
 
    interface
      A `Zope interface <http://pypi.python.org/pypi/zope.interface>`_
-     object.  In :mod:`pyramid`, an interface may be attached to a
+     object.  In :app:`Pyramid`, an interface may be attached to a
      :term:`model` object or a :term:`request` object in order to
      identify that the object is "of a type".  Interfaces are used
-     internally by :mod:`pyramid` to perform view lookups and other
+     internally by :app:`Pyramid` to perform view lookups and other
      policy lookups.  The ability to make use of an interface is
      exposed to an application programmers during :term:`view
      configuration` via the ``context`` argument, the ``request_type``
      argument and the ``containment`` argument.  Interfaces are also
      exposed to application developers when they make use of the
-     :term:`event` system. Fundamentally, :mod:`pyramid`
+     :term:`event` system. Fundamentally, :app:`Pyramid`
      programmers can think of an interface as something that they can
      attach to an object that stamps it with a "type" unrelated to its
      underlying Python type.  Interfaces can also be used to describe
      the behavior of an object (its methods and attributes), but
-     unless they choose to, :mod:`pyramid` programmers do not need
+     unless they choose to, :app:`Pyramid` programmers do not need
      to understand or use this feature of interfaces.
 
    event
      An object broadcast to zero or more :term:`subscriber` callables
-     during normal :mod:`pyramid` system operations during the
+     during normal :app:`Pyramid` system operations during the
      lifetime of an application.  Application code can subscribe to
      these events by using the subscriber functionality described in
      :ref:`events_chapter`.
@@ -448,7 +448,7 @@ Glossary
    request type
      An attribute of a :term:`request` that allows for specialization
      of view invocation based on arbitrary categorization.  The every
-     :term:`request` object that :mod:`pyramid` generates and
+     :term:`request` object that :app:`Pyramid` generates and
      manipulates has one or more :term:`interface` objects attached to
      it.  The default interface attached to a request object is
      ``pyramid.interfaces.IRequest``.
@@ -456,24 +456,24 @@ Glossary
    repoze.lemonade
      Zope2 CMF-like `data structures and helper facilities
      <http://docs.repoze.org/lemonade>`_ for CA-and-ZODB-based
-     applications useful within :mod:`pyramid` applications.
+     applications useful within :app:`Pyramid` applications.
 
    repoze.catalog
      An indexing and search facility (fielded and full-text) based on
      `zope.index <http://pypi.python.org/pypi/zope.index>`_.  See `the
      documentation <http://docs.repoze.org/catalog>`_ for more
-     information.  A tutorial for its usage in :mod:`pyramid`
+     information.  A tutorial for its usage in :app:`Pyramid`
      exists in :ref:`catalog_tutorial`.
 
    repoze.who
      `Authentication middleware <http://docs.repoze.org/who>`_ for
-     :term:`WSGI` applications.  It can be used by :mod:`pyramid` to
+     :term:`WSGI` applications.  It can be used by :app:`Pyramid` to
      provide authentication information.
 
    repoze.workflow
      `Barebones workflow for Python apps
      <http://docs.repoze.org/workflow>`_ .  It can be used by
-     :mod:`pyramid` to form a workflow system.
+     :app:`Pyramid` to form a workflow system.
 
    virtual root
      A model object representing the "virtual" root of a request; this
@@ -490,11 +490,11 @@ Glossary
      object in a lineage is available as its ``__parent__`` attribute.
 
    root factory
-     The "root factory" of an :mod:`pyramid` application is called
+     The "root factory" of an :app:`Pyramid` application is called
      on every request sent to the application.  The root factory
      returns the traversal root of an application.  It is
      conventionally named ``get_root``.  An application may supply a
-     root factory to :mod:`pyramid` during the construction of a
+     root factory to :app:`Pyramid` during the construction of a
      :term:`Configurator`.  If a root factory is not supplied, the
      application uses a default root object.  Use of the default root
      object is useful in application which use :term:`URL dispatch` for
@@ -524,7 +524,7 @@ Glossary
      `mod_wsgi <http://code.google.com/p/modwsgi/>`_ is an Apache
      module developed by Graham Dumpleton.  It allows :term:`WSGI`
      applications (such as applications developed using
-     :mod:`pyramid`) to be served using the Apache web server.
+     :app:`Pyramid`) to be served using the Apache web server.
 
    view predicate
      An argument to a :term:`view configuration` which evaluates to
@@ -548,7 +548,7 @@ Glossary
 
    predicate
      A test which returns ``True`` or ``False``.  Two different types
-     of predicates exist in :mod:`pyramid`: a :term:`view predicate`
+     of predicates exist in :app:`Pyramid`: a :term:`view predicate`
      and a :term:`route predicate`.  View predicates are attached to
      :term:`view configuration` and route predicates are attached to
      :term:`route configuration`.
@@ -556,13 +556,13 @@ Glossary
    decorator
      A wrapper around a Python function or class which accepts the
      function or class as its first argument and which returns an
-     arbitrary object.  :mod:`pyramid` provides several decorators,
+     arbitrary object.  :app:`Pyramid` provides several decorators,
      used for configuration and return value modification purposes.  See
      also `PEP 318 <http://www.python.org/dev/peps/pep-0318/>`_.
 
    configuration declaration
      An individual method call made to an instance of a
-     :mod:`pyramid` :term:`Configurator` object which performs an
+     :app:`Pyramid` :term:`Configurator` object which performs an
      arbitrary action, such as registering a :term:`view configuration`
      (via the ``view`` method of the configurator) or :term:`route
      configuration` (via the ``route`` method of the configurator).  A
@@ -578,7 +578,7 @@ Glossary
      ``@view_config``.
 
    scan
-     The term used by :mod:`pyramid` to define the process of
+     The term used by :app:`Pyramid` to define the process of
      importing and examining all code in a Python package or module for
      :term:`configuration decoration`.
 
@@ -597,28 +597,28 @@ Glossary
      a set of :term:`configuration declaration` statements.
 
    Not Found view
-      An :term:`exception view` invoked by :mod:`pyramid` when the
+      An :term:`exception view` invoked by :app:`Pyramid` when the
       developer explicitly raises a ``pyramid.exceptions.NotFound``
       exception from within :term:`view` code or :term:`root factory`
       code, or when the current request doesn't match any :term:`view
-      configuration`.  :mod:`pyramid` provides a default
+      configuration`.  :app:`Pyramid` provides a default
       implementation of a not found view; it can be overridden.  See
       :ref:`changing_the_notfound_view`.
 
    Forbidden view
-      An :term:`exception view` invoked by :mod:`pyramid` when the
+      An :term:`exception view` invoked by :app:`Pyramid` when the
       developer explicitly raises a
       ``pyramid.exceptions.Forbidden`` exception from within
       :term:`view` code or :term:`root factory` code, or when the
       :term:`view configuration` and :term:`authorization policy`
       found for a request disallows a particular view invocation.
-      :mod:`pyramid` provides a default implementation of a
+      :app:`Pyramid` provides a default implementation of a
       forbidden view; it can be overridden.  See
       :ref:`changing_the_forbidden_view`.
 
    Exception view
       An exception view is a :term:`view callable` which may be
-      invoked by :mod:`pyramid` when an exception is raised during
+      invoked by :app:`Pyramid` when an exception is raised during
       request processing.  See :ref:`exception_views` for more
       information.
 
@@ -628,7 +628,7 @@ Glossary
       each `thread
       <http://en.wikipedia.org/wiki/Thread_(computer_science)>` used by
       the application may have a different value for this same "global"
-      variable.  :mod:`pyramid` uses a small number of thread local
+      variable.  :app:`Pyramid` uses a small number of thread local
       variables, as described in :ref:`threadlocals_chapter`. See also
       the `threading.local documentation
       <http://docs.python.org/library/threading.html#threading.local>`
@@ -654,7 +654,7 @@ Glossary
 
    Python
      The `programming language <http://python.org>` in which
-     :mod:`pyramid` is written.
+     :app:`Pyramid` is written.
 
    CPython
      The C implementation of the Python language.  This is the
@@ -672,7 +672,7 @@ Glossary
      The act of locating a :term:`context` and a :term:`view name`
      given a :term:`request`.  :term:`Traversal` and :term:`URL
      dispatch` are the context finding subsystems used by
-     :mod:`pyramid`.
+     :app:`Pyramid`.
 
    Triad
      The three bits of information used by :term:`view lookup` to find
@@ -682,14 +682,14 @@ Glossary
    Google App Engine
      `Google App Engine <http://code.google.com/appengine/>`_ (aka
      "GAE") is a Python application hosting service offered by Google.
-     :mod:`pyramid` runs on GAE.
+     :app:`Pyramid` runs on GAE.
 
    Venusian
      `Venusian <http://docs.repoze.org/venusian>`_ is a library which
      allows framework authors to defer decorator actions.  Instead of
      taking actions when a function (or class) decorator is executed
      at import time, the action usually taken by the decorator is
-     deferred until a separate "scan" phase.  :mod:`pyramid` relies
+     deferred until a separate "scan" phase.  :app:`Pyramid` relies
      on Venusian to provide a basis for its :term:`scan` feature.
 
    Translation String
@@ -713,7 +713,7 @@ Glossary
      A callable which receives a :term:`translation string` and
      returns a translated Unicode object for the purposes of
      internationalization.  A :term:`localizer` supplies a
-     translator to a :mod:`pyramid` application accessible via its
+     translator to a :app:`Pyramid` application accessible via its
      ``translate`` method.
 
    Translation Directory
@@ -749,11 +749,11 @@ Glossary
 
    Gettext
      The GNU `gettext <http://www.gnu.org/software/gettext/>`_
-     library, used by the :mod:`pyramid` translation machinery.
+     library, used by the :app:`Pyramid` translation machinery.
 
    Babel
      A `collection of tools <http://babel.edgewall.org/>`_ for
-     internationalizing Python applications.  :mod:`pyramid` does
+     internationalizing Python applications.  :app:`Pyramid` does
      not depend on Babel to operate, but if Babel is installed,
      additional locale functionality becomes available to your
      application.

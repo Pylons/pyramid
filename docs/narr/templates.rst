@@ -4,17 +4,17 @@ Templates
 =========
 
 A :term:`template` is a file on disk which can be used to render
-dynamic data provided by a :term:`view`.  :mod:`pyramid` offers a
+dynamic data provided by a :term:`view`.  :app:`Pyramid` offers a
 number of ways to perform templating tasks out of the box, and
 provides add-on templating support through a set of bindings packages.
 
-Out of the box, :mod:`pyramid` provides templating via the :term:`Chameleon`
+Out of the box, :app:`Pyramid` provides templating via the :term:`Chameleon`
 and :term:`Mako` templating libraries. :term:`Chameleon` provides support for
 two different types of templates: :term:`ZPT` templates and text templates.
 
 Before discussing how built-in templates are used in
 detail, we'll discuss two ways to render templates within
-:mod:`pyramid` in general: directly, and via renderer
+:app:`Pyramid` in general: directly, and via renderer
 configuration.
 
 .. index::
@@ -26,11 +26,11 @@ Templates Used Directly
 -----------------------
 
 The most straightforward way to use a template within
-:mod:`pyramid` is to cause it to be rendered directly within a
+:app:`Pyramid` is to cause it to be rendered directly within a
 :term:`view callable`.  You may use whatever API is supplied by a
 given templating engine to do so.
 
-:mod:`pyramid` provides various APIs that allow you to render
+:app:`Pyramid` provides various APIs that allow you to render
 templates directly from within a view callable.  For example, if there
 is a :term:`Chameleon` ZPT template named ``foo.pt`` in a directory in
 your application named ``templates``, you can render the template from
@@ -56,7 +56,7 @@ within the body of a view callable like so:
    Application developers are encouraged instead to use the functions
    available in the :mod:`pyramid.renderers` module to perform
    rendering tasks.  This set of functions works to render templates
-   for all renderer extensions registered with :mod:`pyramid`.
+   for all renderer extensions registered with :app:`Pyramid`.
 
 The ``sample_view`` :term:`view callable` above returns a
 :term:`response` object which contains the body of the
@@ -115,7 +115,7 @@ containing them around.
    path, it is treated as an absolute resource specification.
 
 In the examples above we pass in a keyword argument named ``request``
-representing the current :mod:`pyramid` request. Passing a request
+representing the current :app:`Pyramid` request. Passing a request
 keyword argument will cause the ``render_to_response`` function to
 supply the renderer with more correct system values (see
 :ref:`renderer_system_values`), because most of the information
@@ -156,15 +156,15 @@ the body of the response:
        return response
 
 Because :term:`view callable` functions are typically the only code in
-:mod:`pyramid` that need to know anything about templates, and because view
+:app:`Pyramid` that need to know anything about templates, and because view
 functions are very simple Python, you can use whatever templating system you're
-most comfortable with within :mod:`pyramid`.  Install the templating system,
+most comfortable with within :app:`Pyramid`.  Install the templating system,
 import its API functions into your views module, use those APIs to generate a
-string, then return that string as the body of a :mod:`pyramid`
+string, then return that string as the body of a :app:`Pyramid`
 :term:`Response` object.
 
 For example, here's an example of using "raw" `Mako
-<http://www.makotemplates.org/>`_ from within a :mod:`pyramid` :term:`view`:
+<http://www.makotemplates.org/>`_ from within a :app:`Pyramid` :term:`view`:
 
 .. ignore-next-block
 .. code-block:: python
@@ -181,21 +181,21 @@ For example, here's an example of using "raw" `Mako
 
 You probably wouldn't use this particular snippet in a project, because it's
 easier to use the Mako renderer bindings which already exist in
-:mod:`pyramid`. But if your favorite templating system is not supported as a
-renderer extension for :mod:`pyramid`, you can create your own simple
+:app:`Pyramid`. But if your favorite templating system is not supported as a
+renderer extension for :app:`Pyramid`, you can create your own simple
 combination as shown above.
 
 .. note::
 
    If you use third-party templating languages without cooperating
-   :mod:`pyramid` bindings directly within view callables, the
+   :app:`Pyramid` bindings directly within view callables, the
    auto-template-reload strategy explained in
    :ref:`reload_templates_section` will not be available, nor will the
    template resource overriding capability explained in
    :ref:`overriding_resources_section` be available, nor will it be
    possible to use any template using that language as a
    :term:`renderer`.  However, it's reasonably easy to write custom
-   templating system binding packages for use under :mod:`pyramid` so
+   templating system binding packages for use under :app:`Pyramid` so
    that templates written in the language can be used as renderers.
    See :ref:`adding_and_overriding_renderers` for instructions on how
    to create your own template renderer and
@@ -257,7 +257,7 @@ template will be provided with a number of *system* values.  These
 values are provided in a dictionary to the renderer and include:
 
 ``context``
-  The current :mod:`pyramid` context if ``request`` was provided as
+  The current :app:`Pyramid` context if ``request`` was provided as
   a keyword argument or ``None``.
 
 ``request``
@@ -344,11 +344,11 @@ specification` in the form ``some.dotted.package_name:relative/path``, making
 it possible to address template resources which live in another package.
 
 Not just any template from any arbitrary templating system may be used as a
-renderer.  Bindings must exist specifically for :mod:`pyramid` to use a
-templating language template as a renderer.  Currently, :mod:`pyramid` has
+renderer.  Bindings must exist specifically for :app:`Pyramid` to use a
+templating language template as a renderer.  Currently, :app:`Pyramid` has
 built-in support for two Chameleon templating languages: ZPT and text, and
 the Mako templating system.  See :ref:`built_in_renderers` for a discussion
-of their details.  :mod:`pyramid` also supports the use of :term:`Jinja2`
+of their details.  :app:`Pyramid` also supports the use of :term:`Jinja2`
 templates as renderers.  See :ref:`available_template_system_bindings`.
 
 .. sidebar:: Why Use A Renderer via View Configuration
@@ -393,9 +393,9 @@ imperatively.  See :ref:`renderer_system_values`.
 :term:`Chameleon` ZPT Templates
 -------------------------------
 
-Like :term:`Zope`, :mod:`pyramid` uses :term:`ZPT` (Zope Page
+Like :term:`Zope`, :app:`Pyramid` uses :term:`ZPT` (Zope Page
 Templates) as its default templating language.  However,
-:mod:`pyramid` uses a different implementation of the :term:`ZPT`
+:app:`Pyramid` uses a different implementation of the :term:`ZPT`
 specification than Zope does: the :term:`Chameleon` templating
 engine. The Chameleon engine complies largely with the `Zope Page
 Template <http://wiki.zope.org/ZPT/FrontPage>`_ template
@@ -436,7 +436,7 @@ A Sample ZPT Template
 ~~~~~~~~~~~~~~~~~~~~~
 
 Here's what a simple :term:`Chameleon` ZPT template used under
-:mod:`pyramid` might look like:
+:app:`Pyramid` might look like:
 
 .. code-block:: xml
    :linenos:
@@ -469,17 +469,17 @@ works in these templates.
    single: ZPT macros
    single: Chameleon ZPT macros
 
-Using ZPT Macros in :mod:`pyramid`
+Using ZPT Macros in :app:`Pyramid`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When a :term:`renderer` is used to render a template,
-:mod:`pyramid` makes at least two top-level names available to the
+:app:`Pyramid` makes at least two top-level names available to the
 template by default: ``context`` and ``request``.  One of the common
 needs in ZPT-based templates is to use one template's "macros" from within
 a different template.  In Zope, this is typically handled by
 retrieving the template from the ``context``.  But having a hold of
-the context in :mod:`pyramid` is not helpful: templates cannot
-usually be retrieved from models.  To use macros in :mod:`pyramid`,
+the context in :app:`Pyramid` is not helpful: templates cannot
+usually be retrieved from models.  To use macros in :app:`Pyramid`,
 you need to make the macro template itself available to the rendered
 template by passing the template in which the macro is defined (or even
 the macro itself) *into* the rendered template.  To make a macro
@@ -536,7 +536,7 @@ And ``templates/mytemplate.pt`` might look like so:
 Templating with :term:`Chameleon` Text Templates
 ------------------------------------------------
 
-:mod:`pyramid` also allows for the use of templates which are
+:app:`Pyramid` also allows for the use of templates which are
 composed entirely of non-XML text via :term:`Chameleon`.  To do so,
 you can create templates that are entirely composed of text except for
 ``${name}`` -style substitution points.
@@ -606,7 +606,7 @@ Nicer Exceptions in Chameleon Templates
 ---------------------------------------
 
 The exceptions raised by Chameleon templates when a rendering fails
-are sometimes less than helpful.  :mod:`pyramid` allows you to
+are sometimes less than helpful.  :app:`Pyramid` allows you to
 configure your application development environment so that exceptions
 generated by Chameleon during template compilation and execution will
 contain nicer debugging information.
@@ -688,7 +688,7 @@ templates.
 Templating With Mako Templates
 ------------------------------
 
-:term:`Mako` is a templating system written by Mike Bayer.  :mod:`pyramid`
+:term:`Mako` is a templating system written by Mike Bayer.  :app:`Pyramid`
 has built-in bindings for the Mako templating system.  The language
 definition documentation for Mako templates is available from `the Mako
 website <http://www.makotemplates.org/>`_.
@@ -723,7 +723,7 @@ placed into the application's ``ini`` file.
 A Sample Mako Template
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Here's what a simple :term:`Mako` template used under :mod:`pyramid` might
+Here's what a simple :term:`Mako` template used under :app:`Pyramid` might
 look like:
 
 .. code-block:: xml
@@ -761,7 +761,7 @@ Automatically Reloading Templates
 
 It's often convenient to see changes you make to a template file
 appear immediately without needing to restart the application process.
-:mod:`pyramid` allows you to configure your application development
+:app:`Pyramid` allows you to configure your application development
 environment so that a change to a template will be automatically
 detected, and the template will be reloaded on the next rendering.
 
@@ -795,7 +795,7 @@ application's configuration section, e.g.::
 Available Add-On Template System Bindings
 -----------------------------------------
 
-Jinja2 template bindings are available for :mod:`pyramid` in the
+Jinja2 template bindings are available for :app:`Pyramid` in the
 ``pyramid_jinja2`` package.  It lives in the Pylons version control
 repository at `http://github.com/Pylons/pyramid_jinja2
 <http://github.com/Pylons/pyramid_jinja2>`_.  At the time of this writing, it

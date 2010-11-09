@@ -52,7 +52,7 @@ Preparation, UNIX
 #. (Optional) Consider using ``source bin/activate`` to make your
    shell environment wired to use the virtualenv.
 
-#. Use ``easy_install`` to get :mod:`pyramid` and its direct
+#. Use ``easy_install`` to get :app:`Pyramid` and its direct
    dependencies installed:
 
    .. code-block:: bash
@@ -104,7 +104,7 @@ Preparation, Windows
 #. (Optional) Consider using ``bin\activate.bat`` to make your shell
    environment wired to use the virtualenv.
 
-#. Use ``easy_install`` to get :mod:`pyramid` and its direct
+#. Use ``easy_install`` to get :app:`Pyramid` and its direct
    dependencies installed:
 
    .. code-block:: bat
@@ -124,7 +124,7 @@ Preparation, Windows
 Making a Project
 ================
 
-Your next step is to create a project.  :mod:`pyramid` supplies a
+Your next step is to create a project.  :app:`Pyramid` supplies a
 variety of templates to generate sample projects.  For this tutorial,
 we will use the :term:`ZODB` -oriented template named ``pyramid_zodb``.
 
@@ -255,8 +255,8 @@ assumptions:
 
 .. note::
 
-   :mod:`pyramid` supports any persistent storage mechanism (e.g. a SQL
-   database or filesystem files, etc).  :mod:`pyramid` also supports an
+   :app:`Pyramid` supports any persistent storage mechanism (e.g. a SQL
+   database or filesystem files, etc).  :app:`Pyramid` also supports an
    additional mechanism to map URLs to code (:term:`URL dispatch`).  However,
    for the purposes of this tutorial, we'll only be using traversal and ZODB.
 

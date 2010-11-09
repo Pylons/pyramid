@@ -2,7 +2,7 @@ from pyramid.compat import wraps
 from pyramid.traversal import quote_path_segment
 
 def wsgiapp(wrapped):
-    """ Decorator to turn a WSGI application into a :mod:`pyramid`
+    """ Decorator to turn a WSGI application into a :app:`Pyramid`
     :term:`view callable`.  This decorator differs from the
     :func:`pyramid.wsgi.wsgiapp2` decorator inasmuch as fixups of
     ``PATH_INFO`` and ``SCRIPT_NAME`` within the WSGI environment *are
@@ -32,7 +32,7 @@ def wsgiapp(wrapped):
 
     The ``wsgiapp`` decorator will convert the result of the WSGI
     application to a :term:`Response` and return it to
-    :mod:`pyramid` as if the WSGI app were a :mod:`pyramid`
+    :app:`Pyramid` as if the WSGI app were a :mod:`pyramid`
     view.
     
     """
@@ -41,7 +41,7 @@ def wsgiapp(wrapped):
     return wraps(wrapped)(decorator) # grokkability
 
 def wsgiapp2(wrapped):
-    """ Decorator to turn a WSGI application into a :mod:`pyramid`
+    """ Decorator to turn a WSGI application into a :app:`Pyramid`
     view callable.  This decorator differs from the
     :func:`pyramid.wsgi.wsgiapp` decorator inasmuch as fixups of
     ``PATH_INFO`` and ``SCRIPT_NAME`` within the WSGI environment
@@ -70,8 +70,8 @@ def wsgiapp2(wrapped):
         config.add_view(hello_world, name='hello_world.txt')
 
     The ``wsgiapp2`` decorator will convert the result of the WSGI
-    application to a Response and return it to :mod:`pyramid` as if
-    the WSGI app were a :mod:`pyramid` view.  The ``SCRIPT_NAME``
+    application to a Response and return it to :app:`Pyramid` as if
+    the WSGI app were a :app:`Pyramid` view.  The ``SCRIPT_NAME``
     and ``PATH_INFO`` values present in the WSGI environment are fixed
     up before the application is invoked.  """
     

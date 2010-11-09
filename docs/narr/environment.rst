@@ -19,7 +19,7 @@
 Environment Variables and ``.ini`` File Settings
 ================================================
 
-:mod:`pyramid` behavior can be configured through a combination of
+:app:`Pyramid` behavior can be configured through a combination of
 operating system environment variables and ``.ini`` configuration file
 application section settings.  The meaning of the environment
 variables and the configuration file settings overlap.
@@ -32,7 +32,7 @@ variables and the configuration file settings overlap.
 The term "configuration file setting name" refers to a key in the
 ``.ini`` configuration for your application.  The configuration file
 setting names documented in this chapter are reserved for
-:mod:`pyramid` use.  You should not use them to indicate
+:app:`Pyramid` use.  You should not use them to indicate
 application-specific configuration settings.
 
 Reloading Templates
@@ -206,7 +206,7 @@ Examples
 
 Let's presume your configuration file is named ``MyProject.ini``, and
 there is a section representing your application named ``[app:main]``
-within the file that represents your :mod:`pyramid` application.
+within the file that represents your :app:`Pyramid` application.
 The configuration file settings documented in the above "Config File
 Setting Name" column would go in the ``[app:main]`` section.  Here's
 an example of such a section:
@@ -220,14 +220,14 @@ an example of such a section:
 
 You can also use environment variables to accomplish the same purpose
 for settings documented as such.  For example, you might start your
-:mod:`pyramid` application using the following command line:
+:app:`Pyramid` application using the following command line:
 
 .. code-block:: python
 
   $ BFG_DEBUG_AUTHORIZATION=1 BFG_RELOAD_TEMPLATES=1 bin/paster serve \
          MyProject.ini
 
-If you started your application this way, your :mod:`pyramid`
+If you started your application this way, your :app:`Pyramid`
 application would behave in the same manner as if you had placed the
 respective settings in the ``[app:main]`` section of your
 application's ``.ini`` file.
@@ -255,24 +255,24 @@ Understanding the Distinction Between ``reload_templates`` and ``reload_resource
 
 The difference between ``reload_resources`` and ``reload_templates``
 is a bit subtle.  Templates are themselves also treated by
-:mod:`pyramid` as :term:`pkg_resources` resource files (along with
+:app:`Pyramid` as :term:`pkg_resources` resource files (along with
 static files and other resources), so the distinction can be
 confusing.  It's helpful to read :ref:`overriding_resources_section`
 for some context about resources in general.
 
-When ``reload_templates`` is true, :mod:`pyramid` takes advantage
+When ``reload_templates`` is true, :app:`Pyramid` takes advantage
 of the underlying templating systems' ability to check for file
 modifications to an individual template file.  When
 ``reload_templates`` is true but ``reload_resources`` is *not* true,
 the template filename returned by pkg_resources is cached by
-:mod:`pyramid` on the first request.  Subsequent requests for the
+:app:`Pyramid` on the first request.  Subsequent requests for the
 same template file will return a cached template filename.  The
 underlying templating system checks for modifications to this
 particular file for every request.  Setting ``reload_templates`` to
 ``True`` doesn't affect performance dramatically (although it should
 still not be used in production because it has some effect).
 
-However, when ``reload_resources`` is true, :mod:`pyramid` will not
+However, when ``reload_resources`` is true, :app:`Pyramid` will not
 cache the template filename, meaning you can see the effect of
 changing the content of an overridden resource directory for templates
 without restarting the server after every change.  Subsequent requests

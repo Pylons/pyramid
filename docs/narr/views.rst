@@ -3,7 +3,7 @@
 Views
 =====
 
-The primary job of any :mod:`pyramid` application is is to find and
+The primary job of any :app:`Pyramid` application is is to find and
 invoke a :term:`view callable` when a :term:`request` reaches the
 application.  View callables are bits of code written by you -- the
 application developer -- which do something interesting in response to
@@ -11,7 +11,7 @@ a request made to your application.
 
 .. note:: 
 
-   A :mod:`pyramid` :term:`view callable` is often referred to in
+   A :app:`Pyramid` :term:`view callable` is often referred to in
    conversational shorthand as a :term:`view`.  In this documentation,
    however, we need to use less ambiguous terminology because there
    are significant differences between view *configuration*, the code
@@ -39,12 +39,12 @@ View Callables
 --------------
 
 No matter how a view callable is eventually found, all view callables
-used by :mod:`pyramid` must be constructed in the same way, and
+used by :app:`Pyramid` must be constructed in the same way, and
 must return the same kind of return value.
 
 Most view callables accept a single argument named ``request``.  This argument
-represents a :mod:`pyramid` :term:`Request` object.  A request object
-encapsulates a WSGI environment as represented to :mod:`pyramid` by the
+represents a :app:`Pyramid` :term:`Request` object.  A request object
+encapsulates a WSGI environment as represented to :app:`Pyramid` by the
 upstream :term:`WSGI` server.
 
 A view callable may always return a :mod:`Pyramid` :term:`Response` object
@@ -150,7 +150,7 @@ context
   will be a :term:`model` object.
 
 request
-  A :mod:`pyramid` Request object representing the current WSGI
+  A :app:`Pyramid` Request object representing the current WSGI
   request.
 
 The following types work as view callables in this style:
@@ -211,7 +211,7 @@ has access to the context via ``request.context``.
 View Callable Responses
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-A view callable may always return an object that implements the :mod:`pyramid`
+A view callable may always return an object that implements the :app:`Pyramid`
 :term:`Response` interface.  The easiest way to return something that
 implements the :term:`Response` interface is to return a
 :class:`pyramid.response.Response` object instance directly.  For example:
@@ -225,7 +225,7 @@ implements the :term:`Response` interface is to return a
        return Response('OK')
 
 You don't need to always use :class:`pyramid.response.Response` to represent a
-response.  :mod:`pyramid` provides a range of different "exception" classes
+response.  :app:`Pyramid` provides a range of different "exception" classes
 which can act as response objects too.  For example, an instance of the class
 :class:`pyramid.httpexceptions.HTTPFound` is also a valid response object (see
 :ref:`http_redirect`).  A view can actually return any object that has the
@@ -249,7 +249,7 @@ app_iter
 
 Furthermore, a view needn't *always* return a Response object.  If a view
 happens to return something which does not implement the Pyramid Response
-interface, :mod:`pyramid` will attempt to use a :term:`renderer` to construct a
+interface, :app:`Pyramid` will attempt to use a :term:`renderer` to construct a
 response.  For example:
 
 .. code-block:: python
@@ -350,7 +350,7 @@ response.
 If the :term:`view callable` associated with a :term:`view configuration`
 returns a Response object directly (an object with the attributes ``status``,
 ``headerlist`` and ``app_iter``), any renderer associated with the view
-configuration is ignored, and the response is passed back to :mod:`pyramid`
+configuration is ignored, and the response is passed back to :app:`Pyramid`
 unmolested.  For example, if your view callable returns an instance of the
 :class:`pyramid.httpexceptions.HTTPFound` class as a response, no renderer will
 be employed.
@@ -379,7 +379,7 @@ Additional renderers can be added to the system as necessary (see
 Built-In Renderers
 ~~~~~~~~~~~~~~~~~~
 
-Several built-in "renderers" exist in :mod:`pyramid`.  These
+Several built-in "renderers" exist in :app:`Pyramid`.  These
 renderers can be used in the ``renderer`` attribute of view
 configurations.
 
@@ -621,7 +621,7 @@ Varying Attributes of Rendered Responses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Before a response that is constructed as the result of the use of a
-:term:`renderer` is returned to :mod:`pyramid`, several attributes
+:term:`renderer` is returned to :app:`Pyramid`, several attributes
 of the request are examined which have the potential to influence
 response behavior.
 
@@ -676,7 +676,7 @@ documentation in :ref:`request_module`.
 Adding and Overriding Renderers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-New templating systems and serializers can be associated with :mod:`pyramid`
+New templating systems and serializers can be associated with :app:`Pyramid`
 renderer names.  To this end, configuration declarations can be made which
 override an existing :term:`renderer factory` and which add a new renderer
 factory.
@@ -845,7 +845,7 @@ extension for the same kinds of templates.  For example, to associate the
 
    config.add_renderer('.zpt', 'pyramid.chameleon_zpt.renderer_factory')
 
-After you do this, :mod:`pyramid` will treat templates ending in both the
+After you do this, :app:`Pyramid` will treat templates ending in both the
 ``.pt`` and ``.zpt`` filename extensions as Chameleon ZPT templates.
 
 To override the default mapping in which files with a ``.pt`` extension are
@@ -879,11 +879,11 @@ Using Special Exceptions In View Callables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Usually when a Python exception is raised within a view callable,
-:mod:`pyramid` allows the exception to propagate all the way out to
+:app:`Pyramid` allows the exception to propagate all the way out to
 the :term:`WSGI` server which invoked the application.
 
 However, for convenience, two special exceptions exist which are
-always handled by :mod:`pyramid` itself.  These are
+always handled by :app:`Pyramid` itself.  These are
 :exc:`pyramid.exceptions.NotFound` and
 :exc:`pyramid.exceptions.Forbidden`.  Both are exception classes
 which accept a single positional constructor argument: a ``message``.
@@ -897,7 +897,7 @@ the result of the :term:`Forbidden View` will be returned to the user
 agent which performed the request.
 
 In all cases, the message provided to the exception constructor is
-made available to the view which :mod:`pyramid` invokes as
+made available to the view which :app:`Pyramid` invokes as
 ``request.exception.args[0]``.
 
 .. index::
@@ -916,7 +916,7 @@ specialized views as described in
 developers to convert arbitrary exceptions to responses.
 
 To register a view that should be called whenever a particular
-exception is raised from with :mod:`pyramid` view code, use the
+exception is raised from with :app:`Pyramid` view code, use the
 exception class or one of its superclasses as the ``context`` of a
 view configuration which points at a view callable you'd like to
 generate a response.
@@ -999,23 +999,23 @@ Handling Form Submissions in View Callables (Unicode and Character Set Issues)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Most web applications need to accept form submissions from web
-browsers and various other clients.  In :mod:`pyramid`, form
+browsers and various other clients.  In :app:`Pyramid`, form
 submission handling logic is always part of a :term:`view`.  For a
 general overview of how to handle form submission data using the
 :term:`WebOb` API, see :ref:`webob_chapter` and `"Query and POST
 variables" within the WebOb documentation
 <http://pythonpaste.org/webob/reference.html#query-post-variables>`_.
-:mod:`pyramid` defers to WebOb for its request and response
+:app:`Pyramid` defers to WebOb for its request and response
 implementations, and handling form submission data is a property of
 the request implementation.  Understanding WebOb's request API is the
 key to understanding how to process form submission data.
 
 There are some defaults that you need to be aware of when trying to handle form
-submission data in a :mod:`pyramid` view.  Because having high-order
+submission data in a :app:`Pyramid` view.  Because having high-order
 (non-ASCII) characters in data contained within form submissions is exceedingly
 common, and because the UTF-8 encoding is the most common encoding used on the
 web for non-ASCII character data, and because working and storing Unicode
-values is much saner than working with and storing bytestrings, :mod:`pyramid`
+values is much saner than working with and storing bytestrings, :app:`Pyramid`
 configures the :term:`WebOb` request machinery to attempt to decode form
 submission values into Unicode from the UTF-8 character set implicitly.  This
 implicit decoding happens when view code obtains form field values via the
@@ -1023,7 +1023,7 @@ implicit decoding happens when view code obtains form field values via the
 :ref:`request_module` for details about these APIs).
 
 For example, let's assume that the following form page is served up to
-a browser client, and its ``action`` points at some :mod:`pyramid`
+a browser client, and its ``action`` points at some :app:`Pyramid`
 view code:
 
 .. code-block:: xml
@@ -1044,7 +1044,7 @@ view code:
      </form>
    </html>
 
-The ``myview`` view code in the :mod:`pyramid` application *must*
+The ``myview`` view code in the :app:`Pyramid` application *must*
 expect that the values returned by ``request.params`` will be of type
 ``unicode``, as opposed to type ``str``. The following will work to
 accept a form post from the above form:
@@ -1070,7 +1070,7 @@ decode already-decoded (``unicode``) values obtained from
        lastname = request.params['lastname'].decode('utf-8')
 
 For implicit decoding to work reliably, you should ensure that every form you
-render that posts to a :mod:`pyramid` view is rendered via a response that has
+render that posts to a :app:`Pyramid` view is rendered via a response that has
 a ``;charset=UTF-8`` in its ``Content-Type`` header; or, as in the form above,
 with a ``meta http-equiv`` tag that implies that the charset is UTF-8 within
 the HTML ``head`` of the page containing the form.  This must be done
@@ -1098,7 +1098,7 @@ response object, you will need to ensure you do this yourself.
 
 .. note:: Only the *values* of request params obtained via
    ``request.params``, ``request.GET`` or ``request.POST`` are decoded
-   to Unicode objects implicitly in the :mod:`pyramid` default
+   to Unicode objects implicitly in the :app:`Pyramid` default
    configuration.  The keys are still strings.
 
 .. index::
@@ -1110,7 +1110,7 @@ View Configuration: Mapping a Context to a View
 -----------------------------------------------
 
 A developer makes a :term:`view callable` available for use within a
-:mod:`pyramid` application via :term:`view configuration`.  A view
+:app:`Pyramid` application via :term:`view configuration`.  A view
 configuration associates a view callable with a set of statements
 about the set of circumstances which must be true for the view
 callable to be invoked.
@@ -1220,7 +1220,7 @@ Non-Predicate Arguments
 
   The ``renderer`` attribute is optional.  If it is not defined, the
   "null" renderer is assumed (no rendering is performed and the value
-  is passed back to the upstream :mod:`pyramid` machinery
+  is passed back to the upstream :app:`Pyramid` machinery
   unmolested).  Note that if the view callable itself returns a
   :term:`response` (see :ref:`the_response`), the specified renderer
   implementation is never called.
@@ -1433,13 +1433,13 @@ Usage of the ``view_config`` decorator is a form of :term:`declarative
 configuration`, like ZCML, but in decorator form.
 :class:`pyramid.view.view_config` can be used to associate :term:`view
 configuration` information -- as done via the equivalent imperative code or
-ZCML -- with a function that acts as a :mod:`pyramid` view callable.  All
+ZCML -- with a function that acts as a :app:`Pyramid` view callable.  All
 arguments to the :meth:`pyramid.configuration.Configurator.add_view` method
 (save for the ``view`` argument) are available in decorator form and mean
 precisely the same thing.
 
 An example of the :class:`pyramid.view.view_config` decorator might
-reside in a :mod:`pyramid` application module ``views.py``:
+reside in a :app:`Pyramid` application module ``views.py``:
 
 .. ignore-next-block
 .. code-block:: python
@@ -1483,7 +1483,7 @@ requests with any request method / request type / request param /
 route name / containment.
 
 The mere existence of a ``@view_config`` decorator doesn't suffice to perform
-view configuration.  To make :mod:`pyramid` process your
+view configuration.  To make :app:`Pyramid` process your
 :class:`pyramid.view.view_config` declarations, you *must* do use the
 ``scan`` method of a :class:`pyramid.configuration.Configurator`:
 
@@ -1786,7 +1786,7 @@ will be returned to the client as per :ref:`protecting_views`.
 View Lookup and Invocation
 --------------------------
 
-:term:`View lookup` is the :mod:`pyramid` subsystem responsible for
+:term:`View lookup` is the :app:`Pyramid` subsystem responsible for
 finding an invoking a :term:`view callable`.  The view lookup
 subsystem is passed a :term:`context`, a :term:`view name`, and the
 :term:`request` object.  These three bits of information are referred
@@ -1807,7 +1807,7 @@ For any given request, a view with five predicates will always be
 found and evaluated before a view with two, for example.  All
 predicates must match for the associated view to be called.
 
-This does not mean however, that :mod:`pyramid` "stops looking"
+This does not mean however, that :app:`Pyramid` "stops looking"
 when it finds a view registration with predicates that don't match.
 If one set of view predicates does not match, the "next most specific"
 view (if any) view is consulted for predicates, and so on, until a
@@ -1816,7 +1816,7 @@ first view with a set of predicates all of which match the request
 environment will be invoked.
 
 If no view can be found which has predicates which allow it to be
-matched up with the request, :mod:`pyramid` will return an error to
+matched up with the request, :app:`Pyramid` will return an error to
 the user's browser, representing a "not found" (404) page.  See
 :ref:`changing_the_notfound_view` for more information about changing
 the default notfound view.

@@ -1,6 +1,6 @@
 .. _installing_chapter:
 
-Installing :mod:`pyramid`
+Installing :app:`Pyramid`
 ============================
 
 .. index::
@@ -10,22 +10,22 @@ Before You Install
 ------------------
 
 You will need `Python <http://python.org>`_ version 2.4 or better to
-run :mod:`pyramid`.  
+run :app:`Pyramid`.  
 
 .. sidebar:: Python Versions
 
-    As of this writing, :mod:`pyramid` has been tested under Python
+    As of this writing, :app:`Pyramid` has been tested under Python
     2.4.6, Python 2.5.4 and Python 2.6.2, and Python 2.7.  To ensure
-    backwards compatibility, development of :mod:`pyramid` is
+    backwards compatibility, development of :app:`Pyramid` is
     currently done primarily under Python 2.4 and Python 2.5.
-    :mod:`pyramid` does not run under any version of Python before
+    :app:`Pyramid` does not run under any version of Python before
     2.4, and does not yet run under Python 3.X.
 
-:mod:`pyramid` is known to run on all popular Unix-like systems
+:app:`Pyramid` is known to run on all popular Unix-like systems
 such as Linux, MacOS X, and FreeBSD as well as on Windows platforms.
 It is also known to run on Google's App Engine and :term:`Jython`.
 
-:mod:`pyramid` installation does not require the compilation of any
+:app:`Pyramid` installation does not require the compilation of any
 C code, so you need only a Python interpreter that meets the
 requirements mentioned.
 
@@ -60,7 +60,7 @@ Source Compile Method
 
 It's useful to use a Python interpreter that *isn't* the "system"
 Python interpreter to develop your software.  The authors of
-:mod:`pyramid` tend not to use the system Python for development
+:app:`Pyramid` tend not to use the system Python for development
 purposes; always a self-compiled one.  Compiling Python is usually
 easy, and often the "system" Python is compiled with options that
 aren't optimal for web development.
@@ -126,20 +126,20 @@ extensions <http://sourceforge.net/projects/pywin32/files/>`_.
 
 .. _installing_unix:
 
-Installing :mod:`pyramid` on a UNIX System
+Installing :app:`Pyramid` on a UNIX System
 ---------------------------------------------
 
-It is best practice to install :mod:`pyramid` into a "virtual"
+It is best practice to install :app:`Pyramid` into a "virtual"
 Python environment in order to obtain isolation from any "system"
 packages you've got installed in your Python version.  This can be
 done by using the :term:`virtualenv` package.  Using a virtualenv will
-also prevent :mod:`pyramid` from globally installing versions of
+also prevent :app:`Pyramid` from globally installing versions of
 packages that are not compatible with your system Python.
 
-To set up a virtualenv in which to install :mod:`pyramid`, first
+To set up a virtualenv in which to install :app:`Pyramid`, first
 ensure that :term:`setuptools` is installed.  Invoke ``import
 setuptools`` within the Python interpreter you'd like to run
-:mod:`pyramid` under:
+:app:`Pyramid` under:
 
 .. code-block:: text
 
@@ -225,8 +225,8 @@ following:
 .. warning:: Using ``--no-site-packages`` when generating your
    virtualenv is *very important*. This flag provides the necessary
    isolation for running the set of packages required by
-   :mod:`pyramid`.  If you do not specify ``--no-site-packages``,
-   it's possible that :mod:`pyramid` will not install properly into
+   :app:`Pyramid`.  If you do not specify ``--no-site-packages``,
+   it's possible that :app:`Pyramid` will not install properly into
    the virtualenv, or, even if it does, may not run properly,
    depending on the packages you've already got installed into your
    Python's "main" site-packages dir.
@@ -238,11 +238,11 @@ following:
 You should perform any following commands that mention a "bin"
 directory from within the ``env`` virtualenv dir.
 
-Installing :mod:`pyramid` Into the Virtual Python Environment
+Installing :app:`Pyramid` Into the Virtual Python Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 After you've got your ``env`` virtualenv installed, you may install
-:mod:`pyramid` itself using the following commands from within the
+:app:`Pyramid` itself using the following commands from within the
 virtualenv (``env``) directory:
 
 .. code-block:: text
@@ -257,7 +257,7 @@ downloads and installs a number of dependencies.
 
 .. _installing_windows:
 
-Installing :mod:`pyramid` on a Windows System
+Installing :app:`Pyramid` on a Windows System
 -------------------------------------------------
 
 #. Install, or find `Python 2.6
@@ -300,7 +300,7 @@ Installing :mod:`pyramid` on a Windows System
    environment wired to use the virtualenv.
 
 #. Use ``easy_install`` pointed at the "current" index to get
-   :mod:`pyramid` and its direct dependencies installed:
+   :app:`Pyramid` and its direct dependencies installed:
 
    .. code-block:: text
 
@@ -309,29 +309,29 @@ Installing :mod:`pyramid` on a Windows System
 .. index::
    single: installing on Google App Engine
 
-Installing :mod:`pyramid` on Google App Engine
+Installing :app:`Pyramid` on Google App Engine
 -------------------------------------------------
 
 :ref:`appengine_tutorial` documents the steps required to install a
-:mod:`pyramid` application on Google App Engine.
+:app:`Pyramid` application on Google App Engine.
 
-Installing :mod:`pyramid` on Jython
+Installing :app:`Pyramid` on Jython
 --------------------------------------
 
-:mod:`pyramid` is known to work under :term:`Jython` version 2.5.1.
+:app:`Pyramid` is known to work under :term:`Jython` version 2.5.1.
 Install :term:`Jython`, and then follow the installation steps for
-:mod:`pyramid` on your platform described in one of the sections
+:app:`Pyramid` on your platform described in one of the sections
 entitled :ref:`installing_unix` or :ref:`installing_windows` above,
 replacing the ``python`` command with ``jython`` as necessary.  The
 steps are exactly the same except you should use the ``jython``
 command name instead of the ``python`` command name.
 
-One caveat exists to using :mod:`pyramid` under Jython: the
+One caveat exists to using :app:`Pyramid` under Jython: the
 :term:`Chameleon` templating engine, which is the default templating
-engine for :mod:`pyramid` does not work on Jython.
+engine for :app:`Pyramid` does not work on Jython.
 
 The ``pyramid_jinja2`` distribution provides templating for
-:mod:`pyramid` using the :term:`Jinja2` templating system.  You may
+:app:`Pyramid` using the :term:`Jinja2` templating system.  You may
 install it like so using the ``easy_install`` command for Jython:
 
 .. code-block:: python
@@ -339,7 +339,7 @@ install it like so using the ``easy_install`` command for Jython:
    $ easy_install pyramid_jinja2
 
 Once this is done, you can use this command to get started with a
-:mod:`pyramid` sample application that uses the Jinja2 templating
+:app:`Pyramid` sample application that uses the Jinja2 templating
 engine:
 
 .. code-block:: python
@@ -352,10 +352,10 @@ about the ``paster create`` command.
 What Gets Installed
 -------------------
 
-When you ``easy_install`` :mod:`pyramid`, various Zope libraries,
+When you ``easy_install`` :app:`Pyramid`, various Zope libraries,
 various Chameleon libraries, WebOb, Paste, PasteScript, and
 PasteDeploy libraries are installed.
 
 Additionally, as chronicled in :ref:`project_narr`, PasteScript (aka
 *paster*) templates will be registered that make it easy to start a
-new :mod:`pyramid` project.
+new :app:`Pyramid` project.

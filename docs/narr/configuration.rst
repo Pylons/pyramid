@@ -6,22 +6,22 @@
 Application Configuration 
 =========================
 
-Each deployment of an application written using :mod:`pyramid` implies a
+Each deployment of an application written using :app:`Pyramid` implies a
 specific *configuration* of the framework itself.  For example, an
 application which serves up MP3s for user consumption might plug code into
 the framework that manages songs, while an application that manages corporate
-data might plug in code that manages accounting information.  :mod:`pyramid`
+data might plug in code that manages accounting information.  :app:`Pyramid`
 refers to the way in which code is plugged in to it for a specific
 application as "configuration".
 
 Most people understand "configuration" as coarse settings that inform the
 high-level operation of a specific application deployment.  For instance,
 it's easy to think of the values implied by a ``.ini`` file parsed at
-application startup time as "configuration".  :mod:`pyramid` extends this
+application startup time as "configuration".  :app:`Pyramid` extends this
 pattern to application development, using the term "configuration" to express
 standardized ways that code gets plugged into a deployment of the framework
-itself.  When you plug code into the :mod:`pyramid` framework, you are
-"configuring" :mod:`pyramid` for the purpose of creating a particular
+itself.  When you plug code into the :app:`Pyramid` framework, you are
+"configuring" :app:`Pyramid` for the purpose of creating a particular
 application deployment.
 
 .. index::
@@ -32,7 +32,7 @@ application deployment.
 Imperative Configuration
 ------------------------
 
-Here's one of the simplest :mod:`pyramid` applications, configured
+Here's one of the simplest :app:`Pyramid` applications, configured
 imperatively:
 
 .. code-block:: python
@@ -77,7 +77,7 @@ An alternate mode of configuration lends more *locality of reference* to a
 configuration done in imperative code, because you may need to have two files
 open at once to see the "big picture": the file that represents the
 configuration, and the file that contains the implementation objects
-referenced by the configuration.  To avoid this, :mod:`pyramid` allows you to
+referenced by the configuration.  To avoid this, :app:`Pyramid` allows you to
 insert :term:`configuration decoration` statements very close to code that is
 referred to by the declaration itself.  For example:
 
@@ -93,7 +93,7 @@ referred to by the declaration itself.  For example:
 
 The mere existence of configuration decoration doesn't cause any
 configuration registration to be made.  Before they have any effect on
-the configuration of a :mod:`pyramid` application, a configuration
+the configuration of a :app:`Pyramid` application, a configuration
 decoration within application code must be found through a process
 known as a :term:`scan`.
 
@@ -101,7 +101,7 @@ The :class:`pyramid.view.view_config` decorator above adds an
 attribute to the ``hello`` function, making it available for a
 :term:`scan` to find it later.
 
-:mod:`pyramid` is willing to :term:`scan` a module or a package and
+:app:`Pyramid` is willing to :term:`scan` a module or a package and
 its subpackages for decorations when the
 :meth:`pyramid.configuration.Configurator.scan` method is invoked:
 scanning implies searching for configuration declarations in a package
@@ -155,7 +155,7 @@ Declarative Configuration
 -------------------------
 
 A third mode of configuration can be employed when you create a
-:mod:`pyramid` application named *declarative configuration*.  This mode uses
+:app:`Pyramid` application named *declarative configuration*.  This mode uses
 :term:`ZCML` to represent configuration statements rather than Python.  ZCML
 is often used when application extensibility is important.  Most of the
 examples in the narrative portion of this documentation concentrate on

@@ -3,7 +3,7 @@
 ``forbidden``
 -------------
 
-When :mod:`pyramid` can't authorize execution of a view based on
+When :app:`Pyramid` can't authorize execution of a view based on
 the :term:`authorization policy` in use, it invokes a :term:`forbidden
 view`.  The default forbidden response has a 401 status code and is
 very plain, but it can be overridden as necessary using the
@@ -11,7 +11,7 @@ very plain, but it can be overridden as necessary using the
 
 .. warning::
 
-   The ``forbidden`` ZCML directive is deprecated in :mod:`pyramid`
+   The ``forbidden`` ZCML directive is deprecated in :app:`Pyramid`
    version 1.3.  Instead, you should use the :ref:`view_directive`
    directive with a ``context`` that names the
    :exc:`pyramid.exceptions.Forbidden` class.  See

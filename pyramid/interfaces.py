@@ -4,13 +4,13 @@ from zope.interface import Interface
 # public API interfaces
 
 class IContextFound(Interface):
-    """ An event type that is emitted after :mod:`pyramid` finds a
+    """ An event type that is emitted after :app:`Pyramid` finds a
     :term:`context` object but before it calls any view code.  See the
     documentation attached to :class:`pyramid.events.ContextFound`
     for more information.
 
     .. note:: For backwards compatibility with versions of
-       :mod:`pyramid` before 1.0, this event interface can also be
+       :app:`Pyramid` before 1.0, this event interface can also be
        imported as :class:`pyramid.interfaces.IAfterTraversal`.
     """
     request = Attribute('The request object')
@@ -18,13 +18,13 @@ class IContextFound(Interface):
 IAfterTraversal = IContextFound
 
 class INewRequest(Interface):
-    """ An event type that is emitted whenever :mod:`pyramid`
+    """ An event type that is emitted whenever :app:`Pyramid`
     begins to process a new request.  See the documentation attached
     to :class:`pyramid.events.NewRequest` for more information."""
     request = Attribute('The request object')
     
 class INewResponse(Interface):
-    """ An event type that is emitted whenever any :mod:`pyramid`
+    """ An event type that is emitted whenever any :app:`Pyramid`
     view returns a response. See the
     documentation attached to :class:`pyramid.events.NewResponse`
     for more information."""
@@ -38,7 +38,7 @@ class IApplicationCreated(Interface):
     :class:`pyramid.events.ApplicationCreated` for more
     information.
 
-    .. note:: For backwards compatibility with :mod:`pyramid`
+    .. note:: For backwards compatibility with :app:`Pyramid`
        versions before 1.0, this interface can also be imported as
        :class:`pyramid.interfaces.IWSGIApplicationCreatedEvent`.
     """
@@ -58,7 +58,7 @@ class IExceptionResponse(IException, IResponse):
     """ An interface representing a WSGI response which is also an
     exception object.  Register an exception view using this interface
     as a ``context`` to apply the registered view for all exception
-    types raised by :mod:`pyramid` internally
+    types raised by :app:`Pyramid` internally
     (:class:`pyramid.exceptions.NotFound` and
     :class:`pyramid.exceptions.Forbidden`)."""
 
@@ -323,7 +323,7 @@ class IRoute(Interface):
     name = Attribute('The route name')
     pattern = Attribute('The route pattern')
     factory = Attribute(
-        'The :term:`root factory` used by the :mod:`pyramid` router '
+        'The :term:`root factory` used by the :app:`Pyramid` router '
         'when this route matches (or ``None``)')
     predicates = Attribute(
         'A sequence of :term:`route predicate` objects used to '

@@ -12,7 +12,7 @@ products often provide skin layers that are activated within a
 particular skin to provide the site with additional features.
 
 To override static resources using a "search path" much like a set of
-skin layers, :mod:`pyramid` provides the concept of
+skin layers, :app:`Pyramid` provides the concept of
 :term:`resource` overrides.  See :ref:`overriding_resources_section`
 for more information about resource overrides.
 

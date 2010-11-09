@@ -1,6 +1,6 @@
 .. _catalog_tutorial:
 
-Using :mod:`repoze.catalog` Within :mod:`pyramid`
+Using :mod:`repoze.catalog` Within :app:`Pyramid`
 =================================================
 
 :mod:`repoze.catalog` is a ZODB-based system that can be used to index

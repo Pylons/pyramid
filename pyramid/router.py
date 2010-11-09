@@ -49,7 +49,7 @@ class Router(object):
     def __call__(self, environ, start_response):
         """
         Accept ``environ`` and ``start_response``; create a
-        :term:`request` and route the request to a :mod:`pyramid`
+        :term:`request` and route the request to a :app:`Pyramid`
         view based on introspection of :term:`view configuration`
         within the application registry; call ``start_response`` and
         return an iterable.

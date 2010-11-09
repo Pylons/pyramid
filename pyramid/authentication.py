@@ -44,7 +44,7 @@ class CallbackAuthenticationPolicy(object):
 
 
 class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
-    """ A :mod:`pyramid` :term:`authentication policy` which
+    """ A :app:`Pyramid` :term:`authentication policy` which
     obtains data from the :mod:`repoze.who` 1.X WSGI 'API' (the
     ``repoze.who.identity`` key in the WSGI environment).
 
@@ -123,7 +123,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         return identifier.forget(request.environ, identity)
 
 class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
-    """ A :mod:`pyramid` :term:`authentication policy` which
+    """ A :app:`Pyramid` :term:`authentication policy` which
     obtains data from the ``REMOTE_USER`` WSGI environment variable.
 
     Constructor Arguments
@@ -157,7 +157,7 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
         return []
 
 class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
-    """ A :mod:`pyramid` :term:`authentication policy` which
+    """ A :app:`Pyramid` :term:`authentication policy` which
     obtains data from an :class:`paste.auth.auth_tkt` cookie.
 
     Constructor Arguments

@@ -6,7 +6,7 @@
 Security
 ========
 
-:mod:`pyramid` provides an optional declarative authorization
+:app:`Pyramid` provides an optional declarative authorization
 system that prevents a :term:`view` from being invoked when the user
 represented by credentials in the :term:`request` does not have an
 appropriate level of access within a particular :term:`context`.
@@ -43,8 +43,8 @@ Here's how it works at a high level:
 
 Authorization is enabled by modifying your application to include an
 :term:`authentication policy` and :term:`authorization policy`.
-:mod:`pyramid` comes with a variety of implementations of these
-policies.  To provide maximal flexibility, :mod:`pyramid` also
+:app:`Pyramid` comes with a variety of implementations of these
+policies.  To provide maximal flexibility, :app:`Pyramid` also
 allows you to create custom authentication policies and authorization
 policies.
 
@@ -54,7 +54,7 @@ policies.
 Enabling an Authorization Policy
 --------------------------------
 
-By default, :mod:`pyramid` enables no authorization policy.  All
+By default, :app:`Pyramid` enables no authorization policy.  All
 views are accessible by completely anonymous users.  In order to begin
 protecting views from execution based on security settings, you need
 to enable an authorization policy.
@@ -174,7 +174,7 @@ registered view always be executable by entirely anonymous users: any
 authorization policy in effect is ignored.
 
 In support of making it easier to configure applications which are
-"secure by default", :mod:`pyramid` allows you to configure a
+"secure by default", :app:`Pyramid` allows you to configure a
 *default* permission.  If supplied, the default permission is used as
 the permission string to all view registrations which don't otherwise
 name a ``permission`` argument.
@@ -211,7 +211,7 @@ When a default permission is registered:
 Assigning ACLs to your Model Objects
 ------------------------------------
 
-When the default :mod:`pyramid` :term:`authorization policy`
+When the default :app:`Pyramid` :term:`authorization policy`
 determines whether a user possesses a particular permission in a
 :term:`context`, it examines the :term:`ACL` associated with the
 context.  An ACL is associated with a context by virtue of the
@@ -479,7 +479,7 @@ location-awareness.  See also :ref:`location_aware`.
 Changing the Forbidden View
 ---------------------------
 
-When :mod:`pyramid` denies a view invocation due to an
+When :app:`Pyramid` denies a view invocation due to an
 authorization denial, the special ``forbidden`` view is invoked.  "Out
 of the box", this forbidden view is very plain.  See
 :ref:`changing_the_forbidden_view` within :ref:`hooks_chapter` for
@@ -543,7 +543,7 @@ via print statements when a call to
 Creating Your Own Authentication Policy
 ---------------------------------------
 
-:mod:`pyramid` ships with a number of useful out-of-the-box
+:app:`Pyramid` ships with a number of useful out-of-the-box
 security policies (see :mod:`pyramid.authentication`).  However,
 creating your own authentication policy is often necessary when you
 want to control the "horizontal and vertical" of how your users
@@ -587,7 +587,7 @@ Creating Your Own Authorization Policy
 --------------------------------------
 
 An authorization policy is a policy that allows or denies access after
-a user has been authenticated.  By default, :mod:`pyramid` will use
+a user has been authenticated.  By default, :app:`Pyramid` will use
 the :class:`pyramid.authorization.ACLAuthorizationPolicy` if an
 authentication policy is activated and an authorization policy isn't
 otherwise specified.
@@ -599,7 +599,7 @@ example, it might be desirable to construct an alternate authorization
 policy which allows the application to use an authorization mechanism
 that does not involve :term:`ACL` objects.
 
-:mod:`pyramid` ships with only a single default authorization
+:app:`Pyramid` ships with only a single default authorization
 policy, so you'll need to create your own if you'd like to use a
 different one.  Creating and using your own authorization policy is a
 matter of creating an instance of an object that implements the

@@ -5,7 +5,7 @@
 
 Use of the ``static`` ZCML directive or allows you to serve static
 resources (such as JavaScript and CSS files) within a
-:mod:`pyramid` application. This mechanism makes static files
+:app:`Pyramid` application. This mechanism makes static files
 available at a name relative to the application root URL.
 
 Attributes

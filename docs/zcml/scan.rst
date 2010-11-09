@@ -5,7 +5,7 @@
 
 To make use of :term:`configuration decoration` decorators, you must
 perform a :term:`scan`.  A scan finds these decorators in code.  The
-``scan`` ZCML directive tells :mod:`pyramid` to begin such a scan.
+``scan`` ZCML directive tells :app:`Pyramid` to begin such a scan.
 
 Attributes
 ~~~~~~~~~~

@@ -46,15 +46,15 @@ measure of assurance that your "units" work together, as they will be
 expected to when your application is run in production.
 
 The suggested mechanism for unit and integration testing of a
-:mod:`pyramid` application is the Python :mod:`unittest` module.
+:app:`Pyramid` application is the Python :mod:`unittest` module.
 Although this module is named :mod:`unittest`, it is actually capable
 of driving both unit and integration tests.  A good :mod:`unittest`
 tutorial is available within `Dive Into Python
 <http://diveintopython.org/unit_testing/index.html>`_ by Mark Pilgrim.
 
-:mod:`pyramid` provides a number of facilities that make unit and
+:app:`Pyramid` provides a number of facilities that make unit and
 integration tests easier to write.  The facilities become particularly
-useful when your code calls into :mod:`pyramid` -related framework
+useful when your code calls into :app:`Pyramid` -related framework
 functions.
 
 .. index::
@@ -67,7 +67,7 @@ functions.
 Test Set Up and Tear Down
 --------------------------
 
-:mod:`pyramid` uses a "global" (actually :term:`thread local`) data
+:app:`Pyramid` uses a "global" (actually :term:`thread local`) data
 structure to hold on to two items: the current :term:`request` and the
 current :term:`application registry`.  These data structures are
 available via the :func:`pyramid.threadlocal.get_current_request`
@@ -76,7 +76,7 @@ respectively.  See :ref:`threadlocals_chapter` for information about
 these functions and the data structures they return.
 
 If your code uses these ``get_current_*`` functions or calls
-:mod:`pyramid` code which uses ``get_current_*`` functions, you
+:app:`Pyramid` code which uses ``get_current_*`` functions, you
 will need to construct a :term:`Configurator` and call its ``begin``
 method within the ``setUp`` method of your unit test and call the same
 configurator's ``end`` method within the ``tearDown`` method of your
@@ -145,7 +145,7 @@ request you passed into the ``begin`` method.  Otherwise, during
 testing, :func:`pyramid.threadlocal.get_current_request` will
 return ``None``.  We use a "dummy" request implementation supplied by
 :class:`pyramid.testing.DummyRequest` because it's easier to
-construct than a "real" :mod:`pyramid` request object.
+construct than a "real" :app:`Pyramid` request object.
 
 What?
 ~~~~~
@@ -176,7 +176,7 @@ current :term:`application registry`, but typically register a "stub"
 or "dummy" feature in place of the "real" feature that the code would
 call if it was being run normally.
 
-For example, let's imagine you want to unit test a :mod:`pyramid`
+For example, let's imagine you want to unit test a :app:`Pyramid`
 view function.
 
 .. code-block:: python
@@ -191,7 +191,7 @@ view function.
 
 Without invoking any startup code or using the testing API, an attempt
 to run this view function in a unit test will result in an error.
-When a :mod:`pyramid` application starts normally, it will populate
+When a :app:`Pyramid` application starts normally, it will populate
 a :term:`application registry` using :term:`configuration declaration`
 calls made against a :term:`Configurator` (sometimes deferring to the
 application's ``configure.zcml`` :term:`ZCML` file via ``load_zcml``).
@@ -199,9 +199,9 @@ But if this application registry is not created and populated
 (e.g. with an :meth:`pyramid.configuration.Configurator.add_view`
 :term:`configuration declaration` or ``view`` declarations in
 :term:`ZCML`), like when you invoke application code via a unit test,
-:mod:`pyramid` API functions will tend to fail.
+:app:`Pyramid` API functions will tend to fail.
 
-The testing API provided by :mod:`pyramid` allows you to simulate
+The testing API provided by :app:`Pyramid` allows you to simulate
 various application registry registrations for use under a unit
 testing framework without needing to invoke the actual application
 configuration implied by its ``run.py``.  For example, if you wanted
@@ -241,7 +241,7 @@ used the testing API.
            renderer.assert_(say='Yo')
 
 In the above example, we create a ``MyTest`` test case that inherits
-from :mod:`unittest.TestCase`.  If it's in our :mod:`pyramid`
+from :mod:`unittest.TestCase`.  If it's in our :app:`Pyramid`
 application, it will be found when ``setup.py test`` is run.  It has
 two test methods.
 
@@ -257,7 +257,7 @@ hang on to for later.
 We then create a :class:`pyramid.testing.DummyRequest` object which
 simulates a WebOb request object API.  A
 :class:`pyramid.testing.DummyRequest` is a request object that
-requires less setup than a "real" :mod:`pyramid` request.  We call
+requires less setup than a "real" :app:`Pyramid` request.  We call
 the function being tested with the manufactured request.  When the
 function is called,
 :func:`pyramid.chameleon_zpt.render_template_to_response` will call
@@ -289,7 +289,7 @@ sure to use this pattern in your test case's ``setUp`` and
 ``tearDown``; these methods make sure you're using a "fresh"
 :term:`application registry` per test run.
 
-See the :ref:`testing_module` chapter for the entire :mod:`pyramid`
+See the :ref:`testing_module` chapter for the entire :app:`Pyramid`
 -specific testing API.  This chapter describes APIs for registering a
 security policy, registering models at paths, registering event
 listeners, registering views and view permissions, and classes
@@ -306,22 +306,22 @@ See also the various methods of the :term:`Configurator` documented in
 Creating Integration Tests
 --------------------------
 
-In :mod:`pyramid`, a *unit test* typically relies on "mock" or
+In :app:`Pyramid`, a *unit test* typically relies on "mock" or
 "dummy" implementations to give the code under test only enough
 context to run.
 
 "Integration testing" implies another sort of testing.  In the context
-of a :mod:`pyramid`, integration test, the test logic tests the
+of a :app:`Pyramid`, integration test, the test logic tests the
 functionality of some code *and* its integration with the rest of the
-:mod:`pyramid` framework.
+:app:`Pyramid` framework.
 
-In :mod:`pyramid` applications that use :term:`ZCML`, you can
+In :app:`Pyramid` applications that use :term:`ZCML`, you can
 create an integration test by *loading its ZCML* in the test's setup
-code.  This causes the entire :mod:`pyramid` environment to be set
+code.  This causes the entire :app:`Pyramid` environment to be set
 up and torn down as if your application was running "for real".  This
 is a heavy-hammer way of making sure that your tests have enough
 context to run properly, and it tests your code's integration with the
-rest of :mod:`pyramid`.
+rest of :app:`Pyramid`.
 
 Let's demonstrate this by showing an integration test for a view.  The
 below test assumes that your application's package name is ``myapp``,

@@ -154,7 +154,7 @@ Adding a Scan Directive
 
 In order for our decorators to be recognized, we must add a bit of
 boilerplate to our ``configure.zcml`` file which tells
-:mod:`pyramid` to kick off a :term:`scan` at startup time.  Add the
+:app:`Pyramid` to kick off a :term:`scan` at startup time.  Add the
 following tag anywhere beneath the ``<include
 package="pyramid.includes">`` tag but before the ending
 ``</configure>`` tag within ``configure.zcml``:

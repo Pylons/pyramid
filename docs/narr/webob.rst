@@ -10,17 +10,17 @@ Request and Response Objects
 .. note:: This chapter is adapted from a portion of the :term:`WebOb`
    documentation, originally written by Ian Bicking.
 
-:mod:`pyramid` uses the :term:`WebOb` package to supply
+:app:`Pyramid` uses the :term:`WebOb` package to supply
 :term:`request` and :term:`response` object implementations.  The
-:term:`request` object that is passed to a :mod:`pyramid`
+:term:`request` object that is passed to a :app:`Pyramid`
 :term:`view` is an instance of the :class:`pyramid.request.Request`
 class, which is a subclass of :class:`webob.Request`.  The
-:term:`response` returned from a :mod:`pyramid` :term:`view`
+:term:`response` returned from a :app:`Pyramid` :term:`view`
 :term:`renderer` is an instance of the :mod:`webob.Response` class.
 Users can also return an instance of :mod:`webob.Response` directly
 from a view as necessary.
 
-WebOb is a project separate from :mod:`pyramid` with a separate set
+WebOb is a project separate from :app:`Pyramid` with a separate set
 of authors and a fully separate `set of documentation
 <http://pythonpaste.org/webob/>`_.
 
@@ -31,7 +31,7 @@ environment and response status/headers/app_iter (body).
 WebOb request and response objects provide many conveniences for
 parsing WSGI requests and forming WSGI responses.  WebOb is a nice way
 to represent "raw" WSGI requests and responses; however, we won't
-cover that use case in this document, as users of :mod:`pyramid`
+cover that use case in this document, as users of :app:`Pyramid`
 don't typically need to use the WSGI-related features of WebOb
 directly.  The `reference documentation
 <http://pythonpaste.org/webob/reference.html>`_ shows many examples of
@@ -98,7 +98,7 @@ instance, ``req.if_modified_since`` returns a `datetime
 <http://python.org/doc/current/lib/datetime-datetime.html>`_ object
 (or None if the header is was not provided).
 
-.. note:: Full API documentation for the :mod:`pyramid` request
+.. note:: Full API documentation for the :app:`Pyramid` request
    object is available in :ref:`request_module`.
 
 .. index::
@@ -106,10 +106,10 @@ instance, ``req.if_modified_since`` returns a `datetime
 
 .. _special_request_attributes:
 
-Special Attributes Added to the Request by :mod:`pyramid`
+Special Attributes Added to the Request by :app:`Pyramid`
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-In addition to the standard :term:`WebOb` attributes, :mod:`pyramid`
+In addition to the standard :term:`WebOb` attributes, :app:`Pyramid`
 adds special attributes to every request: ``context``, ``registry``,
 ``root``, ``subpath``, ``traversed``, ``view_name``, ``virtual_root``
 , ``virtual_root_path``, ``session``, and ``tmpl_context``.  These
@@ -196,7 +196,7 @@ More detail about the request object API is available in:
 - The `WebOb documentation <http://pythonpaste.org/webob>`_ .  All
   methods and attributes of a ``webob.Request`` documented within the
   WebOb documentation will work against request objects created by
-  :mod:`pyramid`.
+  :app:`Pyramid`.
 
 .. index::
    single: response object
@@ -204,7 +204,7 @@ More detail about the request object API is available in:
 Response
 ~~~~~~~~
 
-The :mod:`pyramid` response object can be imported as
+The :app:`Pyramid` response object can be imported as
 :class:`pyramid.response.Response`.  This import location is merely a facade
 for its original location: ``webob.Response``.
 
@@ -305,7 +305,7 @@ Exception Responses
 To facilitate error responses like ``404 Not Found``, the module
 :mod:`webob.exc` contains classes for each kind of error response.  These
 include boring but appropriate error bodies.  The exceptions exposed by this
-module, when used under :mod:`pyramid`, should be imported from the
+module, when used under :app:`Pyramid`, should be imported from the
 :mod:`pyramid.httpexceptions` "facade" module.  This import location is merely
 a facade for the original location of these exceptions: ``webob.exc``.
 

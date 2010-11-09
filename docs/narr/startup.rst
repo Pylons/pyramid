@@ -3,7 +3,7 @@
 Startup
 =======
 
-When you cause :mod:`pyramid` to start up in a console window,
+When you cause :app:`Pyramid` to start up in a console window,
 you'll see something much like this show up on the console:
 
 .. code-block:: text
@@ -24,11 +24,11 @@ The Startup Process
 -------------------
 
 The easiest and best-documented way to start and serve a
-:mod:`pyramid` application is to use the ``paster serve`` command
+:app:`Pyramid` application is to use the ``paster serve`` command
 against a :term:`PasteDeploy` ``.ini`` file.  This uses the ``.ini``
 file to infer settings and starts a server listening on a port.  For
 the purposes of this discussion, we'll assume that you are using this
-command to run your :mod:`pyramid` application.
+command to run your :app:`Pyramid` application.
 
 Here's a high-level time-ordered overview of what happens when you
 press ``return`` after running ``paster serve development.ini``.
@@ -44,16 +44,16 @@ press ``return`` after running ``paster serve development.ini``.
    the ``.ini`` file.  This section represents the configuration of a
    :term:`WSGI` application that will be served.  If you're using a
    simple application (e.g. an ``[app:main]`` section of a
-   default-generated :mod:`pyramid` project), the application
+   default-generated :app:`Pyramid` project), the application
    :term:`entry point` or :term:`dotted Python name` will be named on
    the ``use=`` line within the section's configuration.  If, instead
    of a simple application, you're using a WSGI :term:`pipeline`
    (e.g. a ``[pipeline:main]`` section), the application named on the
-   "last" element will refer to your :mod:`pyramid` application.
+   "last" element will refer to your :app:`Pyramid` application.
    If instead of a simple application or a pipeline, you're using a
    Paste "composite" (e.g. ``[composite:main]``), refer to the
    documentation for that particular composite to understand how to
-   make it refer to your :mod:`pyramid` application.
+   make it refer to your :app:`Pyramid` application.
 
 #. The application's *constructor* (named by the entry point reference
    or dotted Python name on the ``use=`` line) is passed the key/value
@@ -61,10 +61,10 @@ press ``return`` after running ``paster serve development.ini``.
    constructor is meant to return a :term:`router` instance, which is
    a :term:`WSGI` application.
 
-   For :mod:`pyramid` applications, the constructor will be a function named
+   For :app:`Pyramid` applications, the constructor will be a function named
    ``app`` in the ``__init__.py`` file within the :term:`package` in which
    your application lives.  If this function succeeds, it will return a
-   :mod:`pyramid` :term:`router` instance.  Here's the contents of an example
+   :app:`Pyramid` :term:`router` instance.  Here's the contents of an example
    ``__init__.py`` module:
 
    .. literalinclude:: MyProject/myproject/__init__.py
@@ -112,7 +112,7 @@ press ``return`` after running ``paster serve development.ini``.
 #. The ``app`` function then calls various methods on the an instance of the
    class :class:`pyramid.configuration.Configurator` method.  The intent of
    calling these methods is to populate an :term:`application registry`,
-   which represents the :mod:`pyramid` configuration related to the
+   which represents the :app:`Pyramid` configuration related to the
    application.
 
 #. The :meth:`pyramid.configuration.Configurator.make_wsgi_app` method is

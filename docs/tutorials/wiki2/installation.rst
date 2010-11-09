@@ -56,7 +56,7 @@ Preparation, UNIX
 #. (Optional) Consider using ``source bin/activate`` to make your
    shell environment wired to use the virtualenv.
 
-#. Use ``easy_install`` to get :mod:`pyramid` and its direct
+#. Use ``easy_install`` to get :app:`Pyramid` and its direct
    dependencies installed:
 
    .. code-block:: text
@@ -107,7 +107,7 @@ Preparation, Windows
 #. (Optional) Consider using ``bin\activate.bat`` to make your shell
    environment wired to use the virtualenv.
 
-#. Use ``easy_install`` to get :mod:`pyramid` and its direct
+#. Use ``easy_install`` to get :app:`Pyramid` and its direct
    dependencies installed:
 
    .. code-block:: text
@@ -127,7 +127,7 @@ Preparation, Windows
 Making a Project
 ================
 
-Your next step is to create a project.  :mod:`pyramid` supplies a
+Your next step is to create a project.  :app:`Pyramid` supplies a
 variety of templates to generate sample projects.  We will use the
 ``pyramid_routesalchemy`` template, which generates an application
 that uses :term:`SQLAlchemy` and :term:`URL dispatch`.
@@ -277,7 +277,7 @@ the following assumptions:
 
 .. note::
 
-   :mod:`pyramid` supports any persistent storage mechanism (e.g. object
+   :app:`Pyramid` supports any persistent storage mechanism (e.g. object
    database or filesystem files, etc).  It also supports an additional
    mechanism to map URLs to code (:term:`traversal`).  However, for the
    purposes of this tutorial, we'll only be using url dispatch and

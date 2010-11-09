@@ -11,14 +11,14 @@
 Using Events
 =============
 
-An *event* is an object broadcast by the :mod:`pyramid` framework
+An *event* is an object broadcast by the :app:`Pyramid` framework
 at interesting points during the lifetime of an application.  You
-don't need to use events in order to create most :mod:`pyramid`
+don't need to use events in order to create most :app:`Pyramid`
 applications, but they can be useful when you want to perform slightly
 advanced operations.  For example, subscribing to an event can allow
 you to run some code as the result of every new request.
 
-Events in :mod:`pyramid` are always broadcast by the framework.
+Events in :app:`Pyramid` are always broadcast by the framework.
 However, they only become useful when you register a *subscriber*.  A
 subscriber is a function that accepts a single argument named `event`:
 
@@ -86,7 +86,7 @@ function found via a :term:`scan`.
    :ref:`zcml_event_listener`.
 
 Either of the above registration examples implies that every time the
-:mod:`pyramid` framework emits an event object that supplies an
+:app:`Pyramid` framework emits an event object that supplies an
 :class:`pyramid.events.NewRequest` interface, the ``mysubscriber`` function
 will be called with an *event* object.
 
@@ -102,7 +102,7 @@ The return value of a subscriber function is ignored.  Subscribers to
 the same event type are not guaranteed to be called in any particular
 order relative to each other.
 
-All the concrete :mod:`pyramid` event types are documented in the
+All the concrete :app:`Pyramid` event types are documented in the
 :ref:`events_module` API documentation.
 
 An Example

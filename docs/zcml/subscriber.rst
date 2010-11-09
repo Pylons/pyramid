@@ -4,7 +4,7 @@
 --------------
 
 The ``subscriber`` ZCML directive configures an :term:`subscriber`
-callable to listen for events broadcast by the :mod:`pyramid` web
+callable to listen for events broadcast by the :app:`Pyramid` web
 framework.
 
 Attributes

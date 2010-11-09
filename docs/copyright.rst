@@ -26,9 +26,9 @@ similar license to this one.
 
 .. note::
 
-   While the :mod:`pyramid` documentation is offered under the
+   While the :app:`Pyramid` documentation is offered under the
    Creative Commons Attribution-Nonconmmercial-Share Alike 3.0 United
-   States License, the :mod:`pyramid` *software* is offered under a
+   States License, the :app:`Pyramid` *software* is offered under a
    `less restrictive (BSD-like) license
    <http://repoze.org/license.html>`_ .
 
@@ -81,6 +81,6 @@ An HTML version of this book is freely available via
 http://docs.pylonshq.com
 
 The source code for the examples used in this book are available
-within the :mod:`pyramid` software distribution, always available
+within the :app:`Pyramid` software distribution, always available
 via http://pylonshq.com/pyramid.
 

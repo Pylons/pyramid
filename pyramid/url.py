@@ -15,7 +15,7 @@ from pyramid.traversal import TraversalContextURL
 from pyramid.traversal import quote_path_segment
 
 def route_url(route_name, request, *elements, **kw):
-    """Generates a fully qualified URL for a named :mod:`pyramid`
+    """Generates a fully qualified URL for a named :app:`Pyramid`
     :term:`route configuration`.
 
     Use the route's ``name`` as the first positional argument.  Use a

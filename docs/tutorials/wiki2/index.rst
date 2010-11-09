@@ -4,7 +4,7 @@ SQLAlchemy + URL Dispatch Wiki Tutorial (For Developers Familiar with Pylons 1)
 ===============================================================================
 
 This tutorial introduces a :term:`SQLAlchemy` and :term:`url dispatch` -based
-:mod:`pyramid` application to a developer familiar with Python, and will be
+:app:`Pyramid` application to a developer familiar with Python, and will be
 most familiar to developers who have used the :term:`Pylons` 1.X web
 framework.  When the tutorial is finished, the developer will have created a
 basic Wiki application with authentication.

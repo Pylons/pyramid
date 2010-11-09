@@ -7,7 +7,7 @@ view, edit, and add pages to our wiki.  For purposes of demonstration
 we'll change our application to allow people whom are members of a
 *group* named ``group:editors`` to add and edit wiki pages but we'll
 continue allowing anyone with access to the server to view pages.
-:mod:`pyramid` provides facilities for *authorization* and
+:app:`Pyramid` provides facilities for *authorization* and
 *authentication*.  We'll make use of both features to provide security
 to our application.
 
@@ -19,7 +19,7 @@ The source code for this tutorial stage can be browsed via
 Configuring a ``pyramid`` Authentication Policy
 --------------------------------------------------
 
-For any :mod:`pyramid` application to perform authorization, we
+For any :app:`Pyramid` application to perform authorization, we
 need to add a ``security.py`` module and we'll need to change our
 :term:`application registry` to add an :term:`authentication policy`
 and a :term:`authorization policy`.
@@ -31,7 +31,7 @@ We'll change our ``configure.zcml`` file to enable an
 ``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy`` to
 enable declarative security checking.  We'll also add a new view
 stanza, which specifies a :term:`forbidden view`.  This configures our
-login view to show up when :mod:`pyramid` detects that a view
+login view to show up when :app:`Pyramid` detects that a view
 invocation can not be authorized.  When you're done, your
 ``configure.zcml`` will look like so:
 
@@ -146,7 +146,7 @@ Giving Our Root Model Object an ACL
 -----------------------------------
 
 We need to give our root model object an :term:`ACL`.  This ACL will
-be sufficient to provide enough information to the :mod:`pyramid`
+be sufficient to provide enough information to the :app:`Pyramid`
 security machinery to challenge a user who doesn't have appropriate
 credentials when he attempts to invoke the ``add_page`` or
 ``edit_page`` views.
@@ -171,7 +171,7 @@ class scope to our ``Wiki`` class:
 
 It's only happenstance that we're assigning this ACL at class scope.
 An ACL can be attached to an object *instance* too; this is how "row
-level security" can be achieved in :mod:`pyramid` applications.  We
+level security" can be achieved in :app:`Pyramid` applications.  We
 actually only need *one* ACL for the entire system, however, because
 our security requirements are simple, so this feature is not
 demonstrated.

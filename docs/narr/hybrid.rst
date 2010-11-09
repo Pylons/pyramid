@@ -3,11 +3,11 @@
 Combining Traversal and URL Dispatch
 ====================================
 
-When you write most :mod:`pyramid` applications, you'll be using
+When you write most :app:`Pyramid` applications, you'll be using
 one or the other of two available :term:`context finding` subsystems:
 traversal or URL dispatch.  However, to solve a limited set of
 problems, it's useful to use *both* traversal and URL dispatch
-together within the same application.  :mod:`pyramid` makes this
+together within the same application.  :app:`Pyramid` makes this
 possible via *hybrid* applications.
 
 .. warning::
@@ -24,7 +24,7 @@ A Review of Non-Hybrid Applications
 -----------------------------------
 
 When used according to the tutorials in its documentation
-:mod:`pyramid` is a "dual-mode" framework: the tutorials explain
+:app:`Pyramid` is a "dual-mode" framework: the tutorials explain
 how to create an application in terms of using either :term:`url
 dispatch` *or* :term:`traversal`.  This chapter details how you might
 combine these two dispatch mechanisms, but we'll review how they work
@@ -79,7 +79,7 @@ Hybrid Applications
 -------------------
 
 Either traversal or url dispatch alone can be used to create a
-:mod:`pyramid` application.  However, it is also possible to
+:app:`Pyramid` application.  However, it is also possible to
 combine the concepts of traversal and url dispatch when building an
 application: the result is a hybrid application.  In a hybrid
 application, traversal is performed *after* a particular route has
@@ -205,7 +205,7 @@ instead of invariably invoking a specific view callable named directly within
 the matched route's configuration.
 
 Because the pattern of the above route ends with ``*traverse``, when this
-route configuration is matched during a request, :mod:`pyramid`
+route configuration is matched during a request, :app:`Pyramid`
 will attempt to use :term:`traversal` against the :term:`root` object
 implied by the :term:`root factory` implied by the route's
 configuration.  Once :term:`traversal` has found a :term:`context`,
@@ -277,7 +277,7 @@ returned from the root factory.  In the above example, the
 If the URL that matched a route with the pattern ``:foo/:bar/*traverse``,
 is ``http://example.com/one/two/a/b/c``, the traversal path used
 against the root object will be ``a/b/c``.  As a result,
-:mod:`pyramid` will attempt to traverse through the edges ``a``,
+:app:`Pyramid` will attempt to traverse through the edges ``a``,
 ``b``, and ``c``, beginning at the root object.
 
 In our above example, this particular set of traversal steps will mean

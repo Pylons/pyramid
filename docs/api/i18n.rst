@@ -25,7 +25,7 @@
   .. autofunction:: default_locale_negotiator
 
 See :ref:`i18n_chapter` for more information about using
-:mod:`pyramid` internationalization and localization services within
+:app:`Pyramid` internationalization and localization services within
 an application.
 
 

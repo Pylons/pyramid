@@ -4,17 +4,17 @@
 
 .. _converting_a_bfg_app:
 
-Converting a :mod:`repoze.bfg` Application to :mod:`pyramid`
+Converting a :mod:`repoze.bfg` Application to :app:`Pyramid`
 ============================================================
 
-Prior iterations of :mod:`pyramid` were released as a package named
+Prior iterations of :app:`Pyramid` were released as a package named
 :mod:`repoze.bfg`.  :mod:`repoze.bfg` users are encouraged to upgrade
-their deployments to :mod:`pyramid`, as, after the first final release
-of :mod:`pyramid`, further feature development on :mod:`repoze.bfg`
+their deployments to :app:`Pyramid`, as, after the first final release
+of :app:`Pyramid`, further feature development on :mod:`repoze.bfg`
 will cease.
 
 Most existing :mod:`repoze.bfg` applications can be converted to a
-:mod:`pyramid` application in a completely automated fashion.
+:app:`Pyramid` application in a completely automated fashion.
 However, if your application depends on packages which are not "core"
 parts of :mod:`repoze.bfg` but which nonetheless have ``repoze.bfg``
 in their names (e.g. ``repoze.bfg.skins``,
@@ -24,11 +24,11 @@ there will be a ``pyramid_jinja2`` package, which can be used instead
 of ``repoze.bfg.jinja2``.  If an analogue does not seem to exist for a
 ``repoze.bfg`` add-on package that your application uses, please email
 the `Pylons-devel <http://groups.google.com/group/pylons-devel>`_
-maillist; we'll convert the package to a :mod:`pyramid` analogue for
+maillist; we'll convert the package to a :app:`Pyramid` analogue for
 you.
 
 Here's how to convert a :mod:`repoze.bfg` application to a
-:mod:`pyramid` application:
+:app:`Pyramid` application:
 
 #. Ensure that your application works under :mod:`repoze.bfg` *version
    1.3 or better*.  See
@@ -52,8 +52,8 @@ Here's how to convert a :mod:`repoze.bfg` application to a
    ``bfgenv`` above will be the virtualenv into which you've installed
    :mod:`repoze.bfg` 1.3.
 
-#. Install :mod:`pyramid` into a *separate* virtualenv as per the
-   instructions in :ref:`installing_chapter`.  The :mod:`pyramid`
+#. Install :app:`Pyramid` into a *separate* virtualenv as per the
+   instructions in :ref:`installing_chapter`.  The :app:`Pyramid`
    virtualenv should be separate from the one you've used to install
    :mod:`repoze.bfg`.  A quick way to do this:
 
@@ -74,8 +74,8 @@ Here's how to convert a :mod:`repoze.bfg` application to a
       $ svn co http://my.server/my/bfg/application/trunk bfgapp
 
 #. Use the ``bfg2pyramid`` script present in the ``bin`` directory of
-   the :mod:`pyramid` virtualenv to convert all :mod:`repoze.bfg`
-   Python import statements into compatible :mod:`pyramid` import
+   the :app:`Pyramid` virtualenv to convert all :mod:`repoze.bfg`
+   Python import statements into compatible :app:`Pyramid` import
    statements. ``bfg2pyramid`` will also fix ZCML directive usages of
    common :mod:`repoze.bfg` directives. You invoke ``bfg2pyramid`` by
    passing it the *path* of the copy of your application.  The path
@@ -88,10 +88,10 @@ Here's how to convert a :mod:`repoze.bfg` application to a
       $ ~/pyramidenv/bfg2pyramid /tmp/bfgapp
 
    ``bfg2pyramid`` will convert the following :mod:`repoze.bfg`
-   application aspects to :mod:`pyramid` compatible analogues:
+   application aspects to :app:`Pyramid` compatible analogues:
 
    - Python ``import`` statements naming :mod:`repoze.bfg` APIs will
-     be converted to :mod:`pyramid` compatible ``import`` statements.
+     be converted to :app:`Pyramid` compatible ``import`` statements.
      Every Python file beneath the top-level path will be visited and
      converted recursively, except Python files which live in
      directories which start with a ``.`` (dot).
@@ -107,7 +107,7 @@ Here's how to convert a :mod:`repoze.bfg` application to a
    - ZCML files which contain directives that have attributes which
      name a ``repoze.bfg`` API module or attribute of an API module
      (e.g. ``context="repoze.bfg.exceptions.NotFound"``) will be
-     converted to :mod:`pyramid` compatible ZCML attributes
+     converted to :app:`Pyramid` compatible ZCML attributes
      (e.g. ``context="pyramid.exceptions.NotFound``).  Every ZCML file
      beneath the top-level path (files ending with ``.zcml``) will be
      visited and converted recursively, except ZCML files which live
@@ -137,11 +137,11 @@ Here's how to convert a :mod:`repoze.bfg` application to a
 
 #. Convert any ``install_requires`` dependencies your application has
    on other add-on packages which have ``repoze.bfg`` in their names
-   to :mod:`pyramid` compatible analogues (e.g. ``repoze.bfg.jinja2``
+   to :app:`Pyramid` compatible analogues (e.g. ``repoze.bfg.jinja2``
    should be replaced with ``pyramid_jinja2``).  You may need to
    adjust configuration options and/or imports in your
    :mod:`repoze.bfg` application after replacing these add-ons.  Read
-   the documentation of the :mod:`pyramid` add-on package for
+   the documentation of the :app:`Pyramid` add-on package for
    information.
 
 #. *Only if you use ZCML and add-ons which use ZCML*: The default
@@ -176,7 +176,7 @@ Here's how to convert a :mod:`repoze.bfg` application to a
          <bfg:failingtag attr="foo"/>
      </configure>
 
-#. Retest your application using :mod:`pyramid`.  This might be as
+#. Retest your application using :app:`Pyramid`.  This might be as
    easy as:
 
    .. code-block:: bash

@@ -4,7 +4,7 @@
 -------------
 
 Because :term:`ZCML` is XML, and because XML requires a single root
-tag for each document, every ZCML file used by :mod:`pyramid` must
+tag for each document, every ZCML file used by :app:`Pyramid` must
 contain a ``configure`` container directive, which acts as the root
 XML tag.  It is a "container" directive because its only job is to
 contain other directives.
@@ -40,9 +40,9 @@ the ``configure`` start tag.
 Using the ``http://pylonshq.com/pyramid`` namespace as the default XML
 namespace isn't strictly necessary; you can use a different default
 namespace as the default.  However, if you do, the declaration tags
-which are defined by :mod:`pyramid` such as the ``view`` declaration
+which are defined by :app:`Pyramid` such as the ``view`` declaration
 tag will need to be defined in such a way that the XML parser that
-:mod:`pyramid` uses knows which namespace the :mod:`pyramid` tags are
+:app:`Pyramid` uses knows which namespace the :mod:`pyramid` tags are
 associated with.  For example, the following files are all completely
 equivalent:
 

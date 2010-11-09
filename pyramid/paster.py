@@ -59,7 +59,7 @@ def get_app(config_file, name, loadapp=loadapp):
 
 _marker = object()
 class PShellCommand(Command):
-    """Open an interactive shell with a :mod:`pyramid` app loaded.
+    """Open an interactive shell with a :app:`Pyramid` app loaded.
 
     This command accepts two positional arguments:
 

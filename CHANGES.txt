@@ -9,6 +9,10 @@ Documentation
   their concrete classes (e.g. ``pyramid.events.NewRequest``) in
   documentation about making subscriptions.
 
+- All references to Pyramid-the-application were changed from :mod:`pyramid`
+  to :app:`Pyramid`.  A custom role setting was added to ``docs/conf.py`` to
+  allow for this.  (internal)
+
 1.0a1 (2010-11-05)
 ==================
 

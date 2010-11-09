@@ -15,7 +15,7 @@ one language or cultural context.  :term:`Localization` (l10n) is the
 process of displaying the user interface of an internationalized
 application in a *particular* language or cultural context.
 
-:mod:`pyramid` offers internationalization and localization
+:app:`Pyramid` offers internationalization and localization
 subsystems that can be used to translate the text of buttons, error
 messages and other software- and template-defined values into the
 native language of a user of your application.
@@ -35,7 +35,7 @@ text values into the languages used by your application's users.  This
 markup creates a :term:`translation string`.  A translation string is
 an object that behaves mostly like a normal Unicode object, except that
 it also carries around extra information related to its job as part of
-the :mod:`pyramid` translation machinery.
+the :app:`Pyramid` translation machinery.
 
 Using The ``TranslationString`` Class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -207,7 +207,7 @@ method.
 Working With ``gettext`` Translation Files
 ------------------------------------------
 
-The basis of :mod:`pyramid` translation services is
+The basis of :app:`Pyramid` translation services is
 GNU :term:`gettext`. Once your application source code files and templates
 are marked up with translation markers, you can work on translations
 by creating various kinds of gettext files.
@@ -215,7 +215,7 @@ by creating various kinds of gettext files.
 .. note::
 
    The steps a developer must take to work with :term:`gettext`
-   :term:`message catalog` files within a :mod:`pyramid`
+   :term:`message catalog` files within a :app:`Pyramid`
    application are very similar to the steps a :term:`Pylons`
    developer must take to do the same.  See the `Pylons
    internationalization documentation
@@ -246,7 +246,7 @@ GNU gettext uses three types of files in the translation framework,
   makes the localized program run faster.
 
 The tool for working with :term:`gettext` translation files related to
-a :mod:`pyramid` application is :term:`Babel`.
+a :app:`Pyramid` application is :term:`Babel`.
 
 .. index::
    single: Babel
@@ -259,13 +259,13 @@ Installing Babel
 In order for the commands related to working with ``gettext``
 translation files to work properly, you will need to have
 :term:`Babel` installed into the same environment in which
-:mod:`pyramid` is installed.
+:app:`Pyramid` is installed.
 
 Installation on UNIX
 ++++++++++++++++++++
 
 If the :term:`virtualenv` into which you've installed your
-:mod:`pyramid` application lives in ``/my/virtualenv``, you can
+:app:`Pyramid` application lives in ``/my/virtualenv``, you can
 install Babel like so:
 
 .. code-block:: bash
@@ -277,7 +277,7 @@ Installation on Windows
 +++++++++++++++++++++++
 
 If the :term:`virtualenv` into which you've installed your
-:mod:`pyramid` application lives in ``C:\my\virtualenv``, you can
+:app:`Pyramid` application lives in ``C:\my\virtualenv``, you can
 install Babel like so:
 
 .. code-block:: bash
@@ -333,7 +333,7 @@ Extracting Messages from Code and Templates
 Once :term:`Babel` is installed and your application's ``setup.py``
 file has the correct message extractor references, you may extract a
 message catalog template from the code and :term:`Chameleon` templates
-which reside in your :mod:`pyramid` application.  You run a
+which reside in your :app:`Pyramid` application.  You run a
 ``setup.py`` command to extract the messages:
 
 .. code-block:: bash
@@ -353,11 +353,11 @@ The name ``myapplication`` above in the filename ``myapplication.pot``
 denotes the :term:`translation domain` of the translations that must
 be performed to localize your application.  By default, the
 translation domain is the :term:`project` name of your
-:mod:`pyramid` application.
+:app:`Pyramid` application.
 
 To change the translation domain of the extracted messages in your
 project, edit the ``setup.cfg`` file of your application, The default
-``setup.cfg`` file of a Paster-generated :mod:`pyramid` application
+``setup.cfg`` file of a Paster-generated :app:`Pyramid` application
 has stanzas in it that look something like the following:
 
 .. code-block:: ini
@@ -436,7 +436,7 @@ Once the file is there, it can be worked on by a human translator.
 One tool which may help with this is `Poedit
 <http://www.poedit.net/>`_.
 
-Note that :mod:`pyramid` itself ignores the existence of all
+Note that :app:`Pyramid` itself ignores the existence of all
 ``.po`` files.  For a running application to have translations
 available, a ``.mo`` file must exist.  See
 :ref:`compiling_message_catalog`.
@@ -477,7 +477,7 @@ translations, compile ``.po`` files to ``.mo`` files::
 This will create a ``.mo`` file for each ``.po`` file in your
 application.  As long as the :term:`translation directory` in which
 the ``.mo`` file ends up in is configured into your application, these
-translations will be available to :mod:`pyramid`.
+translations will be available to :app:`Pyramid`.
 
 .. index::
    single: localizer
@@ -645,7 +645,7 @@ to obtaining a locale name by calling the
 Performing Date Formatting and Currency Formatting
 --------------------------------------------------
 
-:mod:`pyramid` does not itself perform date and currency formatting
+:app:`Pyramid` does not itself perform date and currency formatting
 for different locales.  However, :term:`Babel` can help you do this
 via the :class:`babel.core.Locale` class.  The `Babel documentation
 for this class
@@ -655,7 +655,7 @@ related locale operations.  See :ref:`installing_babel` for
 information about how to install Babel.
 
 The :class:`babel.core.Locale` class requires a :term:`locale name` as
-an argument to its constructor. You can use :mod:`pyramid` APIs to
+an argument to its constructor. You can use :app:`Pyramid` APIs to
 obtain the locale name for a request to pass to the
 :class:`babel.core.Locale` constructor; see
 :ref:`obtaining_the_locale_name`.  For example:
@@ -712,20 +712,20 @@ through translation before being rendered:
 .. 1.2.3
 
 The features represented by attributes of the ``i18n`` namespace of
-Chameleon will also consult the :mod:`pyramid` translations.
+Chameleon will also consult the :app:`Pyramid` translations.
 See
 `http://chameleon.repoze.org/docs/latest/i18n.html#the-i18n-namespace
 <http://chameleon.repoze.org/docs/latest/i18n.html#the-i18n-namespace>`_.
 
 .. note::
 
-   Unlike when Chameleon is used outside of :mod:`pyramid`, when it
-   is used *within* :mod:`pyramid`, it does not support use of the
+   Unlike when Chameleon is used outside of :app:`Pyramid`, when it
+   is used *within* :app:`Pyramid`, it does not support use of the
    ``zope.i18n`` translation framework.  Applications which use
-   :mod:`pyramid` should use the features documented in this
+   :app:`Pyramid` should use the features documented in this
    chapter rather than ``zope.i18n``.
 
-Third party :mod:`pyramid` template renderers might not provide
+Third party :app:`Pyramid` template renderers might not provide
 this support out of the box and may need special code to do an
 equivalent.  For those, you can always use the more manual translation
 facility described in :ref:`performing_a_translation`.
@@ -739,7 +739,7 @@ facility described in :ref:`performing_a_translation`.
 Localization-Related Deployment Settings
 ----------------------------------------
 
-A :mod:`pyramid` application will have a ``default_locale_name``
+A :app:`Pyramid` application will have a ``default_locale_name``
 setting.  This value represents the :term:`default locale name` used
 when the :term:`locale negotiator` returns ``None``.  Pass it to the
 :mod:`pyramid.configuration.Configurator` constructor at startup
@@ -767,7 +767,7 @@ application's Paster ``.ini`` file:
 If this value is not supplied via the Configurator constructor or via
 a Paste config file, it will default to ``en``.
 
-If this setting is supplied within the :mod:`pyramid` application
+If this setting is supplied within the :app:`Pyramid` application
 ``.ini`` file, it will be available as a settings key:
 
 .. code-block:: python
@@ -784,7 +784,7 @@ Other systems provide an API that returns the set of "available
 languages" as indicated by the union of all languages in all
 translation directories on disk at the time of the call to the API.
 
-It is by design that :mod:`pyramid` doesn't supply such an API.
+It is by design that :app:`Pyramid` doesn't supply such an API.
 Instead, the application itself is responsible for knowing the "available
 languages".  The rationale is this: any particular application
 deployment must always know which languages it should be translatable
@@ -838,7 +838,7 @@ languages" configuration scheme as necessary.
 Activating Translation
 ----------------------
 
-By default, a :mod:`pyramid` application performs no translation.
+By default, a :app:`Pyramid` application performs no translation.
 To turn translation on, you must:
 
 - add at least one :term:`translation directory` to your application.
@@ -851,7 +851,7 @@ Adding a Translation Directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :term:`gettext` is the underlying machinery behind the
-:mod:`pyramid` translation machinery.  A translation directory is a
+:app:`Pyramid` translation machinery.  A translation directory is a
 directory organized to be useful to :term:`gettext`.  A translation
 directory usually includes a listing of language directories, each of
 which itself includes an ``LC_MESSAGES`` directory.  Each
@@ -862,7 +862,7 @@ to provide translations to your application.
 Adding a :term:`translation directory` registers all of its
 constituent :term:`message catalog` files (all of the ``.mo`` files
 found within all ``LC_MESSAGES`` directories within each locale
-directory in the translation directory) within your :mod:`pyramid`
+directory in the translation directory) within your :app:`Pyramid`
 application to be available to use for translation services.
 
 You can add a translation directory imperatively by using the
@@ -893,7 +893,7 @@ Setting the Locale
 
 When the *default locale negotiator* (see
 :ref:`default_locale_negotiator`) is in use, you can inform
-:mod:`pyramid` of the current locale name by doing any of these
+:app:`Pyramid` of the current locale name by doing any of these
 things before any translations need to be performed:
 
 - Set the ``_LOCALE_`` attribute of the request to a valid locale name
@@ -985,7 +985,7 @@ Here's an implementation of a simple locale negotiator:
         return locale_name
 
 If a locale negotiator returns ``None``, it signifies to
-:mod:`pyramid` that the default application locale name should be
+:app:`Pyramid` that the default application locale name should be
 used.
 
 You may add your newly created locale negotiator to your application's

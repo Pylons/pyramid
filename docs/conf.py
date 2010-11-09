@@ -17,6 +17,8 @@ import datetime
 # skip raw nodes
 from sphinx.writers.text import TextTranslator
 from docutils import nodes
+from docutils import utils
+
 def raw(*arg):
     raise nodes.SkipNode
 TextTranslator.visit_raw = raw
@@ -320,8 +322,6 @@ latex_elements = {
 #    'pointsize':'12pt', # uncomment for 12pt version
 }
 
-from docutils import nodes
-
 # secnumdepth counter reset to 2 causes numbering in related matter;
 # reset to -1 causes chapters to not be numbered, reset to -2 causes
 # parts to not be numbered.
@@ -375,7 +375,18 @@ def backmatter(name, arguments, options, content, lineno,
     return [nodes.raw('', '\\backmatter\n\\setcounter{secnumdepth}{-1}\n',
                       format='latex')]
 
+def app_role(role, rawtext, text, lineno, inliner, options={}, content=[]):
+    """custom role for :app: marker, does nothing in particular except allow
+    :app:`Pyramid` to work (for later search and replace)."""
+    if 'class' in options:
+        assert 'classes' not in options
+        options['classes'] = options['class']
+        del options['class']
+    return [nodes.inline(rawtext, utils.unescape(text), **options)], []
+
+
 def setup(app):
+    app.add_role('app', app_role)
     app.add_directive('frontmatter', frontmatter, 1, (0, 0, 0))
     app.add_directive('mainmatter', mainmatter, 1, (0, 0, 0))
     app.add_directive('backmatter', backmatter, 1, (0, 0, 0))

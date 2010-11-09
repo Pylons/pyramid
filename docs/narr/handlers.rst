@@ -3,7 +3,7 @@
 View Handlers
 =============
 
-Along with normal view callables, :mod:`pyramid` provides the concept of a
+Along with normal view callables, :app:`Pyramid` provides the concept of a
 :term:`view handler`.  Using a view handler instead of a plain :term:`view
 callable` makes it unnecessary to call
 :meth:`pyramid.configuration.Configurator.add_route` (and/or
@@ -19,7 +19,7 @@ predicate` to control which method of the handler is called.
    :term:`url dispatch`.  The concept of a view handler is analogous to a
    "controller" in Pylons 1.0.
 
-The view handler class is initialized by :mod:`pyramid` in the same manner as
+The view handler class is initialized by :app:`Pyramid` in the same manner as
 a view class.  Its ``__init__`` is called with a request object (see
 :ref:`class_as_view`) when a request enters the system which corresponds with
 a view handler registration made during configuration. A method of the view

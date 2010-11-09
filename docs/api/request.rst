@@ -77,7 +77,7 @@
 
      If an exception was raised by a :term:`root factory` or a
      :term:`view callable`, or at various other points where
-     :mod:`pyramid` executes user-defined code during the
+     :app:`Pyramid` executes user-defined code during the
      processing of a request, the exception object which was caught
      will be available as the ``exception`` attribute of the request
      within a :term:`exception view`, a :term:`response callback` or a

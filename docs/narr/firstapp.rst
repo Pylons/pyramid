@@ -1,9 +1,9 @@
 .. _firstapp_chapter:
 
-Creating Your First :mod:`pyramid` Application
+Creating Your First :app:`Pyramid` Application
 =================================================
 
-We will walk through the creation of a tiny :mod:`pyramid`
+We will walk through the creation of a tiny :app:`Pyramid`
 application in this chapter.  After we're finished creating it, we'll
 explain in more detail how the application works.
 
@@ -20,7 +20,7 @@ explain in more detail how the application works.
 Hello World, Goodbye World
 --------------------------
 
-Here's one of the very simplest :mod:`pyramid` applications,
+Here's one of the very simplest :app:`Pyramid` applications,
 configured imperatively:
 
 .. code-block:: python
@@ -46,7 +46,7 @@ configured imperatively:
        serve(app, host='0.0.0.0')
 
 When this code is inserted into a Python script named ``helloworld.py`` and
-executed by a Python interpreter which has the :mod:`pyramid` software
+executed by a Python interpreter which has the :app:`Pyramid` software
 installed, an HTTP server is started on TCP port 8080:
 
 .. code-block:: bash
@@ -76,17 +76,17 @@ The above script defines the following set of imports:
 
 The script imports the ``Configurator`` class from the
 ``pyramid.configuration`` module.  This class is used to configure
-:mod:`pyramid` for a particular application.  An instance of this class
-provides methods which help configure various parts of :mod:`pyramid` for a
+:app:`Pyramid` for a particular application.  An instance of this class
+provides methods which help configure various parts of :app:`Pyramid` for a
 given application deployment.
 
 The script uses the :class:`pyramid.response.Response` class later in the
 script to create a :term:`response` object.
 
-Like many other Python web frameworks, :mod:`pyramid` uses the :term:`WSGI`
+Like many other Python web frameworks, :app:`Pyramid` uses the :term:`WSGI`
 protocol to connect an application and a web server together.  The
 :mod:`paste.httpserver` server is used in this example as a WSGI server for
-convenience, as the ``paste`` package is a dependency of :mod:`pyramid` itself.
+convenience, as the ``paste`` package is a dependency of :app:`Pyramid` itself.
 
 View Callable Declarations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -110,7 +110,7 @@ The ``goodbye_world`` function returns a response instance with the
 body ``Goodbye world!``.
 
 Each of these functions is known as a :term:`view callable`.  View
-callables in a :mod:`pyramid` application accept a single argument,
+callables in a :app:`Pyramid` application accept a single argument,
 ``request`` and are expected to return a :term:`response` object.  A
 view callable doesn't need to be a function; it can be represented via
 another type of object, like a class or an instance, but for our
@@ -118,7 +118,7 @@ purposes here, a function serves us well.
 
 A view callable is always called with a :term:`request` object.  A
 request object is a representation of an HTTP request sent to
-:mod:`pyramid` via the active :term:`WSGI` server.
+:app:`Pyramid` via the active :term:`WSGI` server.
 
 A view callable is required to return a :term:`response` object because a
 response object has all the information necessary to formulate an actual HTTP
@@ -186,7 +186,7 @@ execution.
 The ``config = Configurator()`` line above creates an instance of the
 :class:`pyramid.configuration.Configurator` class.  The resulting
 ``config`` object represents an API which the script uses to configure
-this particular :mod:`pyramid` application.  Methods called on the
+this particular :app:`Pyramid` application.  Methods called on the
 Configurator will cause registrations to be made in a
 :term:`application registry` associated with the application.
 
@@ -243,7 +243,7 @@ argument passed is the ``hello_world`` function.  This line calls
 ``add_view`` with a *default* value for the :term:`predicate`
 argument, named ``name``.  The ``name`` predicate defaults to a value
 equalling the empty string (``''``).  This means that we're
-instructing :mod:`pyramid` to invoke the ``hello_world`` view
+instructing :app:`Pyramid` to invoke the ``hello_world`` view
 callable when the :term:`view name` is the empty string.  We'll learn
 in later chapters what a :term:`view name` is, and under which
 circumstances a request will have a view name that is the empty
@@ -268,17 +268,17 @@ keyword argument to the ``add_view`` method narrows the set of
 circumstances which would cause the view configuration's callable to
 be invoked.  In general, a greater number of predicates supplied along
 with a view configuration will more strictly limit the applicability
-of its associated view callable.  When :mod:`pyramid` processes a
+of its associated view callable.  When :app:`Pyramid` processes a
 request, however, the view callable with the *most specific* view
 configuration (the view configuration that matches the most specific
 set of predicates) is always invoked.
 
-In this application, :mod:`pyramid` chooses the most specific view
+In this application, :app:`Pyramid` chooses the most specific view
 callable based only on view :term:`predicate` applicability.  The
 ordering of calls to
 :meth:`pyramid.configuration.Configurator.add_view` is never very
 important.  We can register ``goodbye_world`` first and
-``hello_world`` second; :mod:`pyramid` will still give us the most
+``hello_world`` second; :app:`Pyramid` will still give us the most
 specific callable when a request is dispatched to it.
 
 Ending Configuration
@@ -328,8 +328,8 @@ Python applications.  We don't discuss :term:`WSGI` in any depth
 within this book, however, you can learn more about it by visiting
 `wsgi.org <http://wsgi.org>`_.
 
-The :mod:`pyramid` application object, in particular, is an
-instance of a class representing a :mod:`pyramid` :term:`router`.
+The :app:`Pyramid` application object, in particular, is an
+instance of a class representing a :app:`Pyramid` :term:`router`.
 It has a reference to the :term:`application registry` which resulted
 from method calls to the configurator used to configure it.  The
 :term:`router` consults the registry to obey the policy choices made
@@ -365,7 +365,7 @@ Conclusion
 ~~~~~~~~~~
 
 Our hello world application is one of the simplest possible
-:mod:`pyramid` applications, configured "imperatively".  We can see
+:app:`Pyramid` applications, configured "imperatively".  We can see
 that it's configured imperatively because the full power of Python is
 available to us as we perform configuration tasks.
 

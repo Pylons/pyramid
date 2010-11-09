@@ -3,7 +3,7 @@
 ``view``
 --------
 
-A ``view`` declaration directs :mod:`pyramid` to create a single
+A ``view`` declaration directs :app:`Pyramid` to create a single
 :term:`view configuration` registration in the current
 :term:`application registry`.
 

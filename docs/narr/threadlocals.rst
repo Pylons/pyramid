@@ -14,15 +14,15 @@ true global variable, one thread or process serving the application
 may receive a different value than another thread or process when that
 variable is "thread local".
 
-When a request is processed, :mod:`pyramid` makes two :term:`thread
+When a request is processed, :app:`Pyramid` makes two :term:`thread
 local` variables available to the application: a "registry" and a
 "request".
 
-Why and How :mod:`pyramid` Uses Thread Local Variables
+Why and How :app:`Pyramid` Uses Thread Local Variables
 ---------------------------------------------------------
 
-How are thread locals beneficial to :mod:`pyramid` and application
-developers who use :mod:`pyramid`?  Well, usually they're decidedly
+How are thread locals beneficial to :app:`Pyramid` and application
+developers who use :app:`Pyramid`?  Well, usually they're decidedly
 **not**.  Using a global or a thread local variable in any application
 usually makes it a lot harder to understand for a casual reader.  Use
 of a thread local or a global is usually just a way to avoid passing
@@ -30,7 +30,7 @@ some value around between functions, which is itself usually a very
 bad idea, at least if code readability counts as an important concern.
 
 For historical reasons, however, thread local variables are indeed
-consulted by various :mod:`pyramid` API functions.  For example,
+consulted by various :app:`Pyramid` API functions.  For example,
 the implementation of the :mod:`pyramid.security` function named
 :func:`pyramid.security.authenticated_userid` retrieves the thread
 local :term:`application registry` as a matter of course to find an
@@ -38,10 +38,10 @@ local :term:`application registry` as a matter of course to find an
 :func:`pyramid.threadlocal.get_current_registry` function to
 retrieve the application registry, from which it looks up the
 authentication policy; it then uses the authentication policy to
-retrieve the authenticated user id.  This is how :mod:`pyramid`
+retrieve the authenticated user id.  This is how :app:`Pyramid`
 allows arbitrary authentication policies to be "plugged in".
 
-When they need to do so, :mod:`pyramid` internals use two API
+When they need to do so, :app:`Pyramid` internals use two API
 functions to retrieve the :term:`request` and :term:`application
 registry`: :func:`pyramid.threadlocal.get_current_request` and
 :func:`pyramid.threadlocal.get_current_registry`.  The former
@@ -52,13 +52,13 @@ thread-local data structure.  These API functions are documented in
 
 These values are thread locals rather than true globals because one
 Python process may be handling multiple simultaneous requests or even
-multiple :mod:`pyramid` applications.  If they were true globals,
-:mod:`pyramid` could not handle multiple simultaneous requests or
-allow more than one :mod:`pyramid` application instance to exist in
+multiple :app:`Pyramid` applications.  If they were true globals,
+:app:`Pyramid` could not handle multiple simultaneous requests or
+allow more than one :app:`Pyramid` application instance to exist in
 a single Python process.
 
-Because one :mod:`pyramid` application is permitted to call
-*another* :mod:`pyramid` application from its own :term:`view` code
+Because one :app:`Pyramid` application is permitted to call
+*another* :app:`Pyramid` application from its own :term:`view` code
 (perhaps as a :term:`WSGI` app with help from the
 :func:`pyramid.wsgi.wsgiapp2` decorator), these variables are
 managed in a *stack* during normal system operations.  The stack
@@ -82,7 +82,7 @@ calls to the :func:`pyramid.testing.setUp` and
 and pop the threadlocal stack when the system is under test.  See
 :ref:`test_setup_and_teardown` for the definitions of these functions.
 
-Scripts which use :mod:`pyramid` machinery but never actually start
+Scripts which use :app:`Pyramid` machinery but never actually start
 a WSGI server or receive requests via HTTP such as scripts which use
 the :mod:`pyramid.scripting` API will never cause any Router code
 to be executed.  However, the :mod:`pyramid.scripting` APIs also
@@ -131,8 +131,8 @@ follows:
 - Neither ``get_current_request`` nor ``get_current_registry`` should
   ever be called within application-specific forks of third-party
   library code.  The library you've forked almost certainly has
-  nothing to do with :mod:`pyramid`, and making it dependent on
-  :mod:`pyramid` (rather than making your :mod:`pyramid`
+  nothing to do with :app:`Pyramid`, and making it dependent on
+  :app:`Pyramid` (rather than making your :mod:`pyramid`
   application depend upon it) means you're forming a dependency in the
   wrong direction.
 

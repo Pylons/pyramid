@@ -27,7 +27,7 @@ zcml_configure # prevent pyflakes from complaining
 _marker = object()
 
 def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
-    """ Registers a pair of faux :mod:`pyramid` security policies:
+    """ Registers a pair of faux :app:`Pyramid` security policies:
     a :term:`authentication policy` and a :term:`authorization
     policy`.
 
@@ -52,7 +52,7 @@ def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
     :func:`pyramid.security.effective_principals`, and
     :func:`pyramid.security.principals_allowed_by_permission`.
 
-    .. warning:: This API is deprecated as of :mod:`pyramid` 1.0.
+    .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
        :meth:`pyramid.configuration.Configurator.testing_securitypolicy`
        method in your unit and integration tests.
@@ -74,7 +74,7 @@ def registerModels(models):
     :func:`pyramid.traversal.find_model` is called with an
     equivalent path string or tuple.
 
-    .. warning:: This API is deprecated as of :mod:`pyramid` 1.0.
+    .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
        :meth:`pyramid.configuration.Configurator.testing_models`
        method in your unit and integration tests.
@@ -100,7 +100,7 @@ def registerEventListener(event_iface=None):
     The default value of ``event_iface`` (``None``) implies a
     subscriber registered for *any* kind of event.
 
-    .. warning:: This API is deprecated as of :mod:`pyramid` 1.0.
+    .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
        :meth:`pyramid.configuration.Configurator.testing_add_subscriber`
        method in your unit and integration tests.
@@ -119,7 +119,7 @@ def registerTemplateRenderer(path, renderer=None):
     other ``render_*`` or ``get_*`` API of the
     :mod:`pyramid.renderers` module.
 
-    .. warning:: This API is deprecated as of :mod:`pyramid` 1.0.
+    .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
        :meth:`pyramid.configuration.Configurator.testing_add_template``
        method in your unit and integration tests.
@@ -135,7 +135,7 @@ registerDummyRenderer = registerTemplateRenderer
 
 def registerView(name, result='', view=None, for_=(Interface, Interface),
                  permission=None):
-    """ Registers a :mod:`pyramid` :term:`view callable` under the
+    """ Registers a :app:`Pyramid` :term:`view callable` under the
     name implied by the ``name`` argument.  The view will return a
     :term:`WebOb` :term:`Response` object with the value implied by
     the ``result`` argument as its ``body`` attribute.  To gain more
@@ -151,7 +151,7 @@ def registerView(name, result='', view=None, for_=(Interface, Interface),
     This function is useful when testing code which calls
     :func:`pyramid.view.render_view_to_response`.
 
-    .. warning:: This API is deprecated as of :mod:`pyramid` 1.0.
+    .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
        :meth:`pyramid.configuration.Configurator.add_view``
        method in your unit and integration tests.
@@ -187,7 +187,7 @@ def registerUtility(impl, iface=Interface, name=''):
     See `The ZCA book <http://www.muthukadan.net/docs/zca.html>`_ for
     more information about ZCA utilities.
 
-    .. warning:: This API is deprecated as of :mod:`pyramid` 1.0.
+    .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the :meth:`pyramid.Registry.registerUtility`
        method.  The ``registry`` attribute of a :term:`Configurator`
        in your unit and integration tests is an instance of the
@@ -217,7 +217,7 @@ def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
     See `The ZCA book <http://www.muthukadan.net/docs/zca.html>`_ for
     more information about ZCA adapters.
 
-    .. warning:: This API is deprecated as of :mod:`pyramid` 1.0.
+    .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the :meth:`pyramid.Registry.registerAdapter`
        method.  The ``registry`` attribute of a :term:`Configurator`
        in your unit and integration tests is an instance of the
@@ -244,7 +244,7 @@ def registerSubscriber(subscriber, iface=Interface):
     See `The ZCA book <http://www.muthukadan.net/docs/zca.html>`_ for
     more information about ZCA subscribers.
 
-    .. warning:: This API is deprecated as of :mod:`pyramid` 1.0.
+    .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
        :meth:`pyramid.configuration.Configurator.add_subscriber`
        method in your unit and integration tests.
@@ -265,7 +265,7 @@ def registerRoute(pattern, name, factory=None):
     This API is useful for testing code that calls
     e.g. :func:`pyramid.url.route_url`.
 
-    .. warning:: This API is deprecated as of :mod:`pyramid` 1.0.
+    .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
        :meth:`pyramid.configuration.Configurator.add_route`
        method in your unit and integration tests.
@@ -291,7 +291,7 @@ def registerSettings(dictarg=None, **kw):
     calls the :func:`pyramid.settings.get_settings` API and which
     uses return values from that API.
 
-    .. warning:: This API is deprecated as of :mod:`pyramid` 1.0.
+    .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
        :meth:`pyramid.configuration.Configurator.add_settings`
        method in your unit and integration tests.
@@ -403,7 +403,7 @@ class DummyTemplateRenderer(object):
         return True
 
 class DummyModel:
-    """ A dummy :mod:`pyramid` :term:`model` object."""
+    """ A dummy :app:`Pyramid` :term:`model` object."""
     def __init__(self, __name__=None, __parent__=None, __provides__=None,
                  **kw):
         """ The model's ``__name__`` attribute will be set to the
@@ -553,7 +553,7 @@ class DummyRequest(object):
 
 def setUp(registry=None, request=None, hook_zca=True):
     """
-    Set :mod:`pyramid` registry and request thread locals for the
+    Set :app:`Pyramid` registry and request thread locals for the
     duration of a single unit test.
 
     Use this function in the ``setUp`` method of a unittest test case
@@ -569,7 +569,7 @@ def setUp(registry=None, request=None, hook_zca=True):
       :func:`pyramid.threadlocal.get_current_request` functions.
 
     If you use the ``testing.register*`` APIs, or the
-    ``get_current_*`` functions (or call :mod:`pyramid` code that
+    ``get_current_*`` functions (or call :app:`Pyramid` code that
     uses these functions) without calling ``setUp``,
     :func:`pyramid.threadlocal.get_current_registry` will return a
     *global* :term:`application registry`, which may cause unit tests
@@ -609,7 +609,7 @@ def setUp(registry=None, request=None, hook_zca=True):
     execution of the test.
 
     .. warning:: Although this method of setting up a test registry
-                 will never disappear, after :mod:`pyramid` 1.0,
+                 will never disappear, after :app:`Pyramid` 1.0,
                  using the ``begin`` and ``end`` methods of a
                  ``Configurator`` are preferred to using
                  ``pyramid.testing.setUp`` and
@@ -654,7 +654,7 @@ def tearDown(unhook_zca=True):
     imported, ignore the argument.
 
     .. warning:: Although this method of tearing a test setup down
-                 will never disappear, after :mod:`pyramid` 1.0,
+                 will never disappear, after :app:`Pyramid` 1.0,
                  using the ``begin`` and ``end`` methods of a
                  ``Configurator`` are preferred to using
                  ``pyramid.testing.setUp`` and
@@ -686,7 +686,7 @@ def tearDown(unhook_zca=True):
 def cleanUp(*arg, **kw):
     """ :func:`pyramid.testing.cleanUp` is an alias for
     :func:`pyramid.testing.setUp`.  Although this function is
-    effectively deprecated as of :mod:`pyramid` 1.0, due to its
+    effectively deprecated as of :app:`Pyramid` 1.0, due to its
     extensive production usage, it will never be removed."""
     return setUp(*arg, **kw)
 

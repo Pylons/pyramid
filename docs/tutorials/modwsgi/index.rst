@@ -1,6 +1,6 @@
 .. _modwsgi_tutorial:
 
-Running a :mod:`pyramid` Application under ``mod_wsgi``
+Running a :app:`Pyramid` Application under ``mod_wsgi``
 ==========================================================
 
 :term:`mod_wsgi` is an Apache module developed by Graham Dumpleton.
@@ -8,15 +8,15 @@ It allows :term:`WSGI` programs to be served using the Apache web
 server.
 
 This guide will outline broad steps that can be used to get a
-:mod:`pyramid` application running under Apache via ``mod_wsgi``.
+:app:`Pyramid` application running under Apache via ``mod_wsgi``.
 This particular tutorial was developed under Apple's Mac OS X platform
 (Snow Leopard, on a 32-bit Mac), but the instructions should be
 largely the same for all systems, delta specific path information for
 commands and files.
 
 .. note:: Unfortunately these instructions almost certainly won't work
-   for deploying a :mod:`pyramid` application on a Windows system
-   using ``mod_wsgi``.  If you have experience with :mod:`pyramid`
+   for deploying a :app:`Pyramid` application on a Windows system
+   using ``mod_wsgi``.  If you have experience with :app:`Pyramid`
    and ``mod_wsgi`` on Windows systems, please help us document
    this experience by submitting documentation to the `mailing list
    <http://lists.repoze.org/listinfo/repoze-dev>`_.
@@ -49,17 +49,17 @@ commands and files.
        $ cd modwsgi
        $ /usr/local/bin/virtualenv --no-site-packages env
 
-#.  Install :mod:`pyramid` into the newly created virtualenv:
+#.  Install :app:`Pyramid` into the newly created virtualenv:
 
     .. code-block:: text
 
        $ cd ~/modwsgi/env
        $ bin/easy_install pyramid
     
-#.  Create and install your :mod:`pyramid` application.  For the
+#.  Create and install your :app:`Pyramid` application.  For the
     purposes of this tutorial, we'll just be using the ``bfg_starter``
     application as a baseline application.  Substitute your existing
-    :mod:`pyramid` application as necessary if you already have
+    :app:`Pyramid` application as necessary if you already have
     one.
 
     .. code-block:: text
@@ -122,7 +122,7 @@ commands and files.
 
 :term:`mod_wsgi` has many knobs and a great variety of deployment
 modes.  This is just one representation of how you might use it to
-serve up a :mod:`pyramid` application.  See the `mod_wsgi
+serve up a :app:`Pyramid` application.  See the `mod_wsgi
 configuration documentation
 <http://code.google.com/p/modwsgi/wiki/ConfigurationGuidelines>`_ for
 more in-depth configuration information.

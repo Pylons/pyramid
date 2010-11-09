@@ -4,7 +4,7 @@ ZCML Directives
 ===============
 
 Comprehensive reference material for every ZCML directive provided by
-:mod:`pyramid` is available within this chapter.  The ZCML directive
+:app:`Pyramid` is available within this chapter.  The ZCML directive
 documentation is organized alphabetically by directive name.
 
 .. toctree::

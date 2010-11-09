@@ -1,12 +1,12 @@
 .. _extending_chapter:
 
-Extending An Existing :mod:`pyramid` Application
+Extending An Existing :app:`Pyramid` Application
 ===================================================
 
-If the developer of a :mod:`pyramid` application has obeyed certain
+If the developer of a :app:`Pyramid` application has obeyed certain
 constraints while building that application, a third party should be
 able to change its behavior without needing to modify its source code.
-The behavior of a :mod:`pyramid` application that obeys certain
+The behavior of a :app:`Pyramid` application that obeys certain
 constraints can be *overridden* or *extended* without modification.
 
 .. index::
@@ -16,11 +16,11 @@ Rules for Building An Extensible Application
 --------------------------------------------
 
 There's only one rule you need to obey if you want to build a
-maximally extensible :mod:`pyramid` application: you should not use
+maximally extensible :app:`Pyramid` application: you should not use
 any :term:`configuration decoration` or :term:`imperative
 configuration`. This means the application developer should avoid
 relying on :term:`configuration decoration` meant to be detected via
-a :term:`scan`, and you mustn't configure your :mod:`pyramid`
+a :term:`scan`, and you mustn't configure your :app:`Pyramid`
 application *imperatively* by using any code which configures the
 application through methods of the :term:`Configurator` (except for
 the :meth:`pyramid.configuration.Configurator.load_zcml` method).
@@ -36,11 +36,11 @@ Fundamental Plugpoints
 ~~~~~~~~~~~~~~~~~~~~~~
 
 The fundamental "plug points" of an application developed using
-:mod:`pyramid` are *routes*, *views*, and *resources*.  Routes are
+:app:`Pyramid` are *routes*, *views*, and *resources*.  Routes are
 declarations made using the ZCML ``<route>`` directive.  Views are
 declarations made using the ZCML ``<view>`` directive (or the
 ``@view_config`` decorator).  Resources are files that are accessed by
-:mod:`pyramid` using the :term:`pkg_resources` API such as static
+:app:`Pyramid` using the :term:`pkg_resources` API such as static
 files and templates.
 
 .. index::
@@ -88,7 +88,7 @@ and/or imperative code.
 Extending an Application Which Possesses Configuration Decorators Or Which Does Configuration Imperatively
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you've inherited a :mod:`pyramid` application which uses
+If you've inherited a :app:`Pyramid` application which uses
 :class:`pyramid.view.view_config` decorators or which performs
 configuration imperatively, one of two things may be true:
 
@@ -132,7 +132,7 @@ The general pattern for extending an existing application looks
 something like this:
 
 - Create a new Python package.  The easiest way to do this is to
-  create a new :mod:`pyramid` application using the "paster"
+  create a new :app:`Pyramid` application using the "paster"
   template mechanism.  See :ref:`creating_a_project` for more
   information.
 
@@ -141,7 +141,7 @@ something like this:
   setup.py install``).
 
 - Change the ``configure.zcml`` in the new package to include the
-  original :mod:`pyramid` application's ``configure.zcml`` via an
+  original :app:`Pyramid` application's ``configure.zcml`` via an
   include statement, e.g.  ``<include package="theoriginalapp"/>``.
   Alternately, if the original application writer anticipated
   overriding some things and not others, instead of including the

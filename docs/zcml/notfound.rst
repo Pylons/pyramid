@@ -5,13 +5,13 @@
 
 .. warning::
 
-   The ``notfound`` ZCML directive is deprecated in :mod:`pyramid`
+   The ``notfound`` ZCML directive is deprecated in :app:`Pyramid`
    version 1.0.  Instead, you should use the :ref:`view_directive`
    directive with a ``context`` that names the
    :exc:`pyramid.exceptions.NotFound` class.  See
    :ref:`changing_the_notfound_view` form more information.
 
-When :mod:`pyramid` can't map a URL to view code, it invokes a
+When :app:`Pyramid` can't map a URL to view code, it invokes a
 :term:`not found view`.  The default not found view is very plain, but
 the view callable used can be configured via the ``notfound`` ZCML
 tag.

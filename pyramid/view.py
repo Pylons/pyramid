@@ -431,9 +431,9 @@ def default_exceptionresponse_view(context, request):
 
 class AppendSlashNotFoundViewFactory(object):
     """ There can only be one :term:`Not Found view` in any
-    :mod:`pyramid` application.  Even if you use
+    :app:`Pyramid` application.  Even if you use
     :func:`pyramid.view.append_slash_notfound_view` as the Not
-    Found view, :mod:`pyramid` still must generate a ``404 Not
+    Found view, :app:`Pyramid` still must generate a ``404 Not
     Found`` response when it cannot redirect to a slash-appended URL;
     this not found response will be visible to site users.
 

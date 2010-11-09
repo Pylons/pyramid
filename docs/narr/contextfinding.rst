@@ -11,24 +11,24 @@ framework must provide a mechanism to find and invoke code written by
 the application developer based on parameters present in the
 :term:`request`.
 
-:mod:`pyramid` uses two separate but cooperating subsystems to find
+:app:`Pyramid` uses two separate but cooperating subsystems to find
 and invoke code written by the application developer: :term:`context
 finding` and :term:`view lookup`.
 
-- A :mod:`pyramid` :term:`context finding` subsystem is given a
+- A :app:`Pyramid` :term:`context finding` subsystem is given a
   :term:`request`; it is responsible for finding a :term:`context`
   object and a :term:`view name` based on information present in the
   request.
 
 - Using the context and view name provided by :term:`context finding`,
-  the :mod:`pyramid` :term:`view lookup` subsystem is provided with
+  the :app:`Pyramid` :term:`view lookup` subsystem is provided with
   a :term:`request`, a :term:`context` and a :term:`view name`.  It is
   then responsible for finding and invoking a :term:`view callable`.
   A view callable is a specific bit of code written and registered by
   the application developer which receives the :term:`request` and
   which returns a :term:`response`.
 
-These two subsystems are used by :mod:`pyramid` serially:
+These two subsystems are used by :app:`Pyramid` serially:
 first, a :term:`context finding` subsystem does its job.  Then the
 result of context finding is passed to the :term:`view lookup`
 subsystem.  The view lookup system finds a :term:`view callable`
@@ -38,7 +38,7 @@ requesting user.
 
 .. sidebar::  What Good is A Context Finding Subsystem?
 
-   The :term:`URL dispatch` mode of :mod:`pyramid` as well as many
+   The :term:`URL dispatch` mode of :app:`Pyramid` as well as many
    other web frameworks such as :term:`Pylons` or :term:`Django`
    actually collapse the two steps of context finding and view lookup
    into a single step.  In these systems, a URL can map *directly* to
@@ -51,14 +51,14 @@ requesting user.
    that do not provide a notion of a context.
 
 There are two separate :term:`context finding` subsystems in
-:mod:`pyramid`: :term:`traversal` and :term:`URL dispatch`.  The
+:app:`Pyramid`: :term:`traversal` and :term:`URL dispatch`.  The
 subsystems are documented within this chapter.  They can be used
 separately or they can be combined.  Three chapters which follow
 describe :term:`context finding`: :ref:`traversal_chapter`,
 :ref:`urldispatch_chapter` and :ref:`hybrid_chapter`.
 
 There is only one :term:`view lookup` subsystem present in
-:mod:`pyramid`.  Where appropriate, within this chapter, we
+:app:`Pyramid`.  Where appropriate, within this chapter, we
 describe how view lookup interacts with context finding.  One chapter
 which follows describes :term:`view lookup`: :ref:`views_chapter`.
 
@@ -113,6 +113,6 @@ in terms of traversing that graph.  However, when you have a
 hierarchical data store, using traversal can provide significant
 advantages over using URL-based dispatch.
 
-Since :mod:`pyramid` provides support for both approaches, you can
+Since :app:`Pyramid` provides support for both approaches, you can
 use either exclusively or combine them as you see fit.
 

@@ -1,9 +1,9 @@
 .. _appengine_tutorial:
 
-Running :mod:`pyramid` on Google's App Engine
+Running :app:`Pyramid` on Google's App Engine
 ================================================
 
-It is possible to run a :mod:`pyramid` application on Google's `App
+It is possible to run a :app:`Pyramid` application on Google's `App
 Engine <http://code.google.com/appengine/>`_.  Content from this
 tutorial was contributed by YoungKing, based on the
 `"appengine-monkey" tutorial for Pylons
@@ -43,18 +43,18 @@ system.
    ``pyramidapp/app/`` which is the directory you will upload to
    appengine.
 
-#. Install :mod:`pyramid` into the virtualenv
+#. Install :app:`Pyramid` into the virtualenv
 
    .. code-block:: text
 
       $ cd pyramidapp/
       $ bin/easy_install pyramid
 
-   This will install :mod:`pyramid` in the environment.
+   This will install :app:`Pyramid` in the environment.
 
 #. Create your application
 
-   We'll use the standard way to create a :mod:`pyramid`
+   We'll use the standard way to create a :app:`Pyramid`
    application, but we'll have to move some files around when we are
    done.  The below commands assume your current working directory is
    the ``pyramidapp`` virtualenv directory you created in the third step
@@ -222,7 +222,7 @@ packages. You can zip a package like so:
 
    $ bin/pip zip pytz-2009g-py2.5.egg
 
-Note that it requires the whole egg file name.  For a :mod:`pyramid` app, the
+Note that it requires the whole egg file name.  For a :app:`Pyramid` app, the
 following packages are good candidates to be zipped.
 
 - Chameleon

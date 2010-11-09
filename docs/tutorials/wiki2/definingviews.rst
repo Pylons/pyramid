@@ -3,15 +3,15 @@ Defining Views
 ==============
 
 A :term:`view callable` in a :term:`url dispatch` -based
-:mod:`pyramid` application is typically a simple Python function that
+:app:`Pyramid` application is typically a simple Python function that
 accepts a single parameter named :term:`request`.  A view callable is
 assumed to return a :term:`response` object.
 
-.. note:: A :mod:`pyramid` view can also be defined as callable
+.. note:: A :app:`Pyramid` view can also be defined as callable
    which accepts *two* arguments: a :term:`context` and a
    :term:`request`.  You'll see this two-argument pattern used in
-   other :mod:`pyramid` tutorials and applications.  Either calling
-   convention will work in any :mod:`pyramid` application; the
+   other :app:`Pyramid` tutorials and applications.  Either calling
+   convention will work in any :app:`Pyramid` application; the
    calling conventions can be used interchangeably as necessary.  In
    :term:`url dispatch` based applications, however, the context
    object is rarely used in the view body itself, so within this
@@ -117,7 +117,7 @@ content of our current page object.
 We then generate an edit URL (because it's easier to do here than in
 the template), and we return a dictionary with a number of arguments.
 The fact that this view returns a dictionary (as opposed to a
-:term:`response` object) is a cue to :mod:`pyramid` that it should
+:term:`response` object) is a cue to :app:`Pyramid` that it should
 try to use a :term:`renderer` associated with the view configuration
 to render a template.  In our case, the template which will be
 rendered will be the ``templates/view.pt`` template, as per the
@@ -147,7 +147,7 @@ lazy here, so we're trying to use the same template
 (``templates/edit.pt``) for the add view as well as the page edit
 view, so we create a dummy Page object in order to satisfy the edit
 form's desire to have *some* page object exposed as ``page``, and
-:mod:`pyramid` will render the template associated with this view
+:app:`Pyramid` will render the template associated with this view
 to a response.
 
 If the view execution *is* a result of a form submission (if the
@@ -196,7 +196,7 @@ Adding Templates
 
 The views we've added all reference a :term:`template`.  Each template
 is a :term:`Chameleon` template.  The default templating system in
-:mod:`pyramid` is a variant of :term:`ZPT` provided by
+:app:`Pyramid` is a variant of :term:`ZPT` provided by
 :term:`Chameleon`.  These templates will live in the ``templates``
 directory of our tutorial package.
 

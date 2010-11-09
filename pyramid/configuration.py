@@ -92,7 +92,7 @@ DEFAULT_RENDERERS = (
 
 class Configurator(object):
     """
-    A Configurator is used to configure a :mod:`pyramid`
+    A Configurator is used to configure a :app:`Pyramid`
     :term:`application registry`.
 
     The Configurator accepts a number of arguments: ``registry``,
@@ -158,7 +158,7 @@ class Configurator(object):
     logs to stderr will be used.  If it is passed, it should be an
     instance of the :class:`logging.Logger` (PEP 282) standard library
     class or a :term:`dotted Python name` to same.  The debug logger
-    is used by :mod:`pyramid` itself to log warnings and
+    is used by :app:`Pyramid` itself to log warnings and
     authorization debugging information.
 
     If ``locale_negotiator`` is passed, it should be a :term:`locale
@@ -258,14 +258,14 @@ class Configurator(object):
         self.registry.registerUtility(factory, IDefaultRootFactory) # b/c
 
     def _set_authentication_policy(self, policy, _info=u''):
-        """ Add a :mod:`pyramid` :term:`authentication policy` to
+        """ Add a :app:`Pyramid` :term:`authentication policy` to
         the current configuration."""
         policy = self.maybe_dotted(policy)
         self.registry.registerUtility(policy, IAuthenticationPolicy,
                                       info=_info)
         
     def _set_authorization_policy(self, policy, _info=u''):
-        """ Add a :mod:`pyramid` :term:`authorization policy` to
+        """ Add a :app:`Pyramid` :term:`authorization policy` to
         the current configuration state (also accepts a :term:`dotted
         Python name`."""
         policy = self.maybe_dotted(policy)
@@ -382,13 +382,13 @@ class Configurator(object):
         :term:`Configurator` constructor, no initial 'setup' is
         performed against the registry.  This is because the registry
         you pass in may have already been initialized for use under
-        :mod:`pyramid` via a different configurator.  However, in
+        :app:`Pyramid` via a different configurator.  However, in
         some circumstances, such as when you want to use the Zope
         'global` registry instead of a registry created as a result of
         the Configurator constructor, or when you want to reset the
         initial setup of a registry, you *do* want to explicitly
         initialize the registry associated with a Configurator for use
-        under :mod:`pyramid`.  Use ``setup_registry`` to do this
+        under :app:`Pyramid`.  Use ``setup_registry`` to do this
         initialization.
 
         ``setup_registry`` configures settings, a root factory,
@@ -434,7 +434,7 @@ class Configurator(object):
         the :term:`Zope Component Architecture` 'global' APIs such as
         :func:`zope.component.getSiteManager`,
         :func:`zope.component.getAdapter` and others to use the
-        :mod:`pyramid` :term:`application registry` rather than the
+        :app:`Pyramid` :term:`application registry` rather than the
         Zope 'global' registry.  If :mod:`zope.component` cannot be
         imported, this method will raise an :exc:`ImportError`."""
         if getSiteManager is None:
@@ -480,12 +480,12 @@ class Configurator(object):
         This is API is useful to framework extenders who create
         pluggable systems which need to register 'proxy' view
         callables for functions, instances, or classes which meet the
-        requirements of being a :mod:`pyramid` view callable.  For
+        requirements of being a :app:`Pyramid` view callable.  For
         example, a ``some_other_framework`` function in another
         framework may want to allow a user to supply a view callable,
         but he may want to wrap the view callable in his own before
-        registering the wrapper as a :mod:`pyramid` view callable.
-        Because a :mod:`pyramid` view callable can be any of a
+        registering the wrapper as a :app:`Pyramid` view callable.
+        Because a :app:`Pyramid` view callable can be any of a
         number of valid objects, the framework extender will not know
         how to call the user-supplied object.  Running it through
         ``derive_view`` normalizes it to a callable which accepts two
@@ -553,7 +553,7 @@ class Configurator(object):
         ``subscriber`` argument represents a callable object (or a
         :term:`dotted Python name` which identifies a callable); it
         will be called with a single object ``event`` whenever
-        :mod:`pyramid` emits an :term:`event` associated with the
+        :app:`Pyramid` emits an :term:`event` associated with the
         ``iface``, which may be an :term:`interface` or a class or a
         :term:`dotted Python name` to a global object representing an
         interface or a class.  Using the default ``iface`` value,
@@ -615,7 +615,7 @@ class Configurator(object):
         return self.registry.queryUtility(ISettings)
 
     def make_wsgi_app(self):
-        """ Returns a :mod:`pyramid` WSGI application representing
+        """ Returns a :app:`Pyramid` WSGI application representing
         the current configuration state and sends a
         :class:`pyramid.events.ApplicationCreated`
         event to all listeners."""
@@ -775,7 +775,7 @@ class Configurator(object):
         down below into *predicate* arguments and *non-predicate*
         arguments.  Predicate arguments narrow the circumstances in
         which the view callable will be invoked when a request is
-        presented to :mod:`pyramid`; non-predicate arguments are
+        presented to :app:`Pyramid`; non-predicate arguments are
         informational.
 
         Non-Predicate Arguments
@@ -857,7 +857,7 @@ class Configurator(object):
           The ``renderer`` attribute is optional.  If it is not
           defined, the "null" renderer is assumed (no rendering is
           performed and the value is passed back to the upstream
-          :mod:`pyramid` machinery unmolested).
+          :app:`Pyramid` machinery unmolested).
 
         wrapper
 
@@ -1228,7 +1228,7 @@ class Configurator(object):
 
           A Python object (often a function or a class) or a
           :term:`dotted Python name` which refers to the same object
-          that will generate a :mod:`pyramid` :term:`context`
+          that will generate a :app:`Pyramid` :term:`context`
           object when this route matches. For example,
           ``mypackage.models.MyFactoryClass``.  If this argument is
           not specified, a default root factory will be used.
@@ -1286,7 +1286,7 @@ class Configurator(object):
            replace the arguments it is passed when generating a URL
            for the route.  This is a feature not often used directly
            by applications, it is meant to be hooked by frameworks
-           that use :mod:`pyramid` as a base.
+           that use :app:`Pyramid` as a base.
 
         Predicate Arguments
 
@@ -1299,7 +1299,7 @@ class Configurator(object):
           continues.
 
           .. note:: For backwards compatibility purposes (as of
-             :mod:`pyramid` 1.0), a ``path`` keyword argument passed
+             :app:`Pyramid` 1.0), a ``path`` keyword argument passed
              to this function will be used to represent the pattern
              value if the ``pattern`` argument is ``None``.  If both
              ``path`` and ``pattern`` are passed, ``pattern`` wins.
@@ -1555,13 +1555,13 @@ class Configurator(object):
 
         By default, ``categories`` is ``None`` which will execute
         *all* Venusian decorator callbacks including
-        :mod:`pyramid`-related decorators such as
+        :app:`Pyramid`-related decorators such as
         :class:`pyramid.view.view_config``.  If this is not desirable
         because the codebase has other Venusian-using decorators that
         aren't meant to be invoked during a particular scan, use
         ``('pyramid',)`` as a ``categories`` value to limit the execution
         of decorator callbacks to only those registered by
-        :mod:`pyramid` itself.  Or pass a sequence of Venusian scan
+        :app:`Pyramid` itself.  Or pass a sequence of Venusian scan
         categories as necessary (e.g. ``('pyramid', 'myframework')``) to
         limit the decorators called to the set of categories required.
         """
@@ -1574,7 +1574,7 @@ class Configurator(object):
 
     def add_renderer(self, name, factory, _info=u''):
         """
-        Add a :mod:`pyramid` :term:`renderer` factory to the
+        Add a :app:`Pyramid` :term:`renderer` factory to the
         current configuration state.
 
         The ``name`` argument is the renderer name.
@@ -1596,7 +1596,7 @@ class Configurator(object):
 
     def override_resource(self, to_override, override_with,
                           _info=u'', _override=None,):
-        """ Add a :mod:`pyramid` resource override to the current
+        """ Add a :app:`Pyramid` resource override to the current
         configuration state.
 
         ``to_override`` is a :term:`resource specification` to the
@@ -1647,7 +1647,7 @@ class Configurator(object):
         """ Add a default forbidden view to the current configuration
         state.
 
-        .. warning:: This method has been deprecated in :mod:`pyramid`
+        .. warning:: This method has been deprecated in :app:`Pyramid`
            1.0.  *Do not use it for new development; it should only be
            used to support older code bases which depend upon it.* See
            :ref:`changing_the_forbidden_view` to see how a forbidden
@@ -1685,7 +1685,7 @@ class Configurator(object):
         state.
 
         .. warning:: This method has been deprecated in
-           :mod:`pyramid` 1.0.  *Do not use it for new development;
+           :app:`Pyramid` 1.0.  *Do not use it for new development;
            it should only be used to support older code bases which
            depend upon it.* See :ref:`changing_the_notfound_view` to
            see how a not found view should be registered in new
@@ -1721,7 +1721,7 @@ class Configurator(object):
     def set_request_factory(self, factory):
         """ The object passed as ``factory`` should be an object (or a
         :term:`dotted Python name` which refers to an object) which
-        will be used by the :mod:`pyramid` router to create all
+        will be used by the :app:`Pyramid` router to create all
         request objects.  This factory object must have the same
         methods and attributes as the
         :class:`pyramid.request.Request` class (particularly
@@ -1737,7 +1737,7 @@ class Configurator(object):
     def set_renderer_globals_factory(self, factory):
         """ The object passed as ``factory`` should be an callable (or
         a :term:`dotted Python name` which refers to an callable) that
-        will be used by the :mod:`pyramid` rendering machinery as a
+        will be used by the :app:`Pyramid` rendering machinery as a
         renderers global factory (see :ref:`adding_renderer_globals`).
 
         The ``factory`` callable must accept a single argument named
@@ -1971,7 +1971,7 @@ class Configurator(object):
     def testing_securitypolicy(self, userid=None, groupids=(),
                                permissive=True):
         """Unit/integration testing helper: Registers a pair of faux
-        :mod:`pyramid` security policies: a :term:`authentication
+        :app:`Pyramid` security policies: a :term:`authentication
         policy` and a :term:`authorization policy`.
 
         The behavior of the registered :term:`authorization policy`
@@ -2648,10 +2648,10 @@ def isexception(o):
 def make_app(root_factory, package=None, filename='configure.zcml',
              settings=None, options=None, Configurator=Configurator):
     """ Return a Router object, representing a fully configured
-    :mod:`pyramid` WSGI application.
+    :app:`Pyramid` WSGI application.
 
     .. warning:: Use of this function is deprecated as of
-       :mod:`pyramid` 1.0.  You should instead use a
+       :app:`Pyramid` 1.0.  You should instead use a
        :class:`pyramid.configuration.Configurator` instance to
        perform startup configuration as shown in
        :ref:`configuration_narr`.

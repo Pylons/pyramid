@@ -8,10 +8,10 @@
 
 .. _zca_chapter:
 
-Using the Zope Component Architecture in :mod:`pyramid`
+Using the Zope Component Architecture in :app:`Pyramid`
 ==========================================================
 
-Under the hood, :mod:`pyramid` uses a :term:`Zope Component
+Under the hood, :app:`Pyramid` uses a :term:`Zope Component
 Architecture` component registry as its :term:`application registry`.
 The Zope Component Architecture is referred to colloquially as the
 "ZCA."
@@ -36,16 +36,16 @@ API is used by a developer, the conceptual load on a casual reader of
 code is high.
 
 While the ZCA is an excellent tool with which to build a *framework*
-such as :mod:`pyramid`, it is not always the best tool with which
+such as :app:`Pyramid`, it is not always the best tool with which
 to build an *application* due to the opacity of the ``zope.component``
-APIs.  Accordingly, :mod:`pyramid` tends to hide the the presence
+APIs.  Accordingly, :app:`Pyramid` tends to hide the the presence
 of the ZCA from application developers.  You needn't understand the
-ZCA to create a :mod:`pyramid` application; its use is effectively
+ZCA to create a :app:`Pyramid` application; its use is effectively
 only a framework implementation detail.
 
 However, developers who are already used to writing :term:`Zope`
 applications often still wish to use the ZCA while building a
-:mod:`pyramid` application; :mod:`pyramid` makes this possible.
+:app:`Pyramid` application; :mod:`pyramid` makes this possible.
 
 .. index::
    single: get_current_registry
@@ -53,7 +53,7 @@ applications often still wish to use the ZCA while building a
    single: getSiteManager
    single: ZCA global API
 
-Using the ZCA Global API in a :mod:`pyramid` Application
+Using the ZCA Global API in a :app:`Pyramid` Application
 -----------------------------------------------------------
 
 :term:`Zope` uses a single ZCA registry -- the "global" ZCA registry
@@ -72,24 +72,24 @@ process.
 
 Most production Zope applications are relatively large, making it
 impractical due to memory constraints to run more than one Zope
-application per Python process.  However, a :mod:`pyramid`
+application per Python process.  However, a :app:`Pyramid`
 application may be very small and consume very little memory, so it's
 a reasonable goal to be able to run more than one BFG application per
 process.
 
-In order to make it possible to run more than one :mod:`pyramid`
-application in a single process, :mod:`pyramid` defaults to using a
+In order to make it possible to run more than one :app:`Pyramid`
+application in a single process, :app:`Pyramid` defaults to using a
 separate ZCA registry *per application*.
 
 While this services a reasonable goal, it causes some issues when
 trying to use patterns which you might use to build a typical
-:term:`Zope` application to build a :mod:`pyramid` application.
+:term:`Zope` application to build a :app:`Pyramid` application.
 Without special help, ZCA "global" APIs such as
 ``zope.component.getUtility`` and ``zope.component.getSiteManager``
 will use the ZCA "global" registry.  Therefore, these APIs
-will appear to fail when used in a :mod:`pyramid` application,
+will appear to fail when used in a :app:`Pyramid` application,
 because they'll be consulting the ZCA global registry rather than the
-component registry associated with your :mod:`pyramid` application.
+component registry associated with your :app:`Pyramid` application.
 
 There are three ways to fix this: by disusing the ZCA global API
 entirely, by using
@@ -123,18 +123,18 @@ but it largely mirrors the "global" API almost exactly.
 
 If you are willing to disuse the "global" ZCA APIs and use the method
 interface of a registry instead, you need only know how to obtain the
-:mod:`pyramid` component registry.
+:app:`Pyramid` component registry.
 
 There are two ways of doing so:
 
 - use the :func:`pyramid.threadlocal.get_current_registry`
-  function within :mod:`pyramid` view or model code.  This will
-  always return the "current" :mod:`pyramid` application registry.
+  function within :app:`Pyramid` view or model code.  This will
+  always return the "current" :app:`Pyramid` application registry.
 
 - use the attribute of the :term:`request` object named ``registry``
-  in your :mod:`pyramid` view code, eg. ``request.registry``.  This
+  in your :app:`Pyramid` view code, eg. ``request.registry``.  This
   is the ZCA component registry related to the running
-  :mod:`pyramid` application.
+  :app:`Pyramid` application.
 
 See :ref:`threadlocals_chapter` for more information about
 :func:`pyramid.threadlocal.get_current_registry`.
@@ -147,7 +147,7 @@ See :ref:`threadlocals_chapter` for more information about
 Enabling the ZCA Global API by Using ``hook_zca``
 +++++++++++++++++++++++++++++++++++++++++++++++++
 
-Consider the following bit of idiomatic :mod:`pyramid` startup code:
+Consider the following bit of idiomatic :app:`Pyramid` startup code:
 
 .. code-block:: python
    :linenos:
@@ -213,14 +213,14 @@ is that an analogue of the following code is executed:
    from pyramid.threadlocal import get_current_registry
    getSiteManager.sethook(get_current_registry)
 
-This causes the ZCA global API to start using the :mod:`pyramid`
-application registry in threads which are running a :mod:`pyramid`
+This causes the ZCA global API to start using the :app:`Pyramid`
+application registry in threads which are running a :app:`Pyramid`
 request.
 
 Calling ``hook_zca`` is usually sufficient to "fix" the problem of
-being able to use the global ZCA API within a :mod:`pyramid`
+being able to use the global ZCA API within a :app:`Pyramid`
 application.  However, it also means that a Zope application that is
-running in the same process may start using the :mod:`pyramid`
+running in the same process may start using the :app:`Pyramid`
 global registry instead of the Zope global registry, effectively
 inverting the original problem.  In such a case, follow the steps in
 the next section, :ref:`using_the_zca_global_registry`.
@@ -235,7 +235,7 @@ the next section, :ref:`using_the_zca_global_registry`.
 Enabling the ZCA Global API by Using The ZCA Global Registry
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-You can tell your :mod:`pyramid` application to use the ZCA global
+You can tell your :app:`Pyramid` application to use the ZCA global
 registry at startup time instead of constructing a new one:
 
 .. code-block:: python
@@ -262,7 +262,7 @@ registry with BFG-specific registrations; this is code that is
 normally executed when a registry is constructed rather than created,
 but we must call it "by hand" when we pass an explicit registry.
 
-At this point, :mod:`pyramid` will use the ZCA global registry
+At this point, :app:`Pyramid` will use the ZCA global registry
 rather than creating a new application-specific registry; since by
 default the ZCA global API will use this registry, things will work as
 you might expect a Zope app to when you use the global ZCA API.
@@ -280,7 +280,7 @@ Some :term:`Zope` and third-party :term:`ZCML` directives use the
 they should actually be calling ``zope.component.getSiteManager``.
 
 ``zope.component.getSiteManager`` can be overridden by
-:mod:`pyramid` via
+:app:`Pyramid` via
 :meth:`pyramid.configuration.Configurator.hook_zca`, while
 ``zope.component.getGlobalSiteManager`` cannot.  Directives that use
 ``zope.component.getGlobalSiteManager`` are effectively broken; no
@@ -288,7 +288,7 @@ ZCML directive should be using this function to find a registry to
 populate.
 
 You cannot use ZCML directives which use
-``zope.component.getGlobalSiteManager`` within a :mod:`pyramid`
+``zope.component.getGlobalSiteManager`` within a :app:`Pyramid`
 application without passing the ZCA global registry to the
 :term:`Configurator` constructor at application startup, as per
 :ref:`using_the_zca_global_registry`.

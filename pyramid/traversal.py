@@ -337,7 +337,7 @@ def virtual_root(model, request):
     Provided any :term:`model` and a :term:`request` object, return
     the model object representing the :term:`virtual root` of the
     current :term:`request`.  Using a virtual root in a
-    :term:`traversal` -based :mod:`pyramid` application permits
+    :term:`traversal` -based :app:`Pyramid` application permits
     rooting, for example, the object at the traversal path ``/cms`` at
     ``http://example.com/`` instead of rooting it at
     ``http://example.com/cms/``.
@@ -431,9 +431,9 @@ def traversal_path(path):
               resolveable by the
               :func:`pyramid.traversal.find_model` API.
               ``traversal_path`` is a function mostly used by the
-              internals of :mod:`pyramid` and by people writing
+              internals of :app:`Pyramid` and by people writing
               their own traversal machinery, as opposed to users
-              writing applications in :mod:`pyramid`.
+              writing applications in :app:`Pyramid`.
     """
     if isinstance(path, unicode):
         path = path.encode('ascii')

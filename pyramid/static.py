@@ -154,7 +154,7 @@ class StaticURLInfo(object):
 
 class static_view(object):
     """ An instance of this class is a callable which can act as a
-    :mod:`pyramid` :term:`view callable`; this view will serve
+    :app:`Pyramid` :term:`view callable`; this view will serve
     static files from a directory on disk based on the ``root_dir``
     you provide to its constructor.
 
@@ -181,7 +181,7 @@ class static_view(object):
     five minutes).
 
     .. note:: If the ``root_dir`` is relative to a :term:`package`, or
-         is a :term:`resource specification` the :mod:`pyramid`
+         is a :term:`resource specification` the :app:`Pyramid`
          ``resource`` ZCML directive or
          :class:`pyramid.configuration.Configurator` method can be
          used to override resources within the named ``root_dir``

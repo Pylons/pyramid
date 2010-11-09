@@ -57,7 +57,7 @@ Our ``Wiki`` class should also have a ``__name__`` attribute set to
 ``None`` at class scope, and should have a ``__parent__`` attribute
 set to ``None`` at class scope as well.  If a model has a
 ``__parent__`` attribute of ``None`` in a traversal-based
-:mod:`pyramid` application, it means that it's the :term:`root`
+:app:`Pyramid` application, it means that it's the :term:`root`
 model.  The ``__name__`` of the root model is also always ``None``.
 
 Then we'll add a ``Page`` class.  This class should inherit from the

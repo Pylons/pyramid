@@ -194,7 +194,7 @@ class PermitsResult(int):
 
 class Denied(PermitsResult):
     """ An instance of ``Denied`` is returned when a security-related
-    API or other :mod:`pyramid` code denies an action unrelated to
+    API or other :app:`Pyramid` code denies an action unrelated to
     an ACL check.  It evaluates equal to all boolean false types.  It
     has an attribute named ``msg`` describing the circumstances for
     the deny."""
@@ -202,7 +202,7 @@ class Denied(PermitsResult):
 
 class Allowed(PermitsResult):
     """ An instance of ``Allowed`` is returned when a security-related
-    API or other :mod:`pyramid` code allows an action unrelated to
+    API or other :app:`Pyramid` code allows an action unrelated to
     an ACL check.  It evaluates equal to all boolean true types.  It
     has an attribute named ``msg`` describing the circumstances for
     the allow."""

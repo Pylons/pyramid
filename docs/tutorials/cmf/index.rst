@@ -1,21 +1,21 @@
-Converting an Existing Zope/CMF Application to :mod:`pyramid`
+Converting an Existing Zope/CMF Application to :app:`Pyramid`
 ================================================================
 
 The Zope `Content Management Framework
 <http://www.zope.org/Products/CMF/>`_ (aka CMF) is a layer on top of
 :term:`Zope` 2 that provides facilities for creating content-driven
 websites.  It's reasonably easy to convert a modern Zope/CMF
-application to :mod:`pyramid`.
+application to :app:`Pyramid`.
 
-The main difference between CMF and :mod:`pyramid` is that
-:mod:`pyramid` does not advertise itself as a system into which you
+The main difference between CMF and :app:`Pyramid` is that
+:app:`Pyramid` does not advertise itself as a system into which you
 can plug arbitrary "packages" that extend a system-supplied management
 user interface.  You *could* build a CMF-like layer on top of
-:mod:`pyramid` (as CMF is built on Zope) but none currently exists.
+:app:`Pyramid` (as CMF is built on Zope) but none currently exists.
 For those sorts of high-extensibility, highly-regularized-UI systems,
 CMF is still the better choice.
 
-:mod:`pyramid` (and other more lightweight systems) is often a
+:app:`Pyramid` (and other more lightweight systems) is often a
 better choice when you're building the a user interface from scratch,
 which often happens when the paradigms of some CMF-provided user
 interface don't match the requirements of an application very closely.

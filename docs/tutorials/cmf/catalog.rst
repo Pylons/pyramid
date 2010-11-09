@@ -8,7 +8,7 @@ The main feature of the CMF catalog is that it filters search results
 from the Zope 2 "catalog" based on the requesting user's ability to
 view a particular cataloged object.
 
-:mod:`pyramid` itself has no cataloging facility, but an addon
+:app:`Pyramid` itself has no cataloging facility, but an addon
 package named :term:`repoze.catalog` offers similar functionality.
 
 Creating an Allowed Index

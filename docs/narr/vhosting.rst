@@ -6,19 +6,19 @@
 Virtual Hosting
 ===============
 
-"Virtual hosting" is, loosely, the act of serving a :mod:`pyramid`
-application or a portion of a :mod:`pyramid` application under a
+"Virtual hosting" is, loosely, the act of serving a :app:`Pyramid`
+application or a portion of a :app:`Pyramid` application under a
 URL space that it does not "naturally" inhabit.
 
-:mod:`pyramid` provides facilities for serving an application under
+:app:`Pyramid` provides facilities for serving an application under
 a URL "prefix", as well as serving a *portion* of a :term:`traversal`
 based application under a root URL.
 
 Hosting an Application Under a URL Prefix
 -----------------------------------------
 
-:mod:`pyramid` supports a common form of virtual hosting whereby you
-can host a :mod:`pyramid` application as a "subset" of some other site
+:app:`Pyramid` supports a common form of virtual hosting whereby you
+can host a :app:`Pyramid` application as a "subset" of some other site
 (e.g. under ``http://example.com/mypyramidapplication/`` as opposed to
 under ``http://example.com/``).
 
@@ -29,8 +29,8 @@ by Paste's `urlmap <http://pythonpaste.org/modules/urlmap.html>`_
 hosting translation for you "under the hood".
 
 If you use the ``urlmap`` composite application "in front" of a
-:mod:`pyramid` application or if you use :term:`mod_wsgi` to serve
-up a :mod:`pyramid` application, nothing special needs to be done
+:app:`Pyramid` application or if you use :term:`mod_wsgi` to serve
+up a :app:`Pyramid` application, nothing special needs to be done
 within the application for URLs to be generated that contain a
 prefix. :mod:`paste.urlmap` and :term:`mod_wsgi` manipulate the
 :term:`WSGI` environment in such a way that the ``PATH_INFO`` and
@@ -48,7 +48,7 @@ a ``urlmap`` composite.
   use = egg:Paste#urlmap
   /pyramidapp = mypyramidapp
 
-This "roots" the :mod:`pyramid` application at the prefix
+This "roots" the :app:`Pyramid` application at the prefix
 ``/pyramidapp`` and serves up the composite as the "main" application
 in the file.
 
@@ -71,7 +71,7 @@ work for you:
 
    WSGIScriptAlias /pyramidapp /Users/chrism/projects/modwsgi/env/pyramid.wsgi
 
-In the above configuration, we root a :mod:`pyramid` application at
+In the above configuration, we root a :app:`Pyramid` application at
 ``/pyramidapp`` within the Apache configuration.
 
 .. index::
@@ -80,12 +80,12 @@ In the above configuration, we root a :mod:`pyramid` application at
 Virtual Root Support
 --------------------
 
-:mod:`pyramid` also supports "virtual roots", which can be used in
+:app:`Pyramid` also supports "virtual roots", which can be used in
 :term:`traversal` -based (but not :term:`URL dispatch` -based)
 applications.
 
 Virtual root support is useful when you'd like to host some model in a
-:mod:`pyramid` object graph as an application under a URL pathname
+:app:`Pyramid` object graph as an application under a URL pathname
 that does not include the model path itself.  For example, you might
 want to serve the object at the traversal path ``/cms`` as an
 application reachable via ``http://example.com/`` (as opposed to
@@ -122,7 +122,7 @@ is below:
    <http://httpd.apache.org/docs/2.2/mod/mod_headers.html>`_ module be
    available in the Apache environment you're using.
 
-For a :mod:`pyramid` application running under :term:`mod_wsgi`,
+For a :app:`Pyramid` application running under :term:`mod_wsgi`,
 the same can be achieved using ``SetEnv``:
 
 .. code-block:: apache
@@ -144,5 +144,5 @@ returns the virtual root object (or the physical root object if no
 virtual root has been specified).
 
 :ref:`modwsgi_tutorial` has detailed information about using
-:term:`mod_wsgi` to serve :mod:`pyramid` applications.
+:term:`mod_wsgi` to serve :app:`Pyramid` applications.
 

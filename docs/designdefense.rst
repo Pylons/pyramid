@@ -3,7 +3,7 @@
 Defending Pyramid's Design
 ==========================
 
-From time to time, challenges to various aspects of :mod:`pyramid`
+From time to time, challenges to various aspects of :app:`Pyramid`
 design are lodged.  To give context to discussions that follow, we
 detail some of the design decisions and trade-offs here.  In some
 cases, we acknowledge that the framework can be made better and we
@@ -69,7 +69,7 @@ What *part* of Zope do you hate?  "Zope" is a brand, not a technology.
 If it's Zope2-the-web-framework, Pyramid is not that.  The primary designers
 and developers of Pyramid, if anyone, should know.  We wrote Pyramid's
 predecessor (:mod:`repoze.bfg`), in part, because *we* knew that Zope 2 had
-usability issues and limitations.  :mod:`repoze.bfg` (and now :mod:`pyramid`)
+usability issues and limitations.  :mod:`repoze.bfg` (and now :app:`Pyramid`)
 was written to address these issues.
 
 If it's Zope3-the-web-framework, Pyramid is *definitely* not that.  Making
@@ -107,14 +107,14 @@ developers obviously disagree.
 Pyramid Uses A Zope Component Architecture ("ZCA") Registry
 -----------------------------------------------------------
 
-:mod:`pyramid` uses a :term:`Zope Component Architecture` (ZCA)
+:app:`Pyramid` uses a :term:`Zope Component Architecture` (ZCA)
 "component registry" as its :term:`application registry` under the
-hood.  This is a point of some contention.  :mod:`pyramid` is of a
+hood.  This is a point of some contention.  :app:`Pyramid` is of a
 :term:`Zope` pedigree, so it was natural for its developers to use a
 ZCA registry at its inception.  However, we understand that using a
 ZCA registry has issues and consequences, which we've attempted to
 address as best we can.  Here's an introspection about
-:mod:`pyramid` use of a ZCA registry, and the trade-offs its usage
+:app:`Pyramid` use of a ZCA registry, and the trade-offs its usage
 involves.
 
 Problems
@@ -171,7 +171,7 @@ That's sort of the best answer in this context (a more specific answer
 would require knowledge of internals).  Can there be more than one
 registry?  Yes.  So *which* registry does it find the registration in?
 Well, the "current" registry of course.  In terms of
-:mod:`pyramid`, the current registry is a thread local variable.
+:app:`Pyramid`, the current registry is a thread local variable.
 Using an API that consults a thread local makes understanding how it
 works non-local.
 
@@ -184,7 +184,7 @@ nor was it performed imperatively.  This is extremely hard to
 comprehend.  Problem number six.
 
 Clearly there's some amount of cognitive load here that needs to be
-borne by a reader of code that extends the :mod:`pyramid` framework
+borne by a reader of code that extends the :app:`Pyramid` framework
 due to its use of the ZCA, even if he or she is already an expert
 Python programmer and whom is an expert in the domain of web
 applications.  This is suboptimal.
@@ -192,10 +192,10 @@ applications.  This is suboptimal.
 Ameliorations
 +++++++++++++
 
-First, the primary amelioration: :mod:`pyramid` *does not expect
+First, the primary amelioration: :app:`Pyramid` *does not expect
 application developers to understand ZCA concepts or any of its APIs*.
 If an *application* developer needs to understand a ZCA concept or API
-during the creation of a :mod:`pyramid` application, we've failed
+during the creation of a :app:`Pyramid` application, we've failed
 on some axis.
 
 Instead, the framework hides the presence of the ZCA registry behind
@@ -236,7 +236,7 @@ application developers.  Application developers should just never know
 about the ZCA API: they should call a Python function with some object
 germane to the domain as an argument, and it should returns a result.
 A corollary that follows is that any reader of an application that has
-been written using :mod:`pyramid` needn't understand the ZCA API
+been written using :app:`Pyramid` needn't understand the ZCA API
 either.
 
 Hiding the ZCA API from application developers and code readers is a
@@ -244,24 +244,24 @@ form of enhancing "domain specificity".  No application developer
 wants to need to understand the minutiae of the mechanics of how a web
 framework does its thing.  People want to deal in concepts that are
 closer to the domain they're working in: for example, web developers
-want to know about *users*, not *utilities*.  :mod:`pyramid` uses
+want to know about *users*, not *utilities*.  :app:`Pyramid` uses
 the ZCA as an implementation detail, not as a feature which is exposed
 to end users.
 
 However, unlike application developers, *framework developers*,
-including people who want to override :mod:`pyramid` functionality
+including people who want to override :app:`Pyramid` functionality
 via preordained framework plugpoints like traversal or view lookup
 *must* understand the ZCA registry API.
 
-:mod:`pyramid` framework developers were so concerned about
+:app:`Pyramid` framework developers were so concerned about
 conceptual load issues of the ZCA registry API for framework
 developers that a `replacement registry implementation
 <http://svn.repoze.org/repoze.component/trunk>`_ named
 :mod:`repoze.component` was actually developed.  Though this package
 has a registry implementation which is fully functional and
 well-tested, and its API is much nicer than the ZCA registry API, work
-on it was largely abandoned and it is not used in :mod:`pyramid`.
-We continued to use a ZCA registry within :mod:`pyramid` because it
+on it was largely abandoned and it is not used in :app:`Pyramid`.
+We continued to use a ZCA registry within :app:`Pyramid` because it
 ultimately proved a better fit.
 
 .. note:: We continued using ZCA registry rather than disusing it in
@@ -274,16 +274,16 @@ ultimately proved a better fit.
    reinventing the wheel.
 
 Making framework developers and extenders understand the ZCA registry
-API is a trade-off.  We (the :mod:`pyramid` developers) like the
+API is a trade-off.  We (the :app:`Pyramid` developers) like the
 features that the ZCA registry gives us, and we have long-ago borne
 the weight of understanding what it does and how it works.  The
-authors of :mod:`pyramid` understand the ZCA deeply and can read
+authors of :app:`Pyramid` understand the ZCA deeply and can read
 code that uses it as easily as any other code.
 
 But we recognize that developers who my want to extend the framework
 are not as comfortable with the ZCA registry API as the original
 developers are with it.  So, for the purposes of being kind to
-third-party :mod:`pyramid` framework developers in, we've drawn
+third-party :app:`Pyramid` framework developers in, we've drawn
 some lines in the sand.
 
 #) In all "core" code, We've made use of ZCA global API functions such
@@ -297,7 +297,7 @@ some lines in the sand.
       from zope.component import getUtility
       policy = getUtility(IAuthenticationPolicy)
 
-   :mod:`pyramid` code will usually do:
+   :app:`Pyramid` code will usually do:
 
    .. code-block:: python
       :linenos:
@@ -308,10 +308,10 @@ some lines in the sand.
       policy = registry.getUtility(IAuthenticationPolicy)
 
    While the latter is more verbose, it also arguably makes it more
-   obvious what's going on.  All of the :mod:`pyramid` core code uses
+   obvious what's going on.  All of the :app:`Pyramid` core code uses
    this pattern rather than the ZCA global API.
 
-#) We've turned the component registry used by :mod:`pyramid` into
+#) We've turned the component registry used by :app:`Pyramid` into
    something that is accessible using the plain old dictionary API
    (like the :mod:`repoze.component` API).  For example, the snippet
    of code in the problem section above was:
@@ -351,7 +351,7 @@ some lines in the sand.
    attributes and the dictionary API.  Every Python programmer knows
    these things, even framework programmers.
 
-While :mod:`pyramid` still uses some suboptimal unnamed utility
+While :app:`Pyramid` still uses some suboptimal unnamed utility
 registrations, future versions of it will where possible disuse these
 things in favor of straight dictionary assignments and lookups, as
 demonstrated above, to be kinder to new framework developers.  We'll
@@ -360,16 +360,16 @@ continue to seek ways to reduce framework developer cognitive load.
 Rationale
 +++++++++
 
-Here are the main rationales involved in the :mod:`pyramid`
+Here are the main rationales involved in the :app:`Pyramid`
 decision to use the ZCA registry:
 
 - Pedigree.  A nontrivial part of the answer to this question is
-  "pedigree".  Much of the design of :mod:`pyramid` is stolen
+  "pedigree".  Much of the design of :app:`Pyramid` is stolen
   directly from :term:`Zope`.  Zope uses the ZCA registry to do a
-  number of tricks.  :mod:`pyramid` mimics these tricks, and,
+  number of tricks.  :app:`Pyramid` mimics these tricks, and,
   because the ZCA registry works well for that set of tricks,
-  :mod:`pyramid` uses it for the same purposes.  For example, the
-  way that :mod:`pyramid` maps a :term:`request` to a :term:`view
+  :app:`Pyramid` uses it for the same purposes.  For example, the
+  way that :app:`Pyramid` maps a :term:`request` to a :term:`view
   callable` is lifted almost entirely from Zope.  The ZCA registry
   plays an important role in the particulars of how this request to
   view mapping is done.
@@ -383,12 +383,12 @@ decision to use the ZCA registry:
   :term:`interface`.
 
 - Singularity.  There's only one "place" where "application
-  configuration" lives in a :mod:`pyramid` application: in a
+  configuration" lives in a :app:`Pyramid` application: in a
   component registry.  The component registry answers questions made
   to it by the framework at runtime based on the configuration of *an
   application*.  Note: "an application" is not the same as "a
   process", multiple independently configured copies of the same
-  :mod:`pyramid` application are capable of running in the same
+  :app:`Pyramid` application are capable of running in the same
   process space.
 
 - Composability.  A ZCA component registry can be populated
@@ -401,7 +401,7 @@ decision to use the ZCA registry:
   extensibility via a well-defined and widely understood plugin
   architecture.  As long as framework developers and extenders
   understand the ZCA registry, it's possible to extend
-  :mod:`pyramid` almost arbitrarily.  For example, it's relatively
+  :app:`Pyramid` almost arbitrarily.  For example, it's relatively
   easy to build a ZCML directive that registers several views "all at
   once", allowing app developers to use that ZCML directive as a
   "macro" in code that they write.  This is somewhat of a
@@ -414,25 +414,25 @@ decision to use the ZCA registry:
   lookups in the code find our mock objects.
 
 - Speed.  The ZCA registry is very fast for a specific set of complex
-  lookup scenarios that :mod:`pyramid` uses, having been optimized
+  lookup scenarios that :app:`Pyramid` uses, having been optimized
   through the years for just these purposes.  The ZCA registry
   contains optional C code for this purpose which demonstrably has no
   (or very few) bugs.
 
 - Ecosystem.  Many existing Zope packages can be used in
-  :mod:`pyramid` with few (or no) changes due to our use of the ZCA
+  :app:`Pyramid` with few (or no) changes due to our use of the ZCA
   registry and :term:`ZCML`.
 
 Conclusion
 ++++++++++
 
-If you only *develop applications* using :mod:`pyramid`, there's not much to
+If you only *develop applications* using :app:`Pyramid`, there's not much to
 complain about here.  You just should never need to understand the ZCA
-registry or even know about its presence: use documented :mod:`pyramid` APIs
+registry or even know about its presence: use documented :app:`Pyramid` APIs
 instead.  However, you may be an application developer who doesn't read API
 documentation because it's unmanly. Instead you read the raw source code, and
 because you haven't read the documentation, you don't know what functions,
-classes, and methods even *form* the :mod:`pyramid` API.  As a result, you've
+classes, and methods even *form* the :app:`Pyramid` API.  As a result, you've
 now written code that uses internals and you've painted yourself into a
 conceptual corner as a result of needing to wrestle with some ZCA-using
 implementation detail.  If this is you, it's extremely hard to have a lot of
@@ -440,9 +440,9 @@ sympathy for you.  You'll either need to get familiar with how we're using
 the ZCA registry or you'll need to use only the documented APIs; that's why
 we document them as APIs.
 
-If you *extend* or *develop* :mod:`pyramid` (create new ZCML directives, use
+If you *extend* or *develop* :app:`Pyramid` (create new ZCML directives, use
 some of the more obscure "ZCML hooks" as described in :ref:`hooks_chapter`,
-or work on the :mod:`pyramid` core code), you will be faced with needing to
+or work on the :app:`Pyramid` core code), you will be faced with needing to
 understand at least some ZCA concepts.  In some places it's used unabashedly,
 and will be forever.  We know it's quirky, but it's also useful and
 fundamentally understandable if you take the time to do some reading about
@@ -456,7 +456,7 @@ In this `TOPP Engineering blog entry
 Ian Bicking asserts that the way :mod:`repoze.bfg` used a Zope interface to
 represent an HTTP request method added too much indirection for not enough
 gain.  We agreed in general, and for this reason, :mod:`repoze.bfg` version 1.1
-(and subsequent versions including :mod:`pyramid` 1.0+) added :term:`view
+(and subsequent versions including :app:`Pyramid` 1.0+) added :term:`view
 predicate` and :term:`route predicate` modifiers to view configuration.
 Predicates are request-specific (or :term:`context` -specific) matching
 narrowers which don't use interfaces.  Instead, each predicate uses a
@@ -525,17 +525,17 @@ Pyramid "Encourages Use of ZCML"
 --------------------------------
 
 :term:`ZCML` is a configuration language that can be used to configure the
-:term:`Zope Component Architecture` registry that :mod:`pyramid` uses as its
+:term:`Zope Component Architecture` registry that :app:`Pyramid` uses as its
 application configuration.  Often people claim that Pyramid "needs ZCML".
 
 Quick answer: well, it doesn't. At least not anymore.  In :mod:`repoze.bfg`
 (the predecessor to Pyramid) versions 1.0 and and 1.1, an application needed to
 possess a ZCML file for it to begin executing successfully.  However,
-:mod:`repoze.bfg` 1.2 and greater (including :mod:`pyramid` 1.0) includes a
+:mod:`repoze.bfg` 1.2 and greater (including :app:`Pyramid` 1.0) includes a
 completely imperative mode for all configuration.  You will be able to make
 "single file" apps in this mode, which should help people who need to see
 everything done completely imperatively.  For example, the very most basic
-:mod:`pyramid` "helloworld" program has become something like:
+:app:`Pyramid` "helloworld" program has become something like:
 
 .. code-block:: python
    :linenos:
@@ -581,20 +581,20 @@ called *declarations*.  For an example:
 
 This declaration associates a :term:`view` with a route pattern. 
 
-All :mod:`pyramid` declarations are singleton tags, unlike many
+All :app:`Pyramid` declarations are singleton tags, unlike many
 other XML configuration systems.  No XML *values* in ZCML are
 meaningful; it's always just XML tags and attributes.  So in the very
 common case it's not really very much different than an otherwise
 "flat" configuration format like ``.ini``, except a developer can
 *create* a directive that requires nesting (none of these exist in
-:mod:`pyramid` itself), and multiple "sections" can exist with the
+:app:`Pyramid` itself), and multiple "sections" can exist with the
 same "name" (e.g. two ``<route>`` declarations) must be able to exist
 simultaneously.
 
 You might think some other configuration file format would be better.
 But all configuration formats suck in one way or another.  I
 personally don't think any of our lives would be markedly better if
-the declarative configuration format used by :mod:`pyramid` were
+the declarative configuration format used by :app:`Pyramid` were
 YAML, JSON, or INI.  It's all just plumbing that you mostly cut and
 paste once you've progressed 30 minutes into your first project.
 Folks who tend to agitate for another configuration file format are
@@ -605,9 +605,9 @@ folks that haven't yet spent that 30 minutes.
 Pyramid Uses "Model" To Represent A Node In The Graph of Objects Traversed
 --------------------------------------------------------------------------
 
-The :mod:`pyramid` documentation refers to the graph being
+The :app:`Pyramid` documentation refers to the graph being
 traversed when :term:`traversal` is used as a "model graph".  Some of
-the :mod:`pyramid` APIs also use the word "model" in them when
+the :app:`Pyramid` APIs also use the word "model" in them when
 referring to a node in this graph (e.g. ``pyramid.url.model_url``).
 
 A terminology overlap confuses people who write applications that
@@ -619,21 +619,21 @@ Often model objects must be explicitly manufactured by an ORM as a
 result of some query performed by a :term:`view`.  As a result, it can
 be unnatural to think of the nodes traversed as "model" objects if you
 develop your application using traversal and a relational database.
-When you develop such applications, the things that :mod:`pyramid`
+When you develop such applications, the things that :app:`Pyramid`
 refers to as "models" in such an application may just be stand-ins
 that perform a query and generate some wrapper *for* an ORM "model"
 (or set of ORM models).  The graph *might* be composed completely of
 "model" objects (as defined by the ORM) but it also might not be.
 
 The naming impedance mismatch between the way the term "model" is used
-to refer to a node in a graph in :mod:`pyramid` and the way the
+to refer to a node in a graph in :app:`Pyramid` and the way the
 term "model" is used by packages like SQLAlchemy is unfortunate.  For
 the purpose of avoiding confusion, if we had it to do all over again,
-we might refer to the graph that :mod:`pyramid` traverses a "node
+we might refer to the graph that :app:`Pyramid` traverses a "node
 graph" or "object graph" rather than a "model graph", but since we've
 baked the name into the API, it's a little late.  Sorry.
 
-In our defense, many :mod:`pyramid` applications (especially ones
+In our defense, many :app:`Pyramid` applications (especially ones
 which use :term:`ZODB`) do indeed traverse a graph full of model
 nodes.  Each node in the graph is a separate persistent object that is
 stored within a database.  This was the use case considered when
@@ -642,7 +642,7 @@ coming up with the "model" terminology.
 Pyramid Does Traversal, And I Don't Like Traversal
 --------------------------------------------------
 
-In :mod:`pyramid`, :term:`traversal` is the act of resolving a URL
+In :app:`Pyramid`, :term:`traversal` is the act of resolving a URL
 path to a :term:`model` object in an object graph.  Some people are
 uncomfortable with this notion, and believe it is wrong.
 
@@ -672,7 +672,7 @@ excellent way to model this, even if the backend is a relational
 database.  In this situation, the graph being traversed is actually
 less a "model graph" than a site structure.
 
-But the point is ultimately moot.  If you use :mod:`pyramid`, and
+But the point is ultimately moot.  If you use :app:`Pyramid`, and
 you don't want to model your application in terms of traversal, you
 needn't use it at all.  Instead, use :term:`URL dispatch` to map URL
 paths to views.
@@ -680,7 +680,7 @@ paths to views.
 Pyramid Does URL Dispatch, And I Don't Like URL Dispatch
 --------------------------------------------------------
 
-In :mod:`pyramid`, :term:`url dispatch` is the act of resolving a
+In :app:`Pyramid`, :term:`url dispatch` is the act of resolving a
 URL path to a :term:`view` callable by performing pattern matching
 against some set of ordered route definitions.  The route definitions
 are examined in order: the first pattern which matches is used to
@@ -698,7 +698,7 @@ object graph), and traversal is required to reach this code.
 
 I'll argue that URL dispatch is ultimately useful, even if you want to use
 traversal as well.  You can actually *combine* URL dispatch and traversal in
-:mod:`pyramid` (see :ref:`hybrid_chapter`).  One example of such a usage: if
+:app:`Pyramid` (see :ref:`hybrid_chapter`).  One example of such a usage: if
 you want to emulate something like Zope 2's "Zope Management Interface" UI on
 top of your object graph (or any administrative interface), you can register
 a route like ``<route name="manage" pattern="manage/*traverse"/>`` and then
@@ -718,10 +718,10 @@ one-off associations between views and URL paths.  Sometimes it's just
 pointless to add a node to the object graph that effectively
 represents the entry point for some bit of code.  You can just use a
 route and be done with it.  If a route matches, a view associated with
-the route will be called; if no route matches, :mod:`pyramid` falls
+the route will be called; if no route matches, :app:`Pyramid` falls
 back to using traversal.
 
-But the point is ultimately moot.  If you use :mod:`pyramid`, and
+But the point is ultimately moot.  If you use :app:`Pyramid`, and
 you really don't want to use URL dispatch, you needn't use it at all.
 Instead, use :term:`traversal` exclusively to map URL paths to views,
 just like you do in :term:`Zope`.
@@ -763,11 +763,11 @@ arguments in the request, and the method is called (if possible) with
 its argument list filled with values mentioned therein.  TurboGears
 and Pylons 1.X operate similarly.
 
-:mod:`pyramid` has neither of these features.  :mod:`pyramid`
+:app:`Pyramid` has neither of these features.  :mod:`pyramid`
 view callables always accept only ``context`` and ``request`` (or just
 ``request``), and no other arguments.  The rationale: this argument
 specification matching done aggressively can be costly, and
-:mod:`pyramid` has performance as one of its main goals, so we've
+:app:`Pyramid` has performance as one of its main goals, so we've
 decided to make people obtain information by interrogating the request
 object for it in the view body instead of providing magic to do
 unpacking into the view argument list.  The feature itself also just
@@ -786,7 +786,7 @@ A similar feature could be implemented to provide the Django-like
 behavior as a decorator by wrapping the view with a decorator that
 looks in ``request.matchdict``.
 
-It's possible at some point that :mod:`pyramid` will grow some form
+It's possible at some point that :app:`Pyramid` will grow some form
 of argument matching feature (it would be simple to make it an
 always-on optional feature that has no cost unless you actually use
 it) for, but currently it has none.
@@ -794,20 +794,20 @@ it) for, but currently it has none.
 Pyramid Provides Too Few "Rails"
 --------------------------------
 
-By design, :mod:`pyramid` is not a particularly "opinionated" web framework.
+By design, :app:`Pyramid` is not a particularly "opinionated" web framework.
 It has a relatively parsimonious feature set.  It contains no built in ORM
 nor any particular database bindings.  It contains no form generation
 framework.  It has no administrative web user interface.  It has no built in
 text indexing.  It does not dictate how you arrange your code.
 
 Such opinionated functionality exists in applications and frameworks built
-*on top* of :mod:`pyramid`.  It's intended that higher-level systems emerge
-built using :mod:`pyramid` as a base.  See also :ref:`apps_are_extensible`.
+*on top* of :app:`Pyramid`.  It's intended that higher-level systems emerge
+built using :app:`Pyramid` as a base.  See also :ref:`apps_are_extensible`.
 
 Pyramid Provides Too Many "Rails"
 ---------------------------------
 
-:mod:`pyramid` provides some features that other web frameworks do
+:app:`Pyramid` provides some features that other web frameworks do
 not.  Most notably it has machinery which resolves a URL first to a
 :term:`context` before calling a view (which has the capability to
 accept the context in its argument list), and a declarative
@@ -824,20 +824,20 @@ declarations as :term:`ACL` objects.
 Having context-sensitive declarative security for individual objects
 in the object graph is simply required for this class of application.
 Other frameworks save for Zope just do not have this feature.  This is
-one of the primary reasons that :mod:`pyramid` was actually
+one of the primary reasons that :app:`Pyramid` was actually
 written.
 
 If you don't like this, it doesn't mean you can't use
-:mod:`pyramid`.  Just ignore this feature and avoid configuring an
+:app:`Pyramid`.  Just ignore this feature and avoid configuring an
 authorization or authentication policy and using ACLs.  You can build
-"Pylons-1.X-style" applications using :mod:`pyramid` that use their own
+"Pylons-1.X-style" applications using :app:`Pyramid` that use their own
 security model via decorators or plain-old-imperative logic in view
 code.
 
 Pyramid Is Too Big
 ------------------
 
-"The :mod:`pyramid` compressed tarball is almost 2MB.  It must be
+"The :app:`Pyramid` compressed tarball is almost 2MB.  It must be
 enormous!"
 
 No.  We just ship it with test code and helper templates.  Here's a
@@ -859,7 +859,7 @@ pyramid/ (except for ``pyramd/tests and pyramid/paster_templates``)
 
   539K
 
-The actual :mod:`pyramid` runtime code is about 10% of the total size of the
+The actual :app:`Pyramid` runtime code is about 10% of the total size of the
 tarball omitting docs, helper templates used for package generation, and test
 code.  Of the approximately 19K lines of Python code in the package, the code
 that actually has a chance of executing during normal operation, excluding
@@ -871,13 +871,13 @@ Pyramid Has Too Many Dependencies
 ---------------------------------
 
 This is true.  At the time of this writing, the total number of Python
-package distributions that :mod:`pyramid` depends upon transitively
+package distributions that :app:`Pyramid` depends upon transitively
 is 18 if you use Python 2.6 or 2.7, or 16 if you use Python 2.4 or
 2.5.  This is a lot more than zero package distribution dependencies:
 a metric which various Python microframeworks and Django boast.
 
 The :mod:`zope.component` and :mod:`zope.configuration` packages on
-which :mod:`pyramid` depends have transitive dependencies on
+which :app:`Pyramid` depends have transitive dependencies on
 several other packages (:mod:`zope.schema`, :mod:`zope.i18n`,
 :mod:`zope.event`, :mod:`zope.interface`, :mod:`zope.deprecation`,
 :mod:`zope.i18nmessageid`).  We've been working with the Zope
@@ -886,16 +886,16 @@ We'd prefer that these packages have fewer packages as transitive
 dependencies, and that much of the functionality of these packages was
 moved into a smaller *number* of packages.
 
-:mod:`pyramid` also has its own direct dependencies, such as :term:`Paste`,
+:app:`Pyramid` also has its own direct dependencies, such as :term:`Paste`,
 :term:`Chameleon`, :term:`Mako` and :term:`WebOb`, and some of these in turn
 have their own transitive dependencies.
 
-It should be noted that :mod:`pyramid` is positively lithe compared
+It should be noted that :app:`Pyramid` is positively lithe compared
 to :term:`Grok`, a different Zope-based framework.  As of this
 writing, in its default configuration, Grok has 126 package
 distribution dependencies. The number of dependencies required by
-:mod:`pyramid` is many times fewer than Grok (or Zope itself, upon
-which Grok is based).  :mod:`pyramid` has a number of package
+:app:`Pyramid` is many times fewer than Grok (or Zope itself, upon
+which Grok is based).  :app:`Pyramid` has a number of package
 distribution dependencies comparable to similarly-targeted frameworks
 such as Pylons 1.X.
 
@@ -903,7 +903,7 @@ We try not to reinvent too many wheels (at least the ones that don't
 need reinventing), and this comes at the cost of some number of
 dependencies.  However, "number of package distributions" is just not
 a terribly great metric to measure complexity.  For example, the
-:mod:`zope.event` distribution on which :mod:`pyramid` depends has
+:mod:`zope.event` distribution on which :app:`Pyramid` depends has
 a grand total of four lines of runtime code.  As noted above, we're
 continually trying to agitate for a collapsing of these sorts of
 packages into fewer distribution files.
@@ -912,14 +912,14 @@ Pyramid "Cheats" To Obtain Speed
 --------------------------------
 
 Complaints have been lodged by other web framework authors at various
-times that :mod:`pyramid` "cheats" to gain performance.  One
+times that :app:`Pyramid` "cheats" to gain performance.  One
 claimed cheating mechanism is our use (transitively) of the C
 extensions provided by :mod:`zope.interface` to do fast lookups.
 Another claimed cheating mechanism is the religious avoidance of
 extraneous function calls.
 
 If there's such a thing as cheating to get better performance, we want
-to cheat as much as possible.  We optimize :mod:`pyramid`
+to cheat as much as possible.  We optimize :app:`Pyramid`
 aggressively.  This comes at a cost: the core code has sections that
 could be expressed more readably.  As an amelioration, we've commented
 these sections liberally.
@@ -927,13 +927,13 @@ these sections liberally.
 Pyramid Gets Its Terminology Wrong ("MVC")
 ------------------------------------------
 
-"I'm a MVC web framework user, and I'm confused.  :mod:`pyramid`
+"I'm a MVC web framework user, and I'm confused.  :app:`Pyramid`
 calls the controller a view!  And it doesn't have any controllers."
 
 If you are in this camp, you might have come to expect things about how your
 existing "MVC" framework uses its terminology.  For example, you probably
 expect that models are ORM models, controllers are classes that have methods
-that map to URLs, and views are templates.  :mod:`pyramid` indeed has each of
+that map to URLs, and views are templates.  :app:`Pyramid` indeed has each of
 these concepts, and each probably *works* almost exactly like your existing
 "MVC" web framework. We just don't use the "MVC" terminology, as we can't
 square its usage in the web framework space with historical reality.
@@ -1004,11 +1004,11 @@ reasonable model, given the current constraints of the web.
 Pyramid Applications are Extensible; I Don't Believe In Application Extensibility
 ---------------------------------------------------------------------------------
 
-Any :mod:`pyramid` application written obeying certain constraints
-is *extensible*. This feature is discussed in the :mod:`pyramid`
+Any :app:`Pyramid` application written obeying certain constraints
+is *extensible*. This feature is discussed in the :app:`Pyramid`
 documentation chapter named :ref:`extending_chapter`.  It is made
 possible by the use of the :term:`Zope Component Architecture` and
-:term:`ZCML` within :mod:`pyramid`.
+:term:`ZCML` within :app:`Pyramid`.
 
 "Extensible", in this context, means:
 
@@ -1050,7 +1050,7 @@ lifetime of a deployment can be difficult and time consuming, and it's
 often useful to be able to modify an application for a particular
 deployment in a less invasive way.
 
-If you don't want to think about :mod:`pyramid` application
+If you don't want to think about :app:`Pyramid` application
 extensibility at all, you needn't.  You can ignore extensibility
 entirely.  However, if you follow the set of rules defined in
 :ref:`extending_chapter`, you don't need to *make* your application
@@ -1095,23 +1095,23 @@ worth, be contained in one, canonical, well-defined place.
 
 Branching an application and continually merging in order to get new
 features and bugfixes is clearly useful.  You can do that with a
-:mod:`pyramid` application just as usefully as you can do it with
+:app:`Pyramid` application just as usefully as you can do it with
 any application.  But deployment of an application written in
-:mod:`pyramid` makes it possible to avoid the need for this even if
+:app:`Pyramid` makes it possible to avoid the need for this even if
 the application doesn't define any plugpoints ahead of time.  It's
 possible that promoters of competing web frameworks dismiss this
 feature in favor of branching and merging because applications written
 in their framework of choice aren't extensible out of the box in a
 comparably fundamental way.
 
-While :mod:`pyramid` application are fundamentally extensible even
+While :app:`Pyramid` application are fundamentally extensible even
 if you don't write them with specific extensibility in mind, if you're
 moderately adventurous, you can also take it a step further.  If you
 learn more about the :term:`Zope Component Architecture`, you can
 optionally use it to expose other more domain-specific configuration
 plugpoints while developing an application.  The plugpoints you expose
 needn't be as coarse as the ones provided automatically by
-:mod:`pyramid` itself.  For example, you might compose your own
+:app:`Pyramid` itself.  For example, you might compose your own
 :term:`ZCML` directive that configures a set of views for a prebaked
 purpose (e.g. ``restview`` or somesuch) , allowing other people to
 refer to that directive when they make declarations in the
@@ -1121,9 +1121,9 @@ plugpoints for its deployers will need to understand the ZCA or he
 will need to develop his own similar extensibility system.
 
 Ultimately, any argument about whether the extensibility features lent
-to applications by :mod:`pyramid` are "good" or "bad" is somewhat
+to applications by :app:`Pyramid` are "good" or "bad" is somewhat
 pointless. You needn't take advantage of the extensibility features
-provided by a particular :mod:`pyramid` application in order to
+provided by a particular :app:`Pyramid` application in order to
 affect a modification for a particular set of its deployments.  You
 can ignore the application's extensibility plugpoints entirely, and
 instead use version control branching and merging to manage
@@ -1136,7 +1136,7 @@ Zope 3 Enforces "TTW" Authorization Checks By Default; Pyramid Does Not
 Challenge
 +++++++++
 
-:mod:`pyramid` performs automatic authorization checks only at
+:app:`Pyramid` performs automatic authorization checks only at
 :term:`view` execution time.  Zope 3 wraps context objects with a
 `security proxy <http://wiki.zope.org/zope3/WhatAreSecurityProxies>`,
 which causes Zope 3 to do also security checks during attribute
@@ -1151,15 +1151,15 @@ access.  I like this, because it means:
 #) I want to also expose my model via a REST API using Twisted Web. If
    Pyramid performed authorization based on attribute access via Zope3's
    security proies, I could enforce my authorization policy in both
-   :mod:`pyramid` and in the Twisted-based system the same way.
+   :app:`Pyramid` and in the Twisted-based system the same way.
 
 Defense
 +++++++
 
-:mod:`pyramid` was developed by folks familiar with Zope 2, which
+:app:`Pyramid` was developed by folks familiar with Zope 2, which
 has a "through the web" security model.  This "TTW" security model was
 the precursor to Zope 3's security proxies.  Over time, as the
-:mod:`pyramid` developers (working in Zope 2) created such sites,
+:app:`Pyramid` developers (working in Zope 2) created such sites,
 we found authorization checks during code interpretation extremely
 useful in a minority of projects.  But much of the time, TTW
 authorization checks usually slowed down the development velocity of
@@ -1180,7 +1180,7 @@ notwithstanding, given that Zope 3 security proxies are "viral" by
 nature, the only requirement to use one is to make sure you wrap a
 single object in a security proxy and make sure to access that object
 normally when you want proxy security checks to happen.  It is
-possible to override the :mod:`pyramid` "traverser" for a given
+possible to override the :app:`Pyramid` "traverser" for a given
 application (see :ref:`changing_the_traverser`).  To get Zope3-like
 behavior, it is possible to plug in a different traverser which
 returns Zope3-security-proxy-wrapped objects for each traversed object
@@ -1679,7 +1679,7 @@ be timely and correct.
 
 The methods :meth:`pyramid.configuration.Configurator.begin` and
 :meth:`pyramid.configuration.Configurator.end` are used to bracket
-the configuration phase of a :mod:`pyramid` application.
+the configuration phase of a :app:`Pyramid` application.
 
 These exist because existing legacy third party *configuration* (not
 runtime) code relies on a threadlocal stack being populated. The

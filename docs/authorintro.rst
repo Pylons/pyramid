@@ -2,10 +2,10 @@
  Author Introduction
 =====================
 
-Welcome to "The :mod:`pyramid` Web Application Framework".  In this
+Welcome to "The :app:`Pyramid` Web Application Framework".  In this
 introduction, I'll describe the audience for this book, I'll describe
 the book content, I'll provide some context regarding the genesis of
-:mod:`pyramid`, and I'll thank some important people.
+:app:`Pyramid`, and I'll thank some important people.
 
 I hope you enjoy both this book and the software it documents.  I've
 had a blast writing both.
@@ -42,7 +42,7 @@ book.  For example, the book doesn't try to define common web-related
 concepts like "URL" or "query string."  Likewise, the book describes
 various interactions in terms of the HTTP protocol, but it does not
 describe how the HTTP protocol works in detail.  Like any good web
-framework, though, :mod:`pyramid` shields you from needing to know
+framework, though, :app:`Pyramid` shields you from needing to know
 most of the gory details of web protocols and low-level data
 structures. As a result, you can usually avoid becoming "blocked"
 while you read this book even if you don't yet deeply understand web
@@ -58,10 +58,10 @@ This book is divided into four major parts:
 
 :ref:`narrative_documentation`
 
-  This is documentation which describes :mod:`pyramid` concepts in
+  This is documentation which describes :app:`Pyramid` concepts in
   narrative form, written in a largely conversational tone.  Each
   narrative documentation chapter describes an isolated
-  :mod:`pyramid` concept.  You should be able to get useful
+  :app:`Pyramid` concept.  You should be able to get useful
   information out of the narrative chapters if you read them
   out-of-order, or when you need only a reminder about a particular
   topic while you're developing an application.
@@ -71,18 +71,18 @@ This book is divided into four major parts:
   Each tutorial builds a sample application or implements a set of
   concepts with a sample; it then describes the application or
   concepts in terms of the sample.  You should read the tutorials if
-  you want a guided tour of :mod:`pyramid`.
+  you want a guided tour of :app:`Pyramid`.
 
 :ref:`api_reference`
 
   Comprehensive reference material for every public API exposed by
-  :mod:`pyramid`.  The API documentation is organized
+  :app:`Pyramid`.  The API documentation is organized
   alphabetically by module name.
 
 :ref:`zcml_reference`
 
   Comprehensive reference material for every :term:`ZCML directive`
-  provided by :mod:`pyramid`.  The ZCML directive documentation is
+  provided by :app:`Pyramid`.  The ZCML directive documentation is
   organized alphabetically by directive name.
 
 .. index::
@@ -95,7 +95,7 @@ This book is divided into four major parts:
 The Genesis of :mod:`repoze.bfg`
 ================================
 
-Before the end of 2010, :mod:`pyramid` was known as :mod:`repoze.bfg`.
+Before the end of 2010, :app:`Pyramid` was known as :mod:`repoze.bfg`.
 
 I wrote :mod:`repoze.bfg` after many years of writing applications
 using :term:`Zope`.  Zope provided me with a lot of mileage: it wasn't
@@ -133,12 +133,12 @@ I decided that in the long term, creating a simpler framework that
 retained features I had become accustomed to when developing Zope
 applications was a more reasonable idea than continuing to use any
 Zope publisher or living with the limitations and unfamiliarities of a
-different framework.  The result is what is now :mod:`pyramid`.
+different framework.  The result is what is now :app:`Pyramid`.
 
-The Genesis of :mod:`pyramid`
+The Genesis of :app:`Pyramid`
 =============================
 
-What was :mod:`repoze.bfg` has become :mod:`pyramid` as the result of
+What was :mod:`repoze.bfg` has become :app:`Pyramid` as the result of
 a coalition built between the :term:`Repoze` and :term:`Pylons`
 community throughout the year 2010.  By merging technology, we're able
 to reduce duplication of effort, and take advantage of more of each

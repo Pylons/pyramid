@@ -4,7 +4,7 @@
 The pyramid Web Application Development Framework
 =================================================
 
-:mod:`pyramid` is a small, fast, down-to-earth Python web application
+:app:`Pyramid` is a small, fast, down-to-earth Python web application
 development framework.  It is developed as part of the `Pylons Project
 <http://docs.pylonshq.com/>`_.  It is licensed under a `BSD-like license
 <http://repoze.org/license.html>`_.
@@ -27,7 +27,7 @@ Narrative documentation
 =======================
 
 Narrative documentation in chapter form explaining how to use
-:mod:`pyramid`.
+:app:`Pyramid`.
 
 .. toctree::
    :maxdepth: 2
@@ -66,8 +66,8 @@ Narrative documentation in chapter form explaining how to use
 Tutorials
 =========
 
-Detailed tutorials explaining how to use :mod:`pyramid` to build
-various types of applications and how to deploy :mod:`pyramid`
+Detailed tutorials explaining how to use :app:`Pyramid` to build
+various types of applications and how to deploy :app:`Pyramid`
 applications to various platforms.
 
 .. toctree::
@@ -87,7 +87,7 @@ Reference Material
 ==================
 
 Reference material includes API documentation and documentation of
-every :mod:`pyramid` :term:`ZCML directive`.
+every :app:`Pyramid` :term:`ZCML directive`.
 
 .. toctree::
    :maxdepth: 2
@@ -116,9 +116,9 @@ Sample Applications
 
 .. warning::
 
-   These applications are for an older version of :mod:`pyramid`,
+   These applications are for an older version of :app:`Pyramid`,
    which was named :mod:`repoze.bfg`.  We'll be updating them soon to
-   use :mod:`pyramid`.
+   use :app:`Pyramid`.
 
 `repoze.cluegun <http://svn.repoze.org/repoze.cluegun/trunk/>`_ is a
 simple pastebin application based on Rocky Burt's `ClueBin
@@ -167,7 +167,7 @@ Support and Development
 =======================
 
 The `Pylons Project web site <http://docs.pylonshq.com/>`_ is the main online
-source of :mod:`pyramid` support and development information.
+source of :app:`Pyramid` support and development information.
 
 To report bugs, use the `issue tracker
 <http://github.com/Pylons/pyramid/issues>`_.
@@ -177,13 +177,13 @@ contact the `Pylons-devel maillist
 <http://groups.google.com/group/pylons-devel>`_ or join the `#pylons
 IRC channel <irc://irc.freenode.net/#pylons>`_.
 
-Browse and check out tagged and trunk versions of :mod:`pyramid` via
+Browse and check out tagged and trunk versions of :app:`Pyramid` via
 the `Pyramid GitHub repository <http://github.com/Pylons/pyramid/>`_.
 To check out the trunk via ``git``, use this command::
 
   git clone git@github.com:Pylons/pyramid.git
 
-To find out how to become a contributor to :mod:`pyramid`, please see
+To find out how to become a contributor to :app:`Pyramid`, please see
 the `contributor's page <http://repoze.org/contributing.html>`_.
 
 Index and Glossary

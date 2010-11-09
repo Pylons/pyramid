@@ -1,4 +1,4 @@
-:mod:`pyramid` Change History
+:app:`Pyramid` Change History
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. include:: ../CHANGES.txt

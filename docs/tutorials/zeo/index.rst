@@ -4,18 +4,18 @@ Using ZODB with ZEO
 ===================
 
 :term:`ZODB` is a Python object persistence mechanism.  :term:`ZODB`
-works well as a storage mechanism for :mod:`pyramid` applications,
+works well as a storage mechanism for :app:`Pyramid` applications,
 especially in applications that use :term:`traversal`.
 
 :term:`ZEO` is an extension to ZODB which allows more than one process
 to simultaneously communicate with a ZODB storage.  Making a ZODB
 database accessible to more than one process means that you can debug
-your application objects at the same time that a :mod:`pyramid`
+your application objects at the same time that a :app:`Pyramid`
 server that accesses the database is running, and will also allow your
 application to run under multiprocess configurations, such as those
 exposed by :term:`mod_wsgi`.
 
-The easiest way to get started with ZODB in a :mod:`pyramid` application is
+The easiest way to get started with ZODB in a :app:`Pyramid` application is
 to use the ZODB ``pyramid_zodb`` paster template.  See
 :ref:`additional_paster_templates` for more information about using this
 template.  However, the Paster template does not set up a ZEO-capable
@@ -24,7 +24,7 @@ application.  This chapter shows you how to do that "from scratch".
 Installing Dependencies
 -----------------------
 
-#. Edit your :mod:`pyramid` application's ``setup.py`` file, adding
+#. Edit your :app:`Pyramid` application's ``setup.py`` file, adding
    the following packages to the ``install_requires`` of the
    application:
 
@@ -142,7 +142,7 @@ Configuration
       </blobstorage>
 
 #.  For the purposes of this tutorial we'll assume that you want your
-    :mod:`pyramid` application's :term:`root` object to be a
+    :app:`Pyramid` application's :term:`root` object to be a
     "folderish" object.  To achieve this, change your application's
     ``models.py`` file to look like the below:
 

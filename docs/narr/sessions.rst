@@ -14,10 +14,10 @@ Using The Default Session Factory
 ---------------------------------
 
 In order to use sessions, you must set up a :term:`session factory`
-during your :mod:`pyramid` configuration.
+during your :app:`Pyramid` configuration.
 
 A very basic, insecure sample session factory implementation is
-provided in the :mod:`pyramid` core.  It uses a cookie to store
+provided in the :app:`Pyramid` core.  It uses a cookie to store
 session information.  This implementation has the following
 limitation:
 
@@ -33,7 +33,7 @@ limitation:
 It is, however, digitally signed, and thus its data cannot easily be
 tampered with.
 
-You can configure this session factory in your :mod:`pyramid`
+You can configure this session factory in your :app:`Pyramid`
 application by using the ``session_factory`` argument to the
 :class:`pyramid.configuration.Configurator` class:
 
@@ -149,7 +149,7 @@ Creating Your Own Session Factory
 ---------------------------------
 
 If none of the default or otherwise available sessioning
-implementations for :mod:`pyramid` suit you, you may create your own
+implementations for :app:`Pyramid` suit you, you may create your own
 session object by implementing a :term:`session factory`.  Your
 session factory should return a :term:`session`.  The interfaces for
 both types are available in
