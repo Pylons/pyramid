@@ -426,30 +426,28 @@ decision to use the ZCA registry:
 Conclusion
 ++++++++++
 
-If you only *develop applications* using :mod:`pyramid`, there's
-not much to complain about here.  You just should never need to
-understand the ZCA registry or even know about its presence: use
-documented :mod:`pyramid` APIs instead.  However, you may be an
-application developer who doesn't read API documentation because it's
-unmanly. Instead you read the raw source code, and because you haven't
-read the documentation, you don't know what functions, classes, and
-methods even *form* the :mod:`pyramid` API.  As a result, you've
-now written code that uses internals and you've pained yourself into a
-conceptual corner as a result of needing to wrestle with some
-ZCA-using implementation detail.  If this is you, it's extremely hard
-to have a lot of sympathy for you.  You'll either need to get familiar
-with how we're using the ZCA registry or you'll need to use only the
-documented APIs; that's why we document them as APIs.
+If you only *develop applications* using :mod:`pyramid`, there's not much to
+complain about here.  You just should never need to understand the ZCA
+registry or even know about its presence: use documented :mod:`pyramid` APIs
+instead.  However, you may be an application developer who doesn't read API
+documentation because it's unmanly. Instead you read the raw source code, and
+because you haven't read the documentation, you don't know what functions,
+classes, and methods even *form* the :mod:`pyramid` API.  As a result, you've
+now written code that uses internals and you've painted yourself into a
+conceptual corner as a result of needing to wrestle with some ZCA-using
+implementation detail.  If this is you, it's extremely hard to have a lot of
+sympathy for you.  You'll either need to get familiar with how we're using
+the ZCA registry or you'll need to use only the documented APIs; that's why
+we document them as APIs.
 
-If you *extend* or *develop* :mod:`pyramid` (create new ZCML
-directives, use some of the more obscure "ZCML hooks" as described in
-:ref:`hooks_chapter`, or work on the :mod:`pyramid` core code), you
-will be faced with needing to understand at least some ZCA concepts.
-The ZCA registry API is quirky: we've tried to make it at least
-slightly nicer by disusing it for common registrations and lookups
-such as unnamed utilities.  Some places it's used unabashedly, and
-will be forever.  We know it's quirky, but it's also useful and
-fundamentally understandable if you take the time to do some reading
+If you *extend* or *develop* :mod:`pyramid` (create new ZCML directives, use
+some of the more obscure "ZCML hooks" as described in :ref:`hooks_chapter`,
+or work on the :mod:`pyramid` core code), you will be faced with needing to
+understand at least some ZCA concepts.  The ZCA registry API is quirky: we've
+tried to make it at least slightly nicer by disusing it for common
+registrations and lookups such as unnamed utilities.  Some places it's used
+unabashedly, and will be forever.  We know it's quirky, but it's also useful
+and fundamentally understandable if you take the time to do some reading
 about it.
 
 Pyramid Uses Interfaces Too Liberally
@@ -1027,7 +1025,7 @@ possible by the use of the :term:`Zope Component Architecture` and
   fundamental application behavior to be overriden or extended.
 
 - The original developer may optionally choose to anticipate an
-  application-specific set of plugpoints, which will may be hooked by
+  application-specific set of plugpoints, which may be hooked by
   a deployer.  If he chooses to use the facilities provided by the
   ZCA, the original developer does not need to think terribly hard
   about the mechanics of introducing such a plugpoint.
@@ -1150,12 +1148,12 @@ access.  I like this, because it means:
 
 #) When I use the security proxy machinery, I can have a view that
    conditionally displays certain HTML elements (like form fields) or
-   prevents certain attributes from being modified depending on the
-   depending on the permissions that the accessing user possesses with
-   respect to a context object.
+   prevents certain attributes from being modified depending on the the
+   permissions that the accessing user possesses with respect to a context
+   object.
 
 #) I want to also expose my model via a REST API using Twisted Web. If
-   If Pyramid performed authorization based on attribute access via Zope3's
+   Pyramid performed authorization based on attribute access via Zope3's
    security proies, I could enforce my authorization policy in both
    :mod:`pyramid` and in the Twisted-based system the same way.
 
@@ -1371,29 +1369,27 @@ yourself in as an application developer: you probably didn't even know
 you signed up for the job, because the documentation offered by
 decorator-based microframeworks don't warn you about it.
 
-Python application programmers do not control the module scope
-codepath.  Anyone who tries to sell you on the idea that they do is
-simply mistaken.  Test runners that you may want to use to run your
-code's tests often perform imports of arbitrary code in strange orders
-that manifest bugs like the one demonstrated above.  API documentation
-generation tools do the same.  Some (mutant) people even think it's
-safe to use the Python ``reload`` command or delete objects from
-``sys.modules``, each of which has hilarious effects when used against
-code that has import- time side effects.  When Python programmers
+Python application programmers do not control the module scope codepath.
+Anyone who tries to sell you on the idea that they do is simply mistaken.
+Test runners that you may want to use to run your code's tests often perform
+imports of arbitrary code in strange orders that manifest bugs like the one
+demonstrated above.  API documentation generation tools do the same.  Some
+(mutant) people even think it's safe to use the Python ``reload`` command or
+delete objects from ``sys.modules``, each of which has hilarious effects when
+used against code that has import-time side effects.  When Python programmers
 assume they can use the module-scope codepath to run arbitrary code
-(especially code which populates an external registry), and this
-assumption is challenged by reality, the application developer is
-often required to undergo a painful, meticulous debugging process to
-find the root cause of an inevitably obscure symptom.  The solution is
-often to rearrange application import ordering or move an import
-statement from module-scope into a function body.  The rationale for
-doing so can never be expressed adequnately in the checkin message
-which accompanies the fix or documented succinctly enough for the
-benefit of the rest of the development team so that the problem never
-happens again.  It will happen again next month too, especially if you
-are working on a project with other people who haven't yet
-internalized the lessons you learned while you stepped through
-module-scope code using ``pdb``.
+(especially code which populates an external registry), and this assumption
+is challenged by reality, the application developer is often required to
+undergo a painful, meticulous debugging process to find the root cause of an
+inevitably obscure symptom.  The solution is often to rearrange application
+import ordering or move an import statement from module-scope into a function
+body.  The rationale for doing so can never be expressed adequnately in the
+checkin message which accompanies the fix or documented succinctly enough for
+the benefit of the rest of the development team so that the problem never
+happens again.  It will happen again next month too, especially if you are
+working on a project with other people who haven't yet internalized the
+lessons you learned while you stepped through module-scope code using
+``pdb``.
 
 Folks who have a large investment in eager decorator-based
 configuration that populates an external data structure (such as
