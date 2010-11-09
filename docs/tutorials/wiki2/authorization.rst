@@ -104,7 +104,8 @@ model via its ACL, so only the a user whom is a member of the group named
 Viewing Your Changes
 ~~~~~~~~~~~~~~~~~~~~
 
-When you're done, your ``__init__.py`` will look like so:
+When we're done configuring a root factory, adding an authorization policy,
+and adding views, your application's ``__init__.py`` will look like this:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :linenos:
@@ -119,15 +120,6 @@ representing a :term:`dotted Python name`, which points at the
 ``groupfinder`` function in the current directory's ``security.py`` file.  We
 haven't added that module yet, but we're about to.
 
-Viewing Our Edits to ``__init__.py``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When we're done configuring a root factory, adding an authorization policy,
-and adding views, your application's ``__init__.py`` will look like this:
-
-.. literalinclude:: src/authorization/tutorial/__init__.py
-   :linenos:
-   :language: python
 
 Adding ``security.py``
 ~~~~~~~~~~~~~~~~~~~~~~
