@@ -95,3 +95,22 @@
 
 - Option for route_url to omit the host and port (perhaps a different
   function named ``route_path``).
+
+- SQLAlchemy idiomatics:
+
+   <RaFromBRC> mcdonc: those paster templates all look pretty good... the
+   only thing i'd consider is adjusting your config variable names to match
+   exactly what sqlalchemy uses as parameter names, see here:
+   http://www.sqlalchemy.org/docs/core/engines.html
+
+   <RaFromBRC> mcdonc: especially in the pylons_sqla ini file, where the db
+   initialization is mixed in w/ the app config...
+
+   <RaFromBRC> ... i'd use "sqlalchemy.PARAMETER" for all of the sqla
+   settings, so it could easily be handed to engine_from_config w/o any need
+   to parse by hand
+
+   <RaFromBRC> mcdonc: in the other ini files, where sqlalchemy is given its
+   own part, the "sqlalchemy." prefix probably isn't necessary, but matching
+   the parameter names (e.g. 'url' instead of 'db_string') is still probably
+   a good idea
