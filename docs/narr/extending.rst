@@ -168,11 +168,9 @@ something like this:
   registrations.  See :ref:`overriding_views`,
   :ref:`overriding_routes` and :ref:`overriding_resources`.
 
-- Change the Paste ``.ini`` file that starts up the original
-  application.  Add a ``configure_zcml`` key within the application's
-  section in the file which points at your *new* package's
-  ``configure.zcml`` file.  See :ref:`environment_chapter` for more
-  information about this setting.
+- In the ``__init__.py`` of the new package, load the ``configure.zcml`` file
+  of the new package using the
+  :meth:`pyramid.configuration.Configurator.load_zcml` method.
 
 .. index::
    pair: overriding; views
