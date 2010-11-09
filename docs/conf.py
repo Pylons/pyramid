@@ -16,12 +16,21 @@ import datetime
 
 # skip raw nodes
 from sphinx.writers.text import TextTranslator
+from sphinx.writers.latex import LaTeXTranslator
+
 from docutils import nodes
 from docutils import utils
 
 def raw(*arg):
     raise nodes.SkipNode
 TextTranslator.visit_raw = raw
+
+
+# make sure :app:`Pyramid` doesn't mess up LaTeX rendering
+def nothing(*arg):
+    pass
+LaTeXTranslator.visit_inline = nothing
+LaTeXTranslator.depart_inline = nothing
 
 book = os.environ.get('BOOK')
 
