@@ -443,12 +443,10 @@ we document them as APIs.
 If you *extend* or *develop* :mod:`pyramid` (create new ZCML directives, use
 some of the more obscure "ZCML hooks" as described in :ref:`hooks_chapter`,
 or work on the :mod:`pyramid` core code), you will be faced with needing to
-understand at least some ZCA concepts.  The ZCA registry API is quirky: we've
-tried to make it at least slightly nicer by disusing it for common
-registrations and lookups such as unnamed utilities.  Some places it's used
-unabashedly, and will be forever.  We know it's quirky, but it's also useful
-and fundamentally understandable if you take the time to do some reading
-about it.
+understand at least some ZCA concepts.  In some places it's used unabashedly,
+and will be forever.  We know it's quirky, but it's also useful and
+fundamentally understandable if you take the time to do some reading about
+it.
 
 Pyramid Uses Interfaces Too Liberally
 -------------------------------------
@@ -698,21 +696,20 @@ the code that calls into the database lives somewhere in the ZODB
 object graph (or at least is a :term:`view` related to a node in the
 object graph), and traversal is required to reach this code.
 
-I'll argue that URL dispatch is ultimately useful, even if you want to
-use traversal as well.  You can actually *combine* URL dispatch and
-traversal in :mod:`pyramid` (see :ref:`hybrid_chapter`).  One
-example of such a usage: if you want to emulate something like Zope
-2's "Zope Management Interface" UI on top of your object graph (or any
-administrative interface), you can register a route like ``<route
-name="manage" path="manage/*traverse"/>`` and then associate
-"management" views in your code by using the ``route_name`` argument
-to a ``view`` configuration, e.g. ``<view view=".some.callable"
-context=".some.Model" route_name="manage"/>``.  If you wire things up
-this way someone then walks up to for example, ``/manage/ob1/ob2``,
-they might be presented with a management interface, but walking up to
-``/ob1/ob2`` would present them with the default object view.  There
-are other tricks you can pull in these hybrid configurations if you're
-clever (and maybe masochistic) too.
+I'll argue that URL dispatch is ultimately useful, even if you want to use
+traversal as well.  You can actually *combine* URL dispatch and traversal in
+:mod:`pyramid` (see :ref:`hybrid_chapter`).  One example of such a usage: if
+you want to emulate something like Zope 2's "Zope Management Interface" UI on
+top of your object graph (or any administrative interface), you can register
+a route like ``<route name="manage" pattern="manage/*traverse"/>`` and then
+associate "management" views in your code by using the ``route_name``
+argument to a ``view`` configuration, e.g. ``<view view=".some.callable"
+context=".some.Model" route_name="manage"/>``.  If you wire things up this
+way someone then walks up to for example, ``/manage/ob1/ob2``, they might be
+presented with a management interface, but walking up to ``/ob1/ob2`` would
+present them with the default object view.  There are other tricks you can
+pull in these hybrid configurations if you're clever (and maybe masochistic)
+too.
 
 Also, if you are a URL dispatch hater, if you should ever be asked to
 write an application that must use some legacy relational database
@@ -732,13 +729,13 @@ just like you do in :term:`Zope`.
 Pyramid Views Do Not Accept Arbitrary Keyword Arguments
 -------------------------------------------------------
 
-Many web frameworks (Zope, TurboGears, Pylons, Django) allow for their
-variant of a :term:`view callable` to accept arbitrary keyword or
-positional arguments, which are "filled in" using values present in
-the ``request.POST`` or ``request.GET`` dictionaries or by values
-present in the "route match dictionary".  For example, a Django view
-will accept positional arguments which match information in an
-associated "urlconf" such as ``r'^polls/(?P<poll_id>\d+)/$``:
+Many web frameworks (Zope, TurboGears, Pylons 1.X, Django) allow for their
+variant of a :term:`view callable` to accept arbitrary keyword or positional
+arguments, which are "filled in" using values present in the ``request.POST``
+or ``request.GET`` dictionaries or by values present in the "route match
+dictionary".  For example, a Django view will accept positional arguments
+which match information in an associated "urlconf" such as
+``r'^polls/(?P<poll_id>\d+)/$``:
 
 .. code-block:: python
    :linenos:
@@ -764,7 +761,7 @@ callable, the Zope request object's GET and POST namespaces are
 searched for keys which match the names of the positional and keyword
 arguments in the request, and the method is called (if possible) with
 its argument list filled with values mentioned therein.  TurboGears
-and Pylons operate similarly.
+and Pylons 1.X operate similarly.
 
 :mod:`pyramid` has neither of these features.  :mod:`pyramid`
 view callables always accept only ``context`` and ``request`` (or just
@@ -833,7 +830,7 @@ written.
 If you don't like this, it doesn't mean you can't use
 :mod:`pyramid`.  Just ignore this feature and avoid configuring an
 authorization or authentication policy and using ACLs.  You can build
-"Pylons-style" applications using :mod:`pyramid` that use their own
+"Pylons-1.X-style" applications using :mod:`pyramid` that use their own
 security model via decorators or plain-old-imperative logic in view
 code.
 
@@ -862,14 +859,13 @@ pyramid/ (except for ``pyramd/tests and pyramid/paster_templates``)
 
   539K
 
-The actual :mod:`pyramid` runtime code is about 10% of the total size
-of the tarball omitting docs, helper templates used for package
-generation, and test code.  Of the approximately 19K lines of Python
-code in the package, the code that actually has a chance of executing
-during normal operation, excluding tests and paster template Python
-files, accounts for approximately 5K lines of Python code.  This is
-comparable to Pylons, which ships with a little over 2K lines of
-Python code, excluding tests.
+The actual :mod:`pyramid` runtime code is about 10% of the total size of the
+tarball omitting docs, helper templates used for package generation, and test
+code.  Of the approximately 19K lines of Python code in the package, the code
+that actually has a chance of executing during normal operation, excluding
+tests and paster template Python files, accounts for approximately 5K lines
+of Python code.  This is comparable to Pylons 1.X, which ships with a little
+over 2K lines of Python code, excluding tests.
 
 Pyramid Has Too Many Dependencies
 ---------------------------------
@@ -901,7 +897,7 @@ distribution dependencies. The number of dependencies required by
 :mod:`pyramid` is many times fewer than Grok (or Zope itself, upon
 which Grok is based).  :mod:`pyramid` has a number of package
 distribution dependencies comparable to similarly-targeted frameworks
-such as Pylons.
+such as Pylons 1.X.
 
 We try not to reinvent too many wheels (at least the ones that don't
 need reinventing), and this comes at the cost of some number of
@@ -1589,7 +1585,7 @@ not logically global*:
         # this is executed if the request method was GET or the
         # credentials were invalid    
 
-The `Pylons <http://pylonshq.com>`_ web framework uses a similar
+The `Pylons 1.X <http://pylonshq.com>`_ web framework uses a similar
 strategy.  It calls these things "Stacked Object Proxies", so, for
 purposes of this discussion, I'll do so as well.
 
