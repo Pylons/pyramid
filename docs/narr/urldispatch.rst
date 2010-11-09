@@ -16,15 +16,14 @@ dispatch exclusively allows you to avoid thinking about your
 application in terms of "contexts" and "view names" entirely.
 
 Many applications don't need :app:`Pyramid` features -- such as
-declarative security via an :term:`authorization policy` -- that
-benefit from having any visible separation between :term:`context
-finding` and :term:`view lookup`.  To this end, URL dispatch provides
-a handy syntax that allows you to effectively map URLs *directly* to
-:term:`view` code in such a way that you needn't think about your
-application in terms of "context finding" at all.  This makes developing
-a :app:`Pyramid` application seem more like developing an
-application in a system that is "context-free", such as :term:`Pylons`
-or :term:`Django`.
+context-sensitive declarative security via an :term:`authorization policy` --
+that benefit from having any visible separation between :term:`context
+finding` and :term:`view lookup`.  To this end, URL dispatch provides a handy
+syntax that allows you to effectively map URLs *directly* to :term:`view`
+code in such a way that you needn't think about your application in terms of
+"context finding" at all.  This makes developing a :app:`Pyramid` application
+seem more like developing an application in a system that is "context-free",
+such as :term:`Pylons` or :term:`Django`.
 
 Whether or not you care about "context", it often makes a lot of sense
 to use :term:`URL dispatch` instead of :term:`traversal` in an
@@ -263,10 +262,6 @@ segment replacement marker.  For example, for the URL ``/abc/``:
 - ``/abc/:foo`` will not match.
 
 - ``/:foo/`` will match.
-
-.. warning:: The must-be-one-character-to-match-segment-marker rule is
-   new in version 1.3.  It is untrue for older releases, but this was
-   due to a bug.
 
 Note that values representing path segments matched with a
 ``:segment`` match will be url-unquoted and decoded from UTF-8 into
