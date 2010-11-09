@@ -82,5 +82,5 @@ http://docs.pylonshq.com
 
 The source code for the examples used in this book are available
 within the :app:`Pyramid` software distribution, always available
-via http://pylonshq.com/pyramid.
+via https://github.com/Pylons/pyramid
 
