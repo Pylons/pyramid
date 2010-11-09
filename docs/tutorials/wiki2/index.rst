@@ -1,12 +1,13 @@
 .. _bfg_sql_wiki_tutorial:
 
-SQLAlchemy + URL Dispatch Wiki Tutorial
-=======================================
+SQLAlchemy + URL Dispatch Wiki Tutorial (For Developers Familiar with Pylons 1)
+===============================================================================
 
-This tutorial introduces a :term:`SQLAlchemy` and :term:`url dispatch`
--based :mod:`pyramid` application to a developer familiar with
-Python.  When the tutorial is finished, the developer will have
-created a basic Wiki application with authentication.
+This tutorial introduces a :term:`SQLAlchemy` and :term:`url dispatch` -based
+:mod:`pyramid` application to a developer familiar with Python, and will be
+most familiar to developers who have used the :term:`Pylons` 1.X web
+framework.  When the tutorial is finished, the developer will have created a
+basic Wiki application with authentication.
 
 For cut and paste purposes, the source code for all stages of this
 tutorial can be browsed at
