@@ -93,4 +93,5 @@
 
 - Make settings an attribute of.. registry?  request?  Ugh.
 
-- Option for route_url to omit the host and port.
+- Option for route_url to omit the host and port (perhaps a different
+  function named ``route_path``).
