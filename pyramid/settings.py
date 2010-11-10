@@ -80,6 +80,9 @@ def get_settings():
     return reg.queryUtility(ISettings)
 
 def asbool(s):
+    """ Return the boolean value ``True`` if the case-lowered value of string
+    input ``s`` is any of ``t``, ``true``, ``y``, ``on``, or ``1``, otherwise
+    return the boolean value ``False``."""
     s = str(s).strip()
     return s.lower() in ('t', 'true', 'y', 'yes', 'on', '1')
 

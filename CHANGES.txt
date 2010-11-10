@@ -11,6 +11,8 @@ Features
 - Added class vars ``matchdict`` and ``matched_route`` to
   ``pyramid.request.Request``.  Each is set to ``None``.
 
+- New API method: ``pyramid.settings.asbool``.
+
 Bug Fixes
 ---------
 

@@ -7,3 +7,6 @@
 
   .. autofunction:: get_settings
 
+  .. autofunction:: asbool
+
+
