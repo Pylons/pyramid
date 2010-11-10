@@ -180,7 +180,7 @@ Elided output from a run of this command is shown below:
 
    $ ../bin/python setup.py develop
    ...
-   Finished processing dependencies for MyProject==0.1
+   Finished processing dependencies for MyProject==0.0
 
 This will install the :term:`distribution` representing your
 application's into the interpreter's library set so it can be found
@@ -245,17 +245,17 @@ develop``, you can use an interactive Python shell to examine your
 a Python prompt.  To do so, use the ``paster`` shell command with the
 ``pshell`` argument:
 
-The first argument to ``pshell`` is the path to your application's
-``.ini`` file.  The second is the section name inside the ``.ini``
-file which points to your *application* as opposed to any other
-section within the ``.ini`` file.  For example, if your application
-``.ini`` file might have a ``[app:main]`` section that looks like so:
+The first argument to ``pshell`` is the path to your application's ``.ini``
+file.  The second is the ``app`` section name inside the ``.ini`` file which
+points to *your application* as opposed to any other section within the
+``.ini`` file.  For example, if your application ``.ini`` file might have a
+``[app:MyProject]`` section that looks like so:
 
 .. code-block:: ini
    :linenos:
 
-   [app:main]
-   use = egg:MyProject#app
+   [app:MyProject]
+   use = egg:MyProject
    reload_templates = true
    debug_authorization = false
    debug_notfound = false
@@ -263,20 +263,16 @@ section within the ``.ini`` file.  For example, if your application
    default_locale_name = en
 
 If so, you can use the following command to invoke a debug shell using
-the name ``main`` as a section name:
+the name ``MyProject`` as a section name:
 
 .. code-block::  text
 
-   [chrism@vitaminf shellenv]$ ../bin/paster --plugin=pyramid \
-                               pshell development.ini main
+   [chrism@vitaminf shellenv]$ ../bin/paster pshell development.ini MyProject
    Python 2.4.5 (#1, Aug 29 2008, 12:27:37) 
    [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
    Type "help" for more information. "root" is the Pyramid app root object.
    >>> root
-   <foo.models.MyModel object at 0x445270>
-
-.. note:: You *might* get away without passing
-          ``--plugin=pyramid`` to the ``pshell`` command.
+   <myproject.models.MyModel object at 0x445270>
 
 If you have `IPython <http://en.wikipedia.org/wiki/IPython>`_
 installed in the interpreter you use to invoke the ``paster`` command,
@@ -288,46 +284,40 @@ Python interpreter shell unconditionally.
 
 .. code-block::  text
 
-   [chrism@vitaminf shellenv]$ ../bin/paster --plugin=pyramid pshell \
-         --disable-ipython development.ini main
+   [chrism@vitaminf shellenv]$ ../bin/paster pshell --disable-ipython \
+                                development.ini MyProject
 
-You should always use a section name argument that refers to the
-actual ``app`` section within the Paste configuration file that points
-at your :app:`Pyramid` application *without any middleware wrapping*.
-In particular, a section name is inappropriate as the second argument
-to ``pshell`` if the configuration section it names is a ``pipeline``
-rather than an ``app``.  For example, if you have the following
-``.ini`` file content:
+.. warning::
 
-.. code-block:: ini
-   :linenos:
+   You should always use a section name argument that refers to the actual
+   ``app`` section within the Paste configuration file that points at your
+   :app:`Pyramid` application *without any middleware wrapping*.  In
+   particular, a section name is inappropriate as the second argument to
+   ``pshell`` if the configuration section it names is a ``pipeline`` rather
+   than an ``app``.  For example, if you have the following ``.ini`` file
+   content:
 
-   [app:myapp]
-   use = egg:MyProject#app
-   reload_templates = true
-   debug_authorization = false
-   debug_notfound = false
-   debug_templates = true
-   default_locale_name = en
+   .. code-block:: ini
+      :linenos:
 
-   [pipeline:main]
-   pipeline = egg:repoze.tm2#tm
-              myapp
+      [app:MyProject]
+      use = egg:MyProject
+      reload_templates = true
+      debug_authorization = false
+      debug_notfound = false
+      debug_templates = true
+      default_locale_name = en
 
-The command you use to invoke the interactive shell should be:
+      [pipeline:main]
+      pipeline = egg:WebError#evalerror
+                 myapp
 
-.. code-block::  text
+   If you use ``main`` as the section name argument instead of ``myapp``
+   against the above ``.ini`` file, an error will occur.  Use the most
+   specific reference to your application within the ``.ini`` file possible
+   as the section name argument.
 
-   [chrism@vitaminf shellenv]$ ../bin/paster --plugin=pyramid pshell \
-         development.ini myapp
-
-If you use ``main`` as the section name argument instead of ``myapp``
-against the above ``.ini`` file, an error will likely occur.  Use the
-most specific reference to the application within the ``.ini`` file
-possible as the section name argument.
-
-Press ``Ctrl-D`` to exit the interactive shell (or ``Ctrl-Z`` on
-Windows).
+Press ``Ctrl-D`` to exit the interactive shell (or ``Ctrl-Z`` on Windows).
 
 .. index::
    single: running an application
@@ -498,87 +488,82 @@ The generated ``development.ini`` file looks like so:
 .. literalinclude:: MyProject/development.ini
    :linenos:
 
-This file contains several "sections" including ``[DEFAULT]``,
-``[app:main]``, and ``[server:main]``.
+This file contains several "sections" including ``[app:MyProject]``,
+``[pipeline:main]``, and ``[server:main]``.
 
-The ``[DEFAULT]`` section consists of global parameters that are
-shared by all the applications, servers and :term:`middleware` defined
-within the configuration file.  By default it contains one key
-``debug``, which is set to ``true``.  This key is used by various
-components to decide whether to act in a "debugging" mode.
-``pyramid`` itself does not do anything at all with this parameter,
-and neither does any template-generated application.
+The ``[app:MyProject]`` section represents configuration for your
+application.  This section name represents the ``MyProject`` application (and
+it's an ``app`` -lication, thus ``app:MyProject``)
 
-The ``[app:main]`` section represents configuration for your
-application.  This section name represents the ``main`` application
-(and it's an ``app`` -lication, thus ``app:main``), signifying that
-this is the default application run by ``paster serve`` when it is
-invoked against this configuration file.  The name ``main`` is a
-convention signifying that it the default application.
-
-The ``use`` setting is required in the ``[app:main]`` section.  The
-``use`` setting points at a :term:`setuptools` :term:`entry point`
-named ``MyProject#app`` (the ``egg:`` prefix in ``egg:MyProject#app``
-indicates that this is an entry point *URI* specifier, where the
-"scheme" is "egg").
+The ``use`` setting is required in the ``[app:MyProject]`` section.  The
+``use`` setting points at a :term:`setuptools` :term:`entry point` named
+``MyProject`` (the ``egg:`` prefix in ``egg:MyProject`` indicates that this
+is an entry point *URI* specifier, where the "scheme" is "egg").
+``egg:MyProject`` is actually shorthand for a longer spelling:
+``egg:MyProject#main``.  The ``#main`` part is omitted for brevity, as it is
+the default.
 
 .. sidebar::  ``setuptools`` Entry Points and PasteDeploy ``.ini`` Files
 
-   This part of configuration can be confusing so let's try to clear
-   things up a bit.  Take a look at the generated ``setup.py`` file
-   for this project.  Note that the ``entry_point`` line in
-   ``setup.py`` points at a string which looks a lot like an ``.ini``
-   file.  This string representation of an ``.ini`` file has a section
-   named ``[paste.app_factory]``.  Within this section, there is a key
-   named ``app`` (the entry point name) which has a value
-   ``myproject:app``.  The *key* ``app`` is what our
-   ``egg:MyProject#app`` value of the ``use`` section in our config
-   file is pointing at.  The value represents a :term:`dotted Python
-   name` path, which refers to a callable in our ``myproject``
-   package's ``__init__.py`` module.  In English, this entry point can thus
-   be referred to as a "Paste application factory in the ``MyProject``
-   project which has the entry point named ``app`` where the entry
-   point refers to a ``app`` function in the ``mypackage``
-   module".  If indeed if you open up the ``__init__.py`` module generated
-   within the ``myproject`` package, you'll see a ``app`` function.
-   This is the function called by :term:`PasteDeploy` when the
-   ``paster serve`` command is invoked against our application.  It
-   accepts a global configuration object and *returns* an instance of
-   our application.
+   This part of configuration can be confusing so let's try to clear things
+   up a bit.  Take a look at the generated ``setup.py`` file for this
+   project.  Note that the ``entry_point`` line in ``setup.py`` points at a
+   string which looks a lot like an ``.ini`` file.  This string
+   representation of an ``.ini`` file has a section named
+   ``[paste.app_factory]``.  Within this section, there is a key named
+   ``main`` (the entry point name) which has a value ``myproject:main``.  The
+   *key* ``main`` is what our ``egg:MyProject#main`` value of the ``use``
+   section in our config file is pointing at (although it is actually
+   shortened to ``egg:MyProject`` there).  The value represents a
+   :term:`dotted Python name` path, which refers to a callable in our
+   ``myproject`` package's ``__init__.py`` module.  In English, this entry
+   point can thus be referred to as a "Paste application factory in the
+   ``MyProject`` project which has the entry point named ``main`` where the
+   entry point refers to a ``main`` function in the ``mypackage`` module".
+   If indeed if you open up the ``__init__.py`` module generated within the
+   ``myproject`` package, you'll see a ``main`` function.  This is the
+   function called by :term:`PasteDeploy` when the ``paster serve`` command
+   is invoked against our application.  It accepts a global configuration
+   object and *returns* an instance of our application.
 
-The ``use`` setting is the only setting required in the ``[app:main]``
+The ``use`` setting is the only setting *required* in the ``[app:MyProject]``
 section unless you've changed the callable referred to by the
-``MyProject#app`` entry point to accept more arguments: other settings
-you add to this section are passed as keywords arguments to the
-callable represented by this entry point (``app`` in our ``__init__.py``
-module).  You can provide startup-time configuration parameters to
-your application by requiring more settings in this section.
+``egg:MyProject`` entry point to accept more arguments: other settings you
+add to this section are passed as keywords arguments to the callable
+represented by this entry point (``main`` in our ``__init__.py`` module).
+You can provide startup-time configuration parameters to your application by
+requiring more settings in this section.
 
-The ``reload_templates`` setting in the ``[app:main]`` section is a
-:app:`Pyramid` -specific setting which is passed into the
-framework.  If it exists, and its value is ``true``, :term:`Chameleon`
-template changes will not require an application restart to be
-detected.  See :ref:`reload_templates_section` for more information.
+The ``reload_templates`` setting in the ``[app:MyProject]`` section is a
+:app:`Pyramid` -specific setting which is passed into the framework.  If it
+exists, and its value is ``true``, :term:`Chameleon` and :term:`Mako`
+template changes will not require an application restart to be detected.  See
+:ref:`reload_templates_section` for more information.
 
 .. warning:: The ``reload_templates`` option should be turned off for
    production applications, as template rendering is slowed when it is
    turned on.
 
-The ``debug_templates`` setting in the ``[app:main]`` section is a
-:app:`Pyramid` -specific setting which is passed into the
-framework.  If it exists, and its value is ``true``, :term:`Chameleon`
-template exceptions will contained more detailed and helpful
-information about the error than when this value is ``false``.  See
-:ref:`debug_templates_section` for more information.
+The ``debug_templates`` setting in the ``[app:MyProject]`` section is a
+:app:`Pyramid` -specific setting which is passed into the framework.  If it
+exists, and its value is ``true``, :term:`Chameleon` template exceptions will
+contained more detailed and helpful information about the error than when
+this value is ``false``.  See :ref:`debug_templates_section` for more
+information.
 
 .. warning:: The ``debug_templates`` option should be turned off for
    production applications, as template rendering is slowed when it is
    turned on.
 
-Various other settings may exist in this section having to do with
-debugging or influencing runtime behavior of a :app:`Pyramid`
-application.  See :ref:`environment_chapter` for more information
-about these settings.
+Various other settings may exist in this section having to do with debugging
+or influencing runtime behavior of a :app:`Pyramid` application.  See
+:ref:`environment_chapter` for more information about these settings.
+
+``[pipeline:main]``, has the name ``main`` signifying that this is the
+default 'application' (although it's actually a pipeline of middleware and an
+application) run by ``paster serve`` when it is invoked against this
+configuration file.  The name ``main`` is a convention used by PasteDeploy
+signifying that it the default application.
 
 The ``[server:main]`` section of the configuration file configures a
 WSGI server which listens on TCP port 6543.  It is configured to
@@ -596,6 +581,14 @@ See the :term:`PasteDeploy` documentation for more information about
 other types of things you can put into this ``.ini`` file, such as
 other applications, :term:`middleware` and alternate :term:`WSGI`
 server implementations.
+
+.. note::
+
+   You can add a ``[DEFAULT]`` section to your ``development.ini`` file.
+   Such a section should consists of global parameters that are shared by all
+   the applications, servers and :term:`middleware` defined within the
+   configuration file.
+
 
 .. index::
    single: setup.py
@@ -629,29 +622,26 @@ application is kept.  While it's beyond the scope of this
 documentation to explain everything about setuptools setup files, we'll
 provide a whirlwind tour of what exists in this file in this section.
 
-Your application's name can be any string; it is specified in the
-``name`` field.  The version number is specified in the ``version``
-value.  A short description is provided in the ``description`` field.
-The ``long_description`` is conventionally the content of the README
-and CHANGES file appended together.  The ``classifiers`` field is a
-list of `Trove
+Your application's name can be any string; it is specified in the ``name``
+field.  The version number is specified in the ``version`` value.  A short
+description is provided in the ``description`` field.  The
+``long_description`` is conventionally the content of the README and CHANGES
+file appended together.  The ``classifiers`` field is a list of `Trove
 <http://pypi.python.org/pypi?%3Aaction=list_classifiers>`_ classifiers
-describing your application.  ``author`` and ``author_email`` are text
-fields which probably don't need any description.  ``url`` is a field
-that should point at your application project's URL (if any).
-``packages=find_packages()`` causes all packages within the project to
-be found when packaging the application.  ``include_package_data``
-will include non-Python files when the application is packaged if
-those files are checked into version control.  ``zip_safe`` indicates
-that this package is not safe to use as a zipped egg; instead it will
-always unpack as a directory, which is more convenient.
-``install_requires`` and ``tests_require`` indicate that this package
-depends on the ``pyramid`` package.  ``test_suite`` points at the
-package for our application, which means all tests found in the
-package will be run when ``setup.py test`` is invoked.  We examined
-``entry_points`` in our discussion of the ``development.ini`` file; this
-file defines the ``app`` entry point that represents our project's
-application.
+describing your application.  ``author`` and ``author_email`` are text fields
+which probably don't need any description.  ``url`` is a field that should
+point at your application project's URL (if any).
+``packages=find_packages()`` causes all packages within the project to be
+found when packaging the application.  ``include_package_data`` will include
+non-Python files when the application is packaged if those files are checked
+into version control.  ``zip_safe`` indicates that this package is not safe
+to use as a zipped egg; instead it will always unpack as a directory, which
+is more convenient.  ``install_requires`` and ``tests_require`` indicate that
+this package depends on the ``pyramid`` package.  ``test_suite`` points at
+the package for our application, which means all tests found in the package
+will be run when ``setup.py test`` is invoked.  We examined ``entry_points``
+in our discussion of the ``development.ini`` file; this file defines the
+``main`` entry point that represents our project's application.
 
 Usually you only need to think about the contents of the ``setup.py``
 file when distributing your application to other people, or when
@@ -673,9 +663,12 @@ tarball to other people who want to use your application.
    ``templates/mytemplate.pt`` file and the files in the ``static`` directory
    are not packaged in the tarball.  To allow this to happen, check all the
    files that you'd like to be distributed along with your application's
-   Python files into a version control system such as Subversion.  After you
-   do this, when you rerun ``setup.py sdist``, all files checked into the
-   version control system will be included in the tarball.
+   Python files into Subversion.  After you do this, when you rerun
+   ``setup.py sdist``, all files checked into the version control system will
+   be included in the tarball.  If you don't use Subversion, and instead use
+   a different version control system, you may need to install a setuptools
+   add-on such as ``setuptools-git`` or ``setuptools-hg`` for this behavior
+   to work properly.
 
 ``setup.cfg``
 ~~~~~~~~~~~~~
@@ -703,7 +696,7 @@ The ``myproject`` :term:`package` lives inside the ``MyProject``
 
 #. An ``__init__.py`` file which signifies that this is a Python
    :term:`package`.  It also contains code that helps users run the
-   application, include an ``app`` function which is used as a Paste entry
+   application, include a ``main`` function which is used as a Paste entry
    point.
 
 #. A ``models.py`` module, which contains :term:`model` code.
@@ -741,14 +734,14 @@ also informs Python that the directory which contains it is a *package*.
 #. Line 2 imports the ``get_root`` function from
    :mod:`myproject.models` that we use later.
 
-#. Lines 4-17 define a function that returns a :app:`Pyramid`
+#. Lines 4-14 define a function that returns a :app:`Pyramid`
    WSGI application.  This function is meant to be called
    by the :term:`PasteDeploy` framework as a result of running
    ``paster serve``.
 
    Within this function, configuration is performed.
 
-   Lines 12-14 register a "default view" (a view that has no ``name``
+   Lines 9-11 register a "default view" (a view that has no ``name``
    attribute).  It is registered so that it will be found when the
    :term:`context` of the request is an instance of the
    :class:`myproject.models.MyModel` class.  The first argument to
@@ -762,11 +755,11 @@ also informs Python that the directory which contains it is a *package*.
    ``templates`` directory of the ``myproject`` package.  The template file
    it actually points to is a :term:`Chameleon` ZPT template file.
 
-   Line 15 registers a static view, which will serve up the files from the
+   Line 12 registers a static view, which will serve up the files from the
    ``mypackage:static`` :term:`resource specification` (the ``static``
    directory of the ``mypackage`` package).
 
-   Line 17 returns a :term:`WSGI` application to the caller of the function
+   Line 14 returns a :term:`WSGI` application to the caller of the function
    (Paste).
 
 ``views.py``

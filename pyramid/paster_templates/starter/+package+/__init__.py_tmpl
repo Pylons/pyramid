@@ -3,9 +3,6 @@ from {{package}}.models import get_root
 
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
-    
-    It is usually called by the PasteDeploy framework during 
-    ``paster serve``.
     """
     config = Configurator(root_factory=get_root, settings=settings)
     config.begin()
