@@ -201,3 +201,39 @@ class TestGetSettings(unittest.TestCase):
         self.config.registry.registerUtility(settings, ISettings)
         self.assertEqual(self._callFUT(), settings)
 
+class Test_asbool(unittest.TestCase):
+    def _callFUT(self, s):
+        from pyramid.settings import asbool
+        return asbool(s)
+
+    def test_s_is_None(self):
+        result = self._callFUT(None)
+        self.assertEqual(result, False)
+        
+    def test_s_is_True(self):
+        result = self._callFUT(True)
+        self.assertEqual(result, True)
+        
+    def test_s_is_False(self):
+        result = self._callFUT(False)
+        self.assertEqual(result, False)
+
+    def test_s_is_true(self):
+        result = self._callFUT('True')
+        self.assertEqual(result, True)
+
+    def test_s_is_false(self):
+        result = self._callFUT('False')
+        self.assertEqual(result, False)
+
+    def test_s_is_yes(self):
+        result = self._callFUT('yes')
+        self.assertEqual(result, True)
+
+    def test_s_is_on(self):
+        result = self._callFUT('on')
+        self.assertEqual(result, True)
+
+    def test_s_is_1(self):
+        result = self._callFUT(1)
+        self.assertEqual(result, True)
