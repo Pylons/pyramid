@@ -30,32 +30,32 @@ entry point happens to be the ``app`` function within the file named
       :linenos:
       :language: py
 
-#. *Lines 1-2*.  Perform some dependency imports.
+#. *Lines 1-3*.  Perform some dependency imports.
 
-#. *Line 12*. Get the ZODB configuration from the ``development.ini``
+#. *Line 8*. Get the ZODB configuration from the ``development.ini``
    file's ``[app:main]`` section represented by the ``settings``
    dictionary passed to our ``app`` function.  This will be a URI
    (something like ``file:///path/to/Data.fs``).
 
-#. *Line 15*. We create a "finder" object using the
+#. *Line 12*. We create a "finder" object using the
    ``PersistentApplicationFinder`` helper class, passing it the ZODB
    URI and the "appmaker" we've imported from ``models.py``.
 
-#. *Lines 16 - 17*.  We create a :term:`root factory` which uses the
+#. *Lines 13 - 14*.  We create a :term:`root factory` which uses the
    finder to return a ZODB root object.
 
-#. *Line 18*.  We construct a :term:`Configurator` with a :term:`root
+#. *Line 15*.  We construct a :term:`Configurator` with a :term:`root
    factory` and the settings keywords parsed by PasteDeploy.  The root
    factory is named ``get_root``.
 
-#. *Lines 19-21*.  Begin configuration using the ``begin`` method of
+#. *Lines 16-18*.  Begin configuration using the ``begin`` method of
    the :meth:`pyramid.configuration.Configurator` class, load the
    ``configure.zcml`` file from our package using the
    :meth:`pyramid.configuration.Configurator.load_zcml` method, and
    end configuration using the
    :meth:`pyramid.configuration.Configurator.end` method.
 
-#. *Line 22*.  Use the
+#. *Line 19*.  Use the
    :meth:`pyramid.configuration.Configurator.make_wsgi_app` method
    to return a :term:`WSGI` application.
 

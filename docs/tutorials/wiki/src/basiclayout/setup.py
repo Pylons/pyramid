@@ -12,6 +12,7 @@ requires = [
     'ZODB3',
     'repoze.zodbconn',
     'repoze.tm',
+    'WebError',
     ]
 
 setup(name='tutorial',
@@ -28,7 +29,7 @@ setup(name='tutorial',
       author='',
       author_email='',
       url='',
-      keywords='web wsgi pylons pyramid bfg',
+      keywords='web pyramid bfg',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
@@ -37,6 +38,6 @@ setup(name='tutorial',
       test_suite="tutorial",
       entry_points = """\
       [paste.app_factory]
-      app = tutorial:app
+      main = tutorial:main
       """
       )
