@@ -111,3 +111,5 @@
    own part, the "sqlalchemy." prefix probably isn't necessary, but matching
    the parameter names (e.g. 'url' instead of 'db_string') is still probably
    a good idea
+
+- Default renderer.
