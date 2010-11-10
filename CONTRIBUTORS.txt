@@ -112,3 +112,5 @@ Contributors
 - Ben Bangert, 2010/11/09
 
 - Blaise Laflamme, 2010/11/09
+
+- Chris Rossi, 2010/11/10
