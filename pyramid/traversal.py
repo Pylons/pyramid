@@ -592,7 +592,7 @@ class ModelGraphTraverser(object):
                             'virtual_root':vroot,
                             'virtual_root_path':vroot_tuple,
                             'root':root}
-                if i == vroot_idx: 
+                if i == vroot_idx:
                     vroot = next
                 ob = next
                 i += 1
@@ -623,7 +623,7 @@ class TraversalContextURL(object):
             return self.request.root
         except AttributeError:
             return find_root(self.context)
-        
+
     def __call__(self):
         """ Generate a URL based on the :term:`lineage` of a
         :term:`model` object obtained via :term:`traversal`.  If any
@@ -658,8 +658,9 @@ class DefaultRootFactory:
     __parent__ = None
     __name__ = None
     def __init__(self, request):
-        matchdict = getattr(request, 'matchdict', {})
+        matchdict = request.matchdict
         # provide backwards compatibility for applications which
         # used routes (at least apps without any custom "context
         # factory") in BFG 0.9.X and before
-        self.__dict__.update(matchdict)
+        if matchdict is not None:
+            self.__dict__.update(matchdict)

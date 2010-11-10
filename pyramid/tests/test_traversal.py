@@ -6,7 +6,7 @@ class TraversalPathTests(unittest.TestCase):
     def _callFUT(self, path):
         from pyramid.traversal import traversal_path
         return traversal_path(path)
-        
+
     def test_path_startswith_endswith(self):
         self.assertEqual(self._callFUT('/foo/'), (u'foo',))
 
@@ -41,7 +41,7 @@ class TraversalPathTests(unittest.TestCase):
         decoded = unicode(la, 'utf-8')
         path = '/'.join([encoded, encoded])
         self.assertEqual(self._callFUT(path), (decoded, decoded))
-        
+
     def test_utf16(self):
         from pyramid.exceptions import URLDecodeError
         import urllib
@@ -626,7 +626,7 @@ class ModelPathTupleTests(unittest.TestCase):
         root.__name__ = None
         result = self._callFUT(root)
         self.assertEqual(result, ('',))
-        
+
     def test_nonroot_default(self):
         root = DummyContext()
         root.__parent__ = None
@@ -750,7 +750,7 @@ class TraversalContextURLTests(unittest.TestCase):
         context_url = self._makeOne(two, request)
         result = context_url()
         self.assertEqual(result, 'http://example.com:5432/two/')
-        
+
         request = DummyRequest({VH_ROOT_KEY:'/one/two'})
         context_url = self._makeOne(two, request)
         result = context_url()
@@ -973,8 +973,9 @@ class TestDefaultRootFactory(unittest.TestCase):
         return self._getTargetClass()(environ)
 
     def test_no_matchdict(self):
-        environ = {}
-        root = self._makeOne(environ)
+        class DummyRequest:
+            matchdict = None
+        root = self._makeOne(DummyRequest())
         self.assertEqual(root.__parent__, None)
         self.assertEqual(root.__name__, None)
 
@@ -997,13 +998,13 @@ def make_traverser(result):
             self.context.request = request
             return result
     return DummyTraverser
-        
+
 class DummyContext(object):
     __parent__ = None
     def __init__(self, next=None, name=None):
         self.next = next
         self.__name__ = name
-        
+
     def __getitem__(self, name):
         if self.next is None:
             raise KeyError, name
@@ -1018,7 +1019,7 @@ class DummyRequest:
         if environ is None:
             environ = {}
         self.environ = environ
-        
+
 class DummyContextURL:
     def __init__(self, context, request):
         pass

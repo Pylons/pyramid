@@ -567,7 +567,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(L[0], event)
         config.registry.subscribers((event.object, IDummy), None)
         self.assertEqual(len(L), 1)
-        
+
     def test_make_wsgi_app(self):
         from pyramid.router import Router
         from pyramid.interfaces import IApplicationCreated
@@ -1934,7 +1934,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_add_handler_with_action_and_action_in_path(self):
         from pyramid.exceptions import ConfigurationError
         config = self._makeOne()
-        self.assertRaises(ConfigurationError, config.add_handler, 
+        self.assertRaises(ConfigurationError, config.add_handler,
                           'name', '/{action}', DummyHandler, action='abc')
 
     def test_add_handler_with_explicit_action(self):
@@ -1970,7 +1970,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(view['attr'], None)
         self.assertEqual(view['route_name'], 'name')
         self.assertEqual(view['view'], DummyHandler)
-    
+
     def test_add_handler_with_multiple_action(self):
         config = self._makeOne()
         class DummyHandler(object):
@@ -2584,7 +2584,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.failUnless(result is view)
         self.failIf(hasattr(result, '__call_permissive__'))
         self.assertEqual(view(None, None), 'OK')
-        
+
     def test__derive_view_as_function_requestonly(self):
         def view(request):
             return 'OK'
@@ -2611,7 +2611,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(view.__name__, result.__name__)
         self.failIf(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), 'OK')
-        
+
     def test__derive_view_as_newstyle_class_requestonly(self):
         class view(object):
             def __init__(self, context, request):
@@ -2641,7 +2641,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(view.__name__, result.__name__)
         self.failIf(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), 'OK')
-        
+
     def test__derive_view_as_oldstyle_class_requestonly(self):
         class view:
             def __init__(self, context, request):
@@ -2667,7 +2667,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.failUnless(result is view)
         self.failIf(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), 'OK')
-        
+
     def test__derive_view_as_instance_requestonly(self):
         class View:
             def __call__(self, request):
@@ -2745,7 +2745,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(logger.messages[0],
                          "debug_authorization of url url (view name "
                          "'view_name' against context None): True")
-        
+
     def test__derive_view_debug_auth_permission_authpol_denied(self):
         from pyramid.exceptions import Forbidden
         view = lambda *arg: 'OK'
@@ -3028,10 +3028,10 @@ class ConfiguratorTests(unittest.TestCase):
 
         result = render_view_to_response(ctx, req, 'stacked_method2')
         self.assertEqual(result, 'stacked_method')
-        
+
         result = render_view_to_response(ctx, req, 'subpackage_init')
         self.assertEqual(result, 'subpackage_init')
-        
+
         result = render_view_to_response(ctx, req, 'subpackage_notinit')
         self.assertEqual(result, 'subpackage_notinit')
 
@@ -3132,7 +3132,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(len(L), 2)
         self.assertEqual(L[0], 'foo')
         self.assertEqual(L[1], event)
-        
+
     def test_testing_add_subscriber_defaults(self):
         config = self._makeOne()
         L = config.testing_add_subscriber()
@@ -3149,7 +3149,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         config.hook_zca(getSiteManager=gsm)
         self.assertEqual(gsm.hook, get_current_registry)
-        
+
     def test_unhook_zca(self):
         gsm = DummyGetSiteManager()
         config = self._makeOne()
@@ -3170,7 +3170,7 @@ class ConfiguratorTests(unittest.TestCase):
         renderer.assert_(foo=1)
         renderer.assert_(bar=2)
         renderer.assert_(request=request)
-        
+
     def test_testing_add_renderer_explicitrenderer(self):
         config = self._makeOne()
         class E(Exception): pass
@@ -3188,7 +3188,7 @@ class ConfiguratorTests(unittest.TestCase):
         except E:
             pass
         else: # pragma: no cover
-            raise AssertionError 
+            raise AssertionError
 
     def test_testing_add_template(self):
         config = self._makeOne()
@@ -3214,7 +3214,7 @@ class Test__map_view(unittest.TestCase):
     def tearDown(self):
         del self.registry
         testing.tearDown()
-        
+
     def _registerRenderer(self, typ='.txt'):
         from pyramid.interfaces import IRendererFactory
         from pyramid.interfaces import ITemplateRenderer
@@ -3237,7 +3237,7 @@ class Test__map_view(unittest.TestCase):
     def _callFUT(self, *arg, **kw):
         from pyramid.configuration import _map_view
         return _map_view(*arg, **kw)
-    
+
     def test__map_view_as_function_context_and_request(self):
         def view(context, request):
             return 'OK'
@@ -3259,7 +3259,7 @@ class Test__map_view(unittest.TestCase):
         result = self._callFUT(view, attr='__name__', renderer=info)
         self.failIf(result is view)
         self.assertRaises(TypeError, result, None, None)
-        
+
     def test__map_view_as_function_requestonly(self):
         def view(request):
             return 'OK'
@@ -3322,7 +3322,7 @@ class Test__map_view(unittest.TestCase):
         self.assertEqual(view.__name__, result.__name__)
         request = self._makeRequest()
         self.assertEqual(result(None, request).body, 'Hello!')
-        
+
     def test__map_view_as_newstyle_class_requestonly(self):
         class view(object):
             def __init__(self, request):
@@ -3457,7 +3457,7 @@ class Test__map_view(unittest.TestCase):
         result = self._callFUT(view)
         self.failUnless(result is view)
         self.assertEqual(result(None, None), 'OK')
-        
+
     def test__map_view_as_instance_context_and_request_and_attr(self):
         class View:
             def index(self, context, request):
@@ -3547,7 +3547,7 @@ class Test_decorate_view(unittest.TestCase):
     def _callFUT(self, wrapped, original):
         from pyramid.configuration import decorate_view
         return decorate_view(wrapped, original)
-    
+
     def test_it_same(self):
         def view(context, request):
             """ """
@@ -3700,7 +3700,7 @@ class Test__make_predicates(unittest.TestCase):
             )
         order3, _, _ = self._callFUT(
             path_info='path_info',
-            ) 
+            )
         order4, _, _ = self._callFUT(
             request_param='param',
             )
@@ -3809,7 +3809,7 @@ class TestMultiView(unittest.TestCase):
 
     def _makeOne(self, name='name'):
         return self._getTargetClass()(name)
-    
+
     def test_class_implements_ISecuredView(self):
         from zope.interface.verify import verifyClass
         from pyramid.interfaces import ISecuredView
@@ -3925,7 +3925,7 @@ class TestMultiView(unittest.TestCase):
             """ """
         mv.views = [(100, view, None)]
         self.assertEqual(mv.__permitted__(None, None), True)
-        
+
     def test_permitted(self):
         mv = self._makeOne()
         def view(context, request):
@@ -4047,13 +4047,13 @@ class TestMultiView(unittest.TestCase):
         mv.accepts = ['text/xml']
         response = mv(context, request)
         self.assertEqual(response, expected_response)
-        
+
 
 class TestRequestOnly(unittest.TestCase):
     def _callFUT(self, arg):
         from pyramid.configuration import requestonly
         return requestonly(arg)
-    
+
     def test_newstyle_class_no_init(self):
         class foo(object):
             """ """
@@ -4064,7 +4064,7 @@ class TestRequestOnly(unittest.TestCase):
             def __init__(self, context, request):
                 """ """
         self.assertFalse(self._callFUT(foo))
-        
+
     def test_newstyle_class_init_onearg_named_request(self):
         class foo(object):
             def __init__(self, request):
@@ -4105,7 +4105,7 @@ class TestRequestOnly(unittest.TestCase):
             def __init__(self, context, request):
                 """ """
         self.assertFalse(self._callFUT(foo))
-        
+
     def test_oldstyle_class_init_onearg_named_request(self):
         class foo:
             def __init__(self, request):
@@ -4140,7 +4140,7 @@ class TestRequestOnly(unittest.TestCase):
         def foo(context, request):
             """ """
         self.assertFalse(self._callFUT(foo))
-        
+
     def test_function_onearg_named_request(self):
         def foo(request):
             """ """
@@ -4172,7 +4172,7 @@ class TestRequestOnly(unittest.TestCase):
                 """ """
         foo = Foo()
         self.assertFalse(self._callFUT(foo))
-        
+
     def test_instance_defaultargs_onearg_named_request(self):
         class Foo:
             def __call__(self, request):
@@ -4269,7 +4269,7 @@ class TestDottedNameResolver(unittest.TestCase):
         result = typ._zope_dottedname_style(
             'pyramid.tests.test_configuration.TestDottedNameResolver')
         self.assertEqual(result, self.__class__)
-        
+
     def test_zope_dottedname_style_irrresolveable_absolute(self):
         typ = self._makeOne()
         self.assertRaises(ImportError, typ._zope_dottedname_style,
@@ -4339,7 +4339,7 @@ class TestDottedNameResolver(unittest.TestCase):
         result = typ._pkg_resources_style(
             'pyramid.tests.test_configuration:TestDottedNameResolver')
         self.assertEqual(result, self.__class__)
-        
+
     def test__pkg_resources_style_irrresolveable_absolute(self):
         typ = self._makeOne()
         self.assertRaises(ImportError, typ._pkg_resources_style,
@@ -4357,7 +4357,7 @@ class TestDottedNameResolver(unittest.TestCase):
         typ = self._makeOne(package=pyramid.tests)
         result = typ._pkg_resources_style('.')
         self.assertEqual(result, pyramid.tests)
-        
+
     def test__pkg_resources_style_resolve_relative_nocurrentpackage(self):
         typ = self._makeOne()
         from pyramid.exceptions import ConfigurationError
@@ -4431,7 +4431,7 @@ class Test_isexception(unittest.TestCase):
     def _callFUT(self, ob):
         from pyramid.configuration import isexception
         return isexception(ob)
-    
+
     def test_is_exception_instance(self):
         class E(Exception):
             pass
@@ -4457,7 +4457,7 @@ class TestActionPredicate(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.configuration import ActionPredicate
         return ActionPredicate
-    
+
     def _makeOne(self, action='myaction'):
         return self._getTargetClass()(action)
 
@@ -4501,11 +4501,12 @@ class TestActionPredicate(unittest.TestCase):
         self.assertEqual(hash(pred1), hash(pred2))
         self.assertNotEqual(hash(pred1), hash(pred3))
         self.assertNotEqual(hash(pred2), hash(pred3))
-        
-        
+
+
 
 class DummyRequest:
     subpath = ()
+    matchdict = None
     def __init__(self):
         self.environ = {'PATH_INFO':'/static'}
         self.params = {}
@@ -4524,7 +4525,7 @@ class DummyLock:
 
     def release(self):
         self.released = True
-        
+
 class DummyPackage:
     def __init__(self, name):
         self.__name__ = name
@@ -4592,13 +4593,13 @@ class DummyConfigurator(object):
 
     def load_zcml(self, filename):
         self.zcml_file = filename
-    
+
     def make_wsgi_app(self):
         return self
 
     def hook_zca(self):
         self.zca_hooked = True
-    
+
 
 class DummyAccept(object):
     def __init__(self, *matches):
@@ -4632,7 +4633,7 @@ class DummyGetSiteManager(object):
         self.hook = hook
     def reset(self):
         self.unhooked = True
-    
+
 class DummyThreadLocalManager(object):
     pushed = None
     popped = False
@@ -4648,17 +4649,17 @@ class DummyFactory(object):
     implements(IFactory)
     def __call__(self):
         """ """
-        
+
 class DummyEvent:
     implements(IDummy)
 
 class DummyStaticURLInfo:
     def __init__(self):
         self.added = []
-        
+
     def add(self, name, spec, **kw):
         self.added.append((name, spec, kw))
-        
+
 def dummy_view(request):
     return 'OK'
 

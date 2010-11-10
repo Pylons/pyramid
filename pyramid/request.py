@@ -37,6 +37,8 @@ class Request(WebobRequest):
     response_callbacks = ()
     finished_callbacks = ()
     exception = None
+    matchdict = None
+    matched_route = None
 
     @reify
     def tmpl_context(self):

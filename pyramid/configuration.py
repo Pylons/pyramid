@@ -263,7 +263,7 @@ class Configurator(object):
         policy = self.maybe_dotted(policy)
         self.registry.registerUtility(policy, IAuthenticationPolicy,
                                       info=_info)
-        
+
     def _set_authorization_policy(self, policy, _info=u''):
         """ Add a :app:`Pyramid` :term:`authorization policy` to
         the current configuration state (also accepts a :term:`dotted
@@ -472,7 +472,7 @@ class Configurator(object):
 
     def derive_view(self, view, attr=None, renderer=None):
         """
-        
+
         Create a :term:`view callable` using the function, instance,
         or class (or :term:`dotted Python name` referring to the same)
         provided as ``view`` object.
@@ -582,7 +582,7 @@ class Configurator(object):
            config.add_settings({'external_uri':'http://example.com'})
 
         Or a set of key/value pairs::
-    
+
            config.add_settings(external_uri='http://example.com')
 
         This function is useful when you need to test code that calls
@@ -658,7 +658,7 @@ class Configurator(object):
         """ Add a Pylons-style view handler.  This function adds a
         route and some number of views based on a handler object
         (usually a class).
-        
+
         ``route_name`` is the name of the route (to be used later in
         URL generation).
 
@@ -668,7 +668,7 @@ class Configurator(object):
         ``route_name`` is used.  If ``pattern`` is ``None`` and no
         route named ``route_name`` exists, a ``ConfigurationError`` is
         raised.
-        
+
         ``handler`` is a dotted name of (or direct reference to) a
         Python handler class,
         e.g. ``'my.package.handlers.MyHandler'``.
@@ -698,7 +698,7 @@ class Configurator(object):
                     'The "pattern" parameter may only be "None" when a route '
                     'with the route_name argument was previously registered. '
                     'No such route named %r exists' % route_name)
-                                         
+
             pattern = route.pattern
 
         path_has_action = ':action' in pattern or '{action}' in pattern
@@ -735,7 +735,7 @@ class Configurator(object):
             method_name = action
             if method_name is None:
                 method_name = '__call__'
-            
+
             # Scan the controller for any other methods with this action name
             for meth_name, method in inspect.getmembers(
                 handler, inspect.ismethod):
@@ -754,7 +754,7 @@ class Configurator(object):
                     del view_args['name']
                     self.add_view(view=handler, attr=meth_name,
                                   route_name=route_name, **view_args)
-            
+
             # Now register the method itself
             method = getattr(handler, method_name, None)
             configs = getattr(method, '__exposed__', [{}])
@@ -1001,7 +1001,7 @@ class Configurator(object):
           variable.  If the regex matches, this predicate will be
           ``True``.
 
-          
+
         custom_predicates
 
           This value should be a sequence of references to custom
@@ -1145,11 +1145,11 @@ class Configurator(object):
             #   the same predicate hash as this view; this registration
             #   is therefore an override.
             regclosure()
-        
+
         else:
             # - A view or multiview was already registered for this
             #   triad, and the new view is not an override.
-            
+
             # XXX we could try to be more efficient here and register
             # a non-secured view for a multiview if none of the
             # multiview's consituent views have a permission
@@ -1401,7 +1401,7 @@ class Configurator(object):
           A Python object or :term:`dotted Python name` to the same
           object that will be used as a view callable when this route
           matches. e.g. ``mypackage.views.my_view``.
-          
+
         view_context
 
           A class or an :term:`interface` or :term:`dotted Python
@@ -1487,7 +1487,7 @@ class Configurator(object):
             traverse=traverse,
             custom=custom_predicates
             )
-        
+
         request_iface = self.registry.queryUtility(IRouteRequest, name=name)
         if request_iface is None:
             bases = use_global_views and (IRequest,) or ()
@@ -1524,7 +1524,7 @@ class Configurator(object):
             pattern = path
         if pattern is None:
             raise ConfigurationError('"pattern" argument may not be None')
-        
+
         return mapper.connect(name, pattern, factory, predicates=predicates,
                               pregenerator=pregenerator)
 
@@ -2731,7 +2731,7 @@ class DottedNameResolver(object):
     the resolver's ``resolve`` and ``maybe_resolve`` methods.  A
     dotted name which has a ``.`` (dot) or ``:`` (colon) as its first
     character is treated as relative.
-    
+
     If the value ``None`` is supplied as the package name, the
     resolver will only be able to resolve fully qualified (not
     relative) names.  Any attempt to resolve a relative name when the
@@ -2839,7 +2839,7 @@ class DottedNameResolver(object):
                 raise ConfigurationError(
                     'The dotted name %r cannot be imported' % (dotted,))
         return dotted
-        
+
 
 class ActionPredicate(object):
     action_name = 'action'
@@ -2851,7 +2851,7 @@ class ActionPredicate(object):
             raise ConfigurationError(why[0])
 
     def __call__(self, context, request):
-        matchdict = getattr(request, 'matchdict', None)
+        matchdict = request.matchdict
         if matchdict is None:
             return False
         action = matchdict.get(self.action_name)
@@ -2863,4 +2863,4 @@ class ActionPredicate(object):
         # allow this predicate's phash to be compared as equal to
         # others that share the same action name
         return hash(self.action)
-        
+

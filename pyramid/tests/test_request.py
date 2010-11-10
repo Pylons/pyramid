@@ -8,7 +8,7 @@ class TestRequest(unittest.TestCase):
 
     def tearDown(self):
         self.config.end()
-        
+
     def _makeOne(self, environ):
         return self._getTargetClass()(environ)
 
@@ -23,6 +23,14 @@ class TestRequest(unittest.TestCase):
     def test_exception_defaults_to_None(self):
         r = self._makeOne({'PATH_INFO':'/'})
         self.assertEqual(r.exception, None)
+
+    def test_matchdict_defaults_to_None(self):
+        r = self._makeOne({'PATH_INFO':'/'})
+        self.assertEqual(r.matchdict, None)
+
+    def test_matched_route_defaults_to_None(self):
+        r = self._makeOne({'PATH_INFO':'/'})
+        self.assertEqual(r.matched_route, None)
 
     def test_params_decoded_from_utf_8_by_default(self):
         environ = {
@@ -48,7 +56,7 @@ class TestRequest(unittest.TestCase):
         inst = self._makeOne({})
         result = inst.tmpl_context
         self.assertEqual(result.__class__, TemplateContext)
-        
+
     def test_session_configured(self):
         from pyramid.interfaces import ISessionFactory
         inst = self._makeOne({})
@@ -107,7 +115,7 @@ class TestRequest(unittest.TestCase):
         environ = {'zooma':1}
         inst = self._makeOne(environ)
         self.assertEqual(inst.get('zooma'), 1)
-        
+
     def test_has_key(self):
         environ = {'zooma':1}
         inst = self._makeOne(environ)
