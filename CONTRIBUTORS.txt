@@ -108,3 +108,7 @@ Contributors
 - Chris McDonough, 2010/11/08
 
 - Tres Seaver, 2010/11/09
+
+- Ben Bangert, 2010/11/09
+
+- Blaise Laflamme, 2010/11/09
