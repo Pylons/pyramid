@@ -42,6 +42,10 @@ differ from each other on a number of axes:
 
 - the type of configuration used (:term:`ZCML` vs. imperative configuration).
 
+- whether or not the ``pyramid_beaker`` library is relied upon as the
+  sessioning implementation (as opposed to no sessioning or default
+  sessioning).
+
 The included templates are these:
 
 ``pyramid_starter``
@@ -65,15 +69,17 @@ The included templates are these:
 
 ``pylons_minimal``
   URL mapping via :term:`URL dispatch` and Pylons-style view handlers,
-  minimal setup.
+  minimal setup, uses ``pyramid_beaker`` as a sessioning implementation.
 
 ``pylons_basic``
-  URL mapping via :term:`URL dispatch` and Pylons-style view handlers,
-  and some extra functionality.
+  URL mapping via :term:`URL dispatch` and Pylons-style view handlers, and
+  some extra functionality, uses ``pyramid_beaker`` as a sessioning
+  implementation.
 
 ``pylons_sqla``
-  URL mapping via :term:`URL dispatch` and Pylons-style view handlers,
-  some extra functionality, and SQLAlchemy set up.
+  URL mapping via :term:`URL dispatch` and Pylons-style view handlers, some
+  extra functionality, and SQLAlchemy set up, uses ``pyramid_beaker`` as a
+  sessioning implementation.
 
 Each paster template makes the assumption that you want your code to live in
 a Python :term:`package`.  Even if your application is extremely simple, it
