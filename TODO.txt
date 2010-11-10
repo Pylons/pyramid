@@ -52,9 +52,6 @@
 - Raise an exception when a value in response_headerlist is not a
   string or decide to encode.
 
-- Change docs so that we dont use INewReponse, but instead just
-  NewResponse (likewise for INewRequest, etc).
-
 - Change "Cleaning up After a Request" in the urldispatch chapter to
   use ``request.add_response_callback``.
 
@@ -76,7 +73,7 @@
 
 - "BFG" in environ variables.
 
-- request.link (route_url)
+- request.link (route_url)?
 
 - Test on GAE, Jython, PyPy, IronPython.
 
