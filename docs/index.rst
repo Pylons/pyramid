@@ -183,8 +183,9 @@ To check out the trunk via ``git``, use this command::
 
   git clone git@github.com:Pylons/pyramid.git
 
-To find out how to become a contributor to :app:`Pyramid`, please see
-the `contributor's page <http://repoze.org/contributing.html>`_.
+To find out how to become a contributor to :app:`Pyramid`, please see the
+`contributor's section of the documentation
+<http://docs.pylonshq.com/index.html#contributing>`_.
 
 Index and Glossary
 ==================
