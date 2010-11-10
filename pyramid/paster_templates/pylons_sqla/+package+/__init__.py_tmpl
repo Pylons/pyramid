@@ -1,10 +1,10 @@
+from pyramid.configuration import Configurator
 from pyramid_beaker import session_factory_from_settings
+from paste.deploy.converters import asbool
 
 def main(global_config, **settings):
-    """ This function returns a Pylons WSGI application.
+    """ This function returns a Pyramid WSGI application.
     """
-    from paste.deploy.converters import asbool
-    from pyramid.configuration import Configurator
     from {{package}}.models import initialize_sql
     db_string = settings.get('db_string')
     if db_string is None:
@@ -15,14 +15,13 @@ def main(global_config, **settings):
     config.begin()
     session_factory = session_factory_from_settings(settings)
     config.set_session_factory(session_factory)
-    # XXX add caching setup
     config.add_static_view(
         'static',
         '{{package}}:static/'
         )
     config.add_handler(
         'main',
-        '/{action}',
+        '/:action',
         '{{package}}.handlers:MyHandler',
         )
     config.add_handler(

@@ -8,9 +8,8 @@ def main(global_config, **settings):
     config.begin()
     session_factory = session_factory_from_settings(settings)
     config.set_session_factory(session_factory)
-    # XXX add caching setup
     config.add_static_view('static', '{{package}}:static/')
-    config.add_handler('action', '/{action}', 
+    config.add_handler('action', '/:action', 
                        '{{package}}.handlers.hello:HelloHandler')
     config.add_handler('home', '/', '{{package}}.handlers.hello:HelloHandler',
                        action='index')

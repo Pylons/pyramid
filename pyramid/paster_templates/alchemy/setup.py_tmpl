@@ -12,6 +12,7 @@ requires = [
     'repoze.tm2',
     'sqlalchemy',
     'zope.sqlalchemy',
+    'WebError',
     ]
 
 if sys.version_info[:3] < (2,5,0):
@@ -30,7 +31,7 @@ setup(name='{{project}}',
       author='',
       author_email='',
       url='',
-      keywords='web wsgi bfg pylons pyramid',
+      keywords='web pylons pyramid',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
@@ -39,7 +40,7 @@ setup(name='{{project}}',
       test_suite="{{package}}",
       entry_points = """\
       [paste.app_factory]
-      app = {{package}}:app
+      main = {{package}}:main
       """,
       paster_plugins=['pyramid'],
       )

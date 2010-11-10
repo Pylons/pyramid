@@ -1,8 +1,5 @@
-[DEFAULT]
-debug = true
-
-[app:sqlalchemy]
-use = egg:{{package}}#app
+[app:{{package}}]
+use = egg:{{package}}
 reload_templates = true
 debug_authorization = false
 debug_notfound = false
@@ -13,8 +10,9 @@ db_echo = false
 
 [pipeline:main]
 pipeline =
+    egg:WebError#evalerror
     egg:repoze.tm2#tm
-    sqlalchemy
+    {{package}}
 
 [server:main]
 use = egg:Paste#http

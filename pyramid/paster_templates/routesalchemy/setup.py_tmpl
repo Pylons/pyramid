@@ -13,6 +13,7 @@ requires = [
     'transaction',
     'repoze.tm2',
     'zope.sqlalchemy',
+    'WebError',
     ]
 
 if sys.version_info[:3] < (2,5,0):
@@ -39,7 +40,7 @@ setup(name='{{project}}',
       install_requires = requires,
       entry_points = """\
       [paste.app_factory]
-      app = {{package}}:app
+      main = {{package}}:main
       """,
       paster_plugins=['pyramid'],
       )

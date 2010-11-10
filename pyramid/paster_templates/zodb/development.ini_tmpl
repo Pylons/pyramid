@@ -1,8 +1,5 @@
-[DEFAULT]
-debug = true
-
-[app:zodb]
-use = egg:{{project}}#app
+[app:{{project}}]
+use = egg:{{project}}
 reload_templates = true
 debug_authorization = false
 debug_notfound = false
@@ -12,9 +9,10 @@ zodb_uri = file://%(here)s/Data.fs?connection_cache_size=20000
 
 [pipeline:main]
 pipeline =
+    egg:WebError#evalerror
     egg:repoze.zodbconn#closer
     egg:repoze.tm#tm
-    zodb
+    {{project}}
 
 [server:main]
 use = egg:Paste#http

@@ -1,6 +1,19 @@
 Next release
 ============
 
+Features
+--------
+
+- Normalized all paster templates: each now uses the name ``main`` to
+  represent the function that returns a WSGI application, each now uses
+  WebError, each now has roughly the same shape of development.ini style.
+
+Bug Fixes
+---------
+
+- The pylons_* paster templates erroneously used the ``{squiggly}`` routing
+  syntax as the pattern supplied to ``add_route``.  This style of routing is
+  not supported.  They were replaced with ``:colon`` style route patterns.
 
 1.0a2 (2010-11-09)
 ==================
