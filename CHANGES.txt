@@ -15,6 +15,12 @@ Bug Fixes
   syntax as the pattern supplied to ``add_route``.  This style of routing is
   not supported.  They were replaced with ``:colon`` style route patterns.
 
+- The pylons_* paster template used the same string
+  (``your_app_secret_string``) for the ``session.secret`` setting in the
+  generated ``development.ini``.  This was a security risk if left unchanged
+  in a project that used one of the templates to produce production
+  applications.  It now uses a randomly generated string.
+
 Documentation
 -------------
 

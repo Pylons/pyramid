@@ -12,7 +12,7 @@ session.type = file
 session.data_dir = %(here)s/data/sessions/data
 session.lock_dir = %(here)s/data/sessions/lock
 session.key = {{project}}
-session.secret = your_app_secret_string
+session.secret = {{random_string}}
 
 [pipeline:main]
 pipeline =
