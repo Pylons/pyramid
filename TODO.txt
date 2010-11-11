@@ -73,8 +73,6 @@
 
 - "BFG" in environ variables.
 
-- request.link (route_url)?
-
 - Test on GAE, Jython, PyPy, IronPython.
 
 - Add docs for httpexceptions.
