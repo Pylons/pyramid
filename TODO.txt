@@ -85,8 +85,6 @@
 
 - translationdir ZCML directive use of ``path_spec`` should maybe die.
 
-- Make settings an attribute of.. registry?  request?  Ugh.
-
 - Option for route_url to omit the host and port (perhaps a different
   function named ``route_path``).
 
