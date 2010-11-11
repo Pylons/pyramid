@@ -67,7 +67,8 @@
 
 - ``handler`` ZCML directive.
 
-- Try to get rid of Mako Beaker dependency.
+- Try to get rid of Mako Beaker dependency.  Mail sent to
+  http://groups.google.com/group/mako-discuss (was put into moderation).
 
 - ``docs`` directory for each paster template.
 
@@ -81,8 +82,6 @@
 
 - Do something about ZODB session chapter: either remove or create a
   pyramid_zodbsessions package.
-
-- repoze.bfg.viewgroup in CMF tutorial
 
 - translationdir ZCML directive use of ``path_spec`` should maybe die.
 
