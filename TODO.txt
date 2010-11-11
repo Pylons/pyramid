@@ -116,9 +116,8 @@
   chameleon_text.TextTemplateRenderer.template (also uses get_settings),
   chameleon_zpt.ZPTTemplateRenderer.template (also uses get_settings),
   resource.OverrideProvider._get_overrides, traversal.traverse,
-  Configurator.add_translation_dirs (get_current_request),
-  i18n.negotiate_locale_name (get_settings).  All ZCML directives use
-  ``get_current_registry`` to obtain the registry.
+  Configurator.add_translation_dirs (get_current_request).  All ZCML
+  directives use ``get_current_registry`` to obtain the registry.
 
 - Add deprecation warnings for:
 

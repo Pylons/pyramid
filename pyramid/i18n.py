@@ -13,7 +13,6 @@ from pyramid.interfaces import ILocalizer
 from pyramid.interfaces import ITranslationDirectories
 from pyramid.interfaces import ILocaleNegotiator
 
-from pyramid.settings import get_settings
 from pyramid.threadlocal import get_current_registry
 
 class Localizer(object):
@@ -132,7 +131,7 @@ def negotiate_locale_name(request):
     locale_name = negotiator(request)
 
     if locale_name is None:
-        settings = get_settings() or {}
+        settings = registry.settings or {}
         locale_name = settings.get('default_locale_name', 'en')
 
     return locale_name
