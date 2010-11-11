@@ -159,10 +159,11 @@ Here's some sample code that implements a minimal forbidden view:
 .. code-block:: python
    :linenos:
 
-   from pyramid.chameleon_zpt import render_template_to_response
+   from pyramid.views import view_config
 
+   @view_config(renderer='templates/login_form.pt')
    def forbidden_view(request):
-       return render_template_to_response('templates/login_form.pt')
+       return {}
 
 .. note:: When a forbidden view callable is invoked, it is passed a
    :term:`request`.  The ``exception`` attribute of the request will
