@@ -77,7 +77,7 @@ def get_settings():
        performs the same duty.
     """
     reg = get_current_registry()
-    return reg.queryUtility(ISettings)
+    return reg.settings
 
 def asbool(s):
     """ Return the boolean value ``True`` if the case-lowered value of string

@@ -17,6 +17,10 @@ Features
   ``route_url``.  These are simple passthroughs for their respective
   functions in ``pyramid.url``.
 
+- The ``settings`` object which used to be available only when
+  ``request.settings.get_settings`` was called is now available as
+  ``registry.settings`` (e.g. ``request.registry.settings`` in view code).
+
 Bug Fixes
 ---------
 
@@ -41,6 +45,21 @@ Documentation
 
 - Documented the ``matchdict`` and ``matched_route`` attributes of the
   request object in the Request API documentation.
+
+Deprecations
+------------
+
+- Obtaining the ``settings`` object via
+  ``registry.{get|query}Utility(ISettings)`` is now deprecated.  Instead,
+  obtain the ``settings`` object via the ``registry.settings`` attribute.  A
+  backwards compatibility shim was added to the registry object to register
+  the settings object as an ISettings utility when ``setattr(registry,
+  'settings', foo)`` is called, but it will be removed in a later release.
+
+- Obtaining the ``settings`` object via ``pyramid.settings.get_settings`` is
+  now deprecated.  Obtain it as the ``settings`` attribute of the registry
+  now (obtain the registry via ``pyramid.threadlocal.get_registry`` or as
+  ``request.registry``).
 
 1.0a2 (2010-11-09)
 ==================

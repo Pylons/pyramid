@@ -192,10 +192,9 @@ class TestRendererFromName(unittest.TestCase):
 
     def test_it(self):
         from pyramid.threadlocal import get_current_registry
-        from pyramid.interfaces import ISettings
         registry = get_current_registry()
         settings = {}
-        registry.registerUtility(settings, ISettings)
+        registry.settings = settings
         from pyramid.interfaces import IRendererFactory
         import os
         here = os.path.dirname(os.path.abspath(__file__))
@@ -213,10 +212,9 @@ class TestRendererFromName(unittest.TestCase):
     def test_it_with_package(self):
         import pyramid
         from pyramid.threadlocal import get_current_registry
-        from pyramid.interfaces import ISettings
         registry = get_current_registry()
         settings = {}
-        registry.registerUtility(settings, ISettings)
+        registry.settings = settings
         from pyramid.interfaces import IRendererFactory
         import os
         here = os.path.dirname(os.path.abspath(__file__))

@@ -28,6 +28,16 @@ class TestRegistry(unittest.TestCase):
                                              [IDummyEvent], Interface)
         self.assertEqual(registry.has_listeners, True)
 
+    def test__get_settings(self):
+        registry = self._makeOne()
+        registry._settings = 'foo'
+        self.assertEqual(registry.settings, 'foo')
+
+    def test__set_settings(self):
+        registry = self._makeOne()
+        registry.settings = 'foo'
+        self.assertEqual(registry._settings, 'foo')
+
 class DummyModule:
     __path__ = "foo"
     __name__ = "dummy"

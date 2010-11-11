@@ -77,8 +77,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.registry.registerUtility(policy, IAuthorizationPolicy)
 
     def _registerSettings(self, config, **settings):
-        from pyramid.interfaces import ISettings
-        config.registry.registerUtility(settings, ISettings)
+        config.registry.settings = settings
 
     def test_ctor_no_registry(self):
         import sys
@@ -472,20 +471,18 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(config.get_settings(), None)
 
     def test_get_settings_withsettings(self):
-        from pyramid.interfaces import ISettings
         settings = {'a':1}
         config = self._makeOne()
-        config.registry.registerUtility(settings, ISettings)
+        config.registry.settings = settings
         self.assertEqual(config.get_settings(), settings)
 
     def test_add_settings_settings_already_registered(self):
         from pyramid.registry import Registry
-        from pyramid.interfaces import ISettings
         reg = Registry()
         config = self._makeOne(reg)
         config._set_settings({'a':1})
         config.add_settings({'b':2})
-        settings = reg.getUtility(ISettings)
+        settings = reg.settings
         self.assertEqual(settings['a'], 1)
         self.assertEqual(settings['b'], 2)
 

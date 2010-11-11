@@ -34,7 +34,6 @@ from pyramid.interfaces import IRootFactory
 from pyramid.interfaces import IRouteRequest
 from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import ISecuredView
-from pyramid.interfaces import ISettings
 from pyramid.interfaces import IStaticURLInfo
 from pyramid.interfaces import ITranslationDirectories
 from pyramid.interfaces import ITraverser
@@ -127,8 +126,8 @@ class Configurator(object):
     If the ``settings`` argument is passed, it should be a Python
     dictionary representing the deployment settings for this
     application.  These are later retrievable using the
-    :meth:`pyramid.configuration.Configurator.get_settings` and
-    :func:`pyramid.settings.get_settings` APIs.
+    :meth:`pyramid.registry.Registry.settings` attribute or the
+    :func:`pyramid.settings.get_settings` API.
 
     If the ``root_factory`` argument is passed, it should be an object
     representing the default :term:`root factory` for your application
@@ -244,7 +243,7 @@ class Configurator(object):
 
     def _set_settings(self, mapping):
         settings = Settings(mapping or {})
-        self.registry.registerUtility(settings, ISettings)
+        self.registry.settings = settings
         return settings
 
     def _set_root_factory(self, factory):
@@ -288,7 +287,7 @@ class Configurator(object):
         view = self.maybe_dotted(view)
         authn_policy = self.registry.queryUtility(IAuthenticationPolicy)
         authz_policy = self.registry.queryUtility(IAuthorizationPolicy)
-        settings = self.registry.queryUtility(ISettings)
+        settings = self.registry.settings
         logger = self.registry.queryUtility(IDebugLogger)
         mapped_view = _map_view(view, attr, renderer, self.registry)
         owrapped_view = _owrap_view(mapped_view, viewname, wrapper_viewname)
@@ -593,7 +592,7 @@ class Configurator(object):
         """
         if settings is None:
             settings = {}
-        utility = self.registry.queryUtility(ISettings)
+        utility = self.registry.settings
         if utility is None:
             utility = self._set_settings(settings)
         utility.update(settings)
@@ -610,9 +609,10 @@ class Configurator(object):
         .. note:: For backwards compatibility, dictionary keys can also be
            looked up as attributes of the settings object.
 
-        .. note:: the :class:`pyramid.settings.get_settings` function
-           performs the same duty."""
-        return self.registry.queryUtility(ISettings)
+        .. note:: the :class:`pyramid.settings.get_settings` and function
+        performs the same duty and the settings attribute can also be
+        accessed as :attr:`pyramid.registry.Registry.settings`"""
+        return self.registry.settings
 
     def make_wsgi_app(self):
         """ Returns a :app:`Pyramid` WSGI application representing

@@ -34,10 +34,9 @@ class TestRouter(unittest.TestCase):
         return logger
 
     def _registerSettings(self, **kw):
-        from pyramid.interfaces import ISettings
         settings = {'debug_authorization':False, 'debug_notfound':False}
         settings.update(kw)
-        self.registry.registerUtility(settings, ISettings)
+        self.registry.settings = settings
 
     def _registerTraverserFactory(self, context, view_name='', subpath=None,
                                   traversed=None, virtual_root=None,

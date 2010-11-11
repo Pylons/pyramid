@@ -196,9 +196,8 @@ class TestGetSettings(unittest.TestCase):
         self.assertEqual(self._callFUT(), None)
 
     def test_it_withsettings(self):
-        from pyramid.interfaces import ISettings
         settings = {'a':1}
-        self.config.registry.registerUtility(settings, ISettings)
+        self.config.registry.settings = settings
         self.assertEqual(self._callFUT(), settings)
 
 class Test_asbool(unittest.TestCase):

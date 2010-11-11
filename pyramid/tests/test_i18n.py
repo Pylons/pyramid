@@ -87,8 +87,7 @@ class Test_negotiate_locale_name(unittest.TestCase):
         from pyramid.threadlocal import get_current_registry
         registry = get_current_registry()
         settings = {'default_locale_name':'settings'}
-        from pyramid.interfaces import ISettings
-        registry.registerUtility(settings, ISettings)
+        registry.settings = settings
         request = DummyRequest()
         request.registry = registry
         result = self._callFUT(request)

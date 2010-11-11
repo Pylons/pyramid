@@ -8,7 +8,6 @@ from pyramid.interfaces import IRendererGlobalsFactory
 from pyramid.interfaces import IRendererFactory
 from pyramid.interfaces import IResponseFactory
 from pyramid.interfaces import ITemplateRenderer
-from pyramid.interfaces import ISettings
 from pyramid.interfaces import IRendererInfo
 
 from pyramid.compat import json
@@ -231,7 +230,7 @@ class RendererHelper(object):
 
     @reify
     def settings(self):
-        settings = self.registry.queryUtility(ISettings)
+        settings = self.registry.settings
         return settings
 
     @reify

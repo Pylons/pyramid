@@ -9,7 +9,6 @@ from pyramid.interfaces import IRouteRequest
 from pyramid.interfaces import IRouter
 from pyramid.interfaces import IRequestFactory
 from pyramid.interfaces import IRoutesMapper
-from pyramid.interfaces import ISettings
 from pyramid.interfaces import ITraverser
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
@@ -42,7 +41,7 @@ class Router(object):
         self.request_factory = q(IRequestFactory, default=Request)
         self.root_policy = self.root_factory # b/w compat
         self.registry = registry
-        settings = q(ISettings)
+        settings = registry.settings
         if settings is not None:
             self.debug_notfound = settings['debug_notfound']
 
