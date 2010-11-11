@@ -32,30 +32,30 @@ entry point happens to be the ``app`` function within the file named
 
 #. *Lines 1-4*. Imports to support later code.
 
-#. *Lines 12-14*. Get the database configuration string from the
+#. *Lines 9-11*. Get the database configuration string from the
    ``development.ini`` file's ``[app:sqlalchemy]`` section.  This will be a
    URI (something like ``sqlite://``).
 
-#. *Line 15*. Get the database echo setting from ``development.ini``
+#. *Line 12*. Get the database echo setting from ``development.ini``
    file's ``[app:sqlalchemy]`` section.  This will either be ``true``
    or ``false``.  If ``true``, the application will print SQL to the
    console as it is generated and run by SQLAlchemy.  By default, it
    is false.
 
-#. Line *16*. We initialize our SQL database using SQLAlchemy, passing
+#. Line *13*. We initialize our SQL database using SQLAlchemy, passing
    it the db string and a variant of the db_echo value.
 
-#. *Line 17*.  We construct a :term:`Configurator`.  ``settings`` is
+#. *Line 14*.  We construct a :term:`Configurator`.  ``settings`` is
    passed as a keyword argument with the dictionary values passed by
    PasteDeploy as the ``settings`` argument.  This will be a
    dictionary of settings parsed by PasteDeploy, which contains
    deployment-related values such as ``reload_templates``,
    ``db_string``, etc.
 
-#. *Line 18*.  We call :meth:`pyramid.configuration.Configurator.begin` which
+#. *Line 15*.  We call :meth:`pyramid.configuration.Configurator.begin` which
     tells the configuration machinery we are starting configuration.
 
-#. *Line 19*.  We call
+#. *Line 16*.  We call
    :meth:`pyramid.configuration.Configurator.add_static_view` with the
    arguments ``static`` (the name), and ``tutorial:static`` (the path).  This
    registers a static resource view which will match any URL that starts with
@@ -67,7 +67,7 @@ entry point happens to be the ``app`` function within the file named
    ``/static/foo``) will be used to compose a path to a static file resource,
    such as a CSS file.
 
-#. *Lines 20-21*.  Register a :term:`route configuration` via the
+#. *Lines 17-18*.  Register a :term:`route configuration` via the
    :meth:`pyramid.configuration.Configurator.add_route` method that will be
    used when the URL is ``/``.  Since this route has an ``pattern`` equalling
    ``/`` it is the "default" route. The argument named ``view`` with the
@@ -81,10 +81,10 @@ entry point happens to be the ``app`` function within the file named
    ``tutorial.views.my_view`` view returns a dictionary, a :term:`renderer`
    will use this template to create a response.
 
-#. *Line 22*.  We call :meth:`pyramid.configuration.Configurator.end` which
+#. *Line 19*.  We call :meth:`pyramid.configuration.Configurator.end` which
     tells the configuration machinery we are ending configuration.
 
-#. *Line 23*.  We use the
+#. *Line 20*.  We use the
    :meth:`pyramid.configuration.Configurator.make_wsgi_app` method to return
    a :term:`WSGI` application.
 

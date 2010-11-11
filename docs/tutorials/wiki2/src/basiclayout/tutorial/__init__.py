@@ -1,13 +1,10 @@
 from pyramid.configuration import Configurator
-from paste.deploy.converters import asbool
+from pyramid.settings import asbool
 
 from tutorial.models import initialize_sql
 
-def app(global_config, **settings):
-    """ This function returns a WSGI application.
-    
-    It is usually called by the PasteDeploy framework during 
-    ``paster serve``.
+def main(global_config, **settings):
+    """ This function returns a Pyramid WSGI application.
     """
     db_string = settings.get('db_string')
     if db_string is None:
@@ -21,3 +18,5 @@ def app(global_config, **settings):
                      view_renderer='templates/mytemplate.pt')
     config.end()
     return config.make_wsgi_app()
+
+

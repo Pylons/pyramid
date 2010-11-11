@@ -194,11 +194,9 @@ like this:
 Adding Templates
 ================
 
-The views we've added all reference a :term:`template`.  Each template
-is a :term:`Chameleon` template.  The default templating system in
-:app:`Pyramid` is a variant of :term:`ZPT` provided by
-:term:`Chameleon`.  These templates will live in the ``templates``
-directory of our tutorial package.
+The views we've added all reference a :term:`template`.  Each template is a
+:term:`Chameleon` :term:`ZPT` template.  These templates will live in the
+``templates`` directory of our tutorial package.
 
 The ``view.pt`` Template
 ------------------------
@@ -299,41 +297,11 @@ something like so:
    :linenos:
    :language: python
 
-The WSGI Pipeline
------------------
-
-Within ``development.ini``, note the existence of a ``[pipeline:main]``
-section which specifies our WSGI pipeline.  This "pipeline" will be
-served up as our WSGI application.  As far as the WSGI server is
-concerned the pipeline *is* our application.  Simpler configurations
-don't use a pipeline: instead they expose a single WSGI application as
-"main".  Our setup is more complicated, so we use a pipeline.
-
-``egg:repoze.tm2#tm`` is at the "top" of the pipeline.  This is a
-piece of middleware which commits a transaction if no exception
-occurs; if an exception occurs, the transaction will be aborted.  This
-is the piece of software that allows us to forget about needing to do
-manual commits and aborts of our database connection in view code.
-
-Adding an Element to the Pipeline
----------------------------------
-
-Let's add a piece of middleware to the WSGI pipeline.  We'll add
-``egg:Paste#evalerror`` middleware which displays debuggable errors in
-the browser while you're developing (this is *not* recommended for
-deployment as it is a security risk).  Let's insert evalerror into the
-pipeline right above ``egg:repoze.tm2#tm``, making our resulting
-``development.ini`` file look like so:
-
-.. literalinclude:: src/views/development.ini
-   :linenos:
-   :language: ini
-
 Viewing the Application in a Browser
 ====================================
 
-Once we've set up the WSGI pipeline properly, we can finally examine
-our application in a browser.  The views we'll try are as follows:
+We can finally examine our application in a browser.  The views we'll try are
+as follows:
 
 - Visiting ``http://localhost:6543`` in a browser invokes the
   ``view_wiki`` view.  This always redirects to the ``view_page`` view

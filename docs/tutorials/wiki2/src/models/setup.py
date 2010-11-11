@@ -13,6 +13,7 @@ requires = [
     'transaction',
     'repoze.tm2',
     'zope.sqlalchemy',
+    'WebError',
     ]
 
 if sys.version_info[:3] < (2,5,0):
@@ -31,7 +32,7 @@ setup(name='tutorial',
       author='',
       author_email='',
       url='',
-      keywords='web wsgi pylons pyramid bfg',
+      keywords='web wsgi bfg pylons pyramid',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
@@ -39,7 +40,8 @@ setup(name='tutorial',
       install_requires = requires,
       entry_points = """\
       [paste.app_factory]
-      app = tutorial:app
-      """
+      main = tutorial:main
+      """,
+      paster_plugins=['pyramid'],
       )
 

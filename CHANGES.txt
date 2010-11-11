@@ -36,6 +36,9 @@ Documentation
 - ZODB+traversal wiki (``wiki``) tutorial updated due to changes to
   ``pyramid_zodb`` paster template.
 
+- SQLAlchemy+urldispach wiki (``wiki2``) tutorial updated due to changes to
+  ``pyramid_routesalchemy`` paster template.
+
 - Documented the ``matchdict`` and ``matched_route`` attributes of the
   request object in the Request API documentation.
 
