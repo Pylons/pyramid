@@ -124,4 +124,8 @@
   - Use of chameleon_zpt and chameleon_text templating functions (use
     renderer API instead).
 
+  - settings.get_settings
+
+
+
 
