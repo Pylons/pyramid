@@ -94,6 +94,7 @@ API Reference
    api/interfaces
    api/location
    api/paster
+   api/registry
    api/renderers
    api/request
    api/response

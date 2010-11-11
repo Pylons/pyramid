@@ -123,11 +123,10 @@ class Configurator(object):
     is assumed to be the Python package in which the *caller* of the
     ``Configurator`` constructor lives.
 
-    If the ``settings`` argument is passed, it should be a Python
-    dictionary representing the deployment settings for this
-    application.  These are later retrievable using the
-    :meth:`pyramid.registry.Registry.settings` attribute or the
-    :func:`pyramid.settings.get_settings` API.
+    If the ``settings`` argument is passed, it should be a Python dictionary
+    representing the deployment settings for this application.  These are
+    later retrievable using the :attr:`pyramid.registry.Registry.settings`
+    attribute (aka ``request.registry.settings``).
 
     If the ``root_factory`` argument is passed, it should be an object
     representing the default :term:`root factory` for your application
@@ -584,11 +583,11 @@ class Configurator(object):
 
            config.add_settings(external_uri='http://example.com')
 
-        This function is useful when you need to test code that calls
-        the :func:`pyramid.settings.get_settings` API (or the
-        :meth:`pyramid.configuration.Configurator.get_settings`
-        API) and which uses return values from that API.
-
+        This function is useful when you need to test code that calls the
+        :func:`pyramid.settings.get_settings` API (or the
+        :meth:`pyramid.configuration.Configurator.get_settings` API or
+        accesses ``request.settings``) and which uses return values from that
+        API.
         """
         if settings is None:
             settings = {}
@@ -610,8 +609,9 @@ class Configurator(object):
            looked up as attributes of the settings object.
 
         .. note:: the :class:`pyramid.settings.get_settings` and function
-        performs the same duty and the settings attribute can also be
-        accessed as :attr:`pyramid.registry.Registry.settings`"""
+           performs the same duty and the settings attribute can also be
+           accessed as :attr:`pyramid.registry.Registry.settings`
+           """
         return self.registry.settings
 
     def make_wsgi_app(self):

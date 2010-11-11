@@ -138,7 +138,18 @@ press ``return`` after running ``paster serve development.ini``.
    the application, and the application is running, waiting to receive
    requests.
 
+.. _deployment_settings:
 
+Deployment Settings
+-------------------
+
+Note that an augmented version of the values passed as ``**settings`` to the
+:class:`pyramid.configuration.Configurator` constructor will be available in
+:app:`Pyramid` :term:`view callable` code as ``request.registry.settings``.
+You can create objects you wish to access later from view code, and put them
+into the dictionary you pass to the configurator as ``settings``.  They will
+then be present in the ``request.registry.settings`` dictionary at
+application runtime.
 
 
    

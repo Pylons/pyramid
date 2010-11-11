@@ -2,6 +2,20 @@ from zope.component.registry import Components
 from pyramid.interfaces import ISettings
 
 class Registry(Components, dict):
+    """ A registry object is an :term:`application registry`.  The existence
+    of a registry implementation detail of :app:`pyramid`.  It is used by the
+    framework itself to perform mappings of URLs to view callables, as well
+    as servicing other various duties. Despite being an implementation detail
+    of the framework, it has a number of attributes that may be useful within
+    application code.
+
+    For information about the purpose and usage of the application registry,
+    see :ref:`zca_chapter`.
+
+    The application registry is usually accessed as ``request.registry`` in
+    application code.
+
+    """
 
     # for optimization purposes, if no listeners are listening, don't try
     # to notify them
