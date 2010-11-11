@@ -8,6 +8,8 @@ from pyramid.interfaces import ISessionFactory
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.decorator import reify
+from pyramid.url import route_url
+from pyramid.url import model_url
 
 class TemplateContext(object):
     pass
@@ -162,6 +164,61 @@ class Request(WebobRequest):
                 'No session factory registered '
                 '(see the Session Objects chapter of the documentation)')
         return factory(self)
+
+    def route_url(self, route_name, *elements, **kw):
+        """ Return the URL for the route named ``route_name``, using
+        ``*elements`` and ``**kw`` as modifiers.
+
+        This is a convenience method.  The result of calling
+        :meth:`pyramid.request.Request.route_url` is the same as calling
+        :func:`pyramid.url.route_url` with an explicit ``request``
+        parameter.
+
+        The :meth:`pyramid.request.Request.route_url` method calls the
+        :func:`pyramid.url.route_url` function using the Request object as
+        the ``request`` argument.  The ``route_name``, ``*elements`` and
+        ``*kw`` arguments passed to :meth:`pyramid.request.Request.route_url`
+        are passed through to :func:`pyramid.url.route_url` unchanged and its
+        result is returned.
+
+        This call to :meth:`pyramid.request.Request.route_url`::
+
+          request.route_url('route_name')
+
+        Is completely equivalent to calling :func:`pyramid.url.route_url`
+        like this::
+
+          from pyramid.url import route_url
+          route_url('route_name', request)
+        """
+        return route_url(route_name, self, *elements, **kw)
+
+    def model_url(self, model, *elements, **kw):
+        """ Return the URL for the model object named ``model``, using
+        ``*elements`` and ``**kw`` as modifiers.
+
+        This is a convenience method.  The result of calling
+        :meth:`pyramid.request.Request.model_url` is the same as calling
+        :func:`pyramid.url.model_url` with an explicit ``request`` parameter.
+
+        The :meth:`pyramid.request.Request.model_url` method calls the
+        :func:`pyramid.url.model_url` function using the Request object as
+        the ``request`` argument.  The ``model``, ``*elements`` and ``*kw``
+        arguments passed to :meth:`pyramid.request.Request.model_url` are
+        passed through to :func:`pyramid.url.model_url` unchanged and its
+        result is returned.
+
+        This call to :meth:`pyramid.request.Request.model_url`::
+
+          request.route_url(mymodel)
+
+        Is completely equivalent to calling :func:`pyramid.url.model_url`
+        like this::
+
+          from pyramid.url import model_url
+          route_url(model, request)
+        """
+        return model_url(model, self, *elements, **kw)
 
     # override default WebOb "environ['adhoc_attr']" mutation behavior
     __getattr__ = object.__getattribute__

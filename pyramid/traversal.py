@@ -13,7 +13,6 @@ from pyramid.interfaces import VH_ROOT_KEY
 from pyramid.encode import url_quote
 from pyramid.exceptions import URLDecodeError
 from pyramid.location import lineage
-from pyramid.request import Request
 from pyramid.threadlocal import get_current_registry
 
 def find_root(model):
@@ -277,7 +276,12 @@ def traverse(model, path):
         model = find_root(model)
 
     reg = get_current_registry()
-    request_factory = reg.queryUtility(IRequestFactory, default=Request)
+    
+    request_factory = reg.queryUtility(IRequestFactory)
+    if request_factory is None:
+        from pyramid.request import Request # avoid circdep
+        request_factory = Request
+
     request = request_factory.blank(path)
     request.registry = reg
     traverser = reg.queryAdapter(model, ITraverser)

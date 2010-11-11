@@ -16,6 +16,18 @@ class TestRequest(unittest.TestCase):
         from pyramid.request import Request
         return Request
 
+    def _registerContextURL(self):
+        from pyramid.interfaces import IContextURL
+        from zope.interface import Interface
+        class DummyContextURL(object):
+            def __init__(self, context, request):
+                pass
+            def __call__(self):
+                return 'http://example.com/context/'
+        self.config.registry.registerAdapter(
+            DummyContextURL, (Interface, Interface),
+            IContextURL)
+
     def test_charset_defaults_to_utf8(self):
         r = self._makeOne({'PATH_INFO':'/'})
         self.assertEqual(r.charset, 'UTF-8')
@@ -229,6 +241,31 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(inst.called2, True)
         self.assertEqual(inst.finished_callbacks, [])
 
+    def test_model_url(self):
+        self._registerContextURL()
+        inst = self._makeOne({})
+        root = DummyContext()
+        result = inst.model_url(root)
+        self.assertEqual(result, 'http://example.com/context/')
+
+    def test_route_url(self):
+        environ = {
+            'PATH_INFO':'/',
+            'SERVER_NAME':'example.com',
+            'SERVER_PORT':'5432',
+            'QUERY_STRING':'la=La%20Pe%C3%B1a',
+            'wsgi.url_scheme':'http',
+            }
+        from pyramid.interfaces import IRoutesMapper
+        inst = self._makeOne(environ)
+        mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
+        self.config.registry.registerUtility(mapper, IRoutesMapper)
+        result = inst.route_url('flub', 'extra1', 'extra2',
+                                a=1, b=2, c=3, _query={'a':1},
+                                _anchor=u"foo")
+        self.assertEqual(result,
+                         'http://example.com:5432/1/2/3/extra1/extra2?a=1#foo')
+
 class Test_route_request_iface(unittest.TestCase):
     def _callFUT(self, name):
         from pyramid.request import route_request_iface
@@ -267,3 +304,22 @@ class DummyResponse:
         self.headerlist = []
 
 
+class DummyContext:
+    pass
+
+class DummyRoutesMapper:
+    raise_exc = None
+    def __init__(self, route=None, raise_exc=False):
+        self.route = route
+
+    def get_route(self, route_name):
+        return self.route
+
+class DummyRoute:
+    pregenerator = None
+    def __init__(self, result='/1/2/3'):
+        self.result = result
+
+    def generate(self, kw):
+        self.kw = kw
+        return self.result

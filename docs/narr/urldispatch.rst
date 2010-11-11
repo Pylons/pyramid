@@ -763,6 +763,8 @@ finding` and :term:`view lookup`.
 .. index::
    single: matchdict
 
+.. _matchdict:
+
 The Matchdict
 ~~~~~~~~~~~~~
 
@@ -780,6 +782,8 @@ strings.  The values will be Unicode objects.
 
 .. index::
    single: matched_route
+
+.. _matched_route:
 
 The Matched Route
 ~~~~~~~~~~~~~~~~~
