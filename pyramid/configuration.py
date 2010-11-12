@@ -10,6 +10,8 @@ import venusian
 from translationstring import ChameleonTranslate
 
 from zope.configuration import xmlconfig
+from zope.configuration.config import ConfigurationMachine
+from zope.configuration.xmlconfig import registerCommonDirectives
 
 from zope.interface import Interface
 from zope.interface import implementedBy
@@ -647,7 +649,11 @@ class Configurator(object):
         lock.acquire()
         self.manager.push({'registry':self.registry, 'request':None})
         try:
-            xmlconfig.file(filename, package, execute=True)
+            context = ConfigurationMachine()
+            registerCommonDirectives(context)
+            context.package = package
+            context.registry = self.registry
+            xmlconfig.file(filename, package, context=context, execute=True)
         finally:
             lock.release()
             self.manager.pop()

@@ -61,6 +61,13 @@ Deprecations
   now (obtain the registry via ``pyramid.threadlocal.get_registry`` or as
   ``request.registry``).
 
+Behavior Differences
+--------------------
+
+- Internal: ZCML directives no longer call get_current_registry() if there's
+  a ``registry`` attribute on the ZCML context (kill off use of
+  threadlocals).
+
 1.0a2 (2010-11-09)
 ==================
 

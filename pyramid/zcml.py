@@ -172,7 +172,10 @@ def view(
     cacheable=True, # not used, here for b/w compat < 0.8
     ):
 
-    reg = get_current_registry()
+    try:
+        reg = _context.registry
+    except AttributeError: # pragma: no cover (b/c)
+        reg = get_current_registry()
 
     if renderer is not None:
         package = getattr(_context, 'package', None)
@@ -281,7 +284,10 @@ def route(_context,
 
     # these are route predicates; if they do not match, the next route
     # in the routelist will be tried
-    reg = get_current_registry()
+    try:
+        reg = _context.registry
+    except AttributeError: # pragma: no cover (b/c)
+        reg = get_current_registry()
 
     if view_context is None:
         view_context = view_for or for_
@@ -367,7 +373,10 @@ def notfound(_context,
              wrapper=None):
 
     def register():
-        reg = get_current_registry()
+        try:
+            reg = _context.registry
+        except AttributeError: # pragma: no cover (b/c)
+            reg = get_current_registry()
         config = Configurator(reg, package=_context.package)
         config.set_notfound_view(view=view, attr=attr, renderer=renderer,
                                  wrapper=wrapper, _info=_context.info)
@@ -387,7 +396,10 @@ def forbidden(_context,
              wrapper=None):
 
     def register():
-        reg = get_current_registry()
+        try:
+            reg = _context.registry
+        except AttributeError: # pragma: no cover (b/c)
+            reg = get_current_registry()
         config = Configurator(reg, package=_context.package)
         config.set_forbidden_view(view=view, attr=attr, renderer=renderer,
                                  wrapper=wrapper, _info=_context.info)
@@ -415,7 +427,11 @@ class IResourceDirective(Interface):
         required=True)
 
 def resource(_context, to_override, override_with):
-    reg = get_current_registry()
+    try:
+        reg = _context.registry
+    except AttributeError: # pragma: no cover (b/c)
+        reg = get_current_registry()
+
     config = Configurator(reg, package=_context.package)
 
     _context.action(
@@ -435,7 +451,10 @@ def repozewho1authenticationpolicy(_context, identifier_name='auth_tkt',
                                             callback=callback)
     # authentication policies must be registered eagerly so they can
     # be found by the view registration machinery
-    reg = get_current_registry()
+    try:
+        reg = _context.registry
+    except AttributeError: # pragma: no cover (b/c)
+        reg = get_current_registry()
     config = Configurator(reg, package=_context.package)
     config._set_authentication_policy(policy, _info=_context.info)
     _context.action(discriminator=IAuthenticationPolicy)
@@ -451,7 +470,10 @@ def remoteuserauthenticationpolicy(_context, environ_key='REMOTE_USER',
                                             callback=callback)
     # authentication policies must be registered eagerly so they can
     # be found by the view registration machinery
-    reg = get_current_registry()
+    try:
+        reg = _context.registry
+    except AttributeError: # pragma: no cover (b/c)
+        reg = get_current_registry()
     config = Configurator(reg, package=_context.package)
     config._set_authentication_policy(policy, _info=_context.info)
     _context.action(discriminator=IAuthenticationPolicy)
@@ -495,7 +517,10 @@ def authtktauthenticationpolicy(_context,
         raise ConfigurationError(str(why))
     # authentication policies must be registered eagerly so they can
     # be found by the view registration machinery
-    reg = get_current_registry()
+    try:
+        reg = _context.registry
+    except AttributeError: # pragma: no cover (b/c)
+        reg = get_current_registry()
     config = Configurator(reg, package=_context.package)
     config._set_authentication_policy(policy, _info=_context.info)
     _context.action(discriminator=IAuthenticationPolicy)
@@ -507,7 +532,10 @@ def aclauthorizationpolicy(_context):
     policy = ACLAuthorizationPolicy()
     # authorization policies must be registered eagerly so they can be
     # found by the view registration machinery
-    reg = get_current_registry()
+    try:
+        reg = _context.registry
+    except AttributeError: # pragma: no cover (b/c)
+        reg = get_current_registry()
     config = Configurator(reg, package=_context.package)
     config._set_authorization_policy(policy, _info=_context.info)
     _context.action(discriminator=IAuthorizationPolicy)
@@ -524,7 +552,10 @@ class IRendererDirective(Interface):
 def renderer(_context, factory, name=''):
     # renderer factories must be registered eagerly so they can be
     # found by the view machinery
-    reg = get_current_registry()
+    try:
+        reg = _context.registry
+    except AttributeError: # pragma: no cover (b/c)
+        reg = get_current_registry()
     config = Configurator(reg, package=_context.package)
     config.add_renderer(name, factory, _info=_context.info)
     _context.action(discriminator=(IRendererFactory, name))
@@ -557,7 +588,10 @@ def static(_context, name, path, cache_max_age=3600,
            permission='__no_permission_required__'):
     """ Handle ``static`` ZCML directives
     """
-    reg = get_current_registry()
+    try:
+        reg = _context.registry
+    except AttributeError: # pragma: no cover (b/c)
+        reg = get_current_registry()
     config = Configurator(reg, package=_context.package)
 
     _context.action(
@@ -584,7 +618,10 @@ class IScanDirective(Interface):
         )
 
 def scan(_context, package):
-    reg = get_current_registry()
+    try:
+        reg = _context.registry
+    except AttributeError: # pragma: no cover (b/c)
+        reg = get_current_registry()
     config = Configurator(reg, package=_context.package)
     _context.action(
         discriminator=None,
@@ -601,7 +638,11 @@ class ITranslationDirDirective(Interface):
 
 def translationdir(_context, dir):
     path = path_spec(_context, dir)
-    reg = get_current_registry()
+    try:
+        reg = _context.registry
+    except AttributeError: # pragma: no cover (b/c)
+        reg = get_current_registry()
+
     config = Configurator(reg, package=_context.package)
 
     _context.action(
@@ -618,7 +659,10 @@ class ILocaleNegotiatorDirective(Interface):
         )
 
 def localenegotiator(_context, negotiator):
-    reg = get_current_registry()
+    try:
+        reg = _context.registry
+    except AttributeError: # pragma: no cover (b/c)
+        reg = get_current_registry()
     config = Configurator(reg, package=_context.package)
 
     _context.action(
@@ -696,7 +740,11 @@ def adapter(_context, factory, provides=None, for_=None, name=''):
     else:
         factory = _rolledUpFactory(factories)
     
-    registry = get_current_registry()
+    try:
+        registry = _context.registry
+    except AttributeError: # pragma: no cover (b/c)
+        registry = get_current_registry()
+        
     _context.action(
         discriminator = ('adapter', for_, provides, name),
         callable = registry.registerAdapter,
@@ -759,7 +807,11 @@ def subscriber(_context, for_=None, factory=None, handler=None, provides=None):
 
     for_ = tuple(for_)
 
-    registry = get_current_registry()
+    try:
+        registry = _context.registry
+    except AttributeError: # pragma: no cover (b/c)
+        registry = get_current_registry()
+        
     config = Configurator(registry=registry, package=_context.package)
 
     if handler is not None:
@@ -831,7 +883,11 @@ def utility(_context, provides=None, component=None, factory=None, name=''):
         # so if we don't need it, we don't pass it
         kw = {}
 
-    registry = get_current_registry()
+    try:
+        registry = _context.registry
+    except AttributeError: # pragma: no cover (b/c)
+        registry = get_current_registry()
+        
     _context.action(
         discriminator = ('utility', provides, name),
         callable = registry.registerUtility,
@@ -846,7 +902,10 @@ def default_permission(_context, name):
     """ Register a default permission name """
     # the default permission must be registered eagerly so it can
     # be found by the view registration machinery
-    reg = get_current_registry()
+    try:
+        reg = _context.registry
+    except AttributeError: # pragma: no cover (b/c)
+        reg = get_current_registry()
     config = Configurator(reg, package=_context.package)
     config.set_default_permission(name)
     _context.action(discriminator=IDefaultPermission)
@@ -871,6 +930,7 @@ def zcml_configure(name, package):
     context = ConfigurationMachine()
     xmlconfig.registerCommonDirectives(context)
     context.package = package
+    context.registry = get_current_registry()
     xmlconfig.include(context, name, package)
     context.execute_actions(clear=False) # the raison d'etre
     return context.actions

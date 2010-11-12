@@ -107,12 +107,20 @@
 - Default renderer.
 
 - Non-bwcompat use of threadlocals:
-  security.principals_allowed_by_permission, settings.get_settings,
-  chameleon_text.TextTemplateRenderer.template (also uses get_settings),
-  chameleon_zpt.ZPTTemplateRenderer.template (also uses get_settings),
-  resource.OverrideProvider._get_overrides, traversal.traverse,
-  Configurator.add_translation_dirs (get_current_request).  All ZCML
-  directives use ``get_current_registry`` to obtain the registry.
+
+  security.principals_allowed_by_permission
+
+  chameleon_text.TextTemplateRenderer.template (also uses get_settings)
+
+  chameleon_zpt.ZPTTemplateRenderer.template (also uses get_settings)
+
+  resource.OverrideProvider._get_overrides: can't credibly be removed,
+  because it stores an overrideprovider as a module-scope global.
+
+  traversal.traverse: this API is a stepchild, and needs to be changed.
+
+  Configurator.add_translation_dirs: not passed any context but a message,
+  can't credibly be removed.
 
 - Add deprecation warnings for:
 
@@ -120,6 +128,10 @@
     renderer API instead).
 
   - settings.get_settings
+
+  - zcml.zcml_configure
+
+  - zcml.file_configure
 
 
 
