@@ -122,7 +122,7 @@ Generating Static Resource URLs
 
 When a :meth:`pyramid.configuration.Configurator.add_static_view` method is
 used to register a static resource directory, a special helper API named
-:func:`pyramid.static_url` can be used to generate the appropriate URL for a
+:func:`pyramid.url.static_url` can be used to generate the appropriate URL for a
 package resource that lives in one of the directories named by the static
 registration ``path`` attribute.
 
@@ -246,8 +246,8 @@ be accessible as the static view against any model.  This will also allow
 ``/static/foo.js`` to work, but it will allow for ``/anything/static/foo.js``
 too, as long as ``anything`` itself is resolvable.
 
-Note that you cannot use the :func:`pyramid.static_url` API to generate URLs
-against resources made accessible by registering a custom static view.
+Note that you cannot use the :func:`pyramid.url.static_url` API to generate
+URLs against resources made accessible by registering a custom static view.
 
 .. warning::
 
