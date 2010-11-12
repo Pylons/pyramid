@@ -67,9 +67,6 @@
 
 - ``handler`` ZCML directive.
 
-- Try to get rid of Mako Beaker dependency.  Mail sent to
-  http://groups.google.com/group/mako-discuss (was put into moderation).
-
 - ``docs`` directory for each paster template.
 
 - "BFG" in environ variables.
