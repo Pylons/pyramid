@@ -48,4 +48,4 @@ class RootFactory(object):
     __acl__ = [ (Allow, Everyone, 'view'),
                 (Allow, 'group:editors', 'edit') ]
     def __init__(self, request):
-        self.__dict__.update(request.matchdict)
+        pass
