@@ -81,12 +81,8 @@ class MakoLookupTemplateRenderer(object):
         self.lookup = lookup
  
     def implementation(self):
-        return self.template
-
-    @property
-    def template(self):
         return self.lookup.get_template(self.path)
-   
+
     def __call__(self, value, system):
         context = system.pop('context', None)
         if context is not None:
@@ -98,7 +94,7 @@ class MakoLookupTemplateRenderer(object):
             system.update(value)
         except (TypeError, ValueError):
             raise ValueError('renderer was passed non-dictionary as value')
-        template = self.template
+        template = self.implementation()
         if def_name is not None:
             template = template.get_def(def_name)
         result = template.render_unicode(**system)
