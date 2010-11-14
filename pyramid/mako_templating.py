@@ -1,4 +1,5 @@
 import os
+import threading
 
 from zope.interface import implements
 from zope.interface import Interface
@@ -51,6 +52,8 @@ class PkgResourceTemplateLookup(TemplateLookup):
         return TemplateLookup.get_template(self, uri)
 
 
+registry_lock = threading.Lock() 
+
 def renderer_factory(info):
     path = info.name
     registry = info.registry
@@ -70,7 +73,12 @@ def renderer_factory(info):
                                            module_directory=module_directory,
                                            input_encoding=input_encoding,
                                            filesystem_checks=reload_templates)
-        registry.registerUtility(lookup, IMakoLookup)
+        registry_lock.acquire()
+        try:
+            registry.registerUtility(lookup, IMakoLookup)
+        finally:
+            registry_lock.release()
+            
     return MakoLookupTemplateRenderer(path, lookup)
 
 
