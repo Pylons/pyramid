@@ -1,4 +1,4 @@
-TEXDIR=.build/latex
+TEXDIR=_build/latex
 
 if test ! -z $BOOK; then
   for img in $TEXDIR/*.png;
