@@ -21,8 +21,8 @@ from pyramid import renderers
 from pyramid.settings import get_settings
 from pyramid.threadlocal import get_current_registry
 
-def renderer_factory(path):
-    return renderers.template_renderer_factory(path, ZPTTemplateRenderer)
+def renderer_factory(info):
+    return renderers.template_renderer_factory(info, ZPTTemplateRenderer)
 
 class ZPTTemplateRenderer(object):
     implements(ITemplateRenderer)

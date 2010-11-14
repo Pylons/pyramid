@@ -39,8 +39,8 @@ class TextTemplateFile(TemplateFile):
         super(TextTemplateFile, self).__init__(filename, parser, format,
                                                doctype, **kwargs)
 
-def renderer_factory(path):
-    return renderers.template_renderer_factory(path, TextTemplateRenderer)
+def renderer_factory(info):
+    return renderers.template_renderer_factory(info, TextTemplateRenderer)
 
 class TextTemplateRenderer(object):
     implements(ITemplateRenderer)
