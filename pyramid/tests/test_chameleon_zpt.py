@@ -43,7 +43,8 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         from zope.interface.verify import verifyObject
         from pyramid.interfaces import ITemplateRenderer
         path = self._getTemplatePath('minimal.pt')
-        verifyObject(ITemplateRenderer, self._makeOne(path))
+        lookup = DummyLookup()
+        verifyObject(ITemplateRenderer, self._makeOne(path, lookup))
 
     def test_class_implements_ITemplate(self):
         from zope.interface.verify import verifyClass
@@ -52,7 +53,8 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
 
     def test_call(self):
         minimal = self._getTemplatePath('minimal.pt')
-        instance = self._makeOne(minimal)
+        lookup = DummyLookup()
+        instance = self._makeOne(minimal, lookup)
         result = instance({}, {})
         self.failUnless(isinstance(result, unicode))
         self.assertEqual(result,
@@ -60,55 +62,66 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
 
     def test_template_reified(self):
         minimal = self._getTemplatePath('minimal.pt')
-        instance = self._makeOne(minimal)
+        lookup = DummyLookup()
+        instance = self._makeOne(minimal, lookup)
         self.failIf('template' in instance.__dict__)
         template  = instance.template
         self.assertEqual(template, instance.__dict__['template'])
 
     def test_template_with_ichameleon_translate(self):
-        from pyramid.interfaces import IChameleonTranslate
-        def ct(): pass
-        self.config.registry.registerUtility(ct, IChameleonTranslate)
         minimal = self._getTemplatePath('minimal.pt')
-        instance = self._makeOne(minimal)
+        lookup = DummyLookup()
+        instance = self._makeOne(minimal, lookup)
         self.failIf('template' in instance.__dict__)
         template  = instance.template
-        self.assertEqual(template.translate, ct)
+        self.assertEqual(template.translate, lookup.translate)
 
     def test_template_with_debug_templates(self):
-        self.config.add_settings({'debug_templates':True})
         minimal = self._getTemplatePath('minimal.pt')
-        instance = self._makeOne(minimal)
+        lookup = DummyLookup()
+        lookup.debug = True
+        instance = self._makeOne(minimal, lookup)
         self.failIf('template' in instance.__dict__)
         template  = instance.template
         self.assertEqual(template.debug, True)
 
-    def test_template_with_reload_templates(self):
-        self.config.add_settings({'reload_templates':True})
+    def test_template_without_debug_templates(self):
         minimal = self._getTemplatePath('minimal.pt')
-        instance = self._makeOne(minimal)
+        lookup = DummyLookup()
+        lookup.debug = False
+        instance = self._makeOne(minimal, lookup)
+        self.failIf('template' in instance.__dict__)
+        template  = instance.template
+        self.assertEqual(template.debug, False)
+
+    def test_template_with_reload_templates(self):
+        minimal = self._getTemplatePath('minimal.pt')
+        lookup = DummyLookup()
+        lookup.auto_reload = True
+        instance = self._makeOne(minimal, lookup)
         self.failIf('template' in instance.__dict__)
         template  = instance.template
         self.assertEqual(template.auto_reload, True)
 
-    def test_template_with_emptydict(self):
-        from pyramid.interfaces import ISettings
-        self.config.registry.registerUtility({}, ISettings)
+    def test_template_without_reload_templates(self):
         minimal = self._getTemplatePath('minimal.pt')
-        instance = self._makeOne(minimal)
+        lookup = DummyLookup()
+        lookup.auto_reload = False
+        instance = self._makeOne(minimal, lookup)
         self.failIf('template' in instance.__dict__)
         template  = instance.template
         self.assertEqual(template.auto_reload, False)
-        self.assertEqual(template.debug, False)
 
     def test_call_with_nondict_value(self):
         minimal = self._getTemplatePath('minimal.pt')
-        instance = self._makeOne(minimal)
+        lookup = DummyLookup()
+        instance = self._makeOne(minimal, lookup)
         self.assertRaises(ValueError, instance, None, {})
 
     def test_implementation(self):
         minimal = self._getTemplatePath('minimal.pt')
-        instance = self._makeOne(minimal)
+        lookup = DummyLookup()
+        instance = self._makeOne(minimal, lookup)
         result = instance.implementation()()
         self.failUnless(isinstance(result, unicode))
         self.assertEqual(result,
@@ -192,3 +205,8 @@ class GetTemplateTests(Base, unittest.TestCase):
         self._registerUtility(rf, IRendererFactory, name='foo')
         result = self._callFUT('foo')
         self.failUnless(result is renderer.template)
+
+class DummyLookup(object):
+    auto_reload=True
+    debug = True
+    def translate(self, msg): pass

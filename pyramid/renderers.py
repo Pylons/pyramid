@@ -4,6 +4,8 @@ import threading
 
 from zope.interface import implements
 
+from pyramid.interfaces import IChameleonLookup
+from pyramid.interfaces import IChameleonTranslate
 from pyramid.interfaces import IRendererGlobalsFactory
 from pyramid.interfaces import IRendererFactory
 from pyramid.interfaces import IResponseFactory
@@ -150,66 +152,102 @@ def string_renderer_factory(info):
 
 # utility functions, not API
 
-# Lock to prevent simultaneous registry writes; used in
-# template_renderer_factory.  template_renderer_factory may be called
-# at runtime, from more than a single thread.
-registry_lock = threading.Lock() 
+class ChameleonRendererLookup(object):
+    implements(IChameleonLookup)
+    def __init__(self, impl, registry):
+        self.impl = impl
+        self.registry = registry
+        self.lock = threading.Lock()
+        
+    def get_spec(self, name, package):
+        spec = name
+        isabs = os.path.isabs(name)
 
-def template_renderer_factory(info, impl, lock=registry_lock):
-    spec = info.name
-    reg = info.registry
-    package = info.package
+        if (not isabs) and (not ':' in name) and package:
+            # relative resource spec
+            if not isabs:
+                pp = package_path(package)
+                spec = os.path.join(pp, spec)
+            spec = resource_spec_from_abspath(spec, package)
+        return spec
 
-    isabs = os.path.isabs(spec)
+    @reify # wait until completely necessary to look up translator
+    def translate(self):
+        return self.registry.queryUtility(IChameleonTranslate)
 
-    if (not isabs) and (not ':' in spec) and package:
-        # relative resource spec
-        if not isabs:
-            pp = package_path(package)
-            spec = os.path.join(pp, spec)
-        spec = resource_spec_from_abspath(spec, package)
-    
-    if os.path.isabs(spec):
-        # 'spec' is an absolute filename
-        if not os.path.exists(spec):
-            raise ValueError('Missing template file: %s' % spec)
-        renderer = reg.queryUtility(ITemplateRenderer, name=spec)
-        if renderer is None:
-            renderer = impl(spec)
-            # cache the template
-            try:
-                lock.acquire()
-                reg.registerUtility(renderer, ITemplateRenderer, name=spec)
-            finally:
-                lock.release()
-    else:
-        # spec is a package:relpath resource spec
-        renderer = reg.queryUtility(ITemplateRenderer, name=spec)
-        if renderer is None:
-            try:
-                package_name, filename = spec.split(':', 1)
-            except ValueError: # pragma: no cover
-                # somehow we were passed a relative pathname; this
-                # should die
-                package_name = caller_package(4).__name__
-                filename = spec
-            abspath = pkg_resources.resource_filename(package_name, filename)
-            if not pkg_resources.resource_exists(package_name, filename):
-                raise ValueError(
-                    'Missing template resource: %s (%s)' % (spec, abspath))
-            renderer = impl(abspath)
-            settings = info.settings
-            if settings and not settings.get('reload_resources'):
+    @reify # wait until completely necessary to look up debug_templates
+    def debug(self):
+        settings = self.registry.settings or {}
+        return settings.get('debug_templates', False)
+
+    @reify # wait until completely necessary to look up reload_templates
+    def auto_reload(self):
+        settings = self.registry.settings or {}
+        return settings.get('reload_templates', False)
+
+    def __call__(self, info):
+        spec = self.get_spec(info.name, info.package)
+        registry = info.registry
+
+        if os.path.isabs(spec):
+            # 'spec' is an absolute filename
+            if not os.path.exists(spec):
+                raise ValueError('Missing template file: %s' % spec)
+            renderer = registry.queryUtility(ITemplateRenderer, name=spec)
+            if renderer is None:
+                renderer = self.impl(spec, self)
                 # cache the template
                 try:
-                    lock.acquire()
-                    reg.registerUtility(renderer, ITemplateRenderer, name=spec)
+                    self.lock.acquire()
+                    registry.registerUtility(renderer,
+                                             ITemplateRenderer, name=spec)
                 finally:
-                    lock.release()
-        
-    return renderer
+                    self.lock.release()
+        else:
+            # spec is a package:relpath resource spec
+            renderer = registry.queryUtility(ITemplateRenderer, name=spec)
+            if renderer is None:
+                try:
+                    package_name, filename = spec.split(':', 1)
+                except ValueError: # pragma: no cover
+                    # somehow we were passed a relative pathname; this
+                    # should die
+                    package_name = caller_package(4).__name__
+                    filename = spec
+                abspath = pkg_resources.resource_filename(package_name,
+                                                          filename)
+                if not pkg_resources.resource_exists(package_name, filename):
+                    raise ValueError(
+                        'Missing template resource: %s (%s)' % (spec, abspath))
+                renderer = self.impl(abspath, self)
+                settings = info.settings or {}
+                if not settings.get('reload_resources'):
+                    # cache the template
+                    self.lock.acquire()
+                    try:
+                        registry.registerUtility(renderer, ITemplateRenderer,
+                                                 name=spec)
+                    finally:
+                        self.lock.release()
 
-def renderer_from_name(path, package=None): # XXX deprecate?
+        return renderer
+
+registry_lock = threading.Lock()
+
+def template_renderer_factory(info, impl, lock=registry_lock):
+    registry = info.registry
+    lookup = registry.queryUtility(IChameleonLookup, name=info.type)
+    if lookup is None:
+        lookup = ChameleonRendererLookup(impl, registry)
+        lock.acquire()
+        try:
+            registry.registerUtility(lookup, IChameleonLookup, name=info.type)
+        finally:
+            lock.release()
+    return lookup(info)
+
+# XXX deprecate
+def renderer_from_name(path, package=None): 
     return RendererHelper(name=path, package=package).renderer
 
 class RendererHelper(object):
