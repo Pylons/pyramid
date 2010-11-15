@@ -171,16 +171,16 @@ class ChameleonRendererLookup(object):
             spec = resource_spec_from_abspath(spec, package)
         return spec
 
-    @reify # wait until completely necessary to look up translator
+    @property # wait until completely necessary to look up translator
     def translate(self):
         return self.registry.queryUtility(IChameleonTranslate)
 
-    @reify # wait until completely necessary to look up debug_templates
+    @property # wait until completely necessary to look up debug_templates
     def debug(self):
         settings = self.registry.settings or {}
         return settings.get('debug_templates', False)
 
-    @reify # wait until completely necessary to look up reload_templates
+    @property # wait until completely necessary to look up reload_templates
     def auto_reload(self):
         settings = self.registry.settings or {}
         return settings.get('reload_templates', False)
