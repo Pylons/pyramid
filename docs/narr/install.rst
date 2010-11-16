@@ -86,7 +86,6 @@ the following commands:
    [chrism@vitaminf ~]$ mkdir tmp
    [chrism@vitaminf ~]$ mkdir opt
    [chrism@vitaminf ~]$ cd tmp
-   [chrism@vitaminf tmp]$ cd tmp
    [chrism@vitaminf tmp]$ wget \
           http://www.python.org/ftp/python/2.6.4/Python-2.6.4.tgz
    [chrism@vitaminf tmp]$ tar xvzf Python-2.6.4.tgz
