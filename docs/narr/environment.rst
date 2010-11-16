@@ -213,7 +213,7 @@ error-rendering functions.
 +-----------------------------+
 | Config File Setting Name    |
 +=============================+
-|  ``mako.error_handler``   _ |
+|  ``mako.error_handler``     |
 |                             |
 |                             |
 |                             |
@@ -227,7 +227,7 @@ List of string filter names that will be applied to all Mako expressions.
 +-----------------------------+
 | Config File Setting Name    |
 +=============================+
-|  ``mako.default_filters`` _ |
+|  ``mako.default_filters``   |
 |                             |
 |                             |
 |                             |
@@ -243,7 +243,7 @@ will be placed into the module level preamble of all generated Python modules.
 +-----------------------------+
 | Config File Setting Name    |
 +=============================+
-|  ``mako.imports``________ _ |
+|  ``mako.imports``           |
 |                             |
 |                             |
 |                             |
