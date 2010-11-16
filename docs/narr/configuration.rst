@@ -21,8 +21,7 @@ application startup time as "configuration".  :app:`Pyramid` extends this
 pattern to application development, using the term "configuration" to express
 standardized ways that code gets plugged into a deployment of the framework
 itself.  When you plug code into the :app:`Pyramid` framework, you are
-"configuring" :app:`Pyramid` for the purpose of creating a particular
-application deployment.
+"configuring" :app:`Pyramid` to create a particular application.
 
 .. index::
    single: imperative configuration
