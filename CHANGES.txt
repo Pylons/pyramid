@@ -13,9 +13,9 @@ Features
 
 - New API method: ``pyramid.settings.asbool``.
 
-- New API methods for ``pyramid.request.Request``: ``model_url`` and
-  ``route_url``.  These are simple passthroughs for their respective
-  functions in ``pyramid.url``.
+- New API methods for ``pyramid.request.Request``: ``model_url``,
+  ``route_url``, and ``static_url``.  These are simple passthroughs for their
+  respective functions in ``pyramid.url``.
 
 - The ``settings`` object which used to be available only when
   ``request.settings.get_settings`` was called is now available as

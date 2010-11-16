@@ -266,6 +266,24 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3/extra1/extra2?a=1#foo')
 
+    def test_static_url(self):
+        from pyramid.interfaces import IStaticURLInfo
+        environ = {
+            'PATH_INFO':'/',
+            'SERVER_NAME':'example.com',
+            'SERVER_PORT':'5432',
+            'QUERY_STRING':'',
+            'wsgi.url_scheme':'http',
+            }
+        request = self._makeOne(environ)
+        info = DummyStaticURLInfo('abc')
+        self.config.registry.registerUtility(info, IStaticURLInfo)
+        result = request.static_url('pyramid.tests:static/foo.css')
+        self.assertEqual(result, 'abc')
+        self.assertEqual(info.args,
+                         ('pyramid.tests:static/foo.css', request, {}) )
+        
+
 class Test_route_request_iface(unittest.TestCase):
     def _callFUT(self, name):
         from pyramid.request import route_request_iface
@@ -322,4 +340,12 @@ class DummyRoute:
 
     def generate(self, kw):
         self.kw = kw
+        return self.result
+
+class DummyStaticURLInfo:
+    def __init__(self, result):
+        self.result = result
+
+    def generate(self, path, request, **kw):
+        self.args = path, request, kw
         return self.result

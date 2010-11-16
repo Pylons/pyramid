@@ -8,8 +8,9 @@ from pyramid.interfaces import ISessionFactory
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.decorator import reify
-from pyramid.url import route_url
 from pyramid.url import model_url
+from pyramid.url import route_url
+from pyramid.url import static_url
 
 class TemplateContext(object):
     pass
@@ -219,6 +220,38 @@ class Request(WebobRequest):
           route_url(model, request)
         """
         return model_url(model, self, *elements, **kw)
+
+    def static_url(self, path, **kw):
+        """ Generates a fully qualified URL for a static :term:`resource`.
+        The resource must live within a location defined via the
+        :meth:`pyramid.configuration.Configurator.add_static_view`
+        :term:`configuration declaration` or the ``<static>`` ZCML
+        directive (see :ref:`static_resources_section`).
+
+        This is a convenience method.  The result of calling
+        :meth:`pyramid.request.Request.static_url` is the same as calling
+        :func:`pyramid.url.static_url` with an explicit ``request`` parameter.
+
+        The :meth:`pyramid.request.Request.static_url` method calls the
+        :func:`pyramid.url.static_url` function using the Request object as
+        the ``request`` argument.  The ``*kw`` arguments passed to
+        :meth:`pyramid.request.Request.static_url` are passed through to
+        :func:`pyramid.url.static_url` unchanged and its result is returned.
+
+        This call to :meth:`pyramid.request.Request.static_url`::
+
+          request.static_url('mypackage:static/foo.css')
+
+        Is completely equivalent to calling :func:`pyramid.url.static_url`
+        like this::
+
+          from pyramid.url import static_url
+          static_url('mypackage:static/foo.css, request)
+
+        See :func:`pyramid.url.static_url` for more information
+        
+        """
+        return static_url(path, self, **kw)
 
     # override default WebOb "environ['adhoc_attr']" mutation behavior
     __getattr__ = object.__getattribute__

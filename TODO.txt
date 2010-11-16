@@ -129,4 +129,3 @@
 
   - zcml.file_configure
 
-- Add static_url as method of request.
