@@ -1,6 +1,13 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
+- Add deprecation warnings to import of ``pyramid.chameleon_text`` and
+  ``pyramid.chameleon_zpt`` of ``get_renderer``, ``get_template``,
+  ``render_template``, and ``render_template_to_response``.
+
 
 1.0a3 (2010-11-16)
 ==================

@@ -11,9 +11,13 @@ class Base:
             os.unlink(self._getTemplatePath('minimal.txt.py'))
         except:
             pass
+        from zope.deprecation import __show__
+        __show__.off()
 
     def tearDown(self):
         cleanUp()
+        from zope.deprecation import __show__
+        __show__.on()
 
     def _getTemplatePath(self, name):
         import os

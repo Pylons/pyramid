@@ -1,5 +1,6 @@
 import sys
 
+from zope.deprecation import deprecated
 from zope.interface import implements
 
 try:
@@ -80,6 +81,11 @@ def get_renderer(path):
     factory = renderers.RendererHelper(path, package=package)
     return factory.get_renderer()
 
+deprecated(
+    'get_renderer',
+    '(pyramid.chameleon_text.get_renderer is deprecated '
+    'as of Pyramid 1.0; instead use pyramid.renderers.get_renderer)')
+
 def get_template(path):
     """ Return the underyling object representing a :term:`Chameleon`
     text template using the template implied by the ``path`` argument.
@@ -93,6 +99,12 @@ def get_template(path):
     package = caller_package()
     factory = renderers.RendererHelper(path, package=package)
     return factory.get_renderer().implementation()
+
+deprecated(
+    'render_template',
+    '(pyramid.chameleon_text.render_template is deprecated '
+    'as of Pyramid 1.0; instead use '
+    'pyramid.renderers.get_renderer().implementation())')
 
 def render_template(path, **kw):
     """ Render a :term:`Chameleon` text template using the template
@@ -110,6 +122,11 @@ def render_template(path, **kw):
     renderer = renderers.RendererHelper(path, package=package)
     return renderer.render(kw, None, request=request)
 
+deprecated(
+    'render_template',
+    '(pyramid.chameleon_text.render_template is deprecated '
+    'as of Pyramid 1.0; instead use pyramid.renderers.render)')
+
 def render_template_to_response(path, **kw):
     """ Render a :term:`Chameleon` text template using the template
     implied by the ``path`` argument.  The ``path`` argument may be a
@@ -126,3 +143,9 @@ def render_template_to_response(path, **kw):
     request = kw.pop('request', None)
     renderer = renderers.RendererHelper(path, package=package)
     return renderer.render_to_response(kw, None, request=request)
+
+deprecated(
+    'render_template_to_response',
+    '(pyramid.chameleon_text.render_template_to_response is deprecated '
+    'as of Pyramid 1.0; instead use pyramid.renderers.render_to_response)')
+

@@ -5,9 +5,13 @@ from pyramid.testing import cleanUp
 class Base(object):
     def setUp(self):
         cleanUp()
+        from zope.deprecation import __show__
+        __show__.off()
 
     def tearDown(self):
         cleanUp()
+        from zope.deprecation import __show__
+        __show__.on()
 
     def _getTemplatePath(self, name):
         import os

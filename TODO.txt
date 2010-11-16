@@ -120,9 +120,6 @@
 
 - Add deprecation warnings for:
 
-  - Use of chameleon_zpt and chameleon_text templating functions (use
-    renderer API instead).
-
   - settings.get_settings
 
   - zcml.zcml_configure
