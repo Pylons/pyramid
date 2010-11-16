@@ -139,10 +139,10 @@ passed to the ``Response`` constructor as the *body* of the response.  In the
 Application Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In the above script, the following code, representing the
-*configuration* of an application which uses the previously defined
-imports and function definitions is placed within the confines of an
-``if`` statement:
+In the above script, the following code represents the *configuration* of this
+simple application. The application is configured using the previously defined
+imports and function definitions, placed within the confines of an ``if``
+statement:
 
 .. code-block:: python
    :linenos:
