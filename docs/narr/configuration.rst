@@ -10,9 +10,9 @@ Each deployment of an application written using :app:`Pyramid` implies a
 specific *configuration* of the framework itself.  For example, an
 application which serves up MP3s for user consumption might plug code into
 the framework that manages songs, while an application that manages corporate
-data might plug in code that manages accounting information.  :app:`Pyramid`
-refers to the way in which code is plugged in to it for a specific
-application as "configuration".
+data might plug in code that manages accounting information.  The way in which
+code is plugged in to :app:`Pyramid`, for a specific application, is referred
+to as "configuration".
 
 Most people understand "configuration" as coarse settings that inform the
 high-level operation of a specific application deployment.  For instance,
