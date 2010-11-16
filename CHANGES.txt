@@ -4,6 +4,9 @@ Next release
 Features
 --------
 
+- Added Mako TemplateLookup settings for ``mako.error_handler``,
+  ``mako.default_filters``, and ``mako.imports``.
+
 - Normalized all paster templates: each now uses the name ``main`` to
   represent the function that returns a WSGI application, each now uses
   WebError, each now has roughly the same shape of development.ini style.

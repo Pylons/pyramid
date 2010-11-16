@@ -64,6 +64,9 @@ def renderer_factory(info):
         directories = settings.get('mako.directories')
         module_directory = settings.get('mako.module_directory')
         input_encoding = settings.get('mako.input_encoding', 'utf-8')
+        error_handler = settings.get('mako.error_handler', None)
+        default_filters = settings.get('mako.default_filters', [])
+        imports = settings.get('mako.imports', [])
         if directories is None:
             raise ConfigurationError(
                 'Mako template used without a ``mako.directories`` setting')
@@ -72,6 +75,9 @@ def renderer_factory(info):
         lookup = PkgResourceTemplateLookup(directories=directories,
                                            module_directory=module_directory,
                                            input_encoding=input_encoding,
+                                           error_handler=error_handler,
+                                           default_filters=default_filters,
+                                           imports=imports,
                                            filesystem_checks=reload_templates)
         registry_lock.acquire()
         try:
