@@ -201,12 +201,12 @@ Beginning Configuration
 The :meth:`pyramid.configuration.Configurator.begin` method tells
 the system that application configuration has begun.  In particular,
 this causes the :term:`application registry` associated with this
-configurator to become the "current" application registry, meaning
-that code which attempts to use the application registry :term:`thread
-local` will obtain the registry associated with the configurator.
-This is an explicit step because it's sometimes convenient to use a
-configurator without causing the registry associated with the
-configurator to become "current".
+configurator to become the "current" application registry. 
+Code that subsequently attempts to use the application registry 
+:term:`thread local` will obtain the registry associated with this 
+configurator.  This is an explicit step because it's sometimes 
+convenient to use a configurator without causing the registry 
+associated with the configurator to become "current".
 
 .. note::
 
