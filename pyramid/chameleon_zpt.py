@@ -1,4 +1,5 @@
 import sys
+import threading
 
 from zope.interface import implements
 
@@ -12,44 +13,32 @@ except ImportError: # pragma: no cover
         def __init__(self, *arg, **kw):
             raise ImportError, exc, tb
 
-from pyramid.interfaces import IChameleonTranslate
 from pyramid.interfaces import ITemplateRenderer
 
 from pyramid.decorator import reify
 from pyramid.path import caller_package
 from pyramid import renderers
-from pyramid.settings import get_settings
-from pyramid.threadlocal import get_current_registry
 
-def renderer_factory(info):
+registry_lock = threading.Lock()
+    
+def renderer_factory(info, lock=registry_lock):
     return renderers.template_renderer_factory(info, ZPTTemplateRenderer)
 
 class ZPTTemplateRenderer(object):
     implements(ITemplateRenderer)
-    def __init__(self, path):
+    def __init__(self, path, lookup):
         self.path = path
+        self.lookup = lookup
 
     @reify # avoid looking up reload_templates before manager pushed
     def template(self):
         if sys.platform.startswith('java'): # pragma: no cover
             raise RuntimeError(
                 'Chameleon templates are not compatible with Jython')
-        settings = get_settings()
-        debug = False
-        auto_reload = False
-        if settings:
-            # using .get here is a strategy to be kind to old *tests* rather
-            # than being kind to any existing production system
-            auto_reload = settings.get('reload_templates')
-            debug = settings.get('debug_templates')
-        reg = get_current_registry()
-        translate = None
-        if reg is not None:
-            translate = reg.queryUtility(IChameleonTranslate)
         return PageTemplateFile(self.path,
-                                auto_reload=auto_reload,
-                                debug=debug,
-                                translate=translate)
+                                auto_reload=self.lookup.auto_reload,
+                                debug=self.lookup.debug,
+                                translate=self.lookup.translate)
 
     def implementation(self):
         return self.template

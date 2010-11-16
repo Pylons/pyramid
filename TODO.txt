@@ -110,10 +110,6 @@
 
   security.principals_allowed_by_permission
 
-  chameleon_text.TextTemplateRenderer.template (also uses get_settings)
-
-  chameleon_zpt.ZPTTemplateRenderer.template (also uses get_settings)
-
   resource.OverrideProvider._get_overrides: can't credibly be removed,
   because it stores an overrideprovider as a module-scope global.
 

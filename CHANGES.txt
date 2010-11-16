@@ -68,6 +68,14 @@ Behavior Differences
   a ``registry`` attribute on the ZCML context (kill off use of
   threadlocals).
 
+- Internal: Chameleon template renderers now accept two arguments: ``path``
+  and ``lookup``.  ``Lookup`` will be an instance of a lookup class which
+  supplies (late-bound) arguments for debug, reload, and translate.  Any
+  third-party renderers which use (the non-API) function
+  ``pyramid.renderers.template_renderer_factory`` will need to adjust their
+  implementations to obey the new callback argument list.  This change was to
+  kill off inappropriate use of threadlocals.
+
 1.0a2 (2010-11-09)
 ==================
 
