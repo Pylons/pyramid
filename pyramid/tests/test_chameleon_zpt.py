@@ -145,12 +145,6 @@ class RenderTemplateTests(Base, unittest.TestCase):
                      '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
 
 class RenderTemplateToResponseTests(Base, unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-        
     def _callFUT(self, name, **kw):
         from pyramid.chameleon_zpt import render_template_to_response
         return render_template_to_response(name, **kw)
