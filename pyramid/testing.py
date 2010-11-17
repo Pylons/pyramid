@@ -119,7 +119,7 @@ def registerTemplateRenderer(path, renderer=None):
 
     .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
-       :meth:`pyramid.configuration.Configurator.testing_add_template``
+       :meth:`pyramid.configuration.Configurator.testing_add_template`
        method in your unit and integration tests.
 
     """
@@ -151,7 +151,7 @@ def registerView(name, result='', view=None, for_=(Interface, Interface),
 
     .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
-       :meth:`pyramid.configuration.Configurator.add_view``
+       :meth:`pyramid.configuration.Configurator.add_view`
        method in your unit and integration tests.
     """
     for_ = (IViewClassifier, ) + for_
