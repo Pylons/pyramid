@@ -1,4 +1,5 @@
 import copy
+import os
 
 from zope.configuration.xmlconfig import _clearContext
 
@@ -733,3 +734,16 @@ class MockTemplate(object):
     def __call__(self, *arg, **kw):
         self._received.update(kw)
         return self.response
+
+def skip_on(*platforms):
+    def decorator(func):
+        def wrapper(*args, **kw):
+            for platform in platforms:
+                if skip_on.os_name.startswith(platform):
+                    return
+            return func(*args, **kw)
+        wrapper.__name__ = func.__name__
+        wrapper.__doc__ = func.__doc__
+        return wrapper
+    return decorator
+skip_on.os_name = os.name # for testing
