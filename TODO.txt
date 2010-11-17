@@ -115,8 +115,5 @@
   Configurator.add_translation_dirs: not passed any context but a message,
   can't credibly be removed.
 
-- Stop using Twill in integration tests (too much of a pain in the ass to
-  make work without deprecation warnings).
-
 - Use ``@register_view`` instead of ``@view_config`` and change view docs to
   use "view registration" instead of "view configuration".
