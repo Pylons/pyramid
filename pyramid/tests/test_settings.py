@@ -184,9 +184,13 @@ class TestGetSettings(unittest.TestCase):
         registry = Registry('testing')
         self.config = Configurator(registry=registry)
         self.config.begin()
+        from zope.deprecation import __show__
+        __show__.off()
 
     def tearDown(self):
         self.config.end()
+        from zope.deprecation import __show__
+        __show__.on()
         
     def _callFUT(self):
         from pyramid.settings import get_settings

@@ -277,7 +277,7 @@ def registerRoute(pattern, name, factory=None):
 def registerSettings(dictarg=None, **kw):
     """Register one or more 'setting' key/value pairs.  A setting is
     a single key/value pair in the dictionary-ish object returned from
-    the API :func:`pyramid.settings.get_settings`.
+    the API :attr:`pyramid.registry.Registry.settings`.
 
     You may pass a dictionary::
 
@@ -287,9 +287,9 @@ def registerSettings(dictarg=None, **kw):
     
        registerSettings(external_uri='http://example.com')
 
-    Use of this function is required when you need to test code that
-    calls the :func:`pyramid.settings.get_settings` API and which
-    uses return values from that API.
+    Use of this function is required when you need to test code that calls
+    the :attr:`pyramid.registry.Registry.settings` API and which uses return
+    values from that API.
 
     .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the

@@ -8,6 +8,13 @@ Bug Fixes
   ``pyramid.chameleon_zpt`` of ``get_renderer``, ``get_template``,
   ``render_template``, and ``render_template_to_response``.
 
+Deprecations
+------------
+
+- The ``pyramid.settings.get_settings`` API is now deprecated.  Use
+  ``pyramid.threadlocals.get_registry().settings`` instead or use the
+  ``settings`` attribute of the registry available from the request
+  (``request.registry.settings``).
 
 1.0a3 (2010-11-16)
 ==================

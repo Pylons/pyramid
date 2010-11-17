@@ -570,11 +570,10 @@ class Configurator(object):
         return subscriber
 
     def add_settings(self, settings=None, **kw):
-        """Augment the ``settings`` argument passed in to the
-        Configurator constructor with one or more 'setting' key/value
-        pairs.  A setting is a single key/value pair in the
-        dictionary-ish object returned from the API
-        :func:`pyramid.settings.get_settings` and
+        """Augment the ``settings`` argument passed in to the Configurator
+        constructor with one or more 'setting' key/value pairs.  A setting is
+        a single key/value pair in the dictionary-ish object returned from
+        the API :attr:`pyramid.registry.Registry.settings` and
         :meth:`pyramid.configuration.Configurator.get_settings`.
 
         You may pass a dictionary::
@@ -585,11 +584,10 @@ class Configurator(object):
 
            config.add_settings(external_uri='http://example.com')
 
-        This function is useful when you need to test code that calls the
-        :func:`pyramid.settings.get_settings` API (or the
-        :meth:`pyramid.configuration.Configurator.get_settings` API or
-        accesses ``request.settings``) and which uses return values from that
-        API.
+        This function is useful when you need to test code that accesses the
+        :attr:`pyramid.registry.Registry.settings` API (or the
+        :meth:`pyramid.configuration.Configurator.get_settings` API) and
+        which uses values from that API.
         """
         if settings is None:
             settings = {}
@@ -610,9 +608,8 @@ class Configurator(object):
         .. note:: For backwards compatibility, dictionary keys can also be
            looked up as attributes of the settings object.
 
-        .. note:: the :class:`pyramid.settings.get_settings` and function
-           performs the same duty and the settings attribute can also be
-           accessed as :attr:`pyramid.registry.Registry.settings`
+        .. note:: the :attr:`pyramid.registry.Registry.settings` API
+           performs the same duty.
            """
         return self.registry.settings
 
