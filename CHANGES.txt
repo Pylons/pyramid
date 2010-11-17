@@ -11,6 +11,9 @@ Bug Fixes
 - Add deprecation warning for import of ``pyramid.zcml.zcml_configure`` and
   ``pyramid.zcml.file_configure``.
 
+- The ``pyramid_alchemy`` paster template had a typo, preventing an import
+  from working.
+
 Backwards Incompatibilities
 ---------------------------
 
