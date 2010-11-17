@@ -177,7 +177,7 @@ class view_config(object):
              :class:`pyramid.view.bfg_view`.
 
     The following arguments are supported as arguments to
-    :class:`pyramid.view.view_config``: ``context``, ``permission``,
+    :class:`pyramid.view.view_config`: ``context``, ``permission``,
     ``name``, ``request_type``, ``route_name``, ``request_method``,
     ``request_param``, ``containment``, ``xhr``, ``accept``,
     ``header`` and ``path_info``.
