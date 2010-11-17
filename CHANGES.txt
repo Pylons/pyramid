@@ -28,6 +28,13 @@ Deprecations
   ``settings`` attribute of the registry available from the request
   (``request.registry.settings``).
 
+Documentation
+-------------
+
+- Removed ``zodbsessions`` tutorial chapter.  It's still useful, but we now
+  have a SessionFactory abstraction which competes with it, and maintaining
+  documentation on both ways to do it is a distraction.
+
 1.0a3 (2010-11-16)
 ==================
 
