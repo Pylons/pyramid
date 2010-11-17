@@ -101,8 +101,8 @@ def get_template(path):
     return factory.get_renderer().implementation()
 
 deprecated(
-    'render_template',
-    '(pyramid.chameleon_text.render_template is deprecated '
+    'get_template',
+    '(pyramid.chameleon_text.get_template is deprecated '
     'as of Pyramid 1.0; instead use '
     'pyramid.renderers.get_renderer().implementation())')
 

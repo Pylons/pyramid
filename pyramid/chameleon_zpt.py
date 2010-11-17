@@ -130,6 +130,6 @@ def render_template_to_response(path, **kw):
     return renderer.render_to_response(kw, None, request=request)
 
 deprecated(
-    'render_template',
+    'render_template_to_response',
     '(pyramid.chameleon_zpt.render_template_to_response is deprecated; as of '
     'Pyramid 1.0, instead use pyramid.renderers.render_to_response)')
