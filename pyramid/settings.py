@@ -78,8 +78,8 @@ def get_settings():
        performs the same duty.
 
     .. warning:: This method is deprecated as of Pyramid 1.0.  Use
-       ``pyramid.threadlocals.get_registry().settings`` instead or use the
-       ``settings`` attribute of the registry available from the request
+       ``pyramid.threadlocals.get_current_registry().settings`` instead or use '
+       the ``settings`` attribute of the registry available from the request
        (``request.registry.settings``).
     """
     reg = get_current_registry()
@@ -88,8 +88,8 @@ def get_settings():
 deprecated(
     'get_settings',
     '(pyramid.settings.get_settings is deprecated as of Pyramid 1.0.  Use'
-    '``pyramid.threadlocals.get_registry().settings`` instead or use the '
-    '``settings`` attribute of the registry available from the request '
+    '``pyramid.threadlocals.get_current_registry().settings`` instead or use '
+    'the ``settings`` attribute of the registry available from the request '
     '(``request.registry.settings``)).')
 
 def asbool(s):

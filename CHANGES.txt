@@ -21,7 +21,7 @@ Deprecations
 ------------
 
 - The ``pyramid.settings.get_settings`` API is now deprecated.  Use
-  ``pyramid.threadlocals.get_registry().settings`` instead or use the
+  ``pyramid.threadlocals.get_current_registry().settings`` instead or use the
   ``settings`` attribute of the registry available from the request
   (``request.registry.settings``).
 
