@@ -411,7 +411,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
 
     def test_identify_cookie_reissue(self):
         import time
-        plugin = self._makeOne('secret', timeout=5, reissue_time=0)
+        plugin = self._makeOne('secret', timeout=5000, reissue_time=0)
         plugin.auth_tkt.timestamp = time.time()
         request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
         result = plugin.identify(request)

@@ -138,6 +138,8 @@ class TestTemplateRendererFactory(unittest.TestCase):
         result = self._callFUT(info, factory)
         self.failUnless(result is renderer)
         path = os.path.abspath(__file__).split('$')[0] # jython
+        if path.endswith('.pyc'):
+            path = path[:-1]
         self.failUnless(factory.path.startswith(path))
         self.assertEqual(factory.kw, {})
 
