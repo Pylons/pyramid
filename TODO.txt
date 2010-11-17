@@ -77,9 +77,6 @@
 
 - RendererHelper -> RendererInfo?
 
-- Do something about ZODB session chapter: either remove or create a
-  pyramid_zodbsessions package.
-
 - translationdir ZCML directive use of ``path_spec`` should maybe die.
 
 - Option for route_url to omit the host and port (perhaps a different
