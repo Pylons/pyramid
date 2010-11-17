@@ -49,7 +49,8 @@ Attributions
 ------------
 
 Contributors:
-  Ben Bangert, Blaise Laflamme, Carlos de la Guardia, Paul Everitt
+  Ben Bangert, Blaise Laflamme, Carlos de la Guardia, Paul Everitt, 
+  Marius Gedminas
 
 .. Cover Designer:
 ..   Nat Hardwick of `Electrosoup <http://www.electrosoup.co.uk>`_.
