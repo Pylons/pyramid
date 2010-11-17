@@ -1,6 +1,17 @@
 Next release
 ============
 
+Features
+--------
+
+- Add a ``pyramid.url.route_path`` API, allowing folks to generate relative
+  URLs.  Calling ``route_path`` is the same as calling
+  ``pyramid.url.route_url`` with the argument ``_app_url`` equal to the empty
+  string.
+
+- Add a ``pyramid.request.Request.route_path`` API.  This is a convenience
+  method of the request which calls ``pyramid.url.route_url``.
+
 Bug Fixes
 ---------
 

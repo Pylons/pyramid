@@ -9,6 +9,8 @@
 
   .. autofunction:: route_url
 
+  .. autofunction:: route_path
+
   .. autofunction:: static_url
 
   .. autofunction:: urlencode

@@ -11,6 +11,7 @@ from pyramid.decorator import reify
 from pyramid.url import model_url
 from pyramid.url import route_url
 from pyramid.url import static_url
+from pyramid.url import route_path
 
 class TemplateContext(object):
     pass
@@ -246,12 +247,52 @@ class Request(WebobRequest):
         like this::
 
           from pyramid.url import static_url
-          static_url('mypackage:static/foo.css, request)
+          static_url('mypackage:static/foo.css', request)
 
         See :func:`pyramid.url.static_url` for more information
         
         """
         return static_url(path, self, **kw)
+
+    def route_path(self, route_name, *elements, **kw):
+        """Generates a path (aka a 'relative URL', a URL minus the host,
+        scheme, and port) for a named :app:`Pyramid`
+        :term:`route configuration`.
+        
+        .. note:: Calling :meth:`pyramid.Request.route_path` can be used to
+                  achieve the same result as :func:`pyramid.url.route_path`.
+
+        This is a convenience method.  The result of calling
+        :meth:`pyramid.request.Request.route_path` is the same as calling
+        :func:`pyramid.url.route_path` with an explicit ``request``
+        parameter.
+
+        This method accepts the same arguments as
+        :meth:`pyramid.request.Request.route_url` and performs the same duty.
+        It just omits the host, port, and scheme information in the return
+        value; only the path, query parameters, and anchor data are present
+        in the returned string.
+
+        The :meth:`pyramid.request.Request.route_path` method calls the
+        :func:`pyramid.url.route_path` function using the Request object as
+        the ``request`` argument.  The ``*elements`` and ``*kw`` arguments
+        passed to :meth:`pyramid.request.Request.route_path` are passed
+        through to :func:`pyramid.url.route_path` unchanged and its result is
+        returned.
+
+        This call to :meth:`pyramid.request.Request.route_path`::
+
+          request.route_path('foobar')
+
+        Is completely equivalent to calling :func:`pyramid.url.route_path`
+        like this::
+
+          from pyramid.url import route_path
+          route_path('foobar', request)
+
+        See :func:`pyramid.url.route_path` for more information
+        """
+        return route_path(route_name, self, *elements, **kw)
 
     # override default WebOb "environ['adhoc_attr']" mutation behavior
     __getattr__ = object.__getattribute__

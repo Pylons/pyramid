@@ -266,6 +266,23 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3/extra1/extra2?a=1#foo')
 
+    def test_route_path(self):
+        environ = {
+            'PATH_INFO':'/',
+            'SERVER_NAME':'example.com',
+            'SERVER_PORT':'5432',
+            'QUERY_STRING':'la=La%20Pe%C3%B1a',
+            'wsgi.url_scheme':'http',
+            }
+        from pyramid.interfaces import IRoutesMapper
+        inst = self._makeOne(environ)
+        mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
+        self.config.registry.registerUtility(mapper, IRoutesMapper)
+        result = inst.route_path('flub', 'extra1', 'extra2',
+                                a=1, b=2, c=3, _query={'a':1},
+                                _anchor=u"foo")
+        self.assertEqual(result, '/1/2/3/extra1/extra2?a=1#foo')
+
     def test_static_url(self):
         from pyramid.interfaces import IStaticURLInfo
         environ = {

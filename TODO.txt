@@ -44,8 +44,6 @@
          action = '^foo$'
            mypackage.views.MyView.foo_GET
 
-- Ability to use configurator as a context manager.
-
 - Provide a response_cookies attribute on the request for rendered
   responses that can be used as input to response.set_cookie.
 
@@ -78,9 +76,6 @@
 - RendererHelper -> RendererInfo?
 
 - translationdir ZCML directive use of ``path_spec`` should maybe die.
-
-- Option for route_url to omit the host and port (perhaps a different
-  function named ``route_path``).
 
 - SQLAlchemy idiomatics:
 

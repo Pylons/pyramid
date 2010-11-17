@@ -153,6 +153,33 @@ def route_url(route_name, request, *elements, **kw):
 
     return app_url + path + suffix + qs + anchor
 
+def route_path(route_name, request, *elements, **kw):
+    """Generates a path (aka a 'relative URL', a URL minus the host, scheme,
+    and port) for a named :app:`Pyramid` :term:`route configuration`.
+
+    .. note:: Calling :meth:`pyramid.Request.route_path` can be used to
+              achieve the same result as :func:`pyramid.url.route_path`.
+
+    This function accepts the same argument as :func:`pyramid.url.route_url`
+    and performs the same duty.  It just omits the host, port, and scheme
+    information in the return value; only the path, query parameters,
+    and anchor data are present in the returned string.
+
+    For example, if you've defined a route named 'foobar' with the path
+    ``/:foo/:bar``, this call to ``route_path``::
+
+        route_path('foobar', request, foo='1', bar='2')
+
+    Will return the string ``/1/2``.
+
+    .. note:: Calling ``route_path('route', request)`` is the same as calling
+       ``route_url('route', request, _app_url='')``.  ``route_path`` is, in
+       fact, implemented in terms of ``route_url`` in just this way. As a
+       result, passing ``_app_url`` within the ``**kw`` values passed to
+       ``route_path`` will result in an exception.
+    """
+    return route_url(route_name, request, *elements, _app_url='', **kw)
+
 def model_url(model, request, *elements, **kw):
     """
     Generate a string representing the absolute URL of the ``model``
