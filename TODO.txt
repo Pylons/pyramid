@@ -121,4 +121,5 @@
 - Stop using Twill in integration tests (too much of a pain in the ass to
   make work without deprecation warnings).
 
-- Send patch to Ian for pastescript so it works on Jython.
+- Use ``@register_view`` instead of ``@view_config`` and change view docs to
+  use "view registration" instead of "view configuration".
