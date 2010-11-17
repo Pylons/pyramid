@@ -7,8 +7,6 @@ from pyramid.view import static
 
 from zope.interface import Interface
 
-from pyramid import testing
-
 class INothing(Interface):
     pass
 
@@ -67,33 +65,6 @@ class TestStaticApp(unittest.TestCase):
 
 class IntegrationBase(unittest.TestCase):
     root_factory = None
-    ## def setUp(self):
-    ##     import sys
-    ##     import twill
-    ##     from twill.commands import config as twillconfig
-    ##     # for benefit of Jython, which cannot import the subprocess module, we
-    ##     # configure twill to not use tidy
-    ##     twillconfig('use_tidy', False)
-    ##     twillconfig('require_tidy', False)
-    ##     from pyramid.configuration import Configurator
-    ##     config = Configurator(root_factory=self.root_factory)
-    ##     config.load_zcml(self.config)
-    ##     twill.add_wsgi_intercept('localhost', 6543, config.make_wsgi_app)
-    ##     if sys.platform is 'win32': # pragma: no cover
-    ##         out = open('nul:', 'wb')
-    ##     else:
-    ##         out = open('/dev/null', 'wb')
-    ##     twill.set_output(out)
-    ##     self.config = testing.setUp(registry=config.registry)
-
-    ## def tearDown(self):
-    ##     import twill
-    ##     import twill.commands
-    ##     twill.commands.reset_browser()
-    ##     twill.remove_wsgi_intercept('localhost', 6543)
-    ##     twill.set_output(None)
-    ##     testing.tearDown()
-
     def setUp(self):
         from pyramid.configuration import Configurator
         config = Configurator(root_factory=self.root_factory)
