@@ -269,7 +269,7 @@ circumstances which would cause the view configuration's callable to
 be invoked.  In general, a greater number of predicates supplied along
 with a view configuration will more strictly limit the applicability
 of its associated view callable.  When :app:`Pyramid` processes a
-request, however, the view callable with the *most specific* view
+request, the view callable with the *most specific* view
 configuration (the view configuration that matches the most specific
 set of predicates) is always invoked.
 
