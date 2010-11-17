@@ -6,6 +6,8 @@ from zope.configuration.fields import GlobalInterface
 from zope.configuration.fields import GlobalObject
 from zope.configuration.fields import Tokens
 
+from zope.deprecation import deprecated
+
 from zope.interface import Interface
 from zope.interface import implementedBy
 from zope.interface import providedBy
@@ -936,6 +938,16 @@ def zcml_configure(name, package):
     return context.actions
 
 file_configure = zcml_configure # backwards compat (>0.8.1)
+
+deprecated(
+    'zcml_configure',
+    '(pyramid.zcml.zcml_configure is deprecated as of Pyramid 1.0.  Use'
+    '``pyramid.configuration.Configurator.load_zcml`` instead.) ')
+
+deprecated(
+    'file_configure',
+    '(pyramid.zcml.file_configure is deprecated as of Pyramid 1.0.  Use'
+    '``pyramid.configuration.Configurator.load_zcml`` instead.) ')
 
 def _rolledUpFactory(factories):
     def factory(ob):

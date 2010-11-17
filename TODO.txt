@@ -118,11 +118,4 @@
   Configurator.add_translation_dirs: not passed any context but a message,
   can't credibly be removed.
 
-- Add deprecation warnings for:
-
-  - settings.get_settings
-
-  - zcml.zcml_configure
-
-  - zcml.file_configure
 

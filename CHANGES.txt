@@ -8,6 +8,15 @@ Bug Fixes
   ``pyramid.chameleon_zpt`` of ``get_renderer``, ``get_template``,
   ``render_template``, and ``render_template_to_response``.
 
+- Add deprecation warning for import of ``pyramid.zcml.zcml_configure`` and
+  ``pyramid.zcml.file_configure``.
+
+Backwards Incompatibilities
+---------------------------
+
+- The ``pyramid.testing.zcml_configure`` API has been removed.  It had been
+  advertised as removed since 1.2a1, but hadn't actually been.
+
 Deprecations
 ------------
 

@@ -20,9 +20,6 @@ from pyramid.security import Everyone
 from pyramid.security import has_permission
 from pyramid.threadlocal import get_current_registry
 from pyramid.threadlocal import manager
-from pyramid.zcml import zcml_configure # API
-
-zcml_configure # prevent pyflakes from complaining
 
 _marker = object()
 
