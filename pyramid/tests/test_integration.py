@@ -70,6 +70,11 @@ class TwillBase(unittest.TestCase):
     def setUp(self):
         import sys
         import twill
+        from twill.commands import config as twillconfig
+        # for benefit of Jython, which cannot import the subprocess module, we
+        # configure twill to not use tidy
+        twillconfig('use_tidy', False)
+        twillconfig('require_tidy', False)
         from pyramid.configuration import Configurator
         config = Configurator(root_factory=self.root_factory)
         config.load_zcml(self.config)
@@ -79,7 +84,7 @@ class TwillBase(unittest.TestCase):
         else:
             out = open('/dev/null', 'wb')
         twill.set_output(out)
-        testing.setUp(registry=config.registry)
+        self.config = testing.setUp(registry=config.registry)
 
     def tearDown(self):
         import twill
@@ -172,6 +177,10 @@ class TestRestBugApp(TwillBase):
 class TestViewDecoratorApp(TwillBase):
     config = 'pyramid.tests.viewdecoratorapp:configure.zcml'
     def test_it(self):
+        # we use mako here instead of chameleon because it works on Jython
+        tmpldir = os.path.join(os.path.dirname(__file__), 'viewdecoratorapp',
+                               'views')
+        self.config.registry.settings['mako.directories'] = tmpldir
         import twill.commands
         browser = twill.commands.get_browser()
         browser.go('http://localhost:6543/first')
@@ -181,10 +190,6 @@ class TestViewDecoratorApp(TwillBase):
         browser.go('http://localhost:6543/second')
         self.assertEqual(browser.get_code(), 200)
         self.failUnless('OK2' in browser.get_html())
-
-        browser.go('http://localhost:6543/third')
-        self.assertEqual(browser.get_code(), 200)
-        self.failUnless('OK3' in browser.get_html())
 
 class TestViewPermissionBug(TwillBase):
     # view_execution_permitted bug as reported by Shane at http://lists.repoze.org/pipermail/repoze-dev/2010-October/003603.html
