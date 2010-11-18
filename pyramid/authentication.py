@@ -286,6 +286,7 @@ EXPIRE = object()
 
 class AuthTktCookieHelper(object):
     auth_tkt = auth_tkt # for tests
+    now = None # for tests
 
     userid_type_decoders = {
         'int':int,
@@ -373,7 +374,10 @@ class AuthTktCookieHelper(object):
         except self.auth_tkt.BadTicket:
             return None
 
-        now = time.time()
+        now = self.now # service tests
+
+        if now is None: 
+            now = time.time()
 
         if self.timeout and ( (timestamp + self.timeout) < now ):
             return None
