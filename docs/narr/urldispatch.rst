@@ -208,16 +208,16 @@ and:
 
    /:foo/bar/baz
 
-A patttern segment (an individual item between ``/`` characters in the
-pattern) may either be a literal string (e.g. ``foo``) *or* it may be
-a segment replacement marker (e.g. ``:foo``) or a certain combination
-of both.
+A pattern segment (an individual item between ``/`` characters in the pattern)
+may either be a literal string (e.g. ``foo``) *or* it may be a replacement
+marker (e.g. ``:foo``) or a certain combination of both. A replacement marker
+does not need to be preceded by a ``/`` character.
 
-A segment replacement marker is in the format ``:name``, where this
-means "accept any characters up to the next nonalphaunumeric character
+A replacement marker is in the format ``:name``, where this
+means "accept any characters up to the next non-alphanumeric character
 and use this as the ``name`` matchdict value."  For example, the
 following pattern defines one literal segment ("foo") and two dynamic
-segments ("baz", and "bar"):
+replacement markers ("baz", and "bar"):
 
 .. code-block:: text
 
@@ -252,9 +252,21 @@ literal path ``/foo/biz`` will not match, because it does not contain
 a literal ``.html`` at the end of the segment represented by
 ``:name.html`` (it only contains ``biz``, not ``biz.html``).
 
-This does not mean, however, that you can use two segment replacement
-markers in the same segment.  For instance, ``/:foo:bar`` is a
-nonsensical route pattern.  It will never match anything.
+To capture both segments, two replacement markers can be used:
+
+.. code-block:: text
+    
+    foo/:name.:ext
+
+The literal path ``/foo/biz.html`` will match the above route pattern, and the
+match result will be ``{'name': 'biz', 'ext': 'html'}``. This occurs because
+the replacement marker ``:name`` has a literal part of ``.`` between the other
+replacement marker ``:ext``.
+
+It is possible to use two replacement markers without any literal characters
+between them, for instance ``/:foo:bar``. This would be a nonsensical pattern
+without specifying any ``pattern_regexes`` to restrict valid values of each
+replacement marker.
 
 Segments must contain at least one character in order to match a
 segment replacement marker.  For example, for the URL ``/abc/``:
@@ -471,6 +483,13 @@ represent neither predicates nor view configuration information.
      as ``path``.  ``path`` continues to work as an alias for
      ``pattern``.
 
+``marker_pattern``
+  A dict of regular expression replacements for replacement markers in the
+  pattern to use when generating the complete regular expression used to
+  match the route. By default, every replacement marker in the pattern is
+  replaced with the regular expression ``[^/]+``. Values in this dict will
+  be used instead if present.
+  
 ``xhr``
   This value should be either ``True`` or ``False``.  If this value is
   specified and is ``True``, the :term:`request` must possess an

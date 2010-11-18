@@ -17,10 +17,10 @@ _marker = object()
 class Route(object):
     implements(IRoute)
     def __init__(self, name, pattern, factory=None, predicates=(),
-                 pregenerator=None):
+                 pregenerator=None, marker_pattern=None):
         self.pattern = pattern
         self.path = pattern # indefinite b/w compat, not in interface
-        self.match, self.generate = _compile_route(pattern)
+        self.match, self.generate = _compile_route(pattern, marker_pattern)
         self.name = name
         self.factory = factory
         self.predicates = predicates
@@ -42,11 +42,12 @@ class RoutesMapper(object):
         return self.routes.get(name)
 
     def connect(self, name, pattern, factory=None, predicates=(),
-                pregenerator=None):
+                pregenerator=None, marker_pattern=None):
         if name in self.routes:
             oldroute = self.routes[name]
             self.routelist.remove(oldroute)
-        route = Route(name, pattern, factory, predicates, pregenerator)
+        route = Route(name, pattern, factory, predicates, pregenerator,
+                      marker_pattern)
         self.routelist.append(route)
         self.routes[name] = route
         return route
@@ -74,8 +75,9 @@ class RoutesMapper(object):
         return {'route':None, 'match':None}
 
 # stolen from bobo and modified
-route_re = re.compile(r'(/:[a-zA-Z]\w*)')
-def _compile_route(route):
+route_re = re.compile(r'(:[a-zA-Z]\w*)')
+def _compile_route(route, marker_pattern=None):
+    marker_pattern = marker_pattern or {}
     if not route.startswith('/'):
         route = '/' + route
     star = None
@@ -91,9 +93,9 @@ def _compile_route(route):
         gen.append(prefix)
     while pat:
         name = pat.pop()
-        name = name[2:]
-        gen.append('/%%(%s)s' % name)
-        name = '/(?P<%s>[^/]+)' % name
+        name = name[1:]
+        gen.append('%%(%s)s' % name)
+        name = '(?P<%s>%s)' % (name, marker_pattern.get(name, '[^/]+'))
         rpat.append(name)
         s = pat.pop()
         if s:

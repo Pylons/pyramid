@@ -4,6 +4,11 @@ Next release
 Features
 --------
 
+- URL Dispatch now allows for replacement markers to be located anywhere
+  in the pattern, instead of immediately following a ``/``.
+- Added ``marker_pattern`` option to ``add_route`` to supply a dict of
+  regular expressions to be used for markers in the pattern instead of the
+  default regular expression that matched everything except a ``/``.
 - Add a ``pyramid.url.route_path`` API, allowing folks to generate relative
   URLs.  Calling ``route_path`` is the same as calling
   ``pyramid.url.route_url`` with the argument ``_app_url`` equal to the empty
