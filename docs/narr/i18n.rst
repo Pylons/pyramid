@@ -773,8 +773,8 @@ If this setting is supplied within the :app:`Pyramid` application
 .. code-block:: python
    :linenos:
 
-   from pyramid.setttings import get_settings
-   settings = get_settings()
+   from pyramid.threadlocal import get_current_registry
+   settings = get_current_registry().settings
    default_locale_name = settings['default_locale_name']
 
 "Detecting" Available Languages
@@ -822,8 +822,9 @@ Then as a part of the code of a custom :term:`locale negotiator`:
 
 .. code-block:: py
 
-  from pyramid.settings import get_settings
-  languages = get_settings()['available_languages'].split()
+   from pyramid.threadlocal import get_current_registry
+   settings = get_current_registry().settings
+   languages = settings['available_languages'].split()
 
 This is only a suggestion.  You can create your own "available
 languages" configuration scheme as necessary.

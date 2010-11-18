@@ -13,6 +13,9 @@
 
 import sys, os
 import datetime
+import warnings
+
+warnings.simplefilter('ignore', DeprecationWarning)
 
 # skip raw nodes
 from sphinx.writers.text import TextTranslator
@@ -73,7 +76,7 @@ copyright = '%s, Agendaless Consulting' % datetime.datetime.now().year
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '1.0a2'
+version = '1.0a3'
 # The full version, including alpha/beta/rc tags.
 release = version
 

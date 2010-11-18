@@ -209,6 +209,27 @@ class TestRouteUrl(unittest.TestCase):
         self.assertEqual(result,  'http://example2.com/1/2/3/a')
         self.assertEqual(route.kw, {}) # shouldnt have anchor/query
 
+class TestRoutePath(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+        
+    def _callFUT(self, *arg, **kw):
+        from pyramid.url import route_path
+        return route_path(*arg, **kw)
+
+    def test_with_elements(self):
+        from pyramid.interfaces import IRoutesMapper
+        request = _makeRequest()
+        mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = self._callFUT('flub', request, 'extra1', 'extra2',
+                               a=1, b=2, c=3, _query={'a':1},
+                               _anchor=u"foo")
+        self.assertEqual(result, '/1/2/3/extra1/extra2?a=1#foo')
+
 class TestStaticUrl(unittest.TestCase):
     def setUp(self):
         cleanUp()

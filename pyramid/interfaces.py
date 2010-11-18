@@ -166,7 +166,7 @@ class IRequestFactory(Interface):
 
     def blank(path):
         """ Return an empty request object (see
-        :meth:`pyramid.request.Request.blank``)"""
+        :meth:`pyramid.request.Request.blank`)"""
 
 class IViewClassifier(Interface):
     """ *Internal only* marker interface for views."""

@@ -1,5 +1,5 @@
 from pyramid.configuration import Configurator
-from pramid.settings import asbool
+from pyramid.settings import asbool
 
 from {{package}}.models import appmaker
 

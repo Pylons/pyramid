@@ -358,7 +358,7 @@ Using the ``traverse`` Argument In a Route Definition
 
 Rather than using the ``*traverse`` remainder marker in a pattern, you
 can use the ``traverse`` argument to the
-:meth:`pyramid.configuration.Configurator.add_route`` method.
+:meth:`pyramid.configuration.Configurator.add_route` method.
 
 When you use the ``*traverse`` remainder marker, the traversal path is
 limited to being the remainder segments of a request URL when a route

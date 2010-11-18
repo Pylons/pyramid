@@ -803,6 +803,8 @@ class TestZCMLConfigure(unittest.TestCase):
         return zcml_configure(path, package)
     
     def setUp(self):
+        from zope.deprecation import __show__
+        __show__.off()
         testing.setUp()
         self.tempdir = None
         import sys
@@ -822,6 +824,8 @@ class TestZCMLConfigure(unittest.TestCase):
         self.tempdir = tempdir
 
     def tearDown(self):
+        from zope.deprecation import __show__
+        __show__.on()
         testing.tearDown()
         import sys
         import shutil

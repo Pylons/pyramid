@@ -72,13 +72,13 @@ system.
 #. Edit ``config.py``
 
    Edit the ``APP_NAME`` and ``APP_ARGS`` settings within
-   ``config.py``.  The ``APP_NAME`` must be ``pyramidapp:app``, and
+   ``config.py``.  The ``APP_NAME`` must be ``pyramidapp:main``, and
    the APP_ARGS must be ``({},)``.  Any other settings in
    ``config.py`` should remain the same.
 
    .. code-block:: python
 
-      APP_NAME = 'pyramidapp:app'
+      APP_NAME = 'pyramidapp:main'
       APP_ARGS = ({},)
 
 #. Edit ``runner.py``

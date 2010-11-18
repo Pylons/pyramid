@@ -1,13 +1,18 @@
 import unittest
 
 from pyramid.testing import cleanUp
+from pyramid.testing import skip_on
 
 class Base(object):
     def setUp(self):
         cleanUp()
+        from zope.deprecation import __show__
+        __show__.off()
 
     def tearDown(self):
         cleanUp()
+        from zope.deprecation import __show__
+        __show__.on()
 
     def _getTemplatePath(self, name):
         import os
@@ -51,6 +56,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         from pyramid.interfaces import ITemplateRenderer
         verifyClass(ITemplateRenderer, self._getTargetClass())
 
+    @skip_on('java')
     def test_call(self):
         minimal = self._getTemplatePath('minimal.pt')
         lookup = DummyLookup()
@@ -60,6 +66,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         self.assertEqual(result,
                      '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
 
+    @skip_on('java')
     def test_template_reified(self):
         minimal = self._getTemplatePath('minimal.pt')
         lookup = DummyLookup()
@@ -68,6 +75,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template, instance.__dict__['template'])
 
+    @skip_on('java')
     def test_template_with_ichameleon_translate(self):
         minimal = self._getTemplatePath('minimal.pt')
         lookup = DummyLookup()
@@ -76,6 +84,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template.translate, lookup.translate)
 
+    @skip_on('java')
     def test_template_with_debug_templates(self):
         minimal = self._getTemplatePath('minimal.pt')
         lookup = DummyLookup()
@@ -85,6 +94,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template.debug, True)
 
+    @skip_on('java')
     def test_template_without_debug_templates(self):
         minimal = self._getTemplatePath('minimal.pt')
         lookup = DummyLookup()
@@ -94,6 +104,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template.debug, False)
 
+    @skip_on('java')
     def test_template_with_reload_templates(self):
         minimal = self._getTemplatePath('minimal.pt')
         lookup = DummyLookup()
@@ -103,6 +114,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template.auto_reload, True)
 
+    @skip_on('java')
     def test_template_without_reload_templates(self):
         minimal = self._getTemplatePath('minimal.pt')
         lookup = DummyLookup()
@@ -112,12 +124,14 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template.auto_reload, False)
 
+    @skip_on('java')
     def test_call_with_nondict_value(self):
         minimal = self._getTemplatePath('minimal.pt')
         lookup = DummyLookup()
         instance = self._makeOne(minimal, lookup)
         self.assertRaises(ValueError, instance, None, {})
 
+    @skip_on('java')
     def test_implementation(self):
         minimal = self._getTemplatePath('minimal.pt')
         lookup = DummyLookup()
@@ -133,6 +147,7 @@ class RenderTemplateTests(Base, unittest.TestCase):
         from pyramid.chameleon_zpt import render_template
         return render_template(name, **kw)
 
+    @skip_on('java')
     def test_it(self):
         minimal = self._getTemplatePath('minimal.pt')
         result = self._callFUT(minimal)
@@ -141,16 +156,11 @@ class RenderTemplateTests(Base, unittest.TestCase):
                      '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
 
 class RenderTemplateToResponseTests(Base, unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-        
     def _callFUT(self, name, **kw):
         from pyramid.chameleon_zpt import render_template_to_response
         return render_template_to_response(name, **kw)
 
+    @skip_on('java')
     def test_it(self):
         minimal = self._getTemplatePath('minimal.pt')
         result = self._callFUT(minimal)
@@ -161,6 +171,7 @@ class RenderTemplateToResponseTests(Base, unittest.TestCase):
         self.assertEqual(result.status, '200 OK')
         self.assertEqual(len(result.headerlist), 2)
 
+    @skip_on('java')
     def test_iresponsefactory_override(self):
         from webob import Response
         class Response2(Response):
@@ -176,6 +187,7 @@ class GetRendererTests(Base, unittest.TestCase):
         from pyramid.chameleon_zpt import get_renderer
         return get_renderer(name)
 
+    @skip_on('java')
     def test_it(self):
         from pyramid.interfaces import IRendererFactory
         class Dummy:
@@ -193,6 +205,7 @@ class GetTemplateTests(Base, unittest.TestCase):
         from pyramid.chameleon_zpt import get_template
         return get_template(name)
 
+    @skip_on('java')
     def test_it(self):
         from pyramid.interfaces import IRendererFactory
         class Dummy:

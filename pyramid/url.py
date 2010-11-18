@@ -18,6 +18,9 @@ def route_url(route_name, request, *elements, **kw):
     """Generates a fully qualified URL for a named :app:`Pyramid`
     :term:`route configuration`.
 
+    .. note:: Calling :meth:`pyramid.Request.route_url` can be used to
+              achieve the same result as :func:`pyramid.url.route_url`.
+
     Use the route's ``name`` as the first positional argument.  Use a
     request object as the second positional argument.  Additional
     positional arguments are appended to the URL as path segments
@@ -102,6 +105,7 @@ def route_url(route_name, request, *elements, **kw):
     If the route object which matches the ``route_name`` argument has
     a :term:`pregenerator`, the ``*elements`` and ``**kw`` arguments
     arguments passed to this function might be augmented or changed.
+
     """
     try:
         reg = request.registry
@@ -149,6 +153,34 @@ def route_url(route_name, request, *elements, **kw):
 
     return app_url + path + suffix + qs + anchor
 
+def route_path(route_name, request, *elements, **kw):
+    """Generates a path (aka a 'relative URL', a URL minus the host, scheme,
+    and port) for a named :app:`Pyramid` :term:`route configuration`.
+
+    .. note:: Calling :meth:`pyramid.Request.route_path` can be used to
+              achieve the same result as :func:`pyramid.url.route_path`.
+
+    This function accepts the same argument as :func:`pyramid.url.route_url`
+    and performs the same duty.  It just omits the host, port, and scheme
+    information in the return value; only the path, query parameters,
+    and anchor data are present in the returned string.
+
+    For example, if you've defined a route named 'foobar' with the path
+    ``/:foo/:bar``, this call to ``route_path``::
+
+        route_path('foobar', request, foo='1', bar='2')
+
+    Will return the string ``/1/2``.
+
+    .. note:: Calling ``route_path('route', request)`` is the same as calling
+       ``route_url('route', request, _app_url='')``.  ``route_path`` is, in
+       fact, implemented in terms of ``route_url`` in just this way. As a
+       result, any ``_app_url`` pass within the ``**kw`` values to
+       ``route_path`` will be ignored.
+    """
+    kw['_app_url'] = ''
+    return route_url(route_name, request, *elements, **kw)
+
 def model_url(model, request, *elements, **kw):
     """
     Generate a string representing the absolute URL of the ``model``
@@ -156,6 +188,9 @@ def model_url(model, request, *elements, **kw):
     ``SERVER_NAME`` in the ``request``, plus any ``SCRIPT_NAME``.  The
     overall result of this function is always a UTF-8 encoded string
     (never Unicode).
+
+    .. note:: Calling :meth:`pyramid.Request.model_url` can be used to
+              achieve the same result as :func:`pyramid.url.model_url`.
 
     Examples::
 
@@ -269,6 +304,9 @@ def static_url(path, request, **kw):
     :meth:`pyramid.configuration.Configurator.add_static_view`
     :term:`configuration declaration` or the ``<static>`` ZCML
     directive (see :ref:`static_resources_section`).
+
+    .. note:: Calling :meth:`pyramid.Request.static_url` can be used to
+              achieve the same result as :func:`pyramid.url.static_url`.
 
     Example::
 

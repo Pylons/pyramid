@@ -1,4 +1,5 @@
 import copy
+import os
 
 from zope.configuration.xmlconfig import _clearContext
 
@@ -20,9 +21,6 @@ from pyramid.security import Everyone
 from pyramid.security import has_permission
 from pyramid.threadlocal import get_current_registry
 from pyramid.threadlocal import manager
-from pyramid.zcml import zcml_configure # API
-
-zcml_configure # prevent pyflakes from complaining
 
 _marker = object()
 
@@ -121,7 +119,7 @@ def registerTemplateRenderer(path, renderer=None):
 
     .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
-       :meth:`pyramid.configuration.Configurator.testing_add_template``
+       :meth:`pyramid.configuration.Configurator.testing_add_template`
        method in your unit and integration tests.
 
     """
@@ -153,7 +151,7 @@ def registerView(name, result='', view=None, for_=(Interface, Interface),
 
     .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
-       :meth:`pyramid.configuration.Configurator.add_view``
+       :meth:`pyramid.configuration.Configurator.add_view`
        method in your unit and integration tests.
     """
     for_ = (IViewClassifier, ) + for_
@@ -277,7 +275,7 @@ def registerRoute(pattern, name, factory=None):
 def registerSettings(dictarg=None, **kw):
     """Register one or more 'setting' key/value pairs.  A setting is
     a single key/value pair in the dictionary-ish object returned from
-    the API :func:`pyramid.settings.get_settings`.
+    the API :attr:`pyramid.registry.Registry.settings`.
 
     You may pass a dictionary::
 
@@ -287,9 +285,9 @@ def registerSettings(dictarg=None, **kw):
     
        registerSettings(external_uri='http://example.com')
 
-    Use of this function is required when you need to test code that
-    calls the :func:`pyramid.settings.get_settings` API and which
-    uses return values from that API.
+    Use of this function is required when you need to test code that calls
+    the :attr:`pyramid.registry.Registry.settings` API and which uses return
+    values from that API.
 
     .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
@@ -736,3 +734,16 @@ class MockTemplate(object):
     def __call__(self, *arg, **kw):
         self._received.update(kw)
         return self.response
+
+def skip_on(*platforms):
+    def decorator(func):
+        def wrapper(*args, **kw):
+            for platform in platforms:
+                if skip_on.os_name.startswith(platform):
+                    return
+            return func(*args, **kw)
+        wrapper.__name__ = func.__name__
+        wrapper.__doc__ = func.__doc__
+        return wrapper
+    return decorator
+skip_on.os_name = os.name # for testing

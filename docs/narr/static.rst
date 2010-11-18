@@ -69,22 +69,21 @@ when generating a URL using :func:`pyramid.url.static_url`.
 .. note::
 
    Using :func:`pyramid.url.static_url` in conjunction with a
-   :meth:`pyramid.configuration.Configurator.add_static_view` makes
-   it possible to put static media on a separate webserver during
-   production (if the ``name`` argument to
-   :meth:`pyramid.configuration.Configurator.add_static_view` is a
-   URL), while keeping static media package-internal and served by the
-   development webserver during development (if the ``name`` argument
-   to :meth:`pyramid.configuration.Configurator.add_static_view` is
-   a view name).  To create such a circumstance, we suggest using the
-   :func:`pyramid.settings.get_settings` API in conjunction with a
-   setting in the application ``.ini`` file named ``media_location``.
-   Then set the value of ``media_location`` to either a view name or a
-   URL depending on whether the application is being run in
-   development or in production (use a different `.ini`` file for
-   production than you do for development).  This is just a suggestion
-   for a pattern; any setting name other than ``media_location`` could
-   be used.
+   :meth:`pyramid.configuration.Configurator.add_static_view` makes it
+   possible to put static media on a separate webserver during production (if
+   the ``name`` argument to
+   :meth:`pyramid.configuration.Configurator.add_static_view` is a URL),
+   while keeping static media package-internal and served by the development
+   webserver during development (if the ``name`` argument to
+   :meth:`pyramid.configuration.Configurator.add_static_view` is a view
+   name).  To create such a circumstance, we suggest using the
+   :attr:`pyramid.registry.Registry.settings` API in conjunction with a
+   setting in the application ``.ini`` file named ``media_location``.  Then
+   set the value of ``media_location`` to either a view name or a URL
+   depending on whether the application is being run in development or in
+   production (use a different `.ini`` file for production than you do for
+   development).  This is just a suggestion for a pattern; any setting name
+   other than ``media_location`` could be used.
 
 For example, :meth:`pyramid.configuration.Configurator.add_static_view` may
 be fed a ``name`` argument which is ``http://example.com/images``:
