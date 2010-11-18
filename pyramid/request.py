@@ -259,9 +259,6 @@ class Request(WebobRequest):
         scheme, and port) for a named :app:`Pyramid`
         :term:`route configuration`.
         
-        .. note:: Calling :meth:`pyramid.Request.route_path` can be used to
-                  achieve the same result as :func:`pyramid.url.route_path`.
-
         This is a convenience method.  The result of calling
         :meth:`pyramid.request.Request.route_path` is the same as calling
         :func:`pyramid.url.route_path` with an explicit ``request``
