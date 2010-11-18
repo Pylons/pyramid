@@ -145,6 +145,17 @@ project we name ``MyProject``:
    name during ``paster create`` by adding the project name to the
    command line, e.g. ``paster create -t pyramid_starter MyProject``.
 
+.. note:: You may encounter an error when using ``paster create``
+   if a dependent Python package is not installed. This will
+   result in a traceback ending in: 
+
+   .. code-block:: text
+
+	   pkg_resources.DistributionNotFound: <package name>
+
+   Simply run ``bin/easy_install``, with the missing package
+   name from the error message, to workaround this issue.
+
 As a result of invoking the ``paster create`` command, a project is
 created in a directory named ``MyProject``.  That directory is a
 :term:`setuptools` :term:`project` directory from which a setuptools
