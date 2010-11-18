@@ -13,6 +13,9 @@
 
 import sys, os
 import datetime
+import warnings
+
+warnings.simplefilter('ignore', DeprecationWarning)
 
 # skip raw nodes
 from sphinx.writers.text import TextTranslator
