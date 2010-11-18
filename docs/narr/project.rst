@@ -763,7 +763,7 @@ also informs Python that the directory which contains it is a *package*.
    :term:`context` of the request is an instance of the
    :class:`myproject.models.MyModel` class.  The first argument to
    ``add_view`` points at a Python function that does all the work for this
-   view, also known as a :term:`view callable` via a :term:`dotted Python
+   view, also known as a :term:`view callable`, via a :term:`dotted Python
    name`.  The view declaration also names a ``renderer``, which in this case
    is a template that will be used to render the result of the view callable.
    This particular view declaration points at
