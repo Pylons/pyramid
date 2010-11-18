@@ -1,5 +1,5 @@
-:mod:`repoze.bfg` TODOs
-=======================
+Pyramid TODOs
+=============
 
 Must-Have (before 1.0)
 ----------------------
