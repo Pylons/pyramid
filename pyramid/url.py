@@ -175,10 +175,11 @@ def route_path(route_name, request, *elements, **kw):
     .. note:: Calling ``route_path('route', request)`` is the same as calling
        ``route_url('route', request, _app_url='')``.  ``route_path`` is, in
        fact, implemented in terms of ``route_url`` in just this way. As a
-       result, passing ``_app_url`` within the ``**kw`` values passed to
-       ``route_path`` will result in an exception.
+       result, any ``_app_url`` pass within the ``**kw`` values to
+       ``route_path`` will be ignored.
     """
-    return route_url(route_name, request, *elements, _app_url='', **kw)
+    kw['_app_url'] = ''
+    return route_url(route_name, request, *elements, **kw)
 
 def model_url(model, request, *elements, **kw):
     """
