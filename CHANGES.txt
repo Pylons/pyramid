@@ -12,6 +12,9 @@ Features
 - Add a ``pyramid.request.Request.route_path`` API.  This is a convenience
   method of the request which calls ``pyramid.url.route_url``.
 
+- Make test suite pass on Jython (requires PasteScript trunk, presumably to
+  be 1.7.4).
+
 Bug Fixes
 ---------
 

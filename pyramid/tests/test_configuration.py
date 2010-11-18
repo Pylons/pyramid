@@ -2940,6 +2940,7 @@ class ConfiguratorTests(unittest.TestCase):
                          pyramid.tests)
 
     def test_scan_integration(self):
+        import os
         from zope.interface import alsoProvides
         from pyramid.interfaces import IRequest
         from pyramid.view import render_view_to_response
@@ -3011,8 +3012,12 @@ class ConfiguratorTests(unittest.TestCase):
         result = render_view_to_response(ctx, req, 'another_stacked_class2')
         self.assertEqual(result, 'another_stacked_class')
 
-        self.assertRaises(TypeError,
-                          render_view_to_response, ctx, req, 'basemethod')
+        if not os.name.startswith('java'):
+            # on Jython, a class without an __init__ apparently accepts
+            # any number of arguments without raising a TypeError.
+
+            self.assertRaises(TypeError,
+                              render_view_to_response, ctx, req, 'basemethod')
 
         result = render_view_to_response(ctx, req, 'method1')
         self.assertEqual(result, 'method1')
