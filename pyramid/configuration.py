@@ -24,6 +24,8 @@ from pyramid.interfaces import IChameleonTranslate
 from pyramid.interfaces import IDebugLogger
 from pyramid.interfaces import IDefaultPermission
 from pyramid.interfaces import IDefaultRootFactory
+from pyramid.interfaces import IException
+from pyramid.interfaces import IExceptionResponse
 from pyramid.interfaces import IExceptionViewClassifier
 from pyramid.interfaces import ILocaleNegotiator
 from pyramid.interfaces import IMultiView
@@ -36,34 +38,32 @@ from pyramid.interfaces import IRootFactory
 from pyramid.interfaces import IRouteRequest
 from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import ISecuredView
+from pyramid.interfaces import ISessionFactory
 from pyramid.interfaces import IStaticURLInfo
 from pyramid.interfaces import ITranslationDirectories
 from pyramid.interfaces import ITraverser
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
-from pyramid.interfaces import IExceptionResponse
-from pyramid.interfaces import IException
-from pyramid.interfaces import ISessionFactory
 
 from pyramid import chameleon_text
 from pyramid import chameleon_zpt
-from pyramid.mako_templating import renderer_factory as mako_renderer_factory
 from pyramid import renderers
-from pyramid.renderers import RendererHelper
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.compat import all
 from pyramid.compat import md5
 from pyramid.events import ApplicationCreated
+from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import Forbidden
 from pyramid.exceptions import NotFound
 from pyramid.exceptions import PredicateMismatch
-from pyramid.exceptions import ConfigurationError
 from pyramid.i18n import get_localizer
 from pyramid.log import make_stream_logger
+from pyramid.mako_templating import renderer_factory as mako_renderer_factory
 from pyramid.path import caller_package
-from pyramid.path import package_path
 from pyramid.path import package_of
+from pyramid.path import package_path
 from pyramid.registry import Registry
+from pyramid.renderers import RendererHelper
 from pyramid.request import route_request_iface
 from pyramid.resource import PackageOverrides
 from pyramid.resource import resolve_resource_spec
@@ -72,12 +72,12 @@ from pyramid.static import StaticURLInfo
 from pyramid.threadlocal import get_current_registry
 from pyramid.threadlocal import get_current_request
 from pyramid.threadlocal import manager
-from pyramid.traversal import traversal_path
 from pyramid.traversal import DefaultRootFactory
 from pyramid.traversal import find_interface
+from pyramid.traversal import traversal_path
 from pyramid.urldispatch import RoutesMapper
-from pyramid.view import render_view_to_response
 from pyramid.view import default_exceptionresponse_view
+from pyramid.view import render_view_to_response
 
 MAX_ORDER = 1 << 30
 DEFAULT_PHASH = md5().hexdigest()

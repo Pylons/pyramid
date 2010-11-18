@@ -47,7 +47,7 @@ install_requires=[
 if platform.system() == 'Java':
     tests_require = install_requires + ['WebTest']
 else:
-    tests_require= install_requires + ['Sphinx', 'docutils', 'coverage',
+    tests_require= install_requires + ['Sphinx', 'docutils', 
                                        'WebTest', 'repoze.sphinx.autointerface']
 
 if sys.version_info[:2] < (2, 6):
