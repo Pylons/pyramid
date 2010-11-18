@@ -4,11 +4,6 @@ Pyramid TODOs
 Must-Have (before 1.0)
 ----------------------
 
-- Test on GAE, Jython, PyPy, IronPython.
-
-- Add docs for httpexceptions module for each webob.exc class that inherits
-  from WSGIHTTPException.
-
 - Add a ``handler`` ZCML directive.  This implies some slightly dicey
   refactoring of the configurator to allow it to generate ZCML
   "discriminators" for views and routes.
@@ -59,6 +54,11 @@ Must-Have (before 1.0)
 
 Should-Have
 -----------
+
+- Try to make test suite pass on PyPy, IronPython.
+
+- Add docs for httpexceptions module for each webob.exc class that inherits
+  from WSGIHTTPException.
 
 - Create a ``docs`` directory for each paster template.
 
