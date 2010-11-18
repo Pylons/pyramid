@@ -522,6 +522,32 @@ class FindModelTests(unittest.TestCase):
         self.assertEqual(root.wascontext, True)
         self.assertEqual(root.request.environ['PATH_INFO'], '/')
 
+    def test_absolute_unicode_found(self):
+        # test for bug wiggy found in wild, traceback stack:
+        # root = u'/%E6%B5%81%E8%A1%8C%E8%B6%8B%E5%8A%BF'
+        # wiggy's code: section=find_model(page, root)
+        # find_model L76: D = traverse(model, path)
+        # traverse L291: return traverser(request)
+        # __call__ line 568: vpath_tuple = traversal_path(vpath)
+        # lru_cached line 91: f(*arg)
+        # traversal_path line 443: path.encode('ascii')
+        # UnicodeEncodeError: 'ascii' codec can't encode characters in
+        #     position 1-12: ordinal not in range(128)
+        #
+        # solution: encode string to ascii in pyramid.traversal.traverse
+        # before passing it along to webob as path_info
+        from pyramid.traversal import ModelGraphTraverser
+        unprintable = DummyContext()
+        root = DummyContext(unprintable)
+        unprintable.__parent__ = root
+        unprintable.__name__ = unicode(
+            '/\xe6\xb5\x81\xe8\xa1\x8c\xe8\xb6\x8b\xe5\x8a\xbf', 'utf-8')
+        root.__parent__ = None
+        root.__name__ = None
+        traverser = ModelGraphTraverser
+        self._registerTraverser(traverser)
+        result = self._callFUT(root, u'/%E6%B5%81%E8%A1%8C%E8%B6%8B%E5%8A%BF')
+        self.assertEqual(result, unprintable)
 
 class ModelPathTests(unittest.TestCase):
     def _callFUT(self, model, *elements):
