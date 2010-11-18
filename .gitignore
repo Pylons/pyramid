@@ -5,9 +5,10 @@
 *.pt.py
 *.txt.py
 .coverage
-env26
-env24
-env27
-jyenv
+env26/
+env24/
+env27/
+jyenv/
+pypyenv/
 build/
 dist/
