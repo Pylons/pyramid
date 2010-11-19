@@ -17,10 +17,10 @@ _marker = object()
 class Route(object):
     implements(IRoute)
     def __init__(self, name, pattern, factory=None, predicates=(),
-                 pregenerator=None, marker_pattern=None):
+                 pregenerator=None):
         self.pattern = pattern
         self.path = pattern # indefinite b/w compat, not in interface
-        self.match, self.generate = _compile_route(pattern, marker_pattern)
+        self.match, self.generate = _compile_route(pattern)
         self.name = name
         self.factory = factory
         self.predicates = predicates
@@ -42,12 +42,11 @@ class RoutesMapper(object):
         return self.routes.get(name)
 
     def connect(self, name, pattern, factory=None, predicates=(),
-                pregenerator=None, marker_pattern=None):
+                pregenerator=None):
         if name in self.routes:
             oldroute = self.routes[name]
             self.routelist.remove(oldroute)
-        route = Route(name, pattern, factory, predicates, pregenerator,
-                      marker_pattern)
+        route = Route(name, pattern, factory, predicates, pregenerator)
         self.routelist.append(route)
         self.routes[name] = route
         return route
@@ -75,9 +74,16 @@ class RoutesMapper(object):
         return {'route':None, 'match':None}
 
 # stolen from bobo and modified
-route_re = re.compile(r'(:[a-zA-Z]\w*)')
-def _compile_route(route, marker_pattern=None):
-    marker_pattern = marker_pattern or {}
+old_route_re = re.compile(r'(\:[a-zA-Z]\w*)')
+route_re = re.compile(r'(\{[a-zA-Z][^\}]*\})')
+def update_pattern(matchobj):
+    name = matchobj.group(0)
+    return '{%s}' % name[1:]
+
+def _compile_route(route):
+    if old_route_re.search(route) and not route_re.search(route):
+        route = old_route_re.sub(update_pattern, route)
+
     if not route.startswith('/'):
         route = '/' + route
     star = None
@@ -93,9 +99,13 @@ def _compile_route(route, marker_pattern=None):
         gen.append(prefix)
     while pat:
         name = pat.pop()
-        name = name[1:]
+        name = name[1:-1]
+        if ':' in name:
+            name, reg = name.split(':')
+        else:
+            reg = '[^/]+'
         gen.append('%%(%s)s' % name)
-        name = '(?P<%s>%s)' % (name, marker_pattern.get(name, '[^/]+'))
+        name = '(?P<%s>%s)' % (name, reg)
         rpat.append(name)
         s = pat.pop()
         if s:
