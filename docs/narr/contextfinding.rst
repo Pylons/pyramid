@@ -57,9 +57,9 @@ follow describe :term:`context finding`: :ref:`traversal_chapter`,
 :ref:`urldispatch_chapter` and :ref:`hybrid_chapter`.
 
 There is only one :term:`view lookup` subsystem present in
-:app:`Pyramid`.  Where appropriate, within this chapter, we
-describe how view lookup interacts with context finding.  One chapter
-which follows describes :term:`view lookup`: :ref:`views_chapter`.
+:app:`Pyramid`.  Where appropriate, we will describe how view lookup
+interacts with context finding.  One chapter which follows describes
+:term:`view lookup`: :ref:`views_chapter`.
 
 Should I Use Traversal or URL Dispatch for Context Finding?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
