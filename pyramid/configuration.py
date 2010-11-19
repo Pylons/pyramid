@@ -45,8 +45,15 @@ from pyramid.interfaces import ITraverser
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
 
-from pyramid import chameleon_text
-from pyramid import chameleon_zpt
+try:
+    from pyramid import chameleon_text
+except TypeError:  # pragma: no cover
+    chameleon_text = None # pypy
+try: 
+    from pyramid import chameleon_zpt
+except TypeError: # pragma: no cover
+    chameleon_zpt = None # pypy
+
 from pyramid import renderers
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.compat import all
@@ -83,13 +90,17 @@ MAX_ORDER = 1 << 30
 DEFAULT_PHASH = md5().hexdigest()
 
 DEFAULT_RENDERERS = (
-    ('.pt', chameleon_zpt.renderer_factory),
-    ('.txt', chameleon_text.renderer_factory),
     ('.mak', mako_renderer_factory),
     ('.mako', mako_renderer_factory),
     ('json', renderers.json_renderer_factory),
     ('string', renderers.string_renderer_factory),
     )
+
+if chameleon_text:
+    DEFAULT_RENDERERS += (('.pt', chameleon_zpt.renderer_factory),)
+if chameleon_zpt:
+    DEFAULT_RENDERERS += (('.txt', chameleon_text.renderer_factory),)
+
 
 class Configurator(object):
     """

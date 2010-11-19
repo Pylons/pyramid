@@ -51,6 +51,7 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         klass = self._getTargetClass()
         return klass(*arg, **kw)
 
+    @skip_on('pypy')
     def test_instance_implements_ITemplate(self):
         from zope.interface.verify import verifyObject
         from pyramid.interfaces import ITemplateRenderer
@@ -58,12 +59,13 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         verifyObject(ITemplateRenderer, self._makeOne(path, lookup))
 
+    @skip_on('pypy')
     def test_class_implements_ITemplate(self):
         from zope.interface.verify import verifyClass
         from pyramid.interfaces import ITemplateRenderer
         verifyClass(ITemplateRenderer, self._getTargetClass())
 
-    @skip_on('java')
+    @skip_on('java', 'pypy')
     def test_template_reified(self):
         minimal = self._getTemplatePath('minimal.txt')
         lookup = DummyLookup()
@@ -72,7 +74,7 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template, instance.__dict__['template'])
 
-    @skip_on('java')
+    @skip_on('java', 'pypy')
     def test_template_with_ichameleon_translate(self):
         minimal = self._getTemplatePath('minimal.txt')
         lookup = DummyLookup()
@@ -81,7 +83,7 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template.translate, lookup.translate)
 
-    @skip_on('java')
+    @skip_on('java', 'pypy')
     def test_template_with_debug_templates(self):
         minimal = self._getTemplatePath('minimal.txt')
         lookup = DummyLookup()
@@ -91,7 +93,7 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template.debug, True)
 
-    @skip_on('java')
+    @skip_on('java', 'pypy')
     def test_template_with_reload_templates(self):
         minimal = self._getTemplatePath('minimal.txt')
         lookup = DummyLookup()
@@ -101,7 +103,7 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template.auto_reload, True)
 
-    @skip_on('java')
+    @skip_on('java', 'pypy')
     def test_template_without_reload_templates(self):
         minimal = self._getTemplatePath('minimal.txt')
         lookup = DummyLookup()
@@ -111,7 +113,7 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template.auto_reload, False)
 
-    @skip_on('java')
+    @skip_on('java', 'pypy')
     def test_call(self):
         minimal = self._getTemplatePath('minimal.txt')
         lookup = DummyLookup()
@@ -120,14 +122,14 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         self.failUnless(isinstance(result, str))
         self.assertEqual(result, 'Hello.\n')
 
-    @skip_on('java')
+    @skip_on('java', 'pypy')
     def test_call_with_nondict_value(self):
         minimal = self._getTemplatePath('minimal.txt')
         lookup = DummyLookup()
         instance = self._makeOne(minimal, lookup)
         self.assertRaises(ValueError, instance, None, {})
 
-    @skip_on('java')
+    @skip_on('java', 'pypy')
     def test_call_nonminimal(self):
         nonminimal = self._getTemplatePath('nonminimal.txt')
         lookup = DummyLookup()
@@ -136,7 +138,7 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         self.failUnless(isinstance(result, str))
         self.assertEqual(result, 'Hello, Chris!\n')
 
-    @skip_on('java')
+    @skip_on('java', 'pypy')
     def test_implementation(self):
         minimal = self._getTemplatePath('minimal.txt')
         lookup = DummyLookup()
@@ -150,7 +152,7 @@ class RenderTemplateTests(Base, unittest.TestCase):
         from pyramid.chameleon_text import render_template
         return render_template(name, **kw)
 
-    @skip_on('java')
+    @skip_on('java', 'pypy')
     def test_it(self):
         minimal = self._getTemplatePath('minimal.txt')
         result = self._callFUT(minimal)
@@ -162,7 +164,7 @@ class RenderTemplateToResponseTests(Base, unittest.TestCase):
         from pyramid.chameleon_text import render_template_to_response
         return render_template_to_response(name, **kw)
 
-    @skip_on('java')
+    @skip_on('java', 'pypy')
     def test_minimal(self):
         minimal = self._getTemplatePath('minimal.txt')
         result = self._callFUT(minimal)
@@ -172,7 +174,7 @@ class RenderTemplateToResponseTests(Base, unittest.TestCase):
         self.assertEqual(result.status, '200 OK')
         self.assertEqual(len(result.headerlist), 2)
 
-    @skip_on('java')
+    @skip_on('java', 'pypy')
     def test_iresponsefactory_override(self):
         from webob import Response
         class Response2(Response):
@@ -188,7 +190,7 @@ class GetRendererTests(Base, unittest.TestCase):
         from pyramid.chameleon_text import get_renderer
         return get_renderer(name)
 
-    @skip_on('java')
+    @skip_on('java', 'pypy')
     def test_it(self):
         from pyramid.interfaces import IRendererFactory
         class Dummy:
@@ -206,7 +208,7 @@ class GetTemplateTests(Base, unittest.TestCase):
         from pyramid.chameleon_text import get_template
         return get_template(name)
 
-    @skip_on('java')
+    @skip_on('java', 'pypy')
     def test_it(self):
         from pyramid.interfaces import IRendererFactory
         class Dummy:
