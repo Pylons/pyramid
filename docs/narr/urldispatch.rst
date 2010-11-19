@@ -95,7 +95,6 @@ registry`.  Here's an example:
    config.add_route('myroute', '/prefix/{one}/{two}', view=myview)
 
 .. versionchanged:: 1.0a4
-    
     Prior to 1.0a4, routes allow for a marker starting with a ``:``, for
     example::
         
