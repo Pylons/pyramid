@@ -360,7 +360,7 @@ and a :term:`view name`.
     of path segments that come from ``PATH_INFO`` that are "left over"
     after traversal has completed.
 
-Once :term:`context` and :term:`view name` and associated attributes
+Once :term:`context`, :term:`view name`, and associated attributes
 such as the :term:`subpath` are located, the job of :term:`traversal`
 is finished.  It passes back the information it obtained to its
 caller, the :app:`Pyramid` :term:`Router`, which subsequently
