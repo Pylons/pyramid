@@ -270,8 +270,8 @@ replacement marker ``:ext``.
 
 It is possible to use two replacement markers without any literal characters
 between them, for instance ``/{foo}{bar}``. This would be a nonsensical pattern
-without specifying any ``pattern_regexes`` to restrict valid values of each
-replacement marker.
+without specifying a custom regular expression to restrict what a marker
+captures.
 
 Segments must contain at least one character in order to match a
 segment replacement marker.  For example, for the URL ``/abc/``:
