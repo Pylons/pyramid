@@ -51,10 +51,9 @@ requesting user.
    that do not provide a notion of a context.
 
 There are two separate :term:`context finding` subsystems in
-:app:`Pyramid`: :term:`traversal` and :term:`URL dispatch`.  The
-subsystems are documented within this chapter.  They can be used
-separately or they can be combined.  Three chapters which follow
-describe :term:`context finding`: :ref:`traversal_chapter`,
+:app:`Pyramid`: :term:`traversal` and :term:`URL dispatch`. They can
+be used separately or they can be combined.  Three chapters which
+follow describe :term:`context finding`: :ref:`traversal_chapter`,
 :ref:`urldispatch_chapter` and :ref:`hybrid_chapter`.
 
 There is only one :term:`view lookup` subsystem present in
