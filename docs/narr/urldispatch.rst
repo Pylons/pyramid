@@ -96,12 +96,8 @@ registry`.  Here's an example:
 
 .. versionchanged:: 1.0a4
     Prior to 1.0a4, routes allow for a marker starting with a ``:``, for
-    example::
-        
-        config.add_route('myroute', '/prefix/:one/:two', view=myview)
-    
-    Starting in 1.0a4, this style is deprecated in favor or ``{}`` usage
-    which allows for additional functionality.
+    example ``/prefix/{one}``. Starting in 1.0a4, this style is deprecated
+    in favor or ``{}`` usage which allows for additional functionality.
 
 .. index::
    single: route configuration; view callable
@@ -280,9 +276,9 @@ replacement marker.
 Segments must contain at least one character in order to match a
 segment replacement marker.  For example, for the URL ``/abc/``:
 
-- ``/abc/:foo`` will not match.
+- ``/abc/{foo}`` will not match.
 
-- ``/:foo/`` will match.
+- ``/{foo}/`` will match.
 
 Note that values representing path segments matched with a
 ``:segment`` match will be url-unquoted and decoded from UTF-8 into
@@ -1246,7 +1242,7 @@ Such a ``factory`` might look like so:
           if article == '1':
               self.__acl__ = [ (Allow, 'editor', 'view') ]
 
-If the route ``archives/:article`` is matched, and the article number
+If the route ``archives/{article}`` is matched, and the article number
 is ``1``, :app:`Pyramid` will generate an ``Article``
 :term:`context` with an ACL on it that allows the ``editor`` principal
 the ``view`` permission.  Obviously you can do more generic things
