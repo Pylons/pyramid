@@ -2,6 +2,11 @@ import unittest
 
 from pyramid import testing
 
+try:
+    import __pypy__
+except:
+    __pypy__ = None
+
 class ConfiguratorTests(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.configuration import Configurator
@@ -90,8 +95,9 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(config.package, this_pkg)
         self.failUnless(config.registry.getUtility(IRendererFactory, 'json'))
         self.failUnless(config.registry.getUtility(IRendererFactory, 'string'))
-        self.failUnless(config.registry.getUtility(IRendererFactory, '.pt'))
-        self.failUnless(config.registry.getUtility(IRendererFactory, '.txt'))
+        if not __pypy__:
+            self.failUnless(config.registry.getUtility(IRendererFactory, '.pt'))
+            self.failUnless(config.registry.getUtility(IRendererFactory,'.txt'))
         self.failUnless(config.registry.getUtility(IRendererFactory, '.mak'))
         self.failUnless(config.registry.getUtility(IRendererFactory, '.mako'))
 

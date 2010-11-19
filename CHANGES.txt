@@ -24,6 +24,8 @@ Features
 - Make test suite pass on Jython (requires PasteScript trunk, presumably to
   be 1.7.4).
 
+- Make test suite pass on PyPy (Chameleon doesn't work).
+
 Bug Fixes
 ---------
 
