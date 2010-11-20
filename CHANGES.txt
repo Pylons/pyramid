@@ -26,6 +26,16 @@ Features
 
 - Make test suite pass on PyPy (Chameleon doesn't work).
 
+- Surrounding application configuration with ``config.begin()`` and
+  ``config.end()`` is no longer necessary.  All paster templates have been
+  changed to no longer call these functions.
+
+Documentation
+-------------
+
+- SQLAlchemy+URLDispatch and ZODB+Traversal tutorials have been updated to
+  not call ``config.begin()`` or ``config.end()``.
+
 Bug Fixes
 ---------
 

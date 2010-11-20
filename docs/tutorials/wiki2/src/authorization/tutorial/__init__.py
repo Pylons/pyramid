@@ -22,7 +22,6 @@ def main(global_config, **settings):
                           root_factory='tutorial.models.RootFactory',
                           authentication_policy=authn_policy,
                           authorization_policy=authz_policy)
-    config.begin()
     config.add_static_view('static', 'tutorial:static')
     config.add_route('view_wiki', '/', view='tutorial.views.view_wiki')
     config.add_route('login', '/login',
@@ -44,6 +43,5 @@ def main(global_config, **settings):
     config.add_view('tutorial.login.login',
                     renderer='tutorial:templates/login.pt',
                     context='pyramid.exceptions.Forbidden')
-    config.end()
     return config.make_wsgi_app()
 

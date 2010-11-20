@@ -12,7 +12,6 @@ def main(global_config, **settings):
     db_echo = settings.get('db_echo', 'false')
     get_root = appmaker(db_string, asbool(db_echo))
     config = Configurator(settings=settings, root_factory=get_root)
-    config.begin()
     config.add_static_view('static', '{{package}}:static')
     config.add_view('{{package}}.views.view_root', 
                     context='{{package}}.models.MyApp', 
@@ -20,7 +19,6 @@ def main(global_config, **settings):
     config.add_view('{{package}}.views.view_model',
                     context='{{package}}.models.MyModel',
                     renderer="templates/model.pt")
-    config.end()
     return config.make_wsgi_app()
 
 

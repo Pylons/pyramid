@@ -16,7 +16,5 @@ def main(global_config, **settings):
     def get_root(request):
         return finder(request.environ)
     config = Configurator(root_factory=get_root, settings=settings)
-    config.begin()
     config.load_zcml('configure.zcml')
-    config.end()
     return config.make_wsgi_app()

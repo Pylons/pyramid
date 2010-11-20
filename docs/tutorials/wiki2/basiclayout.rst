@@ -52,10 +52,7 @@ entry point happens to be the ``app`` function within the file named
    deployment-related values such as ``reload_templates``,
    ``db_string``, etc.
 
-#. *Line 15*.  We call :meth:`pyramid.configuration.Configurator.begin` which
-    tells the configuration machinery we are starting configuration.
-
-#. *Line 16*.  We call
+#. *Line 15*.  We call
    :meth:`pyramid.configuration.Configurator.add_static_view` with the
    arguments ``static`` (the name), and ``tutorial:static`` (the path).  This
    registers a static resource view which will match any URL that starts with
@@ -67,7 +64,7 @@ entry point happens to be the ``app`` function within the file named
    ``/static/foo``) will be used to compose a path to a static file resource,
    such as a CSS file.
 
-#. *Lines 17-18*.  Register a :term:`route configuration` via the
+#. *Lines 16-17*.  Register a :term:`route configuration` via the
    :meth:`pyramid.configuration.Configurator.add_route` method that will be
    used when the URL is ``/``.  Since this route has an ``pattern`` equalling
    ``/`` it is the "default" route. The argument named ``view`` with the
@@ -81,10 +78,7 @@ entry point happens to be the ``app`` function within the file named
    ``tutorial.views.my_view`` view returns a dictionary, a :term:`renderer`
    will use this template to create a response.
 
-#. *Line 19*.  We call :meth:`pyramid.configuration.Configurator.end` which
-    tells the configuration machinery we are ending configuration.
-
-#. *Line 20*.  We use the
+#. *Line 18*.  We use the
    :meth:`pyramid.configuration.Configurator.make_wsgi_app` method to return
    a :term:`WSGI` application.
 

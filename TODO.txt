@@ -16,9 +16,6 @@ Must-Have (before 1.0)
 - Use ``@register_view`` instead of ``@view_config`` and change view docs to
   use "view registration" instead of "view configuration".
 
-- Remove calls to config.begin()/config.end() from startup config code in
-  tutorials and paster templates (no longer required).
-
 - SQLAlchemy idiomatics:
 
    <RaFromBRC> mcdonc: those paster templates all look pretty good... the
@@ -59,7 +56,7 @@ Must-Have (before 1.0)
 Should-Have
 -----------
 
-- Try to make test suite pass on PyPy, IronPython.
+- Try to make test suite pass on IronPython.
 
 - Add docs for httpexceptions module for each webob.exc class that inherits
   from WSGIHTTPException.

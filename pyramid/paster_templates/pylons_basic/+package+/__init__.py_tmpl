@@ -5,7 +5,6 @@ def main(global_config, **settings):
     """
     from pyramid.configuration import Configurator
     config = Configurator(settings=settings)
-    config.begin()
     session_factory = session_factory_from_settings(settings)
     config.set_session_factory(session_factory)
     config.add_static_view('static', '{{package}}:static/')
@@ -15,5 +14,4 @@ def main(global_config, **settings):
                        action='index')
     config.add_subscriber('{{package}}.lib.subscribers.add_renderer_globals',
                           'pyramid.events.BeforeRender')
-    config.end()
     return config.make_wsgi_app()

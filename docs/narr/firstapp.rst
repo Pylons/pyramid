@@ -38,10 +38,8 @@ configured imperatively:
 
    if __name__ == '__main__':
        config = Configurator()
-       config.begin()
        config.add_view(hello_world)
        config.add_view(goodbye_world, name='goodbye')
-       config.end()
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
@@ -149,10 +147,8 @@ imports and function definitions is placed within the confines of an
 
    if __name__ == '__main__':
        config = Configurator()
-       config.begin()
        config.add_view(hello_world)
        config.add_view(goodbye_world, name='goodbye')
-       config.end()
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
@@ -189,29 +185,6 @@ The ``config = Configurator()`` line above creates an instance of the
 this particular :app:`Pyramid` application.  Methods called on the
 Configurator will cause registrations to be made in a
 :term:`application registry` associated with the application.
-
-Beginning Configuration
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. ignore-next-block
-.. code-block:: python
-
-   config.begin()
-
-The :meth:`pyramid.configuration.Configurator.begin` method tells
-the system that application configuration has begun.  In particular,
-this causes the :term:`application registry` associated with this
-configurator to become the "current" application registry, meaning
-that code which attempts to use the application registry :term:`thread
-local` will obtain the registry associated with the configurator.
-This is an explicit step because it's sometimes convenient to use a
-configurator without causing the registry associated with the
-configurator to become "current".
-
-.. note::
-
-   See :ref:`threadlocals_chapter` for a discussion about what it
-   means for an application registry to be "current".
 
 .. _adding_configuration:
 
@@ -280,28 +253,6 @@ ordering of calls to
 important.  We can register ``goodbye_world`` first and
 ``hello_world`` second; :app:`Pyramid` will still give us the most
 specific callable when a request is dispatched to it.
-
-Ending Configuration
-~~~~~~~~~~~~~~~~~~~~
-
-.. ignore-next-block
-.. code-block:: python
-
-   config.end()
-
-The :meth:`pyramid.configuration.Configurator.end` method tells the
-system that application configuration has ended.  It is the inverse of
-:meth:`pyramid.configuration.Configurator.begin`.  In particular,
-this causes the :term:`application registry` associated with this
-configurator to no longer be the "current" application registry,
-meaning that code which attempts to use the application registry
-:term:`thread local` will no longer obtain the registry associated
-with the configurator.
-
-.. note::
-
-   See :ref:`threadlocals_chapter` for a discussion about what it
-   means for an application registry to be "current".
 
 .. index::
    single: make_wsgi_app
