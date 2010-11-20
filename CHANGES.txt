@@ -30,6 +30,10 @@ Features
   ``config.end()`` is no longer necessary.  All paster templates have been
   changed to no longer call these functions.
 
+- Fix configurator to not convert ``ImportError`` to ``ConfigurationError``
+  if the import that failed was unrelated to the import requested via a
+  dotted name when resolving dotted names (such as view dotted names).
+
 Documentation
 -------------
 

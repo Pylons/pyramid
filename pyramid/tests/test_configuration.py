@@ -216,9 +216,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(result, pyramid.tests)
 
     def test_maybe_dotted_string_fail(self):
-        from pyramid.configuration import ConfigurationError
         config = self._makeOne()
-        self.assertRaises(ConfigurationError,
+        self.assertRaises(ImportError,
                           config.maybe_dotted, 'cant.be.found')
 
     def test_maybe_dotted_notstring_success(self):
@@ -4397,9 +4396,7 @@ class TestDottedNameResolver(unittest.TestCase):
 
     def test_resolve_missing_raises(self):
         typ = self._makeOne()
-        e = self.config_exc(typ.resolve, 'cant.be.found')
-        self.assertEqual(e.args[0],
-                         "The dotted name 'cant.be.found' cannot be imported")
+        self.assertRaises(ImportError, typ.resolve, 'cant.be.found')
 
     def test_ctor_string_module_resolveable(self):
         import pyramid.tests

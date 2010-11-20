@@ -2844,14 +2844,10 @@ class DottedNameResolver(object):
 
     def maybe_resolve(self, dotted):
         if isinstance(dotted, basestring):
-            try:
-                if ':' in dotted:
-                    return self._pkg_resources_style(dotted)
-                else:
-                    return self._zope_dottedname_style(dotted)
-            except ImportError:
-                raise ConfigurationError(
-                    'The dotted name %r cannot be imported' % (dotted,))
+            if ':' in dotted:
+                return self._pkg_resources_style(dotted)
+            else:
+                return self._zope_dottedname_style(dotted)
         return dotted
 
 

@@ -37,10 +37,6 @@ Must-Have (before 1.0)
 
 - Better ``config.add_handler`` documentation.
 
-- Fix DottedNameResolver to not convert ImportError to ConfigurationError if
-  the import that failed was unrelated to the import requested via a dotted
-  name.
-
 Should-Have
 -----------
 
