@@ -1199,7 +1199,6 @@ class Configurator(object):
     def add_route(self,
                   name,
                   pattern=None,
-                  marker_pattern=None,
                   view=None,
                   view_for=None,
                   permission=None,
@@ -1318,12 +1317,6 @@ class Configurator(object):
              to this function will be used to represent the pattern
              value if the ``pattern`` argument is ``None``.  If both
              ``path`` and ``pattern`` are passed, ``pattern`` wins.
-        
-        marker_pattern
-        
-          A dict of regular expression's that will be used in the place
-          of the default ``[^/]+`` regular expression for all replacement
-          markers in the route pattern.
         
         xhr
 
@@ -1547,8 +1540,7 @@ class Configurator(object):
             raise ConfigurationError('"pattern" argument may not be None')
 
         return mapper.connect(name, pattern, factory, predicates=predicates,
-                              pregenerator=pregenerator,
-                              marker_pattern=marker_pattern)
+                              pregenerator=pregenerator)
 
     def get_routes_mapper(self):
         """ Return the :term:`routes mapper` object associated with

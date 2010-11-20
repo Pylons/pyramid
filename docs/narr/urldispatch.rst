@@ -92,7 +92,12 @@ registry`.  Here's an example:
    # pyramid.configuration.Configurator class; "myview" is assumed
    # to be a "view callable" function
    from views import myview
-   config.add_route('myroute', '/prefix/:one/:two', view=myview)
+   config.add_route('myroute', '/prefix/{one}/{two}', view=myview)
+
+.. versionchanged:: 1.0a4
+    Prior to 1.0a4, routes allow for a marker starting with a ``:``, for
+    example ``/prefix/{one}``. Starting in 1.0a4, this style is deprecated
+    in favor or ``{}`` usage which allows for additional functionality.
 
 .. index::
    single: route configuration; view callable
@@ -116,7 +121,7 @@ Here's an example route configuration that references a view callable:
    # pyramid.configuration.Configurator class; "myview" is assumed
    # to be a "view callable" function
    from myproject.views import myview
-   config.add_route('myroute', '/prefix/:one/:two', view=myview)
+   config.add_route('myroute', '/prefix/{one}/{two}', view=myview)
 
 You can also pass a :term:`dotted Python name` as the ``view`` argument
 rather than an actual callable:
@@ -128,7 +133,7 @@ rather than an actual callable:
    # pyramid.configuration.Configurator class; "myview" is assumed
    # to be a "view callable" function
    from myproject.views import myview
-   config.add_route('myroute', '/prefix/:one/:two', 
+   config.add_route('myroute', '/prefix/{one}/{two}', 
                     view='myproject.views.myview')
 
 When a route configuration names a ``view`` attribute, the :term:`view
@@ -200,20 +205,20 @@ the following patterns are equivalent:
 
 .. code-block:: text
 
-   :foo/bar/baz
+   {foo}/bar/baz
 
 and:
 
 .. code-block:: text
 
-   /:foo/bar/baz
+   /{foo}/bar/baz
 
 A pattern segment (an individual item between ``/`` characters in the pattern)
 may either be a literal string (e.g. ``foo``) *or* it may be a replacement
-marker (e.g. ``:foo``) or a certain combination of both. A replacement marker
+marker (e.g. ``{foo}``) or a certain combination of both. A replacement marker
 does not need to be preceded by a ``/`` character.
 
-A replacement marker is in the format ``:name``, where this
+A replacement marker is in the format ``{name}``, where this
 means "accept any characters up to the next non-alphanumeric character
 and use this as the ``name`` matchdict value."  For example, the
 following pattern defines one literal segment ("foo") and two dynamic
@@ -221,7 +226,7 @@ replacement markers ("baz", and "bar"):
 
 .. code-block:: text
 
-   foo/:baz/:bar
+   foo/{baz}/{bar}
 
 The above pattern will match these URLs, generating the following
 matchdicts:
@@ -244,36 +249,36 @@ pattern.  So, for instance, if this route pattern was used:
 
 .. code-block:: text
 
-   foo/:name.html
+   foo/{name}.html
 
 The literal path ``/foo/biz.html`` will match the above route pattern,
 and the match result will be ``{'name':u'biz'}``.  However, the
 literal path ``/foo/biz`` will not match, because it does not contain
 a literal ``.html`` at the end of the segment represented by
-``:name.html`` (it only contains ``biz``, not ``biz.html``).
+``{name}.html`` (it only contains ``biz``, not ``biz.html``).
 
 To capture both segments, two replacement markers can be used:
 
 .. code-block:: text
     
-    foo/:name.:ext
+    foo/{name}.{ext}
 
 The literal path ``/foo/biz.html`` will match the above route pattern, and the
 match result will be ``{'name': 'biz', 'ext': 'html'}``. This occurs because
-the replacement marker ``:name`` has a literal part of ``.`` between the other
+the replacement marker ``{name}`` has a literal part of ``.`` between the other
 replacement marker ``:ext``.
 
 It is possible to use two replacement markers without any literal characters
-between them, for instance ``/:foo:bar``. This would be a nonsensical pattern
-without specifying any ``pattern_regexes`` to restrict valid values of each
-replacement marker.
+between them, for instance ``/{foo}{bar}``. This would be a nonsensical pattern
+without specifying a custom regular expression to restrict what a marker
+captures.
 
 Segments must contain at least one character in order to match a
 segment replacement marker.  For example, for the URL ``/abc/``:
 
-- ``/abc/:foo`` will not match.
+- ``/abc/{foo}`` will not match.
 
-- ``/:foo/`` will match.
+- ``/{foo}/`` will match.
 
 Note that values representing path segments matched with a
 ``:segment`` match will be url-unquoted and decoded from UTF-8 into
@@ -282,7 +287,7 @@ pattern:
 
 .. code-block:: text
 
-   foo/:bar
+   foo/{bar}
 
 When matching the following URL:
 
@@ -304,7 +309,7 @@ need to be preceded by a slash.  For example:
 
 .. code-block:: text
 
-   foo/:baz/:bar*fizzle
+   foo/{baz}/{bar}*fizzle
 
 The above pattern will match these URLs, generating the following
 matchdicts:
@@ -336,6 +341,24 @@ Will generate the following matchdict:
 
    {'fizzle':(u'La Pe\xf1a', u'a', u'b', u'c')}
 
+By default, the ``*stararg`` will parse the remainder sections into a tuple
+split by segment. Changing the regular expression used to match a marker can
+also capture the remainder of the URL, for example:
+
+.. code-block:: text
+    
+    foo/{baz}/{bar}{fizzle:.*}
+
+The above pattern will match these URLs, generating the following matchdicts:
+
+   foo/1/2/           -> {'baz':'1', 'bar':'2', 'fizzle':()}
+   foo/abc/def/a/b/c  -> {'baz':'abc', 'bar':'def', 'fizzle': 'a/b/c')}
+
+This occurs because the default regular expression for a marker is ``[^/]+``
+which will match everything up to the first ``/``, while ``{filzzle:.*}`` will
+result in a regular expression match of ``.*`` capturing the remainder into
+a single value.
+
 .. index::
    single: route ordering
 
@@ -360,12 +383,12 @@ be added in the following order:
 
 .. code-block:: text
 
-   members/:def
+   members/{def}
    members/abc
 
 In such a configuration, the ``members/abc`` pattern would *never* be
 matched; this is because the match ordering will always match
-``members/:def`` first; the route configuration with ``members/abc``
+``members/{def}`` first; the route configuration with ``members/abc``
 will never be evaluated.
 
 .. index::
@@ -446,8 +469,8 @@ represent neither predicates nor view configuration information.
 
   The syntax of the ``traverse`` argument is the same as it is for
   ``pattern``. For example, if the ``pattern`` provided is
-  ``articles/:article/edit``, and the ``traverse`` argument provided
-  is ``/:article``, when a request comes in that causes the route to
+  ``articles/{article}/edit``, and the ``traverse`` argument provided
+  is ``/{article}``, when a request comes in that causes the route to
   match in such a way that the ``article`` match value is '1' (when
   the request URI is ``/articles/1/edit``), the traversal path will be
   generated as ``/1``.  This means that the root object's
@@ -474,7 +497,7 @@ represent neither predicates nor view configuration information.
 **Predicate Arguments**
 
 ``pattern``
-  The path of the route e.g. ``ideas/:idea``.  This argument is
+  The path of the route e.g. ``ideas/{idea}``.  This argument is
   required.  See :ref:`route_path_pattern_syntax` for information
   about the syntax of route paths.  If the path doesn't match the
   current URL, route matching continues.  
@@ -482,13 +505,6 @@ represent neither predicates nor view configuration information.
   .. note:: In earlier releases of this framework, this argument existed
      as ``path``.  ``path`` continues to work as an alias for
      ``pattern``.
-
-``marker_pattern``
-  A dict of regular expression replacements for replacement markers in the
-  pattern to use when generating the complete regular expression used to
-  match the route. By default, every replacement marker in the pattern is
-  replaced with the regular expression ``[^/]+``. Values in this dict will
-  be used instead if present.
   
 ``xhr``
   This value should be either ``True`` or ``False``.  If this value is
@@ -663,7 +679,7 @@ match.  For example:
 
    num_one_two_or_three = any_of('num', 'one', 'two', 'three')
 
-   config.add_route('num', '/:num', 
+   config.add_route('num', '/{num}', 
                     custom_predicates=(num_one_two_or_three,))
 
 The above ``any_of`` function generates a predicate which ensures that
@@ -694,13 +710,36 @@ For instance, a predicate might do some type conversion of values:
 
     ymd_to_int = integers('year', 'month', 'day')
 
-    config.add_route('num', '/:year/:month/:day', 
+    config.add_route('num', '/{year}/{month}/{day}', 
                      custom_predicates=(ymd_to_int,))
 
 Note that a conversion predicate is still a predicate so it must
 return ``True`` or ``False``; a predicate that does *only* conversion,
 such as the one we demonstrate above should unconditionally return
 ``True``.
+
+To avoid the try/except uncertainty, the route pattern can contain regular
+expressions specifying requirements for that marker. For instance:
+
+.. code-block:: python
+   :linenos:
+
+    def integers(*segment_names):
+        def predicate(info, request):
+            match = info['match']
+            for segment_name in segment_names:
+                match[segment_name] = int(match[segment_name])
+            return True
+        return predicate
+
+    ymd_to_int = integers('year', 'month', 'day')
+
+    config.add_route('num', '/{year:\d+}/{month:\d+}/{day:\d+}', 
+                     custom_predicates=(ymd_to_int,))
+
+Now the try/except is no longer needed because the route will not match at
+all unless these markers match ``\d+`` which requires them to be valid digits
+for an ``int`` type conversion.
 
 The ``match`` dictionary passed within ``info`` to each predicate
 attached to a route will be the same dictionary.  Therefore, when
@@ -732,9 +771,9 @@ An example of using the route in a set of route predicates:
         if info['route'].name in ('ymd', 'ym', 'y'):
             return info['match']['year'] == '2010'
 
-    config.add_route('y', '/:year', custom_predicates=(twenty_ten,))
-    config.add_route('ym', '/:year/:month', custom_predicates=(twenty_ten,))
-    config.add_route('ymd', '/:year/:month:/day', 
+    config.add_route('y', '/{year}', custom_predicates=(twenty_ten,))
+    config.add_route('ym', '/{year}/{month}', custom_predicates=(twenty_ten,))
+    config.add_route('ymd', '/{year}/{month}/{day}', 
                      custom_predicates=(twenty_ten,))
 
 The above predicate, when added to a number of route configurations
@@ -833,7 +872,7 @@ The simplest route declaration which configures a route match to
 .. code-block:: python
    :linenos:
 
-    config.add_route('idea', 'site/:id', view='mypackage.views.site_view')
+    config.add_route('idea', 'site/{id}', view='mypackage.views.site_view')
 
 When a route configuration with a ``view`` attribute is added to the
 system, and an incoming request matches the *pattern* of the route
@@ -841,12 +880,12 @@ configuration, the :term:`view callable` named as the ``view``
 attribute of the route configuration will be invoked.
 
 In the case of the above example, when the URL of a request matches
-``/site/:id``, the view callable at the Python dotted path name
+``/site/{id}``, the view callable at the Python dotted path name
 ``mypackage.views.site_view`` will be called with the request.  In
 other words, we've associated a view callable directly with a route
 pattern.
 
-When the ``/site/:id`` route pattern matches during a request, the
+When the ``/site/{id}`` route pattern matches during a request, the
 ``site_view`` view callable is invoked with that request as its sole
 argument.  When this route matches, a ``matchdict`` will be generated
 and attached to the request as ``request.matchdict``.  If the specific
@@ -879,30 +918,30 @@ might add to your application:
 .. code-block:: python
    :linenos:
 
-   config.add_route('idea', 'ideas/:idea', view='mypackage.views.idea_view')
-   config.add_route('user', 'users/:user', view='mypackage.views.user_view')
-   config.add_route('tag', 'tags/:tags', view='mypackage.views.tag_view')
+   config.add_route('idea', 'ideas/{idea}', view='mypackage.views.idea_view')
+   config.add_route('user', 'users/{user}', view='mypackage.views.user_view')
+   config.add_route('tag', 'tags/{tags}', view='mypackage.views.tag_view')
 
 The above configuration will allow :app:`Pyramid` to service URLs
 in these forms:
 
 .. code-block:: text
 
-   /ideas/:idea
-   /users/:user
-   /tags/:tag
+   /ideas/{idea}
+   /users/{user}
+   /tags/{tag}
 
-- When a URL matches the pattern ``/ideas/:idea``, the view callable
+- When a URL matches the pattern ``/ideas/{idea}``, the view callable
   available at the dotted Python pathname ``mypackage.views.idea_view`` will
   be called.  For the specific URL ``/ideas/1``, the ``matchdict`` generated
   and attached to the :term:`request` will consist of ``{'idea':'1'}``.
 
-- When a URL matches the pattern ``/users/:user``, the view callable
+- When a URL matches the pattern ``/users/{user}``, the view callable
   available at the dotted Python pathname ``mypackage.views.user_view`` will
   be called.  For the specific URL ``/users/1``, the ``matchdict`` generated
   and attached to the :term:`request` will consist of ``{'user':'1'}``.
 
-- When a URL matches the pattern ``/tags/:tag``, the view callable available
+- When a URL matches the pattern ``/tags/{tag}``, the view callable available
   at the dotted Python pathname ``mypackage.views.tag_view`` will be called.
   For the specific URL ``/tags/1``, the ``matchdict`` generated and attached
   to the :term:`request` will consist of ``{'tag':'1'}``.
@@ -930,7 +969,7 @@ An example of using a route with a factory:
 .. code-block:: python
    :linenos:
 
-   config.add_route('idea', 'ideas/:idea', 
+   config.add_route('idea', 'ideas/{idea}', 
                     view='myproject.views.idea_view',
                     factory='myproject.models.Idea')
 
@@ -958,7 +997,7 @@ a ``view`` declaration.
 .. code-block:: python
    :linenos:
 
-   config.add_route('idea', 'site/:id')
+   config.add_route('idea', 'site/{id}')
    config.add_view(route_name='idea', view='mypackage.views.site_view')
 
 This set of configuration parameters creates a configuration
@@ -968,7 +1007,7 @@ completely equivalent to this example provided in
 .. code-block:: python
    :linenos:
 
-   config.add_route('idea', 'site/:id', view='mypackage.views.site_view')
+   config.add_route('idea', 'site/{id}', view='mypackage.views.site_view')
 
 In fact, the spelling which names a ``view`` attribute is just
 syntactic sugar for the more verbose spelling which contains separate
@@ -1009,7 +1048,7 @@ Generating Route URLs
 
 Use the :func:`pyramid.url.route_url` function to generate URLs based on
 route patterns.  For example, if you've configured a route with the ``name``
-"foo" and the ``pattern`` ":a/:b/:c", you might do this.
+"foo" and the ``pattern`` "{a}/{b}/{c}", you might do this.
 
 .. ignore-next-block
 .. code-block:: python
@@ -1203,7 +1242,7 @@ Such a ``factory`` might look like so:
           if article == '1':
               self.__acl__ = [ (Allow, 'editor', 'view') ]
 
-If the route ``archives/:article`` is matched, and the article number
+If the route ``archives/{article}`` is matched, and the article number
 is ``1``, :app:`Pyramid` will generate an ``Article``
 :term:`context` with an ACL on it that allows the ``editor`` principal
 the ``view`` permission.  Obviously you can do more generic things

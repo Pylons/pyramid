@@ -218,9 +218,9 @@ class RoutesMapperTests(unittest.TestCase):
         self.assertEqual(mapper.generate('abc', {}), 123)
 
 class TestCompileRoute(unittest.TestCase):
-    def _callFUT(self, pattern, marker_pattern=None):
+    def _callFUT(self, pattern):
         from pyramid.urldispatch import _compile_route
-        return _compile_route(pattern, marker_pattern)
+        return _compile_route(pattern)
 
     def test_no_star(self):
         matcher, generator = self._callFUT('/foo/:baz/biz/:buz/bar')
@@ -253,8 +253,7 @@ class TestCompileRoute(unittest.TestCase):
         self.assertRaises(URLDecodeError, matcher, '/%FF%FE%8B%00')
     
     def test_custom_regex(self):
-        matcher, generator = self._callFUT('foo/:baz/biz/:buz.:bar',
-            {'buz': '[^/\.]+'})
+        matcher, generator = self._callFUT('foo/{baz}/biz/{buz:[^/\.]+}.{bar}')
         self.assertEqual(matcher('/foo/baz/biz/buz.bar'),
                          {'baz':'baz', 'buz':'buz', 'bar':'bar'})
         self.assertEqual(matcher('foo/baz/biz/buz/bar'), None)
