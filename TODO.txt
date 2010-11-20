@@ -35,18 +35,6 @@ Must-Have (before 1.0)
    the parameter names (e.g. 'url' instead of 'db_string') is still probably
    a good idea
 
-- Non-bwcompat use of threadlocals that need to be documented or ameliorated:
-
-  security.principals_allowed_by_permission
-
-  resource.OverrideProvider._get_overrides: can't credibly be removed,
-  because it stores an overrideprovider as a module-scope global.
-
-  traversal.traverse: this API is a stepchild, and needs to be changed.
-
-  Configurator.add_translation_dirs: not passed any context but a message,
-  can't credibly be removed.
-
 - Better ``config.add_handler`` documentation.
 
 - Fix DottedNameResolver to not convert ImportError to ConfigurationError if
@@ -76,6 +64,18 @@ Should-Have
 
 Nice-to-Have
 ------------
+
+- Non-bwcompat use of threadlocals that need to be documented or ameliorated:
+
+  security.principals_allowed_by_permission
+
+  resource.OverrideProvider._get_overrides: can't credibly be removed,
+  because it stores an overrideprovider as a module-scope global.
+
+  traversal.traverse: this API is a stepchild, and needs to be changed.
+
+  Configurator.add_translation_dirs: not passed any context but a message,
+  can't credibly be removed.
 
 - Supply ``X-Vhm-Host`` support.
 
