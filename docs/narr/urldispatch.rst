@@ -96,7 +96,7 @@ registry`.  Here's an example:
 
 .. versionchanged:: 1.0a4
     Prior to 1.0a4, routes allow for a marker starting with a ``:``, for
-    example ``/prefix/{one}``. Starting in 1.0a4, this style is deprecated
+    example ``/prefix/:one``. Starting in 1.0a4, this style is deprecated
     in favor or ``{}`` usage which allows for additional functionality.
 
 .. index::
