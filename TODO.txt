@@ -6,7 +6,8 @@ Must-Have (before 1.0)
 
 - Add a ``handler`` ZCML directive.  This implies some slightly dicey
   refactoring of the configurator to allow it to generate ZCML
-  "discriminators" for views and routes.
+  "discriminators" for views and routes, that could be implemented in terms
+  of "twophase configuration" in "should have" below.
 
 - Provide a .flash API on session object.
 
@@ -40,8 +41,6 @@ Must-Have (before 1.0)
 Should-Have
 -----------
 
-- Try to make test suite pass on IronPython.
-
 - Add docs for httpexceptions module for each webob.exc class that inherits
   from WSGIHTTPException.
 
@@ -58,8 +57,12 @@ Should-Have
 - Change "Cleaning up After a Request" in the urldispatch chapter to
   use ``request.add_response_callback``.
 
+- Twophase configuration (config = Configurator(autocommit=False))
+
 Nice-to-Have
 ------------
+
+- Try to make test suite pass on IronPython.
 
 - Non-bwcompat use of threadlocals that need to be documented or ameliorated:
 
