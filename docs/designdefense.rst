@@ -40,9 +40,7 @@ Too Complex
 
    if __name__ == '__main__':
        config = Configurator()
-       config.begin()
        config.add_view(hello_world)
-       config.end()
        app = config.make_wsgi_app()
        serve(app)
 
@@ -549,9 +547,7 @@ everything done completely imperatively.  For example, the very most basic
 
    if __name__ == '__main__':
        config = Configurator()
-       config.begin()
        config.add_view(hello_world)
-       config.end()
        app = config.make_wsgi_app()
        serve(app)
 
@@ -1674,37 +1670,6 @@ can interface with a WSGI application is placed on the server
 developer, not the web framework developer, making it more likely to
 be timely and correct.
 
-:meth:`pyramid.configuration.Configurator.begin` and :meth:`pyramid.configuration.Configurator.end` methods
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-The methods :meth:`pyramid.configuration.Configurator.begin` and
-:meth:`pyramid.configuration.Configurator.end` are used to bracket
-the configuration phase of a :app:`Pyramid` application.
-
-These exist because existing legacy third party *configuration* (not
-runtime) code relies on a threadlocal stack being populated. The
-``begin`` method pushes data on to a threadlocal stack.  The ``end``
-method pops it back off.
-
-For the simplest applications, these lines are actually not required.
-I *could* omit them from every Pyramid hello world app without ill
-effect.  However, when users use certain configuration methods (ones
-not represented in the hello world app), calling code will begin to
-fail when it is not bracketed between a ``begin()`` and an ``end()``.
-It is just easier to tell users that this bracketing is required than
-to try to explain to them which circumstances it is actually required
-and which it is not, because the explanation is often torturous.
-
-The effectively-required execution of these two methods is a wholly
-bogus artifact of an early bad design decision which encouraged
-application developers to use threadlocal data structures during the
-execution of configuration plugins.  However, I don't hate my
-framework's users enough to break backwards compatibility for the sake
-of removing two boilerplate lines of code, so it stays, at least for
-the foreseeable future.  If I eventually figure out a way to remove
-the requirement, these methods will turn into no-ops and they will be
-removed from the documenation.
-
 Wrapping Up
 +++++++++++
 
@@ -1724,9 +1689,7 @@ where comments take into account what we've discussed in the
    if __name__ == '__main__':
        from pyramid.configuration import Configurator
        config = Configurator()       # no global application object.
-       config.begin()                # bogus, but required.
        config.add_view(hello_world)  # explicit non-decorator registration
-       config.end()                  # bogus, but required.
        app = config.make_wsgi_app()  # explicitly WSGI
        serve(app, host='0.0.0.0')    # explicitly WSGI
 
