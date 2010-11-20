@@ -74,8 +74,16 @@ class RoutesMapper(object):
         return {'route':None, 'match':None}
 
 # stolen from bobo and modified
-route_re = re.compile(r'(/:[a-zA-Z]\w*)')
+old_route_re = re.compile(r'(\:[a-zA-Z]\w*)')
+route_re = re.compile(r'(\{[a-zA-Z][^\}]*\})')
+def update_pattern(matchobj):
+    name = matchobj.group(0)
+    return '{%s}' % name[1:]
+
 def _compile_route(route):
+    if old_route_re.search(route) and not route_re.search(route):
+        route = old_route_re.sub(update_pattern, route)
+
     if not route.startswith('/'):
         route = '/' + route
     star = None
@@ -91,9 +99,13 @@ def _compile_route(route):
         gen.append(prefix)
     while pat:
         name = pat.pop()
-        name = name[2:]
-        gen.append('/%%(%s)s' % name)
-        name = '/(?P<%s>[^/]+)' % name
+        name = name[1:-1]
+        if ':' in name:
+            name, reg = name.split(':')
+        else:
+            reg = '[^/]+'
+        gen.append('%%(%s)s' % name)
+        name = '(?P<%s>%s)' % (name, reg)
         rpat.append(name)
         s = pat.pop()
         if s:

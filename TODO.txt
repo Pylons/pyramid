@@ -4,11 +4,6 @@ Pyramid TODOs
 Must-Have (before 1.0)
 ----------------------
 
-- Test on GAE, Jython, PyPy, IronPython.
-
-- Add docs for httpexceptions module for each webob.exc class that inherits
-  from WSGIHTTPException.
-
 - Add a ``handler`` ZCML directive.  This implies some slightly dicey
   refactoring of the configurator to allow it to generate ZCML
   "discriminators" for views and routes.
@@ -20,9 +15,6 @@ Must-Have (before 1.0)
 
 - Use ``@register_view`` instead of ``@view_config`` and change view docs to
   use "view registration" instead of "view configuration".
-
-- Remove calls to config.begin()/config.end() from startup config code in
-  tutorials and paster templates (no longer required).
 
 - SQLAlchemy idiomatics:
 
@@ -57,8 +49,17 @@ Must-Have (before 1.0)
 
 - Better ``config.add_handler`` documentation.
 
+- Fix DottedNameResolver to not convert ImportError to ConfigurationError if
+  the import that failed was unrelated to the import requested via a dotted
+  name.
+
 Should-Have
 -----------
+
+- Try to make test suite pass on IronPython.
+
+- Add docs for httpexceptions module for each webob.exc class that inherits
+  from WSGIHTTPException.
 
 - Create a ``docs`` directory for each paster template.
 

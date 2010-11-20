@@ -741,9 +741,16 @@ def skip_on(*platforms):
             for platform in platforms:
                 if skip_on.os_name.startswith(platform):
                     return
+                if platform == 'pypy' and skip_on.pypy: # pragma: no cover
+                    return
             return func(*args, **kw)
         wrapper.__name__ = func.__name__
         wrapper.__doc__ = func.__doc__
         return wrapper
     return decorator
 skip_on.os_name = os.name # for testing
+try: # pragma: no cover
+    import __pypy__  
+    skip_on.pypy = True
+except ImportError:
+    skip_on.pypy = False

@@ -251,6 +251,13 @@ class TestCompileRoute(unittest.TestCase):
         from pyramid.exceptions import URLDecodeError
         matcher, generator = self._callFUT('/:foo')
         self.assertRaises(URLDecodeError, matcher, '/%FF%FE%8B%00')
+    
+    def test_custom_regex(self):
+        matcher, generator = self._callFUT('foo/{baz}/biz/{buz:[^/\.]+}.{bar}')
+        self.assertEqual(matcher('/foo/baz/biz/buz.bar'),
+                         {'baz':'baz', 'buz':'buz', 'bar':'bar'})
+        self.assertEqual(matcher('foo/baz/biz/buz/bar'), None)
+        self.assertEqual(generator({'baz':1, 'buz':2, 'bar': 'html'}), '/foo/1/biz/2.html')
 
 class TestCompileRouteMatchFunctional(unittest.TestCase):
     def matches(self, pattern, path, expected):
@@ -271,7 +278,6 @@ class TestCompileRouteMatchFunctional(unittest.TestCase):
         self.matches('/:x', '', None)
         self.matches('/:x', '/', None)
         self.matches('/abc/:def', '/abc/', None)
-        self.matches('/abc/:def:baz', '/abc/bleep', None) # bad pattern
         self.matches('', '/', {})
         self.matches('/', '/', {})
         self.matches('/:x', '/a', {'x':'a'})

@@ -65,7 +65,7 @@ def renderer_factory(info):
         module_directory = settings.get('mako.module_directory')
         input_encoding = settings.get('mako.input_encoding', 'utf-8')
         error_handler = settings.get('mako.error_handler', None)
-        default_filters = settings.get('mako.default_filters', [])
+        default_filters = settings.get('mako.default_filters', None)
         imports = settings.get('mako.imports', [])
         if directories is None:
             raise ConfigurationError(

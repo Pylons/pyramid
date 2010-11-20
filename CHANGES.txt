@@ -4,6 +4,15 @@ Next release
 Features
 --------
 
+- URL Dispatch now allows for replacement markers to be located anywhere
+  in the pattern, instead of immediately following a ``/``.
+
+- URL Dispatch now uses the form ``{marker}`` to denote a replace marker in
+  the route pattern instead of ``:marker``. The old syntax is still backwards
+  compatible and accepted. The new format allows a regular expression for that
+  marker location to be used instead of the default ``[^/]+``, for example
+  ``{marker:\d+}`` is now valid to require the marker to be digits.
+
 - Add a ``pyramid.url.route_path`` API, allowing folks to generate relative
   URLs.  Calling ``route_path`` is the same as calling
   ``pyramid.url.route_url`` with the argument ``_app_url`` equal to the empty
@@ -11,6 +20,21 @@ Features
 
 - Add a ``pyramid.request.Request.route_path`` API.  This is a convenience
   method of the request which calls ``pyramid.url.route_url``.
+
+- Make test suite pass on Jython (requires PasteScript trunk, presumably to
+  be 1.7.4).
+
+- Make test suite pass on PyPy (Chameleon doesn't work).
+
+- Surrounding application configuration with ``config.begin()`` and
+  ``config.end()`` is no longer necessary.  All paster templates have been
+  changed to no longer call these functions.
+
+Documentation
+-------------
+
+- SQLAlchemy+URLDispatch and ZODB+Traversal tutorials have been updated to
+  not call ``config.begin()`` or ``config.end()``.
 
 Bug Fixes
 ---------
@@ -24,6 +48,18 @@ Bug Fixes
 
 - The ``pyramid_alchemy`` paster template had a typo, preventing an import
   from working.
+
+- Fix apparent failures when calling ``pyramid.traversal.find_model(root,
+  path)`` or ``pyramid.traversal.traverse(path)`` when ``path`` is
+  (erroneously) a Unicode object. The user is meant to pass these APIs a
+  string object, never a Unicode object.  In practice, however, users indeed
+  pass Unicode.  Because the string that is passed must be ASCII encodeable,
+  now, if they pass a Unicode object, its data is eagerly converted to an
+  ASCII string rather than being passed along to downstream code as a
+  convenience to the user and to prevent puzzling second-order failures from
+  cropping up (all failures will occur within ``pyramid.traversal.traverse``
+  rather than later down the line as the result of calling
+  ``traversal_path``).
 
 Backwards Incompatibilities
 ---------------------------

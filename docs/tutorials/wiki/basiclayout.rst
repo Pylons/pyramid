@@ -48,14 +48,11 @@ entry point happens to be the ``app`` function within the file named
    factory` and the settings keywords parsed by PasteDeploy.  The root
    factory is named ``get_root``.
 
-#. *Lines 16-18*.  Begin configuration using the ``begin`` method of
-   the :meth:`pyramid.configuration.Configurator` class, load the
+#. *Line 16*.  Load the
    ``configure.zcml`` file from our package using the
-   :meth:`pyramid.configuration.Configurator.load_zcml` method, and
-   end configuration using the
-   :meth:`pyramid.configuration.Configurator.end` method.
+   :meth:`pyramid.configuration.Configurator.load_zcml` method.
 
-#. *Line 19*.  Use the
+#. *Line 17*.  Use the
    :meth:`pyramid.configuration.Configurator.make_wsgi_app` method
    to return a :term:`WSGI` application.
 
