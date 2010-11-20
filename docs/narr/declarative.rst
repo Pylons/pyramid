@@ -655,7 +655,7 @@ declaration` causes a route to be added to the application.
 
    <route
        name="myroute"
-       pattern="/prefix/:one/:two"
+       pattern="/prefix/{one}/{two}"
        view=".views.myview"
     />
 

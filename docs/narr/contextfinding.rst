@@ -75,7 +75,7 @@ URL dispatch can easily handle URLs such as
 ``http://example.com/members/Chris``, where it's assumed that each
 item "below" ``members`` in the URL represents a single member in some
 system.  You just match everything "below" ``members`` to a particular
-:term:`view callable`, e.g. ``/members/:memberid``.
+:term:`view callable`, e.g. ``/members/{memberid}``.
 
 However, URL dispatch is not very convenient if you'd like your URLs
 to represent an arbitrary hierarchy.  For example, if you need to

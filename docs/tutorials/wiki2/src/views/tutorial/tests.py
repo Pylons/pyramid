@@ -14,9 +14,9 @@ def _initTestingDB():
     return DBSession
 
 def _registerRoutes(config):
-    config.add_route('view_page', ':pagename')
-    config.add_route('edit_page', ':pagename/edit_page')
-    config.add_route('add_page', 'add_page/:pagename')
+    config.add_route('view_page', '{pagename}')
+    config.add_route('edit_page', '{pagename}/edit_page')
+    config.add_route('add_page', 'add_page/{pagename}')
 
 class ViewWikiTests(unittest.TestCase):
     def setUp(self):
@@ -28,7 +28,7 @@ class ViewWikiTests(unittest.TestCase):
         
     def test_it(self):
         from tutorial.views import view_wiki
-        self.config.add_route('view_page', ':pagename')
+        self.config.add_route('view_page', '{pagename}')
         request = testing.DummyRequest()
         response = view_wiki(request)
         self.assertEqual(response.location, 'http://example.com/FrontPage')

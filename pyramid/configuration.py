@@ -1260,9 +1260,9 @@ class Configurator(object):
 
           The syntax of the ``traverse`` argument is the same as it is
           for ``pattern``. For example, if the ``pattern`` provided to
-          ``add_route`` is ``articles/:article/edit``, and the
+          ``add_route`` is ``articles/{article}/edit``, and the
           ``traverse`` argument provided to ``add_route`` is
-          ``/:article``, when a request comes in that causes the route
+          ``/{article}``, when a request comes in that causes the route
           to match in such a way that the ``article`` match value is
           '1' (when the request URI is ``/articles/1/edit``), the
           traversal path will be generated as ``/1``.  This means that
@@ -1306,7 +1306,7 @@ class Configurator(object):
 
         pattern
 
-          The pattern of the route e.g. ``ideas/:idea``.  This
+          The pattern of the route e.g. ``ideas/{idea}``.  This
           argument is required.  See :ref:`route_path_pattern_syntax`
           for information about the syntax of route patterns.  If the
           pattern doesn't match the current URL, route matching

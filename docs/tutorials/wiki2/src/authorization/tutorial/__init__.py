@@ -29,14 +29,14 @@ def main(global_config, **settings):
                      view_renderer='tutorial:templates/login.pt')
     config.add_route('logout', '/logout',
                      view='tutorial.login.logout')
-    config.add_route('view_page', '/:pagename',
+    config.add_route('view_page', '/{pagename}',
                      view='tutorial.views.view_page',
                      view_renderer='tutorial:templates/view.pt')
-    config.add_route('add_page', '/add_page/:pagename',
+    config.add_route('add_page', '/add_page/{pagename}',
                      view='tutorial.views.add_page',
                      view_renderer='tutorial:templates/edit.pt',
                      view_permission='edit')
-    config.add_route('edit_page', '/:pagename/edit_page',
+    config.add_route('edit_page', '/{pagename}/edit_page',
                      view='tutorial.views.edit_page',
                      view_renderer='tutorial:templates/edit.pt',
                      view_permission='edit')

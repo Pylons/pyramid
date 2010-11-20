@@ -16,7 +16,7 @@ def main(global_config, **settings):
     session_factory = session_factory_from_settings(settings)
     config.set_session_factory(session_factory)
     config.add_static_view('static', '{{package}}:static/')
-    config.add_handler('main', '/:action', '{{package}}.handlers:MyHandler')
+    config.add_handler('main', '/{action}', '{{package}}.handlers:MyHandler')
     config.add_handler('home', '/', '{{package}}.handlers:MyHandler',
                        action='index')
     config.add_subscriber('{{package}}.subscribers.add_renderer_globals',
