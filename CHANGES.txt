@@ -1,6 +1,15 @@
 Next release
 ============
 
+Features
+--------
+
+- Add logging configuration to all paster templates.
+
+- ``pyramid_alchemy``, ``pyramid_routesalchemy``, and ``pylons_sqla`` paster
+  templates now use idiomatic SQLAlchemy configuration in their respective
+  ``.ini`` files and Python code.
+
 Bug Fixes
 ---------
 
