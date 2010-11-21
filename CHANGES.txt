@@ -1,6 +1,12 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
+- The ``pyramid_routesalchemy`` paster template's unit tests failed
+  (``AssertionError: 'SomeProject' != 'someproject'``).  This is fixed.
+
 Documentation
 -------------
 

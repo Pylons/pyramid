@@ -21,4 +21,4 @@ class TestMyView(unittest.TestCase):
         request = testing.DummyRequest()
         info = my_view(request)
         self.assertEqual(info['root'].name, 'root')
-        self.assertEqual(info['project'], '{{package}}')
+        self.assertEqual(info['project'], '{{project}}')
