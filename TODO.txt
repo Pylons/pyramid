@@ -17,25 +17,6 @@ Must-Have (before 1.0)
 - Use ``@register_view`` instead of ``@view_config`` and change view docs to
   use "view registration" instead of "view configuration".
 
-- SQLAlchemy idiomatics:
-
-   <RaFromBRC> mcdonc: those paster templates all look pretty good... the
-   only thing i'd consider is adjusting your config variable names to match
-   exactly what sqlalchemy uses as parameter names, see here:
-   http://www.sqlalchemy.org/docs/core/engines.html
-
-   <RaFromBRC> mcdonc: especially in the pylons_sqla ini file, where the db
-   initialization is mixed in w/ the app config...
-
-   <RaFromBRC> ... i'd use "sqlalchemy.PARAMETER" for all of the sqla
-   settings, so it could easily be handed to engine_from_config w/o any need
-   to parse by hand
-
-   <RaFromBRC> mcdonc: in the other ini files, where sqlalchemy is given its
-   own part, the "sqlalchemy." prefix probably isn't necessary, but matching
-   the parameter names (e.g. 'url' instead of 'db_string') is still probably
-   a good idea
-
 - Better ``config.add_handler`` documentation.
 
 Should-Have
