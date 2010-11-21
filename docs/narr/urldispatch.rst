@@ -268,10 +268,10 @@ and the match result will be ``{'name': 'biz', 'ext': 'html'}``. This
 occurs because the replacement marker ``{name}`` has a literal part of
 ``.`` (period) between the other replacement marker ``{ext}``.
 
-It is possible to use two replacement markers without any literal characters
-between them, for instance ``/{foo}{bar}``. This would be a nonsensical pattern
-without specifying a custom regular expression to restrict what a marker
-captures.
+It is possible to use two replacement markers without any literal
+characters between them, for instance ``/{foo}{bar}``. However, this
+would be a nonsensical pattern without specifying a custom regular
+expression to restrict what each marker captures.
 
 Segments must contain at least one character in order to match a
 segment replacement marker.  For example, for the URL ``/abc/``:
