@@ -355,7 +355,7 @@ The above pattern will match these URLs, generating the following matchdicts:
    foo/abc/def/a/b/c  -> {'baz':'abc', 'bar':'def', 'fizzle': 'a/b/c')}
 
 This occurs because the default regular expression for a marker is ``[^/]+``
-which will match everything up to the first ``/``, while ``{filzzle:.*}`` will
+which will match everything up to the first ``/``, while ``{fizzle:.*}`` will
 result in a regular expression match of ``.*`` capturing the remainder into
 a single value.
 
