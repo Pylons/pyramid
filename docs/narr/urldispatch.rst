@@ -281,7 +281,7 @@ segment replacement marker.  For example, for the URL ``/abc/``:
 - ``/{foo}/`` will match.
 
 Note that values representing path segments matched with a
-``:segment`` match will be url-unquoted and decoded from UTF-8 into
+``{segment}`` match will be url-unquoted and decoded from UTF-8 into
 Unicode within the matchdict.  So for instance, the following
 pattern:
 
