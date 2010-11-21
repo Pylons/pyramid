@@ -23,6 +23,9 @@ Documentation
   Shootout and Virginia sample applications, ported from their repoze.bfg
   origin packages.
 
+- SQLAlchemy+URLDispatch tutorial updated to integrate changes to
+  ``pyramid_routesalchemy`` template.
+
 
 1.0a4 (2010-11-21)
 ==================

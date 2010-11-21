@@ -1,5 +1,4 @@
 from pyramid.configuration import Configurator
-from pyramid.settings import asbool
 from sqlalchemy import engine_from_config
 
 from {{package}}.models import appmaker

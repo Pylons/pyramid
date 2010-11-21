@@ -1,5 +1,4 @@
 from pyramid.configuration import Configurator
-from pyramid.settings import asbool
 
 from pyramid_beaker import session_factory_from_settings
 
