@@ -179,12 +179,12 @@ during a request.  To do so:
   to service requests that match the route pattern.
 
 In this way, we supply a shortcut to the developer.  Under the hood,
-:app:`Pyramid` still consumes the :term:`context finding` and
-:term:`view lookup` subsystems provided by :app:`Pyramid`, but in a
-way which does not require that a developer understand either of them
-if he doesn't want or need to.  It also means that we can allow a
-developer to combine :term:`URL dispatch` and :term:`traversal` in
-various exceptional cases as documented in :ref:`hybrid_chapter`.
+the :term:`context finding` and :term:`view lookup` subsystems
+provided by :app:`Pyramid` are still being utilized, but in a way
+which does not require a developer to understand either of them in
+detail.  It also means that we can allow a developer to combine
+:term:`URL dispatch` and :term:`traversal` in various exceptional
+cases as documented in :ref:`hybrid_chapter`.
 
 .. index::
    single: route path pattern syntax
