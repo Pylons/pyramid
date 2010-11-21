@@ -100,6 +100,26 @@ class IBeforeRender(Interface):
         """ Return the value for key ``k`` from the renderer globals
         dictionary, or the default if no such value exists."""
 
+class IRenderer(Interface):
+    def __call__(value, system):
+        """ Call a the renderer implementation with the result of the
+        view (``value``) passed in and return a result (a string or
+        unicode object useful as a response body).  Values computed by
+        the system are passed by the system in the ``system``
+        parameter, which is a dictionary.  Keys in the dictionary
+        include: ``view`` (the view callable that returned the value),
+        ``renderer_name`` (the template name or simple name of the
+        renderer), ``context`` (the context object passed to the
+        view), and ``request`` (the request object passed to the
+        view)."""
+
+class ITemplateRenderer(IRenderer):
+    def implementation():
+        """ Return the object that the underlying templating system
+        uses to render the template; it is typically a callable that
+        accepts arbitrary keyword arguments and returns a string or
+        unicode object """
+
 # internal interfaces
 
 class IRequest(Interface):
@@ -233,19 +253,6 @@ class ITraverser(Interface):
 
 ITraverserFactory = ITraverser # b / c for 1.0 code
 
-class IRenderer(Interface):
-    def __call__(value, system):
-        """ Call a the renderer implementation with the result of the
-        view (``value``) passed in and return a result (a string or
-        unicode object useful as a response body).  Values computed by
-        the system are passed by the system in the ``system``
-        parameter, which is a dictionary.  Keys in the dictionary
-        include: ``view`` (the view callable that returned the value),
-        ``renderer_name`` (the template name or simple name of the
-        renderer), ``context`` (the context object passed to the
-        view), and ``request`` (the request object passed to the
-        view)."""
-
 class IRendererFactory(Interface):
     def __call__(name):
         """ Return an object that implements ``IRenderer``  """
@@ -258,13 +265,6 @@ class IRendererGlobalsFactory(Interface):
         key, indicating the current request, and the value
         ``renderer_name``, which will be the name of the renderer in
         use."""
-
-class ITemplateRenderer(IRenderer):
-    def implementation():
-        """ Return the object that the underlying templating system
-        uses to render the template; it is typically a callable that
-        accepts arbitrary keyword arguments and returns a string or
-        unicode object """
 
 class IViewPermission(Interface):
     def __call__(context, request):

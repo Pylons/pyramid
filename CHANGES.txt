@@ -26,6 +26,10 @@ Documentation
 - SQLAlchemy+URLDispatch tutorial updated to integrate changes to
   ``pyramid_routesalchemy`` template.
 
+- Add ``pyramid.interfaces.ITemplateRenderer`` interface to Interfaces API
+  chapter (has ``implementation()`` method, required to be used when getting
+  at Chameleon macros).
+
 
 1.0a4 (2010-11-21)
 ==================
