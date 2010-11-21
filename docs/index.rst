@@ -116,7 +116,7 @@ Sample Applications
 `cluegun <https://github.com/Pylons/cluegun>`_ is a simple pastebin
 application based on Rocky Burt's `ClueBin
 <http://pypi.python.org/pypi/ClueBin/0.2.3>`_.  It demonstrates form
-processing, security, and the use of :term:`ZODB` within a :mod:`repoze.bfg`
+processing, security, and the use of :term:`ZODB` within a :app:`Pyramid`
 application.  It also has very simple :term:`repoze.who` integration. Check
 this application out via::
 
