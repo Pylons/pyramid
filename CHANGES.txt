@@ -1,6 +1,13 @@
 Next release
 ============
 
+Documentation
+-------------
+
+- "Sample Applications" section of docs changed to note existence of Cluegun,
+  Shootout and Virginia sample applications, ported from their repoze.bfg
+  origin packages.
+
 
 1.0a4 (2010-11-21)
 ==================

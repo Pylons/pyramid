@@ -113,38 +113,39 @@ Design Documentation
 Sample Applications
 ===================
 
-.. warning::
-
-   These applications are for an older version of :app:`Pyramid`,
-   which was named :mod:`repoze.bfg`.  We'll be updating them soon to
-   use :app:`Pyramid`.
-
-`repoze.cluegun <http://svn.repoze.org/repoze.cluegun/trunk/>`_ is a
-simple pastebin application based on Rocky Burt's `ClueBin
+`cluegun <https://github.com/Pylons/cluegun>`_ is a simple pastebin
+application based on Rocky Burt's `ClueBin
 <http://pypi.python.org/pypi/ClueBin/0.2.3>`_.  It demonstrates form
-processing, security, and the use of :term:`ZODB` within a
-:mod:`repoze.bfg` application.  It also has very simple
-:term:`repoze.who` integration. Check this application out of
-Subversion via::
+processing, security, and the use of :term:`ZODB` within a :mod:`repoze.bfg`
+application.  It also has very simple :term:`repoze.who` integration. Check
+this application out via::
 
-  svn co http://svn.repoze.org/repoze.cluegun/trunk repoze.cluegun
+  git clone git://github.com/Pylons/cluegun.git
 
-`repoze.virginia <http://svn.repoze.org/repoze.virginia/trunk/>`_ is a
-very simple dynamic file rendering application.  It is willing to
-render structured text documents, HTML documents, and images from a
-filesystem directory.  This application runs the `repoze.org
-<http://repoze.org>`_ website.  Check this application out of
-Subversion via::
+`virginia <https://github.com/Pylons/virginia>`_ is a very simple dynamic
+file rendering application.  It is willing to render structured text
+documents, HTML documents, and images from a filesystem directory.  An
+earlier version of this application runs the `repoze.org
+<http://repoze.org>`_ website.  Check this application out via::
 
-  svn co http://svn.repoze.org/repoze.virginia/trunk repoze.virginia
+  git clone git://github.com/Pylons/virginia.git
 
-`repoze.shootout <http://svn.repoze.org/repoze.shootout/trunk/>`_ is
-an example "idea competition" application by Carlos de la Guardia.  It
-demonstrates a hybrid of :term:`URL dispatch` and :term:`traversal`
-and integration with `SQLAlchemy <http://www.sqlalchemy.org/>`_ and
-:term:`repoze.who`.  Check this application out of Subversion via::
+`shootout <https://github.com/Pylons/shootout>`_ is an example "idea
+competition" application by Carlos de la Guardia.  It demonstrates a hybrid
+of :term:`URL dispatch` and :term:`traversal` and integration with
+`SQLAlchemy <http://www.sqlalchemy.org/>`_ and :term:`repoze.who`.  Check
+this application out of version control via::
 
-  svn co http://svn.repoze.org/repoze.shootout/trunk repoze.shootout
+  git clone git://github.com/Pylons/shootout.git
+
+Older Sample Applications (repoze.bfg)
+======================================
+
+.. note::
+
+   These applications are for an older version of :app:`Pyramid`, which was
+   named :mod:`repoze.bfg`.  They won't work unmodified under Pyramid, but
+   might provide useful clues.
 
 `bfgsite <http://svn.repoze.org/bfgsite/trunk>`_ is the software which
 runs the `bfg.repoze.org <http://bfg.repoze.org>`_ website.  It
