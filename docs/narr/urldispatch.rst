@@ -263,10 +263,10 @@ To capture both segments, two replacement markers can be used:
     
     foo/{name}.{ext}
 
-The literal path ``/foo/biz.html`` will match the above route pattern, and the
-match result will be ``{'name': 'biz', 'ext': 'html'}``. This occurs because
-the replacement marker ``{name}`` has a literal part of ``.`` between the other
-replacement marker ``:ext``.
+The literal path ``/foo/biz.html`` will match the above route pattern,
+and the match result will be ``{'name': 'biz', 'ext': 'html'}``. This
+occurs because the replacement marker ``{name}`` has a literal part of
+``.`` (period) between the other replacement marker ``:ext``.
 
 It is possible to use two replacement markers without any literal characters
 between them, for instance ``/{foo}{bar}``. This would be a nonsensical pattern
