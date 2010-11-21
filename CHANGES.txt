@@ -70,7 +70,7 @@ Backwards Incompatibilities
 ---------------------------
 
 - The ``pyramid.testing.zcml_configure`` API has been removed.  It had been
-  advertised as removed since 1.2a1, but hadn't actually been.
+  advertised as removed since repoze.bfg 1.2a1, but hadn't actually been.
 
 Deprecations
 ------------
