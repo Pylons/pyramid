@@ -365,9 +365,9 @@ a single value.
 Route Declaration Ordering
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Because route configuration declarations are evaluated in a specific
-order when a request enters the system, route configuration
-declaration ordering is very important.
+Route configuration declarations are evaluated in a specific
+order when a request enters the system. As a result, the
+order of route configuration declarations is very important.
 
 The order that routes declarations are evaluated is the order in which
 they are added to the application at startup time.  This is unlike
@@ -387,7 +387,7 @@ be added in the following order:
    members/abc
 
 In such a configuration, the ``members/abc`` pattern would *never* be
-matched; this is because the match ordering will always match
+matched. This is because the match ordering will always match
 ``members/{def}`` first; the route configuration with ``members/abc``
 will never be evaluated.
 
