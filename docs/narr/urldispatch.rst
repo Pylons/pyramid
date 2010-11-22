@@ -422,8 +422,8 @@ related to each particular route.
 
 Supplying a different context for each route is useful when you're
 trying to use a :app:`Pyramid` :term:`authorization policy` to
-provide declarative "context-sensitive" security checks; each context
-can maintain a separate :term:`ACL`, as in
+provide declarative, "context sensitive" security checks; each context
+can maintain a separate :term:`ACL`, as documented in
 :ref:`using_security_with_urldispatch`.  It is also useful when you
 wish to combine URL dispatch with :term:`traversal` as documented
 within :ref:`hybrid_chapter`.
