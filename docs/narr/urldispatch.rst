@@ -414,7 +414,7 @@ found via :term:`view lookup`.
                     factory='myproject.models.root_factory')
 
 The factory can either be a Python object or a :term:`dotted Python name` (a
-string) which points to such a Python oject, as it is above.
+string) which points to such a Python object, as it is above.
 
 In this way, each route can use a different factory, making it
 possible to supply a different :term:`context` object to the view
