@@ -117,8 +117,7 @@ Sample Applications
 application based on Rocky Burt's `ClueBin
 <http://pypi.python.org/pypi/ClueBin/0.2.3>`_.  It demonstrates form
 processing, security, and the use of :term:`ZODB` within a :app:`Pyramid`
-application.  It also has very simple :term:`repoze.who` integration. Check
-this application out via::
+application.  Check this application out via::
 
   git clone git://github.com/Pylons/cluegun.git
 
@@ -133,8 +132,9 @@ earlier version of this application runs the `repoze.org
 `shootout <https://github.com/Pylons/shootout>`_ is an example "idea
 competition" application by Carlos de la Guardia.  It demonstrates a hybrid
 of :term:`URL dispatch` and :term:`traversal` and integration with
-`SQLAlchemy <http://www.sqlalchemy.org/>`_ and :term:`repoze.who`.  Check
-this application out of version control via::
+`SQLAlchemy <http://www.sqlalchemy.org/>`_, :term:`repoze.who`, and
+`Deliverance <http://www.deliveranceproject.org/>`_.  Check this application
+out of version control via::
 
   git clone git://github.com/Pylons/shootout.git
 
