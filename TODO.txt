@@ -14,8 +14,6 @@ Must-Have (before 1.0)
 - Use ``@register_view`` instead of ``@view_config`` and change view docs to
   use "view registration" instead of "view configuration".
 
-- Better ``config.add_handler`` documentation.
-
 Should-Have
 -----------
 
