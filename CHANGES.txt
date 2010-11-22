@@ -10,6 +10,9 @@ Features
   templates now use idiomatic SQLAlchemy configuration in their respective
   ``.ini`` files and Python code.
 
+- ``pyramid.testig.DummyRequest`` now has a class variable, ``query_string``,
+  which defaults to the empty string.
+
 Bug Fixes
 ---------
 
