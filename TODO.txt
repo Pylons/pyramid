@@ -11,9 +11,6 @@ Must-Have (before 1.0)
 
 - Provide a .flash API on session object.
 
-- Make default renderer work (renderer registered with no name, which is
-  active for every view unless the view names a specific renderer).
-
 - Use ``@register_view`` instead of ``@view_config`` and change view docs to
   use "view registration" instead of "view configuration".
 

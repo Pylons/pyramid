@@ -2558,6 +2558,36 @@ class ConfiguratorTests(unittest.TestCase):
         self.failIf(result is view)
         self.assertEqual(result(None, None).body, 'moo')
 
+    def test_derive_view_with_default_renderer_no_explicit_renderer(self):
+        def view(request):
+            return 'OK'
+        config = self._makeOne()
+        class moo(object):
+            def __init__(self, *arg, **kw):
+                pass
+            def __call__(self, *arg, **kw):
+                return 'moo'
+        config.add_renderer(None, moo)
+        result = config.derive_view(view)
+        self.failIf(result is view)
+        self.assertEqual(result(None, None).body, 'moo')
+
+    def test_derive_view_with_default_renderer_with_explicit_renderer(self):
+        def view(request):
+            return 'OK'
+        config = self._makeOne()
+        class moo(object): pass
+        class foo(object):
+            def __init__(self, *arg, **kw):
+                pass
+            def __call__(self, *arg, **kw):
+                return 'foo'
+        config.add_renderer(None, moo)
+        config.add_renderer('foo', foo)
+        result = config.derive_view(view, renderer='foo')
+        self.failIf(result is view)
+        self.assertEqual(result(None, None).body, 'foo')
+
     def test_derive_view_class_without_attr(self):
         class View(object):
             def __init__(self, request):
@@ -3241,9 +3271,9 @@ class Test__map_view(unittest.TestCase):
         request.registry = self.registry
         return request
 
-    def _callFUT(self, *arg, **kw):
+    def _callFUT(self, view, **kw):
         from pyramid.configuration import _map_view
-        return _map_view(*arg, **kw)
+        return _map_view(view, self.registry, **kw)
 
     def test__map_view_as_function_context_and_request(self):
         def view(context, request):
@@ -3542,8 +3572,7 @@ class Test__map_view(unittest.TestCase):
         def view(context, request):
             return {'a':'1'}
         info = {'name':renderer.spec, 'package':None}
-        result = self._callFUT(view, renderer=info,
-                               registry=self.registry)
+        result = self._callFUT(view, renderer=info)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)

@@ -296,12 +296,17 @@ class Configurator(object):
                      attr=None, renderer=None, wrapper_viewname=None,
                      viewname=None, accept=None, order=MAX_ORDER,
                      phash=DEFAULT_PHASH):
+        if renderer is None: # use default renderer if one exists
+            default_renderer_factory = self.registry.queryUtility(
+                IRendererFactory)
+            if default_renderer_factory is not None:
+                renderer = {'name':None, 'package':self.package}
         view = self.maybe_dotted(view)
         authn_policy = self.registry.queryUtility(IAuthenticationPolicy)
         authz_policy = self.registry.queryUtility(IAuthorizationPolicy)
         settings = self.registry.settings
         logger = self.registry.queryUtility(IDebugLogger)
-        mapped_view = _map_view(view, attr, renderer, self.registry)
+        mapped_view = _map_view(view, self.registry, attr, renderer)
         owrapped_view = _owrap_view(mapped_view, viewname, wrapper_viewname)
         secured_view = _secure_view(owrapped_view, permission,
                                     authn_policy, authz_policy)
@@ -1591,7 +1596,9 @@ class Configurator(object):
         Add a :app:`Pyramid` :term:`renderer` factory to the
         current configuration state.
 
-        The ``name`` argument is the renderer name.
+        The ``name`` argument is the renderer name.  Use ``None`` to
+        represent the default renderer (a renderer which will be used for all
+        views unless they name another renderer specifically).
 
         The ``factory`` argument is Python reference to an
         implementation of a :term:`renderer` factory or a
@@ -1605,6 +1612,11 @@ class Configurator(object):
         to use this method.
         """
         factory = self.maybe_dotted(factory)
+        # if name is None or the empty string, we're trying to register
+        # a default renderer, but registerUtility is too dumb to accept None
+        # as a name
+        if not name: 
+            name = ''
         self.registry.registerUtility(
             factory, IRendererFactory, name=name, info=_info)
 
@@ -2426,7 +2438,7 @@ def is_response(ob):
         return True
     return False
 
-def _map_view(view, attr=None, renderer=None, registry=None):
+def _map_view(view, registry, attr=None, renderer=None):
     wrapped_view = view
 
     helper = None
