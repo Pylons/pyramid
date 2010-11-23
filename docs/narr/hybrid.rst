@@ -102,7 +102,7 @@ application and a hybrid application:
   hybrid application, at least one route will be defined.
 
 - In a purely traversal based application, the root object used is
-  global implied by the :term:`root factory` provided at startup
+  global, implied by the :term:`root factory` provided at startup
   time; in a hybrid application, the :term:`root` object at which
   traversal begins may be varied on a per-route basis.
 
