@@ -207,8 +207,11 @@ the matched route's configuration.
 Because the pattern of the above route ends with ``*traverse``, when this
 route configuration is matched during a request, :app:`Pyramid`
 will attempt to use :term:`traversal` against the :term:`root` object
-implied by the :term:`root factory` implied by the route's
-configuration.  Once :term:`traversal` has found a :term:`context`,
+implied by the :term:`root factory` that is implied by the route's
+configuration.  Since no ``root_factory`` argument is explicitly specified
+for this route, this will either be the *global* root factory
+for the application, or the *default* root factory. 
+Once :term:`traversal` has found a :term:`context`,
 :term:`view lookup` will be invoked in almost exactly the same way it
 would have been invoked in a "pure" traversal-based application.
 
