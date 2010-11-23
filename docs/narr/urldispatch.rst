@@ -1072,12 +1072,14 @@ Redirecting to Slash-Appended Routes
 ------------------------------------
 
 For behavior like Django's ``APPEND_SLASH=True``, use the
-:func:`pyramid.view.append_slash_notfound_view` view as the
-:term:`Not Found view` in your application.  When this view is the Not
-Found view (indicating that no view was found), and any routes have
-been defined in the configuration of your application, if the value of
-``PATH_INFO`` does not already end in a slash, and if the value of
-``PATH_INFO`` *plus* a slash matches any route's pattern, it does an
+:func:`pyramid.view.append_slash_notfound_view` view as the :term:`Not
+Found view` in your application.  Defining this view as the :term:`Not
+Found view` is a way to automatically redirect requests where the URL
+lacks a trailing slash, but requires one to match the proper route.
+When configured, along with at least one other route in your
+application, this view will be invoked if the value of ``PATH_INFO``
+does not already end in a slash, and if the value of ``PATH_INFO``
+*plus* a slash matches any route's pattern.  In this case it does an
 HTTP redirect to the slash-appended ``PATH_INFO``.
 
 Let's use an example, because this behavior is a bit magical. If the
