@@ -1092,20 +1092,24 @@ your route configuration looks like so:
    config.add_route('noslash', 'no_slash', view='myproject.views.no_slash')
    config.add_route('hasslash', 'has_slash/', view='myproject.views.has_slash')
 
-If a request enters the application with the ``PATH_INFO`` value of
-``/no_slash``, the first route will match.  If a request enters the
-application with the ``PATH_INFO`` value of ``/no_slash/``, *no* route
-will match, and the slash-appending "not found" view will *not* find a
-matching route with an appended slash.
-
-However, if a request enters the application with the ``PATH_INFO``
+If a request enters the application with the ``PATH_INFO``
 value of ``/has_slash/``, the second route will match.  If a request
 enters the application with the ``PATH_INFO`` value of ``/has_slash``,
-a route *will* be found by the slash appending notfound view.  An HTTP
+a route *will* be found by the slash-appending not found view.  An HTTP
 redirect to ``/has_slash/`` will be returned to the user's browser.
 
-Note that this will *lose* ``POST`` data information (turning it into
-a GET), so you shouldn't rely on this to redirect POST requests.
+However, if a request enters the application with the ``PATH_INFO`` value of
+``/no_slash``, the first route will match.  If a request enters the
+application with the ``PATH_INFO`` value of ``/no_slash/``, *no* route
+will match, and the slash-appending not found view will *not* find a
+matching route with an appended slash.
+
+.. warning::
+
+	You **should not** rely on this mechanism to redirect ``POST`` requests.
+	The redirect  of the slash-appending not found view will turn a ``POST``
+	request into a ``GET``, losing any ``POST`` data in the original
+	request.
 
 To configure the slash-appending not found view in your application, change
 the application's startup configuration, adding the following stanza:
