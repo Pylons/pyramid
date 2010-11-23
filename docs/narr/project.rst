@@ -316,12 +316,13 @@ Python interpreter shell unconditionally.
 
       [pipeline:main]
       pipeline = egg:WebError#evalerror
-                 myapp
+                 MyProject
 
-   If you use ``main`` as the section name argument instead of ``myapp``
-   against the above ``.ini`` file, an error will occur.  Use the most
-   specific reference to your application within the ``.ini`` file possible
-   as the section name argument.
+   Use ``MyProject`` instead of ``main`` as the section name argument to
+   ``pshell`` against the above ``.ini`` file (e.g. ``paster pshell
+   development.ini MyProject``).  If you use ``main`` instead, an error will
+   occur.  Use the most specific reference to your application within the
+   ``.ini`` file possible as the section name argument.
 
 Press ``Ctrl-D`` to exit the interactive shell (or ``Ctrl-Z`` on Windows).
 
