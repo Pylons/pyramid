@@ -168,8 +168,8 @@ information on the handler method which is used by
 configuration.
 
 All keyword arguments are recorded, and passed to
-:meth:`!pyramid.configuration.Configurator.add_view`. Any valid keyword
-arguments for :meth:`!pyramid.configuration.Configurator.add_view` can thus be
+:meth:`~pyramid.configuration.Configurator.add_view`. Any valid keyword
+arguments for :meth:`~pyramid.configuration.Configurator.add_view` can thus be
 used with the :class:`~pyramid.view.action` decorator to further restrict when
 the view will be called.
 
