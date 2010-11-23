@@ -108,3 +108,5 @@ Nice-to-Have
 
 - Add functionality that mocks the behavior of ``repoze.browserid``.
 
+- One way to split up views chapter: views with renderers / views without
+  renderers.
