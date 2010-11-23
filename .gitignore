@@ -5,6 +5,7 @@
 *.pt.py
 *.txt.py
 .coverage
+tutorial.db
 env26/
 env24/
 env27/

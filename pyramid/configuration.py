@@ -296,12 +296,17 @@ class Configurator(object):
                      attr=None, renderer=None, wrapper_viewname=None,
                      viewname=None, accept=None, order=MAX_ORDER,
                      phash=DEFAULT_PHASH):
+        if renderer is None: # use default renderer if one exists
+            default_renderer_factory = self.registry.queryUtility(
+                IRendererFactory)
+            if default_renderer_factory is not None:
+                renderer = {'name':None, 'package':self.package}
         view = self.maybe_dotted(view)
         authn_policy = self.registry.queryUtility(IAuthenticationPolicy)
         authz_policy = self.registry.queryUtility(IAuthorizationPolicy)
         settings = self.registry.settings
         logger = self.registry.queryUtility(IDebugLogger)
-        mapped_view = _map_view(view, attr, renderer, self.registry)
+        mapped_view = _map_view(view, self.registry, attr, renderer)
         owrapped_view = _owrap_view(mapped_view, viewname, wrapper_viewname)
         secured_view = _secure_view(owrapped_view, permission,
                                     authn_policy, authz_policy)
@@ -698,6 +703,8 @@ class Configurator(object):
         route pattern is disallowed.
 
         Any extra keyword arguments are passed along to ``add_route``.
+
+        See :ref:`handlers_chapter` for more explanatory documentation.
 
         This method returns the result of add_route."""
         handler = self.maybe_dotted(handler)
@@ -1260,9 +1267,9 @@ class Configurator(object):
 
           The syntax of the ``traverse`` argument is the same as it is
           for ``pattern``. For example, if the ``pattern`` provided to
-          ``add_route`` is ``articles/:article/edit``, and the
+          ``add_route`` is ``articles/{article}/edit``, and the
           ``traverse`` argument provided to ``add_route`` is
-          ``/:article``, when a request comes in that causes the route
+          ``/{article}``, when a request comes in that causes the route
           to match in such a way that the ``article`` match value is
           '1' (when the request URI is ``/articles/1/edit``), the
           traversal path will be generated as ``/1``.  This means that
@@ -1306,7 +1313,7 @@ class Configurator(object):
 
         pattern
 
-          The pattern of the route e.g. ``ideas/:idea``.  This
+          The pattern of the route e.g. ``ideas/{idea}``.  This
           argument is required.  See :ref:`route_path_pattern_syntax`
           for information about the syntax of route patterns.  If the
           pattern doesn't match the current URL, route matching
@@ -1591,7 +1598,9 @@ class Configurator(object):
         Add a :app:`Pyramid` :term:`renderer` factory to the
         current configuration state.
 
-        The ``name`` argument is the renderer name.
+        The ``name`` argument is the renderer name.  Use ``None`` to
+        represent the default renderer (a renderer which will be used for all
+        views unless they name another renderer specifically).
 
         The ``factory`` argument is Python reference to an
         implementation of a :term:`renderer` factory or a
@@ -1605,6 +1614,11 @@ class Configurator(object):
         to use this method.
         """
         factory = self.maybe_dotted(factory)
+        # if name is None or the empty string, we're trying to register
+        # a default renderer, but registerUtility is too dumb to accept None
+        # as a name
+        if not name: 
+            name = ''
         self.registry.registerUtility(
             factory, IRendererFactory, name=name, info=_info)
 
@@ -2426,7 +2440,7 @@ def is_response(ob):
         return True
     return False
 
-def _map_view(view, attr=None, renderer=None, registry=None):
+def _map_view(view, registry, attr=None, renderer=None):
     wrapped_view = view
 
     helper = None
@@ -2844,14 +2858,10 @@ class DottedNameResolver(object):
 
     def maybe_resolve(self, dotted):
         if isinstance(dotted, basestring):
-            try:
-                if ':' in dotted:
-                    return self._pkg_resources_style(dotted)
-                else:
-                    return self._zope_dottedname_style(dotted)
-            except ImportError:
-                raise ConfigurationError(
-                    'The dotted name %r cannot be imported' % (dotted,))
+            if ':' in dotted:
+                return self._pkg_resources_style(dotted)
+            else:
+                return self._zope_dottedname_style(dotted)
         return dotted
 
 

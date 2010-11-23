@@ -6,57 +6,16 @@ Must-Have (before 1.0)
 
 - Add a ``handler`` ZCML directive.  This implies some slightly dicey
   refactoring of the configurator to allow it to generate ZCML
-  "discriminators" for views and routes.
+  "discriminators" for views and routes, that could be implemented in terms
+  of "twophase configuration" in "should have" below.
 
 - Provide a .flash API on session object.
-
-- Make default renderer work (renderer registered with no name, which is
-  active for every view unless the view names a specific renderer).
 
 - Use ``@register_view`` instead of ``@view_config`` and change view docs to
   use "view registration" instead of "view configuration".
 
-- SQLAlchemy idiomatics:
-
-   <RaFromBRC> mcdonc: those paster templates all look pretty good... the
-   only thing i'd consider is adjusting your config variable names to match
-   exactly what sqlalchemy uses as parameter names, see here:
-   http://www.sqlalchemy.org/docs/core/engines.html
-
-   <RaFromBRC> mcdonc: especially in the pylons_sqla ini file, where the db
-   initialization is mixed in w/ the app config...
-
-   <RaFromBRC> ... i'd use "sqlalchemy.PARAMETER" for all of the sqla
-   settings, so it could easily be handed to engine_from_config w/o any need
-   to parse by hand
-
-   <RaFromBRC> mcdonc: in the other ini files, where sqlalchemy is given its
-   own part, the "sqlalchemy." prefix probably isn't necessary, but matching
-   the parameter names (e.g. 'url' instead of 'db_string') is still probably
-   a good idea
-
-- Non-bwcompat use of threadlocals that need to be documented or ameliorated:
-
-  security.principals_allowed_by_permission
-
-  resource.OverrideProvider._get_overrides: can't credibly be removed,
-  because it stores an overrideprovider as a module-scope global.
-
-  traversal.traverse: this API is a stepchild, and needs to be changed.
-
-  Configurator.add_translation_dirs: not passed any context but a message,
-  can't credibly be removed.
-
-- Better ``config.add_handler`` documentation.
-
-- Fix DottedNameResolver to not convert ImportError to ConfigurationError if
-  the import that failed was unrelated to the import requested via a dotted
-  name.
-
 Should-Have
 -----------
-
-- Try to make test suite pass on IronPython.
 
 - Add docs for httpexceptions module for each webob.exc class that inherits
   from WSGIHTTPException.
@@ -74,8 +33,26 @@ Should-Have
 - Change "Cleaning up After a Request" in the urldispatch chapter to
   use ``request.add_response_callback``.
 
+- Twophase configuration (config = Configurator(autocommit=False)).  Maybe
+  use ``zope.configuration`` ConfigurationContext as config.registry.ctx and
+  push execution into the configurator.
+
 Nice-to-Have
 ------------
+
+- Try to make test suite pass on IronPython.
+
+- Non-bwcompat use of threadlocals that need to be documented or ameliorated:
+
+  security.principals_allowed_by_permission
+
+  resource.OverrideProvider._get_overrides: can't credibly be removed,
+  because it stores an overrideprovider as a module-scope global.
+
+  traversal.traverse: this API is a stepchild, and needs to be changed.
+
+  Configurator.add_translation_dirs: not passed any context but a message,
+  can't credibly be removed.
 
 - Supply ``X-Vhm-Host`` support.
 
@@ -85,7 +62,8 @@ Nice-to-Have
 
 - Change docs about creating a venusian decorator to not use ZCA.
 
-- ``decorator=`` parameter to bfg_view.
+- ``decorator=`` parameter to view_config.  This would replace the existing
+  _map_view "decorator" if it existed.
 
 - Try to better explain the relationship between a renderer and a
   template in the templates chapter and elsewhere.  Scan the

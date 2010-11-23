@@ -4,14 +4,54 @@ Next release
 Features
 --------
 
+- Add logging configuration to all paster templates.
+
+- ``pyramid_alchemy``, ``pyramid_routesalchemy``, and ``pylons_sqla`` paster
+  templates now use idiomatic SQLAlchemy configuration in their respective
+  ``.ini`` files and Python code.
+
+- ``pyramid.testig.DummyRequest`` now has a class variable, ``query_string``,
+  which defaults to the empty string.
+
+Bug Fixes
+---------
+
+- The ``pyramid_routesalchemy`` paster template's unit tests failed
+  (``AssertionError: 'SomeProject' != 'someproject'``).  This is fixed.
+
+- Make default renderer work (renderer factory registered with no name, which
+  is active for every view unless the view names a specific renderer).
+
+Documentation
+-------------
+
+- "Sample Applications" section of docs changed to note existence of Cluegun,
+  Shootout and Virginia sample applications, ported from their repoze.bfg
+  origin packages.
+
+- SQLAlchemy+URLDispatch tutorial updated to integrate changes to
+  ``pyramid_routesalchemy`` template.
+
+- Add ``pyramid.interfaces.ITemplateRenderer`` interface to Interfaces API
+  chapter (has ``implementation()`` method, required to be used when getting
+  at Chameleon macros).
+
+
+1.0a4 (2010-11-21)
+==================
+
+Features
+--------
+
 - URL Dispatch now allows for replacement markers to be located anywhere
   in the pattern, instead of immediately following a ``/``.
 
 - URL Dispatch now uses the form ``{marker}`` to denote a replace marker in
-  the route pattern instead of ``:marker``. The old syntax is still backwards
-  compatible and accepted. The new format allows a regular expression for that
-  marker location to be used instead of the default ``[^/]+``, for example
-  ``{marker:\d+}`` is now valid to require the marker to be digits.
+  the route pattern instead of ``:marker``. The old colon-style marker syntax
+  is still accepted for backwards compatibility. The new format allows a
+  regular expression for that marker location to be used instead of the
+  default ``[^/]+``, for example ``{marker:\d+}`` is now valid to require the
+  marker to be digits.
 
 - Add a ``pyramid.url.route_path`` API, allowing folks to generate relative
   URLs.  Calling ``route_path`` is the same as calling
@@ -29,6 +69,10 @@ Features
 - Surrounding application configuration with ``config.begin()`` and
   ``config.end()`` is no longer necessary.  All paster templates have been
   changed to no longer call these functions.
+
+- Fix configurator to not convert ``ImportError`` to ``ConfigurationError``
+  if the import that failed was unrelated to the import requested via a
+  dotted name when resolving dotted names (such as view dotted names).
 
 Documentation
 -------------
@@ -58,14 +102,14 @@ Bug Fixes
   ASCII string rather than being passed along to downstream code as a
   convenience to the user and to prevent puzzling second-order failures from
   cropping up (all failures will occur within ``pyramid.traversal.traverse``
-  rather than later down the line as the result of calling
+  rather than later down the line as the result of calling e.g.
   ``traversal_path``).
 
 Backwards Incompatibilities
 ---------------------------
 
 - The ``pyramid.testing.zcml_configure`` API has been removed.  It had been
-  advertised as removed since 1.2a1, but hadn't actually been.
+  advertised as removed since repoze.bfg 1.2a1, but hadn't actually been.
 
 Deprecations
 ------------

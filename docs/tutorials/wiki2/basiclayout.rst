@@ -32,27 +32,21 @@ entry point happens to be the ``app`` function within the file named
 
 #. *Lines 1-4*. Imports to support later code.
 
-#. *Lines 9-11*. Get the database configuration string from the
-   ``development.ini`` file's ``[app:sqlalchemy]`` section.  This will be a
-   URI (something like ``sqlite://``).
+#. *Line 9*. Create a SQLAlchemy database engine from the ``sqlalchemy.``
+   prefixed settings in the ``development.ini`` file's ``[app:tutorial]``
+   section.  This will be a URI (something like ``sqlite://``).
 
-#. *Line 12*. Get the database echo setting from ``development.ini``
-   file's ``[app:sqlalchemy]`` section.  This will either be ``true``
-   or ``false``.  If ``true``, the application will print SQL to the
-   console as it is generated and run by SQLAlchemy.  By default, it
-   is false.
+#. *Line 10*. We initialize our SQL database using SQLAlchemy, passing
+   it the engine
 
-#. Line *13*. We initialize our SQL database using SQLAlchemy, passing
-   it the db string and a variant of the db_echo value.
-
-#. *Line 14*.  We construct a :term:`Configurator`.  ``settings`` is
+#. *Line 11*.  We construct a :term:`Configurator`.  ``settings`` is
    passed as a keyword argument with the dictionary values passed by
    PasteDeploy as the ``settings`` argument.  This will be a
    dictionary of settings parsed by PasteDeploy, which contains
    deployment-related values such as ``reload_templates``,
    ``db_string``, etc.
 
-#. *Line 15*.  We call
+#. *Line 12*.  We call
    :meth:`pyramid.configuration.Configurator.add_static_view` with the
    arguments ``static`` (the name), and ``tutorial:static`` (the path).  This
    registers a static resource view which will match any URL that starts with
@@ -64,7 +58,7 @@ entry point happens to be the ``app`` function within the file named
    ``/static/foo``) will be used to compose a path to a static file resource,
    such as a CSS file.
 
-#. *Lines 16-17*.  Register a :term:`route configuration` via the
+#. *Lines 13-14*.  Register a :term:`route configuration` via the
    :meth:`pyramid.configuration.Configurator.add_route` method that will be
    used when the URL is ``/``.  Since this route has an ``pattern`` equalling
    ``/`` it is the "default" route. The argument named ``view`` with the
@@ -78,7 +72,7 @@ entry point happens to be the ``app`` function within the file named
    ``tutorial.views.my_view`` view returns a dictionary, a :term:`renderer`
    will use this template to create a response.
 
-#. *Line 18*.  We use the
+#. *Line 15*.  We use the
    :meth:`pyramid.configuration.Configurator.make_wsgi_app` method to return
    a :term:`WSGI` application.
 
@@ -97,29 +91,28 @@ Here is the source for ``models.py``:
       :linenos:
       :language: py
 
-#. *Lines 1-14*.  Imports to support later code.
+#. *Lines 1-13*.  Imports to support later code.
 
-#. *Line 16*.  We set up a SQLAlchemy "DBSession" object here.  We
+#. *Line 15*.  We set up a SQLAlchemy "DBSession" object here.  We
    specify that we'd like to use the "ZopeTransactionExtension".  This
    extension is an extension which allows us to use a *transaction
    manager* instead of controlling commits and aborts to database
    operations by hand.
 
-#. *Line 17*.  We create a declarative ``Base`` object to use as a
+#. *Line 16*.  We create a declarative ``Base`` object to use as a
    base class for our model.
 
-#. *Lines 19-27*.  A model class named ``MyModel``.  It has an
+#. *Lines 18-26*.  A model class named ``MyModel``.  It has an
    ``__init__`` that takes a two arguments (``name``, and ``value``).
    It stores these values as ``self.name`` and ``self.value`` within
    the ``__init__`` function itself.  The ``MyModel`` class also has a
    ``__tablename__`` attribute.  This informs SQLAlchemy which table
    to use to store the data representing instances of this class.
 
-#. *Lines 29-34*.  A function named ``populate`` which adds a single
+#. *Lines 28-33*.  A function named ``populate`` which adds a single
    model instance into our SQL storage and commits a transaction.
 
-#. *Lines 36-44*.  A function named ``initialize_sql`` which sets up
-   an actual SQL database and binds it to our SQLAlchemy DBSession
-   object.  It also calls the ``populate`` function, to do initial
-   database population.
+#. *Lines 35-42*.  A function named ``initialize_sql`` which receives a SQL
+   database engine and binds it to our SQLAlchemy DBSession object.  It also
+   calls the ``populate`` function, to do initial database population.
 

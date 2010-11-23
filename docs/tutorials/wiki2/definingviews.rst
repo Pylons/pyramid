@@ -24,7 +24,7 @@ The request passed to every view that is called as the result of a route
 match has an attribute named ``matchdict`` that contains the elements placed
 into the URL by the ``pattern`` of a ``route`` statement.  For instance, if a
 call to :meth:`pyramid.configuration.Configurator.add_route` in
-``__init__.py`` had the pattern ``:one/:two``, and the URL at
+``__init__.py`` had the pattern ``{one}/{two}``, and the URL at
 ``http://example.com/foo/bar`` was invoked, matching this pattern, the
 matchdict dictionary attached to the request passed to the view would have a
 ``one`` key with the value ``foo`` and a ``two`` key with the value ``bar``.
@@ -277,16 +277,16 @@ the order they're found in the ``__init__.py`` file.
    to the view named ``view_wiki`` in our ``views.py`` file with the name
    ``view_wiki``.  This is the :term:`default view` for the wiki.
 
-#. Add a declaration which maps the pattern ``/:pagename`` to the view named
+#. Add a declaration which maps the pattern ``/{pagename}`` to the view named
    ``view_page`` in our ``views.py`` file with the view name ``view_page``.
    This is the regular view for a page.
 
 #. Add a declaration which maps the pattern
-   ``/add_page/:pagename`` to the view named ``add_page`` in our
+   ``/add_page/{pagename}`` to the view named ``add_page`` in our
    ``views.py`` file with the name ``add_page``.  This is the add view
    for a new page.
 
-#. Add a declaration which maps the pattern ``/:pagename/edit_page`` to the
+#. Add a declaration which maps the pattern ``/{pagename}/edit_page`` to the
    view named ``edit_page`` in our ``views.py`` file with the name
    ``edit_page``.  This is the edit view for a page.
 
