@@ -8,6 +8,7 @@ from pyramid.interfaces import ITemplateRenderer
 from pyramid.exceptions import ConfigurationError
 from pyramid.resource import resolve_resource_spec
 from pyramid.resource import abspath_from_resource_spec
+from pyramid.util import DottedNameResolver
 
 from mako.lookup import TemplateLookup
 from mako import exceptions
@@ -61,17 +62,27 @@ def renderer_factory(info):
     lookup = registry.queryUtility(IMakoLookup)
     if lookup is None:
         reload_templates = settings.get('reload_templates', False)
-        directories = settings.get('mako.directories')
-        module_directory = settings.get('mako.module_directory')
+        directories = settings.get('mako.directories', None)
+        module_directory = settings.get('mako.module_directory', None)
         input_encoding = settings.get('mako.input_encoding', 'utf-8')
         error_handler = settings.get('mako.error_handler', None)
         default_filters = settings.get('mako.default_filters', None)
-        imports = settings.get('mako.imports', [])
+        imports = settings.get('mako.imports', None)
         if directories is None:
             raise ConfigurationError(
                 'Mako template used without a ``mako.directories`` setting')
-        directories = directories.splitlines()
+        directories = filter(None, directories.splitlines())
         directories = [ abspath_from_resource_spec(d) for d in directories ]
+        if module_directory is not None:
+            module_directory = abspath_from_resource_spec(module_directory)
+        if error_handler is not None:
+            dotted = DottedNameResolver(info.package)
+            error_handler = dotted.maybe_resolve(error_handler)
+        if default_filters is not None:
+            default_filters = filter(None, default_filters.splitlines())
+        if imports:
+            imports = filter(None, imports.splitlines())
+        
         lookup = PkgResourceTemplateLookup(directories=directories,
                                            module_directory=module_directory,
                                            input_encoding=input_encoding,

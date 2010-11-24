@@ -16,6 +16,9 @@ Features
 - Add support for json on GAE by catching NotImplementedError and importing
   simplejson from django.utils.
 
+- The Mako renderer now accepts a resource specification for
+  ``mako.module_directory``.
+
 Bug Fixes
 ---------
 
@@ -24,6 +27,12 @@ Bug Fixes
 
 - Make default renderer work (renderer factory registered with no name, which
   is active for every view unless the view names a specific renderer).
+
+- The Mako renderer did not properly turn the ``mako.imports``,
+  ``mako.default_filters``, and ``mako.imports`` settings into lists.
+
+- The Mako renderer did not properly convert the ``mako.error_handler``
+  setting from a dotted name to a callable.
 
 Documentation
 -------------
