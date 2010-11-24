@@ -10,8 +10,8 @@ Features
   templates now use idiomatic SQLAlchemy configuration in their respective
   ``.ini`` files and Python code.
 
-- ``pyramid.testig.DummyRequest`` now has a class variable, ``query_string``,
-  which defaults to the empty string.
+- ``pyramid.testing.DummyRequest`` now has a class variable,
+  ``query_string``, which defaults to the empty string.
 
 - Add support for json on GAE by catching NotImplementedError and importing
   simplejson from django.utils.
