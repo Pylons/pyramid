@@ -13,6 +13,9 @@ Features
 - ``pyramid.testig.DummyRequest`` now has a class variable, ``query_string``,
   which defaults to the empty string.
 
+- Add support for json on GAE by catching NotImplementedError and importing
+  simplejson from django.utils.
+
 Bug Fixes
 ---------
 
