@@ -516,7 +516,7 @@ itself (``myproject.views.abc``) will ever be invoked when the route matches,
 because the default view is always invoked when a route matches and when no
 post-match traversal is performed.
 
-To make the above view declaration non-useless, the special ``*traverse``
+To make the above view declaration useful, the special ``*traverse``
 token must end the route's pattern.  For example:
 
 .. code-block:: python
