@@ -250,14 +250,14 @@ route configuration statement:
    config.add_route('home', '{foo}/{bar}/*traverse', 
                     factory='mypackage.routes.root_factory')
 
-The ``factory`` above points at the function we've defined.  It
-will return an instance of the ``Traversable`` class as a root object
-whenever this route is matched.  Because the ``Traversable`` object
-we've defined has a ``__getitem__`` method that does something
-nominally useful, and because traversal uses ``__getitem__`` to walk
-the nodes that make up an object graph, using traversal against the
-root object implied by our route statement becomes a reasonable thing
-to do.
+The ``factory`` above points at the function we've defined.  It will
+return an instance of the ``Traversable`` class as a root object
+whenever this route is matched.  Instances of the``Traversable`` class
+can be used for graph traversal because they have a ``__getitem__``
+method that does something nominally useful. Since traversal uses
+``__getitem__`` to walk the nodes of an object graph, using traversal
+against the root object implied by our route statement is a reasonable
+thing to do.
 
 .. note::
 
