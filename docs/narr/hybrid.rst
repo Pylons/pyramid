@@ -389,7 +389,7 @@ request comes in that causes the route to match in such a way that the
 This means that the root object's ``__getitem__`` will be called with
 the name ``1`` during the traversal phase.  If the ``1`` object
 exists, it will become the :term:`context` of the request.
-:ref:`traversal_chapter` has more information about traversal.
+The :ref:`traversal_chapter` chapter has more information about traversal.
 
 If the traversal path contains segment marker names which are not
 present in the pattern argument, a runtime error will occur.  The
