@@ -312,7 +312,7 @@ route's name, in order to indicate that the view should *only be invoked when
 the route matches*.
 
 Calls to :meth:`pyramid.configuration.Configurator.add_view` may pass a
-``route_name`` attribute which refers to the value of an existing route's
+``route_name`` attribute, which refers to the value of an existing route's
 ``name`` argument.  In the above example, the route name is ``home``,
 referring to the name of the route defined above it.
 
