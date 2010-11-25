@@ -215,11 +215,12 @@ Once :term:`traversal` has found a :term:`context`,
 :term:`view lookup` will be invoked in almost exactly the same way it
 would have been invoked in a "pure" traversal-based application.
 
-The *default* :term:`root factory` cannot be traversed: it has no
-useful ``__getitem__`` method.  So we'll need to associate this route
-configuration with a non-default root factory in order to create a
-useful hybrid application.  To that end, let's imagine that we've
-created a root factory that looks like so in a module named
+Let's assume there is no *global* :term:`root factory` configured in
+this application. The *default* :term:`root factory` cannot be traversed: 
+it has no useful ``__getitem__`` method.  So we'll need to associate
+this route configuration with a custom root factory in order to
+create a useful hybrid application.  To that end, let's imagine that
+we've created a root factory that looks like so in a module named
 ``routes.py``:
 
 .. code-block:: python
