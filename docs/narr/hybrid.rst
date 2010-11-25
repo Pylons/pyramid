@@ -526,3 +526,8 @@ token must end the route's pattern.  For example:
    config.add_view('myproject.views.bazbuz', name='bazbuz',
                    route_name='abc')
 
+With the above configuration, the ``myproject.views.bazbuz`` view will
+be invoked when the request URI is ``/abc/bazbuz``, assuming there is
+no object contained by the root object with the key ``bazbuz``. A
+different request URI, such as ``/abc/foo/bar``, would invoke the
+default ``myproject.views.abc`` view.
