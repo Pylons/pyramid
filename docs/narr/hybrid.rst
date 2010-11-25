@@ -263,7 +263,7 @@ thing to do.
 
   We could have also used our ``root_factory`` callable as the
   ``root_factory`` argument of the
-  :class:`pyramid.configuration.Configurator` constructor instead
+  :class:`pyramid.configuration.Configurator` constructor, instead
   of associating it with a particular route inside the route's
   configuration.  Every hybrid route configuration that is matched but
   which does *not* name a ``factory``` attribute will use the use
