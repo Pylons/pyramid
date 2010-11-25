@@ -1,5 +1,9 @@
 from zope.component.registry import Components
+from zope.configuration.config import ConfigurationMachine
+from zope.configuration.xmlconfig import registerCommonDirectives
+
 from pyramid.interfaces import ISettings
+from pyramid.decorator import reify
 
 class Registry(Components, dict):
     """ A registry object is an :term:`application registry`.  The existence
@@ -47,5 +51,11 @@ class Registry(Components, dict):
         self._settings = settings
 
     settings = property(_get_settings, _set_settings)
+
+    @reify
+    def ctx(self):
+        context = ConfigurationMachine()
+        registerCommonDirectives(context)
+        return context
 
 global_registry = Registry('global')

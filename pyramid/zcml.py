@@ -17,11 +17,6 @@ from zope.schema import Bool
 from zope.schema import Int
 from zope.schema import TextLine
 
-from pyramid.interfaces import IAuthenticationPolicy
-from pyramid.interfaces import IAuthorizationPolicy
-from pyramid.interfaces import IDefaultPermission
-from pyramid.interfaces import IRendererFactory
-from pyramid.interfaces import IRouteRequest
 from pyramid.interfaces import IView
 
 from pyramid.authentication import AuthTktAuthenticationPolicy
@@ -31,10 +26,7 @@ from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.configuration import Configurator
 from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import NotFound
-from pyramid.exceptions import Forbidden
-from pyramid.request import route_request_iface
 from pyramid.resource import resource_spec_from_abspath
-from pyramid.static import StaticURLInfo
 from pyramid.threadlocal import get_current_registry
 
 ###################### directives ##########################
@@ -185,28 +177,14 @@ def view(
 
     context = context or for_
 
-    def register():
-        config = Configurator(reg, package=_context.package)
-        config.add_view(
-            permission=permission, context=context, view=view, name=name,
-            request_type=request_type, route_name=route_name,
-            request_method=request_method, request_param=request_param,
-            containment=containment, attr=attr, renderer=renderer,
-            wrapper=wrapper, xhr=xhr, accept=accept, header=header,
-            path_info=path_info, custom_predicates=custom_predicates,
-            _info=_context.info)
-
-    discriminator = ['view', context, name, request_type, IView, containment,
-                     request_param, request_method, route_name, attr,
-                     xhr, accept, header, path_info]
-
-    discriminator.extend(sorted(custom_predicates))
-    discriminator = tuple(discriminator)
-
-    _context.action(
-        discriminator = discriminator,
-        callable = register,
-        )
+    config = Configurator(reg, package=_context.package)
+    config.add_view(
+        permission=permission, context=context, view=view, name=name,
+        request_type=request_type, route_name=route_name,
+        request_method=request_method, request_param=request_param,
+        containment=containment, attr=attr, renderer=renderer,
+        wrapper=wrapper, xhr=xhr, accept=accept, header=header,
+        path_info=path_info, custom_predicates=custom_predicates)
 
 _view = view # for directives that take a view arg
 
@@ -303,48 +281,26 @@ def route(_context,
     if pattern is None:
         raise ConfigurationError('route directive must include a "pattern"')
 
-    def register():
-        config = Configurator(reg, package=_context.package)
-        config.add_route(
-            name,
-            pattern,
-            factory=factory,
-            header=header,
-            xhr=xhr,
-            accept=accept,
-            path_info=path_info,
-            request_method=request_method,
-            request_param=request_param,
-            custom_predicates=custom_predicates,
-            view=view,
-            view_context=view_context,
-            view_permission=view_permission,
-            view_renderer=view_renderer,
-            view_attr=view_attr,
-            use_global_views=use_global_views,
-            traverse=traverse,
-            _info=_context.info
-            )
-
-    discriminator = ['route', name, xhr, request_method, path_info,
-                     request_param, header, accept]
-    discriminator.extend(sorted(custom_predicates))
-    discriminator = tuple(discriminator)
-        
-    _context.action(
-        discriminator=discriminator,
-        callable = register,
+    config = Configurator(reg, package=_context.package)
+    config.add_route(
+        name,
+        pattern,
+        factory=factory,
+        header=header,
+        xhr=xhr,
+        accept=accept,
+        path_info=path_info,
+        request_method=request_method,
+        request_param=request_param,
+        custom_predicates=custom_predicates,
+        view=view,
+        view_context=view_context,
+        view_permission=view_permission,
+        view_renderer=view_renderer,
+        view_attr=view_attr,
+        use_global_views=use_global_views,
+        traverse=traverse,
         )
-
-    if view:
-        request_iface = reg.queryUtility(IRouteRequest, name=name)
-        if request_iface is None:
-            request_iface = route_request_iface(name)
-            reg.registerUtility(request_iface, IRouteRequest, name=name)
-        _context.action(
-            discriminator = (
-                'view', view_context, '', None, IView, name, view_attr),
-            )
 
 class ISystemViewDirective(Interface):
     view = GlobalObject(
@@ -381,7 +337,7 @@ def notfound(_context,
             reg = get_current_registry()
         config = Configurator(reg, package=_context.package)
         config.set_notfound_view(view=view, attr=attr, renderer=renderer,
-                                 wrapper=wrapper, _info=_context.info)
+                                 wrapper=wrapper)
 
     discriminator = ('view', NotFound, '', None, IView, None, None, None,
                      None, attr, False, None, None, None)
@@ -397,22 +353,14 @@ def forbidden(_context,
              renderer=None,
              wrapper=None):
 
-    def register():
-        try:
-            reg = _context.registry
-        except AttributeError: # pragma: no cover (b/c)
-            reg = get_current_registry()
-        config = Configurator(reg, package=_context.package)
-        config.set_forbidden_view(view=view, attr=attr, renderer=renderer,
-                                 wrapper=wrapper, _info=_context.info)
+    try:
+        reg = _context.registry
+    except AttributeError: # pragma: no cover (b/c)
+        reg = get_current_registry()
+    config = Configurator(reg, package=_context.package)
+    config.set_forbidden_view(view=view, attr=attr, renderer=renderer,
+                             wrapper=wrapper)
 
-    discriminator = ('view', Forbidden, '', None, IView, None, None, None,
-                     None, attr, False, None, None, None)
-
-    _context.action(
-        discriminator = discriminator,
-        callable = register,
-        )
     
 class IResourceDirective(Interface):
     """
@@ -435,12 +383,7 @@ def resource(_context, to_override, override_with):
         reg = get_current_registry()
 
     config = Configurator(reg, package=_context.package)
-
-    _context.action(
-        discriminator = None,
-        callable = config.override_resource,
-        args = (to_override, override_with, _context.info),
-        )
+    config.override_resource(to_override, override_with)
 
 class IRepozeWho1AuthenticationPolicyDirective(Interface):
     identifier_name = TextLine(title=u'identitfier_name', required=False,
@@ -458,8 +401,7 @@ def repozewho1authenticationpolicy(_context, identifier_name='auth_tkt',
     except AttributeError: # pragma: no cover (b/c)
         reg = get_current_registry()
     config = Configurator(reg, package=_context.package)
-    config._set_authentication_policy(policy, _info=_context.info)
-    _context.action(discriminator=IAuthenticationPolicy)
+    config._set_authentication_policy(policy)
 
 class IRemoteUserAuthenticationPolicyDirective(Interface):
     environ_key = TextLine(title=u'environ_key', required=False,
@@ -477,8 +419,7 @@ def remoteuserauthenticationpolicy(_context, environ_key='REMOTE_USER',
     except AttributeError: # pragma: no cover (b/c)
         reg = get_current_registry()
     config = Configurator(reg, package=_context.package)
-    config._set_authentication_policy(policy, _info=_context.info)
-    _context.action(discriminator=IAuthenticationPolicy)
+    config._set_authentication_policy(policy)
 
 class IAuthTktAuthenticationPolicyDirective(Interface):
     secret = TextLine(title=u'secret', required=True)
@@ -524,8 +465,7 @@ def authtktauthenticationpolicy(_context,
     except AttributeError: # pragma: no cover (b/c)
         reg = get_current_registry()
     config = Configurator(reg, package=_context.package)
-    config._set_authentication_policy(policy, _info=_context.info)
-    _context.action(discriminator=IAuthenticationPolicy)
+    config._set_authentication_policy(policy)
 
 class IACLAuthorizationPolicyDirective(Interface):
     pass
@@ -539,8 +479,7 @@ def aclauthorizationpolicy(_context):
     except AttributeError: # pragma: no cover (b/c)
         reg = get_current_registry()
     config = Configurator(reg, package=_context.package)
-    config._set_authorization_policy(policy, _info=_context.info)
-    _context.action(discriminator=IAuthorizationPolicy)
+    config._set_authorization_policy(policy)
 
 class IRendererDirective(Interface):
     factory = GlobalObject(
@@ -559,8 +498,7 @@ def renderer(_context, factory, name=''):
     except AttributeError: # pragma: no cover (b/c)
         reg = get_current_registry()
     config = Configurator(reg, package=_context.package)
-    config.add_renderer(name, factory, _info=_context.info)
-    _context.action(discriminator=(IRendererFactory, name))
+    config.add_renderer(name, factory)
 
 class IStaticDirective(Interface):
     name = TextLine(
@@ -595,23 +533,8 @@ def static(_context, name, path, cache_max_age=3600,
     except AttributeError: # pragma: no cover (b/c)
         reg = get_current_registry()
     config = Configurator(reg, package=_context.package)
-
-    _context.action(
-        discriminator=('static', name),
-        callable=config.add_static_view,
-        args = (name, path),
-        kw = {'cache_max_age':cache_max_age,
-              'permission':permission,
-              '_info':_context.info},
-        )
-
-    if not '/' in name:
-        _context.action(
-            discriminator = (
-                'view', StaticURLInfo, '', None, IView, None,  None, None,
-                name, None, None, None, None, None,
-                )
-            )
+    config.add_static_view(name, path, cache_max_age=cache_max_age,
+                           permission=permission)
 
 class IScanDirective(Interface):
     package = GlobalObject(
@@ -625,11 +548,7 @@ def scan(_context, package):
     except AttributeError: # pragma: no cover (b/c)
         reg = get_current_registry()
     config = Configurator(reg, package=_context.package)
-    _context.action(
-        discriminator=None,
-        callable=config.scan,
-        args=(package, None, _context.info)
-        )
+    config.scan(package)
 
 class ITranslationDirDirective(Interface):
     dir = TextLine(
@@ -646,12 +565,7 @@ def translationdir(_context, dir):
         reg = get_current_registry()
 
     config = Configurator(reg, package=_context.package)
-
-    _context.action(
-        discriminator = ('tdir', path),
-        callable=config.add_translation_dirs,
-        args = (dir,),
-        )
+    config.add_translation_dirs(path)
 
 class ILocaleNegotiatorDirective(Interface):
     negotiator = GlobalObject(
@@ -666,12 +580,7 @@ def localenegotiator(_context, negotiator):
     except AttributeError: # pragma: no cover (b/c)
         reg = get_current_registry()
     config = Configurator(reg, package=_context.package)
-
-    _context.action(
-        discriminator = 'lnegotiator',
-        callable=config.set_locale_negotiator,
-        args = (negotiator,)
-        )
+    config.set_locale_negotiator(negotiator)
 
 class IAdapterDirective(Interface):
     """
@@ -817,11 +726,7 @@ def subscriber(_context, for_=None, factory=None, handler=None, provides=None):
     config = Configurator(registry=registry, package=_context.package)
 
     if handler is not None:
-        _context.action(
-            discriminator = None,
-            callable = config.add_subscriber,
-            args = (handler, for_, _context.info),
-            )
+        config.add_subscriber(handler, for_)
     else:
         _context.action(
             discriminator = None,
@@ -910,7 +815,6 @@ def default_permission(_context, name):
         reg = get_current_registry()
     config = Configurator(reg, package=_context.package)
     config.set_default_permission(name)
-    _context.action(discriminator=IDefaultPermission)
 
 def path_spec(context, path):
     # we prefer registering resource specifications over absolute

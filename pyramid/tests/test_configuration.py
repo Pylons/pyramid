@@ -245,7 +245,9 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(result, 'pyramid.tests:templates')
 
     def test_setup_registry_fixed(self):
+        from zope.configuration.config import ConfigurationMachine
         class DummyRegistry(object):
+            ctx = ConfigurationMachine()
             def subscribers(self, events, name):
                 self.events = events
                 return events
@@ -262,7 +264,9 @@ class ConfiguratorTests(unittest.TestCase):
     def test_setup_registry_registers_default_exceptionresponse_view(self):
         from pyramid.interfaces import IExceptionResponse
         from pyramid.view import default_exceptionresponse_view
+        from zope.configuration.config import ConfigurationMachine
         class DummyRegistry(object):
+            ctx = ConfigurationMachine()
             def registerUtility(self, *arg, **kw):
                 pass
         reg = DummyRegistry()

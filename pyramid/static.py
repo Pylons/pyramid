@@ -136,7 +136,6 @@ class StaticURLInfo(object):
             self.registrations.append((name, spec, True))
         else:
             # it's a view name
-            _info = extra.pop('_info', None)
             cache_max_age = extra.pop('cache_max_age', None)
             view = static_view(spec, cache_max_age=cache_max_age)
             # register a route using this view
@@ -148,7 +147,6 @@ class StaticURLInfo(object):
                 view_for=self.__class__,
                 view_permission=permission,
                 factory=lambda *x: self,
-                _info=_info
                 )
             self.registrations.append((name, spec, False))
 

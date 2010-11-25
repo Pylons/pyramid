@@ -9,8 +9,6 @@ import venusian
 from translationstring import ChameleonTranslate
 
 from zope.configuration import xmlconfig
-from zope.configuration.config import ConfigurationMachine
-from zope.configuration.xmlconfig import registerCommonDirectives
 
 from zope.interface import Interface
 from zope.interface import implementedBy
@@ -100,6 +98,15 @@ if chameleon_text:
 if chameleon_zpt:
     DEFAULT_RENDERERS += (('.txt', chameleon_text.renderer_factory),)
 
+def config_method(wrapped):
+    def wrapper(self, *arg, **kw):
+        result = wrapped(self, *arg, **kw)
+        if self.autocommit:
+            self.commit()
+        return result
+    wrapper.__doc__ = wrapped.__doc__
+    wrapper.__name__ = wrapped.__name__
+    return wrapper
 
 class Configurator(object):
     """
@@ -227,6 +234,7 @@ class Configurator(object):
                  renderer_globals_factory=None,
                  default_permission=None,
                  session_factory=None,
+                 autocommit = True,
                  ):
         if package is None:
             package = caller_package()
@@ -235,6 +243,7 @@ class Configurator(object):
         self.package_name = name_resolver.package_name
         self.package = name_resolver.package
         self.registry = registry
+        self.autocommit = autocommit
         if registry is None:
             registry = Registry(self.package_name)
             self.registry = registry
@@ -267,20 +276,29 @@ class Configurator(object):
         self.registry.registerUtility(factory, IRootFactory)
         self.registry.registerUtility(factory, IDefaultRootFactory) # b/c
 
-    def _set_authentication_policy(self, policy, _info=u''):
+    @config_method
+    def _set_authentication_policy(self, policy):
         """ Add a :app:`Pyramid` :term:`authentication policy` to
         the current configuration."""
         policy = self.maybe_dotted(policy)
-        self.registry.registerUtility(policy, IAuthenticationPolicy,
-                                      info=_info)
+        _info = self.ctx_info()
+        def register():
+            self.registry.registerUtility(policy, IAuthenticationPolicy,
+                                          info=_info)
+        self.action(IAuthenticationPolicy, register)
 
-    def _set_authorization_policy(self, policy, _info=u''):
+    @config_method
+    def _set_authorization_policy(self, policy):
         """ Add a :app:`Pyramid` :term:`authorization policy` to
         the current configuration state (also accepts a :term:`dotted
         Python name`."""
         policy = self.maybe_dotted(policy)
-        self.registry.registerUtility(policy, IAuthorizationPolicy, info=_info)
-
+        _info = self.ctx_info()
+        def register():
+            self.registry.registerUtility(policy, IAuthorizationPolicy,
+                                          info=_info)
+        self.action(IAuthorizationPolicy, register)
+            
     def _make_spec(self, path_or_spec):
         package, filename = resolve_resource_spec(path_or_spec,
                                                   self.package_name)
@@ -317,16 +335,17 @@ class Configurator(object):
         return derived_view
 
     def _override(self, package, path, override_package, override_prefix,
-                  _info=u'', PackageOverrides=PackageOverrides):
-            pkg_name = package.__name__
-            override_pkg_name = override_package.__name__
-            override = self.registry.queryUtility(
-                IPackageOverrides, name=pkg_name)
-            if override is None:
-                override = PackageOverrides(package)
-                self.registry.registerUtility(override, IPackageOverrides,
-                                              name=pkg_name, info=_info)
-            override.insert(path, override_pkg_name, override_prefix)
+                  PackageOverrides=PackageOverrides):
+        pkg_name = package.__name__
+        override_pkg_name = override_package.__name__
+        override = self.registry.queryUtility(
+            IPackageOverrides, name=pkg_name)
+        _info = self.ctx_info()
+        if override is None:
+            override = PackageOverrides(package)
+            self.registry.registerUtility(override, IPackageOverrides,
+                                          name=pkg_name, info=_info)
+        override.insert(path, override_pkg_name, override_prefix)
 
     def _set_security_policies(self, authentication, authorization=None):
         if authorization is None:
@@ -355,6 +374,10 @@ class Configurator(object):
             _registry.has_listeners = True
 
     # API
+
+    def commit(self):
+        """ Commit the current set of configuration actions. """
+        self.registry.ctx.execute_actions()
 
     def with_package(self, package):
         """ Return a new Configurator instance with the same registry
@@ -562,7 +585,16 @@ class Configurator(object):
             renderer = {'name':renderer, 'package':self.package}
         return self._derive_view(view, attr=attr, renderer=renderer)
 
-    def add_subscriber(self, subscriber, iface=None, info=u''):
+    def action(self, discriminator, callable, args=(), kw=None, order=0):
+        if kw is None:
+            kw = {}
+        self.registry.ctx.action(discriminator, callable, args, kw, order)
+
+    def ctx_info(self):
+        return getattr(self.registry.ctx, 'info', '')
+
+    @config_method
+    def add_subscriber(self, subscriber, iface=None):
         """Add an event :term:`subscriber` for the event stream
         implied by the supplied ``iface`` interface.  The
         ``subscriber`` argument represents a callable object (or a
@@ -581,7 +613,10 @@ class Configurator(object):
             iface = (Interface,)
         if not isinstance(iface, (tuple, list)):
             iface = (iface,)
-        self.registry.registerHandler(subscriber, iface, info=info)
+        info = self.ctx_info()
+        def register():
+            self.registry.registerHandler(subscriber, iface, info=info)
+        self.action(None, register)
         return subscriber
 
     def add_settings(self, settings=None, **kw):
@@ -661,8 +696,7 @@ class Configurator(object):
         lock.acquire()
         self.manager.push({'registry':self.registry, 'request':None})
         try:
-            context = ConfigurationMachine()
-            registerCommonDirectives(context)
+            context = self.registry.ctx
             context.package = package
             context.registry = self.registry
             xmlconfig.file(filename, package, context=context, execute=True)
@@ -784,12 +818,13 @@ class Configurator(object):
 
         return route
 
+    @config_method
     def add_view(self, view=None, name="", for_=None, permission=None,
                  request_type=None, route_name=None, request_method=None,
                  request_param=None, containment=None, attr=None,
                  renderer=None, wrapper=None, xhr=False, accept=None,
                  header=None, path_info=None, custom_predicates=(),
-                 context=None, _info=u''):
+                 context=None):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
         down below into *predicate* arguments and *non-predicate*
@@ -1073,7 +1108,6 @@ class Configurator(object):
                     renderer=renderer, wrapper=wrapper, xhr=xhr, accept=accept,
                     header=header, path_info=path_info,
                     custom_predicates=custom_predicates, context=context,
-                    _info=u''
                     )
                 view_info = deferred_views.setdefault(route_name, [])
                 view_info.append(info)
@@ -1092,11 +1126,6 @@ class Configurator(object):
         if renderer is not None and not isinstance(renderer, dict):
             renderer = {'name':renderer, 'package':self.package}
 
-        # NO_PERMISSION_REQUIRED handled by _secure_view
-        derived_view = self._derive_view(view, permission, predicates, attr,
-                                         renderer, wrapper, name, accept,
-                                         order, phash)
-
         if context is None:
             context = for_
 
@@ -1106,102 +1135,120 @@ class Configurator(object):
         if not IInterface.providedBy(r_context):
             r_context = implementedBy(r_context)
 
-        registered = self.registry.adapters.registered
+        _info = self.ctx_info()
 
-        # A multiviews is a set of views which are registered for
-        # exactly the same context type/request type/name triad.  Each
-        # consituent view in a multiview differs only by the
-        # predicates which it possesses.
+        def register():
 
-        # To find a previously registered view for a context
-        # type/request type/name triad, we need to use the
-        # ``registered`` method of the adapter registry rather than
-        # ``lookup``.  ``registered`` ignores interface inheritance
-        # for the required and provided arguments, returning only a
-        # view registered previously with the *exact* triad we pass
-        # in.
+            # NO_PERMISSION_REQUIRED handled by _secure_view
+            derived_view = self._derive_view(view, permission, predicates, attr,
+                                             renderer, wrapper, name, accept,
+                                             order, phash)
 
-        # We need to do this three times, because we use three
-        # different interfaces as the ``provided`` interface while
-        # doing registrations, and ``registered`` performs exact
-        # matches on all the arguments it receives.
+            registered = self.registry.adapters.registered
 
-        old_view = None
+            # A multiviews is a set of views which are registered for
+            # exactly the same context type/request type/name triad.  Each
+            # consituent view in a multiview differs only by the
+            # predicates which it possesses.
 
-        for view_type in (IView, ISecuredView, IMultiView):
-            old_view = registered((IViewClassifier, request_iface, r_context),
-                                  view_type, name)
-            if old_view is not None:
-                break
+            # To find a previously registered view for a context
+            # type/request type/name triad, we need to use the
+            # ``registered`` method of the adapter registry rather than
+            # ``lookup``.  ``registered`` ignores interface inheritance
+            # for the required and provided arguments, returning only a
+            # view registered previously with the *exact* triad we pass
+            # in.
 
-        isexc = isexception(context)
+            # We need to do this three times, because we use three
+            # different interfaces as the ``provided`` interface while
+            # doing registrations, and ``registered`` performs exact
+            # matches on all the arguments it receives.
 
-        def regclosure():
-            if hasattr(derived_view, '__call_permissive__'):
-                view_iface = ISecuredView
-            else:
-                view_iface = IView
-            self.registry.registerAdapter(
-                derived_view,
-                (IViewClassifier, request_iface, context),
-                view_iface, name, info=_info)
-            if isexc:
+            old_view = None
+
+            for view_type in (IView, ISecuredView, IMultiView):
+                old_view = registered((IViewClassifier, request_iface,
+                                       r_context), view_type, name)
+                if old_view is not None:
+                    break
+
+            isexc = isexception(context)
+
+            def regclosure():
+                if hasattr(derived_view, '__call_permissive__'):
+                    view_iface = ISecuredView
+                else:
+                    view_iface = IView
                 self.registry.registerAdapter(
                     derived_view,
-                    (IExceptionViewClassifier, request_iface, context),
+                    (IViewClassifier, request_iface, context),
                     view_iface, name, info=_info)
-
-        is_multiview = IMultiView.providedBy(old_view)
-        old_phash = getattr(old_view, '__phash__', DEFAULT_PHASH)
-
-        if old_view is None:
-            # - No component was yet registered for any of our I*View
-            #   interfaces exactly; this is the first view for this
-            #   triad.
-            regclosure()
-
-        elif (not is_multiview) and (old_phash == phash):
-            # - A single view component was previously registered with
-            #   the same predicate hash as this view; this registration
-            #   is therefore an override.
-            regclosure()
-
-        else:
-            # - A view or multiview was already registered for this
-            #   triad, and the new view is not an override.
-
-            # XXX we could try to be more efficient here and register
-            # a non-secured view for a multiview if none of the
-            # multiview's consituent views have a permission
-            # associated with them, but this code is getting pretty
-            # rough already
-            if is_multiview:
-                multiview = old_view
-            else:
-                multiview = MultiView(name)
-                old_accept = getattr(old_view, '__accept__', None)
-                old_order = getattr(old_view, '__order__', MAX_ORDER)
-                multiview.add(old_view, old_order, old_accept, old_phash)
-            multiview.add(derived_view, order, accept, phash)
-            for view_type in (IView, ISecuredView):
-                # unregister any existing views
-                self.registry.adapters.unregister(
-                    (IViewClassifier, request_iface, r_context),
-                    view_type, name=name)
                 if isexc:
+                    self.registry.registerAdapter(
+                        derived_view,
+                        (IExceptionViewClassifier, request_iface, context),
+                        view_iface, name, info=_info)
+
+            is_multiview = IMultiView.providedBy(old_view)
+            old_phash = getattr(old_view, '__phash__', DEFAULT_PHASH)
+
+            if old_view is None:
+                # - No component was yet registered for any of our I*View
+                #   interfaces exactly; this is the first view for this
+                #   triad.
+                regclosure()
+
+            elif (not is_multiview) and (old_phash == phash):
+                # - A single view component was previously registered with
+                #   the same predicate hash as this view; this registration
+                #   is therefore an override.
+                regclosure()
+
+            else:
+                # - A view or multiview was already registered for this
+                #   triad, and the new view is not an override.
+
+                # XXX we could try to be more efficient here and register
+                # a non-secured view for a multiview if none of the
+                # multiview's consituent views have a permission
+                # associated with them, but this code is getting pretty
+                # rough already
+                if is_multiview:
+                    multiview = old_view
+                else:
+                    multiview = MultiView(name)
+                    old_accept = getattr(old_view, '__accept__', None)
+                    old_order = getattr(old_view, '__order__', MAX_ORDER)
+                    multiview.add(old_view, old_order, old_accept, old_phash)
+                multiview.add(derived_view, order, accept, phash)
+                for view_type in (IView, ISecuredView):
+                    # unregister any existing views
                     self.registry.adapters.unregister(
-                        (IExceptionViewClassifier, request_iface, r_context),
+                        (IViewClassifier, request_iface, r_context),
                         view_type, name=name)
-            self.registry.registerAdapter(
-                multiview,
-                (IViewClassifier, request_iface, context),
-                IMultiView, name=name, info=_info)
-            if isexc:
+                    if isexc:
+                        self.registry.adapters.unregister(
+                            (IExceptionViewClassifier, request_iface,
+                             r_context), view_type, name=name)
                 self.registry.registerAdapter(
                     multiview,
-                    (IExceptionViewClassifier, request_iface, context),
+                    (IViewClassifier, request_iface, context),
                     IMultiView, name=name, info=_info)
+                if isexc:
+                    self.registry.registerAdapter(
+                        multiview,
+                        (IExceptionViewClassifier, request_iface, context),
+                        IMultiView, name=name, info=_info)
 
+        discriminator = [
+            'view', context, name, request_type, containment,
+            request_param, request_method, route_name, attr,
+            xhr, accept, header, path_info]
+        discriminator.extend(sorted(custom_predicates))
+        discriminator = tuple(discriminator)
+        self.action(discriminator, register)
+
+    @config_method
     def add_route(self,
                   name,
                   pattern=None,
@@ -1225,8 +1272,7 @@ class Configurator(object):
                   view_attr=None,
                   use_global_views=False,
                   path=None,
-                  pregenerator=None,
-                  _info=u''):
+                  pregenerator=None):
         """ Add a :term:`route configuration` to the current
         configuration state, as well as possibly a :term:`view
         configuration` to be used to specify a :term:`view callable`
@@ -1534,7 +1580,6 @@ class Configurator(object):
                 route_name=name,
                 renderer=view_renderer,
                 attr=view_attr,
-                _info=_info,
                 )
 
         mapper = self.get_routes_mapper()
@@ -1544,6 +1589,13 @@ class Configurator(object):
             pattern = path
         if pattern is None:
             raise ConfigurationError('"pattern" argument may not be None')
+
+        discriminator = ['route', name, xhr, request_method, path_info,
+                         request_param, header, accept]
+        discriminator.extend(sorted(custom_predicates))
+        discriminator = tuple(discriminator)
+
+        self.action(discriminator, None)
 
         return mapper.connect(name, pattern, factory, predicates=predicates,
                               pregenerator=pregenerator)
@@ -1557,7 +1609,7 @@ class Configurator(object):
             self.registry.registerUtility(mapper, IRoutesMapper)
         return mapper
 
-    def scan(self, package=None, categories=None, _info=u''):
+    def scan(self, package=None, categories=None):
         """ Scan a Python package and any of its subpackages for
         objects marked with :term:`configuration decoration` such as
         :class:`pyramid.view.view_config`.  Any decorated object found
@@ -1592,7 +1644,8 @@ class Configurator(object):
         scanner = self.venusian.Scanner(config=self)
         scanner.scan(package, categories=categories)
 
-    def add_renderer(self, name, factory, _info=u''):
+    @config_method
+    def add_renderer(self, name, factory):
         """
         Add a :app:`Pyramid` :term:`renderer` factory to the
         current configuration state.
@@ -1619,10 +1672,12 @@ class Configurator(object):
         if not name: 
             name = ''
         self.registry.registerUtility(
-            factory, IRendererFactory, name=name, info=_info)
+            factory, IRendererFactory, name=name, info=self.ctx_info())
+        self.action(('renderer', name), None)
 
+    @config_method
     def override_resource(self, to_override, override_with,
-                          _info=u'', _override=None,):
+                          _override=None,):
         """ Add a :app:`Pyramid` resource override to the current
         configuration state.
 
@@ -1666,11 +1721,12 @@ class Configurator(object):
         override_package = sys.modules[override_package]
 
         override = _override or self._override # test jig
-        override(package, path, override_package, override_prefix,
-                 _info=_info)
+        def register():
+            override(package, path, override_package, override_prefix)
+        self.action(None, register)
 
     def set_forbidden_view(self, view=None, attr=None, renderer=None,
-                           wrapper=None, _info=u''):
+                           wrapper=None):
         """ Add a default forbidden view to the current configuration
         state.
 
@@ -1703,11 +1759,10 @@ class Configurator(object):
         def bwcompat_view(context, request):
             context = getattr(request, 'context', None)
             return view(context, request)
-        return self.add_view(bwcompat_view, context=Forbidden,
-                             wrapper=wrapper, _info=_info)
+        return self.add_view(bwcompat_view, context=Forbidden, wrapper=wrapper)
 
     def set_notfound_view(self, view=None, attr=None, renderer=None,
-                          wrapper=None, _info=u''):
+                          wrapper=None):
         """ Add a default not found view to the current configuration
         state.
 
@@ -1742,9 +1797,9 @@ class Configurator(object):
         def bwcompat_view(context, request):
             context = getattr(request, 'context', None)
             return view(context, request)
-        return self.add_view(bwcompat_view, context=NotFound,
-                             wrapper=wrapper, _info=_info)
+        return self.add_view(bwcompat_view, context=NotFound, wrapper=wrapper)
 
+    @config_method
     def set_request_factory(self, factory):
         """ The object passed as ``factory`` should be an object (or a
         :term:`dotted Python name` which refers to an object) which
@@ -1759,8 +1814,11 @@ class Configurator(object):
            can be used to achieve the same purpose.
         """
         factory = self.maybe_dotted(factory)
-        self.registry.registerUtility(factory, IRequestFactory)
+        def register():
+            self.registry.registerUtility(factory, IRequestFactory)
+        self.action(IRequestFactory, register)
 
+    @config_method
     def set_renderer_globals_factory(self, factory):
         """ The object passed as ``factory`` should be an callable (or
         a :term:`dotted Python name` which refers to an callable) that
@@ -1780,8 +1838,11 @@ class Configurator(object):
            can be used to achieve the same purpose.
         """
         factory = self.maybe_dotted(factory)
-        self.registry.registerUtility(factory, IRendererGlobalsFactory)
+        def register():
+            self.registry.registerUtility(factory, IRendererGlobalsFactory)
+        self.action(IRendererGlobalsFactory, register)
 
+    @config_method
     def set_locale_negotiator(self, negotiator):
         """
         Set the :term:`locale negotiator` for this application.  The
@@ -1801,8 +1862,11 @@ class Configurator(object):
            can be used to achieve the same purpose.
         """
         negotiator = self.maybe_dotted(negotiator)
-        self.registry.registerUtility(negotiator, ILocaleNegotiator)
+        def register():
+            self.registry.registerUtility(negotiator, ILocaleNegotiator)
+        self.action(ILocaleNegotiator, register)
 
+    @config_method
     def set_default_permission(self, permission):
         """
         Set the default permission to be used by all subsequent
@@ -1829,16 +1893,22 @@ class Configurator(object):
            :class:`pyramid.configuration.Configurator` constructor
            can be used to achieve the same purpose.
         """
+        # default permission used during view registration
         self.registry.registerUtility(permission, IDefaultPermission)
+        self.action(IDefaultPermission, None)
 
+    @config_method
     def set_session_factory(self, session_factory):
         """
         Configure the application with a :term:`session factory`.  If
         this method is called, the ``session_factory`` argument must
         be a session factory callable.
         """
-        self.registry.registerUtility(session_factory, ISessionFactory)
+        def register():
+            self.registry.registerUtility(session_factory, ISessionFactory)
+        self.action(ISessionFactory, register)
 
+    @config_method
     def add_translation_dirs(self, *specs):
         """ Add one or more :term:`translation directory` paths to the
         current configuration state.  The ``specs`` argument is a
@@ -1873,6 +1943,7 @@ class Configurator(object):
                 self.registry.registerUtility(tdirs, ITranslationDirectories)
 
             tdirs.insert(0, directory)
+            self.action(('tdir', directory), None)
 
         if specs:
 
@@ -1889,6 +1960,7 @@ class Configurator(object):
             ctranslate = ChameleonTranslate(translator)
             self.registry.registerUtility(ctranslate, IChameleonTranslate)
 
+    @config_method
     def add_static_view(self, name, path, **kw):
         """ Add a view used to render static resources such as images
         and CSS files.
@@ -1987,12 +2059,14 @@ class Configurator(object):
         See :ref:`static_resources_section` for more information.
         """
         spec = self._make_spec(path)
-        info = self.registry.queryUtility(IStaticURLInfo)
-        if info is None:
-            info = StaticURLInfo(self)
-            self.registry.registerUtility(info, IStaticURLInfo)
+        def register():
+            info = self.registry.queryUtility(IStaticURLInfo)
+            if info is None:
+                info = StaticURLInfo(self)
+                self.registry.registerUtility(info, IStaticURLInfo)
 
-        info.add(name, spec, **kw)
+            info.add(name, spec, **kw)
+        self.action(('static', name), register)
 
     # testing API
     def testing_securitypolicy(self, userid=None, groupids=(),
