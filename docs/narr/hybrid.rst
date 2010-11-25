@@ -498,7 +498,7 @@ Can also be spelled like so:
 The two spellings are logically equivalent.  In fact, the former is
 just a syntactical shortcut for the latter.
 
-Binding Extra Views Against a Route Configuration that Doesn't Have a ``*traverse`` Element In Its Patttern
+Binding Extra Views Against a Route Configuration that Doesn't Have a ``*traverse`` Element In Its Pattern
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here's another corner case that just makes no sense.
