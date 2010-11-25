@@ -501,7 +501,7 @@ just a syntactical shortcut for the latter.
 Binding Extra Views Against a Route Configuration that Doesn't Have a ``*traverse`` Element In Its Pattern
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here's another corner case that just makes no sense.
+Here's another corner case that just makes no sense:
 
 .. code-block:: python
    :linenos:
