@@ -406,14 +406,15 @@ with this route).
 Making Global Views Match
 +++++++++++++++++++++++++
 
-By default, view configurations that don't mention a ``route_name`` will be
-not found by view lookup when a route that mentions a ``*traverse`` in its
-pattern matches.  You can make these match forcibly by adding the
-``use_global_views`` flag to the route definition.  For example, the
-``myproject.views.bazbuz`` view below will be found if the route named
-``abc`` below is matched and the ``PATH_INFO`` is ``/abc/bazbuz``, even
-though the view configuration statement does not have the
-``route_name="abc"`` attribute.
+By default, only view configurations that mention a ``route_name``
+will be found during view lookup when a route that has a ``*traverse``
+in its pattern matches.  You can allow views without a ``route_name``
+attribute to match a route by adding the ``use_global_views`` flag to
+the route definition.  For example, the ``myproject.views.bazbuz``
+view below will be found if the route named ``abc`` below is matched
+and the ``PATH_INFO`` is ``/abc/bazbuz``, even though the view
+configuration statement does not have the ``route_name="abc"``
+attribute.
 
 .. code-block:: python
    :linenos:
