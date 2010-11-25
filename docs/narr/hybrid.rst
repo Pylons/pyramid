@@ -240,7 +240,7 @@ we've created a root factory that looks like so in a module named
    def root_factory(request):
        return root
 
-Above, we've defined a (bogus) graph here that can be traversed, and a
+Above, we've defined a (bogus) graph that can be traversed, and a
 ``root_factory`` function that can be used as part of a particular
 route configuration statement:
 
