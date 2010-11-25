@@ -190,6 +190,34 @@ class Test_renderer_factory(Base, unittest.TestCase):
         lookup = self.config.registry.getUtility(IMakoLookup)
         self.assertEqual(lookup.template_args['imports'], ['one', 'two'])
 
+    def test_with_strict_undefined_true(self):
+        from pyramid.mako_templating import IMakoLookup
+        settings = {'mako.directories':self.templates_dir,
+                    'mako.strict_undefined':'true'}
+        info = DummyRendererInfo({
+            'name':'helloworld.mak',
+            'package':None,
+            'registry':self.config.registry,
+            'settings':settings,
+            })
+        self._callFUT(info)
+        lookup = self.config.registry.getUtility(IMakoLookup)
+        self.assertEqual(lookup.template_args['strict_undefined'], True)
+
+    def test_with_strict_undefined_false(self):
+        from pyramid.mako_templating import IMakoLookup
+        settings = {'mako.directories':self.templates_dir,
+                    'mako.strict_undefined':'false'}
+        info = DummyRendererInfo({
+            'name':'helloworld.mak',
+            'package':None,
+            'registry':self.config.registry,
+            'settings':settings,
+            })
+        self._callFUT(info)
+        lookup = self.config.registry.getUtility(IMakoLookup)
+        self.assertEqual(lookup.template_args['strict_undefined'], False)
+
     def test_with_lookup(self):
         from pyramid.mako_templating import IMakoLookup
         lookup = dict()
@@ -301,7 +329,8 @@ class TestIntegration(unittest.TestCase):
 
     def test_render_to_response_pkg_spec(self):
         from pyramid.renderers import render_to_response
-        result = render_to_response('pyramid.tests:fixtures/helloworld.mak', {'a':1})
+        result = render_to_response('pyramid.tests:fixtures/helloworld.mak',
+                                    {'a':1})
         self.assertEqual(result.ubody, u'\nHello föö\n')
     
     def test_render_with_abs_path(self):

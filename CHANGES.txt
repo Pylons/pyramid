@@ -19,6 +19,16 @@ Features
 - The Mako renderer now accepts a resource specification for
   ``mako.module_directory``.
 
+- New boolean Mako settings variable ``mako.strict_undefined``.  See `Mako
+  Context Variables
+  <http://www.makotemplates.org/docs/runtime.html#context-variables>`_ for
+  its meaning.
+
+Dependencies
+------------
+
+- Depend on Mako 0.3.6+ (we now require the ``strict_undefined`` feature).
+
 Bug Fixes
 ---------
 

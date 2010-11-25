@@ -8,6 +8,7 @@ from pyramid.interfaces import ITemplateRenderer
 from pyramid.exceptions import ConfigurationError
 from pyramid.resource import resolve_resource_spec
 from pyramid.resource import abspath_from_resource_spec
+from pyramid.settings import asbool
 from pyramid.util import DottedNameResolver
 
 from mako.lookup import TemplateLookup
@@ -68,6 +69,7 @@ def renderer_factory(info):
         error_handler = settings.get('mako.error_handler', None)
         default_filters = settings.get('mako.default_filters', None)
         imports = settings.get('mako.imports', None)
+        strict_undefined = settings.get('mako.strict_undefined', 'false')
         if directories is None:
             raise ConfigurationError(
                 'Mako template used without a ``mako.directories`` setting')
@@ -85,6 +87,7 @@ def renderer_factory(info):
         if imports is not None:
             if not hasattr(imports, '__iter__'):
                 imports = filter(None, imports.splitlines())
+        strict_undefined = asbool(strict_undefined)
         
         lookup = PkgResourceTemplateLookup(directories=directories,
                                            module_directory=module_directory,
@@ -92,7 +95,8 @@ def renderer_factory(info):
                                            error_handler=error_handler,
                                            default_filters=default_filters,
                                            imports=imports,
-                                           filesystem_checks=reload_templates)
+                                           filesystem_checks=reload_templates,
+                                           strict_undefined=strict_undefined)
         registry_lock.acquire()
         try:
             registry.registerUtility(lookup, IMakoLookup)

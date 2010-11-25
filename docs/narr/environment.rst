@@ -249,6 +249,24 @@ will be placed into the module level preamble of all generated Python modules.
 |                             |
 +-----------------------------+
 
+
+Mako Strict Undefined
++++++++++++++++++++++
+
+``true`` or ``false``, representing the "strict undefined" behavior of Mako
+(see `Mako Context Variables
+<http://www.makotemplates.org/docs/runtime.html#context-variables>`_).  By
+default, this is ``false``.
+
++-----------------------------+
+| Config File Setting Name    |
++=============================+
+|  ``mako.strict_undefined``  |
+|                             |
+|                             |
+|                             |
++-----------------------------+
+
 Examples
 --------
 
