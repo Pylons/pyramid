@@ -59,6 +59,19 @@ class Test_renderer_factory(Base, unittest.TestCase):
         lookup = self.config.registry.getUtility(IMakoLookup)
         self.assertEqual(lookup.directories, [self.templates_dir]*2)
 
+    def test_directories_list(self):
+        from pyramid.mako_templating import IMakoLookup
+        settings = {'mako.directories':['a', 'b']}
+        info = DummyRendererInfo({
+            'name':'helloworld.mak',
+            'package':None,
+            'registry':self.config.registry,
+            'settings':settings,
+            })
+        self._callFUT(info)
+        lookup = self.config.registry.getUtility(IMakoLookup)
+        self.assertEqual(lookup.directories, ['a', 'b'])
+
     def test_with_module_directory_resource_spec(self):
         import os
         from pyramid.mako_templating import IMakoLookup
@@ -135,10 +148,38 @@ class Test_renderer_factory(Base, unittest.TestCase):
         lookup = self.config.registry.getUtility(IMakoLookup)
         self.assertEqual(lookup.template_args['default_filters'], ['h', 'g'])
 
+    def test_with_default_filters_list(self):
+        from pyramid.mako_templating import IMakoLookup
+        settings = {'mako.directories':self.templates_dir,
+                    'mako.default_filters':['h', 'g']}
+        info = DummyRendererInfo({
+            'name':'helloworld.mak',
+            'package':None,
+            'registry':self.config.registry,
+            'settings':settings,
+            })
+        self._callFUT(info)
+        lookup = self.config.registry.getUtility(IMakoLookup)
+        self.assertEqual(lookup.template_args['default_filters'], ['h', 'g'])
+
     def test_with_imports(self):
         from pyramid.mako_templating import IMakoLookup
         settings = {'mako.directories':self.templates_dir,
                     'mako.imports':'\none\ntwo\n\n'}
+        info = DummyRendererInfo({
+            'name':'helloworld.mak',
+            'package':None,
+            'registry':self.config.registry,
+            'settings':settings,
+            })
+        self._callFUT(info)
+        lookup = self.config.registry.getUtility(IMakoLookup)
+        self.assertEqual(lookup.template_args['imports'], ['one', 'two'])
+
+    def test_with_imports_list(self):
+        from pyramid.mako_templating import IMakoLookup
+        settings = {'mako.directories':self.templates_dir,
+                    'mako.imports':['one', 'two']}
         info = DummyRendererInfo({
             'name':'helloworld.mak',
             'package':None,

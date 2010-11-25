@@ -71,7 +71,8 @@ def renderer_factory(info):
         if directories is None:
             raise ConfigurationError(
                 'Mako template used without a ``mako.directories`` setting')
-        directories = filter(None, directories.splitlines())
+        if not hasattr(directories, '__iter__'):
+            directories = filter(None, directories.splitlines())
         directories = [ abspath_from_resource_spec(d) for d in directories ]
         if module_directory is not None:
             module_directory = abspath_from_resource_spec(module_directory)
@@ -79,9 +80,11 @@ def renderer_factory(info):
             dotted = DottedNameResolver(info.package)
             error_handler = dotted.maybe_resolve(error_handler)
         if default_filters is not None:
-            default_filters = filter(None, default_filters.splitlines())
-        if imports:
-            imports = filter(None, imports.splitlines())
+            if not hasattr(default_filters, '__iter__'):
+                default_filters = filter(None, default_filters.splitlines())
+        if imports is not None:
+            if not hasattr(imports, '__iter__'):
+                imports = filter(None, imports.splitlines())
         
         lookup = PkgResourceTemplateLookup(directories=directories,
                                            module_directory=module_directory,
