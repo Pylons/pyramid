@@ -251,6 +251,8 @@ class ConfiguratorTests(unittest.TestCase):
             def subscribers(self, events, name):
                 self.events = events
                 return events
+            def reset_context(self):
+                self.context_reset = True
             def registerUtility(self, *arg, **kw):
                 pass
         reg = DummyRegistry()
@@ -260,6 +262,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(reg.has_listeners, True)
         self.assertEqual(reg.notify(1), None)
         self.assertEqual(reg.events, (1,))
+        self.assertEqual(reg.context_reset, True)
 
     def test_setup_registry_registers_default_exceptionresponse_view(self):
         from pyramid.interfaces import IExceptionResponse
@@ -269,6 +272,8 @@ class ConfiguratorTests(unittest.TestCase):
             ctx = ConfigurationMachine()
             def registerUtility(self, *arg, **kw):
                 pass
+            def reset_context(self):
+                self.context_reset = True
         reg = DummyRegistry()
         config = self._makeOne(reg)
         views = []
@@ -276,6 +281,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.setup_registry()
         self.assertEqual(views[0], ((default_exceptionresponse_view,),
                                     {'context':IExceptionResponse}))
+        self.assertEqual(reg.context_reset, True)
 
     def test_setup_registry_explicit_notfound_trumps_iexceptionresponse(self):
         from zope.interface import implementedBy

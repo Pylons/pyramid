@@ -439,9 +439,9 @@ class Configurator(object):
         negotiator, and various other settings using the
         configurator's current registry, as per the descriptions in
         the Configurator constructor."""
-        self._fix_registry()
         registry = self.registry
         registry.autocommit = autocommit
+        self._fix_registry()
         self._set_settings(settings)
         self._set_root_factory(root_factory)
         debug_logger = self.maybe_dotted(debug_logger)

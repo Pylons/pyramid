@@ -121,7 +121,6 @@ class TestNotFoundDirective(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, context, view, **kw):
         from pyramid.zcml import notfound
@@ -189,7 +188,6 @@ class TestForbiddenDirective(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, context, view, **kw):
         from pyramid.zcml import forbidden
@@ -257,7 +255,6 @@ class TestRepozeWho1AuthenticationPolicyDirective(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, context, **kw):
         from pyramid.zcml import repozewho1authenticationpolicy
@@ -301,7 +298,6 @@ class TestRemoteUserAuthenticationPolicyDirective(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, context, **kw):
         from pyramid.zcml import remoteuserauthenticationpolicy
@@ -347,7 +343,6 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, context, secret, **kw):
         from pyramid.zcml import authtktauthenticationpolicy
@@ -409,7 +404,6 @@ class TestACLAuthorizationPolicyDirective(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, context, **kw):
         from pyramid.zcml import aclauthorizationpolicy
@@ -438,7 +432,6 @@ class TestRouteDirective(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, *arg, **kw):
         from pyramid.zcml import route
@@ -637,7 +630,6 @@ class TestStaticDirective(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, *arg, **kw):
         from pyramid.zcml import static
@@ -723,7 +715,6 @@ class TestResourceDirective(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, *arg, **kw):
         from pyramid.zcml import resource
@@ -748,7 +739,6 @@ class TestRendererDirective(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, *arg, **kw):
         from pyramid.zcml import renderer
@@ -822,7 +812,6 @@ class TestZCMLScanDirective(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, context, package):
         from pyramid.zcml import scan
@@ -846,7 +835,6 @@ class TestAdapterDirective(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, *arg, **kw):
         from pyramid.zcml import adapter
@@ -937,7 +925,6 @@ class TestSubscriberDirective(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, *arg, **kw):
         from pyramid.zcml import subscriber
@@ -1008,7 +995,6 @@ class TestUtilityDirective(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, *arg, **kw):
         from pyramid.zcml import utility
@@ -1054,7 +1040,6 @@ class TestTranslationDirDirective(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, *arg, **kw):
         from pyramid.zcml import translationdir
@@ -1080,7 +1065,6 @@ class TestLocaleNegotiatorDirective(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, *arg, **kw):
         from pyramid.zcml import localenegotiator
