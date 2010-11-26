@@ -11,7 +11,7 @@ from zope.interface import implements
 
 class TestViewDirective(unittest.TestCase):
     def setUp(self):
-        testing.setUp()
+        self.config = testing.setUp()
 
     def tearDown(self):
         testing.tearDown()
@@ -21,14 +21,12 @@ class TestViewDirective(unittest.TestCase):
         return view(*arg, **kw)
 
     def test_with_dotted_renderer(self):
-        from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IRendererFactory
         from pyramid.interfaces import IRequest
-        context = DummyContext()
-        reg = get_current_registry()
-        context.registry = reg
+        reg = self.config.registry
+        context = reg.ctx
         def factory(path):
             def foo(*arg):
                 return 'OK'
@@ -49,13 +47,11 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(regview(None, None).body, 'OK')
 
     def test_with_custom_predicates(self):
-        from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IRequest
-        context = DummyContext()
-        reg = get_current_registry()
-        context.registry = reg
+        reg = self.config.registry
+        context = reg.ctx
         view = lambda *arg: 'OK'
         def pred1(context, request):
             return True
@@ -77,13 +73,11 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(regview(None, None), 'OK')
 
     def test_context_trumps_for(self):
-        from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IRequest
         context = DummyContext()
-        reg = get_current_registry()
-        context.registry = reg
+        reg = self.config.registry
         view = lambda *arg: 'OK'
         class Foo:
             pass
@@ -101,13 +95,11 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(regview(None, None), 'OK')
 
     def test_with_for(self):
-        from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IRequest
-        context = DummyContext()
-        reg = get_current_registry()
-        context.registry = reg
+        reg = self.config.registry
+        context = reg.ctx
         view = lambda *arg: 'OK'
         class Foo:
             pass
@@ -861,8 +853,7 @@ class TestZCMLScanDirective(unittest.TestCase):
     def test_it(self):
         from pyramid.configuration import Configurator
         dummy_module = DummyModule()
-        context = DummyContext()
-        context.registry = self.config.registry
+        context = self.config.registry.ctx
         self._callFUT(context, dummy_module)
         actions = context.actions
         self.assertEqual(len(actions), 1)

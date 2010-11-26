@@ -101,7 +101,7 @@ if chameleon_zpt:
 def config_method(wrapped):
     def wrapper(self, *arg, **kw):
         result = wrapped(self, *arg, **kw)
-        if self.autocommit:
+        if self.registry.autocommit:
             self.commit()
         return result
     wrapper.__doc__ = wrapped.__doc__
@@ -243,7 +243,6 @@ class Configurator(object):
         self.package_name = name_resolver.package_name
         self.package = name_resolver.package
         self.registry = registry
-        self.autocommit = autocommit
         if registry is None:
             registry = Registry(self.package_name)
             self.registry = registry
@@ -259,6 +258,7 @@ class Configurator(object):
                 renderer_globals_factory=renderer_globals_factory,
                 default_permission=default_permission,
                 session_factory=session_factory,
+                autocommit=autocommit,
                 )
 
     def _set_settings(self, mapping):
@@ -266,6 +266,7 @@ class Configurator(object):
         self.registry.settings = settings
         return settings
 
+    @config_method
     def _set_root_factory(self, factory):
         """ Add a :term:`root factory` to the current configuration
         state.  If the ``factory`` argument is ``None`` a default root
@@ -273,8 +274,10 @@ class Configurator(object):
         factory = self.maybe_dotted(factory)
         if factory is None:
             factory = DefaultRootFactory
-        self.registry.registerUtility(factory, IRootFactory)
-        self.registry.registerUtility(factory, IDefaultRootFactory) # b/c
+        def register():
+            self.registry.registerUtility(factory, IRootFactory)
+            self.registry.registerUtility(factory, IDefaultRootFactory) # b/c
+        self.action(IRootFactory, register)
 
     @config_method
     def _set_authentication_policy(self, policy):
@@ -282,10 +285,9 @@ class Configurator(object):
         the current configuration."""
         policy = self.maybe_dotted(policy)
         _info = self.ctx_info()
-        def register():
-            self.registry.registerUtility(policy, IAuthenticationPolicy,
-                                          info=_info)
-        self.action(IAuthenticationPolicy, register)
+        self.registry.registerUtility(policy, IAuthenticationPolicy,
+                                      info=_info)
+        self.action(IAuthenticationPolicy, None)
 
     @config_method
     def _set_authorization_policy(self, policy):
@@ -294,10 +296,9 @@ class Configurator(object):
         Python name`."""
         policy = self.maybe_dotted(policy)
         _info = self.ctx_info()
-        def register():
-            self.registry.registerUtility(policy, IAuthorizationPolicy,
-                                          info=_info)
-        self.action(IAuthorizationPolicy, register)
+        self.registry.registerUtility(policy, IAuthorizationPolicy,
+                                      info=_info)
+        self.action(IAuthorizationPolicy, None)
             
     def _make_spec(self, path_or_spec):
         package, filename = resolve_resource_spec(path_or_spec,
@@ -415,7 +416,8 @@ class Configurator(object):
                        locale_negotiator=None, request_factory=None,
                        renderer_globals_factory=None,
                        default_permission=None,
-                       session_factory=None):
+                       session_factory=None,
+                       autocommit=True):
         """ When you pass a non-``None`` ``registry`` argument to the
         :term:`Configurator` constructor, no initial 'setup' is
         performed against the registry.  This is because the registry
@@ -435,12 +437,13 @@ class Configurator(object):
         configurator's current registry, as per the descriptions in
         the Configurator constructor."""
         self._fix_registry()
+        registry = self.registry
+        registry.autocommit = autocommit
         self._set_settings(settings)
         self._set_root_factory(root_factory)
         debug_logger = self.maybe_dotted(debug_logger)
         if debug_logger is None:
             debug_logger = make_stream_logger('pyramid.debug', sys.stderr)
-        registry = self.registry
         registry.registerUtility(debug_logger, IDebugLogger)
         if authentication_policy or authorization_policy:
             self._set_security_policies(authentication_policy,
@@ -586,6 +589,7 @@ class Configurator(object):
         return self._derive_view(view, attr=attr, renderer=renderer)
 
     def action(self, discriminator, callable, args=(), kw=None, order=0):
+        """ Register an action which will be executed during commit. """
         if kw is None:
             kw = {}
         self.registry.ctx.action(discriminator, callable, args, kw, order)
@@ -694,16 +698,19 @@ class Configurator(object):
             package = sys.modules[package_name]
 
         lock.acquire()
-        self.manager.push({'registry':self.registry, 'request':None})
+        registry = self.registry
+        self.manager.push({'registry':registry, 'request':None})
+        context = registry.ctx
+        autocommit = registry.autocommit
         try:
-            context = self.registry.ctx
+            registry.autocommit = False
             context.package = package
-            context.registry = self.registry
             xmlconfig.file(filename, package, context=context, execute=True)
         finally:
             lock.release()
             self.manager.pop()
-        return self.registry
+            registry.autocommit = autocommit
+        return registry
 
     def add_handler(self, route_name, pattern, handler, action=None, **kw):
 
@@ -1241,7 +1248,7 @@ class Configurator(object):
                         IMultiView, name=name, info=_info)
 
         discriminator = [
-            'view', context, name, request_type, containment,
+            'view', context, name, request_type, IView, containment,
             request_param, request_method, route_name, attr,
             xhr, accept, header, path_info]
         discriminator.extend(sorted(custom_predicates))
@@ -1960,7 +1967,6 @@ class Configurator(object):
             ctranslate = ChameleonTranslate(translator)
             self.registry.registerUtility(ctranslate, IChameleonTranslate)
 
-    @config_method
     def add_static_view(self, name, path, **kw):
         """ Add a view used to render static resources such as images
         and CSS files.
@@ -2059,14 +2065,12 @@ class Configurator(object):
         See :ref:`static_resources_section` for more information.
         """
         spec = self._make_spec(path)
-        def register():
-            info = self.registry.queryUtility(IStaticURLInfo)
-            if info is None:
-                info = StaticURLInfo(self)
-                self.registry.registerUtility(info, IStaticURLInfo)
+        info = self.registry.queryUtility(IStaticURLInfo)
+        if info is None:
+            info = StaticURLInfo(self)
+            self.registry.registerUtility(info, IStaticURLInfo)
 
-            info.add(name, spec, **kw)
-        self.action(('static', name), register)
+        info.add(name, spec, **kw)
 
     # testing API
     def testing_securitypolicy(self, userid=None, groupids=(),

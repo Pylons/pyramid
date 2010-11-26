@@ -25,6 +25,7 @@ class Registry(Components, dict):
     # to notify them
     has_listeners = False
     _settings = None
+    autocommit = False
 
     def registerSubscriptionAdapter(self, *arg, **kw):
         result = Components.registerSubscriptionAdapter(self, *arg, **kw)
@@ -56,6 +57,7 @@ class Registry(Components, dict):
     def ctx(self):
         context = ConfigurationMachine()
         registerCommonDirectives(context)
+        context.registry = self # circdep
         return context
 
 global_registry = Registry('global')
