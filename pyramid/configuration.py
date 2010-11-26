@@ -9,6 +9,7 @@ import venusian
 from translationstring import ChameleonTranslate
 
 from zope.configuration import xmlconfig
+from zope.configuration.config import ConfigurationMachine
 
 from zope.interface import Interface
 from zope.interface import implementedBy
@@ -378,7 +379,9 @@ class Configurator(object):
 
     def commit(self):
         """ Commit the current set of configuration actions. """
-        self.registry.ctx.execute_actions()
+        context = self.registry.ctx
+        context.execute_actions()
+        self.registry.reset_context()
 
     def with_package(self, package):
         """ Return a new Configurator instance with the same registry
@@ -1649,7 +1652,13 @@ class Configurator(object):
             package = caller_package()
 
         scanner = self.venusian.Scanner(config=self)
-        scanner.scan(package, categories=categories)
+        autocommit = self.registry.autocommit
+        try:
+            self.registry.autocommit = False
+            scanner.scan(package, categories=categories)
+        finally:
+            self.registry.autocommit = autocommit
+        self.commit()
 
     @config_method
     def add_renderer(self, name, factory):

@@ -76,8 +76,8 @@ class TestViewDirective(unittest.TestCase):
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IRequest
-        context = DummyContext()
         reg = self.config.registry
+        context = reg.ctx
         view = lambda *arg: 'OK'
         class Foo:
             pass
@@ -135,8 +135,7 @@ class TestNotFoundDirective(unittest.TestCase):
         from pyramid.exceptions import NotFound
 
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = reg.ctx
         def view(request):
             return 'OK'
         self._callFUT(context, view)
@@ -165,8 +164,7 @@ class TestNotFoundDirective(unittest.TestCase):
         from pyramid.exceptions import NotFound
         from pyramid.configuration import Configurator
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = reg.ctx
         config = Configurator(reg)
         def dummy_renderer_factory(*arg, **kw):
             return lambda *arg, **kw: 'OK'
@@ -204,8 +202,7 @@ class TestForbiddenDirective(unittest.TestCase):
         from pyramid.interfaces import IViewClassifier
         from pyramid.exceptions import Forbidden
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = reg.ctx
         def view(request):
             return 'OK'
         self._callFUT(context, view)
@@ -234,9 +231,8 @@ class TestForbiddenDirective(unittest.TestCase):
         from pyramid.interfaces import IViewClassifier
         from pyramid.exceptions import Forbidden
         from pyramid.configuration import Configurator
-        context = DummyContext()
         reg = self.config.registry
-        context.registry = reg
+        context = reg.ctx
         config = Configurator(reg)
         def dummy_renderer_factory(*arg, **kw):
             return lambda *arg, **kw: 'OK'
@@ -270,8 +266,7 @@ class TestRepozeWho1AuthenticationPolicyDirective(unittest.TestCase):
     def test_it_defaults(self):
         reg = self.config.registry
         from pyramid.interfaces import IAuthenticationPolicy
-        context = DummyContext()
-        context.registry = reg
+        context = self.config.registry.ctx
         self._callFUT(context)
         actions = context.actions
         self.assertEqual(len(actions), 1)
@@ -286,8 +281,7 @@ class TestRepozeWho1AuthenticationPolicyDirective(unittest.TestCase):
     def test_it(self):
         reg = self.config.registry
         from pyramid.interfaces import IAuthenticationPolicy
-        context = DummyContext()
-        context.registry = reg
+        context = self.config.registry.ctx
         def callback(identity, request):
             """ """
         self._callFUT(context, identifier_name='something', callback=callback)
@@ -316,8 +310,7 @@ class TestRemoteUserAuthenticationPolicyDirective(unittest.TestCase):
     def test_defaults(self):
         from pyramid.interfaces import IAuthenticationPolicy
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = reg.ctx
         def callback(identity, request):
             """ """
         self._callFUT(context)
@@ -334,8 +327,7 @@ class TestRemoteUserAuthenticationPolicyDirective(unittest.TestCase):
     def test_it(self):
         from pyramid.interfaces import IAuthenticationPolicy
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = reg.ctx
         def callback(identity, request):
             """ """
         self._callFUT(context, environ_key='BLAH', callback=callback)
@@ -364,8 +356,7 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
     def test_it_defaults(self):
         from pyramid.interfaces import IAuthenticationPolicy
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = reg.ctx
         self._callFUT(context, 'sosecret')
         actions = context.actions
         self.assertEqual(len(actions), 1)
@@ -380,8 +371,7 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
     def test_it_noconfigerror(self):
         from pyramid.interfaces import IAuthenticationPolicy
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = reg.ctx
         def callback(identity, request):
             """ """
         self._callFUT(context, 'sosecret', callback=callback,
@@ -402,7 +392,7 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
 
     def test_it_configerror(self):
         from pyramid.exceptions import ConfigurationError
-        context = DummyContext()
+        context = self.config.registry.ctx
         def callback(identity, request):
             """ """
         self.assertRaises(ConfigurationError,
@@ -429,8 +419,7 @@ class TestACLAuthorizationPolicyDirective(unittest.TestCase):
         from pyramid.authorization import ACLAuthorizationPolicy
         from pyramid.interfaces import IAuthorizationPolicy
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = reg.ctx
         def callback(identity, request):
             """ """
         self._callFUT(context)
@@ -472,9 +461,8 @@ class TestRouteDirective(unittest.TestCase):
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IRouteRequest
-        context = DummyContext()
         reg = self.config.registry
-        context.registry = reg
+        context = reg.ctx
         view = lambda *arg: 'OK'
         self._callFUT(context, 'name', 'pattern', view=view)
         actions = context.actions
@@ -500,9 +488,8 @@ class TestRouteDirective(unittest.TestCase):
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IRouteRequest
-        context = DummyContext()
         reg = self.config.registry
-        context.registry = reg
+        context = reg.ctx
         view = lambda *arg: 'OK'
         self._callFUT(context, 'name', 'pattern', view=view,
                       view_context=IDummy)
@@ -530,8 +517,7 @@ class TestRouteDirective(unittest.TestCase):
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IRouteRequest
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = reg.ctx
         view = lambda *arg: 'OK'
         class Foo:
             pass
@@ -566,9 +552,8 @@ class TestRouteDirective(unittest.TestCase):
         def renderer(path):
             return lambda *arg: 'OK'
         reg.registerUtility(renderer, IRendererFactory, name='.pt')
+        context = reg.ctx
 
-        context = DummyContext()
-        context.registry = reg
         view = lambda *arg: 'OK'
         self._callFUT(context, 'name', 'pattern', view=view,
                       renderer='fixtureapp/templates/foo.pt')
@@ -599,8 +584,8 @@ class TestRouteDirective(unittest.TestCase):
         def pred2(context, request): pass
         preds = tuple(sorted([pred1, pred2]))
 
-        context = DummyContext()
-        context.registry = self.config.registry
+        context = self.config.registry.ctx
+
         self._callFUT(context, 'name', 'pattern',
                       custom_predicates=(pred1, pred2))
         actions = context.actions
@@ -615,8 +600,7 @@ class TestRouteDirective(unittest.TestCase):
         self._assertRoute('name', 'pattern', 2)
 
     def test_with_path_argument_no_pattern(self):
-        context = DummyContext()
-        context.registry = self.config.registry
+        context = self.config.registry.ctx
         self._callFUT(context, 'name', path='pattern')
         actions = context.actions
         self.assertEqual(len(actions), 1)
@@ -629,8 +613,7 @@ class TestRouteDirective(unittest.TestCase):
         self._assertRoute('name', 'pattern')
 
     def test_with_path_argument_and_pattern(self):
-        context = DummyContext()
-        context.registry = self.config.registry
+        context = self.config.registry.ctx
         self._callFUT(context, 'name', pattern='pattern', path='path')
         actions = context.actions
         self.assertEqual(len(actions), 1)
@@ -645,8 +628,7 @@ class TestRouteDirective(unittest.TestCase):
 
     def test_with_neither_path_nor_pattern(self):
         from pyramid.exceptions import ConfigurationError
-        context = DummyContext()
-        context.registry = self.config.registry
+        context = self.config.registry.ctx
         self.assertRaises(ConfigurationError, self._callFUT, context, 'name')
 
 class TestStaticDirective(unittest.TestCase):
@@ -672,8 +654,7 @@ class TestStaticDirective(unittest.TestCase):
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IRoutesMapper
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = reg.ctx
         self._callFUT(context, 'name', 'fixtures/static')
         actions = context.actions
         self.assertEqual(len(actions), 2)
@@ -710,8 +691,7 @@ class TestStaticDirective(unittest.TestCase):
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IRoutesMapper
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = reg.ctx
         self._callFUT(context, 'name', 'fixtures/static', permission='aperm')
         actions = context.actions
         self.assertEqual(len(actions), 2)
@@ -751,8 +731,7 @@ class TestResourceDirective(unittest.TestCase):
 
     def test_it(self):
         from pyramid.configuration import Configurator
-        context = DummyContext()
-        context.registry = self.config.registry
+        context = self.config.registry.ctx
         self._callFUT(context, 'a', 'b')
         actions = context.actions
         self.assertEqual(len(actions), 1)
@@ -778,8 +757,7 @@ class TestRendererDirective(unittest.TestCase):
     def test_it(self):
         from pyramid.interfaces import IRendererFactory
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = reg.ctx
         renderer = lambda *arg, **kw: None
         self._callFUT(context, renderer, 'r')
         actions = context.actions
@@ -966,32 +944,32 @@ class TestSubscriberDirective(unittest.TestCase):
         return subscriber(*arg, **kw)
 
     def test_no_factory_no_handler(self):
-        context = DummyContext()
+        context = self.config.registry.ctx
         self.assertRaises(TypeError,
                           self._callFUT, context, for_=None, factory=None,
                           handler=None,
                           provides=None)
 
     def test_handler_with_provides(self):
-        context = DummyContext()
+        context = self.config.registry.ctx
         self.assertRaises(TypeError,
                           self._callFUT, context, for_=None, factory=None,
                           handler=1, provides=1)
 
     def test_handler_and_factory(self):
-        context = DummyContext()
+        context = self.config.registry.ctx
         self.assertRaises(TypeError,
                           self._callFUT, context, for_=None, factory=1,
                           handler=1, provides=None)
 
     def test_no_provides_with_factory(self):
-        context = DummyContext()
+        context = self.config.registry.ctx
         self.assertRaises(TypeError,
                           self._callFUT, context, for_=None, factory=1,
                           handler=None, provides=None)
 
     def test_adapted_by_as_for_is_None(self):
-        context = DummyContext()
+        context = self.config.registry.ctx
         factory = DummyFactory()
         factory.__component_adapts__ = None
         self.assertRaises(TypeError, self._callFUT, context, for_=None,
@@ -999,8 +977,7 @@ class TestSubscriberDirective(unittest.TestCase):
         
     def test_register_with_factory(self):
         from pyramid.registry import Registry
-        context = DummyContext()
-        context.registry = self.config.registry
+        context = self.config.registry.ctx
         factory = DummyFactory()
         self._callFUT(context, for_=(IDummy,),
                       factory=factory, handler=None, provides=IFactory)
@@ -1014,8 +991,7 @@ class TestSubscriberDirective(unittest.TestCase):
 
     def test_register_with_handler(self):
         from pyramid.configuration import Configurator
-        context = DummyContext()
-        context.registry = self.config.registry
+        context = self.config.registry.ctx
         factory = DummyFactory()
         self._callFUT(context, for_=(IDummy,),
                       factory=None, handler=factory)
@@ -1039,18 +1015,17 @@ class TestUtilityDirective(unittest.TestCase):
         return utility(*arg, **kw)
 
     def test_factory_and_component(self):
-        context = DummyContext()
+        context = self.config.registry.ctx
         self.assertRaises(TypeError, self._callFUT,
                           context, factory=1, component=1)
 
     def test_missing_provides(self):
-        context = DummyContext()
+        context = self.config.registry.ctx
         self.assertRaises(TypeError, self._callFUT, context, provides=None)
         
     def test_provides_from_factory_implements(self):
         from pyramid.registry import Registry
-        context = DummyContext()
-        context.registry = self.config.registry
+        context = self.config.registry.ctx
         self._callFUT(context, factory=DummyFactory)
         self.assertEqual(len(context.actions), 1)
         utility = context.actions[0]
@@ -1062,8 +1037,7 @@ class TestUtilityDirective(unittest.TestCase):
 
     def test_provides_from_component_provides(self):
         from pyramid.registry import Registry
-        context = DummyContext()
-        context.registry = self.config.registry
+        context = self.config.registry.ctx
         component = DummyFactory()
         self._callFUT(context, component=component)
         self.assertEqual(len(context.actions), 1)
@@ -1088,8 +1062,7 @@ class TestTranslationDirDirective(unittest.TestCase):
 
     def test_it(self):
         from pyramid.configuration import Configurator
-        context = DummyContext()
-        context.registry = self.config.registry
+        context = self.config.registry.ctx
         tdir = 'pyramid.tests.localeapp:locale'
         self._callFUT(context, tdir)
         actions = context.actions
@@ -1115,8 +1088,7 @@ class TestLocaleNegotiatorDirective(unittest.TestCase):
 
     def test_it(self):
         from pyramid.configuration import Configurator
-        context = DummyContext()
-        context.registry = self.config.registry
+        context = self.config.registry.ctx
         dummy_negotiator = object()
         self._callFUT(context, dummy_negotiator)
         actions = context.actions
@@ -1142,8 +1114,7 @@ class TestDefaultPermissionDirective(unittest.TestCase):
     def test_it(self):
         from pyramid.interfaces import IDefaultPermission
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = reg.ctx
         self._callFUT(context, 'view')
         actions = context.actions
         self.assertEqual(len(actions), 1)
