@@ -81,7 +81,7 @@ def initialize_sql(db_string, db_echo=False):
     try:
         populate()
     except IntegrityError:
-        pass
+        DBSession.rollback()
 
 def appmaker(db_string, db_echo=False):
     initialize_sql(db_string, db_echo)

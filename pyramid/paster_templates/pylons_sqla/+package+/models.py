@@ -44,4 +44,4 @@ def initialize_sql(db_string, db_echo=False):
     try:
         populate()
     except IntegrityError:
-        pass
+        DBSession.rollback()
