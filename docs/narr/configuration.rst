@@ -47,20 +47,16 @@ imperatively:
 
    if __name__ == '__main__':
        config = Configurator()
-       config.begin()
        config.add_view(hello_world)
-       config.end()
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
-We won't talk much about what this application does yet.  Just note
-that the "configuration' statements take place underneath the ``if
-__name__ == '__main__':`` stanza in the form of method calls on a
-:term:`Configurator` object (e.g. ``config.begin()``,
-``config.add_view(...)``, and ``config.end()``.  These statements take
-place one after the other, and are executed in order, so the full
-power of Python, including conditionals, can be employed in this mode
-of configuration.
+We won't talk much about what this application does yet.  Just note that the
+"configuration' statements take place underneath the ``if __name__ ==
+'__main__':`` stanza in the form of method calls on a :term:`Configurator`
+object (e.g. ``config.add_view(...)``).  These statements take place one
+after the other, and are executed in order, so the full power of Python,
+including conditionals, can be employed in this mode of configuration.
 
 .. index::
    single: view_config
@@ -123,9 +119,7 @@ and its subpackages.  For example:
       if __name__ == '__main__':
           from pyramid.configuration import Configurator
           config = Configurator()
-          config.begin()
           config.scan()
-          config.end()
           app = config.make_wsgi_app()
           serve(app, host='0.0.0.0')
 

@@ -59,11 +59,11 @@ be performed in order to register it with the system:
 
 .. code-block:: python
 
-    config.add_handler('hello', '/hello/:action', handler=Hello)
+    config.add_handler('hello', '/hello/{action}', handler=Hello)
 
 This example will result in a route being added for the pattern
-``/hello/:action``, each method of the ``Hello`` class will then be examined
-to register the views. The value of ``:action`` in the route pattern will be
+``/hello/{action}``, each method of the ``Hello`` class will then be examined
+to register the views. The value of ``{action}`` in the route pattern will be
 used to determine which view should be called, and each view in the class will
 be setup with a view predicate that requires a specific ``action`` name.
 
@@ -98,7 +98,7 @@ For example:
 
 .. code-block:: python
     
-    config.add_handler('hello', '/hello/:action',
+    config.add_handler('hello', '/hello/{action}',
                        handler='mypackage.handlers:MyHandler')
 
 In larger applications, it is advised to use a :term:`resource specification`
@@ -168,8 +168,8 @@ information on the handler method which is used by
 configuration.
 
 All keyword arguments are recorded, and passed to
-:meth:`!pyramid.configuration.Configurator.add_view`. Any valid keyword
-arguments for :meth:`!pyramid.configuration.Configurator.add_view` can thus be
+:meth:`~pyramid.configuration.Configurator.add_view`. Any valid keyword
+arguments for :meth:`~pyramid.configuration.Configurator.add_view` can thus be
 used with the :class:`~pyramid.view.action` decorator to further restrict when
 the view will be called.
 
@@ -219,7 +219,7 @@ Example:
             return {}
 
     # in the config
-    config.add_handler('hello', '/hello/:action', handler=Hello)
+    config.add_handler('hello', '/hello/{action}', handler=Hello)
 
 With this configuration, the url ``/hello/home`` will find a view configuration
 that results in calling the ``show_template`` method, then rendering the

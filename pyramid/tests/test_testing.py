@@ -693,6 +693,30 @@ class TestMockTemplate(unittest.TestCase):
         template = self._makeOne('123')
         self.assertEqual(template(), '123')
 
+class Test_skip_on(unittest.TestCase):
+    def setUp(self):
+        from pyramid.testing import skip_on
+        self.os_name = skip_on.os_name
+        skip_on.os_name = 'wrong'
+
+    def tearDown(self):
+        from pyramid.testing import skip_on
+        skip_on.os_name = self.os_name
+        
+    def _callFUT(self, *platforms):
+        from pyramid.testing import skip_on
+        return skip_on(*platforms)
+
+    def test_wrong_platform(self):
+        def foo(): return True
+        decorated = self._callFUT('wrong')(foo)
+        self.assertEqual(decorated(), None)
+        
+    def test_ok_platform(self):
+        def foo(): return True
+        decorated = self._callFUT('ok')(foo)
+        self.assertEqual(decorated(), True)
+
 from zope.interface import Interface
 from zope.interface import implements
         

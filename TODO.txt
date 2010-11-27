@@ -1,5 +1,56 @@
-:mod:`repoze.bfg` TODOs
-=======================
+Pyramid TODOs
+=============
+
+Must-Have (before 1.0)
+----------------------
+
+- Add a ``handler`` ZCML directive.  This implies some slightly dicey
+  refactoring of the configurator to allow it to generate ZCML
+  "discriminators" for views and routes, that could be implemented in terms
+  of "twophase configuration" in "should have" below.
+
+- Provide a .flash API on session object.
+
+- Use ``@register_view`` instead of ``@view_config`` and change view docs to
+  use "view registration" instead of "view configuration".
+
+Should-Have
+-----------
+
+- Add docs for httpexceptions module for each webob.exc class that inherits
+  from WSGIHTTPException.
+
+- Remove "BFG" from Pyramid-specific environ variables.
+
+- translationdir ZCML directive use of ``path_spec`` should maybe die.
+
+- Add CRSF token creation/checking machinery (only "should have" vs. "must
+  have" because I'm not sure it belongs in Pyramid.. it definitely must exist
+  in formgen libraries, and *might* belong in Pyramid).
+
+- Change "Cleaning up After a Request" in the urldispatch chapter to
+  use ``request.add_response_callback``.
+
+- Twophase configuration (config = Configurator(autocommit=False)).  Maybe
+  use ``zope.configuration`` ConfigurationContext as config.registry.ctx and
+  push execution into the configurator.
+
+Nice-to-Have
+------------
+
+- Try to make test suite pass on IronPython.
+
+- Non-bwcompat use of threadlocals that need to be documented or ameliorated:
+
+  security.principals_allowed_by_permission
+
+  resource.OverrideProvider._get_overrides: can't credibly be removed,
+  because it stores an overrideprovider as a module-scope global.
+
+  traversal.traverse: this API is a stepchild, and needs to be changed.
+
+  Configurator.add_translation_dirs: not passed any context but a message,
+  can't credibly be removed.
 
 - Supply ``X-Vhm-Host`` support.
 
@@ -9,7 +60,8 @@
 
 - Change docs about creating a venusian decorator to not use ZCA.
 
-- ``decorator=`` parameter to bfg_view.
+- ``decorator=`` parameter to view_config.  This would replace the existing
+  _map_view "decorator" if it existed.
 
 - Try to better explain the relationship between a renderer and a
   template in the templates chapter and elsewhere.  Scan the
@@ -44,98 +96,15 @@
          action = '^foo$'
            mypackage.views.MyView.foo_GET
 
-- Ability to use configurator as a context manager.
-
 - Provide a response_cookies attribute on the request for rendered
   responses that can be used as input to response.set_cookie.
 
 - Raise an exception when a value in response_headerlist is not a
   string or decide to encode.
 
-- Change "Cleaning up After a Request" in the urldispatch chapter to
-  use ``request.add_response_callback``.
+- Update App engine chapter with less creaky directions.
 
-- Update App engine chapter.
+- Add functionality that mocks the behavior of ``repoze.browserid``.
 
-- Browser id?
-
-- .flash API on session.
-
-- CRSF token machinery
-
-- ``add_handler`` documentation.
-
-- ``handler`` ZCML directive.
-
-- ``docs`` directory for each paster template.
-
-- "BFG" in environ variables.
-
-- Test on GAE, Jython, PyPy, IronPython.
-
-- Add docs for httpexceptions.
-
-- RendererHelper -> RendererInfo?
-
-- Do something about ZODB session chapter: either remove or create a
-  pyramid_zodbsessions package.
-
-- translationdir ZCML directive use of ``path_spec`` should maybe die.
-
-- Option for route_url to omit the host and port (perhaps a different
-  function named ``route_path``).
-
-- SQLAlchemy idiomatics:
-
-   <RaFromBRC> mcdonc: those paster templates all look pretty good... the
-   only thing i'd consider is adjusting your config variable names to match
-   exactly what sqlalchemy uses as parameter names, see here:
-   http://www.sqlalchemy.org/docs/core/engines.html
-
-   <RaFromBRC> mcdonc: especially in the pylons_sqla ini file, where the db
-   initialization is mixed in w/ the app config...
-
-   <RaFromBRC> ... i'd use "sqlalchemy.PARAMETER" for all of the sqla
-   settings, so it could easily be handed to engine_from_config w/o any need
-   to parse by hand
-
-   <RaFromBRC> mcdonc: in the other ini files, where sqlalchemy is given its
-   own part, the "sqlalchemy." prefix probably isn't necessary, but matching
-   the parameter names (e.g. 'url' instead of 'db_string') is still probably
-   a good idea
-
-- Default renderer.
-
-- Non-bwcompat use of threadlocals:
-
-  security.principals_allowed_by_permission
-
-  chameleon_text.TextTemplateRenderer.template (also uses get_settings)
-
-  chameleon_zpt.ZPTTemplateRenderer.template (also uses get_settings)
-
-  resource.OverrideProvider._get_overrides: can't credibly be removed,
-  because it stores an overrideprovider as a module-scope global.
-
-  traversal.traverse: this API is a stepchild, and needs to be changed.
-
-  Configurator.add_translation_dirs: not passed any context but a message,
-  can't credibly be removed.
-
-- Add deprecation warnings for:
-
-  - Use of chameleon_zpt and chameleon_text templating functions (use
-    renderer API instead).
-
-  - settings.get_settings
-
-  - zcml.zcml_configure
-
-  - zcml.file_configure
-
-- Add static_url as method of request.
-
-
-
-
-
+- One way to split up views chapter: views with renderers / views without
+  renderers.

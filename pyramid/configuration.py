@@ -3,7 +3,6 @@ import re
 import sys
 import threading
 import inspect
-import pkg_resources
 
 import venusian
 
@@ -24,6 +23,8 @@ from pyramid.interfaces import IChameleonTranslate
 from pyramid.interfaces import IDebugLogger
 from pyramid.interfaces import IDefaultPermission
 from pyramid.interfaces import IDefaultRootFactory
+from pyramid.interfaces import IException
+from pyramid.interfaces import IExceptionResponse
 from pyramid.interfaces import IExceptionViewClassifier
 from pyramid.interfaces import ILocaleNegotiator
 from pyramid.interfaces import IMultiView
@@ -36,34 +37,38 @@ from pyramid.interfaces import IRootFactory
 from pyramid.interfaces import IRouteRequest
 from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import ISecuredView
+from pyramid.interfaces import ISessionFactory
 from pyramid.interfaces import IStaticURLInfo
 from pyramid.interfaces import ITranslationDirectories
 from pyramid.interfaces import ITraverser
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
-from pyramid.interfaces import IExceptionResponse
-from pyramid.interfaces import IException
-from pyramid.interfaces import ISessionFactory
 
-from pyramid import chameleon_text
-from pyramid import chameleon_zpt
-from pyramid.mako_templating import renderer_factory as mako_renderer_factory
+try:
+    from pyramid import chameleon_text
+except TypeError:  # pragma: no cover
+    chameleon_text = None # pypy
+try: 
+    from pyramid import chameleon_zpt
+except TypeError: # pragma: no cover
+    chameleon_zpt = None # pypy
+
 from pyramid import renderers
-from pyramid.renderers import RendererHelper
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.compat import all
 from pyramid.compat import md5
 from pyramid.events import ApplicationCreated
+from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import Forbidden
 from pyramid.exceptions import NotFound
 from pyramid.exceptions import PredicateMismatch
-from pyramid.exceptions import ConfigurationError
 from pyramid.i18n import get_localizer
 from pyramid.log import make_stream_logger
+from pyramid.mako_templating import renderer_factory as mako_renderer_factory
 from pyramid.path import caller_package
 from pyramid.path import package_path
-from pyramid.path import package_of
 from pyramid.registry import Registry
+from pyramid.renderers import RendererHelper
 from pyramid.request import route_request_iface
 from pyramid.resource import PackageOverrides
 from pyramid.resource import resolve_resource_spec
@@ -72,24 +77,29 @@ from pyramid.static import StaticURLInfo
 from pyramid.threadlocal import get_current_registry
 from pyramid.threadlocal import get_current_request
 from pyramid.threadlocal import manager
-from pyramid.traversal import traversal_path
 from pyramid.traversal import DefaultRootFactory
 from pyramid.traversal import find_interface
+from pyramid.traversal import traversal_path
 from pyramid.urldispatch import RoutesMapper
-from pyramid.view import render_view_to_response
+from pyramid.util import DottedNameResolver
 from pyramid.view import default_exceptionresponse_view
+from pyramid.view import render_view_to_response
 
 MAX_ORDER = 1 << 30
 DEFAULT_PHASH = md5().hexdigest()
 
 DEFAULT_RENDERERS = (
-    ('.pt', chameleon_zpt.renderer_factory),
-    ('.txt', chameleon_text.renderer_factory),
     ('.mak', mako_renderer_factory),
     ('.mako', mako_renderer_factory),
     ('json', renderers.json_renderer_factory),
     ('string', renderers.string_renderer_factory),
     )
+
+if chameleon_text:
+    DEFAULT_RENDERERS += (('.pt', chameleon_zpt.renderer_factory),)
+if chameleon_zpt:
+    DEFAULT_RENDERERS += (('.txt', chameleon_text.renderer_factory),)
+
 
 class Configurator(object):
     """
@@ -285,12 +295,17 @@ class Configurator(object):
                      attr=None, renderer=None, wrapper_viewname=None,
                      viewname=None, accept=None, order=MAX_ORDER,
                      phash=DEFAULT_PHASH):
+        if renderer is None: # use default renderer if one exists
+            default_renderer_factory = self.registry.queryUtility(
+                IRendererFactory)
+            if default_renderer_factory is not None:
+                renderer = {'name':None, 'package':self.package}
         view = self.maybe_dotted(view)
         authn_policy = self.registry.queryUtility(IAuthenticationPolicy)
         authz_policy = self.registry.queryUtility(IAuthorizationPolicy)
         settings = self.registry.settings
         logger = self.registry.queryUtility(IDebugLogger)
-        mapped_view = _map_view(view, attr, renderer, self.registry)
+        mapped_view = _map_view(view, self.registry, attr, renderer)
         owrapped_view = _owrap_view(mapped_view, viewname, wrapper_viewname)
         secured_view = _secure_view(owrapped_view, permission,
                                     authn_policy, authz_policy)
@@ -570,11 +585,10 @@ class Configurator(object):
         return subscriber
 
     def add_settings(self, settings=None, **kw):
-        """Augment the ``settings`` argument passed in to the
-        Configurator constructor with one or more 'setting' key/value
-        pairs.  A setting is a single key/value pair in the
-        dictionary-ish object returned from the API
-        :func:`pyramid.settings.get_settings` and
+        """Augment the ``settings`` argument passed in to the Configurator
+        constructor with one or more 'setting' key/value pairs.  A setting is
+        a single key/value pair in the dictionary-ish object returned from
+        the API :attr:`pyramid.registry.Registry.settings` and
         :meth:`pyramid.configuration.Configurator.get_settings`.
 
         You may pass a dictionary::
@@ -585,11 +599,10 @@ class Configurator(object):
 
            config.add_settings(external_uri='http://example.com')
 
-        This function is useful when you need to test code that calls the
-        :func:`pyramid.settings.get_settings` API (or the
-        :meth:`pyramid.configuration.Configurator.get_settings` API or
-        accesses ``request.settings``) and which uses return values from that
-        API.
+        This function is useful when you need to test code that accesses the
+        :attr:`pyramid.registry.Registry.settings` API (or the
+        :meth:`pyramid.configuration.Configurator.get_settings` API) and
+        which uses values from that API.
         """
         if settings is None:
             settings = {}
@@ -610,9 +623,8 @@ class Configurator(object):
         .. note:: For backwards compatibility, dictionary keys can also be
            looked up as attributes of the settings object.
 
-        .. note:: the :class:`pyramid.settings.get_settings` and function
-           performs the same duty and the settings attribute can also be
-           accessed as :attr:`pyramid.registry.Registry.settings`
+        .. note:: the :attr:`pyramid.registry.Registry.settings` API
+           performs the same duty.
            """
         return self.registry.settings
 
@@ -690,6 +702,8 @@ class Configurator(object):
         route pattern is disallowed.
 
         Any extra keyword arguments are passed along to ``add_route``.
+
+        See :ref:`handlers_chapter` for more explanatory documentation.
 
         This method returns the result of add_route."""
         handler = self.maybe_dotted(handler)
@@ -1252,9 +1266,9 @@ class Configurator(object):
 
           The syntax of the ``traverse`` argument is the same as it is
           for ``pattern``. For example, if the ``pattern`` provided to
-          ``add_route`` is ``articles/:article/edit``, and the
+          ``add_route`` is ``articles/{article}/edit``, and the
           ``traverse`` argument provided to ``add_route`` is
-          ``/:article``, when a request comes in that causes the route
+          ``/{article}``, when a request comes in that causes the route
           to match in such a way that the ``article`` match value is
           '1' (when the request URI is ``/articles/1/edit``), the
           traversal path will be generated as ``/1``.  This means that
@@ -1298,7 +1312,7 @@ class Configurator(object):
 
         pattern
 
-          The pattern of the route e.g. ``ideas/:idea``.  This
+          The pattern of the route e.g. ``ideas/{idea}``.  This
           argument is required.  See :ref:`route_path_pattern_syntax`
           for information about the syntax of route patterns.  If the
           pattern doesn't match the current URL, route matching
@@ -1309,7 +1323,7 @@ class Configurator(object):
              to this function will be used to represent the pattern
              value if the ``pattern`` argument is ``None``.  If both
              ``path`` and ``pattern`` are passed, ``pattern`` wins.
-
+        
         xhr
 
           This value should be either ``True`` or ``False``.  If this
@@ -1562,7 +1576,7 @@ class Configurator(object):
         By default, ``categories`` is ``None`` which will execute
         *all* Venusian decorator callbacks including
         :app:`Pyramid`-related decorators such as
-        :class:`pyramid.view.view_config``.  If this is not desirable
+        :class:`pyramid.view.view_config`.  If this is not desirable
         because the codebase has other Venusian-using decorators that
         aren't meant to be invoked during a particular scan, use
         ``('pyramid',)`` as a ``categories`` value to limit the execution
@@ -1583,7 +1597,9 @@ class Configurator(object):
         Add a :app:`Pyramid` :term:`renderer` factory to the
         current configuration state.
 
-        The ``name`` argument is the renderer name.
+        The ``name`` argument is the renderer name.  Use ``None`` to
+        represent the default renderer (a renderer which will be used for all
+        views unless they name another renderer specifically).
 
         The ``factory`` argument is Python reference to an
         implementation of a :term:`renderer` factory or a
@@ -1597,6 +1613,11 @@ class Configurator(object):
         to use this method.
         """
         factory = self.maybe_dotted(factory)
+        # if name is None or the empty string, we're trying to register
+        # a default renderer, but registerUtility is too dumb to accept None
+        # as a name
+        if not name: 
+            name = ''
         self.registry.registerUtility(
             factory, IRendererFactory, name=name, info=_info)
 
@@ -2418,7 +2439,7 @@ def is_response(ob):
         return True
     return False
 
-def _map_view(view, attr=None, renderer=None, registry=None):
+def _map_view(view, registry, attr=None, renderer=None):
     wrapped_view = view
 
     helper = None
@@ -2704,148 +2725,6 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     config.load_zcml(zcml_file)
     config.end()
     return config.make_wsgi_app()
-
-class DottedNameResolver(object):
-    """ This class resolves dotted name references to 'global' Python
-    objects (objects which can be imported) to those objects.
-
-    Two dotted name styles are supported during deserialization:
-
-    - ``pkg_resources``-style dotted names where non-module attributes
-      of a package are separated from the rest of the path using a ':'
-      e.g. ``package.module:attr``.
-
-    - ``zope.dottedname``-style dotted names where non-module
-      attributes of a package are separated from the rest of the path
-      using a '.' e.g. ``package.module.attr``.
-
-    These styles can be used interchangeably.  If the serialization
-    contains a ``:`` (colon), the ``pkg_resources`` resolution
-    mechanism will be chosen, otherwise the ``zope.dottedname``
-    resolution mechanism will be chosen.
-
-    The constructor accepts a single argument named ``package`` which
-    should be a one of:
-
-    - a Python module or package object
-
-    - A fully qualified (not relative) dotted name to a module or package
-
-    - The value ``None``
-
-    The ``package`` is used when relative dotted names are supplied to
-    the resolver's ``resolve`` and ``maybe_resolve`` methods.  A
-    dotted name which has a ``.`` (dot) or ``:`` (colon) as its first
-    character is treated as relative.
-
-    If the value ``None`` is supplied as the package name, the
-    resolver will only be able to resolve fully qualified (not
-    relative) names.  Any attempt to resolve a relative name when the
-    ``package`` is ``None`` will result in an
-    :exc:`pyramid.configuration.ConfigurationError` exception.
-
-    If a *module* or *module name* (as opposed to a package or package
-    name) is supplied as ``package``, its containing package is
-    computed and this package used to derive the package name (all
-    names are resolved relative to packages, never to modules).  For
-    example, if the ``package`` argument to this type was passed the
-    string ``xml.dom.expatbuilder``, and ``.mindom`` is supplied to
-    the ``resolve`` method, the resulting import would be for
-    ``xml.minidom``, because ``xml.dom.expatbuilder`` is a module
-    object, not a package object.
-
-    If a *package* or *package name* (as opposed to a module or module
-    name) is supplied as ``package``, this package will be used to
-    relative compute dotted names.  For example, if the ``package``
-    argument to this type was passed the string ``xml.dom``, and
-    ``.minidom`` is supplied to the ``resolve`` method, the resulting
-    import would be for ``xml.minidom``.
-
-    When a dotted name cannot be resolved, a
-    :class:`pyramid.exceptions.ConfigurationError` error is raised.
-    """
-    def __init__(self, package):
-        if package is None:
-            self.package_name = None
-            self.package = None
-        else:
-            if isinstance(package, basestring):
-                try:
-                    __import__(package)
-                except ImportError:
-                    raise ConfigurationError(
-                        'The dotted name %r cannot be imported' % (package,))
-                package = sys.modules[package]
-            self.package = package_of(package)
-            self.package_name = self.package.__name__
-
-    def _pkg_resources_style(self, value):
-        """ package.module:attr style """
-        if value.startswith('.') or value.startswith(':'):
-            if not self.package_name:
-                raise ConfigurationError(
-                    'relative name %r irresolveable without '
-                    'package_name' % (value,))
-            if value in ['.', ':']:
-                value = self.package_name
-            else:
-                value = self.package_name + value
-        return pkg_resources.EntryPoint.parse(
-            'x=%s' % value).load(False)
-
-    def _zope_dottedname_style(self, value):
-        """ package.module.attr style """
-        module = self.package_name and self.package_name or None
-        if value == '.':
-            if self.package_name is None:
-                raise ConfigurationError(
-                    'relative name %r irresolveable without package' % (value,)
-                )
-            name = module.split('.')
-        else:
-            name = value.split('.')
-            if not name[0]:
-                if module is None:
-                    raise ConfigurationError(
-                        'relative name %r irresolveable without '
-                        'package' % (value,)
-                        )
-                module = module.split('.')
-                name.pop(0)
-                while not name[0]:
-                    module.pop()
-                    name.pop(0)
-                name = module + name
-
-        used = name.pop(0)
-        found = __import__(used)
-        for n in name:
-            used += '.' + n
-            try:
-                found = getattr(found, n)
-            except AttributeError:
-                __import__(used)
-                found = getattr(found, n) # pragma: no cover
-
-        return found
-
-    def resolve(self, dotted):
-        if not isinstance(dotted, basestring):
-            raise ConfigurationError('%r is not a string' % (dotted,))
-        return self.maybe_resolve(dotted)
-
-    def maybe_resolve(self, dotted):
-        if isinstance(dotted, basestring):
-            try:
-                if ':' in dotted:
-                    return self._pkg_resources_style(dotted)
-                else:
-                    return self._zope_dottedname_style(dotted)
-            except ImportError:
-                raise ConfigurationError(
-                    'The dotted name %r cannot be imported' % (dotted,))
-        return dotted
-
 
 class ActionPredicate(object):
     action_name = 'action'

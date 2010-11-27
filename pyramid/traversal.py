@@ -228,7 +228,7 @@ def traverse(model, path):
     object supplied to the function as the ``model`` argument.  If an
     empty string is passed as ``path``, the ``model`` passed in will
     be returned.  Model path strings must be escaped in the following
-    manner: each Unicode path segment must be encoded as UTF-8 and as
+    manner: each Unicode path segment must be encoded as UTF-8 and
     each path segment must escaped via Python's :mod:`urllib.quote`.
     For example, ``/path/to%20the/La%20Pe%C3%B1a`` (absolute) or
     ``to%20the/La%20Pe%C3%B1a`` (relative).  The
@@ -271,6 +271,17 @@ def traverse(model, path):
             path = _join_path_tuple(tuple(path))
         else:
             path = ''
+
+    # The user is supposed to pass us a string object, never Unicode.  In
+    # practice, however, users indeed pass Unicode to this API.  If they do
+    # pass a Unicode object, its data *must* be entirely encodeable to ASCII,
+    # so we encode it here as a convenience to the user and to prevent
+    # second-order failures from cropping up (all failures will occur at this
+    # step rather than later down the line as the result of calling
+    # ``traversal_path``).
+
+    if isinstance(path, unicode):
+        path = path.encode('ascii')
 
     if path and path[0] == '/':
         model = find_root(model)

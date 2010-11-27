@@ -33,4 +33,5 @@ Other Interfaces
 
   .. autointerface:: IRendererInfo
 
+  .. autointerface:: ITemplateRenderer
 

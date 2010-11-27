@@ -1,18 +1,14 @@
 from pyramid.configuration import Configurator
-from pramid.settings import asbool
+from sqlalchemy import engine_from_config
 
 from {{package}}.models import appmaker
 
 def main(global_config, **settings):
     """ This function returns a WSGI application.
     """
-    db_string = settings.get('db_string')
-    if db_string is None:
-        raise ValueError("No 'db_string' value in application configuration.")
-    db_echo = settings.get('db_echo', 'false')
-    get_root = appmaker(db_string, asbool(db_echo))
+    engine = engine_from_config(settings, 'sqlalchemy.')
+    get_root = appmaker(engine)
     config = Configurator(settings=settings, root_factory=get_root)
-    config.begin()
     config.add_static_view('static', '{{package}}:static')
     config.add_view('{{package}}.views.view_root', 
                     context='{{package}}.models.MyApp', 
@@ -20,7 +16,6 @@ def main(global_config, **settings):
     config.add_view('{{package}}.views.view_model',
                     context='{{package}}.models.MyModel',
                     renderer="templates/model.pt")
-    config.end()
     return config.make_wsgi_app()
 
 

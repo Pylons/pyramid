@@ -2,6 +2,11 @@ import unittest
 
 from pyramid import testing
 
+try:
+    import __pypy__
+except:
+    __pypy__ = None
+
 class ConfiguratorTests(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.configuration import Configurator
@@ -90,8 +95,9 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(config.package, this_pkg)
         self.failUnless(config.registry.getUtility(IRendererFactory, 'json'))
         self.failUnless(config.registry.getUtility(IRendererFactory, 'string'))
-        self.failUnless(config.registry.getUtility(IRendererFactory, '.pt'))
-        self.failUnless(config.registry.getUtility(IRendererFactory, '.txt'))
+        if not __pypy__:
+            self.failUnless(config.registry.getUtility(IRendererFactory, '.pt'))
+            self.failUnless(config.registry.getUtility(IRendererFactory,'.txt'))
         self.failUnless(config.registry.getUtility(IRendererFactory, '.mak'))
         self.failUnless(config.registry.getUtility(IRendererFactory, '.mako'))
 
@@ -210,9 +216,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(result, pyramid.tests)
 
     def test_maybe_dotted_string_fail(self):
-        from pyramid.configuration import ConfigurationError
         config = self._makeOne()
-        self.assertRaises(ConfigurationError,
+        self.assertRaises(ImportError,
                           config.maybe_dotted, 'cant.be.found')
 
     def test_maybe_dotted_notstring_success(self):
@@ -2553,6 +2558,36 @@ class ConfiguratorTests(unittest.TestCase):
         self.failIf(result is view)
         self.assertEqual(result(None, None).body, 'moo')
 
+    def test_derive_view_with_default_renderer_no_explicit_renderer(self):
+        def view(request):
+            return 'OK'
+        config = self._makeOne()
+        class moo(object):
+            def __init__(self, *arg, **kw):
+                pass
+            def __call__(self, *arg, **kw):
+                return 'moo'
+        config.add_renderer(None, moo)
+        result = config.derive_view(view)
+        self.failIf(result is view)
+        self.assertEqual(result(None, None).body, 'moo')
+
+    def test_derive_view_with_default_renderer_with_explicit_renderer(self):
+        def view(request):
+            return 'OK'
+        config = self._makeOne()
+        class moo(object): pass
+        class foo(object):
+            def __init__(self, *arg, **kw):
+                pass
+            def __call__(self, *arg, **kw):
+                return 'foo'
+        config.add_renderer(None, moo)
+        config.add_renderer('foo', foo)
+        result = config.derive_view(view, renderer='foo')
+        self.failIf(result is view)
+        self.assertEqual(result(None, None).body, 'foo')
+
     def test_derive_view_class_without_attr(self):
         class View(object):
             def __init__(self, request):
@@ -2940,6 +2975,7 @@ class ConfiguratorTests(unittest.TestCase):
                          pyramid.tests)
 
     def test_scan_integration(self):
+        import os
         from zope.interface import alsoProvides
         from pyramid.interfaces import IRequest
         from pyramid.view import render_view_to_response
@@ -3011,8 +3047,12 @@ class ConfiguratorTests(unittest.TestCase):
         result = render_view_to_response(ctx, req, 'another_stacked_class2')
         self.assertEqual(result, 'another_stacked_class')
 
-        self.assertRaises(TypeError,
-                          render_view_to_response, ctx, req, 'basemethod')
+        if not os.name.startswith('java'):
+            # on Jython, a class without an __init__ apparently accepts
+            # any number of arguments without raising a TypeError.
+
+            self.assertRaises(TypeError,
+                              render_view_to_response, ctx, req, 'basemethod')
 
         result = render_view_to_response(ctx, req, 'method1')
         self.assertEqual(result, 'method1')
@@ -3231,9 +3271,9 @@ class Test__map_view(unittest.TestCase):
         request.registry = self.registry
         return request
 
-    def _callFUT(self, *arg, **kw):
+    def _callFUT(self, view, **kw):
         from pyramid.configuration import _map_view
-        return _map_view(*arg, **kw)
+        return _map_view(view, self.registry, **kw)
 
     def test__map_view_as_function_context_and_request(self):
         def view(context, request):
@@ -3532,8 +3572,7 @@ class Test__map_view(unittest.TestCase):
         def view(context, request):
             return {'a':'1'}
         info = {'name':renderer.spec, 'package':None}
-        result = self._callFUT(view, renderer=info,
-                               registry=self.registry)
+        result = self._callFUT(view, renderer=info)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -4246,183 +4285,6 @@ class TestMakeApp(unittest.TestCase):
         app = self._callFUT(rootfactory, filename='1.zcml', settings=settings,
                             Configurator=DummyConfigurator)
         self.assertEqual(app.zcml_file, '2.zcml')
-
-class TestDottedNameResolver(unittest.TestCase):
-    def _makeOne(self, package=None):
-        from pyramid.configuration import DottedNameResolver
-        return DottedNameResolver(package)
-
-    def config_exc(self, func, *arg, **kw):
-        from pyramid.exceptions import ConfigurationError
-        try:
-            func(*arg, **kw)
-        except ConfigurationError, e:
-            return e
-        else:
-            raise AssertionError('Invalid not raised') # pragma: no cover
-
-    def test_zope_dottedname_style_resolve_absolute(self):
-        typ = self._makeOne()
-        result = typ._zope_dottedname_style(
-            'pyramid.tests.test_configuration.TestDottedNameResolver')
-        self.assertEqual(result, self.__class__)
-
-    def test_zope_dottedname_style_irrresolveable_absolute(self):
-        typ = self._makeOne()
-        self.assertRaises(ImportError, typ._zope_dottedname_style,
-            'pyramid.test_configuration.nonexisting_name')
-
-    def test__zope_dottedname_style_resolve_relative(self):
-        import pyramid.tests
-        typ = self._makeOne(package=pyramid.tests)
-        result = typ._zope_dottedname_style(
-            '.test_configuration.TestDottedNameResolver')
-        self.assertEqual(result, self.__class__)
-
-    def test__zope_dottedname_style_resolve_relative_leading_dots(self):
-        import pyramid.tests.test_configuration
-        typ = self._makeOne(package=pyramid.tests)
-        result = typ._zope_dottedname_style(
-            '..tests.test_configuration.TestDottedNameResolver')
-        self.assertEqual(result, self.__class__)
-
-    def test__zope_dottedname_style_resolve_relative_is_dot(self):
-        import pyramid.tests
-        typ = self._makeOne(package=pyramid.tests)
-        result = typ._zope_dottedname_style('.')
-        self.assertEqual(result, pyramid.tests)
-
-    def test__zope_dottedname_style_irresolveable_relative_is_dot(self):
-        typ = self._makeOne()
-        e = self.config_exc(typ._zope_dottedname_style, '.')
-        self.assertEqual(
-            e.args[0],
-            "relative name '.' irresolveable without package")
-
-    def test_zope_dottedname_style_resolve_relative_nocurrentpackage(self):
-        typ = self._makeOne()
-        e = self.config_exc(typ._zope_dottedname_style, '.whatever')
-        self.assertEqual(
-            e.args[0],
-            "relative name '.whatever' irresolveable without package")
-
-    def test_zope_dottedname_style_irrresolveable_relative(self):
-        import pyramid.tests
-        typ = self._makeOne(package=pyramid.tests)
-        self.assertRaises(ImportError, typ._zope_dottedname_style,
-                          '.notexisting')
-
-    def test__zope_dottedname_style_resolveable_relative(self):
-        import pyramid
-        typ = self._makeOne(package=pyramid)
-        result = typ._zope_dottedname_style('.tests')
-        from pyramid import tests
-        self.assertEqual(result, tests)
-
-    def test__zope_dottedname_style_irresolveable_absolute(self):
-        typ = self._makeOne()
-        self.assertRaises(
-            ImportError,
-            typ._zope_dottedname_style, 'pyramid.fudge.bar')
-
-    def test__zope_dottedname_style_resolveable_absolute(self):
-        typ = self._makeOne()
-        result = typ._zope_dottedname_style(
-            'pyramid.tests.test_configuration.TestDottedNameResolver')
-        self.assertEqual(result, self.__class__)
-
-    def test__pkg_resources_style_resolve_absolute(self):
-        typ = self._makeOne()
-        result = typ._pkg_resources_style(
-            'pyramid.tests.test_configuration:TestDottedNameResolver')
-        self.assertEqual(result, self.__class__)
-
-    def test__pkg_resources_style_irrresolveable_absolute(self):
-        typ = self._makeOne()
-        self.assertRaises(ImportError, typ._pkg_resources_style,
-            'pyramid.tests:nonexisting')
-
-    def test__pkg_resources_style_resolve_relative(self):
-        import pyramid.tests
-        typ = self._makeOne(package=pyramid.tests)
-        result = typ._pkg_resources_style(
-            '.test_configuration:TestDottedNameResolver')
-        self.assertEqual(result, self.__class__)
-
-    def test__pkg_resources_style_resolve_relative_is_dot(self):
-        import pyramid.tests
-        typ = self._makeOne(package=pyramid.tests)
-        result = typ._pkg_resources_style('.')
-        self.assertEqual(result, pyramid.tests)
-
-    def test__pkg_resources_style_resolve_relative_nocurrentpackage(self):
-        typ = self._makeOne()
-        from pyramid.exceptions import ConfigurationError
-        self.assertRaises(ConfigurationError, typ._pkg_resources_style,
-                          '.whatever')
-
-    def test__pkg_resources_style_irrresolveable_relative(self):
-        import pyramid
-        typ = self._makeOne(package=pyramid)
-        self.assertRaises(ImportError, typ._pkg_resources_style,
-                          ':notexisting')
-
-    def test_resolve_not_a_string(self):
-        typ = self._makeOne()
-        e = self.config_exc(typ.resolve, None)
-        self.assertEqual(e.args[0], 'None is not a string')
-
-    def test_resolve_using_pkgresources_style(self):
-        typ = self._makeOne()
-        result = typ.resolve(
-            'pyramid.tests.test_configuration:TestDottedNameResolver')
-        self.assertEqual(result, self.__class__)
-
-    def test_resolve_using_zope_dottedname_style(self):
-        typ = self._makeOne()
-        result = typ.resolve(
-            'pyramid.tests.test_configuration:TestDottedNameResolver')
-        self.assertEqual(result, self.__class__)
-
-    def test_resolve_missing_raises(self):
-        typ = self._makeOne()
-        e = self.config_exc(typ.resolve, 'cant.be.found')
-        self.assertEqual(e.args[0],
-                         "The dotted name 'cant.be.found' cannot be imported")
-
-    def test_ctor_string_module_resolveable(self):
-        import pyramid.tests
-        typ = self._makeOne('pyramid.tests.test_configuration')
-        self.assertEqual(typ.package, pyramid.tests)
-        self.assertEqual(typ.package_name, 'pyramid.tests')
-
-    def test_ctor_string_package_resolveable(self):
-        import pyramid.tests
-        typ = self._makeOne('pyramid.tests')
-        self.assertEqual(typ.package, pyramid.tests)
-        self.assertEqual(typ.package_name, 'pyramid.tests')
-
-    def test_ctor_string_irresolveable(self):
-        from pyramid.configuration import ConfigurationError
-        self.assertRaises(ConfigurationError, self._makeOne, 'cant.be.found')
-
-    def test_ctor_module(self):
-        import pyramid.tests
-        import pyramid.tests.test_configuration
-        typ = self._makeOne(pyramid.tests.test_configuration)
-        self.assertEqual(typ.package, pyramid.tests)
-        self.assertEqual(typ.package_name, 'pyramid.tests')
-
-    def test_ctor_package(self):
-        import pyramid.tests
-        typ = self._makeOne(pyramid.tests)
-        self.assertEqual(typ.package, pyramid.tests)
-        self.assertEqual(typ.package_name, 'pyramid.tests')
-
-    def test_ctor_None(self):
-        typ = self._makeOne(None)
-        self.assertEqual(typ.package, None)
-        self.assertEqual(typ.package_name, None)
 
 class Test_isexception(unittest.TestCase):
     def _callFUT(self, ob):

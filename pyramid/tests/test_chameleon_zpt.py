@@ -1,13 +1,18 @@
 import unittest
 
 from pyramid.testing import cleanUp
+from pyramid.testing import skip_on
 
 class Base(object):
     def setUp(self):
         cleanUp()
+        from zope.deprecation import __show__
+        __show__.off()
 
     def tearDown(self):
         cleanUp()
+        from zope.deprecation import __show__
+        __show__.on()
 
     def _getTemplatePath(self, name):
         import os
@@ -39,76 +44,100 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         klass = self._getTargetClass()
         return klass(*arg, **kw)
 
+    @skip_on('pypy')
     def test_instance_implements_ITemplate(self):
         from zope.interface.verify import verifyObject
         from pyramid.interfaces import ITemplateRenderer
         path = self._getTemplatePath('minimal.pt')
-        verifyObject(ITemplateRenderer, self._makeOne(path))
+        lookup = DummyLookup()
+        verifyObject(ITemplateRenderer, self._makeOne(path, lookup))
 
+    @skip_on('pypy')
     def test_class_implements_ITemplate(self):
         from zope.interface.verify import verifyClass
         from pyramid.interfaces import ITemplateRenderer
         verifyClass(ITemplateRenderer, self._getTargetClass())
 
+    @skip_on('java', 'pypy')
     def test_call(self):
         minimal = self._getTemplatePath('minimal.pt')
-        instance = self._makeOne(minimal)
+        lookup = DummyLookup()
+        instance = self._makeOne(minimal, lookup)
         result = instance({}, {})
         self.failUnless(isinstance(result, unicode))
         self.assertEqual(result,
                      '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
 
+    @skip_on('java', 'pypy')
     def test_template_reified(self):
         minimal = self._getTemplatePath('minimal.pt')
-        instance = self._makeOne(minimal)
+        lookup = DummyLookup()
+        instance = self._makeOne(minimal, lookup)
         self.failIf('template' in instance.__dict__)
         template  = instance.template
         self.assertEqual(template, instance.__dict__['template'])
 
+    @skip_on('java', 'pypy')
     def test_template_with_ichameleon_translate(self):
-        from pyramid.interfaces import IChameleonTranslate
-        def ct(): pass
-        self.config.registry.registerUtility(ct, IChameleonTranslate)
         minimal = self._getTemplatePath('minimal.pt')
-        instance = self._makeOne(minimal)
+        lookup = DummyLookup()
+        instance = self._makeOne(minimal, lookup)
         self.failIf('template' in instance.__dict__)
         template  = instance.template
-        self.assertEqual(template.translate, ct)
+        self.assertEqual(template.translate, lookup.translate)
 
+    @skip_on('java', 'pypy')
     def test_template_with_debug_templates(self):
-        self.config.add_settings({'debug_templates':True})
         minimal = self._getTemplatePath('minimal.pt')
-        instance = self._makeOne(minimal)
+        lookup = DummyLookup()
+        lookup.debug = True
+        instance = self._makeOne(minimal, lookup)
         self.failIf('template' in instance.__dict__)
         template  = instance.template
         self.assertEqual(template.debug, True)
 
-    def test_template_with_reload_templates(self):
-        self.config.add_settings({'reload_templates':True})
+    @skip_on('java', 'pypy')
+    def test_template_without_debug_templates(self):
         minimal = self._getTemplatePath('minimal.pt')
-        instance = self._makeOne(minimal)
+        lookup = DummyLookup()
+        lookup.debug = False
+        instance = self._makeOne(minimal, lookup)
+        self.failIf('template' in instance.__dict__)
+        template  = instance.template
+        self.assertEqual(template.debug, False)
+
+    @skip_on('java', 'pypy')
+    def test_template_with_reload_templates(self):
+        minimal = self._getTemplatePath('minimal.pt')
+        lookup = DummyLookup()
+        lookup.auto_reload = True
+        instance = self._makeOne(minimal, lookup)
         self.failIf('template' in instance.__dict__)
         template  = instance.template
         self.assertEqual(template.auto_reload, True)
 
-    def test_template_with_emptydict(self):
-        from pyramid.interfaces import ISettings
-        self.config.registry.registerUtility({}, ISettings)
+    @skip_on('java', 'pypy')
+    def test_template_without_reload_templates(self):
         minimal = self._getTemplatePath('minimal.pt')
-        instance = self._makeOne(minimal)
+        lookup = DummyLookup()
+        lookup.auto_reload = False
+        instance = self._makeOne(minimal, lookup)
         self.failIf('template' in instance.__dict__)
         template  = instance.template
         self.assertEqual(template.auto_reload, False)
-        self.assertEqual(template.debug, False)
 
+    @skip_on('java', 'pypy')
     def test_call_with_nondict_value(self):
         minimal = self._getTemplatePath('minimal.pt')
-        instance = self._makeOne(minimal)
+        lookup = DummyLookup()
+        instance = self._makeOne(minimal, lookup)
         self.assertRaises(ValueError, instance, None, {})
 
+    @skip_on('java', 'pypy')
     def test_implementation(self):
         minimal = self._getTemplatePath('minimal.pt')
-        instance = self._makeOne(minimal)
+        lookup = DummyLookup()
+        instance = self._makeOne(minimal, lookup)
         result = instance.implementation()()
         self.failUnless(isinstance(result, unicode))
         self.assertEqual(result,
@@ -120,6 +149,7 @@ class RenderTemplateTests(Base, unittest.TestCase):
         from pyramid.chameleon_zpt import render_template
         return render_template(name, **kw)
 
+    @skip_on('java', 'pypy')
     def test_it(self):
         minimal = self._getTemplatePath('minimal.pt')
         result = self._callFUT(minimal)
@@ -128,16 +158,11 @@ class RenderTemplateTests(Base, unittest.TestCase):
                      '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
 
 class RenderTemplateToResponseTests(Base, unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-        
     def _callFUT(self, name, **kw):
         from pyramid.chameleon_zpt import render_template_to_response
         return render_template_to_response(name, **kw)
 
+    @skip_on('java', 'pypy')
     def test_it(self):
         minimal = self._getTemplatePath('minimal.pt')
         result = self._callFUT(minimal)
@@ -148,6 +173,7 @@ class RenderTemplateToResponseTests(Base, unittest.TestCase):
         self.assertEqual(result.status, '200 OK')
         self.assertEqual(len(result.headerlist), 2)
 
+    @skip_on('java', 'pypy')
     def test_iresponsefactory_override(self):
         from webob import Response
         class Response2(Response):
@@ -163,6 +189,7 @@ class GetRendererTests(Base, unittest.TestCase):
         from pyramid.chameleon_zpt import get_renderer
         return get_renderer(name)
 
+    @skip_on('java', 'pypy')
     def test_it(self):
         from pyramid.interfaces import IRendererFactory
         class Dummy:
@@ -180,6 +207,7 @@ class GetTemplateTests(Base, unittest.TestCase):
         from pyramid.chameleon_zpt import get_template
         return get_template(name)
 
+    @skip_on('java', 'pypy')
     def test_it(self):
         from pyramid.interfaces import IRendererFactory
         class Dummy:
@@ -192,3 +220,8 @@ class GetTemplateTests(Base, unittest.TestCase):
         self._registerUtility(rf, IRendererFactory, name='foo')
         result = self._callFUT('foo')
         self.failUnless(result is renderer.template)
+
+class DummyLookup(object):
+    auto_reload=True
+    debug = True
+    def translate(self, msg): pass

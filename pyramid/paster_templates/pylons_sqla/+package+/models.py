@@ -36,8 +36,7 @@ def populate():
     DBSession.flush()
     transaction.commit()
     
-def initialize_sql(db_string, db_echo=False):
-    engine = create_engine(db_string, echo=db_echo)
+def initialize_sql(engine):
     DBSession.configure(bind=engine)
     Base.metadata.bind = engine
     Base.metadata.create_all(engine)

@@ -3,8 +3,9 @@ from pyramid.configuration import Configurator
 from pyramid import testing
 
 def _initTestingDB():
+    from sqlalchemy import create_engine
     from tutorial.models import initialize_sql
-    session = initialize_sql('sqlite://')
+    session = initialize_sql(create_engine('sqlite://'))
     return session
 
 class TestMyView(unittest.TestCase):

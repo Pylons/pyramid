@@ -1,5 +1,6 @@
 import sys
 
+from zope.deprecation import deprecated
 from zope.interface import implements
 
 try:
@@ -21,13 +22,10 @@ except ImportError: # pragma: no cover
         pass
 
 from pyramid.interfaces import ITemplateRenderer
-from pyramid.interfaces import IChameleonTranslate
 
 from pyramid.decorator import reify
 from pyramid import renderers
 from pyramid.path import caller_package
-from pyramid.settings import get_settings
-from pyramid.threadlocal import get_current_registry
 
 class TextTemplateFile(TemplateFile):
     default_parser = Parser()
@@ -39,35 +37,24 @@ class TextTemplateFile(TemplateFile):
         super(TextTemplateFile, self).__init__(filename, parser, format,
                                                doctype, **kwargs)
 
-def renderer_factory(path):
-    return renderers.template_renderer_factory(path, TextTemplateRenderer)
+def renderer_factory(info):
+    return renderers.template_renderer_factory(info, TextTemplateRenderer)
 
 class TextTemplateRenderer(object):
     implements(ITemplateRenderer)
-    def __init__(self, path):
+    def __init__(self, path, lookup):
         self.path = path
+        self.lookup = lookup
 
     @reify # avoid looking up reload_templates before manager pushed
     def template(self):
         if sys.platform.startswith('java'): # pragma: no cover
             raise RuntimeError(
                 'Chameleon templates are not compatible with Jython')
-        settings = get_settings()
-        debug = False
-        auto_reload = False
-        if settings:
-            # using .get here is a strategy to be kind to old *tests* rather
-            # than being kind to any existing production system
-            auto_reload = settings.get('reload_templates')
-            debug = settings.get('debug_templates')
-        reg = get_current_registry()
-        translate = None
-        if reg is not None:
-            translate = reg.queryUtility(IChameleonTranslate)
         return TextTemplateFile(self.path,
-                                auto_reload=auto_reload,
-                                debug=debug,
-                                translate=translate)
+                                auto_reload=self.lookup.auto_reload,
+                                debug=self.lookup.debug,
+                                translate=self.lookup.translate)
 
     def implementation(self):
         return self.template
@@ -94,6 +81,11 @@ def get_renderer(path):
     factory = renderers.RendererHelper(path, package=package)
     return factory.get_renderer()
 
+deprecated(
+    'get_renderer',
+    '(pyramid.chameleon_text.get_renderer is deprecated '
+    'as of Pyramid 1.0; instead use pyramid.renderers.get_renderer)')
+
 def get_template(path):
     """ Return the underyling object representing a :term:`Chameleon`
     text template using the template implied by the ``path`` argument.
@@ -107,6 +99,12 @@ def get_template(path):
     package = caller_package()
     factory = renderers.RendererHelper(path, package=package)
     return factory.get_renderer().implementation()
+
+deprecated(
+    'get_template',
+    '(pyramid.chameleon_text.get_template is deprecated '
+    'as of Pyramid 1.0; instead use '
+    'pyramid.renderers.get_renderer().implementation())')
 
 def render_template(path, **kw):
     """ Render a :term:`Chameleon` text template using the template
@@ -124,6 +122,11 @@ def render_template(path, **kw):
     renderer = renderers.RendererHelper(path, package=package)
     return renderer.render(kw, None, request=request)
 
+deprecated(
+    'render_template',
+    '(pyramid.chameleon_text.render_template is deprecated '
+    'as of Pyramid 1.0; instead use pyramid.renderers.render)')
+
 def render_template_to_response(path, **kw):
     """ Render a :term:`Chameleon` text template using the template
     implied by the ``path`` argument.  The ``path`` argument may be a
@@ -140,3 +143,9 @@ def render_template_to_response(path, **kw):
     request = kw.pop('request', None)
     renderer = renderers.RendererHelper(path, package=package)
     return renderer.render_to_response(kw, None, request=request)
+
+deprecated(
+    'render_template_to_response',
+    '(pyramid.chameleon_text.render_template_to_response is deprecated '
+    'as of Pyramid 1.0; instead use pyramid.renderers.render_to_response)')
+

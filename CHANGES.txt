@@ -4,6 +4,165 @@ Next release
 Features
 --------
 
+- Add logging configuration to all paster templates.
+
+- ``pyramid_alchemy``, ``pyramid_routesalchemy``, and ``pylons_sqla`` paster
+  templates now use idiomatic SQLAlchemy configuration in their respective
+  ``.ini`` files and Python code.
+
+- ``pyramid.testing.DummyRequest`` now has a class variable,
+  ``query_string``, which defaults to the empty string.
+
+- Add support for json on GAE by catching NotImplementedError and importing
+  simplejson from django.utils.
+
+- The Mako renderer now accepts a resource specification for
+  ``mako.module_directory``.
+
+- New boolean Mako settings variable ``mako.strict_undefined``.  See `Mako
+  Context Variables
+  <http://www.makotemplates.org/docs/runtime.html#context-variables>`_ for
+  its meaning.
+
+Dependencies
+------------
+
+- Depend on Mako 0.3.6+ (we now require the ``strict_undefined`` feature).
+
+Bug Fixes
+---------
+
+- The ``pyramid_routesalchemy`` paster template's unit tests failed
+  (``AssertionError: 'SomeProject' != 'someproject'``).  This is fixed.
+
+- Make default renderer work (renderer factory registered with no name, which
+  is active for every view unless the view names a specific renderer).
+
+- The Mako renderer did not properly turn the ``mako.imports``,
+  ``mako.default_filters``, and ``mako.imports`` settings into lists.
+
+- The Mako renderer did not properly convert the ``mako.error_handler``
+  setting from a dotted name to a callable.
+
+Documentation
+-------------
+
+- "Sample Applications" section of docs changed to note existence of Cluegun,
+  Shootout and Virginia sample applications, ported from their repoze.bfg
+  origin packages.
+
+- SQLAlchemy+URLDispatch tutorial updated to integrate changes to
+  ``pyramid_routesalchemy`` template.
+
+- Add ``pyramid.interfaces.ITemplateRenderer`` interface to Interfaces API
+  chapter (has ``implementation()`` method, required to be used when getting
+  at Chameleon macros).
+
+
+1.0a4 (2010-11-21)
+==================
+
+Features
+--------
+
+- URL Dispatch now allows for replacement markers to be located anywhere
+  in the pattern, instead of immediately following a ``/``.
+
+- URL Dispatch now uses the form ``{marker}`` to denote a replace marker in
+  the route pattern instead of ``:marker``. The old colon-style marker syntax
+  is still accepted for backwards compatibility. The new format allows a
+  regular expression for that marker location to be used instead of the
+  default ``[^/]+``, for example ``{marker:\d+}`` is now valid to require the
+  marker to be digits.
+
+- Add a ``pyramid.url.route_path`` API, allowing folks to generate relative
+  URLs.  Calling ``route_path`` is the same as calling
+  ``pyramid.url.route_url`` with the argument ``_app_url`` equal to the empty
+  string.
+
+- Add a ``pyramid.request.Request.route_path`` API.  This is a convenience
+  method of the request which calls ``pyramid.url.route_url``.
+
+- Make test suite pass on Jython (requires PasteScript trunk, presumably to
+  be 1.7.4).
+
+- Make test suite pass on PyPy (Chameleon doesn't work).
+
+- Surrounding application configuration with ``config.begin()`` and
+  ``config.end()`` is no longer necessary.  All paster templates have been
+  changed to no longer call these functions.
+
+- Fix configurator to not convert ``ImportError`` to ``ConfigurationError``
+  if the import that failed was unrelated to the import requested via a
+  dotted name when resolving dotted names (such as view dotted names).
+
+Documentation
+-------------
+
+- SQLAlchemy+URLDispatch and ZODB+Traversal tutorials have been updated to
+  not call ``config.begin()`` or ``config.end()``.
+
+Bug Fixes
+---------
+
+- Add deprecation warnings to import of ``pyramid.chameleon_text`` and
+  ``pyramid.chameleon_zpt`` of ``get_renderer``, ``get_template``,
+  ``render_template``, and ``render_template_to_response``.
+
+- Add deprecation warning for import of ``pyramid.zcml.zcml_configure`` and
+  ``pyramid.zcml.file_configure``.
+
+- The ``pyramid_alchemy`` paster template had a typo, preventing an import
+  from working.
+
+- Fix apparent failures when calling ``pyramid.traversal.find_model(root,
+  path)`` or ``pyramid.traversal.traverse(path)`` when ``path`` is
+  (erroneously) a Unicode object. The user is meant to pass these APIs a
+  string object, never a Unicode object.  In practice, however, users indeed
+  pass Unicode.  Because the string that is passed must be ASCII encodeable,
+  now, if they pass a Unicode object, its data is eagerly converted to an
+  ASCII string rather than being passed along to downstream code as a
+  convenience to the user and to prevent puzzling second-order failures from
+  cropping up (all failures will occur within ``pyramid.traversal.traverse``
+  rather than later down the line as the result of calling e.g.
+  ``traversal_path``).
+
+Backwards Incompatibilities
+---------------------------
+
+- The ``pyramid.testing.zcml_configure`` API has been removed.  It had been
+  advertised as removed since repoze.bfg 1.2a1, but hadn't actually been.
+
+Deprecations
+------------
+
+- The ``pyramid.settings.get_settings`` API is now deprecated.  Use
+  ``pyramid.threadlocals.get_current_registry().settings`` instead or use the
+  ``settings`` attribute of the registry available from the request
+  (``request.registry.settings``).
+
+Documentation
+-------------
+
+- Removed ``zodbsessions`` tutorial chapter.  It's still useful, but we now
+  have a SessionFactory abstraction which competes with it, and maintaining
+  documentation on both ways to do it is a distraction.
+
+Internal
+--------
+
+- Replace Twill with WebTest in internal integration tests (avoid deprecation
+  warnings generated by Twill).
+
+1.0a3 (2010-11-16)
+==================
+
+Features
+--------
+
+- Added Mako TemplateLookup settings for ``mako.error_handler``,
+  ``mako.default_filters``, and ``mako.imports``.
+
 - Normalized all paster templates: each now uses the name ``main`` to
   represent the function that returns a WSGI application, each now uses
   WebError, each now has roughly the same shape of development.ini style.
@@ -13,9 +172,9 @@ Features
 
 - New API method: ``pyramid.settings.asbool``.
 
-- New API methods for ``pyramid.request.Request``: ``model_url`` and
-  ``route_url``.  These are simple passthroughs for their respective
-  functions in ``pyramid.url``.
+- New API methods for ``pyramid.request.Request``: ``model_url``,
+  ``route_url``, and ``static_url``.  These are simple passthroughs for their
+  respective functions in ``pyramid.url``.
 
 - The ``settings`` object which used to be available only when
   ``request.settings.get_settings`` was called is now available as
@@ -67,6 +226,14 @@ Behavior Differences
 - Internal: ZCML directives no longer call get_current_registry() if there's
   a ``registry`` attribute on the ZCML context (kill off use of
   threadlocals).
+
+- Internal: Chameleon template renderers now accept two arguments: ``path``
+  and ``lookup``.  ``Lookup`` will be an instance of a lookup class which
+  supplies (late-bound) arguments for debug, reload, and translate.  Any
+  third-party renderers which use (the non-API) function
+  ``pyramid.renderers.template_renderer_factory`` will need to adjust their
+  implementations to obey the new callback argument list.  This change was to
+  kill off inappropriate use of threadlocals.
 
 1.0a2 (2010-11-09)
 ==================

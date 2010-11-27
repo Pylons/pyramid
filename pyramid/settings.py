@@ -1,5 +1,6 @@
 import os
 
+from zope.deprecation import deprecated
 from zope.interface import implements
 
 from pyramid.interfaces import ISettings
@@ -75,9 +76,21 @@ def get_settings():
     .. note:: the
        :class:`pyramid.configuration.Configurator.get_settings` method
        performs the same duty.
+
+    .. warning:: This method is deprecated as of Pyramid 1.0.  Use
+       ``pyramid.threadlocals.get_current_registry().settings`` instead or use '
+       the ``settings`` attribute of the registry available from the request
+       (``request.registry.settings``).
     """
     reg = get_current_registry()
     return reg.settings
+
+deprecated(
+    'get_settings',
+    '(pyramid.settings.get_settings is deprecated as of Pyramid 1.0.  Use'
+    '``pyramid.threadlocal.get_current_registry().settings`` instead or use '
+    'the ``settings`` attribute of the registry available from the request '
+    '(``request.registry.settings``)).')
 
 def asbool(s):
     """ Return the boolean value ``True`` if the case-lowered value of string

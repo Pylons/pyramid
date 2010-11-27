@@ -10,7 +10,7 @@ Attributes
 ~~~~~~~~~~
 
 ``pattern``
-  The pattern of the route e.g. ``ideas/:idea``.  This attribute is
+  The pattern of the route e.g. ``ideas/{idea}``.  This attribute is
   required.  See :ref:`route_pattern_syntax` for information
   about the syntax of route patterns.
 
@@ -51,9 +51,9 @@ Attributes
 
   The syntax of the ``traverse`` argument is the same as it is for
   ``pattern``. For example, if the ``pattern`` provided to the
-  ``route`` directive is ``articles/:article/edit``, and the
+  ``route`` directive is ``articles/{article}/edit``, and the
   ``traverse`` argument provided to the ``route`` directive is
-  ``/:article``, when a request comes in that causes the route to
+  ``/{article}``, when a request comes in that causes the route to
   match in such a way that the ``article`` match value is '1' (when
   the request URI is ``/articles/1/edit``), the traversal path will be
   generated as ``/1``.  This means that the root object's

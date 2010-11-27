@@ -1,4 +1,5 @@
 import os
+import threading
 
 from zope.interface import implements
 from zope.interface import Interface
@@ -7,6 +8,8 @@ from pyramid.interfaces import ITemplateRenderer
 from pyramid.exceptions import ConfigurationError
 from pyramid.resource import resolve_resource_spec
 from pyramid.resource import abspath_from_resource_spec
+from pyramid.settings import asbool
+from pyramid.util import DottedNameResolver
 
 from mako.lookup import TemplateLookup
 from mako import exceptions
@@ -51,6 +54,8 @@ class PkgResourceTemplateLookup(TemplateLookup):
         return TemplateLookup.get_template(self, uri)
 
 
+registry_lock = threading.Lock() 
+
 def renderer_factory(info):
     path = info.name
     registry = info.registry
@@ -58,19 +63,46 @@ def renderer_factory(info):
     lookup = registry.queryUtility(IMakoLookup)
     if lookup is None:
         reload_templates = settings.get('reload_templates', False)
-        directories = settings.get('mako.directories')
-        module_directory = settings.get('mako.module_directory')
+        directories = settings.get('mako.directories', None)
+        module_directory = settings.get('mako.module_directory', None)
         input_encoding = settings.get('mako.input_encoding', 'utf-8')
+        error_handler = settings.get('mako.error_handler', None)
+        default_filters = settings.get('mako.default_filters', None)
+        imports = settings.get('mako.imports', None)
+        strict_undefined = settings.get('mako.strict_undefined', 'false')
         if directories is None:
             raise ConfigurationError(
                 'Mako template used without a ``mako.directories`` setting')
-        directories = directories.splitlines()
+        if not hasattr(directories, '__iter__'):
+            directories = filter(None, directories.splitlines())
         directories = [ abspath_from_resource_spec(d) for d in directories ]
+        if module_directory is not None:
+            module_directory = abspath_from_resource_spec(module_directory)
+        if error_handler is not None:
+            dotted = DottedNameResolver(info.package)
+            error_handler = dotted.maybe_resolve(error_handler)
+        if default_filters is not None:
+            if not hasattr(default_filters, '__iter__'):
+                default_filters = filter(None, default_filters.splitlines())
+        if imports is not None:
+            if not hasattr(imports, '__iter__'):
+                imports = filter(None, imports.splitlines())
+        strict_undefined = asbool(strict_undefined)
+        
         lookup = PkgResourceTemplateLookup(directories=directories,
                                            module_directory=module_directory,
                                            input_encoding=input_encoding,
-                                           filesystem_checks=reload_templates)
-        registry.registerUtility(lookup, IMakoLookup)
+                                           error_handler=error_handler,
+                                           default_filters=default_filters,
+                                           imports=imports,
+                                           filesystem_checks=reload_templates,
+                                           strict_undefined=strict_undefined)
+        registry_lock.acquire()
+        try:
+            registry.registerUtility(lookup, IMakoLookup)
+        finally:
+            registry_lock.release()
+            
     return MakoLookupTemplateRenderer(path, lookup)
 
 
@@ -81,12 +113,8 @@ class MakoLookupTemplateRenderer(object):
         self.lookup = lookup
  
     def implementation(self):
-        return self.template
-
-    @property
-    def template(self):
         return self.lookup.get_template(self.path)
-   
+
     def __call__(self, value, system):
         context = system.pop('context', None)
         if context is not None:
@@ -98,7 +126,7 @@ class MakoLookupTemplateRenderer(object):
             system.update(value)
         except (TypeError, ValueError):
             raise ValueError('renderer was passed non-dictionary as value')
-        template = self.template
+        template = self.implementation()
         if def_name is not None:
             template = template.get_def(def_name)
         result = template.render_unicode(**system)

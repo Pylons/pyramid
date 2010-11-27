@@ -42,8 +42,8 @@ configuration:
 
    # config is an instance of pyramid.configuration.Configurator
 
-   config.add_route('foobar', ':foo/:bar', view='myproject.views.foobar')
-   config.add_route('bazbuz', ':baz/:buz', view='myproject.views.bazbuz')
+   config.add_route('foobar', '{foo}/{bar}', view='myproject.views.foobar')
+   config.add_route('bazbuz', '{baz}/{buz}', view='myproject.views.bazbuz')
 
 Each :term:`route` typically corresponds to a single view callable,
 and when that route is matched during a request, the view callable
@@ -185,7 +185,7 @@ of a route's pattern:
 .. code-block:: python
    :linenos:
 
-   config.add_route('home', ':foo/:bar/*traverse')
+   config.add_route('home', '{foo}/{bar}/*traverse')
 
 A ``*traverse`` token at the end of the pattern in a route's
 configuration implies a "remainder" *capture* value.  When it is used,
@@ -243,7 +243,7 @@ route configuration statement:
 .. code-block:: python
    :linenos:
 
-   config.add_route('home', ':foo/:bar/*traverse', 
+   config.add_route('home', '{foo}/{bar}/*traverse', 
                     factory='mypackage.routes.root_factory')
 
 The ``factory`` above points at the function we've defined.  It
@@ -267,14 +267,14 @@ to do.
 
 When the route configuration named ``home`` above is matched during a
 request, the matchdict generated will be based on its pattern:
-``:foo/:bar/*traverse``.  The "capture value" implied by the
+``{foo}/{bar}/*traverse``.  The "capture value" implied by the
 ``*traverse`` element in the pattern will be used to traverse the
 graph in order to find a context, starting from the root object
 returned from the root factory.  In the above example, the
 :term:`root` object found will be the instance named ``root`` in
 ``routes.py``.
 
-If the URL that matched a route with the pattern ``:foo/:bar/*traverse``,
+If the URL that matched a route with the pattern ``{foo}/{bar}/*traverse``,
 is ``http://example.com/one/two/a/b/c``, the traversal path used
 against the root object will be ``a/b/c``.  As a result,
 :app:`Pyramid` will attempt to traverse through the edges ``a``,
@@ -296,7 +296,7 @@ invoked after a route matches:
 .. code-block:: python
    :linenos:
 
-   config.add_route('home', ':foo/:bar/*traverse', 
+   config.add_route('home', '{foo}/{bar}/*traverse', 
                     factory='mypackage.routes.root_factory')
    config.add_view('mypackage.views.myview', route_name='home')
 
@@ -326,7 +326,7 @@ when a hybrid route is matched:
 .. code-block:: python
    :linenos:
 
-   config.add_route('home', ':foo/:bar/*traverse', 
+   config.add_route('home', '{foo}/{bar}/*traverse', 
                     factory='mypackage.routes.root_factory')
    config.add_view('mypackage.views.myview', name='home')
    config.add_view('mypackage.views.another_view', name='another', 
@@ -358,7 +358,7 @@ Using the ``traverse`` Argument In a Route Definition
 
 Rather than using the ``*traverse`` remainder marker in a pattern, you
 can use the ``traverse`` argument to the
-:meth:`pyramid.configuration.Configurator.add_route`` method.
+:meth:`pyramid.configuration.Configurator.add_route` method.
 
 When you use the ``*traverse`` remainder marker, the traversal path is
 limited to being the remainder segments of a request URL when a route
@@ -371,14 +371,14 @@ Here's a use of the ``traverse`` pattern in a call to
 .. code-block:: python
    :linenos:
 
-   config.add_route('abc', '/articles/:article/edit',
-                    traverse='/articles/:article')
+   config.add_route('abc', '/articles/{article}/edit',
+                    traverse='/articles/{article}')
 
 The syntax of the ``traverse`` argument is the same as it is for
 ``pattern``.
 
-If, as above, the ``pattern`` provided is ``articles/:article/edit``,
-and the ``traverse`` argument provided is ``/:article``, when a
+If, as above, the ``pattern`` provided is ``articles/{article}/edit``,
+and the ``traverse`` argument provided is ``/{article}``, when a
 request comes in that causes the route to match in such a way that the
 ``article`` match value is ``1`` (when the request URI is
 ``/articles/1/edit``), the traversal path will be generated as ``/1``.
@@ -467,7 +467,7 @@ startup time.
 .. code-block:: python
    :linenos:
 
-   config.add_route('home', ':foo/:bar/*traverse',
+   config.add_route('home', '{foo}/{bar}/*traverse',
                     view='myproject.views.home')
    config.add_view('myproject.views.another', route_name='home')
 
@@ -479,7 +479,7 @@ supply a view attribute.  For example, this ``add_route`` call:
 .. code-block:: python
    :linenos:
 
-   config.add_route('home', ':foo/:bar/*traverse',
+   config.add_route('home', '{foo}/{bar}/*traverse',
                     view='myproject.views.home')
 
 Can also be spelled like so:
@@ -487,7 +487,7 @@ Can also be spelled like so:
 .. code-block:: python
    :linenos:
 
-   config.add_route('home', ':foo/:bar/*traverse')
+   config.add_route('home', '{foo}/{bar}/*traverse')
    config.add_view('myproject.views.home', route_name='home')
 
 The two spellings are logically equivalent.  In fact, the former is

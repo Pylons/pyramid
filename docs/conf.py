@@ -13,6 +13,9 @@
 
 import sys, os
 import datetime
+import warnings
+
+warnings.simplefilter('ignore', DeprecationWarning)
 
 # skip raw nodes
 from sphinx.writers.text import TextTranslator
@@ -73,7 +76,7 @@ copyright = '%s, Agendaless Consulting' % datetime.datetime.now().year
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '1.0a2'
+version = '1.0a4'
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -125,11 +128,11 @@ html_theme = 'pylons'
 html_title = 'The Pyramid Web Application Development Framework v%s' % release
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
-#html_short_title = None
+html_short_title = 'Home'
 
 # The name of an image file (within the static path) to place at the top of
 # the sidebar.
-#html_logo = '_static/pylons.png'
+html_logo = '_static/pyramid.png'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -198,7 +201,7 @@ latex_documents = [
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-latex_logo = '_static/pyramid.png'
+latex_logo = '_static/pylons_small.png'
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.

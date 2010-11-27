@@ -29,7 +29,7 @@ except IOError:
 
 install_requires=[
     'Chameleon >= 1.2.3',
-    'Mako',
+    'Mako >= 0.3.6', # strict_undefined
     'Paste > 1.7', # temp version pin to prevent PyPi install failure :-(
     'PasteDeploy',
     'PasteScript',
@@ -45,10 +45,10 @@ install_requires=[
     ]
 
 if platform.system() == 'Java':
-    tests_require = install_requires + ['twill']
+    tests_require = install_requires + ['WebTest']
 else:
-    tests_require= install_requires + ['Sphinx', 'docutils', 'coverage',
-                                       'twill', 'repoze.sphinx.autointerface']
+    tests_require= install_requires + ['Sphinx', 'docutils', 
+                                       'WebTest', 'repoze.sphinx.autointerface']
 
 if sys.version_info[:2] < (2, 6):
     install_requires.append('simplejson')

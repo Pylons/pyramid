@@ -86,9 +86,9 @@ press ``return`` after running ``paster serve development.ini``.
       :linenos:
 
    In this case, the ``myproject.run:app`` function referred to by the entry
-   point URI ``egg:MyProject#app`` (see :ref:`MyProject_ini` for more
-   information about entry point URIs, and how they relate to callables),
-   will receive the key/value pairs ``{'reload_templates':'true',
+   point URI ``egg:MyProject`` (see :ref:`MyProject_ini` for more information
+   about entry point URIs, and how they relate to callables), will receive
+   the key/value pairs ``{'reload_templates':'true',
    'debug_authorization':'false', 'debug_notfound':'false',
    'debug_templates':'true', 'default_locale_name':'en'}``.
 

@@ -1,4 +1,5 @@
 import copy
+import os
 
 from zope.configuration.xmlconfig import _clearContext
 
@@ -20,9 +21,6 @@ from pyramid.security import Everyone
 from pyramid.security import has_permission
 from pyramid.threadlocal import get_current_registry
 from pyramid.threadlocal import manager
-from pyramid.zcml import zcml_configure # API
-
-zcml_configure # prevent pyflakes from complaining
 
 _marker = object()
 
@@ -43,7 +41,7 @@ def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
     argument.  The authentication policy will return the userid
     identifier implied by the ``userid`` argument and the group ids
     implied by the ``groupids`` argument when the
-    :func:`pyramid.security.authenticated_userid` or 
+    :func:`pyramid.security.authenticated_userid` or
     :func:`pyramid.security.effective_principals` APIs are used.
 
     This function is most useful when testing code that uses the APIs
@@ -121,7 +119,7 @@ def registerTemplateRenderer(path, renderer=None):
 
     .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
-       :meth:`pyramid.configuration.Configurator.testing_add_template``
+       :meth:`pyramid.configuration.Configurator.testing_add_template`
        method in your unit and integration tests.
 
     """
@@ -153,7 +151,7 @@ def registerView(name, result='', view=None, for_=(Interface, Interface),
 
     .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
-       :meth:`pyramid.configuration.Configurator.add_view``
+       :meth:`pyramid.configuration.Configurator.add_view`
        method in your unit and integration tests.
     """
     for_ = (IViewClassifier, ) + for_
@@ -213,7 +211,7 @@ def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
 
     The ``name`` argument is the empty string by default; it implies
     the name under which the adapter is registered.
-    
+
     See `The ZCA book <http://www.muthukadan.net/docs/zca.html>`_ for
     more information about ZCA adapters.
 
@@ -277,19 +275,19 @@ def registerRoute(pattern, name, factory=None):
 def registerSettings(dictarg=None, **kw):
     """Register one or more 'setting' key/value pairs.  A setting is
     a single key/value pair in the dictionary-ish object returned from
-    the API :func:`pyramid.settings.get_settings`.
+    the API :attr:`pyramid.registry.Registry.settings`.
 
     You may pass a dictionary::
 
        registerSettings({'external_uri':'http://example.com'})
 
     Or a set of key/value pairs::
-    
+
        registerSettings(external_uri='http://example.com')
 
-    Use of this function is required when you need to test code that
-    calls the :func:`pyramid.settings.get_settings` API and which
-    uses return values from that API.
+    Use of this function is required when you need to test code that calls
+    the :attr:`pyramid.registry.Registry.settings` API and which uses return
+    values from that API.
 
     .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
@@ -363,7 +361,7 @@ class DummyTemplateRenderer(object):
 
     def implementation(self):
         return self._implementation
-    
+
     def __call__(self, kw, system=None):
         if system:
             self._received.update(system)
@@ -395,7 +393,7 @@ class DummyTemplateRenderer(object):
                     raise AssertionError(
                         'A value for key "%s" was not passed to the renderer'
                         % k)
-                    
+
             if myval != v:
                 raise AssertionError(
                     '\nasserted value for %s: %r\nactual value: %r' % (
@@ -433,7 +431,7 @@ class DummyModel:
         val.__name__ = name
         val.__parent__ = self
         self.subs[name] = val
-        
+
     def __getitem__(self, name):
         """ Return a named subobject (see ``__setitem__``)"""
         ob = self.subs[name]
@@ -467,7 +465,7 @@ class DummyModel:
 
     def __contains__(self, name):
         return name in self.subs
-    
+
     def clone(self, __name__=_marker, __parent__=_marker, **kw):
         """ Create a clone of the model object.  If ``__name__`` or
         ``__parent__`` arguments are passed, use these values to
@@ -487,7 +485,7 @@ class DummyModel:
 
 class DummyRequest(object):
     """ A dummy request object (imitates a :term:`request` object).
-    
+
     The ``params``, ``environ``, ``headers``, ``path``, and
     ``cookies`` arguments correspond to their :term`WebOb`
     equivalents.
@@ -505,6 +503,7 @@ class DummyRequest(object):
     application_url = 'http://example.com'
     host = 'example.com:80'
     content_length = 0
+    query_string = ''
     response_callbacks = ()
     def __init__(self, params=None, environ=None, headers=None, path='/',
                  cookies=None, post=None, **kw):
@@ -723,8 +722,8 @@ class DummyRendererFactory(object):
                     raise KeyError('No testing renderer registered for %r' %
                                    spec)
         return renderer
-            
-        
+
+
 class MockTemplate(object):
     def __init__(self, response):
         self._received = {}
@@ -736,3 +735,23 @@ class MockTemplate(object):
     def __call__(self, *arg, **kw):
         self._received.update(kw)
         return self.response
+
+def skip_on(*platforms):
+    def decorator(func):
+        def wrapper(*args, **kw):
+            for platform in platforms:
+                if skip_on.os_name.startswith(platform):
+                    return
+                if platform == 'pypy' and skip_on.pypy: # pragma: no cover
+                    return
+            return func(*args, **kw)
+        wrapper.__name__ = func.__name__
+        wrapper.__doc__ = func.__doc__
+        return wrapper
+    return decorator
+skip_on.os_name = os.name # for testing
+try: # pragma: no cover
+    import __pypy__
+    skip_on.pypy = True
+except ImportError:
+    skip_on.pypy = False

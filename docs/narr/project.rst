@@ -316,12 +316,13 @@ Python interpreter shell unconditionally.
 
       [pipeline:main]
       pipeline = egg:WebError#evalerror
-                 myapp
+                 MyProject
 
-   If you use ``main`` as the section name argument instead of ``myapp``
-   against the above ``.ini`` file, an error will occur.  Use the most
-   specific reference to your application within the ``.ini`` file possible
-   as the section name argument.
+   Use ``MyProject`` instead of ``main`` as the section name argument to
+   ``pshell`` against the above ``.ini`` file (e.g. ``paster pshell
+   development.ini MyProject``).  If you use ``main`` instead, an error will
+   occur.  Use the most specific reference to your application within the
+   ``.ini`` file possible as the section name argument.
 
 Press ``Ctrl-D`` to exit the interactive shell (or ``Ctrl-Z`` on Windows).
 
@@ -740,14 +741,14 @@ also informs Python that the directory which contains it is a *package*.
 #. Line 2 imports the ``get_root`` function from
    :mod:`myproject.models` that we use later.
 
-#. Lines 4-14 define a function that returns a :app:`Pyramid`
+#. Lines 4-12 define a function that returns a :app:`Pyramid`
    WSGI application.  This function is meant to be called
    by the :term:`PasteDeploy` framework as a result of running
    ``paster serve``.
 
    Within this function, configuration is performed.
 
-   Lines 9-11 register a "default view" (a view that has no ``name``
+   Lines 8-10 register a "default view" (a view that has no ``name``
    attribute).  It is registered so that it will be found when the
    :term:`context` of the request is an instance of the
    :class:`myproject.models.MyModel` class.  The first argument to
@@ -761,11 +762,11 @@ also informs Python that the directory which contains it is a *package*.
    ``templates`` directory of the ``myproject`` package.  The template file
    it actually points to is a :term:`Chameleon` ZPT template file.
 
-   Line 12 registers a static view, which will serve up the files from the
+   Line 11 registers a static view, which will serve up the files from the
    ``mypackage:static`` :term:`resource specification` (the ``static``
    directory of the ``mypackage`` package).
 
-   Line 14 returns a :term:`WSGI` application to the caller of the function
+   Line 12 returns a :term:`WSGI` application to the caller of the function
    (Paste).
 
 ``views.py``
