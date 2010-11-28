@@ -259,7 +259,7 @@ override a single resource.  For example:
     <resource
       to_override="some.package:templates/mytemplate.pt"
       override_with="another.package:othertemplates/anothertemplate.pt"
-    />
+     />
 
 The string value passed to both ``to_override`` and ``override_with``
 attached to a resource directive is called a "specification".  The

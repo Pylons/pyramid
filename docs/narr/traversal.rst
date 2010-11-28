@@ -403,7 +403,9 @@ Let's pretend the user asks for
 ``http://example.com/foo/bar/baz/biz/buz.txt``. The request's
 ``PATH_INFO`` in that case is ``/foo/bar/baz/biz/buz.txt``.  Let's
 further pretend that when this request comes in that we're traversing
-the following object graph::
+the following object graph:
+
+.. code-block:: text
 
   /--
      |
@@ -448,7 +450,9 @@ Let's say that view lookup finds no matching view type.  In this
 circumstance, the :app:`Pyramid` :term:`router` returns the result
 of the :term:`not found view` and the request ends.
 
-However, for this graph::
+However, for this graph:
+
+.. code-block:: text
 
   /--
      |

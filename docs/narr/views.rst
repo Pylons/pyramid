@@ -469,7 +469,7 @@ You can configure a view to use the JSON renderer by naming ``json`` as the
    :linenos:
 
    config.add_view('myproject.views.hello_world', 
-                    name='hello'
+                    name='hello',
                     context='myproject.models.Hello',
                     renderer='json')
     

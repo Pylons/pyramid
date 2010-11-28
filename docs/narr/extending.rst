@@ -190,9 +190,10 @@ the original application with slight tweaks.  For example:
 .. code-block:: xml
    :linenos:
 
-    <view context="theoriginalapplication.models.SomeModel"
-          name="theview"
-          view=".views.a_view_that_does_something_slightly_different"
+    <view 
+      context="theoriginalapplication.models.SomeModel"
+      name="theview"
+      view=".views.a_view_that_does_something_slightly_different"
      />
 
 A similar pattern can be used to *extend* the application with

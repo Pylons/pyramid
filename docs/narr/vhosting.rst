@@ -40,13 +40,14 @@ Here's an example of a PasteDeploy configuration snippet that includes
 a ``urlmap`` composite.
 
 .. code-block:: ini
+  :linenos:
 
   [app:mypyramidapp]
   use = egg:mypyramidapp#app
 
   [composite:main]
   use = egg:Paste#urlmap
-  /pyramidapp = mypyramidapp
+  pyramidapp = mypyramidapp
 
 This "roots" the :app:`Pyramid` application at the prefix
 ``/pyramidapp`` and serves up the composite as the "main" application
