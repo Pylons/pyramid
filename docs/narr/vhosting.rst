@@ -47,7 +47,7 @@ a ``urlmap`` composite.
 
   [composite:main]
   use = egg:Paste#urlmap
-  pyramidapp = mypyramidapp
+  /pyramidapp = mypyramidapp
 
 This "roots" the :app:`Pyramid` application at the prefix
 ``/pyramidapp`` and serves up the composite as the "main" application
