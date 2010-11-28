@@ -282,8 +282,8 @@ and renderers which use templating systems.  See also
 
 .. _http_redirect:
 
-Using a View Callable to Do A HTTP Redirect
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Using a View Callable to Do an HTTP Redirect
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can issue an HTTP redirect from within a view by returning a
 particular kind of response.
