@@ -429,9 +429,8 @@ attributes by attaching properties to the request.  See
 ``json``: JSON Renderer
 +++++++++++++++++++++++
 
-The ``json`` renderer is a renderer which renders view callable
-results to :term:`JSON`.  If a view callable returns a non-Response
-object it is called.  It passes the return value through the
+The ``json`` renderer renders view callable
+results to :term:`JSON`.  It passes the return value through the
 ``json.dumps`` standard library function, and wraps the result in a
 response object.  It also sets the response content-type to
 ``application/json``.
