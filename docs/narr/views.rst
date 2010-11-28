@@ -379,7 +379,7 @@ Additional renderers can be added to the system as necessary (see
 Built-In Renderers
 ~~~~~~~~~~~~~~~~~~
 
-Several built-in "renderers" exist in :app:`Pyramid`.  These
+Several built-in renderers exist in :app:`Pyramid`.  These
 renderers can be used in the ``renderer`` attribute of view
 configurations.
 
