@@ -881,3 +881,67 @@ provided as convenience and example.
 
 See :ref:`unittesting_chapter` for more information about writing
 :app:`Pyramid` unit tests.
+
+Modifying Package Structure
+----------------------------
+
+It is best practice for your application's code layout to not stray too much
+from accepted Pyramid paster template defaults.  If you refrain from changing
+things very much, other Pyramid coders will be able to more quickly
+understand your application.  However, the code layout choices made for you
+by a paster template are in no way magical or required.  Despite the choices
+made for you by any paster template, you can decide to lay your code out any
+way you see fit.
+
+For example, the configuration method named
+:meth:`~pyramid.configuration.Configurator.add_view` requires you to pass a
+:term:`dotted Python name` or a direct object reference as the class or
+function to be used as a view.  By default, the ``pyramid_starter`` paster
+template would have you add view functions to the ``views.py`` module in your
+package.  However, you might be more comfortable creating a ``views``
+*directory*, and adding a single file for each view.
+
+If your project package name was ``myproject`` and you wanted to arrange all
+your views in a Python subpackage within the ``myproject`` :term:`package`
+named ``views`` instead of within a single ``views.py`` file, you might:
+
+- Create a ``views`` directory inside your ``mypackage`` package directory
+  (the same directory which holds ``views.py``).
+
+- *Move* the existing ``views.py`` file to a file inside the new ``views``
+  directory named, say, ``blog.py``.
+
+- Create a file within the new ``views`` directory named ``__init__.py`` (it
+  can be empty, this just tells Python that the ``views`` directory is a
+  *package*.
+
+Then change the __init__.py of your myproject project (*not* the
+``__init__.py`` you just created in the ``views`` directory, the one in its
+parent directory).  For example, from something like:
+
+.. code-block:: python
+
+    config.add_view('myproject.views.my_view',
+                    renderer='myproject:templates/mytemplate.pt')
+
+To this:
+
+.. code-block:: python
+
+    config.add_view('myproject.views.blogs.my_view',
+                    renderer='myproject:templates/mytemplate.pt')
+
+You can then continue to add files to the ``views`` directory, and refer to
+views or handler classes/functions within those files via the dotted name
+passed as the first argument to ``add_view``.  For example:
+
+.. code-block:: python
+
+    config.add_view('myproject.views.anothermodule.my_view',
+                    renderer='myproject:templates/anothertemplate.pt')
+
+This pattern can be used to rearrage code referred to by any Pyramid API
+argument which accepts a :term:`dotted Python name` or direct object
+reference.
+
+
