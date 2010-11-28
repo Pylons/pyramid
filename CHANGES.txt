@@ -58,6 +58,8 @@ Documentation
   chapter (has ``implementation()`` method, required to be used when getting
   at Chameleon macros).
 
+- Add a "Modifying Package Structure" section to the project narrative
+  documentation chapter (explain turning a module into a package).
 
 1.0a4 (2010-11-21)
 ==================

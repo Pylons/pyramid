@@ -10,3 +10,4 @@ def main(global_config, **settings):
                     renderer='myproject:templates/mytemplate.pt')
     config.add_static_view('static', 'myproject:static')
     return config.make_wsgi_app()
+
