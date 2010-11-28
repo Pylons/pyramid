@@ -302,6 +302,19 @@ See :mod:`pyramid.httpexceptions` for the documentation for the ``HTTPFound``
 exception; it also includes other response types that imply other HTTP response
 codes, such as ``HTTPUnauthorized`` for ``401 Unauthorized``.
 
+.. note::
+
+   Although exception types from the :mod:`pyramid.httpexceptions` module are
+   in fact bona fide Python :class:`Exception` types, the :app:`Pyramid` view
+   machinery expects them to be *returned* by a view callable rather than
+   *raised*.
+
+   It is possible, however, in Python 2.5 and above, to configure an
+   *exception view* to catch these exceptions, and return an appropriate
+   :class:`pyramid.response.Response`. The simplest such view could just
+   catch and return the original exception. See :ref:`exception_views` for
+   more details.
+
 .. index::
    single: renderer
    single: view renderer
