@@ -73,9 +73,9 @@ applications to various platforms.
 .. toctree::
    :maxdepth: 2
 
-   tutorials/bfg/index.rst
    tutorials/wiki/index.rst
    tutorials/wiki2/index.rst
+   tutorials/bfg/index.rst
    tutorials/cmf/index.rst
    tutorials/gae/index.rst
    tutorials/modwsgi/index.rst
