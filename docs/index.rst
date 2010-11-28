@@ -117,7 +117,9 @@ Sample Applications
 application based on Rocky Burt's `ClueBin
 <http://pypi.python.org/pypi/ClueBin/0.2.3>`_.  It demonstrates form
 processing, security, and the use of :term:`ZODB` within a :app:`Pyramid`
-application.  Check this application out via::
+application.  Check this application out via:
+
+.. code-block:: text
 
   git clone git://github.com/Pylons/cluegun.git
 
@@ -125,7 +127,9 @@ application.  Check this application out via::
 file rendering application.  It is willing to render structured text
 documents, HTML documents, and images from a filesystem directory.  An
 earlier version of this application runs the `repoze.org
-<http://repoze.org>`_ website.  Check this application out via::
+<http://repoze.org>`_ website.  Check this application out via:
+
+.. code-block:: text
 
   git clone git://github.com/Pylons/virginia.git
 
@@ -134,7 +138,9 @@ competition" application by Carlos de la Guardia.  It demonstrates a hybrid
 of :term:`URL dispatch` and :term:`traversal` and integration with
 `SQLAlchemy <http://www.sqlalchemy.org/>`_, :term:`repoze.who`, and
 `Deliverance <http://www.deliveranceproject.org/>`_.  Check this application
-out of version control via::
+out of version control via:
+
+.. code-block:: text
 
   git clone git://github.com/Pylons/shootout.git
 
@@ -151,7 +157,9 @@ Older Sample Applications (repoze.bfg)
 runs the `bfg.repoze.org <http://bfg.repoze.org>`_ website.  It
 demonstrates integration with Trac, and includes several
 mini-applications such as a pastebin and tutorial engine.  Check a
-buildout for this application out of Subversion via::
+buildout for this application out of Subversion via:
+
+.. code-block:: text
 
   svn co http://svn.repoze.org/buildouts/bfgsite/ bfgsite_buildout
 
@@ -179,7 +187,9 @@ IRC channel <irc://irc.freenode.net/#pylons>`_.
 
 Browse and check out tagged and trunk versions of :app:`Pyramid` via
 the `Pyramid GitHub repository <http://github.com/Pylons/pyramid/>`_.
-To check out the trunk via ``git``, use this command::
+To check out the trunk via ``git``, use this command:
+
+.. code-block:: text
 
   git clone git@github.com:Pylons/pyramid.git
 
