@@ -56,21 +56,20 @@ commands and files.
        $ cd ~/modwsgi/env
        $ bin/easy_install pyramid
     
-#.  Create and install your :app:`Pyramid` application.  For the
-    purposes of this tutorial, we'll just be using the ``bfg_starter``
-    application as a baseline application.  Substitute your existing
-    :app:`Pyramid` application as necessary if you already have
-    one.
+#.  Create and install your :app:`Pyramid` application.  For the purposes of
+    this tutorial, we'll just be using the ``pyramid_starter`` application as
+    a baseline application.  Substitute your existing :app:`Pyramid`
+    application as necessary if you already have one.
 
     .. code-block:: text
 
        $ cd ~/modwsgi/env
-       $ bin/paster create -t bfg_starter myapp
+       $ bin/paster create -t pyramid_starter myapp
        $ cd myapp
        $ ../bin/python setup.py install
 
 #.  Within the virtualenv directory (``~/modwsgi/env``), create a
-    script named ``bfg.wsgi``.  Give it these contents:
+    script named ``pyramid.wsgi``.  Give it these contents:
 
     .. code-block:: python
 
@@ -84,12 +83,12 @@ commands and files.
     assignment to the name ``application`` is important: mod_wsgi
     requires finding such an assignment when it opens the file.
 
-#.  Make the ``bfg.wsgi`` script executable.
+#.  Make the ``pyramid.wsgi`` script executable.
 
     .. code-block:: text
 
        $ cd ~/modwsgi/env
-       $ chmod 755 bfg.wsgi
+       $ chmod 755 pyramid.wsgi
 
 #.  Edit your Apache configuration and add some stuff.  I happened to
     create a file named ``/etc/apache2/other/modwsgi.conf`` on my own
@@ -101,12 +100,12 @@ commands and files.
        # play badly with C extensions.
        WSGIApplicationGroup %{GLOBAL}
        WSGIPassAuthorization On
-       WSGIDaemonProcess bfg user=chrism group=staff processes=1 threads=4 \
+       WSGIDaemonProcess pyramid user=chrism group=staff processes=1 threads=4 \
           python-path=/Users/chrism/modwsgi/env/lib/python2.6/site-packages
-       WSGIScriptAlias /myapp /Users/chrism/modwsgi/env/bfg.wsgi
+       WSGIScriptAlias /myapp /Users/chrism/modwsgi/env/pyramid.wsgi
 
        <Directory /Users/chrism/modwsgi/env>
-         WSGIProcessGroup bfg
+         WSGIProcessGroup pyramid
          Order allow, deny
          Allow from all
        </Directory>
