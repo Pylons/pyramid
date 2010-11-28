@@ -18,7 +18,7 @@ a request made to your application.
    that implements a view *callable*, and the process of view
    *lookup*.
 
-The chapter named :ref:`contextfinding_chapter` describes how, using
+The chapter :ref:`contextfinding_chapter` describes how, using
 information from the :term:`request`, a :term:`context` and a
 :term:`view name` are computed.  But neither the context nor the view
 name found are very useful unless those elements can eventually be
