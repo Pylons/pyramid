@@ -55,7 +55,7 @@ configuration` for the view.
 
 View callables can be functions, instances, or classes.  View
 callables can optionally be defined with an alternate calling
-convention.
+convention. XXX Explain this more XXX
 
 .. index::
    single: view calling convention
@@ -67,7 +67,7 @@ Defining a View Callable as a Function
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The easiest way to define a view callable is to create a function that
-accepts a single argument named ``request`` and which returns a
+accepts a single argument named ``request``, and which returns a
 :term:`Response` object.  For example, this is a "hello world" view
 callable implemented as a function:
 
