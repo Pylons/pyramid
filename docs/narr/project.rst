@@ -495,7 +495,7 @@ serve``, as well as the deployment settings provided to that application.
 The generated ``development.ini`` file looks like so:
 
 .. literalinclude:: MyProject/development.ini
-   :language: python
+   :language: guess
    :linenos:
 
 This file contains several "sections" including ``[app:MyProject]``,
