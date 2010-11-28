@@ -429,7 +429,7 @@ results to :term:`JSON`.  It passes the return value through the
 response object.  It also sets the response content-type to
 ``application/json``.
 
-Here's an example of a view that returns a dictionary.  If the
+Here's an example of a view that returns a dictionary.  Since the
 ``json`` renderer is specified in the configuration for this view, the
 view will render the returned dictionary to a JSON serialization:
 
