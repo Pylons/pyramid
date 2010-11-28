@@ -47,10 +47,10 @@ represents a :app:`Pyramid` :term:`Request` object.  A request object
 encapsulates a WSGI environment as represented to :app:`Pyramid` by the
 upstream :term:`WSGI` server.
 
-A view callable may always return a :mod:`Pyramid` :term:`Response` object
-directly.  It may optionally return another arbitrary non-Response value: if a
-view callable returns a non-Response result, the result must be converted into
-a response by the :term:`renderer` associated with the :term:`view
+A view callable can return a :mod:`Pyramid` :term:`Response` object
+directly.  It may return another arbitrary non-Response value,
+however, this return value must be converted into a :term:`Response`
+object by the :term:`renderer` associated with the :term:`view
 configuration` for the view.
 
 View callables can be functions, instances, or classes.  View
