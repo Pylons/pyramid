@@ -315,8 +315,9 @@ Python interpreter shell unconditionally.
       default_locale_name = en
 
       [pipeline:main]
-      pipeline = egg:WebError#evalerror
-                 MyProject
+      pipeline = 
+          egg:WebError#evalerror
+          MyProject
 
    Use ``MyProject`` instead of ``main`` as the section name argument to
    ``pshell`` against the above ``.ini`` file (e.g. ``paster pshell
