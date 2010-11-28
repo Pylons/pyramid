@@ -263,6 +263,7 @@ WSGI Application Creation
 
 .. ignore-next-block
 .. code-block:: python
+   :linenos:
 
    app = config.make_wsgi_app()
 
@@ -294,6 +295,7 @@ WSGI Application Serving
 
 .. ignore-next-block
 .. code-block:: python
+   :linenos:
 
    serve(app, host='0.0.0.0')
 

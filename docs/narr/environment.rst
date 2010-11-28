@@ -290,7 +290,6 @@ for settings documented as such.  For example, you might start your
 :app:`Pyramid` application using the following command line:
 
 .. code-block:: text
-  :linenos:
 
   $ BFG_DEBUG_AUTHORIZATION=1 BFG_RELOAD_TEMPLATES=1 bin/paster serve \
          MyProject.ini

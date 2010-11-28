@@ -1143,6 +1143,7 @@ custom notfound view as the first argument to its constructor.  For
 instance:
 
 .. code-block:: python
+     :linenos:
 
      from pyramid.exceptions import NotFound
      from pyramid.view import AppendSlashNotFoundViewFactory

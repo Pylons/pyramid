@@ -256,7 +256,6 @@ application we created earlier in :ref:`helloworld_imperative`.  We can run
 it the same way.
 
 .. code-block:: text
-   :linenos:
 
    $ python helloworld.py
    serving on 0.0.0.0:8080 view at http://127.0.0.1:8080

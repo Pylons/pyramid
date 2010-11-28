@@ -339,7 +339,6 @@ which reside in your :app:`Pyramid` application.  You run a
 ``setup.py`` command to extract the messages:
 
 .. code-block:: text
-   :linenos:
 
    $ cd /place/where/myapplication/setup.py/lives
    $ mkdir -p myapplication/locale
@@ -429,7 +428,6 @@ locale from a pre-generated ``.pot`` template by using the ``setup.py
 init_catalog`` command:
 
 .. code-block:: text
-   :linenos:
 
    $ cd /place/where/myapplication/setup.py/lives
    $ python setup.py init_catalog -l es
@@ -461,7 +459,6 @@ First, regenerate the ``.pot`` file as per :ref:`extracting_messages`.
 Then use the ``setup.py update_catalog`` command.
 
 .. code-block:: text
-   :linenos:
 
    $ cd /place/where/myapplication/setup.py/lives
    $ python setup.py update_catalog
@@ -478,7 +475,6 @@ Finally, to prepare an application for performing actual runtime
 translations, compile ``.po`` files to ``.mo`` files:
 
 .. code-block:: text
-   :linenos:
 
    $ cd /place/where/myapplication/setup.py/lives
    $ python setup.py compile_catalog

@@ -142,6 +142,7 @@ method, effectively:
 
 .. ignore-next-block
 .. code-block:: python
+   :linenos:
 
    config.add_view(hello)
 

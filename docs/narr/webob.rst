@@ -288,6 +288,7 @@ Generally any attribute of the response can be passed in as a keyword
 argument to the class; e.g.:
 
 .. code-block:: python
+  :linenos:
 
   from pyramid.response import Response
   response = Response(body='hello world!', content_type='text/plain')
@@ -316,6 +317,7 @@ the same way.  A typical example is:
 
 .. ignore-next-block
 .. code-block:: python
+    :linenos:
 
     from pyramid.httpexceptions import HTTPNotFound
     from pyramid.httpexceptions import HTTPMovedPermanently

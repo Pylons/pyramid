@@ -593,7 +593,6 @@ author's ``svn propedit svn:ignore .`` in each of my ``templates``
 directories.
 
 .. code-block:: text
-   :linenos:
 
    *.pt.py
    *.txt.py
@@ -632,7 +631,8 @@ To use a setting in the application ``.ini`` file for the same
 purpose, set the ``debug_templates`` key to ``true`` within the
 application's configuration section, e.g.:
 
-.. code-block:: guess
+.. code-block:: ini
+  :linenos:
 
   [app:main]
   use = egg:MyProject#app
@@ -642,7 +642,7 @@ With template debugging off, a :exc:`NameError` exception resulting
 from rendering a template with an undefined variable
 (e.g. ``${wrong}``) might end like this:
 
-.. code-block:: python
+.. code-block:: text
 
   File "...", in __getitem__
     raise NameError(key)
@@ -794,7 +794,8 @@ To use a setting in the application ``.ini`` file for the same
 purpose, set the ``reload_templates`` key to ``true`` within the
 application's configuration section, e.g.:
 
-.. code-block:: guess
+.. code-block:: ini
+  :linenos:
 
   [app:main]
   use = egg:MyProject#app
