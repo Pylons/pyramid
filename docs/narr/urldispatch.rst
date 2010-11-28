@@ -349,7 +349,8 @@ also capture the remainder of the URL, for example:
     
     foo/{baz}/{bar}{fizzle:.*}
 
-The above pattern will match these URLs, generating the following matchdicts:
+The above pattern will match these URLs, generating the following
+matchdicts::
 
    foo/1/2/           -> {'baz':'1', 'bar':'2', 'fizzle':()}
    foo/abc/def/a/b/c  -> {'baz':'abc', 'bar':'def', 'fizzle': 'a/b/c')}

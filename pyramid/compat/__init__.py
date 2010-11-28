@@ -133,7 +133,12 @@ except NameError: # pragma: no cover
 try:
     import json
 except ImportError: # pragma: no cover
-    import simplejson as json
+    try:
+        import simplejson as json
+    except NotImplementedError:
+        from django.utils import simplejson as json # GAE
+        
+        
 
 try:
     from hashlib import md5

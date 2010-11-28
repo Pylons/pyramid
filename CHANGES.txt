@@ -10,8 +10,24 @@ Features
   templates now use idiomatic SQLAlchemy configuration in their respective
   ``.ini`` files and Python code.
 
-- ``pyramid.testig.DummyRequest`` now has a class variable, ``query_string``,
-  which defaults to the empty string.
+- ``pyramid.testing.DummyRequest`` now has a class variable,
+  ``query_string``, which defaults to the empty string.
+
+- Add support for json on GAE by catching NotImplementedError and importing
+  simplejson from django.utils.
+
+- The Mako renderer now accepts a resource specification for
+  ``mako.module_directory``.
+
+- New boolean Mako settings variable ``mako.strict_undefined``.  See `Mako
+  Context Variables
+  <http://www.makotemplates.org/docs/runtime.html#context-variables>`_ for
+  its meaning.
+
+Dependencies
+------------
+
+- Depend on Mako 0.3.6+ (we now require the ``strict_undefined`` feature).
 
 Bug Fixes
 ---------
@@ -21,6 +37,12 @@ Bug Fixes
 
 - Make default renderer work (renderer factory registered with no name, which
   is active for every view unless the view names a specific renderer).
+
+- The Mako renderer did not properly turn the ``mako.imports``,
+  ``mako.default_filters``, and ``mako.imports`` settings into lists.
+
+- The Mako renderer did not properly convert the ``mako.error_handler``
+  setting from a dotted name to a callable.
 
 Documentation
 -------------
@@ -36,6 +58,8 @@ Documentation
   chapter (has ``implementation()`` method, required to be used when getting
   at Chameleon macros).
 
+- Add a "Modifying Package Structure" section to the project narrative
+  documentation chapter (explain turning a module into a package).
 
 1.0a4 (2010-11-21)
 ==================

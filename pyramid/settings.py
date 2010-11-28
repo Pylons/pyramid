@@ -88,7 +88,7 @@ def get_settings():
 deprecated(
     'get_settings',
     '(pyramid.settings.get_settings is deprecated as of Pyramid 1.0.  Use'
-    '``pyramid.threadlocals.get_current_registry().settings`` instead or use '
+    '``pyramid.threadlocal.get_current_registry().settings`` instead or use '
     'the ``settings`` attribute of the registry available from the request '
     '(``request.registry.settings``)).')
 

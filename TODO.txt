@@ -20,8 +20,6 @@ Should-Have
 - Add docs for httpexceptions module for each webob.exc class that inherits
   from WSGIHTTPException.
 
-- Create a ``docs`` directory for each paster template.
-
 - Remove "BFG" from Pyramid-specific environ variables.
 
 - translationdir ZCML directive use of ``path_spec`` should maybe die.
@@ -108,3 +106,5 @@ Nice-to-Have
 
 - Add functionality that mocks the behavior of ``repoze.browserid``.
 
+- One way to split up views chapter: views with renderers / views without
+  renderers.

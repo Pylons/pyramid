@@ -80,7 +80,7 @@ def initialize_sql(engine):
     try:
         populate()
     except IntegrityError:
-        pass
+        DBSession.rollback()
 
 def appmaker(engine):
     initialize_sql(engine)

@@ -268,7 +268,7 @@ points to *your application* as opposed to any other section within the
 ``.ini`` file.  For example, if your application ``.ini`` file might have a
 ``[app:MyProject]`` section that looks like so:
 
-.. code-block:: ini
+.. code-block:: guess
    :linenos:
 
    [app:MyProject]
@@ -282,7 +282,7 @@ points to *your application* as opposed to any other section within the
 If so, you can use the following command to invoke a debug shell using
 the name ``MyProject`` as a section name:
 
-.. code-block::  text
+.. code-block:: text
 
    [chrism@vitaminf shellenv]$ ../bin/paster pshell development.ini MyProject
    Python 2.4.5 (#1, Aug 29 2008, 12:27:37) 
@@ -299,7 +299,7 @@ happen, even if you have IPython installed, you can pass the
 ``--disable-ipython`` flag to the ``pshell`` command to use a standard
 Python interpreter shell unconditionally.
 
-.. code-block::  text
+.. code-block:: text
 
    [chrism@vitaminf shellenv]$ ../bin/paster pshell --disable-ipython \
                                 development.ini MyProject
@@ -314,7 +314,7 @@ Python interpreter shell unconditionally.
    than an ``app``.  For example, if you have the following ``.ini`` file
    content:
 
-   .. code-block:: ini
+   .. code-block:: guess
       :linenos:
 
       [app:MyProject]
@@ -326,13 +326,15 @@ Python interpreter shell unconditionally.
       default_locale_name = en
 
       [pipeline:main]
-      pipeline = egg:WebError#evalerror
-                 myapp
+      pipeline = 
+          egg:WebError#evalerror
+          MyProject
 
-   If you use ``main`` as the section name argument instead of ``myapp``
-   against the above ``.ini`` file, an error will occur.  Use the most
-   specific reference to your application within the ``.ini`` file possible
-   as the section name argument.
+   Use ``MyProject`` instead of ``main`` as the section name argument to
+   ``pshell`` against the above ``.ini`` file (e.g. ``paster pshell
+   development.ini MyProject``).  If you use ``main`` instead, an error will
+   occur.  Use the most specific reference to your application within the
+   ``.ini`` file possible as the section name argument.
 
 Press ``Ctrl-D`` to exit the interactive shell (or ``Ctrl-Z`` on Windows).
 
@@ -442,7 +444,9 @@ name except for case).  All :app:`Pyramid` ``paster`` -generated projects
 share a similar structure.
 
 The ``MyProject`` project we've generated has the following directory
-structure::
+structure:
+
+.. code-block:: text
 
   MyProject/
   |-- CHANGES.txt
@@ -503,6 +507,7 @@ serve``, as well as the deployment settings provided to that application.
 The generated ``development.ini`` file looks like so:
 
 .. literalinclude:: MyProject/development.ini
+   :language: guess
    :linenos:
 
 This file contains several "sections" including ``[app:MyProject]``,
@@ -628,6 +633,7 @@ distributing your application.
 Our generated ``setup.py`` looks like this:
 
 .. literalinclude:: MyProject/setup.py
+   :language: python
    :linenos:
 
 The ``setup.py`` file calls the setuptools ``setup`` function, which
@@ -665,7 +671,7 @@ file when distributing your application to other people, or when
 versioning your application for your own use.  For fun, you can try
 this command now:
 
-.. code-block:: python
+.. code-block:: text
 
    $ python setup.py sdist
 
@@ -696,6 +702,7 @@ contains various settings related to testing and internationalization:
 Our generated ``setup.cfg`` looks like this:
 
 .. literalinclude:: MyProject/setup.cfg
+   :language: guess
    :linenos:
 
 The values in the default setup file allow various commonly-used
@@ -743,6 +750,7 @@ This is the file named ``__init__.py``.  The presence of an ``__init__.py``
 also informs Python that the directory which contains it is a *package*.
 
 .. literalinclude:: MyProject/myproject/__init__.py
+   :language: python
    :linenos:
 
 #. Line 1 imports the :term:`Configurator` class from
@@ -789,6 +797,7 @@ code which accepts a :term:`request` and which returns a
 :term:`response`.
 
 .. literalinclude:: MyProject/myproject/views.py
+   :language: python
    :linenos:
 
 This bit of code was registered as the view callable within ``__init__.py``
@@ -835,6 +844,7 @@ and provide APIs which mutate and return this data.  We write a class
 named ``MyModel`` that provides the behavior.
 
 .. literalinclude:: MyProject/myproject/models.py
+   :language: python
    :linenos:
 
 #. Lines 1-2 define the MyModel class.
@@ -881,6 +891,7 @@ by view functions themselves.  See :ref:`templates_used_directly` and
 The ``tests.py`` module includes unit tests for your application.
 
 .. literalinclude:: MyProject/myproject/tests.py
+   :language: python
    :linenos:
 
 This sample ``tests.py`` file has a single unit test defined within
@@ -891,3 +902,67 @@ provided as convenience and example.
 
 See :ref:`unittesting_chapter` for more information about writing
 :app:`Pyramid` unit tests.
+
+Modifying Package Structure
+----------------------------
+
+It is best practice for your application's code layout to not stray too much
+from accepted Pyramid paster template defaults.  If you refrain from changing
+things very much, other Pyramid coders will be able to more quickly
+understand your application.  However, the code layout choices made for you
+by a paster template are in no way magical or required.  Despite the choices
+made for you by any paster template, you can decide to lay your code out any
+way you see fit.
+
+For example, the configuration method named
+:meth:`~pyramid.configuration.Configurator.add_view` requires you to pass a
+:term:`dotted Python name` or a direct object reference as the class or
+function to be used as a view.  By default, the ``pyramid_starter`` paster
+template would have you add view functions to the ``views.py`` module in your
+package.  However, you might be more comfortable creating a ``views``
+*directory*, and adding a single file for each view.
+
+If your project package name was ``myproject`` and you wanted to arrange all
+your views in a Python subpackage within the ``myproject`` :term:`package`
+named ``views`` instead of within a single ``views.py`` file, you might:
+
+- Create a ``views`` directory inside your ``mypackage`` package directory
+  (the same directory which holds ``views.py``).
+
+- *Move* the existing ``views.py`` file to a file inside the new ``views``
+  directory named, say, ``blog.py``.
+
+- Create a file within the new ``views`` directory named ``__init__.py`` (it
+  can be empty, this just tells Python that the ``views`` directory is a
+  *package*.
+
+Then change the __init__.py of your myproject project (*not* the
+``__init__.py`` you just created in the ``views`` directory, the one in its
+parent directory).  For example, from something like:
+
+.. code-block:: python
+
+    config.add_view('myproject.views.my_view',
+                    renderer='myproject:templates/mytemplate.pt')
+
+To this:
+
+.. code-block:: python
+
+    config.add_view('myproject.views.blogs.my_view',
+                    renderer='myproject:templates/mytemplate.pt')
+
+You can then continue to add files to the ``views`` directory, and refer to
+views or handler classes/functions within those files via the dotted name
+passed as the first argument to ``add_view``.  For example:
+
+.. code-block:: python
+
+    config.add_view('myproject.views.anothermodule.my_view',
+                    renderer='myproject:templates/anothertemplate.pt')
+
+This pattern can be used to rearrage code referred to by any Pyramid API
+argument which accepts a :term:`dotted Python name` or direct object
+reference.
+
+
