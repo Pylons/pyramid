@@ -42,22 +42,13 @@ style:
 
   :ref:`traversal_chapter`
 
-Python code blocks are presented in the following style:
+Code and configuration file blocks are presented in the following style:
 
   .. code-block:: python
      :linenos:
 
      def foo(abc):
          pass
-
-Blocks of XML markup are presented in the following style:
-
-  .. code-block:: xml
-     :linenos:
-
-     <root>
-       <!-- ... more XML .. -->
-     </root>
 
 When a command that should be typed on one line is too long to fit on
 a page, the backslash ``\`` is used to indicate that the following
