@@ -573,13 +573,13 @@ The dictionary items will then be used in the global template space. If the
 view callable returns anything but a Response object, or a dictionary, an error
 will be raised.
 
-A Mako template can be specified two ways using the ``renderer`` attribute.
-First, a relative path can be used to name a
-Mako template relative to the configured Mako template directories. Second, a
-:term:`resource specification` can be used to locate a template to render.
-These two styles of naming a template to render also carry through to Mako
-templates, so that Mako template's can inherit using a :term:`resource
-specification` if desired.
+When using a ``renderer`` argument to a :term:`view configuration` to
+specify a Mako template, the value of the ``renderer`` may be a path
+relative to the ``mako.directories`` setting (e.g.
+``some/template.mak``) or, alternately, it may be a :term:`resource
+specification` (e.g. ``apackage:templates/sometemplate.mak``).  Mako
+templates may internally inherit other Mako templates using a relative
+filename or a :term:`resource specification` as desired.
 
 Here's an example view configuration which uses a relative path:
 
