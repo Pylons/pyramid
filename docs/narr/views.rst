@@ -567,7 +567,7 @@ attaching properties to the request.  See
 ``*.mak`` or ``*.mako``: Mako Template Renderer
 +++++++++++++++++++++++++++++++++++++++++++++++
 
-The ``Mako`` template renderer is a renderer which renders a Mako template.
+The ``Mako`` template renderer renders views using a Mako template.
 When used, the view must return a Response object or a Python *dictionary*.
 The dictionary items will then be used in the global template space. If the
 view callable returns anything but a Response object, or a dictionary, an error
