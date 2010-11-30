@@ -746,8 +746,8 @@ factory constructor is available as :class:`pyramid.interfaces.IRendererInfo`.
 
 There are essentially two different kinds of renderer factories:
 
-- A renderer factory which expects to accept a :term:`resource specification`
-  or an absolute path as the ``name`` attribute of the ``info`` object fed to
+- A renderer factory which expects to accept a :term:`resource specification`,
+  or an absolute path, as the ``name`` attribute of the ``info`` object fed to
   its constructor.  These renderer factories are registered with a ``name``
   value that begins with a dot (``.``).  These types of renderer factories
   usually relate to a file on the filesystem, such as a template.
