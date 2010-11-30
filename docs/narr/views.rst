@@ -685,7 +685,7 @@ Adding and Overriding Renderers
 
 New templating systems and serializers can be associated with :app:`Pyramid`
 renderer names.  To this end, configuration declarations can be made which
-override an existing :term:`renderer factory` and which add a new renderer
+override an existing :term:`renderer factory`, and which add a new renderer
 factory.
 
 Renderers can be registered imperatively using the
