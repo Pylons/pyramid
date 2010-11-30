@@ -714,7 +714,7 @@ to such an object.
 Adding a New Renderer
 +++++++++++++++++++++
 
-You may a new renderer by creating and registering a :term:`renderer
+You may add a new renderer by creating and registering a :term:`renderer
 factory`.
 
 A renderer factory implementation is usually a class which has the
