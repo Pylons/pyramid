@@ -307,8 +307,8 @@ _PREAMBLE = r"""
 \renewenvironment{notice}[2]{%
   \origbeginnotice{#1}{}% equivalent to original \begin{notice}{#1}{#2}
   % load graphics
-  \ifthenelse{\equal{#1}{warning}}{\includegraphics{exclaim.png}}{}
-  \ifthenelse{\equal{#1}{note}}{\includegraphics{info.png}}{}
+  \ifthenelse{\equal{#1}{warning}}{\includegraphics{latex-warning.png}}{}
+  \ifthenelse{\equal{#1}{note}}{\includegraphics{latex-note.png}}{}
   % etc.
 }{%
   \origendnotice% equivalent to original \end{notice}
