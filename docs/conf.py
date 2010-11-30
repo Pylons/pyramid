@@ -109,6 +109,8 @@ add_module_names = False
 
 # The name of the Pygments (syntax highlighting) style to use.
 #pygments_style = book and 'bw' or 'tango'
+if book:
+    pygments_style = 'bw'
 
 # The default language to highlight source code in.
 #highlight_language = 'guess'
