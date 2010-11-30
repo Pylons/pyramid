@@ -717,7 +717,7 @@ Adding a New Renderer
 You may add a new renderer by creating and registering a :term:`renderer
 factory`.
 
-A renderer factory implementation is usually a class which has the
+A renderer factory implementation is typically a class with the
 following interface:
 
 .. code-block:: python
