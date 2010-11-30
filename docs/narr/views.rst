@@ -581,6 +581,8 @@ specification` (e.g. ``apackage:templates/sometemplate.mak``).  Mako
 templates may internally inherit other Mako templates using a relative
 filename or a :term:`resource specification` as desired.
 
+XXX Further explanation or link to mako inheritance info
+
 Here's an example view configuration which uses a relative path:
 
 .. code-block:: python
