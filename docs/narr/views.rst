@@ -626,10 +626,9 @@ additional :ref:`mako_template_renderer_settings`.
 Varying Attributes of Rendered Responses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Before a response that is constructed as the result of the use of a
-:term:`renderer` is returned to :app:`Pyramid`, several attributes
-of the request are examined which have the potential to influence
-response behavior.
+Before a response constructed by a :term:`renderer` is returned to
+:app:`Pyramid`, several attributes of the request are examined which
+have the potential to influence response behavior.
 
 View callables that don't directly return a response should set these
 values on the ``request`` object via ``setattr`` within the view
