@@ -631,8 +631,8 @@ Before a response constructed by a :term:`renderer` is returned to
 have the potential to influence response behavior.
 
 View callables that don't directly return a response should set these
-values on the ``request`` object via ``setattr`` within the view
-callable to influence associated response attributes.
+attributes on the ``request`` object via ``setattr`` during their
+execution to influence associated response attributes.
 
 ``response_content_type``
   Defines the content-type of the resulting response,
