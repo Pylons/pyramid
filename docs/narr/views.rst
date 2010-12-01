@@ -792,13 +792,12 @@ renderer by specifying ``amf`` in the ``renderer`` attribute of a
    def myview(request):
        return {'Hello':'world'}
 
-At startup time, when a :term:`view configuration` is encountered
-which has a ``name`` argument that does not contain a dot, such as the
-above ``amf`` is encountered, the full value of the ``name`` attribute
-is used to construct a renderer from the associated renderer factory.
-In this case, the view configuration will create an instance of an
-``AMFRenderer`` for each view configuration which includes ``amf`` as
-its renderer value.  The ``name`` passed to the ``AMFRenderer``
+At startup time, when a :term:`view configuration` is encountered, which
+has a ``name`` attribute that does not contain a dot, the full ``name``
+value is used to construct a renderer from the associated renderer
+factory.  In this case, the view configuration will create an instance
+of an ``AMFRenderer`` for each view configuration which includes ``amf``
+as its renderer value.  The ``name`` passed to the ``AMFRenderer``
 constructor will always be ``amf``.
 
 Here's an example of the registration of a more complicated renderer
@@ -824,17 +823,17 @@ the ``renderer`` attribute of a :term:`view configuration`:
    def myview(request):
        return {'Hello':'world'}
 
-When a :term:`view configuration` which has a ``name`` attribute that does
-contain a dot, such as ``templates/mytemplate.jinja2`` above is encountered
-at startup time, the value of the name attribute is split on its final dot.
-The second element of the split is typically the filename extension.  This
-extension is used to look up a renderer factory for the configured view.
-Then the value of ``renderer`` is passed to the factory to create a renderer
-for the view.  In this case, the view configuration will create an instance
-of a ``Jinja2Renderer`` for each view configuration which includes anything
-ending with ``.jinja2`` as its ``renderer`` value.  The ``name`` passed to
-the ``Jinja2Renderer`` constructor will be whatever the user passed as
-``renderer=`` to the view configuration.
+When a :term:`view configuration` is encountered at startup time, which
+has a ``name`` attribute that does contain a dot, the value of the name
+attribute is split on its final dot.  The second element of the split is
+typically the filename extension.  This extension is used to look up a
+renderer factory for the configured view.  Then the value of
+``renderer`` is passed to the factory to create a renderer for the view.
+In this case, the view configuration will create an instance of a
+``Jinja2Renderer`` for each view configuration which includes anything
+ending with ``.jinja2`` in its ``renderer`` value.  The ``name`` passed
+to the ``Jinja2Renderer`` constructor will be the full value that was
+set as ``renderer=`` in the view configuration.
 
 See also :ref:`renderer_directive` and
 :meth:`pyramid.configuration.Configurator.add_renderer`.
