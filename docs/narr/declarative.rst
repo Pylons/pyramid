@@ -65,8 +65,8 @@ previously created ``helloworld.py``:
      <include package="pyramid.includes" />
 
      <view
-        view="helloworld.hello_world"
-        />
+       view="helloworld.hello_world"
+      />
 
    </configure>
 
@@ -120,8 +120,8 @@ filesystem.  Let's take a look at that ``configure.zcml`` file again:
       <include package="pyramid.includes" />
 
       <view
-         view="helloworld.hello_world"
-         />
+        view="helloworld.hello_world"
+       />
 
    </configure>
 
@@ -181,11 +181,11 @@ start.  For example, the following ZCML file has two conflicting
 
       <view
         view="helloworld.hello_world"
-        />
+       />
 
       <view
         view="helloworld.hello_world"
-        />
+       />
 
     </configure>
 
@@ -241,13 +241,13 @@ the previously created ``helloworld.py``:
      <include package="pyramid.includes" />
 
      <view
-        view="helloworld.hello_world"
-        />
+       view="helloworld.hello_world"
+      />
 
      <view
        name="goodbye"
        view="helloworld.goodbye_world"
-       />
+      />
 
    </configure>
 
@@ -255,7 +255,7 @@ This pair of files forms an application functionally equivalent to the
 application we created earlier in :ref:`helloworld_imperative`.  We can run
 it the same way.
 
-.. code-block:: bash
+.. code-block:: text
 
    $ python helloworld.py
    serving on 0.0.0.0:8080 view at http://127.0.0.1:8080
@@ -308,13 +308,13 @@ which sits next to ``helloworld.py``.  Let's take a look at the
       <include package="pyramid.includes" />
 
       <view
-         view="helloworld.hello_world"
-         />
+        view="helloworld.hello_world"
+       />
 
       <view
-         name="goodbye"
-         view="helloworld.goodbye_world"
-         />
+        name="goodbye"
+        view="helloworld.goodbye_world"
+       />
 
    </configure>
 
@@ -352,6 +352,7 @@ The ``configure.zcml`` ZCML file contains this bit of XML within the
 ``<configure>`` root tag:
 
 .. code-block:: xml
+   :linenos:
 
    <include package="pyramid.includes" />
 
@@ -399,12 +400,12 @@ The ``configure.zcml`` ZCML file contains these bits of XML *after* the
 
    <view
      view="helloworld.hello_world"
-     />
+    />
 
    <view
      name="goodbye"
      view="helloworld.goodbye_world"
-     />
+    />
 
 These ``<view>`` declaration tags direct :app:`Pyramid` to create
 two :term:`view configuration` registrations.  The first ``<view>``
@@ -451,12 +452,12 @@ completely equivalent:
 
      <view
        view="helloworld.hello_world"
-       />
+      />
 
      <view
        name="goodbye"
        view="helloworld.goodbye_world"
-       />
+      />
 
 .. topic:: Goodbye Before Hello
 
@@ -466,11 +467,11 @@ completely equivalent:
      <view
        name="goodbye"
        view="helloworld.goodbye_world"
-       />
+      />
 
      <view
        view="helloworld.hello_world"
-       />
+      />
 
 We've now configured a :app:`Pyramid` helloworld application
 declaratively.  More information about this mode of configuration is
@@ -556,10 +557,10 @@ example of a view declaration in ZCML is as follows:
    :linenos:
 
    <view
-       context=".models.Hello"
-       view=".views.hello_world"
-       name="hello.html"
-       />
+     context=".models.Hello"
+     view=".views.hello_world"
+     name="hello.html"
+    />
 
 The above maps the ``.views.hello_world`` view callable function to
 the following set of :term:`context finding` results:
@@ -589,9 +590,9 @@ type:
    :linenos:
 
    <view
-       context=".models.Hello"
-       view=".views.hello_world"
-       />
+     context=".models.Hello"
+     view=".views.hello_world"
+    />
 
 A *default view callable* simply has no ``name`` attribute.  For the
 above registration, when a :term:`context` is found that is of the
@@ -607,10 +608,10 @@ string as its ``name`` attribute:
    :linenos:
 
    <view
-       context=".models.Hello"
-       view=".views.hello_world"
-       name=""
-       />
+     context=".models.Hello"
+     view=".views.hello_world"
+     name=""
+    />
 
 You may also declare that a view callable is good for any context type
 by using the special ``*`` character as the value of the ``context``
@@ -620,10 +621,10 @@ attribute:
    :linenos:
 
    <view
-       context="*"
-       view=".views.hello_world"
-       name="hello.html"
-       />
+     context="*"
+     view=".views.hello_world"
+     name="hello.html"
+    />
 
 This indicates that when :app:`Pyramid` identifies that the
 :term:`view name` is ``hello.html`` and the context is of any type,
@@ -654,9 +655,9 @@ declaration` causes a route to be added to the application.
    :linenos:
 
    <route
-       name="myroute"
-       pattern="/prefix/{one}/{two}"
-       view=".views.myview"
+     name="myroute"
+     pattern="/prefix/{one}/{two}"
+     view=".views.myview"
     />
 
 .. note::
@@ -705,9 +706,9 @@ absolute path.
    :linenos:
 
    <static
-      name="static"
-      path="/var/www/static"
-      />
+     name="static"
+     path="/var/www/static"
+    />
 
 Here's an example of a ``static`` directive that will serve files up
 under the ``/static`` URL from the ``a/b/c/static`` directory of the
@@ -718,9 +719,9 @@ Python package named ``some_package`` using a fully qualified
    :linenos:
 
    <static
-      name="static"
-      path="some_package:a/b/c/static"
-      />
+     name="static"
+     path="some_package:a/b/c/static"
+    />
 
 Here's an example of a ``static`` directive that will serve files up
 under the ``/static`` URL from the ``static`` directory of the Python
@@ -731,9 +732,9 @@ package-relative path.
    :linenos:
 
    <static
-      name="static"
-      path="static"
-      />
+     name="static"
+     path="static"
+    />
 
 Whether you use for ``path`` a fully qualified resource specification,
 an absolute path, or a package-relative path, When you place your
@@ -764,9 +765,9 @@ argument which is ``http://example.com/images``:
    :linenos:
 
    <static
-      name="http://example.com/images"
-      path="mypackage:images"
-      />
+     name="http://example.com/images"
+     path="mypackage:images"
+    />
 
 Because the ``static`` ZCML directive is provided with a ``name`` argument
 that is the URL prefix ``http://example.com/images``, subsequent calls to
@@ -808,7 +809,7 @@ this:
      <!-- views and other directives before this... -->
 
      <authtktauthenticationpolicy
-          secret="iamsosecret"/>
+       secret="iamsosecret"/>
 
      <aclauthorizationpolicy/>
 
@@ -852,16 +853,16 @@ An example of its usage, with all attributes fully expanded:
    :linenos:
 
    <authtktauthenticationpolicy
-    secret="goshiamsosecret"
-    callback=".somemodule.somefunc"
-    cookie_name="mycookiename"
-    secure="false"
-    include_ip="false"
-    timeout="86400"
-    reissue_time="600"
-    max_age="31536000"
-    path="/"
-    http_only="false"
+     secret="goshiamsosecret"
+     callback=".somemodule.somefunc"
+     cookie_name="mycookiename"
+     secure="false"
+     include_ip="false"
+     timeout="86400"
+     reissue_time="600"
+     max_age="31536000"
+     path="/"
+     http_only="false"
     />
 
 See :ref:`authtktauthenticationpolicy_directive` for details about
@@ -880,8 +881,8 @@ An example of its usage, with all attributes fully expanded:
    :linenos:
 
    <remoteuserauthenticationpolicy
-    environ_key="REMOTE_USER"
-    callback=".somemodule.somefunc"
+     environ_key="REMOTE_USER"
+     callback=".somemodule.somefunc"
     />
 
 See :ref:`remoteuserauthenticationpolicy_directive` for detailed
@@ -900,8 +901,8 @@ An example of its usage, with all attributes fully expanded:
    :linenos:
 
    <repozewho1authenticationpolicy
-    identifier_name="auth_tkt"
-    callback=".somemodule.somefunc"
+     identifier_name="auth_tkt"
+     callback=".somemodule.somefunc"
     />
 
 See :ref:`repozewho1authenticationpolicy_directive` for detailed
@@ -953,7 +954,8 @@ For example, to add a renderer which renders views which have a
 
    <renderer
      name=".jinja2"
-     factory="my.package.MyJinja2Renderer"/>
+     factory="my.package.MyJinja2Renderer"
+    />
 
 The ``factory`` attribute is a :term:`dotted Python name` that must
 point to an implementation of a :term:`renderer factory`.
@@ -972,7 +974,8 @@ See :ref:`adding_a_renderer` for more information for the definition of a
 
    <renderer
      name="amf"
-     factory="my.package.MyAMFRenderer"/>
+     factory="my.package.MyAMFRenderer"
+    />
 
 Adding the above ZCML to your application will allow you to use the
 ``my.package.MyAMFRenderer`` renderer factory implementation in view
@@ -983,8 +986,9 @@ attribute of a :term:`view configuration`:
    :linenos:
 
    <view
-    view="mypackage.views.my_view"
-    renderer="amf"/>
+     view="mypackage.views.my_view"
+     renderer="amf"
+    />
 
 Here's an example of the registration of a more complicated renderer
 factory, which expects to be passed a filesystem path:
@@ -994,7 +998,8 @@ factory, which expects to be passed a filesystem path:
 
    <renderer
      name=".jinja2"
-     factory="my.package.MyJinja2Renderer"/>
+     factory="my.package.MyJinja2Renderer"
+    />
 
 Adding the above ZCML to your application will allow you to use the
 ``my.package.MyJinja2Renderer`` renderer factory implementation in
@@ -1006,8 +1011,9 @@ configuration`:
    :linenos:
 
    <view
-    view="mypackage.views.my_view"
-    renderer="templates/mytemplate.jinja2"/>
+     view="mypackage.views.my_view"
+     renderer="templates/mytemplate.jinja2"
+    />
 
 When a :term:`view configuration` which has a ``name`` attribute that does
 contain a dot, such as ``templates/mytemplate.jinja2`` above is encountered at
@@ -1038,8 +1044,9 @@ renderer factory, use:
    :linenos:
 
    <renderer
-      name=".zpt"
-      factory="pyramid.chameleon_zpt.renderer_factory"/>
+     name=".zpt"
+     factory="pyramid.chameleon_zpt.renderer_factory"
+    />
 
 After you do this, :app:`Pyramid` will treat templates ending in
 both the ``.pt`` and ``.zpt`` filename extensions as Chameleon ZPT
@@ -1053,8 +1060,9 @@ a variation on the following in your application's ZCML:
    :linenos:
 
    <renderer
-      name=".pt"
-      factory="my.package.pt_renderer"/>
+     name=".pt"
+     factory="my.package.pt_renderer"
+    />
 
 After you do this, the :term:`renderer factory` in
 ``my.package.pt_renderer`` will be used to render templates which end
@@ -1068,8 +1076,9 @@ variation on the following in your application's ZCML:
    :linenos:
 
    <renderer
-      name=".txt"
-      factory="my.package.text_renderer"/>
+     name=".txt"
+     factory="my.package.text_renderer"
+    />
 
 After you do this, the :term:`renderer factory` in
 ``my.package.text_renderer`` will be used to render templates which
@@ -1084,7 +1093,8 @@ tag):
    :linenos:
 
    <renderer
-      factory="pyramid.renderers.json_renderer_factory"/>
+     factory="pyramid.renderers.json_renderer_factory"
+    />
 
 See also :ref:`renderer_directive` and
 :meth:`pyramid.configuration.Configurator.add_renderer`.
@@ -1123,7 +1133,8 @@ You can add a custom locale negotiator via ZCML by using the
    :linenos:
 
     <localenegotiator 
-       negotiator="my_application.my_module.my_locale_negotiator"/>
+      negotiator="my_application.my_module.my_locale_negotiator"
+     />
 
 See also :ref:`custom_locale_negotiator` and
 :ref:`localenegotiator_directive`.
@@ -1145,8 +1156,8 @@ which we assume lives in a ``subscribers.py`` module within your application:
    :linenos:
 
    <subscriber
-      for="pyramid.events.NewRequest"
-      handler=".subscribers.mysubscriber"
+     for="pyramid.events.NewRequest"
+     handler=".subscribers.mysubscriber"
     />
 
 See also :ref:`subscriber_directive` and :ref:`events_chapter`.

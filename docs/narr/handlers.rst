@@ -37,6 +37,7 @@ will call that view callable.
 Here's an example view handler class:
 
 .. code-block:: python
+    :linenos:
     
     from pyramid.response import Response
    
@@ -58,6 +59,7 @@ An accompanying call to the
 be performed in order to register it with the system:
 
 .. code-block:: python
+    :linenos:
 
     config.add_handler('hello', '/hello/{action}', handler=Hello)
 
@@ -74,6 +76,7 @@ Alternatively, the action can be declared specifically for a URL to go to a
 specific ``action`` name:
 
 .. code-block:: python
+    :linenos:
     
     config.add_handler('hello_index', '/hello/index', 
                        handler=Hello, action='index')
@@ -97,6 +100,7 @@ directly through to :meth:`pyramid.configuration.Configurator.add_route`.
 For example:
 
 .. code-block:: python
+    :linenos:
     
     config.add_handler('hello', '/hello/{action}',
                        handler='mypackage.handlers:MyHandler')
@@ -110,6 +114,7 @@ specify the same handler, to register specific route names for different
 handler/action combinations. For example:
 
 .. code-block:: python
+    :linenos:
     
     config.add_handler('hello_index', '/hello/index', 
                        handler=Hello, action='index')
@@ -139,6 +144,7 @@ Every method in the handler class that has a name meeting the
 disabled by setting the ``__autoexpose__`` attribute to ``None``:
 
 .. code-block:: python
+    :linenos:
 
     from pyramid.view import action
    
@@ -179,6 +185,7 @@ name that is different from the method name by passing in a ``name`` argument.
 Example:
 
 .. code-block:: python
+    :linenos:
     
     from pyramid.view import action
    
@@ -205,6 +212,7 @@ URL's can result in different template renderings with the same data.
 Example:
 
 .. code-block:: python
+    :linenos:
     
     from pyramid.view import action
    

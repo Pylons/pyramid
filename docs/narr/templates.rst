@@ -543,7 +543,9 @@ you can create templates that are entirely composed of text except for
 
 Here's an example usage of a Chameleon text template.  Create a file
 on disk named ``mytemplate.txt`` in your project's ``templates``
-directory with the following contents::
+directory with the following contents:
+
+.. code-block:: text
 
    Hello, ${name}!
 
@@ -590,8 +592,7 @@ should cause it to ignore these files.  Here's the contents of the
 author's ``svn propedit svn:ignore .`` in each of my ``templates``
 directories.
 
-.. code-block:: bash
-   :linenos:
+.. code-block:: text
 
    *.pt.py
    *.txt.py
@@ -620,13 +621,18 @@ environment variable setting or a configuration file setting.
 
 To use an environment variable, start your application under a shell
 using the ``BFG_DEBUG_TEMPLATES`` operating system environment
-variable set to ``1``, For example::
+variable set to ``1``, For example:
+
+.. code-block:: text
 
   $ BFG_DEBUG_TEMPLATES=1 bin/paster serve myproject.ini
 
 To use a setting in the application ``.ini`` file for the same
 purpose, set the ``debug_templates`` key to ``true`` within the
-application's configuration section, e.g.::
+application's configuration section, e.g.:
+
+.. code-block:: ini
+  :linenos:
 
   [app:main]
   use = egg:MyProject#app
@@ -634,7 +640,9 @@ application's configuration section, e.g.::
 
 With template debugging off, a :exc:`NameError` exception resulting
 from rendering a template with an undefined variable
-(e.g. ``${wrong}``) might end like this::
+(e.g. ``${wrong}``) might end like this:
+
+.. code-block:: text
 
   File "...", in __getitem__
     raise NameError(key)
@@ -642,7 +650,9 @@ from rendering a template with an undefined variable
 
 Note that the exception has no information about which template was
 being rendered when the error occured.  But with template debugging
-on, an exception resulting from the same problem might end like so::
+on, an exception resulting from the same problem might end like so:
+
+.. code-block:: text
 
     RuntimeError: Caught exception rendering template.
      - Expression: ``wrong``
@@ -774,13 +784,18 @@ environment variable setting or a configuration file setting.
 
 To use an environment variable, start your application under a shell
 using the ``BFG_RELOAD_TEMPLATES`` operating system environment
-variable set to ``1``, For example::
+variable set to ``1``, For example:
+
+.. code-block:: text
 
   $ BFG_RELOAD_TEMPLATES=1 bin/paster serve myproject.ini
 
 To use a setting in the application ``.ini`` file for the same
 purpose, set the ``reload_templates`` key to ``true`` within the
-application's configuration section, e.g.::
+application's configuration section, e.g.:
+
+.. code-block:: ini
+  :linenos:
 
   [app:main]
   use = egg:MyProject#app

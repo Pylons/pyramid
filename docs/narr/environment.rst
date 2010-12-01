@@ -278,6 +278,7 @@ Setting Name" column would go in the ``[app:main]`` section.  Here's
 an example of such a section:
 
 .. code-block:: ini
+  :linenos:
 
   [app:main]
   use = egg:MyProject#app
@@ -288,7 +289,7 @@ You can also use environment variables to accomplish the same purpose
 for settings documented as such.  For example, you might start your
 :app:`Pyramid` application using the following command line:
 
-.. code-block:: python
+.. code-block:: text
 
   $ BFG_DEBUG_AUTHORIZATION=1 BFG_RELOAD_TEMPLATES=1 bin/paster serve \
          MyProject.ini

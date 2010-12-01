@@ -333,7 +333,7 @@ The ``pyramid_jinja2`` distribution provides templating for
 :app:`Pyramid` using the :term:`Jinja2` templating system.  You may
 install it like so using the ``easy_install`` command for Jython:
 
-.. code-block:: python
+.. code-block:: text
 
    $ easy_install pyramid_jinja2
 
@@ -341,7 +341,7 @@ Once this is done, you can use this command to get started with a
 :app:`Pyramid` sample application that uses the Jinja2 templating
 engine:
 
-.. code-block:: python
+.. code-block:: text
 
    $ paster create -t pyramid_jinja2_starter
 

@@ -268,7 +268,7 @@ points to *your application* as opposed to any other section within the
 ``.ini`` file.  For example, if your application ``.ini`` file might have a
 ``[app:MyProject]`` section that looks like so:
 
-.. code-block:: guess
+.. code-block:: ini
    :linenos:
 
    [app:MyProject]
@@ -941,6 +941,7 @@ Then change the __init__.py of your myproject project (*not* the
 parent directory).  For example, from something like:
 
 .. code-block:: python
+    :linenos:
 
     config.add_view('myproject.views.my_view',
                     renderer='myproject:templates/mytemplate.pt')
@@ -948,6 +949,7 @@ parent directory).  For example, from something like:
 To this:
 
 .. code-block:: python
+    :linenos:
 
     config.add_view('myproject.views.blogs.my_view',
                     renderer='myproject:templates/mytemplate.pt')
@@ -957,6 +959,7 @@ views or handler classes/functions within those files via the dotted name
 passed as the first argument to ``add_view``.  For example:
 
 .. code-block:: python
+    :linenos:
 
     config.add_view('myproject.views.anothermodule.my_view',
                     renderer='myproject:templates/anothertemplate.pt')

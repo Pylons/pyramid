@@ -475,7 +475,7 @@ You can configure a view to use the JSON renderer by naming ``json`` as the
    :linenos:
 
    config.add_view('myproject.views.hello_world', 
-                    name='hello'
+                    name='hello',
                     context='myproject.models.Hello',
                     renderer='json')
     
@@ -1466,6 +1466,7 @@ configuration stanza:
 
 .. ignore-next-block
 .. code-block:: python
+   :linenos:
 
    config.add_view('.views.my_view', name='my_view', request_method='POST', 
                    context=MyModel, permission='read')
@@ -1495,6 +1496,7 @@ view configuration.  To make :app:`Pyramid` process your
 ``scan`` method of a :class:`pyramid.configuration.Configurator`:
 
 .. code-block:: python
+   :linenos:
 
    # config is assumed to be an instance of the
    # pyramid.configuration.Configurator class

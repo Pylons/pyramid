@@ -350,7 +350,9 @@ also capture the remainder of the URL, for example:
     foo/{baz}/{bar}{fizzle:.*}
 
 The above pattern will match these URLs, generating the following
-matchdicts::
+matchdicts:
+
+.. code-block:: text
 
    foo/1/2/           -> {'baz':'1', 'bar':'2', 'fizzle':()}
    foo/abc/def/a/b/c  -> {'baz':'abc', 'bar':'def', 'fizzle': 'a/b/c')}
@@ -1147,6 +1149,7 @@ custom notfound view as the first argument to its constructor.  For
 instance:
 
 .. code-block:: python
+     :linenos:
 
      from pyramid.exceptions import NotFound
      from pyramid.view import AppendSlashNotFoundViewFactory

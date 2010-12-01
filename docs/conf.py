@@ -109,9 +109,11 @@ add_module_names = False
 
 # The name of the Pygments (syntax highlighting) style to use.
 #pygments_style = book and 'bw' or 'tango'
+if book:
+    pygments_style = 'bw'
 
 # The default language to highlight source code in.
-highlight_language = 'guess'
+#highlight_language = 'guess'
 
 # Options for HTML output
 # -----------------------
@@ -119,7 +121,7 @@ highlight_language = 'guess'
 # Add and use Pylons theme
 sys.path.append(os.path.abspath('_themes'))
 html_theme_path = ['_themes']
-html_theme = 'pylons'
+html_theme = 'pyramid'
 
 # The style sheet to use for HTML and HTML Help pages. A file of that name
 # must exist either in Sphinx' static/ path, or in one of the custom paths
@@ -131,21 +133,21 @@ html_theme = 'pylons'
 html_title = 'The Pyramid Web Application Development Framework v%s' % release
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
-html_short_title = 'Home'
+#html_short_title = 'Home'
 
 # The name of an image file (within the static path) to place at the top of
 # the sidebar.
-html_logo = '_static/pyramid.png'
+#html_logo = '_static/pyramid.png'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-#html_favicon = '_static/favicon.ico'
+#html_favicon = '_static/pyramid.ico'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+#html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -204,7 +206,7 @@ latex_documents = [
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-latex_logo = '_static/pylons_small.png'
+#latex_logo = '_static/pylons_small.png'
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
@@ -305,8 +307,8 @@ _PREAMBLE = r"""
 \renewenvironment{notice}[2]{%
   \origbeginnotice{#1}{}% equivalent to original \begin{notice}{#1}{#2}
   % load graphics
-  \ifthenelse{\equal{#1}{warning}}{\includegraphics{exclaim.png}}{}
-  \ifthenelse{\equal{#1}{note}}{\includegraphics{info.png}}{}
+  \ifthenelse{\equal{#1}{warning}}{\includegraphics{latex-warning.png}}{}
+  \ifthenelse{\equal{#1}{note}}{\includegraphics{latex-note.png}}{}
   % etc.
 }{%
   \origendnotice% equivalent to original \end{notice}
