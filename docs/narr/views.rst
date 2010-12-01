@@ -777,10 +777,11 @@ Here's an example of the registration of a simple renderer factory via
 
    config.add_renderer(name='amf', factory='my.package.MyAMFRenderer')
 
-Adding the above code to your application startup configuration will allow
-you to use the ``my.package.MyAMFRenderer`` renderer factory implementation
-in view configurations by referring to it as ``amf`` in the ``renderer``
-attribute of a :term:`view configuration`:
+Adding the above code to your application startup configuration will
+allow you to use the ``my.package.MyAMFRenderer`` renderer factory
+implementation in view configurations. Your application can use this
+renderer by specifying ``amf`` in the ``renderer`` attribute of a
+:term:`view configuration`:
 
 .. code-block:: python
    :linenos:
