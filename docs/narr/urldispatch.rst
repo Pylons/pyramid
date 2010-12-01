@@ -838,8 +838,8 @@ strings.  The values will be Unicode objects.
 
 .. note::
 
-   If no route URL pattern matches, no ``matchdict`` is attached to
-   the request.
+   If no route URL pattern matches, the ``matchdict`` object attached to the
+   request will be ``None``.
 
 .. index::
    single: matched_route
@@ -856,6 +856,11 @@ an attribute of the :term:`request` object.  Thus,
 :class:`pyramid.interfaces.IRoute` interface which matched the
 request.  The most useful attribute of the route object is ``name``,
 which is the name of the route that matched.
+
+.. note::
+
+   If no route URL pattern matches, the ``matched_route`` object attached to
+   the request will be ``None``.
 
 Routing Examples
 ----------------
