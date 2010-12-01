@@ -38,7 +38,10 @@ application-specific configuration settings.
 Reloading Templates
 -------------------
 
-When this value is true, reload templates without a restart.
+When this value is true, reload templates without a restart, so you can see
+changes to templates take effect immediately during development.  This flag
+is meaningful to Chameleon and Mako templates, as well as most third-party
+template rendering extensions.
 
 +---------------------------------+-----------------------------+
 | Environment Variable Name       | Config File Setting Name    |
