@@ -868,9 +868,9 @@ After you do this, the :term:`renderer factory` in
 ``mypackage.pt_renderer`` will be used to render templates which end
 in ``.pt``, replacing the default Chameleon ZPT renderer.
 
-To associate a *default* renderer with *all* view configurations (even ones
-which do not possess a ``renderer`` attribute), use a variation on the
-following (ie. pass ``None`` as the ``name`` attribute to the renderer tag):
+To associate a *default* renderer with *all* view configurations (even
+ones which do not possess a ``renderer`` attribute), pass ``None`` as
+the ``name`` attribute to the renderer tag:
 
 .. code-block:: python
    :linenos:
