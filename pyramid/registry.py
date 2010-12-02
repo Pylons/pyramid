@@ -26,7 +26,7 @@ class Registry(Components, dict):
         result = Components.registerSubscriptionAdapter(self, *arg, **kw)
         self.has_listeners = True
         return result
-        
+
     def registerHandler(self, *arg, **kw):
         result = Components.registerHandler(self, *arg, **kw)
         self.has_listeners = True
