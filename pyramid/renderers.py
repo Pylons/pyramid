@@ -158,7 +158,7 @@ class ChameleonRendererLookup(object):
         self.impl = impl
         self.registry = registry
         self.lock = threading.Lock()
-        
+
     def get_spec(self, name, package):
         spec = name
         isabs = os.path.isabs(name)
@@ -247,7 +247,7 @@ def template_renderer_factory(info, impl, lock=registry_lock):
     return lookup(info)
 
 # XXX deprecate
-def renderer_from_name(path, package=None): 
+def renderer_from_name(path, package=None):
     return RendererHelper(name=path, package=package).renderer
 
 class RendererHelper(object):
@@ -281,7 +281,7 @@ class RendererHelper(object):
 
     def get_renderer(self):
         return self.renderer
-    
+
     def render(self, value, system_values, request=None):
         renderer = self.renderer
         if system_values is None:
@@ -337,4 +337,3 @@ class RendererHelper(object):
                 response.cache_expires = cache_for
 
         return response
-
