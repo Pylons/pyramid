@@ -271,7 +271,7 @@ points to *your application* as opposed to any other section within the
 If so, you can use the following command to invoke a debug shell using
 the name ``MyProject`` as a section name:
 
-.. code-block::  text
+.. code-block:: text
 
    [chrism@vitaminf shellenv]$ ../bin/paster pshell development.ini MyProject
    Python 2.4.5 (#1, Aug 29 2008, 12:27:37) 
@@ -288,7 +288,7 @@ happen, even if you have IPython installed, you can pass the
 ``--disable-ipython`` flag to the ``pshell`` command to use a standard
 Python interpreter shell unconditionally.
 
-.. code-block::  text
+.. code-block:: text
 
    [chrism@vitaminf shellenv]$ ../bin/paster pshell --disable-ipython \
                                 development.ini MyProject
@@ -303,7 +303,7 @@ Python interpreter shell unconditionally.
    than an ``app``.  For example, if you have the following ``.ini`` file
    content:
 
-   .. code-block:: ini
+   .. code-block:: guess
       :linenos:
 
       [app:MyProject]
@@ -315,8 +315,9 @@ Python interpreter shell unconditionally.
       default_locale_name = en
 
       [pipeline:main]
-      pipeline = egg:WebError#evalerror
-                 MyProject
+      pipeline = 
+          egg:WebError#evalerror
+          MyProject
 
    Use ``MyProject`` instead of ``main`` as the section name argument to
    ``pshell`` against the above ``.ini`` file (e.g. ``paster pshell
@@ -432,7 +433,9 @@ name except for case).  All :app:`Pyramid` ``paster`` -generated projects
 share a similar structure.
 
 The ``MyProject`` project we've generated has the following directory
-structure::
+structure:
+
+.. code-block:: text
 
   MyProject/
   |-- CHANGES.txt
@@ -493,6 +496,7 @@ serve``, as well as the deployment settings provided to that application.
 The generated ``development.ini`` file looks like so:
 
 .. literalinclude:: MyProject/development.ini
+   :language: guess
    :linenos:
 
 This file contains several "sections" including ``[app:MyProject]``,
@@ -618,6 +622,7 @@ distributing your application.
 Our generated ``setup.py`` looks like this:
 
 .. literalinclude:: MyProject/setup.py
+   :language: python
    :linenos:
 
 The ``setup.py`` file calls the setuptools ``setup`` function, which
@@ -655,7 +660,7 @@ file when distributing your application to other people, or when
 versioning your application for your own use.  For fun, you can try
 this command now:
 
-.. code-block:: python
+.. code-block:: text
 
    $ python setup.py sdist
 
@@ -686,6 +691,7 @@ contains various settings related to testing and internationalization:
 Our generated ``setup.cfg`` looks like this:
 
 .. literalinclude:: MyProject/setup.cfg
+   :language: guess
    :linenos:
 
 The values in the default setup file allow various commonly-used
@@ -733,6 +739,7 @@ This is the file named ``__init__.py``.  The presence of an ``__init__.py``
 also informs Python that the directory which contains it is a *package*.
 
 .. literalinclude:: MyProject/myproject/__init__.py
+   :language: python
    :linenos:
 
 #. Line 1 imports the :term:`Configurator` class from
@@ -779,6 +786,7 @@ code which accepts a :term:`request` and which returns a
 :term:`response`.
 
 .. literalinclude:: MyProject/myproject/views.py
+   :language: python
    :linenos:
 
 This bit of code was registered as the view callable within ``__init__.py``
@@ -825,6 +833,7 @@ and provide APIs which mutate and return this data.  We write a class
 named ``MyModel`` that provides the behavior.
 
 .. literalinclude:: MyProject/myproject/models.py
+   :language: python
    :linenos:
 
 #. Lines 1-2 define the MyModel class.
@@ -871,6 +880,7 @@ by view functions themselves.  See :ref:`templates_used_directly` and
 The ``tests.py`` module includes unit tests for your application.
 
 .. literalinclude:: MyProject/myproject/tests.py
+   :language: python
    :linenos:
 
 This sample ``tests.py`` file has a single unit test defined within
@@ -920,6 +930,7 @@ Then change the __init__.py of your myproject project (*not* the
 parent directory).  For example, from something like:
 
 .. code-block:: python
+    :linenos:
 
     config.add_view('myproject.views.my_view',
                     renderer='myproject:templates/mytemplate.pt')
@@ -927,6 +938,7 @@ parent directory).  For example, from something like:
 To this:
 
 .. code-block:: python
+    :linenos:
 
     config.add_view('myproject.views.blogs.my_view',
                     renderer='myproject:templates/mytemplate.pt')
@@ -936,6 +948,7 @@ views or handler classes/functions within those files via the dotted name
 passed as the first argument to ``add_view``.  For example:
 
 .. code-block:: python
+    :linenos:
 
     config.add_view('myproject.views.anothermodule.my_view',
                     renderer='myproject:templates/anothertemplate.pt')

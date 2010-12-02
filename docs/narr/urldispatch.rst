@@ -350,7 +350,9 @@ also capture the remainder of the URL, for example:
     foo/{baz}/{bar}{fizzle:.*}
 
 The above pattern will match these URLs, generating the following
-matchdicts::
+matchdicts:
+
+.. code-block:: text
 
    foo/1/2/           -> {'baz':'1', 'bar':'2', 'fizzle':()}
    foo/abc/def/a/b/c  -> {'baz':'abc', 'bar':'def', 'fizzle': 'a/b/c')}
@@ -836,8 +838,8 @@ strings.  The values will be Unicode objects.
 
 .. note::
 
-   If no route URL pattern matches, no ``matchdict`` is attached to
-   the request.
+   If no route URL pattern matches, the ``matchdict`` object attached to the
+   request will be ``None``.
 
 .. index::
    single: matched_route
@@ -854,6 +856,11 @@ an attribute of the :term:`request` object.  Thus,
 :class:`pyramid.interfaces.IRoute` interface which matched the
 request.  The most useful attribute of the route object is ``name``,
 which is the name of the route that matched.
+
+.. note::
+
+   If no route URL pattern matches, the ``matched_route`` object attached to
+   the request will be ``None``.
 
 Routing Examples
 ----------------
@@ -1141,6 +1148,7 @@ custom notfound view as the first argument to its constructor.  For
 instance:
 
 .. code-block:: python
+     :linenos:
 
      from pyramid.exceptions import NotFound
      from pyramid.view import AppendSlashNotFoundViewFactory

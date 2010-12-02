@@ -47,7 +47,7 @@ When this code is inserted into a Python script named ``helloworld.py`` and
 executed by a Python interpreter which has the :app:`Pyramid` software
 installed, an HTTP server is started on TCP port 8080:
 
-.. code-block:: bash
+.. code-block:: text
 
    $ python helloworld.py
    serving on 0.0.0.0:8080 view at http://127.0.0.1:8080
@@ -263,6 +263,7 @@ WSGI Application Creation
 
 .. ignore-next-block
 .. code-block:: python
+   :linenos:
 
    app = config.make_wsgi_app()
 
@@ -294,6 +295,7 @@ WSGI Application Serving
 
 .. ignore-next-block
 .. code-block:: python
+   :linenos:
 
    serve(app, host='0.0.0.0')
 

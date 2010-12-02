@@ -54,7 +54,8 @@ class as the ``context`` of the view configuration.
 
       <view
         view="helloworld.views.notfound_view"
-        context="pyramid.exceptions.NotFound"/>
+        context="pyramid.exceptions.NotFound"
+       />
 
    Replace ``helloworld.views.notfound_view`` with the Python dotted name
    to the notfound view you want to use.
@@ -142,7 +143,8 @@ class as the ``context`` of the view configuration.
 
       <view
         view="helloworld.views.notfound_view"
-        context="pyramid.exceptions.Forbidden"/>
+        context="pyramid.exceptions.Forbidden"
+       />
 
    Replace ``helloworld.views.forbidden_view`` with the Python
    dotted name to the forbidden view you want to use.
@@ -203,7 +205,7 @@ change the default traverser:
       factory="myapp.traversal.Traverser"
       provides="pyramid.interfaces.ITraverser"
       for="*"
-      />
+     />
 
 In the example above, ``myapp.traversal.Traverser`` is assumed to be
 a class that implements the following interface:
@@ -254,7 +256,7 @@ traverser would be used.  For example:
       factory="myapp.traversal.Traverser"
       provides="pyramid.interfaces.ITraverser"
       for="myapp.models.MyRoot"
-      />
+     />
 
 If the above stanza was added to a ``configure.zcml`` file,
 :app:`Pyramid` would use the ``myapp.traversal.Traverser`` only
@@ -287,7 +289,7 @@ of :term:`context` by adding an adapter stanza for
       factory="myapp.traversal.URLGenerator"
       provides="pyramid.interfaces.IContextURL"
       for="myapp.models.MyRoot *"
-      />
+     />
 
 In the above example, the ``myapp.traversal.URLGenerator`` class will
 be used to provide services to :func:`pyramid.url.model_url` any

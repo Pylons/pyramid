@@ -104,7 +104,9 @@ right translator file on the filesystem which contains translations
 for a given domain.  In this case, if it were trying to translate
 our msgid to German, it might try to find a translation from a
 :term:`gettext` file within a :term:`translation directory` like this
-one::
+one:
+
+.. code-block:: text
 
    locale/de/LC_MESSAGES/form.mo
 
@@ -268,7 +270,7 @@ If the :term:`virtualenv` into which you've installed your
 :app:`Pyramid` application lives in ``/my/virtualenv``, you can
 install Babel like so:
 
-.. code-block:: bash
+.. code-block:: text
 
    $ cd /my/virtualenv
    $ bin/easy_install Babel
@@ -280,7 +282,7 @@ If the :term:`virtualenv` into which you've installed your
 :app:`Pyramid` application lives in ``C:\my\virtualenv``, you can
 install Babel like so:
 
-.. code-block:: bash
+.. code-block:: text
 
    C> cd \my\virtualenv
    C> bin\easy_install Babel
@@ -307,9 +309,9 @@ In particular, add the ``Babel`` distribution to the
    :linenos:
 
     setup(name="mypackage",
-          ...
+          # ...
           install_requires = [
-                ....
+                # ...
                 'Babel',
                 ],
           message_extractors = { '.': [
@@ -336,8 +338,7 @@ message catalog template from the code and :term:`Chameleon` templates
 which reside in your :app:`Pyramid` application.  You run a
 ``setup.py`` command to extract the messages:
 
-.. code-block:: bash
-   :linenos:
+.. code-block:: text
 
    $ cd /place/where/myapplication/setup.py/lives
    $ mkdir -p myapplication/locale
@@ -424,7 +425,9 @@ in the ``.pot`` file, you need to generate at least one ``.po`` file.
 A ``.po`` file represents translations of a particular set of messages
 to a particular locale.  Initialize a ``.po`` file for a specific
 locale from a pre-generated ``.pot`` template by using the ``setup.py
-init_catalog`` command::
+init_catalog`` command:
+
+.. code-block:: text
 
    $ cd /place/where/myapplication/setup.py/lives
    $ python setup.py init_catalog -l es
@@ -455,7 +458,7 @@ changed messages can also be translated or re-translated.
 First, regenerate the ``.pot`` file as per :ref:`extracting_messages`.
 Then use the ``setup.py update_catalog`` command.
 
-.. code-block:: bash
+.. code-block:: text
 
    $ cd /place/where/myapplication/setup.py/lives
    $ python setup.py update_catalog
@@ -469,7 +472,9 @@ Compiling a Message Catalog File
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Finally, to prepare an application for performing actual runtime
-translations, compile ``.po`` files to ``.mo`` files::
+translations, compile ``.po`` files to ``.mo`` files:
+
+.. code-block:: text
 
    $ cd /place/where/myapplication/setup.py/lives
    $ python setup.py compile_catalog
@@ -812,16 +817,18 @@ mechanism:
 Allow a deployer to modify your application's PasteDeploy .ini file:
 
 .. code-block:: ini
+   :linenos:
 
    [app:main]
    use = egg:MyProject#app
-   ...
+   # ...
    available_languages = fr de en ru
 
 Then as a part of the code of a custom :term:`locale negotiator`:
 
-.. code-block:: py
-
+.. code-block:: python
+   :linenos:
+    
    from pyramid.threadlocal import get_current_registry
    settings = get_current_registry().settings
    languages = settings['available_languages'].split()
@@ -877,7 +884,7 @@ application startup.  For example:
    config.begin()
    config.add_translation_dirs('my.application:locale/', 
                                'another.application:locale/')
-   ...
+   # ...
    config.end()
 
 A message catalog in a translation directory added via

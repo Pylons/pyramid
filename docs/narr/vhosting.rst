@@ -40,6 +40,7 @@ Here's an example of a PasteDeploy configuration snippet that includes
 a ``urlmap`` composite.
 
 .. code-block:: ini
+  :linenos:
 
   [app:mypyramidapp]
   use = egg:mypyramidapp#app

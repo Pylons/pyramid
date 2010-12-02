@@ -436,6 +436,7 @@ authorization policy is in effect might look like so:
 the following:
 
 .. code-block:: python
+   :linenos:
 
    from pyramid.security import ALL_PERMISSIONS
    __acl__ = [ (Deny, Everyone, ALL_PERMISSIONS) ]
@@ -497,7 +498,9 @@ Debugging View Authorization Failures
 If your application in your judgment is allowing or denying view
 access inappropriately, start your application under a shell using the
 ``BFG_DEBUG_AUTHORIZATION`` environment variable set to ``1``.  For
-example::
+example:
+
+.. code-block:: text
 
   $ BFG_DEBUG_AUTHORIZATION=1 bin/paster serve myproject.ini
 
@@ -508,7 +511,10 @@ authentication information.
 
 This behavior can also be turned on in the application ``.ini`` file
 by setting the ``debug_authorization`` key to ``true`` within the
-application's configuration section, e.g.::
+application's configuration section, e.g.:
+
+.. code-block:: ini
+  :linenos:
 
   [app:main]
   use = egg:MyProject#app
@@ -551,6 +557,7 @@ authenticate.  Doing so is a matter of creating an instance of something
 that implements the following interface:
 
 .. code-block:: python
+   :linenos:
 
    class AuthenticationPolicy(object):
        """ An object representing a Pyramid authentication policy. """
@@ -606,6 +613,7 @@ matter of creating an instance of an object that implements the
 following interface:
 
 .. code-block:: python
+    :linenos:
 
     class IAuthorizationPolicy(object):
         """ An object representing a Pyramid authorization policy. """

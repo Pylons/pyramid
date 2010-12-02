@@ -115,6 +115,7 @@ registry, the following bit of code is equivalent to
 ``zope.component.getUtility(IFoo)``:
 
 .. code-block:: python
+   :linenos:
 
    registry.getUtility(IFoo)
 

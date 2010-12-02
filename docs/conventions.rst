@@ -22,12 +22,12 @@ concept are presented in the following style:
 
 We present Python method names using the following style:
 
-  :meth:`Python.method_name`
+  :meth:`pyramid.configuration.Configurator.add_view`
 
 We present Python class names, module names, attributes and global
 variables using the following style:
 
-  :class:`Python.class_module_or_attribute.name`
+  :class:`pyramid.configuration.Configurator.registry`
 
 References to glossary terms are presented using the following style:
 
@@ -42,22 +42,13 @@ style:
 
   :ref:`traversal_chapter`
 
-Python code blocks are presented in the following style:
+Code and configuration file blocks are presented in the following style:
 
   .. code-block:: python
      :linenos:
 
      def foo(abc):
          pass
-
-Blocks of XML markup are presented in the following style:
-
-  .. code-block:: xml
-     :linenos:
-
-     <root>
-       <!-- ... more XML .. -->
-     </root>
 
 When a command that should be typed on one line is too long to fit on
 a page, the backslash ``\`` is used to indicate that the following

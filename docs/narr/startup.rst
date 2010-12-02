@@ -68,6 +68,7 @@ press ``return`` after running ``paster serve development.ini``.
    ``__init__.py`` module:
 
    .. literalinclude:: MyProject/myproject/__init__.py
+      :language: python
       :linenos:
 
    Note that the constructor function accepts a ``global_config``
@@ -83,6 +84,7 @@ press ``return`` after running ``paster serve development.ini``.
    Our generated ``development.ini`` file looks like so:
 
    .. literalinclude:: MyProject/development.ini
+      :language: guess
       :linenos:
 
    In this case, the ``myproject.run:app`` function referred to by the entry

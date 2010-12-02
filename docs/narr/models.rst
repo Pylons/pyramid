@@ -272,6 +272,7 @@ The ``__parent__`` of the root object should be ``None`` and its
 ``__name__`` should be the empty string.  For instance:
 
 .. code-block:: python
+   :linenos:
 
    class MyRootObject(object):
        __name__ = ''

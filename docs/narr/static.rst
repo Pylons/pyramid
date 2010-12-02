@@ -185,6 +185,7 @@ resources which begin with ``mypackage:images`` will be prefixed with
 ``http://example.com/images``:
 
 .. code-block:: python
+   :linenos:
 
    static_url('mypackage:images/logo.png', request)
    # -> http://example.com/images/logo.png

@@ -7,13 +7,12 @@ The Zope `Content Management Framework
 websites.  It's reasonably easy to convert a modern Zope/CMF
 application to :app:`Pyramid`.
 
-The main difference between CMF and :app:`Pyramid` is that
-:app:`Pyramid` does not advertise itself as a system into which you
-can plug arbitrary "packages" that extend a system-supplied management
-user interface.  You *could* build a CMF-like layer on top of
-:app:`Pyramid` (as CMF is built on Zope) but none currently exists.
-For those sorts of high-extensibility, highly-regularized-UI systems,
-CMF is still the better choice.
+The main difference between CMF and :app:`Pyramid` is that :app:`Pyramid`
+does not advertise itself as a system into which you can plug arbitrary
+"packages" that extend a system-supplied management user interface.  You
+*could* build a CMF-like layer on top of :app:`Pyramid` but none currently
+exists.  For those sorts of high-extensibility, highly-regularized-UI
+systems, CMF is still the better choice.
 
 :app:`Pyramid` (and other more lightweight systems) is often a
 better choice when you're building the a user interface from scratch,

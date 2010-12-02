@@ -15,7 +15,9 @@ Pyramid Has Zope Things In It, So It's Too Complex
 --------------------------------------------------
 
 On occasion, someone will feel compelled to post a mailing
-list message that reads something like this::
+list message that reads something like this:
+
+.. code-block:: text
 
    had a quick look at pyramid ... too complex to me and not really
    understand for which benefits.. I feel should consider whether it's time
@@ -29,7 +31,10 @@ Let's take this criticism point-by point.
 Too Complex
 +++++++++++
 
-- If you can understand this hello world program, you can use Pyramid::
+- If you can understand this hello world program, you can use Pyramid:
+
+.. code-block:: python
+   :linenos:
 
    from paste.httpserver import serve
    from pyramid.configuration import Configurator
@@ -570,10 +575,10 @@ called *declarations*.  For an example:
    :linenos:
 
    <route
-      view=".views.my_view"
-      path="/"
-      name="root"
-      />
+     view=".views.my_view"
+     path="/"
+     name="root"
+    />
 
 This declaration associates a :term:`view` with a route pattern. 
 
@@ -940,7 +945,9 @@ provide some frame of reference for how various components in the
 common web framework might hang together.  But in the opinion of the
 author, "MVC" doesn't match the web very well in general. Quoting from
 the `Model-View-Controller Wikipedia entry
-<http://en.wikipedia.org/wiki/Model–view–controller>`_::
+<http://en.wikipedia.org/wiki/Model–view–controller>`_:
+
+.. code-block:: text
 
   Though MVC comes in different flavors, control flow is generally as
   follows:
@@ -1232,6 +1239,7 @@ it:
 The contents of ``app.py``:
 
 .. code-block:: python
+    :linenos:
 
     from config import decorator
     from config import L
@@ -1248,6 +1256,7 @@ The contents of ``app.py``:
 The contents of ``app2.py``:
 
 .. code-block:: python
+    :linenos:
 
     import app
 
@@ -1258,6 +1267,7 @@ The contents of ``app2.py``:
 The contents of ``config.py``:
 
 .. code-block:: python
+  :linenos:
 
     L = []
 
@@ -1273,7 +1283,7 @@ function ``bar`` in ``app2.py``.  Since each time the decorator is
 used, the list ``L`` in ``config.py`` is appended to, we'd expect a
 list with two elements to be printed, right?  Sadly, no:
 
-.. code-block:: bash
+.. code-block:: text
 
     [chrism@thinko]$ python app.py 
     [<function foo at 0x7f4ea41ab1b8>,
@@ -1303,6 +1313,7 @@ Let's see what happens when we use the same pattern with the
 Replace the contents of ``app.py`` above with this:
 
 .. code-block:: python
+    :linenos:
 
     from config import gh
 
@@ -1317,6 +1328,7 @@ Replace the contents of ``app.py`` above with this:
 Replace the contents of ``app2.py`` above with this:
 
 .. code-block:: python
+    :linenos:
 
     import app
 
@@ -1327,6 +1339,7 @@ Replace the contents of ``app2.py`` above with this:
 Replace the contents of ``config.py`` above with this:
 
 .. code-block:: python
+    :linenos:
 
     from groundhog import Groundhog
     gh = Groundhog('myapp', 'seekrit')
@@ -1418,6 +1431,7 @@ problem.  They allow you to disuse decorator based configuration
 entirely.  Instead of requiring you to do the following:
 
 .. code-block:: python
+    :linenos:
 
     gh = Groundhog('myapp', 'seekrit')
 
@@ -1432,6 +1446,7 @@ They allow you to disuse the decorator syntax and go
 almost-all-imperative:
 
 .. code-block:: python
+    :linenos:
 
     def foo():
         return 'foo'
@@ -1473,6 +1488,7 @@ Consider the following simple `Groundhog
 <http://bfg.repoze.org/videos#groundhog1>`_ application:
 
 .. code-block:: python
+    :linenos:
 
     from groundhog import Groundhog
     app = Groundhog('myapp', 'seekrit')
@@ -1497,6 +1513,7 @@ If you run this application and visit the URL ``/admin``, you will see
 rearrange the order of the function definitions in the file?
 
 .. code-block:: python
+    :linenos:
 
     from groundhog import Groundhog
     app = Groundhog('myapp', 'seekrit')
@@ -1566,6 +1583,7 @@ use the ``import`` statement to get a handle to an object which *is
 not logically global*:
 
 .. code-block:: python
+    :linenos:
 
     from flask import request
 
@@ -1596,6 +1614,7 @@ of a function.  For example, we'd never try to import ``i`` from the
 code below:
 
 .. code-block::  python
+   :linenos:
 
    def afunc():
        for i in range(10):
@@ -1678,6 +1697,7 @@ where comments take into account what we've discussed in the
 :ref:`microframeworks_smaller_hello_world` section.
 
 .. code-block:: python
+   :linenos:
 
    from webob import Response                 # explicit response objects, no TL
    from paste.httpserver import serve         # explicitly WSGI

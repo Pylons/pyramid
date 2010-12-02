@@ -38,7 +38,10 @@ application-specific configuration settings.
 Reloading Templates
 -------------------
 
-When this value is true, reload templates without a restart.
+When this value is true, reload templates without a restart, so you can see
+changes to templates take effect immediately during development.  This flag
+is meaningful to Chameleon and Mako templates, as well as most third-party
+template rendering extensions.
 
 +---------------------------------+-----------------------------+
 | Environment Variable Name       | Config File Setting Name    |
@@ -278,6 +281,7 @@ Setting Name" column would go in the ``[app:main]`` section.  Here's
 an example of such a section:
 
 .. code-block:: ini
+  :linenos:
 
   [app:main]
   use = egg:MyProject#app
@@ -288,7 +292,7 @@ You can also use environment variables to accomplish the same purpose
 for settings documented as such.  For example, you might start your
 :app:`Pyramid` application using the following command line:
 
-.. code-block:: python
+.. code-block:: text
 
   $ BFG_DEBUG_AUTHORIZATION=1 BFG_RELOAD_TEMPLATES=1 bin/paster serve \
          MyProject.ini
