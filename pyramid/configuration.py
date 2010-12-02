@@ -48,7 +48,7 @@ try:
     from pyramid import chameleon_text
 except TypeError:  # pragma: no cover
     chameleon_text = None # pypy
-try: 
+try:
     from pyramid import chameleon_zpt
 except TypeError: # pragma: no cover
     chameleon_zpt = None # pypy
