@@ -1130,7 +1130,7 @@ View Configuration: Mapping a Context to a View
 A developer makes a :term:`view callable` available for use within a
 :app:`Pyramid` application via :term:`view configuration`.  A view
 configuration associates a view callable with a set of statements
-about the set of circumstances which must be true for the view
+that determine the set of circumstances which must be true for the view
 callable to be invoked.
 
 A view configuration statement is made about information present in
