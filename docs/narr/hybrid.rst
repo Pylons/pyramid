@@ -266,7 +266,7 @@ thing to do.
   :class:`pyramid.configuration.Configurator` constructor, instead
   of associating it with a particular route inside the route's
   configuration.  Every hybrid route configuration that is matched but
-  which does *not* name a ``factory``` attribute will use the use
+  which does *not* name a ``factory`` attribute will use the use
   global ``root_factory`` function to generate a root object.
 
 When the route configuration named ``home`` above is matched during a
