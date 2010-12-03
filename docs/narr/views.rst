@@ -993,8 +993,8 @@ exception views which have a name will be ignored.
   view.  This means that you can use an exception as ``context`` for a
   normal view.
 
-Exception views can be configured with any view registration mechanism
-(``@view_config`` decorator, ZCML, or imperative ``add_view`` styles).
+Exception views can be configured with any view registration mechanism:
+``@view_config`` decorator, ZCML, or imperative ``add_view`` styles.
 
 .. index::
    single: unicode, views, and forms
