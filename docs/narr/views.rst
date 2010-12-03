@@ -1085,22 +1085,24 @@ decode already-decoded (``unicode``) values obtained from
        firstname = request.params['firstname'].decode('utf-8')
        lastname = request.params['lastname'].decode('utf-8')
 
-For implicit decoding to work reliably, you should ensure that every form you
-render that posts to a :app:`Pyramid` view is rendered via a response that has
-a ``;charset=UTF-8`` in its ``Content-Type`` header; or, as in the form above,
-with a ``meta http-equiv`` tag that implies that the charset is UTF-8 within
-the HTML ``head`` of the page containing the form.  This must be done
-explicitly because all known browser clients assume that they should encode
-form data in the character set implied by ``Content-Type`` value of the
-response containing the form when subsequently submitting that form; there is
-no other generally accepted way to tell browser clients which charset to use to
-encode form data.  If you do not specify an encoding explicitly, the browser
-client will choose to encode form data in its default character set before
-submitting it.  The browser client may have a non-UTF-8 default encoding.  If
-such a request is handled by your view code, when the form submission data is
-encoded in a non-UTF8 charset, eventually the request code accessed within your
-view will throw an error when it can't decode some high-order character encoded
-in another character set within form data e.g. when
+For implicit decoding to work reliably, you should ensure that every
+form you render that posts to a :app:`Pyramid` view explicitly defines a
+charset encoding of UTF-8. This can be done via a response that has a
+``;charset=UTF-8`` in its ``Content-Type`` header; or, as in the form
+above, with a ``meta http-equiv`` tag that implies that the charset is
+UTF-8 within the HTML ``head`` of the page containing the form.  This
+must be done explicitly because all known browser clients assume that
+they should encode form data in the same character set implied by
+``Content-Type`` value of the response containing the form when
+subsequently submitting that form. There is no other generally accepted
+way to tell browser clients which charset to use to encode form data.
+If you do not specify an encoding explicitly, the browser client will
+choose to encode form data in its default character set before
+submitting it, which may not be UTF-8 as the server expects.  If a
+request containing form data encoded in a non-UTF8 charset is handled by
+your view code, eventually the request code accessed within your view
+will throw an error when it can't decode some high-order character
+encoded in another character set within form data, e.g., when
 ``request.params['somename']`` is accessed.
 
 If you are using the :class:`pyramid.response.Response` class to generate a
