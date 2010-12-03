@@ -375,9 +375,8 @@ class Configurator(object):
     # API
 
     def commit(self):
-        """ Commit the current set of configuration actions. """
-        context = self.registry.ctx
-        context.execute_actions()
+        """ Commit pending configuration actions. """
+        self.registry.ctx.execute_actions()
         self.registry.reset_context()
 
     def with_package(self, package):
@@ -703,7 +702,7 @@ class Configurator(object):
         context = registry.ctx
         try:
             context.package = package
-            xmlconfig.file(filename, package, context=context, execute=True)
+            xmlconfig.file(filename, package, context=context, execute=False)
         finally:
             lock.release()
             self.manager.pop()
@@ -1123,10 +1122,6 @@ class Configurator(object):
             containment=containment, request_type=request_type,
             custom=custom_predicates)
 
-        if permission is None:
-            # intent: will be None if no default permission is registered
-            permission = self.registry.queryUtility(IDefaultPermission)
-
         if renderer is not None and not isinstance(renderer, dict):
             renderer = {'name':renderer, 'package':self.package}
 
@@ -1141,7 +1136,11 @@ class Configurator(object):
 
         _info = self.ctx_info()
 
-        def register():
+        def register(permission=permission):
+
+            if permission is None:
+                # intent: will be None if no default permission is registered
+                permission = self.registry.queryUtility(IDefaultPermission)
 
             # NO_PERMISSION_REQUIRED handled by _secure_view
             derived_view = self._derive_view(view, permission, predicates, attr,
