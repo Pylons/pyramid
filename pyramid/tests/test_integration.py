@@ -35,6 +35,7 @@ class WGSIAppPlusViewConfigTests(unittest.TestCase):
         from pyramid.tests import test_integration
         config = Configurator()
         config.scan(test_integration)
+        config.commit()
         reg = config.registry
         view = reg.adapters.lookup(
             (IViewClassifier, IRequest, INothing), IView, name='')
@@ -70,6 +71,7 @@ class IntegrationBase(unittest.TestCase):
         config = Configurator(root_factory=self.root_factory)
         config.begin()
         config.load_zcml(self.config)
+        config.commit()
         app = config.make_wsgi_app()
         from webtest import TestApp
         self.testapp = TestApp(app)

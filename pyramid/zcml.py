@@ -17,15 +17,12 @@ from zope.schema import Bool
 from zope.schema import Int
 from zope.schema import TextLine
 
-from pyramid.interfaces import IView
-
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authentication import RemoteUserAuthenticationPolicy
 from pyramid.authentication import RepozeWho1AuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.configuration import Configurator
 from pyramid.exceptions import ConfigurationError
-from pyramid.exceptions import NotFound
 from pyramid.resource import resource_spec_from_abspath
 from pyramid.threadlocal import get_current_registry
 
@@ -330,22 +327,14 @@ def notfound(_context,
              renderer=None,
              wrapper=None):
 
-    def register():
-        try:
-            reg = _context.registry
-        except AttributeError: # pragma: no cover (b/c)
-            reg = get_current_registry()
-        config = Configurator(reg, package=_context.package)
-        config.set_notfound_view(view=view, attr=attr, renderer=renderer,
-                                 wrapper=wrapper)
+    try:
+        reg = _context.registry
+    except AttributeError: # pragma: no cover (b/c)
+        reg = get_current_registry()
+    config = Configurator(reg, package=_context.package)
+    config.set_notfound_view(view=view, attr=attr, renderer=renderer,
+                             wrapper=wrapper)
 
-    discriminator = ('view', NotFound, '', None, IView, None, None, None,
-                     None, attr, False, None, None, None)
-
-    _context.action(
-        discriminator = discriminator,
-        callable = register,
-        )
 
 def forbidden(_context,
              view=None,
@@ -376,14 +365,14 @@ class IResourceDirective(Interface):
         description=u"The spec of the resource providing the override.",
         required=True)
 
-def resource(_context, to_override, override_with):
+def resource(_context, to_override, override_with, _override=None):
     try:
         reg = _context.registry
     except AttributeError: # pragma: no cover (b/c)
         reg = get_current_registry()
 
     config = Configurator(reg, package=_context.package)
-    config.override_resource(to_override, override_with)
+    config.override_resource(to_override, override_with, _override=_override)
 
 class IRepozeWho1AuthenticationPolicyDirective(Interface):
     identifier_name = TextLine(title=u'identitfier_name', required=False,

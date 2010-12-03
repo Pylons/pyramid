@@ -294,6 +294,7 @@ class ConfiguratorTests(unittest.TestCase):
         def myview(context, request):
             return 'OK'
         config.add_view(myview, context=NotFound)
+        config.commit()
         request = self._makeRequest(config)
         view = self._getViewCallable(config, ctx_iface=implementedBy(NotFound),
                                      request_iface=IRequest)
@@ -522,6 +523,7 @@ class ConfiguratorTests(unittest.TestCase):
             L.append(event)
         config = self._makeOne()
         config.add_subscriber(subscriber)
+        config.commit()
         event = Event()
         config.registry.notify(event)
         self.assertEqual(len(L), 1)
@@ -541,6 +543,7 @@ class ConfiguratorTests(unittest.TestCase):
             L.append(event)
         config = self._makeOne()
         config.add_subscriber(subscriber, IEvent)
+        config.commit()
         event = Event()
         config.registry.notify(event)
         self.assertEqual(len(L), 1)
@@ -554,6 +557,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         config.add_subscriber('pyramid.tests',
                               'pyramid.interfaces.INewRequest')
+        config.commit()
         handlers = list(config.registry.registeredHandlers())
         self.assertEqual(len(handlers), 1)
         handler = handlers[0]
@@ -574,6 +578,7 @@ class ConfiguratorTests(unittest.TestCase):
             L.append(event)
         config = self._makeOne()
         config.add_subscriber(subscriber, (Interface, IEvent))
+        config.commit()
         config.registry.subscribers((event.object, event), None)
         self.assertEqual(len(L), 1)
         self.assertEqual(L[0], event)
@@ -599,6 +604,7 @@ class ConfiguratorTests(unittest.TestCase):
         import pyramid.tests.fixtureapp
         config = self._makeOne(package=pyramid.tests.fixtureapp)
         registry = config.load_zcml()
+        config.commit()
         from pyramid.tests.fixtureapp.models import IFixture
         self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
 
@@ -606,18 +612,21 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IRoutesMapper
         config = self._makeOne()
         config.load_zcml('pyramid.tests.routesapp:configure.zcml')
+        config.commit()
         self.failUnless(config.registry.getUtility(IRoutesMapper))
 
     def test_load_zcml_fixtureapp(self):
         from pyramid.tests.fixtureapp.models import IFixture
         config = self._makeOne()
         config.load_zcml('pyramid.tests.fixtureapp:configure.zcml')
+        config.commit()
         self.failUnless(config.registry.queryUtility(IFixture)) # only in c.zcml
 
     def test_load_zcml_as_relative_filename(self):
         import pyramid.tests.fixtureapp
         config = self._makeOne(package=pyramid.tests.fixtureapp)
         registry = config.load_zcml('configure.zcml')
+        config.commit()
         from pyramid.tests.fixtureapp.models import IFixture
         self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
 
@@ -628,6 +637,7 @@ class ConfiguratorTests(unittest.TestCase):
         dn = os.path.dirname(pyramid.tests.fixtureapp.__file__)
         c_z = os.path.join(dn, 'configure.zcml')
         registry = config.load_zcml(c_z)
+        config.commit()
         from pyramid.tests.fixtureapp.models import IFixture
         self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
 
@@ -637,6 +647,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.load_zcml(
             'pyramid.tests.fixtureapp:configure.zcml',
             lock=dummylock)
+        config.commit()
         self.assertEqual(dummylock.acquired, True)
         self.assertEqual(dummylock.released, True)
 
@@ -659,6 +670,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         config.add_view(view=view,
                         request_type='pyramid.interfaces.IRequest')
+        config.commit() 
         wrapper = self._getViewCallable(config)
         request = DummyRequest()
         self._assertNotFound(wrapper, None, request)
@@ -670,6 +682,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         self._registerRenderer(config, name='dummy')
         config.add_view(renderer='dummy')
+        config.commit()
         view = self._getViewCallable(config)
         self.failUnless('Hello!' in view(None, None).body)
 
@@ -678,6 +691,7 @@ class ConfiguratorTests(unittest.TestCase):
             """ """
         config = self._makeOne()
         config.add_view(view=view)
+        config.commit()
         wrapper = self._getViewCallable(config)
         self.assertEqual(wrapper.__module__, view.__module__)
         self.assertEqual(wrapper.__name__, view.__name__)
@@ -686,6 +700,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_add_view_view_callable_dottedname(self):
         config = self._makeOne()
         config.add_view(view='pyramid.tests.test_configuration.dummy_view')
+        config.commit()
         wrapper = self._getViewCallable(config)
         self.assertEqual(wrapper(None, None), 'OK')
 
@@ -693,6 +708,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view)
+        config.commit()
         wrapper = self._getViewCallable(config)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
@@ -702,6 +718,7 @@ class ConfiguratorTests(unittest.TestCase):
             return 'OK'
         config = self._makeOne()
         config.add_view(view=view)
+        config.commit()
         wrapper = self._getViewCallable(config)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
@@ -714,6 +731,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = AView()
         config = self._makeOne()
         config.add_view(view=view)
+        config.commit()
         wrapper = self._getViewCallable(config)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
@@ -726,6 +744,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = AView()
         config = self._makeOne()
         config.add_view(view=view)
+        config.commit()
         wrapper = self._getViewCallable(config)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
@@ -740,6 +759,7 @@ class ConfiguratorTests(unittest.TestCase):
                 return 'OK'
         config = self._makeOne()
         config.add_view(view=view)
+        config.commit()
         wrapper = self._getViewCallable(config)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
@@ -753,6 +773,7 @@ class ConfiguratorTests(unittest.TestCase):
                 return 'OK'
         config = self._makeOne()
         config.add_view(view=view)
+        config.commit()
         wrapper = self._getViewCallable(config)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
@@ -764,6 +785,7 @@ class ConfiguratorTests(unittest.TestCase):
             pass
         config = self._makeOne()
         config.add_view(context=Foo, view=view)
+        config.commit()
         foo = implementedBy(Foo)
         wrapper = self._getViewCallable(config, foo)
         self.assertEqual(wrapper, view)
@@ -772,6 +794,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(context=IDummy, view=view)
+        config.commit()
         wrapper = self._getViewCallable(config, IDummy)
         self.assertEqual(wrapper, view)
 
@@ -780,6 +803,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         config.add_view(context='pyramid.tests.test_configuration.IDummy',
                         view=view)
+        config.commit()
         wrapper = self._getViewCallable(config, IDummy)
         self.assertEqual(wrapper, view)
 
@@ -788,6 +812,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         config.add_view(for_='pyramid.tests.test_configuration.IDummy',
                         view=view)
+        config.commit()
         wrapper = self._getViewCallable(config, IDummy)
         self.assertEqual(wrapper, view)
 
@@ -799,6 +824,7 @@ class ConfiguratorTests(unittest.TestCase):
             pass
         config = self._makeOne()
         config.add_view(for_=Foo, view=view)
+        config.commit()
         foo = implementedBy(Foo)
         wrapper = self._getViewCallable(config, foo)
         self.assertEqual(wrapper, view)
@@ -808,6 +834,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(for_=IDummy, view=view)
+        config.commit()
         wrapper = self._getViewCallable(config, IDummy)
         self.assertEqual(wrapper, view)
 
@@ -818,6 +845,7 @@ class ConfiguratorTests(unittest.TestCase):
         class Foo:
             pass
         config.add_view(context=IDummy, for_=Foo, view=view)
+        config.commit()
         wrapper = self._getViewCallable(config, IDummy)
         self.assertEqual(wrapper, view)
 
@@ -830,6 +858,7 @@ class ConfiguratorTests(unittest.TestCase):
         view.__call_permissive__ = view
         config = self._makeOne()
         config.add_view(view=view)
+        config.commit()
         wrapper = config.registry.adapters.lookup(
             (IViewClassifier, IRequest, Interface),
             ISecuredView, name='', default=None)
@@ -844,6 +873,7 @@ class ConfiguratorTests(unittest.TestCase):
         view.__call_permissive__ = view
         config = self._makeOne()
         config.add_view(view=view, context=RuntimeError)
+        config.commit()
         wrapper = config.registry.adapters.lookup(
             (IExceptionViewClassifier, IRequest, implementedBy(RuntimeError)),
             IView, name='', default=None)
@@ -866,6 +896,7 @@ class ConfiguratorTests(unittest.TestCase):
         def newview(context, request):
             return 'OK'
         config.add_view(view=newview, xhr=True)
+        config.commit()
         wrapper = self._getViewCallable(config)
         self.failIf(IMultiView.providedBy(wrapper))
         request = DummyRequest()
@@ -892,6 +923,7 @@ class ConfiguratorTests(unittest.TestCase):
             return 'OK'
         config.add_view(view=newview, xhr=True,
                         context=RuntimeError)
+        config.commit()
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
         self.failIf(IMultiView.providedBy(wrapper))
@@ -912,6 +944,7 @@ class ConfiguratorTests(unittest.TestCase):
         def newview(context, request):
             return 'OK'
         config.add_view(view=newview)
+        config.commit()
         wrapper = self._getViewCallable(config)
         self.failIf(IMultiView.providedBy(wrapper))
         request = DummyRequest()
@@ -933,6 +966,7 @@ class ConfiguratorTests(unittest.TestCase):
         def newview(context, request):
             return 'OK'
         config.add_view(view=newview, context=RuntimeError)
+        config.commit()
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
         self.failIf(IMultiView.providedBy(wrapper))
@@ -955,6 +989,7 @@ class ConfiguratorTests(unittest.TestCase):
         def newview(context, request):
             return 'OK'
         config.add_view(view=newview)
+        config.commit()
         wrapper = self._getViewCallable(config)
         self.failIf(IMultiView.providedBy(wrapper))
         request = DummyRequest()
@@ -978,6 +1013,7 @@ class ConfiguratorTests(unittest.TestCase):
         def newview(context, request):
             return 'OK'
         config.add_view(view=newview, context=RuntimeError)
+        config.commit()
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
         self.failIf(IMultiView.providedBy(wrapper))
@@ -997,6 +1033,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.registry.registerAdapter(
             view, (IViewClassifier, IRequest, Interface), IView, name='')
         config.add_view(view=view)
+        config.commit()
         wrapper = self._getViewCallable(config)
         self.failUnless(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper(None, None), 'OK')
@@ -1020,6 +1057,7 @@ class ConfiguratorTests(unittest.TestCase):
             (IExceptionViewClassifier, IRequest, implementedBy(RuntimeError)),
             IView, name='')
         config.add_view(view=view, context=RuntimeError)
+        config.commit()
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
         self.failUnless(IMultiView.providedBy(wrapper))
@@ -1038,6 +1076,7 @@ class ConfiguratorTests(unittest.TestCase):
             view, (IViewClassifier, IRequest, Interface),
             ISecuredView, name='')
         config.add_view(view=view)
+        config.commit()
         wrapper = self._getViewCallable(config)
         self.failUnless(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper(None, None), 'OK')
@@ -1061,6 +1100,7 @@ class ConfiguratorTests(unittest.TestCase):
             (IExceptionViewClassifier, IRequest, implementedBy(RuntimeError)),
             ISecuredView, name='')
         config.add_view(view=view, context=RuntimeError)
+        config.commit()
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
         self.failUnless(IMultiView.providedBy(wrapper))
@@ -1080,6 +1120,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.registry.registerAdapter(
             view, (IViewClassifier, IRequest, Interface), IView, name='')
         config.add_view(view=view2, accept='text/html')
+        config.commit()
         wrapper = self._getViewCallable(config)
         self.failUnless(IMultiView.providedBy(wrapper))
         self.assertEqual(len(wrapper.views), 1)
@@ -1110,6 +1151,7 @@ class ConfiguratorTests(unittest.TestCase):
             (IExceptionViewClassifier, IRequest, implementedBy(RuntimeError)),
             IView, name='')
         config.add_view(view=view2, accept='text/html', context=RuntimeError)
+        config.commit()
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
         self.failUnless(IMultiView.providedBy(wrapper))
@@ -1136,6 +1178,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.registry.registerAdapter(
             view, (IViewClassifier, IRequest, Interface), IView, name='')
         config.add_view(view=view2)
+        config.commit()
         wrapper = self._getViewCallable(config)
         self.failUnless(IMultiView.providedBy(wrapper))
         self.assertEqual(len(wrapper.views), 1)
@@ -1168,6 +1211,7 @@ class ConfiguratorTests(unittest.TestCase):
             (IExceptionViewClassifier, IRequest, implementedBy(RuntimeError)),
             IView, name='')
         config.add_view(view=view2, context=RuntimeError)
+        config.commit()
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
         self.failUnless(IMultiView.providedBy(wrapper))
@@ -1190,6 +1234,7 @@ class ConfiguratorTests(unittest.TestCase):
             IMultiView, name='')
         view2 = lambda *arg: 'OK2'
         config.add_view(view=view2)
+        config.commit()
         wrapper = self._getViewCallable(config)
         self.failUnless(IMultiView.providedBy(wrapper))
         self.assertEqual([x[:2] for x in wrapper.views], [(view2, None)])
@@ -1213,6 +1258,7 @@ class ConfiguratorTests(unittest.TestCase):
             IMultiView, name='')
         view2 = lambda *arg: 'OK2'
         config.add_view(view=view2, context=RuntimeError)
+        config.commit()
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
         self.failUnless(IMultiView.providedBy(wrapper))
@@ -1235,6 +1281,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.registry.registerAdapter(
             view, (IViewClassifier, IRequest, ISuper), IView, name='')
         config.add_view(view=view2, for_=ISub)
+        config.commit()
         wrapper = self._getViewCallable(config, ISuper, IRequest)
         self.failIf(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper(None, None), 'OK')
@@ -1261,6 +1308,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.registry.registerAdapter(
             view, (IExceptionViewClassifier, IRequest, Super), IView, name='')
         config.add_view(view=view2, for_=Sub)
+        config.commit()
         wrapper = self._getViewCallable(
             config, implementedBy(Super), IRequest)
         wrapper_exc_view = self._getViewCallable(
@@ -1296,6 +1344,8 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_view(view=view7, request_param='param', containment=IDummy)
         config.add_view(view=view8, request_method='POST',request_param='param',
                         containment=IDummy)
+
+        config.commit()
 
         wrapper = self._getViewCallable(config)
 
@@ -1365,6 +1415,7 @@ class ConfiguratorTests(unittest.TestCase):
         renderer = self._registerRenderer(config)
         fixture = 'pyramid.tests:fixtures/minimal.txt'
         config.add_view(view=view, renderer=fixture)
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         result = wrapper(None, request)
@@ -1384,6 +1435,7 @@ class ConfiguratorTests(unittest.TestCase):
         renderer = self._registerRenderer(config)
         fixture = 'pyramid.tests:fixtures/minimal.txt'
         config.add_view(view=None, renderer=fixture)
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         result = wrapper(None, request)
@@ -1402,6 +1454,7 @@ class ConfiguratorTests(unittest.TestCase):
             return 'OK'
         config = self._makeOne()
         config.add_view(request_type=IDummy, view=view)
+        config.commit()
         wrapper = self._getViewCallable(config, None)
         request = self._makeRequest(config)
         directlyProvides(request, IDummy)
@@ -1420,6 +1473,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, route_name='foo')
+        config.commit()
         self.assertEqual(len(config.registry.deferred_route_views), 1)
         infos = config.registry.deferred_route_views['foo']
         self.assertEqual(len(infos), 1)
@@ -1431,6 +1485,7 @@ class ConfiguratorTests(unittest.TestCase):
         wrapper = self._getViewCallable(config, None)
         self.assertEqual(wrapper, None)
         config.add_route('foo', '/a/b')
+        config.commit()
         request_iface = self._getRouteRequestIface(config, 'foo')
         self.failIfEqual(request_iface, None)
         wrapper = self._getViewCallable(config, request_iface=request_iface)
@@ -1441,6 +1496,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, route_name='foo', custom_predicates=('123',))
+        config.commit()
         self.assertEqual(len(config.registry.deferred_route_views), 1)
         infos = config.registry.deferred_route_views['foo']
         self.assertEqual(len(infos), 1)
@@ -1454,6 +1510,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, route_name='foo', context=RuntimeError)
+        config.commit()
         self.assertEqual(len(config.registry.deferred_route_views), 1)
         infos = config.registry.deferred_route_views['foo']
         self.assertEqual(len(infos), 1)
@@ -1467,6 +1524,7 @@ class ConfiguratorTests(unittest.TestCase):
             exception_view=True)
         self.assertEqual(wrapper_exc_view, None)
         config.add_route('foo', '/a/b')
+        config.commit()
         request_iface = self._getRouteRequestIface(config, 'foo')
         self.failIfEqual(request_iface, None)
         wrapper_exc_view = self._getViewCallable(
@@ -1483,6 +1541,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, request_method='POST')
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.method = 'POST'
@@ -1492,6 +1551,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, request_method='POST')
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.method = 'GET'
@@ -1501,6 +1561,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, request_param='abc')
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.params = {'abc':''}
@@ -1510,6 +1571,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, request_param='abc')
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.params = {}
@@ -1519,6 +1581,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, request_param='abc=123')
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.params = {'abc':'123'}
@@ -1528,6 +1591,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, request_param='abc=123')
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.params = {'abc':''}
@@ -1537,6 +1601,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, xhr=True)
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.is_xhr = True
@@ -1546,6 +1611,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, xhr=True)
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.is_xhr = False
@@ -1562,6 +1628,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, header='Host')
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.headers = {'Host':'whatever'}
@@ -1571,6 +1638,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, header='Host')
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.headers = {'NotHost':'whatever'}
@@ -1580,6 +1648,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, header=r'Host:\d')
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.headers = {'Host':'1'}
@@ -1589,6 +1658,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, header=r'Host:\d')
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.headers = {'Host':'abc'}
@@ -1599,6 +1669,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, header=r'Host:\d')
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.headers = {'NoHost':'1'}
@@ -1608,6 +1679,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, accept='text/xml')
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.accept = ['text/xml']
@@ -1617,6 +1689,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, accept='text/xml')
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.accept = ['text/html']
@@ -1627,6 +1700,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, containment=IDummy)
+        config.commit()
         wrapper = self._getViewCallable(config)
         context = DummyContext()
         directlyProvides(context, IDummy)
@@ -1636,6 +1710,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, containment=IDummy)
+        config.commit()
         wrapper = self._getViewCallable(config)
         context = DummyContext()
         self._assertNotFound(wrapper, context, None)
@@ -1647,6 +1722,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_view(
             view=view,
             containment='pyramid.tests.test_configuration.IDummy')
+        config.commit()
         wrapper = self._getViewCallable(config)
         context = DummyContext()
         directlyProvides(context, IDummy)
@@ -1663,6 +1739,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, path_info='/foo')
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.path_info = '/foo'
@@ -1672,6 +1749,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, path_info='/foo')
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.path_info = '/'
@@ -1686,6 +1764,7 @@ class ConfiguratorTests(unittest.TestCase):
             return True
         predicates = (pred1, pred2)
         config.add_view(view=view, custom_predicates=predicates)
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         self.assertEqual(wrapper(None, request), 'OK')
@@ -1699,6 +1778,7 @@ class ConfiguratorTests(unittest.TestCase):
             return False
         predicates = (pred1, pred2)
         config.add_view(view=view, custom_predicates=predicates)
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         self._assertNotFound(wrapper, None, request)
@@ -1711,6 +1791,7 @@ class ConfiguratorTests(unittest.TestCase):
             return True
         config.add_view(view=view, custom_predicates=(pred1,))
         config.add_view(view=view2, request_method='GET')
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.method = 'GET'
@@ -1722,6 +1803,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         config.add_view(view=view, request_method='GET', xhr=True)
         config.add_view(view=view2, request_method='GET')
+        config.commit()
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.method = 'GET'
@@ -1729,14 +1811,13 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_same_predicates(self):
+        from zope.configuration.config import ConfigurationConflictError
         view2 = lambda *arg: 'second'
         view1 = lambda *arg: 'first'
         config = self._makeOne()
         config.add_view(view=view1)
         config.add_view(view=view2)
-        view = self._getViewCallable(config)
-        request = self._makeRequest(config)
-        self.assertEqual(view(None, request), 'second')
+        self.assertRaises(ConfigurationConflictError, config.commit)
 
     def test_add_view_with_permission(self):
         view1 = lambda *arg: 'OK'
@@ -1754,6 +1835,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(authorization_policy=policy,
                                authentication_policy=policy)
         config.add_view(view=view1, permission='view')
+        config.commit()
         view = self._getViewCallable(config)
         request = self._makeRequest(config)
         self.assertEqual(view(None, request), 'OK')
@@ -1775,6 +1857,7 @@ class ConfiguratorTests(unittest.TestCase):
                                authentication_policy=policy,
                                default_permission='view')
         config.add_view(view=view1)
+        config.commit()
         view = self._getViewCallable(config)
         request = self._makeRequest(config)
         self.assertEqual(view(None, request), 'OK')
@@ -1786,6 +1869,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(authorization_policy=policy,
                                authentication_policy=policy)
         config.add_view(view=view1)
+        config.commit()
         view = self._getViewCallable(config)
         request = self._makeRequest(config)
         self.assertEqual(view(None, request), 'OK')
@@ -1797,6 +1881,7 @@ class ConfiguratorTests(unittest.TestCase):
             views.append(kw)
         config.add_view = dummy_add_view
         config.add_handler('name', '/:action', DummyHandler)
+        config.commit()
         self._assertRoute(config, 'name', '/:action', 0)
         self.assertEqual(len(views), 2)
 
@@ -1833,6 +1918,7 @@ class ConfiguratorTests(unittest.TestCase):
         class MyView(DummyHandler):
             __autoexpose__ = None
         config.add_handler('name', '/:action', MyView)
+        config.commit()
         self._assertRoute(config, 'name', '/:action', 0)
         self.assertEqual(len(views), 0)
 
@@ -1869,6 +1955,7 @@ class ConfiguratorTests(unittest.TestCase):
                 return 'response'
             action.__exposed__ = [{'custom_predicates':(1,)}]
         config.add_handler('name', '/:action', MyView)
+        config.commit()
         self._assertRoute(config, 'name', '/:action', 0)
         self.assertEqual(len(views), 1)
         view = views[0]
@@ -1889,6 +1976,7 @@ class ConfiguratorTests(unittest.TestCase):
                 return 'response'
             action.__exposed__ = [{'name':'action3000'}]
         config.add_handler('name', '/:action', MyView)
+        config.commit()
         self._assertRoute(config, 'name', '/:action', 0)
         self.assertEqual(len(views), 1)
         view = views[0]
@@ -1915,6 +2003,7 @@ class ConfiguratorTests(unittest.TestCase):
                 return 'response'
             action.__exposed__ = [{'name':'^action3000$'}]
         config.add_handler('name', '/:action', MyView)
+        config.commit()
         self._assertRoute(config, 'name', '/:action', 0)
         self.assertEqual(len(views), 1)
         view = views[0]
@@ -1941,6 +2030,7 @@ class ConfiguratorTests(unittest.TestCase):
                 return 'response'
             action.__exposed__ = exposed
         config.add_handler('name', '/{action}', MyView)
+        config.commit()
         self.assertEqual(exposed[0], {'name':'^action3000$'}) # not mutated
 
     def test_add_handler_with_action_and_action_in_path(self):
@@ -1959,6 +2049,7 @@ class ConfiguratorTests(unittest.TestCase):
             views.append(kw)
         config.add_view = dummy_add_view
         config.add_handler('name', '/abc', DummyHandler, action='index')
+        config.commit()
         self.assertEqual(len(views), 1)
         view = views[0]
         self.assertEqual(view['a'], '1')
@@ -1976,6 +2067,7 @@ class ConfiguratorTests(unittest.TestCase):
             views.append(kw)
         config.add_view = dummy_add_view
         config.add_handler('name', '/abc', DummyHandler)
+        config.commit()
         self.assertEqual(len(views), 1)
         view = views[0]
         self.assertEqual(view['a'], '1')
@@ -1994,6 +2086,7 @@ class ConfiguratorTests(unittest.TestCase):
             views.append(kw)
         config.add_view = dummy_add_view
         config.add_handler('name', '/abc', DummyHandler, action='index')
+        config.commit()
         self.assertEqual(len(views), 2)
         view = views[0]
         self.assertEqual(view['attr'], 'create')
@@ -2010,6 +2103,7 @@ class ConfiguratorTests(unittest.TestCase):
             views.append(kw)
         config.add_view = dummy_add_view
         config.add_handler('name', '/abc', 'pyramid')
+        config.commit()
         self.assertEqual(len(views), 1)
         view = views[0]
         self.assertEqual(view['view'], pyramid)
@@ -2030,6 +2124,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_view = dummy_add_view
         config.add_route = None # shouldn't be called
         config.add_handler('name', None, 'pyramid')
+        config.commit()
         self.assertEqual(len(views), 1)
         view = views[0]
         self.assertEqual(view['view'], pyramid)
@@ -2062,6 +2157,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_add_route_defaults(self):
         config = self._makeOne()
         route = config.add_route('name', 'path')
+        config.commit()
         self._assertRoute(config, 'name', 'path')
         self.assertEqual(route.name, 'name')
 
@@ -2069,6 +2165,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         factory = object()
         route = config.add_route('name', 'path', factory=factory)
+        config.commit()
         self.assertEqual(route.factory, factory)
 
     def test_add_route_with_factory_dottedname(self):
@@ -2076,11 +2173,13 @@ class ConfiguratorTests(unittest.TestCase):
         route = config.add_route(
             'name', 'path',
             factory='pyramid.tests.test_configuration.dummyfactory')
+        config.commit()
         self.assertEqual(route.factory, dummyfactory)
 
     def test_add_route_with_xhr(self):
         config = self._makeOne()
         config.add_route('name', 'path', xhr=True)
+        config.commit()
         route = self._assertRoute(config, 'name', 'path', 1)
         predicate = route.predicates[0]
         request = self._makeRequest(config)
@@ -2093,6 +2192,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_add_route_with_request_method(self):
         config = self._makeOne()
         config.add_route('name', 'path', request_method='GET')
+        config.commit()
         route = self._assertRoute(config, 'name', 'path', 1)
         predicate = route.predicates[0]
         request = self._makeRequest(config)
@@ -2105,6 +2205,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_add_route_with_path_info(self):
         config = self._makeOne()
         config.add_route('name', 'path', path_info='/foo')
+        config.commit()
         route = self._assertRoute(config, 'name', 'path', 1)
         predicate = route.predicates[0]
         request = self._makeRequest(config)
@@ -2117,6 +2218,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_add_route_with_request_param(self):
         config = self._makeOne()
         config.add_route('name', 'path', request_param='abc')
+        config.commit()
         route = self._assertRoute(config, 'name', 'path', 1)
         predicate = route.predicates[0]
         request = self._makeRequest(config)
@@ -2131,12 +2233,14 @@ class ConfiguratorTests(unittest.TestCase):
         def pred1(context, request): pass
         def pred2(context, request): pass
         config.add_route('name', 'path', custom_predicates=(pred1, pred2))
+        config.commit()
         route = self._assertRoute(config, 'name', 'path', 2)
         self.assertEqual(route.predicates, [pred1, pred2])
 
     def test_add_route_with_header(self):
         config = self._makeOne()
         config.add_route('name', 'path', header='Host')
+        config.commit()
         route = self._assertRoute(config, 'name', 'path', 1)
         predicate = route.predicates[0]
         request = self._makeRequest(config)
@@ -2149,6 +2253,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_add_route_with_accept(self):
         config = self._makeOne()
         config.add_route('name', 'path', accept='text/xml')
+        config.commit()
         route = self._assertRoute(config, 'name', 'path', 1)
         predicate = route.predicates[0]
         request = self._makeRequest(config)
@@ -2162,6 +2267,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         view = lambda *arg: 'OK'
         config.add_route('name', 'path', view=view)
+        config.commit()
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         self.assertEqual(wrapper(None, None), 'OK')
@@ -2171,6 +2277,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         view = lambda *arg: 'OK'
         config.add_route('name', 'path', view=view, view_context=IDummy)
+        config.commit()
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, IDummy, request_type)
         self.assertEqual(wrapper(None, None), 'OK')
@@ -2183,6 +2290,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         view = lambda *arg: 'OK'
         config.add_route('name', 'path', view=view, view_context=RuntimeError)
+        config.commit()
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError),
@@ -2198,6 +2306,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         view = lambda *arg: 'OK'
         config.add_route('name', 'path', view=view, view_for=IDummy)
+        config.commit()
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, IDummy, request_type)
         self.assertEqual(wrapper(None, None), 'OK')
@@ -2209,6 +2318,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         view = lambda *arg: 'OK'
         config.add_route('name', 'path', view=view, for_=IDummy)
+        config.commit()
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, IDummy, request_type)
         self.assertEqual(wrapper(None, None), 'OK')
@@ -2222,6 +2332,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config.add_route('name', 'path', view=view,
                          view_renderer='fixtures/minimal.txt')
+        config.commit()
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         self._assertRoute(config, 'name', 'path')
@@ -2236,6 +2347,7 @@ class ConfiguratorTests(unittest.TestCase):
             def alt(self):
                 return 'OK'
         config.add_route('name', 'path', view=View, view_attr='alt')
+        config.commit()
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         self._assertRoute(config, 'name', 'path')
@@ -2247,6 +2359,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config.add_route('name', 'path', view=view,
                          renderer='fixtures/minimal.txt')
+        config.commit()
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         self._assertRoute(config, 'name', 'path')
@@ -2261,6 +2374,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.registry.registerUtility(policy, IAuthorizationPolicy)
         view = lambda *arg: 'OK'
         config.add_route('name', 'path', view=view, view_permission='edit')
+        config.commit()
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         self._assertRoute(config, 'name', 'path')
@@ -2275,6 +2389,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.registry.registerUtility(policy, IAuthorizationPolicy)
         view = lambda *arg: 'OK'
         config.add_route('name', 'path', view=view, permission='edit')
+        config.commit()
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         self._assertRoute(config, 'name', 'path')
@@ -2283,6 +2398,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_add_route_no_pattern_with_path(self):
         config = self._makeOne()
         route = config.add_route('name', path='path')
+        config.commit()
         self._assertRoute(config, 'name', 'path')
         self.assertEqual(route.name, 'name')
 
@@ -2294,6 +2410,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_add_route_with_pregenerator(self):
         config = self._makeOne()
         route = config.add_route('name', 'pattern', pregenerator='123')
+        config.commit()
         self.assertEqual(route.pregenerator, '123')
 
     def test__override_not_yet_registered(self):
@@ -2329,6 +2446,7 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IViewClassifier
         config = self._makeOne()
         config.add_static_view('static', 'fixtures/static')
+        config.commit()
         request_type = self._getRouteRequestIface(config, 'static/')
         route = self._assertRoute(config, 'static/', 'static/*subpath')
         self.assertEqual(route.factory.__class__, type(lambda x: x))
@@ -2344,6 +2462,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         config.registry.registerUtility(info, IStaticURLInfo)
         config.add_static_view('static', 'pyramid.tests:fixtures/static')
+        config.commit()
         self.assertEqual(info.added,
                          [('static', 'pyramid.tests:fixtures/static', {})])
 
@@ -2353,6 +2472,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         config.registry.registerUtility(info, IStaticURLInfo)
         config.add_static_view('static', 'fixtures/static')
+        config.commit()
         self.assertEqual(info.added,
                          [('static', 'pyramid.tests:fixtures/static', {})])
 
@@ -2365,6 +2485,7 @@ class ConfiguratorTests(unittest.TestCase):
         here = os.path.dirname(__file__)
         static_path = os.path.join(here, 'fixtures', 'static')
         config.add_static_view('static', static_path)
+        config.commit()
         self.assertEqual(info.added,
                          [('static', static_path, {})])
 
@@ -2375,6 +2496,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         view = lambda *arg: arg
         config.set_notfound_view(view)
+        config.commit()
         request = self._makeRequest(config)
         view = self._getViewCallable(config, ctx_iface=implementedBy(NotFound),
                                      request_iface=IRequest)
@@ -2388,6 +2510,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         view = lambda *arg: arg
         config.set_notfound_view(view)
+        config.commit()
         request = self._makeRequest(config)
         request.context = 'abc'
         view = self._getViewCallable(config, ctx_iface=implementedBy(NotFound),
@@ -2402,6 +2525,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         view = lambda *arg: 'OK'
         config.set_forbidden_view(view)
+        config.commit()
         request = self._makeRequest(config)
         view = self._getViewCallable(config, ctx_iface=implementedBy(Forbidden),
                                      request_iface=IRequest)
@@ -2415,6 +2539,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         view = lambda *arg: arg
         config.set_forbidden_view(view)
+        config.commit()
         request = self._makeRequest(config)
         request.context = 'abc'
         view = self._getViewCallable(config, ctx_iface=implementedBy(Forbidden),
@@ -2427,6 +2552,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         policy = object()
         config._set_authentication_policy(policy)
+        config.commit()
         self.assertEqual(
             config.registry.getUtility(IAuthenticationPolicy), policy)
 
@@ -2435,6 +2561,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         policy = object()
         config._set_authorization_policy(policy)
+        config.commit()
         self.assertEqual(
             config.registry.getUtility(IAuthorizationPolicy), policy)
 
@@ -2443,6 +2570,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         def negotiator(request): pass
         config.set_locale_negotiator(negotiator)
+        config.commit()
         self.assertEqual(config.registry.getUtility(ILocaleNegotiator),
                          negotiator)
 
@@ -2451,6 +2579,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         config.set_locale_negotiator(
             'pyramid.tests.test_configuration.dummyfactory')
+        config.commit()
         self.assertEqual(config.registry.getUtility(ILocaleNegotiator),
                          dummyfactory)
 
@@ -2459,6 +2588,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         factory = object()
         config.set_request_factory(factory)
+        config.commit()
         self.assertEqual(config.registry.getUtility(IRequestFactory), factory)
 
     def test_set_request_factory_dottedname(self):
@@ -2466,6 +2596,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         config.set_request_factory(
             'pyramid.tests.test_configuration.dummyfactory')
+        config.commit()
         self.assertEqual(config.registry.getUtility(IRequestFactory),
                          dummyfactory)
 
@@ -2474,6 +2605,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         factory = object()
         config.set_renderer_globals_factory(factory)
+        config.commit()
         self.assertEqual(config.registry.getUtility(IRendererGlobalsFactory),
                          factory)
 
@@ -2482,6 +2614,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         config.set_renderer_globals_factory(
             'pyramid.tests.test_configuration.dummyfactory')
+        config.commit()
         self.assertEqual(config.registry.getUtility(IRendererGlobalsFactory),
                          dummyfactory)
 
@@ -2489,6 +2622,7 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IDefaultPermission
         config = self._makeOne()
         config.set_default_permission('view')
+        config.commit()
         self.assertEqual(config.registry.getUtility(IDefaultPermission),
                          'view')
 
@@ -2496,6 +2630,7 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import ISessionFactory
         config = self._makeOne()
         config.set_session_factory('factory')
+        config.commit()
         self.assertEqual(config.registry.getUtility(ISessionFactory),
                          'factory')
 
@@ -2511,6 +2646,7 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import ITranslationDirectories
         config = self._makeOne()
         config.add_translation_dirs('pyramid.tests.localeapp:locale')
+        config.commit()
         here = os.path.dirname(__file__)
         locale = os.path.join(here, 'localeapp', 'locale')
         self.assertEqual(config.registry.getUtility(ITranslationDirectories),
@@ -2524,6 +2660,7 @@ class ConfiguratorTests(unittest.TestCase):
         manager.push({'request':request, 'registry':config.registry})
         try:
             config.add_translation_dirs('pyramid.tests.localeapp:locale')
+            config.commit() 
             translate = config.registry.getUtility(IChameleonTranslate)
             self.assertEqual(translate('Approve'), u'Approve')
         finally:
@@ -2536,6 +2673,7 @@ class ConfiguratorTests(unittest.TestCase):
         here = os.path.dirname(__file__)
         locale = os.path.join(here, 'localeapp', 'locale')
         config.add_translation_dirs(locale)
+        config.commit()
         self.assertEqual(config.registry.getUtility(ITranslationDirectories),
                          [locale])
 
@@ -2564,6 +2702,7 @@ class ConfiguratorTests(unittest.TestCase):
             def __call__(self, *arg, **kw):
                 return 'moo'
         config.add_renderer('moo', moo)
+        config.commit()
         result = config.derive_view(view, renderer='moo')
         self.failIf(result is view)
         self.assertEqual(result(None, None).body, 'moo')
@@ -2578,6 +2717,7 @@ class ConfiguratorTests(unittest.TestCase):
             def __call__(self, *arg, **kw):
                 return 'moo'
         config.add_renderer(None, moo)
+        config.commit()
         result = config.derive_view(view)
         self.failIf(result is view)
         self.assertEqual(result(None, None).body, 'moo')
@@ -2594,6 +2734,7 @@ class ConfiguratorTests(unittest.TestCase):
                 return 'foo'
         config.add_renderer(None, moo)
         config.add_renderer('foo', foo)
+        config.commit()
         result = config.derive_view(view, renderer='foo')
         self.failIf(result is view)
         self.assertEqual(result(None, None).body, 'foo')
@@ -2961,6 +3102,7 @@ class ConfiguratorTests(unittest.TestCase):
             'pyramid.tests.fixtureapp:templates/foo.pt',
             'pyramid.tests.fixtureapp.subpackage:templates/bar.pt',
             _override=override)
+        config.commit()
         from pyramid.tests import fixtureapp
         from pyramid.tests.fixtureapp import subpackage
         self.assertEqual(override.package, fixtureapp)
@@ -2973,6 +3115,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         renderer = object()
         config.add_renderer('name', renderer)
+        config.commit()
         self.assertEqual(config.registry.getUtility(IRendererFactory, 'name'),
                          renderer)
 
@@ -2981,6 +3124,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         import pyramid.tests
         config.add_renderer('name', 'pyramid.tests')
+        config.commit()
         self.assertEqual(config.registry.getUtility(IRendererFactory, 'name'),
                          pyramid.tests)
 
@@ -2992,6 +3136,7 @@ class ConfiguratorTests(unittest.TestCase):
         import pyramid.tests.grokkedapp as package
         config = self._makeOne()
         config.scan(package)
+        config.commit()
 
         ctx = DummyContext()
         req = DummyRequest()
@@ -3094,6 +3239,7 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.view import render_view_to_response
         config = self._makeOne()
         config.scan('pyramid.tests.grokkedapp')
+        config.commit()
 
         ctx = DummyContext()
         req = DummyRequest()
@@ -3109,6 +3255,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         config.testing_securitypolicy('user', ('group1', 'group2'),
                                       permissive=False)
+        config.commit()
         from pyramid.interfaces import IAuthenticationPolicy
         from pyramid.interfaces import IAuthorizationPolicy
         ut = config.registry.getUtility(IAuthenticationPolicy)
@@ -3126,6 +3273,7 @@ class ConfiguratorTests(unittest.TestCase):
         models = {'/ob1':ob1, '/ob2':ob2}
         config = self._makeOne()
         config.testing_models(models)
+        config.commit()
         adapter = config.registry.getAdapter(None, ITraverser)
         result = adapter({'PATH_INFO':'/ob1'})
         self.assertEqual(result['context'], ob1)
@@ -3151,6 +3299,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_testing_add_subscriber_single(self):
         config = self._makeOne()
         L = config.testing_add_subscriber(IDummy)
+        config.commit()
         event = DummyEvent()
         config.registry.notify(event)
         self.assertEqual(len(L), 1)
@@ -3162,6 +3311,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         L = config.testing_add_subscriber(
             'pyramid.tests.test_configuration.IDummy')
+        config.commit()
         event = DummyEvent()
         config.registry.notify(event)
         self.assertEqual(len(L), 1)
@@ -3172,6 +3322,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_testing_add_subscriber_multiple(self):
         config = self._makeOne()
         L = config.testing_add_subscriber((Interface, IDummy))
+        config.commit()
         event = DummyEvent()
         event.object = 'foo'
         # the below is the equivalent of z.c.event.objectEventNotify(event)
@@ -3183,6 +3334,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_testing_add_subscriber_defaults(self):
         config = self._makeOne()
         L = config.testing_add_subscriber()
+        config.commit()
         event = object()
         config.registry.notify(event)
         self.assertEqual(L[-1], event)
@@ -3206,6 +3358,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_testing_add_renderer(self):
         config = self._makeOne()
         renderer = config.testing_add_renderer('templates/foo.pt')
+        config.commit()
         from pyramid.testing import DummyTemplateRenderer
         self.failUnless(isinstance(renderer, DummyTemplateRenderer))
         from pyramid.renderers import render_to_response
@@ -3225,6 +3378,7 @@ class ConfiguratorTests(unittest.TestCase):
             self.assertEqual(kw, {'foo':1, 'bar':2})
             raise E
         renderer = config.testing_add_renderer('templates/foo.pt', renderer)
+        config.commit()
         from pyramid.renderers import render_to_response
         # must provide request to pass in registry (this is a functest)
         request = DummyRequest()
@@ -3240,6 +3394,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_testing_add_template(self):
         config = self._makeOne()
         renderer = config.testing_add_template('templates/foo.pt')
+        config.commit()
         from pyramid.testing import DummyTemplateRenderer
         self.failUnless(isinstance(renderer, DummyTemplateRenderer))
         from pyramid.renderers import render_to_response

@@ -57,8 +57,10 @@ def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
     """
     registry = get_current_registry()
     config = Configurator(registry=registry)
-    return config.testing_securitypolicy(userid=userid, groupids=groupids,
-                                         permissive=permissive)
+    result = config.testing_securitypolicy(userid=userid, groupids=groupids,
+                                           permissive=permissive)
+    config.commit()
+    return result
 
 def registerModels(models):
     """ Registers a dictionary of :term:`model` objects that can be
@@ -79,7 +81,9 @@ def registerModels(models):
     """
     registry = get_current_registry()
     config = Configurator(registry=registry)
-    return config.testing_models(models)
+    result = config.testing_models(models)
+    config.commit()
+    return result
 
 def registerEventListener(event_iface=None):
     """ Registers an :term:`event` listener (aka :term:`subscriber`)
@@ -105,7 +109,9 @@ def registerEventListener(event_iface=None):
     """
     registry = get_current_registry()
     config = Configurator(registry=registry)
-    return config.testing_add_subscriber(event_iface)
+    result = config.testing_add_subscriber(event_iface)
+    config.commit()
+    return result
 
 def registerTemplateRenderer(path, renderer=None):
     """ Register a template renderer at ``path`` (usually a relative
@@ -125,7 +131,9 @@ def registerTemplateRenderer(path, renderer=None):
     """
     registry = get_current_registry()
     config = Configurator(registry=registry)
-    return config.testing_add_template(path, renderer)
+    result = config.testing_add_template(path, renderer)
+    config.commit()
+    return result
 
 # registerDummyRenderer is a deprecated alias that should never be removed
 # (too much usage in the wild)
@@ -249,7 +257,9 @@ def registerSubscriber(subscriber, iface=Interface):
     """
     registry = get_current_registry()
     config = Configurator(registry)
-    return config.add_subscriber(subscriber, iface=iface)
+    result = config.add_subscriber(subscriber, iface=iface)
+    config.commit()
+    return result
 
 def registerRoute(pattern, name, factory=None):
     """ Register a new :term:`route` using a pattern
@@ -270,7 +280,9 @@ def registerRoute(pattern, name, factory=None):
     """
     reg = get_current_registry()
     config = Configurator(registry=reg)
-    return config.add_route(name, pattern, factory=factory)
+    result = config.add_route(name, pattern, factory=factory)
+    config.commit()
+    return result
 
 def registerSettings(dictarg=None, **kw):
     """Register one or more 'setting' key/value pairs.  A setting is
@@ -637,6 +649,7 @@ def setUp(registry=None, request=None, hook_zca=True):
             # ``render_template`` and friends went behind the back of
             # any existing renderer factory lookup system.
             config.add_renderer(name, renderer)
+    config.commit()
     hook_zca and config.hook_zca()
     config.begin(request=request)
     return config

@@ -9,7 +9,6 @@ import venusian
 from translationstring import ChameleonTranslate
 
 from zope.configuration import xmlconfig
-from zope.configuration.config import ConfigurationMachine
 
 from zope.interface import Interface
 from zope.interface import implementedBy
@@ -235,7 +234,6 @@ class Configurator(object):
                  renderer_globals_factory=None,
                  default_permission=None,
                  session_factory=None,
-                 autocommit = True,
                  ):
         if package is None:
             package = caller_package()
@@ -259,7 +257,6 @@ class Configurator(object):
                 renderer_globals_factory=renderer_globals_factory,
                 default_permission=default_permission,
                 session_factory=session_factory,
-                autocommit=autocommit,
                 )
 
     def _set_settings(self, mapping):
@@ -267,7 +264,7 @@ class Configurator(object):
         self.registry.settings = settings
         return settings
 
-    @config_method
+    #@config_method
     def _set_root_factory(self, factory):
         """ Add a :term:`root factory` to the current configuration
         state.  If the ``factory`` argument is ``None`` a default root
@@ -280,7 +277,7 @@ class Configurator(object):
             self.registry.registerUtility(factory, IDefaultRootFactory) # b/c
         self.action(IRootFactory, register)
 
-    @config_method
+    #@config_method
     def _set_authentication_policy(self, policy):
         """ Add a :app:`Pyramid` :term:`authentication policy` to
         the current configuration."""
@@ -290,7 +287,7 @@ class Configurator(object):
                                       info=_info)
         self.action(IAuthenticationPolicy, None)
 
-    @config_method
+    #@config_method
     def _set_authorization_policy(self, policy):
         """ Add a :app:`Pyramid` :term:`authorization policy` to
         the current configuration state (also accepts a :term:`dotted
@@ -419,8 +416,7 @@ class Configurator(object):
                        locale_negotiator=None, request_factory=None,
                        renderer_globals_factory=None,
                        default_permission=None,
-                       session_factory=None,
-                       autocommit=True):
+                       session_factory=None):
         """ When you pass a non-``None`` ``registry`` argument to the
         :term:`Configurator` constructor, no initial 'setup' is
         performed against the registry.  This is because the registry
@@ -440,7 +436,6 @@ class Configurator(object):
         configurator's current registry, as per the descriptions in
         the Configurator constructor."""
         registry = self.registry
-        registry.autocommit = autocommit
         self._fix_registry()
         self._set_settings(settings)
         self._set_root_factory(root_factory)
@@ -469,6 +464,7 @@ class Configurator(object):
             self.set_default_permission(default_permission)
         if session_factory is not None:
             self.set_session_factory(session_factory)
+        self.commit()
 
     # getSiteManager is a unit testing dep injection
     def hook_zca(self, getSiteManager=None):
@@ -600,7 +596,7 @@ class Configurator(object):
     def ctx_info(self):
         return getattr(self.registry.ctx, 'info', '')
 
-    @config_method
+    #@config_method
     def add_subscriber(self, subscriber, iface=None):
         """Add an event :term:`subscriber` for the event stream
         implied by the supplied ``iface`` interface.  The
@@ -675,6 +671,7 @@ class Configurator(object):
         the current configuration state and sends a
         :class:`pyramid.events.ApplicationCreated`
         event to all listeners."""
+        self.commit()
         from pyramid.router import Router # avoid circdep
         app = Router(self.registry)
         # We push the registry on to the stack here in case any code
@@ -704,15 +701,12 @@ class Configurator(object):
         registry = self.registry
         self.manager.push({'registry':registry, 'request':None})
         context = registry.ctx
-        autocommit = registry.autocommit
         try:
-            registry.autocommit = False
             context.package = package
             xmlconfig.file(filename, package, context=context, execute=True)
         finally:
             lock.release()
             self.manager.pop()
-            registry.autocommit = autocommit
         return registry
 
     def add_handler(self, route_name, pattern, handler, action=None, **kw):
@@ -828,7 +822,7 @@ class Configurator(object):
 
         return route
 
-    @config_method
+    #@config_method
     def add_view(self, view=None, name="", for_=None, permission=None,
                  request_type=None, route_name=None, request_method=None,
                  request_param=None, containment=None, attr=None,
@@ -1258,7 +1252,7 @@ class Configurator(object):
         discriminator = tuple(discriminator)
         self.action(discriminator, register)
 
-    @config_method
+    #@config_method
     def add_route(self,
                   name,
                   pattern=None,
@@ -1652,15 +1646,9 @@ class Configurator(object):
             package = caller_package()
 
         scanner = self.venusian.Scanner(config=self)
-        autocommit = self.registry.autocommit
-        try:
-            self.registry.autocommit = False
-            scanner.scan(package, categories=categories)
-        finally:
-            self.registry.autocommit = autocommit
-        self.commit()
+        scanner.scan(package, categories=categories)
 
-    @config_method
+    #@config_method
     def add_renderer(self, name, factory):
         """
         Add a :app:`Pyramid` :term:`renderer` factory to the
@@ -1689,11 +1677,10 @@ class Configurator(object):
             name = ''
         self.registry.registerUtility(
             factory, IRendererFactory, name=name, info=self.ctx_info())
-        self.action(('renderer', name), None)
+        self.action((IRendererFactory, name), None)
 
-    @config_method
-    def override_resource(self, to_override, override_with,
-                          _override=None,):
+    #@config_method
+    def override_resource(self, to_override, override_with, _override=None):
         """ Add a :app:`Pyramid` resource override to the current
         configuration state.
 
@@ -1731,14 +1718,13 @@ class Configurator(object):
                     'A file cannot be overridden with a directory (put a '
                     'slash at the end of to_override if necessary)')
 
-        __import__(package)
-        __import__(override_package)
-        package = sys.modules[package]
-        override_package = sys.modules[override_package]
-
         override = _override or self._override # test jig
         def register():
-            override(package, path, override_package, override_prefix)
+            __import__(package)
+            __import__(override_package)
+            from_package = sys.modules[package]
+            to_package = sys.modules[override_package]
+            override(from_package, path, to_package, override_prefix)
         self.action(None, register)
 
     def set_forbidden_view(self, view=None, attr=None, renderer=None,
@@ -1815,7 +1801,7 @@ class Configurator(object):
             return view(context, request)
         return self.add_view(bwcompat_view, context=NotFound, wrapper=wrapper)
 
-    @config_method
+    #@config_method
     def set_request_factory(self, factory):
         """ The object passed as ``factory`` should be an object (or a
         :term:`dotted Python name` which refers to an object) which
@@ -1834,7 +1820,7 @@ class Configurator(object):
             self.registry.registerUtility(factory, IRequestFactory)
         self.action(IRequestFactory, register)
 
-    @config_method
+    #@config_method
     def set_renderer_globals_factory(self, factory):
         """ The object passed as ``factory`` should be an callable (or
         a :term:`dotted Python name` which refers to an callable) that
@@ -1858,7 +1844,7 @@ class Configurator(object):
             self.registry.registerUtility(factory, IRendererGlobalsFactory)
         self.action(IRendererGlobalsFactory, register)
 
-    @config_method
+    #@config_method
     def set_locale_negotiator(self, negotiator):
         """
         Set the :term:`locale negotiator` for this application.  The
@@ -1882,7 +1868,7 @@ class Configurator(object):
             self.registry.registerUtility(negotiator, ILocaleNegotiator)
         self.action(ILocaleNegotiator, register)
 
-    @config_method
+    #@config_method
     def set_default_permission(self, permission):
         """
         Set the default permission to be used by all subsequent
@@ -1913,7 +1899,7 @@ class Configurator(object):
         self.registry.registerUtility(permission, IDefaultPermission)
         self.action(IDefaultPermission, None)
 
-    @config_method
+    #@config_method
     def set_session_factory(self, session_factory):
         """
         Configure the application with a :term:`session factory`.  If
@@ -1924,7 +1910,7 @@ class Configurator(object):
             self.registry.registerUtility(session_factory, ISessionFactory)
         self.action(ISessionFactory, register)
 
-    @config_method
+    #@config_method
     def add_translation_dirs(self, *specs):
         """ Add one or more :term:`translation directory` paths to the
         current configuration state.  The ``specs`` argument is a
@@ -1959,7 +1945,7 @@ class Configurator(object):
                 self.registry.registerUtility(tdirs, ITranslationDirectories)
 
             tdirs.insert(0, directory)
-            self.action(('tdir', directory), None)
+            # XXX no action?
 
         if specs:
 

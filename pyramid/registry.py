@@ -25,7 +25,6 @@ class Registry(Components, dict):
     # to notify them
     has_listeners = False
     _settings = None
-    autocommit = False
     _ctx = None
 
     def registerSubscriptionAdapter(self, *arg, **kw):
