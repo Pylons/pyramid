@@ -977,8 +977,7 @@ The above exception view names the ``route_name`` of ``home``, meaning
 that it will only be called when the route matched has a name of
 ``home``.  You can therefore have more than one exception view for any
 given exception in the system: the "most specific" one will be called
-when the set of request circumstances which match the view
-registration.
+when the set of request circumstances match the view registration.
 
 The only view predicate that cannot be not be used successfully when
 creating an exception view configuration is ``name``.  The name used
