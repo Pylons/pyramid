@@ -1110,7 +1110,7 @@ response, or if you use the ``render_template_*`` templating APIs, the UTF-8
 charset is set automatically as the default via the ``Content-Type`` header.
 If you return a ``Content-Type`` header without an explicit charset, a request
 will add a ``;charset=utf-8`` trailer to the ``Content-Type`` header value for
-you for response content types that are textual (e.g. ``text/html``,
+you, for response content types that are textual (e.g. ``text/html``,
 ``application/xml``, etc) as it is rendered.  If you are using your own
 response object, you will need to ensure you do this yourself.
 
