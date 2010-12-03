@@ -986,9 +986,9 @@ exception views which have a name will be ignored.
 
 .. note::
 
-  Normal (non-exception) views registered against a context which
+  Normal (i.e., non-exception) views registered against a context which
   inherits from :exc:`Exception` will work normally.  When an
-  exception view configuraton is processed, *two* views are
+  exception view configuration is processed, *two* views are
   registered.  One as a "normal" view, the other as an "exception"
   view.  This means that you can use an exception as ``context`` for a
   normal view.
