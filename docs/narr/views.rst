@@ -1016,17 +1016,17 @@ implementations, and handling form submission data is a property of
 the request implementation.  Understanding WebOb's request API is the
 key to understanding how to process form submission data.
 
-There are some defaults that you need to be aware of when trying to handle form
-submission data in a :app:`Pyramid` view.  Because having high-order
-(non-ASCII) characters in data contained within form submissions is exceedingly
-common, and because the UTF-8 encoding is the most common encoding used on the
-web for non-ASCII character data, and because working and storing Unicode
-values is much saner than working with and storing bytestrings, :app:`Pyramid`
+There are some defaults that you need to be aware of when trying to
+handle form submission data in a :app:`Pyramid` view.  Having high-order
+(i.e., non-ASCII) characters in data contained within form submissions
+is exceedingly common, and the UTF-8 encoding is the most common
+encoding used on the web for character data. Since Unicode values are
+much saner than working with and storing bytestrings, :app:`Pyramid`
 configures the :term:`WebOb` request machinery to attempt to decode form
-submission values into Unicode from the UTF-8 character set implicitly.  This
-implicit decoding happens when view code obtains form field values via the
-``request.params``, ``request.GET``, or ``request.POST`` APIs (see
-:ref:`request_module` for details about these APIs).
+submission values into Unicode from UTF-8 implicitly.
+This implicit decoding happens when view code obtains form field values
+via the ``request.params``, ``request.GET``, or ``request.POST`` APIs
+(see :ref:`request_module` for details about these APIs).
 
 For example, let's assume that the following form page is served up to
 a browser client, and its ``action`` points at some :app:`Pyramid`
