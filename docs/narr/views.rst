@@ -1028,6 +1028,17 @@ This implicit decoding happens when view code obtains form field values
 via the ``request.params``, ``request.GET``, or ``request.POST`` APIs
 (see :ref:`request_module` for details about these APIs).
 
+.. note::
+   Many people find the difference between Unicode and UTF-8 confusing.
+   Unicode is a standard for representing text that supports most of
+   the world's writing systems. However, there are many ways that Unicode
+   data can be encoded into bytes for transmittal and storage. UTF-8
+   is a specific encoding for Unicode, that is backwards-compatible
+   with ASCII. This makes UTF-8 very convenient for encoding data
+   where a large subset of that data is ASCII characters, which is
+   largely true on the web. UTF-8 is also the standard character 
+   encoding for URLs.
+
 For example, let's assume that the following form page is served up to
 a browser client, and its ``action`` points at some :app:`Pyramid`
 view code:
