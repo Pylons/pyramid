@@ -1117,7 +1117,7 @@ response object, you will need to ensure you do this yourself.
 .. note:: Only the *values* of request params obtained via
    ``request.params``, ``request.GET`` or ``request.POST`` are decoded
    to Unicode objects implicitly in the :app:`Pyramid` default
-   configuration.  The keys are still strings.
+   configuration.  The keys are still (byte) strings.
 
 .. index::
    single: view configuration
