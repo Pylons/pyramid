@@ -1,14 +1,16 @@
+import inspect
 import os
 import re
 import sys
 import threading
-import inspect
 
 import venusian
 
 from translationstring import ChameleonTranslate
 
 from zope.configuration import xmlconfig
+from zope.configuration.config import GroupingContextDecorator
+from zope.configuration.config import GroupingStackItem
 
 from zope.interface import Interface
 from zope.interface import implementedBy
@@ -98,15 +100,15 @@ if chameleon_text:
 if chameleon_zpt:
     DEFAULT_RENDERERS += (('.txt', chameleon_text.renderer_factory),)
 
-def config_method(wrapped):
-    def wrapper(self, *arg, **kw):
-        result = wrapped(self, *arg, **kw)
-        if self.registry.autocommit:
-            self.commit()
-        return result
-    wrapper.__doc__ = wrapped.__doc__
-    wrapper.__name__ = wrapped.__name__
-    return wrapper
+## def config_method(wrapped):
+##     def wrapper(self, *arg, **kw):
+##         result = wrapped(self, *arg, **kw)
+##         if self.registry.autocommit:
+##             self.commit()
+##         return result
+##     wrapper.__doc__ = wrapped.__doc__
+##     wrapper.__name__ = wrapped.__name__
+##     return wrapper
 
 class Configurator(object):
     """
@@ -707,6 +709,42 @@ class Configurator(object):
             lock.release()
             self.manager.pop()
         return registry
+
+    def include(self, *funcs):
+        """ Include one or more configuration callables.  A configuration
+        callable should be a callable that accepts a single argument named
+        ``config``, which will be an instance of a :term:`Configurator`.  (be
+        warned that it will not be the same configurator instance on which
+        you call this method, however).  The code which runs as the result of
+        calling the callable should invoke methods on the configurator which
+        add configuration state.  The return value of a callable will be
+        ignored.
+
+        Values allowed to be presented via the ``*funcs`` argument to this
+        method: any callable Python object or any :term:`dotted Python name`
+        which resolves to a callable Python object.
+        """
+        sourcefiles = []
+
+        for func in funcs:
+            func = self.maybe_dotted(func)
+            sourcefile = inspect.getsourcefile(func)
+            module = inspect.getmodule(func)
+            sourcefiles.append((sourcefile, func, module))
+
+        sourcefiles.sort()
+
+        _context = self.registry.ctx
+
+        for filename, func, module in sourcefiles:
+            context = GroupingContextDecorator(_context)
+            context.basepath = os.path.dirname(filename)
+            context.includepath = _context.includepath + (filename,)
+            self.registry.ctx = context
+            try:
+                func(self.with_package(module))
+            finally:
+                self.registry.ctx = _context
 
     def add_handler(self, route_name, pattern, handler, action=None, **kw):
 
@@ -1674,6 +1712,8 @@ class Configurator(object):
         # as a name
         if not name: 
             name = ''
+        # we need to register renderers eagerly because they are used during
+        # view configuration
         self.registry.registerUtility(
             factory, IRendererFactory, name=name, info=self.ctx_info())
         self.action((IRendererFactory, name), None)

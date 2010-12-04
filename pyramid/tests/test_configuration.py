@@ -651,6 +651,40 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(dummylock.acquired, True)
         self.assertEqual(dummylock.released, True)
 
+    def test_include_with_dotted_name(self):
+        from pyramid import tests
+        import os
+        here = os.path.dirname(__file__)
+        fname = os.path.join(here, 'test_configuration.py')
+        config = self._makeOne()
+        context_before = config.registry.ctx
+        config.include('pyramid.tests.test_configuration.dummy_include')
+        context_after = config.registry.ctx
+        self.assertEqual(
+            context_after.actions,
+            [('discrim', None, tests, {},(fname,))]
+            )
+        self.assertEqual(context_after.basepath, None)
+        self.assertEqual(context_after.includepath, ())
+        self.failUnless(context_after is context_before)
+
+    def test_include_with_python_callable(self):
+        from pyramid import tests
+        import os
+        here = os.path.dirname(__file__)
+        fname = os.path.join(here, 'test_configuration.py')
+        config = self._makeOne()
+        context_before = config.registry.ctx
+        config.include(dummy_include)
+        context_after = config.registry.ctx
+        self.assertEqual(
+            context_after.actions,
+            [('discrim', None, tests, {},(fname,))]
+            )
+        self.assertEqual(context_after.basepath, None)
+        self.assertEqual(context_after.includepath, ())
+        self.failUnless(context_after is context_before)
+
     def test_add_view_view_callable_None_no_renderer(self):
         from pyramid.exceptions import ConfigurationError
         config = self._makeOne()
@@ -4700,3 +4734,6 @@ class DummyHandler(object): # pragma: no cover
     def action2(self):
         return 'response 2'
 
+def dummy_include(config):
+    config.action('discrim', None, config.package)
+    

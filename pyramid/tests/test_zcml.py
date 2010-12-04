@@ -841,8 +841,7 @@ class TestZCMLScanDirective(unittest.TestCase):
 
     def test_it(self):
         dummy_module = DummyModule()
-        def foo():
-            pass
+        def foo(): pass
         def bar(scanner, name, ob):
             dummy_module.scanned = True
         foo.__venusian_callbacks__ = {'pyramid':[bar]}
