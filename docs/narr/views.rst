@@ -1868,5 +1868,5 @@ misconfiguration.  To debug these errors, use the
 configuration file setting.  Details of why a view was not found will
 be printed to ``stderr``, and the browser representation of the error
 will include the same information.  See :ref:`environment_chapter` for
-more information about how and where to set these values.
+more information about how, and where to set these values.
 
