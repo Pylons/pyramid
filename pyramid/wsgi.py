@@ -34,7 +34,7 @@ def wsgiapp(wrapped):
     application to a :term:`Response` and return it to
     :app:`Pyramid` as if the WSGI app were a :mod:`pyramid`
     view.
-    
+
     """
     def decorator(context, request):
         return request.get_response(wrapped)
@@ -74,7 +74,7 @@ def wsgiapp2(wrapped):
     the WSGI app were a :app:`Pyramid` view.  The ``SCRIPT_NAME``
     and ``PATH_INFO`` values present in the WSGI environment are fixed
     up before the application is invoked.  """
-    
+
     def decorator(context, request):
         traversed = request.traversed
         vroot_path = request.virtual_root_path or ()
@@ -94,4 +94,3 @@ def wsgiapp2(wrapped):
         request.environ['SCRIPT_NAME'] = script_name
         return request.get_response(wrapped)
     return wraps(wrapped)(decorator) # grokkability
-
