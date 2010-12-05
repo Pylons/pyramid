@@ -1264,6 +1264,10 @@ Non-Predicate Arguments
 Predicate Arguments
 +++++++++++++++++++
 
+These arguments modify view lookup behavior. In general, the more
+predicate arguments that are supplied, the more specific, and narrower
+the usage of the configured view.
+
 ``name``
   The :term:`view name` required to match this view callable.  Read
   :ref:`traversal_chapter` to understand the concept of a view name.
