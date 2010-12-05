@@ -1628,7 +1628,7 @@ When the decorator is used against a class method, a view is
 registered for the *class*, so the class constructor must accept an
 argument list in one of two forms: either it must accept a single
 argument ``request`` or it must accept two arguments, ``context,
-request`` as per :ref:`request_and_context_view_definitions`.
+request``.
 
 The method which is decorated must return a :term:`response` or it
 must rely on a :term:`renderer` to generate one.
