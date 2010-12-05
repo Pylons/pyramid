@@ -1293,9 +1293,9 @@ the usage of the configured view.
   This value must match the ``name`` of a :term:`route configuration`
   declaration (see :ref:`urldispatch_chapter`) that must match before
   this view will be called.  Note that the ``route`` configuration
-  referred to by ``route_name`` usually has a ``*traverse`` token in
-  the value of its ``pattern``, representing a part of the path that will
-  be used by :term:`traversal` against the result of the route's
+  referred to by ``route_name`` will usually have a ``*traverse`` token
+  in the value of its ``pattern``, representing a part of the path that
+  will be used by :term:`traversal` against the result of the route's
   :term:`root factory`.
 
   If ``route_name`` is not supplied, the view callable will be have a
