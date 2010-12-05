@@ -19,12 +19,12 @@ an ``__init__.py`` file.  Even if empty, this marks a directory as a Python
 package.  We use ``__init__.py`` both as a package marker and to contain
 configuration code.
 
-When you run the application using the ``paster`` command using the
-``development.ini`` generated config file, the application configuration
-points at an Setuptools *entry point* described as ``egg:tutorial#app``.  In
-our application, because the application's ``setup.py`` file says so, this
-entry point happens to be the ``app`` function within the file named
-``__init__.py``:
+The generated ``development.ini`` file is read by ``paster`` which looks for
+the application module in the ``use`` variable of the ``app:tutorial``
+section. The *entry point* is defined in the Setuptools configuration of this
+module, specifically in the ``setup.py`` file. For this tutorial, the *entry
+point* is defined as ``tutorial:main`` and points to the following ``main``
+function:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :linenos:
