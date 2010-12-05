@@ -1342,9 +1342,10 @@ the usage of the configured view.
 
 ``containment``
   This value should be a reference to a Python class or
-  :term:`interface` that a parent object in the :term:`lineage` must
-  provide in order for this view to be found and called.  The nodes in
-  your object graph must be "location-aware" to use this feature.
+  :term:`interface` that a parent object in the context's
+  :term:`lineage` must provide in order for this view to be found and
+  called.  The nodes in your object graph must be "location-aware" to
+  use this feature.
 
   If ``containment`` is not supplied, the interfaces and classes in
   the lineage are not considered when deciding whether or not to
@@ -1503,8 +1504,8 @@ All arguments to ``view_config`` may be omitted.  For example:
 Such a registration as the one directly above implies that the view
 name will be ``my_view``, registered with a ``context`` argument that
 matches any model type, using no permission, registered against
-requests with any request method / request type / request param /
-route name / containment.
+requests with any request method, request type, request param,
+route name, or containment.
 
 The mere existence of a ``@view_config`` decorator doesn't suffice to perform
 view configuration.  To make :app:`Pyramid` process your
