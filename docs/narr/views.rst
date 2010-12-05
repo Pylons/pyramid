@@ -1507,8 +1507,10 @@ matches any model type, using no permission, registered against
 requests with any request method, request type, request param,
 route name, or containment.
 
-The mere existence of a ``@view_config`` decorator doesn't suffice to perform
-view configuration.  To make :app:`Pyramid` process your
+The mere existence of a ``@view_config`` decorator doesn't suffice to
+perform view configuration.  All that the decorator does is "annotate"
+the function with your configuration declarations, it doesn't process
+them. To make :app:`Pyramid` process your
 :class:`pyramid.view.view_config` declarations, you *must* do use the
 ``scan`` method of a :class:`pyramid.configuration.Configurator`:
 
