@@ -1821,7 +1821,7 @@ View Lookup and Invocation
 finding an invoking a :term:`view callable`.  The view lookup
 subsystem is passed a :term:`context`, a :term:`view name`, and the
 :term:`request` object.  These three bits of information are referred
-to within this chapter as a :term:`triad`.
+to within this chapter as the :term:`triad`.
 
 :term:`View configuration` information stored within in the
 :term:`application registry` is compared against a triad by the view
