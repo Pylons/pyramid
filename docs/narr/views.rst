@@ -1767,11 +1767,13 @@ Any time a model that is determined to be the :term:`context` provides this
 interface, and a view named ``hello.html`` is looked up against it as per the
 URL, the ``mypackage.views.hello_world`` view callable will be invoked.
 
-Note that views registered against a model class take precedence over views
-registered for any interface the model class implements when an ambiguity
-arises.  If a view is registered for both the class type of the context and
-an interface implemented by the context's class, the view registered for the
-context's class will "win".
+Note, in cases where a view is registered against a model class, and a
+view is also registered against an interface that the model class
+implements, an ambiguity arises. Views registered for the model class
+take precedence over any views registered for any interface the model
+class implements. Thus, if a view is registered for both the class type
+of the context and an interface implemented by the context's class, the
+view registered for the context's class will "win".
 
 For more information about defining models with interfaces for use within
 view configuration, see :ref:`models_which_implement_interfaces`.
