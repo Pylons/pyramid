@@ -1276,7 +1276,7 @@ the usage of the configured view.
   default view).
 
 ``context``
-  An object representing Python class that the :term:`context` must be
+  An object representing a Python class that the :term:`context` must be
   an instance of, *or* the :term:`interface` that the :term:`context`
   must provide in order for this view to be found and called.  This
   predicate is true when the :term:`context` is an instance of the
