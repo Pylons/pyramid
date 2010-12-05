@@ -1846,7 +1846,7 @@ view is found, or no view can be matched up with the request.  The
 first view with a set of predicates all of which match the request
 environment will be invoked.
 
-If no view can be found which has predicates which allow it to be
+If no view can be found with predicates which allow it to be
 matched up with the request, :app:`Pyramid` will return an error to
 the user's browser, representing a "not found" (404) page.  See
 :ref:`changing_the_notfound_view` for more information about changing
