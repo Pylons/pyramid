@@ -1299,8 +1299,9 @@ the usage of the configured view.
   :term:`root factory`.
 
   If ``route_name`` is not supplied, the view callable will be have a
-  chance of being invoked for when the :term:`triad` includes a
-  request object that does not indicate it matched a route.
+  chance of being invoked if no other route was matched. This is when
+  the request object of the :term:`triad` does not indicate it matched
+  any configured route.
 
 ``request_type``
   This value should be an :term:`interface` that the :term:`request`
