@@ -1803,11 +1803,11 @@ permission in a view configuration using
    config.add_view('myproject.views.add_entry', name='add.html',
                    context='myproject.models.IBlog', permission='add')
 
-When an authentication policy is enabled, this view will be protected with
-the ``add`` permission.  The view will *not be called* if the user does not
-possess the ``add`` permission relative to the current :term:`context` and an
-authorization policy is enabled.  Instead the :term:`forbidden view` result
-will be returned to the client as per :ref:`protecting_views`.
+When an :term:`authorization policy` is enabled, this view will be
+protected with the ``add`` permission.  The view will *not be called* if
+the user does not possess the ``add`` permission relative to the current
+:term:`context`.  Instead the :term:`forbidden view` result will be
+returned to the client as per :ref:`protecting_views`.
 
 .. index::
    single: view lookup
