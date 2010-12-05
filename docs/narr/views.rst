@@ -1747,12 +1747,12 @@ in such a way that the interface is attached to it.
        alsoProvides(hello, IHello)
        return hello
 
-Regardless of how you associate an interface with a model instance or a model
+Regardless of how you associate an interface, with a model instance, or a model
 class, the resulting code to associate that interface with a view callable is
 the same.  Assuming the above code that defines an ``IHello`` interface lives
 in the root of your application, and its module is named "models.py", the
-below interface declaration will associate the
-``mypackage.views.hello_world`` view with models that implement (aka provide)
+interface declaration below will associate the
+``mypackage.views.hello_world`` view with models that implement, or provide,
 this interface.
 
 .. code-block:: python
