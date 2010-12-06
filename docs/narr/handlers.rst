@@ -169,7 +169,7 @@ Action Decorator
 ----------------
 
 The :class:`~pyramid.view.action` decorator registers view configuration
-information on the handler method which is used by
+information on the handler method, which is used by
 :meth:`~pyramid.configuration.Configurator.add_handler` to setup the view
 configuration.
 
@@ -204,10 +204,11 @@ Example:
 This will register two views that require the ``action`` to be ``index``, with
 the additional view predicate requiring a specific request method.
 
-When a method is decorated multiple times with :class:`~pyramid.view.action`,
-a view configuration will be registered for each call, with the view callable
-being the method decorated. Used with a combination of ``name``, multiple
-URL's can result in different template renderings with the same data.
+It can be useful to decorate a single method multiple times with
+:class:`~pyramid.view.action`. Each action decorator will register a new view
+for the method. By specifying different names and renderers for each action,
+the same view logic can be exposed and rendered differently on multiple
+URLs.
 
 Example:
 
