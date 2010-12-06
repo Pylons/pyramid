@@ -27,13 +27,13 @@ during configuration.  After the view handler class is instantiated, a
 method on the instance is called. The method which is called depends on
 the view handler configuration.
 
-The :meth:`pyramid.configuration.Configurator.add_handler` method will scan
-the handler class and automatically set up views for methods that are
-auto-exposed or were decorated with :class:`~pyramid.view.action`. The
-:class:`~pyramid.view.action` decorator is used to setup additional view
-configuration information for individual class methods, and can be used
-repeatedly for a single method to register multiple view configurations that
-will call that view callable.
+The :meth:`pyramid.configuration.Configurator.add_handler` method will
+scan the handler class and automatically set up views for methods that
+are auto-exposed, or were decorated with the
+:class:`~pyramid.view.action` decorator. This decorator is used to setup
+additional view configuration information for individual methods of the
+class, and can be used repeatedly for a single view method to
+register multiple view configurations for it.
 
 Here's an example view handler class:
 
