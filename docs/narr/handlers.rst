@@ -19,12 +19,13 @@ predicate` to control which method of the handler is called.
    :term:`url dispatch`.  The concept of a view handler is analogous to a
    "controller" in Pylons 1.0.
 
-The view handler class is initialized by :app:`Pyramid` in the same manner as
-a view class.  Its ``__init__`` is called with a request object (see
-:ref:`class_as_view`) when a request enters the system which corresponds with
-a view handler registration made during configuration. A method of the view
-handler class is then called. The method which is called depends on the view
-handler configuration.
+The view handler class is initialized by :app:`Pyramid` in the same
+manner as a view class.  Its ``__init__`` is called with a request
+object (see :ref:`class_as_view`) as its argument when a request enters
+the system which corresponds with a view handler registration made
+during configuration.  After the view handler class is instantiated, a
+method on the instance is called. The method which is called depends on
+the view handler configuration.
 
 The :meth:`pyramid.configuration.Configurator.add_handler` method will scan
 the handler class and automatically set up views for methods that are
