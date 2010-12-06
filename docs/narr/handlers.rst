@@ -83,10 +83,9 @@ specific ``action`` name:
                        handler=Hello, action='index')
 
 This will result one of the methods that are configured for the ``action`` of
-'index' in the ``Hello`` handler class to be called. Other methods in the
-handler class not named 'index' might be called if they were configured to be
-called when the ``action`` name is 'index' as will be seen below.
-
+'index' in the ``Hello`` handler class to be called. In this case the name
+of the method is the same as the action value: 'index'. However, this
+need not be the case, as we will see below.
 
 Using :meth:`~pyramid.configuration.Configurator.add_handler`
 -------------------------------------------------------------
