@@ -124,19 +124,39 @@ URLs
 
 In addition to these attributes, there are several ways to get the URL
 of the request.  I'll show various values for an example URL
-``http://localhost/app/?id=10``, where the application is mounted at
+``http://localhost/app/blog?id=10``, where the application is mounted at
 ``http://localhost/app``.
 
 ``req.url``:
     The full request URL, with query string, e.g.,
-    ``http://localhost/app/?id=10``
+    ``http://localhost/app/blog?id=10``
+
+``req.host``:
+    The host information in the URL, e.g.,
+    ``localhost``
+
+``req.host_url``:
+    The URL with the host, e.g., ``http://localhost``
 
 ``req.application_url``:
     The URL of the application (just the SCRIPT_NAME portion of the
     path, not PATH_INFO).  E.g., ``http://localhost/app``
 
-``req.host_url``:
-    The URL with the host, e.g., ``http://localhost``
+``req.path_url``:
+    The URL of the application including the PATH_INFO. e.g.,
+    ``http://localhost/app/blog``
+
+``req.path``:
+    The URL including PATH_INFO without the host or scheme. e.g.,
+    ``/app/blog``
+
+``req.path_qs``:
+    The URL including PATH_INFO and the query string. e.g,
+    ``/app/blog?id=10``
+
+``req.query_string``:
+    The query string in the URL, e.g.,
+    ``id=10``
 
 ``req.relative_url(url, to_application=False)``:
     Gives a URL, relative to the current URL.  If ``to_application``
