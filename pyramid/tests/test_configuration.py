@@ -245,43 +245,37 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(result, 'pyramid.tests:templates')
 
     def test_setup_registry_fixed(self):
-        from zope.configuration.config import ConfigurationMachine
         class DummyRegistry(object):
-            ctx = ConfigurationMachine()
             def subscribers(self, events, name):
                 self.events = events
                 return events
-            def reset_context(self):
-                self.context_reset = True
             def registerUtility(self, *arg, **kw):
                 pass
         reg = DummyRegistry()
         config = self._makeOne(reg)
+        old_ctx = config._ctx
         config.add_view = lambda *arg, **kw: False
         config.setup_registry()
         self.assertEqual(reg.has_listeners, True)
         self.assertEqual(reg.notify(1), None)
         self.assertEqual(reg.events, (1,))
-        self.assertEqual(reg.context_reset, True)
+        self.failIf(old_ctx is config._ctx)
 
     def test_setup_registry_registers_default_exceptionresponse_view(self):
         from pyramid.interfaces import IExceptionResponse
         from pyramid.view import default_exceptionresponse_view
-        from zope.configuration.config import ConfigurationMachine
         class DummyRegistry(object):
-            ctx = ConfigurationMachine()
             def registerUtility(self, *arg, **kw):
                 pass
-            def reset_context(self):
-                self.context_reset = True
         reg = DummyRegistry()
         config = self._makeOne(reg)
+        old_ctx = config._ctx
         views = []
         config.add_view = lambda *arg, **kw: views.append((arg, kw))
         config.setup_registry()
         self.assertEqual(views[0], ((default_exceptionresponse_view,),
                                     {'context':IExceptionResponse}))
-        self.assertEqual(reg.context_reset, True)
+        self.failIf(old_ctx is config._ctx)
 
     def test_setup_registry_explicit_notfound_trumps_iexceptionresponse(self):
         from zope.interface import implementedBy
@@ -653,16 +647,15 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_include_with_dotted_name(self):
         from pyramid import tests
-        import os
-        here = os.path.dirname(__file__)
-        fname = os.path.join(here, 'test_configuration.py')
         config = self._makeOne()
-        context_before = config.registry.ctx
+        context_before = config._ctx
         config.include('pyramid.tests.test_configuration.dummy_include')
-        context_after = config.registry.ctx
+        context_after = config._ctx
+        actions = context_after.actions
+        self.assertEqual(len(actions), 1)
         self.assertEqual(
-            context_after.actions,
-            [('discrim', None, tests, {},(fname,))]
+            context_after.actions[0][:3],
+            ('discrim', None, tests),
             )
         self.assertEqual(context_after.basepath, None)
         self.assertEqual(context_after.includepath, ())
@@ -670,16 +663,15 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_include_with_python_callable(self):
         from pyramid import tests
-        import os
-        here = os.path.dirname(__file__)
-        fname = os.path.join(here, 'test_configuration.py')
         config = self._makeOne()
-        context_before = config.registry.ctx
+        context_before = config._ctx
         config.include(dummy_include)
-        context_after = config.registry.ctx
+        context_after = config._ctx
+        actions = context_after.actions
+        self.assertEqual(len(actions), 1)
         self.assertEqual(
-            context_after.actions,
-            [('discrim', None, tests, {},(fname,))]
+            actions[0][:3],
+            ('discrim', None, tests),
             )
         self.assertEqual(context_after.basepath, None)
         self.assertEqual(context_after.includepath, ())
@@ -3441,6 +3433,15 @@ class ConfiguratorTests(unittest.TestCase):
         renderer.assert_(bar=2)
         renderer.assert_(request=request)
 
+    def test_commit_conflict_simple(self):
+        from zope.configuration.config import ConfigurationConflictError
+        config = self._makeOne()
+        def view1(request): pass
+        def view2(request): pass
+        config.add_view(view1)
+        config.add_view(view2)
+        self.assertRaises(ConfigurationConflictError, config.commit)
+
 class Test__map_view(unittest.TestCase):
     def setUp(self):
         from pyramid.registry import Registry
@@ -4735,5 +4736,5 @@ class DummyHandler(object): # pragma: no cover
         return 'response 2'
 
 def dummy_include(config):
-    config.action('discrim', None, config.package)
+    config._action('discrim', None, config.package)
     

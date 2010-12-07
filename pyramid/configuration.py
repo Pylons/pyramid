@@ -3,6 +3,7 @@ import os
 import re
 import sys
 import threading
+import traceback
 
 import venusian
 
@@ -10,7 +11,8 @@ from translationstring import ChameleonTranslate
 
 from zope.configuration import xmlconfig
 from zope.configuration.config import GroupingContextDecorator
-from zope.configuration.config import GroupingStackItem
+from zope.configuration.config import ConfigurationMachine
+from zope.configuration.xmlconfig import registerCommonDirectives
 
 from zope.interface import Interface
 from zope.interface import implementedBy
@@ -236,6 +238,7 @@ class Configurator(object):
                  renderer_globals_factory=None,
                  default_permission=None,
                  session_factory=None,
+                 _ctx=None,
                  ):
         if package is None:
             package = caller_package()
@@ -244,9 +247,14 @@ class Configurator(object):
         self.package_name = name_resolver.package_name
         self.package = name_resolver.package
         self.registry = registry
+        if _ctx is None:
+            _ctx = self._make_context()
+            _ctx.registry = registry
+        self._ctx = _ctx
         if registry is None:
             registry = Registry(self.package_name)
             self.registry = registry
+            _ctx.registry = registry
             self.setup_registry(
                 settings=settings,
                 root_factory=root_factory,
@@ -260,6 +268,12 @@ class Configurator(object):
                 default_permission=default_permission,
                 session_factory=session_factory,
                 )
+
+    def _action(self, discriminator, callable=None, args=(), kw=None, order=0):
+        """ Register an action which will be executed during a commit. """
+        if kw is None:
+            kw = {}
+        self._ctx.action(discriminator, callable, args, kw, order)
 
     def _set_settings(self, mapping):
         settings = Settings(mapping or {})
@@ -277,17 +291,15 @@ class Configurator(object):
         def register():
             self.registry.registerUtility(factory, IRootFactory)
             self.registry.registerUtility(factory, IDefaultRootFactory) # b/c
-        self.action(IRootFactory, register)
+        self._action(IRootFactory, register)
 
     #@config_method
     def _set_authentication_policy(self, policy):
         """ Add a :app:`Pyramid` :term:`authentication policy` to
         the current configuration."""
         policy = self.maybe_dotted(policy)
-        _info = self.ctx_info()
-        self.registry.registerUtility(policy, IAuthenticationPolicy,
-                                      info=_info)
-        self.action(IAuthenticationPolicy, None)
+        self.registry.registerUtility(policy, IAuthenticationPolicy)
+        self._action(IAuthenticationPolicy)
 
     #@config_method
     def _set_authorization_policy(self, policy):
@@ -295,10 +307,8 @@ class Configurator(object):
         the current configuration state (also accepts a :term:`dotted
         Python name`."""
         policy = self.maybe_dotted(policy)
-        _info = self.ctx_info()
-        self.registry.registerUtility(policy, IAuthorizationPolicy,
-                                      info=_info)
-        self.action(IAuthorizationPolicy, None)
+        self.registry.registerUtility(policy, IAuthorizationPolicy)
+        self._action(IAuthorizationPolicy, None)
             
     def _make_spec(self, path_or_spec):
         package, filename = resolve_resource_spec(path_or_spec,
@@ -341,11 +351,10 @@ class Configurator(object):
         override_pkg_name = override_package.__name__
         override = self.registry.queryUtility(
             IPackageOverrides, name=pkg_name)
-        _info = self.ctx_info()
         if override is None:
             override = PackageOverrides(package)
             self.registry.registerUtility(override, IPackageOverrides,
-                                          name=pkg_name, info=_info)
+                                          name=pkg_name)
         override.insert(path, override_pkg_name, override_prefix)
 
     def _set_security_policies(self, authentication, authorization=None):
@@ -374,20 +383,29 @@ class Configurator(object):
         if not hasattr(_registry, 'has_listeners'):
             _registry.has_listeners = True
 
+    def _make_context(self):
+        context = PyramidConfigurationMachine()
+        registerCommonDirectives(context)
+        return context
+
     # API
 
     def commit(self):
         """ Commit pending configuration actions. """
-        self.registry.ctx.execute_actions()
-        self.registry.reset_context()
+        self._ctx.execute_actions()
+        self._ctx = self._make_context()
+        self._ctx.registry = self.registry
 
-    def with_package(self, package):
+    def with_package(self, package, _ctx=None):
         """ Return a new Configurator instance with the same registry
         as this configurator using the package supplied as the
         ``package`` argument to the new configurator.  ``package`` may
         be an actual Python package object or a Python dotted name
         representing a package."""
-        return self.__class__(registry=self.registry, package=package)
+        if _ctx is None:
+            _ctx = self._ctx
+        return self.__class__(registry=self.registry, package=package,
+                              _ctx=_ctx)
 
     def maybe_dotted(self, dotted):
         """ Resolve the :term:`dotted Python name` ``dotted`` to a
@@ -466,7 +484,7 @@ class Configurator(object):
         if session_factory is not None:
             self.set_session_factory(session_factory)
         self.commit()
-
+        
     # getSiteManager is a unit testing dep injection
     def hook_zca(self, getSiteManager=None):
         """ Call :func:`zope.component.getSiteManager.sethook` with
@@ -588,15 +606,6 @@ class Configurator(object):
             renderer = {'name':renderer, 'package':self.package}
         return self._derive_view(view, attr=attr, renderer=renderer)
 
-    def action(self, discriminator, callable, args=(), kw=None, order=0):
-        """ Register an action which will be executed during commit. """
-        if kw is None:
-            kw = {}
-        self.registry.ctx.action(discriminator, callable, args, kw, order)
-
-    def ctx_info(self):
-        return getattr(self.registry.ctx, 'info', '')
-
     #@config_method
     def add_subscriber(self, subscriber, iface=None):
         """Add an event :term:`subscriber` for the event stream
@@ -617,10 +626,9 @@ class Configurator(object):
             iface = (Interface,)
         if not isinstance(iface, (tuple, list)):
             iface = (iface,)
-        info = self.ctx_info()
         def register():
-            self.registry.registerHandler(subscriber, iface, info=info)
-        self.action(None, register)
+            self.registry.registerHandler(subscriber, iface)
+        self._action(None, register)
         return subscriber
 
     def add_settings(self, settings=None, **kw):
@@ -701,7 +709,7 @@ class Configurator(object):
         lock.acquire()
         registry = self.registry
         self.manager.push({'registry':registry, 'request':None})
-        context = registry.ctx
+        context = self._ctx
         try:
             context.package = package
             xmlconfig.file(filename, package, context=context, execute=False)
@@ -734,17 +742,13 @@ class Configurator(object):
 
         sourcefiles.sort()
 
-        _context = self.registry.ctx
+        _context = self._ctx
 
         for filename, func, module in sourcefiles:
             context = GroupingContextDecorator(_context)
             context.basepath = os.path.dirname(filename)
             context.includepath = _context.includepath + (filename,)
-            self.registry.ctx = context
-            try:
-                func(self.with_package(module))
-            finally:
-                self.registry.ctx = _context
+            func(self.with_package(module, _ctx=context))
 
     def add_handler(self, route_name, pattern, handler, action=None, **kw):
 
@@ -1111,7 +1115,7 @@ class Configurator(object):
           ``True``, the associated view callable will be considered
           viable for a given request.
 
-          """
+        """
         view = self.maybe_dotted(view)
         context = self.maybe_dotted(context)
         for_ = self.maybe_dotted(for_)
@@ -1172,8 +1176,6 @@ class Configurator(object):
         if not IInterface.providedBy(r_context):
             r_context = implementedBy(r_context)
 
-        _info = self.ctx_info()
-
         def register(permission=permission):
 
             if permission is None:
@@ -1222,13 +1224,13 @@ class Configurator(object):
                     view_iface = IView
                 self.registry.registerAdapter(
                     derived_view,
-                    (IViewClassifier, request_iface, context),
-                    view_iface, name, info=_info)
+                    (IViewClassifier, request_iface, context), view_iface, name
+                    )
                 if isexc:
                     self.registry.registerAdapter(
                         derived_view,
                         (IExceptionViewClassifier, request_iface, context),
-                        view_iface, name, info=_info)
+                        view_iface, name)
 
             is_multiview = IMultiView.providedBy(old_view)
             old_phash = getattr(old_view, '__phash__', DEFAULT_PHASH)
@@ -1274,12 +1276,12 @@ class Configurator(object):
                 self.registry.registerAdapter(
                     multiview,
                     (IViewClassifier, request_iface, context),
-                    IMultiView, name=name, info=_info)
+                    IMultiView, name=name)
                 if isexc:
                     self.registry.registerAdapter(
                         multiview,
                         (IExceptionViewClassifier, request_iface, context),
-                        IMultiView, name=name, info=_info)
+                        IMultiView, name=name)
 
         discriminator = [
             'view', context, name, request_type, IView, containment,
@@ -1287,7 +1289,7 @@ class Configurator(object):
             xhr, accept, header, path_info]
         discriminator.extend(sorted(custom_predicates))
         discriminator = tuple(discriminator)
-        self.action(discriminator, register)
+        self._action(discriminator, register)
 
     #@config_method
     def add_route(self,
@@ -1313,7 +1315,8 @@ class Configurator(object):
                   view_attr=None,
                   use_global_views=False,
                   path=None,
-                  pregenerator=None):
+                  pregenerator=None,
+                  ):
         """ Add a :term:`route configuration` to the current
         configuration state, as well as possibly a :term:`view
         configuration` to be used to specify a :term:`view callable`
@@ -1636,7 +1639,7 @@ class Configurator(object):
         discriminator.extend(sorted(custom_predicates))
         discriminator = tuple(discriminator)
 
-        self.action(discriminator, None)
+        self._action(discriminator, None)
 
         return mapper.connect(name, pattern, factory, predicates=predicates,
                               pregenerator=pregenerator)
@@ -1714,9 +1717,8 @@ class Configurator(object):
             name = ''
         # we need to register renderers eagerly because they are used during
         # view configuration
-        self.registry.registerUtility(
-            factory, IRendererFactory, name=name, info=self.ctx_info())
-        self.action((IRendererFactory, name), None)
+        self.registry.registerUtility(factory, IRendererFactory, name=name)
+        self._action((IRendererFactory, name), None)
 
     #@config_method
     def override_resource(self, to_override, override_with, _override=None):
@@ -1764,7 +1766,7 @@ class Configurator(object):
             from_package = sys.modules[package]
             to_package = sys.modules[override_package]
             override(from_package, path, to_package, override_prefix)
-        self.action(None, register)
+        self._action(None, register)
 
     def set_forbidden_view(self, view=None, attr=None, renderer=None,
                            wrapper=None):
@@ -1857,7 +1859,7 @@ class Configurator(object):
         factory = self.maybe_dotted(factory)
         def register():
             self.registry.registerUtility(factory, IRequestFactory)
-        self.action(IRequestFactory, register)
+        self._action(IRequestFactory, register)
 
     #@config_method
     def set_renderer_globals_factory(self, factory):
@@ -1881,7 +1883,7 @@ class Configurator(object):
         factory = self.maybe_dotted(factory)
         def register():
             self.registry.registerUtility(factory, IRendererGlobalsFactory)
-        self.action(IRendererGlobalsFactory, register)
+        self._action(IRendererGlobalsFactory, register)
 
     #@config_method
     def set_locale_negotiator(self, negotiator):
@@ -1905,7 +1907,7 @@ class Configurator(object):
         negotiator = self.maybe_dotted(negotiator)
         def register():
             self.registry.registerUtility(negotiator, ILocaleNegotiator)
-        self.action(ILocaleNegotiator, register)
+        self._action(ILocaleNegotiator, register)
 
     #@config_method
     def set_default_permission(self, permission):
@@ -1936,7 +1938,7 @@ class Configurator(object):
         """
         # default permission used during view registration
         self.registry.registerUtility(permission, IDefaultPermission)
-        self.action(IDefaultPermission, None)
+        self._action(IDefaultPermission, None)
 
     #@config_method
     def set_session_factory(self, session_factory):
@@ -1947,7 +1949,7 @@ class Configurator(object):
         """
         def register():
             self.registry.registerUtility(session_factory, ISessionFactory)
-        self.action(ISessionFactory, register)
+        self._action(ISessionFactory, register)
 
     #@config_method
     def add_translation_dirs(self, *specs):
@@ -2860,4 +2862,33 @@ class ActionPredicate(object):
         # allow this predicate's phash to be compared as equal to
         # others that share the same action name
         return hash(self.action)
+
+class PyramidConfigurationMachine(ConfigurationMachine):
+    def action(self, discriminator, callable, args=(), kw=None, order=0):
+        if kw is None:
+            kw = {}
+
+        includepath = getattr(self, 'includepath', ())
+        info = getattr(self, 'info', None)
+        if not info:
+            info = self._extract_stack()
+
+        action = (discriminator, callable, args, kw,
+                  includepath,
+                  info,
+                  order,
+                  )
+
+        # remove trailing false items
+        while (len(action) > 2) and not action[-1]:
+            action = action[:-1]
+
+        self.actions.append(action)
+
+    def _extract_stack(self):
+        try:
+            f = traceback.extract_stack(limit=5)
+            return f[0]
+        except:
+            return ''
 

@@ -1,9 +1,6 @@
 from zope.component.registry import Components
-from zope.configuration.config import ConfigurationMachine
-from zope.configuration.xmlconfig import registerCommonDirectives
 
 from pyramid.interfaces import ISettings
-from pyramid.decorator import reify
 
 class Registry(Components, dict):
     """ A registry object is an :term:`application registry`.  The existence
@@ -25,7 +22,6 @@ class Registry(Components, dict):
     # to notify them
     has_listeners = False
     _settings = None
-    _ctx = None
 
     def registerSubscriptionAdapter(self, *arg, **kw):
         result = Components.registerSubscriptionAdapter(self, *arg, **kw)
@@ -52,16 +48,5 @@ class Registry(Components, dict):
         self._settings = settings
 
     settings = property(_get_settings, _set_settings)
-
-    def reset_context(self):
-        context = ConfigurationMachine()
-        registerCommonDirectives(context)
-        context.registry = self # circdep
-        self.ctx = context
-        return context
-
-    @reify
-    def ctx(self):
-        return self.reset_context()
 
 global_registry = Registry('global')

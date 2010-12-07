@@ -174,7 +174,7 @@ def view(
 
     context = context or for_
 
-    config = Configurator(reg, package=_context.package)
+    config = Configurator(reg, package=_context.package, _ctx=_context)
     config.add_view(
         permission=permission, context=context, view=view, name=name,
         request_type=request_type, route_name=route_name,
@@ -278,7 +278,7 @@ def route(_context,
     if pattern is None:
         raise ConfigurationError('route directive must include a "pattern"')
 
-    config = Configurator(reg, package=_context.package)
+    config = Configurator(reg, package=_context.package, _ctx=_context)
     config.add_route(
         name,
         pattern,
@@ -331,7 +331,7 @@ def notfound(_context,
         reg = _context.registry
     except AttributeError: # pragma: no cover (b/c)
         reg = get_current_registry()
-    config = Configurator(reg, package=_context.package)
+    config = Configurator(reg, package=_context.package, _ctx=_context)
     config.set_notfound_view(view=view, attr=attr, renderer=renderer,
                              wrapper=wrapper)
 
@@ -346,7 +346,7 @@ def forbidden(_context,
         reg = _context.registry
     except AttributeError: # pragma: no cover (b/c)
         reg = get_current_registry()
-    config = Configurator(reg, package=_context.package)
+    config = Configurator(reg, package=_context.package, _ctx=_context)
     config.set_forbidden_view(view=view, attr=attr, renderer=renderer,
                              wrapper=wrapper)
 
@@ -371,7 +371,7 @@ def resource(_context, to_override, override_with, _override=None):
     except AttributeError: # pragma: no cover (b/c)
         reg = get_current_registry()
 
-    config = Configurator(reg, package=_context.package)
+    config = Configurator(reg, package=_context.package, _ctx=_context)
     config.override_resource(to_override, override_with, _override=_override)
 
 class IRepozeWho1AuthenticationPolicyDirective(Interface):
@@ -389,7 +389,7 @@ def repozewho1authenticationpolicy(_context, identifier_name='auth_tkt',
         reg = _context.registry
     except AttributeError: # pragma: no cover (b/c)
         reg = get_current_registry()
-    config = Configurator(reg, package=_context.package)
+    config = Configurator(reg, package=_context.package, _ctx=_context)
     config._set_authentication_policy(policy)
 
 class IRemoteUserAuthenticationPolicyDirective(Interface):
@@ -407,7 +407,7 @@ def remoteuserauthenticationpolicy(_context, environ_key='REMOTE_USER',
         reg = _context.registry
     except AttributeError: # pragma: no cover (b/c)
         reg = get_current_registry()
-    config = Configurator(reg, package=_context.package)
+    config = Configurator(reg, package=_context.package, _ctx=_context)
     config._set_authentication_policy(policy)
 
 class IAuthTktAuthenticationPolicyDirective(Interface):
@@ -453,7 +453,7 @@ def authtktauthenticationpolicy(_context,
         reg = _context.registry
     except AttributeError: # pragma: no cover (b/c)
         reg = get_current_registry()
-    config = Configurator(reg, package=_context.package)
+    config = Configurator(reg, package=_context.package, _ctx=_context)
     config._set_authentication_policy(policy)
 
 class IACLAuthorizationPolicyDirective(Interface):
@@ -467,7 +467,7 @@ def aclauthorizationpolicy(_context):
         reg = _context.registry
     except AttributeError: # pragma: no cover (b/c)
         reg = get_current_registry()
-    config = Configurator(reg, package=_context.package)
+    config = Configurator(reg, package=_context.package, _ctx=_context)
     config._set_authorization_policy(policy)
 
 class IRendererDirective(Interface):
@@ -486,7 +486,7 @@ def renderer(_context, factory, name=''):
         reg = _context.registry
     except AttributeError: # pragma: no cover (b/c)
         reg = get_current_registry()
-    config = Configurator(reg, package=_context.package)
+    config = Configurator(reg, package=_context.package, _ctx=_context)
     config.add_renderer(name, factory)
 
 class IStaticDirective(Interface):
@@ -521,7 +521,7 @@ def static(_context, name, path, cache_max_age=3600,
         reg = _context.registry
     except AttributeError: # pragma: no cover (b/c)
         reg = get_current_registry()
-    config = Configurator(reg, package=_context.package)
+    config = Configurator(reg, package=_context.package, _ctx=_context)
     config.add_static_view(name, path, cache_max_age=cache_max_age,
                            permission=permission)
 
@@ -536,7 +536,7 @@ def scan(_context, package):
         reg = _context.registry
     except AttributeError: # pragma: no cover (b/c)
         reg = get_current_registry()
-    config = Configurator(reg, package=_context.package)
+    config = Configurator(reg, package=_context.package, _ctx=_context)
     config.scan(package)
 
 class ITranslationDirDirective(Interface):
@@ -553,7 +553,7 @@ def translationdir(_context, dir):
     except AttributeError: # pragma: no cover (b/c)
         reg = get_current_registry()
 
-    config = Configurator(reg, package=_context.package)
+    config = Configurator(reg, package=_context.package, _ctx=_context)
     config.add_translation_dirs(path)
 
 class ILocaleNegotiatorDirective(Interface):
@@ -568,7 +568,7 @@ def localenegotiator(_context, negotiator):
         reg = _context.registry
     except AttributeError: # pragma: no cover (b/c)
         reg = get_current_registry()
-    config = Configurator(reg, package=_context.package)
+    config = Configurator(reg, package=_context.package, _ctx=_context)
     config.set_locale_negotiator(negotiator)
 
 class IAdapterDirective(Interface):
@@ -712,7 +712,8 @@ def subscriber(_context, for_=None, factory=None, handler=None, provides=None):
     except AttributeError: # pragma: no cover (b/c)
         registry = get_current_registry()
         
-    config = Configurator(registry=registry, package=_context.package)
+    config = Configurator(registry=registry, package=_context.package,
+                          _ctx=_context)
 
     if handler is not None:
         config.add_subscriber(handler, for_)
@@ -802,7 +803,7 @@ def default_permission(_context, name):
         reg = _context.registry
     except AttributeError: # pragma: no cover (b/c)
         reg = get_current_registry()
-    config = Configurator(reg, package=_context.package)
+    config = Configurator(reg, package=_context.package, _ctx=_context)
     config.set_default_permission(name)
 
 def path_spec(context, path):
