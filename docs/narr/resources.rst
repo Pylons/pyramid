@@ -114,40 +114,6 @@ following kinds of resources defined in any Python package:
 - Any other resource (or set of resources) addressed by code that uses
   the setuptools :term:`pkg_resources` API.
 
-Usually, overriding a resource in an existing application means
-performing the following steps:
-
-- Create a new Python package.  The easiest way to do this is to
-  create a new :app:`Pyramid` application using the "paster"
-  template mechanism.  See :ref:`creating_a_project` for more
-  information.
-
-- Install the new package into the same Python environment as the
-  original application (e.g. ``python setup.py develop`` or ``python
-  setup.py install``).
-
-- Change the ``configure.zcml`` in the new package to include one or
-  more ``resource`` ZCML directives (see :ref:`resource_directive`
-  below).  The new package's ``configure.zcml`` should then include
-  the original :app:`Pyramid` application's ``configure.zcml`` via
-  an include statement, e.g.  ``<include
-  package="theoriginalpackage"/>``.
-
-- Add override resources to the package as necessary.
-
-- Change the Paste ``.ini`` file that starts up the original
-  application.  Add a ``configure_zcml`` statement within the
-  application's section in the file which points at your *new*
-  package's ``configure.zcml`` file.  See :ref:`environment_chapter`
-  for more information about this setting.
-
-Note that overriding resources is not the only way to extend or modify
-the behavior of an existing :app:`Pyramid` application.  A "heavier
-hammer" way to do the same thing is explained in
-:ref:`extending_chapter`.  The heavier hammer way allows you to
-replace a :term:`view` wholesale rather than resources that might be
-used by a view.
-
 .. index::
    single: override_resource
 
