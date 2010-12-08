@@ -3484,6 +3484,18 @@ class ConfiguratorTests(unittest.TestCase):
         registeredview = self._getViewCallable(config)
         self.assertEqual(registeredview.__name__, 'view3')
 
+    def test_autocommit_no_conflicts(self):
+        config = self._makeOne(autocommit=True)
+        def view1(request): pass
+        def view2(request): pass
+        def view3(request): pass
+        config.add_view(view1)
+        config.add_view(view2)
+        config.add_view(view3)
+        config.commit()
+        registeredview = self._getViewCallable(config)
+        self.assertEqual(registeredview.__name__, 'view3')
+
 class Test__map_view(unittest.TestCase):
     def setUp(self):
         from pyramid.registry import Registry
