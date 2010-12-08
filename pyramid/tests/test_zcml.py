@@ -995,9 +995,12 @@ class TestSubscriberDirective(unittest.TestCase):
         subadapt = actions[0]
         self.assertEqual(subadapt['discriminator'], None)
         subadapt['callable'](*subadapt['args'], **subadapt['kw'])
+        registrations = self.config.registry._subscription_registrations
+        self.assertEqual(len(registrations), 1)
+        reg = registrations[0]
         self.assertEqual(
-            self.config.registry._subscription_registrations,
-            [((IDummy,), IFactory, None, factory, '')]
+            reg[:4],
+            ((IDummy,), IFactory, None, factory)
             )
 
     def test_register_with_handler(self):
@@ -1047,7 +1050,7 @@ class TestUtilityDirective(unittest.TestCase):
         self.assertEqual(utility['discriminator'], ('utility', IFactory, ''))
         self.assertEqual(utility['callable'].im_func,
                          Registry.registerUtility.im_func)
-        self.assertEqual(utility['args'], (None, IFactory, '', ''))
+        self.assertEqual(utility['args'][:3], (None, IFactory, ''))
         self.assertEqual(utility['kw'], {'factory':DummyFactory})
 
     def test_provides_from_component_provides(self):
@@ -1061,7 +1064,7 @@ class TestUtilityDirective(unittest.TestCase):
         self.assertEqual(utility['discriminator'], ('utility', IFactory, ''))
         self.assertEqual(utility['callable'].im_func,
                          Registry.registerUtility.im_func)
-        self.assertEqual(utility['args'], (component, IFactory, '', ''))
+        self.assertEqual(utility['args'][:3], (component, IFactory, ''))
         self.assertEqual(utility['kw'], {})
 
 class TestTranslationDirDirective(unittest.TestCase):
@@ -1261,14 +1264,17 @@ class DummyPackage(object):
         self.__file__ = '/__init__.py'
 
 def extract_actions(native):
+    from zope.configuration.config import expand_action
     L = []
     for action in native:
+        (discriminator, callable, args, kw, includepath, info, order
+         ) = expand_action(*action)
         d = {}
-        d['discriminator'] = action[0]
-        d['callable'] = action[1]
-        d['args'] = action[2]
-        d['kw'] = action[3]
-        d['order'] = action[4]
+        d['discriminator'] = discriminator
+        d['callable'] = callable
+        d['args'] = args
+        d['kw'] = kw
+        d['order'] = order
         L.append(d)
     return L
         
