@@ -3468,7 +3468,6 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertRaises(ConfigurationConflictError, config.commit)
 
     def test_commit_conflict_resolved_with_two_includes_and_local(self):
-        from zope.configuration.config import ConfigurationConflictError
         config = self._makeOne()
         def view1(request): pass
         def view2(request): pass
