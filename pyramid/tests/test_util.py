@@ -154,7 +154,7 @@ class TestDottedNameResolver(unittest.TestCase):
         self.assertEqual(typ.package_name, 'pyramid.tests')
 
     def test_ctor_string_irresolveable(self):
-        from pyramid.configuration import ConfigurationError
+        from pyramid.config import ConfigurationError
         self.assertRaises(ConfigurationError, self._makeOne, 'cant.be.found')
 
     def test_ctor_module(self):

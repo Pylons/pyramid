@@ -31,9 +31,9 @@ class WGSIAppPlusViewConfigTests(unittest.TestCase):
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
-        from pyramid.configuration import Config
+        from pyramid.config import Configurator
         from pyramid.tests import test_integration
-        config = Config()
+        config = Configurator()
         config.scan(test_integration)
         config.commit()
         reg = config.registry
@@ -67,8 +67,8 @@ class TestStaticApp(unittest.TestCase):
 class IntegrationBase(unittest.TestCase):
     root_factory = None
     def setUp(self):
-        from pyramid.configuration import Config
-        config = Config(root_factory=self.root_factory)
+        from pyramid.config import Configurator
+        config = Configurator(root_factory=self.root_factory)
         config.begin()
         config.load_zcml(self.config)
         config.commit()
@@ -243,8 +243,8 @@ class TestExceptionViewsApp(IntegrationBase):
 
 class ImperativeIncludeConfigurationTest(unittest.TestCase):
     def setUp(self):
-        from pyramid.configuration import Config
-        config = Config()
+        from pyramid.config import Configurator
+        config = Configurator()
         from pyramid.tests.includeapp1.root import configure
         configure(config)
         app = config.make_wsgi_app()

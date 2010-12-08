@@ -163,9 +163,9 @@ class TestNotFoundDirective(unittest.TestCase):
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         from pyramid.exceptions import NotFound
-        from pyramid.configuration import Config
+        from pyramid.config import Configurator
         reg = self.config.registry
-        config = Config(reg)
+        config = Configurator(reg)
         def dummy_renderer_factory(*arg, **kw):
             return lambda *arg, **kw: 'OK'
         config.add_renderer('.pt', dummy_renderer_factory)
@@ -232,9 +232,9 @@ class TestForbiddenDirective(unittest.TestCase):
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         from pyramid.exceptions import Forbidden
-        from pyramid.configuration import Config
+        from pyramid.config import Configurator
         reg = self.config.registry
-        config = Config(reg)
+        config = Configurator(reg)
         def dummy_renderer_factory(*arg, **kw):
             return lambda *arg, **kw: 'OK'
         config.add_renderer('.pt', dummy_renderer_factory)
