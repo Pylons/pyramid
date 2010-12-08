@@ -3,7 +3,9 @@ Twophase branch
 
 - ``pyramid.configuration.Config`` was added.  It has the same API as the old
   ``Configurator`` which it means to replace, except by default it is a
-  *non-autocommitting* configurator.  It also has a new API method named
+  *non-autocommitting* configurator, unlike
+  ``pyramid.configuration.Configurator``, which will autocommit every time a
+  configuration method is called.  It also has a new API method named
   ``with_context`` (a classmethod).
 
 - ``pyramid.configuration.Configurator`` is now deprecated.  Use

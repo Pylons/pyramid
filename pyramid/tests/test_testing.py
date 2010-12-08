@@ -7,7 +7,6 @@ class TestBase(unittest.TestCase):
         from pyramid.registry import Registry
         manager.clear()
         registry = Registry('testing')
-        registry.autocommit = True
         self.registry = registry
         manager.push({'registry':registry, 'request':None})
         from zope.deprecation import __show__

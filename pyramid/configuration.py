@@ -107,8 +107,8 @@ if chameleon_zpt:
 def config_method(wrapped):
     def wrapper(self, *arg, **kw):
         context = self._ctx
-        if not context.autocommit:
-            if not context.info:
+        if context is not None:
+            if (not context.autocommit) and (not context.info):
                 # Try to provide more accurate info for conflict reports by
                 # wrapping the context in a decorator and attaching caller info
                 # to it, unless the context already has info (if it already has
@@ -123,9 +123,8 @@ def config_method(wrapped):
                 newctx.info = info
                 self._ctx = newctx
         result = wrapped(self, *arg, **kw)
-        self._ctx = context
-        if self._ctx.autocommit:
-            self.commit()
+        if context is not None:
+            self._ctx = context
         return result
     wrapper.__doc__ = wrapped.__doc__
     wrapper.__name__ = wrapped.__name__
@@ -242,6 +241,7 @@ class Config(object):
 
     manager = manager # for testing injection
     venusian = venusian # for testing injection
+    _ctx = None
 
     def __init__(self,
                  registry=None,
@@ -266,11 +266,10 @@ class Config(object):
         self.package_name = name_resolver.package_name
         self.package = name_resolver.package
         self.registry = registry
-        self._ctx = self._make_context(autocommit)
+        self.autocommit = autocommit
         if registry is None:
             registry = Registry(self.package_name)
             self.registry = registry
-            self._ctx.registry = registry
             self.setup_registry(
                 settings=settings,
                 root_factory=root_factory,
@@ -289,7 +288,13 @@ class Config(object):
         """ Register an action which will be executed during a commit. """
         if kw is None:
             kw = {}
-        self._ctx.action(discriminator, callable, args, kw, order)
+        if self.autocommit:
+            if callable is not None:
+                callable(*args, **kw)
+        else:
+            if self._ctx is None:
+                self._ctx = self._make_context(self.autocommit)
+            self._ctx.action(discriminator, callable, args, kw, order)
 
     def _set_settings(self, mapping):
         settings = Settings(mapping or {})
@@ -410,25 +415,31 @@ class Config(object):
 
     def commit(self):
         """ Commit pending configuration actions. """
+        if self._ctx is None:
+            return
         self._ctx.execute_actions()
-        # reset the context
-        self._ctx = self._make_context(self._ctx.autocommit)
+        # unwrap and reset the context
+        self._ctx = None
 
     @classmethod
     def with_context(cls, context):
         """ Used by ZCML directives to obtain a configurator with 'the right'
         context """
-        configurator = cls(registry=context.registry, package=context.package)
+        configurator = cls(registry=context.registry, package=context.package,
+                           autocommit=context.autocommit)
         configurator._ctx = context
         return configurator
 
-    def with_package(self, package, _ctx=None):
+    def with_package(self, package):
         """ Return a new Configurator instance with the same registry
         as this configurator using the package supplied as the
         ``package`` argument to the new configurator.  ``package`` may
         be an actual Python package object or a Python dotted name
         representing a package."""
-        context = GroupingContextDecorator(self._ctx)
+        context = self._ctx
+        if context is None:
+            context = self._ctx = self._make_context(self.autocommit)
+        context = GroupingContextDecorator(context)
         context.package = package
         return self.__class__.with_context(context)
 
@@ -735,11 +746,14 @@ class Config(object):
         registry = self.registry
         self.manager.push({'registry':registry, 'request':None})
         context = self._ctx
+        if context is None:
+            context = self._ctx = self._make_context(self.autocommit)
 
         lock.acquire()
         try:
             context.package = package
-            xmlconfig.file(filename, package, context=context, execute=False)
+            xmlconfig.file(filename, package, context=context,
+                           execute=self.autocommit)
         finally:
             lock.release()
             self.manager.pop()
@@ -768,6 +782,8 @@ class Config(object):
             sourcefiles.append((sourcefile, func, module))
 
         _context = self._ctx
+        if _context is None:
+            _context = self._ctx = self._make_context(self.autocommit)
 
         for filename, func, module in sourcefiles:
             spec = module.__name__ + ':' + func.__name__
@@ -2279,6 +2295,7 @@ class Configurator(Config):
                  default_permission=None,
                  session_factory=None,
                  autocommit=True,
+                 context=None,
                  ):
         if package is None:
             package = caller_package()
@@ -2297,7 +2314,8 @@ class Configurator(Config):
             renderer_globals_factory=renderer_globals_factory,
             default_permission=default_permission,
             session_factory=session_factory,
-            autocommit=autocommit
+            autocommit=autocommit,
+            context=context,
             )
             
 deprecated(
@@ -2952,3 +2970,10 @@ class PyramidConfigurationMachine(ConfigurationMachine):
         self._seen_files.add(spec)
         return True
 
+def context_base(context):
+    while 1:
+        newcontext = getattr(context, 'context', None)
+        if newcontext is None:
+            return context
+        context = newcontext
+        

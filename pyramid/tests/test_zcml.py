@@ -12,6 +12,7 @@ from zope.interface import implements
 class TestViewDirective(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
@@ -118,6 +119,7 @@ class TestViewDirective(unittest.TestCase):
 class TestNotFoundDirective(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
@@ -186,6 +188,7 @@ class TestNotFoundDirective(unittest.TestCase):
 class TestForbiddenDirective(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
@@ -254,6 +257,7 @@ class TestForbiddenDirective(unittest.TestCase):
 class TestRepozeWho1AuthenticationPolicyDirective(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
@@ -297,6 +301,7 @@ class TestRepozeWho1AuthenticationPolicyDirective(unittest.TestCase):
 class TestRemoteUserAuthenticationPolicyDirective(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
@@ -342,6 +347,7 @@ class TestRemoteUserAuthenticationPolicyDirective(unittest.TestCase):
 class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
@@ -403,6 +409,7 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
 class TestACLAuthorizationPolicyDirective(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
@@ -431,6 +438,7 @@ class TestACLAuthorizationPolicyDirective(unittest.TestCase):
 class TestRouteDirective(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
@@ -634,6 +642,7 @@ class TestRouteDirective(unittest.TestCase):
 class TestStaticDirective(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
@@ -729,6 +738,7 @@ class TestStaticDirective(unittest.TestCase):
 class TestResourceDirective(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
@@ -758,6 +768,7 @@ class TestResourceDirective(unittest.TestCase):
 class TestRendererDirective(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
@@ -831,6 +842,7 @@ class TestZCMLConfigure(unittest.TestCase):
 class TestZCMLScanDirective(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
@@ -854,6 +866,7 @@ class TestZCMLScanDirective(unittest.TestCase):
 class TestAdapterDirective(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
@@ -945,6 +958,7 @@ class TestAdapterDirective(unittest.TestCase):
 class TestSubscriberDirective(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
@@ -1023,6 +1037,7 @@ class TestSubscriberDirective(unittest.TestCase):
 class TestUtilityDirective(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
@@ -1070,6 +1085,7 @@ class TestUtilityDirective(unittest.TestCase):
 class TestTranslationDirDirective(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
@@ -1092,6 +1108,7 @@ class TestTranslationDirDirective(unittest.TestCase):
 class TestLocaleNegotiatorDirective(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
@@ -1117,6 +1134,7 @@ class TestLocaleNegotiatorDirective(unittest.TestCase):
 class TestDefaultPermissionDirective(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
