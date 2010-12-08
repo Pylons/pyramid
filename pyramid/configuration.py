@@ -269,6 +269,12 @@ class Configurator(object):
                 session_factory=session_factory,
                 )
 
+    @classmethod
+    def with_context(cls, context):
+        configurator = cls(registry=context.registry, package=context.package)
+        configurator._ctx = context
+        return configurator
+
     def _action(self, discriminator, callable=None, args=(), kw=None, order=0):
         """ Register an action which will be executed during a commit. """
         if kw is None:
