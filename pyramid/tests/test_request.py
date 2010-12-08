@@ -1,9 +1,9 @@
 import unittest
+from pyramid import testing
 
 class TestRequest(unittest.TestCase):
     def setUp(self):
-        from pyramid.configuration import Configurator
-        self.config = Configurator()
+        self.config = testing.setUp()
         self.config.begin()
 
     def tearDown(self):

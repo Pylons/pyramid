@@ -12,7 +12,7 @@ from pyramid.interfaces import ISecuredView
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
 
-from pyramid.configuration import Configurator
+from pyramid.configuration import Config
 from pyramid.exceptions import Forbidden
 from pyramid.response import Response
 from pyramid.registry import Registry
@@ -56,7 +56,7 @@ def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
        method in your unit and integration tests.
     """
     registry = get_current_registry()
-    config = Configurator(registry=registry)
+    config = Config(registry=registry)
     result = config.testing_securitypolicy(userid=userid, groupids=groupids,
                                            permissive=permissive)
     config.commit()
@@ -80,7 +80,7 @@ def registerModels(models):
        method in your unit and integration tests.
     """
     registry = get_current_registry()
-    config = Configurator(registry=registry)
+    config = Config(registry=registry)
     result = config.testing_models(models)
     config.commit()
     return result
@@ -108,7 +108,7 @@ def registerEventListener(event_iface=None):
        method in your unit and integration tests.
     """
     registry = get_current_registry()
-    config = Configurator(registry=registry)
+    config = Config(registry=registry)
     result = config.testing_add_subscriber(event_iface)
     config.commit()
     return result
@@ -130,7 +130,7 @@ def registerTemplateRenderer(path, renderer=None):
 
     """
     registry = get_current_registry()
-    config = Configurator(registry=registry)
+    config = Config(registry=registry)
     result = config.testing_add_template(path, renderer)
     config.commit()
     return result
@@ -256,7 +256,7 @@ def registerSubscriber(subscriber, iface=Interface):
        method in your unit and integration tests.
     """
     registry = get_current_registry()
-    config = Configurator(registry)
+    config = Config(registry)
     result = config.add_subscriber(subscriber, iface=iface)
     config.commit()
     return result
@@ -279,7 +279,7 @@ def registerRoute(pattern, name, factory=None):
        method in your unit and integration tests.
     """
     reg = get_current_registry()
-    config = Configurator(registry=reg)
+    config = Config(registry=reg)
     result = config.add_route(name, pattern, factory=factory)
     config.commit()
     return result
@@ -307,7 +307,7 @@ def registerSettings(dictarg=None, **kw):
        method in your unit and integration tests.
     """
     registry = get_current_registry()
-    config = Configurator(registry=registry)
+    config = Config(registry=registry)
     config.add_settings(dictarg, **kw)
 
 class DummyRootFactory(object):
@@ -562,7 +562,7 @@ class DummyRequest(object):
             self.response_callbacks = []
         self.response_callbacks.append(callback)
 
-def setUp(registry=None, request=None, hook_zca=True):
+def setUp(registry=None, request=None, hook_zca=True, autocommit=True):
     """
     Set :app:`Pyramid` registry and request thread locals for the
     duration of a single unit test.
@@ -630,7 +630,7 @@ def setUp(registry=None, request=None, hook_zca=True):
     manager.clear()
     if registry is None:
         registry = Registry('testing')
-    config = Configurator(registry=registry)
+    config = Config(registry=registry, autocommit=autocommit)
     if hasattr(registry, 'registerUtility'):
         # Sometimes nose calls us with a non-registry object because
         # it thinks this function is module test setup.  Likewise,

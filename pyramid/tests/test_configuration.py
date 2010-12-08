@@ -7,10 +7,10 @@ try:
 except:
     __pypy__ = None
 
-class ConfiguratorTests(unittest.TestCase):
+class ConfigTests(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
-        from pyramid.configuration import Configurator
-        return Configurator(*arg, **kw)
+        from pyramid.configuration import Config
+        return Config(*arg, **kw)
 
     def _registerRenderer(self, config, name='.txt'):
         from pyramid.interfaces import IRendererFactory
@@ -87,9 +87,9 @@ class ConfiguratorTests(unittest.TestCase):
     def test_ctor_no_registry(self):
         import sys
         from pyramid.interfaces import ISettings
-        from pyramid.configuration import Configurator
+        from pyramid.configuration import Config
         from pyramid.interfaces import IRendererFactory
-        config = Configurator()
+        config = Config()
         this_pkg = sys.modules['pyramid.tests']
         self.failUnless(config.registry.getUtility(ISettings))
         self.assertEqual(config.package, this_pkg)
@@ -102,8 +102,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.failUnless(config.registry.getUtility(IRendererFactory, '.mako'))
 
     def test_begin(self):
-        from pyramid.configuration import Configurator
-        config = Configurator()
+        from pyramid.configuration import Config
+        config = Config()
         manager = DummyThreadLocalManager()
         config.manager = manager
         config.begin()
@@ -112,8 +112,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(manager.popped, False)
 
     def test_begin_with_request(self):
-        from pyramid.configuration import Configurator
-        config = Configurator()
+        from pyramid.configuration import Config
+        config = Config()
         request = object()
         manager = DummyThreadLocalManager()
         config.manager = manager
@@ -123,8 +123,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(manager.popped, False)
 
     def test_end(self):
-        from pyramid.configuration import Configurator
-        config = Configurator()
+        from pyramid.configuration import Config
+        config = Config()
         manager = DummyThreadLocalManager()
         config.manager = manager
         config.end()
@@ -133,9 +133,9 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_ctor_with_package_registry(self):
         import sys
-        from pyramid.configuration import Configurator
+        from pyramid.configuration import Config
         pkg = sys.modules['pyramid']
-        config = Configurator(package=pkg)
+        config = Config(package=pkg)
         self.assertEqual(config.package, pkg)
 
     def test_ctor_noreg_custom_settings(self):

@@ -2,6 +2,7 @@ import unittest
 
 from pyramid.testing import cleanUp
 from pyramid.testing import skip_on
+from pyramid import testing
 
 class Base:
     def setUp(self):
@@ -34,10 +35,9 @@ class Base:
 
 class TextTemplateRendererTests(Base, unittest.TestCase):
     def setUp(self):
-        from pyramid.configuration import Configurator
         from pyramid.registry import Registry
         registry = Registry()
-        self.config = Configurator(registry=registry)
+        self.config = testing.setUp(registry=registry)
         self.config.begin()
 
     def tearDown(self):

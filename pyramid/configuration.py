@@ -13,6 +13,7 @@ from zope.configuration import xmlconfig
 from zope.configuration.config import GroupingContextDecorator
 from zope.configuration.config import ConfigurationMachine
 from zope.configuration.xmlconfig import registerCommonDirectives
+from zope.deprecation import deprecated
 
 from zope.interface import Interface
 from zope.interface import implementedBy
@@ -130,7 +131,7 @@ def config_method(wrapped):
     wrapper.__name__ = wrapped.__name__
     return wrapper
 
-class Configurator(object):
+class Config(object):
     """
     A Configurator is used to configure a :app:`Pyramid`
     :term:`application registry`.
@@ -429,7 +430,7 @@ class Configurator(object):
         representing a package."""
         context = GroupingContextDecorator(self._ctx)
         context.package = package
-        return Configurator.with_context(context)
+        return self.__class__.with_context(context)
 
     def maybe_dotted(self, dotted):
         """ Resolve the :term:`dotted Python name` ``dotted`` to a
@@ -775,7 +776,7 @@ class Configurator(object):
                 context.basepath = os.path.dirname(filename)
                 context.includepath = _context.includepath + (spec,)
                 context.package = package_of(module)
-                config = Configurator.with_context(context)
+                config = self.__class__.with_context(context)
                 func(config)
 
     def add_handler(self, route_name, pattern, handler, action=None, **kw):
@@ -2262,6 +2263,48 @@ class Configurator(object):
 
     testing_add_template = testing_add_renderer
 
+class Configurator(Config):
+    def __init__(self,
+                 registry=None,
+                 package=None,
+                 settings=None,
+                 root_factory=None,
+                 authentication_policy=None,
+                 authorization_policy=None,
+                 renderers=DEFAULT_RENDERERS,
+                 debug_logger=None,
+                 locale_negotiator=None,
+                 request_factory=None,
+                 renderer_globals_factory=None,
+                 default_permission=None,
+                 session_factory=None,
+                 autocommit=True,
+                 ):
+        if package is None:
+            package = caller_package()
+        Config.__init__(
+            self,
+            registry=registry,
+            package=package,
+            settings=settings,
+            root_factory=root_factory,
+            authentication_policy=authentication_policy,
+            authorization_policy=authorization_policy,
+            renderers=renderers,
+            debug_logger=debug_logger,
+            locale_negotiator=locale_negotiator,
+            request_factory=request_factory,
+            renderer_globals_factory=renderer_globals_factory,
+            default_permission=default_permission,
+            session_factory=session_factory,
+            autocommit=autocommit
+            )
+            
+deprecated(
+    'Configurator',
+    '(pyramid.configuration.Configurator is deprecated as of Pyramid 1.0.  Use'
+    '``pyramid.configuration.Config`` with ``autocommit=True`` instead.) ')
+
 def _make_predicates(xhr=None, request_method=None, path_info=None,
                      request_param=None, header=None, accept=None,
                      containment=None, request_type=None,
@@ -2816,7 +2859,7 @@ def isexception(o):
 # note that ``options`` is a b/w compat alias for ``settings`` and
 # ``Configurator`` is a testing dep inj
 def make_app(root_factory, package=None, filename='configure.zcml',
-             settings=None, options=None, Configurator=Configurator):
+             settings=None, options=None, Configurator=Config):
     """ Return a Router object, representing a fully configured
     :app:`Pyramid` WSGI application.
 
