@@ -103,7 +103,7 @@ if chameleon_text:
 if chameleon_zpt:
     DEFAULT_RENDERERS += (('.txt', chameleon_text.renderer_factory),)
 
-def config_method(wrapped):
+def maybe_autocommit(wrapped):
     def wrapper(self, *arg, **kw):
         result = wrapped(self, *arg, **kw)
         if self._ctx.autocommit:
@@ -284,7 +284,7 @@ class Configurator(object):
         self.registry.settings = settings
         return settings
 
-    @config_method
+    @maybe_autocommit
     def _set_root_factory(self, factory):
         """ Add a :term:`root factory` to the current configuration
         state.  If the ``factory`` argument is ``None`` a default root
@@ -297,7 +297,7 @@ class Configurator(object):
             self.registry.registerUtility(factory, IDefaultRootFactory) # b/c
         self._action(IRootFactory, register)
 
-    @config_method
+    @maybe_autocommit
     def _set_authentication_policy(self, policy):
         """ Add a :app:`Pyramid` :term:`authentication policy` to
         the current configuration."""
@@ -305,7 +305,7 @@ class Configurator(object):
         self.registry.registerUtility(policy, IAuthenticationPolicy)
         self._action(IAuthenticationPolicy)
 
-    @config_method
+    @maybe_autocommit
     def _set_authorization_policy(self, policy):
         """ Add a :app:`Pyramid` :term:`authorization policy` to
         the current configuration state (also accepts a :term:`dotted
@@ -610,7 +610,7 @@ class Configurator(object):
             renderer = {'name':renderer, 'package':self.package}
         return self._derive_view(view, attr=attr, renderer=renderer)
 
-    @config_method
+    @maybe_autocommit
     def add_subscriber(self, subscriber, iface=None):
         """Add an event :term:`subscriber` for the event stream
         implied by the supplied ``iface`` interface.  The
@@ -869,7 +869,7 @@ class Configurator(object):
 
         return route
 
-    @config_method
+    @maybe_autocommit
     def add_view(self, view=None, name="", for_=None, permission=None,
                  request_type=None, route_name=None, request_method=None,
                  request_param=None, containment=None, attr=None,
@@ -1297,7 +1297,7 @@ class Configurator(object):
         discriminator = tuple(discriminator)
         self._action(discriminator, register)
 
-    @config_method
+    @maybe_autocommit
     def add_route(self,
                   name,
                   pattern=None,
@@ -1694,7 +1694,7 @@ class Configurator(object):
         scanner = self.venusian.Scanner(config=self)
         scanner.scan(package, categories=categories)
 
-    @config_method
+    @maybe_autocommit
     def add_renderer(self, name, factory):
         """
         Add a :app:`Pyramid` :term:`renderer` factory to the
@@ -1726,7 +1726,7 @@ class Configurator(object):
         self.registry.registerUtility(factory, IRendererFactory, name=name)
         self._action((IRendererFactory, name), None)
 
-    @config_method
+    @maybe_autocommit
     def override_resource(self, to_override, override_with, _override=None):
         """ Add a :app:`Pyramid` resource override to the current
         configuration state.
@@ -1848,7 +1848,7 @@ class Configurator(object):
             return view(context, request)
         return self.add_view(bwcompat_view, context=NotFound, wrapper=wrapper)
 
-    @config_method
+    @maybe_autocommit
     def set_request_factory(self, factory):
         """ The object passed as ``factory`` should be an object (or a
         :term:`dotted Python name` which refers to an object) which
@@ -1867,7 +1867,7 @@ class Configurator(object):
             self.registry.registerUtility(factory, IRequestFactory)
         self._action(IRequestFactory, register)
 
-    @config_method
+    @maybe_autocommit
     def set_renderer_globals_factory(self, factory):
         """ The object passed as ``factory`` should be an callable (or
         a :term:`dotted Python name` which refers to an callable) that
@@ -1891,7 +1891,7 @@ class Configurator(object):
             self.registry.registerUtility(factory, IRendererGlobalsFactory)
         self._action(IRendererGlobalsFactory, register)
 
-    @config_method
+    @maybe_autocommit
     def set_locale_negotiator(self, negotiator):
         """
         Set the :term:`locale negotiator` for this application.  The
@@ -1915,7 +1915,7 @@ class Configurator(object):
             self.registry.registerUtility(negotiator, ILocaleNegotiator)
         self._action(ILocaleNegotiator, register)
 
-    @config_method
+    @maybe_autocommit
     def set_default_permission(self, permission):
         """
         Set the default permission to be used by all subsequent
@@ -1946,7 +1946,7 @@ class Configurator(object):
         self.registry.registerUtility(permission, IDefaultPermission)
         self._action(IDefaultPermission, None)
 
-    @config_method
+    @maybe_autocommit
     def set_session_factory(self, session_factory):
         """
         Configure the application with a :term:`session factory`.  If
@@ -1957,7 +1957,7 @@ class Configurator(object):
             self.registry.registerUtility(session_factory, ISessionFactory)
         self._action(ISessionFactory, register)
 
-    @config_method
+    @maybe_autocommit
     def add_translation_dirs(self, *specs):
         """ Add one or more :term:`translation directory` paths to the
         current configuration state.  The ``specs`` argument is a
