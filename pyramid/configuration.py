@@ -239,7 +239,6 @@ class Configurator(object):
                  renderer_globals_factory=None,
                  default_permission=None,
                  session_factory=None,
-                 _ctx=None,
                  ):
         if package is None:
             package = caller_package()
@@ -248,14 +247,11 @@ class Configurator(object):
         self.package_name = name_resolver.package_name
         self.package = name_resolver.package
         self.registry = registry
-        if _ctx is None:
-            _ctx = self._make_context()
-            _ctx.registry = registry
-        self._ctx = _ctx
+        self._ctx = self._make_context()
         if registry is None:
             registry = Registry(self.package_name)
             self.registry = registry
-            _ctx.registry = registry
+            self._ctx.registry = registry
             self.setup_registry(
                 settings=settings,
                 root_factory=root_factory,
@@ -409,10 +405,9 @@ class Configurator(object):
         ``package`` argument to the new configurator.  ``package`` may
         be an actual Python package object or a Python dotted name
         representing a package."""
-        if _ctx is None:
-            _ctx = self._ctx
-        return self.__class__(registry=self.registry, package=package,
-                              _ctx=_ctx)
+        context = GroupingContextDecorator(self._ctx)
+        context.package = package
+        return Configurator.with_context(context)
 
     def maybe_dotted(self, dotted):
         """ Resolve the :term:`dotted Python name` ``dotted`` to a
