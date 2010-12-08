@@ -69,6 +69,7 @@ from pyramid.log import make_stream_logger
 from pyramid.mako_templating import renderer_factory as mako_renderer_factory
 from pyramid.path import caller_package
 from pyramid.path import package_path
+from pyramid.path import package_of
 from pyramid.registry import Registry
 from pyramid.renderers import RendererHelper
 from pyramid.request import route_request_iface
@@ -746,15 +747,14 @@ class Configurator(object):
             module = inspect.getmodule(func)
             sourcefiles.append((sourcefile, func, module))
 
-        sourcefiles.sort()
-
         _context = self._ctx
 
         for filename, func, module in sourcefiles:
             context = GroupingContextDecorator(_context)
             context.basepath = os.path.dirname(filename)
             context.includepath = _context.includepath + (filename,)
-            func(self.with_package(module, _ctx=context))
+            context.package = package_of(module)
+            func(Configurator.with_context(context))
 
     def add_handler(self, route_name, pattern, handler, action=None, **kw):
 
