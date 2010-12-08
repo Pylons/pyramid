@@ -717,6 +717,7 @@ class Configurator(object):
             self.manager.pop()
         return app
 
+    @config_method
     def load_zcml(self, spec='configure.zcml', lock=threading.Lock()):
         """ Load configuration from a :term:`ZCML` file into the
         current configuration state.  The ``spec`` argument is an
@@ -1680,6 +1681,7 @@ class Configurator(object):
             self.registry.registerUtility(mapper, IRoutesMapper)
         return mapper
 
+    @config_method
     def scan(self, package=None, categories=None):
         """ Scan a Python package and any of its subpackages for
         objects marked with :term:`configuration decoration` such as
