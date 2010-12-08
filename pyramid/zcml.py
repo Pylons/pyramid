@@ -754,13 +754,12 @@ def zcml_configure(name, package):
     ZCML into the current ZCML registry.
 
     """
-    context = ConfigurationMachine()
-    xmlconfig.registerCommonDirectives(context)
-    context.package = package
-    context.registry = get_current_registry()
-    xmlconfig.include(context, name, package)
-    context.execute_actions(clear=False) # the raison d'etre
-    return context.actions
+    registry = get_current_registry()
+    configurator = Configurator(registry=registry, package=package)
+    configurator.load_zcml(name)
+    actions = configurator._ctx.actions[:]
+    configurator.commit()
+    return actions
 
 file_configure = zcml_configure # backwards compat (>0.8.1)
 
