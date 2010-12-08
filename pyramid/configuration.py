@@ -713,10 +713,11 @@ class Configurator(object):
             __import__(package_name)
             package = sys.modules[package_name]
 
-        lock.acquire()
         registry = self.registry
         self.manager.push({'registry':registry, 'request':None})
         context = self._ctx
+
+        lock.acquire()
         try:
             context.package = package
             xmlconfig.file(filename, package, context=context, execute=False)
