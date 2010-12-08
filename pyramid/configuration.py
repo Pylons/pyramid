@@ -389,6 +389,7 @@ class Configurator(object):
     def _make_context(self):
         context = PyramidConfigurationMachine()
         registerCommonDirectives(context)
+        context.registry = self.registry
         return context
 
     # API
@@ -397,7 +398,6 @@ class Configurator(object):
         """ Commit pending configuration actions. """
         self._ctx.execute_actions()
         self._ctx = self._make_context()
-        self._ctx.registry = self.registry
 
     def with_package(self, package, _ctx=None):
         """ Return a new Configurator instance with the same registry
@@ -746,11 +746,13 @@ class Configurator(object):
         _context = self._ctx
 
         for filename, func, module in sourcefiles:
-            context = GroupingContextDecorator(_context)
-            context.basepath = os.path.dirname(filename)
-            context.includepath = _context.includepath + (filename,)
-            context.package = package_of(module)
-            func(Configurator.with_context(context))
+            spec = module.__name__ + ':' + func.__name__
+            if _context.processSpec(spec):
+                context = GroupingContextDecorator(_context)
+                context.basepath = os.path.dirname(filename)
+                context.includepath = _context.includepath + (spec,)
+                context.package = package_of(module)
+                func(Configurator.with_context(context))
 
     def add_handler(self, route_name, pattern, handler, action=None, **kw):
 
@@ -2894,3 +2896,16 @@ class PyramidConfigurationMachine(ConfigurationMachine):
         except:
             return ''
 
+    def processSpec(self, spec):
+        """Check whether a callable needs to be processed.  The ``spec``
+        refers to a unique identifier for the callable.
+
+        Return True if processing is needed and False otherwise. If
+        the callablke needs to be processed, it will be marked as
+        processed, assuming that the caller will procces the callable if
+        it needs to be processed.
+        """
+        if spec in self._seen_files:
+            return False
+        self._seen_files.add(spec)
+        return True

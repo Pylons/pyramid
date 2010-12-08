@@ -3442,6 +3442,48 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_view(view2)
         self.assertRaises(ConfigurationConflictError, config.commit)
 
+    def test_commit_conflict_resolved_with_include(self):
+        config = self._makeOne()
+        def view1(request): pass
+        def view2(request): pass
+        def includeme(config):
+            config.add_view(view2)
+        config.add_view(view1)
+        config.include(includeme)
+        config.commit()
+        registeredview = self._getViewCallable(config)
+        self.assertEqual(registeredview.__name__, 'view1')
+
+    def test_commit_conflict_with_two_includes(self):
+        from zope.configuration.config import ConfigurationConflictError
+        config = self._makeOne()
+        def view1(request): pass
+        def view2(request): pass
+        def includeme1(config):
+            config.add_view(view1)
+        def includeme2(config):
+            config.add_view(view2)
+        config.include(includeme1)
+        config.include(includeme2)
+        self.assertRaises(ConfigurationConflictError, config.commit)
+
+    def test_commit_conflict_resolved_with_two_includes_and_local(self):
+        from zope.configuration.config import ConfigurationConflictError
+        config = self._makeOne()
+        def view1(request): pass
+        def view2(request): pass
+        def view3(request): pass
+        def includeme1(config):
+            config.add_view(view1)
+        def includeme2(config):
+            config.add_view(view2)
+        config.include(includeme1)
+        config.include(includeme2)
+        config.add_view(view3)
+        config.commit()
+        registeredview = self._getViewCallable(config)
+        self.assertEqual(registeredview.__name__, 'view3')
+
 class Test__map_view(unittest.TestCase):
     def setUp(self):
         from pyramid.registry import Registry
