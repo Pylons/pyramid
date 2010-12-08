@@ -2897,7 +2897,7 @@ class PyramidConfigurationMachine(ConfigurationMachine):
         refers to a unique identifier for the callable.
 
         Return True if processing is needed and False otherwise. If
-        the callablke needs to be processed, it will be marked as
+        the callable needs to be processed, it will be marked as
         processed, assuming that the caller will procces the callable if
         it needs to be processed.
         """
