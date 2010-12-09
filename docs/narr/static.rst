@@ -20,7 +20,7 @@ application root URL, e.g. ``/static``.
 
 Note that the ``path`` provided to
 :meth:`pyramid.configuration.Configurator.add_static_view` may be a fully
-qualified :term:`resource specification` or an *absolute path*.  
+qualified :term:`resource specification`, or an *absolute path*.  
 
 Here's an example of a use of
 :meth:`pyramid.configuration.Configurator.add_static_view` that will serve
