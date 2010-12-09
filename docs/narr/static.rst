@@ -205,7 +205,7 @@ The :class:`pyramid.view.static` helper class is used to perform
 this task. This class creates an object that is capable acting as a
 :app:`Pyramid` view callable which serves static resources from a
 directory.  For instance, to serve files within a directory located on
-your filesystem at ``/path/to/static/dir`` mounted at the URL path
+your filesystem at ``/path/to/static/dir`` from the URL path
 ``/static`` in your application, create an instance of the
 :class:`pyramid.view.static` class inside a ``static.py`` file in
 your application root as below.
