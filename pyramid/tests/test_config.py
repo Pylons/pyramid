@@ -4569,5 +4569,5 @@ class DummyHandler(object): # pragma: no cover
         return 'response 2'
 
 def dummy_include(config):
-    config._action('discrim', None, config.package)
+    config.action('discrim', None, config.package)
     
