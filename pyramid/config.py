@@ -404,7 +404,7 @@ class Configurator(object):
         respectively, which are passed to ``callable`` when this action is
         executed.
 
-        ``order`` is a crude order control mechanism, rarely used.
+        ``order`` is a crude order control mechanism, only rarely used.
         """
         if kw is None:
             kw = {}
@@ -514,8 +514,10 @@ class Configurator(object):
 
     @classmethod
     def with_context(cls, context):
-        """ Used by ZCML directives to obtain a configurator with 'the right'
-        context """
+        """A classmethod used by ZCML directives,
+        :meth:`pyramid.config.Configurator.with_package`, and
+        :meth:`pyramid.config.Configurator.include` to obtain a configurator
+        with 'the right' context.  Returns a new Configurator instance."""
         configurator = cls(registry=context.registry, package=context.package,
                            autocommit=context.autocommit)
         configurator._ctx = context

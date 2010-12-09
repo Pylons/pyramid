@@ -667,6 +667,12 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(context_after.includepath, ())
         self.failUnless(context_after is context_before)
 
+    def test_with_context(self):
+        config = self._makeOne()
+        ctx = config._make_context()
+        newconfig = config.with_context(ctx)
+        self.assertEqual(newconfig._ctx, ctx)
+
     def test_add_view_view_callable_None_no_renderer(self):
         from pyramid.exceptions import ConfigurationError
         config = self._makeOne(autocommit=True)

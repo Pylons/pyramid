@@ -5,6 +5,8 @@ from pyramid.path import caller_package
 
 from zope.deprecation import deprecated
 
+ConfigurationError = ConfigurationError # pyflakes
+
 deprecated(
     'ConfigurationError',
     'pyramid.configuration.ConfigurationError is deprecated as of '
