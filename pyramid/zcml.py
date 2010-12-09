@@ -292,7 +292,7 @@ def route(_context,
 
 class IHandlerDirective(IRouteLikeDirective):
     route_name = TextLine(title=u'route_name', required=True)
-    for_ = GlobalObject(title=u'handler', required=True)
+    handler = GlobalObject(title=u'handler', required=True)
     action = TextLine(title=u"action", required=False)
 
 def handler(_context,
