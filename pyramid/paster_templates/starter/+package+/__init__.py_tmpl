@@ -1,4 +1,4 @@
-from pyramid.configuration import Configurator
+from pyramid.config import Configurator
 from {{package}}.models import get_root
 
 def main(global_config, **settings):
@@ -9,5 +9,6 @@ def main(global_config, **settings):
                     context='{{package}}.models.MyModel',
                     renderer='{{package}}:templates/mytemplate.pt')
     config.add_static_view('static', '{{package}}:static')
+    config.commit()
     return config.make_wsgi_app()
 

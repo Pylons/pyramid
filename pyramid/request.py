@@ -225,7 +225,7 @@ class Request(WebobRequest):
     def static_url(self, path, **kw):
         """ Generates a fully qualified URL for a static :term:`resource`.
         The resource must live within a location defined via the
-        :meth:`pyramid.configuration.Configurator.add_static_view`
+        :meth:`pyramid.config.Configurator.add_static_view`
         :term:`configuration declaration` or the ``<static>`` ZCML
         directive (see :ref:`static_resources_section`).
 

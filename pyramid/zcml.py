@@ -764,12 +764,12 @@ file_configure = zcml_configure # backwards compat (>0.8.1)
 deprecated(
     'zcml_configure',
     '(pyramid.zcml.zcml_configure is deprecated as of Pyramid 1.0.  Use'
-    '``pyramid.configuration.Configurator.load_zcml`` instead.) ')
+    '``pyramid.config.Configurator.load_zcml`` instead.) ')
 
 deprecated(
     'file_configure',
     '(pyramid.zcml.file_configure is deprecated as of Pyramid 1.0.  Use'
-    '``pyramid.configuration.Configurator.load_zcml`` instead.) ')
+    '``pyramid.config.Configurator.load_zcml`` instead.) ')
 
 def _rolledUpFactory(factories):
     def factory(ob):

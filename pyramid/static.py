@@ -181,7 +181,7 @@ class static_view(object):
     .. note:: If the ``root_dir`` is relative to a :term:`package`, or
          is a :term:`resource specification` the :app:`Pyramid`
          ``resource`` ZCML directive or
-         :class:`pyramid.configuration.Configurator` method can be
+         :class:`pyramid.config.Configurator` method can be
          used to override resources within the named ``root_dir``
          package-relative directory.  However, if the ``root_dir`` is
          absolute, the ``resource`` directive will not be able to

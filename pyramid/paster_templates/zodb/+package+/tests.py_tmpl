@@ -1,11 +1,11 @@
 import unittest
 
-from pyramid.configuration import Configurator
+from pyramid.config import Configurator
 from pyramid import testing
 
 class ViewTests(unittest.TestCase):
     def setUp(self):
-        self.config = Configurator()
+        self.config = Configurator(autocommit=True)
         self.config.begin()
 
     def tearDown(self):

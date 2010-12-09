@@ -1,4 +1,4 @@
-from pyramid.configuration import Configurator
+from pyramid.config import Configurator
 
 from pyramid_beaker import session_factory_from_settings
 
@@ -20,4 +20,5 @@ def main(global_config, **settings):
                        action='index')
     config.add_subscriber('{{package}}.subscribers.add_renderer_globals',
                           'pyramid.events.BeforeRender')
+    config.commit()
     return config.make_wsgi_app()

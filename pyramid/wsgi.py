@@ -25,7 +25,7 @@ def wsgiapp(wrapped):
         />
 
     Or the following call to
-    :meth:`pyramid.configuration.Configurator.add_view`::
+    :meth:`pyramid.config.Configurator.add_view`::
 
         from views import hello_world
         config.add_view(hello_world, name='hello_world.txt')
@@ -64,7 +64,7 @@ def wsgiapp2(wrapped):
         />
 
     Or the following call to
-    :meth:`pyramid.configuration.Configurator.add_view`::
+    :meth:`pyramid.config.Configurator.add_view`::
 
         from views import hello_world
         config.add_view(hello_world, name='hello_world.txt')

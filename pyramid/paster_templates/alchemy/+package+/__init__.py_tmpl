@@ -1,4 +1,4 @@
-from pyramid.configuration import Configurator
+from pyramid.config import Configurator
 from sqlalchemy import engine_from_config
 
 from {{package}}.models import appmaker
@@ -16,6 +16,7 @@ def main(global_config, **settings):
     config.add_view('{{package}}.views.view_model',
                     context='{{package}}.models.MyModel',
                     renderer="templates/model.pt")
+    config.commit()
     return config.make_wsgi_app()
 
 

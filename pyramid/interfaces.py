@@ -33,7 +33,7 @@ class INewResponse(Interface):
 
 class IApplicationCreated(Interface):
     """ Event issued when the
-    :meth:`pyramid.configuration.Configurator.make_wsgi_app` method
+    :meth:`pyramid.config.Configurator.make_wsgi_app` method
     is called.  See the documentation attached to
     :class:`pyramid.events.ApplicationCreated` for more
     information.
@@ -312,7 +312,7 @@ class IRoutePregenerator(Interface):
 
         You can employ a pregenerator by passing a ``pregenerator``
         argument to the
-        :meth:`pyramid.configuration.Configurator.add_route`
+        :meth:`pyramid.config.Configurator.add_route`
         function.
 
         """

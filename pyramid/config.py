@@ -189,7 +189,7 @@ class Configurator(object):
     representing a set of :term:`renderer` factories which should be
     configured into this application (each tuple representing a set of
     positional values that should be passed to
-    :meth:`pyramid.configuration.Configurator.add_renderer`).  If
+    :meth:`pyramid.config.Configurator.add_renderer`).  If
     it is not passed, a default set of renderer factories is used.
 
     If ``debug_logger`` is not passed, a default debug logger that
@@ -292,7 +292,7 @@ class Configurator(object):
                 callable(*args, **kw)
         else:
             if self._ctx is None:
-                self._ctx = self._make_context()
+                self._ctx = self._make_context(self.autocommit)
             self._ctx.action(discriminator, callable, args, kw, order)
 
     def _set_settings(self, mapping):
@@ -539,7 +539,7 @@ class Configurator(object):
     def unhook_zca(self, getSiteManager=None):
         """ Call :func:`zope.component.getSiteManager.reset` to undo
         the action of
-        :meth:`pyramid.configuration.Configurator.hook_zca`.  If
+        :meth:`pyramid.config.Configurator.hook_zca`.  If
         :mod:`zope.component` cannot be imported, this method will
         raise an :exc:`ImportError`."""
         if getSiteManager is None: # pragma: no cover
@@ -671,7 +671,7 @@ class Configurator(object):
         constructor with one or more 'setting' key/value pairs.  A setting is
         a single key/value pair in the dictionary-ish object returned from
         the API :attr:`pyramid.registry.Registry.settings` and
-        :meth:`pyramid.configuration.Configurator.get_settings`.
+        :meth:`pyramid.config.Configurator.get_settings`.
 
         You may pass a dictionary::
 
@@ -683,7 +683,7 @@ class Configurator(object):
 
         This function is useful when you need to test code that accesses the
         :attr:`pyramid.registry.Registry.settings` API (or the
-        :meth:`pyramid.configuration.Configurator.get_settings` API) and
+        :meth:`pyramid.config.Configurator.get_settings` API) and
         which uses values from that API.
         """
         if settings is None:
@@ -699,7 +699,7 @@ class Configurator(object):
         Return a 'settings' object for the current application.  A
         'settings' object is a dictionary-like object that contains
         key/value pairs based on the dictionary passed as the ``settings``
-        argument to the :class:`pyramid.configuration.Configurator`
+        argument to the :class:`pyramid.config.Configurator`
         constructor or the :func:`pyramid.router.make_app` API.
 
         .. note:: For backwards compatibility, dictionary keys can also be
@@ -942,9 +942,9 @@ class Configurator(object):
           security and permissions.  If ``permission`` is omitted, a
           *default* permission may be used for this view registration
           if one was named as the
-          :class:`pyramid.configuration.Configurator` constructor's
+          :class:`pyramid.config.Configurator` constructor's
           ``default_permission`` argument, or if
-          :meth:`pyramid.configuration.Configurator.set_default_permission`
+          :meth:`pyramid.config.Configurator.set_default_permission`
           was used prior to this view registration.  Pass the string
           ``__no_permission_required__`` as the permission argument to
           explicitly indicate that the view should always be
@@ -1834,7 +1834,7 @@ class Configurator(object):
         The ``renderer`` argument should be the name of (or path to) a
         :term:`renderer` used to generate a response for this view
         (see the
-        :meth:`pyramid.configuration.Configurator.add_view`
+        :meth:`pyramid.config.Configurator.add_view`
         method's ``renderer`` argument for information about how a
         configurator relates to a renderer).
 
@@ -1871,7 +1871,7 @@ class Configurator(object):
         The ``renderer`` argument should be the name of (or path to) a
         :term:`renderer` used to generate a response for this view
         (see the
-        :meth:`pyramid.configuration.Configurator.add_view`
+        :meth:`pyramid.config.Configurator.add_view`
         method's ``renderer`` argument for information about how a
         configurator relates to a renderer).
 
@@ -1898,7 +1898,7 @@ class Configurator(object):
         ``__call__``, and ``blank``).
 
         .. note:: Using the :meth:``request_factory`` argument to the
-           :class:`pyramid.configuration.Configurator` constructor
+           :class:`pyramid.config.Configurator` constructor
            can be used to achieve the same purpose.
         """
         factory = self.maybe_dotted(factory)
@@ -1922,7 +1922,7 @@ class Configurator(object):
 
         .. note:: Using the :meth:`renderer_globals_factory`
            argument to the
-           :class:`pyramid.configuration.Configurator` constructor
+           :class:`pyramid.config.Configurator` constructor
            can be used to achieve the same purpose.
         """
         factory = self.maybe_dotted(factory)
@@ -1946,7 +1946,7 @@ class Configurator(object):
         information.
 
         .. note:: Using the ``locale_negotiator`` argument to the
-           :class:`pyramid.configuration.Configurator` constructor
+           :class:`pyramid.config.Configurator` constructor
            can be used to achieve the same purpose.
         """
         negotiator = self.maybe_dotted(negotiator)
@@ -1978,7 +1978,7 @@ class Configurator(object):
         See also :ref:`setting_a_default_permission`.
 
         .. note:: Using the ``default_permission`` argument to the
-           :class:`pyramid.configuration.Configurator` constructor
+           :class:`pyramid.config.Configurator` constructor
            can be used to achieve the same purpose.
         """
         # default permission used during view registration

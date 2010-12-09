@@ -1,4 +1,4 @@
-from pyramid.configuration import Configurator
+from pyramid.config import Configurator
 from {{package}}.models import get_root
 
 def main(global_config, **settings):
@@ -7,5 +7,6 @@ def main(global_config, **settings):
     zcml_file = settings.get('configure_zcml', 'configure.zcml')
     config = Configurator(root_factory=get_root, settings=settings)
     config.load_zcml(zcml_file)
+    config.commit()
     return config.make_wsgi_app()
 

@@ -1,4 +1,4 @@
-from pyramid.configuration import Configurator
+from pyramid.config import Configurator
 from sqlalchemy import engine_from_config
 
 from {{package}}.models import initialize_sql
@@ -12,6 +12,7 @@ def main(global_config, **settings):
     config.add_static_view('static', '{{package}}:static')
     config.add_route('home', '/', view='{{package}}.views.my_view',
                      view_renderer='templates/mytemplate.pt')
+    config.commit()
     return config.make_wsgi_app()
 
 

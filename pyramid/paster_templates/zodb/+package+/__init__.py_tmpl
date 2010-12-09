@@ -1,4 +1,4 @@
-from pyramid.configuration import Configurator
+from pyramid.config import Configurator
 from repoze.zodbconn.finder import PersistentApplicationFinder
 from {{package}}.models import appmaker
 
@@ -15,4 +15,5 @@ def main(global_config, **settings):
         return finder(request.environ)
     config = Configurator(root_factory=get_root, settings=settings)
     config.load_zcml(zcml_file)
+    config.commit()
     return config.make_wsgi_app()

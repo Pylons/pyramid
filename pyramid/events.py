@@ -51,7 +51,7 @@ class subscriber(object):
 
     .. code-block:: python
     
-       from pyramid.configuration import Configurator
+       from pyramid.config import Configurator
        config = Configurator()
        config.scan('somepackage_containing_subscribers')
 
@@ -142,7 +142,7 @@ AfterTraversal = ContextFound # b/c as of 1.0
     
 class ApplicationCreated(object):    
     """ An instance of this class is emitted as an :term:`event` when
-    the :meth:`pyramid.configuration.Configurator.make_wsgi_app` is
+    the :meth:`pyramid.config.Configurator.make_wsgi_app` is
     called.  The instance has an attribute, ``app``, which is an
     instance of the :term:`router` that will handle WSGI requests.
     This class implements the
@@ -179,7 +179,7 @@ class BeforeRender(dict):
     An object of this type is sent as an event just before a :term:`renderer`
     is invoked (but *after* the application-level renderer globals factory
     added via
-    :class:`pyramid.configuration.Configurator.set_renderer_globals_factory`,
+    :class:`pyramid.config.Configurator.set_renderer_globals_factory`,
     if any, has injected its own keys into the renderer globals dictionary).
 
     If a subscriber attempts to add a key that already exist in the renderer

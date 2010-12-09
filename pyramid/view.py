@@ -155,7 +155,7 @@ class view_config(object):
           return 'OK'
 
     Might replace the following call to the
-    :meth:`pyramid.configuration.Configurator.add_view` method::
+    :meth:`pyramid.config.Configurator.add_view` method::
 
        import views
        import models
@@ -371,7 +371,7 @@ class view_config(object):
     ``scan`` directive.
 
     Or, if you don't use ZCML, use the
-    :meth:`pyramid.configuration.Configurator.scan` method::
+    :meth:`pyramid.config.Configurator.scan` method::
 
       config.scan()
     """
@@ -505,7 +505,7 @@ If you use :term:`ZCML`, add the following to your application's
          view="pyramid.view.append_slash_notfound_view"/>
 
 Or use the
-:meth:`pyramid.configuration.Configurator.add_view`
+:meth:`pyramid.config.Configurator.add_view`
 method if you don't use ZCML::
 
   from pyramid.exceptions import NotFound

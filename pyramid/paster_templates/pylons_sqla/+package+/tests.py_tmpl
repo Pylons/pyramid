@@ -2,11 +2,11 @@ import unittest
 
 class MyHandlerTests(unittest.TestCase):
     def setUp(self):
-        from pyramid.configuration import Configurator
+        from pyramid.config import Configurator
         from sqlalchemy import create_engine
         from {{package}}.models import initialize_sql
         self.session = initialize_sql(create_engine('sqlite://'))
-        self.config = Configurator()
+        self.config = Configurator(autocommit=True)
         self.config.begin()
 
     def tearDown(self):
