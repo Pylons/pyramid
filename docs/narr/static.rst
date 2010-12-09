@@ -132,8 +132,8 @@ For example, let's assume you create a set of static declarations like so:
    config.add_static_view(name='static1', path='mypackage:resources/1')
    config.add_static_view(name='static2', path='mypackage:resources/2')
 
-These declarations create URL-accessible directories which have URLs which
-begin, respectively, with ``/static1`` and ``/static2``.  The resources in
+These declarations create URL-accessible directories which have URLs that
+begin with ``/static1`` and ``/static2``, respectively.  The resources in
 the ``resources/1`` directory of the ``mypackage`` package are consulted when
 a user visits a URL which begins with ``/static1``, and the resources in the
 ``resources/2`` directory of the ``mypackage`` package are consulted when a
