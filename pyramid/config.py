@@ -404,7 +404,8 @@ class Configurator(object):
         respectively, which are passed to ``callable`` when this action is
         executed.
 
-        ``order`` is a crude order control mechanism, only rarely used.
+        ``order`` is a crude order control mechanism, only rarely used (has
+        no effect when autocommit is ``True``).
         """
         if kw is None:
             kw = {}
@@ -430,11 +431,11 @@ class Configurator(object):
             context.action(discriminator, callable, args, kw, order)
 
     def commit(self):
-        """ Commit any pending configuration actions added. If a
-        configuration conflict has occurred, this method will raise a
-        :exc:`ConfigurationConflictError`; within the traceback of this error
-        will be information about the source of the conflict, usually
-        including file names and line numbers of the cause of the
+        """ Commit any pending configuration actions. If a configuration
+        conflict is detected in the pending configuration actins, this method
+        will raise a :exc:`ConfigurationConflictError`; within the traceback
+        of this error will be information about the source of the conflict,
+        usually including file names and line numbers of the cause of the
         configuration conflicts."""
         if self._ctx is None:
             return
@@ -490,27 +491,22 @@ class Configurator(object):
         configuration conflict by registering something with the same
         configuration parameters."""
 
-        sourcefiles = []
+        _context = self._ctx
+        if _context is None:
+            _context = self._ctx = self._make_context(self.autocommit)
 
         for c in callables:
             c = self.maybe_dotted(c)
             sourcefile = inspect.getsourcefile(c)
             module = inspect.getmodule(c)
-            sourcefiles.append((sourcefile, c, module))
-
-        _context = self._ctx
-        if _context is None:
-            _context = self._ctx = self._make_context(self.autocommit)
-
-        for filename, func, module in sourcefiles:
-            spec = module.__name__ + ':' + func.__name__
+            spec = module.__name__ + ':' + c.__name__
             if _context.processSpec(spec):
                 context = GroupingContextDecorator(_context)
-                context.basepath = os.path.dirname(filename)
+                context.basepath = os.path.dirname(sourcefile)
                 context.includepath = _context.includepath + (spec,)
                 context.package = package_of(module)
                 config = self.__class__.with_context(context)
-                func(config)
+                c(config)
 
     @classmethod
     def with_context(cls, context):
