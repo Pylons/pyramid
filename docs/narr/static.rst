@@ -46,16 +46,16 @@ specification`.
    # config is an instance of pyramid.configuration.Configurator
    config.add_static_view(name='static', path='some_package:a/b/c/static')
 
-Whether you use for ``path`` a fully qualified resource specification, or an
-absolute path, when you place your static files on the filesystem in the
-directory represented as the ``path`` of the directive, you will then be able
-to view the static files in this directory via a browser at URLs prefixed
-with the directive's ``name``.  For instance if the ``static`` directive's
-``name`` is ``static`` and the static directive's ``path`` is
-``/path/to/static``, ``http://localhost:6543/static/foo.js`` will return the
-file ``/path/to/static/dir/foo.js``.  The static directory may contain
-subdirectories recursively, and any subdirectories may hold files; these will
-be resolved by the static view as you would expect.
+Whether you use a fully qualified resource specification, or an absolute
+path for ``path`` in the directive, it specifies a filesystem directory
+where static files will be served from. Once you place files there, you
+will then be able to view them from a browser at URLs prefixed with the
+directive's ``name``.  For instance, if the ``static`` directive's
+``name`` is ``static``, and the static directive's ``path`` is
+``/path/to/static/dir``, ``http://localhost:6543/static/foo.js`` will
+serve the file ``/path/to/static/dir/foo.js``.  The static directory may
+contain subdirectories recursively, and any subdirectories may hold
+files; these will be resolved by the static view as you would expect.
 
 While the ``path`` argument can be a number of different things, the ``name``
 argument of the call to
