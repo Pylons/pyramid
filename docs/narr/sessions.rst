@@ -35,7 +35,7 @@ tampered with.
 
 You can configure this session factory in your :app:`Pyramid`
 application by using the ``session_factory`` argument to the
-:class:`pyramid.configuration.Configurator` class:
+:class:`pyramid.config.Configurator` class:
 
 .. code-block:: python
    :linenos:
@@ -43,7 +43,7 @@ application by using the ``session_factory`` argument to the
    from pyramid.session import UnencryptedCookieSessionFactoryConfig
    my_session_factory = UnencryptedCookieSessionFactoryConfig('itsaseekreet')
    
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
    config = Configurator(session_factory = my_session_factory)
 
 .. warning:: 

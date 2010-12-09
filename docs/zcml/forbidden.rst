@@ -68,7 +68,7 @@ Alternatives
 Use the :ref:`view_directive` directive with a ``context`` that names
 the :exc:`pyramid.exceptions.Forbidden` class.
 
-Use the :meth:`pyramid.configuration.Configurator.add_view` method,
+Use the :meth:`pyramid.config.Configurator.add_view` method,
 passing it a ``context`` which is the
 :exc:`pyramid.exceptions.Forbidden` class.
 

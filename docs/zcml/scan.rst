@@ -25,7 +25,7 @@ Example
 Alternatives
 ~~~~~~~~~~~~
 
-The :meth:`pyramid.configuration.Configurator.scan` method performs
+The :meth:`pyramid.config.Configurator.scan` method performs
 the same job as the ``scan`` ZCML directive.
 
 See Also

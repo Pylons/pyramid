@@ -26,7 +26,7 @@ configured imperatively:
 .. code-block:: python
    :linenos:
 
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
    from pyramid.response import Response
    from paste.httpserver import serve
 
@@ -68,12 +68,12 @@ The above script defines the following set of imports:
 .. code-block:: python
    :linenos:
 
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
    from pyramid.response import Response
    from paste.httpserver import serve
 
 The script imports the ``Configurator`` class from the
-``pyramid.configuration`` module.  This class is used to configure
+``pyramid.config`` module.  This class is used to configure
 :app:`Pyramid` for a particular application.  An instance of this class
 provides methods which help configure various parts of :app:`Pyramid` for a
 given application deployment.
@@ -180,7 +180,7 @@ code within the ``if`` block should only be run during a direct script
 execution.
 
 The ``config = Configurator()`` line above creates an instance of the
-:class:`pyramid.configuration.Configurator` class.  The resulting
+:class:`pyramid.config.Configurator` class.  The resulting
 ``config`` object represents an API which the script uses to configure
 this particular :app:`Pyramid` application.  Methods called on the
 Configurator will cause registrations to be made in a
@@ -199,7 +199,7 @@ Adding Configuration
    config.add_view(goodbye_world, name='goodbye')
 
 Each of these lines calls the
-:meth:`pyramid.configuration.Configurator.add_view` method.  The
+:meth:`pyramid.config.Configurator.add_view` method.  The
 ``add_view`` method of a configurator registers a :term:`view
 configuration` within the :term:`application registry`.  A :term:`view
 configuration` represents a set of circumstances related to the
@@ -249,7 +249,7 @@ set of predicates) is always invoked.
 In this application, :app:`Pyramid` chooses the most specific view
 callable based only on view :term:`predicate` applicability.  The
 ordering of calls to
-:meth:`pyramid.configuration.Configurator.add_view` is never very
+:meth:`pyramid.config.Configurator.add_view` is never very
 important.  We can register ``goodbye_world`` first and
 ``hello_world`` second; :app:`Pyramid` will still give us the most
 specific callable when a request is dispatched to it.
@@ -269,7 +269,7 @@ WSGI Application Creation
 
 After configuring views and ending configuration, the script creates a
 WSGI *application* via the
-:meth:`pyramid.configuration.Configurator.make_wsgi_app` method.  A
+:meth:`pyramid.config.Configurator.make_wsgi_app` method.  A
 call to ``make_wsgi_app`` implies that all configuration is finished
 (meaning all method calls to the configurator which set up views, and
 various other configuration settings have been performed).  The
@@ -332,7 +332,7 @@ References
 ----------
 
 For more information about the API of a :term:`Configurator` object,
-see :class:`pyramid.configuration.Configurator` .
+see :class:`pyramid.config.Configurator` .
 
 For more information about :term:`view configuration`, see
 :ref:`views_chapter`.

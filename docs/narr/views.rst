@@ -331,7 +331,7 @@ within :ref:`the_response`.
 
 View configuration can vary the renderer associated with a view callable via
 the ``renderer`` attribute.  For example, this call to
-:meth:`pyramid.configuration.Configurator.add_view` associates the ``json``
+:meth:`pyramid.config.Configurator.add_view` associates the ``json``
 renderer with a view callable:
 
 .. code-block:: python
@@ -463,7 +463,7 @@ contain values serializable by :func:`json.dumps`.
 
 You can configure a view to use the JSON renderer by naming ``json`` as the
 ``renderer`` argument of a view configuration, e.g. by using
-:meth:`pyramid.configuration.Configurator.add_view`:
+:meth:`pyramid.config.Configurator.add_view`:
 
 .. code-block:: python
    :linenos:
@@ -531,7 +531,7 @@ renderer:
 .. code-block:: python
    :linenos:
 
-    # config is an instance of pyramid.configuration.Configurator
+    # config is an instance of pyramid.config.Configurator
 
     config.add_view('myproject.views.hello_world',
                     name='hello',
@@ -580,7 +580,7 @@ Here's an example view configuration which uses a relative path:
 .. code-block:: python
    :linenos:
 
-    # config is an instance of pyramid.configuration.Configurator
+    # config is an instance of pyramid.config.Configurator
 
     config.add_view('myproject.views.hello_world',
                     name='hello',
@@ -682,7 +682,7 @@ override an existing :term:`renderer factory` and which add a new renderer
 factory.
 
 Renderers can be registered imperatively using the
-:meth:`pyramid.configuration.Configurator.add_renderer` API.
+:meth:`pyramid.config.Configurator.add_renderer` API.
 
 .. note:: The tasks described in this section can also be performed via
    :term:`declarative configuration`.  See
@@ -761,12 +761,12 @@ There are essentially two different kinds of renderer factories:
    ``my.package`` Python :term:`package`.
 
 Here's an example of the registration of a simple renderer factory via
-:meth:`pyramid.configuration.Configurator.add_renderer`:
+:meth:`pyramid.config.Configurator.add_renderer`:
 
 .. code-block:: python
    :linenos:
 
-   # config is an instance of pyramid.configuration.Configurator
+   # config is an instance of pyramid.config.Configurator
 
    config.add_renderer(name='amf', factory='my.package.MyAMFRenderer')
 
@@ -829,7 +829,7 @@ the ``Jinja2Renderer`` constructor will be whatever the user passed as
 ``renderer=`` to the view configuration.
 
 See also :ref:`renderer_directive` and
-:meth:`pyramid.configuration.Configurator.add_renderer`.
+:meth:`pyramid.config.Configurator.add_renderer`.
 
 Overriding an Existing Renderer
 +++++++++++++++++++++++++++++++
@@ -838,7 +838,7 @@ You can associate more than one filename extension with the same existing
 renderer implementation as necessary if you need to use a different file
 extension for the same kinds of templates.  For example, to associate the
 ``.zpt`` extension with the Chameleon ZPT renderer factory, use the
-:meth:`pyramid.configuration.Configurator.add_renderer` method:
+:meth:`pyramid.config.Configurator.add_renderer` method:
 
 .. code-block:: python
    :linenos:
@@ -1127,8 +1127,8 @@ View configuration is performed in one of these ways:
   object as per :class:`pyramid.view.view_config` and
   :ref:`mapping_views_using_a_decorator_section`.
 
-- by using the :meth:`pyramid.configuration.Configurator.add_view`
-  method as per :meth:`pyramid.configuration.Configurator.add_view`
+- by using the :meth:`pyramid.config.Configurator.add_view`
+  method as per :meth:`pyramid.config.Configurator.add_view`
   and :ref:`mapping_views_using_imperative_config_section`.
 
 Both of these mechanisms is completely equivalent to the other.
@@ -1139,7 +1139,7 @@ Both of these mechanisms is completely equivalent to the other.
 
 A view configuration might also be performed by virtue of :term:`route
 configuration`.  View configuration via route configuration is performed by
-using the :meth:`pyramid.configuration.Configurator.add_route` method to
+using the :meth:`pyramid.config.Configurator.add_route` method to
 create a route with a ``view`` argument.
 
 .. note:: ZCML users can use :ref:`route_directive` to perform the same task.
@@ -1434,7 +1434,7 @@ configuration`, like ZCML, but in decorator form.
 :class:`pyramid.view.view_config` can be used to associate :term:`view
 configuration` information -- as done via the equivalent imperative code or
 ZCML -- with a function that acts as a :app:`Pyramid` view callable.  All
-arguments to the :meth:`pyramid.configuration.Configurator.add_view` method
+arguments to the :meth:`pyramid.config.Configurator.add_view` method
 (save for the ``view`` argument) are available in decorator form and mean
 precisely the same thing.
 
@@ -1486,13 +1486,13 @@ route name / containment.
 The mere existence of a ``@view_config`` decorator doesn't suffice to perform
 view configuration.  To make :app:`Pyramid` process your
 :class:`pyramid.view.view_config` declarations, you *must* do use the
-``scan`` method of a :class:`pyramid.configuration.Configurator`:
+``scan`` method of a :class:`pyramid.config.Configurator`:
 
 .. code-block:: python
    :linenos:
 
    # config is assumed to be an instance of the
-   # pyramid.configuration.Configurator class
+   # pyramid.config.Configurator class
    config.scan()
 
 .. note:: See :ref:`zcml_scanning` for information about how to invoke a scan
@@ -1503,7 +1503,7 @@ about what happens when code is scanned for configuration declarations
 resulting from use of decorators like :class:`pyramid.view.view_config`.
 
 See :ref:`configuration_module` for additional API arguments to the
-:meth:`pyramid.configuration.Configurator.scan` method.  For example, the
+:meth:`pyramid.config.Configurator.scan` method.  For example, the
 method allows you to supply a ``package`` argument to better control exactly
 *which* code will be scanned.
 
@@ -1635,7 +1635,7 @@ equivalently as the below:
 View Configuration Using the ``add_view`` Method of a Configurator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :meth:`pyramid.configuration.Configurator.add_view` method
+The :meth:`pyramid.config.Configurator.add_view` method
 within :ref:`configuration_module` is used to configure a view
 imperatively.  The arguments to this method are very similar to the
 arguments that you provide to the ``@view_config`` decorator.  For
@@ -1650,13 +1650,13 @@ example:
        return Response('hello!')
 
    # config is assumed to be an instance of the
-   # pyramid.configuration.Configurator class
+   # pyramid.config.Configurator class
    config.add_view(hello_world, name='hello.html')
 
 The first argument, ``view``, is required.  It must either be a Python
 object which is the view itself or a :term:`dotted Python name` to
 such an object.  All other arguments are optional.  See
-:meth:`pyramid.configuration.Configurator.add_view` for more
+:meth:`pyramid.config.Configurator.add_view` for more
 information.
 
 .. index::
@@ -1732,7 +1732,7 @@ this interface.
 .. code-block:: python
    :linenos:
 
-   # config is an instance of pyramid.configuration.Configurator
+   # config is an instance of pyramid.config.Configurator
 
    config.add_view('mypackage.views.hello_world', name='hello.html',
                    context='mypackage.models.IHello')
@@ -1764,12 +1764,12 @@ to a :term:`view configuration` found during view lookup will be consulted to
 ensure that the currently authenticated user possesses that permission
 against the :term:`context` before the view function is actually called.
 Here's an example of specifying a permission in a view configuration using
-:meth:`pyramid.configuration.Configurator.add_view`:
+:meth:`pyramid.config.Configurator.add_view`:
 
 .. code-block:: python
    :linenos:
 
-   # config is an instance of pyramid.configuration.Configurator
+   # config is an instance of pyramid.config.Configurator
 
    config.add_view('myproject.views.add_entry', name='add.html',
                    context='myproject.models.IBlog', permission='add')

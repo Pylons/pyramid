@@ -215,7 +215,7 @@ Alternatives
 
 You can also add a :term:`route configuration` via:
 
-- Using the :meth:`pyramid.configuration.Configurator.add_route` method.
+- Using the :meth:`pyramid.config.Configurator.add_route` method.
 
 See Also
 ~~~~~~~~

@@ -95,7 +95,7 @@ press ``return`` after running ``paster serve development.ini``.
    'debug_templates':'true', 'default_locale_name':'en'}``.
 
 #. The ``app`` function first constructs a
-   :class:`pyramid.configuration.Configurator` instance, passing
+   :class:`pyramid.config.Configurator` instance, passing
    ``get_root`` to it as its ``root_factory`` argument, and
    ``settings`` dictionary captured via the ``**settings`` kwarg as
    its ``settings`` argument.
@@ -112,12 +112,12 @@ press ``return`` after running ``paster serve development.ini``.
    'default_locale_name':'en'}``.
 
 #. The ``app`` function then calls various methods on the an instance of the
-   class :class:`pyramid.configuration.Configurator` method.  The intent of
+   class :class:`pyramid.config.Configurator` method.  The intent of
    calling these methods is to populate an :term:`application registry`,
    which represents the :app:`Pyramid` configuration related to the
    application.
 
-#. The :meth:`pyramid.configuration.Configurator.make_wsgi_app` method is
+#. The :meth:`pyramid.config.Configurator.make_wsgi_app` method is
    called.  The result is a :term:`router` instance.  The router is
    associated with the :term:`application registry` implied by the
    configurator previously populated by other methods run against the
@@ -146,7 +146,7 @@ Deployment Settings
 -------------------
 
 Note that an augmented version of the values passed as ``**settings`` to the
-:class:`pyramid.configuration.Configurator` constructor will be available in
+:class:`pyramid.config.Configurator` constructor will be available in
 :app:`Pyramid` :term:`view callable` code as ``request.registry.settings``.
 You can create objects you wish to access later from view code, and put them
 into the dictionary you pass to the configurator as ``settings``.  They will

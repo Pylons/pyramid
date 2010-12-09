@@ -1,6 +1,6 @@
 import unittest
 
-from pyramid.configuration import Configurator
+from pyramid.config import Configurator
 from pyramid import testing
 
 def _initTestingDB():
@@ -20,7 +20,7 @@ def _registerRoutes(config):
 
 class ViewWikiTests(unittest.TestCase):
     def setUp(self):
-        self.config = Configurator()
+        self.config = Configurator(autocommit=True)
         self.config.begin()
 
     def tearDown(self):
@@ -36,7 +36,7 @@ class ViewWikiTests(unittest.TestCase):
 class ViewPageTests(unittest.TestCase):
     def setUp(self):
         self.session = _initTestingDB()
-        self.config = Configurator()
+        self.config = Configurator(autocommit=True)
         self.config.begin()
 
     def tearDown(self):
@@ -71,7 +71,7 @@ class ViewPageTests(unittest.TestCase):
 class AddPageTests(unittest.TestCase):
     def setUp(self):
         self.session = _initTestingDB()
-        self.config = Configurator()
+        self.config = Configurator(autocommit=True)
         self.config.begin()
 
     def tearDown(self):
@@ -104,7 +104,7 @@ class AddPageTests(unittest.TestCase):
 class EditPageTests(unittest.TestCase):
     def setUp(self):
         self.session = _initTestingDB()
-        self.config = Configurator()
+        self.config = Configurator(autocommit=True)
         self.config.begin()
 
     def tearDown(self):

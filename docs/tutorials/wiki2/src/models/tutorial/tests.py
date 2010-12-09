@@ -1,5 +1,5 @@
 import unittest
-from pyramid.configuration import Configurator
+from pyramid.config import Configurator
 from pyramid import testing
 
 def _initTestingDB():
@@ -9,7 +9,7 @@ def _initTestingDB():
 
 class TestMyView(unittest.TestCase):
     def setUp(self):
-        self.config = Configurator()
+        self.config = Configurator(autocommit=True)
         self.config.begin()
         _initTestingDB()
 

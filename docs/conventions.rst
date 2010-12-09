@@ -22,12 +22,12 @@ concept are presented in the following style:
 
 We present Python method names using the following style:
 
-  :meth:`pyramid.configuration.Configurator.add_view`
+  :meth:`pyramid.config.Configurator.add_view`
 
 We present Python class names, module names, attributes and global
 variables using the following style:
 
-  :class:`pyramid.configuration.Configurator.registry`
+  :class:`pyramid.config.Configurator.registry`
 
 References to glossary terms are presented using the following style:
 

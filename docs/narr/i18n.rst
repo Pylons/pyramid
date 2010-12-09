@@ -192,7 +192,7 @@ factory is best practice.  Using your own unique translation domain
 allows another person to reuse your application without needing to
 merge your translation files with his own.  Instead, he can just
 include your package's :term:`translation directory` via the
-:meth:`pyramid.configuration.Configurator.add_translation_dirs`
+:meth:`pyramid.config.Configurator.add_translation_dirs`
 method.
 
 .. note::
@@ -747,13 +747,13 @@ Localization-Related Deployment Settings
 A :app:`Pyramid` application will have a ``default_locale_name``
 setting.  This value represents the :term:`default locale name` used
 when the :term:`locale negotiator` returns ``None``.  Pass it to the
-:mod:`pyramid.configuration.Configurator` constructor at startup
+:mod:`pyramid.config.Configurator` constructor at startup
 time:
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
    config = Configurator(settings={'default_locale_name':'de'})
 
 You may alternately supply a ``default_locale_name`` via an
@@ -874,13 +874,13 @@ directory in the translation directory) within your :app:`Pyramid`
 application to be available to use for translation services.
 
 You can add a translation directory imperatively by using the
-:meth:`pyramid.configuration.Configurator.add_translation_dirs` during
+:meth:`pyramid.config.Configurator.add_translation_dirs` during
 application startup.  For example:
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
    config.begin()
    config.add_translation_dirs('my.application:locale/', 
                                'another.application:locale/')
@@ -888,7 +888,7 @@ application startup.  For example:
    config.end()
 
 A message catalog in a translation directory added via
-:meth:`pyramid.configuration.Configurator.add_translation_dirs`
+:meth:`pyramid.config.Configurator.add_translation_dirs`
 will be merged into translations from a message catalog added earlier
 if both translation directories contain translations for the same
 locale and :term:`translation domain`.
@@ -1000,17 +1000,17 @@ You may add your newly created locale negotiator to your application's
 configuration by passing an object which can act as the negotiator (or a
 :term:`dotted Python name` referring to the object) as the
 ``locale_negotiator`` argument of the
-:class:`pyramid.configuration.Configurator` instance during application
+:class:`pyramid.config.Configurator` instance during application
 startup.  For example:
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
    config = Configurator(locale_negotiator=my_locale_negotiator)
 
 Alternately, use the
-:meth:`pyramid.configuration.Configurator.set_locale_negotiator`
+:meth:`pyramid.config.Configurator.set_locale_negotiator`
 method.
 
 For example:
@@ -1018,7 +1018,7 @@ For example:
 .. code-block:: python
    :linenos:
 
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
    config = Configurator()
    config.begin()
    config.set_locale_negotiator(my_locale_negotiator)

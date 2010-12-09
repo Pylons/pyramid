@@ -23,7 +23,7 @@ assumed to return a :term:`response` object.
 The request passed to every view that is called as the result of a route
 match has an attribute named ``matchdict`` that contains the elements placed
 into the URL by the ``pattern`` of a ``route`` statement.  For instance, if a
-call to :meth:`pyramid.configuration.Configurator.add_route` in
+call to :meth:`pyramid.config.Configurator.add_route` in
 ``__init__.py`` had the pattern ``{one}/{two}``, and the URL at
 ``http://example.com/foo/bar`` was invoked, matching this pattern, the
 matchdict dictionary attached to the request passed to the view would have a
@@ -255,7 +255,7 @@ body of this guide, however it is available `online
 
 This CSS file will be accessed via
 e.g. ``http://localhost:6543/static/style.css`` by virtue of the call we've
-made to :meth:`pyramid.configuration.Configurator.add_static_view` within our
+made to :meth:`pyramid.config.Configurator.add_static_view` within our
 ``__init__.py`` file.  Any number and type of static resources can be placed
 in this directory (or subdirectories) and are just referred to by URL within
 templates.
@@ -264,7 +264,7 @@ Mapping Views to URLs in ``__init__.py``
 ========================================
 
 The ``__init__.py`` file contains
-:meth:`pyramid.configuration.Configurator.add_route` calls which serve to map
+:meth:`pyramid.config.Configurator.add_route` calls which serve to map
 URLs via :term:`url dispatch` to view functions.  First, we’ll get rid of the
 existing route created by the template using the name ``home``. It’s only an
 example and isn’t relevant to our application.

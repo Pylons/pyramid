@@ -180,7 +180,7 @@ named ``config``:
    config = Configurator(root_factory=Root)
 
 Using the ``root_factory`` argument to a
-:class:`pyramid.configuration.Configurator` constructor tells your
+:class:`pyramid.config.Configurator` constructor tells your
 :app:`Pyramid` application to call this root factory to generate a
 root object whenever a request enters the application.  This root
 factory is also known as the global root factory.  A root factory can

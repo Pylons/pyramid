@@ -1,23 +1,30 @@
 Twophase branch
 ===============
 
-- ``pyramid.configuration.Config`` was added.  It has the same API as the old
-  ``Configurator`` which it means to replace, except by default it is a
-  *non-autocommitting* configurator, unlike
-  ``pyramid.configuration.Configurator``, which will autocommit every time a
-  configuration method is called.  It also has a new API method named
-  ``with_context`` (a classmethod).
+- A new module named ``pyramid.config`` was added.  It subsumes the duties of
+  the older ``pyramid.configuration`` module.  The ``pyramid.configuration``
+  module remains, but it is deprecated.
 
 - ``pyramid.configuration.Configurator`` is now deprecated.  Use
-  ``pyramid.configuration.Config`` passing its constructor
+  ``pyramid.config.Configurator``, passing its constructor
   ``autocommit=True`` instead.  The ``pyramid.configuration.Configurator``
-  alias will live for a long time, as every application uses it.
+  alias will live for a long time, as every application uses it, but its
+  import now issues a deprecation warning.  The
+  ``pyramid.config.Configurator`` class has the same API as
+  ``pyramid.configuration.Configurator`` class, which it means to replace,
+  except by default it is a *non-autocommitting* configurator. The
+  now-deprecated ``pyramid.configuration.Configurator`` will autocommit every
+  time a configuration method is called.
+
+- The new ``pyramid.config.Configurator` class has API methods that the older
+  ``pyramid.configuration.Configurator`` class did not: ``with_context`` (a
+  classmethod), ``include``, ``action``, and ``commit``.  These methods exist
+  for imperative application extensibility purposes.
 
 - The ``pyramid.testing.setUp`` function now accepts an ``autocommit``
   keyword argument, which defaults to ``True``.  If it is passed ``False``,
   the Config object returned by ``setUp`` will be a non-autocommiting Config
   object.
-
 
 Next release
 ============

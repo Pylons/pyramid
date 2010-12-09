@@ -12,7 +12,7 @@ documentation is organized alphabetically by module name.
    api/authentication
    api/chameleon_text
    api/chameleon_zpt
-   api/configuration
+   api/config
    api/events
    api/exceptions
    api/httpexceptions

@@ -1,11 +1,11 @@
 .. _configuration_module:
 
-:mod:`pyramid.configuration`
--------------------------------
+:mod:`pyramid.config`
+---------------------
 
-.. automodule:: pyramid.configuration
+.. automodule:: pyramid.config
 
-  .. autoclass:: Configurator(registry=None, package=None, settings=None, root_factory=None, authentication_policy=None, authorization_policy=None, renderers=DEFAULT_RENDERERS, debug_logger=None, locale_negotiator=None, request_factory=None, renderer_globals_factory=None, default_permission=None, session_factory=None)
+  .. autoclass:: Configurator(registry=None, package=None, settings=None, root_factory=None, authentication_policy=None, authorization_policy=None, renderers=DEFAULT_RENDERERS, debug_logger=None, locale_negotiator=None, request_factory=None, renderer_globals_factory=None, default_permission=None, session_factory=None, autocommit=False)
 
      .. attribute:: registry
 
@@ -21,6 +21,12 @@
      .. automethod:: unhook_zca()
 
      .. automethod:: get_settings
+
+     .. automethod:: commit
+
+     .. automethod:: action
+
+     .. automethod:: include
 
      .. automethod:: with_package
 

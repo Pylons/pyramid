@@ -9,14 +9,14 @@ omnipresent in :app:`Pyramid`:
   willing to walk over when :term:`traversal` is used.
 
 - The ``context`` and ``containment`` arguments to
-  :meth:`pyramid.configuration.Configurator.add_view` often
+  :meth:`pyramid.config.Configurator.add_view` often
   reference a model class.
 
 - A :term:`root factory` returns a model instance.
 
 - A model instance is generated as a result of :term:`url dispatch`
   (see the ``factory`` argument to
-  :meth:`pyramid.configuration.Configurator.add_route`).
+  :meth:`pyramid.config.Configurator.add_route`).
 
 - A model instance is exposed to :term:`view` code as the
   :term:`context` of a view.

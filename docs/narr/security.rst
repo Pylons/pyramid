@@ -63,14 +63,14 @@ Enabling an Authorization Policy Imperatively
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Passing an ``authorization_policy`` argument to the constructor of the
-:class:`pyramid.configuration.Configurator` class enables an
+:class:`pyramid.config.Configurator` class enables an
 authorization policy.
 
 You must also enable an :term:`authentication policy` in order to
 enable the authorization policy.  This is because authorization, in
 general, depends upon authentication.  Use the
 ``authentication_policy`` argument to the
-:class:`pyramid.configuration.Configurator` class during
+:class:`pyramid.config.Configurator` class during
 application setup to specify an authentication policy.
 
 For example:
@@ -79,7 +79,7 @@ For example:
 .. code-block:: python
    :linenos:
 
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
    from pyramid.authentication import AuthTktAuthenticationPolicy
    from pyramid.authorization import ACLAuthorizationPolicy
    authentication_policy = AuthTktAuthenticationPolicy('seekrit')
@@ -127,12 +127,12 @@ name permissions whatever you like.
 
 For example, the following view declaration protects the view named
 ``add_entry.html`` when invoked against a ``Blog`` context with the ``add``
-permission using the :meth:`pyramid.configuration.Configurator.add_view` API:
+permission using the :meth:`pyramid.config.Configurator.add_view` API:
 
 .. code-block:: python
    :linenos:
 
-   # config is an instance of pyramid.configuration.Configurator
+   # config is an instance of pyramid.config.Configurator
 
    config.add_view('mypackage.views.blog_entry_add_view',
                    name='add_entry.html', 
@@ -183,10 +183,10 @@ These APIs are in support of configuring a default permission for an
 application:
 
 - The ``default_permission`` constructor argument to the
-  :mod:`pyramid.configuration.Configurator` constructor.
+  :mod:`pyramid.config.Configurator` constructor.
 
 - The
-  :meth:`pyramid.configuration.Configurator.set_default_permission`
+  :meth:`pyramid.config.Configurator.set_default_permission`
   method.
 
 - The :ref:`default_permission_directive` ZCML directive.
@@ -582,7 +582,7 @@ that implements the following interface:
            current user on subsequent requests. """
 
 After you do so, you can pass an instance of such a class into the
-:class:`pyramid.configuration.Configurator` class at configuration
+:class:`pyramid.config.Configurator` class at configuration
 time as ``authentication_policy`` to use it.
 
 .. index::
@@ -626,5 +626,5 @@ following interface:
                 permission """
 
 After you do so, you can pass an instance of such a class into the
-:class:`pyramid.configuration.Configurator` class at configuration
+:class:`pyramid.config.Configurator` class at configuration
 time as ``authorization_policy`` to use it.

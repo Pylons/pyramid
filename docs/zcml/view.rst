@@ -244,7 +244,7 @@ You can also add a :term:`view configuration` via:
 
 - Using the :class:`pyramid.view.view_config` class as a decorator.
 
-- Using the :meth:`pyramid.configuration.Configurator.add_view` method.
+- Using the :meth:`pyramid.config.Configurator.add_view` method.
 
 See Also
 ~~~~~~~~

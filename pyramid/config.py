@@ -206,7 +206,7 @@ class Configurator(object):
     value is passed, the ``session_factory`` will be used to create a
     session object when ``request.session`` is accessed.  Note that
     the same outcome can be achieved by calling
-    :ref:`pyramid.configration.Configurator.set_session_factory`.  By
+    :meth:`pyramid.config.Configurator.set_session_factory`.  By
     default, this argument is ``None``, indicating that no session
     factory will be configured (and thus accessing ``request.session``
     will throw an error) unless ``set_session_factory`` is called later
@@ -220,7 +220,7 @@ class Configurator(object):
     :meth:`pyramid.config.Configurator.commit` is called, the actions implied
     by the called methods will be checked for configuration conflicts unless
     ``autocommit`` is ``True``.  If a conflict is detected a
-    ``ConfigurationConflictError`` will be raised.  NB: calling
+    ``ConfigurationConflictError`` will be raised.  Calling
     :meth:`pyramid.config.Configurator.make_wsgi_app` always implies a final
     commit."""
 
@@ -441,6 +441,76 @@ class Configurator(object):
         self._ctx.execute_actions()
         # unwrap and reset the context
         self._ctx = None
+
+    def include(self, *callables):
+        """Include one or more configuration callables, to support imperative
+        application extensibility.
+
+        A configuration callable should be a callable that accepts a single
+        argument named ``config``, which will be an instance of a
+        :term:`Configurator`  (be warned that it will not be the same
+        configurator instance on which you call this method, however).  The
+        code which runs as the result of calling the callable should invoke
+        methods on the configurator passed to it which add configuration
+        state.  The return value of a callable will be ignored.
+
+        Values allowed to be presented via the ``*callables`` argument to
+        this method: any callable Python object or any :term:`dotted Python
+        name` which resolves to a callable Python object.
+        
+        For example, if the ``configure`` function below lives in a module
+        named ``myapp.myconfig``:
+
+        .. code-block:: python
+           :linenos:
+
+           # myapp.myconfig module
+
+           def my_view(request):
+               from pyramid.response import Response
+               return Response('OK')
+
+           def configure(config):
+               config.add_view(my_view)
+
+        You might cause it be included within your Pyramid application like
+        so:
+
+        .. code-block:: python
+           :linenos:
+
+           from pyramid.config import Configurator
+
+           def main(global_config, **settings):
+               config = Configurator()
+               config.include('myapp.myconfig.configure')
+
+        Included configuration statements will be overridden by local
+        configuration statements if an included callable causes a
+        configuration conflict by registering something with the same
+        configuration parameters."""
+
+        sourcefiles = []
+
+        for c in callables:
+            c = self.maybe_dotted(c)
+            sourcefile = inspect.getsourcefile(c)
+            module = inspect.getmodule(c)
+            sourcefiles.append((sourcefile, c, module))
+
+        _context = self._ctx
+        if _context is None:
+            _context = self._ctx = self._make_context(self.autocommit)
+
+        for filename, func, module in sourcefiles:
+            spec = module.__name__ + ':' + func.__name__
+            if _context.processSpec(spec):
+                context = GroupingContextDecorator(_context)
+                context.basepath = os.path.dirname(filename)
+                context.includepath = _context.includepath + (spec,)
+                context.package = package_of(module)
+                config = self.__class__.with_context(context)
+                func(config)
 
     @classmethod
     def with_context(cls, context):
@@ -777,42 +847,6 @@ class Configurator(object):
             lock.release()
             self.manager.pop()
         return registry
-
-    def include(self, *funcs):
-        """ Include one or more configuration callables.  A configuration
-        callable should be a callable that accepts a single argument named
-        ``config``, which will be an instance of a :term:`Configurator`.  (be
-        warned that it will not be the same configurator instance on which
-        you call this method, however).  The code which runs as the result of
-        calling the callable should invoke methods on the configurator which
-        add configuration state.  The return value of a callable will be
-        ignored.
-
-        Values allowed to be presented via the ``*funcs`` argument to this
-        method: any callable Python object or any :term:`dotted Python name`
-        which resolves to a callable Python object.
-        """
-        sourcefiles = []
-
-        for func in funcs:
-            func = self.maybe_dotted(func)
-            sourcefile = inspect.getsourcefile(func)
-            module = inspect.getmodule(func)
-            sourcefiles.append((sourcefile, func, module))
-
-        _context = self._ctx
-        if _context is None:
-            _context = self._ctx = self._make_context(self.autocommit)
-
-        for filename, func, module in sourcefiles:
-            spec = module.__name__ + ':' + func.__name__
-            if _context.processSpec(spec):
-                context = GroupingContextDecorator(_context)
-                context.basepath = os.path.dirname(filename)
-                context.includepath = _context.includepath + (spec,)
-                context.package = package_of(module)
-                config = self.__class__.with_context(context)
-                func(config)
 
     def add_handler(self, route_name, pattern, handler, action=None, **kw):
 

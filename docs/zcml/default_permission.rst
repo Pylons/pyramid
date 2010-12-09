@@ -43,11 +43,11 @@ Alternatives
 ~~~~~~~~~~~~
 
 Using the ``default_permission`` argument to the
-:class:`pyramid.configuration.Configurator` constructor can be used
+:class:`pyramid.config.Configurator` constructor can be used
 to achieve the same purpose.
 
 Using the 
-:meth:`pyramid.configuration.Configurator.set_default_permission`
+:meth:`pyramid.config.Configurator.set_default_permission`
 method can be used to achieve the same purpose when using imperative
 configuration.
 
