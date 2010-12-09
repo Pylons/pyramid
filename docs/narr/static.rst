@@ -234,13 +234,16 @@ represents your root object.
    config.add_view('mypackage.static.static_view', name='static',
                    context='mypackage.models.Root')
 
-In this case, ``mypackage.models.Root`` refers to the class of which your
-:app:`Pyramid` application's root object is an instance.
+In this case, ``mypackage.models.Root`` refers to the class of your
+:app:`Pyramid` application's traversal root object.
 
-You can also omit the ``context`` argument if you want the name ``static`` to
-be accessible as the static view against any model.  This will also allow
-``/static/foo.js`` to work, but it will allow for ``/anything/static/foo.js``
-too, as long as ``anything`` itself is resolvable.
+The context argument above limits where the static view is accessible to
+URL paths directly under the root object.  If you omit the ``context``
+argument, then ``static`` will be accessible as the static view against
+any model object in the traversal graph.  This will allow
+``/static/foo.js`` to work, but it will also allow for
+``/anything/static/foo.js`` too, as long as ``anything`` can be
+resolved.
 
 Note that you cannot use the :func:`pyramid.url.static_url` API to generate
 URLs against resources made accessible by registering a custom static view.
