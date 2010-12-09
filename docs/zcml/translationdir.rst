@@ -55,7 +55,7 @@ Example 3
 Alternatives
 ~~~~~~~~~~~~
 
-Use :meth:`pyramid.configuration.Configurator.add_translation_dirs`
+Use :meth:`pyramid.config.Configurator.add_translation_dirs`
 method instance during initial application setup.
 
 See Also

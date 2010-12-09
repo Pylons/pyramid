@@ -29,7 +29,7 @@ Example
 Alternatives
 ~~~~~~~~~~~~
 
-Use :meth:`pyramid.configuration.Configurator.set_locale_negotiator`
+Use :meth:`pyramid.config.Configurator.set_locale_negotiator`
 method instance during initial application setup.
 
 See Also

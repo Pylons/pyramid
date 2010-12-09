@@ -37,7 +37,7 @@ Too Complex
    :linenos:
 
    from paste.httpserver import serve
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
    from pyramid.response import Response
 
    def hello_world(request):
@@ -545,7 +545,7 @@ everything done completely imperatively.  For example, the very most basic
 
    from webob import Response
    from paste.httpserver import serve
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
 
    def hello_world(request):
        return Response('Hello world!')
@@ -1707,7 +1707,7 @@ where comments take into account what we've discussed in the
        return Response('Hello world!') 
 
    if __name__ == '__main__':
-       from pyramid.configuration import Configurator
+       from pyramid.config import Configurator
        config = Configurator()       # no global application object.
        config.add_view(hello_world)  # explicit non-decorator registration
        app = config.make_wsgi_app()  # explicitly WSGI

@@ -68,7 +68,7 @@ represents.
 .. note: Although we don't use the functionality here, the ``factory`` used
    to create route contexts may differ per-route as opposed to globally.  See
    the ``factory`` argument to
-   :meth:`pyramid.configuration.Configurator.add_route` for more info.
+   :meth:`pyramid.config.Configurator.add_route` for more info.
 
 We'll pass the ``RootFactory`` we created in the step above in as the
 ``root_factory`` argument to a :term:`Configurator`.  
@@ -85,7 +85,7 @@ For any :app:`Pyramid` application to perform authorization, we need to add a
 We'll change our ``__init__.py`` file to enable an
 ``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy`` to enable
 declarative security checking.  We'll also change ``__init__.py`` to add a
-:meth:`pyramid.configuration.Configurator.add_view` call to points at our
+:meth:`pyramid.config.Configurator.add_view` call to points at our
 ``login`` :term:`view callable`, also known as a :term:`forbidden view`.
 This configures our newly created login view to show up when :app:`Pyramid`
 detects that a view invocation can not be authorized.  Also, we'll add

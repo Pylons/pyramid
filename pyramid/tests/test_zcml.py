@@ -11,7 +11,8 @@ from zope.interface import implements
 
 class TestViewDirective(unittest.TestCase):
     def setUp(self):
-        testing.setUp()
+        self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
@@ -21,14 +22,12 @@ class TestViewDirective(unittest.TestCase):
         return view(*arg, **kw)
 
     def test_with_dotted_renderer(self):
-        from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IRendererFactory
         from pyramid.interfaces import IRequest
-        context = DummyContext()
-        reg = get_current_registry()
-        context.registry = reg
+        reg = self.config.registry
+        context = self.config._ctx
         def factory(path):
             def foo(*arg):
                 return 'OK'
@@ -37,7 +36,7 @@ class TestViewDirective(unittest.TestCase):
         view = lambda *arg: None
         self._callFUT(context, 'repoze.view', IDummy, view=view,
                       renderer='foo/template.pt')
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 1)
         discrim = ('view', IDummy, '', None, IView, None, None, None, None,
                    None, False, None, None, None)
@@ -49,13 +48,11 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(regview(None, None).body, 'OK')
 
     def test_with_custom_predicates(self):
-        from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IRequest
-        context = DummyContext()
-        reg = get_current_registry()
-        context.registry = reg
+        reg = self.config.registry
+        context = self.config._ctx
         view = lambda *arg: 'OK'
         def pred1(context, request):
             return True
@@ -64,7 +61,7 @@ class TestViewDirective(unittest.TestCase):
         preds = (pred1, pred2)
         self._callFUT(context, 'repoze.view', IDummy, view=view,
                       custom_predicates=preds)
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 1)
         discrim = ('view', IDummy, '', None, IView, None, None, None, None,
                    None, False, None, None, None)
@@ -77,19 +74,17 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(regview(None, None), 'OK')
 
     def test_context_trumps_for(self):
-        from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IRequest
-        context = DummyContext()
-        reg = get_current_registry()
-        context.registry = reg
+        reg = self.config.registry
+        context = self.config._ctx
         view = lambda *arg: 'OK'
         class Foo:
             pass
         self._callFUT(context, 'repoze.view', for_=Foo, view=view,
                       context=IDummy)
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 1)
         discrim = ('view', IDummy, '', None, IView, None, None, None, None,
                    None, False, None, None, None)
@@ -101,18 +96,16 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(regview(None, None), 'OK')
 
     def test_with_for(self):
-        from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IRequest
-        context = DummyContext()
-        reg = get_current_registry()
-        context.registry = reg
+        reg = self.config.registry
+        context = self.config._ctx
         view = lambda *arg: 'OK'
         class Foo:
             pass
         self._callFUT(context, 'repoze.view', for_=IDummy, view=view)
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 1)
         discrim = ('view', IDummy, '', None, IView, None, None, None, None,
                    None, False, None, None, None)
@@ -125,11 +118,11 @@ class TestViewDirective(unittest.TestCase):
 
 class TestNotFoundDirective(unittest.TestCase):
     def setUp(self):
-        self.config = testing.setUp()
+        self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, context, view, **kw):
         from pyramid.zcml import notfound
@@ -143,12 +136,11 @@ class TestNotFoundDirective(unittest.TestCase):
         from pyramid.exceptions import NotFound
 
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = self.config._ctx
         def view(request):
             return 'OK'
         self._callFUT(context, view)
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 1)
 
         discrim = ('view', NotFound, '', None, IView, None, None, None, None,
@@ -171,18 +163,18 @@ class TestNotFoundDirective(unittest.TestCase):
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         from pyramid.exceptions import NotFound
-        from pyramid.configuration import Configurator
+        from pyramid.config import Configurator
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
         config = Configurator(reg)
         def dummy_renderer_factory(*arg, **kw):
             return lambda *arg, **kw: 'OK'
         config.add_renderer('.pt', dummy_renderer_factory)
+        config.commit()
         def view(request):
             return {}
+        context = self.config._ctx
         self._callFUT(context, view, renderer='fake.pt')
-        actions = context.actions
+        actions = extract_actions(context.actions)
         regadapt = actions[0]
         register = regadapt['callable']
         register()
@@ -195,11 +187,11 @@ class TestNotFoundDirective(unittest.TestCase):
 
 class TestForbiddenDirective(unittest.TestCase):
     def setUp(self):
-        self.config = testing.setUp()
+        self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, context, view, **kw):
         from pyramid.zcml import forbidden
@@ -212,12 +204,11 @@ class TestForbiddenDirective(unittest.TestCase):
         from pyramid.interfaces import IViewClassifier
         from pyramid.exceptions import Forbidden
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = self.config._ctx
         def view(request):
             return 'OK'
         self._callFUT(context, view)
-        actions = context.actions
+        actions = extract_actions(context.actions)
 
         self.assertEqual(len(actions), 1)
 
@@ -241,18 +232,18 @@ class TestForbiddenDirective(unittest.TestCase):
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         from pyramid.exceptions import Forbidden
-        from pyramid.configuration import Configurator
-        context = DummyContext()
+        from pyramid.config import Configurator
         reg = self.config.registry
-        context.registry = reg
         config = Configurator(reg)
         def dummy_renderer_factory(*arg, **kw):
             return lambda *arg, **kw: 'OK'
         config.add_renderer('.pt', dummy_renderer_factory)
+        config.commit()
         def view(request):
             return {}
+        context = self.config._ctx
         self._callFUT(context, view, renderer='fake.pt')
-        actions = context.actions
+        actions = extract_actions(context.actions)
         regadapt = actions[0]
         register = regadapt['callable']
         register()
@@ -265,11 +256,11 @@ class TestForbiddenDirective(unittest.TestCase):
 
 class TestRepozeWho1AuthenticationPolicyDirective(unittest.TestCase):
     def setUp(self):
-        self.config = testing.setUp()
+        self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, context, **kw):
         from pyramid.zcml import repozewho1authenticationpolicy
@@ -278,10 +269,9 @@ class TestRepozeWho1AuthenticationPolicyDirective(unittest.TestCase):
     def test_it_defaults(self):
         reg = self.config.registry
         from pyramid.interfaces import IAuthenticationPolicy
-        context = DummyContext()
-        context.registry = reg
+        context = self.config._ctx
         self._callFUT(context)
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 1)
         regadapt = actions[0]
         self.assertEqual(regadapt['discriminator'], IAuthenticationPolicy)
@@ -294,12 +284,11 @@ class TestRepozeWho1AuthenticationPolicyDirective(unittest.TestCase):
     def test_it(self):
         reg = self.config.registry
         from pyramid.interfaces import IAuthenticationPolicy
-        context = DummyContext()
-        context.registry = reg
+        context = self.config._ctx
         def callback(identity, request):
             """ """
         self._callFUT(context, identifier_name='something', callback=callback)
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 1)
         regadapt = actions[0]
         self.assertEqual(regadapt['discriminator'], IAuthenticationPolicy)
@@ -311,11 +300,11 @@ class TestRepozeWho1AuthenticationPolicyDirective(unittest.TestCase):
 
 class TestRemoteUserAuthenticationPolicyDirective(unittest.TestCase):
     def setUp(self):
-        self.config = testing.setUp()
+        self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, context, **kw):
         from pyramid.zcml import remoteuserauthenticationpolicy
@@ -324,12 +313,11 @@ class TestRemoteUserAuthenticationPolicyDirective(unittest.TestCase):
     def test_defaults(self):
         from pyramid.interfaces import IAuthenticationPolicy
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = self.config._ctx
         def callback(identity, request):
             """ """
         self._callFUT(context)
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 1)
         regadapt = actions[0]
         self.assertEqual(regadapt['discriminator'], IAuthenticationPolicy)
@@ -342,12 +330,11 @@ class TestRemoteUserAuthenticationPolicyDirective(unittest.TestCase):
     def test_it(self):
         from pyramid.interfaces import IAuthenticationPolicy
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = self.config._ctx
         def callback(identity, request):
             """ """
         self._callFUT(context, environ_key='BLAH', callback=callback)
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 1)
         regadapt = actions[0]
         self.assertEqual(regadapt['discriminator'], IAuthenticationPolicy)
@@ -359,11 +346,11 @@ class TestRemoteUserAuthenticationPolicyDirective(unittest.TestCase):
 
 class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
     def setUp(self):
-        self.config = testing.setUp()
+        self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, context, secret, **kw):
         from pyramid.zcml import authtktauthenticationpolicy
@@ -372,10 +359,9 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
     def test_it_defaults(self):
         from pyramid.interfaces import IAuthenticationPolicy
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = self.config._ctx
         self._callFUT(context, 'sosecret')
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 1)
         regadapt = actions[0]
         self.assertEqual(regadapt['discriminator'], IAuthenticationPolicy)
@@ -388,15 +374,14 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
     def test_it_noconfigerror(self):
         from pyramid.interfaces import IAuthenticationPolicy
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = self.config._ctx
         def callback(identity, request):
             """ """
         self._callFUT(context, 'sosecret', callback=callback,
                       cookie_name='auth_tkt',
                       secure=True, include_ip=True, timeout=100,
                       reissue_time=60, http_only=True, path="/sub/")
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 1)
         regadapt = actions[0]
         self.assertEqual(regadapt['discriminator'], IAuthenticationPolicy)
@@ -410,7 +395,7 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
 
     def test_it_configerror(self):
         from pyramid.exceptions import ConfigurationError
-        context = DummyContext()
+        context = self.config._ctx
         def callback(identity, request):
             """ """
         self.assertRaises(ConfigurationError,
@@ -423,11 +408,11 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
 
 class TestACLAuthorizationPolicyDirective(unittest.TestCase):
     def setUp(self):
-        self.config = testing.setUp()
+        self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, context, **kw):
         from pyramid.zcml import aclauthorizationpolicy
@@ -437,12 +422,11 @@ class TestACLAuthorizationPolicyDirective(unittest.TestCase):
         from pyramid.authorization import ACLAuthorizationPolicy
         from pyramid.interfaces import IAuthorizationPolicy
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = self.config._ctx
         def callback(identity, request):
             """ """
         self._callFUT(context)
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 1)
         regadapt = actions[0]
         self.assertEqual(regadapt['discriminator'], IAuthorizationPolicy)
@@ -453,11 +437,11 @@ class TestACLAuthorizationPolicyDirective(unittest.TestCase):
 
 class TestRouteDirective(unittest.TestCase):
     def setUp(self):
-        self.config = testing.setUp()
+        self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, *arg, **kw):
         from pyramid.zcml import route
@@ -480,26 +464,27 @@ class TestRouteDirective(unittest.TestCase):
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IRouteRequest
-        context = DummyContext()
         reg = self.config.registry
-        context.registry = reg
+        context = self.config._ctx
         view = lambda *arg: 'OK'
         self._callFUT(context, 'name', 'pattern', view=view)
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 2)
 
-        route_action = actions[0]
-        route_action['callable']()
+        view_action = actions[0]
+        request_type = reg.getUtility(IRouteRequest, 'name')
+        view_discriminator = view_action['discriminator']
+        discrim = ('view', None, '', None, IView, None, None, None, 'name',
+                   None, False, None, None, None)
+        self.assertEqual(view_discriminator, discrim)
+        view_action['callable'](*view_action['args'], **view_action['kw'])
+
+        route_action = actions[1]
         route_discriminator = route_action['discriminator']
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None,None))
         self._assertRoute('name', 'pattern')
 
-        view_action = actions[1]
-        request_type = reg.getUtility(IRouteRequest, 'name')
-        view_discriminator = view_action['discriminator']
-        discrim = ('view', None, '', None, IView, 'name', None)
-        self.assertEqual(view_discriminator, discrim)
         wrapped = reg.adapters.lookup(
             (IViewClassifier, request_type, Interface), IView, name='')
         self.failUnless(wrapped)
@@ -508,27 +493,28 @@ class TestRouteDirective(unittest.TestCase):
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IRouteRequest
-        context = DummyContext()
         reg = self.config.registry
-        context.registry = reg
+        context = self.config._ctx
         view = lambda *arg: 'OK'
         self._callFUT(context, 'name', 'pattern', view=view,
                       view_context=IDummy)
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 2)
 
-        route_action = actions[0]
-        route_action['callable']()
+        view_action = actions[0]
+        request_type = reg.getUtility(IRouteRequest, 'name')
+        view_discriminator = view_action['discriminator']
+        discrim = ('view', IDummy, '', None, IView, None, None, None, 'name',
+                   None, False, None, None, None)
+        self.assertEqual(view_discriminator, discrim)
+        view_action['callable'](*view_action['args'], **view_action['kw'])
+
+        route_action = actions[1]
         route_discriminator = route_action['discriminator']
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None,None))
-        self._assertRoute('name', 'pattern')
 
-        view_action = actions[1]
-        request_type = reg.getUtility(IRouteRequest, 'name')
-        view_discriminator = view_action['discriminator']
-        discrim = ('view', IDummy, '', None, IView, 'name', None)
-        self.assertEqual(view_discriminator, discrim)
+        self._assertRoute('name', 'pattern')
         wrapped = reg.adapters.lookup(
             (IViewClassifier, request_type, IDummy), IView, name='')
         self.failUnless(wrapped)
@@ -538,28 +524,29 @@ class TestRouteDirective(unittest.TestCase):
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IRouteRequest
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = self.config._ctx
         view = lambda *arg: 'OK'
         class Foo:
             pass
         self._callFUT(context, 'name', 'pattern', view=view,
                       view_context=IDummy, view_for=Foo)
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 2)
 
-        route_action = actions[0]
-        route_action['callable']()
+        view_action = actions[0]
+        request_type = reg.getUtility(IRouteRequest, 'name')
+        view_discriminator = view_action['discriminator']
+        discrim = ('view', IDummy, '', None, IView, None, None, None, 'name',
+                   None, False, None, None, None)
+        self.assertEqual(view_discriminator, discrim)
+        view_action['callable'](*view_action['args'], **view_action['kw'])
+
+        route_action = actions[1]
         route_discriminator = route_action['discriminator']
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None,None))
-        self._assertRoute('name', 'pattern')
 
-        view_action = actions[1]
-        request_type = reg.getUtility(IRouteRequest, 'name')
-        view_discriminator = view_action['discriminator']
-        discrim = ('view', IDummy, '', None, IView, 'name', None)
-        self.assertEqual(view_discriminator, discrim)
+        self._assertRoute('name', 'pattern')
         wrapped = reg.adapters.lookup(
             (IViewClassifier, request_type, IDummy), IView, name='')
         self.failUnless(wrapped)
@@ -574,27 +561,28 @@ class TestRouteDirective(unittest.TestCase):
         def renderer(path):
             return lambda *arg: 'OK'
         reg.registerUtility(renderer, IRendererFactory, name='.pt')
+        context = self.config._ctx
 
-        context = DummyContext()
-        context.registry = reg
         view = lambda *arg: 'OK'
         self._callFUT(context, 'name', 'pattern', view=view,
                       renderer='fixtureapp/templates/foo.pt')
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 2)
 
-        route_action = actions[0]
-        route_action['callable']()
+        view_action = actions[0]
+        request_type = reg.getUtility(IRouteRequest, 'name')
+        view_discriminator = view_action['discriminator']
+        discrim = ('view', None, '', None, IView, None, None, None, 'name',
+                   None, False, None, None, None) 
+        self.assertEqual(view_discriminator, discrim)
+        view_action['callable'](*view_action['args'], **view_action['kw'])
+
+        route_action = actions[1]
         route_discriminator = route_action['discriminator']
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None,None))
         self._assertRoute('name', 'pattern')
 
-        view_action = actions[1]
-        request_type = reg.getUtility(IRouteRequest, 'name')
-        view_discriminator = view_action['discriminator']
-        discrim = ('view', None, '', None, IView, 'name', None)
-        self.assertEqual(view_discriminator, discrim)
         wrapped = reg.adapters.lookup(
             (IViewClassifier, request_type, Interface), IView, name='')
         self.failUnless(wrapped)
@@ -607,15 +595,14 @@ class TestRouteDirective(unittest.TestCase):
         def pred2(context, request): pass
         preds = tuple(sorted([pred1, pred2]))
 
-        context = DummyContext()
-        context.registry = self.config.registry
+        context = self.config._ctx
+
         self._callFUT(context, 'name', 'pattern',
                       custom_predicates=(pred1, pred2))
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 1)
 
         route_action = actions[0]
-        route_action['callable']()
         route_discriminator = route_action['discriminator']
         self.assertEqual(
             route_discriminator,
@@ -623,28 +610,24 @@ class TestRouteDirective(unittest.TestCase):
         self._assertRoute('name', 'pattern', 2)
 
     def test_with_path_argument_no_pattern(self):
-        context = DummyContext()
-        context.registry = self.config.registry
+        context = self.config._ctx
         self._callFUT(context, 'name', path='pattern')
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 1)
 
         route_action = actions[0]
-        route_action['callable']()
         route_discriminator = route_action['discriminator']
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None,None))
         self._assertRoute('name', 'pattern')
 
     def test_with_path_argument_and_pattern(self):
-        context = DummyContext()
-        context.registry = self.config.registry
+        context = self.config._ctx
         self._callFUT(context, 'name', pattern='pattern', path='path')
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 1)
 
         route_action = actions[0]
-        route_action['callable']()
         route_discriminator = route_action['discriminator']
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None,None))
@@ -653,17 +636,16 @@ class TestRouteDirective(unittest.TestCase):
 
     def test_with_neither_path_nor_pattern(self):
         from pyramid.exceptions import ConfigurationError
-        context = DummyContext()
-        context.registry = self.config.registry
+        context = self.config._ctx
         self.assertRaises(ConfigurationError, self._callFUT, context, 'name')
 
 class TestStaticDirective(unittest.TestCase):
     def setUp(self):
-        self.config = testing.setUp()
+        self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, *arg, **kw):
         from pyramid.zcml import static
@@ -680,26 +662,31 @@ class TestStaticDirective(unittest.TestCase):
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IRoutesMapper
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = self.config._ctx
+
         self._callFUT(context, 'name', 'fixtures/static')
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 2)
 
-        route_action = actions[0]
+        view_action = actions[0]
+        discriminator = view_action['discriminator']
+        self.assertEqual(discriminator[:3], ('view', StaticURLInfo, ''))
+        self.assertEqual(discriminator[4], IView)
+        view_action['callable'](*view_action['args'], **view_action['kw'])
+
+        route_action = actions[1]
         discriminator = route_action['discriminator']
-        self.assertEqual(discriminator, ('static', 'name'))
-        route_action['callable'](*route_action['args'], **route_action['kw'])
+        self.assertEqual(
+            discriminator,
+            ('route', 'name/', False, None, None, None, None, None)
+            )
+
         mapper = reg.getUtility(IRoutesMapper)
         routes = mapper.get_routes()
         self.assertEqual(len(routes), 1)
         self.assertEqual(routes[0].pattern, 'name/*subpath')
         self.assertEqual(routes[0].name, 'name/')
 
-        view_action = actions[1]
-        discriminator = view_action['discriminator']
-        self.assertEqual(discriminator[:3], ('view', StaticURLInfo, ''))
-        self.assertEqual(discriminator[4], IView)
         iface = implementedBy(StaticURLInfo)
         request_type = reg.getUtility(IRouteRequest, 'name/')
         view = reg.adapters.lookup(
@@ -718,26 +705,29 @@ class TestStaticDirective(unittest.TestCase):
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IRoutesMapper
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = self.config._ctx
         self._callFUT(context, 'name', 'fixtures/static', permission='aperm')
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 2)
 
-        route_action = actions[0]
+        view_action = actions[0]
+        discriminator = view_action['discriminator']
+        self.assertEqual(discriminator[:3], ('view', StaticURLInfo, ''))
+        self.assertEqual(discriminator[4], IView)
+        view_action['callable'](*view_action['args'], **view_action['kw'])
+
+        route_action = actions[1]
         discriminator = route_action['discriminator']
-        self.assertEqual(discriminator, ('static', 'name'))
-        route_action['callable'](*route_action['args'], **route_action['kw'])
+        self.assertEqual(
+            discriminator,
+            ('route', 'name/', False, None, None, None, None, None))
         mapper = reg.getUtility(IRoutesMapper)
         routes = mapper.get_routes()
         self.assertEqual(len(routes), 1)
         self.assertEqual(routes[0].pattern, 'name/*subpath')
         self.assertEqual(routes[0].name, 'name/')
 
-        view_action = actions[1]
-        discriminator = view_action['discriminator']
-        self.assertEqual(discriminator[:3], ('view', StaticURLInfo, ''))
-        self.assertEqual(discriminator[4], IView)
+
         iface = implementedBy(StaticURLInfo)
         request_type = reg.getUtility(IRouteRequest, 'name/')
         view = reg.adapters.lookup(
@@ -747,37 +737,41 @@ class TestStaticDirective(unittest.TestCase):
 
 class TestResourceDirective(unittest.TestCase):
     def setUp(self):
-        self.config = testing.setUp()
+        self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, *arg, **kw):
         from pyramid.zcml import resource
         return resource(*arg, **kw)
 
     def test_it(self):
-        from pyramid.configuration import Configurator
-        context = DummyContext()
-        context.registry = self.config.registry
-        self._callFUT(context, 'a', 'b')
-        actions = context.actions
+        import pyramid.tests
+        context = self.config._ctx
+        L = []
+        def dummy_override(*arg):
+            L.append(arg)
+        self._callFUT(context, 'pyramid.tests:fixtures/',
+                      'pyramid.tests:fixtureapp/', _override=dummy_override)
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 1)
         action = actions[0]
-        self.assertEqual(action['callable'].im_func,
-                         Configurator.override_resource.im_func)
         self.assertEqual(action['discriminator'], None)
-        self.assertEqual(action['args'], ('a', 'b', None))
+        action['callable']()
+        self.assertEqual(
+            L,
+            [(pyramid.tests, 'fixtures/', pyramid.tests, 'fixtureapp/')])
 
 
 class TestRendererDirective(unittest.TestCase):
     def setUp(self):
-        self.config = testing.setUp()
+        self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, *arg, **kw):
         from pyramid.zcml import renderer
@@ -786,11 +780,10 @@ class TestRendererDirective(unittest.TestCase):
     def test_it(self):
         from pyramid.interfaces import IRendererFactory
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = self.config._ctx
         renderer = lambda *arg, **kw: None
         self._callFUT(context, renderer, 'r')
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 1)
         action = actions[0]
         self.assertEqual(action['discriminator'], (IRendererFactory, 'r'))
@@ -805,7 +798,7 @@ class TestZCMLConfigure(unittest.TestCase):
     def setUp(self):
         from zope.deprecation import __show__
         __show__.off()
-        testing.setUp()
+        testing.setUp(autocommit=False)
         self.tempdir = None
         import sys
         import os
@@ -848,36 +841,35 @@ class TestZCMLConfigure(unittest.TestCase):
 
 class TestZCMLScanDirective(unittest.TestCase):
     def setUp(self):
-        self.config = testing.setUp()
+        self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, context, package):
         from pyramid.zcml import scan
         return scan(context, package)
 
     def test_it(self):
-        from pyramid.configuration import Configurator
         dummy_module = DummyModule()
-        context = DummyContext()
-        context.registry = self.config.registry
+        def foo(): pass
+        def bar(scanner, name, ob):
+            dummy_module.scanned = True
+        foo.__venusian_callbacks__ = {'pyramid':[bar]}
+        dummy_module.foo = foo
+        
+        context = self.config._ctx
         self._callFUT(context, dummy_module)
-        actions = context.actions
-        self.assertEqual(len(actions), 1)
-        action = actions[0]
-        self.assertEqual(action['callable'].im_func, Configurator.scan.im_func)
-        self.assertEqual(action['discriminator'], None)
-        self.assertEqual(action['args'], (dummy_module, None, None))
+        self.assertEqual(dummy_module.scanned, True)
 
 class TestAdapterDirective(unittest.TestCase):
     def setUp(self):
-        self.config = testing.setUp()
+        self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, *arg, **kw):
         from pyramid.zcml import adapter
@@ -903,8 +895,9 @@ class TestAdapterDirective(unittest.TestCase):
         factory = DummyFactory()
         factory.__component_adapts__ = (IDummy,)
         self._callFUT(context, [factory], provides=IFactory, for_=None)
-        self.assertEqual(len(context.actions), 1)
-        regadapt = context.actions[0]
+        actions = extract_actions(context.actions)
+        self.assertEqual(len(actions), 1)
+        regadapt = actions[0]
         self.assertEqual(regadapt['discriminator'],
                          ('adapter', (IDummy,), IFactory, ''))
         self.assertEqual(regadapt['callable'].im_func,
@@ -923,7 +916,7 @@ class TestAdapterDirective(unittest.TestCase):
         context = DummyContext()
         context.registry = self.config.registry
         self._callFUT(context, [DummyFactory], for_=(IDummy,))
-        regadapt = context.actions[0]
+        regadapt = extract_actions(context.actions)[0]
         self.assertEqual(regadapt['discriminator'],
                          ('adapter', (IDummy,), IFactory, ''))
         self.assertEqual(regadapt['callable'].im_func,
@@ -955,7 +948,7 @@ class TestAdapterDirective(unittest.TestCase):
                       [factory, factory],
                       provides=IFactory,
                       for_=(IDummy,))
-        regadapt = context.actions[0]
+        regadapt = extract_actions(context.actions)[0]
         self.assertEqual(regadapt['discriminator'],
                          ('adapter', (IDummy,), IFactory, ''))
         self.assertEqual(regadapt['callable'].im_func,
@@ -964,182 +957,184 @@ class TestAdapterDirective(unittest.TestCase):
 
 class TestSubscriberDirective(unittest.TestCase):
     def setUp(self):
-        self.config = testing.setUp()
+        self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, *arg, **kw):
         from pyramid.zcml import subscriber
         return subscriber(*arg, **kw)
 
     def test_no_factory_no_handler(self):
-        context = DummyContext()
+        context = self.config._ctx
         self.assertRaises(TypeError,
                           self._callFUT, context, for_=None, factory=None,
                           handler=None,
                           provides=None)
 
     def test_handler_with_provides(self):
-        context = DummyContext()
+        context = self.config._ctx
         self.assertRaises(TypeError,
                           self._callFUT, context, for_=None, factory=None,
                           handler=1, provides=1)
 
     def test_handler_and_factory(self):
-        context = DummyContext()
+        context = self.config._ctx
         self.assertRaises(TypeError,
                           self._callFUT, context, for_=None, factory=1,
                           handler=1, provides=None)
 
     def test_no_provides_with_factory(self):
-        context = DummyContext()
+        context = self.config._ctx
         self.assertRaises(TypeError,
                           self._callFUT, context, for_=None, factory=1,
                           handler=None, provides=None)
 
     def test_adapted_by_as_for_is_None(self):
-        context = DummyContext()
+        context = self.config._ctx
         factory = DummyFactory()
         factory.__component_adapts__ = None
         self.assertRaises(TypeError, self._callFUT, context, for_=None,
                           factory=factory, handler=None, provides=IFactory)
         
     def test_register_with_factory(self):
-        from pyramid.registry import Registry
-        context = DummyContext()
-        context.registry = self.config.registry
+        context = self.config._ctx
         factory = DummyFactory()
         self._callFUT(context, for_=(IDummy,),
                       factory=factory, handler=None, provides=IFactory)
-        self.assertEqual(len(context.actions), 1)
-        subadapt = context.actions[0]
+        actions = extract_actions(context.actions)
+        self.assertEqual(len(actions), 1)
+        subadapt = actions[0]
         self.assertEqual(subadapt['discriminator'], None)
-        self.assertEqual(subadapt['callable'].im_func,
-                         Registry.registerSubscriptionAdapter.im_func)
-        self.assertEqual(subadapt['args'],
-                         (factory, (IDummy,), IFactory, None, None) )
+        subadapt['callable'](*subadapt['args'], **subadapt['kw'])
+        registrations = self.config.registry._subscription_registrations
+        self.assertEqual(len(registrations), 1)
+        reg = registrations[0]
+        self.assertEqual(
+            reg[:4],
+            ((IDummy,), IFactory, None, factory)
+            )
 
     def test_register_with_handler(self):
-        from pyramid.configuration import Configurator
-        context = DummyContext()
-        context.registry = self.config.registry
+        context = self.config._ctx
         factory = DummyFactory()
         self._callFUT(context, for_=(IDummy,),
                       factory=None, handler=factory)
-        self.assertEqual(len(context.actions), 1)
-        subadapt = context.actions[0]
+        actions = extract_actions(context.actions)
+        self.assertEqual(len(actions), 1)
+        subadapt = actions[0]
         self.assertEqual(subadapt['discriminator'], None)
-        self.assertEqual(subadapt['callable'].im_func,
-                         Configurator.add_subscriber.im_func)
-        self.assertEqual(subadapt['args'], (factory, (IDummy,), None) )
+        subadapt['callable'](*subadapt['args'], **subadapt['kw'])
+        registrations = self.config.registry._handler_registrations
+        self.assertEqual(len(registrations), 1)
+        self.assertEqual(
+            registrations[0][:3],
+            ((IDummy,), u'', factory)
+            )
 
 class TestUtilityDirective(unittest.TestCase):
     def setUp(self):
-        self.config = testing.setUp()
+        self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, *arg, **kw):
         from pyramid.zcml import utility
         return utility(*arg, **kw)
 
     def test_factory_and_component(self):
-        context = DummyContext()
+        context = self.config._ctx
         self.assertRaises(TypeError, self._callFUT,
                           context, factory=1, component=1)
 
     def test_missing_provides(self):
-        context = DummyContext()
+        context = self.config._ctx
         self.assertRaises(TypeError, self._callFUT, context, provides=None)
         
     def test_provides_from_factory_implements(self):
         from pyramid.registry import Registry
-        context = DummyContext()
-        context.registry = self.config.registry
+        context = self.config._ctx
         self._callFUT(context, factory=DummyFactory)
-        self.assertEqual(len(context.actions), 1)
-        utility = context.actions[0]
+        actions = extract_actions(context.actions)
+        self.assertEqual(len(actions), 1)
+        utility = actions[0]
         self.assertEqual(utility['discriminator'], ('utility', IFactory, ''))
         self.assertEqual(utility['callable'].im_func,
                          Registry.registerUtility.im_func)
-        self.assertEqual(utility['args'], (None, IFactory, '', None))
+        self.assertEqual(utility['args'][:3], (None, IFactory, ''))
         self.assertEqual(utility['kw'], {'factory':DummyFactory})
 
     def test_provides_from_component_provides(self):
         from pyramid.registry import Registry
-        context = DummyContext()
-        context.registry = self.config.registry
+        context = self.config._ctx
         component = DummyFactory()
         self._callFUT(context, component=component)
-        self.assertEqual(len(context.actions), 1)
-        utility = context.actions[0]
+        actions = extract_actions(context.actions)
+        self.assertEqual(len(actions), 1)
+        utility = actions[0]
         self.assertEqual(utility['discriminator'], ('utility', IFactory, ''))
         self.assertEqual(utility['callable'].im_func,
                          Registry.registerUtility.im_func)
-        self.assertEqual(utility['args'], (component, IFactory, '', None))
+        self.assertEqual(utility['args'][:3], (component, IFactory, ''))
         self.assertEqual(utility['kw'], {})
 
 class TestTranslationDirDirective(unittest.TestCase):
     def setUp(self):
-        self.config = testing.setUp()
+        self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, *arg, **kw):
         from pyramid.zcml import translationdir
         return translationdir(*arg, **kw)
 
     def test_it(self):
-        from pyramid.configuration import Configurator
-        context = DummyContext()
-        context.registry = self.config.registry
+        import os
+        here = os.path.dirname(__file__)
+        expected = os.path.join(here, 'localeapp', 'locale')
+        from pyramid.interfaces import ITranslationDirectories
+        context = self.config._ctx
         tdir = 'pyramid.tests.localeapp:locale'
         self._callFUT(context, tdir)
-        actions = context.actions
-        self.assertEqual(len(actions), 1)
-        action = context.actions[0]
-        self.assertEqual(action['discriminator'], ('tdir', tdir))
-        self.assertEqual(action['callable'].im_func,
-                         Configurator.add_translation_dirs.im_func)
-        self.assertEqual(action['args'], (tdir,))
-        action['callable'](*action['args']) # doesn't blow up
+        util = self.config.registry.getUtility(ITranslationDirectories)
+        self.assertEqual(util, [expected])
 
 class TestLocaleNegotiatorDirective(unittest.TestCase):
     def setUp(self):
-        self.config = testing.setUp()
+        self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
-        self.config = None
 
     def _callFUT(self, *arg, **kw):
         from pyramid.zcml import localenegotiator
         return localenegotiator(*arg, **kw)
 
     def test_it(self):
-        from pyramid.configuration import Configurator
-        context = DummyContext()
-        context.registry = self.config.registry
+        from pyramid.interfaces import ILocaleNegotiator
+        context = self.config._ctx
         dummy_negotiator = object()
         self._callFUT(context, dummy_negotiator)
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 1)
-        action = context.actions[0]
-        self.assertEqual(action['discriminator'], 'lnegotiator')
-        self.assertEqual(action['callable'].im_func,
-                         Configurator.set_locale_negotiator.im_func)
-        self.assertEqual(action['args'], (dummy_negotiator,))
-        action['callable'](*action['args']) # doesn't blow up
+        action = actions[0]
+        self.assertEqual(action['discriminator'], ILocaleNegotiator)
+        callback = action['callable']
+        callback()
+        self.assertEqual(self.config.registry.getUtility(ILocaleNegotiator),
+                         dummy_negotiator)
 
 class TestDefaultPermissionDirective(unittest.TestCase):
     def setUp(self):
-        self.config = testing.setUp()
+        self.config = testing.setUp(autocommit=False)
+        self.config._ctx = self.config._make_context()
 
     def tearDown(self):
         testing.tearDown()
@@ -1151,10 +1146,9 @@ class TestDefaultPermissionDirective(unittest.TestCase):
     def test_it(self):
         from pyramid.interfaces import IDefaultPermission
         reg = self.config.registry
-        context = DummyContext()
-        context.registry = reg
+        context = self.config._ctx
         self._callFUT(context, 'view')
-        actions = context.actions
+        actions = extract_actions(context.actions)
         self.assertEqual(len(actions), 1)
         regadapt = actions[0]
         self.assertEqual(regadapt['discriminator'], IDefaultPermission)
@@ -1163,7 +1157,7 @@ class TestDefaultPermissionDirective(unittest.TestCase):
 
 class TestLoadZCML(unittest.TestCase):
     def setUp(self):
-        testing.setUp()
+        testing.setUp(autocommit=False)
 
     def tearDown(self):
         testing.tearDown()
@@ -1257,12 +1251,7 @@ class DummyContext:
         self.package = None
 
     def action(self, discriminator, callable=None, args=(), kw={}, order=0):
-        self.actions.append(
-            {'discriminator':discriminator,
-             'callable':callable,
-             'args':args,
-             'kw':kw}
-            )
+        self.actions.append((discriminator, callable, args, kw, order))
 
     def path(self, path):
         return path
@@ -1291,4 +1280,19 @@ class DummyPackage(object):
     def __init__(self, name):
         self.__name__ = name
         self.__file__ = '/__init__.py'
+
+def extract_actions(native):
+    from zope.configuration.config import expand_action
+    L = []
+    for action in native:
+        (discriminator, callable, args, kw, includepath, info, order
+         ) = expand_action(*action)
+        d = {}
+        d['discriminator'] = discriminator
+        d['callable'] = callable
+        d['args'] = args
+        d['kw'] = kw
+        d['order'] = order
+        L.append(d)
+    return L
         

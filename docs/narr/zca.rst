@@ -93,7 +93,7 @@ component registry associated with your :app:`Pyramid` application.
 
 There are three ways to fix this: by disusing the ZCA global API
 entirely, by using
-:meth:`pyramid.configuration.Configurator.hook_zca` or by passing
+:meth:`pyramid.config.Configurator.hook_zca` or by passing
 the ZCA global registry to the :term:`Configurator` constructor at
 startup time.  We'll describe all three methods in this section.
 
@@ -154,7 +154,7 @@ Consider the following bit of idiomatic :app:`Pyramid` startup code:
    :linenos:
 
    from zope.component import getGlobalSiteManager
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
 
    def app(global_settings, **settings):
        config = Configurator(settings=settings)
@@ -186,14 +186,14 @@ always return the global ZCA registry (the one in
 
 To "fix" this and make the ZCA global APIs use the "current" BFG
 registry, you need to call
-:meth:`pyramid.configuration.Configurator.hook_zca` within your
+:meth:`pyramid.config.Configurator.hook_zca` within your
 setup code.  For example:
 
 .. code-block:: python
    :linenos:
 
    from zope.component import getGlobalSiteManager
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
 
    def app(global_settings, **settings):
        config = Configurator(settings=settings)
@@ -243,7 +243,7 @@ registry at startup time instead of constructing a new one:
    :linenos:
 
    from zope.component import getGlobalSiteManager
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
 
    def app(global_settings, **settings):
        globalreg = getGlobalSiteManager()
@@ -282,7 +282,7 @@ they should actually be calling ``zope.component.getSiteManager``.
 
 ``zope.component.getSiteManager`` can be overridden by
 :app:`Pyramid` via
-:meth:`pyramid.configuration.Configurator.hook_zca`, while
+:meth:`pyramid.config.Configurator.hook_zca`, while
 ``zope.component.getGlobalSiteManager`` cannot.  Directives that use
 ``zope.component.getGlobalSiteManager`` are effectively broken; no
 ZCML directive should be using this function to find a registry to

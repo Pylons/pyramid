@@ -1,4 +1,5 @@
 import unittest
+from pyramid import testing
 
 class NewRequestEventTests(unittest.TestCase):
     def _getTargetClass(self):
@@ -122,8 +123,7 @@ class ContextFoundEventTests(unittest.TestCase):
 class TestSubscriber(unittest.TestCase):
     def setUp(self):
         registry = DummyRegistry()
-        from pyramid.configuration import Configurator
-        self.config = Configurator(registry)
+        self.config = testing.setUp(registry=registry)
         self.config.begin()
 
     def tearDown(self):

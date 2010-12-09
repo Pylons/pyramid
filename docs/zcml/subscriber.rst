@@ -37,7 +37,7 @@ Alternatives
 ~~~~~~~~~~~~
 
 You can also register an event listener by using the
-:meth:`pyramid.configuration.Configurator.add_subscriber` method.
+:meth:`pyramid.config.Configurator.add_subscriber` method.
 
 See Also
 ~~~~~~~~

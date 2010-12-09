@@ -123,7 +123,7 @@ The ``override_resource`` API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 An individual call to
-:meth:`pyramid.configuration.Configurator.override_resource` can
+:meth:`pyramid.config.Configurator.override_resource` can
 override a single resource.  For example:
 
 .. ignore-next-block
@@ -179,7 +179,7 @@ will need to register two overrides.
 The package name in a specification may start with a dot, meaning that
 the package is relative to the package in which the configuration
 construction file resides (or the ``package`` argument to the
-:class:`pyramid.configuration.Configurator` class construction).
+:class:`pyramid.config.Configurator` class construction).
 For example:
 
 .. ignore-next-block
@@ -211,7 +211,7 @@ The ``resource`` ZCML Directive
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Instead of using
-:meth:`pyramid.configuration.Configurator.override_resource` during
+:meth:`pyramid.config.Configurator.override_resource` during
 :term:`imperative configuration`, an equivalent can be used to perform
 all the tasks described above within :term:`ZCML`.  The ZCML
 ``resource`` tag is a frontend to using ``override_resource``.

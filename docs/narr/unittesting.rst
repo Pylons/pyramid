@@ -79,8 +79,17 @@ If your code uses these ``get_current_*`` functions or calls
 :app:`Pyramid` code which uses ``get_current_*`` functions, you
 will need to construct a :term:`Configurator` and call its ``begin``
 method within the ``setUp`` method of your unit test and call the same
-configurator's ``end`` method within the ``tearDown`` method of your
+Configurator's ``end`` method within the ``tearDown`` method of your
 unit test.
+
+We'll also instruct the Configurator we use during testing to *autocommit*.
+Normally when a Configurator is used by an application, it defers performing
+any "real work" until its ``.commit`` method is called (often implicitly by
+the :meth:`pyramid.config.Configurator.make_wsgi_app` method).  Passing
+``autocommit=True`` to the Configurator constructor causes the Configurator
+to perform all actions implied by methods called on it immediately, which is
+more convenient for unit-testing purposes than needing to call
+:meth:`pyramid.config.Configurator.commit` in each test.
 
 The use of a Configurator and its ``begin`` and ``end`` methods allows
 you to supply each unit test method in a test case with an environment
@@ -91,11 +100,11 @@ of a single test.  Here's an example of using this feature:
    :linenos:
 
    import unittest
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
 
    class MyTest(unittest.TestCase):
        def setUp(self):
-           self.config = Configurator()
+           self.config = Configurator(autocommit=True)
            self.config.begin()
 
        def tearDown(self):
@@ -103,13 +112,12 @@ of a single test.  Here's an example of using this feature:
 
 The above will make sure that
 :func:`pyramid.threadlocal.get_current_registry` will return the
-:term:`application registry` associated with the ``config``
-Configurator instance when
-:func:`pyramid.threadlocal.get_current_registry` is called in a
-test case method attached to ``MyTest``.  Each test case method
-attached to ``MyTest`` will use an isolated registry.
+:term:`application registry` associated with the ``config`` Configurator
+instance when :func:`pyramid.threadlocal.get_current_registry` is called in a
+test case method attached to ``MyTest``.  Each test case method attached to
+``MyTest`` will use an isolated registry.
 
-The :meth:`pyramid.configuration.Configurator.begin` method accepts
+The :meth:`pyramid.config.Configurator.begin` method accepts
 various arguments that influence the code run during the test.  See
 the :ref:`configuration_module` chapter for information about the API
 of a :term:`Configurator`, including its ``begin`` and ``end``
@@ -118,19 +126,19 @@ methods.
 If you also want to make :func:`pyramid.get_current_request`
 return something other than ``None`` during the course of a single
 test, you can pass a :term:`request` object into the
-:meth:`pyramid.configuration.Configurator.begin` method of the
+:meth:`pyramid.config.Configurator.begin` method of the
 Configurator within the ``setUp`` method of your test:
 
 .. code-block:: python
    :linenos:
 
    import unittest
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
    from pyramid import testing
 
    class MyTest(unittest.TestCase):
        def setUp(self):
-           self.config = Configurator()
+           self.config = Configurator(autocommit=True)
            request = testing.DummyRequest()
            self.config.begin(request=request)
 
@@ -150,17 +158,16 @@ construct than a "real" :app:`Pyramid` request object.
 What?
 ~~~~~
 
-Thread local data structures are always a bit confusing, especially
-when they're used by frameworks.  Sorry.  So here's a rule of thumb:
-if you don't *know* whether you're calling code that uses the
+Thread local data structures are always a bit confusing, especially when
+they're used by frameworks.  Sorry.  So here's a rule of thumb: if you don't
+*know* whether you're calling code that uses the
 :func:`pyramid.threadlocal.get_current_registry` or
-:func:`pyramid.threadlocal.get_current_request` functions, or you
-don't care about any of this, but you still want to write test code,
-just always create a Configurator instance and call its ``begin``
-method within the ``setUp`` of a unit test, then subsequently call its
-``end`` method in the test's ``tearDown``.  This won't really hurt
-anything if the application you're testing does not call any
-``get_current*`` function.
+:func:`pyramid.threadlocal.get_current_request` functions, or you don't care
+about any of this, but you still want to write test code, just always create
+an autocommitting Configurator instance and call its ``begin`` method within
+the ``setUp`` of a unit test, then subsequently call its ``end`` method in
+the test's ``tearDown``.  This won't really hurt anything if the application
+you're testing does not call any ``get_current*`` function.
 
 .. index::
    single: pyramid.testing
@@ -196,7 +203,7 @@ a :term:`application registry` using :term:`configuration declaration`
 calls made against a :term:`Configurator` (sometimes deferring to the
 application's ``configure.zcml`` :term:`ZCML` file via ``load_zcml``).
 But if this application registry is not created and populated
-(e.g. with an :meth:`pyramid.configuration.Configurator.add_view`
+(e.g. with an :meth:`pyramid.config.Configurator.add_view`
 :term:`configuration declaration` or ``view`` declarations in
 :term:`ZCML`), like when you invoke application code via a unit test,
 :app:`Pyramid` API functions will tend to fail.
@@ -213,12 +220,12 @@ used the testing API.
    :linenos:
 
    import unittest
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
    from pyramid import testing
 
    class MyTest(unittest.TestCase):
        def setUp(self):
-           self.config = Configurator()
+           self.config = Configurator(autocommit=True)
            self.config.begin()
 
        def tearDown(self):
@@ -249,7 +256,7 @@ The first test method, ``test_view_fn_not_submitted`` tests the
 ``view_fn`` function in the case that no "form" values (represented by
 request.params) have been submitted.  Its first line registers a
 "dummy template renderer" named ``templates/show.pt`` via the
-:meth:`pyramid.configuration.Configurator.testing_add_renderer`
+:meth:`pyramid.config.Configurator.testing_add_renderer`
 method; this method returns a
 :class:`pyramid.testing.DummyTemplateRenderer` instance which we
 hang on to for later.
@@ -281,10 +288,10 @@ attribute is ``Yo``, as this is what is expected of the view function
 in the branch it's testing.
 
 Note that the test calls the
-:meth:`pyramid.configuration.Configurator.begin` method in its
+:meth:`pyramid.config.Configurator.begin` method in its
 ``setUp`` method and the ``end`` method of the same in its
 ``tearDown`` method.  If you use any of the
-:class:`pyramid.configuration.Configurator` APIs during testing, be
+:class:`pyramid.config.Configurator` APIs during testing, be
 sure to use this pattern in your test case's ``setUp`` and
 ``tearDown``; these methods make sure you're using a "fresh"
 :term:`application registry` per test run.
@@ -335,7 +342,7 @@ environment.
 
    import unittest
 
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
    from pyramid import testing
 
    class ViewIntegrationTests(unittest.TestCase):
@@ -345,7 +352,7 @@ environment.
            (including dependent registrations for pyramid itself).
            """
            import myapp
-           self.config = Configurator(package=myapp)
+           self.config = Configurator(package=myapp, autocommit=True)
            self.config.begin()
            self.config.load_zcml('myapp:configure.zcml')
 
@@ -367,7 +374,7 @@ environment.
                                                    str(len(body))))
 
 Unless you cannot avoid it, you should prefer writing unit tests that
-use the :class:`pyramid.configuration.Configurator` API to set up
+use the :class:`pyramid.config.Configurator` API to set up
 the right "mock" registrations rather than creating an integration
 test.  Unit tests will run faster (because they do less for each test)
 and the result of a unit test is usually easier to make assertions

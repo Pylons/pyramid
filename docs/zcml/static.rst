@@ -79,7 +79,7 @@ Examples
 Alternatives
 ~~~~~~~~~~~~
 
-:meth:`pyramid.configuration.configurator.add_static_view` can also
+:meth:`pyramid.config.Configurator.add_static_view` can also
 be used to add a static view.
 
 See Also

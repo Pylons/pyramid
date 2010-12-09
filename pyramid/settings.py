@@ -67,14 +67,14 @@ def get_settings():
     Return a 'settings' object for the current application.  A
     'settings' object is a dictionary-like object that contains
     key/value pairs based on the dictionary passed as the ``settings``
-    argument to the :class:`pyramid.configuration.Configurator`
+    argument to the :class:`pyramid.config.Configurator`
     constructor or the :func:`pyramid.router.make_app` API.
 
     .. note:: For backwards compatibility, dictionary keys can also be
        looked up as attributes of the settings object.
 
     .. note:: the
-       :class:`pyramid.configuration.Configurator.get_settings` method
+       :class:`pyramid.config.Configurator.get_settings` method
        performs the same duty.
 
     .. warning:: This method is deprecated as of Pyramid 1.0.  Use

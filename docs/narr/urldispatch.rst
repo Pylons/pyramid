@@ -35,7 +35,7 @@ a more natural fit for creating an application that manipulates "flat"
 data.
 
 The presence of calls to the
-:meth:`pyramid.configuration.Configurator.add_route` method in imperative
+:meth:`pyramid.config.Configurator.add_route` method in imperative
 configuration within your application is a sign that you're using :term:`URL
 dispatch`.
 
@@ -81,7 +81,7 @@ predicate` parameters, and a set of :term:`view` parameters.
 Configuring a Route via The ``add_route`` Configurator Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :meth:`pyramid.configuration.Configurator.add_route` method
+The :meth:`pyramid.config.Configurator.add_route` method
 adds a single :term:`route configuration` to the :term:`application
 registry`.  Here's an example:
 
@@ -89,7 +89,7 @@ registry`.  Here's an example:
 .. code-block:: python
 
    # "config" below is presumed to be an instance of the
-   # pyramid.configuration.Configurator class; "myview" is assumed
+   # pyramid.config.Configurator class; "myview" is assumed
    # to be a "view callable" function
    from views import myview
    config.add_route('myroute', '/prefix/{one}/{two}', view=myview)
@@ -118,7 +118,7 @@ Here's an example route configuration that references a view callable:
    :linenos:
 
    # "config" below is presumed to be an instance of the
-   # pyramid.configuration.Configurator class; "myview" is assumed
+   # pyramid.config.Configurator class; "myview" is assumed
    # to be a "view callable" function
    from myproject.views import myview
    config.add_route('myroute', '/prefix/{one}/{two}', view=myview)
@@ -130,7 +130,7 @@ rather than an actual callable:
    :linenos:
 
    # "config" below is presumed to be an instance of the
-   # pyramid.configuration.Configurator class; "myview" is assumed
+   # pyramid.config.Configurator class; "myview" is assumed
    # to be a "view callable" function
    from myproject.views import myview
    config.add_route('myroute', '/prefix/{one}/{two}', 
@@ -377,7 +377,7 @@ they are added to the application at startup time.  This is unlike
 :term:`traversal`, which depends on emergent behavior which happens as
 a result of traversing a graph.
 
-For routes added via the :mod:`pyramid.configuration.Configurator.add_route`
+For routes added via the :mod:`pyramid.config.Configurator.add_route`
 method, the order that routes are evaluated is the order in which they are
 added to the configuration imperatively.
 
@@ -657,7 +657,7 @@ Custom Route Predicates
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Each of the predicate callables fed to the ``custom_predicates`` argument of
-:meth:`pyramid.configuration.Configurator.add_route` must be a callable
+:meth:`pyramid.config.Configurator.add_route` must be a callable
 accepting two arguments.  The first argument passed to a custom predicate is
 a dictionary conventionally named ``info``.  The second argument is the
 current :term:`request` object.
@@ -692,7 +692,7 @@ generate a predicate function named ``num_one_two_or_three``, which
 ensures that the ``num`` segment is one of the values ``one``,
 ``two``, or ``three`` , and use the result as a custom predicate by
 feeding it inside a tuple to the ``custom_predicates`` argument to
-:meth:`pyramid.configuration.Configurator.add_route`.
+:meth:`pyramid.config.Configurator.add_route`.
 
 A custom route predicate may also *modify* the ``match`` dictionary.
 For instance, a predicate might do some type conversion of values:
@@ -968,7 +968,7 @@ factory` configured at startup time (the ``root_factory`` argument to the
 :term:`Configurator` used to configure the application).
 
 You can override this behavior by passing in a ``factory`` argument to the
-:meth:`pyramid.configuration.Configurator.add_route` method for a particular
+:meth:`pyramid.config.Configurator.add_route` method for a particular
 route.  The ``factory`` should be a callable that accepts a :term:`request`
 and returns an instance of a class that will be the context used by the view.
 
@@ -1033,7 +1033,7 @@ Matching the Root URL
 
 It's not entirely obvious how to use a route pattern to match the root URL
 ("/").  To do so, give the empty string as a pattern in a call to
-:meth:`pyramid.configuration.Configurator.add_route`:
+:meth:`pyramid.config.Configurator.add_route`:
 
 .. code-block:: python
    :linenos:

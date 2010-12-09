@@ -75,8 +75,8 @@ defined entirely by the behavior of a pyramid :term:`Router`.
 
 However, during unit testing, no Router code is ever invoked, and the
 definition of "current" is defined by the boundary between calls to
-the :meth:`pyramid.configuration.Configurator.begin` and
-:meth:`pyramid.configuration.Configurator.end` methods (or between
+the :meth:`pyramid.config.Configurator.begin` and
+:meth:`pyramid.config.Configurator.end` methods (or between
 calls to the :func:`pyramid.testing.setUp` and
 :func:`pyramid.testing.tearDown` functions).  These functions push
 and pop the threadlocal stack when the system is under test.  See
@@ -156,7 +156,7 @@ place to use the ``get_current_request``.
 Use of the :func:`pyramid.threadlocal.get_current_registry`
 function should be limited to testing scenarios.  The registry made
 current by use of the
-:meth:`pyramid.configuration.Configurator.begin` method during a
+:meth:`pyramid.config.Configurator.begin` method during a
 test (or via :func:`pyramid.testing.setUp`) when you do not pass
 one in is available to you via this API.
 

@@ -23,7 +23,7 @@ relying on :term:`configuration decoration` meant to be detected via
 a :term:`scan`, and you mustn't configure your :app:`Pyramid`
 application *imperatively* by using any code which configures the
 application through methods of the :term:`Configurator` (except for
-the :meth:`pyramid.configuration.Configurator.load_zcml` method).
+the :meth:`pyramid.config.Configurator.load_zcml` method).
 
 Instead, you must always use :term:`ZCML` for the equivalent
 purposes. :term:`ZCML` declarations that belong to an application can be
@@ -104,7 +104,7 @@ configuration imperatively, one of two things may be true:
   :class:`pyramid.view.view_config` decorators, you can just prevent a
   :term:`scan` from happening (by omitting the ``<scan>`` declaration
   from ZCML or omitting any call to the
-  :meth:`pyramid.configuration.Configurator.scan` method).  This
+  :meth:`pyramid.config.Configurator.scan` method).  This
   will cause the decorators to do nothing.  At this point, you will
   need to convert all the configuration done in decorators into
   equivalent :term:`ZCML` and add that ZCML to a separate Python
@@ -170,7 +170,7 @@ something like this:
 
 - In the ``__init__.py`` of the new package, load the ``configure.zcml`` file
   of the new package using the
-  :meth:`pyramid.configuration.Configurator.load_zcml` method.
+  :meth:`pyramid.config.Configurator.load_zcml` method.
 
 .. index::
    pair: overriding; views

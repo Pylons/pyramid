@@ -1,4 +1,5 @@
 import unittest
+from pyramid import testing
 
 class TestSettings(unittest.TestCase):
     def _getTargetClass(self):
@@ -179,10 +180,9 @@ class TestSettings(unittest.TestCase):
 
 class TestGetSettings(unittest.TestCase):
     def setUp(self):
-        from pyramid.configuration import Configurator
         from pyramid.registry import Registry
         registry = Registry('testing')
-        self.config = Configurator(registry=registry)
+        self.config = testing.setUp(registry=registry)
         self.config.begin()
         from zope.deprecation import __show__
         __show__.off()
