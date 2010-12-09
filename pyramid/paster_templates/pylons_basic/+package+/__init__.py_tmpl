@@ -14,5 +14,4 @@ def main(global_config, **settings):
                        action='index')
     config.add_subscriber('{{package}}.lib.subscribers.add_renderer_globals',
                           'pyramid.events.BeforeRender')
-    config.commit()
     return config.make_wsgi_app()

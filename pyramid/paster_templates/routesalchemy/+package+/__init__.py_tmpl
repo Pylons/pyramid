@@ -12,7 +12,6 @@ def main(global_config, **settings):
     config.add_static_view('static', '{{package}}:static')
     config.add_route('home', '/', view='{{package}}.views.my_view',
                      view_renderer='templates/mytemplate.pt')
-    config.commit()
     return config.make_wsgi_app()
 
 

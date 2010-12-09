@@ -16,7 +16,6 @@ def main(global_config, **settings):
     config.add_view('{{package}}.views.view_model',
                     context='{{package}}.models.MyModel',
                     renderer="templates/model.pt")
-    config.commit()
     return config.make_wsgi_app()
 
 
