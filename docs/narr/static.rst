@@ -80,7 +80,7 @@ provided with a ``name`` argument that is the URL prefix
 ``http://example.com/images``, subsequent calls to
 :func:`pyramid.url.static_url` with paths that start with the ``path``
 argument passed to :meth:`pyramid.configuration.Configurator.add_static_view`
-will generate a URL something like ``http://example.com/logo.png``.  The
+will generate a URL something like ``http://example.com/images/logo.png``.  The
 external webserver listening on ``example.com`` must be itself configured to
 respond properly to such a request.  The :func:`pyramid.url.static_url` API
 is discussed in more detail later in this chapter.
