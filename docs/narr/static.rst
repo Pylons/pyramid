@@ -1,8 +1,8 @@
 Static Resources
 ================
 
-:app:`Pyramid` makes it possible to serve up "static" (non-dynamic)
-resources from a directory on a filesystem.  This chapter describes
+:app:`Pyramid` makes it possible to serve up static 
+resources files from a directory on a filesystem.  This chapter describes
 how to configure :app:`Pyramid` to do so.
 
 .. index::
