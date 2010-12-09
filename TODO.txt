@@ -26,10 +26,6 @@ Should-Have
 - Change "Cleaning up After a Request" in the urldispatch chapter to
   use ``request.add_response_callback``.
 
-- Twophase configuration (config = Configurator(autocommit=False)).  Maybe
-  use ``zope.configuration`` ConfigurationContext as config.registry.ctx and
-  push execution into the configurator.
-
 Nice-to-Have
 ------------
 
