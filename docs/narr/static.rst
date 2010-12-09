@@ -65,25 +65,6 @@ is a view name.  When ``name`` is a *URL* (or any string with a slash
 webserver.  In this mode, the ``name`` is used as the URL prefix when
 generating a URL using the :func:`pyramid.url.static_url` function.
 
-.. note::
-
-   Using :func:`pyramid.url.static_url` in conjunction with a
-   :meth:`pyramid.configuration.Configurator.add_static_view` makes it
-   possible to put static media on a separate webserver during production (if
-   the ``name`` argument to
-   :meth:`pyramid.configuration.Configurator.add_static_view` is a URL),
-   while keeping static media package-internal and served by the development
-   webserver during development (if the ``name`` argument to
-   :meth:`pyramid.configuration.Configurator.add_static_view` is a view
-   name).  To create such a circumstance, we suggest using the
-   :attr:`pyramid.registry.Registry.settings` API in conjunction with a
-   setting in the application ``.ini`` file named ``media_location``.  Then
-   set the value of ``media_location`` to either a view name or a URL
-   depending on whether the application is being run in development or in
-   production (use a different `.ini`` file for production than you do for
-   development).  This is just a suggestion for a pattern; any setting name
-   other than ``media_location`` could be used.
-
 For example, :meth:`pyramid.configuration.Configurator.add_static_view` may
 be fed a ``name`` argument which is ``http://example.com/images``:
 
@@ -108,6 +89,25 @@ The :ref:`static_directive` ZCML directive offers an declarative equivalent
 to :meth:`pyramid.configuration.Configurator.add_static_view`.  Use of the
 :ref:`static_directive` ZCML directive is completely equivalent to using
 imperative configuration for the same purpose.
+
+.. note::
+
+   Using :func:`pyramid.url.static_url` in conjunction with a
+   :meth:`pyramid.configuration.Configurator.add_static_view` makes it
+   possible to put static media on a separate webserver during production (if
+   the ``name`` argument to
+   :meth:`pyramid.configuration.Configurator.add_static_view` is a URL),
+   while keeping static media package-internal and served by the development
+   webserver during development (if the ``name`` argument to
+   :meth:`pyramid.configuration.Configurator.add_static_view` is a view
+   name).  To create such a circumstance, we suggest using the
+   :attr:`pyramid.registry.Registry.settings` API in conjunction with a
+   setting in the application ``.ini`` file named ``media_location``.  Then
+   set the value of ``media_location`` to either a view name or a URL
+   depending on whether the application is being run in development or in
+   production (use a different `.ini`` file for production than you do for
+   development).  This is just a suggestion for a pattern; any setting name
+   other than ``media_location`` could be used.
 
 .. index::
    single: generating static resource urls
