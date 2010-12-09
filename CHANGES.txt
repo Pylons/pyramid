@@ -4,6 +4,9 @@ Next release
 Features
 --------
 
+- Add a ``handler`` ZCML directive.  This directive does the same thing as
+  ``pyramid.configuration.add_handler``.
+
 - A new module named ``pyramid.config`` was added.  It subsumes the duties of
   the older ``pyramid.configuration`` module.
 

@@ -86,6 +86,12 @@ This will result one of the methods that are configured for the ``action`` of
 handler class not named 'index' might be called if they were configured to be
 called when the ``action`` name is 'index' as will be seen below.
 
+.. note::
+
+  Handler configuration may also be added to the system via :term:`ZCML` (see
+  :ref:`zcml_handler_configuration`).
+
+.. _using_add_handler:
 
 Using :meth:`~pyramid.config.Configurator.add_handler`
 -------------------------------------------------------------

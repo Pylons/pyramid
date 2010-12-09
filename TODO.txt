@@ -4,11 +4,6 @@ Pyramid TODOs
 Must-Have (before 1.0)
 ----------------------
 
-- Add a ``handler`` ZCML directive.  This implies some slightly dicey
-  refactoring of the configurator to allow it to generate ZCML
-  "discriminators" for views and routes, that could be implemented in terms
-  of "twophase configuration" in "should have" below.
-
 - Provide a .flash API on session object.
 
 - Use ``@register_view`` instead of ``@view_config`` and change view docs to
