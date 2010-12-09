@@ -218,13 +218,10 @@ your application root as below.
    static_view = static('/path/to/static/dir')
 
 .. note:: the argument to :class:`pyramid.view.static` can also be
-   a relative pathname, e.g. ``my/static`` (meaning relative to the
+   a "here-relative" pathname, e.g. ``my/static`` (meaning relative to the
    Python package of the module in which the view is being defined).
    It can also be a :term:`resource specification`
-   (e.g. ``anotherpackage:some/subdirectory``) or it can be a
-   "here-relative" path (e.g. ``some/subdirectory``).  If the path is
-   "here-relative", it is relative to the package of the module in
-   which the static view is defined.
+   (e.g. ``anotherpackage:some/subdirectory``).
  
 Subsequently, you may wire this view up to be accessible as ``/static`` using
 the :mod:`pyramid.configuration.Configurator.add_view` method in your
