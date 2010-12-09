@@ -57,14 +57,13 @@ serve the file ``/path/to/static/dir/foo.js``.  The static directory may
 contain subdirectories recursively, and any subdirectories may hold
 files; these will be resolved by the static view as you would expect.
 
-While the ``path`` argument can be a number of different things, the ``name``
-argument of the call to
-:meth:`pyramid.configuration.Configurator.add_static_view` can also be one of
-a number of things: a *view name* or a *URL*.  The above examples have shown
-usage of the ``name`` argument as a view name.  When ``name`` is a *URL* (or
-any string with a slash (``/``) in it), static resources can be served from
-an external webserver.  In this mode, the ``name`` is used as the URL prefix
-when generating a URL using :func:`pyramid.url.static_url`.
+The ``name`` argument of the call to
+:meth:`pyramid.configuration.Configurator.add_static_view` can be either
+a *view name*, or a *URL*.  In the above examples, the ``name`` argument
+is a view name.  When ``name`` is a *URL* (or any string with a slash
+(``/``) in it), static resources can be served from an external
+webserver.  In this mode, the ``name`` is used as the URL prefix when
+generating a URL using the :func:`pyramid.url.static_url` function.
 
 .. note::
 
