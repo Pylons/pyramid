@@ -250,12 +250,17 @@ URLs against resources made accessible by registering a custom static view.
 
 .. warning::
 
-   To ensure that model objects contained in the root don't "shadow"
-   your static view (model objects take precedence during traversal),
-   or to ensure that your root object's ``__getitem__`` is never
-   called when a static resource is requested, you can refer to your
-   static resources as registered above in URLs as,
-   e.g. ``/@@static/foo.js``.  This is completely equivalent to
-   ``/static/foo.js``.  See :ref:`traversal_chapter` for information
+   When adding a static view to your root object, you need to be
+   careful that there are no model objects contained in the
+   root with the same key as the view name (e.g., ``static``). 
+   Model objects take precedence during traversal,
+   thus such a name collision will cause the model to "shadow"
+   your static view. To avoid this issue, and ensure that your 
+   root object's ``__getitem__`` is never
+   called when a static resource is requested, you can refer to them
+   unambiguously using the ``@@`` prefix (goggles) in their URLs.  
+   For the above examples you could use '/@@static/foo.js' 
+   instead of '/static/foo.js' to avoid such shadowing.
+   See :ref:`traversal_chapter` for information
    about "goggles" (``@@``).
 
