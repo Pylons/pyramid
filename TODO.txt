@@ -4,6 +4,8 @@ Pyramid TODOs
 Must-Have (before 1.0)
 ----------------------
 
+- Narrative docs for ``Configurator.include`` and ``Configurator.commit``.
+
 - Provide a .flash API on session object.
 
 - Use ``@register_view`` instead of ``@view_config`` and change view docs to
