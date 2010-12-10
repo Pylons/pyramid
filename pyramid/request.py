@@ -212,13 +212,13 @@ class Request(WebobRequest):
 
         This call to :meth:`pyramid.request.Request.model_url`::
 
-          request.route_url(mymodel)
+          request.model_url(mymodel)
 
         Is completely equivalent to calling :func:`pyramid.url.model_url`
         like this::
 
           from pyramid.url import model_url
-          route_url(model, request)
+          model_url(model, request)
         """
         return model_url(model, self, *elements, **kw)
 
