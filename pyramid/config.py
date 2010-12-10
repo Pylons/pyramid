@@ -409,11 +409,18 @@ class Configurator(object):
         """
         if kw is None:
             kw = {}
-        if self.autocommit:
+
+        context = self._ctx
+
+        if context is None:
+            autocommit = self.autocommit
+        else:
+            autocommit = context.autocommit
+
+        if autocommit:
             if callable is not None:
                 callable(*args, **kw)
         else:
-            context = self._ctx
             if context is None: # defer expensive creation of context
                 context = self._ctx = self._make_context(self.autocommit)
             if not context.info:
@@ -836,11 +843,23 @@ class Configurator(object):
         if context is None:
             context = self._ctx = self._make_context(self.autocommit)
 
+        # To avoid breaking people's expectations of how ZCML works, we
+        # cannot autocommit ZCML actions incrementally.  If we commit actions
+        # incrementally, configuration outcome will be controlled purely by
+        # ZCML directive execution order, which isn't what anyone who uses
+        # ZCML expects.  So we don't autocommit each ZCML directive action
+        # while parsing is happening, but we do make sure to pass
+        # execute=self.autocommit to xmlconfig.file below, which will cause
+        # the actions implied by the ZCML that was parsed to be committed
+        # right away once parsing is finished if autocommit is True.
+        context = GroupingContextDecorator(context)
+        context.autocommit = False 
+
         lock.acquire()
         try:
             context.package = package
             xmlconfig.file(filename, package, context=context,
-                           execute=context.autocommit)
+                           execute=self.autocommit)
         finally:
             lock.release()
             self.manager.pop()
