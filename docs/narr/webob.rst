@@ -326,7 +326,7 @@ Exception Responses
 
 To facilitate error responses like ``404 Not Found``, the module
 :mod:`webob.exc` contains classes for each kind of error response.  These
-include boring but appropriate error bodies.  The exceptions exposed by this
+include boring, but appropriate error bodies.  The exceptions exposed by this
 module, when used under :app:`Pyramid`, should be imported from the
 :mod:`pyramid.httpexceptions` "facade" module.  This import location is merely
 a facade for the original location of these exceptions: ``webob.exc``.
