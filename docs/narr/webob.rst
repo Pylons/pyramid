@@ -183,7 +183,7 @@ only a few you'll use often:
 ``req.get_response(wsgi_application)``:
     This method calls the given WSGI application with this request,
     and returns a `Response`_ object.  You can also use this for
-    subrequests or testing.
+    subrequests, or testing.
 
 .. index::
    single: request (and unicode)
