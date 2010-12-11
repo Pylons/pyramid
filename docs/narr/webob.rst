@@ -203,8 +203,8 @@ attribute.
 
 If it is set, then ``req.POST``, ``req.GET``, ``req.params``, and
 ``req.cookies`` will contain unicode strings.  Each has a
-corresponding ``req.str_*`` (like ``req.str_POST``) that is always
-``str`` and never unicode.
+corresponding ``req.str_*`` (e.g., ``req.str_POST``) that is always
+a ``str``, and never unicode.
 
 More Details
 ++++++++++++
