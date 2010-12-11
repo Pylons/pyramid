@@ -111,8 +111,8 @@ Special Attributes Added to the Request by :app:`Pyramid`
 
 In addition to the standard :term:`WebOb` attributes, :app:`Pyramid`
 adds special attributes to every request: ``context``, ``registry``,
-``root``, ``subpath``, ``traversed``, ``view_name``, ``virtual_root``
-, ``virtual_root_path``, ``session``, and ``tmpl_context``.  These
+``root``, ``subpath``, ``traversed``, ``view_name``, ``virtual_root``, 
+``virtual_root_path``, ``session``, and ``tmpl_context``.  These
 attributes are documented further within the
 :class:`pyramid.request.Request` API documentation.
 
