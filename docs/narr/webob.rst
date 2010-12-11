@@ -213,9 +213,9 @@ More detail about the request object API is available in:
 
 - The :class:`pyramid.request.Request` API documentation.
 
-- The `WebOb documentation <http://pythonpaste.org/webob>`_ .  All
+- The `WebOb documentation <http://pythonpaste.org/webob>`_.  All
   methods and attributes of a ``webob.Request`` documented within the
-  WebOb documentation will work against request objects created by
+  WebOb documentation will work with request objects created by
   :app:`Pyramid`.
 
 .. index::
