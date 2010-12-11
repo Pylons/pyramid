@@ -231,8 +231,9 @@ for its original location: ``webob.Response``.
 A response object has three fundamental parts:
 
 ``response.status``:
-    The response code plus message, like ``'200 OK'``.  To set the
-    code without the reason, use ``response.status_int = 200``.
+	The response code plus reason message, like ``'200 OK'``.  To set
+	the code without a message, use ``status_int``, i.e.:
+	``response.status_int = 200``.
 
 ``response.headerlist``:
     A list of all the headers, like ``[('Content-Type',
