@@ -117,15 +117,14 @@ Some gotchas:
   pickleable, an error will be raised when the session is serialized.
 
 - If you place a mutable value (for example, a list or a dictionary)
-  in a session object, and you subsequently mutate that value, you
-  must call the ``changed()`` method of the session object.  This is
-  because, although the session object can detect when you call its
-  data-modifying methods such as ``__setitem__``, ``pop`` and other
-  (and thus the session knows it needs to reserialize the session
-  data), when you change a mutable object stored in the session
-  itself, the session has no way to know that you changed that value.
-  When in doubt, call ``changed()`` after you've changed sessioning
-  data.
+  in a session object, and you subsequently mutate that value, you must
+  call the ``changed()`` method of the session object. In this case, the
+  session has no way to know that is was modified. However, when you
+  modify a session object directly, such as setting a value (i.e.,
+  ``__setitem__``), or removing a key (e.g., ``del`` or ``pop``), the
+  session will automatically know that it needs to re-serialize its
+  data, thus calling ``changed()`` is unnecessary. When in doubt, call
+  ``changed()`` after you've changed sessioning data.
 
 .. index::
    single: pyramid_beaker
