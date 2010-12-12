@@ -131,7 +131,7 @@ function is a shortcut function that actually returns a response
 object. This allows the example view above to simply return the result 
 of its call to ``render_to_response()`` directly. 
 
-Obviously not all APIs you might call to get respnonse data will
+Obviously not all APIs you might call to get response data will
 return a response object.  If you call a "response-ignorant" API that
 returns information you'd like to use as a response (such as when you
 render a template to a string), you must construct your own response
