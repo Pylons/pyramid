@@ -117,14 +117,12 @@ In the examples above we pass in a keyword argument named ``request``
 representing the current :app:`Pyramid` request. Passing a request
 keyword argument will cause the ``render_to_response`` function to
 supply the renderer with more correct system values (see
-:ref:`renderer_system_values`), because most of the information
-required to compose proper system values is present in the request.
-If you care about the correct system values being provided to the
-renderer being called (in particular, if your template relies on the
-name ``request`` or ``context``, or if you've configured special
-:term:`renderer globals` make sure to pass ``request`` as a keyword
-argument in every call to to a ``pyramid.renderers.render_*``
-function.
+:ref:`renderer_system_values`), because most of the information required
+to compose proper system values is present in the request.  If your
+template relies on the name ``request`` or ``context``, or if you've
+configured special :term:`renderer globals`, make sure to pass
+``request`` as a keyword argument in every call to to a
+``pyramid.renderers.render_*`` function.
 
 Every view must return a :term:`response` object (except for views
 which use a :term:`renderer` named via view configuration, which we'll
