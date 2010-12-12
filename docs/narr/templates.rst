@@ -67,8 +67,8 @@ the ``sample_view`` function.  The template author will have the names
 comparison purposes.
 
 In the example above, the path ``templates/foo.pt`` is relative to the
-directory in which the file which defines the view configuration
-lives.  In this case, this is the directory containing the file that
+directory containing the file which defines the view configuration.
+In this case, this is the directory containing the file that
 defines the ``sample_view`` function.  Although a renderer path is
 usually just a simple relative pathname, a path named as a renderer
 can be absolute, starting with a slash on UNIX or a drive letter
@@ -76,13 +76,13 @@ prefix on Windows.
 
 .. warning::
 
-   The ability for a template to be named as a renderer relative to the
-   location of the module in which the view callable is defined is limited to
-   :term:`Chameleon` templates.  Mako templates and other templating system
-   bindings work differently.  In particular, Mako templates use a "lookup
-   path" as defined by the ``mako.directories`` configuration file instead of
-   treating relative paths as relative to the current view module.  See
-   :ref:`mako_templates`.
+   Only :term:`Chameleon` templates support defining a renderer for a
+   template relative to the location of the module where the view
+   callable is defined.  Mako templates, and other templating system
+   bindings work differently.  In particular, Mako templates use a
+   "lookup path" as defined by the ``mako.directories`` configuration
+   file instead of treating relative paths as relative to the current
+   view module.  See :ref:`mako_templates`.
 
 The path can alternately be a :term:`resource specification` in the
 form ``some.dotted.package_name:relative/path``, making it possible to
