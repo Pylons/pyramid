@@ -27,8 +27,8 @@ limitation:
   network along which the cookie travels.
 
 - The maximum number of bytes that are storable in a serialized
-  representation of the session is fewer than 4000.  Only very small
-  data sets can be kept in this
+  representation of the session is fewer than 4000.  This is
+  suitable only for very small data sets.
 
 It is, however, digitally signed, and thus its data cannot easily be
 tampered with.
