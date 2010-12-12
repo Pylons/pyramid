@@ -82,8 +82,7 @@ example:
            return Response('Fred was not in the session')
 
 You can use a session much like a Python dictionary.  It supports all
-methods of a Python dictionary, and it has three extra attributes, and
-two extra methods.
+dictionary methods, along with some extra attributes, and methods.
 
 Extra attributes:
 
