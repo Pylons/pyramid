@@ -62,8 +62,8 @@ Using a Session Object
 ----------------------
 
 Once a session factory has been configured for your application, you
-can access session objects provided by the session factory by asking
-for the ``session`` attribute of any :term:`request` object.  For
+can access session objects provided by the session factory via
+the ``session`` attribute of any :term:`request` object.  For
 example:
 
 .. code-block:: python
