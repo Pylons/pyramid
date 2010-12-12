@@ -30,10 +30,10 @@ The most straightforward way to use a template within
 :term:`view callable`.  You may use whatever API is supplied by a
 given templating engine to do so.
 
-:app:`Pyramid` provides various APIs that allow you to render
-templates directly from within a view callable.  For example, if there
-is a :term:`Chameleon` ZPT template named ``foo.pt`` in a directory in
-your application named ``templates``, you can render the template from
+:app:`Pyramid` provides various APIs that allow you to render templates
+directly from within a view callable.  For example, if there is a
+:term:`Chameleon` ZPT template named ``foo.pt`` in a directory  named
+``templates`` in your application, you can render the template from
 within the body of a view callable like so:
 
 .. code-block:: python
