@@ -263,9 +263,10 @@ values are provided in a dictionary to the renderer and include:
   The renderer name used to perform the rendering,
   e.g. ``mypackage:templates/foo.pt``.
 
-``renderer_info`` An object implementing the
-  :class:`pyramid.interfaces.IRendererInfo` interface.  Basically, an object
-  with the following attributes: ``name``, ``package`` and ``type``.
+``renderer_info`` 
+  An object implementing the :class:`pyramid.interfaces.IRendererInfo`
+  interface.  Basically, an object with the following attributes:
+  ``name``, ``package`` and ``type``.
 
 You can define more values which will be passed to every template
 executed as a result of rendering by defining :term:`renderer
