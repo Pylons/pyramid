@@ -272,9 +272,10 @@ You can define more values which will be passed to every template
 executed as a result of rendering by defining :term:`renderer
 globals`.
 
-What any particular renderer does with them is up to the renderer itself, but
-most template renderers, including Chameleon and Mako renderers, make these
-names available as top-level template variables.
+What any particular renderer does with these system values is up to the
+renderer itself, but most template renderers, including Chameleon and
+Mako renderers, make these names available as top-level template
+variables.
 
 .. _templates_used_as_renderers:
 
