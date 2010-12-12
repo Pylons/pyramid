@@ -131,14 +131,12 @@ function is a shortcut function that actually returns a response
 object. This allows the example view above to simply return the result 
 of its call to ``render_to_response()`` directly. 
 
-Obviously not all APIs you might call to get response data will
-return a response object.  If you call a "response-ignorant" API that
-returns information you'd like to use as a response (such as when you
-render a template to a string), you must construct your own response
-object as necessary with the string as the body.  For example, the
-:func:`pyramid.renderers.render` API returns a string.  We can
-manufacture a :term:`response` object directly, and use that string as
-the body of the response:
+Obviously not all APIs you might call to get response data will return a
+response object. For example, you might render one or more templates to
+a string that you want to use as response data.  The
+:func:`pyramid.renderers.render` API renders a template to a string. We
+can manufacture a :term:`response` object directly, and use that string
+as the body of the response:
 
 .. code-block:: python
    :linenos:
@@ -256,7 +254,7 @@ values are provided in a dictionary to the renderer and include:
 
 ``context``
   The current :app:`Pyramid` context if ``request`` was provided as
-  a keyword argument or ``None``.
+  a keyword argument, or ``None``.
 
 ``request``
   The request provided as a keyword argument.
