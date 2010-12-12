@@ -58,7 +58,7 @@ within the body of a view callable like so:
    rendering tasks.  This set of functions works to render templates
    for all renderer extensions registered with :app:`Pyramid`.
 
-The ``sample_view`` :term:`view callable` above returns a
+The ``sample_view`` :term:`view callable` function above returns a
 :term:`response` object which contains the body of the
 ``templates/foo.pt`` template.  In this case, the ``templates``
 directory should live in the same directory as the module containing
