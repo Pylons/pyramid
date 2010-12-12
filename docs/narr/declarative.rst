@@ -41,7 +41,7 @@ In a file named ``helloworld.py``:
 
    from paste.httpserver import serve
    from pyramid.response import Response
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
 
    def hello_world(request):
        return Response('Hello world!')
@@ -91,7 +91,7 @@ the ``if __name__ == '__main__'`` section of ``helloworld.py``:
 
 In our "declarative" code, we've removed the call to ``add_view`` and
 replaced it with a call to the
-:meth:`pyramid.configuration.Configurator.load_zcml` method so that
+:meth:`pyramid.config.Configurator.load_zcml` method so that
 it now reads as:
 
 .. code-block:: python
@@ -135,13 +135,13 @@ This ``<view>`` declaration tag performs the same function as the
 ``add_view`` method that was employed within
 :ref:`imperative_configuration`.  In fact, the ``<view>`` tag is
 effectively a "macro" which calls the
-:meth:`pyramid.configuration.Configurator.add_view` method on your
+:meth:`pyramid.config.Configurator.add_view` method on your
 behalf.
 
 The ``<view>`` tag is an example of a :app:`Pyramid` declaration
 tag.  Other such tags include ``<route>`` and ``<scan>``.  Each of
 these tags is effectively a "macro" which calls methods of a
-:class:`pyramid.configuration.Configurator` object on your behalf.
+:class:`pyramid.config.Configurator` object on your behalf.
 
 Essentially, using a :term:`ZCML` file and loading it from the
 filesystem allows us to put our configuration statements within this
@@ -212,7 +212,7 @@ To do so, first, create a file named ``helloworld.py``:
 .. code-block:: python
    :linenos:
 
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
    from pyramid.response import Response
    from paste.httpserver import serve
 
@@ -277,7 +277,7 @@ within the ``if __name__ == '__main__'`` section of ``helloworld.py``:
        serve(app, host='0.0.0.0')
 
 In our "declarative" code, we've added a call to the
-:meth:`pyramid.configuration.Configurator.load_zcml` method with
+:meth:`pyramid.config.Configurator.load_zcml` method with
 the value ``configure.zcml``, and we've removed the lines which read
 ``config.add_view(hello_world)`` and ``config.add_view(goodbye_world,
 name='goodbye')``, so that it now reads as:
@@ -433,13 +433,13 @@ configurations imperatively, we saw this code:
    config.add_view(goodbye_world, name='goodbye')
 
 Each ``<view>`` declaration tag encountered in a ZCML file effectively
-invokes the :meth:`pyramid.configuration.Configurator.add_view`
+invokes the :meth:`pyramid.config.Configurator.add_view`
 method on the behalf of the developer.  Various attributes can be
 specified on the ``<view>`` tag which influence the :term:`view
 configuration` it creates.
 
 Since the relative ordering of calls to
-:meth:`pyramid.configuration.Configurator.add_view` doesn't matter
+:meth:`pyramid.config.Configurator.add_view` doesn't matter
 (see the sidebar entitled *View Dispatch and Ordering* within
 :ref:`adding_configuration`), the relative order of ``<view>`` tags in
 ZCML doesn't matter either.  The following ZCML orderings are
@@ -501,7 +501,7 @@ file points to is scanned.
        return Response('Hello')
 
    if __name__ == '__main__':
-       from pyramid.configuration import Configurator
+       from pyramid.config import Configurator
        config = Configurator()
        config.begin()
        config.load_zcml('configure.zcml')
@@ -644,12 +644,11 @@ See :ref:`view_directive` for complete ZCML directive documentation.
 Configuring a Route via ZCML
 ----------------------------
 
-Instead of using the imperative
-:meth:`pyramid.configuration.Configurator.add_route` method to add a new
-route, you can alternately use :term:`ZCML`.  :ref:`route_directive`
-statements in a :term:`ZCML` file used by your application is a sign that
-you're using :term:`URL dispatch`.  For example, the following :term:`ZCML
-declaration` causes a route to be added to the application.
+Instead of using the imperative :meth:`pyramid.config.Configurator.add_route`
+method to add a new route, you can alternately use :term:`ZCML`.
+:ref:`route_directive` statements in a :term:`ZCML` file. For example, the
+following :term:`ZCML declaration` causes a route to be added to the
+application.
 
 .. code-block:: xml
    :linenos:
@@ -677,6 +676,46 @@ The order that routes are evaluated when declarative configuration is used
 is the order that they appear relative to each other in the ZCML file.
 
 See :ref:`route_directive` for full ``route`` ZCML directive
+documentation.
+
+.. _zcml_handler_configuration:
+
+Configuring a Handler via ZCML
+------------------------------
+
+Instead of using the imperative
+:meth:`pyramid.config.Configurator.add_handler` method to add a new
+route, you can alternately use :term:`ZCML`.  :ref:`handler_directive`
+statements in a :term:`ZCML` file used by your application is a sign that
+you're using :term:`URL dispatch`.  For example, the following :term:`ZCML
+declaration` causes a route to be added to the application.
+
+.. code-block:: xml
+   :linenos:
+
+   <handler
+     route_name="myroute"
+     pattern="/prefix/{action}"
+     handler=".handlers.MyHandler"
+    />
+
+.. note::
+
+   Values prefixed with a period (``.``) within the values of ZCML attributes
+   such as the ``handler`` attribute of a ``handler`` directive mean
+   "relative to the Python package directory in which this :term:`ZCML` file
+   is stored".  So if the above ``handler`` declaration was made inside a
+   ``configure.zcml`` file that lived in the ``hello`` package, you could
+   replace the relative ``.views.MyHandler`` with the absolute
+   ``hello.views.MyHandler`` Either the relative or absolute form is
+   functionally equivalent.  It's often useful to use the relative form, in
+   case your package's name changes.  It's also shorter to type.
+
+The order that the routes attached to handlers are evaluated when declarative
+configuration is used is the order that they appear relative to each other in
+the ZCML file.
+
+See :ref:`handler_directive` for full ``handler`` ZCML directive
 documentation.
 
 .. index::
@@ -778,7 +817,7 @@ listening on ``example.com`` must be itself configured to respond properly to
 such a request.  The :func:`pyramid.url.static_url` API is discussed in more
 detail later in this chapter.
 
-The :meth:`pyramid.configuration.Configurator.add_static_view` method offers
+The :meth:`pyramid.config.Configurator.add_static_view` method offers
 an imperative equivalent to the ``static`` ZCML directive.  Use of the
 ``add_static_view`` imperative configuration method is completely equivalent
 to using ZCML for the same purpose.  See :ref:`static_resources_section` for
@@ -1028,7 +1067,7 @@ with ``.jinja2`` as its ``renderer`` value.  The ``name`` passed to the
 ``renderer=`` to the view configuration.
 
 See also :ref:`renderer_directive` and
-:meth:`pyramid.configuration.Configurator.add_renderer`.
+:meth:`pyramid.config.Configurator.add_renderer`.
 
 
 Overriding an Existing Renderer
@@ -1097,7 +1136,7 @@ tag):
     />
 
 See also :ref:`renderer_directive` and
-:meth:`pyramid.configuration.Configurator.add_renderer`.
+:meth:`pyramid.config.Configurator.add_renderer`.
 
 .. _zcml_adding_a_translation_directory:
 

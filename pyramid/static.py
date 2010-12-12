@@ -136,7 +136,6 @@ class StaticURLInfo(object):
             self.registrations.append((name, spec, True))
         else:
             # it's a view name
-            _info = extra.pop('_info', None)
             cache_max_age = extra.pop('cache_max_age', None)
             view = static_view(spec, cache_max_age=cache_max_age)
             # register a route using this view
@@ -148,7 +147,6 @@ class StaticURLInfo(object):
                 view_for=self.__class__,
                 view_permission=permission,
                 factory=lambda *x: self,
-                _info=_info
                 )
             self.registrations.append((name, spec, False))
 
@@ -183,7 +181,7 @@ class static_view(object):
     .. note:: If the ``root_dir`` is relative to a :term:`package`, or
          is a :term:`resource specification` the :app:`Pyramid`
          ``resource`` ZCML directive or
-         :class:`pyramid.configuration.Configurator` method can be
+         :class:`pyramid.config.Configurator` method can be
          used to override resources within the named ``root_dir``
          package-relative directory.  However, if the ``root_dir`` is
          absolute, the ``resource`` directive will not be able to

@@ -38,7 +38,7 @@ imperatively:
    :linenos:
 
    from paste.httpserver import serve
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
    from pyramid.response import Response
 
    def hello_world(request):
@@ -98,7 +98,7 @@ attribute to the ``hello`` function, making it available for a
 
 :app:`Pyramid` is willing to :term:`scan` a module or a package and
 its subpackages for decorations when the
-:meth:`pyramid.configuration.Configurator.scan` method is invoked:
+:meth:`pyramid.config.Configurator.scan` method is invoked:
 scanning implies searching for configuration declarations in a package
 and its subpackages.  For example:
 
@@ -116,7 +116,7 @@ and its subpackages.  For example:
           return Response('Hello')
 
       if __name__ == '__main__':
-          from pyramid.configuration import Configurator
+          from pyramid.config import Configurator
           config = Configurator()
           config.scan()
           app = config.make_wsgi_app()
@@ -136,7 +136,7 @@ the intent of the configuration decoration.
 
 In the example above, this is best represented as the scanner
 translating the arguments to :class:`pyramid.view.view_config` into a
-call to the :meth:`pyramid.configuration.Configurator.add_view`
+call to the :meth:`pyramid.config.Configurator.add_view`
 method, effectively:
 
 .. ignore-next-block

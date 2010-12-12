@@ -34,7 +34,7 @@ when it's called.
 The mere existence of a subscriber function, however, is not sufficient to
 arrange for it to be called.  To arrange for the subscriber to be called,
 you'll need to use the
-:meth:`pyramid.configuration.Configurator.add_subscriber` method or you'll
+:meth:`pyramid.config.Configurator.add_subscriber` method or you'll
 need to use the :func:`pyramid.events.subscriber` decorator to decorate a
 function found via a :term:`scan`.
 
@@ -42,7 +42,7 @@ function found via a :term:`scan`.
 
    You can imperatively configure a subscriber function to be called
    for some event type via the
-   :meth:`pyramid.configuration.Configurator.add_subscriber`
+   :meth:`pyramid.config.Configurator.add_subscriber`
    method (see also :term:`Configurator`):
 
    .. code-block:: python
@@ -53,12 +53,12 @@ function found via a :term:`scan`.
       from subscribers import mysubscriber
 
       # "config" below is assumed to be an instance of a 
-      # pyramid.configuration.Configurator object
+      # pyramid.config.Configurator object
 
       config.add_subscriber(mysubscriber, NewRequest)
 
    The first argument to
-   :meth:`pyramid.configuration.Configurator.add_subscriber` is the
+   :meth:`pyramid.config.Configurator.add_subscriber` is the
    subscriber function (or a :term:`dotted Python name` which refers
    to a subscriber callable); the second argument is the event type.
 
@@ -127,7 +127,7 @@ configuration startup:
 .. code-block:: python
    :linenos:
 
-   # config is an instance of pyramid.configuration.Configurator
+   # config is an instance of pyramid.config.Configurator
 
    config.add_subscriber('myproject.subscribers.handle_new_request',
                          'pyramid.events.NewRequest')

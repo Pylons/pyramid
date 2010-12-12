@@ -114,40 +114,6 @@ following kinds of resources defined in any Python package:
 - Any other resource (or set of resources) addressed by code that uses
   the setuptools :term:`pkg_resources` API.
 
-Usually, overriding a resource in an existing application means
-performing the following steps:
-
-- Create a new Python package.  The easiest way to do this is to
-  create a new :app:`Pyramid` application using the "paster"
-  template mechanism.  See :ref:`creating_a_project` for more
-  information.
-
-- Install the new package into the same Python environment as the
-  original application (e.g. ``python setup.py develop`` or ``python
-  setup.py install``).
-
-- Change the ``configure.zcml`` in the new package to include one or
-  more ``resource`` ZCML directives (see :ref:`resource_directive`
-  below).  The new package's ``configure.zcml`` should then include
-  the original :app:`Pyramid` application's ``configure.zcml`` via
-  an include statement, e.g.  ``<include
-  package="theoriginalpackage"/>``.
-
-- Add override resources to the package as necessary.
-
-- Change the Paste ``.ini`` file that starts up the original
-  application.  Add a ``configure_zcml`` statement within the
-  application's section in the file which points at your *new*
-  package's ``configure.zcml`` file.  See :ref:`environment_chapter`
-  for more information about this setting.
-
-Note that overriding resources is not the only way to extend or modify
-the behavior of an existing :app:`Pyramid` application.  A "heavier
-hammer" way to do the same thing is explained in
-:ref:`extending_chapter`.  The heavier hammer way allows you to
-replace a :term:`view` wholesale rather than resources that might be
-used by a view.
-
 .. index::
    single: override_resource
 
@@ -157,7 +123,7 @@ The ``override_resource`` API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 An individual call to
-:meth:`pyramid.configuration.Configurator.override_resource` can
+:meth:`pyramid.config.Configurator.override_resource` can
 override a single resource.  For example:
 
 .. ignore-next-block
@@ -213,7 +179,7 @@ will need to register two overrides.
 The package name in a specification may start with a dot, meaning that
 the package is relative to the package in which the configuration
 construction file resides (or the ``package`` argument to the
-:class:`pyramid.configuration.Configurator` class construction).
+:class:`pyramid.config.Configurator` class construction).
 For example:
 
 .. ignore-next-block
@@ -245,7 +211,7 @@ The ``resource`` ZCML Directive
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Instead of using
-:meth:`pyramid.configuration.Configurator.override_resource` during
+:meth:`pyramid.config.Configurator.override_resource` during
 :term:`imperative configuration`, an equivalent can be used to perform
 all the tasks described above within :term:`ZCML`.  The ZCML
 ``resource`` tag is a frontend to using ``override_resource``.

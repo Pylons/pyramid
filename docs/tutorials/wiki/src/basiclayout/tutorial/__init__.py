@@ -1,4 +1,4 @@
-from pyramid.configuration import Configurator
+from pyramid.config import Configurator
 from repoze.zodbconn.finder import PersistentApplicationFinder
 from tutorial.models import appmaker
 

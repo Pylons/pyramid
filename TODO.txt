@@ -4,10 +4,14 @@ Pyramid TODOs
 Must-Have (before 1.0)
 ----------------------
 
-- Add a ``handler`` ZCML directive.  This implies some slightly dicey
-  refactoring of the configurator to allow it to generate ZCML
-  "discriminators" for views and routes, that could be implemented in terms
-  of "twophase configuration" in "should have" below.
+- Narrative docs for ``Configurator.include`` and ``Configurator.commit``.
+
+- Fix conflict exceptions so they have the right ``info`` when one
+  configuration method is called from another.
+
+- Fix session behavior: when a Forbidden/NotFound hander is invoked, we'd
+  like to allow people to save the session (currently when the response has
+  an exception attribute, the session is tossed unconditionally).
 
 - Provide a .flash API on session object.
 
@@ -30,10 +34,6 @@ Should-Have
 
 - Change "Cleaning up After a Request" in the urldispatch chapter to
   use ``request.add_response_callback``.
-
-- Twophase configuration (config = Configurator(autocommit=False)).  Maybe
-  use ``zope.configuration`` ConfigurationContext as config.registry.ctx and
-  push execution into the configurator.
 
 Nice-to-Have
 ------------

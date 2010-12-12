@@ -1,4 +1,5 @@
 from zope.component.registry import Components
+
 from pyramid.interfaces import ISettings
 
 class Registry(Components, dict):

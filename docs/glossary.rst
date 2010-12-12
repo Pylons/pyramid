@@ -585,7 +585,7 @@ Glossary
    configurator
      An object used to do :term:`configuration declaration` within an
      application.  The most common configurator is an instance of the
-     ``pyramid.configuration.Configurator`` class.
+     ``pyramid.config.Configurator`` class.
 
    imperative configuration
      The configuration mode in which you use Python to call methods on
@@ -822,8 +822,8 @@ Glossary
 
    View handler
      A view handler ties together
-     :meth:`pyramid.configuration.Configurator.add_route` and
-     :meth:`pyramid.configuration.Configurator.add_view` to make it more
+     :meth:`pyramid.config.Configurator.add_route` and
+     :meth:`pyramid.config.Configurator.add_view` to make it more
      convenient to register a collection of views as a single class when
      using :term:`url dispatch`.  See also :ref:`handlers_chapter`.
 

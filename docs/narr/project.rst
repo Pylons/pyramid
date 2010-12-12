@@ -754,7 +754,7 @@ also informs Python that the directory which contains it is a *package*.
    :linenos:
 
 #. Line 1 imports the :term:`Configurator` class from
-   :mod:`pyramid.configuration` that we use later.
+   :mod:`pyramid.config` that we use later.
 
 #. Line 2 imports the ``get_root`` function from
    :mod:`myproject.models` that we use later.
@@ -915,7 +915,7 @@ made for you by any paster template, you can decide to lay your code out any
 way you see fit.
 
 For example, the configuration method named
-:meth:`~pyramid.configuration.Configurator.add_view` requires you to pass a
+:meth:`~pyramid.config.Configurator.add_view` requires you to pass a
 :term:`dotted Python name` or a direct object reference as the class or
 function to be used as a view.  By default, the ``pyramid_starter`` paster
 template would have you add view functions to the ``views.py`` module in your

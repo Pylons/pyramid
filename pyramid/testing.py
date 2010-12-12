@@ -12,7 +12,7 @@ from pyramid.interfaces import ISecuredView
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
 
-from pyramid.configuration import Configurator
+from pyramid.config import Configurator
 from pyramid.exceptions import Forbidden
 from pyramid.response import Response
 from pyramid.registry import Registry
@@ -52,13 +52,15 @@ def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
 
     .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
-       :meth:`pyramid.configuration.Configurator.testing_securitypolicy`
+       :meth:`pyramid.config.Configurator.testing_securitypolicy`
        method in your unit and integration tests.
     """
     registry = get_current_registry()
     config = Configurator(registry=registry)
-    return config.testing_securitypolicy(userid=userid, groupids=groupids,
-                                         permissive=permissive)
+    result = config.testing_securitypolicy(userid=userid, groupids=groupids,
+                                           permissive=permissive)
+    config.commit()
+    return result
 
 def registerModels(models):
     """ Registers a dictionary of :term:`model` objects that can be
@@ -74,12 +76,14 @@ def registerModels(models):
 
     .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
-       :meth:`pyramid.configuration.Configurator.testing_models`
+       :meth:`pyramid.config.Configurator.testing_models`
        method in your unit and integration tests.
     """
     registry = get_current_registry()
     config = Configurator(registry=registry)
-    return config.testing_models(models)
+    result = config.testing_models(models)
+    config.commit()
+    return result
 
 def registerEventListener(event_iface=None):
     """ Registers an :term:`event` listener (aka :term:`subscriber`)
@@ -100,12 +104,14 @@ def registerEventListener(event_iface=None):
 
     .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
-       :meth:`pyramid.configuration.Configurator.testing_add_subscriber`
+       :meth:`pyramid.config.Configurator.testing_add_subscriber`
        method in your unit and integration tests.
     """
     registry = get_current_registry()
     config = Configurator(registry=registry)
-    return config.testing_add_subscriber(event_iface)
+    result = config.testing_add_subscriber(event_iface)
+    config.commit()
+    return result
 
 def registerTemplateRenderer(path, renderer=None):
     """ Register a template renderer at ``path`` (usually a relative
@@ -119,13 +125,15 @@ def registerTemplateRenderer(path, renderer=None):
 
     .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
-       :meth:`pyramid.configuration.Configurator.testing_add_template`
+       :meth:`pyramid.config.Configurator.testing_add_template`
        method in your unit and integration tests.
 
     """
     registry = get_current_registry()
     config = Configurator(registry=registry)
-    return config.testing_add_template(path, renderer)
+    result = config.testing_add_template(path, renderer)
+    config.commit()
+    return result
 
 # registerDummyRenderer is a deprecated alias that should never be removed
 # (too much usage in the wild)
@@ -151,7 +159,7 @@ def registerView(name, result='', view=None, for_=(Interface, Interface),
 
     .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
-       :meth:`pyramid.configuration.Configurator.add_view`
+       :meth:`pyramid.config.Configurator.add_view`
        method in your unit and integration tests.
     """
     for_ = (IViewClassifier, ) + for_
@@ -244,12 +252,14 @@ def registerSubscriber(subscriber, iface=Interface):
 
     .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
-       :meth:`pyramid.configuration.Configurator.add_subscriber`
+       :meth:`pyramid.config.Configurator.add_subscriber`
        method in your unit and integration tests.
     """
     registry = get_current_registry()
     config = Configurator(registry)
-    return config.add_subscriber(subscriber, iface=iface)
+    result = config.add_subscriber(subscriber, iface=iface)
+    config.commit()
+    return result
 
 def registerRoute(pattern, name, factory=None):
     """ Register a new :term:`route` using a pattern
@@ -265,12 +275,14 @@ def registerRoute(pattern, name, factory=None):
 
     .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
-       :meth:`pyramid.configuration.Configurator.add_route`
+       :meth:`pyramid.config.Configurator.add_route`
        method in your unit and integration tests.
     """
     reg = get_current_registry()
     config = Configurator(registry=reg)
-    return config.add_route(name, pattern, factory=factory)
+    result = config.add_route(name, pattern, factory=factory)
+    config.commit()
+    return result
 
 def registerSettings(dictarg=None, **kw):
     """Register one or more 'setting' key/value pairs.  A setting is
@@ -291,7 +303,7 @@ def registerSettings(dictarg=None, **kw):
 
     .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
-       :meth:`pyramid.configuration.Configurator.add_settings`
+       :meth:`pyramid.config.Configurator.add_settings`
        method in your unit and integration tests.
     """
     registry = get_current_registry()
@@ -550,7 +562,7 @@ class DummyRequest(object):
             self.response_callbacks = []
         self.response_callbacks.append(callback)
 
-def setUp(registry=None, request=None, hook_zca=True):
+def setUp(registry=None, request=None, hook_zca=True, autocommit=True):
     """
     Set :app:`Pyramid` registry and request thread locals for the
     duration of a single unit test.
@@ -561,7 +573,7 @@ def setUp(registry=None, request=None, hook_zca=True):
     - any of the ``register*`` functions in :mod:`pyramid.testing`
       (such as :func:`pyramid.testing.registerModels`)
 
-    - any method of the :class:`pyramid.configuration.Configurator`
+    - any method of the :class:`pyramid.config.Configurator`
       object returned by this function.
 
     - the :func:`pyramid.threadlocal.get_current_registry` or
@@ -599,7 +611,7 @@ def setUp(registry=None, request=None, hook_zca=True):
     ``hook_zca`` is ``False``, the hook will not be set.
 
     This function returns an instance of the
-    :class:`pyramid.configuration.Configurator` class, which can be
+    :class:`pyramid.config.Configurator` class, which can be
     used for further configuration to set up an environment suitable
     for a unit or integration test.  The ``registry`` attribute
     attached to the Configurator instance represents the 'current'
@@ -618,14 +630,14 @@ def setUp(registry=None, request=None, hook_zca=True):
     manager.clear()
     if registry is None:
         registry = Registry('testing')
-    config = Configurator(registry=registry)
+    config = Configurator(registry=registry, autocommit=autocommit)
     if hasattr(registry, 'registerUtility'):
         # Sometimes nose calls us with a non-registry object because
         # it thinks this function is module test setup.  Likewise,
         # someone may be passing us an esoteric "dummy" registry, and
         # the below won't succeed if it doesn't have a registerUtility
         # method.
-        from pyramid.configuration import DEFAULT_RENDERERS
+        from pyramid.config import DEFAULT_RENDERERS
         for name, renderer in DEFAULT_RENDERERS:
             # Cause the default renderers to be registered because
             # in-the-wild test code relies on being able to call
@@ -637,6 +649,7 @@ def setUp(registry=None, request=None, hook_zca=True):
             # ``render_template`` and friends went behind the back of
             # any existing renderer factory lookup system.
             config.add_renderer(name, renderer)
+    config.commit()
     hook_zca and config.hook_zca()
     config.begin(request=request)
     return config
@@ -691,7 +704,7 @@ def cleanUp(*arg, **kw):
 
 class DummyRendererFactory(object):
     """ Registered by
-    ``pyramid.configuration.Configurator.testing_add_renderer`` as
+    ``pyramid.config.Configurator.testing_add_renderer`` as
     a dummy renderer factory.  The indecision about what to use as a
     key (a spec vs. a relative name) is caused by test suites in the
     wild believing they can register either.  The ``factory`` argument

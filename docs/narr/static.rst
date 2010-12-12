@@ -13,17 +13,17 @@ how to configure :app:`Pyramid` to do so.
 Serving Static Resources
 ------------------------
 
-Use the :meth:`pyramid.configuration.Configurator.add_static_view` to
+Use the :meth:`pyramid.config.Configurator.add_static_view` to
 instruct :app:`Pyramid` to serve static resources such as JavaScript and CSS
 files. This mechanism makes static files available at a name relative to the
 application root URL, e.g. ``/static``.
 
 Note that the ``path`` provided to
-:meth:`pyramid.configuration.Configurator.add_static_view` may be a fully
+:meth:`pyramid.config.Configurator.add_static_view` may be a fully
 qualified :term:`resource specification`, or an *absolute path*.  
 
 Here's an example of a use of
-:meth:`pyramid.configuration.Configurator.add_static_view` that will serve
+:meth:`pyramid.config.Configurator.add_static_view` that will serve
 files up under the ``/static`` URL from the ``/var/www/static`` directory of
 the computer which runs the :app:`Pyramid` application using an absolute
 path.
@@ -31,11 +31,11 @@ path.
 .. code-block:: python
    :linenos:
 
-   # config is an instance of pyramid.configuration.Configurator
+   # config is an instance of pyramid.config.Configurator
    config.add_static_view(name='static', path='/var/www/static')
 
 Here's an example of
-:meth:`pyramid.configuration.Configurator.add_static_view` that will serve
+:meth:`pyramid.config.Configurator.add_static_view` that will serve
 files up under the ``/static`` URL from the ``a/b/c/static`` directory of the
 Python package named ``some_package`` using a fully qualified :term:`resource
 specification`.
@@ -43,50 +43,70 @@ specification`.
 .. code-block:: python
    :linenos:
 
-   # config is an instance of pyramid.configuration.Configurator
+   # config is an instance of pyramid.config.Configurator
    config.add_static_view(name='static', path='some_package:a/b/c/static')
 
-Whether you use a fully qualified resource specification, or an absolute
-path for ``path`` in the directive, it specifies a filesystem directory
-where static files will be served from. Once you place files there, you
-will then be able to view them from a browser at URLs prefixed with the
-directive's ``name``.  For instance, if the ``static`` directive's
-``name`` is ``static``, and the static directive's ``path`` is
-``/path/to/static/dir``, ``http://localhost:6543/static/foo.js`` will
-serve the file ``/path/to/static/dir/foo.js``.  The static directory may
-contain subdirectories recursively, and any subdirectories may hold
-files; these will be resolved by the static view as you would expect.
+Whether you use for ``path`` a fully qualified resource specification, or an
+absolute path, when you place your static files on the filesystem in the
+directory represented as the ``path`` of the directive, you will then be able
+to view the static files in this directory via a browser at URLs prefixed
+with the directive's ``name``.  For instance if the ``static`` directive's
+``name`` is ``static`` and the static directive's ``path`` is
+``/path/to/static``, ``http://localhost:6543/static/foo.js`` will return the
+file ``/path/to/static/dir/foo.js``.  The static directory may contain
+subdirectories recursively, and any subdirectories may hold files; these will
+be resolved by the static view as you would expect.
 
-The ``name`` argument of the call to
-:meth:`pyramid.configuration.Configurator.add_static_view` can be either
-a *view name*, or a *URL*.  In the above examples, the ``name`` argument
-is a view name.  When ``name`` is a *URL* (or any string with a slash
-(``/``) in it), static resources can be served from an external
-webserver.  In this mode, the ``name`` is used as the URL prefix when
-generating a URL using the :func:`pyramid.url.static_url` function.
+While the ``path`` argument can be a number of different things, the ``name``
+argument of the call to
+:meth:`pyramid.config.Configurator.add_static_view` can also be one of
+a number of things: a *view name* or a *URL*.  The above examples have shown
+usage of the ``name`` argument as a view name.  When ``name`` is a *URL* (or
+any string with a slash (``/``) in it), static resources can be served from
+an external webserver.  In this mode, the ``name`` is used as the URL prefix
+when generating a URL using :func:`pyramid.url.static_url`.
 
-For example, :meth:`pyramid.configuration.Configurator.add_static_view` may
+.. note::
+
+   Using :func:`pyramid.url.static_url` in conjunction with a
+   :meth:`pyramid.config.Configurator.add_static_view` makes it
+   possible to put static media on a separate webserver during production (if
+   the ``name`` argument to
+   :meth:`pyramid.config.Configurator.add_static_view` is a URL),
+   while keeping static media package-internal and served by the development
+   webserver during development (if the ``name`` argument to
+   :meth:`pyramid.config.Configurator.add_static_view` is a view
+   name).  To create such a circumstance, we suggest using the
+   :attr:`pyramid.registry.Registry.settings` API in conjunction with a
+   setting in the application ``.ini`` file named ``media_location``.  Then
+   set the value of ``media_location`` to either a view name or a URL
+   depending on whether the application is being run in development or in
+   production (use a different `.ini`` file for production than you do for
+   development).  This is just a suggestion for a pattern; any setting name
+   other than ``media_location`` could be used.
+
+For example, :meth:`pyramid.config.Configurator.add_static_view` may
 be fed a ``name`` argument which is ``http://example.com/images``:
 
 .. code-block:: python
    :linenos:
 
-   # config is an instance of pyramid.configuration.Configurator
+   # config is an instance of pyramid.config.Configurator
    config.add_static_view(name='http://example.com/images', 
                           path='mypackage:images')
 
-Because :meth:`pyramid.configuration.Configurator.add_static_view` is
+Because :meth:`pyramid.config.Configurator.add_static_view` is
 provided with a ``name`` argument that is the URL prefix
 ``http://example.com/images``, subsequent calls to
 :func:`pyramid.url.static_url` with paths that start with the ``path``
-argument passed to :meth:`pyramid.configuration.Configurator.add_static_view`
+argument passed to :meth:`pyramid.config.Configurator.add_static_view`
 will generate a URL something like ``http://example.com/images/logo.png``.  The
 external webserver listening on ``example.com`` must be itself configured to
 respond properly to such a request.  The :func:`pyramid.url.static_url` API
 is discussed in more detail later in this chapter.
 
 The :ref:`static_directive` ZCML directive offers an declarative equivalent
-to :meth:`pyramid.configuration.Configurator.add_static_view`.  Use of the
+to :meth:`pyramid.config.Configurator.add_static_view`.  Use of the
 :ref:`static_directive` ZCML directive is completely equivalent to using
 imperative configuration for the same purpose.
 
@@ -118,7 +138,7 @@ imperative configuration for the same purpose.
 Generating Static Resource URLs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When a :meth:`pyramid.configuration.Configurator.add_static_view` method is
+When a :meth:`pyramid.config.Configurator.add_static_view` method is
 used to register a static resource directory, a special helper API named
 :func:`pyramid.url.static_url` can be used to generate the appropriate URL for a
 package resource that lives in one of the directories named by the static
@@ -168,7 +188,7 @@ properly after the rename.
 
 URLs may also be generated by :func:`pyramid.url.static_url` to static
 resources that live *outside* the :app:`Pyramid` application.  This will
-happen when the :meth:`pyramid.configuration.Configurator.add_static_view`
+happen when the :meth:`pyramid.config.Configurator.add_static_view`
 API associated with the path fed to :func:`pyramid.url.static_url` is a *URL*
 instead of a view name.  For example, the ``name`` argument may be
 ``http://example.com`` while the the ``path`` given may be
@@ -224,7 +244,7 @@ your application root as below.
    (e.g. ``anotherpackage:some/subdirectory``).
  
 Subsequently, you may wire this view up to be accessible as ``/static`` using
-the :mod:`pyramid.configuration.Configurator.add_view` method in your
+the :mod:`pyramid.config.Configurator.add_view` method in your
 application's startup code against either the class or interface that
 represents your root object.
 

@@ -40,7 +40,7 @@ Alternatives
 
 You may create an instance of the
 :class:`pyramid.authentication.RemoteUserAuthenticationPolicy` and
-pass it to the :class:`pyramid.configuration.Configurator`
+pass it to the :class:`pyramid.config.Configurator`
 constructor as the ``authentication_policy`` argument during initial
 application configuration.
 

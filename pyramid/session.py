@@ -50,9 +50,9 @@ def UnencryptedCookieSessionFactoryConfig(
     (but signed) cookie-based sessions.  The return value of this
     function is a :term:`session factory`, which may be provided as
     the ``session_factory`` argument of a
-    :class:`pyramid.configuration.Configurator` constructor, or used
+    :class:`pyramid.config.Configurator` constructor, or used
     as the ``session_factory`` argument of the
-    :meth:`pyramid.configuration.Configurator.set_session_factory`
+    :meth:`pyramid.config.Configurator.set_session_factory`
     method.
 
     The session factory returned by this function will create sessions

@@ -6,8 +6,8 @@ View Handlers
 Along with normal view callables, :app:`Pyramid` provides the concept of a
 :term:`view handler`.  Using a view handler instead of a plain :term:`view
 callable` makes it unnecessary to call
-:meth:`pyramid.configuration.Configurator.add_route` (and/or
-:meth:`pyramid.configuration.Configurator.add_view`) "by hand" multiple
+:meth:`pyramid.config.Configurator.add_route` (and/or
+:meth:`pyramid.config.Configurator.add_view`) "by hand" multiple
 times, making it more pleasant to register a collection of views as a single
 class when using :term:`url dispatch`.  The view handler machinery also
 introduces the concept of an ``action``, which is used as a :term:`view
@@ -27,7 +27,7 @@ during configuration.  After the view handler class is instantiated, a
 method on the instance is called. The method which is called depends on
 the view handler configuration.
 
-The :meth:`pyramid.configuration.Configurator.add_handler` method will
+The :meth:`pyramid.config.Configurator.add_handler` method will
 scan the handler class and automatically set up views for methods that
 are auto-exposed, or were decorated with the
 :class:`~pyramid.view.action` decorator. This decorator is used to setup
@@ -56,7 +56,7 @@ Here's an example view handler class:
             return {}
 
 An accompanying call to the
-:meth:`~pyramid.configuration.Configurator.add_handler` for the handler must
+:meth:`~pyramid.config.Configurator.add_handler` for the handler must
 be performed in order to register it with the system:
 
 .. code-block:: python
@@ -87,15 +87,22 @@ This will result one of the methods that are configured for the ``action`` of
 of the method is the same as the action name: 'index'. However, this
 need not be the case, as we will see below.
 
-Using :meth:`~pyramid.configuration.Configurator.add_handler`
+.. note::
+
+  Handler configuration may also be added to the system via :term:`ZCML` (see
+  :ref:`zcml_handler_configuration`).
+
+.. _using_add_handler:
+
+Using :meth:`~pyramid.config.Configurator.add_handler`
 -------------------------------------------------------------
 
-When calling :meth:`~pyramid.configuration.Configurator.add_handler`, an
+When calling :meth:`~pyramid.config.Configurator.add_handler`, an
 ``action`` is required in either the route pattern or as a keyword argument,
 but **cannot appear in both places**. A ``handler`` argument must also be
 supplied, which can be either a :term:`resource specification` or a Python
 reference to the handler class. Additional keyword arguments are passed
-directly through to :meth:`pyramid.configuration.Configurator.add_route`.
+directly through to :meth:`pyramid.config.Configurator.add_route`.
 
 For example:
 
@@ -106,10 +113,10 @@ For example:
                        handler='mypackage.handlers:MyHandler')
 
 In larger applications, it is advised to use a :term:`resource specification`
-with :meth:`~pyramid.configuration.Configurator.add_handler` to avoid having
+with :meth:`~pyramid.config.Configurator.add_handler` to avoid having
 to import every handler class.
 
-Multiple :meth:`~pyramid.configuration.Configurator.add_handler` calls can
+Multiple :meth:`~pyramid.config.Configurator.add_handler` calls can
 specify the same handler, to register specific route names for different
 handler/action combinations. For example:
 
@@ -130,7 +137,7 @@ The handler class specified can have a single class level attribute called
 ``None``. It's used to determine which method names will result in additional
 view configurations being registered.
 
-When :meth:`~pyramid.configuration.Configurator.add_handler` runs, every
+When :meth:`~pyramid.config.Configurator.add_handler` runs, every
 method in the handler class will be searched and a view registered if the
 method name matches the ``__autoexpose__`` regular expression, or if the
 method was decorated with :class:`~pyramid.view.action`.
@@ -170,12 +177,12 @@ Action Decorator
 
 The :class:`~pyramid.view.action` decorator registers view configuration
 information on the handler method, which is used by
-:meth:`~pyramid.configuration.Configurator.add_handler` to setup the view
+:meth:`~pyramid.config.Configurator.add_handler` to setup the view
 configuration.
 
 All keyword arguments are recorded, and passed to
-:meth:`~pyramid.configuration.Configurator.add_view`. Any valid keyword
-arguments for :meth:`~pyramid.configuration.Configurator.add_view` can thus be
+:meth:`~pyramid.config.Configurator.add_view`. Any valid keyword
+arguments for :meth:`~pyramid.config.Configurator.add_view` can thus be
 used with the :class:`~pyramid.view.action` decorator to further restrict when
 the view will be called.
 

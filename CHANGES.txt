@@ -4,6 +4,22 @@ Next release
 Features
 --------
 
+- Add a ``handler`` ZCML directive.  This directive does the same thing as
+  ``pyramid.configuration.add_handler``.
+
+- A new module named ``pyramid.config`` was added.  It subsumes the duties of
+  the older ``pyramid.configuration`` module.
+
+- The new ``pyramid.config.Configurator` class has API methods that the older
+  ``pyramid.configuration.Configurator`` class did not: ``with_context`` (a
+  classmethod), ``include``, ``action``, and ``commit``.  These methods exist
+  for imperative application extensibility purposes.
+
+- The ``pyramid.testing.setUp`` function now accepts an ``autocommit``
+  keyword argument, which defaults to ``True``.  If it is passed ``False``,
+  the Config object returned by ``setUp`` will be a non-autocommiting Config
+  object.
+
 - Add logging configuration to all paster templates.
 
 - ``pyramid_alchemy``, ``pyramid_routesalchemy``, and ``pylons_sqla`` paster
@@ -60,6 +76,26 @@ Documentation
 
 - Add a "Modifying Package Structure" section to the project narrative
   documentation chapter (explain turning a module into a package).
+
+- Documentation was added for the new ``handler`` ZCML directive in the ZCML
+  section.
+
+Deprecations
+------------
+
+- ``pyramid.configuration.Configurator`` is now deprecated.  Use
+  ``pyramid.config.Configurator``, passing its constructor
+  ``autocommit=True`` instead.  The ``pyramid.configuration.Configurator``
+  alias will live for a long time, as every application uses it, but its
+  import now issues a deprecation warning.  The
+  ``pyramid.config.Configurator`` class has the same API as
+  ``pyramid.configuration.Configurator`` class, which it means to replace,
+  except by default it is a *non-autocommitting* configurator. The
+  now-deprecated ``pyramid.configuration.Configurator`` will autocommit every
+  time a configuration method is called.
+
+  The ``pyramid.configuration`` module remains, but it is deprecated.  Use
+  ``pyramid.config`` instead.
 
 1.0a4 (2010-11-21)
 ==================

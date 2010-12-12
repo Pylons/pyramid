@@ -31,10 +31,11 @@ class WGSIAppPlusViewConfigTests(unittest.TestCase):
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
-        from pyramid.configuration import Configurator
+        from pyramid.config import Configurator
         from pyramid.tests import test_integration
         config = Configurator()
         config.scan(test_integration)
+        config.commit()
         reg = config.registry
         view = reg.adapters.lookup(
             (IViewClassifier, IRequest, INothing), IView, name='')
@@ -66,10 +67,11 @@ class TestStaticApp(unittest.TestCase):
 class IntegrationBase(unittest.TestCase):
     root_factory = None
     def setUp(self):
-        from pyramid.configuration import Configurator
+        from pyramid.config import Configurator
         config = Configurator(root_factory=self.root_factory)
         config.begin()
         config.load_zcml(self.config)
+        config.commit()
         app = config.make_wsgi_app()
         from webtest import TestApp
         self.testapp = TestApp(app)
@@ -238,6 +240,32 @@ class TestExceptionViewsApp(IntegrationBase):
     def test_route_raise_exception4(self):
         res = self.testapp.get('/route_raise_exception4', status=200)
         self.failUnless('whoa' in res.body)
+
+class ImperativeIncludeConfigurationTest(unittest.TestCase):
+    def setUp(self):
+        from pyramid.config import Configurator
+        config = Configurator()
+        from pyramid.tests.includeapp1.root import configure
+        configure(config)
+        app = config.make_wsgi_app()
+        from webtest import TestApp
+        self.testapp = TestApp(app)
+        self.config = config
+
+    def tearDown(self):
+        self.config.end()
+
+    def test_root(self):
+        res = self.testapp.get('/', status=200)
+        self.failUnless('root' in res.body)
+
+    def test_two(self):
+        res = self.testapp.get('/two', status=200)
+        self.failUnless('two' in res.body)
+
+    def test_three(self):
+        res = self.testapp.get('/three', status=200)
+        self.failUnless('three' in res.body)
 
 class DummyContext(object):
     pass

@@ -24,7 +24,7 @@ Alternatives
 
 You may create an instance of the
 :class:`pyramid.authorization.ACLAuthorizationPolicy` and pass it
-to the :class:`pyramid.configuration.Configurator` constructor as
+to the :class:`pyramid.config.Configurator` constructor as
 the ``authorization_policy`` argument during initial application
 configuration.
 

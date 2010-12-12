@@ -41,7 +41,7 @@ class DottedNameResolver(object):
     resolver will only be able to resolve fully qualified (not
     relative) names.  Any attempt to resolve a relative name when the
     ``package`` is ``None`` will result in an
-    :exc:`pyramid.configuration.ConfigurationError` exception.
+    :exc:`pyramid.config.ConfigurationError` exception.
 
     If a *module* or *module name* (as opposed to a package or package
     name) is supplied as ``package``, its containing package is

@@ -543,9 +543,10 @@ class Test_setUp(unittest.TestCase):
             manager.clear()
 
     def test_it_with_registry(self):
+        from pyramid.registry import Registry
         from zope.component import getSiteManager
         from pyramid.threadlocal import manager
-        registry = object()
+        registry = Registry()
         try:
             self._callFUT(registry=registry)
             current = manager.get()
@@ -569,7 +570,8 @@ class Test_setUp(unittest.TestCase):
     def test_it_with_hook_zca_false(self):
         from zope.component import getSiteManager
         from pyramid.threadlocal import manager
-        registry = object()
+        from pyramid.registry import Registry
+        registry = Registry()
         try:
             self._callFUT(registry=registry, hook_zca=False)
             sm = getSiteManager()

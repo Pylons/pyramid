@@ -35,6 +35,12 @@
         />
 
     <meta:directive
+        name="handler"
+        schema="pyramid.zcml.IHandlerDirective"
+        handler="pyramid.zcml.handler"
+        />
+
+    <meta:directive
         name="resource"
         schema="pyramid.zcml.IResourceDirective"
         handler="pyramid.zcml.resource"

@@ -29,7 +29,7 @@ class as the ``context`` of the view configuration.
 
    If your application uses :term:`imperative configuration`, you can
    replace the Not Found view by using the
-   :meth:`pyramid.configuration.Configurator.add_view` method to
+   :meth:`pyramid.config.Configurator.add_view` method to
    register an "exception view":
 
    .. code-block:: python
@@ -118,7 +118,7 @@ class as the ``context`` of the view configuration.
 
    If your application uses :term:`imperative configuration`, you can
    replace the Forbidden view by using the
-   :meth:`pyramid.configuration.Configurator.add_view` method to
+   :meth:`pyramid.config.Configurator.add_view` method to
    register an "exception view":
 
    .. code-block:: python
@@ -368,13 +368,13 @@ In the below, we assume it lives in a package named
 Lastly, if you're doing imperative configuration, and you'd rather do
 it after you've already constructed a :term:`configurator` it can also
 be registered via the
-:meth:`pyramid.configuration.Configurator.set_request_factory`
+:meth:`pyramid.config.Configurator.set_request_factory`
 method:
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
    from pyramid.request import Request
 
    class MyRequest(Request):
@@ -435,13 +435,13 @@ named ``mypackage.mymodule``.
 Lastly, if you're doing imperative configuration, and you'd rather do
 it after you've already constructed a :term:`configurator` it can also
 be registered via the
-:meth:`pyramid.configuration.Configurator.set_renderer_globals_factory`
+:meth:`pyramid.config.Configurator.set_renderer_globals_factory`
 method:
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
 
    def renderer_globals_factory(system):
        return {'a':1}
@@ -474,7 +474,7 @@ that can be used for this purpose.  For example:
 
 An object of this type is sent as an event just before a :term:`renderer` is
 invoked (but *after* the application-level renderer globals factory added via
-:class:`pyramid.configuration.Configurator.set_renderer_globals_factory`, if
+:class:`pyramid.config.Configurator.set_renderer_globals_factory`, if
 any, has injected its own keys into the renderer globals dictionary).
 
 If a subscriber attempts to add a key that already exist in the renderer
@@ -659,7 +659,7 @@ performed, enabling you to set up the utility in advance:
    :linenos:
 
    from paste.httpserver import serve
-   from pyramid.configuration import Configurator
+   from pyramid.config import Configurator
 
    class UtilityImplementation:
 

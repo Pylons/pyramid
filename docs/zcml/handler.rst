@@ -1,37 +1,35 @@
-.. _route_directive:
+.. _handler_directive:
 
-``route``
----------
+``handler``
+-----------
 
-The ``route`` directive adds a single :term:`route configuration` to
+The ``handler`` directive adds the configuration of a :term:`view handler` to
 the :term:`application registry`.
 
 Attributes
 ~~~~~~~~~~
 
+``route_name``
+  The name of the route, e.g. ``myroute``.  This attribute is required.  It
+  must be unique among all defined handler and route names in a given
+  configuration.
+
 ``pattern``
   The pattern of the route e.g. ``ideas/{idea}``.  This attribute is
-  required.  See :ref:`route_pattern_syntax` for information
-  about the syntax of route patterns.
+  required.  See :ref:`route_pattern_syntax` for information about the syntax
+  of route patterns.  The name ``{action}`` is treated specially in handler
+  patterns.  See :ref:`using_add_handler` for a discussion of how
+  ``{action}`` in handler patterns is treated.
 
-  .. note:: For backwards compatibility purposes, the ``path``
-     attribute can also be used instead of ``pattern``.
-
-``name``
-  The name of the route, e.g. ``myroute``.  This attribute is
-  required.  It must be unique among all defined routes in a given
-  configuration.
+``action``
+  If the action name is not specified in the ``pattern``, use this name as the 
+  handler action (method name).
 
 ``factory``
   The :term:`dotted Python name` to a function that will generate a
-  :app:`Pyramid` context object when this route matches.
+  :app:`Pyramid` context object when the associated route matches.
   e.g. ``mypackage.models.MyFactoryClass``.  If this argument is not
   specified, a default root factory will be used.
-
-``view``
-  The :term:`dotted Python name` to a function that will be used as a
-  view callable when this route matches.
-  e.g. ``mypackage.views.my_view``.
 
 ``xhr``
   This value should be either ``True`` or ``False``.  If this value is
@@ -75,7 +73,7 @@ Attributes
   using a a ``*traverse`` remainder marker; instead you can use other
   match information.
 
-  Note that the ``traverse`` argument to the ``route`` directive is
+  Note that the ``traverse`` argument to the ``handler`` directive is
   ignored when attached to a route that has a ``*traverse`` remainder
   marker in its pattern.
 
@@ -132,7 +130,6 @@ Attributes
   this predicate returns false, route matching continues.
 
 ``custom_predicates``
-
   This value should be a sequence of references to custom predicate
   callables.  Use custom predicates when no set of predefined
   predicates does what you need.  Custom predicates can be combined
@@ -147,77 +144,15 @@ Attributes
   containing matching information; see :ref:`custom_route_predicates`
   for more information about ``info``.
 
-``view_context``
-  The :term:`dotted Python name` to a class or an interface that the
-  :term:`context` of the view should match for the view named by the
-  route to be used.  This attribute is only useful if the ``view``
-  attribute is used.  If this attribute is not specified, the default
-  (``None``) will be used.
-
-  If the ``view`` attribute is not provided, this attribute has no
-  effect.
-
-  This attribute can also be spelled as ``view_for`` or ``for_``;
-  these are valid older spellings.
-
-``view_permission``
-  The permission name required to invoke the view associated with this
-  route.  e.g. ``edit``. (see :ref:`using_security_with_urldispatch`
-  for more information about permissions).
-
-  If the ``view`` attribute is not provided, this attribute has no
-  effect.
-
-  This attribute can also be spelled as ``permission``.
-
-``view_renderer``
-  This is either a single string term (e.g. ``json``) or a string
-  implying a path or :term:`resource specification`
-  (e.g. ``templates/views.pt``).  If the renderer value is a single
-  term (does not contain a dot ``.``), the specified term will be used
-  to look up a renderer implementation, and that renderer
-  implementation will be used to construct a response from the view
-  return value.  If the renderer term contains a dot (``.``), the
-  specified term will be treated as a path, and the filename extension
-  of the last element in the path will be used to look up the renderer
-  implementation, which will be passed the full path.  The renderer
-  implementation will be used to construct a response from the view
-  return value.  See :ref:`views_which_use_a_renderer` for more
-  information.
-
-  If the ``view`` attribute is not provided, this attribute has no
-  effect.
-
-  This attribute can also be spelled as ``renderer``.
-
-``view_attr``
-  The view machinery defaults to using the ``__call__`` method of the
-  view callable (or the function itself, if the view callable is a
-  function) to obtain a response dictionary.  The ``attr`` value allows
-  you to vary the method attribute used to obtain the response.  For
-  example, if your view was a class, and the class has a method named
-  ``index`` and you wanted to use this method instead of the class'
-  ``__call__`` method to return the response, you'd say
-  ``attr="index"`` in the view configuration for the view.  This is
-  most useful when the view definition is a class.
-
-  If the ``view`` attribute is not provided, this attribute has no
-  effect.
-
-``use_global_views``
-  When a request matches this route, and view lookup cannot find a view
-  which has a 'route_name' predicate argument that matches the route,
-  try to fall back to using a view that otherwise matches the context,
-  request, and view name (but does not match the route name predicate).
 
 Alternatives
 ~~~~~~~~~~~~
 
 You can also add a :term:`route configuration` via:
 
-- Using the :meth:`pyramid.config.Configurator.add_route` method.
+- Using the :meth:`pyramid.config.Configurator.add_handler` method.
 
 See Also
 ~~~~~~~~
 
-See also :ref:`urldispatch_chapter`.
+See also :ref:`handlers_chapter`.

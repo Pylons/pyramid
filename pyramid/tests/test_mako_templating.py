@@ -1,11 +1,11 @@
 ## come on python gimme some of that sweet, sweet -*- coding: utf-8 -*-
 
 import unittest
+from pyramid import testing
 
 class Base(object):
     def setUp(self):
-        from pyramid.configuration import Configurator
-        self.config = Configurator()
+        self.config = testing.setUp()
         self.config.begin()
         import os
         here = os.path.abspath(os.path.dirname(__file__))
@@ -290,8 +290,7 @@ class MakoLookupTemplateRendererTests(Base, unittest.TestCase):
 class TestIntegration(unittest.TestCase):
     def setUp(self):
         import pyramid.mako_templating
-        from pyramid.configuration import Configurator
-        self.config = Configurator()
+        self.config = testing.setUp()
         self.config.begin()
         self.config.add_settings({'mako.directories':
                                   'pyramid.tests:fixtures'})

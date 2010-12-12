@@ -1,7 +1,5 @@
 import os
 
-from zope.configuration import xmlconfig
-from zope.configuration.config import ConfigurationMachine
 from zope.configuration.fields import GlobalInterface
 from zope.configuration.fields import GlobalObject
 from zope.configuration.fields import Tokens
@@ -17,24 +15,13 @@ from zope.schema import Bool
 from zope.schema import Int
 from zope.schema import TextLine
 
-from pyramid.interfaces import IAuthenticationPolicy
-from pyramid.interfaces import IAuthorizationPolicy
-from pyramid.interfaces import IDefaultPermission
-from pyramid.interfaces import IRendererFactory
-from pyramid.interfaces import IRouteRequest
-from pyramid.interfaces import IView
-
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authentication import RemoteUserAuthenticationPolicy
 from pyramid.authentication import RepozeWho1AuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
-from pyramid.configuration import Configurator
+from pyramid.config import Configurator
 from pyramid.exceptions import ConfigurationError
-from pyramid.exceptions import NotFound
-from pyramid.exceptions import Forbidden
-from pyramid.request import route_request_iface
 from pyramid.resource import resource_spec_from_abspath
-from pyramid.static import StaticURLInfo
 from pyramid.threadlocal import get_current_registry
 
 ###################### directives ##########################
@@ -174,49 +161,28 @@ def view(
     cacheable=True, # not used, here for b/w compat < 0.8
     ):
 
-    try:
-        reg = _context.registry
-    except AttributeError: # pragma: no cover (b/c)
-        reg = get_current_registry()
-
     if renderer is not None:
         package = getattr(_context, 'package', None)
         renderer = {'name':renderer, 'package':package}
 
     context = context or for_
 
-    def register():
-        config = Configurator(reg, package=_context.package)
-        config.add_view(
-            permission=permission, context=context, view=view, name=name,
-            request_type=request_type, route_name=route_name,
-            request_method=request_method, request_param=request_param,
-            containment=containment, attr=attr, renderer=renderer,
-            wrapper=wrapper, xhr=xhr, accept=accept, header=header,
-            path_info=path_info, custom_predicates=custom_predicates,
-            _info=_context.info)
-
-    discriminator = ['view', context, name, request_type, IView, containment,
-                     request_param, request_method, route_name, attr,
-                     xhr, accept, header, path_info]
-
-    discriminator.extend(sorted(custom_predicates))
-    discriminator = tuple(discriminator)
-
-    _context.action(
-        discriminator = discriminator,
-        callable = register,
-        )
+    config = Configurator.with_context(_context)
+    config.add_view(
+        permission=permission, context=context, view=view, name=name,
+        request_type=request_type, route_name=route_name,
+        request_method=request_method, request_param=request_param,
+        containment=containment, attr=attr, renderer=renderer,
+        wrapper=wrapper, xhr=xhr, accept=accept, header=header,
+        path_info=path_info, custom_predicates=custom_predicates)
 
 _view = view # for directives that take a view arg
 
-class IRouteDirective(Interface):
+
+class IRouteLikeDirective(Interface):
     """ The interface for the ``route`` ZCML directive
     """
-    name = TextLine(title=u'name', required=True)
     pattern = TextLine(title=u'pattern', required=False)
-    # alias for pattern
-    path = TextLine(title=u'path', required=False)
     factory = GlobalObject(title=u'context factory', required=False)
     view = GlobalObject(title=u'view', required=False)
 
@@ -256,6 +222,11 @@ class IRouteDirective(Interface):
         )
     use_global_views = Bool(title=u'use_global_views', required=False)
 
+class IRouteDirective(IRouteLikeDirective):
+    name = TextLine(title=u'name', required=True)
+    # alias for pattern
+    path = TextLine(title=u'path', required=False)
+
 def route(_context,
           name,
           pattern=None,
@@ -286,11 +257,6 @@ def route(_context,
 
     # these are route predicates; if they do not match, the next route
     # in the routelist will be tried
-    try:
-        reg = _context.registry
-    except AttributeError: # pragma: no cover (b/c)
-        reg = get_current_registry()
-
     if view_context is None:
         view_context = view_for or for_
 
@@ -303,48 +269,94 @@ def route(_context,
     if pattern is None:
         raise ConfigurationError('route directive must include a "pattern"')
 
-    def register():
-        config = Configurator(reg, package=_context.package)
-        config.add_route(
-            name,
-            pattern,
-            factory=factory,
-            header=header,
-            xhr=xhr,
-            accept=accept,
-            path_info=path_info,
-            request_method=request_method,
-            request_param=request_param,
-            custom_predicates=custom_predicates,
-            view=view,
-            view_context=view_context,
-            view_permission=view_permission,
-            view_renderer=view_renderer,
-            view_attr=view_attr,
-            use_global_views=use_global_views,
-            traverse=traverse,
-            _info=_context.info
-            )
-
-    discriminator = ['route', name, xhr, request_method, path_info,
-                     request_param, header, accept]
-    discriminator.extend(sorted(custom_predicates))
-    discriminator = tuple(discriminator)
-        
-    _context.action(
-        discriminator=discriminator,
-        callable = register,
+    config = Configurator.with_context(_context)
+    config.add_route(
+        name,
+        pattern,
+        factory=factory,
+        header=header,
+        xhr=xhr,
+        accept=accept,
+        path_info=path_info,
+        request_method=request_method,
+        request_param=request_param,
+        custom_predicates=custom_predicates,
+        view=view,
+        view_context=view_context,
+        view_permission=view_permission,
+        view_renderer=view_renderer,
+        view_attr=view_attr,
+        use_global_views=use_global_views,
+        traverse=traverse,
         )
 
-    if view:
-        request_iface = reg.queryUtility(IRouteRequest, name=name)
-        if request_iface is None:
-            request_iface = route_request_iface(name)
-            reg.registerUtility(request_iface, IRouteRequest, name=name)
-        _context.action(
-            discriminator = (
-                'view', view_context, '', None, IView, name, view_attr),
-            )
+class IHandlerDirective(IRouteLikeDirective):
+    route_name = TextLine(title=u'route_name', required=True)
+    handler = GlobalObject(title=u'handler', required=True)
+    action = TextLine(title=u"action", required=False)
+
+def handler(_context,
+            route_name,
+            pattern,
+            handler,
+            action=None,
+            view=None,
+            view_for=None,
+            permission=None,
+            factory=None,
+            for_=None,
+            header=None,
+            xhr=False,
+            accept=None,
+            path_info=None,
+            request_method=None,
+            request_param=None,
+            custom_predicates=(),
+            view_permission=None,
+            view_attr=None,
+            renderer=None,
+            view_renderer=None,
+            view_context=None,
+            traverse=None,
+            use_global_views=False):
+    """ Handle ``handler`` ZCML directives
+    """
+    # the strange ordering of the request kw args above is for b/w
+    # compatibility purposes.
+
+    # these are route predicates; if they do not match, the next route
+    # in the routelist will be tried
+    if view_context is None:
+        view_context = view_for or for_
+
+    view_permission = view_permission or permission
+    view_renderer = view_renderer or renderer
+
+    if pattern is None:
+        raise ConfigurationError('handler directive must include a "pattern"')
+
+    config = Configurator.with_context(_context)
+    config.add_handler(
+        route_name,
+        pattern,
+        handler,
+        action=action,
+        factory=factory,
+        header=header,
+        xhr=xhr,
+        accept=accept,
+        path_info=path_info,
+        request_method=request_method,
+        request_param=request_param,
+        custom_predicates=custom_predicates,
+        view=view,
+        view_context=view_context,
+        view_permission=view_permission,
+        view_renderer=view_renderer,
+        view_attr=view_attr,
+        use_global_views=use_global_views,
+        traverse=traverse,
+        )
 
 class ISystemViewDirective(Interface):
     view = GlobalObject(
@@ -374,22 +386,10 @@ def notfound(_context,
              renderer=None,
              wrapper=None):
 
-    def register():
-        try:
-            reg = _context.registry
-        except AttributeError: # pragma: no cover (b/c)
-            reg = get_current_registry()
-        config = Configurator(reg, package=_context.package)
-        config.set_notfound_view(view=view, attr=attr, renderer=renderer,
-                                 wrapper=wrapper, _info=_context.info)
+    config = Configurator.with_context(_context)
+    config.set_notfound_view(view=view, attr=attr, renderer=renderer,
+                             wrapper=wrapper)
 
-    discriminator = ('view', NotFound, '', None, IView, None, None, None,
-                     None, attr, False, None, None, None)
-
-    _context.action(
-        discriminator = discriminator,
-        callable = register,
-        )
 
 def forbidden(_context,
              view=None,
@@ -397,22 +397,10 @@ def forbidden(_context,
              renderer=None,
              wrapper=None):
 
-    def register():
-        try:
-            reg = _context.registry
-        except AttributeError: # pragma: no cover (b/c)
-            reg = get_current_registry()
-        config = Configurator(reg, package=_context.package)
-        config.set_forbidden_view(view=view, attr=attr, renderer=renderer,
-                                 wrapper=wrapper, _info=_context.info)
+    config = Configurator.with_context(_context)
+    config.set_forbidden_view(view=view, attr=attr, renderer=renderer,
+                             wrapper=wrapper)
 
-    discriminator = ('view', Forbidden, '', None, IView, None, None, None,
-                     None, attr, False, None, None, None)
-
-    _context.action(
-        discriminator = discriminator,
-        callable = register,
-        )
     
 class IResourceDirective(Interface):
     """
@@ -428,19 +416,9 @@ class IResourceDirective(Interface):
         description=u"The spec of the resource providing the override.",
         required=True)
 
-def resource(_context, to_override, override_with):
-    try:
-        reg = _context.registry
-    except AttributeError: # pragma: no cover (b/c)
-        reg = get_current_registry()
-
-    config = Configurator(reg, package=_context.package)
-
-    _context.action(
-        discriminator = None,
-        callable = config.override_resource,
-        args = (to_override, override_with, _context.info),
-        )
+def resource(_context, to_override, override_with, _override=None):
+    config = Configurator.with_context(_context)
+    config.override_resource(to_override, override_with, _override=_override)
 
 class IRepozeWho1AuthenticationPolicyDirective(Interface):
     identifier_name = TextLine(title=u'identitfier_name', required=False,
@@ -453,13 +431,8 @@ def repozewho1authenticationpolicy(_context, identifier_name='auth_tkt',
                                             callback=callback)
     # authentication policies must be registered eagerly so they can
     # be found by the view registration machinery
-    try:
-        reg = _context.registry
-    except AttributeError: # pragma: no cover (b/c)
-        reg = get_current_registry()
-    config = Configurator(reg, package=_context.package)
-    config._set_authentication_policy(policy, _info=_context.info)
-    _context.action(discriminator=IAuthenticationPolicy)
+    config = Configurator.with_context(_context)
+    config._set_authentication_policy(policy)
 
 class IRemoteUserAuthenticationPolicyDirective(Interface):
     environ_key = TextLine(title=u'environ_key', required=False,
@@ -472,13 +445,8 @@ def remoteuserauthenticationpolicy(_context, environ_key='REMOTE_USER',
                                             callback=callback)
     # authentication policies must be registered eagerly so they can
     # be found by the view registration machinery
-    try:
-        reg = _context.registry
-    except AttributeError: # pragma: no cover (b/c)
-        reg = get_current_registry()
-    config = Configurator(reg, package=_context.package)
-    config._set_authentication_policy(policy, _info=_context.info)
-    _context.action(discriminator=IAuthenticationPolicy)
+    config = Configurator.with_context(_context)
+    config._set_authentication_policy(policy)
 
 class IAuthTktAuthenticationPolicyDirective(Interface):
     secret = TextLine(title=u'secret', required=True)
@@ -519,13 +487,8 @@ def authtktauthenticationpolicy(_context,
         raise ConfigurationError(str(why))
     # authentication policies must be registered eagerly so they can
     # be found by the view registration machinery
-    try:
-        reg = _context.registry
-    except AttributeError: # pragma: no cover (b/c)
-        reg = get_current_registry()
-    config = Configurator(reg, package=_context.package)
-    config._set_authentication_policy(policy, _info=_context.info)
-    _context.action(discriminator=IAuthenticationPolicy)
+    config = Configurator.with_context(_context)
+    config._set_authentication_policy(policy)
 
 class IACLAuthorizationPolicyDirective(Interface):
     pass
@@ -534,13 +497,8 @@ def aclauthorizationpolicy(_context):
     policy = ACLAuthorizationPolicy()
     # authorization policies must be registered eagerly so they can be
     # found by the view registration machinery
-    try:
-        reg = _context.registry
-    except AttributeError: # pragma: no cover (b/c)
-        reg = get_current_registry()
-    config = Configurator(reg, package=_context.package)
-    config._set_authorization_policy(policy, _info=_context.info)
-    _context.action(discriminator=IAuthorizationPolicy)
+    config = Configurator.with_context(_context)
+    config._set_authorization_policy(policy)
 
 class IRendererDirective(Interface):
     factory = GlobalObject(
@@ -554,13 +512,8 @@ class IRendererDirective(Interface):
 def renderer(_context, factory, name=''):
     # renderer factories must be registered eagerly so they can be
     # found by the view machinery
-    try:
-        reg = _context.registry
-    except AttributeError: # pragma: no cover (b/c)
-        reg = get_current_registry()
-    config = Configurator(reg, package=_context.package)
-    config.add_renderer(name, factory, _info=_context.info)
-    _context.action(discriminator=(IRendererFactory, name))
+    config = Configurator.with_context(_context)
+    config.add_renderer(name, factory)
 
 class IStaticDirective(Interface):
     name = TextLine(
@@ -590,28 +543,9 @@ def static(_context, name, path, cache_max_age=3600,
            permission='__no_permission_required__'):
     """ Handle ``static`` ZCML directives
     """
-    try:
-        reg = _context.registry
-    except AttributeError: # pragma: no cover (b/c)
-        reg = get_current_registry()
-    config = Configurator(reg, package=_context.package)
-
-    _context.action(
-        discriminator=('static', name),
-        callable=config.add_static_view,
-        args = (name, path),
-        kw = {'cache_max_age':cache_max_age,
-              'permission':permission,
-              '_info':_context.info},
-        )
-
-    if not '/' in name:
-        _context.action(
-            discriminator = (
-                'view', StaticURLInfo, '', None, IView, None,  None, None,
-                name, None, None, None, None, None,
-                )
-            )
+    config = Configurator.with_context(_context)
+    config.add_static_view(name, path, cache_max_age=cache_max_age,
+                           permission=permission)
 
 class IScanDirective(Interface):
     package = GlobalObject(
@@ -620,16 +554,8 @@ class IScanDirective(Interface):
         )
 
 def scan(_context, package):
-    try:
-        reg = _context.registry
-    except AttributeError: # pragma: no cover (b/c)
-        reg = get_current_registry()
-    config = Configurator(reg, package=_context.package)
-    _context.action(
-        discriminator=None,
-        callable=config.scan,
-        args=(package, None, _context.info)
-        )
+    config = Configurator.with_context(_context)
+    config.scan(package)
 
 class ITranslationDirDirective(Interface):
     dir = TextLine(
@@ -640,18 +566,8 @@ class ITranslationDirDirective(Interface):
 
 def translationdir(_context, dir):
     path = path_spec(_context, dir)
-    try:
-        reg = _context.registry
-    except AttributeError: # pragma: no cover (b/c)
-        reg = get_current_registry()
-
-    config = Configurator(reg, package=_context.package)
-
-    _context.action(
-        discriminator = ('tdir', path),
-        callable=config.add_translation_dirs,
-        args = (dir,),
-        )
+    config = Configurator.with_context(_context)
+    config.add_translation_dirs(path)
 
 class ILocaleNegotiatorDirective(Interface):
     negotiator = GlobalObject(
@@ -661,17 +577,8 @@ class ILocaleNegotiatorDirective(Interface):
         )
 
 def localenegotiator(_context, negotiator):
-    try:
-        reg = _context.registry
-    except AttributeError: # pragma: no cover (b/c)
-        reg = get_current_registry()
-    config = Configurator(reg, package=_context.package)
-
-    _context.action(
-        discriminator = 'lnegotiator',
-        callable=config.set_locale_negotiator,
-        args = (negotiator,)
-        )
+    config = Configurator.with_context(_context)
+    config.set_locale_negotiator(negotiator)
 
 class IAdapterDirective(Interface):
     """
@@ -809,20 +716,12 @@ def subscriber(_context, for_=None, factory=None, handler=None, provides=None):
 
     for_ = tuple(for_)
 
-    try:
-        registry = _context.registry
-    except AttributeError: # pragma: no cover (b/c)
-        registry = get_current_registry()
-        
-    config = Configurator(registry=registry, package=_context.package)
+    config = Configurator.with_context(_context)
 
     if handler is not None:
-        _context.action(
-            discriminator = None,
-            callable = config.add_subscriber,
-            args = (handler, for_, _context.info),
-            )
+        config.add_subscriber(handler, for_)
     else:
+        registry = _context.registry
         _context.action(
             discriminator = None,
             callable = registry.registerSubscriptionAdapter,
@@ -904,13 +803,8 @@ def default_permission(_context, name):
     """ Register a default permission name """
     # the default permission must be registered eagerly so it can
     # be found by the view registration machinery
-    try:
-        reg = _context.registry
-    except AttributeError: # pragma: no cover (b/c)
-        reg = get_current_registry()
-    config = Configurator(reg, package=_context.package)
+    config = Configurator.with_context(_context)
     config.set_default_permission(name)
-    _context.action(discriminator=IDefaultPermission)
 
 def path_spec(context, path):
     # we prefer registering resource specifications over absolute
@@ -929,25 +823,24 @@ def zcml_configure(name, package):
     ZCML into the current ZCML registry.
 
     """
-    context = ConfigurationMachine()
-    xmlconfig.registerCommonDirectives(context)
-    context.package = package
-    context.registry = get_current_registry()
-    xmlconfig.include(context, name, package)
-    context.execute_actions(clear=False) # the raison d'etre
-    return context.actions
+    registry = get_current_registry()
+    configurator = Configurator(registry=registry, package=package)
+    configurator.load_zcml(name)
+    actions = configurator._ctx.actions[:]
+    configurator.commit()
+    return actions
 
 file_configure = zcml_configure # backwards compat (>0.8.1)
 
 deprecated(
     'zcml_configure',
     '(pyramid.zcml.zcml_configure is deprecated as of Pyramid 1.0.  Use'
-    '``pyramid.configuration.Configurator.load_zcml`` instead.) ')
+    '``pyramid.config.Configurator.load_zcml`` instead.) ')
 
 deprecated(
     'file_configure',
     '(pyramid.zcml.file_configure is deprecated as of Pyramid 1.0.  Use'
-    '``pyramid.configuration.Configurator.load_zcml`` instead.) ')
+    '``pyramid.config.Configurator.load_zcml`` instead.) ')
 
 def _rolledUpFactory(factories):
     def factory(ob):

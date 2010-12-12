@@ -1,9 +1,9 @@
 from pyramid_beaker import session_factory_from_settings
+from pyramid.config import Configurator
 
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
-    from pyramid.configuration import Configurator
     config = Configurator(settings=settings)
     session_factory = session_factory_from_settings(settings)
     config.set_session_factory(session_factory)

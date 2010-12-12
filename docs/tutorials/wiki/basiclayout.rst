@@ -50,10 +50,10 @@ entry point happens to be the ``app`` function within the file named
 
 #. *Line 16*.  Load the
    ``configure.zcml`` file from our package using the
-   :meth:`pyramid.configuration.Configurator.load_zcml` method.
+   :meth:`pyramid.config.Configurator.load_zcml` method.
 
 #. *Line 17*.  Use the
-   :meth:`pyramid.configuration.Configurator.make_wsgi_app` method
+   :meth:`pyramid.config.Configurator.make_wsgi_app` method
    to return a :term:`WSGI` application.
 
 Configuration With ``configure.zcml``
