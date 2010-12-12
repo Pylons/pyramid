@@ -155,6 +155,6 @@ session object by implementing a :term:`session factory`.  Your
 session factory should return a :term:`session`.  The interfaces for
 both types are available in
 :class:`pyramid.interfaces.ISessionFactory` and
-:class:`pyramid.interfaces.ISession`.  You might use the cookie
+:class:`pyramid.interfaces.ISession`. You might use the cookie
 implementation in the :mod:`pyramid.session` module as inspiration.
 
