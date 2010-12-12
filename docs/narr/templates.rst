@@ -124,11 +124,12 @@ configured special :term:`renderer globals`, make sure to pass
 ``request`` as a keyword argument in every call to to a
 ``pyramid.renderers.render_*`` function.
 
-Every view must return a :term:`response` object (except for views
-which use a :term:`renderer` named via view configuration, which we'll
+Every view must return a :term:`response` object, except for views
+which use a :term:`renderer` named via view configuration (which we'll
 see shortly).  The :func:`pyramid.renderers.render_to_response`
 function is a shortcut function that actually returns a response
-object.
+object. This allows the example view above to simply return the result 
+of its call to ``render_to_response()`` directly. 
 
 Obviously not all APIs you might call to get respnonse data will
 return a response object.  If you call a "response-ignorant" API that
