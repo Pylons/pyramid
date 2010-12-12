@@ -10,7 +10,7 @@ provides add-on templating support through a set of bindings packages.
 
 Out of the box, :app:`Pyramid` provides templating via the :term:`Chameleon`
 and :term:`Mako` templating libraries. :term:`Chameleon` provides support for
-two different types of templates: :term:`ZPT` templates and text templates.
+two different types of templates: :term:`ZPT` templates, and text templates.
 
 Before discussing how built-in templates are used in
 detail, we'll discuss two ways to render templates within
