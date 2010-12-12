@@ -286,7 +286,7 @@ An alternative to using :func:`pyramid.renderers.render_to_response`
 to render templates manually in your view callable code, is
 to specify the template as a :term:`renderer` in your
 *view configuration*. This can be done with any of the 
-templating languages supported by :app:`pyramid`.
+templating languages supported by :app:`Pyramid`.
 
 To use a renderer via view configuration, specify a template
 :term:`resource specification` as the ``renderer`` argument, or
@@ -312,13 +312,11 @@ template renderer:
    def my_view(request):
        return {'foo':1, 'bar':2}
 
-.. note:: It is not necessary to supply the ``request`` value as a key
+.. note:: You do not need to supply the ``request`` value as a key
    in the dictionary result returned from a renderer-configured view
-   callable in order to ensure that the "most correct" system values
-   are supplied to the renderer as it is when you use
-   :func:`pyramid.renderers.render` or
-   :func:`pyramid.renderers.render_to_response`.  This is handled
-   automatically.
+   callable. :app:`Pyramid` automatically supplies this value for
+   you so that the "most correct" system values are provided to
+   the renderer.
 
 .. warning::
 
