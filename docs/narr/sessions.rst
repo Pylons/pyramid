@@ -123,8 +123,9 @@ Some gotchas:
   modify a session object directly, such as setting a value (i.e.,
   ``__setitem__``), or removing a key (e.g., ``del`` or ``pop``), the
   session will automatically know that it needs to re-serialize its
-  data, thus calling ``changed()`` is unnecessary. When in doubt, call
-  ``changed()`` after you've changed sessioning data.
+  data, thus calling ``changed()`` is unnecessary. There is no harm in
+  calling ``changed()`` in either case, so when in doubt, call it after
+  you've changed sessioning data.
 
 .. index::
    single: pyramid_beaker
