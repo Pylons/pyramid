@@ -97,6 +97,8 @@ Extra methods:
 
 ``changed()``
   Call this when you mutate a mutable value in the session namespace.
+  See the gotchas below for details on when, and why you should
+  call this.
 
 ``invalidate()``
   Call this when you want to invalidate the session (dump all data,
