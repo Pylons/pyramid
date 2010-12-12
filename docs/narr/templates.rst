@@ -84,10 +84,9 @@ prefix on Windows.
    file instead of treating relative paths as relative to the current
    view module.  See :ref:`mako_templates`.
 
-The path can alternately be a :term:`resource specification` in the
-form ``some.dotted.package_name:relative/path``, making it possible to
-address template resources which live in another package.  For
-example:
+The path can alternately be a :term:`resource specification` in the form
+``some.dotted.package_name:relative/path``. This makes it possible to
+address template resources which live in another package.  For example:
 
 .. code-block:: python
    :linenos:
