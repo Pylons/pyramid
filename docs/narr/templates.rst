@@ -282,11 +282,11 @@ variables.
 Templates Used as Renderers via Configuration
 ---------------------------------------------
 
-Instead of using the :func:`pyramid.renderers.render_to_response`
-API within the body of a view function directly to render a specific
-template to a response, you may associate a template written in a
-supported templating language with a view indirectly by specifying it
-as a :term:`renderer` in *view configuration*.
+An alternative to using :func:`pyramid.renderers.render_to_response`
+to render templates manually in your view callable code, is
+to specify the template as a :term:`renderer` in your
+*view configuration*. This can be done with any of the 
+templating languages supported by :app:`pyramid`.
 
 To use a renderer via view configuration, specify a template
 :term:`resource specification` as the ``renderer`` argument or
