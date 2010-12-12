@@ -289,7 +289,7 @@ to specify the template as a :term:`renderer` in your
 templating languages supported by :app:`pyramid`.
 
 To use a renderer via view configuration, specify a template
-:term:`resource specification` as the ``renderer`` argument or
+:term:`resource specification` as the ``renderer`` argument, or
 attribute to the :term:`view configuration` of a :term:`view
 callable`.  Then return a *dictionary* from that view callable.  The
 dictionary items returned by the view callable will be made available
