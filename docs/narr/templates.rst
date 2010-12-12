@@ -22,8 +22,8 @@ configuration.
 
 .. _templates_used_directly:
 
-Templates Used Directly
------------------------
+Using Templates Directly
+------------------------
 
 The most straightforward way to use a template within
 :app:`Pyramid` is to cause it to be rendered directly within a
