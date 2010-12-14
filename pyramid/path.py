@@ -14,9 +14,9 @@ def caller_path(path, level=2):
         path = os.path.join(prefix, path)
     return path
 
-def caller_module(level=2):
+def caller_module(level=2, sys=sys):
     module_globals = sys._getframe(level).f_globals
-    module_name = module_globals['__name__']
+    module_name = module_globals.get('__name__') or '__main__'
     module = sys.modules[module_name]
     return module
 

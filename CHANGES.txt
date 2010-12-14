@@ -48,6 +48,12 @@ Dependencies
 Bug Fixes
 ---------
 
+- When creating a Configurator from within a ``paster pshell`` session, you
+  were required to pass a ``package`` argument although ``package`` is not
+  actually required.  If you didn't pass ``package``, you would receive an
+  error something like ``KeyError: '__name__'`` emanating from the
+  ``pyramid.path.caller_module`` function.  This has now been fixed.
+
 - The ``pyramid_routesalchemy`` paster template's unit tests failed
   (``AssertionError: 'SomeProject' != 'someproject'``).  This is fixed.
 
