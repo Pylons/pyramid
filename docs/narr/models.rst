@@ -5,8 +5,8 @@ A :term:`model` class is typically a simple Python class defined in a
 module.  References to these classes and instances of such classes are
 omnipresent in :app:`Pyramid`:
 
-- Model instances make up the graph that :app:`Pyramid` is
-  willing to walk over when :term:`traversal` is used.
+- Model instances make up the object graph that :app:`Pyramid` 
+  will walk over when :term:`traversal` is used.
 
 - The ``context`` and ``containment`` arguments to
   :meth:`pyramid.config.Configurator.add_view` often
