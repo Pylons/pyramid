@@ -1,6 +1,8 @@
 import unittest
 from pyramid.testing import cleanUp
 
+import os.path
+
 class TestPackageURLParser(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.static import PackageURLParser
@@ -27,15 +29,15 @@ class TestPackageURLParser(unittest.TestCase):
         inst = self._makeOne('package', 'resource/name', root_resource='root',
                              cache_max_age=100)
         self.assertEqual(inst.package_name, 'package')
-        self.assertEqual(inst.resource_name, 'resource/name')
+        self.assertEqual(inst.resource_name, os.path.join('resource', 'name'))
         self.assertEqual(inst.root_resource, 'root')
         self.assertEqual(inst.cache_max_age, 100)
         
     def test_ctor_defaultargs(self):
         inst = self._makeOne('package', 'resource/name')
         self.assertEqual(inst.package_name, 'package')
-        self.assertEqual(inst.resource_name, 'resource/name')
-        self.assertEqual(inst.root_resource, 'resource/name')
+        self.assertEqual(inst.resource_name, os.path.join('resource', 'name'))
+        self.assertEqual(inst.root_resource, os.path.join('resource', 'name'))
         self.assertEqual(inst.cache_max_age, None)
 
     def test_call_adds_slash_path_info_empty(self):
@@ -138,7 +140,8 @@ class TestPackageURLParser(unittest.TestCase):
         inst = self._makeOne('pyramid.tests', 'fixtures/static')
         self.failUnless(
             repr(inst).startswith(
-            '<PackageURLParser pyramid.tests:fixtures/static at'))
+            '<PackageURLParser pyramid.tests:%s at'
+                % os.path.join('fixtures', 'static')))
 
     def test_not_found(self):
         inst = self._makeOne('pyramid.tests', 'fixtures/static')
@@ -184,7 +187,7 @@ class TestStaticView(unittest.TestCase):
         request.environ = self._makeEnviron()
         response = view(context, request)
         self.assertEqual(request.copied, True)
-        self.assertEqual(response.directory, path)
+        self.assertEqual(response.directory, os.path.normcase(path))
 
     def test_relpath(self):
         path = 'fixtures'
