@@ -234,12 +234,12 @@ of a view must ensure that the model instances that make up the model
 graph are "location aware".
 
 In order for :app:`Pyramid` location, security, URL-generation, and
-traversal functions (such as the functions exposed in
-:ref:`location_module`, :ref:`traversal_module`, and :ref:`url_module`
-as well as certain functions in :ref:`security_module` ) to work
-properly against the instances in an object graph, all nodes in the
-graph must be :term:`location` -aware.  This means they must have two
-attributes: ``__parent__`` and ``__name__``.
+traversal functions (i.e., functions in :ref:`location_module`,
+:ref:`traversal_module`, :ref:`url_module` and some in
+:ref:`security_module` ) to work properly against the model instances in
+an object graph, all nodes in the graph must be :term:`location` -aware.
+This means they must have two attributes: ``__parent__`` and
+``__name__``.
 
 The ``__parent__`` attribute should be a reference to the node's
 parent model instance in the graph.  The ``__name__`` attribute should
