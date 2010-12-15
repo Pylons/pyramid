@@ -1,5 +1,5 @@
-Next release
-============
+1.0a5 (2010-12-14)
+==================
 
 Features
 --------
@@ -68,6 +68,10 @@ Bug Fixes
 
 Documentation
 -------------
+
+- Merged many wording, readability, and correctness changes to narrative
+  documentation chapters from https://github.com/caseman/pyramid (up to and
+  including "Models" narrative chapter).
 
 - "Sample Applications" section of docs changed to note existence of Cluegun,
   Shootout and Virginia sample applications, ported from their repoze.bfg
