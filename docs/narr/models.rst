@@ -229,29 +229,6 @@ works against model instances.
 Location-Aware Model Instances
 ------------------------------
 
-.. sidebar::  Using :mod:`repoze.bfg.traversalwrapper`
-
-  If you'd rather not manage the ``__name__`` and ``__parent__``
-  attributes of your models "by hand", an add on package named
-  :mod:`repoze.bfg.traversalwrapper` can help.
-
-  In order to use this helper feature, you must first install the
-  :mod:`repoze.bfg.traversalwrapper` package (available via `SVN
-  <http://svn.repoze.org/repoze.bfg.traversalwrapper>`_), then
-  register its ``ModelGraphTraverser`` as the traversal policy, rather
-  than the default :app:`Pyramid` traverser. The package contains
-  instructions.
-
-  Once :app:`Pyramid` is configured with this feature, you will no
-  longer need to manage the ``__parent__`` and ``__name__`` attributes
-  on graph objects "by hand".  Instead, as necessary, during traversal
-  :app:`Pyramid` will wrap each object (even the root object) in a
-  ``LocationProxy`` which will dynamically assign a ``__name__`` and a
-  ``__parent__`` to the traversed object (based on the last traversed
-  object and the name supplied to ``__getitem__``).  The root object
-  will have a ``__name__`` attribute of ``None`` and a ``__parent__``
-  attribute of ``None``.
-
 Applications which use :term:`traversal` to locate the :term:`context`
 of a view must ensure that the model instances that make up the model
 graph are "location aware".
@@ -297,6 +274,29 @@ and so on.
    generated improperly.  The value of ``__name__`` will be prepended
    to every path and URL generated (as opposed to a single leading
    slash or empty tuple element).
+
+.. sidebar::  Using :mod:`repoze.bfg.traversalwrapper`
+
+  If you'd rather not manage the ``__name__`` and ``__parent__``
+  attributes of your models "by hand", an add-on package named
+  :mod:`repoze.bfg.traversalwrapper` can help.
+
+  In order to use this helper feature, you must first install the
+  :mod:`repoze.bfg.traversalwrapper` package (available via `SVN
+  <http://svn.repoze.org/repoze.bfg.traversalwrapper>`_), then
+  register its ``ModelGraphTraverser`` as the traversal policy, rather
+  than the default :app:`Pyramid` traverser. The package contains
+  instructions for doing so.
+
+  Once :app:`Pyramid` is configured with this feature, you will no
+  longer need to manage the ``__parent__`` and ``__name__`` attributes
+  on graph objects "by hand".  Instead, as necessary, during traversal
+  :app:`Pyramid` will wrap each object (even the root object) in a
+  ``LocationProxy`` which will dynamically assign a ``__name__`` and a
+  ``__parent__`` to the traversed object (based on the last traversed
+  object and the name supplied to ``__getitem__``).  The root object
+  will have a ``__name__`` attribute of ``None`` and a ``__parent__``
+  attribute of ``None``.
 
 .. index::
    single: model API functions
