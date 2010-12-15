@@ -583,7 +583,7 @@ files showing up in your ``templates`` directory (or otherwise
 directly "next" to your templates), it is due to this feature.
 
 If you're using a version control system such as Subversion, you
-should cause it to ignore these files.  Here's the contents of the
+should configure it to ignore these files.  Here's the contents of the
 author's ``svn propedit svn:ignore .`` in each of my ``templates``
 directories.
 
