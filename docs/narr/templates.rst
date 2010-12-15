@@ -405,7 +405,7 @@ templates is available from `the Chameleon website
 
    :term:`Chameleon` only works on :term:`CPython` platforms and
    :term:`Google App Engine`.  On :term:`Jython` and other non-CPython
-   platforms, you should use Mako (:ref:`mako_templates`) or
+   platforms, you should use Mako (see :ref:`mako_templates`) or
    ``pyramid_jinja2`` instead.  See
    :ref:`available_template_system_bindings`.
 
