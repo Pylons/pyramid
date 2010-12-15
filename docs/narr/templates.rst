@@ -806,9 +806,8 @@ Available Add-On Template System Bindings
 -----------------------------------------
 
 Jinja2 template bindings are available for :app:`Pyramid` in the
-``pyramid_jinja2`` package.  It lives in the Pylons version control
-repository at `http://github.com/Pylons/pyramid_jinja2
-<http://github.com/Pylons/pyramid_jinja2>`_.  At the time of this writing, it
-has not had a release, but by the time you read this it also might be
-available from :term:`PyPI`.
+``pyramid_jinja2`` package. You can get the latest release of
+this package from the 
+`Python package index <http://pypi.python.org/pypi/pyramid_jinja2>`_
+(pypi).
 
