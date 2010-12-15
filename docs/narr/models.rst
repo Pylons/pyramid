@@ -72,7 +72,7 @@ instance.
 
 A model constructor may be essentially any Python object which is
 callable, and which returns a model instance.  In the above example,
-the ``BlogEntry`` class can be "called", returning a model instance.
+the ``BlogEntry`` class can be called, returning a model instance.
 
 .. index::
    single: model interfaces
