@@ -775,7 +775,7 @@ detected, and the template will be reloaded on the next rendering.
              usually only desirable during development.
 
 In order to turn on automatic reloading of templates, you can use an
-environment variable setting or a configuration file setting.
+environment variable, or a configuration file setting.
 
 To use an environment variable, start your application under a shell
 using the ``BFG_RELOAD_TEMPLATES`` operating system environment
