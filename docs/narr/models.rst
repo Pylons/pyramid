@@ -130,8 +130,9 @@ that a model implements an interface by using the
 ``BlogEntry`` model implements the ``IBlogEntry`` interface.
 
 You can also specify that a *particular* model instance provides an
-interface (as opposed to its class).  To do so, use the
-:func:`zope.interface.directlyProvides` function:
+interface, as opposed to its class as above, which implies that all
+instances do.  To do so, use the :func:`zope.interface.directlyProvides`
+function:
 
 .. code-block:: python
    :linenos:
