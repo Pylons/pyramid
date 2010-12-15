@@ -267,6 +267,26 @@ class ImperativeIncludeConfigurationTest(unittest.TestCase):
         res = self.testapp.get('/three', status=200)
         self.failUnless('three' in res.body)
 
+class SelfScanAppTest(unittest.TestCase):
+    def setUp(self):
+        from pyramid.tests.selfscanapp import main
+        config = main()
+        app = config.make_wsgi_app()
+        from webtest import TestApp
+        self.testapp = TestApp(app)
+        self.config = config
+
+    def tearDown(self):
+        self.config.end()
+
+    def test_root(self):
+        res = self.testapp.get('/', status=200)
+        self.failUnless('root' in res.body)
+
+    def test_two(self):
+        res = self.testapp.get('/two', status=200)
+        self.failUnless('two' in res.body)
+
 class DummyContext(object):
     pass
 

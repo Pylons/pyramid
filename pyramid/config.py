@@ -1790,7 +1790,7 @@ class Configurator(object):
             self.registry.registerUtility(mapper, IRoutesMapper)
         return mapper
 
-    @action_method
+    # this is *not* an action method (uses caller_package)
     def scan(self, package=None, categories=None):
         """ Scan a Python package and any of its subpackages for
         objects marked with :term:`configuration decoration` such as
