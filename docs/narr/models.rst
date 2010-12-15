@@ -1,9 +1,9 @@
 Models
 ======
 
-A :term:`model` class is typically a simple Python class defined in a
-module.  References to these classes and instances of such classes are
-omnipresent in :app:`Pyramid`:
+A :term:`model` class is typically a simple Python class defined in a module.
+References to these classes and instances of such classes are omnipresent in
+:app:`Pyramid` when :term:`traversal` is used to build an application:
 
 - Model instances make up the object graph that :app:`Pyramid` 
   will walk over when :term:`traversal` is used.
@@ -14,15 +14,12 @@ omnipresent in :app:`Pyramid`:
 
 - A :term:`root factory` returns a model instance.
 
-- A model instance is generated as a result of :term:`url dispatch`
-  (see the ``factory`` argument to
-  :meth:`pyramid.config.Configurator.add_route`).
+- A model instance is exposed to :term:`view` code as the :term:`context` of
+  a view.
 
-- A model instance is exposed to :term:`view` code as the
-  :term:`context` of a view.
-
-Model objects typically store data and offer methods related to
-mutating that data.
+In many :term:`traversal` based applications (particularly ones that use
+Zope-like patterns), model objects often store data and offer methods related
+to mutating that data.
 
 .. note::
 
@@ -313,9 +310,9 @@ filesystem root directory.
 :app:`Pyramid` API Functions That Act Against Models
 -------------------------------------------------------
 
-A model instance is used as the :term:`context` argument provided to a
-view.  See :ref:`traversal_chapter` and :ref:`urldispatch_chapter` for
-more information about how a model instance becomes the context.
+A model instance is used as the :term:`context` provided to a view.  See
+:ref:`traversal_chapter` and :ref:`urldispatch_chapter` for more information
+about how a model instance becomes the context.
 
 The APIs provided by :ref:`traversal_module` are used against model
 instances.  These functions can be used to find the "path" of a model,
@@ -332,3 +329,4 @@ model object) as one of its arguments; the ACL is obtained from this
 model or one of its ancestors.  Other APIs in the
 :mod:`pyramid.security` module also accept :term:`context` as an
 argument, and a context is always a model.
+
