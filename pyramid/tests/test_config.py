@@ -3319,7 +3319,14 @@ class ConfiguratorTests(unittest.TestCase):
             config.add_view(view2)
         config.include(includeme1)
         config.include(includeme2)
-        self.assertRaises(ConfigurationConflictError, config.commit)
+        try:
+            config.commit()
+        except ConfigurationConflictError, why:
+            c1, c2 = self._conflictFunctions(why)
+            self.assertEqual(c1, 'includeme1')
+            self.assertEqual(c2, 'includeme2')
+        else: #pragma: no cover
+            raise AssertionError
 
     def test_commit_conflict_resolved_with_two_includes_and_local(self):
         config = self._makeOne()
@@ -3348,6 +3355,80 @@ class ConfiguratorTests(unittest.TestCase):
         config.commit()
         registeredview = self._getViewCallable(config)
         self.assertEqual(registeredview.__name__, 'view3')
+
+    def test_conflict_route_with_view(self):
+        from zope.configuration.config import ConfigurationConflictError
+        config = self._makeOne()
+        def view1(request): pass
+        def view2(request): pass
+        config.add_route('a', '/a', view=view1)
+        config.add_route('a', '/a', view=view2)
+        try:
+            config.commit()
+        except ConfigurationConflictError, why:
+            c1, c2, c3, c4 = self._conflictFunctions(why)
+            self.assertEqual(c1, 'test_conflict_route_with_view')
+            self.assertEqual(c2, 'test_conflict_route_with_view')
+            self.assertEqual(c3, 'test_conflict_route_with_view')
+            self.assertEqual(c4, 'test_conflict_route_with_view')
+        else: # pragma: no cover
+            raise AssertionError
+        
+    def test_conflict_set_notfound_view(self):
+        from zope.configuration.config import ConfigurationConflictError
+        config = self._makeOne()
+        def view1(request): pass
+        def view2(request): pass
+        config.set_notfound_view(view1)
+        config.set_notfound_view(view2)
+        try:
+            config.commit()
+        except ConfigurationConflictError, why:
+            c1, c2 = self._conflictFunctions(why)
+            self.assertEqual(c1, 'test_conflict_set_notfound_view')
+            self.assertEqual(c2, 'test_conflict_set_notfound_view')
+        else: # pragma: no cover
+            raise AssertionError
+
+    def test_conflict_set_forbidden_view(self):
+        from zope.configuration.config import ConfigurationConflictError
+        config = self._makeOne()
+        def view1(request): pass
+        def view2(request): pass
+        config.set_forbidden_view(view1)
+        config.set_forbidden_view(view2)
+        try:
+            config.commit()
+        except ConfigurationConflictError, why:
+            c1, c2 = self._conflictFunctions(why)
+            self.assertEqual(c1, 'test_conflict_set_forbidden_view')
+            self.assertEqual(c2, 'test_conflict_set_forbidden_view')
+        else: # pragma: no cover
+            raise AssertionError
+
+    def test_conflict_add_handler(self):
+        class AHandler(object):
+            def aview(self): pass
+        from zope.configuration.config import ConfigurationConflictError
+        config = self._makeOne()
+        config.add_handler('h1', '/h1', handler=AHandler)
+        config.add_handler('h1', '/h1', handler=AHandler)
+        try:
+            config.commit()
+        except ConfigurationConflictError, why:
+            c1, c2, c3, c4 = self._conflictFunctions(why)
+            self.assertEqual(c1, 'test_conflict_add_handler')
+            self.assertEqual(c2, 'test_conflict_add_handler')
+            self.assertEqual(c3, 'test_conflict_add_handler')
+            self.assertEqual(c3, 'test_conflict_add_handler')
+        else: # pragma: no cover
+            raise AssertionError
+
+    def _conflictFunctions(self, e):
+        conflicts = e._conflicts.values()
+        for conflict in conflicts:
+            for confinst in conflict:
+                yield confinst[2]
 
 class Test__map_view(unittest.TestCase):
     def setUp(self):
