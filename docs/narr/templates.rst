@@ -409,9 +409,9 @@ templates is available from `the Chameleon website
    ``pyramid_jinja2`` instead.  See
    :ref:`available_template_system_bindings`.
 
-Given a :term:`Chameleon` ZPT template named ``foo.pt``
-in a directory in your application named ``templates``, you can render
-the template as a :term:`renderer` like so:
+Given a :term:`Chameleon` ZPT template named ``foo.pt`` in a directory
+in your application named ``templates``, you can render the template as
+a :term:`renderer` like so:
 
 .. code-block:: python
    :linenos:
@@ -468,22 +468,21 @@ works in these templates.
 Using ZPT Macros in :app:`Pyramid`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When a :term:`renderer` is used to render a template,
-:app:`Pyramid` makes at least two top-level names available to the
-template by default: ``context`` and ``request``.  One of the common
-needs in ZPT-based templates is to use one template's "macros" from within
-a different template.  In Zope, this is typically handled by
-retrieving the template from the ``context``.  But having a hold of
-the context in :app:`Pyramid` is not helpful: templates cannot
-usually be retrieved from models.  To use macros in :app:`Pyramid`,
-you need to make the macro template itself available to the rendered
-template by passing the template in which the macro is defined (or even
-the macro itself) *into* the rendered template.  To make a macro
-available to the rendered template, you can retrieve a different
-template using the :func:`pyramid.renderers.get_renderer` API,
-and pass it in to the template being rendered.  For example, using a
-:term:`view configuration` via a :class:`pyramid.view.view_config`
-decorator that uses a :term:`renderer`:
+When a :term:`renderer` is used to render a template, :app:`Pyramid`
+makes at least two top-level names available to the template by default:
+``context`` and ``request``.  One of the common needs in ZPT-based
+templates is to use one template's "macros" from within a different
+template.  In Zope, this is typically handled by retrieving the template
+from the ``context``.  But the context in :app:`Pyramid` is typically a
+model object, and templates cannot usually be retrieved from models.  To
+use macros in :app:`Pyramid`, you need to make the macro template itself
+available to the rendered template by passing the macro template, or
+even the macro itself, *into* the rendered template.  To do this you can
+use the :func:`pyramid.renderers.get_renderer` API to retrieve the macro
+template, and pass it into the template being rendered via the dictionary
+returned by the view.  For example, using a :term:`view configuration` via a
+:class:`pyramid.view.view_config` decorator that uses a
+:term:`renderer`:
 
 .. code-block:: python
    :linenos:
