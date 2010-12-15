@@ -350,21 +350,21 @@ templates as renderers.  See :ref:`available_template_system_bindings`.
 .. sidebar:: Why Use A Renderer via View Configuration
 
    Using a renderer in view configuration is usually a better way to
-   render templates than using any rendering API directly from within
-   a :term:`view callable` because it makes the view callable more
-   unit-testable.  Views which use templating or rendering APIs
-   directly must return a :term:`Response` object.  Making testing
-   assertions about response objects is typically an indirect process,
-   because it means that your test code often needs to somehow parse
-   information out of the response body (often HTML).  View callables
-   which are configured with renderers externally via view
-   configuration typically return a dictionary, and making assertions
-   about the information is almost always more direct than needing to
-   parse HTML.  Specifying a renderer from within :term:`ZCML` (as
-   opposed to imperatively or via a ``view_config`` decorator, or using a
-   template directly from within a view callable) also makes it
-   possible for someone to modify the template used to render a view
-   without needing to fork your code to do so.  See
+   render templates than using any rendering API directly from within a
+   :term:`view callable` because it makes the view callable more
+   unit-testable.  Views which use templating or rendering APIs directly
+   must return a :term:`Response` object.  Making testing assertions
+   about response objects is typically an indirect process, because it
+   means that your test code often needs to somehow parse information
+   out of the response body (often HTML).  View callables configured
+   with renderers externally via view configuration typically return a
+   dictionary, as above.  Making assertions about results returned in a
+   dictionary is almost always more direct and straightforward than
+   needing to parse HTML.  Specifying a renderer from within
+   :term:`ZCML` (as opposed to imperatively or via a ``view_config``
+   decorator, or using a template directly from within a view callable)
+   also makes it possible for someone to modify the template used to
+   render a view without needing to fork your code to do so.  See
    :ref:`extending_chapter` for more information.
 
 By default, views rendered via a template renderer return a
