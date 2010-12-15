@@ -36,9 +36,9 @@ class TestCallerPath(unittest.TestCase):
         self.assertEqual(test_path.__abspath__, here)
 
 class TestCallerModule(unittest.TestCase):
-    def _callFUT(self, level=2):
+    def _callFUT(self, *arg, **kw):
         from pyramid.path import caller_module
-        return caller_module(level)
+        return caller_module(*arg, **kw)
 
     def test_it_level_1(self):
         from pyramid.tests import test_path
@@ -54,6 +54,18 @@ class TestCallerModule(unittest.TestCase):
         from pyramid.tests import test_path
         result = self._callFUT(3)
         self.failIfEqual(result, test_path)
+
+    def test_it_no___name__(self):
+        class DummyFrame(object):
+            f_globals = {}
+        class DummySys(object):
+            def _getframe(self, level):
+                return DummyFrame()
+            modules = {'__main__':'main'}
+        dummy_sys = DummySys()
+        result = self._callFUT(3, sys=dummy_sys)
+        self.assertEqual(result, 'main')
+
 
 class TestCallerPackage(unittest.TestCase):
     def _callFUT(self, *arg, **kw):
