@@ -752,7 +752,7 @@ look like:
 
 This template doesn't use any advanced features of Mako, only the
 ``${squiggly}`` replacement syntax for names that are passed in as
-:term:`renderer globals` values.  See the `the Mako documentation
+:term:`renderer globals`.  See the `the Mako documentation
 <http://www.makotemplates.org/>`_ to use more advanced features.
 
 .. index::
