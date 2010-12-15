@@ -11,6 +11,9 @@ Bug Fixes
   functions and classes and non-detection of view callables decorated with
   ``view_config`` decorators.  This has been fixed.
 
+- Tests now pass on Windows (no bugs found, but a few tests in the test suite
+  assumed UNIX path segments in filenames).
+
 1.0a5 (2010-12-14)
 ==================
 
