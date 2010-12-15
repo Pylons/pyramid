@@ -203,18 +203,18 @@ Defining a Graph of Model Instances for Traversal
 When :term:`traversal` is used (as opposed to a purely :term:`url
 dispatch` based application), :app:`Pyramid` expects to be able to
 traverse a graph composed of model instances.  Traversal begins at a
-root model, and descends into the graph recursively via each found
-model's ``__getitem__`` method.  :app:`Pyramid` imposes the
+root model instance, and descends into the graph recursively via each
+found model's ``__getitem__`` method.  :app:`Pyramid` imposes the
 following policy on model instance nodes in the graph:
 
-- Nodes which contain other nodes (aka "container" nodes) must supply
+- Container nodes (i.e., nodes which contain other nodes) must supply
   a ``__getitem__`` method which is willing to resolve a unicode name
   to a subobject.  If a subobject by that name does not exist in the
   container, ``__getitem__`` must raise a :exc:`KeyError`.  If a
   subobject by that name *does* exist, the container should return the
   subobject (another model instance).
 
-- Nodes which do not contain other nodes (aka "leaf" nodes) must not
+- Leaf nodes, which do not contain other nodes, must not
   implement a ``__getitem__``, or if they do, their ``__getitem__``
   method must raise a :exc:`KeyError`.
 
