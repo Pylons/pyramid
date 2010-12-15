@@ -8,9 +8,8 @@ Bug Fixes
   without a ``package`` argument (e.g. ``config.scan()`` as opposed to
   ``config.scan('packagename')``.  The symptoms were: lots of deprecation
   warnings printed to the console about imports of deprecated Pyramid
-  functions and classes and non-detection of views decorated with
-  ``view_config`` decorators.  This has now been fixed.
-
+  functions and classes and non-detection of view callables decorated with
+  ``view_config`` decorators.  This has been fixed.
 
 1.0a5 (2010-12-14)
 ==================
