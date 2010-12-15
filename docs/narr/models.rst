@@ -256,15 +256,15 @@ The ``__parent__`` of the root object should be ``None`` and its
        __name__ = ''
        __parent__ = None
 
-A node returned from the root item's ``__getitem__`` method should
-have a ``__parent__`` attribute that is a reference to the root
-object, and its ``__name__`` attribute should match the name by which
-it is reachable via the root object's ``__getitem__``.  *That*
-object's ``__getitem__`` should return objects that have a
-``__parent__`` attribute that points at that object, and
-``__getitem__``-returned objects should have a ``__name__`` attribute
-that matches the name by which they are retrieved via ``__getitem__``,
-and so on.
+A node returned from the root item's ``__getitem__`` method should have
+a ``__parent__`` attribute that is a reference to the root object, and
+its ``__name__`` attribute should match the name by which it is
+reachable via the root object's ``__getitem__``.  A container under the
+root should have a ``__getitem__`` that returns objects with a
+``__parent__`` attribute that points at the container, and these
+subobjects should have a ``__name__`` attribute that matches the name by
+which they are retrieved from the container via ``__getitem__``. 
+This pattern continues recursively down the graph.
 
 .. warning:: If your root model object has a ``__name__`` argument
    that is not ``None`` or the empty string, URLs returned by the
