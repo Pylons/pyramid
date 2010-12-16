@@ -13,7 +13,6 @@ class ViewTests(unittest.TestCase):
 
     def test_my_view(self):
         from tutorial.views import my_view
-        context = testing.DummyModel()
         request = testing.DummyRequest()
-        info = my_view(context, request)
+        info = my_view(request)
         self.assertEqual(info['project'], 'tutorial')

@@ -8,11 +8,11 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
     'pyramid',
-    'docutils',
-    'ZODB3',
     'repoze.zodbconn',
     'repoze.tm',
+    'ZODB3',
     'WebError',
+    'docutils',
     ]
 
 setup(name='tutorial',
@@ -39,6 +39,7 @@ setup(name='tutorial',
       entry_points = """\
       [paste.app_factory]
       main = tutorial:main
-      """
+      """,
+      paster_plugins=['pyramid'],
       )
 

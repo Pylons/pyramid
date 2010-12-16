@@ -7,19 +7,19 @@ application is typically a simple Python function that accepts two
 parameters: :term:`context`, and :term:`request`.  A view callable is
 assumed to return a :term:`response` object.
 
-.. note:: A :app:`Pyramid` view can also be defined as callable
-   which accepts *one* arguments: a :term:`request`.  You'll see this
-   one-argument pattern used in other :app:`Pyramid` tutorials and
-   applications.  Either calling convention will work in any
-   :app:`Pyramid` application; the calling conventions can be used
-   interchangeably as necessary.  In :term:`traversal` based
-   applications, such as this tutorial, the context is used frequently
-   within the body of a view method, so it makes sense to use the
-   two-argument syntax in this application.  However, in :term:`url
-   dispatch` based applications, the context object is rarely used in
-   the view body itself, so within code that uses URL-dispatch-only,
-   it's common to define views as callables that accept only a request
-   to avoid the visual "noise".
+.. note:: A :app:`Pyramid` view can also be defined as callable which accepts
+   *one* arguments: a :term:`request`.  You'll see this one-argument pattern
+   used in other :app:`Pyramid` tutorials and applications.  It was also used
+   in the ``my_view`` view callable that we deleted in the last chapter.
+   Either calling convention will work in any :app:`Pyramid` application; the
+   calling conventions can be used interchangeably as necessary.  In
+   :term:`traversal` based applications, such as this tutorial, the context
+   is used frequently within the body of a view method, so it makes sense to
+   use the two-argument syntax in this application.  However, in :term:`url
+   dispatch` based applications, the context object is rarely used in the
+   view body itself, so within code that uses URL-dispatch-only, it's common
+   to define views as callables that accept only a request to avoid the
+   visual "noise".
 
 We're going to define several :term:`view callable` functions then
 wire them into :app:`Pyramid` using some :term:`view

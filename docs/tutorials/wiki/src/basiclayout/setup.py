@@ -8,10 +8,9 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
     'pyramid',
-    'docutils',
-    'ZODB3',
     'repoze.zodbconn',
     'repoze.tm',
+    'ZODB3',
     'WebError',
     ]
 
@@ -29,7 +28,7 @@ setup(name='tutorial',
       author='',
       author_email='',
       url='',
-      keywords='web pyramid bfg',
+      keywords='web pylons pyramid',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
@@ -39,5 +38,6 @@ setup(name='tutorial',
       entry_points = """\
       [paste.app_factory]
       main = tutorial:main
-      """
+      """,
+      paster_plugins=['pyramid'],
       )
