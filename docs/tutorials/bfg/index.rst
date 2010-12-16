@@ -186,6 +186,8 @@ Here's how to convert a :mod:`repoze.bfg` application to a
 
 #. Fix any test failures.
 
+#. Fix any code which generates deprecation warnings.
+
 #. Start using the converted version of your application.  Celebrate.
 
 

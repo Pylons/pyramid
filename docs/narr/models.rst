@@ -280,18 +280,17 @@ filesystem root directory.
    to every path and URL generated (as opposed to a single leading
    slash or empty tuple element).
 
-.. sidebar::  Using :mod:`repoze.bfg.traversalwrapper`
+.. sidebar::  Using :mod:`pyramid_traversalwrapper`
 
   If you'd rather not manage the ``__name__`` and ``__parent__``
   attributes of your models "by hand", an add-on package named
-  :mod:`repoze.bfg.traversalwrapper` can help.
+  :mod:`pyramid_traversalwrapper` can help.
 
   In order to use this helper feature, you must first install the
-  :mod:`repoze.bfg.traversalwrapper` package (available via `SVN
-  <http://svn.repoze.org/repoze.bfg.traversalwrapper>`_), then
-  register its ``ModelGraphTraverser`` as the traversal policy, rather
-  than the default :app:`Pyramid` traverser. The package contains
-  instructions for doing so.
+  :mod:`pyramid_traversalwrapper` package (available via PyPI), then register
+  its ``ModelGraphTraverser`` as the traversal policy, rather than the
+  default :app:`Pyramid` traverser. The package contains instructions for
+  doing so.
 
   Once :app:`Pyramid` is configured with this feature, you will no
   longer need to manage the ``__parent__`` and ``__name__`` attributes
