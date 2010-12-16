@@ -1,6 +1,12 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
+- Make it possible to succesfully run all tests via ``nosetests`` command
+  directly (rather than indirectly via ``python setup.py nosetests``).
+
 1.0a6 (2010-12-15)
 ==================
 
