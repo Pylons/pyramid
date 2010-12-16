@@ -34,7 +34,9 @@ class TestRouter(unittest.TestCase):
         return logger
 
     def _registerSettings(self, **kw):
-        settings = {'debug_authorization':False, 'debug_notfound':False}
+        settings = {'debug_authorization':False,
+                    'debug_notfound':False,
+                    'debug_matched':False}
         settings.update(kw)
         self.registry.settings = settings
 
@@ -493,6 +495,8 @@ class TestRouter(unittest.TestCase):
 
     def test_call_route_matches_and_has_factory(self):
         from pyramid.interfaces import IViewClassifier
+        logger = self._registerLogger()
+        self._registerSettings(debug_matched=True)
         self._registerRouteRequest('foo')
         root = object()
         def factory(request):
@@ -522,6 +526,15 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(environ['bfg.routes.route'].name, 'foo')
         self.assertEqual(request.matchdict, matchdict)
         self.assertEqual(request.matched_route.name, 'foo')
+
+        self.assertEqual(len(logger.messages), 1)
+        self.assertEqual(logger.messages[0],
+            "debug_matched of url http://localhost:8080"
+            "/archives/action1/article1; "
+            "path_info: '/archives/action1/article1', "
+            "route_name: 'foo', pattern: 'archives/:action/:article', "
+            "matchdict: {'action': u'action1', 'article': u'article1'}, "
+            "predicates: ()")
 
     def test_call_route_matches_doesnt_overwrite_subscriber_iface(self):
         from pyramid.interfaces import INewRequest
