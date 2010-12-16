@@ -1,8 +1,6 @@
 import unittest
 from pyramid.testing import cleanUp
 
-import os.path
-
 class TestPackageURLParser(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.static import PackageURLParser
@@ -26,6 +24,7 @@ class TestPackageURLParser(unittest.TestCase):
         return environ
     
     def test_ctor_allargs(self):
+        import os.path
         inst = self._makeOne('package', 'resource/name', root_resource='root',
                              cache_max_age=100)
         self.assertEqual(inst.package_name, 'package')
@@ -34,6 +33,7 @@ class TestPackageURLParser(unittest.TestCase):
         self.assertEqual(inst.cache_max_age, 100)
         
     def test_ctor_defaultargs(self):
+        import os.path
         inst = self._makeOne('package', 'resource/name')
         self.assertEqual(inst.package_name, 'package')
         self.assertEqual(inst.resource_name, os.path.join('resource', 'name'))
@@ -137,6 +137,7 @@ class TestPackageURLParser(unittest.TestCase):
         self.assertEqual(response[0], '')
 
     def test_repr(self):
+        import os.path
         inst = self._makeOne('pyramid.tests', 'fixtures/static')
         self.failUnless(
             repr(inst).startswith(
@@ -178,7 +179,7 @@ class TestStaticView(unittest.TestCase):
         return environ
 
     def test_abspath(self):
-        import os
+        import os.path
         path = os.path.dirname(__file__)
         view = self._makeOne(path)
         context = DummyContext()
