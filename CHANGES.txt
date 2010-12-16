@@ -22,6 +22,11 @@ Documentation
 - Added reference to ``BFG_DEBUG_ROUTEMATCH`` envvar and ``debug_routematch``
   config file setting to the Environment narrative docs chapter.
 
+Paster Templates
+----------------
+
+- Added ``debug_routematch = false`` to all paster templates.
+
 1.0a6 (2010-12-15)
 ==================
 
