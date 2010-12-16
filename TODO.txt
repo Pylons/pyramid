@@ -75,8 +75,6 @@ Nice-to-Have
 
 - Create a function which performs a recursive request.
 
-- Debug option to print route matching decision.
-
 - Debug option to print view matching decision.
 
 - Script or paster command that prints, for a given URL, the views
