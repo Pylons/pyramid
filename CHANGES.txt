@@ -1,17 +1,26 @@
 Next release
 ============
 
-Features
---------
-
-- Added ``debug_matched`` configuration setting that logs matched routes
-  (including the matchdict and predicates).
-
 Bug Fixes
 ---------
 
 - Make it possible to succesfully run all tests via ``nosetests`` command
   directly (rather than indirectly via ``python setup.py nosetests``).
+
+Features
+--------
+
+- Added ``debug_routematch`` configuration setting that logs matched routes
+  (including the matchdict and predicates).
+
+Documentation
+-------------
+
+- Added "Debugging Route Matching" section to the urldispatch narrative
+  documentation chapter.
+
+- Added reference to ``BFG_DEBUG_ROUTEMATCH`` envvar and ``debug_routematch``
+  config file setting to the Environment narrative docs chapter.
 
 1.0a6 (2010-12-15)
 ==================

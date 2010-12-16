@@ -30,7 +30,7 @@ class Router(object):
     implements(IRouter)
 
     debug_notfound = False
-    debug_matched = False
+    debug_routematch = False
 
     threadlocal_manager = manager
 
@@ -46,7 +46,7 @@ class Router(object):
 
         if settings is not None:
             self.debug_notfound = settings['debug_notfound']
-            self.debug_matched = settings['debug_matched']
+            self.debug_routematch = settings['debug_routematch']
 
     def __call__(self, environ, start_response):
         """
@@ -84,7 +84,12 @@ class Router(object):
                     if self.routes_mapper is not None:
                         info = self.routes_mapper(request)
                         match, route = info['match'], info['route']
-                        if route is not None:
+                        if route is None:
+                            if self.debug_routematch:
+                                msg = ('no route matched for url %s' %
+                                       request.url)
+                                logger and logger.debug(msg)
+                        else:
                             # TODO: kill off bfg.routes.* environ keys when
                             # traverser requires request arg, and cant cope
                             # with environ anymore (they are docs-deprecated as
@@ -94,14 +99,18 @@ class Router(object):
                             attrs['matchdict'] = match
                             attrs['matched_route'] = route
 
-                            if self.debug_matched:
+                            if self.debug_routematch:
                                 msg = (
-                                    'debug_matched of url %s; path_info: %r, '
-                                    'route_name: %r, pattern: %r, '
+                                    'route matched for url %s; '
+                                    'route_name: %r, '
+                                    'path_info: %r, '
+                                    'pattern: %r, '
                                     'matchdict: %r, '
                                     'predicates: %r' % (
-                                        request.url, request.path_info,
-                                        route.name, route.pattern, match,
+                                        request.url,
+                                        route.name,
+                                        request.path_info,
+                                        route.pattern, match,
                                         route.predicates)
                                     )
                                 logger and logger.debug(msg)

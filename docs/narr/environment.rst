@@ -97,6 +97,21 @@ when this value is true.  See also :ref:`debug_notfound_section`.
 |                                 |                             |
 +---------------------------------+-----------------------------+
 
+Debugging Route Matching
+------------------------
+
+Print debugging messages related to :term:`url dispatch` route matching when
+this value is true.  See also :ref:`debug_routematch_section`.
+
++---------------------------------+-----------------------------+
+| Environment Variable Name       | Config File Setting Name    |
++=================================+=============================+
+| ``BFG_DEBUG_ROUTEMATCH``        |  ``debug_routematch``       |
+|                                 |                             |
+|                                 |                             |
+|                                 |                             |
++---------------------------------+-----------------------------+
+
 Debugging All
 -------------
 

@@ -29,9 +29,9 @@ class Settings(dict):
         config_debug_notfound = self.get('debug_notfound', '')
         eff_debug_notfound = asbool(eget('BFG_DEBUG_NOTFOUND',
                                          config_debug_notfound))
-        config_debug_matched = self.get('debug_matched', '')
-        eff_debug_matched = asbool(eget('BFG_DEBUG_MATCHED',
-                                         config_debug_matched))
+        config_debug_routematch = self.get('debug_routematch', '')
+        eff_debug_routematch = asbool(eget('BFG_DEBUG_ROUTEMATCH',
+                                         config_debug_routematch))
         config_debug_templates = self.get('debug_templates', '')
         eff_debug_templates = asbool(eget('BFG_DEBUG_TEMPLATES',
                                           config_debug_templates))
@@ -49,7 +49,7 @@ class Settings(dict):
         update = {
             'debug_authorization': eff_debug_all or eff_debug_auth,
             'debug_notfound': eff_debug_all or eff_debug_notfound,
-            'debug_matched': eff_debug_all or eff_debug_matched,
+            'debug_routematch': eff_debug_all or eff_debug_routematch,
             'debug_templates': eff_debug_all or eff_debug_templates,
             'reload_templates': eff_reload_all or eff_reload_templates,
             'reload_resources':eff_reload_all or eff_reload_resources,

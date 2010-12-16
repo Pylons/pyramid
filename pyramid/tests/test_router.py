@@ -36,7 +36,7 @@ class TestRouter(unittest.TestCase):
     def _registerSettings(self, **kw):
         settings = {'debug_authorization':False,
                     'debug_notfound':False,
-                    'debug_matched':False}
+                    'debug_routematch':False}
         settings.update(kw)
         self.registry.settings = settings
 
@@ -496,7 +496,7 @@ class TestRouter(unittest.TestCase):
     def test_call_route_matches_and_has_factory(self):
         from pyramid.interfaces import IViewClassifier
         logger = self._registerLogger()
-        self._registerSettings(debug_matched=True)
+        self._registerSettings(debug_routematch=True)
         self._registerRouteRequest('foo')
         root = object()
         def factory(request):
@@ -529,12 +529,32 @@ class TestRouter(unittest.TestCase):
 
         self.assertEqual(len(logger.messages), 1)
         self.assertEqual(logger.messages[0],
-            "debug_matched of url http://localhost:8080"
+            "route matched for url http://localhost:8080"
             "/archives/action1/article1; "
+            "route_name: 'foo', "
             "path_info: '/archives/action1/article1', "
-            "route_name: 'foo', pattern: 'archives/:action/:article', "
+            "pattern: 'archives/:action/:article', "
             "matchdict: {'action': u'action1', 'article': u'article1'}, "
             "predicates: ()")
+
+    def test_call_route_match_miss_debug_routematch(self):
+        from pyramid.exceptions import NotFound
+        logger = self._registerLogger()
+        self._registerSettings(debug_routematch=True)
+        self._registerRouteRequest('foo')
+        self._connectRoute('foo', 'archives/:action/:article')
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        environ = self._makeEnviron(PATH_INFO='/wontmatch')
+        self._registerRootFactory(context)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        self.assertRaises(NotFound, router, environ, start_response)
+
+        self.assertEqual(len(logger.messages), 1)
+        self.assertEqual(
+            logger.messages[0],
+            'no route matched for url http://localhost:8080/wontmatch')
 
     def test_call_route_matches_doesnt_overwrite_subscriber_iface(self):
         from pyramid.interfaces import INewRequest

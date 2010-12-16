@@ -1268,6 +1268,37 @@ not very ambitious.
 .. note:: See :ref:`security_chapter` for more information about
    :app:`Pyramid` security and ACLs.
 
+.. _debug_routematch_section:
+
+Debugging Route Matching
+------------------------
+
+It's useful to be able to take a peek under the hood when requests that enter
+your application arent matching your routes as you expect them to.  To debug
+route matching, use the ``BFG_DEBUG_ROUTEMATCH`` environment variable or the
+``debug_routematch`` configuration file setting (set either to ``true``).
+Details of the route matching decision for a particular request to the
+:app:`Pyramid` application will be printed to the ``stderr`` of the console
+which you started the application from.  For example:
+
+.. code-block:: text
+   :linenos:
+
+    [chrism@thinko pylonsbasic]$ BFG_DEBUG_ROUTEMATCH=true \
+                                 bin/paster serve development.ini 
+    Starting server in PID 13586.
+    serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
+    2010-12-16 14:45:19,956 no route matched for url \
+                                        http://localhost:6543/wontmatch
+    2010-12-16 14:45:20,010 no route matched for url \
+                                http://localhost:6543/favicon.ico
+    2010-12-16 14:41:52,084 route matched for url \
+                                http://localhost:6543/static/logo.png; \
+                                route_name: 'static/', ....
+
+See :ref:`environment_chapter` for more information about how, and where to
+set these values.
+
 References
 ----------
 

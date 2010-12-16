@@ -3,7 +3,7 @@ use = egg:{{project}}
 reload_templates = true
 debug_authorization = false
 debug_notfound = false
-debug_matched = false
+debug_routematch = false
 debug_templates = true
 default_locale_name = en
 zodb_uri = file://%(here)s/Data.fs?connection_cache_size=20000
