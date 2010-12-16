@@ -3,6 +3,9 @@
 import unittest
 from pyramid import testing
 
+import sys
+import os.path
+
 class Base(object):
     def setUp(self):
         self.config = testing.setUp()
@@ -70,7 +73,10 @@ class Test_renderer_factory(Base, unittest.TestCase):
             })
         self._callFUT(info)
         lookup = self.config.registry.getUtility(IMakoLookup)
-        self.assertEqual(lookup.directories, ['a', 'b'])
+        module_path = os.path.dirname(sys.modules['__main__'].__file__)
+        self.assertEqual(lookup.directories, [
+            os.path.join(module_path, 'a'),
+            os.path.join(module_path, 'b')])
 
     def test_with_module_directory_resource_spec(self):
         import os
