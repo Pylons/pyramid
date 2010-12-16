@@ -30,6 +30,8 @@ class Router(object):
     implements(IRouter)
 
     debug_notfound = False
+    debug_matched = False
+
     threadlocal_manager = manager
 
     def __init__(self, registry):
@@ -41,8 +43,10 @@ class Router(object):
         self.root_policy = self.root_factory # b/w compat
         self.registry = registry
         settings = registry.settings
+
         if settings is not None:
             self.debug_notfound = settings['debug_notfound']
+            self.debug_matched = settings['debug_matched']
 
     def __call__(self, environ, start_response):
         """
@@ -89,6 +93,19 @@ class Router(object):
                             environ['bfg.routes.matchdict'] = match
                             attrs['matchdict'] = match
                             attrs['matched_route'] = route
+
+                            if self.debug_matched:
+                                msg = (
+                                    'debug_matched of url %s; path_info: %r, '
+                                    'route_name: %r, pattern: %r, '
+                                    'matchdict: %r, '
+                                    'predicates: %r' % (
+                                        request.url, request.path_info,
+                                        route.name, route.pattern, match,
+                                        route.predicates)
+                                    )
+                                logger and logger.debug(msg)
+
                             request_iface = registry.queryUtility(
                                 IRouteRequest,
                                 name=route.name,

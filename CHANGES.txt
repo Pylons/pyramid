@@ -1,6 +1,12 @@
 Next release
 ============
 
+Features
+--------
+
+- Added ``debug_matched`` configuration setting that logs matched routes
+  (including the matchdict and predicates).
+
 Bug Fixes
 ---------
 

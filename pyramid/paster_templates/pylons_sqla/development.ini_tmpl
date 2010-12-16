@@ -3,6 +3,7 @@ use = egg:{{project}}
 reload_templates = true
 debug_authorization = false
 debug_notfound = false
+debug_matched = false
 debug_templates = true
 default_locale_name = en
 mako.directories = {{package}}:templates
