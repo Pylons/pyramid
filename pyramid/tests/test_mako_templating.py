@@ -3,9 +3,6 @@
 import unittest
 from pyramid import testing
 
-import sys
-import os.path
-
 class Base(object):
     def setUp(self):
         self.config = testing.setUp()
@@ -63,6 +60,8 @@ class Test_renderer_factory(Base, unittest.TestCase):
         self.assertEqual(lookup.directories, [self.templates_dir]*2)
 
     def test_directories_list(self):
+        import sys
+        import os.path
         from pyramid.mako_templating import IMakoLookup
         settings = {'mako.directories':['a', 'b']}
         info = DummyRendererInfo({
