@@ -287,9 +287,24 @@ the name ``MyProject`` as a section name:
    [chrism@vitaminf shellenv]$ ../bin/paster pshell development.ini MyProject
    Python 2.4.5 (#1, Aug 29 2008, 12:27:37) 
    [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
-   Type "help" for more information. "root" is the Pyramid app root object.
+   Type "help" for more information. "root" is the Pyramid app root object,
+   "registry" is the Pyramid registry object.
    >>> root
    <myproject.models.MyModel object at 0x445270>
+   >>> registry
+   <Registry myproject>
+   >>> registry.settings['debug_notfound']
+   False
+   >>> from myproject.views import my_view
+   >>> from pyramid.request import Request
+   >>> r = Request.blank('/')
+   >>> my_view(r)
+   {'project': 'myproject'}
+
+Two names are made available to the pshell user as globals: ``root`` and
+``registry``.  ``root`` is the the object returned by the default :term:`root
+factory` in your application.  ``registry`` is the :term:`application
+registry` object (often accessed within view code as ``request.registry``).
 
 If you have `IPython <http://en.wikipedia.org/wiki/IPython>`_
 installed in the interpreter you use to invoke the ``paster`` command,

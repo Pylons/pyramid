@@ -27,7 +27,8 @@ class TestPShellCommand(unittest.TestCase):
         pushed = app.threadlocal_manager.pushed[0]
         self.assertEqual(pushed['registry'], dummy_registry)
         self.assertEqual(pushed['request'].registry, dummy_registry)
-        self.assertEqual(interact.local, {'root':dummy_root})
+        self.assertEqual(interact.local, {'root':dummy_root,
+                                          'registry':dummy_registry})
         self.failUnless(interact.banner)
         self.assertEqual(len(app.threadlocal_manager.popped), 1)
 
@@ -75,7 +76,8 @@ class TestPShellCommand(unittest.TestCase):
         pushed = app.threadlocal_manager.pushed[0]
         self.assertEqual(pushed['registry'], dummy_registry)
         self.assertEqual(pushed['request'].registry, dummy_registry)
-        self.assertEqual(interact.local, {'root':dummy_root})
+        self.assertEqual(interact.local, {'root':dummy_root,
+                                          'registry':dummy_registry})
         self.failUnless(interact.banner)
         self.assertEqual(len(app.threadlocal_manager.popped), 1)
         self.assertEqual(apped, [(('/foo/bar/myapp.ini', 'myapp'),
@@ -103,7 +105,8 @@ class TestPShellCommand(unittest.TestCase):
         self.assertEqual(loadapp.section_name, 'myapp')
         self.failUnless(loadapp.relative_to)
         self.assertEqual(len(app.threadlocal_manager.pushed), 0)
-        self.assertEqual(interact.local, {'root':root})
+        self.assertEqual(interact.local, {'root':root,
+                                          'registry':dummy_registry})
         self.failUnless(interact.banner)
         self.assertEqual(apps, [app])
 

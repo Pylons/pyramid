@@ -115,7 +115,7 @@ class PShellCommand(Command):
             except ImportError: #pragma no cover
                 IPShell = None
         cprt =('Type "help" for more information. "root" is the Pyramid app '
-               'root object.')
+               'root object, "registry" is the Pyramid registry object.')
         banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
         config_file, section_name = self.args
         self.logging_file_config(config_file)
@@ -130,7 +130,8 @@ class PShellCommand(Command):
                 closer()
         else:
             try:
-                self.interact[0](banner, local={'root':root})
+                self.interact[0](banner,
+                                 local={'root':root,'registry':app.registry})
             finally:
                 closer()
 

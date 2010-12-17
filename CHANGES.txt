@@ -13,6 +13,9 @@ Features
 - Added ``debug_routematch`` configuration setting that logs matched routes
   (including the matchdict and predicates).
 
+- The name ``registry`` is now available in a ``pshell`` environment by
+  default.  It is the application registry object.
+
 Documentation
 -------------
 
@@ -21,6 +24,8 @@ Documentation
 
 - Added reference to ``BFG_DEBUG_ROUTEMATCH`` envvar and ``debug_routematch``
   config file setting to the Environment narrative docs chapter.
+
+- Changed "Project" chapter slightly to expand on use of ``paster pshell``.
 
 Paster Templates
 ----------------
