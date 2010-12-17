@@ -21,9 +21,9 @@ run :app:`Pyramid`.
     :app:`Pyramid` does not run under any version of Python before
     2.4, and does not yet run under Python 3.X.
 
-:app:`Pyramid` is known to run on all popular Unix-like systems
-such as Linux, MacOS X, and FreeBSD as well as on Windows platforms.
-It is also known to run on Google's App Engine and :term:`Jython`.
+:app:`Pyramid` is known to run on all popular Unix-like systems such as
+Linux, MacOS X, and FreeBSD as well as on Windows platforms.  It is also
+known to run on Google's App Engine and :term:`Jython`.
 
 :app:`Pyramid` installation does not require the compilation of any
 C code, so you need only a Python interpreter that meets the
@@ -325,28 +325,10 @@ replacing the ``python`` command with ``jython`` as necessary.  The
 steps are exactly the same except you should use the ``jython``
 command name instead of the ``python`` command name.
 
-One caveat exists to using :app:`Pyramid` under Jython: the
-:term:`Chameleon` templating engine, which is the default templating
-engine for :app:`Pyramid` does not work on Jython.
-
-The ``pyramid_jinja2`` distribution provides templating for
-:app:`Pyramid` using the :term:`Jinja2` templating system.  You may
-install it like so using the ``easy_install`` command for Jython:
-
-.. code-block:: text
-
-   $ easy_install pyramid_jinja2
-
-Once this is done, you can use this command to get started with a
-:app:`Pyramid` sample application that uses the Jinja2 templating
-engine:
-
-.. code-block:: text
-
-   $ paster create -t pyramid_jinja2_starter
-
-See the chapter entitled :ref:`project_narr` for more information
-about the ``paster create`` command.
+One caveat exists to using :app:`Pyramid` under Jython: the :term:`Chameleon`
+templating engine does not work on Jython.  However, the :term:`Mako`
+templating system, which is also included with Pyramid, does work under
+Jython; use it instead.
 
 What Gets Installed
 -------------------

@@ -27,6 +27,9 @@ Documentation
 
 - Changed "Project" chapter slightly to expand on use of ``paster pshell``.
 
+- Direct Jython users to Mako rather than Jinja2 in "Install" narrative
+  chapter.
+
 Paster Templates
 ----------------
 
