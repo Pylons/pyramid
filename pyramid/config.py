@@ -1041,7 +1041,7 @@ class Configurator(object):
           was used prior to this view registration.  Pass the string
           ``__no_permission_required__`` as the permission argument to
           explicitly indicate that the view should always be
-         executable by entirely anonymous users, regardless of the
+          executable by entirely anonymous users, regardless of the
           default permission, bypassing any :term:`authorization
           policy` that may be in effect.
 
@@ -1251,7 +1251,6 @@ class Configurator(object):
           the context and/or the request.  If all callables return
           ``True``, the associated view callable will be considered
           viable for a given request.
-
         """
         view = self.maybe_dotted(view)
         context = self.maybe_dotted(context)
