@@ -336,4 +336,3 @@ see :class:`pyramid.config.Configurator` .
 
 For more information about :term:`view configuration`, see
 :ref:`views_chapter`.
-

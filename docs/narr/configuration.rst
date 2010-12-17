@@ -87,10 +87,10 @@ referred to by the declaration itself.  For example:
        return Response('Hello')
 
 The mere existence of configuration decoration doesn't cause any
-configuration registration to be made.  Before they have any effect on
-the configuration of a :app:`Pyramid` application, a configuration
-decoration within application code must be found through a process
-known as a :term:`scan`.
+configuration registration to be made.  Before it hasany effect on the
+configuration of a :app:`Pyramid` application, a configuration decoration
+within application code must be found through a process known as a
+:term:`scan`.
 
 The :class:`pyramid.view.view_config` decorator above adds an
 attribute to the ``hello`` function, making it available for a
@@ -102,7 +102,7 @@ its subpackages for decorations when the
 scanning implies searching for configuration declarations in a package
 and its subpackages.  For example:
 
-.. topic:: Imperatively Starting A Scan
+.. topic:: Starting A Scan
 
    .. code-block:: python
       :linenos:
