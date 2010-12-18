@@ -11,22 +11,31 @@ Terminology Changes
 
       pyramid.url.model_url -> 
                         pyramid.url.resource_url
+
       pyramid.traversal.find_model -> 
                         pyramid.url.find_resource
+
       pyramid.traversal.model_path ->
                         pyramid.traversal.resource_path
+
       pyramid.traversal.model_path_tuple ->
                         pyramid.traversal.resource_path_tuple
+
       pyramid.traversal.ModelGraphTraverser -> 
                         pyramid.traversal.ResourceTreeTraverser
+
       pyramid.traversal.ModelGraphTraverser -> 
                         pyramid.traversal.ResourceTreeTraverser
+
       pyramid.config.Configurator.testing_models ->
                         pyramid.config.Configurator.testing_resources
+
       pyramid.request.Request.model_url ->
                         pyramid.request.Request.resource_url
+
       pyramid.testing.registerModels ->
                         pyramid.testing.registerResources
+
       pyramid.testing.DummyModel ->
                         pyramid.testing.DummyResource
 
@@ -55,6 +64,7 @@ Terminology Changes
 
       pyramid.config.Configurator.absolute_resource_spec ->
                         pyramid.config.Configurator.absolute_asset_spec
+
       pyramid.config.Configurator.override_resource ->
                         pyramid.config.Configurator.override_asset
 
