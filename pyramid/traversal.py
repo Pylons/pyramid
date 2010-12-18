@@ -74,7 +74,7 @@ def find_resource(resource, path):
     resolved by ``find_resource``.
 
     .. note:: For backwards compatibility purposes, this function can also
-       be imported as ``find_model``.
+       be imported as :func:`pyramid.traversal.find_model`.
     """
     D = traverse(resource, path)
     view_name = D['view_name']

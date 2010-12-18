@@ -44,7 +44,7 @@ class Settings(dict):
                                     config_reload_assets))
         reload_resources = asbool(eget('BFG_RELOAD_RESOURCES',
                                     config_reload_resources))
-        # reload_resources is an older alias for reload_resources
+        # reload_resources is an older alias for reload_assets
         eff_reload_assets = reload_assets or reload_resources
         configure_zcml = self.get('configure_zcml', '')
         eff_configure_zcml = eget('BFG_CONFIGURE_ZCML', configure_zcml)

@@ -26,7 +26,7 @@ DENY_ALL = (Deny, Everyone, ALL_PERMISSIONS)
 
 def has_permission(permission, context, request):
     """ Provided a permission (a string or unicode object), a context
-    (a :term:`model` instance) and a request object, return an
+    (a :term:`resource` instance) and a request object, return an
     instance of :data:`pyramid.security.Allowed` if the permission
     is granted in this context to the user implied by the
     request. Return an instance of :mod:`pyramid.security.Denied`
@@ -81,7 +81,7 @@ def effective_principals(request):
     return policy.effective_principals(request)
 
 def principals_allowed_by_permission(context, permission):
-    """ Provided a ``context`` (a model object), and a ``permission``
+    """ Provided a ``context`` (a resource object), and a ``permission``
     (a string or unicode object), if a :term:`authorization policy` is
     in effect, return a sequence of :term:`principal` ids that possess
     the permission in the ``context``.  If no authorization policy is

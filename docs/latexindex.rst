@@ -119,6 +119,7 @@ ZCML Directive Reference
    zcml/aclauthorizationpolicy
    zcml/adapter
    zcml/authtktauthenticationpolicy
+   zcml/asset
    zcml/configure
    zcml/default_permission
    zcml/forbidden
@@ -127,7 +128,6 @@ ZCML Directive Reference
    zcml/remoteuserauthenticationpolicy
    zcml/renderer
    zcml/repozewho1authenticationpolicy
-   zcml/resource
    zcml/route
    zcml/scan
    zcml/static

@@ -12,29 +12,29 @@
 #
 ##############################################################################
 
-def inside(model1, model2):
-    """Is ``model1`` 'inside' ``model2``?  Return ``True`` if so, else
+def inside(resource1, resource2):
+    """Is ``resource1`` 'inside' ``resource2``?  Return ``True`` if so, else
     ``False``.
 
-    ``model1`` is 'inside' ``model2`` if ``model2`` is a
-    :term:`lineage` ancestor of ``model1``.  It is a lineage ancestor
+    ``resource1`` is 'inside' ``resource2`` if ``resource2`` is a
+    :term:`lineage` ancestor of ``resource1``.  It is a lineage ancestor
     if its parent (or one of its parent's parents, etc.) is an
     ancestor.
     """
-    while model1 is not None:
-        if model1 is model2:
+    while resource1 is not None:
+        if resource1 is resource2:
             return True
-        model1 = model1.__parent__
+        resource1 = resource1.__parent__
 
     return False
 
-def lineage(model):
+def lineage(resource):
     """
     Return a generator representing the :term:`lineage` of the
-    :term:`model` object implied by the ``model`` argument.  The
-    generator first returns ``model`` unconditionally.  Then, if
-    ``model`` supplies a ``__parent__`` attribute, return the object
-    represented by ``model.__parent__``.  If *that* object has a
+    :term:`resource` object implied by the ``resource`` argument.  The
+    generator first returns ``resource`` unconditionally.  Then, if
+    ``resource`` supplies a ``__parent__`` attribute, return the object
+    represented by ``resource.__parent__``.  If *that* object has a
     ``__parent__`` attribute, return that object's parent, and so on,
     until the object being inspected either has no ``__parent__``
     attribute or which has a ``__parent__`` attribute of ``None``.
@@ -50,8 +50,8 @@ def lineage(model):
       list(lineage(thing2))
       [ <Thing object at thing2>, <Thing object at thing1> ]
     """
-    while model is not None:
-        yield model
+    while resource is not None:
+        yield resource
         # The common case is that the AttributeError exception below
         # is exceptional as long as the developer is a "good citizen"
         # who has a root object with a __parent__ of None.  Using an
@@ -60,7 +60,7 @@ def lineage(model):
         # called in any non-trivial application over and over again to
         # generate URLs and paths.
         try:
-            model = model.__parent__
+            resource = resource.__parent__
         except AttributeError:
-            model = None
+            resource = None
 

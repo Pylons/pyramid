@@ -108,7 +108,7 @@ class StaticURLInfo(object):
 
     def add(self, name, spec, **extra):
         # This feature only allows for the serving of a directory and
-        # the files contained within, not of a single resource;
+        # the files contained within, not of a single asset;
         # appending a slash here if the spec doesn't have one is
         # required for proper prefix matching done in ``generate``
         # (``subpath = path[len(spec):]``).
@@ -162,7 +162,7 @@ class static_view(object):
     path into a response.
 
     You may pass an absolute or relative filesystem path or a
-    :term:`resource specification` representing the directory
+    :term:`asset specification` representing the directory
     containing static files as the ``root_dir`` argument to this
     class' constructor.
 
@@ -179,13 +179,13 @@ class static_view(object):
     five minutes).
 
     .. note:: If the ``root_dir`` is relative to a :term:`package`, or
-         is a :term:`resource specification` the :app:`Pyramid`
-         ``resource`` ZCML directive or
+         is a :term:`asset specification` the :app:`Pyramid`
+         ``asset`` ZCML directive or
          :class:`pyramid.config.Configurator` method can be
-         used to override resources within the named ``root_dir``
+         used to override assets within the named ``root_dir``
          package-relative directory.  However, if the ``root_dir`` is
-         absolute, the ``resource`` directive will not be able to
-         override the resources it contains.  """
+         absolute, configuration will not be able to
+         override the assets it contains.  """
     
     def __init__(self, root_dir, cache_max_age=3600, package_name=None):
         # package_name is for bw compat; it is preferred to pass in a

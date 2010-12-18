@@ -163,7 +163,7 @@ class IAuthorizationPolicy(Interface):
         """ Return a set of principal identifiers allowed by the permission """
 
 class IStaticURLInfo(Interface):
-    """ A policy for generating URLs to static resources """
+    """ A policy for generating URLs to static assets """
     def add(name, spec, **extra):
         """ Add a new static info registration """
 

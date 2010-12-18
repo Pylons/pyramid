@@ -62,28 +62,33 @@ def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
     config.commit()
     return result
 
-def registerModels(models):
-    """ Registers a dictionary of :term:`model` objects that can be
-    resolved via the :func:`pyramid.traversal.find_model` API.
+def registerResources(resources):
+    """ Registers a dictionary of :term:`resource` objects that can be
+    resolved via the :func:`pyramid.traversal.find_resource` API.
 
-    The :func:`pyramid.traversal.find_model` API is called with a
+    The :func:`pyramid.traversal.find_resource` API is called with a
     path as one of its arguments.  If the dictionary you register when
     calling this method contains that path as a string key
     (e.g. ``/foo/bar`` or ``foo/bar``), the corresponding value will
-    be returned to ``find_model`` (and thus to your code) when
-    :func:`pyramid.traversal.find_model` is called with an
+    be returned to ``find_resource`` (and thus to your code) when
+    :func:`pyramid.traversal.find_resource` is called with an
     equivalent path string or tuple.
 
     .. warning:: This API is deprecated as of :app:`Pyramid` 1.0.
        Instead use the
-       :meth:`pyramid.config.Configurator.testing_models`
+       :meth:`pyramid.config.Configurator.testing_resources`
        method in your unit and integration tests.
+
+    .. note:: For ancient backward compatibility purposes, this API can also
+       be accessed as :func:`pyramid.testing.registerModels`.
     """
     registry = get_current_registry()
     config = Configurator(registry=registry)
-    result = config.testing_models(models)
+    result = config.testing_resources(resources)
     config.commit()
     return result
+
+registerModels = registerResources
 
 def registerEventListener(event_iface=None):
     """ Registers an :term:`event` listener (aka :term:`subscriber`)
@@ -412,19 +417,19 @@ class DummyTemplateRenderer(object):
                     v, k, myval))
         return True
 
-class DummyModel:
-    """ A dummy :app:`Pyramid` :term:`model` object."""
+class DummyResource:
+    """ A dummy :app:`Pyramid` :term:`resource` object."""
     def __init__(self, __name__=None, __parent__=None, __provides__=None,
                  **kw):
-        """ The model's ``__name__`` attribute will be set to the
-        value of the ``__name__`` argument, and the model's
+        """ The resource's ``__name__`` attribute will be set to the
+        value of the ``__name__`` argument, and the resource's
         ``__parent__`` attribute will be set to the value of the
         ``__parent__`` argument.  If ``__provides__`` is specified, it
         should be an interface object or tuple of interface objects
-        that will be attached to the resulting model via
+        that will be attached to the resulting resource via
         :func:`zope.interface.alsoProvides`. Any extra keywords passed
         in the ``kw`` argumnent will be set as direct attributes of
-        the model object."""
+        the resource object."""
         self.__name__ = __name__
         self.__parent__ = __parent__
         if __provides__ is not None:
@@ -436,9 +441,9 @@ class DummyModel:
     def __setitem__(self, name, val):
         """ When the ``__setitem__`` method is called, the object
         passed in as ``val`` will be decorated with a ``__parent__``
-        attribute pointing at the dummy model and a ``__name__``
+        attribute pointing at the dummy resource and a ``__name__``
         attribute that is the value of ``name``.  The value will then
-        be returned when dummy model's ``__getitem__`` is called with
+        be returned when dummy resource's ``__getitem__`` is called with
         the name ``name```."""
         val.__name__ = name
         val.__parent__ = self
@@ -479,12 +484,12 @@ class DummyModel:
         return name in self.subs
 
     def clone(self, __name__=_marker, __parent__=_marker, **kw):
-        """ Create a clone of the model object.  If ``__name__`` or
+        """ Create a clone of the resource object.  If ``__name__`` or
         ``__parent__`` arguments are passed, use these values to
         override the existing ``__name__`` or ``__parent__`` of the
-        model.  If any extra keyword args are passed in via the ``kw``
+        resource.  If any extra keyword args are passed in via the ``kw``
         argument, use these keywords to add to or override existing
-        model keywords (attributes)."""
+        resource keywords (attributes)."""
         oldkw = self.kw.copy()
         oldkw.update(kw)
         inst = self.__class__(self.__name__, self.__parent__, **oldkw)
@@ -494,6 +499,8 @@ class DummyModel:
         if __parent__ is not _marker:
             inst.__parent__ = __parent__
         return inst
+
+DummyModel = DummyResource # b/w compat (forever)
 
 class DummyRequest(object):
     """ A dummy request object (imitates a :term:`request` object).
@@ -509,6 +516,9 @@ class DummyRequest(object):
 
     Extra keyword arguments are assigned as attributes of the request
     itself.
+
+    .. note:: For backwards compatibility purposes, this class can also be
+       imported as :class:`pyramid.testing.DummyModel`.
     """
     implements(IRequest)
     method = 'GET'
@@ -571,7 +581,7 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True):
     which directly or indirectly uses:
 
     - any of the ``register*`` functions in :mod:`pyramid.testing`
-      (such as :func:`pyramid.testing.registerModels`)
+      (such as :func:`pyramid.testing.registerResources`)
 
     - any method of the :class:`pyramid.config.Configurator`
       object returned by this function.

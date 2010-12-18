@@ -304,11 +304,11 @@ model_url = resource_url # b/w compat (forever)
 
 def static_url(path, request, **kw):
     """
-    Generates a fully qualified URL for a static :term:`resource`.
-    The resource must live within a location defined via the
+    Generates a fully qualified URL for a static :term:`asset`.
+    The asset must live within a location defined via the
     :meth:`pyramid.config.Configurator.add_static_view`
     :term:`configuration declaration` or the ``<static>`` ZCML
-    directive (see :ref:`static_resources_section`).
+    directive (see :ref:`static_assets_section`).
 
     .. note:: Calling :meth:`pyramid.Request.static_url` can be used to
               achieve the same result as :func:`pyramid.url.static_url`.
@@ -322,7 +322,7 @@ def static_url(path, request, **kw):
 
     The ``path`` argument points at a file or directory on disk which
     a URL should be generated for.  The ``path`` may be either a
-    relative path (e.g. ``static/foo.css``) or a :term:`resource
+    relative path (e.g. ``static/foo.css``) or a :term:`asset
     specification` (e.g. ``mypackage:static/foo.css``).  A ``path``
     may not be an absolute filesystem path (a :exc:`ValueError` will
     be raised if this function is supplied with an absolute path).
@@ -333,7 +333,7 @@ def static_url(path, request, **kw):
     the :func:`pyramid.url.route_url` ``**kw`` argument.  See the
     documentation for that function to understand the arguments which
     you can provide to it.  However, typically, you don't need to pass
-    anything as ``*kw`` when generating a static resource URL.
+    anything as ``*kw`` when generating a static asset URL.
 
     This function raises a :exc:`ValueError` if a static view
     definition cannot be found which matches the path specification.
@@ -341,7 +341,7 @@ def static_url(path, request, **kw):
     """
     if os.path.isabs(path):
         raise ValueError('Absolute paths cannot be used to generate static '
-                         'urls (use a package-relative path or a resource '
+                         'urls (use a package-relative path or an asset '
                          'specification).')
     if not ':' in path:
         # if it's not a package:relative/name and it's not an

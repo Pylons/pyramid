@@ -117,7 +117,7 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
         self.assertEqual(result.ace, '<default deny>')
         self.assertEqual(
             result.acl,
-            '<No ACL found on any object in model lineage>')
+            '<No ACL found on any object in resource lineage>')
 
     def test_principals_allowed_by_permission_direct(self):
         from pyramid.security import Allow

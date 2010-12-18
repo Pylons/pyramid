@@ -217,7 +217,7 @@ class Request(WebobRequest):
         Is completely equivalent to calling :func:`pyramid.url.resource_url`
         like this::
 
-          from pyramid.url import model_url
+          from pyramid.url import resource_url
           resource_url(resource, request)
 
         .. note:: For backwards compatibility purposes, this method can also
@@ -228,11 +228,12 @@ class Request(WebobRequest):
     model_url = resource_url # b/w compat forever
 
     def static_url(self, path, **kw):
-        """ Generates a fully qualified URL for a static :term:`resource`.
-        The resource must live within a location defined via the
+        """
+        Generates a fully qualified URL for a static :term:`asset`.  The
+        asset must live within a location defined via the
         :meth:`pyramid.config.Configurator.add_static_view`
-        :term:`configuration declaration` or the ``<static>`` ZCML
-        directive (see :ref:`static_resources_section`).
+        :term:`configuration declaration` or the ``<static>`` ZCML directive
+        (see :ref:`static_assets_section`).
 
         This is a convenience method.  The result of calling
         :meth:`pyramid.request.Request.static_url` is the same as calling
