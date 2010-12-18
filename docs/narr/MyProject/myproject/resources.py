@@ -1,7 +1,3 @@
-class MyModel(object):
-    pass
-
-root = MyModel()
-
-def get_root(request):
-    return root
+class Root(object):
+    def __init__(self, request):
+        self.request = request
