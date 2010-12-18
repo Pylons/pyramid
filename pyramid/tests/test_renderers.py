@@ -143,11 +143,11 @@ class TestTemplateRendererFactory(unittest.TestCase):
         self.failUnless(factory.path.startswith(path))
         self.assertEqual(factory.kw, {})
 
-    def test_reload_resources_true(self):
+    def test_reload_assets_true(self):
         import pyramid.tests
         from pyramid.interfaces import ISettings
         from pyramid.interfaces import ITemplateRenderer
-        settings = {'reload_resources':True}
+        settings = {'reload_assets':True}
         testing.registerUtility(settings, ISettings)
         renderer = {}
         factory = DummyFactory(renderer)
@@ -166,10 +166,10 @@ class TestTemplateRendererFactory(unittest.TestCase):
         self.assertEqual(reg.queryUtility(ITemplateRenderer, name=spec),
                          None)
 
-    def test_reload_resources_false(self):
+    def test_reload_assets_false(self):
         import pyramid.tests
         from pyramid.interfaces import ITemplateRenderer
-        settings = {'reload_resources':False}
+        settings = {'reload_assets':False}
         renderer = {}
         factory = DummyFactory(renderer)
         spec = 'test_renderers.py'

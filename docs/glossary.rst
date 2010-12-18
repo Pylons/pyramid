@@ -38,20 +38,20 @@ Glossary
 
    pkg_resources
      A module which ships with :term:`setuptools` that provides an API
-     for addressing "resource files" within Python packages.  Resource
+     for addressing "asset files" within Python packages.  Asset
      files are static files, template files, etc; basically anything
      non-Python-source that lives in a Python package can be considered
-     a resource file.  See also `PkgResources
+     a asset file.  See also `PkgResources
      <http://peak.telecommunity.com/DevCenter/PkgResources>`_
 
-   resource
+   asset
      Any file contained within a Python :term:`package` which is *not*
      a Python source code file.
 
-   resource specification
-     A colon-delimited identifier for a :term:`resource`.  The colon
+   asset specification
+     A colon-delimited identifier for an :term:`asset`.  The colon
      separates a Python :term:`package` name from a package subpath.
-     For example, the resource specification
+     For example, the asset specification
      ``my.package:static/baz.css`` identifies the file named
      ``baz.css`` in the ``static`` subdirectory of the ``my.package``
      Python :term:`package`.
@@ -120,10 +120,10 @@ Glossary
      string (which implies the :term:`default view`).
 
    Default view
-     The default view of a model is the view invoked when the
-     :term:`view name` is the empty string (``''``).  This is the case
-     when :term:`traversal` exhausts the path elements in the PATH_INFO
-     of a request before it returns a :term:`context`.
+     The default view of a :term:`resource` is the view invoked when the
+     :term:`view name` is the empty string (``''``).  This is the case when
+     :term:`traversal` exhausts the path elements in the PATH_INFO of a
+     request before it returns a :term:`context`.
 
    virtualenv
      An isolated Python environment.  Allows you to control which
@@ -131,25 +131,33 @@ Glossary
      Python.  `virtualenv <http://pypi.python.org/pypi/virtualenv>`_
      was created by Ian Bicking.
 
-   model
-     An object representing data in the system.  If :mod:`traversal` is
-     used, a model is a node in the object graph traversed by the
-     system.  When traversal is used, a model instance becomes the
-     :term:`context` of a :term:`view`.  If :mod:`url dispatch` is
-     used, a single :term:`context` is generated for each request and
-     is used as the context of a view: this object is also technically
-     a "model" in :app:`Pyramid` terms, although this terminology
-     can be a bit confusing: see :ref:`model_traversal_confusion`.
+   resource
+     An object representing a node in the :term:`resource tree` of an
+     application.  If :mod:`traversal` is used, a resource is an element in
+     the resource tree traversed by the system.  When traversal is used, a
+     resource becomes the :term:`context` of a :term:`view`.  If :mod:`url
+     dispatch` is used, a single resource is generated for each request and
+     is used as the context of a view.
+
+   resource tree
+     A nested set of dictionary-like objects, each of which is a
+     :term:`resource`.  The act of :term:`traversal` uses the resource tree
+     to find a :term:`context`.
+
+   domain model
+     Persistent data related to your application.  For example, data stored
+     in a relational database.  In some applications, the :term:`resource
+     tree` acts as the domain model.
 
    traversal
-     The act of descending "down" a graph of model objects from a root
-     model in order to find a :term:`context`.  The :app:`Pyramid`
-     :term:`router` performs traversal of model objects when a
-     :term:`root factory` is specified.  See the
-     :ref:`traversal_chapter` chapter for more information.  Traversal
-     can be performed *instead* of :term:`URL dispatch` or can be
-     combined *with* URL dispatch.  See :ref:`hybrid_chapter` for more
-     information about combining traversal and URL dispatch (advanced).
+     The act of descending "up" a tree of resource objects from a root
+     resource in order to find a :term:`context`.  The :app:`Pyramid`
+     :term:`router` performs traversal of resource objects when a :term:`root
+     factory` is specified.  See the :ref:`traversal_chapter` chapter for
+     more information.  Traversal can be performed *instead* of :term:`URL
+     dispatch` or can be combined *with* URL dispatch.  See
+     :ref:`hybrid_chapter` for more information about combining traversal and
+     URL dispatch (advanced).
 
    router
      The :term:`WSGI` application created when you start a
@@ -159,7 +167,7 @@ Glossary
      :app:`Pyramid` application.
 
    URL dispatch
-     An alternative to graph traversal as a mechanism for locating a
+     An alternative to :term:`traversal` as a mechanism for locating a
      :term:`context` for a :term:`view`.  When you use a :term:`route`
      in your :app:`Pyramid` application via a :term:`route
      configuration`, you are using URL dispatch. See the
@@ -167,19 +175,19 @@ Glossary
 
    context
      An object in the system that is found during :term:`traversal` or
-     :term:`URL dispatch` based on URL data; if it's found via
-     traversal, it's usually a :term:`model` object that is part of an
-     object graph; if it's found via :term:`URL dispatch`, it's a
-     object manufactured on behalf of the route's "factory".  A context
-     becomes the subject of a :term:`view`, and typically has security
-     information attached to it.  See the :ref:`traversal_chapter`
-     chapter and the :ref:`urldispatch_chapter` chapter for more
-     information about how a URL is resolved to a context.
+     :term:`URL dispatch` based on URL data; if it's found via traversal,
+     it's usually a :term:`resource` object that is part of a resource tree;
+     if it's found via :term:`URL dispatch`, it's a object manufactured on
+     behalf of the route's "factory".  A context becomes the subject of a
+     :term:`view`, and typically has security information attached to it.
+     See the :ref:`traversal_chapter` chapter and the
+     :ref:`urldispatch_chapter` chapter for more information about how a URL
+     is resolved to a context.
 
    application registry
      A registry of configuration information consulted by
      :app:`Pyramid` while servicing an application.  An application
-     registry maps model types to views, as well as housing other
+     registry maps resource types to views, as well as housing other
      application-specific component registrations.  Every
      :app:`Pyramid` application has one (and only one) application
      registry.
@@ -189,20 +197,20 @@ Glossary
      text, XML, or HTML when rendered.
 
    location
-     The path to an object in an object graph.  See :ref:`location_aware`
-     for more information about how to make a model object *location-aware*.
+     The path to an object in a :term:`resource tree`.  See
+     :ref:`location_aware` for more information about how to make a resource
+     object *location-aware*.
 
    permission
-     A string or unicode object that represents an action being taken
-     against a context.  A permission is associated with a view name
-     and a model type by the developer.  Models are decorated with
-     security declarations (e.g. an :term:`ACL`), which reference these
-     tokens also.  Permissions are used by the active to security
-     policy to match the view permission against the model's statements
-     about which permissions are granted to which principal in a
-     context in order to to answer the question "is this user allowed
-     to do this".  Examples of permissions: ``read``, or
-     ``view_blog_entries``.
+     A string or unicode object that represents an action being taken against
+     a context.  A permission is associated with a view name and a resource
+     type by the developer.  Resources are decorated with security
+     declarations (e.g. an :term:`ACL`), which reference these tokens also.
+     Permissions are used by the active to security policy to match the view
+     permission against the resources's statements about which permissions
+     are granted to which principal in a context in order to to answer the
+     question "is this user allowed to do this".  Examples of permissions:
+     ``read``, or ``view_blog_entries``.
 
    default permission
      A :term:`permission` which is registered as the default for an
@@ -225,9 +233,9 @@ Glossary
 
    ACL
      An *access control list*.  An ACL is a sequence of :term:`ACE`
-     tuples.  An ACL is attached to a model instance.  An example of an
+     tuples.  An ACL is attached to a resource instance.  An example of an
      ACL is ``[ (Allow, 'bob', 'read'), (Deny, 'fred', 'write')]``.  If
-     an ACL is attached to a model instance, and that model instance is
+     an ACL is attached to a resource instance, and that resource is
      findable via the context, it will be consulted any active security
      policy to determine wither a particular request can be fulfilled
      given the :term:`authentication` information in the request.
@@ -416,7 +424,7 @@ Glossary
    interface
      A `Zope interface <http://pypi.python.org/pypi/zope.interface>`_
      object.  In :app:`Pyramid`, an interface may be attached to a
-     :term:`model` object or a :term:`request` object in order to
+     :term:`resource` object or a :term:`request` object in order to
      identify that the object is "of a type".  Interfaces are used
      internally by :app:`Pyramid` to perform view lookups and other
      policy lookups.  The ability to make use of an interface is
@@ -476,7 +484,7 @@ Glossary
      :app:`Pyramid` to form a workflow system.
 
    virtual root
-     A model object representing the "virtual" root of a request; this
+     A resource object representing the "virtual" root of a request; this
      is typically the physical root object (the object returned by the
      application root factory) unless :ref:`vhosting_chapter` is in
      use.

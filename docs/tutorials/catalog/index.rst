@@ -88,11 +88,11 @@ want the application to be based on :term:`traversal`.
        Python 2.5.4 (r254:67916, Sep  4 2009, 02:12:16) 
        [GCC 4.2.1 (Apple Inc. build 5646)] on darwin
        Type "help" for more information. "root" is the Pyramid app root object.
-       >>> from pyramid.traversal import model_path
+       >>> from pyramid.traversal import resource_path
        >>> from myapp.models import Document
        >>> root['name'] = Document('title')
        >>> doc = root['name']
-       >>> docid = root.catalog.document_map.add(model_path(doc))
+       >>> docid = root.catalog.document_map.add(resource_path(doc))
        >>> root.catalog.index_doc(docid, doc)
        >>> import transaction
        >>> transaction.commit()

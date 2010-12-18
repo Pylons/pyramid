@@ -95,20 +95,20 @@ don't deal very well with URLs that represent arbitrary-depth
 hierarchies.
 
 But :term:`traversal` *does* work well for URLs that represent
-arbitrary-depth hierarchies.  Since the path segments that compose a
-URL are addressed separately, it becomes very easy to form URLs that
-represent arbitrary depth hierarchies in a system that uses traversal.
-When you're willing to treat your application models as a graph that
-can be traversed, it also becomes easy to provide "instance-level
-security": you just attach a security declaration to each instance in
-the graph.  This is not nearly as easy to do when using URL dispatch.
+arbitrary-depth hierarchies.  Since the path segments that compose a URL are
+addressed separately, it becomes very easy to form URLs that represent
+arbitrary depth hierarchies in a system that uses traversal.  When you're
+willing to treat your application resources as a tree that can be traversed,
+it also becomes easy to provide "instance-level security": you just attach a
+security declaration to each instance in the tree.  This is not nearly as
+easy to do when using URL dispatch.
 
 In essence, the choice to use traversal vs. URL dispatch is largely
 religious.  Traversal dispatch probably just doesn't make any sense
 when you possess completely "square" data stored in a relational
 database because it requires the construction and maintenance of a
-graph and requires that the developer think about mapping URLs to code
-in terms of traversing that graph.  However, when you have a
+tree and requires that the developer think about mapping URLs to code
+in terms of traversing that tree.  However, when you have a
 hierarchical data store, using traversal can provide significant
 advantages over using URL-based dispatch.
 

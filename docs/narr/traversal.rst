@@ -3,14 +3,14 @@
 Traversal
 =========
 
-:term:`Traversal` is a :term:`context finding` mechanism. It is the
-act of finding a :term:`context` and a :term:`view name` by walking
-over an *object graph*, starting from a :term:`root` object, using a
+:term:`Traversal` is a :term:`context finding` mechanism. It is the act of
+finding a :term:`context` and a :term:`view name` by walking over a
+:term:`resource tree`, starting from a :term:`root` resource, using a
 :term:`request` object as a source of path information.
 
-In this chapter, we'll provide a high-level overview of traversal,
-we'll explain the concept of an *object graph*, and we'll show how
-traversal might be used within an application.
+In this chapter, we'll provide a high-level overview of traversal, we'll
+explain the concept of a resource tree, and we'll show how traversal might be
+used within an application.
 
 .. index::
    single: traversal analogy
@@ -55,16 +55,16 @@ can run the ``cat`` command:
 
 The contents of ``myfile`` are now printed on the user's behalf.
 
-:app:`Pyramid` is very much like this inexperienced UNIX user as it
-uses :term:`traversal` against an object graph.  In this analogy, we
-can map the ``cat`` program to the :app:`Pyramid` concept of a
-:term:`view callable`: it is a program that can be run against some
-:term:`context` as the result of :term:`view lookup`.  The file being
-operated on in this analogy is the :term:`context` object; the context
-is the "last node found" in a traversal.  The directory structure is
-the object graph being traversed.  The act of progressively changing
-directories to find the file as well as the handling of a ``cd`` error
-as a stop condition is analogous to :term:`traversal`.
+:app:`Pyramid` is very much like this inexperienced UNIX user as it uses
+:term:`traversal` against a resource tree.  In this analogy, we can map the
+``cat`` program to the :app:`Pyramid` concept of a :term:`view callable`: it
+is a program that can be run against some :term:`context` as the result of
+:term:`view lookup`.  The file being operated on in this analogy is the
+:term:`context` object; the context is the "last resource found" in a
+traversal.  The directory structure is the resource tree being traversed.
+The act of progressively changing directories to find the file as well as the
+handling of a ``cd`` error as a stop condition is analogous to
+:term:`traversal`.
 
 The analogy we've used is not *exactly* correct, because, while the
 naive user already knows which command he wants to invoke before he
@@ -94,9 +94,9 @@ Traversal treats the ``PATH_INFO`` segment of a URL as a sequence of
 path segments.  For example, the ``PATH_INFO`` string ``/a/b/c`` is
 converted to the sequence ``['a', 'b', 'c']``.
 
-After the path info is converted, a lookup is performed against the
-object graph for each path segment.  Each lookup uses the
-``__getitem__`` method of an object in the graph.
+After the path info is converted, a lookup is performed against the resource
+tree for each path segment.  Each lookup uses the ``__getitem__`` method of
+an object in the tree.
 
 For example, if the path info sequence is ``['a', 'b', 'c']``:
 
@@ -121,13 +121,13 @@ This process continues until the path segment sequence is exhausted or
 a lookup for a path element fails.  In either case, a :term:`context`
 is found.
 
-Traversal "stops" when it either reaches a leaf level model instance
-in your object graph or when the path segments implied by the URL "run
-out".  The object that traversal "stops on" becomes the
-:term:`context`.  If at any point during traversal any node in the
-graph doesn't have a ``__getitem__`` method, or if the ``__getitem__``
-method of a node raises a :exc:`KeyError`, traversal ends immediately,
-and that node becomes the :term:`context`.
+Traversal "stops" when it either reaches a leaf level resource in your
+resource tree or when the path segments implied by the URL "run out".  The
+object that traversal "stops on" becomes the :term:`context`.  If at any
+point during traversal any resource in the tree doesn't have a
+``__getitem__`` method, or if the ``__getitem__`` method of a resource raises
+a :exc:`KeyError`, traversal ends immediately, and that resource becomes the
+:term:`context`.
 
 The results of a :term:`traversal` also include a :term:`view name`.
 The :term:`view name` is the *first* URL path segment in the set of
@@ -142,18 +142,18 @@ request.  How :app:`Pyramid` performs view lookup is explained
 within the :ref:`views_chapter` chapter.
 
 .. index::
-   single: object graph
-   single: traversal graph
-   single: model graph
+   single: object tree
+   single: traversal tree
+   single: resource tree
 
-.. _the_object_graph:
+.. _the_resource_tree:
 
-The Object Graph
-----------------
+The Resource Tree
+-----------------
 
-When your application uses :term:`traversal` to resolve URLs to code,
-your application must supply an *object graph* to :app:`Pyramid`.
-This graph is represented by a :term:`root` object.
+When your application uses :term:`traversal` to resolve URLs to code, your
+application must supply the a resource tree to :app:`Pyramid`.  This tree is
+represented by a :term:`root` object.
 
 In order to supply a root object for an application, at system startup
 time, the :app:`Pyramid` :term:`Router` is configured with a
@@ -188,19 +188,18 @@ alternately be passed to the ``Configurator`` as a :term:`dotted
 Python name` which refers to a root factory object defined in a
 different module.
 
-A root factory is passed a :term:`request` object and it is expected
-to return an object which represents the root of the object graph.
-All :term:`traversal` will begin at this root object.  Usually a root
-factory for a traversal-based application will be more complicated
-than the above ``Root`` object; in particular it may be associated
-with a database connection or another persistence mechanism.  A root
-object is often an instance of a class which has a ``__getitem__``
-method.
+A root factory is passed a :term:`request` object and it is expected to
+return an object which represents the root of the resource tree.  All
+:term:`traversal` will begin at this root object.  Usually a root factory for
+a traversal-based application will be more complicated than the above
+``Root`` object; in particular it may be associated with a database
+connection or another persistence mechanism.  A root object is often an
+instance of a class which has a ``__getitem__`` method.
 
 If no :term:`root factory` is passed to the :app:`Pyramid`
 :term:`Configurator` constructor, or the ``root_factory`` is specified
 as the value ``None``, a *default* root factory is used.  The default
-root factory always returns an object that has no child nodes.
+root factory always returns an object that has no child resources.
 
 .. sidebar:: Emulating the Default Root Factory
 
@@ -218,47 +217,48 @@ root factory always returns an object that has no child nodes.
       config = Configurator(root_factory=Root)
 
    The default root factory is just a really stupid object that has no
-   behavior or state.  Using :term:`traversal` against an application
-   that uses the object graph supplied by the default root object is
-   not very interesting, because the default root object has no
-   children.  Its availability is more useful when you're developing
-   an application using :term:`URL dispatch`.
+   behavior or state.  Using :term:`traversal` against an application that
+   uses the resource tree supplied by the default root object is not very
+   interesting, because the default root object has no children.  Its
+   availability is more useful when you're developing an application using
+   :term:`URL dispatch`.
 
-Items contained within the object graph are sometimes analogous to the
-concept of :term:`model` objects used by many other frameworks (and
-:app:`Pyramid` APIs often refers to them as "models", as well).
-They are typically instances of Python classes.
+.. note::
 
-The object graph consists of *container* nodes and *leaf* nodes.
-There is only one difference between a *container* node and a *leaf*
-node: *container* nodes possess a ``__getitem__`` method while *leaf*
-nodes do not.  The ``__getitem__`` method was chosen as the signifying
-difference between the two types of nodes because the presence of this
+   If the items contained within the resource tree are "persistent" (they
+   have state that lasts longer than the execution of a single process), they
+   become analogous to the concept of :term:`domain model` objects used by
+   many other frameworks.
+
+The resource tree consists of *container* resources and *leaf* resources.
+There is only one difference between a *container* resource and a *leaf*
+resource: *container* resources possess a ``__getitem__`` method while *leaf*
+resources do not.  The ``__getitem__`` method was chosen as the signifying
+difference between the two types of resources because the presence of this
 method is how Python itself typically determines whether an object is
 "containerish" or not.
 
-Each container node is presumed to be willing to return a child node
+Each container resource is presumed to be willing to return a child resource
 or raise a ``KeyError`` based on a name passed to its ``__getitem__``.
 
 Leaf-level instances must not have a ``__getitem__``.  If
 instances that you'd like to be leaves already happen to have a
 ``__getitem__`` through some historical inequity, you should subclass
-these node types and cause their ``__getitem__`` methods to simply
+these resource types and cause their ``__getitem__`` methods to simply
 raise a ``KeyError``.  Or just disuse them and think up another
 strategy.
 
-Usually, the traversal root is a *container* node, and as such it
-contains other nodes.  However, it doesn't *need* to be a container.
-Your object graph can be as shallow or as deep as you require.
+Usually, the traversal root is a *container* resource, and as such it
+contains other resources.  However, it doesn't *need* to be a container.
+Your resource tree can be as shallow or as deep as you require.
 
-In general, the object graph is traversed beginning at its root object
-using a sequence of path elements described by the ``PATH_INFO`` of
-the current request; if there are path segments, the root object's
-``__getitem__`` is called with the next path segment, and it is
-expected to return another graph object.  The resulting object's
-``__getitem__`` is called with the very next path segment, and it is
-expected to return another graph object.  This happens *ad infinitum*
-until all path segments are exhausted.
+In general, the resource tree is traversed beginning at its root object using
+a sequence of path elements described by the ``PATH_INFO`` of the current
+request; if there are path segments, the root object's ``__getitem__`` is
+called with the next path segment, and it is expected to return another
+resource object.  The resulting object's ``__getitem__`` is called with the
+very next path segment, and it is expected to return another resource object.
+This happens *ad infinitum* until all path segments are exhausted.
 
 .. index::
    single: traversal algorithm
@@ -273,7 +273,7 @@ This section will attempt to explain the :app:`Pyramid` traversal
 algorithm.  We'll provide a description of the algorithm, a diagram of
 how the algorithm works, and some example traversal scenarios that
 might help you understand how the algorithm operates against a
-specific object graph.
+specific resource tree.
 
 We'll also talk a bit about :term:`view lookup`.  The
 :ref:`views_chapter` chapter discusses :term:`view lookup` in detail,
@@ -314,17 +314,15 @@ and a :term:`view name`.
     stripped off ``PATH_INFO``, and the remaining path segments are
     split on the slash character to form a traversal sequence.
 
-    The traversal algorithm by default attempts to first URL-unquote
-    and then Unicode-decode each path segment derived from
-    ``PATH_INFO`` from its natural byte string (``str`` type)
-    representation.  URL unquoting is performed using the Python
-    standard library ``urllib.unquote`` function.  Conversion from a
-    URL-decoded string into Unicode is attempted using the UTF-8
-    encoding.  If any URL-unquoted path segment in ``PATH_INFO`` is
-    not decodeable using the UTF-8 decoding, a :exc:`TypeError` is
-    raised.  A segment will be fully URL-unquoted and UTF8-decoded
-    before it is passed it to the ``__getitem__`` of any model object
-    during traversal.
+    The traversal algorithm by default attempts to first URL-unquote and then
+    Unicode-decode each path segment derived from ``PATH_INFO`` from its
+    natural byte string (``str`` type) representation.  URL unquoting is
+    performed using the Python standard library ``urllib.unquote`` function.
+    Conversion from a URL-decoded string into Unicode is attempted using the
+    UTF-8 encoding.  If any URL-unquoted path segment in ``PATH_INFO`` is not
+    decodeable using the UTF-8 decoding, a :exc:`TypeError` is raised.  A
+    segment will be fully URL-unquoted and UTF8-decoded before it is passed
+    it to the ``__getitem__`` of any resource during traversal.
 
     Thus, a request with a ``PATH_INFO`` variable of ``/a/b/c`` maps
     to the traversal sequence ``[u'a', u'b', u'c']``.
@@ -340,12 +338,11 @@ and a :term:`view name`.
     for the name ``c``, and may return "object ``c``".
 
 #.  Traversal ends when a) the entire path is exhausted or b) when any
-    graph element raises a :exc:`KeyError` from its ``__getitem__`` or
-    c) when any non-final path element traversal does not have a
-    ``__getitem__`` method (resulting in a :exc:`NameError`) or d)
-    when any path element is prefixed with the set of characters
-    ``@@`` (indicating that the characters following the ``@@`` token
-    should be treated as a :term:`view name`).
+    resouce raises a :exc:`KeyError` from its ``__getitem__`` or c) when any
+    non-final path element traversal does not have a ``__getitem__`` method
+    (resulting in a :exc:`NameError`) or d) when any path element is prefixed
+    with the set of characters ``@@`` (indicating that the characters
+    following the ``@@`` token should be treated as a :term:`view name`).
 
 #.  When traversal ends for any of the reasons in the previous step,
     the last object found during traversal is deemed to be the
@@ -375,19 +372,18 @@ The traversal algorithm exposes two special cases:
   The default view is a view that is registered with no name or a view
   which is registered with a name that equals the empty string.
 
-- If any path segment element begins with the special characters
-  ``@@`` (think of them as goggles), the value of that segment minus
-  the goggle characters is considered the :term:`view name`
-  immediately and traversal stops there.  This allows you to address
-  views that may have the same names as model instance names in the
-  graph unambiguously.
+- If any path segment element begins with the special characters ``@@``
+  (think of them as goggles), the value of that segment minus the goggle
+  characters is considered the :term:`view name` immediately and traversal
+  stops there.  This allows you to address views that may have the same names
+  as resource names in the tree unambiguously.
 
 Finally, traversal is responsible for locating a :term:`virtual root`.
 A virtual root is used during "virtual hosting"; see the
 :ref:`vhosting_chapter` chapter for information.  We won't speak more
 about it in this chapter.
 
-.. image:: modelgraphtraverser.png
+.. image:: resourcetreetraverser.png
 
 .. index::
    single: traversal examples
@@ -397,13 +393,13 @@ Traversal Algorithm Examples
 
 No one can be expected to understand the traversal algorithm by
 analogy and description alone, so let's examine some traversal
-scenarios that use concrete URLs and object graph compositions.
+scenarios that use concrete URLs and resource tree compositions.
 
 Let's pretend the user asks for
 ``http://example.com/foo/bar/baz/biz/buz.txt``. The request's
 ``PATH_INFO`` in that case is ``/foo/bar/baz/biz/buz.txt``.  Let's
 further pretend that when this request comes in that we're traversing
-the following object graph:
+the following resource tree:
 
 .. code-block:: text
 
@@ -450,7 +446,7 @@ Let's say that view lookup finds no matching view type.  In this
 circumstance, the :app:`Pyramid` :term:`router` returns the result
 of the :term:`not found view` and the request ends.
 
-However, for this graph:
+However, for this tree:
 
 .. code-block:: text
 
@@ -537,6 +533,6 @@ The :mod:`pyramid.traversal` module contains API functions that
 deal with traversal, such as traversal invocation from within
 application code.
 
-The :func:`pyramid.url.model_url` function generates a URL when
-given an object retrieved from an object graph.
+The :func:`pyramid.url.resource_url` function generates a URL when
+given an object retrieved from an resource tree.
 

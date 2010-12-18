@@ -56,7 +56,7 @@ def get_renderer(path):
     """ Return a callable object which can be used to render a
     :term:`Chameleon` ZPT template using the template implied by the
     ``path`` argument.  The ``path`` argument may be a
-    package-relative path, an absolute path, or a :term:`resource
+    package-relative path, an absolute path, or a :term:`asset
     specification`.
     
     .. warning:: This API is deprecated in :app:`Pyramid` 1.0.  Use
@@ -75,7 +75,7 @@ def get_template(path):
     """ Return the underyling object representing a :term:`Chameleon`
     ZPT template using the template implied by the ``path`` argument.
     The ``path`` argument may be a package-relative path, an absolute
-    path, or a :term:`resource specification`.
+    path, or a :term:`asset specification`.
 
     .. warning:: This API is deprecated in :app:`Pyramid` 1.0.  Use
        the ``implementation()`` method of a template renderer retrieved via
@@ -94,7 +94,7 @@ deprecated(
 def render_template(path, **kw):
     """ Render a :term:`Chameleon` ZPT template using the template
     implied by the ``path`` argument.  The ``path`` argument may be a
-    package-relative path, an absolute path, or a :term:`resource
+    package-relative path, an absolute path, or a :term:`asset
     specification`.  The arguments in ``*kw`` are passed as top-level
     names to the template, and so may be used within the template
     itself.  Returns a string.
@@ -115,7 +115,7 @@ deprecated(
 def render_template_to_response(path, **kw):
     """ Render a :term:`Chameleon` ZPT template using the template
     implied by the ``path`` argument.  The ``path`` argument may be a
-    package-relative path, an absolute path, or a :term:`resource
+    package-relative path, an absolute path, or a :term:`asset
     specification`.  The arguments in ``*kw`` are passed as top-level
     names to the template, and so may be used within the template
     itself.  Returns a :term:`Response` object with the body as the

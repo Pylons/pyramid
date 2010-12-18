@@ -33,13 +33,13 @@ class Test_registerDummySecurityPolicy(TestBase):
         self.assertEqual(ut.groupids, ('group1', 'group2'))
         self.assertEqual(ut.permissive, False)
 
-class Test_registerModels(TestBase):
-    def test_registerModels(self):
+class Test_registerResources(TestBase):
+    def test_it(self):
         ob1 = object()
         ob2 = object()
-        models = {'/ob1':ob1, '/ob2':ob2}
+        resources = {'/ob1':ob1, '/ob2':ob2}
         from pyramid import testing
-        testing.registerModels(models)
+        testing.registerResources(resources)
         from pyramid.interfaces import ITraverser
         adapter = self.registry.getAdapter(None, ITraverser)
         result = adapter({'PATH_INFO':'/ob1'})
@@ -57,8 +57,8 @@ class Test_registerModels(TestBase):
         self.assertEqual(result['virtual_root'], ob2)
         self.assertEqual(result['virtual_root_path'], ())
         self.assertRaises(KeyError, adapter, {'PATH_INFO':'/ob3'})
-        from pyramid.traversal import find_model
-        self.assertEqual(find_model(None, '/ob1'), ob1)
+        from pyramid.traversal import find_resource
+        self.assertEqual(find_resource(None, '/ob1'), ob1)
 
 class Test_registerTemplateRenderer(TestBase):
     def test_registerTemplateRenderer(self):
@@ -331,10 +331,10 @@ class TestDummySecurityPolicy(unittest.TestCase):
         
         
 
-class TestDummyModel(unittest.TestCase):
+class TestDummyResource(unittest.TestCase):
     def _getTargetClass(self):
-        from pyramid.testing import DummyModel
-        return DummyModel
+        from pyramid.testing import DummyResource
+        return DummyResource
 
     def _makeOne(self, name=None, parent=None, **kw):
         klass = self._getTargetClass()
@@ -344,26 +344,26 @@ class TestDummyModel(unittest.TestCase):
         class Dummy:
             pass
         dummy = Dummy()
-        model = self._makeOne()
-        model['abc'] = dummy
+        resource = self._makeOne()
+        resource['abc'] = dummy
         self.assertEqual(dummy.__name__, 'abc')
-        self.assertEqual(dummy.__parent__, model)
-        self.assertEqual(model['abc'], dummy)
-        self.assertEqual(model.get('abc'), dummy)
-        self.assertRaises(KeyError, model.__getitem__, 'none')
-        self.failUnless('abc' in model)
-        del model['abc']
-        self.failIf('abc' in model)
-        self.assertEqual(model.get('abc', 'foo'), 'foo')
-        self.assertEqual(model.get('abc'), None)
+        self.assertEqual(dummy.__parent__, resource)
+        self.assertEqual(resource['abc'], dummy)
+        self.assertEqual(resource.get('abc'), dummy)
+        self.assertRaises(KeyError, resource.__getitem__, 'none')
+        self.failUnless('abc' in resource)
+        del resource['abc']
+        self.failIf('abc' in resource)
+        self.assertEqual(resource.get('abc', 'foo'), 'foo')
+        self.assertEqual(resource.get('abc'), None)
 
     def test_extra_params(self):
-        model = self._makeOne(foo=1)
-        self.assertEqual(model.foo, 1)
+        resource = self._makeOne(foo=1)
+        self.assertEqual(resource.foo, 1)
         
     def test_clone(self):
-        model = self._makeOne('name', 'parent', foo=1, bar=2)
-        clone = model.clone('name2', 'parent2', bar=1)
+        resource = self._makeOne('name', 'parent', foo=1, bar=2)
+        clone = resource.clone('name2', 'parent2', bar=1)
         self.assertEqual(clone.bar, 1)
         self.assertEqual(clone.__name__, 'name2')
         self.assertEqual(clone.__parent__, 'parent2')
@@ -372,21 +372,21 @@ class TestDummyModel(unittest.TestCase):
     def test_keys_items_values_len(self):
         class Dummy:
             pass
-        model = self._makeOne()
-        model['abc'] = Dummy()
-        model['def'] = Dummy()
-        self.assertEqual(model.values(), model.subs.values())
-        self.assertEqual(model.items(), model.subs.items())
-        self.assertEqual(model.keys(), model.subs.keys())
-        self.assertEqual(len(model), 2)
+        resource = self._makeOne()
+        resource['abc'] = Dummy()
+        resource['def'] = Dummy()
+        self.assertEqual(resource.values(), resource.subs.values())
+        self.assertEqual(resource.items(), resource.subs.items())
+        self.assertEqual(resource.keys(), resource.subs.keys())
+        self.assertEqual(len(resource), 2)
 
     def test_nonzero(self):
-        model = self._makeOne()
-        self.assertEqual(model.__nonzero__(), True)
+        resource = self._makeOne()
+        self.assertEqual(resource.__nonzero__(), True)
 
     def test_ctor_with__provides__(self):
-        model = self._makeOne(__provides__=IDummy)
-        self.failUnless(IDummy.providedBy(model))
+        resource = self._makeOne(__provides__=IDummy)
+        self.failUnless(IDummy.providedBy(resource))
 
 class TestDummyRequest(unittest.TestCase):
     def _getTargetClass(self):

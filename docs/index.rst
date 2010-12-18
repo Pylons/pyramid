@@ -48,7 +48,7 @@ Narrative documentation in chapter form explaining how to use
    narr/webob
    narr/sessions
    narr/templates
-   narr/models
+   narr/resources
    narr/security
    narr/i18n
    narr/vhosting
@@ -58,7 +58,7 @@ Narrative documentation in chapter form explaining how to use
    narr/hooks
    narr/declarative
    narr/extending
-   narr/resources
+   narr/assets
    narr/router
    narr/threadlocals
    narr/zca

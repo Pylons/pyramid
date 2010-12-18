@@ -65,7 +65,7 @@ class ACLAuthorizationPolicy(object):
         permits access, return an instance of
         :class:`pyramid.security.ACLDenied` if not."""
 
-        acl = '<No ACL found on any object in model lineage>'
+        acl = '<No ACL found on any object in resource lineage>'
         
         for location in lineage(context):
             try:

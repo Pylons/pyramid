@@ -43,7 +43,7 @@ class AppmakerTests(unittest.TestCase):
 class ViewWikiTests(unittest.TestCase):
     def test_it(self):
         from tutorial.views import view_wiki
-        context = testing.DummyModel()
+        context = testing.DummyResource()
         request = testing.DummyRequest()
         response = view_wiki(context, request)
         self.assertEqual(response.location, 'http://example.com/FrontPage')
@@ -54,9 +54,9 @@ class ViewPageTests(unittest.TestCase):
         return view_page(context, request)
 
     def test_it(self):
-        wiki = testing.DummyModel()
-        wiki['IDoExist'] = testing.DummyModel()
-        context = testing.DummyModel(data='Hello CruelWorld IDoExist')
+        wiki = testing.DummyResource()
+        wiki['IDoExist'] = testing.DummyResource()
+        context = testing.DummyResource(data='Hello CruelWorld IDoExist')
         context.__parent__ = wiki
         context.__name__ = 'thepage'
         request = testing.DummyRequest()
@@ -80,18 +80,18 @@ class AddPageTests(unittest.TestCase):
         return add_page(context, request)
 
     def test_it_notsubmitted(self):
-        from pyramid.url import model_url
-        context = testing.DummyModel()
+        from pyramid.url import resource_url
+        context = testing.DummyResource()
         request = testing.DummyRequest()
         request.subpath = ['AnotherPage']
         info = self._callFUT(context, request)
         self.assertEqual(info['page'].data,'')
         self.assertEqual(
             info['save_url'],
-            model_url(context, request, 'add_page', 'AnotherPage'))
+            resource_url(context, request, 'add_page', 'AnotherPage'))
         
     def test_it_submitted(self):
-        context = testing.DummyModel()
+        context = testing.DummyResource()
         request = testing.DummyRequest({'form.submitted':True,
                                         'body':'Hello yo!'})
         request.subpath = ['AnotherPage']
@@ -107,16 +107,16 @@ class EditPageTests(unittest.TestCase):
         return edit_page(context, request)
 
     def test_it_notsubmitted(self):
-        from pyramid.url import model_url
-        context = testing.DummyModel()
+        from pyramid.url import resource_url
+        context = testing.DummyResource()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         self.assertEqual(info['page'], context)
         self.assertEqual(info['save_url'],
-                         model_url(context, request, 'edit_page'))
+                         resource_url(context, request, 'edit_page'))
         
     def test_it_submitted(self):
-        context = testing.DummyModel()
+        context = testing.DummyResource()
         request = testing.DummyRequest({'form.submitted':True,
                                         'body':'Hello yo!'})
         response = self._callFUT(context, request)

@@ -147,9 +147,9 @@ class view_config(object):
 
     For example, this code in a module ``views.py``::
 
-      from models import MyModel
+      from resources import MyResource
 
-      @view_config(name='my_view', context=MyModel, permission='read',
+      @view_config(name='my_view', context=MyResource, permission='read',
                    route_name='site1')
       def my_view(context, request):
           return 'OK'
@@ -158,14 +158,14 @@ class view_config(object):
     :meth:`pyramid.config.Configurator.add_view` method::
 
        import views
-       import models
-       config.add_view(views.my_view, context=models.MyModel, name='my_view',
+       from resources import MyResource
+       config.add_view(views.my_view, context=MyResource, name='my_view',
                        permission='read', 'route_name='site1')
 
     Or might replace the following ZCML ``view`` declaration::
 
       <view
-       for='.models.MyModel'
+       for='.resources.MyResource'
        view='.views.my_view'
        name='my_view'
        permission='read'

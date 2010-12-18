@@ -88,11 +88,10 @@ callable:
    it is false.
 
 .. warning:: When a NotFound view callable accepts an argument list as
-   described in :ref:`request_and_context_view_definitions`, the
-   ``context`` passed as the first argument to the view callable will
-   be the :exc:`pyramid.exceptions.NotFound` exception instance.
-   If available, the *model* context will still be available as
-   ``request.context``.
+   described in :ref:`request_and_context_view_definitions`, the ``context``
+   passed as the first argument to the view callable will be the
+   :exc:`pyramid.exceptions.NotFound` exception instance.  If available, the
+   resource context will still be available as ``request.context``.
 
 .. index::
    single: forbidden view
@@ -221,14 +220,14 @@ a class that implements the following interface:
            """ Return a dictionary with (at least) the keys ``root``,
            ``context``, ``view_name``, ``subpath``, ``traversed``,
            ``virtual_root``, and ``virtual_root_path``.  These values are
-           typically the result of an object graph traversal.  ``root``
-           is the physical root object, ``context`` will be a model
+           typically the result of a resource tree traversal.  ``root``
+           is the physical root object, ``context`` will be a resource
            object, ``view_name`` will be the view name used (a Unicode
            name), ``subpath`` will be a sequence of Unicode names that
            followed the view name but were not traversed, ``traversed``
            will be a sequence of Unicode names that were traversed
            (including the virtual root path, if any) ``virtual_root``
-           will be a model object representing the virtual root (or the
+           will be a resource object representing the virtual root (or the
            physical root if traversal was not performed), and
            ``virtual_root_path`` will be a sequence representing the
            virtual root path (a sequence of Unicode names) or None if
@@ -255,30 +254,29 @@ traverser would be used.  For example:
     <adapter
       factory="myapp.traversal.Traverser"
       provides="pyramid.interfaces.ITraverser"
-      for="myapp.models.MyRoot"
+      for="myapp.resources.MyRoot"
      />
 
 If the above stanza was added to a ``configure.zcml`` file,
 :app:`Pyramid` would use the ``myapp.traversal.Traverser`` only
 when the application :term:`root factory` returned an instance of the
-``myapp.models.MyRoot`` object.  Otherwise it would use the default
+``myapp.resources.MyRoot`` object.  Otherwise it would use the default
 :app:`Pyramid` traverser to do traversal.
 
 .. index::
    single: url generator
 
-Changing How :mod:`pyramid.url.model_url` Generates a URL
+Changing How :mod:`pyramid.url.resource_url` Generates a URL
 ------------------------------------------------------------
 
-When you add a traverser as described in
-:ref:`changing_the_traverser`, it's often convenient to continue to
-use the :func:`pyramid.url.model_url` API.  However, since the way
-traversal is done will have been modified, the URLs it generates by
-default may be incorrect.
+When you add a traverser as described in :ref:`changing_the_traverser`, it's
+often convenient to continue to use the :func:`pyramid.url.resource_url` API.
+However, since the way traversal is done will have been modified, the URLs it
+generates by default may be incorrect.
 
 If you've added a traverser, you can change how
-:func:`pyramid.url.model_url` generates a URL for a specific type
-of :term:`context` by adding an adapter stanza for
+:func:`pyramid.url.resource_url` generates a URL for a specific type of
+resource by adding an adapter stanza for
 :class:`pyramid.interfaces.IContextURL` to your application's
 ``configure.zcml``:
 
@@ -288,13 +286,13 @@ of :term:`context` by adding an adapter stanza for
     <adapter
       factory="myapp.traversal.URLGenerator"
       provides="pyramid.interfaces.IContextURL"
-      for="myapp.models.MyRoot *"
+      for="myapp.resources.MyRoot *"
      />
 
 In the above example, the ``myapp.traversal.URLGenerator`` class will
-be used to provide services to :func:`pyramid.url.model_url` any
-time the :term:`context` passed to ``model_url`` is of class
-``myapp.models.MyRoot``.  The asterisk following represents the type
+be used to provide services to :func:`pyramid.url.resource_url` any
+time the :term:`context` passed to ``resource_url`` is of class
+``myapp.resources.MyRoot``.  The asterisk following represents the type
 of interface that must be possessed by the :term:`request` (in this
 case, any interface, represented by asterisk).
 

@@ -144,10 +144,9 @@ it only supplies a mechanism to map URLs to :term:`view` code, along
 with a set of conventions for calling those views.  You are free to
 use third-party components that fit your needs in your applications.
 
-The concepts of :term:`view` and :term:`model` are used by
-:app:`Pyramid` mostly as they would be by Django.
-:app:`Pyramid` has a documentation culture more like Django's than
-like Zope's.
+The concept of :term:`view` is used by :app:`Pyramid` mostly as it would be
+by Django.  :app:`Pyramid` has a documentation culture more like Django's
+than like Zope's.
 
 Like :term:`Pylons` version 1.0, but unlike :term:`Zope`, a
 :app:`Pyramid` application developer may use completely imperative
@@ -177,13 +176,13 @@ frameworks, :app:`Pyramid` also generally fits into this class.
 
 .. sidebar:: You Say :app:`Pyramid` is MVC, But Where's The Controller?
 
-   The :app:`Pyramid` authors believe that the MVC pattern just
-   doesn't really fit the web very well. In a :app:`Pyramid`
-   application, there are models, which store data, and views, which
-   present the data stored in models.  However, no facility provided
-   by the framework actually maps to the concept of a "controller".
-   So :app:`Pyramid` is actually an "MV" framework rather than an
-   "MVC" framework.  "MVC", however, is close enough as a general
-   classification moniker for purposes of comparison with other web
-   frameworks.
-
+   The :app:`Pyramid` authors believe that the MVC pattern just doesn't
+   really fit the web very well. In a :app:`Pyramid` application, there is a
+   resource tree, which represents the site structure, and views, which tend
+   to present the data stored in the resource tree and a user-defined "domain
+   model".  However, no facility provided *by the framework* actually
+   necessarily maps to the concept of a "controller" or "model".  So if you
+   had to give it some acronym, I guess you'd say :app:`Pyramid` is actually
+   an "RV" framework rather than an "MVC" framework.  "MVC", however, is
+   close enough as a general classification moniker for purposes of
+   comparison with other web frameworks.

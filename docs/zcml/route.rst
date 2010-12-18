@@ -25,7 +25,7 @@ Attributes
 ``factory``
   The :term:`dotted Python name` to a function that will generate a
   :app:`Pyramid` context object when this route matches.
-  e.g. ``mypackage.models.MyFactoryClass``.  If this argument is not
+  e.g. ``mypackage.resources.MyResource``.  If this argument is not
   specified, a default root factory will be used.
 
 ``view``
@@ -172,7 +172,7 @@ Attributes
 
 ``view_renderer``
   This is either a single string term (e.g. ``json``) or a string
-  implying a path or :term:`resource specification`
+  implying a path or :term:`asset specification`
   (e.g. ``templates/views.pt``).  If the renderer value is a single
   term (does not contain a dot ``.``), the specified term will be used
   to look up a renderer implementation, and that renderer

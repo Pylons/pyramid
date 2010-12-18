@@ -815,7 +815,7 @@ class TestStaticDirective(unittest.TestCase):
         request = DummyRequest()
         self.assertRaises(Forbidden, view, None, request)
 
-class TestResourceDirective(unittest.TestCase):
+class TestAssetDirective(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp(autocommit=False)
         self.config._ctx = self.config._make_context()
@@ -824,8 +824,8 @@ class TestResourceDirective(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, *arg, **kw):
-        from pyramid.zcml import resource
-        return resource(*arg, **kw)
+        from pyramid.zcml import asset
+        return asset(*arg, **kw)
 
     def test_it(self):
         import pyramid.tests
@@ -1302,7 +1302,7 @@ class Test_path_spec(unittest.TestCase):
         result = self._callFUT(context, '/foo.pt')
         self.assertEqual(result, '/foo.pt')
 
-    def test_path_is_already_resource_spec(self):
+    def test_path_is_already_asset_spec(self):
         context = DummyContext()
         result = self._callFUT(context, 'pyramid.tests:foo.pt')
         self.assertEqual(result, 'pyramid.tests:foo.pt')

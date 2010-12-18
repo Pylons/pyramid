@@ -129,7 +129,7 @@ interface of a registry instead, you need only know how to obtain the
 There are two ways of doing so:
 
 - use the :func:`pyramid.threadlocal.get_current_registry`
-  function within :app:`Pyramid` view or model code.  This will
+  function within :app:`Pyramid` view or resource code.  This will
   always return the "current" :app:`Pyramid` application registry.
 
 - use the attribute of the :term:`request` object named ``registry``

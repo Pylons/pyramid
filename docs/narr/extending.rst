@@ -191,15 +191,15 @@ the original application with slight tweaks.  For example:
    :linenos:
 
     <view 
-      context="theoriginalapplication.models.SomeModel"
+      context="theoriginalapplication.resources.SomeResource"
       name="theview"
       view=".views.a_view_that_does_something_slightly_different"
      />
 
-A similar pattern can be used to *extend* the application with
-``<view>`` declarations.  Just register a new view against some
-existing model type and make sure the URLs it implies are available on
-some other page rendering.
+A similar pattern can be used to *extend* the application with ``<view>``
+declarations.  Just register a new view against some existing resource type
+(using ``context``) and make sure the URLs it implies are available on some
+other page rendering.
 
 .. index::
    pair: overriding; routes

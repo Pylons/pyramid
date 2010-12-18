@@ -3,7 +3,7 @@
    single: settings
    single: reload
    single: debug_authorization
-   single: reload_resources
+   single: reload_assets
    single: debug_notfound
    single: debug_all
    single: reload_all
@@ -52,20 +52,24 @@ template rendering extensions.
 |                                 |                             |
 +---------------------------------+-----------------------------+
 
-Reloading Resources
--------------------
+Reloading Assets
+----------------
 
-Don't cache any resource file data when this value is true.  See
-also :ref:`overriding_resources_section`.
+Don't cache any asset file data when this value is true.  See
+also :ref:`overriding_assets_section`.
 
 +---------------------------------+-----------------------------+
 | Environment Variable Name       | Config File Setting Name    |
 +=================================+=============================+
-| ``BFG_RELOAD_RESOURCES``        |  ``reload_resources``       |
+| ``BFG_RELOAD_ASSETS``           |  ``reload_assets``          |
 |                                 |                             |
 |                                 |                             |
 |                                 |                             |
 +---------------------------------+-----------------------------+
+
+.. note:: For backwards compatibility purposes, the following aliases can be
+   used for configurating asset reloading: ``BFG_RELOAD_RESOURCES`` (envvar)
+   and ``reload_resources`` (config file).
 
 Debugging Authorization
 -----------------------
@@ -174,7 +178,7 @@ Mako Directories
 ++++++++++++++++
 
 The value(s) supplied here are passed in as the template directories. They
-should be in :term:`resource specification` format, for example:
+should be in :term:`asset specification` format, for example:
 ``my.package:templates``.
 
 +-----------------------------+
@@ -333,40 +337,38 @@ affect settings that do not start with ``reload_*`` such as
 
 .. index:: 
    single: reload_templates
-   single: reload_resources
+   single: reload_assets
 
-Understanding the Distinction Between ``reload_templates`` and ``reload_resources``
------------------------------------------------------------------------------------
+Understanding the Distinction Between ``reload_templates`` and ``reload_assets``
+--------------------------------------------------------------------------------
 
-The difference between ``reload_resources`` and ``reload_templates``
-is a bit subtle.  Templates are themselves also treated by
-:app:`Pyramid` as :term:`pkg_resources` resource files (along with
-static files and other resources), so the distinction can be
-confusing.  It's helpful to read :ref:`overriding_resources_section`
-for some context about resources in general.
+The difference between ``reload_assets`` and ``reload_templates`` is a bit
+subtle.  Templates are themselves also treated by :app:`Pyramid` as asset
+files (along with other static files), so the distinction can be confusing.
+It's helpful to read :ref:`overriding_assets_section` for some context
+about assets in general.
 
-When ``reload_templates`` is true, :app:`Pyramid` takes advantage
-of the underlying templating systems' ability to check for file
-modifications to an individual template file.  When
-``reload_templates`` is true but ``reload_resources`` is *not* true,
-the template filename returned by pkg_resources is cached by
-:app:`Pyramid` on the first request.  Subsequent requests for the
-same template file will return a cached template filename.  The
-underlying templating system checks for modifications to this
-particular file for every request.  Setting ``reload_templates`` to
-``True`` doesn't affect performance dramatically (although it should
-still not be used in production because it has some effect).
+When ``reload_templates`` is true, :app:`Pyramid` takes advantage of the
+underlying templating systems' ability to check for file modifications to an
+individual template file.  When ``reload_templates`` is true but
+``reload_assets`` is *not* true, the template filename returned by the
+``pkg_resources`` package (used under the hood by asset resolution) is cached
+by :app:`Pyramid` on the first request.  Subsequent requests for the same
+template file will return a cached template filename.  The underlying
+templating system checks for modifications to this particular file for every
+request.  Setting ``reload_templates`` to ``True`` doesn't affect performance
+dramatically (although it should still not be used in production because it
+has some effect).
 
-However, when ``reload_resources`` is true, :app:`Pyramid` will not
-cache the template filename, meaning you can see the effect of
-changing the content of an overridden resource directory for templates
-without restarting the server after every change.  Subsequent requests
-for the same template file may return different filenames based on the
-current state of overridden resource directories. Setting
-``reload_resources`` to ``True`` affects performance *dramatically*,
-slowing things down by an order of magnitude for each template
-rendering.  However, it's convenient to enable when moving files
-around in overridden resource directories. ``reload_resources`` makes
-the system *very slow* when templates are in use.  Never set
-``reload_resources`` to ``True`` on a production system.
+However, when ``reload_assets`` is true, :app:`Pyramid` will not cache the
+template filename, meaning you can see the effect of changing the content of
+an overridden asset directory for templates without restarting the server
+after every change.  Subsequent requests for the same template file may
+return different filenames based on the current state of overridden asset
+directories. Setting ``reload_assets`` to ``True`` affects performance
+*dramatically*, slowing things down by an order of magnitude for each
+template rendering.  However, it's convenient to enable when moving files
+around in overridden asset directories. ``reload_assets`` makes the system
+*very slow* when templates are in use.  Never set ``reload_assets`` to
+``True`` on a production system.
 

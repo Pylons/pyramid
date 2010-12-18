@@ -1,6 +1,77 @@
 Next release
 ============
 
+Terminology Changes
+-------------------
+
+- The Pyramid concept previously known as "model" is now known as "resource".
+  As a result:
+
+  - The following API changes have been made::
+
+      pyramid.url.model_url -> 
+                        pyramid.url.resource_url
+
+      pyramid.traversal.find_model -> 
+                        pyramid.url.find_resource
+
+      pyramid.traversal.model_path ->
+                        pyramid.traversal.resource_path
+
+      pyramid.traversal.model_path_tuple ->
+                        pyramid.traversal.resource_path_tuple
+
+      pyramid.traversal.ModelGraphTraverser -> 
+                        pyramid.traversal.ResourceTreeTraverser
+
+      pyramid.config.Configurator.testing_models ->
+                        pyramid.config.Configurator.testing_resources
+
+      pyramid.testing.registerModels ->
+                        pyramid.testing.registerResources
+
+      pyramid.testing.DummyModel ->
+                        pyramid.testing.DummyResource
+
+   - All documentation which previously referred to "model" now refers to
+     "resource".
+
+   - The ``starter`` and ``starter_zcml`` paster templates now have a
+     ``resources.py`` module instead of a ``models.py`` module.
+
+  - Positional argument names of various APIs have been changed from
+    ``model`` to ``resource``.
+
+  Backwards compatibility shims have been left in place in all cases.  They
+  will continue to work "forever".
+
+- The Pyramid concept previously known as "resource" is now known as "asset".
+  As a result:
+
+  - The (non-API) module previously known as ``pyramid.resource`` is now
+    known as ``pyramid.asset``.
+
+  - All docs that previously referred to "resource specification" now refer
+    to "asset specification".
+
+  - The following API changes were made::
+
+      pyramid.config.Configurator.absolute_resource_spec ->
+                        pyramid.config.Configurator.absolute_asset_spec
+
+      pyramid.config.Configurator.override_resource ->
+                        pyramid.config.Configurator.override_asset
+
+  - The ZCML directive previously known as ``resource`` is now known as
+    ``asset``.
+
+  - The setting previously known as ``BFG_RELOAD_RESOURCES`` (envvar) or
+    ``reload_resources`` (config file) is now known, respectively, as
+    ``BFG_RELOAD_ASSETS`` and ``reload_assets``.
+
+  Backwards compatibility shims have been left in place in all cases.  They
+  will continue to work "forever".
+
 Bug Fixes
 ---------
 
@@ -29,6 +100,9 @@ Documentation
 
 - Direct Jython users to Mako rather than Jinja2 in "Install" narrative
   chapter.
+
+- Many changes to support terminological renaming of "model" to "resource"
+  and "resource" to "asset".
 
 Paster Templates
 ----------------

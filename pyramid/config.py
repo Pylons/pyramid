@@ -73,8 +73,8 @@ from pyramid.path import package_of
 from pyramid.registry import Registry
 from pyramid.renderers import RendererHelper
 from pyramid.request import route_request_iface
-from pyramid.resource import PackageOverrides
-from pyramid.resource import resolve_resource_spec
+from pyramid.asset import PackageOverrides
+from pyramid.asset import resolve_asset_spec
 from pyramid.settings import Settings
 from pyramid.static import StaticURLInfo
 from pyramid.threadlocal import get_current_registry
@@ -327,14 +327,14 @@ class Configurator(object):
         self.action(IAuthorizationPolicy, None)
             
     def _make_spec(self, path_or_spec):
-        package, filename = resolve_resource_spec(path_or_spec,
-                                                  self.package_name)
+        package, filename = resolve_asset_spec(path_or_spec,
+                                               self.package_name)
         if package is None:
             return filename # absolute filename
         return '%s:%s' % (package, filename)
 
     def _split_spec(self, path_or_spec):
-        return resolve_resource_spec(path_or_spec, self.package_name)
+        return resolve_asset_spec(path_or_spec, self.package_name)
 
     def _derive_view(self, view, permission=None, predicates=(),
                      attr=None, renderer=None, wrapper_viewname=None,
@@ -570,18 +570,20 @@ class Configurator(object):
         this Configurator's constructor."""
         return self.name_resolver.maybe_resolve(dotted)
 
-    def absolute_resource_spec(self, relative_spec):
-        """ Resolve the potentially relative :term:`resource
+    def absolute_asset_spec(self, relative_spec):
+        """ Resolve the potentially relative :term:`asset
         specification` string passed as ``relative_spec`` into an
-        absolute resource specification string and return the string.
+        absolute asset specification string and return the string.
         Use the ``package`` of this configurator as the package to
-        which the resource specification will be considered relative
-        when generating an absolute resource specification.  If the
+        which the asset specification will be considered relative
+        when generating an absolute asset specification.  If the
         provided ``relative_spec`` argument is already absolute, or if
         the ``relative_spec`` is not a string, it is simply returned."""
         if not isinstance(relative_spec, basestring):
             return relative_spec
         return self._make_spec(relative_spec)
+
+    absolute_resource_spec = absolute_asset_spec # b/w compat forever
 
     def setup_registry(self, settings=None, root_factory=None,
                        authentication_policy=None, authorization_policy=None,
@@ -848,7 +850,7 @@ class Configurator(object):
     def load_zcml(self, spec='configure.zcml', lock=threading.Lock()):
         """ Load configuration from a :term:`ZCML` file into the
         current configuration state.  The ``spec`` argument is an
-        absolute filename, a relative filename, or a :term:`resource
+        absolute filename, a relative filename, or a :term:`asset
         specification`, defaulting to ``configure.zcml`` (relative to
         the package of the configurator's caller)."""
         package_name, filename = self._split_spec(spec)
@@ -1061,7 +1063,7 @@ class Configurator(object):
         renderer
 
           This is either a single string term (e.g. ``json``) or a
-          string implying a path or :term:`resource specification`
+          string implying a path or :term:`asset specification`
           (e.g. ``templates/views.pt``) naming a :term:`renderer`
           implementation.  If the ``renderer`` value does not contain
           a dot ``.``, the specified string will be used to look up a
@@ -1086,9 +1088,9 @@ class Configurator(object):
           current :term:`package` of the Configurator), a path can be
           absolute, starting with a slash on UNIX or a drive letter
           prefix on Windows.  The path can alternately be a
-          :term:`resource specification` in the form
+          :term:`asset specification` in the form
           ``some.dotted.package_name:relative/path``, making it
-          possible to address template resources which live in a
+          possible to address template assets which live in a
           separate package.
 
           The ``renderer`` attribute is optional.  If it is not
@@ -1472,11 +1474,10 @@ class Configurator(object):
 
         factory
 
-          A Python object (often a function or a class) or a
-          :term:`dotted Python name` which refers to the same object
-          that will generate a :app:`Pyramid` :term:`context`
-          object when this route matches. For example,
-          ``mypackage.models.MyFactoryClass``.  If this argument is
+          A Python object (often a function or a class) or a :term:`dotted
+          Python name` which refers to the same object that will generate a
+          :app:`Pyramid` root resource object when this route matches. For
+          example, ``mypackage.resources.MyFactory``.  If this argument is
           not specified, a default root factory will be used.
 
         traverse
@@ -1677,7 +1678,7 @@ class Configurator(object):
         view_renderer
 
           This is either a single string term (e.g. ``json``) or a
-          string implying a path or :term:`resource specification`
+          string implying a path or :term:`asset specification`
           (e.g. ``templates/views.pt``).  If the renderer value is a
           single term (does not contain a dot ``.``), the specified
           term will be used to look up a renderer implementation, and
@@ -1858,20 +1859,20 @@ class Configurator(object):
         self.action((IRendererFactory, name), None)
 
     @action_method
-    def override_resource(self, to_override, override_with, _override=None):
-        """ Add a :app:`Pyramid` resource override to the current
+    def override_asset(self, to_override, override_with, _override=None):
+        """ Add a :app:`Pyramid` asset override to the current
         configuration state.
 
-        ``to_override`` is a :term:`resource specification` to the
-        resource being overridden.
+        ``to_override`` is a :term:`asset specification` to the
+        asset being overridden.
 
-        ``override_with`` is a :term:`resource specification` to the
-        resource that is performing the override.
+        ``override_with`` is a :term:`asset specification` to the
+        asset that is performing the override.
 
-        See :ref:`resources_chapter` for more
-        information about resource overrides."""
+        See :ref:`assets_chapter` for more
+        information about asset overrides."""
         if to_override == override_with:
-            raise ConfigurationError('You cannot override a resource with '
+            raise ConfigurationError('You cannot override an asset with '
                                      'itself')
 
         package = to_override
@@ -1904,6 +1905,8 @@ class Configurator(object):
             to_package = sys.modules[override_package]
             override(from_package, path, to_package, override_prefix)
         self.action(None, register)
+
+    override_resource = override_asset # bw compat
 
     @action_method
     def set_forbidden_view(self, view=None, attr=None, renderer=None,
@@ -2094,7 +2097,7 @@ class Configurator(object):
         """ Add one or more :term:`translation directory` paths to the
         current configuration state.  The ``specs`` argument is a
         sequence that may contain absolute directory paths
-        (e.g. ``/usr/share/locale``) or :term:`resource specification`
+        (e.g. ``/usr/share/locale``) or :term:`asset specification`
         names naming a directory path (e.g. ``some.package:locale``)
         or a combination of the two.
 
@@ -2143,7 +2146,7 @@ class Configurator(object):
 
     @action_method
     def add_static_view(self, name, path, **kw):
-        """ Add a view used to render static resources such as images
+        """ Add a view used to render static assets such as images
         and CSS files.
 
         The ``name`` argument is a string representing :term:`view
@@ -2152,40 +2155,39 @@ class Configurator(object):
 
         The ``path`` argument is the path on disk where the static
         files reside.  This can be an absolute path, a
-        package-relative path, or a :term:`resource specification`.
+        package-relative path, or a :term:`asset specification`.
 
         The ``cache_max_age`` keyword argument is input to set the
-        ``Expires`` and ``Cache-Control`` headers for static resources
+        ``Expires`` and ``Cache-Control`` headers for static assets
         served.  Note that this argument has no effect when the
         ``name`` is a *url prefix*.  By default, this argument is
         ``None``, meaning that no particular Expires or Cache-Control
         headers are set in the response.
 
         The ``permission`` keyword argument is used to specify the
-        :term:`permission` required by a user to execute the static
-        view.  By default, it is the string
-        ``__no_permission_required__``.  The
-        ``__no_permission_required__`` string is a special sentinel
-        which indicates that, even if a :term:`default permission`
-        exists for the current application, the static view should be
-        renderered to completely anonymous users.  This default value
-        is permissive because, in most web apps, static resources
-        seldom need protection from viewing.
+        :term:`permission` required by a user to execute the static view.  By
+        default, it is the string ``__no_permission_required__``.  The
+        ``__no_permission_required__`` string is a special sentinel which
+        indicates that, even if a :term:`default permission` exists for the
+        current application, the static view should be renderered to
+        completely anonymous users.  This default value is permissive
+        because, in most web apps, static assets seldom need protection from
+        viewing.
 
         *Usage*
 
         The ``add_static_view`` function is typically used in
         conjunction with the :func:`pyramid.url.static_url`
         function.  ``add_static_view`` adds a view which renders a
-        static resource when some URL is visited;
+        static asset when some URL is visited;
         :func:`pyramid.url.static_url` generates a URL to that
-        resource.
+        asset.
 
         The ``name`` argument to ``add_static_view`` is usually a
         :term:`view name`.  When this is the case, the
         :func:`pyramid.url.static_url` API will generate a URL
         which points to a Pyramid view, which will serve up a set of
-        resources that live in the package itself. For example:
+        assets that live in the package itself. For example:
 
         .. code-block:: python
 
@@ -2208,7 +2210,7 @@ class Configurator(object):
         be served.
 
         ``add_static_view`` can alternately be used with a ``name``
-        argument which is a *URL*, causing static resources to be
+        argument which is a *URL*, causing static assets to be
         served from an external webserver.  This happens when the
         ``name`` argument is a URL (detected as any string with a
         slash in it).  In this mode, the ``name`` is used as the URL
@@ -2237,7 +2239,7 @@ class Configurator(object):
         listening on ``example.com`` must be itself configured to
         respond properly to such a request.
 
-        See :ref:`static_resources_section` for more information.
+        See :ref:`static_assets_section` for more information.
         """
         spec = self._make_spec(path)
         info = self.registry.queryUtility(IStaticURLInfo)
@@ -2281,18 +2283,18 @@ class Configurator(object):
         self.registry.registerUtility(policy, IAuthorizationPolicy)
         self.registry.registerUtility(policy, IAuthenticationPolicy)
 
-    def testing_models(self, models):
+    def testing_resources(self, resources):
         """Unit/integration testing helper: registers a dictionary of
-        :term:`model` objects that can be resolved via the
-        :func:`pyramid.traversal.find_model` API.
+        :term:`resource` objects that can be resolved via the
+        :func:`pyramid.traversal.find_resource` API.
 
-        The :func:`pyramid.traversal.find_model` API is called with
+        The :func:`pyramid.traversal.find_resource` API is called with
         a path as one of its arguments.  If the dictionary you
         register when calling this method contains that path as a
         string key (e.g. ``/foo/bar`` or ``foo/bar``), the
-        corresponding value will be returned to ``find_model`` (and
+        corresponding value will be returned to ``find_resource`` (and
         thus to your code) when
-        :func:`pyramid.traversal.find_model` is called with an
+        :func:`pyramid.traversal.find_resource` is called with an
         equivalent path string or tuple.
         """
         class DummyTraverserFactory:
@@ -2301,14 +2303,16 @@ class Configurator(object):
 
             def __call__(self, request):
                 path = request['PATH_INFO']
-                ob = models[path]
+                ob = resources[path]
                 traversed = traversal_path(path)
                 return {'context':ob, 'view_name':'','subpath':(),
                         'traversed':traversed, 'virtual_root':ob,
                         'virtual_root_path':(), 'root':ob}
         self.registry.registerAdapter(DummyTraverserFactory, (Interface,),
                                       ITraverser)
-        return models
+        return resources
+
+    testing_models = testing_resources # b/w compat
 
     @action_method
     def testing_add_subscriber(self, event_iface=None):
@@ -2339,7 +2343,7 @@ class Configurator(object):
     def testing_add_renderer(self, path, renderer=None):
         """Unit/integration testing helper: register a renderer at
         ``path`` (usually a relative filename ala ``templates/foo.pt``
-        or a resource specification) and return the renderer object.
+        or an asset specification) and return the renderer object.
         If the ``renderer`` argument is None, a 'dummy' renderer will
         be used.  This function is useful when testing code that calls
         the :func:`pyramid.renderers.render` function or
@@ -2507,7 +2511,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
     if traverse is not None:
         # ``traverse`` can only be used as a *route* "predicate"; it
         # adds 'traverse' to the matchdict if it's specified in the
-        # routing args.  This causes the ModelGraphTraverser to use
+        # routing args.  This causes the ResourceTreeTraverser to use
         # the resolved traverse pattern as the traversal path.
         from pyramid.urldispatch import _compile_route
         _, tgenerate = _compile_route(traverse)

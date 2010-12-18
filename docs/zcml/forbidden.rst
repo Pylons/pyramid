@@ -35,7 +35,7 @@ Attributes
 
 ``renderer``
   This is either a single string term (e.g. ``json``) or a string
-  implying a path or :term:`resource specification`
+  implying a path or :term:`asset specification`
   (e.g. ``templates/views.pt``) used when the view returns a
   non-:term:`response` object.  This attribute has the same meaning as
   it would in the context of :ref:`view_directive`; see the

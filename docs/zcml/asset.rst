@@ -1,51 +1,51 @@
-.. _resource_directive:
+.. _asset_directive:
 
-``resource``
-------------
+``asset``
+---------
 
-The ``resource`` directive adds a resource override for a single
-resource.
+The ``asset`` directive adds an asset override for a single
+static file/directory asset.
 
 Attributes
 ~~~~~~~~~~
 
 ``to_override``
-   A :term:`resource specification` specifying the resource to be
+   A :term:`asset specification` specifying the asset to be
    overridden.
 
 ``override_with``
-   A :term:`resource specification` specifying the resource which
+   A :term:`asset specification` specifying the asset which
    is used as the override.
 
 Examples
 ~~~~~~~~
 
-.. topic:: Overriding a Single Resource File
+.. topic:: Overriding a Single Asset File
 
   .. code-block:: xml
      :linenos:
 
-     <resource
+     <asset
        to_override="some.package:templates/mytemplate.pt"
        override_with="another.package:othertemplates/anothertemplate.pt"
      />
 
-.. topic:: Overriding all Resources in a Package
+.. topic:: Overriding all Assets in a Package
 
   .. code-block:: xml
      :linenos:
 
-     <resource
+     <asset
        to_override="some.package"
        override_with="another.package"
       />
 
-.. topic:: Overriding all Resources in a Subdirectory of a Package
+.. topic:: Overriding all Assets in a Subdirectory of a Package
 
   .. code-block:: xml
      :linenos:
 
-     <resource
+     <asset
        to_override="some.package:templates/"
        override_with="another.package:othertemplates/"
       />
@@ -53,10 +53,13 @@ Examples
 Alternatives
 ~~~~~~~~~~~~
 
-The :meth:`pyramid.config.Configurator.override_resource`
+The :meth:`pyramid.config.Configurator.override_asset`
 method can be used instead of the ``resource`` ZCML directive.
+
+This directive can also be invoked as the ``resource`` ZCML directive for
+backwards compatibility purposes.
 
 See Also
 ~~~~~~~~
 
-See also :ref:`resource_zcml_directive`.
+See also :ref:`asset_zcml_directive`.

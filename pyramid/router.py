@@ -22,7 +22,7 @@ from pyramid.exceptions import NotFound
 from pyramid.request import Request
 from pyramid.threadlocal import manager
 from pyramid.traversal import DefaultRootFactory
-from pyramid.traversal import ModelGraphTraverser
+from pyramid.traversal import ResourceTreeTraverser
 
 from pyramid.config import Configurator # b/c
 
@@ -127,7 +127,7 @@ class Router(object):
                     # find a context
                     traverser = adapters.queryAdapter(root, ITraverser)
                     if traverser is None:
-                        traverser = ModelGraphTraverser(root)
+                        traverser = ResourceTreeTraverser(root)
                     tdict = traverser(request)
                     context, view_name, subpath, traversed, vroot, vroot_path =(
                         tdict['context'], tdict['view_name'], tdict['subpath'],
@@ -239,13 +239,13 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     ``filename`` passed or the value in the ``options`` dictionary
     named ``configure_zcml`` must be a) absolute pathname to a
     :term:`ZCML` file that represents the application's configuration
-    *or* b) a :term:`resource specification` to a :term:`ZCML` file in
+    *or* b) a :term:`asset specification` to a :term:`ZCML` file in
     the form ``dotted.package.name:relative/file/path.zcml``.
 
     ``filename`` is the filesystem path to a ZCML file (optionally
     relative to the package path) that should be parsed to create the
     application registry.  It defaults to ``configure.zcml``.  It can
-    also be a ;term:`resource specification` in the form
+    also be a ;term:`asset specification` in the form
     ``dotted_package_name:relative/file/path.zcml``. Note that if any
     value for ``configure_zcml`` is passed within the ``settings``
     dictionary, the value passed as ``filename`` will be ignored,

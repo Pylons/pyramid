@@ -12,23 +12,22 @@ your application.  In this context, a "unit" is often a function or a
 method of a class instance.  The unit is also referred to as a "unit
 under test".
 
-The goal of a single unit test is to test **only** some permutation of
-the "unit under test".  If you write a unit test that aims to verify
-the result of a particular codepath through a Python function, you
-need only be concerned about testing the code that *lives in the
-function body itself*.  If the function accepts a parameter that
-represents a complex application "domain object" (such as a model, a
-database connection, or an SMTP server), the argument provided to this
-function during a unit test *need not be* and likely *should not be* a
-"real" implementation object.  For example, although a particular
-function implementation may accept an argument that represents an SMTP
-server object, and the function may call a method of this object when
-the system is operating normally that would result in an email being
-sent, a unit test of this codepath of the function does *not* need to
-test that an email is actually sent.  It just needs to make sure that
-the function calls the method of the object provided as an argument
-that *would* send an email if the argument happened to be the "real"
-implementation of an SMTP server object.
+The goal of a single unit test is to test **only** some permutation of the
+"unit under test".  If you write a unit test that aims to verify the result
+of a particular codepath through a Python function, you need only be
+concerned about testing the code that *lives in the function body itself*.
+If the function accepts a parameter that represents a complex application
+"domain object" (such as a resource, a database connection, or an SMTP
+server), the argument provided to this function during a unit test *need not
+be* and likely *should not be* a "real" implementation object.  For example,
+although a particular function implementation may accept an argument that
+represents an SMTP server object, and the function may call a method of this
+object when the system is operating normally that would result in an email
+being sent, a unit test of this codepath of the function does *not* need to
+test that an email is actually sent.  It just needs to make sure that the
+function calls the method of the object provided as an argument that *would*
+send an email if the argument happened to be the "real" implementation of an
+SMTP server object.
 
 An *integration test*, on the other hand, is a different form of
 testing in which the interaction between two or more "units" is
@@ -298,9 +297,9 @@ sure to use this pattern in your test case's ``setUp`` and
 
 See the :ref:`testing_module` chapter for the entire :app:`Pyramid`
 -specific testing API.  This chapter describes APIs for registering a
-security policy, registering models at paths, registering event
+security policy, registering resources at paths, registering event
 listeners, registering views and view permissions, and classes
-representing "dummy" implementations of a request and a model.
+representing "dummy" implementations of a request and a resource.
 
 See also the various methods of the :term:`Configurator` documented in
 :ref:`configuration_module` that begin with the ``testing_`` prefix.

@@ -7,7 +7,7 @@
 
   .. autofunction:: registerDummySecurityPolicy
 
-  .. autofunction:: registerModels
+  .. autofunction:: registerResources
 
   .. autofunction:: registerEventListener
 
@@ -31,7 +31,7 @@
 
   .. autofunction:: cleanUp
 
-  .. autoclass:: DummyModel
+  .. autoclass:: DummyResource
      :members:
 
   .. autoclass:: DummyRequest

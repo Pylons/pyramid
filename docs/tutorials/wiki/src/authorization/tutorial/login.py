@@ -1,7 +1,7 @@
 from pyramid.httpexceptions import HTTPFound
 
 from pyramid.view import view_config
-from pyramid.url import model_url
+from pyramid.url import resource_url
 
 from pyramid.security import remember
 from pyramid.security import forget
@@ -11,7 +11,7 @@ from tutorial.security import USERS
 
 @view_config(context=Wiki, name='login', renderer='templates/login.pt')
 def login(request):
-    login_url = model_url(request.context, request, 'login')
+    login_url = resource_url(request.context, request, 'login')
     referrer = request.url
     if referrer == login_url:
         referrer = '/' # never use the login form itself as came_from
@@ -39,6 +39,6 @@ def login(request):
 @view_config(context=Wiki, name='logout')
 def logout(request):
     headers = forget(request)
-    return HTTPFound(location = model_url(request.context, request),
+    return HTTPFound(location = resource_url(request.context, request),
                      headers = headers)
     

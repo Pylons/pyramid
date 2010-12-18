@@ -4,10 +4,10 @@ import threading
 from zope.interface import implements
 from zope.interface import Interface
 
-from pyramid.interfaces import ITemplateRenderer
+from pyramid.asset import resolve_asset_spec
+from pyramid.asset import abspath_from_asset_spec
 from pyramid.exceptions import ConfigurationError
-from pyramid.resource import resolve_resource_spec
-from pyramid.resource import abspath_from_resource_spec
+from pyramid.interfaces import ITemplateRenderer
 from pyramid.settings import asbool
 from pyramid.util import DottedNameResolver
 
@@ -18,12 +18,11 @@ class IMakoLookup(Interface):
     pass
 
 class PkgResourceTemplateLookup(TemplateLookup):
-    """TemplateLookup subclass that handles resource specification
-    uri's"""
+    """TemplateLookup subclass that handles asset specification URIs"""
     def adjust_uri(self, uri, relativeto):
         """Called from within a Mako template, avoids adjusting the
-        uri if it looks like a resource specification"""
-        # Don't adjust pkg resource spec names
+        uri if it looks like an asset specification"""
+        # Don't adjust asset spec names
         if ':' in uri:
             return uri
         return TemplateLookup.adjust_uri(self, uri, relativeto)
@@ -33,7 +32,7 @@ class PkgResourceTemplateLookup(TemplateLookup):
         for it
         
         In addition to the basic filesystem lookup, this subclass will
-        use pkg_resource to load a file using the resource
+        use pkg_resource to load a file using the asset
         specification syntax.
         
         """
@@ -45,8 +44,8 @@ class PkgResourceTemplateLookup(TemplateLookup):
                 else:
                     return self._collection[uri]
             except KeyError:
-                pname, path = resolve_resource_spec(uri)
-                srcfile = abspath_from_resource_spec(path, pname)
+                pname, path = resolve_asset_spec(uri)
+                srcfile = abspath_from_asset_spec(path, pname)
                 if os.path.isfile(srcfile):
                     return self._load(srcfile, uri)
                 raise exceptions.TopLevelLookupException(
@@ -75,9 +74,9 @@ def renderer_factory(info):
                 'Mako template used without a ``mako.directories`` setting')
         if not hasattr(directories, '__iter__'):
             directories = filter(None, directories.splitlines())
-        directories = [ abspath_from_resource_spec(d) for d in directories ]
+        directories = [ abspath_from_asset_spec(d) for d in directories ]
         if module_directory is not None:
-            module_directory = abspath_from_resource_spec(module_directory)
+            module_directory = abspath_from_asset_spec(module_directory)
         if error_handler is not None:
             dotted = DottedNameResolver(info.package)
             error_handler = dotted.maybe_resolve(error_handler)

@@ -92,11 +92,11 @@ For example:
    Python name` values, each representing the dotted name path to a
    suitable implementation global defined at Python module scope.
 
-The above configuration enables a policy which compares the value of
-an "auth ticket" cookie passed in the request's environment which
-contains a reference to a single :term:`principal` against the
-principals present in any :term:`ACL` found in model data when
-attempting to call some :term:`view`.
+The above configuration enables a policy which compares the value of an "auth
+ticket" cookie passed in the request's environment which contains a reference
+to a single :term:`principal` against the principals present in any
+:term:`ACL` found in the resource tree when attempting to call some
+:term:`view`.
 
 While it is possible to mix and match different authentication and
 authorization policies, it is an error to pass an authentication
@@ -136,7 +136,7 @@ permission using the :meth:`pyramid.config.Configurator.add_view` API:
 
    config.add_view('mypackage.views.blog_entry_add_view',
                    name='add_entry.html', 
-                   context='mypackage.models.Blog',
+                   context='mypackage.resources.Blog',
                    permission='add')
 
 The equivalent view registration including the ``add`` permission name
@@ -147,7 +147,7 @@ may be performed via the ``@view_config`` decorator:
    :linenos:
 
    from pyramid.view import view_config
-   from models import Blog
+   from resources import Blog
 
    @view_config(context=Blog, name='add_entry.html', permission='add')
    def blog_entry_add_view(request):
@@ -208,19 +208,18 @@ When a default permission is registered:
 
 .. _assigning_acls:
 
-Assigning ACLs to your Model Objects
-------------------------------------
+Assigning ACLs to your Resource Objects
+---------------------------------------
 
-When the default :app:`Pyramid` :term:`authorization policy`
-determines whether a user possesses a particular permission in a
-:term:`context`, it examines the :term:`ACL` associated with the
-context.  An ACL is associated with a context by virtue of the
-``__acl__`` attribute of the model object representing the
-:term:`context`.  This attribute can be defined on the model
-*instance* if you need instance-level security, or it can be defined
-on the model *class* if you just need type-level security.
+When the default :app:`Pyramid` :term:`authorization policy` determines
+whether a user possesses a particular permission in a :term:`context`, it
+examines the :term:`ACL` associated with the context.  An ACL is associated
+with a context by virtue of the ``__acl__`` attribute of the resource object
+representing the :term:`context`.  This attribute can be defined on the
+resource *instance* if you need instance-level security, or it can be defined
+on the resource *class* if you just need type-level security.
 
-For example, an ACL might be attached to the model for a blog via its
+For example, an ACL might be attached to the resource for a blog via its
 class:
 
 .. code-block:: python
@@ -236,8 +235,8 @@ class:
            (Allow, 'group:editors', 'edit'),
            ]
 
-Or, if your models are persistent, an ACL might be specified via the
-``__acl__`` attribute of an *instance* of a model:
+Or, if your resources are persistent, an ACL might be specified via the
+``__acl__`` attribute of an *instance* of a resource:
 
 .. code-block:: python
    :linenos:
@@ -256,11 +255,11 @@ Or, if your models are persistent, an ACL might be specified via the
            (Allow, 'group:editors', 'edit'),
            ]
 
-Whether an ACL is attached to a model's class or an instance of the
-model itself, the effect is the same.  It is useful to decorate
-individual model instances with an ACL (as opposed to just decorating
-their class) in applications such as "CMS" systems where fine-grained
-access is required on an object-by-object basis.
+Whether an ACL is attached to a resource's class or an instance of the
+resource itself, the effect is the same.  It is useful to decorate individual
+resource instances with an ACL (as opposed to just decorating their class) in
+applications such as "CMS" systems where fine-grained access is required on
+an object-by-object basis.
 
 .. index::
    single: ACE
@@ -448,16 +447,16 @@ the following:
 ACL Inheritance and Location-Awareness
 --------------------------------------
 
-While the default :term:`authorization policy` is in place, if a model
-object does not have an ACL when it is the context, its *parent* is
-consulted for an ACL.  If that object does not have an ACL, *its*
-parent is consulted for an ACL, ad infinitum, until we've reached the
-root and there are no more parents left.
+While the default :term:`authorization policy` is in place, if a resource
+object does not have an ACL when it is the context, its *parent* is consulted
+for an ACL.  If that object does not have an ACL, *its* parent is consulted
+for an ACL, ad infinitum, until we've reached the root and there are no more
+parents left.
 
-In order to allow the security machinery to perform ACL inheritance,
-model objects must provide *location-awareness*.  Providing
-*location-awareness* means two things: the root object in the graph
-must have a ``_name__`` attribute and a ``__parent__`` attribute.
+In order to allow the security machinery to perform ACL inheritance, resource
+objects must provide *location-awareness*.  Providing *location-awareness*
+means two things: the root object in the resource tree must have a
+``_name__`` attribute and a ``__parent__`` attribute.
 
 .. code-block:: python
    :linenos:

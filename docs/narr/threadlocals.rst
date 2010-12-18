@@ -110,11 +110,9 @@ follows:
   View callables already have access to the request (it's passed in to
   each as ``request``).
 
-- ``get_current_request`` should never be called in :term:`model`
-  code.  Model code should never require any access to the request; if
-  your model code requires access to a request object, you've almost
-  certainly factored something wrong, and you should change your code
-  rather than using this function.
+- ``get_current_request`` should never be called in :term:`resource` code.
+   If a resource needs access to the request, it should be passed the request
+   by a :term:`view callable`.
 
 - ``get_current_request`` function should never be called because it's
   "easier" or "more elegant" to think about calling it than to pass a

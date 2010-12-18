@@ -51,7 +51,7 @@ Non-Predicate Attributes
 
 ``renderer``
   This is either a single string term (e.g. ``json``) or a string
-  implying a path or :term:`resource specification`
+  implying a path or :term:`asset specification`
   (e.g. ``templates/views.pt``).  If the renderer value is a single
   term (does not contain a dot ``.``), the specified term will be used
   to look up a renderer implementation, and that renderer
@@ -72,10 +72,10 @@ Non-Predicate Attributes
   template named "foo.pt" is in the "templates" directory relative to
   the directory in which the ZCML file is defined), a path can be
   absolute, starting with a slash on UNIX or a drive letter prefix on
-  Windows.  The path can alternately be a :term:`resource
+  Windows.  The path can alternately be a :term:`asset
   specification` in the form
   ``some.dotted.package_name:relative/path``, making it possible to
-  address template resources which live in a separate package.
+  address template assets which live in a separate package.
 
   The ``renderer`` attribute is optional.  If it is not defined, the
   "null" renderer is assumed (no rendering is performed and the value
@@ -157,7 +157,7 @@ Predicate Attributes
   representing the class that a graph traversal parent object of the
   :term:`context` must be an instance of (or :term:`interface` that a
   parent object must provide) in order for this view to be found and
-  called.  Your models must be "location-aware" to use this feature.
+  called.  Your resources must be "location-aware" to use this feature.
   See :ref:`location_aware` for more information about
   location-awareness.
 
@@ -222,7 +222,7 @@ Examples
      :linenos:
 
         <view
-           context=".models.MyModel"
+           context=".resources.MyResource"
            view=".views.hello_world"
          />
 
@@ -232,7 +232,7 @@ Examples
      :linenos:
 
         <view
-           context=".models.MyModel"
+           context=".resources.MyResource"
            view=".views.hello_world_post"
            request_method="POST"
          />

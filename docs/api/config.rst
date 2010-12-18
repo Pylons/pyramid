@@ -32,7 +32,7 @@
 
      .. automethod:: maybe_dotted
 
-     .. automethod:: absolute_resource_spec
+     .. automethod:: absolute_asset_spec
 
      .. automethod:: setup_registry(settings=None, root_factory=None, authentication_policy=None, renderers=DEFAULT_RENDERERS, debug_logger=None, locale_negotiator=None, request_factory=None, renderer_globals_factory=None)
 
@@ -58,7 +58,7 @@
 
      .. automethod:: make_wsgi_app()
 
-     .. automethod:: override_resource(to_override, override_with)
+     .. automethod:: override_asset(to_override, override_with)
 
      .. automethod:: scan(package=None, categories=None)
 
@@ -78,7 +78,7 @@
 
      .. automethod:: testing_securitypolicy
 
-     .. automethod:: testing_models
+     .. automethod:: testing_resources
 
      .. automethod:: testing_add_subscriber
 

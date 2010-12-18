@@ -241,11 +241,11 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(inst.called2, True)
         self.assertEqual(inst.finished_callbacks, [])
 
-    def test_model_url(self):
+    def test_resource_url(self):
         self._registerContextURL()
         inst = self._makeOne({})
         root = DummyContext()
-        result = inst.model_url(root)
+        result = inst.resource_url(root)
         self.assertEqual(result, 'http://example.com/context/')
 
     def test_route_url(self):

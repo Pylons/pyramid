@@ -13,6 +13,7 @@ documentation is organized alphabetically by directive name.
    zcml/aclauthorizationpolicy
    zcml/adapter
    zcml/authtktauthenticationpolicy
+   zcml/asset
    zcml/configure
    zcml/default_permission
    zcml/forbidden
@@ -23,7 +24,6 @@ documentation is organized alphabetically by directive name.
    zcml/remoteuserauthenticationpolicy
    zcml/renderer
    zcml/repozewho1authenticationpolicy
-   zcml/resource
    zcml/route
    zcml/scan
    zcml/static
