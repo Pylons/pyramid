@@ -1787,22 +1787,12 @@ view configuration, see :ref:`models_which_implement_interfaces`.
 Configuring View Security
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-<<<<<<< HEAD
-If an :term:`authorization policy` is active, any :term:`permission`
-attached to a :term:`view configuration` found during view lookup will
-be verified.  This will ensure that the currently authenticated user
-possesses that permission against the :term:`context` before the view
-function is actually called.  Here's an example of specifying a
-permission in a view configuration using
-:meth:`pyramid.configuration.Configurator.add_view`:
-=======
-If a :term:`authorization policy` is active, any :term:`permission` attached
-to a :term:`view configuration` found during view lookup will be consulted to
-ensure that the currently authenticated user possesses that permission
-against the :term:`context` before the view function is actually called.
-Here's an example of specifying a permission in a view configuration using
-:meth:`pyramid.config.Configurator.add_view`:
->>>>>>> fee38663daccc0130d0c34dbc5a14e67bef2e183
+If an :term:`authorization policy` is active, any :term:`permission` attached
+to a :term:`view configuration` found during view lookup will be verified.
+This will ensure that the currently authenticated user possesses that
+permission against the :term:`context` before the view function is actually
+called.  Here's an example of specifying a permission in a view configuration
+using :meth:`pyramid.config.Configurator.add_view`:
 
 .. code-block:: python
    :linenos:
