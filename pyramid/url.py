@@ -2,6 +2,8 @@
 
 import os
 
+from zope.deprecation import deprecated
+
 from repoze.lru import lru_cache
 
 from pyramid.interfaces import IContextURL
@@ -73,9 +75,9 @@ def route_url(route_name, request, *elements, **kw):
 
     If a keyword argument ``_anchor`` is present, its string
     representation will be used as a named anchor in the generated URL
-    (e.g. if ``_anchor`` is passed as ``foo`` and the model URL is
-    ``http://example.com/model/url``, the resulting generated URL will
-    be ``http://example.com/model/url#foo``).
+    (e.g. if ``_anchor`` is passed as ``foo`` and the route URL is
+    ``http://example.com/route/url``, the resulting generated URL will
+    be ``http://example.com/route/url#foo``).
 
     .. note:: If ``_anchor`` is passed as a string, it should be UTF-8
               encoded. If ``_anchor`` is passed as a Unicode object, it
@@ -181,42 +183,42 @@ def route_path(route_name, request, *elements, **kw):
     kw['_app_url'] = ''
     return route_url(route_name, request, *elements, **kw)
 
-def model_url(model, request, *elements, **kw):
+def resource_url(resource, request, *elements, **kw):
     """
-    Generate a string representing the absolute URL of the ``model``
+    Generate a string representing the absolute URL of the :term:`resource`
     object based on the ``wsgi.url_scheme``, ``HTTP_HOST`` or
     ``SERVER_NAME`` in the ``request``, plus any ``SCRIPT_NAME``.  The
     overall result of this function is always a UTF-8 encoded string
     (never Unicode).
 
-    .. note:: Calling :meth:`pyramid.Request.model_url` can be used to
-              achieve the same result as :func:`pyramid.url.model_url`.
+    .. note:: Calling :meth:`pyramid.Request.resource_url` can be used to
+              achieve the same result as :func:`pyramid.url.resource_url`.
 
     Examples::
 
-        model_url(context, request) =>
+        resource_url(context, request) =>
 
                                    http://example.com/
 
-        model_url(context, request, 'a.html') =>
+        resource_url(context, request, 'a.html') =>
 
                                    http://example.com/a.html
 
-        model_url(context, request, 'a.html', query={'q':'1'}) =>
+        resource_url(context, request, 'a.html', query={'q':'1'}) =>
 
                                    http://example.com/a.html?q=1
 
-        model_url(context, request, 'a.html', anchor='abc') =>
+        resource_url(context, request, 'a.html', anchor='abc') =>
 
                                    http://example.com/a.html#abc
 
     Any positional arguments passed in as ``elements`` must be strings
     or Unicode objects.  These will be joined by slashes and appended
-    to the generated model URL.  Each of the elements passed in is
+    to the generated resource URL.  Each of the elements passed in is
     URL-quoted before being appended; if any element is Unicode, it
     will converted to a UTF-8 bytestring before being URL-quoted.
 
-    .. warning:: if no ``elements`` arguments are specified, the model
+    .. warning:: if no ``elements`` arguments are specified, the resource
                  URL will end with a trailing slash.  If any
                  ``elements`` are used, the generated URL will *not*
                  end in trailing a slash.
@@ -241,9 +243,9 @@ def model_url(model, request, *elements, **kw):
 
     If a keyword argument ``anchor`` is present, its string
     representation will be used as a named anchor in the generated URL
-    (e.g. if ``anchor`` is passed as ``foo`` and the model URL is
-    ``http://example.com/model/url``, the resulting generated URL will
-    be ``http://example.com/model/url#foo``).
+    (e.g. if ``anchor`` is passed as ``foo`` and the resource URL is
+    ``http://example.com/resource/url``, the resulting generated URL will
+    be ``http://example.com/resource/url#foo``).
 
     .. note:: If ``anchor`` is passed as a string, it should be UTF-8
               encoded. If ``anchor`` is passed as a Unicode object, it
@@ -255,15 +257,15 @@ def model_url(model, request, *elements, **kw):
     will always follow the query element,
     e.g. ``http://example.com?foo=1#bar``.
 
-    .. note:: If the ``model`` used is the result of a
+    .. note:: If the :term:`resource` used is the result of a
              :term:`traversal`, it must be :term:`location`-aware.
-             The ``model`` can also be the context of a :term:`URL
+             The resource can also be the context of a :term:`URL
              dispatch`; contexts found this way do not need to be
              location-aware.
 
     .. note:: If a 'virtual root path' is present in the request
               environment (the value of the WSGI environ key
-              ``HTTP_X_VHM_ROOT``), and the ``model`` was obtained via
+              ``HTTP_X_VHM_ROOT``), and the resource was obtained via
               :term:`traversal`, the URL path will not include the
               virtual root prefix (it will be stripped off the
               left hand side of the generated URL).
@@ -273,10 +275,10 @@ def model_url(model, request, *elements, **kw):
     except AttributeError:
         reg = get_current_registry() # b/c
     
-    context_url = reg.queryMultiAdapter((model, request), IContextURL)
+    context_url = reg.queryMultiAdapter((resource, request), IContextURL)
     if context_url is None:
-        context_url = TraversalContextURL(model, request)
-    model_url = context_url()
+        context_url = TraversalContextURL(resource, request)
+    resource_url = context_url()
 
     qs = ''
     anchor = ''
@@ -295,7 +297,14 @@ def model_url(model, request, *elements, **kw):
     else:
         suffix = ''
 
-    return model_url + suffix + qs + anchor
+    return resource_url + suffix + qs + anchor
+
+model_url = resource_url
+
+deprecated(
+    'model_url',
+    '(The ``pyramid.url.model_url`` API is deprecated as of Pyramid 1.0.  Use'
+    'the ``pyramid.url.resource_url`` instead.) ')
 
 def static_url(path, request, **kw):
     """

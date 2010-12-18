@@ -41,8 +41,14 @@
         />
 
     <meta:directive
+        name="asset"
+        schema="pyramid.zcml.IAssetDirective"
+        handler="pyramid.zcml.asset"
+        />
+
+    <meta:directive
         name="resource"
-        schema="pyramid.zcml.IResourceDirective"
+        schema="pyramid.zcml.IAssetDirective"
         handler="pyramid.zcml.resource"
         />
 

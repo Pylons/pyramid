@@ -375,7 +375,7 @@ order of route configuration declarations is very important.
 The order that routes declarations are evaluated is the order in which
 they are added to the application at startup time.  This is unlike
 :term:`traversal`, which depends on emergent behavior which happens as
-a result of traversing a graph.
+a result of traversing a resource tree.
 
 For routes added via the :mod:`pyramid.config.Configurator.add_route`
 method, the order that routes are evaluated is the order in which they are
@@ -414,7 +414,7 @@ found via :term:`view lookup`.
    :linenos:
 
    config.add_route('abc', '/abc', view='myproject.views.theview', 
-                    factory='myproject.models.root_factory')
+                    factory='myproject.resources.root_factory')
 
 The factory can either be a Python object or a :term:`dotted Python name` (a
 string) which points to such a Python object, as it is above.
@@ -459,7 +459,7 @@ represent neither predicates nor view configuration information.
   A Python object (often a function or a class) or a :term:`dotted
   Python name` to such an object that will generate a
   :app:`Pyramid` :term:`context` object when this route
-  matches. For example, ``mypackage.models.MyFactoryClass``.  If this
+  matches. For example, ``mypackage.resources.MyFactoryClass``.  If this
   argument is not specified, the traversal root factory will be used.
 
 ``traverse``
@@ -979,10 +979,10 @@ An example of using a route with a factory:
 
    config.add_route('idea', 'ideas/{idea}', 
                     view='myproject.views.idea_view',
-                    factory='myproject.models.Idea')
+                    factory='myproject.resources.Idea')
 
-The above route will manufacture an ``Idea`` model as a
-:term:`context`, assuming that ``mypackage.models.Idea`` resolves to a
+The above route will manufacture an ``Idea`` resource as a
+:term:`context`, assuming that ``mypackage.resources.Idea`` resolves to a
 class that accepts a request in its ``__init__``.  For example:
 
 .. code-block:: python

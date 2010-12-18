@@ -468,20 +468,19 @@ works in these templates.
 Using ZPT Macros in :app:`Pyramid`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When a :term:`renderer` is used to render a template, :app:`Pyramid`
-makes at least two top-level names available to the template by default:
-``context`` and ``request``.  One of the common needs in ZPT-based
-templates is to use one template's "macros" from within a different
-template.  In Zope, this is typically handled by retrieving the template
-from the ``context``.  But the context in :app:`Pyramid` is typically a
-model object, and templates cannot usually be retrieved from models.  To
-use macros in :app:`Pyramid`, you need to make the macro template itself
-available to the rendered template by passing the macro template, or
-even the macro itself, *into* the rendered template.  To do this you can
-use the :func:`pyramid.renderers.get_renderer` API to retrieve the macro
-template, and pass it into the template being rendered via the dictionary
-returned by the view.  For example, using a :term:`view configuration` via a
-:class:`pyramid.view.view_config` decorator that uses a
+When a :term:`renderer` is used to render a template, :app:`Pyramid` makes at
+least two top-level names available to the template by default: ``context``
+and ``request``.  One of the common needs in ZPT-based templates is to use
+one template's "macros" from within a different template.  In Zope, this is
+typically handled by retrieving the template from the ``context``.  But the
+context in :app:`Pyramid` is a resource object, and templates cannot usually
+be retrieved from resources.  To use macros in :app:`Pyramid`, you need to make
+the macro template itself available to the rendered template by passing the
+macro template, or even the macro itself, *into* the rendered template.  To
+do this you can use the :func:`pyramid.renderers.get_renderer` API to
+retrieve the macro template, and pass it into the template being rendered via
+the dictionary returned by the view.  For example, using a :term:`view
+configuration` via a :class:`pyramid.view.view_config` decorator that uses a
 :term:`renderer`:
 
 .. code-block:: python
@@ -658,7 +657,7 @@ on, an exception resulting from the same problem might end like so:
                    request: <Request - at 0x1d2ecd0>
                    project: proj
                    macros: <Macros - at 0x1d3aed0>
-                   context: <MyModel None at 0x1d39130>
+                   context: <MyResource None at 0x1d39130>
                    view: <function my_view at 0x1d23570>
 
     NameError: wrong

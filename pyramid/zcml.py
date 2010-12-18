@@ -402,23 +402,30 @@ def forbidden(_context,
                              wrapper=wrapper)
 
     
-class IResourceDirective(Interface):
+class IAssetDirective(Interface):
     """
-    Directive for specifying that one package may override resources from
+    Directive for specifying that one package may override assets from
     another package.
     """
     to_override = TextLine(
         title=u"Override spec",
-        description=u'The spec of the resource to override.',
+        description=u'The spec of the asset to override.',
         required=True)
     override_with = TextLine(
         title=u"With spec",
-        description=u"The spec of the resource providing the override.",
+        description=u"The spec of the asset providing the override.",
         required=True)
 
-def resource(_context, to_override, override_with, _override=None):
+def asset(_context, to_override, override_with, _override=None):
     config = Configurator.with_context(_context)
-    config.override_resource(to_override, override_with, _override=_override)
+    config.override_asset(to_override, override_with, _override=_override)
+
+resource = asset # b/w compat
+
+deprecated(
+    'resource',
+    '(The ``resource`` ZCML directive is deprecated as of Pyramid 1.0.  Use'
+    'the ``asset`` directive instead.) ')
 
 class IRepozeWho1AuthenticationPolicyDirective(Interface):
     identifier_name = TextLine(title=u'identitfier_name', required=False,

@@ -1,26 +1,26 @@
-Static Resources
-================
+Static Assets
+=============
 
-:app:`Pyramid` makes it possible to serve up static 
-resources files from a directory on a filesystem.  This chapter describes
-how to configure :app:`Pyramid` to do so.
+:app:`Pyramid` makes it possible to serve up static asset files from a
+directory on a filesystem.  This chapter describes how to configure
+:app:`Pyramid` to do so.
 
 .. index::
    single: add_static_view
 
-.. _static_resources_section:
+.. _static_assets_section:
 
-Serving Static Resources
-------------------------
+Serving Static Assets
+---------------------
 
-Use the :meth:`pyramid.config.Configurator.add_static_view` to
-instruct :app:`Pyramid` to serve static resources such as JavaScript and CSS
-files. This mechanism makes static files available at a name relative to the
-application root URL, e.g. ``/static``.
+Use the :meth:`pyramid.config.Configurator.add_static_view` to instruct
+:app:`Pyramid` to serve static assets such as JavaScript and CSS files. This
+mechanism makes static files available at a name relative to the application
+root URL, e.g. ``/static``.
 
 Note that the ``path`` provided to
-:meth:`pyramid.config.Configurator.add_static_view` may be a fully
-qualified :term:`resource specification`, or an *absolute path*.  
+:meth:`pyramid.config.Configurator.add_static_view` may be a fully qualified
+:term:`asset specification`, or an *absolute path*.
 
 Here's an example of a use of
 :meth:`pyramid.config.Configurator.add_static_view` that will serve
@@ -34,11 +34,10 @@ path.
    # config is an instance of pyramid.config.Configurator
    config.add_static_view(name='static', path='/var/www/static')
 
-Here's an example of
-:meth:`pyramid.config.Configurator.add_static_view` that will serve
-files up under the ``/static`` URL from the ``a/b/c/static`` directory of the
-Python package named ``some_package`` using a fully qualified :term:`resource
-specification`.
+Here's an example of :meth:`pyramid.config.Configurator.add_static_view` that
+will serve files up under the ``/static`` URL from the ``a/b/c/static``
+directory of the Python package named ``some_package`` using a fully
+qualified :term:`asset specification`.
 
 .. code-block:: python
    :linenos:
@@ -46,7 +45,7 @@ specification`.
    # config is an instance of pyramid.config.Configurator
    config.add_static_view(name='static', path='some_package:a/b/c/static')
 
-Whether you use for ``path`` a fully qualified resource specification, or an
+Whether you use for ``path`` a fully qualified asset specification, or an
 absolute path, when you place your static files on the filesystem in the
 directory represented as the ``path`` of the directive, you will then be able
 to view the static files in this directory via a browser at URLs prefixed
@@ -58,13 +57,12 @@ subdirectories recursively, and any subdirectories may hold files; these will
 be resolved by the static view as you would expect.
 
 While the ``path`` argument can be a number of different things, the ``name``
-argument of the call to
-:meth:`pyramid.config.Configurator.add_static_view` can also be one of
-a number of things: a *view name* or a *URL*.  The above examples have shown
-usage of the ``name`` argument as a view name.  When ``name`` is a *URL* (or
-any string with a slash (``/``) in it), static resources can be served from
-an external webserver.  In this mode, the ``name`` is used as the URL prefix
-when generating a URL using :func:`pyramid.url.static_url`.
+argument of the call to :meth:`pyramid.config.Configurator.add_static_view`
+can also be one of a number of things: a *view name* or a *URL*.  The above
+examples have shown usage of the ``name`` argument as a view name.  When
+``name`` is a *URL* (or any string with a slash (``/``) in it), static assets
+can be served from an external webserver.  In this mode, the ``name`` is used
+as the URL prefix when generating a URL using :func:`pyramid.url.static_url`.
 
 .. note::
 
@@ -130,18 +128,18 @@ imperative configuration for the same purpose.
    other than ``media_location`` could be used.
 
 .. index::
-   single: generating static resource urls
-   single: static resource urls
+   single: generating static asset urls
+   single: static asset urls
 
-.. _generating_static_resource_urls:
+.. _generating_static_asset_urls:
 
-Generating Static Resource URLs
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Generating Static Asset URLs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When a :meth:`pyramid.config.Configurator.add_static_view` method is
-used to register a static resource directory, a special helper API named
-:func:`pyramid.url.static_url` can be used to generate the appropriate URL for a
-package resource that lives in one of the directories named by the static
+When a :meth:`pyramid.config.Configurator.add_static_view` method is used to
+register a static asset directory, a special helper API named
+:func:`pyramid.url.static_url` can be used to generate the appropriate URL
+for an asset that lives in one of the directories named by the static
 registration ``path`` attribute.
 
 For example, let's assume you create a set of static declarations like so:
@@ -149,19 +147,19 @@ For example, let's assume you create a set of static declarations like so:
 .. code-block:: python
    :linenos:
 
-   config.add_static_view(name='static1', path='mypackage:resources/1')
-   config.add_static_view(name='static2', path='mypackage:resources/2')
+   config.add_static_view(name='static1', path='mypackage:assets/1')
+   config.add_static_view(name='static2', path='mypackage:assets/2')
 
 These declarations create URL-accessible directories which have URLs that
-begin with ``/static1`` and ``/static2``, respectively.  The resources in
-the ``resources/1`` directory of the ``mypackage`` package are consulted when
-a user visits a URL which begins with ``/static1``, and the resources in the
-``resources/2`` directory of the ``mypackage`` package are consulted when a
-user visits a URL which begins with ``/static2``.
+begin with ``/static1`` and ``/static2``, respectively.  The assets in the
+``assets/1`` directory of the ``mypackage`` package are consulted when a user
+visits a URL which begins with ``/static1``, and the assets in the
+``assets/2`` directory of the ``mypackage`` package are consulted when a user
+visits a URL which begins with ``/static2``.
 
-You needn't generate the URLs to static resources "by hand" in such a
-configuration.  Instead, use the :func:`pyramid.url.static_url` API
-to generate them for you.  For example:
+You needn't generate the URLs to static assets "by hand" in such a
+configuration.  Instead, use the :func:`pyramid.url.static_url` API to
+generate them for you.  For example:
 
 .. code-block:: python
    :linenos:
@@ -170,8 +168,8 @@ to generate them for you.  For example:
    from pyramid.chameleon_zpt import render_template_to_response
 
    def my_view(request):
-       css_url = static_url('mypackage:resources/1/foo.css', request)
-       js_url = static_url('mypackage:resources/2/foo.js', request)
+       css_url = static_url('mypackage:assets/1/foo.css', request)
+       js_url = static_url('mypackage:assets/2/foo.js', request)
        return render_template_to_response('templates/my_template.pt',
                                           css_url = css_url,
                                           js_url = js_url)
@@ -186,13 +184,12 @@ constructing static URLs "by hand" is that if you need to change the ``name``
 of a static URL declaration, the generated URLs will continue to resolve
 properly after the rename.
 
-URLs may also be generated by :func:`pyramid.url.static_url` to static
-resources that live *outside* the :app:`Pyramid` application.  This will
-happen when the :meth:`pyramid.config.Configurator.add_static_view`
-API associated with the path fed to :func:`pyramid.url.static_url` is a *URL*
-instead of a view name.  For example, the ``name`` argument may be
-``http://example.com`` while the the ``path`` given may be
-``mypackage:images``:
+URLs may also be generated by :func:`pyramid.url.static_url` to static assets
+that live *outside* the :app:`Pyramid` application.  This will happen when
+the :meth:`pyramid.config.Configurator.add_static_view` API associated with
+the path fed to :func:`pyramid.url.static_url` is a *URL* instead of a view
+name.  For example, the ``name`` argument may be ``http://example.com`` while
+the the ``path`` given may be ``mypackage:images``:
 
 .. code-block:: python
    :linenos:
@@ -200,7 +197,7 @@ instead of a view name.  For example, the ``name`` argument may be
    config.add_static_view(name='http://example.com/images', path='mypackage:images')
 
 Under such a configuration, the URL generated by ``static_url`` for
-resources which begin with ``mypackage:images`` will be prefixed with
+assets which begin with ``mypackage:images`` will be prefixed with
 ``http://example.com/images``:
 
 .. code-block:: python
@@ -210,25 +207,23 @@ resources which begin with ``mypackage:images`` will be prefixed with
    # -> http://example.com/images/logo.png
 
 .. index::
-   single: static resource view
+   single: static assets view
 
-Advanced: Serving Static Resources Using a View Callable
---------------------------------------------------------
+Advanced: Serving Static Assets Using a View Callable
+-----------------------------------------------------
 
-For more flexibility, static resources can be served by a :term:`view
-callable` which you register manually.  For example, you may want
-static resources to only be available when the :term:`context` of the
-view is of a particular type, or when the request is of a particular
-type.
+For more flexibility, static assets can be served by a :term:`view callable`
+which you register manually.  For example, you may want static assets to only
+be available when the :term:`context` is of a particular type, or when
+certain request headers are present.
 
-The :class:`pyramid.view.static` helper class is used to perform
-this task. This class creates an object that is capable acting as a
-:app:`Pyramid` view callable which serves static resources from a
-directory.  For instance, to serve files within a directory located on
-your filesystem at ``/path/to/static/dir`` from the URL path
-``/static`` in your application, create an instance of the
-:class:`pyramid.view.static` class inside a ``static.py`` file in
-your application root as below.
+The :class:`pyramid.view.static` helper class is used to perform this
+task. This class creates an object that is capable acting as a :app:`Pyramid`
+view callable which serves static assets from a directory.  For instance, to
+serve files within a directory located on your filesystem at
+``/path/to/static/dir`` from the URL path ``/static`` in your application,
+create an instance of the :class:`pyramid.view.static` class inside a
+``static.py`` file in your application root as below.
 
 .. ignore-next-block
 .. code-block:: python
@@ -240,47 +235,43 @@ your application root as below.
 .. note:: the argument to :class:`pyramid.view.static` can also be
    a "here-relative" pathname, e.g. ``my/static`` (meaning relative to the
    Python package of the module in which the view is being defined).
-   It can also be a :term:`resource specification`
+   It can also be a :term:`asset specification`
    (e.g. ``anotherpackage:some/subdirectory``).
  
 Subsequently, you may wire this view up to be accessible as ``/static`` using
-the :mod:`pyramid.config.Configurator.add_view` method in your
-application's startup code against either the class or interface that
-represents your root object.
+the :mod:`pyramid.config.Configurator.add_view` method in your application's
+startup code against either the class or interface that represents your root
+resource object.
 
 .. code-block:: python
    :linenos:
 
    config.add_view('mypackage.static.static_view', name='static',
-                   context='mypackage.models.Root')
+                   context='mypackage.resources.Root')
 
-In this case, ``mypackage.models.Root`` refers to the class of your
-:app:`Pyramid` application's traversal root object.
+In this case, ``mypackage.resources.Root`` refers to the class of your
+:app:`Pyramid` application's resource tree.
 
-The context argument above limits where the static view is accessible to
-URL paths directly under the root object.  If you omit the ``context``
-argument, then ``static`` will be accessible as the static view against
-any model object in the traversal graph.  This will allow
-``/static/foo.js`` to work, but it will also allow for
-``/anything/static/foo.js`` too, as long as ``anything`` can be
-resolved.
+The context argument above limits where the static view is accessible to URL
+paths directly under the root object.  If you omit the ``context`` argument,
+then ``static`` will be accessible as the static view against any resource
+object in the resource tree.  This will allow ``/static/foo.js`` to work, but
+it will also allow for ``/anything/static/foo.js`` too, as long as
+``anything`` can be resolved.
 
 Note that you cannot use the :func:`pyramid.url.static_url` API to generate
-URLs against resources made accessible by registering a custom static view.
+URLs against assets made accessible by registering a custom static view.
 
 .. warning::
 
-   When adding a static view to your root object, you need to be
-   careful that there are no model objects contained in the
-   root with the same key as the view name (e.g., ``static``). 
-   Model objects take precedence during traversal,
-   thus such a name collision will cause the model to "shadow"
-   your static view. To avoid this issue, and ensure that your 
-   root object's ``__getitem__`` is never
-   called when a static resource is requested, you can refer to them
-   unambiguously using the ``@@`` prefix (goggles) in their URLs.  
-   For the above examples you could use '/@@static/foo.js' 
-   instead of '/static/foo.js' to avoid such shadowing.
-   See :ref:`traversal_chapter` for information
-   about "goggles" (``@@``).
+   When adding a static view to your root object, you need to be careful that
+   there are no resource objects contained in the root with the same key as
+   the view name (e.g., ``static``).  Resource objects take precedence during
+   traversal, thus such a name collision will cause the resource to "shadow"
+   your static view. To avoid this issue, and ensure that your root
+   resource's ``__getitem__`` is never called when a static asset is
+   requested, you can refer to them unambiguously using the ``@@`` prefix
+   (goggles) in their URLs.  For the above examples you could use
+   '/@@static/foo.js' instead of '/static/foo.js' to avoid such shadowing.
+   See :ref:`traversal_chapter` for information about "goggles" (``@@``).
 

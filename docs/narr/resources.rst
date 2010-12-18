@@ -1,274 +1,319 @@
-.. index::
-   single: resources
-
-.. _resources_chapter:
-
 Resources
 =========
 
-A :term:`resource` is any file contained within a Python
-:term:`package` which is *not* a Python source code file.  For
-example, each of the following is a resource:
+A :term:`resource` is an object that represents a "place" in your
+application.  Every :app:`Pyramid` application has at least one resource
+object: the :term:`root resource`.  The root resource is the root of a
+:term:`resource tree`.  A resource tree is a set of nested dictionary-like
+objects which you may use to represent your website's structure.
 
-- a :term:`Chameleon` template file contained within a Python package.
+In an application which uses :term:`traversal` to map URLs to code, the
+resource tree structure is used heavily to map a URL to a :term:`view
+callable`.  :app:`Pyramid` will walk "up" the resource tree when
+:term:`traversal` is used in order to find a :term:`context`.  Once a context
+is found, the resource represented by the context combined with data in the
+request will be used to find a :term:`view callable`.
 
-- a GIF image file contained within a Python package.
+In an application which uses :term:`URL dispatch`, the resource tree is only
+used indirectly, and is often "invisible" to the developer.  In URL dispatch
+applications, the resource "tree" is often composed of only the root resource
+by itself.  This root resource sometimes has security declarations attached
+to it, but is not required to have any.  In general, the resource tree is
+much less important in applications that use URL dispatch than applications
+that use traversal.
 
-- a CSS file contained within a Python package.
+In "Zope-like" :app:`Pyramid` applications, resource objects also often store
+data persistently and offer methods related to mutating that persistent data.
+In these kinds of applications, resources not only represent the site
+structure of your website, but they become the :term:`model` of the
+application.
 
-- a JavaScript source file contained within a Python package.
+Also:
 
-- A directory within a package that does not have an ``__init__.py``
-  in it (if it possessed an ``__init__.py`` it would *be* a package).
+- The ``context`` and ``containment`` predicate arguments to
+  :meth:`pyramid.config.Configurator.add_view` (or a
+  :func:`pyramid.view.view_config` decorator) and reference a resource class
+  or resource :term:`interface`.
 
-The use of resources is quite common in most web development projects.
-For example, when you create a :app:`Pyramid` application using one
-of the available "paster" templates, as described in
-:ref:`creating_a_project`, the directory representing the application
-contains a Python :term:`package`.  Within that Python package, there
-are directories full of files which are resources.  For example, there
-is a ``templates`` directory which contains ``.pt`` files, and a
-``static`` directory which contains ``.css``, ``.js``, and ``.gif``
-files.
+- A :term:`root factory` returns a resource.
 
-.. _understanding_resources:
-
-Understanding Resources
------------------------
-
-Let's imagine you've created a :app:`Pyramid` application that uses
-a :term:`Chameleon` ZPT template via the
-:func:`pyramid.chameleon_zpt.render_template_to_response` API.  For
-example, the application might address the resource named
-``templates/some_template.pt`` using that API within a ``views.py``
-file inside a ``myapp`` package:
-
-.. ignore-next-block
-.. code-block:: python
-   :linenos:
-
-   from pyramid.chameleon_zpt import render_template_to_response
-   render_template_to_response('templates/some_template.pt')
-
-"Under the hood", when this API is called, :app:`Pyramid` attempts
-to make sense out of the string ``templates/some_template.pt``
-provided by the developer.  To do so, it first finds the "current"
-package.  The "current" package is the Python package in which the
-``views.py`` module which contains this code lives.  This would be the
-``myapp`` package, according to our example so far.  By resolving the
-current package, :app:`Pyramid` has enough information to locate
-the actual template file.  These are the elements it needs:
-
-- The *package name* (``myapp``)
-
-- The *resource name* (``templates/some_template.pt``)
-
-:app:`Pyramid` uses the :term:`pkg_resources` API to resolve the
-package name and resource name to an absolute
-(operating-system-specific) file name.  It eventually passes this
-resolved absolute filesystem path to the Chameleon templating engine,
-which then uses it to load, parse, and execute the template file.
-
-Package names often contain dots.  For example, ``pyramid`` is a
-package.  Resource names usually look a lot like relative UNIX file
-paths.
+- A resource is exposed to :term:`view` code as the :term:`context` of a
+  view.
 
 .. index::
-   pair: overriding; resources
+   single: resource constructor
 
-.. _overriding_resources_section:
+Defining a Resource Constructor
+-------------------------------
 
-Overriding Resources
---------------------
+An example of a resource constructor, ``BlogEntry`` is presented below.  It
+is implemented as a class which, when instantiated, becomes a resource
+instance.
 
-It can often be useful to override specific resources "from outside" a
-given :app:`Pyramid` application.  For example, you may wish to
-reuse an existing :app:`Pyramid` application more or less
-unchanged.  However, some specific template file owned by the
-application might have inappropriate HTML, or some static resource
-(such as a logo file or some CSS file) might not be appropriate.  You
-*could* just fork the application entirely, but it's often more
-convenient to just override the resources that are inappropriate and
-reuse the application "as is".  This is particularly true when you
-reuse some "core" application over and over again for some set of
-customers (such as a CMS application, or some bug tracking
-application), and you want to make arbitrary visual modifications to a
-particular application deployment without forking the underlying code.
+.. code-block:: python
+   :linenos:
 
-To this end, :app:`Pyramid` contains a feature that makes it
-possible to "override" one resource with one or more other resources.
-In support of this feature, a :term:`ZCML` directive exists named
-``resource``.  The ``resource`` directive allows you to *override* the
-following kinds of resources defined in any Python package:
+   import datetime
 
-- Individual :term:`Chameleon` templates.
+   class BlogEntry(object):
+       def __init__(self, title, body, author):
+           self.title = title
+           self.body =  body
+           self.author = author
+           self.created = datetime.datetime.now()
 
-- A directory containing multiple Chameleon templates.
-
-- Individual static files served up by an instance of the
-  ``pyramid.view.static`` helper class.
-
-- A directory of static files served up by an instance of the
-  ``pyramid.view.static`` helper class.
-
-- Any other resource (or set of resources) addressed by code that uses
-  the setuptools :term:`pkg_resources` API.
+A resource constructor may be any Python object which is callable, and which
+returns a resource instance.  In the above example, the ``BlogEntry`` class
+can be "called", returning a resource instance.
 
 .. index::
-   single: override_resource
+   single: resource interfaces
 
-.. _override_resource:
+.. _resources_which_implement_interfaces:
 
-The ``override_resource`` API
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Resources Which Implement Interfaces
+------------------------------------
 
-An individual call to
-:meth:`pyramid.config.Configurator.override_resource` can
-override a single resource.  For example:
+Resources can optionally be made to implement an :term:`interface`.  An
+interface is used to tag a resource object with a "type" that can later be
+referred to within :term:`view configuration`.
 
-.. ignore-next-block
+Specifying an interface instead of a class as the ``context`` or
+``containment`` predicate arguments within :term:`view configuration`
+statements effectively makes it possible to use a single view callable for
+more than one class of resource object.  If your application is simple enough
+that you see no reason to want to do this, you can skip reading this section
+of the chapter.
+
+For example, here's some code which describes a blog entry which also
+declares that the blog entry implements an :term:`interface`.
+
 .. code-block:: python
    :linenos:
 
-   config.override_resource(
-            to_override='some.package:templates/mytemplate.pt',
-            override_with='another.package:othertemplates/anothertemplate.pt')
+   import datetime
+   from zope.interface import implements
+   from zope.interface import Interface
 
-The string value passed to both ``to_override`` and ``override_with``
-attached to a resource directive is called a "specification".  The
-colon separator in a specification separates the *package name* from
-the *resource name*.  The colon and the following resource name are
-optional.  If they are not specified, the override attempts to resolve
-every lookup into a package from the directory of another package.
-For example:
+   class IBlogEntry(Interface):
+       pass
 
-.. ignore-next-block
+   class BlogEntry(object):
+       implements(IBlogEntry)
+       def __init__(self, title, body, author):
+           self.title = title
+           self.body =  body
+           self.author = author
+           self.created = datetime.datetime.now()
+
+This resource consists of two things: the class which defines the resource
+constructor as the class ``BlogEntry``, and an :term:`interface` attached to
+the class via an ``implements`` statement at class scope using the
+``IBlogEntry`` interface as its sole argument.
+
+The interface object used must be an instance of a class that inherits from
+:class:`zope.interface.Interface`.
+
+A resource class may implement zero or more interfaces.  You specify that a
+resource implements an interface by using the
+:func:`zope.interface.implements` function at class scope.  The above
+``BlogEntry`` resource implements the ``IBlogEntry`` interface.
+
+You can also specify that a particular resource *instance* provides an
+interface, as opposed to its class.  When you declare that a class implements
+an interface, all instances of that class will also provide that interface.
+However, you can also just say that a single object provides the interface.
+To do so, use the :func:`zope.interface.directlyProvides` function:
+
 .. code-block:: python
    :linenos:
 
-   config.override_resource(to_override='some.package',
-                            override_with='another.package')
+   from zope.interface import directlyProvides
+   from zope.interface import Interface
 
-Individual subdirectories within a package can also be overridden:
+   class IBlogEntry(Interface):
+       pass
 
-.. ignore-next-block
+   class BlogEntry(object):
+       def __init__(self, title, body, author):
+           self.title = title
+           self.body =  body
+           self.author = author
+           self.created = datetime.datetime.now()
+
+   entry = BlogEntry('title', 'body', 'author')
+   directlyProvides(entry, IBlogEntry)
+
+:func:`zope.interface.directlyProvides` will replace any existing interface
+that was previously provided by an instance.  If a resource object already
+has instance-level interface declarations that you don't want to replace, use
+the :func:`zope.interface.alsoProvides` function:
+
 .. code-block:: python
    :linenos:
 
-   config.override_resource(to_override='some.package:templates/',
-                            override_with='another.package:othertemplates/')
+   from zope.interface import alsoProvides
+   from zope.interface import directlyProvides
+   from zope.interface import Interface
 
+   class IBlogEntry1(Interface):
+       pass
 
-If you wish to override a directory with another directory, you *must*
-make sure to attach the slash to the end of both the ``to_override``
-specification and the ``override_with`` specification.  If you fail to
-attach a slash to the end of a specification that points to a directory,
-you will get unexpected results.
+   class IBlogEntry2(Interface):
+       pass
 
-You cannot override a directory specification with a file
-specification, and vice versa: a startup error will occur if you try.
-You cannot override a resource with itself: a startup error will occur
-if you try.
+   class BlogEntry(object):
+       def __init__(self, title, body, author):
+           self.title = title
+           self.body =  body
+           self.author = author
+           self.created = datetime.datetime.now()
 
-Only individual *package* resources may be overridden.  Overrides will
-not traverse through subpackages within an overridden package.  This
-means that if you want to override resources for both
-``some.package:templates``, and ``some.package.views:templates``, you
-will need to register two overrides.
+   entry = BlogEntry('title', 'body', 'author')
+   directlyProvides(entry, IBlogEntry1)
+   alsoProvides(entry, IBlogEntry2)
 
-The package name in a specification may start with a dot, meaning that
-the package is relative to the package in which the configuration
-construction file resides (or the ``package`` argument to the
-:class:`pyramid.config.Configurator` class construction).
-For example:
+:func:`zope.interface.alsoProvides` will augment the set of interfaces
+directly provided by an instance instead of overwriting them like
+:func:`zope.interface.directlyProvides` does.
 
-.. ignore-next-block
-.. code-block:: python
-   :linenos:
-
-   config.override_resource(to_override='.subpackage:templates/',
-                            override_with='another.package:templates/')
-
-Multiple ``override_resource`` statements which name a shared
-``to_override`` but a different ``override_with`` specification can be
-"stacked" to form a search path.  The first resource that exists in
-the search path will be used; if no resource exists in the override
-path, the original resource is used.
-
-Resource overrides can actually override resources other than
-templates and static files.  Any software which uses the
-:func:`pkg_resources.get_resource_filename`,
-:func:`pkg_resources.get_resource_stream` or
-:func:`pkg_resources.get_resource_string` APIs will obtain an
-overridden file when an override is used.
+For more information about how resource interfaces can be used by view
+configuration, see :ref:`using_resource_interfaces`.
 
 .. index::
-   pair: ZCML directive; resource
+   single: resource tree
+   single: traversal tree
+   single: object tree
+   single: container resources
+   single: leaf resources
 
-.. _resource_zcml_directive:
+Defining a Resource Tree
+------------------------
 
-The ``resource`` ZCML Directive
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+When :term:`traversal` is used (as opposed to a purely :term:`url dispatch`
+based application), :app:`Pyramid` expects to be able to traverse a tree
+composed of resources (the :term:`resource tree`).  Traversal begins at a
+root resource, and descends into the tree recursively via each resource's
+``__getitem__`` method.  :app:`Pyramid` imposes the following policy on
+resource instances in the tree:
 
-Instead of using
-:meth:`pyramid.config.Configurator.override_resource` during
-:term:`imperative configuration`, an equivalent can be used to perform
-all the tasks described above within :term:`ZCML`.  The ZCML
-``resource`` tag is a frontend to using ``override_resource``.
+- A container resource (a resource which contains other resources) must
+  supply a ``__getitem__`` method which is willing to resolve a unicode name
+  to a sub-resource.  If a sub-resource by a particular name does not exist
+  in a container resource, ``__getitem__`` method of the container resource
+  must raise a :exc:`KeyError`.  If a sub-resource by that name *does* exist,
+  the container's ``__getitem__`` should return the sub-resource.
 
-An individual :app:`Pyramid` ``resource`` ZCML statement can
-override a single resource.  For example:
+- Leaf resources, which do not contain other resources, must not implement a
+  ``__getitem__``, or if they do, their ``__getitem__`` method must raise a
+  :exc:`KeyError`.
 
-.. code-block:: xml
+See :ref:`traversal_chapter` for more information about how traversal
+works against resource instances.
+
+.. index::
+   pair: location-aware; resource
+
+.. _location_aware:
+
+Location-Aware Resources
+------------------------
+
+Applications which use :term:`traversal` to locate the :term:`context`
+resource of a view must ensure that the resources that make up the
+resource tree are "location aware".
+
+In order for :app:`Pyramid` location, security, URL-generation, and traversal
+functions (i.e., functions in :ref:`location_module`,
+:ref:`traversal_module`, :ref:`url_module` and some in :ref:`security_module`
+) to work properly against the resources in a resource tree, all resources in
+the tree must be :term:`location` -aware.  This means they must have two
+attributes: ``__parent__`` and ``__name__``.
+
+The ``__parent__`` attribute should be a reference to the resource's parent
+resource instance in the tree.  The ``__name__`` attribute should be the name
+with which a resource's parent refers to the resource via ``__getitem__``.
+
+The ``__parent__`` of the root resource should be ``None`` and its
+``__name__`` should be the empty string.  For instance:
+
+.. code-block:: python
    :linenos:
 
-    <resource
-      to_override="some.package:templates/mytemplate.pt"
-      override_with="another.package:othertemplates/anothertemplate.pt"
-     />
+   class MyRootResource(object):
+       __name__ = ''
+       __parent__ = None
 
-The string value passed to both ``to_override`` and ``override_with``
-attached to a resource directive is called a "specification".  The
-colon separator in a specification separates the *package name* from
-the *resource name*.  The colon and the following resource name are
-optional.  If they are not specified, the override attempts to resolve
-every lookup into a package from the directory of another package.
-For example:
+A resource returned from the root resource's ``__getitem__`` method should
+have a ``__parent__`` attribute that is a reference to the root resource, and
+its ``__name__`` attribute should match the name by which it is reachable via
+the root resource's ``__getitem__``.  A container resource within the root
+resource should have a ``__getitem__`` that returns resources with a
+``__parent__`` attribute that points at the container, and these subobjects
+should have a ``__name__`` attribute that matches the name by which they are
+retrieved from the container via ``__getitem__``.  This pattern continues
+recursively "up" the tree from the root.
 
-.. code-block:: xml
-   :linenos:
+The ``__parent__`` attributes of each resource form a linked list that points
+"upward" toward the root. This is analogous to the `..` entry in filesystem
+directories. If you follow the ``__parent__`` values from any resource in the
+resource tree, you will eventually come to the root resource, just like if
+you keep executing the ``cd ..`` filesystem command, eventually you will
+reach the filesystem root directory.
 
-    <resource
-      to_override="some.package"
-      override_with="another.package"
-     />
+.. warning:: If your root resource has a ``__name__`` argument
+   that is not ``None`` or the empty string, URLs returned by the
+   :func:`pyramid.url.resource_url` function and paths generated by
+   the :func:`pyramid.traversal.resource_path` and
+   :func:`pyramid.traversal.resource_path_tuple` APIs will be
+   generated improperly.  The value of ``__name__`` will be prepended
+   to every path and URL generated (as opposed to a single leading
+   slash or empty tuple element).
 
-Individual subdirectories within a package can also be overridden:
+.. sidebar::  Using :mod:`pyramid_traversalwrapper`
 
-.. code-block:: xml
-   :linenos:
+  If you'd rather not manage the ``__name__`` and ``__parent__`` attributes
+  of your resources "by hand", an add-on package named
+  :mod:`pyramid_traversalwrapper` can help.
 
-    <resource
-      to_override="some.package:templates/"
-      override_with="another.package:othertemplates/"
-     />
+  In order to use this helper feature, you must first install the
+  :mod:`pyramid_traversalwrapper` package (available via PyPI), then register
+  its ``ModelGraphTraverser`` as the traversal policy, rather than the
+  default :app:`Pyramid` traverser. The package contains instructions for
+  doing so.
 
-If you wish to override a directory with another directory, you *must*
-make sure to attach the slash to the end of both the ``to_override``
-specification and the ``override_with`` specification.  If you fail to
-attach a slash to the end of a specification that points to a directory,
-you will get unexpected results.
+  Once :app:`Pyramid` is configured with this feature, you will no longer
+  need to manage the ``__parent__`` and ``__name__`` attributes on resource
+  objects "by hand".  Instead, as necessary, during traversal :app:`Pyramid`
+  will wrap each resource (even the root resource) in a ``LocationProxy``
+  which will dynamically assign a ``__name__`` and a ``__parent__`` to the
+  traversed resrouce (based on the last traversed resource and the name
+  supplied to ``__getitem__``).  The root resource will have a ``__name__``
+  attribute of ``None`` and a ``__parent__`` attribute of ``None``.
 
-The package name in a specification may start with a dot, meaning that
-the package is relative to the package in which the ZCML file resides.
-For example:
+.. index::
+   single: resource API functions
+   single: url generation (traversal)
 
-.. code-block:: xml
-   :linenos:
+:app:`Pyramid` API Functions That Act Against Resources
+-------------------------------------------------------
 
-    <resource
-      to_override=".subpackage:templates/"
-      override_with="another.package:templates/"
-     />
+A resource object is used as the :term:`context` provided to a view.  See
+:ref:`traversal_chapter` and :ref:`urldispatch_chapter` for more information
+about how a resource object becomes the context.
 
-See also :ref:`resource_directive`.
+The APIs provided by :ref:`traversal_module` are used against resource
+objects.  These functions can be used to find the "path" of a resource, the
+root resource in a resource tree, or to generate a URL for a resource.
+
+The APIs provided by :ref:`location_module` are used against resources.
+These can be used to walk down a resource tree, or conveniently locate one
+resource "inside" another.
+
+Some APIs in :ref:`security_module` accept a resource object as a parameter.
+For example, the :func:`pyramid.security.has_permission` API accepts a
+resource object as one of its arguments; the ACL is obtained from this
+resource or one of its ancestors.  Other APIs in the :mod:`pyramid.security`
+module also accept :term:`context` as an argument, and a context is always a
+resource.
+

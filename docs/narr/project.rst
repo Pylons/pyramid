@@ -258,8 +258,8 @@ The Interactive Shell
 
 Once you've installed your program for development using ``setup.py
 develop``, you can use an interactive Python shell to examine your
-:app:`Pyramid` application :term:`model` and :term:`view` objects from
-a Python prompt.  To do so, use the ``paster`` shell command with the
+:app:`Pyramid` application :term:`resource` and :term:`view` objects from a
+Python prompt.  To do so, use the ``paster`` shell command with the
 ``pshell`` argument:
 
 The first argument to ``pshell`` is the path to your application's ``.ini``
@@ -290,7 +290,7 @@ the name ``MyProject`` as a section name:
    Type "help" for more information. "root" is the Pyramid app root object,
    "registry" is the Pyramid registry object.
    >>> root
-   <myproject.models.MyModel object at 0x445270>
+   <myproject.resources.MyResource object at 0x445270>
    >>> registry
    <Registry myproject>
    >>> registry.settings['debug_notfound']
@@ -868,7 +868,7 @@ named ``MyModel`` that provides the behavior.
 
 #. Line 6 is a "root factory" function that will be called by the
    :app:`Pyramid` *Router* for each request when it wants to find
-   the root of the object graph.  Conventionally this is called
+   the root of the resource tree.  Conventionally this is called
    ``get_root``.
 
 In a "real" application, the root object would not be such a simple

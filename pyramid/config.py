@@ -1858,18 +1858,18 @@ class Configurator(object):
         self.action((IRendererFactory, name), None)
 
     @action_method
-    def override_resource(self, to_override, override_with, _override=None):
-        """ Add a :app:`Pyramid` resource override to the current
+    def override_asset(self, to_override, override_with, _override=None):
+        """ Add a :app:`Pyramid` asset override to the current
         configuration state.
 
-        ``to_override`` is a :term:`resource specification` to the
-        resource being overridden.
+        ``to_override`` is a :term:`asset specification` to the
+        asset being overridden.
 
-        ``override_with`` is a :term:`resource specification` to the
-        resource that is performing the override.
+        ``override_with`` is a :term:`asset specification` to the
+        asset that is performing the override.
 
-        See :ref:`resources_chapter` for more
-        information about resource overrides."""
+        See :ref:`assets_chapter` for more
+        information about asset overrides."""
         if to_override == override_with:
             raise ConfigurationError('You cannot override a resource with '
                                      'itself')
@@ -1904,6 +1904,8 @@ class Configurator(object):
             to_package = sys.modules[override_package]
             override(from_package, path, to_package, override_prefix)
         self.action(None, register)
+
+    override_resource = override_asset # bw compat
 
     @action_method
     def set_forbidden_view(self, view=None, attr=None, renderer=None,

@@ -8,7 +8,7 @@ from pyramid.interfaces import ISessionFactory
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.decorator import reify
-from pyramid.url import model_url
+from pyramid.url import resource_url
 from pyramid.url import route_url
 from pyramid.url import static_url
 from pyramid.url import route_path
@@ -195,32 +195,34 @@ class Request(WebobRequest):
         """
         return route_url(route_name, self, *elements, **kw)
 
-    def model_url(self, model, *elements, **kw):
-        """ Return the URL for the model object named ``model``, using
-        ``*elements`` and ``**kw`` as modifiers.
+    def resource_url(self, resource, *elements, **kw):
+        """ Return the URL for the :term:`resource` object named ``resource``,
+        using ``*elements`` and ``**kw`` as modifiers.
 
         This is a convenience method.  The result of calling
-        :meth:`pyramid.request.Request.model_url` is the same as calling
-        :func:`pyramid.url.model_url` with an explicit ``request`` parameter.
+        :meth:`pyramid.request.Request.resource_url` is the same as calling
+        :func:`pyramid.url.resource_url` with an explicit ``request`` parameter.
 
-        The :meth:`pyramid.request.Request.model_url` method calls the
-        :func:`pyramid.url.model_url` function using the Request object as
-        the ``request`` argument.  The ``model``, ``*elements`` and ``*kw``
-        arguments passed to :meth:`pyramid.request.Request.model_url` are
-        passed through to :func:`pyramid.url.model_url` unchanged and its
+        The :meth:`pyramid.request.Request.resource_url` method calls the
+        :func:`pyramid.url.resource_url` function using the Request object as
+        the ``request`` argument.  The ``resource``, ``*elements`` and ``*kw``
+        arguments passed to :meth:`pyramid.request.Request.resource_url` are
+        passed through to :func:`pyramid.url.resource_url` unchanged and its
         result is returned.
 
-        This call to :meth:`pyramid.request.Request.model_url`::
+        This call to :meth:`pyramid.request.Request.resource_url`::
 
-          request.model_url(mymodel)
+          request.resource_url(myresource)
 
-        Is completely equivalent to calling :func:`pyramid.url.model_url`
+        Is completely equivalent to calling :func:`pyramid.url.resource_url`
         like this::
 
           from pyramid.url import model_url
-          model_url(model, request)
+          resource_url(resource, request)
         """
-        return model_url(model, self, *elements, **kw)
+        return resource_url(resource, self, *elements, **kw)
+
+    model_url = resource_url # b/w compat forever
 
     def static_url(self, path, **kw):
         """ Generates a fully qualified URL for a static :term:`resource`.

@@ -3,11 +3,10 @@
 Views
 =====
 
-The primary job of any :app:`Pyramid` application is is to find and
-invoke a :term:`view callable` when a :term:`request` reaches the
-application.  View callables are bits of code written by you -- the
-application developer -- which do something interesting in response to
-a request made to your application.
+The primary job of any :app:`Pyramid` application is is to find and invoke a
+:term:`view callable` when a :term:`request` reaches the application.  View
+callables are bits of code which do something interesting in response to a
+request made to your application.
 
 .. note:: 
 
@@ -18,11 +17,10 @@ a request made to your application.
    that implements a view *callable*, and the process of view
    *lookup*.
 
-The chapter :ref:`contextfinding_chapter` describes how, using
-information from the :term:`request`, a :term:`context` and a
-:term:`view name` are computed.  But neither the context nor the view
-name found are very useful unless those elements can eventually be
-mapped to a :term:`view callable`.
+The chapter :ref:`contextfinding_chapter` describes how, using information
+from the :term:`request`, a :term:`context` and a :term:`view name` are
+computed.  But neither the context nor the view name found are very useful
+unless those elements can eventually be mapped to a :term:`view callable`.
 
 The job of actually locating and invoking the "best" :term:`view
 callable` is the job of the :term:`view lookup` subsystem.  The view
@@ -139,9 +137,8 @@ represent the method expected to return a response, you can use an
 	function defined in this style can be defined as follows:
 
 	context
-	  An instance of a :term:`context` found via graph :term:`traversal`
-	  or :term:`URL dispatch`.  If the context is found via traversal, it
-	  will be a :term:`model` object.
+	  The :term:`resource` object found via tree :term:`traversal`
+	  or :term:`URL dispatch`.
 
 	request
 	  A :app:`Pyramid` Request object representing the current WSGI
@@ -476,7 +473,7 @@ You can configure a view to use the JSON renderer by naming ``json`` as the
 
    config.add_view('myproject.views.hello_world', 
                     name='hello',
-                    context='myproject.models.Hello',
+                    context='myproject.resources.Hello',
                     renderer='json')
     
 
@@ -494,22 +491,21 @@ attributes by attaching properties to the request.  See
 
 Two built-in renderers exist for :term:`Chameleon` templates.
 
-If the ``renderer`` attribute of a view configuration is an absolute
-path, a relative path or :term:`resource specification` which has a
-final path element with a filename extension of ``.pt``, the Chameleon
-ZPT renderer is used.  See :ref:`chameleon_zpt_templates` for more
-information about ZPT templates.
+If the ``renderer`` attribute of a view configuration is an absolute path, a
+relative path or :term:`asset specification` which has a final path element
+with a filename extension of ``.pt``, the Chameleon ZPT renderer is used.
+See :ref:`chameleon_zpt_templates` for more information about ZPT templates.
 
 If the ``renderer`` attribute of a view configuration is an absolute path or
-a :term:`resource specification` which has a final path element with a
-filename extension of ``.txt``, the :term:`Chameleon` text renderer is used.
-See :ref:`chameleon_zpt_templates` for more information about Chameleon text
+a :term:`asset specification` which has a final path element with a filename
+extension of ``.txt``, the :term:`Chameleon` text renderer is used.  See
+:ref:`chameleon_zpt_templates` for more information about Chameleon text
 templates.
 
 The behavior of these renderers is the same, except for the engine
 used to render the template.
 
-When a ``renderer`` attribute that names a template path or :term:`resource
+When a ``renderer`` attribute that names a template path or :term:`asset
 specification` (e.g. ``myproject:templates/foo.pt`` or
 ``myproject:templates/foo.txt``) is used, the view must return a
 :term:`Response` object or a Python *dictionary*.  If the view callable with
@@ -541,7 +537,7 @@ renderer:
 
     config.add_view('myproject.views.hello_world',
                     name='hello',
-                    context='myproject.models.Hello',
+                    context='myproject.resources.Hello',
                     renderer='myproject:templates/foo.pt')
 
 Here's an example view configuration which uses a Chameleon text
@@ -552,7 +548,7 @@ renderer:
 
     config.add_view('myproject.views.hello_world',
                     name='hello',
-                    context='myproject.models.Hello',
+                    context='myproject.resources.Hello',
                     renderer='myproject:templates/foo.txt')
 
 Views which use a Chameleon renderer can vary response attributes by
@@ -573,13 +569,13 @@ The dictionary items will then be used in the global template space. If the
 view callable returns anything but a Response object, or a dictionary, an error
 will be raised.
 
-When using a ``renderer`` argument to a :term:`view configuration` to
-specify a Mako template, the value of the ``renderer`` may be a path
-relative to the ``mako.directories`` setting (e.g.
-``some/template.mak``) or, alternately, it may be a :term:`resource
-specification` (e.g. ``apackage:templates/sometemplate.mak``).  Mako
-templates may internally inherit other Mako templates using a relative
-filename or a :term:`resource specification` as desired.
+When using a ``renderer`` argument to a :term:`view configuration` to specify
+a Mako template, the value of the ``renderer`` may be a path relative to the
+``mako.directories`` setting (e.g.  ``some/template.mak``) or, alternately,
+it may be a :term:`asset specification`
+(e.g. ``apackage:templates/sometemplate.mak``).  Mako templates may
+internally inherit other Mako templates using a relative filename or a
+:term:`asset specification` as desired.
 
 XXX Further explanation or link to mako inheritance info
 
@@ -592,7 +588,7 @@ Here's an example view configuration which uses a relative path:
 
     config.add_view('myproject.views.hello_world',
                     name='hello',
-                    context='myproject.models.Hello',
+                    context='myproject.resources.Hello',
                     renderer='foo.mak')
 
 It's important to note that in Mako's case, the 'relative' path name
@@ -600,16 +596,15 @@ It's important to note that in Mako's case, the 'relative' path name
 directory (or directories) configured for Mako via the ``mako.directories``
 configuration file setting.
 
-The renderer can also be provided in :term:`resource specification`
-format. Here's an example view configuration which uses a :term:`resource
-specification`:
+The renderer can also be provided in :term:`asset specification`
+format. Here's an example view configuration which uses one:
 
 .. code-block:: python
    :linenos:
 
     config.add_view('myproject.views.hello_world',
                     name='hello',
-                    context='myproject.models.Hello',
+                    context='myproject.resources.Hello',
                     renderer='mypackage:templates/foo.mak')
 
 The above configuration will use the file named ``foo.mak`` in the
@@ -746,26 +741,27 @@ factory constructor is available as :class:`pyramid.interfaces.IRendererInfo`.
 
 There are essentially two different kinds of renderer factories:
 
-- A renderer factory which expects to accept a :term:`resource specification`,
-  or an absolute path, as the ``name`` attribute of the ``info`` object fed to
-  its constructor.  These renderer factories are registered with a ``name``
-  value that begins with a dot (``.``).  These types of renderer factories
-  usually relate to a file on the filesystem, such as a template.
-
-- A renderer factory which expects to accept a token that does not represent a
-  filesystem path or a resource specification in the ``name`` attribute of the
+- A renderer factory which expects to accept a :term:`asset
+  specification`, or an absolute path, as the ``name`` attribute of the
   ``info`` object fed to its constructor.  These renderer factories are
-  registered with a ``name`` value that does not begin with a dot.  These
-  renderer factories are typically object serializers.
+  registered with a ``name`` value that begins with a dot (``.``).  These
+  types of renderer factories usually relate to a file on the filesystem,
+  such as a template.
 
-.. sidebar:: Resource Specifications
+- A renderer factory which expects to accept a token that does not represent
+  a filesystem path or a asset specification in the ``name``
+  attribute of the ``info`` object fed to its constructor.  These renderer
+  factories are registered with a ``name`` value that does not begin with a
+  dot.  These renderer factories are typically object serializers.
 
-   A resource specification is a colon-delimited identifier for a
-   :term:`resource`.  The colon separates a Python :term:`package`
-   name from a package subpath.  For example, the resource
-   specification ``my.package:static/baz.css`` identifies the file
-   named ``baz.css`` in the ``static`` subdirectory of the
-   ``my.package`` Python :term:`package`.
+.. sidebar:: Asset Specifications
+
+   A asset specification is a colon-delimited identifier for a
+   :term:`asset`.  The colon separates a Python :term:`package`
+   name from a package subpath.  For example, the asset
+   specification ``my.package:static/baz.css`` identifies the file named
+   ``baz.css`` in the ``static`` subdirectory of the ``my.package`` Python
+   :term:`package`.
 
 Here's an example of the registration of a simple renderer factory via
 :meth:`pyramid.config.Configurator.add_renderer`:
@@ -1211,30 +1207,26 @@ Non-Predicate Arguments
   itself if the view is a function, or the ``__call__`` callable
   attribute if the view is a class).
 
-``renderer``
-  This is either a single string term (e.g. ``json``) or a string
-  implying a path or :term:`resource specification`
-  (e.g. ``templates/views.pt``) naming a :term:`renderer`
-  implementation.  If the ``renderer`` value does not contain a dot
-  (``.``), the specified string will be used to look up a renderer
-  implementation, and that renderer implementation will be used to
-  construct a response from the view return value.  If the
-  ``renderer`` value contains a dot (``.``), the specified term will
-  be treated as a path, and the filename extension of the last element
-  in the path will be used to look up the renderer implementation,
-  which will be passed the full path.  The renderer implementation
-  will be used to construct a :term:`response` from the view return
-  value.
+``renderer`` This is either a single string term (e.g. ``json``) or a string
+  implying a path or :term:`asset specification`
+  (e.g. ``templates/views.pt``) naming a :term:`renderer` implementation.  If
+  the ``renderer`` value does not contain a dot (``.``), the specified string
+  will be used to look up a renderer implementation, and that renderer
+  implementation will be used to construct a response from the view return
+  value.  If the ``renderer`` value contains a dot (``.``), the specified
+  term will be treated as a path, and the filename extension of the last
+  element in the path will be used to look up the renderer implementation,
+  which will be passed the full path.  The renderer implementation will be
+  used to construct a :term:`response` from the view return value.
 
-  When the renderer is a path, although a path is usually just a
-  simple relative pathname (e.g. ``templates/foo.pt``, implying that a
-  template named "foo.pt" is in the "templates" directory relative to
-  the directory of the current :term:`package`), a path can be
-  absolute, starting with a slash on UNIX or a drive letter prefix on
-  Windows.  The path can alternately be a :term:`resource
-  specification` in the form
-  ``some.dotted.package_name:relative/path``, making it possible to
-  address template resources which live in a separate package.
+  When the renderer is a path, although a path is usually just a simple
+  relative pathname (e.g. ``templates/foo.pt``, implying that a template
+  named "foo.pt" is in the "templates" directory relative to the directory of
+  the current :term:`package`), a path can be absolute, starting with a slash
+  on UNIX or a drive letter prefix on Windows.  The path can alternately be a
+  :term:`asset specification` in the form
+  ``some.dotted.package_name:relative/path``, making it possible to address
+  template assets which live in a separate package.
 
   The ``renderer`` attribute is optional.  If it is not defined, the
   "null" renderer is assumed (no rendering is performed and the value
@@ -1276,15 +1268,15 @@ the usage of the configured view.
   default view).
 
 ``context``
-  An object representing a Python class that the :term:`context` must be
-  an instance of, *or* the :term:`interface` that the :term:`context`
-  must provide in order for this view to be found and called.  This
-  predicate is true when the :term:`context` is an instance of the
-  represented class or if the :term:`context` provides the represented
-  interface; it is otherwise false.  
+  An object representing a Python class that the :term:`context` resource
+  must be an instance of, *or* the :term:`interface` that the :term:`context`
+  must provide in order for this view to be found and called.  This predicate
+  is true when the :term:`context` is an instance of the represented class or
+  if the :term:`context` provides the represented interface; it is otherwise
+  false.
 
-  If ``context`` is not supplied, the value ``None``, which matches
-  any model, is used.
+  If ``context`` is not supplied, the value ``None``, which matches any
+  resource, is used.
 
 ``route_name``
   If ``route_name`` is supplied, the view callable will be invoked
@@ -1344,7 +1336,7 @@ the usage of the configured view.
   This value should be a reference to a Python class or
   :term:`interface` that a parent object in the context's
   :term:`lineage` must provide in order for this view to be found and
-  called.  The nodes in your object graph must be "location-aware" to
+  called.  The resources in your resource tree must be "location-aware" to
   use this feature.
 
   If ``containment`` is not supplied, the interfaces and classes in
@@ -1469,11 +1461,11 @@ reside in a :app:`Pyramid` application module ``views.py``:
 .. code-block:: python
    :linenos:
 
-   from models import MyModel
+   from resources import MyResource
    from pyramid.view import view_config
    from pyramid.chameleon_zpt import render_template_to_response
 
-   @view_config(name='my_view', request_method='POST', context=MyModel,
+   @view_config(name='my_view', request_method='POST', context=MyResource,
              permission='read', renderer='templates/my.pt')
    def my_view(request):
        return {'a':1}
@@ -1486,7 +1478,7 @@ configuration stanza:
    :linenos:
 
    config.add_view('.views.my_view', name='my_view', request_method='POST', 
-                   context=MyModel, permission='read')
+                   context=MyResource, permission='read')
 
 All arguments to ``view_config`` may be omitted.  For example:
 
@@ -1503,7 +1495,7 @@ All arguments to ``view_config`` may be omitted.  For example:
 
 Such a registration as the one directly above implies that the view
 name will be ``my_view``, registered with a ``context`` argument that
-matches any model type, using no permission, registered against
+matches any resource type, using no permission, registered against
 requests with any request method, request type, request param,
 route name, or containment.
 
@@ -1686,32 +1678,32 @@ such an object.  All other arguments are optional.  See
 information.
 
 .. index::
-   single: model interfaces
+   single: resource interfaces
 
-.. _using_model_interfaces:
+.. _using_resource_interfaces:
 
-Using Model Interfaces In View Configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Using Resource Interfaces In View Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Instead of registering your views with a ``context`` that names a
-Python model *class*, you can optionally register a view callable with
-a ``context`` which is an :term:`interface`.  An interface can be
-attached arbitrarily to any model instance.  View lookup treats
-context interfaces specially, and therefore the identity of a model
-can be divorced from that of the class which implements it.  As a
-result, associating a view with an interface can provide more
-flexibility for sharing a single view between two or more different
-implementations of a model type.  For example, if two model object
-instances of different Python class types share the same interface,
-you can use the same view against each of them.
+Instead of registering your views with a ``context`` that names a Python
+resource *class*, you can optionally register a view callable with a
+``context`` which is an :term:`interface`.  An interface can be attached
+arbitrarily to any resource object.  View lookup treats context interfaces
+specially, and therefore the identity of a resource can be divorced from that
+of the class which implements it.  As a result, associating a view with an
+interface can provide more flexibility for sharing a single view between two
+or more different implementations of a resource type.  For example, if two
+resource objects of different Python class types share the same interface,
+you can use the same view configuration to specify both of them as a
+``context``.
 
-In order to make use of interfaces in your application during view
-dispatch, you must create an interface and mark up your model classes
-or instances with interface declarations that refer to this interface.
+In order to make use of interfaces in your application during view dispatch,
+you must create an interface and mark up your resource classes or instances
+with interface declarations that refer to this interface.
 
-To attach an interface to a model *class*, you define the interface
-and use the :func:`zope.interface.implements` function to associate
-the interface with the class.
+To attach an interface to a resource *class*, you define the interface and
+use the :func:`zope.interface.implements` function to associate the interface
+with the class.
 
 .. code-block:: python
    :linenos:
@@ -1725,10 +1717,10 @@ the interface with the class.
    class Hello(object):
        implements(IHello)
 
-To attach an interface to a model *instance*, you define the interface
-and use the :func:`zope.interface.alsoProvides` function to associate
-the interface with the instance.  This function mutates the instance
-in such a way that the interface is attached to it.
+To attach an interface to a resource *instance*, you define the interface and
+use the :func:`zope.interface.alsoProvides` function to associate the
+interface with the instance.  This function mutates the instance in such a
+way that the interface is attached to it.
 
 .. code-block:: python
    :linenos:
@@ -1747,13 +1739,13 @@ in such a way that the interface is attached to it.
        alsoProvides(hello, IHello)
        return hello
 
-Regardless of how you associate an interface, with a model instance, or a model
-class, the resulting code to associate that interface with a view callable is
-the same.  Assuming the above code that defines an ``IHello`` interface lives
-in the root of your application, and its module is named "models.py", the
-interface declaration below will associate the
-``mypackage.views.hello_world`` view with models that implement, or provide,
-this interface.
+Regardless of how you associate an interface, with a resource instance, or a
+resource class, the resulting code to associate that interface with a view
+callable is the same.  Assuming the above code that defines an ``IHello``
+interface lives in the root of your application, and its module is named
+"resources.py", the interface declaration below will associate the
+``mypackage.views.hello_world`` view with resources that implement, or
+provide, this interface.
 
 .. code-block:: python
    :linenos:
@@ -1761,22 +1753,25 @@ this interface.
    # config is an instance of pyramid.config.Configurator
 
    config.add_view('mypackage.views.hello_world', name='hello.html',
-                   context='mypackage.models.IHello')
+                   context='mypackage.resources.IHello')
 
-Any time a model that is determined to be the :term:`context` provides this
-interface, and a view named ``hello.html`` is looked up against it as per the
-URL, the ``mypackage.views.hello_world`` view callable will be invoked.
+Any time a resource that is determined to be the :term:`context` provides
+this interface, and a view named ``hello.html`` is looked up against it as
+per the URL, the ``mypackage.views.hello_world`` view callable will be
+invoked.
 
-Note, in cases where a view is registered against a model class, and a
-view is also registered against an interface that the model class
-implements, an ambiguity arises. Views registered for the model class
-take precedence over any views registered for any interface the model
-class implements. Thus, if a view is registered for both the class type
-of the context and an interface implemented by the context's class, the
-view registered for the context's class will "win".
+Note, in cases where a view is registered against a resource class, and a
+view is also registered against an interface that the resource class
+implements, an ambiguity arises. Views registered for the resource class take
+precedence over any views registered for any interface the resource class
+implements. Thus, if one view configuration names a ``context`` of both the
+class type of a resource, and another view configuration names a ``context``
+of interface implemented by the resource's class, and both view
+configurations are otherwise identical, the view registered for the context's
+class will "win".
 
-For more information about defining models with interfaces for use within
-view configuration, see :ref:`models_which_implement_interfaces`.
+For more information about defining resources with interfaces for use within
+view configuration, see :ref:`resources_which_implement_interfaces`.
 
 .. index::
    single: view security
@@ -1787,22 +1782,12 @@ view configuration, see :ref:`models_which_implement_interfaces`.
 Configuring View Security
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-<<<<<<< HEAD
-If an :term:`authorization policy` is active, any :term:`permission`
-attached to a :term:`view configuration` found during view lookup will
-be verified.  This will ensure that the currently authenticated user
-possesses that permission against the :term:`context` before the view
-function is actually called.  Here's an example of specifying a
-permission in a view configuration using
-:meth:`pyramid.configuration.Configurator.add_view`:
-=======
 If a :term:`authorization policy` is active, any :term:`permission` attached
-to a :term:`view configuration` found during view lookup will be consulted to
-ensure that the currently authenticated user possesses that permission
-against the :term:`context` before the view function is actually called.
-Here's an example of specifying a permission in a view configuration using
-:meth:`pyramid.config.Configurator.add_view`:
->>>>>>> fee38663daccc0130d0c34dbc5a14e67bef2e183
+to a :term:`view configuration` found during view lookup will be verified.
+This will ensure that the currently authenticated user possesses that
+permission against the :term:`context` before the view function is actually
+called.  Here's an example of specifying a permission in a view configuration
+using :meth:`pyramid.config.Configurator.add_view`:
 
 .. code-block:: python
    :linenos:
@@ -1810,7 +1795,7 @@ Here's an example of specifying a permission in a view configuration using
    # config is an instance of pyramid.config.Configurator
 
    config.add_view('myproject.views.add_entry', name='add.html',
-                   context='myproject.models.IBlog', permission='add')
+                   context='myproject.resources.IBlog', permission='add')
 
 When an :term:`authorization policy` is enabled, this view will be
 protected with the ``add`` permission.  The view will *not be called* if

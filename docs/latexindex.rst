@@ -41,7 +41,7 @@ Narrative Documentation
    narr/webob
    narr/sessions
    narr/templates
-   narr/models
+   narr/resources
    narr/security
    narr/i18n
    narr/vhosting
@@ -51,7 +51,7 @@ Narrative Documentation
    narr/hooks
    narr/declarative
    narr/extending
-   narr/resources
+   narr/assets
    narr/router
    narr/startup
    narr/threadlocals

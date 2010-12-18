@@ -557,7 +557,7 @@ example of a view declaration in ZCML is as follows:
    :linenos:
 
    <view
-     context=".models.Hello"
+     context=".resources.Hello"
      view=".views.hello_world"
      name="hello.html"
     />
@@ -566,7 +566,7 @@ The above maps the ``.views.hello_world`` view callable function to
 the following set of :term:`context finding` results:
 
 - A :term:`context` object which is an instance (or subclass) of the
-  Python class represented by ``.models.Hello``
+  Python class represented by ``.resources.Hello``
 
 - A :term:`view name` equalling ``hello.html``.
 
@@ -575,28 +575,27 @@ the following set of :term:`context finding` results:
    above) mean "relative to the Python package directory in which this
    :term:`ZCML` file is stored".  So if the above ``view`` declaration
    was made inside a ``configure.zcml`` file that lived in the
-   ``hello`` package, you could replace the relative ``.models.Hello``
-   with the absolute ``hello.models.Hello``; likewise you could
+   ``hello`` package, you could replace the relative ``.resources.Hello``
+   with the absolute ``hello.resources.Hello``; likewise you could
    replace the relative ``.views.hello_world`` with the absolute
    ``hello.views.hello_world``.  Either the relative or absolute form
    is functionally equivalent.  It's often useful to use the relative
    form, in case your package's name changes.  It's also shorter to
    type.
 
-You can also declare a *default view callable* for a :term:`model`
-type:
+You can also declare a *default view callable* for a :term:`resource` type:
 
 .. code-block:: xml
    :linenos:
 
    <view
-     context=".models.Hello"
+     context=".resources.Hello"
      view=".views.hello_world"
     />
 
 A *default view callable* simply has no ``name`` attribute.  For the
 above registration, when a :term:`context` is found that is of the
-type ``.models.Hello`` and there is no :term:`view name` associated
+type ``.resources.Hello`` and there is no :term:`view name` associated
 with the result of :term:`context finding`, the *default view
 callable* will be used.  In this case, it's the view at
 ``.views.hello_world``.
@@ -608,7 +607,7 @@ string as its ``name`` attribute:
    :linenos:
 
    <view
-     context=".models.Hello"
+     context=".resources.Hello"
      view=".views.hello_world"
      name=""
     />
@@ -823,6 +822,75 @@ an imperative equivalent to the ``static`` ZCML directive.  Use of the
 to using ZCML for the same purpose.  See :ref:`static_resources_section` for
 more information.
 
+.. index::
+   pair: ZCML directive; asset
+
+.. _asset_zcml_directive:
+
+The ``asset`` ZCML Directive
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Instead of using :meth:`pyramid.config.Configurator.override_asset` during
+:term:`imperative configuration`, an equivalent ZCML directive can be used.
+The ZCML ``asset`` tag is a frontend to using
+:meth:`pyramid.config.Configurator.override_asset`.
+
+An individual :app:`Pyramid` ``asset`` ZCML statement can override a
+single asset.  For example:
+
+.. code-block:: xml
+   :linenos:
+
+    <asset
+      to_override="some.package:templates/mytemplate.pt"
+      override_with="another.package:othertemplates/anothertemplate.pt"
+     />
+
+The string value passed to both ``to_override`` and ``override_with``
+attached to an ``asset`` directive is called an "asset specification".  The
+colon separator in a specification separates the *package name* from the
+*asset name*.  The colon and the following asset name are optional.  If they
+are not specified, the override attempts to resolve every lookup into a
+package from the directory of another package.  For example:
+
+.. code-block:: xml
+   :linenos:
+
+    <asset
+      to_override="some.package"
+      override_with="another.package"
+     />
+
+Individual subdirectories within a package can also be overridden:
+
+.. code-block:: xml
+   :linenos:
+
+    <asset
+      to_override="some.package:templates/"
+      override_with="another.package:othertemplates/"
+     />
+
+If you wish to override an asset directory with another directory, you *must*
+make sure to attach the slash to the end of both the ``to_override``
+specification and the ``override_with`` specification.  If you fail to attach
+a slash to the end of an asset specification that points to a directory, you
+will get unexpected results.
+
+The package name in an asset specification may start with a dot, meaning that
+the package is relative to the package in which the ZCML file resides.  For
+example:
+
+.. code-block:: xml
+   :linenos:
+
+    <asset
+      to_override=".subpackage:templates/"
+      override_with="another.package:templates/"
+     />
+
+See also :ref:`asset_directive`.
+
 .. _zcml_authorization_policy:
 
 Enabling an Authorization Policy Via ZCML
@@ -833,12 +901,11 @@ than imperative configuration, modify the ZCML file loaded by your
 application (usually named ``configure.zcml``) to enable an
 authorization policy.
 
-For example, to enable a policy which compares the value of an "auth
-ticket" cookie passed in the request's environment which contains a
-reference to a single :term:`principal` against the principals present
-in any :term:`ACL` found in model data when attempting to call some
-:term:`view`, modify your ``configure.zcml`` to look something like
-this:
+For example, to enable a policy which compares the value of an "auth ticket"
+cookie passed in the request's environment which contains a reference to a
+single :term:`principal` against the principals present in any :term:`ACL`
+found in the resource tree when attempting to call some :term:`view`, modify
+your ``configure.zcml`` to look something like this:
 
 .. code-block:: xml
    :linenos:
@@ -958,7 +1025,7 @@ Built-In Authorization Policy ZCML Directives
 ``aclauthorizationpolicy``
 
 When this directive is used, authorization information is obtained
-from :term:`ACL` objects attached to model instances.
+from :term:`ACL` objects attached to resources.
 
 An example of its usage, with all attributes fully expanded:
 
@@ -1068,7 +1135,6 @@ with ``.jinja2`` as its ``renderer`` value.  The ``name`` passed to the
 
 See also :ref:`renderer_directive` and
 :meth:`pyramid.config.Configurator.add_renderer`.
-
 
 Overriding an Existing Renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1207,4 +1273,3 @@ See also :ref:`subscriber_directive` and :ref:`events_chapter`.
 
 .. - hooks chapter still has topics for ZCML
 
-.. - resources chapter still has topics for ZCML

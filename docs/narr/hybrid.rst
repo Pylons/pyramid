@@ -171,7 +171,7 @@ match is straightforward.  When a route is matched:
    Root factories related to a route were explained previously within
    :ref:`route_factories`.  Both the global root factory and default
    root factory were explained previously within
-   :ref:`the_object_graph`.  
+   :ref:`the_resource_tree`.  
 
 .. _using_traverse_in_a_route_pattern:
 
@@ -226,7 +226,7 @@ we've created a root factory that looks like so in a module named
 .. code-block:: python
    :linenos:
 
-   class Traversable(object):
+   class Resource(object):
        def __init__(self, subobjects):
           self.subobjects = subobjects
 
@@ -234,15 +234,15 @@ we've created a root factory that looks like so in a module named
           return self.subobjects[name]
 
    root = Traversable(
-           {'a':Traversable({'b':Traversable({'c':Traversable({})})})}
+           {'a':Resource({'b':Resource({'c':Resource({})})})}
           )
 
    def root_factory(request):
        return root
 
-Above, we've defined a (bogus) graph that can be traversed, and a
-``root_factory`` function that can be used as part of a particular
-route configuration statement:
+Above, we've defined a (bogus) resource tree that can be traversed, and a
+``root_factory`` function that can be used as part of a particular route
+configuration statement:
 
 .. code-block:: python
    :linenos:
@@ -250,14 +250,13 @@ route configuration statement:
    config.add_route('home', '{foo}/{bar}/*traverse', 
                     factory='mypackage.routes.root_factory')
 
-The ``factory`` above points at the function we've defined.  It will
-return an instance of the ``Traversable`` class as a root object
-whenever this route is matched.  Instances of the``Traversable`` class
-can be used for graph traversal because they have a ``__getitem__``
-method that does something nominally useful. Since traversal uses
-``__getitem__`` to walk the nodes of an object graph, using traversal
-against the root object implied by our route statement is a reasonable
-thing to do.
+The ``factory`` above points at the function we've defined.  It will return
+an instance of the ``Traversable`` class as a root object whenever this route
+is matched.  Instances of the``Resource`` class can be used for tree
+traversal because they have a ``__getitem__`` method that does something
+nominally useful. Since traversal uses ``__getitem__`` to walk the resources
+of a resource tree, using traversal against the root resource implied by our
+route statement is a reasonable thing to do.
 
 .. note::
 
@@ -271,12 +270,11 @@ thing to do.
 
 When the route configuration named ``home`` above is matched during a
 request, the matchdict generated will be based on its pattern:
-``{foo}/{bar}/*traverse``.  The "capture value" implied by the
-``*traverse`` element in the pattern will be used to traverse the
-graph in order to find a context, starting from the root object
-returned from the root factory.  In the above example, the
-:term:`root` object found will be the instance named ``root`` in
-``routes.py``.
+``{foo}/{bar}/*traverse``.  The "capture value" implied by the ``*traverse``
+element in the pattern will be used to traverse the resource tree in order to
+find a context, starting from the root object returned from the root factory.
+In the above example, the :term:`root` object found will be the instance
+named ``root`` in ``routes.py``.
 
 If the URL that matched a route with the pattern ``{foo}/{bar}/*traverse``,
 is ``http://example.com/one/two/a/b/c``, the traversal path used
@@ -284,12 +282,11 @@ against the root object will be ``a/b/c``.  As a result,
 :app:`Pyramid` will attempt to traverse through the edges ``a``,
 ``b``, and ``c``, beginning at the root object.
 
-In our above example, this particular set of traversal steps will mean
-that the :term:`context` of the view would be the ``Traversable``
-object we've named ``c`` in our bogus graph and the :term:`view name`
-resulting from traversal will be the empty string; if you need a
-refresher about why this outcome is presumed, see
-:ref:`traversal_algorithm`.
+In our above example, this particular set of traversal steps will mean that
+the :term:`context` of the view would be the ``Traversable`` object we've
+named ``c`` in our bogus resource tree and the :term:`view name` resulting
+from traversal will be the empty string; if you need a refresher about why
+this outcome is presumed, see :ref:`traversal_algorithm`.
 
 At this point, a suitable view callable will be found and invoked
 using :term:`view lookup` as described in :ref:`view_configuration`,
@@ -347,7 +344,7 @@ above ``mypackage.views.another_view`` view will be invoked when:
 - the :term:`context` is any object.
 
 For instance, if the URL ``http://example.com/one/two/a/another`` is provided
-to an application that uses the previously mentioned object graph, the
+to an application that uses the previously mentioned resource tree, the
 ``mypackage.views.another`` view callable will be called instead of the
 ``mypackage.views.myview`` view callable because the :term:`view name` will
 be ``another`` instead of the empty string.
