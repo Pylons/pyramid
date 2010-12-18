@@ -1,6 +1,6 @@
-=======================
-Defining a Domain Model
-=======================
+=========================
+Defining the Domain Model
+=========================
 
 The first change we'll make to our stock paster-generated application will be
 to define a :term:`domain model` constructor representing a wiki page.  We'll
