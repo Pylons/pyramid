@@ -468,7 +468,7 @@ structure:
   |-- development.ini
   |-- myproject
   |   |-- __init__.py
-  |   |-- models.py
+  |   |-- resources.py
   |   |-- static
   |   |   |-- favicon.ico
   |   |   |-- logo.png
@@ -738,7 +738,7 @@ The ``myproject`` :term:`package` lives inside the ``MyProject``
    application, include a ``main`` function which is used as a Paste entry
    point.
 
-#. A ``models.py`` module, which contains :term:`model` code.
+#. A ``resources.py`` module, which contains :term:`resource` code.
 
 #. A ``templates`` directory, which contains :term:`Chameleon` (or
    other types of) templates.
@@ -771,8 +771,8 @@ also informs Python that the directory which contains it is a *package*.
 #. Line 1 imports the :term:`Configurator` class from
    :mod:`pyramid.config` that we use later.
 
-#. Line 2 imports the ``get_root`` function from
-   :mod:`myproject.models` that we use later.
+#. Line 2 imports the ``Root`` class from :mod:`myproject.resources` that we
+   use later.
 
 #. Lines 4-12 define a function that returns a :app:`Pyramid`
    WSGI application.  This function is meant to be called
@@ -784,7 +784,7 @@ also informs Python that the directory which contains it is a *package*.
    Lines 8-10 register a "default view" (a view that has no ``name``
    attribute).  It is registered so that it will be found when the
    :term:`context` of the request is an instance of the
-   :class:`myproject.models.MyModel` class.  The first argument to
+   :class:`myproject.resources.Root` class.  The first argument to
    ``add_view`` points at a Python function that does all the work for this
    view, also known as a :term:`view callable`, via a :term:`dotted Python
    name`.  The view declaration also names a ``renderer``, which in this case
@@ -817,7 +817,7 @@ code which accepts a :term:`request` and which returns a
 
 This bit of code was registered as the view callable within ``__init__.py``
 (via ``add_view``).  ``add_view`` said that the default URL for instances
-that are of the class :class:`myproject.models.MyModel` should run this
+that are of the class :class:`myproject.resources.Root` should run this
 :func:`myproject.views.my_view` function.
 
 This view callable function is handed a single piece of information:
@@ -846,37 +846,32 @@ renderers, and templates relate and cooperate.
    the speed at which templates may be rendered.
 
 .. index::
-   single: models.py
+   single: resources.py
 
-.. _modelspy_project_section:
+.. _resourcespy_project_section:
 
-``models.py``
-~~~~~~~~~~~~~
+``resources.py``
+~~~~~~~~~~~~~~~~
 
-The ``models.py`` module provides the :term:`model` data and behavior
-for our application.  Models are objects which store application data
-and provide APIs which mutate and return this data.  We write a class
-named ``MyModel`` that provides the behavior.
+The ``resources.py`` module provides the :term:`resource` data and behavior
+for our application.  Resources are objects which exist to provide site
+structure in applications which use :term:`traversal` to map URLs to code.
+We write a class named ``Root`` that provides the behavior for the root
+resource.
 
-.. literalinclude:: MyProject/myproject/models.py
+.. literalinclude:: MyProject/myproject/resources.py
    :language: python
    :linenos:
 
-#. Lines 1-2 define the MyModel class.
+#. Lines 1-3 define the Root class.  The Root class is a "root resource
+   factory" function that will be called by the :app:`Pyramid` *Router* for
+   each request when it wants to find the root of the resource tree.
 
-#. Line 4 defines an instance of MyModel as the root.
-
-#. Line 6 is a "root factory" function that will be called by the
-   :app:`Pyramid` *Router* for each request when it wants to find
-   the root of the resource tree.  Conventionally this is called
-   ``get_root``.
-
-In a "real" application, the root object would not be such a simple
-object.  Instead, it would be an object that could access some
-persistent data store, such as a database.  :app:`Pyramid` doesn't
-make any assumption about which sort of datastore you'll want to use,
-so the sample application uses an instance of
-:class:`myproject.models.MyModel` to represent the root.
+In a "real" application, the Root object would not be such a simple object.
+Instead, it might be an object that could access some persistent data store,
+such as a database.  :app:`Pyramid` doesn't make any assumption about which
+sort of datastore you'll want to use, so the sample application uses an
+instance of :class:`myproject.resources.Root` to represent the root.
 
 ``static``
 ~~~~~~~~~~~~~~~~~~~~
