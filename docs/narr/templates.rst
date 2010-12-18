@@ -84,9 +84,9 @@ prefix on Windows.
    file instead of treating relative paths as relative to the current
    view module.  See :ref:`mako_templates`.
 
-The path can alternately be a :term:`resource specification` in the form
+The path can alternately be a :term:`asset specification` in the form
 ``some.dotted.package_name:relative/path``. This makes it possible to
-address template resources which live in another package.  For example:
+address template assets which live in another package.  For example:
 
 .. code-block:: python
    :linenos:
@@ -98,20 +98,20 @@ address template resources which live in another package.  For example:
                                  {'foo':1, 'bar':2},
                                  request=request)
 
-A resource specification points at a file within a Python *package*.
+An asset specification points at a file within a Python *package*.
 In this case, it points at a file named ``foo.pt`` within the
 ``templates`` directory of the ``mypackage`` package.  Using a
-resource specification instead of a relative template name is usually
-a good idea, because calls to ``render_to_response`` using resource
+asset specification instead of a relative template name is usually
+a good idea, because calls to ``render_to_response`` using asset
 specifications will continue to work properly if you move the code
 containing them around.
 
 .. note::
 
-   Mako templating system bindings also respect absolute resource
+   Mako templating system bindings also respect absolute asset
    specifications as an argument to any of the ``render*`` commands.  If a
    template name defines a ``:`` (colon) character and is not an absolute
-   path, it is treated as an absolute resource specification.
+   path, it is treated as an absolute asset specification.
 
 In the examples above we pass in a keyword argument named ``request``
 representing the current :app:`Pyramid` request. Passing a request
@@ -187,8 +187,8 @@ combination as shown above.
    :app:`Pyramid` bindings directly within view callables, the
    auto-template-reload strategy explained in
    :ref:`reload_templates_section` will not be available, nor will the
-   template resource overriding capability explained in
-   :ref:`overriding_resources_section` be available, nor will it be
+   template asset overriding capability explained in
+   :ref:`overriding_assets_section` be available, nor will it be
    possible to use any template using that language as a
    :term:`renderer`.  However, it's reasonably easy to write custom
    templating system binding packages for use under :app:`Pyramid` so
@@ -289,7 +289,7 @@ to specify the template as a :term:`renderer` in your
 templating languages supported by :app:`Pyramid`.
 
 To use a renderer via view configuration, specify a template
-:term:`resource specification` as the ``renderer`` argument, or
+:term:`asset specification` as the ``renderer`` argument, or
 attribute to the :term:`view configuration` of a :term:`view
 callable`.  Then return a *dictionary* from that view callable.  The
 dictionary items returned by the view callable will be made available
@@ -326,7 +326,7 @@ template renderer:
    we're using a Chameleon renderer, it means "relative to the directory in
    which the file which defines the view configuration lives".  In this case,
    this is the directory containing the file that defines the ``my_view``
-   function.  View-configuration-relative resource specifications work only
+   function.  View-configuration-relative asset specifications work only
    in Chameleon, not in Mako templates.
 
 Similar renderer configuration can be done imperatively and via
@@ -335,9 +335,9 @@ Similar renderer configuration can be done imperatively and via
 
 Although a renderer path is usually just a simple relative pathname, a path
 named as a renderer can be absolute, starting with a slash on UNIX or a drive
-letter prefix on Windows.  The path can alternately be a :term:`resource
+letter prefix on Windows.  The path can alternately be an :term:`asset
 specification` in the form ``some.dotted.package_name:relative/path``, making
-it possible to address template resources which live in another package.
+it possible to address template assets which live in another package.
 
 Not just any template from any arbitrary templating system may be used as a
 renderer.  Bindings must exist specifically for :app:`Pyramid` to use a
@@ -473,15 +473,15 @@ least two top-level names available to the template by default: ``context``
 and ``request``.  One of the common needs in ZPT-based templates is to use
 one template's "macros" from within a different template.  In Zope, this is
 typically handled by retrieving the template from the ``context``.  But the
-context in :app:`Pyramid` is a resource object, and templates cannot usually
-be retrieved from resources.  To use macros in :app:`Pyramid`, you need to make
-the macro template itself available to the rendered template by passing the
-macro template, or even the macro itself, *into* the rendered template.  To
-do this you can use the :func:`pyramid.renderers.get_renderer` API to
-retrieve the macro template, and pass it into the template being rendered via
-the dictionary returned by the view.  For example, using a :term:`view
-configuration` via a :class:`pyramid.view.view_config` decorator that uses a
-:term:`renderer`:
+context in :app:`Pyramid` is a :term:`resource` object, and templates cannot
+usually be retrieved from resources.  To use macros in :app:`Pyramid`, you
+need to make the macro template itself available to the rendered template by
+passing the macro template, or even the macro itself, *into* the rendered
+template.  To do this you can use the :func:`pyramid.renderers.get_renderer`
+API to retrieve the macro template, and pass it into the template being
+rendered via the dictionary returned by the view.  For example, using a
+:term:`view configuration` via a :class:`pyramid.view.view_config` decorator
+that uses a :term:`renderer`:
 
 .. code-block:: python
    :linenos:

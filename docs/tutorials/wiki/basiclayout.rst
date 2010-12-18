@@ -98,11 +98,15 @@ following:
 Content Models with ``models.py``
 ---------------------------------
 
-:app:`Pyramid` often uses the word :term:`model` when talking about
-content resources arranged in the hierarchical *object graph*
-consulted by :term:`traversal`.  The ``models.py`` file is where the
-``pyramid_zodb`` Paster template put the classes that implement our
-model objects.
+:app:`Pyramid` uses the word :term:`resource` to describe objects arranged
+hierarchically in a :term:`resource tree`.  This tree is consulted by
+:term:`traversal` to map URLs to code.  In this application, the resource
+tree represents the site structure, but it *also* represents the
+:term:`domain model` of the application, because eeach resource is a node
+stored persistently in a :term:`ZODB` database.  The ``models.py`` file is
+where the ``pyramid_zodb`` Paster template put the classes that implement our
+resource objects, each of which happens also to be a domain model
+object.
 
 Here is the source for ``models.py``:
 

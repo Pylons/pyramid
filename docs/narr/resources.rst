@@ -3,7 +3,7 @@ Resources
 
 A :term:`resource` is an object that represents a "place" in your
 application.  Every :app:`Pyramid` application has at least one resource
-object: the :term:`root resource`.  The root resource is the root of a
+object: the :term:`root` resource.  The root resource is the root of a
 :term:`resource tree`.  A resource tree is a set of nested dictionary-like
 objects which you may use to represent your website's structure.
 
@@ -25,7 +25,7 @@ that use traversal.
 In "Zope-like" :app:`Pyramid` applications, resource objects also often store
 data persistently and offer methods related to mutating that persistent data.
 In these kinds of applications, resources not only represent the site
-structure of your website, but they become the :term:`model` of the
+structure of your website, but they become the :term:`domain model` of the
 application.
 
 Also:

@@ -790,13 +790,13 @@ also informs Python that the directory which contains it is a *package*.
    name`.  The view declaration also names a ``renderer``, which in this case
    is a template that will be used to render the result of the view callable.
    This particular view declaration points at
-   ``myproject:templates/mytemplate.pt``, which is a :term:`resource
+   ``myproject:templates/mytemplate.pt``, which is a :term:`asset
    specification` that specifies the ``mytemplate.pt`` file within the
    ``templates`` directory of the ``myproject`` package.  The template file
    it actually points to is a :term:`Chameleon` ZPT template file.
 
    Line 11 registers a static view, which will serve up the files from the
-   ``mypackage:static`` :term:`resource specification` (the ``static``
+   ``mypackage:static`` :term:`asset specification` (the ``static``
    directory of the ``mypackage`` package).
 
    Line 12 returns a :term:`WSGI` application to the caller of the function
@@ -874,10 +874,10 @@ sort of datastore you'll want to use, so the sample application uses an
 instance of :class:`myproject.resources.Root` to represent the root.
 
 ``static``
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~
 
-This directory contains static resources which support the
-``mytemplate.pt`` template.  It includes CSS and images.
+This directory contains static assets which support the ``mytemplate.pt``
+template.  It includes CSS and images.
 
 .. index::
    single: tests.py

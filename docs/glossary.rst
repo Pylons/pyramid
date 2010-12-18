@@ -49,7 +49,7 @@ Glossary
      a Python source code file.
 
    asset specification
-     A colon-delimited identifier for a :term:`resource`.  The colon
+     A colon-delimited identifier for an :term:`asset`.  The colon
      separates a Python :term:`package` name from a package subpath.
      For example, the asset specification
      ``my.package:static/baz.css`` identifies the file named
@@ -120,10 +120,10 @@ Glossary
      string (which implies the :term:`default view`).
 
    Default view
-     The default view of a resource is the view invoked when the
-     :term:`view name` is the empty string (``''``).  This is the case
-     when :term:`traversal` exhausts the path elements in the PATH_INFO
-     of a request before it returns a :term:`context`.
+     The default view of a :term:`resource` is the view invoked when the
+     :term:`view name` is the empty string (``''``).  This is the case when
+     :term:`traversal` exhausts the path elements in the PATH_INFO of a
+     request before it returns a :term:`context`.
 
    virtualenv
      An isolated Python environment.  Allows you to control which
@@ -132,15 +132,24 @@ Glossary
      was created by Ian Bicking.
 
    resource
-     An object representing a node in the resource tree of an application.
-     If :mod:`traversal` is used, a resource is an element in the resource
-     tree traversed by the system.  When traversal is used, a resource
-     becomes the :term:`context` of a :term:`view`.  If :mod:`url dispatch`
-     is used, a single resource is generated for each request and is
-     used as the context of a view.
+     An object representing a node in the :term:`resource tree` of an
+     application.  If :mod:`traversal` is used, a resource is an element in
+     the resource tree traversed by the system.  When traversal is used, a
+     resource becomes the :term:`context` of a :term:`view`.  If :mod:`url
+     dispatch` is used, a single resource is generated for each request and
+     is used as the context of a view.
+
+   resource tree
+     A nested set of dictionary-like objects, each of which is a
+     :term:`resource`.  The act of :term:`traversal` uses the resource tree
+     to find a :term:`context`.
+
+   domain model
+     Persistent data related to your application.  For example, data stored
+     in a relational database.  In some applications, the :term:`resource
+     tree` acts as the domain model.
 
    traversal
-
      The act of descending "up" a tree of resource objects from a root
      resource in order to find a :term:`context`.  The :app:`Pyramid`
      :term:`router` performs traversal of resource objects when a :term:`root
@@ -188,8 +197,9 @@ Glossary
      text, XML, or HTML when rendered.
 
    location
-     The path to an object in a resource tree.  See :ref:`location_aware` for
-     more information about how to make a resource object *location-aware*.
+     The path to an object in a :term:`resource tree`.  See
+     :ref:`location_aware` for more information about how to make a resource
+     object *location-aware*.
 
    permission
      A string or unicode object that represents an action being taken against

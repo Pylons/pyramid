@@ -1,15 +1,17 @@
-===============
-Defining Models
-===============
+=========================
+Defining the Domain Model
+=========================
 
 The first change we'll make to our bone-stock ``paster`` -generated
-application will be to define a number of :term:`model` constructors.
-For this application, which will be a Wiki, we will need two kinds of
-model constructors: a "Wiki" model constructor, and a "Page" model
-constructor.  Both our Page and Wiki constructors will be class
-objects.  A single instance of the "Wiki" class will serve as a
-container for "Page" objects, which will be instances of the "Page"
-class.
+application will be to define a number of :term:`resource` constructors.
+Remember that, because we're using :term:`ZODB` to represent our
+:term:`resource tree`, each of these resource constructors represents a
+:term:`domain model` object, so we'll call these constructors "model
+constructors".  For this application, which will be a Wiki, we will need two
+kinds of model constructors: a "Wiki" model constructor, and a "Page" model
+constructor.  Both our Page and Wiki constructors will be class objects.  A
+single instance of the "Wiki" class will serve as a container for "Page"
+objects, which will be instances of the "Page" class.
 
 The source code for this tutorial stage can be browsed via
 `http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/models/

@@ -720,19 +720,19 @@ documentation.
 .. index::
    triple: view; zcml; static resource
 
-.. _zcml_static_resources_section:
+.. _zcml_static_assets_section:
 
-Serving Static Resources Using ZCML
-------------------------------------
+Serving Static Assets Using ZCML
+--------------------------------
 
-Use of the ``static`` ZCML directive makes static files available at a name
-relative to the application root URL, e.g. ``/static``.  
+Use of the ``static`` ZCML directive makes static assets available at a name
+relative to the application root URL, e.g. ``/static``.
 
 Note that the ``path`` provided to the ``static`` ZCML directive may be a
-fully qualified :term:`resource specification`, a package-relative path, or
+fully qualified :term:`asset specification`, a package-relative path, or
 an *absolute path*.  The ``path`` with the value ``a/b/c/static`` of a
 ``static`` directive in a ZCML file that resides in the "mypackage" package
-will resolve to a package-qualified resource such as
+will resolve to a package-qualified assets such as
 ``some_package:a/b/c/static``.
 
 Here's an example of a ``static`` ZCML directive that will serve files
@@ -751,7 +751,7 @@ absolute path.
 Here's an example of a ``static`` directive that will serve files up
 under the ``/static`` URL from the ``a/b/c/static`` directory of the
 Python package named ``some_package`` using a fully qualified
-:term:`resource specification`.
+:term:`asset specification`.
 
 .. code-block:: xml
    :linenos:
@@ -774,7 +774,7 @@ package-relative path.
      path="static"
     />
 
-Whether you use for ``path`` a fully qualified resource specification,
+Whether you use for ``path`` a fully qualified asset specification,
 an absolute path, or a package-relative path, When you place your
 static files on the filesystem in the directory represented as the
 ``path`` of the directive, you will then be able to view the static
@@ -791,7 +791,7 @@ While the ``path`` argument can be a number of different things, the
 ``name`` argument of the ``static`` ZCML directive can also be one of
 a number of things: a *view name* or a *URL*.  The above examples have
 shown usage of the ``name`` argument as a view name.  When ``name`` is
-a *URL* (or any string with a slash (``/``) in it), static resources
+a *URL* (or any string with a slash (``/``) in it), static assets
 can be served from an external webserver.  In this mode, the ``name``
 is used as the URL prefix when generating a URL using
 :func:`pyramid.url.static_url`.
@@ -819,7 +819,7 @@ detail later in this chapter.
 The :meth:`pyramid.config.Configurator.add_static_view` method offers
 an imperative equivalent to the ``static`` ZCML directive.  Use of the
 ``add_static_view`` imperative configuration method is completely equivalent
-to using ZCML for the same purpose.  See :ref:`static_resources_section` for
+to using ZCML for the same purpose.  See :ref:`static_assets_section` for
 more information.
 
 .. index::

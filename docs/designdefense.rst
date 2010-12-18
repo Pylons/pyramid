@@ -606,77 +606,48 @@ folks that haven't yet spent that 30 minutes.
 Pyramid Uses "Model" To Represent A Node In The Graph of Objects Traversed
 --------------------------------------------------------------------------
 
-The :app:`Pyramid` documentation refers to the graph being
-traversed when :term:`traversal` is used as a "model graph".  Some of
-the :app:`Pyramid` APIs also use the word "model" in them when
-referring to a node in this graph (e.g. ``pyramid.url.model_url``).
-
-A terminology overlap confuses people who write applications that
-always use ORM packages such as SQLAlchemy, which has a different
-notion of the definition of a "model".  When using the API of common
-ORM packages, its conception of "model" is almost certainly not a
-directed acyclic graph (as may be the case in many graph databases).
-Often model objects must be explicitly manufactured by an ORM as a
-result of some query performed by a :term:`view`.  As a result, it can
-be unnatural to think of the nodes traversed as "model" objects if you
-develop your application using traversal and a relational database.
-When you develop such applications, the things that :app:`Pyramid`
-refers to as "models" in such an application may just be stand-ins
-that perform a query and generate some wrapper *for* an ORM "model"
-(or set of ORM models).  The graph *might* be composed completely of
-"model" objects (as defined by the ORM) but it also might not be.
-
-The naming impedance mismatch between the way the term "model" is used
-to refer to a node in a graph in :app:`Pyramid` and the way the
-term "model" is used by packages like SQLAlchemy is unfortunate.  For
-the purpose of avoiding confusion, if we had it to do all over again,
-we might refer to the graph that :app:`Pyramid` traverses a "node
-graph" or "object graph" rather than a "model graph", but since we've
-baked the name into the API, it's a little late.  Sorry.
-
-In our defense, many :app:`Pyramid` applications (especially ones
-which use :term:`ZODB`) do indeed traverse a graph full of model
-nodes.  Each node in the graph is a separate persistent object that is
-stored within a database.  This was the use case considered when
-coming up with the "model" terminology.
+The ``repoze.bfg`` documentation used to refer to the graph being traversed
+when :term:`traversal` is used as a "model graph".  A terminology overlap
+confused people who wrote applications that always use ORM packages such as
+SQLAlchemy, which has a different notion of the definition of a "model".  As
+a sresult, in Pyramid 1.0a7, the tree of objects traversed is now renamed to
+:term:`resource tree` and its components are now named :term:`resource`
+objects.  Associated APIs have been changed.  This hopefully alleviates the
+terminology confusion caused by overriding the term "model".
 
 Pyramid Does Traversal, And I Don't Like Traversal
 --------------------------------------------------
 
-In :app:`Pyramid`, :term:`traversal` is the act of resolving a URL
-path to a :term:`model` object in an object graph.  Some people are
-uncomfortable with this notion, and believe it is wrong.
+In :app:`Pyramid`, :term:`traversal` is the act of resolving a URL path to a
+:term:`resource` object in a resource tree.  Some people are uncomfortable
+with this notion, and believe it is wrong.
 
-This is understandable.  The people who believe it is wrong almost
-invariably have all of their data in a relational database.
-Relational databases aren't naturally hierarchical, so "traversing"
-one like a graph is not possible.  This problem is related to
-:ref:`model_traversal_confusion`.
+This is understandable.  The people who believe it is wrong almost invariably
+have all of their data in a relational database.  Relational databases aren't
+naturally hierarchical, so "traversing" one like a tree is not possible.
 
-Folks who deem traversal unilaterally "wrong" are neglecting to take
-into account that many persistence mechanisms *are* hierarchical.
-Examples include a filesystem, an LDAP database, a :term:`ZODB` (or
-another type of graph) database, an XML document, and the Python
-module namespace.  It is often convenient to model the frontend to a
-hierarchical data store as a graph, using traversal to apply views to
-objects that either *are* the nodes in the graph being traversed (such
-as in the case of ZODB) or at least ones which stand in for them (such
-as in the case of wrappers for files from the filesystem).
+Folks who deem traversal unilaterally "wrong" are neglecting to take into
+account that many persistence mechanisms *are* hierarchical.  Examples
+include a filesystem, an LDAP database, a :term:`ZODB` (or another type of
+graph) database, an XML document, and the Python module namespace.  It is
+often convenient to model the frontend to a hierarchical data store as a
+graph, using traversal to apply views to objects that either *are* the
+resources in the tree being traversed (such as in the case of ZODB) or at
+least ones which stand in for them (such as in the case of wrappers for files
+from the filesystem).
 
-Also, many website structures are naturally hierarchical, even if the
-data which drives them isn't.  For example, newspaper websites are
-often extremely hierarchical: sections within sections within
-sections, ad infinitum.  If you want your URLs to indicate this
-structure, and the structure is indefinite (the number of nested
-sections can be "N" instead of some fixed number), traversal is an
-excellent way to model this, even if the backend is a relational
-database.  In this situation, the graph being traversed is actually
-less a "model graph" than a site structure.
+Also, many website structures are naturally hierarchical, even if the data
+which drives them isn't.  For example, newspaper websites are often extremely
+hierarchical: sections within sections within sections, ad infinitum.  If you
+want your URLs to indicate this structure, and the structure is indefinite
+(the number of nested sections can be "N" instead of some fixed number), a
+resource tree is an excellent way to model this, even if the backend is a
+relational database.  In this situation, the resource tree a just a site
+structure.
 
-But the point is ultimately moot.  If you use :app:`Pyramid`, and
-you don't want to model your application in terms of traversal, you
-needn't use it at all.  Instead, use :term:`URL dispatch` to map URL
-paths to views.
+But the point is ultimately moot.  If you use :app:`Pyramid`, and you don't
+want to model your application in terms of a resource tree, you needn't use
+it at all.  Instead, use :term:`URL dispatch` to map URL paths to views.
 
 Pyramid Does URL Dispatch, And I Don't Like URL Dispatch
 --------------------------------------------------------
@@ -705,7 +676,7 @@ top of your object graph (or any administrative interface), you can register
 a route like ``<route name="manage" pattern="manage/*traverse"/>`` and then
 associate "management" views in your code by using the ``route_name``
 argument to a ``view`` configuration, e.g. ``<view view=".some.callable"
-context=".some.Model" route_name="manage"/>``.  If you wire things up this
+context=".some.Resource" route_name="manage"/>``.  If you wire things up this
 way someone then walks up to for example, ``/manage/ob1/ob2``, they might be
 presented with a management interface, but walking up to ``/ob1/ob2`` would
 present them with the default object view.  There are other tricks you can
@@ -745,7 +716,7 @@ which match information in an associated "urlconf" such as
        return HttpResponse(poll_id)
 
 Zope, likewise allows you to add arbitrary keyword and positional
-arguments to any method of a model object found via traversal:
+arguments to any method of a resource object found via traversal:
 
 .. ignore-next-block
 .. code-block:: python
@@ -993,14 +964,16 @@ frameworks have some sort of event system hooked up that lets the view
 detect when the model changes.  The web just has no such facility in
 its current form: it's effectively pull-only.
 
-So, in the interest of not mistaking desire with reality, and instead
-of trying to jam the square peg that is the web into the round hole of
-"MVC", we just punt and say there are two things: the model, and the
-view. The model stores the data, the view presents it.  The templates
-are really just an implementation detail of any given view: a view
-doesn't need a template to return a response.  There's no
-"controller": it just doesn't exist.  This seems to us like a more
-reasonable model, given the current constraints of the web.
+So, in the interest of not mistaking desire with reality, and instead of
+trying to jam the square peg that is the web into the round hole of "MVC", we
+just punt and say there are two things: resources and views. The resource
+tree represents a site structure, the view presents a resource.  The
+templates are really just an implementation detail of any given view: a view
+doesn't need a template to return a response.  There's no "controller": it
+just doesn't exist.  The "model" is either represented by the resource tree
+or by a "domain model" (like a SQLAlchemy model) that is separate from the
+framework entirely.  This seems to us like more reasonable terminology, given
+the current constraints of the web.
 
 .. _apps_are_extensible:
 
@@ -1151,9 +1124,9 @@ access.  I like this, because it means:
    permissions that the accessing user possesses with respect to a context
    object.
 
-#) I want to also expose my model via a REST API using Twisted Web. If
+#) I want to also expose my resources via a REST API using Twisted Web. If
    Pyramid performed authorization based on attribute access via Zope3's
-   security proies, I could enforce my authorization policy in both
+   security proxies, I could enforce my authorization policy in both
    :app:`Pyramid` and in the Twisted-based system the same way.
 
 Defense

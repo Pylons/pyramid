@@ -61,7 +61,7 @@ also :ref:`overriding_assets_section`.
 +---------------------------------+-----------------------------+
 | Environment Variable Name       | Config File Setting Name    |
 +=================================+=============================+
-| ``BFG_RELOAD_ASSETS`   `        |  ``reload_assets``          |
+| ``BFG_RELOAD_ASSETS``           |  ``reload_assets``          |
 |                                 |                             |
 |                                 |                             |
 |                                 |                             |

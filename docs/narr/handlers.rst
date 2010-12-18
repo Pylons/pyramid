@@ -100,7 +100,7 @@ Using :meth:`~pyramid.config.Configurator.add_handler`
 When calling :meth:`~pyramid.config.Configurator.add_handler`, an
 ``action`` is required in either the route pattern or as a keyword argument,
 but **cannot appear in both places**. A ``handler`` argument must also be
-supplied, which can be either a :term:`resource specification` or a Python
+supplied, which can be either a :term:`asset specification` or a Python
 reference to the handler class. Additional keyword arguments are passed
 directly through to :meth:`pyramid.config.Configurator.add_route`.
 
@@ -112,7 +112,7 @@ For example:
     config.add_handler('hello', '/hello/{action}',
                        handler='mypackage.handlers:MyHandler')
 
-In larger applications, it is advised to use a :term:`resource specification`
+In larger applications, it is advised to use a :term:`asset specification`
 with :meth:`~pyramid.config.Configurator.add_handler` to avoid having
 to import every handler class.
 

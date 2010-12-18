@@ -223,9 +223,12 @@ root factory always returns an object that has no child resources.
    availability is more useful when you're developing an application using
    :term:`URL dispatch`.
 
-Items contained within the resource tree are sometimes, in certain types of
-applications, analogous to the concept of :term:`model` objects used by many
-other frameworks.  They are typically instances of Python classes.
+.. note::
+
+   If the items contained within the resource tree are "persistent" (they
+   have state that lasts longer than the execution of a single process), they
+   become analogous to the concept of :term:`domain model` objects used by
+   many other frameworks.
 
 The resource tree consists of *container* resources and *leaf* resources.
 There is only one difference between a *container* resource and a *leaf*

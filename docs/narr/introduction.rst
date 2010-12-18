@@ -178,10 +178,11 @@ frameworks, :app:`Pyramid` also generally fits into this class.
 
    The :app:`Pyramid` authors believe that the MVC pattern just doesn't
    really fit the web very well. In a :app:`Pyramid` application, there is a
-   model, which stores data, and views, which present the data stored in the
-   model.  However, no facility provided by the framework actually maps to
-   the concept of a "controller".  So :app:`Pyramid` is actually an "MV"
-   framework rather than an "MVC" framework.  "MVC", however, is close enough
-   as a general classification moniker for purposes of comparison with other
-   web frameworks.
-
+   resource tree, which represents the site structure, and views, which tend
+   to present the data stored in the resource tree and a user-defined "domain
+   model".  However, no facility provided *by the framework* actually
+   necessarily maps to the concept of a "controller" or "model".  So if you
+   had to give it some acronym, I guess you'd say :app:`Pyramid` is actually
+   an "RV" framework rather than an "MVC" framework.  "MVC", however, is
+   close enough as a general classification moniker for purposes of
+   comparison with other web frameworks.

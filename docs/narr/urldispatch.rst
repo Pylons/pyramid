@@ -613,7 +613,7 @@ represent neither predicates nor view configuration information.
 
 ``view_renderer``
   This is either a single string term (e.g. ``json``) or a string
-  implying a path or :term:`resource specification`
+  implying a path or :term:`asset specification`
   (e.g. ``templates/views.pt``).  If the renderer value is a single
   term (does not contain a dot ``.``), the specified term will be used
   to look up a renderer implementation, and that renderer
