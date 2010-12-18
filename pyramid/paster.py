@@ -31,7 +31,7 @@ class ZODBProjectTemplate(PyramidTemplate):
 
 class RoutesAlchemyProjectTemplate(PyramidTemplate):
     _template_dir = 'paster_templates/routesalchemy'
-    summary = 'pyramid SQLAlchemy project using Routes (no traversal)'
+    summary = 'pyramid SQLAlchemy project using url dispatch (no traversal)'
     template_renderer = staticmethod(paste_script_template_renderer)
 
 class AlchemyProjectTemplate(PyramidTemplate):
