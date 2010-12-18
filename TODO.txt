@@ -14,12 +14,6 @@ Must-Have (before 1.0)
 
 - Provide a .flash API on session object.
 
-- Use ``@register_view`` instead of ``@view_config`` and change view docs to
-  use "view registration" instead of "view configuration".
-
-- Change references to "model" to references to "resource" in all docs (and
-  alias model_url to resource_url, etc).
-
 Should-Have
 -----------
 
@@ -39,6 +33,9 @@ Should-Have
 
 Nice-to-Have
 ------------
+
+- Use ``@register_view`` instead of ``@view_config`` and change view docs to
+  use "view registration" instead of "view configuration".
 
 - Try to make test suite pass on IronPython.
 
