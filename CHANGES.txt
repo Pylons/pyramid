@@ -40,7 +40,7 @@ Terminology Changes
                         pyramid.testing.DummyResource
 
    - All documentation which previously referred to "model" now refers to
-    "resource".
+     "resource".
 
    - The ``starter`` and ``starter_zcml`` paster templates now have a
      ``resources.py`` module instead of a ``models.py`` module.
