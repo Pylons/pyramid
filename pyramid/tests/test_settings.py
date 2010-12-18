@@ -45,40 +45,76 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result['reload_templates'], True)
 
     def test_reload_resources(self):
+        # alias for reload_assets
         result = self._makeOne({})
         self.assertEqual(result['reload_resources'], False)
+        self.assertEqual(result['reload_assets'], False)
         result = self._makeOne({'reload_resources':'false'})
         self.assertEqual(result['reload_resources'], False)
+        self.assertEqual(result['reload_assets'], False)
         result = self._makeOne({'reload_resources':'t'})
         self.assertEqual(result['reload_resources'], True)
+        self.assertEqual(result['reload_assets'], True)
         result = self._makeOne({'reload_resources':'1'})
         self.assertEqual(result['reload_resources'], True)
+        self.assertEqual(result['reload_assets'], True)
         result = self._makeOne({}, {'BFG_RELOAD_RESOURCES':'1'})
         self.assertEqual(result['reload_resources'], True)
+        self.assertEqual(result['reload_assets'], True)
         result = self._makeOne({'reload_resources':'false'},
                              {'BFG_RELOAD_RESOURCES':'1'})
         self.assertEqual(result['reload_resources'], True)
+        self.assertEqual(result['reload_assets'], True)
+
+    def test_reload_assets(self):
+        # alias for reload_resources
+        result = self._makeOne({})
+        self.assertEqual(result['reload_assets'], False)
+        self.assertEqual(result['reload_resources'], False)
+        result = self._makeOne({'reload_assets':'false'})
+        self.assertEqual(result['reload_resources'], False)
+        self.assertEqual(result['reload_assets'], False)
+        result = self._makeOne({'reload_assets':'t'})
+        self.assertEqual(result['reload_assets'], True)
+        self.assertEqual(result['reload_resources'], True)
+        result = self._makeOne({'reload_assets':'1'})
+        self.assertEqual(result['reload_assets'], True)
+        self.assertEqual(result['reload_resources'], True)
+        result = self._makeOne({}, {'BFG_RELOAD_ASSETS':'1'})
+        self.assertEqual(result['reload_assets'], True)
+        self.assertEqual(result['reload_resources'], True)
+        result = self._makeOne({'reload_assets':'false'},
+                             {'BFG_RELOAD_ASSETS':'1'})
+        self.assertEqual(result['reload_assets'], True)
+        self.assertEqual(result['reload_resources'], True)
+
 
     def test_reload_all(self):
         result = self._makeOne({})
         self.assertEqual(result['reload_templates'], False)
         self.assertEqual(result['reload_resources'], False)
+        self.assertEqual(result['reload_assets'], False)
         result = self._makeOne({'reload_all':'false'})
         self.assertEqual(result['reload_templates'], False)
         self.assertEqual(result['reload_resources'], False)
+        self.assertEqual(result['reload_assets'], False)
         result = self._makeOne({'reload_all':'t'})
         self.assertEqual(result['reload_templates'], True)
         self.assertEqual(result['reload_resources'], True)
+        self.assertEqual(result['reload_assets'], True)
         result = self._makeOne({'reload_all':'1'})
         self.assertEqual(result['reload_templates'], True)
         self.assertEqual(result['reload_resources'], True)
+        self.assertEqual(result['reload_assets'], True)
         result = self._makeOne({}, {'BFG_RELOAD_ALL':'1'})
         self.assertEqual(result['reload_templates'], True)
         self.assertEqual(result['reload_resources'], True)
+        self.assertEqual(result['reload_assets'], True)
         result = self._makeOne({'reload_all':'false'},
                              {'BFG_RELOAD_ALL':'1'})
         self.assertEqual(result['reload_templates'], True)
         self.assertEqual(result['reload_resources'], True)
+        self.assertEqual(result['reload_assets'], True)
 
     def test_debug_authorization(self):
         result = self._makeOne({})

@@ -3153,14 +3153,14 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(ut.groupids, ('group1', 'group2'))
         self.assertEqual(ut.permissive, False)
 
-    def test_testing_models(self):
-        from pyramid.traversal import find_model
+    def test_testing_resources(self):
+        from pyramid.traversal import find_resource
         from pyramid.interfaces import ITraverser
         ob1 = object()
         ob2 = object()
-        models = {'/ob1':ob1, '/ob2':ob2}
+        resources = {'/ob1':ob1, '/ob2':ob2}
         config = self._makeOne(autocommit=True)
-        config.testing_models(models)
+        config.testing_resources(resources)
         adapter = config.registry.getAdapter(None, ITraverser)
         result = adapter({'PATH_INFO':'/ob1'})
         self.assertEqual(result['context'], ob1)
@@ -3179,7 +3179,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertRaises(KeyError, adapter, {'PATH_INFO':'/ob3'})
         try:
             config.begin()
-            self.assertEqual(find_model(None, '/ob1'), ob1)
+            self.assertEqual(find_resource(None, '/ob1'), ob1)
         finally:
             config.end()
 

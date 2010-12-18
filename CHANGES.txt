@@ -24,14 +24,8 @@ Terminology Changes
       pyramid.traversal.ModelGraphTraverser -> 
                         pyramid.traversal.ResourceTreeTraverser
 
-      pyramid.traversal.ModelGraphTraverser -> 
-                        pyramid.traversal.ResourceTreeTraverser
-
       pyramid.config.Configurator.testing_models ->
                         pyramid.config.Configurator.testing_resources
-
-      pyramid.request.Request.model_url ->
-                        pyramid.request.Request.resource_url
 
       pyramid.testing.registerModels ->
                         pyramid.testing.registerResources
