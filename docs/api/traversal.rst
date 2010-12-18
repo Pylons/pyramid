@@ -7,13 +7,13 @@
 
   .. autofunction:: find_interface
 
-  .. autofunction:: find_model
+  .. autofunction:: find_resource
 
   .. autofunction:: find_root
 
-  .. autofunction:: model_path
+  .. autofunction:: resource_path
 
-  .. autofunction:: model_path_tuple
+  .. autofunction:: resource_path_tuple
 
   .. autofunction:: quote_path_segment
 

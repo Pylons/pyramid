@@ -78,7 +78,7 @@
 
      .. automethod:: testing_securitypolicy
 
-     .. automethod:: testing_models
+     .. automethod:: testing_resources
 
      .. automethod:: testing_add_subscriber
 

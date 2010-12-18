@@ -9,7 +9,7 @@ class TestOverrideProvider(unittest.TestCase):
         cleanUp()
 
     def _getTargetClass(self):
-        from pyramid.resource import OverrideProvider
+        from pyramid.asset import OverrideProvider
         return OverrideProvider
 
     def _makeOne(self, module):
@@ -24,7 +24,7 @@ class TestOverrideProvider(unittest.TestCase):
 
     def test_get_resource_filename_no_overrides(self):
         import os
-        resource_name = 'test_resource.py'
+        resource_name = 'test_asset.py'
         import pyramid.tests
         provider = self._makeOne(pyramid.tests)
         here = os.path.dirname(os.path.abspath(__file__))
@@ -34,7 +34,7 @@ class TestOverrideProvider(unittest.TestCase):
 
     def test_get_resource_stream_no_overrides(self):
         import os
-        resource_name = 'test_resource.py'
+        resource_name = 'test_asset.py'
         import pyramid.tests
         provider = self._makeOne(pyramid.tests)
         here = os.path.dirname(os.path.abspath(__file__))
@@ -44,7 +44,7 @@ class TestOverrideProvider(unittest.TestCase):
 
     def test_get_resource_string_no_overrides(self):
         import os
-        resource_name = 'test_resource.py'
+        resource_name = 'test_asset.py'
         import pyramid.tests
         provider = self._makeOne(pyramid.tests)
         here = os.path.dirname(os.path.abspath(__file__))
@@ -53,14 +53,14 @@ class TestOverrideProvider(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_has_resource_no_overrides(self):
-        resource_name = 'test_resource.py'
+        resource_name = 'test_asset.py'
         import pyramid.tests
         provider = self._makeOne(pyramid.tests)
         result = provider.has_resource(resource_name)
         self.assertEqual(result, True)
 
     def test_resource_isdir_no_overrides(self):
-        file_resource_name = 'test_resource.py'
+        file_resource_name = 'test_asset.py'
         directory_resource_name = 'fixtures'
         import pyramid.tests
         provider = self._makeOne(pyramid.tests)
@@ -80,7 +80,7 @@ class TestOverrideProvider(unittest.TestCase):
         overrides = DummyOverrides(None)
         self._registerOverrides(overrides)
         import os
-        resource_name = 'test_resource.py'
+        resource_name = 'test_asset.py'
         import pyramid.tests
         provider = self._makeOne(pyramid.tests)
         here = os.path.dirname(os.path.abspath(__file__))
@@ -92,7 +92,7 @@ class TestOverrideProvider(unittest.TestCase):
         overrides = DummyOverrides(None)
         self._registerOverrides(overrides)
         import os
-        resource_name = 'test_resource.py'
+        resource_name = 'test_asset.py'
         import pyramid.tests
         provider = self._makeOne(pyramid.tests)
         here = os.path.dirname(os.path.abspath(__file__))
@@ -104,7 +104,7 @@ class TestOverrideProvider(unittest.TestCase):
         overrides = DummyOverrides(None)
         self._registerOverrides(overrides)
         import os
-        resource_name = 'test_resource.py'
+        resource_name = 'test_asset.py'
         import pyramid.tests
         provider = self._makeOne(pyramid.tests)
         here = os.path.dirname(os.path.abspath(__file__))
@@ -115,7 +115,7 @@ class TestOverrideProvider(unittest.TestCase):
     def test_has_resource_override_returns_None(self):
         overrides = DummyOverrides(None)
         self._registerOverrides(overrides)
-        resource_name = 'test_resource.py'
+        resource_name = 'test_asset.py'
         import pyramid.tests
         provider = self._makeOne(pyramid.tests)
         result = provider.has_resource(resource_name)
@@ -144,7 +144,7 @@ class TestOverrideProvider(unittest.TestCase):
         import pyramid.tests
         self._registerOverrides(overrides)
         provider = self._makeOne(pyramid.tests)
-        result = provider.get_resource_filename(None, 'test_resource.py')
+        result = provider.get_resource_filename(None, 'test_asset.py')
         self.assertEqual(result, 'value')
 
     def test_get_resource_stream_override_returns_value(self):
@@ -152,7 +152,7 @@ class TestOverrideProvider(unittest.TestCase):
         import pyramid.tests
         self._registerOverrides(overrides)
         provider = self._makeOne(pyramid.tests)
-        result = provider.get_resource_stream(None, 'test_resource.py')
+        result = provider.get_resource_stream(None, 'test_asset.py')
         self.assertEqual(result, 'value')
 
     def test_get_resource_string_override_returns_value(self):
@@ -160,7 +160,7 @@ class TestOverrideProvider(unittest.TestCase):
         import pyramid.tests
         self._registerOverrides(overrides)
         provider = self._makeOne(pyramid.tests)
-        result = provider.get_resource_string(None, 'test_resource.py')
+        result = provider.get_resource_string(None, 'test_asset.py')
         self.assertEqual(result, 'value')
 
     def test_has_resource_override_returns_True(self):
@@ -168,7 +168,7 @@ class TestOverrideProvider(unittest.TestCase):
         import pyramid.tests
         self._registerOverrides(overrides)
         provider = self._makeOne(pyramid.tests)
-        result = provider.has_resource('test_resource.py')
+        result = provider.has_resource('test_asset.py')
         self.assertEqual(result, True)
 
     def test_resource_isdir_override_returns_False(self):
@@ -189,7 +189,7 @@ class TestOverrideProvider(unittest.TestCase):
 
 class TestPackageOverrides(unittest.TestCase):
     def _getTargetClass(self):
-        from pyramid.resource import PackageOverrides
+        from pyramid.asset import PackageOverrides
         return PackageOverrides
 
     def _makeOne(self, package, pkg_resources=None):
@@ -259,39 +259,39 @@ class TestPackageOverrides(unittest.TestCase):
     def test_get_filename(self):
         import os
         overrides = [ DummyOverride(None), DummyOverride(
-            ('pyramid.tests', 'test_resource.py'))]
+            ('pyramid.tests', 'test_asset.py'))]
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides= overrides
         here = os.path.dirname(os.path.abspath(__file__))
-        expected = os.path.join(here, 'test_resource.py')
+        expected = os.path.join(here, 'test_asset.py')
         self.assertEqual(po.get_filename('whatever'), expected)
         
     def test_get_stream(self):
         import os
         overrides = [ DummyOverride(None), DummyOverride(
-            ('pyramid.tests', 'test_resource.py'))]
+            ('pyramid.tests', 'test_asset.py'))]
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides= overrides
         here = os.path.dirname(os.path.abspath(__file__))
-        expected = open(os.path.join(here, 'test_resource.py')).read()
+        expected = open(os.path.join(here, 'test_asset.py')).read()
         self.assertEqual(po.get_stream('whatever').read(), expected)
         
     def test_get_string(self):
         import os
         overrides = [ DummyOverride(None), DummyOverride(
-            ('pyramid.tests', 'test_resource.py'))]
+            ('pyramid.tests', 'test_asset.py'))]
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides= overrides
         here = os.path.dirname(os.path.abspath(__file__))
-        expected = open(os.path.join(here, 'test_resource.py')).read()
+        expected = open(os.path.join(here, 'test_asset.py')).read()
         self.assertEqual(po.get_string('whatever'), expected)
         
     def test_has_resource(self):
         overrides = [ DummyOverride(None), DummyOverride(
-            ('pyramid.tests', 'test_resource.py'))]
+            ('pyramid.tests', 'test_asset.py'))]
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides= overrides
@@ -299,7 +299,7 @@ class TestPackageOverrides(unittest.TestCase):
 
     def test_isdir_false(self):
         overrides = [ DummyOverride(
-            ('pyramid.tests', 'test_resource.py'))]
+            ('pyramid.tests', 'test_asset.py'))]
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides= overrides
@@ -323,7 +323,7 @@ class TestPackageOverrides(unittest.TestCase):
 
 class TestDirectoryOverride(unittest.TestCase):
     def _getTargetClass(self):
-        from pyramid.resource import DirectoryOverride
+        from pyramid.asset import DirectoryOverride
         return DirectoryOverride
 
     def _makeOne(self, path, package, prefix):
@@ -340,10 +340,10 @@ class TestDirectoryOverride(unittest.TestCase):
         result = o('baz/notfound.pt')
         self.assertEqual(result, None)
 
-class Test_resolve_resource_spec(unittest.TestCase):
+class Test_resolve_asset_spec(unittest.TestCase):
     def _callFUT(self, spec, package_name='__main__'):
-        from pyramid.resource import resolve_resource_spec
-        return resolve_resource_spec(spec, package_name)
+        from pyramid.resource import resolve_asset_spec
+        return resolve_asset_spec(spec, package_name)
 
     def test_abspath(self):
         import os
@@ -355,37 +355,37 @@ class Test_resolve_resource_spec(unittest.TestCase):
 
     def test_rel_spec(self):
         pkg = 'pyramid.tests'
-        path = 'test_resource.py'
+        path = 'test_asset.py'
         package_name, filename = self._callFUT(path, pkg)
         self.assertEqual(package_name, 'pyramid.tests')
-        self.assertEqual(filename, 'test_resource.py')
+        self.assertEqual(filename, 'test_asset.py')
         
     def test_abs_spec(self):
         pkg = 'pyramid.tests'
-        path = 'pyramid.nottests:test_resource.py'
+        path = 'pyramid.nottests:test_asset.py'
         package_name, filename = self._callFUT(path, pkg)
         self.assertEqual(package_name, 'pyramid.nottests')
-        self.assertEqual(filename, 'test_resource.py')
+        self.assertEqual(filename, 'test_asset.py')
 
     def test_package_name_is_None(self):
         pkg = None
-        path = 'test_resource.py'
+        path = 'test_asset.py'
         package_name, filename = self._callFUT(path, pkg)
         self.assertEqual(package_name, None)
-        self.assertEqual(filename, 'test_resource.py')
+        self.assertEqual(filename, 'test_asset.py')
 
     def test_package_name_is_package_object(self):
         import pyramid.tests
         pkg = pyramid.tests
-        path = 'test_resource.py'
+        path = 'test_asset.py'
         package_name, filename = self._callFUT(path, pkg)
         self.assertEqual(package_name, 'pyramid.tests')
-        self.assertEqual(filename, 'test_resource.py')
+        self.assertEqual(filename, 'test_asset.py')
 
 
 class TestFileOverride(unittest.TestCase):
     def _getTargetClass(self):
-        from pyramid.resource import FileOverride
+        from pyramid.asset import FileOverride
         return FileOverride
 
     def _makeOne(self, path, package, prefix):
@@ -402,16 +402,16 @@ class TestFileOverride(unittest.TestCase):
         result = o('notfound.pt')
         self.assertEqual(result, None)
 
-class Test_abspath_from_resource_spec(unittest.TestCase):
+class Test_abspath_from_asset_spec(unittest.TestCase):
     def _callFUT(self, spec, pname='__main__'):
-        from pyramid.resource import abspath_from_resource_spec
-        return abspath_from_resource_spec(spec, pname)
+        from pyramid.resource import abspath_from_asset_spec
+        return abspath_from_asset_spec(spec, pname)
 
-    def test_pname_is_None_before_resolve_resource_spec(self):
+    def test_pname_is_None_before_resolve_asset_spec(self):
         result = self._callFUT('abc', None)
         self.assertEqual(result, 'abc')
 
-    def test_pname_is_None_after_resolve_resource_spec(self):
+    def test_pname_is_None_after_resolve_asset_spec(self):
         result = self._callFUT('/abc', '__main__')
         self.assertEqual(result, '/abc')
 

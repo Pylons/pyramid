@@ -12,13 +12,13 @@ from pyramid.interfaces import IResponseFactory
 from pyramid.interfaces import ITemplateRenderer
 from pyramid.interfaces import IRendererInfo
 
+from pyramid.asset import asset_spec_from_abspath
 from pyramid.compat import json
 from pyramid.decorator import reify
 from pyramid.events import BeforeRender
 from pyramid.path import caller_package
 from pyramid.path import package_path
 from pyramid.response import Response
-from pyramid.resource import resource_spec_from_abspath
 from pyramid.threadlocal import get_current_registry
 
 # API
@@ -31,14 +31,14 @@ def render(renderer_name, value, request=None, package=None):
 
     If the renderer name refers to a file on disk (such as when the
     renderer is a template), it's usually best to supply the name as a
-    :term:`resource specification`
+    :term:`asset specification`
     (e.g. ``packagename:path/to/template.pt``).
 
-    You may supply a relative resource spec as ``renderer_name``.  If
+    You may supply a relative asset spec as ``renderer_name``.  If
     the ``package`` argument is supplied, a relative renderer path
-    will be converted to an absolute resource specification by
+    will be converted to an absolute asset specification by
     combining the package supplied as ``package`` with the relative
-    resource specification supplied as ``renderer_name``.  If you do
+    asset specification supplied as ``renderer_name``.  If you do
     not supply a ``package`` (or ``package`` is ``None``) the package
     name of the *caller* of this function will be used as the package.
 
@@ -75,13 +75,13 @@ def render_to_response(renderer_name, value, request=None, package=None):
 
     If the renderer name refers to a file on disk (such as when the
     renderer is a template), it's usually best to supply the name as a
-    :term:`resource specification`.
+    :term:`asset specification`.
 
-    You may supply a relative resource spec as ``renderer_name``.  If
+    You may supply a relative asset spec as ``renderer_name``.  If
     the ``package`` argument is supplied, a relative renderer name
-    will be converted to an absolute resource specification by
+    will be converted to an absolute asset specification by
     combining the package supplied as ``package`` with the relative
-    resource specification supplied as ``renderer_name``.  If you do
+    asset specification supplied as ``renderer_name``.  If you do
     not supply a ``package`` (or ``package`` is ``None``) the package
     name of the *caller* of this function will be used as the package.
 
@@ -114,11 +114,11 @@ def get_renderer(renderer_name, package=None):
     """ Return the renderer object for the renderer named as
     ``renderer_name``.
 
-    You may supply a relative resource spec as ``renderer_name``.  If
+    You may supply a relative asset spec as ``renderer_name``.  If
     the ``package`` argument is supplied, a relative renderer name
-    will be converted to an absolute resource specification by
+    will be converted to an absolute asset specification by
     combining the package supplied as ``package`` with the relative
-    resource specification supplied as ``renderer_name``.  If you do
+    asset specification supplied as ``renderer_name``.  If you do
     not supply a ``package`` (or ``package`` is ``None``) the package
     name of the *caller* of this function will be used as the package.
     """
@@ -164,11 +164,11 @@ class ChameleonRendererLookup(object):
         isabs = os.path.isabs(name)
 
         if (not isabs) and (not ':' in name) and package:
-            # relative resource spec
+            # relative asset spec
             if not isabs:
                 pp = package_path(package)
                 spec = os.path.join(pp, spec)
-            spec = resource_spec_from_abspath(spec, package)
+            spec = asset_spec_from_abspath(spec, package)
         return spec
 
     @property # wait until completely necessary to look up translator
@@ -204,7 +204,7 @@ class ChameleonRendererLookup(object):
                 finally:
                     self.lock.release()
         else:
-            # spec is a package:relpath resource spec
+            # spec is a package:relpath asset spec
             renderer = registry.queryUtility(ITemplateRenderer, name=spec)
             if renderer is None:
                 try:
@@ -218,10 +218,10 @@ class ChameleonRendererLookup(object):
                                                           filename)
                 if not pkg_resources.resource_exists(package_name, filename):
                     raise ValueError(
-                        'Missing template resource: %s (%s)' % (spec, abspath))
+                        'Missing template asset: %s (%s)' % (spec, abspath))
                 renderer = self.impl(abspath, self)
                 settings = info.settings or {}
-                if not settings.get('reload_resources'):
+                if not settings.get('reload_assets'):
                     # cache the template
                     self.lock.acquire()
                     try:

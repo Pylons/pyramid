@@ -26,7 +26,7 @@
    .. attribute:: root
 
       The :term:`root` object will be available as the ``root``
-      attribute of the :term:`request` object.  It will be the model
+      attribute of the :term:`request` object.  It will be the resource
       object at which traversal started (the root).  See
       :ref:`traversal_chapter` for information about root objects.
 

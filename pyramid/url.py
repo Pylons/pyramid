@@ -2,8 +2,6 @@
 
 import os
 
-from zope.deprecation import deprecated
-
 from repoze.lru import lru_cache
 
 from pyramid.interfaces import IContextURL
@@ -269,6 +267,9 @@ def resource_url(resource, request, *elements, **kw):
               :term:`traversal`, the URL path will not include the
               virtual root prefix (it will be stripped off the
               left hand side of the generated URL).
+
+    .. note:: For backwards compatibility purposes, this function can also
+       be imported as ``model_url``.
     """
     try:
         reg = request.registry
@@ -299,12 +300,7 @@ def resource_url(resource, request, *elements, **kw):
 
     return resource_url + suffix + qs + anchor
 
-model_url = resource_url
-
-deprecated(
-    'model_url',
-    '(The ``pyramid.url.model_url`` API is deprecated as of Pyramid 1.0.  Use'
-    'the ``pyramid.url.resource_url`` instead.) ')
+model_url = resource_url # b/w compat (forever)
 
 def static_url(path, request, **kw):
     """

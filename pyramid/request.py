@@ -219,6 +219,9 @@ class Request(WebobRequest):
 
           from pyramid.url import model_url
           resource_url(resource, request)
+
+        .. note:: For backwards compatibility purposes, this method can also
+        be called as :meth:`pyramid.request.Request.model_url`.
         """
         return resource_url(resource, self, *elements, **kw)
 

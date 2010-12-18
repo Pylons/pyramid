@@ -4,7 +4,7 @@
 --------------------------
 
 When this directive is used, authorization information is obtained
-from :term:`ACL` objects attached to model instances.
+from :term:`ACL` objects attached to :term:`resource` objects.
 
 Attributes
 ~~~~~~~~~~

@@ -157,7 +157,7 @@ Predicate Attributes
   representing the class that a graph traversal parent object of the
   :term:`context` must be an instance of (or :term:`interface` that a
   parent object must provide) in order for this view to be found and
-  called.  Your models must be "location-aware" to use this feature.
+  called.  Your resources must be "location-aware" to use this feature.
   See :ref:`location_aware` for more information about
   location-awareness.
 
@@ -222,7 +222,7 @@ Examples
      :linenos:
 
         <view
-           context=".models.MyModel"
+           context=".resources.MyResource"
            view=".views.hello_world"
          />
 
@@ -232,7 +232,7 @@ Examples
      :linenos:
 
         <view
-           context=".models.MyModel"
+           context=".resources.MyResource"
            view=".views.hello_world_post"
            request_method="POST"
          />

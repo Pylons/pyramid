@@ -25,7 +25,7 @@ Attributes
 ``factory``
   The :term:`dotted Python name` to a function that will generate a
   :app:`Pyramid` context object when this route matches.
-  e.g. ``mypackage.models.MyFactoryClass``.  If this argument is not
+  e.g. ``mypackage.resources.MyResource``.  If this argument is not
   specified, a default root factory will be used.
 
 ``view``

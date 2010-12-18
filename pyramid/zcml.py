@@ -21,7 +21,7 @@ from pyramid.authentication import RepozeWho1AuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.config import Configurator
 from pyramid.exceptions import ConfigurationError
-from pyramid.resource import resource_spec_from_abspath
+from pyramid.asset import asset_spec_from_abspath
 from pyramid.threadlocal import get_current_registry
 
 ###################### directives ##########################
@@ -420,13 +420,6 @@ def asset(_context, to_override, override_with, _override=None):
     config = Configurator.with_context(_context)
     config.override_asset(to_override, override_with, _override=_override)
 
-resource = asset # b/w compat
-
-deprecated(
-    'resource',
-    '(The ``resource`` ZCML directive is deprecated as of Pyramid 1.0.  Use'
-    'the ``asset`` directive instead.) ')
-
 class IRepozeWho1AuthenticationPolicyDirective(Interface):
     identifier_name = TextLine(title=u'identitfier_name', required=False,
                                default=u'auth_tkt')
@@ -531,7 +524,7 @@ class IStaticDirective(Interface):
         required=True)
 
     path = TextLine(
-        title=u'Path to the directory which contains resources',
+        title=u'Path to the directory which contains assets',
         description=u'May be package-relative by using a colon to '
         'separate package name and path relative to the package directory.',
         required=True)
@@ -814,14 +807,14 @@ def default_permission(_context, name):
     config.set_default_permission(name)
 
 def path_spec(context, path):
-    # we prefer registering resource specifications over absolute
-    # paths because these can be overridden by the resource directive.
+    # we prefer registering asset specifications over absolute
+    # paths because these can be overridden by the asset directive.
     if ':' in path and not os.path.isabs(path):
-        # it's already a resource specification
+        # it's already an asset specification
         return path
     abspath = context.path(path)
     if hasattr(context, 'package') and context.package:
-        return resource_spec_from_abspath(abspath, context.package)
+        return asset_spec_from_abspath(abspath, context.package)
     return abspath
 
 def zcml_configure(name, package):

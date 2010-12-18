@@ -2,16 +2,16 @@ import unittest
 
 from pyramid.testing import cleanUp
 
-class ModelURLTests(unittest.TestCase):
+class ResourceURLTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
     def tearDown(self):
         cleanUp()
         
-    def _callFUT(self, model, request, *elements, **kw):
-        from pyramid.url import model_url
-        return model_url(model, request, *elements, **kw)
+    def _callFUT(self, resource, request, *elements, **kw):
+        from pyramid.url import resource_url
+        return resource_url(resource, request, *elements, **kw)
 
     def _registerContextURL(self, reg):
         from pyramid.interfaces import IContextURL

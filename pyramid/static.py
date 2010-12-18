@@ -10,9 +10,9 @@ from paste.urlparser import StaticURLParser
 
 from zope.interface import implements
 
+from pyramid.asset import resolve_asset_spec
 from pyramid.interfaces import IStaticURLInfo
 from pyramid.path import caller_package
-from pyramid.resource import resolve_resource_spec
 from pyramid.url import route_url
 
 class PackageURLParser(StaticURLParser):
@@ -193,7 +193,7 @@ class static_view(object):
         # (e.g. ``anotherpackage:foo/static``).
         caller_package_name = caller_package().__name__
         package_name = package_name or caller_package_name
-        package_name, root_dir = resolve_resource_spec(root_dir, package_name)
+        package_name, root_dir = resolve_asset_spec(root_dir, package_name)
         if package_name is None:
             app = StaticURLParser(root_dir, cache_max_age=cache_max_age)
         else:

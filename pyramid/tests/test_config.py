@@ -226,22 +226,22 @@ class ConfiguratorTests(unittest.TestCase):
         result = config.maybe_dotted(pyramid.tests)
         self.assertEqual(result, pyramid.tests)
 
-    def test_absolute_resource_spec_already_absolute(self):
+    def test_absolute_asset_spec_already_absolute(self):
         import pyramid.tests
         config = self._makeOne(package=pyramid.tests)
-        result = config.absolute_resource_spec('already:absolute')
+        result = config.absolute_asset_spec('already:absolute')
         self.assertEqual(result, 'already:absolute')
 
-    def test_absolute_resource_spec_notastring(self):
+    def test_absolute_asset_spec_notastring(self):
         import pyramid.tests
         config = self._makeOne(package=pyramid.tests)
-        result = config.absolute_resource_spec(None)
+        result = config.absolute_asset_spec(None)
         self.assertEqual(result, None)
 
-    def test_absolute_resource_spec_relative(self):
+    def test_absolute_asset_spec_relative(self):
         import pyramid.tests
         config = self._makeOne(package=pyramid.tests)
-        result = config.absolute_resource_spec('templates')
+        result = config.absolute_asset_spec('templates')
         self.assertEqual(result, 'pyramid.tests:templates')
 
     def test_setup_registry_fixed(self):
@@ -2541,7 +2541,7 @@ class ConfiguratorTests(unittest.TestCase):
                           config.add_translation_dirs,
                           '/wont/exist/on/my/system')
 
-    def test_add_translation_dirs_resource_spec(self):
+    def test_add_translation_dirs_asset_spec(self):
         import os
         from pyramid.interfaces import ITranslationDirectories
         config = self._makeOne(autocommit=True)
@@ -2972,27 +2972,27 @@ class ConfiguratorTests(unittest.TestCase):
             inner_view, viewname='inner', wrapper_viewname='owrap')
         self.assertRaises(ValueError, wrapped, None, request)
 
-    def test_override_resource_samename(self):
+    def test_override_asset_samename(self):
         from pyramid.exceptions import ConfigurationError
         config = self._makeOne()
-        self.assertRaises(ConfigurationError, config.override_resource,'a', 'a')
+        self.assertRaises(ConfigurationError, config.override_asset,'a', 'a')
 
-    def test_override_resource_directory_with_file(self):
+    def test_override_asset_directory_with_file(self):
         from pyramid.exceptions import ConfigurationError
         config = self._makeOne()
-        self.assertRaises(ConfigurationError, config.override_resource,
+        self.assertRaises(ConfigurationError, config.override_asset,
                           'a:foo/', 'a:foo.pt')
 
-    def test_override_resource_file_with_directory(self):
+    def test_override_asset_file_with_directory(self):
         from pyramid.exceptions import ConfigurationError
         config = self._makeOne()
-        self.assertRaises(ConfigurationError, config.override_resource,
+        self.assertRaises(ConfigurationError, config.override_asset,
                           'a:foo.pt', 'a:foo/')
 
-    def test_override_resource_success(self):
+    def test_override_asset_success(self):
         config = self._makeOne(autocommit=True)
         override = DummyUnderOverride()
-        config.override_resource(
+        config.override_asset(
             'pyramid.tests.fixtureapp:templates/foo.pt',
             'pyramid.tests.fixtureapp.subpackage:templates/bar.pt',
             _override=override)

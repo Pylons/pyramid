@@ -77,7 +77,7 @@ class Test_renderer_factory(Base, unittest.TestCase):
             os.path.join(module_path, 'a'),
             os.path.join(module_path, 'b')])
 
-    def test_with_module_directory_resource_spec(self):
+    def test_with_module_directory_asset_spec(self):
         import os
         from pyramid.mako_templating import IMakoLookup
         module_directory = 'pyramid.tests:fixtures'
@@ -94,7 +94,7 @@ class Test_renderer_factory(Base, unittest.TestCase):
         fixtures = os.path.join(os.path.dirname(__file__), 'fixtures')
         self.assertEqual(lookup.module_directory, fixtures)
 
-    def test_with_module_directory_resource_abspath(self):
+    def test_with_module_directory_asset_abspath(self):
         import os
         from pyramid.mako_templating import IMakoLookup
         fixtures = os.path.join(os.path.dirname(__file__), 'fixtures')
@@ -364,28 +364,28 @@ class TestPkgResourceTemplateLookup(unittest.TestCase):
         import pyramid.tests
         return os.path.join(os.path.dirname(pyramid.tests.__file__), 'fixtures')
 
-    def test_adjust_uri_not_resource_spec(self):
+    def test_adjust_uri_not_asset_spec(self):
         inst = self._makeOne()
         result = inst.adjust_uri('a', None)
         self.assertEqual(result, '/a')
 
-    def test_adjust_uri_resource_spec(self):
+    def test_adjust_uri_asset_spec(self):
         inst = self._makeOne()
         result = inst.adjust_uri('a:b', None)
         self.assertEqual(result, 'a:b')
 
-    def test_get_template_not_resource_spec(self):
+    def test_get_template_not_asset_spec(self):
         fixturedir = self.get_fixturedir()
         inst = self._makeOne(directories=[fixturedir])
         result = inst.get_template('helloworld.mak')
         self.failIf(result is None)
         
-    def test_get_template_resource_spec_with_filesystem_checks(self):
+    def test_get_template_asset_spec_with_filesystem_checks(self):
         inst = self._makeOne(filesystem_checks=True)
         result = inst.get_template('pyramid.tests:fixtures/helloworld.mak')
         self.failIf(result is None)
 
-    def test_get_template_resource_spec_missing(self):
+    def test_get_template_asset_spec_missing(self):
         from mako.exceptions import TopLevelLookupException
         fixturedir = self.get_fixturedir()
         inst = self._makeOne(filesystem_checks=True, directories=[fixturedir])

@@ -73,8 +73,8 @@ from pyramid.path import package_of
 from pyramid.registry import Registry
 from pyramid.renderers import RendererHelper
 from pyramid.request import route_request_iface
-from pyramid.resource import PackageOverrides
-from pyramid.resource import resolve_resource_spec
+from pyramid.asset import PackageOverrides
+from pyramid.asset import resolve_asset_spec
 from pyramid.settings import Settings
 from pyramid.static import StaticURLInfo
 from pyramid.threadlocal import get_current_registry
@@ -327,14 +327,14 @@ class Configurator(object):
         self.action(IAuthorizationPolicy, None)
             
     def _make_spec(self, path_or_spec):
-        package, filename = resolve_resource_spec(path_or_spec,
-                                                  self.package_name)
+        package, filename = resolve_asset_spec(path_or_spec,
+                                               self.package_name)
         if package is None:
             return filename # absolute filename
         return '%s:%s' % (package, filename)
 
     def _split_spec(self, path_or_spec):
-        return resolve_resource_spec(path_or_spec, self.package_name)
+        return resolve_asset_spec(path_or_spec, self.package_name)
 
     def _derive_view(self, view, permission=None, predicates=(),
                      attr=None, renderer=None, wrapper_viewname=None,
@@ -570,18 +570,20 @@ class Configurator(object):
         this Configurator's constructor."""
         return self.name_resolver.maybe_resolve(dotted)
 
-    def absolute_resource_spec(self, relative_spec):
-        """ Resolve the potentially relative :term:`resource
+    def absolute_asset_spec(self, relative_spec):
+        """ Resolve the potentially relative :term:`asset
         specification` string passed as ``relative_spec`` into an
-        absolute resource specification string and return the string.
+        absolute asset specification string and return the string.
         Use the ``package`` of this configurator as the package to
-        which the resource specification will be considered relative
-        when generating an absolute resource specification.  If the
+        which the asset specification will be considered relative
+        when generating an absolute asset specification.  If the
         provided ``relative_spec`` argument is already absolute, or if
         the ``relative_spec`` is not a string, it is simply returned."""
         if not isinstance(relative_spec, basestring):
             return relative_spec
         return self._make_spec(relative_spec)
+
+    absolute_resource_spec = absolute_asset_spec # b/w compat forever
 
     def setup_registry(self, settings=None, root_factory=None,
                        authentication_policy=None, authorization_policy=None,
@@ -2283,18 +2285,18 @@ class Configurator(object):
         self.registry.registerUtility(policy, IAuthorizationPolicy)
         self.registry.registerUtility(policy, IAuthenticationPolicy)
 
-    def testing_models(self, models):
+    def testing_resources(self, resources):
         """Unit/integration testing helper: registers a dictionary of
-        :term:`model` objects that can be resolved via the
-        :func:`pyramid.traversal.find_model` API.
+        :term:`resource` objects that can be resolved via the
+        :func:`pyramid.traversal.find_resource` API.
 
-        The :func:`pyramid.traversal.find_model` API is called with
+        The :func:`pyramid.traversal.find_resource` API is called with
         a path as one of its arguments.  If the dictionary you
         register when calling this method contains that path as a
         string key (e.g. ``/foo/bar`` or ``foo/bar``), the
-        corresponding value will be returned to ``find_model`` (and
+        corresponding value will be returned to ``find_resource`` (and
         thus to your code) when
-        :func:`pyramid.traversal.find_model` is called with an
+        :func:`pyramid.traversal.find_resource` is called with an
         equivalent path string or tuple.
         """
         class DummyTraverserFactory:
@@ -2303,14 +2305,16 @@ class Configurator(object):
 
             def __call__(self, request):
                 path = request['PATH_INFO']
-                ob = models[path]
+                ob = resources[path]
                 traversed = traversal_path(path)
                 return {'context':ob, 'view_name':'','subpath':(),
                         'traversed':traversed, 'virtual_root':ob,
                         'virtual_root_path':(), 'root':ob}
         self.registry.registerAdapter(DummyTraverserFactory, (Interface,),
                                       ITraverser)
-        return models
+        return resources
+
+    testing_models = testing_resources # b/w compat
 
     @action_method
     def testing_add_subscriber(self, event_iface=None):

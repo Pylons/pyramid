@@ -49,7 +49,7 @@
     <meta:directive
         name="resource"
         schema="pyramid.zcml.IAssetDirective"
-        handler="pyramid.zcml.resource"
+        handler="pyramid.zcml.asset"
         />
 
     <meta:directive
