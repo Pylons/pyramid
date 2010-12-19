@@ -44,7 +44,7 @@ given codebase.  Unit testing often provides the opportunity to obtain better
 "coverage": it's usually possible to supply a unit under test with arguments
 and/or an environment which causes *all* of its potential codepaths to be
 executed.  This is usually not as easy to do with a set of integration or
-functinal tests, but integration and functional testing provides a measure of
+functional tests, but integration and functional testing provides a measure of
 assurance that your "units" work together, as they will be expected to when
 your application is run in production.
 
