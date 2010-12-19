@@ -25,6 +25,9 @@ Should-Have
 - Change "Cleaning up After a Request" in the urldispatch chapter to
   use ``request.add_response_callback``.
 
+- ``decorator=`` parameter to view_config.  This would replace the existing
+  _map_view "decorator" if it existed.
+
 Nice-to-Have
 ------------
 
@@ -52,9 +55,6 @@ Nice-to-Have
 - Fix message catalog extraction / compilation documentation.
 
 - Change docs about creating a venusian decorator to not use ZCA.
-
-- ``decorator=`` parameter to view_config.  This would replace the existing
-  _map_view "decorator" if it existed.
 
 - Try to better explain the relationship between a renderer and a
   template in the templates chapter and elsewhere.  Scan the
