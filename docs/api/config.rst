@@ -60,11 +60,11 @@
 
      .. automethod:: override_asset(to_override, override_with)
 
-     .. automethod:: scan(package=None, categories=None)
+     .. automethod:: scan
 
-     .. automethod:: set_forbidden_view(view=None, attr=None, renderer=None, wrapper=None)
+     .. automethod:: set_forbidden_view
 
-     .. automethod:: set_notfound_view(view=None, attr=None, renderer=None, wrapper=None)
+     .. automethod:: set_notfound_view
 
      .. automethod:: set_locale_negotiator
 
