@@ -59,6 +59,7 @@ Glossary
    package
      A directory on disk which contains an ``__init__.py`` file, making
      it recognizable to Python as a location which can be ``import`` -ed.
+     A package exists to contain :term:`module` files.
 
    module
      A Python source file; a file on the filesystem that typically ends with
