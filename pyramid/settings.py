@@ -10,7 +10,7 @@ from pyramid.threadlocal import get_current_registry
 class Settings(dict):
     """ Deployment settings.  Update application settings (usually
     from PasteDeploy keywords) with framework-specific key/value pairs
-    (e.g. find ``BFG_DEBUG_AUTHORIZATION`` in os.environ and jam into
+    (e.g. find ``PYRAMID_DEBUG_AUTHORIZATION`` in os.environ and jam into
     keyword args)."""
     implements(ISettings)
     # _environ_ is dep inj for testing
@@ -20,36 +20,36 @@ class Settings(dict):
         dict.__init__(self, d, **kw)
         eget = _environ_.get
         config_debug_all = self.get('debug_all', '')
-        eff_debug_all = asbool(eget('BFG_DEBUG_ALL', config_debug_all))
+        eff_debug_all = asbool(eget('PYRAMID_DEBUG_ALL', config_debug_all))
         config_reload_all = self.get('reload_all', '')
-        eff_reload_all = asbool(eget('BFG_RELOAD_ALL',config_reload_all))
+        eff_reload_all = asbool(eget('PYRAMID_RELOAD_ALL',config_reload_all))
         config_debug_auth = self.get('debug_authorization', '')
-        eff_debug_auth = asbool(eget('BFG_DEBUG_AUTHORIZATION',
+        eff_debug_auth = asbool(eget('PYRAMID_DEBUG_AUTHORIZATION',
                                      config_debug_auth))
         config_debug_notfound = self.get('debug_notfound', '')
-        eff_debug_notfound = asbool(eget('BFG_DEBUG_NOTFOUND',
+        eff_debug_notfound = asbool(eget('PYRAMID_DEBUG_NOTFOUND',
                                          config_debug_notfound))
         config_debug_routematch = self.get('debug_routematch', '')
-        eff_debug_routematch = asbool(eget('BFG_DEBUG_ROUTEMATCH',
+        eff_debug_routematch = asbool(eget('PYRAMID_DEBUG_ROUTEMATCH',
                                          config_debug_routematch))
         config_debug_templates = self.get('debug_templates', '')
-        eff_debug_templates = asbool(eget('BFG_DEBUG_TEMPLATES',
+        eff_debug_templates = asbool(eget('PYRAMID_DEBUG_TEMPLATES',
                                           config_debug_templates))
         config_reload_templates = self.get('reload_templates', '')
-        eff_reload_templates = asbool(eget('BFG_RELOAD_TEMPLATES',
+        eff_reload_templates = asbool(eget('PYRAMID_RELOAD_TEMPLATES',
                                            config_reload_templates))
         config_reload_assets = self.get('reload_assets', '')
         config_reload_resources = self.get('reload_resources', '')
-        reload_assets = asbool(eget('BFG_RELOAD_ASSETS',
+        reload_assets = asbool(eget('PYRAMID_RELOAD_ASSETS',
                                     config_reload_assets))
-        reload_resources = asbool(eget('BFG_RELOAD_RESOURCES',
+        reload_resources = asbool(eget('PYRAMID_RELOAD_RESOURCES',
                                     config_reload_resources))
         # reload_resources is an older alias for reload_assets
         eff_reload_assets = reload_assets or reload_resources
         configure_zcml = self.get('configure_zcml', '')
-        eff_configure_zcml = eget('BFG_CONFIGURE_ZCML', configure_zcml)
+        eff_configure_zcml = eget('PYRAMID_CONFIGURE_ZCML', configure_zcml)
         locale_name = self.get('default_locale_name', 'en')
-        eff_locale_name = eget('BFG_DEFAULT_LOCALE_NAME', locale_name)
+        eff_locale_name = eget('PYRAMID_DEFAULT_LOCALE_NAME', locale_name)
         
         update = {
             'debug_authorization': eff_debug_all or eff_debug_auth,

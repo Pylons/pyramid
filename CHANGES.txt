@@ -90,6 +90,13 @@ Features
 - The name ``registry`` is now available in a ``pshell`` environment by
   default.  It is the application registry object.
 
+Environment
+-----------
+
+- All environment variables which used to be prefixed with ``BFG_`` are now
+  prefixed with ``PYRAMID_`` (e.g. ``BFG_DEBUG_NOTFOUND`` is now
+  ``PYRAMID_DEBUG_NOTFOUND``)
+
 Documentation
 -------------
 

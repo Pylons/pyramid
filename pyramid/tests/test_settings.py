@@ -38,10 +38,10 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result['reload_templates'], True)
         result = self._makeOne({'reload_templates':'1'})
         self.assertEqual(result['reload_templates'], True)
-        result = self._makeOne({}, {'BFG_RELOAD_TEMPLATES':'1'})
+        result = self._makeOne({}, {'PYRAMID_RELOAD_TEMPLATES':'1'})
         self.assertEqual(result['reload_templates'], True)
         result = self._makeOne({'reload_templates':'false'},
-                             {'BFG_RELOAD_TEMPLATES':'1'})
+                             {'PYRAMID_RELOAD_TEMPLATES':'1'})
         self.assertEqual(result['reload_templates'], True)
 
     def test_reload_resources(self):
@@ -58,11 +58,11 @@ class TestSettings(unittest.TestCase):
         result = self._makeOne({'reload_resources':'1'})
         self.assertEqual(result['reload_resources'], True)
         self.assertEqual(result['reload_assets'], True)
-        result = self._makeOne({}, {'BFG_RELOAD_RESOURCES':'1'})
+        result = self._makeOne({}, {'PYRAMID_RELOAD_RESOURCES':'1'})
         self.assertEqual(result['reload_resources'], True)
         self.assertEqual(result['reload_assets'], True)
         result = self._makeOne({'reload_resources':'false'},
-                             {'BFG_RELOAD_RESOURCES':'1'})
+                             {'PYRAMID_RELOAD_RESOURCES':'1'})
         self.assertEqual(result['reload_resources'], True)
         self.assertEqual(result['reload_assets'], True)
 
@@ -80,11 +80,11 @@ class TestSettings(unittest.TestCase):
         result = self._makeOne({'reload_assets':'1'})
         self.assertEqual(result['reload_assets'], True)
         self.assertEqual(result['reload_resources'], True)
-        result = self._makeOne({}, {'BFG_RELOAD_ASSETS':'1'})
+        result = self._makeOne({}, {'PYRAMID_RELOAD_ASSETS':'1'})
         self.assertEqual(result['reload_assets'], True)
         self.assertEqual(result['reload_resources'], True)
         result = self._makeOne({'reload_assets':'false'},
-                             {'BFG_RELOAD_ASSETS':'1'})
+                             {'PYRAMID_RELOAD_ASSETS':'1'})
         self.assertEqual(result['reload_assets'], True)
         self.assertEqual(result['reload_resources'], True)
 
@@ -106,12 +106,12 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result['reload_templates'], True)
         self.assertEqual(result['reload_resources'], True)
         self.assertEqual(result['reload_assets'], True)
-        result = self._makeOne({}, {'BFG_RELOAD_ALL':'1'})
+        result = self._makeOne({}, {'PYRAMID_RELOAD_ALL':'1'})
         self.assertEqual(result['reload_templates'], True)
         self.assertEqual(result['reload_resources'], True)
         self.assertEqual(result['reload_assets'], True)
         result = self._makeOne({'reload_all':'false'},
-                             {'BFG_RELOAD_ALL':'1'})
+                             {'PYRAMID_RELOAD_ALL':'1'})
         self.assertEqual(result['reload_templates'], True)
         self.assertEqual(result['reload_resources'], True)
         self.assertEqual(result['reload_assets'], True)
@@ -125,10 +125,10 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result['debug_authorization'], True)
         result = self._makeOne({'debug_authorization':'1'})
         self.assertEqual(result['debug_authorization'], True)
-        result = self._makeOne({}, {'BFG_DEBUG_AUTHORIZATION':'1'})
+        result = self._makeOne({}, {'PYRAMID_DEBUG_AUTHORIZATION':'1'})
         self.assertEqual(result['debug_authorization'], True)
         result = self._makeOne({'debug_authorization':'false'},
-                             {'BFG_DEBUG_AUTHORIZATION':'1'})
+                             {'PYRAMID_DEBUG_AUTHORIZATION':'1'})
         self.assertEqual(result['debug_authorization'], True)
 
     def test_debug_notfound(self):
@@ -140,10 +140,10 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result['debug_notfound'], True)
         result = self._makeOne({'debug_notfound':'1'})
         self.assertEqual(result['debug_notfound'], True)
-        result = self._makeOne({}, {'BFG_DEBUG_NOTFOUND':'1'})
+        result = self._makeOne({}, {'PYRAMID_DEBUG_NOTFOUND':'1'})
         self.assertEqual(result['debug_notfound'], True)
         result = self._makeOne({'debug_notfound':'false'},
-                             {'BFG_DEBUG_NOTFOUND':'1'})
+                             {'PYRAMID_DEBUG_NOTFOUND':'1'})
         self.assertEqual(result['debug_notfound'], True)
 
     def test_debug_routematch(self):
@@ -155,10 +155,10 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result['debug_routematch'], True)
         result = self._makeOne({'debug_routematch':'1'})
         self.assertEqual(result['debug_routematch'], True)
-        result = self._makeOne({}, {'BFG_DEBUG_ROUTEMATCH':'1'})
+        result = self._makeOne({}, {'PYRAMID_DEBUG_ROUTEMATCH':'1'})
         self.assertEqual(result['debug_routematch'], True)
         result = self._makeOne({'debug_routematch':'false'},
-                             {'BFG_DEBUG_ROUTEMATCH':'1'})
+                             {'PYRAMID_DEBUG_ROUTEMATCH':'1'})
         self.assertEqual(result['debug_routematch'], True)
 
     def test_debug_templates(self):
@@ -170,10 +170,10 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result['debug_templates'], True)
         result = self._makeOne({'debug_templates':'1'})
         self.assertEqual(result['debug_templates'], True)
-        result = self._makeOne({}, {'BFG_DEBUG_TEMPLATES':'1'})
+        result = self._makeOne({}, {'PYRAMID_DEBUG_TEMPLATES':'1'})
         self.assertEqual(result['debug_templates'], True)
         result = self._makeOne({'debug_templates':'false'},
-                             {'BFG_DEBUG_TEMPLATES':'1'})
+                             {'PYRAMID_DEBUG_TEMPLATES':'1'})
         self.assertEqual(result['debug_templates'], True)
 
     def test_debug_all(self):
@@ -197,13 +197,13 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result['debug_routematch'], True)
         self.assertEqual(result['debug_authorization'], True)
         self.assertEqual(result['debug_templates'], True)
-        result = self._makeOne({}, {'BFG_DEBUG_ALL':'1'})
+        result = self._makeOne({}, {'PYRAMID_DEBUG_ALL':'1'})
         self.assertEqual(result['debug_notfound'], True)
         self.assertEqual(result['debug_routematch'], True)
         self.assertEqual(result['debug_authorization'], True)
         self.assertEqual(result['debug_templates'], True)
         result = self._makeOne({'debug_all':'false'},
-                             {'BFG_DEBUG_ALL':'1'})
+                             {'PYRAMID_DEBUG_ALL':'1'})
         self.assertEqual(result['debug_notfound'], True)
         self.assertEqual(result['debug_routematch'], True)
         self.assertEqual(result['debug_authorization'], True)
@@ -214,10 +214,10 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result['configure_zcml'], '')
         result = self._makeOne({'configure_zcml':'abc'})
         self.assertEqual(result['configure_zcml'], 'abc')
-        result = self._makeOne({}, {'BFG_CONFIGURE_ZCML':'abc'})
+        result = self._makeOne({}, {'PYRAMID_CONFIGURE_ZCML':'abc'})
         self.assertEqual(result['configure_zcml'], 'abc')
         result = self._makeOne({'configure_zcml':'def'},
-                             {'BFG_CONFIGURE_ZCML':'abc'})
+                             {'PYRAMID_CONFIGURE_ZCML':'abc'})
         self.assertEqual(result['configure_zcml'], 'abc')
 
     def test_default_locale_name(self):
@@ -225,10 +225,10 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result['default_locale_name'], 'en')
         result = self._makeOne({'default_locale_name':'abc'})
         self.assertEqual(result['default_locale_name'], 'abc')
-        result = self._makeOne({}, {'BFG_DEFAULT_LOCALE_NAME':'abc'})
+        result = self._makeOne({}, {'PYRAMID_DEFAULT_LOCALE_NAME':'abc'})
         self.assertEqual(result['default_locale_name'], 'abc')
         result = self._makeOne({'default_locale_name':'def'},
-                             {'BFG_DEFAULT_LOCALE_NAME':'abc'})
+                             {'PYRAMID_DEFAULT_LOCALE_NAME':'abc'})
         self.assertEqual(result['default_locale_name'], 'abc')
 
     def test_originals_kept(self):

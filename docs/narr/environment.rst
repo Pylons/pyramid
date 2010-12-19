@@ -46,7 +46,7 @@ template rendering extensions.
 +---------------------------------+-----------------------------+
 | Environment Variable Name       | Config File Setting Name    |
 +=================================+=============================+
-| ``BFG_RELOAD_TEMPLATES``        |  ``reload_templates``       |
+| ``PYRAMID_RELOAD_TEMPLATES``    |  ``reload_templates``       |
 |                                 |                             |
 |                                 |                             |
 |                                 |                             |
@@ -61,14 +61,14 @@ also :ref:`overriding_assets_section`.
 +---------------------------------+-----------------------------+
 | Environment Variable Name       | Config File Setting Name    |
 +=================================+=============================+
-| ``BFG_RELOAD_ASSETS``           |  ``reload_assets``          |
+| ``PYRAMID_RELOAD_ASSETS``       |  ``reload_assets``          |
 |                                 |                             |
 |                                 |                             |
 |                                 |                             |
 +---------------------------------+-----------------------------+
 
 .. note:: For backwards compatibility purposes, the following aliases can be
-   used for configurating asset reloading: ``BFG_RELOAD_RESOURCES`` (envvar)
+   used for configurating asset reloading: ``PYRAMID_RELOAD_RESOURCES`` (envvar)
    and ``reload_resources`` (config file).
 
 Debugging Authorization
@@ -80,7 +80,7 @@ when this value is true.  See also :ref:`debug_authorization_section`.
 +---------------------------------+-----------------------------+
 | Environment Variable Name       | Config File Setting Name    |
 +=================================+=============================+
-| ``BFG_DEBUG_AUTHORIZATION``     |  ``debug_authorization``    |
+| ``PYRAMID_DEBUG_AUTHORIZATION`` |  ``debug_authorization``    |
 |                                 |                             |
 |                                 |                             |
 |                                 |                             | 
@@ -95,7 +95,7 @@ when this value is true.  See also :ref:`debug_notfound_section`.
 +---------------------------------+-----------------------------+
 | Environment Variable Name       | Config File Setting Name    |
 +=================================+=============================+
-| ``BFG_DEBUG_NOTFOUND``          |  ``debug_notfound``         |
+| ``PYRAMID_DEBUG_NOTFOUND``      |  ``debug_notfound``         |
 |                                 |                             |
 |                                 |                             |
 |                                 |                             |
@@ -110,7 +110,7 @@ this value is true.  See also :ref:`debug_routematch_section`.
 +---------------------------------+-----------------------------+
 | Environment Variable Name       | Config File Setting Name    |
 +=================================+=============================+
-| ``BFG_DEBUG_ROUTEMATCH``        |  ``debug_routematch``       |
+| ``PYRAMID_DEBUG_ROUTEMATCH``    |  ``debug_routematch``       |
 |                                 |                             |
 |                                 |                             |
 |                                 |                             |
@@ -124,7 +124,7 @@ Turns on all ``debug*`` settings.
 +---------------------------------+-----------------------------+
 | Environment Variable Name       | Config File Setting Name    |
 +=================================+=============================+
-| ``BFG_DEBUG_ALL``               |  ``debug_all``              |
+| ``PYRAMID_DEBUG_ALL``           |  ``debug_all``              |
 |                                 |                             |
 |                                 |                             |
 |                                 |                             |
@@ -138,7 +138,7 @@ Turns on all ``reload*`` settings.
 +---------------------------------+-----------------------------+
 | Environment Variable Name       | Config File Setting Name    |
 +=================================+=============================+
-| ``BFG_RELOAD_ALL``              |  ``reload_all``             |
+| ``PYRAMID_RELOAD_ALL``          |  ``reload_all``             |
 |                                 |                             |
 |                                 |                             |
 |                                 |                             |
@@ -156,7 +156,7 @@ The value supplied here is used as the default locale name when a
 +---------------------------------+-----------------------------+
 | Environment Variable Name       | Config File Setting Name    |
 +=================================+=============================+
-| ``BFG_DEFAULT_LOCALE_NAME``     |  ``default_locale_name``    |
+| ``PYRAMID_DEFAULT_LOCALE_NAME`` |  ``default_locale_name``    |
 |                                 |                             |
 |                                 |                             |
 |                                 |                             |
@@ -313,8 +313,8 @@ for settings documented as such.  For example, you might start your
 
 .. code-block:: text
 
-  $ BFG_DEBUG_AUTHORIZATION=1 BFG_RELOAD_TEMPLATES=1 bin/paster serve \
-         MyProject.ini
+  $ PYRAMID_DEBUG_AUTHORIZATION=1 PYRAMID_RELOAD_TEMPLATES=1 \
+         bin/paster serve MyProject.ini
 
 If you started your application this way, your :app:`Pyramid`
 application would behave in the same manner as if you had placed the
@@ -323,14 +323,14 @@ application's ``.ini`` file.
 
 If you want to turn all ``debug`` settings (every setting that starts
 with ``debug_``). on in one fell swoop, you can use
-``BFG_DEBUG_ALL=1`` as an environment variable setting or you may use
+``PYRAMID_DEBUG_ALL=1`` as an environment variable setting or you may use
 ``debug_all=true`` in the config file.  Note that this does not affect
 settings that do not start with ``debug_*`` such as
 ``reload_templates``.
 
 If you want to turn all ``reload`` settings (every setting that starts
 with ``reload_``). on in one fell swoop, you can use
-``BFG_RELOAD_ALL=1`` as an environment variable setting or you may use
+``PYRAMID_RELOAD_ALL=1`` as an environment variable setting or you may use
 ``reload_all=true`` in the config file.  Note that this does not
 affect settings that do not start with ``reload_*`` such as
 ``debug_notfound``.

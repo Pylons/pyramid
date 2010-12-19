@@ -14,8 +14,6 @@ Should-Have
 - Add docs for httpexceptions module for each webob.exc class that inherits
   from WSGIHTTPException.
 
-- Remove "BFG" from Pyramid-specific environ variables.
-
 - translationdir ZCML directive use of ``path_spec`` should maybe die.
 
 - Add CRSF token creation/checking machinery (only "should have" vs. "must
