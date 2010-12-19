@@ -190,4 +190,11 @@ Here's how to convert a :mod:`repoze.bfg` application to a
 
 #. Start using the converted version of your application.  Celebrate.
 
-
+Two terminological changes have been made to Pyramid which make its
+documentation and newer APIs different than those of ``repoze.bfg``.  The
+concept that BFG called ``model`` is called ``resource`` in Pyramid and the
+concept that BFG called ``resource`` is called ``asset`` in Pyramid.  Various
+APIs have changed as a result (although all have backwards compatible shims).
+Additionally, the environment variables that influenced server behavior which
+used to be prefixed with ``BFG_`` (such as ``BFG_DEBUG_NOTFOUND``) must now
+be prefixed with ``PYRAMID_``.
