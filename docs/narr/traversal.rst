@@ -4,15 +4,16 @@ Traversal
 =========
 
 :term:`Traversal` It provides an alternative to using :term:`URL dispatch` to
-map a URL to a :term:`view callable`.  It is a :term:`resource location`
-mechanism. It is the act of finding a :term:`context` resource by walking
-over a :term:`resource tree`, starting from a :term:`root` resource, using a
-:term:`request` object as a source of path information.  Once a context
-resource is found, a view callable is looked up and invoked.
+map a URL to a :term:`view callable`.  It is the act of locating a
+:term:`context` resource by walking over a :term:`resource tree`, starting
+from a :term:`root` resource, using a :term:`request` object as a source of
+path information.  Once a context resource is found, a view callable is
+looked up and invoked.
 
-In this chapter, we'll provide a high-level overview of traversal, we'll
-explain the concept of a resource tree, and we'll show how traversal might be
-used within an application.
+Using :term:`Traversal` to map a URL to code is optional.  It is often less
+easy to understand than URL dispatch, so if you're a rank beginner, it
+probably makes sense to use URL dispatch to map URLs to code instead of
+traversal.  In that case, you can skip this chapter.
 
 .. index::
    single: traversal overview
