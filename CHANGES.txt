@@ -117,6 +117,9 @@ Documentation
 - Added an example of ``WebTest`` functional testing to the testing narrative
   chapter.
 
+- Rearranged chapter ordering by popular demand (URL dispatch first, then
+  traversal).  Put hybrid chapter after views chapter.
+
 Paster Templates
 ----------------
 
