@@ -901,8 +901,8 @@ tests here as you build your application.  You are not required to write
 tests to use :app:`Pyramid`, this file is simply provided as convenience and
 example.
 
-See :ref:`unittesting_chapter` for more information about writing
-:app:`Pyramid` unit tests.
+See :ref:`testing_chapter` for more information about writing :app:`Pyramid`
+unit tests.
 
 Modifying Package Structure
 ----------------------------

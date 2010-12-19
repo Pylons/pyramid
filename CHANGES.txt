@@ -114,6 +114,9 @@ Documentation
 - Many changes to support terminological renaming of "model" to "resource"
   and "resource" to "asset".
 
+- Added an example of ``WebTest`` functional testing to the testing narrative
+  chapter.
+
 Paster Templates
 ----------------
 

@@ -635,7 +635,7 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True):
                  ``Configurator`` are preferred to using
                  ``pyramid.testing.setUp`` and
                  ``pyramid.testing.tearDown``.  See
-                 :ref:`unittesting_chapter` for more information.
+                 :ref:`testing_chapter` for more information.
     """
     manager.clear()
     if registry is None:
@@ -681,7 +681,7 @@ def tearDown(unhook_zca=True):
                  ``Configurator`` are preferred to using
                  ``pyramid.testing.setUp`` and
                  ``pyramid.testing.tearDown``.  See
-                 :ref:`unittesting_chapter` for more information.
+                 :ref:`testing_chapter` for more information.
 
     """
     if unhook_zca:

@@ -841,3 +841,8 @@ Glossary
      ``request.registry.settings`` dictionary.  Deployment settings can be
      used as global application values.
 
+   WebTest
+     `WebTest <http://pythonpaste.org/webtest/>`_ is a package which can help
+     you write functional tests for your WSGI application.
+
+

@@ -54,7 +54,7 @@ Narrative documentation in chapter form explaining how to use
    narr/vhosting
    narr/events
    narr/environment
-   narr/unittesting
+   narr/testing
    narr/hooks
    narr/declarative
    narr/extending
