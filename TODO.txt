@@ -4,8 +4,6 @@ Pyramid TODOs
 Must-Have (before 1.0)
 ----------------------
 
-- Fix conflict info case for ``scan``.
-
 - Narrative docs for ``Configurator.include`` and ``Configurator.commit``.
 
 - Fix session behavior: when a Forbidden/NotFound hander is invoked, we'd
