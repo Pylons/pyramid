@@ -1230,7 +1230,7 @@ for more information about changing the default notfound view.
 
 It's useful to be able to debug :exc:`NotFound` error responses when they
 occur unexpectedly due to an application registry misconfiguration.  To debug
-these errors, use the ``BFG_DEBUG_NOTFOUND`` environment variable or the
+these errors, use the ``PYRAMID_DEBUG_NOTFOUND`` environment variable or the
 ``debug_notfound`` configuration file setting.  Details of why a view was not
 found will be printed to ``stderr``, and the browser representation of the
 error will include the same information.  See :ref:`environment_chapter` for

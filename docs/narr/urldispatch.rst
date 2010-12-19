@@ -1207,7 +1207,7 @@ Debugging Route Matching
 
 It's useful to be able to take a peek under the hood when requests that enter
 your application arent matching your routes as you expect them to.  To debug
-route matching, use the ``BFG_DEBUG_ROUTEMATCH`` environment variable or the
+route matching, use the ``PYRAMID_DEBUG_ROUTEMATCH`` environment variable or the
 ``debug_routematch`` configuration file setting (set either to ``true``).
 Details of the route matching decision for a particular request to the
 :app:`Pyramid` application will be printed to the ``stderr`` of the console
@@ -1216,7 +1216,7 @@ which you started the application from.  For example:
 .. code-block:: text
    :linenos:
 
-    [chrism@thinko pylonsbasic]$ BFG_DEBUG_ROUTEMATCH=true \
+    [chrism@thinko pylonsbasic]$ PYRAMID_DEBUG_ROUTEMATCH=true \
                                  bin/paster serve development.ini 
     Starting server in PID 13586.
     serving on 0.0.0.0:6543 view at http://127.0.0.1:6543

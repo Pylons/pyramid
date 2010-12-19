@@ -614,12 +614,12 @@ In order to turn on template exception debugging, you can use an
 environment variable setting or a configuration file setting.
 
 To use an environment variable, start your application under a shell
-using the ``BFG_DEBUG_TEMPLATES`` operating system environment
+using the ``PYRAMID_DEBUG_TEMPLATES`` operating system environment
 variable set to ``1``, For example:
 
 .. code-block:: text
 
-  $ BFG_DEBUG_TEMPLATES=1 bin/paster serve myproject.ini
+  $ PYRAMID_DEBUG_TEMPLATES=1 bin/paster serve myproject.ini
 
 To use a setting in the application ``.ini`` file for the same
 purpose, set the ``debug_templates`` key to ``true`` within the
@@ -777,12 +777,12 @@ In order to turn on automatic reloading of templates, you can use an
 environment variable, or a configuration file setting.
 
 To use an environment variable, start your application under a shell
-using the ``BFG_RELOAD_TEMPLATES`` operating system environment
+using the ``PYRAMID_RELOAD_TEMPLATES`` operating system environment
 variable set to ``1``, For example:
 
 .. code-block:: text
 
-  $ BFG_RELOAD_TEMPLATES=1 bin/paster serve myproject.ini
+  $ PYRAMID_RELOAD_TEMPLATES=1 bin/paster serve myproject.ini
 
 To use a setting in the application ``.ini`` file for the same
 purpose, set the ``reload_templates`` key to ``true`` within the
