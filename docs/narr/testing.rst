@@ -56,7 +56,7 @@ Into Python <http://diveintopython.org/unit_testing/index.html>`_ by Mark
 Pilgrim.
 
 :app:`Pyramid` provides a number of facilities that make unit, integration,
-and cunctional tests easier to write.  The facilities become particularly
+and functional tests easier to write.  The facilities become particularly
 useful when your code calls into :app:`Pyramid` -related framework functions.
 
 .. index::
