@@ -39,8 +39,8 @@ Narrative documentation in chapter form explaining how to use
    narr/project
    narr/startup
    narr/resourcelocation
-   narr/traversal
    narr/urldispatch
+   narr/traversal
    narr/hybrid
    narr/views
    narr/handlers

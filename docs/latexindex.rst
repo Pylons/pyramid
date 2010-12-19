@@ -32,8 +32,8 @@ Narrative Documentation
    narr/firstapp
    narr/project
    narr/resourcelocation
-   narr/traversal
    narr/urldispatch
+   narr/traversal
    narr/hybrid
    narr/views
    narr/handlers

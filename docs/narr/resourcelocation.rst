@@ -6,45 +6,27 @@
 Resource Location and View Lookup
 ---------------------------------
 
-As a primary job, :app:`Pyramid` provides a mechanism to find and invoke code
-written by the application developer based on parameters present in the
-:term:`request`.
-
 :app:`Pyramid` uses two separate but cooperating subsystems to find and
-invoke code written by the application developer: :term:`resource location`
-and :term:`view lookup`.
+invoke :term:`view callable` code written by the application developer:
+:term:`resource location` and :term:`view lookup`.
 
-- A :app:`Pyramid` :term:`resource location` subsystem is given a
+- First, a :app:`Pyramid` :term:`resource location` subsystem is given a
   :term:`request`; it is responsible for finding a :term:`resource` object
   based on information present in the request.  When a resource is found via
   resource location, it becomes known as the :term:`context`.
 
-- Using the context provided by :term:`resource location`, the :app:`Pyramid`
-  :term:`view lookup` subsystem is provided with a :term:`request` and
-  :term:`context`.  It is then responsible for finding and invoking a
-  :term:`view callable`.  A view callable is a specific bit of code written
-  and registered by the application developer which receives the
+- Next, using the context resource found by :term:`resource location` and the
+  :term:`request`, :term:`view lookup` is then responsible for finding and
+  invoking a :term:`view callable`.  A view callable is a specific bit of
+  code written and registered by the application developer which receives the
   :term:`request` and which returns a :term:`response`.
 
 These two subsystems are used by :app:`Pyramid` serially: first, a
-:term:`resource location` subsystem does its job.  Then the result of context
-finding is passed to the :term:`view lookup` subsystem.  The view lookup
-system finds a :term:`view callable` written by an application developer, and
-invokes it.  A view callable returns a :term:`response`.  The response is
-returned to the requesting user.
-
-.. sidebar::  What Good is A Resource Location Subsystem?
-
-   The :term:`URL dispatch` mode of :app:`Pyramid` as well as many other web
-   frameworks such as :term:`Pylons` or :term:`Django` actually collapse the
-   two steps of resource location and view lookup into a single step.  In
-   these systems, a URL can map *directly* to a view callable.  This makes
-   them simpler to understand than systems which use distinct subsystems to
-   locate a resource and find a view.  However, explicitly finding a resource
-   provides extra flexibility.  For example, it makes it possible to protect
-   your application with declarative context-sensitive instance-level
-   :term:`authorization`, which is not well-supported in frameworks that do
-   not provide a notion of a resource.
+:term:`resource location` subsystem does its job.  Then the result of
+resource location is passed to the :term:`view lookup` subsystem.  The view
+lookup system finds a :term:`view callable` written by an application
+developer, and invokes it.  A view callable returns a :term:`response`.  The
+response is returned to the requesting user.
 
 There are two separate :term:`resource location` subsystems in
 :app:`Pyramid`: :term:`traversal` and :term:`URL dispatch`. They can be used
@@ -60,8 +42,11 @@ finding.  One chapter which follows describes :term:`view lookup`:
 Should I Use Traversal or URL Dispatch for Resource Location?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Since :app:`Pyramid` provides support for both approaches, you can use either
-exclusively or combine them as you see fit.
+When you use :app:`Pyramid`, you have a choice about how you'd like to
+resolve URLs to code: you can use either :term:`traversal` or :term:`URL
+dispatch`.  The choice to use traversal vs. URL dispatch is largely
+"religious".  Since :app:`Pyramid` provides support for both approaches, you
+can use either exclusively or combine them as you see fit.
 
 :term:`URL dispatch` is very straightforward.  When you limit your
 application to using URL dispatch, you know every URL that your application
@@ -76,9 +61,9 @@ You just match everything "below" ``members`` to a particular :term:`view
 callable`, e.g. ``/members/{memberid}``.
 
 However, URL dispatch is not very convenient if you'd like your URLs to
-represent an arbitrary hierarchy.  For example, if you need to infer the
-difference between sets of URLs such as these, where the ``document`` in the
-first URL represents a PDF document, and ``/stuff/page`` in the second
+represent an arbitrary-depth hierarchy.  For example, if you need to infer
+the difference between sets of URLs such as these, where the ``document`` in
+the first URL represents a PDF document, and ``/stuff/page`` in the second
 represents an OpenOffice document in a "stuff" folder.
 
 .. code-block:: text
@@ -88,22 +73,31 @@ represents an OpenOffice document in a "stuff" folder.
 
 It takes more pattern matching assertions to be able to make hierarchies work
 in URL-dispatch based systems, and some assertions just aren't possible.
-Essentially, URL-dispatch based systems just don't deal very well with URLs
-that represent arbitrary-depth hierarchies.
+URL-dispatch based systems just don't deal very well with URLs that represent
+arbitrary-depth hierarchies.
 
-But :term:`traversal` *does* work well for URLs that represent
+:term:`URL dispatch` tends to collapse the two steps of :term:`resource
+location` and :term:`view lookup` into a single step.  Thus, a URL can map
+*directly* to a view callable.  This makes URL dispatch eaiser to understand
+than traversal, because traversal makes you understand how :term:`resource
+location` works.  But explicitly locating a resource provides extra
+flexibility.  For example, it makes it possible to protect your application
+with declarative context-sensitive instance-level :term:`authorization`.
+
+Unlike URL dispatch, :term:`traversal` works well for URLs that represent
 arbitrary-depth hierarchies.  Since the path segments that compose a URL are
 addressed separately, it becomes very easy to form URLs that represent
 arbitrary depth hierarchies in a system that uses traversal.  When you're
 willing to treat your application resources as a tree that can be traversed,
-it also becomes easy to provide "instance-level security": you just attach a
-security declaration to each resource in the tree.  This is not nearly as
-easy to do when using URL dispatch.
+it also becomes easy to provide "instance-level security": you just attach an
+:term:`ACL` security declaration to each resource in the tree.  This is not
+nearly as easy to do when using URL dispatch.
 
-In essence, the choice to use traversal vs. URL dispatch is largely
-religious.  Traversal dispatch probably just doesn't make any sense when you
-possess completely "square" data stored in a relational database because it
-requires the construction and maintenance of a tree and requires that the
+Traversal probably just doesn't make any sense when you possess completely
+"square" data stored in a relational database because it requires the
+construction and maintenance of a resource tree and requires that the
 developer think about mapping URLs to code in terms of traversing that tree.
-However, when you have a hierarchical data store, using traversal can provide
-significant advantages over using URL-based dispatch.
+
+We'll examine both :term:`URL dispatch` and :term:`traversal` in the next two
+chapters.
+
