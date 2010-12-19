@@ -9,12 +9,12 @@ convenient to use a *template* to generate a basic :app:`Pyramid`
 :term:`project`.
 
 A project is a directory that contains at least one :term:`package`.  You'll
-use the template to render a project, and create your application logic
-within the package that lives inside the project.  Even if your application
-is extremely simple, it is useful to place code that drives the application
-within a package, because a package is more easily extended with new code.
-An application that lives inside a package can also be distributed more
-easily than one which does not live within a package.
+use the template to create a project, and you'll create your application
+logic within a package that lives inside the project.  Even if your
+application is extremely simple, it is useful to place code that drives the
+application within a package, because a package is more easily extended with
+new code.  An application that lives inside a package can also be distributed
+more easily than one which does not live within a package.
 
 :app:`Pyramid` comes with a variety of templates that you can use to generate
 a project.  Each template makes different configuration assumptions about
@@ -45,8 +45,8 @@ each other on a number of axes:
 - the persistence mechanism they offer (no persistence mechanism,
   :term:`ZODB`, or :term:`SQLAlchemy`).
 
-- the mechanism they use to map URLs to code (:term:`traversal` or
-  :term:`URL dispatch`).
+- the mechanism they use to map URLs to code (:term:`traversal` or :term:`URL
+  dispatch`).
 
 - the type of configuration used (:term:`ZCML` vs. imperative configuration).
 
@@ -98,12 +98,12 @@ The included templates are these:
 Creating the Project
 --------------------
 
-In :ref:`installing_chapter`, you created a virtual Python
-environment via the ``virtualenv`` command.  To start a
-:app:`Pyramid` :term:`project`, use the ``paster`` facility
-installed within the virtualenv.  In :ref:`installing_chapter` we
-called the virtualenv directory ``env``; the following command
-assumes that our current working directory is that directory.
+In :ref:`installing_chapter`, you created a virtual Python environment via
+the ``virtualenv`` command.  To start a :app:`Pyramid` :term:`project`, use
+the ``paster`` facility installed within the virtualenv.  In
+:ref:`installing_chapter` we called the virtualenv directory ``env``; the
+following command assumes that our current working directory is that
+directory.
 
 We'll choose the ``pyramid_starter`` template for this purpose.
 
@@ -111,11 +111,10 @@ We'll choose the ``pyramid_starter`` template for this purpose.
 
    $ bin/paster create -t pyramid_starter
 
-The above command uses the ``paster`` command to create a project
-using the ``pyramid_starter`` template.  The ``create`` version of
-paster invokes the creation of a project from a template.  To use a
-different template, such as ``pyramid_routesalchemy``, you'd just
-change the last argument.  For example:
+The above command uses the ``paster`` command to create a project using the
+``pyramid_starter`` template.  The ``paster create`` command creates project
+from a template.  To use a different template, such as
+``pyramid_routesalchemy``, you'd just change the last argument.  For example:
 
 .. code-block:: text
 
@@ -179,12 +178,16 @@ where you'll edit your application's Python code and templates.
 Installing your Newly Created Project for Development
 -----------------------------------------------------
 
-Using the interpreter from the :term:`virtualenv` you create during
-:ref:`installing_chapter`, invoke the following command when inside
-the project directory.  The file named ``setup.py`` will be in the
-root of the paster-generated project directory.  The ``python`` you're
-invoking should be the one that lives in the ``bin`` directory of your
-virtual Python environment.
+To install a newly created project for development, you should ``cd`` to the
+newly created project directory and use the Python interpreter from the
+:term:`virtualenv` you created during :ref:`installing_chapter` to invoke the
+command ``python setup.py develop.py``
+
+The file named ``setup.py`` will be in the root of the paster-generated
+project directory.  The ``python`` you're invoking should be the one that
+lives in the ``bin`` directory of your virtual Python environment.  Your
+terminal's current working directory *must* the the newly created project
+directory.  For example:
 
 .. code-block:: text
 
@@ -209,8 +212,10 @@ interpreter's library set so it can be found by ``import`` statements and by
 Running The Tests For Your Application
 --------------------------------------
 
-To run unit tests for your application, you should invoke them using
-the ``python`` that lives in the ``bin`` directory of your virtualenv:
+To run unit tests for your application, you should invoke them using the
+Python interpreter from the :term:`virtualenv` you created during
+:ref:`installing_chapter` (the ``python`` command that lives in the ``bin``
+directory of your virtualenv):
 
 .. code-block:: text
 
@@ -258,8 +263,7 @@ The Interactive Shell
 Once you've installed your program for development using ``setup.py
 develop``, you can use an interactive Python shell to examine your
 :app:`Pyramid` project's :term:`resource` and :term:`view` objects from a
-Python prompt.  To do so, use the ``paster`` shell command with the
-``pshell`` argument:
+Python prompt.  To do so, use your virtualenv's ``paster pshell`` command.
 
 The first argument to ``pshell`` is the path to your application's ``.ini``
 file.  The second is the ``app`` section name inside the ``.ini`` file which
@@ -380,9 +384,8 @@ Here's sample output from a run of ``paster serve``:
    serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
 
 By default, :app:`Pyramid` applications generated from a ``paster`` template
-will listen on TCP port 6543.
-
-You can shut down a server started this way by pressing ``Ctrl-C``.
+will listen on TCP port 6543.  You can shut down a server started this way by
+pressing ``Ctrl-C``.
 
 During development, it's often useful to run ``paster serve`` using its
 ``--reload`` option.  When ``--reload`` is passed to ``paster serve``,
@@ -450,13 +453,13 @@ create`` -generated ``pyramid_starter`` application in a browser.
 The Project Structure
 ---------------------
 
-The ``pyramid_starter`` template generated a setuptools :term:`project`
-(named ``MyProject``), which contains a Python :term:`package`.  The package
-is *also* named ``myproject``, but it's lowercased; the paster template
+The ``pyramid_starter`` template generated a :term:`project` (named
+``MyProject``), which contains a Python :term:`package`.  The package is
+*also* named ``myproject``, but it's lowercased; the paster template
 generates a project which contains a package that shares its name except for
-case.  All :app:`Pyramid` ``paster`` -generated projects share a similar
-structure.
+case.
 
+All :app:`Pyramid` ``paster`` -generated projects share a similar structure.
 The ``MyProject`` project we've generated has the following directory
 structure:
 
@@ -606,10 +609,10 @@ for each request.
 
 .. note::
 
-  In general, :app:`Pyramid` applications generated from ``paster
-  templates`` should be threading-aware.  It is not required that a
-  :app:`Pyramid` application be nonblocking as all application code
-  will run in its own thread, provided by the server you're using.
+  In general, :app:`Pyramid` applications generated from paster templates
+  should be threading-aware.  It is not required that a :app:`Pyramid`
+  application be nonblocking as all application code will run in its own
+  thread, provided by the server you're using.
 
 See the :term:`PasteDeploy` documentation for more information about other
 types of things you can put into this ``.ini`` file, such as other
@@ -621,8 +624,8 @@ implementations.
    You can add a ``[DEFAULT]`` section to your ``development.ini`` file.
    Such a section should consists of global parameters that are shared by all
    the applications, servers and :term:`middleware` defined within the
-   configuration file.
-
+   configuration file.  The values in a ``[DEFAULT]`` section will be passed
+   to your application's ``main`` function as ``global_values``.
 
 .. index::
    single: setup.py
@@ -728,7 +731,7 @@ The ``myproject`` :term:`package` lives inside the ``MyProject``
 :term:`project`.  It contains:
 
 #. An ``__init__.py`` file signifies that this is a Python :term:`package`.
-   It also contains code that helps users run the application, include a
+   It also contains code that helps users run the application, including a
    ``main`` function which is used as a Paste entry point.
 
 #. A ``resources.py`` module, which contains :term:`resource` code.
@@ -743,8 +746,10 @@ The ``myproject`` :term:`package` lives inside the ``MyProject``
    application.
 
 These are purely conventions established by the ``paster`` template:
-:app:`Pyramid` doesn't insist that you name things in any
-particular way.
+:app:`Pyramid` doesn't insist that you name things in any particular way.
+However, it's generally a good idea to follow Pyramid standards for naming,
+so that other Pyramid developers can get up to speed quickly on your code
+when you need help.
 
 .. index::
    single: __init__.py
@@ -771,7 +776,7 @@ also informs Python that the directory which contains it is a *package*.
    application.  This function is meant to be called by the
    :term:`PasteDeploy` framework as a result of running ``paster serve``.
 
-   Within this function, configuration is performed.
+   Within this function, application configuration is performed.
 
    Lines 8-10 register a "default view" (a view that has no ``name``
    attribute).  It is registered so that it will be found when the
