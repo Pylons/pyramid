@@ -34,9 +34,9 @@ Narrative Documentation
    narr/resourcelocation
    narr/urldispatch
    narr/traversal
-   narr/hybrid
    narr/views
    narr/handlers
+   narr/hybrid
    narr/static
    narr/webob
    narr/sessions
