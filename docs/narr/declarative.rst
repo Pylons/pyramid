@@ -563,7 +563,7 @@ example of a view declaration in ZCML is as follows:
     />
 
 The above maps the ``.views.hello_world`` view callable function to
-the following set of :term:`context finding` results:
+the following set of :term:`resource location` results:
 
 - A :term:`context` object which is an instance (or subclass) of the
   Python class represented by ``.resources.Hello``
@@ -593,12 +593,11 @@ You can also declare a *default view callable* for a :term:`resource` type:
      view=".views.hello_world"
     />
 
-A *default view callable* simply has no ``name`` attribute.  For the
-above registration, when a :term:`context` is found that is of the
-type ``.resources.Hello`` and there is no :term:`view name` associated
-with the result of :term:`context finding`, the *default view
-callable* will be used.  In this case, it's the view at
-``.views.hello_world``.
+A *default view callable* simply has no ``name`` attribute.  For the above
+registration, when a :term:`context` is found that is of the type
+``.resources.Hello`` and there is no :term:`view name` associated with the
+result of :term:`resource location`, the *default view callable* will be
+used.  In this case, it's the view at ``.views.hello_world``.
 
 A default view callable can alternately be defined by using the empty
 string as its ``name`` attribute:

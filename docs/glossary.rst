@@ -129,7 +129,7 @@ Glossary
      The default view of a :term:`resource` is the view invoked when the
      :term:`view name` is the empty string (``''``).  This is the case when
      :term:`traversal` exhausts the path elements in the PATH_INFO of a
-     request before it returns a :term:`context`.
+     request before it returns a :term:`context` resource.
 
    virtualenv
      An isolated Python environment.  Allows you to control which
@@ -143,12 +143,12 @@ Glossary
      the resource tree traversed by the system.  When traversal is used, a
      resource becomes the :term:`context` of a :term:`view`.  If :mod:`url
      dispatch` is used, a single resource is generated for each request and
-     is used as the context of a view.
+     is used as the context resource of a view.
 
    resource tree
      A nested set of dictionary-like objects, each of which is a
      :term:`resource`.  The act of :term:`traversal` uses the resource tree
-     to find a :term:`context`.
+     to find a :term:`context` resource.
 
    domain model
      Persistent data related to your application.  For example, data stored
@@ -157,13 +157,13 @@ Glossary
 
    traversal
      The act of descending "up" a tree of resource objects from a root
-     resource in order to find a :term:`context`.  The :app:`Pyramid`
-     :term:`router` performs traversal of resource objects when a :term:`root
-     factory` is specified.  See the :ref:`traversal_chapter` chapter for
-     more information.  Traversal can be performed *instead* of :term:`URL
-     dispatch` or can be combined *with* URL dispatch.  See
-     :ref:`hybrid_chapter` for more information about combining traversal and
-     URL dispatch (advanced).
+     resource in order to find a :term:`context` resource.  The
+     :app:`Pyramid` :term:`router` performs traversal of resource objects
+     when a :term:`root factory` is specified.  See the
+     :ref:`traversal_chapter` chapter for more information.  Traversal can be
+     performed *instead* of :term:`URL dispatch` or can be combined *with*
+     URL dispatch.  See :ref:`hybrid_chapter` for more information about
+     combining traversal and URL dispatch (advanced).
 
    router
      The :term:`WSGI` application created when you start a
@@ -174,21 +174,21 @@ Glossary
 
    URL dispatch
      An alternative to :term:`traversal` as a mechanism for locating a
-     :term:`context` for a :term:`view`.  When you use a :term:`route`
-     in your :app:`Pyramid` application via a :term:`route
+     :term:`context` resource for a :term:`view`.  When you use a
+     :term:`route` in your :app:`Pyramid` application via a :term:`route
      configuration`, you are using URL dispatch. See the
      :ref:`urldispatch_chapter` for more information.
 
    context
-     An object in the system that is found during :term:`traversal` or
-     :term:`URL dispatch` based on URL data; if it's found via traversal,
+     An resource in the resource tree that is found during :term:`traversal`
+     or :term:`URL dispatch` based on URL data; if it's found via traversal,
      it's usually a :term:`resource` object that is part of a resource tree;
      if it's found via :term:`URL dispatch`, it's a object manufactured on
-     behalf of the route's "factory".  A context becomes the subject of a
-     :term:`view`, and typically has security information attached to it.
-     See the :ref:`traversal_chapter` chapter and the
+     behalf of the route's "factory".  A context resource becomes the subject
+     of a :term:`view`, and often has security information attached to
+     it.  See the :ref:`traversal_chapter` chapter and the
      :ref:`urldispatch_chapter` chapter for more information about how a URL
-     is resolved to a context.
+     is resolved to a context resource.
 
    application registry
      A registry of configuration information consulted by
@@ -209,14 +209,14 @@ Glossary
 
    permission
      A string or unicode object that represents an action being taken against
-     a context.  A permission is associated with a view name and a resource
-     type by the developer.  Resources are decorated with security
-     declarations (e.g. an :term:`ACL`), which reference these tokens also.
-     Permissions are used by the active to security policy to match the view
-     permission against the resources's statements about which permissions
-     are granted to which principal in a context in order to to answer the
-     question "is this user allowed to do this".  Examples of permissions:
-     ``read``, or ``view_blog_entries``.
+     a :term:`context` resource.  A permission is associated with a view name
+     and a resource type by the developer.  Resources are decorated with
+     security declarations (e.g. an :term:`ACL`), which reference these
+     tokens also.  Permissions are used by the active to security policy to
+     match the view permission against the resources's statements about which
+     permissions are granted to which principal in a context in order to to
+     answer the question "is this user allowed to do this".  Examples of
+     permissions: ``read``, or ``view_blog_entries``.
 
    default permission
      A :term:`permission` which is registered as the default for an
@@ -235,16 +235,16 @@ Glossary
      group), and a :term:`permission`.  For example the ACE, ``(Allow,
      'bob', 'read')`` is a member of an ACL that indicates that the
      principal ``bob`` is allowed the permission ``read`` against the
-     context the ACL is attached to.
+     resource the ACL is attached to.
 
    ACL
-     An *access control list*.  An ACL is a sequence of :term:`ACE`
-     tuples.  An ACL is attached to a resource instance.  An example of an
-     ACL is ``[ (Allow, 'bob', 'read'), (Deny, 'fred', 'write')]``.  If
-     an ACL is attached to a resource instance, and that resource is
-     findable via the context, it will be consulted any active security
-     policy to determine wither a particular request can be fulfilled
-     given the :term:`authentication` information in the request.
+     An *access control list*.  An ACL is a sequence of :term:`ACE` tuples.
+     An ACL is attached to a resource instance.  An example of an ACL is ``[
+     (Allow, 'bob', 'read'), (Deny, 'fred', 'write')]``.  If an ACL is
+     attached to a resource instance, and that resource is findable via the
+     context resource, it will be consulted any active security policy to
+     determine wither a particular request can be fulfilled given the
+     :term:`authentication` information in the request.
 
    authentication
      The act of determining that the credentials a user presents
@@ -253,12 +253,12 @@ Glossary
      policy`.
 
    authorization
-     The act of determining whether a user can perform a specific
-     action.  In pyramid terms, this means determining whether, for a
-     given context, any :term:`principal` (or principals) associated
-     with the request have the requisite :term:`permission` to allow
-     the request to continue.  Authorization in :app:`Pyramid` is
-     performed via its :term:`authorization policy`.
+     The act of determining whether a user can perform a specific action.  In
+     pyramid terms, this means determining whether, for a given resource, any
+     :term:`principal` (or principals) associated with the request have the
+     requisite :term:`permission` to allow the request to continue.
+     Authorization in :app:`Pyramid` is performed via its
+     :term:`authorization policy`.
 
    principal
      A *principal* is a string or unicode object representing a userid
@@ -274,7 +274,7 @@ Glossary
      code which has an API which determines whether or not the
      principals associated with the request can perform an action
      associated with a permission, based on the information found on the
-     :term:`context`.
+     :term:`context` resource.
 
    authentication policy
      An authentication policy in :app:`Pyramid` terms is a bit of
@@ -415,9 +415,10 @@ Glossary
      documentation is authored in ReStructuredText format.
 
    root
-     The object at which :term:`traversal` begins when
-     :app:`Pyramid` searches for a :term:`context` (for :term:`URL
-     Dispatch`, the root is *always* the context).
+     The object at which :term:`traversal` begins when :app:`Pyramid`
+     searches for a :term:`context` resource (for :term:`URL Dispatch`, the
+     root is *always* the context resource unless the ``traverse=`` argument 
+     is used in route configuration).
 
    subpath
      A list of element "left over" after the :term:`router` has
@@ -496,12 +497,12 @@ Glossary
      use.
 
    lineage
-     An ordered sequence of objects based on a ":term:`location`
-     -aware" context.  The lineage of any given :term:`context` is
-     composed of itself, its parent, its parent's parent, and so on.
-     The order of the sequence is context-first, then the parent of the
-     context, then its parent's parent, and so on.  The parent of an
-     object in a lineage is available as its ``__parent__`` attribute.
+     An ordered sequence of objects based on a ":term:`location` -aware"
+     resource.  The lineage of any given :term:`resource` is composed of
+     itself, its parent, its parent's parent, and so on.  The order of the
+     sequence is resource-first, then the parent of the resource, then its
+     parent's parent, and so on.  The parent of a resource in a lineage is
+     available as its ``__parent__`` attribute.
 
    root factory
      The "root factory" of an :app:`Pyramid` application is called
@@ -679,19 +680,12 @@ Glossary
 
    View Lookup
      The act of finding and invoking the "best" :term:`view callable`
-     given a :term:`request`, a :term:`context`, and a :term:`view
-     name`.
+     given a :term:`request` and a :term:`context` resource.
 
-   Context Finding
-     The act of locating a :term:`context` and a :term:`view name`
-     given a :term:`request`.  :term:`Traversal` and :term:`URL
-     dispatch` are the context finding subsystems used by
-     :app:`Pyramid`.
-
-   Triad
-     The three bits of information used by :term:`view lookup` to find
-     "the best" view callable for a given circumstance: a
-     :term:`context` type, a :term:`view name` and a :term:`request`.
+   Resource Location
+     The act of locating a :term:`context` resource given a :term:`request`.
+     :term:`Traversal` and :term:`URL dispatch` are the resource location
+     subsystems used by :app:`Pyramid`.
 
    Google App Engine
      `Google App Engine <http://code.google.com/appengine/>`_ (aka

@@ -38,7 +38,7 @@ Narrative documentation in chapter form explaining how to use
    narr/firstapp
    narr/project
    narr/startup
-   narr/contextfinding
+   narr/resourcelocation
    narr/traversal
    narr/urldispatch
    narr/hybrid

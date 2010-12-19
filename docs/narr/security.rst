@@ -6,20 +6,20 @@
 Security
 ========
 
-:app:`Pyramid` provides an optional declarative authorization
-system that prevents a :term:`view` from being invoked when the user
-represented by credentials in the :term:`request` does not have an
-appropriate level of access within a particular :term:`context`.
-Here's how it works at a high level:
+:app:`Pyramid` provides an optional declarative authorization system that
+prevents a :term:`view` from being invoked when the user represented by
+credentials in the :term:`request` does not have an appropriate level of
+access when a particular resource is the :term:`context`.  Here's how it
+works at a high level:
 
 - A :term:`request` is generated when a user visits our application.
 
-- Based on the request, a :term:`context` is located through
-  :term:`context finding`.  A context is located differently depending
-  on whether the application uses :term:`traversal` or :term:`URL
-  dispatch`, but a context is ultimately found in either case.  See
-  :ref:`contextfinding_chapter` for more information about context
-  finding.
+- Based on the request, a :term:`context` resource is located through
+  :term:`resource location`.  A context is located differently depending on
+  whether the application uses :term:`traversal` or :term:`URL dispatch`, but
+  a context is ultimately found in either case.  See
+  :ref:`resourcelocation_chapter` for more information about resource
+  location.
 
 - A :term:`view callable` is located by :term:`view lookup` using the
   context as well as other attributes of the request.
@@ -119,15 +119,16 @@ You can also enable a security policy declaratively via ZCML.  See
 Protecting Views with Permissions
 ---------------------------------
 
-To protect a :term:`view callable` from invocation based on a user's
-security settings in a :term:`context`, you must pass a
-:term:`permission` to :term:`view configuration`.  Permissions are
-usually just strings, and they have no required composition: you can
-name permissions whatever you like.
+To protect a :term:`view callable` from invocation based on a user's security
+settings when a particular type of resource becomes the :term:`context`, you
+must pass a :term:`permission` to :term:`view configuration`.  Permissions
+are usually just strings, and they have no required composition: you can name
+permissions whatever you like.
 
 For example, the following view declaration protects the view named
-``add_entry.html`` when invoked against a ``Blog`` context with the ``add``
-permission using the :meth:`pyramid.config.Configurator.add_view` API:
+``add_entry.html`` when the context resource is of type ``Blog`` with the
+``add`` permission using the :meth:`pyramid.config.Configurator.add_view`
+API:
 
 .. code-block:: python
    :linenos:
@@ -160,9 +161,9 @@ Or the same thing can be done using the ``permission`` attribute of the ZCML
 As a result of any of these various view configuration statements, if an
 authorization policy is in place when the view callable is found during
 normal application operations, the requesting user will need to possess the
-``add`` permission against the :term:`context` to be able to invoke the
-``blog_entry_add_view`` view.  If he does not, the :term:`Forbidden view`
-will be invoked.
+``add`` permission against the :term:`context` resource in order to be able
+to invoke the ``blog_entry_add_view`` view.  If he does not, the
+:term:`Forbidden view` will be invoked.
 
 .. _setting_a_default_permission:
 
@@ -212,12 +213,12 @@ Assigning ACLs to your Resource Objects
 ---------------------------------------
 
 When the default :app:`Pyramid` :term:`authorization policy` determines
-whether a user possesses a particular permission in a :term:`context`, it
-examines the :term:`ACL` associated with the context.  An ACL is associated
-with a context by virtue of the ``__acl__`` attribute of the resource object
-representing the :term:`context`.  This attribute can be defined on the
-resource *instance* if you need instance-level security, or it can be defined
-on the resource *class* if you just need type-level security.
+whether a user possesses a particular permission with respect to a resource,
+it examines the :term:`ACL` associated with the resource.  An ACL is
+associated with a resource by adding an ``__acl__`` attribute to the resource
+object.  This attribute can be defined on the resource *instance* if you need
+instance-level security, or it can be defined on the resource *class* if you
+just need type-level security.
 
 For example, an ACL might be attached to the resource for a blog via its
 class:
@@ -414,14 +415,13 @@ module.  These can be imported for use in ACLs.
 Special ACEs
 ------------
 
-A convenience :term:`ACE` is defined representing a deny to everyone
-of all permissions in :data:`pyramid.security.DENY_ALL`.  This ACE
-is often used as the *last* ACE of an ACL to explicitly cause
-inheriting authorization policies to "stop looking up the traversal
-tree" (effectively breaking any inheritance).  For example, an ACL
-which allows *only* ``fred`` the view permission in a particular
-traversal context despite what inherited ACLs may say when the default
-authorization policy is in effect might look like so:
+A convenience :term:`ACE` is defined representing a deny to everyone of all
+permissions in :data:`pyramid.security.DENY_ALL`.  This ACE is often used as
+the *last* ACE of an ACL to explicitly cause inheriting authorization
+policies to "stop looking up the traversal tree" (effectively breaking any
+inheritance).  For example, an ACL which allows *only* ``fred`` the view
+permission for a particular resource despite what inherited ACLs may say when
+the default authorization policy is in effect might look like so:
 
 .. code-block:: python
    :linenos:

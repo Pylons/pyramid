@@ -3,12 +3,11 @@
 Combining Traversal and URL Dispatch
 ====================================
 
-When you write most :app:`Pyramid` applications, you'll be using
-one or the other of two available :term:`context finding` subsystems:
-traversal or URL dispatch.  However, to solve a limited set of
-problems, it's useful to use *both* traversal and URL dispatch
-together within the same application.  :app:`Pyramid` makes this
-possible via *hybrid* applications.
+When you write most :app:`Pyramid` applications, you'll be using one or the
+other of two available :term:`resource location` subsystems: traversal or URL
+dispatch.  However, to solve a limited set of problems, it's useful to use
+*both* traversal and URL dispatch together within the same application.
+:app:`Pyramid` makes this possible via *hybrid* applications.
 
 .. warning::
 
@@ -92,8 +91,8 @@ application, :term:`traversal` is performed during a request after a
 route has already matched.  This means that the URL pattern that
 represents the ``pattern`` argument of a route must match the
 ``PATH_INFO`` of a request, and after the route pattern has matched,
-most of the "normal" rules of traversal with respect to :term:`context
-finding` and :term:`view lookup` apply.
+most of the "normal" rules of traversal with respect to :term:`resource
+location` and :term:`view lookup` apply.
 
 There are only four real differences between a purely traversal-based
 application and a hybrid application:
@@ -200,20 +199,19 @@ remainder becomes the path used to perform traversal.
 Note that unlike the examples provided within :ref:`urldispatch_chapter`, the
 ``add_route`` configuration statement named previously does not pass a
 ``view`` argument.  This is because a hybrid mode application relies on
-:term:`traversal` to do :term:`context finding` and :term:`view lookup`
+:term:`traversal` to do :term:`resource location` and :term:`view lookup`
 instead of invariably invoking a specific view callable named directly within
 the matched route's configuration.
 
 Because the pattern of the above route ends with ``*traverse``, when this
-route configuration is matched during a request, :app:`Pyramid`
-will attempt to use :term:`traversal` against the :term:`root` object
-implied by the :term:`root factory` that is implied by the route's
-configuration.  Since no ``root_factory`` argument is explicitly specified
-for this route, this will either be the *global* root factory
-for the application, or the *default* root factory. 
-Once :term:`traversal` has found a :term:`context`,
-:term:`view lookup` will be invoked in almost exactly the same way it
-would have been invoked in a "pure" traversal-based application.
+route configuration is matched during a request, :app:`Pyramid` will attempt
+to use :term:`traversal` against the :term:`root` object implied by the
+:term:`root factory` that is implied by the route's configuration.  Since no
+``root_factory`` argument is explicitly specified for this route, this will
+either be the *global* root factory for the application, or the *default*
+root factory.  Once :term:`traversal` has found a :term:`context` resource,
+:term:`view lookup` will be invoked in almost exactly the same way it would
+have been invoked in a "pure" traversal-based application.
 
 Let's assume there is no *global* :term:`root factory` configured in
 this application. The *default* :term:`root factory` cannot be traversed: 
@@ -272,9 +270,9 @@ When the route configuration named ``home`` above is matched during a
 request, the matchdict generated will be based on its pattern:
 ``{foo}/{bar}/*traverse``.  The "capture value" implied by the ``*traverse``
 element in the pattern will be used to traverse the resource tree in order to
-find a context, starting from the root object returned from the root factory.
-In the above example, the :term:`root` object found will be the instance
-named ``root`` in ``routes.py``.
+find a context resource, starting from the root object returned from the root
+factory.  In the above example, the :term:`root` object found will be the
+instance named ``root`` in ``routes.py``.
 
 If the URL that matched a route with the pattern ``{foo}/{bar}/*traverse``,
 is ``http://example.com/one/two/a/b/c``, the traversal path used
@@ -283,10 +281,10 @@ against the root object will be ``a/b/c``.  As a result,
 ``b``, and ``c``, beginning at the root object.
 
 In our above example, this particular set of traversal steps will mean that
-the :term:`context` of the view would be the ``Traversable`` object we've
-named ``c`` in our bogus resource tree and the :term:`view name` resulting
-from traversal will be the empty string; if you need a refresher about why
-this outcome is presumed, see :ref:`traversal_algorithm`.
+the :term:`context` resource of the view would be the ``Traversable`` object
+we've named ``c`` in our bogus resource tree and the :term:`view name`
+resulting from traversal will be the empty string; if you need a refresher
+about why this outcome is presumed, see :ref:`traversal_algorithm`.
 
 At this point, a suitable view callable will be found and invoked
 using :term:`view lookup` as described in :ref:`view_configuration`,
@@ -319,7 +317,7 @@ The above ``mypackage.views.myview`` view callable will be invoked when:
 
 - the :term:`view name` resulting from traversal is the empty string.
 
-- the :term:`context` is any object.
+- the :term:`context` resource is any object.
 
 It is also possible to declare alternate views that may be invoked
 when a hybrid route is matched:
@@ -341,7 +339,7 @@ above ``mypackage.views.another_view`` view will be invoked when:
 
 - the :term:`view name` resulting from traversal is ``another``.
 
-- the :term:`context` is any object.
+- the :term:`context` resource is any object.
 
 For instance, if the URL ``http://example.com/one/two/a/another`` is provided
 to an application that uses the previously mentioned resource tree, the

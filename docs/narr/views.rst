@@ -17,17 +17,17 @@ request made to your application.
    that implements a view *callable*, and the process of view
    *lookup*.
 
-The chapter :ref:`contextfinding_chapter` describes how, using information
-from the :term:`request`, a :term:`context` and a :term:`view name` are
-computed.  But neither the context nor the view name found are very useful
-unless those elements can eventually be mapped to a :term:`view callable`.
+The chapter :ref:`resourcelocation_chapter` describes how, using information
+from the :term:`request`, a :term:`context` resource is computed.  But the
+context resource found isn't very useful unless those elements can eventually
+be mapped to a :term:`view callable`.
 
-The job of actually locating and invoking the "best" :term:`view
-callable` is the job of the :term:`view lookup` subsystem.  The view
-lookup subsystem compares information supplied by :term:`context
-finding` against :term:`view configuration` statements made by the
-developer stored in the :term:`application registry` to choose the
-most appropriate view callable for a specific request.
+The job of actually locating and invoking the "best" :term:`view callable` is
+the job of the :term:`view lookup` subsystem.  The view lookup subsystem
+compares information supplied by :term:`resource location` against
+:term:`view configuration` statements made by the developer stored in the
+:term:`application registry` to choose the most appropriate view callable for
+a specific request.
 
 This chapter provides documentation detailing the process of creating
 view callables, documentation about performing view configuration, and
@@ -130,7 +130,7 @@ represent the method expected to return a response, you can use an
 	Usually, view callables are defined to accept only a single argument:
 	``request``.  However, view callables may alternately be defined as
 	classes, functions, or any callable that accept *two* positional
-	arguments: a :term:`context` as the first argument and a
+	arguments: a :term:`context` resource as the first argument and a
 	:term:`request` as the second argument.
 
 	The :term:`context` and :term:`request` arguments passed to a view
@@ -523,9 +523,9 @@ inserted into the set of keyword arguments passed to the template as the
 will be an instance of that class.  Also inserted into the keywords passed to
 the template are ``renderer_name`` (the string used in the ``renderer``
 attribute of the directive), ``renderer_info`` (an object containing
-renderer-related information), ``context`` (the context of the view used to
-render the template), and ``request`` (the request passed to the view used to
-render the template).
+renderer-related information), ``context`` (the context resource of the view
+used to render the template), and ``request`` (the request passed to the view
+used to render the template).
 
 Here's an example view configuration which uses a Chameleon ZPT
 renderer:
@@ -982,12 +982,11 @@ exception views which have a name will be ignored.
 
 .. note::
 
-  Normal (i.e., non-exception) views registered against a context which
-  inherits from :exc:`Exception` will work normally.  When an
-  exception view configuration is processed, *two* views are
-  registered.  One as a "normal" view, the other as an "exception"
-  view.  This means that you can use an exception as ``context`` for a
-  normal view.
+  Normal (i.e., non-exception) views registered against a context resource
+  type which inherits from :exc:`Exception` will work normally.  When an
+  exception view configuration is processed, *two* views are registered.  One
+  as a "normal" view, the other as an "exception" view.  This means that you
+  can use an exception as ``context`` for a normal view.
 
 Exception views can be configured with any view registration mechanism:
 ``@view_config`` decorator, ZCML, or imperative ``add_view`` styles.
@@ -1120,8 +1119,8 @@ response object, you will need to ensure you do this yourself.
 
 .. _view_configuration:
 
-View Configuration: Mapping a Context to a View
------------------------------------------------
+View Configuration: Mapping a Resource Type to a View
+-----------------------------------------------------
 
 A developer makes a :term:`view callable` available for use within a
 :app:`Pyramid` application via :term:`view configuration`.  A view
@@ -1129,10 +1128,8 @@ configuration associates a view callable with a set of statements
 that determine the set of circumstances which must be true for the view
 callable to be invoked.
 
-A view configuration statement is made about information present in
-the :term:`context` and in the :term:`request`, as well as the
-:term:`view name`.  These three pieces of information are known,
-collectively, as a :term:`triad`.
+A view configuration statement is made about information present in the
+:term:`context` resource and the :term:`request`.
 
 View configuration is performed in one of these ways:
 
@@ -1269,11 +1266,11 @@ the usage of the configured view.
 
 ``context``
   An object representing a Python class that the :term:`context` resource
-  must be an instance of, *or* the :term:`interface` that the :term:`context`
+  must be an instance of *or* the :term:`interface` that the :term:`context`
   must provide in order for this view to be found and called.  This predicate
-  is true when the :term:`context` is an instance of the represented class or
-  if the :term:`context` provides the represented interface; it is otherwise
-  false.
+  is true when the :term:`context` resource is an instance of the represented 
+  class or if the :term:`context` provides the represented interface; it is 
+  otherwise false.
 
   If ``context`` is not supplied, the value ``None``, which matches any
   resource, is used.
@@ -1290,10 +1287,10 @@ the usage of the configured view.
   will be used by :term:`traversal` against the result of the route's
   :term:`root factory`.
 
-  If ``route_name`` is not supplied, the view callable will be have a
-  chance of being invoked if no other route was matched. This is when
-  the request object of the :term:`triad` does not indicate it matched
-  any configured route.
+  If ``route_name`` is not supplied, the view callable will be have a chance
+  of being invoked if no other route was matched. This is when the
+  request/context pair found via :term:`resource location` does not indicate
+  it matched any configured route.
 
 ``request_type``
   This value should be an :term:`interface` that the :term:`request`
@@ -1334,7 +1331,7 @@ the usage of the configured view.
 
 ``containment``
   This value should be a reference to a Python class or
-  :term:`interface` that a parent object in the context's
+  :term:`interface` that a parent object in the context resource's
   :term:`lineage` must provide in order for this view to be found and
   called.  The resources in your resource tree must be "location-aware" to
   use this feature.
@@ -1414,7 +1411,7 @@ the usage of the configured view.
   predicates can be combined with predefined predicates as necessary.
   Each custom predicate callable should accept two arguments:
   ``context`` and ``request`` and should return either ``True`` or
-  ``False`` after doing arbitrary evaluation of the context and/or the
+  ``False`` after doing arbitrary evaluation of the context resource and/or the
   request.  If all callables return ``True``, the associated view
   callable will be considered viable for a given request.
 
@@ -1785,9 +1782,9 @@ Configuring View Security
 If an :term:`authorization policy` is active, any :term:`permission` attached
 to a :term:`view configuration` found during view lookup will be verified.
 This will ensure that the currently authenticated user possesses that
-permission against the :term:`context` before the view function is actually
-called.  Here's an example of specifying a permission in a view configuration
-using :meth:`pyramid.config.Configurator.add_view`:
+permission against the :term:`context` resource before the view function is
+actually called.  Here's an example of specifying a permission in a view
+configuration using :meth:`pyramid.config.Configurator.add_view`:
 
 .. code-block:: python
    :linenos:
@@ -1811,16 +1808,14 @@ returned to the client as per :ref:`protecting_views`.
 View Lookup and Invocation
 --------------------------
 
-:term:`View lookup` is the :app:`Pyramid` subsystem responsible for
-finding an invoking a :term:`view callable`.  The view lookup
-subsystem is passed a :term:`context`, a :term:`view name`, and the
-:term:`request` object.  These three bits of information are referred
-to within this chapter as the :term:`triad`.
+:term:`View lookup` is the :app:`Pyramid` subsystem responsible for finding
+an invoking a :term:`view callable`.  The view lookup subsystem is passed a
+:term:`context` and a:term:`request` object.
 
 :term:`View configuration` information stored within in the
-:term:`application registry` is compared against a triad by the view
-lookup subsystem in order to find the "best" view callable for the set
-of circumstances implied by the triad.
+:term:`application registry` is compared against the context and request by
+the view lookup subsystem in order to find the "best" view callable for the
+set of circumstances implied by the context and request.
 
 Predicate attributes of view configuration can be thought of like
 "narrowers".  In general, the greater number of predicate attributes

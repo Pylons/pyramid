@@ -31,7 +31,7 @@ Narrative Documentation
    narr/configuration
    narr/firstapp
    narr/project
-   narr/contextfinding
+   narr/resourcelocation
    narr/traversal
    narr/urldispatch
    narr/hybrid

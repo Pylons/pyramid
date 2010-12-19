@@ -3,10 +3,10 @@
 Traversal
 =========
 
-:term:`Traversal` is a :term:`context finding` mechanism. It is the act of
-finding a :term:`context` and a :term:`view name` by walking over a
-:term:`resource tree`, starting from a :term:`root` resource, using a
-:term:`request` object as a source of path information.
+:term:`Traversal` is a :term:`resource location` mechanism. It is the act of
+finding a :term:`context` resource by walking over a :term:`resource tree`,
+starting from a :term:`root` resource, using a :term:`request` object as a
+source of path information.
 
 In this chapter, we'll provide a high-level overview of traversal, we'll
 explain the concept of a resource tree, and we'll show how traversal might be
@@ -58,22 +58,21 @@ The contents of ``myfile`` are now printed on the user's behalf.
 :app:`Pyramid` is very much like this inexperienced UNIX user as it uses
 :term:`traversal` against a resource tree.  In this analogy, we can map the
 ``cat`` program to the :app:`Pyramid` concept of a :term:`view callable`: it
-is a program that can be run against some :term:`context` as the result of
-:term:`view lookup`.  The file being operated on in this analogy is the
-:term:`context` object; the context is the "last resource found" in a
-traversal.  The directory structure is the resource tree being traversed.
-The act of progressively changing directories to find the file as well as the
-handling of a ``cd`` error as a stop condition is analogous to
+is a program that can be run against some :term:`resource` (the "context") as
+the result of :term:`view lookup`.  The file being operated on in this
+analogy is the :term:`context` resource; the context is the "last resource
+found" in a traversal.  The directory structure is the resource tree being
+traversed.  The act of progressively changing directories to find the file as
+well as the handling of a ``cd`` error as a stop condition is analogous to
 :term:`traversal`.
 
-The analogy we've used is not *exactly* correct, because, while the
-naive user already knows which command he wants to invoke before he
-starts "traversing" (``cat``), :app:`Pyramid` needs to obtain that
-information from the path being traversed itself.  In
-:term:`traversal`, the "command" meant to be invoked is a :term:`view
-callable`.  A view callable is derived via :term:`view lookup` from
-the combination of the :term:`view name` and the :term:`context`.
-Traversal is the act of obtaining these two items.
+The analogy we've used is not *exactly* correct, because, while the naive
+user already knows which command he wants to invoke before he starts
+"traversing" (``cat``), :app:`Pyramid` needs to obtain that information from
+the path being traversed itself.  In :term:`traversal`, the "command" meant
+to be invoked is a :term:`view callable`.  A view callable is derived via
+:term:`view lookup` from the combination of the :term:`request` and the
+:term:`context`.
 
 .. index::
    single: traversal overview
@@ -81,49 +80,48 @@ Traversal is the act of obtaining these two items.
 A High-Level Overview of Traversal
 ----------------------------------
 
-:term:`Traversal` is dependent on information in a :term:`request`
-object.  Every :term:`request` object contains URL path information in
-the ``PATH_INFO`` portion of the :term:`WSGI` environment.  The
-``PATH_INFO`` portion of the WSGI environment is the portion of a
-request's URL following the hostname and port number, but before any
-query string elements or fragment element.  For example the
-``PATH_INFO`` portion of the URL
+:term:`Traversal` is dependent on information in a :term:`request` object.
+Every :term:`request` object contains URL path information in the
+``PATH_INFO`` portion of the :term:`WSGI` environment.  The ``PATH_INFO``
+portion of the WSGI environment is the portion of a request's URL following
+the hostname and port number, but before any query string elements or
+fragment element.  For example the ``PATH_INFO`` portion of the URL
 ``http://example.com:8080/a/b/c?foo=1`` is ``/a/b/c``.
 
-Traversal treats the ``PATH_INFO`` segment of a URL as a sequence of
-path segments.  For example, the ``PATH_INFO`` string ``/a/b/c`` is
-converted to the sequence ``['a', 'b', 'c']``.
+Traversal treats the ``PATH_INFO`` segment of a URL as a sequence of path
+segments.  For example, the ``PATH_INFO`` string ``/a/b/c`` is converted to
+the sequence ``['a', 'b', 'c']``.
 
 After the path info is converted, a lookup is performed against the resource
 tree for each path segment.  Each lookup uses the ``__getitem__`` method of
-an object in the tree.
+a resource in the tree.
 
 For example, if the path info sequence is ``['a', 'b', 'c']``:
 
 - :term:`Traversal` pops the first element (``a``) from the path
-  segment sequence and attempts to call the root object's
+  segment sequence and attempts to call the root resource's
   ``__getitem__`` method using that value (``a``) as an argument;
   we'll presume it succeeds.
 
-- When the root object's ``__getitem__`` succeeds it will return an
-  object, which we'll call "A".  The :term:`context` temporarily
-  becomes the "A" object.
+- When the root resource's ``__getitem__`` succeeds it will return another
+  resource, which we'll call "A".  The :term:`context` temporarily becomes
+  the "A" resource.
 
 - The next segment (``b``) is popped from the path sequence, and the
-  "A" object's ``__getitem__`` is called with that value (``b``) as an
+  "A" resource's ``__getitem__`` is called with that value (``b``) as an
   argument; we'll presume it succeeds.
 
-- When the "A" object's ``__getitem__`` succeeds it will return an
-  object, which we'll call "B".  The :term:`context` temporarily
-  becomes the "B" object.
+- When the "A" resource's ``__getitem__`` succeeds it will return another
+  resource, which we'll call "B".  The :term:`context` temporarily
+  becomes the "B" resource.
 
-This process continues until the path segment sequence is exhausted or
-a lookup for a path element fails.  In either case, a :term:`context`
+This process continues until the path segment sequence is exhausted or a
+lookup for a path element fails.  In either case, a :term:`context` resouce
 is found.
 
 Traversal "stops" when it either reaches a leaf level resource in your
 resource tree or when the path segments implied by the URL "run out".  The
-object that traversal "stops on" becomes the :term:`context`.  If at any
+resource that traversal "stops on" becomes the :term:`context`.  If at any
 point during traversal any resource in the tree doesn't have a
 ``__getitem__`` method, or if the ``__getitem__`` method of a resource raises
 a :exc:`KeyError`, traversal ends immediately, and that resource becomes the
@@ -132,14 +130,13 @@ a :exc:`KeyError`, traversal ends immediately, and that resource becomes the
 The results of a :term:`traversal` also include a :term:`view name`.
 The :term:`view name` is the *first* URL path segment in the set of
 ``PATH_INFO`` segments "left over" in the path segment list popped by
-the traversal process *after* traversal finds a context object.
+the traversal process *after* traversal finds a context resource.
 
-The combination of the :term:`context` object and the :term:`view
-name` found via traversal is used later in the same request by a
-separate :app:`Pyramid` subsystem -- the :term:`view lookup`
-subsystem -- to find a :term:`view callable` later within the same
-request.  How :app:`Pyramid` performs view lookup is explained
-within the :ref:`views_chapter` chapter.
+The combination of the context resource and the :term:`view name` found via
+traversal is used later in the same request by a separate :app:`Pyramid`
+subsystem -- the :term:`view lookup` subsystem -- to find a :term:`view
+callable` later within the same request.  How :app:`Pyramid` performs view
+lookup is explained within the :ref:`views_chapter` chapter.
 
 .. index::
    single: object tree
@@ -153,9 +150,9 @@ The Resource Tree
 
 When your application uses :term:`traversal` to resolve URLs to code, your
 application must supply the a resource tree to :app:`Pyramid`.  This tree is
-represented by a :term:`root` object.
+represented by a :term:`root` resource.
 
-In order to supply a root object for an application, at system startup
+In order to supply a root resource for an application, at system startup
 time, the :app:`Pyramid` :term:`Router` is configured with a
 callback known as a :term:`root factory`.  The root factory is
 supplied by the application developer as the ``root_factory`` argument
@@ -179,27 +176,24 @@ named ``config``:
 
    config = Configurator(root_factory=Root)
 
-Using the ``root_factory`` argument to a
-:class:`pyramid.config.Configurator` constructor tells your
-:app:`Pyramid` application to call this root factory to generate a
-root object whenever a request enters the application.  This root
-factory is also known as the global root factory.  A root factory can
-alternately be passed to the ``Configurator`` as a :term:`dotted
-Python name` which refers to a root factory object defined in a
-different module.
+Using the ``root_factory`` argument to a :class:`pyramid.config.Configurator`
+constructor tells your :app:`Pyramid` application to call this root factory
+to generate a root resource whenever a request enters the application.  This
+root factory is also known as the global root factory.  A root factory can
+alternately be passed to the ``Configurator`` as a :term:`dotted Python name`
+which refers to a root factory defined in a different module.
 
 A root factory is passed a :term:`request` object and it is expected to
-return an object which represents the root of the resource tree.  All
-:term:`traversal` will begin at this root object.  Usually a root factory for
-a traversal-based application will be more complicated than the above
-``Root`` object; in particular it may be associated with a database
-connection or another persistence mechanism.  A root object is often an
-instance of a class which has a ``__getitem__`` method.
+return a resource which represents the root of the resource tree.  All
+:term:`traversal` will begin at this root resource.  Usually a root factory
+for a traversal-based application will be more complicated than the above
+``Root`` class; in particular it may be associated with a database
+connection or another persistence mechanism.
 
 If no :term:`root factory` is passed to the :app:`Pyramid`
 :term:`Configurator` constructor, or the ``root_factory`` is specified
 as the value ``None``, a *default* root factory is used.  The default
-root factory always returns an object that has no child resources.
+root factory always returns a resource that has no child resources.
 
 .. sidebar:: Emulating the Default Root Factory
 
@@ -218,8 +212,8 @@ root factory always returns an object that has no child resources.
 
    The default root factory is just a really stupid object that has no
    behavior or state.  Using :term:`traversal` against an application that
-   uses the resource tree supplied by the default root object is not very
-   interesting, because the default root object has no children.  Its
+   uses the resource tree supplied by the default root resource is not very
+   interesting, because the default root resource has no children.  Its
    availability is more useful when you're developing an application using
    :term:`URL dispatch`.
 
@@ -235,7 +229,7 @@ There is only one difference between a *container* resource and a *leaf*
 resource: *container* resources possess a ``__getitem__`` method while *leaf*
 resources do not.  The ``__getitem__`` method was chosen as the signifying
 difference between the two types of resources because the presence of this
-method is how Python itself typically determines whether an object is
+method is how Python itself typically determines whether a resource is
 "containerish" or not.
 
 Each container resource is presumed to be willing to return a child resource
@@ -252,13 +246,13 @@ Usually, the traversal root is a *container* resource, and as such it
 contains other resources.  However, it doesn't *need* to be a container.
 Your resource tree can be as shallow or as deep as you require.
 
-In general, the resource tree is traversed beginning at its root object using
-a sequence of path elements described by the ``PATH_INFO`` of the current
-request; if there are path segments, the root object's ``__getitem__`` is
-called with the next path segment, and it is expected to return another
-resource object.  The resulting object's ``__getitem__`` is called with the
-very next path segment, and it is expected to return another resource object.
-This happens *ad infinitum* until all path segments are exhausted.
+In general, the resource tree is traversed beginning at its root resource
+using a sequence of path elements described by the ``PATH_INFO`` of the
+current request; if there are path segments, the root resource's
+``__getitem__`` is called with the next path segment, and it is expected to
+return another resource.  The resulting resource's ``__getitem__`` is called
+with the very next path segment, and it is expected to return another
+resource.  This happens *ad infinitum* until all path segments are exhausted.
 
 .. index::
    single: traversal algorithm
@@ -307,7 +301,7 @@ and a :term:`view name`.
     environment.
 
 #.  The :term:`root factory` is called with the :term:`request`.  It
-    returns a :term:`root` object.
+    returns a :term:`root` resource.
 
 #.  The router uses the WSGI environment's ``PATH_INFO`` information
     to determine the path segments to traverse.  The leading slash is
@@ -327,15 +321,15 @@ and a :term:`view name`.
     Thus, a request with a ``PATH_INFO`` variable of ``/a/b/c`` maps
     to the traversal sequence ``[u'a', u'b', u'c']``.
 
-#.  :term:`Traversal` begins at the root object returned by the root
-    factory.  For the traversal sequence ``[u'a', u'b', u'c']``, the
-    root object's ``__getitem__`` is called with the name ``a``.
-    Traversal continues through the sequence.  In our example, if the
-    root object's ``__getitem__`` called with the name ``a`` returns
-    an object (aka "object ``a``"), that object's ``__getitem__`` is
-    called with the name ``b``.  If object A returns an object when
-    asked for ``b``, "object ``b``"'s ``__getitem__`` is then asked
-    for the name ``c``, and may return "object ``c``".
+#.  :term:`Traversal` begins at the root resource returned by the root
+    factory.  For the traversal sequence ``[u'a', u'b', u'c']``, the root
+    resource's ``__getitem__`` is called with the name ``a``.  Traversal
+    continues through the sequence.  In our example, if the root resource's
+    ``__getitem__`` called with the name ``a`` returns a resource (aka
+    "resource ``a``"), that resource's ``__getitem__`` is called with the name
+    ``b``.  If resource A returns a resource when asked for ``b``, "resource
+    ``b``"'s ``__getitem__`` is then asked for the name ``c``, and may return
+    "resource ``c``".
 
 #.  Traversal ends when a) the entire path is exhausted or b) when any
     resouce raises a :exc:`KeyError` from its ``__getitem__`` or c) when any
@@ -345,7 +339,7 @@ and a :term:`view name`.
     following the ``@@`` token should be treated as a :term:`view name`).
 
 #.  When traversal ends for any of the reasons in the previous step,
-    the last object found during traversal is deemed to be the
+    the last resource found during traversal is deemed to be the
     :term:`context`.  If the path has been exhausted when traversal
     ends, the :term:`view name` is deemed to be the empty string
     (``''``).  However, if the path was *not* exhausted before
@@ -423,7 +417,7 @@ Here's what happens:
 The fact that it does not find "baz" at this point does not signify an
 error condition.  It signifies that:
 
-- the :term:`context` is "bar" (the context is the last item found
+- the :term:`context` is "bar" (the context is the last resource found
   during traversal).
 
 - the :term:`view name` is ``baz``
@@ -432,11 +426,11 @@ error condition.  It signifies that:
 
 At this point, traversal has ended, and :term:`view lookup` begins.
 
-Because it's the "context", the view lookup machinery examines "bar"
-to find out what "type" it is. Let's say it finds that the context is
-a ``Bar`` type (because "bar" happens to be an instance of the class
-``Bar``).  Using the :term:`view name` (``baz``) and the type, view
-lookup asks the :term:`application registry` this question:
+Because it's the "context" resource, the view lookup machinery examines "bar"
+to find out what "type" it is. Let's say it finds that the context is a
+``Bar`` type (because "bar" happens to be an instance of the class ``Bar``).
+Using the :term:`view name` (``baz``) and the type, view lookup asks the
+:term:`application registry` this question:
 
 - Please find me a :term:`view callable` registered using a
   :term:`view configuration` with the name "baz" that can be used for
@@ -477,7 +471,7 @@ The user asks for ``http://example.com/foo/bar/baz/biz/buz.txt``
 The fact that it does not find "buz.txt" at this point does not
 signify an error condition.  It signifies that:
 
-- the :term:`context` is "biz" (the context is the last item found
+- the :term:`context` is "biz" (the context is the last resource found
   during traversal).
 
 - the :term:`view name` is "buz.txt"
@@ -486,11 +480,11 @@ signify an error condition.  It signifies that:
 
 At this point, traversal has ended, and :term:`view lookup` begins.
 
-Because it's the "context", the view lookup machinery examines "biz"
-to find out what "type" it is. Let's say it finds that the context is
-a ``Biz`` type (because "biz" is an instance of the Python class
-``Biz``).  Using the :term:`view name` (``buz.txt``) and the type,
-view lookup asks the :term:`application registry` this question:
+Because it's the "context" resource, the view lookup machinery examines "biz"
+to find out what "type" it is. Let's say it finds that the context is a
+``Biz`` type (because "biz" is an instance of the Python class ``Biz``).
+Using the :term:`view name` (``buz.txt``) and the type, view lookup asks the
+:term:`application registry` this question:
 
 - Please find me a :term:`view callable` registered with a :term:`view
   configuration` with the name ``buz.txt`` that can be used for class
@@ -502,22 +496,21 @@ callable`.  The view callable is then called with the current
 :term:`WebOb` :term:`request` as the sole argument: ``request``; it is
 expected to return a response.
 
-.. sidebar:: The Example View Callables Accept Only a Request; How Do I Access the Context?
+.. sidebar:: The Example View Callables Accept Only a Request; How Do I Access the Context Resource?
 
-   Most of the examples in this book assume that a view callable is
-   typically passed only a :term:`request` object.  Sometimes your
-   view callables need access to the :term:`context`, especially when
-   you use :term:`traversal`.  You might use a supported alternate
-   view callable argument list in your view callables such as the
-   ``(context, request)`` calling convention described in
-   :ref:`request_and_context_view_definitions`.  But you don't need to
-   if you don't want to.  In view callables that accept only a
-   request, the :term:`context` found by traversal is available as the
-   ``context`` attribute of the request object,
-   e.g. ``request.context``.  The :term:`view name` is available as
-   the ``view_name`` attribute of the request object,
-   e.g. ``request.view_name``.  Other :app:`Pyramid` -specific
-   request attributes are also available as described in
+   Most of the examples in this book assume that a view callable is typically
+   passed only a :term:`request` object.  Sometimes your view callables need
+   access to the :term:`context` resource, especially when you use
+   :term:`traversal`.  You might use a supported alternate view callable
+   argument list in your view callables such as the ``(context, request)``
+   calling convention described in
+   :ref:`request_and_context_view_definitions`.  But you don't need to if you
+   don't want to.  In view callables that accept only a request, the
+   :term:`context` resource found by traversal is available as the
+   ``context`` attribute of the request object, e.g. ``request.context``.
+   The :term:`view name` is available as the ``view_name`` attribute of the
+   request object, e.g. ``request.view_name``.  Other :app:`Pyramid`
+   -specific request attributes are also available as described in
    :ref:`special_request_attributes`.
 
 References
@@ -534,5 +527,5 @@ deal with traversal, such as traversal invocation from within
 application code.
 
 The :func:`pyramid.url.resource_url` function generates a URL when
-given an object retrieved from an resource tree.
+given a resource retrieved from an resource tree.
 
