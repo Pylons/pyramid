@@ -78,6 +78,9 @@ Bug Fixes
 - Make it possible to succesfully run all tests via ``nosetests`` command
   directly (rather than indirectly via ``python setup.py nosetests``).
 
+- When a configuration conflict is encountered during scanning, the conflict
+  exception now shows the decorator information that caused the conflict.
+
 Features
 --------
 
@@ -108,6 +111,11 @@ Paster Templates
 ----------------
 
 - Added ``debug_routematch = false`` to all paster templates.
+
+Dependencies
+------------
+
+- Depend on Venusian >= 0.5 (for scanning conflict exception decoration).
 
 1.0a6 (2010-12-15)
 ==================

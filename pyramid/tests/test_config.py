@@ -3424,6 +3424,27 @@ class ConfiguratorTests(unittest.TestCase):
         else: # pragma: no cover
             raise AssertionError
 
+    def test_scan_conflict(self):
+        from zope.configuration.config import ConfigurationConflictError
+        from pyramid.tests import selfscanapp
+        from pyramid.config import Configurator
+        c = Configurator()
+        c.scan(selfscanapp)
+        c.scan(selfscanapp)
+        try:
+            c.commit()
+        except ConfigurationConflictError, why:
+            def scanconflicts(e):
+                conflicts = e._conflicts.values()
+                for conflict in conflicts:
+                    for confinst in conflict:
+                        yield confinst[3]
+            c1, c2, c3, c4 = scanconflicts(why)
+            self.assertEqual(c1, "@view_config(renderer='string')")
+            self.assertEqual(c2, "@view_config(renderer='string')")
+            self.assertEqual(c3, "@view_config(name='two', renderer='string')")
+            self.assertEqual(c4, "@view_config(name='two', renderer='string')")
+
     def _conflictFunctions(self, e):
         conflicts = e._conflicts.values()
         for conflict in conflicts:

@@ -481,6 +481,7 @@ class IContext(Interface):
 class DummyVenusianInfo(object):
     scope = 'notaclass'
     module = sys.modules['pyramid.tests']
+    codeinfo = 'codeinfo'
 
 class DummyVenusian(object):
     def __init__(self, info=None):

@@ -109,11 +109,13 @@ def action_method(wrapped):
     def wrapper(self, *arg, **kw):
         if self._ainfo is None:
             self._ainfo = []
-        try:
-            f = traceback.extract_stack(limit=3)
-            info = f[-2]
-        except: # pragma: no cover
-            info = ''
+        info = kw.pop('_info', None)
+        if info is None:
+            try:
+                f = traceback.extract_stack(limit=3)
+                info = f[-2]
+            except: # pragma: no cover
+                info = ''
         self._ainfo.append(info)
         try:
             result = wrapped(self, *arg, **kw)

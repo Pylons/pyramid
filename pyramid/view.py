@@ -417,6 +417,7 @@ class view_config(object):
         if renderer_name is not None and not isinstance(renderer_name, dict):
             settings['renderer'] = {'name':renderer_name,
                                     'package':info.module}
+        settings['_info'] = info.codeinfo
         return wrapped
 
 bfg_view = view_config # permanent b/c
