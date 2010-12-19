@@ -482,5 +482,5 @@ deal with traversal, such as traversal invocation from within
 application code.
 
 The :func:`pyramid.url.resource_url` function generates a URL when
-given a resource retrieved from an resource tree.
+given a resource retrieved from a resource tree.
 
