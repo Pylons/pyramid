@@ -13,72 +13,26 @@ explain the concept of a resource tree, and we'll show how traversal might be
 used within an application.
 
 .. index::
-   single: traversal analogy
-
-A Traversal Analogy
--------------------
-
-We use an analogy to provide an introduction to :term:`traversal`.
-Imagine an inexperienced UNIX computer user, wishing only to use the
-command line to find a file and to invoke the ``cat`` command against
-that file.  Because he is inexperienced, the only commands he knows
-how to use are ``cd``, which changes the current directory and
-``cat``, which prints the contents of a file.  And because he is
-inexperienced, he doesn't understand that ``cat`` can take an absolute
-path specification as an argument, so he doesn't know that you can
-issue a single command command ``cat /an/absolute/path`` to get the
-desired result.  Instead, this user believes he must issue the ``cd``
-command, starting from the root, for each intermediate path segment,
-*even the path segment that represents the file itself*.  Once he gets
-an error (because you cannot successfully ``cd`` into a file), he
-knows he has reached the file he wants, and he will be able to execute
-``cat`` against the resulting path segment.
-
-This inexperienced user's attempt to execute ``cat`` against the file
-named ``/fiz/buz/myfile`` might be to issue the following set of UNIX
-commands:
-
-.. code-block::  text
-
-   cd /
-   cd fiz
-   cd buz
-   cd myfile
-
-The user now knows he has found a *file*, because the ``cd`` command
-issues an error when he executed ``cd myfile``.  Now he knows that he
-can run the ``cat`` command:
-
-.. code-block::  text
-
-   cat myfile
-
-The contents of ``myfile`` are now printed on the user's behalf.
-
-:app:`Pyramid` is very much like this inexperienced UNIX user as it uses
-:term:`traversal` against a resource tree.  In this analogy, we can map the
-``cat`` program to the :app:`Pyramid` concept of a :term:`view callable`: it
-is a program that can be run against some :term:`resource` (the "context") as
-the result of :term:`view lookup`.  The file being operated on in this
-analogy is the :term:`context` resource; the context is the "last resource
-found" in a traversal.  The directory structure is the resource tree being
-traversed.  The act of progressively changing directories to find the file as
-well as the handling of a ``cd`` error as a stop condition is analogous to
-:term:`traversal`.
-
-The analogy we've used is not *exactly* correct, because, while the naive
-user already knows which command he wants to invoke before he starts
-"traversing" (``cat``), :app:`Pyramid` needs to obtain that information from
-the path being traversed itself.  In :term:`traversal`, the "command" meant
-to be invoked is a :term:`view callable`.  A view callable is derived via
-:term:`view lookup` from the combination of the :term:`request` and the
-:term:`context`.
-
-.. index::
    single: traversal overview
 
 A High-Level Overview of Traversal
 ----------------------------------
+
+A :term:`traversal` uses the URL (Universal Resource Locator) to find a
+:term:`resource`.  This is done by mapping each segment of the path portion
+of the URL into a set of nested dictionary-like objects called the
+:term:`resource tree`.  You might think of this as looking up files and
+directories in a file system.  Traversal walks down the path until it finds a
+published "directory" or "file".  The resource we find as the result of a
+traversal becomes the :term:`context`.  A separate :term:`view lookup`
+subsystem is used to then find some code willing "publish" the context
+resource.
+
+.. index::
+   single: traversal details
+
+Traversal Details
+-----------------
 
 :term:`Traversal` is dependent on information in a :term:`request` object.
 Every :term:`request` object contains URL path information in the
@@ -149,14 +103,15 @@ The Resource Tree
 -----------------
 
 When your application uses :term:`traversal` to resolve URLs to code, your
-application must supply the a resource tree to :app:`Pyramid`.  This tree is
-represented by a :term:`root` resource.
+application must supply a :term:`resource tree` to :app:`Pyramid`.  The
+resource tree is a set of nested dictionary-like objects. The root of the
+tree is represented by a :term:`root` resource.
 
 In order to supply a root resource for an application, at system startup
-time, the :app:`Pyramid` :term:`Router` is configured with a
-callback known as a :term:`root factory`.  The root factory is
-supplied by the application developer as the ``root_factory`` argument
-to the application's :term:`Configurator`.
+time, the :app:`Pyramid` :term:`Router` is configured with a callback known
+as a :term:`root factory`.  The root factory is supplied by the application
+developer as the ``root_factory`` argument to the application's
+:term:`Configurator`.
 
 Here's an example of a simple root factory:
 
@@ -167,9 +122,8 @@ Here's an example of a simple root factory:
        def __init__(self, request):
            pass
 
-Here's an example of using this root factory within startup
-configuration, by passing it to an instance of a :term:`Configurator`
-named ``config``:
+Here's an example of using this root factory within startup configuration, by
+passing it to an instance of a :term:`Configurator` named ``config``:
 
 .. code-block:: python
    :linenos:
@@ -187,13 +141,13 @@ A root factory is passed a :term:`request` object and it is expected to
 return a resource which represents the root of the resource tree.  All
 :term:`traversal` will begin at this root resource.  Usually a root factory
 for a traversal-based application will be more complicated than the above
-``Root`` class; in particular it may be associated with a database
-connection or another persistence mechanism.
+``Root`` class; in particular it may be associated with a database connection
+or another persistence mechanism.
 
 If no :term:`root factory` is passed to the :app:`Pyramid`
-:term:`Configurator` constructor, or the ``root_factory`` is specified
-as the value ``None``, a *default* root factory is used.  The default
-root factory always returns a resource that has no child resources.
+:term:`Configurator` constructor, or the ``root_factory`` is specified as the
+value ``None``, a *default* root factory is used.  The default root factory
+always returns a resource that has no child resources.
 
 .. sidebar:: Emulating the Default Root Factory
 
@@ -226,11 +180,12 @@ root factory always returns a resource that has no child resources.
 
 The resource tree consists of *container* resources and *leaf* resources.
 There is only one difference between a *container* resource and a *leaf*
-resource: *container* resources possess a ``__getitem__`` method while *leaf*
-resources do not.  The ``__getitem__`` method was chosen as the signifying
-difference between the two types of resources because the presence of this
-method is how Python itself typically determines whether a resource is
-"containerish" or not.
+resource: *container* resources possess a ``__getitem__`` method (making it
+"dictionary-like") while *leaf* resources do not.  The ``__getitem__`` method
+was chosen as the signifying difference between the two types of resources
+because the presence of this method is how Python itself typically determines
+whether an object is "containerish" or not (dictionary objects are
+"containerish").
 
 Each container resource is presumed to be willing to return a child resource
 or raise a ``KeyError`` based on a name passed to its ``__getitem__``.
