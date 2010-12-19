@@ -108,7 +108,6 @@ rather than an actual callable:
    # "config" below is presumed to be an instance of the
    # pyramid.config.Configurator class; "myview" is assumed
    # to be a "view callable" function
-   from myproject.views import myview
    config.add_route('myroute', '/prefix/{one}/{two}', 
                     view='myproject.views.myview')
 
