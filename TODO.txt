@@ -8,6 +8,8 @@ Must-Have (before 1.0)
 
 - Provide a .flash API on session object.
 
+- Consider deprecations for ``model`` and ``resource`` APIs.
+
 Should-Have
 -----------
 
