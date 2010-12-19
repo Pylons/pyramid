@@ -3,17 +3,25 @@
 Creating a :app:`Pyramid` Project
 ====================================
 
-It's possible to create a :app:`Pyramid` application completely
-manually, but it's usually more convenient to use a template to
-generate a basic :app:`Pyramid` application structure.
+As we saw in :ref:`firstapp_chapter`, it's possible to create a
+:app:`Pyramid` application completely manually.  However, it's usually more
+convenient to use a *template* to generate a basic :app:`Pyramid`
+:term:`project`.
 
-:app:`Pyramid` comes with templates that you can use to generate a
-project.  Each template makes different configuration assumptions
-about what type of application you're trying to construct.
+A project is a directory that contains at least one :term:`package`.  You'll
+use the template to render a project, and create your application logic
+within the package that lives inside the project.  Even if your application
+is extremely simple, it is useful to place code that drives the application
+within a package, because a package is more easily extended with new code.
+An application that lives inside a package can also be distributed more
+easily than one which does not live within a package.
 
-These templates are rendered using the :term:`PasteDeploy` ``paster``
-script, and so therefore they are often referred to as "paster
-templates".
+:app:`Pyramid` comes with a variety of templates that you can use to generate
+a project.  Each template makes different configuration assumptions about
+what type of application you're trying to construct.
+
+These templates are rendered using the :term:`PasteDeploy` ``paster`` script,
+and so therefore they are often referred to as "paster templates".
 
 .. index::
    single: paster templates
@@ -31,8 +39,8 @@ templates".
 Paster Templates Included with :app:`Pyramid`
 ------------------------------------------------
 
-The convenience ``paster`` templates included with :app:`Pyramid`
-differ from each other on a number of axes:
+The convenience ``paster`` templates included with :app:`Pyramid` differ from
+each other on a number of axes:
 
 - the persistence mechanism they offer (no persistence mechanism,
   :term:`ZODB`, or :term:`SQLAlchemy`).
@@ -80,13 +88,6 @@ The included templates are these:
   URL mapping via :term:`URL dispatch` and Pylons-style view handlers, some
   extra functionality, and SQLAlchemy set up, uses ``pyramid_beaker`` as a
   sessioning implementation.
-
-Each paster template makes the assumption that you want your code to live in
-a Python :term:`package`.  Even if your application is extremely simple, it
-is useful to place code that drives the application within a package, because
-a package is more easily extended with new code.  An application that lives
-inside a package can also be distributed more easily than one which does not
-live within a package.
 
 .. index::
    single: creating a project
@@ -154,14 +155,12 @@ project we name ``MyProject``:
 	   pkg_resources.DistributionNotFound: <package name>
 
    Simply run ``bin/easy_install``, with the missing package
-   name from the error message, to workaround this issue.
+   name from the error message, to work around this issue.
 
-As a result of invoking the ``paster create`` command, a project is
-created in a directory named ``MyProject``.  That directory is a
-:term:`setuptools` :term:`project` directory from which a setuptools
-:term:`distribution` can be created.  The ``setup.py`` file in that
-directory can be used to distribute your application, or install your
-application for deployment or development.
+As a result of invoking the ``paster create`` command, a project is created
+in a directory named ``MyProject``.  That directory is a :term:`project`
+directory.  The ``setup.py`` file in that directory can be used to distribute
+your application, or install your application for deployment or development.
 
 A :term:`PasteDeploy` ``.ini`` file named ``development.ini`` will also be
 created in the project directory.  You will use this ``.ini`` file to
@@ -199,9 +198,9 @@ Elided output from a run of this command is shown below:
    ...
    Finished processing dependencies for MyProject==0.0
 
-This will install the :term:`distribution` representing your
-application's into the interpreter's library set so it can be found
-and run by :term:`PasteDeploy` via the command ``paster serve``.
+This will install a :term:`distribution` representing your project into the
+interpreter's library set so it can be found by ``import`` statements and by
+:term:`PasteDeploy` commands such as ``paster serve`` and ``paster pshell``.
 
 .. index::
    single: running tests
@@ -244,9 +243,9 @@ Here's sample output from a test run:
    output to a stream of dots.  If you don't pass ``-q``, you'll see more
    verbose test result output (which normally isn't very useful).
 
-The tests themselves are found in the ``tests.py`` module in your
-``paster create`` -generated project.  Within a project generated by
-the ``pyramid_starter`` template, a single sample test exists.
+The tests themselves are found in the ``tests.py`` module in your ``paster
+create`` -generated project.  Within a project generated by the
+``pyramid_starter`` template, a single sample test exists.
 
 .. index::
    single: interactive shell
@@ -258,7 +257,7 @@ The Interactive Shell
 
 Once you've installed your program for development using ``setup.py
 develop``, you can use an interactive Python shell to examine your
-:app:`Pyramid` application :term:`resource` and :term:`view` objects from a
+:app:`Pyramid` project's :term:`resource` and :term:`view` objects from a
 Python prompt.  To do so, use the ``paster`` shell command with the
 ``pshell`` argument:
 
@@ -279,8 +278,8 @@ points to *your application* as opposed to any other section within the
    debug_templates = true
    default_locale_name = en
 
-If so, you can use the following command to invoke a debug shell using
-the name ``MyProject`` as a section name:
+If so, you can use the following command to invoke a debug shell using the
+name ``MyProject`` as a section name:
 
 .. code-block:: text
 
@@ -304,15 +303,16 @@ the name ``MyProject`` as a section name:
 Two names are made available to the pshell user as globals: ``root`` and
 ``registry``.  ``root`` is the the object returned by the default :term:`root
 factory` in your application.  ``registry`` is the :term:`application
-registry` object (often accessed within view code as ``request.registry``).
+registry` object associated with your project's application (often accessed
+within view code as ``request.registry``).
 
-If you have `IPython <http://en.wikipedia.org/wiki/IPython>`_
-installed in the interpreter you use to invoke the ``paster`` command,
-the ``pshell`` command will use an IPython interactive shell instead
-of a standard Python interpreter shell.  If you don't want this to
-happen, even if you have IPython installed, you can pass the
-``--disable-ipython`` flag to the ``pshell`` command to use a standard
-Python interpreter shell unconditionally.
+If you have `IPython <http://en.wikipedia.org/wiki/IPython>`_ installed in
+the interpreter you use to invoke the ``paster`` command, the ``pshell``
+command will use an IPython interactive shell instead of a standard Python
+interpreter shell.  If you don't want this to happen, even if you have
+IPython installed, you can pass the ``--disable-ipython`` flag to the
+``pshell`` command to use a standard Python interpreter shell
+unconditionally.
 
 .. code-block:: text
 
@@ -363,10 +363,9 @@ Press ``Ctrl-D`` to exit the interactive shell (or ``Ctrl-Z`` on Windows).
 Running The Project Application
 -------------------------------
 
-Once a project is installed for development, you can run the
-application it represents using the ``paster serve`` command against
-the generated configuration file.  In our case, this file is named
-``development.ini``:
+Once a project is installed for development, you can run the application it
+represents using the ``paster serve`` command against the generated
+configuration file.  In our case, this file is named ``development.ini``:
 
 .. code-block:: text
 
@@ -380,15 +379,17 @@ Here's sample output from a run of ``paster serve``:
    Starting server in PID 16601.
    serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
 
-By default, :app:`Pyramid` applications generated from a ``paster``
-template will listen on TCP port 6543.
+By default, :app:`Pyramid` applications generated from a ``paster`` template
+will listen on TCP port 6543.
 
-During development, it's often useful to run ``paster serve`` using
-its ``--reload`` option.  When ``--reload`` is passed to ``paster
-serve``, changes to any Python module your project uses will cause the
-server to restart.  This typically makes development easier, as
-changes to Python code made within a :app:`Pyramid` application is
-not put into effect until the server restarts.
+You can shut down a server started this way by pressing ``Ctrl-C``.
+
+During development, it's often useful to run ``paster serve`` using its
+``--reload`` option.  When ``--reload`` is passed to ``paster serve``,
+changes to any Python module your project uses will cause the server to
+restart.  This typically makes development easier, as changes to Python code
+made within a :app:`Pyramid` application is not put into effect until the
+server restarts.
 
 For example:
 
@@ -400,50 +401,48 @@ For example:
    serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
 
 For more detailed information about the startup process, see
-:ref:`startup_chapter`.  For more information about environment
-variables and configuration file settings that influence startup and
-runtime behavior, see :ref:`environment_chapter`.
-
-Using an Alternate WSGI Server
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The code generated by :app:`Pyramid` ``paster`` templates assumes
-that you will be using the ``paster serve`` command to start your
-application while you do development.  However, ``paster serve`` is by
-no means the only way to start up and serve a :app:`Pyramid`
-application.  As we saw in :ref:`configuration_narr`, ``paster serve``
-needn't be invoked at all to run a :app:`Pyramid` application.  The
-use of ``paster serve`` to run a :app:`Pyramid` application is
-purely conventional based on the output of its ``paster`` templates.
-
-Any :term:`WSGI` server is capable of running a :app:`Pyramid`
-application.  Some WSGI servers don't require the :term:`PasteDeploy`
-framework's ``paster serve`` command to do server process management
-at all.  Each :term:`WSGI` server has its own documentation about how
-it creates a process to run an application, and there are many of
-them, so we cannot provide the details for each here.  But the
-concepts are largely the same, whatever server you happen to use.
-
-One popular production alternative to a ``paster``-invoked server is
-:term:`mod_wsgi`. You can also use :term:`mod_wsgi` to serve your
-:app:`Pyramid` application using the Apache web server rather than
-any "pure-Python" server that is started as a result of ``paster
-serve``.  See :ref:`modwsgi_tutorial` for details.  However, it is
-usually easier to *develop* an application using a ``paster serve``
--invoked webserver, as exception and debugging output will be sent to
-the console.
+:ref:`startup_chapter`.  For more information about environment variables and
+configuration file settings that influence startup and runtime behavior, see
+:ref:`environment_chapter`.
 
 Viewing the Application
 -----------------------
 
 Once your application is running via ``paster serve``, you may visit
-``http://localhost:6543/`` in your browser.  You will see something in
-your browser like what is displayed in the following image:
+``http://localhost:6543/`` in your browser.  You will see something in your
+browser like what is displayed in the following image:
 
 .. image:: project.png
 
-This is the page shown by default when you visit an unmodified
-``paster create`` -generated ``pyramid_starter`` application in a browser.
+This is the page shown by default when you visit an unmodified ``paster
+create`` -generated ``pyramid_starter`` application in a browser.
+
+.. sidebar:: Using an Alternate WSGI Server
+
+   The code generated by :app:`Pyramid` ``paster`` templates assumes that you
+   will be using the ``paster serve`` command to start your application while
+   you do development.  However, ``paster serve`` is by no means the only way
+   to start up and serve a :app:`Pyramid` application.  As we saw in
+   :ref:`firstapp_chapter`, ``paster serve`` needn't be invoked at all to run
+   a :app:`Pyramid` application.  The use of ``paster serve`` to run a
+   :app:`Pyramid` application is purely conventional based on the output of
+   its ``paster`` templates.
+
+   Any :term:`WSGI` server is capable of running a :app:`Pyramid`
+   application.  Some WSGI servers don't require the :term:`PasteDeploy`
+   framework's ``paster serve`` command to do server process management at
+   all.  Each :term:`WSGI` server has its own documentation about how it
+   creates a process to run an application, and there are many of them, so we
+   cannot provide the details for each here.  But the concepts are largely
+   the same, whatever server you happen to use.
+
+   One popular production alternative to a ``paster``-invoked server is
+   :term:`mod_wsgi`. You can also use :term:`mod_wsgi` to serve your
+   :app:`Pyramid` application using the Apache web server rather than any
+   "pure-Python" server that is started as a result of ``paster serve``.  See
+   :ref:`modwsgi_tutorial` for details.  However, it is usually easier to
+   *develop* an application using a ``paster serve`` -invoked webserver, as
+   exception and debugging output will be sent to the console.
 
 .. index::
    single: project structure
@@ -451,12 +450,12 @@ This is the page shown by default when you visit an unmodified
 The Project Structure
 ---------------------
 
-Our generated :app:`Pyramid` ``pyramid_starter`` application is a setuptools
-:term:`project` (named ``MyProject``), which contains a Python
-:term:`package` (which is *also* named ``myproject``, but lowercased; the
-paster template generates a project which contains a package that shares its
-name except for case).  All :app:`Pyramid` ``paster`` -generated projects
-share a similar structure.
+The ``pyramid_starter`` template generated a setuptools :term:`project`
+(named ``MyProject``), which contains a Python :term:`package`.  The package
+is *also* named ``myproject``, but it's lowercased; the paster template
+generates a project which contains a package that shares its name except for
+case.  All :app:`Pyramid` ``paster`` -generated projects share a similar
+structure.
 
 The ``MyProject`` project we've generated has the following directory
 structure:
@@ -484,27 +483,25 @@ structure:
 The ``MyProject`` :term:`Project`
 ---------------------------------
 
-The ``MyProject`` :term:`project` is the distribution and deployment
-wrapper for your application.  It contains both the ``myproject``
+The ``MyProject`` :term:`project` directory is the distribution and
+deployment wrapper for your application.  It contains both the ``myproject``
 :term:`package` representing your application as well as files used to
 describe, run, and test your application.
 
-#. ``CHANGES.txt`` describes the changes you've made to the
-   application.  It is conventionally written in
-   :term:`ReStructuredText` format.
+#. ``CHANGES.txt`` describes the changes you've made to the application.  It
+   is conventionally written in :term:`ReStructuredText` format.
 
-#. ``README.txt`` describes the application in general.  It is
-   conventionally written in :term:`ReStructuredText` format.
+#. ``README.txt`` describes the application in general.  It is conventionally
+   written in :term:`ReStructuredText` format.
 
-#. ``development.ini`` is a :term:`PasteDeploy` configuration file that
-   can be used to execute your application.
+#. ``development.ini`` is a :term:`PasteDeploy` configuration file that can
+   be used to execute your application.
 
 #. ``setup.cfg`` is a :term:`setuptools` configuration file used by
    ``setup.py``.
 
 #. ``setup.py`` is the file you'll use to test and distribute your
-   application.  It is a standard :term:`setuptools` ``setup.py``
-   file.
+   application.  It is a standard :term:`setuptools` ``setup.py`` file.
 
 .. index::
    single: PasteDeploy
@@ -569,7 +566,7 @@ section unless you've changed the callable referred to by the
 add to this section are passed as keywords arguments to the callable
 represented by this entry point (``main`` in our ``__init__.py`` module).
 You can provide startup-time configuration parameters to your application by
-requiring more settings in this section.
+adding more settings to this section.
 
 The ``reload_templates`` setting in the ``[app:MyProject]`` section is a
 :app:`Pyramid` -specific setting which is passed into the framework.  If it
@@ -602,10 +599,10 @@ application) run by ``paster serve`` when it is invoked against this
 configuration file.  The name ``main`` is a convention used by PasteDeploy
 signifying that it the default application.
 
-The ``[server:main]`` section of the configuration file configures a
-WSGI server which listens on TCP port 6543.  It is configured to
-listen on all interfaces (``0.0.0.0``).  The ``Paste#http`` server
-will create a new thread for each request.
+The ``[server:main]`` section of the configuration file configures a WSGI
+server which listens on TCP port 6543.  It is configured to listen on all
+interfaces (``0.0.0.0``).  The ``Paste#http`` server will create a new thread
+for each request.
 
 .. note::
 
@@ -614,10 +611,10 @@ will create a new thread for each request.
   :app:`Pyramid` application be nonblocking as all application code
   will run in its own thread, provided by the server you're using.
 
-See the :term:`PasteDeploy` documentation for more information about
-other types of things you can put into this ``.ini`` file, such as
-other applications, :term:`middleware` and alternate :term:`WSGI`
-server implementations.
+See the :term:`PasteDeploy` documentation for more information about other
+types of things you can put into this ``.ini`` file, such as other
+applications, :term:`middleware` and alternate :term:`WSGI` server
+implementations.
 
 .. note::
 
@@ -633,16 +630,15 @@ server implementations.
 ``setup.py``
 ~~~~~~~~~~~~
 
-The ``setup.py`` file is a :term:`setuptools` setup file.  It is meant
-to be run directly from the command line to perform a variety of
-functions, such as testing your application, packaging, and
-distributing your application.
+The ``setup.py`` file is a :term:`setuptools` setup file.  It is meant to be
+run directly from the command line to perform a variety of functions, such as
+testing your application, packaging, and distributing your application.
 
 .. note::
 
   ``setup.py`` is the defacto standard which Python developers use to
-  distribute their reusable code.  You can read more about
-  ``setup.py`` files and their usage in the `Setuptools documentation
+  distribute their reusable code.  You can read more about ``setup.py`` files
+  and their usage in the `Setuptools documentation
   <http://peak.telecommunity.com/DevCenter/setuptools>`_.
 
 Our generated ``setup.py`` looks like this:
@@ -651,14 +647,14 @@ Our generated ``setup.py`` looks like this:
    :language: python
    :linenos:
 
-The ``setup.py`` file calls the setuptools ``setup`` function, which
-does various things depending on the arguments passed to ``setup.py``
-on the command line.
+The ``setup.py`` file calls the setuptools ``setup`` function, which does
+various things depending on the arguments passed to ``setup.py`` on the
+command line.
 
 Within the arguments to this function call, information about your
-application is kept.  While it's beyond the scope of this
-documentation to explain everything about setuptools setup files, we'll
-provide a whirlwind tour of what exists in this file in this section.
+application is kept.  While it's beyond the scope of this documentation to
+explain everything about setuptools setup files, we'll provide a whirlwind
+tour of what exists in this file in this section.
 
 Your application's name can be any string; it is specified in the ``name``
 field.  The version number is specified in the ``version`` value.  A short
@@ -681,18 +677,17 @@ will be run when ``setup.py test`` is invoked.  We examined ``entry_points``
 in our discussion of the ``development.ini`` file; this file defines the
 ``main`` entry point that represents our project's application.
 
-Usually you only need to think about the contents of the ``setup.py``
-file when distributing your application to other people, or when
-versioning your application for your own use.  For fun, you can try
-this command now:
+Usually you only need to think about the contents of the ``setup.py`` file
+when distributing your application to other people, or when versioning your
+application for your own use.  For fun, you can try this command now:
 
 .. code-block:: text
 
    $ python setup.py sdist
 
-This will create a tarball of your application in a ``dist``
-subdirectory named ``MyProject-0.1.tar.gz``.  You can send this
-tarball to other people who want to use your application.
+This will create a tarball of your application in a ``dist`` subdirectory
+named ``MyProject-0.1.tar.gz``.  You can send this tarball to other people
+who want to use your application.
 
 .. warning::
 
@@ -721,8 +716,7 @@ Our generated ``setup.cfg`` looks like this:
    :linenos:
 
 The values in the default setup file allow various commonly-used
-internationalization commands and testing commands to work more
-smoothly.
+internationalization commands and testing commands to work more smoothly.
 
 .. index::
    single: package
@@ -733,10 +727,9 @@ The ``myproject`` :term:`Package`
 The ``myproject`` :term:`package` lives inside the ``MyProject``
 :term:`project`.  It contains:
 
-#. An ``__init__.py`` file which signifies that this is a Python
-   :term:`package`.  It also contains code that helps users run the
-   application, include a ``main`` function which is used as a Paste entry
-   point.
+#. An ``__init__.py`` file signifies that this is a Python :term:`package`.
+   It also contains code that helps users run the application, include a
+   ``main`` function which is used as a Paste entry point.
 
 #. A ``resources.py`` module, which contains :term:`resource` code.
 
@@ -768,16 +761,15 @@ also informs Python that the directory which contains it is a *package*.
    :language: python
    :linenos:
 
-#. Line 1 imports the :term:`Configurator` class from
-   :mod:`pyramid.config` that we use later.
+#. Line 1 imports the :term:`Configurator` class from :mod:`pyramid.config`
+   that we use later.
 
 #. Line 2 imports the ``Root`` class from :mod:`myproject.resources` that we
    use later.
 
-#. Lines 4-12 define a function that returns a :app:`Pyramid`
-   WSGI application.  This function is meant to be called
-   by the :term:`PasteDeploy` framework as a result of running
-   ``paster serve``.
+#. Lines 4-12 define a function that returns a :app:`Pyramid` WSGI
+   application.  This function is meant to be called by the
+   :term:`PasteDeploy` framework as a result of running ``paster serve``.
 
    Within this function, configuration is performed.
 
@@ -805,11 +797,10 @@ also informs Python that the directory which contains it is a *package*.
 ``views.py``
 ~~~~~~~~~~~~
 
-Much of the heavy lifting in a :app:`Pyramid` application comes in
-the form of *view callables*.  A :term:`view callable` is the main
-tool of a :app:`Pyramid` web application developer; it is a bit of
-code which accepts a :term:`request` and which returns a
-:term:`response`.
+Much of the heavy lifting in a :app:`Pyramid` application is done by *view
+callables*.  A :term:`view callable` is the main tool of a :app:`Pyramid` web
+application developer; it is a bit of code which accepts a :term:`request`
+and which returns a :term:`response`.
 
 .. literalinclude:: MyProject/myproject/views.py
    :language: python
@@ -820,10 +811,9 @@ This bit of code was registered as the view callable within ``__init__.py``
 that are of the class :class:`myproject.resources.Root` should run this
 :func:`myproject.views.my_view` function.
 
-This view callable function is handed a single piece of information:
-the :term:`request`.  The *request* is an instance of the
-:term:`WebOb` ``Request`` class representing the browser's request to
-our server.
+This view callable function is handed a single piece of information: the
+:term:`request`.  The *request* is an instance of the :term:`WebOb`
+``Request`` class representing the browser's request to our server.
 
 This view returns a dictionary.  When this view is invoked, a
 :term:`renderer` converts the dictionary returned by the view into HTML, and
@@ -835,7 +825,7 @@ file call to ``add_view``).
 See :ref:`views_which_use_a_renderer` for more information about how views,
 renderers, and templates relate and cooperate.
 
-.. note:: because our ``development.ini`` has a ``reload_templates =
+.. note:: Because our ``development.ini`` has a ``reload_templates =
    true`` directive indicating that templates should be reloaded when
    they change, you won't need to restart the application server to
    see changes you make to templates.  During development, this is
@@ -867,11 +857,12 @@ resource.
    factory" function that will be called by the :app:`Pyramid` *Router* for
    each request when it wants to find the root of the resource tree.
 
-In a "real" application, the Root object would not be such a simple object.
-Instead, it might be an object that could access some persistent data store,
-such as a database.  :app:`Pyramid` doesn't make any assumption about which
-sort of datastore you'll want to use, so the sample application uses an
-instance of :class:`myproject.resources.Root` to represent the root.
+In a "real" application, the Root object would likely not be such a simple
+object.  Instead, it might be an object that could access some persistent
+data store, such as a database.  :app:`Pyramid` doesn't make any assumption
+about which sort of data storage you'll want to use, so the sample
+application uses an instance of :class:`myproject.resources.Root` to
+represent the root.
 
 ``static``
 ~~~~~~~~~~
@@ -891,8 +882,8 @@ is referenced by the call to ``add_view`` as the ``renderer`` attribute in
 the ``__init__`` file.  See :ref:`views_which_use_a_renderer` for more
 information about renderers.
 
-Templates are accessed and used by view configurations and sometimes
-by view functions themselves.  See :ref:`templates_used_directly` and
+Templates are accessed and used by view configurations and sometimes by view
+functions themselves.  See :ref:`templates_used_directly` and
 :ref:`templates_used_as_renderers`.
 
 ``tests.py``
@@ -904,11 +895,11 @@ The ``tests.py`` module includes unit tests for your application.
    :language: python
    :linenos:
 
-This sample ``tests.py`` file has a single unit test defined within
-it.  This test is executed when you run ``python setup.py test``.  You
-may add more tests here as you build your application.  You are not
-required to write tests to use :app:`Pyramid`, this file is simply
-provided as convenience and example.
+This sample ``tests.py`` file has a single unit test defined within it.  This
+test is executed when you run ``python setup.py test``.  You may add more
+tests here as you build your application.  You are not required to write
+tests to use :app:`Pyramid`, this file is simply provided as convenience and
+example.
 
 See :ref:`unittesting_chapter` for more information about writing
 :app:`Pyramid` unit tests.
