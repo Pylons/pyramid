@@ -36,7 +36,6 @@ Narrative Documentation
    narr/traversal
    narr/views
    narr/renderers
-   narr/handlers
    narr/hybrid
    narr/static
    narr/webob
