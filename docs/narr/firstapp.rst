@@ -316,12 +316,6 @@ applications, configured "imperatively".  We can see that it's configured
 imperatively because the full power of Python is available to us as we
 perform configuration tasks.
 
-.. note::
-
-   An example of using *declarative* configuration (:term:`ZCML`) instead of
-   imperative configuration to create a similar "hello world" is available
-   within :ref:`declarative_configuration`.
-
 References
 ----------
 
@@ -330,3 +324,7 @@ see :class:`pyramid.config.Configurator` .
 
 For more information about :term:`view configuration`, see
 :ref:`views_chapter`.
+
+An example of using *declarative* configuration (:term:`ZCML`) instead of
+imperative configuration to create a similar "hello world" is available
+within :ref:`declarative_configuration`.
