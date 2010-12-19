@@ -1,5 +1,5 @@
 from pyramid.config import Configurator
-from {{package}}.models import Root
+from {{package}}.resources import Root
 
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.

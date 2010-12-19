@@ -6,7 +6,7 @@ def main(global_config, **settings):
     """
     config = Configurator(root_factory=Root, settings=settings)
     config.add_view('{{package}}.views.my_view',
-                    context='{{package}}:resources.Root"
+                    context='{{package}}:resources.Root',
                     renderer='{{package}}:templates/mytemplate.pt')
     config.add_static_view('static', '{{package}}:static')
     return config.make_wsgi_app()
