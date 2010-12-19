@@ -6,10 +6,6 @@ Must-Have (before 1.0)
 
 - Narrative docs for ``Configurator.include`` and ``Configurator.commit``.
 
-- Fix session behavior: when a Forbidden/NotFound hander is invoked, we'd
-  like to allow people to save the session (currently when the response has
-  an exception attribute, the session is tossed unconditionally).
-
 - Provide a .flash API on session object.
 
 Should-Have
