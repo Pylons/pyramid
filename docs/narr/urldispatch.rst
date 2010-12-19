@@ -1146,7 +1146,7 @@ Then add an event subscriber in your startup configuration:
 .. code-block:: python
    :linenos:
 
-   config.add_subscriber('mypackage.run.handle_teardown', 
+   config.add_subscriber('mypackage.handle_teardown',
                          'pyramid.events.NewRequest')
 
 Registering a handle_teardown subscriber will cause the DBSession to be
