@@ -120,6 +120,9 @@ Documentation
 - Rearranged chapter ordering by popular demand (URL dispatch first, then
   traversal).  Put hybrid chapter after views chapter.
 
+- Split off "Renderers" as its own chapter from "Views" chapter in narrative
+  documentation.
+
 Paster Templates
 ----------------
 

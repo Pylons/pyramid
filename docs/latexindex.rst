@@ -35,6 +35,7 @@ Narrative Documentation
    narr/urldispatch
    narr/traversal
    narr/views
+   narr/renderers
    narr/handlers
    narr/hybrid
    narr/static
