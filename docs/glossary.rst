@@ -37,11 +37,11 @@ Glossary
      distribution, and installation of libraries and applications.
 
    pkg_resources
-     A module which ships with :term:`setuptools` that provides an API
-     for addressing "asset files" within Python packages.  Asset
-     files are static files, template files, etc; basically anything
-     non-Python-source that lives in a Python package can be considered
-     a asset file.  See also `PkgResources
+     A module which ships with :term:`setuptools` that provides an API for
+     addressing "asset files" within a Python :term:`package`.  Asset files
+     are static files, template files, etc; basically anything
+     non-Python-source that lives in a Python package can be considered a
+     asset file.  See also `PkgResources
      <http://peak.telecommunity.com/DevCenter/PkgResources>`_
 
    asset
@@ -59,6 +59,11 @@ Glossary
    package
      A directory on disk which contains an ``__init__.py`` file, making
      it recognizable to Python as a location which can be ``import`` -ed.
+
+   module
+     A Python source file; a file on the filesystem that typically ends with
+     the extension ``.py`` or ``.pyc``.  Modules often live in a 
+     :term:`package`.
 
    project
      (Setuptools/distutils terminology). A directory on disk which
