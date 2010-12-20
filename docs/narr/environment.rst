@@ -67,7 +67,7 @@ also :ref:`overriding_assets_section`.
 |                                 |                             |
 +---------------------------------+-----------------------------+
 
-.. note:: For backwards compatibility purposes, the following aliases can be
+.. note:: For backwards compatibility purposes, aliases can be
    used for configurating asset reloading: ``PYRAMID_RELOAD_RESOURCES`` (envvar)
    and ``reload_resources`` (config file).
 
