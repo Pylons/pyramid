@@ -496,12 +496,12 @@ Debugging View Authorization Failures
 
 If your application in your judgment is allowing or denying view
 access inappropriately, start your application under a shell using the
-``BFG_DEBUG_AUTHORIZATION`` environment variable set to ``1``.  For
+``PYRAMID_DEBUG_AUTHORIZATION`` environment variable set to ``1``.  For
 example:
 
 .. code-block:: text
 
-  $ BFG_DEBUG_AUTHORIZATION=1 bin/paster serve myproject.ini
+  $ PYRAMID_DEBUG_AUTHORIZATION=1 bin/paster serve myproject.ini
 
 When any authorization takes place during a top-level view rendering,
 a message will be logged to the console (to stderr) about what ACE in

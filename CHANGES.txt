@@ -67,7 +67,7 @@ Terminology Changes
 
   - The setting previously known as ``BFG_RELOAD_RESOURCES`` (envvar) or
     ``reload_resources`` (config file) is now known, respectively, as
-    ``BFG_RELOAD_ASSETS`` and ``reload_assets``.
+    ``PYRAMID_RELOAD_ASSETS`` and ``reload_assets``.
 
   Backwards compatibility shims have been left in place in all cases.  They
   will continue to work "forever".
@@ -103,7 +103,7 @@ Documentation
 - Added "Debugging Route Matching" section to the urldispatch narrative
   documentation chapter.
 
-- Added reference to ``BFG_DEBUG_ROUTEMATCH`` envvar and ``debug_routematch``
+- Added reference to ``PYRAMID_DEBUG_ROUTEMATCH`` envvar and ``debug_routematch``
   config file setting to the Environment narrative docs chapter.
 
 - Changed "Project" chapter slightly to expand on use of ``paster pshell``.
