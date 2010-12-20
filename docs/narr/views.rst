@@ -1441,7 +1441,7 @@ View Lookup and Invocation
 
 :term:`View lookup` is the :app:`Pyramid` subsystem responsible for finding
 an invoking a :term:`view callable`.  The view lookup subsystem is passed a
-:term:`context` and a:term:`request` object.
+:term:`context` and a :term:`request` object.
 
 :term:`View configuration` information stored within in the
 :term:`application registry` is compared against the context and request by
