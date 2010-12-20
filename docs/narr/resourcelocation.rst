@@ -78,7 +78,7 @@ arbitrary-depth hierarchies.
 
 :term:`URL dispatch` tends to collapse the two steps of :term:`resource
 location` and :term:`view lookup` into a single step.  Thus, a URL can map
-*directly* to a view callable.  This makes URL dispatch eaiser to understand
+*directly* to a view callable.  This makes URL dispatch easier to understand
 than traversal, because traversal makes you understand how :term:`resource
 location` works.  But explicitly locating a resource provides extra
 flexibility.  For example, it makes it possible to protect your application
