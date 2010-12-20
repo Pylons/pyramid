@@ -1017,7 +1017,7 @@ Redirecting to Slash-Appended Routes
 ------------------------------------
 
 For behavior like Django's ``APPEND_SLASH=True``, use the
-:func:`pyramid.view.append_slash_notfound_view` view as the :term:`Not Found
+:func:`~pyramid.view.append_slash_notfound_view` view as the :term:`Not Found
 view` in your application.  Defining this view as the :term:`Not Found view`
 is a way to automatically redirect requests where the URL lacks a trailing
 slash, but requires one to match the proper route.  When configured, along
@@ -1072,18 +1072,18 @@ Custom Not Found View With Slash Appended Routes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There can only be one :term:`Not Found view` in any :app:`Pyramid`
-application.  Even if you use :func:`pyramid.view.append_slash_notfound_view`
+application.  Even if you use :func:`~pyramid.view.append_slash_notfound_view`
 as the Not Found view, :app:`Pyramid` still must generate a ``404 Not Found``
 response when it cannot redirect to a slash-appended URL; this not found
 response will be visible to site users.
 
 If you don't care what this 404 response looks like, and only you need
 redirections to slash-appended route URLs, you may use the
-:func:`pyramid.view.append_slash_notfound_view` object as the Not Found view
+:func:`~pyramid.view.append_slash_notfound_view` object as the Not Found view
 as described above.  However, if you wish to use a *custom* notfound view
 callable when a URL cannot be redirected to a slash-appended URL, you may
 wish to use an instance of the
-:class:`pyramid.view.AppendSlashNotFoundViewFactory` class as the Not Found
+:class:`~pyramid.view.AppendSlashNotFoundViewFactory` class as the Not Found
 view, supplying a :term:`view callable` to be used as the custom notfound
 view as the first argument to its constructor.  For instance:
 

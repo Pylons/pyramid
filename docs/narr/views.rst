@@ -97,8 +97,8 @@ parameters.  Views defined as classes must have the following traits:
 
 - an ``__init__`` method that accepts a ``request`` argument.
 
-- a ``__call__`` method that accepts no parameters and which returns a
-  response.
+- a ``__call__`` (or other) method that accepts no parameters and which
+  returns a response.
 
 For example:
 
@@ -118,137 +118,90 @@ The request object passed to ``__init__`` is the same type of request object
 described in :ref:`function_as_view`.
 
 If you'd like to use a different attribute than ``__call__`` to represent the
-method expected to return a response, you can use an ``attr`` value as part
-of the configuration for the view.  See :ref:`view_configuration_parameters`.
-The same view callable class can be used in different view configuration
-statements with different ``attr`` values, each pointing at a different
-method of the class if you'd like the class to represent a collection of
-related view callables.
+method expected to return a response, you can either:
+
+- use an ``attr`` value as part of the configuration for the view.  See
+  :ref:`view_configuration_parameters`.  The same view callable class can be
+  used in different view configuration statements with different ``attr``
+  values, each pointing at a different method of the class if you'd like the
+  class to represent a collection of related view callables.
+
+- treat the class as a :term:`view handler` by using it as the ``handler=``
+  argument of a call to :meth:`pyramid.config.Configurator.add_handler`.
 
 .. index::
    single: view calling convention
 
 .. _request_and_context_view_definitions:
 
-.. sidebar:: Context-And-Request View Callable Definitions
+Alternate View Callable Argument/Calling Conventions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-	Usually, view callables are defined to accept only a single argument:
-	``request``.  However, view callables may alternately be defined as
-	classes, functions, or any callable that accept *two* positional
-	arguments: a :term:`context` resource as the first argument and a
-	:term:`request` as the second argument.
+Usually, view callables are defined to accept only a single argument:
+``request``.  However, view callables may alternately be defined as classes,
+functions, or any callable that accept *two* positional arguments: a
+:term:`context` resource as the first argument and a :term:`request` as the
+second argument.
 
-	The :term:`context` and :term:`request` arguments passed to a view
-	function defined in this style can be defined as follows:
+The :term:`context` and :term:`request` arguments passed to a view function
+defined in this style can be defined as follows:
 
-	context
-	  The :term:`resource` object found via tree :term:`traversal`
-	  or :term:`URL dispatch`.
+context
 
-	request
-	  A :app:`Pyramid` Request object representing the current WSGI
-	  request.
+  The :term:`resource` object found via tree :term:`traversal` or :term:`URL
+  dispatch`.
 
-	The following types work as view callables in this style:
+request
+  A :app:`Pyramid` Request object representing the current WSGI request.
 
-	#. Functions that accept two arguments: ``context``, and ``request``,
-	   e.g.:
+The following types work as view callables in this style:
 
-	   .. code-block:: python
-		  :linenos:
+#. Functions that accept two arguments: ``context``, and ``request``,
+   e.g.:
 
-		  from pyramid.response import Response
+   .. code-block:: python
+	  :linenos:
 
-		  def view(context, request):
+	  from pyramid.response import Response
+
+	  def view(context, request):
+		  return Response('OK')
+
+#. Classes that have an ``__init__`` method that accepts ``context,
+   request`` and a ``__call__`` which accepts no arguments, e.g.:
+
+   .. code-block:: python
+	  :linenos:
+
+	  from pyramid.response import Response
+
+	  class view(object):
+		  def __init__(self, context, request):
+			  self.context = context
+			  self.request = request
+
+		  def __call__(self):
 			  return Response('OK')
 
-	#. Classes that have an ``__init__`` method that accepts ``context,
-	   request`` and a ``__call__`` which accepts no arguments, e.g.:
+#. Arbitrary callables that have a ``__call__`` method that accepts
+   ``context, request``, e.g.:
 
-	   .. code-block:: python
-		  :linenos:
+   .. code-block:: python
+	  :linenos:
 
-		  from pyramid.response import Response
+	  from pyramid.response import Response
 
-		  class view(object):
-			  def __init__(self, context, request):
-				  self.context = context
-				  self.request = request
+	  class View(object):
+		  def __call__(self, context, request):
+			  return Response('OK')
+	  view = View() # this is the view callable
 
-			  def __call__(self):
-				  return Response('OK')
+This style of calling convention is most useful for :term:`traversal` based
+applications, where the context object is frequently used within the view
+callable code itself.
 
-	#. Arbitrary callables that have a ``__call__`` method that accepts
-	   ``context, request``, e.g.:
-
-	   .. code-block:: python
-		  :linenos:
-
-		  from pyramid.response import Response
-
-		  class View(object):
-			  def __call__(self, context, request):
-				  return Response('OK')
-		  view = View() # this is the view callable
-
-	This style of calling convention is most useful for :term:`traversal`
-	based applications, where the context object is frequently used within
-	the view callable code itself.
-
-	No matter which view calling convention is used, the view code always
-	has access to the context via ``request.context``.
-
-Defining a Set of View Callables Using a Handler
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Along with normal view callable functions, instances, and classes,
-:app:`Pyramid` provides the special concept of a :term:`view handler`.  View
-handlers are a convenience for :term:`URL dispatch` users.  The concept of a
-view handler is analogous to a "controller" in Pylons 1.0.  Using a view
-handler instead of a plain function or class :term:`view callable` makes it
-unnecessary to call :meth:`pyramid.config.Configurator.add_route` (and/or
-:meth:`pyramid.config.Configurator.add_view`) "by hand" multiple times,
-making it more pleasant to register a collection of views as a single class
-when using :term:`url dispatch`.  The view handler machinery also introduces
-the concept of an ``action``, which is used as a :term:`view predicate` to
-control which method of the handler is called.
-
-.. note:: 
-
-   View handlers are *not* useful when using :term:`traversal`, only when using
-   :term:`url dispatch`.  
-
-The view handler class is initialized by :app:`Pyramid` in the same manner as
-a view *class*.  Its ``__init__`` is called with a request object (see
-:ref:`class_as_view`) as its argument when a request enters the system which
-corresponds with a view handler registration made during configuration.
-After the view handler class is instantiated, a method on the instance is
-called. Typically, each method of the handler is used as a view callable.
-The methods which are called depends on the view handler's configuration.
-
-Here's an example view handler class:
-
-.. code-block:: python
-    :linenos:
-    
-    from pyramid.response import Response
-   
-    from pyramid.view import action
-   
-    class Hello(object):
-        def __init__(self, request):
-            self.request = request
-       
-        def index(self):
-            return Response('Hello world!')
-
-        @action(renderer="mytemplate.mak")
-        def bye(self):
-            return {}
-
-Handlers are added to application configuration via the
-:meth:`pyramid.config.Configurator.add_handler` API, as described in
-:ref:`using_add_handler`.
+No matter which view calling convention is used, the view code always has
+access to the context via ``request.context``.
 
 .. index::
    single: view response
@@ -1087,8 +1040,8 @@ against the ``amethod`` method could be spelled equivalently as the below:
 
 .. _mapping_views_using_imperative_config_section:
 
-View Configuration Using the ``add_view`` Method of a Configurator
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+View Registration Using :meth:`~pyramid.config.Configurator.add_view`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The :meth:`pyramid.config.Configurator.add_view` method within
 :ref:`configuration_module` is used to configure a view imperatively.  The
@@ -1114,10 +1067,63 @@ All other arguments are optional.  See
 
 .. _using_add_handler:
 
-Using :meth:`~pyramid.config.Configurator.add_handler` to Register a Handler
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Handler Registration Using :meth:`~pyramid.config.Configurator.add_handler`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :meth:`pyramid.config.Configurator.add_handler` method will scan a
+:app:`Pyramid` provides the special concept of a :term:`view handler`.  View
+handlers are view classes that implement a number of methods, each of which
+is a :term:`view callable` as a convenience for :term:`URL dispatch` users.
+
+.. note:: 
+
+   View handlers are *not* useful when using :term:`traversal`, only when using
+   :term:`url dispatch`.  
+
+Using a view handler instead of a plain function or class :term:`view
+callable` makes it unnecessary to call
+:meth:`pyramid.config.Configurator.add_route` (and/or
+:meth:`pyramid.config.Configurator.add_view`) "by hand" multiple times,
+making it more pleasant to register a collection of views as a single class
+when using :term:`url dispatch`.  The view handler machinery also introduces
+the concept of an ``action``, which is used as a :term:`view predicate` to
+control which method of the handler is called.  The method name is the
+default *action name* of a handler view callable.
+
+The concept of a view handler is analogous to a "controller" in Pylons 1.0.
+
+The view handler class is initialized by :app:`Pyramid` in the same manner as
+a "plain" view class.  Its ``__init__`` is called with a request object (see
+:ref:`class_as_view`).  It implements methods, each of which is a :term:`view
+callable`.  When a request enters the system which corresponds with an
+*action* related to one of its view callable methods, this method is called,
+and it is expected to return a response.
+
+Here's an example view handler class:
+
+.. code-block:: python
+    :linenos:
+    
+    from pyramid.response import Response
+   
+    from pyramid.view import action
+   
+    class Hello(object):
+        def __init__(self, request):
+            self.request = request
+       
+        def index(self):
+            return Response('Hello world!')
+
+        @action(renderer="mytemplate.mak")
+        def bye(self):
+            return {}
+
+The :class:`pyramid.view.action` decorator is used to fine-tune the view
+parameters for each potential view callable which is a method of the handler.
+
+Handlers are added to application configuration via the
+:meth:`pyramid.config.Configurator.add_handler` API.  The
+:meth:`~pyramid.config.Configurator.add_handler` method will scan a
 :term:`view handler` class and automatically set up view configurations for
 its methods that represent "auto-exposed" view callable, or those that were
 decorated explicitly with the :class:`~pyramid.view.action` decorator. This
@@ -1132,16 +1138,19 @@ method to register multiple view configurations for it.
     config.add_handler('hello', '/hello/{action}', handler=Hello)
 
 This example will result in a route being added for the pattern
-``/hello/{action}``, each method of the ``Hello`` class will then be examined
-to register the views. The value of ``{action}`` in the route pattern will be
-used to determine which view should be called, and each view in the class
-will be setup with a view predicate that requires a specific ``action`` name.
+``/hello/{action}``, and each method of the ``Hello`` class will then be
+examined to see if it should be registered as a potential view callable when
+the ``/hello/{action}`` pattern matches.  The value of ``{action}`` in the
+route pattern will be used to determine which view should be called, and each
+view in the class will be setup with a view predicate that requires a
+specific ``action`` name.  By default, the action name for a method of a
+handler is the method name.
 
-If the URL in the above example was ``/hello/index``, then the ``index``
-method of the Hello class would be called.
+If the URL was ``/hello/index``, the above example pattern would match, and,
+by default, the ``index`` method of the ``Hello`` class would be called.
 
-Alternatively, the action can be declared specifically for a URL to go to a
-specific ``action`` name:
+Alternatively, the action can be declared specifically for a URL to be
+registered for a *specific* ``action`` name:
 
 .. code-block:: python
     :linenos:
@@ -1152,8 +1161,8 @@ specific ``action`` name:
 
 This will result one of the methods that are configured for the ``action`` of
 'index' in the ``Hello`` handler class to be called. In this case the name of
-the method is the same as the action name: 'index'. However, this need not be
-the case, as we will see below.
+the method is the same as  the action name: ``index``. However, this need not
+be the case, as we will see below.
 
 When calling :meth:`~pyramid.config.Configurator.add_handler`, an ``action``
 is required in either the route pattern or as a keyword argument, but
@@ -1190,18 +1199,18 @@ handler/action combinations. For example:
 View Setup in the Handler Class
 +++++++++++++++++++++++++++++++
 
-The handler class specified can have a single class level attribute called
+A handler class can have a single class level attribute called
 ``__autoexpose__`` which should be a regular expression or the value
 ``None``. It's used to determine which method names will result in additional
 view configurations being registered.
 
-When :meth:`~pyramid.config.Configurator.add_handler` runs, every
-method in the handler class will be searched and a view registered if the
-method name matches the ``__autoexpose__`` regular expression, or if the
-method was decorated with :class:`~pyramid.view.action`.
+When :meth:`~pyramid.config.Configurator.add_handler` runs, every method in
+the handler class will be searched and a view registered if the method name
+matches the ``__autoexpose__`` regular expression, or if the method was
+decorated with :class:`~pyramid.view.action`.
 
 Every method in the handler class that has a name meeting the
-``_autoexpose__`` regular expression will have a view registered for an
+``__autoexpose__`` regular expression will have a view registered for an
 ``action`` name corresponding to the method name. This functionality can be
 disabled by setting the ``__autoexpose__`` attribute to ``None``:
 
@@ -1225,7 +1234,8 @@ disabled by setting the ``__autoexpose__`` attribute to ``None``:
             return {}
 
 With auto-expose effectively disabled, no views will be registered for a
-method unless it is specifically decorated with :class:`~pyramid.view.action`.
+method unless it is specifically decorated with
+:class:`~pyramid.view.action`.
 
 Action Decorators in a Handler
 ++++++++++++++++++++++++++++++

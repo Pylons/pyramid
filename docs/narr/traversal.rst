@@ -3,7 +3,7 @@
 Traversal
 =========
 
-:term:`Traversal` It provides an alternative to using :term:`URL dispatch` to
+:term:`Traversal` provides an alternative to using :term:`URL dispatch` to
 map a URL to a :term:`view callable`.  It is the act of locating a
 :term:`context` resource by walking over a :term:`resource tree`, starting
 from a :term:`root` resource, using a :term:`request` object as a source of
