@@ -36,13 +36,13 @@ Narrative Documentation
    narr/traversal
    narr/views
    narr/renderers
-   narr/hybrid
+   narr/templates
+   narr/resources
    narr/static
    narr/webob
    narr/sessions
-   narr/templates
-   narr/resources
    narr/security
+   narr/hybrid
    narr/i18n
    narr/vhosting
    narr/events
