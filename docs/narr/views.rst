@@ -566,8 +566,6 @@ View configuration is performed in one of these ways:
    :ref:`mapping_views_using_zcml_section`, :ref:`view_directive`, and
    :ref:`handler_directive`.
 
-A view configuration might also be performed by virtue of 
-
 .. note:: ZCML users can use :ref:`route_directive` to perform the same task.
    See also :ref:`zcml_route_configuration`.
 
