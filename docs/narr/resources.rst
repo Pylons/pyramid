@@ -1,21 +1,21 @@
 Resources
 =========
 
-A :term:`resource` is an object that represents a "place" in a tree related
-to your application.  Every :app:`Pyramid` application has at least one
-resource object: the :term:`root` resource.  Even if you don't define a
-root resource manually, a default one is created for you.  The root resource is
-the root of a :term:`resource tree`.  A resource tree is a set of nested
-dictionary-like objects which you can use to represent your website's
-structure.
+A :term:`resource` is an object that represents a "place" in a tree
+related to your application.  Every :app:`Pyramid` application has at
+least one resource object: the :term:`root` resource.  Even if you don't
+define a root resource manually, a default one is created for you.  The
+root resource is the root of a :term:`resource tree`.  A resource tree
+is a set of nested dictionary-like objects which you can use to
+represent your website's structure.
 
 In an application which uses :term:`traversal` to map URLs to code, the
-resource tree structure is used heavily to map a URL to a :term:`view
-callable`.  :app:`Pyramid` will walk "up" the resource tree by traversing
-through the nested dictionary structure of the tree when :term:`traversal` is
-used in order to find a :term:`context` resource.  Once a context resource is
-found, the context resource and data in the request will be used to find a
-:term:`view callable`.
+resource tree structure is used heavily to map each URL to a :term:`view
+callable`.  When :term:`traversal` is used, :app:`Pyramid` will walk
+through the resource tree by traversing through its nested dictionary
+structure in order to find a :term:`context` resource.  Once a context
+resource is found, the context resource and data in the request will be
+used to find a :term:`view callable`.
 
 In an application which uses :term:`URL dispatch`, the resource tree is only
 used indirectly, and is often "invisible" to the developer.  In URL dispatch
