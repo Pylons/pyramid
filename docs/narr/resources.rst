@@ -26,7 +26,7 @@ much less important in applications that use URL dispatch than applications
 that use traversal.
 
 In "Zope-like" :app:`Pyramid` applications, resource objects also often store
-data persistently and offer methods related to mutating that persistent data.
+data persistently, and offer methods related to mutating that persistent data.
 In these kinds of applications, resources not only represent the site
 structure of your website, but they become the :term:`domain model` of the
 application.
@@ -72,8 +72,8 @@ tree:
   the container's ``__getitem__`` should return the sub-resource.
 
 - Leaf resources, which do not contain other resources, must not implement a
-  ``__getitem__``, or if they do, their ``__getitem__`` method must raise a
-  :exc:`KeyError`.
+  ``__getitem__``, or if they do, their ``__getitem__`` method must always
+  raise a :exc:`KeyError`.
 
 See :ref:`traversal_chapter` for more information about how traversal
 works against resource instances.
