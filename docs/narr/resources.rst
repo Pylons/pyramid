@@ -3,8 +3,8 @@ Resources
 
 A :term:`resource` is an object that represents a "place" in a tree related
 to your application.  Every :app:`Pyramid` application has at least one
-resource object: the :term:`root` resource (even if you don't define one
-manually, a default root resource is created for you).  The root resource is
+resource object: the :term:`root` resource.  Even if you don't define a
+root resource manually, a default one is created for you.  The root resource is
 the root of a :term:`resource tree`.  A resource tree is a set of nested
 dictionary-like objects which you can use to represent your website's
 structure.
