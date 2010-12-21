@@ -44,7 +44,7 @@ def find_resource(resource, path):
     Rules for passing a *string* as the ``path`` argument: if the
     first character in the path string is the with the ``/``
     character, the path will considered absolute and the resource tree
-    traversal will start at the root object.  If the first character
+    traversal will start at the root resource.  If the first character
     of the path string is *not* the ``/`` character, the path is
     considered relative and resource tree traversal will begin at the resource
     object supplied to the function as the ``resource`` argument.  If an
@@ -86,13 +86,13 @@ find_model = find_resource # b/w compat
 
 def find_interface(resource, class_or_interface):
     """
-    Return the first object found in the parent chain of ``resource``
-    which, a) if ``class_or_interface`` is a Python class object, is
-    an instance of the class or any subclass of that class or b) if
-    ``class_or_interface`` is a :term:`interface`, provides the
-    specified interface.  Return ``None`` if no object providing
-    ``interface_or_class`` can be found in the parent chain.  The
-    ``resource`` passed in *must* be :term:`location`-aware.
+    Return the first resource found in the :term:`lineage` of ``resource``
+    which, a) if ``class_or_interface`` is a Python class object, is an
+    instance of the class or any subclass of that class or b) if
+    ``class_or_interface`` is a :term:`interface`, provides the specified
+    interface.  Return ``None`` if no resource providing ``interface_or_class``
+    can be found in the lineage.  The ``resource`` passed in *must* be
+    :term:`location`-aware.
     """
     if IInterface.providedBy(class_or_interface):
         test = class_or_interface.providedBy
@@ -179,7 +179,7 @@ def traverse(resource, path):
       in the ``path``.  The ``view_name`` will be a Unicode object or
       the empty string.  The ``view_name`` will be the empty string if
       there is no element which follows the ``context`` path.  An
-      example: if the path passed is ``/foo/bar``, and a context
+      example: if the path passed is ``/foo/bar``, and a resource
       object is found at ``/foo`` (but not at ``/foo/bar``), the 'view
       name' will be ``u'bar'``.  If the ``resource`` was found via
       urldispatch, the view_name will be the name the route found was
@@ -190,7 +190,7 @@ def traverse(resource, path):
       the ``view_name`` (if any).  Each of these items is a Unicode
       object.  If no path segments follow the ``view_name``, the
       subpath will be the empty sequence.  An example: if the path
-      passed is ``/foo/bar/baz/buz``, and a context object is found at
+      passed is ``/foo/bar/baz/buz``, and a resource object is found at
       ``/foo`` (but not ``/foo/bar``), the 'view name' will be
       ``u'bar'`` and the :term:`subpath` will be ``[u'baz', u'buz']``.
       For a ``resource`` found via url dispatch, the subpath will be a
@@ -210,7 +210,7 @@ def traverse(resource, path):
       See :ref:`vhosting_chapter` for a definition of the virtual root
       object.  If no virtual hosting is in effect, and the ``path``
       passed in was absolute, the ``virtual_root`` will be the
-      *physical* root object (the object at which :term:`traversal`
+      *physical* root resource object (the object at which :term:`traversal`
       begins).  If the ``resource`` passed in was found via :term:`URL
       dispatch` or if the ``path`` passed in was relative, the
       ``virtual_root`` will always equal the ``root`` object (the
@@ -218,9 +218,9 @@ def traverse(resource, path):
 
     - ``virtual_root_path`` -- If :term:`traversal` was used to find
       the ``resource``, this will be the sequence of path elements
-      traversed to find the ``virtual_root`` object.  Each of these
+      traversed to find the ``virtual_root`` resource.  Each of these
       items is a Unicode object.  If no path segments were traversed
-      to find the ``virtual_root`` object (e.g. if virtual hosting is
+      to find the ``virtual_root`` resource (e.g. if virtual hosting is
       not in effect), the ``traversed`` value will be the empty list.
       If url dispatch was used to find the ``resource``, this will be
       ``None``.
@@ -230,7 +230,7 @@ def traverse(resource, path):
     Rules for passing a *string* as the ``path`` argument: if the
     first character in the path string is the with the ``/``
     character, the path will considered absolute and the resource tree
-    traversal will start at the root object.  If the first character
+    traversal will start at the root resource.  If the first character
     of the path string is *not* the ``/`` character, the path is
     considered relative and resource tree traversal will begin at the resource
     object supplied to the function as the ``resource`` argument.  If an
@@ -367,7 +367,7 @@ def virtual_root(resource, request):
     the resource object representing the :term:`virtual root` of the
     current :term:`request`.  Using a virtual root in a
     :term:`traversal` -based :app:`Pyramid` application permits
-    rooting, for example, the object at the traversal path ``/cms`` at
+    rooting, for example, the resource at the traversal path ``/cms`` at
     ``http://example.com/`` instead of rooting it at
     ``http://example.com/cms/``.
 
@@ -375,8 +375,8 @@ def virtual_root(resource, request):
     :term:`traversal`, and if the ``HTTP_X_VHM_ROOT`` key is in the
     WSGI environment, the value of this key will be treated as a
     'virtual root path': the :func:`pyramid.traversal.find_resource`
-    API will be used to find the virtual root object using this path;
-    if the object is found, it will be returned.  If the
+    API will be used to find the virtual root resource using this path;
+    if the resource is found, it will be returned.  If the
     ``HTTP_X_VHM_ROOT`` key is is not present in the WSGI environment,
     the physical :term:`root` of the resource tree will be returned instead.
 
@@ -526,8 +526,8 @@ def quote_path_segment(segment):
 
 class ResourceTreeTraverser(object):
     """ A resource tree traverser that should be used (for speed) when
-    every object in the tree supplies a ``__name__`` and
-    ``__parent__`` attribute (ie. every object in the tree is
+    every resource in the tree supplies a ``__name__`` and
+    ``__parent__`` attribute (ie. every resource in the tree is
     :term:`location` aware) ."""
 
     implements(ITraverser)
@@ -633,8 +633,8 @@ class ResourceTreeTraverser(object):
 ModelGraphTraverser = ResourceTreeTraverser # b/w compat
 
 class TraversalContextURL(object):
-    """ The IContextURL adapter used to generate URLs for a context
-    object obtained via resource tree traversal"""
+    """ The IContextURL adapter used to generate URLs for a resource in a
+    resource tree"""
     implements(IContextURL)
 
     vroot_varname = VH_ROOT_KEY

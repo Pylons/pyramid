@@ -28,6 +28,11 @@ Documentation
 - Added "Determining if a Resource is In The Lineage of Another Resource" to
   Resources narrative chapter.
 
+- Added "Finding the Root Resource" to Resources narrative chapter.
+
+- Added "Finding a Resource With a Class or Interface in Lineage" to
+  Resources narrative chapter.
+
 1.0a7 (2010-12-20)
 ==================
 

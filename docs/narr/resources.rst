@@ -462,6 +462,35 @@ parent (or one of its parent's parents, etc.) is an ancestor.
 
 See :func:`pyramid.location.inside` for more information.
 
+Finding the Root Resource
+-------------------------
+
+Use the :func:`pyramid.traversal.find_root` API to find the :term:`root`
+resource.  The root resource is the root resource of the :term:`resource
+tree`.  The API accepts a single argument: ``resource``.  This is a resource
+that is :term:`location` aware.  It can be any resource in the tree for which
+you want to find the root.
+
+For example, if the resource tree is:
+
+.. code-block:: python
+   :linenos:
+
+   class Thing(object): pass
+
+   a = Thing()
+   b = Thing()
+   b.__parent__ = a
+
+Calling ``find_root(b)`` will return ``a``.
+
+The root resource is also available as ``request.root`` within :term:`view
+callable` code.
+
+The presence or absence of a :term:`virtual root` has no impact on the
+behavior of :func:`~pyramid.traversal.find_root`.  The root object returned
+is always the *physical* root object.
+
 .. index::
    single: resource interfaces
 
@@ -472,14 +501,15 @@ Resources Which Implement Interfaces
 
 Resources can optionally be made to implement an :term:`interface`.  An
 interface is used to tag a resource object with a "type" that can later be
-referred to within :term:`view configuration`.
+referred to within :term:`view configuration` and by
+:func:`pyramid.traversal.find_interface`.
 
 Specifying an interface instead of a class as the ``context`` or
 ``containment`` predicate arguments within :term:`view configuration`
-statements effectively makes it possible to use a single view callable for
-more than one class of resource object.  If your application is simple enough
-that you see no reason to want to do this, you can skip reading this section
-of the chapter.
+statements makes it possible to use a single view callable for more than one
+class of resource object.  If your application is simple enough that you see
+no reason to want to do this, you can skip reading this section of the
+chapter.
 
 For example, here's some code which describes a blog entry which also
 declares that the blog entry implements an :term:`interface`.
@@ -575,6 +605,40 @@ directly provided by an instance instead of overwriting them like
 
 For more information about how resource interfaces can be used by view
 configuration, see :ref:`using_resource_interfaces`.
+
+Finding a Resource With a Class or Interface in Lineage
+-------------------------------------------------------
+
+Use the :func:`pyramid.traversal.find_interface` API to locate a parent that
+is of a particular Python class, or which implements some :term:`interface`.
+
+For example, if your resource tree is composed as follows:
+
+.. code-block:: python
+   :linenos:
+
+   class Thing1(object): pass
+   class Thing2(object): pass
+
+   a = Thing1()
+   b = Thing2()
+   b.__parent__ = a
+
+Calling ``find_interface(a, Thing1)`` will return the ``a`` resource because
+``a`` is of class ``Thing1`` (the resource passed as the first argument is
+considered first, and is returned if the class or interface spec matches).
+
+Calling ``find_interface(b, Thing1)`` will return the ``a`` resource because
+``a`` is of class ``Thing1`` and ``a`` is the first resource in ``b``'s
+lineage of this class.
+
+Calling ``find_interface(b, Thing2)`` will return the ``b`` resource.
+
+The second argument to find_interface may also be a :term:`interface` instead
+of a class.  If it is an interface, each resource in the lineage is checked
+to see if the resource implements the specificed interface (instead of seeing
+if the resource is of a class).  See also
+:ref:`resources_which_implement_interfaces`.
 
 .. index::
    single: resource API functions
