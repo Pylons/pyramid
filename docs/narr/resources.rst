@@ -239,7 +239,7 @@ A slash is appended to all resource URLs when
 :func:`~pyramid.url.resource_url` is used to generate them in this simple
 manner, because resources are "places" in the hierarchy, and URLs are meant
 to be clicked on to be visited.  Relative URLs that you include on HTML pages
-rendered as the result of the default view of a resource are typically more
+rendered as the result of the default view of a resource are more
 apt to be relative to these resources than relative to their parent.
 
 You can also pass extra elements to :func:`~pyramid.url.resource_url`:
