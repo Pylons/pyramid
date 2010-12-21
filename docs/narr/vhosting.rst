@@ -78,6 +78,8 @@ In the above configuration, we root a :app:`Pyramid` application at
 .. index::
    single: virtual root
 
+.. _virtual_root_support:
+
 Virtual Root Support
 --------------------
 

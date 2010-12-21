@@ -829,6 +829,30 @@ class TraversalContextURLTests(unittest.TestCase):
         result = context_url()
         self.assertEqual(result, 'http://example.com:5432//bar/')
 
+    def test_local_url_returns_None(self):
+        resource = DummyContext()
+        def resource_url(request, info):
+            self.assertEqual(info['virtual_path'], '/')
+            self.assertEqual(info['physical_path'], '/')
+            return None
+        resource.__resource_url__ = resource_url
+        request = DummyRequest()
+        context_url = self._makeOne(resource, request)
+        result = context_url()
+        self.assertEqual(result, 'http://example.com:5432/')
+        
+    def test_local_url_returns_url(self):
+        resource = DummyContext()
+        def resource_url(request, info):
+            self.assertEqual(info['virtual_path'], '/')
+            self.assertEqual(info['physical_path'], '/')
+            return 'abc'
+        resource.__resource_url__ = resource_url
+        request = DummyRequest()
+        context_url = self._makeOne(resource, request)
+        result = context_url()
+        self.assertEqual(result, 'abc')
+
 class TestVirtualRoot(unittest.TestCase):
     def setUp(self):
         cleanUp()

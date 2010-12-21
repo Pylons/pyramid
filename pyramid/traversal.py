@@ -16,7 +16,7 @@ from pyramid.location import lineage
 from pyramid.threadlocal import get_current_registry
 
 def find_root(resource):
-    """ Find the root node in the graph to which ``resource``
+    """ Find the root node in the resource tree to which ``resource``
     belongs. Note that ``resource`` should be :term:`location`-aware.
     Note that the root resource is available in the request object by
     accessing the ``request.root`` attribute.
@@ -29,13 +29,12 @@ def find_root(resource):
 
 def find_resource(resource, path):
     """ Given a resource object and a string or tuple representing a path
-    (such as the return value of
-    :func:`pyramid.traversal.resource_path` or
-    :func:`pyramid.traversal.resource_path_tuple`), return a context
-    in this application's resource tree at the specified path.  The
-    resource passed in *must* be :term:`location`-aware.  If the path
-    cannot be resolved (if the respective node in the graph does not
-    exist), a :exc:`KeyError` will be raised.
+    (such as the return value of :func:`pyramid.traversal.resource_path` or
+    :func:`pyramid.traversal.resource_path_tuple`), return a resource in this
+    application's resource tree at the specified path.  The resource passed
+    in *must* be :term:`location`-aware.  If the path cannot be resolved (if
+    the respective node in the resource tree does not exist), a
+    :exc:`KeyError` will be raised.
 
     This function is the logical inverse of
     :func:`pyramid.traversal.resource_path` and
@@ -44,10 +43,10 @@ def find_resource(resource, path):
 
     Rules for passing a *string* as the ``path`` argument: if the
     first character in the path string is the with the ``/``
-    character, the path will considered absolute and the graph
+    character, the path will considered absolute and the resource tree
     traversal will start at the root object.  If the first character
     of the path string is *not* the ``/`` character, the path is
-    considered relative and graph traversal will begin at the resource
+    considered relative and resource tree traversal will begin at the resource
     object supplied to the function as the ``resource`` argument.  If an
     empty string is passed as ``path``, the ``resource`` passed in will
     be returned.  Resource path strings must be escaped in the following
@@ -60,10 +59,10 @@ def find_resource(resource, path):
 
     Rules for passing a *tuple* as the ``path`` argument: if the first
     element in the path tuple is the empty string (for example ``('',
-    'a', 'b', 'c')``, the path is considered absolute and the graph
-    traversal will start at the graph root object.  If the first
+    'a', 'b', 'c')``, the path is considered absolute and the resource tree
+    traversal will start at the resource tree root object.  If the first
     element in the path tuple is not the empty string (for example
-    ``('a', 'b', 'c')``), the path is considered relative and graph
+    ``('a', 'b', 'c')``), the path is considered relative and resource tree
     traversal will begin at the resource object supplied to the function
     as the ``resource`` argument.  If an empty sequence is passed as
     ``path``, the ``resource`` passed in itself will be returned.  No
@@ -126,7 +125,7 @@ def resource_path(resource, *elements):
 
     .. note:: Each segment in the path string returned will use the
               ``__name__`` attribute of the resource it represents within
-              the graph.  Each of these segments *should* be a unicode
+              the resource tree.  Each of these segments *should* be a unicode
               or string object (as per the contract of
               :term:`location`-awareness).  However, no conversion or
               safety checking of resource names is performed.  For
@@ -207,7 +206,7 @@ def traverse(resource, path):
       via :term:`url dispatch`, traversed will be None.
 
     - ``virtual_root``: A resource object representing the 'virtual' root
-      of the object graph being traversed during :term:`traversal`.
+      of the resource tree being traversed during :term:`traversal`.
       See :ref:`vhosting_chapter` for a definition of the virtual root
       object.  If no virtual hosting is in effect, and the ``path``
       passed in was absolute, the ``virtual_root`` will be the
@@ -230,10 +229,10 @@ def traverse(resource, path):
 
     Rules for passing a *string* as the ``path`` argument: if the
     first character in the path string is the with the ``/``
-    character, the path will considered absolute and the graph
+    character, the path will considered absolute and the resource tree
     traversal will start at the root object.  If the first character
     of the path string is *not* the ``/`` character, the path is
-    considered relative and graph traversal will begin at the resource
+    considered relative and resource tree traversal will begin at the resource
     object supplied to the function as the ``resource`` argument.  If an
     empty string is passed as ``path``, the ``resource`` passed in will
     be returned.  Resource path strings must be escaped in the following
@@ -246,10 +245,10 @@ def traverse(resource, path):
 
     Rules for passing a *tuple* as the ``path`` argument: if the first
     element in the path tuple is the empty string (for example ``('',
-    'a', 'b', 'c')``, the path is considered absolute and the graph
-    traversal will start at the graph root object.  If the first
+    'a', 'b', 'c')``, the path is considered absolute and the resource tree
+    traversal will start at the resource tree root object.  If the first
     element in the path tuple is not the empty string (for example
-    ``('a', 'b', 'c')``), the path is considered relative and graph
+    ``('a', 'b', 'c')``), the path is considered relative and resource tree
     traversal will begin at the resource object supplied to the function
     as the ``resource`` argument.  If an empty sequence is passed as
     ``path``, the ``resource`` passed in itself will be returned.  No
@@ -313,7 +312,7 @@ def traverse(resource, path):
 def resource_path_tuple(resource, *elements):
     """
     Return a tuple representing the absolute physical path of the
-    ``resource`` object based on its position in an object graph, e.g
+    ``resource`` object based on its position in a resource tree, e.g
     ``('', 'foo', 'bar')``.  Any positional arguments passed in as
     ``elements`` will be appended as elements in the tuple
     representing the resource path.  For instance, if the resource's
@@ -331,7 +330,7 @@ def resource_path_tuple(resource, *elements):
 
     .. note:: Each segment in the path tuple returned will equal the
               ``__name__`` attribute of the resource it represents within
-              the graph.  Each of these segments *should* be a unicode
+              the resource tree.  Each of these segments *should* be a unicode
               or string object (as per the contract of
               :term:`location`-awareness).  However, no conversion or
               safety checking of resource names is performed.  For
@@ -379,7 +378,7 @@ def virtual_root(resource, request):
     API will be used to find the virtual root object using this path;
     if the object is found, it will be returned.  If the
     ``HTTP_X_VHM_ROOT`` key is is not present in the WSGI environment,
-    the physical :term:`root` of the graph will be returned instead.
+    the physical :term:`root` of the resource tree will be returned instead.
 
     Virtual roots are not useful at all in applications that use
     :term:`URL dispatch`. Contexts obtained via URL dispatch don't
@@ -401,7 +400,7 @@ def virtual_root(resource, request):
 def traversal_path(path):
     """ Given a ``PATH_INFO`` string (slash-separated path segments),
     return a tuple representing that path which can be used to
-    traverse a graph.
+    traverse a resource tree.
 
     The ``PATH_INFO`` is split on slashes, creating a list of
     segments.  Each segment is URL-unquoted, and subsequently decoded
@@ -657,30 +656,43 @@ class TraversalContextURL(object):
             return find_root(self.context)
 
     def __call__(self):
-        """ Generate a URL based on the :term:`lineage` of a
-        :term:`resource` object obtained via :term:`traversal`.  If any
-        resource in the context lineage has a Unicode name, it will be
-        converted to a UTF-8 string before being attached to the URL.
-        If a ``HTTP_X_VHM_ROOT`` key is present in the WSGI
-        environment, its value will be treated as a 'virtual root
-        path': the path of the URL generated by this will be
+        """ Generate a URL based on the :term:`lineage` of a :term:`resource`
+        object that is ``self.context``.  If any resource in the context
+        lineage has a Unicode name, it will be converted to a UTF-8 string
+        before being attached to the URL.  If a ``HTTP_X_VHM_ROOT`` key is
+        present in the WSGI environment, its value will be treated as a
+        'virtual root path': the path of the URL generated by this will be
         left-stripped of this virtual root path value.
         """
-        path = resource_path(self.context)
-        if path != '/':
-            path = path + '/'
+        resource = self.context
+        physical_path = resource_path(resource)
+        if physical_path != '/':
+            physical_path = physical_path + '/'
+        virtual_path = physical_path
+
         request = self.request
         environ = request.environ
         vroot_varname = self.vroot_varname
+        vroot_path = environ.get(vroot_varname)
 
-        # if the path starts with the virtual root path, trim it out
-        if vroot_varname in environ:
-            vroot_path = environ[vroot_varname]
-            if path.startswith(vroot_path):
-                path = path[len(vroot_path):]
+        # if the physical path starts with the virtual root path, trim it out
+        # of the virtual path
+        if vroot_path is not None:
+            if physical_path.startswith(vroot_path):
+                virtual_path = physical_path[len(vroot_path):]
+
+        local_url = getattr(resource, '__resource_url__', None)
+        if local_url is not None:
+            result = local_url(request,
+                               {'virtual_path':virtual_path,
+                                'physical_path':physical_path},
+                               )
+            if result is not None:
+                # allow it to punt by returning ``None``
+                return result
 
         app_url = request.application_url # never ends in a slash
-        return app_url + path
+        return app_url + virtual_path
 
 @lru_cache(1000)
 def _join_path_tuple(tuple):

@@ -255,6 +255,10 @@ def resource_url(resource, request, *elements, **kw):
     will always follow the query element,
     e.g. ``http://example.com?foo=1#bar``.
 
+    If the ``resource`` passed in has a ``__resource_url__`` method, it will
+    be used to generate the URL that is returned by this function.  See also
+    :ref:`overriding_resource_url_generation`.
+
     .. note:: If the :term:`resource` used is the result of a
              :term:`traversal`, it must be :term:`location`-aware.
              The resource can also be the context of a :term:`URL

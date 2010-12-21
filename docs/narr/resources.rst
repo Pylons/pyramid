@@ -1,11 +1,13 @@
 Resources
 =========
 
-A :term:`resource` is an object that represents a "place" in your
-application.  Every :app:`Pyramid` application has at least one resource
-object: the :term:`root` resource.  The root resource is the root of a
-:term:`resource tree`.  A resource tree is a set of nested dictionary-like
-objects which you can use to represent your website's structure.
+A :term:`resource` is an object that represents a "place" in a tree related
+to your application.  Every :app:`Pyramid` application has at least one
+resource object: the :term:`root` resource (even if you don't define one
+manually, a default root resource is created for you).  The root resource is
+the root of a :term:`resource tree`.  A resource tree is a set of nested
+dictionary-like objects which you can use to represent your website's
+structure.
 
 In an application which uses :term:`traversal` to map URLs to code, the
 resource tree structure is used heavily to map a URL to a :term:`view
@@ -150,11 +152,11 @@ retrieved from the container via ``__getitem__``.  This pattern continues
 recursively "up" the tree from the root.
 
 The ``__parent__`` attributes of each resource form a linked list that points
-"upward" toward the root. This is analogous to the `..` entry in filesystem
-directories. If you follow the ``__parent__`` values from any resource in the
-resource tree, you will eventually come to the root resource, just like if
-you keep executing the ``cd ..`` filesystem command, eventually you will
-reach the filesystem root directory.
+"downwards" toward the root. This is analogous to the `..` entry in
+filesystem directories. If you follow the ``__parent__`` values from any
+resource in the resource tree, you will eventually come to the root resource,
+just like if you keep executing the ``cd ..`` filesystem command, eventually
+you will reach the filesystem root directory.
 
 .. warning:: If your root resource has a ``__name__`` argument
    that is not ``None`` or the empty string, URLs returned by the
@@ -199,8 +201,199 @@ and (usually) :func:`~pyramid.security.has_permission` and
 
 In general, since so much :app:`Pyramid` infrastructure depends on
 location-aware resources, it's a good idea to make each resource in your tree
-location-aware, even though location-awareness is not a prerequisite for
-plain traversal.
+location-aware.
+
+.. index::
+   single: resource_url
+   pair: generating; resource url
+
+Generating The URL Of A Resource
+--------------------------------
+
+If your resources are :term:`location` aware, you can use the
+:func:`pyramid.url.resource_url` API to generate a URL for the resource.
+This URL will use the resource's position in the parent tree to create a
+resource path, and it will prefix the path with the current application URL
+to form a fully-qualified URL with the scheme, host, port, and path.  You can
+also pass extra arguments to :func:`~pyramid.url.resource_url` to influence
+the generated URL.
+
+The simplest call to :func:`~pyramid.url.resource_url` looks like this:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.url import resource_url
+   url = resource_url(resource, request)
+
+The ``request`` passed to ``resource_url`` in the above example is an
+instance of an :app:`Pyramid` :term:`request` object.
+
+If the resource referred to as ``resource`` in the above example was the root
+resource, and the host that was used to contact the server was
+``example.com``, the URL generated would be ``http://example.com/``.
+However, if the resource was a child of the root resource named ``a``, the
+generated URL would be ``http://example.com/a/``.
+
+A slash is appended to all resource URLs when
+:func:`~pyramid.url.resource_url` is used to generate them in this simple
+manner, because resources are "places" in the hierarchy, and URLs are meant
+to be clicked on to be visited.  Relative URLs that you include on HTML pages
+rendered as the result of the default view of a resource are typically more
+apt to be relative to these resources than relative to their parent.
+
+You can also pass extra elements to :func:`~pyramid.url.resource_url`:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.url import resource_url
+   url = resource_url(resource, request, 'foo', 'bar')
+
+If the resource referred to as ``resource`` in the above example was the root
+resource, and the host that was used to contact the server was
+``example.com``, the URL generated would be ``http://example.com/foo/bar``.
+Any number of extra elements can be passed to
+:func:`~pyramid.url.resource_url` as extra positional arguments.  When extra
+elements are passed, they are appended to the resource's URL.  A slash is not
+appended to the final segment when elements are passed.
+
+You can also pass a query string:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.url import resource_url
+   url = resource_url(resource, request, query={'a':'1'})
+
+If the resource referred to as ``resource`` in the above example was the root
+resource, and the host that was used to contact the server was
+``example.com``, the URL generated would be ``http://example.com/?a=1``.
+
+When a :term:`virtual root` is active, the URL generated by
+:func:`~pyramid.url.resource_url` for a resource may be "shorter" than its
+physical tree path.  See :ref:`virtual_root_support` for more information
+about virtually rooting a resource.
+
+The shortcut method of the :term:`request` named
+:meth:`pyramid.request.Request.resource_url` can be used instead of
+:func:`pyramid.url.resource_url` to generate a resource URL.
+
+For more information about generating resource URLs, see the documentation
+for :func:`pyramid.url.resource_url`.
+
+.. _overriding_resource_url_generation:
+
+Overriding Resource URL Generation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If a resource object implements a ``__resource_url__`` method, this method
+will be called when :func:`pyramid.url.resource_url` is called to generate a
+URL for the resource, overriding the default URL returned for the resource by
+:func:`~pyramid.url.resource_url`.
+
+The ``__resource_url__`` hook is passed two arguments: ``request`` and
+``info``.  ``request`` is the :term:`request` object passed to
+:func:`pyramid.url.resource_url`.  ``info`` is a dictionary with two
+keys:
+
+``physical_path``
+   The "physical path" computed for the resource, as defined by
+   ``pyramid.traversal.resource_path(resource)``.
+
+``virtual_path``
+   The "virtual path" computed for the resource, as defined by
+   :ref:`virtual_root_support`.  This will be identical to the physical path
+   if virtual rooting is not enabled.
+
+The ``__resource_url__`` method of a resource should return a string
+representing a URL.  If it cannot override the default, it should return
+``None``.  If it returns ``None``, the default URL will be returned.
+
+Here's an example ``__resource_url__`` method.
+
+.. code-block:: python
+   :linenos:
+
+   class Resource(object):
+       def __resource_url__(self, request, info):
+           return request.application_url + info['virtual_path']
+
+The above example actually just generates and returns the default URL, which
+would have been what was returned anyway, but your code can perform arbitrary
+logic as necessary.  For example, your code may wish to override the hostname
+or port number of the generated URL.
+
+Generating the Path To a Resource
+---------------------------------
+
+:func:`pyramid.traversal.resource_path` returns a string object representing
+the absolute physical path of the resource object based on its position in
+the resource tree.  Each segment of the path is separated with a slash
+character.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.traversal import resource_path
+   url = resource_path(resource)
+
+If ``resource`` in the example above was accessible in the tree as
+``root['a']['b']``, the above example would generate the string ``/a/b``.
+
+Any positional arguments passed in to :func:`pyramid.traversal.resource_path`
+will be appended as path segments to the end of the resource path.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.traversal import resource_path
+   url = resource_path(resource, 'foo', 'bar')
+
+If ``resource`` in the example above was accessible in the tree as
+``root['a']['b']``, the above example would generate the string
+``/a/b/foo/bar``.
+
+The resource passed in must be :term:`location`-aware.
+
+The presence or absence of a :term:`virtual root` has no impact on the
+behavior of :func:`~pyramid.traversal.resource_path`.
+
+Finding a Resource by Path
+--------------------------
+
+If you have a string path to a resource, you can grab the resource from
+that place in the application's resource tree using
+:func:`pyramid.traversal.find_resource`.
+
+You can resolve an absolute path by passing a string prefixed with a ``/`` as
+the ``path`` argument:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.traversal import find_resource
+   url = find_resource(anyresource, '/path')
+
+Or you can resolve a path relative to the resource you pass in by passing a
+string that isn't prefixed by ``/``:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.traversal import find_resource
+   url = find_resource(anyresource, 'path')
+
+Often the paths you pass to :func:`~pyramid.traversal.find_resource` are
+generated by the :func:`~pyramid.traversal.resource_path` API.  These APIs
+are "mirrors" of each other.
+
+If the path cannot be resolved when calling
+:func:`~pyramid.traversal.find_resource` (if the respective resource in the
+tree does not exist), a :exc:`KeyError` will be raised.
+
+See the :func:`pyramid.traversal.find_resource` documentation for more
+information about resolving a path to a resource.
 
 .. index::
    single: resource interfaces
