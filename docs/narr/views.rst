@@ -561,13 +561,10 @@ View configuration is performed in one of these ways:
   :term:`view handler` class (useful only for :term:`URL dispatch`
   applications).
 
-.. note:: You can also add view configuration by adding a ``<view>`` or
-   ``<handler>`` declaration to :term:`ZCML` used by your application as per
-   :ref:`mapping_views_using_zcml_section`, :ref:`view_directive`, and
-   :ref:`handler_directive`.
-
-.. note:: ZCML users can use :ref:`route_directive` to perform the same task.
-   See also :ref:`zcml_route_configuration`.
+.. note:: You can also add view configuration by adding a ``<view>``,
+   ``<route>`` or ``<handler>`` declaration to :term:`ZCML` used by your
+   application as per :ref:`mapping_views_using_zcml_section`,
+   :ref:`view_directive`, :ref:`route_directive` or :ref:`handler_directive`.
 
 .. _view_configuration_parameters:
 
