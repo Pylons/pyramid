@@ -395,6 +395,73 @@ tree does not exist), a :exc:`KeyError` will be raised.
 See the :func:`pyramid.traversal.find_resource` documentation for more
 information about resolving a path to a resource.
 
+Obtaining the Lineage of a Resource
+-----------------------------------
+
+:func:`pyramid.location.lineage` returns a generator representing the
+:term:`lineage` of the :term:`location` aware:term:`resource` object.
+
+The :func:`~pyramid.location.lineage` function returns the resource it is
+passed, then each parent of the resource, in order.  For example, if the
+resource tree is composed like so:
+
+.. code-block:: python
+   :linenos:
+
+   class Thing(object): pass
+
+   thing1 = Thing()
+   thing2 = Thing()
+   thing2.__parent__ = thing1
+
+Calling ``lineage(thing2)`` will return a generator.  When we turn it into a
+list, we will get:
+
+.. code-block:: python
+   :linenos:
+    
+   list(lineage(thing2))
+   [ <Thing object at thing2>, <Thing object at thing1> ]
+
+The generator returned by :func:`~pyramid.location.lineage` first returns the
+resource it was passed unconditionally.  Then, if the resource supplied a
+``__parent__`` attribute, it returns the resource represented by
+``resource.__parent__``.  If *that* resource has a ``__parent__`` attribute,
+return that resource's parent, and so on, until the resource being inspected
+either has no ``__parent__`` attribute or which has a ``__parent__``
+attribute of ``None``.
+
+See the documentation for :func:`pyramid.location.lineage` for more
+information.
+
+Determining if a Resource is In The Lineage of Another Resource
+---------------------------------------------------------------
+
+Use the :func:`pyramid.location.inside` function to determine if one resource
+is in the :term:`lineage` of another resource.
+
+For example, if the resource tree is:
+
+.. code-block:: python
+   :linenos:
+
+   class Thing(object): pass
+
+   a = Thing()
+   b = Thing()
+   b.__parent__ = a
+
+Calling ``inside(b, a)`` will return ``True``, because ``b`` has a lineage
+that includes ``a``.  However, calling ``inside(a, b)`` will return ``False``
+because ``a`` does not have a lineage that includes ``b``.
+
+The argument list for :func:`~pyramid.location.inside` is ``(resource1,
+resource2)``.  ``resource1`` is 'inside' ``resource2`` if ``resource2`` is a
+:term:`lineage` ancestor of ``resource1``.  It is a lineage ancestor if its
+parent (or one of its parent's parents, etc.) is an ancestor.
+
+See :func:`pyramid.location.inside` for more information.
+
 .. index::
    single: resource interfaces
 

@@ -33,12 +33,12 @@ def lineage(resource):
     Return a generator representing the :term:`lineage` of the
     :term:`resource` object implied by the ``resource`` argument.  The
     generator first returns ``resource`` unconditionally.  Then, if
-    ``resource`` supplies a ``__parent__`` attribute, return the object
-    represented by ``resource.__parent__``.  If *that* object has a
-    ``__parent__`` attribute, return that object's parent, and so on,
-    until the object being inspected either has no ``__parent__``
+    ``resource`` supplies a ``__parent__`` attribute, return the resource
+    represented by ``resource.__parent__``.  If *that* resource has a
+    ``__parent__`` attribute, return that resource's parent, and so on,
+    until the resource being inspected either has no ``__parent__``
     attribute or which has a ``__parent__`` attribute of ``None``.
-    For example, if the object tree is::
+    For example, if the resource tree is::
 
       thing1 = Thing()
       thing2 = Thing()
