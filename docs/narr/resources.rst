@@ -5,14 +5,15 @@ A :term:`resource` is an object that represents a "place" in your
 application.  Every :app:`Pyramid` application has at least one resource
 object: the :term:`root` resource.  The root resource is the root of a
 :term:`resource tree`.  A resource tree is a set of nested dictionary-like
-objects which you may use to represent your website's structure.
+objects which you can use to represent your website's structure.
 
 In an application which uses :term:`traversal` to map URLs to code, the
 resource tree structure is used heavily to map a URL to a :term:`view
-callable`.  :app:`Pyramid` will walk "up" the resource tree when
-:term:`traversal` is used in order to find a :term:`context`.  Once a context
-is found, the resource represented by the context combined with data in the
-request will be used to find a :term:`view callable`.
+callable`.  :app:`Pyramid` will walk "up" the resource tree by traversing
+through the nested dictionary structure of the tree when :term:`traversal` is
+used in order to find a :term:`context` resource.  Once a context resource is
+found, the context resource and data in the request will be used to find a
+:term:`view callable`.
 
 In an application which uses :term:`URL dispatch`, the resource tree is only
 used indirectly, and is often "invisible" to the developer.  In URL dispatch
@@ -40,31 +41,166 @@ Also:
 - A resource is exposed to :term:`view` code as the :term:`context` of a
   view.
 
+- Various helpful :app:`Pyramid` API methods expect a resource as an
+  argument (e.g. :func:`pyramid.url.resource_url` and others).
+
 .. index::
-   single: resource constructor
+   single: resource tree
+   single: traversal tree
+   single: object tree
+   single: container resources
+   single: leaf resources
 
-Defining a Resource Constructor
--------------------------------
+Defining a Resource Tree
+------------------------
 
-An example of a resource constructor, ``BlogEntry`` is presented below.  It
-is implemented as a class which, when instantiated, becomes a resource
-instance.
+When :term:`traversal` is used (as opposed to a purely :term:`url dispatch`
+based application), :app:`Pyramid` expects to be able to traverse a tree
+composed of resources (the :term:`resource tree`).  Traversal begins at a
+root resource, and descends into the tree recursively, trying each resource's
+``__getitem__`` method to resolve a path segment to another resource object.
+:app:`Pyramid` imposes the following policy on resource instances in the
+tree:
+
+- A container resource (a resource which contains other resources) must
+  supply a ``__getitem__`` method which is willing to resolve a unicode name
+  to a sub-resource.  If a sub-resource by a particular name does not exist
+  in a container resource, ``__getitem__`` method of the container resource
+  must raise a :exc:`KeyError`.  If a sub-resource by that name *does* exist,
+  the container's ``__getitem__`` should return the sub-resource.
+
+- Leaf resources, which do not contain other resources, must not implement a
+  ``__getitem__``, or if they do, their ``__getitem__`` method must raise a
+  :exc:`KeyError`.
+
+See :ref:`traversal_chapter` for more information about how traversal
+works against resource instances.
+
+Here's a sample resource tree, represented by a variable named ``root``:
 
 .. code-block:: python
    :linenos:
 
-   import datetime
+    class Resource(dict):
+        pass
 
-   class BlogEntry(object):
-       def __init__(self, title, body, author):
-           self.title = title
-           self.body =  body
-           self.author = author
-           self.created = datetime.datetime.now()
+    root = Resource({'a':Resource({'b':Resource({'c':Resource()})})})
 
-A resource constructor may be any Python object which is callable, and which
-returns a resource instance.  In the above example, the ``BlogEntry`` class
-can be "called", returning a resource instance.
+The resource tree we've created above is represented by a dictionary-like
+root object which has a single child named ``a``.  ``a`` has a single child
+named ``b``, and ``b`` has a single child named ``c``, which has no children.
+It is therefore possible to access ``c`` like so:
+
+.. code-block:: python
+   :linenos:
+
+   root['a']['b']['c']
+
+If you returned the above ``root`` object from a :term:`root factory`, the
+path ``/a/b/c`` would find the ``c`` object in the resource tree as the
+result of :term:`traversal`.
+
+In this example, each of the resources in the tree is of the same class.
+This is not a requirement.  Resource elements in the tree can be of any type.
+We used a single class to represent all resources in the tree for the sake of
+simplicity, but in a "real" app, the resources in the tree can be arbitrary.
+
+Although the example tree above can service a traversal, the resource
+instances in the above example are not aware of :term:`location`, so their
+utility in a "real" application is limited.  To make best use of built-in
+:app:`Pyramid` API facilities, your resources should be "location-aware".
+The next section details how to make resources location-aware.
+
+.. index::
+   pair: location-aware; resource
+
+.. _location_aware:
+
+Location-Aware Resources
+------------------------
+
+In order for certain :app:`Pyramid` location, security, URL-generation, and
+traversal APIs to work properly against the resources in a resource tree, all
+resources in the tree must be :term:`location` -aware.  This means they must
+have two attributes: ``__parent__`` and ``__name__``.
+
+The ``__parent__`` attribute of a location-aware resource should be a
+reference to the resource's parent resource instance in the tree.  The
+``__name__`` attribute should be the name with which a resource's parent
+refers to the resource via ``__getitem__``.
+
+The ``__parent__`` of the root resource should be ``None`` and its
+``__name__`` should be the empty string.  For instance:
+
+.. code-block:: python
+   :linenos:
+
+   class MyRootResource(object):
+       __name__ = ''
+       __parent__ = None
+
+A resource returned from the root resource's ``__getitem__`` method should
+have a ``__parent__`` attribute that is a reference to the root resource, and
+its ``__name__`` attribute should match the name by which it is reachable via
+the root resource's ``__getitem__``.  A container resource within the root
+resource should have a ``__getitem__`` that returns resources with a
+``__parent__`` attribute that points at the container, and these subobjects
+should have a ``__name__`` attribute that matches the name by which they are
+retrieved from the container via ``__getitem__``.  This pattern continues
+recursively "up" the tree from the root.
+
+The ``__parent__`` attributes of each resource form a linked list that points
+"upward" toward the root. This is analogous to the `..` entry in filesystem
+directories. If you follow the ``__parent__`` values from any resource in the
+resource tree, you will eventually come to the root resource, just like if
+you keep executing the ``cd ..`` filesystem command, eventually you will
+reach the filesystem root directory.
+
+.. warning:: If your root resource has a ``__name__`` argument
+   that is not ``None`` or the empty string, URLs returned by the
+   :func:`pyramid.url.resource_url` function and paths generated by
+   the :func:`pyramid.traversal.resource_path` and
+   :func:`pyramid.traversal.resource_path_tuple` APIs will be
+   generated improperly.  The value of ``__name__`` will be prepended
+   to every path and URL generated (as opposed to a single leading
+   slash or empty tuple element).
+
+.. sidebar::  Using :mod:`pyramid_traversalwrapper`
+
+  If you'd rather not manage the ``__name__`` and ``__parent__`` attributes
+  of your resources "by hand", an add-on package named
+  :mod:`pyramid_traversalwrapper` can help.
+
+  In order to use this helper feature, you must first install the
+  :mod:`pyramid_traversalwrapper` package (available via PyPI), then register
+  its ``ModelGraphTraverser`` as the traversal policy, rather than the
+  default :app:`Pyramid` traverser. The package contains instructions for
+  doing so.
+
+  Once :app:`Pyramid` is configured with this feature, you will no longer
+  need to manage the ``__parent__`` and ``__name__`` attributes on resource
+  objects "by hand".  Instead, as necessary, during traversal :app:`Pyramid`
+  will wrap each resource (even the root resource) in a ``LocationProxy``
+  which will dynamically assign a ``__name__`` and a ``__parent__`` to the
+  traversed resrouce (based on the last traversed resource and the name
+  supplied to ``__getitem__``).  The root resource will have a ``__name__``
+  attribute of ``None`` and a ``__parent__`` attribute of ``None``.
+
+Applications which use tree-walking :app:`Pyramid` APIs require
+location-aware resources.  These APIs include (but are not limited to)
+:func:`~pyramid.url.resource_url`, :func:`~pyramid.traversal.find_resource`,
+:func:`~pyramid.traversal.find_root`,
+:func:`~pyramid.traversal.find_interface`,
+:func:`~pyramid.traversal.resource_path`,
+:func:`~pyramid.traversal.resource_path_tuple`, or
+:func:`~pyramid.traversal.traverse`, :func:`~pyramid.traversal.virtual_root`,
+and (usually) :func:`~pyramid.security.has_permission` and
+:func:`~pyramid.security.principals_allowed_by_permission`.
+
+In general, since so much :app:`Pyramid` infrastructure depends on
+location-aware resources, it's a good idea to make each resource in your tree
+location-aware, even though location-awareness is not a prerequisite for
+plain traversal.
 
 .. index::
    single: resource interfaces
@@ -179,117 +315,6 @@ directly provided by an instance instead of overwriting them like
 
 For more information about how resource interfaces can be used by view
 configuration, see :ref:`using_resource_interfaces`.
-
-.. index::
-   single: resource tree
-   single: traversal tree
-   single: object tree
-   single: container resources
-   single: leaf resources
-
-Defining a Resource Tree
-------------------------
-
-When :term:`traversal` is used (as opposed to a purely :term:`url dispatch`
-based application), :app:`Pyramid` expects to be able to traverse a tree
-composed of resources (the :term:`resource tree`).  Traversal begins at a
-root resource, and descends into the tree recursively via each resource's
-``__getitem__`` method.  :app:`Pyramid` imposes the following policy on
-resource instances in the tree:
-
-- A container resource (a resource which contains other resources) must
-  supply a ``__getitem__`` method which is willing to resolve a unicode name
-  to a sub-resource.  If a sub-resource by a particular name does not exist
-  in a container resource, ``__getitem__`` method of the container resource
-  must raise a :exc:`KeyError`.  If a sub-resource by that name *does* exist,
-  the container's ``__getitem__`` should return the sub-resource.
-
-- Leaf resources, which do not contain other resources, must not implement a
-  ``__getitem__``, or if they do, their ``__getitem__`` method must raise a
-  :exc:`KeyError`.
-
-See :ref:`traversal_chapter` for more information about how traversal
-works against resource instances.
-
-.. index::
-   pair: location-aware; resource
-
-.. _location_aware:
-
-Location-Aware Resources
-------------------------
-
-Applications which use :term:`traversal` to locate the :term:`context`
-resource of a view must ensure that the resources that make up the
-resource tree are "location aware".
-
-In order for :app:`Pyramid` location, security, URL-generation, and traversal
-functions (i.e., functions in :ref:`location_module`,
-:ref:`traversal_module`, :ref:`url_module` and some in :ref:`security_module`
-) to work properly against the resources in a resource tree, all resources in
-the tree must be :term:`location` -aware.  This means they must have two
-attributes: ``__parent__`` and ``__name__``.
-
-The ``__parent__`` attribute should be a reference to the resource's parent
-resource instance in the tree.  The ``__name__`` attribute should be the name
-with which a resource's parent refers to the resource via ``__getitem__``.
-
-The ``__parent__`` of the root resource should be ``None`` and its
-``__name__`` should be the empty string.  For instance:
-
-.. code-block:: python
-   :linenos:
-
-   class MyRootResource(object):
-       __name__ = ''
-       __parent__ = None
-
-A resource returned from the root resource's ``__getitem__`` method should
-have a ``__parent__`` attribute that is a reference to the root resource, and
-its ``__name__`` attribute should match the name by which it is reachable via
-the root resource's ``__getitem__``.  A container resource within the root
-resource should have a ``__getitem__`` that returns resources with a
-``__parent__`` attribute that points at the container, and these subobjects
-should have a ``__name__`` attribute that matches the name by which they are
-retrieved from the container via ``__getitem__``.  This pattern continues
-recursively "up" the tree from the root.
-
-The ``__parent__`` attributes of each resource form a linked list that points
-"upward" toward the root. This is analogous to the `..` entry in filesystem
-directories. If you follow the ``__parent__`` values from any resource in the
-resource tree, you will eventually come to the root resource, just like if
-you keep executing the ``cd ..`` filesystem command, eventually you will
-reach the filesystem root directory.
-
-.. warning:: If your root resource has a ``__name__`` argument
-   that is not ``None`` or the empty string, URLs returned by the
-   :func:`pyramid.url.resource_url` function and paths generated by
-   the :func:`pyramid.traversal.resource_path` and
-   :func:`pyramid.traversal.resource_path_tuple` APIs will be
-   generated improperly.  The value of ``__name__`` will be prepended
-   to every path and URL generated (as opposed to a single leading
-   slash or empty tuple element).
-
-.. sidebar::  Using :mod:`pyramid_traversalwrapper`
-
-  If you'd rather not manage the ``__name__`` and ``__parent__`` attributes
-  of your resources "by hand", an add-on package named
-  :mod:`pyramid_traversalwrapper` can help.
-
-  In order to use this helper feature, you must first install the
-  :mod:`pyramid_traversalwrapper` package (available via PyPI), then register
-  its ``ModelGraphTraverser`` as the traversal policy, rather than the
-  default :app:`Pyramid` traverser. The package contains instructions for
-  doing so.
-
-  Once :app:`Pyramid` is configured with this feature, you will no longer
-  need to manage the ``__parent__`` and ``__name__`` attributes on resource
-  objects "by hand".  Instead, as necessary, during traversal :app:`Pyramid`
-  will wrap each resource (even the root resource) in a ``LocationProxy``
-  which will dynamically assign a ``__name__`` and a ``__parent__`` to the
-  traversed resrouce (based on the last traversed resource and the name
-  supplied to ``__getitem__``).  The root resource will have a ``__name__``
-  attribute of ``None`` and a ``__parent__`` attribute of ``None``.
 
 .. index::
    single: resource API functions
