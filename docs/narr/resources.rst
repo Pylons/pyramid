@@ -35,7 +35,7 @@ Also:
 
 - The ``context`` and ``containment`` predicate arguments to
   :meth:`pyramid.config.Configurator.add_view` (or a
-  :func:`pyramid.view.view_config` decorator) and reference a resource class
+  :func:`pyramid.view.view_config` decorator) reference a resource class
   or resource :term:`interface`.
 
 - A :term:`root factory` returns a resource.
