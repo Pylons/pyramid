@@ -120,6 +120,34 @@ class ITemplateRenderer(IRenderer):
         accepts arbitrary keyword arguments and returns a string or
         unicode object """
 
+class IFlashMessages(Interface):
+    """ Dictionary-like object which maps flash category names to lists of
+    flash messages.  Also supports an API for obtaining classes of flash
+    message lists."""
+    def custom(name):
+        """ Return a sequence of custom-category flash messages or an empty
+        list if no messages of this custom category existed in the queue."""
+
+    def debug():
+        """ Return a sequence of flash.DEBUG category flash messages or an
+        empty list if no flash.DEBUG messages existed in the queue."""
+    
+    def info():
+        """ Return a sequence of flash.INFO category flash messages or an
+        empty list if no flash.INFO messages existed in the queue."""
+
+    def success():
+        """ Return a sequence of flash.SUCCESS category flash messages or an
+        empty list if no flash.SUCCESS messages existed in the queue."""
+
+    def warning():
+        """ Return a sequence of flash.WARNING category flash messages or an
+        empty list if no flash.WARNING messages existed in the queue."""
+
+    def error():
+        """ Return a sequence of flash.ERROR category flash messages or an
+        empty list if no flash.ERROR messages existed in the queue."""
+
 # internal interfaces
 
 class IRequest(Interface):
@@ -459,6 +487,18 @@ class ISession(Interface):
         ``session['foo']['a'] = 1``, ``changed()`` must be called for
         the sessioning machinery to notice the mutation of the
         internal dictionary."""
+
+    def flash(msg, category='info', queue_name=''):
+        """ Push a flash message onto the stack related to the category and
+        queue name.  Multiple flash message queues can be managed by passing
+        an optional ``queue_name``. Default category names are 'debug',
+        'info', 'success', 'warning', and 'error' (these have constant names
+        importable from the ``pyramid.flash`` module).  A custom category
+        name is also permitted."""
+
+    def unflash(queue_name=''):
+        """ Pop a queue from the flash message storage.  This method returns
+        an object which implements ``pyramid.interfaces.IFlashMessages``"""
 
     # mapping methods
     

@@ -9,6 +9,9 @@ Features
   generate a URL, overriding the default logic.  See the new "Generating The
   URL Of A Resource" section within the Resources narrative chapter.
 
+- Added flash messaging, as described in the "Flash Messaging" narrative
+  documentation chapter.
+
 Documentation
 -------------
 
@@ -32,6 +35,8 @@ Documentation
 
 - Added "Finding a Resource With a Class or Interface in Lineage" to
   Resources narrative chapter.
+
+- Added a "Flash Messaging" narrative documentation chapter.
 
 1.0a7 (2010-12-20)
 ==================

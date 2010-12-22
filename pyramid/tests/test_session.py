@@ -112,6 +112,61 @@ class TestUnencryptedCookieSession(unittest.TestCase):
         self.assertEqual(secure, 'secure')
         self.assertEqual(httponly, 'HttpOnly')
 
+    def test_flash_default(self):
+        request = testing.DummyRequest()
+        session = self._makeOne(request)
+        session.flash('msg1')
+        session.flash('msg2')
+        self.assertEqual(dict(session['_f_']),
+                         {'info':['msg1', 'msg2']})
+        
+    def test_flash_mixed(self):
+        from pyramid import flash
+        request = testing.DummyRequest()
+        session = self._makeOne(request)
+        session.flash('warn1', flash.WARNING)
+        session.flash('warn2', flash.WARNING)
+        session.flash('err1', flash.ERROR)
+        session.flash('err2', flash.ERROR)
+        self.assertEqual(dict(session['_f_']),
+                         {flash.WARNING:['warn1', 'warn2'],
+                          flash.ERROR:['err1', 'err2']})
+
+    def test_flash_with_nondefault_queue(self):
+        from pyramid import flash
+        request = testing.DummyRequest()
+        session = self._makeOne(request)
+        session.flash('one_1', queue_name='one')
+        session.flash('one_2', queue_name='one')
+        session.flash('two_1', queue_name='two')
+        session.flash('two_2', queue_name='two')
+        self.assertEqual(dict(session['_f_one']),
+                         {flash.INFO:['one_1', 'one_2']})
+        self.assertEqual(dict(session['_f_two']),
+                         {flash.INFO:['two_1', 'two_2']})
+
+    def test_unflash_default_queue(self):
+        from pyramid import flash
+        from pyramid.interfaces import IFlashMessages
+        request = testing.DummyRequest()
+        session = self._makeOne(request)
+        storage = {flash.INFO:['one', 'two']}
+        session['_f_'] = storage
+        result = session.unflash()
+        self.assertEqual(dict(result), storage)
+        self.failUnless(IFlashMessages.providedBy(result))
+
+    def test_unflash_nodefault_queue(self):
+        from pyramid import flash
+        from pyramid.interfaces import IFlashMessages
+        request = testing.DummyRequest()
+        session = self._makeOne(request)
+        storage = {flash.INFO:['one', 'two']}
+        session['_f_one'] = storage
+        result = session.unflash('one')
+        self.assertEqual(dict(result), storage)
+        self.failUnless(IFlashMessages.providedBy(result))
+
 class Test_manage_accessed(unittest.TestCase):
     def _makeOne(self, wrapped):
         from pyramid.session import manage_accessed

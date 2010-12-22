@@ -35,3 +35,4 @@ Other Interfaces
 
   .. autointerface:: ITemplateRenderer
 
+  .. autointerface:: IFlashMessages

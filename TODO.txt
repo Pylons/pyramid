@@ -6,8 +6,6 @@ Must-Have (before 1.0)
 
 - Narrative docs for ``Configurator.include`` and ``Configurator.commit``.
 
-- Provide a .flash API on session object.
-
 - Consider deprecations for ``model`` and ``resource`` APIs.
 
 Should-Have

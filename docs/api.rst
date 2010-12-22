@@ -15,6 +15,7 @@ documentation is organized alphabetically by module name.
    api/config
    api/events
    api/exceptions
+   api/flash
    api/httpexceptions
    api/i18n
    api/interfaces

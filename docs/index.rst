@@ -48,6 +48,7 @@ Narrative documentation in chapter form explaining how to use
    narr/static
    narr/webob
    narr/sessions
+   narr/flash
    narr/security
    narr/hybrid
    narr/i18n

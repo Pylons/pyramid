@@ -10,6 +10,8 @@ A :term:`session` is a namespace which is valid for some period of
 continual activity that can be used to represent a user's interaction
 with a web application.
 
+.. _using_the_default_session_factory:
+
 Using The Default Session Factory
 ---------------------------------
 
@@ -130,6 +132,8 @@ Some gotchas:
 .. index::
    single: pyramid_beaker
    single: Beaker
+
+.. _using_alternate_session_factories:
 
 Using Alternate Session Factories
 ---------------------------------

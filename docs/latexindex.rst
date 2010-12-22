@@ -41,6 +41,7 @@ Narrative Documentation
    narr/static
    narr/webob
    narr/sessions
+   narr/flash
    narr/security
    narr/hybrid
    narr/i18n
@@ -88,6 +89,7 @@ API Reference
    api/config
    api/events
    api/exceptions
+   api/flash
    api/httpexceptions
    api/i18n
    api/interfaces
