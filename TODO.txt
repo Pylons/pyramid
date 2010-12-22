@@ -11,6 +11,8 @@ Must-Have (before 1.0)
 Should-Have
 -----------
 
+- Add narrative docs for wsgiapp and wsgiapp2.
+
 - Add docs for httpexceptions module for each webob.exc class that inherits
   from WSGIHTTPException.
 
