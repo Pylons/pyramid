@@ -18,7 +18,6 @@ import base64
 from zope.interface import implements
 
 from pyramid.interfaces import ISession
-from pyramid import flash
 
 def manage_accessed(wrapped):
     """ Decorator which causes a cookie to be set when a wrapped
@@ -170,15 +169,19 @@ def UnencryptedCookieSessionFactoryConfig(
 
         # flash API methods
         @manage_accessed
-        def flash(self, msg, category=flash.INFO, queue_name=''):
-            storage = self.setdefault('_f_' + queue_name, {})
-            category = storage.setdefault(category, [])
-            category.append(msg)
+        def flash(self, msg, queue='', allow_duplicate=True):
+            storage = self.setdefault('_f_' + queue, [])
+            if allow_duplicate or (msg not in storage):
+                storage.append(msg)
 
         @manage_accessed
-        def unflash(self, queue_name=''):
-            storage = self.pop('_f_' + queue_name, {})
-            return flash.FlashMessages(storage)
+        def pop_flash(self, queue=''):
+            storage = self.pop('_f_' + queue, [])
+            return storage
+
+        def peek_flash(self, queue=''):
+            storage = self.get('_f_' + queue, [])
+            return storage
 
         # non-API methods
         def _set_cookie(self, response):
