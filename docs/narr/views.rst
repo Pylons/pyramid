@@ -3,7 +3,7 @@
 Views
 =====
 
-One of the primary jobs of :app:`Pyramid` is is to find and invoke a
+One of the primary jobs of :app:`Pyramid` is to find and invoke a
 :term:`view callable` when a :term:`request` reaches your application.  View
 callables are bits of code which do something interesting in response to a
 request made to your application.
