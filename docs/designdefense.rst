@@ -1250,7 +1250,7 @@ The contents of ``config.py``:
 
 If we cd to the directory that holds these files and we run ``python
 app.py`` given the directory structure and code above, what happens?
-Presuably, our ``decorator`` decorator will be used twice, once by the
+Presumably, our ``decorator`` decorator will be used twice, once by the
 decorated function ``foo`` in ``app.py`` and once by the decorated
 function ``bar`` in ``app2.py``.  Since each time the decorator is
 used, the list ``L`` in ``config.py`` is appended to, we'd expect a
