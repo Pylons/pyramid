@@ -3788,16 +3788,18 @@ class Test__map_view(unittest.TestCase):
         request = self._makeRequest()
         self.assertEqual(result(None, request).body, 'Hello!')
 
-class Test_decorate_view(unittest.TestCase):
-    def _callFUT(self, wrapped, original):
-        from pyramid.config import decorate_view
-        return decorate_view(wrapped, original)
+class Test_preserve_attrs(unittest.TestCase):
+    def _callFUT(self, fn, view):
+        from pyramid.config import preserve_attrs
+        return preserve_attrs(fn)(None, view)
 
     def test_it_same(self):
         def view(context, request):
             """ """
-        result = self._callFUT(view, view)
-        self.assertEqual(result, False)
+        def afunc(self, view):
+            return view
+        result = self._callFUT(afunc, view)
+        self.failUnless(result is view)
 
     def test_it_different(self):
         class DummyView1:
@@ -3826,8 +3828,10 @@ class Test_decorate_view(unittest.TestCase):
                 """ """
         view1 = DummyView1()
         view2 = DummyView2()
-        result = self._callFUT(view1, view2)
-        self.assertEqual(result, True)
+        def afunc(self, view):
+            return view1
+        result = self._callFUT(afunc, view2)
+        self.assertEqual(result, view1)
         self.failUnless(view1.__doc__ is view2.__doc__)
         self.failUnless(view1.__module__ is view2.__module__)
         self.failUnless(view1.__name__ is view2.__name__)
