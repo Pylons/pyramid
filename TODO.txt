@@ -18,10 +18,6 @@ Should-Have
 
 - translationdir ZCML directive use of ``path_spec`` should maybe die.
 
-- Add CRSF token creation/checking machinery (only "should have" vs. "must
-  have" because I'm not sure it belongs in Pyramid.. it definitely must exist
-  in formgen libraries, and *might* belong in Pyramid).
-
 - Change "Cleaning up After a Request" in the urldispatch chapter to
   use ``request.add_response_callback``.
 

@@ -12,6 +12,9 @@ Features
 - Added flash messaging, as described in the "Flash Messaging" narrative
   documentation chapter.
 
+- Added CSRF token generation, as described in the narrative chapter entitled
+  "Preventing Cross-Site Request Forgery Attacks".
+
 Documentation
 -------------
 
@@ -37,6 +40,9 @@ Documentation
   Resources narrative chapter.
 
 - Added a "Flash Messaging" narrative documentation chapter.
+
+- Added a narrative chapter entitled "Preventing Cross-Site Request Forgery
+  Attacks".
 
 1.0a7 (2010-12-20)
 ==================

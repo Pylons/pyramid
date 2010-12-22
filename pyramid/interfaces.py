@@ -477,7 +477,18 @@ class ISession(Interface):
         """ Peek at a queue in the flash storage.  The queue remains in
         flash storage after this message is called.  The queue is returned;
         it is a list of flash messages added by
-        :meth:`pyramid.interfaces.ISesssion.flash`"""
+        :meth:`pyramid.interfaces.ISesssion.flash`
+        """
+
+    def new_csrf_token(self):
+        """ Create and set into the session a new, random cross-site request
+        forgery protection token.  Return the token.  It will be a string."""
+
+    def pop_csrf_token(self):
+        """ Pop any CSRF token previously added to the session via
+        ``new_csrf_token``, and return the token.  If no CSRF token exists,
+        the value returned will be ``None``.
+        """
 
     # mapping methods
     
