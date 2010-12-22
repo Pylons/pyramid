@@ -31,9 +31,6 @@ Should-Have
 Nice-to-Have
 ------------
 
-- Use ``@register_view`` instead of ``@view_config`` and change view docs to
-  use "view registration" instead of "view configuration".
-
 - Try to make test suite pass on IronPython.
 
 - Non-bwcompat use of threadlocals that need to be documented or ameliorated:
