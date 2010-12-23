@@ -35,7 +35,7 @@ When you're done, your ``__init__.py`` will look like so:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :linenos:
-   :language: xml
+   :language: python
 
 Note that the creation of an ``AuthTktAuthenticationPolicy`` requires two
 arguments: ``secret`` and ``callback``.  ``secret`` is a string representing
