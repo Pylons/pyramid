@@ -256,7 +256,8 @@ def resource_url(resource, request, *elements, **kw):
     e.g. ``http://example.com?foo=1#bar``.
 
     If the ``resource`` passed in has a ``__resource_url__`` method, it will
-    be used to generate the URL that is returned by this function.  See also
+    be used to generate the URL (scheme, host, port, path) that for the base
+    resource which is operated upon by this function.  See also
     :ref:`overriding_resource_url_generation`.
 
     .. note:: If the :term:`resource` used is the result of a
