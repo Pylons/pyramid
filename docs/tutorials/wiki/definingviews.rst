@@ -118,7 +118,7 @@ The ``add_page`` view function
 ------------------------------
 
 The ``add_page`` function will be configured to respond when the context is a
-Wiki and the :term:`view_name` is ``add_page``.  We'll provide it with a
+Wiki and the :term:`view name` is ``add_page``.  We'll provide it with a
 ``@view_config`` decorator which names the string ``add_page`` as its
 :term:`view name` (via name=), the class ``tutorial.models.Wiki`` as its
 context, and the renderer named ``templates/edit.pt``.  This means that when
@@ -165,7 +165,7 @@ The ``edit_page`` view function
 -------------------------------
 
 The ``edit_page`` function will be configured to respond when the context is
-a Page and the :term:`view_name` is ``edit_page``.  We'll provide it with a
+a Page and the :term:`view name` is ``edit_page``.  We'll provide it with a
 ``@view_config`` decorator which names the string ``edit_page`` as its
 :term:`view name` (via name=), the class ``tutorial.models.Page`` as its
 context, and the renderer named ``templates/edit.pt``.  This means that when

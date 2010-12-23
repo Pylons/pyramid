@@ -845,4 +845,10 @@ Glossary
      `WebTest <http://pythonpaste.org/webtest/>`_ is a package which can help
      you write functional tests for your WSGI application.
 
+   WebError
+     WSGI middleware which can display debuggable traceback information in
+     the browser when an exception is raised by a Pyramid application.  See
+     http://pypi.python.org/pypi/WebError .
+ 
+
 
