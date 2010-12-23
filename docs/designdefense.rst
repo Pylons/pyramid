@@ -610,7 +610,7 @@ The ``repoze.bfg`` documentation used to refer to the graph being traversed
 when :term:`traversal` is used as a "model graph".  A terminology overlap
 confused people who wrote applications that always use ORM packages such as
 SQLAlchemy, which has a different notion of the definition of a "model".  As
-a sresult, in Pyramid 1.0a7, the tree of objects traversed is now renamed to
+a result, in Pyramid 1.0a7, the tree of objects traversed is now renamed to
 :term:`resource tree` and its components are now named :term:`resource`
 objects.  Associated APIs have been changed.  This hopefully alleviates the
 terminology confusion caused by overriding the term "model".
