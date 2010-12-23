@@ -227,7 +227,7 @@ def resource_url(resource, request, *elements, **kw):
     a data structure with an ``.items()`` method that returns a
     sequence of two-tuples (presumably a dictionary).  This data
     structure will be turned into a query string per the documentation
-    of ``repoze.url.urlencode`` function.  After the query data is
+    of ``pyramid.url.urlencode`` function.  After the query data is
     turned into a query string, a leading ``?`` is prepended, and the
     resulting string is appended to the generated URL.
 
