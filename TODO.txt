@@ -24,6 +24,8 @@ Should-Have
 - ``decorator=`` parameter to view_config.  This would replace the existing
   _map_view "decorator" if it existed.
 
+- Static (URL-generation only) routes.
+
 Nice-to-Have
 ------------
 
