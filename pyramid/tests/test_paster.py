@@ -50,7 +50,8 @@ class TestPShellCommand(unittest.TestCase):
         pushed = app.threadlocal_manager.pushed[0]
         self.assertEqual(pushed['registry'], dummy_registry)
         self.assertEqual(pushed['request'].registry, dummy_registry)
-        self.assertEqual(dummy_shell_factory.shell.local_ns,{'root':dummy_root})
+        self.assertEqual(dummy_shell_factory.shell.local_ns,
+                         {'root':dummy_root, 'registry':dummy_registry})
         self.assertEqual(dummy_shell_factory.shell.global_ns, {})
         self.failUnless('\n\n' in dummy_shell_factory.shell.IP.BANNER)
         self.assertEqual(len(app.threadlocal_manager.popped), 1)

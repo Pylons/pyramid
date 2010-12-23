@@ -1,6 +1,12 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
+- The name ``registry`` was not available in the ``paster pshell``
+  environment under IPython.
+
 Features
 --------
 

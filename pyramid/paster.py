@@ -123,7 +123,8 @@ class PShellCommand(Command):
         root, closer = self.get_root(app)
         if IPShell is not None and not self.options.disable_ipython:
             try:
-                shell = IPShell(argv=[], user_ns={'root':root})
+                shell = IPShell(argv=[], user_ns={'root':root,
+                                                  'registry':app.registry})
                 shell.IP.BANNER = shell.IP.BANNER + '\n\n' + banner
                 shell.mainloop()
             finally:
