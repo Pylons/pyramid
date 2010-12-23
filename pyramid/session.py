@@ -193,8 +193,8 @@ def UnencryptedCookieSessionFactoryConfig(
             return token
 
         @manage_accessed
-        def pop_csrf_token(self):
-            return self.pop('_csrft_', None)
+        def get_csrf_token(self):
+            return self.get('_csrft_', None)
 
         # non-API methods
         def _set_cookie(self, response):

@@ -484,8 +484,8 @@ class ISession(Interface):
         """ Create and set into the session a new, random cross-site request
         forgery protection token.  Return the token.  It will be a string."""
 
-    def pop_csrf_token(self):
-        """ Pop any CSRF token previously added to the session via
+    def get_csrf_token(self):
+        """ Get the CSRF token previously added to the session via
         ``new_csrf_token``, and return the token.  If no CSRF token exists,
         the value returned will be ``None``.
         """
