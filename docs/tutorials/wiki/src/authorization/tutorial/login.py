@@ -1,15 +1,16 @@
 from pyramid.httpexceptions import HTTPFound
 
+from pyramid.security import remember
+from pyramid.security import forget
 from pyramid.view import view_config
 from pyramid.url import resource_url
 
-from pyramid.security import remember
-from pyramid.security import forget
-
-from tutorial.models import Wiki
 from tutorial.security import USERS
 
-@view_config(context=Wiki, name='login', renderer='templates/login.pt')
+@view_config(context='pyramid.exceptions.Forbidden',
+             renderer='templates/login.pt')
+@view_config(context='tutorial.models.Wiki', name='login',
+             renderer='templates/login.pt')
 def login(request):
     login_url = resource_url(request.context, request, 'login')
     referrer = request.url
@@ -36,7 +37,7 @@ def login(request):
         password = password,
         )
     
-@view_config(context=Wiki, name='logout')
+@view_config(context='tutorial.models.Wiki', name='logout')
 def logout(request):
     headers = forget(request)
     return HTTPFound(location = resource_url(request.context, request),

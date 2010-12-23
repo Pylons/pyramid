@@ -22,7 +22,6 @@ tutorial can be browsed at
    basiclayout
    definingmodels
    definingviews
-   viewdecorators
    authorization
    distributing
 

@@ -15,6 +15,12 @@ Features
 - Added CSRF token generation, as described in the narrative chapter entitled
   "Preventing Cross-Site Request Forgery Attacks".
 
+Paster Templates
+----------------
+
+- The ``pyramid_zodb`` Paster template no longer employs ZCML.  Instead, it
+  is based on scanning.
+
 Documentation
 -------------
 
@@ -43,6 +49,9 @@ Documentation
 
 - Added a narrative chapter entitled "Preventing Cross-Site Request Forgery
   Attacks".
+
+- Changed the "ZODB + Traversal Wiki Tutorial" based on changes to
+  ``pyramid_zodb`` Paster template.
 
 1.0a7 (2010-12-20)
 ==================

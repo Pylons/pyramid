@@ -2,14 +2,13 @@
 Adding Authorization
 ====================
 
-Our application currently allows anyone with access to the server to
-view, edit, and add pages to our wiki.  For purposes of demonstration
-we'll change our application to allow people whom are members of a
-*group* named ``group:editors`` to add and edit wiki pages but we'll
-continue allowing anyone with access to the server to view pages.
-:app:`Pyramid` provides facilities for *authorization* and
-*authentication*.  We'll make use of both features to provide security
-to our application.
+Our application currently allows anyone with access to the server to view,
+edit, and add pages to our wiki.  For purposes of demonstration we'll change
+our application to allow people whom are members of a *group* named
+``group:editors`` to add and edit wiki pages but we'll continue allowing
+anyone with access to the server to view pages.  :app:`Pyramid` provides
+facilities for *authorization* and *authentication*.  We'll make use of both
+features to provide security to our application.
 
 The source code for this tutorial stage can be browsed via
 `http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/authorization/
@@ -19,33 +18,31 @@ The source code for this tutorial stage can be browsed via
 Configuring a ``pyramid`` Authentication Policy
 --------------------------------------------------
 
-For any :app:`Pyramid` application to perform authorization, we
-need to add a ``security.py`` module and we'll need to change our
-:term:`application registry` to add an :term:`authentication policy`
-and a :term:`authorization policy`.
+For any :app:`Pyramid` application to perform authorization, we need to add a
+``security.py`` module and we'll need to change our :term:`application
+registry` to add an :term:`authentication policy` and a :term:`authorization
+policy`.
 
-Changing ``configure.zcml``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Changing ``__init__.py``
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-We'll change our ``configure.zcml`` file to enable an
-``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy`` to
-enable declarative security checking.  We'll also add a new view
-stanza, which specifies a :term:`forbidden view`.  This configures our
-login view to show up when :app:`Pyramid` detects that a view
-invocation can not be authorized.  When you're done, your
-``configure.zcml`` will look like so:
+We'll change our ``__init__.py`` file to enable an
+``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy`` to enable
+declarative security checking.  We'll also add a new view stanza, which
+specifies a :term:`forbidden view`.  This configures our login view to show
+up when :app:`Pyramid` detects that a view invocation can not be authorized.
+When you're done, your ``__init__.py`` will look like so:
 
-.. literalinclude:: src/authorization/tutorial/configure.zcml
+.. literalinclude:: src/authorization/tutorial/__init__.py
    :linenos:
    :language: xml
 
-Note that the ``authtktauthenticationpolicy`` tag has two attributes:
-``secret`` and ``callback``.  ``secret`` is a string representing an
-encryption key used by the "authentication ticket" machinery
-represented by this policy: it is required.  The ``callback`` is a
-string, representing a :term:`dotted Python name`, which points at the
-``groupfinder`` function in the current directory's ``security.py``
-file.  We haven't added that module yet, but we're about to.
+Note that the creation of an ``AuthTktAuthenticationPolicy`` requires two
+arguments: ``secret`` and ``callback``.  ``secret`` is a string representing
+an encryption key used by the "authentication ticket" machinery represented
+by this policy: it is required.  The ``callback`` is a reference to a
+``groupfinder`` function in the ``tutorial`` package's ``security.py`` file.
+We haven't added that module yet, but we're about to.
 
 Adding ``security.py``
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -59,14 +56,13 @@ content:
    :language: python
 
 The ``groupfinder`` function defined here is an authorization policy
-"callback"; it is a callable that accepts a userid and a request.  If
-the userid exists in the set of users known by the system, the
-callback will return a sequence of group identifiers (or an empty
-sequence if the user isn't a member of any groups).  If the userid
-*does not* exist in the system, the callback will return ``None``.  In
-a production system this data will most often come from a database,
-but here we use "dummy" data to represent user and groups
-sources. Note that the ``editor`` user is a member of the
+"callback"; it is a callable that accepts a userid and a request.  If the
+userid exists in the set of users known by the system, the callback will
+return a sequence of group identifiers (or an empty sequence if the user
+isn't a member of any groups).  If the userid *does not* exist in the system,
+the callback will return ``None``.  In a production system this data will
+most often come from a database, but here we use "dummy" data to represent
+user and groups sources. Note that the ``editor`` user is a member of the
 ``group:editors`` group in our dummy group data (the ``GROUPS`` data
 structure).
 
