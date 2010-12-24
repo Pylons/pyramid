@@ -14,6 +14,9 @@ Must-Have (before 1.0)
 
 - Add an example of serving a static asset from the root using a view.
 
+- Add an example of serving a static asset using a view by setting
+  response.app_iter and the response content-type/content-disposition.
+
 - Add an example of using a cascade to serve static assets from the root.
 
 - Explore static file return from handler action using wsgiapp2 + fileapp.
