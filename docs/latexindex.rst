@@ -51,6 +51,7 @@ Narrative Documentation
    narr/environment
    narr/testing
    narr/hooks
+   narr/advconfig
    narr/declarative
    narr/extending
    narr/assets

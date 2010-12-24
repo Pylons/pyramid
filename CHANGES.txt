@@ -59,6 +59,10 @@ Documentation
 - Changed the "ZODB + Traversal Wiki Tutorial" based on changes to
   ``pyramid_zodb`` Paster template.
 
+- Added "Advanced Configuration" narrative chapter which documents how to
+  deal with configuration conflicts, two-phase configuration, ``include`` and
+  ``commit``.
+
 - Fix API documentation rendering for ``pyramid.view.static``
 
 1.0a7 (2010-12-20)
