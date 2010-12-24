@@ -378,4 +378,10 @@ The same is untrue when you use an *autocommitting* configurator (see
 used, two-phase configuration is disabled, and configuration statements must
 be ordered in dependency order.
 
+Some configuration methods, such as
+:meth:`pyramid.config.Configurator.add_route` and
+:meth:`pyramid.config.Configurator.add_handler` have internal ordering
+constraints: they routes they imply require relative ordering.  Such ordering
+constraints are not absolved by two-phase configuration.  Routes are still
+added in configuration execution order.
 
