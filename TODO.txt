@@ -8,6 +8,15 @@ Must-Have (before 1.0)
 
 - Consider deprecations for ``model`` and ``resource`` APIs.
 
+- Fix add_static_view docs to mention: static views cannot be served from the
+  root, that "name" really means "prefix", and that a non-URL prefix can be a
+  path with slashes in it.
+
+- Add an example of serving a static asset from the root using a view.
+
+- Add an example of using a cascade to serve static assets from the root.
+
+
 Should-Have
 -----------
 
@@ -25,6 +34,9 @@ Should-Have
   _map_view "decorator" if it existed.
 
 - Static (URL-generation only) routes.
+
+- Provide a response_set_cookie method on the request for rendered responses
+  that can be used as input to response.set_cookie?
 
 Nice-to-Have
 ------------
@@ -81,9 +93,6 @@ Nice-to-Have
        request_method = 'GET'
          action = '^foo$'
            mypackage.views.MyView.foo_GET
-
-- Provide a response_cookies attribute on the request for rendered
-  responses that can be used as input to response.set_cookie.
 
 - Raise an exception when a value in response_headerlist is not a
   string or decide to encode.
