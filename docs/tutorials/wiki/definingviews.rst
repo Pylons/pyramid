@@ -7,9 +7,10 @@ Conventionally, :term:`view callable` objects are defined within a
 automagically special about the filename ``views.py``.  Files implementing
 views often have ``view`` in their filenames (or may live in a Python
 subpackage of your application package named ``views``), but this is only by
-convention.  However, a project may have many views throughout its codebase
-in arbitrarily-named files.  In this application, we'll be continuing to use
-the ``views.py`` module, because there's no reason to break convention.
+convention.  A project may have many views throughout its codebase in
+arbitrarily-named files.  In this application, however, we'll be continuing
+to use the ``views.py`` module, because there's no reason to break
+convention.
 
 A :term:`view callable` in a :app:`Pyramid` application is typically a simple
 Python function that accepts a single parameter: :term:`request`.  A view
