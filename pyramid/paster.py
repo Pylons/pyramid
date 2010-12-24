@@ -121,18 +121,17 @@ class PShellCommand(Command):
         self.logging_file_config(config_file)
         app = self.get_app(config_file, section_name, loadapp=self.loadapp[0])
         root, closer = self.get_root(app)
+        shell_globals = {'root':root, 'registry':app.registry}
         if IPShell is not None and not self.options.disable_ipython:
             try:
-                shell = IPShell(argv=[], user_ns={'root':root,
-                                                  'registry':app.registry})
+                shell = IPShell(argv=[], user_ns=shell_globals)
                 shell.IP.BANNER = shell.IP.BANNER + '\n\n' + banner
                 shell.mainloop()
             finally:
                 closer()
         else:
             try:
-                self.interact[0](banner,
-                                 local={'root':root,'registry':app.registry})
+                self.interact[0](banner, local=shell_globals)
             finally:
                 closer()
 
