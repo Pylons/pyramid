@@ -22,7 +22,8 @@ Must-Have (before 1.0)
 - Explore static file return from handler action using wsgiapp2 + fileapp.
 
 - Document ``config.add_route('catchall', '/*subpath',
-  view=static_view('some:asset/spec'))``
+  view=pyramid.views.static('some:asset/spec'))``, and explain that
+  ``static`` requires ``subpath``.
 
 Should-Have
 -----------
