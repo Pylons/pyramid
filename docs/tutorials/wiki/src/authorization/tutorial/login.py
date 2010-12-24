@@ -7,9 +7,9 @@ from pyramid.url import resource_url
 
 from tutorial.security import USERS
 
-@view_config(context='pyramid.exceptions.Forbidden',
-             renderer='templates/login.pt')
 @view_config(context='tutorial.models.Wiki', name='login',
+             renderer='templates/login.pt')
+@view_config(context='pyramid.exceptions.Forbidden',
              renderer='templates/login.pt')
 def login(request):
     login_url = resource_url(request.context, request, 'login')

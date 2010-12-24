@@ -18,19 +18,22 @@ callable is assumed to return a :term:`response` object.
 
 However, a :app:`Pyramid` view can also be defined as callable which accepts
 *two* arguments: a :term:`context` and a :term:`request`.  In :term:`url
-dispatch` based applications, the context object is rarely used in the view
+dispatch` based applications, the context resource is rarely used in the view
 body itself, so within code that uses URL-dispatch-only, it's common to
-define views as callables that accept only a request to avoid the visual
-"noise".  This application, however, uses :term:`traversal` to map URLs to
-resources, so we're often interested in the context; it's not "noise" to use.
+define views as callables that accept only a ``request`` to avoid the visual
+"noise" of a ``context`` argument.  This application, however, uses
+:term:`traversal` to map URLs to a context :term:`resource`, and since our
+:term:`resource tree` also represents our application's "domain model", we're
+often interested in the context, because it represents the persistent storage
+of our application.  For this reason, having ``context`` in the callable
+argument list is not "noise" to us; instead it's actually rather important
+within the view code we'll define in this application.
 
 The single-arg (``request`` -only) or two-arg (``context`` and ``request``)
 calling conventions will work in any :app:`Pyramid` application for any view;
-they can be used interchangeably as necessary.  In :term:`traversal` based
-applications, such as the application we're building in this tutorial, the
-context is used frequently within the body of a view method, so we'll be
-using the two-argument ``(context, request)`` syntax in this application for
-views that we add.
+they can be used interchangeably as necessary.  We'll be using the
+two-argument ``(context, request)`` view callable argument list syntax in
+this application.
 
 We're going to define several :term:`view callable` functions then wire them
 into :app:`Pyramid` using some :term:`view configuration`.
@@ -43,7 +46,7 @@ Adding View Functions
 =====================
 
 We're going to add four :term:`view callable` functions to our ``views.py``
-module.  One view (named ``view_wiki``) will display the wiki itself (it will
+module.  One view named ``view_wiki`` will display the wiki itself (it will
 answer on the root URL), another named ``view_page`` will display an
 individual page, another named ``add_page`` will allow a page to be added,
 and a final view named ``edit_page`` will allow a page to be edited.
@@ -52,36 +55,35 @@ The ``view_wiki`` view function
 -------------------------------
 
 The ``view_wiki`` function will be configured to respond as the default view
-callable for a ``Wiki`` resource object.  We'll provide it with a
-``@view_config`` decorator which names the class ``tutorial.models.Wiki`` as
-its context.  This means that when a Wiki object is the context, and no
-:term:`view name` exists in the request, this view will be used.  The view
-configuration associated with ``view_wiki`` does not use a ``renderer``
-because the view callable always returns a :term:`response` object rather
-than a dictionary.  No renderer is necessary when a view returns a response
-object.
+callable for a Wiki resource.  We'll provide it with a ``@view_config``
+decorator which names the class ``tutorial.models.Wiki`` as its context.
+This means that when a Wiki resource is the context, and no :term:`view name`
+exists in the request, this view will be used.  The view configuration
+associated with ``view_wiki`` does not use a ``renderer`` because the view
+callable always returns a :term:`response` object rather than a dictionary.
+No renderer is necessary when a view returns a response object.
 
-The view callable always redirects to the ``Page`` object named "FrontPage".
-It returns an instance of the :class:`pyramid.httpexceptions.HTTPFound` class
-(instances of which implement the WebOb :term:`response` interface), and the
-:func:`pyramid.url.resource_url` API.  :func:`pyramid.url.resource_url`
-constructs a URL to the ``FrontPage`` page resource
-(e.g. ``http://localhost:6543/FrontPage``), and uses it as the "location" of
-the HTTPFound response, forming an HTTP redirect.
+The ``view_wiki`` view callable always redirects to the URL of a Page
+resource named "FrontPage".  To do so, it returns an instance of the
+:class:`pyramid.httpexceptions.HTTPFound` class (instances of which implement
+the WebOb :term:`response` interface).  The :func:`pyramid.url.resource_url`
+API.  :func:`pyramid.url.resource_url` constructs a URL to the ``FrontPage``
+page resource (e.g. ``http://localhost:6543/FrontPage``), and uses it as the
+"location" of the HTTPFound response, forming an HTTP redirect.
 
 The ``view_page`` view function
 -------------------------------
 
 The ``view_page`` function will be configured to respond as the default view
-of a ``Page`` resource.  We'll provide it with a ``@view_config`` decorator
-which names the class ``tutorial.models.Wiki`` as its context.  This means
-that when a Page object is the context, and no :term:`view name` exists in
-the request, this view will be used.  We inform :app:`Pyramid` this view will
-use the ``templates/view.pt`` template file as a ``renderer``.
+of a Page resource.  We'll provide it with a ``@view_config`` decorator which
+names the class ``tutorial.models.Wiki`` as its context.  This means that
+when a Page resource is the context, and no :term:`view name` exists in the
+request, this view will be used.  We inform :app:`Pyramid` this view will use
+the ``templates/view.pt`` template file as a ``renderer``.
 
 The ``view_page`` function generates the :term:`ReStructuredText` body of a
 page (stored as the ``data`` attribute of the context passed to the view; the
-context will be a Page object) as HTML.  Then it substitutes an HTML anchor
+context will be a Page resource) as HTML.  Then it substitutes an HTML anchor
 for each *WikiWord* reference in the rendered HTML using a compiled regular
 expression.
 
@@ -96,7 +98,7 @@ substitution value and returns it.
 
 As a result, the ``content`` variable is now a fully formed bit of HTML
 containing various view and add links for WikiWords based on the content of
-our current page object.
+our current page resource.
 
 We then generate an edit URL (because it's easier to do here than in the
 template), and we wrap up a number of arguments in a dictionary and return
@@ -118,13 +120,13 @@ callable.  In the ``view_wiki`` view callable, we unconditionally return a
 The ``add_page`` view function
 ------------------------------
 
-The ``add_page`` function will be configured to respond when the context is a
-Wiki and the :term:`view name` is ``add_page``.  We'll provide it with a
-``@view_config`` decorator which names the string ``add_page`` as its
-:term:`view name` (via name=), the class ``tutorial.models.Wiki`` as its
+The ``add_page`` function will be configured to respond when the context
+resource is a Wiki and the :term:`view name` is ``add_page``.  We'll provide
+it with a ``@view_config`` decorator which names the string ``add_page`` as
+its :term:`view name` (via name=), the class ``tutorial.models.Wiki`` as its
 context, and the renderer named ``templates/edit.pt``.  This means that when
-a Wiki object is the context, and a :term:`view name` exists as the result of
-traverasal named ``add_page``, this view will be used.  We inform
+a Wiki resource is the context, and a :term:`view name` named ``add_page``
+exists as the result of traversal, this view will be used.  We inform
 :app:`Pyramid` this view will use the ``templates/edit.pt`` template file as
 a ``renderer``.  We share the same template between add and edit views, thus
 ``edit.pt`` instead of ``add.pt``.
@@ -132,9 +134,9 @@ a ``renderer``.  We share the same template between add and edit views, thus
 The ``add_page`` function will be invoked when a user clicks on a WikiWord
 which isn't yet represented as a page in the system.  The ``check`` function
 within the ``view_page`` view generates URLs to this view.  It also acts as a
-handler for the form that is generated when we want to add a page object.
-The ``context`` of the ``add_page`` view is always a Wiki object (*not* a
-Page object).
+handler for the form that is generated when we want to add a page resource.
+The ``context`` of the ``add_page`` view is always a Wiki resource (*not* a
+Page resource).
 
 The request :term:`subpath` in :app:`Pyramid` is the sequence of names that
 are found *after* the :term:`view name` in the URL segments given in the
@@ -151,14 +153,14 @@ expression ``'form.submitted' in request.params`` is ``False``), the view
 renders a template.  To do so, it generates a "save url" which the template
 use as the form post URL during rendering.  We're lazy here, so we're trying
 to use the same template (``templates/edit.pt``) for the add view as well as
-the page edit view.  To do so, we create a dummy Page object in order to
-satisfy the edit form's desire to have *some* page object exposed as
+the page edit view.  To do so, we create a dummy Page resource object in
+order to satisfy the edit form's desire to have *some* page object exposed as
 ``page``, and we'll render the template to a response.
 
 If the view rendering *is* a result of a form submission (if the expression
 ``'form.submitted' in request.params`` is ``True``), we scrape the page body
 from the form data, create a Page object using the name in the subpath and
-the page body, and save it into "our context" (the wiki) using the
+the page body, and save it into "our context" (the Wiki) using the
 ``__setitem__`` method of the context. We then redirect back to the
 ``view_page`` view (the default view for a page) for the newly created page.
 
@@ -166,23 +168,23 @@ The ``edit_page`` view function
 -------------------------------
 
 The ``edit_page`` function will be configured to respond when the context is
-a Page and the :term:`view name` is ``edit_page``.  We'll provide it with a
-``@view_config`` decorator which names the string ``edit_page`` as its
-:term:`view name` (via name=), the class ``tutorial.models.Page`` as its
+a Page resource and the :term:`view name` is ``edit_page``.  We'll provide it
+with a ``@view_config`` decorator which names the string ``edit_page`` as its
+:term:`view name` (via ``name=``), the class ``tutorial.models.Page`` as its
 context, and the renderer named ``templates/edit.pt``.  This means that when
-a Page object is the context, and a :term:`view name` exists as the result of
-traverasal named ``edit_page``, this view will be used.  We inform
+a Page resource is the context, and a :term:`view name` exists as the result
+of traverasal named ``edit_page``, this view will be used.  We inform
 :app:`Pyramid` this view will use the ``templates/edit.pt`` template file as
 a ``renderer``.
 
 The ``edit_page`` function will be invoked when a user clicks the "Edit this
 Page" button on the view form.  It renders an edit form but it also acts as
-the handler for the form it renders.  The ``context`` of the ``edit_page``
-view will *always* be a Page object (never a Wiki object).
+the form post view callable for the form it renders.  The ``context`` of the
+``edit_page`` view will *always* be a Page resource (never a Wiki resource).
 
 If the view execution is *not* a result of a form submission (if the
 expression ``'form.submitted' in request.params`` is ``False``), the view
-simply renders the edit form, passing the request, the page object, and a
+simply renders the edit form, passing the request, the page resource, and a
 save_url which will be used as the action of the generated form.
 
 If the view execution *is* a result of a form submission (if the expression
@@ -208,8 +210,8 @@ Most view callables we've added expected to be rendered via a
 :term:`template`.  The default templating systems in :app:`Pyramid` are
 :term:`Chameleon` and :term:`Mako`.  Chameleon is a variant of :term:`ZPT`,
 which is an XML-based templating language.  Mako is a non-XML-based
-templating language.  Because we have to pick one, we'll use Chameleon for
-this tutorial.
+templating language.  Because we had to pick one, we chose Chameleon for this
+tutorial.
 
 The templates we create will live in the ``templates`` directory of our
 tutorial package.  Chameleon templates must have a ``.pt`` extension to be
@@ -218,8 +220,8 @@ recognized as such.
 The ``view.pt`` Template
 ------------------------
 
-The ``view.pt`` template is used for viewing a single wiki page.  It is used
-by the ``view_page`` view function.  It should have a div that is "structure
+The ``view.pt`` template is used for viewing a single Page.  It is used by
+the ``view_page`` view function.  It should have a div that is "structure
 replaced" with the ``content`` value provided by the view.  It should also
 have a link on the rendered page that points at the "edit" URL (the URL which
 invokes the ``edit_page`` view for the page being viewed).
@@ -244,12 +246,12 @@ the below:
 The ``edit.pt`` Template
 ------------------------
 
-The ``edit.pt`` template is used for adding and editing a wiki page.  It is
-used by the ``add_page`` and ``edit_page`` view functions.  It should display
-a page containing a form that POSTs back to the "save_url" argument supplied
-by the view.  The form should have a "body" textarea field (the page data),
-and a submit button that has the name "form.submitted".  The textarea in the
-form should be filled with any existing page data when it is rendered.
+The ``edit.pt`` template is used for adding and editing a Page.  It is used
+by the ``add_page`` and ``edit_page`` view functions.  It should display a
+page containing a form that POSTs back to the "save_url" argument supplied by
+the view.  The form should have a "body" textarea field (the page data), and
+a submit button that has the name "form.submitted".  The textarea in the form
+should be filled with any existing page data when it is rendered.
 
 Once we're done with the ``edit.pt`` template, it will look a lot like the
 below:
@@ -258,10 +260,10 @@ below:
    :linenos:
    :language: xml
 
-Static Resources
-----------------
+Static Assets
+-------------
 
-Our templates name a single static resource named ``style.css``.  We need to
+Our templates name a single static asset named ``style.css``.  We need to
 create this and place it in a file named ``style.css`` within our package's
 ``static`` directory.  This file is a little too long to replicate within the
 body of this guide, however it is available `online
@@ -270,7 +272,7 @@ body of this guide, however it is available `online
 This CSS file will be accessed via
 e.g. ``http://localhost:6543/static/style.css`` by virtue of the call to
 ``add_static_view`` directive we've made in the ``__init__`` file.  Any
-number and type of static resources can be placed in this directory (or
+number and type of static assets can be placed in this directory (or
 subdirectories) and are just referred to by URL within templates.
 
 Testing the Views
@@ -324,20 +326,20 @@ Viewing the Application in a Browser
 Once we've completed our edits, we can finally examine our application in a
 browser.  The views we'll try are as follows:
 
-- Visiting ``http://localhost:6543/`` in a browser invokes the
-  ``view_wiki`` view.  This always redirects to the ``view_page`` view
-  of the FrontPage page object.
+- Visiting ``http://localhost:6543/`` in a browser invokes the ``view_wiki``
+  view.  This always redirects to the ``view_page`` view of the ``FrontPage``
+  Page resource.
 
 - Visiting ``http://localhost:6543/FrontPage/`` in a browser invokes
-  the ``view_page`` view of the front page page object.  This is
+  the ``view_page`` view of the front page resource.  This is
   because it's the *default view* (a view without a ``name``) for Page
-  objects.
+  resources.
 
 - Visiting ``http://localhost:6543/FrontPage/edit_page`` in a browser
-  invokes the edit view for the front page object.
+  invokes the edit view for the ``FrontPage`` Page resource.
 
 - Visiting ``http://localhost:6543/add_page/SomePageName`` in a
-  browser invokes the add view for a page.
+  browser invokes the add view for a Page.
 
 - To generate an error, visit ``http://localhost:6543/add_page`` which
   will generate an ``IndexError`` for the expression
