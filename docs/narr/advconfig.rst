@@ -371,7 +371,9 @@ Has the same result as:
 
 Even though the view statement depends on the registration of a custom
 renderer, due to two-phase configuration, the order in which the
-configuration statements are issued is not important.
+configuration statements are issued is not important.  ``add_view`` will be
+able to find the ``.rn`` renderer even if ``add_renderer`` is called after
+``add_view``.
 
 The same is untrue when you use an *autocommitting* configurator (see
 :ref:`autocommitting_configurator`).  When an autocommitting configurator is
