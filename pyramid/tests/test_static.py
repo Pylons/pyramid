@@ -153,7 +153,7 @@ class TestPackageURLParser(unittest.TestCase):
         self.failUnless('404 Not Found' in body)
         self.assertEqual(sr.status, '404 Not Found')
 
-class TestStaticView(unittest.TestCase):
+class Test_static_view(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
