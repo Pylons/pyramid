@@ -401,8 +401,8 @@ Pyramid Uses ZCML; ZCML is XML and I Don't Like XML
 :term:`ZCML` is a configuration language in the XML syntax.  Due to the
 "imperative configuration" feature (new in :mod:`repoze.bfg` 1.2), you don't
 need to use ZCML at all.  But if you really do want to perform declarative
-configuration, perhaps because you want to build an extensible application, you
-will need to use and understand it.
+configuration, perhaps because you want to build an extensible application,
+you may need to use and understand it.
 
 :term:`ZCML` contains elements that are mostly singleton tags that are
 called *declarations*.  For an example:
@@ -418,24 +418,22 @@ called *declarations*.  For an example:
 
 This declaration associates a :term:`view` with a route pattern. 
 
-All :app:`Pyramid` declarations are singleton tags, unlike many
-other XML configuration systems.  No XML *values* in ZCML are
-meaningful; it's always just XML tags and attributes.  So in the very
-common case it's not really very much different than an otherwise
-"flat" configuration format like ``.ini``, except a developer can
-*create* a directive that requires nesting (none of these exist in
-:app:`Pyramid` itself), and multiple "sections" can exist with the
-same "name" (e.g. two ``<route>`` declarations) must be able to exist
-simultaneously.
+All :app:`Pyramid` declarations are singleton tags, unlike many other XML
+configuration systems.  No XML *values* in ZCML are meaningful; it's always
+just XML tags and attributes.  So in the very common case it's not really
+very much different than an otherwise "flat" configuration format like
+``.ini``, except a developer can *create* a directive that requires nesting
+(none of these exist in :app:`Pyramid` itself), and multiple "sections" can
+exist with the same "name" (e.g. two ``<route>`` declarations) must be able
+to exist simultaneously.
 
-You might think some other configuration file format would be better.
-But all configuration formats suck in one way or another.  I
-personally don't think any of our lives would be markedly better if
-the declarative configuration format used by :app:`Pyramid` were
-YAML, JSON, or INI.  It's all just plumbing that you mostly cut and
-paste once you've progressed 30 minutes into your first project.
-Folks who tend to agitate for another configuration file format are
-folks that haven't yet spent that 30 minutes.
+You might think some other configuration file format would be better.  But
+all configuration formats suck in one way or another.  I personally don't
+think any of our lives would be markedly better if the declarative
+configuration format used by :app:`Pyramid` were YAML, JSON, or INI.  It's
+all just plumbing that you mostly cut and paste once you've progressed 30
+minutes into your first project.  Folks who tend to agitate for another
+configuration file format are folks that haven't yet spent that 30 minutes.
 
 .. _model_traversal_confusion:
 
