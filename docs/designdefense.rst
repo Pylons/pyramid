@@ -1499,7 +1499,7 @@ Let's take this criticism point-by point.
 Too Complex
 +++++++++++
 
-- If you can understand this hello world program, you can use Pyramid:
+If you can understand this hello world program, you can use Pyramid:
 
 .. code-block:: python
    :linenos:
