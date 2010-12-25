@@ -89,7 +89,9 @@ applications and libraries, each built upon a specific low level stack that
 is incompatible with any other.  We'll also shrink the choice of credible
 Python web frameworks down by at least one.  Some overlap of functionality to
 achieve these goals is expected and unavoidable, at least if we aim to
-prevent pointless duplication at higher levels.
+prevent pointless duplication at higher levels.  If we've done our job well
+enough, the various audiences will be able to coexist and cooperate rather
+than firing at each other across some imaginary web framework "DMZ".
 
 Pyramid Uses A Zope Component Architecture ("ZCA") Registry
 -----------------------------------------------------------
