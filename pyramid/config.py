@@ -2151,20 +2151,19 @@ class Configurator(object):
         """ Add a view used to render static assets such as images
         and CSS files.
 
-        The ``name`` argument is a string representing :term:`view
-        name` of the view which is registered.  It may alternately be
-        a *url prefix*.
+        The ``name`` argument is a string representing an
+        application-relative local URL prefix.  It may alternately be a full
+        URL.
 
-        The ``path`` argument is the path on disk where the static
-        files reside.  This can be an absolute path, a
-        package-relative path, or a :term:`asset specification`.
+        The ``path`` argument is the path on disk where the static files
+        reside.  This can be an absolute path, a package-relative path, or a
+        :term:`asset specification`.
 
         The ``cache_max_age`` keyword argument is input to set the
-        ``Expires`` and ``Cache-Control`` headers for static assets
-        served.  Note that this argument has no effect when the
-        ``name`` is a *url prefix*.  By default, this argument is
-        ``None``, meaning that no particular Expires or Cache-Control
-        headers are set in the response.
+        ``Expires`` and ``Cache-Control`` headers for static assets served.
+        Note that this argument has no effect when the ``name`` is a *url
+        prefix*.  By default, this argument is ``None``, meaning that no
+        particular Expires or Cache-Control headers are set in the response.
 
         The ``permission`` keyword argument is used to specify the
         :term:`permission` required by a user to execute the static view.  By
@@ -2178,67 +2177,62 @@ class Configurator(object):
 
         *Usage*
 
-        The ``add_static_view`` function is typically used in
-        conjunction with the :func:`pyramid.url.static_url`
-        function.  ``add_static_view`` adds a view which renders a
-        static asset when some URL is visited;
-        :func:`pyramid.url.static_url` generates a URL to that
-        asset.
+        The ``add_static_view`` function is typically used in conjunction
+        with the :func:`pyramid.url.static_url` function.
+        ``add_static_view`` adds a view which renders a static asset when
+        some URL is visited; :func:`pyramid.url.static_url` generates a URL
+        to that asset.
 
-        The ``name`` argument to ``add_static_view`` is usually a
-        :term:`view name`.  When this is the case, the
-        :func:`pyramid.url.static_url` API will generate a URL
-        which points to a Pyramid view, which will serve up a set of
-        assets that live in the package itself. For example:
+        The ``name`` argument to ``add_static_view`` is usually a :term:`view
+        name`.  When this is the case, the :func:`pyramid.url.static_url` API
+        will generate a URL which points to a Pyramid view, which will serve
+        up a set of assets that live in the package itself. For example:
 
         .. code-block:: python
 
            add_static_view('images', 'mypackage:images/')
 
-        Code that registers such a view can generate URLs to the view
-        via :func:`pyramid.url.static_url`:
+        Code that registers such a view can generate URLs to the view via
+        :func:`pyramid.url.static_url`:
 
         .. code-block:: python
 
            static_url('mypackage:images/logo.png', request)
 
-        When ``add_static_view`` is called with a ``name`` argument
-        that represents a simple view name, as it is above, subsequent
-        calls to :func:`pyramid.url.static_url` with paths that
-        start with the ``path`` argument passed to ``add_static_view``
-        will generate a URL something like ``http://<Pyramid app
-        URL>/images/logo.png``, which will cause the ``logo.png`` file
-        in the ``images`` subdirectory of the ``mypackage`` package to
-        be served.
+        When ``add_static_view`` is called with a ``name`` argument that
+        represents a URL prefix, as it is above, subsequent calls to
+        :func:`pyramid.url.static_url` with paths that start with the
+        ``path`` argument passed to ``add_static_view`` will generate a URL
+        something like ``http://<Pyramid app URL>/images/logo.png``, which
+        will cause the ``logo.png`` file in the ``images`` subdirectory of
+        the ``mypackage`` package to be served.
 
-        ``add_static_view`` can alternately be used with a ``name``
-        argument which is a *URL*, causing static assets to be
-        served from an external webserver.  This happens when the
-        ``name`` argument is a URL (detected as any string with a
-        slash in it).  In this mode, the ``name`` is used as the URL
-        prefix when generating a URL using
-        :func:`pyramid.url.static_url`.  For example, if
-        ``add_static_view`` is called like so:
+        ``add_static_view`` can alternately be used with a ``name`` argument
+        which is a *URL*, causing static assets to be served from an external
+        webserver.  This happens when the ``name`` argument is a fully
+        qualified URL (e.g. starts with ``http://`` or similar).  In this
+        mode, the ``name`` is used as the prefix of the full URL when
+        generating a URL using :func:`pyramid.url.static_url`.  For example,
+        if ``add_static_view`` is called like so:
 
         .. code-block:: python
 
            add_static_view('http://example.com/images', 'mypackage:images/')
 
-        Subsequently, the URLs generated by
-        :func:`pyramid.url.static_url` for that static view will be
-        prefixed with ``http://example.com/images``:
+        Subsequently, the URLs generated by :func:`pyramid.url.static_url`
+        for that static view will be prefixed with
+        ``http://example.com/images``:
 
         .. code-block:: python
 
            static_url('mypackage:images/logo.png', request)
 
-        When ``add_static_view`` is called with a ``name`` argument
-        that is the URL prefix ``http://example.com/images``,
-        subsequent calls to :func:`pyramid.url.static_url` with
-        paths that start with the ``path`` argument passed to
-        ``add_static_view`` will generate a URL something like
-        ``http://example.com/logo.png``.  The external webserver
-        listening on ``example.com`` must be itself configured to
+        When ``add_static_view`` is called with a ``name`` argument that is
+        the URL ``http://example.com/images``, subsequent calls to
+        :func:`pyramid.url.static_url` with paths that start with the
+        ``path`` argument passed to ``add_static_view`` will generate a URL
+        something like ``http://example.com/logo.png``.  The external
+        webserver listening on ``example.com`` must be itself configured to
         respond properly to such a request.
 
         See :ref:`static_assets_section` for more information.

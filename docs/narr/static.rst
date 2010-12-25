@@ -42,15 +42,23 @@ files that live in ``/var/www/static`` as sub-URLs of the ``/static`` URL
 prefix.  Therefore, the file ``/var/www/static/foo.css`` will be returned
 when the user visits your application's URL ``/static/foo.css``.
 
-No authorization is ever required for users to visit files served by a static
-view added via :meth:`~pyramid.config.Configurator.add_static_view`.  If you
-need "static" resources to be protected by authentication services, see
-:ref:`advanced_static`.
-
 A static directory named at ``path`` may contain subdirectories recursively,
 and any subdirectories may hold files; these will be resolved by the static
 view as you would expect.  The ``Content-Type`` header returned by the static
 view for each particular type of file is dependent upon its file extension.
+
+By default, all files made available via
+:meth:`~pyramid.config.Configurator.add_static_view` are accessible by
+completely anonymous users.  Simple authorization can be required, however.
+To protect a set of static files using a permission, in addition to passing
+the required ``name`` and ``path`` arguments, also pass the ``permission``
+keyword argument to :meth:`~pyramid.config.Configurator.add_static_view`.
+The value of the ``permission`` argument represents the :term:`permission`
+that the user must have relative to the current :term:`context` when the
+static view is invoked.  A user will be required to possess this permission
+to view any of the files represented by ``path`` of the static view.  If your
+static resources must be protected by a more complex authorization scheme,
+see :ref:`advanced_static`.
 
 Here's another example that uses an :term:`asset specification` instead of an
 absolute path as the ``path`` argument.  To convince
