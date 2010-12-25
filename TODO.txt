@@ -14,22 +14,9 @@ Must-Have (before 1.0)
 Should-Have
 -----------
 
-- Fix add_static_view docs to mention: static views cannot be served from the
-  root, that "name" really means "prefix", and that a non-URL prefix can be a
-  path with slashes in it.
-
-- Add an example of serving a static asset from the root using a view.
-
-- Add an example of serving a static asset using a view by setting
-  response.app_iter and the response content-type/content-disposition.
-
 - Add an example of using a cascade to serve static assets from the root.
 
 - Explore static file return from handler action using wsgiapp2 + fileapp.
-
-- Document ``config.add_route('catchall', '/*subpath',
-  view=pyramid.views.static('some:asset/spec'))``, and explain that
-  ``static`` requires ``subpath``.
 
 - Static (URL-generation only) routes.
 

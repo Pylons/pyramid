@@ -68,6 +68,11 @@ Documentation
 - Add "Pyramid Provides More Than One Way to Do It" to Design Defense
   documentation.
 
+- Changed "Static Assets" narrative chapter: clarify that ``name`` represents
+  a prefix unless it's a URL, added an example of a root-relative static view
+  fallback for URL dispatch, added an example of creating a simple view that
+  returns the body of a file.
+
 1.0a7 (2010-12-20)
 ==================
 
