@@ -77,7 +77,8 @@ form a plan to "merge".  The features missing from BFG (notably :term:`view
 handler` classes, flash messaging, and other minor missing bits), were added,
 to provide familiarity to ex-Pylons users.  The result is :app:`Pyramid`.
 
-We're truly hoping that the amalgamation of components in :app:`Pyramid` will
+The Python web framework space is currently notoriously balkanized.  We're
+truly hoping that the amalgamation of components in :app:`Pyramid` will
 appeal to at least two currently very distinct sets of users: Pylons and BFG
 (often ex-Zope) users.  By unifying the best concepts from Pylons and BFG
 into a single codebase and leaving the bad concepts from their ancestors
@@ -86,7 +87,7 @@ promote our efforts as a unit rather than competing pointlessly.  We hope to
 be able to shortcut the pack mentality which results in a *much larger*
 duplication of effort, represented by competing but incredibly similar
 applications and libraries, each built upon a specific low level stack that
-is incompatible with any other.  We'll also shrink the choice of credible
+is incompatible with the other.  We'll also shrink the choice of credible
 Python web frameworks down by at least one.  Some overlap of functionality to
 achieve these goals is expected and unavoidable, at least if we aim to
 prevent pointless duplication at higher levels.  If we've done our job well
