@@ -260,7 +260,7 @@ ZCA registry gives us, and we have long-ago borne the weight of understanding
 what it does and how it works.  The authors of :app:`Pyramid` understand the
 ZCA deeply and can read code that uses it as easily as any other code.
 
-But we recognize that developers who my want to extend the framework are not
+But we recognize that developers who might want to extend the framework are not
 as comfortable with the ZCA registry API as the original developers are with
 it.  So, for the purposes of being kind to third-party :app:`Pyramid`
 framework developers in, we've drawn some lines in the sand.
