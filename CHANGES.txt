@@ -65,6 +65,9 @@ Documentation
 
 - Fix API documentation rendering for ``pyramid.view.static``
 
+- Add "Pyramid Provides More Than One Way to Do It" to Design Defense
+  documentation.
+
 1.0a7 (2010-12-20)
 ==================
 
