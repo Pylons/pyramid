@@ -21,6 +21,10 @@ Features
 - Added CSRF token generation, as described in the narrative chapter entitled
   "Preventing Cross-Site Request Forgery Attacks".
 
+- Prevent misunderstanding of how the ``view`` and ``view_permission``
+  arguments to add_route work by raising an exception during configuration if
+  view-related arguments exist but no ``view`` argument is passed.
+
 Paster Templates
 ----------------
 

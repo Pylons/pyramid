@@ -1748,13 +1748,14 @@ class Configurator(object):
             for info in view_info:
                 self.add_view(**info)
 
-        if view:
+        if view_context is None:
+            view_context = view_for
             if view_context is None:
-                view_context = view_for
-                if view_context is None:
-                    view_context = for_
-            view_permission = view_permission or permission
-            view_renderer = view_renderer or renderer
+                view_context = for_
+        view_permission = view_permission or permission
+        view_renderer = view_renderer or renderer
+
+        if view:
             self.add_view(
                 permission=view_permission,
                 context=view_context,
@@ -1764,6 +1765,25 @@ class Configurator(object):
                 renderer=view_renderer,
                 attr=view_attr,
                 )
+        else:
+            # prevent mistakes due to misunderstanding of how hybrid calls to
+            # add_route and add_view interact
+            if view_attr:
+                raise ConfigurationError(
+                    'view_attr argument not permitted without view '
+                    'argument')
+            if view_context:
+                raise ConfigurationError(
+                    'view_context argument not permitted without view '
+                    'argument')
+            if view_permission:
+                raise ConfigurationError(
+                    'view_permission argument not permitted without view '
+                    'argument')
+            if view_renderer:
+                raise ConfigurationError(
+                    'view_renderer argument not permitted without '
+                    'view argument')
 
         mapper = self.get_routes_mapper()
 
