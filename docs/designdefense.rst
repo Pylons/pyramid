@@ -79,16 +79,17 @@ to provide familiarity to ex-Pylons users.  The result is :app:`Pyramid`.
 
 We're truly hoping that the amalgamation of components in :app:`Pyramid` will
 appeal to at least two currently very distinct sets of users: Pylons and BFG
-(usually ex-Zope) users.  By unifying the best concepts from Pylons and BFG
-into a single codebase (and leaving the bad concepts from their ancestors
-behind), we'll be able to consolidate our efforts better, share more code,
-and promote our efforts as a unit rather than competing.  We'll be able to
-shortcut pointless pack mentality which results in a *much larger*
+(often ex-Zope) users.  By unifying the best concepts from Pylons and BFG
+into a single codebase and leaving the bad concepts from their ancestors
+behind, we'll be able to consolidate our efforts better, share more code, and
+promote our efforts as a unit rather than competing pointlessly.  We hope to
+be able to shortcut the pack mentality which results in a *much larger*
 duplication of effort, represented by competing but incredibly similar
-packages, each built upon a specific low level stack.  We'll also shrink the
-choice of credible Python web frameworks down by at least one.  Some overlap
-of functionality to achieve these goals is expected and unavoidable, at least
-if we aim to prevent pointless duplication at higher levels.
+applications and libraries, each built upon a specific low level stack that
+is incompatible with any other.  We'll also shrink the choice of credible
+Python web frameworks down by at least one.  Some overlap of functionality to
+achieve these goals is expected and unavoidable, at least if we aim to
+prevent pointless duplication at higher levels.
 
 Pyramid Uses A Zope Component Architecture ("ZCA") Registry
 -----------------------------------------------------------
