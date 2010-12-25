@@ -14,6 +14,8 @@ Must-Have (before 1.0)
 Should-Have
 -----------
 
+- Add notes about renderer response attrs to request docs.
+
 - Add an example of using a cascade to serve static assets from the root.
 
 - Explore static file return from handler action using wsgiapp2 + fileapp.
