@@ -90,7 +90,7 @@ libraries, each built upon a specific low level stack that is incompatible
 with the other.  We'll also shrink the choice of credible Python web
 frameworks down by at least one.  We're also hoping to attract users from
 other communities (such as Zope's and TurboGears') by providing the features
-they requre, while allowing enough flexibility to do things in a familiar
+they require, while allowing enough flexibility to do things in a familiar
 fashion.  Some overlap of functionality to achieve these goals is expected
 and unavoidable, at least if we aim to prevent pointless duplication at
 higher levels.  If we've done our job well enough, the various audiences will
