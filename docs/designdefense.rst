@@ -21,8 +21,7 @@ an acronym for "there is more than one way to do it").
 it includes more than one way to resolve a URL to a :term:`view callable`:
 via :term:`url dispatch` or :term:`traversal`.  Multiple methods of
 configuration exist: :term:`imperative configuration`, :term:`configuration
-decoration`, and :term:`ZCML`. A view callable can itself be either a
-function, an instance, or a class.  It works with multiple different kinds of
+decoration`, and :term:`ZCML`. It works with multiple different kinds of
 persistence and templating systems.  And so on.  However, the existence of
 most of these overlapping ways to do things are not without reason and
 purpose: we have a number of audiences to serve, and we believe that TIMTOWTI
@@ -40,11 +39,12 @@ Implementations of these features were *required* to allow the :app:`Pyramid`
 authors to build the bread-and-butter CMS-type systems for customers in the
 way they were accustomed to building them.  No other system save Zope itself
 had such features.  And Zope itself was beginning to show signs of its age.
-W were becoming hampered by consequences of early design mistakes.  Zope's
-lack of documentation was also difficult to work around: it was hard to hire
-smart people to work on Zope applications, because there was no comprehensive
-documentation set to point them at which explained "it all" in one consumble
-place.  Before :mod:`repoze.bfg` went under development, its authors
+We were becoming hampered by consequences of its early design mistakes.
+Zope's lack of documentation was also difficult to work around: it was hard
+to hire smart people to work on Zope applications, because there was no
+comprehensive documentation set to point them at which explained "it all" in
+one consumble place, and it was too large and self-inconsistent to document
+properly.  Before :mod:`repoze.bfg` went under development, its authors
 obviously looked around for other frameworks that fit the bill.  But no
 non-Zope framework did.  So we embarked on building :mod:`repoze.bfg`.
 
@@ -69,9 +69,10 @@ As the result of this generalization, it became obvious BFG shared 90% of its
 featureset with the featureset of Pylons 1, and thus had a very similar
 target market.  Because they were so similar, choosing between the two
 systems was an exercise in frustration for an otherwise non-partisan
-developer.  It was also painful and felt wrong for Pylons and BFG development
-communities to compete for users.  So the Pylons and BFG teams began to work
-together to form a plan to "merge".  The features missing from BFG (notably
+developer.  It was also strange for the Pylons and BFG development
+communities to be in competition for the same set of users, given how similar
+the two frameworks were.  So the Pylons and BFG teams began to work together
+to form a plan to "merge".  The features missing from BFG (notably
 :term:`view handler` classes, flash messaging, and other minor missing bits),
 were added, to provide familiarity to ex-Pylons users.  The result is
 :app:`Pyramid`.
@@ -89,7 +90,7 @@ libraries, each built upon a specific low level stack that is incompatible
 with the other.  We'll also shrink the choice of credible Python web
 frameworks down by at least one.  We're also hoping to attract users from
 other communities (such as Zope's and TurboGears') by providing the features
-they need, while allowing enough flexibility to do thing in a familiar
+they requre, while allowing enough flexibility to do things in a familiar
 fashion.  Some overlap of functionality to achieve these goals is expected
 and unavoidable, at least if we aim to prevent pointless duplication at
 higher levels.  If we've done our job well enough, the various audiences will
