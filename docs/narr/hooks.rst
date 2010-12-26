@@ -142,6 +142,260 @@ For information about how to configure a forbidden view via :term:`ZCML`, see
 :ref:`forbidden_zcml`.
 
 .. index::
+   single: request factory
+
+.. _changing_the_request_factory:
+
+Changing the Request Factory
+----------------------------
+
+Whenever :app:`Pyramid` handles a :term:`WSGI` request, it creates a
+:term:`request` object based on the WSGI environment it has been passed.  By
+default, an instance of the :class:`pyramid.request.Request` class is created
+to represent the request object.
+
+The class (aka "factory") that :app:`Pyramid` uses to create a request object
+instance can be changed by passing a ``request_factory`` argument to the
+constructor of the :term:`configurator`.  This argument can be either a
+callable or a :term:`dotted Python name` representing a callable.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.request import Request
+
+   class MyRequest(Request):
+       pass
+
+   config = Configurator(request_factory=MyRequest)
+
+If you're doing imperative configuration, and you'd rather do it after you've
+already constructed a :term:`configurator` it can also be registered via the
+:meth:`pyramid.config.Configurator.set_request_factory` method:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+   from pyramid.request import Request
+
+   class MyRequest(Request):
+       pass
+
+   config = Configurator()
+   config.set_request_factory(MyRequest)
+
+To use ZCML for the same purpose, see :ref:`changing_request_factory_zcml`.
+
+.. index::
+   single: renderer globals
+
+.. _adding_renderer_globals:
+
+Adding Renderer Globals
+-----------------------
+
+Whenever :app:`Pyramid` handles a request to perform a rendering (after a
+view with a ``renderer=`` configuration attribute is invoked, or when the any
+of the methods beginning with ``render`` within the :mod:`pyramid.renderers`
+module are called), *renderer globals* can be injected into the *system*
+values sent to the renderer.  By default, no renderer globals are injected,
+and the "bare" system values (such as ``request``, ``context``, and
+``renderer_name``) are the only values present in the system dictionary
+passed to every renderer.
+
+A callback that :app:`Pyramid` will call every time a renderer is invoked can
+be added by passing a ``renderer_globals_factory`` argument to the
+constructor of the :term:`configurator`.  This callback can either be a
+callable object or a :term:`dotted Python name` representing such a callable.
+
+.. code-block:: python
+   :linenos:
+
+   def renderer_globals_factory(system):
+       return {'a':1}
+
+   config = Configurator(
+            renderer_globals_factory=renderer_globals_factory)
+
+Such a callback must accept a single positional argument (notionally named
+``system``) which will contain the original system values.  It must return a
+dictionary of values that will be merged into the system dictionary.  See
+:ref:`renderer_system_values` for discription of the values present in the
+system dictionary.
+
+If you're doing imperative configuration, and you'd rather do it after you've
+already constructed a :term:`configurator` it can also be registered via the
+:meth:`pyramid.config.Configurator.set_renderer_globals_factory` method:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+
+   def renderer_globals_factory(system):
+       return {'a':1}
+
+   config = Configurator()
+   config.set_renderer_globals_factory(renderer_globals_factory)
+
+Another mechanism which allows event subscribers to add renderer global values
+exists in :ref:`beforerender_event`.
+
+If you'd rather ZCML to register a renderer globals factory, see
+:ref:`adding_renderer_globals_zcml`.
+
+.. index::
+   single: before render event
+
+.. _beforerender_event:
+
+Using The Before Render Event
+-----------------------------
+
+Subscribers to the :class:`pyramid.events.BeforeRender` event may introspect
+the and modify the set of :term:`renderer globals` before they are passed to
+a :term:`renderer`.  This event object iself has a dictionary-like interface
+that can be used for this purpose.  For example:
+
+.. code-block:: python
+   :linenos:
+
+    from pyramid.events import subscriber
+    from pyramid.events import BeforeRender
+
+    @subscriber(BeforeRender)
+    def add_global(event):
+        event['mykey'] = 'foo'
+
+An object of this type is sent as an event just before a :term:`renderer` is
+invoked (but *after* the application-level renderer globals factory added via
+:class:`pyramid.config.Configurator.set_renderer_globals_factory`, if any,
+has injected its own keys into the renderer globals dictionary).
+
+If a subscriber attempts to add a key that already exist in the renderer
+globals dictionary, a :exc:`KeyError` is raised.  This limitation is enforced
+because event subscribers do not possess any relative ordering.  The set of
+keys added to the renderer globals dictionary by all
+:class:`pyramid.events.BeforeRender` subscribers and renderer globals
+factories must be unique.
+
+See the API documentation for the :class:`pyramid.events.BeforeRender` event
+interface at :class:`pyramid.interfaces.IBeforeRender`.
+
+Another mechanism which allows event subscribers more control when adding
+renderer global values exists in :ref:`adding_renderer_globals`.
+
+.. index::
+   single: response callback
+
+.. _using_response_callbacks:
+
+Using Response Callbacks
+------------------------
+
+Unlike many other web frameworks, :app:`Pyramid` does not eagerly create a
+global response object.  Adding a :term:`response callback` allows an
+application to register an action to be performed against a response object
+once it is created, usually in order to mutate it.
+
+The :meth:`pyramid.request.Request.add_response_callback` method is used to
+register a response callback.
+
+A response callback is a callable which accepts two positional parameters:
+``request`` and ``response``.  For example:
+
+.. code-block:: python
+   :linenos:
+
+   def cache_callback(request, response):
+       """Set the cache_control max_age for the response"""
+       if request.exception is not None:
+           response.cache_control.max_age = 360
+   request.add_response_callback(cache_callback)
+
+No response callback is called if an unhandled exception happens in
+application code, or if the response object returned by a :term:`view
+callable` is invalid.  Response callbacks *are*, however, invoked when a
+:term:`exception view` is rendered successfully: in such a case, the
+:attr:`request.exception` attribute of the request when it enters a response
+callback will be an exception object instead of its default value of
+``None``.
+
+Response callbacks are called in the order they're added
+(first-to-most-recently-added).  All response callbacks are called *after*
+the :class:`pyramid.events.NewResponse` event is sent.  Errors raised by
+response callbacks are not handled specially.  They will be propagated to the
+caller of the :app:`Pyramid` router application.
+
+A response callback has a lifetime of a *single* request.  If you want a
+response callback to happen as the result of *every* request, you must
+re-register the callback into every new request (perhaps within a subscriber
+of a :class:`pyramid.events.NewRequest` event).
+
+.. index::
+   single: finished callback
+
+.. _using_finished_callbacks:
+
+Using Finished Callbacks
+------------------------
+
+A :term:`finished callback` is a function that will be called unconditionally
+by the :app:`Pyramid` :term:`router` at the very end of request processing.
+A finished callback can be used to perform an action at the end of a request
+unconditionally.
+
+The :meth:`pyramid.request.Request.add_finished_callback` method is used to
+register a finished callback.
+
+A finished callback is a callable which accepts a single positional
+parameter: ``request``.  For example:
+
+.. code-block:: python
+   :linenos:
+
+   import transaction
+
+   def commit_callback(request):
+       '''commit or abort the transaction associated with request'''
+       if request.exception is not None:
+           transaction.abort()
+       else:
+           transaction.commit()
+   request.add_finished_callback(commit_callback)
+
+Finished callbacks are called in the order they're added ( first- to
+most-recently- added).  Finished callbacks (unlike a :term:`response
+callback`) are *always* called, even if an exception happens in application
+code that prevents a response from being generated.
+
+The set of finished callbacks associated with a request are called *very
+late* in the processing of that request; they are essentially the very last
+thing called by the :term:`router` before a request "ends". They are called
+after response processing has already occurred in a top-level ``finally:``
+block within the router request processing code.  As a result, mutations
+performed to the ``request`` provided to a finished callback will have no
+meaningful effect, because response processing will have already occurred,
+and the request's scope will expire almost immediately after all finished
+callbacks have been processed.
+
+It is often necessary to tell whether an exception occurred within
+:term:`view callable` code from within a finished callback: in such a case,
+the :attr:`request.exception` attribute of the request when it enters a
+response callback will be an exception object instead of its default value of
+``None``.
+
+Errors raised by finished callbacks are not handled specially.  They
+will be propagated to the caller of the :app:`Pyramid` router
+application.
+
+A finished callback has a lifetime of a *single* request.  If you want a
+finished callback to happen as the result of *every* request, you must
+re-register the callback into every new request (perhaps within a subscriber
+of a :class:`pyramid.events.NewRequest` event).
+
+.. index::
    single: traverser
 
 .. _changing_the_traverser:
@@ -286,244 +540,8 @@ The default context URL generator is available for perusal as the class
 <http://github.com/Pylons/pyramid/blob/master/pyramid/traversal.py>`_ of the
 :term:`Pylons` GitHub Pyramid repository.
 
-.. _changing_the_request_factory:
-
-Changing the Request Factory
-----------------------------
-
-Whenever :app:`Pyramid` handles a :term:`WSGI` request, it creates a
-:term:`request` object based on the WSGI environment it has been passed.  By
-default, an instance of the :class:`pyramid.request.Request` class is created
-to represent the request object.
-
-The class (aka "factory") that :app:`Pyramid` uses to create a request object
-instance can be changed by passing a ``request_factory`` argument to the
-constructor of the :term:`configurator`.  This argument can be either a
-callable or a :term:`dotted Python name` representing a callable.
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.request import Request
-
-   class MyRequest(Request):
-       pass
-
-   config = Configurator(request_factory=MyRequest)
-
-If you're doing imperative configuration, and you'd rather do it after you've
-already constructed a :term:`configurator` it can also be registered via the
-:meth:`pyramid.config.Configurator.set_request_factory` method:
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.config import Configurator
-   from pyramid.request import Request
-
-   class MyRequest(Request):
-       pass
-
-   config = Configurator()
-   config.set_request_factory(MyRequest)
-
-To use ZCML for the same purpose, see :ref:`changing_request_factory_zcml`.
-
-.. _adding_renderer_globals:
-
-Adding Renderer Globals
------------------------
-
-Whenever :app:`Pyramid` handles a request to perform a rendering (after a
-view with a ``renderer=`` configuration attribute is invoked, or when the any
-of the methods beginning with ``render`` within the :mod:`pyramid.renderers`
-module are called), *renderer globals* can be injected into the *system*
-values sent to the renderer.  By default, no renderer globals are injected,
-and the "bare" system values (such as ``request``, ``context``, and
-``renderer_name``) are the only values present in the system dictionary
-passed to every renderer.
-
-A callback that :app:`Pyramid` will call every time a renderer is invoked can
-be added by passing a ``renderer_globals_factory`` argument to the
-constructor of the :term:`configurator`.  This callback can either be a
-callable object or a :term:`dotted Python name` representing such a callable.
-
-.. code-block:: python
-   :linenos:
-
-   def renderer_globals_factory(system):
-       return {'a':1}
-
-   config = Configurator(
-            renderer_globals_factory=renderer_globals_factory)
-
-Such a callback must accept a single positional argument (notionally named
-``system``) which will contain the original system values.  It must return a
-dictionary of values that will be merged into the system dictionary.  See
-:ref:`renderer_system_values` for discription of the values present in the
-system dictionary.
-
-If you're doing imperative configuration, and you'd rather do it after you've
-already constructed a :term:`configurator` it can also be registered via the
-:meth:`pyramid.config.Configurator.set_renderer_globals_factory` method:
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.config import Configurator
-
-   def renderer_globals_factory(system):
-       return {'a':1}
-
-   config = Configurator()
-   config.set_renderer_globals_factory(renderer_globals_factory)
-
-Another mechanism which allows event subscribers to add renderer global values
-exists in :ref:`beforerender_event`.
-
-If you'd rather ZCML to register a renderer globals factory, see
-:ref:`adding_renderer_globals_zcml`.
-
-.. _beforerender_event:
-
-Using The Before Render Event
------------------------------
-
-Subscribers to the :class:`pyramid.events.BeforeRender` event may introspect
-the and modify the set of :term:`renderer globals` before they are passed to
-a :term:`renderer`.  This event object iself has a dictionary-like interface
-that can be used for this purpose.  For example:
-
-.. code-block:: python
-   :linenos:
-
-    from pyramid.events import subscriber
-    from pyramid.events import BeforeRender
-
-    @subscriber(BeforeRender)
-    def add_global(event):
-        event['mykey'] = 'foo'
-
-An object of this type is sent as an event just before a :term:`renderer` is
-invoked (but *after* the application-level renderer globals factory added via
-:class:`pyramid.config.Configurator.set_renderer_globals_factory`, if any,
-has injected its own keys into the renderer globals dictionary).
-
-If a subscriber attempts to add a key that already exist in the renderer
-globals dictionary, a :exc:`KeyError` is raised.  This limitation is enforced
-because event subscribers do not possess any relative ordering.  The set of
-keys added to the renderer globals dictionary by all
-:class:`pyramid.events.BeforeRender` subscribers and renderer globals
-factories must be unique.
-
-See the API documentation for the :class:`pyramid.events.BeforeRender` event
-interface at :class:`pyramid.interfaces.IBeforeRender`.
-
-Another mechanism which allows event subscribers more control when adding
-renderer global values exists in :ref:`adding_renderer_globals`.
-
-.. _using_response_callbacks:
-
-Using Response Callbacks
-------------------------
-
-Unlike many other web frameworks, :app:`Pyramid` does not eagerly create a
-global response object.  Adding a :term:`response callback` allows an
-application to register an action to be performed against a response object
-once it is created, usually in order to mutate it.
-
-The :meth:`pyramid.request.Request.add_response_callback` method is used to
-register a response callback.
-
-A response callback is a callable which accepts two positional parameters:
-``request`` and ``response``.  For example:
-
-.. code-block:: python
-   :linenos:
-
-   def cache_callback(request, response):
-       """Set the cache_control max_age for the response"""
-       if request.exception is not None:
-           response.cache_control.max_age = 360
-   request.add_response_callback(cache_callback)
-
-No response callback is called if an unhandled exception happens in
-application code, or if the response object returned by a :term:`view
-callable` is invalid.  Response callbacks *are*, however, invoked when a
-:term:`exception view` is rendered successfully: in such a case, the
-:attr:`request.exception` attribute of the request when it enters a response
-callback will be an exception object instead of its default value of
-``None``.
-
-Response callbacks are called in the order they're added
-(first-to-most-recently-added).  All response callbacks are called *after*
-the :class:`pyramid.events.NewResponse` event is sent.  Errors raised by
-response callbacks are not handled specially.  They will be propagated to the
-caller of the :app:`Pyramid` router application.
-
-A response callback has a lifetime of a *single* request.  If you want a
-response callback to happen as the result of *every* request, you must
-re-register the callback into every new request (perhaps within a subscriber
-of a :class:`pyramid.events.NewRequest` event).
-
-.. _using_finished_callbacks:
-
-Using Finished Callbacks
-------------------------
-
-A :term:`finished callback` is a function that will be called unconditionally
-by the :app:`Pyramid` :term:`router` at the very end of request processing.
-A finished callback can be used to perform an action at the end of a request
-unconditionally.
-
-The :meth:`pyramid.request.Request.add_finished_callback` method is used to
-register a finished callback.
-
-A finished callback is a callable which accepts a single positional
-parameter: ``request``.  For example:
-
-.. code-block:: python
-   :linenos:
-
-   import transaction
-
-   def commit_callback(request):
-       '''commit or abort the transaction associated with request'''
-       if request.exception is not None:
-           transaction.abort()
-       else:
-           transaction.commit()
-   request.add_finished_callback(commit_callback)
-
-Finished callbacks are called in the order they're added ( first- to
-most-recently- added).  Finished callbacks (unlike a :term:`response
-callback`) are *always* called, even if an exception happens in application
-code that prevents a response from being generated.
-
-The set of finished callbacks associated with a request are called *very
-late* in the processing of that request; they are essentially the very last
-thing called by the :term:`router` before a request "ends". They are called
-after response processing has already occurred in a top-level ``finally:``
-block within the router request processing code.  As a result, mutations
-performed to the ``request`` provided to a finished callback will have no
-meaningful effect, because response processing will have already occurred,
-and the request's scope will expire almost immediately after all finished
-callbacks have been processed.
-
-It is often necessary to tell whether an exception occurred within
-:term:`view callable` code from within a finished callback: in such a case,
-the :attr:`request.exception` attribute of the request when it enters a
-response callback will be an exception object instead of its default value of
-``None``.
-
-Errors raised by finished callbacks are not handled specially.  They
-will be propagated to the caller of the :app:`Pyramid` router
-application.
-
-A finished callback has a lifetime of a *single* request.  If you want a
-finished callback to happen as the result of *every* request, you must
-re-register the callback into every new request (perhaps within a subscriber
-of a :class:`pyramid.events.NewRequest` event).
+.. index::
+   single: configuration decorator
 
 .. _registering_configuration_decorators:
 
