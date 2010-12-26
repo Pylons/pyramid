@@ -284,7 +284,6 @@ do so, do things "by hand".  First define the view callable.
    :linenos:
 
    import os
-   from pyramid.view import view_config
    from webob import Response
 
    def favicon_view(request):
