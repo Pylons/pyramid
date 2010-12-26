@@ -75,11 +75,13 @@ template file.
 There is a second form of asset specification: a *relative* asset
 specification.  Instead of using an "absolute" asset specification which
 includes the package name, in certain circumstances you can omit the package
-name.  For example, you might be able to use ``templates/mytemplate.pt``
-instead of ``myapp:templates/some_template.pt``.  Such asset specifications
-are usually relative to a "current package."  The "current package" is
-usually the package which contains the code that *uses* the asset
-specification.
+name from the specification.  For example, you might be able to use
+``templates/mytemplate.pt`` instead of ``myapp:templates/some_template.pt``.
+Such asset specifications are usually relative to a "current package."  The
+"current package" is usually the package which contains the code that *uses*
+the asset specification.  :app:`Pyramid` APIs which accept relative asset
+specifications typically describe what the asset is relative to in their
+individual documentation.
 
 .. index::
    single: add_static_view
