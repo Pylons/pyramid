@@ -77,6 +77,8 @@ Documentation
   fallback for URL dispatch, added an example of creating a simple view that
   returns the body of a file.
 
+- Move ZCML usage in Hooks chapter to Declarative Configuration chapter.
+
 1.0a7 (2010-12-20)
 ==================
 
