@@ -11,16 +11,20 @@ An :term:`asset` is any file contained within a Python :term:`package` which
 is *not* a Python source code file.  For example, each of the following is an
 asset:
 
-- a :term:`Chameleon` template file contained within a Python package.
+- a GIF image file contained within a Python package or contained within any
+  subdirectory of a Python package.
 
-- a GIF image file contained within a Python package.
+- a CSS file contained within a Python package or contained within any
+  subdirectory of a Python package.
 
-- a CSS file contained within a Python package.
-
-- a JavaScript source file contained within a Python package.
+- a JavaScript source file contained within a Python package or contained
+  within any subdirectory of a Python package.
 
 - A directory within a package that does not have an ``__init__.py``
   in it (if it possessed an ``__init__.py`` it would *be* a package).
+
+- a :term:`Chameleon` or :term:`Mako` template file contained within a Python
+  package.
 
 The use of assets is quite common in most web development projects.  For
 example, when you create a :app:`Pyramid` application using one of the
@@ -31,7 +35,7 @@ static assets.  For example, there's a ``static`` directory which contains
 ``.css``, ``.js``, and ``.gif`` files.  These asset files are delivered when
 a user visits an application URL.
 
-.. _understanding_assets:
+.. _asset_specifications:
 
 Understanding Asset Specifications
 ----------------------------------

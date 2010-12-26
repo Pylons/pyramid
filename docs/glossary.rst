@@ -54,7 +54,8 @@ Glossary
      For example, the asset specification
      ``my.package:static/baz.css`` identifies the file named
      ``baz.css`` in the ``static`` subdirectory of the ``my.package``
-     Python :term:`package`.
+     Python :term:`package`.  See :ref:`asset_specifications` for more 
+     info.
 
    package
      A directory on disk which contains an ``__init__.py`` file, making
