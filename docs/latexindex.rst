@@ -38,7 +38,7 @@ Narrative Documentation
    narr/renderers
    narr/templates
    narr/resources
-   narr/static
+   narr/assets
    narr/webob
    narr/sessions
    narr/flash
@@ -54,7 +54,6 @@ Narrative Documentation
    narr/advconfig
    narr/declarative
    narr/extending
-   narr/assets
    narr/router
    narr/startup
    narr/threadlocals

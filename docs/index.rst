@@ -45,7 +45,7 @@ Narrative documentation in chapter form explaining how to use
    narr/renderers
    narr/templates
    narr/resources
-   narr/static
+   narr/assets
    narr/webob
    narr/sessions
    narr/flash
@@ -61,7 +61,6 @@ Narrative documentation in chapter form explaining how to use
    narr/advconfig
    narr/declarative
    narr/extending
-   narr/assets
    narr/router
    narr/threadlocals
    narr/zca

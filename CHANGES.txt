@@ -79,6 +79,8 @@ Documentation
 
 - Move ZCML usage in Hooks chapter to Declarative Configuration chapter.
 
+- Merge "Static Assets" chapter into the "Assets" chapter.
+
 1.0a7 (2010-12-20)
 ==================
 
