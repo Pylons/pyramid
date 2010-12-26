@@ -1,10 +1,11 @@
 .. index::
    single: assets
+   single: static asssets
 
 .. _assets_chapter:
 
-Assets
-======
+Static Assets
+=============
 
 An :term:`asset` is any file contained within a Python :term:`package` which
 is *not* a Python source code file.  For example, each of the following is an
@@ -26,19 +27,19 @@ example, when you create a :app:`Pyramid` application using one of the
 available "paster" templates, as described in :ref:`creating_a_project`, the
 directory representing the application contains a Python :term:`package`.
 Within that Python package, there are directories full of files which are
-assets.  For example, there is a ``templates`` directory which contains
-``.pt`` files, and a ``static`` directory which contains ``.css``, ``.js``,
-and ``.gif`` files.
+static assets.  For example, there's a ``static`` directory which contains
+``.css``, ``.js``, and ``.gif`` files.  These asset files are delivered when
+a user visits an application URL.
 
 .. _understanding_assets:
 
-Understanding Assets
---------------------
+Understanding Asset Specifications
+----------------------------------
 
 Let's imagine you've created a :app:`Pyramid` application that uses a
 :term:`Chameleon` ZPT template via the
 :func:`pyramid.renderers.render_to_response` API.  For example, the
-application might address the asset using the asset specification
+application might address the asset using the :term:`asset specification`
 ``myapp:templates/some_template.pt`` using that API within a ``views.py``
 file inside a ``myapp`` package:
 
