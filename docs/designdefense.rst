@@ -90,7 +90,7 @@ libraries, each built upon a specific low level stack that is incompatible
 with the other.  We'll also shrink the choice of credible Python web
 frameworks down by at least one.  We're also hoping to attract users from
 other communities (such as Zope's and TurboGears') by providing the features
-they requre, while allowing enough flexibility to do things in a familiar
+they require, while allowing enough flexibility to do things in a familiar
 fashion.  Some overlap of functionality to achieve these goals is expected
 and unavoidable, at least if we aim to prevent pointless duplication at
 higher levels.  If we've done our job well enough, the various audiences will
@@ -260,7 +260,7 @@ ZCA registry gives us, and we have long-ago borne the weight of understanding
 what it does and how it works.  The authors of :app:`Pyramid` understand the
 ZCA deeply and can read code that uses it as easily as any other code.
 
-But we recognize that developers who my want to extend the framework are not
+But we recognize that developers who might want to extend the framework are not
 as comfortable with the ZCA registry API as the original developers are with
 it.  So, for the purposes of being kind to third-party :app:`Pyramid`
 framework developers in, we've drawn some lines in the sand.
