@@ -99,8 +99,9 @@ You should do move the calls to ``add_view`` outside of the (non-reusable)
        config.add_view('myapp.views.view2', name='view2')
 
 Doing this allows an integrator to maximally reuse the configuration
-statements that relate to your application by selectively including or
-disincluding the configuration functions you've created from another package.
+statements that relate to your application by allowing him to selectively
+include or disinclude the configuration functions you've created from an
+"override package".
 
 Alternately, you can use :term:`ZCML` for the purpose of making configuration
 extensible and overrideable. :term:`ZCML` declarations that belong to an
