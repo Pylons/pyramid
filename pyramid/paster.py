@@ -63,7 +63,22 @@ def get_app(config_file, name, loadapp=loadapp):
     return app
 
 _marker = object()
-class PShellCommand(Command):
+
+class PCommand(Command):
+    get_app = staticmethod(get_app) # hook point
+    get_root = staticmethod(get_root) # hook point
+    group_name = 'pyramid'
+    interact = (interact,) # for testing
+    loadapp = (loadapp,) # for testing
+    verbose = 3
+
+    def __init__(self, *arg, **kw):
+        # needs to be in constructor to support Jython (used to be at class
+        # scope as ``usage = '\n' + __doc__``.
+        self.usage = '\n' + self.__doc__
+        Command.__init__(self, *arg, **kw)
+
+class PShellCommand(PCommand):
     """Open an interactive shell with a :app:`Pyramid` app loaded.
 
     This command accepts two positional arguments:
@@ -88,25 +103,12 @@ class PShellCommand(Command):
 
     min_args = 2
     max_args = 2
-    group_name = 'pyramid'
 
     parser = Command.standard_parser(simulate=True)
     parser.add_option('-d', '--disable-ipython',
                       action='store_true',
                       dest='disable_ipython',
                       help="Don't use IPython even if it is available")
-
-    interact = (interact,) # for testing
-    loadapp = (loadapp,) # for testing
-    get_app = staticmethod(get_app) # hook point
-    get_root = staticmethod(get_root) # hook point
-    verbose = 3
-
-    def __init__(self, *arg, **kw):
-        # needs to be in constructor to support Jython (used to be at class
-        # scope as ``usage = '\n' + __doc__``.
-        self.usage = '\n' + self.__doc__
-        Command.__init__(self, *arg, **kw)
 
     def command(self, IPShell=_marker):
         if IPShell is _marker:
@@ -136,3 +138,82 @@ class PShellCommand(Command):
                 closer()
 
 BFGShellCommand = PShellCommand # b/w compat forever
+
+class PRoutesCommand(PCommand):
+    """Print all URL dispatch routes used by a Pyramid application in the
+    order in which they are evaluated.  Each route includes the name of the
+    route, the pattern of the route, and the view callable which will be
+    invoked when the route is matched.
+
+    This command accepts two positional arguments:
+
+    ``config_file`` -- specifies the PasteDeploy config file to use
+    for the interactive shell.  
+
+    ``section_name`` -- specifies the section name in the PasteDeploy
+    config file that represents the application.
+
+    Example::
+
+        $ paster proutes myapp.ini main
+
+    .. note:: You should use a ``section_name`` that refers to the
+              actual ``app`` section in the config file that points at
+              your Pyramid app without any middleware wrapping, or this
+              command will almost certainly fail.
+    """
+    summary = "Print all URL dispatch routes related to a Pyramid application"
+    min_args = 2
+    max_args = 2
+    stdout = sys.stdout
+
+    parser = Command.standard_parser(simulate=True)
+
+    def _get_mapper(self, app):
+        from pyramid.config import Configurator
+        registry = app.registry
+        config = Configurator(registry = registry)
+        return config.get_routes_mapper()
+
+    def out(self, msg): # pragma: no cover
+        print msg
+    
+    def command(self):
+        from pyramid.request import Request
+        from pyramid.interfaces import IRouteRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IView
+        from zope.interface import Interface
+        from zope.interface import providedBy
+        config_file, section_name = self.args
+        app = self.get_app(config_file, section_name, loadapp=self.loadapp[0])
+        registry = app.registry
+        mapper = self._get_mapper(app)
+        if mapper is not None:
+            routes = mapper.get_routes()
+            fmt = '%-15s %-30s %-25s'
+            if not routes:
+                return
+            self.out(fmt % ('Name', 'Pattern', 'View'))
+            self.out(
+                fmt % ('-'*len('Name'), '-'*len('Pattern'), '-'*len('View')))
+            for route in routes:
+                request_iface = registry.queryUtility(IRouteRequest,
+                                                      name=route.name)
+                view_callable = None
+                if request_iface is not None:
+                    if route.factory is None:
+                        context_iface = Interface
+                    else:
+                        request = Request.blank('/')
+                        inst = route.factory(request)
+                        context_iface = providedBy(inst)
+                    # try with factory instance as context; views registered for
+                    # a more general interface will be found if the context
+                    # iface is very specific
+                    view_callable = registry.adapters.lookup(
+                        (IViewClassifier, request_iface, context_iface),
+                        IView, name='', default=None)
+                self.out(fmt % (route.name, route.pattern, view_callable))
+            
+                

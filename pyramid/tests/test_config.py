@@ -2338,7 +2338,7 @@ class ConfiguratorTests(unittest.TestCase):
             config.add_route('name', '/pattern', view_attr='abc')
         except ConfigurationError:
             pass
-        else:
+        else: # pragma: no cover
             raise AssertionError
 
     def test_add_route_no_view_with_view_context(self):
@@ -2348,7 +2348,7 @@ class ConfiguratorTests(unittest.TestCase):
             config.add_route('name', '/pattern', view_context=DummyContext)
         except ConfigurationError:
             pass
-        else:
+        else: # pragma: no cover
             raise AssertionError
 
     def test_add_route_no_view_with_view_permission(self):
@@ -2358,7 +2358,7 @@ class ConfiguratorTests(unittest.TestCase):
             config.add_route('name', '/pattern', view_permission='edit')
         except ConfigurationError:
             pass
-        else:
+        else: # pragma: no cover
             raise AssertionError
 
     def test_add_route_no_view_with_view_renderer(self):
@@ -2368,7 +2368,7 @@ class ConfiguratorTests(unittest.TestCase):
             config.add_route('name', '/pattern', view_renderer='json')
         except ConfigurationError:
             pass
-        else:
+        else: # pragma: no cover
             raise AssertionError
 
     def test__override_not_yet_registered(self):

@@ -88,6 +88,7 @@ setup(name='pyramid',
         pylons_sqla=pyramid.paster:PylonsSQLAlchemyProjectTemplate
         [paste.paster_command]
         pshell=pyramid.paster:PShellCommand
+        proutes=pyramid.paster:PRoutesCommand
         [console_scripts]
         bfg2pyramid = pyramid.fixers.fix_bfg_imports:main
       """

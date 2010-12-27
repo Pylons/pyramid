@@ -25,6 +25,10 @@ Features
   arguments to add_route work by raising an exception during configuration if
   view-related arguments exist but no ``view`` argument is passed.
 
+- Add ``paster proute`` command which displays a summary of the routing
+  table.  See the narrative documentation section within the "URL Dispatch"
+  chapter entitled "Displaying All Application Routes".
+
 Paster Templates
 ----------------
 
@@ -80,6 +84,10 @@ Documentation
 - Move ZCML usage in Hooks chapter to Declarative Configuration chapter.
 
 - Merge "Static Assets" chapter into the "Assets" chapter.
+
+- Added narrative documentation section within the "URL Dispatch" chapter
+  entitled "Displaying All Application Routes" (for ``paster proutes``
+  command).
 
 1.0a7 (2010-12-20)
 ==================
