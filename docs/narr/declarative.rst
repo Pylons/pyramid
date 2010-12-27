@@ -47,9 +47,7 @@ In a file named ``helloworld.py``:
 
    if __name__ == '__main__':
        config = Configurator()
-       config.begin()
        config.load_zcml('configure.zcml')
-       config.end()
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
@@ -82,9 +80,7 @@ the ``if __name__ == '__main__'`` section of ``helloworld.py``:
 
    if __name__ == '__main__':
        config = Configurator()
-       config.begin()
        config.add_view(hello_world)
-       config.end()
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
@@ -98,9 +94,7 @@ it now reads as:
 
    if __name__ == '__main__':
        config = Configurator()
-       config.begin()
        config.load_zcml('configure.zcml')
-       config.end()
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
@@ -225,9 +219,7 @@ To do so, first, create a file named ``helloworld.py``:
 
    if __name__ == '__main__':
        config = Configurator()
-       config.begin()
        config.load_zcml('configure.zcml')
-       config.end()
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
@@ -270,10 +262,8 @@ within the ``if __name__ == '__main__'`` section of ``helloworld.py``:
 
    if __name__ == '__main__':
        config = Configurator()
-       config.begin()
        config.add_view(hello_world)
        config.add_view(goodbye_world, name='goodbye')
-       config.end()
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
@@ -288,9 +278,7 @@ name='goodbye')``, so that it now reads as:
 
    if __name__ == '__main__':
        config = Configurator()
-       config.begin()
        config.load_zcml('configure.zcml')
-       config.end()
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
@@ -545,9 +533,7 @@ file points to is scanned.
    if __name__ == '__main__':
        from pyramid.config import Configurator
        config = Configurator()
-       config.begin()
        config.load_zcml('configure.zcml')
-       config.end()
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
