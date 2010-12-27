@@ -66,11 +66,11 @@ two parts:
 
 The two parts are separated by the colon character.
 
-:app:`Pyramid` uses the :term:`pkg_resources` API to resolve the package name
-and asset name to an absolute (operating-system-specific) file name.  It
-eventually passes this resolved absolute filesystem path to the Chameleon
-templating engine, which then uses it to load, parse, and execute the
-template file.
+:app:`Pyramid` uses the Python :term:`pkg_resources` API to resolve the
+package name and asset name to an absolute (operating-system-specific) file
+name.  It eventually passes this resolved absolute filesystem path to the
+Chameleon templating engine, which then uses it to load, parse, and execute
+the template file.
 
 There is a second form of asset specification: a *relative* asset
 specification.  Instead of using an "absolute" asset specification which
