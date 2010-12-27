@@ -1002,7 +1002,7 @@ understand the ZCA or he will need to develop his own similar extensibility
 system.
 
 Ultimately, any argument about whether the extensibility features lent to
-applications by :app:`Pyramid` are "good" or "bad" is somewhat pointless. You
+applications by :app:`Pyramid` are "good" or "bad" is mostly pointless. You
 needn't take advantage of the extensibility features provided by a particular
 :app:`Pyramid` application in order to affect a modification for a particular
 set of its deployments.  You can ignore the application's extensibility
