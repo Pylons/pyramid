@@ -10,10 +10,11 @@ except ImportError: # pragma: no cover
 
 from webob import Response
 
-import hmac
-import binascii
-import time
 import base64
+import binascii
+import hmac
+import time
+import os
 
 from zope.interface import implements
 
@@ -166,6 +167,34 @@ def UnencryptedCookieSessionFactoryConfig(
         popitem = manage_accessed(dict.popitem)
         __setitem__ = manage_accessed(dict.__setitem__)
         __delitem__ = manage_accessed(dict.__delitem__)
+
+        # flash API methods
+        @manage_accessed
+        def flash(self, msg, queue='', allow_duplicate=True):
+            storage = self.setdefault('_f_' + queue, [])
+            if allow_duplicate or (msg not in storage):
+                storage.append(msg)
+
+        @manage_accessed
+        def pop_flash(self, queue=''):
+            storage = self.pop('_f_' + queue, [])
+            return storage
+
+        @manage_accessed
+        def peek_flash(self, queue=''):
+            storage = self.get('_f_' + queue, [])
+            return storage
+
+        # CSRF API methods
+        @manage_accessed
+        def new_csrf_token(self):
+            token = os.urandom(20).encode('hex')
+            self['_csrft_'] = token
+            return token
+
+        @manage_accessed
+        def get_csrf_token(self):
+            return self.get('_csrft_', None)
 
         # non-API methods
         def _set_cookie(self, response):

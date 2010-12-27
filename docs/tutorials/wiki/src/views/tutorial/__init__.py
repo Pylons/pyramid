@@ -4,9 +4,6 @@ from tutorial.models import appmaker
 
 def main(global_config, **settings):
     """ This function returns a WSGI application.
-    
-    It is usually called by the PasteDeploy framework during 
-    ``paster serve``.
     """
     zodb_uri = settings.get('zodb_uri')
     if zodb_uri is None:
@@ -16,6 +13,6 @@ def main(global_config, **settings):
     def get_root(request):
         return finder(request.environ)
     config = Configurator(root_factory=get_root, settings=settings)
-    config.load_zcml('configure.zcml')
+    config.add_static_view('static', 'tutorial:static')
+    config.scan('tutorial')
     return config.make_wsgi_app()
-

@@ -4,23 +4,24 @@ Pyramid TODOs
 Must-Have (before 1.0)
 ----------------------
 
-- Narrative docs for ``Configurator.include`` and ``Configurator.commit``.
-
-- Provide a .flash API on session object.
+- Write a "Whats New" (delta from BFG 1.3)
 
 - Consider deprecations for ``model`` and ``resource`` APIs.
 
 Should-Have
 -----------
 
-- Add docs for httpexceptions module for each webob.exc class that inherits
-  from WSGIHTTPException.
+- Add notes about renderer response attrs to request docs.
+
+- Add an example of using a cascade to serve static assets from the root.
+
+- Explore static file return from handler action using wsgiapp2 + fileapp.
+
+- Static (URL-generation only) routes.
+
+- Add narrative docs for wsgiapp and wsgiapp2.
 
 - translationdir ZCML directive use of ``path_spec`` should maybe die.
-
-- Add CRSF token creation/checking machinery (only "should have" vs. "must
-  have" because I'm not sure it belongs in Pyramid.. it definitely must exist
-  in formgen libraries, and *might* belong in Pyramid).
 
 - Change "Cleaning up After a Request" in the urldispatch chapter to
   use ``request.add_response_callback``.
@@ -28,11 +29,13 @@ Should-Have
 - ``decorator=`` parameter to view_config.  This would replace the existing
   _map_view "decorator" if it existed.
 
+- Provide a response_set_cookie method on the request for rendered responses
+  that can be used as input to response.set_cookie?
+
 Nice-to-Have
 ------------
 
-- Use ``@register_view`` instead of ``@view_config`` and change view docs to
-  use "view registration" instead of "view configuration".
+- Better "Extending" chapter.
 
 - Try to make test suite pass on IronPython.
 
@@ -86,9 +89,6 @@ Nice-to-Have
        request_method = 'GET'
          action = '^foo$'
            mypackage.views.MyView.foo_GET
-
-- Provide a response_cookies attribute on the request for rendered
-  responses that can be used as input to response.set_cookie.
 
 - Raise an exception when a value in response_headerlist is not a
   string or decide to encode.

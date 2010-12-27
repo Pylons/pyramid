@@ -38,9 +38,11 @@ Narrative Documentation
    narr/renderers
    narr/templates
    narr/resources
-   narr/static
+   narr/assets
    narr/webob
    narr/sessions
+   narr/flash
+   narr/csrf
    narr/security
    narr/hybrid
    narr/i18n
@@ -49,9 +51,9 @@ Narrative Documentation
    narr/environment
    narr/testing
    narr/hooks
+   narr/advconfig
    narr/declarative
    narr/extending
-   narr/assets
    narr/router
    narr/startup
    narr/threadlocals

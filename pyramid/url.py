@@ -227,7 +227,7 @@ def resource_url(resource, request, *elements, **kw):
     a data structure with an ``.items()`` method that returns a
     sequence of two-tuples (presumably a dictionary).  This data
     structure will be turned into a query string per the documentation
-    of ``repoze.url.urlencode`` function.  After the query data is
+    of ``pyramid.url.urlencode`` function.  After the query data is
     turned into a query string, a leading ``?`` is prepended, and the
     resulting string is appended to the generated URL.
 
@@ -256,7 +256,8 @@ def resource_url(resource, request, *elements, **kw):
     e.g. ``http://example.com?foo=1#bar``.
 
     If the ``resource`` passed in has a ``__resource_url__`` method, it will
-    be used to generate the URL that is returned by this function.  See also
+    be used to generate the URL (scheme, host, port, path) that for the base
+    resource which is operated upon by this function.  See also
     :ref:`overriding_resource_url_generation`.
 
     .. note:: If the :term:`resource` used is the result of a

@@ -1,6 +1,12 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
+- The name ``registry`` was not available in the ``paster pshell``
+  environment under IPython.
+
 Features
 --------
 
@@ -8,6 +14,22 @@ Features
   as the result of invoking the ``pyramid.url.resource_url`` function to
   generate a URL, overriding the default logic.  See the new "Generating The
   URL Of A Resource" section within the Resources narrative chapter.
+
+- Added flash messaging, as described in the "Flash Messaging" narrative
+  documentation chapter.
+
+- Added CSRF token generation, as described in the narrative chapter entitled
+  "Preventing Cross-Site Request Forgery Attacks".
+
+- Prevent misunderstanding of how the ``view`` and ``view_permission``
+  arguments to add_route work by raising an exception during configuration if
+  view-related arguments exist but no ``view`` argument is passed.
+
+Paster Templates
+----------------
+
+- The ``pyramid_zodb`` Paster template no longer employs ZCML.  Instead, it
+  is based on scanning.
 
 Documentation
 -------------
@@ -32,6 +54,32 @@ Documentation
 
 - Added "Finding a Resource With a Class or Interface in Lineage" to
   Resources narrative chapter.
+
+- Added a "Flash Messaging" narrative documentation chapter.
+
+- Added a narrative chapter entitled "Preventing Cross-Site Request Forgery
+  Attacks".
+
+- Changed the "ZODB + Traversal Wiki Tutorial" based on changes to
+  ``pyramid_zodb`` Paster template.
+
+- Added "Advanced Configuration" narrative chapter which documents how to
+  deal with configuration conflicts, two-phase configuration, ``include`` and
+  ``commit``.
+
+- Fix API documentation rendering for ``pyramid.view.static``
+
+- Add "Pyramid Provides More Than One Way to Do It" to Design Defense
+  documentation.
+
+- Changed "Static Assets" narrative chapter: clarify that ``name`` represents
+  a prefix unless it's a URL, added an example of a root-relative static view
+  fallback for URL dispatch, added an example of creating a simple view that
+  returns the body of a file.
+
+- Move ZCML usage in Hooks chapter to Declarative Configuration chapter.
+
+- Merge "Static Assets" chapter into the "Assets" chapter.
 
 1.0a7 (2010-12-20)
 ==================

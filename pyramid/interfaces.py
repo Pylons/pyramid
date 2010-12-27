@@ -460,6 +460,36 @@ class ISession(Interface):
         the sessioning machinery to notice the mutation of the
         internal dictionary."""
 
+    def flash(msg, queue='', allow_duplicate=True):
+        """ Push a flash message onto the end of the flash queue represented
+        by ``queue``.  An alternate flash message queue can used by passing
+        an optional ``queue``, which must be a string.  If
+        ``allow_duplicate`` is false, if the ``msg`` already exists in the
+        queue, it will not be readded."""
+
+    def pop_flash(queue=''):
+        """ Pop a queue from the flash storage.  The queue is removed from
+        flash storage after this message is called.  The queue is returned;
+        it is a list of flash messages added by
+        :meth:`pyramid.interfaces.ISesssion.flash`"""
+
+    def peek_flash(queue=''):
+        """ Peek at a queue in the flash storage.  The queue remains in
+        flash storage after this message is called.  The queue is returned;
+        it is a list of flash messages added by
+        :meth:`pyramid.interfaces.ISesssion.flash`
+        """
+
+    def new_csrf_token(self):
+        """ Create and set into the session a new, random cross-site request
+        forgery protection token.  Return the token.  It will be a string."""
+
+    def get_csrf_token(self):
+        """ Get the CSRF token previously added to the session via
+        ``new_csrf_token``, and return the token.  If no CSRF token exists,
+        the value returned will be ``None``.
+        """
+
     # mapping methods
     
     def __getitem__(key):

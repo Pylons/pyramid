@@ -251,7 +251,8 @@ assumptions:
 
 - you are willing to use :term:`traversal` to map URLs to code.
 
-- you want to use :term:`ZCML` to perform configuration.
+- you want to use imperative code plus a :term:`scan` to perform
+  configuration.
 
 .. note::
 

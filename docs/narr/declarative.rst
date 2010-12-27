@@ -3,28 +3,27 @@
 Declarative Configuration
 =========================
 
-The mode of configuration most comprehensively detailed by examples in
-narrative chapters in this book is "imperative" configuration. This is the
-configuration mode in which a developer cedes the least amount of control to
-the framework; it's "imperative" because you express the configuration
-directly in Python code, and you have the full power of Python at your
-disposal as you issue configuration statements.  However, another mode of
-configuration exists within :app:`Pyramid`, which often provides better
-extensibility and configuration conflict detection.
+The mode of configuration detailed in the majority of examples within this
+this book is "imperative" configuration. This is the configuration mode in
+which a developer cedes the least amount of control to the framework; it's
+"imperative" because you express the configuration directly in Python code,
+and you have the full power of Python at your disposal as you issue
+configuration statements.  However, another mode of configuration exists
+within :app:`Pyramid` named :term:`ZCML` which often provides better
+opportunity for extensibility.
 
 A complete listing of ZCML directives is available within
 :ref:`zcml_directives`.  This chapter provides an overview of how you might
 get started with ZCML and highlights some common tasks performed when you use
-ZCML.  You can get a better understanding of when it's appropriate to use
-ZCML from :ref:`extending_chapter`.
+ZCML.
 
 .. index::
    single: declarative configuration
 
 .. _declarative_configuration:
 
-Declarative Configuration
--------------------------
+ZCML Configuration
+------------------
 
 A :app:`Pyramid` application can be configured "declaratively", if so
 desired.  Declarative configuration relies on *declarations* made external to
@@ -48,9 +47,7 @@ In a file named ``helloworld.py``:
 
    if __name__ == '__main__':
        config = Configurator()
-       config.begin()
        config.load_zcml('configure.zcml')
-       config.end()
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
@@ -83,9 +80,7 @@ the ``if __name__ == '__main__'`` section of ``helloworld.py``:
 
    if __name__ == '__main__':
        config = Configurator()
-       config.begin()
        config.add_view(hello_world)
-       config.end()
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
@@ -99,9 +94,7 @@ it now reads as:
 
    if __name__ == '__main__':
        config = Configurator()
-       config.begin()
        config.load_zcml('configure.zcml')
-       config.end()
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
@@ -162,6 +155,8 @@ configure your application; instead you need to use :term:`ZCML`.
 
 .. index::
    single: ZCML conflict detection
+
+.. _zcml_conflict_detection:
 
 ZCML Conflict Detection
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -224,9 +219,7 @@ To do so, first, create a file named ``helloworld.py``:
 
    if __name__ == '__main__':
        config = Configurator()
-       config.begin()
        config.load_zcml('configure.zcml')
-       config.end()
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
@@ -269,10 +262,8 @@ within the ``if __name__ == '__main__'`` section of ``helloworld.py``:
 
    if __name__ == '__main__':
        config = Configurator()
-       config.begin()
        config.add_view(hello_world)
        config.add_view(goodbye_world, name='goodbye')
-       config.end()
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
@@ -287,9 +278,7 @@ name='goodbye')``, so that it now reads as:
 
    if __name__ == '__main__':
        config = Configurator()
-       config.begin()
        config.load_zcml('configure.zcml')
-       config.end()
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
@@ -344,6 +333,8 @@ XML tag.  It is a "container" directive because its only job is to
 contain other directives.
 
 See also :ref:`configure_directive` and :ref:`word_on_xml_namespaces`.
+
+.. _the_include_tag:
 
 The ``<include>`` Tag
 ~~~~~~~~~~~~~~~~~~~~~
@@ -478,6 +469,45 @@ declaratively.  More information about this mode of configuration is
 available in :ref:`declarative_configuration` and within
 :ref:`zcml_reference`.
 
+.. index::
+   single: ZCML granularity
+
+ZCML Granularity
+~~~~~~~~~~~~~~~~
+
+It's extremely helpful to third party application "extenders" (aka
+"integrators") if the :term:`ZCML` that composes the configuration for an
+application is broken up into separate files which do very specific things.
+These more specific ZCML files can be reintegrated within the application's
+main ``configure.zcml`` via ``<include file="otherfile.zcml"/>``
+declarations.  When ZCML files contain sets of specific declarations, an
+integrator can avoid including any ZCML he does not want by including only
+ZCML files which contain the declarations he needs.  He is not forced to
+"accept everything" or "use nothing".
+
+For example, it's often useful to put all ``<route>`` declarations in a
+separate ZCML file, as ``<route>`` statements have a relative ordering that
+is extremely important to the application: if an extender wants to add a
+route to the "middle" of the routing table, he will always need to disuse all
+the routes and cut and paste the routing configuration into his own
+application.  It's useful for the extender to be able to disuse just a
+*single* ZCML file in this case, accepting the remainder of the configuration
+from other :term:`ZCML` files in the original application.
+
+Granularizing ZCML is not strictly required.  An extender can always disuse
+*all* your ZCML, choosing instead to copy and paste it into his own package,
+if necessary.  However, doing so is considerate, and allows for the best
+reusability. Sometimes it's possible to include only certain ZCML files from
+an application that contain only the registrations you really need, omitting
+others. But sometimes it's not.  For brute force purposes, when you're
+getting ``view`` or ``route`` registrations that you don't actually want in
+your overridden application, it's always appropriate to just *not include*
+any ZCML file from the overridden application.  Instead, just cut and paste
+the entire contents of the ``configure.zcml`` (and any ZCML file included by
+the overridden application's ``configure.zcml``) into your own package and
+omit the ``<include package=""/>`` ZCML declaration in the overriding
+package's ``configure.zcml``.
+
 .. _zcml_scanning:
 
 Scanning via ZCML
@@ -503,9 +533,7 @@ file points to is scanned.
    if __name__ == '__main__':
        from pyramid.config import Configurator
        config = Configurator()
-       config.begin()
        config.load_zcml('configure.zcml')
-       config.end()
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
@@ -1266,9 +1294,143 @@ which we assume lives in a ``subscribers.py`` module within your application:
 
 See also :ref:`subscriber_directive` and :ref:`events_chapter`.
 
+.. index::
+   single: not found view
 
-.. Todo
-.. ----
+.. _notfound_zcml:
 
-.. - hooks chapter still has topics for ZCML
+Configuring a Not Found View via ZCML
+-------------------------------------
+
+If your application uses :term:`ZCML`, you can replace the Not Found view by
+placing something like the following ZCML in your ``configure.zcml`` file.
+
+.. code-block:: xml
+   :linenos:
+
+   <view
+     view="helloworld.views.notfound_view"
+     context="pyramid.exceptions.NotFound"
+    />
+
+Replace ``helloworld.views.notfound_view`` with the Python dotted name to the
+notfound view you want to use.
+
+See :ref:`changing_the_notfound_view` for more information.
+
+.. index::
+   single: forbidden view
+
+.. _forbidden_zcml:
+
+Configuring a Forbidden View via ZCML
+-------------------------------------
+
+If your application uses :term:`ZCML`, you can replace the Forbidden view by
+placing something like the following ZCML in your ``configure.zcml`` file.
+
+.. code-block:: xml
+   :linenos:
+
+   <view
+     view="helloworld.views.notfound_view"
+     context="pyramid.exceptions.Forbidden"
+    />
+
+Replace ``helloworld.views.forbidden_view`` with the Python dotted name to
+the forbidden view you want to use.
+
+See :ref:`changing_the_forbidden_view` for more information.
+
+.. _changing_traverser_zcml:
+
+Configuring an Alternate Traverser via ZCML
+-------------------------------------------
+
+Use an ``adapter`` stanza in your application's ``configure.zcml`` to
+change the default traverser:
+
+.. code-block:: xml
+   :linenos:
+
+    <adapter
+      factory="myapp.traversal.Traverser"
+      provides="pyramid.interfaces.ITraverser"
+      for="*"
+     />
+
+Or to register a traverser for a specific resource type:
+
+.. code-block:: xml
+   :linenos:
+
+    <adapter
+      factory="myapp.traversal.Traverser"
+      provides="pyramid.interfaces.ITraverser"
+      for="myapp.resources.MyRoot"
+     />
+
+See :ref:`changing_the_traverser` for more information.
+
+.. index::
+   single: url generator
+
+.. _changing_resource_url_zcml:
+
+Changing ``resource_url`` URL Generation via ZCML
+-------------------------------------------------
+
+You can change how :func:`pyramid.url.resource_url` generates a URL for a
+specific type of resource by adding an adapter statement to your
+``configure.zcml``.
+
+.. code-block:: xml
+   :linenos:
+
+    <adapter
+      factory="myapp.traversal.URLGenerator"
+      provides="pyramid.interfaces.IContextURL"
+      for="myapp.resources.MyRoot *"
+     />
+
+See :ref:`changing_resource_url` for more information.
+
+.. _changing_request_factory_zcml:
+
+Changing the Request Factory via ZCML
+-------------------------------------
+
+A ``MyRequest`` class can be registered via ZCML as a request factory through
+the use of the ZCML ``utility`` directive.  In the below, we assume it lives
+in a package named ``mypackage.mymodule``.
+
+.. code-block:: xml
+   :linenos:
+
+   <utility
+      component="mypackage.mymodule.MyRequest"
+      provides="pyramid.interfaces.IRequestFactory"
+    />
+
+See :ref:`changing_request_factory` for more information.
+
+.. _adding_renderer_globals_zcml:
+
+Changing the Renderer Globals Factory via ZCML
+----------------------------------------------
+
+A renderer globals factory can be registered via ZCML as a through the use of
+the ZCML ``utility`` directive.  In the below, we assume a
+``renderers_globals_factory`` function lives in a package named
+``mypackage.mymodule``.
+
+.. code-block:: xml
+   :linenos:
+
+   <utility
+      component="mypackage.mymodule.renderer_globals_factory"
+      provides="pyramid.interfaces.IRendererGlobalsFactory"
+    />
+
+See :ref:`adding_renderer_globals` for more information.
 

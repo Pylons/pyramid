@@ -64,8 +64,7 @@ The included templates are these:
   :term:`ZCML` (declarative configuration).
 
 ``pyramid_zodb``
-  URL mapping via :term:`traversal` and persistence via :term:`ZODB`, using
-  :term:`ZCML` (declarative configuration).
+  URL mapping via :term:`traversal` and persistence via :term:`ZODB`.
 
 ``pyramid_routesalchemy`` 
   URL mapping via :term:`URL dispatch` and persistence via
