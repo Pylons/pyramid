@@ -6,9 +6,6 @@ Must-Have (before 1.0)
 
 - Write a "Whats New" (delta from BFG 1.3)
 
-- Reconcile "extending an existing application" chapter with existence of
-  "advanced configuration" chapter.
-
 - Consider deprecations for ``model`` and ``resource`` APIs.
 
 Should-Have
@@ -37,6 +34,8 @@ Should-Have
 
 Nice-to-Have
 ------------
+
+- Better "Extending" chapter.
 
 - Try to make test suite pass on IronPython.
 

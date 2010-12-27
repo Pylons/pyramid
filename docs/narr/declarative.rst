@@ -3,28 +3,27 @@
 Declarative Configuration
 =========================
 
-The mode of configuration most comprehensively detailed by examples in
-narrative chapters in this book is "imperative" configuration. This is the
-configuration mode in which a developer cedes the least amount of control to
-the framework; it's "imperative" because you express the configuration
-directly in Python code, and you have the full power of Python at your
-disposal as you issue configuration statements.  However, another mode of
-configuration exists within :app:`Pyramid`, which often provides better
-extensibility and configuration conflict detection.
+The mode of configuration detailed in the majority of examples within this
+this book is "imperative" configuration. This is the configuration mode in
+which a developer cedes the least amount of control to the framework; it's
+"imperative" because you express the configuration directly in Python code,
+and you have the full power of Python at your disposal as you issue
+configuration statements.  However, another mode of configuration exists
+within :app:`Pyramid` named :term:`ZCML` which often provides better
+opportunity for extensibility.
 
 A complete listing of ZCML directives is available within
 :ref:`zcml_directives`.  This chapter provides an overview of how you might
 get started with ZCML and highlights some common tasks performed when you use
-ZCML.  You can get a better understanding of when it's appropriate to use
-ZCML from :ref:`extending_chapter`.
+ZCML.
 
 .. index::
    single: declarative configuration
 
 .. _declarative_configuration:
 
-Declarative Configuration
--------------------------
+ZCML Configuration
+------------------
 
 A :app:`Pyramid` application can be configured "declaratively", if so
 desired.  Declarative configuration relies on *declarations* made external to
@@ -162,6 +161,8 @@ configure your application; instead you need to use :term:`ZCML`.
 
 .. index::
    single: ZCML conflict detection
+
+.. _zcml_conflict_detection:
 
 ZCML Conflict Detection
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -345,6 +346,8 @@ contain other directives.
 
 See also :ref:`configure_directive` and :ref:`word_on_xml_namespaces`.
 
+.. _the_include_tag:
+
 The ``<include>`` Tag
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -477,6 +480,45 @@ We've now configured a :app:`Pyramid` helloworld application
 declaratively.  More information about this mode of configuration is
 available in :ref:`declarative_configuration` and within
 :ref:`zcml_reference`.
+
+.. index::
+   single: ZCML granularity
+
+ZCML Granularity
+~~~~~~~~~~~~~~~~
+
+It's extremely helpful to third party application "extenders" (aka
+"integrators") if the :term:`ZCML` that composes the configuration for an
+application is broken up into separate files which do very specific things.
+These more specific ZCML files can be reintegrated within the application's
+main ``configure.zcml`` via ``<include file="otherfile.zcml"/>``
+declarations.  When ZCML files contain sets of specific declarations, an
+integrator can avoid including any ZCML he does not want by including only
+ZCML files which contain the declarations he needs.  He is not forced to
+"accept everything" or "use nothing".
+
+For example, it's often useful to put all ``<route>`` declarations in a
+separate ZCML file, as ``<route>`` statements have a relative ordering that
+is extremely important to the application: if an extender wants to add a
+route to the "middle" of the routing table, he will always need to disuse all
+the routes and cut and paste the routing configuration into his own
+application.  It's useful for the extender to be able to disuse just a
+*single* ZCML file in this case, accepting the remainder of the configuration
+from other :term:`ZCML` files in the original application.
+
+Granularizing ZCML is not strictly required.  An extender can always disuse
+*all* your ZCML, choosing instead to copy and paste it into his own package,
+if necessary.  However, doing so is considerate, and allows for the best
+reusability. Sometimes it's possible to include only certain ZCML files from
+an application that contain only the registrations you really need, omitting
+others. But sometimes it's not.  For brute force purposes, when you're
+getting ``view`` or ``route`` registrations that you don't actually want in
+your overridden application, it's always appropriate to just *not include*
+any ZCML file from the overridden application.  Instead, just cut and paste
+the entire contents of the ``configure.zcml`` (and any ZCML file included by
+the overridden application's ``configure.zcml``) into your own package and
+omit the ``<include package=""/>`` ZCML declaration in the overriding
+package's ``configure.zcml``.
 
 .. _zcml_scanning:
 

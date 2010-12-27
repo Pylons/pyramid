@@ -118,6 +118,9 @@ Conflict detection happens for any kind of configuration: imperative
 configuration, :term:`ZCML` configuration, or configuration that results from
 the execution of a :term:`scan`.
 
+.. note:: If you use, ZCML, its conflict detection algorithm is described in
+   :ref:`zcml_conflict_detection`.
+
 Manually Resolving Conflicts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -334,6 +337,9 @@ Instead, use :meth:`pyramid.config.Configuration.include`:
 
 Using ``include`` rather than calling the function directly will allow
 :ref:`automatic_conflict_resolution` to work.
+
+.. note: See :ref:`the_include_tag` for a declarative alternative to
+   :meth:`pyramid.config.Configurator.include`.
 
 .. _twophase_config:
 
