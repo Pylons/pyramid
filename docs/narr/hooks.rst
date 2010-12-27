@@ -621,10 +621,8 @@ performed, enabling you to set up the utility in advance:
 
    if __name__ == '__main__':
        config = Configurator()
-       config.begin()
        config.registry.registerUtility(UtilityImplementation())
        config.scan()
-       config.end()
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
