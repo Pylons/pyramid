@@ -125,7 +125,9 @@ ZCML Directive Reference
    zcml/configure
    zcml/default_permission
    zcml/forbidden
+   zcml/handler
    zcml/include
+   zcml/localenegotiator
    zcml/notfound
    zcml/remoteuserauthenticationpolicy
    zcml/renderer
@@ -134,6 +136,7 @@ ZCML Directive Reference
    zcml/scan
    zcml/static
    zcml/subscriber
+   zcml/translationdir
    zcml/utility
    zcml/view
 
