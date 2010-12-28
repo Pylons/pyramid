@@ -63,6 +63,8 @@ queue and return it for use.
 To pop a particular queue of messages from the flash object, use the session
 object's ``pop_flash`` method.
 
+.. method:: pop_flash(queue='')
+
 .. code-block:: python
    :linenos:
 
@@ -92,6 +94,8 @@ Once one or more messages has been added to a flash queue by the
 ``session.flash`` API, the ``session.peek_flash`` API can be used to "peek"
 at that queue.  Unlike ``session.pop_flash``, the queue is not popped from
 flash storage.
+
+.. method:: peek_flash(queue='')
 
 .. code-block:: python
    :linenos:
