@@ -404,7 +404,7 @@ Obtaining the Lineage of a Resource
 -----------------------------------
 
 :func:`pyramid.location.lineage` returns a generator representing the
-:term:`lineage` of the :term:`location` aware:term:`resource` object.
+:term:`lineage` of the :term:`location` aware :term:`resource` object.
 
 The :func:`~pyramid.location.lineage` function returns the resource it is
 passed, then each parent of the resource, in order.  For example, if the
