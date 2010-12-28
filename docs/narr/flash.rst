@@ -38,7 +38,7 @@ provide is not modified in any way.
 
 The ``queue`` argument allows you to choose a queue to which to append the
 message you provide.  This can be used to push different kinds of messages
-into flash storage for later display in different places on a page.  You cam
+into flash storage for later display in different places on a page.  You can
 pass any name for your queue, but it must be a string. The default value is
 the empty string, which chooses the default queue. Each queue is independent,
 and can be popped by ``pop_flash`` or examined via ``peek_flash`` separately.
