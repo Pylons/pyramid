@@ -98,7 +98,7 @@ directory on a filesystem to an application user's browser.  Use the
 mechanism makes a directory of static files available at a name relative to
 the application root URL, e.g. ``/static`` or as an external URL.
 
-.. note:: `~pyramid.config.Configurator.add_static_view` cannot serve a
+.. note:: :meth:`~pyramid.config.Configurator.add_static_view` cannot serve a
    single file, nor can it serve a directory of static files directly
    relative to the root URL of a :app:`Pyramid` application.  For these
    features, see :ref:`advanced_static`.
@@ -282,7 +282,7 @@ create such a circumstance, we suggest using the
 in the application ``.ini`` file named ``media_location``.  Then set the
 value of ``media_location`` to either a prefix or a URL depending on whether
 the application is being run in development or in production (use a different
-`.ini`` file for production than you do for development).  This is just a
+``.ini`` file for production than you do for development).  This is just a
 suggestion for a pattern; any setting name other than ``media_location``
 could be used.
 
