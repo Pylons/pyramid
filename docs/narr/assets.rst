@@ -282,7 +282,7 @@ create such a circumstance, we suggest using the
 in the application ``.ini`` file named ``media_location``.  Then set the
 value of ``media_location`` to either a prefix or a URL depending on whether
 the application is being run in development or in production (use a different
-`.ini`` file for production than you do for development).  This is just a
+``.ini`` file for production than you do for development).  This is just a
 suggestion for a pattern; any setting name other than ``media_location``
 could be used.
 
