@@ -1,7 +1,13 @@
 Next release
 ============
 
-- ...
+Bug Fixes
+---------
+
+- The ``proutes`` command tried too hard to resolve the view for printing,
+  resulting in exceptions when an exceptional root factory was encountered.
+  Instead of trying to resolve the view, if it cannot, it will now just print
+  ``<unknown>``.
 
 1.0a8 (2010-12-27)
 ==================

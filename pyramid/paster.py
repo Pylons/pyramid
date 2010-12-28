@@ -201,19 +201,10 @@ class PRoutesCommand(PCommand):
                 request_iface = registry.queryUtility(IRouteRequest,
                                                       name=route.name)
                 view_callable = None
-                if request_iface is not None:
-                    if route.factory is None:
-                        context_iface = Interface
-                    else:
-                        request = Request.blank('/')
-                        inst = route.factory(request)
-                        context_iface = providedBy(inst)
-                    # try with factory instance as context; views registered for
-                    # a more general interface will be found if the context
-                    # iface is very specific
+                if (request_iface is None) or (route.factory is not None):
+                    self.out(fmt % (route.name, route.pattern, '<unknown>'))
+                else:
                     view_callable = registry.adapters.lookup(
-                        (IViewClassifier, request_iface, context_iface),
+                        (IViewClassifier, request_iface, Interface),
                         IView, name='', default=None)
-                self.out(fmt % (route.name, route.pattern, view_callable))
-            
-                
+                    self.out(fmt % (route.name, route.pattern, view_callable))
