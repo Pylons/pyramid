@@ -56,7 +56,7 @@ present in the queue, it will not be added.
 Using the ``session.pop_flash`` Method
 --------------------------------------
 
-Once one or more messages has been added to a flash queue by the
+Once one or more messages have been added to a flash queue by the
 ``session.flash`` API, the ``session.pop_flash`` API can be used to pop that
 queue and return it for use.
 
