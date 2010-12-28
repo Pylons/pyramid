@@ -415,7 +415,7 @@ class AuthTktCookieHelper(object):
         environ = request.environ
         return self._get_cookies(environ, '', max_age=EXPIRE)
     
-    def remember(self, request, userid, max_age=None):
+    def remember(self, request, userid, max_age=None, tokens=()):
         max_age = max_age or self.max_age
         environ = request.environ
 
@@ -436,6 +436,7 @@ class AuthTktCookieHelper(object):
             self.secret,
             userid,
             remote_addr,
+            tokens=tokens,
             user_data=user_data,
             cookie_name=self.cookie_name,
             secure=self.secure)

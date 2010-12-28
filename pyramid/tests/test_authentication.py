@@ -568,7 +568,22 @@ class TestAuthTktCookieHelper(unittest.TestCase):
 
         self.assertEqual(values[0]['max-age'], '500')
         self.failUnless(values[0]['expires'])
-        
+
+    def test_remember_tokens(self):
+        plugin = self._makeOne('secret')
+        request = self._makeRequest()
+        result = plugin.remember(request, 'other', tokens=('foo', 'bar'))
+        self.assertEqual(len(result), 3)
+
+        self.assertEqual(result[0][0], 'Set-Cookie')
+        self.failUnless("'tokens': ('foo', 'bar')" in result[0][1])
+
+        self.assertEqual(result[1][0], 'Set-Cookie')
+        self.failUnless("'tokens': ('foo', 'bar')" in result[1][1])
+
+        self.assertEqual(result[2][0], 'Set-Cookie')
+        self.failUnless("'tokens': ('foo', 'bar')" in result[2][1])
+
     def test_forget(self):
         plugin = self._makeOne('secret')
         request = self._makeRequest()
