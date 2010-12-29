@@ -741,14 +741,17 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_view_with_decorator(self):
         def view(request):
+            """ ABC """
             return 'OK'
         def view_wrapper(fn):
-            fn.__assert_wrapped__ = True
-            return fn
+            def inner(context, request):
+                return fn(context, request)
+            return inner
         config = self._makeOne(autocommit=True)
         config.add_view(view=view, decorator=view_wrapper)
         wrapper = self._getViewCallable(config)
-        self.assertTrue(getattr(wrapper, '__assert_wrapped__', False))
+        self.failIf(wrapper is view)
+        self.assertEqual(wrapper.__doc__, view.__doc__)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
 

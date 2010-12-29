@@ -2910,7 +2910,6 @@ class DefaultViewMapper(object):
 
         return False
         
-    @wraps_view
     def __call__(self, view):
         attr = self.kw.get('attr')
         decorator = self.kw.get('decorator')
@@ -2931,6 +2930,7 @@ class DefaultViewMapper(object):
             view = preserve_view_attrs(view, decorated_view)
         return view
 
+    @wraps_view
     def map_requestonly_class(self, view):
         # its a class that has an __init__ which only accepts request
         attr = self.kw.get('attr')
@@ -2956,6 +2956,7 @@ class DefaultViewMapper(object):
             return response
         return _class_requestonly_view
 
+    @wraps_view
     def map_class(self, view):
         # its a class that has an __init__ which accepts both context and
         # request
@@ -2981,6 +2982,7 @@ class DefaultViewMapper(object):
             return response
         return _class_view
 
+    @wraps_view
     def map_requestonly_func(self, view):
         # its a function or instance that has a __call__ accepts only a
         # single request argument
@@ -3007,6 +3009,7 @@ class DefaultViewMapper(object):
             return response
         return _requestonly_view
 
+    @wraps_view
     def map_attr(self, view):
         # its a function that has a __call__ which accepts both context and
         # request, but still has an attr
@@ -3029,6 +3032,7 @@ class DefaultViewMapper(object):
             return response
         return _attr_view
 
+    @wraps_view
     def map_rendered(self, view):
         # it's a function that has a __call__ that accepts both context and
         # request, but requires rendering
