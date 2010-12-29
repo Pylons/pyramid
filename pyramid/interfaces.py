@@ -120,34 +120,6 @@ class ITemplateRenderer(IRenderer):
         accepts arbitrary keyword arguments and returns a string or
         unicode object """
 
-class IFlashMessages(Interface):
-    """ Dictionary-like object which maps flash category names to lists of
-    flash messages.  Also supports an API for obtaining classes of flash
-    message lists."""
-    def custom(name):
-        """ Return a sequence of custom-category flash messages or an empty
-        list if no messages of this custom category existed in the queue."""
-
-    def debug():
-        """ Return a sequence of flash.DEBUG category flash messages or an
-        empty list if no flash.DEBUG messages existed in the queue."""
-    
-    def info():
-        """ Return a sequence of flash.INFO category flash messages or an
-        empty list if no flash.INFO messages existed in the queue."""
-
-    def success():
-        """ Return a sequence of flash.SUCCESS category flash messages or an
-        empty list if no flash.SUCCESS messages existed in the queue."""
-
-    def warning():
-        """ Return a sequence of flash.WARNING category flash messages or an
-        empty list if no flash.WARNING messages existed in the queue."""
-
-    def error():
-        """ Return a sequence of flash.ERROR category flash messages or an
-        empty list if no flash.ERROR messages existed in the queue."""
-
 # internal interfaces
 
 class IRequest(Interface):
@@ -488,17 +460,35 @@ class ISession(Interface):
         the sessioning machinery to notice the mutation of the
         internal dictionary."""
 
-    def flash(msg, category='info', queue_name=''):
-        """ Push a flash message onto the stack related to the category and
-        queue name.  Multiple flash message queues can be managed by passing
-        an optional ``queue_name``. Default category names are 'debug',
-        'info', 'success', 'warning', and 'error' (these have constant names
-        importable from the ``pyramid.flash`` module).  A custom category
-        name is also permitted."""
+    def flash(msg, queue='', allow_duplicate=True):
+        """ Push a flash message onto the end of the flash queue represented
+        by ``queue``.  An alternate flash message queue can used by passing
+        an optional ``queue``, which must be a string.  If
+        ``allow_duplicate`` is false, if the ``msg`` already exists in the
+        queue, it will not be readded."""
 
-    def unflash(queue_name=''):
-        """ Pop a queue from the flash message storage.  This method returns
-        an object which implements ``pyramid.interfaces.IFlashMessages``"""
+    def pop_flash(queue=''):
+        """ Pop a queue from the flash storage.  The queue is removed from
+        flash storage after this message is called.  The queue is returned;
+        it is a list of flash messages added by
+        :meth:`pyramid.interfaces.ISesssion.flash`"""
+
+    def peek_flash(queue=''):
+        """ Peek at a queue in the flash storage.  The queue remains in
+        flash storage after this message is called.  The queue is returned;
+        it is a list of flash messages added by
+        :meth:`pyramid.interfaces.ISesssion.flash`
+        """
+
+    def new_csrf_token(self):
+        """ Create and set into the session a new, random cross-site request
+        forgery protection token.  Return the token.  It will be a string."""
+
+    def get_csrf_token(self):
+        """ Get the CSRF token previously added to the session via
+        ``new_csrf_token``, and return the token.  If no CSRF token exists,
+        the value returned will be ``None``.
+        """
 
     # mapping methods
     

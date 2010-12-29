@@ -3,11 +3,61 @@
 Extending An Existing :app:`Pyramid` Application
 ===================================================
 
-If the developer of a :app:`Pyramid` application has obeyed certain
-constraints while building that application, a third party should be
-able to change its behavior without needing to modify its source code.
-The behavior of a :app:`Pyramid` application that obeys certain
-constraints can be *overridden* or *extended* without modification.
+If a :app:`Pyramid` developer has obeyed certain constraints while building
+an application, a third party should be able to change the application's
+behavior without needing to modify its source code.  The behavior of a
+:app:`Pyramid` application that obeys certain constraints can be *overridden*
+or *extended* without modification.
+
+We'll define some jargon here for the benefit of identifying the parties
+involved in such an effort.
+
+Developer
+  The original application developer.
+
+Integrator
+  Another developer who wishes to reuse the application written by the
+  original application developer in an unanticipated context.  He may also
+  wish to modify the original application without changing the original
+  application's source code.
+
+The Difference Between "Extensible" and "Pluggable" Applications
+----------------------------------------------------------------
+
+Other web frameworks, such as :term:`Django`, advertise that they allow
+developers to create "pluggable applications".  They claim that if you create
+an application in a certain way, it will be integratable in a sensible,
+structured way into another arbitrarily-written application or project
+created by a third-party developer.
+
+:app:`Pyramid`, as a platform, does not claim to provide such a feature.  The
+platform provides no guarantee that you can create an application and package
+it up such that an arbitrary integrator can use it as a subcomponent in a
+larger Pyramid application or project.  Pyramid does not mandate the
+constraints necessary for such a pattern to work satisfactorily.  Because
+Pyramid is not very "opinionated", developers are able to use wildly
+different patterns and technologies to build an application.  A given Pyramid
+application may happen to be reusable by a particular third party integrator,
+because the integrator and the original developer may share similar base
+technology choices (such as the use of a particular relational database or
+ORM).  But the same application may not be reusable by a different developer,
+because he has made different technology choices which are incompatible with
+the original developer's.
+
+As a result, the concept of a "pluggable application" is left to layers built
+above Pyramid, such as a "CMS" layer or "application server" layer.  Such
+layers are apt to provide the necessary "opinions" (such as mandating a
+storage layer, a templating system, and a structured, well-documented pattern
+of registering that certain URLs map to certain bits of code) which makes the
+concept of a "pluggable application" possible.  "Pluggable applications",
+thus, should not plug in to Pyramid itself but should instead plug into a
+system written atop Pyramid.
+
+Although it does not provide for "pluggable applications", Pyramid *does*
+provide a rich set of mechanisms which allows for the extension of a single
+existing application.  Such features can be used by frameworks built using
+Pyramid as a base.  All Pyramid applications may not be *pluggable*, but all
+Pyramid applications are *extensible*.
 
 .. index::
    single: extensible application
@@ -15,65 +65,65 @@ constraints can be *overridden* or *extended* without modification.
 Rules for Building An Extensible Application
 --------------------------------------------
 
-There's only one rule you need to obey if you want to build a
-maximally extensible :app:`Pyramid` application: you should not use
-any :term:`configuration decoration` or :term:`imperative
-configuration`. This means the application developer should avoid
-relying on :term:`configuration decoration` meant to be detected via
-a :term:`scan`, and you mustn't configure your :app:`Pyramid`
-application *imperatively* by using any code which configures the
-application through methods of the :term:`Configurator` (except for
-the :meth:`pyramid.config.Configurator.load_zcml` method).
+There is only one rule you need to obey if you want to build a maximally
+extensible :app:`Pyramid` application: as a developer, you should factor any
+overrideable :term:`imperative configuration` you've created into functions
+which can be used via :meth:`pyramid.config.Configurator.include` rather than
+inlined as calls to methods of a :term:`Configurator` within the ``main``
+function in your application's ``__init__.py``.  For example, rather than:
 
-Instead, you must always use :term:`ZCML` for the equivalent
-purposes. :term:`ZCML` declarations that belong to an application can be
-"overridden" by integrators as necessary, but decorators and imperative code
-which perform the same tasks cannot.  Use only :term:`ZCML` to configure your
-application if you'd like it to be extensible.  See
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+
+   if __name__ == '__main__':
+       config = Configurator()
+       config.add_view('myapp.views.view1', name='view1')
+       config.add_view('myapp.views.view2', name='view2')
+
+You should do move the calls to ``add_view`` outside of the (non-reusable)
+``if __name__ == '__main__'`` block, and into a reusable function:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+
+   if __name__ == '__main__':
+       config = Configurator()
+       config.include(add_views)
+
+   def add_views(config):
+       config.add_view('myapp.views.view1', name='view1')
+       config.add_view('myapp.views.view2', name='view2')
+
+Doing this allows an integrator to maximally reuse the configuration
+statements that relate to your application by allowing him to selectively
+include or disinclude the configuration functions you've created from an
+"override package".
+
+Alternately, you can use :term:`ZCML` for the purpose of making configuration
+extensible and overrideable. :term:`ZCML` declarations that belong to an
+application can be overridden and extended by integrators as necessary in a
+similar fashion.  If you use only :term:`ZCML` to configure your application,
+it will automatically be maximally extensible without any manual effort.  See
 :ref:`declarative_chapter` for information about using ZCML.
 
 Fundamental Plugpoints
 ~~~~~~~~~~~~~~~~~~~~~~
 
 The fundamental "plug points" of an application developed using
-:app:`Pyramid` are *routes*, *views*, and *resources*.  Routes are
-declarations made using the ZCML ``<route>`` directive.  Views are
-declarations made using the ZCML ``<view>`` directive (or the
-``@view_config`` decorator).  Resources are files that are accessed by
-:app:`Pyramid` using the :term:`pkg_resources` API such as static
-files and templates.
-
-.. index::
-   single: ZCML granularity
-
-ZCML Granularity
-~~~~~~~~~~~~~~~~
-
-It's extremely helpful to third party application "extenders" (aka
-"integrators") if the :term:`ZCML` that composes the configuration for
-an application is broken up into separate files which do very specific
-things.  These more specific ZCML files can be reintegrated within the
-application's main ``configure.zcml`` via ``<include
-file="otherfile.zcml"/>`` declarations.  When ZCML files contain sets
-of specific declarations, an integrator can avoid including any ZCML
-he does not want by including only ZCML files which contain the
-declarations he needs.  He is not forced to "accept everything" or
-"use nothing".
-
-For example, it's often useful to put all ``<route>`` declarations in
-a separate ZCML file, as ``<route>`` statements have a relative
-ordering that is extremely important to the application: if an
-extender wants to add a route to the "middle" of the routing table, he
-will always need to disuse all the routes and cut and paste the
-routing configuration into his own application.  It's useful for the
-extender to be able to disuse just a *single* ZCML file in this case,
-accepting the remainder of the configuration from other :term:`ZCML`
-files in the original application.
-
-Granularizing ZCML is not strictly required.  An extender can always
-disuse *all* your ZCML, choosing instead to copy and paste it into his
-own package, if necessary.  However, doing so is considerate, and
-allows for the best reusability.
+:app:`Pyramid` are *routes*, *views*, and *assets*.  Routes are declarations
+made using the :meth:`pyramid.config.Configurator.add_route` method (or the
+ZCML ``<route>`` directive).  Views are declarations made using the
+:meth:`pyramid.config.Configurator.add_view` method (or the ZCML ``<view>``
+directive).  Assets are files that are accessed by :app:`Pyramid` using the
+:term:`pkg_resources` API such as static files and templates via a
+:term:`asset specification`.  Other directives and configurator methods also
+deal in routes, views, and assets.  For example,
+:meth:`pyramid.config.Configurator.add_handler` adds a single route, and some
+number of views.
 
 .. index::
    single: extending an existing application
@@ -81,96 +131,88 @@ allows for the best reusability.
 Extending an Existing Application
 ---------------------------------
 
-The steps for extending an existing application depend largely on
-whether the application does or does not use configuration decorators
-and/or imperative code.
+The steps for extending an existing application depend largely on whether the
+application does or does not use configuration decorators and/or imperative
+code.
 
-Extending an Application Which Possesses Configuration Decorators Or Which Does Configuration Imperatively
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If The Application Has Configuration Decorations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you've inherited a :app:`Pyramid` application which uses
-:class:`pyramid.view.view_config` decorators or which performs
-configuration imperatively, one of two things may be true:
+You've inherited a :app:`Pyramid` application which you'd like to extend or
+override that uses :class:`pyramid.view.view_config` decorators or other
+:term:`configuration decoration` decorators.
 
-- If you just want to *extend* the application, you can write
-  additional ZCML that registers more views or routes, loading any
-  existing ZCML and continuing to use any existing imperative
-  configuration done by the original application.
+If you just want to *extend* the application, you can run a :term:`scan`
+against the application's package, then add additional configuration that
+registers more views or routes.
 
-- If you want to *override* configuration in the application, you
-  *may* need to change the source code of the original application.
+.. code-block:: python
+   :linenos:
 
-  If the only source of trouble is the existence of
-  :class:`pyramid.view.view_config` decorators, you can just prevent a
-  :term:`scan` from happening (by omitting the ``<scan>`` declaration
-  from ZCML or omitting any call to the
-  :meth:`pyramid.config.Configurator.scan` method).  This
-  will cause the decorators to do nothing.  At this point, you will
-  need to convert all the configuration done in decorators into
-  equivalent :term:`ZCML` and add that ZCML to a separate Python
-  package as described in :ref:`extending_the_application`.
+   if __name__ == '__main__':
+       config.scan('someotherpackage')
+       config.add_view('mypackage.views.myview', name='myview')
 
-  If the source of trouble is configuration done imperatively in a
-  function called during application startup, you'll need to change
-  the code: convert imperative configuration statements into
-  equivalent :term:`ZCML` declarations.
+If you want to *override* configuration in the application, you *may* need to
+run :meth:`pyramid.config.Configurator.commit` after performing the scan of
+the original package, then add additional configuration that registers more
+views or routes which performs overrides.
 
-Once this is done, you should be able to extend or override the
-application like any other (see :ref:`extending_the_application`).
+.. code-block:: python
+   :linenos:
+
+   if __name__ == '__main__':
+       config.scan('someotherpackage')
+       config.commit()
+       config.add_view('mypackage.views.myview', name='myview'
+
+Once this is done, you should be able to extend or override the application
+like any other (see :ref:`extending_the_application`).
+
+You can alternately just prevent a :term:`scan` from happening (by omitting
+any call to the :meth:`pyramid.config.Configurator.scan` method).  This will
+cause the decorators attached to objects in the target application to do
+nothing.  At this point, you will need to convert all the configuration done
+in decorators into equivalent imperative configuration or ZCML and add that
+configuration or ZCML to a separate Python package as described in
+:ref:`extending_the_application`.
 
 .. _extending_the_application:
 
-Extending an Application Which Does Not Possess Configuration Decorators or Imperative Configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Extending the Application
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To extend or override the behavior of an existing application, you
-will need to write some :term:`ZCML`, and perhaps some implementations
-of the types of things you'd like to override (such as views), which
-are referred to within that ZCML.
+To extend or override the behavior of an existing application, you will need
+to create a new package which includes the configuration of the old package,
+and you'll perhaps need to create implementations of the types of things
+you'd like to override (such as views), which are referred to within the
+original package.
 
-The general pattern for extending an existing application looks
-something like this:
+The general pattern for extending an existing application looks something
+like this:
 
-- Create a new Python package.  The easiest way to do this is to
-  create a new :app:`Pyramid` application using the "paster"
-  template mechanism.  See :ref:`creating_a_project` for more
-  information.
+- Create a new Python package.  The easiest way to do this is to create a new
+  :app:`Pyramid` application using the "paster" template mechanism.  See
+  :ref:`creating_a_project` for more information.
 
-- Install the new package into the same Python environment as the
-  original application (e.g. ``python setup.py develop`` or ``python
-  setup.py install``).
+- In the new package, create Python files containing views and other
+  overridden elements, such as templates and static resources as necessary.
 
-- Change the ``configure.zcml`` in the new package to include the
-  original :app:`Pyramid` application's ``configure.zcml`` via an
-  include statement, e.g.  ``<include package="theoriginalapp"/>``.
-  Alternately, if the original application writer anticipated
-  overriding some things and not others, instead of including the
-  "main" ``configure.zcml`` of the original application, include only
-  specific ZCML files from the original application using the ``file``
-  attribute of the ``<include>`` statement, e.g. ``<include
-  package="theoriginalapp" file="views.zcml"/>``.
+- Install the new package into the same Python environment as the original
+  application (e.g. ``python setup.py develop`` or ``python setup.py
+  install``).
 
-- On a line in the new package's ``configure.zcml`` file that falls
-  after (XML-ordering-wise) all the ``include`` statements of the original
-  package ZCML, put an ``includeOverrides`` statement which identifies
-  *another* ZCML file within the new package (for example
-  ``<includeOverrides file="overrides.zcml"/>``.
+- Change the ``main`` function in the new package's ``__init__py`` to include
+  the original :app:`Pyramid` application's configuration functions via
+  :meth:`pyramid.config.Configurator.include` statements or a :term:`scan`.
 
-- Create an ``overrides.zcml`` file within the new package.  The
-  statements in the ``overrides.zcml`` file will override any ZCML
-  statements made within the original application (such as view
-  declarations).
-
-- Create Python files containing views and other overridden elements,
-  such as templates and static resources as necessary, and wire these
-  up using ZCML registrations within the ``overrides.zcml`` file.
-  These registrations may extend or override the original view
-  registrations.  See :ref:`overriding_views`,
+- Wire the new views and assets created in the new package up using
+  imperative registrations within the ``main`` function of the
+  ``__init__.py`` file of the new application.  These wiring should happen
+  *after* including the configuration functions of the old application.
+  These registrations will extend or override any registrations performed by
+  the original application.  See :ref:`overriding_views`,
   :ref:`overriding_routes` and :ref:`overriding_resources`.
-
-- In the ``__init__.py`` of the new package, load the ``configure.zcml`` file
-  of the new package using the
-  :meth:`pyramid.config.Configurator.load_zcml` method.
 
 .. index::
    pair: overriding; views
@@ -180,26 +222,44 @@ something like this:
 Overriding Views
 ~~~~~~~~~~~~~~~~~
 
-The ZCML ``<view>`` declarations you make which *override* application
-behavior will usually have the same ``context`` and ``name`` (and
-:term:`predicate` attributes, if used) as the original.  These
-``<view>`` declarations will point at "new" view code.  The new view
-code itself will usually be cut-n-paste copies of view callables from
-the original application with slight tweaks.  For example:
+The :term:`view configuration` declarations you make which *override*
+application behavior will usually have the same :term:`view predicate`
+attributes as the original you wish to override.  These ``<view>``
+declarations will point at "new" view code, in the override package you've
+created.  The new view code itself will usually be cut-n-paste copies of view
+callables from the original application with slight tweaks.
 
-.. code-block:: xml
+For example, if the original application has the following
+``configure_views`` configuration method:
+
+.. code-block:: python
    :linenos:
 
-    <view 
-      context="theoriginalapplication.resources.SomeResource"
-      name="theview"
-      view=".views.a_view_that_does_something_slightly_different"
-     />
+    def configure_views(config):
+        config.add_view('theoriginalapp.views.theview', name='theview')
 
-A similar pattern can be used to *extend* the application with ``<view>``
-declarations.  Just register a new view against some existing resource type
-(using ``context``) and make sure the URLs it implies are available on some
-other page rendering.
+You can override the first view configuration statement made by
+``configure_views`` within the override package, after loading the original
+configuration function:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+   from originalapp import configure_views
+
+   if __name == '__main__':
+       config = Configurator()
+       config.include(configure_views)
+       config.add_view('theoverrideapp.views.theview', name='theview')
+
+In this case, the ``theoriginalapp.views.theview`` view will never be
+executed.  Instead, a new view, ``theoverrideapp.views.theview`` will be
+executed instead, when request circumstances dictate.
+
+A similar pattern can be used to *extend* the application with ``add_view``
+declarations.  Just register a new view against some other set of predicates
+to make sure the URLs it implies are available on some other page rendering.
 
 .. index::
    pair: overriding; routes
@@ -209,48 +269,27 @@ other page rendering.
 Overriding Routes
 ~~~~~~~~~~~~~~~~~
 
-Route setup is currently typically performed in a sequence of ordered
-ZCML ``<route>`` declarations.  Because these declarations are ordered
-relative to each other, and because this ordering is typically
-important, you should retain the relative ordering of these
-declarations when performing an override.  Typically, this means
-*copying* all the ``<route>`` declarations into an external ZCML file
-and changing them as necessary.  Then disinclude any ZCML from the
-original application which contains the original declarations.
+Route setup is currently typically performed in a sequence of ordered calls
+to :meth:`pyramid.config.Configurator.add_route`.  Because these calls are
+ordered relative to each other, and because this ordering is typically
+important, you should retain their relative ordering when performing an
+override.  Typically, this means *copying* all the ``add_route`` statements
+into the override package's file and changing them as necessary.  Then
+disinclude any ``add_route`` statements from the original application.
 
 .. index::
    pair: overriding; resources
 
 .. _overriding_resources:
 
-Overriding Resources
-~~~~~~~~~~~~~~~~~~~~
+Overriding Assets
+~~~~~~~~~~~~~~~~~
 
-"Resource" files are static files on the filesystem that are
-accessible within a Python *package*.  An entire chapter is devoted to
-resources: :ref:`resources_chapter`.  Within this chapter is a section
-named :ref:`overriding_resources_section`.  This section of that
-chapter describes in detail how to override package resources with
-other resources by using :term:`ZCML` ``<resource>`` declarations.  Add
-such ``<resource>`` declarations to your override package's
-``configure.zcml`` to perform overrides.
-
-.. index::
-   single: ZCML inclusion
-
-Dealing With ZCML Inclusions
-----------------------------
-
-Sometimes it's possible to include only certain ZCML files from an
-application that contain only the registrations you really need,
-omitting others. But sometimes it's not.  For brute force purposes,
-when you're getting ``view`` or ``route`` registrations that you don't
-actually want in your overridden application, it's always appropriate
-to just *not include* any ZCML file from the overridden application.
-Instead, just cut and paste the entire contents of the
-``configure.zcml`` (and any ZCML file included by the overridden
-application's ``configure.zcml``) into your own package and omit the
-``<include package=""/>`` ZCML declaration in the overriding package's
-``configure.zcml``.
-
-
+Assets are files on the filesystem that are accessible within a Python
+*package*.  An entire chapter is devoted to resources: :ref:`assets_chapter`.
+Within this chapter is a section named :ref:`overriding_assets_section`.
+This section of that chapter describes in detail how to override package
+resources with other resources by using the
+:meth:`pyramid.config.Configurator.override_asset` method.  Add such
+``override_asset`` calls to your override package's ``__init__.py`` to
+perform overrides.

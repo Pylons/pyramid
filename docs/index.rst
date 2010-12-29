@@ -45,10 +45,11 @@ Narrative documentation in chapter form explaining how to use
    narr/renderers
    narr/templates
    narr/resources
-   narr/static
+   narr/assets
    narr/webob
    narr/sessions
    narr/flash
+   narr/csrf
    narr/security
    narr/hybrid
    narr/i18n
@@ -57,9 +58,9 @@ Narrative documentation in chapter form explaining how to use
    narr/environment
    narr/testing
    narr/hooks
+   narr/advconfig
    narr/declarative
    narr/extending
-   narr/assets
    narr/router
    narr/threadlocals
    narr/zca

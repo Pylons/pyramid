@@ -1,6 +1,23 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
+- The ``proutes`` command tried too hard to resolve the view for printing,
+  resulting in exceptions when an exceptional root factory was encountered.
+  Instead of trying to resolve the view, if it cannot, it will now just print
+  ``<unknown>``.
+
+1.0a8 (2010-12-27)
+==================
+
+Bug Fixes
+---------
+
+- The name ``registry`` was not available in the ``paster pshell``
+  environment under IPython.
+
 Features
 --------
 
@@ -11,6 +28,23 @@ Features
 
 - Added flash messaging, as described in the "Flash Messaging" narrative
   documentation chapter.
+
+- Added CSRF token generation, as described in the narrative chapter entitled
+  "Preventing Cross-Site Request Forgery Attacks".
+
+- Prevent misunderstanding of how the ``view`` and ``view_permission``
+  arguments to add_route work by raising an exception during configuration if
+  view-related arguments exist but no ``view`` argument is passed.
+
+- Add ``paster proute`` command which displays a summary of the routing
+  table.  See the narrative documentation section within the "URL Dispatch"
+  chapter entitled "Displaying All Application Routes".
+
+Paster Templates
+----------------
+
+- The ``pyramid_zodb`` Paster template no longer employs ZCML.  Instead, it
+  is based on scanning.
 
 Documentation
 -------------
@@ -37,6 +71,34 @@ Documentation
   Resources narrative chapter.
 
 - Added a "Flash Messaging" narrative documentation chapter.
+
+- Added a narrative chapter entitled "Preventing Cross-Site Request Forgery
+  Attacks".
+
+- Changed the "ZODB + Traversal Wiki Tutorial" based on changes to
+  ``pyramid_zodb`` Paster template.
+
+- Added "Advanced Configuration" narrative chapter which documents how to
+  deal with configuration conflicts, two-phase configuration, ``include`` and
+  ``commit``.
+
+- Fix API documentation rendering for ``pyramid.view.static``
+
+- Add "Pyramid Provides More Than One Way to Do It" to Design Defense
+  documentation.
+
+- Changed "Static Assets" narrative chapter: clarify that ``name`` represents
+  a prefix unless it's a URL, added an example of a root-relative static view
+  fallback for URL dispatch, added an example of creating a simple view that
+  returns the body of a file.
+
+- Move ZCML usage in Hooks chapter to Declarative Configuration chapter.
+
+- Merge "Static Assets" chapter into the "Assets" chapter.
+
+- Added narrative documentation section within the "URL Dispatch" chapter
+  entitled "Displaying All Application Routes" (for ``paster proutes``
+  command).
 
 1.0a7 (2010-12-20)
 ==================

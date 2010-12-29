@@ -2331,6 +2331,46 @@ class ConfiguratorTests(unittest.TestCase):
         route = config.add_route('name', 'pattern', pregenerator='123')
         self.assertEqual(route.pregenerator, '123')
 
+    def test_add_route_no_view_with_view_attr(self):
+        config = self._makeOne(autocommit=True)
+        from pyramid.exceptions import ConfigurationError
+        try:
+            config.add_route('name', '/pattern', view_attr='abc')
+        except ConfigurationError:
+            pass
+        else: # pragma: no cover
+            raise AssertionError
+
+    def test_add_route_no_view_with_view_context(self):
+        config = self._makeOne(autocommit=True)
+        from pyramid.exceptions import ConfigurationError
+        try:
+            config.add_route('name', '/pattern', view_context=DummyContext)
+        except ConfigurationError:
+            pass
+        else: # pragma: no cover
+            raise AssertionError
+
+    def test_add_route_no_view_with_view_permission(self):
+        config = self._makeOne(autocommit=True)
+        from pyramid.exceptions import ConfigurationError
+        try:
+            config.add_route('name', '/pattern', view_permission='edit')
+        except ConfigurationError:
+            pass
+        else: # pragma: no cover
+            raise AssertionError
+
+    def test_add_route_no_view_with_view_renderer(self):
+        config = self._makeOne(autocommit=True)
+        from pyramid.exceptions import ConfigurationError
+        try:
+            config.add_route('name', '/pattern', view_renderer='json')
+        except ConfigurationError:
+            pass
+        else: # pragma: no cover
+            raise AssertionError
+
     def test__override_not_yet_registered(self):
         from pyramid.interfaces import IPackageOverrides
         package = DummyPackage('package')

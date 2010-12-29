@@ -881,11 +881,8 @@ application startup.  For example:
    :linenos:
 
    from pyramid.config import Configurator
-   config.begin()
    config.add_translation_dirs('my.application:locale/', 
                                'another.application:locale/')
-   # ...
-   config.end()
 
 A message catalog in a translation directory added via
 :meth:`pyramid.config.Configurator.add_translation_dirs`
@@ -1020,9 +1017,7 @@ For example:
 
    from pyramid.config import Configurator
    config = Configurator()
-   config.begin()
    config.set_locale_negotiator(my_locale_negotiator)
-   config.end()
 
 .. note:: You can also add a custom locale negotiator via ZCML.  See
    :ref:`zcml_adding_a_locale_negotiator`

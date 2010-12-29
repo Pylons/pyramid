@@ -1,2 +1,6 @@
+from pyramid.view import view_config
+from {{package}}.models import MyModel
+
+@view_config(context=MyModel, renderer='{{package}}:templates/mytemplate.pt')
 def my_view(request):
     return {'project':'{{project}}'}

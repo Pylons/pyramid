@@ -38,10 +38,11 @@ Narrative Documentation
    narr/renderers
    narr/templates
    narr/resources
-   narr/static
+   narr/assets
    narr/webob
    narr/sessions
    narr/flash
+   narr/csrf
    narr/security
    narr/hybrid
    narr/i18n
@@ -50,9 +51,9 @@ Narrative Documentation
    narr/environment
    narr/testing
    narr/hooks
+   narr/advconfig
    narr/declarative
    narr/extending
-   narr/assets
    narr/router
    narr/startup
    narr/threadlocals
@@ -89,7 +90,6 @@ API Reference
    api/config
    api/events
    api/exceptions
-   api/flash
    api/httpexceptions
    api/i18n
    api/interfaces
@@ -125,7 +125,9 @@ ZCML Directive Reference
    zcml/configure
    zcml/default_permission
    zcml/forbidden
+   zcml/handler
    zcml/include
+   zcml/localenegotiator
    zcml/notfound
    zcml/remoteuserauthenticationpolicy
    zcml/renderer
@@ -134,6 +136,7 @@ ZCML Directive Reference
    zcml/scan
    zcml/static
    zcml/subscriber
+   zcml/translationdir
    zcml/utility
    zcml/view
 

@@ -19,10 +19,12 @@ from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
 
 from pyramid.httpexceptions import HTTPFound
-from pyramid.static import static_view as static # B/C
+from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
 
-static = static # dont yet deprecate this (ever?)
+# Nast BW compat hack: dont yet deprecate this (ever?)
+class static(static_view): # only subclass for purposes of autodoc
+    __doc__ = static_view.__doc__
 
 _marker = object()
 

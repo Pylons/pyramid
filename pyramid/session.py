@@ -10,15 +10,15 @@ except ImportError: # pragma: no cover
 
 from webob import Response
 
-import hmac
-import binascii
-import time
 import base64
+import binascii
+import hmac
+import time
+import os
 
 from zope.interface import implements
 
 from pyramid.interfaces import ISession
-from pyramid import flash
 
 def manage_accessed(wrapped):
     """ Decorator which causes a cookie to be set when a wrapped
@@ -170,15 +170,31 @@ def UnencryptedCookieSessionFactoryConfig(
 
         # flash API methods
         @manage_accessed
-        def flash(self, msg, category=flash.INFO, queue_name=''):
-            storage = self.setdefault('_f_' + queue_name, {})
-            category = storage.setdefault(category, [])
-            category.append(msg)
+        def flash(self, msg, queue='', allow_duplicate=True):
+            storage = self.setdefault('_f_' + queue, [])
+            if allow_duplicate or (msg not in storage):
+                storage.append(msg)
 
         @manage_accessed
-        def unflash(self, queue_name=''):
-            storage = self.pop('_f_' + queue_name, {})
-            return flash.FlashMessages(storage)
+        def pop_flash(self, queue=''):
+            storage = self.pop('_f_' + queue, [])
+            return storage
+
+        @manage_accessed
+        def peek_flash(self, queue=''):
+            storage = self.get('_f_' + queue, [])
+            return storage
+
+        # CSRF API methods
+        @manage_accessed
+        def new_csrf_token(self):
+            token = os.urandom(20).encode('hex')
+            self['_csrft_'] = token
+            return token
+
+        @manage_accessed
+        def get_csrf_token(self):
+            return self.get('_csrft_', None)
 
         # non-API methods
         def _set_cookie(self, response):
