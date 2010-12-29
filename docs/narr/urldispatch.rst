@@ -533,12 +533,12 @@ neither predicates nor view configuration information.
   callables.  Use custom predicates when no set of predefined predicates does
   what you need.  Custom predicates can be combined with predefined
   predicates as necessary.  Each custom predicate callable should accept two
-  arguments: ``context`` and ``request`` and should return either ``True`` or
+  arguments: ``info`` and ``request`` and should return either ``True`` or
   ``False`` after doing arbitrary evaluation of the context resource and/or
   the request.  If all callables return ``True``, the associated route will
   be considered viable for a given request.  If any custom predicate returns
-  ``False``, route matching continues.  Note that the value ``context`` will
-  always be ``None`` when passed to a custom route predicate.
+  ``False``, route matching continues.  See :ref:`custom_route_predicates`
+  for more information.
 
 **View-Related Arguments**
 
