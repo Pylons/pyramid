@@ -22,6 +22,7 @@ response.  For example:
    from pyramid.response import Response
    from pyramid.view import view_config
 
+   @view_config(renderer='json')
    def hello_world(request):
        return {'content':'Hello!'}
 

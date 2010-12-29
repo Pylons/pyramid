@@ -9,6 +9,13 @@ Bug Fixes
   Instead of trying to resolve the view, if it cannot, it will now just print
   ``<unknown>``.
 
+Documentation
+-------------
+
+- The (weak) "Converting a CMF Application to Pyramid" tutorial has been
+  removed from the tutorials section.  It was moved to the
+  ``pyramid_tutorials`` Github repository.
+
 1.0a8 (2010-12-27)
 ==================
 
