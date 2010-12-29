@@ -3868,10 +3868,10 @@ class Test__map_view(unittest.TestCase):
         request = self._makeRequest()
         self.assertEqual(result(None, request).body, 'Hello!')
 
-class Test_preserve_attrs(unittest.TestCase):
+class Test_wraps_view(unittest.TestCase):
     def _callFUT(self, fn, view):
-        from pyramid.config import preserve_attrs
-        return preserve_attrs(fn)(None, view)
+        from pyramid.config import wraps_view
+        return wraps_view(fn)(None, view)
 
     def test_it_same(self):
         def view(context, request):

@@ -2676,39 +2676,42 @@ class MultiView(object):
                 continue
         raise PredicateMismatch(self.name)
 
-def preserve_attrs(wrapped):
+def wraps_view(wrapped):
     def inner(self, view):
         wrapped_view = wrapped(self, view)
-        if wrapped_view is view:
-            return view
-        wrapped_view.__module__ = view.__module__
-        wrapped_view.__doc__ = view.__doc__
-        try:
-            wrapped_view.__name__ = view.__name__
-        except AttributeError:
-            wrapped_view.__name__ = repr(view)
-        try:
-            wrapped_view.__permitted__ = view.__permitted__
-        except AttributeError:
-            pass
-        try:
-            wrapped_view.__call_permissive__ = view.__call_permissive__
-        except AttributeError:
-            pass
-        try:
-            wrapped_view.__predicated__ = view.__predicated__
-        except AttributeError:
-            pass
-        try:
-            wrapped_view.__accept__ = view.__accept__
-        except AttributeError:
-            pass
-        try:
-            wrapped_view.__order__ = view.__order__
-        except AttributeError:
-            pass
-        return wrapped_view
+        return preserve_view_attrs(view, wrapped_view)
     return inner
+
+def preserve_view_attrs(view, wrapped_view):
+    if wrapped_view is view:
+        return view
+    wrapped_view.__module__ = view.__module__
+    wrapped_view.__doc__ = view.__doc__
+    try:
+        wrapped_view.__name__ = view.__name__
+    except AttributeError:
+        wrapped_view.__name__ = repr(view)
+    try:
+        wrapped_view.__permitted__ = view.__permitted__
+    except AttributeError:
+        pass
+    try:
+        wrapped_view.__call_permissive__ = view.__call_permissive__
+    except AttributeError:
+        pass
+    try:
+        wrapped_view.__predicated__ = view.__predicated__
+    except AttributeError:
+        pass
+    try:
+        wrapped_view.__accept__ = view.__accept__
+    except AttributeError:
+        pass
+    try:
+        wrapped_view.__order__ = view.__order__
+    except AttributeError:
+        pass
+    return wrapped_view
 
 class ViewDeriver(object):
     def __init__(self, **kw):
@@ -2732,7 +2735,7 @@ class ViewDeriver(object):
                         self.owrap_view(
                             view)))))
 
-    @preserve_attrs
+    @wraps_view
     def owrap_view(self, view):
         wrapper_viewname = self.kw.get('wrapper_viewname')
         viewname = self.kw.get('viewname')
@@ -2752,7 +2755,7 @@ class ViewDeriver(object):
             return wrapped_response
         return _owrapped_view
 
-    @preserve_attrs
+    @wraps_view
     def secured_view(self, view):
         permission = self.kw.get('permission')
         if permission == '__no_permission_required__':
@@ -2780,7 +2783,7 @@ class ViewDeriver(object):
 
         return wrapped_view
 
-    @preserve_attrs
+    @wraps_view
     def authdebug_view(self, view):
         wrapped_view = view
         settings = self.registry.settings
@@ -2813,7 +2816,7 @@ class ViewDeriver(object):
 
         return wrapped_view
 
-    @preserve_attrs
+    @wraps_view
     def predicated_view(self, view):
         predicates = self.kw.get('predicates', ())
         if not predicates:
@@ -2828,7 +2831,7 @@ class ViewDeriver(object):
         predicate_wrapper.__predicated__ = checker
         return predicate_wrapper
 
-    @preserve_attrs
+    @wraps_view
     def attr_wrapped_view(self, view):
         kw = self.kw
         accept, order, phash = (kw.get('accept', None),
@@ -2907,7 +2910,7 @@ class DefaultViewMapper(object):
 
         return False
         
-    @preserve_attrs
+    @wraps_view
     def __call__(self, view):
         attr = self.kw.get('attr')
         decorator = self.kw.get('decorator')
@@ -2924,7 +2927,8 @@ class DefaultViewMapper(object):
         elif self.helper is not None:
             view = self.map_rendered(view)
         if decorator is not None:
-            view = decorator(view)
+            decorated_view = decorator(view)
+            view = preserve_view_attrs(view, decorated_view)
         return view
 
     def map_requestonly_class(self, view):
