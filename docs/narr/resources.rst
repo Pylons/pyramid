@@ -404,7 +404,7 @@ Obtaining the Lineage of a Resource
 -----------------------------------
 
 :func:`pyramid.location.lineage` returns a generator representing the
-:term:`lineage` of the :term:`location` aware:term:`resource` object.
+:term:`lineage` of the :term:`location` aware :term:`resource` object.
 
 The :func:`~pyramid.location.lineage` function returns the resource it is
 passed, then each parent of the resource, in order.  For example, if the
@@ -533,7 +533,7 @@ declares that the blog entry implements an :term:`interface`.
        implements(IBlogEntry)
        def __init__(self, title, body, author):
            self.title = title
-           self.body =  body
+           self.body = body
            self.author = author
            self.created = datetime.datetime.now()
 
@@ -568,7 +568,7 @@ To do so, use the :func:`zope.interface.directlyProvides` function:
    class BlogEntry(object):
        def __init__(self, title, body, author):
            self.title = title
-           self.body =  body
+           self.body = body
            self.author = author
            self.created = datetime.datetime.now()
 
@@ -596,7 +596,7 @@ the :func:`zope.interface.alsoProvides` function:
    class BlogEntry(object):
        def __init__(self, title, body, author):
            self.title = title
-           self.body =  body
+           self.body = body
            self.author = author
            self.created = datetime.datetime.now()
 
