@@ -7,6 +7,9 @@ Features
   callable which will decorate the view callable before it is added to
   the registry
 
+- If a handler class provides an _action_decorator classmethod, use that
+  as the decorator for each view registration for that handler.
+
 1.0a8 (2010-12-27)
 ==================
 
