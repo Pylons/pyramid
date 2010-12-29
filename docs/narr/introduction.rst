@@ -63,7 +63,7 @@ A Sense of Fun
 
 Minimalism
   :app:`Pyramid` provides only the very basics: *URL to code
-  mapping*, *templating*, *security*, and *resources*.  There is not
+  mapping*, *templating*, *security*, and *assets*.  There is not
   much more to the framework than these pieces: you are expected to
   provide the rest.
 
