@@ -942,6 +942,10 @@ class Configurator(object):
             pattern = route.pattern
 
         action_decorator = getattr(handler, '_action_decorator', None)
+        if action_decorator is not None and action_decorator.im_self is None:
+            raise ConfigurationError(
+                'The "_action_decorator" method on a handler class MUST be '
+                'defined as a classmethod.')
 
         path_has_action = ':action' in pattern or '{action}' in pattern
 

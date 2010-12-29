@@ -1993,6 +1993,17 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(len(views), 1)
         self.assertEqual(views[0]['decorator'], MyHandler._action_decorator)
 
+    def test_add_handler_with_action_decorator_no_classmethod(self):
+        config = self._makeOne(autocommit=True)
+        class MyHandler(object):
+            def _action_decorator(self, fn): # pragma: no cover
+                return fn
+            def action(self): # pragma: no cover
+                return 'response'
+        from pyramid.exceptions import ConfigurationError
+        self.assertRaises(ConfigurationError, config.add_handler,
+                          'name', '/{action}', MyHandler)
+
     def test_add_handler_doesnt_mutate_expose_dict(self):
         config = self._makeOne(autocommit=True)
         views = []
