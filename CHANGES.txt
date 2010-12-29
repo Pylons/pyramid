@@ -1,3 +1,12 @@
+1.0a9 (unreleased)
+
+Features
+--------
+
+- config.add_view now accepts a 'decorator' keyword argument, a
+  callable which will decorate the view callable before it is added to
+  the registry
+
 1.0a8 (2010-12-27)
 ==================
 
