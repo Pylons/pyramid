@@ -1008,9 +1008,9 @@ class Configurator(object):
     def add_view(self, view=None, name="", for_=None, permission=None,
                  request_type=None, route_name=None, request_method=None,
                  request_param=None, containment=None, attr=None,
-                 renderer=None, wrapper=None, xhr=False, accept=None,
-                 header=None, path_info=None, custom_predicates=(),
-                 context=None):
+                 renderer=None, wrapper=None, decorator=None, xhr=False,
+                 accept=None, header=None, path_info=None,
+                 custom_predicates=(), context=None):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
         down below into *predicate* arguments and *non-predicate*
@@ -1119,6 +1119,15 @@ class Configurator(object):
           view is the same context and request of the inner view.  If
           this attribute is unspecified, no view wrapping is done.
 
+        decorator
+
+          A function which will be used to decorate the registered
+          :term:`view callable`.  The decorator function will be
+          called with the view callable as a single argument, and it
+          must return a replacement view callable which accepts the
+          same arguments and returns the same type of values as the
+          original function.
+          
         Predicate Arguments
 
         name
@@ -1326,6 +1335,10 @@ class Configurator(object):
             derived_view = self._derive_view(view, permission, predicates, attr,
                                              renderer, wrapper, name, accept,
                                              order, phash)
+            if decorator is not None:
+                wrapped_view = decorator(derived_view)
+                decorate_view(wrapped_view, derived_view)
+                derived_view = wrapped_view
 
             registered = self.registry.adapters.registered
 
