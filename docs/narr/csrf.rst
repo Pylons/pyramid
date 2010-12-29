@@ -9,7 +9,7 @@ phenomenon whereby a user with an identity on your website might click on a
 URL or button on another website which unwittingly redirects the user to your
 application to perform some command that requires elevated privileges.
 
-You can avoid most of these attacks by making sure that a the correct *CSRF
+You can avoid most of these attacks by making sure that the correct *CSRF
 token* has been set in an :app:`Pyramid` session object before performing any
 actions in code which requires elevated privileges and is invoked via a form
 post.  To use CSRF token support, you must enable a :term:`session factory`
