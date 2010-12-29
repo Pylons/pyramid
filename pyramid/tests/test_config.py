@@ -1983,15 +1983,15 @@ class ConfiguratorTests(unittest.TestCase):
         def dummy_add_view(**kw):
             views.append(kw)
         config.add_view = dummy_add_view
-        class MyView(object):
+        class MyHandler(object):
             @classmethod
             def _action_decorator(cls, fn): # pragma: no cover
                 return fn
             def action(self): # pragma: no cover
                 return 'response'
-        config.add_handler('name', '/{action}', MyView)
+        config.add_handler('name', '/{action}', MyHandler)
         self.assertEqual(len(views), 1)
-        self.assertEqual(views[0]['decorator'], MyView._action_decorator)
+        self.assertEqual(views[0]['decorator'], MyHandler._action_decorator)
 
     def test_add_handler_doesnt_mutate_expose_dict(self):
         config = self._makeOne(autocommit=True)
