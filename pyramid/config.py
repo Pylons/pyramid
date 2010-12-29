@@ -45,6 +45,7 @@ from pyramid.interfaces import ITranslationDirectories
 from pyramid.interfaces import ITraverser
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
+from pyramid.interfaces import IViewMapperFactory
 
 try:
     from pyramid import chameleon_text
@@ -266,14 +267,10 @@ class Configurator(object):
                  renderer_globals_factory=None,
                  default_permission=None,
                  session_factory=None,
-                 view_deriver=None,
                  autocommit=False,
                  ):
         if package is None:
             package = caller_package()
-        if view_deriver is None:
-            view_deriver = DefaultViewDeriver
-        self.view_deriver = view_deriver
         name_resolver = DottedNameResolver(package)
         self.name_resolver = name_resolver
         self.package_name = name_resolver.package_name
@@ -342,24 +339,25 @@ class Configurator(object):
     def _split_spec(self, path_or_spec):
         return resolve_asset_spec(path_or_spec, self.package_name)
 
+    # b/w compat
     def _derive_view(self, view, permission=None, predicates=(),
                      attr=None, renderer=None, wrapper_viewname=None,
                      viewname=None, accept=None, order=MAX_ORDER,
                      phash=DEFAULT_PHASH):
         view = self.maybe_dotted(view)
-        deriver = self.view_deriver(view,
-                                    registry=self.registry,
-                                    permission=permission,
-                                    predicates=predicates,
-                                    attr=attr,
-                                    renderer=renderer,
-                                    wrapper_viewname=wrapper_viewname,
-                                    viewname=viewname,
-                                    accept=accept,
-                                    order=order,
-                                    phash=phash,
-                                    package=self.package)
-        return deriver()
+        deriver = ViewDeriver(
+            registry=self.registry,
+            permission=permission,
+            predicates=predicates,
+            attr=attr,
+            renderer=renderer,
+            wrapper_viewname=wrapper_viewname,
+            viewname=viewname,
+            accept=accept,
+            order=order,
+            phash=phash,
+            package=self.package)
+        return deriver(view)
 
     def _override(self, package, path, override_package, override_prefix,
                   PackageOverrides=PackageOverrides):
@@ -1008,7 +1006,7 @@ class Configurator(object):
                  request_param=None, containment=None, attr=None,
                  renderer=None, wrapper=None, xhr=False, accept=None,
                  header=None, path_info=None, custom_predicates=(),
-                 context=None):
+                 context=None, view_mapper=None):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
         down below into *predicate* arguments and *non-predicate*
@@ -1253,6 +1251,18 @@ class Configurator(object):
           the context and/or the request.  If all callables return
           ``True``, the associated view callable will be considered
           viable for a given request.
+
+        view_mapper
+
+          A class implementing the
+          :class:`pyramid.interfaces.IViewMapperFactory` interface, which
+          performs view argument and response mapping.  By default it is
+          ``None``, which indicates that the view should use the default view
+          mapper.  This plug-point is useful for Pyramid extension
+          developers, but it's not very useful for'
+          'civilians' who are just developing stock Pyramid applications.
+          Pay no attention to the man behind the curtain.
+          
         """
         view = self.maybe_dotted(view)
         context = self.maybe_dotted(context)
@@ -1291,6 +1301,7 @@ class Configurator(object):
                     renderer=renderer, wrapper=wrapper, xhr=xhr, accept=accept,
                     header=header, path_info=path_info,
                     custom_predicates=custom_predicates, context=context,
+                    view_mapper = view_mapper,
                     )
                 view_info = deferred_views.setdefault(route_name, [])
                 view_info.append(info)
@@ -1321,10 +1332,18 @@ class Configurator(object):
                 permission = self.registry.queryUtility(IDefaultPermission)
 
             # NO_PERMISSION_REQUIRED handled by _secure_view
-            derived_view = self._derive_view(view, permission, predicates, attr,
-                                             renderer, wrapper, name, accept,
-                                             order, phash)
-
+            derived_view = ViewDeriver(registry=self.registry,
+                                       permission=permission,
+                                       predicates=predicates,
+                                       attr=attr,
+                                       renderer=renderer,
+                                       wrapper_viewname=wrapper,
+                                       viewname=name,
+                                       accept=accept,
+                                       order=order,
+                                       phash=phash,
+                                       view_mapper=view_mapper)(view)
+                                       
             registered = self.registry.adapters.registered
 
             # A multiviews is a set of views which are registered for
@@ -2631,11 +2650,6 @@ class MultiView(object):
                 continue
         raise PredicateMismatch(self.name)
 
-def requestonly(view, attr=None):
-    """ Return true of the class or callable accepts only a request argument,
-    as opposed to something that accepts context, request """
-    return DefaultViewDeriver(view, attr=attr).requestonly()
-
 def preserve_attrs(wrapped):
     def inner(self, view):
         wrapped_view = wrapped(self, view)
@@ -2670,81 +2684,27 @@ def preserve_attrs(wrapped):
         return wrapped_view
     return inner
 
-class DefaultViewDeriver(object):
-    def __init__(self, view, **kw):
+class ViewDeriver(object):
+    def __init__(self, **kw):
         self.kw = kw
-        self.view = view
-        self.registry = kw.get('registry')
-        self.helper = None
-        self.renderer = kw.get('renderer')
-        if self.renderer is None and self.registry is not None:
-            # use default renderer if one exists
-            default_renderer_factory = self.registry.queryUtility(
-                IRendererFactory)
-            if default_renderer_factory is not None:
-                self.renderer = {'name':None, 'package':kw.get('package')}
-        if self.renderer is not None:
-            self.helper = RendererHelper(self.renderer['name'],
-                                         package=self.renderer['package'],
-                                         registry=self.registry)
-        if self.registry is not None:
-            self.authn_policy = self.registry.queryUtility(
-                IAuthenticationPolicy)
-            self.authz_policy = self.registry.queryUtility(
-                IAuthorizationPolicy)
-            self.logger = self.registry.queryUtility(IDebugLogger)
+        self.registry = kw['registry']
+        self.authn_policy = self.registry.queryUtility(
+            IAuthenticationPolicy)
+        self.authz_policy = self.registry.queryUtility(
+            IAuthorizationPolicy)
+        self.logger = self.registry.queryUtility(IDebugLogger)
 
-    def __call__(self):
+    def __call__(self, view):
+        mapper = self.kw.get('view_mapper')
+        if mapper is None:
+            mapper = DefaultViewMapper
+        view = mapper(**self.kw)(view)
         return self.attr_wrapped_view(
             self.predicated_view(
                 self.authdebug_view(
                     self.secured_view(
                         self.owrap_view(
-                            self.map_view(self.view))))))
-
-    def requestonly(self):
-        view = self.view
-        attr = self.kw.get('attr')
-        if attr is None:
-            attr = '__call__'
-        if inspect.isfunction(view):
-            fn = view
-        elif inspect.isclass(view):
-            try:
-                fn = view.__init__
-            except AttributeError:
-                return False
-        else:
-            try:
-                fn = getattr(view, attr)
-            except AttributeError:
-                return False
-
-        try:
-            argspec = inspect.getargspec(fn)
-        except TypeError:
-            return False
-
-        args = argspec[0]
-        defaults = argspec[3]
-
-        if hasattr(fn, 'im_func'):
-            # it's an instance method
-            if not args:
-                return False
-            args = args[1:]
-        if not args:
-            return False
-
-        if len(args) == 1:
-            return True
-
-        elif args[0] == 'request':
-            if len(args) - len(defaults) == 1:
-                return True
-
-        return False
-        
+                            view)))))
 
     @preserve_attrs
     def owrap_view(self, view):
@@ -2861,26 +2821,85 @@ class DefaultViewDeriver(object):
         attr_view.__phash__ = phash
         return attr_view
 
+class DefaultViewMapper(object):
+    implements(IViewMapperFactory)
+    def __init__(self, **kw):
+        self.kw = kw
+        self.helper = None
+        self.renderer = kw.get('renderer')
+        self.registry = kw.get('registry')
+        if self.renderer is None and self.registry is not None:
+            # use default renderer if one exists
+            default_renderer_factory = self.registry.queryUtility(
+                IRendererFactory)
+            if default_renderer_factory is not None:
+                self.renderer = {'name':None, 'package':kw.get('package')}
+        if self.renderer is not None:
+            self.helper = RendererHelper(self.renderer['name'],
+                                         package=self.renderer['package'],
+                                         registry=self.registry)
+
+    def requestonly(self, view):
+        attr = self.kw.get('attr')
+        if attr is None:
+            attr = '__call__'
+        if inspect.isfunction(view):
+            fn = view
+        elif inspect.isclass(view):
+            try:
+                fn = view.__init__
+            except AttributeError:
+                return False
+        else:
+            try:
+                fn = getattr(view, attr)
+            except AttributeError:
+                return False
+
+        try:
+            argspec = inspect.getargspec(fn)
+        except TypeError:
+            return False
+
+        args = argspec[0]
+        defaults = argspec[3]
+
+        if hasattr(fn, 'im_func'):
+            # it's an instance method
+            if not args:
+                return False
+            args = args[1:]
+        if not args:
+            return False
+
+        if len(args) == 1:
+            return True
+
+        elif args[0] == 'request':
+            if len(args) - len(defaults) == 1:
+                return True
+
+        return False
+        
     @preserve_attrs
-    def map_view(self, view):
+    def __call__(self, view):
         attr = self.kw.get('attr')
         isclass = inspect.isclass(view)
-        ronly = self.requestonly()
+        ronly = self.requestonly(view)
         if isclass and ronly:
-            view = self.adapt_requestonly_class()
+            view = self.map_requestonly_class(view)
         elif isclass:
-            view = self.adapt_class()
+            view = self.map_class(view)
         elif ronly:
-            view = self.adapt_requestonly_func()
+            view = self.map_requestonly_func(view)
         elif attr:
-            view = self.adapt_attr()
+            view = self.map_attr(view)
         elif self.helper is not None:
-            view = self.adapt_rendered()
+            view = self.map_rendered(view)
         return view
 
-    def adapt_requestonly_class(self):
+    def map_requestonly_class(self, view):
         # its a class that has an __init__ which only accepts request
-        view = self.view
         attr = self.kw.get('attr')
         helper = self.helper
         renderer = self.renderer
@@ -2904,10 +2923,9 @@ class DefaultViewDeriver(object):
             return response
         return _class_requestonly_view
 
-    def adapt_class(self):
+    def map_class(self, view):
         # its a class that has an __init__ which accepts both context and
         # request
-        view = self.view
         attr = self.kw.get('attr')
         helper = self.helper
         renderer = self.renderer
@@ -2930,10 +2948,9 @@ class DefaultViewDeriver(object):
             return response
         return _class_view
 
-    def adapt_requestonly_func(self):
+    def map_requestonly_func(self, view):
         # its a function or instance that has a __call__ accepts only a
         # single request argument
-        view = self.view
         attr = self.kw.get('attr')
         helper = self.helper
         renderer = self.renderer
@@ -2957,10 +2974,9 @@ class DefaultViewDeriver(object):
             return response
         return _requestonly_view
 
-    def adapt_attr(self):
+    def map_attr(self, view):
         # its a function that has a __call__ which accepts both context and
         # request, but still has an attr
-        view = self.view
         attr = self.kw.get('attr')
         helper = self.helper
         renderer = self.renderer
@@ -2980,10 +2996,9 @@ class DefaultViewDeriver(object):
             return response
         return _attr_view
 
-    def adapt_rendered(self):
+    def map_rendered(self, view):
         # it's a function that has a __call__ that accepts both context and
         # request, but requires rendering
-        view = self.view
         helper = self.helper
         renderer = self.renderer
         def _rendered_view(context, request):
@@ -3000,10 +3015,6 @@ class DefaultViewDeriver(object):
                                                      request=request)
             return response
         return _rendered_view
-
-def _map_view(view, registry, attr=None, renderer=None):
-    return DefaultViewDeriver(view, registry=registry, attr=attr,
-                              renderer=renderer).map_view(view)
 
 def isexception(o):
     if IInterface.providedBy(o):
@@ -3059,3 +3070,15 @@ def is_response(ob):
          hasattr(ob, 'status') ):
         return True
     return False
+
+# b/c
+def _map_view(view, registry, attr=None, renderer=None):
+    return DefaultViewMapper(registry=registry, attr=attr,
+                             renderer=renderer)(view)
+
+# b/c
+def requestonly(view, attr=None):
+    """ Return true of the class or callable accepts only a request argument,
+    as opposed to something that accepts context, request """
+    return DefaultViewMapper(attr=attr).requestonly(view)
+
