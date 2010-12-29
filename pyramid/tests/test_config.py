@@ -1985,18 +1985,18 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_view = dummy_add_view
         class MyHandler(object):
             @classmethod
-            def _action_decorator(cls, fn): # pragma: no cover
+            def __action_decorator__(cls, fn): # pragma: no cover
                 return fn
             def action(self): # pragma: no cover
                 return 'response'
         config.add_handler('name', '/{action}', MyHandler)
         self.assertEqual(len(views), 1)
-        self.assertEqual(views[0]['decorator'], MyHandler._action_decorator)
+        self.assertEqual(views[0]['decorator'], MyHandler.__action_decorator__)
 
-    def test_add_handler_with_action_decorator_no_classmethod(self):
+    def test_add_handler_with_action_decorator_fail_on_instancemethod(self):
         config = self._makeOne(autocommit=True)
         class MyHandler(object):
-            def _action_decorator(self, fn): # pragma: no cover
+            def __action_decorator__(self, fn): # pragma: no cover
                 return fn
             def action(self): # pragma: no cover
                 return 'response'
