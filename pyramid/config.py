@@ -4,7 +4,6 @@ import re
 import sys
 import threading
 import traceback
-from types import FunctionType
 
 import venusian
 
@@ -940,14 +939,17 @@ class Configurator(object):
 
         action_decorator = getattr(handler, '__action_decorator__', None)
         if action_decorator is not None:
-            class_or_static = getattr(action_decorator, 'im_self',
-                                      None) is not None
-            if not class_or_static:
-                class_or_static = isinstance(action_decorator, FunctionType)
-            if not class_or_static:
-                raise ConfigurationError(
-                    'The "__action_decorator__" callable on a handler class '
-                    'MUST be defined as a classmethod or a staticmethod.')
+            if hasattr(action_decorator, 'im_self'):
+                # instance methods have an im_self == None
+                # classmethods have an im_self == cls
+                # staticmethods have no im_self
+                # instances have no im_self
+                if action_decorator.im_self is not handler:
+                    raise ConfigurationError(
+                        'The "__action_decorator__" attribute of a handler '
+                        'must not be an instance method (must be a '
+                        'staticmethod, classmethod, function, or an instance '
+                        'which is a callable')
 
         path_has_action = ':action' in pattern or '{action}' in pattern
 
