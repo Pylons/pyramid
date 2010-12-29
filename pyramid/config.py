@@ -941,6 +941,8 @@ class Configurator(object):
 
             pattern = route.pattern
 
+        action_decorator = getattr(handler, '_action_decorator', None)
+
         path_has_action = ':action' in pattern or '{action}' in pattern
 
         if action and path_has_action:
@@ -970,7 +972,8 @@ class Configurator(object):
                     preds.append(ActionPredicate(action))
                     view_args['custom_predicates'] = preds
                     self.add_view(view=handler, attr=method_name,
-                                  route_name=route_name, **view_args)
+                                  route_name=route_name,
+                                  decorator=action_decorator, **view_args)
         else:
             method_name = action
             if method_name is None:
@@ -993,14 +996,15 @@ class Configurator(object):
                     view_args = expose_config.copy()
                     del view_args['name']
                     self.add_view(view=handler, attr=meth_name,
-                                  route_name=route_name, **view_args)
+                                  route_name=route_name,
+                                  decorator=action_decorator, **view_args)
 
             # Now register the method itself
             method = getattr(handler, method_name, None)
             configs = getattr(method, '__exposed__', [{}])
             for expose_config in configs:
                 self.add_view(view=handler, attr=action, route_name=route_name,
-                              **expose_config)
+                              decorator=action_decorator, **expose_config)
 
         return route
 
