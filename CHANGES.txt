@@ -1,4 +1,14 @@
-1.0a9 (unreleased)
+=======
+Next release
+============
+
+Bug Fixes
+---------
+
+- The ``proutes`` command tried too hard to resolve the view for printing,
+  resulting in exceptions when an exceptional root factory was encountered.
+  Instead of trying to resolve the view, if it cannot, it will now just print
+  ``<unknown>``.
 
 Features
 --------
@@ -9,6 +19,14 @@ Features
 
 - If a handler class provides an _action_decorator classmethod, use that
   as the decorator for each view registration for that handler.
+
+Documentation
+-------------
+
+- The (weak) "Converting a CMF Application to Pyramid" tutorial has been
+  removed from the tutorials section.  It was moved to the
+  ``pyramid_tutorials`` Github repository.
+
 
 1.0a8 (2010-12-27)
 ==================

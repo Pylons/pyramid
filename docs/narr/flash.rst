@@ -38,7 +38,7 @@ provide is not modified in any way.
 
 The ``queue`` argument allows you to choose a queue to which to append the
 message you provide.  This can be used to push different kinds of messages
-into flash storage for later display in different places on a page.  You cam
+into flash storage for later display in different places on a page.  You can
 pass any name for your queue, but it must be a string. The default value is
 the empty string, which chooses the default queue. Each queue is independent,
 and can be popped by ``pop_flash`` or examined via ``peek_flash`` separately.
@@ -49,19 +49,21 @@ default flash message queue.
 
    request.session.flash(msg, 'myappsqueue')
 
-The ``allow_duplicate`` argument, which defaults to ``True``.  If this is
+The ``allow_duplicate`` argument defaults to ``True``.  If this is
 ``False``, if you attempt to add a message to a queue which is already
 present in the queue, it will not be added.
 
 Using the ``session.pop_flash`` Method
 --------------------------------------
 
-Once one or more messages has been added to a flash queue by the
+Once one or more messages have been added to a flash queue by the
 ``session.flash`` API, the ``session.pop_flash`` API can be used to pop that
 queue and return it for use.
 
 To pop a particular queue of messages from the flash object, use the session
 object's ``pop_flash`` method.
+
+.. method:: pop_flash(queue='')
 
 .. code-block:: python
    :linenos:
@@ -85,13 +87,15 @@ been popped.
 
 The object returned from ``pop_flash`` is a list.
 
-Using the ``session.pop_flash`` Method
---------------------------------------
+Using the ``session.peek_flash`` Method
+---------------------------------------
 
 Once one or more messages has been added to a flash queue by the
 ``session.flash`` API, the ``session.peek_flash`` API can be used to "peek"
 at that queue.  Unlike ``session.pop_flash``, the queue is not popped from
 flash storage.
+
+.. method:: peek_flash(queue='')
 
 .. code-block:: python
    :linenos:

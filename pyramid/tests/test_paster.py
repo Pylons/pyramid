@@ -133,7 +133,7 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(result, None)
         self.assertEqual(L, [])
 
-    def test_single_route_no_views_registered(self):
+    def test_single_route_no_route_registered(self):
         command = self._makeOne()
         route = DummyRoute('a', '/a')
         mapper = DummyMapper(route)
@@ -147,7 +147,32 @@ class TestPRoutesCommand(unittest.TestCase):
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(len(L), 3)
-        self.assertEqual(L[-1].split(), ['a', '/a', 'None'])
+        self.assertEqual(L[-1].split(), ['a', '/a', '<unknown>'])
+
+    def test_single_route_no_views_registered(self):
+        from zope.interface import Interface
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IRouteRequest
+        registry = Registry()
+        def view():pass
+        class IMyRoute(Interface):
+            pass
+        registry.registerUtility(IMyRoute, IRouteRequest, name='a')
+        command = self._makeOne()
+        route = DummyRoute('a', '/a')
+        mapper = DummyMapper(route)
+        command._get_mapper = lambda *arg: mapper
+        L = []
+        command.out = L.append
+        app = DummyApp()
+        app.registry = registry
+        loadapp = DummyLoadApp(app)
+        command.loadapp = (loadapp,)
+        command.args = ('/foo/bar/myapp.ini', 'myapp')
+        result = command.command()
+        self.assertEqual(result, None)
+        self.assertEqual(len(L), 3)
+        self.assertEqual(L[-1].split()[:3], ['a', '/a', 'None'])
 
     def test_single_route_one_view_registered(self):
         from zope.interface import Interface
@@ -181,7 +206,6 @@ class TestPRoutesCommand(unittest.TestCase):
         
     def test_single_route_one_view_registered_with_factory(self):
         from zope.interface import Interface
-        from zope.interface import implements
         from pyramid.registry import Registry
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IViewClassifier
@@ -190,8 +214,6 @@ class TestPRoutesCommand(unittest.TestCase):
         def view():pass
         class IMyRoot(Interface):
             pass
-        class Root(object):
-            implements(IMyRoot)
         class IMyRoute(Interface):
             pass
         registry.registerAdapter(view,
@@ -199,8 +221,7 @@ class TestPRoutesCommand(unittest.TestCase):
                                  IView, '')
         registry.registerUtility(IMyRoute, IRouteRequest, name='a')
         command = self._makeOne()
-        def factory(request):
-            return Root()
+        def factory(request): pass
         route = DummyRoute('a', '/a', factory=factory)
         mapper = DummyMapper(route)
         command._get_mapper = lambda *arg: mapper
@@ -214,7 +235,7 @@ class TestPRoutesCommand(unittest.TestCase):
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(len(L), 3)
-        self.assertEqual(L[-1].split()[:4], ['a', '/a', '<function', 'view'])
+        self.assertEqual(L[-1].split()[:3], ['a', '/a', '<unknown>'])
 
     def test__get_mapper(self):
         from pyramid.registry import Registry
