@@ -87,8 +87,8 @@ been popped.
 
 The object returned from ``pop_flash`` is a list.
 
-Using the ``session.pop_flash`` Method
---------------------------------------
+Using the ``session.peek_flash`` Method
+---------------------------------------
 
 Once one or more messages has been added to a flash queue by the
 ``session.flash`` API, the ``session.peek_flash`` API can be used to "peek"
