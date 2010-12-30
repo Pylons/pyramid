@@ -24,7 +24,7 @@ class Request(WebobRequest):
     argument.
 
     The documentation below (save for the ``add_response_callback`` and
-    ''add_finished_callback`` methods, which are defined in this subclass
+    ``add_finished_callback`` methods, which are defined in this subclass
     itself, and the attributes ``context``, ``registry``, ``root``,
     ``subpath``, ``traversed``, ``view_name``, ``virtual_root`` , and
     ``virtual_root_path``, each of which is added to the request by the
