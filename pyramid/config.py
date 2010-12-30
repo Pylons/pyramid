@@ -2872,6 +2872,107 @@ class DefaultViewMapper(object):
         self.attr = kw.get('attr')
         self.decorator = kw.get('decorator')
 
+    def __call__(self, view):
+        decorator = self.decorator
+        if inspect.isclass(view):
+            view = preserve_view_attrs(view, self.map_class(view))
+        else:
+            view = preserve_view_attrs(view, self.map_nonclass(view))
+        if decorator is not None:
+            view = preserve_view_attrs(view, decorator(view))
+        return view
+
+    def map_class(self, view):
+        ronly = self.requestonly(view)
+        if ronly:
+            mapped_view = self._map_class_requestonly(view)
+        else:
+            mapped_view = self._map_class_native(view)
+        return mapped_view
+
+    def map_nonclass(self, view):
+        # We do more work here than appears necessary to avoid wrapping the
+        # view unless it actually requires wrapping (to avoid function call
+        # overhead).
+        mapped_view = view
+        ronly = self.requestonly(view)
+        if ronly:
+            mapped_view = self._map_nonclass_requestonly(view)
+        elif self.attr:
+            mapped_view = self._map_nonclass_attr(view)
+        elif self.renderer is not None:
+            mapped_view = self._map_nonclass_rendered(view)
+        return mapped_view
+        
+    def _map_class_requestonly(self, view):
+        # its a class that has an __init__ which only accepts request
+        attr = self.attr
+        def _class_requestonly_view(context, request):
+            inst = view(request)
+            if attr is None:
+                response = inst()
+            else:
+                response = getattr(inst, attr)()
+            if self.renderer is not None and not is_response(response):
+                response = self.renderer.render_view(request, response, view,
+                                                     context)
+            return response
+        return _class_requestonly_view
+
+    def _map_class_native(self, view):
+        # its a class that has an __init__ which accepts both context and
+        # request
+        attr = self.attr
+        def _class_view(context, request):
+            inst = view(context, request)
+            if attr is None:
+                response = inst()
+            else:
+                response = getattr(inst, attr)()
+            if self.renderer is not None and not is_response(response):
+                response = self.renderer.render_view(request, response, view,
+                                                     context)
+            return response
+        return _class_view
+
+    def _map_nonclass_requestonly(self, view):
+        # its a function that has a __call__ which accepts only a single
+        # request argument
+        attr = self.attr
+        def _requestonly_view(context, request):
+            if attr is None:
+                response = view(request)
+            else:
+                response = getattr(view, attr)(request)
+            if self.renderer is not None and not is_response(response):
+                response = self.renderer.render_view(request, response, view,
+                                                     context)
+            return response
+        return _requestonly_view
+
+    def _map_nonclass_attr(self, view):
+        # its a function that has a __call__ which accepts both context and
+        # request, but still has an attr
+        attr = self.attr
+        def _attr_view(context, request):
+            response = getattr(view, attr)(context, request)
+            if self.renderer is not None and not is_response(response):
+                response = self.renderer.render_view(request, response, view,
+                                                     context)
+            return response
+        return _attr_view
+
+    def _map_nonclass_rendered(self, view):
+        # it's a function that has a __call__ that accepts both context and
+        # request, but requires rendering
+        def _rendered_view(context, request):
+            response = view(context, request)
+            if self.renderer is not None and not is_response(response):
+                response = self.renderer.render_view(request, response, view,
+                                                     context)
+            return response
+        return _rendered_view
+
     def requestonly(self, view):
         attr = self.attr
         if attr is None:
@@ -2913,94 +3014,7 @@ class DefaultViewMapper(object):
                 return True
 
         return False
-        
-    def __call__(self, view):
-        attr = self.attr
-        decorator = self.decorator
-        isclass = inspect.isclass(view)
-        ronly = self.requestonly(view)
-        if isclass and ronly:
-            view = preserve_view_attrs(view, self.map_requestonly_class(view))
-        elif isclass:
-            view = preserve_view_attrs(view, self.map_class(view))
-        elif ronly:
-            view = preserve_view_attrs(view, self.map_requestonly_func(view))
-        elif attr:
-            view = preserve_view_attrs(view, self.map_attr(view))
-        elif self.renderer is not None:
-            view = preserve_view_attrs(view, self.map_rendered(view))
-        if decorator is not None:
-            view = preserve_view_attrs(view, decorator(view))
-        return view
 
-    def map_requestonly_class(self, view):
-        # its a class that has an __init__ which only accepts request
-        attr = self.attr
-        def _class_requestonly_view(context, request):
-            inst = view(request)
-            if attr is None:
-                response = inst()
-            else:
-                response = getattr(inst, attr)()
-            if self.renderer is not None and not is_response(response):
-                response = self.renderer.render_view(request, response, view,
-                                                     context)
-            return response
-        return _class_requestonly_view
-
-    def map_class(self, view):
-        # its a class that has an __init__ which accepts both context and
-        # request
-        attr = self.attr
-        def _class_view(context, request):
-            inst = view(context, request)
-            if attr is None:
-                response = inst()
-            else:
-                response = getattr(inst, attr)()
-            if self.renderer is not None and not is_response(response):
-                response = self.renderer.render_view(request, response, view,
-                                                     context)
-            return response
-        return _class_view
-
-    def map_requestonly_func(self, view):
-        # its a function that has a __call__ which accepts only a single
-        # request argument
-        attr = self.attr
-        def _requestonly_view(context, request):
-            if attr is None:
-                response = view(request)
-            else:
-                response = getattr(view, attr)(request)
-            if self.renderer is not None and not is_response(response):
-                response = self.renderer.render_view(request, response, view,
-                                                     context)
-            return response
-        return _requestonly_view
-
-    def map_attr(self, view):
-        # its a function that has a __call__ which accepts both context and
-        # request, but still has an attr
-        attr = self.attr
-        def _attr_view(context, request):
-            response = getattr(view, attr)(context, request)
-            if self.renderer is not None and not is_response(response):
-                response = self.renderer.render_view(request, response, view,
-                                                     context)
-            return response
-        return _attr_view
-
-    def map_rendered(self, view):
-        # it's a function that has a __call__ that accepts both context and
-        # request, but requires rendering
-        def _rendered_view(context, request):
-            response = view(context, request)
-            if self.renderer is not None and not is_response(response):
-                response = self.renderer.render_view(request, response, view,
-                                                     context)
-            return response
-        return _rendered_view
 
 def isexception(o):
     if IInterface.providedBy(o):
