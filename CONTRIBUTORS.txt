@@ -116,3 +116,5 @@ Contributors
 - Chris Rossi, 2010/11/10
 
 - Casey Duncan, 2010/12/27
+
+- Marius Gedminas, 2010/12/31
