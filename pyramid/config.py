@@ -345,6 +345,15 @@ class Configurator(object):
                      viewname=None, accept=None, order=MAX_ORDER,
                      phash=DEFAULT_PHASH):
         view = self.maybe_dotted(view)
+        if isinstance(renderer, basestring):
+            renderer = RendererHelper(name=renderer, package=self.package,
+                                      registry = self.registry)
+        if renderer is None:
+            # use default renderer if one exists
+            if self.registry.queryUtility(IRendererFactory) is not None:
+                renderer = RendererHelper(name=None,
+                                          package=self.package,
+                                          registry=self.registry)
         deriver = ViewDeriver(
             registry=self.registry,
             permission=permission,
@@ -753,9 +762,6 @@ class Configurator(object):
         a :term:`response` object.  If a ``renderer`` argument is not
         supplied, the user-supplied view must itself return a
         :term:`response` object.  """
-
-        if renderer is not None and not isinstance(renderer, dict):
-            renderer = {'name':renderer, 'package':self.package}
         return self._derive_view(view, attr=attr, renderer=renderer)
 
     @action_method
@@ -1284,9 +1290,9 @@ class Configurator(object):
           performs view argument and response mapping.  By default it is
           ``None``, which indicates that the view should use the default view
           mapper.  This plug-point is useful for Pyramid extension
-          developers, but it's not very useful for'
-          'civilians' who are just developing stock Pyramid applications.
-          Pay no attention to the man behind the curtain.
+          developers, but it's not very useful for 'civilians' who are
+          just developing stock Pyramid applications. Pay no attention to
+          the man behind the curtain.
           
         """
         view = self.maybe_dotted(view)
@@ -1338,9 +1344,6 @@ class Configurator(object):
             containment=containment, request_type=request_type,
             custom=custom_predicates)
 
-        if renderer is not None and not isinstance(renderer, dict):
-            renderer = {'name':renderer, 'package':self.package}
-
         if context is None:
             context = for_
 
@@ -1350,7 +1353,17 @@ class Configurator(object):
         if not IInterface.providedBy(r_context):
             r_context = implementedBy(r_context)
 
-        def register(permission=permission):
+        if isinstance(renderer, basestring):
+            renderer = RendererHelper(name=renderer, package=self.package,
+                                      registry = self.registry)
+
+        def register(permission=permission, renderer=renderer):
+            if renderer is None:
+                # use default renderer if one exists
+                if self.registry.queryUtility(IRendererFactory) is not None:
+                    renderer = RendererHelper(name=None,
+                                              package=self.package,
+                                              registry=self.registry)
 
             if permission is None:
                 # intent: will be None if no default permission is registered
@@ -2002,8 +2015,9 @@ class Configurator(object):
         The ``wrapper`` argument should be the name of another view
         which will wrap this view when rendered (see the ``add_view``
         method's ``wrapper`` argument for a description)."""
-        if renderer is not None and not isinstance(renderer, dict):
-            renderer = {'name':renderer, 'package':self.package}
+        if isinstance(renderer, basestring):
+            renderer = RendererHelper(name=renderer, package=self.package,
+                                      registry = self.registry)
         view = self._derive_view(view, attr=attr, renderer=renderer)
         def bwcompat_view(context, request):
             context = getattr(request, 'context', None)
@@ -2041,8 +2055,9 @@ class Configurator(object):
         which will wrap this view when rendered (see the ``add_view``
         method's ``wrapper`` argument for a description).
         """
-        if renderer is not None and not isinstance(renderer, dict):
-            renderer = {'name':renderer, 'package':self.package}
+        if isinstance(renderer, basestring):
+            renderer = RendererHelper(name=renderer, package=self.package,
+                                      registry=self.registry)
         view = self._derive_view(view, attr=attr, renderer=renderer)
         def bwcompat_view(context, request):
             context = getattr(request, 'context', None)
@@ -2853,23 +2868,12 @@ class ViewDeriver(object):
 class DefaultViewMapper(object):
     implements(IViewMapperFactory)
     def __init__(self, **kw):
-        self.kw = kw
-        self.helper = None
         self.renderer = kw.get('renderer')
-        self.registry = kw.get('registry')
-        if self.renderer is None and self.registry is not None:
-            # use default renderer if one exists
-            default_renderer_factory = self.registry.queryUtility(
-                IRendererFactory)
-            if default_renderer_factory is not None:
-                self.renderer = {'name':None, 'package':kw.get('package')}
-        if self.renderer is not None:
-            self.helper = RendererHelper(self.renderer['name'],
-                                         package=self.renderer['package'],
-                                         registry=self.registry)
+        self.attr = kw.get('attr')
+        self.decorator = kw.get('decorator')
 
     def requestonly(self, view):
-        attr = self.kw.get('attr')
+        attr = self.attr
         if attr is None:
             attr = '__call__'
         if inspect.isfunction(view):
@@ -2911,145 +2915,90 @@ class DefaultViewMapper(object):
         return False
         
     def __call__(self, view):
-        attr = self.kw.get('attr')
-        decorator = self.kw.get('decorator')
+        attr = self.attr
+        decorator = self.decorator
         isclass = inspect.isclass(view)
         ronly = self.requestonly(view)
         if isclass and ronly:
-            view = self.map_requestonly_class(view)
+            view = preserve_view_attrs(view, self.map_requestonly_class(view))
         elif isclass:
-            view = self.map_class(view)
+            view = preserve_view_attrs(view, self.map_class(view))
         elif ronly:
-            view = self.map_requestonly_func(view)
+            view = preserve_view_attrs(view, self.map_requestonly_func(view))
         elif attr:
-            view = self.map_attr(view)
-        elif self.helper is not None:
-            view = self.map_rendered(view)
+            view = preserve_view_attrs(view, self.map_attr(view))
+        elif self.renderer is not None:
+            view = preserve_view_attrs(view, self.map_rendered(view))
         if decorator is not None:
-            decorated_view = decorator(view)
-            view = preserve_view_attrs(view, decorated_view)
+            view = preserve_view_attrs(view, decorator(view))
         return view
 
-    @wraps_view
     def map_requestonly_class(self, view):
         # its a class that has an __init__ which only accepts request
-        attr = self.kw.get('attr')
-        helper = self.helper
-        renderer = self.renderer
+        attr = self.attr
         def _class_requestonly_view(context, request):
             inst = view(request)
             if attr is None:
                 response = inst()
             else:
                 response = getattr(inst, attr)()
-            if helper is not None:
-                if not is_response(response):
-                    system = {
-                        'view':inst,
-                        'renderer_name':renderer['name'], # b/c
-                        'renderer_info':renderer,
-                        'context':context,
-                        'request':request
-                        }
-                    response = helper.render_to_response(response, system,
-                                                         request=request)
+            if self.renderer is not None and not is_response(response):
+                response = self.renderer.render_view(request, response, view,
+                                                     context)
             return response
         return _class_requestonly_view
 
-    @wraps_view
     def map_class(self, view):
         # its a class that has an __init__ which accepts both context and
         # request
-        attr = self.kw.get('attr')
-        helper = self.helper
-        renderer = self.renderer
+        attr = self.attr
         def _class_view(context, request):
             inst = view(context, request)
             if attr is None:
                 response = inst()
             else:
                 response = getattr(inst, attr)()
-            if helper is not None:
-                if not is_response(response):
-                    system = {'view':inst,
-                              'renderer_name':renderer['name'], # b/c
-                              'renderer_info':renderer,
-                              'context':context,
-                              'request':request
-                              }
-                    response = helper.render_to_response(response, system,
-                                                         request=request)
+            if self.renderer is not None and not is_response(response):
+                response = self.renderer.render_view(request, response, view,
+                                                     context)
             return response
         return _class_view
 
-    @wraps_view
     def map_requestonly_func(self, view):
-        # its a function or instance that has a __call__ accepts only a
-        # single request argument
-        attr = self.kw.get('attr')
-        helper = self.helper
-        renderer = self.renderer
+        # its a function that has a __call__ which accepts only a single
+        # request argument
+        attr = self.attr
         def _requestonly_view(context, request):
             if attr is None:
                 response = view(request)
             else:
                 response = getattr(view, attr)(request)
-
-            if helper is not None:
-                if not is_response(response):
-                    system = {
-                        'view':view,
-                        'renderer_name':renderer['name'],
-                        'renderer_info':renderer,
-                        'context':context,
-                        'request':request
-                        }
-                    response = helper.render_to_response(response, system,
-                                                         request=request)
+            if self.renderer is not None and not is_response(response):
+                response = self.renderer.render_view(request, response, view,
+                                                     context)
             return response
         return _requestonly_view
 
-    @wraps_view
     def map_attr(self, view):
         # its a function that has a __call__ which accepts both context and
         # request, but still has an attr
-        attr = self.kw.get('attr')
-        helper = self.helper
-        renderer = self.renderer
+        attr = self.attr
         def _attr_view(context, request):
             response = getattr(view, attr)(context, request)
-            if helper is not None:
-                if not is_response(response):
-                    system = {
-                        'view':view,
-                        'renderer_name':renderer['name'],
-                        'renderer_info':renderer,
-                        'context':context,
-                        'request':request
-                        }
-                    response = helper.render_to_response(response, system,
-                                                         request=request)
+            if self.renderer is not None and not is_response(response):
+                response = self.renderer.render_view(request, response, view,
+                                                     context)
             return response
         return _attr_view
 
-    @wraps_view
     def map_rendered(self, view):
         # it's a function that has a __call__ that accepts both context and
         # request, but requires rendering
-        helper = self.helper
-        renderer = self.renderer
         def _rendered_view(context, request):
             response = view(context, request)
-            if not is_response(response):
-                system = {
-                    'view':view,
-                    'renderer_name':renderer['name'], # b/c
-                    'renderer_info':renderer,
-                    'context':context,
-                    'request':request
-                    }
-                response = helper.render_to_response(response, system,
-                                                     request=request)
+            if self.renderer is not None and not is_response(response):
+                response = self.renderer.render_view(request, response, view,
+                                                     context)
             return response
         return _rendered_view
 
@@ -3102,12 +3051,6 @@ class PyramidConfigurationMachine(ConfigurationMachine):
         self._seen_files.add(spec)
         return True
 
-def is_response(ob):
-    if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
-         hasattr(ob, 'status') ):
-        return True
-    return False
-
 # b/c
 def _map_view(view, registry, attr=None, renderer=None):
     return DefaultViewMapper(registry=registry, attr=attr,
@@ -3118,4 +3061,10 @@ def requestonly(view, attr=None):
     """ Return true of the class or callable accepts only a request argument,
     as opposed to something that accepts context, request """
     return DefaultViewMapper(attr=attr).requestonly(view)
+
+def is_response(ob):
+    if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
+         hasattr(ob, 'status') ):
+        return True
+    return False
 

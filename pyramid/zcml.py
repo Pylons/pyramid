@@ -161,12 +161,7 @@ def view(
     cacheable=True, # not used, here for b/w compat < 0.8
     ):
 
-    if renderer is not None:
-        package = getattr(_context, 'package', None)
-        renderer = {'name':renderer, 'package':package}
-
     context = context or for_
-
     config = Configurator.with_context(_context)
     config.add_view(
         permission=permission, context=context, view=view, name=name,

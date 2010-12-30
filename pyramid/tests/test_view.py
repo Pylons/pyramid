@@ -317,10 +317,9 @@ class TestViewConfigDecorator(unittest.TestCase):
         settings = call_venusian(venusian)
         self.assertEqual(len(settings), 1)
         renderer = settings[0]['renderer']
-        self.assertEqual(renderer,
-                         {'name':'fixtures/minimal.pt',
-                          'package':pyramid.tests,
-                          })
+        self.assertEqual(renderer.name, 'fixtures/minimal.pt')
+        self.assertEqual(renderer.package, pyramid.tests)
+        self.assertEqual(renderer.registry.__class__, DummyRegistry)
 
     def test_call_with_renderer_dict(self):
         decorator = self._makeOne(renderer={'a':1})
@@ -494,9 +493,13 @@ class DummyVenusian(object):
         self.attachments.append((wrapped, callback, category))
         return self.info
 
+class DummyRegistry(object):
+    pass
+
 class DummyConfig(object):
     def __init__(self):
         self.settings = []
+        self.registry = DummyRegistry()
 
     def add_view(self, **kw):
         self.settings.append(kw)
