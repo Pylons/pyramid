@@ -8,6 +8,14 @@ Must-Have (before 1.0)
 
 - Consider deprecations for ``model`` and ``resource`` APIs.
 
+- Re-make testing.setUp() and testing.tearDown() the canonical APIs for test
+  configuration.
+
+- Document ``decorator=`` and ``view_mapper`` parameters to add_view.
+
+- Allow ``decorator=`` and ``view_mapper=`` to be passed via ZCML and the
+  ``view_config`` decorator.
+
 Should-Have
 -----------
 
@@ -25,9 +33,6 @@ Should-Have
 
 - Change "Cleaning up After a Request" in the urldispatch chapter to
   use ``request.add_response_callback``.
-
-- ``decorator=`` parameter to view_config.  This would replace the existing
-  _map_view "decorator" if it existed.
 
 - Provide a response_set_cookie method on the request for rendered responses
   that can be used as input to response.set_cookie?

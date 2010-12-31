@@ -3,6 +3,7 @@ from webob.exc import status_map
 
 # Parent classes
 from webob.exc import HTTPException
+from webob.exc import WSGIHTTPException
 from webob.exc import HTTPOk
 from webob.exc import HTTPRedirection
 from webob.exc import HTTPError

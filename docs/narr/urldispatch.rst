@@ -533,12 +533,12 @@ neither predicates nor view configuration information.
   callables.  Use custom predicates when no set of predefined predicates does
   what you need.  Custom predicates can be combined with predefined
   predicates as necessary.  Each custom predicate callable should accept two
-  arguments: ``context`` and ``request`` and should return either ``True`` or
+  arguments: ``info`` and ``request`` and should return either ``True`` or
   ``False`` after doing arbitrary evaluation of the context resource and/or
   the request.  If all callables return ``True``, the associated route will
   be considered viable for a given request.  If any custom predicate returns
-  ``False``, route matching continues.  Note that the value ``context`` will
-  always be ``None`` when passed to a custom route predicate.
+  ``False``, route matching continues.  See :ref:`custom_route_predicates`
+  for more information.
 
 **View-Related Arguments**
 
@@ -1230,6 +1230,44 @@ which you started the application from.  For example:
 
 See :ref:`environment_chapter` for more information about how, and where to
 set these values.
+
+.. index::
+   pair: routes; printing
+   single: paster proutes
+
+Displaying All Application Routes
+---------------------------------
+
+You can use the ``paster proutes`` command in a terminal window to print a
+summary of routes related to your application.  Much like the ``paster
+pshell`` command (see :ref:`interactive shell`), the ``paster proutes``
+command accepts two arguments.  The first argument to ``proutes`` is the path
+to your application's ``.ini`` file.  The second is the ``app`` section name
+inside the ``.ini`` file which points to your application.
+
+For example:
+
+.. code-block:: text
+   :linenos:
+
+   [chrism@thinko MyProject]$ ../bin/paster proutes development.ini MyProject
+   Name            Pattern                        View
+   ----            -------                        ----                     
+   home            /                              <function my_view>
+   home2           /                              <function my_view>
+   another         /another                       None                     
+   static/         static/*subpath                <static_view object>
+   catchall        /*subpath                      <function static_view>
+
+``paster proutes`` generates a table.  The table has three columns: a Name
+name column, a Pattern column, and a View column.  The items listed in the
+Name column are route names, the items listen in the Pattern column are route
+patterns, and the items listed in the View column are representations of the
+view callable that will be invoked when a request matches the associated
+route pattern.  The view column may show ``None`` if no associated view
+callable could be found.  If no routes are configured within your
+application, nothing will be printed to the console when ``paster proutes``
+is executed.
 
 References
 ----------

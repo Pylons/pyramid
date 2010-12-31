@@ -17,8 +17,10 @@ from zope.interface import providedBy
 from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
+from pyramid.interfaces import IRendererFactory
 
 from pyramid.httpexceptions import HTTPFound
+from pyramid.renderers import RendererHelper
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
 
@@ -404,6 +406,12 @@ class view_config(object):
         settings = self.__dict__.copy()
 
         def callback(context, name, ob):
+            renderer = settings.get('renderer')
+            if isinstance(renderer, basestring):
+                renderer = RendererHelper(name=renderer,
+                                          package=info.module,
+                                          registry=context.config.registry)
+            settings['renderer'] = renderer
             context.config.add_view(view=ob, **settings)
 
         info = self.venusian.attach(wrapped, callback, category='pyramid')
@@ -415,10 +423,6 @@ class view_config(object):
             if settings['attr'] is None:
                 settings['attr'] = wrapped.__name__
 
-        renderer_name = settings.get('renderer')
-        if renderer_name is not None and not isinstance(renderer_name, dict):
-            settings['renderer'] = {'name':renderer_name,
-                                    'package':info.module}
         settings['_info'] = info.codeinfo
         return wrapped
 

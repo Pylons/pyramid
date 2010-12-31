@@ -35,3 +35,7 @@ Other Interfaces
 
   .. autointerface:: ITemplateRenderer
 
+  .. autointerface:: IViewMapperFactory
+
+  .. autointerface:: IViewMapper
+

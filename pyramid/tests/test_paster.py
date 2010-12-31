@@ -111,6 +111,144 @@ class TestPShellCommand(unittest.TestCase):
         self.failUnless(interact.banner)
         self.assertEqual(apps, [app])
 
+class TestPRoutesCommand(unittest.TestCase):
+    def _getTargetClass(self):
+        from pyramid.paster import PRoutesCommand
+        return PRoutesCommand
+
+    def _makeOne(self):
+        return self._getTargetClass()('proutes')
+
+    def test_no_routes(self):
+        command = self._makeOne()
+        mapper = DummyMapper()
+        command._get_mapper = lambda *arg: mapper
+        L = []
+        command.out = L.append
+        app = DummyApp()
+        loadapp = DummyLoadApp(app)
+        command.loadapp = (loadapp,)
+        command.args = ('/foo/bar/myapp.ini', 'myapp')
+        result = command.command()
+        self.assertEqual(result, None)
+        self.assertEqual(L, [])
+
+    def test_single_route_no_route_registered(self):
+        command = self._makeOne()
+        route = DummyRoute('a', '/a')
+        mapper = DummyMapper(route)
+        command._get_mapper = lambda *arg: mapper
+        L = []
+        command.out = L.append
+        app = DummyApp()
+        loadapp = DummyLoadApp(app)
+        command.loadapp = (loadapp,)
+        command.args = ('/foo/bar/myapp.ini', 'myapp')
+        result = command.command()
+        self.assertEqual(result, None)
+        self.assertEqual(len(L), 3)
+        self.assertEqual(L[-1].split(), ['a', '/a', '<unknown>'])
+
+    def test_single_route_no_views_registered(self):
+        from zope.interface import Interface
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IRouteRequest
+        registry = Registry()
+        def view():pass
+        class IMyRoute(Interface):
+            pass
+        registry.registerUtility(IMyRoute, IRouteRequest, name='a')
+        command = self._makeOne()
+        route = DummyRoute('a', '/a')
+        mapper = DummyMapper(route)
+        command._get_mapper = lambda *arg: mapper
+        L = []
+        command.out = L.append
+        app = DummyApp()
+        app.registry = registry
+        loadapp = DummyLoadApp(app)
+        command.loadapp = (loadapp,)
+        command.args = ('/foo/bar/myapp.ini', 'myapp')
+        result = command.command()
+        self.assertEqual(result, None)
+        self.assertEqual(len(L), 3)
+        self.assertEqual(L[-1].split()[:3], ['a', '/a', 'None'])
+
+    def test_single_route_one_view_registered(self):
+        from zope.interface import Interface
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IRouteRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IView
+        registry = Registry()
+        def view():pass
+        class IMyRoute(Interface):
+            pass
+        registry.registerAdapter(view,
+                                 (IViewClassifier, IMyRoute, Interface),
+                                 IView, '')
+        registry.registerUtility(IMyRoute, IRouteRequest, name='a')
+        command = self._makeOne()
+        route = DummyRoute('a', '/a')
+        mapper = DummyMapper(route)
+        command._get_mapper = lambda *arg: mapper
+        L = []
+        command.out = L.append
+        app = DummyApp()
+        app.registry = registry
+        loadapp = DummyLoadApp(app)
+        command.loadapp = (loadapp,)
+        command.args = ('/foo/bar/myapp.ini', 'myapp')
+        result = command.command()
+        self.assertEqual(result, None)
+        self.assertEqual(len(L), 3)
+        self.assertEqual(L[-1].split()[:4], ['a', '/a', '<function', 'view'])
+        
+    def test_single_route_one_view_registered_with_factory(self):
+        from zope.interface import Interface
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IRouteRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IView
+        registry = Registry()
+        def view():pass
+        class IMyRoot(Interface):
+            pass
+        class IMyRoute(Interface):
+            pass
+        registry.registerAdapter(view,
+                                 (IViewClassifier, IMyRoute, IMyRoot),
+                                 IView, '')
+        registry.registerUtility(IMyRoute, IRouteRequest, name='a')
+        command = self._makeOne()
+        def factory(request): pass
+        route = DummyRoute('a', '/a', factory=factory)
+        mapper = DummyMapper(route)
+        command._get_mapper = lambda *arg: mapper
+        L = []
+        command.out = L.append
+        app = DummyApp()
+        app.registry = registry
+        loadapp = DummyLoadApp(app)
+        command.loadapp = (loadapp,)
+        command.args = ('/foo/bar/myapp.ini', 'myapp')
+        result = command.command()
+        self.assertEqual(result, None)
+        self.assertEqual(len(L), 3)
+        self.assertEqual(L[-1].split()[:3], ['a', '/a', '<unknown>'])
+
+    def test__get_mapper(self):
+        from pyramid.registry import Registry
+        from pyramid.urldispatch import RoutesMapper
+        command = self._makeOne()
+        registry = Registry()
+        class App: pass
+        app = App()
+        app.registry = registry
+        result = command._get_mapper(app)
+        self.assertEqual(result.__class__, RoutesMapper)
+        
+        
 class TestGetApp(unittest.TestCase):
     def _callFUT(self, config_file, section_name, loadapp):
         from pyramid.paster import get_app
@@ -125,6 +263,8 @@ class TestGetApp(unittest.TestCase):
         self.assertEqual(loadapp.section_name, 'myapp')
         self.assertEqual(loadapp.relative_to, os.getcwd())
         self.assertEqual(result, app)
+        
+        
 
 class Dummy:
     pass
@@ -149,7 +289,7 @@ class DummyIPShell(object):
 dummy_root = Dummy()
 
 class DummyRegistry(object):
-    def queryUtility(self, iface, default=None):
+    def queryUtility(self, iface, default=None, name=''):
         return default
 
 dummy_registry = DummyRegistry()
@@ -187,4 +327,17 @@ class DummyThreadLocalManager:
 
     def pop(self):
         self.popped.append(True)
+        
+class DummyMapper(object):
+    def __init__(self, *routes):
+        self.routes = routes
+
+    def get_routes(self):
+        return self.routes
+
+class DummyRoute(object):
+    def __init__(self, name, pattern, factory=None):
+        self.name = name
+        self.pattern = pattern
+        self.factory = factory
         

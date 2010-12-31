@@ -4,38 +4,21 @@ from zope.deprecation import deprecated
 from zope.interface import implements
 
 try:
-    from chameleon.core.template import TemplateFile
-    TemplateFile # prevent pyflakes complaining about a redefinition below
+    from chameleon.zpt.template import PageTextTemplateFile
+    # prevent pyflakes complaining about a redefinition below
+    PageTextTemplateFile 
 except ImportError: # pragma: no cover
     exc_class, exc, tb = sys.exc_info()
     # Chameleon doesn't work on non-CPython platforms
-    class TemplateFile(object):
+    class PageTextTemplateFile(object):
         def __init__(self, *arg, **kw):
             raise ImportError, exc, tb
-
-try:
-    from chameleon.zpt.language import Parser
-    Parser # prevent pyflakes complaining about a redefinition below
-except ImportError: # pragma: no cover
-    # Chameleon doesn't work on non-CPython platforms
-    class Parser(object):
-        pass
 
 from pyramid.interfaces import ITemplateRenderer
 
 from pyramid.decorator import reify
 from pyramid import renderers
 from pyramid.path import caller_package
-
-class TextTemplateFile(TemplateFile):
-    default_parser = Parser()
-    
-    def __init__(self, filename, parser=None, format='text', doctype=None,
-                 **kwargs):
-        if parser is None:
-            parser = self.default_parser
-        super(TextTemplateFile, self).__init__(filename, parser, format,
-                                               doctype, **kwargs)
 
 def renderer_factory(info):
     return renderers.template_renderer_factory(info, TextTemplateRenderer)
@@ -51,10 +34,10 @@ class TextTemplateRenderer(object):
         if sys.platform.startswith('java'): # pragma: no cover
             raise RuntimeError(
                 'Chameleon templates are not compatible with Jython')
-        return TextTemplateFile(self.path,
-                                auto_reload=self.lookup.auto_reload,
-                                debug=self.lookup.debug,
-                                translate=self.lookup.translate)
+        return PageTextTemplateFile(self.path,
+                                    auto_reload=self.lookup.auto_reload,
+                                    debug=self.lookup.debug,
+                                    translate=self.lookup.translate)
 
     def implementation(self):
         return self.template

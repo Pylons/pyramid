@@ -4,6 +4,60 @@ Next release
 Bug Fixes
 ---------
 
+- The ``proutes`` command tried too hard to resolve the view for printing,
+  resulting in exceptions when an exceptional root factory was encountered.
+  Instead of trying to resolve the view, if it cannot, it will now just print
+  ``<unknown>``.
+
+Features
+--------
+
+- ``config.add_view`` now accepts a ``decorator`` keyword argument, a callable
+  which will decorate the view callable before it is added to the registry.
+
+- ``config.add_view`` now accepts a ``view_mapper`` keyword argument, which
+  should be a class which implements the new
+  ``pyramid.interfaces.IViewMapperFactory`` interface.  Use of an alternate
+  view mapper allows objects that are meant to be used as view callables to
+  have an arbitrary argument list and an arbitrary result.  This feature will
+  be used by Pyramid extension developers, not by "civilians".
+
+- If a handler class provides an __action_decorator__ attribute (usually a
+  classmethod or staticmethod), use that as the decorator for each view
+  registration for that handler.
+
+Documentation
+-------------
+
+- The (weak) "Converting a CMF Application to Pyramid" tutorial has been
+  removed from the tutorials section.  It was moved to the
+  ``pyramid_tutorials`` Github repository.
+
+Internals
+---------
+
+- The "view derivation" code is now factored into a set of classes rather
+  than a large number of standalone functions (a side effect of the
+  ``view_mapper`` refactoring).
+
+- The ``pyramid.renderer.RendererHelper`` class has grown a ``render_view``
+  method, which is used by the default view mapper (a side effect of the
+  ``view_mapper`` refactoring).
+
+- The object passed as ``renderer`` to the "view deriver" is now an instance
+  of ``pyramid.renderers.RendererHelper`` rather than a dictionary (a side
+  effect of ``view_mapper`` refactoring).
+
+- The class used as the "page template" in ``pyramid.chameleon_text`` was
+  removed, in preference to using a Chameleon-inbuilt version.
+
+
+1.0a8 (2010-12-27)
+==================
+
+Bug Fixes
+---------
+
 - The name ``registry`` was not available in the ``paster pshell``
   environment under IPython.
 
@@ -24,6 +78,10 @@ Features
 - Prevent misunderstanding of how the ``view`` and ``view_permission``
   arguments to add_route work by raising an exception during configuration if
   view-related arguments exist but no ``view`` argument is passed.
+
+- Add ``paster proute`` command which displays a summary of the routing
+  table.  See the narrative documentation section within the "URL Dispatch"
+  chapter entitled "Displaying All Application Routes".
 
 Paster Templates
 ----------------
@@ -80,6 +138,10 @@ Documentation
 - Move ZCML usage in Hooks chapter to Declarative Configuration chapter.
 
 - Merge "Static Assets" chapter into the "Assets" chapter.
+
+- Added narrative documentation section within the "URL Dispatch" chapter
+  entitled "Displaying All Application Routes" (for ``paster proutes``
+  command).
 
 1.0a7 (2010-12-20)
 ==================

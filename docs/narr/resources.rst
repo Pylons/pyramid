@@ -533,7 +533,7 @@ declares that the blog entry implements an :term:`interface`.
        implements(IBlogEntry)
        def __init__(self, title, body, author):
            self.title = title
-           self.body =  body
+           self.body = body
            self.author = author
            self.created = datetime.datetime.now()
 
@@ -568,7 +568,7 @@ To do so, use the :func:`zope.interface.directlyProvides` function:
    class BlogEntry(object):
        def __init__(self, title, body, author):
            self.title = title
-           self.body =  body
+           self.body = body
            self.author = author
            self.created = datetime.datetime.now()
 
@@ -596,7 +596,7 @@ the :func:`zope.interface.alsoProvides` function:
    class BlogEntry(object):
        def __init__(self, title, body, author):
            self.title = title
-           self.body =  body
+           self.body = body
            self.author = author
            self.created = datetime.datetime.now()
 

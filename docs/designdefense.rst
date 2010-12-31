@@ -1604,10 +1604,10 @@ If you can understand this hello world program, you can use Pyramid:
        app = config.make_wsgi_app()
        serve(app)
 
-Pyramid has ~ 650 of documentation (printed), covering topics from the very
-basic to the most advanced.  *Nothing* is left undocumented, quite literally.
-It also has an *awesome*, very helpful community.  Visit the #repoze and/or
-#pylons IRC channels on freenode.net and see.
+Pyramid has ~ 650 pages of documentation (printed), covering topics from the
+very basic to the most advanced.  *Nothing* is left undocumented, quite
+literally.  It also has an *awesome*, very helpful community.  Visit the
+#repoze and/or #pylons IRC channels on freenode.net and see.
 
 Hate Zope
 +++++++++
