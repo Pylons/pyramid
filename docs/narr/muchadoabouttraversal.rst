@@ -151,7 +151,7 @@ what are these nested dictionary things?  Where do these objects, these
 
 Well, since :app:`Pyramid` is not a highly opinionated framework, there
 is no restriction on how a resource is implemented; the developer can do
-whatever he wants.  One common pattern is to persist all of the
+whatever they want.  One common pattern is to persist all of the
 resources, including the root, in a database.  The root object stores
 the ids of all of its subresources, and provides a ``__getitem__``
 implementation that fetches them.  So ``get_root()`` fetches the unique
