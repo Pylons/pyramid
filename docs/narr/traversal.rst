@@ -125,7 +125,7 @@ constructor tells your :app:`Pyramid` application to call this root factory
 to generate a root resource whenever a request enters the application.  This
 root factory is also known as the global root factory.  A root factory can
 alternately be passed to the ``Configurator`` as a :term:`dotted Python name`
-which refers to a root factory defined in a different module.
+which can refer to a root factory defined in a different module.
 
 A root factory is passed a :term:`request` object and it is expected to
 return an object which represents the root of the resource tree.  All
