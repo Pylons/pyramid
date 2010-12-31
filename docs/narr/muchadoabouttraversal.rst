@@ -32,7 +32,7 @@ used a run-of-the-mill file system with folders and files.
    :ref:`traversal_chapter` chapter, which discusses the technical
    details.
 
-URL Matching
+URL Dispatch
 ------------
 
 Let's take a step back.  The problem we're trying to solve is
