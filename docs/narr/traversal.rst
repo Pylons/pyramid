@@ -17,7 +17,7 @@ resource.
 Using :term:`Traversal` to map a URL to code is optional.  It is often
 less easy to understand than :term:`URL dispatch`, so if you're a rank
 beginner, it probably makes sense to use URL dispatch to map URLs to
-code instead of traversal.  In that case, you can skip this chapter.`
+code instead of traversal.  In that case, you can skip this chapter.
 
 .. index::
    single: traversal details
