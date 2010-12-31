@@ -297,7 +297,11 @@ class TestDummySecurityPolicy(unittest.TestCase):
     def test_authenticated_userid(self):
         policy = self._makeOne('user')
         self.assertEqual(policy.authenticated_userid(None), 'user')
-        
+
+    def test_unauthenticated_userid(self):
+        policy = self._makeOne('user')
+        self.assertEqual(policy.unauthenticated_userid(None), 'user')
+
     def test_effective_principals_userid(self):
         policy = self._makeOne('user', ('group1',))
         from pyramid.security import Everyone

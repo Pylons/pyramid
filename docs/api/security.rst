@@ -10,6 +10,8 @@ Authentication API Functions
 
 .. autofunction:: authenticated_userid
 
+.. autofunction:: unauthenticated_userid
+
 .. autofunction:: effective_principals
 
 .. autofunction:: forget

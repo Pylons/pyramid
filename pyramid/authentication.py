@@ -17,7 +17,7 @@ from pyramid.security import Everyone
 class CallbackAuthenticationPolicy(object):
     """ Abstract class """
     def authenticated_userid(self, request):
-        userid = self._get_userid(request)
+        userid = self.unauthenticated_userid(request)
         if userid is None:
             return None
         if self.callback is None:
@@ -27,7 +27,7 @@ class CallbackAuthenticationPolicy(object):
 
     def effective_principals(self, request):
         effective_principals = [Everyone]
-        userid = self._get_userid(request)
+        userid = self.unauthenticated_userid(request)
         if userid is None:
             return effective_principals
         if self.callback is None:
@@ -89,6 +89,12 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         if self.callback(identity, request) is not None: # is not None!
             return identity['repoze.who.userid']
 
+    def unauthenticated_userid(self, request):
+        identity = self._get_identity(request)
+        if identity is None:
+            return None
+        return identity['repoze.who.userid']
+
     def effective_principals(self, request):
         effective_principals = [Everyone]
         identity = self._get_identity(request)
@@ -147,7 +153,7 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
         self.environ_key = environ_key
         self.callback = callback
 
-    def _get_userid(self, request):
+    def unauthenticated_userid(self, request):
         return request.environ.get(self.environ_key)
 
     def remember(self, request, principal, **kw):
@@ -264,7 +270,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
             )
         self.callback = callback
 
-    def _get_userid(self, request):
+    def unauthenticated_userid(self, request):
         result = self.cookie.identify(request)
         if result:
             return result['userid']

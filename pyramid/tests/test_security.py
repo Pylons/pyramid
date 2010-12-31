@@ -224,6 +224,36 @@ class TestAuthenticatedUserId(unittest.TestCase):
         result = self._callFUT(request)
         self.assertEqual(result, 'yo')
 
+class TestUnauthenticatedUserId(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+        
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, request):
+        from pyramid.security import unauthenticated_userid
+        return unauthenticated_userid(request)
+
+    def test_no_authentication_policy(self):
+        request = _makeRequest()
+        result = self._callFUT(request)
+        self.assertEqual(result, None)
+
+    def test_with_authentication_policy(self):
+        request = _makeRequest()
+        _registerAuthenticationPolicy(request.registry, 'yo')
+        result = self._callFUT(request)
+        self.assertEqual(result, 'yo')
+
+    def test_with_authentication_policy_no_reg_on_request(self):
+        from pyramid.threadlocal import get_current_registry
+        request = DummyRequest({})
+        registry = get_current_registry()
+        _registerAuthenticationPolicy(registry, 'yo')
+        result = self._callFUT(request)
+        self.assertEqual(result, 'yo')
+
 class TestEffectivePrincipals(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -353,6 +383,9 @@ class DummyAuthenticationPolicy:
         self.result = result
 
     def effective_principals(self, request):
+        return self.result
+
+    def unauthenticated_userid(self, request):
         return self.result
 
     def authenticated_userid(self, request):

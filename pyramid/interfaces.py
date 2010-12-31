@@ -155,8 +155,19 @@ class IRouteRequest(Interface):
 class IAuthenticationPolicy(Interface):
     """ An object representing a Pyramid authentication policy. """
     def authenticated_userid(request):
-        """ Return the authenticated userid or ``None`` if no
-        authenticated userid can be found. """
+        """ Return the authenticated userid or ``None`` if no authenticated
+        userid can be found. This method of the policy should ensure that a
+        record exists in whatever persistent store is used related to the
+        user (the user should not have been deleted); if a record associated
+        with the current id does not exist in a persistent store, it should
+        return ``None``."""
+
+    def unauthenticated_userid(request):
+        """ Return the *unauthenticated* userid.  This method performs the
+        same duty as ``authenticated_userid`` but is permitted to return the
+        userid based only on data present in the request; it neednt (and
+        shouldn't) check any persistent store to ensure that the user record
+        related to the request userid exists."""
 
     def effective_principals(request):
         """ Return a sequence representing the effective principals

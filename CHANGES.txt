@@ -26,6 +26,32 @@ Features
   classmethod or staticmethod), use that as the decorator for each view
   registration for that handler.
 
+- The ``pyramid.interfaces.IAuthenticationPolicy`` interface now specifies an
+  ``unauthenticated_userid`` method.  This method supports an important
+  optimization required by people who are using persistent storages which do
+  not support object caching and whom want to create a "user object" as a
+  request attribute.
+
+- A new API has been added to the ``pyramid.security`` module named
+  ``unauthenticated_userid``.  This API function calls the
+  ``unauthenticated_userid`` method of the effective security policy.
+
+- An ``unauthenticated_userid`` method has been added to the dummy
+  authentication policy returned by
+  ``pyramid.config.Configurator.testing_securitypolicy``.  It returns the
+  same thing as that the dummy authentication policy's
+  ``authenticated_userid`` method.
+
+Backwards Incompatibilities
+---------------------------
+
+- Since the ``pyramid.interfaces.IAuthenticationPolicy`` interface now
+  specifies that a policy implementation must implement an
+  ``unauthenticated_userid`` method, all third-party custom authentication
+  policies now must implement this method.  It, however, will only be called
+  when the global function named ``pyramid.security.unauthenticated_userid``
+  is invoked, so if you're not invoking that, you will not notice any issues.
+
 Documentation
 -------------
 
@@ -54,6 +80,11 @@ Internals
 - A view callable wrapper registered in the registry now contains an
   ``__original_view__`` attribute which references the original view callable
   (or class).
+
+- The (non-API) method of all internal authentication policy implementations
+  previously named ``_get_userid`` is now named ``unauthenticated_userid``,
+  promoted to an API method.  If you were overriding this method, you'll now
+  need to override it as ``unauthenticated_userid`` instead.
 
 
 1.0a8 (2010-12-27)

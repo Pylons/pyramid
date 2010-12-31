@@ -18,11 +18,22 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         from pyramid.interfaces import IAuthenticationPolicy
         verifyObject(IAuthenticationPolicy, self._makeOne())
 
+    def test_unauthenticated_userid_returns_None(self):
+        request = DummyRequest({})
+        policy = self._makeOne()
+        self.assertEqual(policy.unauthenticated_userid(request), None)
+
+    def test_unauthenticated_userid(self):
+        request = DummyRequest(
+            {'repoze.who.identity':{'repoze.who.userid':'fred'}})
+        policy = self._makeOne()
+        self.assertEqual(policy.unauthenticated_userid(request), 'fred')
+
     def test_authenticated_userid_None(self):
         request = DummyRequest({})
         policy = self._makeOne()
         self.assertEqual(policy.authenticated_userid(request), None)
-        
+
     def test_authenticated_userid(self):
         request = DummyRequest(
             {'repoze.who.identity':{'repoze.who.userid':'fred'}})
@@ -132,6 +143,16 @@ class TestRemoteUserAuthenticationPolicy(unittest.TestCase):
         from pyramid.interfaces import IAuthenticationPolicy
         verifyObject(IAuthenticationPolicy, self._makeOne())
 
+    def test_unauthenticated_userid_returns_None(self):
+        request = DummyRequest({})
+        policy = self._makeOne()
+        self.assertEqual(policy.unauthenticated_userid(request), None)
+
+    def test_unauthenticated_userid(self):
+        request = DummyRequest({'REMOTE_USER':'fred'})
+        policy = self._makeOne()
+        self.assertEqual(policy.unauthenticated_userid(request), 'fred')
+
     def test_authenticated_userid_None(self):
         request = DummyRequest({})
         policy = self._makeOne()
@@ -195,6 +216,16 @@ class TestAutkTktAuthenticationPolicy(unittest.TestCase):
         from zope.interface.verify import verifyObject
         from pyramid.interfaces import IAuthenticationPolicy
         verifyObject(IAuthenticationPolicy, self._makeOne(None, None))
+
+    def test_unauthenticated_userid_returns_None(self):
+        request = DummyRequest({})
+        policy = self._makeOne(None, None)
+        self.assertEqual(policy.unauthenticated_userid(request), None)
+
+    def test_unauthenticated_userid(self):
+        request = DummyRequest({'REMOTE_USER':'fred'})
+        policy = self._makeOne(None, {'userid':'fred'})
+        self.assertEqual(policy.unauthenticated_userid(request), 'fred')
 
     def test_authenticated_userid_no_cookie_identity(self):
         request = DummyRequest({})

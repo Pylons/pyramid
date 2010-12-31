@@ -44,9 +44,10 @@ def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
     :func:`pyramid.security.authenticated_userid` or
     :func:`pyramid.security.effective_principals` APIs are used.
 
-    This function is most useful when testing code that uses the APIs
-    named :func:`pyramid.security.has_permission`,
+    This function is most useful when testing code that uses the APIs named
+    :func:`pyramid.security.has_permission`,
     :func:`pyramid.security.authenticated_userid`,
+    :func:`pyramid.security.unauthenticated_userid`,
     :func:`pyramid.security.effective_principals`, and
     :func:`pyramid.security.principals_allowed_by_permission`.
 
@@ -330,6 +331,9 @@ class DummySecurityPolicy(object):
         self.permissive = permissive
 
     def authenticated_userid(self, request):
+        return self.userid
+
+    def unauthenticated_userid(self, request):
         return self.userid
 
     def effective_principals(self, request):
