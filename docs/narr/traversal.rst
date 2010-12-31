@@ -95,8 +95,7 @@ The Resource Tree
 When your application uses :term:`traversal` to resolve URLs to code, the
 application must supply a :term:`resource tree` to :app:`Pyramid`.  The
 resource tree is a set of nested dictionary-like objects. The root of the
-tree is represented by a :term:`root` resource.  The tree is effectively a
-nested set of dictionary-like objects.
+tree is represented by a :term:`root` resource.
 
 In order to supply a root resource for an application, at system startup
 time, the :app:`Pyramid` :term:`Router` is configured with a callback known
