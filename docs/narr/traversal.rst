@@ -137,7 +137,7 @@ or another persistence mechanism.
 If no :term:`root factory` is passed to the :app:`Pyramid`
 :term:`Configurator` constructor, or the ``root_factory`` is specified as the
 value ``None``, a *default* root factory is used.  The default root factory
-always returns a resource that has no child resources.
+always returns a resource that has no child resources; it is effectively empty.
 
 .. sidebar:: Emulating the Default Root Factory
 
