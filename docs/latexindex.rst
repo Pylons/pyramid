@@ -33,6 +33,7 @@ Narrative Documentation
    narr/project
    narr/resourcelocation
    narr/urldispatch
+   narr/muchadoabouttraversal
    narr/traversal
    narr/views
    narr/renderers
