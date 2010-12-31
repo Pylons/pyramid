@@ -923,7 +923,7 @@ class Configurator(object):
 
         Any extra keyword arguments are passed along to ``add_route``.
 
-        See :ref:`handlers_chapter` for more explanatory documentation.
+        See :ref:`views_chapter` for more explanatory documentation.
 
         This method returns the result of add_route."""
         handler = self.maybe_dotted(handler)
