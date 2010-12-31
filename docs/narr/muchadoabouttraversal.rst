@@ -4,9 +4,6 @@
 Much Ado About Traversal
 ========================
 
-Introduction
-------------
-
 A lot of folks who have been using Pylons (and, therefore, Routes-based
 URL matching) are being exposed for the first time, via :app:`Pyramid`,
 to new ideas such as ":term:`traversal`" and ":term:`view lookup`" as a
