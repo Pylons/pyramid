@@ -3886,18 +3886,24 @@ class Test__map_view(unittest.TestCase):
         request = self._makeRequest()
         self.assertEqual(result(None, request).body, 'Hello!')
 
-class Test_wraps_view(unittest.TestCase):
-    def _callFUT(self, fn, view):
-        from pyramid.config import wraps_view
-        return wraps_view(fn)(None, view)
+class Test_preserve_view_attrs(unittest.TestCase):
+    def _callFUT(self, view, wrapped_view):
+        from pyramid.config import preserve_view_attrs
+        return preserve_view_attrs(view, wrapped_view)
 
     def test_it_same(self):
         def view(context, request):
             """ """
-        def afunc(self, view):
-            return view
-        result = self._callFUT(afunc, view)
+        result = self._callFUT(view, view)
         self.failUnless(result is view)
+
+    def test_it_different_with_existing_original_view(self):
+        def view1(context, request): pass
+        view1.__original_view__ = 'abc'
+        def view2(context, request): pass
+        result = self._callFUT(view1, view2)
+        self.assertEqual(result.__original_view__, 'abc')
+        self.failIf(result is view1)
 
     def test_it_different(self):
         class DummyView1:
@@ -3906,9 +3912,9 @@ class Test_wraps_view(unittest.TestCase):
             __module__ = '1'
             def __call__(self, context, request):
                 """ """
-            def __call_permissive__(self, context, reuqest):
+            def __call_permissive__(self, context, request):
                 """ """
-            def __predicated__(self, context, reuqest):
+            def __predicated__(self, context, request):
                 """ """
             def __permitted__(self, context, request):
                 """ """
@@ -3918,18 +3924,17 @@ class Test_wraps_view(unittest.TestCase):
             __module__ = '2'
             def __call__(self, context, request):
                 """ """
-            def __call_permissive__(self, context, reuqest):
+            def __call_permissive__(self, context, request):
                 """ """
-            def __predicated__(self, context, reuqest):
+            def __predicated__(self, context, request):
                 """ """
             def __permitted__(self, context, request):
                 """ """
         view1 = DummyView1()
         view2 = DummyView2()
-        def afunc(self, view):
-            return view1
-        result = self._callFUT(afunc, view2)
+        result = self._callFUT(view2, view1)
         self.assertEqual(result, view1)
+        self.failUnless(view1.__original_view__ is view2)
         self.failUnless(view1.__doc__ is view2.__doc__)
         self.failUnless(view1.__module__ is view2.__module__)
         self.failUnless(view1.__name__ is view2.__name__)

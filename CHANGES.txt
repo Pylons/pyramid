@@ -51,6 +51,10 @@ Internals
 - The class used as the "page template" in ``pyramid.chameleon_text`` was
   removed, in preference to using a Chameleon-inbuilt version.
 
+- A view callable wrapper registered in the registry now contains an
+  ``__original_view__`` attribute which references the original view callable
+  (or class).
+
 
 1.0a8 (2010-12-27)
 ==================

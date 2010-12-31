@@ -2695,6 +2695,10 @@ def wraps_view(wrapped):
 def preserve_view_attrs(view, wrapped_view):
     if wrapped_view is view:
         return view
+    original_view = getattr(view, '__original_view__', None)
+    if original_view is None:
+        original_view = view
+    wrapped_view.__original_view__ = original_view
     wrapped_view.__module__ = view.__module__
     wrapped_view.__doc__ = view.__doc__
     try:
