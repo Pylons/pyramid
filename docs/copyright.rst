@@ -59,6 +59,9 @@ Used with permission:
    The :ref:`webob_chapter` chapter is adapted, with permission, from
    documentation originally written by Ian Bicking.
 
+   The :ref:`much_ado_about_traversal_chapter` chapter is adapted,
+   with permission, from an article written by Rob Miller.
+
 .. Print Production
 .. ----------------
 
