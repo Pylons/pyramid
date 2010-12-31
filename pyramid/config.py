@@ -2158,11 +2158,6 @@ class Configurator(object):
             # same function once for each added translation directory,
             # which does too much work, but has the same effect.
 
-            def translator(msg):
-                request = get_current_request()
-                localizer = get_localizer(request)
-                return localizer.translate(msg)
-
             ctranslate = ChameleonTranslate(translator)
             self.registry.registerUtility(ctranslate, IChameleonTranslate)
 
@@ -2983,4 +2978,9 @@ class PyramidConfigurationMachine(ConfigurationMachine):
             return False
         self._seen_files.add(spec)
         return True
+
+def translator(msg):
+    request = get_current_request()
+    localizer = get_localizer(request)
+    return localizer.translate(msg)
 
