@@ -53,7 +53,7 @@ def route_url(route_name, request, *elements, **kw):
     ``*remainder`` replacement value, it is tacked on to the URL
     untouched.
 
-    If a keyword argument ``_query`` is present, it will used to
+    If a keyword argument ``_query`` is present, it will be used to
     compose a query string that will be tacked on to the end of the
     URL.  The value of ``_query`` must be a sequence of two-tuples
     *or* a data structure with an ``.items()`` method that returns a
@@ -221,7 +221,7 @@ def resource_url(resource, request, *elements, **kw):
                  ``elements`` are used, the generated URL will *not*
                  end in trailing a slash.
 
-    If a keyword argument ``query`` is present, it will used to
+    If a keyword argument ``query`` is present, it will be used to
     compose a query string that will be tacked on to the end of the
     URL.  The value of ``query`` must be a sequence of two-tuples *or*
     a data structure with an ``.items()`` method that returns a

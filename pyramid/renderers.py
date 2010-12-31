@@ -282,6 +282,18 @@ class RendererHelper(object):
     def get_renderer(self):
         return self.renderer
 
+    def render_view(self, request, response, view, context):
+        system = {
+            'view':view,
+            'renderer_name':self.name, # b/c
+            'renderer_info':{'name':self.name, 'package':self.package},
+            'context':context,
+            'request':request
+            }
+        return self.render_to_response(response, system,
+                                       request=request)
+                
+
     def render(self, value, system_values, request=None):
         renderer = self.renderer
         if system_values is None:

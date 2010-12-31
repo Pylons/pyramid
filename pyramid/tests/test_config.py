@@ -739,6 +739,22 @@ class ConfiguratorTests(unittest.TestCase):
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
 
+    def test_add_view_with_decorator(self):
+        def view(request):
+            """ ABC """
+            return 'OK'
+        def view_wrapper(fn):
+            def inner(context, request):
+                return fn(context, request)
+            return inner
+        config = self._makeOne(autocommit=True)
+        config.add_view(view=view, decorator=view_wrapper)
+        wrapper = self._getViewCallable(config)
+        self.failIf(wrapper is view)
+        self.assertEqual(wrapper.__doc__, view.__doc__)
+        result = wrapper(None, None)
+        self.assertEqual(result, 'OK')
+
     def test_add_view_as_instance(self):
         class AView:
             def __call__(self, context, request):
@@ -1410,6 +1426,29 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(result.name, fixture)
         self.assertEqual(result.settings, settings)
 
+    def test_add_view_with_default_renderer(self):
+        import pyramid.tests
+        from pyramid.interfaces import ISettings
+        class view(object):
+            def __init__(self, context, request):
+                self.request = request
+                self.context = context
+
+            def __call__(self):
+                return {'a':'1'}
+        config = self._makeOne(autocommit=True)
+        class moo(object):
+            def __init__(self, *arg, **kw):
+                pass
+            def __call__(self, *arg, **kw):
+                return 'moo'
+        config.add_renderer(None, moo)
+        config.add_view(view=view)
+        wrapper = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        result = wrapper(None, request)
+        self.assertEqual(result.body, 'moo')
+
     def test_add_view_with_template_renderer_no_callable(self):
         import pyramid.tests
         from pyramid.interfaces import ISettings
@@ -1963,6 +2002,33 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(view['route_name'], 'name')
         self.assertEqual(view['attr'], 'action')
         self.assertEqual(view['view'], MyView)
+
+    def test_add_handler_with_action_decorator(self):
+        config = self._makeOne(autocommit=True)
+        views = []
+        def dummy_add_view(**kw):
+            views.append(kw)
+        config.add_view = dummy_add_view
+        class MyHandler(object):
+            @classmethod
+            def __action_decorator__(cls, fn): # pragma: no cover
+                return fn
+            def action(self): # pragma: no cover
+                return 'response'
+        config.add_handler('name', '/{action}', MyHandler)
+        self.assertEqual(len(views), 1)
+        self.assertEqual(views[0]['decorator'], MyHandler.__action_decorator__)
+
+    def test_add_handler_with_action_decorator_fail_on_instancemethod(self):
+        config = self._makeOne(autocommit=True)
+        class MyHandler(object):
+            def __action_decorator__(self, fn): # pragma: no cover
+                return fn
+            def action(self): # pragma: no cover
+                return 'response'
+        from pyramid.exceptions import ConfigurationError
+        self.assertRaises(ConfigurationError, config.add_handler,
+                          'name', '/{action}', MyHandler)
 
     def test_add_handler_doesnt_mutate_expose_dict(self):
         config = self._makeOne(autocommit=True)
@@ -3504,16 +3570,17 @@ class Test__map_view(unittest.TestCase):
     def _registerRenderer(self, typ='.txt'):
         from pyramid.interfaces import IRendererFactory
         from pyramid.interfaces import ITemplateRenderer
+        from pyramid.renderers import RendererHelper
         from zope.interface import implements
-        class Renderer:
+        class DummyRenderer:
             implements(ITemplateRenderer)
-            spec = 'abc' + typ
             def __init__(self, path):
                 self.__class__.path = path
             def __call__(self, *arg):
                 return 'Hello!'
-        self.registry.registerUtility(Renderer, IRendererFactory, name=typ)
-        return Renderer
+        self.registry.registerUtility(DummyRenderer, IRendererFactory, name=typ)
+        renderer =  RendererHelper(name='abc' + typ, registry=self.registry)
+        return renderer
 
     def _makeRequest(self):
         request = DummyRequest()
@@ -3541,8 +3608,7 @@ class Test__map_view(unittest.TestCase):
     def test__map_view_as_function_with_attr_and_renderer(self):
         renderer = self._registerRenderer()
         view = lambda *arg: 'OK'
-        info = {'name':renderer.spec, 'package':None}
-        result = self._callFUT(view, attr='__name__', renderer=info)
+        result = self._callFUT(view, attr='__name__', renderer=renderer)
         self.failIf(result is view)
         self.assertRaises(TypeError, result, None, None)
 
@@ -3600,8 +3666,7 @@ class Test__map_view(unittest.TestCase):
                 pass
             def index(self):
                 return {'a':'1'}
-        info = {'name':renderer.spec, 'package':None}
-        result = self._callFUT(view, attr='index', renderer=info)
+        result = self._callFUT(view, attr='index', renderer=renderer)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -3642,8 +3707,7 @@ class Test__map_view(unittest.TestCase):
                 pass
             def index(self):
                 return {'a':'1'}
-        info = {'name':renderer.spec, 'package':None}
-        result = self._callFUT(view, attr='index', renderer=info)
+        result = self._callFUT(view, attr='index', renderer=renderer)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -3684,8 +3748,7 @@ class Test__map_view(unittest.TestCase):
                 pass
             def index(self):
                 return {'a':'1'}
-        info = {'name':renderer.spec, 'package':None}
-        result = self._callFUT(view, attr='index', renderer=info)
+        result = self._callFUT(view, attr='index', renderer=renderer)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -3726,8 +3789,7 @@ class Test__map_view(unittest.TestCase):
                 pass
             def index(self):
                 return {'a':'1'}
-        info = {'name':renderer.spec, 'package':None}
-        result = self._callFUT(view, attr='index', renderer=info)
+        result = self._callFUT(view, attr='index', renderer=renderer)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -3759,8 +3821,7 @@ class Test__map_view(unittest.TestCase):
             def index(self, context, request):
                 return {'a':'1'}
         view = View()
-        info = {'name':renderer.spec, 'package':None}
-        result = self._callFUT(view, attr='index', renderer=info)
+        result = self._callFUT(view, attr='index', renderer=renderer)
         self.failIf(result is view)
         request = self._makeRequest()
         self.assertEqual(result(None, request).body, 'Hello!')
@@ -3795,8 +3856,7 @@ class Test__map_view(unittest.TestCase):
             def index(self, request):
                 return {'a':'1'}
         view = View()
-        info = {'name':renderer.spec, 'package':None}
-        result = self._callFUT(view, attr='index', renderer=info)
+        result = self._callFUT(view, attr='index', renderer=renderer)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -3808,8 +3868,7 @@ class Test__map_view(unittest.TestCase):
         renderer = self._registerRenderer()
         def view(context, request):
             return {'a':'1'}
-        info = {'name':renderer.spec, 'package':None}
-        result = self._callFUT(view, renderer=info)
+        result = self._callFUT(view, renderer=renderer)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -3820,24 +3879,25 @@ class Test__map_view(unittest.TestCase):
         renderer = self._registerRenderer()
         def view(context, request):
             return {'a':'1'}
-        info = {'name':renderer.spec, 'package':None}
-        result = self._callFUT(view, renderer=info)
+        result = self._callFUT(view, renderer=renderer)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         request = self._makeRequest()
         self.assertEqual(result(None, request).body, 'Hello!')
 
-class Test_decorate_view(unittest.TestCase):
-    def _callFUT(self, wrapped, original):
-        from pyramid.config import decorate_view
-        return decorate_view(wrapped, original)
+class Test_wraps_view(unittest.TestCase):
+    def _callFUT(self, fn, view):
+        from pyramid.config import wraps_view
+        return wraps_view(fn)(None, view)
 
     def test_it_same(self):
         def view(context, request):
             """ """
-        result = self._callFUT(view, view)
-        self.assertEqual(result, False)
+        def afunc(self, view):
+            return view
+        result = self._callFUT(afunc, view)
+        self.failUnless(result is view)
 
     def test_it_different(self):
         class DummyView1:
@@ -3866,8 +3926,10 @@ class Test_decorate_view(unittest.TestCase):
                 """ """
         view1 = DummyView1()
         view2 = DummyView2()
-        result = self._callFUT(view1, view2)
-        self.assertEqual(result, True)
+        def afunc(self, view):
+            return view1
+        result = self._callFUT(afunc, view2)
+        self.assertEqual(result, view1)
         self.failUnless(view1.__doc__ is view2.__doc__)
         self.failUnless(view1.__module__ is view2.__module__)
         self.failUnless(view1.__name__ is view2.__name__)

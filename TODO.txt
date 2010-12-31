@@ -11,8 +11,10 @@ Must-Have (before 1.0)
 - Re-make testing.setUp() and testing.tearDown() the canonical APIs for test
   configuration.
 
-- ``decorator=`` parameter to view_config.  This would replace the existing
-  _map_view "decorator" if it existed (Rob needs).
+- Document ``decorator=`` and ``view_mapper`` parameters to add_view.
+
+- Allow ``decorator=`` and ``view_mapper=`` to be passed via ZCML and the
+  ``view_config`` decorator.
 
 Should-Have
 -----------

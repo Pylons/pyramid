@@ -45,6 +45,7 @@ from pyramid.interfaces import ITranslationDirectories
 from pyramid.interfaces import ITraverser
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
+from pyramid.interfaces import IViewMapperFactory
 
 try:
     from pyramid import chameleon_text
@@ -338,30 +339,34 @@ class Configurator(object):
     def _split_spec(self, path_or_spec):
         return resolve_asset_spec(path_or_spec, self.package_name)
 
+    # b/w compat
     def _derive_view(self, view, permission=None, predicates=(),
                      attr=None, renderer=None, wrapper_viewname=None,
                      viewname=None, accept=None, order=MAX_ORDER,
                      phash=DEFAULT_PHASH):
-        if renderer is None: # use default renderer if one exists
-            default_renderer_factory = self.registry.queryUtility(
-                IRendererFactory)
-            if default_renderer_factory is not None:
-                renderer = {'name':None, 'package':self.package}
         view = self.maybe_dotted(view)
-        authn_policy = self.registry.queryUtility(IAuthenticationPolicy)
-        authz_policy = self.registry.queryUtility(IAuthorizationPolicy)
-        settings = self.registry.settings
-        logger = self.registry.queryUtility(IDebugLogger)
-        mapped_view = _map_view(view, self.registry, attr, renderer)
-        owrapped_view = _owrap_view(mapped_view, viewname, wrapper_viewname)
-        secured_view = _secure_view(owrapped_view, permission,
-                                    authn_policy, authz_policy)
-        debug_view = _authdebug_view(secured_view, permission,
-                                     authn_policy, authz_policy, settings,
-                                     logger)
-        predicated_view = _predicate_wrap(debug_view, predicates)
-        derived_view = _attr_wrap(predicated_view, accept, order, phash)
-        return derived_view
+        if isinstance(renderer, basestring):
+            renderer = RendererHelper(name=renderer, package=self.package,
+                                      registry = self.registry)
+        if renderer is None:
+            # use default renderer if one exists
+            if self.registry.queryUtility(IRendererFactory) is not None:
+                renderer = RendererHelper(name=None,
+                                          package=self.package,
+                                          registry=self.registry)
+        deriver = ViewDeriver(
+            registry=self.registry,
+            permission=permission,
+            predicates=predicates,
+            attr=attr,
+            renderer=renderer,
+            wrapper_viewname=wrapper_viewname,
+            viewname=viewname,
+            accept=accept,
+            order=order,
+            phash=phash,
+            package=self.package)
+        return deriver(view)
 
     def _override(self, package, path, override_package, override_prefix,
                   PackageOverrides=PackageOverrides):
@@ -757,9 +762,6 @@ class Configurator(object):
         a :term:`response` object.  If a ``renderer`` argument is not
         supplied, the user-supplied view must itself return a
         :term:`response` object.  """
-
-        if renderer is not None and not isinstance(renderer, dict):
-            renderer = {'name':renderer, 'package':self.package}
         return self._derive_view(view, attr=attr, renderer=renderer)
 
     @action_method
@@ -941,6 +943,20 @@ class Configurator(object):
 
             pattern = route.pattern
 
+        action_decorator = getattr(handler, '__action_decorator__', None)
+        if action_decorator is not None:
+            if hasattr(action_decorator, 'im_self'):
+                # instance methods have an im_self == None
+                # classmethods have an im_self == cls
+                # staticmethods have no im_self
+                # instances have no im_self
+                if action_decorator.im_self is not handler:
+                    raise ConfigurationError(
+                        'The "__action_decorator__" attribute of a handler '
+                        'must not be an instance method (must be a '
+                        'staticmethod, classmethod, function, or an instance '
+                        'which is a callable')
+
         path_has_action = ':action' in pattern or '{action}' in pattern
 
         if action and path_has_action:
@@ -970,7 +986,8 @@ class Configurator(object):
                     preds.append(ActionPredicate(action))
                     view_args['custom_predicates'] = preds
                     self.add_view(view=handler, attr=method_name,
-                                  route_name=route_name, **view_args)
+                                  route_name=route_name,
+                                  decorator=action_decorator, **view_args)
         else:
             method_name = action
             if method_name is None:
@@ -993,14 +1010,15 @@ class Configurator(object):
                     view_args = expose_config.copy()
                     del view_args['name']
                     self.add_view(view=handler, attr=meth_name,
-                                  route_name=route_name, **view_args)
+                                  route_name=route_name,
+                                  decorator=action_decorator, **view_args)
 
             # Now register the method itself
             method = getattr(handler, method_name, None)
             configs = getattr(method, '__exposed__', [{}])
             for expose_config in configs:
                 self.add_view(view=handler, attr=action, route_name=route_name,
-                              **expose_config)
+                              decorator=action_decorator, **expose_config)
 
         return route
 
@@ -1010,7 +1028,7 @@ class Configurator(object):
                  request_param=None, containment=None, attr=None,
                  renderer=None, wrapper=None, xhr=False, accept=None,
                  header=None, path_info=None, custom_predicates=(),
-                 context=None):
+                 context=None, decorator=None, view_mapper=None):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
         down below into *predicate* arguments and *non-predicate*
@@ -1119,6 +1137,15 @@ class Configurator(object):
           view is the same context and request of the inner view.  If
           this attribute is unspecified, no view wrapping is done.
 
+        decorator
+
+          A function which will be used to decorate the registered
+          :term:`view callable`.  The decorator function will be
+          called with the view callable as a single argument, and it
+          must return a replacement view callable which accepts the
+          same arguments and returns the same type of values as the
+          original function.
+          
         Predicate Arguments
 
         name
@@ -1255,6 +1282,18 @@ class Configurator(object):
           the context and/or the request.  If all callables return
           ``True``, the associated view callable will be considered
           viable for a given request.
+
+        view_mapper
+
+          A class implementing the
+          :class:`pyramid.interfaces.IViewMapperFactory` interface, which
+          performs view argument and response mapping.  By default it is
+          ``None``, which indicates that the view should use the default view
+          mapper.  This plug-point is useful for Pyramid extension
+          developers, but it's not very useful for 'civilians' who are
+          just developing stock Pyramid applications. Pay no attention to
+          the man behind the curtain.
+          
         """
         view = self.maybe_dotted(view)
         context = self.maybe_dotted(context)
@@ -1293,6 +1332,7 @@ class Configurator(object):
                     renderer=renderer, wrapper=wrapper, xhr=xhr, accept=accept,
                     header=header, path_info=path_info,
                     custom_predicates=custom_predicates, context=context,
+                    view_mapper = view_mapper,
                     )
                 view_info = deferred_views.setdefault(route_name, [])
                 view_info.append(info)
@@ -1304,9 +1344,6 @@ class Configurator(object):
             containment=containment, request_type=request_type,
             custom=custom_predicates)
 
-        if renderer is not None and not isinstance(renderer, dict):
-            renderer = {'name':renderer, 'package':self.package}
-
         if context is None:
             context = for_
 
@@ -1316,16 +1353,35 @@ class Configurator(object):
         if not IInterface.providedBy(r_context):
             r_context = implementedBy(r_context)
 
-        def register(permission=permission):
+        if isinstance(renderer, basestring):
+            renderer = RendererHelper(name=renderer, package=self.package,
+                                      registry = self.registry)
+
+        def register(permission=permission, renderer=renderer):
+            if renderer is None:
+                # use default renderer if one exists
+                if self.registry.queryUtility(IRendererFactory) is not None:
+                    renderer = RendererHelper(name=None,
+                                              package=self.package,
+                                              registry=self.registry)
 
             if permission is None:
                 # intent: will be None if no default permission is registered
                 permission = self.registry.queryUtility(IDefaultPermission)
 
             # NO_PERMISSION_REQUIRED handled by _secure_view
-            derived_view = self._derive_view(view, permission, predicates, attr,
-                                             renderer, wrapper, name, accept,
-                                             order, phash)
+            derived_view = ViewDeriver(registry=self.registry,
+                                       permission=permission,
+                                       predicates=predicates,
+                                       attr=attr,
+                                       renderer=renderer,
+                                       wrapper_viewname=wrapper,
+                                       viewname=name,
+                                       accept=accept,
+                                       order=order,
+                                       phash=phash,
+                                       decorator=decorator,
+                                       view_mapper=view_mapper)(view)
 
             registered = self.registry.adapters.registered
 
@@ -1959,8 +2015,9 @@ class Configurator(object):
         The ``wrapper`` argument should be the name of another view
         which will wrap this view when rendered (see the ``add_view``
         method's ``wrapper`` argument for a description)."""
-        if renderer is not None and not isinstance(renderer, dict):
-            renderer = {'name':renderer, 'package':self.package}
+        if isinstance(renderer, basestring):
+            renderer = RendererHelper(name=renderer, package=self.package,
+                                      registry = self.registry)
         view = self._derive_view(view, attr=attr, renderer=renderer)
         def bwcompat_view(context, request):
             context = getattr(request, 'context', None)
@@ -1998,8 +2055,9 @@ class Configurator(object):
         which will wrap this view when rendered (see the ``add_view``
         method's ``wrapper`` argument for a description).
         """
-        if renderer is not None and not isinstance(renderer, dict):
-            renderer = {'name':renderer, 'package':self.package}
+        if isinstance(renderer, basestring):
+            renderer = RendererHelper(name=renderer, package=self.package,
+                                      registry=self.registry)
         view = self._derive_view(view, attr=attr, renderer=renderer)
         def bwcompat_view(context, request):
             context = getattr(request, 'context', None)
@@ -2628,307 +2686,330 @@ class MultiView(object):
                 continue
         raise PredicateMismatch(self.name)
 
-def decorate_view(wrapped_view, original_view):
-    if wrapped_view is original_view:
-        return False
-    wrapped_view.__module__ = original_view.__module__
-    wrapped_view.__doc__ = original_view.__doc__
+def wraps_view(wrapped):
+    def inner(self, view):
+        wrapped_view = wrapped(self, view)
+        return preserve_view_attrs(view, wrapped_view)
+    return inner
+
+def preserve_view_attrs(view, wrapped_view):
+    if wrapped_view is view:
+        return view
+    wrapped_view.__module__ = view.__module__
+    wrapped_view.__doc__ = view.__doc__
     try:
-        wrapped_view.__name__ = original_view.__name__
+        wrapped_view.__name__ = view.__name__
     except AttributeError:
-        wrapped_view.__name__ = repr(original_view)
+        wrapped_view.__name__ = repr(view)
     try:
-        wrapped_view.__permitted__ = original_view.__permitted__
-    except AttributeError:
-        pass
-    try:
-        wrapped_view.__call_permissive__ = original_view.__call_permissive__
-    except AttributeError:
-        pass
-    try:
-        wrapped_view.__predicated__ = original_view.__predicated__
+        wrapped_view.__permitted__ = view.__permitted__
     except AttributeError:
         pass
     try:
-        wrapped_view.__accept__ = original_view.__accept__
+        wrapped_view.__call_permissive__ = view.__call_permissive__
     except AttributeError:
         pass
     try:
-        wrapped_view.__order__ = original_view.__order__
+        wrapped_view.__predicated__ = view.__predicated__
     except AttributeError:
         pass
-    return True
-
-def requestonly(class_or_callable, attr=None):
-    """ Return true of the class or callable accepts only a request argument,
-    as opposed to something that accepts context, request """
-    if attr is None:
-        attr = '__call__'
-    if inspect.isfunction(class_or_callable):
-        fn = class_or_callable
-    elif inspect.isclass(class_or_callable):
-        try:
-            fn = class_or_callable.__init__
-        except AttributeError:
-            return False
-    else:
-        try:
-            fn = getattr(class_or_callable, attr)
-        except AttributeError:
-            return False
-
     try:
-        argspec = inspect.getargspec(fn)
-    except TypeError:
-        return False
+        wrapped_view.__accept__ = view.__accept__
+    except AttributeError:
+        pass
+    try:
+        wrapped_view.__order__ = view.__order__
+    except AttributeError:
+        pass
+    return wrapped_view
 
-    args = argspec[0]
-    defaults = argspec[3]
+class ViewDeriver(object):
+    def __init__(self, **kw):
+        self.kw = kw
+        self.registry = kw['registry']
+        self.authn_policy = self.registry.queryUtility(
+            IAuthenticationPolicy)
+        self.authz_policy = self.registry.queryUtility(
+            IAuthorizationPolicy)
+        self.logger = self.registry.queryUtility(IDebugLogger)
 
-    if hasattr(fn, 'im_func'):
-        # it's an instance method
-        if not args:
-            return False
-        args = args[1:]
-    if not args:
-        return False
+    def __call__(self, view):
+        mapper = self.kw.get('view_mapper')
+        if mapper is None:
+            mapper = DefaultViewMapper
+        view = mapper(**self.kw)(view)
+        return self.attr_wrapped_view(
+            self.predicated_view(
+                self.authdebug_view(
+                    self.secured_view(
+                        self.owrap_view(
+                            view)))))
 
-    if len(args) == 1:
-        return True
+    @wraps_view
+    def owrap_view(self, view):
+        wrapper_viewname = self.kw.get('wrapper_viewname')
+        viewname = self.kw.get('viewname')
+        if not wrapper_viewname:
+            return view
+        def _owrapped_view(context, request):
+            response = view(context, request)
+            request.wrapped_response = response
+            request.wrapped_body = response.body
+            request.wrapped_view = view
+            wrapped_response = render_view_to_response(context, request,
+                                                       wrapper_viewname)
+            if wrapped_response is None:
+                raise ValueError(
+                    'No wrapper view named %r found when executing view '
+                    'named %r' % (wrapper_viewname, viewname))
+            return wrapped_response
+        return _owrapped_view
 
-    elif args[0] == 'request':
-        if len(args) - len(defaults) == 1:
-            return True
+    @wraps_view
+    def secured_view(self, view):
+        permission = self.kw.get('permission')
+        if permission == '__no_permission_required__':
+            # allow views registered within configurations that have a
+            # default permission to explicitly override the default
+            # permission, replacing it with no permission at all
+            permission = None
 
-    return False
+        wrapped_view = view
+        if self.authn_policy and self.authz_policy and (permission is not None):
+            def _secured_view(context, request):
+                principals = self.authn_policy.effective_principals(request)
+                if self.authz_policy.permits(context, principals, permission):
+                    return view(context, request)
+                msg = getattr(request, 'authdebug_message',
+                              'Unauthorized: %s failed permission check' % view)
+                raise Forbidden(msg)
+            _secured_view.__call_permissive__ = view
+            def _permitted(context, request):
+                principals = self.authn_policy.effective_principals(request)
+                return self.authz_policy.permits(context, principals,
+                                                 permission)
+            _secured_view.__permitted__ = _permitted
+            wrapped_view = _secured_view
 
-def is_response(ob):
-    if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
-         hasattr(ob, 'status') ):
-        return True
-    return False
+        return wrapped_view
 
-def _map_view(view, registry, attr=None, renderer=None):
-    wrapped_view = view
+    @wraps_view
+    def authdebug_view(self, view):
+        wrapped_view = view
+        settings = self.registry.settings
+        permission = self.kw.get('permission')
+        if settings and settings.get('debug_authorization', False):
+            def _authdebug_view(context, request):
+                view_name = getattr(request, 'view_name', None)
 
-    helper = None
-
-    if renderer is not None:
-        helper = RendererHelper(renderer['name'],
-                                package=renderer['package'],
-                                registry=registry)
-
-    if inspect.isclass(view):
-        # If the object we've located is a class, turn it into a
-        # function that operates like a Zope view (when it's invoked,
-        # construct an instance using 'context' and 'request' as
-        # position arguments, then immediately invoke the __call__
-        # method of the instance with no arguments; __call__ should
-        # return an IResponse).
-        if requestonly(view, attr):
-            # its __init__ accepts only a single request argument,
-            # instead of both context and request
-            def _class_requestonly_view(context, request):
-                inst = view(request)
-                if attr is None:
-                    response = inst()
+                if self.authn_policy and self.authz_policy:
+                    if permission is None:
+                        msg = 'Allowed (no permission registered)'
+                    else:
+                        principals = self.authn_policy.effective_principals(
+                            request)
+                        msg = str(self.authz_policy.permits(context, principals,
+                                                            permission))
                 else:
-                    response = getattr(inst, attr)()
-                if helper is not None:
-                    if not is_response(response):
-                        system = {
-                            'view':inst,
-                            'renderer_name':renderer['name'], # b/c
-                            'renderer_info':renderer,
-                            'context':context,
-                            'request':request
-                            }
-                        response = helper.render_to_response(response, system,
-                                                             request=request)
-                return response
-            wrapped_view = _class_requestonly_view
+                    msg = 'Allowed (no authorization policy in use)'
+
+                view_name = getattr(request, 'view_name', None)
+                url = getattr(request, 'url', None)
+                msg = ('debug_authorization of url %s (view name %r against '
+                       'context %r): %s' % (url, view_name, context, msg))
+                self.logger and self.logger.debug(msg)
+                if request is not None:
+                    request.authdebug_message = msg
+                return view(context, request)
+
+            wrapped_view = _authdebug_view
+
+        return wrapped_view
+
+    @wraps_view
+    def predicated_view(self, view):
+        predicates = self.kw.get('predicates', ())
+        if not predicates:
+            return view
+        def predicate_wrapper(context, request):
+            if all((predicate(context, request) for predicate in predicates)):
+                return view(context, request)
+            raise PredicateMismatch('predicate mismatch for view %s' % view)
+        def checker(context, request):
+            return all((predicate(context, request) for predicate in
+                        predicates))
+        predicate_wrapper.__predicated__ = checker
+        return predicate_wrapper
+
+    @wraps_view
+    def attr_wrapped_view(self, view):
+        kw = self.kw
+        accept, order, phash = (kw.get('accept', None),
+                                kw.get('order', MAX_ORDER),
+                                kw.get('phash', DEFAULT_PHASH))
+        # this is a little silly but we don't want to decorate the original
+        # function with attributes that indicate accept, order, and phash,
+        # so we use a wrapper
+        if ( (accept is None) and (order == MAX_ORDER) and
+             (phash == DEFAULT_PHASH) ):
+            return view # defaults
+        def attr_view(context, request):
+            return view(context, request)
+        attr_view.__accept__ = accept
+        attr_view.__order__ = order
+        attr_view.__phash__ = phash
+        return attr_view
+
+class DefaultViewMapper(object):
+    implements(IViewMapperFactory)
+    def __init__(self, **kw):
+        self.renderer = kw.get('renderer')
+        self.attr = kw.get('attr')
+        self.decorator = kw.get('decorator')
+
+    def __call__(self, view):
+        decorator = self.decorator
+        if inspect.isclass(view):
+            view = preserve_view_attrs(view, self.map_class(view))
         else:
-            # its __init__ accepts both context and request
-            def _class_view(context, request):
-                inst = view(context, request)
-                if attr is None:
-                    response = inst()
-                else:
-                    response = getattr(inst, attr)()
-                if helper is not None:
-                    if not is_response(response):
-                        system = {'view':inst,
-                                  'renderer_name':renderer['name'], # b/c
-                                  'renderer_info':renderer,
-                                  'context':context,
-                                  'request':request
-                                  }
-                        response = helper.render_to_response(response, system,
-                                                             request=request)
-                return response
-            wrapped_view = _class_view
+            view = preserve_view_attrs(view, self.map_nonclass(view))
+        if decorator is not None:
+            view = preserve_view_attrs(view, decorator(view))
+        return view
 
-    elif requestonly(view, attr):
-        # its __call__ accepts only a single request argument,
-        # instead of both context and request
+    def map_class(self, view):
+        ronly = self.requestonly(view)
+        if ronly:
+            mapped_view = self._map_class_requestonly(view)
+        else:
+            mapped_view = self._map_class_native(view)
+        return mapped_view
+
+    def map_nonclass(self, view):
+        # We do more work here than appears necessary to avoid wrapping the
+        # view unless it actually requires wrapping (to avoid function call
+        # overhead).
+        mapped_view = view
+        ronly = self.requestonly(view)
+        if ronly:
+            mapped_view = self._map_nonclass_requestonly(view)
+        elif self.attr:
+            mapped_view = self._map_nonclass_attr(view)
+        elif self.renderer is not None:
+            mapped_view = self._map_nonclass_rendered(view)
+        return mapped_view
+        
+    def _map_class_requestonly(self, view):
+        # its a class that has an __init__ which only accepts request
+        attr = self.attr
+        def _class_requestonly_view(context, request):
+            inst = view(request)
+            if attr is None:
+                response = inst()
+            else:
+                response = getattr(inst, attr)()
+            if self.renderer is not None and not is_response(response):
+                response = self.renderer.render_view(request, response, view,
+                                                     context)
+            return response
+        return _class_requestonly_view
+
+    def _map_class_native(self, view):
+        # its a class that has an __init__ which accepts both context and
+        # request
+        attr = self.attr
+        def _class_view(context, request):
+            inst = view(context, request)
+            if attr is None:
+                response = inst()
+            else:
+                response = getattr(inst, attr)()
+            if self.renderer is not None and not is_response(response):
+                response = self.renderer.render_view(request, response, view,
+                                                     context)
+            return response
+        return _class_view
+
+    def _map_nonclass_requestonly(self, view):
+        # its a function that has a __call__ which accepts only a single
+        # request argument
+        attr = self.attr
         def _requestonly_view(context, request):
             if attr is None:
                 response = view(request)
             else:
                 response = getattr(view, attr)(request)
-
-            if helper is not None:
-                if not is_response(response):
-                    system = {
-                        'view':view,
-                        'renderer_name':renderer['name'],
-                        'renderer_info':renderer,
-                        'context':context,
-                        'request':request
-                        }
-                    response = helper.render_to_response(response, system,
-                                                         request=request)
+            if self.renderer is not None and not is_response(response):
+                response = self.renderer.render_view(request, response, view,
+                                                     context)
             return response
-        wrapped_view = _requestonly_view
+        return _requestonly_view
 
-    elif attr:
+    def _map_nonclass_attr(self, view):
+        # its a function that has a __call__ which accepts both context and
+        # request, but still has an attr
+        attr = self.attr
         def _attr_view(context, request):
             response = getattr(view, attr)(context, request)
-            if helper is not None:
-                if not is_response(response):
-                    system = {
-                        'view':view,
-                        'renderer_name':renderer['name'],
-                        'renderer_info':renderer,
-                        'context':context,
-                        'request':request
-                        }
-                    response = helper.render_to_response(response, system,
-                                                         request=request)
+            if self.renderer is not None and not is_response(response):
+                response = self.renderer.render_view(request, response, view,
+                                                     context)
             return response
-        wrapped_view = _attr_view
+        return _attr_view
 
-    elif helper is not None:
+    def _map_nonclass_rendered(self, view):
+        # it's a function that has a __call__ that accepts both context and
+        # request, but requires rendering
         def _rendered_view(context, request):
             response = view(context, request)
-            if not is_response(response):
-                system = {
-                    'view':view,
-                    'renderer_name':renderer['name'], # b/c
-                    'renderer_info':renderer,
-                    'context':context,
-                    'request':request
-                    }
-                response = helper.render_to_response(response, system,
-                                                     request=request)
+            if self.renderer is not None and not is_response(response):
+                response = self.renderer.render_view(request, response, view,
+                                                     context)
             return response
-        wrapped_view = _rendered_view
+        return _rendered_view
 
-    decorate_view(wrapped_view, view)
-    return wrapped_view
+    def requestonly(self, view):
+        attr = self.attr
+        if attr is None:
+            attr = '__call__'
+        if inspect.isfunction(view):
+            fn = view
+        elif inspect.isclass(view):
+            try:
+                fn = view.__init__
+            except AttributeError:
+                return False
+        else:
+            try:
+                fn = getattr(view, attr)
+            except AttributeError:
+                return False
 
-def _owrap_view(view, viewname, wrapper_viewname):
-    if not wrapper_viewname:
-        return view
-    def _owrapped_view(context, request):
-        response = view(context, request)
-        request.wrapped_response = response
-        request.wrapped_body = response.body
-        request.wrapped_view = view
-        wrapped_response = render_view_to_response(context, request,
-                                                   wrapper_viewname)
-        if wrapped_response is None:
-            raise ValueError(
-                'No wrapper view named %r found when executing view '
-                'named %r' % (wrapper_viewname, viewname))
-        return wrapped_response
-    decorate_view(_owrapped_view, view)
-    return _owrapped_view
+        try:
+            argspec = inspect.getargspec(fn)
+        except TypeError:
+            return False
 
-def _predicate_wrap(view, predicates):
-    if not predicates:
-        return view
-    def predicate_wrapper(context, request):
-        if all((predicate(context, request) for predicate in predicates)):
-            return view(context, request)
-        raise PredicateMismatch('predicate mismatch for view %s' % view)
-    def checker(context, request):
-        return all((predicate(context, request) for predicate in
-                    predicates))
-    predicate_wrapper.__predicated__ = checker
-    decorate_view(predicate_wrapper, view)
-    return predicate_wrapper
+        args = argspec[0]
+        defaults = argspec[3]
 
-def _secure_view(view, permission, authn_policy, authz_policy):
-    if permission == '__no_permission_required__':
-        # allow views registered within configurations that have a
-        # default permission to explicitly override the default
-        # permission, replacing it with no permission at all
-        permission = None
+        if hasattr(fn, 'im_func'):
+            # it's an instance method
+            if not args:
+                return False
+            args = args[1:]
+        if not args:
+            return False
 
-    wrapped_view = view
-    if authn_policy and authz_policy and (permission is not None):
-        def _secured_view(context, request):
-            principals = authn_policy.effective_principals(request)
-            if authz_policy.permits(context, principals, permission):
-                return view(context, request)
-            msg = getattr(request, 'authdebug_message',
-                          'Unauthorized: %s failed permission check' % view)
-            raise Forbidden(msg)
-        _secured_view.__call_permissive__ = view
-        def _permitted(context, request):
-            principals = authn_policy.effective_principals(request)
-            return authz_policy.permits(context, principals, permission)
-        _secured_view.__permitted__ = _permitted
-        wrapped_view = _secured_view
-        decorate_view(wrapped_view, view)
+        if len(args) == 1:
+            return True
 
-    return wrapped_view
+        elif args[0] == 'request':
+            if len(args) - len(defaults) == 1:
+                return True
 
-def _authdebug_view(view, permission, authn_policy, authz_policy, settings,
-                    logger):
-    wrapped_view = view
-    if settings and settings.get('debug_authorization', False):
-        def _authdebug_view(context, request):
-            view_name = getattr(request, 'view_name', None)
+        return False
 
-            if authn_policy and authz_policy:
-                if permission is None:
-                    msg = 'Allowed (no permission registered)'
-                else:
-                    principals = authn_policy.effective_principals(request)
-                    msg = str(authz_policy.permits(context, principals,
-                                                   permission))
-            else:
-                msg = 'Allowed (no authorization policy in use)'
-
-            view_name = getattr(request, 'view_name', None)
-            url = getattr(request, 'url', None)
-            msg = ('debug_authorization of url %s (view name %r against '
-                   'context %r): %s' % (url, view_name, context, msg))
-            logger and logger.debug(msg)
-            if request is not None:
-                request.authdebug_message = msg
-            return view(context, request)
-
-        wrapped_view = _authdebug_view
-        decorate_view(wrapped_view, view)
-
-    return wrapped_view
-
-def _attr_wrap(view, accept, order, phash):
-    # this is a little silly but we don't want to decorate the original
-    # function with attributes that indicate accept, order, and phash,
-    # so we use a wrapper
-    if (accept is None) and (order == MAX_ORDER) and (phash == DEFAULT_PHASH):
-        return view # defaults
-    def attr_view(context, request):
-        return view(context, request)
-    attr_view.__accept__ = accept
-    attr_view.__order__ = order
-    attr_view.__phash__ = phash
-    decorate_view(attr_view, view)
-    return attr_view
 
 def isexception(o):
     if IInterface.providedBy(o):
@@ -2983,4 +3064,21 @@ def translator(msg):
     request = get_current_request()
     localizer = get_localizer(request)
     return localizer.translate(msg)
+
+# b/c
+def _map_view(view, registry, attr=None, renderer=None):
+    return DefaultViewMapper(registry=registry, attr=attr,
+                             renderer=renderer)(view)
+
+# b/c
+def requestonly(view, attr=None):
+    """ Return true of the class or callable accepts only a request argument,
+    as opposed to something that accepts context, request """
+    return DefaultViewMapper(attr=attr).requestonly(view)
+
+def is_response(ob):
+    if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
+         hasattr(ob, 'status') ):
+        return True
+    return False
 

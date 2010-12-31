@@ -120,6 +120,27 @@ class ITemplateRenderer(IRenderer):
         accepts arbitrary keyword arguments and returns a string or
         unicode object """
 
+class IViewMapper(Interface):
+    def __call__(self, object):
+        """ Provided with an arbitrary object (a function, class, or
+        instance), returns a callable with the call signature ``(context,
+        request)``.  The callable returned should itself return a Response
+        object.  An IViewMapper is returned by
+        :class:`pyramid.interfaces.IViewMapperFactory`."""
+
+class IViewMapperFactory(Interface):
+    def __call__(self, **kw):
+        """
+        Return an object which implements
+        :class:`pyramid.interfaces.IViewMapper`.  ``kw`` will be a dictionary
+        containing view-specific arguments, such as ``permission``,
+        ``predicates``, ``attr``, ``renderer``, and other items.  An
+        IViewMapperFactory is used by
+        :meth:`pyramid.config.Configurator.add_view` to provide a plugpoint
+        to extension developers who want to modify potential view callable
+        invocation signatures and response values.
+        """
+
 # internal interfaces
 
 class IRequest(Interface):
