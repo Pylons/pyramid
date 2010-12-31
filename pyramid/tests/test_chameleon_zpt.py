@@ -1,17 +1,16 @@
 import unittest
 
-from pyramid.testing import cleanUp
 from pyramid.testing import skip_on
 from pyramid import testing
 
 class Base(object):
     def setUp(self):
-        cleanUp()
+        self.config = testing.setUp()
         from zope.deprecation import __show__
         __show__.off()
 
     def tearDown(self):
-        cleanUp()
+        testing.tearDown()
         from zope.deprecation import __show__
         __show__.on()
 
@@ -21,21 +20,11 @@ class Base(object):
         return os.path.join(here, 'fixtures', name)
 
     def _registerUtility(self, utility, iface, name=''):
-        from pyramid.threadlocal import get_current_registry
-        reg = get_current_registry()
+        reg = self.config.registry
         reg.registerUtility(utility, iface, name=name)
         return reg
         
 class ZPTTemplateRendererTests(Base, unittest.TestCase):
-    def setUp(self):
-        from pyramid.registry import Registry
-        registry = Registry()
-        self.config = testing.setUp(registry=registry)
-        self.config.begin()
-
-    def tearDown(self):
-        self.config.end()
-
     def _getTargetClass(self):
         from pyramid.chameleon_zpt import ZPTTemplateRenderer
         return ZPTTemplateRenderer
