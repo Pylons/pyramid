@@ -3,33 +3,21 @@
 Traversal
 =========
 
-:term:`Traversal` provides an alternative to using :term:`URL dispatch` to
-map a URL to a :term:`view callable`.  It is the act of locating a
-:term:`context` resource by walking over a :term:`resource tree`, starting
-from a :term:`root` resource, using a :term:`request` object as a source of
-path information.  Once a context resource is found, a view callable is
-looked up and invoked.
-
-Using :term:`Traversal` to map a URL to code is optional.  It is often less
-easy to understand than URL dispatch, so if you're a rank beginner, it
-probably makes sense to use URL dispatch to map URLs to code instead of
-traversal.  In that case, you can skip this chapter.
-
-.. index::
-   single: traversal overview
-
-A High-Level Overview of Traversal
-----------------------------------
-
 A :term:`traversal` uses the URL (Universal Resource Locator) to find a
-:term:`resource`.  This is done by mapping each segment of the path portion
-of the URL into a set of nested dictionary-like objects called the
-:term:`resource tree`.  You might think of this as looking up files and
-directories in a file system.  Traversal walks down the path until it finds a
-published "directory" or "file".  The resource we find as the result of a
-traversal becomes the :term:`context`.  A separate :term:`view lookup`
-subsystem is used to then find some view code willing "publish" the context
+:term:`resource` located in a :term:`resource tree`, which is a set of
+nested dictionary-like objects.  Traversal is done by using each segment
+of the path portion of the URL to navigate through the :term:`resource
+tree`.  You might think of this as looking up files and directories in a
+file system.  Traversal walks down the path until it finds a published
+"directory" or "file".  The resource we find as the result of a
+traversal becomes the :term:`context`.  Then, the :term:`view lookup`
+subsystem is used to find some view code willing "publish" this
 resource.
+
+Using :term:`Traversal` to map a URL to code is optional.  It is often
+less easy to understand than :term:`URL dispatch`, so if you're a rank
+beginner, it probably makes sense to use URL dispatch to map URLs to
+code instead of traversal.  In that case, you can skip this chapter.`
 
 .. index::
    single: traversal details
@@ -76,7 +64,7 @@ element cannot be resolved to a resource.  In either case, a :term:`context`
 resource is chosen.
 
 Traversal "stops" when it either reaches a leaf level resource in your
-resource tree or when the path segments implied by the URL "run out".  The
+resource tree or when the path segments from the URL "run out".  The
 resource that traversal "stops on" becomes the :term:`context`.  If at any
 point during traversal any resource in the tree doesn't have a
 ``__getitem__`` method, or if the ``__getitem__`` method of a resource raises
@@ -88,11 +76,11 @@ The results of a :term:`traversal` also include a :term:`view name`.  The
 segments "left over" in the path segment list popped by the traversal process
 *after* traversal finds a context resource.
 
-The combination of the context resource and the :term:`view name` found via
-traversal is used later in the same request by a separate :app:`Pyramid`
-subsystem -- the :term:`view lookup` subsystem -- to find a :term:`view
-callable` later within the same request.  How :app:`Pyramid` performs view
-lookup is explained within the :ref:`views_chapter` chapter.
+The combination of the context resource and the :term:`view name` found
+via traversal is used later in the same request by the :term:`view
+lookup` subsystem to find a :term:`view callable`.  How :app:`Pyramid`
+performs view lookup is explained within the :ref:`views_chapter`
+chapter.
 
 .. index::
    single: object tree
