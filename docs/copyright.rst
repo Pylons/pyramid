@@ -50,7 +50,7 @@ Attributions
 
 Contributors:
   Ben Bangert, Blaise Laflamme, Carlos de la Guardia, Paul Everitt, 
-  Marius Gedminas
+  Marius Gedminas, Casey Duncan
 
 .. Cover Designer:
 ..   Nat Hardwick of `Electrosoup <http://www.electrosoup.co.uk>`_.
