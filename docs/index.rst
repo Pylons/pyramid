@@ -38,7 +38,6 @@ Narrative documentation in chapter form explaining how to use
    narr/firstapp
    narr/project
    narr/startup
-   narr/resourcelocation
    narr/urldispatch
    narr/muchadoabouttraversal
    narr/traversal

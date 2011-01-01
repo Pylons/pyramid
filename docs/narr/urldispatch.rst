@@ -9,13 +9,24 @@ URL Dispatch
 :term:`URL dispatch` provides a simple way to map URLs :term:`view` code
 using a simple pattern matching language.  An ordered set of patterns is
 checked one-by-one.  If one of the patterns matches the path information
-associated with a request, a particular :term:`view callable` is invoked.  If
-no route matches, :app:`Pyramid` falls back to trying to use
-:term:`traversal` to map the current request to a :term:`view callable`.
+associated with a request, a particular :term:`view callable` is invoked.  
 
-The presence of calls to the :meth:`pyramid.config.Configurator.add_route`
-method within your application is a sign that you're using :term:`URL
-dispatch`.
+:term:`URL dispatch` is one of two ways to perform :term:`resource
+location` in :app:`Pyramid`; the other way is using :term:`traversal`.
+If no route is matched using :term:`URL dispatch`, :app:`Pyramid` falls
+back to :term:`traversal` to handle the :term:`request`.
+
+It is the responsibility of the :term:`resource location` subsystem
+(i.e., :term:`URL dispatch` or :term:`traversal`) to find the resource
+object that is the :term:`context` of the :term:`request`. Once the
+:term:`context` is determined, :term:`view lookup` is then responsible
+for finding and invoking a :term:`view callable`.  A view callable is a
+specific bit of code, defined in your application, that receives the
+:term:`request` and returns a :term:`response` object.
+
+Where appropriate, we will describe how view lookup interacts with 
+:term:`resource location`.  The :ref:`views_chapter` describes the
+details of :term:`view lookup`.
 
 High-Level Operational Overview
 -------------------------------

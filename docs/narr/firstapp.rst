@@ -10,7 +10,7 @@ more detail how it works.
 .. note::
 
    If you're a "theory-first" kind of person, you might choose to read
-   :ref:`resourcelocation_chapter` and :ref:`views_chapter` before diving into
+   :ref:`urldispatch_chapter` and :ref:`views_chapter` before diving into
    the code that follows, but it's not necessary if -- like many programmers
    -- you're willing to "go with the flow".
 
