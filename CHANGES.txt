@@ -22,8 +22,8 @@ Features
   have an arbitrary argument list and an arbitrary result.  This feature will
   be used by Pyramid extension developers, not by "civilians".
 
-- If a handler class provides an __action_decorator__ attribute (usually a
-  classmethod or staticmethod), use that as the decorator for each view
+- If a handler class provides an ``__action_decorator__`` attribute (usually
+  a classmethod or staticmethod), use that as the decorator for each view
   registration for that handler.
 
 - The ``pyramid.interfaces.IAuthenticationPolicy`` interface now specifies an
