@@ -9,10 +9,11 @@ nested dictionary-like objects.  Traversal is done by using each segment
 of the path portion of the URL to navigate through the :term:`resource
 tree`.  You might think of this as looking up files and directories in a
 file system.  Traversal walks down the path until it finds a published
-"directory" or "file".  The resource we find as the result of a
-traversal becomes the :term:`context`.  Then, the :term:`view lookup`
+resource, analogous to a file system "directory" or "file".  The
+resource found as the result of a traversal becomes the
+:term:`context` of the :term:`request`.  Then, the :term:`view lookup`
 subsystem is used to find some view code willing "publish" this
-resource.
+resource by generating a :term:`response`.
 
 Using :term:`Traversal` to map a URL to code is optional.  It is often
 less easy to understand than :term:`URL dispatch`, so if you're a rank
