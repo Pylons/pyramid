@@ -6,10 +6,11 @@
 URL Dispatch
 ============
 
-:term:`URL dispatch` provides a simple way to map URLs :term:`view` code
-using a simple pattern matching language.  An ordered set of patterns is
-checked one-by-one.  If one of the patterns matches the path information
-associated with a request, a particular :term:`view callable` is invoked.  
+:term:`URL dispatch` provides a simple way to map URLs to :term:`view`
+code using a simple pattern matching language.  An ordered set of
+patterns is checked one-by-one.  If one of the patterns matches the path
+information associated with a request, a particular :term:`view
+callable` is invoked.  
 
 :term:`URL dispatch` is one of two ways to perform :term:`resource
 location` in :app:`Pyramid`; the other way is using :term:`traversal`.
