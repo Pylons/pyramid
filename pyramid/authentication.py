@@ -291,6 +291,12 @@ def b64decode(v):
 EXPIRE = object()
 
 class AuthTktCookieHelper(object):
+    """
+    A helper class for use in third-party authentication policy
+    implementations.  See
+    :class:`pyramid.authentication.AuthTktAuthenticationPolicy' for the
+    meanings of the constructor arguments.
+    """
     auth_tkt = auth_tkt # for tests
     now = None # for tests
 
@@ -362,6 +368,8 @@ class AuthTktCookieHelper(object):
         return cookies
 
     def identify(self, request):
+        """ Return a dictionary with authentication information, or ``None``
+        if no valid auth_tkt is attached to ``request``"""
         environ = request.environ
         cookies = get_cookies(environ)
         cookie = cookies.get(self.cookie_name)
@@ -417,11 +425,14 @@ class AuthTktCookieHelper(object):
         return identity
 
     def forget(self, request):
-        # return a set of expires Set-Cookie headers
+        """ Return a set of expires Set-Cookie headers, which will destroy
+        any existing auth_tkt cookie when attached to a response"""
         environ = request.environ
         return self._get_cookies(environ, '', max_age=EXPIRE)
     
     def remember(self, request, userid, max_age=None):
+        """ Return a set of Set-Cookie headers; when set into a response,
+        these headers will represent a valid authentication ticket."""
         max_age = max_age or self.max_age
         environ = request.environ
 

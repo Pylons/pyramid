@@ -42,6 +42,10 @@ Features
   same thing as that the dummy authentication policy's
   ``authenticated_userid`` method.
 
+- The class ``pyramid.authentication.AuthTktCookieHelper`` is now an API.
+  This class can be used by third-party authentication policy developers to
+  help in the mechanics of authentication cookie-setting.
+
 Backwards Incompatibilities
 ---------------------------
 
