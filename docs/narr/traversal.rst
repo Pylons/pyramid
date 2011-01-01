@@ -26,11 +26,11 @@ code instead of traversal.  In that case, you can skip this chapter.
 Traversal Details
 -----------------
 
-:term:`Traversal` is dependent on information in a :term:`request` object.
-Every :term:`request` object contains URL path information in the
-``PATH_INFO`` portion of the :term:`WSGI` environment.  The ``PATH_INFO``
-portion of the WSGI environment is the portion of a request's URL following
-the hostname and port number, but before any query string elements or
+:term:`Traversal` is dependent on information in a :term:`request`
+object.  Every :term:`request` object contains URL path information in
+the ``PATH_INFO`` portion of the :term:`WSGI` environment.  The
+``PATH_INFO`` string is the portion of a request's URL following the
+hostname and port number, but before any query string elements or
 fragment element.  For example the ``PATH_INFO`` portion of the URL
 ``http://example.com:8080/a/b/c?foo=1`` is ``/a/b/c``.
 
