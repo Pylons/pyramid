@@ -44,33 +44,35 @@ tree`, looking up a resource for each path segment. Each lookup uses the
 
 For example, if the path info sequence is ``['a', 'b', 'c']``:
 
-- :term:`Traversal` pops the first element (``a``) from the path segment
-  sequence and attempts to call the root resource's ``__getitem__`` method
-  using that value (``a``) as an argument; we'll presume it succeeds.
+- :term:`Traversal` starts by acquiring the :term:`root` resource of the
+  application by calling the :term:`root factory`. The :term:`root factory`
+  can be configured to return whatever object is appropriate as the
+  traversal root of your application.
 
-- When the root resource's ``__getitem__`` succeeds it will return another
-  resource, which we'll call "A".  The :term:`context` temporarily becomes
-  the "A" resource.
+- Next, the first element (``a``) is popped from the path segment
+  sequence and is used as a key to lookup the corresponding resource
+  in the root. This invokes the root resource's ``__getitem__`` method
+  using that value (``a``) as an argument.
+
+- If the root resource "contains" a resource with key ``a``, its
+  ``__getitem__`` method will return it. The :term:`context` temporarily
+  becomes the "A" resource.
 
 - The next segment (``b``) is popped from the path sequence, and the "A"
   resource's ``__getitem__`` is called with that value (``b``) as an
   argument; we'll presume it succeeds.
 
-- When the "A" resource's ``__getitem__`` succeeds it will return another
-  resource, which we'll call "B".  The :term:`context` temporarily becomes
-  the "B" resource.
+- The "A" resource's ``__getitem__`` returns another resource, which
+  we'll call "B".  The :term:`context` temporarily becomes the "B"
+  resource.
 
-This process continues until the path segment sequence is exhausted or a path
-element cannot be resolved to a resource.  In either case, a :term:`context`
-resource is chosen.
-
-Traversal "stops" when it either reaches a leaf level resource in your
-resource tree or when the path segments from the URL "run out".  The
-resource that traversal "stops on" becomes the :term:`context`.  If at any
-point during traversal any resource in the tree doesn't have a
-``__getitem__`` method, or if the ``__getitem__`` method of a resource raises
-a :exc:`KeyError`, traversal ends immediately, and that resource becomes the
-:term:`context`.
+Traversal continues until the path segment sequence is exhausted or a
+path element cannot be resolved to a resource.  In either case, the
+:term:`context` resource is the last object that the traversal
+successfully resolved.  If any resource found during traversal lacks a
+``__getitem__`` method, or if its ``__getitem__`` method raises a
+:exc:`KeyError`, traversal ends immediately, and that resource becomes
+the :term:`context`.
 
 The results of a :term:`traversal` also include a :term:`view name`.  The
 :term:`view name` is the *first* URL path segment in the set of ``PATH_INFO``
