@@ -74,10 +74,11 @@ successfully resolved.  If any resource found during traversal lacks a
 :exc:`KeyError`, traversal ends immediately, and that resource becomes
 the :term:`context`.
 
-The results of a :term:`traversal` also include a :term:`view name`.  The
-:term:`view name` is the *first* URL path segment in the set of ``PATH_INFO``
-segments "left over" in the path segment list popped by the traversal process
-*after* traversal finds a context resource.
+The results of a :term:`traversal` also include a :term:`view name`. If
+traversal ends before the path segment sequence is exhausted, the
+:term:`view name` is the *next* remaining path segment element. If the
+:term:`traversal` expends all of the path segments, then the :term:`view
+name` is the empty string (`''`).
 
 The combination of the context resource and the :term:`view name` found
 via traversal is used later in the same request by the :term:`view
