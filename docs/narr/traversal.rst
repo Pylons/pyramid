@@ -96,18 +96,20 @@ chapter.
 The Resource Tree
 -----------------
 
-When your application uses :term:`traversal` to resolve URLs to code, the
-application must supply a :term:`resource tree` to :app:`Pyramid`.  The
-resource tree is a set of nested dictionary-like objects. The root of the
-tree is represented by a :term:`root` resource.
+The resource tree is a set of nested dictionary-like resource objects
+that begins with a :term:`root` resource. In order to use
+:term:`traversal` to resolve URLs to code, your application must supply
+a :term:`resource tree` to :app:`Pyramid`.
 
-In order to supply a root resource for an application, at system startup
-time, the :app:`Pyramid` :term:`Router` is configured with a callback known
-as a :term:`root factory`.  The root factory is supplied by the application
-developer as the ``root_factory`` argument to the application's
-:term:`Configurator`.
+In order to supply a root resource for an application the :app:`Pyramid`
+:term:`Router` is configured with a callback known as a :term:`root
+factory`.  The root factory is supplied by the application, at startup
+time, as the ``root_factory`` argument to the :term:`Configurator`.
 
-Here's an example of a simple root factory:
+The root factory is a Python callable that accepts a :term:`request`
+object, and returns the root object of the :term:`resource tree`. A
+function, or class is typically used as an application's root factory.
+Here's an example of a simple root factory class:
 
 .. code-block:: python
    :linenos:
