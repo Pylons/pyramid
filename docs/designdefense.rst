@@ -1018,7 +1018,7 @@ Challenge
 
 :app:`Pyramid` performs automatic authorization checks only at :term:`view`
 execution time.  Zope 3 wraps context objects with a `security proxy
-<http://wiki.zope.org/zope3/WhatAreSecurityProxies>`, which causes Zope 3 to
+<http://wiki.zope.org/zope3/WhatAreSecurityProxies>`_, which causes Zope 3 to
 do also security checks during attribute access.  I like this, because it
 means:
 
