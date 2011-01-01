@@ -895,9 +895,9 @@ Pyramid Applications are Extensible; I Don't Believe In Application Extensibilit
 
 Any :app:`Pyramid` application written obeying certain constraints is
 *extensible*. This feature is discussed in the :app:`Pyramid` documentation
-chapters named :ref:`extending_chapter` and :ref:`advconf_narr`.  It is made
-possible by the use of the :term:`Zope Component Architecture` and within
-:app:`Pyramid`.
+chapters named :ref:`extending_chapter` and :ref:`advconfig_narr`.  It is
+made possible by the use of the :term:`Zope Component Architecture` and
+within :app:`Pyramid`.
 
 "Extensible", in this context, means:
 
