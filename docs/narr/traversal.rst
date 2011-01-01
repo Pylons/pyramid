@@ -34,13 +34,13 @@ hostname and port number, but before any query string elements or
 fragment element.  For example the ``PATH_INFO`` portion of the URL
 ``http://example.com:8080/a/b/c?foo=1`` is ``/a/b/c``.
 
-Traversal treats the ``PATH_INFO`` segment of a URL as a sequence of path
-segments.  For example, the ``PATH_INFO`` string ``/a/b/c`` is converted to
-the sequence ``['a', 'b', 'c']``.
+Traversal treats the ``PATH_INFO`` segment of a URL as a sequence of
+path segments.  For example, the ``PATH_INFO`` string ``/a/b/c`` is
+converted to the sequence ``['a', 'b', 'c']``.
 
-After the path info is converted, a lookup is performed against the resource
-tree for each path segment.  Each lookup uses the ``__getitem__`` method of a
-resource in the tree.
+This path sequence is then used to descend through the :term:`resource
+tree`, looking up a resource for each path segment. Each lookup uses the
+``__getitem__`` method of a resource in the tree.
 
 For example, if the path info sequence is ``['a', 'b', 'c']``:
 
