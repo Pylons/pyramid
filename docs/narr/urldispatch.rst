@@ -25,9 +25,9 @@ for finding and invoking a :term:`view callable`.  A view callable is a
 specific bit of code, defined in your application, that receives the
 :term:`request` and returns a :term:`response` object.
 
-Where appropriate, we will describe how view lookup interacts with 
-:term:`resource location`.  The :ref:`views_chapter` describes the
-details of :term:`view lookup`.
+Where appropriate, we will describe how view lookup interacts with
+:term:`resource location`.  The :ref:`views_chapter` chapter describes
+the details of :term:`view lookup`.
 
 High-Level Operational Overview
 -------------------------------
