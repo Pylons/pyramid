@@ -910,6 +910,8 @@ example.
 See :ref:`testing_chapter` for more information about writing :app:`Pyramid`
 unit tests.
 
+.. _modifying_package_structure:
+
 Modifying Package Structure
 ----------------------------
 
