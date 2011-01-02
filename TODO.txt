@@ -27,6 +27,10 @@ Must-Have (before 1.0)
 Should-Have
 -----------
 
+- Convert paster template and tutorial HTML templates to use
+  ``request.static_url('{{package}}:static/foo.css') rather than
+  ``${request.application_url}/static/foo.css``.
+
 - Add notes about renderer response attrs to request docs.
 
 - Add an example of using a cascade to serve static assets from the root.
