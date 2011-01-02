@@ -958,12 +958,14 @@ To this:
 .. code-block:: python
     :linenos:
 
-    config.add_view('myproject.views.blogs.my_view',
+    config.add_view('myproject.views.blog.my_view',
                     renderer='myproject:templates/mytemplate.pt')
 
 You can then continue to add files to the ``views`` directory, and refer to
 views or handler classes/functions within those files via the dotted name
-passed as the first argument to ``add_view``.  For example:
+passed as the first argument to ``add_view``.  For example, if you added a
+file named ``anothermodule.py`` to the ``views`` subdirectory, and added a
+view callable named ``my_view`` to it:
 
 .. code-block:: python
     :linenos:
