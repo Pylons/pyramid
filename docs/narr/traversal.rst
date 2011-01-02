@@ -126,24 +126,23 @@ passing it to an instance of a :term:`Configurator` named ``config``:
 
    config = Configurator(root_factory=Root)
 
-Using the ``root_factory`` argument to a :class:`pyramid.config.Configurator`
-constructor tells your :app:`Pyramid` application to call this root factory
-to generate a root resource whenever a request enters the application.  This
-root factory is also known as the global root factory.  A root factory can
-alternately be passed to the ``Configurator`` as a :term:`dotted Python name`
-which can refer to a root factory defined in a different module.
-
-A root factory is passed a :term:`request` object and it is expected to
-return an object which represents the root of the resource tree.  All
-:term:`traversal` will begin at this root resource.  Usually a root factory
-for a traversal-based application will be more complicated than the above
-``Root`` class; in particular it may be associated with a database connection
-or another persistence mechanism.
+The ``root_factory`` argument to the
+:class:`pyramid.config.Configurator` constructor registers this root
+factory to be called to generate a root resource whenever a request
+enters the application.  The root factory registered this way is also
+known as the global root factory.  A root factory can alternately be
+passed to the ``Configurator`` as a :term:`dotted Python name` which can
+refer to a root factory defined in a different module.
 
 If no :term:`root factory` is passed to the :app:`Pyramid`
-:term:`Configurator` constructor, or the ``root_factory`` is specified as the
-value ``None``, a *default* root factory is used.  The default root factory
-always returns a resource that has no child resources; it is effectively empty.
+:term:`Configurator` constructor, or if the ``root_factory`` value
+specified is ``None``, a *default* root factory is used.  The default
+root factory always returns a resource that has no child resources; it
+is effectively empty.
+
+Usually a root factory for a traversal-based application will be more
+complicated than the above ``Root`` class; in particular it may be
+associated with a database connection or another persistence mechanism.
 
 .. sidebar:: Emulating the Default Root Factory
 
