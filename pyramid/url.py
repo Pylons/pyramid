@@ -32,7 +32,7 @@ def route_url(route_name, request, *elements, **kw):
     enough arguments, for example).
 
     For example, if you've defined a route named "foobar" with the path
-    ``:foo/{bar}/*traverse``::
+    ``{foo}/{bar}/*traverse``::
 
         route_url('foobar', request, foo='1')          => <KeyError exception>
         route_url('foobar', request, foo='1', bar='2') => <KeyError exception>
