@@ -18,7 +18,11 @@ Must-Have (before 1.0)
 
 - Document ``Configurator.add_view_mapper``.
 
-- Consider the ability to defer the choice of view mapper.
+- Consider the ability to defer the choice of view mapper and/or renderer
+  (note that we could also just suggest that people use a default renderer
+  instead).
+
+- ZCML directive for view mapper (or just use "utility", but it's not eager).
 
 Should-Have
 -----------
