@@ -628,7 +628,7 @@ application's configuration section, e.g.:
 .. code-block:: ini
   :linenos:
 
-  [app:main]
+  [app:MyProject]
   use = egg:MyProject#app
   debug_templates = true
 
