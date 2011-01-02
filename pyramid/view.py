@@ -17,7 +17,6 @@ from zope.interface import providedBy
 from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
-from pyramid.interfaces import IRendererFactory
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import RendererHelper
@@ -384,7 +383,7 @@ class view_config(object):
                  route_name=None, request_method=None, request_param=None,
                  containment=None, attr=None, renderer=None, wrapper=None,
                  xhr=False, accept=None, header=None, path_info=None,
-                 custom_predicates=(), context=None):
+                 custom_predicates=(), context=None, view_mapper=None):
         self.name = name
         self.request_type = request_type
         self.context = context or for_
@@ -401,6 +400,7 @@ class view_config(object):
         self.header = header
         self.path_info = path_info
         self.custom_predicates = custom_predicates
+        self.view_mapper = view_mapper
 
     def __call__(self, wrapped):
         settings = self.__dict__.copy()

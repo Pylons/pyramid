@@ -15,12 +15,21 @@ Features
 - ``config.add_view`` now accepts a ``decorator`` keyword argument, a callable
   which will decorate the view callable before it is added to the registry.
 
+- add a ``add_view_mapper`` API to Configurator.  This API allows you to add
+  a named implementation of a ``pyramid.interfaces.IViewMapperFactory``
+  interface.  Its name can be passed as a ``view_mapper`` argument to
+  ``config.add_view``.  A view mapper allows objects that are meant to be
+  used as view callables to have an arbitrary argument list and an arbitrary
+  result.  This feature will be used by Pyramid extension developers, not by
+  "civilians".
+
+- New constructor argument to Configurator: ``default_view_mapper``.  Useful
+  to create systems that have view callables with alternate default calling
+  conventions.
+
 - ``config.add_view`` now accepts a ``view_mapper`` keyword argument, which
-  should be a class which implements the new
-  ``pyramid.interfaces.IViewMapperFactory`` interface.  Use of an alternate
-  view mapper allows objects that are meant to be used as view callables to
-  have an arbitrary argument list and an arbitrary result.  This feature will
-  be used by Pyramid extension developers, not by "civilians".
+  should either be ``None`` or the name of a view mapper previously
+  registered via ``add_view_mapper``.
 
 - If a handler class provides an ``__action_decorator__`` attribute (usually
   a classmethod or staticmethod), use that as the decorator for each view
@@ -90,6 +99,7 @@ Internals
   promoted to an API method.  If you were overriding this method, you'll now
   need to override it as ``unauthenticated_userid`` instead.
 
+- Remove (non-API) function of config.py named _map_view.
 
 1.0a8 (2010-12-27)
 ==================

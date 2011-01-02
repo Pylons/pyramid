@@ -850,6 +850,11 @@ Glossary
      WSGI middleware which can display debuggable traceback information in
      the browser when an exception is raised by a Pyramid application.  See
      http://pypi.python.org/pypi/WebError .
- 
 
+   view mapper
+
+    A view mapper is a class which implements the
+    :class:`pyramid.interfaces.IViewMapperFactory` interface, which performs
+    view argument and return value mapping.  This is a plug point for
+    extension builders, not normally used by "civilians".
 

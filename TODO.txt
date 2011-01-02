@@ -16,6 +16,10 @@ Must-Have (before 1.0)
 - Allow ``decorator=`` and ``view_mapper=`` to be passed via ZCML and the
   ``view_config`` decorator.
 
+- Document ``Configurator.add_view_mapper``.
+
+- Consider the ability to defer the choice of view mapper.
+
 Should-Have
 -----------
 

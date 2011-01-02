@@ -246,7 +246,13 @@ class Configurator(object):
     ``autocommit`` is ``True``.  If a conflict is detected a
     ``ConfigurationConflictError`` will be raised.  Calling
     :meth:`pyramid.config.Configurator.make_wsgi_app` always implies a final
-    commit."""
+    commit.
+
+    If ``default_view_mapper`` is passed, it will be used as the default
+    view mapper factory for view configurations that don't otherwise specify
+    one (see :class:`pyramid.interfaces.IViewMapperFactory`).
+    If a default_view_mapper is not passed, a superdefault view mapper will
+    be used.  """
 
     manager = manager # for testing injection
     venusian = venusian # for testing injection
@@ -267,6 +273,7 @@ class Configurator(object):
                  renderer_globals_factory=None,
                  default_permission=None,
                  session_factory=None,
+                 default_view_mapper=None,
                  autocommit=False,
                  ):
         if package is None:
@@ -292,6 +299,7 @@ class Configurator(object):
                 renderer_globals_factory=renderer_globals_factory,
                 default_permission=default_permission,
                 session_factory=session_factory,
+                default_view_mapper=default_view_mapper,
                 )
 
     def _set_settings(self, mapping):
@@ -596,9 +604,8 @@ class Configurator(object):
                        authentication_policy=None, authorization_policy=None,
                        renderers=DEFAULT_RENDERERS, debug_logger=None,
                        locale_negotiator=None, request_factory=None,
-                       renderer_globals_factory=None,
-                       default_permission=None,
-                       session_factory=None):
+                       renderer_globals_factory=None, default_permission=None,
+                       session_factory=None, default_view_mapper=None):
         """ When you pass a non-``None`` ``registry`` argument to the
         :term:`Configurator` constructor, no initial 'setup' is performed
         against the registry.  This is because the registry you pass in may
@@ -644,7 +651,13 @@ class Configurator(object):
             self.set_default_permission(default_permission)
         if session_factory is not None:
             self.set_session_factory(session_factory)
+        # commit before adding default_view_mapper, as the
+        # default_exceptionresponse_view above requires the superdefault view
+        # mapper
         self.commit()
+        if default_view_mapper is not None:
+            self.add_view_mapper(None, default_view_mapper)
+            self.commit()
         
     # getSiteManager is a unit testing dep injection
     def hook_zca(self, getSiteManager=None):
@@ -1140,11 +1153,11 @@ class Configurator(object):
         decorator
 
           A function which will be used to decorate the registered
-          :term:`view callable`.  The decorator function will be
-          called with the view callable as a single argument, and it
-          must return a replacement view callable which accepts the
-          same arguments and returns the same type of values as the
-          original function.
+          :term:`view callable`.  The decorator function will be called with
+          the view callable as a single argument.  The view callable it is
+          passed will accept ``(context, request)`.  The decorator must
+          return a replacement view callable which also accepts ``(context,
+          request)``.
           
         Predicate Arguments
 
@@ -1285,14 +1298,12 @@ class Configurator(object):
 
         view_mapper
 
-          A class implementing the
-          :class:`pyramid.interfaces.IViewMapperFactory` interface, which
-          performs view argument and response mapping.  By default it is
-          ``None``, which indicates that the view should use the default view
-          mapper.  This plug-point is useful for Pyramid extension
-          developers, but it's not very useful for 'civilians' who are
-          just developing stock Pyramid applications. Pay no attention to
-          the man behind the curtain.
+          The name of a previously registered :term:`view mapper` or
+          ``None``.  By default it is ``None``, which indicates that the view
+          should use the default view mapper.  This plug-point is useful for
+          Pyramid extension developers, but it's not very useful for
+          'civilians' who are just developing stock Pyramid applications.
+          Pay no attention to the man behind the curtain.
           
         """
         view = self.maybe_dotted(view)
@@ -1369,19 +1380,20 @@ class Configurator(object):
                 # intent: will be None if no default permission is registered
                 permission = self.registry.queryUtility(IDefaultPermission)
 
-            # NO_PERMISSION_REQUIRED handled by _secure_view
-            derived_view = ViewDeriver(registry=self.registry,
-                                       permission=permission,
-                                       predicates=predicates,
-                                       attr=attr,
-                                       renderer=renderer,
-                                       wrapper_viewname=wrapper,
-                                       viewname=name,
-                                       accept=accept,
-                                       order=order,
-                                       phash=phash,
-                                       decorator=decorator,
-                                       view_mapper=view_mapper)(view)
+            # __no_permission_required__ handled by _secure_view
+            deriver = ViewDeriver(registry=self.registry,
+                                  permission=permission,
+                                  predicates=predicates,
+                                  attr=attr,
+                                  renderer=renderer,
+                                  wrapper_viewname=wrapper,
+                                  viewname=name,
+                                  accept=accept,
+                                  order=order,
+                                  phash=phash,
+                                  decorator=decorator,
+                                  view_mapper=view_mapper)
+            derived_view = deriver(view)
 
             registered = self.registry.adapters.registered
 
@@ -2163,6 +2175,36 @@ class Configurator(object):
         self.action(IDefaultPermission, None)
 
     @action_method
+    def add_view_mapper(self, name, mapper):
+        """
+        Adding a :term:`view mapper` makes it possible to make use of
+        :term:`view callable` objects which implement a different call
+        signature than the ones described in the :app:`Pyramid`
+        documentation.  This is an advanced feature, not usually consumed by
+        'civilians'.
+
+        ``name`` must be a string or ``None``.  If ``name`` is a string, the
+        view mapper will be registered under the specified name for
+        consumption by extensions.  If ``name`` is ``None``, the provided
+        mapper will become the *default* view mapper to be used by all
+        subsequent :term:`view configuration` registrations, as if you had
+        passed a ``default_view_mapper`` argument to the
+        :class:`pyramid.config.Configurator` constructor.
+        
+        The ``mapper`` should argument be an object implementing
+        :class:`pyramid.interfaces.IViewMapperFactory` or a :term:`dotted
+        Python name` to such an object.
+
+        See also :ref:`using_an_alternate_view_mapper`.
+        """
+        if mapper is not None:
+            mapper = self.maybe_dotted(mapper)
+        if name is None:
+            name = ''
+        self.registry.registerUtility(mapper, IViewMapperFactory, name=name)
+        self.action((IViewMapperFactory, name), None)
+
+    @action_method
     def set_session_factory(self, session_factory):
         """
         Configure the application with a :term:`session factory`.  If
@@ -2738,19 +2780,29 @@ class ViewDeriver(object):
         self.logger = self.registry.queryUtility(IDebugLogger)
 
     def __call__(self, view):
-        mapper = self.kw.get('view_mapper')
-        if mapper is None:
-            mapper = DefaultViewMapper
-        view = mapper(**self.kw)(view)
         return self.attr_wrapped_view(
             self.predicated_view(
                 self.authdebug_view(
                     self.secured_view(
-                        self.owrap_view(
-                            view)))))
+                        self.owrapped_view(
+                            self.decorated_view(
+                                self.rendered_view(
+                                    self.mapped_view(view))))))))
 
     @wraps_view
-    def owrap_view(self, view):
+    def mapped_view(self, view):
+        mapper_name = self.kw.get('view_mapper')
+        mapper = self.registry.queryUtility(IViewMapperFactory,
+                                            name=mapper_name)
+
+        if mapper is None:
+            mapper = DefaultViewMapper
+
+        mapped_view = mapper(**self.kw)(view)
+        return mapped_view
+
+    @wraps_view
+    def owrapped_view(self, view):
         wrapper_viewname = self.kw.get('wrapper_viewname')
         viewname = self.kw.get('viewname')
         if not wrapper_viewname:
@@ -2864,29 +2916,53 @@ class ViewDeriver(object):
         attr_view.__phash__ = phash
         return attr_view
 
+    @wraps_view
+    def rendered_view(self, view):
+        wrapped_view = view
+        renderer = self.kw.get('renderer')
+        if renderer is None:
+            return view
+
+        def _rendered_view(context, request):
+            response = wrapped_view(context, request)
+            if not is_response(response):
+                attrs = getattr(request, '__dict__', {})
+                if '__view__' in attrs:
+                    view_inst = attrs.pop('__view__')
+                else:
+                    view_inst = getattr(wrapped_view, '__original_view__',
+                                        wrapped_view)
+                return renderer.render_view(request, response, view_inst,
+                                            context)
+            return response
+
+        return _rendered_view
+
+    @wraps_view
+    def decorated_view(self, view):
+        decorator = self.kw.get('decorator')
+        if decorator is None:
+            return view
+        return decorator(view)
+
 class DefaultViewMapper(object):
     implements(IViewMapperFactory)
     def __init__(self, **kw):
-        self.renderer = kw.get('renderer')
         self.attr = kw.get('attr')
-        self.decorator = kw.get('decorator')
 
     def __call__(self, view):
-        decorator = self.decorator
         if inspect.isclass(view):
-            view = preserve_view_attrs(view, self.map_class(view))
+            view = self.map_class(view)
         else:
-            view = preserve_view_attrs(view, self.map_nonclass(view))
-        if decorator is not None:
-            view = preserve_view_attrs(view, decorator(view))
+            view = self.map_nonclass(view)
         return view
 
     def map_class(self, view):
-        ronly = self.requestonly(view)
+        ronly = requestonly(view, self.attr)
         if ronly:
-            mapped_view = self._map_class_requestonly(view)
+            mapped_view = self.map_class_requestonly(view)
         else:
-            mapped_view = self._map_class_native(view)
+            mapped_view = self.map_class_native(view)
         return mapped_view
 
     def map_nonclass(self, view):
@@ -2894,47 +2970,41 @@ class DefaultViewMapper(object):
         # view unless it actually requires wrapping (to avoid function call
         # overhead).
         mapped_view = view
-        ronly = self.requestonly(view)
+        ronly = requestonly(view, self.attr)
         if ronly:
-            mapped_view = self._map_nonclass_requestonly(view)
+            mapped_view = self.map_nonclass_requestonly(view)
         elif self.attr:
-            mapped_view = self._map_nonclass_attr(view)
-        elif self.renderer is not None:
-            mapped_view = self._map_nonclass_rendered(view)
+            mapped_view = self.map_nonclass_attr(view)
         return mapped_view
         
-    def _map_class_requestonly(self, view):
+    def map_class_requestonly(self, view):
         # its a class that has an __init__ which only accepts request
         attr = self.attr
         def _class_requestonly_view(context, request):
             inst = view(request)
+            request.__view__ = inst
             if attr is None:
                 response = inst()
             else:
                 response = getattr(inst, attr)()
-            if self.renderer is not None and not is_response(response):
-                response = self.renderer.render_view(request, response, view,
-                                                     context)
             return response
         return _class_requestonly_view
 
-    def _map_class_native(self, view):
+    def map_class_native(self, view):
         # its a class that has an __init__ which accepts both context and
         # request
         attr = self.attr
         def _class_view(context, request):
             inst = view(context, request)
+            request.__view__ = inst
             if attr is None:
                 response = inst()
             else:
                 response = getattr(inst, attr)()
-            if self.renderer is not None and not is_response(response):
-                response = self.renderer.render_view(request, response, view,
-                                                     context)
             return response
         return _class_view
 
-    def _map_nonclass_requestonly(self, view):
+    def map_nonclass_requestonly(self, view):
         # its a function that has a __call__ which accepts only a single
         # request argument
         attr = self.attr
@@ -2943,86 +3013,58 @@ class DefaultViewMapper(object):
                 response = view(request)
             else:
                 response = getattr(view, attr)(request)
-            if self.renderer is not None and not is_response(response):
-                response = self.renderer.render_view(request, response, view,
-                                                     context)
             return response
         return _requestonly_view
 
-    def _map_nonclass_attr(self, view):
+    def map_nonclass_attr(self, view):
         # its a function that has a __call__ which accepts both context and
         # request, but still has an attr
-        attr = self.attr
         def _attr_view(context, request):
-            response = getattr(view, attr)(context, request)
-            if self.renderer is not None and not is_response(response):
-                response = self.renderer.render_view(request, response, view,
-                                                     context)
+            response = getattr(view, self.attr)(context, request)
             return response
         return _attr_view
 
-    def _map_nonclass_rendered(self, view):
-        # it's a function that has a __call__ that accepts both context and
-        # request, but requires rendering
-        def _rendered_view(context, request):
-            response = view(context, request)
-            if self.renderer is not None and not is_response(response):
-                response = self.renderer.render_view(request, response, view,
-                                                     context)
-            return response
-        return _rendered_view
-
-    def requestonly(self, view):
-        attr = self.attr
-        if attr is None:
-            attr = '__call__'
-        if inspect.isfunction(view):
-            fn = view
-        elif inspect.isclass(view):
-            try:
-                fn = view.__init__
-            except AttributeError:
-                return False
-        else:
-            try:
-                fn = getattr(view, attr)
-            except AttributeError:
-                return False
-
+def requestonly(view, attr=None):
+    if attr is None:
+        attr = '__call__'
+    if inspect.isfunction(view):
+        fn = view
+    elif inspect.isclass(view):
         try:
-            argspec = inspect.getargspec(fn)
-        except TypeError:
+            fn = view.__init__
+        except AttributeError:
+            return False
+    else:
+        try:
+            fn = getattr(view, attr)
+        except AttributeError:
             return False
 
-        args = argspec[0]
-        defaults = argspec[3]
-
-        if hasattr(fn, 'im_func'):
-            # it's an instance method
-            if not args:
-                return False
-            args = args[1:]
-        if not args:
-            return False
-
-        if len(args) == 1:
-            return True
-
-        elif args[0] == 'request':
-            if len(args) - len(defaults) == 1:
-                return True
-
+    try:
+        argspec = inspect.getargspec(fn)
+    except TypeError:
         return False
 
+    args = argspec[0]
+    defaults = argspec[3]
 
-def isexception(o):
-    if IInterface.providedBy(o):
-        if IException.isEqualOrExtendedBy(o):
+    if hasattr(fn, 'im_func'):
+        # it's an instance method
+        if not args:
+            return False
+        args = args[1:]
+    if not args:
+        return False
+
+    if len(args) == 1:
+        return True
+
+    elif args[0] == 'request':
+        if len(args) - len(defaults) == 1:
             return True
-    return (
-        isinstance(o, Exception) or
-        (inspect.isclass(o) and (issubclass(o, Exception)))
-        )
+
+    return False
+
 
 class ActionPredicate(object):
     action_name = 'action'
@@ -3069,20 +3111,18 @@ def translator(msg):
     localizer = get_localizer(request)
     return localizer.translate(msg)
 
-# b/c
-def _map_view(view, registry, attr=None, renderer=None):
-    return DefaultViewMapper(registry=registry, attr=attr,
-                             renderer=renderer)(view)
-
-# b/c
-def requestonly(view, attr=None):
-    """ Return true of the class or callable accepts only a request argument,
-    as opposed to something that accepts context, request """
-    return DefaultViewMapper(attr=attr).requestonly(view)
-
 def is_response(ob):
     if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
          hasattr(ob, 'status') ):
         return True
     return False
+
+def isexception(o):
+    if IInterface.providedBy(o):
+        if IException.isEqualOrExtendedBy(o):
+            return True
+    return (
+        isinstance(o, Exception) or
+        (inspect.isclass(o) and (issubclass(o, Exception)))
+        )
 
