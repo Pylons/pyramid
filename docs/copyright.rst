@@ -50,7 +50,7 @@ Attributions
 
 Contributors:
   Ben Bangert, Blaise Laflamme, Carlos de la Guardia, Paul Everitt, 
-  Marius Gedminas
+  Marius Gedminas, Casey Duncan
 
 .. Cover Designer:
 ..   Nat Hardwick of `Electrosoup <http://www.electrosoup.co.uk>`_.
@@ -58,6 +58,9 @@ Contributors:
 Used with permission:
    The :ref:`webob_chapter` chapter is adapted, with permission, from
    documentation originally written by Ian Bicking.
+
+   The :ref:`much_ado_about_traversal_chapter` chapter is adapted,
+   with permission, from an article written by Rob Miller.
 
 .. Print Production
 .. ----------------

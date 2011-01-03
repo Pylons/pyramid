@@ -31,8 +31,8 @@ Narrative Documentation
    narr/configuration
    narr/firstapp
    narr/project
-   narr/resourcelocation
    narr/urldispatch
+   narr/muchadoabouttraversal
    narr/traversal
    narr/views
    narr/renderers

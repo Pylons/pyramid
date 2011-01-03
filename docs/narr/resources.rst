@@ -1,21 +1,21 @@
 Resources
 =========
 
-A :term:`resource` is an object that represents a "place" in a tree related
-to your application.  Every :app:`Pyramid` application has at least one
-resource object: the :term:`root` resource (even if you don't define one
-manually, a default root resource is created for you).  The root resource is
-the root of a :term:`resource tree`.  A resource tree is a set of nested
-dictionary-like objects which you can use to represent your website's
-structure.
+A :term:`resource` is an object that represents a "place" in a tree
+related to your application.  Every :app:`Pyramid` application has at
+least one resource object: the :term:`root` resource.  Even if you don't
+define a root resource manually, a default one is created for you.  The
+root resource is the root of a :term:`resource tree`.  A resource tree
+is a set of nested dictionary-like objects which you can use to
+represent your website's structure.
 
 In an application which uses :term:`traversal` to map URLs to code, the
-resource tree structure is used heavily to map a URL to a :term:`view
-callable`.  :app:`Pyramid` will walk "up" the resource tree by traversing
-through the nested dictionary structure of the tree when :term:`traversal` is
-used in order to find a :term:`context` resource.  Once a context resource is
-found, the context resource and data in the request will be used to find a
-:term:`view callable`.
+resource tree structure is used heavily to map each URL to a :term:`view
+callable`.  When :term:`traversal` is used, :app:`Pyramid` will walk
+through the resource tree by traversing through its nested dictionary
+structure in order to find a :term:`context` resource.  Once a context
+resource is found, the context resource and data in the request will be
+used to find a :term:`view callable`.
 
 In an application which uses :term:`URL dispatch`, the resource tree is only
 used indirectly, and is often "invisible" to the developer.  In URL dispatch
@@ -26,7 +26,7 @@ much less important in applications that use URL dispatch than applications
 that use traversal.
 
 In "Zope-like" :app:`Pyramid` applications, resource objects also often store
-data persistently and offer methods related to mutating that persistent data.
+data persistently, and offer methods related to mutating that persistent data.
 In these kinds of applications, resources not only represent the site
 structure of your website, but they become the :term:`domain model` of the
 application.
@@ -72,8 +72,8 @@ tree:
   the container's ``__getitem__`` should return the sub-resource.
 
 - Leaf resources, which do not contain other resources, must not implement a
-  ``__getitem__``, or if they do, their ``__getitem__`` method must raise a
-  :exc:`KeyError`.
+  ``__getitem__``, or if they do, their ``__getitem__`` method must always
+  raise a :exc:`KeyError`.
 
 See :ref:`traversal_chapter` for more information about how traversal
 works against resource instances.
@@ -239,7 +239,7 @@ A slash is appended to all resource URLs when
 :func:`~pyramid.url.resource_url` is used to generate them in this simple
 manner, because resources are "places" in the hierarchy, and URLs are meant
 to be clicked on to be visited.  Relative URLs that you include on HTML pages
-rendered as the result of the default view of a resource are typically more
+rendered as the result of the default view of a resource are more
 apt to be relative to these resources than relative to their parent.
 
 You can also pass extra elements to :func:`~pyramid.url.resource_url`:

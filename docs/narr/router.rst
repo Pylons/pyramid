@@ -133,6 +133,6 @@ processing?
 This is a very high-level overview that leaves out various details.
 For more detail about subsystems invoked by the :app:`Pyramid` router
 such as traversal, URL dispatch, views, and event processing, see
-:ref:`resourcelocation_chapter`, :ref:`views_chapter`, and
+:ref:`urldispatch_chapter`, :ref:`views_chapter`, and
 :ref:`events_chapter`.
 

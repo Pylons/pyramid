@@ -17,11 +17,11 @@ request made to your application.
    that implements a view *callable*, and the process of view
    *lookup*.
 
-The chapter :ref:`resourcelocation_chapter` describes how, using information
-from the :term:`request`, a :term:`context` resource is computed.  But the
-context resource itself isn't very useful without an associated :term:`view
-callable`.  A view callable returns a response to a user, often using the
-context resource to do so.
+The :ref:`urldispatch_chapter`, and :ref:`traversal_chapter` describes how,
+using information from the :term:`request`, a :term:`context` resource is
+computed.  But the context resource itself isn't very useful without an
+associated :term:`view callable`.  A view callable returns a response to a
+user, often using the context resource to do so.
 
 The job of actually locating and invoking the "best" :term:`view callable` is
 the job of the :term:`view lookup` subsystem.  The view lookup subsystem

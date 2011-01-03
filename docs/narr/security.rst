@@ -18,8 +18,7 @@ works at a high level:
   :term:`resource location`.  A context is located differently depending on
   whether the application uses :term:`traversal` or :term:`URL dispatch`, but
   a context is ultimately found in either case.  See
-  :ref:`resourcelocation_chapter` for more information about resource
-  location.
+  the :ref:`urldispatch_chapter` chapter for more information.
 
 - A :term:`view callable` is located by :term:`view lookup` using the
   context as well as other attributes of the request.
