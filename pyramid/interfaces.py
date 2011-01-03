@@ -512,11 +512,11 @@ class ISession(Interface):
         :meth:`pyramid.interfaces.ISesssion.flash`
         """
 
-    def new_csrf_token(self):
+    def new_csrf_token():
         """ Create and set into the session a new, random cross-site request
         forgery protection token.  Return the token.  It will be a string."""
 
-    def get_csrf_token(self):
+    def get_csrf_token():
         """ Get the CSRF token previously added to the session via
         ``new_csrf_token``, and return the token.  If no CSRF token exists,
         the value returned will be ``None``.
