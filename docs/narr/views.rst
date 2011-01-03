@@ -38,24 +38,24 @@ a detailed explanation of view lookup.
 View Callables
 --------------
 
-No matter how a view callable is eventually found, all view callables
-used by :app:`Pyramid` must be constructed in the same way, and
-must return the same kind of return value.
+View callables are, at the risk of sounding obvious, callable Python
+objects. Specifically, view callables can be functions, classes, or
+instances that implement an ``__call__`` method (making the
+instance callable).
 
-Most view callables accept a single argument named ``request``.  This
-argument represents a :app:`Pyramid` :term:`Request` object.  A request
-object encapsulates a WSGI environment as represented to :app:`Pyramid` by
-the upstream :term:`WSGI` server.
+View callables must, at a minimum, accept a single argument named
+``request``.  This argument represents a :app:`Pyramid` :term:`Request`
+object.  A request object encapsulates a WSGI environment provided to
+:app:`Pyramid` by the upstream :term:`WSGI` server. As you might expect,
+the request object contains everything your application needs to know
+about the specific HTTP request being made.
 
-In general, a view callable must return a :mod:`Pyramid` :term:`Response`
-object.
-
-.. note:: The above statement, though it sounds definitive, isn't always
-   true.  See :ref:`renderers_chapter` for information related to using a
-   :term:`renderer` to convert a non-Response view callable return value into
-   a Response object.
-
-View callables can be functions, instances, or classes.  
+In general, a view callable must return a :mod:`Pyramid`
+:term:`Response` object. If a view callable does not return a response
+itself, it will typically be configured with a :term:`renderer` that
+converts its response value into a :term:`Response` object. Using
+renderers is the common way that templates are bound to view callables.
+See the :ref:`renderers_chapter` chapter for details.
 
 .. index::
    single: view calling convention
