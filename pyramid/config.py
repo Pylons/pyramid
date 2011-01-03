@@ -435,8 +435,8 @@ class Configurator(object):
         immediately if ``autocommit`` is ``True``).
 
         .. note:: This method is typically only used by :app:`Pyramid`
-        framework extension authors, not by :app:`Pyramid` application
-        developers.
+           framework extension authors, not by :app:`Pyramid` application
+           developers.
 
         The ``discriminator`` uniquely identifies the action.  It must be
         given, but it can be ``None``, to indicate that the action never
