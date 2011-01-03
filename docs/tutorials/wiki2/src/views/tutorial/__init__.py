@@ -10,7 +10,7 @@ def main(global_config, **settings):
     initialize_sql(engine)
     config = Configurator(settings=settings)
     config.add_static_view('static', 'tutorial:static')
-    config.add_route('home', '/', view='tutorial.views.view_wiki')
+    config.add_route('view_wiki', '/', view='tutorial.views.view_wiki')
     config.add_route('view_page', '/{pagename}',
                      view='tutorial.views.view_page',
                      view_renderer='tutorial:templates/view.pt')
