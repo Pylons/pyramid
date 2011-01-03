@@ -3,18 +3,10 @@
 Renderers
 =========
 
-In the :ref:`views_chapter` chapter, we said that a view callable must
-return a :term:`Response` object.  We lied.  A :term:`renderer` is a service
-that attempts to convert a non-Response return value of a function, class, or
-instance that acts as a :term:`view callable` to a :term:`Response` object.
-
-Overview
---------
-
-A view needn't *always* return a Response object.  If a view happens to
-return something which does not implement the Pyramid Response interface,
-:app:`Pyramid` will attempt to use a :term:`renderer` to construct a
-response.  For example:
+A view needn't *always* return a :term:`Response` object.  If a view
+happens to return something which does not implement the Pyramid
+Response interface, :app:`Pyramid` will attempt to use a
+:term:`renderer` to construct a response.  For example:
 
 .. code-block:: python
    :linenos:
