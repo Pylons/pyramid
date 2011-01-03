@@ -155,4 +155,4 @@ You can also add a :term:`route configuration` via:
 See Also
 ~~~~~~~~
 
-See also :ref:`handlers_chapter`.
+See also :ref:`views_chapter`.
