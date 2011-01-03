@@ -32,7 +32,7 @@ Should-Have
 - ``current_route_url`` function.  https://gist.github.com/762842
 
 - Convert paster template and tutorial HTML templates to use
-  ``request.static_url('{{package}}:static/foo.css') rather than
+  ``request.static_url('{{package}}:static/foo.css')`` rather than
   ``${request.application_url}/static/foo.css``.
 
 - Add notes about renderer response attrs to request docs.
