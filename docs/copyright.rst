@@ -7,7 +7,7 @@ by Chris McDonough
 
 .. |copy|   unicode:: U+000A9 .. COPYRIGHT SIGN
 
-Copyright |copy| 2008-2010, Agendaless Consulting.
+Copyright |copy| 2008-2011, Agendaless Consulting.
 
 .. ISBN-10: 0615345379
 

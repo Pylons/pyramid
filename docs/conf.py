@@ -426,7 +426,7 @@ def setup(app):
 epub_title = 'The Pyramid Web Application Development Framework, Version 1.0'
 epub_author = 'Chris McDonough'
 epub_publisher = 'Agendaless Consulting'
-epub_copyright = '2008-2010'
+epub_copyright = '2008-2011'
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.
