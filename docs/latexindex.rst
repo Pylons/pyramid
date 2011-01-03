@@ -59,6 +59,7 @@ Narrative Documentation
    narr/startup
    narr/threadlocals
    narr/zca
+   narr/forms
 
 .. _tutorials:
 
