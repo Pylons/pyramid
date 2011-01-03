@@ -80,6 +80,13 @@ Documentation
   removed from the tutorials section.  It was moved to the
   ``pyramid_tutorials`` Github repository.
 
+- The "Resource Location and View Lookup" chapter has been replaced with a
+  variant of Rob Miller's "Much Ado About Traversal" (originally published at
+  http://blog.nonsequitarian.org/2010/much-ado-about-traversal/).
+
+- Many minor wording tweaks and refactorings (merged Casey Duncan's docs
+  fork, in which he is working on general editing).
+
 Internals
 ---------
 
