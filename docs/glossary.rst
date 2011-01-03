@@ -834,7 +834,7 @@ Glossary
      :meth:`pyramid.config.Configurator.add_route` and
      :meth:`pyramid.config.Configurator.add_view` to make it more
      convenient to register a collection of views as a single class when
-     using :term:`url dispatch`.  See also :ref:`handlers_chapter`.
+     using :term:`url dispatch`.  See also :ref:`views_chapter`.
 
    Deployment settings
      Deployment settings are settings passed to the :term:`Configurator` as a
