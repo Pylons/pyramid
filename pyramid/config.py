@@ -249,10 +249,10 @@ class Configurator(object):
     commit.
 
     If ``default_view_mapper`` is passed, it will be used as the default
-    view mapper factory for view configurations that don't otherwise specify
-    one (see :class:`pyramid.interfaces.IViewMapperFactory`).
-    If a default_view_mapper is not passed, a superdefault view mapper will
-    be used.  """
+    :term:`view mapper` factory for view configurations that don't otherwise
+    specify one (see :class:`pyramid.interfaces.IViewMapperFactory`).  If a
+    default_view_mapper is not passed, a superdefault view mapper will be
+    used.  """
 
     manager = manager # for testing injection
     venusian = venusian # for testing injection
