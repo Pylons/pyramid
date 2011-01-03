@@ -3790,6 +3790,53 @@ class TestViewDeriver(unittest.TestCase):
         context = testing.DummyResource()
         self.assertEqual(result(context, request), {'a':'1'})
 
+    def test_with_view_mapper_config_specified(self):
+        class mapper(object):
+            def __init__(self, **kw):
+                self.kw = kw
+            def __call__(self, view):
+                def wrapped(context, request):
+                    return 'OK'
+                return wrapped
+        def view(context, request):
+            return 'NOTOK'
+        deriver = self._makeOne(view_mapper=mapper)
+        result = deriver(view)
+        self.failIf(result is view)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test_with_view_mapper_view_specified(self):
+        def mapper(**kw):
+            def inner(view):
+                def superinner(context, request):
+                    self.assertEqual(request, None)
+                    return 'OK'
+                return superinner
+            return inner
+        def view(context, request):
+            return 'NOTOK'
+        view.__view_mapper__ = mapper
+        deriver = self._makeOne()
+        result = deriver(view)
+        self.failIf(result is view)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test_with_view_mapper_default_mapper_specified(self):
+        def mapper(**kw):
+            def inner(view):
+                def superinner(context, request):
+                    self.assertEqual(request, None)
+                    return 'OK'
+                return superinner
+            return inner
+        self.config.set_view_mapper(mapper)
+        def view(context, request):
+            return 'NOTOK'
+        deriver = self._makeOne()
+        result = deriver(view)
+        self.failIf(result is view)
+        self.assertEqual(result(None, None), 'OK')
+
 class TestDefaultViewMapper(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()

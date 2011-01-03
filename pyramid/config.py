@@ -2793,9 +2793,11 @@ class ViewDeriver(object):
     def mapped_view(self, view):
         mapper = self.kw.get('view_mapper')
         if mapper is None:
-            mapper = self.registry.queryUtility(IViewMapperFactory)
+            mapper = getattr(view, '__view_mapper__', None)
             if mapper is None:
-                mapper = DefaultViewMapper
+                mapper = self.registry.queryUtility(IViewMapperFactory)
+                if mapper is None:
+                    mapper = DefaultViewMapper
 
         mapped_view = mapper(**self.kw)(view)
         return mapped_view
