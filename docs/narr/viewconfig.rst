@@ -8,6 +8,11 @@ View Configuration
 .. index::
    single: view lookup
 
+:term:`View configuration` controls how :term:`view lookup` operates in
+your application. In earlier chapters, you have been exposed to a few
+simple view configuration declarations without much explanation. In this
+chapter we will explore the subject in detail.
+
 .. _view_lookup:
 
 View Lookup and Invocation
