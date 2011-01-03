@@ -50,12 +50,14 @@ object.  A request object encapsulates a WSGI environment provided to
 the request object contains everything your application needs to know
 about the specific HTTP request being made.
 
-In general, a view callable must return a :mod:`Pyramid`
-:term:`Response` object. If a view callable does not return a response
-itself, it will typically be configured with a :term:`renderer` that
-converts its response value into a :term:`Response` object. Using
-renderers is the common way that templates are bound to view callables.
-See the :ref:`renderers_chapter` chapter for details.
+A view callable's ultimate responsibility is to create a :mod:`Pyramid`
+:term:`Response` object. This can be done by creating the response in
+the view callable code and returning it directly. However, if a view
+callable does not return a response itself, it can be configured to use
+a :term:`renderer` that converts its return value into a
+:term:`Response` object. Using renderers is the common way that
+templates are used with view callables to generate markup.  See the
+:ref:`renderers_chapter` chapter for details.
 
 .. index::
    single: view calling convention
