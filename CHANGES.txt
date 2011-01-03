@@ -15,22 +15,6 @@ Features
 - ``config.add_view`` now accepts a ``decorator`` keyword argument, a callable
   which will decorate the view callable before it is added to the registry.
 
-- add a ``add_view_mapper`` API to Configurator.  This API allows you to add
-  a named implementation of a ``pyramid.interfaces.IViewMapperFactory``
-  interface.  Its name can be passed as a ``view_mapper`` argument to
-  ``config.add_view``.  A view mapper allows objects that are meant to be
-  used as view callables to have an arbitrary argument list and an arbitrary
-  result.  This feature will be used by Pyramid extension developers, not by
-  "civilians".
-
-- New constructor argument to Configurator: ``default_view_mapper``.  Useful
-  to create systems that have view callables with alternate default calling
-  conventions.
-
-- ``config.add_view`` now accepts a ``view_mapper`` keyword argument, which
-  should either be ``None`` or the name of a view mapper previously
-  registered via ``add_view_mapper``.
-
 - If a handler class provides an ``__action_decorator__`` attribute (usually
   a classmethod or staticmethod), use that as the decorator for each view
   registration for that handler.
@@ -54,6 +38,27 @@ Features
 - The class ``pyramid.authentication.AuthTktCookieHelper`` is now an API.
   This class can be used by third-party authentication policy developers to
   help in the mechanics of authentication cookie-setting.
+
+- New constructor argument to Configurator: ``default_view_mapper``.  Useful
+  to create systems that have alternate view calling conventions.  A view
+  mapper allows objects that are meant to be used as view callables to have
+  an arbitrary argument list and an arbitrary result.  The object passed as
+  ``default_view_mapper`` should implement the
+  ``pyramid.interfaces.IViewMapperFactory`` interface.
+
+- add a ``set_view_mapper`` API to Configurator.  Has
+  the same result as passing ``default_view_mapper`` to the Configurator
+  constructor.
+
+- ``config.add_view`` now accepts a ``view_mapper`` keyword argument, which
+  should either be ``None``, a string representing a Python dotted name, or
+  an object which is an ``IViewMapperFactory``.  This feature is not useful
+  for "civilians", only for extension writers.
+
+- Allow static renderer provided during view registration to be overridden at
+  request time via a request attribute named ``override_renderer``, which
+  should be the name of a previously registered renderer.  Useful to provide
+  "omnipresent" RPC using existing rendered views.
 
 Backwards Incompatibilities
 ---------------------------

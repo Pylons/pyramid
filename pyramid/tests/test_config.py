@@ -2678,15 +2678,15 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IViewMapperFactory
         config = self._makeOne(autocommit=True)
         mapper = object()
-        config.add_view_mapper('mapper', mapper)
-        result = config.registry.getUtility(IViewMapperFactory, name='mapper')
+        config.set_view_mapper(mapper)
+        result = config.registry.getUtility(IViewMapperFactory)
         self.assertEqual(result, mapper)
 
     def test_add_view_mapper_dottedname(self):
         from pyramid.interfaces import IViewMapperFactory
         config = self._makeOne(autocommit=True)
-        config.add_view_mapper('mapper', 'pyramid.tests.test_config')
-        result = config.registry.getUtility(IViewMapperFactory, name='mapper')
+        config.set_view_mapper('pyramid.tests.test_config')
+        result = config.registry.getUtility(IViewMapperFactory)
         from pyramid.tests import test_config
         self.assertEqual(result, test_config)
 
@@ -3270,6 +3270,25 @@ class TestViewDeriver(unittest.TestCase):
         request = self._makeRequest()
         context = testing.DummyResource()
         self.assertEqual(result(context, request), 'moo')
+
+    def test_requestonly_function_with_renderer_request_override(self):
+        def moo(info):
+            def inner(value, system):
+                self.assertEqual(value, 'OK')
+                self.assertEqual(system['request'], request)
+                self.assertEqual(system['context'], context)
+                return 'moo'
+            return inner
+        def view(request):
+            return 'OK'
+        self.config.add_renderer('moo', moo)
+        deriver = self._makeOne(renderer='string')
+        result = deriver(view)
+        self.failIf(result is view)
+        request = self._makeRequest()
+        request.override_renderer = 'moo'
+        context = testing.DummyResource()
+        self.assertEqual(result(context, request).body, 'moo')
 
     def test_requestonly_function_with_renderer_request_has_view(self):
         class moo(object):

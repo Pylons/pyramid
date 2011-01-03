@@ -656,7 +656,7 @@ class Configurator(object):
         # mapper
         self.commit()
         if default_view_mapper is not None:
-            self.add_view_mapper(None, default_view_mapper)
+            self.set_view_mapper(default_view_mapper)
             self.commit()
         
     # getSiteManager is a unit testing dep injection
@@ -1298,18 +1298,19 @@ class Configurator(object):
 
         view_mapper
 
-          The name of a previously registered :term:`view mapper` or
-          ``None``.  By default it is ``None``, which indicates that the view
-          should use the default view mapper.  This plug-point is useful for
-          Pyramid extension developers, but it's not very useful for
-          'civilians' who are just developing stock Pyramid applications.
-          Pay no attention to the man behind the curtain.
+          A Python object or :term:`dotted Python name` which refers to a
+          :term:`view mapper`, or ``None``.  By default it is ``None``, which
+          indicates that the view should use the default view mapper.  This
+          plug-point is useful for Pyramid extension developers, but it's not
+          very useful for 'civilians' who are just developing stock Pyramid
+          applications. Pay no attention to the man behind the curtain.
           
         """
         view = self.maybe_dotted(view)
         context = self.maybe_dotted(context)
         for_ = self.maybe_dotted(for_)
         containment = self.maybe_dotted(containment)
+        view_mapper = self.maybe_dotted(view_mapper)
 
         if not view:
             if renderer:
@@ -2175,34 +2176,27 @@ class Configurator(object):
         self.action(IDefaultPermission, None)
 
     @action_method
-    def add_view_mapper(self, name, mapper):
+    def set_view_mapper(self, mapper):
         """
-        Adding a :term:`view mapper` makes it possible to make use of
-        :term:`view callable` objects which implement a different call
-        signature than the ones described in the :app:`Pyramid`
-        documentation.  This is an advanced feature, not usually consumed by
-        'civilians'.
+        Setting a :term:`view mapper` makes it possible to make use of
+        :term:`view callable` objects which implement different call
+        signatures than the ones supported by :app:`Pyramid` as described in
+        its narrative documentation.
 
-        ``name`` must be a string or ``None``.  If ``name`` is a string, the
-        view mapper will be registered under the specified name for
-        consumption by extensions.  If ``name`` is ``None``, the provided
-        mapper will become the *default* view mapper to be used by all
-        subsequent :term:`view configuration` registrations, as if you had
-        passed a ``default_view_mapper`` argument to the
-        :class:`pyramid.config.Configurator` constructor.
-        
         The ``mapper`` should argument be an object implementing
         :class:`pyramid.interfaces.IViewMapperFactory` or a :term:`dotted
         Python name` to such an object.
 
+        The provided ``mapper`` will become the default view mapper to be
+        used by all subsequent :term:`view configuration` registrations, as
+        if you had passed a ``default_view_mapper`` argument to the
+        :class:`pyramid.config.Configurator` constructor.
+        
         See also :ref:`using_an_alternate_view_mapper`.
         """
-        if mapper is not None:
-            mapper = self.maybe_dotted(mapper)
-        if name is None:
-            name = ''
-        self.registry.registerUtility(mapper, IViewMapperFactory, name=name)
-        self.action((IViewMapperFactory, name), None)
+        mapper = self.maybe_dotted(mapper)
+        self.registry.registerUtility(mapper, IViewMapperFactory)
+        self.action(IViewMapperFactory, None)
 
     @action_method
     def set_session_factory(self, session_factory):
@@ -2791,12 +2785,11 @@ class ViewDeriver(object):
 
     @wraps_view
     def mapped_view(self, view):
-        mapper_name = self.kw.get('view_mapper')
-        mapper = self.registry.queryUtility(IViewMapperFactory,
-                                            name=mapper_name)
-
+        mapper = self.kw.get('view_mapper')
         if mapper is None:
-            mapper = DefaultViewMapper
+            mapper = self.registry.queryUtility(IViewMapperFactory)
+            if mapper is None:
+                mapper = DefaultViewMapper
 
         mapped_view = mapper(**self.kw)(view)
         return mapped_view
@@ -2919,14 +2912,25 @@ class ViewDeriver(object):
     @wraps_view
     def rendered_view(self, view):
         wrapped_view = view
-        renderer = self.kw.get('renderer')
-        if renderer is None:
+        static_renderer = self.kw.get('renderer')
+        if static_renderer is None:
+            # register a default renderer if you want super-dynamic
+            # rendering.  registering a default renderer will also allow
+            # override_renderer to work if a renderer is left unspecified for
+            # a view registration.
             return view
 
         def _rendered_view(context, request):
+            renderer = static_renderer
             response = wrapped_view(context, request)
             if not is_response(response):
                 attrs = getattr(request, '__dict__', {})
+                if 'override_renderer' in attrs:
+                    # renderer overridden by newrequest event or other
+                    renderer_name = attrs.pop('override_renderer')
+                    renderer = RendererHelper(name=renderer_name,
+                                              package=self.kw.get('package'),
+                                              registry = self.kw['registry'])
                 if '__view__' in attrs:
                     view_inst = attrs.pop('__view__')
                 else:
