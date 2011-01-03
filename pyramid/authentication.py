@@ -294,7 +294,7 @@ class AuthTktCookieHelper(object):
     """
     A helper class for use in third-party authentication policy
     implementations.  See
-    :class:`pyramid.authentication.AuthTktAuthenticationPolicy' for the
+    :class:`pyramid.authentication.AuthTktAuthenticationPolicy` for the
     meanings of the constructor arguments.
     """
     auth_tkt = auth_tkt # for tests
