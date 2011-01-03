@@ -351,8 +351,10 @@ class Configurator(object):
     def _derive_view(self, view, permission=None, predicates=(),
                      attr=None, renderer=None, wrapper_viewname=None,
                      viewname=None, accept=None, order=MAX_ORDER,
-                     phash=DEFAULT_PHASH):
+                     phash=DEFAULT_PHASH, decorator=None,
+                     view_mapper=None):
         view = self.maybe_dotted(view)
+        view_mapper = self.maybe_dotted(view_mapper)
         if isinstance(renderer, basestring):
             renderer = RendererHelper(name=renderer, package=self.package,
                                       registry = self.registry)
@@ -362,18 +364,21 @@ class Configurator(object):
                 renderer = RendererHelper(name=None,
                                           package=self.package,
                                           registry=self.registry)
-        deriver = ViewDeriver(
-            registry=self.registry,
-            permission=permission,
-            predicates=predicates,
-            attr=attr,
-            renderer=renderer,
-            wrapper_viewname=wrapper_viewname,
-            viewname=viewname,
-            accept=accept,
-            order=order,
-            phash=phash,
-            package=self.package)
+
+        deriver = ViewDeriver(registry=self.registry,
+                              permission=permission,
+                              predicates=predicates,
+                              attr=attr,
+                              renderer=renderer,
+                              wrapper_viewname=wrapper_viewname,
+                              viewname=viewname,
+                              accept=accept,
+                              order=order,
+                              phash=phash,
+                              package=self.package,
+                              view_mapper=view_mapper,
+                              decorator=decorator)
+        
         return deriver(view)
 
     def _override(self, package, path, override_package, override_prefix,
@@ -1392,8 +1397,9 @@ class Configurator(object):
                                   accept=accept,
                                   order=order,
                                   phash=phash,
-                                  decorator=decorator,
-                                  view_mapper=view_mapper)
+                                  package=self.package,
+                                  view_mapper=view_mapper,
+                                  decorator=decorator)
             derived_view = deriver(view)
 
             registered = self.registry.adapters.registered
