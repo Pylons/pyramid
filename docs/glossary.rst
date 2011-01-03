@@ -857,3 +857,8 @@ Glossary
     view argument and return value mapping.  This is a plug point for
     extension builders, not normally used by "civilians".
 
+   matchdict
+    The dictionary attached to the :term:`request` object as
+    ``request.matchdict`` when a :term:`URL dispatch` route has been matched.
+    Its keys are names as identified within the route pattern; its values are
+    the values matched by each pattern name.

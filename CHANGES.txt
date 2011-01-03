@@ -15,6 +15,9 @@ Bug Fixes
 Features
 --------
 
+- Add a new API ``pyramid.url.current_route_url``, which computes a URL based
+  on the "current" route (if any) and its matchdict values.
+
 - ``config.add_view`` now accepts a ``decorator`` keyword argument, a callable
   which will decorate the view callable before it is added to the registry.
 

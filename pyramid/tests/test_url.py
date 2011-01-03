@@ -209,6 +209,47 @@ class TestRouteUrl(unittest.TestCase):
         self.assertEqual(result,  'http://example2.com/1/2/3/a')
         self.assertEqual(route.kw, {}) # shouldnt have anchor/query
 
+class TestCurrentRouteUrl(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+        
+    def _callFUT(self, *arg, **kw):
+        from pyramid.url import current_route_url
+        return current_route_url(*arg, **kw)
+
+    def test_current_request_has_no_route(self):
+        request = _makeRequest()
+        self.assertRaises(ValueError, self._callFUT, request)
+
+    def test_with_elements_query_and_anchor(self):
+        from pyramid.interfaces import IRoutesMapper
+        request = _makeRequest()
+        route = DummyRoute('/1/2/3')
+        mapper = DummyRoutesMapper(route=route)
+        request.matched_route = route
+        request.matchdict = {}
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = self._callFUT(request, 'extra1', 'extra2', _query={'a':1},
+                               _anchor=u"foo")
+        self.assertEqual(result,
+                         'http://example.com:5432/1/2/3/extra1/extra2?a=1#foo')
+
+    def test_with__route_name(self):
+        from pyramid.interfaces import IRoutesMapper
+        request = _makeRequest()
+        route = DummyRoute('/1/2/3')
+        mapper = DummyRoutesMapper(route=route)
+        request.matched_route = route
+        request.matchdict = {}
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = self._callFUT(request, 'extra1', 'extra2', _query={'a':1},
+                               _anchor=u"foo", _route_name='bar')
+        self.assertEqual(result,
+                         'http://example.com:5432/1/2/3/extra1/extra2?a=1#foo')
+
 class TestRoutePath(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -302,6 +343,7 @@ class DummyRoutesMapper:
 
 class DummyRoute:
     pregenerator = None
+    name = 'route'
     def __init__(self, result='/1/2/3'):
         self.result = result
 

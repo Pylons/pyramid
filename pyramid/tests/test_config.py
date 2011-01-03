@@ -3798,8 +3798,7 @@ class TestViewDeriver(unittest.TestCase):
                 def wrapped(context, request):
                     return 'OK'
                 return wrapped
-        def view(context, request):
-            return 'NOTOK'
+        def view(context, request): return 'NOTOK'
         deriver = self._makeOne(view_mapper=mapper)
         result = deriver(view)
         self.failIf(result is view)
@@ -3813,8 +3812,7 @@ class TestViewDeriver(unittest.TestCase):
                     return 'OK'
                 return superinner
             return inner
-        def view(context, request):
-            return 'NOTOK'
+        def view(context, request): return 'NOTOK'
         view.__view_mapper__ = mapper
         deriver = self._makeOne()
         result = deriver(view)
@@ -3830,8 +3828,7 @@ class TestViewDeriver(unittest.TestCase):
                 return superinner
             return inner
         self.config.set_view_mapper(mapper)
-        def view(context, request):
-            return 'NOTOK'
+        def view(context, request): return 'NOTOK'
         deriver = self._makeOne()
         result = deriver(view)
         self.failIf(result is view)
