@@ -11,16 +11,15 @@ Must-Have (before 1.0)
 - Re-make testing.setUp() and testing.tearDown() the canonical APIs for test
   configuration.
 
-- Document ``decorator=`` and ``view_mapper`` parameters to add_view.
+- Document ``decorator=`` and ``view_mapper`` parameters to add_view and
+  ``@view_config``.
 
-- Allow ``decorator=`` and ``view_mapper=`` to be passed via ZCML and the
-  ``view_config`` decorator.
+- Allow ``decorator=`` and ``view_mapper=`` to be passed via ZCML.
 
-- Document ``Configurator.add_view_mapper``.
+- Document ``Configurator.set_view_mapper``.
 
-- Consider the ability to defer the choice of view mapper and/or renderer
-  (note that we could also just suggest that people use a default renderer
-  instead).
+- Document ``__view_mapper__`` attribute for view callable view mapper
+  preference.
 
 - ZCML directive for view mapper (or just use "utility", but it's not eager).
 
