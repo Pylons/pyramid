@@ -366,6 +366,38 @@ def static_url(path, request, **kw):
         
     return info.generate(path, request, **kw)
 
+def current_route_url(request, *elements, **query):
+    """Generates a fully qualified URL for a named :app:`Pyramid`
+    :term:`route configuration` based on current route.
+    
+    This function is to supplement :func:`pyramid.url.route_url`, it's purpose
+    is to allow for easy overriding parameters of current route.
+    
+    Example::
+        If our url route is /foo/{page} - and current url is /foo/1 :
+        current_route_url(request, page='2')
+        Will return the string ``/foo/2``.
+        
+    Alternatively we may have routes /foo/{action} and /foo/{action}/{page},
+    on url /foo/view we may want to have a template macro/def that allows us
+    to output next/prev buttons that contain page numbers. The ability to
+    override route name helps with this task.
+    
+    Example:: 
+        where ``foo_pages`` is route name for ``/foo/{action}/{page}``
+        current_url(request, _route_name='foo_pages', page=paginator.page+1)
+        Will return the string like: ``/foo/view/5``
+    """
+    if '_route_name' in query:
+        route_name = query['_route_name']
+    else:
+        route_name = getattr(request, 'matched_route', None)
+        route_name = getattr(route_name, 'name')
+    matchdict = {}
+    matchdict.update(getattr(request, 'matchdict', {}) or {})
+    matchdict.update(query)
+    return route_url(route_name, request, *elements, **matchdict)
+
 @lru_cache(1000)
 def _join_elements(elements):
     return '/'.join([quote_path_segment(s) for s in elements])
