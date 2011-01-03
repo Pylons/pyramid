@@ -26,6 +26,8 @@ Must-Have (before 1.0)
 - Decide whether ``self.decorated_view(view)`` is in the right place in the
   view deriver chain.
 
+- API docs for ``pyramid.views.action``.
+
 Should-Have
 -----------
 
