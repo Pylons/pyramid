@@ -76,7 +76,7 @@ All forms of view configuration accept the same general types of arguments.
 
 Many arguments supplied during view configuration are :term:`view predicate`
 arguments.  View predicate arguments used during view configuration are used
-to narrow the set of circumstances in which :mod:`view lookup` will find a
+to narrow the set of circumstances in which :term:`view lookup` will find a
 particular view callable.  
 
 In general, the fewer number of predicates which are supplied to a
