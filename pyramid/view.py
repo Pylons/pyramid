@@ -383,7 +383,8 @@ class view_config(object):
                  route_name=None, request_method=None, request_param=None,
                  containment=None, attr=None, renderer=None, wrapper=None,
                  xhr=False, accept=None, header=None, path_info=None,
-                 custom_predicates=(), context=None, view_mapper=None):
+                 custom_predicates=(), context=None, decorator=None,
+                 view_mapper=None):
         self.name = name
         self.request_type = request_type
         self.context = context or for_
@@ -400,6 +401,7 @@ class view_config(object):
         self.header = header
         self.path_info = path_info
         self.custom_predicates = custom_predicates
+        self.decorator = decorator
         self.view_mapper = view_mapper
 
     def __call__(self, wrapped):
