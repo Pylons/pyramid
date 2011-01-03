@@ -120,3 +120,5 @@ Contributors
 - Rob Miller, 2010/12/28
 
 - Marius Gedminas, 2010/12/31
+
+- Marcin Lulek, 2011/01/02

@@ -366,6 +366,60 @@ def static_url(path, request, **kw):
         
     return info.generate(path, request, **kw)
 
+def current_route_url(request, *elements, **kw):
+    """Generates a fully qualified URL for a named :app:`Pyramid`
+    :term:`route configuration` based on the 'current route'.
+    
+    This function supplements :func:`pyramid.url.route_url`. It presents an
+    easy way to generate a URL for the 'current route' (defined as the route
+    which matched when the request was generated).
+
+    The arguments to this function have the same meaning as those with the
+    same names passed to :func:`pyramid.url.route_url`.  It also understands
+    an extra argument which ``route_url`` does not named ``_route_name``.
+
+    The route name used to generate a URL is taken from either the
+    ``_route_name`` keyword argument or the name of the route which is
+    currently associated with the request if ``_route_name`` was not passed.
+    Keys and values from the current request :term:`matchdict` are combined
+    with the ``kw`` arguments to form a set of defaults named ``newkw``.
+    Then ``route_url(route_name, request, *elements, **newkw)`` is called,
+    returning a URL.
+
+    Examples follow.
+
+    If the 'current route' has the route pattern ``/foo/{page}`` and the
+    current url path is ``/foo/1`` , the matchdict will be ``{'page':'1'}``.
+    The result of ``current_route_url(request)`` in this situation will be
+    ``/foo/1``.
+
+    If the 'current route' has the route pattern ``/foo/{page}`` and the
+    current current url path is ``/foo/1``, the matchdict will be
+    ``{'page':'1'}``.  The result of ``current_route_url(request, page='2')``
+    in this situation will be ``/foo/2``.
+        
+    Usage of the ``_route_name`` keyword argument: if our routing table
+    defines routes ``/foo/{action}`` named 'foo' and ``/foo/{action}/{page}``
+    named ``fooaction``, and the current url pattern is ``/foo/view`` (which
+    has matched the ``/foo/{action}`` route), we may want to use the
+    matchdict args to generate a URL to the ``fooaction`` route.  In this
+    scenario, ``current_url(request, _route_name='fooaction', page='5')``
+    Will return string like: ``/foo/view/5``.
+    """
+
+    if '_route_name' in kw:
+        route_name = kw.pop('_route_name')
+    else:
+        route = getattr(request, 'matched_route', None)
+        route_name = getattr(route, 'name', None)
+        if route_name is None:
+            raise ValueError('Current request matches no route')
+
+    newkw = {}
+    newkw.update(request.matchdict)
+    newkw.update(kw)
+    return route_url(route_name, request, *elements, **newkw)
+
 @lru_cache(1000)
 def _join_elements(elements):
     return '/'.join([quote_path_segment(s) for s in elements])
