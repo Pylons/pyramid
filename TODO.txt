@@ -28,6 +28,9 @@ Must-Have (before 1.0)
 
 - API docs for ``pyramid.views.action``.
 
+- Use a commit veto when configuring repoze.tm2 in paster templates for
+  non-1X, 2X, or 3X responses.
+
 Should-Have
 -----------
 
