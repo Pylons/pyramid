@@ -852,7 +852,6 @@ Glossary
      http://pypi.python.org/pypi/WebError .
 
    view mapper
-
     A view mapper is a class which implements the
     :class:`pyramid.interfaces.IViewMapperFactory` interface, which performs
     view argument and return value mapping.  This is a plug point for
