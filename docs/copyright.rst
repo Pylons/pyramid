@@ -48,9 +48,15 @@ with respect to the use of the information contained herein.
 Attributions
 ------------
 
+Editor:
+  Casey Duncan
+
 Contributors:
-  Ben Bangert, Blaise Laflamme, Carlos de la Guardia, Paul Everitt, 
-  Marius Gedminas, Casey Duncan
+
+  Ben Bangert, Blaise Laflamme, Rob Miller, Mike Orr, Carlos de la Guardia,
+  Paul Everitt, Tres Seaver, Marius Gedminas, Chris Rossi, Joachim Krebs,
+  Xavier Spriet, Reed O'Brien, William Chambers, Charlie Choiniere, Jamaludin
+  Ahmad.
 
 .. Cover Designer:
 ..   Nat Hardwick of `Electrosoup <http://www.electrosoup.co.uk>`_.
