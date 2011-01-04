@@ -23,9 +23,6 @@ Must-Have (before 1.0)
 
 - ZCML directive for view mapper (or just use "utility", but it's not eager).
 
-- Decide whether ``self.decorated_view(view)`` is in the right place in the
-  view deriver chain.
-
 - API docs for ``pyramid.views.action``.
 
 - Use a commit veto when configuring repoze.tm2 in paster templates for
