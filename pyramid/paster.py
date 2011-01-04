@@ -179,12 +179,10 @@ class PRoutesCommand(PCommand):
         print msg
     
     def command(self):
-        from pyramid.request import Request
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IView
         from zope.interface import Interface
-        from zope.interface import providedBy
         config_file, section_name = self.args
         app = self.get_app(config_file, section_name, loadapp=self.loadapp[0])
         registry = app.registry
