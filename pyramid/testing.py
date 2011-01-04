@@ -433,7 +433,12 @@ class DummyResource:
         that will be attached to the resulting resource via
         :func:`zope.interface.alsoProvides`. Any extra keywords passed
         in the ``kw`` argumnent will be set as direct attributes of
-        the resource object."""
+        the resource object.
+
+        .. note:: For backwards compatibility purposes, this class can also
+                  be imported as :class:`pyramid.testing.DummyModel`.
+
+        """
         self.__name__ = __name__
         self.__parent__ = __parent__
         if __provides__ is not None:
@@ -521,8 +526,6 @@ class DummyRequest(object):
     Extra keyword arguments are assigned as attributes of the request
     itself.
 
-    .. note:: For backwards compatibility purposes, this class can also be
-       imported as :class:`pyramid.testing.DummyModel`.
     """
     implements(IRequest)
     method = 'GET'
