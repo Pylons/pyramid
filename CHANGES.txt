@@ -66,6 +66,10 @@ Features
   should be the name of a previously registered renderer.  Useful to provide
   "omnipresent" RPC using existing rendered views.
 
+- Instances of ``pyramid.testing.DummyRequest`` now have a ``session``
+  object, which is mostly a dictionary, but also implements the other session
+  API methods for flash and CSRF.
+
 Backwards Incompatibilities
 ---------------------------
 

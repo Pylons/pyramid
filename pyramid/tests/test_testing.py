@@ -413,6 +413,7 @@ class TestDummyRequest(unittest.TestCase):
 
     def test_defaults(self):
         from pyramid.threadlocal import get_current_registry
+        from pyramid.testing import DummySession
         request = self._makeOne()
         self.assertEqual(request.method, 'GET')
         self.assertEqual(request.application_url, 'http://example.com')
@@ -438,6 +439,7 @@ class TestDummyRequest(unittest.TestCase):
         self.assertEqual(request.virtual_root, None)
         self.assertEqual(request.virtual_root_path, ())
         self.assertEqual(request.registry, get_current_registry())
+        self.assertEqual(request.session.__class__, DummySession)
 
     def test_params_explicit(self):
         request = self._makeOne(params = {'foo':'bar'})
@@ -722,6 +724,86 @@ class Test_skip_on(unittest.TestCase):
         def foo(): return True
         decorated = self._callFUT('ok')(foo)
         self.assertEqual(decorated(), True)
+
+class TestDummySession(unittest.TestCase):
+    def _makeOne(self):
+        from pyramid.testing import DummySession
+        return DummySession()
+
+    def test_instance_conforms(self):
+        from zope.interface.verify import verifyObject
+        from pyramid.interfaces import ISession
+        session = self._makeOne()
+        verifyObject(ISession, session)
+
+    def test_changed(self):
+        session = self._makeOne()
+        self.assertEqual(session.changed(), None)
+
+    def test_invalidate(self):
+        session = self._makeOne()
+        session['a'] = 1
+        self.assertEqual(session.invalidate(), None)
+        self.failIf('a' in session)
+
+    def test_flash_default(self):
+        session = self._makeOne()
+        session.flash('msg1')
+        session.flash('msg2')
+        self.assertEqual(session['_f_'], ['msg1', 'msg2'])
+        
+    def test_flash_mixed(self):
+        session = self._makeOne()
+        session.flash('warn1', 'warn')
+        session.flash('warn2', 'warn')
+        session.flash('err1', 'error')
+        session.flash('err2', 'error')
+        self.assertEqual(session['_f_warn'], ['warn1', 'warn2'])
+
+    def test_pop_flash_default_queue(self):
+        session = self._makeOne()
+        queue = ['one', 'two']
+        session['_f_'] = queue
+        result = session.pop_flash()
+        self.assertEqual(result, queue)
+        self.assertEqual(session.get('_f_'), None)
+
+    def test_pop_flash_nodefault_queue(self):
+        session = self._makeOne()
+        queue = ['one', 'two']
+        session['_f_error'] = queue
+        result = session.pop_flash('error')
+        self.assertEqual(result, queue)
+        self.assertEqual(session.get('_f_error'), None)
+
+    def test_peek_flash_default_queue(self):
+        session = self._makeOne()
+        queue = ['one', 'two']
+        session['_f_'] = queue
+        result = session.peek_flash()
+        self.assertEqual(result, queue)
+        self.assertEqual(session.get('_f_'), queue)
+
+    def test_peek_flash_nodefault_queue(self):
+        session = self._makeOne()
+        queue = ['one', 'two']
+        session['_f_error'] = queue
+        result = session.peek_flash('error')
+        self.assertEqual(result, queue)
+        self.assertEqual(session.get('_f_error'), queue)
+
+    def test_new_csrf_token(self):
+        session = self._makeOne()
+        token = session.new_csrf_token()
+        self.assertEqual(token, session['_csrft_'])
+
+    def test_get_csrf_token(self):
+        session = self._makeOne()
+        session['_csrft_'] = 'token'
+        token = session.get_csrf_token()
+        self.assertEqual(token, 'token')
+        self.failUnless('_csrft_' in session)
+
 
 from zope.interface import Interface
 from zope.interface import implements

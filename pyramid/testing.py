@@ -11,6 +11,7 @@ from pyramid.interfaces import IRequest
 from pyramid.interfaces import ISecuredView
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
+from pyramid.interfaces import ISession
 
 from pyramid.config import Configurator
 from pyramid.exceptions import Forbidden
@@ -511,6 +512,37 @@ class DummyResource:
 
 DummyModel = DummyResource # b/w compat (forever)
 
+class DummySession(dict):
+    implements(ISession)
+    created = None
+    new = True
+    def changed(self):
+        pass
+
+    def invalidate(self):
+        self.clear()
+
+    def flash(self, msg, queue='', allow_duplicate=True):
+        storage = self.setdefault('_f_' + queue, [])
+        if allow_duplicate or (msg not in storage):
+            storage.append(msg)
+
+    def pop_flash(self, queue=''):
+        storage = self.pop('_f_' + queue, [])
+        return storage
+
+    def peek_flash(self, queue=''):
+        storage = self.get('_f_' + queue, [])
+        return storage
+
+    def new_csrf_token(self):
+        token = 'csrft'
+        self['_csrft_'] = token
+        return token
+
+    def get_csrf_token(self):
+        return self.get('_csrft_', None)
+        
 class DummyRequest(object):
     """ A dummy request object (imitates a :term:`request` object).
 
@@ -572,6 +604,7 @@ class DummyRequest(object):
         self.virtual_root = None
         self.marshalled = params # repoze.monty
         self.registry = get_current_registry()
+        self.session = DummySession()
         self.__dict__.update(kw)
 
     def add_response_callback(self, callback):
