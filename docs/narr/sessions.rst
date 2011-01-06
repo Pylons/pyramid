@@ -222,10 +222,11 @@ Using the ``session.pop_flash`` Method
 
 Once one or more messages have been added to a flash queue by the
 ``session.flash()`` API, the ``session.pop_flash()`` API can be used to
-pop that queue and return it for use.
+pop an entire queue and return it for use.
 
 To pop a particular queue of messages from the flash object, use the session
-object's ``pop_flash()`` method.
+object's ``pop_flash()`` method. This returns a list of the messages
+that were added to the flash queue, and empties the queue.
 
 .. method:: pop_flash(queue='')
 
@@ -248,8 +249,6 @@ been popped.
    ['info message']
    >>> request.session.pop_flash()
    []
-
-The object returned from ``pop_flash()`` is a list.
 
 Using the ``session.peek_flash`` Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
