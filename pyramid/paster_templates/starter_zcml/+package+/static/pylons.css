@@ -58,7 +58,7 @@ ul.links li{list-style-type:none;font-size:14px;}
 form{border-style:none;}
 fieldset{border-style:none;}
 input{color:#222;border:1px solid #ccc;font-family:sans-serif;font-size:12px;line-height:16px;}
-input[type=text]{width:205px;}
+input[type=text],input[type=password]{width:205px;}
 input[type=submit]{background-color:#ddd;font-weight:bold;}
 /*Opera Fix*/
 body:before{content:"";height:100%;float:left;width:0;margin-top:-32767px;}
