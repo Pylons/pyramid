@@ -11,9 +11,9 @@ continual activity that can be used to represent a user's interaction
 with a web application.
 
 This chapter describes how to configure sessions, what session
-implementations :app:`Pyramid` provides out of the box, and two
-session-specific features: flash messages, and cross-site request
-forgery attack prevention.
+implementations :app:`Pyramid` provides out of the box, how to store and
+retrieve data from sessions, and two session-specific features: flash
+messages, and cross-site request forgery attack prevention.
 
 .. _using_the_default_session_factory:
 
