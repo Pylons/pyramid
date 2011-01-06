@@ -49,8 +49,6 @@ Narrative documentation in chapter form explaining how to use
    narr/assets
    narr/webob
    narr/sessions
-   narr/flash
-   narr/csrf
    narr/security
    narr/hybrid
    narr/i18n

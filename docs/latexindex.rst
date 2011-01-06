@@ -42,8 +42,6 @@ Narrative Documentation
    narr/assets
    narr/webob
    narr/sessions
-   narr/flash
-   narr/csrf
    narr/security
    narr/hybrid
    narr/i18n
