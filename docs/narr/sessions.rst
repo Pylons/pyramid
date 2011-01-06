@@ -340,6 +340,3 @@ obtained via ``session.new_csrf_token()`` as a hidden input field named
    if token != request.POST['csrf_token']:
        raise ValueError('CSRF token did not match')
 
-.. comment:: 
-   XXX Some advice on when a new csrf token should be generated would be
-   useful. At login time? When the form is generated?
