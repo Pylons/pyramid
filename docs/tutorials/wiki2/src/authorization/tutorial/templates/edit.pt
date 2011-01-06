@@ -15,10 +15,10 @@
 </head>
 <body>
 	<div id="wrap">
-		<div id="top">
-			<div class="top align-center">
+		<div id="top-small">
+			<div class="top-small align-center">
 				<div>
-					<img src="${request.static_url('tutorial:static/pyramid.png')}" width="750" height="169" alt="pyramid" />
+					<img src="${request.static_url('tutorial:static/pyramid-small.png')}" width="220" height="50" alt="pyramid" />
 				</div>
 			</div>
 		</div>

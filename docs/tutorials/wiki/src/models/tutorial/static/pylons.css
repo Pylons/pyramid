@@ -38,12 +38,13 @@ body h6{font-family:"Neuton","Lucida Grande",Lucida,Verdana,sans-serif;font-weig
 #footer{bottom:0;background:#000000 url(footerbg.png) repeat-x 0 top;position:relative;margin-top:-40px;clear:both;}
 .header,.footer{width:750px;margin-right:auto;margin-left:auto;}
 .wrapper{width:100%}
-#top,#bottom{width:100%;}
-#top{color:#000000;height:230px;
-background:#ffffff url(headerbg.png) repeat-x 0 top;position:relative;}
+#top,#top-small,#bottom{width:100%;}
+#top{color:#000000;height:230px;background:#ffffff url(headerbg.png) repeat-x 0 top;position:relative;}
+#top-small{color:#000000;height:60px;background:#ffffff url(headerbg.png) repeat-x 0 top;position:relative;}
 #bottom{color:#222;background-color:#ffffff;}
-.top,.middle,.bottom{width:750px;margin-right:auto;margin-left:auto;}
+.top,.top-snall,.middle,.bottom{width:750px;margin-right:auto;margin-left:auto;}
 .top{padding-top:40px;}
+.top-small{padding-top:10px;}
 #middle{width:100%;height:100px;background:url(middlebg.png) repeat-x;border-top:2px solid #ffffff;border-bottom:2px solid #b2b2b2;}
 .app-welcome{margin-top:25px;}
 .app-name{color:#000000;font-weight:bold;}
