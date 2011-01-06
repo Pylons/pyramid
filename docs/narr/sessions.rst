@@ -182,17 +182,17 @@ template. The user interface consists of a number of methods of the
 Using the ``session.flash`` Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To add a message to a flash message queue, use a session object's ``flash``
+To add a message to a flash message queue, use a session object's ``flash()``
 method:
 
 .. code-block:: python
 
    request.session.flash('mymessage')
 
-The ``.flash`` method appends a message to a flash queue, creating the queue
+The ``flash()`` method appends a message to a flash queue, creating the queue
 if necessary. 
 
-``.flash`` accepts three arguments:
+``flash()`` accepts three arguments:
 
 .. method:: flash(message, queue='', allow_duplicate=True)
 
@@ -200,14 +200,15 @@ The ``message`` argument is required.  It represents a message you wish to
 later display to a user.  It is usually a string but the ``message`` you
 provide is not modified in any way.
 
-The ``queue`` argument allows you to choose a queue to which to append the
-message you provide.  This can be used to push different kinds of messages
-into flash storage for later display in different places on a page.  You can
-pass any name for your queue, but it must be a string. The default value is
-the empty string, which chooses the default queue. Each queue is independent,
-and can be popped by ``pop_flash`` or examined via ``peek_flash`` separately.
-``queue`` defaults to the empty string.  The empty string represents the
-default flash message queue.
+The ``queue`` argument allows you to choose a queue to which to append
+the message you provide.  This can be used to push different kinds of
+messages into flash storage for later display in different places on a
+page.  You can pass any name for your queue, but it must be a string.
+The default value is the empty string, which chooses the default queue.
+Each queue is independent, and can be popped by ``pop_flash()`` or
+examined via ``peek_flash()`` separately.  ``queue`` defaults to the
+empty string.  The empty string represents the default flash message
+queue.
 
 .. code-block:: python
 
@@ -221,11 +222,11 @@ Using the ``session.pop_flash`` Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once one or more messages have been added to a flash queue by the
-``session.flash`` API, the ``session.pop_flash`` API can be used to pop that
-queue and return it for use.
+``session.flash()`` API, the ``session.pop_flash()`` API can be used to
+pop that queue and return it for use.
 
 To pop a particular queue of messages from the flash object, use the session
-object's ``pop_flash`` method.
+object's ``pop_flash()`` method.
 
 .. method:: pop_flash(queue='')
 
@@ -237,7 +238,7 @@ object's ``pop_flash`` method.
    ['info message']
 
 Calling ``session.pop_flash()`` again like above without a corresponding call
-to ``session.flash`` will return an empty list, because the queue has already
+to ``session.flash()`` will return an empty list, because the queue has already
 been popped.
 
 .. code-block:: python
@@ -249,15 +250,15 @@ been popped.
    >>> request.session.pop_flash()
    []
 
-The object returned from ``pop_flash`` is a list.
+The object returned from ``pop_flash()`` is a list.
 
 Using the ``session.peek_flash`` Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once one or more messages has been added to a flash queue by the
-``session.flash`` API, the ``session.peek_flash`` API can be used to "peek"
-at that queue.  Unlike ``session.pop_flash``, the queue is not popped from
-flash storage.
+``session.flash()`` API, the ``session.peek_flash()`` API can be used to
+"peek" at that queue.  Unlike ``session.pop_flash()``, the queue is not
+popped from flash storage.
 
 .. method:: peek_flash(queue='')
 
