@@ -32,7 +32,7 @@ limitation:
   representation of the session is fewer than 4000.  This is
   suitable only for very small data sets.
 
-It is, however, digitally signed, and thus its data cannot easily be
+It is digitally signed, however, and thus its data cannot easily be
 tampered with.
 
 You can configure this session factory in your :app:`Pyramid`
