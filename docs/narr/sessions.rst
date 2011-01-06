@@ -293,7 +293,7 @@ application to perform some command that requires elevated privileges.
 
 You can avoid most of these attacks by making sure that the correct *CSRF
 token* has been set in an :app:`Pyramid` session object before performing any
-actions in code which requires elevated privileges and is invoked via a form
+actions in code which requires elevated privileges that is invoked via a form
 post.  To use CSRF token support, you must enable a :term:`session factory`
 as described in :ref:`using_the_default_session_factory` or
 :ref:`using_alternate_session_factories`.
