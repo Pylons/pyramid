@@ -28,11 +28,7 @@
 					Editing <b><span tal:replace="page.__name__">Page Name Goes Here</span></b><br/>
 					You can return to the <a href="${request.application_url}">FrontPage</a>.<br/>
 				</div>
-				<div id="right" class="app-welcome align-right">
-					<span tal:condition="logged_in">
-  						<a href="${request.application_url}/logout">Logout</a>
-					</span>
-				</div>
+				<div id="right" class="app-welcome align-right"></div>
 			</div>
 		</div>
 		<div id="bottom">
