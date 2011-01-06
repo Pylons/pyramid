@@ -18,7 +18,7 @@ On Windows:
 
 .. code-block:: text
 
-   c:\bigfntut> ..\Scripts\python setup.py sdist
+   c:\pyramidtut> ..\Scripts\python setup.py sdist
 
 .. warning:: If your project files are not checked in to a version
    control repository (such as Subversion), the dist tarball will
