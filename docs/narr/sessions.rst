@@ -113,7 +113,7 @@ documentation.
 Some gotchas:
 
 - Keys and values of session data must be *pickleable*.  This means,
-  typically, that they must be instances of basic types of objects,
+  typically, that they are instances of basic types of objects,
   such as strings, lists, dictionaries, tuples, integers, etc.  If you
   place an object in a session data key or value that is not
   pickleable, an error will be raised when the session is serialized.
