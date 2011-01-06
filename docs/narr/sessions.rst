@@ -186,7 +186,6 @@ To add a message to a flash message queue, use a session object's ``flash``
 method:
 
 .. code-block:: python
-   :linenos:
 
    request.session.flash('mymessage')
 
