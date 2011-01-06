@@ -45,13 +45,13 @@ Preparation, UNIX
 
    .. code-block:: text
 
-      $ path/to/my/Python-2.6/bin/virtualenv --no-site-packages bigfntut
+      $ path/to/my/Python-2.6/bin/virtualenv --no-site-packages pyramidtut
 
-#. Switch to the ``bigfntut`` directory:
+#. Switch to the ``pyramidtut`` directory:
 
    .. code-block:: text
 
-      $ cd bigfntut
+      $ cd pyramidtut
 
 #. (Optional) Consider using ``source bin/activate`` to make your
    shell environment wired to use the virtualenv.
@@ -96,13 +96,13 @@ Preparation, Windows
 
    .. code-block:: text
 
-      c:\> c:\Python26\Scripts\virtualenv --no-site-packages bigfntut
+      c:\> c:\Python26\Scripts\virtualenv --no-site-packages pyramidtut
 
-#. Switch to the ``bigfntut`` directory:
+#. Switch to the ``pyramidtut`` directory:
 
    .. code-block:: text
 
-      c:\> cd bigfntut
+      c:\> cd pyramidtut
 
 #. (Optional) Consider using ``bin\activate.bat`` to make your shell
    environment wired to use the virtualenv.
@@ -112,13 +112,13 @@ Preparation, Windows
 
    .. code-block:: text
 
-      c:\bigfntut> Scripts\easy_install pyramid
+      c:\pyramidtut> Scripts\easy_install pyramid
 
 #. Use ``easy_install`` to install various packages from PyPI.
 
    .. code-block:: text
 
-      c:\bigfntut> Scripts\easy_install -i docutils \
+      c:\pyramidtut> Scripts\easy_install -i docutils \
                nose coverage zope.sqlalchemy SQLAlchemy repoze.tm2
 
 
@@ -133,7 +133,7 @@ variety of templates to generate sample projects.  We will use the
 that uses :term:`SQLAlchemy` and :term:`URL dispatch`.
 
 The below instructions assume your current working directory is the
-"virtualenv" named "bigfntut".
+"virtualenv" named "pyramidtut".
 
 On UNIX:
 
@@ -145,7 +145,7 @@ On Windows:
 
 .. code-block:: text
 
-   c:\bigfntut> Scripts\paster create -t pyramid_routesalchemy tutorial
+   c:\pyramidtut> Scripts\paster create -t pyramid_routesalchemy tutorial
 
 .. note:: If you are using Windows, the ``pyramid_routesalchemy``
    Paster template may not deal gracefully with installation into a
@@ -173,8 +173,8 @@ On Windows:
 
 .. code-block:: text
 
-   c:\bigfntut> cd tutorial
-   c:\bigfntut\tutorial> ..\Scripts\python setup.py develop
+   c:\pyramidtut> cd tutorial
+   c:\pyramidtut\tutorial> ..\Scripts\python setup.py develop
 
 .. _sql_running_tests:
 
@@ -194,7 +194,7 @@ On Windows:
 
 .. code-block:: text
 
-   c:\bigfntut\tutorial> ..\Scripts\python setup.py test -q
+   c:\pyramidtut\tutorial> ..\Scripts\python setup.py test -q
 
 Starting the Application
 ========================
@@ -211,7 +211,7 @@ On Windows:
 
 .. code-block:: text
 
-   c:\bifgfntut\tutorial> ..\Scripts\paster serve development.ini --reload
+   c:\pyramidtut\tutorial> ..\Scripts\paster serve development.ini --reload
 
 Exposing Test Coverage Information
 ==================================
@@ -235,7 +235,7 @@ On Windows:
 
 .. code-block:: text
 
-   c:\bigfntut\tutorial> ..\Scripts\easy_install nose coverage
+   c:\pyramidtut\tutorial> ..\Scripts\easy_install nose coverage
 
 Once ``nose`` and ``coverage`` are installed, we can actually run the
 coverage tests.
@@ -250,7 +250,7 @@ On Windows:
 
 .. code-block:: text
 
-   c:\bigfntut\tutorial> ..\Scripts\nosetests --cover-package=tutorial \
+   c:\pyramidtut\tutorial> ..\Scripts\nosetests --cover-package=tutorial \
          --cover-erase --with-coverage
 
 Looks like our package's ``models`` module doesn't quite have 100%

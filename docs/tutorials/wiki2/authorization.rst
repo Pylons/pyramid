@@ -202,7 +202,6 @@ Add a ``login.pt`` template to your templates directory.  It's
 referred to within the login view we just added to ``login.py``.
 
 .. literalinclude:: src/authorization/tutorial/templates/login.pt
-   :linenos:
    :language: xml
 
 Change ``view.pt`` and ``edit.pt``
@@ -212,11 +211,10 @@ We'll also need to change our ``edit.pt`` and ``view.pt`` templates to
 display a "Logout" link if someone is logged in.  This link will
 invoke the logout view.
 
-To do so we'll add this to both templates within the ``<div
-class="main_content">`` div:
+To do so we'll add this to both templates within the ``<div id="right"
+class="app-welcome align-right">`` div:
 
 .. code-block:: xml
-   :linenos:
 
    <span tal:condition="logged_in">
       <a href="${request.application_url}/logout">Logout</a>
@@ -261,13 +259,11 @@ Our ``views.py`` module will look something like this when we're done:
 Our ``edit.pt`` template will look something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.pt
-   :linenos:
    :language: xml
 
 Our ``view.pt`` template will look something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/view.pt
-   :linenos:
    :language: xml
 
 Revisiting the Application

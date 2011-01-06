@@ -163,7 +163,7 @@ On Windows:
 
 .. code-block::  text
 
-   c:\bigfntut\tutorial> ..\Scripts\python setup.py test -q
+   c:\pyramidtut\tutorial> ..\Scripts\python setup.py test -q
 
 The expected output is something like this:
 

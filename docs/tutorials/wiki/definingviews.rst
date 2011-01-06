@@ -230,7 +230,6 @@ Once we're done with the ``view.pt`` template, it will look a lot like
 the below:
 
 .. literalinclude:: src/views/tutorial/templates/view.pt
-   :linenos:
    :language: xml
 
 .. note:: The names available for our use in a template are always those that
@@ -257,23 +256,24 @@ Once we're done with the ``edit.pt`` template, it will look a lot like the
 below:
 
 .. literalinclude:: src/views/tutorial/templates/edit.pt
-   :linenos:
    :language: xml
 
 Static Assets
 -------------
 
-Our templates name a single static asset named ``style.css``.  We need to
-create this and place it in a file named ``style.css`` within our package's
-``static`` directory.  This file is a little too long to replicate within the
-body of this guide, however it is available `online
-<http://github.com/Pylons/pyramid/blob/master/docs/tutorials/wiki/src/views/tutorial/static/style.css>`_.
+Our templates name a single static asset named ``pylons.css``.  We don't need
+to create this file within our package's ``static`` directory because it was
+provided at the time we created the project. This file is a little too long to
+replicate within the body of this guide, however it is available `online
+<http://github.com/Pylons/pyramid/blob/master/docs/tutorials/wiki/src/views/tutorial/static/pylons.css>`_.
 
 This CSS file will be accessed via
-e.g. ``http://localhost:6543/static/style.css`` by virtue of the call to
+e.g. ``http://localhost:6543/static/pylons.css`` by virtue of the call to
 ``add_static_view`` directive we've made in the ``__init__`` file.  Any
 number and type of static assets can be placed in this directory (or
-subdirectories) and are just referred to by URL within templates.
+subdirectories) and are just referred to by URL or by using the convenience
+method ``static_url`` e.g. ``request.static_url('{{package}}:static/foo.css')``
+within templates.
 
 Testing the Views
 =================
@@ -308,7 +308,7 @@ On Windows:
 
 .. code-block:: text
 
-   c:\bigfntut\tutorial> ..\Scripts\python setup.py test -q
+   c:\pyramidtut\tutorial> ..\Scripts\python setup.py test -q
 
 The expected result looks something like:
 
