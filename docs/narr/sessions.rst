@@ -214,7 +214,7 @@ queue.
    request.session.flash(msg, 'myappsqueue')
 
 The ``allow_duplicate`` argument defaults to ``True``.  If this is
-``False``, if you attempt to add a message to a queue which is already
+``False``, and you attempt to add a message value which is already
 present in the queue, it will not be added.
 
 Using the ``session.pop_flash`` Method
