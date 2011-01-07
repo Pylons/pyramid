@@ -125,6 +125,7 @@ def action_method(wrapped):
         return result
     wrapper.__name__ = wrapped.__name__
     wrapper.__doc__ = wrapped.__doc__
+    wrapper.__docobj__ = wrapped
     return wrapper
 
 class Configurator(object):

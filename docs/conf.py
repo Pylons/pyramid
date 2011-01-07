@@ -13,6 +13,7 @@
 
 import sys, os
 import datetime
+import inspect
 import warnings
 
 warnings.simplefilter('ignore', DeprecationWarning)
@@ -407,6 +408,18 @@ def setup(app):
     app.add_directive('frontmatter', frontmatter, 1, (0, 0, 0))
     app.add_directive('mainmatter', mainmatter, 1, (0, 0, 0))
     app.add_directive('backmatter', backmatter, 1, (0, 0, 0))
+    app.connect('autodoc-process-signature', resig)
+
+def resig(app, what, name, obj, options, signature, return_annotation):
+    """ Allow for preservation of ``@action_method`` decorated methods
+    in configurator """
+    docobj = getattr(obj, '__docobj__', None)
+    if docobj is not None:
+        argspec = inspect.getargspec(docobj)
+        if argspec[0] and argspec[0][0] in ('cls', 'self'):
+            del argspec[0][0]
+        signature = inspect.formatargspec(*argspec)
+    return signature, return_annotation
 
 # turn off all line numbers in latex formatting
 
