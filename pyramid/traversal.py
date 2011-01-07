@@ -352,6 +352,9 @@ def resource_path_tuple(resource, *elements):
     """
     return tuple(_resource_path_list(resource, *elements))
 
+model_path_tuple = resource_path_tuple  # b/w compat
+
+
 def _resource_path_list(resource, *elements):
     """ Implementation detail shared by resource_path and resource_path_tuple"""
     path = [loc.__name__ or '' for loc in lineage(resource)]
