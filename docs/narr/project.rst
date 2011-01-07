@@ -180,7 +180,7 @@ Installing your Newly Created Project for Development
 To install a newly created project for development, you should ``cd`` to the
 newly created project directory and use the Python interpreter from the
 :term:`virtualenv` you created during :ref:`installing_chapter` to invoke the
-command ``python setup.py develop.py``
+command ``python setup.py develop``
 
 The file named ``setup.py`` will be in the root of the paster-generated
 project directory.  The ``python`` you're invoking should be the one that
