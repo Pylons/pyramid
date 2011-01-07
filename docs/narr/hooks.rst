@@ -581,7 +581,7 @@ follows:
            self.path = path
 
        def register(self, scanner, name, wrapped):
-           registry = get_current_registry()
+           registry = scanner.config.registry
            registry.getUtility(IMyUtility).register(
                self.path, wrapped
                )
