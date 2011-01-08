@@ -10,7 +10,7 @@ Bug Fixes
   ``<unknown>``.
 
 - The `self` argument was included in new methods of the ``ISession`` interface
-  signature, causing ``pyramid_beaker`` tests to fail (jkrebs).
+  signature, causing ``pyramid_beaker`` tests to fail.
 
 - Readd ``pyramid.traversal.model_path_tuple`` as an alias for
   ``pyramid.traversal.resource_path_tuple`` for backwards compatibility.
