@@ -11,13 +11,6 @@ Must-Have (before 1.0)
 - Re-make testing.setUp() and testing.tearDown() the canonical APIs for test
   configuration.
 
-- Document ``Configurator.set_view_mapper``.
-
-- Document ``__view_mapper__`` attribute and ``mapper`` argument to view
-  configuration for view callable view mapper preference.
-
-- ZCML directive for view mapper (or just use "utility", but it's not eager).
-
 - API docs for ``pyramid.views.action``.
 
 - Use a commit veto when configuring repoze.tm2 in paster templates for

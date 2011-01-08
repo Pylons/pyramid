@@ -541,6 +541,94 @@ The default context URL generator is available for perusal as the class
 :term:`Pylons` GitHub Pyramid repository.
 
 .. index::
+   single: view mapper
+
+Using a View Mapper
+-------------------
+
+The default calling conventions for view callables are documented in the
+:ref:`views_chapter`.  You can change the way users define view callbles by
+employing a :term:`view mapper`.
+
+A view mapper is an object that accepts a set of keyword arguments and which
+returns a callable.  The returned callable is called with the :term:`view
+callable` object.  The returned callable should itself return another
+callable which can be called with the "internal calling protocol" ``(context,
+request)``.
+
+You can use a view mapper in a number of ways:
+
+- by setting a ``__view_mapper__`` attribute (which is the view mapper
+  object) on the view callable itself
+
+- by passing the mapper object to
+  :meth:`pyramid.config.Configurator.add_view` (or its declarative/decorator
+  equivalents) as the ``mapper`` argument.
+
+- by registering a *default* view mapper.
+
+Here's an example of a view mapper that emulates (somewhat) a Pylons
+"controller".  The mapper is initialized with some keyword arguments.  Its
+``__call__`` method accepts the view object (which will be a class).  It uses
+the ``attr`` keyword argument it is passed to determine which attribute
+should be used as an action method.  The wrapper method it returns accepts
+``(context, request)`` and returns the result of calling the action method
+with keyword arguments implied by the :term:`matchdict` after popping the
+``action`` out of it.  This somewhat emulates the Pylons style of calling
+action methods with routing parameters pulled out of the route matching dict
+as keyword arguments.
+
+.. code-block:: python
+   :linenos:
+
+   # framework
+
+   class PylonsControllerViewMapper(object):
+       def __init__(self, **kw):
+           self.kw = kw
+
+       def __call__(self, view):
+           attr = self.kw['attr']
+           def wrapper(context, request):
+               matchdict = request.matchdict.copy()
+               matchdict.pop('action', None)
+               inst = view()
+               meth = getattr(inst, attr)
+               return meth(**matchdict)
+           return wrapper
+
+   class BaseController(object):
+       __view_mapper__ = PylonsControllerViewMapper
+
+A user might make use of these framework components like so:
+
+.. code-block:: python
+   :linenos:
+
+   # user application
+
+   from webob import Response
+   from pyramid.config import Configurator
+   from paste.httpserver import serve
+
+   class MyController(BaseController):
+       def index(self, id):
+           return Response(id)
+
+   if __name__ == '__main__':
+       config = Configurator()
+       config.add_handler('one', '/{id}', MyController, action='index')
+       config.add_handler('two', '/{action}/{id}', MyController)
+       serve(config.make_wsgi_app())
+
+The :meth:`pyramid.config.Configurator.set_default_mapper` method can be used
+to set a *default* view mapper (overriding the superdefault view mapper used
+by Pyramid itself).
+
+A *single* view registration can use a view mapper by passing the mapper as
+the ``mapper`` argument to :meth:`pyramid.config.Configuration.add_view`.
+
+.. index::
    single: configuration decorator
 
 .. _registering_configuration_decorators:
