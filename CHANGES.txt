@@ -113,6 +113,8 @@ Documentation
 - Merge Session Objects, Cross-Site Request Forgery, and Flash Messaging
   chapter into a single Sessions chapter.
 
+- The Wiki and Wiki2 tutorials now have much nicer CSS and graphics.
+
 Internals
 ---------
 
