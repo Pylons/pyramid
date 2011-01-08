@@ -184,7 +184,7 @@ you will reach the filesystem root directory.
   objects "by hand".  Instead, as necessary, during traversal :app:`Pyramid`
   will wrap each resource (even the root resource) in a ``LocationProxy``
   which will dynamically assign a ``__name__`` and a ``__parent__`` to the
-  traversed resrouce (based on the last traversed resource and the name
+  traversed resource (based on the last traversed resource and the name
   supplied to ``__getitem__``).  The root resource will have a ``__name__``
   attribute of ``None`` and a ``__parent__`` attribute of ``None``.
 
