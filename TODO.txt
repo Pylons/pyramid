@@ -23,6 +23,8 @@ Must-Have (before 1.0)
 
 - Document the ``request.override_renderer`` attribute.
 
+- Figure out how to slim the herd of paster templates.
+
 Should-Have
 -----------
 
