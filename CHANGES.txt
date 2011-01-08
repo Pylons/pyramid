@@ -97,6 +97,9 @@ Documentation
 - Many minor wording tweaks and refactorings (merged Casey Duncan's docs
   fork, in which he is working on general editing).
 
+- Added (weak) description of new view mapper feature to Hooks narrative
+  chapter.
+
 Internals
 ---------
 
