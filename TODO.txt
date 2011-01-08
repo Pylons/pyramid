@@ -21,6 +21,8 @@ Must-Have (before 1.0)
 
 - Add docs for ``__action_decorator__`` attr of handler.
 
+- Document the ``request.override_renderer`` attribute.
+
 Should-Have
 -----------
 
