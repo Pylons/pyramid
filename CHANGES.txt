@@ -105,6 +105,14 @@ Documentation
 - Added (weak) description of new view mapper feature to Hooks narrative
   chapter.
 
+- Split views chapter into 2: View Callables and View Configuration.
+
+- Reorder Renderers and Templates chapters after View Callables but before
+  View Configuration.
+
+- Merge Session Objects, Cross-Site Request Forgery, and Flash Messaging
+  chapter into a single Sessions chapter.
+
 Internals
 ---------
 
