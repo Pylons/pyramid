@@ -323,7 +323,7 @@ For more information about the API of a :term:`Configurator` object,
 see :class:`pyramid.config.Configurator` .
 
 For more information about :term:`view configuration`, see
-:ref:`views_chapter`.
+:ref:`view_config_chapter`.
 
 An example of using *declarative* configuration (:term:`ZCML`) instead of
 imperative configuration to create a similar "hello world" is available

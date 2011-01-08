@@ -44,12 +44,11 @@ Narrative documentation in chapter form explaining how to use
    narr/views
    narr/renderers
    narr/templates
+   narr/viewconfig
    narr/resources
    narr/assets
    narr/webob
    narr/sessions
-   narr/flash
-   narr/csrf
    narr/security
    narr/hybrid
    narr/i18n
@@ -64,6 +63,7 @@ Narrative documentation in chapter form explaining how to use
    narr/router
    narr/threadlocals
    narr/zca
+   narr/forms
 
 Tutorials
 =========

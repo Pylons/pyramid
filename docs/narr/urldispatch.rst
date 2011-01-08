@@ -26,7 +26,7 @@ specific bit of code, defined in your application, that receives the
 :term:`request` and returns a :term:`response` object.
 
 Where appropriate, we will describe how view lookup interacts with
-:term:`resource location`.  The :ref:`views_chapter` chapter describes
+:term:`resource location`.  The :ref:`view_config_chapter` chapter describes
 the details of :term:`view lookup`.
 
 High-Level Operational Overview
@@ -95,7 +95,7 @@ Route Configuration That Names a View Callable
 When a route configuration declaration names a ``view`` attribute, the value
 of the attribute will reference a :term:`view callable`.  This view callable
 will be invoked when the route matches.  A view callable, as described in
-:ref:`views_chapter`, is developer-supplied code that "does stuff" as the
+:ref:`view_chapter`, is developer-supplied code that "does stuff" as the
 result of a request.  For more information about how to create view
 callables, see :ref:`views_chapter`.
 
@@ -865,7 +865,8 @@ The ``mypackage.views`` module referred to above might look like so:
 The view has access to the matchdict directly via the request, and can access
 variables within it that match keys present as a result of the route pattern.
 
-See :ref:`views_chapter` for more information about views.
+See :ref:`views_chapter`, and :ref:`view_config_chapter` for more
+information about views.
 
 Example 2
 ~~~~~~~~~

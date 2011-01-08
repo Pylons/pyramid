@@ -83,7 +83,7 @@ name` is the empty string (`''`).
 The combination of the context resource and the :term:`view name` found
 via traversal is used later in the same request by the :term:`view
 lookup` subsystem to find a :term:`view callable`.  How :app:`Pyramid`
-performs view lookup is explained within the :ref:`views_chapter`
+performs view lookup is explained within the :ref:`view_config_chapter`
 chapter.
 
 .. index::
@@ -217,13 +217,14 @@ We'll provide a description of the algorithm, a diagram of how the algorithm
 works, and some example traversal scenarios that might help you understand
 how the algorithm operates against a specific resource tree.
 
-We'll also talk a bit about :term:`view lookup`.  The :ref:`views_chapter`
-chapter discusses :term:`view lookup` in detail, and it is the canonical
-source for information about views.  Technically, :term:`view lookup` is a
-:app:`Pyramid` subsystem that is separated from traversal entirely.  However,
-we'll describe the fundamental behavior of view lookup in the examples in the
-next few sections to give you an idea of how traversal and view lookup
-cooperate, because they are almost always used together.
+We'll also talk a bit about :term:`view lookup`.  The
+:ref:`view_config_chapter` chapter discusses :term:`view lookup` in
+detail, and it is the canonical source for information about views.
+Technically, :term:`view lookup` is a :app:`Pyramid` subsystem that is
+separated from traversal entirely.  However, we'll describe the
+fundamental behavior of view lookup in the examples in the next few
+sections to give you an idea of how traversal and view lookup cooperate,
+because they are almost always used together.
 
 .. index::
    single: view name
@@ -461,7 +462,7 @@ References
 A tutorial showing how :term:`traversal` can be used within a :app:`Pyramid`
 application exists in :ref:`bfg_wiki_tutorial`.
 
-See the :ref:`views_chapter` chapter for detailed information about
+See the :ref:`view_config_chapter` chapter for detailed information about
 :term:`view lookup`.
 
 The :mod:`pyramid.traversal` module contains API functions that deal with
