@@ -37,12 +37,11 @@ Narrative Documentation
    narr/views
    narr/renderers
    narr/templates
+   narr/viewconfig
    narr/resources
    narr/assets
    narr/webob
    narr/sessions
-   narr/flash
-   narr/csrf
    narr/security
    narr/hybrid
    narr/i18n
@@ -58,6 +57,7 @@ Narrative Documentation
    narr/startup
    narr/threadlocals
    narr/zca
+   narr/forms
 
 .. _tutorials:
 

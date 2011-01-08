@@ -112,14 +112,14 @@ Glossary
      about :app:`Pyramid` view callables.
 
    view configuration
-     View configuration is the act of associating a :term:`view
-     callable` with configuration information.  This configuration
-     information helps map a given :term:`request` to a particular view
-     callable and it can influence the response of a view callable.
-     :app:`Pyramid` views can be configured via :term:`imperative
-     configuration`, :term:`ZCML` or by a special ``@view_config``
-     decorator coupled with a :term:`scan`.  See :ref:`views_chapter`
-     for more information about view configuration.
+     View configuration is the act of associating a :term:`view callable`
+     with configuration information.  This configuration information helps
+     map a given :term:`request` to a particular view callable and it can
+     influence the response of a view callable.  :app:`Pyramid` views can be
+     configured via :term:`imperative configuration`, :term:`ZCML` or by a
+     special ``@view_config`` decorator coupled with a :term:`scan`.  See
+     :ref:`view_config_chapter` for more information about view
+     configuration.
 
    view name
      The "URL name" of a view, e.g ``index.html``.  If a view is
