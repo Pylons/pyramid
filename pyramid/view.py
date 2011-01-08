@@ -276,6 +276,9 @@ class view_config(object):
     ``False``).  The view will only be invoked if all custom
     predicates return ``True``.
 
+    See the :meth:`pyramid.config.Configurator.add_view`` method for
+    descriptions of the ``decorator`` and ``mapper`` arguments.
+
     Any individual or all parameters can be omitted.  The simplest
     :class:`pyramid.view.view_config` declaration is::
 

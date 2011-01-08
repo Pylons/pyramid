@@ -1158,12 +1158,22 @@ class Configurator(object):
 
         decorator
 
-          A function which will be used to decorate the registered
-          :term:`view callable`.  The decorator function will be called with
-          the view callable as a single argument.  The view callable it is
-          passed will accept ``(context, request)`.  The decorator must
-          return a replacement view callable which also accepts ``(context,
+          A :term:`dotted Python name` to function (or the function itself)
+          which will be used to decorate the registered :term:`view
+          callable`.  The decorator function will be called with the view
+          callable as a single argument.  The view callable it is passed will
+          accept ``(context, request)``.  The decorator must return a
+          replacement view callable which also accepts ``(context,
           request)``.
+          
+        mapper
+
+          A Python object or :term:`dotted Python name` which refers to a
+          :term:`view mapper`, or ``None``.  By default it is ``None``, which
+          indicates that the view should use the default view mapper.  This
+          plug-point is useful for Pyramid extension developers, but it's not
+          very useful for 'civilians' who are just developing stock Pyramid
+          applications. Pay no attention to the man behind the curtain.
           
         Predicate Arguments
 
@@ -1302,21 +1312,13 @@ class Configurator(object):
           ``True``, the associated view callable will be considered
           viable for a given request.
 
-        mapper
-
-          A Python object or :term:`dotted Python name` which refers to a
-          :term:`view mapper`, or ``None``.  By default it is ``None``, which
-          indicates that the view should use the default view mapper.  This
-          plug-point is useful for Pyramid extension developers, but it's not
-          very useful for 'civilians' who are just developing stock Pyramid
-          applications. Pay no attention to the man behind the curtain.
-          
         """
         view = self.maybe_dotted(view)
         context = self.maybe_dotted(context)
         for_ = self.maybe_dotted(for_)
         containment = self.maybe_dotted(containment)
         mapper = self.maybe_dotted(mapper)
+        decorator = self.maybe_dotted(decorator)
 
         if not view:
             if renderer:

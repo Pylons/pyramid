@@ -658,6 +658,22 @@ Non-Predicate Arguments
 
   If ``wrapper`` is not supplied, no wrapper view is used.
 
+``decorator``
+  A :term:`dotted Python name` to function (or the function itself) which
+  will be used to decorate the registered :term:`view callable`.  The
+  decorator function will be called with the view callable as a single
+  argument.  The view callable it is passed will accept ``(context,
+  request)``.  The decorator must return a replacement view callable which
+  also accepts ``(context, request)``.
+          
+``mapper``
+  A Python object or :term:`dotted Python name` which refers to a :term:`view
+  mapper`, or ``None``.  By default it is ``None``, which indicates that the
+  view should use the default view mapper.  This plug-point is useful for
+  Pyramid extension developers, but it's not very useful for 'civilians' who
+  are just developing stock Pyramid applications. Pay no attention to the man
+  behind the curtain.
+
 Predicate Arguments
 +++++++++++++++++++
 
