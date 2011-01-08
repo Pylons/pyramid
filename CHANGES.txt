@@ -59,10 +59,10 @@ Features
   the same result as passing ``default_view_mapper`` to the Configurator
   constructor.
 
-- ``config.add_view`` now accepts a ``view_mapper`` keyword argument, which
-  should either be ``None``, a string representing a Python dotted name, or
-  an object which is an ``IViewMapperFactory``.  This feature is not useful
-  for "civilians", only for extension writers.
+- ``config.add_view`` now accepts a ``mapper`` keyword argument, which should
+  either be ``None``, a string representing a Python dotted name, or an
+  object which is an ``IViewMapperFactory``.  This feature is not useful for
+  "civilians", only for extension writers.
 
 - Allow static renderer provided during view registration to be overridden at
   request time via a request attribute named ``override_renderer``, which
@@ -102,15 +102,15 @@ Internals
 
 - The "view derivation" code is now factored into a set of classes rather
   than a large number of standalone functions (a side effect of the
-  ``view_mapper`` refactoring).
+  view mapper refactoring).
 
 - The ``pyramid.renderer.RendererHelper`` class has grown a ``render_view``
   method, which is used by the default view mapper (a side effect of the
-  ``view_mapper`` refactoring).
+  view mapper refactoring).
 
 - The object passed as ``renderer`` to the "view deriver" is now an instance
   of ``pyramid.renderers.RendererHelper`` rather than a dictionary (a side
-  effect of ``view_mapper`` refactoring).
+  effect of view mapper refactoring).
 
 - The class used as the "page template" in ``pyramid.chameleon_text`` was
   removed, in preference to using a Chameleon-inbuilt version.

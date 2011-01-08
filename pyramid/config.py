@@ -353,9 +353,9 @@ class Configurator(object):
                      attr=None, renderer=None, wrapper_viewname=None,
                      viewname=None, accept=None, order=MAX_ORDER,
                      phash=DEFAULT_PHASH, decorator=None,
-                     view_mapper=None):
+                     mapper=None):
         view = self.maybe_dotted(view)
-        view_mapper = self.maybe_dotted(view_mapper)
+        mapper = self.maybe_dotted(mapper)
         if isinstance(renderer, basestring):
             renderer = RendererHelper(name=renderer, package=self.package,
                                       registry = self.registry)
@@ -377,7 +377,7 @@ class Configurator(object):
                               order=order,
                               phash=phash,
                               package=self.package,
-                              view_mapper=view_mapper,
+                              mapper=mapper,
                               decorator=decorator)
         
         return deriver(view)
@@ -1047,7 +1047,7 @@ class Configurator(object):
                  request_param=None, containment=None, attr=None,
                  renderer=None, wrapper=None, xhr=False, accept=None,
                  header=None, path_info=None, custom_predicates=(),
-                 context=None, decorator=None, view_mapper=None):
+                 context=None, decorator=None, mapper=None):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
         down below into *predicate* arguments and *non-predicate*
@@ -1302,7 +1302,7 @@ class Configurator(object):
           ``True``, the associated view callable will be considered
           viable for a given request.
 
-        view_mapper
+        mapper
 
           A Python object or :term:`dotted Python name` which refers to a
           :term:`view mapper`, or ``None``.  By default it is ``None``, which
@@ -1316,7 +1316,7 @@ class Configurator(object):
         context = self.maybe_dotted(context)
         for_ = self.maybe_dotted(for_)
         containment = self.maybe_dotted(containment)
-        view_mapper = self.maybe_dotted(view_mapper)
+        mapper = self.maybe_dotted(mapper)
 
         if not view:
             if renderer:
@@ -1350,7 +1350,7 @@ class Configurator(object):
                     renderer=renderer, wrapper=wrapper, xhr=xhr, accept=accept,
                     header=header, path_info=path_info,
                     custom_predicates=custom_predicates, context=context,
-                    view_mapper = view_mapper,
+                    mapper = mapper,
                     )
                 view_info = deferred_views.setdefault(route_name, [])
                 view_info.append(info)
@@ -1399,7 +1399,7 @@ class Configurator(object):
                                   order=order,
                                   phash=phash,
                                   package=self.package,
-                                  view_mapper=view_mapper,
+                                  mapper=mapper,
                                   decorator=decorator)
             derived_view = deriver(view)
 
@@ -2792,7 +2792,7 @@ class ViewDeriver(object):
 
     @wraps_view
     def mapped_view(self, view):
-        mapper = self.kw.get('view_mapper')
+        mapper = self.kw.get('mapper')
         if mapper is None:
             mapper = getattr(view, '__view_mapper__', None)
             if mapper is None:

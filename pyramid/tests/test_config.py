@@ -3799,7 +3799,7 @@ class TestViewDeriver(unittest.TestCase):
                     return 'OK'
                 return wrapped
         def view(context, request): return 'NOTOK'
-        deriver = self._makeOne(view_mapper=mapper)
+        deriver = self._makeOne(mapper=mapper)
         result = deriver(view)
         self.failIf(result is view)
         self.assertEqual(result(None, None), 'OK')

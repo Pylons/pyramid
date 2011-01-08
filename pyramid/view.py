@@ -384,7 +384,7 @@ class view_config(object):
                  containment=None, attr=None, renderer=None, wrapper=None,
                  xhr=False, accept=None, header=None, path_info=None,
                  custom_predicates=(), context=None, decorator=None,
-                 view_mapper=None):
+                 mapper=None):
         self.name = name
         self.request_type = request_type
         self.context = context or for_
@@ -402,7 +402,7 @@ class view_config(object):
         self.path_info = path_info
         self.custom_predicates = custom_predicates
         self.decorator = decorator
-        self.view_mapper = view_mapper
+        self.mapper = mapper
 
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
