@@ -178,6 +178,13 @@ class TestUnencryptedCookieSession(unittest.TestCase):
         self.assertEqual(token, 'token')
         self.failUnless('_csrft_' in session)
 
+    def test_get_csrf_token_new(self):
+        request = testing.DummyRequest()
+        session = self._makeOne(request)
+        token = session.get_csrf_token()
+        self.failUnless(token)
+        self.failUnless('_csrft_' in session)
+
 class Test_manage_accessed(unittest.TestCase):
     def _makeOne(self, wrapped):
         from pyramid.session import manage_accessed

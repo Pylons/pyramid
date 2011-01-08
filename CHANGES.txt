@@ -83,6 +83,11 @@ Backwards Incompatibilities
   when the global function named ``pyramid.security.unauthenticated_userid``
   is invoked, so if you're not invoking that, you will not notice any issues.
 
+- ``pyramid.interfaces.ISession.get_csrf_token`` now mandates that an
+  implementation should return a *new* token if one doesn't already exist in
+  the session (previously it would return None).  The internal sessioning
+  implementation has been changed.
+
 Documentation
 -------------
 

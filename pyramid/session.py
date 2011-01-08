@@ -194,7 +194,10 @@ def UnencryptedCookieSessionFactoryConfig(
 
         @manage_accessed
         def get_csrf_token(self):
-            return self.get('_csrft_', None)
+            token = self.get('_csrft_', None)
+            if token is None:
+                token = self.new_csrf_token()
+            return token
 
         # non-API methods
         def _set_cookie(self, response):

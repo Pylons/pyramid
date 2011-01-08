@@ -16,9 +16,6 @@ Must-Have (before 1.0)
 - Use a commit veto when configuring repoze.tm2 in paster templates for
   non-1X, 2X, or 3X responses.
 
-- Make ``get_csrf_token`` call ``new_csrf_token`` (session timeout is
-  probably fine for the token).
-
 - Consider passing two callables to CallbackAuthenticationPolicy: one for
   validating/obtaining the userid, the other for returning groups.
 

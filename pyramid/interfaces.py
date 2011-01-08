@@ -517,9 +517,12 @@ class ISession(Interface):
         forgery protection token.  Return the token.  It will be a string."""
 
     def get_csrf_token():
-        """ Get the CSRF token previously added to the session via
-        ``new_csrf_token``, and return the token.  If no CSRF token exists,
-        the value returned will be ``None``.
+        """ Return a random cross-site request forgery protection token.  It
+        will be a string.  If a token was previously added to the session via
+        ``new_csrf_token``, that token will be returned.  If no CSRF token
+        was previously set into the session, ``new_csrf_token`` will be
+        called, which will create and set a token, and this token will be
+        returned.
         """
 
     # mapping methods
