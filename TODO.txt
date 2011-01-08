@@ -22,6 +22,8 @@ Must-Have (before 1.0)
 - Consider passing two callables to CallbackAuthenticationPolicy: one for
   validating/obtaining the userid, the other for returning groups.
 
+- Add docs for ``__action_decorator__`` attr of handler.
+
 Should-Have
 -----------
 
