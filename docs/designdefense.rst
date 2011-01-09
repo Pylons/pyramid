@@ -700,32 +700,52 @@ built using :app:`Pyramid` as a base.  See also :ref:`apps_are_extensible`.
 Pyramid Provides Too Many "Rails"
 ---------------------------------
 
-:app:`Pyramid` provides some features that other web frameworks do
-not.  Most notably it has machinery which resolves a URL first to a
-:term:`context` before calling a view (which has the capability to
-accept the context in its argument list), and a declarative
-authorization system that makes use of this feature.  Most other web
-frameworks besides :term:`Zope`, from which the pattern was stolen,
-have no equivalent core feature.
+:app:`Pyramid` provides some features that other web frameworks do not.
+These are features meant for use cases that might not make sense to you if
+you're building a simple "bespoke" web application:
 
-We consider this an important feature for a particular class of
-applications (CMS-style applications, which the authors are often
-commissioned to write) that usually use :term:`traversal` against a
-persistent object graph.  The object graph contains security
-declarations as :term:`ACL` objects.
+- An optional way to map URLs to code using :term:`traversal` which implies a
+  walk of a :term:`resource tree`.
 
-Having context-sensitive declarative security for individual objects
-in the object graph is simply required for this class of application.
-Other frameworks save for Zope just do not have this feature.  This is
-one of the primary reasons that :app:`Pyramid` was actually
-written.
+- The ability to aggregate Pyramid application configuration from multiple
+  sources using :meth:`pyramid.config.Configurator.include`.
 
-If you don't like this, it doesn't mean you can't use
-:app:`Pyramid`.  Just ignore this feature and avoid configuring an
-authorization or authentication policy and using ACLs.  You can build
-"Pylons-1.X-style" applications using :app:`Pyramid` that use their own
-security model via decorators or plain-old-imperative logic in view
-code.
+- View and subscriber registrations made using :term:`interface` objects
+  instead of class objects (e.g. :ref:`using_resource_interfaces`).
+
+- A declarative :term:`authorization` system.
+
+- Multiple separate I18N :term:`translation string` factories, each of which
+  can name its own "domain".
+
+These features are important to the authors of :app:`Pyramid`.  The
+:app:`Pyramid` authors are often commissioned to build CMS-style
+applications.  Such applications are often "frameworky" because they have
+more than one deployment.  Each deployment requires a slightly different
+composition of sub-applications, and the framework and subapplications often
+need to be *extensible*.  Because the application has more than one
+deployment, pluggability and extensibility is important, as maintaining
+multiple forks of the application, one per deployment, is extremely
+undesirable.  Because it's easier to extend a system that uses
+:term:`traversal` "from the outside" than it is to do the same in a system
+that uses :term:`URL dispatch`, each deployment uses a :term:`resource tree`
+composed of a persistent tree of domain model objects, and uses
+:term:`traversal` to map :term:`view callable` code to resources in the tree.
+The resource tree contains very granular security declarations, as resources
+are owned and accessible by different sets of users.
+
+In a bespoke web application, usually there's a single canonical deployment,
+and therefore no possibility of multiple code forks.  Extensibility is not
+required; the code is just changed in-place.  Therefore, the features listed
+above are often overkill for such an application.
+
+If you don't like these features, it doesn't mean you can't or shouldn't use
+:app:`Pyramid`.  They are all optional, and *lots* of time has been spent
+making sure you don't need to know about them up-front.  You can build
+"Pylons-1.X-style" applications using :app:`Pyramid` that are purely bespoke
+by ignoring the features above.  You may find these features handy later
+after building a "bespoke" web application that suddenly becomes popular and
+requires extensibility because it must be deployed in multiple locations.
 
 Pyramid Is Too Big
 ------------------
