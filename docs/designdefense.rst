@@ -541,14 +541,18 @@ Pyramid Does Traversal, And I Don't Like Traversal
 
 In :app:`Pyramid`, :term:`traversal` is the act of resolving a URL path to a
 :term:`resource` object in a resource tree.  Some people are uncomfortable
-with this notion, and believe it is wrong.
+with this notion, and believe it is wrong.  Thankfully, if you use
+:app:`Pyramid`, and you don't want to model your application in terms of a
+resource tree, you needn't use it at all.  Instead, use :term:`URL dispatch`
+to map URL paths to views.
 
-This is understandable.  The people who believe it is wrong almost invariably
-have all of their data in a relational database.  Relational databases aren't
+The idea that some folks believe traversal is unilaterally "wrong" is
+understandable.  The people who believe it is wrong almost invariably have
+all of their data in a relational database.  Relational databases aren't
 naturally hierarchical, so "traversing" one like a tree is not possible.
 
-Folks who deem traversal unilaterally "wrong" are neglecting to take into
-account that many persistence mechanisms *are* hierarchical.  Examples
+However, folks who deem traversal unilaterally wrong are neglecting to take
+into account that many persistence mechanisms *are* hierarchical.  Examples
 include a filesystem, an LDAP database, a :term:`ZODB` (or another type of
 graph) database, an XML document, and the Python module namespace.  It is
 often convenient to model the frontend to a hierarchical data store as a
@@ -566,28 +570,32 @@ resource tree is an excellent way to model this, even if the backend is a
 relational database.  In this situation, the resource tree a just a site
 structure.
 
-But the point is ultimately moot.  If you use :app:`Pyramid`, and you don't
-want to model your application in terms of a resource tree, you needn't use
-it at all.  Instead, use :term:`URL dispatch` to map URL paths to views.
+Traversal also offers better composability of applications than URL dispatch,
+because it doesn't rely on a fixed ordering of URL matching.  You can compose
+a set of disparate functionality (and add to it later) around a mapping of
+view to resource more predictably than trying to get "the right" ordering of
+URL pattern matching.
+
+But the point is ultimately moot.  If you don't want to use traversal, you
+needn't.  Use URL dispatch instead.
 
 Pyramid Does URL Dispatch, And I Don't Like URL Dispatch
 --------------------------------------------------------
 
-In :app:`Pyramid`, :term:`url dispatch` is the act of resolving a
-URL path to a :term:`view` callable by performing pattern matching
-against some set of ordered route definitions.  The route definitions
-are examined in order: the first pattern which matches is used to
-associate the URL with a view callable.
+In :app:`Pyramid`, :term:`url dispatch` is the act of resolving a URL path to
+a :term:`view` callable by performing pattern matching against some set of
+ordered route definitions.  The route definitions are examined in order: the
+first pattern which matches is used to associate the URL with a view
+callable.
 
-Some people are uncomfortable with this notion, and believe it is
-wrong.  These are usually people who are steeped deeply in
-:term:`Zope`.  Zope does not provide any mechanism except
-:term:`traversal` to map code to URLs.  This is mainly because Zope
-effectively requires use of :term:`ZODB`, which is a hierarchical
-object store.  Zope also supports relational databases, but typically
-the code that calls into the database lives somewhere in the ZODB
-object graph (or at least is a :term:`view` related to a node in the
-object graph), and traversal is required to reach this code.
+Some people are uncomfortable with this notion, and believe it is wrong.
+These are usually people who are steeped deeply in :term:`Zope`.  Zope does
+not provide any mechanism except :term:`traversal` to map code to URLs.  This
+is mainly because Zope effectively requires use of :term:`ZODB`, which is a
+hierarchical object store.  Zope also supports relational databases, but
+typically the code that calls into the database lives somewhere in the ZODB
+object graph (or at least is a :term:`view` related to a node in the object
+graph), and traversal is required to reach this code.
 
 I'll argue that URL dispatch is ultimately useful, even if you want to use
 traversal as well.  You can actually *combine* URL dispatch and traversal in
@@ -604,20 +612,19 @@ present them with the default object view.  There are other tricks you can
 pull in these hybrid configurations if you're clever (and maybe masochistic)
 too.
 
-Also, if you are a URL dispatch hater, if you should ever be asked to
-write an application that must use some legacy relational database
-structure, you might find that using URL dispatch comes in handy for
-one-off associations between views and URL paths.  Sometimes it's just
-pointless to add a node to the object graph that effectively
-represents the entry point for some bit of code.  You can just use a
-route and be done with it.  If a route matches, a view associated with
-the route will be called; if no route matches, :app:`Pyramid` falls
-back to using traversal.
+Also, if you are a URL dispatch hater, if you should ever be asked to write
+an application that must use some legacy relational database structure, you
+might find that using URL dispatch comes in handy for one-off associations
+between views and URL paths.  Sometimes it's just pointless to add a node to
+the object graph that effectively represents the entry point for some bit of
+code.  You can just use a route and be done with it.  If a route matches, a
+view associated with the route will be called; if no route matches,
+:app:`Pyramid` falls back to using traversal.
 
-But the point is ultimately moot.  If you use :app:`Pyramid`, and
-you really don't want to use URL dispatch, you needn't use it at all.
-Instead, use :term:`traversal` exclusively to map URL paths to views,
-just like you do in :term:`Zope`.
+But the point is ultimately moot.  If you use :app:`Pyramid`, and you really
+don't want to use URL dispatch, you needn't use it at all.  Instead, use
+:term:`traversal` exclusively to map URL paths to views, just like you do in
+:term:`Zope`.
 
 Pyramid Views Do Not Accept Arbitrary Keyword Arguments
 -------------------------------------------------------
@@ -649,40 +656,24 @@ arguments to any method of a resource object found via traversal:
         def aview(self, a, b, c=None):
             return '%s %s %c' % (a, b, c)
 
-When this method is called as the result of being the published
-callable, the Zope request object's GET and POST namespaces are
-searched for keys which match the names of the positional and keyword
-arguments in the request, and the method is called (if possible) with
-its argument list filled with values mentioned therein.  TurboGears
-and Pylons 1.X operate similarly.
+When this method is called as the result of being the published callable, the
+Zope request object's GET and POST namespaces are searched for keys which
+match the names of the positional and keyword arguments in the request, and
+the method is called (if possible) with its argument list filled with values
+mentioned therein.  TurboGears and Pylons 1.X operate similarly.
 
-:app:`Pyramid` has neither of these features.  :mod:`pyramid`
-view callables always accept only ``context`` and ``request`` (or just
-``request``), and no other arguments.  The rationale: this argument
-specification matching done aggressively can be costly, and
-:app:`Pyramid` has performance as one of its main goals, so we've
-decided to make people obtain information by interrogating the request
-object for it in the view body instead of providing magic to do
-unpacking into the view argument list.  The feature itself also just
-seems a bit like a gimmick.  Getting the arguments you want explicitly
-from the request via getitem is not really very hard; it's certainly
-never a bottleneck for the author when he writes web apps.
+Out of the box, :app:`Pyramid` is configured to have none of these features.
+By default, :mod:`pyramid` view callables always accept only ``reqest`` and
+no other arguments.  The rationale: this argument specification matching done
+aggressively can be costly, and :app:`Pyramid` has performance as one of its
+main goals, so we've decided to make people, by default, obtain information
+by interrogating the request object within the view callable body instead of
+providing magic to do unpacking into the view argument list.
 
-It is possible to replicate the Zope-like behavior in a view callable
-decorator, however, should you badly want something like it back.  No
-such decorator currently exists.  If you'd like to create one, Google
-for "zope mapply" and adapt the function you'll find to a decorator
-that pulls the argument mapping information out of the
-``request.params`` dictionary.
-
-A similar feature could be implemented to provide the Django-like
-behavior as a decorator by wrapping the view with a decorator that
-looks in ``request.matchdict``.
-
-It's possible at some point that :app:`Pyramid` will grow some form
-of argument matching feature (it would be simple to make it an
-always-on optional feature that has no cost unless you actually use
-it) for, but currently it has none.
+However, as of :app:`Pyramid` 1.0a9, user code can influence the way view
+callables are expected to be called, making it possible to compose a system
+out of view callables which are called with arbitrary arguments.  See
+:ref:`using_a_view_mapper`.
 
 Pyramid Provides Too Few "Rails"
 --------------------------------
@@ -722,7 +713,7 @@ These features are important to the authors of :app:`Pyramid`.  The
 :app:`Pyramid` authors are often commissioned to build CMS-style
 applications.  Such applications are often "frameworky" because they have
 more than one deployment.  Each deployment requires a slightly different
-composition of sub-applications, and the framework and subapplications often
+composition of sub-applications, and the framework and sub-applications often
 need to be *extensible*.  Because the application has more than one
 deployment, pluggability and extensibility is important, as maintaining
 multiple forks of the application, one per deployment, is extremely
@@ -732,15 +723,17 @@ that uses :term:`URL dispatch`, each deployment uses a :term:`resource tree`
 composed of a persistent tree of domain model objects, and uses
 :term:`traversal` to map :term:`view callable` code to resources in the tree.
 The resource tree contains very granular security declarations, as resources
-are owned and accessible by different sets of users.
+are owned and accessible by different sets of users.  Interfaces are used to
+make unit testing and implementation substitutability easier.
 
 In a bespoke web application, usually there's a single canonical deployment,
 and therefore no possibility of multiple code forks.  Extensibility is not
-required; the code is just changed in-place.  Therefore, the features listed
-above are often overkill for such an application.
+required; the code is just changed in-place.  Security requirements are often
+less granular.  Using the features listed above will often be overkill for
+such an application.
 
 If you don't like these features, it doesn't mean you can't or shouldn't use
-:app:`Pyramid`.  They are all optional, and *lots* of time has been spent
+:app:`Pyramid`.  They are all optional, and a lot of time has been spent
 making sure you don't need to know about them up-front.  You can build
 "Pylons-1.X-style" applications using :app:`Pyramid` that are purely bespoke
 by ignoring the features above.  You may find these features handy later
