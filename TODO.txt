@@ -25,6 +25,8 @@ Must-Have (before 1.0)
 
 - Figure out how to slim the herd of paster templates.
 
+- Explain i18n in Mako and Jinja2.
+
 Should-Have
 -----------
 
