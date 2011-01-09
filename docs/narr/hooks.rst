@@ -543,6 +543,8 @@ The default context URL generator is available for perusal as the class
 .. index::
    single: view mapper
 
+.. _using_a_view_mapper:
+
 Using a View Mapper
 -------------------
 
