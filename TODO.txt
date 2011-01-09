@@ -57,6 +57,9 @@ Should-Have
 Nice-to-Have
 ------------
 
+- ``config.meta`` classmethod which adds a new method to the Configurator
+  class.
+
 - Better "Extending" chapter.
 
 - Try to make test suite pass on IronPython.
