@@ -1892,32 +1892,26 @@ class Configurator(object):
 
     # this is *not* an action method (uses caller_package)
     def scan(self, package=None, categories=None):
-        """ Scan a Python package and any of its subpackages for
-        objects marked with :term:`configuration decoration` such as
-        :class:`pyramid.view.view_config`.  Any decorated object found
-        will influence the current configuration state.
+        """Scan a Python package and any of its subpackages for objects
+        marked with :term:`configuration decoration` such as
+        :class:`pyramid.view.view_config`.  Any decorated object found will
+        influence the current configuration state.
 
-        The ``package`` argument should be a Python :term:`package` or
-        module object (or a :term:`dotted Python name` which refers to
-        such a package or module).  If ``package`` is ``None``, the
-        package of the *caller* is used.
+        The ``package`` argument should be a Python :term:`package` or module
+        object (or a :term:`dotted Python name` which refers to such a
+        package or module).  If ``package`` is ``None``, the package of the
+        *caller* is used.
 
         The ``categories`` argument, if provided, should be the
-        :term:`Venusian` 'scan categories' to use during scanning.
-        Providing this argument is not often necessary; specifying
-        scan categories is an extremely advanced usage.
+        :term:`Venusian` 'scan categories' to use during scanning.  Providing
+        this argument is not often necessary; specifying scan categories is
+        an extremely advanced usage.
 
-        By default, ``categories`` is ``None`` which will execute
-        *all* Venusian decorator callbacks including
-        :app:`Pyramid`-related decorators such as
-        :class:`pyramid.view.view_config`.  If this is not desirable
-        because the codebase has other Venusian-using decorators that
-        aren't meant to be invoked during a particular scan, use
-        ``('pyramid',)`` as a ``categories`` value to limit the execution
-        of decorator callbacks to only those registered by
-        :app:`Pyramid` itself.  Or pass a sequence of Venusian scan
-        categories as necessary (e.g. ``('pyramid', 'myframework')``) to
-        limit the decorators called to the set of categories required.
+        By default, ``categories`` is ``None`` which will execute *all*
+        Venusian decorator callbacks including :app:`Pyramid`-related
+        decorators such as :class:`pyramid.view.view_config`.  See the
+        :ref:`Venusian` documentation for more information about limiting a
+        scan by using an explicit set of categories.
         """
         package = self.maybe_dotted(package)
         if package is None: # pragma: no cover
