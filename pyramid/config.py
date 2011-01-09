@@ -1905,13 +1905,12 @@ class Configurator(object):
         The ``categories`` argument, if provided, should be the
         :term:`Venusian` 'scan categories' to use during scanning.  Providing
         this argument is not often necessary; specifying scan categories is
-        an extremely advanced usage.
-
-        By default, ``categories`` is ``None`` which will execute *all*
-        Venusian decorator callbacks including :app:`Pyramid`-related
-        decorators such as :class:`pyramid.view.view_config`.  See the
-        :ref:`Venusian` documentation for more information about limiting a
-        scan by using an explicit set of categories.
+        an extremely advanced usage.  By default, ``categories`` is ``None``
+        which will execute *all* Venusian decorator callbacks including
+        :app:`Pyramid`-related decorators such as
+        :class:`pyramid.view.view_config`.  See the :ref:`Venusian`
+        documentation for more information about limiting a scan by using an
+        explicit set of categories.
         """
         package = self.maybe_dotted(package)
         if package is None: # pragma: no cover
