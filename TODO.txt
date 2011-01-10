@@ -33,6 +33,9 @@ Must-Have (before 1.0)
   will be confused with ``name`` of ``view_config`` which means something
   else.
 
+- Consider adding a default exception view for HTTPException and attendant
+  ``redirect`` and ``abort`` functions ala Pylons.
+
 Should-Have
 -----------
 
