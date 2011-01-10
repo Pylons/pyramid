@@ -27,6 +27,8 @@ Must-Have (before 1.0)
 
 - Explain i18n in Mako and Jinja2.
 
+- Turn Forbidden into a 403.
+
 Should-Have
 -----------
 
@@ -50,6 +52,9 @@ Should-Have
 
 Nice-to-Have
 ------------
+
+- Make it possible to get at ACLDenied data from Forbidden response in
+  exceptionview.
 
 - ``config.meta`` classmethod which adds a new method to the Configurator
   class.
