@@ -295,6 +295,12 @@ class RendererHelper(object):
                 
 
     def render(self, value, system_values, request=None):
+        if request is not None and hasattr(request, 'response_renderer'):
+            renderer_name = request.response_renderer
+            del request.response_renderer
+            helper = RendererHelper(renderer_name, registry=self.registry)
+            return helper.render(value, system_values, request)
+
         renderer = self.renderer
         if system_values is None:
             system_values = {
@@ -304,7 +310,6 @@ class RendererHelper(object):
                 'context':getattr(request, 'context', None),
                 'request':request,
                 }
-
         registry = self.registry
         globals_factory = registry.queryUtility(IRendererGlobalsFactory)
 

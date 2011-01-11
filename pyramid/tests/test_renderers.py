@@ -478,6 +478,16 @@ class Test_render(unittest.TestCase):
         renderer.assert_(a=1)
         renderer.assert_(request=request)
 
+    def test_it_with_request_response_renderer(self):
+        renderer = self.config.testing_add_renderer(
+            'pyramid.tests:abc/def.pt')
+        renderer.string_response = '{"a": 1}'
+        request = testing.DummyRequest()
+        request.response_renderer = 'json'
+        result = self._callFUT('abc/def.pt',
+                               dict(a=1), request=request)
+        self.assertEqual(result, '{"a": 1}')
+
 class Test_render_to_response(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
@@ -509,7 +519,18 @@ class Test_render_to_response(unittest.TestCase):
         self.assertEqual(response.body, 'abc')
         renderer.assert_(a=1)
         renderer.assert_(request=request)
-    
+
+    def test_it_with_request_response_renderer(self):
+        renderer = self.config.testing_add_renderer(
+            'pyramid.tests:abc/def.pt')
+        request = testing.DummyRequest()
+        request.response_renderer = 'json'
+        response = self._callFUT('abc/def.pt',
+                               dict(a=1), request=request)
+        self.assertEqual(response.body, '{"a": 1}')
+        self.assertEqual(response.content_type, 'application/json')
+
+
 class Test_get_renderer(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
