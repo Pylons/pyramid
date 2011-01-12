@@ -15,9 +15,6 @@ Must-Have (before 1.0)
 - Use a commit veto when configuring repoze.tm2 in paster templates for
   non-1X, 2X, or 3X responses.
 
-- Consider passing two callables to CallbackAuthenticationPolicy: one for
-  validating/obtaining the userid, the other for returning groups.
-
 - Add docs for ``__action_decorator__`` attr of handler.
 
 - Figure out how to slim the herd of paster templates.
@@ -28,6 +25,8 @@ Must-Have (before 1.0)
 
 - Consider adding a default exception view for HTTPException and attendant
   ``redirect`` and ``abort`` functions ala Pylons.
+
+- Fix too-long template lines in tutorials for PDF renderings.
 
 Should-Have
 -----------
@@ -120,4 +119,8 @@ Nice-to-Have
 - Update App engine chapter with less creaky directions.
 
 - Add functionality that mocks the behavior of ``repoze.browserid``.
+
+- Consider implementing the API outlined in
+  http://plope.com/pyramid_auth_design_api_postmortem, phasing out the
+  current auth-n-auth abstractions in a backwards compatible way.
 
