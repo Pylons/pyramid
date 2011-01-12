@@ -6,16 +6,14 @@ Must-Have (before 1.0)
 
 - Write a "Whats New" (delta from BFG 1.3)
 
-- Consider deprecations for ``model`` and ``resource`` APIs.
-
 - API docs for ``pyramid.views.action``.  (also, @action decorator uses
   ``name`` for the method name; consider whether this will be confused with
   ``name`` of ``view_config`` which means something else)
 
+- Add docs for ``__action_decorator__`` attr of handler.
+
 - Use a commit veto when configuring repoze.tm2 in paster templates for
   non-1X, 2X, or 3X responses.
-
-- Add docs for ``__action_decorator__`` attr of handler.
 
 - Figure out how to slim the herd of paster templates.
 
@@ -49,14 +47,14 @@ Should-Have
 - Provide a response_set_cookie method on the request for rendered responses
   that can be used as input to response.set_cookie?
 
-Nice-to-Have
-------------
-
 - Make it possible to get at ACLDenied data from Forbidden response in
   exceptionview.
 
-- ``config.meta`` classmethod which adds a new method to the Configurator
-  class.
+- ``config.meta`` or ``config.extend`` classmethod which adds a new method
+  ("directive") to the Configurator class.
+
+Nice-to-Have
+------------
 
 - Better "Extending" chapter.
 

@@ -31,6 +31,17 @@ Documentation
 - Document the ``request.override_renderer`` attribute within the narrative
   "Renderers" chapter in a section named "Overriding A Renderer at Runtime".
 
+Deprecations
+------------
+
+- Deprecation warnings related to import of the following API functions were
+  added: ``pyramid.traversal.find_model``, ``pyramid.traversal.model_path``,
+  ``pyramid.traversal.model_path_tuple``, ``pyramid.url.model_url``.  The
+  instructions emitted by the deprecation warnings instruct the developer to
+  change these method spellings to their ``resource`` equivalents.  This is a
+  consequence of the mass concept rename of "model" to "resource" performed
+  in 1.0a7.
+
 1.0a9 (2011-01-08)
 ==================
 

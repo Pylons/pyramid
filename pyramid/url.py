@@ -2,6 +2,8 @@
 
 import os
 
+from zope.deprecation import deprecated
+
 from repoze.lru import lru_cache
 
 from pyramid.interfaces import IContextURL
@@ -273,8 +275,9 @@ def resource_url(resource, request, *elements, **kw):
               virtual root prefix (it will be stripped off the
               left hand side of the generated URL).
 
-    .. note:: For backwards compatibility purposes, this function can also
-       be imported as ``model_url``.
+    .. note:: For backwards compatibility purposes, this function can also be
+       imported as ``model_url``, although doing so will emit a deprecation
+       warning.
     """
     try:
         reg = request.registry
@@ -306,6 +309,12 @@ def resource_url(resource, request, *elements, **kw):
     return resource_url + suffix + qs + anchor
 
 model_url = resource_url # b/w compat (forever)
+
+deprecated(
+    'model_url',
+    'pyramid.url.model_url is deprecated as of Pyramid 1.0.  Use'
+    '``pyramid.url.resource_url`` instead (API-compat, simple '
+    'rename).')
 
 def static_url(path, request, **kw):
     """

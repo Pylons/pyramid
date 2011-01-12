@@ -2,6 +2,7 @@ import urllib
 
 from zope.interface import implements
 from zope.interface.interfaces import IInterface
+from zope.deprecation import deprecated
 
 from repoze.lru import lru_cache
 
@@ -73,7 +74,8 @@ def find_resource(resource, path):
     resolved by ``find_resource``.
 
     .. note:: For backwards compatibility purposes, this function can also
-       be imported as :func:`pyramid.traversal.find_model`.
+       be imported as :func:`pyramid.traversal.find_model`, although doing so
+       will emit a deprecation warning.
     """
     D = traverse(resource, path)
     view_name = D['view_name']
@@ -83,6 +85,12 @@ def find_resource(resource, path):
     return context
 
 find_model = find_resource # b/w compat
+
+deprecated(
+    'find_model',
+    'pyramid.traversal.find_model is deprecated as of Pyramid 1.0.  Use'
+    '``pyramid.traversal.find_resource`` instead (API-compat, simple '
+    'rename).')
 
 def find_interface(resource, class_or_interface):
     """
@@ -143,13 +151,20 @@ def resource_path(resource, *elements):
               single leading '/' character.
 
     .. note:: For backwards compatibility purposes, this function can also
-       be imported as ``model_path``.
+       be imported as ``model_path``, although doing so will cause
+       a deprecation warning to be emitted.
     """
     # joining strings is a bit expensive so we delegate to a function
     # which caches the joined result for us
     return _join_path_tuple(resource_path_tuple(resource, *elements))
 
 model_path = resource_path # b/w compat
+
+deprecated(
+    'model_path',
+    'pyramid.traversal.model_path is deprecated as of Pyramid 1.0.  Use'
+    '``pyramid.traversal.resource_path`` instead (API-compat, simple rename).')
+
 
 def traverse(resource, path):
     """Given a resource object as ``resource`` and a string or tuple
@@ -346,14 +361,20 @@ def resource_path_tuple(resource, *elements):
               its name will be the first element in the generated
               path tuple rather than the empty string.
 
-    .. note:: For backwards compatibility purposes, this function can also
-       be imported as ``model_path_tuple``.
+    .. note:: For backwards compatibility purposes, this function can also be
+       imported as ``model_path_tuple``, although doing so will cause a
+       deprecation warning to be emitted.
 
     """
     return tuple(_resource_path_list(resource, *elements))
 
 model_path_tuple = resource_path_tuple  # b/w compat
 
+deprecated(
+    'model_path_tuple',
+    'pyramid.traversal.model_path_tuple is deprecated as of Pyramid 1.0.  Use'
+    '``pyramid.traversal.resource_path_tuple`` instead (API-compat, simple '
+    'rename).')
 
 def _resource_path_list(resource, *elements):
     """ Implementation detail shared by resource_path and resource_path_tuple"""
@@ -362,7 +383,7 @@ def _resource_path_list(resource, *elements):
     path.extend(elements)
     return path
 
-_model_path_list = _resource_path_list # b/w compat
+_model_path_list = _resource_path_list # b/w compat, not an API
 
 def virtual_root(resource, request):
     """
@@ -633,7 +654,7 @@ class ResourceTreeTraverser(object):
                 'traversed':vpath_tuple, 'virtual_root':vroot,
                 'virtual_root_path':vroot_tuple, 'root':root}
 
-ModelGraphTraverser = ResourceTreeTraverser # b/w compat
+ModelGraphTraverser = ResourceTreeTraverser # b/w compat, not API, used in wild
 
 class TraversalContextURL(object):
     """ The IContextURL adapter used to generate URLs for a resource in a
