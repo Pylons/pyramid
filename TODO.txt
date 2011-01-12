@@ -15,19 +15,36 @@ Must-Have (before 1.0)
 - Use a commit veto when configuring repoze.tm2 in paster templates for
   non-1X, 2X, or 3X responses.
 
-- Figure out how to slim the herd of paster templates.
+- Figure out how to slim the herd of paster templates.  Related:
+  https://github.com/Pylons/pyramid/issues#issue/40,
+  https://github.com/Pylons/pyramid/issues#issue/42,
+  https://github.com/Pylons/pyramid/issues#issue/44,
+  https://github.com/Pylons/pyramid/issues#issue/94
+, https://github.com/Pylons/pyramid/issues#issue/95
 
-- Explain i18n in Mako and Jinja2.
+- Explain how to use i18n localization in Mako and Jinja2.
 
-- Turn Forbidden into a 403.
-
-- Consider adding a default exception view for HTTPException and attendant
-  ``redirect`` and ``abort`` functions ala Pylons.
+- Turn Forbidden status code into a 403 (it's currently a 401, which is for
+  bw compat, but is misleading).
 
 - Fix too-long template lines in tutorials for PDF renderings.
 
+- Bug in URL dispatch pattern matching:
+  https://github.com/Pylons/pyramid/issues#issue/90
+
+- Allow ``pyramid.security.remember`` to accept a list of tokens for use when
+  there's an ``auth_tkt`` authentication policy:
+  https://github.com/Pylons/pyramid/issues#issue/81 and
+  https://github.com/Pylons/pyramid/issues#issue/78
+
+- Add docs for ``route_path`` and ``route_url``, etc to Request API docs (see
+  also https://github.com/Pylons/pyramid/issues#issue/19).
+
 Should-Have
 -----------
+
+- Consider adding a default exception view for HTTPException and attendant
+  ``redirect`` and ``abort`` functions ala Pylons.
 
 - Add notes about renderer response attrs to request docs.
 
