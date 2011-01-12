@@ -165,7 +165,7 @@ class IAuthenticationPolicy(Interface):
     def unauthenticated_userid(request):
         """ Return the *unauthenticated* userid.  This method performs the
         same duty as ``authenticated_userid`` but is permitted to return the
-        userid based only on data present in the request; it neednt (and
+        userid based only on data present in the request; it needn't (and
         shouldn't) check any persistent store to ensure that the user record
         related to the request userid exists."""
 
