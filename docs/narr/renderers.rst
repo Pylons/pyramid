@@ -389,12 +389,12 @@ documentation in :ref:`request_module`.
 
 .. _adding_and_overriding_renderers:
 
-Adding and Overriding Renderers
--------------------------------
+Adding and Changing Renderers
+-----------------------------
 
 New templating systems and serializers can be associated with :app:`Pyramid`
 renderer names.  To this end, configuration declarations can be made which
-override an existing :term:`renderer factory`, and which add a new renderer
+change an existing :term:`renderer factory`, and which add a new renderer
 factory.
 
 Renderers can be registered imperatively using the
@@ -546,7 +546,7 @@ set as ``renderer=`` in the view configuration.
 See also :ref:`renderer_directive` and
 :meth:`pyramid.config.Configurator.add_renderer`.
 
-Overriding an Existing Renderer
+Changing an Existing Renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can associate more than one filename extension with the same existing
@@ -563,7 +563,7 @@ extension for the same kinds of templates.  For example, to associate the
 After you do this, :app:`Pyramid` will treat templates ending in both the
 ``.pt`` and ``.zpt`` filename extensions as Chameleon ZPT templates.
 
-To override the default mapping in which files with a ``.pt`` extension are
+To change the default mapping in which files with a ``.pt`` extension are
 rendered via a Chameleon ZPT page template renderer, use a variation on the
 following in your application's startup code:
 
@@ -585,3 +585,44 @@ the ``name`` attribute to the renderer tag:
 
    config.add_renderer(None, 'mypackage.json_renderer_factory')
 
+Overriding A Renderer At Runtime
+--------------------------------
+
+.. warning:: This is an advanced feature, not typically used by "civilians".
+
+In some circumstances, it is necessary to instruct the system to ignore the
+static renderer declaration provided by the developer in view configuration,
+replacing the renderer with another *after a request starts*.  For example,
+an "omnipresent" XML-RPC implementation that detects that the request is from
+an XML-RPC client might override a view configuration statement made by the
+user instructing the view to use a template renderer with one that uses an
+XML-RPC renderer.  This renderer would produce an XML-RPC representation of
+the data returned by an arbitrary view callable.
+
+To use this feature, create a :class:`pyramid.events.NewRequest`
+:term:`subscriber` which sniffs at the request data and which conditionally
+sets an ``override_renderer`` attribute on the request itself, which is the
+*name* of a registered renderer.  For example:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.event import subscriber
+   from pyramid.event import NewRequest
+
+   @subscriber(NewRequest)
+   def set_xmlrpc_params(event):
+       request = event.request
+       if (request.content_type == 'text/xml'
+           and request.method == 'POST'
+           and not 'soapaction' in request.headers
+           and not 'x-pyramid-avoid-xmlrpc' in request.headers):
+           params, method = parse_xmlrpc_request(request)
+           request.xmlrpc_params, request.xmlrpc_method = params, method
+           request.is_xmlrpc = True
+           request.override_renderer = 'xmlrpc'
+           return True
+
+The result of such a subscriber will be to replace any existing static
+renderer configured by the developer with a (notional, nonexistent) XML-RPC
+renderer if the request appears to come from an XML-RPC client.

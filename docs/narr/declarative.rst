@@ -1068,15 +1068,15 @@ See :ref:`aclauthorizationpolicy_directive` for detailed information.
 
 .. _zcml_adding_and_overriding_renderers:
 
-Adding and Overriding Renderers via ZCML
-----------------------------------------
+Adding and Changing Renderers via ZCML
+--------------------------------------
 
 New templating systems and serializers can be associated with :app:`Pyramid`
 renderer names.  To this end, configuration declarations can be made which
-override an existing :term:`renderer factory` and which add a new renderer
+change an existing :term:`renderer factory` and which add a new renderer
 factory.
 
-Adding or overriding a renderer via ZCML is accomplished via the
+Adding or changing an existing renderer via ZCML is accomplished via the
 :ref:`renderer_directive` ZCML directive.
 
 For example, to add a renderer which renders views which have a
@@ -1163,7 +1163,7 @@ with ``.jinja2`` as its ``renderer`` value.  The ``name`` passed to the
 See also :ref:`renderer_directive` and
 :meth:`pyramid.config.Configurator.add_renderer`.
 
-Overriding an Existing Renderer
+Changing an Existing Renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can associate more than one filename extension with the same
@@ -1184,7 +1184,7 @@ After you do this, :app:`Pyramid` will treat templates ending in
 both the ``.pt`` and ``.zpt`` filename extensions as Chameleon ZPT
 templates.
 
-To override the default mapping in which files with a ``.pt``
+To change the default mapping in which files with a ``.pt``
 extension are rendered via a Chameleon ZPT page template renderer, use
 a variation on the following in your application's ZCML:
 
@@ -1200,7 +1200,7 @@ After you do this, the :term:`renderer factory` in
 ``my.package.pt_renderer`` will be used to render templates which end
 in ``.pt``, replacing the default Chameleon ZPT renderer.
 
-To override the default mapping in which files with a ``.txt``
+To ochange the default mapping in which files with a ``.txt``
 extension are rendered via a Chameleon text template renderer, use a
 variation on the following in your application's ZCML:
 

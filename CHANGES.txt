@@ -28,6 +28,9 @@ Documentation
   ``pyramid.testing.tearDown`` instead of Configurator creation and
   ``Configurator.begin()`` and ``Configurator.end()``.
 
+- Document the ``request.override_renderer`` attribute within the narrative
+  "Renderers" chapter in a section named "Overriding A Renderer at Runtime".
+
 1.0a9 (2011-01-08)
 ==================
 
