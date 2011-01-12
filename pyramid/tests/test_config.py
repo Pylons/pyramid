@@ -3220,8 +3220,7 @@ class TestConfiguratorExtender(unittest.TestCase):
 
     def setUp(self):
         from pyramid.config import Configurator
-        class Config(Configurator): pass
-        self.config = Config()
+        self.config = Configurator()
 
     def test_extend_with_dotted_name(self):
         from pyramid import tests
@@ -3241,6 +3240,8 @@ class TestConfiguratorExtender(unittest.TestCase):
         self.assertEqual(context_after.basepath, None)
         self.assertEqual(context_after.includepath, ())
         self.failUnless(context_after is context_before)
+        self.assertEqual(len(context_before.extends), 1)
+        self.assertEqual(context_before.extends, context_after.extends)
 
     def test_extend_with_python_callable(self):
         from pyramid import tests
@@ -3260,15 +3261,24 @@ class TestConfiguratorExtender(unittest.TestCase):
         self.assertEqual(context_after.basepath, None)
         self.assertEqual(context_after.includepath, ())
         self.failUnless(context_after is context_before)
+        self.assertEqual(len(context_before.extends), 1)
+        self.assertEqual(context_before.extends, context_after.extends)
 
     def test_extend_conflict(self):
-        from pyramid import tests
         from pyramid.exceptions import ConfigurationError
         config = self.config
         context_before = config._make_context()
         config._ctx = context_before
         config.extend(dummy_extend)
         self.assertRaises(ConfigurationError, config.extend, 'pyramid.tests.dummy_extend')
+
+    def test_extend_no_conflict_with_two_instance(self):
+        from pyramid.config import Configurator
+        config = self.config
+        config.extend(dummy_extend)
+        config2 = Configurator()
+        config2.extend('pyramid.tests.dummy_extend')
+        self.failUnless(config._ctx.extends != config2._ctx.extends)
 
 class TestViewDeriver(unittest.TestCase):
     def setUp(self):

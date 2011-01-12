@@ -275,6 +275,7 @@ class Configurator(object):
                  default_permission=None,
                  session_factory=None,
                  default_view_mapper=None,
+                 extends = None,
                  autocommit=False,
                  ):
         if package is None:
@@ -302,6 +303,8 @@ class Configurator(object):
                 session_factory=session_factory,
                 default_view_mapper=default_view_mapper,
                 )
+        if extends:
+            self.extend(*extends)
 
     def _set_settings(self, mapping):
         settings = Settings(mapping or {})
@@ -425,6 +428,7 @@ class Configurator(object):
         context = PyramidConfigurationMachine()
         registerCommonDirectives(context)
         context.registry = self.registry
+        context.extends = []
         context.autocommit = autocommit
         return context
 
@@ -572,7 +576,7 @@ class Configurator(object):
             module = inspect.getmodule(c)
             spec = module.__name__ + ':' + name
             if _context.processSpec(spec):
-                if hasattr(klass, name):
+                if hasattr(self, name):
                     raise ConfigurationError(
                         "Configurator already have a method named %s" % name)
                 context = GroupingContextDecorator(_context)
@@ -580,10 +584,13 @@ class Configurator(object):
                 context.includepath = _context.includepath + (spec,)
                 context.package = package_of(module)
                 config = klass.with_context(context)
-                def extend_wrapper(*args, **kwargs):
-                    c(config, *args, **kwargs)
-                extend_wrapper.__name__ = name
-                setattr(klass, name, staticmethod(extend_wrapper))
+                wrapped = action_method(c)
+                def wrapper(*args, **kwargs):
+                    return wrapped(config, *args, **kwargs)
+                wrapper.__name__ = name
+                wrapper.__doc__ = c.__doc__
+                self.__dict__[name] = wrapper
+                context.extends.append(c)
 
     @classmethod
     def with_context(cls, context):
@@ -592,7 +599,7 @@ class Configurator(object):
         :meth:`pyramid.config.Configurator.include` to obtain a configurator
         with 'the right' context.  Returns a new Configurator instance."""
         configurator = cls(registry=context.registry, package=context.package,
-                           autocommit=context.autocommit)
+                           extends=context.extends, autocommit=context.autocommit)
         configurator._ctx = context
         return configurator
 
