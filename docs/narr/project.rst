@@ -876,9 +876,6 @@ represent the root.
 This directory contains static assets which support the ``mytemplate.pt``
 template.  It includes CSS and images.
 
-.. index::
-   single: tests.py
-
 ``templates/mytemplate.pt``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -891,6 +888,9 @@ information about renderers.
 Templates are accessed and used by view configurations and sometimes by view
 functions themselves.  See :ref:`templates_used_directly` and
 :ref:`templates_used_as_renderers`.
+
+.. index::
+   single: tests.py
 
 ``tests.py``
 ~~~~~~~~~~~~

@@ -8,10 +8,9 @@ Must-Have (before 1.0)
 
 - Consider deprecations for ``model`` and ``resource`` APIs.
 
-- Re-make testing.setUp() and testing.tearDown() the canonical APIs for test
-  configuration.
-
-- API docs for ``pyramid.views.action``.
+- API docs for ``pyramid.views.action``.  (also, @action decorator uses
+  ``name`` for the method name; consider whether this will be confused with
+  ``name`` of ``view_config`` which means something else)
 
 - Use a commit veto when configuring repoze.tm2 in paster templates for
   non-1X, 2X, or 3X responses.
@@ -28,10 +27,6 @@ Must-Have (before 1.0)
 - Explain i18n in Mako and Jinja2.
 
 - Turn Forbidden into a 403.
-
-- @action decorator uses ``name`` for the method name; consider whether this
-  will be confused with ``name`` of ``view_config`` which means something
-  else.
 
 - Consider adding a default exception view for HTTPException and attendant
   ``redirect`` and ``abort`` functions ala Pylons.

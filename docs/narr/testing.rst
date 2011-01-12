@@ -78,38 +78,43 @@ See :ref:`threadlocals_chapter` for information about these functions and the
 data structures they return.
 
 If your code uses these ``get_current_*`` functions or calls :app:`Pyramid`
-code which uses ``get_current_*`` functions, you will need to construct a
-:term:`Configurator` and call its ``begin`` method within the ``setUp``
-method of your unit test and call the same Configurator's ``end`` method
-within the ``tearDown`` method of your unit test.
+code which uses ``get_current_*`` functions, you will need to call
+:func:`pyramid.testing.setUp` in your test setup and you will need to call
+:func:`pyramid.testing.tearDown` in your test teardown.
+:func:`~pyramid.testing.setUp` pushes a registry onto the :term:`thread
+local` stack, which makes the ``get_current_*`` functions work.  It returns a
+:term:`Configurator` object which can be used to perform extra configuration
+required by the code under test.  :func:`~pyramid.testing.tearDown` pops the
+thread local stack.
 
-We'll also instruct the Configurator we use during testing to *autocommit*.
-Normally when a Configurator is used by an application, it defers performing
-any "real work" until its ``.commit`` method is called (often implicitly by
-the :meth:`pyramid.config.Configurator.make_wsgi_app` method).  Passing
-``autocommit=True`` to the Configurator constructor causes the Configurator
-to perform all actions implied by methods called on it immediately, which is
-more convenient for unit-testing purposes than needing to call
-:meth:`pyramid.config.Configurator.commit` in each test.
+Normally when a Configurator is used directly with the ``main`` block of a
+Pyramid application, it defers performing any "real work" until its
+``.commit`` method is called (often implicitly by the
+:meth:`pyramid.config.Configurator.make_wsgi_app` method).  The Configurator
+returned by :func:`~pyramid.testing.setUp` is however an *autocommitting*
+Configurator which performs all actions implied by methods called on it
+immediately.  This is more convenient for unit-testing purposes than needing
+to call :meth:`pyramid.config.Configurator.commit` in each test after adding
+extra configuration statements.
 
-The use of a Configurator and its ``begin`` and ``end`` methods allows you to
-supply each unit test method in a test case with an environment that has an
-isolated registry and an isolated request for the duration of a single test.
-Here's an example of using this feature:
+The use of the :func:`~pyramid.testing.setUp` and
+:func:`~pyramid.testing.tearDown` functions allows you to supply each unit
+test method in a test case with an environment that has an isolated registry
+and an isolated request for the duration of a single test.  Here's an example
+of using this feature:
 
 .. code-block:: python
    :linenos:
 
    import unittest
-   from pyramid.config import Configurator
+   from pyramid import testing
 
    class MyTest(unittest.TestCase):
        def setUp(self):
-           self.config = Configurator(autocommit=True)
-           self.config.begin()
+           self.config = testing.setUp()
 
        def tearDown(self):
-           self.config.end()
+           testing.tearDown()
 
 The above will make sure that
 :func:`pyramid.threadlocal.get_current_registry` will return the
@@ -118,35 +123,33 @@ instance when :func:`pyramid.threadlocal.get_current_registry` is called in a
 test case method attached to ``MyTest``.  Each test case method attached to
 ``MyTest`` will use an isolated registry.
 
-The :meth:`pyramid.config.Configurator.begin` method accepts various
-arguments that influence the code run during the test.  See the
-:ref:`configuration_module` chapter for information about the API of a
-:term:`Configurator`, including its ``begin`` and ``end`` methods.
+The :func:`~pyramid.testing.setUp` and :func:`~pyramid.testing.tearDown`
+functions accepts various arguments that influence the environment of the
+test.  See the :ref:`testing_module` chapter for information about the extra
+arguments supported by these functions.
 
 If you also want to make :func:`pyramid.get_current_request` return something
 other than ``None`` during the course of a single test, you can pass a
-:term:`request` object into the :meth:`pyramid.config.Configurator.begin`
-method of the Configurator within the ``setUp`` method of your test:
+:term:`request` object into the :func:`pyramid.testing.setUp` within the
+``setUp`` method of your test:
 
 .. code-block:: python
    :linenos:
 
    import unittest
-   from pyramid.config import Configurator
    from pyramid import testing
 
    class MyTest(unittest.TestCase):
        def setUp(self):
-           self.config = Configurator(autocommit=True)
            request = testing.DummyRequest()
-           self.config.begin(request=request)
+           self.config = testing.setUp(request=request)
 
        def tearDown(self):
-           self.config.end()
+           testing.tearDown()
 
-If you pass a :term:`request` object into the ``begin`` method of the
-configurator within your test case's ``setUp``, any test method attached to
-the ``MyTest`` test case that directly or indirectly calls
+If you pass a :term:`request` object into :func:`pyramid.testing.setUp`
+within your test case's ``setUp``, any test method attached to the ``MyTest``
+test case that directly or indirectly calls
 :func:`pyramid.threadlocal.get_current_request` will receive the request you
 passed into the ``begin`` method.  Otherwise, during testing,
 :func:`pyramid.threadlocal.get_current_request` will return ``None``.  We use
@@ -162,18 +165,18 @@ they're used by frameworks.  Sorry.  So here's a rule of thumb: if you don't
 *know* whether you're calling code that uses the
 :func:`pyramid.threadlocal.get_current_registry` or
 :func:`pyramid.threadlocal.get_current_request` functions, or you don't care
-about any of this, but you still want to write test code, just always create
-an autocommitting Configurator instance and call its ``begin`` method within
-the ``setUp`` of a unit test, then subsequently call its ``end`` method in
-the test's ``tearDown``.  This won't really hurt anything if the application
-you're testing does not call any ``get_current*`` function.
+about any of this, but you still want to write test code, just always call
+:func:`pyramid.testing.setUp` in your test's ``setUp`` method and
+:func:`pyramid.testing.tearDown` in your tests' ``tearDown`` method.  This
+won't really hurt anything if the application you're testing does not call
+any ``get_current*`` function.
 
 .. index::
    single: pyramid.testing
    single: Configurator testing API
 
 Using the ``Configurator`` and ``pyramid.testing`` APIs in Unit Tests
-------------------------------------------------------------------------
+---------------------------------------------------------------------
 
 The ``Configurator`` API and the ``pyramid.testing`` module provide a number
 of functions which can be used during unit testing.  These functions make
@@ -217,16 +220,14 @@ without needing to invoke the actual application configuration implied by its
    :linenos:
 
    import unittest
-   from pyramid.config import Configurator
    from pyramid import testing
 
    class MyTest(unittest.TestCase):
        def setUp(self):
-           self.config = Configurator(autocommit=True)
-           self.config.begin()
+           self.config = testing.setUp()
 
        def tearDown(self):
-           self.config.end()
+           testing.tearDown()
        
        def test_view_fn_not_submitted(self):
            from my.package import view_fn
@@ -277,8 +278,8 @@ performs a similar template registration and assertion.  We assert at the end
 of this that the renderer's ``say`` attribute is ``Yo``, as this is what is
 expected of the view function in the branch it's testing.
 
-Note that the test calls the :meth:`pyramid.config.Configurator.begin` method
-in its ``setUp`` method and the ``end`` method of the same in its
+Note that the test calls the :func:`pyramid.testing.setUp` function in its
+``setUp`` method and the :func:`pyramid.testing.tearDown` function in its
 ``tearDown`` method.  If you use any of the
 :class:`pyramid.config.Configurator` APIs during testing, be sure to use this
 pattern in your test case's ``setUp`` and ``tearDown``; these methods make
@@ -327,7 +328,6 @@ after accessing some values that require a fully set up environment.
 
    import unittest
 
-   from pyramid.config import Configurator
    from pyramid import testing
 
    class ViewIntegrationTests(unittest.TestCase):
@@ -337,13 +337,12 @@ after accessing some values that require a fully set up environment.
            (including dependent registrations for pyramid itself).
            """
            import myapp
-           self.config = Configurator(package=myapp, autocommit=True)
-           self.config.begin()
+           self.config = testing.setUp()
            self.config.load_zcml('myapp:configure.zcml')
 
        def tearDown(self):
            """ Clear out the application registry """
-           self.config.end()
+           testing.tearDown()
 
        def test_my_view(self):
            from myapp.views import my_view

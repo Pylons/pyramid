@@ -1,7 +1,32 @@
 Next release
 ============
 
-- ...
+Features
+--------
+
+- ``pyramid.testing.setUp`` and ``pyramid.testing.tearDown`` have been
+  undeprecated.  They are now the canonical setup and teardown APIs for test
+  configuration, replacing "direct" creation of a Configurator.  This is a
+  change designed to provide a facade that will protect against any future
+  Configurator deprecations.
+
+Paster Templates
+----------------
+
+- All paster templates now use ``pyramid.testing.setUp`` and
+  ``pyramid.testing.tearDown`` rather than creating a Configurator "by hand"
+  within their ``tests.py`` module, as per decision in features above.
+
+Documentation
+-------------
+
+- The wiki and wiki2 tutorials now use ``pyramid.testing.setUp`` and
+  ``pyramid.testing.tearDown`` rather than creating a Configurator "by hand",
+  as per decision in features above.
+
+- The "Testing" narrative chapter now explains ``pyramid.testing.setUp`` and
+  ``pyramid.testing.tearDown`` instead of Configurator creation and
+  ``Configurator.begin()`` and ``Configurator.end()``.
 
 1.0a9 (2011-01-08)
 ==================

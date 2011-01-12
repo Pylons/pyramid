@@ -668,14 +668,6 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True):
     :term:`application registry`; the same registry will be returned
     by :func:`pyramid.threadlocal.get_current_registry` during the
     execution of the test.
-
-    .. warning:: Although this method of setting up a test registry
-                 will never disappear, after :app:`Pyramid` 1.0,
-                 using the ``begin`` and ``end`` methods of a
-                 ``Configurator`` are preferred to using
-                 ``pyramid.testing.setUp`` and
-                 ``pyramid.testing.tearDown``.  See
-                 :ref:`testing_chapter` for more information.
     """
     manager.clear()
     if registry is None:
@@ -714,15 +706,6 @@ def tearDown(unhook_zca=True):
     action of :func:`pyramid.testing.setUp` called with the
     argument ``hook_zca=True``.  If :mod:`zope.component` cannot be
     imported, ignore the argument.
-
-    .. warning:: Although this method of tearing a test setup down
-                 will never disappear, after :app:`Pyramid` 1.0,
-                 using the ``begin`` and ``end`` methods of a
-                 ``Configurator`` are preferred to using
-                 ``pyramid.testing.setUp`` and
-                 ``pyramid.testing.tearDown``.  See
-                 :ref:`testing_chapter` for more information.
-
     """
     if unhook_zca:
         try:
@@ -747,9 +730,7 @@ def tearDown(unhook_zca=True):
 
 def cleanUp(*arg, **kw):
     """ :func:`pyramid.testing.cleanUp` is an alias for
-    :func:`pyramid.testing.setUp`.  Although this function is
-    effectively deprecated as of :app:`Pyramid` 1.0, due to its
-    extensive production usage, it will never be removed."""
+    :func:`pyramid.testing.setUp`. """
     return setUp(*arg, **kw)
 
 class DummyRendererFactory(object):
