@@ -3216,6 +3216,60 @@ class ConfiguratorTests(unittest.TestCase):
             for confinst in conflict:
                 yield confinst[2]
 
+class TestConfiguratorExtender(unittest.TestCase):
+
+    def setUp(self):
+        from pyramid.config import Configurator
+        class Config(Configurator): pass
+        self.config = Config()
+
+    def test_extend_with_dotted_name(self):
+        from pyramid import tests
+        config = self.config
+        context_before = config._make_context()
+        config._ctx = context_before
+        config.extend('pyramid.tests.test_config.dummy_extend')
+        self.assert_(hasattr(config, 'dummy_extend'))
+        config.dummy_extend('discrim')
+        context_after = config._ctx
+        actions = context_after.actions
+        self.assertEqual(len(actions), 1)
+        self.assertEqual(
+            context_after.actions[0][:3],
+            ('discrim', None, tests),
+            )
+        self.assertEqual(context_after.basepath, None)
+        self.assertEqual(context_after.includepath, ())
+        self.failUnless(context_after is context_before)
+
+    def test_extend_with_python_callable(self):
+        from pyramid import tests
+        config = self.config
+        context_before = config._make_context()
+        config._ctx = context_before
+        config.extend(dummy_extend)
+        self.assert_(hasattr(config, 'dummy_extend'))
+        config.dummy_extend('discrim')
+        context_after = config._ctx
+        actions = context_after.actions
+        self.assertEqual(len(actions), 1)
+        self.assertEqual(
+            context_after.actions[0][:3],
+            ('discrim', None, tests),
+            )
+        self.assertEqual(context_after.basepath, None)
+        self.assertEqual(context_after.includepath, ())
+        self.failUnless(context_after is context_before)
+
+    def test_extend_conflict(self):
+        from pyramid import tests
+        from pyramid.exceptions import ConfigurationError
+        config = self.config
+        context_before = config._make_context()
+        config._ctx = context_before
+        config.extend(dummy_extend)
+        self.assertRaises(ConfigurationError, config.extend, 'pyramid.tests.dummy_extend')
+
 class TestViewDeriver(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
@@ -4943,4 +4997,7 @@ class DummyHandler(object): # pragma: no cover
 
 def dummy_include(config):
     config.action('discrim', None, config.package)
-    
+
+def dummy_extend(config, discrim):
+    config.action(discrim, None, config.package)
+

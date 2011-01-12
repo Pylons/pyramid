@@ -558,6 +558,33 @@ class Configurator(object):
                 config = self.__class__.with_context(context)
                 c(config)
 
+    def extend(self, *callables):
+        _context = self._ctx
+        if _context is None:
+            _context = self._ctx = self._make_context(self.autocommit)
+
+        klass = self.__class__
+
+        for c in callables:
+            c = self.maybe_dotted(c)
+            name = c.__name__
+            sourcefile = inspect.getsourcefile(c)
+            module = inspect.getmodule(c)
+            spec = module.__name__ + ':' + name
+            if _context.processSpec(spec):
+                if hasattr(klass, name):
+                    raise ConfigurationError(
+                        "Configurator already have a method named %s" % name)
+                context = GroupingContextDecorator(_context)
+                context.basepath = os.path.dirname(sourcefile)
+                context.includepath = _context.includepath + (spec,)
+                context.package = package_of(module)
+                config = klass.with_context(context)
+                def extend_wrapper(*args, **kwargs):
+                    c(config, *args, **kwargs)
+                extend_wrapper.__name__ = name
+                setattr(klass, name, staticmethod(extend_wrapper))
+
     @classmethod
     def with_context(cls, context):
         """A classmethod used by ZCML directives,
