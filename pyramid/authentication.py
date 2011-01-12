@@ -243,6 +243,12 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
        Default: ``False``. Hide cookie from JavaScript by setting the
        HttpOnly flag. Not honored by all browsers.
        Optional.
+
+    ``wild_domain``
+
+       Default: ``True``. An auth_tkt cookie will be generated for the
+       wildcard domain.
+       Optional.
     """
     implements(IAuthenticationPolicy)
     def __init__(self,
