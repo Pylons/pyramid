@@ -567,8 +567,6 @@ class Configurator(object):
         if _context is None:
             _context = self._ctx = self._make_context(self.autocommit)
 
-        klass = self.__class__
-
         for c in callables:
             c = self.maybe_dotted(c)
             name = c.__name__
@@ -583,7 +581,7 @@ class Configurator(object):
                 context.basepath = os.path.dirname(sourcefile)
                 context.includepath = _context.includepath + (spec,)
                 context.package = package_of(module)
-                config = klass.with_context(context)
+                config = self.__class__.with_context(context)
                 wrapped = action_method(c)
                 def wrapper(*args, **kwargs):
                     return wrapped(config, *args, **kwargs)

@@ -3277,8 +3277,19 @@ class TestConfiguratorExtender(unittest.TestCase):
         config = self.config
         config.extend(dummy_extend)
         config2 = Configurator()
-        config2.extend('pyramid.tests.dummy_extend')
-        self.failUnless(config._ctx.extends != config2._ctx.extends)
+        config2.extend(dummy_extend)
+        self.assertEqual(config._ctx.extends, config2._ctx.extends)
+
+    def test_extend_after_with_package(self):
+        from pyramid import tests
+        config = self.config
+        context_before = config._make_context()
+        config._ctx = context_before
+        config.extend(dummy_extend)
+        config2 = config.with_package('pyramid.tests')
+        self.assert_(hasattr(config2, 'dummy_extend'))
+        self.assertEqual(len(config._ctx.extends), 1)
+        self.assertEqual(config._ctx.extends, config2._ctx.extends)
 
 class TestViewDeriver(unittest.TestCase):
     def setUp(self):
