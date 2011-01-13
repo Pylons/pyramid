@@ -88,7 +88,7 @@ HTML Version and Source Code
 ----------------------------
 
 An HTML version of this book is freely available via
-http://docs.pylonshq.com
+http://docs.pylonsproject.org
 
 The source code for the examples used in this book are available
 within the :app:`Pyramid` software distribution, always available

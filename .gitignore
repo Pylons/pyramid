@@ -4,6 +4,7 @@
 *$py.class
 *.pt.py
 *.txt.py
+*~
 .coverage
 tutorial.db
 env26/

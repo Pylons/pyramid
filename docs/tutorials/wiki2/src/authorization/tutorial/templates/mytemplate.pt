@@ -7,8 +7,7 @@
 	<meta name="description" content="pyramid web application" />
 	<link rel="shortcut icon" href="${request.static_url('tutorial:static/favicon.ico')}" />
 	<link rel="stylesheet" href="${request.static_url('tutorial:static/pylons.css')}" type="text/css" media="screen" charset="utf-8" />
-	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
-	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Neuton|Nobile:regular,i,b,bi&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
 	<!--[if lte IE 6]>
 	<link rel="stylesheet" href="${request.static_url('tutorial:static/ie6.css')}" type="text/css" media="screen" charset="utf-8" />
 	<![endif]-->
@@ -32,7 +31,7 @@
 			<div class="bottom">
 				<div id="left" class="align-right">
 					<h2>Search documentation</h2>
-					<form method="get" action="http://docs.pylonshq.com/pyramid/dev/search.html">
+					<form method="get" action="http://docs.pylonsproject.org/projects/pyramid/dev/search.html">
 		      			<input type="text" id="q" name="q" value="" />
 		      			<input type="submit" id="x" value="Go" />
 		  			</form>
@@ -41,25 +40,25 @@
 					<h2>Pyramid links</h2>
 					<ul class="links">
 						<li>
-							<a href="http://pylonshq.com">Pylons Website</a>
+							<a href="http://pylonsproject.org">Pylons Website</a>
 						</li>
 						<li>
-							<a href="http://docs.pylonshq.com/pyramid/dev/#narrative-documentation">Narrative Documentation</a>
+							<a href="http://docs.pylonsproject.org/projects/pyramid/dev/#narrative-documentation">Narrative Documentation</a>
 						</li>
 						<li>
-							<a href="http://docs.pylonshq.com/pyramid/dev/#api-documentation">API Documentation</a>
+							<a href="http://docs.pylonsproject.org/projects/pyramid/dev/#api-documentation">API Documentation</a>
 						</li>
 						<li>
-							<a href="http://docs.pylonshq.com/pyramid/dev/#tutorials">Tutorials</a>
+							<a href="http://docs.pylonsproject.org/projects/pyramid/dev/#tutorials">Tutorials</a>
 						</li>
 						<li>
-							<a href="http://docs.pylonshq.com/pyramid/dev/#change-history">Change History</a>
+							<a href="http://docs.pylonsproject.org/projects/pyramid/dev/#change-history">Change History</a>
 						</li>
 						<li>
-							<a href="http://docs.pylonshq.com/pyramid/dev/#sample-applications">Sample Applications</a>
+							<a href="http://docs.pylonsproject.org/projects/pyramid/dev/#sample-applications">Sample Applications</a>
 						</li>
 						<li>
-							<a href="http://docs.pylonshq.com/pyramid/dev/#support-and-development">Support and Development</a>
+							<a href="http://docs.pylonsproject.org/projects/pyramid/dev/#support-and-development">Support and Development</a>
 						</li>
 						<li>
 							<a href="irc://irc.freenode.net#pyramid">IRC Channel</a>

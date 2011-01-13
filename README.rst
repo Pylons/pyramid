@@ -5,7 +5,7 @@ Pyramid is a small, fast, down-to-earth, open source Python web development
 framework. It makes real-world web application development and deployment
 more fun, more predictable, and more productive.
 
-Pyramid is a `Pylons <http://docs.pylonshq.com/>`_ project, and underlies the
+Pyramid is a `Pylons <http://docs.pylonsproject.org/>`_ project, and underlies the
 newest web frameworks produced by the Pylons community.
 
 Pyramid was previously known as `repoze.bfg <http://bfg.repoze.org>`_.
@@ -13,7 +13,7 @@ Pyramid was previously known as `repoze.bfg <http://bfg.repoze.org>`_.
 Support and Documentation
 -------------------------
 
-See the `Pylons Project website <http://docs.pylonshq.com/>`_ to view
+See the `Pylons Project website <http://docs.pylonsproject.org/>`_ to view
 documentation, report bugs, and obtain support.
 
 License
