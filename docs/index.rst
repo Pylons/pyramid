@@ -6,7 +6,7 @@ The Pyramid Web Application Development Framework
 
 :app:`Pyramid` is a small, fast, down-to-earth Python web application
 development framework.  It is developed as part of the `Pylons Project
-<http://docs.pylonshq.com/>`_.  It is licensed under a `BSD-like license
+<http://docs.pylonsproject.org/>`_.  It is licensed under a `BSD-like license
 <http://repoze.org/license.html>`_.
 
 .. note::
@@ -175,7 +175,7 @@ commenting, and file uploads.  See the `KARL site
 Support and Development
 =======================
 
-The `Pylons Project web site <http://docs.pylonshq.com/>`_ is the main online
+The `Pylons Project web site <http://pylonsproject.org/>`_ is the main online
 source of :app:`Pyramid` support and development information.
 
 To report bugs, use the `issue tracker
@@ -196,7 +196,7 @@ To check out the trunk via ``git``, use this command:
 
 To find out how to become a contributor to :app:`Pyramid`, please see the
 `contributor's section of the documentation
-<http://docs.pylonshq.com/index.html#contributing>`_.
+<http://docs.pylonsproject.org/index.html#contributing>`_.
 
 Index and Glossary
 ==================

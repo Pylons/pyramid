@@ -104,7 +104,7 @@ What Is The Pylons Project?
 
 :app:`Pyramid` is a member of the collection of software published under the
 Pylons Project.  Pylons software is written by a loose-knit community of
-contributors.  The `Pylons Project website <http://docs.pylonshq.com>`_
+contributors.  The `Pylons Project website <http://docs.pylonsproject.org>`_
 includes details about how :app:`Pyramid` relates to the Pylons Project.
 
 .. index::

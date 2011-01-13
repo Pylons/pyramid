@@ -1472,7 +1472,7 @@ global*:
         # this is executed if the request method was GET or the
         # credentials were invalid    
 
-The `Pylons 1.X <http://pylonshq.com>`_ web framework uses a similar
+The `Pylons 1.X <http://pylonsproject.org>`_ web framework uses a similar
 strategy.  It calls these things "Stacked Object Proxies", so, for purposes
 of this discussion, I'll do so as well.
 
