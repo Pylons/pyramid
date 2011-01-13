@@ -43,12 +43,12 @@ ever used a run-of-the-mill file system with folders and files.
 URL Dispatch
 ------------
 
-Let's step back and consider the problem we're trying to solve, which is
-simple.  An HTTP request for a particular path has been routed to our web
-application.  The requested path will possibly invoke a specific :term:`view
-callable` function defined somewhere in our app.  We're trying to determine
-*which* callable function, if any, should be invoked for a given requested
-URL.
+Let's step back and consider the problem we're trying to solve.  An
+HTTP request for a particular path has been routed to our web
+application.  The requested path will possibly invoke a specific
+:term:`view callable` function defined somewhere in our app.  We're
+trying to determine *which* callable function, if any, should be
+invoked for a given requested URL.
 
 Many systems, including Pyramid, offer a simple solution.  They offer the
 concept of "URL matching".  URL matching approaches this problem by parsing
@@ -59,10 +59,9 @@ request path matches a specific pattern, the associated function is called.
 If the request path matches more than one pattern, some conflict resolution
 scheme is used, usually a simple order precedence so that the first match
 will take priority over any subsequent matches.  If a request path doesn't
-match any of the defined patterns, :app:`Pyramid` a "404 Not Found" response
-is returned.
+match any of the defined patterns, a "404 Not Found" response is returned.
 
-In Pyramid, we offer an implementation of URL mapping which we call
+In Pyramid, we offer an implementation of URL matching which we call
 :term:`URL dispatch`.  Using :app:`Pyramid` syntax, we might have a match
 pattern such as ``/{userid}/photos/{photoid}``, mapped to a ``photo_view()``
 function defined somewhere in our code.  Then a request for a path such as
@@ -115,7 +114,7 @@ then you understand view lookup.
 
 The major difference between file system lookup and traversal is that a file
 system lookup steps through nested directories and files in a file system
-tree, while traversal steps through nested dictionary-type objects in an
+tree, while traversal steps through nested dictionary-type objects in a
 :term:`resource tree`.  Let's take a detailed look at one of our example
 paths, so we can see what I mean:
 
@@ -123,7 +122,7 @@ The path ``/joeschmoe/photos/photo1``, has four segments: ``/``,
 ``joeschmoe``, ``photos`` and ``photo1``.  With file system lookup we might
 have a root folder (``/``) containing a nested folder (``joeschmoe``), which
 contains another nested folder (``photos``), which finally contains a JPG
-file ("photo1").  With traversal, we instead have a dictionary-like root
+file (``photo1``).  With traversal, we instead have a dictionary-like root
 object.  Asking for the ``joeschmoe`` key gives us another dictionary-like
 object.  Asking this in turn for the ``photos`` key gives us yet another
 mapping object, which finally (hopefully) contains the resource that we're
@@ -154,9 +153,9 @@ Since :app:`Pyramid` is not a highly opinionated framework, it makes no
 restriction on how a :term:`resource` is implemented; a developer can
 implement them as he wishes.  One common pattern used is to persist all of
 the resources, including the root, in a database as a graph.  The root object
-is a dictionarylike object.  Dictionarylike objects in Python supply a
+is a dictionary-like object.  Dictionary-like objects in Python supply a
 ``__getitem__`` method which is called when key lookup is done.  Under the
-hood, when ``adict`` is a dictionarylike object, Python translates
+hood, when ``adict`` is a dictionary-like object, Python translates
 ``adict['a']`` to ``adict.__getitem__('a')``.  Try doing this in a Python
 interpreter prompt if you don't believe us:
 
@@ -174,7 +173,7 @@ interpreter prompt if you don't believe us:
    1
 
 
-The dictionarylike root object stores the ids of all of its subresources as
+The dictionary-like root object stores the ids of all of its subresources as
 keys, and provides a ``__getitem__`` implementation that fetches them.  So
 ``get_root()`` fetches the unique root object, while
 ``get_root()['joeschmoe']`` returns a different object, also stored in the
@@ -185,12 +184,13 @@ days, or anywhere else, it doesn't matter.  As long as the returned objects
 provide the dictionary-like API (i.e. as long as they have an appropriately
 implemented ``__getitem__`` method) then traversal will work.
 
-In fact, you don't need a "database" at all.  You could trivially implement a
-set of objects with ``__getitem__`` methods that search for files in specific
-directories, and thus precisely recreate the older mechanism of having the
-URL path mapped directly to a folder structure on the file system.  Or you
-could use plain dictionaries too.  Traversal is in fact a superset of file
-system lookup.
+In fact, you don't need a "database" at all.  You could use plain
+dictionaries, with your site's URL structure hard-coded directly in
+the Python source.  Or you could trivially implement a set of objects
+with ``__getitem__`` methods that search for files in specific
+directories, and thus precisely recreate the traditional mechanism of
+having the URL path mapped directly to a folder structure on the file
+system.  Traversal is in fact a superset of file system lookup.
 
 .. note:: See the chapter entitled :ref:`resources_chapter` for a more
    technical overview of resources.
@@ -207,13 +207,14 @@ that you might want to take after finding a :term:`resource`.  With our photo
 example, for instance, you might want to view the photo in a page, but you
 might also want to provide a way for the user to edit the photo and any
 associated metadata.  We'll call the former the ``view`` view, and the latter
-will be the ``edit`` view (Original, I know.)  :app:`Pyramid` has a
-centralized view registry where named views can be associated with specific
-resource types.  So in our example, we'll assume that we've registered
-``view`` and ``edit`` views for photo objects, and that we've specified the
-``view`` view as the default, so that ``/joeschmoe/photos/photo1/view`` and
-``/joeschmoe/photos/photo1`` are equivalent.  The edit view would sensibly be
-provided by a request for ``/joeschmoe/photos/photo1/edit``.
+will be the ``edit`` view.  (Original, I know.)  :app:`Pyramid` has a
+centralized view :term:`registry` where named views can be associated with
+specific resource types.  So in our example, we'll assume that we've
+registered ``view`` and ``edit`` views for photo objects, and that we've
+specified the ``view`` view as the default, so that
+``/joeschmoe/photos/photo1/view`` and ``/joeschmoe/photos/photo1`` are
+equivalent.  The edit view would sensibly be provided by a request for
+``/joeschmoe/photos/photo1/edit``.
 
 Hopefully it's clear that the first portion of the edit view's URL path is
 going to resolve to the same resource as the non-edit version, specifically
@@ -232,15 +233,15 @@ response.
 
 You might conceptualize a request for ``/joeschmoe/photos/photo1/edit`` as
 ultimately converted into the following piece of Pythonic pseudocode::
-     
+
   context = get_root()['joeschmoe']['photos']['photo1']
   view_callable = get_view(context, 'edit')
   request.context = context
   view_callable(request)
 
 The ``get_root`` and ``get_view`` functions don't really exist.  Internally,
-:app:`Pyramid` does something more complicated.  But the example above is a
-reasonable approximation of the view lookup algorithm in pseudocode.
+:app:`Pyramid` does something more complicated.  But the example above
+is a reasonable approximation of the view lookup algorithm in pseudocode.
 
 Use Cases
 ---------
@@ -264,20 +265,18 @@ folder.  He might decide to nest folders dozens of layers deep.  How will you
 construct matching patterns that could account for every possible combination
 of paths that might develop?
 
-It's possible, but it will make for some somewhat ugly URLs.  And the
-matching patterns are going to become complex quickly as you try to handle
-all of the edge cases.
+It might be possible, but it certainly won't be easy.  The matching
+patterns are going to become complex quickly as you try to handle all
+of the edge cases.
 
-With traversal, however, it's straightforward.  If you want 20 layers of
-nesting, it's no problem.  :app:`Pyramid` will happily call ``__getitem__``
+With traversal, however, it's straightforward.  20 layers of nesting would be
+ no problem.  :app:`Pyramid` will happily call ``__getitem__``
 as many times as it needs to, until it runs out of path segments or until a
 resource raises a :exc:`KeyError`.  Each resource only needs to know how to
 fetch its immediate children, the traversal algorithm takes care of the rest.
-
-One of the key advantages of traversal is that the structure of the resource
-tree can live in the database, and not in the code. It's simple to let users
-modify the tree at runtime to set up their own personalized directory
-structures.
+Also, since the structure of the resource tree can live in the database and
+not in the code, it's simple to let users modify the tree at runtime to set
+up their own personalized "directory" structures.
 
 Another use case in which traversal shines is when there is a need to support
 a context-dependent security policy.  One example might be a document
