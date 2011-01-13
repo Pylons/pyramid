@@ -841,6 +841,35 @@ configuration that results in calling the ``show_template`` method, then
 rendering the template with ``home.mak``, and the url ``/hello/about`` will
 call the same method and render the ``about.mak`` template.
 
+Handler ``__action_decorator__`` Attribute
+++++++++++++++++++++++++++++++++++++++++++
+
+If a handler class has an ``__action_decorator__`` attribute, then the
+value of the class attribute will be passed in as the ``decorator``
+argument every time a handler action is registered as a view callable.
+This means that, like anything passed to ``add_view()`` as the
+``decorator`` argument, ``__action_decorator__`` must be a callable
+accepting a single argument.  This argument will itself be a callable
+accepting ``(context, request)`` arguments, and
+``__action_decorator__`` must return a replacement callable with the
+same call signature.
+
+Note that, since handler actions are registered as views against the
+handler class and not a handler instance, any ``__action_decorator__``
+attribute must *not* be a regular instance method.  Defining an
+``__action_decorator__`` instance method on a handler class will
+result in a :exc:`ConfigurationError`.  Instead, ``__action_decorator__``
+can be any other type of callable: a staticmethod, classmethod, function,
+or some sort of callable instance.
+
+.. note::
+
+   In a Pylons 1.0 controller, it was possible to override the ``__call__()``
+   method, which allowed a developer to "wrap" the entire action invocation,
+   with a try/except or any other arbitrary code.  In :app:`Pyramid`, this
+   can be emulated with the use of an ``__action_decorator__`` classmethod
+   on your handler class.
+
 .. index::
    single: resource interfaces
 
