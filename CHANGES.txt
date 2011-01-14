@@ -10,6 +10,9 @@ Features
   change designed to provide a facade that will protect against any future
   Configurator deprecations.
 
+- Add ``charset`` attribute to ``pyramid.testing.DummyRequest``
+  (unconditionally ``UTF-8``).
+
 Paster Templates
 ----------------
 
