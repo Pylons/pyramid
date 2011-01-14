@@ -40,6 +40,28 @@ Must-Have (before 1.0)
 - Add docs for ``route_path`` and ``route_url``, etc to Request API docs (see
   also https://github.com/Pylons/pyramid/issues#issue/19).
 
+- Deprecate ``@bfg_view``.
+
+- Reversing (context, request) in function view callable arglist produces
+  incomprehensible traceback::
+
+   def aview(request, context):
+       return {}
+
+   if __name__ == '__main__':
+       from pyramid.config import Configurator
+       from paste.httpserver import serve
+       c = Configurator()
+       c.add_view(aview, renderer='__main__:foo.pt')
+       serve(c.make_wsgi_app())
+
+   File "/home/chrism/projects/pyramid/pyramid/config.py", line 2981, in map_nonclass
+   ronly = requestonly(view, self.attr)
+   File "/home/chrism/projects/pyramid/pyramid/config.py", line 3071, in requestonly
+   if len(args) - len(defaults) == 1:
+   zope.configuration.config.ConfigurationExecutionError: <type 'exceptions.TypeError'>: object of type 'NoneType' has no len()                                    in:
+    ('reversed.py', 14, '<module>', "c.add_view(aview, renderer='__main__:foo.pt')")
+
 Should-Have
 -----------
 
