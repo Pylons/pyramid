@@ -122,3 +122,5 @@ Contributors
 - Marius Gedminas, 2010/12/31
 
 - Marcin Lulek, 2011/01/02
+
+- John Shipman, 2011/01-15
