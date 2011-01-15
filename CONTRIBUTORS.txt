@@ -123,4 +123,4 @@ Contributors
 
 - Marcin Lulek, 2011/01/02
 
-- John Shipman, 2011/01-15
+- John Shipman, 2011/01/15
