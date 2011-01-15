@@ -1,6 +1,12 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
+- URL Dispatch properly handles a '.*' or '*' appearing in a regex match
+  when used inside brackets. Resolve Issue #90.
+
 Features
 --------
 
