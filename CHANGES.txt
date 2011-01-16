@@ -19,6 +19,9 @@ Features
 - Add ``charset`` attribute to ``pyramid.testing.DummyRequest``
   (unconditionally ``UTF-8``).
 
+- Add ``add_directive`` method to configurator, which allows framework
+  extenders to add methods to the configurator (ala ZCML directives).
+
 Paster Templates
 ----------------
 
