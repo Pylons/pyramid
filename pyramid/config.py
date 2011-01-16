@@ -2,6 +2,7 @@ import inspect
 import os
 import re
 import sys
+import types
 import threading
 import traceback
 
@@ -302,6 +303,9 @@ class Configurator(object):
                 session_factory=session_factory,
                 default_view_mapper=default_view_mapper,
                 )
+        if hasattr(registry, '_directives'):
+            for name, directive in registry._directives.items():
+                self.add_directive(name, directive)
 
     def _set_settings(self, mapping):
         settings = Settings(mapping or {})
@@ -557,6 +561,30 @@ class Configurator(object):
                 context.package = package_of(module)
                 config = self.__class__.with_context(context)
                 c(config)
+
+    def add_directive(self, name, directive):
+        """
+        Add a directive method to the configurator.
+
+        Framework extenders can add directive methods to a configurator by
+        instructing their users to call ``config.add_directive('somename',
+        'some.callable')``.  This will make ``some.callable`` accessible as
+        ``config.somename``.  ``some.callable`` should be a function which
+        accepts ``config`` as a first argument, and arbitrary positional and
+        keyword arguments following.  It should use config.action as
+        necessary to perform actions.  Directive methods can then be invoked
+        like 'built-in' directives such as ``add_view``, ``add_route``, etc.
+        
+        ``add_directive`` does not participate in conflict detection, and
+        later calls to ``add_directive`` will override earlier calls.
+        """
+        c = self.maybe_dotted(directive)
+        if not hasattr(self.registry, '_directives'):
+            self.registry._directives = {}
+        self.registry._directives[name] = c
+        c = action_method(c)
+        m = types.MethodType(c, self, self.__class__)
+        setattr(self, name, m)
 
     @classmethod
     def with_context(cls, context):
