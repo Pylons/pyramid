@@ -48,8 +48,6 @@
 
      .. automethod:: add_translation_dirs
 
-     .. automethod:: add_handler
-
      .. automethod:: add_view
 
      .. automethod:: derive_view
