@@ -7,7 +7,7 @@ Security
 ========
 
 :app:`Pyramid` provides an optional declarative authorization system
-that prevents a :term:`view` from being invoked based on an
+that can prevent a :term:`view` from being invoked based on an
 :term:`authorization policy`. Before a view is invoked, the
 authorization system can use the credentials in the :term:`request`
 along with the :term:`context` resource to determine if access will be
