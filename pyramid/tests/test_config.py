@@ -3216,7 +3216,7 @@ class ConfiguratorTests(unittest.TestCase):
             for confinst in conflict:
                 yield confinst[2]
 
-class TestConfiguratorExtender(unittest.TestCase):
+class TestConfigurator_add_directive(unittest.TestCase):
 
     def setUp(self):
         from pyramid.config import Configurator
@@ -3225,9 +3225,8 @@ class TestConfiguratorExtender(unittest.TestCase):
     def test_extend_with_dotted_name(self):
         from pyramid import tests
         config = self.config
-        context_before = config._make_context()
-        config._ctx = context_before
-        config.extend('pyramid.tests.test_config.dummy_extend')
+        config.add_directive(
+            'dummy_extend', 'pyramid.tests.test_config.dummy_extend')
         self.assert_(hasattr(config, 'dummy_extend'))
         config.dummy_extend('discrim')
         context_after = config._ctx
@@ -3237,18 +3236,12 @@ class TestConfiguratorExtender(unittest.TestCase):
             context_after.actions[0][:3],
             ('discrim', None, tests),
             )
-        self.assertEqual(context_after.basepath, None)
-        self.assertEqual(context_after.includepath, ())
-        self.failUnless(context_after is context_before)
-        self.assertEqual(len(context_before.extends), 1)
-        self.assertEqual(context_before.extends, context_after.extends)
 
     def test_extend_with_python_callable(self):
         from pyramid import tests
         config = self.config
-        context_before = config._make_context()
-        config._ctx = context_before
-        config.extend(dummy_extend)
+        config.add_directive(
+            'dummy_extend', dummy_extend)
         self.assert_(hasattr(config, 'dummy_extend'))
         config.dummy_extend('discrim')
         context_after = config._ctx
@@ -3258,38 +3251,47 @@ class TestConfiguratorExtender(unittest.TestCase):
             context_after.actions[0][:3],
             ('discrim', None, tests),
             )
-        self.assertEqual(context_after.basepath, None)
-        self.assertEqual(context_after.includepath, ())
-        self.failUnless(context_after is context_before)
-        self.assertEqual(len(context_before.extends), 1)
-        self.assertEqual(context_before.extends, context_after.extends)
 
-    def test_extend_conflict(self):
-        from pyramid.exceptions import ConfigurationError
+    def test_extend_same_name_doesnt_conflict(self):
         config = self.config
-        context_before = config._make_context()
-        config._ctx = context_before
-        config.extend(dummy_extend)
-        self.assertRaises(ConfigurationError, config.extend, 'pyramid.tests.dummy_extend')
+        config.add_directive(
+            'dummy_extend', dummy_extend)
+        config.add_directive(
+            'dummy_extend', dummy_extend2)
+        self.assert_(hasattr(config, 'dummy_extend'))
+        config.dummy_extend('discrim')
+        context_after = config._ctx
+        actions = context_after.actions
+        self.assertEqual(len(actions), 1)
+        self.assertEqual(
+            context_after.actions[0][:3],
+            ('discrim', None, config.registry),
+            )
 
-    def test_extend_no_conflict_with_two_instance(self):
-        from pyramid.config import Configurator
+    def test_extend_action_method_successful(self):
+        from zope.configuration.config import ConfigurationConflictError
         config = self.config
-        config.extend(dummy_extend)
-        config2 = Configurator()
-        config2.extend(dummy_extend)
-        self.assertEqual(config._ctx.extends, config2._ctx.extends)
+        config.add_directive(
+            'dummy_extend', dummy_extend)
+        config.dummy_extend('discrim')
+        config.dummy_extend('discrim')
+        self.assertRaises(ConfigurationConflictError, config.commit)
 
-    def test_extend_after_with_package(self):
-        from pyramid import tests
+    def test_directive_persists_across_configurator_creations(self):
+        from zope.configuration.config import GroupingContextDecorator
         config = self.config
-        context_before = config._make_context()
-        config._ctx = context_before
-        config.extend(dummy_extend)
-        config2 = config.with_package('pyramid.tests')
-        self.assert_(hasattr(config2, 'dummy_extend'))
-        self.assertEqual(len(config._ctx.extends), 1)
-        self.assertEqual(config._ctx.extends, config2._ctx.extends)
+        config.add_directive('dummy_extend', dummy_extend)
+        context = config._make_context(autocommit=False)
+        context = GroupingContextDecorator(context)
+        config2 = config.with_context(context)
+        config2.dummy_extend('discrim')
+        context_after = config2._ctx
+        actions = context_after.actions
+        self.assertEqual(len(actions), 1)
+        self.assertEqual(
+            context_after.actions[0][:3],
+            ('discrim', None, config2.package),
+            )
 
 class TestViewDeriver(unittest.TestCase):
     def setUp(self):
@@ -5022,3 +5024,6 @@ def dummy_include(config):
 def dummy_extend(config, discrim):
     config.action(discrim, None, config.package)
 
+def dummy_extend2(config, discrim):
+    config.action(discrim, None, config.registry)
+    
