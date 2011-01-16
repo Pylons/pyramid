@@ -336,6 +336,14 @@ with ``reload_``). on in one fell swoop, you can use
 affect settings that do not start with ``reload_*`` such as
 ``debug_notfound``.
 
+.. note::
+   Specifying configuration settings via environment variables is generally
+   most useful during development, where you may wish to augment or
+   override the more permanent settings in the configuration file.
+   This is useful because many of the reload and debug settings may
+   have performance or security (i.e., disclosure) implications 
+   that make them undesirable in a production environment.
+
 .. index:: 
    single: reload_templates
    single: reload_assets
