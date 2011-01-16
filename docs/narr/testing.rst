@@ -118,11 +118,10 @@ of using this feature:
            testing.tearDown()
 
 The above will make sure that
-:func:`pyramid.threadlocal.get_current_registry` will return the
-:term:`application registry` associated with the ``config`` Configurator
-instance when :func:`pyramid.threadlocal.get_current_registry` is called in a
-test case method attached to ``MyTest``.  Each test case method attached to
-``MyTest`` will use an isolated registry.
+:func:`pyramid.threadlocal.get_current_registry` called within a test
+case method of ``MyTest`` will return the :term:`application registry`
+associated with the ``config`` Configurator instance.  Each test case
+method attached to ``MyTest`` will use an isolated registry.
 
 The :func:`~pyramid.testing.setUp` and :func:`~pyramid.testing.tearDown`
 functions accepts various arguments that influence the environment of the
