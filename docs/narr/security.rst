@@ -6,11 +6,12 @@
 Security
 ========
 
-:app:`Pyramid` provides an optional declarative authorization system that
-prevents a :term:`view` from being invoked when the user represented by
-credentials in the :term:`request` does not have an appropriate level of
-access when a particular resource is the :term:`context`.  Here's how it
-works at a high level:
+:app:`Pyramid` provides an optional declarative authorization system
+that prevents a :term:`view` from being invoked based on an
+:term:`authorization policy`. Before a view is invoked, the
+authorization system can use the credentials in the :term:`request`
+along with the :term:`context` resource to determine if access will be
+allowed.  Here's how it works at a high level:
 
 - A :term:`request` is generated when a user visits the application.
 
