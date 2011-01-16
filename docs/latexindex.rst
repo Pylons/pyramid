@@ -125,7 +125,6 @@ ZCML Directive Reference
    zcml/configure
    zcml/default_permission
    zcml/forbidden
-   zcml/handler
    zcml/include
    zcml/localenegotiator
    zcml/notfound
