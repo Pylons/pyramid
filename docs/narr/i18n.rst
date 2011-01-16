@@ -867,11 +867,11 @@ which itself includes an ``LC_MESSAGES`` directory.  Each
 Each ``.mo`` file represents a :term:`message catalog`, which is used
 to provide translations to your application.
 
-Adding a :term:`translation directory` registers all of its
-constituent :term:`message catalog` files (all of the ``.mo`` files
-found within all ``LC_MESSAGES`` directories within each locale
-directory in the translation directory) within your :app:`Pyramid`
-application to be available to use for translation services.
+Adding a :term:`translation directory` registers all of its constituent
+:term:`message catalog` files within your :app:`Pyramid` application to
+be available to use for translation services.  This includes all of the
+``.mo`` files found within all ``LC_MESSAGES`` directories within each
+locale directory in the translation directory.
 
 You can add a translation directory imperatively by using the
 :meth:`pyramid.config.Configurator.add_translation_dirs` during
