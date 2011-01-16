@@ -301,9 +301,6 @@ These are the methods of the configurator which provide conflict detection:
 Some other methods of the configurator also indirectly provide conflict
 detection, because they're implemented in terms of conflict-aware methods:
 
-- :meth:`~pyramid.config.Configurator.add_handler`, a frontend for
-  ``add_route`` and ``add_view``.
-
 - :meth:`~pyramid.config.Configurator.add_route` does a second type of
   conflict detection when a ``view`` parameter is passed (it calls
   ``add_view``).
@@ -404,8 +401,7 @@ used, two-phase configuration is disabled, and configuration statements must
 be ordered in dependency order.
 
 Some configuration methods, such as
-:meth:`pyramid.config.Configurator.add_route` and
-:meth:`pyramid.config.Configurator.add_handler` have internal ordering
+:meth:`pyramid.config.Configurator.add_route` have internal ordering
 constraints: they routes they imply require relative ordering.  Such ordering
 constraints are not absolved by two-phase configuration.  Routes are still
 added in configuration execution order.

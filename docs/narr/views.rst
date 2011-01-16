@@ -130,8 +130,10 @@ method expected to return a response, you can either:
   values, each pointing at a different method of the class if you'd like the
   class to represent a collection of related view callables.
 
-- treat the class as a :term:`view handler` by using it as the ``handler=``
-  argument of a call to :meth:`pyramid.config.Configurator.add_handler`.
+.. note:: A package named ``pyramid_handlers`` (available from PyPI) provides
+   an analogue of :term:`Pylons` -style "controllers", which are a special
+   kind of view class which provides more automation when your application
+   uses :term:`URL dispatch` solely.
 
 .. index::
    single: view calling convention

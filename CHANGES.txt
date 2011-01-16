@@ -25,6 +25,10 @@ Backwards Incompatibilities
 - The ``handler`` ZCML directive has been removed.  It is now a feature of
   the ``pyramid_handlers`` package.
 
+- The ``pylons_minimal``, ``pylons_basic`` and ``pylons_sqla`` paster
+  templates were removed.  Use ``pyramid_sqla`` (available from PyPI) as a
+  generic replacement for Pylons-esque development.
+
 Features
 --------
 

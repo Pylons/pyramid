@@ -121,9 +121,9 @@ ZCML ``<route>`` directive).  Views are declarations made using the
 directive).  Assets are files that are accessed by :app:`Pyramid` using the
 :term:`pkg_resources` API such as static files and templates via a
 :term:`asset specification`.  Other directives and configurator methods also
-deal in routes, views, and assets.  For example,
-:meth:`pyramid.config.Configurator.add_handler` adds a single route, and some
-number of views.
+deal in routes, views, and assets.  For example, ``add_handler`` directive of
+the ``pyramid_handlers`` package adds a single route, and some number of
+views.
 
 .. index::
    single: extending an existing application

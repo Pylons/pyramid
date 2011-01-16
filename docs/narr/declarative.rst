@@ -704,46 +704,6 @@ is the order that they appear relative to each other in the ZCML file.
 See :ref:`route_directive` for full ``route`` ZCML directive
 documentation.
 
-.. _zcml_handler_configuration:
-
-Configuring a Handler via ZCML
-------------------------------
-
-Instead of using the imperative
-:meth:`pyramid.config.Configurator.add_handler` method to add a new
-route, you can alternately use :term:`ZCML`.  :ref:`handler_directive`
-statements in a :term:`ZCML` file used by your application is a sign that
-you're using :term:`URL dispatch`.  For example, the following :term:`ZCML
-declaration` causes a route to be added to the application.
-
-.. code-block:: xml
-   :linenos:
-
-   <handler
-     route_name="myroute"
-     pattern="/prefix/{action}"
-     handler=".handlers.MyHandler"
-    />
-
-.. note::
-
-   Values prefixed with a period (``.``) within the values of ZCML attributes
-   such as the ``handler`` attribute of a ``handler`` directive mean
-   "relative to the Python package directory in which this :term:`ZCML` file
-   is stored".  So if the above ``handler`` declaration was made inside a
-   ``configure.zcml`` file that lived in the ``hello`` package, you could
-   replace the relative ``.views.MyHandler`` with the absolute
-   ``hello.views.MyHandler`` Either the relative or absolute form is
-   functionally equivalent.  It's often useful to use the relative form, in
-   case your package's name changes.  It's also shorter to type.
-
-The order that the routes attached to handlers are evaluated when declarative
-configuration is used is the order that they appear relative to each other in
-the ZCML file.
-
-See :ref:`handler_directive` for full ``handler`` ZCML directive
-documentation.
-
 .. index::
    triple: view; zcml; static resource
 

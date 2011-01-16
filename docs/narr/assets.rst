@@ -345,7 +345,7 @@ application's startup code.
 .. code-block:: python
    :linenos:
 
-   # .. every other add_route and/or add_handler declaration should come
+   # .. every other add_route declaration should come
    # before this one, as it will, by default, catch all requests
 
    config.add_route('catchall_static', '/*subpath', 'myapp.static.static_view')
