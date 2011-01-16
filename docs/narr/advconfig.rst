@@ -338,6 +338,23 @@ Instead, use :meth:`pyramid.config.Configuration.include`:
 Using ``include`` rather than calling the function directly will allow
 :ref:`automatic_conflict_resolution` to work.
 
+:meth:`pyramid.config.Configuration.include` can also accept a :term:`module`
+as an argument:
+
+.. code-block:: python
+   :linenos:
+
+   import myapp
+
+   config.include(myapp)
+
+For this to work properly, the ``myapp`` module must contain a callable with
+the special name ``includeme``, which should perform configuration (like the
+``add_routes`` callable we showed above as an example).
+
+:meth:`pyramid.config.Configuration.include` can also accept a :term:`dotted
+Python name` to a function or a module.
+
 .. note: See :ref:`the_include_tag` for a declarative alternative to
    :meth:`pyramid.config.Configurator.include`.
 
