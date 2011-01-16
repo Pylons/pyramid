@@ -12,7 +12,7 @@ credentials in the :term:`request` does not have an appropriate level of
 access when a particular resource is the :term:`context`.  Here's how it
 works at a high level:
 
-- A :term:`request` is generated when a user visits our application.
+- A :term:`request` is generated when a user visits the application.
 
 - Based on the request, a :term:`context` resource is located through
   :term:`resource location`.  A context is located differently depending on
