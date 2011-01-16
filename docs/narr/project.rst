@@ -601,7 +601,7 @@ or influencing runtime behavior of a :app:`Pyramid` application.  See
 default 'application' (although it's actually a pipeline of middleware and an
 application) run by ``paster serve`` when it is invoked against this
 configuration file.  The name ``main`` is a convention used by PasteDeploy
-signifying that it the default application.
+signifying that it is the default application.
 
 The ``[server:main]`` section of the configuration file configures a WSGI
 server which listens on TCP port 6543.  It is configured to listen on all
@@ -705,7 +705,8 @@ who want to use your application.
    be included in the tarball.  If you don't use Subversion, and instead use
    a different version control system, you may need to install a setuptools
    add-on such as ``setuptools-git`` or ``setuptools-hg`` for this behavior
-   to work properly.
+   to work properly.  Alternatively, you can specify the non-Python-source
+   files by hand in a  ``manifest template``, called ``MANIFEST.in`` by default.
 
 ``setup.cfg``
 ~~~~~~~~~~~~~
