@@ -148,14 +148,14 @@ other than ``None`` during the course of a single test, you can pass a
            testing.tearDown()
 
 If you pass a :term:`request` object into :func:`pyramid.testing.setUp`
-within your test case's ``setUp``, any test method attached to the ``MyTest``
-test case that directly or indirectly calls
-:func:`pyramid.threadlocal.get_current_request` will receive the request you
-passed into the ``begin`` method.  Otherwise, during testing,
-:func:`pyramid.threadlocal.get_current_request` will return ``None``.  We use
-a "dummy" request implementation supplied by
-:class:`pyramid.testing.DummyRequest` because it's easier to construct than a
-"real" :app:`Pyramid` request object.
+within your test case's ``setUp``, any test method attached to the
+``MyTest`` test case that directly or indirectly calls
+:func:`pyramid.threadlocal.get_current_request` will receive the request
+object.  Otherwise, during testing,
+:func:`pyramid.threadlocal.get_current_request` will return ``None``.
+We use a "dummy" request implementation supplied by
+:class:`pyramid.testing.DummyRequest` because it's easier to construct
+than a "real" :app:`Pyramid` request object.
 
 What?
 ~~~~~
