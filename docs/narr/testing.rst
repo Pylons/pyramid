@@ -87,14 +87,15 @@ local` stack, which makes the ``get_current_*`` functions work.  It returns a
 required by the code under test.  :func:`~pyramid.testing.tearDown` pops the
 thread local stack.
 
-Normally when a Configurator is used directly with the ``main`` block of a
-Pyramid application, it defers performing any "real work" until its
+Normally when a Configurator is used directly with the ``main`` block of
+a Pyramid application, it defers performing any "real work" until its
 ``.commit`` method is called (often implicitly by the
-:meth:`pyramid.config.Configurator.make_wsgi_app` method).  The Configurator
-returned by :func:`~pyramid.testing.setUp` is however an *autocommitting*
-Configurator which performs all actions implied by methods called on it
-immediately.  This is more convenient for unit-testing purposes than needing
-to call :meth:`pyramid.config.Configurator.commit` in each test after adding
+:meth:`pyramid.config.Configurator.make_wsgi_app` method).  The
+Configurator returned by :func:`~pyramid.testing.setUp` is an
+*autocommitting* Configurator, however, which performs all actions
+implied by methods called on it immediately.  This is more convenient
+for unit-testing purposes than needing to call
+:meth:`pyramid.config.Configurator.commit` in each test after adding
 extra configuration statements.
 
 The use of the :func:`~pyramid.testing.setUp` and
