@@ -258,6 +258,7 @@ below:
 
 .. literalinclude:: src/views/tutorial/templates/edit.pt
    :language: xml
+   :tab-width: 2
 
 Static Assets
 -------------
