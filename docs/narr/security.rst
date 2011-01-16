@@ -179,8 +179,8 @@ to invoke the ``blog_entry_add_view`` view.  If he does not, the
 Setting a Default Permission
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If a permission is not supplied to a view configuration, the
-registered view always be executable by entirely anonymous users: any
+If a permission is not supplied to a view configuration, the registered
+view will always be executable by entirely anonymous users: any
 authorization policy in effect is ignored.
 
 In support of making it easier to configure applications which are
