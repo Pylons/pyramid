@@ -133,6 +133,11 @@ method expected to return a response, you can either:
 - treat the class as a :term:`view handler` by using it as the ``handler=``
   argument of a call to :meth:`pyramid.config.Configurator.add_handler`.
 
+.. note::
+   You can also create :term:`view handler` classes that define
+   multiple view callables similar to "controllers" in Pylons 1.0. See
+   the :ref:`handlers_chapter` chapter for details.
+
 .. index::
    single: view calling convention
 
