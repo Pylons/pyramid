@@ -162,8 +162,7 @@ def get_localizer(request):
 
     if localizer is None:
         # no localizer utility registered yet
-        translations = Translations()
-        translations._catalog = {}
+        translations_found = []
         tdirs = registry.queryUtility(ITranslationDirectories, default=[])
         for tdir in tdirs:
             locale_dirs = [ (lname, os.path.join(tdir, lname)) for lname in
@@ -181,7 +180,14 @@ def get_localizer(request):
                         mofp = open(mopath, 'rb')
                         domain = mofile[:-3]
                         dtrans = Translations(mofp, domain)
-                        translations.add(dtrans)
+                        translations_found.append(dtrans)
+        if translations_found:
+            translations = translations_found[0]
+            for t in translations_found[1:]:
+                translations.add(t)
+        else:
+            translations = Translations()
+            translations._catalog = {}
 
         localizer = Localizer(locale_name=current_locale_name,
                               translations=translations)

@@ -1021,3 +1021,111 @@ For example:
 
 .. note:: You can also add a custom locale negotiator via ZCML.  See
    :ref:`zcml_adding_a_locale_negotiator`
+
+i18n with Jinja2 
+------------------
+In addition to all of the regular steps to get i18n
+working in pyramid, if you are using jinja2, there are
+three more steps to enable i18 in your templates:
+
+- Enable the jinja2 i18n extension in your application
+
+- Add a message extractor to ``setup.py``
+
+- Add translation tags to your templates
+
+The sections below explain how to complete these items.
+
+Enable the jinja2 i18n extenstion
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Jinja2 has an internationalization extension, but it is not 
+enabled by default. To enable the extension, add a line to your
+``development.ini`` file just like line 4.
+
+.. code-block:: ini
+   :linenos:
+
+   [app:myapp]
+   #...
+   jinja2.directories = myapp:templates
+   jinja2.extensions = jinja2.ext.i18n
+
+If you want to enable more than one extension, then use a syntax like below, using a backslash to escape the newline.
+
+.. code-block:: text
+   :linenos:
+
+   [app:myapp]
+   #...
+   jinja2.directories = myapp:templates
+   jinja2.extensions = jinja2.ext.i18n\
+                       jinja2.ext.do\
+                       jinja2.ext.autoescape
+   another.setting = blue
+
+If you are not using ``paster`` and therefore do not have an ``.ini`` file,
+then you can add a setting to be passed into your ``Configurator``.
+
+Add a message extractor to ``setup.py``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order for the translation tags ``{% trans %}Translate me{% endtrans%}`` 
+in the jinja2 templates to be added to your :term:`gettext` 
+files from your application, you need to add a message 
+extractor function in your application's ``setup.py`` file (see line 10).
+It is assumed that ``Babel`` is installed.
+This additional message extractor is directing the extraction process
+to look in all files ending with ``.jinja2`` to be extracted by the function
+``babel_extract`` in the package ``jinja2.ext``.  The last parameter, 
+specified below as ``None`` is an optional dictionary of options to be passed
+into the jinja2 environment during the message extraction process..
+
+.. code-block:: python
+   :linenos:
+
+    setup(name="mypackage",
+          # ...
+          install_requires = [
+                # ...
+                'Babel',
+                ],
+          message_extractors = { '.': [
+                ('**.py',   'chameleon_python', None ),
+                ('**.pt',   'chameleon_xml', None ),
+                ('**.jinja2', 'jinja2.ext:babel_extract', None)
+                ]},
+          )
+
+For jinja2, the options allow you to override various conventions. 
+Here is an example providing some overrides.
+
+.. code-block:: python
+   :linenos:
+
+    setup(name="mypackage",
+          # ...
+          install_requires = [
+                # ...
+                'Babel',
+                ],
+          message_extractors = { '.': [
+                ('**.py',   'chameleon_python', None ),
+                ('**.jinja2', 'jinja2.ext:babel_extract', {
+                    'block_start_string':'{%%',
+                    'block_end_string':'%%}',
+                    'newstyle_gettext':'True'
+                 })
+                ]},
+          )
+
+Add translation tags to your templates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The last thing to do is to add translation tags into your templates.
+You can consult the ``jinja2`` docs `here <http://jinja.pocoo.org/templates/#i18n-in-templates>`_.
+Most applications can make use of the default locale negotiator, which
+requires no additional coding or configuration.
+
+One thing to keep in mind is that unlike chameleon, jinja2 will not call translate on any of the ``TranslationString`` objects that you have passed into the template. It is up to you to call the :meth:`pyramid.i18n.Localizer.translate`  method before passing the string to jinja2.
+
+Jinja2 will call ``gettext`` and ``ngettext`` on the translations object that was passed to it.  This means that only the default domain of your messages can be accessed. If you need jinja2 to pass in the domain to perform a translation, then you will need to access the Jinja2 environment from the ``registry``, and use the Jinja2 api to install your own callables for ``gettext`` and ``ngettext``. 

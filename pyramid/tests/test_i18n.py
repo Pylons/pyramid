@@ -196,6 +196,9 @@ class Test_get_localizer(unittest.TestCase):
         self.assertEqual(result.__class__, Localizer)
         self.assertEqual(result.translate('Approve', 'deformsite'),
                          'Genehmigen')
+        request = DummyRequest()
+        request.locale_name = 'en'
+        result = self._callFUT(request)
         self.assertEqual(result.translate('Approve'), 'Approve')
         self.failUnless(hasattr(result, 'pluralize'))
 

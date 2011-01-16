@@ -1,4 +1,4 @@
-# German translations for deformsite.
+# English translations for deformsite.
 # Copyright (C) 2010 ORGANIZATION
 # This file is distributed under the same license as the deformsite project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
@@ -19,13 +19,13 @@ msgstr ""
 
 #: deformsite/__init__.py:458
 msgid "Approve"
-msgstr "Genehmigen"
+msgstr "Approve"
 
 #: deformsite/__init__.py:459
 msgid "Show approval"
-msgstr "Zeigen Genehmigung"
+msgstr "Show approval"
 
 #: deformsite/__init__.py:466
 msgid "Submit"
-msgstr "Beugen"
+msgstr "Submit"
 
