@@ -137,7 +137,7 @@ The value of the ``permission`` argument represents the :term:`permission`
 that the user must have relative to the current :term:`context` when the
 static view is invoked.  A user will be required to possess this permission
 to view any of the files represented by ``path`` of the static view.  If your
-static resources must be protected by a more complex authorization scheme,
+static assets must be protected by a more complex authorization scheme,
 see :ref:`advanced_static`.
 
 Here's another example that uses an :term:`asset specification` instead of an
