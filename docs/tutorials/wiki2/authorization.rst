@@ -278,6 +278,8 @@ of hitting an edit or add page and submitting the login form with the
 hand corner.  When we click it, we're logged out, and redirected back
 to the front page.
 
+.. _wiki2_flow_of_authentication:
+
 Overall flow of an authentication
 ---------------------------------
 

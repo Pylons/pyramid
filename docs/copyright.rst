@@ -54,19 +54,23 @@ Editor:
 Contributors:
 
   Ben Bangert, Blaise Laflamme, Rob Miller, Mike Orr, Carlos de la Guardia,
-  Paul Everitt, Tres Seaver, Marius Gedminas, Chris Rossi, Joachim Krebs,
-  Xavier Spriet, Reed O'Brien, William Chambers, Charlie Choiniere, Jamaludin
-  Ahmad.
+  Paul Everitt, Tres Seaver, John Shipman, Marius Gedminas, Chris Rossi,
+  Joachim Krebs, Xavier Spriet, Reed O'Brien, William Chambers, Charlie
+  Choiniere, Jamaludin Ahmad.
 
 .. Cover Designer:
 ..   Nat Hardwick of `Electrosoup <http://www.electrosoup.co.uk>`_.
 
 Used with permission:
+
    The :ref:`webob_chapter` chapter is adapted, with permission, from
    documentation originally written by Ian Bicking.
 
    The :ref:`much_ado_about_traversal_chapter` chapter is adapted,
    with permission, from an article written by Rob Miller.
+
+   The :ref:`wiki2_flow_of_authentication` section was contributed by John
+   Shipman.
 
 .. Print Production
 .. ----------------
