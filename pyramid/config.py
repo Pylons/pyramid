@@ -511,9 +511,12 @@ class Configurator(object):
 
         Values allowed to be presented via the ``*callables`` argument to
         this method: any callable Python object or any :term:`dotted Python
-        name` which resolves to a callable Python object.
+        name` which resolves to a callable Python object.  It may also be a
+        Python :term:`module`, in which case, the module will be searched for
+        a callable named ``includeme``, which will be treated as the
+        configuration callable.
         
-        For example, if the ``configure`` function below lives in a module
+        For example, if the ``includeme`` function below lives in a module
         named ``myapp.myconfig``:
 
         .. code-block:: python
@@ -525,7 +528,7 @@ class Configurator(object):
                from pyramid.response import Response
                return Response('OK')
 
-           def configure(config):
+           def includeme(config):
                config.add_view(my_view)
 
         You might cause it be included within your Pyramid application like
@@ -538,7 +541,19 @@ class Configurator(object):
 
            def main(global_config, **settings):
                config = Configurator()
-               config.include('myapp.myconfig.configure')
+               config.include('myapp.myconfig.includeme')
+
+        Because the function is named ``includeme``, the function name can
+        also be omitted from the dotted name reference:
+
+        .. code-block:: python
+           :linenos:
+
+           from pyramid.config import Configurator
+
+           def main(global_config, **settings):
+               config = Configurator()
+               config.include('myapp.myconfig')
 
         Included configuration statements will be overridden by local
         configuration statements if an included callable causes a
@@ -551,9 +566,11 @@ class Configurator(object):
 
         for c in callables:
             c = self.maybe_dotted(c)
-            sourcefile = inspect.getsourcefile(c)
             module = inspect.getmodule(c)
+            if module is c:
+                c = getattr(module, 'includeme')
             spec = module.__name__ + ':' + c.__name__
+            sourcefile = inspect.getsourcefile(c)
             if _context.processSpec(spec):
                 context = GroupingContextDecorator(_context)
                 context.basepath = os.path.dirname(sourcefile)

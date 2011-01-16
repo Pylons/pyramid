@@ -22,6 +22,13 @@ Features
 - Add ``add_directive`` method to configurator, which allows framework
   extenders to add methods to the configurator (ala ZCML directives).
 
+- When ``Configurator.include`` is passed a *module* as an argument, it
+  defaults to attempting to find and use a callable named ``includeme``
+  within that module.  This makes it possible to use
+  ``config.include('some.module')`` rather than
+  ``config.include('some.module.somefunc')`` as long as the include function
+  within ``some.module`` is named ``includeme``.
+
 Paster Templates
 ----------------
 

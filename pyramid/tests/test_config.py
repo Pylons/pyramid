@@ -658,6 +658,23 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(context_after.includepath, ())
         self.failUnless(context_after is context_before)
 
+    def test_include_with_module_defaults_to_includeme(self):
+        from pyramid import tests
+        config = self._makeOne()
+        context_before = config._make_context()
+        config._ctx = context_before
+        config.include('pyramid.tests.test_config')
+        context_after = config._ctx
+        actions = context_after.actions
+        self.assertEqual(len(actions), 1)
+        self.assertEqual(
+            actions[0][:3],
+            ('discrim', None, tests),
+            )
+        self.assertEqual(context_after.basepath, None)
+        self.assertEqual(context_after.includepath, ())
+        self.failUnless(context_after is context_before)
+
     def test_with_context(self):
         config = self._makeOne()
         ctx = config._make_context()
@@ -5020,6 +5037,8 @@ class DummyHandler(object): # pragma: no cover
 
 def dummy_include(config):
     config.action('discrim', None, config.package)
+
+includeme = dummy_include
 
 def dummy_extend(config, discrim):
     config.action(discrim, None, config.package)
