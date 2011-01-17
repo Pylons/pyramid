@@ -39,21 +39,6 @@ class AlchemyProjectTemplate(PyramidTemplate):
     summary = 'pyramid SQLAlchemy project using traversal'
     template_renderer = staticmethod(paste_script_template_renderer)
 
-class PylonsBasicProjectTemplate(PyramidTemplate):
-    _template_dir = 'paster_templates/pylons_basic'
-    summary = 'Pylons basic project'
-    template_renderer = staticmethod(paste_script_template_renderer)
-
-class PylonsMinimalProjectTemplate(PyramidTemplate):
-    _template_dir = 'paster_templates/pylons_minimal'
-    summary = 'Pylons minimal project'
-    template_renderer = staticmethod(paste_script_template_renderer)
-
-class PylonsSQLAlchemyProjectTemplate(PyramidTemplate):
-    _template_dir = 'paster_templates/pylons_sqla'
-    summary = 'Pylons SQLAlchemy project'
-    template_renderer = staticmethod(paste_script_template_renderer)
-
 def get_app(config_file, name, loadapp=loadapp):
     """ Return the WSGI application named ``name`` in the PasteDeploy
     config file ``config_file``"""

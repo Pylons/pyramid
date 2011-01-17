@@ -611,6 +611,7 @@ A user might make use of these framework components like so:
 
    from webob import Response
    from pyramid.config import Configurator
+   import pyramid_handlers
    from paste.httpserver import serve
 
    class MyController(BaseController):
@@ -619,6 +620,7 @@ A user might make use of these framework components like so:
 
    if __name__ == '__main__':
        config = Configurator()
+       config.include(pyramid_handlers)
        config.add_handler('one', '/{id}', MyController, action='index')
        config.add_handler('two', '/{action}/{id}', MyController)
        serve(config.make_wsgi_app())

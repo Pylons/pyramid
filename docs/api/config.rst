@@ -48,8 +48,6 @@
 
      .. automethod:: add_translation_dirs
 
-     .. automethod:: add_handler
-
      .. automethod:: add_view
 
      .. automethod:: derive_view
@@ -75,6 +73,8 @@
      .. automethod:: set_request_factory
 
      .. automethod:: set_renderer_globals_factory
+
+     .. automethod:: add_directive
 
      .. automethod:: testing_securitypolicy
 

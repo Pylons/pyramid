@@ -35,12 +35,6 @@
         />
 
     <meta:directive
-        name="handler"
-        schema="pyramid.zcml.IHandlerDirective"
-        handler="pyramid.zcml.handler"
-        />
-
-    <meta:directive
         name="asset"
         schema="pyramid.zcml.IAssetDirective"
         handler="pyramid.zcml.asset"

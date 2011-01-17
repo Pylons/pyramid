@@ -62,6 +62,11 @@ Must-Have (before 1.0)
    zope.configuration.config.ConfigurationExecutionError: <type 'exceptions.TypeError'>: object of type 'NoneType' has no len()                                    in:
     ('reversed.py', 14, '<module>', "c.add_view(aview, renderer='__main__:foo.pt')")
 
+- Fix misleading conflict error reports for static views ala
+  http://cluebin.appspot.com/pasted/7242843
+
+- Document ``add_directive``.
+
 Should-Have
 -----------
 

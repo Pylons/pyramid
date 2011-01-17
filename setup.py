@@ -83,9 +83,6 @@ setup(name='pyramid',
         pyramid_zodb=pyramid.paster:ZODBProjectTemplate
         pyramid_routesalchemy=pyramid.paster:RoutesAlchemyProjectTemplate
         pyramid_alchemy=pyramid.paster:AlchemyProjectTemplate
-        pylons_basic=pyramid.paster:PylonsBasicProjectTemplate
-        pylons_minimal=pyramid.paster:PylonsMinimalProjectTemplate
-        pylons_sqla=pyramid.paster:PylonsSQLAlchemyProjectTemplate
         [paste.paster_command]
         pshell=pyramid.paster:PShellCommand
         proutes=pyramid.paster:PRoutesCommand

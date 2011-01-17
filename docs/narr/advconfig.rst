@@ -301,9 +301,6 @@ These are the methods of the configurator which provide conflict detection:
 Some other methods of the configurator also indirectly provide conflict
 detection, because they're implemented in terms of conflict-aware methods:
 
-- :meth:`~pyramid.config.Configurator.add_handler`, a frontend for
-  ``add_route`` and ``add_view``.
-
 - :meth:`~pyramid.config.Configurator.add_route` does a second type of
   conflict detection when a ``view`` parameter is passed (it calls
   ``add_view``).
@@ -337,6 +334,23 @@ Instead, use :meth:`pyramid.config.Configuration.include`:
 
 Using ``include`` rather than calling the function directly will allow
 :ref:`automatic_conflict_resolution` to work.
+
+:meth:`pyramid.config.Configuration.include` can also accept a :term:`module`
+as an argument:
+
+.. code-block:: python
+   :linenos:
+
+   import myapp
+
+   config.include(myapp)
+
+For this to work properly, the ``myapp`` module must contain a callable with
+the special name ``includeme``, which should perform configuration (like the
+``add_routes`` callable we showed above as an example).
+
+:meth:`pyramid.config.Configuration.include` can also accept a :term:`dotted
+Python name` to a function or a module.
 
 .. note: See :ref:`the_include_tag` for a declarative alternative to
    :meth:`pyramid.config.Configurator.include`.
@@ -387,8 +401,7 @@ used, two-phase configuration is disabled, and configuration statements must
 be ordered in dependency order.
 
 Some configuration methods, such as
-:meth:`pyramid.config.Configurator.add_route` and
-:meth:`pyramid.config.Configurator.add_handler` have internal ordering
+:meth:`pyramid.config.Configurator.add_route` have internal ordering
 constraints: they routes they imply require relative ordering.  Such ordering
 constraints are not absolved by two-phase configuration.  Routes are still
 added in configuration execution order.

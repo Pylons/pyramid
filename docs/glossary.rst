@@ -285,7 +285,7 @@ Glossary
    WSGI
      `Web Server Gateway Interface <http://wsgi.org/>`_.  This is a
      Python standard for connecting web applications to web servers,
-     similar to the concept of Java Servlets.  ``pyramid`` requires
+     similar to the concept of Java Servlets.  :app:`Pyramid` requires
      that your application be served as a WSGI application.
 
    middleware

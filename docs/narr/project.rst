@@ -30,9 +30,6 @@ and so therefore they are often referred to as "paster templates".
    single: pyramid_zodb paster template
    single: pyramid_alchemy paster template
    single: pyramid_routesalchemy paster template
-   single: pylons_minimal paster template
-   single: pylons_basic paster template
-   single: pylons_sqla paster template
 
 .. _additional_paster_templates:
 
@@ -73,20 +70,6 @@ The included templates are these:
 ``pyramid_alchemy``
   URL mapping via :term:`traversal` and persistence via
   :term:`SQLAlchemy`
-
-``pylons_minimal``
-  URL mapping via :term:`URL dispatch` and Pylons-style view handlers,
-  minimal setup, uses ``pyramid_beaker`` as a sessioning implementation.
-
-``pylons_basic``
-  URL mapping via :term:`URL dispatch` and Pylons-style view handlers, and
-  some extra functionality, uses ``pyramid_beaker`` as a sessioning
-  implementation.
-
-``pylons_sqla``
-  URL mapping via :term:`URL dispatch` and Pylons-style view handlers, some
-  extra functionality, and SQLAlchemy set up, uses ``pyramid_beaker`` as a
-  sessioning implementation.
 
 .. index::
    single: creating a project
@@ -965,10 +948,10 @@ To this:
                     renderer='myproject:templates/mytemplate.pt')
 
 You can then continue to add files to the ``views`` directory, and refer to
-views or handler classes/functions within those files via the dotted name
-passed as the first argument to ``add_view``.  For example, if you added a
-file named ``anothermodule.py`` to the ``views`` subdirectory, and added a
-view callable named ``my_view`` to it:
+view classes or functions within those files via the dotted name passed as
+the first argument to ``add_view``.  For example, if you added a file named
+``anothermodule.py`` to the ``views`` subdirectory, and added a view callable
+named ``my_view`` to it:
 
 .. code-block:: python
     :linenos:

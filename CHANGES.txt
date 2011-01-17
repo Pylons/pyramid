@@ -7,6 +7,28 @@ Bug Fixes
 - URL Dispatch properly handles a '.*' or '*' appearing in a regex match
   when used inside brackets. Resolve Issue #90.
 
+Backwards Incompatibilities
+---------------------------
+
+- The ``add_handler`` method of a Configurator has been removed from the
+  Pyramid core.  Handlers are now a feature of the ``pyramid_handlers``
+  package, which can be downloaded from PyPI.  Documentation for the package
+  should be available via http://pylonsproject.org, which describes how to
+  get this method back after depending upon ``pyramid_handlers`` as an
+  ``install_requires`` dependency.
+
+- The ``pyramid.view.action`` decorator has been removed from the Pyramid
+  core.  Handlers are now a feature of the ``pyramid_handlers`` package.  It
+  should now be imported from ``pyramid_handlers`` e.g. ``from
+  pyramid_handlers import action``.
+
+- The ``handler`` ZCML directive has been removed.  It is now a feature of
+  the ``pyramid_handlers`` package.
+
+- The ``pylons_minimal``, ``pylons_basic`` and ``pylons_sqla`` paster
+  templates were removed.  Use ``pyramid_sqla`` (available from PyPI) as a
+  generic replacement for Pylons-esque development.
+
 Features
 --------
 
@@ -18,6 +40,16 @@ Features
 
 - Add ``charset`` attribute to ``pyramid.testing.DummyRequest``
   (unconditionally ``UTF-8``).
+
+- Add ``add_directive`` method to configurator, which allows framework
+  extenders to add methods to the configurator (ala ZCML directives).
+
+- When ``Configurator.include`` is passed a *module* as an argument, it
+  defaults to attempting to find and use a callable named ``includeme``
+  within that module.  This makes it possible to use
+  ``config.include('some.module')`` rather than
+  ``config.include('some.module.somefunc')`` as long as the include function
+  within ``some.module`` is named ``includeme``.
 
 Paster Templates
 ----------------

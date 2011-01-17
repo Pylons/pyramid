@@ -529,14 +529,3 @@ See also :ref:`changing_the_notfound_view`.
 """
 
 
-class action(object):
-    def __init__(self, **kw):
-        self.kw = kw
-
-    def __call__(self, wrapped):
-        if hasattr(wrapped, '__exposed__'):
-            wrapped.__exposed__.append(self.kw)
-        else:
-            wrapped.__exposed__ = [self.kw]
-        return wrapped
-

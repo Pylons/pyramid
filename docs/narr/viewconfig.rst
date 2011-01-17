@@ -63,14 +63,15 @@ View configuration is performed in one of these ways:
   :meth:`pyramid.config.Configurator.add_route` method, passing a ``view``
   argument specifying a view callable.
 
-- by using the :meth:`pyramid.config.Configurator.add_handler` against a
-  :term:`view handler` class (useful only for :term:`URL dispatch`
-  applications).
+.. note:: You can also add view configuration by adding a ``<view>`` or
+   ``<route>`` declaration to :term:`ZCML` used by your application as per
+   :ref:`mapping_views_using_zcml_section`, :ref:`view_directive` or
+   :ref:`route_directive`.
 
-.. note:: You can also add view configuration by adding a ``<view>``,
-   ``<route>`` or ``<handler>`` declaration to :term:`ZCML` used by your
-   application as per :ref:`mapping_views_using_zcml_section`,
-   :ref:`view_directive`, :ref:`route_directive` or :ref:`handler_directive`.
+.. note:: A package named ``pyramid_handlers`` (available from PyPI) provides
+   an analogue of :term:`Pylons` -style "controllers", which are a special
+   kind of view class which provides more automation when your application
+   uses :term:`URL dispatch` solely.
 
 .. _view_configuration_parameters:
 
@@ -598,7 +599,6 @@ The first argument, ``view``, is required.  It must either be a Python object
 which is the view itself or a :term:`dotted Python name` to such an object.
 All other arguments are optional.  See
 :meth:`pyramid.config.Configurator.add_view` for more information.
-
 
 .. index::
    single: resource interfaces
