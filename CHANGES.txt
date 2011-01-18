@@ -1,5 +1,5 @@
-Next release
-============
+1.0a10 (2011-01-18)
+===================
 
 Bug Fixes
 ---------
@@ -13,16 +13,20 @@ Backwards Incompatibilities
 - The ``add_handler`` method of a Configurator has been removed from the
   Pyramid core.  Handlers are now a feature of the ``pyramid_handlers``
   package, which can be downloaded from PyPI.  Documentation for the package
-  should be available via http://pylonsproject.org, which describes how to
-  get this method back after depending upon ``pyramid_handlers`` as an
-  ``install_requires`` dependency.
+  should be available via
+  http://pylonsproject.org/projects/pyramid_handlers/dev, which describes how
+  to add a configuration statement to your ``main`` block to reobtain this
+  method.  You will also need to add an ``install_requires`` dependency upon
+  ``pyramid_handlers`` to your ``setup.py`` file.
 
 - The ``load_zcml`` method of a Configurator has been removed from the
   Pyramid core.  Loading ZCML is now a feature of the ``pyramid_zcml``
   package, which can be downloaded from PyPI.  Documentation for the package
-  should be available via http://pylonsproject.org, which describes how to
-  get this method back after depending upon ``pyramid_zcml`` as an
-  ``install_requires`` dependency.
+  should be available via
+  http://pylonsproject.org/projects/pyramid_zcml/dev, which describes how
+  to add a configuration statement to your ``main`` block to reobtain this
+  method.  You will also need to add an ``install_requires`` dependency upon
+  ``pyramid_zcml`` to your ``setup.py`` file.
 
 - The ``pyramid.includes`` subpackage has been removed.  ZCML files which use
   include the package ``pyramid.includes`` (e.g. ``<include
@@ -48,9 +52,6 @@ Backwards Incompatibilities
 - The ``configure_zcml`` setting within the deployment settings (within
   ``**settings`` passed to a Pyramid ``main`` function) has ceased to have any
   meaning.
-
-- The ``starter_zcml`` paster template has been moved to the ``pyramid_zcml``
-  package.
 
 Features
 --------
@@ -85,6 +86,9 @@ Paster Templates
 - All paster templates now use ``pyramid.testing.setUp`` and
   ``pyramid.testing.tearDown`` rather than creating a Configurator "by hand"
   within their ``tests.py`` module, as per decision in features above.
+
+- The ``starter_zcml`` paster template has been moved to the ``pyramid_zcml``
+  package.
 
 Documentation
 -------------
