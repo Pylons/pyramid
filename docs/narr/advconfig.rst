@@ -115,11 +115,8 @@ allowing the circumstance to go unreported, by default Pyramid raises a
 running.
 
 Conflict detection happens for any kind of configuration: imperative
-configuration, :term:`ZCML` configuration, or configuration that results from
-the execution of a :term:`scan`.
-
-.. note:: If you use, ZCML, its conflict detection algorithm is described in
-   :ref:`zcml_conflict_detection`.
+configuration or configuration that results from the execution of a
+:term:`scan`.
 
 Manually Resolving Conflicts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

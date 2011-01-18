@@ -79,12 +79,6 @@ This book is divided into four major parts:
   :app:`Pyramid`.  The API documentation is organized
   alphabetically by module name.
 
-:ref:`zcml_reference`
-
-  Comprehensive reference material for every :term:`ZCML directive`
-  provided by :app:`Pyramid`.  The ZCML directive documentation is
-  organized alphabetically by directive name.
-
 .. index::
    single: repoze.zope2
    single: Zope 3

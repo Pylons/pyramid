@@ -82,9 +82,6 @@ function found via a :term:`scan`.
    decorated function for the decorator to have any effect.  See
    :func:`pyramid.subscriber` for more information.
 
-.. note:: You can also configure an event listener via ZCML.  See
-   :ref:`zcml_event_listener`.
-
 Either of the above registration examples implies that every time the
 :app:`Pyramid` framework emits an event object that supplies an
 :class:`pyramid.events.NewRequest` interface, the ``mysubscriber`` function

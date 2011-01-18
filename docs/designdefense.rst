@@ -453,34 +453,11 @@ Pyramid "Encourages Use of ZCML"
 :term:`Zope Component Architecture` registry that :app:`Pyramid` uses for
 application configuration.  Often people claim that Pyramid "needs ZCML".
 
-Quick answer: it doesn't. At least not anymore.  In :mod:`repoze.bfg` (the
-predecessor to Pyramid) versions 1.0 and and 1.1, an application needed to
-possess a ZCML file for it to begin executing successfully.  However,
-:mod:`repoze.bfg` 1.2 and greater (including :app:`Pyramid` 1.0) includes a
-completely imperative mode for all configuration.  You will be able to make
-"single file" apps in this mode, which should help people who need to see
-everything done completely imperatively.  For example, the very most basic
-:app:`Pyramid` "helloworld" program has become something like:
-
-.. code-block:: python
-   :linenos:
-
-   from webob import Response
-   from paste.httpserver import serve
-   from pyramid.config import Configurator
-
-   def hello_world(request):
-       return Response('Hello world!')
-
-   if __name__ == '__main__':
-       config = Configurator()
-       config.add_view(hello_world)
-       app = config.make_wsgi_app()
-       serve(app)
-
-In this mode, no ZCML is required at all, nor any other sort of frameworky
-frontend to application configuration.  Hopefully this mode will allow people
-who are used to doing everything imperatively feel more comfortable.
+It doesn't.  In :app:`Pyramid` 1.0, ZCML doesn't ship as part of the core;
+instead it ships in the :term:`pyramid_zcml` add-on package, which is
+completely optional.  No ZCML is required at all to use :app:`Pyramid`, nor
+any other sort of frameworky declarative frontend to application
+configuration.
 
 Pyramid Uses ZCML; ZCML is XML and I Don't Like XML
 ---------------------------------------------------

@@ -26,8 +26,8 @@ Backwards Incompatibilities
 
 - The ``pyramid.includes`` subpackage has been removed.  ZCML files which use
   include the package ``pyramid.includes`` (e.g. ``<include
-  package="pyramid.includes">``) now must include the ``pyramid_zcml``
-  package instead (e.g. ``<include package="pyramid_zcml"/>).
+  package="pyramid.includes"/>``) now must include the ``pyramid_zcml``
+  package instead (e.g. ``<include package="pyramid_zcml"/>``).
 
 - The ``pyramid.view.action`` decorator has been removed from the Pyramid
   core.  Handlers are now a feature of the ``pyramid_handlers`` package.  It
@@ -101,7 +101,10 @@ Documentation
   "Renderers" chapter in a section named "Overriding A Renderer at Runtime".
 
 - The "Declarative Configuration" narrative chapter has been removed (it was
-  moved to the ``pyramid_zcml`` pakcage).
+  moved to the ``pyramid_zcml`` package).
+
+- Most references to ZCML in narrative chapters have been removed or
+  redirected to ``pyramid_zcml`` locations.
 
 Deprecations
 ------------
