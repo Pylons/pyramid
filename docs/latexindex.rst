@@ -51,9 +51,7 @@ Narrative Documentation
    narr/testing
    narr/hooks
    narr/advconfig
-   narr/declarative
    narr/extending
-   narr/router
    narr/startup
    narr/threadlocals
    narr/zca
@@ -99,7 +97,6 @@ API Reference
    api/renderers
    api/request
    api/response
-   api/router
    api/scripting
    api/security
    api/settings
@@ -109,35 +106,6 @@ API Reference
    api/url
    api/view
    api/wsgi
-
-.. _zcml_reference:
-
-ZCML Directive Reference
-@@@@@@@@@@@@@@@@@@@@@@@@
-
-.. toctree::
-   :maxdepth: 1
-
-   zcml/aclauthorizationpolicy
-   zcml/adapter
-   zcml/authtktauthenticationpolicy
-   zcml/asset
-   zcml/configure
-   zcml/default_permission
-   zcml/forbidden
-   zcml/include
-   zcml/localenegotiator
-   zcml/notfound
-   zcml/remoteuserauthenticationpolicy
-   zcml/renderer
-   zcml/repozewho1authenticationpolicy
-   zcml/route
-   zcml/scan
-   zcml/static
-   zcml/subscriber
-   zcml/translationdir
-   zcml/utility
-   zcml/view
 
 .. backmatter::
 

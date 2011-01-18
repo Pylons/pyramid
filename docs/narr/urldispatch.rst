@@ -1287,6 +1287,3 @@ References
 A tutorial showing how :term:`URL dispatch` can be used to create a
 :app:`Pyramid` application exists in :ref:`bfg_sql_wiki_tutorial`.
 
-Route configuration may also be added to the system via :term:`ZCML` (see
-:ref:`zcml_route_configuration`).
-

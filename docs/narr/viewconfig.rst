@@ -63,11 +63,6 @@ View configuration is performed in one of these ways:
   :meth:`pyramid.config.Configurator.add_route` method, passing a ``view``
   argument specifying a view callable.
 
-.. note:: You can also add view configuration by adding a ``<view>`` or
-   ``<route>`` declaration to :term:`ZCML` used by your application as per
-   :ref:`mapping_views_using_zcml_section`, :ref:`view_directive` or
-   :ref:`route_directive`.
-
 .. note:: A package named ``pyramid_handlers`` (available from PyPI) provides
    an analogue of :term:`Pylons` -style "controllers", which are a special
    kind of view class which provides more automation when your application
@@ -442,9 +437,6 @@ you *must* do use the ``scan`` method of a
    # config is assumed to be an instance of the
    # pyramid.config.Configurator class
    config.scan()
-
-.. note:: See :ref:`zcml_scanning` for information about how to invoke a scan
-   via ZCML (if you're not using imperative configuration).
 
 Please see :ref:`decorations_and_code_scanning` for detailed information
 about what happens when code is scanned for configuration declarations

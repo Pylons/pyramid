@@ -106,9 +106,6 @@ See also the :mod:`pyramid.authorization` and
 :mod:`pyramid.authentication` modules for alternate implementations
 of authorization and authentication policies.  
 
-You can also enable a security policy declaratively via ZCML.  See
-:ref:`zcml_authorization_policy`.
-
 .. index::
    single: permissions
    single: protecting views
@@ -154,9 +151,6 @@ may be performed via the ``@view_config`` decorator:
        """ Add blog entry code goes here """
        pass
 
-Or the same thing can be done using the ``permission`` attribute of the ZCML
-:ref:`view_directive` directive.
-
 As a result of any of these various view configuration statements, if an
 authorization policy is in place when the view callable is found during
 normal application operations, the requesting user will need to possess the
@@ -188,8 +182,6 @@ application:
 - The
   :meth:`pyramid.config.Configurator.set_default_permission`
   method.
-
-- The :ref:`default_permission_directive` ZCML directive.
 
 When a default permission is registered:
 

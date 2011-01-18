@@ -400,10 +400,6 @@ factory.
 Renderers can be registered imperatively using the
 :meth:`pyramid.config.Configurator.add_renderer` API.
 
-.. note:: The tasks described in this section can also be performed via
-   :term:`declarative configuration`.  See
-   :ref:`zcml_adding_and_overriding_renderers`.
-
 For example, to add a renderer which renders views which have a
 ``renderer`` attribute that is a path that ends in ``.jinja2``:
 

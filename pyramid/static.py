@@ -180,7 +180,6 @@ class static_view(object):
 
     .. note:: If the ``root_dir`` is relative to a :term:`package`, or
          is a :term:`asset specification` the :app:`Pyramid`
-         ``asset`` ZCML directive or
          :class:`pyramid.config.Configurator` method can be
          used to override assets within the named ``root_dir``
          package-relative directory.  However, if the ``root_dir`` is

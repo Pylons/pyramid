@@ -89,9 +89,9 @@ Glossary
    dotted Python name
      A reference to a Python object by name using a string, in the form
      ``path.to.modulename:attributename``.  Often used in Paste and
-     setuptools configurations.  A variant is used in dotted names
-     within :term:`ZCML` attributes that name objects (such as the ZCML
-     "view" directive's "view" attribute): the colon (``:``) is not
+     setuptools configurations.  A variant is used in dotted names within
+     configurator method arguments that name objects (such as the "add_view"
+     method's "view" and "context" attributes): the colon (``:``) is not
      used; in its place is a dot.
 
    view
@@ -116,8 +116,8 @@ Glossary
      with configuration information.  This configuration information helps
      map a given :term:`request` to a particular view callable and it can
      influence the response of a view callable.  :app:`Pyramid` views can be
-     configured via :term:`imperative configuration`, :term:`ZCML` or by a
-     special ``@view_config`` decorator coupled with a :term:`scan`.  See
+     configured via :term:`imperative configuration`, or by a special
+     ``@view_config`` decorator coupled with a :term:`scan`.  See
      :ref:`view_config_chapter` for more information about view
      configuration.
 
@@ -377,29 +377,10 @@ Glossary
      ultimately a :term:`view`).  See also :term:`url dispatch`.
 
    route configuration
-     Route configuration is the act of using :term:`imperative
-     configuration` or a :term:`ZCML` ``<route>`` statement to
-     associate request parameters with a particular :term:`route` using
-     pattern matching and :term:`route predicate` statements.  See
-     :ref:`urldispatch_chapter` for more information about route
-     configuration.
-
-   ZCML
-     `Zope Configuration Markup Language
-     <http://www.muthukadan.net/docs/zca.html#zcml>`_, an XML dialect
-     used by Zope and :app:`Pyramid` for configuration tasks.  ZCML
-     is capable of performing different types of :term:`configuration
-     declaration`, but its primary purpose in :app:`Pyramid` is to
-     perform :term:`view configuration` and :term:`route configuration`
-     within the ``configure.zcml`` file in a :app:`Pyramid`
-     application.  You can use ZCML as an alternative to
-     :term:`imperative configuration`.
-
-   ZCML directive
-     A ZCML "tag" such as ``<view>`` or ``<route>``.
-
-   ZCML declaration
-     The concrete use of a :term:`ZCML directive` within a ZCML file.
+     Route configuration is the act of associating request parameters with a
+     particular :term:`route` using pattern matching and :term:`route
+     predicate` statements.  See :ref:`urldispatch_chapter` for more
+     information about route configuration.
 
    Zope Component Architecture
      The `Zope Component Architecture
@@ -457,9 +438,9 @@ Glossary
 
    subscriber
      A callable which receives an :term:`event`.  A callable becomes a
-     subscriber via :term:`imperative configuration` or the
-     ``<subscriber>`` ZCML directive.  See :ref:`events_chapter` for
-     more information.
+     subscriber via :term:`imperative configuration` or via
+     :term:`configuration decoration`.  See :ref:`events_chapter` for more
+     information.
 
    request type
      An attribute of a :term:`request` that allows for specialization
@@ -577,15 +558,13 @@ Glossary
      also `PEP 318 <http://www.python.org/dev/peps/pep-0318/>`_.
 
    configuration declaration
-     An individual method call made to an instance of a
-     :app:`Pyramid` :term:`Configurator` object which performs an
-     arbitrary action, such as registering a :term:`view configuration`
-     (via the ``view`` method of the configurator) or :term:`route
-     configuration` (via the ``route`` method of the configurator).  A
-     set of configuration declarations is also usually implied via the
-     use of a :term:`ZCML declaration` within an application, or a set
-     of configuration declarations might be performed by a :term:`scan`
-     of code in a package.
+     An individual method call made to an instance of a :app:`Pyramid`
+     :term:`Configurator` object which performs an arbitrary action, such as
+     registering a :term:`view configuration` (via the ``add_view`` method of
+     the configurator) or :term:`route configuration` (via the ``add_route``
+     method of the configurator).  A set of configuration declarations is
+     also implied by the :term:`configuration decoration` detected by a
+     :term:`scan` of code in a package.
 
    configuration decoration
      Metadata implying one or more :term:`configuration declaration`
@@ -609,8 +588,8 @@ Glossary
      declaration` required by your application.
 
    declarative configuration
-     The configuration mode in which you use :term:`ZCML` to make
-     a set of :term:`configuration declaration` statements.
+     The configuration mode in which you use :term:`ZCML` to make a set of
+     :term:`configuration declaration` statements.  See :term:`pyramid_zcml`.
 
    Not Found view
       An :term:`exception view` invoked by :app:`Pyramid` when the
@@ -862,3 +841,21 @@ Glossary
     ``request.matchdict`` when a :term:`URL dispatch` route has been matched.
     Its keys are names as identified within the route pattern; its values are
     the values matched by each pattern name.
+
+   pyramid_zcml
+     An add-on package to :app:`Pyramid` which allows applications to be
+     configured via ZCML.  It is available on :term:`PyPI`.  If you use
+     ``pyramid_zcml``, you can use ZCML as an alternative to
+     :term:`imperative configuration`.
+
+   ZCML
+     `Zope Configuration Markup Language
+     <http://www.muthukadan.net/docs/zca.html#zcml>`_, an XML dialect
+     used by Zope and :term:`pyramid_zcml` for configuration tasks.  
+
+   ZCML directive
+     A ZCML "tag" such as ``<view>`` or ``<route>``.
+
+   ZCML declaration
+     The concrete use of a :term:`ZCML directive` within a ZCML file.
+

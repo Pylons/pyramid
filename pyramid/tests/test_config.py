@@ -576,54 +576,6 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(len(subscriber), 1)
         self.failUnless(IApplicationCreated.providedBy(subscriber[0]))
 
-    def test_load_zcml_default(self):
-        import pyramid.tests.fixtureapp
-        config = self._makeOne(package=pyramid.tests.fixtureapp,
-                               autocommit=True)
-        registry = config.load_zcml()
-        from pyramid.tests.fixtureapp.models import IFixture
-        self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
-
-    def test_load_zcml_routesapp(self):
-        from pyramid.interfaces import IRoutesMapper
-        config = self._makeOne(autocommit=True)
-        config.load_zcml('pyramid.tests.routesapp:configure.zcml')
-        self.failUnless(config.registry.getUtility(IRoutesMapper))
-
-    def test_load_zcml_fixtureapp(self):
-        from pyramid.tests.fixtureapp.models import IFixture
-        config = self._makeOne(autocommit=True)
-        config.load_zcml('pyramid.tests.fixtureapp:configure.zcml')
-        self.failUnless(config.registry.queryUtility(IFixture)) # only in c.zcml
-
-    def test_load_zcml_as_relative_filename(self):
-        import pyramid.tests.fixtureapp
-        config = self._makeOne(package=pyramid.tests.fixtureapp,
-                               autocommit=True)
-        registry = config.load_zcml('configure.zcml')
-        from pyramid.tests.fixtureapp.models import IFixture
-        self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
-
-    def test_load_zcml_as_absolute_filename(self):
-        import os
-        import pyramid.tests.fixtureapp
-        config = self._makeOne(package=pyramid.tests.fixtureapp,
-                               autocommit=True)
-        dn = os.path.dirname(pyramid.tests.fixtureapp.__file__)
-        c_z = os.path.join(dn, 'configure.zcml')
-        registry = config.load_zcml(c_z)
-        from pyramid.tests.fixtureapp.models import IFixture
-        self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
-
-    def test_load_zcml_lock_and_unlock(self):
-        config = self._makeOne(autocommit=True)
-        dummylock = DummyLock()
-        config.load_zcml(
-            'pyramid.tests.fixtureapp:configure.zcml',
-            lock=dummylock)
-        self.assertEqual(dummylock.acquired, True)
-        self.assertEqual(dummylock.released, True)
-
     def test_include_with_dotted_name(self):
         from pyramid import tests
         config = self._makeOne()
@@ -2322,6 +2274,25 @@ class ConfiguratorTests(unittest.TestCase):
         result = view(None, request)
         self.assertEqual(result, ('abc', request))
 
+    def test_set_notfound_view_with_renderer(self):
+        from zope.interface import implementedBy
+        from pyramid.interfaces import IRequest
+        from pyramid.exceptions import NotFound
+        config = self._makeOne(autocommit=True)
+        view = lambda *arg: {}
+        config.set_notfound_view(view,
+                                 renderer='pyramid.tests:fixtures/minimal.pt')
+        config.begin()
+        try: # chameleon depends on being able to find a threadlocal registry
+            request = self._makeRequest(config)
+            view = self._getViewCallable(config,
+                                         ctx_iface=implementedBy(NotFound),
+                                         request_iface=IRequest)
+            result = view(None, request)
+        finally:
+            config.end()
+        self.failUnless('div' in result.body)
+
     def test_set_forbidden_view(self):
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
@@ -2348,6 +2319,25 @@ class ConfiguratorTests(unittest.TestCase):
                                      request_iface=IRequest)
         result = view(None, request)
         self.assertEqual(result, ('abc', request))
+
+    def test_set_forbidden_view_with_renderer(self):
+        from zope.interface import implementedBy
+        from pyramid.interfaces import IRequest
+        from pyramid.exceptions import Forbidden
+        config = self._makeOne(autocommit=True)
+        view = lambda *arg: {}
+        config.set_forbidden_view(view,
+                                  renderer='pyramid.tests:fixtures/minimal.pt')
+        config.begin()
+        try: # chameleon requires a threadlocal registry
+            request = self._makeRequest(config)
+            view = self._getViewCallable(config,
+                                         ctx_iface=implementedBy(Forbidden),
+                                         request_iface=IRequest)
+            result = view(None, request)
+        finally:
+            config.end()
+        self.failUnless('div' in result.body)
 
     def test__set_authentication_policy(self):
         from pyramid.interfaces import IAuthenticationPolicy
@@ -2956,7 +2946,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test___getattr__matches(self):
         config = self._makeOne()
         def foo(config): pass
-        directives = {'foo':foo}
+        directives = {'foo':(foo, True)}
         config.registry._directives = directives
         foo_meth = config.foo
         self.failUnless(foo_meth.im_func.__docobj__ is foo)
@@ -4578,13 +4568,6 @@ class DummyRequest:
 
 class DummyContext:
     pass
-
-class DummyLock:
-    def acquire(self):
-        self.acquired = True
-
-    def release(self):
-        self.released = True
 
 class DummyPackage:
     def __init__(self, name):

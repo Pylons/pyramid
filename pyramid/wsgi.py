@@ -17,14 +17,7 @@ def wsgiapp(wrapped):
                                      ('Content-Length', len(body)) ] )
           return [body]
 
-    Allows the following ZCML view declaration to be made::
-
-       <view
-          view=".views.hello_world"
-          name="hello_world.txt"
-        />
-
-    Or the following call to
+    Allows the following call to
     :meth:`pyramid.config.Configurator.add_view`::
 
         from views import hello_world
@@ -56,14 +49,7 @@ def wsgiapp2(wrapped):
                                      ('Content-Length', len(body)) ] )
           return [body]
 
-    Allows the following ZCML view declaration to be made::
-
-       <view
-          view=".views.hello_world"
-          name="hello_world.txt"
-        />
-
-    Or the following call to
+    Allows the following call to
     :meth:`pyramid.config.Configurator.add_view`::
 
         from views import hello_world

@@ -17,6 +17,18 @@ Backwards Incompatibilities
   get this method back after depending upon ``pyramid_handlers`` as an
   ``install_requires`` dependency.
 
+- The ``load_zcml`` method of a Configurator has been removed from the
+  Pyramid core.  Loading ZCML is now a feature of the ``pyramid_zcml``
+  package, which can be downloaded from PyPI.  Documentation for the package
+  should be available via http://pylonsproject.org, which describes how to
+  get this method back after depending upon ``pyramid_zcml`` as an
+  ``install_requires`` dependency.
+
+- The ``pyramid.includes`` subpackage has been removed.  ZCML files which use
+  include the package ``pyramid.includes`` (e.g. ``<include
+  package="pyramid.includes"/>``) now must include the ``pyramid_zcml``
+  package instead (e.g. ``<include package="pyramid_zcml"/>``).
+
 - The ``pyramid.view.action`` decorator has been removed from the Pyramid
   core.  Handlers are now a feature of the ``pyramid_handlers`` package.  It
   should now be imported from ``pyramid_handlers`` e.g. ``from
@@ -28,6 +40,17 @@ Backwards Incompatibilities
 - The ``pylons_minimal``, ``pylons_basic`` and ``pylons_sqla`` paster
   templates were removed.  Use ``pyramid_sqla`` (available from PyPI) as a
   generic replacement for Pylons-esque development.
+
+- The ``make_app`` function has been removed from the ``pyramid.router``
+  module.  It continues life within the ``pyramid_zcml`` package.  This
+  leaves the ``pyramid.router`` module without any API functions.
+
+- The ``configure_zcml`` setting within the deployment settings (within
+  ``**settings`` passed to a Pyramid ``main`` function) has ceased to have any
+  meaning.
+
+- The ``starter_zcml`` paster template has been moved to the ``pyramid_zcml``
+  package.
 
 Features
 --------
@@ -51,6 +74,11 @@ Features
   ``config.include('some.module.somefunc')`` as long as the include function
   within ``some.module`` is named ``includeme``.
 
+- The ``bfg2pyramid`` script now converts ZCML include tags that have
+  ``repoze.bfg.includes`` as a package attribute to the value
+  ``pyramid_zcml``.  For example, ``<include package="repoze.bfg.includes">``
+  will be converted to ``<include package="pyramid_zcml">``.
+
 Paster Templates
 ----------------
 
@@ -71,6 +99,12 @@ Documentation
 
 - Document the ``request.override_renderer`` attribute within the narrative
   "Renderers" chapter in a section named "Overriding A Renderer at Runtime".
+
+- The "Declarative Configuration" narrative chapter has been removed (it was
+  moved to the ``pyramid_zcml`` package).
+
+- Most references to ZCML in narrative chapters have been removed or
+  redirected to ``pyramid_zcml`` locations.
 
 Deprecations
 ------------

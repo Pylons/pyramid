@@ -26,7 +26,6 @@ and so therefore they are often referred to as "paster templates".
 .. index::
    single: paster templates
    single: pyramid_starter paster template
-   single: pyramid_starter_zcml paster template
    single: pyramid_zodb paster template
    single: pyramid_alchemy paster template
    single: pyramid_routesalchemy paster template
@@ -45,8 +44,6 @@ each other on a number of axes:
 - the mechanism they use to map URLs to code (:term:`traversal` or :term:`URL
   dispatch`).
 
-- the type of configuration used (:term:`ZCML` vs. imperative configuration).
-
 - whether or not the ``pyramid_beaker`` library is relied upon as the
   sessioning implementation (as opposed to no sessioning or default
   sessioning).
@@ -55,10 +52,6 @@ The included templates are these:
 
 ``pyramid_starter``
   URL mapping via :term:`traversal` and no persistence mechanism.
-
-``pyramid_starter_zcml``
-  URL mapping via :term:`traversal` and no persistence mechanism, using
-  :term:`ZCML` (declarative configuration).
 
 ``pyramid_zodb``
   URL mapping via :term:`traversal` and persistence via :term:`ZODB`.
