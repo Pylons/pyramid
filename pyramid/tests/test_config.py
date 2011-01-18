@@ -2282,10 +2282,15 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: {}
         config.set_notfound_view(view,
                                  renderer='pyramid.tests:fixtures/minimal.pt')
-        request = self._makeRequest(config)
-        view = self._getViewCallable(config, ctx_iface=implementedBy(NotFound),
-                                     request_iface=IRequest)
-        result = view(None, request)
+        config.begin()
+        try: # chameleon depends on being able to find a threadlocal registry
+            request = self._makeRequest(config)
+            view = self._getViewCallable(config,
+                                         ctx_iface=implementedBy(NotFound),
+                                         request_iface=IRequest)
+            result = view(None, request)
+        finally:
+            config.end()
         self.failUnless('div' in result.body)
 
     def test_set_forbidden_view(self):
@@ -2323,10 +2328,15 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: {}
         config.set_forbidden_view(view,
                                   renderer='pyramid.tests:fixtures/minimal.pt')
-        request = self._makeRequest(config)
-        view = self._getViewCallable(config, ctx_iface=implementedBy(Forbidden),
-                                     request_iface=IRequest)
-        result = view(None, request)
+        config.begin()
+        try: # chameleon requires a threadlocal registry
+            request = self._makeRequest(config)
+            view = self._getViewCallable(config,
+                                         ctx_iface=implementedBy(Forbidden),
+                                         request_iface=IRequest)
+            result = view(None, request)
+        finally:
+            config.end()
         self.failUnless('div' in result.body)
 
     def test__set_authentication_policy(self):
