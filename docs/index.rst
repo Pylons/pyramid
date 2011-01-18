@@ -58,7 +58,6 @@ Narrative documentation in chapter form explaining how to use
    narr/testing
    narr/hooks
    narr/advconfig
-   narr/declarative
    narr/extending
    narr/router
    narr/threadlocals

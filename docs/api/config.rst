@@ -52,8 +52,6 @@
 
      .. automethod:: derive_view
 
-     .. automethod:: load_zcml(spec)
-
      .. automethod:: make_wsgi_app()
 
      .. automethod:: override_asset(to_override, override_with)

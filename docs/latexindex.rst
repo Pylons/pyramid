@@ -51,9 +51,7 @@ Narrative Documentation
    narr/testing
    narr/hooks
    narr/advconfig
-   narr/declarative
    narr/extending
-   narr/router
    narr/startup
    narr/threadlocals
    narr/zca

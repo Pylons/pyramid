@@ -145,7 +145,7 @@ def is_response(ob):
 class view_config(object):
     """ A function, class or method :term:`decorator` which allows a
     developer to create view registrations nearer to a :term:`view
-    callable` definition than use of :term:`ZCML` or :term:`imperative
+    callable` definition than use :term:`imperative
     configuration` to do the same.
 
     For example, this code in a module ``views.py``::
@@ -164,16 +164,6 @@ class view_config(object):
        from resources import MyResource
        config.add_view(views.my_view, context=MyResource, name='my_view',
                        permission='read', 'route_name='site1')
-
-    Or might replace the following ZCML ``view`` declaration::
-
-      <view
-       for='.resources.MyResource'
-       view='.views.my_view'
-       name='my_view'
-       permission='read'
-       route_name='site1'
-       />
 
     .. note: :class:`pyramid.view.view_config` is also importable, for
              backwards compatibility purposes, as the name
@@ -368,17 +358,9 @@ class view_config(object):
                 return Response('hello from %s!' % self.context)
 
     To make use of any ``view_config`` declaration, you must perform a
-    :term:`scan`.  To do so, either insert the following boilerplate
-    into your application registry's ZCML::
+    :term:`scan`.  To do so, insert the following into your Pyramid
+    application's ``main`` stanza::
     
-      <scan package="."/>
-
-    See :ref:`scan_directive` for more information about the ZCML
-    ``scan`` directive.
-
-    Or, if you don't use ZCML, use the
-    :meth:`pyramid.config.Configurator.scan` method::
-
       config.scan()
     """
     venusian = venusian # for testing injection
@@ -509,16 +491,8 @@ redirect to the slash-appended PATH_INFO.  Note that this will *lose*
 ``POST`` data information (turning it into a GET), so you shouldn't
 rely on this to redirect POST requests.
 
-If you use :term:`ZCML`, add the following to your application's
-``configure.zcml`` to use this view as the Not Found view::
-
-      <view
-         context="pyramid.exceptions.NotFound"
-         view="pyramid.view.append_slash_notfound_view"/>
-
-Or use the
-:meth:`pyramid.config.Configurator.add_view`
-method if you don't use ZCML::
+Use the :meth:`pyramid.config.Configurator.add_view` method to configure this
+view as the Not Found view::
 
   from pyramid.exceptions import NotFound
   from pyramid.view import append_slash_notfound_view

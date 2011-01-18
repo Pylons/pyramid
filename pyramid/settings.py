@@ -46,8 +46,6 @@ class Settings(dict):
                                     config_reload_resources))
         # reload_resources is an older alias for reload_assets
         eff_reload_assets = reload_assets or reload_resources
-        configure_zcml = self.get('configure_zcml', '')
-        eff_configure_zcml = eget('PYRAMID_CONFIGURE_ZCML', configure_zcml)
         locale_name = self.get('default_locale_name', 'en')
         eff_locale_name = eget('PYRAMID_DEFAULT_LOCALE_NAME', locale_name)
         
@@ -59,7 +57,6 @@ class Settings(dict):
             'reload_templates': eff_reload_all or eff_reload_templates,
             'reload_resources':eff_reload_all or eff_reload_assets,
             'reload_assets':eff_reload_all or eff_reload_assets,
-            'configure_zcml':eff_configure_zcml,
             'default_locale_name':eff_locale_name,
             }
 

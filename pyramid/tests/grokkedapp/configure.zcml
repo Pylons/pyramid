@@ -1,6 +1,0 @@
-<configure xmlns="http://pylonshq.com/pyramid">
-
-  <include package="pyramid.includes" />
-  <scan package="."/>
-
-</configure>

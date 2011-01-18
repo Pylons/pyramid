@@ -29,6 +29,17 @@ Backwards Incompatibilities
   templates were removed.  Use ``pyramid_sqla`` (available from PyPI) as a
   generic replacement for Pylons-esque development.
 
+- The ``make_app`` function has been removed from the ``pyramid.router``
+  module.  It continues life within the ``pyramid_zcml`` package.  This
+  leaves the ``pyramid.router`` module without any API functions.
+
+- The ``configure_zcml`` setting within the deployment settings (within
+  ``**settings`` passed to a Pyramid ``main`` function) has ceased to have any
+  meaning.
+
+- The ``starter_zcml`` paster template has been moved to the ``pyramid_zcml``
+  package.
+
 Features
 --------
 
@@ -50,6 +61,11 @@ Features
   ``config.include('some.module')`` rather than
   ``config.include('some.module.somefunc')`` as long as the include function
   within ``some.module`` is named ``includeme``.
+
+- The ``bfg2pyramid`` script now converts ZCML include tags that have
+  ``repoze.bfg.includes`` as a package attribute to the value
+  ``pyramid_zcml``.  For example, ``<include package="repoze.bfg.includes">``
+  will be converted to ``<include package="pyramid_zcml">``.
 
 Paster Templates
 ----------------
