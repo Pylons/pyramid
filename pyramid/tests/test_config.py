@@ -2274,6 +2274,20 @@ class ConfiguratorTests(unittest.TestCase):
         result = view(None, request)
         self.assertEqual(result, ('abc', request))
 
+    def test_set_notfound_view_with_renderer(self):
+        from zope.interface import implementedBy
+        from pyramid.interfaces import IRequest
+        from pyramid.exceptions import NotFound
+        config = self._makeOne(autocommit=True)
+        view = lambda *arg: {}
+        config.set_notfound_view(view,
+                                 renderer='pyramid.tests:fixtures/minimal.pt')
+        request = self._makeRequest(config)
+        view = self._getViewCallable(config, ctx_iface=implementedBy(NotFound),
+                                     request_iface=IRequest)
+        result = view(None, request)
+        self.failUnless('div' in result.body)
+
     def test_set_forbidden_view(self):
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
@@ -2300,6 +2314,20 @@ class ConfiguratorTests(unittest.TestCase):
                                      request_iface=IRequest)
         result = view(None, request)
         self.assertEqual(result, ('abc', request))
+
+    def test_set_forbidden_view_with_renderer(self):
+        from zope.interface import implementedBy
+        from pyramid.interfaces import IRequest
+        from pyramid.exceptions import Forbidden
+        config = self._makeOne(autocommit=True)
+        view = lambda *arg: {}
+        config.set_forbidden_view(view,
+                                  renderer='pyramid.tests:fixtures/minimal.pt')
+        request = self._makeRequest(config)
+        view = self._getViewCallable(config, ctx_iface=implementedBy(Forbidden),
+                                     request_iface=IRequest)
+        result = view(None, request)
+        self.failUnless('div' in result.body)
 
     def test__set_authentication_policy(self):
         from pyramid.interfaces import IAuthenticationPolicy
