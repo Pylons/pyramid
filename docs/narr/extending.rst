@@ -196,7 +196,7 @@ like this:
   :ref:`creating_a_project` for more information.
 
 - In the new package, create Python files containing views and other
-  overridden elements, such as templates and static resources as necessary.
+  overridden elements, such as templates and static assets as necessary.
 
 - Install the new package into the same Python environment as the original
   application (e.g. ``python setup.py develop`` or ``python setup.py
