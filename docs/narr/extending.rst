@@ -108,7 +108,7 @@ extensible and overrideable. :term:`ZCML` declarations that belong to an
 application can be overridden and extended by integrators as necessary in a
 similar fashion.  If you use only :term:`ZCML` to configure your application,
 it will automatically be maximally extensible without any manual effort.  See
-:ref:`declarative_chapter` for information about using ZCML.
+:term:`pyramid_zcml` for information about using ZCML.
 
 Fundamental Plugpoints
 ~~~~~~~~~~~~~~~~~~~~~~
