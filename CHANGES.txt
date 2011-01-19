@@ -13,8 +13,8 @@ Documentation
 Bug Fixes
 ---------
 
-- URL Dispatch properly handles a '.*' or '*' appearing in a regex match
-  when used inside brackets. Resolve Issue #90.
+- URL dispatch now properly handles a ``.*`` or ``*`` appearing in a regex
+  match when used inside brackets.  Resolves issue #90.
 
 Backwards Incompatibilities
 ---------------------------
