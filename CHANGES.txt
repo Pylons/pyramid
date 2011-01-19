@@ -26,6 +26,12 @@ Backwards Incompatibilities
   through.  Those deployments will need to configure ``repoze.who`` to also
   react to ``403 Forbidden``.
 
+- The default value for the ``cookie_on_exception`` parameter to
+  ``pyramid.session.UnencyrptedCookieSessionFactory`` is now ``True``.  This
+  means that when view code causes an exception to be raised, and the session
+  has been mutated, a cookie will be sent back in the response.  Previously
+  its default value was ``False``.
+
 1.0a10 (2011-01-18)
 ===================
 
