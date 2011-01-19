@@ -18,9 +18,6 @@ Must-Have (before 1.0)
 
 - Explain how to use i18n localization in Mako and Jinja2.
 
-- Turn Forbidden status code into a 403 (it's currently a 401, which is for
-  bw compat, but is misleading).
-
 - Fix too-long template lines in tutorials for PDF renderings.
 
 - Allow ``pyramid.security.remember`` to accept a list of tokens for use when

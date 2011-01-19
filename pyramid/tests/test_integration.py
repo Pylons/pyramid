@@ -100,7 +100,7 @@ class TestFixtureApp(IntegrationBase):
         self.assertEqual(res.body, 'supressed')
 
     def test_protected(self):
-        self.testapp.get('/protected.html', status=401)
+        self.testapp.get('/protected.html', status=403)
 
 class TestCCBug(IntegrationBase):
     # "unordered" as reported in IRC by author of
@@ -191,17 +191,17 @@ class TestViewPermissionBug(IntegrationBase):
         self.failUnless('ACLDenied' in res.body)
 
     def test_x(self):
-        self.testapp.get('/x', status=401)
+        self.testapp.get('/x', status=403)
 
 class TestDefaultViewPermissionBug(IntegrationBase):
     # default_view_permission bug as reported by Wiggy at http://lists.repoze.org/pipermail/repoze-dev/2010-October/003602.html
     package = 'pyramid.tests.defpermbugapp'
     def test_x(self):
-        res = self.testapp.get('/x', status=401)
+        res = self.testapp.get('/x', status=403)
         self.failUnless('failed permission check' in res.body)
 
     def test_y(self):
-        res = self.testapp.get('/y', status=401)
+        res = self.testapp.get('/y', status=403)
         self.failUnless('failed permission check' in res.body)
 
     def test_z(self):

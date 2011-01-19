@@ -7,6 +7,17 @@ Documentation
 - Merged caseman-master narrative editing branch, many wording fixes and
   extensions.
 
+Backwards Incompatibilities
+---------------------------
+
+- When a ``pyramid.exceptions.Forbidden`` error is raised, its status code
+  now ``403 Forbidden``.  It was previously ``401 Unauthorized``, for
+  backwards compatibility purposes with ``repoze.bfg``.  This change will
+  cause problems for users of Pyramid with ``repoze.who``, which intercepts
+  ``401 Unauthorized`` by default, but allows ``403 Forbidden`` to pass
+  through.  Those deployments will need to configure ``repoze.who`` to also
+  react to ``403 Forbidden``.
+
 1.0a10 (2011-01-18)
 ===================
 

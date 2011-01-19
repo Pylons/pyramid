@@ -42,4 +42,4 @@ class TestForbidden(unittest.TestCase):
         from pyramid.exceptions import ExceptionResponse
         e = self._makeOne('unauthorized')
         self.failUnless(isinstance(e, ExceptionResponse))
-        self.assertEqual(e.status, '401 Unauthorized')
+        self.assertEqual(e.status, '403 Forbidden')

@@ -40,7 +40,7 @@ class Forbidden(ExceptionResponse):
     """
     Raise this exception within :term:`view` code to immediately
     return the :term:`forbidden view` to the invoking user.  Usually
-    this is a basic ``401`` page, but the forbidden view can be
+    this is a basic ``403`` page, but the forbidden view can be
     customized as necessary.  See :ref:`changing_the_forbidden_view`.
 
     This exception's constructor accepts a single positional argument, which
@@ -48,7 +48,7 @@ class Forbidden(ExceptionResponse):
     request by the router as the ``exception_message`` attribute, for
     availability to the :term:`Forbidden View`.
     """
-    status = '401 Unauthorized'
+    status = '403 Forbidden'
 
 class NotFound(ExceptionResponse):
     """

@@ -80,7 +80,7 @@ Changing the Forbidden View
 
 When :app:`Pyramid` can't authorize execution of a view based on the
 :term:`authorization policy` in use, it invokes a :term:`forbidden view`.
-The default forbidden response has a 401 status code and is very plain, but
+The default forbidden response has a 403 status code and is very plain, but
 the view which generates it can be overridden as necessary.
 
 The :term:`forbidden view` callable is a view callable like any other.  The
@@ -128,12 +128,6 @@ Here's some sample code that implements a minimal forbidden view:
    forbidden was raised.  This message will be different when the
    ``debug_authorization`` environment setting is true than it is when
    it is false.
-
-.. warning:: the default forbidden view sends a response with a ``401
-   Unauthorized`` status code for backwards compatibility reasons.
-   You can influence the status code of Forbidden responses by using
-   an alternate forbidden view.  For example, it would make sense to
-   return a response with a ``403 Forbidden`` status code.
 
 .. index::
    single: request factory
