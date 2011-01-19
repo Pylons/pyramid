@@ -61,6 +61,8 @@ Must-Have (before 1.0)
 
 - Add example for ``__action_decorator__`` to pyramid_handler docs.
 
+- Figure out what to do with "Forms" chapter in narr docs.
+
 Should-Have
 -----------
 
