@@ -111,8 +111,8 @@ follows:
   each as ``request``).
 
 - ``get_current_request`` should never be called in :term:`resource` code.
-   If a resource needs access to the request, it should be passed the request
-   by a :term:`view callable`.
+  If a resource needs access to the request, it should be passed the request
+  by a :term:`view callable`.
 
 - ``get_current_request`` function should never be called because it's
   "easier" or "more elegant" to think about calling it than to pass a
