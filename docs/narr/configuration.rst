@@ -151,9 +151,7 @@ Declarative Configuration
 A third mode of configuration can be employed when you create a
 :app:`Pyramid` application named *declarative configuration*.  This mode uses
 an XML language known as :term:`ZCML` to represent configuration statements
-rather than Python.  ZCML is often used when application extensibility is
-important.  Most of the examples in the narrative portion of this
-documentation concentrate on imperative configuration rather than ZCML, but
-almost everything that can be configured imperatively can also be configured
-via ZCML.  See :ref:`declarative_chapter` for more information about ZCML.
+rather than Python.  ZCML is not built-in to Pyramid, but almost everything
+that can be configured imperatively can also be configured via ZCML if you
+install the :term:`pyramid_zcml` package.
 
