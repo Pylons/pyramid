@@ -6,6 +6,9 @@ Must-Have (before 1.0)
 
 - Write a "Whats New" (delta from BFG 1.3)
 
+- Fix deprecated example showing ``chameleon_zpt`` API call in testing
+  narrative chapter.
+
 - Use a commit veto when configuring repoze.tm2 in paster templates for
   non-1X, 2X, or 3X responses.
 
