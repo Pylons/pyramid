@@ -9,11 +9,6 @@ development framework.  It is developed as part of the `Pylons Project
 <http://docs.pylonsproject.org/>`_.  It is licensed under a `BSD-like license
 <http://repoze.org/license.html>`_.
 
-.. note::
-
-   Pyramid is the latest iteration of the web framework previously known as
-   :mod:`repoze.bfg`.
-
 Front Matter
 ============
 
