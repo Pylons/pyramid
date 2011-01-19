@@ -1,3 +1,12 @@
+Next release
+============
+
+Documentation
+-------------
+
+- Merged caseman-master narrative editing branch, many wording fixes and
+  extensions.
+
 1.0a10 (2011-01-18)
 ===================
 
