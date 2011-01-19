@@ -54,7 +54,7 @@ technologies.
 Book Content
 ============
 
-This book is divided into four major parts:
+This book is divided into three major parts:
 
 :ref:`narrative_documentation`
 
