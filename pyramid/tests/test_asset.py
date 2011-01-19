@@ -422,6 +422,32 @@ class Test_abspath_from_asset_spec(unittest.TestCase):
         result = self._callFUT('abc', 'pyramid.tests')
         self.assertEqual(result, os.path.join(path, 'abc'))
 
+class Test_asset_spec_from_abspath(unittest.TestCase):
+    def _callFUT(self, abspath, package):
+        from pyramid.asset import asset_spec_from_abspath
+        return asset_spec_from_abspath(abspath, package)
+
+    def test_package_name_is_main(self):
+        pkg = DummyPackage('__main__')
+        result = self._callFUT('abspath', pkg)
+        self.assertEqual(result, 'abspath')
+
+    def test_abspath_startswith_package_path(self):
+        import os
+        abspath = os.path.dirname(__file__) + '/fixtureapp'
+        pkg = DummyPackage('pyramid.tests')
+        pkg.__file__ = 'file'
+        result = self._callFUT(abspath, pkg)
+        self.assertEqual(result, 'pyramid:fixtureapp')
+
+    def test_abspath_doesnt_startwith_package_path(self):
+        import os
+        abspath = os.path.dirname(__file__)
+        pkg = DummyPackage('pyramid.tests')
+        result = self._callFUT(abspath, pkg)
+        self.assertEqual(result, abspath)
+        
+
 class DummyOverride:
     def __init__(self, result):
         self.result = result

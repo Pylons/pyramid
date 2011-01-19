@@ -66,11 +66,13 @@ class TestStaticApp(unittest.TestCase):
 
 class IntegrationBase(unittest.TestCase):
     root_factory = None
+    package = None
     def setUp(self):
         from pyramid.config import Configurator
-        config = Configurator(root_factory=self.root_factory)
+        config = Configurator(root_factory=self.root_factory,
+                              package=self.package)
         config.begin()
-        config.load_zcml(self.config)
+        config.include(self.package)
         config.commit()
         app = config.make_wsgi_app()
         from webtest import TestApp
@@ -81,7 +83,7 @@ class IntegrationBase(unittest.TestCase):
         self.config.end()
 
 class TestFixtureApp(IntegrationBase):
-    config = 'pyramid.tests.fixtureapp:configure.zcml'
+    package = 'pyramid.tests.fixtureapp'
     def test_another(self):
         res = self.testapp.get('/another.html', status=200)
         self.assertEqual(res.body, 'fixture')
@@ -103,7 +105,7 @@ class TestFixtureApp(IntegrationBase):
 class TestCCBug(IntegrationBase):
     # "unordered" as reported in IRC by author of
     # http://labs.creativecommons.org/2010/01/13/cc-engine-and-web-non-frameworks/
-    config = 'pyramid.tests.ccbugapp:configure.zcml'
+    package = 'pyramid.tests.ccbugapp'
     def test_rdf(self):
         res = self.testapp.get('/licenses/1/v1/rdf', status=200)
         self.assertEqual(res.body, 'rdf')
@@ -116,7 +118,7 @@ class TestHybridApp(IntegrationBase):
     # make sure views registered for a route "win" over views registered
     # without one, even though the context of the non-route view may
     # be more specific than the route view.
-    config = 'pyramid.tests.hybridapp:configure.zcml'
+    package = 'pyramid.tests.hybridapp'
     def test_root(self):
         res = self.testapp.get('/', status=200)
         self.assertEqual(res.body, 'global')
@@ -157,13 +159,13 @@ class TestHybridApp(IntegrationBase):
 
 class TestRestBugApp(IntegrationBase):
     # test bug reported by delijati 2010/2/3 (http://pastebin.com/d4cc15515)
-    config = 'pyramid.tests.restbugapp:configure.zcml'
+    package = 'pyramid.tests.restbugapp'
     def test_it(self):
         res = self.testapp.get('/pet', status=200)
         self.assertEqual(res.body, 'gotten')
 
 class TestViewDecoratorApp(IntegrationBase):
-    config = 'pyramid.tests.viewdecoratorapp:configure.zcml'
+    package = 'pyramid.tests.viewdecoratorapp'
     def _configure_mako(self):
         tmpldir = os.path.join(os.path.dirname(__file__), 'viewdecoratorapp',
                                'views')
@@ -183,7 +185,7 @@ class TestViewDecoratorApp(IntegrationBase):
 
 class TestViewPermissionBug(IntegrationBase):
     # view_execution_permitted bug as reported by Shane at http://lists.repoze.org/pipermail/repoze-dev/2010-October/003603.html
-    config = 'pyramid.tests.permbugapp:configure.zcml'
+    package = 'pyramid.tests.permbugapp'
     def test_test(self):
         res = self.testapp.get('/test', status=200)
         self.failUnless('ACLDenied' in res.body)
@@ -193,7 +195,7 @@ class TestViewPermissionBug(IntegrationBase):
 
 class TestDefaultViewPermissionBug(IntegrationBase):
     # default_view_permission bug as reported by Wiggy at http://lists.repoze.org/pipermail/repoze-dev/2010-October/003602.html
-    config = 'pyramid.tests.defpermbugapp:configure.zcml'
+    package = 'pyramid.tests.defpermbugapp'
     def test_x(self):
         res = self.testapp.get('/x', status=401)
         self.failUnless('failed permission check' in res.body)
@@ -211,7 +213,7 @@ excroot = {'anexception':AnException(),
            'notanexception':NotAnException()}
 
 class TestExceptionViewsApp(IntegrationBase):
-    config = 'pyramid.tests.exceptionviewapp:configure.zcml'
+    package = 'pyramid.tests.exceptionviewapp'
     root_factory = lambda *arg: excroot
     def test_root(self):
         res = self.testapp.get('/', status=200)

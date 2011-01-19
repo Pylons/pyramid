@@ -890,9 +890,6 @@ will be merged into translations from a message catalog added earlier
 if both translation directories contain translations for the same
 locale and :term:`translation domain`.
 
-.. note:: You can also add a translation directory via ZCML.  See
-   :ref:`zcml_adding_a_translation_directory`
-
 Setting the Locale
 ~~~~~~~~~~~~~~~~~~
 
@@ -1019,5 +1016,3 @@ For example:
    config = Configurator()
    config.set_locale_negotiator(my_locale_negotiator)
 
-.. note:: You can also add a custom locale negotiator via ZCML.  See
-   :ref:`zcml_adding_a_locale_negotiator`

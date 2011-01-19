@@ -232,8 +232,8 @@ class Request(WebobRequest):
         Generates a fully qualified URL for a static :term:`asset`.  The
         asset must live within a location defined via the
         :meth:`pyramid.config.Configurator.add_static_view`
-        :term:`configuration declaration` or the ``<static>`` ZCML directive
-        (see :ref:`static_assets_section`).
+        :term:`configuration declaration` directive (see
+        :ref:`static_assets_section`).
 
         This is a convenience method.  The result of calling
         :meth:`pyramid.request.Request.static_url` is the same as calling

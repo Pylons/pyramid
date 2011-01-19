@@ -3,14 +3,12 @@ import os
 import re
 import sys
 import types
-import threading
 import traceback
 
 import venusian
 
 from translationstring import ChameleonTranslate
 
-from zope.configuration import xmlconfig
 from zope.configuration.config import GroupingContextDecorator
 from zope.configuration.config import ConfigurationMachine
 from zope.configuration.xmlconfig import registerCommonDirectives
@@ -576,7 +574,7 @@ class Configurator(object):
                 config = self.__class__.with_context(context)
                 c(config)
 
-    def add_directive(self, name, directive):
+    def add_directive(self, name, directive, action_wrap=True):
         """
         Add a directive method to the configurator.
 
@@ -588,6 +586,12 @@ class Configurator(object):
         keyword arguments following.  It should use config.action as
         necessary to perform actions.  Directive methods can then be invoked
         like 'built-in' directives such as ``add_view``, ``add_route``, etc.
+
+        The ``action_wrap`` argument should be ``True`` for directives which
+        perform ``config.action`` with potentially conflicting
+        discriminators.  ``action_wrap`` will cause the directive to be
+        wrapped in a decorator which provides more accurate conflict
+        cause information.
         
         ``add_directive`` does not participate in conflict detection, and
         later calls to ``add_directive`` will override earlier calls.
@@ -595,7 +599,7 @@ class Configurator(object):
         c = self.maybe_dotted(directive)
         if not hasattr(self.registry, '_directives'):
             self.registry._directives = {}
-        self.registry._directives[name] = c
+        self.registry._directives[name] = (c, action_wrap)
 
     def __getattr__(self, name):
         # allow directive extension names to work
@@ -603,7 +607,9 @@ class Configurator(object):
         c = directives.get(name)
         if c is None:
             raise AttributeError(name)
-        c = action_method(c)
+        c, action_wrap = c
+        if action_wrap:
+            c = action_method(c)
         m = types.MethodType(c, self, self.__class__)
         return m
 
@@ -918,47 +924,6 @@ class Configurator(object):
         finally:
             self.manager.pop()
         return app
-
-    def load_zcml(self, spec='configure.zcml', lock=threading.Lock()):
-        """ Load configuration from a :term:`ZCML` file into the
-        current configuration state.  The ``spec`` argument is an
-        absolute filename, a relative filename, or a :term:`asset
-        specification`, defaulting to ``configure.zcml`` (relative to
-        the package of the configurator's caller)."""
-        package_name, filename = self._split_spec(spec)
-        if package_name is None: # absolute filename
-            package = self.package
-        else:
-            __import__(package_name)
-            package = sys.modules[package_name]
-
-        registry = self.registry
-        self.manager.push({'registry':registry, 'request':None})
-        context = self._ctx
-        if context is None:
-            context = self._ctx = self._make_context(self.autocommit)
-
-        # To avoid breaking people's expectations of how ZCML works, we
-        # cannot autocommit ZCML actions incrementally.  If we commit actions
-        # incrementally, configuration outcome will be controlled purely by
-        # ZCML directive execution order, which isn't what anyone who uses
-        # ZCML expects.  So we don't autocommit each ZCML directive action
-        # while parsing is happening, but we do make sure to pass
-        # execute=self.autocommit to xmlconfig.file below, which will cause
-        # the actions implied by the ZCML that was parsed to be committed
-        # right away once parsing is finished if autocommit is True.
-        context = GroupingContextDecorator(context)
-        context.autocommit = False 
-
-        lock.acquire()
-        try:
-            context.package = package
-            xmlconfig.file(filename, package, context=context,
-                           execute=self.autocommit)
-        finally:
-            lock.release()
-            self.manager.pop()
-        return registry
 
     @action_method
     def add_view(self, view=None, name="", for_=None, permission=None,

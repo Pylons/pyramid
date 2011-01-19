@@ -201,13 +201,11 @@ Without invoking any startup code or using the testing API, an attempt to run
 this view function in a unit test will result in an error.  When a
 :app:`Pyramid` application starts normally, it will populate a
 :term:`application registry` using :term:`configuration declaration` calls
-made against a :term:`Configurator` (sometimes deferring to the application's
-``configure.zcml`` :term:`ZCML` file via ``load_zcml``).  But if this
-application registry is not created and populated (e.g. with an
+made against a :term:`Configurator`.  But if this application registry is not
+created and populated (e.g. with an
 :meth:`pyramid.config.Configurator.add_view` :term:`configuration
-declaration` or ``view`` declarations in :term:`ZCML`), like when you invoke
-application code via a unit test, :app:`Pyramid` API functions will tend to
-fail.
+declaration`), like when you invoke application code via a unit test,
+:app:`Pyramid` API functions will tend to fail.
 
 The testing API provided by :app:`Pyramid` allows you to simulate various
 application registry registrations for use under a unit testing framework
@@ -310,12 +308,13 @@ implementations to give the code under test only enough context to run.
 some code *and* its integration with the rest of the :app:`Pyramid`
 framework.
 
-In :app:`Pyramid` applications that use :term:`ZCML`, you can create an
-integration test by *loading its ZCML* in the test's setup code.  This causes
-the entire :app:`Pyramid` environment to be set up and torn down as if your
-application was running "for real".  This is a heavy-hammer way of making
-sure that your tests have enough context to run properly, and it tests your
-code's integration with the rest of :app:`Pyramid`.
+In :app:`Pyramid` applications that are plugins to Pyramid, you can create an
+integration test by including it's ``includeme`` function via
+:meth:`pyramid.config.Configurator.include` in the test's setup code.  This
+causes the entire :app:`Pyramid` environment to be set up and torn down as if
+your application was running "for real".  This is a heavy-hammer way of
+making sure that your tests have enough context to run properly, and it tests
+your code's integration with the rest of :app:`Pyramid`.
 
 Let's demonstrate this by showing an integration test for a view.  The below
 test assumes that your application's package name is ``myapp``, and that
@@ -333,12 +332,12 @@ after accessing some values that require a fully set up environment.
    class ViewIntegrationTests(unittest.TestCase):
        def setUp(self):
            """ This sets up the application registry with the
-           registrations your application declares in its configure.zcml
-           (including dependent registrations for pyramid itself).
+           registrations your application declares in its ``includeme`` 
+           function.
            """
            import myapp
            self.config = testing.setUp()
-           self.config.load_zcml('myapp:configure.zcml')
+           self.config.include('myapp')
 
        def tearDown(self):
            """ Clear out the application registry """

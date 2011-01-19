@@ -59,7 +59,6 @@ Narrative documentation in chapter form explaining how to use
    narr/testing
    narr/hooks
    narr/advconfig
-   narr/declarative
    narr/extending
    narr/router
    narr/threadlocals
@@ -87,14 +86,12 @@ applications to various platforms.
 Reference Material
 ==================
 
-Reference material includes API documentation and documentation of
-every :app:`Pyramid` :term:`ZCML directive`.
+Reference material includes documentation for every :app:`Pyramid` API.
 
 .. toctree::
    :maxdepth: 2
 
    api
-   zcml
 
 Detailed Change History
 =======================

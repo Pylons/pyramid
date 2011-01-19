@@ -70,9 +70,6 @@ Here's some sample code that implements a minimal NotFound view callable:
    :exc:`pyramid.exceptions.NotFound` exception instance.  If available, the
    resource context will still be available as ``request.context``.
 
-For information about how to configure a not found view via :term:`ZCML`, see
-:ref:`notfound_zcml`.
-
 .. index::
    single: forbidden view
 
@@ -138,9 +135,6 @@ Here's some sample code that implements a minimal forbidden view:
    an alternate forbidden view.  For example, it would make sense to
    return a response with a ``403 Forbidden`` status code.
 
-For information about how to configure a forbidden view via :term:`ZCML`, see
-:ref:`forbidden_zcml`.
-
 .. index::
    single: request factory
 
@@ -184,8 +178,6 @@ already constructed a :term:`configurator` it can also be registered via the
 
    config = Configurator()
    config.set_request_factory(MyRequest)
-
-To use ZCML for the same purpose, see :ref:`changing_request_factory_zcml`.
 
 .. index::
    single: renderer globals
@@ -241,9 +233,6 @@ already constructed a :term:`configurator` it can also be registered via the
 
 Another mechanism which allows event subscribers to add renderer global values
 exists in :ref:`beforerender_event`.
-
-If you'd rather ZCML to register a renderer globals factory, see
-:ref:`adding_renderer_globals_zcml`.
 
 .. index::
    single: before render event
@@ -474,9 +463,6 @@ function, :app:`Pyramid` would use the ``myapp.traversal.Traverser`` only
 when the application :term:`root factory` returned an instance of the
 ``myapp.resources.MyRoot`` object.  Otherwise it would use the default
 :app:`Pyramid` traverser to do traversal.
-
-For information about how to configure an alternate traverser via
-:term:`ZCML`, see :ref:`changing_traverser_zcml`.
 
 .. index::
    single: url generator

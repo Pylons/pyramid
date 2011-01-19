@@ -14,12 +14,12 @@ This particular tutorial was developed under Apple's Mac OS X platform
 largely the same for all systems, delta specific path information for
 commands and files.
 
-.. note:: Unfortunately these instructions almost certainly won't work
-   for deploying a :app:`Pyramid` application on a Windows system
-   using ``mod_wsgi``.  If you have experience with :app:`Pyramid`
-   and ``mod_wsgi`` on Windows systems, please help us document
-   this experience by submitting documentation to the `mailing list
-   <http://lists.repoze.org/listinfo/repoze-dev>`_.
+.. note:: Unfortunately these instructions almost certainly won't work for
+   deploying a :app:`Pyramid` application on a Windows system using
+   ``mod_wsgi``.  If you have experience with :app:`Pyramid` and ``mod_wsgi``
+   on Windows systems, please help us document this experience by submitting
+   documentation to the `Pylons-devel maillist
+   <http://groups.google.com/group/pylons-devel>`_.
 
 #.  The tutorial assumes you have Apache already installed on your
     system.  If you do not, install Apache 2.X for your platform in
