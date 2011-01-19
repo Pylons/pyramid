@@ -1,6 +1,7 @@
 from codecs import utf_8_decode
 from codecs import utf_8_encode
 import datetime
+import re
 import time
 
 from paste.auth import auth_tkt
@@ -13,6 +14,9 @@ from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.request import add_global_response_headers
 from pyramid.security import Authenticated
 from pyramid.security import Everyone
+
+
+VALID_TOKEN = re.compile(r"^[A-Za-z][A-Za-z0-9+_-]*$")
 
 class CallbackAuthenticationPolicy(object):
     """ Abstract class """
@@ -430,9 +434,23 @@ class AuthTktCookieHelper(object):
         environ = request.environ
         return self._get_cookies(environ, '', max_age=EXPIRE)
     
-    def remember(self, request, userid, max_age=None):
+    def remember(self, request, userid, max_age=None, tokens=()):
         """ Return a set of Set-Cookie headers; when set into a response,
-        these headers will represent a valid authentication ticket."""
+        these headers will represent a valid authentication ticket.
+
+        ``max_age``
+          The max age of the auth_tkt cookie, in seconds.  When this value is
+          set, the cookie's ``Max-Age`` and ``Expires`` settings will be set,
+          allowing the auth_tkt cookie to last between browser sessions.
+          Default: ``None``.
+
+        ``tokens``
+          A sequence of strings that will be placed into the auth_tkt tokens
+          field.  Each string in the sequence must be of the Python ``str``
+          type and must match the regex ``^[A-Za-z][A-Za-z0-9+_-]*$``.
+          Tokens are available in the returned identity when an auth_tkt is
+          found in the request and unpacked.  Default: ``()``.
+        """
         max_age = max_age or self.max_age
         environ = request.environ
 
@@ -449,10 +467,15 @@ class AuthTktCookieHelper(object):
             userid = encoder(userid)
             user_data = 'userid_type:%s' % encoding
         
+        for token in tokens:
+            if not (isinstance(token, str) and VALID_TOKEN.match(token)):
+                raise ValueError("Invalid token %r", token)
+
         ticket = self.auth_tkt.AuthTicket(
             self.secret,
             userid,
             remote_addr,
+            tokens=tokens,
             user_data=user_data,
             cookie_name=self.cookie_name,
             secure=self.secure)
