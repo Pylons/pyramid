@@ -327,4 +327,4 @@ For more information about :term:`view configuration`, see
 
 An example of using *declarative* configuration (:term:`ZCML`) instead of
 imperative configuration to create a similar "hello world" is available
-within :ref:`declarative_configuration`.
+within the documentation for :term:`pyramid_zcml`.
