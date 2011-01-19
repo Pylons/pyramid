@@ -274,7 +274,7 @@ If your code uses the :meth:`pyramid.config.Configurator.include` method to
 include external configuration, some conflicts are automatically resolved.
 Configuration statements that are made as the result of an "include" will be
 overridden by configuration statements that happen within the caller of
-the "include" method.  See also
+the "include" method.
 
 Automatic conflict resolution supports this goal: if a user wants to reuse a
 Pyramid application, and they want to customize the configuration of this
