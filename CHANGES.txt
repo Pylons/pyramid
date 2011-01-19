@@ -1,6 +1,14 @@
 Next release
 ============
 
+Features
+--------
+
+- The AuthTktAuthenticationPolicy now accepts a ``tokens`` parameter via
+  ``pyramid.security.remember``.  The value must be a sequence of strings.
+  Tokens are placed into the auth_tkt "tokens" field and returned in the
+  auth_tkt cookie.
+
 Documentation
 -------------
 
@@ -298,9 +306,6 @@ Bug Fixes
 
 Features
 --------
-
-- When using the auth_tkt authentication plugin accept a ``tokens`` parameter
-  in :py:func:`pyramid.security.remember`.
 
 - If a resource implements a ``__resource_url__`` method, it will be called
   as the result of invoking the ``pyramid.url.resource_url`` function to
