@@ -550,8 +550,8 @@ Using a View Mapper
 -------------------
 
 The default calling conventions for view callables are documented in the
-:ref:`views_chapter`.  You can change the way users define view callbles by
-employing a :term:`view mapper`.
+:ref:`views_chapter` chapter.  You can change the way users define view
+callbles by employing a :term:`view mapper`.
 
 A view mapper is an object that accepts a set of keyword arguments and which
 returns a callable.  The returned callable is called with the :term:`view
