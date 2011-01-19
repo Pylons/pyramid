@@ -455,6 +455,23 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(len(response.headerlist), 3)
         self.assertEqual(response.headerlist[0][0], 'Set-Cookie')
 
+    def test_identify_cookie_reissue_with_token(self):
+        import time
+        plugin = self._makeOne('secret', timeout=10, reissue_time=0)
+        plugin.auth_tkt = DummyAuthTktModule(tokens=('my-token',))
+        now = time.time()
+        plugin.auth_tkt.timestamp = now
+        plugin.now = now + 1
+        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
+        result = plugin.identify(request)
+        self.failUnless(result)
+        self.assertEqual(len(request.callbacks), 1)
+        response = DummyResponse()
+        request.callbacks[0](None, response)
+        self.assertEqual(len(response.headerlist), 3)
+        self.assertEqual(response.headerlist[0][0], 'Set-Cookie')
+        self.assertTrue('my-token' in response.headerlist[0][1])
+
     def test_remember(self):
         plugin = self._makeOne('secret')
         request = self._makeRequest()
