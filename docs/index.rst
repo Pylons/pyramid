@@ -45,7 +45,6 @@ Narrative documentation in chapter form explaining how to use
    narr/renderers
    narr/templates
    narr/viewconfig
-   narr/handlers
    narr/resources
    narr/assets
    narr/webob

@@ -859,3 +859,9 @@ Glossary
    ZCML declaration
      The concrete use of a :term:`ZCML directive` within a ZCML file.
 
+   pyramid_handlers
+     An add-on package which allows :app:`Pyramid` users to create classes
+     that are analogues of Pylons 1 "controllers".  See
+     `http://docs.pylonsproject.org/projects/pyramid_handlers/dev/
+     <http://docs.pylonsproject.org/projects/pyramid_handlers/dev/>`_.
+
