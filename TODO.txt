@@ -58,6 +58,8 @@ Must-Have (before 1.0)
 
 - Document ``add_directive``.
 
+- Add example for ``__action_decorator__`` to pyramid_handler docs.
+
 Should-Have
 -----------
 
