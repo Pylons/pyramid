@@ -584,6 +584,17 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(result[2][0], 'Set-Cookie')
         self.failUnless("'tokens': ('foo', 'bar')" in result[2][1])
 
+    def test_remember_non_string_token(self):
+        plugin = self._makeOne('secret')
+        request = self._makeRequest()
+        self.assertRaises(ValueError, plugin.remember, request, 'other', tokens=(u'foo',))
+
+    def test_remember_invalid_token_format(self):
+        plugin = self._makeOne('secret')
+        request = self._makeRequest()
+        self.assertRaises(ValueError, plugin.remember, request, 'other', tokens=('foo bar',))
+        self.assertRaises(ValueError, plugin.remember, request, 'other', tokens=('1bar',))
+
     def test_forget(self):
         plugin = self._makeOne('secret')
         request = self._makeRequest()

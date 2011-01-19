@@ -1,6 +1,7 @@
 from codecs import utf_8_decode
 from codecs import utf_8_encode
 import datetime
+import re
 import time
 
 from paste.auth import auth_tkt
@@ -13,6 +14,9 @@ from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.request import add_global_response_headers
 from pyramid.security import Authenticated
 from pyramid.security import Everyone
+
+
+VALID_TOKEN = re.compile(r"^[A-Za-z][A-Za-z0-9+_-]*$")
 
 class CallbackAuthenticationPolicy(object):
     """ Abstract class """
@@ -432,6 +436,10 @@ class AuthTktCookieHelper(object):
             userid = encoder(userid)
             user_data = 'userid_type:%s' % encoding
         
+        for token in tokens:
+            if not (isinstance(token, str) and VALID_TOKEN.match(token)):
+                raise ValueError("Invalid token %r", token)
+
         ticket = self.auth_tkt.AuthTicket(
             self.secret,
             userid,
