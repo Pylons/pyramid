@@ -8,13 +8,13 @@ As we saw in :ref:`firstapp_chapter`, it's possible to create a
 convenient to use a *template* to generate a basic :app:`Pyramid`
 :term:`project`.
 
-A project is a directory that contains at least one :term:`package`.  You'll
-use a template to create a project, and you'll create your application logic
-within a package that lives inside the project.  Even if your application is
-extremely simple, it is useful to place code that drives the application
-within a package, because a package is more easily extended with new code.
-An application that lives inside a package can also be distributed more
-easily than one which does not live within a package.
+A project is a directory that contains at least one Python :term:`package`.
+You'll use a template to create a project, and you'll create your application
+logic within a package that lives inside the project.  Even if your
+application is extremely simple, it is useful to place code that drives the
+application within a package, because a package is more easily extended with
+new code.  An application that lives inside a package can also be distributed
+more easily than one which does not live within a package.
 
 :app:`Pyramid` comes with a variety of templates that you can use to generate
 a project.  Each template makes different configuration assumptions about
