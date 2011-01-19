@@ -436,7 +436,21 @@ class AuthTktCookieHelper(object):
     
     def remember(self, request, userid, max_age=None, tokens=()):
         """ Return a set of Set-Cookie headers; when set into a response,
-        these headers will represent a valid authentication ticket."""
+        these headers will represent a valid authentication ticket.
+
+        ``max_age``
+          The max age of the auth_tkt cookie, in seconds.  When this value is
+          set, the cookie's ``Max-Age`` and ``Expires`` settings will be set,
+          allowing the auth_tkt cookie to last between browser sessions.
+          Default: ``None``.
+
+        ``tokens``
+          A sequence of strings that will be placed into the auth_tkt tokens
+          field.  Each string in the sequence must be of the Python ``str``
+          type and must match the regex ``^[A-Za-z][A-Za-z0-9+_-]*$``.
+          Tokens are available in the returned identity when an auth_tkt is
+          found in the request and unpacked.  Default: ``()``.
+        """
         max_age = max_age or self.max_age
         environ = request.environ
 
