@@ -38,6 +38,7 @@ Narrative Documentation
    narr/renderers
    narr/templates
    narr/viewconfig
+   narr/handlers
    narr/resources
    narr/assets
    narr/webob

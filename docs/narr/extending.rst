@@ -196,7 +196,7 @@ like this:
   :ref:`creating_a_project` for more information.
 
 - In the new package, create Python files containing views and other
-  overridden elements, such as templates and static resources as necessary.
+  overridden elements, such as templates and static assets as necessary.
 
 - Install the new package into the same Python environment as the original
   application (e.g. ``python setup.py develop`` or ``python setup.py
@@ -278,7 +278,7 @@ into the override package's file and changing them as necessary.  Then
 disinclude any ``add_route`` statements from the original application.
 
 .. index::
-   pair: overriding; resources
+   pair: overriding; assets
 
 .. _overriding_resources:
 
@@ -286,10 +286,10 @@ Overriding Assets
 ~~~~~~~~~~~~~~~~~
 
 Assets are files on the filesystem that are accessible within a Python
-*package*.  An entire chapter is devoted to resources: :ref:`assets_chapter`.
+*package*.  An entire chapter is devoted to assets: :ref:`assets_chapter`.
 Within this chapter is a section named :ref:`overriding_assets_section`.
 This section of that chapter describes in detail how to override package
-resources with other resources by using the
+assets with other assets by using the
 :meth:`pyramid.config.Configurator.override_asset` method.  Add such
 ``override_asset`` calls to your override package's ``__init__.py`` to
 perform overrides.

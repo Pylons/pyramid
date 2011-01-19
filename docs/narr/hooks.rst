@@ -354,10 +354,11 @@ parameter: ``request``.  For example:
            transaction.commit()
    request.add_finished_callback(commit_callback)
 
-Finished callbacks are called in the order they're added ( first- to
-most-recently- added).  Finished callbacks (unlike a :term:`response
-callback`) are *always* called, even if an exception happens in application
-code that prevents a response from being generated.
+Finished callbacks are called in the order they're added
+(first-to-most-recently-added).  Finished callbacks (unlike a
+:term:`response callback`) are *always* called, even if an exception
+happens in application code that prevents a response from being
+generated.
 
 The set of finished callbacks associated with a request are called *very
 late* in the processing of that request; they are essentially the very last
@@ -535,8 +536,8 @@ Using a View Mapper
 -------------------
 
 The default calling conventions for view callables are documented in the
-:ref:`views_chapter`.  You can change the way users define view callbles by
-employing a :term:`view mapper`.
+:ref:`views_chapter` chapter.  You can change the way users define view
+callbles by employing a :term:`view mapper`.
 
 A view mapper is an object that accepts a set of keyword arguments and which
 returns a callable.  The returned callable is called with the :term:`view

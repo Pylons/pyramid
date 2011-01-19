@@ -87,14 +87,15 @@ local` stack, which makes the ``get_current_*`` functions work.  It returns a
 required by the code under test.  :func:`~pyramid.testing.tearDown` pops the
 thread local stack.
 
-Normally when a Configurator is used directly with the ``main`` block of a
-Pyramid application, it defers performing any "real work" until its
+Normally when a Configurator is used directly with the ``main`` block of
+a Pyramid application, it defers performing any "real work" until its
 ``.commit`` method is called (often implicitly by the
-:meth:`pyramid.config.Configurator.make_wsgi_app` method).  The Configurator
-returned by :func:`~pyramid.testing.setUp` is however an *autocommitting*
-Configurator which performs all actions implied by methods called on it
-immediately.  This is more convenient for unit-testing purposes than needing
-to call :meth:`pyramid.config.Configurator.commit` in each test after adding
+:meth:`pyramid.config.Configurator.make_wsgi_app` method).  The
+Configurator returned by :func:`~pyramid.testing.setUp` is an
+*autocommitting* Configurator, however, which performs all actions
+implied by methods called on it immediately.  This is more convenient
+for unit-testing purposes than needing to call
+:meth:`pyramid.config.Configurator.commit` in each test after adding
 extra configuration statements.
 
 The use of the :func:`~pyramid.testing.setUp` and
@@ -117,11 +118,10 @@ of using this feature:
            testing.tearDown()
 
 The above will make sure that
-:func:`pyramid.threadlocal.get_current_registry` will return the
-:term:`application registry` associated with the ``config`` Configurator
-instance when :func:`pyramid.threadlocal.get_current_registry` is called in a
-test case method attached to ``MyTest``.  Each test case method attached to
-``MyTest`` will use an isolated registry.
+:func:`pyramid.threadlocal.get_current_registry` called within a test
+case method of ``MyTest`` will return the :term:`application registry`
+associated with the ``config`` Configurator instance.  Each test case
+method attached to ``MyTest`` will use an isolated registry.
 
 The :func:`~pyramid.testing.setUp` and :func:`~pyramid.testing.tearDown`
 functions accepts various arguments that influence the environment of the
@@ -148,14 +148,14 @@ other than ``None`` during the course of a single test, you can pass a
            testing.tearDown()
 
 If you pass a :term:`request` object into :func:`pyramid.testing.setUp`
-within your test case's ``setUp``, any test method attached to the ``MyTest``
-test case that directly or indirectly calls
-:func:`pyramid.threadlocal.get_current_request` will receive the request you
-passed into the ``begin`` method.  Otherwise, during testing,
-:func:`pyramid.threadlocal.get_current_request` will return ``None``.  We use
-a "dummy" request implementation supplied by
-:class:`pyramid.testing.DummyRequest` because it's easier to construct than a
-"real" :app:`Pyramid` request object.
+within your test case's ``setUp``, any test method attached to the
+``MyTest`` test case that directly or indirectly calls
+:func:`pyramid.threadlocal.get_current_request` will receive the request
+object.  Otherwise, during testing,
+:func:`pyramid.threadlocal.get_current_request` will return ``None``.
+We use a "dummy" request implementation supplied by
+:class:`pyramid.testing.DummyRequest` because it's easier to construct
+than a "real" :app:`Pyramid` request object.
 
 What?
 ~~~~~

@@ -135,6 +135,11 @@ method expected to return a response, you can either:
    kind of view class which provides more automation when your application
    uses :term:`URL dispatch` solely.
 
+.. note::
+   You can also create :term:`view handler` classes that define
+   multiple view callables similar to "controllers" in Pylons 1.0. See
+   the :ref:`handlers_chapter` chapter for details.
+
 .. index::
    single: view calling convention
 

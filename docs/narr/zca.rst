@@ -57,7 +57,7 @@ Using the ZCA Global API in a :app:`Pyramid` Application
 -----------------------------------------------------------
 
 :term:`Zope` uses a single ZCA registry -- the "global" ZCA registry
--- for all Zope applications run in the same Python process,
+-- for all Zope applications that run in the same Python process,
 effectively making it impossible to run more than one Zope application
 in a single process.
 

@@ -44,7 +44,7 @@ processing?
 
 #. If any route matches, the request is mutated; a ``matchdict`` and
    ``matched_route`` attributes are added to the request object; the
-   former contains a dictionary representign the matched dynamic
+   former contains a dictionary representing the matched dynamic
    elements of the request's ``PATH_INFO`` value, the latter contains
    the :class:`pyramid.interfaces.IRoute` object representing the
    route which matched.  The root object associated with the route
