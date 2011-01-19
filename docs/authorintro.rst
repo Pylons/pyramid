@@ -157,6 +157,10 @@ others' technology.
    single: Holth, Daniel
    single: Hathaway, Shane
    single: Akkerman, Wichert
+   single: Laflamme, Blaise
+   single: Bangert, Ben
+   single: Duncan, Casey
+   single: Orr, Mike
 
 Thanks
 ======
@@ -167,12 +171,13 @@ typewriter (a Royal), and my mother, who bought me my first computer
 
 Thanks to the following people for providing expertise, resources, and
 software.  Without the help of these folks, neither this book nor the
-software which it details would exist: Paul Everitt, Tres Seaver,
-Andrew Sawyers, Malthe Borch, Carlos de la Guardia, Chris Rossi, Shane
-Hathaway, Daniel Holth, Wichert Akkerman, Georg Brandl, Simon Oram and
-Nat Hardwick of Electrosoup, Ian Bicking of the Open Planning Project,
-Jim Fulton of Zope Corporation, Tom Moroz of the Open Society
-Institute, and Todd Koym of Environmental Health Sciences.
+software which it details would exist: Paul Everitt, Tres Seaver, Andrew
+Sawyers, Malthe Borch, Carlos de la Guardia, Chris Rossi, Shane Hathaway,
+Daniel Holth, Wichert Akkerman, Georg Brandl, Blaise Laflamme, Ben Bangert,
+Casey Duncan, Mike Orr, Simon Oram and Nat Hardwick of Electrosoup, Ian
+Bicking of the Open Planning Project, Jim Fulton of Zope Corporation, Tom
+Moroz of the Open Society Institute, and Todd Koym of Environmental Health
+Sciences.
 
 Thanks to Guido van Rossum and Tim Peters for Python.
 
