@@ -1,15 +1,29 @@
 [app:{{project}}]
 use = egg:{{project}}
-reload_templates = true
+reload_templates = false
 debug_authorization = false
 debug_notfound = false
 debug_routematch = false
-debug_templates = true
+debug_templates = false
 default_locale_name = en
+
+[filter:weberror]
+use = egg:WebError#error_catcher
+debug = false
+;error_log = 
+;show_exceptions_in_wsgi_errors = true
+;smtp_server = localhost
+;error_email = janitor@example.com
+;smtp_username = janitor
+;smtp_password = "janitor's password"
+;from_address = paste@localhost
+;error_subject_prefix = "Pyramid Error"
+;smtp_use_tls =
+;error_message =
 
 [pipeline:main]
 pipeline =
-    egg:WebError#evalerror
+    weberror
     {{project}}
 
 [server:main]
@@ -33,7 +47,7 @@ level = INFO
 handlers = console
 
 [logger_{{package_logger}}]
-level = DEBUG
+level = INFO
 handlers =
 qualname = {{package}}
 
