@@ -11,8 +11,12 @@ sqlalchemy.url = sqlite:///%(here)s/{{project}}.db
 [pipeline:main]
 pipeline =
     egg:WebError#evalerror
-    egg:repoze.tm2#tm
-    {{project}}
+    tm
+    {{package}}
+
+[filter:tm]
+use = egg:repoze.tm2#tm
+commit_veto = repoze.tm:default_commit_veto
 
 [server:main]
 use = egg:Paste#http

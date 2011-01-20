@@ -12,8 +12,12 @@ zodb_uri = file://%(here)s/Data.fs?connection_cache_size=20000
 pipeline =
     egg:WebError#evalerror
     egg:repoze.zodbconn#closer
-    egg:repoze.tm#tm
+    tm
     {{project}}
+
+[filter:tm]
+use = egg:repoze.tm2#tm
+commit_veto = repoze.tm:default_commit_veto
 
 [server:main]
 use = egg:Paste#http

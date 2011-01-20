@@ -35,6 +35,16 @@ Backwards Incompatibilities
   has been mutated, a cookie will be sent back in the response.  Previously
   its default value was ``False``.
 
+Paster Templates
+----------------
+
+- The ``pyramid_zodb``, ``pyramid_routesalchemy`` and ``pyramid_alchemy``
+  paster templates now use a default "commit veto" hook when configuring the
+  ``repoze.tm2`` transaction manager in ``development.ini``.  This prevents a
+  transaction from being committed when the response status code is within
+  the 400 or 500 ranges.  See also
+  http://docs.repoze.org/tm2/#using-a-commit-veto.
+
 1.0a10 (2011-01-18)
 ===================
 
