@@ -19,8 +19,6 @@ Must-Have (before 1.0)
   well as -
   http://blog.abourget.net/2011/1/13/pyramid-and-mako:-how-to-do-i18n-the-pylons-way/
 
-- Fix too-long template lines in tutorials for PDF renderings.
-
 - Add docs for ``route_path`` and ``route_url``, etc to Request API docs (see
   also https://github.com/Pylons/pyramid/issues#issue/19).
 
