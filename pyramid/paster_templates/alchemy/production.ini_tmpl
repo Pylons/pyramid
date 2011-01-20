@@ -22,10 +22,14 @@ debug = false
 ;smtp_use_tls =
 ;error_message =
 
+[filter:tm]
+use = egg:repoze.tm2#tm
+commit_veto = repoze.tm:default_commit_veto
+
 [pipeline:main]
 pipeline =
     weberror
-    egg:repoze.tm2#tm
+    tm
     {{project}}
 
 [server:main]
