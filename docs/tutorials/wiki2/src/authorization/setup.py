@@ -11,10 +11,10 @@ requires = [
     'pyramid',
     'SQLAlchemy',
     'transaction',
-    'repoze.tm2',
+    'repoze.tm2>=1.0b1', # default_commit_veto
     'zope.sqlalchemy',
     'WebError',
-    'docutils'
+    'docutils',
     ]
 
 if sys.version_info[:3] < (2,5,0):
