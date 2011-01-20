@@ -18,6 +18,9 @@ Documentation
 - Fix deprecated example showing ``chameleon_zpt`` API call in testing
   narrative chapter.
 
+- Added "Adding Methods to the Configurator via ``add_directive``" section to
+  Advanced Configuration narrative chapter.
+
 Deprecations
 -------------
 

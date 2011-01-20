@@ -403,3 +403,70 @@ constraints: the routes they imply require relative ordering.  Such ordering
 constraints are not absolved by two-phase configuration.  Routes are still
 added in configuration execution order.
 
+Adding Methods to the Configurator via ``add_directive``
+--------------------------------------------------------
+
+Framework extension writers can add arbitrary methods to a
+:term:`Configurator` by using the
+:meth:`pyramid.config.Configurator.add_directive` method of the configurator.
+This makes it possible to extend a Pyramid configurator in arbitrary ways,
+and allows it to perform application-specific tasks more succinctly.
+
+The :meth:`~pyramid.config.Configurator.add_directive` method accepts two
+positional arguments: a method name and a callable object.  The callable
+object is usually a function that takes the configurator instance as its
+first argument and accepts other arbitrary positional and keyword arguments.
+For example:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.events import NewRequest
+   from pyramid.config import Configurator
+
+   def add_newrequest_subscriber(config, subscriber):
+       config.add_subscriber(subscriber, NewRequest).
+
+   if __name__ == '__main__':
+      config = Configurator()
+      config.add_directive('add_newrequest_subscriber', 
+                           add_newrequest_subscriber)
+
+Once :meth:`~pyramid.config.Configurator.add_directive` is called, a user can
+then call the method by its given name as if it were a built-in method of the
+Configurator:
+
+.. code-block:: python
+   :linenos:
+
+   def mysubscriber(event):
+      print event.request
+
+   config.add_newrequest_subscriber(mysubscriber)
+
+A call to :meth:`~pyramid.config.Configurator.add_directive` is often
+"hidden" within an ``includeme`` function within a "frameworky" package meant
+to be included as per :ref:`including_configuration` via
+:meth:`~pyramid.config.Configurator.include`.  For example, if you put this
+code in a package named ``pyramid_subscriberhelpers``:
+
+.. code-block:: python
+   :linenos:
+
+   def includeme(config)
+      config.add_directive('add_newrequest_subscriber', 
+                           add_newrequest_subscriber)
+
+The user of the add-on package ``pyramid_subscriberhelpers`` would then be
+able to install it and subsequently do:
+
+.. code-block:: python
+   :linenos:
+
+   def mysubscriber(event):
+      print event.request
+
+   from pyramid.config import Configurator
+   config = Configurator()
+   config.include('pyramid_subscriberhelpers')
+   config.add_newrequest_subscriber(mysubscriber)

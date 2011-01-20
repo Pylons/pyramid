@@ -22,6 +22,13 @@ Must-Have (before 1.0)
 - Add docs for ``route_path`` and ``route_url``, etc to Request API docs (see
   also https://github.com/Pylons/pyramid/issues#issue/19).
 
+- Add example for ``__action_decorator__`` to pyramid_handler docs.
+
+- Figure out what to do with "Forms" chapter in narr docs.
+
+Should-Have
+-----------
+
 - Reversing (context, request) in function view callable arglist produces
   incomprehensible traceback::
 
@@ -41,15 +48,6 @@ Must-Have (before 1.0)
    if len(args) - len(defaults) == 1:
    zope.configuration.config.ConfigurationExecutionError: <type 'exceptions.TypeError'>: object of type 'NoneType' has no len()                                    in:
     ('reversed.py', 14, '<module>', "c.add_view(aview, renderer='__main__:foo.pt')")
-
-- Document ``add_directive``.
-
-- Add example for ``__action_decorator__`` to pyramid_handler docs.
-
-- Figure out what to do with "Forms" chapter in narr docs.
-
-Should-Have
------------
 
 - Fix misleading conflict error reports for static views ala
   http://cluebin.appspot.com/pasted/7242843

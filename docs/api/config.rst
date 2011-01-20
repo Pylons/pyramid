@@ -28,6 +28,8 @@
 
      .. automethod:: include
 
+     .. automethod:: add_directive
+
      .. automethod:: with_package
 
      .. automethod:: maybe_dotted
@@ -71,8 +73,6 @@
      .. automethod:: set_request_factory
 
      .. automethod:: set_renderer_globals_factory
-
-     .. automethod:: add_directive
 
      .. automethod:: testing_securitypolicy
 
