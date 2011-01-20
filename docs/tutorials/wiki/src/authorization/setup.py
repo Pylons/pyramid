@@ -9,10 +9,9 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 requires = [
     'pyramid',
     'repoze.zodbconn',
-    'repoze.tm',
+    'repoze.tm2>=1.0b1', # default_commit_veto
     'ZODB3',
     'WebError',
-    'docutils',
     ]
 
 setup(name='tutorial',
