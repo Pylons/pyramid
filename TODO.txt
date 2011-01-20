@@ -10,8 +10,7 @@ Must-Have (before 1.0)
   https://github.com/Pylons/pyramid/issues#issue/40,
   https://github.com/Pylons/pyramid/issues#issue/42,
   https://github.com/Pylons/pyramid/issues#issue/44,
-  https://github.com/Pylons/pyramid/issues#issue/94
-, https://github.com/Pylons/pyramid/issues#issue/95
+  https://github.com/Pylons/pyramid/issues#issue/95
 
 - Explain how to use i18n localization in Mako and Jinja2.  See also -
   http://groups.google.com/group/pylons-devel/msg/ab58353594b135c9 and
