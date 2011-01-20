@@ -18,6 +18,12 @@ Documentation
 - Fix deprecated example showing ``chameleon_zpt`` API call in testing
   narrative chapter.
 
+Deprecations
+-------------
+
+- Using the ``pyramid.view.bfg_view`` alias for ``pyramid.view.view_config``
+  (a backwards compatibility shim) now issues a deprecation warning.
+
 Backwards Incompatibilities
 ---------------------------
 

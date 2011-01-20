@@ -13,6 +13,7 @@ if hasattr(mimetypes, 'init'):
 import venusian
 
 from zope.interface import providedBy
+from zope.deprecation import deprecated
 
 from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import IView
@@ -414,6 +415,12 @@ class view_config(object):
         return wrapped
 
 bfg_view = view_config # permanent b/c
+
+deprecated(
+    'bfg_view',
+    'pyramid.view.bfg_view is deprecated as of Pyramid 1.0.  Use '
+    'pyramid.view.view_config instead (API-compat, simple '
+    'rename).')
 
 def default_exceptionresponse_view(context, request):
     if not isinstance(context, Exception):

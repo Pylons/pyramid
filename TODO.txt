@@ -22,8 +22,6 @@ Must-Have (before 1.0)
 - Add docs for ``route_path`` and ``route_url``, etc to Request API docs (see
   also https://github.com/Pylons/pyramid/issues#issue/19).
 
-- Deprecate ``@bfg_view``.
-
 - Reversing (context, request) in function view callable arglist produces
   incomprehensible traceback::
 
