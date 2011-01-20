@@ -51,7 +51,7 @@ Backwards Incompatibilities
   Pyramid core.  Handlers are now a feature of the ``pyramid_handlers``
   package, which can be downloaded from PyPI.  Documentation for the package
   should be available via
-  http://pylonsproject.org/projects/pyramid_handlers/dev, which describes how
+  http://pylonsproject.org/projects/pyramid_handlers/dev/, which describes how
   to add a configuration statement to your ``main`` block to reobtain this
   method.  You will also need to add an ``install_requires`` dependency upon
   ``pyramid_handlers`` to your ``setup.py`` file.
@@ -60,7 +60,7 @@ Backwards Incompatibilities
   Pyramid core.  Loading ZCML is now a feature of the ``pyramid_zcml``
   package, which can be downloaded from PyPI.  Documentation for the package
   should be available via
-  http://pylonsproject.org/projects/pyramid_zcml/dev, which describes how
+  http://pylonsproject.org/projects/pyramid_zcml/dev/, which describes how
   to add a configuration statement to your ``main`` block to reobtain this
   method.  You will also need to add an ``install_requires`` dependency upon
   ``pyramid_zcml`` to your ``setup.py`` file.
