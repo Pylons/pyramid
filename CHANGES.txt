@@ -15,6 +15,9 @@ Documentation
 - Merged caseman-master narrative editing branch, many wording fixes and
   extensions.
 
+- Fix deprecated example showing ``chameleon_zpt`` API call in testing
+  narrative chapter.
+
 Backwards Incompatibilities
 ---------------------------
 
