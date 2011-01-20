@@ -12,6 +12,11 @@ from pyramid.scripting import get_root
 class PyramidTemplate(Template):
     def pre(self, command, output_dir, vars): # pragma: no cover
         vars['random_string'] = os.urandom(20).encode('hex')
+        package_logger = vars['package']
+        if package_logger == 'root':
+            # Rename the app logger in the rare case a project is named 'root'
+            package_logger = 'app'
+        vars['package_logger'] = package_logger
         return Template.pre(self, command, output_dir, vars)
 
 class StarterProjectTemplate(PyramidTemplate):
