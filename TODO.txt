@@ -24,11 +24,6 @@ Must-Have (before 1.0)
 
 - Fix too-long template lines in tutorials for PDF renderings.
 
-- Allow ``pyramid.security.remember`` to accept a list of tokens for use when
-  there's an ``auth_tkt`` authentication policy:
-  https://github.com/Pylons/pyramid/issues#issue/81 and
-  https://github.com/Pylons/pyramid/issues#issue/78
-
 - Add docs for ``route_path`` and ``route_url``, etc to Request API docs (see
   also https://github.com/Pylons/pyramid/issues#issue/19).
 
