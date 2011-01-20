@@ -21,8 +21,6 @@ Must-Have (before 1.0)
 - Add docs for ``route_path`` and ``route_url``, etc to Request API docs (see
   also https://github.com/Pylons/pyramid/issues#issue/19).
 
-- Add example for ``__action_decorator__`` to pyramid_handler docs.
-
 - Figure out what to do with "Forms" chapter in narr docs.
 
 Should-Have
