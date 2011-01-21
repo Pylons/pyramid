@@ -880,5 +880,10 @@ Glossary
      https://bytebucket.org/sluggo/pyramid_sqla/wiki/html/index.html for more
      information.
 
+   Pyramid Cookbook
+     An `additional documentation resource
+     <http://docs.pylonsproject.org/projects/pyramid_cookbook/dev/index.html>`_
+     for Pyramid which presents topical, practical usages of Pyramid.
+
    
 

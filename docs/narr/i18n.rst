@@ -738,8 +738,8 @@ facility described in :ref:`performing_a_translation`.
 Mako Pyramid I18N Support
 -------------------------
 
-:`mako_i18n` is a cookbook recipe which explains how to add idiomatic I18N
-support to :term:`Mako` templates.
+:ref:`mako_i18n` is a recipe within the :term:`Pyramid Cookbook` which
+explains how to add idiomatic I18N support to :term:`Mako` templates.
 
 .. index::
    single: localization deployment settings
