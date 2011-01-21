@@ -247,6 +247,12 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
        Default: ``False``. Hide cookie from JavaScript by setting the
        HttpOnly flag. Not honored by all browsers.
        Optional.
+
+    ``wild_domain``
+
+       Default: ``True``. An auth_tkt cookie will be generated for the
+       wildcard domain.
+       Optional.
     """
     implements(IAuthenticationPolicy)
     def __init__(self,
@@ -260,6 +266,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
                  max_age=None,
                  path="/",
                  http_only=False,
+                 wild_domain=True,
                  ):
         self.cookie = AuthTktCookieHelper(
             secret,
@@ -271,6 +278,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
             max_age=max_age,
             http_only=http_only,
             path=path,
+            wild_domain=wild_domain,
             )
         self.callback = callback
 
@@ -320,7 +328,7 @@ class AuthTktCookieHelper(object):
     
     def __init__(self, secret, cookie_name='auth_tkt', secure=False,
                  include_ip=False, timeout=None, reissue_time=None,
-                 max_age=None, http_only=False, path="/"):
+                 max_age=None, http_only=False, path="/", wild_domain=True):
         self.secret = secret
         self.cookie_name = cookie_name
         self.include_ip = include_ip
@@ -333,6 +341,7 @@ class AuthTktCookieHelper(object):
         self.max_age = max_age
         self.http_only = http_only
         self.path = path
+        self.wild_domain = wild_domain
 
         static_flags = []
         if self.secure:
@@ -356,7 +365,6 @@ class AuthTktCookieHelper(object):
             max_age = ''
 
         cur_domain = environ.get('HTTP_HOST', environ.get('SERVER_NAME'))
-        wild_domain = '.' + cur_domain
 
         cookies = [
             ('Set-Cookie', '%s="%s"; Path=%s%s%s' % (
@@ -364,10 +372,13 @@ class AuthTktCookieHelper(object):
             ('Set-Cookie', '%s="%s"; Path=%s; Domain=%s%s%s' % (
             self.cookie_name, value, self.path, cur_domain, max_age,
                 self.static_flags)),
-            ('Set-Cookie', '%s="%s"; Path=%s; Domain=%s%s%s' % (
-            self.cookie_name, value, self.path, wild_domain, max_age,
-                self.static_flags))
             ]
+
+        if self.wild_domain:
+            wild_domain = '.' + cur_domain
+            cookies.append(('Set-Cookie', '%s="%s"; Path=%s; Domain=%s%s%s' % (
+                self.cookie_name, value, self.path, wild_domain, max_age,
+                self.static_flags)))
 
         return cookies
 
