@@ -401,6 +401,10 @@ Authentication Support Improvements
   Tokens are placed into the auth_tkt "tokens" field and returned in the
   auth_tkt cookie.
 
+- Add ``wild_domain`` argument to AuthTktAuthenticationPolicy, which defaults
+  to ``True``.  If it is set to ``False``, the feature of the policy which
+  sets a cookie with a wilcard domain will be turned off.
+
 Documentation Improvements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
