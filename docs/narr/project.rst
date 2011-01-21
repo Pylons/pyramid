@@ -64,6 +64,16 @@ The included templates are these:
   URL mapping via :term:`traversal` and persistence via
   :term:`SQLAlchemy`
 
+.. note:: At this time, each of these templates uses the :term:`Chameleon`
+   templating system, which is incompatible with both Jython and PyPy.  To
+   use paster templates to build applications which will run on Jython and
+   PyPy, you can try the ``pyramid_jinja2_starter`` template which ships as
+   part of the :term:`pyramid_jinja2` package or the ``pyramid_sqla`` paster
+   template which ships with the :term:`pyramid_sqla` package (it uses Mako),
+   both available from :term:`PyPI`.  You can also just use the above paster
+   templates to build a skeleton and replace the Chameleon template it
+   includes with a :term:`Mako` analogue.
+
 .. index::
    single: creating a project
    single: project

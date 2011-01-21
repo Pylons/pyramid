@@ -811,9 +811,10 @@ Glossary
    View handler
      A view handler ties together
      :meth:`pyramid.config.Configurator.add_route` and
-     :meth:`pyramid.config.Configurator.add_view` to make it more
-     convenient to register a collection of views as a single class when
-     using :term:`url dispatch`.  See also :ref:`views_chapter`.
+     :meth:`pyramid.config.Configurator.add_view` to make it more convenient
+     to register a collection of views as a single class when using
+     :term:`url dispatch`.  View handlers ship as part of the
+     :term:`pyramid_handlers` add-on package.
 
    Deployment settings
      Deployment settings are settings passed to the :term:`Configurator` as a
@@ -864,4 +865,20 @@ Glossary
      that are analogues of Pylons 1 "controllers".  See
      `http://docs.pylonsproject.org/projects/pyramid_handlers/dev/
      <http://docs.pylonsproject.org/projects/pyramid_handlers/dev/>`_.
+
+   pyramid_jinja2
+     :term:`Jinja2` templating system bindings for Pyramid, documented at
+     http://docs.pylonsproject.org/projects/pyramid_jinja2/dev/ .  This
+     package also includes a paster template named
+     ``pyramid_jinja2_starter``, which creates an application package based
+     on the Jinja2 templating system.
+
+   pyramid_sqla
+     A package which provides a Pylons-esque paster template which sports
+     support for :term:`view handler` application development,
+     :term:`SQLAlchemy` support, and other Pylons-like features.  See
+     https://bytebucket.org/sluggo/pyramid_sqla/wiki/html/index.html for more
+     information.
+
+   
 
