@@ -243,7 +243,7 @@ class TestGetSettings(unittest.TestCase):
         return get_settings()
 
     def test_it_nosettings(self):
-        self.assertEqual(self._callFUT(), None)
+        self.assertEqual(self._callFUT()['reload_templates'], False)
 
     def test_it_withsettings(self):
         settings = {'a':1}

@@ -13,6 +13,16 @@ Features
   to ``True``.  If it is set to ``False``, the feature of the policy which
   sets a cookie with a wilcard domain will be turned off.
 
+Bug Fixes
+---------
+
+- ``testing.setUp`` now adds a ``settings`` attribute to the registry (both
+  when it's passed a registry without any settings and when it creates one).
+
+- The ``testing.setUp`` function now takes a ``settings`` argument, which
+  should be a dictionary.  Its values will subsequently be available on the
+  returned ``config`` object as ``config.registry.settings``.
+
 Documentation
 -------------
 

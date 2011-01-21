@@ -268,7 +268,7 @@ class RendererHelper(object):
 
     @reify
     def settings(self):
-        settings = self.registry.settings
+        settings = self.registry.settings or {}
         return settings
 
     @reify

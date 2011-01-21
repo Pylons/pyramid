@@ -613,7 +613,8 @@ class DummyRequest(object):
             self.response_callbacks = []
         self.response_callbacks.append(callback)
 
-def setUp(registry=None, request=None, hook_zca=True, autocommit=True):
+def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
+          settings=None):
     """
     Set :app:`Pyramid` registry and request thread locals for the
     duration of a single unit test.
@@ -661,6 +662,9 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True):
     :mod:`zope.component` package cannot be imported, or if
     ``hook_zca`` is ``False``, the hook will not be set.
 
+    If ``settings`` is not None, it must be a dictionary representing the
+    values passed to a Configurator as its ``settings=`` argument.
+
     This function returns an instance of the
     :class:`pyramid.config.Configurator` class, which can be
     used for further configuration to set up an environment suitable
@@ -674,6 +678,10 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True):
     if registry is None:
         registry = Registry('testing')
     config = Configurator(registry=registry, autocommit=autocommit)
+    if settings is None:
+        settings = {}
+    if getattr(registry, 'settings', None) is None:
+        config._set_settings(settings)
     if hasattr(registry, 'registerUtility'):
         # Sometimes nose calls us with a non-registry object because
         # it thinks this function is module test setup.  Likewise,
