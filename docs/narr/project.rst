@@ -136,10 +136,18 @@ in a directory named ``MyProject``.  That directory is a :term:`project`
 directory.  The ``setup.py`` file in that directory can be used to distribute
 your application, or install your application for deployment or development.
 
-A :term:`PasteDeploy` ``.ini`` file named ``development.ini`` will also be
-created in the project directory.  You will use this ``.ini`` file to
-configure a server, to run your application, and to and debug your
-application.
+A :term:`PasteDeploy` ``.ini`` file named ``development.ini`` will be created
+in the project directory.  You will use this ``.ini`` file to configure a
+server, to run your application, and to and debug your application.  It
+sports configuration that enables an interactive debugger and settings
+optimized for development.
+
+Another :term:`PasteDeploy` ``.ini`` file named ``production.ini`` will also
+be created in the project directory.  It sports configuration that disables
+any interactive debugger (to prevent inappropriate access and disclosure),
+and turns off a number of debugging settings.  You can use this file to put
+your application into production, and you can modify it to do things like
+send email when an exception occurs.
 
 The ``MyProject`` project directory contains an additional subdirectory named
 ``myproject`` (note the case difference) representing a Python
@@ -456,6 +464,7 @@ structure:
   |   |   `-- mytemplate.pt
   |   |-- tests.py
   |   `-- views.py
+  |-- production.ini
   |-- README.txt
   |-- setup.cfg
   `-- setup.py
@@ -475,7 +484,10 @@ describe, run, and test your application.
    written in :term:`ReStructuredText` format.
 
 #. ``development.ini`` is a :term:`PasteDeploy` configuration file that can
-   be used to execute your application.
+   be used to execute your application during development.
+
+#. ``production.ini`` is a :term:`PasteDeploy` configuration file that can
+   be used to execute your application in a production configuration.
 
 #. ``setup.cfg`` is a :term:`setuptools` configuration file used by
    ``setup.py``.
@@ -603,6 +615,17 @@ implementations.
    the applications, servers and :term:`middleware` defined within the
    configuration file.  The values in a ``[DEFAULT]`` section will be passed
    to your application's ``main`` function as ``global_values``.
+
+``production.ini``
+~~~~~~~~~~~~~~~~~~~
+
+The ``development.ini`` file is a :term:`PasteDeploy` configuration file with
+a purpose much like that of ``development.ini``.  However, it disables the
+WebError interactive debugger, replacing it with a logger which outputs
+exception messages to ``stderr`` by default.  It also turns off template
+development options such that templates are not automatically reloaded when
+changed, and turns off all debugging options.  You can use this file instead
+of ``development.ini`` when you put your application into production.
 
 .. index::
    single: setup.py
