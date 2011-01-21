@@ -733,7 +733,7 @@ have their own transitive dependencies.
 
 It should be noted that :app:`Pyramid` is positively lithe compared to
 :term:`Grok`, a different Zope-based framework.  As of this writing, in its
-default configuration, Grok has 126 package distribution dependencies. The
+default configuration, Grok has 109 package distribution dependencies. The
 number of dependencies required by :app:`Pyramid` is many times fewer than
 Grok (or Zope itself, upon which Grok is based).  :app:`Pyramid` has a number
 of package distribution dependencies comparable to similarly-targeted
