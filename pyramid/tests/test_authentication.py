@@ -565,6 +565,20 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.failUnless('; Secure' in result[2][1])
         self.failUnless(result[2][1].startswith('auth_tkt='))
 
+    def test_remember_wild_domain_disabled(self):
+        plugin = self._makeOne('secret', wild_domain=False)
+        request = self._makeRequest()
+        result = plugin.remember(request, 'other')
+        self.assertEqual(len(result), 2)
+
+        self.assertEqual(result[0][0], 'Set-Cookie')
+        self.assertTrue(result[0][1].endswith('; Path=/'))
+        self.failUnless(result[0][1].startswith('auth_tkt='))
+
+        self.assertEqual(result[1][0], 'Set-Cookie')
+        self.assertTrue(result[1][1].endswith('; Path=/; Domain=localhost'))
+        self.failUnless(result[1][1].startswith('auth_tkt='))
+
     def test_remember_string_userid(self):
         plugin = self._makeOne('secret')
         request = self._makeRequest()
