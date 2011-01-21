@@ -145,8 +145,7 @@ Terminology Changes
   - Positional argument names of various APIs have been changed from
     ``model`` to ``resource``.
 
-  Backwards compatibility shims have been left in place in all cases.  They
-  will continue to work "forever".
+  Backwards compatibility shims have been left in place in all cases.
 
 - The Pyramid concept previously known as "resource" is now known as "asset".
   As a result:
