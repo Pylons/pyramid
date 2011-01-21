@@ -18,6 +18,14 @@ Front Matter
    copyright.rst
    conventions.rst
 
+"What's New" Documents
+======================
+
+.. toctree::
+   :maxdepth: 2
+
+   whatsnew-1.0
+
 Narrative documentation
 =======================
 

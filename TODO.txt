@@ -4,7 +4,7 @@ Pyramid TODOs
 Must-Have (before 1.0)
 ----------------------
 
-- Write a "Whats New" (delta from BFG 1.3)
+- Polish "Whats New" document.
 
 - Figure out how/if to slim the herd of paster templates.
 
