@@ -55,6 +55,8 @@ When port 8080 is visited by a browser on the root URL (``/``), the server
 will simply serve up the text "Hello world!"  When visited by a browser on
 the URL ``/goodbye``, the server will serve up the text "Goodbye world!"
 
+Press ``Ctrl-C`` to stop the application.
+
 Now that we have a rudimentary understanding of what the application does,
 let's examine it piece-by-piece.
 
