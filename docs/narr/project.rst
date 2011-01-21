@@ -74,6 +74,13 @@ The included templates are these:
    templates to build a skeleton and replace the Chameleon template it
    includes with a :term:`Mako` analogue.
 
+Rather than use any of the above templates, Pylons 1 users may feel more
+comfortable installing the :term:`pyramid_sqla` add-on package, which
+provides a paster template named ``pyramid_sqla``.  This paster template
+configures a Pyramid application in a "Pylons-esque" way, including the use
+of a :term:`view handler` to map URLs to code (it's much like a Pylons
+"controller").
+
 .. index::
    single: creating a project
    single: project
