@@ -566,10 +566,12 @@ that implements the following interface:
            authenticated userid can be found. """
 
        def effective_principals(self, request):
+
            """ Return a sequence representing the effective principals
            including the userid and any groups belonged to by the current
-           user, including 'system' groups such as Everyone and
-           Authenticated. """
+           user, including 'system' groups such as
+           ``pyramid.security.Everyone`` and
+           ``pyramid.security.Authenticated``. """
 
        def remember(self, request, principal, **kw):
            """ Return a set of headers suitable for 'remembering' the
@@ -618,12 +620,18 @@ following interface:
     class IAuthorizationPolicy(object):
         """ An object representing a Pyramid authorization policy. """
         def permits(self, context, principals, permission):
-            """ Return True if any of the principals is allowed the
-            permission in the current context, else return False """
+            """ Return ``True`` if any of the ``principals`` is allowed the
+            ``permission`` in the current ``context``, else return ``False``
+            """
             
         def principals_allowed_by_permission(self, context, permission):
-            """ Return a set of principal identifiers allowed by the 
-                permission """
+            """ Return a set of principal identifiers allowed by the
+            ``permission`` in ``context``.  This behavior is optional; if you
+            choose to not implement it you should define this method as
+            something which raises a ``NotImplementedError``.  This method
+            will only be called when the
+            ``pyramid.security.principals_allowed_by_permission`` API is
+            used."""
 
 After you do so, you can pass an instance of such a class into the
 :class:`pyramid.config.Configurator` class at configuration

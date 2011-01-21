@@ -188,11 +188,18 @@ class IAuthenticationPolicy(Interface):
 class IAuthorizationPolicy(Interface):
     """ An object representing a Pyramid authorization policy. """
     def permits(context, principals, permission):
-        """ Return True if any of the principals is allowed the
-        permission in the current context, else return False """
+        """ Return ``True`` if any of the ``principals`` is allowed the
+        ``permission`` in the current ``context``, else return ``False``
+        """
         
     def principals_allowed_by_permission(context, permission):
-        """ Return a set of principal identifiers allowed by the permission """
+        """ Return a set of principal identifiers allowed by the
+        ``permission`` in ``context``.  This behavior is optional; if you
+        choose to not implement it you should define this method as
+        something which raises a ``NotImplementedError``.  This method
+        will only be called when the
+        ``pyramid.security.principals_allowed_by_permission`` API is
+        used."""
 
 class IStaticURLInfo(Interface):
     """ A policy for generating URLs to static assets """

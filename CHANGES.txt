@@ -48,6 +48,8 @@ Documentation
 - Move content of "Forms" chapter back to "Views" chapter; I can't think of a
   better place to put it.
 
+- Slightly improved interface docs for ``IAuthorizationPolicy``.
+
 Deprecations
 -------------
 
