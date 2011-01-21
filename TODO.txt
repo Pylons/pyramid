@@ -19,9 +19,6 @@ Must-Have (before 1.0)
   well as -
   http://blog.abourget.net/2011/1/13/pyramid-and-mako:-how-to-do-i18n-the-pylons-way/
 
-- Add docs for ``route_path`` and ``route_url``, etc to Request API docs (see
-  also https://github.com/Pylons/pyramid/issues#issue/19).
-
 - Figure out what to do with "Forms" chapter in narr docs.
 
 Should-Have

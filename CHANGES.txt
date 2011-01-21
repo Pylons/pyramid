@@ -25,6 +25,10 @@ Documentation
 - Added "Adding Methods to the Configurator via ``add_directive``" section to
   Advanced Configuration narrative chapter.
 
+- Add docs for ``add_finished_callback``, ``add_response_callback``,
+  ``route_path``, ``route_url``, and ``static_url`` methods to
+  ``pyramid.request.Request`` API docs.
+
 Deprecations
 -------------
 

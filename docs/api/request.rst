@@ -113,3 +113,15 @@
       request, the value of this attribute will be ``None``. See
       :ref:`matched_route`.
 
+   .. automethod:: add_response_callback
+
+   .. automethod:: add_finished_callback
+
+   .. automethod:: route_url
+
+   .. automethod:: route_path
+
+   .. automethod:: resource_url
+
+   .. automethod:: static_url
+
