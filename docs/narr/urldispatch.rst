@@ -203,9 +203,11 @@ replacement marker does not need to be preceded by a ``/`` character.
 
 A replacement marker is in the format ``{name}``, where this means "accept
 any characters up to the next non-alphanumeric character and use this as the
-``name`` matchdict value."  For example, the following pattern defines one
-literal segment ("foo") and two dynamic replacement markers ("baz", and
-"bar"):
+``name`` :term:`matchdict` value."  A matchdict is the dictionary
+representing the dynamic parts extracted from a URL based on the routing
+pattern.  It is available as ``request.matchdict``.  For example, the
+following pattern defines one literal segment (``foo``) and two replacement
+markers (``baz``, and ``bar``):
 
 .. code-block:: text
 
@@ -247,8 +249,8 @@ To capture both segments, two replacement markers can be used:
 
 The literal path ``/foo/biz.html`` will match the above route pattern, and
 the match result will be ``{'name': 'biz', 'ext': 'html'}``. This occurs
-because the replacement marker ``{name}`` has a literal part of ``.``
-(period) between the other replacement marker ``{ext}``.
+because there is a literal part of ``.`` (period) between the two replacement
+markers ``{name}`` and ``{ext}``.
 
 It is possible to use two replacement markers without any literal characters
 between them, for instance ``/{foo}{bar}``. However, this would be a
@@ -262,9 +264,9 @@ replacement marker.  For example, for the URL ``/abc/``:
 
 - ``/{foo}/`` will match.
 
-Note that values representing path segments matched with a ``{segment}``
-match will be url-unquoted and decoded from UTF-8 into Unicode within the
-matchdict.  So for instance, the following pattern:
+Note that values representing matched path segments will be url-unquoted and
+decoded from UTF-8 into Unicode within the matchdict.  So for instance, the
+following pattern:
 
 .. code-block:: text
 
@@ -295,8 +297,11 @@ The above pattern will match these URLs, generating the following matchdicts:
 
 .. code-block:: text
 
-   foo/1/2/           -> {'baz':'1', 'bar':'2', 'fizzle':()}
-   foo/abc/def/a/b/c  -> {'baz':'abc', 'bar':'def', 'fizzle':('a', 'b', 'c')}
+   foo/1/2/           -> 
+            {'baz':u'1', 'bar':u'2', 'fizzle':()}
+
+   foo/abc/def/a/b/c  -> 
+            {'baz':u'abc', 'bar':u'def', 'fizzle':(u'a', u'b', u'c')}
 
 Note that when a ``*stararg`` remainder match is matched, the value put into
 the matchdict is turned into a tuple of path segments representing the
@@ -331,8 +336,8 @@ The above pattern will match these URLs, generating the following matchdicts:
 
 .. code-block:: text
 
-   foo/1/2/           -> {'baz':'1', 'bar':'2', 'fizzle':()}
-   foo/abc/def/a/b/c  -> {'baz':'abc', 'bar':'def', 'fizzle': 'a/b/c')}
+   foo/1/2/           -> {'baz':u'1', 'bar':u'2', 'fizzle':()}
+   foo/abc/def/a/b/c  -> {'baz':u'abc', 'bar':u'def', 'fizzle': u'a/b/c')}
 
 This occurs because the default regular expression for a marker is ``[^/]+``
 which will match everything up to the first ``/``, while ``{fizzle:.*}`` will

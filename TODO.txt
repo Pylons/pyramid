@@ -13,6 +13,9 @@ Must-Have (before 1.0)
 
 - Figure out what to do with "Forms" chapter in narr docs.
 
+- Actually explain ``{foo:<regex>}`` formatting and purpose in URL dispatch
+  patterns within URL dispatch chapter.
+
 Should-Have
 -----------
 
