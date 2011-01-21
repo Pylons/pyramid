@@ -16,6 +16,9 @@ Features
 Documentation
 -------------
 
+- Added "What's New in Pyramid 1.0" chapter to HTML rendering of
+  documentation.
+
 - Merged caseman-master narrative editing branch, many wording fixes and
   extensions.
 

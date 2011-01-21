@@ -403,6 +403,8 @@ constraints: the routes they imply require relative ordering.  Such ordering
 constraints are not absolved by two-phase configuration.  Routes are still
 added in configuration execution order.
 
+.. _add_directive:
+
 Adding Methods to the Configurator via ``add_directive``
 --------------------------------------------------------
 

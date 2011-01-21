@@ -205,6 +205,8 @@ In general, since so much :app:`Pyramid` infrastructure depends on
 location-aware resources, it's a good idea to make each resource in your tree
 location-aware.
 
+.. _generating_the_url_of_a_resource:
+
 .. index::
    single: resource_url
    pair: generating; resource url
