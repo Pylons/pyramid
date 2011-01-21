@@ -11,8 +11,6 @@ Must-Have (before 1.0)
   http://blog.abourget.net/2011/1/13/pyramid-and-mako:-how-to-do-i18n-the-pylons-way/,
   but I've asked Alexandre if we can include his text in the documentation.
 
-- Figure out what to do with "Forms" chapter in narr docs.
-
 - Actually explain ``{foo:<regex>}`` formatting and purpose in URL dispatch
   patterns within URL dispatch chapter.
 

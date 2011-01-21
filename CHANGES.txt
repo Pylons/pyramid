@@ -45,6 +45,9 @@ Documentation
 - Add (minimal) documentation about using I18N within Mako templates to
   "Internationalization and Localization" narrative chapter.
 
+- Move content of "Forms" chapter back to "Views" chapter; I can't think of a
+  better place to put it.
+
 Deprecations
 -------------
 

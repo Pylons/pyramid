@@ -65,7 +65,6 @@ Narrative documentation in chapter form explaining how to use
    narr/router
    narr/threadlocals
    narr/zca
-   narr/forms
 
 Tutorials
 =========
