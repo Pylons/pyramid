@@ -29,6 +29,9 @@ Documentation
   ``route_path``, ``route_url``, and ``static_url`` methods to
   ``pyramid.request.Request`` API docs.
 
+- Add (minimal) documentation about using I18N within Mako templates to
+  "Internationalization and Localization" narrative chapter.
+
 Deprecations
 -------------
 

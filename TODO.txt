@@ -8,16 +8,19 @@ Must-Have (before 1.0)
 
 - MANIFEST.in? https://github.com/Pylons/pyramid/issues#issue/95
 
-- Explain how to use i18n localization in Mako and Jinja2.  See also -
-  http://groups.google.com/group/pylons-devel/msg/ab58353594b135c9 and
-  https://github.com/Pylons/pyramid_jinja2/pull/14 (pyramid_jinja2 i18n), as
-  well as -
-  http://blog.abourget.net/2011/1/13/pyramid-and-mako:-how-to-do-i18n-the-pylons-way/
+- Explain how to use i18n localization in Mako better.  Currently we just
+  link to
+  http://blog.abourget.net/2011/1/13/pyramid-and-mako:-how-to-do-i18n-the-pylons-way/,
+  but I've asked Alexandre if we can include his text in the documentation.
 
 - Figure out what to do with "Forms" chapter in narr docs.
 
 Should-Have
 -----------
+
+- I18N support for pyramid_jinja2.  See also -
+  http://groups.google.com/group/pylons-devel/msg/ab58353594b135c9 and
+  https://github.com/Pylons/pyramid_jinja2/pull/14 
 
 - Speed up startup time (defer _bootstrap and registerCommonDirectives()
   until needed by ZCML, as well as unfound speedups).
