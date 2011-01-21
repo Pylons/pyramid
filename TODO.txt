@@ -24,9 +24,6 @@ Must-Have (before 1.0)
 
 - Figure out what to do with "Forms" chapter in narr docs.
 
-- Fix tutorials and project section to deal with inclusion of production.ini
-  and logging changes to development.ini.
-
 Should-Have
 -----------
 
