@@ -885,5 +885,10 @@ Glossary
      <http://docs.pylonsproject.org/projects/pyramid_cookbook/dev/index.html>`_
      for Pyramid which presents topical, practical usages of Pyramid.
 
+   distutils
+     The standard system for packaging and distributing Python packages.  See
+     http://docs.python.org/distutils/index.html for more information.
+     :term:`setuptools` is actually an *extension* of the Distutils.
+
    
 
