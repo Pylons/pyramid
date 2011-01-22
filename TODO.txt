@@ -4,9 +4,6 @@ Pyramid TODOs
 Must-Have (before 1.0)
 ----------------------
 
-- Add MANIFEST.in to each paster template? See
-  https://github.com/Pylons/pyramid/issues#issue/95
-
 - Explain ``{foo:<regex>}`` pattern formatting and purpose better in
   within URL dispatch chapter.
 

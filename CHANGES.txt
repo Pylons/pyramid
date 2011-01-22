@@ -13,6 +13,9 @@ Features
   to ``True``.  If it is set to ``False``, the feature of the policy which
   sets a cookie with a wilcard domain will be turned off.
 
+- Add a ``MANIFEST.in`` file to each paster template. See
+  https://github.com/Pylons/pyramid/issues#issue/95
+
 Bug Fixes
 ---------
 
