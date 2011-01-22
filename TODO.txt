@@ -1,12 +1,6 @@
 Pyramid TODOs
 =============
 
-Must-Have (before 1.0)
-----------------------
-
-- Explain ``{foo:<regex>}`` pattern formatting and purpose better in
-  within URL dispatch chapter.
-
 Should-Have
 -----------
 

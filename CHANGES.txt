@@ -53,6 +53,9 @@ Documentation
 
 - Slightly improved interface docs for ``IAuthorizationPolicy``.
 
+- Minimally explain usage of custom regular expressions in URL dispatch
+  replacement markers within URL Dispatch chapter.
+
 Deprecations
 -------------
 

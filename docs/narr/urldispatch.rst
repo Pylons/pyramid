@@ -252,6 +252,18 @@ the match result will be ``{'name': 'biz', 'ext': 'html'}``. This occurs
 because there is a literal part of ``.`` (period) between the two replacement
 markers ``{name}`` and ``{ext}``.
 
+Replacement markers can optionally specify a regular expression which will be
+used to decide whether a path segment should match the marker.  To specify
+that a replacement marker should match only a specific set of characters as
+defined by a regular expression, you must use a slightly extended form of
+replacement marker syntax.  Within braces, the replacement marker name must
+be followed by a colon, then directly thereafter, the regular expression.
+For example, under the hood, the replacement marker ``{foo}`` can more
+verbosely be spelled as ``{foo:[^/]+}``.  The *default* regular expression
+associated with a replacement marker ``[^/]+`` matches one or more characters
+which are not a slash.  You can use an arbitrary regular expression here to
+match a sequence of characters.
+
 It is possible to use two replacement markers without any literal characters
 between them, for instance ``/{foo}{bar}``. However, this would be a
 nonsensical pattern without specifying a custom regular expression to
