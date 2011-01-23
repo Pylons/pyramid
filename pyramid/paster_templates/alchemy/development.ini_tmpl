@@ -1,5 +1,5 @@
-[app:{{package}}]
-use = egg:{{package}}
+[app:{{project}}]
+use = egg:{{project}}
 reload_templates = true
 debug_authorization = false
 debug_notfound = false
@@ -12,7 +12,7 @@ sqlalchemy.url = sqlite:///%(here)s/{{project}}.db
 pipeline =
     egg:WebError#evalerror
     tm
-    {{package}}
+    {{project}}
 
 [filter:tm]
 use = egg:repoze.tm2#tm
