@@ -164,7 +164,7 @@ class Request(WebobRequest):
         if factory is None:
             raise ConfigurationError(
                 'No session factory registered '
-                '(see the Session Objects chapter of the documentation)')
+                '(see the Sessions chapter of the Pyramid documentation)')
         return factory(self)
 
     def route_url(self, route_name, *elements, **kw):
