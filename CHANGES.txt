@@ -19,6 +19,12 @@ Bug Fixes
   start when ``paster serve development.ini`` was used against the result.
   See https://github.com/Pylons/pyramid/issues/#issue/107
 
+- The ``render_view`` method of ``pyramid.renderers.RendererHelper`` passed
+  an incorrect value into the renderer for ``renderer_info``.  It now passes
+  an instance of ``RendererHelper`` instead of a dictionary, which is
+  consistent with other usages.  See
+  https://github.com/Pylons/pyramid/issues#issue/106
+
 1.0b1 (2011-01-21)
 ==================
 

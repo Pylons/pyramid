@@ -286,7 +286,7 @@ class RendererHelper(object):
         system = {
             'view':view,
             'renderer_name':self.name, # b/c
-            'renderer_info':{'name':self.name, 'package':self.package},
+            'renderer_info':self,
             'context':context,
             'request':request
             }

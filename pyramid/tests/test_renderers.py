@@ -334,6 +334,24 @@ class TestRendererHelper(unittest.TestCase):
                                              request=request)
         self.assertEqual(response.body, ('values', 'system_values'))
 
+    def test_render_view(self):
+        self._registerRendererFactory()
+        request = Dummy()
+        helper = self._makeOne('loo.foo')
+        view = 'view'
+        context = 'context'
+        request = testing.DummyRequest()
+        response = 'response'
+        response = helper.render_view(request, response, view, context)
+        self.assertEqual(response.body,
+                         ('response',
+                          {'renderer_info': helper,
+                           'renderer_name': 'loo.foo',
+                           'request': request,
+                           'context': 'context',
+                           'view': 'view'})
+                         )
+
     def test_render_explicit_registry(self):
         factory = self._registerRendererFactory()
         class DummyRegistry(object):
