@@ -129,3 +129,5 @@ Nice-to-Have
   http://plope.com/pyramid_auth_design_api_postmortem, phasing out the
   current auth-n-auth abstractions in a backwards compatible way.
 
+- Add doc string for BeforeRender event with more details.
+
