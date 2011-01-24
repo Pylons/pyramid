@@ -56,7 +56,7 @@ Contributors:
   Ben Bangert, Blaise Laflamme, Rob Miller, Mike Orr, Carlos de la Guardia,
   Paul Everitt, Tres Seaver, John Shipman, Marius Gedminas, Chris Rossi,
   Joachim Krebs, Xavier Spriet, Reed O'Brien, William Chambers, Charlie
-  Choiniere, Jamaludin Ahmad.
+  Choiniere, Jamaludin Ahmad, Graham Higgins.
 
 .. Cover Designer:
 ..   Nat Hardwick of `Electrosoup <http://www.electrosoup.co.uk>`_.
