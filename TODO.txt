@@ -1,6 +1,17 @@
 Pyramid TODOs
 =============
 
+Before Release
+--------------
+
+- Consider per-form_id CSRF instead of per-session global CSRF token.
+
+- Use &copy; instead of copyright symbol in paster templates / tutorials for
+  the benefit of folks who cutnpaste and save to a non-UTF8 format.
+
+- https://github.com/Pylons/pyramid/issues#issue/67 (fixing would make it
+  possible to render a static site from a static dir).
+
 Should-Have
 -----------
 
