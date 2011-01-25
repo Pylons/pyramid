@@ -412,7 +412,15 @@ Backwards Incompatibilities
   cause problems for users of Pyramid with :mod:`repoze.who`, which
   intercepts ``401 Unauthorized`` by default, but allows ``403 Forbidden`` to
   pass through.  Those deployments will need to configure :mod:`repoze.who`
-  to also react to ``403 Forbidden``.
+  to also react to ``403 Forbidden``.  To do so, use a repoze.who
+  ``challenge_decider`` that looks like this::
+
+     import zope.interface
+     from repoze.who.interfaces import IChallengeDecider
+
+     def challenge_decider(environ, status, headers):
+         return status.startswith('403') or status.startswith('401')
+     zope.interface.directlyProvides(challenge_decider, IChallengeDecider)
 
 - The ``paster bfgshell`` command is now known as ``paster pshell``.
 
