@@ -18,7 +18,7 @@ Releasing Pyramid
 
   There should be no meaningful errors or warnings.
 
-- Change setup.py __version__ to the new version number.
+- Change setup.py version to the new version number.
 
 - Change docs/conf.py version to the new version number.
 
