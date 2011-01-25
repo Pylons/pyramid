@@ -421,10 +421,14 @@ class AuthTktCookieHelper(object):
                     userid = decoder(userid)
 
         reissue = self.reissue_time is not None
-            
+
         if not hasattr(request, '_authtkt_reissued'):
             if reissue and ( (now - timestamp) > self.reissue_time):
-                headers = self.remember(request, userid, max_age=self.max_age, tokens=tokens)
+                # paste.auth.auth_tkt.parse_ticket returns ['']
+                # if there are no tokens
+                if tokens == ['']: tokens = ()
+                headers = self.remember(request, userid, max_age=self.max_age,
+                                        tokens=tokens)
                 add_global_response_headers(request, headers)
                 request._authtkt_reissued = True
 
