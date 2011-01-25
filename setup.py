@@ -43,10 +43,11 @@ install_requires=[
     ]
 
 if platform.system() == 'Java':
-    tests_require = install_requires + ['WebTest']
+    tests_require = install_requires + ['WebTest', 'virtualenv']
 else:
     tests_require= install_requires + ['Sphinx', 'docutils', 
-                                       'WebTest', 'repoze.sphinx.autointerface']
+                                       'WebTest', 'repoze.sphinx.autointerface',
+                                       'virtualenv']
 
 if sys.version_info[:2] < (2, 6):
     install_requires.append('simplejson')
