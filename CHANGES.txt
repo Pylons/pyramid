@@ -26,10 +26,9 @@ Bug Fixes
   https://github.com/Pylons/pyramid/issues#issue/106
 
 - A bug existed in the ``pyramid.authentication.AuthTktCookieHelper`` which
-  would break any usage of an AuthTktAuthenticationPolicy when an auth tkt
-  authentication policy was configured to reissue its tokens
-  (``reissue_time`` < ``timeout`` / ``max_age``). Symptom: ``ValueError:
-  ('Invalid token %r', '')``.  See
+  would break any usage of an AuthTktAuthenticationPolicy when one was
+  configured to reissue its tokens (``reissue_time`` < ``timeout`` /
+  ``max_age``). Symptom: ``ValueError: ('Invalid token %r', '')``.  See
   https://github.com/Pylons/pyramid/issues#issue/108.
 
 1.0b1 (2011-01-21)
