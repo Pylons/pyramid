@@ -455,10 +455,11 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(len(response.headerlist), 3)
         self.assertEqual(response.headerlist[0][0], 'Set-Cookie')
 
-    def test_identify_cookie_reissue_with_token(self):
+    def test_identify_cookie_reissue_with_tokens_default(self):
+        # see https://github.com/Pylons/pyramid/issues#issue/108
         import time
         plugin = self._makeOne('secret', timeout=10, reissue_time=0)
-        plugin.auth_tkt = DummyAuthTktModule(tokens=('my-token',))
+        plugin.auth_tkt = DummyAuthTktModule(tokens=[''])
         now = time.time()
         plugin.auth_tkt.timestamp = now
         plugin.now = now + 1
@@ -470,7 +471,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         request.callbacks[0](None, response)
         self.assertEqual(len(response.headerlist), 3)
         self.assertEqual(response.headerlist[0][0], 'Set-Cookie')
-        self.assertTrue('my-token' in response.headerlist[0][1])
+        self.failUnless("'tokens': []" in response.headerlist[0][1])
 
     def test_remember(self):
         plugin = self._makeOne('secret')
@@ -649,13 +650,16 @@ class TestAuthTktCookieHelper(unittest.TestCase):
     def test_remember_non_string_token(self):
         plugin = self._makeOne('secret')
         request = self._makeRequest()
-        self.assertRaises(ValueError, plugin.remember, request, 'other', tokens=(u'foo',))
+        self.assertRaises(ValueError, plugin.remember, request, 'other',
+                          tokens=(u'foo',))
 
     def test_remember_invalid_token_format(self):
         plugin = self._makeOne('secret')
         request = self._makeRequest()
-        self.assertRaises(ValueError, plugin.remember, request, 'other', tokens=('foo bar',))
-        self.assertRaises(ValueError, plugin.remember, request, 'other', tokens=('1bar',))
+        self.assertRaises(ValueError, plugin.remember, request, 'other',
+                          tokens=('foo bar',))
+        self.assertRaises(ValueError, plugin.remember, request, 'other',
+                          tokens=('1bar',))
 
     def test_forget(self):
         plugin = self._makeOne('secret')
