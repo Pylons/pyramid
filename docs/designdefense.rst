@@ -13,7 +13,7 @@ obviously you can't please everyone all of the time.
 Pyramid Provides More Than One Way to Do It
 -------------------------------------------
 
-A canon of Python popular culture is "TIOOTDI" ("there is only one way to do
+A canon of Python popular culture is "TIOOWTDI" ("there is only one way to do
 it", a slighting, tongue-in-cheek reference to Perl's "TIMTOWTDI", which is
 an acronym for "there is more than one way to do it").
 
