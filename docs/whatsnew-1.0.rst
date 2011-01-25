@@ -310,7 +310,7 @@ feature is not useful for "civilians", only for extension writers.  See
 Testing Support Improvements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :func:`pyramid.testing.setUp`` and :func:`pyramid.testing.tearDown` APIs
+The :func:`pyramid.testing.setUp` and :func:`pyramid.testing.tearDown` APIs
 have been undeprecated.  They are now the canonical setup and teardown APIs
 for test configuration, replacing "direct" creation of a Configurator.  This
 is a change designed to provide a facade that will protect against any future
