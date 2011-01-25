@@ -599,7 +599,7 @@ the method is called (if possible) with its argument list filled with values
 mentioned therein.  TurboGears and Pylons 1.X operate similarly.
 
 Out of the box, :app:`Pyramid` is configured to have none of these features.
-By default, :mod:`pyramid` view callables always accept only ``reqest`` and
+By default, :mod:`pyramid` view callables always accept only ``request`` and
 no other arguments.  The rationale: this argument specification matching done
 aggressively can be costly, and :app:`Pyramid` has performance as one of its
 main goals, so we've decided to make people, by default, obtain information
