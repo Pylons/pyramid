@@ -483,7 +483,7 @@ class AuthTktCookieHelper(object):
         
         for token in tokens:
             if not (isinstance(token, str) and VALID_TOKEN.match(token)):
-                raise ValueError("Invalid token %r", token)
+                raise ValueError("Invalid token %r" % (token,))
 
         ticket = self.auth_tkt.AuthTicket(
             self.secret,
