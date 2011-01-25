@@ -1031,10 +1031,9 @@ lives in a single Python file.
 
 Some developers and microframework authors point out that Pyramid's "hello
 world" single-file program is longer (by about five lines) than the
-equivalent program in their favorite microframework.  Guilty as charged; in a
-contest of "whose is shortest", Pyramid indeed loses.
+equivalent program in their favorite microframework.  Guilty as charged.
 
-This loss isn't for lack of trying. Pyramid aims to be useful in the same
+This loss isn't for lack of trying. Pyramid is useful in the same
 circumstance in which microframeworks claim dominance: single-file
 applications.  But Pyramid doesn't sacrifice its ability to credibly support
 larger applications in order to achieve hello-world LoC parity with the
@@ -1128,8 +1127,8 @@ is analogous to the above example: the "global registry" in the above example
 is the list ``L``.
 
 Let's see what happens when we use the same pattern with the `Groundhog
-<http://bfg.repoze.org/videos#groundhog1>`_ microframework.  Replace the
-contents of ``app.py`` above with this:
+<https://github.com/Pylons/groundhog>`_ microframework.  Replace the contents
+of ``app.py`` above with this:
 
 .. code-block:: python
     :linenos:
@@ -1167,10 +1166,10 @@ How many routes will be registered within the routing table of the "gh"
 Groundhog application?  If you answered three, you are correct.  How many
 would a casual reader (and any sane developer) expect to be registered?  If
 you answered two, you are correct.  Will the double registration be a
-problem?  With our fictional Groundhog framework's ``route`` method backing
-this application, not really.  It will slow the application down a little
-bit, because it will need to miss twice for a route when it does not match.
-Will it be a problem with another framework, another application, or another
+problem?  With our Groundhog framework's ``route`` method backing this
+application, not really.  It will slow the application down a little bit,
+because it will need to miss twice for a route when it does not match.  Will
+it be a problem with another framework, another application, or another
 decorator?  Who knows.  You need to understand the application in its
 totality, the framework in its totality, and the chronology of execution to
 be able to predict what the impact of unintentional code double-execution
@@ -1188,10 +1187,10 @@ codepath, and never will*.  Anyone who tries to sell you on the idea that
 they do is simply mistaken.  Test runners that you may want to use to run
 your code's tests often perform imports of arbitrary code in strange orders
 that manifest bugs like the one demonstrated above.  API documentation
-generation tools do the same.  Some (mutant) people even think it's safe to
-use the Python ``reload`` command or delete objects from ``sys.modules``,
-each of which has hilarious effects when used against code that has
-import-time side effects.
+generation tools do the same.  Some people even think it's safe to use the
+Python ``reload`` command or delete objects from ``sys.modules``, each of
+which has hilarious effects when used against code that has import-time side
+effects.
 
 Global-registry-mutating microframework programmers therefore will at some
 point need to start reading the tea leaves about what *might* happen if
