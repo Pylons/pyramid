@@ -34,6 +34,7 @@ class TemplateTest(object):
             os.chdir('Dingle')
             py = os.path.join(self.directory, 'bin', 'python')
             subprocess.check_call([py, 'setup.py', 'install'])
+            subprocess.check_call([py, 'setup.py', 'test'])
             paster = os.path.join(self.directory, 'bin', 'paster')
             proc = subprocess.Popen([paster, 'serve', 'development.ini'])
             try:
