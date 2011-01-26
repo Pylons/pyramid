@@ -392,6 +392,14 @@ class Test_append_slash_notfound_view(BaseTest, unittest.TestCase):
         self.assertEqual(response.status, '302 Found')
         self.assertEqual(response.location, '/abc/')
 
+    def test_with_query_string(self):
+        request = self._makeRequest(PATH_INFO='/abc', QUERY_STRING='a=1&b=2')
+        context = ExceptionResponse()
+        self._registerMapper(request.registry, True)
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '302 Found')
+        self.assertEqual(response.location, '/abc/?a=1&b=2')
+
 class TestAppendSlashNotFoundViewFactory(BaseTest, unittest.TestCase):
     def _makeOne(self, notfound_view):
         from pyramid.view import AppendSlashNotFoundViewFactory

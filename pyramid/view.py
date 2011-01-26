@@ -481,6 +481,8 @@ class AppendSlashNotFoundViewFactory(object):
             slashpath = path + '/'
             for route in mapper.get_routes():
                 if route.match(slashpath) is not None:
+                    if request.environ.get('QUERY_STRING'):
+                        slashpath += '?' + request.environ['QUERY_STRING']
                     return HTTPFound(location=slashpath)
         return self.notfound_view(context, request)
 

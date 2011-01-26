@@ -8,6 +8,9 @@ Bug Fixes
   templates for the benefit of folks who cutnpaste and save to a non-UTF8
   format.
 
+- ``pyramid.view.append_slash_notfound_view`` now preserves GET query
+  parameters across redirects.
+
 
 1.0b2 (2011-01-24)
 ==================
