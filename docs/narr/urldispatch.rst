@@ -84,7 +84,7 @@ example:
 .. versionchanged:: 1.0a4
     Prior to 1.0a4, routes allow for a marker starting with a ``:``, for
     example ``/prefix/:one/:two``.  This style is now deprecated
-    in favor or ``{}`` usage which allows for additional functionality.
+    in favor of ``{}`` usage which allows for additional functionality.
 
 .. index::
    single: route configuration; view callable
