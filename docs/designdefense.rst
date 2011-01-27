@@ -1297,7 +1297,7 @@ Routes (Usually) Need Relative Ordering
 +++++++++++++++++++++++++++++++++++++++
 
 Consider the following simple `Groundhog
-<http://bfg.repoze.org/videos#groundhog1>`_ application:
+<https://github.com/Pylons/groundhog>`_ application:
 
 .. code-block:: python
     :linenos:
