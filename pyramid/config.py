@@ -2047,9 +2047,19 @@ class Configurator(object):
         declare a permission will be executable by entirely anonymous
         users (any authorization policy is ignored).
 
-        Later calls to this method override earlier calls; there can
-        be only one default permission active at a time within an
+        Later calls to this method override will conflict with earlier calls;
+        there can be only one default permission active at a time within an
         application.
+
+        .. warning::
+
+          If a default permission is in effect, view configurations meant to
+          create a truly anonymously accessible view (even :term:`exception
+          view` views) *must* use the explicit permission string
+          ``__no_permission_required__`` as the permission.  When this string
+          is used as the ``permission`` for a view configuration, the default
+          permission is ignored, and the view is registered, making it
+          available to all callers regardless of their credentials.
 
         See also :ref:`setting_a_default_permission`.
 

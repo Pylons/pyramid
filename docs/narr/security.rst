@@ -204,6 +204,13 @@ When a default permission is registered:
   and the view is registered *without* a permission (making it
   available to all callers regardless of their credentials).
 
+.. warning::
+
+   When you register a default permission, *all* views (even :term:`exception
+   view` views) are protected by a permission.  For all views which are truly
+   meant to be anonymously accessible, you will need to associate the view's
+   configuration with the ``__no_permission_required__`` permission.
+
 .. index::
    single: ACL
    single: access control list

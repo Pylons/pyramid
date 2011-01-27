@@ -11,6 +11,12 @@ Bug Fixes
 - ``pyramid.view.append_slash_notfound_view`` now preserves GET query
   parameters across redirects.
 
+Documentation
+-------------
+
+- Beef up documentation related to ``set_default_permission``: explicitly
+  mention that default permissions also protect exception views.
+
 
 1.0b2 (2011-01-24)
 ==================
