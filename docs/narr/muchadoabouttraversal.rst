@@ -108,7 +108,7 @@ Traversal (aka Resource Location)
    single: traversal overview
 
 Believe it or not, if you understand how serving files from a file system
-works,you understand traversal.  And if you understand that a server might do
+works, you understand traversal.  And if you understand that a server might do
 something different based on what type of file a given request specifies,
 then you understand view lookup.
 

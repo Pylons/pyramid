@@ -157,7 +157,7 @@ Non-Predicate Arguments
 
   The ``renderer`` attribute is optional.  If it is not defined, the "null"
   renderer is assumed (no rendering is performed and the value is passed back
-  to the upstream :app:`Pyramid` machinery unmolested).  Note that if the
+  to the upstream :app:`Pyramid` machinery unchanged).  Note that if the
   view callable itself returns a :term:`response` (see :ref:`the_response`),
   the specified renderer implementation is never called.
 

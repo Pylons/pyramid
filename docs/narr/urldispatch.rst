@@ -416,7 +416,7 @@ In this way, each route can use a different factory, making it possible to
 supply a different :term:`context` resource object to the view related to
 each particular route.
 
-Supplying a different resource factory each route is useful when you're
+Supplying a different resource factory for each route is useful when you're
 trying to use a :app:`Pyramid` :term:`authorization policy` to provide
 declarative, "context sensitive" security checks; each resource can maintain
 a separate :term:`ACL`, as documented in
@@ -1034,7 +1034,7 @@ route patterns.  For example, if you've configured a route with the ``name``
    url = route_url('foo', request, a='1', b='2', c='3')
 
 This would return something like the string ``http://example.com/1/2/3`` (at
-least if the current protocol and hostname implied ``http:/example.com``).
+least if the current protocol and hostname implied ``http://example.com``).
 See the :func:`pyramid.url.route_url` API documentation for more information.
 
 .. index::
