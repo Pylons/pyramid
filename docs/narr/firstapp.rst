@@ -247,7 +247,7 @@ predicates) is always invoked.
 
 In this application, :app:`Pyramid` chooses the most specific view callable
 based only on view :term:`predicate` applicability.  The ordering of calls to
-:meth:`pyramid.config.Configurator.add_view` is never very important.  We can
+:meth:`~pyramid.config.Configurator.add_view` is never very important.  We can
 register ``goodbye_world`` first and ``hello_world`` second; :app:`Pyramid`
 will still give us the most specific callable when a request is dispatched to
 it.
@@ -322,7 +322,7 @@ References
 ----------
 
 For more information about the API of a :term:`Configurator` object,
-see :class:`pyramid.config.Configurator` .
+see :class:`~pyramid.config.Configurator` .
 
 For more information about :term:`view configuration`, see
 :ref:`view_config_chapter`.
