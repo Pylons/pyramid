@@ -733,12 +733,8 @@ look like:
 .. code-block:: xml
    :linenos:
 
-    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-    <html xmlns="http://www.w3.org/1999/xhtml"
-          xmlns:tal="http://xml.zope.org/namespaces/tal">
+    <html>
     <head>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
         <title>${project} Application</title>
     </head>
       <body>
@@ -750,7 +746,7 @@ look like:
     </html>
 
 This template doesn't use any advanced features of Mako, only the
-``${squiggly}`` replacement syntax for names that are passed in as
+``${}`` replacement syntax for names that are passed in as
 :term:`renderer globals`.  See the `the Mako documentation
 <http://www.makotemplates.org/>`_ to use more advanced features.
 
