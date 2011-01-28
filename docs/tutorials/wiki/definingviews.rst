@@ -231,7 +231,6 @@ the below:
 
 .. literalinclude:: src/views/tutorial/templates/view.pt
    :language: xml
-   :tab-width: 2
 
 .. note:: The names available for our use in a template are always those that
    are present in the dictionary returned by the view callable.  But our
@@ -258,7 +257,6 @@ below:
 
 .. literalinclude:: src/views/tutorial/templates/edit.pt
    :language: xml
-   :tab-width: 2
 
 Static Assets
 -------------

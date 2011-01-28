@@ -137,7 +137,6 @@ referred to within the login view we just added to ``login.py``.
 
 .. literalinclude:: src/authorization/tutorial/templates/login.pt
    :language: xml
-   :tab-width: 2
 
 Change ``view.pt`` and ``edit.pt``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -282,14 +281,12 @@ Our ``edit.pt`` template will look something like this when we're done:
 .. literalinclude:: src/authorization/tutorial/templates/edit.pt
    :linenos:
    :language: xml
-   :tab-width: 2
 
 Our ``view.pt`` template will look something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/view.pt
    :linenos:
    :language: xml
-   :tab-width: 2
 
 Revisiting the Application
 ---------------------------
