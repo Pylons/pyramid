@@ -118,7 +118,7 @@ of using this feature:
            testing.tearDown()
 
 The above will make sure that
-:func:`pyramid.threadlocal.get_current_registry` called within a test
+:func:`~pyramid.threadlocal.get_current_registry` called within a test
 case method of ``MyTest`` will return the :term:`application registry`
 associated with the ``config`` Configurator instance.  Each test case
 method attached to ``MyTest`` will use an isolated registry.
@@ -128,7 +128,7 @@ functions accepts various arguments that influence the environment of the
 test.  See the :ref:`testing_module` chapter for information about the extra
 arguments supported by these functions.
 
-If you also want to make :func:`pyramid.get_current_request` return something
+If you also want to make :func:`~pyramid.get_current_request` return something
 other than ``None`` during the course of a single test, you can pass a
 :term:`request` object into the :func:`pyramid.testing.setUp` within the
 ``setUp`` method of your test:
@@ -150,9 +150,9 @@ other than ``None`` during the course of a single test, you can pass a
 If you pass a :term:`request` object into :func:`pyramid.testing.setUp`
 within your test case's ``setUp``, any test method attached to the
 ``MyTest`` test case that directly or indirectly calls
-:func:`pyramid.threadlocal.get_current_request` will receive the request
+:func:`~pyramid.threadlocal.get_current_request` will receive the request
 object.  Otherwise, during testing,
-:func:`pyramid.threadlocal.get_current_request` will return ``None``.
+:func:`~pyramid.threadlocal.get_current_request` will return ``None``.
 We use a "dummy" request implementation supplied by
 :class:`pyramid.testing.DummyRequest` because it's easier to construct
 than a "real" :app:`Pyramid` request object.
@@ -163,8 +163,8 @@ What?
 Thread local data structures are always a bit confusing, especially when
 they're used by frameworks.  Sorry.  So here's a rule of thumb: if you don't
 *know* whether you're calling code that uses the
-:func:`pyramid.threadlocal.get_current_registry` or
-:func:`pyramid.threadlocal.get_current_request` functions, or you don't care
+:func:`~pyramid.threadlocal.get_current_registry` or
+:func:`~pyramid.threadlocal.get_current_request` functions, or you don't care
 about any of this, but you still want to write test code, just always call
 :func:`pyramid.testing.setUp` in your test's ``setUp`` method and
 :func:`pyramid.testing.tearDown` in your tests' ``tearDown`` method.  This
@@ -199,7 +199,7 @@ function.
        return {'greeting':'hello'}
 
 Without doing anything special during a unit test, the call to
-:func:`pyramid.security.has_permission` in this view function will always
+:func:`~pyramid.security.has_permission` in this view function will always
 return a ``True`` value.  When a :app:`Pyramid` application starts normally,
 it will populate a :term:`application registry` using :term:`configuration
 declaration` calls made against a :term:`Configurator`.  But if this
@@ -255,7 +255,7 @@ be found when ``setup.py test`` is run.  It has two test methods.
 The first test method, ``test_view_fn_forbidden`` tests the ``view_fn`` when
 the authentication policy forbids the current user the ``edit`` permission.
 Its third line registers a "dummy" "non-permissive" authorization policy
-using the :meth:`pyramid.config.Configurator.testing_securitypolicy` method,
+using the :meth:`~pyramid.config.Configurator.testing_securitypolicy` method,
 which is a special helper method for unit testing.
 
 We then create a :class:`pyramid.testing.DummyRequest` object which simulates
@@ -264,13 +264,13 @@ request object that requires less setup than a "real" :app:`Pyramid` request.
 We call the function being tested with the manufactured request.  When the
 function is called, :func:`pyramid.security.has_permission` will call the
 "dummy" authentication policy we've registered through
-:meth:`pyramid.config.Configuration.testing_securitypolicy`, which denies
+:meth:`~pyramid.config.Configuration.testing_securitypolicy`, which denies
 access.  We check that the view function raises a :exc:`Forbidden` error.
 
 The second test method, named ``test_view_fn_allowed`` tests the alternate
 case, where the authentication policy allows access.  Notice that we pass
 different values to
-:meth:`pyramid.config.Configurator.testing_securitypolicy` to obtain this
+:meth:`~pyramid.config.Configurator.testing_securitypolicy` to obtain this
 result.  We assert at the end of this that the view function returns a value.
 
 Note that the test calls the :func:`pyramid.testing.setUp` function in its
@@ -278,7 +278,7 @@ Note that the test calls the :func:`pyramid.testing.setUp` function in its
 ``tearDown`` method.  We assign the result of :func:`pyramid.testing.setUp`
 as ``config`` on the unittest class.  This is a :term:`Configurator` object
 and all methods of the configurator can be called as necessary within
-tests. If you use any of the :class:`pyramid.config.Configurator` APIs during
+tests. If you use any of the :class:`~pyramid.config.Configurator` APIs during
 testing, be sure to use this pattern in your test case's ``setUp`` and
 ``tearDown``; these methods make sure you're using a "fresh"
 :term:`application registry` per test run.
@@ -357,7 +357,7 @@ after accessing some values that require a fully set up environment.
                                                    str(len(body))))
 
 Unless you cannot avoid it, you should prefer writing unit tests that use the
-:class:`pyramid.config.Configurator` API to set up the right "mock"
+:class:`~pyramid.config.Configurator` API to set up the right "mock"
 registrations rather than creating an integration test.  Unit tests will run
 faster (because they do less for each test) and the result of a unit test is
 usually easier to make assertions about.

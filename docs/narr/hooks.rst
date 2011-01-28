@@ -42,7 +42,7 @@ Like any other view, the notfound view must accept at least a ``request``
 parameter, or both ``context`` and ``request``.  The ``request`` is the
 current :term:`request` representing the denied action.  The ``context`` (if
 used in the call signature) will be the instance of the
-:exc:`pyramid.exceptions.NotFound` exception that caused the view to be
+:exc:`~pyramid.exceptions.NotFound` exception that caused the view to be
 called.
 
 Here's some sample code that implements a minimal NotFound view callable:
@@ -57,7 +57,7 @@ Here's some sample code that implements a minimal NotFound view callable:
 
 .. note:: When a NotFound view callable is invoked, it is passed a
    :term:`request`.  The ``exception`` attribute of the request will
-   be an instance of the :exc:`pyramid.exceptions.NotFound`
+   be an instance of the :exc:`~pyramid.exceptions.NotFound`
    exception that caused the not found view to be called.  The value
    of ``request.exception.args[0]`` will be a value explaining why the
    not found error was raised.  This message will be different when
@@ -67,7 +67,7 @@ Here's some sample code that implements a minimal NotFound view callable:
 .. warning:: When a NotFound view callable accepts an argument list as
    described in :ref:`request_and_context_view_definitions`, the ``context``
    passed as the first argument to the view callable will be the
-   :exc:`pyramid.exceptions.NotFound` exception instance.  If available, the
+   :exc:`~pyramid.exceptions.NotFound` exception instance.  If available, the
    resource context will still be available as ``request.context``.
 
 .. index::
@@ -122,7 +122,7 @@ Here's some sample code that implements a minimal forbidden view:
 
 .. note:: When a forbidden view callable is invoked, it is passed a
    :term:`request`.  The ``exception`` attribute of the request will
-   be an instance of the :exc:`pyramid.exceptions.Forbidden`
+   be an instance of the :exc:`~pyramid.exceptions.Forbidden`
    exception that caused the forbidden view to be called.  The value
    of ``request.exception.args[0]`` will be a value explaining why the
    forbidden was raised.  This message will be different when the
@@ -253,7 +253,7 @@ that can be used for this purpose.  For example:
 
 An object of this type is sent as an event just before a :term:`renderer` is
 invoked (but *after* the application-level renderer globals factory added via
-:class:`pyramid.config.Configurator.set_renderer_globals_factory`, if any,
+:class:`~pyramid.config.Configurator.set_renderer_globals_factory`, if any,
 has injected its own keys into the renderer globals dictionary).
 
 If a subscriber attempts to add a key that already exist in the renderer
@@ -263,7 +263,7 @@ keys added to the renderer globals dictionary by all
 :class:`pyramid.events.BeforeRender` subscribers and renderer globals
 factories must be unique.
 
-See the API documentation for the :class:`pyramid.events.BeforeRender` event
+See the API documentation for the :class:`~pyramid.events.BeforeRender` event
 interface at :class:`pyramid.interfaces.IBeforeRender`.
 
 Another mechanism which allows event subscribers more control when adding
@@ -307,14 +307,14 @@ callback will be an exception object instead of its default value of
 
 Response callbacks are called in the order they're added
 (first-to-most-recently-added).  All response callbacks are called *after*
-the :class:`pyramid.events.NewResponse` event is sent.  Errors raised by
+the :class:`~pyramid.events.NewResponse` event is sent.  Errors raised by
 response callbacks are not handled specially.  They will be propagated to the
 caller of the :app:`Pyramid` router application.
 
 A response callback has a lifetime of a *single* request.  If you want a
 response callback to happen as the result of *every* request, you must
 re-register the callback into every new request (perhaps within a subscriber
-of a :class:`pyramid.events.NewRequest` event).
+of a :class:`~pyramid.events.NewRequest` event).
 
 .. index::
    single: finished callback
@@ -377,7 +377,7 @@ application.
 A finished callback has a lifetime of a *single* request.  If you want a
 finished callback to happen as the result of *every* request, you must
 re-register the callback into every new request (perhaps within a subscriber
-of a :class:`pyramid.events.NewRequest` event).
+of a :class:`~pyramid.events.NewRequest` event).
 
 .. index::
    single: traverser
@@ -472,7 +472,7 @@ However, since the way traversal is done will have been modified, the URLs it
 generates by default may be incorrect.
 
 If you've added a traverser, you can change how
-:func:`pyramid.url.resource_url` generates a URL for a specific type of
+:func:`~pyramid.url.resource_url` generates a URL for a specific type of
 resource by adding a registerAdapter call for
 :class:`pyramid.interfaces.IContextURL` to your application:
 
@@ -488,7 +488,7 @@ resource by adding a registerAdapter call for
                                    IContextURL)
 
 In the above example, the ``myapp.traversal.URLGenerator`` class will be used
-to provide services to :func:`pyramid.url.resource_url` any time the
+to provide services to :func:`~pyramid.url.resource_url` any time the
 :term:`context` passed to ``resource_url`` is of class
 ``myapp.resources.MyRoot``.  The second argument in the ``(MyRoot,
 Interface)`` tuple represents the type of interface that must be possessed by
@@ -496,7 +496,7 @@ the :term:`request` (in this case, any interface, represented by
 ``zope.interface.Interface``).
 
 The API that must be implemented by a class that provides
-:class:`pyramid.interfaces.IContextURL` is as follows:
+:class:`~pyramid.interfaces.IContextURL` is as follows:
 
 .. code-block:: python
   :linenos:
@@ -611,7 +611,7 @@ to set a *default* view mapper (overriding the superdefault view mapper used
 by Pyramid itself).
 
 A *single* view registration can use a view mapper by passing the mapper as
-the ``mapper`` argument to :meth:`pyramid.config.Configuration.add_view`.
+the ``mapper`` argument to :meth:`~pyramid.config.Configuration.add_view`.
 
 .. index::
    single: configuration decorator
@@ -621,7 +621,7 @@ the ``mapper`` argument to :meth:`pyramid.config.Configuration.add_view`.
 Registering Configuration Decorators
 ------------------------------------
 
-Decorators such as :class:`pyramid.view.view_config` don't change the
+Decorators such as :class:`~pyramid.view.view_config` don't change the
 behavior of the functions or classes they're decorating.  Instead, when a
 :term:`scan` is performed, a modified version of the function or class is
 registered with :app:`Pyramid`.

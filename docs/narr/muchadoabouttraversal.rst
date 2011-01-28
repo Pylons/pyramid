@@ -305,7 +305,6 @@ don't require it, great: stick with :term:`URL dispatch`.  But if you're
 using :app:`Pyramid` and you ever find that you *do* need to support one of
 these use cases, you'll be glad you have traversal in your toolkit.
 
-.. note::
-   It is even possible to mix and match :term:`traversal` with
+.. note:: It is even possible to mix and match :term:`traversal` with
    :term:`URL dispatch` in the same :app:`Pyramid` application. See the
    :ref:`hybrid_chapter` chapter for details.

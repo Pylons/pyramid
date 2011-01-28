@@ -163,7 +163,7 @@ Using ``config.commit()``
 +++++++++++++++++++++++++
 
 You can manually commit a configuration by using the
-:meth:`pyramid.config.Configurator.commit` method between configuration
+:meth:`~pyramid.config.Configurator.commit` method between configuration
 calls.  For example, we prevent conflicts from occurring in the application
 we examined previously as the result of adding a ``commit``.  Here's the
 application that generates conflicts:
@@ -255,7 +255,7 @@ conflict detection (and :ref:`twophase_config`) is disabled.  Configuration
 statements will be executed immediately, and succeeding statements will
 override preceding ones.
 
-:meth:`pyramid.config.Configurator.commit` has no effect when ``autocommit``
+:meth:`~pyramid.config.Configurator.commit` has no effect when ``autocommit``
 is ``True``.
 
 If you use a Configurator in code that performs unit testing, it's usually a
@@ -267,7 +267,7 @@ unconcerned about conflict detection or two-phase configuration in test code.
 Automatic Conflict Resolution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If your code uses the :meth:`pyramid.config.Configurator.include` method to
+If your code uses the :meth:`~pyramid.config.Configurator.include` method to
 include external configuration, some conflicts are automatically resolved.
 Configuration statements that are made as the result of an "include" will be
 overridden by configuration statements that happen within the caller of
@@ -332,7 +332,7 @@ Instead, use :meth:`pyramid.config.Configuration.include`:
 Using ``include`` rather than calling the function directly will allow
 :ref:`automatic_conflict_resolution` to work.
 
-:meth:`pyramid.config.Configuration.include` can also accept a :term:`module`
+:meth:`~pyramid.config.Configuration.include` can also accept a :term:`module`
 as an argument:
 
 .. code-block:: python
@@ -346,11 +346,11 @@ For this to work properly, the ``myapp`` module must contain a callable with
 the special name ``includeme``, which should perform configuration (like the
 ``add_routes`` callable we showed above as an example).
 
-:meth:`pyramid.config.Configuration.include` can also accept a :term:`dotted
+:meth:`~pyramid.config.Configuration.include` can also accept a :term:`dotted
 Python name` to a function or a module.
 
 .. note: See :ref:`the_include_tag` for a declarative alternative to
-   :meth:`pyramid.config.Configurator.include`.
+   the :meth:`~pyramid.config.Configurator.include` method.
 
 .. _twophase_config:
 
@@ -368,8 +368,8 @@ to do conflict detection.
 Due to this, for configuration methods that have no internal ordering
 constraints, execution order of configuration method calls is not important.
 For example, the relative ordering of
-:meth:`pyramid.config.Configurator.add_view` and
-:meth:`pyramid.config.Configurator.add_renderer` is unimportant when a
+:meth:`~pyramid.config.Configurator.add_view` and
+:meth:`~pyramid.config.Configurator.add_renderer` is unimportant when a
 non-autocommitting configurator is used.  This code snippet:
 
 .. code-block:: python
@@ -398,7 +398,7 @@ used, two-phase configuration is disabled, and configuration statements must
 be ordered in dependency order.
 
 Some configuration methods, such as
-:meth:`pyramid.config.Configurator.add_route` have internal ordering
+:meth:`~pyramid.config.Configurator.add_route` have internal ordering
 constraints: the routes they imply require relative ordering.  Such ordering
 constraints are not absolved by two-phase configuration.  Routes are still
 added in configuration execution order.

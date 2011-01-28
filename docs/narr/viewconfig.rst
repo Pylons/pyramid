@@ -51,11 +51,9 @@ View configuration is performed in one of these ways:
 
 - by running a :term:`scan` against application source code which has a
   :class:`pyramid.view.view_config` decorator attached to a Python object as
-  per :class:`pyramid.view.view_config` and
-  :ref:`mapping_views_using_a_decorator_section`.
+  per :ref:`mapping_views_using_a_decorator_section`.
 
 - by using the :meth:`pyramid.config.Configurator.add_view` method as per
-  :meth:`pyramid.config.Configurator.add_view` and
   :ref:`mapping_views_using_imperative_config_section`.
 
 - By specifying a view within a :term:`route configuration`.  View
@@ -373,14 +371,14 @@ same purpose.
 
 Usage of the ``view_config`` decorator is a form of :term:`declarative
 configuration`, like ZCML, but in decorator form.
-:class:`pyramid.view.view_config` can be used to associate :term:`view
+:class:`~pyramid.view.view_config` can be used to associate :term:`view
 configuration` information -- as done via the equivalent imperative code or
 ZCML -- with a function that acts as a :app:`Pyramid` view callable.  All
 arguments to the :meth:`pyramid.config.Configurator.add_view` method (save
 for the ``view`` argument) are available in decorator form and mean precisely
 the same thing.
 
-An example of the :class:`pyramid.view.view_config` decorator might reside in
+An example of the :class:`~pyramid.view.view_config` decorator might reside in
 a :app:`Pyramid` application module ``views.py``:
 
 .. ignore-next-block
@@ -427,9 +425,9 @@ request method, request type, request param, route name, or containment.
 The mere existence of a ``@view_config`` decorator doesn't suffice to perform
 view configuration.  All that the decorator does is "annotate" the function
 with your configuration declarations, it doesn't process them. To make
-:app:`Pyramid` process your :class:`pyramid.view.view_config` declarations,
+:app:`Pyramid` process your :class:`~pyramid.view.view_config` declarations,
 you *must* do use the ``scan`` method of a
-:class:`pyramid.config.Configurator`:
+:class:`~pyramid.config.Configurator`:
 
 .. code-block:: python
    :linenos:
@@ -440,17 +438,17 @@ you *must* do use the ``scan`` method of a
 
 Please see :ref:`decorations_and_code_scanning` for detailed information
 about what happens when code is scanned for configuration declarations
-resulting from use of decorators like :class:`pyramid.view.view_config`.
+resulting from use of decorators like :class:`~pyramid.view.view_config`.
 
 See :ref:`configuration_module` for additional API arguments to the
-:meth:`pyramid.config.Configurator.scan` method.  For example, the method
+:meth:`~pyramid.config.Configurator.scan` method.  For example, the method
 allows you to supply a ``package`` argument to better control exactly *which*
 code will be scanned.
 
 ``@view_config`` Placement
 ++++++++++++++++++++++++++
 
-A :class:`pyramid.view.view_config` decorator can be placed in various points
+A :class:`~pyramid.view.view_config` decorator can be placed in various points
 in your application.
 
 If your view callable is a function, it may be used as a function decorator:
@@ -484,7 +482,7 @@ against a class as when they are applied against a function.  For example:
        def __call__(self):
            return Response('hello')
 
-You can use the :class:`pyramid.view.view_config` decorator as a simple
+You can use the :class:`~pyramid.view.view_config` decorator as a simple
 callable to manually decorate classes in Python 2.5 and below without the
 decorator syntactic sugar, if you wish:
 
@@ -503,7 +501,7 @@ decorator syntactic sugar, if you wish:
 
    my_view = view_config()(MyView)
 
-More than one :class:`pyramid.view.view_config` decorator can be stacked on
+More than one :class:`~pyramid.view.view_config` decorator can be stacked on
 top of any number of others.  Each decorator creates a separate view
 registration.  For example:
 
@@ -702,7 +700,7 @@ to a :term:`view configuration` found during view lookup will be verified.
 This will ensure that the currently authenticated user possesses that
 permission against the :term:`context` resource before the view function is
 actually called.  Here's an example of specifying a permission in a view
-configuration using :meth:`pyramid.config.Configurator.add_view`:
+configuration using :meth:`~pyramid.config.Configurator.add_view`:
 
 .. code-block:: python
    :linenos:

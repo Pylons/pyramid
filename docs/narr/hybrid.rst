@@ -156,12 +156,12 @@ match is straightforward.  When a route is matched:
 - If the route's configuration does not have a ``factory``
   argument, the *global* :term:`root factory` will be called to
   generate a :term:`root` object.  The global root factory is the
-  callable implied by the ``root_factory`` argument passed to
-  :class:`pyramid.config.Configurator` at application
+  callable implied by the ``root_factory`` argument passed to the
+  :class:`~pyramid.config.Configurator` at application
   startup time.
 
 - If a ``root_factory`` argument is not provided to the
-  :class:`pyramid.config.Configurator` at startup time, a
+  :class:`~pyramid.config.Configurator` at startup time, a
   *default* root factory is used.  The default root factory is used to
   generate a root object.
 
@@ -260,7 +260,7 @@ route statement is a reasonable thing to do.
 
   We could have also used our ``root_factory`` callable as the
   ``root_factory`` argument of the
-  :class:`pyramid.config.Configurator` constructor, instead
+  :class:`~pyramid.config.Configurator` constructor, instead
   of associating it with a particular route inside the route's
   configuration.  Every hybrid route configuration that is matched but
   which does *not* name a ``factory`` attribute will use the use
@@ -300,13 +300,13 @@ invoked after a route matches:
    config.add_view('mypackage.views.myview', route_name='home')
 
 Note that the above call to
-:meth:`pyramid.config.Configurator.add_view` includes a ``route_name``
+:meth:`~pyramid.config.Configurator.add_view` includes a ``route_name``
 argument.  View configurations that include a ``route_name`` argument are
 meant to associate a particular view declaration with a route, using the
 route's name, in order to indicate that the view should *only be invoked when
 the route matches*.
 
-Calls to :meth:`pyramid.config.Configurator.add_view` may pass a
+Calls to :meth:`~pyramid.config.Configurator.add_view` may pass a
 ``route_name`` attribute, which refers to the value of an existing route's
 ``name`` argument.  In the above example, the route name is ``home``,
 referring to the name of the route defined above it.
@@ -357,7 +357,7 @@ Using the ``traverse`` Argument In a Route Definition
 
 Rather than using the ``*traverse`` remainder marker in a pattern, you
 can use the ``traverse`` argument to the
-:meth:`pyramid.config.Configurator.add_route` method.
+:meth:`~pyramid.config.Configurator.add_route` method.
 
 When you use the ``*traverse`` remainder marker, the traversal path is
 limited to being the remainder segments of a request URL when a route
@@ -365,7 +365,7 @@ matches.  However, when you use the ``traverse`` argument or
 attribute, you have more control over how to compose a traversal path.
 
 Here's a use of the ``traverse`` pattern in a call to
-:meth:`pyramid.config.Configurator.add_route`:
+:meth:`~pyramid.config.Configurator.add_route`:
 
 .. code-block:: python
    :linenos:
@@ -472,7 +472,7 @@ startup time.
    config.add_view('myproject.views.another', route_name='home')
 
 This is because the ``view`` argument to the
-:meth:`pyramid.config.Configurator.add_route` above is an *implicit*
+:meth:`~pyramid.config.Configurator.add_route` above is an *implicit*
 default view when that route matches.  ``add_route`` calls don't *need* to
 supply a view attribute.  For example, this ``add_route`` call:
 

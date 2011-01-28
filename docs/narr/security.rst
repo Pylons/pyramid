@@ -72,14 +72,14 @@ Enabling an Authorization Policy Imperatively
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Passing an ``authorization_policy`` argument to the constructor of the
-:class:`pyramid.config.Configurator` class enables an
+:class:`~pyramid.config.Configurator` class enables an
 authorization policy.
 
 You must also enable an :term:`authentication policy` in order to
 enable the authorization policy.  This is because authorization, in
 general, depends upon authentication.  Use the
 ``authentication_policy`` argument to the
-:class:`pyramid.config.Configurator` class during
+:class:`~pyramid.config.Configurator` class during
 application setup to specify an authentication policy.
 
 For example:
@@ -187,11 +187,9 @@ These APIs are in support of configuring a default permission for an
 application:
 
 - The ``default_permission`` constructor argument to the
-  :mod:`pyramid.config.Configurator` constructor.
+  :mod:`~pyramid.config.Configurator` constructor.
 
-- The
-  :meth:`pyramid.config.Configurator.set_default_permission`
-  method.
+- The :meth:`pyramid.config.Configurator.set_default_permission` method.
 
 When a default permission is registered:
 
@@ -546,7 +544,7 @@ one of :data:`pyramid.security.ACLAllowed`,
 ``msg`` attribute, which is a string indicating why the permission was
 denied or allowed.  Introspecting this information in the debugger or
 via print statements when a call to
-:func:`pyramid.security.has_permission` fails is often useful.
+:func:`~pyramid.security.has_permission` fails is often useful.
 
 .. index::
    single: authentication policy (creating)
@@ -591,7 +589,7 @@ that implements the following interface:
            current user on subsequent requests. """
 
 After you do so, you can pass an instance of such a class into the
-:class:`pyramid.config.Configurator` class at configuration
+:class:`~pyramid.config.Configurator` class at configuration
 time as ``authentication_policy`` to use it.
 
 .. index::
@@ -610,7 +608,7 @@ otherwise specified.
 
 In some cases, it's useful to be able to use a different
 authorization policy than the default
-:class:`pyramid.authorization.ACLAuthorizationPolicy`.  For
+:class:`~pyramid.authorization.ACLAuthorizationPolicy`.  For
 example, it might be desirable to construct an alternate authorization
 policy which allows the application to use an authorization mechanism
 that does not involve :term:`ACL` objects.
@@ -641,5 +639,5 @@ following interface:
             used."""
 
 After you do so, you can pass an instance of such a class into the
-:class:`pyramid.config.Configurator` class at configuration
+:class:`~pyramid.config.Configurator` class at configuration
 time as ``authorization_policy`` to use it.

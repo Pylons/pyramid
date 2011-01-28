@@ -23,7 +23,7 @@ dictionary does not implement the Pyramid response interface, so you might
 believe that this example would fail.  However, since a ``renderer`` is
 associated with the view callable through its :term:`view configuration` (in
 this case, using a ``renderer`` argument passed to
-:func:`pyramid.view.view_config`), if the view does *not* return a Response
+:func:`~pyramid.view.view_config`), if the view does *not* return a Response
 object, the renderer will attempt to convert the result of the view to a
 response on the developer's behalf.
 
@@ -60,7 +60,7 @@ object serialization techniques.
 
 View configuration can vary the renderer associated with a view callable via
 the ``renderer`` attribute.  For example, this call to
-:meth:`pyramid.config.Configurator.add_view` associates the ``json`` renderer
+:meth:`~pyramid.config.Configurator.add_view` associates the ``json`` renderer
 with a view callable:
 
 .. code-block:: python
@@ -187,7 +187,7 @@ values serializable by :func:`json.dumps`.
 
 You can configure a view to use the JSON renderer by naming ``json`` as the
 ``renderer`` argument of a view configuration, e.g. by using
-:meth:`pyramid.config.Configurator.add_view`:
+:meth:`~pyramid.config.Configurator.add_view`:
 
 .. code-block:: python
    :linenos:
@@ -472,7 +472,7 @@ There are essentially two different kinds of renderer factories:
    :term:`package`.
 
 Here's an example of the registration of a simple renderer factory via
-:meth:`pyramid.config.Configurator.add_renderer`:
+:meth:`~pyramid.config.Configurator.add_renderer`:
 
 .. code-block:: python
    :linenos:
@@ -539,9 +539,6 @@ ending with ``.jinja2`` in its ``renderer`` value.  The ``name`` passed
 to the ``Jinja2Renderer`` constructor will be the full value that was
 set as ``renderer=`` in the view configuration.
 
-See also :ref:`renderer_directive` and
-:meth:`pyramid.config.Configurator.add_renderer`.
-
 Changing an Existing Renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -595,7 +592,7 @@ user instructing the view to use a template renderer with one that uses an
 XML-RPC renderer.  This renderer would produce an XML-RPC representation of
 the data returned by an arbitrary view callable.
 
-To use this feature, create a :class:`pyramid.events.NewRequest`
+To use this feature, create a :class:`~pyramid.events.NewRequest`
 :term:`subscriber` which sniffs at the request data and which conditionally
 sets an ``override_renderer`` attribute on the request itself, which is the
 *name* of a registered renderer.  For example:

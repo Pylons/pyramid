@@ -127,7 +127,7 @@ The scanning machinery imports each module and subpackage in a package or
 module recursively, looking for special attributes attached to objects
 defined within a module.  These special attributes are typically attached to
 code via the use of a :term:`decorator`.  For example, the
-:class:`pyramid.view.view_config` decorator can be attached to a function or
+:class:`~pyramid.view.view_config` decorator can be attached to a function or
 instance method.
 
 Once scanning is invoked, and :term:`configuration decoration` is found by
@@ -136,7 +136,7 @@ behalf: these calls replace the need to add imperative configuration
 statements that don't live near the code being configured.
 
 In the example above, the scanner translates the arguments to
-:class:`pyramid.view.view_config` into a call to the
+:class:`~pyramid.view.view_config` into a call to the
 :meth:`pyramid.config.Configurator.add_view` method, effectively:
 
 .. ignore-next-block

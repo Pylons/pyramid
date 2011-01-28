@@ -43,7 +43,7 @@ Configuring an Event Listener Imperatively
 
 You can imperatively configure a subscriber function to be called
 for some event type via the
-:meth:`pyramid.config.Configurator.add_subscriber`
+:meth:`~pyramid.config.Configurator.add_subscriber`
 method (see also :term:`Configurator`):
 
 .. code-block:: python
@@ -59,7 +59,7 @@ method (see also :term:`Configurator`):
   config.add_subscriber(mysubscriber, NewRequest)
 
 The first argument to
-:meth:`pyramid.config.Configurator.add_subscriber` is the
+:meth:`~pyramid.config.Configurator.add_subscriber` is the
 subscriber function (or a :term:`dotted Python name` which refers
 to a subscriber callable); the second argument is the event type.
 
@@ -79,10 +79,9 @@ type via the :func:`pyramid.events.subscriber` function.
   def mysubscriber(event):
 	  event.request.foo = 1
 
-When the :func:`pyramid.subscriber` decorator is used a
+When the :func:`~pyramid.events.subscriber` decorator is used a
 :term:`scan` must be performed against the package containing the
-decorated function for the decorator to have any effect.  See
-:func:`pyramid.subscriber` for more information.
+decorated function for the decorator to have any effect.
 
 Either of the above registration examples implies that every time the
 :app:`Pyramid` framework emits an event object that supplies an

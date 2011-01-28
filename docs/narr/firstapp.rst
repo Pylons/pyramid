@@ -122,7 +122,7 @@ A view callable is required to return a :term:`response` object because a
 response object has all the information necessary to formulate an actual HTTP
 response; this object is then converted to text by the upstream :term:`WSGI`
 server and sent back to the requesting browser.  To return a response, each
-view callable creates an instance of the :class:`pyramid.response.Response`
+view callable creates an instance of the :class:`~pyramid.response.Response`
 class.  In the ``hello_world`` function, the string ``'Hello world!'`` is
 passed to the ``Response`` constructor as the *body* of the response.  In the
 ``goodbye_world`` function, the string ``'Goodbye world!'`` is passed.

@@ -115,15 +115,14 @@ Fundamental Plugpoints
 
 The fundamental "plug points" of an application developed using
 :app:`Pyramid` are *routes*, *views*, and *assets*.  Routes are declarations
-made using the :meth:`pyramid.config.Configurator.add_route` method (or the
-ZCML ``<route>`` directive).  Views are declarations made using the
-:meth:`pyramid.config.Configurator.add_view` method (or the ZCML ``<view>``
-directive).  Assets are files that are accessed by :app:`Pyramid` using the
-:term:`pkg_resources` API such as static files and templates via a
-:term:`asset specification`.  Other directives and configurator methods also
-deal in routes, views, and assets.  For example, ``add_handler`` directive of
-the ``pyramid_handlers`` package adds a single route, and some number of
-views.
+made using the :meth:`pyramid.config.Configurator.add_route` method.  Views
+are declarations made using the :meth:`pyramid.config.Configurator.add_view`
+method.  Assets are files that are
+accessed by :app:`Pyramid` using the :term:`pkg_resources` API such as static
+files and templates via a :term:`asset specification`.  Other directives and
+configurator methods also deal in routes, views, and assets.  For example,
+``add_handler`` directive of the ``pyramid_handlers`` package adds a single
+route, and some number of views.
 
 .. index::
    single: extending an existing application
@@ -270,7 +269,7 @@ Overriding Routes
 ~~~~~~~~~~~~~~~~~
 
 Route setup is currently typically performed in a sequence of ordered calls
-to :meth:`pyramid.config.Configurator.add_route`.  Because these calls are
+to :meth:`~pyramid.config.Configurator.add_route`.  Because these calls are
 ordered relative to each other, and because this ordering is typically
 important, you should retain their relative ordering when performing an
 override.  Typically, this means *copying* all the ``add_route`` statements

@@ -171,7 +171,7 @@ when a :term:`Configurator` constructor is called, or when a
 
 During a request, the application registry created by the Configurator
 is "made current".  This means calls to
-:func:`pyramid.threadlocal.get_current_registry` in the thread
+:func:`~pyramid.threadlocal.get_current_registry` in the thread
 handling the request will return the component registry associated
 with the application.
 
@@ -184,7 +184,7 @@ always return the global ZCA registry (the one in
 
 To "fix" this and make the ZCA global APIs use the "current" BFG
 registry, you need to call
-:meth:`pyramid.config.Configurator.hook_zca` within your
+:meth:`~pyramid.config.Configurator.hook_zca` within your
 setup code.  For example:
 
 .. code-block:: python

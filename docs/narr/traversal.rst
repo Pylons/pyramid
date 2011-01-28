@@ -127,7 +127,7 @@ passing it to an instance of a :term:`Configurator` named ``config``:
    config = Configurator(root_factory=Root)
 
 The ``root_factory`` argument to the
-:class:`pyramid.config.Configurator` constructor registers this root
+:class:`~pyramid.config.Configurator` constructor registers this root
 factory to be called to generate a root resource whenever a request
 enters the application.  The root factory registered this way is also
 known as the global root factory.  A root factory can alternately be

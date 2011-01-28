@@ -94,7 +94,7 @@ Here's a high-level time-ordered overview of what happens when you press
    'default_locale_name':'en'}``.
 
 #. The ``main`` function first constructs a
-   :class:`pyramid.config.Configurator` instance, passing a root resource
+   :class:`~pyramid.config.Configurator` instance, passing a root resource
    factory (constructor) to it as its ``root_factory`` argument, and
    ``settings`` dictionary captured via the ``**settings`` kwarg as its
    ``settings`` argument.
@@ -109,18 +109,18 @@ Here's a high-level time-ordered overview of what happens when you press
    ``debug_authorization``, etc.
 
 #. The ``main`` function then calls various methods on the an instance of the
-   class :class:`pyramid.config.Configurator` method.  The intent of
+   class :class:`~pyramid.config.Configurator` method.  The intent of
    calling these methods is to populate an :term:`application registry`,
    which represents the :app:`Pyramid` configuration related to the
    application.
 
-#. The :meth:`pyramid.config.Configurator.make_wsgi_app` method is called.
+#. The :meth:`~pyramid.config.Configurator.make_wsgi_app` method is called.
    The result is a :term:`router` instance.  The router is associated with
    the :term:`application registry` implied by the configurator previously
    populated by other methods run against the Configurator.  The router is a
    WSGI application.
 
-#. A :class:`pyramid.events.ApplicationCreated` event is emitted (see
+#. A :class:`~pyramid.events.ApplicationCreated` event is emitted (see
    :ref:`events_chapter` for more information about events).
 
 #. Assuming there were no errors, the ``main`` function in ``myproject``
@@ -142,7 +142,7 @@ Deployment Settings
 -------------------
 
 Note that an augmented version of the values passed as ``**settings`` to the
-:class:`pyramid.config.Configurator` constructor will be available in
+:class:`~pyramid.config.Configurator` constructor will be available in
 :app:`Pyramid` :term:`view callable` code as ``request.registry.settings``.
 You can create objects you wish to access later from view code, and put them
 into the dictionary you pass to the configurator as ``settings``.  They will

@@ -231,12 +231,12 @@ implements the :term:`Response` interface is to return a
    def view(request):
        return Response('OK')
 
-You don't need to always use :class:`pyramid.response.Response` to represent a
-response.  :app:`Pyramid` provides a range of different "exception" classes
+You don't need to always use :class:`~pyramid.response.Response` to represent
+a response.  :app:`Pyramid` provides a range of different "exception" classes
 which can act as response objects too.  For example, an instance of the class
-:class:`pyramid.httpexceptions.HTTPFound` is also a valid response object (see
-:ref:`http_redirect`).  A view can actually return any object that has the
-following attributes.  
+:class:`pyramid.httpexceptions.HTTPFound` is also a valid response object
+(see :ref:`http_redirect`).  A view can actually return any object that has
+the following attributes.
 
 status
   The HTTP status code (including the name) for the response as a string.
@@ -291,7 +291,7 @@ Unauthorized``.
 
    It is possible, however, in Python 2.5 and above, to configure an
    *exception view* to catch these exceptions, and return an appropriate
-   :class:`pyramid.response.Response`. The simplest such view could just
+   :class:`~pyramid.response.Response`. The simplest such view could just
    catch and return the original exception. See :ref:`exception_views` for
    more details.
 
@@ -313,11 +313,11 @@ handled by :app:`Pyramid` itself.  These are
 Both are exception classes which accept a single positional constructor
 argument: a ``message``.
 
-If :exc:`pyramid.exceptions.NotFound` is raised within view code, the result
+If :exc:`~pyramid.exceptions.NotFound` is raised within view code, the result
 of the :term:`Not Found View` will be returned to the user agent which
 performed the request.
 
-If :exc:`pyramid.exceptions.Forbidden` is raised within view code, the result
+If :exc:`~pyramid.exceptions.Forbidden` is raised within view code, the result
 of the :term:`Forbidden View` will be returned to the user agent which
 performed the request.
 
@@ -333,8 +333,8 @@ available to the view which :app:`Pyramid` invokes as
 Exception Views
 ---------------
 
-The machinery which allows the special :exc:`pyramid.exceptions.NotFound` and
-:exc:`pyramid.exceptions.Forbidden` exceptions to be caught by specialized
+The machinery which allows the special :exc:`~pyramid.exceptions.NotFound` and
+:exc:`~pyramid.exceptions.Forbidden` exceptions to be caught by specialized
 views as described in :ref:`special_exceptions_in_callables` can also be used
 by application developers to convert arbitrary exceptions to responses.
 
@@ -516,7 +516,7 @@ an error when it can't decode some high-order character encoded in another
 character set within form data, e.g., when ``request.params['somename']`` is
 accessed.
 
-If you are using the :class:`pyramid.response.Response` class to generate a
+If you are using the :class:`~pyramid.response.Response` class to generate a
 response, or if you use the ``render_template_*`` templating APIs, the UTF-8
 charset is set automatically as the default via the ``Content-Type`` header.
 If you return a ``Content-Type`` header without an explicit charset, a
