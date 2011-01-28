@@ -203,14 +203,13 @@ class Configurator(object):
 
     If ``request_factory`` is passed, it should be a :term:`request
     factory` implementation or a :term:`dotted Python name` to same.
-    See :ref:`custom_request_factory`.  By default it is ``None``,
+    See :ref:`changing_the_request_factory`.  By default it is ``None``,
     which means use the default request factory.
 
-    If ``renderer_globals_factory`` is passed, it should be a
-    :term:`renderer globals` factory implementation or a :term:`dotted
-    Python name` to same.  See :ref:`custom_renderer_globals_factory`.
-    By default, it is ``None``, which means use no renderer globals
-    factory.
+    If ``renderer_globals_factory`` is passed, it should be a :term:`renderer
+    globals` factory implementation or a :term:`dotted Python name` to same.
+    See :ref:`adding_renderer_globals`.  By default, it is ``None``, which
+    means use no renderer globals factory.
 
     If ``default_permission`` is passed, it should be a
     :term:`permission` string to be used as the default permission for
@@ -1504,7 +1503,7 @@ class Configurator(object):
         pattern
 
           The pattern of the route e.g. ``ideas/{idea}``.  This
-          argument is required.  See :ref:`route_path_pattern_syntax`
+          argument is required.  See :ref:`route_pattern_syntax`
           for information about the syntax of route patterns.  If the
           pattern doesn't match the current URL, route matching
           continues.
@@ -1792,7 +1791,7 @@ class Configurator(object):
         an extremely advanced usage.  By default, ``categories`` is ``None``
         which will execute *all* Venusian decorator callbacks including
         :app:`Pyramid`-related decorators such as
-        :class:`pyramid.view.view_config`.  See the :ref:`Venusian`
+        :class:`pyramid.view.view_config`.  See the :term:`Venusian`
         documentation for more information about limiting a scan by using an
         explicit set of categories.
         """

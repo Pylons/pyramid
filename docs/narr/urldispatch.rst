@@ -95,7 +95,7 @@ Route Configuration That Names a View Callable
 When a route configuration declaration names a ``view`` attribute, the value
 of the attribute will reference a :term:`view callable`.  This view callable
 will be invoked when the route matches.  A view callable, as described in
-:ref:`view_chapter`, is developer-supplied code that "does stuff" as the
+:ref:`views_chapter`, is developer-supplied code that "does stuff" as the
 result of a request.  For more information about how to create view
 callables, see :ref:`views_chapter`.
 
@@ -492,7 +492,7 @@ neither predicates nor view configuration information.
 
 ``pattern``
   The path of the route e.g. ``ideas/{idea}``.  This argument is required.
-  See :ref:`route_path_pattern_syntax` for information about the syntax of
+  See :ref:`route_pattern_syntax` for information about the syntax of
   route paths.  If the path doesn't match the current URL, route matching
   continues.
 
@@ -1271,7 +1271,7 @@ Displaying All Application Routes
 
 You can use the ``paster proutes`` command in a terminal window to print a
 summary of routes related to your application.  Much like the ``paster
-pshell`` command (see :ref:`interactive shell`), the ``paster proutes``
+pshell`` command (see :ref:`interactive_shell`), the ``paster proutes``
 command accepts two arguments.  The first argument to ``proutes`` is the path
 to your application's ``.ini`` file.  The second is the ``app`` section name
 inside the ``.ini`` file which points to your application.
