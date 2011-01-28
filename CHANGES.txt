@@ -1,3 +1,12 @@
+Next release
+============
+
+Documentation
+-------------
+
+- Fixed bug in ZODB Wiki tutorial (missing dependency on ``docutils`` in
+  "models" step within ``setup.py``).
+
 1.0b3 (2011-01-28)
 ==================
 
