@@ -269,14 +269,14 @@ It might be possible, but it certainly won't be easy.  The matching
 patterns are going to become complex quickly as you try to handle all
 of the edge cases.
 
-With traversal, however, it's straightforward.  20 layers of nesting would be
-no problem.  :app:`Pyramid` will happily call ``__getitem__`` as many times
-as it needs to, until it runs out of path segments or until a resource raises
-a :exc:`KeyError`.  Each resource only needs to know how to fetch its
-immediate children, the traversal algorithm takes care of the rest.  Also,
-since the structure of the resource tree can live in the database and not in
-the code, it's simple to let users modify the tree at runtime to set up their
-own personalized "directory" structures.
+With traversal, however, it's straightforward.  Twenty layers of nesting
+would be no problem.  :app:`Pyramid` will happily call ``__getitem__`` as
+many times as it needs to, until it runs out of path segments or until a
+resource raises a :exc:`KeyError`.  Each resource only needs to know how to
+fetch its immediate children, the traversal algorithm takes care of the rest.
+Also, since the structure of the resource tree can live in the database and
+not in the code, it's simple to let users modify the tree at runtime to set
+up their own personalized "directory" structures.
 
 Another use case in which traversal shines is when there is a need to support
 a context-dependent security policy.  One example might be a document
