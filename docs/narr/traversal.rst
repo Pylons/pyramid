@@ -236,8 +236,8 @@ because they are almost always used together.
 A Description of The Traversal Algorithm
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When a user requests a page from your :mod:`traversal` -powered application,
-the system uses this algorithm to find a :term:`context` resource and a
+When a user requests a page from your traversal-powered application, the
+system uses this algorithm to find a :term:`context` resource and a
 :term:`view name`.
 
 #.  The request for the page is presented to the :app:`Pyramid`
