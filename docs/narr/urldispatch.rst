@@ -96,8 +96,7 @@ When a route configuration declaration names a ``view`` attribute, the value
 of the attribute will reference a :term:`view callable`.  This view callable
 will be invoked when the route matches.  A view callable, as described in
 :ref:`views_chapter`, is developer-supplied code that "does stuff" as the
-result of a request.  For more information about how to create view
-callables, see :ref:`views_chapter`.
+result of a request.
 
 Here's an example route configuration that references a view callable:
 
@@ -125,49 +124,6 @@ rather than an actual callable:
 When a route configuration names a ``view`` attribute, the :term:`view
 callable` named as that ``view`` attribute will always be found and invoked
 when the associated route pattern matches during a request.
-
-Route View Callable Registration and Lookup Details
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-The purpose of making it possible to specify a view callable within a route
-configuration is to prevent developers from needing to deeply understand the
-details of :term:`resource location` and :term:`view lookup`.  When a route
-names a view callable as a ``view`` argument, and a request enters the system
-which matches the pattern of the route, the result is simple: the view
-callable associated with the route is invoked with the request that caused
-the invocation.
-
-For most usage, you needn't understand more than this; how it works is an
-implementation detail.  In the interest of completeness, however, we'll
-explain how it *does* work in the this section.  You can skip it if you're
-uninterested.
-
-When a ``view`` attribute is attached to a route configuration,
-:app:`Pyramid` ensures that a :term:`view configuration` is registered that
-will always be found when the route pattern is matched during a request.  To
-do so:
-
-- A special route-specific :term:`interface` is created at startup time for
-  each route configuration declaration.
-
-- When a route configuration declaration mentions a ``view`` attribute, a
-  :term:`view configuration` is registered at startup time.  This view
-  configuration uses the route-specific interface as a :term:`request` type.
-
-- At runtime, when a request causes any route to match, the :term:`request`
-  object is decorated with the route-specific interface.
-
-- The fact that the request is decorated with a route-specific interface
-  causes the view lookup machinery to always use the view callable registered
-  using that interface by the route configuration to service requests that
-  match the route pattern.
-
-In this way, we supply a shortcut to the developer.  Under the hood, the
-:term:`resource location` and :term:`view lookup` subsystems provided by
-:app:`Pyramid` are still being utilized, but in a way which does not require
-a developer to understand either of them in detail.  It also means that we
-can allow a developer to combine :term:`URL dispatch` and :term:`traversal`
-in various exceptional cases as documented in :ref:`hybrid_chapter`.
 
 .. index::
    single: route path pattern syntax
@@ -202,12 +158,12 @@ replacement marker (e.g. ``{foo}``) or a certain combination of both. A
 replacement marker does not need to be preceded by a ``/`` character.
 
 A replacement marker is in the format ``{name}``, where this means "accept
-any characters up to the next non-alphanumeric character and use this as the
-``name`` :term:`matchdict` value."  A matchdict is the dictionary
-representing the dynamic parts extracted from a URL based on the routing
-pattern.  It is available as ``request.matchdict``.  For example, the
-following pattern defines one literal segment (``foo``) and two replacement
-markers (``baz``, and ``bar``):
+any characters up to the next slash character and use this as the ``name``
+:term:`matchdict` value."  A matchdict is the dictionary representing the
+dynamic parts extracted from a URL based on the routing pattern.  It is
+available as ``request.matchdict``.  For example, the following pattern
+defines one literal segment (``foo``) and two replacement markers (``baz``,
+and ``bar``):
 
 .. code-block:: text
 
@@ -258,11 +214,12 @@ that a replacement marker should match only a specific set of characters as
 defined by a regular expression, you must use a slightly extended form of
 replacement marker syntax.  Within braces, the replacement marker name must
 be followed by a colon, then directly thereafter, the regular expression.
-For example, under the hood, the replacement marker ``{foo}`` can more
-verbosely be spelled as ``{foo:[^/]+}``.  The *default* regular expression
-associated with a replacement marker ``[^/]+`` matches one or more characters
-which are not a slash.  You can use an arbitrary regular expression here to
-match a sequence of characters.
+The *default* regular expression associated with a replacement marker
+``[^/]+`` matches one or more characters which are not a slash.  For example,
+under the hood, the replacement marker ``{foo}`` can more verbosely be
+spelled as ``{foo:[^/]+}``.  You can change this to be an arbitrary regular
+expression to match an arbitrary sequence of characters, such as
+``{foo:\d+}`` to match only digits.
 
 It is possible to use two replacement markers without any literal characters
 between them, for instance ``/{foo}{bar}``. However, this would be a
@@ -371,7 +328,7 @@ are added to the application at startup time.  This is unlike
 :term:`traversal`, which depends on emergent behavior which happens as a
 result of traversing a resource tree.
 
-For routes added via the :mod:`pyramid.config.Configurator.add_route` method,
+For routes added via the :mod:`~pyramid.config.Configurator.add_route` method,
 the order that routes are evaluated is the order in which they are added to
 the configuration imperatively.
 
@@ -635,7 +592,7 @@ Custom Route Predicates
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Each of the predicate callables fed to the ``custom_predicates`` argument of
-:meth:`pyramid.config.Configurator.add_route` must be a callable accepting
+:meth:`~pyramid.config.Configurator.add_route` must be a callable accepting
 two arguments.  The first argument passed to a custom predicate is a
 dictionary conventionally named ``info``.  The second argument is the current
 :term:`request` object.
@@ -669,7 +626,7 @@ predicate function named ``num_one_two_or_three``, which ensures that the
 ``num`` segment is one of the values ``one``, ``two``, or ``three`` , and use
 the result as a custom predicate by feeding it inside a tuple to the
 ``custom_predicates`` argument to
-:meth:`pyramid.config.Configurator.add_route`.
+:meth:`~pyramid.config.Configurator.add_route`.
 
 A custom route predicate may also *modify* the ``match`` dictionary.  For
 instance, a predicate might do some type conversion of values:
@@ -823,7 +780,7 @@ The Matched Route
 When the URL pattern associated with a particular route configuration is
 matched by a request, an object named ``matched_route`` is added as an
 attribute of the :term:`request` object.  Thus, ``request.matched_route``
-will be an object implementing the :class:`pyramid.interfaces.IRoute`
+will be an object implementing the :class:`~pyramid.interfaces.IRoute`
 interface which matched the request.  The most useful attribute of the route
 object is ``name``, which is the name of the route that matched.
 
@@ -936,7 +893,7 @@ the :term:`root factory` configured at startup time (the ``root_factory``
 argument to the :term:`Configurator` used to configure the application).
 
 You can override this behavior by passing in a ``factory`` argument to the
-:meth:`pyramid.config.Configurator.add_route` method for a particular route.
+:meth:`~pyramid.config.Configurator.add_route` method for a particular route.
 The ``factory`` should be a callable that accepts a :term:`request` and
 returns an instance of a class that will be the context resource used by the
 view.
@@ -1001,7 +958,7 @@ Matching the Root URL
 
 It's not entirely obvious how to use a route pattern to match the root URL
 ("/").  To do so, give the empty string as a pattern in a call to
-:meth:`pyramid.config.Configurator.add_route`:
+:meth:`~pyramid.config.Configurator.add_route`:
 
 .. code-block:: python
    :linenos:
@@ -1035,7 +992,7 @@ route patterns.  For example, if you've configured a route with the ``name``
 
 This would return something like the string ``http://example.com/1/2/3`` (at
 least if the current protocol and hostname implied ``http:/example.com``).
-See the :func:`pyramid.url.route_url` API documentation for more information.
+See the :func:`~pyramid.url.route_url` API documentation for more information.
 
 .. index::
    single: redirecting to slash-appended routes
@@ -1299,6 +1256,49 @@ route pattern.  The view column may show ``None`` if no associated view
 callable could be found.  If no routes are configured within your
 application, nothing will be printed to the console when ``paster proutes``
 is executed.
+
+Route View Callable Registration and Lookup Details
+---------------------------------------------------
+
+The purpose of making it possible to specify a view callable within a route
+configuration is to prevent developers from needing to deeply understand the
+details of :term:`resource location` and :term:`view lookup`.  When a route
+names a view callable as a ``view`` argument, and a request enters the system
+which matches the pattern of the route, the result is simple: the view
+callable associated with the route is invoked with the request that caused
+the invocation.
+
+For most usage, you needn't understand more than this; how it works is an
+implementation detail.  In the interest of completeness, however, we'll
+explain how it *does* work in the this section.  You can skip it if you're
+uninterested.
+
+When a ``view`` attribute is attached to a route configuration,
+:app:`Pyramid` ensures that a :term:`view configuration` is registered that
+will always be found when the route pattern is matched during a request.  To
+do so:
+
+- A special route-specific :term:`interface` is created at startup time for
+  each route configuration declaration.
+
+- When a route configuration declaration mentions a ``view`` attribute, a
+  :term:`view configuration` is registered at startup time.  This view
+  configuration uses the route-specific interface as a :term:`request` type.
+
+- At runtime, when a request causes any route to match, the :term:`request`
+  object is decorated with the route-specific interface.
+
+- The fact that the request is decorated with a route-specific interface
+  causes the view lookup machinery to always use the view callable registered
+  using that interface by the route configuration to service requests that
+  match the route pattern.
+
+In this way, we supply a shortcut to the developer.  Under the hood, the
+:term:`resource location` and :term:`view lookup` subsystems provided by
+:app:`Pyramid` are still being utilized, but in a way which does not require
+a developer to understand either of them in detail.  It also means that we
+can allow a developer to combine :term:`URL dispatch` and :term:`traversal`
+in various exceptional cases as documented in :ref:`hybrid_chapter`.
 
 References
 ----------
