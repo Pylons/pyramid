@@ -1,5 +1,5 @@
-Next release
-============
+1.0b3 (2011-01-28)
+==================
 
 Bug Fixes
 ---------
@@ -17,6 +17,8 @@ Documentation
 - Beef up documentation related to ``set_default_permission``: explicitly
   mention that default permissions also protect exception views.
 
+- Paster templates and tutorials now use tabs instead of spaces in their HTML
+  templates.
 
 1.0b2 (2011-01-24)
 ==================
