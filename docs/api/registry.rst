@@ -9,6 +9,8 @@
 
    .. attribute:: settings
 
-     The :term:`deployment settings` object.  See :ref:`deployment_settings`
-     for information.
+     The dictionary-like :term:`deployment settings` object.  See
+     :ref:`deployment_settings` for information.  This object is often
+     accessed as ``request.registry.settings`` or
+     ``config.registry.settings`` in a typical Pyramid application.
 
