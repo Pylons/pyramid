@@ -1019,8 +1019,10 @@ route configuration looks like so:
 .. code-block:: python
    :linenos:
 
-   config.add_route('noslash', 'no_slash', view='myproject.views.no_slash')
-   config.add_route('hasslash', 'has_slash/', view='myproject.views.has_slash')
+   config.add_route('noslash', 'no_slash',
+                    view='myproject.views.no_slash')
+   config.add_route('hasslash', 'has_slash/', 
+                    view='myproject.views.has_slash')
 
 If a request enters the application with the ``PATH_INFO`` value of
 ``/has_slash/``, the second route will match.  If a request enters the
