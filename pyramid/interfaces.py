@@ -618,6 +618,7 @@ class IRendererInfo(Interface):
     type = Attribute('The renderer type name')
     registry = Attribute('The "current" application registry when the '
                          'renderer was created')
-    settings = Attribute('The ISettings dictionary related to the current app')
+    settings = Attribute('The deployment settings dictionary related '
+                         'to the current application')
     
 
