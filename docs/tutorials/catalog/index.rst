@@ -83,11 +83,11 @@ want the application to be based on :term:`traversal`.
 
     .. code-block:: text
 
-       [chrism@snowpro sess]$ ../bin/paster --plugin=pyramid pshell \
+       [chrism@snowpro sess]$ ../bin/paster pshell \
               development.ini myapp
        Python 2.5.4 (r254:67916, Sep  4 2009, 02:12:16) 
        [GCC 4.2.1 (Apple Inc. build 5646)] on darwin
-       Type "help" for more information. "root" is the Pyramid app root object.
+       Type "help" for more information. "root" is the Pyramid app root.
        >>> from pyramid.traversal import resource_path
        >>> from myapp.models import Document
        >>> root['name'] = Document('title')
