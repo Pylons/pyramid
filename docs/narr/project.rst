@@ -137,16 +137,11 @@ project we name ``MyProject``:
    name during ``paster create`` by adding the project name to the
    command line, e.g. ``paster create -t pyramid_starter MyProject``.
 
-.. note:: You may encounter an error when using ``paster create``
-   if a dependent Python package is not installed. This will
-   result in a traceback ending in: 
-
-   .. code-block:: text
-
-	   pkg_resources.DistributionNotFound: <package name>
-
-   Simply run ``bin/easy_install``, with the missing package
-   name from the error message, to work around this issue.
+.. note:: You may encounter an error when using ``paster create`` if a
+   dependent Python package is not installed. This will result in a traceback
+   ending in ``pkg_resources.DistributionNotFound: <package name>``.
+   Simply run ``bin/easy_install``, with the missing package name from the
+   error message to work around this issue.
 
 As a result of invoking the ``paster create`` command, a project is created
 in a directory named ``MyProject``.  That directory is a :term:`project`
@@ -325,37 +320,36 @@ unconditionally.
    [chrism@vitaminf shellenv]$ ../bin/paster pshell --disable-ipython \
                                 development.ini MyProject
 
-.. warning::
+You should always use a section name argument that refers to the actual
+``app`` section within the Paste configuration file that points at your
+:app:`Pyramid` application *without any middleware wrapping*.  In particular,
+a section name is inappropriate as the second argument to ``pshell`` if the
+configuration section it names is a ``pipeline`` rather than an ``app``.  For
+example, if you have the following ``.ini`` file content:
 
-   You should always use a section name argument that refers to the actual
-   ``app`` section within the Paste configuration file that points at your
-   :app:`Pyramid` application *without any middleware wrapping*.  In
-   particular, a section name is inappropriate as the second argument to
-   ``pshell`` if the configuration section it names is a ``pipeline`` rather
-   than an ``app``.  For example, if you have the following ``.ini`` file
-   content:
+.. latexbroken?
 
-   .. code-block:: guess
-      :linenos:
+.. code-block:: ini
+   :linenos:
 
-      [app:MyProject]
-      use = egg:MyProject
-      reload_templates = true
-      debug_authorization = false
-      debug_notfound = false
-      debug_templates = true
-      default_locale_name = en
+   [app:MyProject]
+   use = egg:MyProject
+   reload_templates = true
+   debug_authorization = false
+   debug_notfound = false
+   debug_templates = true
+   default_locale_name = en
 
-      [pipeline:main]
-      pipeline = 
-          egg:WebError#evalerror
-          MyProject
+   [pipeline:main]
+   pipeline = 
+       egg:WebError#evalerror
+       MyProject
 
-   Use ``MyProject`` instead of ``main`` as the section name argument to
-   ``pshell`` against the above ``.ini`` file (e.g. ``paster pshell
-   development.ini MyProject``).  If you use ``main`` instead, an error will
-   occur.  Use the most specific reference to your application within the
-   ``.ini`` file possible as the section name argument.
+Use ``MyProject`` instead of ``main`` as the section name argument to
+``pshell`` against the above ``.ini`` file (e.g. ``paster pshell
+development.ini MyProject``).  If you use ``main`` instead, an error will
+occur.  Use the most specific reference to your application within the
+``.ini`` file possible as the section name argument.
 
 Press ``Ctrl-D`` to exit the interactive shell (or ``Ctrl-Z`` on Windows).
 
@@ -511,8 +505,8 @@ describe, run, and test your application.
    ``setup.py``.
 
 #. ``MANIFEST.in`` is a :term:`distutils` "manifest" file, naming which files
-    should be included in a source distribution of the package when ``python
-    setup.py sdist`` is run.
+   should be included in a source distribution of the package when ``python
+   setup.py sdist`` is run.
 
 #. ``setup.py`` is the file you'll use to test and distribute your
    application.  It is a standard :term:`setuptools` ``setup.py`` file.
@@ -532,8 +526,10 @@ serve``, as well as the deployment settings provided to that application.
 
 The generated ``development.ini`` file looks like so:
 
+.. latexbroken?
+
 .. literalinclude:: MyProject/development.ini
-   :language: guess
+   :language: ini
    :linenos:
 
 This file contains several "sections" including ``[app:MyProject]``,

@@ -81,8 +81,10 @@ Here's a high-level time-ordered overview of what happens when you press
 
    Our generated ``development.ini`` file looks like so:
 
+   .. latexbroken?
+
    .. literalinclude:: MyProject/development.ini
-      :language: guess
+      :language: ini
       :linenos:
 
    In this case, the ``myproject.__init__:main`` function referred to by the
