@@ -130,9 +130,10 @@ def is_response(ob):
     """ Return ``True`` if ``ob`` implements the interface implied by
     :ref:`the_response`. ``False`` if not.
 
-    .. note:: this isn't a true interface check (in Zope terms), it's a
-        duck-typing check, as response objects are not obligated to
-        actually implement a Zope interface."""
+    .. note:: This isn't a true interface or subclass check.  Instead, it's a
+        duck-typing check, as response objects are not obligated to be of a
+        particular class or provide any particular Zope interface."""
+
     # response objects aren't obligated to implement a Zope interface,
     # so we do it the hard way
     if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
@@ -317,8 +318,6 @@ class view_config(object):
               different than when it is a function or another
               non-class callable.  See :ref:`class_as_view` for more
               information.
-
-    .. warning:: Using a class as a view is a new feature in 0.8.1+.
 
     The ``view_config`` decorator can also be used against a class
     method::
