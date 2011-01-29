@@ -224,11 +224,11 @@ Running
     .. code-block:: text
        :linenos:
 
-       [chrism@snowpro sess]$ ../bin/paster --plugin=pyramid pshell \
+       [chrism@snowpro sess]$ ../bin/paster pshell \
               myapp.ini myapp
        Python 2.5.4 (r254:67916, Sep  4 2009, 02:12:16) 
        [GCC 4.2.1 (Apple Inc. build 5646)] on darwin
-       Type "help" for more information. "root" is the Pyramid app root object.
+       Type "help" for more information. "root" is the Pyramid app root.
        >>> root
        <sess.models.MyModel object None at 0x16438f0>
        >>> root.foo = 'bar'
