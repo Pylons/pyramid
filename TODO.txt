@@ -9,6 +9,9 @@ Before Release
 - https://github.com/Pylons/pyramid/issues#issue/67 (fixing would make it
   possible to render a static site from a static dir).
 
+- Change "Cleaning up After a Request" in the urldispatch chapter to
+  use ``request.add_response_callback``.
+
 Should-Have
 -----------
 
@@ -58,9 +61,6 @@ Should-Have
 - Add narrative docs for wsgiapp and wsgiapp2.
 
 - translationdir ZCML directive use of ``path_spec`` should maybe die.
-
-- Change "Cleaning up After a Request" in the urldispatch chapter to
-  use ``request.add_response_callback``.
 
 - Provide a response_set_cookie method on the request for rendered responses
   that can be used as input to response.set_cookie?
