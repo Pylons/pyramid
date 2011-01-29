@@ -81,8 +81,6 @@ Here's a high-level time-ordered overview of what happens when you press
 
    Our generated ``development.ini`` file looks like so:
 
-   .. latexbroken?
-
    .. literalinclude:: MyProject/development.ini
       :language: ini
       :linenos:

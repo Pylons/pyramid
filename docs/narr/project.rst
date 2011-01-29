@@ -327,8 +327,6 @@ a section name is inappropriate as the second argument to ``pshell`` if the
 configuration section it names is a ``pipeline`` rather than an ``app``.  For
 example, if you have the following ``.ini`` file content:
 
-.. latexbroken?
-
 .. code-block:: ini
    :linenos:
 
