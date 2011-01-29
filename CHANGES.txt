@@ -7,6 +7,19 @@ Documentation
 - Fixed bug in ZODB Wiki tutorial (missing dependency on ``docutils`` in
   "models" step within ``setup.py``).
 
+- Removed API documentation for ``pyramid.testing`` APIs named
+  ``registerDummySecurityPolicy``, ``registerResources``, ``registerModels``,
+  ``registerEventListener``, ``registerTemplateRenderer``,
+  ``registerDummyRenderer``, ``registerView``, ``registerUtility``,
+  ``registerAdapter``, ``registerSubscriber``, ``registerRoute``,
+  and ``registerSettings``.
+
+Bug Fixes
+---------
+
+- Deprecated-since-BFG-1.2 APIs from ``pyramid.testing`` now properly emit
+  deprecation warnings.
+
 1.0b3 (2011-01-28)
 ==================
 

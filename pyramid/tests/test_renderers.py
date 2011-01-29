@@ -17,7 +17,8 @@ class TestTemplateRendererFactory(unittest.TestCase):
     def test_abspath_notfound(self):
         from pyramid.interfaces import ITemplateRenderer
         abspath = '/wont/exist'
-        testing.registerUtility({}, ITemplateRenderer, name=abspath)
+        self.config.registry.registerUtility(
+            {}, ITemplateRenderer, name=abspath)
         info = DummyRendererInfo({
             'name':abspath,
             'package':None,
@@ -32,7 +33,8 @@ class TestTemplateRendererFactory(unittest.TestCase):
         import os
         abspath = os.path.abspath(__file__)
         renderer = {}
-        testing.registerUtility(renderer, ITemplateRenderer, name=abspath)
+        self.config.registry.registerUtility(
+            renderer, ITemplateRenderer, name=abspath)
         info = DummyRendererInfo({
             'name':abspath,
             'package':None,
@@ -48,7 +50,8 @@ class TestTemplateRendererFactory(unittest.TestCase):
         import os
         abspath = os.path.abspath(__file__)
         renderer = {}
-        testing.registerUtility(renderer, ITemplateRenderer, name=abspath)
+        self.config.registry.registerUtility(
+            renderer, ITemplateRenderer, name=abspath)
         info = DummyRendererInfo({
             'name':abspath,
             'package':None,
@@ -62,7 +65,8 @@ class TestTemplateRendererFactory(unittest.TestCase):
     def test_relpath_path_registered(self):
         renderer = {}
         from pyramid.interfaces import ITemplateRenderer
-        testing.registerUtility(renderer, ITemplateRenderer, name='foo/bar')
+        self.config.registry.registerUtility(
+            renderer, ITemplateRenderer, name='foo/bar')
         spec = 'foo/bar'
         info = DummyRendererInfo({
             'name':spec,
@@ -79,8 +83,9 @@ class TestTemplateRendererFactory(unittest.TestCase):
         from pyramid.interfaces import ITemplateRenderer
         import pyramid.tests
         spec = 'bar/baz'
-        testing.registerUtility(renderer, ITemplateRenderer,
-                                name='pyramid.tests:bar/baz')
+        self.config.registry.registerUtility(
+            renderer, ITemplateRenderer,
+            name='pyramid.tests:bar/baz')
         info = DummyRendererInfo({
             'name':spec,
             'package':pyramid.tests,
@@ -116,7 +121,8 @@ class TestTemplateRendererFactory(unittest.TestCase):
             'type':'type',
             })
         renderer = {}
-        testing.registerUtility(renderer, ITemplateRenderer, name=spec)
+        self.config.registry.registerUtility(
+            renderer, ITemplateRenderer, name=spec)
         result = self._callFUT(info, None)
         self.failUnless(result is renderer)
 
@@ -148,7 +154,7 @@ class TestTemplateRendererFactory(unittest.TestCase):
         from pyramid.interfaces import ISettings
         from pyramid.interfaces import ITemplateRenderer
         settings = {'reload_assets':True}
-        testing.registerUtility(settings, ISettings)
+        self.config.registry.registerUtility(settings, ISettings)
         renderer = {}
         factory = DummyFactory(renderer)
         spec = 'test_renderers.py'
@@ -208,7 +214,8 @@ class TestRendererFromName(unittest.TestCase):
         fixture = os.path.join(here, 'fixtures/minimal.pt')
         def factory(info, **kw):
             return info
-        testing.registerUtility(factory, IRendererFactory, name='.pt')
+        self.config.registry.registerUtility(
+            factory, IRendererFactory, name='.pt')
         result = self._callFUT(fixture)
         self.assertEqual(result.registry, registry)
         self.assertEqual(result.type, '.pt')
@@ -227,7 +234,8 @@ class TestRendererFromName(unittest.TestCase):
         fixture = os.path.join(here, 'fixtures/minimal.pt')
         def factory(info, **kw):
             return info
-        testing.registerUtility(factory, IRendererFactory, name='.pt')
+        self.config.registry.registerUtility(
+            factory, IRendererFactory, name='.pt')
         result = self._callFUT(fixture, pyramid)
         self.assertEqual(result.registry, registry)
         self.assertEqual(result.type, '.pt')
