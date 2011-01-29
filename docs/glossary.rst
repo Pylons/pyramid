@@ -24,12 +24,13 @@ Glossary
      information about response objects.
 
    Repoze
-     "Repoze" is essentially a "brand" of software developed by
-     `Agendaless Consulting <http://agendaless.com>`_ and a set of
-     contributors.  The term has no special intrinsic meaning.  The
-     project's `website <http://repoze.org>`_ has more information.
-     The software developed "under the brand" is available in a
-     `Subversion repository <http://svn.repoze.org>`_.
+     "Repoze" is essentially a "brand" of software developed by `Agendaless
+     Consulting <http://agendaless.com>`_ and a set of contributors.  The
+     term has no special intrinsic meaning.  The project's `website
+     <http://repoze.org>`_ has more information.  The software developed
+     "under the brand" is available in a `Subversion repository
+     <http://svn.repoze.org>`_.  Pyramid was originally known as
+     :mod:`repoze.bfg`.
 
    setuptools
      `Setuptools <http://peak.telecommunity.com/DevCenter/setuptools>`_
@@ -311,7 +312,8 @@ Glossary
      `A full-featured Python web framework <http://djangoproject.com>`_.
 
    Pylons
-     `A lightweight Python web framework <http://pylonshq.com>`_.
+     `A lightweight Python web framework <http://pylonshq.com>`_ and a
+     predecessor of Pyramid.
 
    ZODB
       `Zope Object Database <http://zodb.org>`_, a
@@ -498,7 +500,7 @@ Glossary
      all URL-to-view code mappings.
 
    SQLAlchemy
-     `SQLAlchemy' <http://www.sqlalchemy.org/>`_ is an object
+     `SQLAlchemy <http://www.sqlalchemy.org/>`_ is an object
      relational mapper used in tutorials within this documentation.
 
    JSON
@@ -618,16 +620,15 @@ Glossary
       information.
 
    thread local
-      A thread-local variable is one which is essentially a global
-      variable in terms of how it is accessed and treated, however,
-      each `thread
-      <http://en.wikipedia.org/wiki/Thread_(computer_science)>` used by
-      the application may have a different value for this same "global"
-      variable.  :app:`Pyramid` uses a small number of thread local
-      variables, as described in :ref:`threadlocals_chapter`. See also
-      the `threading.local documentation
-      <http://docs.python.org/library/threading.html#threading.local>`
-      for more information.
+      A thread-local variable is one which is essentially a global variable
+      in terms of how it is accessed and treated, however, each `thread
+      <http://en.wikipedia.org/wiki/Thread_(computer_science)>`_ used by the
+      application may have a different value for this same "global" variable.
+      :app:`Pyramid` uses a small number of thread local variables, as
+      described in :ref:`threadlocals_chapter`. See also the `threading.local
+      documentation
+      <http://docs.python.org/library/threading.html#threading.local>`_ for
+      more information.
 
    multidict
      An ordered dictionary that can have multiple values for each
@@ -644,11 +645,11 @@ Glossary
      and Chris McDonough.  See also http://agendaless.com .
 
    Jython
-     A `Python implementation <http://www.jython.org/>` written for
+     A `Python implementation <http://www.jython.org/>`_ written for
      the Java Virtual Machine.
 
    Python
-     The `programming language <http://python.org>` in which
+     The `programming language <http://python.org>`_ in which
      :app:`Pyramid` is written.
 
    CPython
@@ -863,8 +864,7 @@ Glossary
    pyramid_handlers
      An add-on package which allows :app:`Pyramid` users to create classes
      that are analogues of Pylons 1 "controllers".  See
-     `http://docs.pylonsproject.org/projects/pyramid_handlers/dev/
-     <http://docs.pylonsproject.org/projects/pyramid_handlers/dev/>`_.
+     http://docs.pylonsproject.org/projects/pyramid_handlers/dev/ .
 
    pyramid_jinja2
      :term:`Jinja2` templating system bindings for Pyramid, documented at
@@ -881,9 +881,9 @@ Glossary
      information.
 
    Pyramid Cookbook
-     An `additional documentation resource
-     <http://docs.pylonsproject.org/projects/pyramid_cookbook/dev/index.html>`_
-     for Pyramid which presents topical, practical usages of Pyramid.
+     An additional documentation resource for Pyramid which presents topical,
+     practical usages of Pyramid available via
+     http://docs.pylonsproject.org/ .
 
    distutils
      The standard system for packaging and distributing Python packages.  See
