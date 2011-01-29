@@ -14,6 +14,10 @@ Documentation
   ``registerAdapter``, ``registerSubscriber``, ``registerRoute``,
   and ``registerSettings``.
 
+- Moved "Using ZODB With ZEO" and "Using repoze.catalog Within Pyramid"
+  tutorials out of core documentation and into the Pyramid Tutorials site
+  (http://docs.pylonsproject.org/projects/pyramid_tutorials/dev/).
+
 Bug Fixes
 ---------
 

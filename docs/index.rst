@@ -81,8 +81,6 @@ applications to various platforms.
    tutorials/bfg/index.rst
    tutorials/gae/index.rst
    tutorials/modwsgi/index.rst
-   tutorials/zeo/index.rst
-   tutorials/catalog/index.rst
 
 Reference Material
 ==================

@@ -69,8 +69,6 @@ Tutorials
    tutorials/wiki2/index.rst
    tutorials/gae/index.rst
    tutorials/modwsgi/index.rst
-   tutorials/zeo/index.rst
-   tutorials/catalog/index.rst
 
 .. _api_reference:
 
