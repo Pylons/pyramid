@@ -10,6 +10,7 @@ requires = [
     'pyramid',
     'repoze.zodbconn',
     'repoze.tm2>=1.0b1', # default_commit_veto
+    'repoze.retry',
     'ZODB3',
     'WebError',
     'docutils',

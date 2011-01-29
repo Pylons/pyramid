@@ -24,6 +24,9 @@ Bug Fixes
 - Deprecated-since-BFG-1.2 APIs from ``pyramid.testing`` now properly emit
   deprecation warnings.
 
+- Added ``egg:repoze.retry#retry`` middleware to the WSGI pipeline in ZODB
+  templates (retry ZODB conflict errors which occur in normal operations).
+
 1.0b3 (2011-01-28)
 ==================
 

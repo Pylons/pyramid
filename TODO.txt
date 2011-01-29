@@ -4,18 +4,16 @@ Pyramid TODOs
 Before Release
 --------------
 
-- Consider per-form_id CSRF instead of per-session global CSRF token.
-
 - https://github.com/Pylons/pyramid/issues#issue/67 (fixing would make it
   possible to render a static site from a static dir).
 
 - Change "Cleaning up After a Request" in the urldispatch chapter to
   use ``request.add_response_callback``.
 
-- ``repoze.retry`` in ZODB template.
-
 Should-Have
 -----------
+
+- Consider per-form_id CSRF instead of per-session global CSRF token.
 
 - I18N support for pyramid_jinja2.  See also -
   http://groups.google.com/group/pylons-devel/msg/ab58353594b135c9 and
