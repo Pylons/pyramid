@@ -26,7 +26,7 @@ Documentation
 - Beef up documentation related to ``set_default_permission``: explicitly
   mention that default permissions also protect exception views.
 
-- Paster templates and tutorials now use tabs instead of spaces in their HTML
+- Paster templates and tutorials now use spaces instead of tabs in their HTML
   templates.
 
 1.0b2 (2011-01-24)
