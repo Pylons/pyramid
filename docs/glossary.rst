@@ -182,10 +182,10 @@ Glossary
      :ref:`urldispatch_chapter` for more information.
 
    context
-     An resource in the resource tree that is found during :term:`traversal`
+     A resource in the resource tree that is found during :term:`traversal`
      or :term:`URL dispatch` based on URL data; if it's found via traversal,
      it's usually a :term:`resource` object that is part of a resource tree;
-     if it's found via :term:`URL dispatch`, it's a object manufactured on
+     if it's found via :term:`URL dispatch`, it's an object manufactured on
      behalf of the route's "factory".  A context resource becomes the subject
      of a :term:`view`, and often has security information attached to
      it.  See the :ref:`traversal_chapter` chapter and the
@@ -488,7 +488,7 @@ Glossary
      available as its ``__parent__`` attribute.
 
    root factory
-     The "root factory" of an :app:`Pyramid` application is called
+     The "root factory" of a :app:`Pyramid` application is called
      on every request sent to the application.  The root factory
      returns the traversal root of an application.  It is
      conventionally named ``get_root``.  An application may supply a
