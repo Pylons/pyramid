@@ -439,7 +439,7 @@ neither predicates nor view configuration information.
   matched which contains a ``*traverse`` remainder marker in its pattern (see
   :ref:`using_traverse_in_a_route_pattern`).  The ``traverse`` argument
   allows you to associate route patterns with an arbitrary traversal path
-  without using a a ``*traverse`` remainder marker; instead you can use other
+  without using a ``*traverse`` remainder marker; instead you can use other
   match information.
 
   Note that the ``traverse`` argument is ignored when attached to a route

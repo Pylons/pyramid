@@ -231,7 +231,7 @@ The simplest call to :func:`~pyramid.url.resource_url` looks like this:
    url = resource_url(resource, request)
 
 The ``request`` passed to ``resource_url`` in the above example is an
-instance of an :app:`Pyramid` :term:`request` object.
+instance of a :app:`Pyramid` :term:`request` object.
 
 If the resource referred to as ``resource`` in the above example was the root
 resource, and the host that was used to contact the server was
