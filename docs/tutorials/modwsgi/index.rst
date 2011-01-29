@@ -102,7 +102,8 @@ commands and files.
        # play badly with C extensions.
        WSGIApplicationGroup %{GLOBAL}
        WSGIPassAuthorization On
-       WSGIDaemonProcess pyramid user=chrism group=staff processes=1 threads=4 \
+       WSGIDaemonProcess pyramid user=chrism group=staff processes=1 \
+          threads=4 \
           python-path=/Users/chrism/modwsgi/env/lib/python2.6/site-packages
        WSGIScriptAlias /myapp /Users/chrism/modwsgi/env/pyramid.wsgi
 
