@@ -144,7 +144,7 @@ def remember(request, principal, **kw):
     implied by the data passed as ``principal`` and ``*kw`` using the
     current :term:`authentication policy`.  Common usage might look
     like so within the body of a view function (``response`` is
-    assumed to be an :term:`WebOb` -style :term:`response` object
+    assumed to be a :term:`WebOb` -style :term:`response` object
     computed previously by the view code)::
 
       from pyramid.security import remember
