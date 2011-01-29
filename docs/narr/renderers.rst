@@ -456,14 +456,14 @@ There are essentially two different kinds of renderer factories:
   such as a template.
 
 - A renderer factory which expects to accept a token that does not represent
-  a filesystem path or a asset specification in the ``name``
+  a filesystem path or an asset specification in the ``name``
   attribute of the ``info`` object fed to its constructor.  These renderer
   factories are registered with a ``name`` value that does not begin with a
   dot.  These renderer factories are typically object serializers.
 
 .. sidebar:: Asset Specifications
 
-   A asset specification is a colon-delimited identifier for a
+   An asset specification is a colon-delimited identifier for an
    :term:`asset`.  The colon separates a Python :term:`package`
    name from a package subpath.  For example, the asset
    specification ``my.package:static/baz.css`` identifies the file named
