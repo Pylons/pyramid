@@ -892,11 +892,12 @@ class Configurator(object):
 
     def get_settings(self):
         """
-        Return a 'settings' object for the current application.  A
-        'settings' object is a dictionary-like object that contains
-        key/value pairs based on the dictionary passed as the ``settings``
-        argument to the :class:`pyramid.config.Configurator`
-        constructor or the :func:`pyramid.router.make_app` API.
+        Return a :term:`deployment settings` object for the current
+        application.  A deployment settings object is a dictionary-like
+        object that contains key/value pairs based on the dictionary passed
+        as the ``settings`` argument to the
+        :class:`pyramid.config.Configurator` constructor or the
+        :func:`pyramid.router.make_app` API.
 
         .. note:: For backwards compatibility, dictionary keys can also be
            looked up as attributes of the settings object.
