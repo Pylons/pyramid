@@ -12,6 +12,8 @@ Before Release
 - Change "Cleaning up After a Request" in the urldispatch chapter to
   use ``request.add_response_callback``.
 
+- ``repoze.retry`` in ZODB template.
+
 Should-Have
 -----------
 
