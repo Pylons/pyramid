@@ -18,6 +18,10 @@ Documentation
   tutorials out of core documentation and into the Pyramid Tutorials site
   (http://docs.pylonsproject.org/projects/pyramid_tutorials/dev/).
 
+- Changed "Cleaning up After a Request" section in the URL Dispatch chapter
+  to use ``request.add_finished_callback`` instead of jamming an object with
+  a ``__del__`` into the WSGI environment.
+
 Bug Fixes
 ---------
 

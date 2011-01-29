@@ -1097,16 +1097,7 @@ Cleaning Up After a Request
 ---------------------------
 
 Sometimes it's required that some cleanup be performed at the end of a
-request when a database connection is involved.  When :term:`traversal` is
-used, this cleanup is often done as a side effect of the traversal
-:term:`root factory`.  Often the root factory will insert an object into the
-WSGI environment that performs some cleanup when its ``__del__`` method is
-called.  When URL dispatch is used, however, no special root factory is
-required, so sometimes that option is not open to you.
-
-Instead of putting this cleanup logic in the root factory, however, you can
-cause a subscriber to be fired when a new request is detected; the subscriber
-can do this work.
+request when a database connection is involved.  
 
 For example, let's say you have a ``mypackage`` :app:`Pyramid` application
 package that uses SQLAlchemy, and you'd like the current SQLAlchemy database
@@ -1117,37 +1108,32 @@ session to be removed after each request.  Put the following in the
 .. code-block:: python
    :linenos:
 
-    from mypackage.sql import DBSession
+   from mypackage.models import DBSession
 
-    class Cleanup:
-        def __init__(self, cleaner):
-            self.cleaner = cleaner
-        def __del__(self):
-            self.cleaner()
+   from pyramid.events import subscriber
+   from pyramid.events import NewRequest
 
-    def handle_teardown(event):
-        environ = event.request.environ
-        environ['mypackage.sqlcleaner'] = Cleanup(DBSession.remove)
+   def cleanup_callback(request):
+       DBSession.remove()
 
-Then add an event subscriber in your startup configuration:
+   @subscriber(NewRequest)
+   def add_cleanup_callback(event):
+       event.request.add_finished_callback(cleanup_callback)
 
-.. code-block:: python
-   :linenos:
+Registering the ``cleanup_callback`` finished callback at the start of a
+request (by causing the ``add_cleanup_callback`` to receive a
+:class:`pyramid.events.NewRequest` event at the start of each request) will
+cause the DBSession to be removed whenever request processing has ended.
+Note that in the example above, for the :class:`pyramid.events.subscriber`
+decorator to "work", the :meth:`pyramid.config.Configurator.scan` method must
+be called against your ``mypackage`` package during application
+initialization.
 
-   config.add_subscriber('mypackage.handle_teardown',
-                         'pyramid.events.NewRequest')
-
-Registering a handle_teardown subscriber will cause the DBSession to be
-removed whenever the WSGI environment is destroyed (usually at the end of
-every request).
-
-.. note:: This is only an example.  In particular, it is not necessary
-   to cause ``DBSession.remove`` to be called as the result of an
-   event listener in an application generated from any
-   :app:`Pyramid` paster template, because these all use the
-   ``repoze.tm2`` middleware.  The cleanup done by
-   ``DBSession.remove`` is unnecessary when ``repoze.tm2`` middleware
-   is in the WSGI pipeline.
+.. note:: This is only an example.  In particular, it is not necessary to
+   cause ``DBSession.remove`` to be called in an application generated from
+   any :app:`Pyramid` paster template, because these all use the
+   ``repoze.tm2`` middleware.  The cleanup done by ``DBSession.remove`` is
+   unnecessary when ``repoze.tm2`` middleware is in the WSGI pipeline.
 
 .. index::
    pair: URL dispatch; security
