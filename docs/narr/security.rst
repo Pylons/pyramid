@@ -311,9 +311,7 @@ authentication system provides group information and the effective
 :term:`authentication policy` policy is written to respect group information.
 For example, the
 :class:`pyramid.authentication.RepozeWho1AuthenicationPolicy` respects group
-information if you configure it with a ``callback``.  See
-:ref:`authentication_policies_directives_section` for more information about
-the ``callback`` attribute.
+information if you configure it with a ``callback``.
 
 Each ACE in an ACL is processed by an authorization policy *in the
 order dictated by the ACL*.  So if you have an ACL like this:
