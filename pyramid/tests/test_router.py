@@ -528,14 +528,13 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(request.matched_route.name, 'foo')
 
         self.assertEqual(len(logger.messages), 1)
-        self.assertEqual(logger.messages[0],
+        self.failUnless(
+            logger.messages[0].startswith(
             "route matched for url http://localhost:8080"
             "/archives/action1/article1; "
             "route_name: 'foo', "
             "path_info: '/archives/action1/article1', "
-            "pattern: 'archives/:action/:article', "
-            "matchdict: {'action': u'action1', 'article': u'article1'}, "
-            "predicates: ()")
+            "pattern: 'archives/:action/:article', "))
 
     def test_call_route_match_miss_debug_routematch(self):
         from pyramid.exceptions import NotFound
