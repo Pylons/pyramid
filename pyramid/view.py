@@ -177,97 +177,9 @@ class view_config(object):
     The meanings of these arguments are the same as the arguments passed to
     :meth:`pyramid.config.Configurator.add_view`.
 
-    Any individual or all parameters can be omitted.  The simplest
-    :class:`pyramid.view.view_config` declaration is::
+    See :ref:`mapping_views_using_a_decorator_section` for details about
+    using :class:`view_config`.
 
-        @view_config()
-        def my_view(...):
-            ...
-
-    Such a registration implies that the view name will be
-    ``my_view``, registered for any :term:`context` object, using no
-    permission, registered against all non-URL-dispatch-based
-    requests, with any ``REQUEST_METHOD``, any set of request.params
-    values, without respect to any object in the :term:`lineage`.
-
-    The ``view_config`` decorator can also be used as a class decorator
-    in Python 2.6 and better (Python 2.5 and below do not support
-    class decorators)::
-
-        from pyramid.response import Response
-        from pyramid.view import view_config
-
-        @view_config()
-        class MyView(object):
-            def __init__(self, context, request):
-                self.context = context
-                self.request = request
-            def __call__(self):
-                return Response('hello from %s!' % self.context)
-
-    In Python 2.5 and below, the ``view_config`` decorator can still be
-    used against a class, although not in decorator form::
-
-        from pyramid.response import Response
-        from pyramid.view import view_config
-
-        class MyView(object):
-            def __init__(self, context, request):
-                self.context = context
-                self.request = request
-            def __call__(self):
-                return Response('hello from %s!' % self.context)
-
-        MyView = view_config()(MyView)
-
-    .. note:: When a view is a class, the calling semantics are
-              different than when it is a function or another
-              non-class callable.  See :ref:`class_as_view` for more
-              information.
-
-    The ``view_config`` decorator can also be used against a class
-    method::
-
-        from pyramid.response import Response
-        from pyramid.view import view_config
-
-        class MyView(object):
-            def __init__(self, context, request):
-                self.context = context
-                self.request = request
-
-            @view_config(name='hello')
-            def amethod(self):
-                return Response('hello from %s!' % self.context)
-
-    When the ``view_config`` decorator is used against a class method,
-    a view is registered for the *class* (as described above), so the
-    class constructor must accept either ``request`` or ``context,
-    request``.  The method which is decorated must return a response
-    (or rely on a :term:`renderer` to generate one). Using the
-    decorator against a particular method of a class is equivalent to
-    using the ``attr`` parameter in a decorator attached to the class
-    itself.  For example, the above registration implied by the
-    decorator being used against the ``amethod`` method could be
-    spelled equivalently as::
-
-        from pyramid.response import Response
-        from pyramid.view import view_config
-
-        @view_config(attr='amethod', name='hello')
-        class MyView(object):
-            def __init__(self, context, request):
-                self.context = context
-                self.request = request
-
-            def amethod(self):
-                return Response('hello from %s!' % self.context)
-
-    To make use of any ``view_config`` declaration, you must perform a
-    :term:`scan`.  To do so, insert the following into your Pyramid
-    application's ``main`` stanza::
-    
-      config.scan()
     """
     venusian = venusian # for testing injection
     def __init__(self, name='', request_type=None, for_=None, permission=None,
