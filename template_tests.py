@@ -1,3 +1,4 @@
+import sys
 import httplib
 import os
 import pkg_resources
@@ -5,6 +6,15 @@ import shutil
 import subprocess
 import tempfile
 import time
+import signal
+
+if not hasattr(subprocess, 'check_call'):
+    # 2.4
+    def check_call(*arg, **kw):
+        returncode = subprocess.call(*arg, **kw)
+        if returncode:
+            raise ValueError(returncode)
+    subprocess.check_call = check_call
 
 class TemplateTest(object):
     def make_venv(self, directory):
@@ -47,14 +57,23 @@ class TemplateTest(object):
                 resp = conn.getresponse()
                 assert(resp.status == 200)
             finally:
-                proc.terminate()
+                if hasattr(proc, 'terminate'):
+                    # 2.6+
+                    proc.terminate()
+                else:
+                    # 2.5
+                    os.kill(proc.pid, signal.SIGTERM)
         finally:
             shutil.rmtree(self.directory)
             os.chdir(self.old_cwd)
 
+templates = ['pyramid_starter', 'pyramid_alchemy', 'pyramid_routesalchemy',]
+
+if sys.version_info >= (2, 5):
+    templates.append('pyramid_zodb')
+
 if __name__ == '__main__':
-    for name in ('pyramid_starter', 'pyramid_alchemy', 'pyramid_routesalchemy',
-                 'pyramid_zodb'):
+    for name in templates:
         test = TemplateTest()
         test.install(name)
     
