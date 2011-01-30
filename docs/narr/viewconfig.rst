@@ -360,8 +360,7 @@ View Configuration Using the ``@view_config`` Decorator
 
 For better locality of reference, you may use the
 :class:`pyramid.view.view_config` decorator to associate your view functions
-with URLs instead of using :term:`ZCML` or imperative configuration for the
-same purpose.
+with URLs instead of using imperative configuration for the same purpose.
 
 .. warning::
 
@@ -370,13 +369,12 @@ same purpose.
    declarations.
 
 Usage of the ``view_config`` decorator is a form of :term:`declarative
-configuration`, like ZCML, but in decorator form.
-:class:`~pyramid.view.view_config` can be used to associate :term:`view
-configuration` information -- as done via the equivalent imperative code or
-ZCML -- with a function that acts as a :app:`Pyramid` view callable.  All
-arguments to the :meth:`pyramid.config.Configurator.add_view` method (save
-for the ``view`` argument) are available in decorator form and mean precisely
-the same thing.
+configuration` in decorator form.  :class:`~pyramid.view.view_config` can be
+used to associate :term:`view configuration` information -- as done via the
+equivalent imperative code -- with a function that acts as a :app:`Pyramid`
+view callable.  All arguments to the
+:meth:`pyramid.config.Configurator.add_view` method (save for the ``view``
+argument) are available in decorator form and mean precisely the same thing.
 
 An example of the :class:`~pyramid.view.view_config` decorator might reside in
 a :app:`Pyramid` application module ``views.py``:
