@@ -71,18 +71,11 @@ class Settings(dict):
 
 def get_settings():
     """
-    Return a 'settings' object for the current application.  A
-    'settings' object is a dictionary-like object that contains
-    key/value pairs based on the dictionary passed as the ``settings``
-    argument to the :class:`pyramid.config.Configurator`
-    constructor or the :func:`pyramid.router.make_app` API.
-
-    .. note:: For backwards compatibility, dictionary keys can also be
-       looked up as attributes of the settings object.
-
-    .. note:: the
-       :class:`pyramid.config.Configurator.get_settings` method
-       performs the same duty.
+    Return a :term:`deployment settings` object for the current application.
+    The object is a dictionary-like object that contains key/value pairs
+    based on the dictionary passed as the ``settings`` argument to the
+    :class:`pyramid.config.Configurator` constructor or the
+    :func:`pyramid.router.make_app` API.
 
     .. warning:: This method is deprecated as of Pyramid 1.0.  Use
        ``pyramid.threadlocals.get_current_registry().settings`` instead or use
