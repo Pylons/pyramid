@@ -1019,11 +1019,11 @@ which you started the application from.  For example:
 See :ref:`environment_chapter` for more information about how, and where to
 set these values.
 
-.. _displaying_application_routes:
-
 .. index::
    pair: routes; printing
    single: paster proutes
+
+.. _displaying_application_routes:
 
 Displaying All Application Routes
 ---------------------------------

@@ -30,7 +30,7 @@ much more insidious and harmful set of duplication at higher levels in the
 Python web community.
 
 :app:`Pyramid` began its life as :mod:`repoze.bfg`, written by a team of
-people with many years of prior :ref:`Zope` experience.  The idea of
+people with many years of prior :term:`Zope` experience.  The idea of
 :term:`traversal` and the way :term:`view lookup` works was stolen entirely
 from Zope.  The authorization subsystem provided by :app:`Pyramid` is a
 derivative of Zope's.  The idea that an application can be *extended* without
@@ -417,9 +417,6 @@ method was ``POST`` and that the remote user agent passed
 ``Accept`` request header.
 
 "Under the hood", these features make no use of interfaces.
-
-For more information about predicates, see
-:ref:`view_predicates_in_1dot1` and :ref:`route_predicates_in_1dot1`.
 
 Many "prebaked" predicates exist.  However, use of only "prebaked" predicates,
 however, doesn't entirely meet Ian's criterion.  He would like to be able to
