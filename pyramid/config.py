@@ -2118,7 +2118,8 @@ class Configurator(object):
 
         .. code-block:: python
 
-           add_translations_dirs('/usr/share/locale', 'some.package:locale')
+           config.add_translation_dirs('/usr/share/locale',
+                                       'some.package:locale')
 
         """
         for spec in specs:
