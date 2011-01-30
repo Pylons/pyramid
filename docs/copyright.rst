@@ -69,9 +69,6 @@ Used with permission:
    The :ref:`much_ado_about_traversal_chapter` chapter is adapted,
    with permission, from an article written by Rob Miller.
 
-   The :ref:`wiki2_flow_of_authentication` section was contributed by John
-   Shipman.
-
 Print Production
 ----------------
 
