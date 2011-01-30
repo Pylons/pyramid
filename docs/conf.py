@@ -61,20 +61,20 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'repoze.sphinx.autointerface',
-    'sphinx.ext.intersphinx'
+#    'sphinx.ext.intersphinx'
     ]
 
 # Looks for objects in other Pyramid projects
-intersphinx_mapping = {
-    'cookbook':
-    ('http://docs.pylonsproject.org/projects/pyramid_cookbook/dev/', None),
-    'handlers':
-    ('http://docs.pylonsproject.org/projects/pyramid_handlers/dev/', None),
-    'zcml':
-    ('http://docs.pylonsproject.org/projects/pyramid_zcml/dev/', None),
-    'jinja2':
-    ('http://docs.pylonsproject.org/projects/pyramid_jinja2/dev/', None),
-    }
+## intersphinx_mapping = {
+##     'cookbook':
+##     ('http://docs.pylonsproject.org/projects/pyramid_cookbook/dev/', None),
+##     'handlers':
+##     ('http://docs.pylonsproject.org/projects/pyramid_handlers/dev/', None),
+##     'zcml':
+##     ('http://docs.pylonsproject.org/projects/pyramid_zcml/dev/', None),
+##     'jinja2':
+##     ('http://docs.pylonsproject.org/projects/pyramid_jinja2/dev/', None),
+##     }
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -93,7 +93,7 @@ copyright = '%s, Agendaless Consulting' % datetime.datetime.now().year
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '1.0b3'
+version = '1.0'
 # The full version, including alpha/beta/rc tags.
 release = version
 
