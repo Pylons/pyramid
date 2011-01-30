@@ -2330,8 +2330,7 @@ class Configurator(object):
         expected event notifications.  This method is useful when
         testing code that wants to call
         :meth:`pyramid.registry.Registry.notify`,
-        :func:`zope.component.event.dispatch` or
-        :func:`zope.component.event.objectEventNotify`.
+        or :func:`zope.component.event.dispatch`.
 
         The default value of ``event_iface`` (``None``) implies a
         subscriber registered for *any* kind of event.
