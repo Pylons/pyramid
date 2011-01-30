@@ -169,115 +169,13 @@ class view_config(object):
              :class:`pyramid.view.bfg_view`.
 
     The following arguments are supported as arguments to
-    :class:`pyramid.view.view_config`: ``context``, ``permission``,
-    ``name``, ``request_type``, ``route_name``, ``request_method``,
-    ``request_param``, ``containment``, ``xhr``, ``accept``,
-    ``header`` and ``path_info``.
+    :class:`pyramid.view.view_config`: ``context``, ``permission``, ``name``,
+    ``request_type``, ``route_name``, ``request_method``, ``request_param``,
+    ``containment``, ``xhr``, ``accept``, ``header``, ``path_info``,
+    ``custom_predicates``, ``decorator``, and ``mapper``.
 
-    ``context`` should be a Python object or :term:`dotted Python
-    name` representing the context type that must be found for this
-    view to be called.  If ``context`` is not supplied, the interface
-    ``zope.interface.Interface`` (matching any context) is used.  An
-    alias for ``context`` is ``for_``.
-
-    If ``permission`` is not supplied, no permission is registered for
-    this view (it's accessible by any caller).
-
-    If ``name`` is not supplied, the empty string is used (implying
-    the default view name).
-
-    If ``attr`` is not supplied, ``None`` is used (implying the
-    function itself if the view is a function, or the ``__call__``
-    callable attribute if the view is a class).
-
-    If ``renderer`` is not supplied, ``None`` is used (meaning that no
-    renderer is associated with this view).
-
-    If ``wrapper`` is not supplied, ``None`` is used (meaning that no
-    view wrapper is associated with this view).
-
-    If ``request_type`` is not supplied, the interface
-    :class:`pyramid.interfaces.IRequest` is used, implying the
-    standard request interface type.
-
-    If ``route_name`` is not supplied, the view configuration is
-    considered to be made against a URL that doesn't match any defined
-    :term:`route`.  The use of a ``route_name`` is an advanced
-    feature, useful only if you're also using :term:`url dispatch`.
-
-    If ``request_method`` is not supplied, this view will match a
-    request with any HTTP ``REQUEST_METHOD``
-    (GET/POST/PUT/HEAD/DELETE).  If this parameter *is* supplied, it
-    must be a string naming an HTTP ``REQUEST_METHOD``, indicating
-    that this view will only match when the current request has a
-    ``REQUEST_METHOD`` that matches this value.
-
-    If ``request_param`` is not supplied, this view will be called
-    when a request with any (or no) request GET or POST parameters is
-    encountered.  If the value is present, it must be a string.  If
-    the value supplied to the parameter has no ``=`` sign in it, it
-    implies that the key must exist in the ``request.params``
-    dictionary for this view to 'match' the current request.  If the value
-    supplied to the parameter has a ``=`` sign in it, e.g.
-    ``request_params="foo=123"``, then the key (``foo``) must both exist
-    in the ``request.params`` dictionary, and the value must match the
-    right hand side of the expression (``123``) for the view to "match" the
-    current request.
-
-    ``containment`` should be a Python object or :term:`dotted Python
-    name` representing a class or interface type which must be found
-    as one of the context's location parents for this view to be
-    called.  If ``containment`` is not supplied, this view will be
-    called when the context of the request has any (or no)
-    :term:`lineage`.  If ``containment`` *is* supplied, it must be a
-    class or :term:`interface`, denoting that the view'matches' the
-    current request only if any graph :term:`lineage` node possesses
-    this class or interface.
-
-    If ``xhr`` is specified, it must be a boolean value.  If the value
-    is ``True``, the view will only be invoked if the request's
-    ``X-Requested-With`` header has the value ``XMLHttpRequest``.
-
-    If ``accept`` is specified, it must be a mimetype value.  If ``accept``
-    is specified, the view will only be invoked if the ``Accept`` HTTP header
-    matches the value requested.  The value of this attribute represents a
-    match query for one or more mimetypes in the ``Accept`` HTTP request
-    header.  If this value is specified, it must be in one of the following
-    forms: a mimetype match token in the form ``text/plain``, a wildcard
-    mimetype match token in the form ``text/*`` or a match-all wildcard
-    mimetype match token in the form ``*/*``.  If any of the forms matches
-    the ``Accept`` header of the request, this predicate will be true.
-
-    If ``header`` is specified, it must be a header name or a
-    ``headername:headervalue`` pair.  If ``header`` is specified, and
-    possesses a value the view will only be invoked if an HTTP header matches
-    the value requested.  The value of this attribute represents an HTTP
-    header name or a header name/value pair.  If the value contains a ``:``
-    (colon), it will be considered a name/value pair
-    (e.g. ``User-Agent:Mozilla/.*`` or ``Host:localhost``).  The *value* of
-    an attribute that represent a name/value pair should be a regular
-    expression.  If the value does not contain a colon, the entire value will
-    be considered to be the header name (e.g. ``If-Modified-Since``).  If the
-    value evaluates to a header name only without a value, the header
-    specified by the name must be present in the request for this predicate
-    to be true.  If the value evaluates to a header name/value pair, the
-    header specified by the name must be present in the request *and* the
-    regular expression specified as the value must match the header value.
-    Whether or not the value represents a header name or a header name/value
-    pair, the case of the header name is not significant.
-
-    If ``path_info`` is specified, it must be a regular
-    expression. The view will only be invoked if the ``PATH_INFO``
-    WSGI environment variable matches the expression.
-
-    If ``custom_predicates`` is specified, it must be a sequence of
-    :term:`predicate` callables (a predicate callable accepts two
-    arguments: ``context`` and ``request`` and returns ``True`` or
-    ``False``).  The view will only be invoked if all custom
-    predicates return ``True``.
-
-    See the :meth:`pyramid.config.Configurator.add_view` method for
-    descriptions of the ``decorator`` and ``mapper`` arguments.
+    The meanings of these arguments are the same as the arguments passed to
+    :meth:`pyramid.config.Configurator.add_view`.
 
     Any individual or all parameters can be omitted.  The simplest
     :class:`pyramid.view.view_config` declaration is::
