@@ -5,6 +5,10 @@ Releasing Pyramid
 
   $ python setup.py nosetests --with-coverage
 
+- Make sure paster templates pass:
+
+  $ python template_tests.py
+
 - Ensure all features of the release are documented (audit CHANGES.txt or
   communicate with contributors).
 
