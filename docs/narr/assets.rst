@@ -183,13 +183,6 @@ webserver listening on ``example.com`` must be itself configured to respond
 properly to such a request.  The :func:`~pyramid.url.static_url` API is
 discussed in more detail later in this chapter.
 
-.. note::
-
-   The :ref:`static_directive` ZCML directive offers a declarative
-   equivalent to :meth:`~pyramid.config.Configurator.add_static_view`.  Use of
-   the :ref:`static_directive` ZCML directive is completely equivalent to
-   using imperative configuration for the same purpose.
-
 .. index::
    single: generating static asset urls
    single: static asset urls
