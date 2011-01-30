@@ -466,7 +466,7 @@ epub_scheme = 'ISBN'
 
 # The unique identifier of the text. This can be a ISBN number
 # or the project homepage.
-epub_identifier = '0615345379'
+epub_identifier = '0615445675'
 
 # A unique identification for the text.
 epub_uid = 'The Pyramid Web Application Development Framework, Version 1.0'
