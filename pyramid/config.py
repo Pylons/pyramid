@@ -87,6 +87,7 @@ from pyramid.urldispatch import RoutesMapper
 from pyramid.util import DottedNameResolver
 from pyramid.view import default_exceptionresponse_view
 from pyramid.view import render_view_to_response
+from pyramid.view import is_response
 
 MAX_ORDER = 1 << 30
 DEFAULT_PHASH = md5().hexdigest()
@@ -2988,12 +2989,6 @@ def translator(msg):
     request = get_current_request()
     localizer = get_localizer(request)
     return localizer.translate(msg)
-
-def is_response(ob):
-    if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
-         hasattr(ob, 'status') ):
-        return True
-    return False
 
 def isexception(o):
     if IInterface.providedBy(o):

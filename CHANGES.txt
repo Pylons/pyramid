@@ -31,6 +31,11 @@ Bug Fixes
 - Added ``egg:repoze.retry#retry`` middleware to the WSGI pipeline in ZODB
   templates (retry ZODB conflict errors which occur in normal operations).
 
+- Removed duplicate implementations of ``is_response``.  Two competing
+  implementations existed: one in ``pyramid.config`` and one in
+  ``pyramid.view``.  Now the one defined in ``pyramid.view`` is used
+  internally by ``pyramid.config`` and continues to be advertised as an API.
+
 1.0b3 (2011-01-28)
 ==================
 
