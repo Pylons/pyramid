@@ -2274,6 +2274,7 @@ class ConfiguratorTests(unittest.TestCase):
         result = view(None, request)
         self.assertEqual(result, ('abc', request))
 
+    @testing.skip_on('pypy', 'java')
     def test_set_notfound_view_with_renderer(self):
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
@@ -2320,6 +2321,7 @@ class ConfiguratorTests(unittest.TestCase):
         result = view(None, request)
         self.assertEqual(result, ('abc', request))
 
+    @testing.skip_on('pypy', 'java')
     def test_set_forbidden_view_with_renderer(self):
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
