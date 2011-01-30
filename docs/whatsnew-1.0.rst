@@ -561,5 +561,17 @@ Documentation Enhancements
 
 - The (weak) "Converting a CMF Application to Pyramid" tutorial has been
   removed from the tutorials section.  It was moved to the
-  ``pyramid_tutorials`` Github repository.
+  ``pyramid_tutorials`` Github repository at
+  http://docs.pylonsproject.org/projects/pyramid_tutorials/dev/.
+
+- Moved "Using ZODB With ZEO" and "Using repoze.catalog Within Pyramid"
+  tutorials out of core documentation and into the Pyramid Tutorials site
+  (http://docs.pylonsproject.org/projects/pyramid_tutorials/dev/).
+
+- Removed API documentation for deprecated ``pyramid.testing`` APIs named
+  ``registerDummySecurityPolicy``, ``registerResources``, ``registerModels``,
+  ``registerEventListener``, ``registerTemplateRenderer``,
+  ``registerDummyRenderer``, ``registerView``, ``registerUtility``,
+  ``registerAdapter``, ``registerSubscriber``, ``registerRoute``, and
+  ``registerSettings``.
 
