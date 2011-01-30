@@ -22,6 +22,17 @@ Documentation
   to use ``request.add_finished_callback`` instead of jamming an object with
   a ``__del__`` into the WSGI environment.
 
+- Remove duplication of ``add_route`` API documentation from URL Dispatch
+  narrative chapter.
+
+- Remove duplication of API and narrative documentation in
+  ``pyramid.view.view_config`` API docs by pointing to
+  ``pyramid.config.add_view`` documentation and narrative chapter
+  documentation.
+
+- Removed some API documentation duplicated in narrative portions of
+  documentation 
+
 Bug Fixes
 ---------
 
