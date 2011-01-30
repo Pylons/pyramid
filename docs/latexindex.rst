@@ -64,9 +64,9 @@ Tutorials
 .. toctree::
    :maxdepth: 1
 
-   tutorials/bfg/index.rst
    tutorials/wiki/index.rst
    tutorials/wiki2/index.rst
+   tutorials/bfg/index.rst
    tutorials/gae/index.rst
    tutorials/modwsgi/index.rst
 
