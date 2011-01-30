@@ -344,7 +344,8 @@ which reside in your :app:`Pyramid` application.  You run a
    $ mkdir -p myapplication/locale
    $ python setup.py extract_messages
 
-The message catalog ``.pot`` template will end up in
+The message catalog ``.pot`` template will end up in:
+
 ``myapplication/locale/myapplication.pot``.
 
 Translation Domains
@@ -432,7 +433,8 @@ init_catalog`` command:
    $ cd /place/where/myapplication/setup.py/lives
    $ python setup.py init_catalog -l es
 
-By default, the message catalog ``.po`` file will end up in
+By default, the message catalog ``.po`` file will end up in:
+
 ``myapplication/locale/es/LC_MESSAGES/myapplication.po``.
 
 Once the file is there, it can be worked on by a human translator.
