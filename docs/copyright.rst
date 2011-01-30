@@ -9,11 +9,11 @@ by Chris McDonough
 
 Copyright |copy| 2008-2011, Agendaless Consulting.
 
-.. ISBN-10: 0615345379
+ISBN-10: 0615445675
 
-.. ISBN-13: 978-0-615-34537-6
+ISBN-13: 978-0615445670
 
-.. First print publishing: February, 2010
+First print publishing: February, 2011
 
 All rights reserved.  This material may be copied or distributed only
 subject to the terms and conditions set forth in the `Creative Commons
@@ -72,12 +72,12 @@ Used with permission:
    The :ref:`wiki2_flow_of_authentication` section was contributed by John
    Shipman.
 
-.. Print Production
-.. ----------------
+Print Production
+----------------
 
-.. The print version of this book was produced using the `Sphinx
-.. <http://sphinx.pocoo.org/>`_ documentation generation system and the
-.. `LaTeX <http://www.latex-project.org/>`_ typesetting system.
+The print version of this book was produced using the `Sphinx
+<http://sphinx.pocoo.org/>`_ documentation generation system and the
+`LaTeX <http://www.latex-project.org/>`_ typesetting system.
 
 Contacting The Publisher
 ------------------------
