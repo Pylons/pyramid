@@ -1,0 +1,4 @@
+#!/bin/sh
+make clean latex SPHINXBUILD=../bookenv/bin/sphinx-build BOOK=1
+cd _build/latex && make all-pdf
+
