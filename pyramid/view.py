@@ -238,22 +238,33 @@ class view_config(object):
     is ``True``, the view will only be invoked if the request's
     ``X-Requested-With`` header has the value ``XMLHttpRequest``.
 
-    If ``accept`` is specified, it must be a mimetype value.  If
-    ``accept`` is specified, the view will only be invoked if the
-    ``Accept`` HTTP header matches the value requested.  See the
-    description of ``accept`` in :ref:`view_directive` for information
-    about the allowable composition and matching behavior of this
-    value.
+    If ``accept`` is specified, it must be a mimetype value.  If ``accept``
+    is specified, the view will only be invoked if the ``Accept`` HTTP header
+    matches the value requested.  The value of this attribute represents a
+    match query for one or more mimetypes in the ``Accept`` HTTP request
+    header.  If this value is specified, it must be in one of the following
+    forms: a mimetype match token in the form ``text/plain``, a wildcard
+    mimetype match token in the form ``text/*`` or a match-all wildcard
+    mimetype match token in the form ``*/*``.  If any of the forms matches
+    the ``Accept`` header of the request, this predicate will be true.
 
     If ``header`` is specified, it must be a header name or a
     ``headername:headervalue`` pair.  If ``header`` is specified, and
-    possesses a value the view will only be invoked if an HTTP header
-    matches the value requested.  If ``header`` is specified without a
-    value (a bare header name only), the view will only be invoked if
-    the HTTP header exists with any value in the request.  See the
-    description of ``header`` in :ref:`view_directive` for information
-    about the allowable composition and matching behavior of this
-    value.
+    possesses a value the view will only be invoked if an HTTP header matches
+    the value requested.  The value of this attribute represents an HTTP
+    header name or a header name/value pair.  If the value contains a ``:``
+    (colon), it will be considered a name/value pair
+    (e.g. ``User-Agent:Mozilla/.*`` or ``Host:localhost``).  The *value* of
+    an attribute that represent a name/value pair should be a regular
+    expression.  If the value does not contain a colon, the entire value will
+    be considered to be the header name (e.g. ``If-Modified-Since``).  If the
+    value evaluates to a header name only without a value, the header
+    specified by the name must be present in the request for this predicate
+    to be true.  If the value evaluates to a header name/value pair, the
+    header specified by the name must be present in the request *and* the
+    regular expression specified as the value must match the header value.
+    Whether or not the value represents a header name or a header name/value
+    pair, the case of the header name is not significant.
 
     If ``path_info`` is specified, it must be a regular
     expression. The view will only be invoked if the ``PATH_INFO``
