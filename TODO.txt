@@ -1,14 +1,11 @@
 Pyramid TODOs
 =============
 
-Before Release
---------------
+Should-Have
+-----------
 
 - https://github.com/Pylons/pyramid/issues#issue/67 (fixing would make it
   possible to render a static site from a static dir).
-
-Should-Have
------------
 
 - Consider per-form_id CSRF instead of per-session global CSRF token.
 
