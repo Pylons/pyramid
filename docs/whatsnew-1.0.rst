@@ -151,7 +151,7 @@ Terminology Changes
 - All documentation which previously referred to "model" now refers to
   "resource".
 
-- The ``starter`` paster template now has a resources.py`` module instead
+- The ``starter`` paster template now has a ``resources.py`` module instead
   of a ``models.py`` module.
 
 - Positional argument names of various APIs have been changed from
