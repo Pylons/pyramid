@@ -76,7 +76,7 @@ The ``view_page`` view function
 
 The ``view_page`` function will be configured to respond as the default view
 of a Page resource.  We'll provide it with a ``@view_config`` decorator which
-names the class ``tutorial.models.Wiki`` as its context.  This means that
+names the class ``tutorial.models.Page`` as its context.  This means that
 when a Page resource is the context, and no :term:`view name` exists in the
 request, this view will be used.  We inform :app:`Pyramid` this view will use
 the ``templates/view.pt`` template file as a ``renderer``.
