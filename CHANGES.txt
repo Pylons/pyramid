@@ -33,6 +33,10 @@ Documentation
 - Removed some API documentation duplicated in narrative portions of
   documentation 
 
+- Removed "Overall Flow of Authentication" from SQLAlchemy + URL Dispatch
+  wiki tutorial due to print space concerns (moved to Pyramid Tutorials
+  site).
+
 Bug Fixes
 ---------
 
