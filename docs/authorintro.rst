@@ -158,6 +158,7 @@ others' technology.
    single: Hathaway, Shane
    single: Akkerman, Wichert
    single: Laflamme, Blaise
+   single: Laflamme, Hugues
    single: Bangert, Ben
    single: Duncan, Casey
    single: Orr, Mike
@@ -175,10 +176,9 @@ software.  Without the help of these folks, neither this book nor the
 software which it details would exist: Paul Everitt, Tres Seaver, Andrew
 Sawyers, Malthe Borch, Carlos de la Guardia, Chris Rossi, Shane Hathaway,
 Daniel Holth, Wichert Akkerman, Georg Brandl, Blaise Laflamme, Ben Bangert,
-Casey Duncan, Mike Orr, John Shipman, Simon Oram and Nat Hardwick of
-Electrosoup, Ian Bicking of the Open Planning Project, Jim Fulton of Zope
-Corporation, Tom Moroz of the Open Society Institute, and Todd Koym of
-Environmental Health Sciences.
+Casey Duncan, Hugues Laflamme, Mike Orr, John Shipman, Simon Oram, Nat
+Hardwick, Ian Bicking, Jim Fulton, Tom Moroz of the Open Society Institute,
+and Todd Koym of Environmental Health Sciences.
 
 Thanks to Guido van Rossum and Tim Peters for Python.
 
