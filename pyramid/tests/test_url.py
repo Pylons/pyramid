@@ -249,6 +249,8 @@ class TestCurrentRouteUrl(unittest.TestCase):
                                _anchor=u"foo", _route_name='bar')
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3/extra1/extra2?a=1#foo')
+        #note: the reason that this matches even though _route_name is 'bar' is
+        # that the DummyRoutesMapper ignores the route name
 
 class TestRoutePath(unittest.TestCase):
     def setUp(self):

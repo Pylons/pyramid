@@ -1859,9 +1859,6 @@ class ConfiguratorTests(unittest.TestCase):
         def dummyapp(environ, start_response):
             """ """ 
 
-
-        # since add_route_wsgi is just one line, this test is
-        # kind of meaningless
         config = self._makeOne(autocommit=True)
         route = config.add_route_wsgi('name', 'path*subpath', dummyapp)
         self._assertRoute(config, 'name', 'path*subpath')
@@ -1888,9 +1885,6 @@ class ConfiguratorTests(unittest.TestCase):
                 self.status = status
                 self.headers = headers
         
-
-        # since add_route_wsgi is just one line, this test is
-        # kind of meaningless
         config = self._makeOne(autocommit=True)
         route = config.add_route_wsgi('name', '/{a}/2/3*subpath', dummyapp)
 
