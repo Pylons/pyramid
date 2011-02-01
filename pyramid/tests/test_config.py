@@ -2,6 +2,7 @@ import unittest
 
 from pyramid import testing
 
+
 try:
     import __pypy__
 except:
@@ -1850,6 +1851,57 @@ class ConfiguratorTests(unittest.TestCase):
         config.registry.registerUtility(mapper, IRoutesMapper)
         result = config.get_routes_mapper()
         self.assertEqual(result, mapper)
+
+    def test_add_route_wsgi(self):
+        from pyramid.wsgi import wsgiapp2
+
+
+        def dummyapp(environ, start_response):
+            """ """ 
+
+
+        # since add_route_wsgi is just one line, this test is
+        # kind of meaningless
+        config = self._makeOne(autocommit=True)
+        route = config.add_route_wsgi('name', 'path*subpath', dummyapp)
+        self._assertRoute(config, 'name', 'path*subpath')
+        self.assertEqual(route.name, 'name')
+        request_type = self._getRouteRequestIface(config, 'name')
+        viewCallable = self._getViewCallable(config, None, request_type)
+        request = self._makeRequest(config)
+        context = None
+        self.assertEqual(viewCallable(context, request), wsgiapp2(dummyapp)(context, request))
+
+
+    def test_add_route_wsgi_and_route(self):
+        def dummyapp(environ, start_response):
+            """Hello world WSGI""" 
+            status = '200 OK'
+            response_headers = [('Content-type','text/plain')]
+            start_response(status, response_headers)
+            return [environ['PATH_INFO'] + '|' + environ['SCRIPT_NAME']]
+
+        class DummyStartResponse:
+            status = ()
+            headers = ()
+            def __call__(self, status, headers):
+                self.status = status
+                self.headers = headers
+        
+
+        # since add_route_wsgi is just one line, this test is
+        # kind of meaningless
+        config = self._makeOne(autocommit=True)
+        route = config.add_route_wsgi('name', '/{a}/2/3*subpath', dummyapp)
+
+        from pyramid.router import Router
+        router = Router(config.registry)
+
+        environ = {'SCRIPT_NAME' : '', 'PATH_INFO':'/1/2/3/sub'}
+        result = router(environ, DummyStartResponse())
+        self.assertEqual(result, ['/sub|/1/2/3'])
+
+        
 
     def test_add_route_defaults(self):
         config = self._makeOne(autocommit=True)
@@ -4557,10 +4609,14 @@ class Test_isexception(unittest.TestCase):
         self.assertEqual(self._callFUT(ISubException), True)
 
 class DummyRequest:
-    subpath = ()
+    subpath = []
     matchdict = None
+    matched_route = None
+    traversed = []
+    virtual_root_path = []
+    view_name = ''
     def __init__(self):
-        self.environ = {'PATH_INFO':'/static'}
+        self.environ = {'PATH_INFO':'/static', 'SCRIPT_NAME':''}
         self.params = {}
         self.cookies = {}
     def copy(self):

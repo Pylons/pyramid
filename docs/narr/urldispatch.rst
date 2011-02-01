@@ -1102,6 +1102,21 @@ a developer to understand either of them in detail.  It also means that we
 can allow a developer to combine :term:`URL dispatch` and :term:`traversal`
 in various exceptional cases as documented in :ref:`hybrid_chapter`.
 
+Delegating everything under a given URL prefix to another WSGI app
+------------------------------------------------------------------
+
+If you want all requests that start with a given URL prefix to be delegated
+E.g. if you have an app called velruseApp that you want to delegate /auth/velruse to,
+do:
+
+.. code-block:: python
+   :linenos:
+
+   config.add_route_wsgi('velruseRoute', '/auth/velruse*subpath', velruseWSGIApp)
+
+
+
+
 References
 ----------
 

@@ -89,6 +89,8 @@ from pyramid.view import default_exceptionresponse_view
 from pyramid.view import render_view_to_response
 from pyramid.view import is_response
 
+from pyramid.wsgi import wsgiapp2
+
 MAX_ORDER = 1 << 30
 DEFAULT_PHASH = md5().hexdigest()
 
@@ -1765,6 +1767,53 @@ class Configurator(object):
 
         return mapper.connect(name, pattern, factory, predicates=predicates,
                               pregenerator=pregenerator)
+
+    @action_method
+    def add_route_wsgi(self,
+                  name,
+                  pattern,
+                  app,
+                  view_for=None,
+                  permission=None,
+                  factory=None,
+                  for_=None,
+                  header=None,
+                  xhr=False,
+                  accept=None,
+                  path_info=None,
+                  request_method=None,
+                  request_param=None,
+                  traverse=None,
+                  custom_predicates=(),
+                  view_permission=None,
+                  renderer=None,
+                  view_renderer=None,
+                  view_context=None,
+                  view_attr=None,
+                  use_global_views=False,
+                  path=None,
+                  pregenerator=None,
+                  ):
+        """Delegation of everything under a given URL prefix to another
+        WSGI app. The first three arguments are mandatory, and are
+        the route name, the pattern, and the WSGI app to delegate to.
+        The pattern must be of the form "PREFIX*subpath", where PREFIX
+        is the prefix you want to delegate, and '*subpath' is exactly as
+        written (i.e. '*subpath' is a hardcoded keyword). E.g. if you have
+        an app called velruseApp that you want to delegate /auth/velruse to,
+        do:
+        
+          config.add_route_wsgi('velruseRoute', '/auth/velruse*subpath', velruseWSGIApp)
+        
+        PATH_INFO and SCRIPT_NAME are adjusted before called the WSGI app, so that only
+        the subpath appears in its PATH_INFO; the prefix is appended to SCRIPT_NAME.
+        
+        Optional arguments are the same as add_route, except that "pattern" is mandatory,
+        and "view" is not allowed.
+        """ 
+
+        return self.add_route(name, pattern, view=wsgiapp2(app), view_for=view_for, permission=permission, factory=factory, for_=for_, header=header, xhr=xhr, accept=accept, path_info=path_info, request_method=request_method, request_param=request_param, traverse=traverse, custom_predicates=custom_predicates, view_permission=view_permission, renderer=renderer, view_renderer=view_renderer, view_context=view_context, view_attr=view_attr, use_global_views=use_global_views, path=path, pregenerator=pregenerator)
+
 
     def get_routes_mapper(self):
         """ Return the :term:`routes mapper` object associated with

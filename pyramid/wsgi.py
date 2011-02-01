@@ -59,9 +59,20 @@ def wsgiapp2(wrapped):
     application to a Response and return it to :app:`Pyramid` as if
     the WSGI app were a :app:`Pyramid` view.  The ``SCRIPT_NAME``
     and ``PATH_INFO`` values present in the WSGI environment are fixed
-    up before the application is invoked.  """
+    up before the application is invoked.  
+    """
 
     def decorator(context, request):
+        script_name = ''
+
+        # first consider URL routing
+        if request.matched_route:
+            matchdictCopy = {}
+            matchdictCopy.update(request.matchdict)
+            matchdictCopy['subpath'] = ''
+            script_name = request.matched_route.generate(matchdictCopy)
+
+        # now consider traversed paths
         traversed = request.traversed
         vroot_path = request.virtual_root_path or ()
         view_name = request.view_name
@@ -70,7 +81,7 @@ def wsgiapp2(wrapped):
         script_list = [ quote_path_segment(name) for name in script_tuple ]
         if view_name:
             script_list.append(quote_path_segment(view_name))
-        script_name =  '/' + '/'.join(script_list)
+        script_name = script_name + '/' + '/'.join(script_list)
         path_list = [ quote_path_segment(name) for name in subpath ]
         path_info = '/' + '/'.join(path_list)
         request.environ['PATH_INFO'] = path_info
@@ -79,4 +90,15 @@ def wsgiapp2(wrapped):
             script_name = script_name[:-1]
         request.environ['SCRIPT_NAME'] = script_name
         return request.get_response(wrapped)
-    return wraps(wrapped)(decorator) # grokkability
+
+    if hasattr(wrapped,'__name__'):
+        return wraps(wrapped)(decorator) # grokkability
+    
+    else:
+        result = decorator
+        result.__name__ =  'Wrapped WSGI application'
+        if hasattr(wrapped,'__doc__'):
+            result.__doc__ = wrapped.__doc__
+        return result
+
+

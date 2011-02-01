@@ -100,9 +100,53 @@ class WSGIApp2Tests(unittest.TestCase):
         self.assertEqual(response, dummyapp)
         self.assertEqual(request.environ['PATH_INFO'], '/')
         self.assertEqual(request.environ['SCRIPT_NAME'], '')
+        
+    def test_route_prefix(self):
+        context = DummyContext()
+        route = DummyRoute()
+        request = DummyRequest()
+        request.traversed = []
+        request.virtual_root_path = []
+        request.subpath = ['sub']
+        request.view_name = ''
+        request.environ = {'SCRIPT_NAME':'', 'PATH_INFO':'/1/2/3/sub'}
+        request.matched_route = route
+        request.matchdict = {'a':'1', 'subpath':'/sub'}
+        decorator = self._callFUT(dummyapp)
+        response = decorator(context, request)
+        self.assertEqual(response, dummyapp)
+        self.assertEqual(request.environ['PATH_INFO'], '/sub')
+        self.assertEqual(request.environ['SCRIPT_NAME'], '/1/2/3')
+
+        
+    def test_route_prefix_no__name__(self):
+        context = DummyContext()
+        route = DummyRoute()
+        request = DummyRequest()
+        request.traversed = []
+        request.virtual_root_path = []
+        request.subpath = ['sub']
+        request.view_name = ''
+        request.environ = {'SCRIPT_NAME':'', 'PATH_INFO':'/1/2/3/sub'}
+        request.matched_route = route
+        request.matchdict = {'a':'1', 'subpath':'/sub'}
+
+        class Blank:
+            pass
+
+        dummyapp_no__name__ = Blank()
+        dummyapp_no__name__.__call__ = dummyapp
+        decorator = self._callFUT(dummyapp_no__name__)
+        response = decorator(context, request)
+        self.assertEqual(response, dummyapp_no__name__)
+        self.assertEqual(request.environ['PATH_INFO'], '/sub')
+        self.assertEqual(request.environ['SCRIPT_NAME'], '/1/2/3')
+
+
+
 
 def dummyapp(environ, start_response):
-    """ """
+    """ """ 
 
 class DummyContext:
     pass
@@ -110,3 +154,8 @@ class DummyContext:
 class DummyRequest:
     def get_response(self, application):
         return application
+    matched_route = None
+    
+class DummyRoute:
+    def generate(self, kw):
+        return '/%s/2/3%s' % (kw['a'], kw['subpath'])
