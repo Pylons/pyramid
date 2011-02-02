@@ -307,3 +307,124 @@ these use cases, you'll be glad you have traversal in your toolkit.
 .. note:: It is even possible to mix and match :term:`traversal` with
    :term:`URL dispatch` in the same :app:`Pyramid` application. See the
    :ref:`hybrid_chapter` chapter for details.
+
+Example
+-------
+
+Here's some examples:
+
+Let's say we want to map 
+
+``/hello/login`` to a function ``login`` in the file ``myapp/views.py``, 
+``/hello/foo`` to a function ``foo`` in the file ``myapp/views.py``, 
+``/hello/listDirectory`` to a function ``listHelloDirectory`` in the file ``myapp/views.py``, 
+``/hello/subdir/listDirectory`` to a function ``listSubDirectory`` in the file ``myapp/views.py``, 
+
+With URL dispatch, we have:
+
+.. code-block:: text
+   :linenos:
+
+
+    config.add_route('helloLogin', '/hello/login', view='myapp.views.login')
+    config.add_route('helloFoo', '/hello/foo', view='myapp.views.foo')
+    config.add_route('helloList', '/hello/listDirectory', view='myapp.views.listHelloDirectory')
+    config.add_route('list', '/hello/{subdir}/listDirectory', view='myapp.views.listSubDirectory')
+
+
+When the listSubDirectory function from myapp/views.py is called, it can tell what the subdirectory's name was by checking ``request.matchdict['subdir']``.
+
+
+With traversal, we have:
+
+.. code-block:: text
+   :linenos:
+
+
+    class MyResource(dict):
+        def __init__(self, name, parent):
+            self.__name__ = name
+            self.__parent__ = parent
+            
+
+
+    class MySubdirResource(MyResource):
+        def __init__(self, name, parent, view_names):
+            self.__name__ = name
+            self.__parent__ = parent
+            self._view_names = view_names
+            self._view_names.append('listDirectory')
+   
+        # returns a MyResource object when the key is the name of a subdirectory, 
+        # or a KeyError if the key is the name of a view
+        def __getitem__(self, key):
+            if key in self._view_names:
+                raise KeyError
+            else:
+                return MySubdirResource(key, self, [])
+            
+    class MyHelloResource(MySubdirResource):
+        pass
+   
+   
+    def myRootFactory(request):
+        rootResource = MyResource('', None)
+        helloResource = MyHelloResource('hello', rootResource, ['login', 'foo'])
+        rootResource['hello'] = helloResource
+        return rootResource
+        
+   
+    config.add_view('myapp.views.login', name='login')
+    config.add_view('myapp.views.foo', name='foo')
+    config.add_view('myapp.views.listHelloDirectory', context=MyHelloResource, name='listDirectory')
+    config.add_view('myapp.views.listSubDirectory', name='listDirectory')
+   
+
+Now, when a request for ``/hello/login`` comes in, the framework calls ``myRootFactory(request)``, and gets back the root resource. It calls the MyResource instance's ``__getitem__('hello')``, and gets back a ``MyHelloResource``. Now we traverse the next path segment. The framework calls ``__getitem__('login')`` on the ``MyHelloResource``, and a ``KeyError`` is raised, so 'login' becomes the view name. The view name 'login' is mapped to the ``login`` function in ``myapp/views.py``.
+
+When a request for ``/hello/foo`` comes in, a similar thing happens.
+
+When a request for ``/hello/listDirectory`` comes in, the framework calls ``myRootFactory(request)``, and gets back the root resource. It calls MyRootResource's ``__getitem__('hello')``, and gets back a ``MyHelloResource`` instance. It calls MyHelloResource's ``__getitem__('listDirectory')``, and gets back a ``KeyError``. So, 'listDirectory' becomes the view name. The view name 'listDirectory' is mapped to ``myapp.views.listRootDirectory``, because the context (the resource object which returned the ``KeyError``) is an instance of ``MyHelloResource``.
+
+When a request for ``/hello/xyz/listDirectory`` comes in, the framework calls ``myRootFactory(request)``, and gets back an instance of ``MyRootResource``. It calls MyRootResource's ``__getitem__('hello')``, and gets back a ``MyHelloResource`` instance. It calls MyHelloResource's ``__getitem__('xyz')``, and gets back another ``MySubdirResource`` instance. It calls ``__getitem__('listDirectory')`` on the ``MySubdirResource`` instance, and gets back a ``KeyError``. So, 'listDirectory' becomes the view name. The view name 'listDirectory' is mapped to ``myapp.views.listSubDirectory``, because the context (the resource object which returned the ``KeyError``) is not an instance of ``MyHelloResource``. The view can access the ``MySubdirResource`` via ``request.context``.
+
+At you can see, traversal is more complicated than URL dispatch. What's the benefit? Well, consider the URL ``/hello/xyz/abc/listDirectory``. This is handled by the above traversal code, but the above URL dispatch code would have to be modified to describe another layer of subdirectories. That is, traversal can handle arbitrarily deep, dynamic hierarchies in a general way, and URL dispatch can't.
+
+You can, if you want to, chain together URL dispatch and traversal (in that order). So, we could rewrite the above as:
+
+.. code-block:: text
+   :linenos:
+
+    class MyResource(dict):
+        def __init__(self, name, parent):
+            self.__name__ = name
+            self.__parent__ = parent
+            
+        # returns a MyResource object when the key is the name of a subdirectory, 
+        # or a KeyError if the key is the name of a view
+        def __getitem__(self, key):
+            if key in ['listDirectory']:
+                raise KeyError
+            else:
+                return MyResource(key, self)
+
+    def myRootFactory(request):
+        return MyResource('', None)
+     
+    config = Configurator()
+
+    config.add_route('helloLogin', '/hello/login', view='myapp.views.login')
+    config.add_route('helloFoo', '/hello/foo', view='myapp.views.foo')
+    config.add_route('helloList', '/hello/listDirectory', view='myapp.views.listHelloDirectory')
+    config.add_route('list', '/hello/*traverse', factory=myRootFactory)
+    
+    config.add_view('myapp.views.listSubDirectory', name='listDirectory', route_name='list')
+      #the route_name argument is mandatory here; to do without it, you'd have to put
+      # use_global_views=True as an argument to the 'list' add_route
+
+
+
+ This is simpler and more readable because we are using URL dispatch to take care of the hardcoded URLs at the top of the tree, and we are using traversal only for the arbitrarily nested subdirectories.
+
+If you don't want to have to write the stuff about __name__ and __parent__, you can use pyramid_traversalwrapper, which does it for you; see the sidebar within the section "Location aware resources" in the :ref:`resources_chapter` for details.
+
