@@ -1852,7 +1852,7 @@ class ConfiguratorTests(unittest.TestCase):
         result = config.get_routes_mapper()
         self.assertEqual(result, mapper)
 
-    def test_add_route_wsgi(self):
+    def test_add_route_subwsgi(self):
         from pyramid.wsgi import wsgiapp2
 
 
@@ -1860,7 +1860,7 @@ class ConfiguratorTests(unittest.TestCase):
             """ """ 
 
         config = self._makeOne(autocommit=True)
-        route = config.add_route_wsgi('name', 'path*subpath', dummyapp)
+        route = config.add_route_subwsgi('name', 'path*subpath', dummyapp)
         self._assertRoute(config, 'name', 'path*subpath')
         self.assertEqual(route.name, 'name')
         request_type = self._getRouteRequestIface(config, 'name')
@@ -1870,7 +1870,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(viewCallable(context, request), wsgiapp2(dummyapp)(context, request))
 
 
-    def test_add_route_wsgi_and_route(self):
+    def test_add_route_subwsgi_and_route(self):
         def dummyapp(environ, start_response):
             """Hello world WSGI""" 
             status = '200 OK'
@@ -1886,7 +1886,7 @@ class ConfiguratorTests(unittest.TestCase):
                 self.headers = headers
         
         config = self._makeOne(autocommit=True)
-        route = config.add_route_wsgi('name', '/{a}/2/3*subpath', dummyapp)
+        route = config.add_route_subwsgi('name', '/{a}/2/3*subpath', dummyapp)
 
         from pyramid.router import Router
         router = Router(config.registry)

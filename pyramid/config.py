@@ -1769,7 +1769,7 @@ class Configurator(object):
                               pregenerator=pregenerator)
 
     @action_method
-    def add_route_wsgi(self,
+    def add_route_subwsgi(self,
                   name,
                   pattern,
                   app,
