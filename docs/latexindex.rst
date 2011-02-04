@@ -14,6 +14,7 @@ Front Matter
 
    copyright.rst
    conventions.rst
+   foreword.rst
    authorintro.rst
 
 .. mainmatter::
