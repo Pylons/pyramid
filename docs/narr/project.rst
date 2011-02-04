@@ -8,13 +8,13 @@ As we saw in :ref:`firstapp_chapter`, it's possible to create a
 convenient to use a *template* to generate a basic :app:`Pyramid`
 :term:`project`.
 
-A project is a directory that contains at least one :term:`package`.  You'll
-use a template to create a project, and you'll create your application logic
-within a package that lives inside the project.  Even if your application is
-extremely simple, it is useful to place code that drives the application
-within a package, because a package is more easily extended with new code.
-An application that lives inside a package can also be distributed more
-easily than one which does not live within a package.
+A project is a directory that contains at least one Python :term:`package`.
+You'll use a template to create a project, and you'll create your application
+logic within a package that lives inside the project.  Even if your
+application is extremely simple, it is useful to place code that drives the
+application within a package, because a package is more easily extended with
+new code.  An application that lives inside a package can also be distributed
+more easily than one which does not live within a package.
 
 :app:`Pyramid` comes with a variety of templates that you can use to generate
 a project.  Each template makes different configuration assumptions about
@@ -26,13 +26,9 @@ and so therefore they are often referred to as "paster templates".
 .. index::
    single: paster templates
    single: pyramid_starter paster template
-   single: pyramid_starter_zcml paster template
    single: pyramid_zodb paster template
    single: pyramid_alchemy paster template
    single: pyramid_routesalchemy paster template
-   single: pylons_minimal paster template
-   single: pylons_basic paster template
-   single: pylons_sqla paster template
 
 .. _additional_paster_templates:
 
@@ -48,8 +44,6 @@ each other on a number of axes:
 - the mechanism they use to map URLs to code (:term:`traversal` or :term:`URL
   dispatch`).
 
-- the type of configuration used (:term:`ZCML` vs. imperative configuration).
-
 - whether or not the ``pyramid_beaker`` library is relied upon as the
   sessioning implementation (as opposed to no sessioning or default
   sessioning).
@@ -58,10 +52,6 @@ The included templates are these:
 
 ``pyramid_starter``
   URL mapping via :term:`traversal` and no persistence mechanism.
-
-``pyramid_starter_zcml``
-  URL mapping via :term:`traversal` and no persistence mechanism, using
-  :term:`ZCML` (declarative configuration).
 
 ``pyramid_zodb``
   URL mapping via :term:`traversal` and persistence via :term:`ZODB`.
@@ -74,19 +64,22 @@ The included templates are these:
   URL mapping via :term:`traversal` and persistence via
   :term:`SQLAlchemy`
 
-``pylons_minimal``
-  URL mapping via :term:`URL dispatch` and Pylons-style view handlers,
-  minimal setup, uses ``pyramid_beaker`` as a sessioning implementation.
+.. note:: At this time, each of these templates uses the :term:`Chameleon`
+   templating system, which is incompatible with both Jython and PyPy.  To
+   use paster templates to build applications which will run on Jython and
+   PyPy, you can try the ``pyramid_jinja2_starter`` template which ships as
+   part of the :term:`pyramid_jinja2` package or the ``pyramid_sqla`` paster
+   template which ships with the :term:`pyramid_sqla` package (it uses Mako),
+   both available from :term:`PyPI`.  You can also just use the above paster
+   templates to build a skeleton and replace the Chameleon template it
+   includes with a :term:`Mako` analogue.
 
-``pylons_basic``
-  URL mapping via :term:`URL dispatch` and Pylons-style view handlers, and
-  some extra functionality, uses ``pyramid_beaker`` as a sessioning
-  implementation.
-
-``pylons_sqla``
-  URL mapping via :term:`URL dispatch` and Pylons-style view handlers, some
-  extra functionality, and SQLAlchemy set up, uses ``pyramid_beaker`` as a
-  sessioning implementation.
+Rather than use any of the above templates, Pylons 1 users may feel more
+comfortable installing the :term:`pyramid_sqla` add-on package, which
+provides a paster template named ``pyramid_sqla``.  This paster template
+configures a Pyramid application in a "Pylons-esque" way, including the use
+of a :term:`view handler` to map URLs to code (it's much like a Pylons
+"controller").
 
 .. index::
    single: creating a project
@@ -144,26 +137,29 @@ project we name ``MyProject``:
    name during ``paster create`` by adding the project name to the
    command line, e.g. ``paster create -t pyramid_starter MyProject``.
 
-.. note:: You may encounter an error when using ``paster create``
-   if a dependent Python package is not installed. This will
-   result in a traceback ending in: 
-
-   .. code-block:: text
-
-	   pkg_resources.DistributionNotFound: <package name>
-
-   Simply run ``bin/easy_install``, with the missing package
-   name from the error message, to work around this issue.
+.. note:: You may encounter an error when using ``paster create`` if a
+   dependent Python package is not installed. This will result in a traceback
+   ending in ``pkg_resources.DistributionNotFound: <package name>``.
+   Simply run ``bin/easy_install``, with the missing package name from the
+   error message to work around this issue.
 
 As a result of invoking the ``paster create`` command, a project is created
 in a directory named ``MyProject``.  That directory is a :term:`project`
 directory.  The ``setup.py`` file in that directory can be used to distribute
 your application, or install your application for deployment or development.
 
-A :term:`PasteDeploy` ``.ini`` file named ``development.ini`` will also be
-created in the project directory.  You will use this ``.ini`` file to
-configure a server, to run your application, and to and debug your
-application.
+A :term:`PasteDeploy` ``.ini`` file named ``development.ini`` will be created
+in the project directory.  You will use this ``.ini`` file to configure a
+server, to run your application, and to and debug your application.  It
+sports configuration that enables an interactive debugger and settings
+optimized for development.
+
+Another :term:`PasteDeploy` ``.ini`` file named ``production.ini`` will also
+be created in the project directory.  It sports configuration that disables
+any interactive debugger (to prevent inappropriate access and disclosure),
+and turns off a number of debugging settings.  You can use this file to put
+your application into production, and you can modify it to do things like
+send email when an exception occurs.
 
 The ``MyProject`` project directory contains an additional subdirectory named
 ``myproject`` (note the case difference) representing a Python
@@ -324,37 +320,34 @@ unconditionally.
    [chrism@vitaminf shellenv]$ ../bin/paster pshell --disable-ipython \
                                 development.ini MyProject
 
-.. warning::
+You should always use a section name argument that refers to the actual
+``app`` section within the Paste configuration file that points at your
+:app:`Pyramid` application *without any middleware wrapping*.  In particular,
+a section name is inappropriate as the second argument to ``pshell`` if the
+configuration section it names is a ``pipeline`` rather than an ``app``.  For
+example, if you have the following ``.ini`` file content:
 
-   You should always use a section name argument that refers to the actual
-   ``app`` section within the Paste configuration file that points at your
-   :app:`Pyramid` application *without any middleware wrapping*.  In
-   particular, a section name is inappropriate as the second argument to
-   ``pshell`` if the configuration section it names is a ``pipeline`` rather
-   than an ``app``.  For example, if you have the following ``.ini`` file
-   content:
+.. code-block:: ini
+   :linenos:
 
-   .. code-block:: guess
-      :linenos:
+   [app:MyProject]
+   use = egg:MyProject
+   reload_templates = true
+   debug_authorization = false
+   debug_notfound = false
+   debug_templates = true
+   default_locale_name = en
 
-      [app:MyProject]
-      use = egg:MyProject
-      reload_templates = true
-      debug_authorization = false
-      debug_notfound = false
-      debug_templates = true
-      default_locale_name = en
+   [pipeline:main]
+   pipeline = 
+       egg:WebError#evalerror
+       MyProject
 
-      [pipeline:main]
-      pipeline = 
-          egg:WebError#evalerror
-          MyProject
-
-   Use ``MyProject`` instead of ``main`` as the section name argument to
-   ``pshell`` against the above ``.ini`` file (e.g. ``paster pshell
-   development.ini MyProject``).  If you use ``main`` instead, an error will
-   occur.  Use the most specific reference to your application within the
-   ``.ini`` file possible as the section name argument.
+Use ``MyProject`` instead of ``main`` as the section name argument to
+``pshell`` against the above ``.ini`` file (e.g. ``paster pshell
+development.ini MyProject``).  If you use ``main`` instead, an error will
+occur.  Use the most specific reference to your application within the
+``.ini`` file possible as the section name argument.
 
 Press ``Ctrl-D`` to exit the interactive shell (or ``Ctrl-Z`` on Windows).
 
@@ -469,6 +462,7 @@ structure:
   MyProject/
   |-- CHANGES.txt
   |-- development.ini
+  |-- MANIFEST.in
   |-- myproject
   |   |-- __init__.py
   |   |-- resources.py
@@ -480,6 +474,7 @@ structure:
   |   |   `-- mytemplate.pt
   |   |-- tests.py
   |   `-- views.py
+  |-- production.ini
   |-- README.txt
   |-- setup.cfg
   `-- setup.py
@@ -499,10 +494,17 @@ describe, run, and test your application.
    written in :term:`ReStructuredText` format.
 
 #. ``development.ini`` is a :term:`PasteDeploy` configuration file that can
-   be used to execute your application.
+   be used to execute your application during development.
+
+#. ``production.ini`` is a :term:`PasteDeploy` configuration file that can
+   be used to execute your application in a production configuration.
 
 #. ``setup.cfg`` is a :term:`setuptools` configuration file used by
    ``setup.py``.
+
+#. ``MANIFEST.in`` is a :term:`distutils` "manifest" file, naming which files
+   should be included in a source distribution of the package when ``python
+   setup.py sdist`` is run.
 
 #. ``setup.py`` is the file you'll use to test and distribute your
    application.  It is a standard :term:`setuptools` ``setup.py`` file.
@@ -522,8 +524,10 @@ serve``, as well as the deployment settings provided to that application.
 
 The generated ``development.ini`` file looks like so:
 
+.. latexbroken?
+
 .. literalinclude:: MyProject/development.ini
-   :language: guess
+   :language: ini
    :linenos:
 
 This file contains several "sections" including ``[app:MyProject]``,
@@ -601,7 +605,7 @@ or influencing runtime behavior of a :app:`Pyramid` application.  See
 default 'application' (although it's actually a pipeline of middleware and an
 application) run by ``paster serve`` when it is invoked against this
 configuration file.  The name ``main`` is a convention used by PasteDeploy
-signifying that it the default application.
+signifying that it is the default application.
 
 The ``[server:main]`` section of the configuration file configures a WSGI
 server which listens on TCP port 6543.  It is configured to listen on all
@@ -627,6 +631,17 @@ implementations.
    the applications, servers and :term:`middleware` defined within the
    configuration file.  The values in a ``[DEFAULT]`` section will be passed
    to your application's ``main`` function as ``global_values``.
+
+``production.ini``
+~~~~~~~~~~~~~~~~~~~
+
+The ``development.ini`` file is a :term:`PasteDeploy` configuration file with
+a purpose much like that of ``development.ini``.  However, it disables the
+WebError interactive debugger, replacing it with a logger which outputs
+exception messages to ``stderr`` by default.  It also turns off template
+development options such that templates are not automatically reloaded when
+changed, and turns off all debugging options.  You can use this file instead
+of ``development.ini`` when you put your application into production.
 
 .. index::
    single: setup.py
@@ -695,17 +710,36 @@ who want to use your application.
 
 .. warning::
 
-   By default, ``setup.py sdist`` does not place non-Python-source files in
-   generated tarballs.  This means, in this case, that the
-   ``templates/mytemplate.pt`` file and the files in the ``static`` directory
-   are not packaged in the tarball.  To allow this to happen, check all the
-   files that you'd like to be distributed along with your application's
-   Python files into Subversion.  After you do this, when you rerun
-   ``setup.py sdist``, all files checked into the version control system will
-   be included in the tarball.  If you don't use Subversion, and instead use
-   a different version control system, you may need to install a setuptools
-   add-on such as ``setuptools-git`` or ``setuptools-hg`` for this behavior
-   to work properly.
+   Without the presence of a ``MANIFEST.in`` file or without checking your
+   source code into a version control repository, ``setup.py sdist`` places
+   only *Python source files* (files ending with a ``.py`` extension) into
+   tarballs generated by ``python setup.py sdist``.  This means, for example,
+   if your project was not checked into a setuptools-compatible source
+   control system, and your project directory didn't contain a ``MANIFEST.in``
+   file that told the ``sdist`` machinery to include ``*.pt`` files, the
+   ``myproject/templates/mytemplate.pt`` file would not be included in the
+   generated tarball.
+
+   Projects generated by Pyramid paster templates include a default
+   ``MANIFEST.in`` file.  The ``MANIFEST.in`` file contains declarations
+   which tell it to include files like ``*.pt``, ``*.css`` and ``*.js`` in
+   the generated tarball.  If you include files with extensions other than
+   the files named in the project's ``MANIFEST.in`` and you don't make use of
+   a setuptools-compatible version control system, you'll need to edit the
+   ``MANIFEST.in`` file and include the statements necessary to include your
+   new files.  See http://docs.python.org/distutils/sourcedist.html#principle
+   for more information about how to do this.
+
+   You can also delete ``MANIFEST.in`` from your project and rely on a
+   setuptools feature which simply causes all files checked into a version
+   control system to be put into the generated tarball.  To allow this to
+   happen, check all the files that you'd like to be distributed along with
+   your application's Python files into Subversion.  After you do this, when
+   you rerun ``setup.py sdist``, all files checked into the version control
+   system will be included in the tarball.  If you don't use Subversion, and
+   instead use a different version control system, you may need to install a
+   setuptools add-on such as ``setuptools-git`` or ``setuptools-hg`` for this
+   behavior to work properly.
 
 ``setup.cfg``
 ~~~~~~~~~~~~~
@@ -964,10 +998,10 @@ To this:
                     renderer='myproject:templates/mytemplate.pt')
 
 You can then continue to add files to the ``views`` directory, and refer to
-views or handler classes/functions within those files via the dotted name
-passed as the first argument to ``add_view``.  For example, if you added a
-file named ``anothermodule.py`` to the ``views`` subdirectory, and added a
-view callable named ``my_view`` to it:
+view classes or functions within those files via the dotted name passed as
+the first argument to ``add_view``.  For example, if you added a file named
+``anothermodule.py`` to the ``views`` subdirectory, and added a view callable
+named ``my_view`` to it:
 
 .. code-block:: python
     :linenos:

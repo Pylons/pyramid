@@ -576,54 +576,6 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(len(subscriber), 1)
         self.failUnless(IApplicationCreated.providedBy(subscriber[0]))
 
-    def test_load_zcml_default(self):
-        import pyramid.tests.fixtureapp
-        config = self._makeOne(package=pyramid.tests.fixtureapp,
-                               autocommit=True)
-        registry = config.load_zcml()
-        from pyramid.tests.fixtureapp.models import IFixture
-        self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
-
-    def test_load_zcml_routesapp(self):
-        from pyramid.interfaces import IRoutesMapper
-        config = self._makeOne(autocommit=True)
-        config.load_zcml('pyramid.tests.routesapp:configure.zcml')
-        self.failUnless(config.registry.getUtility(IRoutesMapper))
-
-    def test_load_zcml_fixtureapp(self):
-        from pyramid.tests.fixtureapp.models import IFixture
-        config = self._makeOne(autocommit=True)
-        config.load_zcml('pyramid.tests.fixtureapp:configure.zcml')
-        self.failUnless(config.registry.queryUtility(IFixture)) # only in c.zcml
-
-    def test_load_zcml_as_relative_filename(self):
-        import pyramid.tests.fixtureapp
-        config = self._makeOne(package=pyramid.tests.fixtureapp,
-                               autocommit=True)
-        registry = config.load_zcml('configure.zcml')
-        from pyramid.tests.fixtureapp.models import IFixture
-        self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
-
-    def test_load_zcml_as_absolute_filename(self):
-        import os
-        import pyramid.tests.fixtureapp
-        config = self._makeOne(package=pyramid.tests.fixtureapp,
-                               autocommit=True)
-        dn = os.path.dirname(pyramid.tests.fixtureapp.__file__)
-        c_z = os.path.join(dn, 'configure.zcml')
-        registry = config.load_zcml(c_z)
-        from pyramid.tests.fixtureapp.models import IFixture
-        self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
-
-    def test_load_zcml_lock_and_unlock(self):
-        config = self._makeOne(autocommit=True)
-        dummylock = DummyLock()
-        config.load_zcml(
-            'pyramid.tests.fixtureapp:configure.zcml',
-            lock=dummylock)
-        self.assertEqual(dummylock.acquired, True)
-        self.assertEqual(dummylock.released, True)
-
     def test_include_with_dotted_name(self):
         from pyramid import tests
         config = self._makeOne()
@@ -647,6 +599,23 @@ class ConfiguratorTests(unittest.TestCase):
         context_before = config._make_context()
         config._ctx = context_before
         config.include(dummy_include)
+        context_after = config._ctx
+        actions = context_after.actions
+        self.assertEqual(len(actions), 1)
+        self.assertEqual(
+            actions[0][:3],
+            ('discrim', None, tests),
+            )
+        self.assertEqual(context_after.basepath, None)
+        self.assertEqual(context_after.includepath, ())
+        self.failUnless(context_after is context_before)
+
+    def test_include_with_module_defaults_to_includeme(self):
+        from pyramid import tests
+        config = self._makeOne()
+        context_before = config._make_context()
+        config._ctx = context_before
+        config.include('pyramid.tests.test_config')
         context_after = config._ctx
         actions = context_after.actions
         self.assertEqual(len(actions), 1)
@@ -1858,278 +1827,6 @@ class ConfiguratorTests(unittest.TestCase):
         request = self._makeRequest(config)
         self.assertEqual(view(None, request), 'OK')
 
-    def test_add_handler_action_in_route_pattern(self):
-        config = self._makeOne(autocommit=True)
-        views = []
-        def dummy_add_view(**kw):
-            views.append(kw)
-        config.add_view = dummy_add_view
-        config.add_handler('name', '/:action', DummyHandler)
-        self._assertRoute(config, 'name', '/:action', 0)
-        self.assertEqual(len(views), 2)
-
-        view = views[0]
-        preds = view['custom_predicates']
-        self.assertEqual(len(preds), 1)
-        pred = preds[0]
-        request = DummyRequest()
-        self.assertEqual(pred(None, request), False)
-        request.matchdict = {'action':'action1'}
-        self.assertEqual(pred(None, request), True)
-        self.assertEqual(view['route_name'], 'name')
-        self.assertEqual(view['attr'], 'action1')
-        self.assertEqual(view['view'], DummyHandler)
-
-        view = views[1]
-        preds = view['custom_predicates']
-        self.assertEqual(len(preds), 1)
-        pred = preds[0]
-        request = DummyRequest()
-        self.assertEqual(pred(None, request), False)
-        request.matchdict = {'action':'action2'}
-        self.assertEqual(pred(None, request), True)
-        self.assertEqual(view['route_name'], 'name')
-        self.assertEqual(view['attr'], 'action2')
-        self.assertEqual(view['view'], DummyHandler)
-
-    def test_add_handler_with_view_overridden_autoexpose_None(self):
-        config = self._makeOne(autocommit=True)
-        views = []
-        def dummy_add_view(**kw):
-            views.append(kw) # pragma: no cover
-        config.add_view = dummy_add_view
-        class MyView(DummyHandler):
-            __autoexpose__ = None
-        config.add_handler('name', '/:action', MyView)
-        self._assertRoute(config, 'name', '/:action', 0)
-        self.assertEqual(len(views), 0)
-
-    def test_add_handler_with_view_overridden_autoexpose_broken_regex1(self):
-        from pyramid.exceptions import ConfigurationError
-        config = self._makeOne()
-        def dummy_add_view(**kw):
-            """ """
-        config.add_view = dummy_add_view
-        class MyView(DummyHandler):
-            __autoexpose__ = 1
-        self.assertRaises(ConfigurationError, config.add_handler,
-                          'name', '/{action}', MyView)
-
-    def test_add_handler_with_view_overridden_autoexpose_broken_regex2(self):
-        from pyramid.exceptions import ConfigurationError
-        config = self._makeOne()
-        def dummy_add_view(**kw):
-            """ """
-        config.add_view = dummy_add_view
-        class MyView(DummyHandler):
-            __autoexpose__ = 'a\\'
-        self.assertRaises(ConfigurationError, config.add_handler,
-                          'name', '/{action}', MyView)
-
-    def test_add_handler_with_view_method_has_expose_config(self):
-        config = self._makeOne(autocommit=True)
-        views = []
-        def dummy_add_view(**kw):
-            views.append(kw)
-        config.add_view = dummy_add_view
-        class MyView(object):
-            def action(self): # pragma: no cover
-                return 'response'
-            action.__exposed__ = [{'custom_predicates':(1,)}]
-        config.add_handler('name', '/:action', MyView)
-        self._assertRoute(config, 'name', '/:action', 0)
-        self.assertEqual(len(views), 1)
-        view = views[0]
-        preds = view['custom_predicates']
-        self.assertEqual(len(preds), 2)
-        self.assertEqual(view['route_name'], 'name')
-        self.assertEqual(view['attr'], 'action')
-        self.assertEqual(view['view'], MyView)
-
-    def test_add_handler_with_view_method_has_expose_config_with_action(self):
-        config = self._makeOne(autocommit=True)
-        views = []
-        def dummy_add_view(**kw):
-            views.append(kw)
-        config.add_view = dummy_add_view
-        class MyView(object):
-            def action(self): # pragma: no cover
-                return 'response'
-            action.__exposed__ = [{'name':'action3000'}]
-        config.add_handler('name', '/:action', MyView)
-        self._assertRoute(config, 'name', '/:action', 0)
-        self.assertEqual(len(views), 1)
-        view = views[0]
-        preds = view['custom_predicates']
-        self.assertEqual(len(preds), 1)
-        pred = preds[0]
-        request = DummyRequest()
-        self.assertEqual(pred(None, request), False)
-        request.matchdict = {'action':'action3000'}
-        self.assertEqual(pred(None, request), True)
-        self.assertEqual(view['route_name'], 'name')
-        self.assertEqual(view['attr'], 'action')
-        self.assertEqual(view['view'], MyView)
-
-    def test_add_handler_with_view_method_has_expose_config_with_action_regex(
-        self):
-        config = self._makeOne(autocommit=True)
-        views = []
-        def dummy_add_view(**kw):
-            views.append(kw)
-        config.add_view = dummy_add_view
-        class MyView(object):
-            def action(self): # pragma: no cover
-                return 'response'
-            action.__exposed__ = [{'name':'^action3000$'}]
-        config.add_handler('name', '/:action', MyView)
-        self._assertRoute(config, 'name', '/:action', 0)
-        self.assertEqual(len(views), 1)
-        view = views[0]
-        preds = view['custom_predicates']
-        self.assertEqual(len(preds), 1)
-        pred = preds[0]
-        request = DummyRequest()
-        self.assertEqual(pred(None, request), False)
-        request.matchdict = {'action':'action3000'}
-        self.assertEqual(pred(None, request), True)
-        self.assertEqual(view['route_name'], 'name')
-        self.assertEqual(view['attr'], 'action')
-        self.assertEqual(view['view'], MyView)
-
-    def test_add_handler_with_action_decorator(self):
-        config = self._makeOne(autocommit=True)
-        views = []
-        def dummy_add_view(**kw):
-            views.append(kw)
-        config.add_view = dummy_add_view
-        class MyHandler(object):
-            @classmethod
-            def __action_decorator__(cls, fn): # pragma: no cover
-                return fn
-            def action(self): # pragma: no cover
-                return 'response'
-        config.add_handler('name', '/{action}', MyHandler)
-        self.assertEqual(len(views), 1)
-        self.assertEqual(views[0]['decorator'], MyHandler.__action_decorator__)
-
-    def test_add_handler_with_action_decorator_fail_on_instancemethod(self):
-        config = self._makeOne(autocommit=True)
-        class MyHandler(object):
-            def __action_decorator__(self, fn): # pragma: no cover
-                return fn
-            def action(self): # pragma: no cover
-                return 'response'
-        from pyramid.exceptions import ConfigurationError
-        self.assertRaises(ConfigurationError, config.add_handler,
-                          'name', '/{action}', MyHandler)
-
-    def test_add_handler_doesnt_mutate_expose_dict(self):
-        config = self._makeOne(autocommit=True)
-        views = []
-        def dummy_add_view(**kw):
-            views.append(kw)
-        config.add_view = dummy_add_view
-        exposed = [{'name':'^action3000$'}]
-        class MyView(object):
-            def action(self): # pragma: no cover
-                return 'response'
-            action.__exposed__ = exposed
-        config.add_handler('name', '/{action}', MyView)
-        self.assertEqual(exposed[0], {'name':'^action3000$'}) # not mutated
-
-    def test_add_handler_with_action_and_action_in_path(self):
-        from pyramid.exceptions import ConfigurationError
-        config = self._makeOne()
-        self.assertRaises(ConfigurationError, config.add_handler,
-                          'name', '/{action}', DummyHandler, action='abc')
-
-    def test_add_handler_with_explicit_action(self):
-        config = self._makeOne(autocommit=True)
-        class DummyHandler(object):
-            def index(self): pass
-            index.__exposed__ = [{'a':'1'}]
-        views = []
-        def dummy_add_view(**kw):
-            views.append(kw)
-        config.add_view = dummy_add_view
-        config.add_handler('name', '/abc', DummyHandler, action='index')
-        self.assertEqual(len(views), 1)
-        view = views[0]
-        self.assertEqual(view['a'], '1')
-        self.assertEqual(view['attr'], 'index')
-        self.assertEqual(view['route_name'], 'name')
-        self.assertEqual(view['view'], DummyHandler)
-
-    def test_add_handler_with_implicit_action(self):
-        config = self._makeOne(autocommit=True)
-        class DummyHandler(object):
-            def __call__(self): pass
-            __call__.__exposed__ = [{'a':'1'}]
-        views = []
-        def dummy_add_view(**kw):
-            views.append(kw)
-        config.add_view = dummy_add_view
-        config.add_handler('name', '/abc', DummyHandler)
-        self.assertEqual(len(views), 1)
-        view = views[0]
-        self.assertEqual(view['a'], '1')
-        self.assertEqual(view['attr'], None)
-        self.assertEqual(view['route_name'], 'name')
-        self.assertEqual(view['view'], DummyHandler)
-
-    def test_add_handler_with_multiple_action(self):
-        config = self._makeOne(autocommit=True)
-        class DummyHandler(object):
-            def index(self): pass
-            def create(self): pass
-            create.__exposed__ = [{'name': 'index'}]
-        views = []
-        def dummy_add_view(**kw):
-            views.append(kw)
-        config.add_view = dummy_add_view
-        config.add_handler('name', '/abc', DummyHandler, action='index')
-        self.assertEqual(len(views), 2)
-        view = views[0]
-        self.assertEqual(view['attr'], 'create')
-        self.assertEqual(view['route_name'], 'name')
-        self.assertEqual(view['view'], DummyHandler)
-        view = views[1]
-        self.assertEqual(view['attr'], 'index')
-
-    def test_add_handler_string(self):
-        import pyramid
-        views = []
-        config = self._makeOne(autocommit=True)
-        def dummy_add_view(**kw):
-            views.append(kw)
-        config.add_view = dummy_add_view
-        config.add_handler('name', '/abc', 'pyramid')
-        self.assertEqual(len(views), 1)
-        view = views[0]
-        self.assertEqual(view['view'], pyramid)
-
-    def test_add_handler_pattern_None_no_previous_route(self):
-        from pyramid.exceptions import ConfigurationError
-        config = self._makeOne()
-        self.assertRaises(ConfigurationError, config.add_handler,
-                          'name', None, 'pyramid')
-
-    def test_add_handler_pattern_None_with_previous_route(self):
-        import pyramid
-        config = self._makeOne(autocommit=True)
-        config.add_route('name', ':def')
-        views = []
-        def dummy_add_view(**kw):
-            views.append(kw)
-        config.add_view = dummy_add_view
-        config.add_route = None # shouldn't be called
-        config.add_handler('name', None, 'pyramid')
-        self.assertEqual(len(views), 1)
-        view = views[0]
-        self.assertEqual(view['view'], pyramid)
-
-
     def _assertRoute(self, config, name, path, num_predicates=0):
         from pyramid.interfaces import IRoutesMapper
         mapper = config.registry.getUtility(IRoutesMapper)
@@ -2577,6 +2274,26 @@ class ConfiguratorTests(unittest.TestCase):
         result = view(None, request)
         self.assertEqual(result, ('abc', request))
 
+    @testing.skip_on('pypy', 'java')
+    def test_set_notfound_view_with_renderer(self):
+        from zope.interface import implementedBy
+        from pyramid.interfaces import IRequest
+        from pyramid.exceptions import NotFound
+        config = self._makeOne(autocommit=True)
+        view = lambda *arg: {}
+        config.set_notfound_view(view,
+                                 renderer='pyramid.tests:fixtures/minimal.pt')
+        config.begin()
+        try: # chameleon depends on being able to find a threadlocal registry
+            request = self._makeRequest(config)
+            view = self._getViewCallable(config,
+                                         ctx_iface=implementedBy(NotFound),
+                                         request_iface=IRequest)
+            result = view(None, request)
+        finally:
+            config.end()
+        self.failUnless('div' in result.body)
+
     def test_set_forbidden_view(self):
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
@@ -2603,6 +2320,26 @@ class ConfiguratorTests(unittest.TestCase):
                                      request_iface=IRequest)
         result = view(None, request)
         self.assertEqual(result, ('abc', request))
+
+    @testing.skip_on('pypy', 'java')
+    def test_set_forbidden_view_with_renderer(self):
+        from zope.interface import implementedBy
+        from pyramid.interfaces import IRequest
+        from pyramid.exceptions import Forbidden
+        config = self._makeOne(autocommit=True)
+        view = lambda *arg: {}
+        config.set_forbidden_view(view,
+                                  renderer='pyramid.tests:fixtures/minimal.pt')
+        config.begin()
+        try: # chameleon requires a threadlocal registry
+            request = self._makeRequest(config)
+            view = self._getViewCallable(config,
+                                         ctx_iface=implementedBy(Forbidden),
+                                         request_iface=IRequest)
+            result = view(None, request)
+        finally:
+            config.end()
+        self.failUnless('div' in result.body)
 
     def test__set_authentication_policy(self):
         from pyramid.interfaces import IAuthenticationPolicy
@@ -3171,24 +2908,6 @@ class ConfiguratorTests(unittest.TestCase):
         else: # pragma: no cover
             raise AssertionError
 
-    def test_conflict_add_handler(self):
-        class AHandler(object):
-            def aview(self): pass
-        from zope.configuration.config import ConfigurationConflictError
-        config = self._makeOne()
-        config.add_handler('h1', '/h1', handler=AHandler)
-        config.add_handler('h1', '/h1', handler=AHandler)
-        try:
-            config.commit()
-        except ConfigurationConflictError, why:
-            c1, c2, c3, c4 = self._conflictFunctions(why)
-            self.assertEqual(c1, 'test_conflict_add_handler')
-            self.assertEqual(c2, 'test_conflict_add_handler')
-            self.assertEqual(c3, 'test_conflict_add_handler')
-            self.assertEqual(c3, 'test_conflict_add_handler')
-        else: # pragma: no cover
-            raise AssertionError
-
     def test_scan_conflict(self):
         from zope.configuration.config import ConfigurationConflictError
         from pyramid.tests import selfscanapp
@@ -3204,17 +2923,112 @@ class ConfiguratorTests(unittest.TestCase):
                 for conflict in conflicts:
                     for confinst in conflict:
                         yield confinst[3]
-            c1, c2, c3, c4 = scanconflicts(why)
-            self.assertEqual(c1, "@view_config(renderer='string')")
-            self.assertEqual(c2, "@view_config(renderer='string')")
-            self.assertEqual(c3, "@view_config(name='two', renderer='string')")
-            self.assertEqual(c4, "@view_config(name='two', renderer='string')")
+            which = list(scanconflicts(why))
+            self.assertEqual(len(which), 4)
+            self.failUnless("@view_config(renderer='string')" in which)
+            self.failUnless("@view_config(name='two', renderer='string')" in
+                            which)
 
     def _conflictFunctions(self, e):
         conflicts = e._conflicts.values()
         for conflict in conflicts:
             for confinst in conflict:
                 yield confinst[2]
+
+    def test___getattr__missing_when_directives_exist(self):
+        config = self._makeOne()
+        directives = {}
+        config.registry._directives = directives
+        self.assertRaises(AttributeError, config.__getattr__, 'wontexist')
+
+    def test___getattr__missing_when_directives_dont_exist(self):
+        config = self._makeOne()
+        self.assertRaises(AttributeError, config.__getattr__, 'wontexist')
+
+    def test___getattr__matches(self):
+        config = self._makeOne()
+        def foo(config): pass
+        directives = {'foo':(foo, True)}
+        config.registry._directives = directives
+        foo_meth = config.foo
+        self.failUnless(foo_meth.im_func.__docobj__ is foo)
+
+class TestConfigurator_add_directive(unittest.TestCase):
+
+    def setUp(self):
+        from pyramid.config import Configurator
+        self.config = Configurator()
+
+    def test_extend_with_dotted_name(self):
+        from pyramid import tests
+        config = self.config
+        config.add_directive(
+            'dummy_extend', 'pyramid.tests.test_config.dummy_extend')
+        self.assert_(hasattr(config, 'dummy_extend'))
+        config.dummy_extend('discrim')
+        context_after = config._ctx
+        actions = context_after.actions
+        self.assertEqual(len(actions), 1)
+        self.assertEqual(
+            context_after.actions[0][:3],
+            ('discrim', None, tests),
+            )
+
+    def test_extend_with_python_callable(self):
+        from pyramid import tests
+        config = self.config
+        config.add_directive(
+            'dummy_extend', dummy_extend)
+        self.assert_(hasattr(config, 'dummy_extend'))
+        config.dummy_extend('discrim')
+        context_after = config._ctx
+        actions = context_after.actions
+        self.assertEqual(len(actions), 1)
+        self.assertEqual(
+            context_after.actions[0][:3],
+            ('discrim', None, tests),
+            )
+
+    def test_extend_same_name_doesnt_conflict(self):
+        config = self.config
+        config.add_directive(
+            'dummy_extend', dummy_extend)
+        config.add_directive(
+            'dummy_extend', dummy_extend2)
+        self.assert_(hasattr(config, 'dummy_extend'))
+        config.dummy_extend('discrim')
+        context_after = config._ctx
+        actions = context_after.actions
+        self.assertEqual(len(actions), 1)
+        self.assertEqual(
+            context_after.actions[0][:3],
+            ('discrim', None, config.registry),
+            )
+
+    def test_extend_action_method_successful(self):
+        from zope.configuration.config import ConfigurationConflictError
+        config = self.config
+        config.add_directive(
+            'dummy_extend', dummy_extend)
+        config.dummy_extend('discrim')
+        config.dummy_extend('discrim')
+        self.assertRaises(ConfigurationConflictError, config.commit)
+
+    def test_directive_persists_across_configurator_creations(self):
+        from zope.configuration.config import GroupingContextDecorator
+        config = self.config
+        config.add_directive('dummy_extend', dummy_extend)
+        context = config._make_context(autocommit=False)
+        context = GroupingContextDecorator(context)
+        config2 = config.with_context(context)
+        config2.dummy_extend('discrim')
+        context_after = config2._ctx
+        actions = context_after.actions
+        self.assertEqual(len(actions), 1)
+        self.assertEqual(
+            context_after.actions[0][:3],
+            ('discrim', None, config2.package),
+            )
 
 class TestViewDeriver(unittest.TestCase):
     def setUp(self):
@@ -4742,57 +4556,6 @@ class Test_isexception(unittest.TestCase):
             pass
         self.assertEqual(self._callFUT(ISubException), True)
 
-class TestActionPredicate(unittest.TestCase):
-    def _getTargetClass(self):
-        from pyramid.config import ActionPredicate
-        return ActionPredicate
-
-    def _makeOne(self, action='myaction'):
-        return self._getTargetClass()(action)
-
-    def test_bad_action_regex_string(self):
-        from pyramid.exceptions import ConfigurationError
-        cls = self._getTargetClass()
-        self.assertRaises(ConfigurationError, cls, '[a-z')
-
-    def test_bad_action_regex_None(self):
-        from pyramid.exceptions import ConfigurationError
-        cls = self._getTargetClass()
-        self.assertRaises(ConfigurationError, cls, None)
-
-    def test___call__no_matchdict(self):
-        pred = self._makeOne()
-        request = DummyRequest()
-        self.assertEqual(pred(None, request), False)
-
-    def test___call__no_action_in_matchdict(self):
-        pred = self._makeOne()
-        request = DummyRequest()
-        request.matchdict = {}
-        self.assertEqual(pred(None, request), False)
-
-    def test___call__action_does_not_match(self):
-        pred = self._makeOne()
-        request = DummyRequest()
-        request.matchdict = {'action':'notmyaction'}
-        self.assertEqual(pred(None, request), False)
-
-    def test___call__action_matches(self):
-        pred = self._makeOne()
-        request = DummyRequest()
-        request.matchdict = {'action':'myaction'}
-        self.assertEqual(pred(None, request), True)
-
-    def test___hash__(self):
-        pred1 = self._makeOne()
-        pred2 = self._makeOne()
-        pred3 = self._makeOne(action='notthesame')
-        self.assertEqual(hash(pred1), hash(pred2))
-        self.assertNotEqual(hash(pred1), hash(pred3))
-        self.assertNotEqual(hash(pred2), hash(pred3))
-
-
-
 class DummyRequest:
     subpath = ()
     matchdict = None
@@ -4807,13 +4570,6 @@ class DummyRequest:
 
 class DummyContext:
     pass
-
-class DummyLock:
-    def acquire(self):
-        self.acquired = True
-
-    def release(self):
-        self.released = True
 
 class DummyPackage:
     def __init__(self, name):
@@ -4931,16 +4687,14 @@ def dummy_view(request):
 def dummyfactory(request):
     """ """
 
-class DummyHandler(object): # pragma: no cover
-    def __init__(self, request):
-        self.request = request
-
-    def action1(self):
-        return 'response 1'
-
-    def action2(self):
-        return 'response 2'
-
 def dummy_include(config):
     config.action('discrim', None, config.package)
+
+includeme = dummy_include
+
+def dummy_extend(config, discrim):
+    config.action(discrim, None, config.package)
+
+def dummy_extend2(config, discrim):
+    config.action(discrim, None, config.registry)
     

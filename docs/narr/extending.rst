@@ -108,22 +108,21 @@ extensible and overrideable. :term:`ZCML` declarations that belong to an
 application can be overridden and extended by integrators as necessary in a
 similar fashion.  If you use only :term:`ZCML` to configure your application,
 it will automatically be maximally extensible without any manual effort.  See
-:ref:`declarative_chapter` for information about using ZCML.
+:term:`pyramid_zcml` for information about using ZCML.
 
 Fundamental Plugpoints
 ~~~~~~~~~~~~~~~~~~~~~~
 
 The fundamental "plug points" of an application developed using
 :app:`Pyramid` are *routes*, *views*, and *assets*.  Routes are declarations
-made using the :meth:`pyramid.config.Configurator.add_route` method (or the
-ZCML ``<route>`` directive).  Views are declarations made using the
-:meth:`pyramid.config.Configurator.add_view` method (or the ZCML ``<view>``
-directive).  Assets are files that are accessed by :app:`Pyramid` using the
-:term:`pkg_resources` API such as static files and templates via a
-:term:`asset specification`.  Other directives and configurator methods also
-deal in routes, views, and assets.  For example,
-:meth:`pyramid.config.Configurator.add_handler` adds a single route, and some
-number of views.
+made using the :meth:`pyramid.config.Configurator.add_route` method.  Views
+are declarations made using the :meth:`pyramid.config.Configurator.add_view`
+method.  Assets are files that are
+accessed by :app:`Pyramid` using the :term:`pkg_resources` API such as static
+files and templates via a :term:`asset specification`.  Other directives and
+configurator methods also deal in routes, views, and assets.  For example,
+``add_handler`` directive of the ``pyramid_handlers`` package adds a single
+route, and some number of views.
 
 .. index::
    single: extending an existing application
@@ -196,7 +195,7 @@ like this:
   :ref:`creating_a_project` for more information.
 
 - In the new package, create Python files containing views and other
-  overridden elements, such as templates and static resources as necessary.
+  overridden elements, such as templates and static assets as necessary.
 
 - Install the new package into the same Python environment as the original
   application (e.g. ``python setup.py develop`` or ``python setup.py
@@ -270,7 +269,7 @@ Overriding Routes
 ~~~~~~~~~~~~~~~~~
 
 Route setup is currently typically performed in a sequence of ordered calls
-to :meth:`pyramid.config.Configurator.add_route`.  Because these calls are
+to :meth:`~pyramid.config.Configurator.add_route`.  Because these calls are
 ordered relative to each other, and because this ordering is typically
 important, you should retain their relative ordering when performing an
 override.  Typically, this means *copying* all the ``add_route`` statements
@@ -278,7 +277,7 @@ into the override package's file and changing them as necessary.  Then
 disinclude any ``add_route`` statements from the original application.
 
 .. index::
-   pair: overriding; resources
+   pair: overriding; assets
 
 .. _overriding_resources:
 
@@ -286,10 +285,10 @@ Overriding Assets
 ~~~~~~~~~~~~~~~~~
 
 Assets are files on the filesystem that are accessible within a Python
-*package*.  An entire chapter is devoted to resources: :ref:`assets_chapter`.
+*package*.  An entire chapter is devoted to assets: :ref:`assets_chapter`.
 Within this chapter is a section named :ref:`overriding_assets_section`.
 This section of that chapter describes in detail how to override package
-resources with other resources by using the
+assets with other assets by using the
 :meth:`pyramid.config.Configurator.override_asset` method.  Add such
 ``override_asset`` calls to your override package's ``__init__.py`` to
 perform overrides.

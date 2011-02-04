@@ -127,7 +127,7 @@ passing it to an instance of a :term:`Configurator` named ``config``:
    config = Configurator(root_factory=Root)
 
 The ``root_factory`` argument to the
-:class:`pyramid.config.Configurator` constructor registers this root
+:class:`~pyramid.config.Configurator` constructor registers this root
 factory to be called to generate a root resource whenever a request
 enters the application.  The root factory registered this way is also
 known as the global root factory.  A root factory can alternately be
@@ -236,8 +236,8 @@ because they are almost always used together.
 A Description of The Traversal Algorithm
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When a user requests a page from your :mod:`traversal` -powered application,
-the system uses this algorithm to find a :term:`context` resource and a
+When a user requests a page from your traversal-powered application, the
+system uses this algorithm to find a :term:`context` resource and a
 :term:`view name`.
 
 #.  The request for the page is presented to the :app:`Pyramid`

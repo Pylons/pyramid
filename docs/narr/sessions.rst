@@ -42,7 +42,7 @@ tampered with.
 
 You can configure this session factory in your :app:`Pyramid`
 application by using the ``session_factory`` argument to the
-:class:`pyramid.config.Configurator` class:
+:class:`~pyramid.config.Configurator` class:
 
 .. code-block:: python
    :linenos:

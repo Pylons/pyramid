@@ -9,11 +9,6 @@ development framework.  It is developed as part of the `Pylons Project
 <http://docs.pylonsproject.org/>`_.  It is licensed under a `BSD-like license
 <http://repoze.org/license.html>`_.
 
-.. note::
-
-   Pyramid is the latest iteration of the web framework previously known as
-   :mod:`repoze.bfg`.
-
 Front Matter
 ============
 
@@ -22,6 +17,14 @@ Front Matter
 
    copyright.rst
    conventions.rst
+
+"What's New" Documents
+======================
+
+.. toctree::
+   :maxdepth: 2
+
+   whatsnew-1.0
 
 Narrative documentation
 =======================
@@ -58,12 +61,10 @@ Narrative documentation in chapter form explaining how to use
    narr/testing
    narr/hooks
    narr/advconfig
-   narr/declarative
    narr/extending
    narr/router
    narr/threadlocals
    narr/zca
-   narr/forms
 
 Tutorials
 =========
@@ -80,20 +81,16 @@ applications to various platforms.
    tutorials/bfg/index.rst
    tutorials/gae/index.rst
    tutorials/modwsgi/index.rst
-   tutorials/zeo/index.rst
-   tutorials/catalog/index.rst
 
 Reference Material
 ==================
 
-Reference material includes API documentation and documentation of
-every :app:`Pyramid` :term:`ZCML directive`.
+Reference material includes documentation for every :app:`Pyramid` API.
 
 .. toctree::
    :maxdepth: 2
 
    api
-   zcml
 
 Detailed Change History
 =======================

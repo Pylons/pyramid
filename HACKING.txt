@@ -29,6 +29,11 @@ checkout.
 
   $ env/bin/easy_install setuptools-git
 
+- Install ``nose`` and ``coverage`` into the virtualenv (for running nose
+  tests with coverage via ``setup.py nosetests --with-coverage``)::
+
+  $ env/bin/easy_install nose coverage
+
 - Install Pyramid from the checkout into the virtualenv using ``setup.py
   develop`` (running ``setup.py develop`` *must* be done while the current
   working directory is the ``pyramid`` checkout directory)::

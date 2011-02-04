@@ -1,6 +1,7 @@
 from codecs import utf_8_decode
 from codecs import utf_8_encode
 import datetime
+import re
 import time
 
 from paste.auth import auth_tkt
@@ -13,6 +14,9 @@ from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.request import add_global_response_headers
 from pyramid.security import Authenticated
 from pyramid.security import Everyone
+
+
+VALID_TOKEN = re.compile(r"^[A-Za-z][A-Za-z0-9+_-]*$")
 
 class CallbackAuthenticationPolicy(object):
     """ Abstract class """
@@ -243,6 +247,12 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
        Default: ``False``. Hide cookie from JavaScript by setting the
        HttpOnly flag. Not honored by all browsers.
        Optional.
+
+    ``wild_domain``
+
+       Default: ``True``. An auth_tkt cookie will be generated for the
+       wildcard domain.
+       Optional.
     """
     implements(IAuthenticationPolicy)
     def __init__(self,
@@ -256,6 +266,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
                  max_age=None,
                  path="/",
                  http_only=False,
+                 wild_domain=True,
                  ):
         self.cookie = AuthTktCookieHelper(
             secret,
@@ -267,6 +278,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
             max_age=max_age,
             http_only=http_only,
             path=path,
+            wild_domain=wild_domain,
             )
         self.callback = callback
 
@@ -316,7 +328,7 @@ class AuthTktCookieHelper(object):
     
     def __init__(self, secret, cookie_name='auth_tkt', secure=False,
                  include_ip=False, timeout=None, reissue_time=None,
-                 max_age=None, http_only=False, path="/"):
+                 max_age=None, http_only=False, path="/", wild_domain=True):
         self.secret = secret
         self.cookie_name = cookie_name
         self.include_ip = include_ip
@@ -329,6 +341,7 @@ class AuthTktCookieHelper(object):
         self.max_age = max_age
         self.http_only = http_only
         self.path = path
+        self.wild_domain = wild_domain
 
         static_flags = []
         if self.secure:
@@ -352,7 +365,6 @@ class AuthTktCookieHelper(object):
             max_age = ''
 
         cur_domain = environ.get('HTTP_HOST', environ.get('SERVER_NAME'))
-        wild_domain = '.' + cur_domain
 
         cookies = [
             ('Set-Cookie', '%s="%s"; Path=%s%s%s' % (
@@ -360,10 +372,13 @@ class AuthTktCookieHelper(object):
             ('Set-Cookie', '%s="%s"; Path=%s; Domain=%s%s%s' % (
             self.cookie_name, value, self.path, cur_domain, max_age,
                 self.static_flags)),
-            ('Set-Cookie', '%s="%s"; Path=%s; Domain=%s%s%s' % (
-            self.cookie_name, value, self.path, wild_domain, max_age,
-                self.static_flags))
             ]
+
+        if self.wild_domain:
+            wild_domain = '.' + cur_domain
+            cookies.append(('Set-Cookie', '%s="%s"; Path=%s; Domain=%s%s%s' % (
+                self.cookie_name, value, self.path, wild_domain, max_age,
+                self.static_flags)))
 
         return cookies
 
@@ -409,7 +424,10 @@ class AuthTktCookieHelper(object):
             
         if not hasattr(request, '_authtkt_reissued'):
             if reissue and ( (now - timestamp) > self.reissue_time):
-                headers = self.remember(request, userid, max_age=self.max_age)
+                # work around https://github.com/Pylons/pyramid/issues#issue/108
+                tokens = filter(None, tokens)
+                headers = self.remember(request, userid, max_age=self.max_age,
+                                        tokens=tokens)
                 add_global_response_headers(request, headers)
                 request._authtkt_reissued = True
 
@@ -430,9 +448,23 @@ class AuthTktCookieHelper(object):
         environ = request.environ
         return self._get_cookies(environ, '', max_age=EXPIRE)
     
-    def remember(self, request, userid, max_age=None):
+    def remember(self, request, userid, max_age=None, tokens=()):
         """ Return a set of Set-Cookie headers; when set into a response,
-        these headers will represent a valid authentication ticket."""
+        these headers will represent a valid authentication ticket.
+
+        ``max_age``
+          The max age of the auth_tkt cookie, in seconds.  When this value is
+          set, the cookie's ``Max-Age`` and ``Expires`` settings will be set,
+          allowing the auth_tkt cookie to last between browser sessions.
+          Default: ``None``.
+
+        ``tokens``
+          A sequence of strings that will be placed into the auth_tkt tokens
+          field.  Each string in the sequence must be of the Python ``str``
+          type and must match the regex ``^[A-Za-z][A-Za-z0-9+_-]*$``.
+          Tokens are available in the returned identity when an auth_tkt is
+          found in the request and unpacked.  Default: ``()``.
+        """
         max_age = max_age or self.max_age
         environ = request.environ
 
@@ -449,10 +481,15 @@ class AuthTktCookieHelper(object):
             userid = encoder(userid)
             user_data = 'userid_type:%s' % encoding
         
+        for token in tokens:
+            if not (isinstance(token, str) and VALID_TOKEN.match(token)):
+                raise ValueError("Invalid token %r" % (token,))
+
         ticket = self.auth_tkt.AuthTicket(
             self.secret,
             userid,
             remote_addr,
+            tokens=tokens,
             user_data=user_data,
             cookie_name=self.cookie_name,
             secure=self.secure)

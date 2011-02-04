@@ -7,13 +7,6 @@ In this chapter, we will walk through the creation of a tiny :app:`Pyramid`
 application.  After we're finished creating the application, we'll explain in
 more detail how it works.
 
-.. note::
-
-   If you're a "theory-first" kind of person, you might choose to read
-   :ref:`urldispatch_chapter` and :ref:`views_chapter` before diving into
-   the code that follows, but it's not necessary if -- like many programmers
-   -- you're willing to "go with the flow".
-
 .. _helloworld_imperative:
 
 Hello World, Goodbye World
@@ -54,6 +47,8 @@ installed, an HTTP server is started on TCP port 8080:
 When port 8080 is visited by a browser on the root URL (``/``), the server
 will simply serve up the text "Hello world!"  When visited by a browser on
 the URL ``/goodbye``, the server will serve up the text "Goodbye world!"
+
+Press ``Ctrl-C`` to stop the application.
 
 Now that we have a rudimentary understanding of what the application does,
 let's examine it piece-by-piece.
@@ -120,7 +115,7 @@ A view callable is required to return a :term:`response` object because a
 response object has all the information necessary to formulate an actual HTTP
 response; this object is then converted to text by the upstream :term:`WSGI`
 server and sent back to the requesting browser.  To return a response, each
-view callable creates an instance of the :class:`pyramid.response.Response`
+view callable creates an instance of the :class:`~pyramid.response.Response`
 class.  In the ``hello_world`` function, the string ``'Hello world!'`` is
 passed to the ``Response`` constructor as the *body* of the response.  In the
 ``goodbye_world`` function, the string ``'Goodbye world!'`` is passed.
@@ -245,7 +240,7 @@ predicates) is always invoked.
 
 In this application, :app:`Pyramid` chooses the most specific view callable
 based only on view :term:`predicate` applicability.  The ordering of calls to
-:meth:`pyramid.config.Configurator.add_view` is never very important.  We can
+:meth:`~pyramid.config.Configurator.add_view` is never very important.  We can
 register ``goodbye_world`` first and ``hello_world`` second; :app:`Pyramid`
 will still give us the most specific callable when a request is dispatched to
 it.
@@ -320,11 +315,11 @@ References
 ----------
 
 For more information about the API of a :term:`Configurator` object,
-see :class:`pyramid.config.Configurator` .
+see :class:`~pyramid.config.Configurator` .
 
 For more information about :term:`view configuration`, see
 :ref:`view_config_chapter`.
 
 An example of using *declarative* configuration (:term:`ZCML`) instead of
 imperative configuration to create a similar "hello world" is available
-within :ref:`declarative_configuration`.
+within the documentation for :term:`pyramid_zcml`.

@@ -13,7 +13,7 @@ obviously you can't please everyone all of the time.
 Pyramid Provides More Than One Way to Do It
 -------------------------------------------
 
-A canon of Python popular culture is "TIOOTDI" ("there is only one way to do
+A canon of Python popular culture is "TIOOWTDI" ("there is only one way to do
 it", a slighting, tongue-in-cheek reference to Perl's "TIMTOWTDI", which is
 an acronym for "there is more than one way to do it").
 
@@ -21,19 +21,20 @@ an acronym for "there is more than one way to do it").
 it includes more than one way to resolve a URL to a :term:`view callable`:
 via :term:`url dispatch` or :term:`traversal`.  Multiple methods of
 configuration exist: :term:`imperative configuration`, :term:`configuration
-decoration`, and :term:`ZCML`. It works with multiple different kinds of
-persistence and templating systems.  And so on.  However, the existence of
-most of these overlapping ways to do things are not without reason and
-purpose: we have a number of audiences to serve, and we believe that TIMTOWTI
-at the web framework level actually *prevents* a much more insidious and
-harmful set of duplication at higher levels in the Python web community.
+decoration`, and :term:`ZCML` (optionally via :term:`pyramid_zcml`). It works
+with multiple different kinds of persistence and templating systems.  And so
+on.  However, the existence of most of these overlapping ways to do things
+are not without reason and purpose: we have a number of audiences to serve,
+and we believe that TIMTOWTI at the web framework level actually *prevents* a
+much more insidious and harmful set of duplication at higher levels in the
+Python web community.
 
 :app:`Pyramid` began its life as :mod:`repoze.bfg`, written by a team of
-people with many years of prior :ref:`Zope` experience.  The idea of
-:term:`traversal`, the usage of :term:`ZCML` and the way :term:`view lookup`
-works was stolen entirely from Zope.  The authorization subsystem provided by
-:app:`Pyramid` is a derivative of Zope's.  The idea that an application can
-be *extended* without forking is also a Zope derivative.
+people with many years of prior :term:`Zope` experience.  The idea of
+:term:`traversal` and the way :term:`view lookup` works was stolen entirely
+from Zope.  The authorization subsystem provided by :app:`Pyramid` is a
+derivative of Zope's.  The idea that an application can be *extended* without
+forking is also a Zope derivative.
 
 Implementations of these features were *required* to allow the :app:`Pyramid`
 authors to build the bread-and-butter CMS-type systems for customers in the
@@ -164,12 +165,11 @@ variable.  Using an API that consults a thread local makes understanding how
 it works non-local.
 
 You've now bought in to the fact that there's a registry that is just
-"hanging around".  But how does the registry get populated?  Why,
-:term:`ZCML` of course.  Sometimes.  Or via imperative code.  In this
-particular case, however, the registration of ``ISettings`` is made by the
-framework itself "under the hood": it's not present in any ZCML nor was it
-performed imperatively.  This is extremely hard to comprehend.  Problem
-number six.
+"hanging around".  But how does the registry get populated?  Why, via code
+that calls directives like ``config.add_view``.  In this particular case,
+however, the registration of ``ISettings`` is made by the framework itself
+"under the hood": it's not present in any user configuration.  This is
+extremely hard to comprehend.  Problem number six.
 
 Clearly there's some amount of cognitive load here that needs to be borne by
 a reader of code that extends the :app:`Pyramid` framework due to its use of
@@ -323,17 +323,18 @@ the ZCA registry:
 
 - Composability.  A ZCA component registry can be populated imperatively, or
   there's an existing mechanism to populate a registry via the use of a
-  configuration file (ZCML).  We didn't need to write a frontend from scratch
-  to make use of configuration-file-driven registry population.
+  configuration file (ZCML, via :term:`pyramid_zcml`).  We didn't need to
+  write a frontend from scratch to make use of configuration-file-driven
+  registry population.
 
 - Pluggability.  Use of the ZCA registry allows for framework extensibility
   via a well-defined and widely understood plugin architecture.  As long as
   framework developers and extenders understand the ZCA registry, it's
   possible to extend :app:`Pyramid` almost arbitrarily.  For example, it's
-  relatively easy to build a ZCML directive that registers several views "all
-  at once", allowing app developers to use that ZCML directive as a "macro"
-  in code that they write.  This is somewhat of a differentiating feature
-  from other (non-Zope) frameworks.
+  relatively easy to build a directive that registers several views "all at
+  once", allowing app developers to use that directive as a "macro" in code
+  that they write.  This is somewhat of a differentiating feature from other
+  (non-Zope) frameworks.
 
 - Testability.  Judicious use of the ZCA registry in framework code makes
   testing that code slightly easier.  Instead of using monkeypatching or
@@ -346,9 +347,8 @@ the ZCA registry:
   for just these purposes.  The ZCA registry contains optional C code for
   this purpose which demonstrably has no (or very few) bugs.
 
-- Ecosystem.  Many existing Zope packages can be used in
-  :app:`Pyramid` with few (or no) changes due to our use of the ZCA
-  registry and :term:`ZCML`.
+- Ecosystem.  Many existing Zope packages can be used in :app:`Pyramid` with
+  few (or no) changes due to our use of the ZCA registry.
 
 Conclusion
 ++++++++++
@@ -366,13 +366,12 @@ this is you, it's extremely hard to have a lot of sympathy for you.  You'll
 either need to get familiar with how we're using the ZCA registry or you'll
 need to use only the documented APIs; that's why we document them as APIs.
 
-If you *extend* or *develop* :app:`Pyramid` (create new ZCML directives, use
-some of the more obscure "ZCML hooks" as described in :ref:`hooks_chapter`,
-or work on the :app:`Pyramid` core code), you will be faced with needing to
-understand at least some ZCA concepts.  In some places it's used unabashedly,
-and will be forever.  We know it's quirky, but it's also useful and
-fundamentally understandable if you take the time to do some reading about
-it.
+If you *extend* or *develop* :app:`Pyramid` (create new directives, use some
+of the more obscure "hooks" as described in :ref:`hooks_chapter`, or work on
+the :app:`Pyramid` core code), you will be faced with needing to understand
+at least some ZCA concepts.  In some places it's used unabashedly, and will
+be forever.  We know it's quirky, but it's also useful and fundamentally
+understandable if you take the time to do some reading about it.
 
 Pyramid Uses Interfaces Too Liberally
 -------------------------------------
@@ -419,9 +418,6 @@ method was ``POST`` and that the remote user agent passed
 
 "Under the hood", these features make no use of interfaces.
 
-For more information about predicates, see
-:ref:`view_predicates_in_1dot1` and :ref:`route_predicates_in_1dot1`.
-
 Many "prebaked" predicates exist.  However, use of only "prebaked" predicates,
 however, doesn't entirely meet Ian's criterion.  He would like to be able to
 match a request using a lambda or another function which interrogates the
@@ -453,74 +449,11 @@ Pyramid "Encourages Use of ZCML"
 :term:`Zope Component Architecture` registry that :app:`Pyramid` uses for
 application configuration.  Often people claim that Pyramid "needs ZCML".
 
-Quick answer: it doesn't. At least not anymore.  In :mod:`repoze.bfg` (the
-predecessor to Pyramid) versions 1.0 and and 1.1, an application needed to
-possess a ZCML file for it to begin executing successfully.  However,
-:mod:`repoze.bfg` 1.2 and greater (including :app:`Pyramid` 1.0) includes a
-completely imperative mode for all configuration.  You will be able to make
-"single file" apps in this mode, which should help people who need to see
-everything done completely imperatively.  For example, the very most basic
-:app:`Pyramid` "helloworld" program has become something like:
-
-.. code-block:: python
-   :linenos:
-
-   from webob import Response
-   from paste.httpserver import serve
-   from pyramid.config import Configurator
-
-   def hello_world(request):
-       return Response('Hello world!')
-
-   if __name__ == '__main__':
-       config = Configurator()
-       config.add_view(hello_world)
-       app = config.make_wsgi_app()
-       serve(app)
-
-In this mode, no ZCML is required at all, nor any other sort of frameworky
-frontend to application configuration.  Hopefully this mode will allow people
-who are used to doing everything imperatively feel more comfortable.
-
-Pyramid Uses ZCML; ZCML is XML and I Don't Like XML
----------------------------------------------------
-
-:term:`ZCML` is a configuration language in the XML syntax.  Due to the
-"imperative configuration" feature (new in :mod:`repoze.bfg` 1.2), you don't
-need to use ZCML at all.  But if you really do want to perform declarative
-configuration, perhaps because you want to build an extensible application,
-you may need to use and understand it.
-
-:term:`ZCML` contains elements that are mostly singleton tags that are
-called *declarations*.  For an example:
-
-.. code-block:: xml
-   :linenos:
-
-   <route
-     view=".views.my_view"
-     path="/"
-     name="root"
-    />
-
-This declaration associates a :term:`view` with a route pattern. 
-
-All :app:`Pyramid` declarations are singleton tags, unlike many other XML
-configuration systems.  No XML *values* in ZCML are meaningful; it's always
-just XML tags and attributes.  So in the very common case it's not really
-very much different than an otherwise "flat" configuration format like
-``.ini``, except a developer can *create* a directive that requires nesting
-(none of these exist in :app:`Pyramid` itself), and multiple "sections" can
-exist with the same "name" (e.g. two ``<route>`` declarations) must be able
-to exist simultaneously.
-
-You might think some other configuration file format would be better.  But
-all configuration formats suck in one way or another.  I personally don't
-think any of our lives would be markedly better if the declarative
-configuration format used by :app:`Pyramid` were YAML, JSON, or INI.  It's
-all just plumbing that you mostly cut and paste once you've progressed 30
-minutes into your first project.  Folks who tend to agitate for another
-configuration file format are folks that haven't yet spent that 30 minutes.
+It doesn't.  In :app:`Pyramid` 1.0, ZCML doesn't ship as part of the core;
+instead it ships in the :term:`pyramid_zcml` add-on package, which is
+completely optional.  No ZCML is required at all to use :app:`Pyramid`, nor
+any other sort of frameworky declarative frontend to application
+configuration.
 
 .. _model_traversal_confusion:
 
@@ -663,7 +596,7 @@ the method is called (if possible) with its argument list filled with values
 mentioned therein.  TurboGears and Pylons 1.X operate similarly.
 
 Out of the box, :app:`Pyramid` is configured to have none of these features.
-By default, :mod:`pyramid` view callables always accept only ``reqest`` and
+By default, :mod:`pyramid` view callables always accept only ``request`` and
 no other arguments.  The rationale: this argument specification matching done
 aggressively can be costly, and :app:`Pyramid` has performance as one of its
 main goals, so we've decided to make people, by default, obtain information
@@ -797,7 +730,7 @@ have their own transitive dependencies.
 
 It should be noted that :app:`Pyramid` is positively lithe compared to
 :term:`Grok`, a different Zope-based framework.  As of this writing, in its
-default configuration, Grok has 126 package distribution dependencies. The
+default configuration, Grok has 109 package distribution dependencies. The
 number of dependencies required by :app:`Pyramid` is many times fewer than
 Grok (or Zope itself, upon which Grok is based).  :app:`Pyramid` has a number
 of package distribution dependencies comparable to similarly-targeted
@@ -1006,11 +939,11 @@ the :term:`Zope Component Architecture`, you can optionally use it to expose
 other more domain-specific configuration plugpoints while developing an
 application.  The plugpoints you expose needn't be as coarse as the ones
 provided automatically by :app:`Pyramid` itself.  For example, you might
-compose your own :term:`ZCML` directive that configures a set of views for a
-prebaked purpose (e.g. ``restview`` or somesuch) , allowing other people to
-refer to that directive when they make declarations in the ``configure.zcml``
-of their customization package.  There is a cost for this: the developer of
-an application that defines custom plugpoints for its deployers will need to
+compose your own directive that configures a set of views for a prebaked
+purpose (e.g. ``restview`` or somesuch) , allowing other people to refer to
+that directive when they make declarations in the ``includeme`` of their
+customization package.  There is a cost for this: the developer of an
+application that defines custom plugpoints for its deployers will need to
 understand the ZCA or he will need to develop his own similar extensibility
 system.
 
@@ -1095,10 +1028,9 @@ lives in a single Python file.
 
 Some developers and microframework authors point out that Pyramid's "hello
 world" single-file program is longer (by about five lines) than the
-equivalent program in their favorite microframework.  Guilty as charged; in a
-contest of "whose is shortest", Pyramid indeed loses.
+equivalent program in their favorite microframework.  Guilty as charged.
 
-This loss isn't for lack of trying. Pyramid aims to be useful in the same
+This loss isn't for lack of trying. Pyramid is useful in the same
 circumstance in which microframeworks claim dominance: single-file
 applications.  But Pyramid doesn't sacrifice its ability to credibly support
 larger applications in order to achieve hello-world LoC parity with the
@@ -1192,8 +1124,8 @@ is analogous to the above example: the "global registry" in the above example
 is the list ``L``.
 
 Let's see what happens when we use the same pattern with the `Groundhog
-<http://bfg.repoze.org/videos#groundhog1>`_ microframework.  Replace the
-contents of ``app.py`` above with this:
+<https://github.com/Pylons/groundhog>`_ microframework.  Replace the contents
+of ``app.py`` above with this:
 
 .. code-block:: python
     :linenos:
@@ -1231,10 +1163,10 @@ How many routes will be registered within the routing table of the "gh"
 Groundhog application?  If you answered three, you are correct.  How many
 would a casual reader (and any sane developer) expect to be registered?  If
 you answered two, you are correct.  Will the double registration be a
-problem?  With our fictional Groundhog framework's ``route`` method backing
-this application, not really.  It will slow the application down a little
-bit, because it will need to miss twice for a route when it does not match.
-Will it be a problem with another framework, another application, or another
+problem?  With our Groundhog framework's ``route`` method backing this
+application, not really.  It will slow the application down a little bit,
+because it will need to miss twice for a route when it does not match.  Will
+it be a problem with another framework, another application, or another
 decorator?  Who knows.  You need to understand the application in its
 totality, the framework in its totality, and the chronology of execution to
 be able to predict what the impact of unintentional code double-execution
@@ -1252,10 +1184,10 @@ codepath, and never will*.  Anyone who tries to sell you on the idea that
 they do is simply mistaken.  Test runners that you may want to use to run
 your code's tests often perform imports of arbitrary code in strange orders
 that manifest bugs like the one demonstrated above.  API documentation
-generation tools do the same.  Some (mutant) people even think it's safe to
-use the Python ``reload`` command or delete objects from ``sys.modules``,
-each of which has hilarious effects when used against code that has
-import-time side effects.
+generation tools do the same.  Some people even think it's safe to use the
+Python ``reload`` command or delete objects from ``sys.modules``, each of
+which has hilarious effects when used against code that has import-time side
+effects.
 
 Global-registry-mutating microframework programmers therefore will at some
 point need to start reading the tea leaves about what *might* happen if
@@ -1362,7 +1294,7 @@ Routes (Usually) Need Relative Ordering
 +++++++++++++++++++++++++++++++++++++++
 
 Consider the following simple `Groundhog
-<http://bfg.repoze.org/videos#groundhog1>`_ application:
+<https://github.com/Pylons/groundhog>`_ application:
 
 .. code-block:: python
     :linenos:

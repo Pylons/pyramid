@@ -44,7 +44,7 @@ def UnencryptedCookieSessionFactoryConfig(
     cookie_domain=None,
     cookie_secure=False, 
     cookie_httponly=False,
-    cookie_on_exception=False,
+    cookie_on_exception=True,
     ):
     """
     Configure a :term:`session factory` which will provide unencrypted
@@ -89,7 +89,7 @@ def UnencryptedCookieSessionFactoryConfig(
 
     ``cookie_on_exception``
       If ``True``, set a session cookie even if an exception occurs
-      while rendering a view.  Default: ``False``.
+      while rendering a view.  Default: ``True``.
 
     """
 

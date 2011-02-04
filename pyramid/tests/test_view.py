@@ -196,15 +196,29 @@ class TestIsResponse(unittest.TestCase):
         response = None
         self.assertEqual(self._callFUT(response), False)
 
-    def test_partial_inst(self):
-        response = DummyResponse()
-        response.app_iter = None
-        self.assertEqual(self._callFUT(response), False)
-        
-    def test_status_not_string(self):
-        response = DummyResponse()
-        response.status = None
-        self.assertEqual(self._callFUT(response), False)
+    def test_isnt_no_headerlist(self):
+        class Response(object):
+            pass
+        resp = Response
+        resp.status = '200 OK'
+        resp.app_iter = []
+        self.assertEqual(self._callFUT(resp), False)
+
+    def test_isnt_no_status(self):
+        class Response(object):
+            pass
+        resp = Response
+        resp.app_iter = []
+        resp.headerlist = ()
+        self.assertEqual(self._callFUT(resp), False)
+
+    def test_isnt_no_app_iter(self):
+        class Response(object):
+            pass
+        resp = Response
+        resp.status = '200 OK'
+        resp.headerlist = ()
+        self.assertEqual(self._callFUT(resp), False)
 
 class TestViewConfigDecorator(unittest.TestCase):
     def setUp(self):
@@ -392,6 +406,14 @@ class Test_append_slash_notfound_view(BaseTest, unittest.TestCase):
         self.assertEqual(response.status, '302 Found')
         self.assertEqual(response.location, '/abc/')
 
+    def test_with_query_string(self):
+        request = self._makeRequest(PATH_INFO='/abc', QUERY_STRING='a=1&b=2')
+        context = ExceptionResponse()
+        self._registerMapper(request.registry, True)
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '302 Found')
+        self.assertEqual(response.location, '/abc/?a=1&b=2')
+
 class TestAppendSlashNotFoundViewFactory(BaseTest, unittest.TestCase):
     def _makeOne(self, notfound_view):
         from pyramid.view import AppendSlashNotFoundViewFactory
@@ -428,28 +450,6 @@ class Test_default_exceptionresponse_view(unittest.TestCase):
         request.exception = 'abc'
         result = self._callFUT(context, request)
         self.assertEqual(result, 'abc')
-
-class Test_action(unittest.TestCase):
-    def _makeOne(self, **kw):
-        from pyramid.view import action
-        return action(**kw)
-
-    def test_call_no_previous__exposed__(self):
-        inst = self._makeOne(a=1, b=2)
-        def wrapped():
-            """ """
-        result = inst(wrapped)
-        self.failUnless(result is wrapped)
-        self.assertEqual(result.__exposed__, [{'a':1, 'b':2}])
-
-    def test_call_with_previous__exposed__(self):
-        inst = self._makeOne(a=1, b=2)
-        def wrapped():
-            """ """
-        wrapped.__exposed__ = [None]
-        result = inst(wrapped)
-        self.failUnless(result is wrapped)
-        self.assertEqual(result.__exposed__, [None, {'a':1, 'b':2}])
 
 class ExceptionResponse(Exception):
     status = '404 Not Found'

@@ -12,16 +12,16 @@ from pyramid.scripting import get_root
 class PyramidTemplate(Template):
     def pre(self, command, output_dir, vars): # pragma: no cover
         vars['random_string'] = os.urandom(20).encode('hex')
+        package_logger = vars['package']
+        if package_logger == 'root':
+            # Rename the app logger in the rare case a project is named 'root'
+            package_logger = 'app'
+        vars['package_logger'] = package_logger
         return Template.pre(self, command, output_dir, vars)
 
 class StarterProjectTemplate(PyramidTemplate):
     _template_dir = 'paster_templates/starter'
     summary = 'pyramid starter project'
-    template_renderer = staticmethod(paste_script_template_renderer)
-
-class StarterZCMLProjectTemplate(PyramidTemplate):
-    _template_dir = 'paster_templates/starter_zcml'
-    summary = 'pyramid starter project (ZCML)'
     template_renderer = staticmethod(paste_script_template_renderer)
 
 class ZODBProjectTemplate(PyramidTemplate):
@@ -37,21 +37,6 @@ class RoutesAlchemyProjectTemplate(PyramidTemplate):
 class AlchemyProjectTemplate(PyramidTemplate):
     _template_dir = 'paster_templates/alchemy'
     summary = 'pyramid SQLAlchemy project using traversal'
-    template_renderer = staticmethod(paste_script_template_renderer)
-
-class PylonsBasicProjectTemplate(PyramidTemplate):
-    _template_dir = 'paster_templates/pylons_basic'
-    summary = 'Pylons basic project'
-    template_renderer = staticmethod(paste_script_template_renderer)
-
-class PylonsMinimalProjectTemplate(PyramidTemplate):
-    _template_dir = 'paster_templates/pylons_minimal'
-    summary = 'Pylons minimal project'
-    template_renderer = staticmethod(paste_script_template_renderer)
-
-class PylonsSQLAlchemyProjectTemplate(PyramidTemplate):
-    _template_dir = 'paster_templates/pylons_sqla'
-    summary = 'Pylons SQLAlchemy project'
     template_renderer = staticmethod(paste_script_template_renderer)
 
 def get_app(config_file, name, loadapp=loadapp):

@@ -9,11 +9,11 @@ by Chris McDonough
 
 Copyright |copy| 2008-2011, Agendaless Consulting.
 
-.. ISBN-10: 0615345379
+ISBN-10: 0615445675
 
-.. ISBN-13: 978-0-615-34537-6
+ISBN-13: 978-0615445670
 
-.. First print publishing: February, 2010
+First print publishing: February, 2011
 
 All rights reserved.  This material may be copied or distributed only
 subject to the terms and conditions set forth in the `Creative Commons
@@ -52,28 +52,28 @@ Editor:
   Casey Duncan
 
 Contributors:
-
   Ben Bangert, Blaise Laflamme, Rob Miller, Mike Orr, Carlos de la Guardia,
-  Paul Everitt, Tres Seaver, Marius Gedminas, Chris Rossi, Joachim Krebs,
-  Xavier Spriet, Reed O'Brien, William Chambers, Charlie Choiniere, Jamaludin
-  Ahmad.
+  Paul Everitt, Tres Seaver, John Shipman, Marius Gedminas, Chris Rossi,
+  Joachim Krebs, Xavier Spriet, Reed O'Brien, William Chambers, Charlie
+  Choiniere, Jamaludin Ahmad, Graham Higgins.
 
-.. Cover Designer:
-..   Nat Hardwick of `Electrosoup <http://www.electrosoup.co.uk>`_.
+Cover Designer:
+   Hugues Laflamme of `Kemeneur <http://www.kemeneur.com/>`_.
 
 Used with permission:
+
    The :ref:`webob_chapter` chapter is adapted, with permission, from
    documentation originally written by Ian Bicking.
 
    The :ref:`much_ado_about_traversal_chapter` chapter is adapted,
    with permission, from an article written by Rob Miller.
 
-.. Print Production
-.. ----------------
+Print Production
+----------------
 
-.. The print version of this book was produced using the `Sphinx
-.. <http://sphinx.pocoo.org/>`_ documentation generation system and the
-.. `LaTeX <http://www.latex-project.org/>`_ typesetting system.
+The print version of this book was produced using the `Sphinx
+<http://sphinx.pocoo.org/>`_ documentation generation system and the
+`LaTeX <http://www.latex-project.org/>`_ typesetting system.
 
 Contacting The Publisher
 ------------------------

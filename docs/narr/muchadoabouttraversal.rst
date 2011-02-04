@@ -6,8 +6,7 @@ Much Ado About Traversal
 
 .. note:: This chapter was adapted, with permission, from a blog post by `Rob
    Miller <http://blog.nonsequitarian.org/>`_, originally published at
-   `http://blog.nonsequitarian.org/2010/much-ado-about-traversal/
-   <http://blog.nonsequitarian.org/2010/much-ado-about-traversal/>`_.
+   http://blog.nonsequitarian.org/2010/much-ado-about-traversal/ .
 
 Traversal is an alternative to :term:`URL dispatch` which allows
 :app:`Pyramid` applications to map URLs to code.
@@ -208,10 +207,10 @@ example, for instance, you might want to view the photo in a page, but you
 might also want to provide a way for the user to edit the photo and any
 associated metadata.  We'll call the former the ``view`` view, and the latter
 will be the ``edit`` view.  (Original, I know.)  :app:`Pyramid` has a
-centralized view :term:`registry` where named views can be associated with
-specific resource types.  So in our example, we'll assume that we've
-registered ``view`` and ``edit`` views for photo objects, and that we've
-specified the ``view`` view as the default, so that
+centralized view :term:`application registry` where named views can be
+associated with specific resource types.  So in our example, we'll assume
+that we've registered ``view`` and ``edit`` views for photo objects, and that
+we've specified the ``view`` view as the default, so that
 ``/joeschmoe/photos/photo1/view`` and ``/joeschmoe/photos/photo1`` are
 equivalent.  The edit view would sensibly be provided by a request for
 ``/joeschmoe/photos/photo1/edit``.
@@ -269,9 +268,9 @@ It might be possible, but it certainly won't be easy.  The matching
 patterns are going to become complex quickly as you try to handle all
 of the edge cases.
 
-With traversal, however, it's straightforward.  20 layers of nesting would be
- no problem.  :app:`Pyramid` will happily call ``__getitem__``
-as many times as it needs to, until it runs out of path segments or until a
+With traversal, however, it's straightforward.  Twenty layers of nesting
+would be no problem.  :app:`Pyramid` will happily call ``__getitem__`` as
+many times as it needs to, until it runs out of path segments or until a
 resource raises a :exc:`KeyError`.  Each resource only needs to know how to
 fetch its immediate children, the traversal algorithm takes care of the rest.
 Also, since the structure of the resource tree can live in the database and
@@ -305,7 +304,6 @@ don't require it, great: stick with :term:`URL dispatch`.  But if you're
 using :app:`Pyramid` and you ever find that you *do* need to support one of
 these use cases, you'll be glad you have traversal in your toolkit.
 
-.. note::
-   It is even possible to mix and match :term:`traversal` with
+.. note:: It is even possible to mix and match :term:`traversal` with
    :term:`URL dispatch` in the same :app:`Pyramid` application. See the
    :ref:`hybrid_chapter` chapter for details.

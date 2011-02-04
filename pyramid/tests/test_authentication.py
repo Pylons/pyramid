@@ -455,6 +455,24 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(len(response.headerlist), 3)
         self.assertEqual(response.headerlist[0][0], 'Set-Cookie')
 
+    def test_identify_cookie_reissue_with_tokens_default(self):
+        # see https://github.com/Pylons/pyramid/issues#issue/108
+        import time
+        plugin = self._makeOne('secret', timeout=10, reissue_time=0)
+        plugin.auth_tkt = DummyAuthTktModule(tokens=[''])
+        now = time.time()
+        plugin.auth_tkt.timestamp = now
+        plugin.now = now + 1
+        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
+        result = plugin.identify(request)
+        self.failUnless(result)
+        self.assertEqual(len(request.callbacks), 1)
+        response = DummyResponse()
+        request.callbacks[0](None, response)
+        self.assertEqual(len(response.headerlist), 3)
+        self.assertEqual(response.headerlist[0][0], 'Set-Cookie')
+        self.failUnless("'tokens': []" in response.headerlist[0][1])
+
     def test_remember(self):
         plugin = self._makeOne('secret')
         request = self._makeRequest()
@@ -548,6 +566,20 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.failUnless('; Secure' in result[2][1])
         self.failUnless(result[2][1].startswith('auth_tkt='))
 
+    def test_remember_wild_domain_disabled(self):
+        plugin = self._makeOne('secret', wild_domain=False)
+        request = self._makeRequest()
+        result = plugin.remember(request, 'other')
+        self.assertEqual(len(result), 2)
+
+        self.assertEqual(result[0][0], 'Set-Cookie')
+        self.assertTrue(result[0][1].endswith('; Path=/'))
+        self.failUnless(result[0][1].startswith('auth_tkt='))
+
+        self.assertEqual(result[1][0], 'Set-Cookie')
+        self.assertTrue(result[1][1].endswith('; Path=/; Domain=localhost'))
+        self.failUnless(result[1][1].startswith('auth_tkt='))
+
     def test_remember_string_userid(self):
         plugin = self._makeOne('secret')
         request = self._makeRequest()
@@ -599,7 +631,36 @@ class TestAuthTktCookieHelper(unittest.TestCase):
 
         self.assertEqual(values[0]['max-age'], '500')
         self.failUnless(values[0]['expires'])
-        
+
+    def test_remember_tokens(self):
+        plugin = self._makeOne('secret')
+        request = self._makeRequest()
+        result = plugin.remember(request, 'other', tokens=('foo', 'bar'))
+        self.assertEqual(len(result), 3)
+
+        self.assertEqual(result[0][0], 'Set-Cookie')
+        self.failUnless("'tokens': ('foo', 'bar')" in result[0][1])
+
+        self.assertEqual(result[1][0], 'Set-Cookie')
+        self.failUnless("'tokens': ('foo', 'bar')" in result[1][1])
+
+        self.assertEqual(result[2][0], 'Set-Cookie')
+        self.failUnless("'tokens': ('foo', 'bar')" in result[2][1])
+
+    def test_remember_non_string_token(self):
+        plugin = self._makeOne('secret')
+        request = self._makeRequest()
+        self.assertRaises(ValueError, plugin.remember, request, 'other',
+                          tokens=(u'foo',))
+
+    def test_remember_invalid_token_format(self):
+        plugin = self._makeOne('secret')
+        request = self._makeRequest()
+        self.assertRaises(ValueError, plugin.remember, request, 'other',
+                          tokens=('foo bar',))
+        self.assertRaises(ValueError, plugin.remember, request, 'other',
+                          tokens=('1bar',))
+
     def test_forget(self):
         plugin = self._makeOne('secret')
         request = self._makeRequest()

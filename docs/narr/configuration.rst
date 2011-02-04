@@ -127,7 +127,7 @@ The scanning machinery imports each module and subpackage in a package or
 module recursively, looking for special attributes attached to objects
 defined within a module.  These special attributes are typically attached to
 code via the use of a :term:`decorator`.  For example, the
-:class:`pyramid.view.view_config` decorator can be attached to a function or
+:class:`~pyramid.view.view_config` decorator can be attached to a function or
 instance method.
 
 Once scanning is invoked, and :term:`configuration decoration` is found by
@@ -136,7 +136,7 @@ behalf: these calls replace the need to add imperative configuration
 statements that don't live near the code being configured.
 
 In the example above, the scanner translates the arguments to
-:class:`pyramid.view.view_config` into a call to the
+:class:`~pyramid.view.view_config` into a call to the
 :meth:`pyramid.config.Configurator.add_view` method, effectively:
 
 .. ignore-next-block
@@ -151,9 +151,7 @@ Declarative Configuration
 A third mode of configuration can be employed when you create a
 :app:`Pyramid` application named *declarative configuration*.  This mode uses
 an XML language known as :term:`ZCML` to represent configuration statements
-rather than Python.  ZCML is often used when application extensibility is
-important.  Most of the examples in the narrative portion of this
-documentation concentrate on imperative configuration rather than ZCML, but
-almost everything that can be configured imperatively can also be configured
-via ZCML.  See :ref:`declarative_chapter` for more information about ZCML.
+rather than Python.  ZCML is not built-in to Pyramid, but almost everything
+that can be configured imperatively can also be configured via ZCML if you
+install the :term:`pyramid_zcml` package.
 

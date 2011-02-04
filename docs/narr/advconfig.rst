@@ -115,11 +115,8 @@ allowing the circumstance to go unreported, by default Pyramid raises a
 running.
 
 Conflict detection happens for any kind of configuration: imperative
-configuration, :term:`ZCML` configuration, or configuration that results from
-the execution of a :term:`scan`.
-
-.. note:: If you use, ZCML, its conflict detection algorithm is described in
-   :ref:`zcml_conflict_detection`.
+configuration or configuration that results from the execution of a
+:term:`scan`.
 
 Manually Resolving Conflicts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -166,7 +163,7 @@ Using ``config.commit()``
 +++++++++++++++++++++++++
 
 You can manually commit a configuration by using the
-:meth:`pyramid.config.Configurator.commit` method between configuration
+:meth:`~pyramid.config.Configurator.commit` method between configuration
 calls.  For example, we prevent conflicts from occurring in the application
 we examined previously as the result of adding a ``commit``.  Here's the
 application that generates conflicts:
@@ -258,7 +255,7 @@ conflict detection (and :ref:`twophase_config`) is disabled.  Configuration
 statements will be executed immediately, and succeeding statements will
 override preceding ones.
 
-:meth:`pyramid.config.Configurator.commit` has no effect when ``autocommit``
+:meth:`~pyramid.config.Configurator.commit` has no effect when ``autocommit``
 is ``True``.
 
 If you use a Configurator in code that performs unit testing, it's usually a
@@ -270,11 +267,11 @@ unconcerned about conflict detection or two-phase configuration in test code.
 Automatic Conflict Resolution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If your code uses the :meth:`pyramid.config.Configurator.include` method to
+If your code uses the :meth:`~pyramid.config.Configurator.include` method to
 include external configuration, some conflicts are automatically resolved.
 Configuration statements that are made as the result of an "include" will be
 overridden by configuration statements that happen within the caller of
-the "include" method.  See also
+the "include" method.
 
 Automatic conflict resolution supports this goal: if a user wants to reuse a
 Pyramid application, and they want to customize the configuration of this
@@ -300,9 +297,6 @@ These are the methods of the configurator which provide conflict detection:
 
 Some other methods of the configurator also indirectly provide conflict
 detection, because they're implemented in terms of conflict-aware methods:
-
-- :meth:`~pyramid.config.Configurator.add_handler`, a frontend for
-  ``add_route`` and ``add_view``.
 
 - :meth:`~pyramid.config.Configurator.add_route` does a second type of
   conflict detection when a ``view`` parameter is passed (it calls
@@ -338,8 +332,25 @@ Instead, use :meth:`pyramid.config.Configuration.include`:
 Using ``include`` rather than calling the function directly will allow
 :ref:`automatic_conflict_resolution` to work.
 
+:meth:`~pyramid.config.Configuration.include` can also accept a :term:`module`
+as an argument:
+
+.. code-block:: python
+   :linenos:
+
+   import myapp
+
+   config.include(myapp)
+
+For this to work properly, the ``myapp`` module must contain a callable with
+the special name ``includeme``, which should perform configuration (like the
+``add_routes`` callable we showed above as an example).
+
+:meth:`~pyramid.config.Configuration.include` can also accept a :term:`dotted
+Python name` to a function or a module.
+
 .. note: See :ref:`the_include_tag` for a declarative alternative to
-   :meth:`pyramid.config.Configurator.include`.
+   the :meth:`~pyramid.config.Configurator.include` method.
 
 .. _twophase_config:
 
@@ -357,8 +368,8 @@ to do conflict detection.
 Due to this, for configuration methods that have no internal ordering
 constraints, execution order of configuration method calls is not important.
 For example, the relative ordering of
-:meth:`pyramid.config.Configurator.add_view` and
-:meth:`pyramid.config.Configurator.add_renderer` is unimportant when a
+:meth:`~pyramid.config.Configurator.add_view` and
+:meth:`~pyramid.config.Configurator.add_renderer` is unimportant when a
 non-autocommitting configurator is used.  This code snippet:
 
 .. code-block:: python
@@ -387,9 +398,77 @@ used, two-phase configuration is disabled, and configuration statements must
 be ordered in dependency order.
 
 Some configuration methods, such as
-:meth:`pyramid.config.Configurator.add_route` and
-:meth:`pyramid.config.Configurator.add_handler` have internal ordering
-constraints: they routes they imply require relative ordering.  Such ordering
+:meth:`~pyramid.config.Configurator.add_route` have internal ordering
+constraints: the routes they imply require relative ordering.  Such ordering
 constraints are not absolved by two-phase configuration.  Routes are still
 added in configuration execution order.
 
+.. _add_directive:
+
+Adding Methods to the Configurator via ``add_directive``
+--------------------------------------------------------
+
+Framework extension writers can add arbitrary methods to a
+:term:`Configurator` by using the
+:meth:`pyramid.config.Configurator.add_directive` method of the configurator.
+This makes it possible to extend a Pyramid configurator in arbitrary ways,
+and allows it to perform application-specific tasks more succinctly.
+
+The :meth:`~pyramid.config.Configurator.add_directive` method accepts two
+positional arguments: a method name and a callable object.  The callable
+object is usually a function that takes the configurator instance as its
+first argument and accepts other arbitrary positional and keyword arguments.
+For example:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.events import NewRequest
+   from pyramid.config import Configurator
+
+   def add_newrequest_subscriber(config, subscriber):
+       config.add_subscriber(subscriber, NewRequest).
+
+   if __name__ == '__main__':
+      config = Configurator()
+      config.add_directive('add_newrequest_subscriber', 
+                           add_newrequest_subscriber)
+
+Once :meth:`~pyramid.config.Configurator.add_directive` is called, a user can
+then call the method by its given name as if it were a built-in method of the
+Configurator:
+
+.. code-block:: python
+   :linenos:
+
+   def mysubscriber(event):
+      print event.request
+
+   config.add_newrequest_subscriber(mysubscriber)
+
+A call to :meth:`~pyramid.config.Configurator.add_directive` is often
+"hidden" within an ``includeme`` function within a "frameworky" package meant
+to be included as per :ref:`including_configuration` via
+:meth:`~pyramid.config.Configurator.include`.  For example, if you put this
+code in a package named ``pyramid_subscriberhelpers``:
+
+.. code-block:: python
+   :linenos:
+
+   def includeme(config)
+      config.add_directive('add_newrequest_subscriber', 
+                           add_newrequest_subscriber)
+
+The user of the add-on package ``pyramid_subscriberhelpers`` would then be
+able to install it and subsequently do:
+
+.. code-block:: python
+   :linenos:
+
+   def mysubscriber(event):
+      print event.request
+
+   from pyramid.config import Configurator
+   config = Configurator()
+   config.include('pyramid_subscriberhelpers')
+   config.add_newrequest_subscriber(mysubscriber)

@@ -1,0 +1,63 @@
+[app:{{project}}]
+use = egg:{{project}}
+reload_templates = false
+debug_authorization = false
+debug_notfound = false
+debug_routematch = false
+debug_templates = false
+default_locale_name = en
+
+[filter:weberror]
+use = egg:WebError#error_catcher
+debug = false
+;error_log = 
+;show_exceptions_in_wsgi_errors = true
+;smtp_server = localhost
+;error_email = janitor@example.com
+;smtp_username = janitor
+;smtp_password = "janitor's password"
+;from_address = paste@localhost
+;error_subject_prefix = "Pyramid Error"
+;smtp_use_tls =
+;error_message =
+
+[pipeline:main]
+pipeline =
+    weberror
+    {{project}}
+
+[server:main]
+use = egg:Paste#http
+host = 0.0.0.0
+port = 6543
+
+# Begin logging configuration
+
+[loggers]
+keys = root, {{package_logger}}
+
+[handlers]
+keys = console
+
+[formatters]
+keys = generic
+
+[logger_root]
+level = WARN
+handlers = console
+
+[logger_{{package_logger}}]
+level = WARN
+handlers =
+qualname = {{package}}
+
+[handler_console]
+class = StreamHandler
+args = (sys.stderr,)
+level = NOTSET
+formatter = generic
+
+[formatter_generic]
+format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
+
+# End logging configuration

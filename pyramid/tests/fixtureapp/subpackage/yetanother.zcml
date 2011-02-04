@@ -1,8 +1,0 @@
-<configure xmlns="http://pylonshq.com/pyramid">
-
-  <include package="pyramid.includes" />
-
-  <include package="pyramid.tests.fixtureapp" file="another.zcml"/>
-
-</configure>
-

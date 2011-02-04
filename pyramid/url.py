@@ -321,8 +321,7 @@ def static_url(path, request, **kw):
     Generates a fully qualified URL for a static :term:`asset`.
     The asset must live within a location defined via the
     :meth:`pyramid.config.Configurator.add_static_view`
-    :term:`configuration declaration` or the ``<static>`` ZCML
-    directive (see :ref:`static_assets_section`).
+    :term:`configuration declaration` (see :ref:`static_assets_section`).
 
     .. note:: Calling :meth:`pyramid.Request.static_url` can be used to
               achieve the same result as :func:`pyramid.url.static_url`.

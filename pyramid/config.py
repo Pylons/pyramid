@@ -2,14 +2,13 @@ import inspect
 import os
 import re
 import sys
-import threading
+import types
 import traceback
 
 import venusian
 
 from translationstring import ChameleonTranslate
 
-from zope.configuration import xmlconfig
 from zope.configuration.config import GroupingContextDecorator
 from zope.configuration.config import ConfigurationMachine
 from zope.configuration.xmlconfig import registerCommonDirectives
@@ -88,6 +87,7 @@ from pyramid.urldispatch import RoutesMapper
 from pyramid.util import DottedNameResolver
 from pyramid.view import default_exceptionresponse_view
 from pyramid.view import render_view_to_response
+from pyramid.view import is_response
 
 MAX_ORDER = 1 << 30
 DEFAULT_PHASH = md5().hexdigest()
@@ -204,14 +204,13 @@ class Configurator(object):
 
     If ``request_factory`` is passed, it should be a :term:`request
     factory` implementation or a :term:`dotted Python name` to same.
-    See :ref:`custom_request_factory`.  By default it is ``None``,
+    See :ref:`changing_the_request_factory`.  By default it is ``None``,
     which means use the default request factory.
 
-    If ``renderer_globals_factory`` is passed, it should be a
-    :term:`renderer globals` factory implementation or a :term:`dotted
-    Python name` to same.  See :ref:`custom_renderer_globals_factory`.
-    By default, it is ``None``, which means use no renderer globals
-    factory.
+    If ``renderer_globals_factory`` is passed, it should be a :term:`renderer
+    globals` factory implementation or a :term:`dotted Python name` to same.
+    See :ref:`adding_renderer_globals`.  By default, it is ``None``, which
+    means use no renderer globals factory.
 
     If ``default_permission`` is passed, it should be a
     :term:`permission` string to be used as the default permission for
@@ -507,9 +506,12 @@ class Configurator(object):
 
         Values allowed to be presented via the ``*callables`` argument to
         this method: any callable Python object or any :term:`dotted Python
-        name` which resolves to a callable Python object.
+        name` which resolves to a callable Python object.  It may also be a
+        Python :term:`module`, in which case, the module will be searched for
+        a callable named ``includeme``, which will be treated as the
+        configuration callable.
         
-        For example, if the ``configure`` function below lives in a module
+        For example, if the ``includeme`` function below lives in a module
         named ``myapp.myconfig``:
 
         .. code-block:: python
@@ -521,7 +523,7 @@ class Configurator(object):
                from pyramid.response import Response
                return Response('OK')
 
-           def configure(config):
+           def includeme(config):
                config.add_view(my_view)
 
         You might cause it be included within your Pyramid application like
@@ -534,7 +536,19 @@ class Configurator(object):
 
            def main(global_config, **settings):
                config = Configurator()
-               config.include('myapp.myconfig.configure')
+               config.include('myapp.myconfig.includeme')
+
+        Because the function is named ``includeme``, the function name can
+        also be omitted from the dotted name reference:
+
+        .. code-block:: python
+           :linenos:
+
+           from pyramid.config import Configurator
+
+           def main(global_config, **settings):
+               config = Configurator()
+               config.include('myapp.myconfig')
 
         Included configuration statements will be overridden by local
         configuration statements if an included callable causes a
@@ -547,9 +561,11 @@ class Configurator(object):
 
         for c in callables:
             c = self.maybe_dotted(c)
-            sourcefile = inspect.getsourcefile(c)
             module = inspect.getmodule(c)
+            if module is c:
+                c = getattr(module, 'includeme')
             spec = module.__name__ + ':' + c.__name__
+            sourcefile = inspect.getsourcefile(c)
             if _context.processSpec(spec):
                 context = GroupingContextDecorator(_context)
                 context.basepath = os.path.dirname(sourcefile)
@@ -557,6 +573,45 @@ class Configurator(object):
                 context.package = package_of(module)
                 config = self.__class__.with_context(context)
                 c(config)
+
+    def add_directive(self, name, directive, action_wrap=True):
+        """
+        Add a directive method to the configurator.
+
+        Framework extenders can add directive methods to a configurator by
+        instructing their users to call ``config.add_directive('somename',
+        'some.callable')``.  This will make ``some.callable`` accessible as
+        ``config.somename``.  ``some.callable`` should be a function which
+        accepts ``config`` as a first argument, and arbitrary positional and
+        keyword arguments following.  It should use config.action as
+        necessary to perform actions.  Directive methods can then be invoked
+        like 'built-in' directives such as ``add_view``, ``add_route``, etc.
+
+        The ``action_wrap`` argument should be ``True`` for directives which
+        perform ``config.action`` with potentially conflicting
+        discriminators.  ``action_wrap`` will cause the directive to be
+        wrapped in a decorator which provides more accurate conflict
+        cause information.
+        
+        ``add_directive`` does not participate in conflict detection, and
+        later calls to ``add_directive`` will override earlier calls.
+        """
+        c = self.maybe_dotted(directive)
+        if not hasattr(self.registry, '_directives'):
+            self.registry._directives = {}
+        self.registry._directives[name] = (c, action_wrap)
+
+    def __getattr__(self, name):
+        # allow directive extension names to work
+        directives = getattr(self.registry, '_directives', {})
+        c = directives.get(name)
+        if c is None:
+            raise AttributeError(name)
+        c, action_wrap = c
+        if action_wrap:
+            c = action_method(c)
+        m = types.MethodType(c, self, self.__class__)
+        return m
 
     @classmethod
     def with_context(cls, context):
@@ -838,11 +893,12 @@ class Configurator(object):
 
     def get_settings(self):
         """
-        Return a 'settings' object for the current application.  A
-        'settings' object is a dictionary-like object that contains
-        key/value pairs based on the dictionary passed as the ``settings``
-        argument to the :class:`pyramid.config.Configurator`
-        constructor or the :func:`pyramid.router.make_app` API.
+        Return a :term:`deployment settings` object for the current
+        application.  A deployment settings object is a dictionary-like
+        object that contains key/value pairs based on the dictionary passed
+        as the ``settings`` argument to the
+        :class:`pyramid.config.Configurator` constructor or the
+        :func:`pyramid.router.make_app` API.
 
         .. note:: For backwards compatibility, dictionary keys can also be
            looked up as attributes of the settings object.
@@ -853,10 +909,10 @@ class Configurator(object):
         return self.registry.settings
 
     def make_wsgi_app(self):
-        """ Returns a :app:`Pyramid` WSGI application representing
-        the current configuration state and sends a
-        :class:`pyramid.events.ApplicationCreated`
-        event to all listeners."""
+        """ Commits any pending configuration statements, sends a
+        :class:`pyramid.events.ApplicationCreated` event to all listeners,
+        and returns a :app:`Pyramid` WSGI application representing the
+        committed configuration state."""
         self.commit()
         from pyramid.router import Router # avoid circdep
         app = Router(self.registry)
@@ -869,177 +925,6 @@ class Configurator(object):
         finally:
             self.manager.pop()
         return app
-
-    def load_zcml(self, spec='configure.zcml', lock=threading.Lock()):
-        """ Load configuration from a :term:`ZCML` file into the
-        current configuration state.  The ``spec`` argument is an
-        absolute filename, a relative filename, or a :term:`asset
-        specification`, defaulting to ``configure.zcml`` (relative to
-        the package of the configurator's caller)."""
-        package_name, filename = self._split_spec(spec)
-        if package_name is None: # absolute filename
-            package = self.package
-        else:
-            __import__(package_name)
-            package = sys.modules[package_name]
-
-        registry = self.registry
-        self.manager.push({'registry':registry, 'request':None})
-        context = self._ctx
-        if context is None:
-            context = self._ctx = self._make_context(self.autocommit)
-
-        # To avoid breaking people's expectations of how ZCML works, we
-        # cannot autocommit ZCML actions incrementally.  If we commit actions
-        # incrementally, configuration outcome will be controlled purely by
-        # ZCML directive execution order, which isn't what anyone who uses
-        # ZCML expects.  So we don't autocommit each ZCML directive action
-        # while parsing is happening, but we do make sure to pass
-        # execute=self.autocommit to xmlconfig.file below, which will cause
-        # the actions implied by the ZCML that was parsed to be committed
-        # right away once parsing is finished if autocommit is True.
-        context = GroupingContextDecorator(context)
-        context.autocommit = False 
-
-        lock.acquire()
-        try:
-            context.package = package
-            xmlconfig.file(filename, package, context=context,
-                           execute=self.autocommit)
-        finally:
-            lock.release()
-            self.manager.pop()
-        return registry
-
-    @action_method
-    def add_handler(self, route_name, pattern, handler, action=None, **kw):
-
-        """ Add a Pylons-style view handler.  This function adds a
-        route and some number of views based on a handler object
-        (usually a class).
-
-        ``route_name`` is the name of the route (to be used later in
-        URL generation).
-
-        ``pattern`` is the matching pattern,
-        e.g. ``'/blog/{action}'``.  ``pattern`` may be ``None``, in
-        which case the pattern of an existing route named the same as
-        ``route_name`` is used.  If ``pattern`` is ``None`` and no
-        route named ``route_name`` exists, a ``ConfigurationError`` is
-        raised.
-
-        ``handler`` is a dotted name of (or direct reference to) a
-        Python handler class,
-        e.g. ``'my.package.handlers.MyHandler'``.
-
-        If ``{action}`` or ``:action`` is in
-        the pattern, the exposed methods of the handler will be used
-        as views.
-
-        If ``action`` is passed, it will be considered the method name
-        of the handler to use as a view.
-
-        Passing both ``action`` and having an ``{action}`` in the
-        route pattern is disallowed.
-
-        Any extra keyword arguments are passed along to ``add_route``.
-
-        See :ref:`views_chapter` for more explanatory documentation.
-
-        This method returns the result of add_route."""
-        handler = self.maybe_dotted(handler)
-
-        if pattern is not None:
-            route = self.add_route(route_name, pattern, **kw)
-        else:
-            mapper = self.get_routes_mapper()
-            route = mapper.get_route(route_name)
-            if route is None:
-                raise ConfigurationError(
-                    'The "pattern" parameter may only be "None" when a route '
-                    'with the route_name argument was previously registered. '
-                    'No such route named %r exists' % route_name)
-
-            pattern = route.pattern
-
-        action_decorator = getattr(handler, '__action_decorator__', None)
-        if action_decorator is not None:
-            if hasattr(action_decorator, 'im_self'):
-                # instance methods have an im_self == None
-                # classmethods have an im_self == cls
-                # staticmethods have no im_self
-                # instances have no im_self
-                if action_decorator.im_self is not handler:
-                    raise ConfigurationError(
-                        'The "__action_decorator__" attribute of a handler '
-                        'must not be an instance method (must be a '
-                        'staticmethod, classmethod, function, or an instance '
-                        'which is a callable')
-
-        path_has_action = ':action' in pattern or '{action}' in pattern
-
-        if action and path_has_action:
-            raise ConfigurationError(
-                'action= (%r) disallowed when an action is in the route '
-                'path %r' % (action, pattern))
-
-        if path_has_action:
-            autoexpose = getattr(handler, '__autoexpose__', r'[A-Za-z]+')
-            if autoexpose:
-                try:
-                    autoexpose = re.compile(autoexpose).match
-                except (re.error, TypeError), why:
-                    raise ConfigurationError(why[0])
-            for method_name, method in inspect.getmembers(
-                handler, inspect.ismethod):
-                configs = getattr(method, '__exposed__', [])
-                if autoexpose and not configs:
-                    if autoexpose(method_name):
-                        configs = [{}]
-                for expose_config in configs:
-                    # we don't want to mutate any dict in __exposed__,
-                    # so we copy each
-                    view_args = expose_config.copy()
-                    action = view_args.pop('name', method_name)
-                    preds = list(view_args.pop('custom_predicates', []))
-                    preds.append(ActionPredicate(action))
-                    view_args['custom_predicates'] = preds
-                    self.add_view(view=handler, attr=method_name,
-                                  route_name=route_name,
-                                  decorator=action_decorator, **view_args)
-        else:
-            method_name = action
-            if method_name is None:
-                method_name = '__call__'
-
-            # Scan the controller for any other methods with this action name
-            for meth_name, method in inspect.getmembers(
-                handler, inspect.ismethod):
-                configs = getattr(method, '__exposed__', [{}])
-                for expose_config in configs:
-                    # Don't re-register the same view if this method name is
-                    # the action name
-                    if meth_name == action:
-                        continue
-                    # We only reg a view if the name matches the action
-                    if expose_config.get('name') != method_name:
-                        continue
-                    # we don't want to mutate any dict in __exposed__,
-                    # so we copy each
-                    view_args = expose_config.copy()
-                    del view_args['name']
-                    self.add_view(view=handler, attr=meth_name,
-                                  route_name=route_name,
-                                  decorator=action_decorator, **view_args)
-
-            # Now register the method itself
-            method = getattr(handler, method_name, None)
-            configs = getattr(method, '__exposed__', [{}])
-            for expose_config in configs:
-                self.add_view(view=handler, attr=action, route_name=route_name,
-                              decorator=action_decorator, **expose_config)
-
-        return route
 
     @action_method
     def add_view(self, view=None, name="", for_=None, permission=None,
@@ -1620,7 +1505,7 @@ class Configurator(object):
         pattern
 
           The pattern of the route e.g. ``ideas/{idea}``.  This
-          argument is required.  See :ref:`route_path_pattern_syntax`
+          argument is required.  See :ref:`route_pattern_syntax`
           for information about the syntax of route patterns.  If the
           pattern doesn't match the current URL, route matching
           continues.
@@ -1908,7 +1793,7 @@ class Configurator(object):
         an extremely advanced usage.  By default, ``categories`` is ``None``
         which will execute *all* Venusian decorator callbacks including
         :app:`Pyramid`-related decorators such as
-        :class:`pyramid.view.view_config`.  See the :ref:`Venusian`
+        :class:`pyramid.view.view_config`.  See the :term:`Venusian`
         documentation for more information about limiting a scan by using an
         explicit set of categories.
         """
@@ -2163,9 +2048,19 @@ class Configurator(object):
         declare a permission will be executable by entirely anonymous
         users (any authorization policy is ignored).
 
-        Later calls to this method override earlier calls; there can
-        be only one default permission active at a time within an
+        Later calls to this method override will conflict with earlier calls;
+        there can be only one default permission active at a time within an
         application.
+
+        .. warning::
+
+          If a default permission is in effect, view configurations meant to
+          create a truly anonymously accessible view (even :term:`exception
+          view` views) *must* use the explicit permission string
+          ``__no_permission_required__`` as the permission.  When this string
+          is used as the ``permission`` for a view configuration, the default
+          permission is ignored, and the view is registered, making it
+          available to all callers regardless of their credentials.
 
         See also :ref:`setting_a_default_permission`.
 
@@ -2223,7 +2118,8 @@ class Configurator(object):
 
         .. code-block:: python
 
-           add_translations_dirs('/usr/share/locale', 'some.package:locale')
+           config.add_translation_dirs('/usr/share/locale',
+                                       'some.package:locale')
 
         """
         for spec in specs:
@@ -2434,8 +2330,7 @@ class Configurator(object):
         expected event notifications.  This method is useful when
         testing code that wants to call
         :meth:`pyramid.registry.Registry.notify`,
-        :func:`zope.component.event.dispatch` or
-        :func:`zope.component.event.objectEventNotify`.
+        or :func:`zope.component.event.dispatch`.
 
         The default value of ``event_iface`` (``None``) implies a
         subscriber registered for *any* kind of event.
@@ -3073,30 +2968,6 @@ def requestonly(view, attr=None):
 
     return False
 
-
-class ActionPredicate(object):
-    action_name = 'action'
-    def __init__(self, action):
-        self.action = action
-        try:
-            self.action_re = re.compile(action + '$')
-        except (re.error, TypeError), why:
-            raise ConfigurationError(why[0])
-
-    def __call__(self, context, request):
-        matchdict = request.matchdict
-        if matchdict is None:
-            return False
-        action = matchdict.get(self.action_name)
-        if action is None:
-            return False
-        return bool(self.action_re.match(action))
-
-    def __hash__(self):
-        # allow this predicate's phash to be compared as equal to
-        # others that share the same action name
-        return hash(self.action)
-
 class PyramidConfigurationMachine(ConfigurationMachine):
     autocommit = False
 
@@ -3118,12 +2989,6 @@ def translator(msg):
     request = get_current_request()
     localizer = get_localizer(request)
     return localizer.translate(msg)
-
-def is_response(ob):
-    if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
-         hasattr(ob, 'status') ):
-        return True
-    return False
 
 def isexception(o):
     if IInterface.providedBy(o):

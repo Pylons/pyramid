@@ -125,7 +125,7 @@ Adding ``security.py``
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Add a ``security.py`` module within your package (in the same directory as
-"__init__.py", "views.py", etc) with the following content:
+:file:`__init__.py`, :file:`views.py`, etc) with the following content:
 
 .. literalinclude:: src/authorization/tutorial/security.py
    :linenos:
@@ -274,6 +274,4 @@ of hitting an edit or add page and submitting the login form with the
 ``editor`` credentials), we'll see a Logout link in the upper right
 hand corner.  When we click it, we're logged out, and redirected back
 to the front page.
-
-
 

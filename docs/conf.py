@@ -57,8 +57,24 @@ for item in os.listdir(parent):
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest',
-              'repoze.sphinx.autointerface']
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.doctest',
+    'repoze.sphinx.autointerface',
+#    'sphinx.ext.intersphinx'
+    ]
+
+# Looks for objects in other Pyramid projects
+## intersphinx_mapping = {
+##     'cookbook':
+##     ('http://docs.pylonsproject.org/projects/pyramid_cookbook/dev/', None),
+##     'handlers':
+##     ('http://docs.pylonsproject.org/projects/pyramid_handlers/dev/', None),
+##     'zcml':
+##     ('http://docs.pylonsproject.org/projects/pyramid_zcml/dev/', None),
+##     'jinja2':
+##     ('http://docs.pylonsproject.org/projects/pyramid_jinja2/dev/', None),
+##     }
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -77,7 +93,7 @@ copyright = '%s, Agendaless Consulting' % datetime.datetime.now().year
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '1.0a9'
+version = '1.0'
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -450,7 +466,7 @@ epub_scheme = 'ISBN'
 
 # The unique identifier of the text. This can be a ISBN number
 # or the project homepage.
-epub_identifier = '0615345379'
+epub_identifier = '0615445675'
 
 # A unique identification for the text.
 epub_uid = 'The Pyramid Web Application Development Framework, Version 1.0'

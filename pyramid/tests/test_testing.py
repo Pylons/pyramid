@@ -586,6 +586,30 @@ class Test_setUp(unittest.TestCase):
             getSiteManager.reset()
             manager.clear()
 
+    def test_it_with_settings_passed_explicit_registry(self):
+        from zope.component import getSiteManager
+        from pyramid.threadlocal import manager
+        from pyramid.registry import Registry
+        registry = Registry()
+        try:
+            self._callFUT(registry=registry, hook_zca=False,
+                          settings=dict(a=1))
+            self.assertEqual(registry.settings['a'], 1)
+        finally:
+            getSiteManager.reset()
+            manager.clear()
+        
+    def test_it_with_settings_passed_implicit_registry(self):
+        from zope.component import getSiteManager
+        from pyramid.threadlocal import manager
+        try:
+            config = self._callFUT(hook_zca=False,
+                                   settings=dict(a=1))
+            self.assertEqual(config.registry.settings['a'], 1)
+        finally:
+            getSiteManager.reset()
+            manager.clear()
+
 class Test_cleanUp(Test_setUp):
     def _callFUT(self, *arg, **kw):
         from pyramid.testing import cleanUp

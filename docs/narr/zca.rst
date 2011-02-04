@@ -57,7 +57,7 @@ Using the ZCA Global API in a :app:`Pyramid` Application
 -----------------------------------------------------------
 
 :term:`Zope` uses a single ZCA registry -- the "global" ZCA registry
--- for all Zope applications run in the same Python process,
+-- for all Zope applications that run in the same Python process,
 effectively making it impossible to run more than one Zope application
 in a single process.
 
@@ -158,9 +158,7 @@ Consider the following bit of idiomatic :app:`Pyramid` startup code:
 
    def app(global_settings, **settings):
        config = Configurator(settings=settings)
-       config.begin()
-       config.load_zcml('configure.zcml')
-       config.end()
+       config.include('some.other.package')
        return config.make_wsgi_app()
 
 When the ``app`` function above is run, a :term:`Configurator` is
@@ -173,7 +171,7 @@ when a :term:`Configurator` constructor is called, or when a
 
 During a request, the application registry created by the Configurator
 is "made current".  This means calls to
-:func:`pyramid.threadlocal.get_current_registry` in the thread
+:func:`~pyramid.threadlocal.get_current_registry` in the thread
 handling the request will return the component registry associated
 with the application.
 
@@ -186,7 +184,7 @@ always return the global ZCA registry (the one in
 
 To "fix" this and make the ZCA global APIs use the "current" BFG
 registry, you need to call
-:meth:`pyramid.config.Configurator.hook_zca` within your
+:meth:`~pyramid.config.Configurator.hook_zca` within your
 setup code.  For example:
 
 .. code-block:: python
@@ -198,9 +196,7 @@ setup code.  For example:
    def app(global_settings, **settings):
        config = Configurator(settings=settings)
        config.hook_zca()
-       config.begin()
-       config.load_zcml('configure.zcml')
-       config.end()
+       config.include('some.other.application')
        return config.make_wsgi_app()
 
 We've added a line to our original startup code, line number 6, which
@@ -250,9 +246,7 @@ registry at startup time instead of constructing a new one:
        config = Configurator(registry=globalreg)
        config.setup_registry(settings=settings)
        config.hook_zca()
-       config.begin()
-       config.load_zcml('configure.zcml')
-       config.end()
+       config.include('some.other.application')
        return config.make_wsgi_app()
 
 Lines 5, 6, and 7 above are the interesting ones.  Line 5 retrieves
@@ -267,37 +261,4 @@ At this point, :app:`Pyramid` will use the ZCA global registry
 rather than creating a new application-specific registry; since by
 default the ZCA global API will use this registry, things will work as
 you might expect a Zope app to when you use the global ZCA API.
-
-.. index::
-   single: Zope ZCML directives
-   single: getGlobalSiteManager
-   single: getSiteManager
-
-Using Broken ZCML Directives
-----------------------------
-
-Some :term:`Zope` and third-party :term:`ZCML` directives use the
-``zope.component.getGlobalSiteManager`` API to get "the registry" when
-they should actually be calling ``zope.component.getSiteManager``.
-
-``zope.component.getSiteManager`` can be overridden by
-:app:`Pyramid` via
-:meth:`pyramid.config.Configurator.hook_zca`, while
-``zope.component.getGlobalSiteManager`` cannot.  Directives that use
-``zope.component.getGlobalSiteManager`` are effectively broken; no
-ZCML directive should be using this function to find a registry to
-populate.
-
-You cannot use ZCML directives which use
-``zope.component.getGlobalSiteManager`` within a :app:`Pyramid`
-application without passing the ZCA global registry to the
-:term:`Configurator` constructor at application startup, as per
-:ref:`using_the_zca_global_registry`.
-
-One alternative exists: fix the ZCML directive to use
-``getSiteManager`` rather than ``getGlobalSiteManager``.  If a
-directive disuses ``getGlobalSiteManager``, the ``hook_zca`` method of
-using a component registry as documented in :ref:`hook_zca` will begin
-to work, allowing you to make use of the ZCML directive without
-also using the ZCA global registry.
 

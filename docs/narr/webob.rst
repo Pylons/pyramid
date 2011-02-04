@@ -20,9 +20,11 @@ class, which is a subclass of :class:`webob.Request`.  The
 Users can also return an instance of :mod:`webob.Response` directly
 from a view as necessary.
 
-WebOb is a project separate from :app:`Pyramid` with a separate set
-of authors and a fully separate `set of documentation
-<http://pythonpaste.org/webob/>`_.
+WebOb is a project separate from :app:`Pyramid` with a separate set of
+authors and a fully separate `set of documentation
+<http://pythonpaste.org/webob/>`_.  Pyramid adds some functionality to the
+standard WebOb request, which is documented in the :ref:`request_module` API
+documentation.
 
 WebOb provides objects for HTTP requests and responses.  Specifically
 it does this by wrapping the `WSGI <http://wsgi.org>`_ request
@@ -109,11 +111,11 @@ instance, ``req.if_modified_since`` returns a `datetime
 Special Attributes Added to the Request by :app:`Pyramid`
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-In addition to the standard :term:`WebOb` attributes, :app:`Pyramid`
-adds special attributes to every request: ``context``, ``registry``,
-``root``, ``subpath``, ``traversed``, ``view_name``, ``virtual_root``, 
-``virtual_root_path``, ``session``, and ``tmpl_context``.  These
-attributes are documented further within the
+In addition to the standard :term:`WebOb` attributes, :app:`Pyramid` adds
+special attributes to every request: ``context``, ``registry``, ``root``,
+``subpath``, ``traversed``, ``view_name``, ``virtual_root``,
+``virtual_root_path``, ``session``, and ``tmpl_context``, ``matchdict``, and
+``matched_route``.  These attributes are documented further within the
 :class:`pyramid.request.Request` API documentation.
 
 .. index::
