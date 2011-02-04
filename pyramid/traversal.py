@@ -614,11 +614,12 @@ class ResourceTreeTraverser(object):
             # and this hurts readability; apologies
             i = 0
             view_selector = self.VIEW_SELECTOR
+            view_selector_len = len(view_selector)
             vpath_tuple = traversal_path(vpath)
             for segment in vpath_tuple:
-                if segment.startswith(view_selector):
+                if segment[:view_selector_len] == view_selector:
                     return {'context':ob,
-                            'view_name':segment[len(view_selector):],
+                            'view_name':segment[view_selector_len:],
                             'subpath':vpath_tuple[i+1:],
                             'traversed':vpath_tuple[:vroot_idx+i+1],
                             'virtual_root':vroot,
