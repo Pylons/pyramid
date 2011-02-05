@@ -193,11 +193,11 @@ application:
 
 When a default permission is registered:
 
-- if a view configuration names an explicit ``permission``, the default
+- If a view configuration names an explicit ``permission``, the default
   permission is ignored for that view registration, and the
   view-configuration-named permission is used.
 
-- if a view configuration names an explicit permission as the string
+- If a view configuration names an explicit permission as the string
   ``__no_permission_required__``, the default permission is ignored,
   and the view is registered *without* a permission (making it
   available to all callers regardless of their credentials).
@@ -460,7 +460,7 @@ parents left.
 In order to allow the security machinery to perform ACL inheritance, resource
 objects must provide *location-awareness*.  Providing *location-awareness*
 means two things: the root object in the resource tree must have a
-``_name__`` attribute and a ``__parent__`` attribute.
+``__name__`` attribute and a ``__parent__`` attribute.
 
 .. code-block:: python
    :linenos:

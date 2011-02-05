@@ -163,6 +163,7 @@ others' technology.
    single: Duncan, Casey
    single: Orr, Mike
    single: Shipman, John
+   single: Beelby, Chris
 
 Thanks
 ======
@@ -176,9 +177,9 @@ software.  Without the help of these folks, neither this book nor the
 software which it details would exist: Paul Everitt, Tres Seaver, Andrew
 Sawyers, Malthe Borch, Carlos de la Guardia, Chris Rossi, Shane Hathaway,
 Daniel Holth, Wichert Akkerman, Georg Brandl, Blaise Laflamme, Ben Bangert,
-Casey Duncan, Hugues Laflamme, Mike Orr, John Shipman, Simon Oram, Nat
-Hardwick, Ian Bicking, Jim Fulton, Tom Moroz of the Open Society Institute,
-and Todd Koym of Environmental Health Sciences.
+Casey Duncan, Hugues Laflamme, Mike Orr, John Shipman, Chris Beelby, Simon
+Oram, Nat Hardwick, Ian Bicking, Jim Fulton, Tom Moroz of the Open Society
+Institute, and Todd Koym of Environmental Health Sciences.
 
 Thanks to Guido van Rossum and Tim Peters for Python.
 

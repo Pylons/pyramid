@@ -94,7 +94,7 @@ Defining a View Callable as a Class
 A view callable may also be represented by a Python class instead of a
 function.  When a view callable is a class, the calling semantics are
 slightly different than when it is a function or another non-class callable.
-When a view callable is a class, the class' ``__init__`` is called with a
+When a view callable is a class, the class' ``__init__`` method is called with a
 ``request`` parameter.  As a result, an instance of the class is created.
 Subsequently, that instance's ``__call__`` method is invoked with no
 parameters.  Views defined as classes must have the following traits:
@@ -122,13 +122,12 @@ The request object passed to ``__init__`` is the same type of request object
 described in :ref:`function_as_view`.
 
 If you'd like to use a different attribute than ``__call__`` to represent the
-method expected to return a response, you can either:
-
-- use an ``attr`` value as part of the configuration for the view.  See
-  :ref:`view_configuration_parameters`.  The same view callable class can be
-  used in different view configuration statements with different ``attr``
-  values, each pointing at a different method of the class if you'd like the
-  class to represent a collection of related view callables.
+method expected to return a response, you can use an ``attr`` value as part 
+of the configuration for the view.  See :ref:`view_configuration_parameters`.
+The same view callable class can be used in different view configuration 
+statements with different ``attr`` values, each pointing at a different 
+method of the class if you'd like the class to represent a collection of 
+related view callables.
 
 .. note:: A package named :term:`pyramid_handlers` (available from PyPI)
    provides an analogue of :term:`Pylons` -style "controllers", which are a
@@ -174,7 +173,7 @@ The following types work as view callables in this style:
 		  return Response('OK')
 
 #. Classes that have an ``__init__`` method that accepts ``context,
-   request`` and a ``__call__`` which accepts no arguments, e.g.:
+   request`` and a ``__call__`` method which accepts no arguments, e.g.:
 
    .. code-block:: python
 	  :linenos:
@@ -218,7 +217,7 @@ access to the context via ``request.context``.
 View Callable Responses
 -----------------------
 
-A view callable may always return an object that implements the :app:`Pyramid`
+A view callable may return an object that implements the :app:`Pyramid`
 :term:`Response` interface.  The easiest way to return something that
 implements the :term:`Response` interface is to return a
 :class:`pyramid.response.Response` object instance directly.  For example:
@@ -253,7 +252,7 @@ app_iter
   world!</body></html>']`` or it can be a file-like object, or any
   other sort of iterable.
 
-These attributes form the notional "Pyramid Response interface".
+These attributes form the structure of the "Pyramid Response interface".
 
 .. index::
    single: view http redirect
@@ -370,7 +369,7 @@ raises a ``hellworld.exceptions.ValidationFailure`` exception:
 
 Assuming that a :term:`scan` was run to pick up this view registration, this
 view callable will be invoked whenever a
-``helloworld.exceptions.ValidationError`` is raised by your application's
+``helloworld.exceptions.ValidationFailure`` is raised by your application's
 view code.  The same exception raised by a custom root factory or a custom
 traverser is also caught and hooked.
 

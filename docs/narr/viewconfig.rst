@@ -155,7 +155,7 @@ Non-Predicate Arguments
 
   The ``renderer`` attribute is optional.  If it is not defined, the "null"
   renderer is assumed (no rendering is performed and the value is passed back
-  to the upstream :app:`Pyramid` machinery unmolested).  Note that if the
+  to the upstream :app:`Pyramid` machinery unchanged).  Note that if the
   view callable itself returns a :term:`response` (see :ref:`the_response`),
   the specified renderer implementation is never called.
 
@@ -176,7 +176,7 @@ Non-Predicate Arguments
   If ``wrapper`` is not supplied, no wrapper view is used.
 
 ``decorator``
-  A :term:`dotted Python name` to function (or the function itself) which
+  A :term:`dotted Python name` to a function (or the function itself) which
   will be used to decorate the registered :term:`view callable`.  The
   decorator function will be called with the view callable as a single
   argument.  The view callable it is passed will accept ``(context,
@@ -242,7 +242,7 @@ configured view.
   *This is an advanced feature, not often used by "civilians"*.
 
 ``request_method``
-  This value can either be one of the strings ``GET``, ``POST``, ``PUT``,
+  This value can be one of the strings ``GET``, ``POST``, ``PUT``,
   ``DELETE``, or ``HEAD`` representing an HTTP ``REQUEST_METHOD``.  A view
   declaration with this argument ensures that the view will only be called
   when the request's ``method`` attribute (aka the ``REQUEST_METHOD`` of the
@@ -399,7 +399,7 @@ configuration stanza:
 .. code-block:: python
    :linenos:
 
-   config.add_view('.views.my_view', name='my_view', request_method='POST', 
+   config.add_view('mypackage.views.my_view', name='my_view', request_method='POST', 
                    context=MyResource, permission='read')
 
 All arguments to ``view_config`` may be omitted.  For example:
@@ -423,9 +423,9 @@ request method, request type, request param, route name, or containment.
 The mere existence of a ``@view_config`` decorator doesn't suffice to perform
 view configuration.  All that the decorator does is "annotate" the function
 with your configuration declarations, it doesn't process them. To make
-:app:`Pyramid` process your :class:`~pyramid.view.view_config` declarations,
-you *must* do use the ``scan`` method of a
-:class:`~pyramid.config.Configurator`:
+:app:`Pyramid` process your :class:`pyramid.view.view_config` declarations,
+you *must* use the ``scan`` method of a
+:class:`pyramid.config.Configurator`:
 
 .. code-block:: python
    :linenos:
