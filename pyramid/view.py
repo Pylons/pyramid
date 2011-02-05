@@ -271,8 +271,7 @@ class AppendSlashNotFoundViewFactory(object):
        from pyramid.view import AppendSlashNotFoundViewFactory
        from pyramid.httpexceptions import HTTPNotFound
 
-       def notfound_view(context, request):
-           return HTTPNotFound('It aint there, stop trying!')
+       def notfound_view(context, request): return HTTPNotFound('nope')
 
        custom_append_slash = AppendSlashNotFoundViewFactory(notfound_view)
        config.add_view(custom_append_slash, context=NotFound)
