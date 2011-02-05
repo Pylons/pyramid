@@ -79,7 +79,7 @@ If the :term:`view callable` associated with a :term:`view configuration`
 returns a Response object directly (an object with the attributes ``status``,
 ``headerlist`` and ``app_iter``), any renderer associated with the view
 configuration is ignored, and the response is passed back to :app:`Pyramid`
-unmolested.  For example, if your view callable returns an instance of the
+unchanged.  For example, if your view callable returns an instance of the
 :class:`pyramid.httpexceptions.HTTPFound` class as a response, no renderer
 will be employed.
 
@@ -351,7 +351,7 @@ to influence associated response attributes.
   e.g. ``text/xml``.
 
 ``response_headerlist``
-  A sequence of tuples describing cookie values that should be set in the
+  A sequence of tuples describing header values that should be set in the
   response, e.g. ``[('Set-Cookie', 'abc=123'), ('X-My-Header', 'foo')]``.
 
 ``response_status``
@@ -499,8 +499,8 @@ At startup time, when a :term:`view configuration` is encountered, which
 has a ``name`` attribute that does not contain a dot, the full ``name``
 value is used to construct a renderer from the associated renderer
 factory.  In this case, the view configuration will create an instance
-of an ``AMFRenderer`` for each view configuration which includes ``amf``
-as its renderer value.  The ``name`` passed to the ``AMFRenderer``
+of an ``MyAMFRenderer`` for each view configuration which includes ``amf``
+as its renderer value.  The ``name`` passed to the ``MyAMFRenderer``
 constructor will always be ``amf``.
 
 Here's an example of the registration of a more complicated renderer
@@ -533,9 +533,9 @@ typically the filename extension.  This extension is used to look up a
 renderer factory for the configured view.  Then the value of
 ``renderer`` is passed to the factory to create a renderer for the view.
 In this case, the view configuration will create an instance of a
-``Jinja2Renderer`` for each view configuration which includes anything
+``MyJinja2Renderer`` for each view configuration which includes anything
 ending with ``.jinja2`` in its ``renderer`` value.  The ``name`` passed
-to the ``Jinja2Renderer`` constructor will be the full value that was
+to the ``MyJinja2Renderer`` constructor will be the full value that was
 set as ``renderer=`` in the view configuration.
 
 Changing an Existing Renderer

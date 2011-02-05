@@ -355,7 +355,7 @@ Here's what happens:
 - :mod:`traversal` traverses "foo", and attempts to find "bar", which it
   finds.
 
-- :mod:`traversal` traverses bar, and attempts to find "baz", which it does
+- :mod:`traversal` traverses "bar", and attempts to find "baz", which it does
   not find (the "bar" resource raises a :exc:`KeyError` when asked for
   "baz").
 
