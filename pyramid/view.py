@@ -269,6 +269,7 @@ class AppendSlashNotFoundViewFactory(object):
 
        from pyramid.exceptions import NotFound
        from pyramid.view import AppendSlashNotFoundViewFactory
+       from pyramid.httpexceptions import HTTPNotFound
 
        def notfound_view(context, request):
            return HTTPNotFound('It aint there, stop trying!')
