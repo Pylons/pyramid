@@ -20,7 +20,7 @@ well as to contain application configuration code.
 
 When you run the application using the ``paster`` command using the
 ``development.ini`` generated config file, the application configuration
-points at an Setuptools *entry point* described as ``egg:tutorial``.  In our
+points at a Setuptools *entry point* described as ``egg:tutorial``.  In our
 application, because the application's ``setup.py`` file says so, this entry
 point happens to be the ``main`` function within the file named
 ``__init__.py``:
@@ -181,7 +181,7 @@ composed of :term:`middleware`.
 
 The ``egg:WebError#evalerror`` middleware is at the "top" of the pipeline.
 This is middleware which displays debuggable errors in the browser while
-you're developing (not recommended for deployment).
+you're developing (not recommended for a production system).
 
 The ``egg:repoze.zodbconn#closer`` middleware is in the middle of the
 pipeline.  This is a piece of middleware which closes the ZODB connection
