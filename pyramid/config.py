@@ -1128,11 +1128,11 @@ class Configurator(object):
 
         containment
 
-          This value should be a Python class or :term:`interface` or
-          a :term:`dotted Python name` to such an object that a parent
-          object in the :term:`lineage` must provide in order for this
-          view to be found and called.  The nodes in your object graph
-          must be "location-aware" to use this feature.  See
+          This value should be a Python class or :term:`interface` (or a
+          :term:`dotted Python name`) that an object in the
+          :term:`lineage` of the context must provide in order for this view
+          to be found and called.  The nodes in your object graph must be
+          "location-aware" to use this feature.  See
           :ref:`location_aware` for more information about
           location-awareness.
 
