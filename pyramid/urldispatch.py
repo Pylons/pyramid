@@ -109,8 +109,6 @@ def _compile_route(route):
         name = name[1:-1]
         if ':' in name:
             name, reg = name.split(':')
-            reg = reg.replace(r'\{', '{')
-            reg = reg.replace(r'\}', '}')
         else:
             reg = '[^/]+'
         gen.append('%%(%s)s' % name)
