@@ -1,3 +1,19 @@
+Next release
+============
+
+Bug Fixes
+---------
+
+- URL pattern markers used in URL dispatch are permitted to specify a custom
+  regex.  For example, the pattern ``/{foo:\d+}`` means to match ``/12345``
+  (foo==12345 in the match dictionary) but not ``/abc``.  However, custom
+  regexes in a pattern marker which used squiggly brackets did not work.  For
+  example, ``/{foo:\d{4}}`` would fail to match ``/1234`` and
+  ``/{foo:\d{1,2}}`` would fail to match ``/1`` or ``/11``.  One level of
+  inner squiggly brackets is now recognized so that the prior two patterns
+  given as examples now work.  See also
+  https://github.com/Pylons/pyramid/issues/#issue/123.
+
 1.0 (2011-01-30)
 ================
 

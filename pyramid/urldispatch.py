@@ -76,7 +76,13 @@ class RoutesMapper(object):
 # stolen from bobo and modified
 old_route_re = re.compile(r'(\:[a-zA-Z]\w*)')
 star_in_brackets = re.compile(r'\{[^\}]*\*\w*[^\}]*\}')
-route_re = re.compile(r'(\{[a-zA-Z][^\}]*\})')
+# The torturous nature of the regex named ``route_re`` below is due to the
+# fact that we need to support at least one level of "inner" squigglies
+# inside the expr of a {name:expr} pattern.  This regex used to be just
+# (\{[a-zA-Z][^\}]*\}) but that choked when supplied with e.g. {foo:\d{4}}.
+# Thanks to Zart for the regex help.
+route_re = re.compile(r'(\{[a-zA-Z](?:\{[^\}]*\}|[^\{\}]*)*\})')
+
 def update_pattern(matchobj):
     name = matchobj.group(0)
     return '{%s}' % name[1:]
@@ -103,6 +109,8 @@ def _compile_route(route):
         name = name[1:-1]
         if ':' in name:
             name, reg = name.split(':')
+            reg = reg.replace(r'\{', '{')
+            reg = reg.replace(r'\}', '}')
         else:
             reg = '[^/]+'
         gen.append('%%(%s)s' % name)
