@@ -14,6 +14,15 @@ Bug Fixes
   given as examples now work.  See also
   https://github.com/Pylons/pyramid/issues/#issue/123.
 
+Features
+--------
+
+- Integers and longs passed as ``elements`` to ``pyramid.url.resource_url``
+  or ``pyramid.request.Request.resource_url`` e.g. ``resource_url(context,
+  request, 1, 2)`` (``1`` and ``2`` are the ``elements``) will now be
+  converted implicitly to strings in the result.  Previously passing integers
+  or longs as elements would cause a TypeError.
+
 1.0 (2011-01-30)
 ================
 

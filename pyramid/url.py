@@ -213,10 +213,12 @@ def resource_url(resource, request, *elements, **kw):
                                    http://example.com/a.html#abc
 
     Any positional arguments passed in as ``elements`` must be strings
-    or Unicode objects.  These will be joined by slashes and appended
-    to the generated resource URL.  Each of the elements passed in is
-    URL-quoted before being appended; if any element is Unicode, it
-    will converted to a UTF-8 bytestring before being URL-quoted.
+    Unicode objects, or integer objects.  These will be joined by slashes and
+    appended to the generated resource URL.  Each of the elements passed in
+    is URL-quoted before being appended; if any element is Unicode, it will
+    converted to a UTF-8 bytestring before being URL-quoted. If any element
+    is an integer, it will be converted to its string representation before
+    being URL-quoted.
 
     .. warning:: if no ``elements`` arguments are specified, the resource
                  URL will end with a trailing slash.  If any

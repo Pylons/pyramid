@@ -542,7 +542,7 @@ def quote_path_segment(segment):
         if segment.__class__ is unicode: # isinstance slighly slower (~15%)
             result = url_quote(segment.encode('utf-8'))
         else:
-            result = url_quote(segment)
+            result = url_quote(str(segment))
         # we don't need a lock to mutate _segment_cache, as the below
         # will generate exactly one Python bytecode (STORE_SUBSCR)
         _segment_cache[segment] = result
