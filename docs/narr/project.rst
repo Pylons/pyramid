@@ -150,9 +150,9 @@ your application, or install your application for deployment or development.
 
 A :term:`PasteDeploy` ``.ini`` file named ``development.ini`` will be created
 in the project directory.  You will use this ``.ini`` file to configure a
-server, to run your application, and to and debug your application.  It
-sports configuration that enables an interactive debugger and settings
-optimized for development.
+server, to run your application, and to debug your application.  It sports
+configuration that enables an interactive debugger and settings optimized for
+development.
 
 Another :term:`PasteDeploy` ``.ini`` file named ``production.ini`` will also
 be created in the project directory.  It sports configuration that disables
