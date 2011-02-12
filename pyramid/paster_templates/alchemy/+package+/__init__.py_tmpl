@@ -11,7 +11,7 @@ def main(global_config, **settings):
     config = Configurator(settings=settings, root_factory=get_root)
     config.add_static_view('static', '{{package}}:static')
     config.add_view('{{package}}.views.view_root', 
-                    context='{{package}}.models.MyApp', 
+                    context='{{package}}.models.MyRoot', 
                     renderer="templates/root.pt")
     config.add_view('{{package}}.views.view_model',
                     context='{{package}}.models.MyModel',

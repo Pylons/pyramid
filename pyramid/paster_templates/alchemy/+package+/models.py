@@ -6,9 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm.exc import NoResultFound
 
-from sqlalchemy import create_engine
 from sqlalchemy import Integer
 from sqlalchemy import Unicode
 from sqlalchemy import Column
@@ -28,7 +26,7 @@ class MyModel(Base):
         self.name = name
         self.value = value
 
-class MyApp(object):
+class MyRoot(object):
     __name__ = None
     __parent__ = None
 
@@ -39,15 +37,13 @@ class MyApp(object):
         except (ValueError, TypeError):
             raise KeyError(key)
 
-        query = session.query(MyModel).filter_by(id=id)
-
-        try:
-            item = query.one()
-            item.__parent__ = self
-            item.__name__ = key
-            return item
-        except NoResultFound:
+        item = session.query(MyModel).get(id)
+        if item is None:
             raise KeyError(key)
+
+        item.__parent__ = self
+        item.__name__ = key
+        return item
 
     def get(self, key, default=None):
         try:
@@ -61,9 +57,9 @@ class MyApp(object):
         query = session.query(MyModel)
         return iter(query)
 
-root = MyApp()
+root = MyRoot()
 
-def default_get_root(request):
+def root_factory(request):
     return root
 
 def populate():
@@ -81,7 +77,8 @@ def initialize_sql(engine):
         populate()
     except IntegrityError:
         DBSession.rollback()
+    return DBSession
 
 def appmaker(engine):
     initialize_sql(engine)
-    return default_get_root
+    return root_factory
