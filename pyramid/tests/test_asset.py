@@ -40,7 +40,7 @@ class TestOverrideProvider(unittest.TestCase):
         here = os.path.dirname(os.path.abspath(__file__))
         expected = open(os.path.join(here, resource_name)).read()
         result = provider.get_resource_stream(None, resource_name)
-        self.assertEqual(result.read(), expected)
+        self.assertEqual(result.read().replace('\r', ''), expected)
 
     def test_get_resource_string_no_overrides(self):
         import os
@@ -50,7 +50,7 @@ class TestOverrideProvider(unittest.TestCase):
         here = os.path.dirname(os.path.abspath(__file__))
         expected = open(os.path.join(here, resource_name)).read()
         result = provider.get_resource_string(None, resource_name)
-        self.assertEqual(result, expected)
+        self.assertEqual(result.replace('\r', ''), expected)
 
     def test_has_resource_no_overrides(self):
         resource_name = 'test_asset.py'
@@ -276,7 +276,7 @@ class TestPackageOverrides(unittest.TestCase):
         po.overrides= overrides
         here = os.path.dirname(os.path.abspath(__file__))
         expected = open(os.path.join(here, 'test_asset.py')).read()
-        self.assertEqual(po.get_stream('whatever').read(), expected)
+        self.assertEqual(po.get_stream('whatever').read().replace('\r', ''), expected)
         
     def test_get_string(self):
         import os
@@ -287,7 +287,7 @@ class TestPackageOverrides(unittest.TestCase):
         po.overrides= overrides
         here = os.path.dirname(os.path.abspath(__file__))
         expected = open(os.path.join(here, 'test_asset.py')).read()
-        self.assertEqual(po.get_string('whatever'), expected)
+        self.assertEqual(po.get_string('whatever').replace('\r', ''), expected)
         
     def test_has_resource(self):
         overrides = [ DummyOverride(None), DummyOverride(
@@ -434,7 +434,7 @@ class Test_asset_spec_from_abspath(unittest.TestCase):
 
     def test_abspath_startswith_package_path(self):
         import os
-        abspath = os.path.dirname(__file__) + '/fixtureapp'
+        abspath = os.path.join(os.path.dirname(__file__), 'fixtureapp')
         pkg = DummyPackage('pyramid.tests')
         pkg.__file__ = 'file'
         result = self._callFUT(abspath, pkg)
