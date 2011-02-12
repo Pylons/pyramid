@@ -145,6 +145,31 @@ def get_locale_name(request):
         request.locale_name = locale_name
     return locale_name
 
+def make_localizer(current_locale_name, registry):
+    translations = Translations()
+    translations._catalog = {}
+    tdirs = registry.queryUtility(ITranslationDirectories, default=[])
+    for tdir in tdirs:
+        locale_dirs = [ (lname, os.path.join(tdir, lname)) for lname in
+                        os.listdir(tdir) ]
+        for locale_name, locale_dir in locale_dirs:
+            if locale_name != current_locale_name:
+                continue
+            messages_dir = os.path.join(locale_dir, 'LC_MESSAGES')
+            if not os.path.isdir(os.path.realpath(messages_dir)):
+                continue
+            for mofile in os.listdir(messages_dir):
+                mopath = os.path.realpath(os.path.join(messages_dir,
+                                                       mofile))
+                if mofile.endswith('.mo') and os.path.isfile(mopath):
+                    mofp = open(mopath, 'rb')
+                    domain = mofile[:-3]
+                    dtrans = Translations(mofp, domain)
+                    translations.add(dtrans)
+
+    return Localizer(locale_name=current_locale_name,
+                          translations=translations)
+
 def get_localizer(request):
     """ Retrieve a :class:`pyramid.i18n.Localizer` object
     corresponding to the current request's locale name. """
@@ -162,29 +187,8 @@ def get_localizer(request):
 
     if localizer is None:
         # no localizer utility registered yet
-        translations = Translations()
-        translations._catalog = {}
-        tdirs = registry.queryUtility(ITranslationDirectories, default=[])
-        for tdir in tdirs:
-            locale_dirs = [ (lname, os.path.join(tdir, lname)) for lname in
-                            os.listdir(tdir) ]
-            for locale_name, locale_dir in locale_dirs:
-                if locale_name != current_locale_name:
-                    continue
-                messages_dir = os.path.join(locale_dir, 'LC_MESSAGES')
-                if not os.path.isdir(os.path.realpath(messages_dir)):
-                    continue
-                for mofile in os.listdir(messages_dir):
-                    mopath = os.path.realpath(os.path.join(messages_dir,
-                                                           mofile))
-                    if mofile.endswith('.mo') and os.path.isfile(mopath):
-                        mofp = open(mopath, 'rb')
-                        domain = mofile[:-3]
-                        dtrans = Translations(mofp, domain)
-                        translations.add(dtrans)
-
-        localizer = Localizer(locale_name=current_locale_name,
-                              translations=translations)
+        localizer = make_localizer(current_locale_name, registry)
+        
         registry.registerUtility(localizer, ILocalizer,
                                  name=current_locale_name)
         request.localizer = localizer
