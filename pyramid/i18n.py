@@ -145,11 +145,13 @@ def get_locale_name(request):
         request.locale_name = locale_name
     return locale_name
 
-def make_localizer(current_locale_name, registry):
+def make_localizer(current_locale_name, translation_directories):
+    """ Create a :class:`pyramid.i18n.Localizer` object
+    corresponding to the provided locale name from the 
+    translations found in the list of translation directories."""
     translations = Translations()
     translations._catalog = {}
-    tdirs = registry.queryUtility(ITranslationDirectories, default=[])
-    for tdir in tdirs:
+    for tdir in translation_directories:
         locale_dirs = [ (lname, os.path.join(tdir, lname)) for lname in
                         os.listdir(tdir) ]
         for locale_name, locale_dir in locale_dirs:
@@ -187,7 +189,8 @@ def get_localizer(request):
 
     if localizer is None:
         # no localizer utility registered yet
-        localizer = make_localizer(current_locale_name, registry)
+        tdirs = registry.queryUtility(ITranslationDirectories, default=[])
+        localizer = make_localizer(current_locale_name, tdirs)
         
         registry.registerUtility(localizer, ILocalizer,
                                  name=current_locale_name)
