@@ -137,6 +137,43 @@ class Test_get_locale_name(unittest.TestCase):
         self.assertEqual(result, 'bogus')
         self.assertEqual(request.locale_name, 'bogus')
 
+class Test_make_localizer(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, locale, tdirs):
+        from pyramid.i18n import make_localizer
+        return make_localizer(locale, tdirs)
+
+    def test_locale_from_mo(self):
+        import os
+        from pyramid.i18n import Localizer
+        here = os.path.dirname(__file__)
+        localedir = os.path.join(here, 'localeapp', 'locale')
+        localedirs = [localedir]
+        locale_name = 'de'
+        result = self._callFUT(locale_name, localedirs)
+        self.assertEqual(result.__class__, Localizer)
+        self.assertEqual(result.translate('Approve', 'deformsite'),
+                         'Genehmigen')
+        self.assertEqual(result.translate('Approve'), 'Approve')
+        self.failUnless(hasattr(result, 'pluralize'))
+
+    def test_locale_from_mo_bad_mo(self):
+        import os
+        from pyramid.i18n import Localizer
+        here = os.path.dirname(__file__)
+        localedir = os.path.join(here, 'localeapp', 'locale')
+        localedirs = [localedir]
+        locale_name = 'be'
+        result = self._callFUT(locale_name, localedirs)
+        self.assertEqual(result.__class__, Localizer)
+        self.assertEqual(result.translate('Approve', 'deformsite'),
+                         'Approve')
+
 class Test_get_localizer(unittest.TestCase):
     def setUp(self):
         cleanUp()

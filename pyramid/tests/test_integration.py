@@ -61,7 +61,7 @@ class TestStaticApp(unittest.TestCase):
         result = staticapp(context, request)
         self.assertEqual(result.status, '200 OK')
         self.assertEqual(
-            result.body,
+            result.body.replace('\r', ''),
             open(os.path.join(here, 'fixtures/minimal.pt'), 'r').read())
 
 class IntegrationBase(unittest.TestCase):

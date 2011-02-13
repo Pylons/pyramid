@@ -126,3 +126,5 @@ Contributors
 - John Shipman, 2011/01/15
 
 - Wichert Akkerman, 2011/01/19
+
+- Christopher Lambacehr, 2011/02/12
