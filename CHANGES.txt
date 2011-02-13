@@ -28,6 +28,9 @@ Features
 
 - ``pyramid_alchemy`` paster template now has unit tests.
 
+- Added ``pyramid.i18n.make_localizer`` API (broken out from
+  ``get_localizer`` guts).
+
 1.0 (2011-01-30)
 ================
 
