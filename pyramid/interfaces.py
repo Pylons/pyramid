@@ -293,8 +293,9 @@ class ITraverser(Interface):
 ITraverserFactory = ITraverser # b / c for 1.0 code
 
 class IRendererFactory(Interface):
-    def __call__(name):
-        """ Return an object that implements ``IRenderer``  """
+    def __call__(info):
+        """ Return an object that implements ``IRenderer``.  ``info`` is an
+        object that implement ``IRendererInfo``.  """
 
 class IRendererGlobalsFactory(Interface):
     def __call__(system_values):
