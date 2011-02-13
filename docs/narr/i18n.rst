@@ -508,6 +508,9 @@ negotiator is registered.
    def aview(request):
        locale = get_localizer(request)
 
+.. note:: If you need to create a localizer for a locale use the
+    :func:`pyramid.i18n.make_localizer` function.
+
 .. index::
    single: translating (i18n)
 
