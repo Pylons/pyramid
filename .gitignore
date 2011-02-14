@@ -6,6 +6,9 @@
 *.txt.py
 *~
 .coverage
+.tox/
+nosetests.xml
+pyramid/coverage.xml
 tutorial.db
 env26/
 env26-debug/
