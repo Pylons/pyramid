@@ -164,7 +164,7 @@ The ``edit_page`` view function
 The ``edit_page`` function will be invoked when a user clicks the
 "Edit this Page" button on the view form.  It renders an edit form but
 it also acts as the handler for the form it renders.  The
-``matchdict`` attribute of the request passed to the ``add_page`` view
+``matchdict`` attribute of the request passed to the ``edit_page`` view
 will have a ``pagename`` key matching the name of the page the user
 wants to edit.
 
