@@ -174,12 +174,11 @@ view simply renders the edit form, passing the request, the page
 object, and a save_url which will be used as the action of the
 generated form.
 
-If the view execution *is* a result of a form submission (if the
-expression ``'form.submitted' in request.params`` is ``True``), the
-view grabs the ``body`` element of the request parameter and sets it
-as the ``data`` key in the matchdict.  It then redirects to the
-default view of the wiki page, which will always be the ``view_page``
-view.
+If the view execution *is* a result of a form submission (if the expression
+``'form.submitted' in request.params`` is ``True``), the view grabs the
+``body`` element of the request parameter and sets it as the ``data``
+attribute of the page object.  It then redirects to the default view of the
+wiki page, which will always be the ``view_page`` view.
 
 Viewing the Result of Our Edits to ``views.py``
 ===============================================
