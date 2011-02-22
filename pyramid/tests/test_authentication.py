@@ -580,6 +580,21 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertTrue(result[1][1].endswith('; Path=/; Domain=localhost'))
         self.failUnless(result[1][1].startswith('auth_tkt='))
 
+    def test_remember_domain_has_port(self):
+        plugin = self._makeOne('secret', wild_domain=False)
+        request = self._makeRequest()
+        request.environ['HTTP_HOST'] = 'example.com:80'
+        result = plugin.remember(request, 'other')
+        self.assertEqual(len(result), 2)
+
+        self.assertEqual(result[0][0], 'Set-Cookie')
+        self.assertTrue(result[0][1].endswith('; Path=/'))
+        self.failUnless(result[0][1].startswith('auth_tkt='))
+
+        self.assertEqual(result[1][0], 'Set-Cookie')
+        self.assertTrue(result[1][1].endswith('; Path=/; Domain=example.com'))
+        self.failUnless(result[1][1].startswith('auth_tkt='))
+        
     def test_remember_string_userid(self):
         plugin = self._makeOne('secret')
         request = self._makeRequest()

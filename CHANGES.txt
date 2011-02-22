@@ -18,6 +18,12 @@ Features
 - Added ``pyramid.i18n.make_localizer`` API (broken out from
   ``get_localizer`` guts).
 
+Bug Fixes
+---------
+
+- Don't send port numbers along with domain information in cookies set by
+  AuthTktCookieHelper (see https://github.com/Pylons/pyramid/issues/131).
+
 1.0 (2011-01-30)
 ================
 

@@ -366,6 +366,18 @@ class AuthTktCookieHelper(object):
 
         cur_domain = environ.get('HTTP_HOST', environ.get('SERVER_NAME'))
 
+        # While Chrome, IE, and Firefox can cope, Opera (at least) cannot
+        # cope with a port number in the cookie domain when the URL it
+        # receives the cookie from does not also have that port number in it
+        # (e.g via a proxy).  In the meantime, HTTP_HOST is sent with port
+        # number, and neither Firefox nor Chrome do anything with the
+        # information when it's provided in a cookie domain except strip it
+        # out.  So we strip out any port number from the cookie domain
+        # aggressively to avoid problems.  See also
+        # https://github.com/Pylons/pyramid/issues/131
+        if ':' in cur_domain:
+            cur_domain = cur_domain.split(':', 1)[0]
+
         cookies = [
             ('Set-Cookie', '%s="%s"; Path=%s%s%s' % (
             self.cookie_name, value, self.path, max_age, self.static_flags)),
