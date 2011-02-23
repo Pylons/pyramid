@@ -23,12 +23,15 @@ class ViewWikiTests(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        
-    def test_it(self):
+
+    def _callFUT(self, request):
         from tutorial.views import view_wiki
-        self.config.add_route('view_page', '{pagename}')
+        return view_wiki(request)
+
+    def test_it(self):
+        _registerRoutes(self.config)
         request = testing.DummyRequest()
-        response = view_wiki(request)
+        response = self._callFUT(request)
         self.assertEqual(response.location, 'http://example.com/FrontPage')
 
 class ViewPageTests(unittest.TestCase):
