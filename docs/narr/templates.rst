@@ -698,10 +698,9 @@ has built-in bindings for the Mako templating system.  The language
 definition documentation for Mako templates is available from `the Mako
 website <http://www.makotemplates.org/>`_.
 
-To use a Mako template, given a :term:`Mako` ZPT template file named
-``foo.mak`` in the ``templates`` subdirectory in your application
-package named ``mypackage``, you can configure the template as a
-:term:`renderer` like so:
+To use a Mako template, given a :term:`Mako` template file named ``foo.mak``
+in the ``templates`` subdirectory in your application package named
+``mypackage``, you can configure the template as a :term:`renderer` like so:
 
 .. code-block:: python
    :linenos:
