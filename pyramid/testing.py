@@ -641,6 +641,7 @@ class DummyRequest(object):
     query_string = ''
     response_callbacks = ()
     charset = 'UTF-8'
+    script_name = ''
     def __init__(self, params=None, environ=None, headers=None, path='/',
                  cookies=None, post=None, **kw):
         if environ is None:

@@ -271,6 +271,17 @@ class TestRoutePath(unittest.TestCase):
                                _anchor=u"foo")
         self.assertEqual(result, '/1/2/3/extra1/extra2?a=1#foo')
 
+    def test_with_script_name(self):
+        from pyramid.interfaces import IRoutesMapper
+        request = _makeRequest()
+        request.script_name = '/foo'
+        mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = self._callFUT('flub', request, 'extra1', 'extra2',
+                               a=1, b=2, c=3, _query={'a':1},
+                               _anchor=u"foo")
+        self.assertEqual(result, '/foo/1/2/3/extra1/extra2?a=1#foo')
+        
 class TestStaticUrl(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -328,6 +339,7 @@ class DummyContext(object):
         
 class DummyRequest:
     application_url = 'http://example.com:5432' # app_url never ends with slash
+    script_name = ''
     def __init__(self, environ=None):
         if environ is None:
             environ = {}

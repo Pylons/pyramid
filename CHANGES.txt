@@ -24,6 +24,14 @@ Bug Fixes
 - Don't send port numbers along with domain information in cookies set by
   AuthTktCookieHelper (see https://github.com/Pylons/pyramid/issues/131).
 
+- ``pyramid.url.route_path`` (and the shortcut
+  ``pyramid.request.Request.route_url`` method) now include the WSGI
+  SCRIPT_NAME at the front of the path if it is not empty (see
+  https://github.com/Pylons/pyramid/issues/135).
+
+- ``pyramid.testing.DummyRequest`` now has a ``script_name`` attribute (the
+  empty string).
+
 1.0 (2011-01-30)
 ================
 

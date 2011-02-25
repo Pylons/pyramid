@@ -164,8 +164,8 @@ def route_path(route_name, request, *elements, **kw):
 
     This function accepts the same argument as :func:`pyramid.url.route_url`
     and performs the same duty.  It just omits the host, port, and scheme
-    information in the return value; only the path, query parameters,
-    and anchor data are present in the returned string.
+    information in the return value; only the script_name, path,
+    query parameters, and anchor data are present in the returned string.
 
     For example, if you've defined a route named 'foobar' with the path
     ``/{foo}/{bar}``, this call to ``route_path``::
@@ -175,12 +175,12 @@ def route_path(route_name, request, *elements, **kw):
     Will return the string ``/1/2``.
 
     .. note:: Calling ``route_path('route', request)`` is the same as calling
-       ``route_url('route', request, _app_url='')``.  ``route_path`` is, in
-       fact, implemented in terms of ``route_url`` in just this way. As a
-       result, any ``_app_url`` pass within the ``**kw`` values to
-       ``route_path`` will be ignored.
+       ``route_url('route', request, _app_url=request.script_name)``.
+       ``route_path`` is, in fact, implemented in terms of ``route_url``
+       in just this way. As a result, any ``_app_url`` passed within the
+       ``**kw`` values to ``route_path`` will be ignored.
     """
-    kw['_app_url'] = ''
+    kw['_app_url'] = request.script_name
     return route_url(route_name, request, *elements, **kw)
 
 def resource_url(resource, request, *elements, **kw):
