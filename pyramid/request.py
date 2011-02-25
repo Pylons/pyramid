@@ -273,8 +273,8 @@ class Request(WebobRequest):
         This method accepts the same arguments as
         :meth:`pyramid.request.Request.route_url` and performs the same duty.
         It just omits the host, port, and scheme information in the return
-        value; only the path, query parameters, and anchor data are present
-        in the returned string.
+        value; only the script name, path, query parameters, and anchor data
+        are present in the returned string.
 
         The :meth:`pyramid.request.Request.route_path` method calls the
         :func:`pyramid.url.route_path` function using the Request object as
@@ -294,6 +294,7 @@ class Request(WebobRequest):
           route_path('foobar', request)
 
         See :func:`pyramid.url.route_path` for more information
+
         """
         return route_path(route_name, self, *elements, **kw)
 
