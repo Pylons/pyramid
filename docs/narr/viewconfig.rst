@@ -258,7 +258,7 @@ configured view.
   variable) that has a name which matches the supplied value.
 
   If the value supplied has a ``=`` sign in it,
-  e.g. ``request_params="foo=123"``, then the key (``foo``) must both exist
+  e.g. ``request_param="foo=123"``, then the key (``foo``) must both exist
   in the ``request.params`` dictionary, *and* the value must match the right
   hand side of the expression (``123``) for the view to "match" the current
   request.
