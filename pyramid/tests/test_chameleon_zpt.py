@@ -54,7 +54,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         instance = self._makeOne(minimal, lookup)
         result = instance({}, {})
         self.failUnless(isinstance(result, unicode))
-        self.assertEqual(result,
+        self.assertEqual(result.rstrip('\n'),
                      '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
 
     @skip_on('java', 'pypy')
@@ -129,7 +129,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         instance = self._makeOne(minimal, lookup)
         result = instance.implementation()()
         self.failUnless(isinstance(result, unicode))
-        self.assertEqual(result,
+        self.assertEqual(result.rstrip('\n'),
                      '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
         
 
@@ -143,7 +143,7 @@ class RenderTemplateTests(Base, unittest.TestCase):
         minimal = self._getTemplatePath('minimal.pt')
         result = self._callFUT(minimal)
         self.failUnless(isinstance(result, unicode))
-        self.assertEqual(result,
+        self.assertEqual(result.rstrip('\n'),
                      '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
 
 class RenderTemplateToResponseTests(Base, unittest.TestCase):
@@ -157,8 +157,8 @@ class RenderTemplateToResponseTests(Base, unittest.TestCase):
         result = self._callFUT(minimal)
         from webob import Response
         self.failUnless(isinstance(result, Response))
-        self.assertEqual(result.app_iter,
-                     ['<div xmlns="http://www.w3.org/1999/xhtml">\n</div>'])
+        self.assertEqual(result.app_iter[0].rstrip('\n'),
+                     '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
         self.assertEqual(result.status, '200 OK')
         self.assertEqual(len(result.headerlist), 2)
 
