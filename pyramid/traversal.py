@@ -509,6 +509,7 @@ def traversal_path(path):
     return tuple(clean)
 
 _segment_cache = {}
+path_safe = ':@&+$,'
 
 def quote_path_segment(segment):
     """ Return a quoted representation of a 'path segment' (such as
@@ -540,9 +541,9 @@ def quote_path_segment(segment):
         return _segment_cache[segment]
     except KeyError:
         if segment.__class__ is unicode: # isinstance slighly slower (~15%)
-            result = url_quote(segment.encode('utf-8'))
+            result = url_quote(segment.encode('utf-8'), path_safe)
         else:
-            result = url_quote(str(segment))
+            result = url_quote(str(segment), path_safe)
         # we don't need a lock to mutate _segment_cache, as the below
         # will generate exactly one Python bytecode (STORE_SUBSCR)
         _segment_cache[segment] = result
