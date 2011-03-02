@@ -49,6 +49,14 @@ class ResourceURLTests(unittest.TestCase):
         self.assertEqual(result,
                      'http://example.com/context/La%20Pe%C3%B1a')
 
+    def test_at_sign_in_element_names(self):
+        request = _makeRequest()
+        self._registerContextURL(request.registry)
+        context = DummyContext()
+        result = self._callFUT(context, request, '@@myview')
+        self.assertEqual(result,
+                     'http://example.com/context/@@myview')
+
     def test_element_names_url_quoted(self):
         request = _makeRequest()
         self._registerContextURL(request.registry)
