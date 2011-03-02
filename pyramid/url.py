@@ -432,4 +432,4 @@ def current_route_url(request, *elements, **kw):
 
 @lru_cache(1000)
 def _join_elements(elements):
-    return '/'.join([quote_path_segment(s) for s in elements])
+    return '/'.join([quote_path_segment(s, safe=':@&+$,') for s in elements])

@@ -510,7 +510,7 @@ def traversal_path(path):
 
 _segment_cache = {}
 
-def quote_path_segment(segment):
+def quote_path_segment(segment, safe=''):
     """ Return a quoted representation of a 'path segment' (such as
     the string ``__name__`` attribute of a resource) as a string.  If the
     ``segment`` passed in is a unicode object, it is converted to a
@@ -520,6 +520,10 @@ def quote_path_segment(segment):
     passed in is not a string or unicode object, an error will be
     raised.  The return value of ``quote_path_segment`` is always a
     string, never Unicode.
+
+    You may pass a string of characters that need not be encoded as
+    the ``safe`` argument to this function.  This corresponds to the
+    ``safe`` argument to :mod:`urllib.quote`.
 
     .. note:: The return value for each segment passed to this
               function is cached in a module-scope dictionary for
@@ -537,15 +541,15 @@ def quote_path_segment(segment):
     # unicode value) as the key, so we can look it up later without
     # needing to reencode or re-url-quote it
     try:
-        return _segment_cache[segment]
+        return _segment_cache[(segment, safe)]
     except KeyError:
         if segment.__class__ is unicode: # isinstance slighly slower (~15%)
-            result = url_quote(segment.encode('utf-8'))
+            result = url_quote(segment.encode('utf-8'), safe)
         else:
-            result = url_quote(str(segment))
+            result = url_quote(str(segment), safe)
         # we don't need a lock to mutate _segment_cache, as the below
         # will generate exactly one Python bytecode (STORE_SUBSCR)
-        _segment_cache[segment] = result
+        _segment_cache[(segment, safe)] = result
         return result
 
 class ResourceTreeTraverser(object):
