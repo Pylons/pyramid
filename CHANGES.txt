@@ -32,6 +32,10 @@ Bug Fixes
 - ``pyramid.testing.DummyRequest`` now has a ``script_name`` attribute (the
   empty string).
 
+- Don't quote ``:@&+$,`` symbols in ``*elements`` passed to
+  ``pyramid.url.route_url`` or ``pyramid.url.resource_url`` (see
+  https://github.com/Pylons/pyramid/issues#issue/141).
+
 1.0 (2011-01-30)
 ================
 
