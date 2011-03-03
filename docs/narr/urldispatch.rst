@@ -430,7 +430,7 @@ For example:
 
    num_one_two_or_three = any_of('num', 'one', 'two', 'three')
 
-   config.add_route('num', '/{num}', 
+   config.add_route('route_to_num', '/{num}', 
                     custom_predicates=(num_one_two_or_three,))
 
 The above ``any_of`` function generates a predicate which ensures that the
@@ -461,7 +461,7 @@ instance, a predicate might do some type conversion of values:
 
     ymd_to_int = integers('year', 'month', 'day')
 
-    config.add_route('num', '/{year}/{month}/{day}', 
+    config.add_route('ymd', '/{year}/{month}/{day}', 
                      custom_predicates=(ymd_to_int,))
 
 Note that a conversion predicate is still a predicate so it must return
@@ -484,7 +484,7 @@ expressions specifying requirements for that marker. For instance:
 
     ymd_to_int = integers('year', 'month', 'day')
 
-    config.add_route('num', '/{year:\d+}/{month:\d+}/{day:\d+}', 
+    config.add_route('ymd', '/{year:\d+}/{month:\d+}/{day:\d+}', 
                      custom_predicates=(ymd_to_int,))
 
 Now the try/except is no longer needed because the route will not match at
