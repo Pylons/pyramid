@@ -26,6 +26,12 @@ Preparation, UNIX
    your system, obtain, install, or find `Python 2.6
    <http://www.python.org/download/releases/2.6.6/>`_ for your system.
 
+#. Make sure the Python development headers are installed on your system.  If
+   you've installed Python from source, these will already be installed.  If
+   you're using a system Python, you may have to install a ``python-dev``
+   package (e.g. ``apt-get python-dev``).  The headers are not required for
+   Pyramid itself, just for dependencies of the tutorial.
+
 #. Install the latest `setuptools` into the Python you
    obtained/installed/found in the step above: download `ez_setup.py
    <http://peak.telecommunity.com/dist/ez_setup.py>`_ and run it using
