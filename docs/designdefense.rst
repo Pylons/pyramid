@@ -1511,6 +1511,78 @@ comments take into account what we've discussed in the
        app = config.make_wsgi_app()  # explicitly WSGI
        serve(app, host='0.0.0.0')    # explicitly WSGI
 
+Pyramid Doesn't Offer Pluggable Apps
+------------------------------------
+
+It is "Pyramidic" to compose multiple external sources into the same
+configuration using :ref:`~pyramid.config.Configuration.include`.  Any number
+of includes can be done to compose an application; includes can even be done
+from within other includes.  Any directive can be used within an include that
+can be used outside of one (such as
+:ref:`~pyramid.config.Configurator.add_view`, etc).
+
+Pyramid has a conflict detection system that will throw an error if two 
+included externals try to add "the same" configuration in a conflicting 
+way (such as both externals trying to add a route using the same name, 
+or both externals trying to add a view with the same set of predicates). 
+It's awful tempting to call this set of features something that can be 
+used to compose a system out of "pluggable applications".  But in 
+reality, there are a number of problems with claiming this: 
+
+- The terminology is strained. Pyramid really has no notion of a 
+  plurality of "applications", just a way to compose configuration 
+  from multiple sources to create a single WSGI application.  That 
+  WSGI application may gain behavior by including or disincluding 
+  configuration, but once it's all composed together, Pyramid 
+  doesn't really provide any machinery which can be used to demarcate 
+  the boundaries of one "application" (in the sense of configuration 
+  from an external that adds routes, views, etc) from another. 
+
+- Pyramid doesn't provide enough "rails" to make it possible to 
+  integrate truly honest-to-god, download-an-app-from-a-random-place 
+  and-plug-it-in-to-create-a-system "pluggable" applications. 
+  Because Pyramid itself isn't opinionated (it doesn't mandate a 
+  particular kind of database, it offers multiple ways to map URLs 
+  to code, etc), it's unlikely that someone who creates something 
+  "application-like" will be able to casually redistribute it 
+  to J. Random Pyramid User and have it "just work" by asking him 
+  to config.include a function from the package. 
+  This is particularly true of very high level components such 
+  as blogs, wikis, twitter clones, commenting systems, etc. 
+  The "integrator" (the Pyramid developer who has downloaded a 
+  package advertised as a "pluggable app") will almost certainly 
+  have made different choices about e.g. what type of persistence 
+  system he's using, and for the integrator to appease the 
+  requirements of the "pluggable application", he may be required 
+  to set up a different database, make changes to his own code 
+  to prevent his application from "shadowing" the pluggable 
+  app (or vice versa), and any other number of arbitrary 
+  changes. 
+
+For this reason, we claim that Pyramid has "extensible" applications, 
+not pluggable applications.  Any Pyramid application can be extended 
+without forking it as long as its configuration statements have been 
+composed into things that can be pulled in via "config.include". 
+
+It's also perfectly reasonable for a single developer or team to create a set
+of interoperating components which can be enabled or disabled by using
+config.include.  That developer or team will be able to provide the "rails"
+(by way of making high-level choices about the technology used to create the
+project, so there won't be any issues with plugging all of the components
+together.  The problem only rears its head when the components need to be
+distributed to *arbitrary* users.  Note that Django has a similar problem
+with "pluggable applications" that need to work for arbitrary third parties,
+even though they provide many, many more rails than does Pyramid.  Even the
+rails they provide are not enough to make the "pluggable application" story
+really work without local modification.
+
+Truly pluggable applications need to be created at a much higher level than a
+web framework, as no web framework can offer enough constraints to really
+make them "work out of the box".  They really need to plug into an
+application, instead.  It would be a noble goal to build an application with
+Pyramid that provides these constraints and which truly does offer a way to
+plug in applications (Joomla, Plone, Drupal come to mind).
+
 Pyramid Has Zope Things In It, So It's Too Complex
 --------------------------------------------------
 
