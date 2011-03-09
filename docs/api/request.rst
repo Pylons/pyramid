@@ -125,3 +125,12 @@
 
    .. automethod:: static_url
 
+   .. attribute::  response_*
+
+      You can set attributes on a :class:`pyramid.request.Request` which will
+      influence the behavor of *rendered* responses (views which use a
+      :term:`renderer` and which don't directly return a response).  These
+      attributes begin with ``response_``, such as ``response_headerlist``. If
+      you need to influence response values from a view that uses a renderer
+      (such as the status code, a header, the content type, etc) see,
+      :ref:`response_request_attrs`.
