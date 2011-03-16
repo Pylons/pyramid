@@ -40,16 +40,10 @@ We'll modify our ``__init__.py``, passing in a :term:`root factory` to our
 inside our ``models.py`` file.  Add the following statements to your
 ``models.py`` file:
 
-.. code-block:: python
-
-   from pyramid.security import Allow
-   from pyramid.security import Everyone
-
-   class RootFactory(object):
-       __acl__ = [ (Allow, Everyone, 'view'), 
-                   (Allow, 'group:editors', 'edit') ]
-       def __init__(self, request):
-           pass
+.. literalinclude:: src/authorization/tutorial/models.py
+   :lines: 3-4,45-49
+   :linenos:
+   :language: python
 
 The ``RootFactory`` class we've just added will be used by
 :app:`Pyramid` to construct a ``context`` object.  The context is
@@ -84,15 +78,44 @@ For any :app:`Pyramid` application to perform authorization, we need to add a
 
 We'll change our ``__init__.py`` file to enable an
 ``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy`` to enable
-declarative security checking.  We'll also change ``__init__.py`` to add a
-:meth:`pyramid.config.Configurator.add_view` call to points at our
-``login`` :term:`view callable`, also known as a :term:`forbidden view`.
+declarative security checking.
+
+.. literalinclude:: src/authorization/tutorial/__init__.py
+   :lines: 15-21
+   :linenos:
+   :language: python
+
+Note that that the
+:class:`pyramid.authentication.AuthTktAuthenticationPolicy` constructor
+accepts two arguments: ``secret`` and ``callback``.  ``secret`` is a string
+representing an encryption key used by the "authentication ticket" machinery
+represented by this policy: it is required.  The ``callback`` is a string,
+representing a :term:`dotted Python name`, which points at the
+``groupfinder`` function in the current directory's ``security.py`` file.  We
+haven't added that module yet, but we're about to.
+
+We'll also change ``__init__.py`` to add a
+:meth:`pyramid.config.Configurator.add_view` call that points at our
+``login`` :term:`view callable`, also known as a :term:`forbidden view`:
+
+.. literalinclude:: src/authorization/tutorial/__init__.py
+   :lines: 24-26
+   :linenos:
+   :language: python
+
 This configures our newly created login view to show up when :app:`Pyramid`
-detects that a view invocation can not be authorized.  Also, we'll add
+detects that a view invocation can not be authorized.
+
+Also, we'll add
 ``view_permission`` arguments with the value ``edit`` to the ``edit_page``
 and ``add_page`` routes.  This indicates that the view callables which these
 routes reference cannot be invoked without the authenticated user possessing
 the ``edit`` permission with respect to the current context.
+
+.. literalinclude:: src/authorization/tutorial/__init__.py
+   :lines: 32-39
+   :linenos:
+   :language: python
 
 This makes the assertion that only users who possess the effective ``edit``
 permission at the time of the request may invoke those two views.  We've
@@ -110,16 +133,6 @@ and adding views, your application's ``__init__.py`` will look like this:
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :linenos:
    :language: python
-
-Note that that the
-:class:`pyramid.authentication.AuthTktAuthenticationPolicy` constructor
-accepts two arguments: ``secret`` and ``callback``.  ``secret`` is a string
-representing an encryption key used by the "authentication ticket" machinery
-represented by this policy: it is required.  The ``callback`` is a string,
-representing a :term:`dotted Python name`, which points at the
-``groupfinder`` function in the current directory's ``security.py`` file.  We
-haven't added that module yet, but we're about to.
-
 
 Adding ``security.py``
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -161,7 +174,7 @@ provide a link to it.  This view will clear the credentials of the
 logged in user and redirect back to the front page.
 
 We'll add a different file (for presentation convenience) to add login
-and logout view callables.  Add a file named ``login.py`` to your
+and the logout view callables.  Add a file named ``login.py`` to your
 application (in the same directory as ``views.py``) with the following
 content:
 
