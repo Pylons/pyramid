@@ -83,7 +83,14 @@ The ``view_wiki`` view function
 
 The ``view_wiki`` function will respond as the :term:`default view` of
 a ``Wiki`` model object.  It always redirects to a URL which
-represents the path to our "FrontPage".  It returns an instance of the
+represents the path to our "FrontPage".
+
+.. literalinclude:: src/views/tutorial/views.py
+   :pyobject: view_wiki
+   :linenos:
+   :language: python
+
+It returns an instance of the
 :class:`pyramid.httpexceptions.HTTPFound` class (instances of which
 implement the WebOb :term:`response` interface), It will use the
 :func:`pyramid.url.route_url` API to construct a URL to the
@@ -100,6 +107,11 @@ a ``Page`` object.  The ``view_page`` function renders the
 attribute of a Page object) as HTML.  Then it substitutes an HTML
 anchor for each *WikiWord* reference in the rendered HTML using a
 compiled regular expression.
+
+.. literalinclude:: src/views/tutorial/views.py
+   :pyobject: view_page
+   :linenos:
+   :language: python
 
 The curried function named ``check`` is used as the first argument to
 ``wikiwords.sub``, indicating that it should be called to provide a
@@ -133,6 +145,11 @@ this view.  It also acts as a handler for the form that is generated
 when we want to add a page object.  The ``matchdict`` attribute of the
 request passed to the ``add_page`` view will have the values we need
 to construct URLs and find model objects.
+
+.. literalinclude:: src/views/tutorial/views.py
+   :pyobject: add_page
+   :linenos:
+   :language: python
 
 The matchdict will have a ``pagename`` key that matches the name of
 the page we'd like to add.  If our add view is invoked via,
@@ -168,6 +185,11 @@ it also acts as the handler for the form it renders.  The
 will have a ``pagename`` key matching the name of the page the user
 wants to edit.
 
+.. literalinclude:: src/views/tutorial/views.py
+   :pyobject: edit_page
+   :linenos:
+   :language: python
+
 If the view execution is *not* a result of a form submission (if the
 expression ``'form.submitted' in request.params`` is ``False``), the
 view simply renders the edit form, passing the request, the page
@@ -180,8 +202,8 @@ If the view execution *is* a result of a form submission (if the expression
 attribute of the page object.  It then redirects to the default view of the
 wiki page, which will always be the ``view_page`` view.
 
-Viewing the Result of Our Edits to ``views.py``
-===============================================
+Viewing the Result of all Our Edits to ``views.py``
+===================================================
 
 The result of all of our edits to ``views.py`` will leave it looking
 like this:
