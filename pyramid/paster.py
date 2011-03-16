@@ -19,6 +19,10 @@ class PyramidTemplate(Template):
         vars['package_logger'] = package_logger
         return Template.pre(self, command, output_dir, vars)
 
+    def post(self, *arg, **kw):
+        print 'Welcome to Pyramid.  Sorry for the convenience.'
+        return Template.post(self, *arg, **kw)
+
 class StarterProjectTemplate(PyramidTemplate):
     _template_dir = 'paster_templates/starter'
     summary = 'pyramid starter project'
