@@ -618,7 +618,7 @@ class DummySession(dict):
         return self.get('_csrft_', None)
         
 class DummyRequest(object):
-    """ A dummy request object (imitates a :term:`request` object).
+    """ A DummyRequest object (incompletely) imitates a :term:`request` object.
 
     The ``params``, ``environ``, ``headers``, ``path``, and
     ``cookies`` arguments correspond to their :term`WebOb`
@@ -632,6 +632,17 @@ class DummyRequest(object):
     Extra keyword arguments are assigned as attributes of the request
     itself.
 
+    Note that DummyRequest does not have complete fidelity with a "real"
+    request.  For example, by default, the DummyRequest ``GET`` and ``POST``
+    attributes are of type ``dict``, unlike a normal Request's GET and POST,
+    which are of type ``MultiDict``. If your code uses the features of
+    MultiDict, you should either use a"real" :class:`pyramid.request.Request`
+    or adapt your DummyRequest by replacing the attributes with ``MultiDict``
+    instances.
+
+    Other similar incompatibilities exist.  If you need all the features of
+    a Request, use the :class:`pyramid.request.Request` class itself rather
+    than this class while writing tests.
     """
     implements(IRequest)
     method = 'GET'
