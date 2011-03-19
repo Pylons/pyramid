@@ -132,11 +132,10 @@ earlier version of this application runs the `repoze.org
   git clone git://github.com/Pylons/virginia.git
 
 `shootout <https://github.com/Pylons/shootout>`_ is an example "idea
-competition" application by Carlos de la Guardia.  It demonstrates a hybrid
-of :term:`URL dispatch` and :term:`traversal` and integration with
-`SQLAlchemy <http://www.sqlalchemy.org/>`_, :term:`repoze.who`, and
-`Deliverance <http://www.deliveranceproject.org/>`_.  Check this application
-out of version control via:
+competition" application by Carlos de la Guardia and Lukasz Fidosz.  It
+demonstrates :term:`URL dispatch`, simple authentication, integration
+with `SQLAlchemy <http://www.sqlalchemy.org/>`_ and ``pyramid_simpleform``.
+Check this application out of version control via:
 
 .. code-block:: text
 
