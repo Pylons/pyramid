@@ -37,28 +37,27 @@ SQLAlchemy models are easier to use than directly-mapped ones.
    :language: python
 
 As you can see, our ``Page`` class has a class level attribute
-``__tablename__`` which equals the string ``pages``. 
-This means that SQLAlchemy will store our wiki
-data in a SQL table named ``pages``.  Our Page class will also have
-class-level attributes named ``id``, ``pagename`` and ``data`` (all instances
-of :class:`sqlalchemy.Column`).  These will map to columns in the ``pages``
-table.  The ``id`` attribute will be the primary key in the table.  The
-``name`` attribute will be a text attribute, each value of which needs to be
-unique within the column.  The ``data`` attribute is a text attribute that
-will hold the body of each page.
+``__tablename__`` which equals the string ``pages``.  This means that
+SQLAlchemy will store our wiki data in a SQL table named ``pages``.  Our Page
+class will also have class-level attributes named ``id``, ``pagename`` and
+``data`` (all instances of :class:`sqlalchemy.Column`).  These will map to
+columns in the ``pages`` table.  The ``id`` attribute will be the primary key
+in the table.  The ``name`` attribute will be a text attribute, each value of
+which needs to be unique within the column.  The ``data`` attribute is a text
+attribute that will hold the body of each page.
 
-We'll also remove our ``populate`` function.  We'll inline the
-populate step into ``initialize_sql``, changing our ``initialize_sql``
-function to add a FrontPage object to our database at startup time.
+We'll also remove our ``populate`` function.  We'll inline the populate step
+into ``initialize_sql``, changing our ``initialize_sql`` function to add a
+FrontPage object to our database at startup time.
 
 .. literalinclude:: src/models/tutorial/models.py
    :pyobject: initialize_sql
    :linenos:
    :language: python
 
-Here, we're using a slightly different binding syntax.  It is
-otherwise largely the same as the ``initialize_sql`` in the
-paster-generated ``models.py``.
+Here, we're using a slightly different binding syntax.  It is otherwise
+largely the same as the ``initialize_sql`` in the paster-generated
+``models.py``.
 
 Our DBSession assignment stays the same as the original generated
 ``models.py``.
@@ -76,11 +75,10 @@ something like this:
 Viewing the Application in a Browser
 ------------------------------------
 
-We can't.  At this point, our system is in a "non-runnable" state;
-we'll need to change view-related files in the next chapter to be able
-to start the application successfully.  If you try to start the
-application, you'll wind up with a Python traceback on your console
-that ends with this exception:
+We can't.  At this point, our system is in a "non-runnable" state; we'll need
+to change view-related files in the next chapter to be able to start the
+application successfully.  If you try to start the application, you'll wind
+up with a Python traceback on your console that ends with this exception:
 
 .. code-block:: text
 
