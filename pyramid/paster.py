@@ -19,7 +19,7 @@ class PyramidTemplate(Template):
         vars['package_logger'] = package_logger
         return Template.pre(self, command, output_dir, vars)
 
-    def post(self, *arg, **kw):
+    def post(self, *arg, **kw): # pragma: no cover
         print 'Welcome to Pyramid.  Sorry for the convenience.'
         return Template.post(self, *arg, **kw)
 
