@@ -24,6 +24,7 @@ class BaseTest(object):
             'SERVER_NAME':'localhost',
             'SERVER_PORT':'8080',
             'REQUEST_METHOD':'GET',
+            'PATH_INFO':'/',
             }
         environ.update(extras)
         return environ
@@ -405,6 +406,14 @@ class Test_append_slash_notfound_view(BaseTest, unittest.TestCase):
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '302 Found')
         self.assertEqual(response.location, '/abc/')
+
+    def test_matches_with_script_name(self):
+        request = self._makeRequest(PATH_INFO='/abc', SCRIPT_NAME='/foo')
+        context = ExceptionResponse()
+        self._registerMapper(request.registry, True)
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '302 Found')
+        self.assertEqual(response.location, '/foo/abc/')
 
     def test_with_query_string(self):
         request = self._makeRequest(PATH_INFO='/abc', QUERY_STRING='a=1&b=2')

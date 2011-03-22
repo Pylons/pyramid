@@ -291,15 +291,16 @@ class AppendSlashNotFoundViewFactory(object):
             # backwards compat for an append_notslash_view registered via
             # config.set_notfound_view instead of as a proper exception view
             context = request.exception
-        path = request.environ.get('PATH_INFO', '/')
+        path = request.path
         registry = request.registry
         mapper = registry.queryUtility(IRoutesMapper)
         if mapper is not None and not path.endswith('/'):
             slashpath = path + '/'
             for route in mapper.get_routes():
                 if route.match(slashpath) is not None:
-                    if request.environ.get('QUERY_STRING'):
-                        slashpath += '?' + request.environ['QUERY_STRING']
+                    qs = request.query_string
+                    if qs:
+                        slashpath += '?' + qs
                     return HTTPFound(location=slashpath)
         return self.notfound_view(context, request)
 

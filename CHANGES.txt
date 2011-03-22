@@ -36,6 +36,10 @@ Bug Fixes
   ``pyramid.url.route_url`` or ``pyramid.url.resource_url`` (see
   https://github.com/Pylons/pyramid/issues#issue/141).
 
+- Include SCRIPT_NAME in redirects issued by
+  ``pyramid.view.append_slash_notfound_view`` (see
+  https://github.com/Pylons/pyramid/issues#issue/149).
+
 1.0 (2011-01-30)
 ================
 
