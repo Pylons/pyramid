@@ -1,5 +1,0 @@
-<configure xmlns="http://pylonshq.com/pyramid">
-
-  <include file="meta.zcml" />
-
-</configure>

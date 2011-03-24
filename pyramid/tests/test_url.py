@@ -49,6 +49,14 @@ class ResourceURLTests(unittest.TestCase):
         self.assertEqual(result,
                      'http://example.com/context/La%20Pe%C3%B1a')
 
+    def test_at_sign_in_element_names(self):
+        request = _makeRequest()
+        self._registerContextURL(request.registry)
+        context = DummyContext()
+        result = self._callFUT(context, request, '@@myview')
+        self.assertEqual(result,
+                     'http://example.com/context/@@myview')
+
     def test_element_names_url_quoted(self):
         request = _makeRequest()
         self._registerContextURL(request.registry)
@@ -209,6 +217,47 @@ class TestRouteUrl(unittest.TestCase):
         self.assertEqual(result,  'http://example2.com/1/2/3/a')
         self.assertEqual(route.kw, {}) # shouldnt have anchor/query
 
+class TestCurrentRouteUrl(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+        
+    def _callFUT(self, *arg, **kw):
+        from pyramid.url import current_route_url
+        return current_route_url(*arg, **kw)
+
+    def test_current_request_has_no_route(self):
+        request = _makeRequest()
+        self.assertRaises(ValueError, self._callFUT, request)
+
+    def test_with_elements_query_and_anchor(self):
+        from pyramid.interfaces import IRoutesMapper
+        request = _makeRequest()
+        route = DummyRoute('/1/2/3')
+        mapper = DummyRoutesMapper(route=route)
+        request.matched_route = route
+        request.matchdict = {}
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = self._callFUT(request, 'extra1', 'extra2', _query={'a':1},
+                               _anchor=u"foo")
+        self.assertEqual(result,
+                         'http://example.com:5432/1/2/3/extra1/extra2?a=1#foo')
+
+    def test_with__route_name(self):
+        from pyramid.interfaces import IRoutesMapper
+        request = _makeRequest()
+        route = DummyRoute('/1/2/3')
+        mapper = DummyRoutesMapper(route=route)
+        request.matched_route = route
+        request.matchdict = {}
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = self._callFUT(request, 'extra1', 'extra2', _query={'a':1},
+                               _anchor=u"foo", _route_name='bar')
+        self.assertEqual(result,
+                         'http://example.com:5432/1/2/3/extra1/extra2?a=1#foo')
+
 class TestRoutePath(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -230,6 +279,17 @@ class TestRoutePath(unittest.TestCase):
                                _anchor=u"foo")
         self.assertEqual(result, '/1/2/3/extra1/extra2?a=1#foo')
 
+    def test_with_script_name(self):
+        from pyramid.interfaces import IRoutesMapper
+        request = _makeRequest()
+        request.script_name = '/foo'
+        mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = self._callFUT('flub', request, 'extra1', 'extra2',
+                               a=1, b=2, c=3, _query={'a':1},
+                               _anchor=u"foo")
+        self.assertEqual(result, '/foo/1/2/3/extra1/extra2?a=1#foo')
+        
 class TestStaticUrl(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -287,6 +347,7 @@ class DummyContext(object):
         
 class DummyRequest:
     application_url = 'http://example.com:5432' # app_url never ends with slash
+    script_name = ''
     def __init__(self, environ=None):
         if environ is None:
             environ = {}
@@ -302,6 +363,7 @@ class DummyRoutesMapper:
 
 class DummyRoute:
     pregenerator = None
+    name = 'route'
     def __init__(self, result='/1/2/3'):
         self.result = result
 

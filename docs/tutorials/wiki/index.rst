@@ -1,7 +1,7 @@
 .. _bfg_wiki_tutorial:
 
-ZODB + Traversal Wiki Tutorial (For Developers Familiar with Zope)
-==================================================================
+ZODB + Traversal Wiki Tutorial
+==============================
 
 This tutorial introduces a :term:`traversal` -based :app:`Pyramid`
 application to a developer familiar with Python.  It will be most familiar to

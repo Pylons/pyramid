@@ -2,6 +2,8 @@
 
 import os
 
+from zope.deprecation import deprecated
+
 from repoze.lru import lru_cache
 
 from pyramid.interfaces import IContextURL
@@ -32,7 +34,7 @@ def route_url(route_name, request, *elements, **kw):
     enough arguments, for example).
 
     For example, if you've defined a route named "foobar" with the path
-    ``:foo/{bar}/*traverse``::
+    ``{foo}/{bar}/*traverse``::
 
         route_url('foobar', request, foo='1')          => <KeyError exception>
         route_url('foobar', request, foo='1', bar='2') => <KeyError exception>
@@ -53,7 +55,7 @@ def route_url(route_name, request, *elements, **kw):
     ``*remainder`` replacement value, it is tacked on to the URL
     untouched.
 
-    If a keyword argument ``_query`` is present, it will used to
+    If a keyword argument ``_query`` is present, it will be used to
     compose a query string that will be tacked on to the end of the
     URL.  The value of ``_query`` must be a sequence of two-tuples
     *or* a data structure with an ``.items()`` method that returns a
@@ -162,8 +164,8 @@ def route_path(route_name, request, *elements, **kw):
 
     This function accepts the same argument as :func:`pyramid.url.route_url`
     and performs the same duty.  It just omits the host, port, and scheme
-    information in the return value; only the path, query parameters,
-    and anchor data are present in the returned string.
+    information in the return value; only the script_name, path,
+    query parameters, and anchor data are present in the returned string.
 
     For example, if you've defined a route named 'foobar' with the path
     ``/{foo}/{bar}``, this call to ``route_path``::
@@ -173,12 +175,12 @@ def route_path(route_name, request, *elements, **kw):
     Will return the string ``/1/2``.
 
     .. note:: Calling ``route_path('route', request)`` is the same as calling
-       ``route_url('route', request, _app_url='')``.  ``route_path`` is, in
-       fact, implemented in terms of ``route_url`` in just this way. As a
-       result, any ``_app_url`` pass within the ``**kw`` values to
-       ``route_path`` will be ignored.
+       ``route_url('route', request, _app_url=request.script_name)``.
+       ``route_path`` is, in fact, implemented in terms of ``route_url``
+       in just this way. As a result, any ``_app_url`` passed within the
+       ``**kw`` values to ``route_path`` will be ignored.
     """
-    kw['_app_url'] = ''
+    kw['_app_url'] = request.script_name
     return route_url(route_name, request, *elements, **kw)
 
 def resource_url(resource, request, *elements, **kw):
@@ -211,23 +213,25 @@ def resource_url(resource, request, *elements, **kw):
                                    http://example.com/a.html#abc
 
     Any positional arguments passed in as ``elements`` must be strings
-    or Unicode objects.  These will be joined by slashes and appended
-    to the generated resource URL.  Each of the elements passed in is
-    URL-quoted before being appended; if any element is Unicode, it
-    will converted to a UTF-8 bytestring before being URL-quoted.
+    Unicode objects, or integer objects.  These will be joined by slashes and
+    appended to the generated resource URL.  Each of the elements passed in
+    is URL-quoted before being appended; if any element is Unicode, it will
+    converted to a UTF-8 bytestring before being URL-quoted. If any element
+    is an integer, it will be converted to its string representation before
+    being URL-quoted.
 
     .. warning:: if no ``elements`` arguments are specified, the resource
                  URL will end with a trailing slash.  If any
                  ``elements`` are used, the generated URL will *not*
                  end in trailing a slash.
 
-    If a keyword argument ``query`` is present, it will used to
+    If a keyword argument ``query`` is present, it will be used to
     compose a query string that will be tacked on to the end of the
     URL.  The value of ``query`` must be a sequence of two-tuples *or*
     a data structure with an ``.items()`` method that returns a
     sequence of two-tuples (presumably a dictionary).  This data
     structure will be turned into a query string per the documentation
-    of ``repoze.url.urlencode`` function.  After the query data is
+    of ``pyramid.url.urlencode`` function.  After the query data is
     turned into a query string, a leading ``?`` is prepended, and the
     resulting string is appended to the generated URL.
 
@@ -256,7 +260,8 @@ def resource_url(resource, request, *elements, **kw):
     e.g. ``http://example.com?foo=1#bar``.
 
     If the ``resource`` passed in has a ``__resource_url__`` method, it will
-    be used to generate the URL that is returned by this function.  See also
+    be used to generate the URL (scheme, host, port, path) that for the base
+    resource which is operated upon by this function.  See also
     :ref:`overriding_resource_url_generation`.
 
     .. note:: If the :term:`resource` used is the result of a
@@ -272,8 +277,9 @@ def resource_url(resource, request, *elements, **kw):
               virtual root prefix (it will be stripped off the
               left hand side of the generated URL).
 
-    .. note:: For backwards compatibility purposes, this function can also
-       be imported as ``model_url``.
+    .. note:: For backwards compatibility purposes, this function can also be
+       imported as ``model_url``, although doing so will emit a deprecation
+       warning.
     """
     try:
         reg = request.registry
@@ -306,13 +312,18 @@ def resource_url(resource, request, *elements, **kw):
 
 model_url = resource_url # b/w compat (forever)
 
+deprecated(
+    'model_url',
+    'pyramid.url.model_url is deprecated as of Pyramid 1.0.  Use'
+    '``pyramid.url.resource_url`` instead (API-compat, simple '
+    'rename).')
+
 def static_url(path, request, **kw):
     """
     Generates a fully qualified URL for a static :term:`asset`.
     The asset must live within a location defined via the
     :meth:`pyramid.config.Configurator.add_static_view`
-    :term:`configuration declaration` or the ``<static>`` ZCML
-    directive (see :ref:`static_assets_section`).
+    :term:`configuration declaration` (see :ref:`static_assets_section`).
 
     .. note:: Calling :meth:`pyramid.Request.static_url` can be used to
               achieve the same result as :func:`pyramid.url.static_url`.
@@ -365,6 +376,60 @@ def static_url(path, request, **kw):
         
     return info.generate(path, request, **kw)
 
+def current_route_url(request, *elements, **kw):
+    """Generates a fully qualified URL for a named :app:`Pyramid`
+    :term:`route configuration` based on the 'current route'.
+    
+    This function supplements :func:`pyramid.url.route_url`. It presents an
+    easy way to generate a URL for the 'current route' (defined as the route
+    which matched when the request was generated).
+
+    The arguments to this function have the same meaning as those with the
+    same names passed to :func:`pyramid.url.route_url`.  It also understands
+    an extra argument which ``route_url`` does not named ``_route_name``.
+
+    The route name used to generate a URL is taken from either the
+    ``_route_name`` keyword argument or the name of the route which is
+    currently associated with the request if ``_route_name`` was not passed.
+    Keys and values from the current request :term:`matchdict` are combined
+    with the ``kw`` arguments to form a set of defaults named ``newkw``.
+    Then ``route_url(route_name, request, *elements, **newkw)`` is called,
+    returning a URL.
+
+    Examples follow.
+
+    If the 'current route' has the route pattern ``/foo/{page}`` and the
+    current url path is ``/foo/1`` , the matchdict will be ``{'page':'1'}``.
+    The result of ``current_route_url(request)`` in this situation will be
+    ``/foo/1``.
+
+    If the 'current route' has the route pattern ``/foo/{page}`` and the
+    current current url path is ``/foo/1``, the matchdict will be
+    ``{'page':'1'}``.  The result of ``current_route_url(request, page='2')``
+    in this situation will be ``/foo/2``.
+        
+    Usage of the ``_route_name`` keyword argument: if our routing table
+    defines routes ``/foo/{action}`` named 'foo' and ``/foo/{action}/{page}``
+    named ``fooaction``, and the current url pattern is ``/foo/view`` (which
+    has matched the ``/foo/{action}`` route), we may want to use the
+    matchdict args to generate a URL to the ``fooaction`` route.  In this
+    scenario, ``current_url(request, _route_name='fooaction', page='5')``
+    Will return string like: ``/foo/view/5``.
+    """
+
+    if '_route_name' in kw:
+        route_name = kw.pop('_route_name')
+    else:
+        route = getattr(request, 'matched_route', None)
+        route_name = getattr(route, 'name', None)
+        if route_name is None:
+            raise ValueError('Current request matches no route')
+
+    newkw = {}
+    newkw.update(request.matchdict)
+    newkw.update(kw)
+    return route_url(route_name, request, *elements, **newkw)
+
 @lru_cache(1000)
 def _join_elements(elements):
-    return '/'.join([quote_path_segment(s) for s in elements])
+    return '/'.join([quote_path_segment(s, safe=':@&+$,') for s in elements])

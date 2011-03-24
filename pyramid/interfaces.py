@@ -120,6 +120,27 @@ class ITemplateRenderer(IRenderer):
         accepts arbitrary keyword arguments and returns a string or
         unicode object """
 
+class IViewMapper(Interface):
+    def __call__(self, object):
+        """ Provided with an arbitrary object (a function, class, or
+        instance), returns a callable with the call signature ``(context,
+        request)``.  The callable returned should itself return a Response
+        object.  An IViewMapper is returned by
+        :class:`pyramid.interfaces.IViewMapperFactory`."""
+
+class IViewMapperFactory(Interface):
+    def __call__(self, **kw):
+        """
+        Return an object which implements
+        :class:`pyramid.interfaces.IViewMapper`.  ``kw`` will be a dictionary
+        containing view-specific arguments, such as ``permission``,
+        ``predicates``, ``attr``, ``renderer``, and other items.  An
+        IViewMapperFactory is used by
+        :meth:`pyramid.config.Configurator.add_view` to provide a plugpoint
+        to extension developers who want to modify potential view callable
+        invocation signatures and response values.
+        """
+
 # internal interfaces
 
 class IRequest(Interface):
@@ -134,8 +155,19 @@ class IRouteRequest(Interface):
 class IAuthenticationPolicy(Interface):
     """ An object representing a Pyramid authentication policy. """
     def authenticated_userid(request):
-        """ Return the authenticated userid or ``None`` if no
-        authenticated userid can be found. """
+        """ Return the authenticated userid or ``None`` if no authenticated
+        userid can be found. This method of the policy should ensure that a
+        record exists in whatever persistent store is used related to the
+        user (the user should not have been deleted); if a record associated
+        with the current id does not exist in a persistent store, it should
+        return ``None``."""
+
+    def unauthenticated_userid(request):
+        """ Return the *unauthenticated* userid.  This method performs the
+        same duty as ``authenticated_userid`` but is permitted to return the
+        userid based only on data present in the request; it needn't (and
+        shouldn't) check any persistent store to ensure that the user record
+        related to the request userid exists."""
 
     def effective_principals(request):
         """ Return a sequence representing the effective principals
@@ -156,11 +188,18 @@ class IAuthenticationPolicy(Interface):
 class IAuthorizationPolicy(Interface):
     """ An object representing a Pyramid authorization policy. """
     def permits(context, principals, permission):
-        """ Return True if any of the principals is allowed the
-        permission in the current context, else return False """
+        """ Return ``True`` if any of the ``principals`` is allowed the
+        ``permission`` in the current ``context``, else return ``False``
+        """
         
     def principals_allowed_by_permission(context, permission):
-        """ Return a set of principal identifiers allowed by the permission """
+        """ Return a set of principal identifiers allowed by the
+        ``permission`` in ``context``.  This behavior is optional; if you
+        choose to not implement it you should define this method as
+        something which raises a ``NotImplementedError``.  This method
+        will only be called when the
+        ``pyramid.security.principals_allowed_by_permission`` API is
+        used."""
 
 class IStaticURLInfo(Interface):
     """ A policy for generating URLs to static assets """
@@ -254,8 +293,9 @@ class ITraverser(Interface):
 ITraverserFactory = ITraverser # b / c for 1.0 code
 
 class IRendererFactory(Interface):
-    def __call__(name):
-        """ Return an object that implements ``IRenderer``  """
+    def __call__(info):
+        """ Return an object that implements ``IRenderer``.  ``info`` is an
+        object that implement ``IRendererInfo``.  """
 
 class IRendererGlobalsFactory(Interface):
     def __call__(system_values):
@@ -480,14 +520,17 @@ class ISession(Interface):
         :meth:`pyramid.interfaces.ISesssion.flash`
         """
 
-    def new_csrf_token(self):
+    def new_csrf_token():
         """ Create and set into the session a new, random cross-site request
         forgery protection token.  Return the token.  It will be a string."""
 
-    def get_csrf_token(self):
-        """ Get the CSRF token previously added to the session via
-        ``new_csrf_token``, and return the token.  If no CSRF token exists,
-        the value returned will be ``None``.
+    def get_csrf_token():
+        """ Return a random cross-site request forgery protection token.  It
+        will be a string.  If a token was previously added to the session via
+        ``new_csrf_token``, that token will be returned.  If no CSRF token
+        was previously set into the session, ``new_csrf_token`` will be
+        called, which will create and set a token, and this token will be
+        returned.
         """
 
     # mapping methods
@@ -576,6 +619,7 @@ class IRendererInfo(Interface):
     type = Attribute('The renderer type name')
     registry = Attribute('The "current" application registry when the '
                          'renderer was created')
-    settings = Attribute('The ISettings dictionary related to the current app')
+    settings = Attribute('The deployment settings dictionary related '
+                         'to the current application')
     
 

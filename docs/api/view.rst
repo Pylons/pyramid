@@ -18,6 +18,7 @@
 
   .. autoclass:: static
      :members:
+     :inherited-members:
 
   .. autofunction:: append_slash_notfound_view(context, request)
 

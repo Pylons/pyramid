@@ -24,7 +24,7 @@ class Request(WebobRequest):
     argument.
 
     The documentation below (save for the ``add_response_callback`` and
-    ''add_finished_callback`` methods, which are defined in this subclass
+    ``add_finished_callback`` methods, which are defined in this subclass
     itself, and the attributes ``context``, ``registry``, ``root``,
     ``subpath``, ``traversed``, ``view_name``, ``virtual_root`` , and
     ``virtual_root_path``, each of which is added to the request by the
@@ -164,7 +164,7 @@ class Request(WebobRequest):
         if factory is None:
             raise ConfigurationError(
                 'No session factory registered '
-                '(see the Session Objects chapter of the documentation)')
+                '(see the Sessions chapter of the Pyramid documentation)')
         return factory(self)
 
     def route_url(self, route_name, *elements, **kw):
@@ -232,8 +232,8 @@ class Request(WebobRequest):
         Generates a fully qualified URL for a static :term:`asset`.  The
         asset must live within a location defined via the
         :meth:`pyramid.config.Configurator.add_static_view`
-        :term:`configuration declaration` or the ``<static>`` ZCML directive
-        (see :ref:`static_assets_section`).
+        :term:`configuration declaration` directive (see
+        :ref:`static_assets_section`).
 
         This is a convenience method.  The result of calling
         :meth:`pyramid.request.Request.static_url` is the same as calling
@@ -273,8 +273,8 @@ class Request(WebobRequest):
         This method accepts the same arguments as
         :meth:`pyramid.request.Request.route_url` and performs the same duty.
         It just omits the host, port, and scheme information in the return
-        value; only the path, query parameters, and anchor data are present
-        in the returned string.
+        value; only the script name, path, query parameters, and anchor data
+        are present in the returned string.
 
         The :meth:`pyramid.request.Request.route_path` method calls the
         :func:`pyramid.url.route_path` function using the Request object as
@@ -294,6 +294,7 @@ class Request(WebobRequest):
           route_path('foobar', request)
 
         See :func:`pyramid.url.route_path` for more information
+
         """
         return route_path(route_name, self, *elements, **kw)
 

@@ -27,7 +27,6 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(settings['debug_routematch'], False)
         self.assertEqual(settings['reload_templates'], False)
         self.assertEqual(settings['reload_resources'], False)
-        self.assertEqual(settings['configure_zcml'], '')
 
     def test_reload_templates(self):
         settings = self._makeOne({})
@@ -209,17 +208,6 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result['debug_authorization'], True)
         self.assertEqual(result['debug_templates'], True)
 
-    def test_configure_zcml(self):
-        result = self._makeOne({})
-        self.assertEqual(result['configure_zcml'], '')
-        result = self._makeOne({'configure_zcml':'abc'})
-        self.assertEqual(result['configure_zcml'], 'abc')
-        result = self._makeOne({}, {'PYRAMID_CONFIGURE_ZCML':'abc'})
-        self.assertEqual(result['configure_zcml'], 'abc')
-        result = self._makeOne({'configure_zcml':'def'},
-                             {'PYRAMID_CONFIGURE_ZCML':'abc'})
-        self.assertEqual(result['configure_zcml'], 'abc')
-
     def test_default_locale_name(self):
         result = self._makeOne({})
         self.assertEqual(result['default_locale_name'], 'en')
@@ -255,7 +243,7 @@ class TestGetSettings(unittest.TestCase):
         return get_settings()
 
     def test_it_nosettings(self):
-        self.assertEqual(self._callFUT(), None)
+        self.assertEqual(self._callFUT()['reload_templates'], False)
 
     def test_it_withsettings(self):
         settings = {'a':1}

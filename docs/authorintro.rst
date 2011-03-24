@@ -54,7 +54,7 @@ technologies.
 Book Content
 ============
 
-This book is divided into four major parts:
+This book is divided into three major parts:
 
 :ref:`narrative_documentation`
 
@@ -78,12 +78,6 @@ This book is divided into four major parts:
   Comprehensive reference material for every public API exposed by
   :app:`Pyramid`.  The API documentation is organized
   alphabetically by module name.
-
-:ref:`zcml_reference`
-
-  Comprehensive reference material for every :term:`ZCML directive`
-  provided by :app:`Pyramid`.  The ZCML directive documentation is
-  organized alphabetically by directive name.
 
 .. index::
    single: repoze.zope2
@@ -163,6 +157,13 @@ others' technology.
    single: Holth, Daniel
    single: Hathaway, Shane
    single: Akkerman, Wichert
+   single: Laflamme, Blaise
+   single: Laflamme, Hugues
+   single: Bangert, Ben
+   single: Duncan, Casey
+   single: Orr, Mike
+   single: Shipman, John
+   single: Beelby, Chris
 
 Thanks
 ======
@@ -173,11 +174,11 @@ typewriter (a Royal), and my mother, who bought me my first computer
 
 Thanks to the following people for providing expertise, resources, and
 software.  Without the help of these folks, neither this book nor the
-software which it details would exist: Paul Everitt, Tres Seaver,
-Andrew Sawyers, Malthe Borch, Carlos de la Guardia, Chris Rossi, Shane
-Hathaway, Daniel Holth, Wichert Akkerman, Georg Brandl, Simon Oram and
-Nat Hardwick of Electrosoup, Ian Bicking of the Open Planning Project,
-Jim Fulton of Zope Corporation, Tom Moroz of the Open Society
+software which it details would exist: Paul Everitt, Tres Seaver, Andrew
+Sawyers, Malthe Borch, Carlos de la Guardia, Chris Rossi, Shane Hathaway,
+Daniel Holth, Wichert Akkerman, Georg Brandl, Blaise Laflamme, Ben Bangert,
+Casey Duncan, Hugues Laflamme, Mike Orr, John Shipman, Chris Beelby, Simon
+Oram, Nat Hardwick, Ian Bicking, Jim Fulton, Tom Moroz of the Open Society
 Institute, and Todd Koym of Environmental Health Sciences.
 
 Thanks to Guido van Rossum and Tim Peters for Python.

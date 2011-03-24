@@ -177,7 +177,9 @@ MODULE_ALTERNATIVES = '|'.join(MODULE_ALTERNATIVES)
 
 BFG_NS_RE = r'xmlns\s*?=\s*?[\'\"]http://namespaces\.repoze\.org/bfg[\'\"]'
 BFG_IN_ATTR = r'(repoze\.bfg)(%s)' % MODULE_ALTERNATIVES
+BFG_INCLUDE_IN_ATTR = r'repoze\.bfg\.includes'
 ATTR = re.compile(BFG_IN_ATTR, re.MULTILINE)
+INCLUDE_ATTR = re.compile(BFG_INCLUDE_IN_ATTR, re.MULTILINE)
 NS = re.compile(BFG_NS_RE, re.MULTILINE)
 
 def replace(match):
@@ -190,6 +192,7 @@ def fix_zcml(path):
                 absfile = os.path.join(root, file)
                 text = open(absfile, 'rb').read()
                 newt = NS.sub('xmlns="http://pylonshq.com/pyramid"', text)
+                newt = INCLUDE_ATTR.sub('pyramid_zcml', newt)
                 newt = ATTR.sub(replace, newt)
                 if text != newt:
                     newf = open(absfile, 'wb')

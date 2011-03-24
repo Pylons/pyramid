@@ -18,14 +18,7 @@ On Windows:
 
 .. code-block:: text
 
-   c:\bigfntut> ..\Scripts\python setup.py sdist
-
-.. warning:: If your project files are not checked in to a version
-   control repository (such as Subversion), the dist tarball will
-   *not* contain all the files it needs to.  In particular, it will
-   not contain non-Python-source files (such as templates and static
-   files).  To ensure that these are included, check your files into a
-   version control repository before running ``setup.py sdist``.
+   c:\pyramidtut> ..\Scripts\python setup.py sdist
 
 The output of such a command will be something like:
 

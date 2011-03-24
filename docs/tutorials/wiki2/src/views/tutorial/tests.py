@@ -1,6 +1,5 @@
 import unittest
 
-from pyramid.config import Configurator
 from pyramid import testing
 
 def _initTestingDB():
@@ -20,28 +19,29 @@ def _registerRoutes(config):
 
 class ViewWikiTests(unittest.TestCase):
     def setUp(self):
-        self.config = Configurator(autocommit=True)
-        self.config.begin()
+        self.config = testing.setUp()
 
     def tearDown(self):
-        self.config.end()
-        
-    def test_it(self):
+        testing.tearDown()
+
+    def _callFUT(self, request):
         from tutorial.views import view_wiki
-        self.config.add_route('view_page', '{pagename}')
+        return view_wiki(request)
+
+    def test_it(self):
+        _registerRoutes(self.config)
         request = testing.DummyRequest()
-        response = view_wiki(request)
+        response = self._callFUT(request)
         self.assertEqual(response.location, 'http://example.com/FrontPage')
 
 class ViewPageTests(unittest.TestCase):
     def setUp(self):
         self.session = _initTestingDB()
-        self.config = Configurator(autocommit=True)
-        self.config.begin()
+        self.config = testing.setUp()
 
     def tearDown(self):
         self.session.remove()
-        self.config.end()
+        testing.tearDown()
         
     def _callFUT(self, request):
         from tutorial.views import view_page
@@ -71,12 +71,12 @@ class ViewPageTests(unittest.TestCase):
 class AddPageTests(unittest.TestCase):
     def setUp(self):
         self.session = _initTestingDB()
-        self.config = Configurator(autocommit=True)
+        self.config = testing.setUp()
         self.config.begin()
 
     def tearDown(self):
         self.session.remove()
-        self.config.end()
+        testing.tearDown()
 
     def _callFUT(self, request):
         from tutorial.views import add_page
@@ -104,12 +104,11 @@ class AddPageTests(unittest.TestCase):
 class EditPageTests(unittest.TestCase):
     def setUp(self):
         self.session = _initTestingDB()
-        self.config = Configurator(autocommit=True)
-        self.config.begin()
+        self.config = testing.setUp()
 
     def tearDown(self):
         self.session.remove()
-        self.config.end()
+        testing.tearDown()
 
     def _callFUT(self, request):
         from tutorial.views import edit_page

@@ -1,7 +1,7 @@
 .. _bfg_sql_wiki_tutorial:
 
-SQLAlchemy + URL Dispatch Wiki Tutorial (For Developers Familiar with Pylons 1)
-===============================================================================
+SQLAlchemy + URL Dispatch Wiki Tutorial
+=======================================
 
 This tutorial introduces a :term:`SQLAlchemy` and :term:`url dispatch` -based
 :app:`Pyramid` application to a developer familiar with Python, and will be

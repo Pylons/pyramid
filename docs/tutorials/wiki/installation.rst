@@ -21,33 +21,39 @@ Preparation, UNIX
    your system, obtain, install, or find `Python 2.6
    <http://python.org/download/releases/2.6.6/>`_ for your system.
 
+#. Make sure the Python development headers are installed on your system.  If
+   you've installed Python from source, these will already be installed.  If
+   you're using a system Python, you may have to install a ``python-dev``
+   package (e.g. ``apt-get python-dev``).  The headers are not required for
+   Pyramid itself, just for dependencies of the tutorial.
+
 #. Install the latest `setuptools` into the Python you
    obtained/installed/found in the step above: download `ez_setup.py
    <http://peak.telecommunity.com/dist/ez_setup.py>`_ and run it using
    the ``python`` interpreter of your Python 2.6 installation:
 
-   .. code-block:: bash
+   .. code-block:: text
 
     $ /path/to/my/Python-2.6/bin/python ez_setup.py
 
 #. Use that Python's `bin/easy_install` to install `virtualenv`:
 
-   .. code-block:: bash
+   .. code-block:: text
 
     $ /path/to/my/Python-2.6/bin/easy_install virtualenv
 
 #. Use that Python's virtualenv to make a workspace:
 
-   .. code-block:: bash
+   .. code-block:: text
 
      $ path/to/my/Python-2.6/bin/virtualenv --no-site-packages \
-               bigfntut
+               pyramidtut
 
-#. Switch to the ``bigfntut`` directory:
+#. Switch to the ``pyramidtut`` directory:
 
-   .. code-block:: bash
+   .. code-block:: text
 
-     $ cd bigfntut
+     $ cd pyramidtut
 
 #. (Optional) Consider using ``source bin/activate`` to make your
    shell environment wired to use the virtualenv.
@@ -55,16 +61,16 @@ Preparation, UNIX
 #. Use ``easy_install`` to get :app:`Pyramid` and its direct
    dependencies installed:
 
-   .. code-block:: bash
+   .. code-block:: text
 
      $ bin/easy_install pyramid
 
-#. Use ``easy_install`` to install ``docutils``, ``repoze.tm``,
+#. Use ``easy_install`` to install ``docutils``, ``repoze.tm2``,
    ``repoze.zodbconn``, ``nose`` and ``coverage``:
 
-   .. code-block:: bash
+   .. code-block:: text
 
-     $ bin/easy_install docutils repoze.tm repoze.zodbconn \
+     $ bin/easy_install docutils repoze.tm2 repoze.zodbconn \
                nose coverage
 
 Preparation, Windows
@@ -79,27 +85,27 @@ Preparation, Windows
    the ``python`` interpreter of your Python 2.6 installation using a
    command prompt:
 
-   .. code-block:: bat
+   .. code-block:: text
 
     c:\> c:\Python26\python ez_setup.py
 
 #. Use that Python's `bin/easy_install` to install `virtualenv`:
 
-   .. code-block:: bat
+   .. code-block:: text
 
     c:\> c:\Python26\Scripts\easy_install virtualenv
 
 #. Use that Python's virtualenv to make a workspace:
 
-   .. code-block:: bat
+   .. code-block:: text
 
-     c:\> c:\Python26\Scripts\virtualenv --no-site-packages bigfntut
+     c:\> c:\Python26\Scripts\virtualenv --no-site-packages pyramidtut
 
-#. Switch to the ``bigfntut`` directory:
+#. Switch to the ``pyramidtut`` directory:
 
-   .. code-block:: bat
+   .. code-block:: text
 
-     c:\> cd bigfntut
+     c:\> cd pyramidtut
 
 #. (Optional) Consider using ``bin\activate.bat`` to make your shell
    environment wired to use the virtualenv.
@@ -107,16 +113,16 @@ Preparation, Windows
 #. Use ``easy_install`` to get :app:`Pyramid` and its direct
    dependencies installed:
 
-   .. code-block:: bat
+   .. code-block:: text
 
-     c:\bigfntut> Scripts\easy_install pyramid
+     c:\pyramidtut> Scripts\easy_install pyramid
 
-#. Use ``easy_install`` to install ``docutils``, ``repoze.tm``,
+#. Use ``easy_install`` to install ``docutils``, ``repoze.tm2``,
    ``repoze.zodbconn``, ``nose`` and ``coverage``:
 
-   .. code-block:: bat
+   .. code-block:: text
 
-     c:\bigfntut> Scripts\easy_install docutils repoze.tm \
+     c:\pyramidtut> Scripts\easy_install docutils repoze.tm2 \
            repoze.zodbconn nose coverage
 
 .. _making_a_project:
@@ -129,19 +135,19 @@ variety of templates to generate sample projects.  For this tutorial,
 we will use the :term:`ZODB` -oriented template named ``pyramid_zodb``.
 
 The below instructions assume your current working directory is the
-"virtualenv" named "bigfntut".
+"virtualenv" named "pyramidtut".
 
 On UNIX:
 
-.. code-block:: bash
+.. code-block:: text
 
   $ bin/paster create -t pyramid_zodb tutorial
 
 On Windows:
 
-.. code-block:: bat
+.. code-block:: text
 
-   c:\bigfntut> Scripts\paster create -t pyramid_zodb tutorial
+   c:\pyramidtut> Scripts\paster create -t pyramid_zodb tutorial
 
 .. note:: If you are using Windows, the ``pyramid_zodb`` Paster template
    doesn't currently deal gracefully with installation into a location
@@ -160,17 +166,17 @@ directory you created in :ref:`making_a_project`, and run the
 
 On UNIX:
 
-.. code-block:: bash
+.. code-block:: text
 
   $ cd tutorial
   $ ../bin/python setup.py develop
 
 On Windows:
 
-.. code-block:: bat
+.. code-block:: text
 
-  C:\bigfntut> cd tutorial
-  C:\bigfntut\tutorial> ..\Scripts\python setup.py develop
+  C:\pyramidtut> cd tutorial
+  C:\pyramidtut\tutorial> ..\Scripts\python setup.py develop
 
 .. _running_tests:
 
@@ -182,15 +188,15 @@ the tests for the project.
 
 On UNIX:
 
-.. code-block:: bash
+.. code-block:: text
 
   $ ../bin/python setup.py test -q
 
 On Windows:
 
-.. code-block:: bat
+.. code-block:: text
 
-  c:\bigfntut\tutorial> ..\Scripts\python setup.py test -q
+  c:\pyramidtut\tutorial> ..\Scripts\python setup.py test -q
 
 Starting the Application
 ========================
@@ -199,15 +205,15 @@ Start the application.
 
 On UNIX:
 
-.. code-block:: bash
+.. code-block:: text
 
   $ ../bin/paster serve development.ini --reload
 
 On Windows:
 
-.. code-block:: bat
+.. code-block:: text
 
-  c:\bifgfntut\tutorial> ..\Scripts\paster serve development.ini --reload
+  c:\pyramidtut\tutorial> ..\Scripts\paster serve development.ini --reload
 
 Exposing Test Coverage Information
 ==================================
@@ -220,15 +226,15 @@ tests.
 
 On UNIX:
 
-.. code-block:: bash
+.. code-block:: text
 
   $ ../bin/nosetests --cover-package=tutorial --cover-erase --with-coverage
 
 On Windows:
 
-.. code-block:: bat
+.. code-block:: text
 
-  c:\bigfntut\tutorial> ..\Scripts\nosetests --cover-package=tutorial \
+  c:\pyramidtut\tutorial> ..\Scripts\nosetests --cover-package=tutorial \
        --cover-erase --with-coverage
 
 Looks like the code in the ``pyramid_zodb`` template for ZODB projects is

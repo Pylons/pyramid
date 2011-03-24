@@ -295,7 +295,7 @@ Installing :app:`Pyramid` on a Windows System
 
       c:\> cd env
 
-#. (Optional) Consider using ``bin\activate.bat`` to make your shell
+#. (Optional) Consider using ``Scripts\activate.bat`` to make your shell
    environment wired to use the virtualenv.
 
 #. Use ``easy_install`` pointed at the "current" index to get

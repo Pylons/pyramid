@@ -9,23 +9,12 @@
 :app:`Pyramid` Introduction
 ==============================
 
-If they are judged only by differences in user interface, most web
-applications seem to have very little in common with each other. For
-example, a web page served by one web application might be a
-representation of the contents of an accounting ledger, while a web
-page served by another application might be a listing of songs.  These
-applications probably won't serve the same set of customers.  However,
-although they're not very similar on the surface, both a
-ledger-serving application and a song-serving application can be
-written using :app:`Pyramid`.
-
-:app:`Pyramid` is a very general open source Python web
-*framework*.  As a framework, its primary job is to make it easier for
-a developer to create an arbitrary web application.  The type of
-application being created isn't really important; it could be a
-spreadsheet, a corporate intranet, or an "oh-so-Web-2.0" social
-networking platform.  :app:`Pyramid` is general enough that it can
-be used in a wide variety of circumstances.
+:app:`Pyramid` is a general, open source, Python web application development
+*framework*. Its primary goal is to make it easier for a developer to create
+web applications. The type of application being created could be a
+spreadsheet, a corporate intranet, or a social networking platform; Pyramid's
+generality enables it to be used to build an unconstrained variety of web
+applications.
 
 .. sidebar:: Frameworks vs. Libraries
 
@@ -44,55 +33,45 @@ be used in a wide variety of circumstances.
    own via a set of libraries if the framework provides a set of
    facilities that fits your application requirements.
 
-The first release of the predecessor to :app:`Pyramid` (named
-:mod:`repoze.bfg`) was made in July of 2008.  Since its first release,
-we've tried to ensure that it maintains the following attributes:
+The first release of Pyramid's predecessor (named :mod:`repoze.bfg`) was made
+in July of 2008. We have worked hard to ensure that Pyramid continues to
+follow the design and engineering principles that we consider to be the core
+characteristics of a successful framework:
 
 Simplicity
-  :app:`Pyramid` attempts to be a *"pay only for what you eat"*
-  framework which delivers results even if you have only partial
-  knowledge.  Other frameworks may expect you to understand many
-  concepts and technologies fully before you can be truly productive.
-  :app:`Pyramid` doesn't force you to use any particular technology
-  to produce an application, and we try to keep the core set of
-  concepts you need to understand to a minimum.
-
-A Sense of Fun
-  Developing a :app:`Pyramid` application should not feel
-  "enterprisey".  We like to keep things down-to-earth.
+  :app:`Pyramid` takes a *"pay only for what you eat"* approach.  This means
+  that you can get results even if you have only a partial understanding of
+  :app:`Pyramid`.  It doesn’t force you to use any particular technology to
+  produce an application, and we try to keep the core set of concepts that
+  you need to understand to a minimum.
 
 Minimalism
-  :app:`Pyramid` provides only the very basics: *URL to code
-  mapping*, *templating*, *security*, and *resources*.  There is not
-  much more to the framework than these pieces: you are expected to
-  provide the rest.
+  :app:`Pyramid` concentrates on providing fast, high-quality solutions to
+  the fundamental problems of creating a web application: the mapping of URLs
+  to code, templating, security and serving static assets. We consider these
+  to be the core activities that are common to nearly all web applications.
 
 Documentation
-  Because :app:`Pyramid` is minimal, it's relatively easy to keep
-  its documentation up-to-date, which is helpful to bring new
-  developers up to speed.  It's our goal that nothing remain
-  undocumented about :app:`Pyramid`.
+  Pyramid's minimalism means that it is relatively easy for us to maintain
+  extensive and up-to-date documentation. It is our goal that no aspect of
+  Pyramid remains undocumented.
 
 Speed
-  :app:`Pyramid` is faster than many other popular Python web
-  frameworks for common tasks such as templating and simple response
-  generation.  The "hardware is cheap" mantra has its limits when
-  you're responsible for managing a great many machines: the fewer you
-  need, the less pain you'll have.
+  :app:`Pyramid` is designed to provide noticeably fast execution for common
+  tasks such as templating and simple response generation. Although the
+  “hardware is cheap” mantra may appear to offer a ready solution to speed
+  problems, the limits of this approach become painfully evident when one
+  finds him or herself responsible for managing a great many machines.
 
-Familiarity
-  The :app:`Pyramid` framework is a canonization of practices that
-  "fit the brains" of its authors.
-
-Trustability
-  :app:`Pyramid` is developed conservatively and tested
-  exhaustively.  *If it ain't tested, it's broke.* Every release of
-  :app:`Pyramid` has 100% statement coverage via unit tests.
+Reliability
+  :app:`Pyramid` is developed conservatively and tested exhaustively. Where
+  Pyramid source code is concerned, our motto is: "If it ain’t tested, it’s
+  broke". Every release of Pyramid has 100% statement coverage via unit
+  tests.
 
 Openness
-  Like :term:`Python`, the :app:`Pyramid` software is distributed
-  under a `permissive open source license
-  <http://repoze.org/license.html>`_.
+  As with Python, the Pyramid software is distributed under a `permissive
+  open source license <http://repoze.org/license.html>`_.
 
 .. index::
    single: Pylons
@@ -104,7 +83,7 @@ What Is The Pylons Project?
 
 :app:`Pyramid` is a member of the collection of software published under the
 Pylons Project.  Pylons software is written by a loose-knit community of
-contributors.  The `Pylons Project website <http://docs.pylonshq.com>`_
+contributors.  The `Pylons Project website <http://docs.pylonsproject.org>`_
 includes details about how :app:`Pyramid` relates to the Pylons Project.
 
 .. index::

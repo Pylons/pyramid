@@ -176,6 +176,10 @@ Here's how to convert a :mod:`repoze.bfg` application to a
          <bfg:failingtag attr="foo"/>
      </configure>
 
+   You will also need to add the ``pyramid_zcml`` package to your
+   ``setup.py`` ``install_requires`` list.  In Pyramid, ZCML configuration
+   became an optional add-on supported by the ``pyramid_zcml`` package.
+
 #. Retest your application using :app:`Pyramid`.  This might be as
    easy as:
 

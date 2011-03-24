@@ -2,10 +2,9 @@
 Installation
 ============
 
-For the most part, the installation process for this tutorial
-duplicates the steps described in :ref:`installing_chapter` and
-:ref:`project_narr`, however it also explains how to install
-additional libraries for tutorial purposes.
+This tutorial assumes that Python and virtualenv are already installed
+and working in your system. If you need help setting this up, you should
+refer to the chapters on :ref:`installing_chapter`.
 
 Preparation
 ===========
@@ -22,39 +21,17 @@ Preparation, UNIX
    manager.  For example, on a Debian Linux system, do ``sudo apt-get
    install libsqlite3-dev``.
 
-#. If you don't already have a Python 2.6 interpreter installed on
-   your system, obtain, install, or find `Python 2.6
-   <http://www.python.org/download/releases/2.6.6/>`_ for your system.
-
-#. Install the latest `setuptools` into the Python you
-   obtained/installed/found in the step above: download `ez_setup.py
-   <http://peak.telecommunity.com/dist/ez_setup.py>`_ and run it using
-   the ``python`` interpreter of your Python 2.6 installation:
+#. Use your Python's virtualenv to make a workspace:
 
    .. code-block:: text
 
-      $ /path/to/my/Python-2.6/bin/python ez_setup.py
+      $ path/to/my/Python-2.6/bin/virtualenv --no-site-packages pyramidtut
 
-#. Use that Python's `bin/easy_install` to install `virtualenv`:
-
-   .. code-block:: text
-
-      $ /path/to/my/Python-2.6/bin/easy_install virtualenv
-
-#. Use that Python's virtualenv to make a workspace:
+#. Switch to the ``pyramidtut`` directory:
 
    .. code-block:: text
 
-      $ path/to/my/Python-2.6/bin/virtualenv --no-site-packages bigfntut
-
-#. Switch to the ``bigfntut`` directory:
-
-   .. code-block:: text
-
-      $ cd bigfntut
-
-#. (Optional) Consider using ``source bin/activate`` to make your
-   shell environment wired to use the virtualenv.
+      $ cd pyramidtut
 
 #. Use ``easy_install`` to get :app:`Pyramid` and its direct
    dependencies installed:
@@ -73,52 +50,30 @@ Preparation, UNIX
 Preparation, Windows
 --------------------
 
-#. Install, or find `Python 2.6.6
-   <http://python.org/download/releases/2.6.6/>`_ for your system.
-
-#. Install the latest `setuptools` into the Python you
-   obtained/installed/found in the step above: download `ez_setup.py
-   <http://peak.telecommunity.com/dist/ez_setup.py>`_ and run it using
-   the ``python`` interpreter of your Python 2.6 installation using a
-   command prompt:
+#. Use your Python's virtualenv to make a workspace:
 
    .. code-block:: text
 
-      c:\> c:\Python26\python ez_setup.py
+      c:\> c:\Python26\Scripts\virtualenv --no-site-packages pyramidtut
 
-#. Use that Python's `bin/easy_install` to install `virtualenv`:
-
-   .. code-block:: text
-
-      c:\> c:\Python26\Scripts\easy_install virtualenv
-
-#. Use that Python's virtualenv to make a workspace:
+#. Switch to the ``pyramidtut`` directory:
 
    .. code-block:: text
 
-      c:\> c:\Python26\Scripts\virtualenv --no-site-packages bigfntut
-
-#. Switch to the ``bigfntut`` directory:
-
-   .. code-block:: text
-
-      c:\> cd bigfntut
-
-#. (Optional) Consider using ``bin\activate.bat`` to make your shell
-   environment wired to use the virtualenv.
+      c:\> cd pyramidtut
 
 #. Use ``easy_install`` to get :app:`Pyramid` and its direct
    dependencies installed:
 
    .. code-block:: text
 
-      c:\bigfntut> Scripts\easy_install pyramid
+      c:\pyramidtut> Scripts\easy_install pyramid
 
 #. Use ``easy_install`` to install various packages from PyPI.
 
    .. code-block:: text
 
-      c:\bigfntut> Scripts\easy_install -i docutils \
+      c:\pyramidtut> Scripts\easy_install -i docutils \
                nose coverage zope.sqlalchemy SQLAlchemy repoze.tm2
 
 
@@ -133,7 +88,7 @@ variety of templates to generate sample projects.  We will use the
 that uses :term:`SQLAlchemy` and :term:`URL dispatch`.
 
 The below instructions assume your current working directory is the
-"virtualenv" named "bigfntut".
+"virtualenv" named "pyramidtut".
 
 On UNIX:
 
@@ -145,7 +100,7 @@ On Windows:
 
 .. code-block:: text
 
-   c:\bigfntut> Scripts\paster create -t pyramid_routesalchemy tutorial
+   c:\pyramidtut> Scripts\paster create -t pyramid_routesalchemy tutorial
 
 .. note:: If you are using Windows, the ``pyramid_routesalchemy``
    Paster template may not deal gracefully with installation into a
@@ -173,8 +128,8 @@ On Windows:
 
 .. code-block:: text
 
-   c:\bigfntut> cd tutorial
-   c:\bigfntut\tutorial> ..\Scripts\python setup.py develop
+   c:\pyramidtut> cd tutorial
+   c:\pyramidtut\tutorial> ..\Scripts\python setup.py develop
 
 .. _sql_running_tests:
 
@@ -194,7 +149,7 @@ On Windows:
 
 .. code-block:: text
 
-   c:\bigfntut\tutorial> ..\Scripts\python setup.py test -q
+   c:\pyramidtut\tutorial> ..\Scripts\python setup.py test -q
 
 Starting the Application
 ========================
@@ -211,7 +166,7 @@ On Windows:
 
 .. code-block:: text
 
-   c:\bifgfntut\tutorial> ..\Scripts\paster serve development.ini --reload
+   c:\pyramidtut\tutorial> ..\Scripts\paster serve development.ini --reload
 
 Exposing Test Coverage Information
 ==================================
@@ -235,7 +190,7 @@ On Windows:
 
 .. code-block:: text
 
-   c:\bigfntut\tutorial> ..\Scripts\easy_install nose coverage
+   c:\pyramidtut\tutorial> ..\Scripts\easy_install nose coverage
 
 Once ``nose`` and ``coverage`` are installed, we can actually run the
 coverage tests.
@@ -250,7 +205,7 @@ On Windows:
 
 .. code-block:: text
 
-   c:\bigfntut\tutorial> ..\Scripts\nosetests --cover-package=tutorial \
+   c:\pyramidtut\tutorial> ..\Scripts\nosetests --cover-package=tutorial \
          --cover-erase --with-coverage
 
 Looks like our package's ``models`` module doesn't quite have 100%

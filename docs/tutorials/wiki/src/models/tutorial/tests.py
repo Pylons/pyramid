@@ -1,6 +1,5 @@
 import unittest
 
-from pyramid.config import Configurator
 from pyramid import testing
 
 class PageModelTests(unittest.TestCase):
@@ -50,11 +49,10 @@ class AppmakerTests(unittest.TestCase):
 
 class ViewTests(unittest.TestCase):
     def setUp(self):
-        self.config = Configurator(autocommit=True)
-        self.config.begin()
+        self.config = testing.setUp()
 
     def tearDown(self):
-        self.config.end()
+        testing.tearDown()
 
     def test_my_view(self):
         from tutorial.views import my_view

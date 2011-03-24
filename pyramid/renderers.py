@@ -268,7 +268,7 @@ class RendererHelper(object):
 
     @reify
     def settings(self):
-        settings = self.registry.settings
+        settings = self.registry.settings or {}
         return settings
 
     @reify
@@ -281,6 +281,18 @@ class RendererHelper(object):
 
     def get_renderer(self):
         return self.renderer
+
+    def render_view(self, request, response, view, context):
+        system = {
+            'view':view,
+            'renderer_name':self.name, # b/c
+            'renderer_info':self,
+            'context':context,
+            'request':request
+            }
+        return self.render_to_response(response, system,
+                                       request=request)
+                
 
     def render(self, value, system_values, request=None):
         renderer = self.renderer

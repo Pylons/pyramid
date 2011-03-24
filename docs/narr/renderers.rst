@@ -3,18 +3,10 @@
 Renderers
 =========
 
-In the :ref:`views_chapter` chapter, we said that a view callable must
-return a :term:`Response` object.  We lied.  A :term:`renderer` is a service
-that attempts to convert a non-Response return value of a function, class, or
-instance that acts as a :term:`view callable` to a :term:`Response` object.
-
-Overview
---------
-
-A view needn't *always* return a Response object.  If a view happens to
-return something which does not implement the Pyramid Response interface,
-:app:`Pyramid` will attempt to use a :term:`renderer` to construct a
-response.  For example:
+A view needn't *always* return a :term:`Response` object.  If a view
+happens to return something which does not implement the Pyramid
+Response interface, :app:`Pyramid` will attempt to use a
+:term:`renderer` to construct a response.  For example:
 
 .. code-block:: python
    :linenos:
@@ -22,6 +14,7 @@ response.  For example:
    from pyramid.response import Response
    from pyramid.view import view_config
 
+   @view_config(renderer='json')
    def hello_world(request):
        return {'content':'Hello!'}
 
@@ -30,7 +23,7 @@ dictionary does not implement the Pyramid response interface, so you might
 believe that this example would fail.  However, since a ``renderer`` is
 associated with the view callable through its :term:`view configuration` (in
 this case, using a ``renderer`` argument passed to
-:func:`pyramid.view.view_config`), if the view does *not* return a Response
+:func:`~pyramid.view.view_config`), if the view does *not* return a Response
 object, the renderer will attempt to convert the result of the view to a
 response on the developer's behalf.
 
@@ -67,7 +60,7 @@ object serialization techniques.
 
 View configuration can vary the renderer associated with a view callable via
 the ``renderer`` attribute.  For example, this call to
-:meth:`pyramid.config.Configurator.add_view` associates the ``json`` renderer
+:meth:`~pyramid.config.Configurator.add_view` associates the ``json`` renderer
 with a view callable:
 
 .. code-block:: python
@@ -86,7 +79,7 @@ If the :term:`view callable` associated with a :term:`view configuration`
 returns a Response object directly (an object with the attributes ``status``,
 ``headerlist`` and ``app_iter``), any renderer associated with the view
 configuration is ignored, and the response is passed back to :app:`Pyramid`
-unmolested.  For example, if your view callable returns an instance of the
+unchanged.  For example, if your view callable returns an instance of the
 :class:`pyramid.httpexceptions.HTTPFound` class as a response, no renderer
 will be employed.
 
@@ -194,7 +187,7 @@ values serializable by :func:`json.dumps`.
 
 You can configure a view to use the JSON renderer by naming ``json`` as the
 ``renderer`` argument of a view configuration, e.g. by using
-:meth:`pyramid.config.Configurator.add_view`:
+:meth:`~pyramid.config.Configurator.add_view`:
 
 .. code-block:: python
    :linenos:
@@ -358,7 +351,7 @@ to influence associated response attributes.
   e.g. ``text/xml``.
 
 ``response_headerlist``
-  A sequence of tuples describing cookie values that should be set in the
+  A sequence of tuples describing header values that should be set in the
   response, e.g. ``[('Set-Cookie', 'abc=123'), ('X-My-Header', 'foo')]``.
 
 ``response_status``
@@ -396,20 +389,16 @@ documentation in :ref:`request_module`.
 
 .. _adding_and_overriding_renderers:
 
-Adding and Overriding Renderers
--------------------------------
+Adding and Changing Renderers
+-----------------------------
 
 New templating systems and serializers can be associated with :app:`Pyramid`
 renderer names.  To this end, configuration declarations can be made which
-override an existing :term:`renderer factory`, and which add a new renderer
+change an existing :term:`renderer factory`, and which add a new renderer
 factory.
 
 Renderers can be registered imperatively using the
 :meth:`pyramid.config.Configurator.add_renderer` API.
-
-.. note:: The tasks described in this section can also be performed via
-   :term:`declarative configuration`.  See
-   :ref:`zcml_adding_and_overriding_renderers`.
 
 For example, to add a renderer which renders views which have a
 ``renderer`` attribute that is a path that ends in ``.jinja2``:
@@ -439,21 +428,20 @@ following interface:
 
    class RendererFactory:
        def __init__(self, info):
-           """ Constructor: ``info`` will be an object having the
-           the following attributes: ``name`` (the renderer name), ``package`` 
-           (the package that was 'current' at the time the renderer was 
-           registered), ``type`` (the renderer type name), ``registry`` 
-           (the current application registry) and ``settings`` (the 
-           deployment settings dictionary).
-           """
+           """ Constructor: info will be an object having the the
+           following attributes: name (the renderer name), package
+           (the package that was 'current' at the time the
+           renderer was registered), type (the renderer type
+           name), registry (the current application registry) and
+           settings (the deployment settings dictionary).  """
 
        def __call__(self, value, system):
-           """ Call a the renderer implementation with the value and
-           the system value passed in as arguments and return the
-           result (a string or unicode object).  The value is the
-           return value of a view.  The system value is a dictionary
-           containing available system values (e.g. ``view``,
-           ``context``, and ``request``). """
+           """ Call a the renderer implementation with the value
+           and the system value passed in as arguments and return
+           the result (a string or unicode object).  The value is
+           the return value of a view.  The system value is a
+           dictionary containing available system values
+           (e.g. view, context, and request). """
 
 The formal interface definition of the ``info`` object passed to a renderer
 factory constructor is available as :class:`pyramid.interfaces.IRendererInfo`.
@@ -468,14 +456,14 @@ There are essentially two different kinds of renderer factories:
   such as a template.
 
 - A renderer factory which expects to accept a token that does not represent
-  a filesystem path or a asset specification in the ``name``
+  a filesystem path or an asset specification in the ``name``
   attribute of the ``info`` object fed to its constructor.  These renderer
   factories are registered with a ``name`` value that does not begin with a
   dot.  These renderer factories are typically object serializers.
 
 .. sidebar:: Asset Specifications
 
-   A asset specification is a colon-delimited identifier for a
+   An asset specification is a colon-delimited identifier for an
    :term:`asset`.  The colon separates a Python :term:`package`
    name from a package subpath.  For example, the asset
    specification ``my.package:static/baz.css`` identifies the file named
@@ -483,7 +471,7 @@ There are essentially two different kinds of renderer factories:
    :term:`package`.
 
 Here's an example of the registration of a simple renderer factory via
-:meth:`pyramid.config.Configurator.add_renderer`:
+:meth:`~pyramid.config.Configurator.add_renderer`:
 
 .. code-block:: python
    :linenos:
@@ -511,8 +499,8 @@ At startup time, when a :term:`view configuration` is encountered, which
 has a ``name`` attribute that does not contain a dot, the full ``name``
 value is used to construct a renderer from the associated renderer
 factory.  In this case, the view configuration will create an instance
-of an ``AMFRenderer`` for each view configuration which includes ``amf``
-as its renderer value.  The ``name`` passed to the ``AMFRenderer``
+of an ``MyAMFRenderer`` for each view configuration which includes ``amf``
+as its renderer value.  The ``name`` passed to the ``MyAMFRenderer``
 constructor will always be ``amf``.
 
 Here's an example of the registration of a more complicated renderer
@@ -545,15 +533,12 @@ typically the filename extension.  This extension is used to look up a
 renderer factory for the configured view.  Then the value of
 ``renderer`` is passed to the factory to create a renderer for the view.
 In this case, the view configuration will create an instance of a
-``Jinja2Renderer`` for each view configuration which includes anything
+``MyJinja2Renderer`` for each view configuration which includes anything
 ending with ``.jinja2`` in its ``renderer`` value.  The ``name`` passed
-to the ``Jinja2Renderer`` constructor will be the full value that was
+to the ``MyJinja2Renderer`` constructor will be the full value that was
 set as ``renderer=`` in the view configuration.
 
-See also :ref:`renderer_directive` and
-:meth:`pyramid.config.Configurator.add_renderer`.
-
-Overriding an Existing Renderer
+Changing an Existing Renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can associate more than one filename extension with the same existing
@@ -570,7 +555,7 @@ extension for the same kinds of templates.  For example, to associate the
 After you do this, :app:`Pyramid` will treat templates ending in both the
 ``.pt`` and ``.zpt`` filename extensions as Chameleon ZPT templates.
 
-To override the default mapping in which files with a ``.pt`` extension are
+To change the default mapping in which files with a ``.pt`` extension are
 rendered via a Chameleon ZPT page template renderer, use a variation on the
 following in your application's startup code:
 
@@ -592,3 +577,44 @@ the ``name`` attribute to the renderer tag:
 
    config.add_renderer(None, 'mypackage.json_renderer_factory')
 
+Overriding A Renderer At Runtime
+--------------------------------
+
+.. warning:: This is an advanced feature, not typically used by "civilians".
+
+In some circumstances, it is necessary to instruct the system to ignore the
+static renderer declaration provided by the developer in view configuration,
+replacing the renderer with another *after a request starts*.  For example,
+an "omnipresent" XML-RPC implementation that detects that the request is from
+an XML-RPC client might override a view configuration statement made by the
+user instructing the view to use a template renderer with one that uses an
+XML-RPC renderer.  This renderer would produce an XML-RPC representation of
+the data returned by an arbitrary view callable.
+
+To use this feature, create a :class:`~pyramid.events.NewRequest`
+:term:`subscriber` which sniffs at the request data and which conditionally
+sets an ``override_renderer`` attribute on the request itself, which is the
+*name* of a registered renderer.  For example:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.event import subscriber
+   from pyramid.event import NewRequest
+
+   @subscriber(NewRequest)
+   def set_xmlrpc_params(event):
+       request = event.request
+       if (request.content_type == 'text/xml'
+           and request.method == 'POST'
+           and not 'soapaction' in request.headers
+           and not 'x-pyramid-avoid-xmlrpc' in request.headers):
+           params, method = parse_xmlrpc_request(request)
+           request.xmlrpc_params, request.xmlrpc_method = params, method
+           request.is_xmlrpc = True
+           request.override_renderer = 'xmlrpc'
+           return True
+
+The result of such a subscriber will be to replace any existing static
+renderer configured by the developer with a (notional, nonexistent) XML-RPC
+renderer if the request appears to come from an XML-RPC client.

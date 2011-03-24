@@ -63,26 +63,10 @@ class ConfiguratorTests(unittest.TestCase):
         config.registry.registerHandler(subscriber, (event_iface,))
         return L
 
-    def _registerLogger(self, config):
-        from pyramid.interfaces import IDebugLogger
-        logger = DummyLogger()
-        config.registry.registerUtility(logger, IDebugLogger)
-        return logger
-
     def _makeRequest(self, config):
         request = DummyRequest()
         request.registry = config.registry
         return request
-
-    def _registerSecurityPolicy(self, config, permissive):
-        from pyramid.interfaces import IAuthenticationPolicy
-        from pyramid.interfaces import IAuthorizationPolicy
-        policy = DummySecurityPolicy(permissive)
-        config.registry.registerUtility(policy, IAuthenticationPolicy)
-        config.registry.registerUtility(policy, IAuthorizationPolicy)
-
-    def _registerSettings(self, config, **settings):
-        config.registry.settings = settings
 
     def test_ctor_no_registry(self):
         import sys
@@ -195,6 +179,13 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import ISessionFactory
         config = self._makeOne(session_factory='factory')
         self.assertEqual(config.registry.getUtility(ISessionFactory), 'factory')
+
+    def test_ctor_default_view_mapper(self):
+        from pyramid.interfaces import IViewMapperFactory
+        mapper = object()
+        config = self._makeOne(default_view_mapper=mapper)
+        self.assertEqual(config.registry.getUtility(IViewMapperFactory),
+                         mapper)
 
     def test_with_package_module(self):
         from pyramid.tests import test_configuration
@@ -585,54 +576,6 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(len(subscriber), 1)
         self.failUnless(IApplicationCreated.providedBy(subscriber[0]))
 
-    def test_load_zcml_default(self):
-        import pyramid.tests.fixtureapp
-        config = self._makeOne(package=pyramid.tests.fixtureapp,
-                               autocommit=True)
-        registry = config.load_zcml()
-        from pyramid.tests.fixtureapp.models import IFixture
-        self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
-
-    def test_load_zcml_routesapp(self):
-        from pyramid.interfaces import IRoutesMapper
-        config = self._makeOne(autocommit=True)
-        config.load_zcml('pyramid.tests.routesapp:configure.zcml')
-        self.failUnless(config.registry.getUtility(IRoutesMapper))
-
-    def test_load_zcml_fixtureapp(self):
-        from pyramid.tests.fixtureapp.models import IFixture
-        config = self._makeOne(autocommit=True)
-        config.load_zcml('pyramid.tests.fixtureapp:configure.zcml')
-        self.failUnless(config.registry.queryUtility(IFixture)) # only in c.zcml
-
-    def test_load_zcml_as_relative_filename(self):
-        import pyramid.tests.fixtureapp
-        config = self._makeOne(package=pyramid.tests.fixtureapp,
-                               autocommit=True)
-        registry = config.load_zcml('configure.zcml')
-        from pyramid.tests.fixtureapp.models import IFixture
-        self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
-
-    def test_load_zcml_as_absolute_filename(self):
-        import os
-        import pyramid.tests.fixtureapp
-        config = self._makeOne(package=pyramid.tests.fixtureapp,
-                               autocommit=True)
-        dn = os.path.dirname(pyramid.tests.fixtureapp.__file__)
-        c_z = os.path.join(dn, 'configure.zcml')
-        registry = config.load_zcml(c_z)
-        from pyramid.tests.fixtureapp.models import IFixture
-        self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
-
-    def test_load_zcml_lock_and_unlock(self):
-        config = self._makeOne(autocommit=True)
-        dummylock = DummyLock()
-        config.load_zcml(
-            'pyramid.tests.fixtureapp:configure.zcml',
-            lock=dummylock)
-        self.assertEqual(dummylock.acquired, True)
-        self.assertEqual(dummylock.released, True)
-
     def test_include_with_dotted_name(self):
         from pyramid import tests
         config = self._makeOne()
@@ -656,6 +599,23 @@ class ConfiguratorTests(unittest.TestCase):
         context_before = config._make_context()
         config._ctx = context_before
         config.include(dummy_include)
+        context_after = config._ctx
+        actions = context_after.actions
+        self.assertEqual(len(actions), 1)
+        self.assertEqual(
+            actions[0][:3],
+            ('discrim', None, tests),
+            )
+        self.assertEqual(context_after.basepath, None)
+        self.assertEqual(context_after.includepath, ())
+        self.failUnless(context_after is context_before)
+
+    def test_include_with_module_defaults_to_includeme(self):
+        from pyramid import tests
+        config = self._makeOne()
+        context_before = config._make_context()
+        config._ctx = context_before
+        config.include('pyramid.tests.test_config')
         context_after = config._ctx
         actions = context_after.actions
         self.assertEqual(len(actions), 1)
@@ -739,6 +699,22 @@ class ConfiguratorTests(unittest.TestCase):
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
 
+    def test_add_view_with_decorator(self):
+        def view(request):
+            """ ABC """
+            return 'OK'
+        def view_wrapper(fn):
+            def inner(context, request):
+                return fn(context, request)
+            return inner
+        config = self._makeOne(autocommit=True)
+        config.add_view(view=view, decorator=view_wrapper)
+        wrapper = self._getViewCallable(config)
+        self.failIf(wrapper is view)
+        self.assertEqual(wrapper.__doc__, view.__doc__)
+        result = wrapper(None, None)
+        self.assertEqual(result, 'OK')
+
     def test_add_view_as_instance(self):
         class AView:
             def __call__(self, context, request):
@@ -774,8 +750,10 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         config.add_view(view=view)
         wrapper = self._getViewCallable(config)
-        result = wrapper(None, None)
+        request = self._makeRequest(config)
+        result = wrapper(None, request)
         self.assertEqual(result, 'OK')
+        self.assertEqual(request.__view__.__class__, view)
 
     def test_add_view_as_oldstyle_class_requestonly(self):
         class view:
@@ -787,8 +765,11 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         config.add_view(view=view)
         wrapper = self._getViewCallable(config)
-        result = wrapper(None, None)
+
+        request = self._makeRequest(config)
+        result = wrapper(None, request)
         self.assertEqual(result, 'OK')
+        self.assertEqual(request.__view__.__class__, view)
 
     def test_add_view_context_as_class(self):
         from zope.interface import implementedBy
@@ -1410,6 +1391,27 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(result.name, fixture)
         self.assertEqual(result.settings, settings)
 
+    def test_add_view_with_default_renderer(self):
+        class view(object):
+            def __init__(self, context, request):
+                self.request = request
+                self.context = context
+
+            def __call__(self):
+                return {'a':'1'}
+        config = self._makeOne(autocommit=True)
+        class moo(object):
+            def __init__(self, *arg, **kw):
+                pass
+            def __call__(self, *arg, **kw):
+                return 'moo'
+        config.add_renderer(None, moo)
+        config.add_view(view=view)
+        wrapper = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        result = wrapper(None, request)
+        self.assertEqual(result.body, 'moo')
+
     def test_add_view_with_template_renderer_no_callable(self):
         import pyramid.tests
         from pyramid.interfaces import ISettings
@@ -1825,251 +1827,6 @@ class ConfiguratorTests(unittest.TestCase):
         request = self._makeRequest(config)
         self.assertEqual(view(None, request), 'OK')
 
-    def test_add_handler_action_in_route_pattern(self):
-        config = self._makeOne(autocommit=True)
-        views = []
-        def dummy_add_view(**kw):
-            views.append(kw)
-        config.add_view = dummy_add_view
-        config.add_handler('name', '/:action', DummyHandler)
-        self._assertRoute(config, 'name', '/:action', 0)
-        self.assertEqual(len(views), 2)
-
-        view = views[0]
-        preds = view['custom_predicates']
-        self.assertEqual(len(preds), 1)
-        pred = preds[0]
-        request = DummyRequest()
-        self.assertEqual(pred(None, request), False)
-        request.matchdict = {'action':'action1'}
-        self.assertEqual(pred(None, request), True)
-        self.assertEqual(view['route_name'], 'name')
-        self.assertEqual(view['attr'], 'action1')
-        self.assertEqual(view['view'], DummyHandler)
-
-        view = views[1]
-        preds = view['custom_predicates']
-        self.assertEqual(len(preds), 1)
-        pred = preds[0]
-        request = DummyRequest()
-        self.assertEqual(pred(None, request), False)
-        request.matchdict = {'action':'action2'}
-        self.assertEqual(pred(None, request), True)
-        self.assertEqual(view['route_name'], 'name')
-        self.assertEqual(view['attr'], 'action2')
-        self.assertEqual(view['view'], DummyHandler)
-
-    def test_add_handler_with_view_overridden_autoexpose_None(self):
-        config = self._makeOne(autocommit=True)
-        views = []
-        def dummy_add_view(**kw):
-            views.append(kw) # pragma: no cover
-        config.add_view = dummy_add_view
-        class MyView(DummyHandler):
-            __autoexpose__ = None
-        config.add_handler('name', '/:action', MyView)
-        self._assertRoute(config, 'name', '/:action', 0)
-        self.assertEqual(len(views), 0)
-
-    def test_add_handler_with_view_overridden_autoexpose_broken_regex1(self):
-        from pyramid.exceptions import ConfigurationError
-        config = self._makeOne()
-        def dummy_add_view(**kw):
-            """ """
-        config.add_view = dummy_add_view
-        class MyView(DummyHandler):
-            __autoexpose__ = 1
-        self.assertRaises(ConfigurationError, config.add_handler,
-                          'name', '/{action}', MyView)
-
-    def test_add_handler_with_view_overridden_autoexpose_broken_regex2(self):
-        from pyramid.exceptions import ConfigurationError
-        config = self._makeOne()
-        def dummy_add_view(**kw):
-            """ """
-        config.add_view = dummy_add_view
-        class MyView(DummyHandler):
-            __autoexpose__ = 'a\\'
-        self.assertRaises(ConfigurationError, config.add_handler,
-                          'name', '/{action}', MyView)
-
-    def test_add_handler_with_view_method_has_expose_config(self):
-        config = self._makeOne(autocommit=True)
-        views = []
-        def dummy_add_view(**kw):
-            views.append(kw)
-        config.add_view = dummy_add_view
-        class MyView(object):
-            def action(self): # pragma: no cover
-                return 'response'
-            action.__exposed__ = [{'custom_predicates':(1,)}]
-        config.add_handler('name', '/:action', MyView)
-        self._assertRoute(config, 'name', '/:action', 0)
-        self.assertEqual(len(views), 1)
-        view = views[0]
-        preds = view['custom_predicates']
-        self.assertEqual(len(preds), 2)
-        self.assertEqual(view['route_name'], 'name')
-        self.assertEqual(view['attr'], 'action')
-        self.assertEqual(view['view'], MyView)
-
-    def test_add_handler_with_view_method_has_expose_config_with_action(self):
-        config = self._makeOne(autocommit=True)
-        views = []
-        def dummy_add_view(**kw):
-            views.append(kw)
-        config.add_view = dummy_add_view
-        class MyView(object):
-            def action(self): # pragma: no cover
-                return 'response'
-            action.__exposed__ = [{'name':'action3000'}]
-        config.add_handler('name', '/:action', MyView)
-        self._assertRoute(config, 'name', '/:action', 0)
-        self.assertEqual(len(views), 1)
-        view = views[0]
-        preds = view['custom_predicates']
-        self.assertEqual(len(preds), 1)
-        pred = preds[0]
-        request = DummyRequest()
-        self.assertEqual(pred(None, request), False)
-        request.matchdict = {'action':'action3000'}
-        self.assertEqual(pred(None, request), True)
-        self.assertEqual(view['route_name'], 'name')
-        self.assertEqual(view['attr'], 'action')
-        self.assertEqual(view['view'], MyView)
-
-    def test_add_handler_with_view_method_has_expose_config_with_action_regex(
-        self):
-        config = self._makeOne(autocommit=True)
-        views = []
-        def dummy_add_view(**kw):
-            views.append(kw)
-        config.add_view = dummy_add_view
-        class MyView(object):
-            def action(self): # pragma: no cover
-                return 'response'
-            action.__exposed__ = [{'name':'^action3000$'}]
-        config.add_handler('name', '/:action', MyView)
-        self._assertRoute(config, 'name', '/:action', 0)
-        self.assertEqual(len(views), 1)
-        view = views[0]
-        preds = view['custom_predicates']
-        self.assertEqual(len(preds), 1)
-        pred = preds[0]
-        request = DummyRequest()
-        self.assertEqual(pred(None, request), False)
-        request.matchdict = {'action':'action3000'}
-        self.assertEqual(pred(None, request), True)
-        self.assertEqual(view['route_name'], 'name')
-        self.assertEqual(view['attr'], 'action')
-        self.assertEqual(view['view'], MyView)
-
-    def test_add_handler_doesnt_mutate_expose_dict(self):
-        config = self._makeOne(autocommit=True)
-        views = []
-        def dummy_add_view(**kw):
-            views.append(kw)
-        config.add_view = dummy_add_view
-        exposed = [{'name':'^action3000$'}]
-        class MyView(object):
-            def action(self): # pragma: no cover
-                return 'response'
-            action.__exposed__ = exposed
-        config.add_handler('name', '/{action}', MyView)
-        self.assertEqual(exposed[0], {'name':'^action3000$'}) # not mutated
-
-    def test_add_handler_with_action_and_action_in_path(self):
-        from pyramid.exceptions import ConfigurationError
-        config = self._makeOne()
-        self.assertRaises(ConfigurationError, config.add_handler,
-                          'name', '/{action}', DummyHandler, action='abc')
-
-    def test_add_handler_with_explicit_action(self):
-        config = self._makeOne(autocommit=True)
-        class DummyHandler(object):
-            def index(self): pass
-            index.__exposed__ = [{'a':'1'}]
-        views = []
-        def dummy_add_view(**kw):
-            views.append(kw)
-        config.add_view = dummy_add_view
-        config.add_handler('name', '/abc', DummyHandler, action='index')
-        self.assertEqual(len(views), 1)
-        view = views[0]
-        self.assertEqual(view['a'], '1')
-        self.assertEqual(view['attr'], 'index')
-        self.assertEqual(view['route_name'], 'name')
-        self.assertEqual(view['view'], DummyHandler)
-
-    def test_add_handler_with_implicit_action(self):
-        config = self._makeOne(autocommit=True)
-        class DummyHandler(object):
-            def __call__(self): pass
-            __call__.__exposed__ = [{'a':'1'}]
-        views = []
-        def dummy_add_view(**kw):
-            views.append(kw)
-        config.add_view = dummy_add_view
-        config.add_handler('name', '/abc', DummyHandler)
-        self.assertEqual(len(views), 1)
-        view = views[0]
-        self.assertEqual(view['a'], '1')
-        self.assertEqual(view['attr'], None)
-        self.assertEqual(view['route_name'], 'name')
-        self.assertEqual(view['view'], DummyHandler)
-
-    def test_add_handler_with_multiple_action(self):
-        config = self._makeOne(autocommit=True)
-        class DummyHandler(object):
-            def index(self): pass
-            def create(self): pass
-            create.__exposed__ = [{'name': 'index'}]
-        views = []
-        def dummy_add_view(**kw):
-            views.append(kw)
-        config.add_view = dummy_add_view
-        config.add_handler('name', '/abc', DummyHandler, action='index')
-        self.assertEqual(len(views), 2)
-        view = views[0]
-        self.assertEqual(view['attr'], 'create')
-        self.assertEqual(view['route_name'], 'name')
-        self.assertEqual(view['view'], DummyHandler)
-        view = views[1]
-        self.assertEqual(view['attr'], 'index')
-
-    def test_add_handler_string(self):
-        import pyramid
-        views = []
-        config = self._makeOne(autocommit=True)
-        def dummy_add_view(**kw):
-            views.append(kw)
-        config.add_view = dummy_add_view
-        config.add_handler('name', '/abc', 'pyramid')
-        self.assertEqual(len(views), 1)
-        view = views[0]
-        self.assertEqual(view['view'], pyramid)
-
-    def test_add_handler_pattern_None_no_previous_route(self):
-        from pyramid.exceptions import ConfigurationError
-        config = self._makeOne()
-        self.assertRaises(ConfigurationError, config.add_handler,
-                          'name', None, 'pyramid')
-
-    def test_add_handler_pattern_None_with_previous_route(self):
-        import pyramid
-        config = self._makeOne(autocommit=True)
-        config.add_route('name', ':def')
-        views = []
-        def dummy_add_view(**kw):
-            views.append(kw)
-        config.add_view = dummy_add_view
-        config.add_route = None # shouldn't be called
-        config.add_handler('name', None, 'pyramid')
-        self.assertEqual(len(views), 1)
-        view = views[0]
-        self.assertEqual(view['view'], pyramid)
-
-
     def _assertRoute(self, config, name, path, num_predicates=0):
         from pyramid.interfaces import IRoutesMapper
         mapper = config.registry.getUtility(IRoutesMapper)
@@ -2274,7 +2031,8 @@ class ConfiguratorTests(unittest.TestCase):
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         self._assertRoute(config, 'name', 'path')
-        self.assertEqual(wrapper(None, None), 'OK')
+        request = self._makeRequest(config)
+        self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_route_with_view_renderer_alias(self):
         config = self._makeOne(autocommit=True)
@@ -2330,6 +2088,92 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         route = config.add_route('name', 'pattern', pregenerator='123')
         self.assertEqual(route.pregenerator, '123')
+
+    def test_add_route_no_view_with_view_attr(self):
+        config = self._makeOne(autocommit=True)
+        from pyramid.exceptions import ConfigurationError
+        try:
+            config.add_route('name', '/pattern', view_attr='abc')
+        except ConfigurationError:
+            pass
+        else: # pragma: no cover
+            raise AssertionError
+
+    def test_add_route_no_view_with_view_context(self):
+        config = self._makeOne(autocommit=True)
+        from pyramid.exceptions import ConfigurationError
+        try:
+            config.add_route('name', '/pattern', view_context=DummyContext)
+        except ConfigurationError:
+            pass
+        else: # pragma: no cover
+            raise AssertionError
+
+    def test_add_route_no_view_with_view_permission(self):
+        config = self._makeOne(autocommit=True)
+        from pyramid.exceptions import ConfigurationError
+        try:
+            config.add_route('name', '/pattern', view_permission='edit')
+        except ConfigurationError:
+            pass
+        else: # pragma: no cover
+            raise AssertionError
+
+    def test_add_route_no_view_with_view_renderer(self):
+        config = self._makeOne(autocommit=True)
+        from pyramid.exceptions import ConfigurationError
+        try:
+            config.add_route('name', '/pattern', view_renderer='json')
+        except ConfigurationError:
+            pass
+        else: # pragma: no cover
+            raise AssertionError
+
+    def test_derive_view_function(self):
+        def view(request):
+            return 'OK'
+        config = self._makeOne()
+        result = config.derive_view(view)
+        self.failIf(result is view)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test_derive_view_dottedname(self):
+        config = self._makeOne()
+        result = config.derive_view(
+            'pyramid.tests.test_config.dummy_view')
+        self.failIf(result is dummy_view)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test_derive_view_with_default_renderer_no_explicit_renderer(self):
+        config = self._makeOne()
+        class moo(object):
+            def __init__(self, view):
+                pass
+            def __call__(self, *arg, **kw):
+                return 'moo'
+        config.add_renderer(None, moo)
+        def view(request):
+            return 'OK'
+        result = config.derive_view(view)
+        self.failIf(result is view)
+        self.assertEqual(result(None, None).body, 'moo')
+
+    def test_derive_view_with_default_renderer_with_explicit_renderer(self):
+        class moo(object): pass
+        class foo(object):
+            def __init__(self, view):
+                pass
+            def __call__(self, *arg, **kw):
+                return 'foo'
+        def view(request):
+            return 'OK'
+        config = self._makeOne()
+        config.add_renderer(None, moo)
+        config.add_renderer('foo', foo)
+        result = config.derive_view(view, renderer='foo')
+        self.failIf(result is view)
+        request = self._makeRequest(config)
+        self.assertEqual(result(None, request).body, 'foo')
 
     def test__override_not_yet_registered(self):
         from pyramid.interfaces import IPackageOverrides
@@ -2430,6 +2274,26 @@ class ConfiguratorTests(unittest.TestCase):
         result = view(None, request)
         self.assertEqual(result, ('abc', request))
 
+    @testing.skip_on('java')
+    def test_set_notfound_view_with_renderer(self):
+        from zope.interface import implementedBy
+        from pyramid.interfaces import IRequest
+        from pyramid.exceptions import NotFound
+        config = self._makeOne(autocommit=True)
+        view = lambda *arg: {}
+        config.set_notfound_view(view,
+                                 renderer='pyramid.tests:fixtures/minimal.pt')
+        config.begin()
+        try: # chameleon depends on being able to find a threadlocal registry
+            request = self._makeRequest(config)
+            view = self._getViewCallable(config,
+                                         ctx_iface=implementedBy(NotFound),
+                                         request_iface=IRequest)
+            result = view(None, request)
+        finally:
+            config.end()
+        self.failUnless('div' in result.body)
+
     def test_set_forbidden_view(self):
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
@@ -2456,6 +2320,26 @@ class ConfiguratorTests(unittest.TestCase):
                                      request_iface=IRequest)
         result = view(None, request)
         self.assertEqual(result, ('abc', request))
+
+    @testing.skip_on('java')
+    def test_set_forbidden_view_with_renderer(self):
+        from zope.interface import implementedBy
+        from pyramid.interfaces import IRequest
+        from pyramid.exceptions import Forbidden
+        config = self._makeOne(autocommit=True)
+        view = lambda *arg: {}
+        config.set_forbidden_view(view,
+                                  renderer='pyramid.tests:fixtures/minimal.pt')
+        config.begin()
+        try: # chameleon requires a threadlocal registry
+            request = self._makeRequest(config)
+            view = self._getViewCallable(config,
+                                         ctx_iface=implementedBy(Forbidden),
+                                         request_iface=IRequest)
+            result = view(None, request)
+        finally:
+            config.end()
+        self.failUnless('div' in result.body)
 
     def test__set_authentication_policy(self):
         from pyramid.interfaces import IAuthenticationPolicy
@@ -2527,6 +2411,22 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(config.registry.getUtility(IDefaultPermission),
                          'view')
 
+    def test_add_view_mapper(self):
+        from pyramid.interfaces import IViewMapperFactory
+        config = self._makeOne(autocommit=True)
+        mapper = object()
+        config.set_view_mapper(mapper)
+        result = config.registry.getUtility(IViewMapperFactory)
+        self.assertEqual(result, mapper)
+
+    def test_add_view_mapper_dottedname(self):
+        from pyramid.interfaces import IViewMapperFactory
+        config = self._makeOne(autocommit=True)
+        config.set_view_mapper('pyramid.tests.test_config')
+        result = config.registry.getUtility(IViewMapperFactory)
+        from pyramid.tests import test_config
+        self.assertEqual(result, test_config)
+
     def test_set_session_factory(self):
         from pyramid.interfaces import ISessionFactory
         config = self._makeOne(autocommit=True)
@@ -2573,404 +2473,6 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_translation_dirs(locale)
         self.assertEqual(config.registry.getUtility(ITranslationDirectories),
                          [locale])
-
-    def test_derive_view_function(self):
-        def view(request):
-            return 'OK'
-        config = self._makeOne()
-        result = config.derive_view(view)
-        self.failIf(result is view)
-        self.assertEqual(result(None, None), 'OK')
-
-    def test_derive_view_dottedname(self):
-        config = self._makeOne()
-        result = config.derive_view(
-            'pyramid.tests.test_config.dummy_view')
-        self.failIf(result is dummy_view)
-        self.assertEqual(result(None, None), 'OK')
-
-    def test_derive_view_with_renderer(self):
-        def view(request):
-            return 'OK'
-        config = self._makeOne(autocommit=True)
-        class moo(object):
-            def __init__(self, *arg, **kw):
-                pass
-            def __call__(self, *arg, **kw):
-                return 'moo'
-        config.add_renderer('moo', moo)
-        result = config.derive_view(view, renderer='moo')
-        self.failIf(result is view)
-        self.assertEqual(result(None, None).body, 'moo')
-
-    def test_derive_view_with_default_renderer_no_explicit_renderer(self):
-        def view(request):
-            return 'OK'
-        config = self._makeOne(autocommit=True)
-        class moo(object):
-            def __init__(self, *arg, **kw):
-                pass
-            def __call__(self, *arg, **kw):
-                return 'moo'
-        config.add_renderer(None, moo)
-        result = config.derive_view(view)
-        self.failIf(result is view)
-        self.assertEqual(result(None, None).body, 'moo')
-
-    def test_derive_view_with_default_renderer_with_explicit_renderer(self):
-        def view(request):
-            return 'OK'
-        config = self._makeOne(autocommit=True)
-        class moo(object): pass
-        class foo(object):
-            def __init__(self, *arg, **kw):
-                pass
-            def __call__(self, *arg, **kw):
-                return 'foo'
-        config.add_renderer(None, moo)
-        config.add_renderer('foo', foo)
-        result = config.derive_view(view, renderer='foo')
-        self.failIf(result is view)
-        self.assertEqual(result(None, None).body, 'foo')
-
-    def test_derive_view_class_without_attr(self):
-        class View(object):
-            def __init__(self, request):
-                pass
-            def __call__(self):
-                return 'OK'
-        config = self._makeOne()
-        result = config.derive_view(View)
-        self.assertEqual(result(None, None), 'OK')
-
-    def test_derive_view_class_with_attr(self):
-        class View(object):
-            def __init__(self, request):
-                pass
-            def another(self):
-                return 'OK'
-        config = self._makeOne()
-        result = config.derive_view(View, attr='another')
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__derive_view_as_function_context_and_request(self):
-        def view(context, request):
-            return 'OK'
-        config = self._makeOne()
-        result = config._derive_view(view)
-        self.failUnless(result is view)
-        self.failIf(hasattr(result, '__call_permissive__'))
-        self.assertEqual(view(None, None), 'OK')
-
-    def test__derive_view_as_function_requestonly(self):
-        def view(request):
-            return 'OK'
-        config = self._makeOne()
-        result = config._derive_view(view)
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.failIf(hasattr(result, '__call_permissive__'))
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__derive_view_as_newstyle_class_context_and_request(self):
-        class view(object):
-            def __init__(self, context, request):
-                pass
-            def __call__(self):
-                return 'OK'
-        config = self._makeOne()
-        result = config._derive_view(view)
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.failIf(hasattr(result, '__call_permissive__'))
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__derive_view_as_newstyle_class_requestonly(self):
-        class view(object):
-            def __init__(self, context, request):
-                pass
-            def __call__(self):
-                return 'OK'
-        config = self._makeOne()
-        result = config._derive_view(view)
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.failIf(hasattr(result, '__call_permissive__'))
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__derive_view_as_oldstyle_class_context_and_request(self):
-        class view:
-            def __init__(self, context, request):
-                pass
-            def __call__(self):
-                return 'OK'
-        config = self._makeOne()
-        result = config._derive_view(view)
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.failIf(hasattr(result, '__call_permissive__'))
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__derive_view_as_oldstyle_class_requestonly(self):
-        class view:
-            def __init__(self, context, request):
-                pass
-            def __call__(self):
-                return 'OK'
-        config = self._makeOne()
-        result = config._derive_view(view)
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.failIf(hasattr(result, '__call_permissive__'))
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__derive_view_as_instance_context_and_request(self):
-        class View:
-            def __call__(self, context, request):
-                return 'OK'
-        view = View()
-        config = self._makeOne()
-        result = config._derive_view(view)
-        self.failUnless(result is view)
-        self.failIf(hasattr(result, '__call_permissive__'))
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__derive_view_as_instance_requestonly(self):
-        class View:
-            def __call__(self, request):
-                return 'OK'
-        view = View()
-        config = self._makeOne()
-        result = config._derive_view(view)
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.failUnless('instance' in result.__name__)
-        self.failIf(hasattr(result, '__call_permissive__'))
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__derive_view_with_debug_authorization_no_authpol(self):
-        view = lambda *arg: 'OK'
-        config = self._makeOne()
-        self._registerSettings(config,
-                               debug_authorization=True, reload_templates=True)
-        logger = self._registerLogger(config)
-        result = config._derive_view(view, permission='view')
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.failIf(hasattr(result, '__call_permissive__'))
-        request = self._makeRequest(config)
-        request.view_name = 'view_name'
-        request.url = 'url'
-        self.assertEqual(result(None, request), 'OK')
-        self.assertEqual(len(logger.messages), 1)
-        self.assertEqual(logger.messages[0],
-                         "debug_authorization of url url (view name "
-                         "'view_name' against context None): Allowed "
-                         "(no authorization policy in use)")
-
-    def test__derive_view_with_debug_authorization_no_permission(self):
-        view = lambda *arg: 'OK'
-        config = self._makeOne()
-        self._registerSettings(config,
-                               debug_authorization=True, reload_templates=True)
-        self._registerSecurityPolicy(config, True)
-        logger = self._registerLogger(config)
-        result = config._derive_view(view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.failIf(hasattr(result, '__call_permissive__'))
-        request = self._makeRequest(config)
-        request.view_name = 'view_name'
-        request.url = 'url'
-        self.assertEqual(result(None, request), 'OK')
-        self.assertEqual(len(logger.messages), 1)
-        self.assertEqual(logger.messages[0],
-                         "debug_authorization of url url (view name "
-                         "'view_name' against context None): Allowed ("
-                         "no permission registered)")
-
-    def test__derive_view_debug_auth_permission_authpol_permitted(self):
-        view = lambda *arg: 'OK'
-        config = self._makeOne()
-        self._registerSettings(config, debug_authorization=True,
-                               reload_templates=True)
-        logger = self._registerLogger(config)
-        self._registerSecurityPolicy(config, True)
-        result = config._derive_view(view, permission='view')
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result.__call_permissive__, view)
-        request = self._makeRequest(config)
-        request.view_name = 'view_name'
-        request.url = 'url'
-        self.assertEqual(result(None, request), 'OK')
-        self.assertEqual(len(logger.messages), 1)
-        self.assertEqual(logger.messages[0],
-                         "debug_authorization of url url (view name "
-                         "'view_name' against context None): True")
-
-    def test__derive_view_debug_auth_permission_authpol_denied(self):
-        from pyramid.exceptions import Forbidden
-        view = lambda *arg: 'OK'
-        config = self._makeOne()
-        self._registerSettings(config,
-                               debug_authorization=True, reload_templates=True)
-        logger = self._registerLogger(config)
-        self._registerSecurityPolicy(config, False)
-        result = config._derive_view(view, permission='view')
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result.__call_permissive__, view)
-        request = self._makeRequest(config)
-        request.view_name = 'view_name'
-        request.url = 'url'
-        self.assertRaises(Forbidden, result, None, request)
-        self.assertEqual(len(logger.messages), 1)
-        self.assertEqual(logger.messages[0],
-                         "debug_authorization of url url (view name "
-                         "'view_name' against context None): False")
-
-    def test__derive_view_debug_auth_permission_authpol_denied2(self):
-        view = lambda *arg: 'OK'
-        config = self._makeOne()
-        self._registerSettings(config,
-                               debug_authorization=True, reload_templates=True)
-        self._registerLogger(config)
-        self._registerSecurityPolicy(config, False)
-        result = config._derive_view(view, permission='view')
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        request = self._makeRequest(config)
-        request.view_name = 'view_name'
-        request.url = 'url'
-        permitted = result.__permitted__(None, None)
-        self.assertEqual(permitted, False)
-
-    def test__derive_view_debug_auth_permission_authpol_overridden(self):
-        view = lambda *arg: 'OK'
-        config = self._makeOne()
-        self._registerSettings(config,
-                               debug_authorization=True, reload_templates=True)
-        logger = self._registerLogger(config)
-        self._registerSecurityPolicy(config, False)
-        result = config._derive_view(view,
-                                     permission='__no_permission_required__')
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.failIf(hasattr(result, '__call_permissive__'))
-        request = self._makeRequest(config)
-        request.view_name = 'view_name'
-        request.url = 'url'
-        self.assertEqual(result(None, request), 'OK')
-        self.assertEqual(len(logger.messages), 1)
-        self.assertEqual(logger.messages[0],
-                         "debug_authorization of url url (view name "
-                         "'view_name' against context None): False")
-
-    def test__derive_view_with_predicates_all(self):
-        view = lambda *arg: 'OK'
-        predicates = []
-        def predicate1(context, request):
-            predicates.append(True)
-            return True
-        def predicate2(context, request):
-            predicates.append(True)
-            return True
-        config = self._makeOne()
-        result = config._derive_view(view, predicates=[predicate1, predicate2])
-        request = self._makeRequest(config)
-        request.method = 'POST'
-        next = result(None, None)
-        self.assertEqual(next, 'OK')
-        self.assertEqual(predicates, [True, True])
-
-    def test__derive_view_with_predicates_checker(self):
-        view = lambda *arg: 'OK'
-        predicates = []
-        def predicate1(context, request):
-            predicates.append(True)
-            return True
-        def predicate2(context, request):
-            predicates.append(True)
-            return True
-        config = self._makeOne()
-        result = config._derive_view(view, predicates=[predicate1, predicate2])
-        request = self._makeRequest(config)
-        request.method = 'POST'
-        next = result.__predicated__(None, None)
-        self.assertEqual(next, True)
-        self.assertEqual(predicates, [True, True])
-
-    def test__derive_view_with_predicates_notall(self):
-        from pyramid.exceptions import NotFound
-        view = lambda *arg: 'OK'
-        predicates = []
-        def predicate1(context, request):
-            predicates.append(True)
-            return True
-        def predicate2(context, request):
-            predicates.append(True)
-            return False
-        config = self._makeOne()
-        result = config._derive_view(view, predicates=[predicate1, predicate2])
-        request = self._makeRequest(config)
-        request.method = 'POST'
-        self.assertRaises(NotFound, result, None, None)
-        self.assertEqual(predicates, [True, True])
-
-    def test__derive_view_with_wrapper_viewname(self):
-        from webob import Response
-        from pyramid.interfaces import IView
-        from pyramid.interfaces import IViewClassifier
-        inner_response = Response('OK')
-        def inner_view(context, request):
-            return inner_response
-        def outer_view(context, request):
-            self.assertEqual(request.wrapped_response, inner_response)
-            self.assertEqual(request.wrapped_body, inner_response.body)
-            self.assertEqual(request.wrapped_view, inner_view)
-            return Response('outer ' + request.wrapped_body)
-        config = self._makeOne()
-        config.registry.registerAdapter(
-            outer_view, (IViewClassifier, None, None), IView, 'owrap')
-        result = config._derive_view(inner_view, viewname='inner',
-                                    wrapper_viewname='owrap')
-        self.failIf(result is inner_view)
-        self.assertEqual(inner_view.__module__, result.__module__)
-        self.assertEqual(inner_view.__doc__, result.__doc__)
-        request = self._makeRequest(config)
-        request.registry = config.registry
-        response = result(None, request)
-        self.assertEqual(response.body, 'outer OK')
-
-    def test__derive_view_with_wrapper_viewname_notfound(self):
-        from webob import Response
-        inner_response = Response('OK')
-        def inner_view(context, request):
-            return inner_response
-        config = self._makeOne()
-        request = self._makeRequest(config)
-        request.registry = config.registry
-        wrapped = config._derive_view(
-            inner_view, viewname='inner', wrapper_viewname='owrap')
-        self.assertRaises(ValueError, wrapped, None, request)
 
     def test_override_asset_samename(self):
         from pyramid.exceptions import ConfigurationError
@@ -3406,24 +2908,6 @@ class ConfiguratorTests(unittest.TestCase):
         else: # pragma: no cover
             raise AssertionError
 
-    def test_conflict_add_handler(self):
-        class AHandler(object):
-            def aview(self): pass
-        from zope.configuration.config import ConfigurationConflictError
-        config = self._makeOne()
-        config.add_handler('h1', '/h1', handler=AHandler)
-        config.add_handler('h1', '/h1', handler=AHandler)
-        try:
-            config.commit()
-        except ConfigurationConflictError, why:
-            c1, c2, c3, c4 = self._conflictFunctions(why)
-            self.assertEqual(c1, 'test_conflict_add_handler')
-            self.assertEqual(c2, 'test_conflict_add_handler')
-            self.assertEqual(c3, 'test_conflict_add_handler')
-            self.assertEqual(c3, 'test_conflict_add_handler')
-        else: # pragma: no cover
-            raise AssertionError
-
     def test_scan_conflict(self):
         from zope.configuration.config import ConfigurationConflictError
         from pyramid.tests import selfscanapp
@@ -3439,11 +2923,11 @@ class ConfiguratorTests(unittest.TestCase):
                 for conflict in conflicts:
                     for confinst in conflict:
                         yield confinst[3]
-            c1, c2, c3, c4 = scanconflicts(why)
-            self.assertEqual(c1, "@view_config(renderer='string')")
-            self.assertEqual(c2, "@view_config(renderer='string')")
-            self.assertEqual(c3, "@view_config(name='two', renderer='string')")
-            self.assertEqual(c4, "@view_config(name='two', renderer='string')")
+            which = list(scanconflicts(why))
+            self.assertEqual(len(which), 4)
+            self.failUnless("@view_config(renderer='string')" in which)
+            self.failUnless("@view_config(name='two', renderer='string')" in
+                            which)
 
     def _conflictFunctions(self, e):
         conflicts = e._conflicts.values()
@@ -3451,353 +2935,932 @@ class ConfiguratorTests(unittest.TestCase):
             for confinst in conflict:
                 yield confinst[2]
 
-class Test__map_view(unittest.TestCase):
+    def test___getattr__missing_when_directives_exist(self):
+        config = self._makeOne()
+        directives = {}
+        config.registry._directives = directives
+        self.assertRaises(AttributeError, config.__getattr__, 'wontexist')
+
+    def test___getattr__missing_when_directives_dont_exist(self):
+        config = self._makeOne()
+        self.assertRaises(AttributeError, config.__getattr__, 'wontexist')
+
+    def test___getattr__matches(self):
+        config = self._makeOne()
+        def foo(config): pass
+        directives = {'foo':(foo, True)}
+        config.registry._directives = directives
+        foo_meth = config.foo
+        self.failUnless(foo_meth.im_func.__docobj__ is foo)
+
+class TestConfigurator_add_directive(unittest.TestCase):
+
     def setUp(self):
-        from pyramid.registry import Registry
-        self.registry = Registry()
-        testing.setUp(registry=self.registry)
+        from pyramid.config import Configurator
+        self.config = Configurator()
+
+    def test_extend_with_dotted_name(self):
+        from pyramid import tests
+        config = self.config
+        config.add_directive(
+            'dummy_extend', 'pyramid.tests.test_config.dummy_extend')
+        self.assert_(hasattr(config, 'dummy_extend'))
+        config.dummy_extend('discrim')
+        context_after = config._ctx
+        actions = context_after.actions
+        self.assertEqual(len(actions), 1)
+        self.assertEqual(
+            context_after.actions[0][:3],
+            ('discrim', None, tests),
+            )
+
+    def test_extend_with_python_callable(self):
+        from pyramid import tests
+        config = self.config
+        config.add_directive(
+            'dummy_extend', dummy_extend)
+        self.assert_(hasattr(config, 'dummy_extend'))
+        config.dummy_extend('discrim')
+        context_after = config._ctx
+        actions = context_after.actions
+        self.assertEqual(len(actions), 1)
+        self.assertEqual(
+            context_after.actions[0][:3],
+            ('discrim', None, tests),
+            )
+
+    def test_extend_same_name_doesnt_conflict(self):
+        config = self.config
+        config.add_directive(
+            'dummy_extend', dummy_extend)
+        config.add_directive(
+            'dummy_extend', dummy_extend2)
+        self.assert_(hasattr(config, 'dummy_extend'))
+        config.dummy_extend('discrim')
+        context_after = config._ctx
+        actions = context_after.actions
+        self.assertEqual(len(actions), 1)
+        self.assertEqual(
+            context_after.actions[0][:3],
+            ('discrim', None, config.registry),
+            )
+
+    def test_extend_action_method_successful(self):
+        from zope.configuration.config import ConfigurationConflictError
+        config = self.config
+        config.add_directive(
+            'dummy_extend', dummy_extend)
+        config.dummy_extend('discrim')
+        config.dummy_extend('discrim')
+        self.assertRaises(ConfigurationConflictError, config.commit)
+
+    def test_directive_persists_across_configurator_creations(self):
+        from zope.configuration.config import GroupingContextDecorator
+        config = self.config
+        config.add_directive('dummy_extend', dummy_extend)
+        context = config._make_context(autocommit=False)
+        context = GroupingContextDecorator(context)
+        config2 = config.with_context(context)
+        config2.dummy_extend('discrim')
+        context_after = config2._ctx
+        actions = context_after.actions
+        self.assertEqual(len(actions), 1)
+        self.assertEqual(
+            context_after.actions[0][:3],
+            ('discrim', None, config2.package),
+            )
+
+class TestViewDeriver(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        self.config = None
+        
+    def _makeOne(self, **kw):
+        kw['registry'] = self.config.registry
+        from pyramid.config import ViewDeriver
+        return ViewDeriver(**kw)
+    
+    def _makeRequest(self):
+        request = DummyRequest()
+        request.registry = self.config.registry
+        return request
+
+    def _registerLogger(self):
+        from pyramid.interfaces import IDebugLogger
+        logger = DummyLogger()
+        self.config.registry.registerUtility(logger, IDebugLogger)
+        return logger
+
+    def _registerSecurityPolicy(self, permissive):
+        from pyramid.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthorizationPolicy
+        policy = DummySecurityPolicy(permissive)
+        self.config.registry.registerUtility(policy, IAuthenticationPolicy)
+        self.config.registry.registerUtility(policy, IAuthorizationPolicy)
+
+    def test_requestonly_function(self):
+        def view(request):
+            return 'OK'
+        deriver = self._makeOne()
+        result = deriver(view)
+        self.failIf(result is view)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test_requestonly_function_with_renderer(self):
+        class moo(object):
+            def render_view(inself, req, resp, view_inst, ctx):
+                self.assertEqual(req, request)
+                self.assertEqual(resp, 'OK')
+                self.assertEqual(view_inst, view)
+                self.assertEqual(ctx, context)
+                return 'moo'
+        def view(request):
+            return 'OK'
+        deriver = self._makeOne(renderer=moo())
+        result = deriver(view)
+        self.failIf(result is view)
+        request = self._makeRequest()
+        context = testing.DummyResource()
+        self.assertEqual(result(context, request), 'moo')
+
+    def test_requestonly_function_with_renderer_request_override(self):
+        def moo(info):
+            def inner(value, system):
+                self.assertEqual(value, 'OK')
+                self.assertEqual(system['request'], request)
+                self.assertEqual(system['context'], context)
+                return 'moo'
+            return inner
+        def view(request):
+            return 'OK'
+        self.config.add_renderer('moo', moo)
+        deriver = self._makeOne(renderer='string')
+        result = deriver(view)
+        self.failIf(result is view)
+        request = self._makeRequest()
+        request.override_renderer = 'moo'
+        context = testing.DummyResource()
+        self.assertEqual(result(context, request).body, 'moo')
+
+    def test_requestonly_function_with_renderer_request_has_view(self):
+        class moo(object):
+            def render_view(inself, req, resp, view_inst, ctx):
+                self.assertEqual(req, request)
+                self.assertEqual(resp, 'OK')
+                self.assertEqual(view_inst, 'view')
+                self.assertEqual(ctx, context)
+                return 'moo'
+        def view(request):
+            return 'OK'
+        deriver = self._makeOne(renderer=moo())
+        result = deriver(view)
+        self.failIf(result is view)
+        request = self._makeRequest()
+        request.__view__ = 'view'
+        context = testing.DummyResource()
+        self.assertEqual(result(context, request), 'moo')
+        self.failIf(hasattr(request, '__view__'))
+
+    def test_class_without_attr(self):
+        class View(object):
+            def __init__(self, request):
+                pass
+            def __call__(self):
+                return 'OK'
+        deriver = self._makeOne()
+        result = deriver(View)
+        request = self._makeRequest()
+        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(request.__view__.__class__, View)
+
+    def test_class_with_attr(self):
+        class View(object):
+            def __init__(self, request):
+                pass
+            def another(self):
+                return 'OK'
+        deriver = self._makeOne(attr='another')
+        result = deriver(View)
+        request = self._makeRequest()
+        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(request.__view__.__class__, View)
+
+    def test_as_function_context_and_request(self):
+        def view(context, request):
+            return 'OK'
+        deriver = self._makeOne()
+        result = deriver(view)
+        self.failUnless(result is view)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertEqual(view(None, None), 'OK')
+
+    def test_as_function_requestonly(self):
+        def view(request):
+            return 'OK'
+        deriver = self._makeOne()
+        result = deriver(view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertEqual(result(None, None), 'OK')
+
+    def test_as_newstyle_class_context_and_request(self):
+        class view(object):
+            def __init__(self, context, request):
+                pass
+            def __call__(self):
+                return 'OK'
+        deriver = self._makeOne()
+        result = deriver(view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        request = self._makeRequest()
+        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(request.__view__.__class__, view)
+
+    def test_as_newstyle_class_requestonly(self):
+        class view(object):
+            def __init__(self, context, request):
+                pass
+            def __call__(self):
+                return 'OK'
+        deriver = self._makeOne()
+        result = deriver(view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        request = self._makeRequest()
+        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(request.__view__.__class__, view)
+
+    def test_as_oldstyle_class_context_and_request(self):
+        class view:
+            def __init__(self, context, request):
+                pass
+            def __call__(self):
+                return 'OK'
+        deriver = self._makeOne()
+        result = deriver(view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        request = self._makeRequest()
+        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(request.__view__.__class__, view)
+
+    def test_as_oldstyle_class_requestonly(self):
+        class view:
+            def __init__(self, context, request):
+                pass
+            def __call__(self):
+                return 'OK'
+        deriver = self._makeOne()
+        result = deriver(view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        request = self._makeRequest()
+        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(request.__view__.__class__, view)
+
+    def test_as_instance_context_and_request(self):
+        class View:
+            def __call__(self, context, request):
+                return 'OK'
+        view = View()
+        deriver = self._makeOne()
+        result = deriver(view)
+        self.failUnless(result is view)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertEqual(result(None, None), 'OK')
+
+    def test_as_instance_requestonly(self):
+        class View:
+            def __call__(self, request):
+                return 'OK'
+        view = View()
+        deriver = self._makeOne()
+        result = deriver(view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.failUnless('instance' in result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertEqual(result(None, None), 'OK')
+
+    def test_with_debug_authorization_no_authpol(self):
+        view = lambda *arg: 'OK'
+        self.config.registry.settings = dict(
+            debug_authorization=True, reload_templates=True)
+        logger = self._registerLogger()
+        deriver = self._makeOne(permission='view')
+        result = deriver(view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        request = self._makeRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(len(logger.messages), 1)
+        self.assertEqual(logger.messages[0],
+                         "debug_authorization of url url (view name "
+                         "'view_name' against context None): Allowed "
+                         "(no authorization policy in use)")
+
+    def test_with_debug_authorization_no_permission(self):
+        view = lambda *arg: 'OK'
+        self.config.registry.settings = dict(
+            debug_authorization=True, reload_templates=True)
+        self._registerSecurityPolicy(True)
+        logger = self._registerLogger()
+        deriver = self._makeOne()
+        result = deriver(view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        request = self._makeRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(len(logger.messages), 1)
+        self.assertEqual(logger.messages[0],
+                         "debug_authorization of url url (view name "
+                         "'view_name' against context None): Allowed ("
+                         "no permission registered)")
+
+    def test_debug_auth_permission_authpol_permitted(self):
+        view = lambda *arg: 'OK'
+        self.config.registry.settings = dict(
+            debug_authorization=True, reload_templates=True)
+        logger = self._registerLogger()
+        self._registerSecurityPolicy(True)
+        deriver = self._makeOne(permission='view')
+        result = deriver(view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertEqual(result.__call_permissive__, view)
+        request = self._makeRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(len(logger.messages), 1)
+        self.assertEqual(logger.messages[0],
+                         "debug_authorization of url url (view name "
+                         "'view_name' against context None): True")
+
+    def test_debug_auth_permission_authpol_denied(self):
+        from pyramid.exceptions import Forbidden
+        view = lambda *arg: 'OK'
+        self.config.registry.settings = dict(
+            debug_authorization=True, reload_templates=True)
+        logger = self._registerLogger()
+        self._registerSecurityPolicy(False)
+        deriver = self._makeOne(permission='view')
+        result = deriver(view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertEqual(result.__call_permissive__, view)
+        request = self._makeRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        self.assertRaises(Forbidden, result, None, request)
+        self.assertEqual(len(logger.messages), 1)
+        self.assertEqual(logger.messages[0],
+                         "debug_authorization of url url (view name "
+                         "'view_name' against context None): False")
+
+    def test_debug_auth_permission_authpol_denied2(self):
+        view = lambda *arg: 'OK'
+        self.config.registry.settings = dict(
+            debug_authorization=True, reload_templates=True)
+        self._registerLogger()
+        self._registerSecurityPolicy(False)
+        deriver = self._makeOne(permission='view')
+        result = deriver(view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        request = self._makeRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        permitted = result.__permitted__(None, None)
+        self.assertEqual(permitted, False)
+
+    def test_debug_auth_permission_authpol_overridden(self):
+        view = lambda *arg: 'OK'
+        self.config.registry.settings = dict(
+            debug_authorization=True, reload_templates=True)
+        logger = self._registerLogger()
+        self._registerSecurityPolicy(False)
+        deriver = self._makeOne(permission='__no_permission_required__')
+        result = deriver(view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        request = self._makeRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(len(logger.messages), 1)
+        self.assertEqual(logger.messages[0],
+                         "debug_authorization of url url (view name "
+                         "'view_name' against context None): False")
+
+    def test_with_predicates_all(self):
+        view = lambda *arg: 'OK'
+        predicates = []
+        def predicate1(context, request):
+            predicates.append(True)
+            return True
+        def predicate2(context, request):
+            predicates.append(True)
+            return True
+        deriver = self._makeOne(predicates=[predicate1, predicate2])
+        result = deriver(view)
+        request = self._makeRequest()
+        request.method = 'POST'
+        next = result(None, None)
+        self.assertEqual(next, 'OK')
+        self.assertEqual(predicates, [True, True])
+
+    def test_with_predicates_checker(self):
+        view = lambda *arg: 'OK'
+        predicates = []
+        def predicate1(context, request):
+            predicates.append(True)
+            return True
+        def predicate2(context, request):
+            predicates.append(True)
+            return True
+        deriver = self._makeOne(predicates=[predicate1, predicate2])
+        result = deriver(view)
+        request = self._makeRequest()
+        request.method = 'POST'
+        next = result.__predicated__(None, None)
+        self.assertEqual(next, True)
+        self.assertEqual(predicates, [True, True])
+
+    def test_with_predicates_notall(self):
+        from pyramid.exceptions import NotFound
+        view = lambda *arg: 'OK'
+        predicates = []
+        def predicate1(context, request):
+            predicates.append(True)
+            return True
+        def predicate2(context, request):
+            predicates.append(True)
+            return False
+        deriver = self._makeOne(predicates=[predicate1, predicate2])
+        result = deriver(view)
+        request = self._makeRequest()
+        request.method = 'POST'
+        self.assertRaises(NotFound, result, None, None)
+        self.assertEqual(predicates, [True, True])
+
+    def test_with_wrapper_viewname(self):
+        from webob import Response
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        inner_response = Response('OK')
+        def inner_view(context, request):
+            return inner_response
+        def outer_view(context, request):
+            self.assertEqual(request.wrapped_response, inner_response)
+            self.assertEqual(request.wrapped_body, inner_response.body)
+            self.assertEqual(request.wrapped_view, inner_view)
+            return Response('outer ' + request.wrapped_body)
+        self.config.registry.registerAdapter(
+            outer_view, (IViewClassifier, None, None), IView, 'owrap')
+        deriver = self._makeOne(viewname='inner',
+                                wrapper_viewname='owrap')
+        result = deriver(inner_view)
+        self.failIf(result is inner_view)
+        self.assertEqual(inner_view.__module__, result.__module__)
+        self.assertEqual(inner_view.__doc__, result.__doc__)
+        request = self._makeRequest()
+        response = result(None, request)
+        self.assertEqual(response.body, 'outer OK')
+
+    def test_with_wrapper_viewname_notfound(self):
+        from webob import Response
+        inner_response = Response('OK')
+        def inner_view(context, request):
+            return inner_response
+        deriver = self._makeOne(viewname='inner', wrapper_viewname='owrap')
+        wrapped = deriver(inner_view)
+        request = self._makeRequest()
+        self.assertRaises(ValueError, wrapped, None, request)
+
+    def test_as_newstyle_class_context_and_request_attr_and_renderer(self):
+        class renderer(object):
+            def render_view(inself, req, resp, view_inst, ctx):
+                self.assertEqual(req, request)
+                self.assertEqual(resp, {'a':'1'})
+                self.assertEqual(view_inst.__class__, View)
+                self.assertEqual(ctx, context)
+                return resp
+        class View(object):
+            def __init__(self, context, request):
+                pass
+            def index(self):
+                return {'a':'1'}
+        deriver = self._makeOne(renderer=renderer(), attr='index')
+        result = deriver(View)
+        self.failIf(result is View)
+        self.assertEqual(result.__module__, View.__module__)
+        self.assertEqual(result.__doc__, View.__doc__)
+        self.assertEqual(result.__name__, View.__name__)
+        request = self._makeRequest()
+        context = testing.DummyResource()
+        self.assertEqual(result(context, request), {'a':'1'})
+
+    def test_as_newstyle_class_requestonly_attr_and_renderer(self):
+        class renderer(object):
+            def render_view(inself, req, resp, view_inst, ctx):
+                self.assertEqual(req, request)
+                self.assertEqual(resp, {'a':'1'})
+                self.assertEqual(view_inst.__class__, View)
+                self.assertEqual(ctx, context)
+                return resp
+        class View(object):
+            def __init__(self, request):
+                pass
+            def index(self):
+                return {'a':'1'}
+        deriver = self._makeOne(renderer=renderer(), attr='index')
+        result = deriver(View)
+        self.failIf(result is View)
+        self.assertEqual(result.__module__, View.__module__)
+        self.assertEqual(result.__doc__, View.__doc__)
+        self.assertEqual(result.__name__, View.__name__)
+        request = self._makeRequest()
+        context = testing.DummyResource()
+        self.assertEqual(result(context, request), {'a':'1'})
+
+    def test_as_oldstyle_cls_context_request_attr_and_renderer(self):
+        class renderer(object):
+            def render_view(inself, req, resp, view_inst, ctx):
+                self.assertEqual(req, request)
+                self.assertEqual(resp, {'a':'1'})
+                self.assertEqual(view_inst.__class__, View)
+                self.assertEqual(ctx, context)
+                return resp
+        class View:
+            def __init__(self, context, request):
+                pass
+            def index(self):
+                return {'a':'1'}
+        deriver = self._makeOne(renderer=renderer(), attr='index')
+        result = deriver(View)
+        self.failIf(result is View)
+        self.assertEqual(result.__module__, View.__module__)
+        self.assertEqual(result.__doc__, View.__doc__)
+        self.assertEqual(result.__name__, View.__name__)
+        request = self._makeRequest()
+        context = testing.DummyResource()
+        self.assertEqual(result(context, request), {'a':'1'})
+
+    def test_as_oldstyle_cls_requestonly_attr_and_renderer(self):
+        class renderer(object):
+            def render_view(inself, req, resp, view_inst, ctx):
+                self.assertEqual(req, request)
+                self.assertEqual(resp, {'a':'1'})
+                self.assertEqual(view_inst.__class__, View)
+                self.assertEqual(ctx, context)
+                return resp
+        class View:
+            def __init__(self, request):
+                pass
+            def index(self):
+                return {'a':'1'}
+        deriver = self._makeOne(renderer=renderer(), attr='index')
+        result = deriver(View)
+        self.failIf(result is View)
+        self.assertEqual(result.__module__, View.__module__)
+        self.assertEqual(result.__doc__, View.__doc__)
+        self.assertEqual(result.__name__, View.__name__)
+        request = self._makeRequest()
+        context = testing.DummyResource()
+        self.assertEqual(result(context, request), {'a':'1'})
+
+    def test_as_instance_context_and_request_attr_and_renderer(self):
+        class renderer(object):
+            def render_view(inself, req, resp, view_inst, ctx):
+                self.assertEqual(req, request)
+                self.assertEqual(resp, {'a':'1'})
+                self.assertEqual(view_inst, view)
+                self.assertEqual(ctx, context)
+                return resp
+        class View:
+            def index(self, context, request):
+                return {'a':'1'}
+        deriver = self._makeOne(renderer=renderer(), attr='index')
+        view = View()
+        result = deriver(view)
+        self.failIf(result is view)
+        self.assertEqual(result.__module__, view.__module__)
+        self.assertEqual(result.__doc__, view.__doc__)
+        request = self._makeRequest()
+        context = testing.DummyResource()
+        self.assertEqual(result(context, request), {'a':'1'})
+
+    def test_as_instance_requestonly_attr_and_renderer(self):
+        class renderer(object):
+            def render_view(inself, req, resp, view_inst, ctx):
+                self.assertEqual(req, request)
+                self.assertEqual(resp, {'a':'1'})
+                self.assertEqual(view_inst, view)
+                self.assertEqual(ctx, context)
+                return resp
+        class View:
+            def index(self, request):
+                return {'a':'1'}
+        deriver = self._makeOne(renderer=renderer(), attr='index')
+        view = View()
+        result = deriver(view)
+        self.failIf(result is view)
+        self.assertEqual(result.__module__, view.__module__)
+        self.assertEqual(result.__doc__, view.__doc__)
+        request = self._makeRequest()
+        context = testing.DummyResource()
+        self.assertEqual(result(context, request), {'a':'1'})
+
+    def test_with_view_mapper_config_specified(self):
+        class mapper(object):
+            def __init__(self, **kw):
+                self.kw = kw
+            def __call__(self, view):
+                def wrapped(context, request):
+                    return 'OK'
+                return wrapped
+        def view(context, request): return 'NOTOK'
+        deriver = self._makeOne(mapper=mapper)
+        result = deriver(view)
+        self.failIf(result is view)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test_with_view_mapper_view_specified(self):
+        def mapper(**kw):
+            def inner(view):
+                def superinner(context, request):
+                    self.assertEqual(request, None)
+                    return 'OK'
+                return superinner
+            return inner
+        def view(context, request): return 'NOTOK'
+        view.__view_mapper__ = mapper
+        deriver = self._makeOne()
+        result = deriver(view)
+        self.failIf(result is view)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test_with_view_mapper_default_mapper_specified(self):
+        def mapper(**kw):
+            def inner(view):
+                def superinner(context, request):
+                    self.assertEqual(request, None)
+                    return 'OK'
+                return superinner
+            return inner
+        self.config.set_view_mapper(mapper)
+        def view(context, request): return 'NOTOK'
+        deriver = self._makeOne()
+        result = deriver(view)
+        self.failIf(result is view)
+        self.assertEqual(result(None, None), 'OK')
+
+class TestDefaultViewMapper(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+        self.registry = self.config.registry 
 
     def tearDown(self):
         del self.registry
         testing.tearDown()
 
-    def _registerRenderer(self, typ='.txt'):
-        from pyramid.interfaces import IRendererFactory
-        from pyramid.interfaces import ITemplateRenderer
-        from zope.interface import implements
-        class Renderer:
-            implements(ITemplateRenderer)
-            spec = 'abc' + typ
-            def __init__(self, path):
-                self.__class__.path = path
-            def __call__(self, *arg):
-                return 'Hello!'
-        self.registry.registerUtility(Renderer, IRendererFactory, name=typ)
-        return Renderer
+    def _makeOne(self, **kw):
+        from pyramid.config import DefaultViewMapper
+        kw['registry'] = self.registry
+        return DefaultViewMapper(**kw)
 
     def _makeRequest(self):
         request = DummyRequest()
         request.registry = self.registry
         return request
 
-    def _callFUT(self, view, **kw):
-        from pyramid.config import _map_view
-        return _map_view(view, self.registry, **kw)
-
-    def test__map_view_as_function_context_and_request(self):
+    def test_view_as_function_context_and_request(self):
         def view(context, request):
             return 'OK'
-        result = self._callFUT(view)
+        mapper = self._makeOne()
+        result = mapper(view)
         self.failUnless(result is view)
-        self.assertEqual(result(None, None), 'OK')
+        request = self._makeRequest()
+        self.assertEqual(result(None, request), 'OK')
 
-    def test__map_view_as_function_with_attr(self):
+    def test__view_as_function_with_attr(self):
         def view(context, request):
             """ """
-        result = self._callFUT(view, attr='__name__')
+        mapper = self._makeOne(attr='__name__')
+        result = mapper(view)
         self.failIf(result is view)
-        self.assertRaises(TypeError, result, None, None)
+        request = self._makeRequest()
+        self.assertRaises(TypeError, result, None, request)
 
-    def test__map_view_as_function_with_attr_and_renderer(self):
-        renderer = self._registerRenderer()
-        view = lambda *arg: 'OK'
-        info = {'name':renderer.spec, 'package':None}
-        result = self._callFUT(view, attr='__name__', renderer=info)
-        self.failIf(result is view)
-        self.assertRaises(TypeError, result, None, None)
-
-    def test__map_view_as_function_requestonly(self):
+    def test_view_as_function_requestonly(self):
         def view(request):
             return 'OK'
-        result = self._callFUT(view)
+        mapper = self._makeOne()
+        result = mapper(view)
         self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result(None, None), 'OK')
+        request = self._makeRequest()
+        self.assertEqual(result(None, request), 'OK')
 
-    def test__map_view_as_function_requestonly_with_attr(self):
+    def test_view_as_function_requestonly_with_attr(self):
         def view(request):
             """ """
-        result = self._callFUT(view, attr='__name__')
+        mapper = self._makeOne(attr='__name__')
+        result = mapper(view)
         self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertRaises(TypeError, result, None, None)
+        request = self._makeRequest()
+        self.assertRaises(TypeError, result, None, request)
 
-    def test__map_view_as_newstyle_class_context_and_request(self):
+    def test_view_as_newstyle_class_context_and_request(self):
         class view(object):
             def __init__(self, context, request):
                 pass
             def __call__(self):
                 return 'OK'
-        result = self._callFUT(view)
+        mapper = self._makeOne()
+        result = mapper(view)
         self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result(None, None), 'OK')
+        request = self._makeRequest()
+        self.assertEqual(result(None, request), 'OK')
 
-    def test__map_view_as_newstyle_class_context_and_request_with_attr(self):
+    def test_view_as_newstyle_class_context_and_request_with_attr(self):
         class view(object):
             def __init__(self, context, request):
                 pass
             def index(self):
                 return 'OK'
-        result = self._callFUT(view, attr='index')
+        mapper = self._makeOne(attr='index')
+        result = mapper(view)
         self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__map_view_as_newstyle_class_context_and_request_attr_and_renderer(
-        self):
-        renderer = self._registerRenderer()
-        class view(object):
-            def __init__(self, context, request):
-                pass
-            def index(self):
-                return {'a':'1'}
-        info = {'name':renderer.spec, 'package':None}
-        result = self._callFUT(view, attr='index', renderer=info)
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
         request = self._makeRequest()
-        self.assertEqual(result(None, request).body, 'Hello!')
+        self.assertEqual(result(None, request), 'OK')
 
-    def test__map_view_as_newstyle_class_requestonly(self):
+    def test_view_as_newstyle_class_requestonly(self):
         class view(object):
             def __init__(self, request):
                 pass
             def __call__(self):
                 return 'OK'
-        result = self._callFUT(view)
+        mapper = self._makeOne()
+        result = mapper(view)
         self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result(None, None), 'OK')
+        request = self._makeRequest()
+        self.assertEqual(result(None, request), 'OK')
 
-    def test__map_view_as_newstyle_class_requestonly_with_attr(self):
+    def test_view_as_newstyle_class_requestonly_with_attr(self):
         class view(object):
             def __init__(self, request):
                 pass
             def index(self):
                 return 'OK'
-        result = self._callFUT(view, attr='index')
+        mapper = self._makeOne(attr='index')
+        result = mapper(view)
         self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__map_view_as_newstyle_class_requestonly_attr_and_renderer(self):
-        renderer = self._registerRenderer()
-        class view(object):
-            def __init__(self, request):
-                pass
-            def index(self):
-                return {'a':'1'}
-        info = {'name':renderer.spec, 'package':None}
-        result = self._callFUT(view, attr='index', renderer=info)
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
         request = self._makeRequest()
-        self.assertEqual(result(None, request).body, 'Hello!')
+        self.assertEqual(result(None, request), 'OK')
 
-    def test__map_view_as_oldstyle_class_context_and_request(self):
+    def test_view_as_oldstyle_class_context_and_request(self):
         class view:
             def __init__(self, context, request):
                 pass
             def __call__(self):
                 return 'OK'
-        result = self._callFUT(view)
+        mapper = self._makeOne()
+        result = mapper(view)
         self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result(None, None), 'OK')
+        request = self._makeRequest()
+        self.assertEqual(result(None, request), 'OK')
 
-    def test__map_view_as_oldstyle_class_context_and_request_with_attr(self):
+    def test_view_as_oldstyle_class_context_and_request_with_attr(self):
         class view:
             def __init__(self, context, request):
                 pass
             def index(self):
                 return 'OK'
-        result = self._callFUT(view, attr='index')
+        mapper = self._makeOne(attr='index')
+        result = mapper(view)
         self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__map_view_as_oldstyle_cls_context_request_attr_and_renderer(self):
-        renderer = self._registerRenderer()
-        class view:
-            def __init__(self, context, request):
-                pass
-            def index(self):
-                return {'a':'1'}
-        info = {'name':renderer.spec, 'package':None}
-        result = self._callFUT(view, attr='index', renderer=info)
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
         request = self._makeRequest()
-        self.assertEqual(result(None, request).body, 'Hello!')
+        self.assertEqual(result(None, request), 'OK')
 
-    def test__map_view_as_oldstyle_class_requestonly(self):
+    def test_view_as_oldstyle_class_requestonly(self):
         class view:
             def __init__(self, request):
                 pass
             def __call__(self):
                 return 'OK'
-        result = self._callFUT(view)
+        mapper = self._makeOne()
+        result = mapper(view)
         self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result(None, None), 'OK')
+        request = self._makeRequest()
+        self.assertEqual(result(None, request), 'OK')
 
-    def test__map_view_as_oldstyle_class_requestonly_with_attr(self):
+    def test_view_as_oldstyle_class_requestonly_with_attr(self):
         class view:
             def __init__(self, request):
                 pass
             def index(self):
                 return 'OK'
-        result = self._callFUT(view, attr='index')
+        mapper = self._makeOne(attr='index')
+        result = mapper(view)
         self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__map_view_as_oldstyle_class_requestonly_attr_and_renderer(self):
-        renderer = self._registerRenderer()
-        class view:
-            def __init__(self, request):
-                pass
-            def index(self):
-                return {'a':'1'}
-        info = {'name':renderer.spec, 'package':None}
-        result = self._callFUT(view, attr='index', renderer=info)
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
         request = self._makeRequest()
-        self.assertEqual(result(None, request).body, 'Hello!')
+        self.assertEqual(result(None, request), 'OK')
 
-    def test__map_view_as_instance_context_and_request(self):
+    def test_view_as_instance_context_and_request(self):
         class View:
             def __call__(self, context, request):
                 return 'OK'
         view = View()
-        result = self._callFUT(view)
+        mapper = self._makeOne()
+        result = mapper(view)
         self.failUnless(result is view)
-        self.assertEqual(result(None, None), 'OK')
+        request = self._makeRequest()
+        self.assertEqual(result(None, request), 'OK')
 
-    def test__map_view_as_instance_context_and_request_and_attr(self):
+    def test_view_as_instance_context_and_request_and_attr(self):
         class View:
             def index(self, context, request):
                 return 'OK'
         view = View()
-        result = self._callFUT(view, attr='index')
-        self.failIf(result is view)
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__map_view_as_instance_context_and_request_attr_and_renderer(self):
-        renderer = self._registerRenderer()
-        class View:
-            def index(self, context, request):
-                return {'a':'1'}
-        view = View()
-        info = {'name':renderer.spec, 'package':None}
-        result = self._callFUT(view, attr='index', renderer=info)
+        mapper = self._makeOne(attr='index')
+        result = mapper(view)
         self.failIf(result is view)
         request = self._makeRequest()
-        self.assertEqual(result(None, request).body, 'Hello!')
+        self.assertEqual(result(None, request), 'OK')
 
-    def test__map_view_as_instance_requestonly(self):
+    def test_view_as_instance_requestonly(self):
         class View:
             def __call__(self, request):
                 return 'OK'
         view = View()
-        result = self._callFUT(view)
+        mapper = self._makeOne()
+        result = mapper(view)
         self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.failUnless('instance' in result.__name__)
-        self.assertEqual(result(None, None), 'OK')
+        request = self._makeRequest()
+        self.assertEqual(result(None, request), 'OK')
 
-    def test__map_view_as_instance_requestonly_with_attr(self):
+    def test_view_as_instance_requestonly_with_attr(self):
         class View:
             def index(self, request):
                 return 'OK'
         view = View()
-        result = self._callFUT(view, attr='index')
+        mapper = self._makeOne(attr='index')
+        result = mapper(view)
         self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.failUnless('instance' in result.__name__)
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__map_view_as_instance_requestonly_with_attr_and_renderer(self):
-        renderer = self._registerRenderer()
-        class View:
-            def index(self, request):
-                return {'a':'1'}
-        view = View()
-        info = {'name':renderer.spec, 'package':None}
-        result = self._callFUT(view, attr='index', renderer=info)
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.failUnless('instance' in result.__name__)
         request = self._makeRequest()
-        self.assertEqual(result(None, request).body, 'Hello!')
+        self.assertEqual(result(None, request), 'OK')
 
-    def test__map_view_rendereronly(self):
-        renderer = self._registerRenderer()
-        def view(context, request):
-            return {'a':'1'}
-        info = {'name':renderer.spec, 'package':None}
-        result = self._callFUT(view, renderer=info)
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        request = self._makeRequest()
-        self.assertEqual(result(None, request).body, 'Hello!')
-
-    def test__map_view_with_registry(self):
-        renderer = self._registerRenderer()
-        def view(context, request):
-            return {'a':'1'}
-        info = {'name':renderer.spec, 'package':None}
-        result = self._callFUT(view, renderer=info)
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        request = self._makeRequest()
-        self.assertEqual(result(None, request).body, 'Hello!')
-
-class Test_decorate_view(unittest.TestCase):
-    def _callFUT(self, wrapped, original):
-        from pyramid.config import decorate_view
-        return decorate_view(wrapped, original)
+class Test_preserve_view_attrs(unittest.TestCase):
+    def _callFUT(self, view, wrapped_view):
+        from pyramid.config import preserve_view_attrs
+        return preserve_view_attrs(view, wrapped_view)
 
     def test_it_same(self):
         def view(context, request):
             """ """
         result = self._callFUT(view, view)
-        self.assertEqual(result, False)
+        self.failUnless(result is view)
+
+    def test_it_different_with_existing_original_view(self):
+        def view1(context, request): pass
+        view1.__original_view__ = 'abc'
+        def view2(context, request): pass
+        result = self._callFUT(view1, view2)
+        self.assertEqual(result.__original_view__, 'abc')
+        self.failIf(result is view1)
 
     def test_it_different(self):
         class DummyView1:
@@ -3806,9 +3869,9 @@ class Test_decorate_view(unittest.TestCase):
             __module__ = '1'
             def __call__(self, context, request):
                 """ """
-            def __call_permissive__(self, context, reuqest):
+            def __call_permissive__(self, context, request):
                 """ """
-            def __predicated__(self, context, reuqest):
+            def __predicated__(self, context, request):
                 """ """
             def __permitted__(self, context, request):
                 """ """
@@ -3818,16 +3881,17 @@ class Test_decorate_view(unittest.TestCase):
             __module__ = '2'
             def __call__(self, context, request):
                 """ """
-            def __call_permissive__(self, context, reuqest):
+            def __call_permissive__(self, context, request):
                 """ """
-            def __predicated__(self, context, reuqest):
+            def __predicated__(self, context, request):
                 """ """
             def __permitted__(self, context, request):
                 """ """
         view1 = DummyView1()
         view2 = DummyView2()
-        result = self._callFUT(view1, view2)
-        self.assertEqual(result, True)
+        result = self._callFUT(view2, view1)
+        self.assertEqual(result, view1)
+        self.failUnless(view1.__original_view__ is view2)
         self.failUnless(view1.__doc__ is view2.__doc__)
         self.failUnless(view1.__module__ is view2.__module__)
         self.failUnless(view1.__name__ is view2.__name__)
@@ -4293,24 +4357,23 @@ class TestMultiView(unittest.TestCase):
         response = mv(context, request)
         self.assertEqual(response, expected_response)
 
-
-class TestRequestOnly(unittest.TestCase):
-    def _callFUT(self, arg):
+class Test_requestonly(unittest.TestCase):
+    def _callFUT(self, view, attr=None):
         from pyramid.config import requestonly
-        return requestonly(arg)
+        return requestonly(view, attr)
 
-    def test_newstyle_class_no_init(self):
+    def test_requestonly_newstyle_class_no_init(self):
         class foo(object):
             """ """
         self.assertFalse(self._callFUT(foo))
 
-    def test_newstyle_class_init_toomanyargs(self):
+    def test_requestonly_newstyle_class_init_toomanyargs(self):
         class foo(object):
             def __init__(self, context, request):
                 """ """
         self.assertFalse(self._callFUT(foo))
 
-    def test_newstyle_class_init_onearg_named_request(self):
+    def test_requestonly_newstyle_class_init_onearg_named_request(self):
         class foo(object):
             def __init__(self, request):
                 """ """
@@ -4385,6 +4448,22 @@ class TestRequestOnly(unittest.TestCase):
         def foo(context, request):
             """ """
         self.assertFalse(self._callFUT(foo))
+
+    def test_function_with_attr_false(self):
+        def bar(context, request):
+            """ """
+        def foo(context, request):
+            """ """
+        foo.bar = bar
+        self.assertFalse(self._callFUT(foo, 'bar'))
+
+    def test_function_with_attr_true(self):
+        def bar(context, request):
+            """ """
+        def foo(request):
+            """ """
+        foo.bar = bar
+        self.assertTrue(self._callFUT(foo, 'bar'))
 
     def test_function_onearg_named_request(self):
         def foo(request):
@@ -4477,57 +4556,6 @@ class Test_isexception(unittest.TestCase):
             pass
         self.assertEqual(self._callFUT(ISubException), True)
 
-class TestActionPredicate(unittest.TestCase):
-    def _getTargetClass(self):
-        from pyramid.config import ActionPredicate
-        return ActionPredicate
-
-    def _makeOne(self, action='myaction'):
-        return self._getTargetClass()(action)
-
-    def test_bad_action_regex_string(self):
-        from pyramid.exceptions import ConfigurationError
-        cls = self._getTargetClass()
-        self.assertRaises(ConfigurationError, cls, '[a-z')
-
-    def test_bad_action_regex_None(self):
-        from pyramid.exceptions import ConfigurationError
-        cls = self._getTargetClass()
-        self.assertRaises(ConfigurationError, cls, None)
-
-    def test___call__no_matchdict(self):
-        pred = self._makeOne()
-        request = DummyRequest()
-        self.assertEqual(pred(None, request), False)
-
-    def test___call__no_action_in_matchdict(self):
-        pred = self._makeOne()
-        request = DummyRequest()
-        request.matchdict = {}
-        self.assertEqual(pred(None, request), False)
-
-    def test___call__action_does_not_match(self):
-        pred = self._makeOne()
-        request = DummyRequest()
-        request.matchdict = {'action':'notmyaction'}
-        self.assertEqual(pred(None, request), False)
-
-    def test___call__action_matches(self):
-        pred = self._makeOne()
-        request = DummyRequest()
-        request.matchdict = {'action':'myaction'}
-        self.assertEqual(pred(None, request), True)
-
-    def test___hash__(self):
-        pred1 = self._makeOne()
-        pred2 = self._makeOne()
-        pred3 = self._makeOne(action='notthesame')
-        self.assertEqual(hash(pred1), hash(pred2))
-        self.assertNotEqual(hash(pred1), hash(pred3))
-        self.assertNotEqual(hash(pred2), hash(pred3))
-
-
-
 class DummyRequest:
     subpath = ()
     matchdict = None
@@ -4542,13 +4570,6 @@ class DummyRequest:
 
 class DummyContext:
     pass
-
-class DummyLock:
-    def acquire(self):
-        self.acquired = True
-
-    def release(self):
-        self.released = True
 
 class DummyPackage:
     def __init__(self, name):
@@ -4666,16 +4687,14 @@ def dummy_view(request):
 def dummyfactory(request):
     """ """
 
-class DummyHandler(object): # pragma: no cover
-    def __init__(self, request):
-        self.request = request
-
-    def action1(self):
-        return 'response 1'
-
-    def action2(self):
-        return 'response 2'
-
 def dummy_include(config):
     config.action('discrim', None, config.package)
+
+includeme = dummy_include
+
+def dummy_extend(config, discrim):
+    config.action(discrim, None, config.package)
+
+def dummy_extend2(config, discrim):
+    config.action(discrim, None, config.registry)
     

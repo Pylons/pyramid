@@ -691,6 +691,26 @@ class QuotePathSegmentTests(unittest.TestCase):
         result = self._callFUT(s)
         self.assertEqual(result, '%2F%20hello%21')
 
+    def test_int(self):
+        s = 12345
+        result = self._callFUT(s)
+        self.assertEqual(result, '12345')
+        
+    def test_long(self):
+        import sys
+        s = long(sys.maxint + 1)
+        result = self._callFUT(s)
+        expected = str(s)
+        self.assertEqual(result, expected)
+
+    def test_other(self):
+        class Foo(object):
+            def __str__(self):
+                return 'abc'
+        s = Foo()
+        result = self._callFUT(s)
+        self.assertEqual(result, 'abc')
+
 class TraversalContextURLTests(unittest.TestCase):
     def _makeOne(self, context, url):
         return self._getTargetClass()(context, url)

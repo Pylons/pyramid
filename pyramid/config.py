@@ -2,14 +2,13 @@ import inspect
 import os
 import re
 import sys
-import threading
+import types
 import traceback
 
 import venusian
 
 from translationstring import ChameleonTranslate
 
-from zope.configuration import xmlconfig
 from zope.configuration.config import GroupingContextDecorator
 from zope.configuration.config import ConfigurationMachine
 from zope.configuration.xmlconfig import registerCommonDirectives
@@ -45,6 +44,7 @@ from pyramid.interfaces import ITranslationDirectories
 from pyramid.interfaces import ITraverser
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
+from pyramid.interfaces import IViewMapperFactory
 
 try:
     from pyramid import chameleon_text
@@ -87,6 +87,7 @@ from pyramid.urldispatch import RoutesMapper
 from pyramid.util import DottedNameResolver
 from pyramid.view import default_exceptionresponse_view
 from pyramid.view import render_view_to_response
+from pyramid.view import is_response
 
 MAX_ORDER = 1 << 30
 DEFAULT_PHASH = md5().hexdigest()
@@ -124,6 +125,7 @@ def action_method(wrapped):
         return result
     wrapper.__name__ = wrapped.__name__
     wrapper.__doc__ = wrapped.__doc__
+    wrapper.__docobj__ = wrapped # for sphinx
     return wrapper
 
 class Configurator(object):
@@ -202,14 +204,13 @@ class Configurator(object):
 
     If ``request_factory`` is passed, it should be a :term:`request
     factory` implementation or a :term:`dotted Python name` to same.
-    See :ref:`custom_request_factory`.  By default it is ``None``,
+    See :ref:`changing_the_request_factory`.  By default it is ``None``,
     which means use the default request factory.
 
-    If ``renderer_globals_factory`` is passed, it should be a
-    :term:`renderer globals` factory implementation or a :term:`dotted
-    Python name` to same.  See :ref:`custom_renderer_globals_factory`.
-    By default, it is ``None``, which means use no renderer globals
-    factory.
+    If ``renderer_globals_factory`` is passed, it should be a :term:`renderer
+    globals` factory implementation or a :term:`dotted Python name` to same.
+    See :ref:`adding_renderer_globals`.  By default, it is ``None``, which
+    means use no renderer globals factory.
 
     If ``default_permission`` is passed, it should be a
     :term:`permission` string to be used as the default permission for
@@ -245,7 +246,13 @@ class Configurator(object):
     ``autocommit`` is ``True``.  If a conflict is detected a
     ``ConfigurationConflictError`` will be raised.  Calling
     :meth:`pyramid.config.Configurator.make_wsgi_app` always implies a final
-    commit."""
+    commit.
+
+    If ``default_view_mapper`` is passed, it will be used as the default
+    :term:`view mapper` factory for view configurations that don't otherwise
+    specify one (see :class:`pyramid.interfaces.IViewMapperFactory`).  If a
+    default_view_mapper is not passed, a superdefault view mapper will be
+    used.  """
 
     manager = manager # for testing injection
     venusian = venusian # for testing injection
@@ -266,6 +273,7 @@ class Configurator(object):
                  renderer_globals_factory=None,
                  default_permission=None,
                  session_factory=None,
+                 default_view_mapper=None,
                  autocommit=False,
                  ):
         if package is None:
@@ -291,6 +299,7 @@ class Configurator(object):
                 renderer_globals_factory=renderer_globals_factory,
                 default_permission=default_permission,
                 session_factory=session_factory,
+                default_view_mapper=default_view_mapper,
                 )
 
     def _set_settings(self, mapping):
@@ -338,30 +347,39 @@ class Configurator(object):
     def _split_spec(self, path_or_spec):
         return resolve_asset_spec(path_or_spec, self.package_name)
 
+    # b/w compat
     def _derive_view(self, view, permission=None, predicates=(),
                      attr=None, renderer=None, wrapper_viewname=None,
                      viewname=None, accept=None, order=MAX_ORDER,
-                     phash=DEFAULT_PHASH):
-        if renderer is None: # use default renderer if one exists
-            default_renderer_factory = self.registry.queryUtility(
-                IRendererFactory)
-            if default_renderer_factory is not None:
-                renderer = {'name':None, 'package':self.package}
+                     phash=DEFAULT_PHASH, decorator=None,
+                     mapper=None):
         view = self.maybe_dotted(view)
-        authn_policy = self.registry.queryUtility(IAuthenticationPolicy)
-        authz_policy = self.registry.queryUtility(IAuthorizationPolicy)
-        settings = self.registry.settings
-        logger = self.registry.queryUtility(IDebugLogger)
-        mapped_view = _map_view(view, self.registry, attr, renderer)
-        owrapped_view = _owrap_view(mapped_view, viewname, wrapper_viewname)
-        secured_view = _secure_view(owrapped_view, permission,
-                                    authn_policy, authz_policy)
-        debug_view = _authdebug_view(secured_view, permission,
-                                     authn_policy, authz_policy, settings,
-                                     logger)
-        predicated_view = _predicate_wrap(debug_view, predicates)
-        derived_view = _attr_wrap(predicated_view, accept, order, phash)
-        return derived_view
+        mapper = self.maybe_dotted(mapper)
+        if isinstance(renderer, basestring):
+            renderer = RendererHelper(name=renderer, package=self.package,
+                                      registry = self.registry)
+        if renderer is None:
+            # use default renderer if one exists
+            if self.registry.queryUtility(IRendererFactory) is not None:
+                renderer = RendererHelper(name=None,
+                                          package=self.package,
+                                          registry=self.registry)
+
+        deriver = ViewDeriver(registry=self.registry,
+                              permission=permission,
+                              predicates=predicates,
+                              attr=attr,
+                              renderer=renderer,
+                              wrapper_viewname=wrapper_viewname,
+                              viewname=viewname,
+                              accept=accept,
+                              order=order,
+                              phash=phash,
+                              package=self.package,
+                              mapper=mapper,
+                              decorator=decorator)
+        
+        return deriver(view)
 
     def _override(self, package, path, override_package, override_prefix,
                   PackageOverrides=PackageOverrides):
@@ -417,8 +435,8 @@ class Configurator(object):
         immediately if ``autocommit`` is ``True``).
 
         .. note:: This method is typically only used by :app:`Pyramid`
-        framework extension authors, not by :app:`Pyramid` application
-        developers.
+           framework extension authors, not by :app:`Pyramid` application
+           developers.
 
         The ``discriminator`` uniquely identifies the action.  It must be
         given, but it can be ``None``, to indicate that the action never
@@ -488,9 +506,12 @@ class Configurator(object):
 
         Values allowed to be presented via the ``*callables`` argument to
         this method: any callable Python object or any :term:`dotted Python
-        name` which resolves to a callable Python object.
+        name` which resolves to a callable Python object.  It may also be a
+        Python :term:`module`, in which case, the module will be searched for
+        a callable named ``includeme``, which will be treated as the
+        configuration callable.
         
-        For example, if the ``configure`` function below lives in a module
+        For example, if the ``includeme`` function below lives in a module
         named ``myapp.myconfig``:
 
         .. code-block:: python
@@ -502,7 +523,7 @@ class Configurator(object):
                from pyramid.response import Response
                return Response('OK')
 
-           def configure(config):
+           def includeme(config):
                config.add_view(my_view)
 
         You might cause it be included within your Pyramid application like
@@ -515,7 +536,19 @@ class Configurator(object):
 
            def main(global_config, **settings):
                config = Configurator()
-               config.include('myapp.myconfig.configure')
+               config.include('myapp.myconfig.includeme')
+
+        Because the function is named ``includeme``, the function name can
+        also be omitted from the dotted name reference:
+
+        .. code-block:: python
+           :linenos:
+
+           from pyramid.config import Configurator
+
+           def main(global_config, **settings):
+               config = Configurator()
+               config.include('myapp.myconfig')
 
         Included configuration statements will be overridden by local
         configuration statements if an included callable causes a
@@ -528,9 +561,11 @@ class Configurator(object):
 
         for c in callables:
             c = self.maybe_dotted(c)
-            sourcefile = inspect.getsourcefile(c)
             module = inspect.getmodule(c)
+            if module is c:
+                c = getattr(module, 'includeme')
             spec = module.__name__ + ':' + c.__name__
+            sourcefile = inspect.getsourcefile(c)
             if _context.processSpec(spec):
                 context = GroupingContextDecorator(_context)
                 context.basepath = os.path.dirname(sourcefile)
@@ -538,6 +573,45 @@ class Configurator(object):
                 context.package = package_of(module)
                 config = self.__class__.with_context(context)
                 c(config)
+
+    def add_directive(self, name, directive, action_wrap=True):
+        """
+        Add a directive method to the configurator.
+
+        Framework extenders can add directive methods to a configurator by
+        instructing their users to call ``config.add_directive('somename',
+        'some.callable')``.  This will make ``some.callable`` accessible as
+        ``config.somename``.  ``some.callable`` should be a function which
+        accepts ``config`` as a first argument, and arbitrary positional and
+        keyword arguments following.  It should use config.action as
+        necessary to perform actions.  Directive methods can then be invoked
+        like 'built-in' directives such as ``add_view``, ``add_route``, etc.
+
+        The ``action_wrap`` argument should be ``True`` for directives which
+        perform ``config.action`` with potentially conflicting
+        discriminators.  ``action_wrap`` will cause the directive to be
+        wrapped in a decorator which provides more accurate conflict
+        cause information.
+        
+        ``add_directive`` does not participate in conflict detection, and
+        later calls to ``add_directive`` will override earlier calls.
+        """
+        c = self.maybe_dotted(directive)
+        if not hasattr(self.registry, '_directives'):
+            self.registry._directives = {}
+        self.registry._directives[name] = (c, action_wrap)
+
+    def __getattr__(self, name):
+        # allow directive extension names to work
+        directives = getattr(self.registry, '_directives', {})
+        c = directives.get(name)
+        if c is None:
+            raise AttributeError(name)
+        c, action_wrap = c
+        if action_wrap:
+            c = action_method(c)
+        m = types.MethodType(c, self, self.__class__)
+        return m
 
     @classmethod
     def with_context(cls, context):
@@ -591,9 +665,8 @@ class Configurator(object):
                        authentication_policy=None, authorization_policy=None,
                        renderers=DEFAULT_RENDERERS, debug_logger=None,
                        locale_negotiator=None, request_factory=None,
-                       renderer_globals_factory=None,
-                       default_permission=None,
-                       session_factory=None):
+                       renderer_globals_factory=None, default_permission=None,
+                       session_factory=None, default_view_mapper=None):
         """ When you pass a non-``None`` ``registry`` argument to the
         :term:`Configurator` constructor, no initial 'setup' is performed
         against the registry.  This is because the registry you pass in may
@@ -639,7 +712,13 @@ class Configurator(object):
             self.set_default_permission(default_permission)
         if session_factory is not None:
             self.set_session_factory(session_factory)
+        # commit before adding default_view_mapper, as the
+        # default_exceptionresponse_view above requires the superdefault view
+        # mapper
         self.commit()
+        if default_view_mapper is not None:
+            self.set_view_mapper(default_view_mapper)
+            self.commit()
         
     # getSiteManager is a unit testing dep injection
     def hook_zca(self, getSiteManager=None):
@@ -757,9 +836,6 @@ class Configurator(object):
         a :term:`response` object.  If a ``renderer`` argument is not
         supplied, the user-supplied view must itself return a
         :term:`response` object.  """
-
-        if renderer is not None and not isinstance(renderer, dict):
-            renderer = {'name':renderer, 'package':self.package}
         return self._derive_view(view, attr=attr, renderer=renderer)
 
     @action_method
@@ -817,11 +893,12 @@ class Configurator(object):
 
     def get_settings(self):
         """
-        Return a 'settings' object for the current application.  A
-        'settings' object is a dictionary-like object that contains
-        key/value pairs based on the dictionary passed as the ``settings``
-        argument to the :class:`pyramid.config.Configurator`
-        constructor or the :func:`pyramid.router.make_app` API.
+        Return a :term:`deployment settings` object for the current
+        application.  A deployment settings object is a dictionary-like
+        object that contains key/value pairs based on the dictionary passed
+        as the ``settings`` argument to the
+        :class:`pyramid.config.Configurator` constructor or the
+        :func:`pyramid.router.make_app` API.
 
         .. note:: For backwards compatibility, dictionary keys can also be
            looked up as attributes of the settings object.
@@ -832,10 +909,10 @@ class Configurator(object):
         return self.registry.settings
 
     def make_wsgi_app(self):
-        """ Returns a :app:`Pyramid` WSGI application representing
-        the current configuration state and sends a
-        :class:`pyramid.events.ApplicationCreated`
-        event to all listeners."""
+        """ Commits any pending configuration statements, sends a
+        :class:`pyramid.events.ApplicationCreated` event to all listeners,
+        and returns a :app:`Pyramid` WSGI application representing the
+        committed configuration state."""
         self.commit()
         from pyramid.router import Router # avoid circdep
         app = Router(self.registry)
@@ -849,168 +926,13 @@ class Configurator(object):
             self.manager.pop()
         return app
 
-    def load_zcml(self, spec='configure.zcml', lock=threading.Lock()):
-        """ Load configuration from a :term:`ZCML` file into the
-        current configuration state.  The ``spec`` argument is an
-        absolute filename, a relative filename, or a :term:`asset
-        specification`, defaulting to ``configure.zcml`` (relative to
-        the package of the configurator's caller)."""
-        package_name, filename = self._split_spec(spec)
-        if package_name is None: # absolute filename
-            package = self.package
-        else:
-            __import__(package_name)
-            package = sys.modules[package_name]
-
-        registry = self.registry
-        self.manager.push({'registry':registry, 'request':None})
-        context = self._ctx
-        if context is None:
-            context = self._ctx = self._make_context(self.autocommit)
-
-        # To avoid breaking people's expectations of how ZCML works, we
-        # cannot autocommit ZCML actions incrementally.  If we commit actions
-        # incrementally, configuration outcome will be controlled purely by
-        # ZCML directive execution order, which isn't what anyone who uses
-        # ZCML expects.  So we don't autocommit each ZCML directive action
-        # while parsing is happening, but we do make sure to pass
-        # execute=self.autocommit to xmlconfig.file below, which will cause
-        # the actions implied by the ZCML that was parsed to be committed
-        # right away once parsing is finished if autocommit is True.
-        context = GroupingContextDecorator(context)
-        context.autocommit = False 
-
-        lock.acquire()
-        try:
-            context.package = package
-            xmlconfig.file(filename, package, context=context,
-                           execute=self.autocommit)
-        finally:
-            lock.release()
-            self.manager.pop()
-        return registry
-
-    @action_method
-    def add_handler(self, route_name, pattern, handler, action=None, **kw):
-
-        """ Add a Pylons-style view handler.  This function adds a
-        route and some number of views based on a handler object
-        (usually a class).
-
-        ``route_name`` is the name of the route (to be used later in
-        URL generation).
-
-        ``pattern`` is the matching pattern,
-        e.g. ``'/blog/{action}'``.  ``pattern`` may be ``None``, in
-        which case the pattern of an existing route named the same as
-        ``route_name`` is used.  If ``pattern`` is ``None`` and no
-        route named ``route_name`` exists, a ``ConfigurationError`` is
-        raised.
-
-        ``handler`` is a dotted name of (or direct reference to) a
-        Python handler class,
-        e.g. ``'my.package.handlers.MyHandler'``.
-
-        If ``{action}`` or ``:action`` is in
-        the pattern, the exposed methods of the handler will be used
-        as views.
-
-        If ``action`` is passed, it will be considered the method name
-        of the handler to use as a view.
-
-        Passing both ``action`` and having an ``{action}`` in the
-        route pattern is disallowed.
-
-        Any extra keyword arguments are passed along to ``add_route``.
-
-        See :ref:`handlers_chapter` for more explanatory documentation.
-
-        This method returns the result of add_route."""
-        handler = self.maybe_dotted(handler)
-
-        if pattern is not None:
-            route = self.add_route(route_name, pattern, **kw)
-        else:
-            mapper = self.get_routes_mapper()
-            route = mapper.get_route(route_name)
-            if route is None:
-                raise ConfigurationError(
-                    'The "pattern" parameter may only be "None" when a route '
-                    'with the route_name argument was previously registered. '
-                    'No such route named %r exists' % route_name)
-
-            pattern = route.pattern
-
-        path_has_action = ':action' in pattern or '{action}' in pattern
-
-        if action and path_has_action:
-            raise ConfigurationError(
-                'action= (%r) disallowed when an action is in the route '
-                'path %r' % (action, pattern))
-
-        if path_has_action:
-            autoexpose = getattr(handler, '__autoexpose__', r'[A-Za-z]+')
-            if autoexpose:
-                try:
-                    autoexpose = re.compile(autoexpose).match
-                except (re.error, TypeError), why:
-                    raise ConfigurationError(why[0])
-            for method_name, method in inspect.getmembers(
-                handler, inspect.ismethod):
-                configs = getattr(method, '__exposed__', [])
-                if autoexpose and not configs:
-                    if autoexpose(method_name):
-                        configs = [{}]
-                for expose_config in configs:
-                    # we don't want to mutate any dict in __exposed__,
-                    # so we copy each
-                    view_args = expose_config.copy()
-                    action = view_args.pop('name', method_name)
-                    preds = list(view_args.pop('custom_predicates', []))
-                    preds.append(ActionPredicate(action))
-                    view_args['custom_predicates'] = preds
-                    self.add_view(view=handler, attr=method_name,
-                                  route_name=route_name, **view_args)
-        else:
-            method_name = action
-            if method_name is None:
-                method_name = '__call__'
-
-            # Scan the controller for any other methods with this action name
-            for meth_name, method in inspect.getmembers(
-                handler, inspect.ismethod):
-                configs = getattr(method, '__exposed__', [{}])
-                for expose_config in configs:
-                    # Don't re-register the same view if this method name is
-                    # the action name
-                    if meth_name == action:
-                        continue
-                    # We only reg a view if the name matches the action
-                    if expose_config.get('name') != method_name:
-                        continue
-                    # we don't want to mutate any dict in __exposed__,
-                    # so we copy each
-                    view_args = expose_config.copy()
-                    del view_args['name']
-                    self.add_view(view=handler, attr=meth_name,
-                                  route_name=route_name, **view_args)
-
-            # Now register the method itself
-            method = getattr(handler, method_name, None)
-            configs = getattr(method, '__exposed__', [{}])
-            for expose_config in configs:
-                self.add_view(view=handler, attr=action, route_name=route_name,
-                              **expose_config)
-
-        return route
-
     @action_method
     def add_view(self, view=None, name="", for_=None, permission=None,
                  request_type=None, route_name=None, request_method=None,
                  request_param=None, containment=None, attr=None,
                  renderer=None, wrapper=None, xhr=False, accept=None,
                  header=None, path_info=None, custom_predicates=(),
-                 context=None):
+                 context=None, decorator=None, mapper=None):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
         down below into *predicate* arguments and *non-predicate*
@@ -1119,6 +1041,25 @@ class Configurator(object):
           view is the same context and request of the inner view.  If
           this attribute is unspecified, no view wrapping is done.
 
+        decorator
+
+          A :term:`dotted Python name` to function (or the function itself)
+          which will be used to decorate the registered :term:`view
+          callable`.  The decorator function will be called with the view
+          callable as a single argument.  The view callable it is passed will
+          accept ``(context, request)``.  The decorator must return a
+          replacement view callable which also accepts ``(context,
+          request)``.
+          
+        mapper
+
+          A Python object or :term:`dotted Python name` which refers to a
+          :term:`view mapper`, or ``None``.  By default it is ``None``, which
+          indicates that the view should use the default view mapper.  This
+          plug-point is useful for Pyramid extension developers, but it's not
+          very useful for 'civilians' who are just developing stock Pyramid
+          applications. Pay no attention to the man behind the curtain.
+          
         Predicate Arguments
 
         name
@@ -1180,18 +1121,18 @@ class Configurator(object):
           dictionary (an HTTP ``GET`` or ``POST`` variable) that has a
           name which matches the supplied value.  If the value
           supplied has a ``=`` sign in it,
-          e.g. ``request_params="foo=123"``, then the key (``foo``)
+          e.g. ``request_param="foo=123"``, then the key (``foo``)
           must both exist in the ``request.params`` dictionary, *and*
           the value must match the right hand side of the expression
           (``123``) for the view to "match" the current request.
 
         containment
 
-          This value should be a Python class or :term:`interface` or
-          a :term:`dotted Python name` to such an object that a parent
-          object in the :term:`lineage` must provide in order for this
-          view to be found and called.  The nodes in your object graph
-          must be "location-aware" to use this feature.  See
+          This value should be a Python class or :term:`interface` (or a
+          :term:`dotted Python name`) that an object in the
+          :term:`lineage` of the context must provide in order for this view
+          to be found and called.  The nodes in your object graph must be
+          "location-aware" to use this feature.  See
           :ref:`location_aware` for more information about
           location-awareness.
 
@@ -1255,11 +1196,14 @@ class Configurator(object):
           the context and/or the request.  If all callables return
           ``True``, the associated view callable will be considered
           viable for a given request.
+
         """
         view = self.maybe_dotted(view)
         context = self.maybe_dotted(context)
         for_ = self.maybe_dotted(for_)
         containment = self.maybe_dotted(containment)
+        mapper = self.maybe_dotted(mapper)
+        decorator = self.maybe_dotted(decorator)
 
         if not view:
             if renderer:
@@ -1293,6 +1237,7 @@ class Configurator(object):
                     renderer=renderer, wrapper=wrapper, xhr=xhr, accept=accept,
                     header=header, path_info=path_info,
                     custom_predicates=custom_predicates, context=context,
+                    mapper = mapper,
                     )
                 view_info = deferred_views.setdefault(route_name, [])
                 view_info.append(info)
@@ -1304,9 +1249,6 @@ class Configurator(object):
             containment=containment, request_type=request_type,
             custom=custom_predicates)
 
-        if renderer is not None and not isinstance(renderer, dict):
-            renderer = {'name':renderer, 'package':self.package}
-
         if context is None:
             context = for_
 
@@ -1316,16 +1258,37 @@ class Configurator(object):
         if not IInterface.providedBy(r_context):
             r_context = implementedBy(r_context)
 
-        def register(permission=permission):
+        if isinstance(renderer, basestring):
+            renderer = RendererHelper(name=renderer, package=self.package,
+                                      registry = self.registry)
+
+        def register(permission=permission, renderer=renderer):
+            if renderer is None:
+                # use default renderer if one exists
+                if self.registry.queryUtility(IRendererFactory) is not None:
+                    renderer = RendererHelper(name=None,
+                                              package=self.package,
+                                              registry=self.registry)
 
             if permission is None:
                 # intent: will be None if no default permission is registered
                 permission = self.registry.queryUtility(IDefaultPermission)
 
-            # NO_PERMISSION_REQUIRED handled by _secure_view
-            derived_view = self._derive_view(view, permission, predicates, attr,
-                                             renderer, wrapper, name, accept,
-                                             order, phash)
+            # __no_permission_required__ handled by _secure_view
+            deriver = ViewDeriver(registry=self.registry,
+                                  permission=permission,
+                                  predicates=predicates,
+                                  attr=attr,
+                                  renderer=renderer,
+                                  wrapper_viewname=wrapper,
+                                  viewname=name,
+                                  accept=accept,
+                                  order=order,
+                                  phash=phash,
+                                  package=self.package,
+                                  mapper=mapper,
+                                  decorator=decorator)
+            derived_view = deriver(view)
 
             registered = self.registry.adapters.registered
 
@@ -1542,7 +1505,7 @@ class Configurator(object):
         pattern
 
           The pattern of the route e.g. ``ideas/{idea}``.  This
-          argument is required.  See :ref:`route_path_pattern_syntax`
+          argument is required.  See :ref:`route_pattern_syntax`
           for information about the syntax of route patterns.  If the
           pattern doesn't match the current URL, route matching
           continues.
@@ -1587,7 +1550,7 @@ class Configurator(object):
           dictionary (an HTTP ``GET`` or ``POST`` variable) that has a
           name which matches the supplied value.  If the value
           supplied as the argument has a ``=`` sign in it,
-          e.g. ``request_params="foo=123"``, then the key
+          e.g. ``request_param="foo=123"``, then the key
           (``foo``) must both exist in the ``request.params`` dictionary, and
           the value must match the right hand side of the expression (``123``)
           for the route to "match" the current request.  If this predicate
@@ -1748,13 +1711,14 @@ class Configurator(object):
             for info in view_info:
                 self.add_view(**info)
 
-        if view:
+        if view_context is None:
+            view_context = view_for
             if view_context is None:
-                view_context = view_for
-                if view_context is None:
-                    view_context = for_
-            view_permission = view_permission or permission
-            view_renderer = view_renderer or renderer
+                view_context = for_
+        view_permission = view_permission or permission
+        view_renderer = view_renderer or renderer
+
+        if view:
             self.add_view(
                 permission=view_permission,
                 context=view_context,
@@ -1764,6 +1728,25 @@ class Configurator(object):
                 renderer=view_renderer,
                 attr=view_attr,
                 )
+        else:
+            # prevent mistakes due to misunderstanding of how hybrid calls to
+            # add_route and add_view interact
+            if view_attr:
+                raise ConfigurationError(
+                    'view_attr argument not permitted without view '
+                    'argument')
+            if view_context:
+                raise ConfigurationError(
+                    'view_context argument not permitted without view '
+                    'argument')
+            if view_permission:
+                raise ConfigurationError(
+                    'view_permission argument not permitted without view '
+                    'argument')
+            if view_renderer:
+                raise ConfigurationError(
+                    'view_renderer argument not permitted without '
+                    'view argument')
 
         mapper = self.get_routes_mapper()
 
@@ -1794,32 +1777,25 @@ class Configurator(object):
 
     # this is *not* an action method (uses caller_package)
     def scan(self, package=None, categories=None):
-        """ Scan a Python package and any of its subpackages for
-        objects marked with :term:`configuration decoration` such as
-        :class:`pyramid.view.view_config`.  Any decorated object found
-        will influence the current configuration state.
+        """Scan a Python package and any of its subpackages for objects
+        marked with :term:`configuration decoration` such as
+        :class:`pyramid.view.view_config`.  Any decorated object found will
+        influence the current configuration state.
 
-        The ``package`` argument should be a Python :term:`package` or
-        module object (or a :term:`dotted Python name` which refers to
-        such a package or module).  If ``package`` is ``None``, the
-        package of the *caller* is used.
+        The ``package`` argument should be a Python :term:`package` or module
+        object (or a :term:`dotted Python name` which refers to such a
+        package or module).  If ``package`` is ``None``, the package of the
+        *caller* is used.
 
         The ``categories`` argument, if provided, should be the
-        :term:`Venusian` 'scan categories' to use during scanning.
-        Providing this argument is not often necessary; specifying
-        scan categories is an extremely advanced usage.
-
-        By default, ``categories`` is ``None`` which will execute
-        *all* Venusian decorator callbacks including
+        :term:`Venusian` 'scan categories' to use during scanning.  Providing
+        this argument is not often necessary; specifying scan categories is
+        an extremely advanced usage.  By default, ``categories`` is ``None``
+        which will execute *all* Venusian decorator callbacks including
         :app:`Pyramid`-related decorators such as
-        :class:`pyramid.view.view_config`.  If this is not desirable
-        because the codebase has other Venusian-using decorators that
-        aren't meant to be invoked during a particular scan, use
-        ``('pyramid',)`` as a ``categories`` value to limit the execution
-        of decorator callbacks to only those registered by
-        :app:`Pyramid` itself.  Or pass a sequence of Venusian scan
-        categories as necessary (e.g. ``('pyramid', 'myframework')``) to
-        limit the decorators called to the set of categories required.
+        :class:`pyramid.view.view_config`.  See the :term:`Venusian`
+        documentation for more information about limiting a scan by using an
+        explicit set of categories.
         """
         package = self.maybe_dotted(package)
         if package is None: # pragma: no cover
@@ -1939,8 +1915,9 @@ class Configurator(object):
         The ``wrapper`` argument should be the name of another view
         which will wrap this view when rendered (see the ``add_view``
         method's ``wrapper`` argument for a description)."""
-        if renderer is not None and not isinstance(renderer, dict):
-            renderer = {'name':renderer, 'package':self.package}
+        if isinstance(renderer, basestring):
+            renderer = RendererHelper(name=renderer, package=self.package,
+                                      registry = self.registry)
         view = self._derive_view(view, attr=attr, renderer=renderer)
         def bwcompat_view(context, request):
             context = getattr(request, 'context', None)
@@ -1978,8 +1955,9 @@ class Configurator(object):
         which will wrap this view when rendered (see the ``add_view``
         method's ``wrapper`` argument for a description).
         """
-        if renderer is not None and not isinstance(renderer, dict):
-            renderer = {'name':renderer, 'package':self.package}
+        if isinstance(renderer, basestring):
+            renderer = RendererHelper(name=renderer, package=self.package,
+                                      registry=self.registry)
         view = self._derive_view(view, attr=attr, renderer=renderer)
         def bwcompat_view(context, request):
             context = getattr(request, 'context', None)
@@ -2070,9 +2048,19 @@ class Configurator(object):
         declare a permission will be executable by entirely anonymous
         users (any authorization policy is ignored).
 
-        Later calls to this method override earlier calls; there can
-        be only one default permission active at a time within an
+        Later calls to this method override will conflict with earlier calls;
+        there can be only one default permission active at a time within an
         application.
+
+        .. warning::
+
+          If a default permission is in effect, view configurations meant to
+          create a truly anonymously accessible view (even :term:`exception
+          view` views) *must* use the explicit permission string
+          ``__no_permission_required__`` as the permission.  When this string
+          is used as the ``permission`` for a view configuration, the default
+          permission is ignored, and the view is registered, making it
+          available to all callers regardless of their credentials.
 
         See also :ref:`setting_a_default_permission`.
 
@@ -2083,6 +2071,29 @@ class Configurator(object):
         # default permission used during view registration
         self.registry.registerUtility(permission, IDefaultPermission)
         self.action(IDefaultPermission, None)
+
+    @action_method
+    def set_view_mapper(self, mapper):
+        """
+        Setting a :term:`view mapper` makes it possible to make use of
+        :term:`view callable` objects which implement different call
+        signatures than the ones supported by :app:`Pyramid` as described in
+        its narrative documentation.
+
+        The ``mapper`` should argument be an object implementing
+        :class:`pyramid.interfaces.IViewMapperFactory` or a :term:`dotted
+        Python name` to such an object.
+
+        The provided ``mapper`` will become the default view mapper to be
+        used by all subsequent :term:`view configuration` registrations, as
+        if you had passed a ``default_view_mapper`` argument to the
+        :class:`pyramid.config.Configurator` constructor.
+        
+        See also :ref:`using_an_alternate_view_mapper`.
+        """
+        mapper = self.maybe_dotted(mapper)
+        self.registry.registerUtility(mapper, IViewMapperFactory)
+        self.action(IViewMapperFactory, None)
 
     @action_method
     def set_session_factory(self, session_factory):
@@ -2107,7 +2118,8 @@ class Configurator(object):
 
         .. code-block:: python
 
-           add_translations_dirs('/usr/share/locale', 'some.package:locale')
+           config.add_translation_dirs('/usr/share/locale',
+                                       'some.package:locale')
 
         """
         for spec in specs:
@@ -2138,11 +2150,6 @@ class Configurator(object):
             # same function once for each added translation directory,
             # which does too much work, but has the same effect.
 
-            def translator(msg):
-                request = get_current_request()
-                localizer = get_localizer(request)
-                return localizer.translate(msg)
-
             ctranslate = ChameleonTranslate(translator)
             self.registry.registerUtility(ctranslate, IChameleonTranslate)
 
@@ -2151,20 +2158,19 @@ class Configurator(object):
         """ Add a view used to render static assets such as images
         and CSS files.
 
-        The ``name`` argument is a string representing :term:`view
-        name` of the view which is registered.  It may alternately be
-        a *url prefix*.
+        The ``name`` argument is a string representing an
+        application-relative local URL prefix.  It may alternately be a full
+        URL.
 
-        The ``path`` argument is the path on disk where the static
-        files reside.  This can be an absolute path, a
-        package-relative path, or a :term:`asset specification`.
+        The ``path`` argument is the path on disk where the static files
+        reside.  This can be an absolute path, a package-relative path, or a
+        :term:`asset specification`.
 
         The ``cache_max_age`` keyword argument is input to set the
-        ``Expires`` and ``Cache-Control`` headers for static assets
-        served.  Note that this argument has no effect when the
-        ``name`` is a *url prefix*.  By default, this argument is
-        ``None``, meaning that no particular Expires or Cache-Control
-        headers are set in the response.
+        ``Expires`` and ``Cache-Control`` headers for static assets served.
+        Note that this argument has no effect when the ``name`` is a *url
+        prefix*.  By default, this argument is ``None``, meaning that no
+        particular Expires or Cache-Control headers are set in the response.
 
         The ``permission`` keyword argument is used to specify the
         :term:`permission` required by a user to execute the static view.  By
@@ -2178,67 +2184,62 @@ class Configurator(object):
 
         *Usage*
 
-        The ``add_static_view`` function is typically used in
-        conjunction with the :func:`pyramid.url.static_url`
-        function.  ``add_static_view`` adds a view which renders a
-        static asset when some URL is visited;
-        :func:`pyramid.url.static_url` generates a URL to that
-        asset.
+        The ``add_static_view`` function is typically used in conjunction
+        with the :func:`pyramid.url.static_url` function.
+        ``add_static_view`` adds a view which renders a static asset when
+        some URL is visited; :func:`pyramid.url.static_url` generates a URL
+        to that asset.
 
-        The ``name`` argument to ``add_static_view`` is usually a
-        :term:`view name`.  When this is the case, the
-        :func:`pyramid.url.static_url` API will generate a URL
-        which points to a Pyramid view, which will serve up a set of
-        assets that live in the package itself. For example:
+        The ``name`` argument to ``add_static_view`` is usually a :term:`view
+        name`.  When this is the case, the :func:`pyramid.url.static_url` API
+        will generate a URL which points to a Pyramid view, which will serve
+        up a set of assets that live in the package itself. For example:
 
         .. code-block:: python
 
            add_static_view('images', 'mypackage:images/')
 
-        Code that registers such a view can generate URLs to the view
-        via :func:`pyramid.url.static_url`:
+        Code that registers such a view can generate URLs to the view via
+        :func:`pyramid.url.static_url`:
 
         .. code-block:: python
 
            static_url('mypackage:images/logo.png', request)
 
-        When ``add_static_view`` is called with a ``name`` argument
-        that represents a simple view name, as it is above, subsequent
-        calls to :func:`pyramid.url.static_url` with paths that
-        start with the ``path`` argument passed to ``add_static_view``
-        will generate a URL something like ``http://<Pyramid app
-        URL>/images/logo.png``, which will cause the ``logo.png`` file
-        in the ``images`` subdirectory of the ``mypackage`` package to
-        be served.
+        When ``add_static_view`` is called with a ``name`` argument that
+        represents a URL prefix, as it is above, subsequent calls to
+        :func:`pyramid.url.static_url` with paths that start with the
+        ``path`` argument passed to ``add_static_view`` will generate a URL
+        something like ``http://<Pyramid app URL>/images/logo.png``, which
+        will cause the ``logo.png`` file in the ``images`` subdirectory of
+        the ``mypackage`` package to be served.
 
-        ``add_static_view`` can alternately be used with a ``name``
-        argument which is a *URL*, causing static assets to be
-        served from an external webserver.  This happens when the
-        ``name`` argument is a URL (detected as any string with a
-        slash in it).  In this mode, the ``name`` is used as the URL
-        prefix when generating a URL using
-        :func:`pyramid.url.static_url`.  For example, if
-        ``add_static_view`` is called like so:
+        ``add_static_view`` can alternately be used with a ``name`` argument
+        which is a *URL*, causing static assets to be served from an external
+        webserver.  This happens when the ``name`` argument is a fully
+        qualified URL (e.g. starts with ``http://`` or similar).  In this
+        mode, the ``name`` is used as the prefix of the full URL when
+        generating a URL using :func:`pyramid.url.static_url`.  For example,
+        if ``add_static_view`` is called like so:
 
         .. code-block:: python
 
            add_static_view('http://example.com/images', 'mypackage:images/')
 
-        Subsequently, the URLs generated by
-        :func:`pyramid.url.static_url` for that static view will be
-        prefixed with ``http://example.com/images``:
+        Subsequently, the URLs generated by :func:`pyramid.url.static_url`
+        for that static view will be prefixed with
+        ``http://example.com/images``:
 
         .. code-block:: python
 
            static_url('mypackage:images/logo.png', request)
 
-        When ``add_static_view`` is called with a ``name`` argument
-        that is the URL prefix ``http://example.com/images``,
-        subsequent calls to :func:`pyramid.url.static_url` with
-        paths that start with the ``path`` argument passed to
-        ``add_static_view`` will generate a URL something like
-        ``http://example.com/logo.png``.  The external webserver
-        listening on ``example.com`` must be itself configured to
+        When ``add_static_view`` is called with a ``name`` argument that is
+        the URL ``http://example.com/images``, subsequent calls to
+        :func:`pyramid.url.static_url` with paths that start with the
+        ``path`` argument passed to ``add_static_view`` will generate a URL
+        something like ``http://example.com/logo.png``.  The external
+        webserver listening on ``example.com`` must be itself configured to
         respond properly to such a request.
 
         See :ref:`static_assets_section` for more information.
@@ -2329,8 +2330,7 @@ class Configurator(object):
         expected event notifications.  This method is useful when
         testing code that wants to call
         :meth:`pyramid.registry.Registry.notify`,
-        :func:`zope.component.event.dispatch` or
-        :func:`zope.component.event.objectEventNotify`.
+        or :func:`zope.component.event.dispatch`.
 
         The default value of ``event_iface`` (``None``) implies a
         subscriber registered for *any* kind of event.
@@ -2619,52 +2619,327 @@ class MultiView(object):
                 continue
         raise PredicateMismatch(self.name)
 
-def decorate_view(wrapped_view, original_view):
-    if wrapped_view is original_view:
-        return False
-    wrapped_view.__module__ = original_view.__module__
-    wrapped_view.__doc__ = original_view.__doc__
-    try:
-        wrapped_view.__name__ = original_view.__name__
-    except AttributeError:
-        wrapped_view.__name__ = repr(original_view)
-    try:
-        wrapped_view.__permitted__ = original_view.__permitted__
-    except AttributeError:
-        pass
-    try:
-        wrapped_view.__call_permissive__ = original_view.__call_permissive__
-    except AttributeError:
-        pass
-    try:
-        wrapped_view.__predicated__ = original_view.__predicated__
-    except AttributeError:
-        pass
-    try:
-        wrapped_view.__accept__ = original_view.__accept__
-    except AttributeError:
-        pass
-    try:
-        wrapped_view.__order__ = original_view.__order__
-    except AttributeError:
-        pass
-    return True
+def wraps_view(wrapped):
+    def inner(self, view):
+        wrapped_view = wrapped(self, view)
+        return preserve_view_attrs(view, wrapped_view)
+    return inner
 
-def requestonly(class_or_callable, attr=None):
-    """ Return true of the class or callable accepts only a request argument,
-    as opposed to something that accepts context, request """
+def preserve_view_attrs(view, wrapped_view):
+    if wrapped_view is view:
+        return view
+    original_view = getattr(view, '__original_view__', None)
+    if original_view is None:
+        original_view = view
+    wrapped_view.__original_view__ = original_view
+    wrapped_view.__module__ = view.__module__
+    wrapped_view.__doc__ = view.__doc__
+    try:
+        wrapped_view.__name__ = view.__name__
+    except AttributeError:
+        wrapped_view.__name__ = repr(view)
+    try:
+        wrapped_view.__permitted__ = view.__permitted__
+    except AttributeError:
+        pass
+    try:
+        wrapped_view.__call_permissive__ = view.__call_permissive__
+    except AttributeError:
+        pass
+    try:
+        wrapped_view.__predicated__ = view.__predicated__
+    except AttributeError:
+        pass
+    try:
+        wrapped_view.__accept__ = view.__accept__
+    except AttributeError:
+        pass
+    try:
+        wrapped_view.__order__ = view.__order__
+    except AttributeError:
+        pass
+    return wrapped_view
+
+class ViewDeriver(object):
+    def __init__(self, **kw):
+        self.kw = kw
+        self.registry = kw['registry']
+        self.authn_policy = self.registry.queryUtility(
+            IAuthenticationPolicy)
+        self.authz_policy = self.registry.queryUtility(
+            IAuthorizationPolicy)
+        self.logger = self.registry.queryUtility(IDebugLogger)
+
+    def __call__(self, view):
+        return self.attr_wrapped_view(
+            self.predicated_view(
+                self.authdebug_view(
+                    self.secured_view(
+                        self.owrapped_view(
+                            self.decorated_view(
+                                self.rendered_view(
+                                    self.mapped_view(view))))))))
+
+    @wraps_view
+    def mapped_view(self, view):
+        mapper = self.kw.get('mapper')
+        if mapper is None:
+            mapper = getattr(view, '__view_mapper__', None)
+            if mapper is None:
+                mapper = self.registry.queryUtility(IViewMapperFactory)
+                if mapper is None:
+                    mapper = DefaultViewMapper
+
+        mapped_view = mapper(**self.kw)(view)
+        return mapped_view
+
+    @wraps_view
+    def owrapped_view(self, view):
+        wrapper_viewname = self.kw.get('wrapper_viewname')
+        viewname = self.kw.get('viewname')
+        if not wrapper_viewname:
+            return view
+        def _owrapped_view(context, request):
+            response = view(context, request)
+            request.wrapped_response = response
+            request.wrapped_body = response.body
+            request.wrapped_view = view
+            wrapped_response = render_view_to_response(context, request,
+                                                       wrapper_viewname)
+            if wrapped_response is None:
+                raise ValueError(
+                    'No wrapper view named %r found when executing view '
+                    'named %r' % (wrapper_viewname, viewname))
+            return wrapped_response
+        return _owrapped_view
+
+    @wraps_view
+    def secured_view(self, view):
+        permission = self.kw.get('permission')
+        if permission == '__no_permission_required__':
+            # allow views registered within configurations that have a
+            # default permission to explicitly override the default
+            # permission, replacing it with no permission at all
+            permission = None
+
+        wrapped_view = view
+        if self.authn_policy and self.authz_policy and (permission is not None):
+            def _secured_view(context, request):
+                principals = self.authn_policy.effective_principals(request)
+                if self.authz_policy.permits(context, principals, permission):
+                    return view(context, request)
+                msg = getattr(request, 'authdebug_message',
+                              'Unauthorized: %s failed permission check' % view)
+                raise Forbidden(msg)
+            _secured_view.__call_permissive__ = view
+            def _permitted(context, request):
+                principals = self.authn_policy.effective_principals(request)
+                return self.authz_policy.permits(context, principals,
+                                                 permission)
+            _secured_view.__permitted__ = _permitted
+            wrapped_view = _secured_view
+
+        return wrapped_view
+
+    @wraps_view
+    def authdebug_view(self, view):
+        wrapped_view = view
+        settings = self.registry.settings
+        permission = self.kw.get('permission')
+        if settings and settings.get('debug_authorization', False):
+            def _authdebug_view(context, request):
+                view_name = getattr(request, 'view_name', None)
+
+                if self.authn_policy and self.authz_policy:
+                    if permission is None:
+                        msg = 'Allowed (no permission registered)'
+                    else:
+                        principals = self.authn_policy.effective_principals(
+                            request)
+                        msg = str(self.authz_policy.permits(context, principals,
+                                                            permission))
+                else:
+                    msg = 'Allowed (no authorization policy in use)'
+
+                view_name = getattr(request, 'view_name', None)
+                url = getattr(request, 'url', None)
+                msg = ('debug_authorization of url %s (view name %r against '
+                       'context %r): %s' % (url, view_name, context, msg))
+                self.logger and self.logger.debug(msg)
+                if request is not None:
+                    request.authdebug_message = msg
+                return view(context, request)
+
+            wrapped_view = _authdebug_view
+
+        return wrapped_view
+
+    @wraps_view
+    def predicated_view(self, view):
+        predicates = self.kw.get('predicates', ())
+        if not predicates:
+            return view
+        def predicate_wrapper(context, request):
+            if all((predicate(context, request) for predicate in predicates)):
+                return view(context, request)
+            raise PredicateMismatch('predicate mismatch for view %s' % view)
+        def checker(context, request):
+            return all((predicate(context, request) for predicate in
+                        predicates))
+        predicate_wrapper.__predicated__ = checker
+        return predicate_wrapper
+
+    @wraps_view
+    def attr_wrapped_view(self, view):
+        kw = self.kw
+        accept, order, phash = (kw.get('accept', None),
+                                kw.get('order', MAX_ORDER),
+                                kw.get('phash', DEFAULT_PHASH))
+        # this is a little silly but we don't want to decorate the original
+        # function with attributes that indicate accept, order, and phash,
+        # so we use a wrapper
+        if ( (accept is None) and (order == MAX_ORDER) and
+             (phash == DEFAULT_PHASH) ):
+            return view # defaults
+        def attr_view(context, request):
+            return view(context, request)
+        attr_view.__accept__ = accept
+        attr_view.__order__ = order
+        attr_view.__phash__ = phash
+        return attr_view
+
+    @wraps_view
+    def rendered_view(self, view):
+        wrapped_view = view
+        static_renderer = self.kw.get('renderer')
+        if static_renderer is None:
+            # register a default renderer if you want super-dynamic
+            # rendering.  registering a default renderer will also allow
+            # override_renderer to work if a renderer is left unspecified for
+            # a view registration.
+            return view
+
+        def _rendered_view(context, request):
+            renderer = static_renderer
+            response = wrapped_view(context, request)
+            if not is_response(response):
+                attrs = getattr(request, '__dict__', {})
+                if 'override_renderer' in attrs:
+                    # renderer overridden by newrequest event or other
+                    renderer_name = attrs.pop('override_renderer')
+                    renderer = RendererHelper(name=renderer_name,
+                                              package=self.kw.get('package'),
+                                              registry = self.kw['registry'])
+                if '__view__' in attrs:
+                    view_inst = attrs.pop('__view__')
+                else:
+                    view_inst = getattr(wrapped_view, '__original_view__',
+                                        wrapped_view)
+                return renderer.render_view(request, response, view_inst,
+                                            context)
+            return response
+
+        return _rendered_view
+
+    @wraps_view
+    def decorated_view(self, view):
+        decorator = self.kw.get('decorator')
+        if decorator is None:
+            return view
+        return decorator(view)
+
+class DefaultViewMapper(object):
+    implements(IViewMapperFactory)
+    def __init__(self, **kw):
+        self.attr = kw.get('attr')
+
+    def __call__(self, view):
+        if inspect.isclass(view):
+            view = self.map_class(view)
+        else:
+            view = self.map_nonclass(view)
+        return view
+
+    def map_class(self, view):
+        ronly = requestonly(view, self.attr)
+        if ronly:
+            mapped_view = self.map_class_requestonly(view)
+        else:
+            mapped_view = self.map_class_native(view)
+        return mapped_view
+
+    def map_nonclass(self, view):
+        # We do more work here than appears necessary to avoid wrapping the
+        # view unless it actually requires wrapping (to avoid function call
+        # overhead).
+        mapped_view = view
+        ronly = requestonly(view, self.attr)
+        if ronly:
+            mapped_view = self.map_nonclass_requestonly(view)
+        elif self.attr:
+            mapped_view = self.map_nonclass_attr(view)
+        return mapped_view
+        
+    def map_class_requestonly(self, view):
+        # its a class that has an __init__ which only accepts request
+        attr = self.attr
+        def _class_requestonly_view(context, request):
+            inst = view(request)
+            request.__view__ = inst
+            if attr is None:
+                response = inst()
+            else:
+                response = getattr(inst, attr)()
+            return response
+        return _class_requestonly_view
+
+    def map_class_native(self, view):
+        # its a class that has an __init__ which accepts both context and
+        # request
+        attr = self.attr
+        def _class_view(context, request):
+            inst = view(context, request)
+            request.__view__ = inst
+            if attr is None:
+                response = inst()
+            else:
+                response = getattr(inst, attr)()
+            return response
+        return _class_view
+
+    def map_nonclass_requestonly(self, view):
+        # its a function that has a __call__ which accepts only a single
+        # request argument
+        attr = self.attr
+        def _requestonly_view(context, request):
+            if attr is None:
+                response = view(request)
+            else:
+                response = getattr(view, attr)(request)
+            return response
+        return _requestonly_view
+
+    def map_nonclass_attr(self, view):
+        # its a function that has a __call__ which accepts both context and
+        # request, but still has an attr
+        def _attr_view(context, request):
+            response = getattr(view, self.attr)(context, request)
+            return response
+        return _attr_view
+
+def requestonly(view, attr=None):
     if attr is None:
         attr = '__call__'
-    if inspect.isfunction(class_or_callable):
-        fn = class_or_callable
-    elif inspect.isclass(class_or_callable):
+    if inspect.isfunction(view):
+        fn = view
+    elif inspect.isclass(view):
         try:
-            fn = class_or_callable.__init__
+            fn = view.__init__
         except AttributeError:
             return False
     else:
         try:
-            fn = getattr(class_or_callable, attr)
+            fn = getattr(view, attr)
         except AttributeError:
             return False
 
@@ -2693,266 +2968,6 @@ def requestonly(class_or_callable, attr=None):
 
     return False
 
-def is_response(ob):
-    if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
-         hasattr(ob, 'status') ):
-        return True
-    return False
-
-def _map_view(view, registry, attr=None, renderer=None):
-    wrapped_view = view
-
-    helper = None
-
-    if renderer is not None:
-        helper = RendererHelper(renderer['name'],
-                                package=renderer['package'],
-                                registry=registry)
-
-    if inspect.isclass(view):
-        # If the object we've located is a class, turn it into a
-        # function that operates like a Zope view (when it's invoked,
-        # construct an instance using 'context' and 'request' as
-        # position arguments, then immediately invoke the __call__
-        # method of the instance with no arguments; __call__ should
-        # return an IResponse).
-        if requestonly(view, attr):
-            # its __init__ accepts only a single request argument,
-            # instead of both context and request
-            def _class_requestonly_view(context, request):
-                inst = view(request)
-                if attr is None:
-                    response = inst()
-                else:
-                    response = getattr(inst, attr)()
-                if helper is not None:
-                    if not is_response(response):
-                        system = {
-                            'view':inst,
-                            'renderer_name':renderer['name'], # b/c
-                            'renderer_info':renderer,
-                            'context':context,
-                            'request':request
-                            }
-                        response = helper.render_to_response(response, system,
-                                                             request=request)
-                return response
-            wrapped_view = _class_requestonly_view
-        else:
-            # its __init__ accepts both context and request
-            def _class_view(context, request):
-                inst = view(context, request)
-                if attr is None:
-                    response = inst()
-                else:
-                    response = getattr(inst, attr)()
-                if helper is not None:
-                    if not is_response(response):
-                        system = {'view':inst,
-                                  'renderer_name':renderer['name'], # b/c
-                                  'renderer_info':renderer,
-                                  'context':context,
-                                  'request':request
-                                  }
-                        response = helper.render_to_response(response, system,
-                                                             request=request)
-                return response
-            wrapped_view = _class_view
-
-    elif requestonly(view, attr):
-        # its __call__ accepts only a single request argument,
-        # instead of both context and request
-        def _requestonly_view(context, request):
-            if attr is None:
-                response = view(request)
-            else:
-                response = getattr(view, attr)(request)
-
-            if helper is not None:
-                if not is_response(response):
-                    system = {
-                        'view':view,
-                        'renderer_name':renderer['name'],
-                        'renderer_info':renderer,
-                        'context':context,
-                        'request':request
-                        }
-                    response = helper.render_to_response(response, system,
-                                                         request=request)
-            return response
-        wrapped_view = _requestonly_view
-
-    elif attr:
-        def _attr_view(context, request):
-            response = getattr(view, attr)(context, request)
-            if helper is not None:
-                if not is_response(response):
-                    system = {
-                        'view':view,
-                        'renderer_name':renderer['name'],
-                        'renderer_info':renderer,
-                        'context':context,
-                        'request':request
-                        }
-                    response = helper.render_to_response(response, system,
-                                                         request=request)
-            return response
-        wrapped_view = _attr_view
-
-    elif helper is not None:
-        def _rendered_view(context, request):
-            response = view(context, request)
-            if not is_response(response):
-                system = {
-                    'view':view,
-                    'renderer_name':renderer['name'], # b/c
-                    'renderer_info':renderer,
-                    'context':context,
-                    'request':request
-                    }
-                response = helper.render_to_response(response, system,
-                                                     request=request)
-            return response
-        wrapped_view = _rendered_view
-
-    decorate_view(wrapped_view, view)
-    return wrapped_view
-
-def _owrap_view(view, viewname, wrapper_viewname):
-    if not wrapper_viewname:
-        return view
-    def _owrapped_view(context, request):
-        response = view(context, request)
-        request.wrapped_response = response
-        request.wrapped_body = response.body
-        request.wrapped_view = view
-        wrapped_response = render_view_to_response(context, request,
-                                                   wrapper_viewname)
-        if wrapped_response is None:
-            raise ValueError(
-                'No wrapper view named %r found when executing view '
-                'named %r' % (wrapper_viewname, viewname))
-        return wrapped_response
-    decorate_view(_owrapped_view, view)
-    return _owrapped_view
-
-def _predicate_wrap(view, predicates):
-    if not predicates:
-        return view
-    def predicate_wrapper(context, request):
-        if all((predicate(context, request) for predicate in predicates)):
-            return view(context, request)
-        raise PredicateMismatch('predicate mismatch for view %s' % view)
-    def checker(context, request):
-        return all((predicate(context, request) for predicate in
-                    predicates))
-    predicate_wrapper.__predicated__ = checker
-    decorate_view(predicate_wrapper, view)
-    return predicate_wrapper
-
-def _secure_view(view, permission, authn_policy, authz_policy):
-    if permission == '__no_permission_required__':
-        # allow views registered within configurations that have a
-        # default permission to explicitly override the default
-        # permission, replacing it with no permission at all
-        permission = None
-
-    wrapped_view = view
-    if authn_policy and authz_policy and (permission is not None):
-        def _secured_view(context, request):
-            principals = authn_policy.effective_principals(request)
-            if authz_policy.permits(context, principals, permission):
-                return view(context, request)
-            msg = getattr(request, 'authdebug_message',
-                          'Unauthorized: %s failed permission check' % view)
-            raise Forbidden(msg)
-        _secured_view.__call_permissive__ = view
-        def _permitted(context, request):
-            principals = authn_policy.effective_principals(request)
-            return authz_policy.permits(context, principals, permission)
-        _secured_view.__permitted__ = _permitted
-        wrapped_view = _secured_view
-        decorate_view(wrapped_view, view)
-
-    return wrapped_view
-
-def _authdebug_view(view, permission, authn_policy, authz_policy, settings,
-                    logger):
-    wrapped_view = view
-    if settings and settings.get('debug_authorization', False):
-        def _authdebug_view(context, request):
-            view_name = getattr(request, 'view_name', None)
-
-            if authn_policy and authz_policy:
-                if permission is None:
-                    msg = 'Allowed (no permission registered)'
-                else:
-                    principals = authn_policy.effective_principals(request)
-                    msg = str(authz_policy.permits(context, principals,
-                                                   permission))
-            else:
-                msg = 'Allowed (no authorization policy in use)'
-
-            view_name = getattr(request, 'view_name', None)
-            url = getattr(request, 'url', None)
-            msg = ('debug_authorization of url %s (view name %r against '
-                   'context %r): %s' % (url, view_name, context, msg))
-            logger and logger.debug(msg)
-            if request is not None:
-                request.authdebug_message = msg
-            return view(context, request)
-
-        wrapped_view = _authdebug_view
-        decorate_view(wrapped_view, view)
-
-    return wrapped_view
-
-def _attr_wrap(view, accept, order, phash):
-    # this is a little silly but we don't want to decorate the original
-    # function with attributes that indicate accept, order, and phash,
-    # so we use a wrapper
-    if (accept is None) and (order == MAX_ORDER) and (phash == DEFAULT_PHASH):
-        return view # defaults
-    def attr_view(context, request):
-        return view(context, request)
-    attr_view.__accept__ = accept
-    attr_view.__order__ = order
-    attr_view.__phash__ = phash
-    decorate_view(attr_view, view)
-    return attr_view
-
-def isexception(o):
-    if IInterface.providedBy(o):
-        if IException.isEqualOrExtendedBy(o):
-            return True
-    return (
-        isinstance(o, Exception) or
-        (inspect.isclass(o) and (issubclass(o, Exception)))
-        )
-
-class ActionPredicate(object):
-    action_name = 'action'
-    def __init__(self, action):
-        self.action = action
-        try:
-            self.action_re = re.compile(action + '$')
-        except (re.error, TypeError), why:
-            raise ConfigurationError(why[0])
-
-    def __call__(self, context, request):
-        matchdict = request.matchdict
-        if matchdict is None:
-            return False
-        action = matchdict.get(self.action_name)
-        if action is None:
-            return False
-        return bool(self.action_re.match(action))
-
-    def __hash__(self):
-        # allow this predicate's phash to be compared as equal to
-        # others that share the same action name
-        return hash(self.action)
-
 class PyramidConfigurationMachine(ConfigurationMachine):
     autocommit = False
 
@@ -2969,4 +2984,18 @@ class PyramidConfigurationMachine(ConfigurationMachine):
             return False
         self._seen_files.add(spec)
         return True
+
+def translator(msg):
+    request = get_current_request()
+    localizer = get_localizer(request)
+    return localizer.translate(msg)
+
+def isexception(o):
+    if IInterface.providedBy(o):
+        if IException.isEqualOrExtendedBy(o):
+            return True
+    return (
+        isinstance(o, Exception) or
+        (inspect.isclass(o) and (issubclass(o, Exception)))
+        )
 

@@ -13,6 +13,7 @@
 
 import sys, os
 import datetime
+import inspect
 import warnings
 
 warnings.simplefilter('ignore', DeprecationWarning)
@@ -56,8 +57,24 @@ for item in os.listdir(parent):
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest',
-              'repoze.sphinx.autointerface']
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.doctest',
+    'repoze.sphinx.autointerface',
+#    'sphinx.ext.intersphinx'
+    ]
+
+# Looks for objects in other Pyramid projects
+## intersphinx_mapping = {
+##     'cookbook':
+##     ('http://docs.pylonsproject.org/projects/pyramid_cookbook/dev/', None),
+##     'handlers':
+##     ('http://docs.pylonsproject.org/projects/pyramid_handlers/dev/', None),
+##     'zcml':
+##     ('http://docs.pylonsproject.org/projects/pyramid_zcml/dev/', None),
+##     'jinja2':
+##     ('http://docs.pylonsproject.org/projects/pyramid_jinja2/dev/', None),
+##     }
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -76,7 +93,7 @@ copyright = '%s, Agendaless Consulting' % datetime.datetime.now().year
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '1.0a7'
+version = '1.0'
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -407,6 +424,18 @@ def setup(app):
     app.add_directive('frontmatter', frontmatter, 1, (0, 0, 0))
     app.add_directive('mainmatter', mainmatter, 1, (0, 0, 0))
     app.add_directive('backmatter', backmatter, 1, (0, 0, 0))
+    app.connect('autodoc-process-signature', resig)
+
+def resig(app, what, name, obj, options, signature, return_annotation):
+    """ Allow for preservation of ``@action_method`` decorated methods
+    in configurator """
+    docobj = getattr(obj, '__docobj__', None)
+    if docobj is not None:
+        argspec = inspect.getargspec(docobj)
+        if argspec[0] and argspec[0][0] in ('cls', 'self'):
+            del argspec[0][0]
+        signature = inspect.formatargspec(*argspec)
+    return signature, return_annotation
 
 # turn off all line numbers in latex formatting
 
@@ -426,7 +455,7 @@ def setup(app):
 epub_title = 'The Pyramid Web Application Development Framework, Version 1.0'
 epub_author = 'Chris McDonough'
 epub_publisher = 'Agendaless Consulting'
-epub_copyright = '2008-2010'
+epub_copyright = '2008-2011'
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.
@@ -437,7 +466,7 @@ epub_scheme = 'ISBN'
 
 # The unique identifier of the text. This can be a ISBN number
 # or the project homepage.
-epub_identifier = '0615345379'
+epub_identifier = '0615445675'
 
 # A unique identification for the text.
 epub_uid = 'The Pyramid Web Application Development Framework, Version 1.0'

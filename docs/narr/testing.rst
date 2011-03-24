@@ -78,81 +78,84 @@ See :ref:`threadlocals_chapter` for information about these functions and the
 data structures they return.
 
 If your code uses these ``get_current_*`` functions or calls :app:`Pyramid`
-code which uses ``get_current_*`` functions, you will need to construct a
-:term:`Configurator` and call its ``begin`` method within the ``setUp``
-method of your unit test and call the same Configurator's ``end`` method
-within the ``tearDown`` method of your unit test.
+code which uses ``get_current_*`` functions, you will need to call
+:func:`pyramid.testing.setUp` in your test setup and you will need to call
+:func:`pyramid.testing.tearDown` in your test teardown.
+:func:`~pyramid.testing.setUp` pushes a registry onto the :term:`thread
+local` stack, which makes the ``get_current_*`` functions work.  It returns a
+:term:`Configurator` object which can be used to perform extra configuration
+required by the code under test.  :func:`~pyramid.testing.tearDown` pops the
+thread local stack.
 
-We'll also instruct the Configurator we use during testing to *autocommit*.
-Normally when a Configurator is used by an application, it defers performing
-any "real work" until its ``.commit`` method is called (often implicitly by
-the :meth:`pyramid.config.Configurator.make_wsgi_app` method).  Passing
-``autocommit=True`` to the Configurator constructor causes the Configurator
-to perform all actions implied by methods called on it immediately, which is
-more convenient for unit-testing purposes than needing to call
-:meth:`pyramid.config.Configurator.commit` in each test.
+Normally when a Configurator is used directly with the ``main`` block of
+a Pyramid application, it defers performing any "real work" until its
+``.commit`` method is called (often implicitly by the
+:meth:`pyramid.config.Configurator.make_wsgi_app` method).  The
+Configurator returned by :func:`~pyramid.testing.setUp` is an
+*autocommitting* Configurator, however, which performs all actions
+implied by methods called on it immediately.  This is more convenient
+for unit-testing purposes than needing to call
+:meth:`pyramid.config.Configurator.commit` in each test after adding
+extra configuration statements.
 
-The use of a Configurator and its ``begin`` and ``end`` methods allows you to
-supply each unit test method in a test case with an environment that has an
-isolated registry and an isolated request for the duration of a single test.
-Here's an example of using this feature:
-
-.. code-block:: python
-   :linenos:
-
-   import unittest
-   from pyramid.config import Configurator
-
-   class MyTest(unittest.TestCase):
-       def setUp(self):
-           self.config = Configurator(autocommit=True)
-           self.config.begin()
-
-       def tearDown(self):
-           self.config.end()
-
-The above will make sure that
-:func:`pyramid.threadlocal.get_current_registry` will return the
-:term:`application registry` associated with the ``config`` Configurator
-instance when :func:`pyramid.threadlocal.get_current_registry` is called in a
-test case method attached to ``MyTest``.  Each test case method attached to
-``MyTest`` will use an isolated registry.
-
-The :meth:`pyramid.config.Configurator.begin` method accepts various
-arguments that influence the code run during the test.  See the
-:ref:`configuration_module` chapter for information about the API of a
-:term:`Configurator`, including its ``begin`` and ``end`` methods.
-
-If you also want to make :func:`pyramid.get_current_request` return something
-other than ``None`` during the course of a single test, you can pass a
-:term:`request` object into the :meth:`pyramid.config.Configurator.begin`
-method of the Configurator within the ``setUp`` method of your test:
+The use of the :func:`~pyramid.testing.setUp` and
+:func:`~pyramid.testing.tearDown` functions allows you to supply each unit
+test method in a test case with an environment that has an isolated registry
+and an isolated request for the duration of a single test.  Here's an example
+of using this feature:
 
 .. code-block:: python
    :linenos:
 
    import unittest
-   from pyramid.config import Configurator
    from pyramid import testing
 
    class MyTest(unittest.TestCase):
        def setUp(self):
-           self.config = Configurator(autocommit=True)
-           request = testing.DummyRequest()
-           self.config.begin(request=request)
+           self.config = testing.setUp()
 
        def tearDown(self):
-           self.config.end()
+           testing.tearDown()
 
-If you pass a :term:`request` object into the ``begin`` method of the
-configurator within your test case's ``setUp``, any test method attached to
-the ``MyTest`` test case that directly or indirectly calls
-:func:`pyramid.threadlocal.get_current_request` will receive the request you
-passed into the ``begin`` method.  Otherwise, during testing,
-:func:`pyramid.threadlocal.get_current_request` will return ``None``.  We use
-a "dummy" request implementation supplied by
-:class:`pyramid.testing.DummyRequest` because it's easier to construct than a
-"real" :app:`Pyramid` request object.
+The above will make sure that
+:func:`~pyramid.threadlocal.get_current_registry` called within a test
+case method of ``MyTest`` will return the :term:`application registry`
+associated with the ``config`` Configurator instance.  Each test case
+method attached to ``MyTest`` will use an isolated registry.
+
+The :func:`~pyramid.testing.setUp` and :func:`~pyramid.testing.tearDown`
+functions accepts various arguments that influence the environment of the
+test.  See the :ref:`testing_module` chapter for information about the extra
+arguments supported by these functions.
+
+If you also want to make :func:`~pyramid.get_current_request` return something
+other than ``None`` during the course of a single test, you can pass a
+:term:`request` object into the :func:`pyramid.testing.setUp` within the
+``setUp`` method of your test:
+
+.. code-block:: python
+   :linenos:
+
+   import unittest
+   from pyramid import testing
+
+   class MyTest(unittest.TestCase):
+       def setUp(self):
+           request = testing.DummyRequest()
+           self.config = testing.setUp(request=request)
+
+       def tearDown(self):
+           testing.tearDown()
+
+If you pass a :term:`request` object into :func:`pyramid.testing.setUp`
+within your test case's ``setUp``, any test method attached to the
+``MyTest`` test case that directly or indirectly calls
+:func:`~pyramid.threadlocal.get_current_request` will receive the request
+object.  Otherwise, during testing,
+:func:`~pyramid.threadlocal.get_current_request` will return ``None``.
+We use a "dummy" request implementation supplied by
+:class:`pyramid.testing.DummyRequest` because it's easier to construct
+than a "real" :app:`Pyramid` request object.
 
 What?
 ~~~~~
@@ -160,20 +163,20 @@ What?
 Thread local data structures are always a bit confusing, especially when
 they're used by frameworks.  Sorry.  So here's a rule of thumb: if you don't
 *know* whether you're calling code that uses the
-:func:`pyramid.threadlocal.get_current_registry` or
-:func:`pyramid.threadlocal.get_current_request` functions, or you don't care
-about any of this, but you still want to write test code, just always create
-an autocommitting Configurator instance and call its ``begin`` method within
-the ``setUp`` of a unit test, then subsequently call its ``end`` method in
-the test's ``tearDown``.  This won't really hurt anything if the application
-you're testing does not call any ``get_current*`` function.
+:func:`~pyramid.threadlocal.get_current_registry` or
+:func:`~pyramid.threadlocal.get_current_request` functions, or you don't care
+about any of this, but you still want to write test code, just always call
+:func:`pyramid.testing.setUp` in your test's ``setUp`` method and
+:func:`pyramid.testing.tearDown` in your tests' ``tearDown`` method.  This
+won't really hurt anything if the application you're testing does not call
+any ``get_current*`` function.
 
 .. index::
    single: pyramid.testing
    single: Configurator testing API
 
 Using the ``Configurator`` and ``pyramid.testing`` APIs in Unit Tests
-------------------------------------------------------------------------
+---------------------------------------------------------------------
 
 The ``Configurator`` API and the ``pyramid.testing`` module provide a number
 of functions which can be used during unit testing.  These functions make
@@ -187,29 +190,29 @@ function.
 .. code-block:: python
    :linenos:
 
-   def view_fn(request):
-       from pyramid.chameleon_zpt import render_template_to_response
-       if 'say' in request.params:
-           return render_template_to_response('templates/submitted.pt',
-                                               say=request.params['say'])
-       return render_template_to_response('templates/show.pt', say='Hello')
+   from pyramid.security import has_permission
+   from pyramid.exceptions import Forbidden
 
-Without invoking any startup code or using the testing API, an attempt to run
-this view function in a unit test will result in an error.  When a
-:app:`Pyramid` application starts normally, it will populate a
-:term:`application registry` using :term:`configuration declaration` calls
-made against a :term:`Configurator` (sometimes deferring to the application's
-``configure.zcml`` :term:`ZCML` file via ``load_zcml``).  But if this
-application registry is not created and populated (e.g. with an
-:meth:`pyramid.config.Configurator.add_view` :term:`configuration
-declaration` or ``view`` declarations in :term:`ZCML`), like when you invoke
-application code via a unit test, :app:`Pyramid` API functions will tend to
-fail.
+   def view_fn(request):
+       if not has_permission('edit', request.context, request):
+           raise Forbidden
+       return {'greeting':'hello'}
+
+Without doing anything special during a unit test, the call to
+:func:`~pyramid.security.has_permission` in this view function will always
+return a ``True`` value.  When a :app:`Pyramid` application starts normally,
+it will populate a :term:`application registry` using :term:`configuration
+declaration` calls made against a :term:`Configurator`.  But if this
+application registry is not created and populated (e.g. by initializing the
+configurator with an authorization policy), like when you invoke application
+code via a unit test, :app:`Pyramid` API functions will tend to either fail
+or return default results.  So how do you test the branch of the code in this
+view function that raises :exc:`Forbidden`?
 
 The testing API provided by :app:`Pyramid` allows you to simulate various
 application registry registrations for use under a unit testing framework
 without needing to invoke the actual application configuration implied by its
-``run.py``.  For example, if you wanted to test the above ``view_fn``
+``main`` function.  For example, if you wanted to test the above ``view_fn``
 (assuming it lived in the package named ``my.package``), you could write a
 :class:`unittest.TestCase` that used the testing API.
 
@@ -217,72 +220,68 @@ without needing to invoke the actual application configuration implied by its
    :linenos:
 
    import unittest
-   from pyramid.config import Configurator
    from pyramid import testing
 
    class MyTest(unittest.TestCase):
        def setUp(self):
-           self.config = Configurator(autocommit=True)
-           self.config.begin()
+           self.config = testing.setUp()
 
        def tearDown(self):
-           self.config.end()
+           testing.tearDown()
        
-       def test_view_fn_not_submitted(self):
+       def test_view_fn_forbidden(self):
+           from pyramid.exceptions import Forbidden
            from my.package import view_fn
-           renderer = self.config.testing_add_renderer('templates/show.pt')
+           self.config.testing_securitypolicy(userid='hank', 
+                                              permissive=False)
            request = testing.DummyRequest()
-           response = view_fn(request)
-           renderer.assert_(say='Hello')
+           request.context = testing.DummyResource()
+           self.assertRaises(Forbidden, view_fn, request)
 
-       def test_view_fn_submitted(self):
+       def test_view_fn_allowed(self):
+           from pyramid.exceptions import Forbidden
            from my.package import view_fn
-           renderer = self.config.testing_add_renderer(
-                                          'templates/submitted.pt')
+           self.config.testing_securitypolicy(userid='hank', 
+                                              permissive=True)
            request = testing.DummyRequest()
-           request.params['say'] = 'Yo'
+           request.context = testing.DummyResource()
            response = view_fn(request)
-           renderer.assert_(say='Yo')
-
+           self.assertEqual(response, {'greeting':'hello'})
+           
 In the above example, we create a ``MyTest`` test case that inherits from
 :mod:`unittest.TestCase`.  If it's in our :app:`Pyramid` application, it will
 be found when ``setup.py test`` is run.  It has two test methods.
 
-The first test method, ``test_view_fn_not_submitted`` tests the ``view_fn``
-function in the case that no "form" values (represented by request.params)
-have been submitted.  Its first line registers a "dummy template renderer"
-named ``templates/show.pt`` via the
-:meth:`pyramid.config.Configurator.testing_add_renderer` method; this method
-returns a :class:`pyramid.testing.DummyTemplateRenderer` instance which we
-hang on to for later.
+The first test method, ``test_view_fn_forbidden`` tests the ``view_fn`` when
+the authentication policy forbids the current user the ``edit`` permission.
+Its third line registers a "dummy" "non-permissive" authorization policy
+using the :meth:`~pyramid.config.Configurator.testing_securitypolicy` method,
+which is a special helper method for unit testing.
 
 We then create a :class:`pyramid.testing.DummyRequest` object which simulates
 a WebOb request object API.  A :class:`pyramid.testing.DummyRequest` is a
 request object that requires less setup than a "real" :app:`Pyramid` request.
 We call the function being tested with the manufactured request.  When the
-function is called, :func:`pyramid.chameleon_zpt.render_template_to_response`
-will call the "dummy" template renderer object instead of the real template
-renderer object.  When the dummy renderer is called, it will set attributes
-on itself corresponding to the non-path keyword arguments provided to the
-:func:`pyramid.chameleon_zpt.render_template_to_response` function.  We check
-that the ``say`` parameter sent into the template rendering function was
-``Hello`` in this specific example.  The ``assert_`` method of the renderer
-we've created will raise an :exc:`AssertionError` if the value passed to the
-renderer as ``say`` does not equal ``Hello`` (any number of keyword arguments
-are supported).
+function is called, :func:`pyramid.security.has_permission` will call the
+"dummy" authentication policy we've registered through
+:meth:`~pyramid.config.Configuration.testing_securitypolicy`, which denies
+access.  We check that the view function raises a :exc:`Forbidden` error.
 
-The second test method, named ``test_view_fn_submitted`` tests the alternate
-case, where the ``say`` form value has already been set in the request and
-performs a similar template registration and assertion.  We assert at the end
-of this that the renderer's ``say`` attribute is ``Yo``, as this is what is
-expected of the view function in the branch it's testing.
+The second test method, named ``test_view_fn_allowed`` tests the alternate
+case, where the authentication policy allows access.  Notice that we pass
+different values to
+:meth:`~pyramid.config.Configurator.testing_securitypolicy` to obtain this
+result.  We assert at the end of this that the view function returns a value.
 
-Note that the test calls the :meth:`pyramid.config.Configurator.begin` method
-in its ``setUp`` method and the ``end`` method of the same in its
-``tearDown`` method.  If you use any of the
-:class:`pyramid.config.Configurator` APIs during testing, be sure to use this
-pattern in your test case's ``setUp`` and ``tearDown``; these methods make
-sure you're using a "fresh" :term:`application registry` per test run.
+Note that the test calls the :func:`pyramid.testing.setUp` function in its
+``setUp`` method and the :func:`pyramid.testing.tearDown` function in its
+``tearDown`` method.  We assign the result of :func:`pyramid.testing.setUp`
+as ``config`` on the unittest class.  This is a :term:`Configurator` object
+and all methods of the configurator can be called as necessary within
+tests. If you use any of the :class:`~pyramid.config.Configurator` APIs during
+testing, be sure to use this pattern in your test case's ``setUp`` and
+``tearDown``; these methods make sure you're using a "fresh"
+:term:`application registry` per test run.
 
 See the :ref:`testing_module` chapter for the entire :app:`Pyramid` -specific
 testing API.  This chapter describes APIs for registering a security policy,
@@ -309,12 +308,13 @@ implementations to give the code under test only enough context to run.
 some code *and* its integration with the rest of the :app:`Pyramid`
 framework.
 
-In :app:`Pyramid` applications that use :term:`ZCML`, you can create an
-integration test by *loading its ZCML* in the test's setup code.  This causes
-the entire :app:`Pyramid` environment to be set up and torn down as if your
-application was running "for real".  This is a heavy-hammer way of making
-sure that your tests have enough context to run properly, and it tests your
-code's integration with the rest of :app:`Pyramid`.
+In :app:`Pyramid` applications that are plugins to Pyramid, you can create an
+integration test by including it's ``includeme`` function via
+:meth:`pyramid.config.Configurator.include` in the test's setup code.  This
+causes the entire :app:`Pyramid` environment to be set up and torn down as if
+your application was running "for real".  This is a heavy-hammer way of
+making sure that your tests have enough context to run properly, and it tests
+your code's integration with the rest of :app:`Pyramid`.
 
 Let's demonstrate this by showing an integration test for a view.  The below
 test assumes that your application's package name is ``myapp``, and that
@@ -327,23 +327,21 @@ after accessing some values that require a fully set up environment.
 
    import unittest
 
-   from pyramid.config import Configurator
    from pyramid import testing
 
    class ViewIntegrationTests(unittest.TestCase):
        def setUp(self):
            """ This sets up the application registry with the
-           registrations your application declares in its configure.zcml
-           (including dependent registrations for pyramid itself).
+           registrations your application declares in its ``includeme`` 
+           function.
            """
            import myapp
-           self.config = Configurator(package=myapp, autocommit=True)
-           self.config.begin()
-           self.config.load_zcml('myapp:configure.zcml')
+           self.config = testing.setUp()
+           self.config.include('myapp')
 
        def tearDown(self):
            """ Clear out the application registry """
-           self.config.end()
+           testing.tearDown()
 
        def test_my_view(self):
            from myapp.views import my_view
@@ -359,7 +357,7 @@ after accessing some values that require a fully set up environment.
                                                    str(len(body))))
 
 Unless you cannot avoid it, you should prefer writing unit tests that use the
-:class:`pyramid.config.Configurator` API to set up the right "mock"
+:class:`~pyramid.config.Configurator` API to set up the right "mock"
 registrations rather than creating an integration test.  Unit tests will run
 faster (because they do less for each test) and the result of a unit test is
 usually easier to make assertions about.

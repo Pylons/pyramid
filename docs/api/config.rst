@@ -28,6 +28,8 @@
 
      .. automethod:: include
 
+     .. automethod:: add_directive
+
      .. automethod:: with_package
 
      .. automethod:: maybe_dotted
@@ -48,13 +50,9 @@
 
      .. automethod:: add_translation_dirs
 
-     .. automethod:: add_handler
-
      .. automethod:: add_view
 
      .. automethod:: derive_view
-
-     .. automethod:: load_zcml(spec)
 
      .. automethod:: make_wsgi_app()
 

@@ -46,8 +46,6 @@ class Settings(dict):
                                     config_reload_resources))
         # reload_resources is an older alias for reload_assets
         eff_reload_assets = reload_assets or reload_resources
-        configure_zcml = self.get('configure_zcml', '')
-        eff_configure_zcml = eget('PYRAMID_CONFIGURE_ZCML', configure_zcml)
         locale_name = self.get('default_locale_name', 'en')
         eff_locale_name = eget('PYRAMID_DEFAULT_LOCALE_NAME', locale_name)
         
@@ -59,7 +57,6 @@ class Settings(dict):
             'reload_templates': eff_reload_all or eff_reload_templates,
             'reload_resources':eff_reload_all or eff_reload_assets,
             'reload_assets':eff_reload_all or eff_reload_assets,
-            'configure_zcml':eff_configure_zcml,
             'default_locale_name':eff_locale_name,
             }
 
@@ -74,21 +71,14 @@ class Settings(dict):
 
 def get_settings():
     """
-    Return a 'settings' object for the current application.  A
-    'settings' object is a dictionary-like object that contains
-    key/value pairs based on the dictionary passed as the ``settings``
-    argument to the :class:`pyramid.config.Configurator`
-    constructor or the :func:`pyramid.router.make_app` API.
-
-    .. note:: For backwards compatibility, dictionary keys can also be
-       looked up as attributes of the settings object.
-
-    .. note:: the
-       :class:`pyramid.config.Configurator.get_settings` method
-       performs the same duty.
+    Return a :term:`deployment settings` object for the current application.
+    The object is a dictionary-like object that contains key/value pairs
+    based on the dictionary passed as the ``settings`` argument to the
+    :class:`pyramid.config.Configurator` constructor or the
+    :func:`pyramid.router.make_app` API.
 
     .. warning:: This method is deprecated as of Pyramid 1.0.  Use
-       ``pyramid.threadlocals.get_current_registry().settings`` instead or use '
+       ``pyramid.threadlocals.get_current_registry().settings`` instead or use
        the ``settings`` attribute of the registry available from the request
        (``request.registry.settings``).
     """

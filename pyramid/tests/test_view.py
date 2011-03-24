@@ -24,6 +24,7 @@ class BaseTest(object):
             'SERVER_NAME':'localhost',
             'SERVER_PORT':'8080',
             'REQUEST_METHOD':'GET',
+            'PATH_INFO':'/',
             }
         environ.update(extras)
         return environ
@@ -196,15 +197,29 @@ class TestIsResponse(unittest.TestCase):
         response = None
         self.assertEqual(self._callFUT(response), False)
 
-    def test_partial_inst(self):
-        response = DummyResponse()
-        response.app_iter = None
-        self.assertEqual(self._callFUT(response), False)
-        
-    def test_status_not_string(self):
-        response = DummyResponse()
-        response.status = None
-        self.assertEqual(self._callFUT(response), False)
+    def test_isnt_no_headerlist(self):
+        class Response(object):
+            pass
+        resp = Response
+        resp.status = '200 OK'
+        resp.app_iter = []
+        self.assertEqual(self._callFUT(resp), False)
+
+    def test_isnt_no_status(self):
+        class Response(object):
+            pass
+        resp = Response
+        resp.app_iter = []
+        resp.headerlist = ()
+        self.assertEqual(self._callFUT(resp), False)
+
+    def test_isnt_no_app_iter(self):
+        class Response(object):
+            pass
+        resp = Response
+        resp.status = '200 OK'
+        resp.headerlist = ()
+        self.assertEqual(self._callFUT(resp), False)
 
 class TestViewConfigDecorator(unittest.TestCase):
     def setUp(self):
@@ -229,11 +244,14 @@ class TestViewConfigDecorator(unittest.TestCase):
         
     def test_create_nondefaults(self):
         decorator = self._makeOne(name=None, request_type=None, for_=None,
-                                  permission='foo')
+                                  permission='foo', mapper='mapper',
+                                  decorator='decorator')
         self.assertEqual(decorator.name, None)
         self.assertEqual(decorator.request_type, None)
         self.assertEqual(decorator.context, None)
         self.assertEqual(decorator.permission, 'foo')
+        self.assertEqual(decorator.mapper, 'mapper')
+        self.assertEqual(decorator.decorator, 'decorator')
         
     def test_call_function(self):
         decorator = self._makeOne()
@@ -317,10 +335,9 @@ class TestViewConfigDecorator(unittest.TestCase):
         settings = call_venusian(venusian)
         self.assertEqual(len(settings), 1)
         renderer = settings[0]['renderer']
-        self.assertEqual(renderer,
-                         {'name':'fixtures/minimal.pt',
-                          'package':pyramid.tests,
-                          })
+        self.assertEqual(renderer.name, 'fixtures/minimal.pt')
+        self.assertEqual(renderer.package, pyramid.tests)
+        self.assertEqual(renderer.registry.__class__, DummyRegistry)
 
     def test_call_with_renderer_dict(self):
         decorator = self._makeOne(renderer={'a':1})
@@ -390,6 +407,22 @@ class Test_append_slash_notfound_view(BaseTest, unittest.TestCase):
         self.assertEqual(response.status, '302 Found')
         self.assertEqual(response.location, '/abc/')
 
+    def test_matches_with_script_name(self):
+        request = self._makeRequest(PATH_INFO='/abc', SCRIPT_NAME='/foo')
+        context = ExceptionResponse()
+        self._registerMapper(request.registry, True)
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '302 Found')
+        self.assertEqual(response.location, '/foo/abc/')
+
+    def test_with_query_string(self):
+        request = self._makeRequest(PATH_INFO='/abc', QUERY_STRING='a=1&b=2')
+        context = ExceptionResponse()
+        self._registerMapper(request.registry, True)
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '302 Found')
+        self.assertEqual(response.location, '/abc/?a=1&b=2')
+
 class TestAppendSlashNotFoundViewFactory(BaseTest, unittest.TestCase):
     def _makeOne(self, notfound_view):
         from pyramid.view import AppendSlashNotFoundViewFactory
@@ -426,28 +459,6 @@ class Test_default_exceptionresponse_view(unittest.TestCase):
         request.exception = 'abc'
         result = self._callFUT(context, request)
         self.assertEqual(result, 'abc')
-
-class Test_action(unittest.TestCase):
-    def _makeOne(self, **kw):
-        from pyramid.view import action
-        return action(**kw)
-
-    def test_call_no_previous__exposed__(self):
-        inst = self._makeOne(a=1, b=2)
-        def wrapped():
-            """ """
-        result = inst(wrapped)
-        self.failUnless(result is wrapped)
-        self.assertEqual(result.__exposed__, [{'a':1, 'b':2}])
-
-    def test_call_with_previous__exposed__(self):
-        inst = self._makeOne(a=1, b=2)
-        def wrapped():
-            """ """
-        wrapped.__exposed__ = [None]
-        result = inst(wrapped)
-        self.failUnless(result is wrapped)
-        self.assertEqual(result.__exposed__, [None, {'a':1, 'b':2}])
 
 class ExceptionResponse(Exception):
     status = '404 Not Found'
@@ -494,9 +505,13 @@ class DummyVenusian(object):
         self.attachments.append((wrapped, callback, category))
         return self.info
 
+class DummyRegistry(object):
+    pass
+
 class DummyConfig(object):
     def __init__(self):
         self.settings = []
+        self.registry = DummyRegistry()
 
     def add_view(self, **kw):
         self.settings.append(kw)

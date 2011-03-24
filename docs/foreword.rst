@@ -8,70 +8,74 @@ Foreword
    Creations*, which later became *Zope Corporation*.  He has been
    a widely respected member of the Python community since 1994.
 
-Fortunate.
+Some times amazing things can actually happen.
 
-As I reflect upon the BFG web framework and this book by Chris to
-document it, I keep coming back to the same word.  Certainly the
-conventional wisdom is clear: "Don't we have too many web frameworks,
-paired with outdated books?"  Yes we do, but to the contrary and for
-that very reason, we are fortunate to have this book and this
-framework.
+In the world of web frameworks, the rate of radioactive decay is very high.
+Projects are starting, splintering, folding, and clashing constantly.  For
+Python, there are over 50 listed web frameworks.  In some ways this shows
+health and experimentation.  Yet others have started to ask: "Is this really
+good for Python developers?"
 
-Chris McDonough first came to work with us at Digital Creations almost
-a decade ago, just after there existed a Zope.  We were all pioneers:
-the first open source application server, one of the first open source
-web companies to get serious investment, and entrants in nearly every
-book and article about the open source space.  Zope wasn't just a
-unique business model, though.  It really was, as quoted at the time,
-one of the places where open source delivered fresh ideas in design
-and architecture.
+This book is the result of an event which bucked this trend, an event which
+Armin Ronacher wrote was "one of the greatest moves in Python's web framework
+history."  Two projects merged and are bringing in a third.  Consolidation
+won a victory over splintering.
 
-Then a decade happened.  Bubbles burst and the new new thing became
-the old new thing, many times in succession.  All of us changed jobs,
-worked on a variety of endeavors, and big dreams yielded to small
-realities.  Somehow, though the trajectory was unforeseen, we have
-orbited back to the same spot.  Older, wiser, but with similar ideas
-and familiar faces.  Back to dream again.
+As someone from the Zope world, I had a strong interest in repoze.bfg.  I
+viewed it as the escape hatch for Zope, teleporting us into the modern world
+of Python development, permitting but not requiring Zope-style idioms.  Chris
+McDonough established a great brand for repoze.bfg: small, documented,
+tested, fast, stable, friendly.  As the project manager for a very large
+repoze.bfg application, I can strongly attest that it was a home run on those
+points.
 
-We are fortunate to have BFG.  It really does carve out a unique spot
-in the Python web frameworks landscape.  It permits the core good
-ideas from Zope, while not requiring them.  Moreover, the reason
-you'll love it has less to do with Zope and more to do with the old
-fashioned stuff:
+But in a crowded web frameworks landscape, repoze.bfg was a long-shot to get
+critical mass.  It had a lot to offer, but was missing critical pieces such
+as momentum and name recognition.
 
-- A superb commitment to outstanding and constantly updated documentation
+Pylons has long been viewed as holding the number two spot in Python web
+frameworks.  It is one of (if not the) first "modern" web framework.  With
+lots of users, and a "full-stack" framework atop it (TurboGears), Pylons had
+momentum and name recognition aplenty.  But it needed more resources to
+accomplish its goals of an architectural transition, and Ben Bangert needed
+to share the load as architect during the transition.
 
-- An equal commitment to quality: test coverage, performance, and
-  documented compatibility
+Ben and Chris started talking during 2011 about architectural patterns and
+discovered Pylons and repoze.bfg covered almost exactly the same surface
+area.  After some experiments, it became clear that, technically at least,
+the next version of Pylons could be the same as the next version of
+repoze.bfg.
 
-- Adult supervision and minimalism in the design, with "pay only for
-  what you eat" simplicity
+But what about the non-technical parts?  It was one thing to consolidate
+code.  Consolidating projects was new territory.
 
-For those of us from the Zope world, BFG permits our still-unique
-ideas while teleporting us into the modern world of Python web
-programming.  It is fascinating, liberating, and rejuvenating.  We are
-able to cast off old sins and legitimately reclaim the title of best
-damn game in town.  Quite a coup: whether you considered Zope but
-turned away, or became an adopter, you'll find BFG the new new new
-thing.
+I was fortunate to meet with the principals in Las Vegas and watch as they
+hashed out the idea.  The projects would merge and keep the Pylons identity.
+repoze.bfg would sacrifice its identity, but provide the technical
+foundation.  All the resources from the two projects would be combined.
 
-We are also fortunate to have this book.  We never had such a resource
-in Zope, even though we funded the writing of the first book a decade
-ago.  In retrospect, the answer is obvious: a second group tried to
-retrofit a book onto code created by the first group.  The true magic
-in BFG is that the top-notch documentation is written by the same
-person as the top-notch code, a person with equal passion and
-commitment to both.  Rarely are we so fortunate.
+I'll confess, I had high hopes for the outcome.  Now that the merge has
+happened and 1.0 released, I can honestly say it has done better than I could
+have imagined.  The story of "consolidation" is catching on, and interest in
+working together is growing.  Pyramid 1.0 is very, very high quality and
+ready to go for PyCon 2011.  People interested in "simple, fast, documented,
+tested" have a strong framework and healthy project.
 
-Which brings us to the final point.  We are fortunate to have Chris.
-I personally consider myself lucky to have worked with him and to be
-his friend this past decade.  He has changed my thinking in numerous
-ways, fundamentally improving the way I view many things.  He's the
-best person I know in the world of open source, and I get to be in
-business with him.  Fortunate indeed.
+It took humility, patience, and pragmatism to reach this point of obvious
+success.  Certainly by the project leaders, who each had to give up some of
+their sovereignty and sacred cows.  But as well, each community had to
+discuss the challenges, the various alternatives for going forward, and the
+pros and cons of consolidation in general but also this particular
+consolidation. That such a conversation and change could happen in a
+responsible, adult fashion speaks volumes about the strength and maturity of
+each community.
 
-I very much hope you enjoy this book and get involved with BFG.  We
-use it for applications as small as "hello world" demos up to
-scalable, re-usable, half-a-million-dollar projects.  May you find
-BFG, and the book, to be a high-quality, honest, and durable framework
-choice for your work as well.
+What might happen in 2011?  TurboGears is considering a move into the
+umbrella Pylons Project.  As Armin writes in his post, there is fertile
+ground for consolidation at other layers. In my own interests, I hope the
+worlds of Zope and Plone view Pyramid as the base for the next decade of
+their ideas.  But also, the Pylons Project as a vibrant home for such ideas.
+
+Congratulations, Pylons Project.  Not only have you accelerated your spot on
+the Python web frameworks chart, but you have injected the word
+"consolidation" into the lexicon of hot ideas for 2011.

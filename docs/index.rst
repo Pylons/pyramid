@@ -6,13 +6,8 @@ The Pyramid Web Application Development Framework
 
 :app:`Pyramid` is a small, fast, down-to-earth Python web application
 development framework.  It is developed as part of the `Pylons Project
-<http://docs.pylonshq.com/>`_.  It is licensed under a `BSD-like license
+<http://docs.pylonsproject.org/>`_.  It is licensed under a `BSD-like license
 <http://repoze.org/license.html>`_.
-
-.. note::
-
-   Pyramid is the latest iteration of the web framework previously known as
-   :mod:`repoze.bfg`.
 
 Front Matter
 ============
@@ -22,6 +17,14 @@ Front Matter
 
    copyright.rst
    conventions.rst
+
+"What's New" Documents
+======================
+
+.. toctree::
+   :maxdepth: 2
+
+   whatsnew-1.0
 
 Narrative documentation
 =======================
@@ -38,18 +41,17 @@ Narrative documentation in chapter form explaining how to use
    narr/firstapp
    narr/project
    narr/startup
-   narr/resourcelocation
    narr/urldispatch
+   narr/muchadoabouttraversal
    narr/traversal
    narr/views
    narr/renderers
    narr/templates
+   narr/viewconfig
    narr/resources
-   narr/static
+   narr/assets
    narr/webob
    narr/sessions
-   narr/flash
-   narr/csrf
    narr/security
    narr/hybrid
    narr/i18n
@@ -58,9 +60,8 @@ Narrative documentation in chapter form explaining how to use
    narr/environment
    narr/testing
    narr/hooks
-   narr/declarative
+   narr/advconfig
    narr/extending
-   narr/assets
    narr/router
    narr/threadlocals
    narr/zca
@@ -75,26 +76,21 @@ applications to various platforms.
 .. toctree::
    :maxdepth: 2
 
-   tutorials/wiki/index.rst
    tutorials/wiki2/index.rst
+   tutorials/wiki/index.rst
    tutorials/bfg/index.rst
-   tutorials/cmf/index.rst
    tutorials/gae/index.rst
    tutorials/modwsgi/index.rst
-   tutorials/zeo/index.rst
-   tutorials/catalog/index.rst
 
 Reference Material
 ==================
 
-Reference material includes API documentation and documentation of
-every :app:`Pyramid` :term:`ZCML directive`.
+Reference material includes documentation for every :app:`Pyramid` API.
 
 .. toctree::
    :maxdepth: 2
 
    api
-   zcml
 
 Detailed Change History
 =======================
@@ -136,11 +132,10 @@ earlier version of this application runs the `repoze.org
   git clone git://github.com/Pylons/virginia.git
 
 `shootout <https://github.com/Pylons/shootout>`_ is an example "idea
-competition" application by Carlos de la Guardia.  It demonstrates a hybrid
-of :term:`URL dispatch` and :term:`traversal` and integration with
-`SQLAlchemy <http://www.sqlalchemy.org/>`_, :term:`repoze.who`, and
-`Deliverance <http://www.deliveranceproject.org/>`_.  Check this application
-out of version control via:
+competition" application by Carlos de la Guardia and Lukasz Fidosz.  It
+demonstrates :term:`URL dispatch`, simple authentication, integration
+with `SQLAlchemy <http://www.sqlalchemy.org/>`_ and ``pyramid_simpleform``.
+Check this application out of version control via:
 
 .. code-block:: text
 
@@ -176,7 +171,7 @@ commenting, and file uploads.  See the `KARL site
 Support and Development
 =======================
 
-The `Pylons Project web site <http://docs.pylonshq.com/>`_ is the main online
+The `Pylons Project web site <http://pylonsproject.org/>`_ is the main online
 source of :app:`Pyramid` support and development information.
 
 To report bugs, use the `issue tracker
@@ -197,7 +192,7 @@ To check out the trunk via ``git``, use this command:
 
 To find out how to become a contributor to :app:`Pyramid`, please see the
 `contributor's section of the documentation
-<http://docs.pylonshq.com/index.html#contributing>`_.
+<http://docs.pylonsproject.org/index.html#contributing>`_.
 
 Index and Glossary
 ==================

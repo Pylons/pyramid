@@ -239,6 +239,17 @@ class TestCompileRoute(unittest.TestCase):
         self.assertEqual(matcher('foo/baz/biz/buz/bar'), None)
         self.assertEqual(generator(
             {'baz':1, 'buz':2, 'traverse':u'/a/b'}), '/foo/1/biz/2/bar/a/b')
+    
+    def test_with_bracket_star(self):
+        matcher, generator = self._callFUT('/foo/{baz}/biz/{buz}/bar{remainder:.*}')
+        self.assertEqual(matcher('/foo/baz/biz/buz/bar'),
+                         {'baz':'baz', 'buz':'buz', 'remainder':''})
+        self.assertEqual(matcher('/foo/baz/biz/buz/bar/everything/else/here'),
+                         {'baz':'baz', 'buz':'buz',
+                          'remainder':'/everything/else/here'})
+        self.assertEqual(matcher('foo/baz/biz/buz/bar'), None)
+        self.assertEqual(generator(
+            {'baz':1, 'buz':2, 'remainder':'/a/b'}), '/foo/1/biz/2/bar%2Fa%2Fb')
 
     def test_no_beginning_slash(self):
         matcher, generator = self._callFUT('foo/:baz/biz/:buz/bar')
@@ -257,7 +268,23 @@ class TestCompileRoute(unittest.TestCase):
         self.assertEqual(matcher('/foo/baz/biz/buz.bar'),
                          {'baz':'baz', 'buz':'buz', 'bar':'bar'})
         self.assertEqual(matcher('foo/baz/biz/buz/bar'), None)
-        self.assertEqual(generator({'baz':1, 'buz':2, 'bar': 'html'}), '/foo/1/biz/2.html')
+        self.assertEqual(generator({'baz':1, 'buz':2, 'bar': 'html'}),
+                         '/foo/1/biz/2.html')
+
+    # XXX reenable after torturous_route_re replacement is found for
+    # Jython
+    ## def test_custom_regex_with_embedded_squigglies(self):
+    ##     matcher, generator = self._callFUT('/{buz:\d{4}}')
+    ##     self.assertEqual(matcher('/2001'), {'buz':'2001'})
+    ##     self.assertEqual(matcher('/200'), None)
+    ##     self.assertEqual(generator({'buz':2001}), '/2001')
+
+    ## def test_custom_regex_with_embedded_squigglies2(self):
+    ##     matcher, generator = self._callFUT('/{buz:\d{3,4}}')
+    ##     self.assertEqual(matcher('/2001'), {'buz':'2001'})
+    ##     self.assertEqual(matcher('/200'), {'buz':'200'})
+    ##     self.assertEqual(matcher('/20'), None)
+    ##     self.assertEqual(generator({'buz':2001}), '/2001')
 
 class TestCompileRouteMatchFunctional(unittest.TestCase):
     def matches(self, pattern, path, expected):

@@ -12,16 +12,20 @@ from pyramid.scripting import get_root
 class PyramidTemplate(Template):
     def pre(self, command, output_dir, vars): # pragma: no cover
         vars['random_string'] = os.urandom(20).encode('hex')
+        package_logger = vars['package']
+        if package_logger == 'root':
+            # Rename the app logger in the rare case a project is named 'root'
+            package_logger = 'app'
+        vars['package_logger'] = package_logger
         return Template.pre(self, command, output_dir, vars)
+
+    def post(self, *arg, **kw): # pragma: no cover
+        print 'Welcome to Pyramid.  Sorry for the convenience.'
+        return Template.post(self, *arg, **kw)
 
 class StarterProjectTemplate(PyramidTemplate):
     _template_dir = 'paster_templates/starter'
     summary = 'pyramid starter project'
-    template_renderer = staticmethod(paste_script_template_renderer)
-
-class StarterZCMLProjectTemplate(PyramidTemplate):
-    _template_dir = 'paster_templates/starter_zcml'
-    summary = 'pyramid starter project (ZCML)'
     template_renderer = staticmethod(paste_script_template_renderer)
 
 class ZODBProjectTemplate(PyramidTemplate):
@@ -39,21 +43,6 @@ class AlchemyProjectTemplate(PyramidTemplate):
     summary = 'pyramid SQLAlchemy project using traversal'
     template_renderer = staticmethod(paste_script_template_renderer)
 
-class PylonsBasicProjectTemplate(PyramidTemplate):
-    _template_dir = 'paster_templates/pylons_basic'
-    summary = 'Pylons basic project'
-    template_renderer = staticmethod(paste_script_template_renderer)
-
-class PylonsMinimalProjectTemplate(PyramidTemplate):
-    _template_dir = 'paster_templates/pylons_minimal'
-    summary = 'Pylons minimal project'
-    template_renderer = staticmethod(paste_script_template_renderer)
-
-class PylonsSQLAlchemyProjectTemplate(PyramidTemplate):
-    _template_dir = 'paster_templates/pylons_sqla'
-    summary = 'Pylons SQLAlchemy project'
-    template_renderer = staticmethod(paste_script_template_renderer)
-
 def get_app(config_file, name, loadapp=loadapp):
     """ Return the WSGI application named ``name`` in the PasteDeploy
     config file ``config_file``"""
@@ -63,7 +52,22 @@ def get_app(config_file, name, loadapp=loadapp):
     return app
 
 _marker = object()
-class PShellCommand(Command):
+
+class PCommand(Command):
+    get_app = staticmethod(get_app) # hook point
+    get_root = staticmethod(get_root) # hook point
+    group_name = 'pyramid'
+    interact = (interact,) # for testing
+    loadapp = (loadapp,) # for testing
+    verbose = 3
+
+    def __init__(self, *arg, **kw):
+        # needs to be in constructor to support Jython (used to be at class
+        # scope as ``usage = '\n' + __doc__``.
+        self.usage = '\n' + self.__doc__
+        Command.__init__(self, *arg, **kw)
+
+class PShellCommand(PCommand):
     """Open an interactive shell with a :app:`Pyramid` app loaded.
 
     This command accepts two positional arguments:
@@ -88,25 +92,12 @@ class PShellCommand(Command):
 
     min_args = 2
     max_args = 2
-    group_name = 'pyramid'
 
     parser = Command.standard_parser(simulate=True)
     parser.add_option('-d', '--disable-ipython',
                       action='store_true',
                       dest='disable_ipython',
                       help="Don't use IPython even if it is available")
-
-    interact = (interact,) # for testing
-    loadapp = (loadapp,) # for testing
-    get_app = staticmethod(get_app) # hook point
-    get_root = staticmethod(get_root) # hook point
-    verbose = 3
-
-    def __init__(self, *arg, **kw):
-        # needs to be in constructor to support Jython (used to be at class
-        # scope as ``usage = '\n' + __doc__``.
-        self.usage = '\n' + self.__doc__
-        Command.__init__(self, *arg, **kw)
 
     def command(self, IPShell=_marker):
         if IPShell is _marker:
@@ -121,18 +112,86 @@ class PShellCommand(Command):
         self.logging_file_config(config_file)
         app = self.get_app(config_file, section_name, loadapp=self.loadapp[0])
         root, closer = self.get_root(app)
+        shell_globals = {'root':root, 'registry':app.registry}
         if IPShell is not None and not self.options.disable_ipython:
             try:
-                shell = IPShell(argv=[], user_ns={'root':root})
+                shell = IPShell(argv=[], user_ns=shell_globals)
                 shell.IP.BANNER = shell.IP.BANNER + '\n\n' + banner
                 shell.mainloop()
             finally:
                 closer()
         else:
             try:
-                self.interact[0](banner,
-                                 local={'root':root,'registry':app.registry})
+                self.interact[0](banner, local=shell_globals)
             finally:
                 closer()
 
 BFGShellCommand = PShellCommand # b/w compat forever
+
+class PRoutesCommand(PCommand):
+    """Print all URL dispatch routes used by a Pyramid application in the
+    order in which they are evaluated.  Each route includes the name of the
+    route, the pattern of the route, and the view callable which will be
+    invoked when the route is matched.
+
+    This command accepts two positional arguments:
+
+    ``config_file`` -- specifies the PasteDeploy config file to use
+    for the interactive shell.  
+
+    ``section_name`` -- specifies the section name in the PasteDeploy
+    config file that represents the application.
+
+    Example::
+
+        $ paster proutes myapp.ini main
+
+    .. note:: You should use a ``section_name`` that refers to the
+              actual ``app`` section in the config file that points at
+              your Pyramid app without any middleware wrapping, or this
+              command will almost certainly fail.
+    """
+    summary = "Print all URL dispatch routes related to a Pyramid application"
+    min_args = 2
+    max_args = 2
+    stdout = sys.stdout
+
+    parser = Command.standard_parser(simulate=True)
+
+    def _get_mapper(self, app):
+        from pyramid.config import Configurator
+        registry = app.registry
+        config = Configurator(registry = registry)
+        return config.get_routes_mapper()
+
+    def out(self, msg): # pragma: no cover
+        print msg
+    
+    def command(self):
+        from pyramid.interfaces import IRouteRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IView
+        from zope.interface import Interface
+        config_file, section_name = self.args
+        app = self.get_app(config_file, section_name, loadapp=self.loadapp[0])
+        registry = app.registry
+        mapper = self._get_mapper(app)
+        if mapper is not None:
+            routes = mapper.get_routes()
+            fmt = '%-15s %-30s %-25s'
+            if not routes:
+                return
+            self.out(fmt % ('Name', 'Pattern', 'View'))
+            self.out(
+                fmt % ('-'*len('Name'), '-'*len('Pattern'), '-'*len('View')))
+            for route in routes:
+                request_iface = registry.queryUtility(IRouteRequest,
+                                                      name=route.name)
+                view_callable = None
+                if (request_iface is None) or (route.factory is not None):
+                    self.out(fmt % (route.name, route.pattern, '<unknown>'))
+                else:
+                    view_callable = registry.adapters.lookup(
+                        (IViewClassifier, request_iface, Interface),
+                        IView, name='', default=None)
+                    self.out(fmt % (route.name, route.pattern, view_callable))

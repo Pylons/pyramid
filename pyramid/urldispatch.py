@@ -75,7 +75,23 @@ class RoutesMapper(object):
 
 # stolen from bobo and modified
 old_route_re = re.compile(r'(\:[a-zA-Z]\w*)')
+star_in_brackets = re.compile(r'\{[^\}]*\*\w*[^\}]*\}')
+
+# The regex named ``torturous_route_re`` below allows us to support at least
+# one level of "inner" squigglies inside the expr of a {name:expr} pattern;
+# for example, {foo:\d{4}}.  Thanks to Zart for the regex help.
+# ``torturous_route_re`` is meant to be a replacement for the regex named
+# ``route_re`` (which is just (\{[a-zA-Z][^\}]*\})) because ``route_re``
+# chokes when it encounters inner squigglies.  However
+# http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5050507 means that the
+# torturous regex doesn't work on Jython (recursion error), so we've disabled
+# it in favor of ``route_re`` for now.  If somebody can make something that
+# will work on Jython but also match inner squigglies, it'd be useful.
+
+# torturous_route_re = re.compile(r'(\{[a-zA-Z](?:\{[^\}]*\}|[^\{\}]*)*\})')
+
 route_re = re.compile(r'(\{[a-zA-Z][^\}]*\})')
+
 def update_pattern(matchobj):
     name = matchobj.group(0)
     return '{%s}' % name[1:]
@@ -87,7 +103,7 @@ def _compile_route(route):
     if not route.startswith('/'):
         route = '/' + route
     star = None
-    if '*' in route:
+    if '*' in route and not star_in_brackets.search(route):
         route, star = route.rsplit('*', 1)
     pat = route_re.split(route)
     pat.reverse()

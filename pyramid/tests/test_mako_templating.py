@@ -307,45 +307,45 @@ class TestIntegration(unittest.TestCase):
 
     def test_render(self):
         from pyramid.renderers import render
-        result = render('helloworld.mak', {'a':1})
+        result = render('helloworld.mak', {'a':1}).replace('\r','')
         self.assertEqual(result, u'\nHello föö\n')
 
     def test_render_from_fs(self):
         from pyramid.renderers import render
         self.config.add_settings({'reload_templates': True})
-        result = render('helloworld.mak', {'a':1})
+        result = render('helloworld.mak', {'a':1}).replace('\r','')
         self.assertEqual(result, u'\nHello föö\n')
     
     def test_render_inheritance(self):
         from pyramid.renderers import render
-        result = render('helloinherit.mak', {})
+        result = render('helloinherit.mak', {}).replace('\r','')
         self.assertEqual(result, u'Layout\nHello World!\n')
 
     def test_render_inheritance_pkg_spec(self):
         from pyramid.renderers import render
-        result = render('hello_inherit_pkg.mak', {})
+        result = render('hello_inherit_pkg.mak', {}).replace('\r','')
         self.assertEqual(result, u'Layout\nHello World!\n')
 
     def test_render_to_response(self):
         from pyramid.renderers import render_to_response
         result = render_to_response('helloworld.mak', {'a':1})
-        self.assertEqual(result.ubody, u'\nHello föö\n')
+        self.assertEqual(result.ubody.replace('\r',''), u'\nHello föö\n')
 
     def test_render_to_response_pkg_spec(self):
         from pyramid.renderers import render_to_response
         result = render_to_response('pyramid.tests:fixtures/helloworld.mak',
                                     {'a':1})
-        self.assertEqual(result.ubody, u'\nHello föö\n')
+        self.assertEqual(result.ubody.replace('\r', ''), u'\nHello föö\n')
     
     def test_render_with_abs_path(self):
         from pyramid.renderers import render
-        result = render('/helloworld.mak', {'a':1})
+        result = render('/helloworld.mak', {'a':1}).replace('\r','')
         self.assertEqual(result, u'\nHello föö\n')
 
     def test_get_renderer(self):
         from pyramid.renderers import get_renderer
         result = get_renderer('helloworld.mak')
-        self.assertEqual(result.implementation().render_unicode(),
+        self.assertEqual(result.implementation().render_unicode().replace('\r',''),
                          u'\nHello föö\n')
     
     def test_template_not_found(self):

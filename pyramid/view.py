@@ -13,16 +13,20 @@ if hasattr(mimetypes, 'init'):
 import venusian
 
 from zope.interface import providedBy
+from zope.deprecation import deprecated
 
 from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
 
 from pyramid.httpexceptions import HTTPFound
-from pyramid.static import static_view as static # B/C
+from pyramid.renderers import RendererHelper
+from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
 
-static = static # dont yet deprecate this (ever?)
+# Nast BW compat hack: dont yet deprecate this (ever?)
+class static(static_view): # only subclass for purposes of autodoc
+    __doc__ = static_view.__doc__
 
 _marker = object()
 
@@ -126,23 +130,21 @@ def is_response(ob):
     """ Return ``True`` if ``ob`` implements the interface implied by
     :ref:`the_response`. ``False`` if not.
 
-    .. note:: this isn't a true interface check (in Zope terms), it's a
-        duck-typing check, as response objects are not obligated to
-        actually implement a Zope interface."""
+    .. note:: This isn't a true interface or subclass check.  Instead, it's a
+        duck-typing check, as response objects are not obligated to be of a
+        particular class or provide any particular Zope interface."""
+
     # response objects aren't obligated to implement a Zope interface,
     # so we do it the hard way
     if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
          hasattr(ob, 'status') ):
-        if ( hasattr(ob.app_iter, '__iter__') and
-             hasattr(ob.headerlist, '__iter__') and
-             isinstance(ob.status, basestring) ) :
-            return True
+        return True
     return False
 
 class view_config(object):
     """ A function, class or method :term:`decorator` which allows a
     developer to create view registrations nearer to a :term:`view
-    callable` definition than use of :term:`ZCML` or :term:`imperative
+    callable` definition than use :term:`imperative
     configuration` to do the same.
 
     For example, this code in a module ``views.py``::
@@ -162,225 +164,30 @@ class view_config(object):
        config.add_view(views.my_view, context=MyResource, name='my_view',
                        permission='read', 'route_name='site1')
 
-    Or might replace the following ZCML ``view`` declaration::
-
-      <view
-       for='.resources.MyResource'
-       view='.views.my_view'
-       name='my_view'
-       permission='read'
-       route_name='site1'
-       />
-
     .. note: :class:`pyramid.view.view_config` is also importable, for
              backwards compatibility purposes, as the name
              :class:`pyramid.view.bfg_view`.
 
     The following arguments are supported as arguments to
-    :class:`pyramid.view.view_config`: ``context``, ``permission``,
-    ``name``, ``request_type``, ``route_name``, ``request_method``,
-    ``request_param``, ``containment``, ``xhr``, ``accept``,
-    ``header`` and ``path_info``.
+    :class:`pyramid.view.view_config`: ``context``, ``permission``, ``name``,
+    ``request_type``, ``route_name``, ``request_method``, ``request_param``,
+    ``containment``, ``xhr``, ``accept``, ``header``, ``path_info``,
+    ``custom_predicates``, ``decorator``, and ``mapper``.
 
-    ``context`` should be a Python object or :term:`dotted Python
-    name` representing the context type that must be found for this
-    view to be called.  If ``context`` is not supplied, the interface
-    ``zope.interface.Interface`` (matching any context) is used.  An
-    alias for ``context`` is ``for_``.
+    The meanings of these arguments are the same as the arguments passed to
+    :meth:`pyramid.config.Configurator.add_view`.
 
-    If ``permission`` is not supplied, no permission is registered for
-    this view (it's accessible by any caller).
+    See :ref:`mapping_views_using_a_decorator_section` for details about
+    using :class:`view_config`.
 
-    If ``name`` is not supplied, the empty string is used (implying
-    the default view name).
-
-    If ``attr`` is not supplied, ``None`` is used (implying the
-    function itself if the view is a function, or the ``__call__``
-    callable attribute if the view is a class).
-
-    If ``renderer`` is not supplied, ``None`` is used (meaning that no
-    renderer is associated with this view).
-
-    If ``wrapper`` is not supplied, ``None`` is used (meaning that no
-    view wrapper is associated with this view).
-
-    If ``request_type`` is not supplied, the interface
-    :class:`pyramid.interfaces.IRequest` is used, implying the
-    standard request interface type.
-
-    If ``route_name`` is not supplied, the view configuration is
-    considered to be made against a URL that doesn't match any defined
-    :term:`route`.  The use of a ``route_name`` is an advanced
-    feature, useful only if you're also using :term:`url dispatch`.
-
-    If ``request_method`` is not supplied, this view will match a
-    request with any HTTP ``REQUEST_METHOD``
-    (GET/POST/PUT/HEAD/DELETE).  If this parameter *is* supplied, it
-    must be a string naming an HTTP ``REQUEST_METHOD``, indicating
-    that this view will only match when the current request has a
-    ``REQUEST_METHOD`` that matches this value.
-
-    If ``request_param`` is not supplied, this view will be called
-    when a request with any (or no) request GET or POST parameters is
-    encountered.  If the value is present, it must be a string.  If
-    the value supplied to the parameter has no ``=`` sign in it, it
-    implies that the key must exist in the ``request.params``
-    dictionary for this view to 'match' the current request.  If the value
-    supplied to the parameter has a ``=`` sign in it, e.g.
-    ``request_params="foo=123"``, then the key (``foo``) must both exist
-    in the ``request.params`` dictionary, and the value must match the
-    right hand side of the expression (``123``) for the view to "match" the
-    current request.
-
-    ``containment`` should be a Python object or :term:`dotted Python
-    name` representing a class or interface type which must be found
-    as one of the context's location parents for this view to be
-    called.  If ``containment`` is not supplied, this view will be
-    called when the context of the request has any (or no)
-    :term:`lineage`.  If ``containment`` *is* supplied, it must be a
-    class or :term:`interface`, denoting that the view'matches' the
-    current request only if any graph :term:`lineage` node possesses
-    this class or interface.
-
-    If ``xhr`` is specified, it must be a boolean value.  If the value
-    is ``True``, the view will only be invoked if the request's
-    ``X-Requested-With`` header has the value ``XMLHttpRequest``.
-
-    If ``accept`` is specified, it must be a mimetype value.  If
-    ``accept`` is specified, the view will only be invoked if the
-    ``Accept`` HTTP header matches the value requested.  See the
-    description of ``accept`` in :ref:`view_directive` for information
-    about the allowable composition and matching behavior of this
-    value.
-
-    If ``header`` is specified, it must be a header name or a
-    ``headername:headervalue`` pair.  If ``header`` is specified, and
-    possesses a value the view will only be invoked if an HTTP header
-    matches the value requested.  If ``header`` is specified without a
-    value (a bare header name only), the view will only be invoked if
-    the HTTP header exists with any value in the request.  See the
-    description of ``header`` in :ref:`view_directive` for information
-    about the allowable composition and matching behavior of this
-    value.
-
-    If ``path_info`` is specified, it must be a regular
-    expression. The view will only be invoked if the ``PATH_INFO``
-    WSGI environment variable matches the expression.
-
-    If ``custom_predicates`` is specified, it must be a sequence of
-    :term:`predicate` callables (a predicate callable accepts two
-    arguments: ``context`` and ``request`` and returns ``True`` or
-    ``False``).  The view will only be invoked if all custom
-    predicates return ``True``.
-
-    Any individual or all parameters can be omitted.  The simplest
-    :class:`pyramid.view.view_config` declaration is::
-
-        @view_config()
-        def my_view(...):
-            ...
-
-    Such a registration implies that the view name will be
-    ``my_view``, registered for any :term:`context` object, using no
-    permission, registered against all non-URL-dispatch-based
-    requests, with any ``REQUEST_METHOD``, any set of request.params
-    values, without respect to any object in the :term:`lineage`.
-
-    The ``view_config`` decorator can also be used as a class decorator
-    in Python 2.6 and better (Python 2.5 and below do not support
-    class decorators)::
-
-        from pyramid.response import Response
-        from pyramid.view import view_config
-
-        @view_config()
-        class MyView(object):
-            def __init__(self, context, request):
-                self.context = context
-                self.request = request
-            def __call__(self):
-                return Response('hello from %s!' % self.context)
-
-    In Python 2.5 and below, the ``view_config`` decorator can still be
-    used against a class, although not in decorator form::
-
-        from pyramid.response import Response
-        from pyramid.view import view_config
-
-        class MyView(object):
-            def __init__(self, context, request):
-                self.context = context
-                self.request = request
-            def __call__(self):
-                return Response('hello from %s!' % self.context)
-
-        MyView = view_config()(MyView)
-
-    .. note:: When a view is a class, the calling semantics are
-              different than when it is a function or another
-              non-class callable.  See :ref:`class_as_view` for more
-              information.
-
-    .. warning:: Using a class as a view is a new feature in 0.8.1+.
-
-    The ``view_config`` decorator can also be used against a class
-    method::
-
-        from pyramid.response import Response
-        from pyramid.view import view_config
-
-        class MyView(object):
-            def __init__(self, context, request):
-                self.context = context
-                self.request = request
-
-            @view_config(name='hello')
-            def amethod(self):
-                return Response('hello from %s!' % self.context)
-
-    When the ``view_config`` decorator is used against a class method,
-    a view is registered for the *class* (as described above), so the
-    class constructor must accept either ``request`` or ``context,
-    request``.  The method which is decorated must return a response
-    (or rely on a :term:`renderer` to generate one). Using the
-    decorator against a particular method of a class is equivalent to
-    using the ``attr`` parameter in a decorator attached to the class
-    itself.  For example, the above registration implied by the
-    decorator being used against the ``amethod`` method could be
-    spelled equivalently as::
-
-        from pyramid.response import Response
-        from pyramid.view import view_config
-
-        @view_config(attr='amethod', name='hello')
-        class MyView(object):
-            def __init__(self, context, request):
-                self.context = context
-                self.request = request
-
-            def amethod(self):
-                return Response('hello from %s!' % self.context)
-
-    To make use of any ``view_config`` declaration, you must perform a
-    :term:`scan`.  To do so, either insert the following boilerplate
-    into your application registry's ZCML::
-    
-      <scan package="."/>
-
-    See :ref:`scan_directive` for more information about the ZCML
-    ``scan`` directive.
-
-    Or, if you don't use ZCML, use the
-    :meth:`pyramid.config.Configurator.scan` method::
-
-      config.scan()
     """
     venusian = venusian # for testing injection
     def __init__(self, name='', request_type=None, for_=None, permission=None,
                  route_name=None, request_method=None, request_param=None,
                  containment=None, attr=None, renderer=None, wrapper=None,
                  xhr=False, accept=None, header=None, path_info=None,
-                 custom_predicates=(), context=None):
+                 custom_predicates=(), context=None, decorator=None,
+                 mapper=None):
         self.name = name
         self.request_type = request_type
         self.context = context or for_
@@ -397,11 +204,19 @@ class view_config(object):
         self.header = header
         self.path_info = path_info
         self.custom_predicates = custom_predicates
+        self.decorator = decorator
+        self.mapper = mapper
 
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
 
         def callback(context, name, ob):
+            renderer = settings.get('renderer')
+            if isinstance(renderer, basestring):
+                renderer = RendererHelper(name=renderer,
+                                          package=info.module,
+                                          registry=context.config.registry)
+            settings['renderer'] = renderer
             context.config.add_view(view=ob, **settings)
 
         info = self.venusian.attach(wrapped, callback, category='pyramid')
@@ -413,14 +228,16 @@ class view_config(object):
             if settings['attr'] is None:
                 settings['attr'] = wrapped.__name__
 
-        renderer_name = settings.get('renderer')
-        if renderer_name is not None and not isinstance(renderer_name, dict):
-            settings['renderer'] = {'name':renderer_name,
-                                    'package':info.module}
         settings['_info'] = info.codeinfo
         return wrapped
 
 bfg_view = view_config # permanent b/c
+
+deprecated(
+    'bfg_view',
+    'pyramid.view.bfg_view is deprecated as of Pyramid 1.0.  Use '
+    'pyramid.view.view_config instead (API-compat, simple '
+    'rename).')
 
 def default_exceptionresponse_view(context, request):
     if not isinstance(context, Exception):
@@ -452,9 +269,9 @@ class AppendSlashNotFoundViewFactory(object):
 
        from pyramid.exceptions import NotFound
        from pyramid.view import AppendSlashNotFoundViewFactory
+       from pyramid.httpexceptions import HTTPNotFound
 
-       def notfound_view(context, request):
-           return HTTPNotFound('It aint there, stop trying!')
+       def notfound_view(context, request): return HTTPNotFound('nope')
 
        custom_append_slash = AppendSlashNotFoundViewFactory(notfound_view)
        config.add_view(custom_append_slash, context=NotFound)
@@ -474,13 +291,16 @@ class AppendSlashNotFoundViewFactory(object):
             # backwards compat for an append_notslash_view registered via
             # config.set_notfound_view instead of as a proper exception view
             context = request.exception
-        path = request.environ.get('PATH_INFO', '/')
+        path = request.path
         registry = request.registry
         mapper = registry.queryUtility(IRoutesMapper)
         if mapper is not None and not path.endswith('/'):
             slashpath = path + '/'
             for route in mapper.get_routes():
                 if route.match(slashpath) is not None:
+                    qs = request.query_string
+                    if qs:
+                        slashpath += '?' + qs
                     return HTTPFound(location=slashpath)
         return self.notfound_view(context, request)
 
@@ -498,16 +318,8 @@ redirect to the slash-appended PATH_INFO.  Note that this will *lose*
 ``POST`` data information (turning it into a GET), so you shouldn't
 rely on this to redirect POST requests.
 
-If you use :term:`ZCML`, add the following to your application's
-``configure.zcml`` to use this view as the Not Found view::
-
-      <view
-         context="pyramid.exceptions.NotFound"
-         view="pyramid.view.append_slash_notfound_view"/>
-
-Or use the
-:meth:`pyramid.config.Configurator.add_view`
-method if you don't use ZCML::
+Use the :meth:`pyramid.config.Configurator.add_view` method to configure this
+view as the Not Found view::
 
   from pyramid.exceptions import NotFound
   from pyramid.view import append_slash_notfound_view
@@ -517,15 +329,4 @@ See also :ref:`changing_the_notfound_view`.
 
 """
 
-
-class action(object):
-    def __init__(self, **kw):
-        self.kw = kw
-
-    def __call__(self, wrapped):
-        if hasattr(wrapped, '__exposed__'):
-            wrapped.__exposed__.append(self.kw)
-        else:
-            wrapped.__exposed__ = [self.kw]
-        return wrapped
 

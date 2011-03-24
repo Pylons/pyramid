@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2008-2010 Agendaless Consulting and Contributors.
+# Copyright (c) 2008-2011 Agendaless Consulting and Contributors.
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the BSD-like license at
@@ -11,8 +11,6 @@
 # FITNESS FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-
-__version__ = '0.0'
 
 import os
 import platform
@@ -45,16 +43,17 @@ install_requires=[
     ]
 
 if platform.system() == 'Java':
-    tests_require = install_requires + ['WebTest']
+    tests_require = install_requires + ['WebTest', 'virtualenv']
 else:
     tests_require= install_requires + ['Sphinx', 'docutils', 
-                                       'WebTest', 'repoze.sphinx.autointerface']
+                                       'WebTest', 'repoze.sphinx.autointerface',
+                                       'virtualenv']
 
 if sys.version_info[:2] < (2, 6):
     install_requires.append('simplejson')
     
 setup(name='pyramid',
-      version=__version__,
+      version='1.0',
       description='The Pyramid web application framework, a Pylons project',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
@@ -65,10 +64,10 @@ setup(name='pyramid',
         "Topic :: Internet :: WWW/HTTP :: WSGI",
         "License :: Repoze Public License",
         ],
-      keywords='web wsgi pylons pyramid bfg',
+      keywords='web wsgi pylons pyramid',
       author="Chris McDonough, Agendaless Consulting",
       author_email="pylons-devel@googlegroups.com",
-      url="http://docs.pylonshq.com",
+      url="http://pylonsproject.org",
       license="BSD-derived (http://www.repoze.org/LICENSE.txt)",
       packages=find_packages(),
       include_package_data=True,
@@ -79,15 +78,12 @@ setup(name='pyramid',
       entry_points = """\
         [paste.paster_create_template]
         pyramid_starter=pyramid.paster:StarterProjectTemplate
-        pyramid_starter_zcml=pyramid.paster:StarterZCMLProjectTemplate
         pyramid_zodb=pyramid.paster:ZODBProjectTemplate
         pyramid_routesalchemy=pyramid.paster:RoutesAlchemyProjectTemplate
         pyramid_alchemy=pyramid.paster:AlchemyProjectTemplate
-        pylons_basic=pyramid.paster:PylonsBasicProjectTemplate
-        pylons_minimal=pyramid.paster:PylonsMinimalProjectTemplate
-        pylons_sqla=pyramid.paster:PylonsSQLAlchemyProjectTemplate
         [paste.paster_command]
         pshell=pyramid.paster:PShellCommand
+        proutes=pyramid.paster:PRoutesCommand
         [console_scripts]
         bfg2pyramid = pyramid.fixers.fix_bfg_imports:main
       """

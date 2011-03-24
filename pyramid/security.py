@@ -64,6 +64,24 @@ def authenticated_userid(request):
         return None
     return policy.authenticated_userid(request)
 
+def unauthenticated_userid(request):
+    """ Return an object which represents the *claimed* (not verified) user
+    id of the credentials present in the request. ``None`` if there is no
+    :term:`authentication policy` in effect or there is no user data
+    associated with the current request.  This differs from
+    :func:`~pyramid.security.authenticated_userid`, because the effective
+    authentication policy will not ensure that a record associated with the
+    userid exists in persistent storage."""
+    try:
+        reg = request.registry
+    except AttributeError:
+        reg = get_current_registry() # b/c
+
+    policy = reg.queryUtility(IAuthenticationPolicy)
+    if policy is None:
+        return None
+    return policy.unauthenticated_userid(request)
+
 def effective_principals(request):
     """ Return the list of 'effective' :term:`principal` identifiers
     for the ``request``.  This will include the userid of the
@@ -126,7 +144,7 @@ def remember(request, principal, **kw):
     implied by the data passed as ``principal`` and ``*kw`` using the
     current :term:`authentication policy`.  Common usage might look
     like so within the body of a view function (``response`` is
-    assumed to be an :term:`WebOb` -style :term:`response` object
+    assumed to be a :term:`WebOb` -style :term:`response` object
     computed previously by the view code)::
 
       from pyramid.security import remember

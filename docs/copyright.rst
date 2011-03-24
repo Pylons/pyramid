@@ -7,13 +7,13 @@ by Chris McDonough
 
 .. |copy|   unicode:: U+000A9 .. COPYRIGHT SIGN
 
-Copyright |copy| 2008-2010, Agendaless Consulting.
+Copyright |copy| 2008-2011, Agendaless Consulting.
 
-.. ISBN-10: 0615345379
+ISBN-10: 0615445675
 
-.. ISBN-13: 978-0-615-34537-6
+ISBN-13: 978-0615445670
 
-.. First print publishing: February, 2010
+First print publishing: February, 2011
 
 All rights reserved.  This material may be copied or distributed only
 subject to the terms and conditions set forth in the `Creative Commons
@@ -48,23 +48,32 @@ with respect to the use of the information contained herein.
 Attributions
 ------------
 
-Contributors:
-  Ben Bangert, Blaise Laflamme, Carlos de la Guardia, Paul Everitt, 
-  Marius Gedminas
+Editor:
+  Casey Duncan
 
-.. Cover Designer:
-..   Nat Hardwick of `Electrosoup <http://www.electrosoup.co.uk>`_.
+Contributors:
+  Ben Bangert, Blaise Laflamme, Rob Miller, Mike Orr, Carlos de la Guardia,
+  Paul Everitt, Tres Seaver, John Shipman, Marius Gedminas, Chris Rossi,
+  Joachim Krebs, Xavier Spriet, Reed O'Brien, William Chambers, Charlie
+  Choiniere, Jamaludin Ahmad, Graham Higgins.
+
+Cover Designer:
+   Hugues Laflamme of `Kemeneur <http://www.kemeneur.com/>`_.
 
 Used with permission:
+
    The :ref:`webob_chapter` chapter is adapted, with permission, from
    documentation originally written by Ian Bicking.
 
-.. Print Production
-.. ----------------
+   The :ref:`much_ado_about_traversal_chapter` chapter is adapted,
+   with permission, from an article written by Rob Miller.
 
-.. The print version of this book was produced using the `Sphinx
-.. <http://sphinx.pocoo.org/>`_ documentation generation system and the
-.. `LaTeX <http://www.latex-project.org/>`_ typesetting system.
+Print Production
+----------------
+
+The print version of this book was produced using the `Sphinx
+<http://sphinx.pocoo.org/>`_ documentation generation system and the
+`LaTeX <http://www.latex-project.org/>`_ typesetting system.
 
 Contacting The Publisher
 ------------------------
@@ -79,7 +88,7 @@ HTML Version and Source Code
 ----------------------------
 
 An HTML version of this book is freely available via
-http://docs.pylonshq.com
+http://docs.pylonsproject.org
 
 The source code for the examples used in this book are available
 within the :app:`Pyramid` software distribution, always available
