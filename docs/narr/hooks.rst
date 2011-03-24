@@ -414,7 +414,7 @@ name` representing such a callable.
 Such a callback must accept a single positional argument (notionally
 named ``system``) which will contain the original system values.  It
 must return a dictionary of values that will be merged into the system
-dictionary.  See :ref:`renderer_system_values` for discription of the
+dictionary.  See :ref:`renderer_system_values` for description of the
 values present in the system dictionary.
 
 A renderer globals factory can alternately be registered via ZCML as a
