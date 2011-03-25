@@ -868,12 +868,12 @@ Glossary
    pyramid_jinja2
      :term:`Jinja2` templating system bindings for Pyramid, documented at
      http://docs.pylonsproject.org/projects/pyramid_jinja2/dev/ .  This
-     package also includes a paster template named
+     package also includes a scaffold named
      ``pyramid_jinja2_starter``, which creates an application package based
      on the Jinja2 templating system.
 
    pyramid_sqla
-     A package which provides a Pylons-esque paster template which sports
+     A package which provides a Pylons-esque scaffold which sports
      support for :term:`view handler` application development,
      :term:`SQLAlchemy` support, and other Pylons-like features.  See
      https://bytebucket.org/sluggo/pyramid_sqla/wiki/html/index.html for more

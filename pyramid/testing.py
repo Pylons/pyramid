@@ -621,7 +621,7 @@ class DummyRequest(object):
     """ A DummyRequest object (incompletely) imitates a :term:`request` object.
 
     The ``params``, ``environ``, ``headers``, ``path``, and
-    ``cookies`` arguments correspond to their :term`WebOb`
+    ``cookies`` arguments correspond to their :term:`WebOb`
     equivalents.
 
     The ``post`` argument,  if passed, populates the request's

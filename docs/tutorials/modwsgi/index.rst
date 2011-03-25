@@ -79,7 +79,7 @@ commands and files.
 
     The first argument to ``get_app`` is the project Paste configuration file
     name.  It's best to use the ``production.ini`` file provided by your
-    Pyramid paster template, as it contains settings appropriate for
+    scaffold, as it contains settings appropriate for
     production.  The second is the name of the section within the .ini file
     that should be loaded by ``mod_wsgi``.  The assignment to the name
     ``application`` is important: mod_wsgi requires finding such an

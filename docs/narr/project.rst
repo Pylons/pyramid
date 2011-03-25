@@ -5,37 +5,36 @@ Creating a :app:`Pyramid` Project
 
 As we saw in :ref:`firstapp_chapter`, it's possible to create a
 :app:`Pyramid` application completely manually.  However, it's usually more
-convenient to use a *template* to generate a basic :app:`Pyramid`
+convenient to use a *scaffold* to generate a basic :app:`Pyramid`
 :term:`project`.
 
 A project is a directory that contains at least one Python :term:`package`.
-You'll use a template to create a project, and you'll create your application
+You'll use a scaffold to create a project, and you'll create your application
 logic within a package that lives inside the project.  Even if your
 application is extremely simple, it is useful to place code that drives the
 application within a package, because a package is more easily extended with
 new code.  An application that lives inside a package can also be distributed
 more easily than one which does not live within a package.
 
-:app:`Pyramid` comes with a variety of templates that you can use to generate
-a project.  Each template makes different configuration assumptions about
+:app:`Pyramid` comes with a variety of scaffolds that you can use to generate
+a project.  Each scaffold makes different configuration assumptions about
 what type of application you're trying to construct.
 
-These templates are rendered using the :term:`PasteDeploy` ``paster`` script,
-and so therefore they are often referred to as "paster templates".
+These scaffolds are rendered using the :term:`PasteDeploy` ``paster`` script.
 
 .. index::
-   single: paster templates
-   single: pyramid_starter paster template
-   single: pyramid_zodb paster template
-   single: pyramid_alchemy paster template
-   single: pyramid_routesalchemy paster template
+   single: scaffolds 
+   single: pyramid_starter scaffold
+   single: pyramid_zodb scaffold
+   single: pyramid_alchemy scaffold
+   single: pyramid_routesalchemy scaffold
 
-.. _additional_paster_templates:
+.. _additional_paster_scaffolds:
 
-Paster Templates Included with :app:`Pyramid`
+Scaffolds Included with :app:`Pyramid`
 ------------------------------------------------
 
-The convenience ``paster`` templates included with :app:`Pyramid` differ from
+The convenience scaffolds included with :app:`Pyramid` differ from
 each other on a number of axes:
 
 - the persistence mechanism they offer (no persistence mechanism,
@@ -48,7 +47,7 @@ each other on a number of axes:
   sessioning implementation (as opposed to no sessioning or default
   sessioning).
 
-The included templates are these:
+The included scaffolds are these:
 
 ``pyramid_starter``
   URL mapping via :term:`traversal` and no persistence mechanism.
@@ -64,21 +63,21 @@ The included templates are these:
   URL mapping via :term:`traversal` and persistence via
   :term:`SQLAlchemy`
 
-.. note:: At this time, each of these templates uses the :term:`Chameleon`
+.. note:: At this time, each of these scaffolds uses the :term:`Chameleon`
    templating system, which is incompatible with both Jython and PyPy.  To
-   use paster templates to build applications which will run on Jython and
-   PyPy, you can try the ``pyramid_jinja2_starter`` template which ships as
-   part of the :term:`pyramid_jinja2` package or the ``pyramid_sqla`` paster
-   template which ships with the :term:`pyramid_sqla` package (it uses Mako),
-   both available from :term:`PyPI`.  You can also just use the above paster
-   templates to build a skeleton and replace the Chameleon template it
-   includes with a :term:`Mako` analogue.
+   use scaffolds to build applications which will run on Jython and
+   PyPy, you can try the ``pyramid_jinja2_starter`` scaffold which ships as
+   part of the :term:`pyramid_jinja2` package or the ``pyramid_sqla`` scaffold
+   which ships with the :term:`pyramid_sqla` package (it uses Mako),
+   both available from :term:`PyPI`.  You can also just use the above
+   scaffold and replace the Chameleon template it includes with a :term:`Mako` 
+   analogue.
 
-Rather than use any of the above templates, Pylons 1 users may feel more
+Rather than use any of the above scaffolds, Pylons 1 users may feel more
 comfortable installing the :term:`pyramid_sqla` add-on package, which
-provides a paster template named ``pyramid_sqla``.  This paster template
-configures a Pyramid application in a "Pylons-esque" way, including the use
-of a :term:`view handler` to map URLs to code (it's much like a Pylons
+provides a scaffold named ``pyramid_sqla``.  This scaffold configures a 
+Pyramid application in a "Pylons-esque" way, including the use of a 
+:term:`view handler` to map URLs to code (it's much like a Pylons
 "controller").
 
 .. index::
@@ -97,15 +96,15 @@ the ``paster`` facility installed within the virtualenv.  In
 following command assumes that our current working directory is that
 directory.
 
-We'll choose the ``pyramid_starter`` template for this purpose.
+We'll choose the ``pyramid_starter`` scaffold for this purpose.
 
 .. code-block:: text
 
    $ bin/paster create -t pyramid_starter
 
 The above command uses the ``paster`` command to create a project using the
-``pyramid_starter`` template.  The ``paster create`` command creates project
-from a template.  To use a different template, such as
+``pyramid_starter`` scaffold.  The ``paster create`` command creates project
+from a scaffold.  To use a different scaffold, such as
 ``pyramid_routesalchemy``, you'd just change the last argument.  For example:
 
 .. code-block:: text
@@ -245,7 +244,7 @@ Here's sample output from a test run:
 
 The tests themselves are found in the ``tests.py`` module in your ``paster
 create`` -generated project.  Within a project generated by the
-``pyramid_starter`` template, a single sample test exists.
+``pyramid_starter`` scaffold, a single sample test exists.
 
 .. index::
    single: interactive shell
@@ -377,7 +376,7 @@ Here's sample output from a run of ``paster serve``:
    Starting server in PID 16601.
    serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
 
-By default, :app:`Pyramid` applications generated from a ``paster`` template
+By default, :app:`Pyramid` applications generated from a scaffold
 will listen on TCP port 6543.  You can shut down a server started this way by
 pressing ``Ctrl-C``.
 
@@ -416,14 +415,14 @@ create`` -generated ``pyramid_starter`` application in a browser.
 
 .. sidebar:: Using an Alternate WSGI Server
 
-   The code generated by :app:`Pyramid` ``paster`` templates assumes that you
+   The code generated by a :app:`Pyramid` scaffold assumes that you
    will be using the ``paster serve`` command to start your application while
    you do development.  However, ``paster serve`` is by no means the only way
    to start up and serve a :app:`Pyramid` application.  As we saw in
    :ref:`firstapp_chapter`, ``paster serve`` needn't be invoked at all to run
    a :app:`Pyramid` application.  The use of ``paster serve`` to run a
    :app:`Pyramid` application is purely conventional based on the output of
-   its ``paster`` templates.
+   its scaffold.
 
    Any :term:`WSGI` server is capable of running a :app:`Pyramid`
    application.  Some WSGI servers don't require the :term:`PasteDeploy`
@@ -447,9 +446,9 @@ create`` -generated ``pyramid_starter`` application in a browser.
 The Project Structure
 ---------------------
 
-The ``pyramid_starter`` template generated a :term:`project` (named
+The ``pyramid_starter`` scaffold generated a :term:`project` (named
 ``MyProject``), which contains a Python :term:`package`.  The package is
-*also* named ``myproject``, but it's lowercased; the paster template
+*also* named ``myproject``, but it's lowercased; the scaffold
 generates a project which contains a package that shares its name except for
 case.
 
@@ -614,7 +613,7 @@ for each request.
 
 .. note::
 
-  In general, :app:`Pyramid` applications generated from paster templates
+  In general, :app:`Pyramid` applications generated from scaffolds 
   should be threading-aware.  It is not required that a :app:`Pyramid`
   application be nonblocking as all application code will run in its own
   thread, provided by the server you're using.
@@ -720,7 +719,7 @@ who want to use your application.
    ``myproject/templates/mytemplate.pt`` file would not be included in the
    generated tarball.
 
-   Projects generated by Pyramid paster templates include a default
+   Projects generated by Pyramid scaffolds include a default
    ``MANIFEST.in`` file.  The ``MANIFEST.in`` file contains declarations
    which tell it to include files like ``*.pt``, ``*.css`` and ``*.js`` in
    the generated tarball.  If you include files with extensions other than
@@ -780,7 +779,7 @@ The ``myproject`` :term:`package` lives inside the ``MyProject``
 #. A ``views.py`` module, which contains view code for the
    application.
 
-These are purely conventions established by the ``paster`` template:
+These are purely conventions established by the scaffold:
 :app:`Pyramid` doesn't insist that you name things in any particular way.
 However, it's generally a good idea to follow Pyramid standards for naming,
 so that other Pyramid developers can get up to speed quickly on your code
@@ -950,18 +949,18 @@ Modifying Package Structure
 ----------------------------
 
 It is best practice for your application's code layout to not stray too much
-from accepted Pyramid paster template defaults.  If you refrain from changing
+from accepted Pyramid scaffold defaults.  If you refrain from changing
 things very much, other Pyramid coders will be able to more quickly
 understand your application.  However, the code layout choices made for you
-by a paster template are in no way magical or required.  Despite the choices
-made for you by any paster template, you can decide to lay your code out any
+by a scaffold are in no way magical or required.  Despite the choices
+made for you by any scaffold, you can decide to lay your code out any
 way you see fit.
 
 For example, the configuration method named
 :meth:`~pyramid.config.Configurator.add_view` requires you to pass a
 :term:`dotted Python name` or a direct object reference as the class or
-function to be used as a view.  By default, the ``pyramid_starter`` paster
-template would have you add view functions to the ``views.py`` module in your
+function to be used as a view.  By default, the ``pyramid_starter`` scaffold
+would have you add view functions to the ``views.py`` module in your
 package.  However, you might be more comfortable creating a ``views``
 *directory*, and adding a single file for each view.
 

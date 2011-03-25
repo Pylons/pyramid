@@ -946,7 +946,7 @@ initialization.
 
 .. note:: This is only an example.  In particular, it is not necessary to
    cause ``DBSession.remove`` to be called in an application generated from
-   any :app:`Pyramid` paster template, because these all use the
+   any :app:`Pyramid` scaffold, because these all use the
    ``repoze.tm2`` middleware.  The cleanup done by ``DBSession.remove`` is
    unnecessary when ``repoze.tm2`` middleware is in the WSGI pipeline.
 

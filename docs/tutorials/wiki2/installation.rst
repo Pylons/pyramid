@@ -83,8 +83,8 @@ Making a Project
 ================
 
 Your next step is to create a project.  :app:`Pyramid` supplies a
-variety of templates to generate sample projects.  We will use the
-``pyramid_routesalchemy`` template, which generates an application
+variety of scaffolds to generate sample projects.  We will use the
+``pyramid_routesalchemy`` scaffold, which generates an application
 that uses :term:`SQLAlchemy` and :term:`URL dispatch`.
 
 The below instructions assume your current working directory is the
@@ -103,7 +103,7 @@ On Windows:
    c:\pyramidtut> Scripts\paster create -t pyramid_routesalchemy tutorial
 
 .. note:: If you are using Windows, the ``pyramid_routesalchemy``
-   Paster template may not deal gracefully with installation into a
+   scaffold may not deal gracefully with installation into a
    location that contains spaces in the path.  If you experience
    startup problems, try putting both the virtualenv and the project
    into directories that do not contain spaces in their paths.
@@ -217,10 +217,10 @@ Visit the Application in a Browser
 In a browser, visit ``http://localhost:6543/``.  You will see the
 generated application's default page.
 
-Decisions the ``pyramid_routesalchemy`` Template Has Made For You
+Decisions the ``pyramid_routesalchemy`` Scaffold Has Made For You
 =================================================================
 
-Creating a project using the ``pyramid_routesalchemy`` template makes
+Creating a project using the ``pyramid_routesalchemy`` scaffold makes
 the following assumptions:
 
 - you are willing to use :term:`SQLAlchemy` as a database access tool
