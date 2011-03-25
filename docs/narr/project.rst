@@ -119,7 +119,7 @@ project we name ``MyProject``:
 .. code-block:: text
 
    $ bin/paster create -t pyramid_starter
-   Selected and implied scaffolds:
+   Selected and implied templates:
      pyramid#pyramid_starter  pyramid starter project
 
    Enter project name: MyProject
@@ -127,7 +127,7 @@ project we name ``MyProject``:
      egg:      MyProject
      package:  myproject
      project:  MyProject
-   Creating scaffold pyramid
+   Creating template pyramid
    Creating directory ./MyProject
    # ... more output ...
    Running /Users/chrism/projects/pyramid/bin/python setup.py egg_info
