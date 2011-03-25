@@ -131,8 +131,8 @@ Making a Project
 ================
 
 Your next step is to create a project.  :app:`Pyramid` supplies a
-variety of templates to generate sample projects.  For this tutorial,
-we will use the :term:`ZODB` -oriented template named ``pyramid_zodb``.
+variety of scaffolds to generate sample projects.  For this tutorial,
+we will use the :term:`ZODB` -oriented scaffold named ``pyramid_zodb``.
 
 The below instructions assume your current working directory is the
 "virtualenv" named "pyramidtut".
@@ -149,7 +149,7 @@ On Windows:
 
    c:\pyramidtut> Scripts\paster create -t pyramid_zodb tutorial
 
-.. note:: If you are using Windows, the ``pyramid_zodb`` Paster template
+.. note:: If you are using Windows, the ``pyramid_zodb`` Paster scaffold
    doesn't currently deal gracefully with installation into a location
    that contains spaces in the path.  If you experience startup
    problems, try putting both the virtualenv and the project into
@@ -237,7 +237,7 @@ On Windows:
   c:\pyramidtut\tutorial> ..\Scripts\nosetests --cover-package=tutorial \
        --cover-erase --with-coverage
 
-Looks like the code in the ``pyramid_zodb`` template for ZODB projects is
+Looks like the code in the ``pyramid_zodb`` scaffold for ZODB projects is
 missing some test coverage, particularly in the file named
 ``models.py``.
 
@@ -247,10 +247,10 @@ Visit the Application in a Browser
 In a browser, visit `http://localhost:6543/ <http://localhost:6543>`_.
 You will see the generated application's default page.
 
-Decisions the ``pyramid_zodb`` Template Has Made For You
+Decisions the ``pyramid_zodb`` Scaffold Has Made For You
 ========================================================
 
-Creating a project using the ``pyramid_zodb`` template makes the following
+Creating a project using the ``pyramid_zodb`` scaffold makes the following
 assumptions:
 
 - you are willing to use :term:`ZODB` as persistent storage
