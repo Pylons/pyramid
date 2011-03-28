@@ -241,7 +241,8 @@ class TestCompileRoute(unittest.TestCase):
             {'baz':1, 'buz':2, 'traverse':u'/a/b'}), '/foo/1/biz/2/bar/a/b')
     
     def test_with_bracket_star(self):
-        matcher, generator = self._callFUT('/foo/{baz}/biz/{buz}/bar{remainder:.*}')
+        matcher, generator = self._callFUT(
+            '/foo/{baz}/biz/{buz}/bar{remainder:.*}')
         self.assertEqual(matcher('/foo/baz/biz/buz/bar'),
                          {'baz':'baz', 'buz':'buz', 'remainder':''})
         self.assertEqual(matcher('/foo/baz/biz/buz/bar/everything/else/here'),
@@ -270,6 +271,14 @@ class TestCompileRoute(unittest.TestCase):
         self.assertEqual(matcher('foo/baz/biz/buz/bar'), None)
         self.assertEqual(generator({'baz':1, 'buz':2, 'bar': 'html'}),
                          '/foo/1/biz/2.html')
+
+    def test_mixed_newstyle_oldstyle_pattern_defaults_to_newstyle(self):
+        # pattern: '\\/foo\\/(?P<baz>abc)\\/biz\\/(?P<buz>[^/]+)\\/bar$'
+        # note presence of :abc in pattern (oldstyle match)
+        matcher, generator = self._callFUT('foo/{baz:abc}/biz/{buz}/bar')
+        self.assertEqual(matcher('/foo/abc/biz/buz/bar'),
+                         {'baz':'abc', 'buz':'buz'})
+        self.assertEqual(generator({'baz':1, 'buz':2}), '/foo/1/biz/2/bar')
 
     # XXX reenable after torturous_route_re replacement is found for
     # Jython
