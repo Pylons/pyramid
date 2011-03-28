@@ -94,9 +94,11 @@ class DottedNameResolver(object):
 
     def _zope_dottedname_style(self, value):
         """ package.module.attr style """
-        module = self.package_name and self.package_name or None
+        module = self.package_name
+        if not module:
+            module = None
         if value == '.':
-            if self.package_name is None:
+            if module is None:
                 raise ConfigurationError(
                     'relative name %r irresolveable without package' % (value,)
                 )
