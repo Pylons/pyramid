@@ -241,6 +241,14 @@ class TestViewConfigDecorator(unittest.TestCase):
         self.assertEqual(decorator.request_type, None)
         self.assertEqual(decorator.context, None)
         self.assertEqual(decorator.permission, None)
+
+    def test_create_context_trumps_for(self):
+        decorator = self._makeOne(context='123', for_='456')
+        self.assertEqual(decorator.context, '123')
+
+    def test_create_for_trumps_context_None(self):
+        decorator = self._makeOne(context=None, for_='456')
+        self.assertEqual(decorator.context, '456')
         
     def test_create_nondefaults(self):
         decorator = self._makeOne(name=None, request_type=None, for_=None,
@@ -279,6 +287,22 @@ class TestViewConfigDecorator(unittest.TestCase):
         self.assertEqual(settings[0]['permission'], None)
         self.assertEqual(settings[0]['context'], None)
         self.assertEqual(settings[0]['request_type'], None)
+        self.assertEqual(settings[0]['attr'], 'foo')
+
+    def test_call_class_attr_already_set(self):
+        decorator = self._makeOne(attr='abc')
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        decorator.venusian.info.scope = 'class'
+        class foo(object): pass
+        wrapped = decorator(foo)
+        self.failUnless(wrapped is foo)
+        settings = call_venusian(venusian)
+        self.assertEqual(len(settings), 1)
+        self.assertEqual(settings[0]['permission'], None)
+        self.assertEqual(settings[0]['context'], None)
+        self.assertEqual(settings[0]['request_type'], None)
+        self.assertEqual(settings[0]['attr'], 'abc')
 
     def test_stacking(self):
         decorator1 = self._makeOne(name='1')
@@ -455,7 +479,7 @@ class Test_default_exceptionresponse_view(unittest.TestCase):
         result = self._callFUT(context, None)
         self.failUnless(result is context)
 
-    def test_is_not_exception_context_is_false_still_chosen(self):
+    def test_is_not_exception_context_is_false_still_chose(self):
         request = DummyRequest()
         request.exception = 0
         result = self._callFUT(None, request)
