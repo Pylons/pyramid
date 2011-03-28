@@ -4407,6 +4407,12 @@ class Test_requestonly(unittest.TestCase):
                 """ """
         self.assertTrue(self._callFUT(foo))
 
+    def test_newstyle_class_init_firstname_request_with_secondname(self):
+        class foo(object):
+            def __init__(self, request, two):
+                """ """
+        self.assertFalse(self._callFUT(foo))
+
     def test_newstyle_class_init_noargs(self):
         class foo(object):
             def __init__():

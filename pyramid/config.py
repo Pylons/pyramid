@@ -2949,7 +2949,6 @@ def requestonly(view, attr=None):
         return False
 
     args = argspec[0]
-    defaults = argspec[3]
 
     if hasattr(fn, 'im_func'):
         # it's an instance method
@@ -2962,7 +2961,11 @@ def requestonly(view, attr=None):
     if len(args) == 1:
         return True
 
-    elif args[0] == 'request':
+    defaults = argspec[3]
+    if defaults is None:
+        defaults = ()
+
+    if args[0] == 'request':
         if len(args) - len(defaults) == 1:
             return True
 
