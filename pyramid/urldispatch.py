@@ -140,18 +140,17 @@ def _compile_route(route):
         if m is None:
             return m
         d = {}
-        for k,v in m.groupdict().iteritems():
-            if k is not None:
-                if k == star:
-                    d[k] = traversal_path(v)
-                else:
-                    encoded = unquote(v)
-                    try:
-                        d[k] = encoded.decode('utf-8')
-                    except UnicodeDecodeError, e:
-                        raise URLDecodeError(
-                            e.encoding, e.object, e.start, e.end, e.reason
-                            )
+        for k, v in m.groupdict().iteritems():
+            if k == star:
+                d[k] = traversal_path(v)
+            else:
+                encoded = unquote(v)
+                try:
+                    d[k] = encoded.decode('utf-8')
+                except UnicodeDecodeError, e:
+                    raise URLDecodeError(
+                        e.encoding, e.object, e.start, e.end, e.reason
+                        )
                         
                         
         return d
