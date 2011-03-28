@@ -102,17 +102,19 @@ def _compile_route(route):
 
     if not route.startswith('/'):
         route = '/' + route
+
     star = None
+
     if '*' in route and not star_in_brackets.search(route):
         route, star = route.rsplit('*', 1)
     pat = route_re.split(route)
     pat.reverse()
     rpat = []
     gen = []
-    prefix = pat.pop()
-    if prefix:
-        rpat.append(re.escape(prefix))
-        gen.append(prefix)
+    prefix = pat.pop() # invar: always at least one element (route='/'+route)
+    rpat.append(re.escape(prefix))
+    gen.append(prefix)
+
     while pat:
         name = pat.pop()
         name = name[1:-1]
