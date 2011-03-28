@@ -2995,6 +2995,14 @@ class ConfiguratorTests(unittest.TestCase):
         foo_meth = config.foo
         self.failUnless(foo_meth.im_func.__docobj__ is foo)
 
+    def test___getattr__matches_no_action_wrap(self):
+        config = self._makeOne()
+        def foo(config): pass
+        directives = {'foo':(foo, False)}
+        config.registry._directives = directives
+        foo_meth = config.foo
+        self.failUnless(foo_meth.im_func is foo)
+
 class TestConfigurator_add_directive(unittest.TestCase):
 
     def setUp(self):
