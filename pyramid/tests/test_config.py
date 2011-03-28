@@ -2210,6 +2210,38 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(overrides.inserted, [('path', 'opackage', 'oprefix')])
         self.assertEqual(overrides.package, package)
 
+    def test_action_branching_kw_is_None(self):
+        config = self._makeOne(autocommit=True)
+        self.assertEqual(config.action('discrim'), None)
+
+    def test_action_branching_kw_is_not_None(self):
+        config = self._makeOne(autocommit=True)
+        self.assertEqual(config.action('discrim', kw={'a':1}), None)
+
+    def test_action_branching_nonautocommit_without_context_info(self):
+        config = self._makeOne(autocommit=False)
+        config._ctx = DummyContext()
+        config._ctx.info = None
+        config._ctx.autocommit = False
+        config._ctx.actions = []
+        self.assertEqual(config.action('discrim', kw={'a':1}), None)
+        self.assertEqual(config._ctx.actions, [('discrim', None, (), {'a': 1})])
+        # info is not set on ctx, it's set on the groupingcontextdecorator,
+        # and then lost
+
+    def test_action_branching_nonautocommit_with_context_info(self):
+        config = self._makeOne(autocommit=False)
+        config._ctx = DummyContext()
+        config._ctx.info = 'abc'
+        config._ctx.autocommit = False
+        config._ctx.actions = []
+        config._ctx.action = lambda *arg, **kw: self.assertEqual(
+            arg,
+            ('discrim', None, (), {'a': 1}, 0))
+        self.assertEqual(config.action('discrim', kw={'a':1}), None)
+        self.assertEqual(config._ctx.actions, [])
+        self.assertEqual(config._ctx.info, 'abc')
+
     def test_add_static_here_no_utility_registered(self):
         from pyramid.static import PackageURLParser
         from zope.interface import implementedBy
