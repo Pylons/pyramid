@@ -399,6 +399,14 @@ class Test_append_slash_notfound_view(BaseTest, unittest.TestCase):
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '404 Not Found')
 
+    def test_no_route_matches(self):
+        request = self._makeRequest(PATH_INFO='/abc')
+        context = ExceptionResponse()
+        mapper = self._registerMapper(request.registry, True)
+        mapper.routelist[0].val = None
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '404 Not Found')
+
     def test_matches(self):
         request = self._makeRequest(PATH_INFO='/abc')
         context = ExceptionResponse()
@@ -447,9 +455,16 @@ class Test_default_exceptionresponse_view(unittest.TestCase):
         result = self._callFUT(context, None)
         self.failUnless(result is context)
 
+    def test_is_not_exception_context_is_false_still_chosen(self):
+        request = DummyRequest()
+        request.exception = 0
+        result = self._callFUT(None, request)
+        self.failUnless(result is None)
+
     def test_is_not_exception_no_request_exception(self):
         context = object()
         request = DummyRequest()
+        request.exception = None
         result = self._callFUT(context, request)
         self.failUnless(result is context)
 

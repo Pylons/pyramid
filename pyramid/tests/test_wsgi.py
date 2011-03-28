@@ -30,7 +30,7 @@ class WSGIApp2Tests(unittest.TestCase):
         self.assertEqual(response, dummyapp)
         self.assertEqual(request.environ['PATH_INFO'], '/subpath')
         self.assertEqual(request.environ['SCRIPT_NAME'], '/foo/b/view_name')
-        
+
     def test_decorator_with_subpath_no_view_name(self):
         context = DummyContext()
         request = DummyRequest()

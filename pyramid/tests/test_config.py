@@ -85,6 +85,16 @@ class ConfiguratorTests(unittest.TestCase):
         self.failUnless(config.registry.getUtility(IRendererFactory, '.mak'))
         self.failUnless(config.registry.getUtility(IRendererFactory, '.mako'))
 
+    def test__set_settings_as_None(self):
+        config = self._makeOne()
+        settings = config._set_settings(None)
+        self.failUnless(settings)
+
+    def test__set_settings_as_dictwithvalues(self):
+        config = self._makeOne()
+        settings = config._set_settings({'a':'1'})
+        self.assertEqual(settings['a'], '1')
+
     def test_begin(self):
         from pyramid.config import Configurator
         config = Configurator()

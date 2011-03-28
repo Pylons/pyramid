@@ -63,9 +63,13 @@ def wsgiapp2(wrapped):
 
     def decorator(context, request):
         traversed = request.traversed
-        vroot_path = request.virtual_root_path or ()
+        vroot_path = request.virtual_root_path
+        if not vroot_path:
+            vroot_path = ()
         view_name = request.view_name
-        subpath = request.subpath or ()
+        subpath = request.subpath
+        if not subpath:
+            subpath = ()
         script_tuple = traversed[len(vroot_path):]
         script_list = [ quote_path_segment(name) for name in script_tuple ]
         if view_name:

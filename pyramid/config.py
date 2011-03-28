@@ -46,15 +46,6 @@ from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
 from pyramid.interfaces import IViewMapperFactory
 
-try:
-    from pyramid import chameleon_text
-except TypeError:  # pragma: no cover
-    chameleon_text = None # pypy
-try: 
-    from pyramid import chameleon_zpt
-except TypeError: # pragma: no cover
-    chameleon_zpt = None # pypy
-
 from pyramid import renderers
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.compat import all
@@ -89,9 +80,6 @@ from pyramid.view import default_exceptionresponse_view
 from pyramid.view import render_view_to_response
 from pyramid.view import is_response
 
-MAX_ORDER = 1 << 30
-DEFAULT_PHASH = md5().hexdigest()
-
 DEFAULT_RENDERERS = (
     ('.mak', mako_renderer_factory),
     ('.mako', mako_renderer_factory),
@@ -99,10 +87,20 @@ DEFAULT_RENDERERS = (
     ('string', renderers.string_renderer_factory),
     )
 
-if chameleon_text:
-    DEFAULT_RENDERERS += (('.pt', chameleon_zpt.renderer_factory),)
-if chameleon_zpt:
+try:
+    from pyramid import chameleon_text
     DEFAULT_RENDERERS += (('.txt', chameleon_text.renderer_factory),)
+except TypeError:  # pragma: no cover
+    pass # pypy
+
+try: 
+    from pyramid import chameleon_zpt
+    DEFAULT_RENDERERS += (('.pt', chameleon_zpt.renderer_factory),)
+except TypeError: # pragma: no cover
+    pass #pypy
+
+MAX_ORDER = 1 << 30
+DEFAULT_PHASH = md5().hexdigest()
 
 def action_method(wrapped):
     """ Wrapper to provide the right conflict info report data when a method
@@ -303,7 +301,9 @@ class Configurator(object):
                 )
 
     def _set_settings(self, mapping):
-        settings = Settings(mapping or {})
+        if not mapping:
+            mapping = {}
+        settings = Settings(mapping)
         self.registry.settings = settings
         return settings
 
