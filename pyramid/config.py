@@ -720,8 +720,7 @@ class Configurator(object):
             self.set_view_mapper(default_view_mapper)
             self.commit()
         
-    # getSiteManager is a unit testing dep injection
-    def hook_zca(self, getSiteManager=None):
+    def hook_zca(self):
         """ Call :func:`zope.component.getSiteManager.sethook` with
         the argument
         :data:`pyramid.threadlocal.get_current_registry`, causing
@@ -731,19 +730,16 @@ class Configurator(object):
         :app:`Pyramid` :term:`application registry` rather than the
         Zope 'global' registry.  If :mod:`zope.component` cannot be
         imported, this method will raise an :exc:`ImportError`."""
-        if getSiteManager is None:
-            from zope.component import getSiteManager
+        from zope.component import getSiteManager
         getSiteManager.sethook(get_current_registry)
 
-    # getSiteManager is a unit testing dep injection
-    def unhook_zca(self, getSiteManager=None):
+    def unhook_zca(self):
         """ Call :func:`zope.component.getSiteManager.reset` to undo
         the action of
         :meth:`pyramid.config.Configurator.hook_zca`.  If
         :mod:`zope.component` cannot be imported, this method will
         raise an :exc:`ImportError`."""
-        if getSiteManager is None: # pragma: no cover
-            from zope.component import getSiteManager
+        from zope.component import getSiteManager
         getSiteManager.reset()
 
     def begin(self, request=None):

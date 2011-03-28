@@ -16,9 +16,9 @@
 
      .. automethod:: end
 
-     .. automethod:: hook_zca()
+     .. automethod:: hook_zca
 
-     .. automethod:: unhook_zca()
+     .. automethod:: unhook_zca
 
      .. automethod:: get_settings
 

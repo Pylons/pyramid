@@ -210,6 +210,15 @@ class ConfiguratorTests(unittest.TestCase):
         newconfig = config.with_package(pyramid.tests)
         self.assertEqual(newconfig.package, pyramid.tests)
 
+    def test_with_package_context_is_not_None(self):
+        import pyramid.tests
+        config = self._makeOne()
+        config._ctx = DummyContext()
+        config._ctx.registry = None
+        config._ctx.autocommit = True
+        newconfig = config.with_package(pyramid.tests)
+        self.assertEqual(newconfig.package, pyramid.tests)
+
     def test_maybe_dotted_string_success(self):
         import pyramid.tests
         config = self._makeOne()
@@ -2770,18 +2779,31 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(L[-1], event2)
 
     def test_hook_zca(self):
-        from pyramid.threadlocal import get_current_registry
-        gsm = DummyGetSiteManager()
-        config = self._makeOne()
-        config.hook_zca(getSiteManager=gsm)
-        self.assertEqual(gsm.hook, get_current_registry)
+        from zope.component import getSiteManager
+        def foo():
+            '123'
+        try:
+            config = self._makeOne()
+            config.hook_zca()
+            config.begin()
+            sm = getSiteManager()
+            self.assertEqual(sm, config.registry)
+        finally:
+            getSiteManager.reset()
 
     def test_unhook_zca(self):
-        gsm = DummyGetSiteManager()
-        config = self._makeOne()
-        config.unhook_zca(getSiteManager=gsm)
-        self.assertEqual(gsm.unhooked, True)
-
+        from zope.component import getSiteManager
+        def foo():
+            '123'
+        try:
+            getSiteManager.sethook(foo)
+            config = self._makeOne()
+            config.unhook_zca()
+            sm = getSiteManager()
+            self.assertNotEqual(sm, '123')
+        finally:
+            getSiteManager.reset()
+        
     def test_testing_add_renderer(self):
         config = self._makeOne(autocommit=True)
         renderer = config.testing_add_renderer('templates/foo.pt')
@@ -4719,12 +4741,6 @@ class DummyMultiView:
         return 'OK1'
     def __permitted__(self, context, request):
         """ """
-
-class DummyGetSiteManager(object):
-    def sethook(self, hook):
-        self.hook = hook
-    def reset(self):
-        self.unhooked = True
 
 class DummyThreadLocalManager(object):
     pushed = None
