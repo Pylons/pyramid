@@ -2798,8 +2798,11 @@ class ViewDeriver(object):
         # this is a little silly but we don't want to decorate the original
         # function with attributes that indicate accept, order, and phash,
         # so we use a wrapper
-        if ( (accept is None) and (order == MAX_ORDER) and
-             (phash == DEFAULT_PHASH) ):
+        if (
+            (accept is None) and
+            (order == MAX_ORDER) and
+            (phash == DEFAULT_PHASH)
+            ):
             return view # defaults
         def attr_view(context, request):
             return view(context, request)
