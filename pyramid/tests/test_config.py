@@ -3722,15 +3722,13 @@ class TestViewDeriver(unittest.TestCase):
 
     def test_attr_wrapped_view_branching_default_phash(self):
         from pyramid.config import DEFAULT_PHASH
-        def view(context, request):
-            return 'OK'
+        def view(context, request): pass
         deriver = self._makeOne(phash=DEFAULT_PHASH)
         result = deriver(view)
         self.assertEqual(result, view)
 
     def test_attr_wrapped_view_branching_nondefault_phash(self):
-        def view(context, request):
-            return 'OK'
+        def view(context, request): pass
         deriver = self._makeOne(phash='nondefault')
         result = deriver(view)
         self.assertNotEqual(result, view)
