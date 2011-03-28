@@ -2,14 +2,15 @@
 Defining the Domain Model
 =========================
 
-The first change we'll make to our bone-stock ``paster`` -generated
-application will be to define a number of :term:`resource` constructors.
-Remember that, because we're using :term:`ZODB` to represent our
+The first change we'll make to our stock paster-generated application will be
+to define two :term:`resource` constructors, one representing a wiki page,
+and another representing the wiki as a mapping of wiki page names to page
+objects.  We'll do this inside our ``models.py`` file.
+
+Because we're using :term:`ZODB` to represent our
 :term:`resource tree`, each of these resource constructors represents a
 :term:`domain model` object, so we'll call these constructors "model
-constructors".  For this application, which will be a Wiki, we will need two
-kinds of model constructors: a "Wiki" model constructor, and a "Page" model
-constructor.  Both our Page and Wiki constructors will be class objects.  A
+constructors". Both our Page and Wiki constructors will be class objects.  A
 single instance of the "Wiki" class will serve as a container for "Page"
 objects, which will be instances of the "Page" class.
 
@@ -20,7 +21,7 @@ The source code for this tutorial stage can be browsed via
 Deleting the Database
 ---------------------
 
-In a subsequent step, we're going to remove the ``MyModel`` Python model
+In the next step, we're going to remove the ``MyModel`` Python model
 class from our ``models.py`` file.  Since this class is referred to within
 our persistent storage (represented on disk as a file named ``Data.fs``),
 we'll have strange things happen the next time we want to visit the
@@ -29,12 +30,8 @@ directory before proceeding any further.  It's always fine to do this as long
 as you don't care about the content of the database; the database itself will
 be recreated as necessary.
 
-Adding Model Classes
---------------------
-
-The next thing we want to do is remove the ``MyModel`` class from the
-generated ``models.py`` file.  The ``MyModel`` class is only a sample and
-we're not going to use it.
+Making Edits to ``models.py``
+-----------------------------
 
 .. note::
 
@@ -44,20 +41,20 @@ we're not going to use it.
   or they may live in a Python subpackage of your application package named
   ``models``, but this is only by convention.
 
-Then, we'll add a ``Wiki`` class.  Because this is a ZODB application, this
-class should inherit from :class:`persistent.mapping.PersistentMapping`.  We
-want it to inherit from the :class:`persistent.mapping.PersistentMapping`
-class because our Wiki class will be a mapping of wiki page names to ``Page``
-objects.  The :class:`persistent.mapping.PersistentMapping` class provides
-our class with mapping behavior, and makes sure that our Wiki page is stored
-as a "first-class" persistent object in our ZODB database.
+The first thing we want to do is remove the ``MyModel`` class from the
+generated ``models.py`` file.  The ``MyModel`` class is only a sample and
+we're not going to use it.
 
-Our ``Wiki`` class should also have a ``__name__`` attribute set to ``None``
-at class scope, and should have a ``__parent__`` attribute set to ``None`` at
-class scope as well.  If a model has a ``__parent__`` attribute of ``None``
-in a traversal-based :app:`Pyramid` application, it means that it's the
-:term:`root` model.  The ``__name__`` of the root model is also always
-``None``.
+Then, we'll add a ``Wiki`` class.  We want it to inherit from the
+:class:`persistent.mapping.PersistentMapping` class because it provides
+mapping behavior, and it makes sure that our Wiki page is stored as a
+"first-class" persistent object in our ZODB database.
+
+Our ``Wiki`` class should have two attributes set to ``None`` at
+class scope: ``__parent__`` and ``__name__``.  If a model has a
+``__parent__`` attribute of ``None`` in a traversal-based :app:`Pyramid`
+application, it means that it's the :term:`root` model.  The ``__name__``
+of the root model is also always ``None``.
 
 Then we'll add a ``Page`` class.  This class should inherit from the
 :class:`persistent.Persistent` class.  We'll also give it an ``__init__``
