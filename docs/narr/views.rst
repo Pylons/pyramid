@@ -354,7 +354,7 @@ For example, given the following exception class in a module named
 
 
 You can wire a view callable to be called whenever any of your *other* code
-raises a ``hellworld.exceptions.ValidationFailure`` exception:
+raises a ``helloworld.exceptions.ValidationFailure`` exception:
 
 .. code-block:: python
    :linenos:
