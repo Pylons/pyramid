@@ -175,6 +175,14 @@ class RoutesMapperTests(unittest.TestCase):
         self.assertEqual(result['route'], mapper.routes['root'])
         self.assertEqual(result['match'], {})
 
+    def test___call__root_route_when_path_info_notempty(self):
+        mapper = self._makeOne()
+        mapper.connect('root', '/')
+        request = self._getRequest(PATH_INFO='/')
+        result = mapper(request)
+        self.assertEqual(result['route'], mapper.routes['root'])
+        self.assertEqual(result['match'], {})
+
     def test___call__no_path_info(self):
         mapper = self._makeOne()
         mapper.connect('root', '/')

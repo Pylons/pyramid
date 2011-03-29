@@ -160,11 +160,18 @@ class TestRouteUrl(unittest.TestCase):
         request = _makeRequest()
         mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
         request.registry.registerUtility(mapper, IRoutesMapper)
-        result = self._callFUT('flub', request, 'extra1', 'extra2',
-                               a=1, b=2, c=3, _query={'a':1},
-                               _anchor=u"foo")
+        result = self._callFUT('flub', request, 'extra1', 'extra2')
         self.assertEqual(result,
-                         'http://example.com:5432/1/2/3/extra1/extra2?a=1#foo')
+                         'http://example.com:5432/1/2/3/extra1/extra2')
+
+    def test_with_elements_path_endswith_slash(self):
+        from pyramid.interfaces import IRoutesMapper
+        request = _makeRequest()
+        mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3/'))
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = self._callFUT('flub', request, 'extra1', 'extra2')
+        self.assertEqual(result,
+                         'http://example.com:5432/1/2/3/extra1/extra2')
 
     def test_no_elements(self):
         from pyramid.interfaces import IRoutesMapper
@@ -175,6 +182,43 @@ class TestRouteUrl(unittest.TestCase):
                                _anchor=u"foo")
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3?a=1#foo')
+
+    def test_with_anchor_string(self):
+        from pyramid.interfaces import IRoutesMapper
+        request = _makeRequest()
+        mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = self._callFUT('flub', request, _anchor="La Pe\xc3\xb1a")
+        self.assertEqual(result,
+                         'http://example.com:5432/1/2/3#La Pe\xc3\xb1a')
+
+    def test_with_anchor_unicode(self):
+        from pyramid.interfaces import IRoutesMapper
+        request = _makeRequest()
+        mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        anchor = unicode('La Pe\xc3\xb1a', 'utf-8')
+        result = self._callFUT('flub', request, _anchor=anchor)
+        self.assertEqual(result,
+                         'http://example.com:5432/1/2/3#La Pe\xc3\xb1a')
+
+    def test_with_query(self):
+        from pyramid.interfaces import IRoutesMapper
+        request = _makeRequest()
+        mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = self._callFUT('flub', request, _query={'q':'1'})
+        self.assertEqual(result,
+                         'http://example.com:5432/1/2/3?q=1')
+
+    def test_with_app_url(self):
+        from pyramid.interfaces import IRoutesMapper
+        request = _makeRequest()
+        mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = self._callFUT('flub', request, _app_url='http://example2.com')
+        self.assertEqual(result,
+                         'http://example2.com/1/2/3')
 
     def test_it_generation_error(self):
         from pyramid.interfaces import IRoutesMapper
@@ -216,6 +260,17 @@ class TestRouteUrl(unittest.TestCase):
         result = self._callFUT('flub', request)
         self.assertEqual(result,  'http://example2.com/1/2/3/a')
         self.assertEqual(route.kw, {}) # shouldnt have anchor/query
+
+    def test_with_anchor_app_url_elements_and_query(self):
+        from pyramid.interfaces import IRoutesMapper
+        request = _makeRequest()
+        mapper = DummyRoutesMapper(route=DummyRoute(result='/1/2/3'))
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = self._callFUT('flub', request, 'element1',
+                               _app_url='http://example2.com',
+                               _anchor='anchor', _query={'q':'1'})
+        self.assertEqual(result,
+                         'http://example2.com/1/2/3/element1?q=1#anchor')
 
 class TestCurrentRouteUrl(unittest.TestCase):
     def setUp(self):
