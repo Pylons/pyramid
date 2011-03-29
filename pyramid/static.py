@@ -190,8 +190,8 @@ class static_view(object):
         # package_name is for bw compat; it is preferred to pass in a
         # package-relative path as root_dir
         # (e.g. ``anotherpackage:foo/static``).
-        caller_package_name = caller_package().__name__
-        package_name = package_name or caller_package_name
+        if package_name is None:
+            package_name = caller_package().__name__
         package_name, root_dir = resolve_asset_spec(root_dir, package_name)
         if package_name is None:
             app = StaticURLParser(root_dir, cache_max_age=cache_max_age)
