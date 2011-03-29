@@ -240,14 +240,6 @@ class TestRouteUrl(unittest.TestCase):
         self.assertEqual(route.kw, {}) # shouldnt have anchor/query
         self.assertEqual(result, 'http://example.com:5432?name=some_name')
 
-    def test_with_app_url(self):
-        from pyramid.interfaces import IRoutesMapper
-        request = _makeRequest()
-        mapper = DummyRoutesMapper(route=DummyRoute(result='/1/2/3'))
-        request.registry.registerUtility(mapper, IRoutesMapper)
-        result = self._callFUT('flub', request, _app_url='http://example2.com')
-        self.assertEqual(result,  'http://example2.com/1/2/3')
-
     def test_with_pregenerator(self):
         from pyramid.interfaces import IRoutesMapper
         request = _makeRequest()
