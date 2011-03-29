@@ -336,6 +336,19 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         self.assertEqual(result['virtual_root'], resource)
         self.assertEqual(result['virtual_root_path'], ())
 
+    def test_withroute_and_traverse_empty(self):
+        resource = DummyContext()
+        traverser = self._makeOne(resource)
+        environ = {'bfg.routes.matchdict': {'traverse':''}}
+        result = traverser(environ)
+        self.assertEqual(result['context'], resource)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], ())
+        self.assertEqual(result['traversed'], ())
+        self.assertEqual(result['root'], resource)
+        self.assertEqual(result['virtual_root'], resource)
+        self.assertEqual(result['virtual_root_path'], ())
+
 class FindInterfaceTests(unittest.TestCase):
     def _callFUT(self, context, iface):
         from pyramid.traversal import find_interface
@@ -653,6 +666,16 @@ class ResourcePathTupleTests(unittest.TestCase):
         result = self._callFUT(root)
         self.assertEqual(result, ('',))
 
+    def test_root_default_emptystring_name(self):
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = ''
+        other = DummyContext()
+        other.__parent__ = root
+        other.__name__ = 'other'
+        result = self._callFUT(other)
+        self.assertEqual(result, ('', 'other',))
+
     def test_nonroot_default(self):
         root = DummyContext()
         root.__parent__ = None
@@ -801,6 +824,22 @@ class TraversalContextURLTests(unittest.TestCase):
         context_url = self._makeOne(two, request)
         result = context_url()
         self.assertEqual(result, 'http://example.com:5432/')
+
+    def test_call_with_virtual_root_path_physical_not_startwith_vroot(self):
+        from pyramid.interfaces import VH_ROOT_KEY
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = None
+        one = DummyContext()
+        one.__parent__ = root
+        one.__name__ = 'one'
+        two = DummyContext()
+        two.__parent__ = one
+        two.__name__ = 'two'
+        request = DummyRequest({VH_ROOT_KEY:'/wrong'})
+        context_url = self._makeOne(two, request)
+        result = context_url()
+        self.assertEqual(result, 'http://example.com:5432/one/two/')
 
     def test_virtual_root_no_virtual_root_path(self):
         root = DummyContext()
@@ -1058,6 +1097,19 @@ class TestDefaultRootFactory(unittest.TestCase):
         self.assertEqual(root.a, 1)
         self.assertEqual(root.b, 2)
 
+class Test__join_path_tuple(unittest.TestCase):
+    def _callFUT(self, tup):
+        from pyramid.traversal import _join_path_tuple
+        return _join_path_tuple(tup)
+
+    def test_empty_tuple(self):
+        # tests "or '/'" case
+        result = self._callFUT(())
+        self.assertEqual(result, '/')
+
+    def test_nonempty_tuple(self):
+        result = self._callFUT(('x',))
+        self.assertEqual(result, 'x')
 
 def make_traverser(result):
     class DummyTraverser(object):

@@ -577,14 +577,14 @@ class ResourceTreeTraverser(object):
         if 'bfg.routes.matchdict' in environ:
             matchdict = environ['bfg.routes.matchdict']
 
-            path = matchdict.get('traverse', '/')
+            path = matchdict.get('traverse', '/') or '/'
             if hasattr(path, '__iter__'):
-                # this is a *traverse stararg (not a :traverse)
+                # this is a *traverse stararg (not a {traverse})
                 path = '/'.join([quote_path_segment(x) for x in path]) or '/'
 
             subpath = matchdict.get('subpath', ())
             if not hasattr(subpath, '__iter__'):
-                # this is not a *subpath stararg (just a :subpath)
+                # this is not a *subpath stararg (just a {subpath})
                 subpath = traversal_path(subpath)
 
         else:
@@ -608,7 +608,7 @@ class ResourceTreeTraverser(object):
         root = self.root
         ob = vroot = root
 
-        if vpath == '/' or (not vpath):
+        if vpath == '/': # invariant: vpath must not be empty
             # prevent a call to traversal_path if we know it's going
             # to return the empty tuple
             vpath_tuple = ()
