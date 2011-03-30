@@ -13,7 +13,6 @@ requires = [
     'repoze.retry',
     'ZODB3',
     'WebError',
-    'docutils',
     ]
 
 setup(name='tutorial',
@@ -21,9 +20,8 @@ setup(name='tutorial',
       description='tutorial',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
-        "Intended Audience :: Developers",
-        "Framework :: Pylons",
         "Programming Language :: Python",
+        "Framework :: Pylons",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         ],
@@ -34,8 +32,8 @@ setup(name='tutorial',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      install_requires=requires,
-      tests_require=requires,
+      install_requires = requires,
+      tests_require= requires,
       test_suite="tutorial",
       entry_points = """\
       [paste.app_factory]
@@ -43,3 +41,4 @@ setup(name='tutorial',
       """,
       paster_plugins=['pyramid'],
       )
+
