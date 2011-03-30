@@ -63,7 +63,17 @@ class TestUnencryptedCookieSession(unittest.TestCase):
         session._cookie_on_exception = False
         response = DummyResponse()
         self.assertEqual(session._set_cookie(response), False)
-        
+
+    def test__set_cookie_on_exception_no_request_exception(self):
+        import webob
+        request = testing.DummyRequest()
+        request.exception = None
+        session = self._makeOne(request)
+        session._cookie_on_exception = False
+        response = webob.Response()
+        self.assertEqual(session._set_cookie(response), True)
+        self.assertEqual(response.headerlist[-1][0], 'Set-Cookie')
+
     def test__set_cookie_cookieval_too_long(self):
         request = testing.DummyRequest()
         session = self._makeOne(request)
@@ -118,7 +128,26 @@ class TestUnencryptedCookieSession(unittest.TestCase):
         session.flash('msg1')
         session.flash('msg2')
         self.assertEqual(session['_f_'], ['msg1', 'msg2'])
-        
+
+    def test_flash_allow_duplicate_false(self):
+        request = testing.DummyRequest()
+        session = self._makeOne(request)
+        session.flash('msg1')
+        session.flash('msg1', allow_duplicate=False)
+        self.assertEqual(session['_f_'], ['msg1'])
+
+    def test_flash_allow_duplicate_true_and_msg_not_in_storage(self):
+        request = testing.DummyRequest()
+        session = self._makeOne(request)
+        session.flash('msg1', allow_duplicate=True)
+        self.assertEqual(session['_f_'], ['msg1'])
+
+    def test_flash_allow_duplicate_false_and_msg_not_in_storage(self):
+        request = testing.DummyRequest()
+        session = self._makeOne(request)
+        session.flash('msg1', allow_duplicate=False)
+        self.assertEqual(session['_f_'], ['msg1'])
+
     def test_flash_mixed(self):
         request = testing.DummyRequest()
         session = self._makeOne(request)
