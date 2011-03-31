@@ -43,7 +43,7 @@ assigning this dependency to the ``install_requires`` parameter in the
 
 Our resulting ``setup.py`` should look like so:
 
-.. literalinclude:: src/models/setup.py
+.. literalinclude:: src/views/setup.py
    :linenos:
    :language: python
 
@@ -191,7 +191,7 @@ with a ``@view_config`` decorator which names the string ``edit_page`` as its
 :term:`view name` (via ``name=``), the class ``tutorial.models.Page`` as its
 context, and the renderer named ``templates/edit.pt``.  This means that when
 a Page resource is the context, and a :term:`view name` exists as the result
-of traverasal named ``edit_page``, this view will be used.  We inform
+of traversal named ``edit_page``, this view will be used.  We inform
 :app:`Pyramid` this view will use the ``templates/edit.pt`` template file as
 a ``renderer``.
 
@@ -211,8 +211,8 @@ If the view execution *is* a result of a form submission (if the expression
 attribute of the page context.  It then redirects to the default view of the
 context (the page), which will always be the ``view_page`` view.
 
-Viewing the Result of Our Edits to ``views.py``
-===============================================
+Viewing the Result of all Our Edits to ``views.py``
+===================================================
 
 The result of all of our edits to ``views.py`` will leave it looking like
 this:
@@ -287,7 +287,7 @@ replicate within the body of this guide, however it is available `online
 
 This CSS file will be accessed via
 e.g. ``http://localhost:6543/static/pylons.css`` by virtue of the call to
-``add_static_view`` directive we've made in the ``__init__`` file.  Any
+``add_static_view`` directive we've made in the ``__init__.py`` file.  Any
 number and type of static assets can be placed in this directory (or
 subdirectories) and are just referred to by URL or by using the convenience
 method ``static_url`` e.g. ``request.static_url('{{package}}:static/foo.css')``
