@@ -293,6 +293,32 @@ subdirectories) and are just referred to by URL or by using the convenience
 method ``static_url`` e.g. ``request.static_url('{{package}}:static/foo.css')``
 within templates.
 
+Viewing the Application in a Browser
+====================================
+
+We can finally examine our application in a
+browser.  The views we'll try are as follows:
+
+- Visiting ``http://localhost:6543/`` in a browser invokes the ``view_wiki``
+  view.  This always redirects to the ``view_page`` view of the ``FrontPage``
+  Page resource.
+
+- Visiting ``http://localhost:6543/FrontPage/`` in a browser invokes
+  the ``view_page`` view of the front page resource.  This is
+  because it's the *default view* (a view without a ``name``) for Page
+  resources.
+
+- Visiting ``http://localhost:6543/FrontPage/edit_page`` in a browser
+  invokes the edit view for the ``FrontPage`` Page resource.
+
+- Visiting ``http://localhost:6543/add_page/SomePageName`` in a
+  browser invokes the add view for a Page.
+
+- To generate an error, visit ``http://localhost:6543/add_page`` which
+  will generate an ``IndexError`` for the expression
+  ``request.subpath[0]``.  You'll see an interactive traceback
+  facility provided by :term:`WebError`.
+
 Testing the Views
 =================
 
@@ -337,29 +363,3 @@ The expected result looks something like:
    Ran 9 tests in 0.203s
    
    OK
-
-Viewing the Application in a Browser
-====================================
-
-Once we've completed our edits, we can finally examine our application in a
-browser.  The views we'll try are as follows:
-
-- Visiting ``http://localhost:6543/`` in a browser invokes the ``view_wiki``
-  view.  This always redirects to the ``view_page`` view of the ``FrontPage``
-  Page resource.
-
-- Visiting ``http://localhost:6543/FrontPage/`` in a browser invokes
-  the ``view_page`` view of the front page resource.  This is
-  because it's the *default view* (a view without a ``name``) for Page
-  resources.
-
-- Visiting ``http://localhost:6543/FrontPage/edit_page`` in a browser
-  invokes the edit view for the ``FrontPage`` Page resource.
-
-- Visiting ``http://localhost:6543/add_page/SomePageName`` in a
-  browser invokes the add view for a Page.
-
-- To generate an error, visit ``http://localhost:6543/add_page`` which
-  will generate an ``IndexError`` for the expression
-  ``request.subpath[0]``.  You'll see an interactive traceback
-  facility provided by :term:`WebError`.
