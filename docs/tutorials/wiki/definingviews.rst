@@ -2,16 +2,6 @@
 Defining Views
 ==============
 
-Conventionally, :term:`view callable` objects are defined within a
-``views.py`` module in an :app:`Pyramid` application.  There is nothing
-automagically special about the filename ``views.py``.  Files implementing
-views often have ``view`` in their filenames (or may live in a Python
-subpackage of your application package named ``views``), but this is only by
-convention.  A project may have many views throughout its codebase in
-arbitrarily-named files.  In this application, however, we'll be continuing
-to use the ``views.py`` module, because there's no reason to break
-convention.
-
 A :term:`view callable` in a :app:`Pyramid` application is typically a simple
 Python function that accepts a single parameter: :term:`request`.  A view
 callable is assumed to return a :term:`response` object.
@@ -72,6 +62,14 @@ module.  One view named ``view_wiki`` will display the wiki itself (it will
 answer on the root URL), another named ``view_page`` will display an
 individual page, another named ``add_page`` will allow a page to be added,
 and a final view named ``edit_page`` will allow a page to be edited.
+
+.. note::
+
+  There is nothing special about the filename ``views.py``.  A project may
+  have many view callables throughout its codebase in arbitrarily-named
+  files.  Files implementing view callables often have ``view`` in their
+  filenames (or may live in a Python subpackage of your application package
+  named ``views``), but this is only by convention.
 
 The ``view_wiki`` view function
 -------------------------------
