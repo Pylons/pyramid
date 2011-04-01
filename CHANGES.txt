@@ -48,6 +48,20 @@ Bug Fixes
   ``pyramid.view.append_slash_notfound_view`` (see
   https://github.com/Pylons/pyramid/issues#issue/149).
 
+- Static views registered with ``config.add_static_view`` which also included
+  a ``permission`` keyword argument would not work as expected, because
+  ``add_static_view`` also registered a route factory internally.  Because a
+  route factory was registered internally, the context checked by the Pyramid
+  permission machinery never had an ACL.  ``add_static_view`` no longer
+  registers a route with a factory, so the default root factory will be used.
+
+- ``config.add_static_view`` now passes extra keyword arguments it receives
+  to ``config.add_route`` (calling add_static_view is mostly logically
+  equivalent to adding a view of the type ``pyramid.static.static_view``
+  hooked up to a route with a subpath).  This makes it possible to pass e.g.,
+  ``factory=`` to ``add_static_view`` to protect a particular static view
+  with a custom ACL.
+
 1.0 (2011-01-30)
 ================
 

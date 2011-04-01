@@ -2252,19 +2252,16 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(config._ctx.info, 'abc')
 
     def test_add_static_here_no_utility_registered(self):
+        from zope.interface import Interface
         from pyramid.static import PackageURLParser
-        from zope.interface import implementedBy
-        from pyramid.static import StaticURLInfo
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         config = self._makeOne(autocommit=True)
         config.add_static_view('static', 'fixtures/static')
         request_type = self._getRouteRequestIface(config, 'static/')
-        route = self._assertRoute(config, 'static/', 'static/*subpath')
-        self.assertEqual(route.factory.__class__, type(lambda x: x))
-        iface = implementedBy(StaticURLInfo)
+        self._assertRoute(config, 'static/', 'static/*subpath')
         wrapped = config.registry.adapters.lookup(
-            (IViewClassifier, request_type, iface), IView, name='')
+            (IViewClassifier, request_type, Interface), IView, name='')
         request = self._makeRequest(config)
         self.assertEqual(wrapped(None, request).__class__, PackageURLParser)
 

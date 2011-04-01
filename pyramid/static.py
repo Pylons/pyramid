@@ -137,17 +137,27 @@ class StaticURLInfo(object):
         else:
             # it's a view name
             cache_max_age = extra.pop('cache_max_age', None)
+            # create a view
             view = static_view(spec, cache_max_age=cache_max_age)
-            # register a route using this view
-            permission = extra.pop('permission', '__no_permission_required__')
-            self.config.add_route(
-                name,
-                "%s*subpath" % name, # name already ends with slash
-                view=view,
-                view_for=self.__class__,
-                view_permission=permission,
-                factory=lambda *x: self,
-                )
+
+            # Mutate extra to allow factory, etc to be passed through here.
+            # Treat permission specially because we'd like to default to
+            # permissiveness (see docs of config.add_static_view).  We need
+            # to deal with both ``view_permission`` and ``permission``
+            # because ``permission`` is used in the docs for add_static_view,
+            # but ``add_route`` prefers ``view_permission``
+            permission = extra.pop('view_permission', None)
+            if permission is None:
+                permission = extra.pop('permission', None)
+            if permission is None:
+                permission = '__no_permission_required__'
+            extra['view_permission'] = permission
+            extra['view'] = view
+
+            # register a route using the computed view, permission, and pattern,
+            # plus any extras passed to us via add_static_view
+            pattern = "%s*subpath" % name # name already ends with slash
+            self.config.add_route(name, pattern, **extra)
             self.registrations.append((name, spec, False))
 
 class static_view(object):

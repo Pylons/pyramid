@@ -102,6 +102,37 @@ class TestFixtureApp(IntegrationBase):
     def test_protected(self):
         self.testapp.get('/protected.html', status=403)
 
+class TestStaticPermApp(IntegrationBase):
+    package = 'pyramid.tests.staticpermapp'
+    root_factory = 'pyramid.tests.staticpermapp:RootFactory'
+    def test_allowed(self):
+        result = self.testapp.get('/allowed/index.html', status=200)
+        self.assertEqual(
+            result.body.replace('\r', ''),
+            open(os.path.join(here, 'fixtures/static/index.html'), 'r').read())
+
+    def test_denied_via_acl_global_root_factory(self):
+        self.testapp.extra_environ = {'REMOTE_USER':'bob'}
+        self.testapp.get('/protected/index.html', status=403)
+
+    def test_allowed_via_acl_global_root_factory(self):
+        self.testapp.extra_environ = {'REMOTE_USER':'fred'}
+        result = self.testapp.get('/protected/index.html', status=200)
+        self.assertEqual(
+            result.body.replace('\r', ''),
+            open(os.path.join(here, 'fixtures/static/index.html'), 'r').read())
+
+    def test_denied_via_acl_local_root_factory(self):
+        self.testapp.extra_environ = {'REMOTE_USER':'fred'}
+        self.testapp.get('/factory_protected/index.html', status=403)
+
+    def test_allowed_via_acl_local_root_factory(self):
+        self.testapp.extra_environ = {'REMOTE_USER':'bob'}
+        result = self.testapp.get('/factory_protected/index.html', status=200)
+        self.assertEqual(
+            result.body.replace('\r', ''),
+            open(os.path.join(here, 'fixtures/static/index.html'), 'r').read())
+
 class TestCCBug(IntegrationBase):
     # "unordered" as reported in IRC by author of
     # http://labs.creativecommons.org/2010/01/13/cc-engine-and-web-non-frameworks/

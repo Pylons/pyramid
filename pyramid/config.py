@@ -2176,7 +2176,13 @@ class Configurator(object):
         current application, the static view should be renderered to
         completely anonymous users.  This default value is permissive
         because, in most web apps, static assets seldom need protection from
-        viewing.
+        viewing.  If ``permission`` is specified, the security checking will
+        be performed against the default root factory ACL.
+
+        Any other keyword arguments sent to ``add_static_view`` are passed on
+        to :meth:`pyramid.config.Configuration.add_route` (e.g. ``factory``,
+        perhaps to define a custom factory with a custom ACL for this static
+        view).
 
         *Usage*
 
