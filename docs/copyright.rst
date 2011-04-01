@@ -55,7 +55,7 @@ Contributors:
   Ben Bangert, Blaise Laflamme, Rob Miller, Mike Orr, Carlos de la Guardia,
   Paul Everitt, Tres Seaver, John Shipman, Marius Gedminas, Chris Rossi,
   Joachim Krebs, Xavier Spriet, Reed O'Brien, William Chambers, Charlie
-  Choiniere, Jamaludin Ahmad, Graham Higgins.
+  Choiniere, Jamaludin Ahmad, Graham Higgins, Patricio Paez.
 
 Cover Designer:
    Hugues Laflamme of `Kemeneur <http://www.kemeneur.com/>`_.

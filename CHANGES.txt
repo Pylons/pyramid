@@ -9,6 +9,10 @@ Documentation
   Jinja, etc.).  'Paster templates' will now be refered to as 'scaffolds,'
   whereas the name for 'rendered templates' will remain as 'templates.'
 
+- The ``wiki`` (ZODB+Traversal) tutorial was updated slightly.
+
+- The ``wiki2`` (SQLA+URL Dispatch) tutorial was updated slightly.
+
 Features
 --------
 
