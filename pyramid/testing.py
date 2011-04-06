@@ -690,7 +690,6 @@ class DummyRequest(object):
         self.root = None
         self.virtual_root = None
         self.marshalled = params # repoze.monty
-        self.registry = get_current_registry()
         self.session = DummySession()
         self.__dict__.update(kw)
 
@@ -698,6 +697,10 @@ class DummyRequest(object):
         if not self.response_callbacks:
             self.response_callbacks = []
         self.response_callbacks.append(callback)
+
+    @property
+    def registry(self):
+        return get_current_registry()
 
 def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
           settings=None):

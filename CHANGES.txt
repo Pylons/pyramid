@@ -66,6 +66,13 @@ Bug Fixes
   ``factory=`` to ``add_static_view`` to protect a particular static view
   with a custom ACL.
 
+- ``testing.DummyRequest`` used the wrong registry (the global registry) as
+  ``self.registry`` if a dummy request was created *before* ``testing.setUp``
+  was executed (``testing.setUp`` pushes a local registry onto the
+  threadlocal stack). Fixed by implementing ``registry`` as a property for
+  DummyRequest instead of eagerly assigning an attribute.
+  See also https://github.com/Pylons/pyramid/issues/165
+
 1.0 (2011-01-30)
 ================
 

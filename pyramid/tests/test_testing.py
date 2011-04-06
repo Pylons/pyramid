@@ -488,7 +488,19 @@ class TestDummyRequest(unittest.TestCase):
         request = self._makeOne()
         request.add_response_callback(1)
         self.assertEqual(request.response_callbacks, [1])
-        
+
+    def test_registry_is_config_registry_when_setup_is_called_after_ctor(self):
+        # see https://github.com/Pylons/pyramid/issues/165
+        from pyramid.registry import Registry
+        from pyramid.config import Configurator
+        request = self._makeOne()
+        try:
+            registry = Registry('this_test')
+            config = Configurator(registry=registry)
+            config.begin()
+            self.failUnless(request.registry is registry)
+        finally:
+            config.end()
 
 class TestDummyTemplateRenderer(unittest.TestCase):
     def _getTargetClass(self, ):
