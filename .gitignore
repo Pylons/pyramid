@@ -19,3 +19,7 @@ jyenv/
 pypyenv/
 build/
 dist/
+bin/
+lib/
+include/
+distribute-*.tar.gz
