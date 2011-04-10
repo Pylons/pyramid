@@ -9,8 +9,6 @@ Should-Have
 - https://github.com/Pylons/pyramid/issues#issue/67 (fixing would make it
   possible to render a static site from a static dir).
 
-- Consider per-form_id CSRF instead of per-session global CSRF token.
-
 - Speed up startup time (defer _bootstrap and registerCommonDirectives()
   until needed by ZCML, as well as unfound speedups).
 
@@ -32,8 +30,12 @@ Should-Have
 - Provide a response_set_cookie method on the request for rendered responses
   that can be used as input to response.set_cookie?
 
+- Fix message catalog extraction / compilation documentation.
+
 Nice-to-Have
 ------------
+
+- Consider per-form_id CSRF instead of per-session global CSRF token.
 
 - Better "Extending" chapter.
 
@@ -54,8 +56,6 @@ Nice-to-Have
 - Supply ``X-Vhm-Host`` support.
 
 - Basic WSGI documentation (pipeline / app / server).
-
-- Fix message catalog extraction / compilation documentation.
 
 - Change docs about creating a venusian decorator to not use ZCA.
 
