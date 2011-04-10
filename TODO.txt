@@ -11,10 +11,6 @@ Should-Have
 
 - Consider per-form_id CSRF instead of per-session global CSRF token.
 
-- I18N support for pyramid_jinja2.  See also -
-  http://groups.google.com/group/pylons-devel/msg/ab58353594b135c9 and
-  https://github.com/Pylons/pyramid_jinja2/pull/14 
-
 - Speed up startup time (defer _bootstrap and registerCommonDirectives()
   until needed by ZCML, as well as unfound speedups).
 
