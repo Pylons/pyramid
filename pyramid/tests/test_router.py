@@ -477,6 +477,27 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(response_events[0].response, response)
         self.assertEqual(result, response.app_iter)
 
+    def test_call_newrequest_evllist_exc_can_be_caught_by_exceptionview(self):
+        from pyramid.interfaces import INewRequest
+        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRequest
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        environ = self._makeEnviron()
+        def listener(event):
+            raise KeyError
+        self.registry.registerHandler(listener, (INewRequest,))
+        exception_response = DummyResponse()
+        exception_response.app_iter = ["Hello, world"]
+        exception_view = DummyView(exception_response)
+        environ = self._makeEnviron()
+        self._registerView(exception_view, '', IExceptionViewClassifier,
+                           IRequest, KeyError)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        self.assertEqual(result, exception_response.app_iter)
+
     def test_call_pushes_and_pops_threadlocal_manager(self):
         from pyramid.interfaces import IViewClassifier
         context = DummyContext()

@@ -71,10 +71,10 @@ class Router(object):
                 threadlocals['request'] = request
                 attrs = request.__dict__
                 attrs['registry'] = registry
-                has_listeners and registry.notify(NewRequest(request))
                 request_iface = IRequest
 
-                try:
+                try: # matches except Exception (exception view execution)
+                    has_listeners and registry.notify(NewRequest(request))
                     # find the root object
                     root_factory = self.root_factory
                     if self.routes_mapper is not None:

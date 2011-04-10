@@ -30,6 +30,9 @@ Features
 - Added ``pyramid.i18n.make_localizer`` API (broken out from
   ``get_localizer`` guts).
 
+- An exception raised by a NewRequest event subscriber can now be caught by
+  an exception view.
+
 Bug Fixes
 ---------
 
