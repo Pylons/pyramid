@@ -43,12 +43,6 @@ Should-Have
   ``redirect`` and ``abort`` functions ala Pylons (promised Mike I'd enable
   this in 1.1).
 
-- Add notes about renderer response attrs to request docs.
-
-- Add an example of using a cascade to serve static assets from the root.
-
-- Explore static file return from handler action using wsgiapp2 + fileapp.
-
 - Static (URL-generation only) routes.
 
 - Add narrative docs for wsgiapp and wsgiapp2.
