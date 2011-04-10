@@ -38,17 +38,31 @@ class ExceptionResponse(Exception):
         
 class Forbidden(ExceptionResponse):
     """
-    Raise this exception within :term:`view` code to immediately
-    return the :term:`forbidden view` to the invoking user.  Usually
-    this is a basic ``403`` page, but the forbidden view can be
-    customized as necessary.  See :ref:`changing_the_forbidden_view`.
+    Raise this exception within :term:`view` code to immediately return the
+    :term:`forbidden view` to the invoking user.  Usually this is a basic
+    ``403`` page, but the forbidden view can be customized as necessary.  See
+    :ref:`changing_the_forbidden_view`.  A ``Forbidden`` exception will be
+    the ``context`` of a :term:`Forbidden View`.
 
-    This exception's constructor accepts a single positional argument, which
-    should be a string.  The value of this string will be placed onto the
-    request by the router as the ``exception_message`` attribute, for
-    availability to the :term:`Forbidden View`.
+    This exception's constructor accepts two arguments.  The first argument,
+    ``message``, should be a string.  The value of this string will be used
+    as the ``message`` attribute of the exception object.  The second
+    argument, ``result`` is usually an instance of
+    :class:`pyramid.security.Denied` or :class:`pyramid.security.ACLDenied`
+    each of which indicates a reason for the forbidden error.  However,
+    ``result`` is also permitted to be just a plain boolean ``False`` object.
+    The ``result`` value will be used as the ``result`` attribute of the
+    exception object.
+
+    The :term:`Forbidden View` can use the attributes of a Forbidden
+    exception as necessary to provide extended information in an error
+    report shown to a user.
     """
     status = '403 Forbidden'
+    def __init__(self, message='', result=None):
+        ExceptionResponse.__init__(self, message)
+        self.message = message
+        self.result = result
 
 class NotFound(ExceptionResponse):
     """
@@ -58,9 +72,9 @@ class NotFound(ExceptionResponse):
     customized as necessary.  See :ref:`changing_the_notfound_view`.
 
     This exception's constructor accepts a single positional argument, which
-    should be a string.  The value of this string will be placed into the WSGI
-    environment by the router as the ``exception_message`` attribute, for
-    availability to the :term:`Not Found View`.
+    should be a string.  The value of this string will be available as the
+    ``message`` attribute of this exception, for availability to the
+    :term:`Not Found View`.
     """
     status = '404 Not Found'
 

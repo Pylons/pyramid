@@ -2726,18 +2726,18 @@ class ViewDeriver(object):
 
         wrapped_view = view
         if self.authn_policy and self.authz_policy and (permission is not None):
-            def _secured_view(context, request):
-                principals = self.authn_policy.effective_principals(request)
-                if self.authz_policy.permits(context, principals, permission):
-                    return view(context, request)
-                msg = getattr(request, 'authdebug_message',
-                              'Unauthorized: %s failed permission check' % view)
-                raise Forbidden(msg)
-            _secured_view.__call_permissive__ = view
             def _permitted(context, request):
                 principals = self.authn_policy.effective_principals(request)
                 return self.authz_policy.permits(context, principals,
                                                  permission)
+            def _secured_view(context, request):
+                result = _permitted(context, request)
+                if result:
+                    return view(context, request)
+                msg = getattr(request, 'authdebug_message',
+                              'Unauthorized: %s failed permission check' % view)
+                raise Forbidden(msg, result)
+            _secured_view.__call_permissive__ = view
             _secured_view.__permitted__ = _permitted
             wrapped_view = _secured_view
 

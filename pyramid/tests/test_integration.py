@@ -195,6 +195,21 @@ class TestRestBugApp(IntegrationBase):
         res = self.testapp.get('/pet', status=200)
         self.assertEqual(res.body, 'gotten')
 
+class TestForbiddenAppHasResult(IntegrationBase):
+    # test that forbidden exception has ACLDenied result attached
+    package = 'pyramid.tests.forbiddenapp'
+    def test_it(self):
+        res = self.testapp.get('/x', status=403)
+        message, result = [x.strip() for x in res.body.split('\n')]
+        self.failUnless(message.endswith('failed permission check'))
+        self.failUnless(
+            result.startswith("ACLDenied permission 'private' via ACE "
+                              "'<default deny>' in ACL "
+                              "'<No ACL found on any object in resource "
+                              "lineage>' on context"))
+        self.failUnless(
+            result.endswith("for principals ['system.Everyone']"))
+
 class TestViewDecoratorApp(IntegrationBase):
     package = 'pyramid.tests.viewdecoratorapp'
     def _configure_mako(self):

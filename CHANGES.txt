@@ -33,6 +33,16 @@ Features
 - An exception raised by a NewRequest event subscriber can now be caught by
   an exception view.
 
+- It is now possible to get information about why Pyramid raised a Forbidden
+  exception from within an exception view.  The ``ACLDenied`` object returned
+  by the ``permits`` method of each stock authorization policy
+  (``pyramid.interfaces.IAuthorizationPolicy.permits``) is now attached to
+  the Forbidden exception as its ``result`` attribute.  Therefore, if you've
+  created a Forbidden exception view, you can see the ACE, ACL, permission,
+  and principals involved in the request as
+  eg. ``context.result.permission``, ``context.result.acl``, etc within the
+  logic of the Forbidden exception view.
+
 Bug Fixes
 ---------
 

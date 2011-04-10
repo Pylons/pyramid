@@ -32,9 +32,6 @@ Should-Have
 - Provide a response_set_cookie method on the request for rendered responses
   that can be used as input to response.set_cookie?
 
-- Make it possible to get at ACLDenied data from Forbidden response in
-  exceptionview.
-
 Nice-to-Have
 ------------
 

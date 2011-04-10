@@ -256,22 +256,22 @@ class ACLPermitsResult(int):
                                                     self.msg)
 
 class ACLDenied(ACLPermitsResult):
-    """ An instance of ``ACLDenied`` represents that a security check
-    made explicitly against ACL was denied.  It evaluates equal to all
-    boolean false types.  It also has attributes which indicate which
-    acl, ace, permission, principals, and context were involved in the
-    request.  Its __str__ method prints a summary of these attributes
-    for debugging purposes.  The same summary is available as the
-    ``msg`` attribute."""
+    """ An instance of ``ACLDenied`` represents that a security check made
+    explicitly against ACL was denied.  It evaluates equal to all boolean
+    false types.  It also has the following attributes: ``acl``, ``ace``,
+    ``permission``, ``principals``, and ``context``.  These attributes
+    indicate the security values involved in the request.  Its __str__ method
+    prints a summary of these attributes for debugging purposes.  The same
+    summary is available as the ``msg`` attribute."""
     boolval = 0
 
 class ACLAllowed(ACLPermitsResult):
-    """ An instance of ``ACLAllowed`` represents that a security check
-    made explicitly against ACL was allowed.  It evaluates equal to
-    all boolean true types.  It also has attributes which indicate
-    which acl, ace, permission, principals, and context were involved
-    in the request.  Its __str__ method prints a summary of these
-    attributes for debugging purposes.  The same summary is available
-    as the ``msg`` attribute."""
+    """ An instance of ``ACLAllowed`` represents that a security check made
+    explicitly against ACL was allowed.  It evaluates equal to all boolean
+    true types.  It also has the following attributes: ``acl``, ``ace``,
+    ``permission``, ``principals``, and ``context``.  These attributes
+    indicate the security values involved in the request.  Its __str__ method
+    prints a summary of these attributes for debugging purposes.  The same
+    summary is available as the ``msg`` attribute."""
     boolval = 1
 
