@@ -54,7 +54,8 @@ if sys.version_info[:2] < (2, 6):
     
 setup(name='pyramid',
       version='1.0',
-      description='The Pyramid web application framework, a Pylons project',
+      description=('The Pyramid web application development framework, a '
+                   'Pylons project'),
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
         "Intended Audience :: Developers",
