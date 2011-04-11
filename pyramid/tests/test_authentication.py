@@ -328,6 +328,12 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         request = self._makeRequest()
         result = plugin.identify(request)
         self.assertEqual(result, None)
+
+    def test_identify_cookie_value_is_None(self):
+        plugin = self._makeOne('secret')
+        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt='})
+        result = plugin.identify(request)
+        self.assertEqual(result, None)
         
     def test_identify_good_cookie_include_ip(self):
         plugin = self._makeOne('secret', include_ip=True)
@@ -377,6 +383,22 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         environ = request.environ
         self.assertEqual(environ['REMOTE_USER_TOKENS'], ())
         self.assertEqual(environ['REMOTE_USER_DATA'],'userid_type:int')
+        self.assertEqual(environ['AUTH_TYPE'],'cookie')
+
+    def test_identify_nonuseridtype_user_data(self):
+        plugin = self._makeOne('secret', include_ip=False)
+        plugin.auth_tkt.userid = '1'
+        plugin.auth_tkt.user_data = 'bogus:int'
+        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=ticket'})
+        result = plugin.identify(request)
+        self.assertEqual(len(result), 4)
+        self.assertEqual(result['tokens'], ())
+        self.assertEqual(result['userid'], '1')
+        self.assertEqual(result['userdata'], 'bogus:int')
+        self.assertEqual(result['timestamp'], 0)
+        environ = request.environ
+        self.assertEqual(environ['REMOTE_USER_TOKENS'], ())
+        self.assertEqual(environ['REMOTE_USER_DATA'],'bogus:int')
         self.assertEqual(environ['AUTH_TYPE'],'cookie')
 
     def test_identify_good_cookie_unknown_useridtype(self):
@@ -695,10 +717,6 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(value,
                          'auth_tkt=""; Path=/; Domain=.localhost; Max-Age=0; '
                          'Expires=Wed, 31-Dec-97 23:59:59 GMT')
-
-    def test_timeout_lower_than_reissue(self):
-        self.assertRaises(ValueError, self._makeOne, 'userid', timeout=1,
-                          reissue_time=2)
 
 class DummyContext:
     pass

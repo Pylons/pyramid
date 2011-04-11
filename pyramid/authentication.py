@@ -210,18 +210,22 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     ``reissue_time``
 
-       Default: ``None``.  If this parameter is set, it represents the
-       number of seconds that must pass before an authentication token
-       cookie is reissued.  The duration is measured as the number of
-       seconds since the last auth_tkt cookie was issued and 'now'.
-       If the ``timeout`` value is ``None``, this parameter has no
-       effect.  If this parameter is provided, and the value of
-       ``timeout`` is not ``None``, the value of ``reissue_time`` must
-       be smaller than value of ``timeout``.  A good rule of thumb: if
-       you want auto-reissued cookies: set this to the ``timeout``
-       value divided by ten.  If this value is ``0``, a new ticket
-       cookie will be reissued on every request which needs
-       authentication. Optional.
+       Default: ``None``.  If this parameter is set, it represents the number
+       of seconds that must pass before an authentication token cookie is
+       automatically reissued as the result of a request which requires
+       authentication.  The duration is measured as the number of seconds
+       since the last auth_tkt cookie was issued and 'now'.  If this value is
+       ``0``, a new ticket cookie will be reissued on every request which
+       requires authentication.
+
+       A good rule of thumb: if you want auto-expired cookies based on
+       inactivity: set the ``timeout`` value to 1200 (20 mins) and set the
+       ``reissue_time`` value to perhaps a tenth of the ``timeout`` value
+       (120 or 2 mins).  It's nonsensical to set the ``timeout`` value lower
+       than the ``reissue_time`` value, as the ticket will never be reissued
+       if so.  However, such a configuration is not explicitly prevented.
+
+       Optional.
 
     ``max_age``
 
@@ -334,9 +338,6 @@ class AuthTktCookieHelper(object):
         self.include_ip = include_ip
         self.secure = secure
         self.timeout = timeout
-        if reissue_time is not None and timeout is not None:
-            if reissue_time > timeout:
-                raise ValueError('reissue_time must be lower than timeout')
         self.reissue_time = reissue_time
         self.max_age = max_age
         self.http_only = http_only
@@ -421,6 +422,7 @@ class AuthTktCookieHelper(object):
             now = time.time()
 
         if self.timeout and ( (timestamp + self.timeout) < now ):
+            # the auth_tkt data has expired
             return None
 
         userid_typename = 'userid_type:'

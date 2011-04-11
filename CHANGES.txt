@@ -43,6 +43,12 @@ Features
   eg. ``context.result.permission``, ``context.result.acl``, etc within the
   logic of the Forbidden exception view.
 
+- Don't explicitly prevent the ``timeout`` from being lower than the
+  ``reissue_time`` when setting up an ``AuthTktAuthenticationPolicy``
+  (previously such a configuration would raise a ``ValueError``, now it's
+  allowed, although typically nonsensical).  Allowing the nonsensical
+  configuration made the code more understandable and required fewer tests.
+
 Bug Fixes
 ---------
 
