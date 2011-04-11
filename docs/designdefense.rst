@@ -1515,11 +1515,11 @@ Pyramid Doesn't Offer Pluggable Apps
 ------------------------------------
 
 It is "Pyramidic" to compose multiple external sources into the same
-configuration using :ref:`~pyramid.config.Configuration.include`.  Any number
-of includes can be done to compose an application; includes can even be done
-from within other includes.  Any directive can be used within an include that
-can be used outside of one (such as
-:ref:`~pyramid.config.Configurator.add_view`, etc).
+configuration using :meth:`~pyramid.config.Configuration.include`.  Any
+number of includes can be done to compose an application; includes can even
+be done from within other includes.  Any directive can be used within an
+include that can be used outside of one (such as
+:meth:`~pyramid.config.Configurator.add_view`, etc).
 
 Pyramid has a conflict detection system that will throw an error if two 
 included externals try to add "the same" configuration in a conflicting 
