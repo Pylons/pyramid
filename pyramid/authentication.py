@@ -64,9 +64,9 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         Default: ``None``.  A callback passed the :mod:`repoze.who`
         identity and the :term:`request`, expected to return ``None``
         if the user represented by the identity doesn't exist or a
-        sequence of group identifiers (possibly empty) if the user
+        sequence of principal identifiers (possibly empty) if the user
         does exist.  If ``callback`` is None, the userid will be
-        assumed to exist with no groups.
+        assumed to exist with no principals.
     """
     implements(IAuthenticationPolicy)
 
@@ -147,9 +147,9 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
 
         Default: ``None``.  A callback passed the userid and the request,
         expected to return None if the userid doesn't exist or a sequence
-        of group identifiers (possibly empty) if the user does exist.
+        of principal identifiers (possibly empty) if the user does exist.
         If ``callback`` is None, the userid will be assumed to exist with no
-        groups.
+        principals.
     """
     implements(IAuthenticationPolicy)
 
@@ -181,9 +181,9 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
 
        Default: ``None``.  A callback passed the userid and the
        request, expected to return ``None`` if the userid doesn't
-       exist or a sequence of group identifiers (possibly empty) if
+       exist or a sequence of principal identifiers (possibly empty) if
        the user does exist.  If ``callback`` is ``None``, the userid
-       will be assumed to exist with no groups.  Optional.
+       will be assumed to exist with no principals.  Optional.
 
     ``cookie_name``
 
