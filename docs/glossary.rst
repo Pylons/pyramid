@@ -872,11 +872,12 @@ Glossary
      ``pyramid_jinja2_starter``, which creates an application package based
      on the Jinja2 templating system.
 
-   pyramid_sqla
-     A package which provides a Pylons-esque scaffold which sports
-     support for :term:`view handler` application development,
-     :term:`SQLAlchemy` support, and other Pylons-like features.  See
-     https://bytebucket.org/sluggo/pyramid_sqla/wiki/html/index.html for more
+   Akhet
+     Akhet is a Pyramid-based development environment which provides a
+     Pylons-esque scaffold which sports support for :term:`view handler`
+     application development, :term:`SQLAlchemy` support, :term:`Mako`
+     templating by default, and other Pylons-like features.  See
+     http://docs.pylonsproject.org/projects/akhet/dev/index.html for more
      information.
 
    Pyramid Cookbook

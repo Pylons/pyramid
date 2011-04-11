@@ -64,21 +64,18 @@ The included scaffolds are these:
   :term:`SQLAlchemy`
 
 .. note:: At this time, each of these scaffolds uses the :term:`Chameleon`
-   templating system, which is incompatible with both Jython and PyPy.  To
-   use scaffolds to build applications which will run on Jython and
-   PyPy, you can try the ``pyramid_jinja2_starter`` scaffold which ships as
-   part of the :term:`pyramid_jinja2` package or the ``pyramid_sqla`` scaffold
-   which ships with the :term:`pyramid_sqla` package (it uses Mako),
-   both available from :term:`PyPI`.  You can also just use the above
-   scaffold and replace the Chameleon template it includes with a :term:`Mako` 
+   templating system, which is incompatible with Jython.  To use scaffolds to
+   build applications which will run on Jython, you can try the
+   ``pyramid_jinja2_starter`` scaffold which ships as part of the
+   :term:`pyramid_jinja2` package.  You can also just use any above scaffold
+   and replace the Chameleon template it includes with a :term:`Mako`
    analogue.
 
 Rather than use any of the above scaffolds, Pylons 1 users may feel more
-comfortable installing the :term:`pyramid_sqla` add-on package, which
-provides a scaffold named ``pyramid_sqla``.  This scaffold configures a 
-Pyramid application in a "Pylons-esque" way, including the use of a 
-:term:`view handler` to map URLs to code (it's much like a Pylons
-"controller").
+comfortable installing the :term:`Akhet` development environment, which
+provides a scaffold named ``akhet``.  This scaffold configures a Pyramid
+application in a "Pylons-esque" way, including the use of a :term:`view
+handler` to map URLs to code (a handler is much like a Pylons "controller").
 
 .. index::
    single: creating a project
