@@ -625,7 +625,8 @@ implementations.
    Such a section should consists of global parameters that are shared by all
    the applications, servers and :term:`middleware` defined within the
    configuration file.  The values in a ``[DEFAULT]`` section will be passed
-   to your application's ``main`` function as ``global_values``.
+   to your application's ``main`` function as ``global_values`` (see
+   the reference to the ``main`` function in :ref:`init_py`).
 
 ``production.ini``
 ~~~~~~~~~~~~~~~~~~~
@@ -637,6 +638,22 @@ exception messages to ``stderr`` by default.  It also turns off template
 development options such that templates are not automatically reloaded when
 changed, and turns off all debugging options.  You can use this file instead
 of ``development.ini`` when you put your application into production.
+
+.. index::
+   single: MANIFEST.in
+
+``MANIFEST.in``
+~~~~~~~~~~~~~~~
+
+The ``MANIFEST.in`` file is a :term:`distutils` configuration file which
+specifies the non-Python files that should be included when a
+:term:`distribution` of your Pyramid project is created when you run ``python
+setup.py sdist``.  Due to the information contained in the default
+``MANIFEST.in``, an sdist of your Pyramid project will include ``.txt``
+files, ``.ini`` files, ``.rst`` files, graphics files, and template files, as
+well as ``.py`` files.  See
+http://docs.python.org/distutils/sourcedist.html#the-manifest-in-template for
+more information about the syntax and usage of ``MANIFEST.in``.
 
 .. index::
    single: setup.py
@@ -784,6 +801,8 @@ when you need help.
 .. index::
    single: __init__.py
 
+.. _init_py:
+
 ``__init__.py``
 ~~~~~~~~~~~~~~~
 
@@ -802,8 +821,8 @@ also informs Python that the directory which contains it is a *package*.
 #. Line 2 imports the ``Root`` class from :mod:`myproject.resources` that we
    use later.
 
-#. Lines 4-12 define a function that returns a :app:`Pyramid` WSGI
-   application.  This function is meant to be called by the
+#. Lines 4-12 define a function named ``main`` that returns a :app:`Pyramid`
+   WSGI application.  This function is meant to be called by the
    :term:`PasteDeploy` framework as a result of running ``paster serve``.
 
    Within this function, application configuration is performed.
