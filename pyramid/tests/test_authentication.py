@@ -477,6 +477,29 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(len(response.headerlist), 3)
         self.assertEqual(response.headerlist[0][0], 'Set-Cookie')
 
+    def test_identify_cookie_reissue_already_reissued_this_request(self):
+        import time
+        plugin = self._makeOne('secret', timeout=10, reissue_time=0)
+        now = time.time()
+        plugin.auth_tkt.timestamp = now
+        plugin.now = now + 1
+        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
+        request._authtkt_reissued = True
+        result = plugin.identify(request)
+        self.failUnless(result)
+        self.assertEqual(len(request.callbacks), 0)
+
+    def test_identify_cookie_reissue_notyet(self):
+        import time
+        plugin = self._makeOne('secret', timeout=10, reissue_time=10)
+        now = time.time()
+        plugin.auth_tkt.timestamp = now
+        plugin.now = now + 1
+        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
+        result = plugin.identify(request)
+        self.failUnless(result)
+        self.assertEqual(len(request.callbacks), 0)
+
     def test_identify_cookie_reissue_with_tokens_default(self):
         # see https://github.com/Pylons/pyramid/issues#issue/108
         import time
@@ -658,6 +681,16 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(val['userid'],
                          userid.encode('utf-8').encode('base64').strip())
         self.assertEqual(val['user_data'], 'userid_type:b64unicode')
+
+    def test_remember_insane_userid(self):
+        plugin = self._makeOne('secret')
+        request = self._makeRequest()
+        userid = object()
+        result = plugin.remember(request, userid)
+        values = self._parseHeaders(result)
+        self.assertEqual(len(result), 3)
+        value = values[0]
+        self.failUnless('userid' in value.value)
 
     def test_remember_max_age(self):
         plugin = self._makeOne('secret')

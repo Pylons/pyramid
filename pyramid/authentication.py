@@ -435,9 +435,9 @@ class AuthTktCookieHelper(object):
                     userid = decoder(userid)
 
         reissue = self.reissue_time is not None
-            
-        if not hasattr(request, '_authtkt_reissued'):
-            if reissue and ( (now - timestamp) > self.reissue_time):
+
+        if reissue and not hasattr(request, '_authtkt_reissued'):
+            if ( (now - timestamp) > self.reissue_time ):
                 # work around https://github.com/Pylons/pyramid/issues#issue/108
                 tokens = filter(None, tokens)
                 headers = self.remember(request, userid, max_age=self.max_age,
@@ -469,8 +469,10 @@ class AuthTktCookieHelper(object):
         ``max_age``
           The max age of the auth_tkt cookie, in seconds.  When this value is
           set, the cookie's ``Max-Age`` and ``Expires`` settings will be set,
-          allowing the auth_tkt cookie to last between browser sessions.
-          Default: ``None``.
+          allowing the auth_tkt cookie to last between browser sessions.  If
+          this value is ``None``, the ``max_age`` value provided to the
+          helper itself will be used as the ``max_age`` value.  Default:
+          ``None``.
 
         ``tokens``
           A sequence of strings that will be placed into the auth_tkt tokens
@@ -479,7 +481,9 @@ class AuthTktCookieHelper(object):
           Tokens are available in the returned identity when an auth_tkt is
           found in the request and unpacked.  Default: ``()``.
         """
-        max_age = max_age or self.max_age
+        if max_age is None:
+            max_age = self.max_age
+
         environ = request.environ
 
         if self.include_ip:
@@ -490,6 +494,7 @@ class AuthTktCookieHelper(object):
         user_data = ''
 
         encoding_data = self.userid_type_encoders.get(type(userid))
+
         if encoding_data:
             encoding, encoder = encoding_data
             userid = encoder(userid)
