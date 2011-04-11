@@ -39,7 +39,7 @@ SQLAlchemy models are easier to use than directly-mapped ones.
 As you can see, our ``Page`` class has a class level attribute
 ``__tablename__`` which equals the string ``pages``.  This means that
 SQLAlchemy will store our wiki data in a SQL table named ``pages``.  Our Page
-class will also have class-level attributes named ``id``, ``pagename`` and
+class will also have class-level attributes named ``id``, ``name`` and
 ``data`` (all instances of :class:`sqlalchemy.Column`).  These will map to
 columns in the ``pages`` table.  The ``id`` attribute will be the primary key
 in the table.  The ``name`` attribute will be a text attribute, each value of
