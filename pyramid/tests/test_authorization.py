@@ -169,6 +169,29 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
         result = sorted(policy.principals_allowed_by_permission(context,'read'))
         self.assertEqual(result, [])
 
+    def test_principals_allowed_by_permission_deny_not_permission_in_acl(self):
+        from pyramid.security import Deny
+        from pyramid.security import Everyone
+        context = DummyContext()
+        acl = [ (Deny, Everyone, 'write') ]
+        context.__acl__ = acl
+        policy = self._makeOne()
+        result = sorted(
+            policy.principals_allowed_by_permission(context, 'read'))
+        self.assertEqual(result, [])
+
+    def test_principals_allowed_by_permission_deny_permission_in_acl(self):
+        from pyramid.security import Deny
+        from pyramid.security import Everyone
+        context = DummyContext()
+        acl = [ (Deny, Everyone, 'read') ]
+        context.__acl__ = acl
+        policy = self._makeOne()
+        result = sorted(
+            policy.principals_allowed_by_permission(context, 'read'))
+        self.assertEqual(result, [])
+        
+
 class DummyContext:
     def __init__(self, *arg, **kw):
         self.__dict__.update(kw)

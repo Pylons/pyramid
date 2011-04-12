@@ -115,18 +115,18 @@ class ACLAuthorizationPolicy(object):
             for ace_action, ace_principal, ace_permissions in acl:
                 if not hasattr(ace_permissions, '__iter__'):
                     ace_permissions = [ace_permissions]
-                if ace_action == Allow and permission in ace_permissions:
+                if (ace_action == Allow) and (permission in ace_permissions):
                     if not ace_principal in denied_here:
                         allowed_here.add(ace_principal)
-                if ace_action == Deny and permission in ace_permissions:
-                    denied_here.add(ace_principal)
-                    if ace_principal == Everyone:
-                        # clear the entire allowed set, as we've hit a
-                        # deny of Everyone ala (Deny, Everyone, ALL)
-                        allowed = set()
-                        break
-                    elif ace_principal in allowed:
-                        allowed.remove(ace_principal)
+                if (ace_action == Deny) and (permission in ace_permissions):
+                        denied_here.add(ace_principal)
+                        if ace_principal == Everyone:
+                            # clear the entire allowed set, as we've hit a
+                            # deny of Everyone ala (Deny, Everyone, ALL)
+                            allowed = set()
+                            break
+                        elif ace_principal in allowed:
+                            allowed.remove(ace_principal)
 
             allowed.update(allowed_here)
 
