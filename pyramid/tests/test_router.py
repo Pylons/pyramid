@@ -112,6 +112,12 @@ class TestRouter(unittest.TestCase):
         environ.update(extras)
         return environ
 
+    def test_ctor_registry_has_no_settings(self):
+        self.registry.settings = None
+        router = self._makeOne()
+        self.failIf('debug_notfound' in router.__dict__)
+        self.failIf('debug_routematch' in router.__dict__)
+
     def test_root_policy(self):
         context = DummyContext()
         self._registerTraverserFactory(context)
