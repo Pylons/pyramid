@@ -22,4 +22,5 @@ dist/
 bin/
 lib/
 include/
+.idea/
 distribute-*.tar.gz
