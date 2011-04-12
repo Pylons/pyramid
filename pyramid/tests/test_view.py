@@ -499,6 +499,27 @@ class Test_default_exceptionresponse_view(unittest.TestCase):
         result = self._callFUT(context, request)
         self.assertEqual(result, 'abc')
 
+class Test_patch_mimetypes(unittest.TestCase):
+    def _callFUT(self, module):
+        from pyramid.view import init_mimetypes
+        return init_mimetypes(module)
+
+    def test_has_init(self):
+        class DummyMimetypes(object):
+            def init(self):
+                self.initted = True
+        module = DummyMimetypes()
+        result = self._callFUT(module)
+        self.assertEqual(result, True)
+        self.assertEqual(module.initted, True)
+        
+    def test_missing_init(self):
+        class DummyMimetypes(object):
+            pass
+        module = DummyMimetypes()
+        result = self._callFUT(module)
+        self.assertEqual(result, False)
+
 class ExceptionResponse(Exception):
     status = '404 Not Found'
     app_iter = ['Not Found']

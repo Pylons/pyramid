@@ -1,15 +1,4 @@
 import mimetypes
-
-# See http://bugs.python.org/issue5853 which is a recursion bug
-# that seems to effect Python 2.6, Python 2.6.1, and 2.6.2 (a fix
-# has been applied on the Python 2 trunk).  This workaround should
-# really be in Paste if anywhere, but it's easiest to just do it
-# here and get it over with to avoid needing to deal with any
-# fallout.
-
-if hasattr(mimetypes, 'init'):
-    mimetypes.init()
-
 import venusian
 
 from zope.interface import providedBy
@@ -23,6 +12,21 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import RendererHelper
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
+
+def init_mimetypes(mimetypes):
+    # this is a function so it can be unittested
+    if hasattr(mimetypes, 'init'):
+        mimetypes.init()
+        return True
+    return False
+
+# See http://bugs.python.org/issue5853 which is a recursion bug
+# that seems to effect Python 2.6, Python 2.6.1, and 2.6.2 (a fix
+# has been applied on the Python 2 trunk).  This workaround should
+# really be in Paste if anywhere, but it's easiest to just do it
+# here and get it over with to avoid needing to deal with any
+# fallout.
+init_mimetypes(mimetypes)
 
 # Nast BW compat hack: dont yet deprecate this (ever?)
 class static(static_view): # only subclass for purposes of autodoc
