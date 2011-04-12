@@ -115,6 +115,8 @@ class TestRouter(unittest.TestCase):
     def test_ctor_registry_has_no_settings(self):
         self.registry.settings = None
         router = self._makeOne()
+        self.assertEqual(router.debug_notfound, False)
+        self.assertEqual(router.debug_routematch, False)
         self.failIf('debug_notfound' in router.__dict__)
         self.failIf('debug_routematch' in router.__dict__)
 
