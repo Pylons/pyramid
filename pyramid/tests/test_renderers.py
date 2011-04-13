@@ -10,15 +10,162 @@ class TestTemplateRendererFactory(unittest.TestCase):
     def tearDown(self):
         cleanUp()
         
-    def _callFUT(self, path, factory):
+    def _callFUT(self, info, impl):
         from pyramid.renderers import template_renderer_factory
-        return template_renderer_factory(path, factory)
+        return template_renderer_factory(info, impl)
 
-    def test_abspath_notfound(self):
+    def test_lookup_found(self):
+        from pyramid.interfaces import IChameleonLookup
+        L = []
+        def dummy(info):
+            L.append(info)
+            return True
+        self.config.registry.registerUtility(dummy, IChameleonLookup,
+                                             name='abc')
+        class DummyInfo(object):
+            pass
+        info = DummyInfo()
+        info.registry = self.config.registry
+        info.type = 'abc'
+        result = self._callFUT(info, None)
+        self.assertEqual(result, True)
+        self.assertEqual(L, [info])
+
+    def test_lookup_miss(self):
         from pyramid.interfaces import ITemplateRenderer
+        import os
+        abspath = os.path.abspath(__file__)
+        renderer = {}
+        self.config.registry.registerUtility(
+            renderer, ITemplateRenderer, name=abspath)
+        info = DummyRendererInfo({
+            'name':abspath,
+            'package':None,
+            'registry':self.config.registry,
+            'settings':{},
+            'type':'type',
+            })
+        result = self._callFUT(info, None)
+        self.failUnless(result is renderer)
+
+class TestChameleonRendererLookup(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+        
+    def _makeOne(self, impl):
+        from pyramid.renderers import ChameleonRendererLookup
+        return ChameleonRendererLookup(impl, self.config.registry)
+
+    def _registerTemplateRenderer(self, renderer, name):
+        from pyramid.interfaces import ITemplateRenderer
+        self.config.registry.registerUtility(
+            renderer, ITemplateRenderer, name=name)
+
+    def test_get_spec_not_abspath_no_colon_no_package(self):
+        lookup = self._makeOne(None)
+        result = lookup.get_spec('foo', None)
+        self.assertEqual(result, 'foo')
+
+    def test_get_spec_not_abspath_no_colon_with_package(self):
+        from pyramid import tests
+        lookup = self._makeOne(None)
+        result = lookup.get_spec('foo', tests)
+        self.assertEqual(result, 'pyramid.tests:foo')
+
+    def test_get_spec_not_abspath_with_colon_no_package(self):
+        lookup = self._makeOne(None)
+        result = lookup.get_spec('fudge:foo', None)
+        self.assertEqual(result, 'fudge:foo')
+
+    def test_get_spec_not_abspath_with_colon_with_package(self):
+        from pyramid import tests
+        lookup = self._makeOne(None)
+        result = lookup.get_spec('fudge:foo', tests)
+        self.assertEqual(result, 'fudge:foo')
+
+    def test_get_spec_is_abspath_no_colon_no_package(self):
+        import os
+        lookup = self._makeOne(None)
+        spec = os.path.abspath(__file__)
+        result = lookup.get_spec(spec, None)
+        self.assertEqual(result, spec)
+
+    def test_get_spec_is_abspath_no_colon_with_path_in_package(self):
+        from pyramid import tests
+        import os
+        lookup = self._makeOne(None)
+        f = __file__
+        spec = os.path.abspath(f)
+        result = lookup.get_spec(spec, tests)
+        self.assertEqual(result, 'pyramid.tests:%s' % os.path.split(f)[-1])
+
+    def test_get_spec_is_abspath_no_colon_with_path_outside_package(self):
+        import venusian # used only because it's outside of pyramid.tests
+        import os
+        lookup = self._makeOne(None)
+        f = __file__
+        spec = os.path.abspath(f)
+        result = lookup.get_spec(spec, venusian)
+        self.assertEqual(result, spec)
+
+    def test_get_spec_is_abspath_with_colon_no_package(self):
+        import os
+        lookup = self._makeOne(None)
+        spec = os.path.join(os.path.abspath(__file__), ':foo')
+        result = lookup.get_spec(spec, None)
+        self.assertEqual(result, spec)
+
+    def test_get_spec_is_abspath_with_colon_with_path_in_package(self):
+        from pyramid import tests
+        import os
+        lookup = self._makeOne(None)
+        f = os.path.abspath(__file__)
+        spec = os.path.join(f, ':foo')
+        result = lookup.get_spec(spec, tests)
+        tail = spec.split(os.sep)[-2:]
+        self.assertEqual(result, 'pyramid.tests:%s/%s' % tuple(tail))
+
+    def test_get_spec_is_abspath_with_colon_with_path_outside_package(self):
+        import venusian # used only because it's outside of pyramid.tests
+        import os
+        lookup = self._makeOne(None)
+        spec = os.path.join(os.path.abspath(__file__), ':foo')
+        result = lookup.get_spec(spec, venusian)
+        self.assertEqual(result, spec)
+
+    def test_translate(self):
+        from pyramid.interfaces import IChameleonTranslate
+        def t(): pass
+        self.config.registry.registerUtility(t, IChameleonTranslate)
+        lookup = self._makeOne(None)
+        self.assertEqual(lookup.translate, t)
+
+    def test_debug_settings_None(self):
+        self.config.registry.settings = None
+        lookup = self._makeOne(None)
+        self.assertEqual(lookup.debug, False)
+
+    def test_debug_settings_not_None(self):
+        self.config.registry.settings = {'debug_templates':True}
+        lookup = self._makeOne(None)
+        self.assertEqual(lookup.debug, True)
+
+    def test_auto_reload_settings_None(self):
+        self.config.registry.settings = None
+        lookup = self._makeOne(None)
+        self.assertEqual(lookup.auto_reload, False)
+
+    def test_auto_reload_settings_not_None(self):
+        self.config.registry.settings = {'reload_templates':True}
+        lookup = self._makeOne(None)
+        self.assertEqual(lookup.auto_reload, True)
+
+    def test___call__abspath_path_notexists(self):
         abspath = '/wont/exist'
-        self.config.registry.registerUtility(
-            {}, ITemplateRenderer, name=abspath)
+        self._registerTemplateRenderer({}, abspath)
         info = DummyRendererInfo({
             'name':abspath,
             'package':None,
@@ -26,15 +173,14 @@ class TestTemplateRendererFactory(unittest.TestCase):
             'settings':{},
             'type':'type',
             })
-        self.assertRaises(ValueError, self._callFUT, info, None)
+        lookup = self._makeOne(None)
+        self.assertRaises(ValueError, lookup.__call__, info)
 
-    def test_abspath_alreadyregistered(self):
-        from pyramid.interfaces import ITemplateRenderer
+    def test___call__abspath_alreadyregistered(self):
         import os
         abspath = os.path.abspath(__file__)
         renderer = {}
-        self.config.registry.registerUtility(
-            renderer, ITemplateRenderer, name=abspath)
+        self._registerTemplateRenderer(renderer, abspath)
         info = DummyRendererInfo({
             'name':abspath,
             'package':None,
@@ -42,16 +188,15 @@ class TestTemplateRendererFactory(unittest.TestCase):
             'settings':{},
             'type':'type',
             })
-        result = self._callFUT(info, None)
+        lookup = self._makeOne(None)
+        result = lookup(info)
         self.failUnless(result is renderer)
 
-    def test_abspath_notyetregistered(self):
-        from pyramid.interfaces import ITemplateRenderer
+    def test___call__abspath_notyetregistered(self):
         import os
         abspath = os.path.abspath(__file__)
         renderer = {}
-        self.config.registry.registerUtility(
-            renderer, ITemplateRenderer, name=abspath)
+        factory = DummyFactory(renderer)
         info = DummyRendererInfo({
             'name':abspath,
             'package':None,
@@ -59,15 +204,14 @@ class TestTemplateRendererFactory(unittest.TestCase):
             'settings':{},
             'type':'type',
             })
-        result = self._callFUT(info, None)
-        self.failUnless(result is renderer)
+        lookup = self._makeOne(factory)
+        result = lookup(info)
+        self.assertEqual(result, renderer)
 
-    def test_relpath_path_registered(self):
+    def test___call__relpath_path_registered(self):
         renderer = {}
-        from pyramid.interfaces import ITemplateRenderer
-        self.config.registry.registerUtility(
-            renderer, ITemplateRenderer, name='foo/bar')
         spec = 'foo/bar'
+        self._registerTemplateRenderer(renderer, spec)
         info = DummyRendererInfo({
             'name':spec,
             'package':None,
@@ -75,17 +219,15 @@ class TestTemplateRendererFactory(unittest.TestCase):
             'settings':{},
             'type':'type',
             })
-        result = self._callFUT(info, None)
+        lookup = self._makeOne(None)
+        result = lookup(info)
         self.failUnless(renderer is result)
 
-    def test_relpath_has_package_registered(self):
+    def test___call__relpath_has_package_registered(self):
         renderer = {}
-        from pyramid.interfaces import ITemplateRenderer
         import pyramid.tests
         spec = 'bar/baz'
-        self.config.registry.registerUtility(
-            renderer, ITemplateRenderer,
-            name='pyramid.tests:bar/baz')
+        self._registerTemplateRenderer(renderer, 'pyramid.tests:bar/baz')
         info = DummyRendererInfo({
             'name':spec,
             'package':pyramid.tests,
@@ -93,10 +235,11 @@ class TestTemplateRendererFactory(unittest.TestCase):
             'settings':{},
             'type':'type',
             })
-        result = self._callFUT(info, None)
+        lookup = self._makeOne(None)
+        result = lookup(info)
         self.failUnless(renderer is result)
 
-    def test_spec_notfound(self):
+    def test___call__spec_notfound(self):
         spec = 'pyramid.tests:wont/exist'
         info = DummyRendererInfo({
             'name':spec,
@@ -105,10 +248,10 @@ class TestTemplateRendererFactory(unittest.TestCase):
             'settings':{},
             'type':'type',
             })
-        self.assertRaises(ValueError, self._callFUT, info, None)
+        lookup = self._makeOne(None)
+        self.assertRaises(ValueError, lookup.__call__, info)
 
-    def test_spec_alreadyregistered(self):
-        from pyramid.interfaces import ITemplateRenderer
+    def test___call__spec_alreadyregistered(self):
         from pyramid import tests
         module_name = tests.__name__
         relpath = 'test_renderers.py'
@@ -121,12 +264,12 @@ class TestTemplateRendererFactory(unittest.TestCase):
             'type':'type',
             })
         renderer = {}
-        self.config.registry.registerUtility(
-            renderer, ITemplateRenderer, name=spec)
-        result = self._callFUT(info, None)
+        self._registerTemplateRenderer(renderer, spec)
+        lookup = self._makeOne(None)
+        result = lookup(info)
         self.failUnless(result is renderer)
 
-    def test_spec_notyetregistered(self):
+    def test___call__spec_notyetregistered(self):
         import os
         from pyramid import tests
         module_name = tests.__name__
@@ -141,7 +284,8 @@ class TestTemplateRendererFactory(unittest.TestCase):
             'settings':{},
             'type':'type',
             })
-        result = self._callFUT(info, factory)
+        lookup = self._makeOne(factory)
+        result = lookup(info)
         self.failUnless(result is renderer)
         path = os.path.abspath(__file__).split('$')[0] # jython
         if path.endswith('.pyc'): # pragma: no cover
@@ -149,7 +293,7 @@ class TestTemplateRendererFactory(unittest.TestCase):
         self.failUnless(factory.path.startswith(path))
         self.assertEqual(factory.kw, {})
 
-    def test_reload_assets_true(self):
+    def test___call__reload_assets_true(self):
         import pyramid.tests
         from pyramid.interfaces import ISettings
         from pyramid.interfaces import ITemplateRenderer
@@ -166,13 +310,14 @@ class TestTemplateRendererFactory(unittest.TestCase):
             'settings':settings,
             'type':'type',
             })
-        result = self._callFUT(info, factory)
+        lookup = self._makeOne(factory)
+        result = lookup(info)
         self.failUnless(result is renderer)
         spec = '%s:%s' % ('pyramid.tests', 'test_renderers.py')
         self.assertEqual(reg.queryUtility(ITemplateRenderer, name=spec),
                          None)
 
-    def test_reload_assets_false(self):
+    def test___call__reload_assets_false(self):
         import pyramid.tests
         from pyramid.interfaces import ITemplateRenderer
         settings = {'reload_assets':False}
@@ -187,7 +332,8 @@ class TestTemplateRendererFactory(unittest.TestCase):
             'settings':settings,
             'type':'type',
             })
-        result = self._callFUT(info, factory)
+        lookup = self._makeOne(factory)
+        result = lookup(info)
         self.failUnless(result is renderer)
         spec = '%s:%s' % ('pyramid.tests', 'test_renderers.py')
         self.assertNotEqual(reg.queryUtility(ITemplateRenderer, name=spec),
@@ -323,6 +469,18 @@ class TestRendererHelper(unittest.TestCase):
         from pyramid.interfaces import IRendererInfo
         helper = self._makeOne()
         verifyObject(IRendererInfo, helper)
+
+    def test_settings_registry_settings_is_None(self):
+        class Dummy(object):
+            settings = None
+        helper = self._makeOne(registry=Dummy)
+        self.assertEqual(helper.settings, {})
+
+    def test_settings_registry_settings_is_not_None(self):
+        class Dummy(object):
+            settings = {'a':1}
+        helper = self._makeOne(registry=Dummy)
+        self.assertEqual(helper.settings, {'a':1})
 
     def _registerRendererFactory(self):
         from pyramid.interfaces import IRendererFactory
@@ -504,6 +662,18 @@ class Test_render(unittest.TestCase):
         renderer.assert_(a=1)
         renderer.assert_(request=request)
 
+    def test_it_with_package(self):
+        import pyramid.tests
+        renderer = self.config.testing_add_renderer(
+            'pyramid.tests:abc/def.pt')
+        renderer.string_response = 'abc'
+        request = testing.DummyRequest()
+        result = self._callFUT('abc/def.pt', dict(a=1), request=request,
+                               package=pyramid.tests)
+        self.assertEqual(result, 'abc')
+        renderer.assert_(a=1)
+        renderer.assert_(request=request)
+
 class Test_render_to_response(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
@@ -535,7 +705,19 @@ class Test_render_to_response(unittest.TestCase):
         self.assertEqual(response.body, 'abc')
         renderer.assert_(a=1)
         renderer.assert_(request=request)
-    
+
+    def test_it_with_package(self):
+        import pyramid.tests
+        renderer = self.config.testing_add_renderer(
+            'pyramid.tests:abc/def.pt')
+        renderer.string_response = 'abc'
+        request = testing.DummyRequest()
+        response = self._callFUT('abc/def.pt', dict(a=1), request=request,
+                                 package=pyramid.tests)
+        self.assertEqual(response.body, 'abc')
+        renderer.assert_(a=1)
+        renderer.assert_(request=request)
+
 class Test_get_renderer(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
@@ -545,12 +727,19 @@ class Test_get_renderer(unittest.TestCase):
 
     def _callFUT(self, renderer_name, **kw):
         from pyramid.renderers import get_renderer
-        return get_renderer(renderer_name)
+        return get_renderer(renderer_name, **kw)
 
-    def test_it(self):
+    def test_it_no_package(self):
         renderer = self.config.testing_add_renderer(
             'pyramid.tests:abc/def.pt')
         result = self._callFUT('abc/def.pt')
+        self.assertEqual(result, renderer)
+
+    def test_it_with_package(self):
+        import pyramid.tests
+        renderer = self.config.testing_add_renderer(
+            'pyramid.tests:abc/def.pt')
+        result = self._callFUT('abc/def.pt', package=pyramid.tests)
         self.assertEqual(result, renderer)
 
 class Dummy:

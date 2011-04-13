@@ -160,15 +160,30 @@ class ChameleonRendererLookup(object):
         self.lock = threading.Lock()
 
     def get_spec(self, name, package):
-        spec = name
-        isabs = os.path.isabs(name)
+        if not package:
+            # if there's no package, we can't do any conversion
+            return name
 
-        if (not isabs) and (not ':' in name) and package:
-            # relative asset spec
-            if not isabs:
-                pp = package_path(package)
-                spec = os.path.join(pp, spec)
+        spec = name
+        isabspath = os.path.isabs(name)
+        colon_in_name = ':' in name
+        isabsspec = colon_in_name and (not isabspath)
+        isrelspec = (not isabsspec) and (not isabspath)
+
+        # if it's already an absolute spec, we don't need to do anything,
+        # but if it's a relative spec or an absolute path, we need to try
+        # to convert it to an absolute spec
+
+        if isrelspec:
+            # convert relative asset spec to absolute asset spec
+            pp = package_path(package)
+            spec = os.path.join(pp, spec)
             spec = asset_spec_from_abspath(spec, package)
+
+        elif isabspath:
+            # convert absolute path to absolute asset spec
+            spec = asset_spec_from_abspath(spec, package)
+
         return spec
 
     @property # wait until completely necessary to look up translator
@@ -177,12 +192,16 @@ class ChameleonRendererLookup(object):
 
     @property # wait until completely necessary to look up debug_templates
     def debug(self):
-        settings = self.registry.settings or {}
+        settings = self.registry.settings
+        if settings is None:
+            return False
         return settings.get('debug_templates', False)
 
     @property # wait until completely necessary to look up reload_templates
     def auto_reload(self):
-        settings = self.registry.settings or {}
+        settings = self.registry.settings
+        if settings is None:
+            return False
         return settings.get('reload_templates', False)
 
     def __call__(self, info):
@@ -220,7 +239,7 @@ class ChameleonRendererLookup(object):
                     raise ValueError(
                         'Missing template asset: %s (%s)' % (spec, abspath))
                 renderer = self.impl(abspath, self)
-                settings = info.settings or {}
+                settings = info.settings
                 if not settings.get('reload_assets'):
                     # cache the template
                     self.lock.acquire()
@@ -268,7 +287,9 @@ class RendererHelper(object):
 
     @reify
     def settings(self):
-        settings = self.registry.settings or {}
+        settings = self.registry.settings
+        if settings is None:
+            settings = {}
         return settings
 
     @reify
