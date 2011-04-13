@@ -34,6 +34,8 @@ Should-Have
 
 - Fix message catalog extraction / compilation documentation.
 
+- Review http://alexmarandon.com/articles/zodb_bfg_pyramid_notes .
+
 Nice-to-Have
 ------------
 
