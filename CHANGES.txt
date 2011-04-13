@@ -13,6 +13,14 @@ Documentation
 
 - The ``wiki2`` (SQLA+URL Dispatch) tutorial was updated slightly.
 
+- Make ``pyramid.interfaces.IAuthenticationPolicy`` and
+  ``pyramid.interfaces.IAuthorizationPolicy`` public interfaces, and refer to
+  them within the ``pyramid.authentication`` and ``pyramid.authorization``
+  API docs.
+
+- Render the function definitions for each exposed interface in
+  ``pyramid.interfaces``.
+
 Features
 --------
 

@@ -141,17 +141,6 @@ class IViewMapperFactory(Interface):
         invocation signatures and response values.
         """
 
-# internal interfaces
-
-class IRequest(Interface):
-    """ Request type interface attached to all request objects """
-
-IRequest.combined = IRequest # for exception view lookups 
-
-class IRouteRequest(Interface):
-    """ *internal only* interface used as in a utility lookup to find
-    route-specific interfaces.  Not an API."""
-
 class IAuthenticationPolicy(Interface):
     """ An object representing a Pyramid authentication policy. """
     def authenticated_userid(request):
@@ -179,7 +168,7 @@ class IAuthenticationPolicy(Interface):
         """ Return a set of headers suitable for 'remembering' the
         principal named ``principal`` when set in a response.  An
         individual authentication policy and its consumers can decide
-        on the composition and meaning of **kw. """
+        on the composition and meaning of ``**kw.`` """
     
     def forget(request):
         """ Return a set of headers suitable for 'forgetting' the
@@ -200,6 +189,18 @@ class IAuthorizationPolicy(Interface):
         will only be called when the
         ``pyramid.security.principals_allowed_by_permission`` API is
         used."""
+
+
+# internal interfaces
+
+class IRequest(Interface):
+    """ Request type interface attached to all request objects """
+
+IRequest.combined = IRequest # for exception view lookups 
+
+class IRouteRequest(Interface):
+    """ *internal only* interface used as in a utility lookup to find
+    route-specific interfaces.  Not an API."""
 
 class IStaticURLInfo(Interface):
     """ A policy for generating URLs to static assets """

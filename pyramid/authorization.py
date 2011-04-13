@@ -55,6 +55,9 @@ class ACLAuthorizationPolicy(object):
       is cleared for all principals encountered in previous ACLs.  The
       walking process ends after we've processed the any ACL directly
       attached to ``context``; a set of principals is returned.
+
+    Objects of this class implement the
+    :class:`pyramid.interfaces.IAuthorizationPolicy` interface.
     """
 
     implements(IAuthorizationPolicy)

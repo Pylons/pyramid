@@ -18,6 +18,7 @@ Helper Classes
 ~~~~~~~~~~~~~~
 
   .. autoclass:: AuthTktCookieHelper
+     :members:
 
 
 

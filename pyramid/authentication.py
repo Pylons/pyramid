@@ -67,6 +67,9 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         sequence of group identifiers (possibly empty) if the user
         does exist.  If ``callback`` is None, the userid will be
         assumed to exist with no groups.
+
+    Objects of this class implement the interface described by
+    :class:`pyramid.interfaces.IAuthenticationPolicy`.
     """
     implements(IAuthenticationPolicy)
 
@@ -150,6 +153,9 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
         of group identifiers (possibly empty) if the user does exist.
         If ``callback`` is None, the userid will be assumed to exist with no
         groups.
+
+    Objects of this class implement the interface described by
+    :class:`pyramid.interfaces.IAuthenticationPolicy`.
     """
     implements(IAuthenticationPolicy)
 
@@ -257,6 +263,9 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
        Default: ``True``. An auth_tkt cookie will be generated for the
        wildcard domain.
        Optional.
+
+    Objects of this class implement the interface described by
+    :class:`pyramid.interfaces.IAuthenticationPolicy`.
     """
     implements(IAuthenticationPolicy)
     def __init__(self,
