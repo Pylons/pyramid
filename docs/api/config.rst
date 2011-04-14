@@ -74,6 +74,8 @@
 
      .. automethod:: set_renderer_globals_factory
 
+     .. automethod:: set_view_mapper
+
      .. automethod:: testing_securitypolicy
 
      .. automethod:: testing_resources

@@ -2085,7 +2085,7 @@ class Configurator(object):
         if you had passed a ``default_view_mapper`` argument to the
         :class:`pyramid.config.Configurator` constructor.
         
-        See also :ref:`using_an_alternate_view_mapper`.
+        See also :ref:`using_a_view_mapper`.
         """
         mapper = self.maybe_dotted(mapper)
         self.registry.registerUtility(mapper, IViewMapperFactory)

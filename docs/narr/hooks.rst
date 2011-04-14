@@ -606,9 +606,9 @@ A user might make use of these framework components like so:
        config.add_handler('two', '/{action}/{id}', MyController)
        serve(config.make_wsgi_app())
 
-The :meth:`pyramid.config.Configurator.set_default_mapper` method can be used
-to set a *default* view mapper (overriding the superdefault view mapper used
-by Pyramid itself).
+The :meth:`pyramid.config.Configurator.set_view_mapper` method can be used to
+set a *default* view mapper (overriding the superdefault view mapper used by
+Pyramid itself).
 
 A *single* view registration can use a view mapper by passing the mapper as
 the ``mapper`` argument to :meth:`~pyramid.config.Configuration.add_view`.

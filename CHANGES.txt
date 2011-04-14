@@ -21,6 +21,10 @@ Documentation
 - Render the function definitions for each exposed interface in
   ``pyramid.interfaces``.
 
+- Add missing docs reference to
+  ``pyramid.config.Configurator.set_view_mapper`` and refer to it within
+  Hooks chapter section named "Using a View Mapper".
+
 Features
 --------
 
