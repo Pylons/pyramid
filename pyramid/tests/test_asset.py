@@ -73,7 +73,7 @@ class TestOverrideProvider(unittest.TestCase):
         resource_name = 'fixtures'
         import pyramid.tests
         provider = self._makeOne(pyramid.tests)
-        result = provider.resource_isdir(resource_name)
+        result = provider.resource_listdir(resource_name)
         self.failUnless(result)
 
     def test_get_resource_filename_override_returns_None(self):
@@ -96,9 +96,9 @@ class TestOverrideProvider(unittest.TestCase):
         import pyramid.tests
         provider = self._makeOne(pyramid.tests)
         here = os.path.dirname(os.path.abspath(__file__))
-        expected = os.path.join(here, resource_name)
-        result = provider.get_resource_filename(None, resource_name)
-        self.assertEqual(result, expected)
+        expected = open(os.path.join(here, resource_name)).read()
+        result = provider.get_resource_stream(None, resource_name)
+        self.assertEqual(result.read(), expected)
 
     def test_get_resource_string_override_returns_None(self):
         overrides = DummyOverrides(None)
@@ -108,8 +108,8 @@ class TestOverrideProvider(unittest.TestCase):
         import pyramid.tests
         provider = self._makeOne(pyramid.tests)
         here = os.path.dirname(os.path.abspath(__file__))
-        expected = os.path.join(here, resource_name)
-        result = provider.get_resource_filename(None, resource_name)
+        expected = open(os.path.join(here, resource_name)).read()
+        result = provider.get_resource_string(None, resource_name)
         self.assertEqual(result, expected)
 
     def test_has_resource_override_returns_None(self):
@@ -248,6 +248,17 @@ class TestPackageOverrides(unittest.TestCase):
         override = po.overrides[0]
         self.assertEqual(override.__class__, FileOverride)
 
+    def test_insert_emptystring(self):
+        # XXX is this a valid case for a directory?
+        from pyramid.resource import DirectoryOverride
+        package = DummyPackage('package')
+        po = self._makeOne(package)
+        po.overrides= [None]
+        po.insert('', 'package', 'bar/')
+        self.assertEqual(len(po.overrides), 2)
+        override = po.overrides[0]
+        self.assertEqual(override.__class__, DirectoryOverride)
+
     def test_search_path(self):
         overrides = [ DummyOverride(None), DummyOverride(('package', 'name'))]
         package = DummyPackage('package')
@@ -266,6 +277,14 @@ class TestPackageOverrides(unittest.TestCase):
         here = os.path.dirname(os.path.abspath(__file__))
         expected = os.path.join(here, 'test_asset.py')
         self.assertEqual(po.get_filename('whatever'), expected)
+
+    def test_get_filename_file_doesnt_exist(self):
+        overrides = [ DummyOverride(None), DummyOverride(
+            ('pyramid.tests', 'wont_exist'))]
+        package = DummyPackage('package')
+        po = self._makeOne(package)
+        po.overrides= overrides
+        self.assertEqual(po.get_filename('whatever'), None)
         
     def test_get_stream(self):
         import os
@@ -276,8 +295,17 @@ class TestPackageOverrides(unittest.TestCase):
         po.overrides= overrides
         here = os.path.dirname(os.path.abspath(__file__))
         expected = open(os.path.join(here, 'test_asset.py')).read()
-        self.assertEqual(po.get_stream('whatever').read().replace('\r', ''), expected)
+        self.assertEqual(po.get_stream('whatever').read().replace('\r', ''),
+                         expected)
         
+    def test_get_stream_file_doesnt_exist(self):
+        overrides = [ DummyOverride(None), DummyOverride(
+            ('pyramid.tests', 'wont_exist'))]
+        package = DummyPackage('package')
+        po = self._makeOne(package)
+        po.overrides= overrides
+        self.assertEqual(po.get_stream('whatever'), None)
+
     def test_get_string(self):
         import os
         overrides = [ DummyOverride(None), DummyOverride(
@@ -289,6 +317,14 @@ class TestPackageOverrides(unittest.TestCase):
         expected = open(os.path.join(here, 'test_asset.py')).read()
         self.assertEqual(po.get_string('whatever').replace('\r', ''), expected)
         
+    def test_get_string_file_doesnt_exist(self):
+        overrides = [ DummyOverride(None), DummyOverride(
+            ('pyramid.tests', 'wont_exist'))]
+        package = DummyPackage('package')
+        po = self._makeOne(package)
+        po.overrides= overrides
+        self.assertEqual(po.get_string('whatever'), None)
+
     def test_has_resource(self):
         overrides = [ DummyOverride(None), DummyOverride(
             ('pyramid.tests', 'test_asset.py'))]
@@ -296,6 +332,14 @@ class TestPackageOverrides(unittest.TestCase):
         po = self._makeOne(package)
         po.overrides= overrides
         self.assertEqual(po.has_resource('whatever'), True)
+
+    def test_has_resource_file_doesnt_exist(self):
+        overrides = [ DummyOverride(None), DummyOverride(
+            ('pyramid.tests', 'wont_exist'))]
+        package = DummyPackage('package')
+        po = self._makeOne(package)
+        po.overrides= overrides
+        self.assertEqual(po.has_resource('whatever'), None)
 
     def test_isdir_false(self):
         overrides = [ DummyOverride(
@@ -313,6 +357,14 @@ class TestPackageOverrides(unittest.TestCase):
         po.overrides= overrides
         self.assertEqual(po.isdir('whatever'), True)
 
+    def test_isdir_doesnt_exist(self):
+        overrides = [ DummyOverride(None), DummyOverride(
+            ('pyramid.tests', 'wont_exist'))]
+        package = DummyPackage('package')
+        po = self._makeOne(package)
+        po.overrides= overrides
+        self.assertEqual(po.isdir('whatever'), None)
+
     def test_listdir(self):
         overrides = [ DummyOverride(
             ('pyramid.tests', 'fixtures'))]
@@ -320,6 +372,14 @@ class TestPackageOverrides(unittest.TestCase):
         po = self._makeOne(package)
         po.overrides= overrides
         self.failUnless(po.listdir('whatever'))
+
+    def test_listdir_doesnt_exist(self):
+        overrides = [ DummyOverride(None), DummyOverride(
+            ('pyramid.tests', 'wont_exist'))]
+        package = DummyPackage('package')
+        po = self._makeOne(package)
+        po.overrides= overrides
+        self.assertEqual(po.listdir('whatever'), None)
 
 class TestDirectoryOverride(unittest.TestCase):
     def _getTargetClass(self):
