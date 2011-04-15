@@ -1491,6 +1491,16 @@ class ConfiguratorTests(unittest.TestCase):
         self.failIfEqual(wrapper, None)
         self.assertEqual(wrapper(None, None), 'OK')
 
+    def test_add_view_with_route_name_deferred_views_already_exist(self):
+        view = lambda *arg: 'OK'
+        config = self._makeOne(autocommit=True)
+        config.registry.deferred_route_views = {'bar':[]}
+        config.add_view(view=view, route_name='foo')
+        self.assertEqual(len(config.registry.deferred_route_views), 2)
+        self.assertEqual(config.registry.deferred_route_views['bar'], [])
+        infos = config.registry.deferred_route_views['foo']
+        self.assertEqual(len(infos), 1)
+
     def test_deferred_route_views_retains_custom_predicates(self):
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
@@ -2489,6 +2499,16 @@ class ConfiguratorTests(unittest.TestCase):
                           config.add_translation_dirs,
                           '/wont/exist/on/my/system')
 
+    def test_add_translation_dirs_no_specs(self):
+        from pyramid.interfaces import ITranslationDirectories
+        from pyramid.interfaces import IChameleonTranslate
+        config = self._makeOne()
+        config.add_translation_dirs()
+        self.assertEqual(config.registry.queryUtility(ITranslationDirectories),
+                         None)
+        self.assertEqual(config.registry.queryUtility(IChameleonTranslate),
+                         None)
+
     def test_add_translation_dirs_asset_spec(self):
         import os
         from pyramid.interfaces import ITranslationDirectories
@@ -2498,6 +2518,18 @@ class ConfiguratorTests(unittest.TestCase):
         locale = os.path.join(here, 'localeapp', 'locale')
         self.assertEqual(config.registry.getUtility(ITranslationDirectories),
                          [locale])
+
+    def test_add_translation_dirs_asset_spec_existing_translation_dirs(self):
+        import os
+        from pyramid.interfaces import ITranslationDirectories
+        config = self._makeOne(autocommit=True)
+        directories = ['abc']
+        config.registry.registerUtility(directories, ITranslationDirectories)
+        config.add_translation_dirs('pyramid.tests.localeapp:locale')
+        here = os.path.dirname(__file__)
+        locale = os.path.join(here, 'localeapp', 'locale')
+        result = config.registry.getUtility(ITranslationDirectories)
+        self.assertEqual(result, [locale, 'abc'])
 
     def test_add_translation_dirs_registers_chameleon_translate(self):
         from pyramid.interfaces import IChameleonTranslate
@@ -2539,7 +2571,13 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertRaises(ConfigurationError, config.override_asset,
                           'a:foo.pt', 'a:foo/')
 
-    def test_override_asset_success(self):
+    def test_override_asset_file_with_package(self):
+        from pyramid.exceptions import ConfigurationError
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError, config.override_asset,
+                          'a:foo.pt', 'a')
+
+    def test_override_asset_file_with_file(self):
         config = self._makeOne(autocommit=True)
         override = DummyUnderOverride()
         config.override_asset(
@@ -2552,6 +2590,62 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(override.path, 'templates/foo.pt')
         self.assertEqual(override.override_package, subpackage)
         self.assertEqual(override.override_prefix, 'templates/bar.pt')
+
+    def test_override_asset_package_with_package(self):
+        config = self._makeOne(autocommit=True)
+        override = DummyUnderOverride()
+        config.override_asset(
+            'pyramid.tests.fixtureapp',
+            'pyramid.tests.fixtureapp.subpackage',
+            _override=override)
+        from pyramid.tests import fixtureapp
+        from pyramid.tests.fixtureapp import subpackage
+        self.assertEqual(override.package, fixtureapp)
+        self.assertEqual(override.path, '')
+        self.assertEqual(override.override_package, subpackage)
+        self.assertEqual(override.override_prefix, '')
+
+    def test_override_asset_directory_with_directory(self):
+        config = self._makeOne(autocommit=True)
+        override = DummyUnderOverride()
+        config.override_asset(
+            'pyramid.tests.fixtureapp:templates/',
+            'pyramid.tests.fixtureapp.subpackage:templates/',
+            _override=override)
+        from pyramid.tests import fixtureapp
+        from pyramid.tests.fixtureapp import subpackage
+        self.assertEqual(override.package, fixtureapp)
+        self.assertEqual(override.path, 'templates/')
+        self.assertEqual(override.override_package, subpackage)
+        self.assertEqual(override.override_prefix, 'templates/')
+
+    def test_override_asset_directory_with_package(self):
+        config = self._makeOne(autocommit=True)
+        override = DummyUnderOverride()
+        config.override_asset(
+            'pyramid.tests.fixtureapp:templates/',
+            'pyramid.tests.fixtureapp.subpackage',
+            _override=override)
+        from pyramid.tests import fixtureapp
+        from pyramid.tests.fixtureapp import subpackage
+        self.assertEqual(override.package, fixtureapp)
+        self.assertEqual(override.path, 'templates/')
+        self.assertEqual(override.override_package, subpackage)
+        self.assertEqual(override.override_prefix, '')
+
+    def test_override_asset_package_with_directory(self):
+        config = self._makeOne(autocommit=True)
+        override = DummyUnderOverride()
+        config.override_asset(
+            'pyramid.tests.fixtureapp',
+            'pyramid.tests.fixtureapp.subpackage:templates/',
+            _override=override)
+        from pyramid.tests import fixtureapp
+        from pyramid.tests.fixtureapp import subpackage
+        self.assertEqual(override.package, fixtureapp)
+        self.assertEqual(override.path, '')
+        self.assertEqual(override.override_package, subpackage)
+        self.assertEqual(override.override_prefix, 'templates/')
 
     def test_add_renderer(self):
         from pyramid.interfaces import IRendererFactory
@@ -2815,6 +2909,28 @@ class ConfiguratorTests(unittest.TestCase):
         renderer.assert_(foo=1)
         renderer.assert_(bar=2)
         renderer.assert_(request=request)
+
+    def test_testing_add_renderer_twice(self):
+        config = self._makeOne(autocommit=True)
+        renderer1 = config.testing_add_renderer('templates/foo.pt')
+        renderer2 = config.testing_add_renderer('templates/bar.pt')
+        from pyramid.testing import DummyTemplateRenderer
+        self.failUnless(isinstance(renderer1, DummyTemplateRenderer))
+        self.failUnless(isinstance(renderer2, DummyTemplateRenderer))
+        from pyramid.renderers import render_to_response
+        # must provide request to pass in registry (this is a functest)
+        request = DummyRequest()
+        request.registry = config.registry
+        render_to_response(
+            'templates/foo.pt', {'foo':1, 'bar':2}, request=request)
+        renderer1.assert_(foo=1)
+        renderer1.assert_(bar=2)
+        renderer1.assert_(request=request)
+        render_to_response(
+            'templates/bar.pt', {'foo':1, 'bar':2}, request=request)
+        renderer2.assert_(foo=1)
+        renderer2.assert_(bar=2)
+        renderer2.assert_(request=request)
 
     def test_testing_add_renderer_explicitrenderer(self):
         config = self._makeOne(autocommit=True)
@@ -3351,6 +3467,52 @@ class TestViewDeriver(unittest.TestCase):
                          "'view_name' against context None): Allowed "
                          "(no authorization policy in use)")
 
+    def test_with_debug_authorization_authn_policy_no_authz_policy(self):
+        view = lambda *arg: 'OK'
+        self.config.registry.settings = dict(debug_authorization=True)
+        from pyramid.interfaces import IAuthenticationPolicy
+        policy = DummySecurityPolicy(False)
+        self.config.registry.registerUtility(policy, IAuthenticationPolicy)
+        logger = self._registerLogger()
+        deriver = self._makeOne(permission='view')
+        result = deriver(view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        request = self._makeRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(len(logger.messages), 1)
+        self.assertEqual(logger.messages[0],
+                         "debug_authorization of url url (view name "
+                         "'view_name' against context None): Allowed "
+                         "(no authorization policy in use)")
+
+    def test_with_debug_authorization_authz_policy_no_authn_policy(self):
+        view = lambda *arg: 'OK'
+        self.config.registry.settings = dict(debug_authorization=True)
+        from pyramid.interfaces import IAuthorizationPolicy
+        policy = DummySecurityPolicy(False)
+        self.config.registry.registerUtility(policy, IAuthorizationPolicy)
+        logger = self._registerLogger()
+        deriver = self._makeOne(permission='view')
+        result = deriver(view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        request = self._makeRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(len(logger.messages), 1)
+        self.assertEqual(logger.messages[0],
+                         "debug_authorization of url url (view name "
+                         "'view_name' against context None): Allowed "
+                         "(no authorization policy in use)")
+
     def test_with_debug_authorization_no_permission(self):
         view = lambda *arg: 'OK'
         self.config.registry.settings = dict(
@@ -3393,6 +3555,24 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(logger.messages[0],
                          "debug_authorization of url url (view name "
                          "'view_name' against context None): True")
+
+    def test_debug_auth_permission_authpol_permitted_no_request(self):
+        view = lambda *arg: 'OK'
+        self.config.registry.settings = dict(
+            debug_authorization=True, reload_templates=True)
+        logger = self._registerLogger()
+        self._registerSecurityPolicy(True)
+        deriver = self._makeOne(permission='view')
+        result = deriver(view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertEqual(result.__call_permissive__, view)
+        self.assertEqual(result(None, None), 'OK')
+        self.assertEqual(len(logger.messages), 1)
+        self.assertEqual(logger.messages[0],
+                         "debug_authorization of url None (view name "
+                         "None against context None): True")
 
     def test_debug_auth_permission_authpol_denied(self):
         from pyramid.exceptions import Forbidden
@@ -3453,6 +3633,40 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(logger.messages[0],
                          "debug_authorization of url url (view name "
                          "'view_name' against context None): False")
+
+    def test_secured_view_authn_policy_no_authz_policy(self):
+        view = lambda *arg: 'OK'
+        self.config.registry.settings = {}
+        from pyramid.interfaces import IAuthenticationPolicy
+        policy = DummySecurityPolicy(False)
+        self.config.registry.registerUtility(policy, IAuthenticationPolicy)
+        deriver = self._makeOne(permission='view')
+        result = deriver(view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        request = self._makeRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        self.assertEqual(result(None, request), 'OK')
+
+    def test_secured_view_authz_policy_no_authn_policy(self):
+        view = lambda *arg: 'OK'
+        self.config.registry.settings = {}
+        from pyramid.interfaces import IAuthorizationPolicy
+        policy = DummySecurityPolicy(False)
+        self.config.registry.registerUtility(policy, IAuthorizationPolicy)
+        deriver = self._makeOne(permission='view')
+        result = deriver(view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        request = self._makeRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        self.assertEqual(result(None, request), 'OK')
 
     def test_with_predicates_all(self):
         view = lambda *arg: 'OK'

@@ -381,18 +381,6 @@ class Configurator(object):
         
         return deriver(view)
 
-    def _override(self, package, path, override_package, override_prefix,
-                  PackageOverrides=PackageOverrides):
-        pkg_name = package.__name__
-        override_pkg_name = override_package.__name__
-        override = self.registry.queryUtility(
-            IPackageOverrides, name=pkg_name)
-        if override is None:
-            override = PackageOverrides(package)
-            self.registry.registerUtility(override, IPackageOverrides,
-                                          name=pkg_name)
-        override.insert(path, override_pkg_name, override_prefix)
-
     @action_method
     def _set_security_policies(self, authentication, authorization=None):
         if (authorization is not None) and (not authentication):
@@ -1698,7 +1686,10 @@ class Configurator(object):
 
         request_iface = self.registry.queryUtility(IRouteRequest, name=name)
         if request_iface is None:
-            bases = use_global_views and (IRequest,) or ()
+            if use_global_views:
+                bases = (IRequest,)
+            else:
+                bases = ()
             request_iface = route_request_iface(name, bases)
             self.registry.registerUtility(
                 request_iface, IRouteRequest, name=name)
@@ -1832,6 +1823,17 @@ class Configurator(object):
         self.registry.registerUtility(factory, IRendererFactory, name=name)
         self.action((IRendererFactory, name), None)
 
+    def _override(self, package, path, override_package, override_prefix,
+                  PackageOverrides=PackageOverrides):
+        pkg_name = package.__name__
+        override_pkg_name = override_package.__name__
+        override = self.registry.queryUtility(IPackageOverrides, name=pkg_name)
+        if override is None:
+            override = PackageOverrides(package)
+            self.registry.registerUtility(override, IPackageOverrides,
+                                          name=pkg_name)
+        override.insert(path, override_pkg_name, override_prefix)
+
     @action_method
     def override_asset(self, to_override, override_with, _override=None):
         """ Add a :app:`Pyramid` asset override to the current
@@ -1846,8 +1848,7 @@ class Configurator(object):
         See :ref:`assets_chapter` for more
         information about asset overrides."""
         if to_override == override_with:
-            raise ConfigurationError('You cannot override an asset with '
-                                     'itself')
+            raise ConfigurationError('You cannot override an asset with itself')
 
         package = to_override
         path = ''
@@ -1859,19 +1860,22 @@ class Configurator(object):
         if ':' in override_with:
             override_package, override_prefix = override_with.split(':', 1)
 
-        if path and path.endswith('/'):
-            if override_prefix and (not override_prefix.endswith('/')):
-                raise ConfigurationError(
-                    'A directory cannot be overridden with a file (put a '
-                    'slash at the end of override_with if necessary)')
+        # *_isdir = override is package or directory
+        overridden_isdir = path=='' or path.endswith('/') 
+        override_isdir = override_prefix=='' or override_prefix.endswith('/')
 
-        if override_prefix and override_prefix.endswith('/'):
-            if path and (not path.endswith('/')):
-                raise ConfigurationError(
-                    'A file cannot be overridden with a directory (put a '
-                    'slash at the end of to_override if necessary)')
+        if overridden_isdir and (not override_isdir):
+            raise ConfigurationError(
+                'A directory cannot be overridden with a file (put a '
+                'slash at the end of override_with if necessary)')
+
+        if (not overridden_isdir) and override_isdir:
+            raise ConfigurationError(
+                'A file cannot be overridden with a directory (put a '
+                'slash at the end of to_override if necessary)')
 
         override = _override or self._override # test jig
+
         def register():
             __import__(package)
             __import__(override_package)
@@ -2666,10 +2670,8 @@ class ViewDeriver(object):
     def __init__(self, **kw):
         self.kw = kw
         self.registry = kw['registry']
-        self.authn_policy = self.registry.queryUtility(
-            IAuthenticationPolicy)
-        self.authz_policy = self.registry.queryUtility(
-            IAuthorizationPolicy)
+        self.authn_policy = self.registry.queryUtility(IAuthenticationPolicy)
+        self.authz_policy = self.registry.queryUtility(IAuthorizationPolicy)
         self.logger = self.registry.queryUtility(IDebugLogger)
 
     def __call__(self, view):
