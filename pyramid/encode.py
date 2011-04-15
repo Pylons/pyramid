@@ -41,7 +41,10 @@ def url_quote(s, safe=''):
         safe_map = {}
         for i in range(256):
             c = chr(i)
-            safe_map[c] = (c in safe) and c or ('%%%02X' % i)
+            if c in safe:
+                safe_map[c] = c
+            else:
+                safe_map[c] = '%%%02X' % i
         _safemaps[cachekey] = safe_map
     res = map(safe_map.__getitem__, s)
     return ''.join(res)

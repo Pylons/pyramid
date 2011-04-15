@@ -24,6 +24,11 @@ class UrlEncodeTests(unittest.TestCase):
         result = self._callFUT([('a', la), ('b',2)], doseq=True)
         self.assertEqual(result, 'a=LaPe%C3%B1a&a=LaPe%C3%B1a&b=2')
 
+    def test_int_val_multiple(self):
+        s = [1, 2]
+        result = self._callFUT([('a', s)], doseq=True)
+        self.assertEqual(result, 'a=1&a=2')
+
     def test_dict(self):
         result = self._callFUT({'a':1})
         self.assertEqual(result, 'a=1')
