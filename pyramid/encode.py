@@ -9,9 +9,6 @@ _must_quote = {}
 def url_quote(s, safe=''):
     """quote('abc def') -> 'abc%20def'
 
-    Faster version of Python stdlib urllib.quote which also quotes
-    the '/' character.  
-
     Each part of a URL, e.g. the path info, the query, etc., has a
     different set of reserved characters that must be quoted.
 
@@ -25,10 +22,10 @@ def url_quote(s, safe=''):
     but not necessarily in all of them.
 
     Unlike the default version of this function in the Python stdlib,
-    by default, the quote function is intended for quoting individual
+    by default, the url_quote function is intended for quoting individual
     path segments instead of an already composed path that might have
     '/' characters in it.  Thus, it *will* encode any '/' character it
-    finds in a string.
+    finds in a string.  It is also slightly faster than the stdlib version.
     """
     cachekey = (safe, always_safe)
     try:
