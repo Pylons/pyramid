@@ -51,6 +51,20 @@ class TestLocalizer(unittest.TestCase):
                          'singular')
         self.failUnless(localizer.pluralizer)
 
+    def test_pluralize_pluralizer_already_added(self):
+        translations = DummyTranslations()
+        localizer = self._makeOne(None, translations)
+        def pluralizer(*arg, **kw):
+            return arg, kw
+        localizer.pluralizer = pluralizer
+        result = localizer.pluralize('singular', 'plural', 1, domain='1',
+                                     mapping={})
+        self.assertEqual(
+            result,
+            (('singular', 'plural', 1), {'domain': '1', 'mapping': {}})
+            )
+        self.failUnless(localizer.pluralizer is pluralizer)
+
 class Test_negotiate_locale_name(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -169,6 +183,18 @@ class Test_make_localizer(unittest.TestCase):
         localedir = os.path.join(here, 'localeapp', 'locale')
         localedirs = [localedir]
         locale_name = 'be'
+        result = self._callFUT(locale_name, localedirs)
+        self.assertEqual(result.__class__, Localizer)
+        self.assertEqual(result.translate('Approve', 'deformsite'),
+                         'Approve')
+
+    def test_locale_from_mo_mo_isdir(self):
+        import os
+        from pyramid.i18n import Localizer
+        here = os.path.dirname(__file__)
+        localedir = os.path.join(here, 'localeapp', 'locale')
+        localedirs = [localedir]
+        locale_name = 'gb'
         result = self._callFUT(locale_name, localedirs)
         self.assertEqual(result.__class__, Localizer)
         self.assertEqual(result.translate('Approve', 'deformsite'),
@@ -313,6 +339,15 @@ class TestTranslations(unittest.TestCase):
         translations = translations1.add(translations2, merge=False)
         return translations
 
+    def test_load_locales_None(self):
+        import gettext
+        import os
+        here = os.path.dirname(__file__)
+        localedir = os.path.join(here, 'localeapp', 'locale')
+        klass = self._getTargetClass()
+        result = klass.load(localedir, None, domain=None)
+        self.assertEqual(result.__class__, gettext.NullTranslations)
+
     def test_load_domain_None(self):
         import gettext
         import os
@@ -355,6 +390,14 @@ class TestTranslations(unittest.TestCase):
         inst2 = self._makeOne()
         inst2._catalog['a'] = 'b'
         inst.merge(inst2)
+        self.assertEqual(inst._catalog['a'], 'b')
+
+    def test_merge_gnutranslations_not_translations(self):
+        import gettext
+        t = gettext.GNUTranslations()
+        t._catalog = {'a':'b'}
+        inst = self._makeOne()
+        inst.merge(t)
         self.assertEqual(inst._catalog['a'], 'b')
 
     def test_add_different_domain_merge_true_notexisting(self):
