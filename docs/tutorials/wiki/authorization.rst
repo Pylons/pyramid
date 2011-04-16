@@ -7,21 +7,25 @@ edit, and add pages to our wiki.  For purposes of demonstration we'll change
 our application to allow people whom are members of a *group* named
 ``group:editors`` to add and edit wiki pages but we'll continue allowing
 anyone with access to the server to view pages.  :app:`Pyramid` provides
-facilities for *authorization* and *authentication*.  We'll make use of both
-features to provide security to our application.
+facilities for :term:`authorization` and :term:`authentication`.  We'll make
+use of both features to provide security to our application.
+
+We will add an :term:`authentication policy` and an
+:term:`authorization policy` to our :term:`application
+registry`, add a ``security.py`` module and give our :term:`root`
+resource an :term:`ACL`.
+
+Then we will add ``login`` and ``logout`` views, and modify the
+existing views to make them return a ``logged_in`` flag to the
+renderer and add :term:`permission` declarations to their ``view_config``
+decorators.
+
+Finally, we will add a ``login.pt`` template and change the existing
+``view.pt`` and ``edit.pt`` to show a "Logout" link when not logged in.
 
 The source code for this tutorial stage can be browsed via
 `http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/authorization/
 <http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/authorization/>`_.
-
-
-Configuring a ``pyramid`` Authentication Policy
---------------------------------------------------
-
-For any :app:`Pyramid` application to perform authorization, we need to add a
-``security.py`` module and we'll need to change our :term:`application
-registry` to add an :term:`authentication policy` and a :term:`authorization
-policy`.
 
 Adding Authentication and Authorization Policies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -63,6 +67,43 @@ most often come from a database, but here we use "dummy" data to represent
 user and groups sources. Note that the ``editor`` user is a member of the
 ``group:editors`` group in our dummy group data (the ``GROUPS`` data
 structure).
+
+Giving Our Root Resource an ACL
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We need to give our root resource object an :term:`ACL`.  This ACL will be
+sufficient to provide enough information to the :app:`Pyramid` security
+machinery to challenge a user who doesn't have appropriate credentials when
+he attempts to invoke the ``add_page`` or ``edit_page`` views.
+
+We need to perform some imports at module scope in our ``models.py`` file:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.security import Allow
+   from pyramid.security import Everyone
+
+Our root resource object is a ``Wiki`` instance.  We'll add the following
+line at class scope to our ``Wiki`` class:
+
+.. code-block:: python
+   :linenos:
+
+   __acl__ = [ (Allow, Everyone, 'view'),
+               (Allow, 'group:editors', 'edit') ]
+
+It's only happenstance that we're assigning this ACL at class scope.  An ACL
+can be attached to an object *instance* too; this is how "row level security"
+can be achieved in :app:`Pyramid` applications.  We actually only need *one*
+ACL for the entire system, however, because our security requirements are
+simple, so this feature is not demonstrated.
+
+Our resulting ``models.py`` file will now look like so:
+
+.. literalinclude:: src/authorization/tutorial/models.py
+   :linenos:
+   :language: python
 
 Adding Login and Logout Views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -129,6 +170,38 @@ template.  For example:
                logged_in = logged_in,
                edit_url = edit_url)
 
+Adding ``permission`` Declarations to our ``view_config`` Decorators
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To protect each of our views with a particular permission, we need to pass a
+``permission`` argument to each of our :class:`pyramid.view.view_config`
+decorators.  To do so, within ``views.py``:
+
+- We add ``permission='view'`` to the decorator attached to the
+  ``view_wiki`` and ``view_page`` view functions. This makes the
+  assertion that only users who possess the ``view`` permission
+  against the context resource at the time of the request may
+  invoke these views.  We've granted
+  :data:`pyramid.security.Everyone` the view permission at the
+  root model via its ACL, so everyone will be able to invoke the
+  ``view_wiki`` and ``view_page`` views.
+
+- We add ``permission='edit'`` to the decorator attached to the
+  ``add_page`` and ``edit_page`` view functions.  This makes the
+  assertion that only users who possess the effective ``edit``
+  permission against the context resource at the time of the
+  request may invoke these views.  We've granted the
+  ``group:editors`` principal the ``edit`` permission at the
+  root model via its ACL, so only a user whom is a member of
+  the group named ``group:editors`` will able to invoke the
+  ``add_page`` or  ``edit_page`` views.  We've likewise given
+  the ``editor`` user membership to this group via the
+  ``security.py`` file by mapping him to the ``group:editors``
+  group in the ``GROUPS`` data structure (``GROUPS
+  = {'editor':['group:editors']}``); the ``groupfinder``
+  function consults the ``GROUPS`` data structure.  This means
+  that the ``editor`` user can add and edit pages.
+
 Adding the ``login.pt`` Template
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -154,92 +227,29 @@ class="app-welcome align-right">`` div:
       <a href="${request.application_url}/logout">Logout</a>
    </span>
 
-Giving Our Root Resource an ACL
--------------------------------
+Seeing Our Changes To ``views.py`` and our Templates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We need to give our root resource object an :term:`ACL`.  This ACL will be
-sufficient to provide enough information to the :app:`Pyramid` security
-machinery to challenge a user who doesn't have appropriate credentials when
-he attempts to invoke the ``add_page`` or ``edit_page`` views.
+Our ``views.py`` module will look something like this when we're done:
 
-We need to perform some imports at module scope in our ``models.py`` file:
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.security import Allow
-   from pyramid.security import Everyone
-
-Our root resource object is a ``Wiki`` instance.  We'll add the following
-line at class scope to our ``Wiki`` class:
-
-.. code-block:: python
-   :linenos:
-
-   __acl__ = [ (Allow, Everyone, 'view'), 
-               (Allow, 'group:editors', 'edit') ]
-
-It's only happenstance that we're assigning this ACL at class scope.  An ACL
-can be attached to an object *instance* too; this is how "row level security"
-can be achieved in :app:`Pyramid` applications.  We actually only need *one*
-ACL for the entire system, however, because our security requirements are
-simple, so this feature is not demonstrated.
-
-Our resulting ``models.py`` file will now look like so:
-
-.. literalinclude:: src/authorization/tutorial/models.py
+.. literalinclude:: src/authorization/tutorial/views.py
    :linenos:
    :language: python
 
-Adding ``permission`` Declarations to our ``view_config`` Decorators
---------------------------------------------------------------------
+Our ``edit.pt`` template will look something like this when we're done:
 
-To protect each of our views with a particular permission, we need to pass a
-``permission`` argument to each of our :class:`pyramid.view.view_config`
-decorators.  To do so, within ``views.py``:
+.. literalinclude:: src/authorization/tutorial/templates/edit.pt
+   :linenos:
+   :language: xml
 
-- We add ``permission='view'`` to the decorator attached to the ``view_wiki``
-  view function. This makes the assertion that only users who possess the
-  ``view`` permission against the context resource at the time of the request
-  may invoke this view.  We've granted :data:`pyramid.security.Everyone` the
-  view permission at the root model via its ACL, so everyone will be able to
-  invoke the ``view_wiki`` view.
+Our ``view.pt`` template will look something like this when we're done:
 
-- We add ``permission='view'`` to the decorator attached to the ``view_page``
-  view function.  This makes the assertion that only users who possess the
-  effective ``view`` permission against the context resource at the time of
-  the request may invoke this view.  We've granted
-  :data:`pyramid.security.Everyone` the view permission at the root model via
-  its ACL, so everyone will be able to invoke the ``view_page`` view.
-
-- We add ``permission='edit'`` to the decorator attached to the ``add_page``
-  view function.  This makes the assertion that only users who possess the
-  effective ``edit`` permission against the context resource at the time of
-  the request may invoke this view.  We've granted the ``group:editors``
-  principal the ``edit`` permission at the root model via its ACL, so only
-  the a user whom is a member of the group named ``group:editors`` will able
-  to invoke the ``add_page`` view.  We've likewise given the ``editor`` user
-  membership to this group via thes ``security.py`` file by mapping him to
-  the ``group:editors`` group in the ``GROUPS`` data structure (``GROUPS =
-  {'editor':['group:editors']}``); the ``groupfinder`` function consults the
-  ``GROUPS`` data structure.  This means that the ``editor`` user can add
-  pages.
-
-- We add ``permission='edit'`` to the decorator attached to the ``edit_page``
-  view function.  This makes the assertion that only users who possess the
-  effective ``edit`` permission against the context resource at the time of
-  the request may invoke this view.  We've granted the ``group:editors``
-  principal the ``edit`` permission at the root model via its ACL, so only
-  the a user whom is a member of the group named ``group:editors`` will able
-  to invoke the ``edit_page`` view.  We've likewise given the ``editor`` user
-  membership to this group via thes ``security.py`` file by mapping him to
-  the ``group:editors`` group in the ``GROUPS`` data structure (``GROUPS =
-  {'editor':['group:editors']}``); the ``groupfinder`` function consults the
-  ``GROUPS`` data structure.  This means that the ``editor`` user can edit
-  pages.
+.. literalinclude:: src/authorization/tutorial/templates/view.pt
+   :linenos:
+   :language: xml
 
 Viewing the Application in a Browser
-------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We can finally examine our application in a browser.  The views we'll try are
 as follows:
@@ -267,35 +277,7 @@ as follows:
   credentials with the username ``editor``, password ``editor`` will
   show the edit page form being displayed.
 
-Seeing Our Changes To ``views.py`` and our Templates
-----------------------------------------------------
-
-Our ``views.py`` module will look something like this when we're done:
-
-.. literalinclude:: src/authorization/tutorial/views.py
-   :linenos:
-   :language: python
-
-Our ``edit.pt`` template will look something like this when we're done:
-
-.. literalinclude:: src/authorization/tutorial/templates/edit.pt
-   :linenos:
-   :language: xml
-
-Our ``view.pt`` template will look something like this when we're done:
-
-.. literalinclude:: src/authorization/tutorial/templates/view.pt
-   :linenos:
-   :language: xml
-
-Revisiting the Application
----------------------------
-
-When we revisit the application in a browser, and log in (as a result
-of hitting an edit or add page and submitting the login form with the
-``editor`` credentials), we'll see a Logout link in the upper right
-hand corner.  When we click it, we're logged out, and redirected back
-to the front page.
-
-
-
+- After logging in (as a result of hitting an edit or add page and 
+  submitting the login form with the ``editor`` credentials), we'll see
+  a Logout link in the upper right hand corner.  When we click it,
+  we're logged out, and redirected back to the front page.
