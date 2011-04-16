@@ -177,45 +177,30 @@ To protect each of our views with a particular permission, we need to pass a
 ``permission`` argument to each of our :class:`pyramid.view.view_config`
 decorators.  To do so, within ``views.py``:
 
-- We add ``permission='view'`` to the decorator attached to the ``view_wiki``
-  view function. This makes the assertion that only users who possess the
-  ``view`` permission against the context resource at the time of the request
-  may invoke this view.  We've granted :data:`pyramid.security.Everyone` the
-  view permission at the root model via its ACL, so everyone will be able to
-  invoke the ``view_wiki`` view.
+- We add ``permission='view'`` to the decorator attached to the
+  ``view_wiki`` and ``view_page`` view functions. This makes the
+  assertion that only users who possess the ``view`` permission
+  against the context resource at the time of the request may
+  invoke these views.  We've granted
+  :data:`pyramid.security.Everyone` the view permission at the
+  root model via its ACL, so everyone will be able to invoke the
+  ``view_wiki`` and ``view_page`` views.
 
-- We add ``permission='view'`` to the decorator attached to the ``view_page``
-  view function.  This makes the assertion that only users who possess the
-  effective ``view`` permission against the context resource at the time of
-  the request may invoke this view.  We've granted
-  :data:`pyramid.security.Everyone` the view permission at the root model via
-  its ACL, so everyone will be able to invoke the ``view_page`` view.
-
-- We add ``permission='edit'`` to the decorator attached to the ``add_page``
-  view function.  This makes the assertion that only users who possess the
-  effective ``edit`` permission against the context resource at the time of
-  the request may invoke this view.  We've granted the ``group:editors``
-  principal the ``edit`` permission at the root model via its ACL, so only
-  the a user whom is a member of the group named ``group:editors`` will able
-  to invoke the ``add_page`` view.  We've likewise given the ``editor`` user
-  membership to this group via thes ``security.py`` file by mapping him to
-  the ``group:editors`` group in the ``GROUPS`` data structure (``GROUPS =
-  {'editor':['group:editors']}``); the ``groupfinder`` function consults the
-  ``GROUPS`` data structure.  This means that the ``editor`` user can add
-  pages.
-
-- We add ``permission='edit'`` to the decorator attached to the ``edit_page``
-  view function.  This makes the assertion that only users who possess the
-  effective ``edit`` permission against the context resource at the time of
-  the request may invoke this view.  We've granted the ``group:editors``
-  principal the ``edit`` permission at the root model via its ACL, so only
-  the a user whom is a member of the group named ``group:editors`` will able
-  to invoke the ``edit_page`` view.  We've likewise given the ``editor`` user
-  membership to this group via thes ``security.py`` file by mapping him to
-  the ``group:editors`` group in the ``GROUPS`` data structure (``GROUPS =
-  {'editor':['group:editors']}``); the ``groupfinder`` function consults the
-  ``GROUPS`` data structure.  This means that the ``editor`` user can edit
-  pages.
+- We add ``permission='edit'`` to the decorator attached to the
+  ``add_page`` and ``edit_page`` view functions.  This makes the
+  assertion that only users who possess the effective ``edit``
+  permission against the context resource at the time of the
+  request may invoke these views.  We've granted the
+  ``group:editors`` principal the ``edit`` permission at the
+  root model via its ACL, so only a user whom is a member of
+  the group named ``group:editors`` will able to invoke the
+  ``add_page`` or  ``edit_page`` views.  We've likewise given
+  the ``editor`` user membership to this group via the
+  ``security.py`` file by mapping him to the ``group:editors``
+  group in the ``GROUPS`` data structure (``GROUPS
+  = {'editor':['group:editors']}``); the ``groupfinder``
+  function consults the ``GROUPS`` data structure.  This means
+  that the ``editor`` user can add and edit pages.
 
 Adding the ``login.pt`` Template
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
