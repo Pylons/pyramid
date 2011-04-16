@@ -98,9 +98,9 @@ DEFAULT_RENDERERS = (
     ('string', renderers.string_renderer_factory),
     )
 
-if chameleon_text:
-    DEFAULT_RENDERERS += (('.pt', chameleon_zpt.renderer_factory),)
 if chameleon_zpt:
+    DEFAULT_RENDERERS += (('.pt', chameleon_zpt.renderer_factory),)
+if chameleon_text:
     DEFAULT_RENDERERS += (('.txt', chameleon_text.renderer_factory),)
 
 def action_method(wrapped):
