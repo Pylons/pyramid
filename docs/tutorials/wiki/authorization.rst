@@ -10,10 +10,18 @@ anyone with access to the server to view pages.  :app:`Pyramid` provides
 facilities for :term:`authorization` and :term:`authentication`.  We'll make
 use of both features to provide security to our application.
 
-We need to add a
-``security.py`` module and we'll need to change our :term:`application
-registry` to add an :term:`authentication policy` and a :term:`authorization
-policy`.
+We will add an :term:`authentication policy` and an
+:term:`authorization policy` to our :term:`application
+registry`, add a ``security.py`` module and give our :term:`root`
+resource an :term:`ACL`.
+
+Then we will add ``login`` and ``logout`` views, and modify the
+existing views to make them return a ``logged_in`` flag to the
+renderer and add :term:`permission` declarations to their ``view_config``
+decorators.
+
+Finally, we will add a ``login.pt`` template and change the existing
+``view.pt`` and ``edit.pt`` to show a "Logout" link when not logged in.
 
 The source code for this tutorial stage can be browsed via
 `http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/authorization/
@@ -59,6 +67,43 @@ most often come from a database, but here we use "dummy" data to represent
 user and groups sources. Note that the ``editor`` user is a member of the
 ``group:editors`` group in our dummy group data (the ``GROUPS`` data
 structure).
+
+Giving Our Root Resource an ACL
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We need to give our root resource object an :term:`ACL`.  This ACL will be
+sufficient to provide enough information to the :app:`Pyramid` security
+machinery to challenge a user who doesn't have appropriate credentials when
+he attempts to invoke the ``add_page`` or ``edit_page`` views.
+
+We need to perform some imports at module scope in our ``models.py`` file:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.security import Allow
+   from pyramid.security import Everyone
+
+Our root resource object is a ``Wiki`` instance.  We'll add the following
+line at class scope to our ``Wiki`` class:
+
+.. code-block:: python
+   :linenos:
+
+   __acl__ = [ (Allow, Everyone, 'view'),
+               (Allow, 'group:editors', 'edit') ]
+
+It's only happenstance that we're assigning this ACL at class scope.  An ACL
+can be attached to an object *instance* too; this is how "row level security"
+can be achieved in :app:`Pyramid` applications.  We actually only need *one*
+ACL for the entire system, however, because our security requirements are
+simple, so this feature is not demonstrated.
+
+Our resulting ``models.py`` file will now look like so:
+
+.. literalinclude:: src/authorization/tutorial/models.py
+   :linenos:
+   :language: python
 
 Adding Login and Logout Views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -125,68 +170,6 @@ template.  For example:
                logged_in = logged_in,
                edit_url = edit_url)
 
-Adding the ``login.pt`` Template
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Add a ``login.pt`` template to your templates directory.  It's
-referred to within the login view we just added to ``login.py``.
-
-.. literalinclude:: src/authorization/tutorial/templates/login.pt
-   :language: xml
-
-Change ``view.pt`` and ``edit.pt``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-We'll also need to change our ``edit.pt`` and ``view.pt`` templates to
-display a "Logout" link if someone is logged in.  This link will
-invoke the logout view.
-
-To do so we'll add this to both templates within the ``<div id="right"
-class="app-welcome align-right">`` div:
-
-.. code-block:: xml
-
-   <span tal:condition="logged_in">
-      <a href="${request.application_url}/logout">Logout</a>
-   </span>
-
-Giving Our Root Resource an ACL
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-We need to give our root resource object an :term:`ACL`.  This ACL will be
-sufficient to provide enough information to the :app:`Pyramid` security
-machinery to challenge a user who doesn't have appropriate credentials when
-he attempts to invoke the ``add_page`` or ``edit_page`` views.
-
-We need to perform some imports at module scope in our ``models.py`` file:
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.security import Allow
-   from pyramid.security import Everyone
-
-Our root resource object is a ``Wiki`` instance.  We'll add the following
-line at class scope to our ``Wiki`` class:
-
-.. code-block:: python
-   :linenos:
-
-   __acl__ = [ (Allow, Everyone, 'view'), 
-               (Allow, 'group:editors', 'edit') ]
-
-It's only happenstance that we're assigning this ACL at class scope.  An ACL
-can be attached to an object *instance* too; this is how "row level security"
-can be achieved in :app:`Pyramid` applications.  We actually only need *one*
-ACL for the entire system, however, because our security requirements are
-simple, so this feature is not demonstrated.
-
-Our resulting ``models.py`` file will now look like so:
-
-.. literalinclude:: src/authorization/tutorial/models.py
-   :linenos:
-   :language: python
-
 Adding ``permission`` Declarations to our ``view_config`` Decorators
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -234,6 +217,52 @@ decorators.  To do so, within ``views.py``:
   ``GROUPS`` data structure.  This means that the ``editor`` user can edit
   pages.
 
+Adding the ``login.pt`` Template
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Add a ``login.pt`` template to your templates directory.  It's
+referred to within the login view we just added to ``login.py``.
+
+.. literalinclude:: src/authorization/tutorial/templates/login.pt
+   :language: xml
+
+Change ``view.pt`` and ``edit.pt``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We'll also need to change our ``edit.pt`` and ``view.pt`` templates to
+display a "Logout" link if someone is logged in.  This link will
+invoke the logout view.
+
+To do so we'll add this to both templates within the ``<div id="right"
+class="app-welcome align-right">`` div:
+
+.. code-block:: xml
+
+   <span tal:condition="logged_in">
+      <a href="${request.application_url}/logout">Logout</a>
+   </span>
+
+Seeing Our Changes To ``views.py`` and our Templates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Our ``views.py`` module will look something like this when we're done:
+
+.. literalinclude:: src/authorization/tutorial/views.py
+   :linenos:
+   :language: python
+
+Our ``edit.pt`` template will look something like this when we're done:
+
+.. literalinclude:: src/authorization/tutorial/templates/edit.pt
+   :linenos:
+   :language: xml
+
+Our ``view.pt`` template will look something like this when we're done:
+
+.. literalinclude:: src/authorization/tutorial/templates/view.pt
+   :linenos:
+   :language: xml
+
 Viewing the Application in a Browser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -267,25 +296,3 @@ as follows:
   submitting the login form with the ``editor`` credentials), we'll see
   a Logout link in the upper right hand corner.  When we click it,
   we're logged out, and redirected back to the front page.
-
-Seeing Our Changes To ``views.py`` and our Templates
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Our ``views.py`` module will look something like this when we're done:
-
-.. literalinclude:: src/authorization/tutorial/views.py
-   :linenos:
-   :language: python
-
-Our ``edit.pt`` template will look something like this when we're done:
-
-.. literalinclude:: src/authorization/tutorial/templates/edit.pt
-   :linenos:
-   :language: xml
-
-Our ``view.pt`` template will look something like this when we're done:
-
-.. literalinclude:: src/authorization/tutorial/templates/view.pt
-   :linenos:
-   :language: xml
-
