@@ -37,21 +37,18 @@ class PackageURLParser(StaticURLParser):
             filename = request.path_info_pop(environ)
         resource = os.path.normcase(os.path.normpath(
                     self.resource_name + '/' + filename))
-        if ( (self.root_resource is not None) and
-            (not resource.startswith(self.root_resource)) ):
+        if not resource.startswith(self.root_resource):
             # Out of bounds
             return self.not_found(environ, start_response)
         if not pkg_resources.resource_exists(self.package_name, resource):
             return self.not_found(environ, start_response)
         if pkg_resources.resource_isdir(self.package_name, resource):
             # @@: Cache?
-            child_root = (self.root_resource is not None and
-                          self.root_resource or self.resource_name)
             return self.__class__(
-                self.package_name, resource, root_resource=child_root,
+                self.package_name, resource, root_resource=self.resource_name,
                 cache_max_age=self.cache_max_age)(environ, start_response)
-        if (environ.get('PATH_INFO')
-            and environ.get('PATH_INFO') != '/'): # pragma: no cover
+        pi = environ.get('PATH_INFO')
+        if pi and pi != '/':
             return self.error_extra_path(environ, start_response) 
         full = pkg_resources.resource_filename(self.package_name, resource)
         if_none_match = environ.get('HTTP_IF_NONE_MATCH')

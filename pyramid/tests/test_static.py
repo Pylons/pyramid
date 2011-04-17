@@ -92,6 +92,14 @@ class TestPackageURLParser(unittest.TestCase):
         body = response[0]
         self.failUnless('<html>static</html>' in body)
 
+    def test_resource_has_extra_path_info(self):
+        environ = self._makeEnviron(PATH_INFO='/static/index.html/more')
+        inst = self._makeOne('pyramid.tests', 'fixtures')
+        sr = DummyStartResponse()
+        response = inst(environ, sr)
+        body = response[0]
+        self.failUnless("The trailing path '/more' is not allowed" in body)
+
     def test_resource_is_file_with_cache_max_age(self):
         environ = self._makeEnviron(PATH_INFO='/index.html')
         inst = self._makeOne('pyramid.tests', 'fixtures/static',
@@ -122,6 +130,15 @@ class TestPackageURLParser(unittest.TestCase):
                          ['Accept-Ranges', 'Content-Length', 'Content-Range',
                           'Content-Type', 'ETag', 'Last-Modified'])
 
+    def test_with_root_resource(self):
+        environ = self._makeEnviron(PATH_INFO='/static/index.html')
+        inst = self._makeOne('pyramid.tests', 'fixtures',
+                             root_resource='fixtures/static')
+        sr = DummyStartResponse()
+        response = inst(environ, sr)
+        body = response[0]
+        self.failUnless('<html>static</html>' in body)
+
     def test_if_none_match(self):
         class DummyEq(object):
             def __eq__(self, other):
@@ -135,6 +152,18 @@ class TestPackageURLParser(unittest.TestCase):
         self.assertEqual(sr.status, '304 Not Modified')
         self.assertEqual(sr.headerlist[0][0], 'ETag')
         self.assertEqual(response[0], '')
+
+    def test_if_none_match_miss(self):
+        class DummyEq(object):
+            def __eq__(self, other):
+                return False
+        dummy_eq = DummyEq()
+        environ = self._makeEnviron(HTTP_IF_NONE_MATCH=dummy_eq)
+        inst = self._makeOne('pyramid.tests', 'fixtures/static')
+        sr = DummyStartResponse()
+        inst(environ, sr)
+        self.assertEqual(len(sr.headerlist), 6)
+        self.assertEqual(sr.status, '200 OK')
 
     def test_repr(self):
         import os.path
@@ -258,6 +287,14 @@ class TestStaticURLInfo(unittest.TestCase):
         request = DummyRequest()
         self.assertRaises(ValueError, inst.generate, 'path', request)
 
+    def test_generate_registration_miss(self):
+        inst = self._makeOne(None)
+        inst.registrations = [('name', 'spec', False),
+                              ('http://example.com/foo/', 'package:path/',True)]
+        request = DummyRequest()
+        result = inst.generate('package:path/abc', request)
+        self.assertEqual(result, 'http://example.com/foo/abc')
+
     def test_generate_slash_in_name1(self):
         inst = self._makeOne(None)
         inst.registrations = [('http://example.com/foo/', 'package:path/',True)]
@@ -331,6 +368,17 @@ class TestStaticURLInfo(unittest.TestCase):
         inst = self._makeOne(config)
         inst.add('view', 'anotherpackage:path', cache_max_age=1,
                  permission='abc')
+        self.assertEqual(config.kw['view_permission'], 'abc')
+
+    def test_add_viewname_with_view_permission(self):
+        class Config:
+            def add_route(self, *arg, **kw):
+                self.arg = arg
+                self.kw = kw
+        config = Config()
+        inst = self._makeOne(config)
+        inst.add('view', 'anotherpackage:path', cache_max_age=1,
+                 view_permission='abc')
         self.assertEqual(config.kw['view_permission'], 'abc')
 
 class DummyStartResponse:
