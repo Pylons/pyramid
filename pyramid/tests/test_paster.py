@@ -42,7 +42,7 @@ class TestPShellCommand(unittest.TestCase):
     def _makeOne(self):
         return self._getTargetClass()('pshell')
 
-    def test_command_ipython_disabled(self):
+    def test_command_ipshell_is_None_ipython_enabled(self):
         command = self._makeOne()
         interact = DummyInteractor()
         app = DummyApp()
@@ -52,8 +52,32 @@ class TestPShellCommand(unittest.TestCase):
         command.args = ('/foo/bar/myapp.ini', 'myapp')
         class Options(object): pass
         command.options = Options()
-        command.options.disable_ipython =True
+        command.options.disable_ipython = False
         command.command(IPShell=None)
+        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
+        self.assertEqual(loadapp.section_name, 'myapp')
+        self.failUnless(loadapp.relative_to)
+        self.assertEqual(len(app.threadlocal_manager.pushed), 1)
+        pushed = app.threadlocal_manager.pushed[0]
+        self.assertEqual(pushed['registry'], dummy_registry)
+        self.assertEqual(pushed['request'].registry, dummy_registry)
+        self.assertEqual(interact.local, {'root':dummy_root,
+                                          'registry':dummy_registry})
+        self.failUnless(interact.banner)
+        self.assertEqual(len(app.threadlocal_manager.popped), 1)
+
+    def test_command_ipshell_is_not_None_ipython_disabled(self):
+        command = self._makeOne()
+        interact = DummyInteractor()
+        app = DummyApp()
+        loadapp = DummyLoadApp(app)
+        command.interact = (interact,)
+        command.loadapp = (loadapp,)
+        command.args = ('/foo/bar/myapp.ini', 'myapp')
+        class Options(object): pass
+        command.options = Options()
+        command.options.disable_ipython = True
+        command.command(IPShell='notnone')
         self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
         self.assertEqual(loadapp.section_name, 'myapp')
         self.failUnless(loadapp.relative_to)
@@ -157,6 +181,19 @@ class TestPRoutesCommand(unittest.TestCase):
         command = self._makeOne()
         mapper = DummyMapper()
         command._get_mapper = lambda *arg: mapper
+        L = []
+        command.out = L.append
+        app = DummyApp()
+        loadapp = DummyLoadApp(app)
+        command.loadapp = (loadapp,)
+        command.args = ('/foo/bar/myapp.ini', 'myapp')
+        result = command.command()
+        self.assertEqual(result, None)
+        self.assertEqual(L, [])
+
+    def test_no_mapper(self):
+        command = self._makeOne()
+        command._get_mapper = lambda *arg:None
         L = []
         command.out = L.append
         app = DummyApp()

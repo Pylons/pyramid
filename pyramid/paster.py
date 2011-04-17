@@ -91,7 +91,7 @@ class PShellCommand(PCommand):
               command will almost certainly fail.
 
     """
-    summary = "Open an interactive shell with a pyramid app loaded"
+    summary = "Open an interactive shell with a Pyramid application loaded"
 
     min_args = 2
     max_args = 2
@@ -103,10 +103,11 @@ class PShellCommand(PCommand):
                       help="Don't use IPython even if it is available")
 
     def command(self, IPShell=_marker):
-        if IPShell is _marker:
-            try: #pragma no cover
+        # IPShell passed to command method is for testing purposes
+        if IPShell is _marker: # pragma: no cover
+            try:
                 from IPython.Shell import IPShell
-            except ImportError: #pragma no cover
+            except ImportError:
                 IPShell = None
         cprt =('Type "help" for more information. "root" is the Pyramid app '
                'root object, "registry" is the Pyramid registry object.')
@@ -116,16 +117,17 @@ class PShellCommand(PCommand):
         app = self.get_app(config_file, section_name, loadapp=self.loadapp[0])
         root, closer = self.get_root(app)
         shell_globals = {'root':root, 'registry':app.registry}
-        if IPShell is not None and not self.options.disable_ipython:
+
+        if (IPShell is None) or self.options.disable_ipython:
             try:
-                shell = IPShell(argv=[], user_ns=shell_globals)
-                shell.IP.BANNER = shell.IP.BANNER + '\n\n' + banner
-                shell.mainloop()
+                self.interact[0](banner, local=shell_globals)
             finally:
                 closer()
         else:
             try:
-                self.interact[0](banner, local=shell_globals)
+                shell = IPShell(argv=[], user_ns=shell_globals)
+                shell.IP.BANNER = shell.IP.BANNER + '\n\n' + banner
+                shell.mainloop()
             finally:
                 closer()
 
