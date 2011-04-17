@@ -61,12 +61,12 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
 
     ``callback``
 
-        Default: ``None``.  A callback passed the :mod:`repoze.who`
-        identity and the :term:`request`, expected to return ``None``
-        if the user represented by the identity doesn't exist or a
-        sequence of group identifiers (possibly empty) if the user
-        does exist.  If ``callback`` is None, the userid will be
-        assumed to exist with no groups.
+        Default: ``None``.  A callback passed the :mod:`repoze.who` identity
+        and the :term:`request`, expected to return ``None`` if the user
+        represented by the identity doesn't exist or a sequence of principal
+        identifiers (possibly empty) representing groups if the user does
+        exist.  If ``callback`` is None, the userid will be assumed to exist
+        with no group principals.
 
     Objects of this class implement the interface described by
     :class:`pyramid.interfaces.IAuthenticationPolicy`.
@@ -149,10 +149,10 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
     ``callback``
 
         Default: ``None``.  A callback passed the userid and the request,
-        expected to return None if the userid doesn't exist or a sequence
-        of group identifiers (possibly empty) if the user does exist.
-        If ``callback`` is None, the userid will be assumed to exist with no
-        groups.
+        expected to return None if the userid doesn't exist or a sequence of
+        principal identifiers (possibly empty) representing groups if the
+        user does exist.  If ``callback`` is None, the userid will be assumed
+        to exist with no group principals.
 
     Objects of this class implement the interface described by
     :class:`pyramid.interfaces.IAuthenticationPolicy`.
@@ -187,9 +187,9 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
 
        Default: ``None``.  A callback passed the userid and the
        request, expected to return ``None`` if the userid doesn't
-       exist or a sequence of group identifiers (possibly empty) if
+       exist or a sequence of principal identifiers (possibly empty) if
        the user does exist.  If ``callback`` is ``None``, the userid
-       will be assumed to exist with no groups.  Optional.
+       will be assumed to exist with no principals.  Optional.
 
     ``cookie_name``
 
