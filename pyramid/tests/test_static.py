@@ -259,6 +259,53 @@ class Test_static_view(unittest.TestCase):
         self.assertEqual(response.package_name, 'another')
         self.assertEqual(response.cache_max_age, 3600)
 
+    def test_no_subpath_preserves_path_info_and_script_name(self):
+        view = self._makeOne('fixtures', package_name='another')
+        context = DummyContext()
+        request = DummyRequest()
+        request.subpath = ()
+        request.environ = self._makeEnviron(PATH_INFO='/path_info', 
+                                            SCRIPT_NAME='/script_name')
+        view(context, request)
+        self.assertEqual(request.copied, True)
+        self.assertEqual(request.environ['PATH_INFO'], '/path_info')
+        self.assertEqual(request.environ['SCRIPT_NAME'], '/script_name')
+
+    def test_with_subpath_path_info_ends_with_slash(self):
+        view = self._makeOne('fixtures', package_name='another')
+        context = DummyContext()
+        request = DummyRequest()
+        request.subpath = ('subpath',)
+        request.environ = self._makeEnviron(PATH_INFO='/path_info/subpath/')
+        view(context, request)
+        self.assertEqual(request.copied, True)
+        self.assertEqual(request.environ['PATH_INFO'], '/subpath/')
+        self.assertEqual(request.environ['SCRIPT_NAME'], '/path_info')
+
+    def test_with_subpath_original_script_name_preserved(self):
+        view = self._makeOne('fixtures', package_name='another')
+        context = DummyContext()
+        request = DummyRequest()
+        request.subpath = ('subpath',)
+        request.environ = self._makeEnviron(PATH_INFO='/path_info/subpath/',
+                                            SCRIPT_NAME='/scriptname')
+        view(context, request)
+        self.assertEqual(request.copied, True)
+        self.assertEqual(request.environ['PATH_INFO'], '/subpath/')
+        self.assertEqual(request.environ['SCRIPT_NAME'], 
+                         '/scriptname/path_info')
+
+    def test_with_subpath_new_script_name_fixes_trailing_double_slashes(self):
+        view = self._makeOne('fixtures', package_name='another')
+        context = DummyContext()
+        request = DummyRequest()
+        request.subpath = ('sub', 'path')
+        request.environ = self._makeEnviron(PATH_INFO='/path_info//sub//path//')
+        view(context, request)
+        self.assertEqual(request.copied, True)
+        self.assertEqual(request.environ['PATH_INFO'], '/sub/path/')
+        self.assertEqual(request.environ['SCRIPT_NAME'], '/path_info/')
+
 class TestStaticURLInfo(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.static import StaticURLInfo
