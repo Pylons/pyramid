@@ -6,9 +6,6 @@ Should-Have
 
 - MultiDict documentation.
 
-- https://github.com/Pylons/pyramid/issues#issue/67 (fixing would make it
-  possible to render a static site from a static dir).
-
 - Speed up startup time (defer _bootstrap and registerCommonDirectives()
   until needed by ZCML, as well as unfound speedups).
 
