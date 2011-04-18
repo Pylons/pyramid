@@ -104,6 +104,16 @@ Bug Fixes
   DummyRequest instead of eagerly assigning an attribute.
   See also https://github.com/Pylons/pyramid/issues/165
 
+- When visiting a URL that represented a static view which resolved to a
+  subdirectory, the ``index.html`` of that subdirectory would not be served
+  properly.  Instead, a redirect to ``/subdir`` would be issued.  This has
+  been fixed, and now visiting a subdirectory that contains an ``index.html``
+  within a static view returns the index.html properly.  See also
+  https://github.com/Pylons/pyramid/issues/67.
+
+- Redirects issued by a static view did not take into account any existing
+  ``SCRIPT_NAME`` (such as one set by a url mapping composite).  Now they do.
+
 1.0 (2011-01-30)
 ================
 

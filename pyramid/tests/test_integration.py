@@ -45,7 +45,7 @@ here = os.path.dirname(__file__)
 staticapp = static(os.path.join(here, 'fixtures'))
 
 class TestStaticApp(unittest.TestCase):
-    def test_it(self):
+    def test_basic(self):
         from webob import Request
         context = DummyContext()
         from StringIO import StringIO
@@ -57,12 +57,67 @@ class TestStaticApp(unittest.TestCase):
                            'wsgi.version':(1,0),
                            'wsgi.url_scheme':'http',
                            'wsgi.input':StringIO()})
-        request.subpath = ['minimal.pt']
+        request.subpath = ('minimal.pt',)
         result = staticapp(context, request)
         self.assertEqual(result.status, '200 OK')
         self.assertEqual(
             result.body.replace('\r', ''),
             open(os.path.join(here, 'fixtures/minimal.pt'), 'r').read())
+
+    def test_file_in_subdir(self):
+        from webob import Request
+        context = DummyContext()
+        from StringIO import StringIO
+        request = Request({'PATH_INFO':'',
+                           'SCRIPT_NAME':'',
+                           'SERVER_NAME':'localhost',
+                           'SERVER_PORT':'80',
+                           'REQUEST_METHOD':'GET',
+                           'wsgi.version':(1,0),
+                           'wsgi.url_scheme':'http',
+                           'wsgi.input':StringIO()})
+        request.subpath = ('static', 'index.html',)
+        result = staticapp(context, request)
+        self.assertEqual(result.status, '200 OK')
+        self.assertEqual(
+            result.body.replace('\r', ''),
+            open(os.path.join(here, 'fixtures/static/index.html'), 'r').read())
+
+    def test_redirect_to_subdir(self):
+        from webob import Request
+        context = DummyContext()
+        from StringIO import StringIO
+        request = Request({'PATH_INFO':'',
+                           'SCRIPT_NAME':'',
+                           'SERVER_NAME':'localhost',
+                           'SERVER_PORT':'80',
+                           'REQUEST_METHOD':'GET',
+                           'wsgi.version':(1,0),
+                           'wsgi.url_scheme':'http',
+                           'wsgi.input':StringIO()})
+        request.subpath = ('static',)
+        result = staticapp(context, request)
+        self.assertEqual(result.status, '301 Moved Permanently')
+        self.assertEqual(result.location, 'http://localhost/static/')
+
+    def test_redirect_to_subdir_with_existing_script_name(self):
+        from webob import Request
+        context = DummyContext()
+        from StringIO import StringIO
+        request = Request({'PATH_INFO':'',
+                           'SCRIPT_NAME':'/script_name',
+                           'SERVER_NAME':'localhost',
+                           'SERVER_PORT':'80',
+                           'REQUEST_METHOD':'GET',
+                           'wsgi.version':(1,0),
+                           'wsgi.url_scheme':'http',
+                           'wsgi.input':StringIO()})
+        request.subpath = ['static']
+        result = staticapp(context, request)
+        self.assertEqual(result.status, '301 Moved Permanently')
+        self.assertEqual(result.location, 
+                         'http://localhost/script_name/static/')
+
 
 class IntegrationBase(unittest.TestCase):
     root_factory = None
