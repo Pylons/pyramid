@@ -5,9 +5,11 @@ from webob import Request as WebobRequest
 
 from pyramid.interfaces import IRequest
 from pyramid.interfaces import ISessionFactory
+from pyramid.interfaces import IResponseFactory
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.decorator import reify
+from pyramid.response import Response
 from pyramid.url import resource_url
 from pyramid.url import route_url
 from pyramid.url import static_url
@@ -297,6 +299,26 @@ class Request(WebobRequest):
 
         """
         return route_path(route_name, self, *elements, **kw)
+
+    @reify
+    def response(self):
+        """This attribute is actually a "reified" property which returns an
+        instance of the :class:`pyramid.response.Response`. class.  The
+        response object returned does not exist until this attribute is
+        accessed.  Once it is accessed, subsequent accesses will return the
+        same Response object.
+
+        The ``request.response`` API is used by renderers.  A render obtains
+        the response object it will return from a view that uses that renderer
+        by accessing ``request.response``.  Therefore, it's possible to use the
+        ``request.response`` API to set up a response object with "the
+        right" attributes (e.g. by calling ``request.response.set_cookie()``)
+        within a view that uses a renderer.  Mutations to this response object
+        will be preserved in the response sent to the client."""
+        registry = self.registry
+        response_factory = registry.queryUtility(IResponseFactory,
+                                                 default=Response)
+        return response_factory()
 
     # override default WebOb "environ['adhoc_attr']" mutation behavior
     __getattr__ = object.__getattribute__

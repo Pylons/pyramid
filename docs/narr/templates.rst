@@ -367,13 +367,13 @@ templates as renderers.  See :ref:`available_template_system_bindings`.
    render a view without needing to fork your code to do so.  See
    :ref:`extending_chapter` for more information.
 
-By default, views rendered via a template renderer return a
-:term:`Response` object which has a *status code* of ``200 OK``, and a
-*content-type* of ``text/html``.  To vary attributes of the response
-of a view that uses a renderer, such as the content-type, headers, or
-status attributes, you must set attributes on the *request* object
-within the view before returning the dictionary.  See
-:ref:`response_request_attrs` for more information.
+By default, views rendered via a template renderer return a :term:`Response`
+object which has a *status code* of ``200 OK``, and a *content-type* of
+``text/html``.  To vary attributes of the response of a view that uses a
+renderer, such as the content-type, headers, or status attributes, you must
+use the API of the :class:`pyramid.response.Response` object exposed as
+``request.response`` within the view before returning the dictionary.  See
+:ref:`request_response_attr` for more information.
 
 The same set of system values are provided to templates rendered via a
 renderer view configuration as those provided to templates rendered

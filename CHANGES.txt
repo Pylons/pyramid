@@ -1,6 +1,36 @@
 Next release
 ============
 
+Requestresponse branch
+----------------------
+
+- Deprecated all assignments to ``request.response_*`` attributes such as
+  ``request.response_content_type = 'foo'``.  Assignments and mutations of
+  the following request attributes that were considered by the framework for
+  response influence are now deprecated: ``response_content_type``,
+  ``response_headerlist``, ``response_status``, ``response_charset``, and
+  ``response_cache_for``.  Instead of assigning these to the request object
+  for detection by the rendering machinery, users should use the appropriate
+  API of the Response object created by accessing ``request.response``
+  (e.g. ``request.response_content_type = 'abc'`` ->
+  ``request.response.content_type = 'abc'``).
+
+- Custom request objects are now required to have a ``response`` attribute
+  (or reified property) if they are meant to be used with renderers.  This
+  ``response`` attribute should be an instance of the class
+  ``pyramid.response.Response``.
+
+- The JSON and string renderer factories now use
+  ``request.response.content_type`` rather than
+  ``request.response_content_type``.  They determine whether they should set
+  the content type of the response by comparing the response's content type
+  against the default (usually ``text/html``); if the content type is not the
+  default, the renderer changes the content type (to ``application/json`` or
+  ``text/plain`` for JSON and string renderers respectively).
+
+- Made it possible to assign to and delete
+  ``pyramid.testing.DummyRequest.registry`` (bugfix).
+
 Documentation
 -------------
 
