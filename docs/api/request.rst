@@ -100,7 +100,7 @@
      attributes (e.g. by calling ``request.response.set_cookie(...)`` or
      ``request.response.content_type = 'text/plain'``, etc) within a view
      that uses a renderer.  For example, within a view that uses a
-     :term:`renderer`:
+     :term:`renderer`::
 
          response = request.response
          response.set_cookie('mycookie', 'mine, all mine!')
@@ -117,8 +117,8 @@
         response.content_type = 'text/plain'
         return response
 
-      Note that the response in this circumstance is not "global"; it still
-      must be returned from the view code if a renderer is not used.
+     Note that the response in this circumstance is not "global"; it still
+     must be returned from the view code if a renderer is not used.
 
    .. attribute:: session
 
