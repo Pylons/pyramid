@@ -93,9 +93,9 @@
      it is accessed, subsequent accesses to this request object will return
      the same :class:`~pyramid.response.Response` object.
 
-     The ``request.response`` API is used by renderers.  A render obtains the
-     response object it will return from a view that uses that renderer by
-     accessing ``request.response``.  Therefore, it's possible to use the
+     The ``request.response`` API can is used by renderers.  A render obtains
+     the response object it will return from a view that uses that renderer
+     by accessing ``request.response``.  Therefore, it's possible to use the
      ``request.response`` API to set up a response object with "the right"
      attributes (e.g. by calling ``request.response.set_cookie(...)`` or
      ``request.response.content_type = 'text/plain'``, etc) within a view
@@ -116,6 +116,9 @@
         response.body = 'Hello!'
         response.content_type = 'text/plain'
         return response
+
+      Note that the response in this circumstance is not "global"; it still
+      must be returned from the view code if a renderer is not used.
 
    .. attribute:: session
 
