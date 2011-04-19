@@ -114,6 +114,14 @@ Bug Fixes
 - Redirects issued by a static view did not take into account any existing
   ``SCRIPT_NAME`` (such as one set by a url mapping composite).  Now they do.
 
+Dependencies
+------------
+
+- Pyramid now depends on WebOb >= 1.0.2 (tests depend on the bugfix in that
+  release: "Fix handling of WSGI environs with missing ``SCRIPT_NAME``").
+  (Note that in reality, everyone should probably be using 1.0.4 or better
+  though, as WebOb 1.0.2 and 1.0.3 were effectively brownbag releases.)
+
 1.0 (2011-01-30)
 ================
 
