@@ -58,7 +58,7 @@ class TestTemplateRendererFactory(unittest.TestCase):
             'type':'type',
             })
         result = self._callFUT(info, None)
-        self.failUnless(result is renderer)
+        self.assertTrue(result is renderer)
 
 class TestChameleonRendererLookup(unittest.TestCase):
     def setUp(self):
@@ -202,7 +202,7 @@ class TestChameleonRendererLookup(unittest.TestCase):
             })
         lookup = self._makeOne(None)
         result = lookup(info)
-        self.failUnless(result is renderer)
+        self.assertTrue(result is renderer)
 
     def test___call__abspath_notyetregistered(self):
         import os
@@ -233,7 +233,7 @@ class TestChameleonRendererLookup(unittest.TestCase):
             })
         lookup = self._makeOne(None)
         result = lookup(info)
-        self.failUnless(renderer is result)
+        self.assertTrue(renderer is result)
 
     def test___call__relpath_has_package_registered(self):
         renderer = {}
@@ -249,7 +249,7 @@ class TestChameleonRendererLookup(unittest.TestCase):
             })
         lookup = self._makeOne(None)
         result = lookup(info)
-        self.failUnless(renderer is result)
+        self.assertTrue(renderer is result)
 
     def test___call__spec_notfound(self):
         spec = 'pyramid.tests:wont/exist'
@@ -279,7 +279,7 @@ class TestChameleonRendererLookup(unittest.TestCase):
         self._registerTemplateRenderer(renderer, spec)
         lookup = self._makeOne(None)
         result = lookup(info)
-        self.failUnless(result is renderer)
+        self.assertTrue(result is renderer)
 
     def test___call__spec_notyetregistered(self):
         import os
@@ -298,11 +298,11 @@ class TestChameleonRendererLookup(unittest.TestCase):
             })
         lookup = self._makeOne(factory)
         result = lookup(info)
-        self.failUnless(result is renderer)
+        self.assertTrue(result is renderer)
         path = os.path.abspath(__file__).split('$')[0] # jython
         if path.endswith('.pyc'): # pragma: no cover
             path = path[:-1]
-        self.failUnless(factory.path.startswith(path))
+        self.assertTrue(factory.path.startswith(path))
         self.assertEqual(factory.kw, {})
 
     def test___call__reload_assets_true(self):
@@ -324,7 +324,7 @@ class TestChameleonRendererLookup(unittest.TestCase):
             })
         lookup = self._makeOne(factory)
         result = lookup(info)
-        self.failUnless(result is renderer)
+        self.assertTrue(result is renderer)
         spec = '%s:%s' % ('pyramid.tests', 'test_renderers.py')
         self.assertEqual(reg.queryUtility(ITemplateRenderer, name=spec),
                          None)
@@ -346,7 +346,7 @@ class TestChameleonRendererLookup(unittest.TestCase):
             })
         lookup = self._makeOne(factory)
         result = lookup(info)
-        self.failUnless(result is renderer)
+        self.assertTrue(result is renderer)
         spec = '%s:%s' % ('pyramid.tests', 'test_renderers.py')
         self.assertNotEqual(reg.queryUtility(ITemplateRenderer, name=spec),
                             None)
@@ -558,7 +558,7 @@ class TestRendererHelper(unittest.TestCase):
         helper = self._makeOne('loo.foo', registry=reg)
         result = helper.render('value', {})
         self.assertEqual(result, ('value', {}))
-        self.failUnless(reg.queried)
+        self.assertTrue(reg.queried)
         self.assertEqual(reg.event._system, {})
         self.assertEqual(reg.event.__class__.__name__, 'BeforeRender')
 

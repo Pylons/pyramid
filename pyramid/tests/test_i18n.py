@@ -41,7 +41,7 @@ class TestLocalizer(unittest.TestCase):
         localizer = self._makeOne(None, translations)
         self.assertEqual(localizer.translate('123', domain='1',
                                              mapping={}), '123')
-        self.failUnless(localizer.translator)
+        self.assertTrue(localizer.translator)
 
     def test_pluralize(self):
         translations = DummyTranslations()
@@ -49,7 +49,7 @@ class TestLocalizer(unittest.TestCase):
         self.assertEqual(localizer.pluralize('singular', 'plural', 1,
                                              domain='1', mapping={}),
                          'singular')
-        self.failUnless(localizer.pluralizer)
+        self.assertTrue(localizer.pluralizer)
 
     def test_pluralize_pluralizer_already_added(self):
         translations = DummyTranslations()
@@ -63,7 +63,7 @@ class TestLocalizer(unittest.TestCase):
             result,
             (('singular', 'plural', 1), {'domain': '1', 'mapping': {}})
             )
-        self.failUnless(localizer.pluralizer is pluralizer)
+        self.assertTrue(localizer.pluralizer is pluralizer)
 
 class Test_negotiate_locale_name(unittest.TestCase):
     def setUp(self):
@@ -174,7 +174,7 @@ class Test_make_localizer(unittest.TestCase):
         self.assertEqual(result.translate('Approve', 'deformsite'),
                          'Genehmigen')
         self.assertEqual(result.translate('Approve'), 'Approve')
-        self.failUnless(hasattr(result, 'pluralize'))
+        self.assertTrue(hasattr(result, 'pluralize'))
 
     def test_locale_from_mo_bad_mo(self):
         import os
@@ -260,7 +260,7 @@ class Test_get_localizer(unittest.TestCase):
         self.assertEqual(result.translate('Approve', 'deformsite'),
                          'Genehmigen')
         self.assertEqual(result.translate('Approve'), 'Approve')
-        self.failUnless(hasattr(result, 'pluralize'))
+        self.assertTrue(hasattr(result, 'pluralize'))
 
     def test_locale_from_mo_bad_mo(self):
         import os

@@ -98,13 +98,13 @@ class TestRequest(unittest.TestCase):
     def test___contains__(self):
         environ ={'zooma':1}
         inst = self._makeOne(environ)
-        self.failUnless('zooma' in inst)
+        self.assertTrue('zooma' in inst)
 
     def test___delitem__(self):
         environ = {'zooma':1}
         inst = self._makeOne(environ)
         del inst['zooma']
-        self.failIf('zooma' in environ)
+        self.assertFalse('zooma' in environ)
 
     def test___getitem__(self):
         environ = {'zooma':1}

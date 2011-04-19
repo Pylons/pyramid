@@ -54,7 +54,7 @@ class TestUnencryptedCookieSession(unittest.TestCase):
         session = self._makeOne(request)
         session['a'] = 1
         self.assertEqual(session.invalidate(), None)
-        self.failIf('a' in session)
+        self.assertFalse('a' in session)
 
     def test__set_cookie_on_exception(self):
         request = testing.DummyRequest()
@@ -116,7 +116,7 @@ class TestUnencryptedCookieSession(unittest.TestCase):
         cookieval= response.headerlist[0][1]
         val, domain, path, secure, httponly = [x.strip() for x in
                                                cookieval.split(';')]
-        self.failUnless(val.startswith('abc='))
+        self.assertTrue(val.startswith('abc='))
         self.assertEqual(domain, 'Domain=localhost')
         self.assertEqual(path, 'Path=/foo')
         self.assertEqual(secure, 'secure')
@@ -205,14 +205,14 @@ class TestUnencryptedCookieSession(unittest.TestCase):
         session['_csrft_'] = 'token'
         token = session.get_csrf_token()
         self.assertEqual(token, 'token')
-        self.failUnless('_csrft_' in session)
+        self.assertTrue('_csrft_' in session)
 
     def test_get_csrf_token_new(self):
         request = testing.DummyRequest()
         session = self._makeOne(request)
         token = session.get_csrf_token()
-        self.failUnless(token)
-        self.failUnless('_csrft_' in session)
+        self.assertTrue(token)
+        self.assertTrue('_csrft_' in session)
 
 class Test_manage_accessed(unittest.TestCase):
     def _makeOne(self, wrapped):
@@ -254,7 +254,7 @@ class Test_manage_accessed(unittest.TestCase):
         response = webob.Response()
         result = callbacks[0](request, response)
         self.assertEqual(result, None)
-        self.failIf('Set-Cookie' in dict(response.headerlist))
+        self.assertFalse('Set-Cookie' in dict(response.headerlist))
 
     def test_cookie_is_set(self):
         request = testing.DummyRequest()

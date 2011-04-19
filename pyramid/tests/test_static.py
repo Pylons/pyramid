@@ -46,8 +46,8 @@ class TestPackageURLParser(unittest.TestCase):
         sr = DummyStartResponse()
         response = inst(environ, sr)
         body = response[0]
-        self.failUnless('301 Moved Permanently' in body)
-        self.failUnless('http://example.com:6543/' in body)
+        self.assertTrue('301 Moved Permanently' in body)
+        self.assertTrue('http://example.com:6543/' in body)
         
     def test_path_info_slash_means_index_html(self):
         environ = self._makeEnviron()
@@ -55,7 +55,7 @@ class TestPackageURLParser(unittest.TestCase):
         sr = DummyStartResponse()
         response = inst(environ, sr)
         body = response[0]
-        self.failUnless('<html>static</html>' in body)
+        self.assertTrue('<html>static</html>' in body)
 
     def test_resource_out_of_bounds(self):
         environ = self._makeEnviron()
@@ -64,8 +64,8 @@ class TestPackageURLParser(unittest.TestCase):
         sr = DummyStartResponse()
         response = inst(environ, sr)
         body = response[0]
-        self.failUnless('404 Not Found' in body)
-        self.failUnless('http://example.com:6543/' in body)
+        self.assertTrue('404 Not Found' in body)
+        self.assertTrue('http://example.com:6543/' in body)
 
     def test_resource_doesnt_exist(self):
         environ = self._makeEnviron(PATH_INFO='/notthere')
@@ -73,8 +73,8 @@ class TestPackageURLParser(unittest.TestCase):
         sr = DummyStartResponse()
         response = inst(environ, sr)
         body = response[0]
-        self.failUnless('404 Not Found' in body)
-        self.failUnless('http://example.com:6543/' in body)
+        self.assertTrue('404 Not Found' in body)
+        self.assertTrue('http://example.com:6543/' in body)
 
     def test_resource_isdir(self):
         environ = self._makeEnviron(PATH_INFO='/subdir/')
@@ -82,7 +82,7 @@ class TestPackageURLParser(unittest.TestCase):
         sr = DummyStartResponse()
         response = inst(environ, sr)
         body = response[0]
-        self.failUnless('<html>subdir</html>' in body)
+        self.assertTrue('<html>subdir</html>' in body)
 
     def test_resource_is_file(self):
         environ = self._makeEnviron(PATH_INFO='/index.html')
@@ -90,7 +90,7 @@ class TestPackageURLParser(unittest.TestCase):
         sr = DummyStartResponse()
         response = inst(environ, sr)
         body = response[0]
-        self.failUnless('<html>static</html>' in body)
+        self.assertTrue('<html>static</html>' in body)
 
     def test_resource_has_extra_path_info(self):
         environ = self._makeEnviron(PATH_INFO='/static/index.html/more')
@@ -98,7 +98,7 @@ class TestPackageURLParser(unittest.TestCase):
         sr = DummyStartResponse()
         response = inst(environ, sr)
         body = response[0]
-        self.failUnless("The trailing path '/more' is not allowed" in body)
+        self.assertTrue("The trailing path '/more' is not allowed" in body)
 
     def test_resource_is_file_with_cache_max_age(self):
         environ = self._makeEnviron(PATH_INFO='/index.html')
@@ -107,7 +107,7 @@ class TestPackageURLParser(unittest.TestCase):
         sr = DummyStartResponse()
         response = inst(environ, sr)
         body = response[0]
-        self.failUnless('<html>static</html>' in body)
+        self.assertTrue('<html>static</html>' in body)
         self.assertEqual(len(sr.headerlist), 8)
         header_names = [ x[0] for x in sr.headerlist ]
         header_names.sort()
@@ -122,7 +122,7 @@ class TestPackageURLParser(unittest.TestCase):
         sr = DummyStartResponse()
         response = inst(environ, sr)
         body = response[0]
-        self.failUnless('<html>static</html>' in body)
+        self.assertTrue('<html>static</html>' in body)
         self.assertEqual(len(sr.headerlist), 6)
         header_names = [ x[0] for x in sr.headerlist ]
         header_names.sort()
@@ -137,7 +137,7 @@ class TestPackageURLParser(unittest.TestCase):
         sr = DummyStartResponse()
         response = inst(environ, sr)
         body = response[0]
-        self.failUnless('<html>static</html>' in body)
+        self.assertTrue('<html>static</html>' in body)
 
     def test_if_none_match(self):
         class DummyEq(object):
@@ -168,7 +168,7 @@ class TestPackageURLParser(unittest.TestCase):
     def test_repr(self):
         import os.path
         inst = self._makeOne('pyramid.tests', 'fixtures/static')
-        self.failUnless(
+        self.assertTrue(
             repr(inst).startswith(
             '<PackageURLParser pyramid.tests:%s at'
                 % os.path.join('fixtures', 'static')))
@@ -179,7 +179,7 @@ class TestPackageURLParser(unittest.TestCase):
         sr = DummyStartResponse()
         response = inst.not_found(environ, sr, 'debug_message')
         body = response[0]
-        self.failUnless('404 Not Found' in body)
+        self.assertTrue('404 Not Found' in body)
         self.assertEqual(sr.status, '404 Not Found')
 
 class Test_static_view(unittest.TestCase):

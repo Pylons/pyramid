@@ -21,8 +21,8 @@ class TestRoute(unittest.TestCase):
         self.assertEqual(route.path, ':path')
         self.assertEqual(route.name, 'name')
         self.assertEqual(route.factory, 'factory')
-        self.failUnless(route.generate.__class__ is types.FunctionType)
-        self.failUnless(route.match.__class__ is types.FunctionType)
+        self.assertTrue(route.generate.__class__ is types.FunctionType)
+        self.assertTrue(route.match.__class__ is types.FunctionType)
 
     def test_ctor_defaults(self):
         import types
@@ -31,8 +31,8 @@ class TestRoute(unittest.TestCase):
         self.assertEqual(route.path, ':path')
         self.assertEqual(route.name, 'name')
         self.assertEqual(route.factory, None)
-        self.failUnless(route.generate.__class__ is types.FunctionType)
-        self.failUnless(route.match.__class__ is types.FunctionType)
+        self.assertTrue(route.generate.__class__ is types.FunctionType)
+        self.assertTrue(route.match.__class__ is types.FunctionType)
 
     def test_match(self):
         route = self._makeOne('name', ':path')

@@ -15,7 +15,7 @@ class TestPyramidTemplate(unittest.TestCase):
         result = tmpl.pre(None, None, vars)
         self.assertEqual(result, None)
         self.assertEqual(vars['package_logger'], 'app')
-        self.failUnless(len(vars['random_string']) == 40)
+        self.assertTrue(len(vars['random_string']) == 40)
 
     def test_pre_logger_noteq_root(self):
         tmpl = self._makeOne('name')
@@ -23,7 +23,7 @@ class TestPyramidTemplate(unittest.TestCase):
         result = tmpl.pre(None, None, vars)
         self.assertEqual(result, None)
         self.assertEqual(vars['package_logger'], 'notroot')
-        self.failUnless(len(vars['random_string']) == 40)
+        self.assertTrue(len(vars['random_string']) == 40)
 
     def test_post(self):
         tmpl = self._makeOne('name')
@@ -56,14 +56,14 @@ class TestPShellCommand(unittest.TestCase):
         command.command(IPShell=None)
         self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
         self.assertEqual(loadapp.section_name, 'myapp')
-        self.failUnless(loadapp.relative_to)
+        self.assertTrue(loadapp.relative_to)
         self.assertEqual(len(app.threadlocal_manager.pushed), 1)
         pushed = app.threadlocal_manager.pushed[0]
         self.assertEqual(pushed['registry'], dummy_registry)
         self.assertEqual(pushed['request'].registry, dummy_registry)
         self.assertEqual(interact.local, {'root':dummy_root,
                                           'registry':dummy_registry})
-        self.failUnless(interact.banner)
+        self.assertTrue(interact.banner)
         self.assertEqual(len(app.threadlocal_manager.popped), 1)
 
     def test_command_ipshell_is_not_None_ipython_disabled(self):
@@ -80,14 +80,14 @@ class TestPShellCommand(unittest.TestCase):
         command.command(IPShell='notnone')
         self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
         self.assertEqual(loadapp.section_name, 'myapp')
-        self.failUnless(loadapp.relative_to)
+        self.assertTrue(loadapp.relative_to)
         self.assertEqual(len(app.threadlocal_manager.pushed), 1)
         pushed = app.threadlocal_manager.pushed[0]
         self.assertEqual(pushed['registry'], dummy_registry)
         self.assertEqual(pushed['request'].registry, dummy_registry)
         self.assertEqual(interact.local, {'root':dummy_root,
                                           'registry':dummy_registry})
-        self.failUnless(interact.banner)
+        self.assertTrue(interact.banner)
         self.assertEqual(len(app.threadlocal_manager.popped), 1)
 
     def test_command_ipython_enabled(self):
@@ -103,7 +103,7 @@ class TestPShellCommand(unittest.TestCase):
         command.command(IPShell=dummy_shell_factory)
         self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
         self.assertEqual(loadapp.section_name, 'myapp')
-        self.failUnless(loadapp.relative_to)
+        self.assertTrue(loadapp.relative_to)
         self.assertEqual(len(app.threadlocal_manager.pushed), 1)
         pushed = app.threadlocal_manager.pushed[0]
         self.assertEqual(pushed['registry'], dummy_registry)
@@ -111,7 +111,7 @@ class TestPShellCommand(unittest.TestCase):
         self.assertEqual(dummy_shell_factory.shell.local_ns,
                          {'root':dummy_root, 'registry':dummy_registry})
         self.assertEqual(dummy_shell_factory.shell.global_ns, {})
-        self.failUnless('\n\n' in dummy_shell_factory.shell.IP.BANNER)
+        self.assertTrue('\n\n' in dummy_shell_factory.shell.IP.BANNER)
         self.assertEqual(len(app.threadlocal_manager.popped), 1)
 
     def test_command_get_app_hookable(self):
@@ -137,7 +137,7 @@ class TestPShellCommand(unittest.TestCase):
         self.assertEqual(pushed['request'].registry, dummy_registry)
         self.assertEqual(interact.local, {'root':dummy_root,
                                           'registry':dummy_registry})
-        self.failUnless(interact.banner)
+        self.assertTrue(interact.banner)
         self.assertEqual(len(app.threadlocal_manager.popped), 1)
         self.assertEqual(apped, [(('/foo/bar/myapp.ini', 'myapp'),
                                   {'loadapp': loadapp})])
@@ -162,11 +162,11 @@ class TestPShellCommand(unittest.TestCase):
         command.command(IPShell=None)
         self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
         self.assertEqual(loadapp.section_name, 'myapp')
-        self.failUnless(loadapp.relative_to)
+        self.assertTrue(loadapp.relative_to)
         self.assertEqual(len(app.threadlocal_manager.pushed), 0)
         self.assertEqual(interact.local, {'root':root,
                                           'registry':dummy_registry})
-        self.failUnless(interact.banner)
+        self.assertTrue(interact.banner)
         self.assertEqual(apps, [app])
 
 class TestPRoutesCommand(unittest.TestCase):
