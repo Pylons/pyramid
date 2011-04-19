@@ -117,8 +117,8 @@ Bug Fixes
 Dependencies
 ------------
 
-- Pyramid now depends on WebOb >= 1.0.2 (tests depend on the bugfix in that
-  release: "Fix handling of WSGI environs with missing ``SCRIPT_NAME``").
+- Pyramid now depends on WebOb >= 1.0.2 as tests depend on the bugfix in that
+  release: "Fix handling of WSGI environs with missing ``SCRIPT_NAME``".
   (Note that in reality, everyone should probably be using 1.0.4 or better
   though, as WebOb 1.0.2 and 1.0.3 were effectively brownbag releases.)
 
