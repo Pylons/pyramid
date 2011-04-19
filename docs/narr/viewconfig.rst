@@ -59,7 +59,8 @@ View configuration is performed in one of these ways:
 - By specifying a view within a :term:`route configuration`.  View
   configuration via a route configuration is performed by using the
   :meth:`pyramid.config.Configurator.add_route` method, passing a ``view``
-  argument specifying a view callable.
+  argument specifying a view callable. This method is deprecated as of
+  :app:`Pyramid` 1.1.
 
 .. note:: A package named ``pyramid_handlers`` (available from PyPI) provides
    an analogue of :term:`Pylons` -style "controllers", which are a special

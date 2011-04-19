@@ -300,7 +300,7 @@ detection, because they're implemented in terms of conflict-aware methods:
 
 - :meth:`~pyramid.config.Configurator.add_route` does a second type of
   conflict detection when a ``view`` parameter is passed (it calls
-  ``add_view``).
+  ``add_view``). This behavior has been deprecated in :app:`Pyramid` 1.1.
 
 - :meth:`~pyramid.config.Configurator.static_view`, a frontend for
   ``add_route`` and ``add_view``.
