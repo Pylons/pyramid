@@ -32,7 +32,9 @@ Features
   object (e.g. ``request.response`` within a view) now produces a new
   ``pyramid.response.Response`` object.  This feature is meant to be used
   mainly when a view configured with a renderer needs to set response
-  attributes, but it can be used by any code.
+  attributes, but it can be used by any code to produce a response object
+  (although the response object produced must still be returned unless a
+  renderer is used).
 
 - Integers and longs passed as ``elements`` to ``pyramid.url.resource_url``
   or ``pyramid.request.Request.resource_url`` e.g. ``resource_url(context,
