@@ -37,6 +37,9 @@ Should-Have
 Nice-to-Have
 ------------
 
+- Response.RequestClass should probably be pyramid.request.Request but this
+  may imply actually subclassing webob.Response
+
 - Consider per-form_id CSRF instead of per-session global CSRF token.
 
 - Better "Extending" chapter.
