@@ -27,7 +27,7 @@ class Test_registerDummySecurityPolicy(TestBase):
         from pyramid.interfaces import IAuthorizationPolicy
         ut = self.registry.getUtility(IAuthenticationPolicy)
         from pyramid.testing import DummySecurityPolicy
-        self.failUnless(isinstance(ut, DummySecurityPolicy))
+        self.assertTrue(isinstance(ut, DummySecurityPolicy))
         ut = self.registry.getUtility(IAuthorizationPolicy)
         self.assertEqual(ut.userid, 'user')
         self.assertEqual(ut.groupids, ('group1', 'group2'))
@@ -65,7 +65,7 @@ class Test_registerTemplateRenderer(TestBase):
         from pyramid import testing
         renderer = testing.registerTemplateRenderer('templates/foo')
         from pyramid.testing import DummyTemplateRenderer
-        self.failUnless(isinstance(renderer, DummyTemplateRenderer))
+        self.assertTrue(isinstance(renderer, DummyTemplateRenderer))
         from pyramid.renderers import render_to_response
         render_to_response('templates/foo', dict(foo=1, bar=2))
         renderer.assert_(foo=1)
@@ -116,7 +116,7 @@ class Test_registerView(TestBase):
         from pyramid import testing
         view = testing.registerView('moo.html')
         import types
-        self.failUnless(isinstance(view, types.FunctionType))
+        self.assertTrue(isinstance(view, types.FunctionType))
         from pyramid.view import render_view_to_response
         request = DummyRequest()
         request.registry = self.registry
@@ -127,7 +127,7 @@ class Test_registerView(TestBase):
         from pyramid import testing
         view = testing.registerView('moo.html', 'yo')
         import types
-        self.failUnless(isinstance(view, types.FunctionType))
+        self.assertTrue(isinstance(view, types.FunctionType))
         from pyramid.view import render_view_to_response
         request = DummyRequest()
         request.registry = self.registry
@@ -141,7 +141,7 @@ class Test_registerView(TestBase):
             return Response('123')
         view = testing.registerView('moo.html', view=view)
         import types
-        self.failUnless(isinstance(view, types.FunctionType))
+        self.assertTrue(isinstance(view, types.FunctionType))
         from pyramid.view import render_view_to_response
         request = DummyRequest()
         request.registry = self.registry
@@ -156,7 +156,7 @@ class Test_registerView(TestBase):
         view = testing.registerView('moo.html', view=view, permission='bar')
         testing.registerDummySecurityPolicy(permissive=False)
         import types
-        self.failUnless(isinstance(view, types.FunctionType))
+        self.assertTrue(isinstance(view, types.FunctionType))
         from pyramid.view import render_view_to_response
         request = DummyRequest()
         request.registry = self.registry
@@ -171,7 +171,7 @@ class Test_registerView(TestBase):
         view = testing.registerView('moo.html', view=view, permission='bar')
         testing.registerDummySecurityPolicy(permissive=False)
         import types
-        self.failUnless(isinstance(view, types.FunctionType))
+        self.assertTrue(isinstance(view, types.FunctionType))
         result = view_execution_permitted(None, None, 'moo.html')
         self.assertEqual(result, False)
 
@@ -183,7 +183,7 @@ class Test_registerView(TestBase):
         view = testing.registerView('moo.html', view=view, permission='bar')
         testing.registerDummySecurityPolicy(permissive=True)
         import types
-        self.failUnless(isinstance(view, types.FunctionType))
+        self.assertTrue(isinstance(view, types.FunctionType))
         from pyramid.view import render_view_to_response
         request = DummyRequest()
         request.registry = self.registry
@@ -355,9 +355,9 @@ class TestDummyResource(unittest.TestCase):
         self.assertEqual(resource['abc'], dummy)
         self.assertEqual(resource.get('abc'), dummy)
         self.assertRaises(KeyError, resource.__getitem__, 'none')
-        self.failUnless('abc' in resource)
+        self.assertTrue('abc' in resource)
         del resource['abc']
-        self.failIf('abc' in resource)
+        self.assertFalse('abc' in resource)
         self.assertEqual(resource.get('abc', 'foo'), 'foo')
         self.assertEqual(resource.get('abc'), None)
 
@@ -390,7 +390,7 @@ class TestDummyResource(unittest.TestCase):
 
     def test_ctor_with__provides__(self):
         resource = self._makeOne(__provides__=IDummy)
-        self.failUnless(IDummy.providedBy(resource))
+        self.assertTrue(IDummy.providedBy(resource))
 
 class TestDummyRequest(unittest.TestCase):
     def _getTargetClass(self):
@@ -498,9 +498,54 @@ class TestDummyRequest(unittest.TestCase):
             registry = Registry('this_test')
             config = Configurator(registry=registry)
             config.begin()
-            self.failUnless(request.registry is registry)
+            self.assertTrue(request.registry is registry)
         finally:
             config.end()
+
+    def test_set_registry(self):
+        request = self._makeOne()
+        request.registry = 'abc'
+        self.assertEqual(request.registry, 'abc')
+
+    def test_del_registry(self):
+        # see https://github.com/Pylons/pyramid/issues/165
+        from pyramid.registry import Registry
+        from pyramid.config import Configurator
+        request = self._makeOne()
+        request.registry = 'abc'
+        self.assertEqual(request.registry, 'abc')
+        del request.registry
+        try:
+            registry = Registry('this_test')
+            config = Configurator(registry=registry)
+            config.begin()
+            self.assertTrue(request.registry is registry)
+        finally:
+            config.end()
+
+    def test_response_with_responsefactory(self):
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IResponseFactory
+        registry = Registry('this_test')
+        class ResponseFactory(object):
+            pass
+        registry.registerUtility(ResponseFactory, IResponseFactory)
+        request = self._makeOne()
+        request.registry = registry
+        resp = request.response
+        self.assertEqual(resp.__class__, ResponseFactory)
+        self.assertTrue(request.response is resp) # reified
+
+    def test_response_without_responsefactory(self):
+        from pyramid.registry import Registry
+        from pyramid.response import Response
+        registry = Registry('this_test')
+        request = self._makeOne()
+        request.registry = registry
+        resp = request.response
+        self.assertEqual(resp.__class__, Response)
+        self.assertTrue(request.response is resp) # reified
+        
 
 class TestDummyTemplateRenderer(unittest.TestCase):
     def _getTargetClass(self, ):
@@ -528,7 +573,7 @@ class TestDummyTemplateRenderer(unittest.TestCase):
         renderer({'a':1, 'b':2})
         self.assertRaises(AssertionError, renderer.assert_, c=1)
         self.assertRaises(AssertionError, renderer.assert_, b=3)
-        self.failUnless(renderer.assert_(a=1, b=2))
+        self.assertTrue(renderer.assert_(a=1, b=2))
         
     def test_nondefault_string_response(self):
         renderer = self._makeOne('abc')
@@ -550,7 +595,7 @@ class Test_setUp(unittest.TestCase):
         try:
             config = self._callFUT()
             current = manager.get()
-            self.failIf(current is old)
+            self.assertFalse(current is old)
             self.assertEqual(config.registry, current['registry'])
             self.assertEqual(current['registry'].__class__, Registry)
             self.assertEqual(current['request'], None)
@@ -593,7 +638,7 @@ class Test_setUp(unittest.TestCase):
         try:
             self._callFUT(registry=registry, hook_zca=False)
             sm = getSiteManager()
-            self.failIf(sm is registry)
+            self.assertFalse(sm is registry)
         finally:
             getSiteManager.reset()
             manager.clear()
@@ -780,7 +825,7 @@ class TestDummySession(unittest.TestCase):
         session = self._makeOne()
         session['a'] = 1
         self.assertEqual(session.invalidate(), None)
-        self.failIf('a' in session)
+        self.assertFalse('a' in session)
 
     def test_flash_default(self):
         session = self._makeOne()
@@ -838,7 +883,7 @@ class TestDummySession(unittest.TestCase):
         session['_csrft_'] = 'token'
         token = session.get_csrf_token()
         self.assertEqual(token, 'token')
-        self.failUnless('_csrft_' in session)
+        self.assertTrue('_csrft_' in session)
 
 
 from zope.interface import Interface

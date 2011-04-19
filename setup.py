@@ -31,7 +31,7 @@ install_requires=[
     'Paste > 1.7', # temp version pin to prevent PyPi install failure :-(
     'PasteDeploy',
     'PasteScript',
-    'WebOb >= 1.0', # no "default_charset"
+    'WebOb >= 1.0.2', # no "default_charset"; request.script_name doesnt error
     'repoze.lru',
     'setuptools',
     'zope.component >= 3.6.0', # independent of zope.hookable

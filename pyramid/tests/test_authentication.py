@@ -470,7 +470,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         plugin.now = now + 1
         request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
         result = plugin.identify(request)
-        self.failUnless(result)
+        self.assertTrue(result)
         self.assertEqual(len(request.callbacks), 1)
         response = DummyResponse()
         request.callbacks[0](None, response)
@@ -486,7 +486,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
         request._authtkt_reissued = True
         result = plugin.identify(request)
-        self.failUnless(result)
+        self.assertTrue(result)
         self.assertEqual(len(request.callbacks), 0)
 
     def test_identify_cookie_reissue_notyet(self):
@@ -497,7 +497,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         plugin.now = now + 1
         request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
         result = plugin.identify(request)
-        self.failUnless(result)
+        self.assertTrue(result)
         self.assertEqual(len(request.callbacks), 0)
 
     def test_identify_cookie_reissue_with_tokens_default(self):
@@ -510,13 +510,13 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         plugin.now = now + 1
         request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
         result = plugin.identify(request)
-        self.failUnless(result)
+        self.assertTrue(result)
         self.assertEqual(len(request.callbacks), 1)
         response = DummyResponse()
         request.callbacks[0](None, response)
         self.assertEqual(len(response.headerlist), 3)
         self.assertEqual(response.headerlist[0][0], 'Set-Cookie')
-        self.failUnless("'tokens': []" in response.headerlist[0][1])
+        self.assertTrue("'tokens': []" in response.headerlist[0][1])
 
     def test_remember(self):
         plugin = self._makeOne('secret')
@@ -525,16 +525,16 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(len(result), 3)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
-        self.failUnless(result[0][1].endswith('; Path=/'))
-        self.failUnless(result[0][1].startswith('auth_tkt='))
+        self.assertTrue(result[0][1].endswith('; Path=/'))
+        self.assertTrue(result[0][1].startswith('auth_tkt='))
 
         self.assertEqual(result[1][0], 'Set-Cookie')
-        self.failUnless(result[1][1].endswith('; Path=/; Domain=localhost'))
-        self.failUnless(result[1][1].startswith('auth_tkt='))
+        self.assertTrue(result[1][1].endswith('; Path=/; Domain=localhost'))
+        self.assertTrue(result[1][1].startswith('auth_tkt='))
 
         self.assertEqual(result[2][0], 'Set-Cookie')
-        self.failUnless(result[2][1].endswith('; Path=/; Domain=.localhost'))
-        self.failUnless(result[2][1].startswith('auth_tkt='))
+        self.assertTrue(result[2][1].endswith('; Path=/; Domain=.localhost'))
+        self.assertTrue(result[2][1].startswith('auth_tkt='))
 
     def test_remember_include_ip(self):
         plugin = self._makeOne('secret', include_ip=True)
@@ -543,16 +543,16 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(len(result), 3)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
-        self.failUnless(result[0][1].endswith('; Path=/'))
-        self.failUnless(result[0][1].startswith('auth_tkt='))
+        self.assertTrue(result[0][1].endswith('; Path=/'))
+        self.assertTrue(result[0][1].startswith('auth_tkt='))
 
         self.assertEqual(result[1][0], 'Set-Cookie')
-        self.failUnless(result[1][1].endswith('; Path=/; Domain=localhost'))
-        self.failUnless(result[1][1].startswith('auth_tkt='))
+        self.assertTrue(result[1][1].endswith('; Path=/; Domain=localhost'))
+        self.assertTrue(result[1][1].startswith('auth_tkt='))
 
         self.assertEqual(result[2][0], 'Set-Cookie')
-        self.failUnless(result[2][1].endswith('; Path=/; Domain=.localhost'))
-        self.failUnless(result[2][1].startswith('auth_tkt='))
+        self.assertTrue(result[2][1].endswith('; Path=/; Domain=.localhost'))
+        self.assertTrue(result[2][1].startswith('auth_tkt='))
 
     def test_remember_path(self):
         plugin = self._makeOne('secret', include_ip=True,
@@ -562,18 +562,18 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(len(result), 3)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
-        self.failUnless(result[0][1].endswith('; Path=/cgi-bin/app.cgi/'))
-        self.failUnless(result[0][1].startswith('auth_tkt='))
+        self.assertTrue(result[0][1].endswith('; Path=/cgi-bin/app.cgi/'))
+        self.assertTrue(result[0][1].startswith('auth_tkt='))
 
         self.assertEqual(result[1][0], 'Set-Cookie')
-        self.failUnless(result[1][1].endswith(
+        self.assertTrue(result[1][1].endswith(
             '; Path=/cgi-bin/app.cgi/; Domain=localhost'))
-        self.failUnless(result[1][1].startswith('auth_tkt='))
+        self.assertTrue(result[1][1].startswith('auth_tkt='))
 
         self.assertEqual(result[2][0], 'Set-Cookie')
-        self.failUnless(result[2][1].endswith(
+        self.assertTrue(result[2][1].endswith(
             '; Path=/cgi-bin/app.cgi/; Domain=.localhost'))
-        self.failUnless(result[2][1].startswith('auth_tkt='))
+        self.assertTrue(result[2][1].startswith('auth_tkt='))
 
     def test_remember_http_only(self):
         plugin = self._makeOne('secret', include_ip=True, http_only=True)
@@ -582,16 +582,16 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(len(result), 3)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
-        self.failUnless(result[0][1].endswith('; HttpOnly'))
-        self.failUnless(result[0][1].startswith('auth_tkt='))
+        self.assertTrue(result[0][1].endswith('; HttpOnly'))
+        self.assertTrue(result[0][1].startswith('auth_tkt='))
 
         self.assertEqual(result[1][0], 'Set-Cookie')
-        self.failUnless(result[1][1].endswith('; HttpOnly'))
-        self.failUnless(result[1][1].startswith('auth_tkt='))
+        self.assertTrue(result[1][1].endswith('; HttpOnly'))
+        self.assertTrue(result[1][1].startswith('auth_tkt='))
 
         self.assertEqual(result[2][0], 'Set-Cookie')
-        self.failUnless(result[2][1].endswith('; HttpOnly'))
-        self.failUnless(result[2][1].startswith('auth_tkt='))
+        self.assertTrue(result[2][1].endswith('; HttpOnly'))
+        self.assertTrue(result[2][1].startswith('auth_tkt='))
 
     def test_remember_secure(self):
         plugin = self._makeOne('secret', include_ip=True, secure=True)
@@ -600,16 +600,16 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(len(result), 3)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
-        self.failUnless('; Secure' in result[0][1])
-        self.failUnless(result[0][1].startswith('auth_tkt='))
+        self.assertTrue('; Secure' in result[0][1])
+        self.assertTrue(result[0][1].startswith('auth_tkt='))
 
         self.assertEqual(result[1][0], 'Set-Cookie')
-        self.failUnless('; Secure' in result[1][1])
-        self.failUnless(result[1][1].startswith('auth_tkt='))
+        self.assertTrue('; Secure' in result[1][1])
+        self.assertTrue(result[1][1].startswith('auth_tkt='))
 
         self.assertEqual(result[2][0], 'Set-Cookie')
-        self.failUnless('; Secure' in result[2][1])
-        self.failUnless(result[2][1].startswith('auth_tkt='))
+        self.assertTrue('; Secure' in result[2][1])
+        self.assertTrue(result[2][1].startswith('auth_tkt='))
 
     def test_remember_wild_domain_disabled(self):
         plugin = self._makeOne('secret', wild_domain=False)
@@ -619,11 +619,11 @@ class TestAuthTktCookieHelper(unittest.TestCase):
 
         self.assertEqual(result[0][0], 'Set-Cookie')
         self.assertTrue(result[0][1].endswith('; Path=/'))
-        self.failUnless(result[0][1].startswith('auth_tkt='))
+        self.assertTrue(result[0][1].startswith('auth_tkt='))
 
         self.assertEqual(result[1][0], 'Set-Cookie')
         self.assertTrue(result[1][1].endswith('; Path=/; Domain=localhost'))
-        self.failUnless(result[1][1].startswith('auth_tkt='))
+        self.assertTrue(result[1][1].startswith('auth_tkt='))
 
     def test_remember_domain_has_port(self):
         plugin = self._makeOne('secret', wild_domain=False)
@@ -634,11 +634,11 @@ class TestAuthTktCookieHelper(unittest.TestCase):
 
         self.assertEqual(result[0][0], 'Set-Cookie')
         self.assertTrue(result[0][1].endswith('; Path=/'))
-        self.failUnless(result[0][1].startswith('auth_tkt='))
+        self.assertTrue(result[0][1].startswith('auth_tkt='))
 
         self.assertEqual(result[1][0], 'Set-Cookie')
         self.assertTrue(result[1][1].endswith('; Path=/; Domain=example.com'))
-        self.failUnless(result[1][1].startswith('auth_tkt='))
+        self.assertTrue(result[1][1].startswith('auth_tkt='))
         
     def test_remember_string_userid(self):
         plugin = self._makeOne('secret')
@@ -690,7 +690,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         values = self._parseHeaders(result)
         self.assertEqual(len(result), 3)
         value = values[0]
-        self.failUnless('userid' in value.value)
+        self.assertTrue('userid' in value.value)
 
     def test_remember_max_age(self):
         plugin = self._makeOne('secret')
@@ -700,7 +700,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(len(result), 3)
 
         self.assertEqual(values[0]['max-age'], '500')
-        self.failUnless(values[0]['expires'])
+        self.assertTrue(values[0]['expires'])
 
     def test_remember_tokens(self):
         plugin = self._makeOne('secret')
@@ -709,13 +709,13 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(len(result), 3)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
-        self.failUnless("'tokens': ('foo', 'bar')" in result[0][1])
+        self.assertTrue("'tokens': ('foo', 'bar')" in result[0][1])
 
         self.assertEqual(result[1][0], 'Set-Cookie')
-        self.failUnless("'tokens': ('foo', 'bar')" in result[1][1])
+        self.assertTrue("'tokens': ('foo', 'bar')" in result[1][1])
 
         self.assertEqual(result[2][0], 'Set-Cookie')
-        self.failUnless("'tokens': ('foo', 'bar')" in result[2][1])
+        self.assertTrue("'tokens': ('foo', 'bar')" in result[2][1])
 
     def test_remember_non_string_token(self):
         plugin = self._makeOne('secret')

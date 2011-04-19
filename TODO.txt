@@ -24,17 +24,15 @@ Should-Have
 
 - translationdir ZCML directive use of ``path_spec`` should maybe die.
 
-- Provide a response_set_cookie method on the request for rendered responses
-  that can be used as input to response.set_cookie?  Or maybe accessing
-  ``request.response`` creates a Response, and you do
-  ``request.response.set_cookie(...)``.
-
 - Fix message catalog extraction / compilation documentation.
 
 - Review http://alexmarandon.com/articles/zodb_bfg_pyramid_notes .
 
 Nice-to-Have
 ------------
+
+- Response.RequestClass should probably be pyramid.request.Request but this
+  may imply actually subclassing webob.Response
 
 - Consider per-form_id CSRF instead of per-session global CSRF token.
 

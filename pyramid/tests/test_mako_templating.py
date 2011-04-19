@@ -260,7 +260,7 @@ class MakoLookupTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         instance = self._makeOne('path', lookup)
         result = instance({}, {'system':1})
-        self.failUnless(isinstance(result, unicode))
+        self.assertTrue(isinstance(result, unicode))
         self.assertEqual(result, u'result')
 
     def test_call_with_system_context(self):
@@ -268,7 +268,7 @@ class MakoLookupTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         instance = self._makeOne('path', lookup)
         result = instance({}, {'context':1})
-        self.failUnless(isinstance(result, unicode))
+        self.assertTrue(isinstance(result, unicode))
         self.assertEqual(result, u'result')
         self.assertEqual(lookup.values, {'_context':1})
 
@@ -289,7 +289,7 @@ class MakoLookupTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         instance = self._makeOne('path', lookup)
         result = instance.implementation().render_unicode()
-        self.failUnless(isinstance(result, unicode))
+        self.assertTrue(isinstance(result, unicode))
         self.assertEqual(result, u'result')
         
 class TestIntegration(unittest.TestCase):
@@ -378,12 +378,12 @@ class TestPkgResourceTemplateLookup(unittest.TestCase):
         fixturedir = self.get_fixturedir()
         inst = self._makeOne(directories=[fixturedir])
         result = inst.get_template('helloworld.mak')
-        self.failIf(result is None)
+        self.assertFalse(result is None)
         
     def test_get_template_asset_spec_with_filesystem_checks(self):
         inst = self._makeOne(filesystem_checks=True)
         result = inst.get_template('pyramid.tests:fixtures/helloworld.mak')
-        self.failIf(result is None)
+        self.assertFalse(result is None)
 
     def test_get_template_asset_spec_missing(self):
         from mako.exceptions import TopLevelLookupException

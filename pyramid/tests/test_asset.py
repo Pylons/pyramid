@@ -74,7 +74,7 @@ class TestOverrideProvider(unittest.TestCase):
         import pyramid.tests
         provider = self._makeOne(pyramid.tests)
         result = provider.resource_listdir(resource_name)
-        self.failUnless(result)
+        self.assertTrue(result)
 
     def test_get_resource_filename_override_returns_None(self):
         overrides = DummyOverrides(None)
@@ -137,7 +137,7 @@ class TestOverrideProvider(unittest.TestCase):
         import pyramid.tests
         provider = self._makeOne(pyramid.tests)
         result = provider.resource_listdir(resource_name)
-        self.failUnless(result)
+        self.assertTrue(result)
 
     def test_get_resource_filename_override_returns_value(self):
         overrides = DummyOverrides('value')
@@ -371,7 +371,7 @@ class TestPackageOverrides(unittest.TestCase):
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides= overrides
-        self.failUnless(po.listdir('whatever'))
+        self.assertTrue(po.listdir('whatever'))
 
     def test_listdir_doesnt_exist(self):
         overrides = [ DummyOverride(None), DummyOverride(

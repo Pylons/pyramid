@@ -117,8 +117,8 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         self.assertEqual(router.debug_notfound, False)
         self.assertEqual(router.debug_routematch, False)
-        self.failIf('debug_notfound' in router.__dict__)
-        self.failIf('debug_routematch' in router.__dict__)
+        self.assertFalse('debug_notfound' in router.__dict__)
+        self.assertFalse('debug_routematch' in router.__dict__)
 
     def test_root_policy(self):
         context = DummyContext()
@@ -142,8 +142,8 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         start_response = DummyStartResponse()
         why = exc_raised(NotFound, router, environ, start_response)
-        self.failUnless('/' in why[0], why)
-        self.failIf('debug_notfound' in why[0])
+        self.assertTrue('/' in why[0], why)
+        self.assertFalse('debug_notfound' in why[0])
         self.assertEqual(len(logger.messages), 0)
 
     def test_traverser_raises_notfound_class(self):
@@ -163,7 +163,7 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         start_response = DummyStartResponse()
         why = exc_raised(NotFound, router, environ, start_response)
-        self.failUnless('foo' in why[0], why)
+        self.assertTrue('foo' in why[0], why)
 
     def test_traverser_raises_forbidden_class(self):
         from pyramid.exceptions import Forbidden
@@ -182,7 +182,7 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         start_response = DummyStartResponse()
         why = exc_raised(Forbidden, router, environ, start_response)
-        self.failUnless('foo' in why[0], why)
+        self.assertTrue('foo' in why[0], why)
 
     def test_call_no_view_registered_no_isettings(self):
         from pyramid.exceptions import NotFound
@@ -193,8 +193,8 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         start_response = DummyStartResponse()
         why = exc_raised(NotFound, router, environ, start_response)
-        self.failUnless('/' in why[0], why)
-        self.failIf('debug_notfound' in why[0])
+        self.assertTrue('/' in why[0], why)
+        self.assertFalse('debug_notfound' in why[0])
         self.assertEqual(len(logger.messages), 0)
 
     def test_call_no_view_registered_debug_notfound_false(self):
@@ -207,8 +207,8 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         start_response = DummyStartResponse()
         why = exc_raised(NotFound, router, environ, start_response)
-        self.failUnless('/' in why[0], why)
-        self.failIf('debug_notfound' in why[0])
+        self.assertTrue('/' in why[0], why)
+        self.assertFalse('debug_notfound' in why[0])
         self.assertEqual(len(logger.messages), 0)
 
     def test_call_no_view_registered_debug_notfound_true(self):
@@ -221,19 +221,19 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         start_response = DummyStartResponse()
         why = exc_raised(NotFound, router, environ, start_response)
-        self.failUnless(
+        self.assertTrue(
             "debug_notfound of url http://localhost:8080/; path_info: '/', "
             "context:" in why[0])
-        self.failUnless("view_name: '', subpath: []" in why[0])
-        self.failUnless('http://localhost:8080' in why[0], why)
+        self.assertTrue("view_name: '', subpath: []" in why[0])
+        self.assertTrue('http://localhost:8080' in why[0], why)
 
         self.assertEqual(len(logger.messages), 1)
         message = logger.messages[0]
-        self.failUnless('of url http://localhost:8080' in message)
-        self.failUnless("path_info: '/'" in message)
-        self.failUnless('DummyContext instance at' in message)
-        self.failUnless("view_name: ''" in message)
-        self.failUnless("subpath: []" in message)
+        self.assertTrue('of url http://localhost:8080' in message)
+        self.assertTrue("path_info: '/'" in message)
+        self.assertTrue('DummyContext instance at' in message)
+        self.assertTrue("view_name: ''" in message)
+        self.assertTrue("subpath: []" in message)
 
     def test_call_view_returns_nonresponse(self):
         from pyramid.interfaces import IViewClassifier
@@ -557,7 +557,7 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(request.matched_route.name, 'foo')
 
         self.assertEqual(len(logger.messages), 1)
-        self.failUnless(
+        self.assertTrue(
             logger.messages[0].startswith(
             "route matched for url http://localhost:8080"
             "/archives/action1/article1; "
@@ -623,7 +623,7 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(environ['bfg.routes.route'].name, 'foo')
         self.assertEqual(request.matchdict, matchdict)
         self.assertEqual(request.matched_route.name, 'foo')
-        self.failUnless(IFoo.providedBy(request))
+        self.assertTrue(IFoo.providedBy(request))
 
     def test_root_factory_raises_notfound(self):
         from pyramid.interfaces import IRootFactory
@@ -641,7 +641,7 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         start_response = DummyStartResponse()
         why = exc_raised(NotFound, router, environ, start_response)
-        self.failUnless('from root factory' in why[0])
+        self.assertTrue('from root factory' in why[0])
 
     def test_root_factory_raises_forbidden(self):
         from pyramid.interfaces import IRootFactory
@@ -659,7 +659,7 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         start_response = DummyStartResponse()
         why = exc_raised(Forbidden, router, environ, start_response)
-        self.failUnless('from root factory' in why[0])
+        self.assertTrue('from root factory' in why[0])
 
     def test_root_factory_exception_propagating(self):
         from pyramid.interfaces import IRootFactory

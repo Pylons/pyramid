@@ -92,8 +92,8 @@ will be employed.
        return HTTPFound(location='http://example.com') # any renderer avoided
 
 Views which use a renderer can vary non-body response attributes (such as
-headers and the HTTP status code) by attaching properties to the request.
-See :ref:`response_request_attrs`.
+headers and the HTTP status code) by attaching a property to the
+``request.response`` attribute See :ref:`request_response_attr`.
 
 Additional renderers can be added by developers to the system as necessary
 (see :ref:`adding_and_overriding_renderers`).
@@ -147,7 +147,8 @@ representing the ``str()`` serialization of the return value:
    {'content': 'Hello!'}
 
 Views which use the string renderer can vary non-body response attributes by
-attaching properties to the request.  See :ref:`response_request_attrs`.
+using the API of the ``request.response`` attribute.  See
+:ref:`request_response_attr`.
 
 .. index::
    pair: renderer; JSON
@@ -199,7 +200,8 @@ You can configure a view to use the JSON renderer by naming ``json`` as the
     
 
 Views which use the JSON renderer can vary non-body response attributes by
-attaching properties to the request.  See :ref:`response_request_attrs`.
+using the api of the ``request.response`` attribute.  See
+:ref:`request_response_attr`.
 
 .. index::
    pair: renderer; chameleon
@@ -269,8 +271,9 @@ Here's an example view configuration which uses a Chameleon text renderer:
                     context='myproject.resources.Hello',
                     renderer='myproject:templates/foo.txt')
 
-Views which use a Chameleon renderer can vary response attributes by
-attaching properties to the request.  See :ref:`response_request_attrs`.
+Views which use a Chameleon renderer can vary response attributes by using
+the API of the ``request.response`` attribute.  See
+:ref:`request_response_attr`.
 
 .. index::
    pair: renderer; mako
@@ -333,7 +336,7 @@ additional :ref:`mako_template_renderer_settings`.
    single: response headers (from a renderer)
    single: renderer response headers
 
-.. _response_request_attrs:
+.. _request_response_attr:
 
 Varying Attributes of Rendered Responses
 ----------------------------------------
@@ -342,9 +345,43 @@ Before a response constructed by a :term:`renderer` is returned to
 :app:`Pyramid`, several attributes of the request are examined which have the
 potential to influence response behavior.
 
-View callables that don't directly return a response should set these
-attributes on the ``request`` object via ``setattr`` during their execution,
-to influence associated response attributes.
+View callables that don't directly return a response should use the API of
+the :class:`pyramid.response.Response` attribute available as
+``request.response`` during their execution, to influence associated response
+behavior.
+
+For example, if you need to change the response status from within a view
+callable that uses a renderer, assign the ``status`` attribute to the
+``response`` attribute of the request before returning a result:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.view import view_config
+
+   @view_config(name='gone', renderer='templates/gone.pt')
+   def myview(request):
+       request.response.status = '404 Not Found'
+       return {'URL':request.URL}
+
+For more information on attributes of the request, see the API documentation
+in :ref:`request_module`.  For more information on the API of
+``request.response``, see :class:`pyramid.response.Response`.
+
+.. _response_prefixed_attrs:
+
+Deprecated Mechanism to Vary Attributes of Rendered Responses
+-------------------------------------------------------------
+
+.. warning:: This section describes behavior deprecated in Pyramid 1.1.
+
+In previous releases of Pyramid (1.0 and before), the ``request.response``
+attribute did not exist.  Instead, Pyramid required users to set special
+``response_`` -prefixed attributes of the request to influence response
+behavior.  As of Pyramid 1.1, those request attributes are deprecated and
+their use will cause a deprecation warning to be issued when used.  Until
+their existence is removed completely, we document them below, for benefit of
+people with older code bases.
 
 ``response_content_type``
   Defines the content-type of the resulting response,
@@ -366,23 +403,6 @@ to influence associated response attributes.
   headers in the returned response.  The same can also be achieved by
   returning various values in the ``response_headerlist``, this is purely a
   convenience.
-
-For example, if you need to change the response status from within a view
-callable that uses a renderer, assign the ``response_status`` attribute to
-the request before returning a result:
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.view import view_config
-
-   @view_config(name='gone', renderer='templates/gone.pt')
-   def myview(request):
-       request.response_status = '404 Not Found'
-       return {'URL':request.URL}
-
-For more information on attributes of the request, see the API
-documentation in :ref:`request_module`.
 
 .. index::
    single: renderer (adding)

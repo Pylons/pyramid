@@ -51,7 +51,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         instance = self._makeOne(minimal, lookup)
         result = instance({}, {})
-        self.failUnless(isinstance(result, unicode))
+        self.assertTrue(isinstance(result, unicode))
         self.assertEqual(result.rstrip('\n'),
                      '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
 
@@ -60,7 +60,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         minimal = self._getTemplatePath('minimal.pt')
         lookup = DummyLookup()
         instance = self._makeOne(minimal, lookup)
-        self.failIf('template' in instance.__dict__)
+        self.assertFalse('template' in instance.__dict__)
         template  = instance.template
         self.assertEqual(template, instance.__dict__['template'])
 
@@ -69,7 +69,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         minimal = self._getTemplatePath('minimal.pt')
         lookup = DummyLookup()
         instance = self._makeOne(minimal, lookup)
-        self.failIf('template' in instance.__dict__)
+        self.assertFalse('template' in instance.__dict__)
         template  = instance.template
         self.assertEqual(template.translate, lookup.translate)
 
@@ -79,7 +79,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         lookup.debug = True
         instance = self._makeOne(minimal, lookup)
-        self.failIf('template' in instance.__dict__)
+        self.assertFalse('template' in instance.__dict__)
         template  = instance.template
         self.assertEqual(template.debug, True)
 
@@ -89,7 +89,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         lookup.debug = False
         instance = self._makeOne(minimal, lookup)
-        self.failIf('template' in instance.__dict__)
+        self.assertFalse('template' in instance.__dict__)
         template  = instance.template
         self.assertEqual(template.debug, False)
 
@@ -99,7 +99,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         lookup.auto_reload = True
         instance = self._makeOne(minimal, lookup)
-        self.failIf('template' in instance.__dict__)
+        self.assertFalse('template' in instance.__dict__)
         template  = instance.template
         self.assertEqual(template.auto_reload, True)
 
@@ -109,7 +109,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         lookup.auto_reload = False
         instance = self._makeOne(minimal, lookup)
-        self.failIf('template' in instance.__dict__)
+        self.assertFalse('template' in instance.__dict__)
         template  = instance.template
         self.assertEqual(template.auto_reload, False)
 
@@ -126,7 +126,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         instance = self._makeOne(minimal, lookup)
         result = instance.implementation()()
-        self.failUnless(isinstance(result, unicode))
+        self.assertTrue(isinstance(result, unicode))
         self.assertEqual(result.rstrip('\n'),
                      '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
         
@@ -140,7 +140,7 @@ class RenderTemplateTests(Base, unittest.TestCase):
     def test_it(self):
         minimal = self._getTemplatePath('minimal.pt')
         result = self._callFUT(minimal)
-        self.failUnless(isinstance(result, unicode))
+        self.assertTrue(isinstance(result, unicode))
         self.assertEqual(result.rstrip('\n'),
                      '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
 
@@ -154,7 +154,7 @@ class RenderTemplateToResponseTests(Base, unittest.TestCase):
         minimal = self._getTemplatePath('minimal.pt')
         result = self._callFUT(minimal)
         from webob import Response
-        self.failUnless(isinstance(result, Response))
+        self.assertTrue(isinstance(result, Response))
         self.assertEqual(result.app_iter[0].rstrip('\n'),
                      '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
         self.assertEqual(result.status, '200 OK')
@@ -169,7 +169,7 @@ class RenderTemplateToResponseTests(Base, unittest.TestCase):
         self._registerUtility(Response2, IResponseFactory)
         minimal = self._getTemplatePath('minimal.pt')
         result = self._callFUT(minimal)
-        self.failUnless(isinstance(result, Response2))
+        self.assertTrue(isinstance(result, Response2))
 
 class GetRendererTests(Base, unittest.TestCase):
     def _callFUT(self, name):
@@ -187,7 +187,7 @@ class GetRendererTests(Base, unittest.TestCase):
             return renderer
         self._registerUtility(rf, IRendererFactory, name='foo')
         result = self._callFUT('foo')
-        self.failUnless(result is renderer)
+        self.assertTrue(result is renderer)
 
 class GetTemplateTests(Base, unittest.TestCase):
     def _callFUT(self, name):
@@ -206,7 +206,7 @@ class GetTemplateTests(Base, unittest.TestCase):
             return renderer
         self._registerUtility(rf, IRendererFactory, name='foo')
         result = self._callFUT('foo')
-        self.failUnless(result is renderer.template)
+        self.assertTrue(result is renderer.template)
 
 class DummyLookup(object):
     auto_reload=True

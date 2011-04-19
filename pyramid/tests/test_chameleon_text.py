@@ -49,7 +49,7 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         minimal = self._getTemplatePath('minimal.txt')
         lookup = DummyLookup()
         instance = self._makeOne(minimal, lookup)
-        self.failIf('template' in instance.__dict__)
+        self.assertFalse('template' in instance.__dict__)
         template  = instance.template
         self.assertEqual(template, instance.__dict__['template'])
 
@@ -58,7 +58,7 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         minimal = self._getTemplatePath('minimal.txt')
         lookup = DummyLookup()
         instance = self._makeOne(minimal, lookup)
-        self.failIf('template' in instance.__dict__)
+        self.assertFalse('template' in instance.__dict__)
         template  = instance.template
         self.assertEqual(template.translate, lookup.translate)
 
@@ -68,7 +68,7 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         lookup.debug = True
         instance = self._makeOne(minimal, lookup)
-        self.failIf('template' in instance.__dict__)
+        self.assertFalse('template' in instance.__dict__)
         template  = instance.template
         self.assertEqual(template.debug, True)
 
@@ -78,7 +78,7 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         lookup.auto_reload = True
         instance = self._makeOne(minimal, lookup)
-        self.failIf('template' in instance.__dict__)
+        self.assertFalse('template' in instance.__dict__)
         template  = instance.template
         self.assertEqual(template.auto_reload, True)
 
@@ -88,7 +88,7 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         lookup.auto_reload = False
         instance = self._makeOne(minimal, lookup)
-        self.failIf('template' in instance.__dict__)
+        self.assertFalse('template' in instance.__dict__)
         template  = instance.template
         self.assertEqual(template.auto_reload, False)
 
@@ -98,7 +98,7 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         instance = self._makeOne(minimal, lookup)
         result = instance({}, {})
-        self.failUnless(isinstance(result, str))
+        self.assertTrue(isinstance(result, str))
         self.assertEqual(result, 'Hello.\n')
 
     @skip_on('java')
@@ -114,7 +114,7 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         instance = self._makeOne(nonminimal, lookup)
         result = instance({'name':'Chris'}, {})
-        self.failUnless(isinstance(result, str))
+        self.assertTrue(isinstance(result, str))
         self.assertEqual(result, 'Hello, Chris!\n')
 
     @skip_on('java')
@@ -123,7 +123,7 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         instance = self._makeOne(minimal, lookup)
         result = instance.implementation()()
-        self.failUnless(isinstance(result, str))
+        self.assertTrue(isinstance(result, str))
         self.assertEqual(result, 'Hello.\n')
 
 class RenderTemplateTests(Base, unittest.TestCase):
@@ -135,7 +135,7 @@ class RenderTemplateTests(Base, unittest.TestCase):
     def test_it(self):
         minimal = self._getTemplatePath('minimal.txt')
         result = self._callFUT(minimal)
-        self.failUnless(isinstance(result, str))
+        self.assertTrue(isinstance(result, str))
         self.assertEqual(result, 'Hello.\n')
 
 class RenderTemplateToResponseTests(Base, unittest.TestCase):
@@ -148,7 +148,7 @@ class RenderTemplateToResponseTests(Base, unittest.TestCase):
         minimal = self._getTemplatePath('minimal.txt')
         result = self._callFUT(minimal)
         from webob import Response
-        self.failUnless(isinstance(result, Response))
+        self.assertTrue(isinstance(result, Response))
         self.assertEqual(result.app_iter, ['Hello.\n'])
         self.assertEqual(result.status, '200 OK')
         self.assertEqual(len(result.headerlist), 2)
@@ -162,7 +162,7 @@ class RenderTemplateToResponseTests(Base, unittest.TestCase):
         self._registerUtility(Response2, IResponseFactory)
         minimal = self._getTemplatePath('minimal.txt')
         result = self._callFUT(minimal)
-        self.failUnless(isinstance(result, Response2))
+        self.assertTrue(isinstance(result, Response2))
 
 class GetRendererTests(Base, unittest.TestCase):
     def _callFUT(self, name):
@@ -180,7 +180,7 @@ class GetRendererTests(Base, unittest.TestCase):
             return renderer
         self._registerUtility(rf, IRendererFactory, name='foo')
         result = self._callFUT('foo')
-        self.failUnless(result is renderer)
+        self.assertTrue(result is renderer)
 
 class GetTemplateTests(Base, unittest.TestCase):
     def _callFUT(self, name):
@@ -199,7 +199,7 @@ class GetTemplateTests(Base, unittest.TestCase):
             return renderer
         self._registerUtility(rf, IRendererFactory, name='foo')
         result = self._callFUT('foo')
-        self.failUnless(result is renderer.template)
+        self.assertTrue(result is renderer.template)
 
 class DummyLookup(object):
     auto_reload=True

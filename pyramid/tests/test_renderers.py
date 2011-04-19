@@ -3,6 +3,18 @@ import unittest
 from pyramid.testing import cleanUp
 from pyramid import testing
 
+def hide_warnings(wrapped):
+    import warnings
+    def wrapper(*arg, **kw):
+        warnings.filterwarnings('ignore')
+        try:
+            wrapped(*arg, **kw)
+        finally:
+            warnings.resetwarnings()
+    wrapper.__name__ = wrapped.__name__
+    wrapper.__doc__ = wrapped.__doc__
+    return wrapper
+
 class TestTemplateRendererFactory(unittest.TestCase):
     def setUp(self):
         self.config = cleanUp()
@@ -46,7 +58,7 @@ class TestTemplateRendererFactory(unittest.TestCase):
             'type':'type',
             })
         result = self._callFUT(info, None)
-        self.failUnless(result is renderer)
+        self.assertTrue(result is renderer)
 
 class TestChameleonRendererLookup(unittest.TestCase):
     def setUp(self):
@@ -190,7 +202,7 @@ class TestChameleonRendererLookup(unittest.TestCase):
             })
         lookup = self._makeOne(None)
         result = lookup(info)
-        self.failUnless(result is renderer)
+        self.assertTrue(result is renderer)
 
     def test___call__abspath_notyetregistered(self):
         import os
@@ -221,7 +233,7 @@ class TestChameleonRendererLookup(unittest.TestCase):
             })
         lookup = self._makeOne(None)
         result = lookup(info)
-        self.failUnless(renderer is result)
+        self.assertTrue(renderer is result)
 
     def test___call__relpath_has_package_registered(self):
         renderer = {}
@@ -237,7 +249,7 @@ class TestChameleonRendererLookup(unittest.TestCase):
             })
         lookup = self._makeOne(None)
         result = lookup(info)
-        self.failUnless(renderer is result)
+        self.assertTrue(renderer is result)
 
     def test___call__spec_notfound(self):
         spec = 'pyramid.tests:wont/exist'
@@ -267,7 +279,7 @@ class TestChameleonRendererLookup(unittest.TestCase):
         self._registerTemplateRenderer(renderer, spec)
         lookup = self._makeOne(None)
         result = lookup(info)
-        self.failUnless(result is renderer)
+        self.assertTrue(result is renderer)
 
     def test___call__spec_notyetregistered(self):
         import os
@@ -286,11 +298,11 @@ class TestChameleonRendererLookup(unittest.TestCase):
             })
         lookup = self._makeOne(factory)
         result = lookup(info)
-        self.failUnless(result is renderer)
+        self.assertTrue(result is renderer)
         path = os.path.abspath(__file__).split('$')[0] # jython
         if path.endswith('.pyc'): # pragma: no cover
             path = path[:-1]
-        self.failUnless(factory.path.startswith(path))
+        self.assertTrue(factory.path.startswith(path))
         self.assertEqual(factory.kw, {})
 
     def test___call__reload_assets_true(self):
@@ -312,7 +324,7 @@ class TestChameleonRendererLookup(unittest.TestCase):
             })
         lookup = self._makeOne(factory)
         result = lookup(info)
-        self.failUnless(result is renderer)
+        self.assertTrue(result is renderer)
         spec = '%s:%s' % ('pyramid.tests', 'test_renderers.py')
         self.assertEqual(reg.queryUtility(ITemplateRenderer, name=spec),
                          None)
@@ -334,7 +346,7 @@ class TestChameleonRendererLookup(unittest.TestCase):
             })
         lookup = self._makeOne(factory)
         result = lookup(info)
-        self.failUnless(result is renderer)
+        self.assertTrue(result is renderer)
         spec = '%s:%s' % ('pyramid.tests', 'test_renderers.py')
         self.assertNotEqual(reg.queryUtility(ITemplateRenderer, name=spec),
                             None)
@@ -394,6 +406,12 @@ class TestRendererFromName(unittest.TestCase):
         
 
 class Test_json_renderer_factory(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+        
     def _callFUT(self, name):
         from pyramid.renderers import json_renderer_factory
         return json_renderer_factory(name)
@@ -407,14 +425,14 @@ class Test_json_renderer_factory(unittest.TestCase):
         request = testing.DummyRequest()
         renderer = self._callFUT(None)
         renderer({'a':1}, {'request':request})
-        self.assertEqual(request.response_content_type, 'application/json')
+        self.assertEqual(request.response.content_type, 'application/json')
 
     def test_with_request_content_type_set(self):
         request = testing.DummyRequest()
-        request.response_content_type = 'text/mishmash'
+        request.response.content_type = 'text/mishmash'
         renderer = self._callFUT(None)
         renderer({'a':1}, {'request':request})
-        self.assertEqual(request.response_content_type, 'text/mishmash')
+        self.assertEqual(request.response.content_type, 'text/mishmash')
 
 class Test_string_renderer_factory(unittest.TestCase):
     def _callFUT(self, name):
@@ -443,14 +461,14 @@ class Test_string_renderer_factory(unittest.TestCase):
         request = testing.DummyRequest()
         renderer = self._callFUT(None)
         renderer(None, {'request':request})
-        self.assertEqual(request.response_content_type, 'text/plain')
+        self.assertEqual(request.response.content_type, 'text/plain')
 
     def test_with_request_content_type_set(self):
         request = testing.DummyRequest()
-        request.response_content_type = 'text/mishmash'
+        request.response.content_type = 'text/mishmash'
         renderer = self._callFUT(None)
         renderer(None, {'request':request})
-        self.assertEqual(request.response_content_type, 'text/mishmash')
+        self.assertEqual(request.response.content_type, 'text/mishmash')
 
 
 class TestRendererHelper(unittest.TestCase):
@@ -492,8 +510,15 @@ class TestRendererHelper(unittest.TestCase):
                                              name='.foo')
         return renderer
 
+    def _registerResponseFactory(self):
+        from pyramid.interfaces import IResponseFactory
+        class ResponseFactory(object):
+            pass
+        self.config.registry.registerUtility(ResponseFactory, IResponseFactory)
+
     def test_render_to_response(self):
         self._registerRendererFactory()
+        self._registerResponseFactory()
         request = Dummy()
         helper = self._makeOne('loo.foo')
         response = helper.render_to_response('values', 'system_values',
@@ -502,6 +527,7 @@ class TestRendererHelper(unittest.TestCase):
 
     def test_render_view(self):
         self._registerRendererFactory()
+        self._registerResponseFactory()
         request = Dummy()
         helper = self._makeOne('loo.foo')
         view = 'view'
@@ -532,7 +558,7 @@ class TestRendererHelper(unittest.TestCase):
         helper = self._makeOne('loo.foo', registry=reg)
         result = helper.render('value', {})
         self.assertEqual(result, ('value', {}))
-        self.failUnless(reg.queried)
+        self.assertTrue(reg.queried)
         self.assertEqual(reg.event._system, {})
         self.assertEqual(reg.event.__class__.__name__, 'BeforeRender')
 
@@ -561,8 +587,43 @@ class TestRendererHelper(unittest.TestCase):
         result = helper.render('values', None)
         self.assertEqual(result[1]['a'], 1)
 
-    def test__make_response_with_content_type(self):
+    def test__make_response_request_is_None(self):
+        request = None
+        helper = self._makeOne('loo.foo')
+        response = helper._make_response('abc', request)
+        self.assertEqual(response.body, 'abc')
+
+    def test__make_response_request_is_None_response_factory_exists(self):
+        self._registerResponseFactory()
+        request = None
+        helper = self._makeOne('loo.foo')
+        response = helper._make_response('abc', request)
+        self.assertEqual(response.__class__.__name__, 'ResponseFactory')
+        self.assertEqual(response.body, 'abc')
+
+    def test__make_response_result_is_unicode(self):
+        from pyramid.response import Response
         request = testing.DummyRequest()
+        request.response = Response()
+        helper = self._makeOne('loo.foo')
+        la = unicode('/La Pe\xc3\xb1a', 'utf-8')
+        response = helper._make_response(la, request)
+        self.assertEqual(response.body, la.encode('utf-8'))
+
+    def test__make_response_result_is_str(self):
+        from pyramid.response import Response
+        request = testing.DummyRequest()
+        request.response = Response()
+        helper = self._makeOne('loo.foo')
+        la = unicode('/La Pe\xc3\xb1a', 'utf-8')
+        response = helper._make_response(la.encode('utf-8'), request)
+        self.assertEqual(response.body, la.encode('utf-8'))
+
+    @hide_warnings
+    def test__make_response_with_content_type(self):
+        from pyramid.response import Response
+        request = testing.DummyRequest()
+        request.response = Response()
         attrs = {'response_content_type':'text/nonsense'}
         request.__dict__.update(attrs)
         helper = self._makeOne('loo.foo')
@@ -570,8 +631,11 @@ class TestRendererHelper(unittest.TestCase):
         self.assertEqual(response.content_type, 'text/nonsense')
         self.assertEqual(response.body, 'abc')
 
+    @hide_warnings
     def test__make_response_with_headerlist(self):
+        from pyramid.response import Response
         request = testing.DummyRequest()
+        request.response = Response()
         attrs = {'response_headerlist':[('a', '1'), ('b', '2')]}
         request.__dict__.update(attrs)
         helper = self._makeOne('loo.foo')
@@ -583,8 +647,11 @@ class TestRendererHelper(unittest.TestCase):
                           ('b', '2')])
         self.assertEqual(response.body, 'abc')
 
+    @hide_warnings
     def test__make_response_with_status(self):
+        from pyramid.response import Response
         request = testing.DummyRequest()
+        request.response = Response()
         attrs = {'response_status':'406 You Lose'}
         request.__dict__.update(attrs)
         helper = self._makeOne('loo.foo')
@@ -592,16 +659,22 @@ class TestRendererHelper(unittest.TestCase):
         self.assertEqual(response.status, '406 You Lose')
         self.assertEqual(response.body, 'abc')
 
+    @hide_warnings
     def test__make_response_with_charset(self):
+        from pyramid.response import Response
         request = testing.DummyRequest()
+        request.response = Response()
         attrs = {'response_charset':'UTF-16'}
         request.__dict__.update(attrs)
         helper = self._makeOne('loo.foo')
         response = helper._make_response('abc', request)
         self.assertEqual(response.charset, 'UTF-16')
 
+    @hide_warnings
     def test__make_response_with_cache_for(self):
+        from pyramid.response import Response
         request = testing.DummyRequest()
+        request.response = Response()
         attrs = {'response_cache_for':100}
         request.__dict__.update(attrs)
         helper = self._makeOne('loo.foo')
@@ -611,21 +684,21 @@ class TestRendererHelper(unittest.TestCase):
     def test_with_alternate_response_factory(self):
         from pyramid.interfaces import IResponseFactory
         class ResponseFactory(object):
-            def __init__(self, result):
-                self.result = result
+            def __init__(self):
+                pass
         self.config.registry.registerUtility(ResponseFactory, IResponseFactory)
         request = testing.DummyRequest()
         helper = self._makeOne('loo.foo')
         response = helper._make_response('abc', request)
         self.assertEqual(response.__class__, ResponseFactory)
-        self.assertEqual(response.result, 'abc')
+        self.assertEqual(response.body, 'abc')
 
     def test__make_response_with_real_request(self):
         # functional
         from pyramid.request import Request
         request = Request({})
-        attrs = {'response_status':'406 You Lose'}
-        request.__dict__.update(attrs)
+        request.registry = self.config.registry
+        request.response.status = '406 You Lose'
         helper = self._makeOne('loo.foo')
         response = helper._make_response('abc', request)
         self.assertEqual(response.status, '406 You Lose')

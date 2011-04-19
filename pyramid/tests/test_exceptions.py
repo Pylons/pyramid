@@ -7,7 +7,7 @@ class TestExceptionResponse(unittest.TestCase):
     
     def test_app_iter(self):
         exc = self._makeOne('')
-        self.failUnless('<code></code>' in exc.app_iter[0])
+        self.assertTrue('<code></code>' in exc.app_iter[0])
 
     def test_headerlist(self):
         exc = self._makeOne('')
@@ -20,7 +20,7 @@ class TestExceptionResponse(unittest.TestCase):
 
     def test_withmessage(self):
         exc = self._makeOne('abc&123')
-        self.failUnless('<code>abc&amp;123</code>' in exc.app_iter[0])
+        self.assertTrue('<code>abc&amp;123</code>' in exc.app_iter[0])
 
 class TestNotFound(unittest.TestCase):
     def _makeOne(self, message):
@@ -30,7 +30,7 @@ class TestNotFound(unittest.TestCase):
     def test_it(self):
         from pyramid.exceptions import ExceptionResponse
         e = self._makeOne('notfound')
-        self.failUnless(isinstance(e, ExceptionResponse))
+        self.assertTrue(isinstance(e, ExceptionResponse))
         self.assertEqual(e.status, '404 Not Found')
 
 class TestForbidden(unittest.TestCase):
@@ -41,5 +41,5 @@ class TestForbidden(unittest.TestCase):
     def test_it(self):
         from pyramid.exceptions import ExceptionResponse
         e = self._makeOne('unauthorized')
-        self.failUnless(isinstance(e, ExceptionResponse))
+        self.assertTrue(isinstance(e, ExceptionResponse))
         self.assertEqual(e.status, '403 Forbidden')
