@@ -20,25 +20,26 @@ def main(global_config, **settings):
                           authentication_policy=authn_policy,
                           authorization_policy=authz_policy)
     config.add_static_view('static', 'tutorial:static')
-    config.add_route('view_wiki', '/', view='tutorial.views.view_wiki')
-    config.add_route('login', '/login',
-                     view='tutorial.login.login',
-                     view_renderer='tutorial:templates/login.pt')
-    config.add_route('logout', '/logout',
-                     view='tutorial.login.logout')
-    config.add_route('view_page', '/{pagename}',
-                     view='tutorial.views.view_page',
-                     view_renderer='tutorial:templates/view.pt')
-    config.add_route('add_page', '/add_page/{pagename}',
-                     view='tutorial.views.add_page',
-                     view_renderer='tutorial:templates/edit.pt',
-                     view_permission='edit')
-    config.add_route('edit_page', '/{pagename}/edit_page',
-                     view='tutorial.views.edit_page',
-                     view_renderer='tutorial:templates/edit.pt',
-                     view_permission='edit')
+
+    config.add_route('view_wiki', '/')
+    config.add_route('login', '/login')
+    config.add_route('logout', '/logout')
+    config.add_route('view_page', '/{pagename}')
+    config.add_route('add_page', '/add_page/{pagename}')
+    config.add_route('edit_page', '/{pagename}/edit_page')
+    config.add_route('view_wiki', '/')
+
+    config.add_view(route_name='login', view='tutorial.login.login',
+                    renderer='tutorial:templates/login.pt')
+    config.add_view(route_name='logout', view='tutorial.login.logout')
+    config.add_view(route_name='view_page', view='tutorial.views.view_page',
+                    renderer='tutorial:templates/view.pt')
+    config.add_view(route_name='add_page', view='tutorial.views.add_page',
+                    renderer='tutorial:templates/edit.pt', permission='edit')
+    config.add_view(route_name='edit_page', view='tutorial.views.edit_page',
+                    renderer='tutorial:templates/edit.pt', permission='edit')
     config.add_view('tutorial.login.login',
-                    renderer='tutorial:templates/login.pt',
-                    context='pyramid.exceptions.Forbidden')
+                    context='pyramid.exceptions.Forbidden',
+                    renderer='tutorial:templates/login.pt')
     return config.make_wsgi_app()
 

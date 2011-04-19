@@ -272,8 +272,8 @@ Mapping Views to URLs in ``__init__.py``
 ========================================
 
 The ``__init__.py`` file contains
-:meth:`pyramid.config.Configurator.add_route` calls which serve to map
-URLs via :term:`url dispatch` to view functions.  First, we’ll get rid of the
+:meth:`pyramid.config.Configurator.add_view` calls which serve to map
+routes via :term:`url dispatch` to views.  First, we’ll get rid of the
 existing route created by the template using the name ``home``. It’s only an
 example and isn’t relevant to our application.
 
@@ -282,21 +282,33 @@ these declarations is very important.  ``route`` declarations are matched in
 the order they're found in the ``__init__.py`` file.
 
 #. Add a declaration which maps the pattern ``/`` (signifying the root URL)
-   to the view named ``view_wiki`` in our ``views.py`` file with the name
-   ``view_wiki``.  This is the :term:`default view` for the wiki.
+   to the route named ``view_wiki``.  This is the :term:`default view` for the
+   wiki.
 
-#. Add a declaration which maps the pattern ``/{pagename}`` to the view named
-   ``view_page`` in our ``views.py`` file with the view name ``view_page``.
-   This is the regular view for a page.
+#. Add a declaration which maps the pattern ``/{pagename}`` to the route named
+   ``view_page``.  This is the regular view for a page.
 
-#. Add a declaration which maps the pattern
-   ``/add_page/{pagename}`` to the view named ``add_page`` in our
-   ``views.py`` file with the name ``add_page``.  This is the add view
-   for a new page.
+#. Add a declaration which maps the pattern ``/add_page/{pagename}`` to the
+   route named ``add_page``.  This is the add view for a new page.
 
 #. Add a declaration which maps the pattern ``/{pagename}/edit_page`` to the
-   view named ``edit_page`` in our ``views.py`` file with the name
-   ``edit_page``.  This is the edit view for a page.
+   route named ``edit_page``.  This is the edit view for a page.
+
+After we've defined the routes for our application, we can register views
+to handle the processing and rendering that needs to happen when each route is
+requested.
+
+#. Add a declaration which maps the ``view_wiki`` route to the view named
+   ``view_wiki`` in our ``views.py`` file.
+
+#. Add a declaration which maps the ``view_page`` route to the view named
+   ``view_page`` in our ``views.py`` file.
+
+#. Add a declaration which maps the ``add_page`` route to the view named
+   ``add_page`` in our ``views.py`` file.
+
+#. Add a declaration which maps the ``edit_page`` route to the view named
+   ``edit_page`` in our ``views.py`` file.
 
 As a result of our edits, the ``__init__.py`` file should look
 something like so:
