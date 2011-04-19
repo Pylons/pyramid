@@ -9,12 +9,14 @@ from zope.interface import Interface
 from zope.interface import alsoProvides
 
 from pyramid.interfaces import IRequest
+from pyramid.interfaces import IResponseFactory
 from pyramid.interfaces import ISecuredView
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
 from pyramid.interfaces import ISession
 
 from pyramid.config import Configurator
+from pyramid.decorator import reify
 from pyramid.exceptions import Forbidden
 from pyramid.response import Response
 from pyramid.registry import Registry
@@ -653,6 +655,8 @@ class DummyRequest(object):
     response_callbacks = ()
     charset = 'UTF-8'
     script_name = ''
+    _registry = None
+
     def __init__(self, params=None, environ=None, headers=None, path='/',
                  cookies=None, post=None, **kw):
         if environ is None:
@@ -698,9 +702,23 @@ class DummyRequest(object):
             self.response_callbacks = []
         self.response_callbacks.append(callback)
 
-    @property
-    def registry(self):
-        return get_current_registry()
+    def _get_registry(self):
+        if self._registry is None:
+            return get_current_registry()
+        return self._registry
+
+    def _set_registry(self, registry):
+        self._registry = registry
+
+    def _del_registry(self):
+        self._registry = None
+
+    registry = property(_get_registry, _set_registry, _del_registry)
+
+    @reify
+    def response(self):
+        f =  self.registry.queryUtility(IResponseFactory, default=Response)
+        return f()
 
 def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
           settings=None):

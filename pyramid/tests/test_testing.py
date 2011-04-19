@@ -502,6 +502,51 @@ class TestDummyRequest(unittest.TestCase):
         finally:
             config.end()
 
+    def test_set_registry(self):
+        request = self._makeOne()
+        request.registry = 'abc'
+        self.assertEqual(request.registry, 'abc')
+
+    def test_del_registry(self):
+        # see https://github.com/Pylons/pyramid/issues/165
+        from pyramid.registry import Registry
+        from pyramid.config import Configurator
+        request = self._makeOne()
+        request.registry = 'abc'
+        self.assertEqual(request.registry, 'abc')
+        del request.registry
+        try:
+            registry = Registry('this_test')
+            config = Configurator(registry=registry)
+            config.begin()
+            self.failUnless(request.registry is registry)
+        finally:
+            config.end()
+
+    def test_response_with_responsefactory(self):
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IResponseFactory
+        registry = Registry('this_test')
+        class ResponseFactory(object):
+            pass
+        registry.registerUtility(ResponseFactory, IResponseFactory)
+        request = self._makeOne()
+        request.registry = registry
+        resp = request.response
+        self.assertEqual(resp.__class__, ResponseFactory)
+        self.failUnless(request.response is resp) # reified
+
+    def test_response_without_responsefactory(self):
+        from pyramid.registry import Registry
+        from pyramid.response import Response
+        registry = Registry('this_test')
+        request = self._makeOne()
+        request.registry = registry
+        resp = request.response
+        self.assertEqual(resp.__class__, Response)
+        self.failUnless(request.response is resp) # reified
+        
+
 class TestDummyTemplateRenderer(unittest.TestCase):
     def _getTargetClass(self, ):
         from pyramid.testing import DummyTemplateRenderer
