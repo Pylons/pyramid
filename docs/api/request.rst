@@ -165,9 +165,9 @@
       .. warning:: As of Pyramid 1.1, assignment to ``response_*`` attrs are
          deprecated.  Assigning to one will cause a deprecation warning to be
          emitted.  Instead of assigning ``response_*`` attributes to the
-         request, use the API of the :class:`pyramid.response.Response`
-         object exposed as ``request.response`` to influence response
-         behavior.
+         request, use API of the the :attr:`pyramid.request.Request.response`
+         object (exposed to view code as ``request.response``) to influence
+         response behavior.
 
       You can set attributes on a :class:`pyramid.request.Request` which will
       influence the behavor of *rendered* responses (views which use a
