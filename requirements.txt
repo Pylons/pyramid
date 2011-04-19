@@ -1,1 +1,5 @@
 pyramid
+zope.configuration
+zope.deprecation
+zope.component
+repoze.sphinx.autointerface
