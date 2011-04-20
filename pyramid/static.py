@@ -13,6 +13,7 @@ from zope.interface import implements
 from pyramid.asset import resolve_asset_spec
 from pyramid.interfaces import IStaticURLInfo
 from pyramid.path import caller_package
+from pyramid.request import copy_request_with_subpath_as_path_info
 from pyramid.url import route_url
 
 class PackageURLParser(StaticURLParser):
@@ -208,44 +209,11 @@ class static_view(object):
         self.app = app
 
     def __call__(self, context, request):
-        # Point PATH_INFO to the static file/dir path; point SCRIPT_NAME
-        # to the prefix before it.
+        script_name = request.environ.get('SCRIPT_NAME', '')
+        path_info = request.environ.get('PATH_INFO', '/')
 
-        # Postconditions:
-        # - SCRIPT_NAME and PATH_INFO are empty or start with /
-        # - At least one of SCRIPT_NAME or PATH_INFO are set.
-        # - SCRIPT_NAME is not '/' (it should be '', and PATH_INFO should
-        #   be '/').
-
-        request_copy = request.copy()
-        script_name = request_copy.environ.get('SCRIPT_NAME', '')
-        path_info = request_copy.environ.get('PATH_INFO', '/')
-
-        new_script_name = script_name
-        new_path_info = path_info
-
-        subpath = list(request.subpath)
-
-        if subpath:
-            # compute new_path_info
-            new_path_info = '/' + '/'.join(subpath)
-            if path_info.endswith('/'):
-                # readd trailing slash stripped by subpath (traversal) 
-                # conversion
-                new_path_info += '/'
-
-            # compute new_script_name
-            tmp = []
-            workback = (script_name + path_info).split('/')
-            while workback:
-                el = workback.pop()
-                if el:
-                    tmp.insert(0, el)
-                if tmp == subpath:
-                    new_script_name = '/'.join(workback)
-                    break
-        
-        request_copy.environ['SCRIPT_NAME'] = new_script_name
-        request_copy.environ['PATH_INFO'] = new_path_info
+        request_copy = copy_request_with_subpath_as_path_info(request,
+                                                              script_name,
+                                                              path_info)
 
         return request_copy.get_response(self.app)

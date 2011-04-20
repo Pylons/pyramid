@@ -393,3 +393,45 @@ def add_global_response_headers(request, headerlist):
             response.headerlist.append((k, v))
     request.add_response_callback(add_headers)
 
+def copy_request_with_subpath_as_path_info(request, default_script_name='',
+                                           default_path_info='/'):
+    # Make a copy of the request and use the request's subpath (if it exists)
+    # as the request copy's PATH_INFO.  Set the request copy's SCRIPT_NAME to
+    # the prefix before the subpath.
+    #
+    # Postconditions:
+    # - SCRIPT_NAME and PATH_INFO are empty or start with /
+    # - At least one of SCRIPT_NAME or PATH_INFO are set.
+    # - SCRIPT_NAME is not '/' (it should be '', and PATH_INFO should
+    #   be '/').
+
+    script_name = request.environ.get('SCRIPT_NAME', '')
+    path_info = request.environ.get('PATH_INFO', '/')
+
+    subpath = getattr(request, 'subpath', ())
+
+    if subpath:
+        # compute new_path_info
+        default_path_info = '/' + '/'.join(subpath)
+        if path_info.endswith('/'):
+            # readd trailing slash stripped by subpath (traversal) 
+            # conversion
+            default_path_info += '/'
+
+        # compute new_script_name
+        tmp = []
+        workback = (script_name + path_info).split('/')
+        while workback:
+            el = workback.pop()
+            if el:
+                tmp.insert(0, el)
+            if tmp == subpath:
+                default_script_name = '/'.join(workback)
+                break
+
+    request_copy = request.copy()
+
+    request_copy.environ['SCRIPT_NAME'] = default_script_name
+    request_copy.environ['PATH_INFO'] = default_path_info
+
+    return request_copy
