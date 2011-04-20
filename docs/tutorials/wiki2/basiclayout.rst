@@ -98,7 +98,7 @@ names a ``view_renderer``, which is a template which lives in the
 ``tutorial.views.my_view`` view returns a dictionary, a :term:`renderer` will
 use this template to create a response.
 
-Fimnally, we use the :meth:`pyramid.config.Configurator.make_wsgi_app`
+Finally, we use the :meth:`pyramid.config.Configurator.make_wsgi_app`
 method to return a :term:`WSGI` application:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
