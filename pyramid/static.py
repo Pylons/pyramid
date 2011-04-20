@@ -148,13 +148,26 @@ class StaticURLInfo(object):
                 permission = extra.pop('permission', None)
             if permission is None:
                 permission = '__no_permission_required__'
-            extra['view_permission'] = permission
-            extra['view'] = view
+
+            context = extra.pop('view_context', None)
+            if context is None:
+                context = extra.pop('view_for', None)
+            if context is None:
+                context = extra.pop('for_', None)
+
+            renderer = extra.pop('view_renderer', None)
+            if renderer is None:
+                renderer = extra.pop('renderer', None)
+
+            attr = extra.pop('view_attr', None)
 
             # register a route using the computed view, permission, and 
             # pattern, plus any extras passed to us via add_static_view
             pattern = "%s*subpath" % name # name already ends with slash
             self.config.add_route(name, pattern, **extra)
+            self.config.add_view(route_name=name, view=view,
+                                 permission=permission, context=context,
+                                 renderer=renderer, attr=attr)
             self.registrations.append((name, spec, False))
 
 class static_view(object):
