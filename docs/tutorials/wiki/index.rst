@@ -23,5 +23,6 @@ tutorial can be browsed at
    definingmodels
    definingviews
    authorization
+   tests
    distributing
 
