@@ -10,6 +10,7 @@ from pyramid.interfaces import IResponseFactory
 from pyramid.exceptions import ConfigurationError
 from pyramid.decorator import reify
 from pyramid.response import Response
+from pyramid.traversal import quote_path_segment
 from pyramid.url import resource_url
 from pyramid.url import route_url
 from pyramid.url import static_url
@@ -393,11 +394,10 @@ def add_global_response_headers(request, headerlist):
             response.headerlist.append((k, v))
     request.add_response_callback(add_headers)
 
-def copy_request_with_subpath_as_path_info(request, default_script_name='',
-                                           default_path_info='/'):
-    # Make a copy of the request and use the request's subpath (if it exists)
-    # as the request copy's PATH_INFO.  Set the request copy's SCRIPT_NAME to
-    # the prefix before the subpath.
+def subpath_as_path_info(request, default_script_name='',default_path_info='/'):
+    # Copy the request.  Use the request's subpath (if it exists) as the new
+    # request's PATH_INFO.  Set the request copy's SCRIPT_NAME to the prefix
+    # before the subpath.
     #
     # Postconditions:
     # - SCRIPT_NAME and PATH_INFO are empty or start with /
@@ -408,15 +408,18 @@ def copy_request_with_subpath_as_path_info(request, default_script_name='',
     script_name = request.environ.get('SCRIPT_NAME', '')
     path_info = request.environ.get('PATH_INFO', '/')
 
-    subpath = getattr(request, 'subpath', ())
+    new_script_name = default_script_name
+    new_path_info = default_path_info
+
+    subpath = list(getattr(request, 'subpath', ()))
 
     if subpath:
         # compute new_path_info
-        default_path_info = '/' + '/'.join(subpath)
+        new_path_info = '/' + '/'.join([quote_path_segment(x) for x in subpath])
         if path_info.endswith('/'):
             # readd trailing slash stripped by subpath (traversal) 
             # conversion
-            default_path_info += '/'
+            new_path_info += '/'
 
         # compute new_script_name
         tmp = []
@@ -424,14 +427,13 @@ def copy_request_with_subpath_as_path_info(request, default_script_name='',
         while workback:
             el = workback.pop()
             if el:
-                tmp.insert(0, el)
+                tmp.insert(0, el.decode('utf-8'))
             if tmp == subpath:
-                default_script_name = '/'.join(workback)
+                new_script_name = '/'.join(workback)
                 break
 
-    request_copy = request.copy()
+    request = request.copy()
+    request.environ['SCRIPT_NAME'] = new_script_name
+    request.environ['PATH_INFO'] = new_path_info
 
-    request_copy.environ['SCRIPT_NAME'] = default_script_name
-    request_copy.environ['PATH_INFO'] = default_path_info
-
-    return request_copy
+    return request

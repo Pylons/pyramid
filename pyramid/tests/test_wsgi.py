@@ -110,3 +110,8 @@ class DummyContext:
 class DummyRequest:
     def get_response(self, application):
         return application
+
+    def copy(self):
+        self.copied = True
+        return self
+
