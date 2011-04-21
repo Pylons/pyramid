@@ -88,3 +88,17 @@ something like this:
 .. literalinclude:: src/models/tutorial/models.py
    :linenos:
    :language: python
+
+Viewing the Application in a Browser
+------------------------------------
+
+We can't.  At this point, our system is in a "non-runnable" state; we'll need
+to change view-related files in the next chapter to be able to start the
+application successfully.  If you try to start the application, you'll wind
+up with a Python traceback on your console that ends with this exception:
+
+.. code-block:: text
+
+   ImportError: cannot import name MyModel
+
+This will also happen if you attempt to run the tests.
