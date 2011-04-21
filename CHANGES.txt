@@ -25,6 +25,10 @@ Documentation
   ``pyramid.config.Configurator.set_view_mapper`` and refer to it within
   Hooks chapter section named "Using a View Mapper".
 
+- Added section to the "Environment Variables and ``.ini`` File Settings"
+  chapter in the narrative documentation section entitled "Adding a Custom
+  Setting".
+
 Features
 --------
 

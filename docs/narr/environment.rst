@@ -381,3 +381,66 @@ around in overridden asset directories. ``reload_assets`` makes the system
 *very slow* when templates are in use.  Never set ``reload_assets`` to
 ``True`` on a production system.
 
+Adding A Custom Setting
+-----------------------
+
+From time to time, you may need to add a custom setting to your application.
+Here's how:
+
+- If you're using an ``.ini`` file, change the ``.ini`` file, adding the
+  setting to the ``[app:foo]`` section representing your Pyramid application.
+  For example:
+
+  .. code-block:: ini
+
+    [app:myapp]
+    # .. other settings
+    debug_frobnosticator = True
+
+- In the ``main()`` function that represents the place that your Pyramid WSGI
+  application is created, anticipate that you'll be getting this key/value
+  pair as a setting and do any type conversion necessary.
+
+  If you've done any type conversion of your custom value, reset the
+  converted values into the ``settings`` dictionary *before* you pass the
+  dictionary as ``settings`` to the :term:`Configurator`.  For example:
+
+  .. code-block:: python
+
+     def main(global_config, **settings):
+         # ...
+         from pyramid.settings import asbool
+         debug_frobnosticator = asbool(settings.get(
+                    'debug_frobnosticator', 'false'))
+         settings['debug_frobnosticator'] = debug_frobnosticator
+         config = Configurator(settings=settings)
+
+  .. note:: It's especially important that you mutate the ``settings``
+     dictionary with the converted version of the variable *before* passing
+     it to the Configurator: the configurator makes a *copy* of ``settings``,
+     it doesn't use the one you pass directly.
+
+- In the runtime code that you need to access the new settings value, find
+  the value in the ``registry.settings`` dictionary and use it.  In
+  :term:`view` code (or any other code that has access to the request), the
+  easiest way to do this is via ``request.registry.settings``.  For example:
+
+  .. code-block:: python
+
+     registry = request.registry.settings
+     debug_frobnosticator = settings['debug_frobnosticator']
+
+  If you wish to use the value in code that does not have access to the
+  request and you wish to use the value, you'll need to use the
+  :func:`pyramid.threadlocal.get_current_registry` API to obtain the current
+  registry, then ask for its ``settings`` attribute.  For example:
+
+  .. code-block:: python
+
+     registry = pyramid.threadlocal.get_current_registry()
+     settings = registry.settings
+     debug_frobnosticator = settings['debug_frobnosticator']
+   
+
+  
+
