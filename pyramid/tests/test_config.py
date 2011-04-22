@@ -3018,7 +3018,6 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
     def _getViewCallable(self, config, ctx_iface=None, request_iface=None,
                          name='', exception_view=False):
         from zope.interface import Interface
-        from pyramid.interfaces import IRequest
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IExceptionViewClassifier
@@ -3028,8 +3027,6 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
             classifier = IViewClassifier
         if ctx_iface is None:
             ctx_iface = Interface
-        if request_iface is None:
-            request_iface = IRequest
         return config.registry.adapters.lookup(
             (classifier, request_iface, ctx_iface), IView, name=name,
             default=None)

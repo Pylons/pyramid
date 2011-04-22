@@ -51,6 +51,7 @@ from pyramid import renderers
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.compat import all
 from pyramid.compat import md5
+from pyramid.compat import any
 from pyramid.events import ApplicationCreated
 from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import Forbidden
@@ -1770,8 +1771,8 @@ class Configurator(object):
                 self.add_view(**info)
 
         # deprecated adding views from add_route
-        if view or view_context or view_permission or view_renderer or \
-           view_for or for_ or permission or renderer or view_attr:
+        if any([view, view_context, view_permission, view_renderer,
+                view_for, for_, permission, renderer, view_attr]):
             self._add_view_from_route(
                 route_name=name,
                 view=view,
