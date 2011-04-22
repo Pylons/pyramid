@@ -31,7 +31,7 @@ def wsgiapp(wrapped):
     """
     def decorator(context, request):
         return request.get_response(wrapped)
-    return wraps(wrapped)(decorator) # grokkability
+    return wraps(wrapped)(decorator)
 
 def wsgiapp2(wrapped):
     """ Decorator to turn a WSGI application into a :app:`Pyramid`
@@ -56,10 +56,14 @@ def wsgiapp2(wrapped):
         config.add_view(hello_world, name='hello_world.txt')
 
     The ``wsgiapp2`` decorator will convert the result of the WSGI
-    application to a Response and return it to :app:`Pyramid` as if
-    the WSGI app were a :app:`Pyramid` view.  The ``SCRIPT_NAME``
-    and ``PATH_INFO`` values present in the WSGI environment are fixed
-    up before the application is invoked.  """
+    application to a Response and return it to :app:`Pyramid` as if the WSGI
+    app were a :app:`Pyramid` view.  The ``SCRIPT_NAME`` and ``PATH_INFO``
+    values present in the WSGI environment are fixed up before the
+    application is invoked.  In particular, a new WSGI environment is
+    generated, and the :term:`subpath` of the request passed to ``wsgiapp2``
+    is used as the new request's ``PATH_INFO`` and everything preceding the
+    subpath is used as the ``SCRIPT_NAME``.  The new environment is passed to
+    the downstream WSGI application."""
 
     def decorator(context, request):
         return call_app_with_subpath_as_path_info(request, wrapped)
