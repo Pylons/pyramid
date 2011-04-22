@@ -104,7 +104,7 @@ class TestStaticApp(unittest.TestCase):
         from webob import Request
         context = DummyContext()
         from StringIO import StringIO
-        request = Request({'PATH_INFO':'',
+        request = Request({'PATH_INFO':'/static',
                            'SCRIPT_NAME':'/script_name',
                            'SERVER_NAME':'localhost',
                            'SERVER_PORT':'80',
@@ -112,7 +112,7 @@ class TestStaticApp(unittest.TestCase):
                            'wsgi.version':(1,0),
                            'wsgi.url_scheme':'http',
                            'wsgi.input':StringIO()})
-        request.subpath = ['static']
+        request.subpath = ('static',)
         result = staticapp(context, request)
         self.assertEqual(result.status, '301 Moved Permanently')
         self.assertEqual(result.location, 
@@ -389,6 +389,22 @@ class SelfScanAppTest(unittest.TestCase):
     def test_two(self):
         res = self.testapp.get('/two', status=200)
         self.assertTrue('two' in res.body)
+
+class WSGIApp2AppTest(unittest.TestCase):
+    def setUp(self):
+        from pyramid.tests.wsgiapp2app import main
+        config = main()
+        app = config.make_wsgi_app()
+        from webtest import TestApp
+        self.testapp = TestApp(app)
+        self.config = config
+
+    def tearDown(self):
+        self.config.end()
+
+    def test_hello(self):
+        res = self.testapp.get('/hello', status=200)
+        self.assertTrue('Hello' in res.body)
 
 class DummyContext(object):
     pass

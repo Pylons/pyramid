@@ -20,11 +20,9 @@ class WSGIApp2Tests(unittest.TestCase):
     def test_decorator_with_subpath_and_view_name(self):
         context = DummyContext()
         request = DummyRequest()
-        request.traversed = ['a', 'b']
-        request.virtual_root_path = ['a']
-        request.subpath = ['subpath']
-        request.view_name = 'view_name'
-        request.environ = {'SCRIPT_NAME':'/foo'}
+        request.subpath = ('subpath',)
+        request.environ = {'SCRIPT_NAME':'/foo',
+                           'PATH_INFO':'/b/view_name/subpath'}
         decorator = self._callFUT(dummyapp)
         response = decorator(context, request)
         self.assertEqual(response, dummyapp)
@@ -34,11 +32,8 @@ class WSGIApp2Tests(unittest.TestCase):
     def test_decorator_with_subpath_no_view_name(self):
         context = DummyContext()
         request = DummyRequest()
-        request.traversed = ['a', 'b']
-        request.virtual_root_path = ['a']
-        request.subpath = ['subpath']
-        request.view_name = ''
-        request.environ = {'SCRIPT_NAME':'/foo'}
+        request.subpath = ('subpath',)
+        request.environ = {'SCRIPT_NAME':'/foo', 'PATH_INFO':'/b/subpath'}
         decorator = self._callFUT(dummyapp)
         response = decorator(context, request)
         self.assertEqual(response, dummyapp)
@@ -48,11 +43,8 @@ class WSGIApp2Tests(unittest.TestCase):
     def test_decorator_no_subpath_with_view_name(self):
         context = DummyContext()
         request = DummyRequest()
-        request.traversed = ['a', 'b']
-        request.virtual_root_path = ['a']
-        request.subpath = []
-        request.view_name = 'view_name'
-        request.environ = {'SCRIPT_NAME':'/foo'}
+        request.subpath = ()
+        request.environ = {'SCRIPT_NAME':'/foo', 'PATH_INFO':'/b/view_name'}
         decorator = self._callFUT(dummyapp)
         response = decorator(context, request)
         self.assertEqual(response, dummyapp)
@@ -62,11 +54,8 @@ class WSGIApp2Tests(unittest.TestCase):
     def test_decorator_traversed_empty_with_view_name(self):
         context = DummyContext()
         request = DummyRequest()
-        request.traversed = []
-        request.virtual_root_path = []
-        request.subpath = []
-        request.view_name = 'view_name'
-        request.environ = {'SCRIPT_NAME':'/foo'}
+        request.subpath = ()
+        request.environ = {'SCRIPT_NAME':'/foo', 'PATH_INFO':'/view_name'}
         decorator = self._callFUT(dummyapp)
         response = decorator(context, request)
         self.assertEqual(response, dummyapp)
@@ -76,11 +65,8 @@ class WSGIApp2Tests(unittest.TestCase):
     def test_decorator_traversed_empty_no_view_name(self):
         context = DummyContext()
         request = DummyRequest()
-        request.traversed = []
-        request.virtual_root_path = []
-        request.subpath = []
-        request.view_name = ''
-        request.environ = {'SCRIPT_NAME':'/foo'}
+        request.subpath = ()
+        request.environ = {'SCRIPT_NAME':'/foo', 'PATH_INFO':'/'}
         decorator = self._callFUT(dummyapp)
         response = decorator(context, request)
         self.assertEqual(response, dummyapp)
@@ -90,11 +76,8 @@ class WSGIApp2Tests(unittest.TestCase):
     def test_decorator_traversed_empty_no_view_name_no_script_name(self):
         context = DummyContext()
         request = DummyRequest()
-        request.traversed = []
-        request.virtual_root_path = []
-        request.subpath = []
-        request.view_name = ''
-        request.environ = {'SCRIPT_NAME':''}
+        request.subpath = ()
+        request.environ = {'SCRIPT_NAME':'', 'PATH_INFO':'/'}
         decorator = self._callFUT(dummyapp)
         response = decorator(context, request)
         self.assertEqual(response, dummyapp)
@@ -110,3 +93,8 @@ class DummyContext:
 class DummyRequest:
     def get_response(self, application):
         return application
+
+    def copy(self):
+        self.copied = True
+        return self
+

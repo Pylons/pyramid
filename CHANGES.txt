@@ -140,6 +140,13 @@ Bug Fixes
 - Redirects issued by a static view did not take into account any existing
   ``SCRIPT_NAME`` (such as one set by a url mapping composite).  Now they do.
 
+- The ``pyramid.wsgi.wsgiapp2`` decorator did not take into account the
+  ``SCRIPT_NAME`` in the origin request.
+
+- The ``pyramid.wsgi.wsgiapp2`` decorator effectively only worked when it
+  decorated a view found via traversal; it ignored the ``PATH_INFO`` that was
+  part of a url-dispatch-matched view.
+
 Deprecations
 ------------
 
@@ -172,6 +179,12 @@ Behavior Changes
   content type is not the default content type (usually ``text/html``), the
   renderer changes the content type (to ``application/json`` or
   ``text/plain`` for JSON and string renderers respectively).
+
+- The ``pyramid.wsgi.wsgiapp2`` now uses a slightly different method of
+  figuring out how to "fix" ``SCRIPT_NAME`` and ``PATH_INFO`` for the
+  downstream application.  As a result, those values may differ slightly from
+  the perspective of the downstream application (for example, ``SCRIPT_NAME``
+  will now never possess a trailing slash).
 
 Dependencies
 ------------

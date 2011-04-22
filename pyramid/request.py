@@ -10,6 +10,7 @@ from pyramid.interfaces import IResponseFactory
 from pyramid.exceptions import ConfigurationError
 from pyramid.decorator import reify
 from pyramid.response import Response
+from pyramid.traversal import quote_path_segment
 from pyramid.url import resource_url
 from pyramid.url import route_url
 from pyramid.url import static_url
@@ -393,3 +394,54 @@ def add_global_response_headers(request, headerlist):
             response.headerlist.append((k, v))
     request.add_response_callback(add_headers)
 
+def call_app_with_subpath_as_path_info(request, app):
+    # Copy the request.  Use the source request's subpath (if it exists) as
+    # the new request's PATH_INFO.  Set the request copy's SCRIPT_NAME to the
+    # prefix before the subpath.  Call the application with the new request
+    # and return a response.
+    #
+    # Postconditions:
+    # - SCRIPT_NAME and PATH_INFO are empty or start with /
+    # - At least one of SCRIPT_NAME or PATH_INFO are set.
+    # - SCRIPT_NAME is not '/' (it should be '', and PATH_INFO should
+    #   be '/').
+
+    environ = request.environ
+    script_name = environ.get('SCRIPT_NAME', '')
+    path_info = environ.get('PATH_INFO', '/')
+    subpath = list(getattr(request, 'subpath', ()))
+
+    new_script_name = ''
+
+    # compute new_path_info
+    new_path_info = '/' + '/'.join([x.encode('utf-8') for x in subpath])
+
+    if new_path_info != '/': # don't want a sole double-slash
+        if path_info != '/': # if orig path_info is '/', we're already done
+            if path_info.endswith('/'):
+                # readd trailing slash stripped by subpath (traversal) 
+                # conversion
+                new_path_info += '/'
+
+    # compute new_script_name
+    workback = (script_name + path_info).split('/')
+
+    tmp = []
+    while workback:
+        if tmp == subpath:
+            break
+        el = workback.pop()
+        if el:
+            tmp.insert(0, el.decode('utf-8'))
+
+    # strip all trailing slashes from workback to avoid appending undue slashes
+    # to end of script_name
+    while workback and (workback[-1] == ''):
+        workback = workback[:-1]
+            
+    new_script_name = '/'.join(workback)
+
+    new_request = request.copy()
+    new_request.environ['SCRIPT_NAME'] = new_script_name
+    new_request.environ['PATH_INFO'] = new_path_info
+    return new_request.get_response(app)
