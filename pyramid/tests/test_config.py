@@ -68,6 +68,12 @@ class ConfiguratorTests(unittest.TestCase):
         request.registry = config.registry
         return request
 
+    def _conflictFunctions(self, e):
+        conflicts = e._conflicts.values()
+        for conflict in conflicts:
+            for confinst in conflict:
+                yield confinst[2]
+
     def test_ctor_no_registry(self):
         import sys
         from pyramid.interfaces import ISettings
@@ -1979,129 +1985,6 @@ class ConfiguratorTests(unittest.TestCase):
         request.accept = ['text/html']
         self.assertEqual(predicate(None, request), False)
 
-    def test_add_route_with_view(self):
-        config = self._makeOne(autocommit=True)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view)
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, None, request_type)
-        self.assertEqual(wrapper(None, None), 'OK')
-        self._assertRoute(config, 'name', 'path')
-
-    def test_add_route_with_view_context(self):
-        config = self._makeOne(autocommit=True)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, view_context=IDummy)
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, IDummy, request_type)
-        self.assertEqual(wrapper(None, None), 'OK')
-        self._assertRoute(config, 'name', 'path')
-        wrapper = self._getViewCallable(config, IOther, request_type)
-        self.assertEqual(wrapper, None)
-
-    def test_add_route_with_view_exception(self):
-        from zope.interface import implementedBy
-        config = self._makeOne(autocommit=True)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, view_context=RuntimeError)
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(
-            config, ctx_iface=implementedBy(RuntimeError),
-            request_iface=request_type, exception_view=True)
-        self.assertEqual(wrapper(None, None), 'OK')
-        self._assertRoute(config, 'name', 'path')
-        wrapper = self._getViewCallable(
-            config, ctx_iface=IOther,
-            request_iface=request_type, exception_view=True)
-        self.assertEqual(wrapper, None)
-
-    def test_add_route_with_view_for(self):
-        config = self._makeOne(autocommit=True)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, view_for=IDummy)
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, IDummy, request_type)
-        self.assertEqual(wrapper(None, None), 'OK')
-        self._assertRoute(config, 'name', 'path')
-        wrapper = self._getViewCallable(config, IOther, request_type)
-        self.assertEqual(wrapper, None)
-
-    def test_add_route_with_for_(self):
-        config = self._makeOne(autocommit=True)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, for_=IDummy)
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, IDummy, request_type)
-        self.assertEqual(wrapper(None, None), 'OK')
-        self._assertRoute(config, 'name', 'path')
-        wrapper = self._getViewCallable(config, IOther, request_type)
-        self.assertEqual(wrapper, None)
-
-    def test_add_route_with_view_renderer(self):
-        config = self._makeOne(autocommit=True)
-        self._registerRenderer(config)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view,
-                         view_renderer='fixtures/minimal.txt')
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, None, request_type)
-        self._assertRoute(config, 'name', 'path')
-        self.assertEqual(wrapper(None, None).body, 'Hello!')
-
-    def test_add_route_with_view_attr(self):
-        config = self._makeOne(autocommit=True)
-        self._registerRenderer(config)
-        class View(object):
-            def __init__(self, context, request):
-                pass
-            def alt(self):
-                return 'OK'
-        config.add_route('name', 'path', view=View, view_attr='alt')
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, None, request_type)
-        self._assertRoute(config, 'name', 'path')
-        request = self._makeRequest(config)
-        self.assertEqual(wrapper(None, request), 'OK')
-
-    def test_add_route_with_view_renderer_alias(self):
-        config = self._makeOne(autocommit=True)
-        self._registerRenderer(config)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view,
-                         renderer='fixtures/minimal.txt')
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, None, request_type)
-        self._assertRoute(config, 'name', 'path')
-        self.assertEqual(wrapper(None, None).body, 'Hello!')
-
-    def test_add_route_with_view_permission(self):
-        from pyramid.interfaces import IAuthenticationPolicy
-        from pyramid.interfaces import IAuthorizationPolicy
-        config = self._makeOne(autocommit=True)
-        policy = lambda *arg: None
-        config.registry.registerUtility(policy, IAuthenticationPolicy)
-        config.registry.registerUtility(policy, IAuthorizationPolicy)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, view_permission='edit')
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, None, request_type)
-        self._assertRoute(config, 'name', 'path')
-        self.assertTrue(hasattr(wrapper, '__call_permissive__'))
-
-    def test_add_route_with_view_permission_alias(self):
-        from pyramid.interfaces import IAuthenticationPolicy
-        from pyramid.interfaces import IAuthorizationPolicy
-        config = self._makeOne(autocommit=True)
-        policy = lambda *arg: None
-        config.registry.registerUtility(policy, IAuthenticationPolicy)
-        config.registry.registerUtility(policy, IAuthorizationPolicy)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, permission='edit')
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, None, request_type)
-        self._assertRoute(config, 'name', 'path')
-        self.assertTrue(hasattr(wrapper, '__call_permissive__'))
-
     def test_add_route_no_pattern_with_path(self):
         config = self._makeOne(autocommit=True)
         route = config.add_route('name', path='path')
@@ -3035,24 +2918,6 @@ class ConfiguratorTests(unittest.TestCase):
         registeredview = self._getViewCallable(config)
         self.assertEqual(registeredview.__name__, 'view3')
 
-    def test_conflict_route_with_view(self):
-        from zope.configuration.config import ConfigurationConflictError
-        config = self._makeOne()
-        def view1(request): pass
-        def view2(request): pass
-        config.add_route('a', '/a', view=view1)
-        config.add_route('a', '/a', view=view2)
-        try:
-            config.commit()
-        except ConfigurationConflictError, why:
-            c1, c2, c3, c4 = self._conflictFunctions(why)
-            self.assertEqual(c1, 'test_conflict_route_with_view')
-            self.assertEqual(c2, 'test_conflict_route_with_view')
-            self.assertEqual(c3, 'test_conflict_route_with_view')
-            self.assertEqual(c4, 'test_conflict_route_with_view')
-        else: # pragma: no cover
-            raise AssertionError
-        
     def test_conflict_set_notfound_view(self):
         from zope.configuration.config import ConfigurationConflictError
         config = self._makeOne()
@@ -3106,12 +2971,6 @@ class ConfiguratorTests(unittest.TestCase):
             self.assertTrue("@view_config(name='two', renderer='string')" in
                             which)
 
-    def _conflictFunctions(self, e):
-        conflicts = e._conflicts.values()
-        for conflict in conflicts:
-            for confinst in conflict:
-                yield confinst[2]
-
     def test___getattr__missing_when_directives_exist(self):
         config = self._makeOne()
         directives = {}
@@ -3137,6 +2996,220 @@ class ConfiguratorTests(unittest.TestCase):
         config.registry._directives = directives
         foo_meth = config.foo
         self.assertTrue(foo_meth.im_func is foo)
+
+class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
+    def setUp(self):
+        import warnings
+        warnings.filterwarnings('ignore')
+
+    def tearDown(self):
+        import warnings
+        warnings.resetwarnings()
+
+    def _makeOne(self, *arg, **kw):
+        from pyramid.config import Configurator
+        return Configurator(*arg, **kw)
+
+    def _getRouteRequestIface(self, config, name):
+        from pyramid.interfaces import IRouteRequest
+        iface = config.registry.getUtility(IRouteRequest, name)
+        return iface
+
+    def _getViewCallable(self, config, ctx_iface=None, request_iface=None,
+                         name='', exception_view=False):
+        from zope.interface import Interface
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
+        if exception_view:
+            classifier = IExceptionViewClassifier
+        else:
+            classifier = IViewClassifier
+        if ctx_iface is None:
+            ctx_iface = Interface
+        if request_iface is None:
+            request_iface = IRequest
+        return config.registry.adapters.lookup(
+            (classifier, request_iface, ctx_iface), IView, name=name,
+            default=None)
+
+    def _registerRenderer(self, config, name='.txt'):
+        from pyramid.interfaces import IRendererFactory
+        from pyramid.interfaces import ITemplateRenderer
+        from zope.interface import implements
+        class Renderer:
+            implements(ITemplateRenderer)
+            def __init__(self, info):
+                self.__class__.info = info
+            def __call__(self, *arg):
+                return 'Hello!'
+        config.registry.registerUtility(Renderer, IRendererFactory, name=name)
+        return Renderer
+
+    def _assertRoute(self, config, name, path, num_predicates=0):
+        from pyramid.interfaces import IRoutesMapper
+        mapper = config.registry.getUtility(IRoutesMapper)
+        routes = mapper.get_routes()
+        route = routes[0]
+        self.assertEqual(len(routes), 1)
+        self.assertEqual(route.name, name)
+        self.assertEqual(route.path, path)
+        self.assertEqual(len(routes[0].predicates), num_predicates)
+        return route
+
+    def _makeRequest(self, config):
+        request = DummyRequest()
+        request.registry = config.registry
+        return request
+
+    def _conflictFunctions(self, e):
+        conflicts = e._conflicts.values()
+        for conflict in conflicts:
+            for confinst in conflict:
+                yield confinst[2]
+
+    def test_add_route_with_view(self):
+        config = self._makeOne(autocommit=True)
+        view = lambda *arg: 'OK'
+        config.add_route('name', 'path', view=view)
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(config, None, request_type)
+        self.assertEqual(wrapper(None, None), 'OK')
+        self._assertRoute(config, 'name', 'path')
+
+    def test_add_route_with_view_context(self):
+        config = self._makeOne(autocommit=True)
+        view = lambda *arg: 'OK'
+        config.add_route('name', 'path', view=view, view_context=IDummy)
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(config, IDummy, request_type)
+        self.assertEqual(wrapper(None, None), 'OK')
+        self._assertRoute(config, 'name', 'path')
+        wrapper = self._getViewCallable(config, IOther, request_type)
+        self.assertEqual(wrapper, None)
+
+    def test_add_route_with_view_exception(self):
+        from zope.interface import implementedBy
+        config = self._makeOne(autocommit=True)
+        view = lambda *arg: 'OK'
+        config.add_route('name', 'path', view=view, view_context=RuntimeError)
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(
+            config, ctx_iface=implementedBy(RuntimeError),
+            request_iface=request_type, exception_view=True)
+        self.assertEqual(wrapper(None, None), 'OK')
+        self._assertRoute(config, 'name', 'path')
+        wrapper = self._getViewCallable(
+            config, ctx_iface=IOther,
+            request_iface=request_type, exception_view=True)
+        self.assertEqual(wrapper, None)
+
+    def test_add_route_with_view_for(self):
+        config = self._makeOne(autocommit=True)
+        view = lambda *arg: 'OK'
+        config.add_route('name', 'path', view=view, view_for=IDummy)
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(config, IDummy, request_type)
+        self.assertEqual(wrapper(None, None), 'OK')
+        self._assertRoute(config, 'name', 'path')
+        wrapper = self._getViewCallable(config, IOther, request_type)
+        self.assertEqual(wrapper, None)
+
+    def test_add_route_with_for_(self):
+        config = self._makeOne(autocommit=True)
+        view = lambda *arg: 'OK'
+        config.add_route('name', 'path', view=view, for_=IDummy)
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(config, IDummy, request_type)
+        self.assertEqual(wrapper(None, None), 'OK')
+        self._assertRoute(config, 'name', 'path')
+        wrapper = self._getViewCallable(config, IOther, request_type)
+        self.assertEqual(wrapper, None)
+
+    def test_add_route_with_view_renderer(self):
+        config = self._makeOne(autocommit=True)
+        self._registerRenderer(config)
+        view = lambda *arg: 'OK'
+        config.add_route('name', 'path', view=view,
+                         view_renderer='fixtures/minimal.txt')
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(config, None, request_type)
+        self._assertRoute(config, 'name', 'path')
+        self.assertEqual(wrapper(None, None).body, 'Hello!')
+
+    def test_add_route_with_view_attr(self):
+        config = self._makeOne(autocommit=True)
+        self._registerRenderer(config)
+        class View(object):
+            def __init__(self, context, request):
+                pass
+            def alt(self):
+                return 'OK'
+        config.add_route('name', 'path', view=View, view_attr='alt')
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(config, None, request_type)
+        self._assertRoute(config, 'name', 'path')
+        request = self._makeRequest(config)
+        self.assertEqual(wrapper(None, request), 'OK')
+
+    def test_add_route_with_view_renderer_alias(self):
+        config = self._makeOne(autocommit=True)
+        self._registerRenderer(config)
+        view = lambda *arg: 'OK'
+        config.add_route('name', 'path', view=view,
+                         renderer='fixtures/minimal.txt')
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(config, None, request_type)
+        self._assertRoute(config, 'name', 'path')
+        self.assertEqual(wrapper(None, None).body, 'Hello!')
+
+    def test_add_route_with_view_permission(self):
+        from pyramid.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthorizationPolicy
+        config = self._makeOne(autocommit=True)
+        policy = lambda *arg: None
+        config.registry.registerUtility(policy, IAuthenticationPolicy)
+        config.registry.registerUtility(policy, IAuthorizationPolicy)
+        view = lambda *arg: 'OK'
+        config.add_route('name', 'path', view=view, view_permission='edit')
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(config, None, request_type)
+        self._assertRoute(config, 'name', 'path')
+        self.assertTrue(hasattr(wrapper, '__call_permissive__'))
+
+    def test_add_route_with_view_permission_alias(self):
+        from pyramid.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthorizationPolicy
+        config = self._makeOne(autocommit=True)
+        policy = lambda *arg: None
+        config.registry.registerUtility(policy, IAuthenticationPolicy)
+        config.registry.registerUtility(policy, IAuthorizationPolicy)
+        view = lambda *arg: 'OK'
+        config.add_route('name', 'path', view=view, permission='edit')
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(config, None, request_type)
+        self._assertRoute(config, 'name', 'path')
+        self.assertTrue(hasattr(wrapper, '__call_permissive__'))
+
+    def test_conflict_route_with_view(self):
+        from zope.configuration.config import ConfigurationConflictError
+        config = self._makeOne()
+        def view1(request): pass
+        def view2(request): pass
+        config.add_route('a', '/a', view=view1)
+        config.add_route('a', '/a', view=view2)
+        try:
+            config.commit()
+        except ConfigurationConflictError, why:
+            c1, c2, c3, c4 = self._conflictFunctions(why)
+            self.assertEqual(c1, 'test_conflict_route_with_view')
+            self.assertEqual(c2, 'test_conflict_route_with_view')
+            self.assertEqual(c3, 'test_conflict_route_with_view')
+            self.assertEqual(c4, 'test_conflict_route_with_view')
+        else: # pragma: no cover
+            raise AssertionError
+        
 
 class TestConfigurator_add_directive(unittest.TestCase):
 

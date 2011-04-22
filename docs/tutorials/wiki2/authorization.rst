@@ -97,25 +97,25 @@ We'll also change ``__init__.py``, adding a call to
 :term:`view callable`.  This is also known as a :term:`forbidden view`:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 24-26
+   :lines: 41-43
    :linenos:
    :language: python
 
 A forbidden view configures our newly created login view to show up when
 :app:`Pyramid` detects that a view invocation can not be authorized.
 
-We'll also add ``view_permission`` arguments with the value ``edit`` to the
-``edit_page`` and ``add_page`` routes.  This indicates that the view
-callables which these routes reference cannot be invoked without the
+We'll also add ``permission`` arguments with the value ``edit`` to the
+``edit_page`` and ``add_page`` views.  This indicates that the view
+callables which these views reference cannot be invoked without the
 authenticated user possessing the ``edit`` permission with respect to the
 current context.
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 32-39
+   :lines: 37-40
    :linenos:
    :language: python
 
-Adding these ``view_permission`` arguments causes Pyramid to make the
+Adding these ``permission`` arguments causes Pyramid to make the
 assertion that only users who possess the effective ``edit`` permission at
 the time of the request may invoke those two views.  We've granted the
 ``group:editors`` principal the ``edit`` permission at the root model via its

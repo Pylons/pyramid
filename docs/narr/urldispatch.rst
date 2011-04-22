@@ -54,16 +54,18 @@ Route Configuration
 -------------------
 
 :term:`Route configuration` is the act of adding a new :term:`route` to an
-application.  A route has a *pattern*, representing a pattern meant to match
+application.  A route has a *name*, which acts as an identifier to be used
+for URL generation.  The name also allows developers to associate a view
+configuration with the route.  A route also has a *pattern*, meant to match
 against the ``PATH_INFO`` portion of a URL (the portion following the scheme
-and port, e.g. ``/foo/bar`` in the URL ``http://localhost:8080/foo/bar``),
-and a *route name*, which is used by developers within a :app:`Pyramid`
-application to uniquely identify a particular route when generating a URL.
-It also optionally has a ``factory``, a set of :term:`route predicate`
-parameters, and a set of :term:`view` parameters.
+and port, e.g. ``/foo/bar`` in the URL ``http://localhost:8080/foo/bar``). It
+also optionally has a ``factory`` and a set of :term:`route predicate`
+attributes.
 
 .. index::
    single: add_route
+
+.. _config-add-route:
 
 Configuring a Route via The ``add_route`` Configurator Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -79,7 +81,8 @@ example:
    # pyramid.config.Configurator class; "myview" is assumed
    # to be a "view callable" function
    from views import myview
-   config.add_route('myroute', '/prefix/{one}/{two}', view=myview)
+   config.add_route('myroute', '/prefix/{one}/{two}')
+   config.add_view(myview, route_name='myroute')
 
 .. versionchanged:: 1.0a4
     Prior to 1.0a4, routes allow for a marker starting with a ``:``, for
@@ -89,8 +92,46 @@ example:
 .. index::
    single: route configuration; view callable
 
+.. _add_route_view_config:
+
 Route Configuration That Names a View Callable
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. warning:: This section describes a feature which has been deprecated in
+   Pyramid 1.1 and higher.  In order to reduce confusion and documentation
+   burden, passing view-related parameters to
+   :meth:`~pyramid.config.Configurator.add_route` is deprecated.
+
+   In versions earlier than 1.1, a view was permitted to be connected to a
+   route using a set of ``view*`` parameters passed to the
+   :meth:`~pyramid.config.Configurator.add_route`.  This was a shorthand
+   which replaced the need to perform a subsequent call to
+   :meth:`~pyramid.config.Configurator.add_view` as described in
+   :ref:`config-add-route`. For example, it was valid (and often recommended)
+   to do:
+
+   .. code-block:: python
+
+      config.add_route('home', '/', view='mypackage.views.myview',
+                        view_renderer='some/renderer.pt')
+
+   Instead of the equivalent:
+
+   .. code-block:: python
+
+     config.add_route('home', '/')
+     config.add_view('mypackage.views.myview', route_name='home')
+                     renderer='some/renderer.pt')
+
+   Passing ``view*`` arguments to ``add_route`` as shown in the first
+   example above is now deprecated in favor of connecting a view to a
+   predefined route via :meth:`~pyramid.config.Configurator.add_view` using
+   the route's ``route_name`` parameter, as shown in the second example
+   above.
+
+   A deprecation warning is now issued when any view-related parameter is
+   passed to ``Configurator.add_route``.  The recommended way to associate a
+   view with a route is documented in :ref:`config-add-route`.
 
 When a route configuration declaration names a ``view`` attribute, the value
 of the attribute will reference a :term:`view callable`.  This view callable
@@ -124,6 +165,9 @@ rather than an actual callable:
 When a route configuration names a ``view`` attribute, the :term:`view
 callable` named as that ``view`` attribute will always be found and invoked
 when the associated route pattern matches during a request.
+
+See :ref:`add_route_view_related_api` for a description of view-related
+arguments to ``add_route``.
 
 .. index::
    single: route path pattern syntax
@@ -363,8 +407,9 @@ resource of the view callable ultimately found via :term:`view lookup`.
 .. code-block:: python
    :linenos:
 
-   config.add_route('abc', '/abc', view='myproject.views.theview', 
+   config.add_route('abc', '/abc', 
                     factory='myproject.resources.root_factory')
+   config.add_view('myproject.views.theview', route_name='abc')
 
 The factory can either be a Python object or a :term:`dotted Python name` (a
 string) which points to such a Python object, as it is above.
@@ -395,7 +440,8 @@ process.  Examples of route predicate arguments are ``pattern``, ``xhr``, and
 ``request_method``.
 
 Other arguments are view configuration related arguments.  These only have an
-effect when the route configuration names a ``view``.
+effect when the route configuration names a ``view``. These arguments have
+been deprecated as of :app:`Pyramid` 1.1 (see :ref:`add_route_view_config`).
 
 Other arguments are ``name`` and ``factory``.  These arguments represent
 neither predicates nor view configuration information.
@@ -547,8 +593,8 @@ If any route matches, the route matching process stops.  The :term:`request`
 is decorated with a special :term:`interface` which describes it as a "route
 request", the :term:`context` resource is generated, and the context and the
 resulting request are handed off to :term:`view lookup`.  During view lookup,
-if any ``view`` argument was provided within the matched route configuration,
-the :term:`view callable` it points to is called.
+if a :term:`view callable` associated with the matched route is found, that
+view is called.
 
 When a route configuration is declared, it may contain :term:`route
 predicate` arguments.  All route predicates associated with a route
@@ -621,7 +667,8 @@ result in a particular view callable being invoked:
 .. code-block:: python
    :linenos:
 
-    config.add_route('idea', 'site/{id}', view='mypackage.views.site_view')
+    config.add_route('idea', 'site/{id}')
+    config.add_view('mypackage.views.site_view', route_name='idea')
 
 When a route configuration with a ``view`` attribute is added to the system,
 and an incoming request matches the *pattern* of the route configuration, the
@@ -665,9 +712,13 @@ add to your application:
 .. code-block:: python
    :linenos:
 
-   config.add_route('idea', 'ideas/{idea}', view='mypackage.views.idea_view')
-   config.add_route('user', 'users/{user}', view='mypackage.views.user_view')
-   config.add_route('tag', 'tags/{tags}', view='mypackage.views.tag_view')
+   config.add_route('idea', 'ideas/{idea}')
+   config.add_route('user', 'users/{user}')
+   config.add_route('tag', 'tags/{tags}')
+
+   config.add_view('mypackage.views.idea_view', route_name='idea')
+   config.add_view('mypackage.views.user_view', route_name='user')
+   config.add_view('mypackage.views.tag_view', route_name='tag')
 
 The above configuration will allow :app:`Pyramid` to service URLs in these
 forms:
@@ -717,9 +768,8 @@ An example of using a route with a factory:
 .. code-block:: python
    :linenos:
 
-   config.add_route('idea', 'ideas/{idea}', 
-                    view='myproject.views.idea_view',
-                    factory='myproject.resources.Idea')
+   config.add_route('idea', 'ideas/{idea}', factory='myproject.resources.Idea')
+   config.add_view('myproject.views.idea_view', route_name='idea')
 
 The above route will manufacture an ``Idea`` resource as a :term:`context`,
 assuming that ``mypackage.resources.Idea`` resolves to a class that accepts a
@@ -735,34 +785,6 @@ request in its ``__init__``.  For example:
 In a more complicated application, this root factory might be a class
 representing a :term:`SQLAlchemy` model.
 
-Example 4
-~~~~~~~~~
-
-It is possible to create a route declaration without a ``view`` attribute,
-but associate the route with a :term:`view callable` using a ``view``
-declaration.
-
-.. code-block:: python
-   :linenos:
-
-   config.add_route('idea', 'site/{id}')
-   config.add_view(route_name='idea', view='mypackage.views.site_view')
-
-This set of configuration parameters creates a configuration completely
-equivalent to this example provided in :ref:`urldispatch_example1`:
-
-.. code-block:: python
-   :linenos:
-
-   config.add_route('idea', 'site/{id}', view='mypackage.views.site_view')
-
-In fact, the spelling which names a ``view`` attribute is just syntactic
-sugar for the more verbose spelling which contains separate view and route
-registrations.
-
-More uses for this style of associating views with routes are explored in
-:ref:`hybrid_chapter`.
-
 .. index::
    single: matching the root URL
    single: root url (matching)
@@ -777,14 +799,14 @@ It's not entirely obvious how to use a route pattern to match the root URL
 .. code-block:: python
    :linenos:
 
-   config.add_route('root', '', view='mypackage.views.root_view')
+   config.add_route('root', '')
 
 Or provide the literal string ``/`` as the pattern:
 
 .. code-block:: python
    :linenos:
 
-   config.add_route('root', '/', view='mypackage.views.root_view')
+   config.add_route('root', '/')
 
 .. index::
    single: generating route URLs
@@ -834,10 +856,11 @@ route configuration looks like so:
 .. code-block:: python
    :linenos:
 
-   config.add_route('noslash', 'no_slash',
-                    view='myproject.views.no_slash')
-   config.add_route('hasslash', 'has_slash/', 
-                    view='myproject.views.has_slash')
+   config.add_route('noslash', 'no_slash')
+   config.add_route('hasslash', 'has_slash/')
+
+   config.add_view('myproject.views.no_slash', route_name='noslash')
+   config.add_view('myproject.views.has_slash', route_name='hasslash')
 
 If a request enters the application with the ``PATH_INFO`` value of
 ``/has_slash/``, the second route will match.  If a request enters the
@@ -864,8 +887,8 @@ the application's startup configuration, adding the following stanza:
 .. code-block:: python
    :linenos:
 
-   config.add_view(context='pyramid.exceptions.NotFound',
-                   view='pyramid.view.append_slash_notfound_view')
+   config.add_view('pyramid.view.append_slash_notfound_view', 
+                   context='pyramid.exceptions.NotFound')
 
 See :ref:`view_module` and :ref:`changing_the_notfound_view` for more
 information about the slash-appending not found view and for a more general
@@ -1063,30 +1086,25 @@ is executed.
 Route View Callable Registration and Lookup Details
 ---------------------------------------------------
 
-The purpose of making it possible to specify a view callable within a route
-configuration is to prevent developers from needing to deeply understand the
-details of :term:`resource location` and :term:`view lookup`.  When a route
-names a view callable as a ``view`` argument, and a request enters the system
-which matches the pattern of the route, the result is simple: the view
-callable associated with the route is invoked with the request that caused
-the invocation.
+When a request enters the system which matches the pattern of the route, the
+usual result is simple: the view callable associated with the route is
+invoked with the request that caused the invocation.
 
 For most usage, you needn't understand more than this; how it works is an
 implementation detail.  In the interest of completeness, however, we'll
 explain how it *does* work in the this section.  You can skip it if you're
 uninterested.
 
-When a ``view`` attribute is attached to a route configuration,
-:app:`Pyramid` ensures that a :term:`view configuration` is registered that
-will always be found when the route pattern is matched during a request.  To
-do so:
+When a view is associated with a route configuration, :app:`Pyramid` ensures
+that a :term:`view configuration` is registered that will always be found
+when the route pattern is matched during a request.  To do so:
 
 - A special route-specific :term:`interface` is created at startup time for
   each route configuration declaration.
 
-- When a route configuration declaration mentions a ``view`` attribute, a
+- When an ``add_view`` statement mentions a ``route name`` attribute, a
   :term:`view configuration` is registered at startup time.  This view
-  configuration uses the route-specific interface as a :term:`request` type.
+  configuration uses a route-specific interface as a :term:`request` type.
 
 - At runtime, when a request causes any route to match, the :term:`request`
   object is decorated with the route-specific interface.
