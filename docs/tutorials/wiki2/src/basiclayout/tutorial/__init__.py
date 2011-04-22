@@ -11,7 +11,7 @@ def main(global_config, **settings):
     config = Configurator(settings=settings)
     config.add_static_view('static', 'tutorial:static')
     config.add_route('home', '/')
-    config.add_view(route_name='home', view='tutorial.views.my_view',
+    config.add_view('tutorial.views.my_view', route_name='home',
                     renderer='templates/mytemplate.pt')
     return config.make_wsgi_app()
 

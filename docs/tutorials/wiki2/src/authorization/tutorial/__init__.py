@@ -29,14 +29,14 @@ def main(global_config, **settings):
     config.add_route('edit_page', '/{pagename}/edit_page')
     config.add_route('view_wiki', '/')
 
-    config.add_view(route_name='login', view='tutorial.login.login',
+    config.add_view('tutorial.login.login', route_name='login', 
                     renderer='tutorial:templates/login.pt')
-    config.add_view(route_name='logout', view='tutorial.login.logout')
-    config.add_view(route_name='view_page', view='tutorial.views.view_page',
+    config.add_view('tutorial.login.logout', route_name='logout')
+    config.add_view('tutorial.views.view_page', route_name='view_page',
                     renderer='tutorial:templates/view.pt')
-    config.add_view(route_name='add_page', view='tutorial.views.add_page',
+    config.add_view('tutorial.views.add_page', route_name='add_page',
                     renderer='tutorial:templates/edit.pt', permission='edit')
-    config.add_view(route_name='edit_page', view='tutorial.views.edit_page',
+    config.add_view('tutorial.views.edit_page', route_name='edit_page',
                     renderer='tutorial:templates/edit.pt', permission='edit')
     config.add_view('tutorial.login.login',
                     context='pyramid.exceptions.Forbidden',

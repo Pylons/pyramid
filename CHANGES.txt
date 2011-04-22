@@ -162,6 +162,30 @@ Deprecations
   ``request.response_content_type = 'abc'`` should be changed to
   ``request.response.content_type = 'abc'``).
 
+- Passing view-related parameters to
+  ``pyramid.config.Configurator.add_route`` is now deprecated.  Previously, a
+  view was permitted to be connected to a route using a set of ``view*``
+  parameters passed to the ``add_route`` method of the Configurator.  This
+  was a shorthand which replaced the need to perform a subsequent call to
+  ``add_view``. For example, it was valid (and often recommended) to do::
+
+     config.add_route('home', '/', view='mypackage.views.myview',
+                       view_renderer='some/renderer.pt')
+
+  Passing ``view*`` arguments to ``add_route`` is now deprecated in favor of
+  connecting a view to a predefined route via ``Configurator.add_view`` using
+  the route's ``route_name`` parameter.  As a result, the above example
+  should now be spelled::
+
+     config.add_route('home', '/')
+     config.add_view('mypackage.views.myview', route_name='home')
+                     renderer='some/renderer.pt')
+
+  This deprecation was done to reduce confusion observed in IRC, as well as
+  to (eventually) reduce documentation burden.  A deprecation warning is now
+  issued when any view-related parameter is passed to
+  ``Configurator.add_route``.
+
 Behavior Changes
 ----------------
 

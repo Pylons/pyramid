@@ -4,6 +4,7 @@ import re
 import sys
 import types
 import traceback
+import warnings
 
 import venusian
 
@@ -12,8 +13,6 @@ from translationstring import ChameleonTranslate
 from zope.configuration.config import GroupingContextDecorator
 from zope.configuration.config import ConfigurationMachine
 from zope.configuration.xmlconfig import registerCommonDirectives
-
-from zope.deprecation import deprecated
 
 from zope.interface import Interface
 from zope.interface import implementedBy
@@ -1380,7 +1379,6 @@ class Configurator(object):
         discriminator = tuple(discriminator)
         self.action(discriminator, register)
 
-    @action_method
     def _add_view_from_route(self,
                              route_name,
                              view,
@@ -1418,9 +1416,14 @@ class Configurator(object):
                 raise ConfigurationError(
                     'view_renderer argument not permitted without '
                     'view argument')
-    _add_view_from_route = deprecated(
-        _add_view_from_route, 'Use add_view() to add views for a route. No '
-        'longer supported directly from add_route() in pyramid 1.1')
+
+        warnings.warn(
+            'Passing view-related arguments to add_route() is deprecated as of '
+            'Pyramid 1.1.  Use add_view() to associate a view with a route '
+            'instead.  See "Deprecations" in "What\'s New in Pyramid 1.1" '
+            'within the general Pyramid documentation for further details.',
+            DeprecationWarning,
+            4)
 
     @action_method
     def add_route(self,
@@ -1456,13 +1459,6 @@ class Configurator(object):
         and *view-related* types.  :term:`Route predicate` arguments
         narrow the circumstances in which a route will be match a
         request; non-predicate arguments are informational.
-
-        .. warning:: View-related arguments have been deprecated in
-            :app:`Pyramid` 1.1. *Do not use it for new development;
-            it should only be used to support older code bases which
-            depend upon it.* Use
-            :meth:`pyramid.config.Configurator.add_view` to add views
-            to a route.
 
         Non-Predicate Arguments
 
@@ -1534,6 +1530,14 @@ class Configurator(object):
            for the route.  This is a feature not often used directly
            by applications, it is meant to be hooked by frameworks
            that use :app:`Pyramid` as a base.
+
+        use_global_views
+
+          When a request matches this route, and view lookup cannot
+          find a view which has a ``route_name`` predicate argument
+          that matches the route, try to fall back to using a view
+          that otherwise matches the context, request, and view name
+          (but which does not match the route_name predicate).
 
         Predicate Arguments
 
@@ -1641,12 +1645,21 @@ class Configurator(object):
           :ref:`custom_route_predicates` for more information about
           ``info``.
 
+        .. _add_route_view_related_api:
+
         View-Related Arguments
+
+        .. warning:: The arguments described below have been deprecated as of
+           :app:`Pyramid` 1.1. *Do not use these for new development; they
+           should only be used to support older code bases which depend upon
+           them.* Use a separate call to
+           :meth:`pyramid.config.Configurator.add_view` to associate a view
+           with a route.
 
         view
 
-          .. warning:: Deprecated in favor of
-            :meth:`pyramid.config.Configurator.add_view`.
+          .. warning:: Deprecated as of :app:`Pyramid` 1.1; see
+             :ref:`add_route_view_related_api`.
 
           A Python object or :term:`dotted Python name` to the same
           object that will be used as a view callable when this route
@@ -1654,8 +1667,8 @@ class Configurator(object):
 
         view_context
 
-          .. warning:: Deprecated in favor of
-            :meth:`pyramid.config.Configurator.add_view`.
+          .. warning:: Deprecated as of :app:`Pyramid` 1.1; see
+             :ref:`add_route_view_related_api`.
 
           A class or an :term:`interface` or :term:`dotted Python
           name` to the same object which the :term:`context` of the
@@ -1671,8 +1684,8 @@ class Configurator(object):
 
         view_permission
 
-          .. warning:: Deprecated in favor of
-            :meth:`pyramid.config.Configurator.add_view`.
+          .. warning:: Deprecated as of :app:`Pyramid` 1.1; see
+             :ref:`add_route_view_related_api`.
 
           The permission name required to invoke the view associated
           with this route.  e.g. ``edit``. (see
@@ -1686,8 +1699,8 @@ class Configurator(object):
 
         view_renderer
 
-          .. warning:: Deprecated in favor of
-            :meth:`pyramid.config.Configurator.add_view`.
+          .. warning:: Deprecated as of :app:`Pyramid` 1.1; see
+             :ref:`add_route_view_related_api`.
 
           This is either a single string term (e.g. ``json``) or a
           string implying a path or :term:`asset specification`
@@ -1711,8 +1724,8 @@ class Configurator(object):
 
         view_attr
 
-          .. warning:: Deprecated in favor of
-            :meth:`pyramid.config.Configurator.add_view`.
+          .. warning:: Deprecated as of :app:`Pyramid` 1.1; see
+             :ref:`add_route_view_related_api`.
 
           The view machinery defaults to using the ``__call__`` method
           of the view callable (or the function itself, if the view
@@ -1727,14 +1740,6 @@ class Configurator(object):
 
           If the ``view`` argument is not provided, this argument has no
           effect.
-
-        use_global_views
-
-          When a request matches this route, and view lookup cannot
-          find a view which has a ``route_name`` predicate argument
-          that matches the route, try to fall back to using a view
-          that otherwise matches the context, request, and view name
-          (but which does not match the route_name predicate).
 
         """
         # these are route predicates; if they do not match, the next route

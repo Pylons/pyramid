@@ -14,12 +14,12 @@ def main(global_config, **settings):
     config.add_route('view_page', '/{pagename}')
     config.add_route('add_page', '/add_page/{pagename}')
     config.add_route('edit_page', '/{pagename}/edit_page')
-    config.add_view(route_name='view_wiki', view='tutorial.views.view_wiki')
-    config.add_view(route_name='view_page', view='tutorial.views.view_page',
+    config.add_view('tutorial.views.view_wiki', route_name='view_wiki')
+    config.add_view('tutorial.views.view_page', route_name='view_page',
                     renderer='tutorial:templates/view.pt')
-    config.add_view(route_name='add_page', view='tutorial.views.add_page',
+    config.add_view('tutorial.views.add_page', route_name='add_page',
                     renderer='tutorial:templates/edit.pt')
-    config.add_view(route_name='edit_page', view='tutorial.views.edit_page',
+    config.add_view('tutorial.views.edit_page', route_name='edit_page',
                     renderer='tutorial:templates/edit.pt')
     return config.make_wsgi_app()
 

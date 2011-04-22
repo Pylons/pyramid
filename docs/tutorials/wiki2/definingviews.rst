@@ -282,8 +282,7 @@ these declarations is very important.  ``route`` declarations are matched in
 the order they're found in the ``__init__.py`` file.
 
 #. Add a declaration which maps the pattern ``/`` (signifying the root URL)
-   to the route named ``view_wiki``.  This is the :term:`default view` for the
-   wiki.
+   to the route named ``view_wiki``.  
 
 #. Add a declaration which maps the pattern ``/{pagename}`` to the route named
    ``view_page``.  This is the regular view for a page.
@@ -299,7 +298,8 @@ to handle the processing and rendering that needs to happen when each route is
 requested.
 
 #. Add a declaration which maps the ``view_wiki`` route to the view named
-   ``view_wiki`` in our ``views.py`` file.
+   ``view_wiki`` in our ``views.py`` file.  This is the :term:`default view`
+   for the wiki.
 
 #. Add a declaration which maps the ``view_page`` route to the view named
    ``view_page`` in our ``views.py`` file.
