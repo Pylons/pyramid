@@ -394,7 +394,7 @@ def add_global_response_headers(request, headerlist):
             response.headerlist.append((k, v))
     request.add_response_callback(add_headers)
 
-def call_app_subpath_as_path_info(request, app):
+def call_app_with_subpath_as_path_info(request, app):
     # Copy the request.  Use the source request's subpath (if it exists) as
     # the new request's PATH_INFO.  Set the request copy's SCRIPT_NAME to the
     # prefix before the subpath.  Call the application with the new request
@@ -424,7 +424,6 @@ def call_app_subpath_as_path_info(request, app):
                 new_path_info += '/'
 
     # compute new_script_name
-    tmp = []
     workback = (script_name + path_info).split('/')
 
     # strip trailing slash from workback to avoid appending undue slash
@@ -432,6 +431,7 @@ def call_app_subpath_as_path_info(request, app):
     if workback and (workback[-1] == ''):
         workback = workback[:-1]
 
+    tmp = []
     while workback:
         if tmp == subpath:
             break

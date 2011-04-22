@@ -1,5 +1,5 @@
 from pyramid.compat import wraps
-from pyramid.request import call_app_subpath_as_path_info
+from pyramid.request import call_app_with_subpath_as_path_info
 
 def wsgiapp(wrapped):
     """ Decorator to turn a WSGI application into a :app:`Pyramid`
@@ -62,6 +62,5 @@ def wsgiapp2(wrapped):
     up before the application is invoked.  """
 
     def decorator(context, request):
-        return call_app_subpath_as_path_info(request, wrapped)
+        return call_app_with_subpath_as_path_info(request, wrapped)
     return wraps(wrapped)(decorator)
-
