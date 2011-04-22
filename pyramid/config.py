@@ -13,6 +13,8 @@ from zope.configuration.config import GroupingContextDecorator
 from zope.configuration.config import ConfigurationMachine
 from zope.configuration.xmlconfig import registerCommonDirectives
 
+from zope.deprecation import deprecated
+
 from zope.interface import Interface
 from zope.interface import implementedBy
 from zope.interface.interfaces import IInterface
@@ -1379,6 +1381,48 @@ class Configurator(object):
         self.action(discriminator, register)
 
     @action_method
+    def _add_view_from_route(self,
+                             route_name,
+                             view,
+                             context,
+                             permission,
+                             renderer,
+                             attr,
+                             ):
+        if view:
+            self.add_view(
+                permission=permission,
+                context=context,
+                view=view,
+                name='',
+                route_name=route_name,
+                renderer=renderer,
+                attr=attr,
+                )
+        else:
+            # prevent mistakes due to misunderstanding of how hybrid calls to
+            # add_route and add_view interact
+            if attr:
+                raise ConfigurationError(
+                    'view_attr argument not permitted without view '
+                    'argument')
+            if context:
+                raise ConfigurationError(
+                    'view_context argument not permitted without view '
+                    'argument')
+            if permission:
+                raise ConfigurationError(
+                    'view_permission argument not permitted without view '
+                    'argument')
+            if renderer:
+                raise ConfigurationError(
+                    'view_renderer argument not permitted without '
+                    'view argument')
+    _add_view_from_route = deprecated(
+        _add_view_from_route, 'Use add_view() to add views for a route. No '
+        'longer supported directly from add_route() in pyramid 1.1')
+
+    @action_method
     def add_route(self,
                   name,
                   pattern=None,
@@ -1412,6 +1456,13 @@ class Configurator(object):
         and *view-related* types.  :term:`Route predicate` arguments
         narrow the circumstances in which a route will be match a
         request; non-predicate arguments are informational.
+
+        .. warning:: View-related arguments have been deprecated in
+            :app:`Pyramid` 1.1. *Do not use it for new development;
+            it should only be used to support older code bases which
+            depend upon it.* Use
+            :meth:`pyramid.config.Configurator.add_view` to add views
+            to a route.
 
         Non-Predicate Arguments
 
@@ -1594,11 +1645,17 @@ class Configurator(object):
 
         view
 
+          .. warning:: Deprecated in favor of
+            :meth:`pyramid.config.Configurator.add_view`.
+
           A Python object or :term:`dotted Python name` to the same
           object that will be used as a view callable when this route
           matches. e.g. ``mypackage.views.my_view``.
 
         view_context
+
+          .. warning:: Deprecated in favor of
+            :meth:`pyramid.config.Configurator.add_view`.
 
           A class or an :term:`interface` or :term:`dotted Python
           name` to the same object which the :term:`context` of the
@@ -1614,6 +1671,9 @@ class Configurator(object):
 
         view_permission
 
+          .. warning:: Deprecated in favor of
+            :meth:`pyramid.config.Configurator.add_view`.
+
           The permission name required to invoke the view associated
           with this route.  e.g. ``edit``. (see
           :ref:`using_security_with_urldispatch` for more information
@@ -1625,6 +1685,9 @@ class Configurator(object):
           This argument can also be spelled as ``permission``.
 
         view_renderer
+
+          .. warning:: Deprecated in favor of
+            :meth:`pyramid.config.Configurator.add_view`.
 
           This is either a single string term (e.g. ``json``) or a
           string implying a path or :term:`asset specification`
@@ -1647,6 +1710,9 @@ class Configurator(object):
           This argument can also be spelled as ``renderer``.
 
         view_attr
+
+          .. warning:: Deprecated in favor of
+            :meth:`pyramid.config.Configurator.add_view`.
 
           The view machinery defaults to using the ``__call__`` method
           of the view callable (or the function itself, if the view
@@ -1698,42 +1764,17 @@ class Configurator(object):
             for info in view_info:
                 self.add_view(**info)
 
-        if view_context is None:
-            view_context = view_for
-            if view_context is None:
-                view_context = for_
-        view_permission = view_permission or permission
-        view_renderer = view_renderer or renderer
-
-        if view:
-            self.add_view(
-                permission=view_permission,
-                context=view_context,
-                view=view,
-                name='',
+        # deprecated adding views from add_route
+        if view or view_context or view_permission or view_renderer or \
+           view_for or for_ or permission or renderer or view_attr:
+            self._add_view_from_route(
                 route_name=name,
-                renderer=view_renderer,
+                view=view,
+                permission=view_permission or permission,
+                context=view_context or view_for or for_,
+                renderer=view_renderer or renderer,
                 attr=view_attr,
-                )
-        else:
-            # prevent mistakes due to misunderstanding of how hybrid calls to
-            # add_route and add_view interact
-            if view_attr:
-                raise ConfigurationError(
-                    'view_attr argument not permitted without view '
-                    'argument')
-            if view_context:
-                raise ConfigurationError(
-                    'view_context argument not permitted without view '
-                    'argument')
-            if view_permission:
-                raise ConfigurationError(
-                    'view_permission argument not permitted without view '
-                    'argument')
-            if view_renderer:
-                raise ConfigurationError(
-                    'view_renderer argument not permitted without '
-                    'view argument')
+            )
 
         mapper = self.get_routes_mapper()
 

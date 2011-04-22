@@ -60,10 +60,12 @@ and port, e.g. ``/foo/bar`` in the URL ``http://localhost:8080/foo/bar``),
 and a *route name*, which is used by developers within a :app:`Pyramid`
 application to uniquely identify a particular route when generating a URL.
 It also optionally has a ``factory``, a set of :term:`route predicate`
-parameters, and a set of :term:`view` parameters.
+parameters, and a set of view callables.
 
 .. index::
    single: add_route
+
+.. _config-add-route:
 
 Configuring a Route via The ``add_route`` Configurator Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -79,18 +81,30 @@ example:
    # pyramid.config.Configurator class; "myview" is assumed
    # to be a "view callable" function
    from views import myview
-   config.add_route('myroute', '/prefix/{one}/{two}', view=myview)
+   config.add_route('myroute', '/prefix/{one}/{two}')
+   config.add_view(myview, route_name='myroute')
 
 .. versionchanged:: 1.0a4
     Prior to 1.0a4, routes allow for a marker starting with a ``:``, for
     example ``/prefix/:one/:two``.  This style is now deprecated
     in favor of ``{}`` usage which allows for additional functionality.
 
+.. versionchanged:: 1.1
+    Prior to 1.1, views were typically connected to routes using a set of
+    view parameters on :meth:`pyramid.config.Configurator.add_route`. That
+    behavior is now deprecated in favor of connecting views to routes using
+    :meth:`pyramid.config.Configurator.add_view` with the ``route_name``
+    parameter.
+
 .. index::
    single: route configuration; view callable
 
 Route Configuration That Names a View Callable
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. warning:: This section describes a feature which has been deprecated in
+    Pyramid 1.1. The recommended way to connect view callables to routes
+    is via :ref:`config-add-route`.
 
 When a route configuration declaration names a ``view`` attribute, the value
 of the attribute will reference a :term:`view callable`.  This view callable
@@ -363,8 +377,8 @@ resource of the view callable ultimately found via :term:`view lookup`.
 .. code-block:: python
    :linenos:
 
-   config.add_route('abc', '/abc', view='myproject.views.theview', 
-                    factory='myproject.resources.root_factory')
+   config.add_route('abc', '/abc', factory='myproject.resources.root_factory')
+   config.add_view('myproject.views.theview', route_name='abc')
 
 The factory can either be a Python object or a :term:`dotted Python name` (a
 string) which points to such a Python object, as it is above.
@@ -395,7 +409,8 @@ process.  Examples of route predicate arguments are ``pattern``, ``xhr``, and
 ``request_method``.
 
 Other arguments are view configuration related arguments.  These only have an
-effect when the route configuration names a ``view``.
+effect when the route configuration names a ``view``. These arguments have
+been deprecated as of :app:`Pyramid` 1.1.
 
 Other arguments are ``name`` and ``factory``.  These arguments represent
 neither predicates nor view configuration information.
@@ -547,8 +562,8 @@ If any route matches, the route matching process stops.  The :term:`request`
 is decorated with a special :term:`interface` which describes it as a "route
 request", the :term:`context` resource is generated, and the context and the
 resulting request are handed off to :term:`view lookup`.  During view lookup,
-if any ``view`` argument was provided within the matched route configuration,
-the :term:`view callable` it points to is called.
+if any ``view`` was provided within the matched route configuration, the
+:term:`view callable` it points to is called.
 
 When a route configuration is declared, it may contain :term:`route
 predicate` arguments.  All route predicates associated with a route
@@ -621,7 +636,8 @@ result in a particular view callable being invoked:
 .. code-block:: python
    :linenos:
 
-    config.add_route('idea', 'site/{id}', view='mypackage.views.site_view')
+    config.add_route('idea', 'site/{id}')
+    config.add_view('mypackage.views.site_view', route_name='idea')
 
 When a route configuration with a ``view`` attribute is added to the system,
 and an incoming request matches the *pattern* of the route configuration, the
@@ -665,9 +681,13 @@ add to your application:
 .. code-block:: python
    :linenos:
 
-   config.add_route('idea', 'ideas/{idea}', view='mypackage.views.idea_view')
-   config.add_route('user', 'users/{user}', view='mypackage.views.user_view')
-   config.add_route('tag', 'tags/{tags}', view='mypackage.views.tag_view')
+   config.add_route('idea', 'ideas/{idea}')
+   config.add_route('user', 'users/{user}')
+   config.add_route('tag', 'tags/{tags}')
+
+   config.add_view('mypackage.views.idea_view', route_name='idea')
+   config.add_view('mypackage.views.user_view', route_name='user')
+   config.add_view('mypackage.views.tag_view', route_name='tag')
 
 The above configuration will allow :app:`Pyramid` to service URLs in these
 forms:
@@ -717,9 +737,8 @@ An example of using a route with a factory:
 .. code-block:: python
    :linenos:
 
-   config.add_route('idea', 'ideas/{idea}', 
-                    view='myproject.views.idea_view',
-                    factory='myproject.resources.Idea')
+   config.add_route('idea', 'ideas/{idea}', factory='myproject.resources.Idea')
+   config.add_view('myproject.views.idea_view', route_name='idea')
 
 The above route will manufacture an ``Idea`` resource as a :term:`context`,
 assuming that ``mypackage.resources.Idea`` resolves to a class that accepts a
@@ -777,14 +796,14 @@ It's not entirely obvious how to use a route pattern to match the root URL
 .. code-block:: python
    :linenos:
 
-   config.add_route('root', '', view='mypackage.views.root_view')
+   config.add_route('root', '')
 
 Or provide the literal string ``/`` as the pattern:
 
 .. code-block:: python
    :linenos:
 
-   config.add_route('root', '/', view='mypackage.views.root_view')
+   config.add_route('root', '/')
 
 .. index::
    single: generating route URLs
@@ -834,10 +853,11 @@ route configuration looks like so:
 .. code-block:: python
    :linenos:
 
-   config.add_route('noslash', 'no_slash',
-                    view='myproject.views.no_slash')
-   config.add_route('hasslash', 'has_slash/', 
-                    view='myproject.views.has_slash')
+   config.add_route('noslash', 'no_slash')
+   config.add_route('hasslash', 'has_slash/')
+
+   config.add_view('myproject.views.no_slash', route_name='noslash')
+   config.add_view('myproject.views.has_slash', route_name='hasslash')
 
 If a request enters the application with the ``PATH_INFO`` value of
 ``/has_slash/``, the second route will match.  If a request enters the
@@ -1063,23 +1083,18 @@ is executed.
 Route View Callable Registration and Lookup Details
 ---------------------------------------------------
 
-The purpose of making it possible to specify a view callable within a route
-configuration is to prevent developers from needing to deeply understand the
-details of :term:`resource location` and :term:`view lookup`.  When a route
-names a view callable as a ``view`` argument, and a request enters the system
-which matches the pattern of the route, the result is simple: the view
-callable associated with the route is invoked with the request that caused
-the invocation.
+When a request enters the system which matches the pattern of the route,
+the result is simple: the view callable associated with the route is invoked
+with the request that caused the invocation.
 
 For most usage, you needn't understand more than this; how it works is an
 implementation detail.  In the interest of completeness, however, we'll
 explain how it *does* work in the this section.  You can skip it if you're
 uninterested.
 
-When a ``view`` attribute is attached to a route configuration,
-:app:`Pyramid` ensures that a :term:`view configuration` is registered that
-will always be found when the route pattern is matched during a request.  To
-do so:
+When a ``view`` is attached to a route configuration, :app:`Pyramid` ensures
+that a :term:`view configuration` is registered that will always be found when
+the route pattern is matched during a request.  To do so:
 
 - A special route-specific :term:`interface` is created at startup time for
   each route configuration declaration.
