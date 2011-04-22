@@ -390,6 +390,22 @@ class SelfScanAppTest(unittest.TestCase):
         res = self.testapp.get('/two', status=200)
         self.assertTrue('two' in res.body)
 
+class WSGIApp2AppTest(unittest.TestCase):
+    def setUp(self):
+        from pyramid.tests.wsgiapp2app import main
+        config = main()
+        app = config.make_wsgi_app()
+        from webtest import TestApp
+        self.testapp = TestApp(app)
+        self.config = config
+
+    def tearDown(self):
+        self.config.end()
+
+    def test_hello(self):
+        res = self.testapp.get('/hello', status=200)
+        self.assertTrue('Hello' in res.body)
+
 class DummyContext(object):
     pass
 
