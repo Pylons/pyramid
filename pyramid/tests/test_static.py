@@ -268,8 +268,9 @@ class Test_static_view(unittest.TestCase):
                                             SCRIPT_NAME='/script_name')
         view(context, request)
         self.assertEqual(request.copied, True)
-        self.assertEqual(request.environ['PATH_INFO'], '/path_info')
-        self.assertEqual(request.environ['SCRIPT_NAME'], '/script_name')
+        self.assertEqual(request.environ['PATH_INFO'], '/')
+        self.assertEqual(request.environ['SCRIPT_NAME'],
+                         '/script_name/path_info')
 
     def test_with_subpath_path_info_ends_with_slash(self):
         view = self._makeOne('fixtures', package_name='another')

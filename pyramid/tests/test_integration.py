@@ -104,7 +104,7 @@ class TestStaticApp(unittest.TestCase):
         from webob import Request
         context = DummyContext()
         from StringIO import StringIO
-        request = Request({'PATH_INFO':'',
+        request = Request({'PATH_INFO':'/static',
                            'SCRIPT_NAME':'/script_name',
                            'SERVER_NAME':'localhost',
                            'SERVER_PORT':'80',
@@ -112,7 +112,7 @@ class TestStaticApp(unittest.TestCase):
                            'wsgi.version':(1,0),
                            'wsgi.url_scheme':'http',
                            'wsgi.input':StringIO()})
-        request.subpath = ['static']
+        request.subpath = ('static',)
         result = staticapp(context, request)
         self.assertEqual(result.status, '301 Moved Permanently')
         self.assertEqual(result.location, 

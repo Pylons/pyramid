@@ -13,7 +13,7 @@ from zope.interface import implements
 from pyramid.asset import resolve_asset_spec
 from pyramid.interfaces import IStaticURLInfo
 from pyramid.path import caller_package
-from pyramid.request import subpath_as_path_info
+from pyramid.request import call_app_subpath_as_path_info
 from pyramid.url import route_url
 
 class PackageURLParser(StaticURLParser):
@@ -209,7 +209,4 @@ class static_view(object):
         self.app = app
 
     def __call__(self, context, request):
-        script_name = request.environ.get('SCRIPT_NAME', '')
-        path_info = request.environ.get('PATH_INFO', '/')
-        request_copy = subpath_as_path_info(request, script_name, path_info)
-        return request_copy.get_response(self.app)
+        return call_app_subpath_as_path_info(request, self.app)

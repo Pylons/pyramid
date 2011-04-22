@@ -394,10 +394,11 @@ def add_global_response_headers(request, headerlist):
             response.headerlist.append((k, v))
     request.add_response_callback(add_headers)
 
-def subpath_as_path_info(request, default_script_name='',default_path_info='/'):
-    # Copy the request.  Use the request's subpath (if it exists) as the new
-    # request's PATH_INFO.  Set the request copy's SCRIPT_NAME to the prefix
-    # before the subpath.
+def call_app_subpath_as_path_info(request, app):
+    # Copy the request.  Use the source request's subpath (if it exists) as
+    # the new request's PATH_INFO.  Set the request copy's SCRIPT_NAME to the
+    # prefix before the subpath.  Call the application with the new request
+    # and return a response.
     #
     # Postconditions:
     # - SCRIPT_NAME and PATH_INFO are empty or start with /
@@ -408,32 +409,40 @@ def subpath_as_path_info(request, default_script_name='',default_path_info='/'):
     script_name = request.environ.get('SCRIPT_NAME', '')
     path_info = request.environ.get('PATH_INFO', '/')
 
-    new_script_name = default_script_name
-    new_path_info = default_path_info
+    new_script_name = ''
 
     subpath = list(getattr(request, 'subpath', ()))
 
-    if subpath:
-        # compute new_path_info
-        new_path_info = '/' + '/'.join([quote_path_segment(x) for x in subpath])
-        if path_info.endswith('/'):
-            # readd trailing slash stripped by subpath (traversal) 
-            # conversion
-            new_path_info += '/'
+    # compute new_path_info
+    new_path_info = '/' + '/'.join([quote_path_segment(x) for x in subpath])
 
-        # compute new_script_name
-        tmp = []
-        workback = (script_name + path_info).split('/')
-        while workback:
-            el = workback.pop()
-            if el:
-                tmp.insert(0, el.decode('utf-8'))
-            if tmp == subpath:
-                new_script_name = '/'.join(workback)
-                break
+    if new_path_info != '/':
+        if path_info != '/':
+            if path_info.endswith('/'):
+                # readd trailing slash stripped by subpath (traversal) 
+                # conversion
+                new_path_info += '/'
 
-    request = request.copy()
-    request.environ['SCRIPT_NAME'] = new_script_name
-    request.environ['PATH_INFO'] = new_path_info
+    # compute new_script_name
+    tmp = []
+    workback = (script_name + path_info).split('/')
 
-    return request
+    # strip trailing slash from workback to avoid appending undue slash
+    # to script_name
+    if workback and (workback[-1] == ''):
+        workback = workback[:-1]
+
+    while workback:
+        if tmp == subpath:
+            break
+        el = workback.pop()
+        if el:
+            tmp.insert(0, el.decode('utf-8'))
+            
+    new_script_name = '/'.join(workback)
+
+    request_copy = request.copy()
+    request_copy.environ['SCRIPT_NAME'] = new_script_name
+    request_copy.environ['PATH_INFO'] = new_path_info
+
+    return request_copy.get_response(app)
