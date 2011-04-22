@@ -406,18 +406,18 @@ def call_app_subpath_as_path_info(request, app):
     # - SCRIPT_NAME is not '/' (it should be '', and PATH_INFO should
     #   be '/').
 
-    script_name = request.environ.get('SCRIPT_NAME', '')
-    path_info = request.environ.get('PATH_INFO', '/')
+    environ = request.environ
+    script_name = environ.get('SCRIPT_NAME', '')
+    path_info = environ.get('PATH_INFO', '/')
+    subpath = list(getattr(request, 'subpath', ()))
 
     new_script_name = ''
-
-    subpath = list(getattr(request, 'subpath', ()))
 
     # compute new_path_info
     new_path_info = '/' + '/'.join([quote_path_segment(x) for x in subpath])
 
-    if new_path_info != '/':
-        if path_info != '/':
+    if new_path_info != '/': # don't want a sole double-slash
+        if path_info != '/': # if orig path_info is '/', we're already done
             if path_info.endswith('/'):
                 # readd trailing slash stripped by subpath (traversal) 
                 # conversion
@@ -428,7 +428,7 @@ def call_app_subpath_as_path_info(request, app):
     workback = (script_name + path_info).split('/')
 
     # strip trailing slash from workback to avoid appending undue slash
-    # to script_name
+    # to end of script_name
     if workback and (workback[-1] == ''):
         workback = workback[:-1]
 
@@ -441,8 +441,7 @@ def call_app_subpath_as_path_info(request, app):
             
     new_script_name = '/'.join(workback)
 
-    request_copy = request.copy()
-    request_copy.environ['SCRIPT_NAME'] = new_script_name
-    request_copy.environ['PATH_INFO'] = new_path_info
-
-    return request_copy.get_response(app)
+    new_request = request.copy()
+    new_request.environ['SCRIPT_NAME'] = new_script_name
+    new_request.environ['PATH_INFO'] = new_path_info
+    return new_request.get_response(app)
