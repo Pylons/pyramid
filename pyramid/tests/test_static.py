@@ -390,43 +390,83 @@ class TestStaticURLInfo(unittest.TestCase):
 
     def test_add_viewname(self):
         from pyramid.static import static_view
-        class Config:
-            def add_route(self, *arg, **kw):
-                self.arg = arg
-                self.kw = kw
-        config = Config()
+        config = DummyConfig()
         inst = self._makeOne(config)
         inst.add('view', 'anotherpackage:path', cache_max_age=1)
         expected = [('view/', 'anotherpackage:path/', False)]
         self.assertEqual(inst.registrations, expected)
-        self.assertEqual(config.arg, ('view/', 'view/*subpath'))
-        self.assertEqual(config.kw['view_permission'],
+        self.assertEqual(config.route_args, ('view/', 'view/*subpath'))
+        self.assertEqual(config.view_kw['permission'],
                          '__no_permission_required__')
-        self.assertEqual(config.kw['view'].__class__, static_view)
-        self.assertEqual(config.kw['view'].app.cache_max_age, 1)
-        self.assertEqual(inst.registrations, expected)
+        self.assertEqual(config.view_kw['view'].__class__, static_view)
+        self.assertEqual(config.view_kw['view'].app.cache_max_age, 1)
 
     def test_add_viewname_with_permission(self):
-        class Config:
-            def add_route(self, *arg, **kw):
-                self.arg = arg
-                self.kw = kw
-        config = Config()
+        config = DummyConfig()
         inst = self._makeOne(config)
         inst.add('view', 'anotherpackage:path', cache_max_age=1,
                  permission='abc')
-        self.assertEqual(config.kw['view_permission'], 'abc')
+        self.assertEqual(config.view_kw['permission'], 'abc')
 
     def test_add_viewname_with_view_permission(self):
-        class Config:
-            def add_route(self, *arg, **kw):
-                self.arg = arg
-                self.kw = kw
-        config = Config()
+        config = DummyConfig()
         inst = self._makeOne(config)
         inst.add('view', 'anotherpackage:path', cache_max_age=1,
                  view_permission='abc')
-        self.assertEqual(config.kw['view_permission'], 'abc')
+        self.assertEqual(config.view_kw['permission'], 'abc')
+
+    def test_add_viewname_with_view_context(self):
+        config = DummyConfig()
+        inst = self._makeOne(config)
+        inst.add('view', 'anotherpackage:path', cache_max_age=1,
+                 view_context=DummyContext)
+        self.assertEqual(config.view_kw['context'], DummyContext)
+
+    def test_add_viewname_with_view_for(self):
+        config = DummyConfig()
+        inst = self._makeOne(config)
+        inst.add('view', 'anotherpackage:path', cache_max_age=1,
+                 view_for=DummyContext)
+        self.assertEqual(config.view_kw['context'], DummyContext)
+
+    def test_add_viewname_with_for_(self):
+        config = DummyConfig()
+        inst = self._makeOne(config)
+        inst.add('view', 'anotherpackage:path', cache_max_age=1,
+                 for_=DummyContext)
+        self.assertEqual(config.view_kw['context'], DummyContext)
+
+    def test_add_viewname_with_view_renderer(self):
+        config = DummyConfig()
+        inst = self._makeOne(config)
+        inst.add('view', 'anotherpackage:path', cache_max_age=1,
+                 view_renderer='mypackage:templates/index.pt')
+        self.assertEqual(config.view_kw['renderer'],
+                         'mypackage:templates/index.pt')
+
+    def test_add_viewname_with_renderer(self):
+        config = DummyConfig()
+        inst = self._makeOne(config)
+        inst.add('view', 'anotherpackage:path', cache_max_age=1,
+                 renderer='mypackage:templates/index.pt')
+        self.assertEqual(config.view_kw['renderer'],
+                         'mypackage:templates/index.pt')
+
+    def test_add_viewname_with_view_attr(self):
+        config = DummyConfig()
+        inst = self._makeOne(config)
+        inst.add('view', 'anotherpackage:path', cache_max_age=1,
+                 view_attr='attr')
+        self.assertEqual(config.view_kw['attr'], 'attr')
+
+class DummyConfig:
+    def add_route(self, *args, **kw):
+        self.route_args = args
+        self.route_kw = kw
+
+    def add_view(self, *args, **kw):
+        self.view_args = args
+        self.view_kw = kw
 
 class DummyStartResponse:
     def __call__(self, status, headerlist, exc_info=None):
