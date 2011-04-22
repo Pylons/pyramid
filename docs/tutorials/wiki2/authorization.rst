@@ -76,7 +76,14 @@ For any :app:`Pyramid` application to perform authorization, we need to add a
 
 We'll change our ``__init__.py`` file to enable an
 ``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy`` to enable
-declarative security checking.
+declarative security checking. We need to import the new policies:
+
+.. literalinclude:: src/authorization/tutorial/__init__.py
+   :lines: 2-3,8
+   :linenos:
+   :language: python
+
+Then, we'll add those policies to the configuration:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :lines: 15-21
@@ -97,12 +104,19 @@ We'll also change ``__init__.py``, adding a call to
 :term:`view callable`.  This is also known as a :term:`forbidden view`:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 41-43
+   :lines: 24-26,41-43
    :linenos:
    :language: python
 
 A forbidden view configures our newly created login view to show up when
 :app:`Pyramid` detects that a view invocation can not be authorized.
+
+A ``logout`` :term:`view callable` will allow users to log out later:
+
+.. literalinclude:: src/authorization/tutorial/__init__.py
+   :lines: 27-28
+   :linenos:
+   :language: python
 
 We'll also add ``permission`` arguments with the value ``edit`` to the
 ``edit_page`` and ``add_page`` views.  This indicates that the view
