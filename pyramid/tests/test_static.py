@@ -296,7 +296,7 @@ class Test_static_view(unittest.TestCase):
         self.assertEqual(request.environ['SCRIPT_NAME'], 
                          '/scriptname/path_info')
 
-    def test_with_subpath_new_script_name_fixes_trailing_double_slashes(self):
+    def test_with_subpath_new_script_name_fixes_trailing_slashes(self):
         view = self._makeOne('fixtures', package_name='another')
         context = DummyContext()
         request = DummyRequest()
@@ -305,7 +305,7 @@ class Test_static_view(unittest.TestCase):
         view(context, request)
         self.assertEqual(request.copied, True)
         self.assertEqual(request.environ['PATH_INFO'], '/sub/path/')
-        self.assertEqual(request.environ['SCRIPT_NAME'], '/path_info/')
+        self.assertEqual(request.environ['SCRIPT_NAME'], '/path_info')
 
 class TestStaticURLInfo(unittest.TestCase):
     def _getTargetClass(self):

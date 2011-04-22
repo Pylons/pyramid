@@ -414,7 +414,7 @@ def call_app_with_subpath_as_path_info(request, app):
     new_script_name = ''
 
     # compute new_path_info
-    new_path_info = '/' + '/'.join([quote_path_segment(x) for x in subpath])
+    new_path_info = '/' + '/'.join([x.encode('utf-8') for x in subpath])
 
     if new_path_info != '/': # don't want a sole double-slash
         if path_info != '/': # if orig path_info is '/', we're already done
@@ -426,11 +426,6 @@ def call_app_with_subpath_as_path_info(request, app):
     # compute new_script_name
     workback = (script_name + path_info).split('/')
 
-    # strip trailing slash from workback to avoid appending undue slash
-    # to end of script_name
-    if workback and (workback[-1] == ''):
-        workback = workback[:-1]
-
     tmp = []
     while workback:
         if tmp == subpath:
@@ -438,6 +433,11 @@ def call_app_with_subpath_as_path_info(request, app):
         el = workback.pop()
         if el:
             tmp.insert(0, el.decode('utf-8'))
+
+    # strip all trailing slashes from workback to avoid appending undue slashes
+    # to end of script_name
+    while workback and (workback[-1] == ''):
+        workback = workback[:-1]
             
     new_script_name = '/'.join(workback)
 
