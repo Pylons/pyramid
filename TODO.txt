@@ -89,9 +89,6 @@ Nice-to-Have
          action = '^foo$'
            mypackage.views.MyView.foo_GET
 
-- Raise an exception when a value in response_headerlist is not a
-  string or decide to encode.
-
 - Update App engine chapter with less creaky directions.
 
 - Add functionality that mocks the behavior of ``repoze.browserid``.
