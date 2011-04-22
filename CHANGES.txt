@@ -182,8 +182,9 @@ Deprecations
                      renderer='some/renderer.pt')
 
   This deprecation was done to reduce confusion observed in IRC, as well as
-  to (eventually) reduce documentation burden.  A deprecation warning is now
-  issued when any view-related parameter is passed to
+  to (eventually) reduce documentation burden (see also
+  https://github.com/Pylons/pyramid/issues/164).  A deprecation warning is
+  now issued when any view-related parameter is passed to
   ``Configurator.add_route``.
 
 Behavior Changes
