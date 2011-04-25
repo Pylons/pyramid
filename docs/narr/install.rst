@@ -242,14 +242,15 @@ Installing :app:`Pyramid` Into the Virtual Python Environment
 
 After you've got your ``env`` virtualenv installed, you may install
 :app:`Pyramid` itself using the following commands from within the
-virtualenv (``env``) directory:
+virtualenv (``env``) directory you created in the last step:
 
 .. code-block:: text
 
+   $ cd env
    $ bin/easy_install pyramid
 
-This command will take longer than the previous ones to complete, as it
-downloads and installs a number of dependencies.
+The ``easy_install`` command will take longer than the previous ones to
+complete, as it downloads and installs a number of dependencies.
 
 .. index::
    single: installing on Windows
