@@ -18,6 +18,7 @@ import os
 
 from zope.interface import implements
 
+from pyramid.compat import any
 from pyramid.interfaces import ISession
 
 def manage_accessed(wrapped):
@@ -282,12 +283,7 @@ def signed_deserialize(serialized, secret, hmac=hmac):
     if len(sig) != len(input_sig):
         raise ValueError('Wrong signature length')
 
-    invalid_bits = 0
-
-    for a, b in zip(sig, input_sig):
-        invalid_bits += a != b
-
-    if invalid_bits:
+    if any(a != b for a, b in zip(sig, input_sig)):
         raise ValueError('Invalid bits in signature')
 
     return pickle.loads(pickled)
