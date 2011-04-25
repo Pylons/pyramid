@@ -89,70 +89,16 @@ something like this:
    :linenos:
    :language: python
 
-Removing View Configuration
----------------------------
+Viewing the Application in a Browser
+------------------------------------
 
-In a previous step in this chapter, we removed the
-``tutorial.models.MyModel`` class.  However, our ``views.py`` module still
-attempts to import this class.  Temporarily, we'll change ``views.py`` so
-that it no longer references ``MyModel`` by removing its imports and removing
-a reference to it from the arguments passed to the ``@view_config``
-:term:`configuration decoration` decorator which sits atop the ``my_view``
-view callable.
-
-The result of all of our edits to ``views.py`` will end up looking
-something like this:
-
-.. literalinclude:: src/models/tutorial/views.py
-   :linenos:
-   :language: python
-
-Testing the Models
-------------------
-
-To make sure the code we just wrote works, we write tests for the model
-classes and the appmaker.  Changing ``tests.py``, we'll write a separate test
-class for each model class, and we'll write a test class for the
-``appmaker``.
-
-To do so, we'll retain the ``tutorial.tests.ViewTests`` class provided as a
-result of the ``pyramid_zodb`` project generator.  We'll add three test
-classes: one for the ``Page`` model named ``PageModelTests``, one for the
-``Wiki`` model named ``WikiModelTests``, and one for the appmaker named
-``AppmakerTests``.
-
-When we're done changing ``tests.py``, it will look something like so:
-
-.. literalinclude:: src/models/tutorial/tests.py
-   :linenos:
-   :language: python
-
-Running the Tests
------------------
-
-We can run these tests by using ``setup.py test`` in the same way we
-did in :ref:`running_tests`.  Assuming our shell's current working
-directory is the "tutorial" distribution directory:
-
-On UNIX:
+We can't.  At this point, our system is in a "non-runnable" state; we'll need
+to change view-related files in the next chapter to be able to start the
+application successfully.  If you try to start the application, you'll wind
+up with a Python traceback on your console that ends with this exception:
 
 .. code-block:: text
 
-  $ ../bin/python setup.py test -q
+   ImportError: cannot import name MyModel
 
-On Windows:
-
-.. code-block::  text
-
-   c:\pyramidtut\tutorial> ..\Scripts\python setup.py test -q
-
-The expected output is something like this:
-
-.. code-block:: text
-
-  .....
-  ----------------------------------------------------------------------
-  Ran 5 tests in 0.008s
-
-  OK
-
+This will also happen if you attempt to run the tests.
