@@ -166,8 +166,8 @@ When a route configuration names a ``view`` attribute, the :term:`view
 callable` named as that ``view`` attribute will always be found and invoked
 when the associated route pattern matches during a request.
 
-See :ref:`add_route_view_related_api` for a description of view-related
-arguments to ``add_route``.
+See :meth:`pyramid.config.Configurator.add_route` for a description of
+view-related arguments.
 
 .. index::
    single: route path pattern syntax
