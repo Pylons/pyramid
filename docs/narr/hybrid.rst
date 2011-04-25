@@ -33,7 +33,7 @@ URL Dispatch Only
 ~~~~~~~~~~~~~~~~~
 
 An application that uses :term:`url dispatch` exclusively to map URLs to code
-will often have statements like this within your application startup
+will often have statements like this within application startup
 configuration:
 
 .. code-block:: python
@@ -41,15 +41,20 @@ configuration:
 
    # config is an instance of pyramid.config.Configurator
 
-   config.add_route('foobar', '{foo}/{bar}', view='myproject.views.foobar')
-   config.add_route('bazbuz', '{baz}/{buz}', view='myproject.views.bazbuz')
+   config.add_route('foobar', '{foo}/{bar}')
+   config.add_route('bazbuz', '{baz}/{buz}')
 
-Each :term:`route` typically corresponds to a single view callable,
-and when that route is matched during a request, the view callable
-named by the ``view`` attribute is invoked.
+   config.add_view('myproject.views.foobar', route_name='foobar')
+   config.add_view('myproject.views.bazbuz', route_name='bazbuz')
 
-Typically, an application that uses only URL dispatch won't perform any calls
-to :meth:`pyramid.config.Configurator.add_view` in its startup code.
+Each :term:`route` corresponds to one or more view callables.  Each view
+callable is associated with a route by passing a ``route_name`` parameter
+that matches its name during a call to
+:meth:`~pyramid.config.Configurator.add_view`.  When a route is matched
+during a request, :term:`view lookup` is used to match the request to its
+associated view callable.  The presence of calls to
+:meth:`~pyramid.config.Configurator.add_route` signify that an application is
+using URL dispatch.
 
 Traversal Only
 ~~~~~~~~~~~~~~
@@ -196,12 +201,9 @@ remainder becomes the path used to perform traversal.
    The ``*remainder`` route pattern syntax is explained in more
    detail within :ref:`route_pattern_syntax`.
 
-Note that unlike the examples provided within :ref:`urldispatch_chapter`, the
-``add_route`` configuration statement named previously does not pass a
-``view`` argument.  This is because a hybrid mode application relies on
-:term:`traversal` to do :term:`resource location` and :term:`view lookup`
-instead of invariably invoking a specific view callable named directly within
-the matched route's configuration.
+A hybrid mode application relies more heavily on :term:`traversal` to do
+:term:`resource location` and :term:`view lookup` than most examples indicate
+within :ref:`urldispatch_chapter`.
 
 Because the pattern of the above route ends with ``*traverse``, when this
 route configuration is matched during a request, :app:`Pyramid` will attempt
@@ -426,13 +428,11 @@ attribute.
 Using ``*subpath`` in a Route Pattern
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There are certain extremely rare cases when you'd like to influence
-the traversal :term:`subpath` when a route matches without actually
-performing traversal.  For instance, the
-:func:`pyramid.wsgi.wsgiapp2` decorator and the
-:class:`pyramid.view.static` helper attempt to compute
-``PATH_INFO`` from the request's subpath, so it's useful to be able to
-influence this value.
+There are certain extremely rare cases when you'd like to influence the
+traversal :term:`subpath` when a route matches without actually performing
+traversal.  For instance, the :func:`pyramid.wsgi.wsgiapp2` decorator and the
+:class:`pyramid.view.static` helper attempt to compute ``PATH_INFO`` from the
+request's subpath, so it's useful to be able to influence this value.
 
 When ``*subpath`` exists in a pattern, no path is actually traversed,
 but the traversal algorithm will return a :term:`subpath` list implied
@@ -442,8 +442,8 @@ commonly in route declarations that look like this:
 .. code-block:: python
    :linenos:
 
-   config.add_route('static', '/static/*subpath',
-                    view='mypackage.views.static_view')
+   config.add_route('static', '/static/*subpath')
+   config.add_view('mypackage.views.static_view', route_name='static')
 
 Where ``mypackage.views.static_view`` is an instance of
 :class:`pyramid.view.static`.  This effectively tells the static helper to
@@ -458,11 +458,16 @@ application.  We'll detail them here.
 Registering a Default View for a Route That Has a ``view`` Attribute
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. warning:: As of :app:`Pyramid` 1.1 this section is slated to be removed in
+   a later documentation release because the the ability to add views
+   directly to the :term:`route configuration` by passing a ``view`` argument
+   to ``add_route`` has been deprecated.
+
 It is an error to provide *both* a ``view`` argument to a :term:`route
 configuration` *and* a :term:`view configuration` which names a
 ``route_name`` that has no ``name`` value or the empty ``name`` value.  For
-example, this pair of declarations will generate a "conflict" error at
-startup time.
+example, this pair of declarations will generate a conflict error at startup
+time.
 
 .. code-block:: python
    :linenos:
@@ -490,8 +495,8 @@ Can also be spelled like so:
    config.add_route('home', '{foo}/{bar}/*traverse')
    config.add_view('myproject.views.home', route_name='home')
 
-The two spellings are logically equivalent.  In fact, the former is
-just a syntactical shortcut for the latter.
+The two spellings are logically equivalent.  In fact, the former is just a
+syntactical shortcut for the latter.
 
 Binding Extra Views Against a Route Configuration that Doesn't Have a ``*traverse`` Element In Its Pattern
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

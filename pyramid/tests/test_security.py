@@ -19,9 +19,9 @@ class TestAllPermissionsList(unittest.TestCase):
 
     def test_it(self):
         thing = self._makeOne()
-        self.failUnless(thing.__eq__(thing))
+        self.assertTrue(thing.__eq__(thing))
         self.assertEqual(thing.__iter__(), ())
-        self.failUnless('anything' in thing)
+        self.assertTrue('anything' in thing)
 
     def test_singleton(self):
         from pyramid.security import ALL_PERMISSIONS
@@ -40,10 +40,10 @@ class TestAllowed(unittest.TestCase):
         allowed = self._makeOne('hello')
         self.assertEqual(allowed.msg, 'hello')
         self.assertEqual(allowed, True)
-        self.failUnless(allowed)
+        self.assertTrue(allowed)
         self.assertEqual(str(allowed), 'hello')
-        self.failUnless('<Allowed instance at ' in repr(allowed))
-        self.failUnless("with msg 'hello'>" in repr(allowed))
+        self.assertTrue('<Allowed instance at ' in repr(allowed))
+        self.assertTrue("with msg 'hello'>" in repr(allowed))
 
 class TestDenied(unittest.TestCase):
     def _getTargetClass(self):
@@ -58,10 +58,10 @@ class TestDenied(unittest.TestCase):
         denied = self._makeOne('hello')
         self.assertEqual(denied.msg, 'hello')
         self.assertEqual(denied, False)
-        self.failIf(denied)
+        self.assertFalse(denied)
         self.assertEqual(str(denied), 'hello')
-        self.failUnless('<Denied instance at ' in repr(denied))
-        self.failUnless("with msg 'hello'>" in repr(denied))
+        self.assertTrue('<Denied instance at ' in repr(denied))
+        self.assertTrue("with msg 'hello'>" in repr(denied))
 
 class TestACLAllowed(unittest.TestCase):
     def _getTargetClass(self):
@@ -76,12 +76,12 @@ class TestACLAllowed(unittest.TestCase):
         msg = ("ACLAllowed permission 'permission' via ACE 'ace' in ACL 'acl' "
                "on context 'ctx' for principals 'principals'")
         allowed = self._makeOne('ace', 'acl', 'permission', 'principals', 'ctx')
-        self.failUnless(msg in allowed.msg)
+        self.assertTrue(msg in allowed.msg)
         self.assertEqual(allowed, True)
-        self.failUnless(allowed)
+        self.assertTrue(allowed)
         self.assertEqual(str(allowed), msg)
-        self.failUnless('<ACLAllowed instance at ' in repr(allowed))
-        self.failUnless("with msg %r>" % msg in repr(allowed))
+        self.assertTrue('<ACLAllowed instance at ' in repr(allowed))
+        self.assertTrue("with msg %r>" % msg in repr(allowed))
 
 class TestACLDenied(unittest.TestCase):
     def _getTargetClass(self):
@@ -96,12 +96,12 @@ class TestACLDenied(unittest.TestCase):
         msg = ("ACLDenied permission 'permission' via ACE 'ace' in ACL 'acl' "
                "on context 'ctx' for principals 'principals'")
         denied = self._makeOne('ace', 'acl', 'permission', 'principals', 'ctx')
-        self.failUnless(msg in denied.msg)
+        self.assertTrue(msg in denied.msg)
         self.assertEqual(denied, False)
-        self.failIf(denied)
+        self.assertFalse(denied)
         self.assertEqual(str(denied), msg)
-        self.failUnless('<ACLDenied instance at ' in repr(denied))
-        self.failUnless("with msg %r>" % msg in repr(denied))
+        self.assertTrue('<ACLDenied instance at ' in repr(denied))
+        self.assertTrue("with msg %r>" % msg in repr(denied))
 
 class TestViewExecutionPermitted(unittest.TestCase):
     def setUp(self):
@@ -140,8 +140,8 @@ class TestViewExecutionPermitted(unittest.TestCase):
         request = DummyRequest({})
         result = self._callFUT(context, request, '')
         msg = result.msg
-        self.failUnless("Allowed: view name '' in context" in msg)
-        self.failUnless('(no permission defined)' in msg)
+        self.assertTrue("Allowed: view name '' in context" in msg)
+        self.assertTrue('(no permission defined)' in msg)
         self.assertEqual(result, True)
 
     def test_with_permission(self):
@@ -156,7 +156,7 @@ class TestViewExecutionPermitted(unittest.TestCase):
         request = DummyRequest({})
         directlyProvides(request, IRequest)
         result = self._callFUT(context, request, '')
-        self.failUnless(result is True)
+        self.assertTrue(result is True)
 
 class TestHasPermission(unittest.TestCase):
     def setUp(self):

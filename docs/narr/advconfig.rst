@@ -295,15 +295,9 @@ These are the methods of the configurator which provide conflict detection:
 :meth:`~pyramid.config.Configurator.set_locale_negotiator` and
 :meth:`~pyramid.config.Configurator.set_default_permission`.
 
-Some other methods of the configurator also indirectly provide conflict
-detection, because they're implemented in terms of conflict-aware methods:
-
-- :meth:`~pyramid.config.Configurator.add_route` does a second type of
-  conflict detection when a ``view`` parameter is passed (it calls
-  ``add_view``).
-
-- :meth:`~pyramid.config.Configurator.static_view`, a frontend for
-  ``add_route`` and ``add_view``.
+:meth:`~pyramid.config.Configurator.add_static_view` also indirectly
+provides conflict detection, because it's implemented in terms of the
+conflict-aware ``add_route`` and ``add_view`` methods.
 
 .. _including_configuration:
 

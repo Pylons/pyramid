@@ -1,6 +1,7 @@
 def includeme(config):
   # <!-- we want this view to "win" -->
-  config.add_route('route', 'abc', view='.views.route_view')
+  config.add_route('route', 'abc')
+  config.add_view('.views.route_view', route_name='route')
   # <!-- .. even though this one has a more specific context -->
   config.add_view('.views.global_view',
                   context='pyramid.traversal.DefaultRootFactory')

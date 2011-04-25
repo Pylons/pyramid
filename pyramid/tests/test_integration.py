@@ -20,8 +20,8 @@ class WGSIAppPlusViewConfigTests(unittest.TestCase):
     def test_it(self):
         from venusian import ATTACH_ATTR
         import types
-        self.failUnless(getattr(wsgiapptest, ATTACH_ATTR))
-        self.failUnless(type(wsgiapptest) is types.FunctionType)
+        self.assertTrue(getattr(wsgiapptest, ATTACH_ATTR))
+        self.assertTrue(type(wsgiapptest) is types.FunctionType)
         context = DummyContext()
         request = DummyRequest()
         result = wsgiapptest(context, request)
@@ -45,7 +45,7 @@ here = os.path.dirname(__file__)
 staticapp = static(os.path.join(here, 'fixtures'))
 
 class TestStaticApp(unittest.TestCase):
-    def test_it(self):
+    def test_basic(self):
         from webob import Request
         context = DummyContext()
         from StringIO import StringIO
@@ -57,12 +57,67 @@ class TestStaticApp(unittest.TestCase):
                            'wsgi.version':(1,0),
                            'wsgi.url_scheme':'http',
                            'wsgi.input':StringIO()})
-        request.subpath = ['minimal.pt']
+        request.subpath = ('minimal.pt',)
         result = staticapp(context, request)
         self.assertEqual(result.status, '200 OK')
         self.assertEqual(
             result.body.replace('\r', ''),
             open(os.path.join(here, 'fixtures/minimal.pt'), 'r').read())
+
+    def test_file_in_subdir(self):
+        from webob import Request
+        context = DummyContext()
+        from StringIO import StringIO
+        request = Request({'PATH_INFO':'',
+                           'SCRIPT_NAME':'',
+                           'SERVER_NAME':'localhost',
+                           'SERVER_PORT':'80',
+                           'REQUEST_METHOD':'GET',
+                           'wsgi.version':(1,0),
+                           'wsgi.url_scheme':'http',
+                           'wsgi.input':StringIO()})
+        request.subpath = ('static', 'index.html',)
+        result = staticapp(context, request)
+        self.assertEqual(result.status, '200 OK')
+        self.assertEqual(
+            result.body.replace('\r', ''),
+            open(os.path.join(here, 'fixtures/static/index.html'), 'r').read())
+
+    def test_redirect_to_subdir(self):
+        from webob import Request
+        context = DummyContext()
+        from StringIO import StringIO
+        request = Request({'PATH_INFO':'',
+                           'SCRIPT_NAME':'',
+                           'SERVER_NAME':'localhost',
+                           'SERVER_PORT':'80',
+                           'REQUEST_METHOD':'GET',
+                           'wsgi.version':(1,0),
+                           'wsgi.url_scheme':'http',
+                           'wsgi.input':StringIO()})
+        request.subpath = ('static',)
+        result = staticapp(context, request)
+        self.assertEqual(result.status, '301 Moved Permanently')
+        self.assertEqual(result.location, 'http://localhost/static/')
+
+    def test_redirect_to_subdir_with_existing_script_name(self):
+        from webob import Request
+        context = DummyContext()
+        from StringIO import StringIO
+        request = Request({'PATH_INFO':'/static',
+                           'SCRIPT_NAME':'/script_name',
+                           'SERVER_NAME':'localhost',
+                           'SERVER_PORT':'80',
+                           'REQUEST_METHOD':'GET',
+                           'wsgi.version':(1,0),
+                           'wsgi.url_scheme':'http',
+                           'wsgi.input':StringIO()})
+        request.subpath = ('static',)
+        result = staticapp(context, request)
+        self.assertEqual(result.status, '301 Moved Permanently')
+        self.assertEqual(result.location, 
+                         'http://localhost/script_name/static/')
+
 
 class IntegrationBase(unittest.TestCase):
     root_factory = None
@@ -201,13 +256,13 @@ class TestForbiddenAppHasResult(IntegrationBase):
     def test_it(self):
         res = self.testapp.get('/x', status=403)
         message, result = [x.strip() for x in res.body.split('\n')]
-        self.failUnless(message.endswith('failed permission check'))
-        self.failUnless(
+        self.assertTrue(message.endswith('failed permission check'))
+        self.assertTrue(
             result.startswith("ACLDenied permission 'private' via ACE "
                               "'<default deny>' in ACL "
                               "'<No ACL found on any object in resource "
                               "lineage>' on context"))
-        self.failUnless(
+        self.assertTrue(
             result.endswith("for principals ['system.Everyone']"))
 
 class TestViewDecoratorApp(IntegrationBase):
@@ -221,20 +276,20 @@ class TestViewDecoratorApp(IntegrationBase):
         # we use mako here instead of chameleon because it works on Jython
         self._configure_mako()
         res = self.testapp.get('/first', status=200)
-        self.failUnless('OK' in res.body)
+        self.assertTrue('OK' in res.body)
 
     def test_second(self):
         # we use mako here instead of chameleon because it works on Jython
         self._configure_mako()
         res = self.testapp.get('/second', status=200)
-        self.failUnless('OK2' in res.body)
+        self.assertTrue('OK2' in res.body)
 
 class TestViewPermissionBug(IntegrationBase):
     # view_execution_permitted bug as reported by Shane at http://lists.repoze.org/pipermail/repoze-dev/2010-October/003603.html
     package = 'pyramid.tests.permbugapp'
     def test_test(self):
         res = self.testapp.get('/test', status=200)
-        self.failUnless('ACLDenied' in res.body)
+        self.assertTrue('ACLDenied' in res.body)
 
     def test_x(self):
         self.testapp.get('/x', status=403)
@@ -244,15 +299,15 @@ class TestDefaultViewPermissionBug(IntegrationBase):
     package = 'pyramid.tests.defpermbugapp'
     def test_x(self):
         res = self.testapp.get('/x', status=403)
-        self.failUnless('failed permission check' in res.body)
+        self.assertTrue('failed permission check' in res.body)
 
     def test_y(self):
         res = self.testapp.get('/y', status=403)
-        self.failUnless('failed permission check' in res.body)
+        self.assertTrue('failed permission check' in res.body)
 
     def test_z(self):
         res = self.testapp.get('/z', status=200)
-        self.failUnless('public' in res.body)
+        self.assertTrue('public' in res.body)
 
 from pyramid.tests.exceptionviewapp.models import AnException, NotAnException
 excroot = {'anexception':AnException(),
@@ -263,31 +318,31 @@ class TestExceptionViewsApp(IntegrationBase):
     root_factory = lambda *arg: excroot
     def test_root(self):
         res = self.testapp.get('/', status=200)
-        self.failUnless('maybe' in res.body)
+        self.assertTrue('maybe' in res.body)
 
     def test_notanexception(self):
         res = self.testapp.get('/notanexception', status=200)
-        self.failUnless('no' in res.body)
+        self.assertTrue('no' in res.body)
 
     def test_anexception(self):
         res = self.testapp.get('/anexception', status=200)
-        self.failUnless('yes' in res.body)
+        self.assertTrue('yes' in res.body)
 
     def test_route_raise_exception(self):
         res = self.testapp.get('/route_raise_exception', status=200)
-        self.failUnless('yes' in res.body)
+        self.assertTrue('yes' in res.body)
 
     def test_route_raise_exception2(self):
         res = self.testapp.get('/route_raise_exception2', status=200)
-        self.failUnless('yes' in res.body)
+        self.assertTrue('yes' in res.body)
 
     def test_route_raise_exception3(self):
         res = self.testapp.get('/route_raise_exception3', status=200)
-        self.failUnless('whoa' in res.body)
+        self.assertTrue('whoa' in res.body)
 
     def test_route_raise_exception4(self):
         res = self.testapp.get('/route_raise_exception4', status=200)
-        self.failUnless('whoa' in res.body)
+        self.assertTrue('whoa' in res.body)
 
 class ImperativeIncludeConfigurationTest(unittest.TestCase):
     def setUp(self):
@@ -305,15 +360,15 @@ class ImperativeIncludeConfigurationTest(unittest.TestCase):
 
     def test_root(self):
         res = self.testapp.get('/', status=200)
-        self.failUnless('root' in res.body)
+        self.assertTrue('root' in res.body)
 
     def test_two(self):
         res = self.testapp.get('/two', status=200)
-        self.failUnless('two' in res.body)
+        self.assertTrue('two' in res.body)
 
     def test_three(self):
         res = self.testapp.get('/three', status=200)
-        self.failUnless('three' in res.body)
+        self.assertTrue('three' in res.body)
 
 class SelfScanAppTest(unittest.TestCase):
     def setUp(self):
@@ -329,11 +384,27 @@ class SelfScanAppTest(unittest.TestCase):
 
     def test_root(self):
         res = self.testapp.get('/', status=200)
-        self.failUnless('root' in res.body)
+        self.assertTrue('root' in res.body)
 
     def test_two(self):
         res = self.testapp.get('/two', status=200)
-        self.failUnless('two' in res.body)
+        self.assertTrue('two' in res.body)
+
+class WSGIApp2AppTest(unittest.TestCase):
+    def setUp(self):
+        from pyramid.tests.wsgiapp2app import main
+        config = main()
+        app = config.make_wsgi_app()
+        from webtest import TestApp
+        self.testapp = TestApp(app)
+        self.config = config
+
+    def tearDown(self):
+        self.config.end()
+
+    def test_hello(self):
+        res = self.testapp.get('/hello', status=200)
+        self.assertTrue('Hello' in res.body)
 
 class DummyContext(object):
     pass

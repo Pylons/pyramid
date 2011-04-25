@@ -66,15 +66,15 @@ more than a single application per process.  For example, use of a
 :term:`Paste` "composite" allows you to run separate individual WSGI
 applications in the same process, each answering requests for some URL
 prefix.  This makes it possible to run, for example, a TurboGears
-application at ``/turbogears`` and a BFG application at ``/bfg``, both
-served up using the same :term:`WSGI` server within a single Python
-process.
+application at ``/turbogears`` and a :app:`Pyramid` application at
+``/pyramid``, both served up using the same :term:`WSGI` server
+within a single Python process.
 
 Most production Zope applications are relatively large, making it
 impractical due to memory constraints to run more than one Zope
-application per Python process.  However, a :app:`Pyramid`
-application may be very small and consume very little memory, so it's
-a reasonable goal to be able to run more than one BFG application per
+application per Python process.  However, a :app:`Pyramid` application
+may be very small and consume very little memory, so it's a reasonable
+goal to be able to run more than one :app:`Pyramid` application per
 process.
 
 In order to make it possible to run more than one :app:`Pyramid`
@@ -182,10 +182,10 @@ global ZCA API.  Without special treatment, the ZCA global APIs will
 always return the global ZCA registry (the one in
 ``zope.component.globalregistry.base``).
 
-To "fix" this and make the ZCA global APIs use the "current" BFG
-registry, you need to call
-:meth:`~pyramid.config.Configurator.hook_zca` within your
-setup code.  For example:
+To "fix" this and make the ZCA global APIs use the "current"
+:app:`Pyramid` registry, you need to call
+:meth:`~pyramid.config.Configurator.hook_zca` within your setup code.
+For example:
 
 .. code-block:: python
    :linenos:
@@ -253,7 +253,7 @@ Lines 5, 6, and 7 above are the interesting ones.  Line 5 retrieves
 the global ZCA component registry.  Line 6 creates a
 :term:`Configurator`, passing the global ZCA registry into its
 constructor as the ``registry`` argument.  Line 7 "sets up" the global
-registry with BFG-specific registrations; this is code that is
+registry with Pyramid-specific registrations; this is code that is
 normally executed when a registry is constructed rather than created,
 but we must call it "by hand" when we pass an explicit registry.
 

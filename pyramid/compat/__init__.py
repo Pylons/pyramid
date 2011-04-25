@@ -146,3 +146,12 @@ except ImportError: # pragma: no cover
     import md5
     md5 = md5.new
     
+try:
+    any = any # make importable
+except NameError: # pragma: no cover
+    def any(L):
+        for thing in L:
+            if thing:
+                return True
+        return False
+    

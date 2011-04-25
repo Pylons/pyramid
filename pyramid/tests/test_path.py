@@ -53,7 +53,7 @@ class TestCallerModule(unittest.TestCase):
     def test_it_level_3(self):
         from pyramid.tests import test_path
         result = self._callFUT(3)
-        self.failIfEqual(result, test_path)
+        self.assertNotEqual(result, test_path)
 
     def test_it_no___name__(self):
         class DummyFrame(object):
@@ -121,7 +121,7 @@ class TestPackagePath(unittest.TestCase):
         from pyramid.tests import test_path
         module = DummyPackageOrModule(test_path, raise_exc=TypeError)
         result = self._callFUT(module)
-        self.failIf(hasattr(module, '__abspath__'))
+        self.assertFalse(hasattr(module, '__abspath__'))
         self.assertEqual(result, module.package_path)
 
 class TestPackageOf(unittest.TestCase):

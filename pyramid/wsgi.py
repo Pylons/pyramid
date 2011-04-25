@@ -1,5 +1,5 @@
 from pyramid.compat import wraps
-from pyramid.traversal import quote_path_segment
+from pyramid.request import call_app_with_subpath_as_path_info
 
 def wsgiapp(wrapped):
     """ Decorator to turn a WSGI application into a :app:`Pyramid`
@@ -31,7 +31,7 @@ def wsgiapp(wrapped):
     """
     def decorator(context, request):
         return request.get_response(wrapped)
-    return wraps(wrapped)(decorator) # grokkability
+    return wraps(wrapped)(decorator)
 
 def wsgiapp2(wrapped):
     """ Decorator to turn a WSGI application into a :app:`Pyramid`
@@ -56,31 +56,15 @@ def wsgiapp2(wrapped):
         config.add_view(hello_world, name='hello_world.txt')
 
     The ``wsgiapp2`` decorator will convert the result of the WSGI
-    application to a Response and return it to :app:`Pyramid` as if
-    the WSGI app were a :app:`Pyramid` view.  The ``SCRIPT_NAME``
-    and ``PATH_INFO`` values present in the WSGI environment are fixed
-    up before the application is invoked.  """
+    application to a Response and return it to :app:`Pyramid` as if the WSGI
+    app were a :app:`Pyramid` view.  The ``SCRIPT_NAME`` and ``PATH_INFO``
+    values present in the WSGI environment are fixed up before the
+    application is invoked.  In particular, a new WSGI environment is
+    generated, and the :term:`subpath` of the request passed to ``wsgiapp2``
+    is used as the new request's ``PATH_INFO`` and everything preceding the
+    subpath is used as the ``SCRIPT_NAME``.  The new environment is passed to
+    the downstream WSGI application."""
 
     def decorator(context, request):
-        traversed = request.traversed
-        vroot_path = request.virtual_root_path
-        if not vroot_path:
-            vroot_path = ()
-        view_name = request.view_name
-        subpath = request.subpath
-        if not subpath:
-            subpath = ()
-        script_tuple = traversed[len(vroot_path):]
-        script_list = [ quote_path_segment(name) for name in script_tuple ]
-        if view_name:
-            script_list.append(quote_path_segment(view_name))
-        script_name =  '/' + '/'.join(script_list)
-        path_list = [ quote_path_segment(name) for name in subpath ]
-        path_info = '/' + '/'.join(path_list)
-        request.environ['PATH_INFO'] = path_info
-        script_name = request.environ['SCRIPT_NAME'] + script_name
-        if script_name.endswith('/'):
-            script_name = script_name[:-1]
-        request.environ['SCRIPT_NAME'] = script_name
-        return request.get_response(wrapped)
-    return wraps(wrapped)(decorator) # grokkability
+        return call_app_with_subpath_as_path_info(request, wrapped)
+    return wraps(wrapped)(decorator)

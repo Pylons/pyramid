@@ -1,6 +1,7 @@
 import os
 import pkg_resources
 import threading
+import warnings
 
 from zope.interface import implements
 
@@ -134,8 +135,10 @@ def json_renderer_factory(info):
     def _render(value, system):
         request = system.get('request')
         if request is not None:
-            if not hasattr(request, 'response_content_type'):
-                request.response_content_type = 'application/json'
+            response = request.response
+            ct = response.content_type
+            if ct == response.default_content_type:
+                response.content_type = 'application/json'
         return json.dumps(value)
     return _render
 
@@ -145,8 +148,10 @@ def string_renderer_factory(info):
             value = str(value)
         request = system.get('request')
         if request is not None:
-            if not hasattr(request, 'response_content_type'):
-                request.response_content_type = 'text/plain'
+            response = request.response
+            ct = response.content_type
+            if ct == response.default_content_type:
+                response.content_type = 'text/plain'
         return value
     return _render
 
@@ -344,29 +349,54 @@ class RendererHelper(object):
         return self._make_response(result, request)
 
     def _make_response(self, result, request):
-        registry = self.registry
-        response_factory = registry.queryUtility(IResponseFactory,
-                                                 default=Response)
+        response = getattr(request, 'response', None)
+        if response is None:
+            # request is None or request is not a pyramid.response.Response
+            registry = self.registry
+            response_factory = registry.queryUtility(IResponseFactory,
+                                                     default=Response)
 
-        response = response_factory(result)
+            response = response_factory()
+
+        if result is None:
+            result = ''
+
+        if isinstance(result, unicode):
+            response.unicode_body = result
+        else:
+            response.body = result
 
         if request is not None:
+            # deprecated mechanism to set up request.response_* attrs
             attrs = request.__dict__
             content_type = attrs.get('response_content_type', None)
             if content_type is not None:
                 response.content_type = content_type
+                deprecate_req_attr('Setting', 'content_type',
+                                   'set', 'content_type')
             headerlist = attrs.get('response_headerlist', None)
             if headerlist is not None:
                 for k, v in headerlist:
                     response.headers.add(k, v)
+                deprecate_req_attr('Setting or mutating', 'headerlist',
+                                   'set or mutate', 'headerlist')
             status = attrs.get('response_status', None)
             if status is not None:
                 response.status = status
+                deprecate_req_attr('Setting', 'status', 'set', 'status')
             charset = attrs.get('response_charset', None)
             if charset is not None:
                 response.charset = charset
+                deprecate_req_attr('Setting', 'charset', 'set', 'charset')
             cache_for = attrs.get('response_cache_for', None)
             if cache_for is not None:
                 response.cache_expires = cache_for
+                deprecate_req_attr('Setting', 'cache_for',
+                                   'set', 'cache_expires')
 
         return response
+
+def deprecate_req_attr(*args):
+    depwarn = ('%s "request.response_%s" is deprecated as of Pyramid 1.1; %s '
+               '"request.response.%s" instead.')
+    warnings.warn(depwarn % args, DeprecationWarning, 3)

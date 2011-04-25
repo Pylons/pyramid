@@ -26,6 +26,14 @@ The first thing we want to do is remove the stock ``MyModel`` class from the
 generated ``models.py`` file.  The ``MyModel`` class is only a sample and
 we're not going to use it.
 
+Next, we'll remove the :class:`sqlalchemy.Unicode` import and replace it
+with :class:`sqlalchemy.Text`.
+
+.. literalinclude:: src/models/tutorial/models.py
+   :lines: 5
+   :linenos:
+   :language: py
+
 Then, we'll add a ``Page`` class.  Because this is a SQLAlchemy
 application, this class should inherit from an instance of
 :class:`sqlalchemy.ext.declarative.declarative_base`.  Declarative

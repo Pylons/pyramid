@@ -85,6 +85,41 @@
      of ``request.exception`` will be ``None`` within response and
      finished callbacks.
 
+   .. attribute:: response
+
+     This attribute is actually a "reified" property which returns an
+     instance of the :class:`pyramid.response.Response` class.  The response
+     object returned does not exist until this attribute is accessed.  Once
+     it is accessed, subsequent accesses to this request object will return
+     the same :class:`~pyramid.response.Response` object.
+
+     The ``request.response`` API can is used by renderers.  A render obtains
+     the response object it will return from a view that uses that renderer
+     by accessing ``request.response``.  Therefore, it's possible to use the
+     ``request.response`` API to set up a response object with "the right"
+     attributes (e.g. by calling ``request.response.set_cookie(...)`` or
+     ``request.response.content_type = 'text/plain'``, etc) within a view
+     that uses a renderer.  For example, within a view that uses a
+     :term:`renderer`::
+
+         response = request.response
+         response.set_cookie('mycookie', 'mine, all mine!')
+         return {'text':'Value that will be used by the renderer'}
+
+     Mutations to this response object will be preserved in the response sent
+     to the client after rendering.
+
+     Non-renderer code can also make use of request.response instead of
+     creating a response "by hand".  For example, in view code::
+
+        response = request.response
+        response.body = 'Hello!'
+        response.content_type = 'text/plain'
+        return response
+
+     Note that the response in this circumstance is not "global"; it still
+     must be returned from the view code if a renderer is not used.
+
    .. attribute:: session
 
      If a :term:`session factory` has been configured, this attribute
@@ -127,10 +162,18 @@
 
    .. attribute::  response_*
 
+      .. warning:: As of Pyramid 1.1, assignment to ``response_*`` attrs are
+         deprecated.  Assigning to one will cause a deprecation warning to be
+         emitted.  Instead of assigning ``response_*`` attributes to the
+         request, use API of the the :attr:`pyramid.request.Request.response`
+         object (exposed to view code as ``request.response``) to influence
+         response behavior.
+
       You can set attributes on a :class:`pyramid.request.Request` which will
       influence the behavor of *rendered* responses (views which use a
       :term:`renderer` and which don't directly return a response).  These
       attributes begin with ``response_``, such as ``response_headerlist``. If
       you need to influence response values from a view that uses a renderer
       (such as the status code, a header, the content type, etc) see,
-      :ref:`response_request_attrs`.
+      :ref:`response_prefixed_attrs`.
+

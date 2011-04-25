@@ -13,6 +13,7 @@ from zope.interface import implements
 from pyramid.asset import resolve_asset_spec
 from pyramid.interfaces import IStaticURLInfo
 from pyramid.path import caller_package
+from pyramid.request import call_app_with_subpath_as_path_info
 from pyramid.url import route_url
 
 class PackageURLParser(StaticURLParser):
@@ -37,21 +38,18 @@ class PackageURLParser(StaticURLParser):
             filename = request.path_info_pop(environ)
         resource = os.path.normcase(os.path.normpath(
                     self.resource_name + '/' + filename))
-        if ( (self.root_resource is not None) and
-            (not resource.startswith(self.root_resource)) ):
+        if not resource.startswith(self.root_resource):
             # Out of bounds
             return self.not_found(environ, start_response)
         if not pkg_resources.resource_exists(self.package_name, resource):
             return self.not_found(environ, start_response)
         if pkg_resources.resource_isdir(self.package_name, resource):
             # @@: Cache?
-            child_root = (self.root_resource is not None and
-                          self.root_resource or self.resource_name)
             return self.__class__(
-                self.package_name, resource, root_resource=child_root,
+                self.package_name, resource, root_resource=self.resource_name,
                 cache_max_age=self.cache_max_age)(environ, start_response)
-        if (environ.get('PATH_INFO')
-            and environ.get('PATH_INFO') != '/'): # pragma: no cover
+        pi = environ.get('PATH_INFO')
+        if pi and pi != '/':
             return self.error_extra_path(environ, start_response) 
         full = pkg_resources.resource_filename(self.package_name, resource)
         if_none_match = environ.get('HTTP_IF_NONE_MATCH')
@@ -151,13 +149,26 @@ class StaticURLInfo(object):
                 permission = extra.pop('permission', None)
             if permission is None:
                 permission = '__no_permission_required__'
-            extra['view_permission'] = permission
-            extra['view'] = view
 
-            # register a route using the computed view, permission, and pattern,
-            # plus any extras passed to us via add_static_view
+            context = extra.pop('view_context', None)
+            if context is None:
+                context = extra.pop('view_for', None)
+            if context is None:
+                context = extra.pop('for_', None)
+
+            renderer = extra.pop('view_renderer', None)
+            if renderer is None:
+                renderer = extra.pop('renderer', None)
+
+            attr = extra.pop('view_attr', None)
+
+            # register a route using the computed view, permission, and 
+            # pattern, plus any extras passed to us via add_static_view
             pattern = "%s*subpath" % name # name already ends with slash
             self.config.add_route(name, pattern, **extra)
+            self.config.add_view(route_name=name, view=view,
+                                 permission=permission, context=context,
+                                 renderer=renderer, attr=attr)
             self.registrations.append((name, spec, False))
 
 class static_view(object):
@@ -211,12 +222,4 @@ class static_view(object):
         self.app = app
 
     def __call__(self, context, request):
-        subpath = '/'.join(request.subpath)
-        request_copy = request.copy()
-        # Fix up PATH_INFO to get rid of everything but the "subpath"
-        # (the actual path to the file relative to the root dir).
-        request_copy.environ['PATH_INFO'] = '/' + subpath
-        # Zero out SCRIPT_NAME for good measure.
-        request_copy.environ['SCRIPT_NAME'] = ''
-        return request_copy.get_response(self.app)
-
+        return call_app_with_subpath_as_path_info(request, self.app)

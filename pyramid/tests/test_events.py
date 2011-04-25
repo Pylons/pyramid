@@ -190,12 +190,12 @@ class TestBeforeRender(unittest.TestCase):
     def test__contains__True(self):
         system = {'a':1}
         event = self._makeOne(system)
-        self.failUnless('a' in event)
+        self.assertTrue('a' in event)
 
     def test__contains__False(self):
         system = {}
         event = self._makeOne(system)
-        self.failIf('a' in event)
+        self.assertFalse('a' in event)
 
     def test__getitem__success(self):
         system = {'a':1}

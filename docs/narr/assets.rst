@@ -341,7 +341,8 @@ application's startup code.
    # .. every other add_route declaration should come
    # before this one, as it will, by default, catch all requests
 
-   config.add_route('catchall_static', '/*subpath', 'myapp.static.static_view')
+   config.add_route('catchall_static', '/*subpath')
+   config.add_view('myapp.static.static_view', route_name='catchall_static')
 
 The special name ``*subpath`` above is used by the
 :class:`~pyramid.view.static` view callable to signify the path of the file
@@ -384,8 +385,8 @@ Or you might register it to be the view callable for a particular route:
 .. code-block:: python
    :linenos:
 
-   config.add_route('favicon', '/favicon.ico', 
-                    view='myapp.views.favicon_view')
+   config.add_route('favicon', '/favicon.ico')
+   config.add_view('myapp.views.favicon_view', route_name='favicon')
 
 Because this is a simple view callable, it can be protected with a
 :term:`permission` or can be configured to respond under different

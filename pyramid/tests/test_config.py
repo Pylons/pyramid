@@ -68,6 +68,12 @@ class ConfiguratorTests(unittest.TestCase):
         request.registry = config.registry
         return request
 
+    def _conflictFunctions(self, e):
+        conflicts = e._conflicts.values()
+        for conflict in conflicts:
+            for confinst in conflict:
+                yield confinst[2]
+
     def test_ctor_no_registry(self):
         import sys
         from pyramid.interfaces import ISettings
@@ -75,20 +81,20 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IRendererFactory
         config = Configurator()
         this_pkg = sys.modules['pyramid.tests']
-        self.failUnless(config.registry.getUtility(ISettings))
+        self.assertTrue(config.registry.getUtility(ISettings))
         self.assertEqual(config.package, this_pkg)
-        self.failUnless(config.registry.getUtility(IRendererFactory, 'json'))
-        self.failUnless(config.registry.getUtility(IRendererFactory, 'string'))
+        self.assertTrue(config.registry.getUtility(IRendererFactory, 'json'))
+        self.assertTrue(config.registry.getUtility(IRendererFactory, 'string'))
         if not __pypy__:
-            self.failUnless(config.registry.getUtility(IRendererFactory, '.pt'))
-            self.failUnless(config.registry.getUtility(IRendererFactory,'.txt'))
-        self.failUnless(config.registry.getUtility(IRendererFactory, '.mak'))
-        self.failUnless(config.registry.getUtility(IRendererFactory, '.mako'))
+            self.assertTrue(config.registry.getUtility(IRendererFactory, '.pt'))
+            self.assertTrue(config.registry.getUtility(IRendererFactory,'.txt'))
+        self.assertTrue(config.registry.getUtility(IRendererFactory, '.mak'))
+        self.assertTrue(config.registry.getUtility(IRendererFactory, '.mako'))
 
     def test__set_settings_as_None(self):
         config = self._makeOne()
         settings = config._set_settings(None)
-        self.failUnless(settings)
+        self.assertTrue(settings)
 
     def test__set_settings_as_dictwithvalues(self):
         config = self._makeOne()
@@ -171,7 +177,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_ctor_no_root_factory(self):
         from pyramid.interfaces import IRootFactory
         config = self._makeOne()
-        self.failUnless(config.registry.getUtility(IRootFactory))
+        self.assertTrue(config.registry.getUtility(IRootFactory))
 
     def test_ctor_alternate_renderers(self):
         from pyramid.interfaces import IRendererFactory
@@ -390,7 +396,7 @@ class ConfiguratorTests(unittest.TestCase):
         reg = Registry()
         config = self._makeOne(reg)
         config.setup_registry()
-        self.failUnless(reg.getUtility(IRootFactory))
+        self.assertTrue(reg.getUtility(IRootFactory))
 
     def test_setup_registry_dottedname_root_factory(self):
         from pyramid.registry import Registry
@@ -591,9 +597,9 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(app.__class__, Router)
         self.assertEqual(manager.pushed['registry'], config.registry)
         self.assertEqual(manager.pushed['request'], None)
-        self.failUnless(manager.popped)
+        self.assertTrue(manager.popped)
         self.assertEqual(len(subscriber), 1)
-        self.failUnless(IApplicationCreated.providedBy(subscriber[0]))
+        self.assertTrue(IApplicationCreated.providedBy(subscriber[0]))
 
     def test_include_with_dotted_name(self):
         from pyramid import tests
@@ -610,7 +616,7 @@ class ConfiguratorTests(unittest.TestCase):
             )
         self.assertEqual(context_after.basepath, None)
         self.assertEqual(context_after.includepath, ())
-        self.failUnless(context_after is context_before)
+        self.assertTrue(context_after is context_before)
 
     def test_include_with_python_callable(self):
         from pyramid import tests
@@ -627,7 +633,7 @@ class ConfiguratorTests(unittest.TestCase):
             )
         self.assertEqual(context_after.basepath, None)
         self.assertEqual(context_after.includepath, ())
-        self.failUnless(context_after is context_before)
+        self.assertTrue(context_after is context_before)
 
     def test_include_with_module_defaults_to_includeme(self):
         from pyramid import tests
@@ -644,7 +650,7 @@ class ConfiguratorTests(unittest.TestCase):
             )
         self.assertEqual(context_after.basepath, None)
         self.assertEqual(context_after.includepath, ())
-        self.failUnless(context_after is context_before)
+        self.assertTrue(context_after is context_before)
 
     def test_with_context(self):
         config = self._makeOne()
@@ -683,7 +689,7 @@ class ConfiguratorTests(unittest.TestCase):
         self._registerRenderer(config, name='dummy')
         config.add_view(renderer='dummy')
         view = self._getViewCallable(config)
-        self.failUnless('Hello!' in view(None, None).body)
+        self.assertTrue('Hello!' in view(None, None).body)
 
     def test_add_view_wrapped_view_is_decorated(self):
         def view(request): # request-only wrapper
@@ -729,7 +735,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         config.add_view(view=view, decorator=view_wrapper)
         wrapper = self._getViewCallable(config)
-        self.failIf(wrapper is view)
+        self.assertFalse(wrapper is view)
         self.assertEqual(wrapper.__doc__, view.__doc__)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
@@ -900,7 +906,7 @@ class ConfiguratorTests(unittest.TestCase):
             return 'OK'
         config.add_view(view=newview, xhr=True)
         wrapper = self._getViewCallable(config)
-        self.failIf(IMultiView.providedBy(wrapper))
+        self.assertFalse(IMultiView.providedBy(wrapper))
         request = DummyRequest()
         request.is_xhr = True
         self.assertEqual(wrapper(None, request), 'OK')
@@ -926,7 +932,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_view(view=newview, xhr=True, context=RuntimeError)
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
-        self.failIf(IMultiView.providedBy(wrapper))
+        self.assertFalse(IMultiView.providedBy(wrapper))
         request = DummyRequest()
         request.is_xhr = True
         self.assertEqual(wrapper(None, request), 'OK')
@@ -945,7 +951,7 @@ class ConfiguratorTests(unittest.TestCase):
             return 'OK'
         config.add_view(view=newview)
         wrapper = self._getViewCallable(config)
-        self.failIf(IMultiView.providedBy(wrapper))
+        self.assertFalse(IMultiView.providedBy(wrapper))
         request = DummyRequest()
         request.is_xhr = True
         self.assertEqual(wrapper(None, request), 'OK')
@@ -967,7 +973,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_view(view=newview, context=RuntimeError)
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
-        self.failIf(IMultiView.providedBy(wrapper))
+        self.assertFalse(IMultiView.providedBy(wrapper))
         request = DummyRequest()
         request.is_xhr = True
         self.assertEqual(wrapper(None, request), 'OK')
@@ -988,7 +994,7 @@ class ConfiguratorTests(unittest.TestCase):
             return 'OK'
         config.add_view(view=newview)
         wrapper = self._getViewCallable(config)
-        self.failIf(IMultiView.providedBy(wrapper))
+        self.assertFalse(IMultiView.providedBy(wrapper))
         request = DummyRequest()
         request.is_xhr = True
         self.assertEqual(wrapper(None, request), 'OK')
@@ -1012,7 +1018,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_view(view=newview, context=RuntimeError)
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
-        self.failIf(IMultiView.providedBy(wrapper))
+        self.assertFalse(IMultiView.providedBy(wrapper))
         request = DummyRequest()
         request.is_xhr = True
         self.assertEqual(wrapper(None, request), 'OK')
@@ -1030,7 +1036,7 @@ class ConfiguratorTests(unittest.TestCase):
             view, (IViewClassifier, IRequest, Interface), IView, name='')
         config.add_view(view=view)
         wrapper = self._getViewCallable(config)
-        self.failUnless(IMultiView.providedBy(wrapper))
+        self.assertTrue(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper(None, None), 'OK')
 
     def test_add_view_exc_multiview_replaces_existing_view(self):
@@ -1054,7 +1060,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_view(view=view, context=RuntimeError)
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
-        self.failUnless(IMultiView.providedBy(wrapper))
+        self.assertTrue(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper(None, None), 'OK')
 
     def test_add_view_multiview_replaces_existing_securedview(self):
@@ -1071,7 +1077,7 @@ class ConfiguratorTests(unittest.TestCase):
             ISecuredView, name='')
         config.add_view(view=view)
         wrapper = self._getViewCallable(config)
-        self.failUnless(IMultiView.providedBy(wrapper))
+        self.assertTrue(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper(None, None), 'OK')
 
     def test_add_view_exc_multiview_replaces_existing_securedview(self):
@@ -1095,7 +1101,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_view(view=view, context=RuntimeError)
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
-        self.failUnless(IMultiView.providedBy(wrapper))
+        self.assertTrue(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper(None, None), 'OK')
 
     def test_add_view_with_accept_multiview_replaces_existing_view(self):
@@ -1113,7 +1119,7 @@ class ConfiguratorTests(unittest.TestCase):
             view, (IViewClassifier, IRequest, Interface), IView, name='')
         config.add_view(view=view2, accept='text/html')
         wrapper = self._getViewCallable(config)
-        self.failUnless(IMultiView.providedBy(wrapper))
+        self.assertTrue(IMultiView.providedBy(wrapper))
         self.assertEqual(len(wrapper.views), 1)
         self.assertEqual(len(wrapper.media_views), 1)
         self.assertEqual(wrapper(None, None), 'OK')
@@ -1144,7 +1150,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_view(view=view2, accept='text/html', context=RuntimeError)
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
-        self.failUnless(IMultiView.providedBy(wrapper))
+        self.assertTrue(IMultiView.providedBy(wrapper))
         self.assertEqual(len(wrapper.views), 1)
         self.assertEqual(len(wrapper.media_views), 1)
         self.assertEqual(wrapper(None, None), 'OK')
@@ -1169,7 +1175,7 @@ class ConfiguratorTests(unittest.TestCase):
             view, (IViewClassifier, IRequest, Interface), IView, name='')
         config.add_view(view=view2)
         wrapper = self._getViewCallable(config)
-        self.failUnless(IMultiView.providedBy(wrapper))
+        self.assertTrue(IMultiView.providedBy(wrapper))
         self.assertEqual(len(wrapper.views), 1)
         self.assertEqual(len(wrapper.media_views), 1)
         self.assertEqual(wrapper(None, None), 'OK2')
@@ -1202,7 +1208,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_view(view=view2, context=RuntimeError)
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
-        self.failUnless(IMultiView.providedBy(wrapper))
+        self.assertTrue(IMultiView.providedBy(wrapper))
         self.assertEqual(len(wrapper.views), 1)
         self.assertEqual(len(wrapper.media_views), 1)
         self.assertEqual(wrapper(None, None), 'OK2')
@@ -1223,7 +1229,7 @@ class ConfiguratorTests(unittest.TestCase):
         view2 = lambda *arg: 'OK2'
         config.add_view(view=view2)
         wrapper = self._getViewCallable(config)
-        self.failUnless(IMultiView.providedBy(wrapper))
+        self.assertTrue(IMultiView.providedBy(wrapper))
         self.assertEqual([x[:2] for x in wrapper.views], [(view2, None)])
         self.assertEqual(wrapper(None, None), 'OK1')
 
@@ -1247,7 +1253,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_view(view=view2, context=RuntimeError)
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
-        self.failUnless(IMultiView.providedBy(wrapper))
+        self.assertTrue(IMultiView.providedBy(wrapper))
         self.assertEqual([x[:2] for x in wrapper.views], [(view2, None)])
         self.assertEqual(wrapper(None, None), 'OK1')
 
@@ -1268,10 +1274,10 @@ class ConfiguratorTests(unittest.TestCase):
             view, (IViewClassifier, IRequest, ISuper), IView, name='')
         config.add_view(view=view2, for_=ISub)
         wrapper = self._getViewCallable(config, ISuper, IRequest)
-        self.failIf(IMultiView.providedBy(wrapper))
+        self.assertFalse(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper(None, None), 'OK')
         wrapper = self._getViewCallable(config, ISub, IRequest)
-        self.failIf(IMultiView.providedBy(wrapper))
+        self.assertFalse(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper(None, None), 'OK2')
 
     def test_add_view_multiview_exception_superclass_then_subclass(self):
@@ -1298,14 +1304,14 @@ class ConfiguratorTests(unittest.TestCase):
         wrapper_exc_view = self._getViewCallable(
             config, implementedBy(Super), IRequest, exception_view=True)
         self.assertEqual(wrapper_exc_view, wrapper)
-        self.failIf(IMultiView.providedBy(wrapper_exc_view))
+        self.assertFalse(IMultiView.providedBy(wrapper_exc_view))
         self.assertEqual(wrapper_exc_view(None, None), 'OK')
         wrapper = self._getViewCallable(
             config, implementedBy(Sub), IRequest)
         wrapper_exc_view = self._getViewCallable(
             config, implementedBy(Sub), IRequest, exception_view=True)
         self.assertEqual(wrapper_exc_view, wrapper)
-        self.failIf(IMultiView.providedBy(wrapper_exc_view))
+        self.assertFalse(IMultiView.providedBy(wrapper_exc_view))
         self.assertEqual(wrapper_exc_view(None, None), 'OK2')
 
     def test_add_view_multiview_call_ordering(self):
@@ -1486,9 +1492,9 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper, None)
         config.add_route('foo', '/a/b')
         request_iface = self._getRouteRequestIface(config, 'foo')
-        self.failIfEqual(request_iface, None)
+        self.assertNotEqual(request_iface, None)
         wrapper = self._getViewCallable(config, request_iface=request_iface)
-        self.failIfEqual(wrapper, None)
+        self.assertNotEqual(wrapper, None)
         self.assertEqual(wrapper(None, None), 'OK')
 
     def test_add_view_with_route_name_deferred_views_already_exist(self):
@@ -1532,11 +1538,11 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper_exc_view, None)
         config.add_route('foo', '/a/b')
         request_iface = self._getRouteRequestIface(config, 'foo')
-        self.failIfEqual(request_iface, None)
+        self.assertNotEqual(request_iface, None)
         wrapper_exc_view = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError),
             request_iface=request_iface, exception_view=True)
-        self.failIfEqual(wrapper_exc_view, None)
+        self.assertNotEqual(wrapper_exc_view, None)
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError),
             request_iface=request_iface)
@@ -1979,129 +1985,6 @@ class ConfiguratorTests(unittest.TestCase):
         request.accept = ['text/html']
         self.assertEqual(predicate(None, request), False)
 
-    def test_add_route_with_view(self):
-        config = self._makeOne(autocommit=True)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view)
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, None, request_type)
-        self.assertEqual(wrapper(None, None), 'OK')
-        self._assertRoute(config, 'name', 'path')
-
-    def test_add_route_with_view_context(self):
-        config = self._makeOne(autocommit=True)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, view_context=IDummy)
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, IDummy, request_type)
-        self.assertEqual(wrapper(None, None), 'OK')
-        self._assertRoute(config, 'name', 'path')
-        wrapper = self._getViewCallable(config, IOther, request_type)
-        self.assertEqual(wrapper, None)
-
-    def test_add_route_with_view_exception(self):
-        from zope.interface import implementedBy
-        config = self._makeOne(autocommit=True)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, view_context=RuntimeError)
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(
-            config, ctx_iface=implementedBy(RuntimeError),
-            request_iface=request_type, exception_view=True)
-        self.assertEqual(wrapper(None, None), 'OK')
-        self._assertRoute(config, 'name', 'path')
-        wrapper = self._getViewCallable(
-            config, ctx_iface=IOther,
-            request_iface=request_type, exception_view=True)
-        self.assertEqual(wrapper, None)
-
-    def test_add_route_with_view_for(self):
-        config = self._makeOne(autocommit=True)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, view_for=IDummy)
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, IDummy, request_type)
-        self.assertEqual(wrapper(None, None), 'OK')
-        self._assertRoute(config, 'name', 'path')
-        wrapper = self._getViewCallable(config, IOther, request_type)
-        self.assertEqual(wrapper, None)
-
-    def test_add_route_with_for_(self):
-        config = self._makeOne(autocommit=True)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, for_=IDummy)
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, IDummy, request_type)
-        self.assertEqual(wrapper(None, None), 'OK')
-        self._assertRoute(config, 'name', 'path')
-        wrapper = self._getViewCallable(config, IOther, request_type)
-        self.assertEqual(wrapper, None)
-
-    def test_add_route_with_view_renderer(self):
-        config = self._makeOne(autocommit=True)
-        self._registerRenderer(config)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view,
-                         view_renderer='fixtures/minimal.txt')
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, None, request_type)
-        self._assertRoute(config, 'name', 'path')
-        self.assertEqual(wrapper(None, None).body, 'Hello!')
-
-    def test_add_route_with_view_attr(self):
-        config = self._makeOne(autocommit=True)
-        self._registerRenderer(config)
-        class View(object):
-            def __init__(self, context, request):
-                pass
-            def alt(self):
-                return 'OK'
-        config.add_route('name', 'path', view=View, view_attr='alt')
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, None, request_type)
-        self._assertRoute(config, 'name', 'path')
-        request = self._makeRequest(config)
-        self.assertEqual(wrapper(None, request), 'OK')
-
-    def test_add_route_with_view_renderer_alias(self):
-        config = self._makeOne(autocommit=True)
-        self._registerRenderer(config)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view,
-                         renderer='fixtures/minimal.txt')
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, None, request_type)
-        self._assertRoute(config, 'name', 'path')
-        self.assertEqual(wrapper(None, None).body, 'Hello!')
-
-    def test_add_route_with_view_permission(self):
-        from pyramid.interfaces import IAuthenticationPolicy
-        from pyramid.interfaces import IAuthorizationPolicy
-        config = self._makeOne(autocommit=True)
-        policy = lambda *arg: None
-        config.registry.registerUtility(policy, IAuthenticationPolicy)
-        config.registry.registerUtility(policy, IAuthorizationPolicy)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, view_permission='edit')
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, None, request_type)
-        self._assertRoute(config, 'name', 'path')
-        self.failUnless(hasattr(wrapper, '__call_permissive__'))
-
-    def test_add_route_with_view_permission_alias(self):
-        from pyramid.interfaces import IAuthenticationPolicy
-        from pyramid.interfaces import IAuthorizationPolicy
-        config = self._makeOne(autocommit=True)
-        policy = lambda *arg: None
-        config.registry.registerUtility(policy, IAuthenticationPolicy)
-        config.registry.registerUtility(policy, IAuthorizationPolicy)
-        view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, permission='edit')
-        request_type = self._getRouteRequestIface(config, 'name')
-        wrapper = self._getViewCallable(config, None, request_type)
-        self._assertRoute(config, 'name', 'path')
-        self.failUnless(hasattr(wrapper, '__call_permissive__'))
-
     def test_add_route_no_pattern_with_path(self):
         config = self._makeOne(autocommit=True)
         route = config.add_route('name', path='path')
@@ -2163,14 +2046,14 @@ class ConfiguratorTests(unittest.TestCase):
             return 'OK'
         config = self._makeOne()
         result = config.derive_view(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         self.assertEqual(result(None, None), 'OK')
 
     def test_derive_view_dottedname(self):
         config = self._makeOne()
         result = config.derive_view(
             'pyramid.tests.test_config.dummy_view')
-        self.failIf(result is dummy_view)
+        self.assertFalse(result is dummy_view)
         self.assertEqual(result(None, None), 'OK')
 
     def test_derive_view_with_default_renderer_no_explicit_renderer(self):
@@ -2184,7 +2067,7 @@ class ConfiguratorTests(unittest.TestCase):
         def view(request):
             return 'OK'
         result = config.derive_view(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         self.assertEqual(result(None, None).body, 'moo')
 
     def test_derive_view_with_default_renderer_with_explicit_renderer(self):
@@ -2200,7 +2083,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_renderer(None, moo)
         config.add_renderer('foo', foo)
         result = config.derive_view(view, renderer='foo')
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         request = self._makeRequest(config)
         self.assertEqual(result(None, request).body, 'foo')
 
@@ -2350,7 +2233,7 @@ class ConfiguratorTests(unittest.TestCase):
             result = view(None, request)
         finally:
             config.end()
-        self.failUnless('div' in result.body)
+        self.assertTrue('div' in result.body)
 
     def test_set_forbidden_view(self):
         from zope.interface import implementedBy
@@ -2397,7 +2280,7 @@ class ConfiguratorTests(unittest.TestCase):
             result = view(None, request)
         finally:
             config.end()
-        self.failUnless('div' in result.body)
+        self.assertTrue('div' in result.body)
 
     def test__set_authentication_policy(self):
         from pyramid.interfaces import IAuthenticationPolicy
@@ -2791,7 +2674,7 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IAuthenticationPolicy
         from pyramid.interfaces import IAuthorizationPolicy
         ut = config.registry.getUtility(IAuthenticationPolicy)
-        self.failUnless(isinstance(ut, DummySecurityPolicy))
+        self.assertTrue(isinstance(ut, DummySecurityPolicy))
         ut = config.registry.getUtility(IAuthorizationPolicy)
         self.assertEqual(ut.userid, 'user')
         self.assertEqual(ut.groupids, ('group1', 'group2'))
@@ -2899,7 +2782,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         renderer = config.testing_add_renderer('templates/foo.pt')
         from pyramid.testing import DummyTemplateRenderer
-        self.failUnless(isinstance(renderer, DummyTemplateRenderer))
+        self.assertTrue(isinstance(renderer, DummyTemplateRenderer))
         from pyramid.renderers import render_to_response
         # must provide request to pass in registry (this is a functest)
         request = DummyRequest()
@@ -2915,8 +2798,8 @@ class ConfiguratorTests(unittest.TestCase):
         renderer1 = config.testing_add_renderer('templates/foo.pt')
         renderer2 = config.testing_add_renderer('templates/bar.pt')
         from pyramid.testing import DummyTemplateRenderer
-        self.failUnless(isinstance(renderer1, DummyTemplateRenderer))
-        self.failUnless(isinstance(renderer2, DummyTemplateRenderer))
+        self.assertTrue(isinstance(renderer1, DummyTemplateRenderer))
+        self.assertTrue(isinstance(renderer2, DummyTemplateRenderer))
         from pyramid.renderers import render_to_response
         # must provide request to pass in registry (this is a functest)
         request = DummyRequest()
@@ -2955,7 +2838,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         renderer = config.testing_add_template('templates/foo.pt')
         from pyramid.testing import DummyTemplateRenderer
-        self.failUnless(isinstance(renderer, DummyTemplateRenderer))
+        self.assertTrue(isinstance(renderer, DummyTemplateRenderer))
         from pyramid.renderers import render_to_response
         # must provide request to pass in registry (this is a functest)
         request = DummyRequest()
@@ -3035,24 +2918,6 @@ class ConfiguratorTests(unittest.TestCase):
         registeredview = self._getViewCallable(config)
         self.assertEqual(registeredview.__name__, 'view3')
 
-    def test_conflict_route_with_view(self):
-        from zope.configuration.config import ConfigurationConflictError
-        config = self._makeOne()
-        def view1(request): pass
-        def view2(request): pass
-        config.add_route('a', '/a', view=view1)
-        config.add_route('a', '/a', view=view2)
-        try:
-            config.commit()
-        except ConfigurationConflictError, why:
-            c1, c2, c3, c4 = self._conflictFunctions(why)
-            self.assertEqual(c1, 'test_conflict_route_with_view')
-            self.assertEqual(c2, 'test_conflict_route_with_view')
-            self.assertEqual(c3, 'test_conflict_route_with_view')
-            self.assertEqual(c4, 'test_conflict_route_with_view')
-        else: # pragma: no cover
-            raise AssertionError
-        
     def test_conflict_set_notfound_view(self):
         from zope.configuration.config import ConfigurationConflictError
         config = self._makeOne()
@@ -3102,15 +2967,9 @@ class ConfiguratorTests(unittest.TestCase):
                         yield confinst[3]
             which = list(scanconflicts(why))
             self.assertEqual(len(which), 4)
-            self.failUnless("@view_config(renderer='string')" in which)
-            self.failUnless("@view_config(name='two', renderer='string')" in
+            self.assertTrue("@view_config(renderer='string')" in which)
+            self.assertTrue("@view_config(name='two', renderer='string')" in
                             which)
-
-    def _conflictFunctions(self, e):
-        conflicts = e._conflicts.values()
-        for conflict in conflicts:
-            for confinst in conflict:
-                yield confinst[2]
 
     def test___getattr__missing_when_directives_exist(self):
         config = self._makeOne()
@@ -3128,7 +2987,7 @@ class ConfiguratorTests(unittest.TestCase):
         directives = {'foo':(foo, True)}
         config.registry._directives = directives
         foo_meth = config.foo
-        self.failUnless(foo_meth.im_func.__docobj__ is foo)
+        self.assertTrue(foo_meth.im_func.__docobj__ is foo)
 
     def test___getattr__matches_no_action_wrap(self):
         config = self._makeOne()
@@ -3136,7 +2995,218 @@ class ConfiguratorTests(unittest.TestCase):
         directives = {'foo':(foo, False)}
         config.registry._directives = directives
         foo_meth = config.foo
-        self.failUnless(foo_meth.im_func is foo)
+        self.assertTrue(foo_meth.im_func is foo)
+
+class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
+    def setUp(self):
+        import warnings
+        warnings.filterwarnings('ignore')
+
+    def tearDown(self):
+        import warnings
+        warnings.resetwarnings()
+
+    def _makeOne(self, *arg, **kw):
+        from pyramid.config import Configurator
+        return Configurator(*arg, **kw)
+
+    def _getRouteRequestIface(self, config, name):
+        from pyramid.interfaces import IRouteRequest
+        iface = config.registry.getUtility(IRouteRequest, name)
+        return iface
+
+    def _getViewCallable(self, config, ctx_iface=None, request_iface=None,
+                         name='', exception_view=False):
+        from zope.interface import Interface
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
+        if exception_view:
+            classifier = IExceptionViewClassifier
+        else:
+            classifier = IViewClassifier
+        if ctx_iface is None:
+            ctx_iface = Interface
+        return config.registry.adapters.lookup(
+            (classifier, request_iface, ctx_iface), IView, name=name,
+            default=None)
+
+    def _registerRenderer(self, config, name='.txt'):
+        from pyramid.interfaces import IRendererFactory
+        from pyramid.interfaces import ITemplateRenderer
+        from zope.interface import implements
+        class Renderer:
+            implements(ITemplateRenderer)
+            def __init__(self, info):
+                self.__class__.info = info
+            def __call__(self, *arg):
+                return 'Hello!'
+        config.registry.registerUtility(Renderer, IRendererFactory, name=name)
+        return Renderer
+
+    def _assertRoute(self, config, name, path, num_predicates=0):
+        from pyramid.interfaces import IRoutesMapper
+        mapper = config.registry.getUtility(IRoutesMapper)
+        routes = mapper.get_routes()
+        route = routes[0]
+        self.assertEqual(len(routes), 1)
+        self.assertEqual(route.name, name)
+        self.assertEqual(route.path, path)
+        self.assertEqual(len(routes[0].predicates), num_predicates)
+        return route
+
+    def _makeRequest(self, config):
+        request = DummyRequest()
+        request.registry = config.registry
+        return request
+
+    def _conflictFunctions(self, e):
+        conflicts = e._conflicts.values()
+        for conflict in conflicts:
+            for confinst in conflict:
+                yield confinst[2]
+
+    def test_add_route_with_view(self):
+        config = self._makeOne(autocommit=True)
+        view = lambda *arg: 'OK'
+        config.add_route('name', 'path', view=view)
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(config, None, request_type)
+        self.assertEqual(wrapper(None, None), 'OK')
+        self._assertRoute(config, 'name', 'path')
+
+    def test_add_route_with_view_context(self):
+        config = self._makeOne(autocommit=True)
+        view = lambda *arg: 'OK'
+        config.add_route('name', 'path', view=view, view_context=IDummy)
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(config, IDummy, request_type)
+        self.assertEqual(wrapper(None, None), 'OK')
+        self._assertRoute(config, 'name', 'path')
+        wrapper = self._getViewCallable(config, IOther, request_type)
+        self.assertEqual(wrapper, None)
+
+    def test_add_route_with_view_exception(self):
+        from zope.interface import implementedBy
+        config = self._makeOne(autocommit=True)
+        view = lambda *arg: 'OK'
+        config.add_route('name', 'path', view=view, view_context=RuntimeError)
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(
+            config, ctx_iface=implementedBy(RuntimeError),
+            request_iface=request_type, exception_view=True)
+        self.assertEqual(wrapper(None, None), 'OK')
+        self._assertRoute(config, 'name', 'path')
+        wrapper = self._getViewCallable(
+            config, ctx_iface=IOther,
+            request_iface=request_type, exception_view=True)
+        self.assertEqual(wrapper, None)
+
+    def test_add_route_with_view_for(self):
+        config = self._makeOne(autocommit=True)
+        view = lambda *arg: 'OK'
+        config.add_route('name', 'path', view=view, view_for=IDummy)
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(config, IDummy, request_type)
+        self.assertEqual(wrapper(None, None), 'OK')
+        self._assertRoute(config, 'name', 'path')
+        wrapper = self._getViewCallable(config, IOther, request_type)
+        self.assertEqual(wrapper, None)
+
+    def test_add_route_with_for_(self):
+        config = self._makeOne(autocommit=True)
+        view = lambda *arg: 'OK'
+        config.add_route('name', 'path', view=view, for_=IDummy)
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(config, IDummy, request_type)
+        self.assertEqual(wrapper(None, None), 'OK')
+        self._assertRoute(config, 'name', 'path')
+        wrapper = self._getViewCallable(config, IOther, request_type)
+        self.assertEqual(wrapper, None)
+
+    def test_add_route_with_view_renderer(self):
+        config = self._makeOne(autocommit=True)
+        self._registerRenderer(config)
+        view = lambda *arg: 'OK'
+        config.add_route('name', 'path', view=view,
+                         view_renderer='fixtures/minimal.txt')
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(config, None, request_type)
+        self._assertRoute(config, 'name', 'path')
+        self.assertEqual(wrapper(None, None).body, 'Hello!')
+
+    def test_add_route_with_view_attr(self):
+        config = self._makeOne(autocommit=True)
+        self._registerRenderer(config)
+        class View(object):
+            def __init__(self, context, request):
+                pass
+            def alt(self):
+                return 'OK'
+        config.add_route('name', 'path', view=View, view_attr='alt')
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(config, None, request_type)
+        self._assertRoute(config, 'name', 'path')
+        request = self._makeRequest(config)
+        self.assertEqual(wrapper(None, request), 'OK')
+
+    def test_add_route_with_view_renderer_alias(self):
+        config = self._makeOne(autocommit=True)
+        self._registerRenderer(config)
+        view = lambda *arg: 'OK'
+        config.add_route('name', 'path', view=view,
+                         renderer='fixtures/minimal.txt')
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(config, None, request_type)
+        self._assertRoute(config, 'name', 'path')
+        self.assertEqual(wrapper(None, None).body, 'Hello!')
+
+    def test_add_route_with_view_permission(self):
+        from pyramid.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthorizationPolicy
+        config = self._makeOne(autocommit=True)
+        policy = lambda *arg: None
+        config.registry.registerUtility(policy, IAuthenticationPolicy)
+        config.registry.registerUtility(policy, IAuthorizationPolicy)
+        view = lambda *arg: 'OK'
+        config.add_route('name', 'path', view=view, view_permission='edit')
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(config, None, request_type)
+        self._assertRoute(config, 'name', 'path')
+        self.assertTrue(hasattr(wrapper, '__call_permissive__'))
+
+    def test_add_route_with_view_permission_alias(self):
+        from pyramid.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthorizationPolicy
+        config = self._makeOne(autocommit=True)
+        policy = lambda *arg: None
+        config.registry.registerUtility(policy, IAuthenticationPolicy)
+        config.registry.registerUtility(policy, IAuthorizationPolicy)
+        view = lambda *arg: 'OK'
+        config.add_route('name', 'path', view=view, permission='edit')
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(config, None, request_type)
+        self._assertRoute(config, 'name', 'path')
+        self.assertTrue(hasattr(wrapper, '__call_permissive__'))
+
+    def test_conflict_route_with_view(self):
+        from zope.configuration.config import ConfigurationConflictError
+        config = self._makeOne()
+        def view1(request): pass
+        def view2(request): pass
+        config.add_route('a', '/a', view=view1)
+        config.add_route('a', '/a', view=view2)
+        try:
+            config.commit()
+        except ConfigurationConflictError, why:
+            c1, c2, c3, c4 = self._conflictFunctions(why)
+            self.assertEqual(c1, 'test_conflict_route_with_view')
+            self.assertEqual(c2, 'test_conflict_route_with_view')
+            self.assertEqual(c3, 'test_conflict_route_with_view')
+            self.assertEqual(c4, 'test_conflict_route_with_view')
+        else: # pragma: no cover
+            raise AssertionError
+        
 
 class TestConfigurator_add_directive(unittest.TestCase):
 
@@ -3250,7 +3320,7 @@ class TestViewDeriver(unittest.TestCase):
             return 'OK'
         deriver = self._makeOne()
         result = deriver(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         self.assertEqual(result(None, None), 'OK')
 
     def test_requestonly_function_with_renderer(self):
@@ -3265,7 +3335,7 @@ class TestViewDeriver(unittest.TestCase):
             return 'OK'
         deriver = self._makeOne(renderer=moo())
         result = deriver(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         request = self._makeRequest()
         context = testing.DummyResource()
         self.assertEqual(result(context, request), 'moo')
@@ -3283,7 +3353,7 @@ class TestViewDeriver(unittest.TestCase):
         self.config.add_renderer('moo', moo)
         deriver = self._makeOne(renderer='string')
         result = deriver(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         request = self._makeRequest()
         request.override_renderer = 'moo'
         context = testing.DummyResource()
@@ -3301,12 +3371,12 @@ class TestViewDeriver(unittest.TestCase):
             return 'OK'
         deriver = self._makeOne(renderer=moo())
         result = deriver(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         request = self._makeRequest()
         request.__view__ = 'view'
         context = testing.DummyResource()
         self.assertEqual(result(context, request), 'moo')
-        self.failIf(hasattr(request, '__view__'))
+        self.assertFalse(hasattr(request, '__view__'))
 
     def test_class_without_attr(self):
         class View(object):
@@ -3337,8 +3407,8 @@ class TestViewDeriver(unittest.TestCase):
             return 'OK'
         deriver = self._makeOne()
         result = deriver(view)
-        self.failUnless(result is view)
-        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertTrue(result is view)
+        self.assertFalse(hasattr(result, '__call_permissive__'))
         self.assertEqual(view(None, None), 'OK')
 
     def test_as_function_requestonly(self):
@@ -3346,11 +3416,11 @@ class TestViewDeriver(unittest.TestCase):
             return 'OK'
         deriver = self._makeOne()
         result = deriver(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
-        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertFalse(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), 'OK')
 
     def test_as_newstyle_class_context_and_request(self):
@@ -3361,11 +3431,11 @@ class TestViewDeriver(unittest.TestCase):
                 return 'OK'
         deriver = self._makeOne()
         result = deriver(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
-        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertFalse(hasattr(result, '__call_permissive__'))
         request = self._makeRequest()
         self.assertEqual(result(None, request), 'OK')
         self.assertEqual(request.__view__.__class__, view)
@@ -3378,11 +3448,11 @@ class TestViewDeriver(unittest.TestCase):
                 return 'OK'
         deriver = self._makeOne()
         result = deriver(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
-        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertFalse(hasattr(result, '__call_permissive__'))
         request = self._makeRequest()
         self.assertEqual(result(None, request), 'OK')
         self.assertEqual(request.__view__.__class__, view)
@@ -3395,11 +3465,11 @@ class TestViewDeriver(unittest.TestCase):
                 return 'OK'
         deriver = self._makeOne()
         result = deriver(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
-        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertFalse(hasattr(result, '__call_permissive__'))
         request = self._makeRequest()
         self.assertEqual(result(None, request), 'OK')
         self.assertEqual(request.__view__.__class__, view)
@@ -3412,11 +3482,11 @@ class TestViewDeriver(unittest.TestCase):
                 return 'OK'
         deriver = self._makeOne()
         result = deriver(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
-        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertFalse(hasattr(result, '__call_permissive__'))
         request = self._makeRequest()
         self.assertEqual(result(None, request), 'OK')
         self.assertEqual(request.__view__.__class__, view)
@@ -3428,8 +3498,8 @@ class TestViewDeriver(unittest.TestCase):
         view = View()
         deriver = self._makeOne()
         result = deriver(view)
-        self.failUnless(result is view)
-        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertTrue(result is view)
+        self.assertFalse(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), 'OK')
 
     def test_as_instance_requestonly(self):
@@ -3439,11 +3509,11 @@ class TestViewDeriver(unittest.TestCase):
         view = View()
         deriver = self._makeOne()
         result = deriver(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
-        self.failUnless('instance' in result.__name__)
-        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertTrue('instance' in result.__name__)
+        self.assertFalse(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), 'OK')
 
     def test_with_debug_authorization_no_authpol(self):
@@ -3456,7 +3526,7 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
-        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertFalse(hasattr(result, '__call_permissive__'))
         request = self._makeRequest()
         request.view_name = 'view_name'
         request.url = 'url'
@@ -3479,7 +3549,7 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
-        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertFalse(hasattr(result, '__call_permissive__'))
         request = self._makeRequest()
         request.view_name = 'view_name'
         request.url = 'url'
@@ -3502,7 +3572,7 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
-        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertFalse(hasattr(result, '__call_permissive__'))
         request = self._makeRequest()
         request.view_name = 'view_name'
         request.url = 'url'
@@ -3524,7 +3594,7 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
-        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertFalse(hasattr(result, '__call_permissive__'))
         request = self._makeRequest()
         request.view_name = 'view_name'
         request.url = 'url'
@@ -3624,7 +3694,7 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
-        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertFalse(hasattr(result, '__call_permissive__'))
         request = self._makeRequest()
         request.view_name = 'view_name'
         request.url = 'url'
@@ -3645,7 +3715,7 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
-        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertFalse(hasattr(result, '__call_permissive__'))
         request = self._makeRequest()
         request.view_name = 'view_name'
         request.url = 'url'
@@ -3662,7 +3732,7 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
-        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertFalse(hasattr(result, '__call_permissive__'))
         request = self._makeRequest()
         request.view_name = 'view_name'
         request.url = 'url'
@@ -3736,7 +3806,7 @@ class TestViewDeriver(unittest.TestCase):
         deriver = self._makeOne(viewname='inner',
                                 wrapper_viewname='owrap')
         result = deriver(inner_view)
-        self.failIf(result is inner_view)
+        self.assertFalse(result is inner_view)
         self.assertEqual(inner_view.__module__, result.__module__)
         self.assertEqual(inner_view.__doc__, result.__doc__)
         request = self._makeRequest()
@@ -3768,7 +3838,7 @@ class TestViewDeriver(unittest.TestCase):
                 return {'a':'1'}
         deriver = self._makeOne(renderer=renderer(), attr='index')
         result = deriver(View)
-        self.failIf(result is View)
+        self.assertFalse(result is View)
         self.assertEqual(result.__module__, View.__module__)
         self.assertEqual(result.__doc__, View.__doc__)
         self.assertEqual(result.__name__, View.__name__)
@@ -3791,7 +3861,7 @@ class TestViewDeriver(unittest.TestCase):
                 return {'a':'1'}
         deriver = self._makeOne(renderer=renderer(), attr='index')
         result = deriver(View)
-        self.failIf(result is View)
+        self.assertFalse(result is View)
         self.assertEqual(result.__module__, View.__module__)
         self.assertEqual(result.__doc__, View.__doc__)
         self.assertEqual(result.__name__, View.__name__)
@@ -3814,7 +3884,7 @@ class TestViewDeriver(unittest.TestCase):
                 return {'a':'1'}
         deriver = self._makeOne(renderer=renderer(), attr='index')
         result = deriver(View)
-        self.failIf(result is View)
+        self.assertFalse(result is View)
         self.assertEqual(result.__module__, View.__module__)
         self.assertEqual(result.__doc__, View.__doc__)
         self.assertEqual(result.__name__, View.__name__)
@@ -3837,7 +3907,7 @@ class TestViewDeriver(unittest.TestCase):
                 return {'a':'1'}
         deriver = self._makeOne(renderer=renderer(), attr='index')
         result = deriver(View)
-        self.failIf(result is View)
+        self.assertFalse(result is View)
         self.assertEqual(result.__module__, View.__module__)
         self.assertEqual(result.__doc__, View.__doc__)
         self.assertEqual(result.__name__, View.__name__)
@@ -3859,7 +3929,7 @@ class TestViewDeriver(unittest.TestCase):
         deriver = self._makeOne(renderer=renderer(), attr='index')
         view = View()
         result = deriver(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         self.assertEqual(result.__module__, view.__module__)
         self.assertEqual(result.__doc__, view.__doc__)
         request = self._makeRequest()
@@ -3880,7 +3950,7 @@ class TestViewDeriver(unittest.TestCase):
         deriver = self._makeOne(renderer=renderer(), attr='index')
         view = View()
         result = deriver(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         self.assertEqual(result.__module__, view.__module__)
         self.assertEqual(result.__doc__, view.__doc__)
         request = self._makeRequest()
@@ -3898,7 +3968,7 @@ class TestViewDeriver(unittest.TestCase):
         def view(context, request): return 'NOTOK'
         deriver = self._makeOne(mapper=mapper)
         result = deriver(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         self.assertEqual(result(None, None), 'OK')
 
     def test_with_view_mapper_view_specified(self):
@@ -3913,7 +3983,7 @@ class TestViewDeriver(unittest.TestCase):
         view.__view_mapper__ = mapper
         deriver = self._makeOne()
         result = deriver(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         self.assertEqual(result(None, None), 'OK')
 
     def test_with_view_mapper_default_mapper_specified(self):
@@ -3928,7 +3998,7 @@ class TestViewDeriver(unittest.TestCase):
         def view(context, request): return 'NOTOK'
         deriver = self._makeOne()
         result = deriver(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         self.assertEqual(result(None, None), 'OK')
 
     def test_attr_wrapped_view_branching_default_phash(self):
@@ -3968,7 +4038,7 @@ class TestDefaultViewMapper(unittest.TestCase):
             return 'OK'
         mapper = self._makeOne()
         result = mapper(view)
-        self.failUnless(result is view)
+        self.assertTrue(result is view)
         request = self._makeRequest()
         self.assertEqual(result(None, request), 'OK')
 
@@ -3977,7 +4047,7 @@ class TestDefaultViewMapper(unittest.TestCase):
             """ """
         mapper = self._makeOne(attr='__name__')
         result = mapper(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         request = self._makeRequest()
         self.assertRaises(TypeError, result, None, request)
 
@@ -3986,7 +4056,7 @@ class TestDefaultViewMapper(unittest.TestCase):
             return 'OK'
         mapper = self._makeOne()
         result = mapper(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         request = self._makeRequest()
         self.assertEqual(result(None, request), 'OK')
 
@@ -3995,7 +4065,7 @@ class TestDefaultViewMapper(unittest.TestCase):
             """ """
         mapper = self._makeOne(attr='__name__')
         result = mapper(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         request = self._makeRequest()
         self.assertRaises(TypeError, result, None, request)
 
@@ -4007,7 +4077,7 @@ class TestDefaultViewMapper(unittest.TestCase):
                 return 'OK'
         mapper = self._makeOne()
         result = mapper(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         request = self._makeRequest()
         self.assertEqual(result(None, request), 'OK')
 
@@ -4019,7 +4089,7 @@ class TestDefaultViewMapper(unittest.TestCase):
                 return 'OK'
         mapper = self._makeOne(attr='index')
         result = mapper(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         request = self._makeRequest()
         self.assertEqual(result(None, request), 'OK')
 
@@ -4031,7 +4101,7 @@ class TestDefaultViewMapper(unittest.TestCase):
                 return 'OK'
         mapper = self._makeOne()
         result = mapper(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         request = self._makeRequest()
         self.assertEqual(result(None, request), 'OK')
 
@@ -4043,7 +4113,7 @@ class TestDefaultViewMapper(unittest.TestCase):
                 return 'OK'
         mapper = self._makeOne(attr='index')
         result = mapper(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         request = self._makeRequest()
         self.assertEqual(result(None, request), 'OK')
 
@@ -4055,7 +4125,7 @@ class TestDefaultViewMapper(unittest.TestCase):
                 return 'OK'
         mapper = self._makeOne()
         result = mapper(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         request = self._makeRequest()
         self.assertEqual(result(None, request), 'OK')
 
@@ -4067,7 +4137,7 @@ class TestDefaultViewMapper(unittest.TestCase):
                 return 'OK'
         mapper = self._makeOne(attr='index')
         result = mapper(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         request = self._makeRequest()
         self.assertEqual(result(None, request), 'OK')
 
@@ -4079,7 +4149,7 @@ class TestDefaultViewMapper(unittest.TestCase):
                 return 'OK'
         mapper = self._makeOne()
         result = mapper(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         request = self._makeRequest()
         self.assertEqual(result(None, request), 'OK')
 
@@ -4091,7 +4161,7 @@ class TestDefaultViewMapper(unittest.TestCase):
                 return 'OK'
         mapper = self._makeOne(attr='index')
         result = mapper(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         request = self._makeRequest()
         self.assertEqual(result(None, request), 'OK')
 
@@ -4102,7 +4172,7 @@ class TestDefaultViewMapper(unittest.TestCase):
         view = View()
         mapper = self._makeOne()
         result = mapper(view)
-        self.failUnless(result is view)
+        self.assertTrue(result is view)
         request = self._makeRequest()
         self.assertEqual(result(None, request), 'OK')
 
@@ -4113,7 +4183,7 @@ class TestDefaultViewMapper(unittest.TestCase):
         view = View()
         mapper = self._makeOne(attr='index')
         result = mapper(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         request = self._makeRequest()
         self.assertEqual(result(None, request), 'OK')
 
@@ -4124,7 +4194,7 @@ class TestDefaultViewMapper(unittest.TestCase):
         view = View()
         mapper = self._makeOne()
         result = mapper(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         request = self._makeRequest()
         self.assertEqual(result(None, request), 'OK')
 
@@ -4135,7 +4205,7 @@ class TestDefaultViewMapper(unittest.TestCase):
         view = View()
         mapper = self._makeOne(attr='index')
         result = mapper(view)
-        self.failIf(result is view)
+        self.assertFalse(result is view)
         request = self._makeRequest()
         self.assertEqual(result(None, request), 'OK')
 
@@ -4148,7 +4218,7 @@ class Test_preserve_view_attrs(unittest.TestCase):
         def view(context, request):
             """ """
         result = self._callFUT(view, view)
-        self.failUnless(result is view)
+        self.assertTrue(result is view)
 
     def test_it_different_with_existing_original_view(self):
         def view1(context, request): pass
@@ -4156,7 +4226,7 @@ class Test_preserve_view_attrs(unittest.TestCase):
         def view2(context, request): pass
         result = self._callFUT(view1, view2)
         self.assertEqual(result.__original_view__, 'abc')
-        self.failIf(result is view1)
+        self.assertFalse(result is view1)
 
     def test_it_different(self):
         class DummyView1:
@@ -4187,15 +4257,15 @@ class Test_preserve_view_attrs(unittest.TestCase):
         view2 = DummyView2()
         result = self._callFUT(view2, view1)
         self.assertEqual(result, view1)
-        self.failUnless(view1.__original_view__ is view2)
-        self.failUnless(view1.__doc__ is view2.__doc__)
-        self.failUnless(view1.__module__ is view2.__module__)
-        self.failUnless(view1.__name__ is view2.__name__)
-        self.failUnless(view1.__call_permissive__.im_func is
+        self.assertTrue(view1.__original_view__ is view2)
+        self.assertTrue(view1.__doc__ is view2.__doc__)
+        self.assertTrue(view1.__module__ is view2.__module__)
+        self.assertTrue(view1.__name__ is view2.__name__)
+        self.assertTrue(view1.__call_permissive__.im_func is
                         view2.__call_permissive__.im_func)
-        self.failUnless(view1.__permitted__.im_func is
+        self.assertTrue(view1.__permitted__.im_func is
                         view2.__permitted__.im_func)
-        self.failUnless(view1.__predicated__.im_func is
+        self.assertTrue(view1.__predicated__.im_func is
                         view2.__predicated__.im_func)
 
 class Test__make_predicates(unittest.TestCase):
@@ -4206,7 +4276,7 @@ class Test__make_predicates(unittest.TestCase):
     def test_ordering_xhr_and_request_method_trump_only_containment(self):
         order1, _, _ = self._callFUT(xhr=True, request_method='GET')
         order2, _, _ = self._callFUT(containment=True)
-        self.failUnless(order1 < order2)
+        self.assertTrue(order1 < order2)
 
     def test_ordering_number_of_predicates(self):
         order1, _, _ = self._callFUT(
@@ -4286,15 +4356,15 @@ class Test__make_predicates(unittest.TestCase):
         order11, _, _ = self._callFUT(
             )
         self.assertEqual(order1, order2)
-        self.failUnless(order3 > order2)
-        self.failUnless(order4 > order3)
-        self.failUnless(order5 > order4)
-        self.failUnless(order6 > order5)
-        self.failUnless(order7 > order6)
-        self.failUnless(order8 > order7)
-        self.failUnless(order9 > order8)
-        self.failUnless(order10 > order9)
-        self.failUnless(order11 > order10)
+        self.assertTrue(order3 > order2)
+        self.assertTrue(order4 > order3)
+        self.assertTrue(order5 > order4)
+        self.assertTrue(order6 > order5)
+        self.assertTrue(order7 > order6)
+        self.assertTrue(order8 > order7)
+        self.assertTrue(order9 > order8)
+        self.assertTrue(order10 > order9)
+        self.assertTrue(order11 > order10)
 
     def test_ordering_importance_of_predicates(self):
         order1, _, _ = self._callFUT(
@@ -4324,14 +4394,14 @@ class Test__make_predicates(unittest.TestCase):
         order9, _, _ = self._callFUT(
             custom=(DummyCustomPredicate(),),
             )
-        self.failUnless(order1 > order2)
-        self.failUnless(order2 > order3)
-        self.failUnless(order3 > order4)
-        self.failUnless(order4 > order5)
-        self.failUnless(order5 > order6)
-        self.failUnless(order6 > order7)
-        self.failUnless(order7 > order8)
-        self.failUnless(order8 > order9)
+        self.assertTrue(order1 > order2)
+        self.assertTrue(order2 > order3)
+        self.assertTrue(order3 > order4)
+        self.assertTrue(order4 > order5)
+        self.assertTrue(order5 > order6)
+        self.assertTrue(order6 > order7)
+        self.assertTrue(order7 > order8)
+        self.assertTrue(order8 > order9)
 
     def test_ordering_importance_and_number(self):
         order1, _, _ = self._callFUT(
@@ -4341,7 +4411,7 @@ class Test__make_predicates(unittest.TestCase):
         order2, _, _ = self._callFUT(
             custom=(DummyCustomPredicate(),),
             )
-        self.failUnless(order1 < order2)
+        self.assertTrue(order1 < order2)
 
         order1, _, _ = self._callFUT(
             xhr='xhr',
@@ -4351,18 +4421,7 @@ class Test__make_predicates(unittest.TestCase):
             request_method='request_method',
             custom=(DummyCustomPredicate(),),
             )
-        self.failUnless(order1 > order2)
-
-        order1, _, _ = self._callFUT(
-            xhr='xhr',
-            request_method='request_method',
-            path_info='path_info',
-            )
-        order2, _, _ = self._callFUT(
-            request_method='request_method',
-            custom=(DummyCustomPredicate(),),
-            )
-        self.failUnless(order1 < order2)
+        self.assertTrue(order1 > order2)
 
         order1, _, _ = self._callFUT(
             xhr='xhr',
@@ -4370,11 +4429,22 @@ class Test__make_predicates(unittest.TestCase):
             path_info='path_info',
             )
         order2, _, _ = self._callFUT(
+            request_method='request_method',
+            custom=(DummyCustomPredicate(),),
+            )
+        self.assertTrue(order1 < order2)
+
+        order1, _, _ = self._callFUT(
+            xhr='xhr',
+            request_method='request_method',
+            path_info='path_info',
+            )
+        order2, _, _ = self._callFUT(
             xhr='xhr',
             request_method='request_method',
             custom=(DummyCustomPredicate(),),
             )
-        self.failUnless(order1 > order2)
+        self.assertTrue(order1 > order2)
 
     def test_different_custom_predicates_with_same_hash(self):
         class PredicateWithHash(object):

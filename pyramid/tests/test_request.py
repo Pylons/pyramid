@@ -98,13 +98,13 @@ class TestRequest(unittest.TestCase):
     def test___contains__(self):
         environ ={'zooma':1}
         inst = self._makeOne(environ)
-        self.failUnless('zooma' in inst)
+        self.assertTrue('zooma' in inst)
 
     def test___delitem__(self):
         environ = {'zooma':1}
         inst = self._makeOne(environ)
         del inst['zooma']
-        self.failIf('zooma' in environ)
+        self.assertFalse('zooma' in environ)
 
     def test___getitem__(self):
         environ = {'zooma':1}
@@ -325,6 +325,66 @@ class Test_add_global_response_headers(unittest.TestCase):
         request.response_callbacks[0](None, response)
         self.assertEqual(response.headerlist,  [('c', 1)] )
 
+class Test_call_app_with_subpath_as_path_info(unittest.TestCase):
+    def _callFUT(self, request, app):
+        from pyramid.request import call_app_with_subpath_as_path_info
+        return call_app_with_subpath_as_path_info(request, app)
+
+    def test_it_all_request_and_environment_data_missing(self):
+        request = DummyRequest({})
+        response = self._callFUT(request, 'app')
+        self.assertTrue(request.copied)
+        self.assertEqual(response, 'app')
+        self.assertEqual(request.environ['SCRIPT_NAME'], '')
+        self.assertEqual(request.environ['PATH_INFO'], '/')
+
+    def test_it_with_subpath_and_path_info(self):
+        request = DummyRequest({'PATH_INFO':'/hello'})
+        request.subpath = ('hello',)
+        response = self._callFUT(request, 'app')
+        self.assertTrue(request.copied)
+        self.assertEqual(response, 'app')
+        self.assertEqual(request.environ['SCRIPT_NAME'], '')
+        self.assertEqual(request.environ['PATH_INFO'], '/hello')
+
+    def test_it_with_subpath_and_path_info_path_info_endswith_slash(self):
+        request = DummyRequest({'PATH_INFO':'/hello/'})
+        request.subpath = ('hello',)
+        response = self._callFUT(request, 'app')
+        self.assertTrue(request.copied)
+        self.assertEqual(response, 'app')
+        self.assertEqual(request.environ['SCRIPT_NAME'], '')
+        self.assertEqual(request.environ['PATH_INFO'], '/hello/')
+
+    def test_it_with_subpath_and_path_info_extra_script_name(self):
+        request = DummyRequest({'PATH_INFO':'/hello', 'SCRIPT_NAME':'/script'})
+        request.subpath = ('hello',)
+        response = self._callFUT(request, 'app')
+        self.assertTrue(request.copied)
+        self.assertEqual(response, 'app')
+        self.assertEqual(request.environ['SCRIPT_NAME'], '/script')
+        self.assertEqual(request.environ['PATH_INFO'], '/hello')
+
+    def test_it_with_extra_slashes_in_path_info(self):
+        request = DummyRequest({'PATH_INFO':'//hello/',
+                                'SCRIPT_NAME':'/script'})
+        request.subpath = ('hello',)
+        response = self._callFUT(request, 'app')
+        self.assertTrue(request.copied)
+        self.assertEqual(response, 'app')
+        self.assertEqual(request.environ['SCRIPT_NAME'], '/script')
+        self.assertEqual(request.environ['PATH_INFO'], '/hello/')
+
+    def test_subpath_path_info_and_script_name_have_utf8(self):
+        la = 'La Pe\xc3\xb1a'
+        request = DummyRequest({'PATH_INFO':'/'+la, 'SCRIPT_NAME':'/'+la})
+        request.subpath = (unicode(la, 'utf-8'), )
+        response = self._callFUT(request, 'app')
+        self.assertTrue(request.copied)
+        self.assertEqual(response, 'app')
+        self.assertEqual(request.environ['SCRIPT_NAME'], '/' + la)
+        self.assertEqual(request.environ['PATH_INFO'], '/' + la)
+
 class DummyRequest:
     def __init__(self, environ=None):
         if environ is None:
@@ -333,6 +393,13 @@ class DummyRequest:
 
     def add_response_callback(self, callback):
         self.response_callbacks = [callback]
+
+    def get_response(self, app):
+        return app
+
+    def copy(self):
+        self.copied = True
+        return self
 
 class DummyResponse:
     def __init__(self):

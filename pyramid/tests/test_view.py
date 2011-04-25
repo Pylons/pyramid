@@ -267,7 +267,7 @@ class TestViewConfigDecorator(unittest.TestCase):
         decorator.venusian = venusian
         def foo(): pass
         wrapped = decorator(foo)
-        self.failUnless(wrapped is foo)
+        self.assertTrue(wrapped is foo)
         settings = call_venusian(venusian)
         self.assertEqual(len(settings), 1)
         self.assertEqual(settings[0]['permission'], None)
@@ -281,7 +281,7 @@ class TestViewConfigDecorator(unittest.TestCase):
         decorator.venusian.info.scope = 'class'
         class foo(object): pass
         wrapped = decorator(foo)
-        self.failUnless(wrapped is foo)
+        self.assertTrue(wrapped is foo)
         settings = call_venusian(venusian)
         self.assertEqual(len(settings), 1)
         self.assertEqual(settings[0]['permission'], None)
@@ -296,7 +296,7 @@ class TestViewConfigDecorator(unittest.TestCase):
         decorator.venusian.info.scope = 'class'
         class foo(object): pass
         wrapped = decorator(foo)
-        self.failUnless(wrapped is foo)
+        self.assertTrue(wrapped is foo)
         settings = call_venusian(venusian)
         self.assertEqual(len(settings), 1)
         self.assertEqual(settings[0]['permission'], None)
@@ -314,8 +314,8 @@ class TestViewConfigDecorator(unittest.TestCase):
         def foo(): pass
         wrapped1 = decorator1(foo)
         wrapped2 = decorator2(wrapped1)
-        self.failUnless(wrapped1 is foo)
-        self.failUnless(wrapped2 is foo)
+        self.assertTrue(wrapped1 is foo)
+        self.assertTrue(wrapped2 is foo)
         settings1 = call_venusian(venusian1)
         self.assertEqual(len(settings1), 1)
         self.assertEqual(settings1[0]['name'], '1')
@@ -344,7 +344,7 @@ class TestViewConfigDecorator(unittest.TestCase):
         decorator.venusian = venusian
         def foo(context, request): pass
         decorated = decorator(foo)
-        self.failUnless(decorated is foo)
+        self.assertTrue(decorated is foo)
         settings = call_venusian(venusian)
         self.assertEqual(settings[0]['custom_predicates'], (1,))
 
@@ -355,7 +355,7 @@ class TestViewConfigDecorator(unittest.TestCase):
         decorator.venusian = venusian
         def foo(): pass
         wrapped = decorator(foo)
-        self.failUnless(wrapped is foo)
+        self.assertTrue(wrapped is foo)
         settings = call_venusian(venusian)
         self.assertEqual(len(settings), 1)
         renderer = settings[0]['renderer']
@@ -369,7 +369,7 @@ class TestViewConfigDecorator(unittest.TestCase):
         decorator.venusian = venusian
         def foo(): pass
         wrapped = decorator(foo)
-        self.failUnless(wrapped is foo)
+        self.assertTrue(wrapped is foo)
         settings = call_venusian(venusian)
         self.assertEqual(len(settings), 1)
         self.assertEqual(settings[0]['renderer'], {'a':1})
@@ -477,20 +477,20 @@ class Test_default_exceptionresponse_view(unittest.TestCase):
     def test_is_exception(self):
         context = Exception()
         result = self._callFUT(context, None)
-        self.failUnless(result is context)
+        self.assertTrue(result is context)
 
     def test_is_not_exception_context_is_false_still_chose(self):
         request = DummyRequest()
         request.exception = 0
         result = self._callFUT(None, request)
-        self.failUnless(result is None)
+        self.assertTrue(result is None)
 
     def test_is_not_exception_no_request_exception(self):
         context = object()
         request = DummyRequest()
         request.exception = None
         result = self._callFUT(context, request)
-        self.failUnless(result is context)
+        self.assertTrue(result is context)
 
     def test_is_not_exception_request_exception(self):
         context = object()
