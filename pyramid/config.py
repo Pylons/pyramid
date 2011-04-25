@@ -2441,7 +2441,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
     if xhr:
         def xhr_predicate(context, request):
             return request.is_xhr
-        xhr_predicate.__text__ = "XHR = True"
+        xhr_predicate.__text__ = "xhr = True"
         weights.append(1 << 1)
         predicates.append(xhr_predicate)
         h.update('xhr:%r' % bool(xhr))
@@ -2449,7 +2449,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
     if request_method is not None:
         def request_method_predicate(context, request):
             return request.method == request_method
-        msg = "Request method = %s"
+        msg = "request method = %s"
         request_method_predicate.__text__ = msg % request_method
         weights.append(1 << 2)
         predicates.append(request_method_predicate)
@@ -2513,6 +2513,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
     if accept is not None:
         def accept_predicate(context, request):
             return accept in request.accept
+        accept_predicate.__text__ = "accept = %s" % accept
         weights.append(1 << 6)
         predicates.append(accept_predicate)
         h.update('accept:%r' % accept)
@@ -2520,6 +2521,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
     if containment is not None:
         def containment_predicate(context, request):
             return find_interface(context, containment) is not None
+        containment_predicate.__text__ = "containment = %s" % containment
         weights.append(1 << 7)
         predicates.append(containment_predicate)
         h.update('containment:%r' % hash(containment))
@@ -2527,6 +2529,8 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
     if request_type is not None:
         def request_type_predicate(context, request):
             return request_type.providedBy(request)
+        msg = "request type = %s" % request_type
+        request_type_predicate.__text__ = msg
         weights.append(1 << 8)
         predicates.append(request_type_predicate)
         h.update('request_type:%r' % hash(request_type))
@@ -2545,6 +2549,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
             tvalue = tgenerate(m)
             m['traverse'] = traversal_path(tvalue)
             return True
+        traverse_predicate.__text__ = "traverse = True"
         # This isn't actually a predicate, it's just a infodict
         # modifier that injects ``traverse`` into the matchdict.  As a
         # result, the ``traverse_predicate`` function above always
@@ -2554,6 +2559,8 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
 
     if custom:
         for num, predicate in enumerate(custom):
+            if not hasattr(predicate, '__text__'):
+                predicate.__text__ = "custom predicate"
             predicates.append(predicate)
             # using hash() here rather than id() is intentional: we
             # want to allow custom predicates that are part of
@@ -2668,8 +2675,13 @@ def preserve_view_attrs(view, wrapped_view):
     except AttributeError:
         pass
     try:
+        wrapped_view.__permission__ = view.__permission__
+    except AttributeError:
+        pass
+    try:
         wrapped_view.__predicated__ = view.__predicated__
-        wrapped_view.__predicates__ = view.__predicates__
+        wrapped_view.__predicates__ = [p.__text__
+                                       for p in view.__predicates__]
     except AttributeError:
         pass
     try:
@@ -2757,6 +2769,7 @@ class ViewDeriver(object):
                 raise Forbidden(msg, result)
             _secured_view.__call_permissive__ = view
             _secured_view.__permitted__ = _permitted
+            _secured_view.__permission__ = permission
             wrapped_view = _secured_view
 
         return wrapped_view
@@ -2830,6 +2843,8 @@ class ViewDeriver(object):
         attr_view.__accept__ = accept
         attr_view.__order__ = order
         attr_view.__phash__ = phash
+        attr_view.__view_attr__ = self.kw.get('attr')
+        attr_view.__permission__ = self.kw.get('permission')
         return attr_view
 
     @wraps_view
