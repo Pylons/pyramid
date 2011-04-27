@@ -211,6 +211,16 @@ Behavior Changes
   the perspective of the downstream application (for example, ``SCRIPT_NAME``
   will now never possess a trailing slash).
 
+- Previously, ``pyramid.request.Request`` inherited from
+  ``webob.request.Request`` and implemented ``__getattr__``, ``__setattr__``
+  and ``__delattr__`` itself in order to overidde "adhoc attr" WebOb behavior
+  where attributes of the request are stored in the environ.  Now,
+  ``pyramid.request.Request`` object inherits from (the more recent)
+  ``webob.request.BaseRequest`` instead of ``webob.request.Request``, which
+  provides the same behavior.  ``pyramid.request.Request`` no longer
+  implements its own ``__getattr__``, ``__setattr__`` or ``__delattr__`` as a
+  result.
+
 Dependencies
 ------------
 

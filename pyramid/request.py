@@ -1,7 +1,7 @@
 from zope.interface import implements
 from zope.interface.interface import InterfaceClass
 
-from webob import Request as WebobRequest
+from webob import BaseRequest
 
 from pyramid.interfaces import IRequest
 from pyramid.interfaces import ISessionFactory
@@ -10,7 +10,6 @@ from pyramid.interfaces import IResponseFactory
 from pyramid.exceptions import ConfigurationError
 from pyramid.decorator import reify
 from pyramid.response import Response
-from pyramid.traversal import quote_path_segment
 from pyramid.url import resource_url
 from pyramid.url import route_url
 from pyramid.url import static_url
@@ -19,7 +18,7 @@ from pyramid.url import route_path
 class TemplateContext(object):
     pass
 
-class Request(WebobRequest):
+class Request(BaseRequest):
     """
     A subclass of the :term:`WebOb` Request class.  An instance of
     this class is created by the :term:`router` and is provided to a
@@ -320,11 +319,6 @@ class Request(WebobRequest):
         response_factory = registry.queryUtility(IResponseFactory,
                                                  default=Response)
         return response_factory()
-
-    # override default WebOb "environ['adhoc_attr']" mutation behavior
-    __getattr__ = object.__getattribute__
-    __setattr__ = object.__setattr__
-    __delattr__ = object.__delattr__
 
     # b/c dict interface for "root factory" code that expects a bare
     # environ.  Explicitly omitted dict methods: clear (unnecessary),

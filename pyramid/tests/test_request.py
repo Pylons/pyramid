@@ -83,7 +83,7 @@ class TestRequest(unittest.TestCase):
         from pyramid.exceptions import ConfigurationError
         inst = self._makeOne({})
         inst.registry = self.config.registry
-        self.assertRaises(ConfigurationError, inst.__getattr__, 'session')
+        self.assertRaises(ConfigurationError, getattr, inst, 'session')
 
     def test_setattr_and_getattr_dotnotation(self):
         inst = self._makeOne({})
@@ -91,9 +91,11 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(inst.foo, 1)
 
     def test_setattr_and_getattr(self):
-        inst = self._makeOne({})
+        environ = {}
+        inst = self._makeOne(environ)
         setattr(inst, 'bar', 1)
         self.assertEqual(getattr(inst, 'bar'), 1)
+        self.assertEqual(environ, {}) # make sure we're not using adhoc attrs
 
     def test___contains__(self):
         environ ={'zooma':1}
