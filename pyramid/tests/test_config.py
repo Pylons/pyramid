@@ -4288,7 +4288,7 @@ class Test__make_predicates(unittest.TestCase):
             accept='accept',
             containment='containment',
             request_type='request_type',
-            custom=('a',)
+            custom=(DummyCustomPredicate(),),
             )
         order2, _, _ = self._callFUT(
             xhr='xhr',
@@ -4299,7 +4299,7 @@ class Test__make_predicates(unittest.TestCase):
             accept='accept',
             containment='containment',
             request_type='request_type',
-            custom=('a',)
+            custom=(DummyCustomPredicate(),),
             )
         order3, _, _ = self._callFUT(
             xhr='xhr',
@@ -4392,7 +4392,7 @@ class Test__make_predicates(unittest.TestCase):
             request_type='request_type',
             )
         order9, _, _ = self._callFUT(
-            custom=('a',),
+            custom=(DummyCustomPredicate(),),
             )
         self.assertTrue(order1 > order2)
         self.assertTrue(order2 > order3)
@@ -4409,7 +4409,7 @@ class Test__make_predicates(unittest.TestCase):
             request_method='request_method',
             )
         order2, _, _ = self._callFUT(
-            custom=('a',),
+            custom=(DummyCustomPredicate(),),
             )
         self.assertTrue(order1 < order2)
 
@@ -4419,7 +4419,7 @@ class Test__make_predicates(unittest.TestCase):
             )
         order2, _, _ = self._callFUT(
             request_method='request_method',
-            custom=('a',),
+            custom=(DummyCustomPredicate(),),
             )
         self.assertTrue(order1 > order2)
 
@@ -4430,7 +4430,7 @@ class Test__make_predicates(unittest.TestCase):
             )
         order2, _, _ = self._callFUT(
             request_method='request_method',
-            custom=('a',),
+            custom=(DummyCustomPredicate(),),
             )
         self.assertTrue(order1 < order2)
 
@@ -4442,7 +4442,7 @@ class Test__make_predicates(unittest.TestCase):
         order2, _, _ = self._callFUT(
             xhr='xhr',
             request_method='request_method',
-            custom=('a',),
+            custom=(DummyCustomPredicate(),),
             )
         self.assertTrue(order1 > order2)
 
@@ -5046,6 +5046,10 @@ class DummyStaticURLInfo:
 
     def add(self, name, spec, **kw):
         self.added.append((name, spec, kw))
+
+class DummyCustomPredicate(object):
+    def __init__(self):
+        self.__text__ = 'custom predicate'
 
 def dummy_view(request):
     return 'OK'

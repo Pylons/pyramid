@@ -2485,6 +2485,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
 
     if xhr:
         def xhr_predicate(context, request):
+            """xhr = True"""
             return request.is_xhr
         weights.append(1 << 1)
         predicates.append(xhr_predicate)
@@ -2492,6 +2493,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
 
     if request_method is not None:
         def request_method_predicate(context, request):
+            """request_method = %s""" % request_method
             return request.method == request_method
         weights.append(1 << 2)
         predicates.append(request_method_predicate)
@@ -2503,6 +2505,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
         except re.error, why:
             raise ConfigurationError(why[0])
         def path_info_predicate(context, request):
+            """path_info = %s""" % path_info
             return path_info_val.match(request.path_info) is not None
         weights.append(1 << 3)
         predicates.append(path_info_predicate)
@@ -2512,7 +2515,12 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
         request_param_val = None
         if '=' in request_param:
             request_param, request_param_val = request_param.split('=', 1)
+        if request_param_val is None:
+            msg = "request_param %s" % request_param
+        else:
+            msg = "request_param %s = %s" % (request_param, request_param_val)
         def request_param_predicate(context, request):
+            """%s""" % msg
             if request_param_val is None:
                 return request_param in request.params
             return request.params.get(request_param) == request_param_val
@@ -2529,7 +2537,12 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
                 header_val = re.compile(header_val)
             except re.error, why:
                 raise ConfigurationError(why[0])
+        if header_val is None:
+            msg = "header %s" % header_name
+        else:
+            msg = "header %s = %s" % (header_name, header_val)
         def header_predicate(context, request):
+            """%s""" % msg
             if header_val is None:
                 return header_name in request.headers
             val = request.headers.get(header_name)
@@ -2542,6 +2555,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
 
     if accept is not None:
         def accept_predicate(context, request):
+            """accept = %s""" % accept
             return accept in request.accept
         weights.append(1 << 6)
         predicates.append(accept_predicate)
@@ -2549,6 +2563,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
 
     if containment is not None:
         def containment_predicate(context, request):
+            """containment = %s""" % containment
             return find_interface(context, containment) is not None
         weights.append(1 << 7)
         predicates.append(containment_predicate)
@@ -2556,6 +2571,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
 
     if request_type is not None:
         def request_type_predicate(context, request):
+            """request_type = %s""" % request_type
             return request_type.providedBy(request)
         weights.append(1 << 8)
         predicates.append(request_type_predicate)
@@ -2584,6 +2600,8 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
 
     if custom:
         for num, predicate in enumerate(custom):
+            if getattr(predicate, '__doc__', None) is None:
+                predicate.__doc__ = "<unknown custom predicate>"
             predicates.append(predicate)
             # using hash() here rather than id() is intentional: we
             # want to allow custom predicates that are part of
@@ -2698,7 +2716,15 @@ def preserve_view_attrs(view, wrapped_view):
     except AttributeError:
         pass
     try:
+        wrapped_view.__permission__ = view.__permission__
+    except AttributeError:
+        pass
+    try:
         wrapped_view.__predicated__ = view.__predicated__
+    except AttributeError:
+        pass
+    try:
+        wrapped_view.__predicates__ = view.__predicates__
     except AttributeError:
         pass
     try:
@@ -2786,6 +2812,7 @@ class ViewDeriver(object):
                 raise Forbidden(msg, result)
             _secured_view.__call_permissive__ = view
             _secured_view.__permitted__ = _permitted
+            _secured_view.__permission__ = permission
             wrapped_view = _secured_view
 
         return wrapped_view
@@ -2836,6 +2863,7 @@ class ViewDeriver(object):
             return all((predicate(context, request) for predicate in
                         predicates))
         predicate_wrapper.__predicated__ = checker
+        predicate_wrapper.__predicates__ = predicates
         return predicate_wrapper
 
     @wraps_view
@@ -2858,6 +2886,8 @@ class ViewDeriver(object):
         attr_view.__accept__ = accept
         attr_view.__order__ = order
         attr_view.__phash__ = phash
+        attr_view.__view_attr__ = self.kw.get('attr')
+        attr_view.__permission__ = self.kw.get('permission')
         return attr_view
 
     @wraps_view

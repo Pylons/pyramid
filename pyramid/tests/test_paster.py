@@ -319,7 +319,423 @@ class TestPRoutesCommand(unittest.TestCase):
         result = command._get_mapper(app)
         self.assertEqual(result.__class__, RoutesMapper)
         
+class TestPViewsCommand(unittest.TestCase):
+    def _getTargetClass(self):
+        from pyramid.paster import PViewsCommand
+        return PViewsCommand
+
+    def _makeOne(self):
+        return self._getTargetClass()('pviews')
+
+    def test__find_view_no_match(self):
+        from pyramid.registry import Registry
+        registry = Registry()
+        self._register_mapper(registry, [])
+        command = self._makeOne()
+        result = command._find_view('/a', registry)
+        self.assertEqual(result, None)
+
+    def test__find_view_no_match_multiview_registered(self):
+        from zope.interface import implements
+        from zope.interface import providedBy
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IMultiView
+        from pyramid.traversal import DefaultRootFactory
+        from pyramid.registry import Registry
+        registry = Registry()
+        class View1(object):
+            implements(IMultiView)
+        request = DummyRequest({'PATH_INFO':'/a'})
+        root = DefaultRootFactory(request)
+        root_iface = providedBy(root)
+        registry.registerAdapter(View1(),
+                                 (IViewClassifier, IRequest, root_iface),
+                                 IMultiView)
+        self._register_mapper(registry, [])
+        command = self._makeOne()
+        result = command._find_view('/x', registry)
+        self.assertEqual(result, None)
+
+    def test__find_view_traversal(self):
+        from zope.interface import providedBy
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IView
+        from pyramid.traversal import DefaultRootFactory
+        from pyramid.registry import Registry
+        registry = Registry()
+        def view1(): pass
+        request = DummyRequest({'PATH_INFO':'/a'})
+        root = DefaultRootFactory(request)
+        root_iface = providedBy(root)
+        registry.registerAdapter(view1,
+                                 (IViewClassifier, IRequest, root_iface),
+                                 IView, name='a')
+        self._register_mapper(registry, [])
+        command = self._makeOne()
+        result = command._find_view('/a', registry)
+        self.assertEqual(result, view1)
+
+    def test__find_view_traversal_multiview(self):
+        from zope.interface import implements
+        from zope.interface import providedBy
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IMultiView
+        from pyramid.traversal import DefaultRootFactory
+        from pyramid.registry import Registry
+        registry = Registry()
+        class View1(object):
+            implements(IMultiView)
+        request = DummyRequest({'PATH_INFO':'/a'})
+        root = DefaultRootFactory(request)
+        root_iface = providedBy(root)
+        view = View1()
+        registry.registerAdapter(view,
+                                 (IViewClassifier, IRequest, root_iface),
+                                 IMultiView, name='a')
+        self._register_mapper(registry, [])
+        command = self._makeOne()
+        result = command._find_view('/a', registry)
+        self.assertEqual(result, view)
+
+    def test__find_view_route_no_multiview(self):
+        from zope.interface import Interface
+        from zope.interface import implements
+        from pyramid.interfaces import IRouteRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IView
+        from pyramid.registry import Registry
+        registry = Registry()
+        def view():pass
+        class IMyRoot(Interface):
+            pass
+        class IMyRoute(Interface):
+            pass
+        registry.registerAdapter(view,
+                                 (IViewClassifier, IMyRoute, IMyRoot),
+                                 IView, '')
+        registry.registerUtility(IMyRoute, IRouteRequest, name='a')
+        class Factory(object):
+            implements(IMyRoot)
+            def __init__(self, request):
+                pass
+        routes = [DummyRoute('a', '/a', factory=Factory, matchdict={}),
+                  DummyRoute('b', '/b', factory=Factory)]
+        self._register_mapper(registry, routes)
+        command = self._makeOne()
+        result = command._find_view('/a', registry)
+        self.assertEqual(result, view)
+
+    def test__find_view_route_multiview_no_view_registered(self):
+        from zope.interface import Interface
+        from zope.interface import implements
+        from pyramid.interfaces import IRouteRequest
+        from pyramid.interfaces import IMultiView
+        from pyramid.interfaces import IRootFactory
+        from pyramid.registry import Registry
+        registry = Registry()
+        def view1():pass
+        def view2():pass
+        class IMyRoot(Interface):
+            pass
+        class IMyRoute1(Interface):
+            pass
+        class IMyRoute2(Interface):
+            pass
+        registry.registerUtility(IMyRoute1, IRouteRequest, name='a')
+        registry.registerUtility(IMyRoute2, IRouteRequest, name='b')
+        class Factory(object):
+            implements(IMyRoot)
+            def __init__(self, request):
+                pass
+        registry.registerUtility(Factory, IRootFactory)
+        routes = [DummyRoute('a', '/a', matchdict={}),
+                  DummyRoute('b', '/a', matchdict={})]
+        self._register_mapper(registry, routes)
+        command = self._makeOne()
+        result = command._find_view('/a', registry)
+        self.failUnless(IMultiView.providedBy(result))
+
+    def test__find_view_route_multiview(self):
+        from zope.interface import Interface
+        from zope.interface import implements
+        from pyramid.interfaces import IRouteRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IMultiView
+        from pyramid.interfaces import IRootFactory
+        from pyramid.registry import Registry
+        registry = Registry()
+        def view1():pass
+        def view2():pass
+        class IMyRoot(Interface):
+            pass
+        class IMyRoute1(Interface):
+            pass
+        class IMyRoute2(Interface):
+            pass
+        registry.registerAdapter(view1,
+                                 (IViewClassifier, IMyRoute1, IMyRoot),
+                                 IView, '')
+        registry.registerAdapter(view2,
+                                 (IViewClassifier, IMyRoute2, IMyRoot),
+                                 IView, '')
+        registry.registerUtility(IMyRoute1, IRouteRequest, name='a')
+        registry.registerUtility(IMyRoute2, IRouteRequest, name='b')
+        class Factory(object):
+            implements(IMyRoot)
+            def __init__(self, request):
+                pass
+        registry.registerUtility(Factory, IRootFactory)
+        routes = [DummyRoute('a', '/a', matchdict={}),
+                  DummyRoute('b', '/a', matchdict={})]
+        self._register_mapper(registry, routes)
+        command = self._makeOne()
+        result = command._find_view('/a', registry)
+        self.failUnless(IMultiView.providedBy(result))
+        self.assertEqual(len(result.views), 2)
+        self.failUnless((None, view1, None) in result.views)
+        self.failUnless((None, view2, None) in result.views)
+
+    def test__find_multi_routes_all_match(self):
+        command = self._makeOne()
+        def factory(request): pass
+        routes = [DummyRoute('a', '/a', factory=factory, matchdict={}),
+                  DummyRoute('b', '/a', factory=factory, matchdict={})]
+        mapper = DummyMapper(*routes)
+        request = DummyRequest({'PATH_INFO':'/a'})
+        result = command._find_multi_routes(mapper, request)
+        self.assertEqual(result, [{'match':{}, 'route':routes[0]},
+                                  {'match':{}, 'route':routes[1]}])
         
+    def test__find_multi_routes_some_match(self):
+        command = self._makeOne()
+        def factory(request): pass
+        routes = [DummyRoute('a', '/a', factory=factory),
+                  DummyRoute('b', '/a', factory=factory, matchdict={})]
+        mapper = DummyMapper(*routes)
+        request = DummyRequest({'PATH_INFO':'/a'})
+        result = command._find_multi_routes(mapper, request)
+        self.assertEqual(result, [{'match':{}, 'route':routes[1]}])
+        
+    def test__find_multi_routes_none_match(self):
+        command = self._makeOne()
+        def factory(request): pass
+        routes = [DummyRoute('a', '/a', factory=factory),
+                  DummyRoute('b', '/a', factory=factory)]
+        mapper = DummyMapper(*routes)
+        request = DummyRequest({'PATH_INFO':'/a'})
+        result = command._find_multi_routes(mapper, request)
+        self.assertEqual(result, [])
+        
+    def test_views_command_not_found(self):
+        from pyramid.registry import Registry
+        command = self._makeOne()
+        registry = Registry()
+        L = []
+        command.out = L.append
+        command._find_view = lambda arg1, arg2: None
+        app = DummyApp()
+        app.registry = registry
+        loadapp = DummyLoadApp(app)
+        command.loadapp = (loadapp,)
+        command.args = ('/foo/bar/myapp.ini', 'myapp', '/a')
+        result = command.command()
+        self.assertEqual(result, None)
+        self.assertEqual(L[1], 'URL = /a')
+        self.assertEqual(L[5], '    Not found.')
+
+    def test_views_command_not_found_url_starts_without_slash(self):
+        from pyramid.registry import Registry
+        command = self._makeOne()
+        registry = Registry()
+        L = []
+        command.out = L.append
+        command._find_view = lambda arg1, arg2: None
+        app = DummyApp()
+        app.registry = registry
+        loadapp = DummyLoadApp(app)
+        command.loadapp = (loadapp,)
+        command.args = ('/foo/bar/myapp.ini', 'myapp', 'a')
+        result = command.command()
+        self.assertEqual(result, None)
+        self.assertEqual(L[1], 'URL = /a')
+        self.assertEqual(L[5], '    Not found.')
+
+    def test_views_command_single_view_traversal(self):
+        from pyramid.registry import Registry
+        command = self._makeOne()
+        registry = Registry()
+        L = []
+        command.out = L.append
+        view = DummyView(context='context', view_name='a')
+        command._find_view = lambda arg1, arg2: view
+        app = DummyApp()
+        app.registry = registry
+        loadapp = DummyLoadApp(app)
+        command.loadapp = (loadapp,)
+        command.args = ('/foo/bar/myapp.ini', 'myapp', '/a')
+        result = command.command()
+        self.assertEqual(result, None)
+        self.assertEqual(L[1], 'URL = /a')
+        self.assertEqual(L[2], '    context: context')
+        self.assertEqual(L[3], '    view name: a')
+        self.assertEqual(L[7], '    pyramid.tests.test_paster.DummyView')
+
+    def test_views_command_single_view_traversal_with_permission(self):
+        from pyramid.registry import Registry
+        command = self._makeOne()
+        registry = Registry()
+        L = []
+        command.out = L.append
+        view = DummyView(context='context', view_name='a')
+        view.__permission__ = 'test'
+        command._find_view = lambda arg1, arg2: view
+        app = DummyApp()
+        app.registry = registry
+        loadapp = DummyLoadApp(app)
+        command.loadapp = (loadapp,)
+        command.args = ('/foo/bar/myapp.ini', 'myapp', '/a')
+        result = command.command()
+        self.assertEqual(result, None)
+        self.assertEqual(L[1], 'URL = /a')
+        self.assertEqual(L[2], '    context: context')
+        self.assertEqual(L[3], '    view name: a')
+        self.assertEqual(L[7], '    pyramid.tests.test_paster.DummyView')
+        self.assertEqual(L[8], '    required permission = test')
+
+    def test_views_command_single_view_traversal_with_predicates(self):
+        from pyramid.registry import Registry
+        command = self._makeOne()
+        registry = Registry()
+        L = []
+        command.out = L.append
+        def predicate():
+            """predicate = x"""
+        view = DummyView(context='context', view_name='a')
+        view.__predicates__ = [predicate]
+        command._find_view = lambda arg1, arg2: view
+        app = DummyApp()
+        app.registry = registry
+        loadapp = DummyLoadApp(app)
+        command.loadapp = (loadapp,)
+        command.args = ('/foo/bar/myapp.ini', 'myapp', '/a')
+        result = command.command()
+        self.assertEqual(result, None)
+        self.assertEqual(L[1], 'URL = /a')
+        self.assertEqual(L[2], '    context: context')
+        self.assertEqual(L[3], '    view name: a')
+        self.assertEqual(L[7], '    pyramid.tests.test_paster.DummyView')
+        self.assertEqual(L[8], '    predicate = x')
+
+    def test_views_command_single_view_route(self):
+        from pyramid.registry import Registry
+        command = self._makeOne()
+        registry = Registry()
+        L = []
+        command.out = L.append
+        route = DummyRoute('a', '/a', matchdict={})
+        view = DummyView(context='context', view_name='a',
+                         matched_route=route, subpath='')
+        command._find_view = lambda arg1, arg2: view
+        app = DummyApp()
+        app.registry = registry
+        loadapp = DummyLoadApp(app)
+        command.loadapp = (loadapp,)
+        command.args = ('/foo/bar/myapp.ini', 'myapp', '/a')
+        result = command.command()
+        self.assertEqual(result, None)
+        self.assertEqual(L[1], 'URL = /a')
+        self.assertEqual(L[2], '    context: context')
+        self.assertEqual(L[3], '    view name: a')
+        self.assertEqual(L[4], '    route name: a')
+        self.assertEqual(L[5], '    route pattern: /a')
+        self.assertEqual(L[6], '    route path: /a')
+        self.assertEqual(L[7], '    subpath: ')
+        self.assertEqual(L[11], '    pyramid.tests.test_paster.DummyView')
+
+    def test_views_command_multiview(self):
+        from pyramid.registry import Registry
+        command = self._makeOne()
+        registry = Registry()
+        L = []
+        command.out = L.append
+        view = DummyView(context='context')
+        view.__name__ = 'view'
+        view.__view_attr__ = 'call'
+        multiview = DummyMultiView(view, context='context', view_name='a')
+        command._find_view = lambda arg1, arg2: multiview
+        app = DummyApp()
+        app.registry = registry
+        loadapp = DummyLoadApp(app)
+        command.loadapp = (loadapp,)
+        command.args = ('/foo/bar/myapp.ini', 'myapp', '/a')
+        result = command.command()
+        self.assertEqual(result, None)
+        self.assertEqual(L[1], 'URL = /a')
+        self.assertEqual(L[2], '    context: context')
+        self.assertEqual(L[3], '    view name: a')
+        self.assertEqual(L[7], '    pyramid.tests.test_paster.view.call')
+
+    def test_views_command_multiview_with_permission(self):
+        from pyramid.registry import Registry
+        command = self._makeOne()
+        registry = Registry()
+        L = []
+        command.out = L.append
+        view = DummyView(context='context')
+        view.__name__ = 'view'
+        view.__view_attr__ = 'call'
+        view.__permission__ = 'test'
+        multiview = DummyMultiView(view, context='context', view_name='a')
+        command._find_view = lambda arg1, arg2: multiview
+        app = DummyApp()
+        app.registry = registry
+        loadapp = DummyLoadApp(app)
+        command.loadapp = (loadapp,)
+        command.args = ('/foo/bar/myapp.ini', 'myapp', '/a')
+        result = command.command()
+        self.assertEqual(result, None)
+        self.assertEqual(L[1], 'URL = /a')
+        self.assertEqual(L[2], '    context: context')
+        self.assertEqual(L[3], '    view name: a')
+        self.assertEqual(L[7], '    pyramid.tests.test_paster.view.call')
+        self.assertEqual(L[8], '    required permission = test')
+
+    def test_views_command_multiview_with_predicates(self):
+        from pyramid.registry import Registry
+        command = self._makeOne()
+        registry = Registry()
+        L = []
+        command.out = L.append
+        def predicate():
+            """predicate = x"""
+        view = DummyView(context='context')
+        view.__name__ = 'view'
+        view.__view_attr__ = 'call'
+        view.__predicates__ = [predicate]
+        multiview = DummyMultiView(view, context='context', view_name='a')
+        command._find_view = lambda arg1, arg2: multiview
+        app = DummyApp()
+        app.registry = registry
+        loadapp = DummyLoadApp(app)
+        command.loadapp = (loadapp,)
+        command.args = ('/foo/bar/myapp.ini', 'myapp', '/a')
+        result = command.command()
+        self.assertEqual(result, None)
+        self.assertEqual(L[1], 'URL = /a')
+        self.assertEqual(L[2], '    context: context')
+        self.assertEqual(L[3], '    view name: a')
+        self.assertEqual(L[7], '    pyramid.tests.test_paster.view.call')
+        self.assertEqual(L[8], '    predicate = x')
+
+    def _register_mapper(self, registry, routes):
+        from pyramid.interfaces import IRoutesMapper
+        mapper = DummyMapper(*routes)
+        registry.registerUtility(mapper, IRoutesMapper)
+
 class TestGetApp(unittest.TestCase):
     def _callFUT(self, config_file, section_name, loadapp):
         from pyramid.paster import get_app
@@ -407,8 +823,34 @@ class DummyMapper(object):
         return self.routes
 
 class DummyRoute(object):
-    def __init__(self, name, pattern, factory=None):
+    def __init__(self, name, pattern, factory=None, matchdict=None):
         self.name = name
+        self.path = pattern
         self.pattern = pattern
         self.factory = factory
+        self.matchdict = matchdict
+        self.predicates = []
+
+    def match(self, route):
+        return self.matchdict
         
+class DummyRequest:
+    application_url = 'http://example.com:5432'
+    script_name = ''
+    def __init__(self, environ):
+        self.environ = environ
+        self.matchdict = {}
+
+class DummyView(object):
+    def __init__(self, **attrs):
+        self.__request_attrs__ = attrs
+
+class DummyMultiView(object):
+    from zope.interface import implements
+    from pyramid.interfaces import IMultiView
+    implements(IMultiView)
+
+    def __init__(self, *views, **attrs):
+        self.views = [(None, view, None) for view in views]
+        self.__request_attrs__ = attrs
+

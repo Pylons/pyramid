@@ -200,3 +200,244 @@ class PRoutesCommand(PCommand):
                         (IViewClassifier, request_iface, Interface),
                         IView, name='', default=None)
                     self.out(fmt % (route.name, route.pattern, view_callable))
+
+class PViewsCommand(PCommand):
+    """Print, for a given URL, the views that might match. Underneath each
+    potentially matching route, list the predicates required. Underneath
+    each route+predicate set, print each view that might match and its
+    predicates.
+
+    This command accepts three positional arguments:
+
+    ``config_file`` -- specifies the PasteDeploy config file to use
+    for the interactive shell.  
+
+    ``section_name`` -- specifies the section name in the PasteDeploy
+    config file that represents the application.
+
+    ``url`` -- specifies the URL that will be used to find matching views.
+
+    Example::
+
+        $ paster proutes myapp.ini main url
+
+    .. note:: You should use a ``section_name`` that refers to the
+              actual ``app`` section in the config file that points at
+              your Pyramid app without any middleware wrapping, or this
+              command will almost certainly fail.
+    """
+    summary = "Print all views in an application that might match a URL"
+    min_args = 3
+    max_args = 3
+    stdout = sys.stdout
+
+    parser = Command.standard_parser(simulate=True)
+
+    def out(self, msg): # pragma: no cover
+        print msg
+    
+    def _find_multi_routes(self, mapper, request):
+        infos = []
+        path = request.environ['PATH_INFO']
+        # find all routes that match path, regardless of predicates
+        for route in mapper.get_routes():
+            match = route.match(path)
+            if match is not None:
+                info = {'match':match, 'route':route}
+                infos.append(info)
+        return infos
+
+    def _find_view(self, url, registry):
+        """
+        Accept ``url`` and ``registry``; create a :term:`request` and
+        find a :app:`Pyramid` view based on introspection of :term:`view
+        configuration` within the application registry; return the view.
+        """
+        from zope.interface import providedBy
+        from zope.interface import implements
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IRootFactory
+        from pyramid.interfaces import IRouteRequest
+        from pyramid.interfaces import IRequestFactory
+        from pyramid.interfaces import IRoutesMapper
+        from pyramid.interfaces import ITraverser
+        from pyramid.interfaces import IMultiView
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.request import Request
+        from pyramid.traversal import DefaultRootFactory
+        from pyramid.traversal import ResourceTreeTraverser
+            
+        q = registry.queryUtility
+        root_factory = q(IRootFactory, default=DefaultRootFactory)
+        routes_mapper = q(IRoutesMapper)
+        request_factory = q(IRequestFactory, default=Request)
+
+        adapters = registry.adapters
+        request = None
+
+        class RoutesMultiView(object):
+            implements(IMultiView)
+
+            def __init__(self, infos, context_iface, subpath):
+                self.views = []
+                for info in infos:
+                    match, route = info['match'], info['route']
+                    if route is not None:
+                        request_iface = registry.queryUtility(
+                            IRouteRequest,
+                            name=route.name,
+                            default=IRequest)
+                        view = adapters.lookup(
+                            (IViewClassifier, request_iface, context_iface),
+                            IView, name='', default=None)
+                        if view is None:
+                            continue
+                        view.__predicates__ = list(route.predicates)
+                        view.__route_attrs__ = {'matchdict': match,
+                                               'matched_route': route,
+                                               'subpath': subpath}
+                        view.__view_attr__ = ''
+                        self.views.append((None, view, None))
+
+
+        # create the request
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_NAME':'localhost',
+            'SERVER_PORT':'8080',
+            'REQUEST_METHOD':'GET',
+            'PATH_INFO':url,
+            }
+        request = request_factory(environ)
+        context = None
+        routes_multiview = None
+        attrs = request.__dict__
+        attrs['registry'] = registry
+        request_iface = IRequest
+
+        # find the root object
+        if routes_mapper is not None:
+            infos = self._find_multi_routes(routes_mapper, request)
+            if len(infos) == 1:
+                info = infos[0]
+                match, route = info['match'], info['route']
+                if route is not None:
+                    attrs['matchdict'] = match
+                    attrs['matched_route'] = route
+                    request.environ['bfg.routes.matchdict'] = match
+                    request_iface = registry.queryUtility(
+                        IRouteRequest,
+                        name=route.name,
+                        default=IRequest)
+                    root_factory = route.factory or root_factory
+            if len(infos) > 1:
+                routes_multiview = infos
+
+        root = root_factory(request)
+        attrs['root'] = root
+
+        # find a context
+        traverser = adapters.queryAdapter(root, ITraverser)
+        if traverser is None:
+            traverser = ResourceTreeTraverser(root)
+        tdict = traverser(request)
+        context, view_name, subpath, traversed, vroot, vroot_path =(
+            tdict['context'], tdict['view_name'], tdict['subpath'],
+            tdict['traversed'], tdict['virtual_root'],
+            tdict['virtual_root_path'])
+        attrs.update(tdict)
+
+        # find a view callable
+        context_iface = providedBy(context)
+        if routes_multiview is None:
+            view = adapters.lookup(
+                (IViewClassifier, request_iface, context_iface),
+                IView, name=view_name, default=None)
+        else:
+            view = RoutesMultiView(infos, context_iface, subpath)
+
+        # routes are not registered with a view name
+        if view is None:
+            view = adapters.lookup(
+                (IViewClassifier, request_iface, context_iface),
+                IView, name='', default=None)
+            # we don't want a multiview here
+            if IMultiView.providedBy(view):
+                view = None
+
+        if view is not None:
+            view.__request_attrs__ = attrs
+
+        return view
+
+    def output_route_attrs(self, attrs):
+        if 'matched_route' in attrs:
+            route = attrs['matched_route']
+            self.out("    route name: %s" % route.name)
+            self.out("    route pattern: %s" % route.pattern)
+            self.out("    route path: %s" % route.path)
+            self.out("    subpath: %s" % '/'.join(attrs['subpath']))
+
+    def output_view_attrs(self, attrs):
+        self.out("    context: %s" % attrs['context'])
+        self.out("    view name: %s" % attrs['view_name'])
+
+    def output_multiview_info(self, view_wrapper):
+        name = view_wrapper.__name__
+        module = view_wrapper.__module__
+        attr = view_wrapper.__view_attr__
+        route_attrs = getattr(view_wrapper, '__route_attrs__', {})
+        self.out('')
+        self.out("    View:")
+        self.out("    -----")
+        self.out("    %s.%s.%s" % (module, name, attr))
+        self.output_route_attrs(route_attrs)
+        permission = getattr(view_wrapper, '__permission__', None)
+        if permission is not None:
+            self.out("    required permission = %s" % permission)
+        predicates = getattr(view_wrapper, '__predicates__', None)
+        if predicates is not None:
+            for predicate in predicates:
+                self.out("    %s" % predicate.__doc__)
+
+    def output_view_info(self, view):
+        if view is not None:
+            name = getattr(view, '__name__', view.__class__.__name__)
+            module = view.__module__
+        else:
+            module = 'Not found'
+            name = ''
+        self.out('')
+        self.out("    View:")
+        self.out("    -----")
+        self.out("    %s.%s" % (module, name))
+        permission = getattr(view, '__permission__', None)
+        if permission is not None:
+            self.out("    required permission = %s" % permission)
+        predicates = getattr(view, '__predicates__', None)
+        if predicates is not None:
+            for predicate in predicates:
+                self.out("    %s" % predicate.__doc__)
+
+    def command(self):
+        from pyramid.interfaces import IMultiView
+
+        config_file, section_name, url = self.args
+        if not url.startswith('/'):
+            url = '/%s' % url
+        app = self.get_app(config_file, section_name, loadapp=self.loadapp[0])
+        registry = app.registry
+        view = self._find_view(url, registry)
+        self.out('')
+        self.out("URL = %s" % url)
+        if view is not None:
+            self.output_view_attrs(view.__request_attrs__)
+            self.output_route_attrs(view.__request_attrs__)
+        if IMultiView.providedBy(view):
+            for dummy, view_wrapper, dummy in view.views:
+                self.output_multiview_info(view_wrapper)
+        else:
+            self.output_view_info(view)
+        self.out('')
+
