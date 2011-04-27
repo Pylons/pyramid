@@ -2604,8 +2604,6 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
 
     if custom:
         for num, predicate in enumerate(custom):
-            if not hasattr(predicate, '__doc__'):
-                predicate.__doc__ = "custom predicate"
             predicates.append(predicate)
             # using hash() here rather than id() is intentional: we
             # want to allow custom predicates that are part of
