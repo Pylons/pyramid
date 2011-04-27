@@ -293,7 +293,7 @@ class PViewsCommand(PCommand):
                             IView, name='', default=None)
                         if view is None:
                             continue
-                        view.__predicates__ = [p.__text__
+                        view.__predicates__ = [p.__doc__
                                                for p in route.predicates]
                         view.__route_attrs__ = {'matchdict': match,
                                                'matched_route': route,

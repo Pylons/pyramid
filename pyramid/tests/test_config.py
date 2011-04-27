@@ -5049,7 +5049,7 @@ class DummyStaticURLInfo:
 
 class DummyCustomPredicate(object):
     def __init__(self):
-        self.__text__ = 'custom predicate'
+        self.__doc__ = 'custom predicate'
 
 def dummy_view(request):
     return 'OK'
