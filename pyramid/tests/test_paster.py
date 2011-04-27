@@ -421,8 +421,8 @@ class TestPViewsCommand(unittest.TestCase):
             implements(IMyRoot)
             def __init__(self, request):
                 pass
-        routes = [DummyRoute('a', '/a', factory=Factory),
-                  DummyRoute('b', '/b', factory=Factory, will_match=False)]
+        routes = [DummyRoute('a', '/a', factory=Factory, matchdict={}),
+                  DummyRoute('b', '/b', factory=Factory)]
         self._register_mapper(registry, routes)
         command = self._makeOne()
         result = command._find_view('/a', registry)
@@ -451,8 +451,8 @@ class TestPViewsCommand(unittest.TestCase):
             def __init__(self, request):
                 pass
         registry.registerUtility(Factory, IRootFactory)
-        routes = [DummyRoute('a', '/a'),
-                  DummyRoute('b', '/a')]
+        routes = [DummyRoute('a', '/a', matchdict={}),
+                  DummyRoute('b', '/a', matchdict={})]
         self._register_mapper(registry, routes)
         command = self._makeOne()
         result = command._find_view('/a', registry)
@@ -489,8 +489,8 @@ class TestPViewsCommand(unittest.TestCase):
             def __init__(self, request):
                 pass
         registry.registerUtility(Factory, IRootFactory)
-        routes = [DummyRoute('a', '/a'),
-                  DummyRoute('b', '/a')]
+        routes = [DummyRoute('a', '/a', matchdict={}),
+                  DummyRoute('b', '/a', matchdict={})]
         self._register_mapper(registry, routes)
         command = self._makeOne()
         result = command._find_view('/a', registry)
@@ -502,29 +502,29 @@ class TestPViewsCommand(unittest.TestCase):
     def test__find_multi_routes_all_match(self):
         command = self._makeOne()
         def factory(request): pass
-        routes = [DummyRoute('a', '/a', factory=factory),
-                  DummyRoute('b', '/a', factory=factory)]
+        routes = [DummyRoute('a', '/a', factory=factory, matchdict={}),
+                  DummyRoute('b', '/a', factory=factory, matchdict={})]
         mapper = DummyMapper(*routes)
         request = DummyRequest({'PATH_INFO':'/a'})
         result = command._find_multi_routes(mapper, request)
-        self.assertEqual(result, [{'match':True, 'route':routes[0]},
-                                  {'match':True, 'route':routes[1]}])
+        self.assertEqual(result, [{'match':{}, 'route':routes[0]},
+                                  {'match':{}, 'route':routes[1]}])
         
     def test__find_multi_routes_some_match(self):
         command = self._makeOne()
         def factory(request): pass
-        routes = [DummyRoute('a', '/a', factory=factory, will_match=False),
-                  DummyRoute('b', '/a', factory=factory)]
+        routes = [DummyRoute('a', '/a', factory=factory),
+                  DummyRoute('b', '/a', factory=factory, matchdict={})]
         mapper = DummyMapper(*routes)
         request = DummyRequest({'PATH_INFO':'/a'})
         result = command._find_multi_routes(mapper, request)
-        self.assertEqual(result, [{'match':True, 'route':routes[1]}])
+        self.assertEqual(result, [{'match':{}, 'route':routes[1]}])
         
     def test__find_multi_routes_none_match(self):
         command = self._makeOne()
         def factory(request): pass
-        routes = [DummyRoute('a', '/a', factory=factory, will_match=False),
-                  DummyRoute('b', '/a', factory=factory, will_match=False)]
+        routes = [DummyRoute('a', '/a', factory=factory),
+                  DummyRoute('b', '/a', factory=factory)]
         mapper = DummyMapper(*routes)
         request = DummyRequest({'PATH_INFO':'/a'})
         result = command._find_multi_routes(mapper, request)
@@ -612,8 +612,10 @@ class TestPViewsCommand(unittest.TestCase):
         registry = Registry()
         L = []
         command.out = L.append
+        def predicate():
+            """predicate = x"""
         view = DummyView(context='context', view_name='a')
-        view.__predicates__ = ['predicate = x']
+        view.__predicates__ = [predicate]
         command._find_view = lambda arg1, arg2: view
         app = DummyApp()
         app.registry = registry
@@ -634,7 +636,7 @@ class TestPViewsCommand(unittest.TestCase):
         registry = Registry()
         L = []
         command.out = L.append
-        route = DummyRoute('a', '/a')
+        route = DummyRoute('a', '/a', matchdict={})
         view = DummyView(context='context', view_name='a',
                          matched_route=route, subpath='')
         command._find_view = lambda arg1, arg2: view
@@ -708,10 +710,12 @@ class TestPViewsCommand(unittest.TestCase):
         registry = Registry()
         L = []
         command.out = L.append
+        def predicate():
+            """predicate = x"""
         view = DummyView(context='context')
         view.__name__ = 'view'
         view.__view_attr__ = 'call'
-        view.__predicates__ = ['predicate = x']
+        view.__predicates__ = [predicate]
         multiview = DummyMultiView(view, context='context', view_name='a')
         command._find_view = lambda arg1, arg2: multiview
         app = DummyApp()
@@ -819,19 +823,16 @@ class DummyMapper(object):
         return self.routes
 
 class DummyRoute(object):
-    def __init__(self, name, pattern, factory=None, will_match=True):
+    def __init__(self, name, pattern, factory=None, matchdict=None):
         self.name = name
         self.path = pattern
         self.pattern = pattern
         self.factory = factory
-        if not will_match:
-            self.will_match = None
-        else:
-            self.will_match = will_match
+        self.matchdict = matchdict
         self.predicates = []
 
     def match(self, route):
-        return self.will_match
+        return self.matchdict
         
 class DummyRequest:
     application_url = 'http://example.com:5432'
