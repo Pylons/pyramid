@@ -288,8 +288,7 @@ class PViewsCommand(PCommand):
                             IView, name='', default=None)
                         if view is None:
                             continue
-                        view.__predicates__ = [p.__text__
-                                               for p in route.predicates]
+                        view.__predicates__ = list(route.predicates)
                         view.__route_attrs__ = {'matchdict': match,
                                                'matched_route': route,
                                                'subpath': subpath}
@@ -321,7 +320,7 @@ class PViewsCommand(PCommand):
                 if route is not None:
                     attrs['matchdict'] = match
                     attrs['matched_route'] = route
-
+                    request.environ['bfg.routes.matchdict'] = match
                     request_iface = registry.queryUtility(
                         IRouteRequest,
                         name=route.name,
@@ -394,8 +393,8 @@ class PViewsCommand(PCommand):
             self.out("    required permission = %s" % permission)
         predicates = getattr(view_wrapper, '__predicates__', None)
         if predicates is not None:
-            for text in predicates:
-                self.out("    %s" % text)
+            for predicate in predicates:
+                self.out("    %s" % predicate.__doc__)
 
     def output_view_info(self, view):
         if view is not None:
@@ -413,8 +412,8 @@ class PViewsCommand(PCommand):
             self.out("    required permission = %s" % permission)
         predicates = getattr(view, '__predicates__', None)
         if predicates is not None:
-            for text in predicates:
-                self.out("    %s" % text)
+            for predicate in predicates:
+                self.out("    %s" % predicate.__doc__)
 
     def command(self):
         from pyramid.interfaces import IMultiView

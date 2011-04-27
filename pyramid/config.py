@@ -2440,17 +2440,16 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
 
     if xhr:
         def xhr_predicate(context, request):
+            """xhr = True"""
             return request.is_xhr
-        xhr_predicate.__text__ = "xhr = True"
         weights.append(1 << 1)
         predicates.append(xhr_predicate)
         h.update('xhr:%r' % bool(xhr))
 
     if request_method is not None:
         def request_method_predicate(context, request):
+            """request_method = %s""" % request_method
             return request.method == request_method
-        msg = "request method = %s"
-        request_method_predicate.__text__ = msg % request_method
         weights.append(1 << 2)
         predicates.append(request_method_predicate)
         h.update('request_method:%r' % request_method)
@@ -2461,9 +2460,8 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
         except re.error, why:
             raise ConfigurationError(why[0])
         def path_info_predicate(context, request):
+            """path_info = %s""" % path_info
             return path_info_val.match(request.path_info) is not None
-        msg = "path_info = %s"
-        path_info_predicate.__text__ = msg % path_info
         weights.append(1 << 3)
         predicates.append(path_info_predicate)
         h.update('path_info:%r' % path_info)
@@ -2472,15 +2470,15 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
         request_param_val = None
         if '=' in request_param:
             request_param, request_param_val = request_param.split('=', 1)
-        def request_param_predicate(context, request):
-            if request_param_val is None:
-                return request_param in request.params
-            return request.params.get(request_param) == request_param_val
         if request_param_val is None:
             msg = "request_param %s" % request_param
         else:
             msg = "request_param %s = %s" % (request_param, request_param_val)
-        request_param_predicate.__text__ = msg 
+        def request_param_predicate(context, request):
+            """%s""" % msg
+            if request_param_val is None:
+                return request_param in request.params
+            return request.params.get(request_param) == request_param_val
         weights.append(1 << 4)
         predicates.append(request_param_predicate)
         h.update('request_param:%r=%r' % (request_param, request_param_val))
@@ -2494,43 +2492,42 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
                 header_val = re.compile(header_val)
             except re.error, why:
                 raise ConfigurationError(why[0])
+        if header_val is None:
+            msg = "header %s" % header_name
+        else:
+            msg = "header %s = %s" % (header_name, header_val)
         def header_predicate(context, request):
+            """%s""" % msg
             if header_val is None:
                 return header_name in request.headers
             val = request.headers.get(header_name)
             if val is None:
                 return False
             return header_val.match(val) is not None
-        if header_val is None:
-            msg = "header %s" % header_name
-        else:
-            msg = "header %s = %s" % (header_name, header_val)
-        header_predicate.__text__ = msg 
         weights.append(1 << 5)
         predicates.append(header_predicate)
         h.update('header:%r=%r' % (header_name, header_val))
 
     if accept is not None:
         def accept_predicate(context, request):
+            """accept = %s""" % accept
             return accept in request.accept
-        accept_predicate.__text__ = "accept = %s" % accept
         weights.append(1 << 6)
         predicates.append(accept_predicate)
         h.update('accept:%r' % accept)
 
     if containment is not None:
         def containment_predicate(context, request):
+            """containment = %s""" % containment
             return find_interface(context, containment) is not None
-        containment_predicate.__text__ = "containment = %s" % containment
         weights.append(1 << 7)
         predicates.append(containment_predicate)
         h.update('containment:%r' % hash(containment))
 
     if request_type is not None:
         def request_type_predicate(context, request):
+            """request_type = %s""" % request_type
             return request_type.providedBy(request)
-        msg = "request type = %s" % request_type
-        request_type_predicate.__text__ = msg
         weights.append(1 << 8)
         predicates.append(request_type_predicate)
         h.update('request_type:%r' % hash(request_type))
@@ -2549,7 +2546,6 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
             tvalue = tgenerate(m)
             m['traverse'] = traversal_path(tvalue)
             return True
-        traverse_predicate.__text__ = "traverse = True"
         # This isn't actually a predicate, it's just a infodict
         # modifier that injects ``traverse`` into the matchdict.  As a
         # result, the ``traverse_predicate`` function above always
@@ -2559,8 +2555,8 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
 
     if custom:
         for num, predicate in enumerate(custom):
-            if not hasattr(predicate, '__text__'):
-                predicate.__text__ = "custom predicate"
+            if getattr(predicate, '__doc__', None) is None:
+                predicate.__doc__ = "<unknown custom predicate>"
             predicates.append(predicate)
             # using hash() here rather than id() is intentional: we
             # want to allow custom predicates that are part of
@@ -2680,8 +2676,10 @@ def preserve_view_attrs(view, wrapped_view):
         pass
     try:
         wrapped_view.__predicated__ = view.__predicated__
-        wrapped_view.__predicates__ = [p.__text__
-                                       for p in view.__predicates__]
+    except AttributeError:
+        pass
+    try:
+        wrapped_view.__predicates__ = view.__predicates__
     except AttributeError:
         pass
     try:
