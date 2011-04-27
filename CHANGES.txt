@@ -187,6 +187,26 @@ Deprecations
   now issued when any view-related parameter is passed to
   ``Configurator.add_route``.
 
+- Passing an ``environ`` dictionary to the ``__call__`` method of a
+  "traverser" (e.g. an object that implements
+  ``pyramid.interfaces.ITraverser`` such as an instance of
+  ``pyramid.traversal.ResourceTreeTraverser``) as its ``request`` argument
+  now causes a deprecation warning to be emitted.  Consumer code should pass a
+  ``request`` object instead.  The fact that passing an environ dict is
+  permitted has been documentation-deprecated since ``repoze.bfg`` 1.1, and
+  this capability will be removed entirely in a future version.
+
+- The following (undocumented, dictionary-like) methods of the
+  ``pyramid.request.Request`` object have been deprecated: ``__contains__``,
+  ``__delitem__``, ``__getitem__``, ``__iter__``, ``__setitem__``, ``get``,
+  ``has_key``, ``items``, ``iteritems``, ``itervalues``, ``keys``, ``pop``,
+  ``popitem``, ``setdefault``, ``update``, and ``values``.  Usage of any of
+  these methods will cause a deprecation warning to be emitted.  These
+  methods were added for internal compatibility in ``repoze.bfg`` 1.1 (code
+  that currently expects a request object expected an environ object in BFG
+  1.0 and before).  In a future version, these methods will be removed
+  entirely.
+
 Behavior Changes
 ----------------
 

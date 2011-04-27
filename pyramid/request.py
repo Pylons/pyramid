@@ -1,3 +1,4 @@
+from zope.deprecation import deprecate
 from zope.interface import implements
 from zope.interface.interface import InterfaceClass
 
@@ -322,56 +323,78 @@ class Request(BaseRequest):
 
     # b/c dict interface for "root factory" code that expects a bare
     # environ.  Explicitly omitted dict methods: clear (unnecessary),
-    # copy (implemented by WebOb), fromkeys (unnecessary)
+    # copy (implemented by WebOb), fromkeys (unnecessary); deprecated
+    # as of Pyramid 1.1.
 
+    dictlike = ('Use of the request as a dict-like object is deprecated as '
+                'of Pyramid 1.1.  Use dict-like methods of "request.environ" '
+                'instead.')
+
+    @deprecate(dictlike)
     def __contains__(self, k):
         return self.environ.__contains__(k)
 
+    @deprecate(dictlike)
     def __delitem__(self, k):
         return self.environ.__delitem__(k)
 
+    @deprecate(dictlike)
     def __getitem__(self, k):
         return self.environ.__getitem__(k)
 
+    @deprecate(dictlike)
     def __iter__(self):
         return iter(self.environ)
 
+    @deprecate(dictlike)
     def __setitem__(self, k, v):
         self.environ[k] = v
 
+    @deprecate(dictlike)
     def get(self, k, default=None):
         return self.environ.get(k, default)
 
+    @deprecate(dictlike)
     def has_key(self, k):
         return k in self.environ
 
+    @deprecate(dictlike)
     def items(self):
         return self.environ.items()
 
+    @deprecate(dictlike)
     def iteritems(self):
         return self.environ.iteritems()
 
+    @deprecate(dictlike)
     def iterkeys(self):
         return self.environ.iterkeys()
 
+    @deprecate(dictlike)
     def itervalues(self):
         return self.environ.itervalues()
 
+    @deprecate(dictlike)
     def keys(self):
         return self.environ.keys()
 
+    @deprecate(dictlike)
     def pop(self, k):
         return self.environ.pop(k)
 
+    @deprecate(dictlike)
     def popitem(self):
         return self.environ.popitem()
 
+    @deprecate(dictlike)
     def setdefault(self, v, default):
         return self.environ.setdefault(v, default)
 
+    @deprecate(dictlike)
     def update(self, v, **kw):
         return self.environ.update(v, **kw)
 
+    @deprecate(dictlike)
     def values(self):
         return self.environ.values()
 

@@ -96,7 +96,8 @@ class ResourceTreeTraverserTests(unittest.TestCase):
     def test_call_with_no_pathinfo(self):
         policy = self._makeOne(None)
         environ = self._getEnviron()
-        result = policy(environ)
+        request = DummyRequest(environ)
+        result = policy(request)
         self.assertEqual(result['context'], None)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
@@ -108,7 +109,8 @@ class ResourceTreeTraverserTests(unittest.TestCase):
     def test_call_pathel_with_no_getitem(self):
         policy = self._makeOne(None)
         environ = self._getEnviron(PATH_INFO='/foo/bar')
-        result = policy(environ)
+        request = DummyRequest(environ)
+        result = policy(request)
         self.assertEqual(result['context'], None)
         self.assertEqual(result['view_name'], 'foo')
         self.assertEqual(result['subpath'], ('bar',))
@@ -121,7 +123,8 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         root = DummyContext()
         policy = self._makeOne(root)
         environ = self._getEnviron(PATH_INFO='')
-        result = policy(environ)
+        request = DummyRequest(environ)
+        result = policy(request)
         self.assertEqual(result['context'], root)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
@@ -135,7 +138,8 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         root = DummyContext(foo)
         policy = self._makeOne(root)
         environ = self._getEnviron(PATH_INFO='/foo/bar')
-        result = policy(environ)
+        request = DummyRequest(environ)
+        result = policy(request)
         self.assertEqual(result['context'], foo)
         self.assertEqual(result['view_name'], 'bar')
         self.assertEqual(result['subpath'], ())
@@ -149,7 +153,8 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         root = DummyContext(foo)
         policy = self._makeOne(root)
         environ = self._getEnviron(PATH_INFO='/foo/bar/baz/buz')
-        result = policy(environ)
+        request = DummyRequest(environ)
+        result = policy(request)
         self.assertEqual(result['context'], foo)
         self.assertEqual(result['view_name'], 'bar')
         self.assertEqual(result['subpath'], ('baz', 'buz'))
@@ -163,7 +168,8 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         root = DummyContext(foo)
         policy = self._makeOne(root)
         environ = self._getEnviron(PATH_INFO='/@@foo')
-        result = policy(environ)
+        request = DummyRequest(environ)
+        result = policy(request)
         self.assertEqual(result['context'], root)
         self.assertEqual(result['view_name'], 'foo')
         self.assertEqual(result['subpath'], ())
@@ -180,7 +186,8 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         foo = DummyContext(bar, 'foo')
         root = DummyContext(foo, 'root')
         policy = self._makeOne(root)
-        result = policy(environ)
+        request = DummyRequest(environ)
+        result = policy(request)
         self.assertEqual(result['context'], baz)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
@@ -197,7 +204,8 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         foo = DummyContext(bar, 'foo')
         root = DummyContext(foo, 'root')
         policy = self._makeOne(root)
-        result = policy(environ)
+        request = DummyRequest(environ)
+        result = policy(request)
         self.assertEqual(result['context'], baz)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
@@ -214,7 +222,8 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         foo = DummyContext(bar)
         root = DummyContext(foo)
         policy = self._makeOne(root)
-        result = policy(environ)
+        request = DummyRequest(environ)
+        result = policy(request)
         self.assertEqual(result['context'], baz)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
@@ -231,7 +240,8 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         foo = DummyContext(bar, 'foo')
         root = DummyContext(foo, 'root')
         policy = self._makeOne(root)
-        result = policy(environ)
+        request = DummyRequest(environ)
+        result = policy(request)
         self.assertEqual(result['context'], baz)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
@@ -244,7 +254,8 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         policy = self._makeOne(None)
         environ = self._getEnviron(HTTP_X_VHM_ROOT='/',
                                    PATH_INFO='/')
-        result = policy(environ)
+        request = DummyRequest(environ)
+        result = policy(request)
         self.assertEqual(result['context'], None)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
@@ -259,8 +270,9 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         policy = self._makeOne(root)
         segment = unicode('LaPe\xc3\xb1a', 'utf-8').encode('utf-16')
         environ = self._getEnviron(PATH_INFO='/%s' % segment)
+        request = DummyRequest(environ)
         from pyramid.exceptions import URLDecodeError
-        self.assertRaises(URLDecodeError, policy, environ)
+        self.assertRaises(URLDecodeError, policy, request)
 
     def test_non_utf8_path_segment_settings_unicode_path_segments_fails(self):
         foo = DummyContext()
@@ -268,14 +280,16 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         policy = self._makeOne(root)
         segment = unicode('LaPe\xc3\xb1a', 'utf-8').encode('utf-16')
         environ = self._getEnviron(PATH_INFO='/%s' % segment)
+        request = DummyRequest(environ)
         from pyramid.exceptions import URLDecodeError
-        self.assertRaises(URLDecodeError, policy, environ)
+        self.assertRaises(URLDecodeError, policy, request)
 
     def test_withroute_nothingfancy(self):
         resource = DummyContext()
         traverser = self._makeOne(resource)
         environ = {'bfg.routes.matchdict': {}}
-        result = traverser(environ)
+        request = DummyRequest(environ)
+        result = traverser(request)
         self.assertEqual(result['context'], resource)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
@@ -288,7 +302,8 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         resource = DummyContext()
         traverser = self._makeOne(resource)
         environ = {'bfg.routes.matchdict': {'subpath':'/a/b/c'}}
-        result = traverser(environ)
+        request = DummyRequest(environ)
+        result = traverser(request)
         self.assertEqual(result['context'], resource)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ('a', 'b','c'))
@@ -301,7 +316,8 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         resource = DummyContext()
         traverser = self._makeOne(resource)
         environ = {'bfg.routes.matchdict': {'subpath':('a', 'b', 'c')}}
-        result = traverser(environ)
+        request = DummyRequest(environ)
+        result = traverser(request)
         self.assertEqual(result['context'], resource)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ('a', 'b','c'))
@@ -314,7 +330,8 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         resource = DummyContext()
         traverser = self._makeOne(resource)
         environ = {'bfg.routes.matchdict': {'traverse':'foo/bar'}}
-        result = traverser(environ)
+        request = DummyRequest(environ)
+        result = traverser(request)
         self.assertEqual(result['context'], resource)
         self.assertEqual(result['view_name'], 'foo')
         self.assertEqual(result['subpath'], ('bar',))
@@ -327,7 +344,8 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         resource = DummyContext()
         traverser = self._makeOne(resource)
         environ = {'bfg.routes.matchdict': {'traverse':('foo', 'bar')}}
-        result = traverser(environ)
+        request = DummyRequest(environ)
+        result = traverser(request)
         self.assertEqual(result['context'], resource)
         self.assertEqual(result['view_name'], 'foo')
         self.assertEqual(result['subpath'], ('bar',))
@@ -340,7 +358,8 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         resource = DummyContext()
         traverser = self._makeOne(resource)
         environ = {'bfg.routes.matchdict': {'traverse':''}}
-        result = traverser(environ)
+        request = DummyRequest(environ)
+        result = traverser(request)
         self.assertEqual(result['context'], resource)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
@@ -348,6 +367,23 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         self.assertEqual(result['root'], resource)
         self.assertEqual(result['virtual_root'], resource)
         self.assertEqual(result['virtual_root_path'], ())
+
+    def test_call_with_environ(self):
+        import warnings
+        warnings.filterwarnings('ignore')
+        try:
+            policy = self._makeOne(None)
+            environ = self._getEnviron()
+            result = policy(environ)
+            self.assertEqual(result['context'], None)
+            self.assertEqual(result['view_name'], '')
+            self.assertEqual(result['subpath'], ())
+            self.assertEqual(result['traversed'], ())
+            self.assertEqual(result['root'], policy.root)
+            self.assertEqual(result['virtual_root'], policy.root)
+            self.assertEqual(result['virtual_root_path'], ())
+        finally:
+            warnings.resetwarnings()
 
 class FindInterfaceTests(unittest.TestCase):
     def _callFUT(self, context, iface):

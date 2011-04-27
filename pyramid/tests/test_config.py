@@ -2689,21 +2689,21 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         config.testing_resources(resources)
         adapter = config.registry.getAdapter(None, ITraverser)
-        result = adapter({'PATH_INFO':'/ob1'})
+        result = adapter(DummyRequest({'PATH_INFO':'/ob1'}))
         self.assertEqual(result['context'], ob1)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
         self.assertEqual(result['traversed'], (u'ob1',))
         self.assertEqual(result['virtual_root'], ob1)
         self.assertEqual(result['virtual_root_path'], ())
-        result = adapter({'PATH_INFO':'/ob2'})
+        result = adapter(DummyRequest({'PATH_INFO':'/ob2'}))
         self.assertEqual(result['context'], ob2)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
         self.assertEqual(result['traversed'], (u'ob2',))
         self.assertEqual(result['virtual_root'], ob2)
         self.assertEqual(result['virtual_root_path'], ())
-        self.assertRaises(KeyError, adapter, {'PATH_INFO':'/ob3'})
+        self.assertRaises(KeyError, adapter, DummyRequest({'PATH_INFO':'/ob3'}))
         try:
             config.begin()
             self.assertEqual(find_resource(None, '/ob1'), ob1)
@@ -4931,8 +4931,10 @@ class Test_isexception(unittest.TestCase):
 class DummyRequest:
     subpath = ()
     matchdict = None
-    def __init__(self):
-        self.environ = {'PATH_INFO':'/static'}
+    def __init__(self, environ=None):
+        if environ is None:
+            environ = {}
+        self.environ = environ
         self.params = {}
         self.cookies = {}
     def copy(self):

@@ -1,4 +1,5 @@
 import urllib
+import warnings
 
 from zope.interface import implements
 from zope.interface.interfaces import IInterface
@@ -573,6 +574,10 @@ class ResourceTreeTraverser(object):
             # rather than a request; some bit of code may still be
             # passing us an environ.  If so, deal.
             environ = request
+            depwarn = ('Passing an environ dictionary directly to a traverser '
+                       'is deprecated in Pyramid 1.1.  Pass a request object '
+                       'instead.')
+            warnings.warn(depwarn, DeprecationWarning, 2)
 
         if 'bfg.routes.matchdict' in environ:
             matchdict = environ['bfg.routes.matchdict']
