@@ -545,7 +545,7 @@ class TestPViewsCommand(unittest.TestCase):
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L[1], 'URL = /a')
-        self.assertEqual(L[5], '    Not found.')
+        self.assertEqual(L[3], '    Not found.')
 
     def test_views_command_not_found_url_starts_without_slash(self):
         from pyramid.registry import Registry
@@ -562,7 +562,7 @@ class TestPViewsCommand(unittest.TestCase):
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L[1], 'URL = /a')
-        self.assertEqual(L[5], '    Not found.')
+        self.assertEqual(L[3], '    Not found.')
 
     def test_views_command_single_view_traversal(self):
         from pyramid.registry import Registry
@@ -580,9 +580,30 @@ class TestPViewsCommand(unittest.TestCase):
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L[1], 'URL = /a')
-        self.assertEqual(L[2], '    context: context')
-        self.assertEqual(L[3], '    view name: a')
-        self.assertEqual(L[7], '    pyramid.tests.test_paster.DummyView')
+        self.assertEqual(L[3], '    context: context')
+        self.assertEqual(L[4], '    view name: a')
+        self.assertEqual(L[8], '    pyramid.tests.test_paster.DummyView')
+
+    def test_views_command_single_view_function_traversal(self):
+        from pyramid.registry import Registry
+        command = self._makeOne()
+        registry = Registry()
+        L = []
+        command.out = L.append
+        def view(): pass
+        view.__request_attrs__ = {'context': 'context', 'view_name': 'a'}
+        command._find_view = lambda arg1, arg2: view
+        app = DummyApp()
+        app.registry = registry
+        loadapp = DummyLoadApp(app)
+        command.loadapp = (loadapp,)
+        command.args = ('/foo/bar/myapp.ini', 'myapp', '/a')
+        result = command.command()
+        self.assertEqual(result, None)
+        self.assertEqual(L[1], 'URL = /a')
+        self.assertEqual(L[3], '    context: context')
+        self.assertEqual(L[4], '    view name: a')
+        self.assertEqual(L[8], '    pyramid.tests.test_paster.view')
 
     def test_views_command_single_view_traversal_with_permission(self):
         from pyramid.registry import Registry
@@ -601,10 +622,10 @@ class TestPViewsCommand(unittest.TestCase):
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L[1], 'URL = /a')
-        self.assertEqual(L[2], '    context: context')
-        self.assertEqual(L[3], '    view name: a')
-        self.assertEqual(L[7], '    pyramid.tests.test_paster.DummyView')
-        self.assertEqual(L[8], '    required permission = test')
+        self.assertEqual(L[3], '    context: context')
+        self.assertEqual(L[4], '    view name: a')
+        self.assertEqual(L[8], '    pyramid.tests.test_paster.DummyView')
+        self.assertEqual(L[9], '    required permission = test')
 
     def test_views_command_single_view_traversal_with_predicates(self):
         from pyramid.registry import Registry
@@ -612,8 +633,8 @@ class TestPViewsCommand(unittest.TestCase):
         registry = Registry()
         L = []
         command.out = L.append
-        def predicate():
-            """predicate = x"""
+        def predicate(): pass
+        predicate.__text__ = "predicate = x"
         view = DummyView(context='context', view_name='a')
         view.__predicates__ = [predicate]
         command._find_view = lambda arg1, arg2: view
@@ -625,10 +646,10 @@ class TestPViewsCommand(unittest.TestCase):
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L[1], 'URL = /a')
-        self.assertEqual(L[2], '    context: context')
-        self.assertEqual(L[3], '    view name: a')
-        self.assertEqual(L[7], '    pyramid.tests.test_paster.DummyView')
-        self.assertEqual(L[8], '    predicate = x')
+        self.assertEqual(L[3], '    context: context')
+        self.assertEqual(L[4], '    view name: a')
+        self.assertEqual(L[8], '    pyramid.tests.test_paster.DummyView')
+        self.assertEqual(L[9], '    view predicates (predicate = x)')
 
     def test_views_command_single_view_route(self):
         from pyramid.registry import Registry
@@ -648,13 +669,70 @@ class TestPViewsCommand(unittest.TestCase):
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L[1], 'URL = /a')
-        self.assertEqual(L[2], '    context: context')
-        self.assertEqual(L[3], '    view name: a')
-        self.assertEqual(L[4], '    route name: a')
-        self.assertEqual(L[5], '    route pattern: /a')
-        self.assertEqual(L[6], '    route path: /a')
-        self.assertEqual(L[7], '    subpath: ')
-        self.assertEqual(L[11], '    pyramid.tests.test_paster.DummyView')
+        self.assertEqual(L[3], '    context: context')
+        self.assertEqual(L[4], '    view name: a')
+        self.assertEqual(L[6], '    Route:')
+        self.assertEqual(L[8], '    route name: a')
+        self.assertEqual(L[9], '    route pattern: /a')
+        self.assertEqual(L[10], '    route path: /a')
+        self.assertEqual(L[11], '    subpath: ')
+        self.assertEqual(L[15], '        pyramid.tests.test_paster.DummyView')
+
+    def test_views_command_multi_view_nested(self):
+        from pyramid.registry import Registry
+        command = self._makeOne()
+        registry = Registry()
+        L = []
+        command.out = L.append
+        view1 = DummyView(context='context', view_name='a1')
+        view1.__name__ = 'view1'
+        view1.__view_attr__ = 'call'
+        multiview1 = DummyMultiView(view1, context='context', view_name='a1')
+        multiview2 = DummyMultiView(multiview1, context='context',
+                                    view_name='a')
+        command._find_view = lambda arg1, arg2: multiview2
+        app = DummyApp()
+        app.registry = registry
+        loadapp = DummyLoadApp(app)
+        command.loadapp = (loadapp,)
+        command.args = ('/foo/bar/myapp.ini', 'myapp', '/a')
+        result = command.command()
+        self.assertEqual(result, None)
+        self.assertEqual(L[1], 'URL = /a')
+        self.assertEqual(L[3], '    context: context')
+        self.assertEqual(L[4], '    view name: a')
+        self.assertEqual(L[8], '    pyramid.tests.test_paster.DummyMultiView')
+        self.assertEqual(L[12], '        pyramid.tests.test_paster.view1.call')
+
+    def test_views_command_single_view_route_with_route_predicates(self):
+        from pyramid.registry import Registry
+        command = self._makeOne()
+        registry = Registry()
+        L = []
+        command.out = L.append
+        def predicate(): pass
+        predicate.__text__ = "predicate = x"
+        route = DummyRoute('a', '/a', matchdict={}, predicate=predicate)
+        view = DummyView(context='context', view_name='a',
+                         matched_route=route, subpath='')
+        command._find_view = lambda arg1, arg2: view
+        app = DummyApp()
+        app.registry = registry
+        loadapp = DummyLoadApp(app)
+        command.loadapp = (loadapp,)
+        command.args = ('/foo/bar/myapp.ini', 'myapp', '/a')
+        result = command.command()
+        self.assertEqual(result, None)
+        self.assertEqual(L[1], 'URL = /a')
+        self.assertEqual(L[3], '    context: context')
+        self.assertEqual(L[4], '    view name: a')
+        self.assertEqual(L[6], '    Route:')
+        self.assertEqual(L[8], '    route name: a')
+        self.assertEqual(L[9], '    route pattern: /a')
+        self.assertEqual(L[10], '    route path: /a')
+        self.assertEqual(L[11], '    subpath: ')
+        self.assertEqual(L[12], '    route predicates (predicate = x)')
+        self.assertEqual(L[16], '        pyramid.tests.test_paster.DummyView')
 
     def test_views_command_multiview(self):
         from pyramid.registry import Registry
@@ -675,9 +753,9 @@ class TestPViewsCommand(unittest.TestCase):
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L[1], 'URL = /a')
-        self.assertEqual(L[2], '    context: context')
-        self.assertEqual(L[3], '    view name: a')
-        self.assertEqual(L[7], '    pyramid.tests.test_paster.view.call')
+        self.assertEqual(L[3], '    context: context')
+        self.assertEqual(L[4], '    view name: a')
+        self.assertEqual(L[8], '    pyramid.tests.test_paster.view.call')
 
     def test_views_command_multiview_with_permission(self):
         from pyramid.registry import Registry
@@ -699,10 +777,10 @@ class TestPViewsCommand(unittest.TestCase):
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L[1], 'URL = /a')
-        self.assertEqual(L[2], '    context: context')
-        self.assertEqual(L[3], '    view name: a')
-        self.assertEqual(L[7], '    pyramid.tests.test_paster.view.call')
-        self.assertEqual(L[8], '    required permission = test')
+        self.assertEqual(L[3], '    context: context')
+        self.assertEqual(L[4], '    view name: a')
+        self.assertEqual(L[8], '    pyramid.tests.test_paster.view.call')
+        self.assertEqual(L[9], '    required permission = test')
 
     def test_views_command_multiview_with_predicates(self):
         from pyramid.registry import Registry
@@ -710,8 +788,8 @@ class TestPViewsCommand(unittest.TestCase):
         registry = Registry()
         L = []
         command.out = L.append
-        def predicate():
-            """predicate = x"""
+        def predicate(): pass
+        predicate.__text__ = "predicate = x"
         view = DummyView(context='context')
         view.__name__ = 'view'
         view.__view_attr__ = 'call'
@@ -726,10 +804,10 @@ class TestPViewsCommand(unittest.TestCase):
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L[1], 'URL = /a')
-        self.assertEqual(L[2], '    context: context')
-        self.assertEqual(L[3], '    view name: a')
-        self.assertEqual(L[7], '    pyramid.tests.test_paster.view.call')
-        self.assertEqual(L[8], '    predicate = x')
+        self.assertEqual(L[3], '    context: context')
+        self.assertEqual(L[4], '    view name: a')
+        self.assertEqual(L[8], '    pyramid.tests.test_paster.view.call')
+        self.assertEqual(L[9], '    view predicates (predicate = x)')
 
     def _register_mapper(self, registry, routes):
         from pyramid.interfaces import IRoutesMapper
@@ -823,13 +901,16 @@ class DummyMapper(object):
         return self.routes
 
 class DummyRoute(object):
-    def __init__(self, name, pattern, factory=None, matchdict=None):
+    def __init__(self, name, pattern, factory=None,
+                 matchdict=None, predicate=None):
         self.name = name
         self.path = pattern
         self.pattern = pattern
         self.factory = factory
         self.matchdict = matchdict
         self.predicates = []
+        if predicate is not None:
+            self.predicates = [predicate]
 
     def match(self, route):
         return self.matchdict

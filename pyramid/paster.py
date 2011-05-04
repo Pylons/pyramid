@@ -201,6 +201,9 @@ class PRoutesCommand(PCommand):
                         IView, name='', default=None)
                     self.out(fmt % (route.name, route.pattern, view_callable))
 
+
+from pyramid.interfaces import IMultiView
+
 class PViewsCommand(PCommand):
     """Print, for a given URL, the views that might match. Underneath each
     potentially matching route, list the predicates required. Underneath
@@ -260,10 +263,9 @@ class PViewsCommand(PCommand):
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IRequestFactory
         from pyramid.interfaces import IRoutesMapper
-        from pyramid.interfaces import ITraverser
-        from pyramid.interfaces import IMultiView
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import ITraverser
         from pyramid.request import Request
         from pyramid.traversal import DefaultRootFactory
         from pyramid.traversal import ResourceTreeTraverser
@@ -279,7 +281,7 @@ class PViewsCommand(PCommand):
         class RoutesMultiView(object):
             implements(IMultiView)
 
-            def __init__(self, infos, context_iface, subpath):
+            def __init__(self, infos, context_iface, root_factory, request):
                 self.views = []
                 for info in infos:
                     match, route = info['match'], info['route']
@@ -293,11 +295,18 @@ class PViewsCommand(PCommand):
                             IView, name='', default=None)
                         if view is None:
                             continue
-                        view.__predicates__ = list(route.predicates)
-                        view.__route_attrs__ = {'matchdict': match,
-                                               'matched_route': route,
-                                               'subpath': subpath}
-                        view.__view_attr__ = ''
+                        view.__request_attrs__ = {}
+                        view.__request_attrs__['matchdict'] = match
+                        view.__request_attrs__['matched_route'] = route
+                        root_factory = route.factory or root_factory
+                        root = root_factory(request)
+                        traverser = adapters.queryAdapter(root, ITraverser)
+                        if traverser is None:
+                            traverser = ResourceTreeTraverser(root)
+                        tdict = traverser(request)
+                        view.__request_attrs__.update(tdict)
+                        if not hasattr(view, '__view_attr__'):
+                            view.__view_attr__ = ''
                         self.views.append((None, view, None))
 
 
@@ -355,7 +364,7 @@ class PViewsCommand(PCommand):
                 (IViewClassifier, request_iface, context_iface),
                 IView, name=view_name, default=None)
         else:
-            view = RoutesMultiView(infos, context_iface, subpath)
+            view = RoutesMultiView(infos, context_iface, root_factory, request)
 
         # routes are not registered with a view name
         if view is None:
@@ -371,58 +380,52 @@ class PViewsCommand(PCommand):
 
         return view
 
-    def output_route_attrs(self, attrs):
-        if 'matched_route' in attrs:
-            route = attrs['matched_route']
-            self.out("    route name: %s" % route.name)
-            self.out("    route pattern: %s" % route.pattern)
-            self.out("    route path: %s" % route.path)
-            self.out("    subpath: %s" % '/'.join(attrs['subpath']))
+    def output_route_attrs(self, attrs, indent):
+        route = attrs['matched_route']
+        self.out("%sroute name: %s" % (indent, route.name))
+        self.out("%sroute pattern: %s" % (indent, route.pattern))
+        self.out("%sroute path: %s" % (indent, route.path))
+        self.out("%ssubpath: %s" % (indent, '/'.join(attrs['subpath'])))
+        predicates = ', '.join([p.__text__ for p in route.predicates])
+        if predicates != '':
+            self.out("%sroute predicates (%s)" % (indent, predicates))
 
-    def output_view_attrs(self, attrs):
-        self.out("    context: %s" % attrs['context'])
-        self.out("    view name: %s" % attrs['view_name'])
-
-    def output_multiview_info(self, view_wrapper):
-        name = view_wrapper.__name__
-        module = view_wrapper.__module__
-        attr = view_wrapper.__view_attr__
-        route_attrs = getattr(view_wrapper, '__route_attrs__', {})
-        self.out('')
-        self.out("    View:")
-        self.out("    -----")
-        self.out("    %s.%s.%s" % (module, name, attr))
-        self.output_route_attrs(route_attrs)
-        permission = getattr(view_wrapper, '__permission__', None)
-        if permission is not None:
-            self.out("    required permission = %s" % permission)
-        predicates = getattr(view_wrapper, '__predicates__', None)
-        if predicates is not None:
-            for predicate in predicates:
-                self.out("    %s" % predicate.__doc__)
-
-    def output_view_info(self, view):
-        if view is not None:
-            name = getattr(view, '__name__', view.__class__.__name__)
-            module = view.__module__
+    def output_view_info(self, view_wrapper, level=1):
+        indent = "    " * level
+        name = getattr(view_wrapper, '__name__', '')
+        module = getattr(view_wrapper, '__module__', '')
+        attr = getattr(view_wrapper, '__view_attr__', None)
+        request_attrs = getattr(view_wrapper, '__request_attrs__', {})
+        if attr is not None:
+            view_callable = "%s.%s.%s" % (module, name, attr)
         else:
-            module = 'Not found'
-            name = ''
+            attr = view_wrapper.__class__.__name__
+            if attr == 'function':
+                attr = name
+            view_callable = "%s.%s" % (module, attr)
         self.out('')
-        self.out("    View:")
-        self.out("    -----")
-        self.out("    %s.%s" % (module, name))
-        permission = getattr(view, '__permission__', None)
-        if permission is not None:
-            self.out("    required permission = %s" % permission)
-        predicates = getattr(view, '__predicates__', None)
-        if predicates is not None:
-            for predicate in predicates:
-                self.out("    %s" % predicate.__doc__)
+        if 'matched_route' in request_attrs:
+            self.out("%sRoute:" % indent)
+            self.out("%s------" % indent)
+            self.output_route_attrs(request_attrs, indent)
+            permission = getattr(view_wrapper, '__permission__', None)
+            if not IMultiView.providedBy(view_wrapper):
+                # single view for this route, so repeat call without route data
+                del request_attrs['matched_route']
+                self.output_view_info(view_wrapper, level+1)
+        else:
+            self.out("%sView:" % indent)
+            self.out("%s-----" % indent)
+            self.out("%s%s" % (indent, view_callable))
+            permission = getattr(view_wrapper, '__permission__', None)
+            if permission is not None:
+                self.out("%srequired permission = %s" % (indent, permission))
+            predicates = getattr(view_wrapper, '__predicates__', None)
+            if predicates is not None:
+                predicate_text = ', '.join([p.__text__ for p in predicates])
+                self.out("%sview predicates (%s)" % (indent, predicate_text))
 
     def command(self):
-        from pyramid.interfaces import IMultiView
-
         config_file, section_name, url = self.args
         if not url.startswith('/'):
             url = '/%s' % url
@@ -431,13 +434,20 @@ class PViewsCommand(PCommand):
         view = self._find_view(url, registry)
         self.out('')
         self.out("URL = %s" % url)
+        self.out('')
         if view is not None:
-            self.output_view_attrs(view.__request_attrs__)
-            self.output_route_attrs(view.__request_attrs__)
+            self.out("    context: %s" % view.__request_attrs__['context'])
+            self.out("    view name: %s" % view.__request_attrs__['view_name'])
         if IMultiView.providedBy(view):
             for dummy, view_wrapper, dummy in view.views:
-                self.output_multiview_info(view_wrapper)
+                self.output_view_info(view_wrapper)
+                if IMultiView.providedBy(view_wrapper):
+                    for dummy, mv_view_wrapper, dummy in view_wrapper.views:
+                        self.output_view_info(mv_view_wrapper, level=2)
         else:
-            self.output_view_info(view)
+            if view is not None:
+                self.output_view_info(view)
+            else:
+                self.out("    Not found.")
         self.out('')
 

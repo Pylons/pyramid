@@ -4477,6 +4477,28 @@ class Test__make_predicates(unittest.TestCase):
         self.assertEqual(info, {'match':
                                 {'a':'a', 'b':'b', 'traverse':('1', 'a', 'b')}})
 
+    def test_predicate_text_is_correct(self):
+        _, predicates, _ = self._callFUT(
+            xhr='xhr',
+            request_method='request_method',
+            path_info='path_info',
+            request_param='param',
+            header='header',
+            accept='accept',
+            containment='containment',
+            request_type='request_type',
+            custom=(DummyCustomPredicate(),))
+        self.assertEqual(predicates[0].__text__, 'xhr = True')
+        self.assertEqual(predicates[1].__text__,
+                         'request method = request_method')
+        self.assertEqual(predicates[2].__text__, 'path_info = path_info')
+        self.assertEqual(predicates[3].__text__, 'request_param param')
+        self.assertEqual(predicates[4].__text__, 'header header')
+        self.assertEqual(predicates[5].__text__, 'accept = accept')
+        self.assertEqual(predicates[6].__text__, 'containment = containment')
+        self.assertEqual(predicates[7].__text__, 'request_type = request_type')
+        self.assertEqual(predicates[8].__text__, '<unknown custom predicate>')
+
 class TestMultiView(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.config import MultiView
