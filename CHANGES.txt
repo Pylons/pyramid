@@ -187,6 +187,26 @@ Deprecations
   now issued when any view-related parameter is passed to
   ``Configurator.add_route``.
 
+- Passing an ``environ`` dictionary to the ``__call__`` method of a
+  "traverser" (e.g. an object that implements
+  ``pyramid.interfaces.ITraverser`` such as an instance of
+  ``pyramid.traversal.ResourceTreeTraverser``) as its ``request`` argument
+  now causes a deprecation warning to be emitted.  Consumer code should pass a
+  ``request`` object instead.  The fact that passing an environ dict is
+  permitted has been documentation-deprecated since ``repoze.bfg`` 1.1, and
+  this capability will be removed entirely in a future version.
+
+- The following (undocumented, dictionary-like) methods of the
+  ``pyramid.request.Request`` object have been deprecated: ``__contains__``,
+  ``__delitem__``, ``__getitem__``, ``__iter__``, ``__setitem__``, ``get``,
+  ``has_key``, ``items``, ``iteritems``, ``itervalues``, ``keys``, ``pop``,
+  ``popitem``, ``setdefault``, ``update``, and ``values``.  Usage of any of
+  these methods will cause a deprecation warning to be emitted.  These
+  methods were added for internal compatibility in ``repoze.bfg`` 1.1 (code
+  that currently expects a request object expected an environ object in BFG
+  1.0 and before).  In a future version, these methods will be removed
+  entirely.
+
 Behavior Changes
 ----------------
 
@@ -210,6 +230,16 @@ Behavior Changes
   downstream application.  As a result, those values may differ slightly from
   the perspective of the downstream application (for example, ``SCRIPT_NAME``
   will now never possess a trailing slash).
+
+- Previously, ``pyramid.request.Request`` inherited from
+  ``webob.request.Request`` and implemented ``__getattr__``, ``__setattr__``
+  and ``__delattr__`` itself in order to overidde "adhoc attr" WebOb behavior
+  where attributes of the request are stored in the environ.  Now,
+  ``pyramid.request.Request`` object inherits from (the more recent)
+  ``webob.request.BaseRequest`` instead of ``webob.request.Request``, which
+  provides the same behavior.  ``pyramid.request.Request`` no longer
+  implements its own ``__getattr__``, ``__setattr__`` or ``__delattr__`` as a
+  result.
 
 Dependencies
 ------------

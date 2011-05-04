@@ -4,10 +4,9 @@ from pyramid import testing
 class TestRequest(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
-        self.config.begin()
 
     def tearDown(self):
-        self.config.end()
+        testing.tearDown()
 
     def _makeOne(self, environ):
         return self._getTargetClass()(environ)
@@ -83,7 +82,7 @@ class TestRequest(unittest.TestCase):
         from pyramid.exceptions import ConfigurationError
         inst = self._makeOne({})
         inst.registry = self.config.registry
-        self.assertRaises(ConfigurationError, inst.__getattr__, 'session')
+        self.assertRaises(ConfigurationError, getattr, inst, 'session')
 
     def test_setattr_and_getattr_dotnotation(self):
         inst = self._makeOne({})
@@ -91,106 +90,11 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(inst.foo, 1)
 
     def test_setattr_and_getattr(self):
-        inst = self._makeOne({})
+        environ = {}
+        inst = self._makeOne(environ)
         setattr(inst, 'bar', 1)
         self.assertEqual(getattr(inst, 'bar'), 1)
-
-    def test___contains__(self):
-        environ ={'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertTrue('zooma' in inst)
-
-    def test___delitem__(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        del inst['zooma']
-        self.assertFalse('zooma' in environ)
-
-    def test___getitem__(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(inst['zooma'], 1)
-
-    def test___iter__(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        iterator = iter(inst)
-        self.assertEqual(list(iterator), list(iter(environ)))
-
-    def test___setitem__(self):
-        environ = {}
-        inst = self._makeOne(environ)
-        inst['zooma'] = 1
-        self.assertEqual(environ, {'zooma':1})
-
-    def test_get(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(inst.get('zooma'), 1)
-
-    def test_has_key(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(inst.has_key('zooma'), True)
-
-    def test_items(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(inst.items(), environ.items())
-
-    def test_iteritems(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(list(inst.iteritems()), list(environ.iteritems()))
-
-    def test_iterkeys(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(list(inst.iterkeys()), list(environ.iterkeys()))
-
-    def test_itervalues(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(list(inst.itervalues()), list(environ.itervalues()))
-
-    def test_keys(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        self.assertEqual(inst.keys(), environ.keys())
-
-    def test_pop(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        popped = inst.pop('zooma')
-        self.assertEqual(environ, {})
-        self.assertEqual(popped, 1)
-
-    def test_popitem(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        popped = inst.popitem()
-        self.assertEqual(environ, {})
-        self.assertEqual(popped, ('zooma', 1))
-
-    def test_setdefault(self):
-        environ = {}
-        inst = self._makeOne(environ)
-        marker = []
-        result = inst.setdefault('a', marker)
-        self.assertEqual(environ, {'a':marker})
-        self.assertEqual(result, marker)
-
-    def test_update(self):
-        environ = {}
-        inst = self._makeOne(environ)
-        inst.update({'a':1}, b=2)
-        self.assertEqual(environ, {'a':1, 'b':2})
-
-    def test_values(self):
-        environ = {'zooma':1}
-        inst = self._makeOne(environ)
-        result = inst.values()
-        self.assertEqual(result, environ.values())
+        self.assertEqual(environ, {}) # make sure we're not using adhoc attrs
 
     def test_add_response_callback(self):
         inst = self._makeOne({})
@@ -300,6 +204,122 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(info.args,
                          ('pyramid.tests:static/foo.css', request, {}) )
         
+
+class TestRequestDeprecatedMethods(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+        self.config.begin()
+        import warnings
+        warnings.filterwarnings('ignore')
+
+    def tearDown(self):
+        testing.tearDown()
+        import warnings
+        warnings.resetwarnings()
+
+    def _getTargetClass(self):
+        from pyramid.request import Request
+        return Request
+
+    def _makeOne(self, environ):
+        return self._getTargetClass()(environ)
+
+    def test___contains__(self):
+        environ ={'zooma':1}
+        inst = self._makeOne(environ)
+        self.assertTrue('zooma' in inst)
+
+    def test___delitem__(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        del inst['zooma']
+        self.assertFalse('zooma' in environ)
+
+    def test___getitem__(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        self.assertEqual(inst['zooma'], 1)
+
+    def test___iter__(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        iterator = iter(inst)
+        self.assertEqual(list(iterator), list(iter(environ)))
+
+    def test___setitem__(self):
+        environ = {}
+        inst = self._makeOne(environ)
+        inst['zooma'] = 1
+        self.assertEqual(environ, {'zooma':1})
+
+    def test_get(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        self.assertEqual(inst.get('zooma'), 1)
+
+    def test_has_key(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        self.assertEqual(inst.has_key('zooma'), True)
+
+    def test_items(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        self.assertEqual(inst.items(), environ.items())
+
+    def test_iteritems(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        self.assertEqual(list(inst.iteritems()), list(environ.iteritems()))
+
+    def test_iterkeys(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        self.assertEqual(list(inst.iterkeys()), list(environ.iterkeys()))
+
+    def test_itervalues(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        self.assertEqual(list(inst.itervalues()), list(environ.itervalues()))
+
+    def test_keys(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        self.assertEqual(inst.keys(), environ.keys())
+
+    def test_pop(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        popped = inst.pop('zooma')
+        self.assertEqual(environ, {})
+        self.assertEqual(popped, 1)
+
+    def test_popitem(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        popped = inst.popitem()
+        self.assertEqual(environ, {})
+        self.assertEqual(popped, ('zooma', 1))
+
+    def test_setdefault(self):
+        environ = {}
+        inst = self._makeOne(environ)
+        marker = []
+        result = inst.setdefault('a', marker)
+        self.assertEqual(environ, {'a':marker})
+        self.assertEqual(result, marker)
+
+    def test_update(self):
+        environ = {}
+        inst = self._makeOne(environ)
+        inst.update({'a':1}, b=2)
+        self.assertEqual(environ, {'a':1, 'b':2})
+
+    def test_values(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        result = inst.values()
+        self.assertEqual(result, environ.values())
 
 class Test_route_request_iface(unittest.TestCase):
     def _callFUT(self, name):

@@ -2356,7 +2356,7 @@ class Configurator(object):
                 self.context = context
 
             def __call__(self, request):
-                path = request['PATH_INFO']
+                path = request.environ['PATH_INFO']
                 ob = resources[path]
                 traversed = traversal_path(path)
                 return {'context':ob, 'view_name':'','subpath':(),
