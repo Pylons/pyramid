@@ -4497,7 +4497,7 @@ class Test__make_predicates(unittest.TestCase):
         self.assertEqual(predicates[5].__text__, 'accept = accept')
         self.assertEqual(predicates[6].__text__, 'containment = containment')
         self.assertEqual(predicates[7].__text__, 'request_type = request_type')
-        self.assertEqual(predicates[8].__text__, '<unknown custom predicate>')
+        self.assertEqual(predicates[8].__text__, 'custom predicate')
 
 class TestMultiView(unittest.TestCase):
     def _getTargetClass(self):
@@ -5073,7 +5073,7 @@ class DummyStaticURLInfo:
 
 class DummyCustomPredicate(object):
     def __init__(self):
-        self.__doc__ = 'custom predicate'
+        self.__text__ = 'custom predicate'
 
 def dummy_view(request):
     return 'OK'
