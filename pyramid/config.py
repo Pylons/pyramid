@@ -2486,6 +2486,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
     if xhr:
         def xhr_predicate(context, request):
             return request.is_xhr
+        xhr_predicate.__text__ = "xhr = True"
         weights.append(1 << 1)
         predicates.append(xhr_predicate)
         h.update('xhr:%r' % bool(xhr))
@@ -2493,6 +2494,8 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
     if request_method is not None:
         def request_method_predicate(context, request):
             return request.method == request_method
+        text = "request method = %s"
+        request_method_predicate.__text__ = text % request_method
         weights.append(1 << 2)
         predicates.append(request_method_predicate)
         h.update('request_method:%r' % request_method)
@@ -2504,6 +2507,8 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
             raise ConfigurationError(why[0])
         def path_info_predicate(context, request):
             return path_info_val.match(request.path_info) is not None
+        text = "path_info = %s"
+        path_info_predicate.__text__ = text % path_info
         weights.append(1 << 3)
         predicates.append(path_info_predicate)
         h.update('path_info:%r' % path_info)
@@ -2512,10 +2517,15 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
         request_param_val = None
         if '=' in request_param:
             request_param, request_param_val = request_param.split('=', 1)
+        if request_param_val is None:
+            text = "request_param %s" % request_param
+        else:
+            text = "request_param %s = %s" % (request_param, request_param_val)
         def request_param_predicate(context, request):
             if request_param_val is None:
                 return request_param in request.params
             return request.params.get(request_param) == request_param_val
+        request_param_predicate.__text__ = text
         weights.append(1 << 4)
         predicates.append(request_param_predicate)
         h.update('request_param:%r=%r' % (request_param, request_param_val))
@@ -2529,6 +2539,10 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
                 header_val = re.compile(header_val)
             except re.error, why:
                 raise ConfigurationError(why[0])
+        if header_val is None:
+            text = "header %s" % header_name
+        else:
+            text = "header %s = %s" % (header_name, header_val)
         def header_predicate(context, request):
             if header_val is None:
                 return header_name in request.headers
@@ -2536,6 +2550,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
             if val is None:
                 return False
             return header_val.match(val) is not None
+        header_predicate.__text__ = text
         weights.append(1 << 5)
         predicates.append(header_predicate)
         h.update('header:%r=%r' % (header_name, header_val))
@@ -2543,6 +2558,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
     if accept is not None:
         def accept_predicate(context, request):
             return accept in request.accept
+        accept_predicate.__text__ = "accept = %s" % accept
         weights.append(1 << 6)
         predicates.append(accept_predicate)
         h.update('accept:%r' % accept)
@@ -2550,6 +2566,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
     if containment is not None:
         def containment_predicate(context, request):
             return find_interface(context, containment) is not None
+        containment_predicate.__text__ = "containment = %s" % containment
         weights.append(1 << 7)
         predicates.append(containment_predicate)
         h.update('containment:%r' % hash(containment))
@@ -2557,6 +2574,8 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
     if request_type is not None:
         def request_type_predicate(context, request):
             return request_type.providedBy(request)
+        text = "request_type = %s"
+        request_type_predicate.__text__ = text % request_type
         weights.append(1 << 8)
         predicates.append(request_type_predicate)
         h.update('request_type:%r' % hash(request_type))
@@ -2584,6 +2603,8 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
 
     if custom:
         for num, predicate in enumerate(custom):
+            if getattr(predicate, '__text__', None) is None:
+                predicate.__text__ = "<unknown custom predicate>"
             predicates.append(predicate)
             # using hash() here rather than id() is intentional: we
             # want to allow custom predicates that are part of
@@ -2698,7 +2719,15 @@ def preserve_view_attrs(view, wrapped_view):
     except AttributeError:
         pass
     try:
+        wrapped_view.__permission__ = view.__permission__
+    except AttributeError:
+        pass
+    try:
         wrapped_view.__predicated__ = view.__predicated__
+    except AttributeError:
+        pass
+    try:
+        wrapped_view.__predicates__ = view.__predicates__
     except AttributeError:
         pass
     try:
@@ -2786,6 +2815,7 @@ class ViewDeriver(object):
                 raise Forbidden(msg, result)
             _secured_view.__call_permissive__ = view
             _secured_view.__permitted__ = _permitted
+            _secured_view.__permission__ = permission
             wrapped_view = _secured_view
 
         return wrapped_view
@@ -2836,6 +2866,7 @@ class ViewDeriver(object):
             return all((predicate(context, request) for predicate in
                         predicates))
         predicate_wrapper.__predicated__ = checker
+        predicate_wrapper.__predicates__ = predicates
         return predicate_wrapper
 
     @wraps_view
@@ -2858,6 +2889,8 @@ class ViewDeriver(object):
         attr_view.__accept__ = accept
         attr_view.__order__ = order
         attr_view.__phash__ = phash
+        attr_view.__view_attr__ = self.kw.get('attr')
+        attr_view.__permission__ = self.kw.get('permission')
         return attr_view
 
     @wraps_view

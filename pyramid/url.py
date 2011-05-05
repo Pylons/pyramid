@@ -413,7 +413,7 @@ def current_route_url(request, *elements, **kw):
     named ``fooaction``, and the current url pattern is ``/foo/view`` (which
     has matched the ``/foo/{action}`` route), we may want to use the
     matchdict args to generate a URL to the ``fooaction`` route.  In this
-    scenario, ``current_url(request, _route_name='fooaction', page='5')``
+    scenario, ``current_route_url(request, _route_name='fooaction', page='5')``
     Will return string like: ``/foo/view/5``.
     """
 

@@ -1121,6 +1121,10 @@ a developer to understand either of them in detail.  It also means that we
 can allow a developer to combine :term:`URL dispatch` and :term:`traversal`
 in various exceptional cases as documented in :ref:`hybrid_chapter`.
 
+To gain a better understanding of how routes and views are associated in a
+real application, you can use the ``paster pviews`` command, as documented
+in :ref:`displaying_matching_views`.
+
 References
 ----------
 
