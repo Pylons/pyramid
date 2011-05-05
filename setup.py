@@ -85,6 +85,7 @@ setup(name='pyramid',
         [paste.paster_command]
         pshell=pyramid.paster:PShellCommand
         proutes=pyramid.paster:PRoutesCommand
+        pviews=pyramid.paster:PViewsCommand
         [console_scripts]
         bfg2pyramid = pyramid.fixers.fix_bfg_imports:main
       """
