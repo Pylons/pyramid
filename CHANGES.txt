@@ -77,6 +77,11 @@ Features
   allowed, although typically nonsensical).  Allowing the nonsensical
   configuration made the code more understandable and required fewer tests.
 
+- A new paster command named ``paster pviews`` was added.  This command
+  prints a summary of potentially matching views for a given path.  See the
+  section entitled "Displaying Matching Views for a Given URL" in the "View
+  Configuration" chapter of the narrative documentation for more information.
+
 Bug Fixes
 ---------
 
