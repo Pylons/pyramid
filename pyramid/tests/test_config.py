@@ -4288,7 +4288,7 @@ class Test__make_predicates(unittest.TestCase):
             accept='accept',
             containment='containment',
             request_type='request_type',
-            custom=('a',)
+            custom=(DummyCustomPredicate(),),
             )
         order2, _, _ = self._callFUT(
             xhr='xhr',
@@ -4299,7 +4299,7 @@ class Test__make_predicates(unittest.TestCase):
             accept='accept',
             containment='containment',
             request_type='request_type',
-            custom=('a',)
+            custom=(DummyCustomPredicate(),),
             )
         order3, _, _ = self._callFUT(
             xhr='xhr',
@@ -4392,7 +4392,7 @@ class Test__make_predicates(unittest.TestCase):
             request_type='request_type',
             )
         order9, _, _ = self._callFUT(
-            custom=('a',),
+            custom=(DummyCustomPredicate(),),
             )
         self.assertTrue(order1 > order2)
         self.assertTrue(order2 > order3)
@@ -4409,7 +4409,7 @@ class Test__make_predicates(unittest.TestCase):
             request_method='request_method',
             )
         order2, _, _ = self._callFUT(
-            custom=('a',),
+            custom=(DummyCustomPredicate(),),
             )
         self.assertTrue(order1 < order2)
 
@@ -4419,7 +4419,7 @@ class Test__make_predicates(unittest.TestCase):
             )
         order2, _, _ = self._callFUT(
             request_method='request_method',
-            custom=('a',),
+            custom=(DummyCustomPredicate(),),
             )
         self.assertTrue(order1 > order2)
 
@@ -4430,7 +4430,7 @@ class Test__make_predicates(unittest.TestCase):
             )
         order2, _, _ = self._callFUT(
             request_method='request_method',
-            custom=('a',),
+            custom=(DummyCustomPredicate(),),
             )
         self.assertTrue(order1 < order2)
 
@@ -4442,7 +4442,7 @@ class Test__make_predicates(unittest.TestCase):
         order2, _, _ = self._callFUT(
             xhr='xhr',
             request_method='request_method',
-            custom=('a',),
+            custom=(DummyCustomPredicate(),),
             )
         self.assertTrue(order1 > order2)
 
@@ -4476,6 +4476,28 @@ class Test__make_predicates(unittest.TestCase):
         self.assertEqual(result, True)
         self.assertEqual(info, {'match':
                                 {'a':'a', 'b':'b', 'traverse':('1', 'a', 'b')}})
+
+    def test_predicate_text_is_correct(self):
+        _, predicates, _ = self._callFUT(
+            xhr='xhr',
+            request_method='request_method',
+            path_info='path_info',
+            request_param='param',
+            header='header',
+            accept='accept',
+            containment='containment',
+            request_type='request_type',
+            custom=(DummyCustomPredicate(),))
+        self.assertEqual(predicates[0].__text__, 'xhr = True')
+        self.assertEqual(predicates[1].__text__,
+                         'request method = request_method')
+        self.assertEqual(predicates[2].__text__, 'path_info = path_info')
+        self.assertEqual(predicates[3].__text__, 'request_param param')
+        self.assertEqual(predicates[4].__text__, 'header header')
+        self.assertEqual(predicates[5].__text__, 'accept = accept')
+        self.assertEqual(predicates[6].__text__, 'containment = containment')
+        self.assertEqual(predicates[7].__text__, 'request_type = request_type')
+        self.assertEqual(predicates[8].__text__, 'custom predicate')
 
 class TestMultiView(unittest.TestCase):
     def _getTargetClass(self):
@@ -5048,6 +5070,10 @@ class DummyStaticURLInfo:
 
     def add(self, name, spec, **kw):
         self.added.append((name, spec, kw))
+
+class DummyCustomPredicate(object):
+    def __init__(self):
+        self.__text__ = 'custom predicate'
 
 def dummy_view(request):
     return 'OK'
