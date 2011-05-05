@@ -59,6 +59,7 @@ def renderer_factory(info):
     path = info.name
     registry = info.registry
     settings = info.settings
+    preprocessor = getattr(info, 'preprocessor', None)
     lookup = registry.queryUtility(IMakoLookup)
     if lookup is None:
         reload_templates = settings.get('reload_templates', False)
@@ -95,6 +96,7 @@ def renderer_factory(info):
                                            default_filters=default_filters,
                                            imports=imports,
                                            filesystem_checks=reload_templates,
+                                           preprocessor=preprocessor,
                                            strict_undefined=strict_undefined)
         registry_lock.acquire()
         try:
