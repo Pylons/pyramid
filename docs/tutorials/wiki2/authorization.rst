@@ -94,8 +94,7 @@ Note that that the
 :class:`pyramid.authentication.AuthTktAuthenticationPolicy` constructor
 accepts two arguments: ``secret`` and ``callback``.  ``secret`` is a string
 representing an encryption key used by the "authentication ticket" machinery
-represented by this policy: it is required.  The ``callback`` is a string,
-representing a :term:`dotted Python name`, which points at the
+represented by this policy: it is required.  The ``callback`` is a
 ``groupfinder`` function in the current directory's ``security.py`` file.  We
 haven't added that module yet, but we're about to.
 
@@ -104,7 +103,7 @@ We'll also change ``__init__.py``, adding a call to
 :term:`view callable`.  This is also known as a :term:`forbidden view`:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 24-26,41-43
+   :lines: 41-43
    :linenos:
    :language: python
 
@@ -114,7 +113,7 @@ A forbidden view configures our newly created login view to show up when
 A ``logout`` :term:`view callable` will allow users to log out later:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 27-28
+   :lines: 26,34
    :linenos:
    :language: python
 
