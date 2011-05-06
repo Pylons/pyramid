@@ -27,8 +27,8 @@ def main(global_config, **settings):
     config.add_route('view_page', '/{pagename}')
     config.add_route('add_page', '/add_page/{pagename}')
     config.add_route('edit_page', '/{pagename}/edit_page')
-    config.add_route('view_wiki', '/')
 
+    config.add_view('tutorial.views.view_wiki', route_name='view_wiki')
     config.add_view('tutorial.login.login', route_name='login', 
                     renderer='tutorial:templates/login.pt')
     config.add_view('tutorial.login.logout', route_name='logout')
