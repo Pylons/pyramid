@@ -2145,6 +2145,10 @@ class Configurator(object):
         Configure the application with a :term:`session factory`.  If
         this method is called, the ``session_factory`` argument must
         be a session factory callable.
+
+        .. note:: Using the ``session_factory`` argument to the
+           :class:`pyramid.config.Configurator` constructor
+           can be used to achieve the same purpose.
         """
         def register():
             self.registry.registerUtility(session_factory, ISessionFactory)
