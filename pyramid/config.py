@@ -2019,7 +2019,7 @@ class Configurator(object):
         :class:`pyramid.request.Request` class (particularly
         ``__call__``, and ``blank``).
 
-        .. note:: Using the :meth:``request_factory`` argument to the
+        .. note:: Using the ``request_factory`` argument to the
            :class:`pyramid.config.Configurator` constructor
            can be used to achieve the same purpose.
         """
