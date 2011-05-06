@@ -2042,9 +2042,8 @@ class Configurator(object):
         dictionary, and therefore will be made available to the code
         which uses the renderer.
 
-        .. note:: Using the :meth:`renderer_globals_factory`
-           argument to the
-           :class:`pyramid.config.Configurator` constructor
+        .. note:: Using the ``renderer_globals_factory`` argument
+           to the :class:`pyramid.config.Configurator` constructor
            can be used to achieve the same purpose.
         """
         factory = self.maybe_dotted(factory)
