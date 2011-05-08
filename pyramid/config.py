@@ -18,6 +18,7 @@ from zope.interface import Interface
 from zope.interface import implementedBy
 from zope.interface.interfaces import IInterface
 from zope.interface import implements
+from zope.interface import classProvides
 
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.interfaces import IAuthorizationPolicy
@@ -45,6 +46,7 @@ from pyramid.interfaces import ITranslationDirectories
 from pyramid.interfaces import ITraverser
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
+from pyramid.interfaces import IViewMapper
 from pyramid.interfaces import IViewMapperFactory
 
 from pyramid import renderers
@@ -2937,7 +2939,8 @@ class ViewDeriver(object):
         return decorator(view)
 
 class DefaultViewMapper(object):
-    implements(IViewMapperFactory)
+    classProvides(IViewMapperFactory)
+    implements(IViewMapper)
     def __init__(self, **kw):
         self.attr = kw.get('attr')
 
