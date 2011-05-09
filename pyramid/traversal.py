@@ -333,14 +333,14 @@ def resource_path_tuple(resource, *elements):
     ``elements`` will be appended as elements in the tuple
     representing the resource path.  For instance, if the resource's
     path is ``('', 'foo', 'bar')`` and elements equals ``('a', 'b')``,
-    the returned tuple will be ``('', 'foo', 'bar', 'a', b')``.  The
+    the returned tuple will be ``('', 'foo', 'bar', 'a', 'b')``.  The
     first element of this tuple will always be the empty string (a
     leading empty string element in a path tuple represents that the
     path is absolute).
 
     This function is a logical inverse of
     :func:`pyramid.traversal.find_resource`: it can be used to
-    generate path references that can later be resolved that function.
+    generate path references that can later be resolved by that function.
 
     The ``resource`` passed in *must* be :term:`location`-aware.
 
