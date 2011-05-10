@@ -18,6 +18,7 @@ from zope.interface import Interface
 from zope.interface import implementedBy
 from zope.interface.interfaces import IInterface
 from zope.interface import implements
+from zope.interface import classProvides
 
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.interfaces import IAuthorizationPolicy
@@ -45,6 +46,7 @@ from pyramid.interfaces import ITranslationDirectories
 from pyramid.interfaces import ITraverser
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
+from pyramid.interfaces import IViewMapper
 from pyramid.interfaces import IViewMapperFactory
 
 from pyramid import renderers
@@ -2019,7 +2021,7 @@ class Configurator(object):
         :class:`pyramid.request.Request` class (particularly
         ``__call__``, and ``blank``).
 
-        .. note:: Using the :meth:``request_factory`` argument to the
+        .. note:: Using the ``request_factory`` argument to the
            :class:`pyramid.config.Configurator` constructor
            can be used to achieve the same purpose.
         """
@@ -2042,9 +2044,8 @@ class Configurator(object):
         dictionary, and therefore will be made available to the code
         which uses the renderer.
 
-        .. note:: Using the :meth:`renderer_globals_factory`
-           argument to the
-           :class:`pyramid.config.Configurator` constructor
+        .. note:: Using the ``renderer_globals_factory`` argument
+           to the :class:`pyramid.config.Configurator` constructor
            can be used to achieve the same purpose.
         """
         factory = self.maybe_dotted(factory)
@@ -2146,6 +2147,10 @@ class Configurator(object):
         Configure the application with a :term:`session factory`.  If
         this method is called, the ``session_factory`` argument must
         be a session factory callable.
+
+        .. note:: Using the ``session_factory`` argument to the
+           :class:`pyramid.config.Configurator` constructor
+           can be used to achieve the same purpose.
         """
         def register():
             self.registry.registerUtility(session_factory, ISessionFactory)
@@ -2934,7 +2939,8 @@ class ViewDeriver(object):
         return decorator(view)
 
 class DefaultViewMapper(object):
-    implements(IViewMapperFactory)
+    classProvides(IViewMapperFactory)
+    implements(IViewMapper)
     def __init__(self, **kw):
         self.attr = kw.get('attr')
 
