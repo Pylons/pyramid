@@ -22,8 +22,6 @@ Should-Have
 
 - Add narrative docs for wsgiapp and wsgiapp2.
 
-- translationdir ZCML directive use of ``path_spec`` should maybe die.
-
 - Fix message catalog extraction / compilation documentation.  Chameleon 2
   broke i18n extraction / compilation.
 
