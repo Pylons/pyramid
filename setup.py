@@ -78,10 +78,10 @@ setup(name='pyramid',
       test_suite="pyramid.tests",
       entry_points = """\
         [paste.paster_create_template]
-        pyramid_starter=pyramid.paster:StarterProjectTemplate
-        pyramid_zodb=pyramid.paster:ZODBProjectTemplate
-        pyramid_routesalchemy=pyramid.paster:RoutesAlchemyProjectTemplate
-        pyramid_alchemy=pyramid.paster:AlchemyProjectTemplate
+        pyramid_starter=pyramid.scaffolds:StarterProjectTemplate
+        pyramid_zodb=pyramid.scaffolds:ZODBProjectTemplate
+        pyramid_routesalchemy=pyramid.scaffolds:RoutesAlchemyProjectTemplate
+        pyramid_alchemy=pyramid.scaffolds:AlchemyProjectTemplate
         [paste.paster_command]
         pshell=pyramid.paster:PShellCommand
         proutes=pyramid.paster:PRoutesCommand

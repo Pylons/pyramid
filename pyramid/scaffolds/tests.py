@@ -8,16 +8,8 @@ import tempfile
 import time
 import signal
 
-if not hasattr(subprocess, 'check_call'):
-    # 2.4
-    def check_call(*arg, **kw):
-        returncode = subprocess.call(*arg, **kw)
-        if returncode:
-            raise ValueError(returncode)
-    subprocess.check_call = check_call
-
 class TemplateTest(object):
-    def make_venv(self, directory):
+    def make_venv(self, directory): # pragma: no cover
         import virtualenv
         import sys
         from virtualenv import Logger
@@ -28,7 +20,7 @@ class TemplateTest(object):
                                       clear=False,
                                       unzip_setuptools=True,
                                       use_distribute=False)
-    def install(self, tmpl_name):
+    def install(self, tmpl_name): # pragma: no cover
         try:
             self.old_cwd = os.getcwd()
             self.directory = tempfile.mkdtemp()
@@ -67,12 +59,20 @@ class TemplateTest(object):
             shutil.rmtree(self.directory)
             os.chdir(self.old_cwd)
 
-templates = ['pyramid_starter', 'pyramid_alchemy', 'pyramid_routesalchemy',]
+if __name__ == '__main__':     # pragma: no cover
+    if not hasattr(subprocess, 'check_call'):
+        # 2.4
+        def check_call(*arg, **kw):
+            returncode = subprocess.call(*arg, **kw)
+            if returncode:
+                raise ValueError(returncode)
+        subprocess.check_call = check_call
 
-if sys.version_info >= (2, 5):
-    templates.append('pyramid_zodb')
+    templates = ['pyramid_starter', 'pyramid_alchemy', 'pyramid_routesalchemy',]
 
-if __name__ == '__main__':
+    if sys.version_info >= (2, 5):
+        templates.append('pyramid_zodb')
+
     for name in templates:
         test = TemplateTest()
         test.install(name)
