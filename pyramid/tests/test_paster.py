@@ -327,6 +327,10 @@ class TestPViewsCommand(unittest.TestCase):
     def _makeOne(self):
         return self._getTargetClass()('pviews')
 
+    def failUnless(self, condition):
+        # silence stupid deprecation under Python >= 2.7
+        self.assertTrue(condition)
+
     def test__find_view_no_match(self):
         from pyramid.registry import Registry
         registry = Registry()
