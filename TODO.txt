@@ -24,7 +24,8 @@ Should-Have
 
 - translationdir ZCML directive use of ``path_spec`` should maybe die.
 
-- Fix message catalog extraction / compilation documentation.
+- Fix message catalog extraction / compilation documentation.  Chameleon 2
+  broke i18n extraction / compilation.
 
 - Review http://alexmarandon.com/articles/zodb_bfg_pyramid_notes .
 
@@ -69,25 +70,6 @@ Nice-to-Have
 - Create a function which performs a recursive request.
 
 - Debug option to print view matching decision.
-
-- Script or paster command that prints, for a given URL, the views
-  that might match.  Underneath each potentially matching route, list
-  the predicates required.  Underneath each route+predicate set, print
-  each view that might match and its predicates.  E.g. with the input
-  URL ``/foo``::
-
-    '/foo' (foo_xhr)
-       xhr = True
-         (no view predicates)
-           mypackage.views.MyXHRFooView.__call__
-
-    '/{action}' (action_route)
-       request_method = 'POST'
-         action = '^foo$'
-           mypackage.views.MyView.foo_POST
-       request_method = 'GET'
-         action = '^foo$'
-           mypackage.views.MyView.foo_GET
 
 - Update App engine chapter with less creaky directions.
 
