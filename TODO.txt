@@ -7,9 +7,6 @@ Should-Have
 - Speed up startup time (defer _bootstrap and registerCommonDirectives()
   until needed by ZCML, as well as unfound speedups).
 
-- Fix misleading conflict error reports for static views ala
-  http://cluebin.appspot.com/pasted/7242843
-
 - Consider adding a default exception view for HTTPException and attendant
   ``redirect`` and ``abort`` functions ala Pylons (promised Mike I'd enable
   this in 1.1).
