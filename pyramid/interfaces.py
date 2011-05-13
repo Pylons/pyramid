@@ -439,7 +439,8 @@ class IRoutesMapper(Interface):
         """ Returns an ``IRoute`` object if a route with the name ``name``
         was registered, otherwise return ``None``."""
 
-    def connect(name, pattern, factory=None, predicates=()):
+    def connect(name, pattern, factory=None, predicates=(), pregenerator=None,
+                static=True):
         """ Add a new route. """
 
     def generate(name, kw):
@@ -451,7 +452,7 @@ class IRoutesMapper(Interface):
         the request; the ``route`` key of this dictionary will either
         be a Route object or ``None`` if no route matched; the
         ``match`` key will be the matchdict or ``None`` if no route
-        matched."""
+        matched.  Static routes will not be considered for matching.  """
 
 class IContextURL(Interface):
     """ An adapter which deals with URLs related to a context.
