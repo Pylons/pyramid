@@ -90,6 +90,29 @@ class RoutesMapperTests(unittest.TestCase):
         self.assertEqual(mapper.routelist[0].pattern,
                          'archives/:action/:article2')
 
+    def test_connect_static(self):
+        mapper = self._makeOne()
+        mapper.connect('foo', 'archives/:action/:article', static=True)
+        self.assertEqual(len(mapper.routelist), 0)
+        self.assertEqual(len(mapper.routes), 1)
+        self.assertEqual(mapper.routes['foo'].pattern,
+                         'archives/:action/:article')
+
+    def test_connect_static_overridden(self):
+        mapper = self._makeOne()
+        mapper.connect('foo', 'archives/:action/:article', static=True)
+        self.assertEqual(len(mapper.routelist), 0)
+        self.assertEqual(len(mapper.routes), 1)
+        self.assertEqual(mapper.routes['foo'].pattern,
+                         'archives/:action/:article')
+        mapper.connect('foo', 'archives/:action/:article2')
+        self.assertEqual(len(mapper.routelist), 1)
+        self.assertEqual(len(mapper.routes), 1)
+        self.assertEqual(mapper.routes['foo'].pattern,
+                         'archives/:action/:article2')
+        self.assertEqual(mapper.routelist[0].pattern,
+                         'archives/:action/:article2')
+
     def test___call__route_matches(self):
         mapper = self._makeOne()
         mapper.connect('foo', 'archives/:action/:article')

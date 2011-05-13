@@ -429,7 +429,8 @@ class IRoute(Interface):
 class IRoutesMapper(Interface):
     """ Interface representing a Routes ``Mapper`` object """
     def get_routes():
-        """ Return a sequence of Route objects registered in the mapper."""
+        """ Return a sequence of Route objects registered in the mapper.
+        Static routes will not be returned in this sequence."""
 
     def has_routes():
         """ Returns ``True`` if any route has been registered. """

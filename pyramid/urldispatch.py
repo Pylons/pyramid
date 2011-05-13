@@ -42,12 +42,14 @@ class RoutesMapper(object):
         return self.routes.get(name)
 
     def connect(self, name, pattern, factory=None, predicates=(),
-                pregenerator=None):
+                pregenerator=None, static=False):
         if name in self.routes:
             oldroute = self.routes[name]
-            self.routelist.remove(oldroute)
+            if oldroute in self.routelist:
+                self.routelist.remove(oldroute)
         route = Route(name, pattern, factory, predicates, pregenerator)
-        self.routelist.append(route)
+        if not static:
+            self.routelist.append(route)
         self.routes[name] = route
         return route
 

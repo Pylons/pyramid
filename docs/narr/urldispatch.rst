@@ -832,6 +832,35 @@ See the :func:`~pyramid.url.route_url` API documentation for more
 information.
 
 .. index::
+   single: static routes
+
+.. _static_route_narr:
+
+Static Routes
+-------------
+
+Routes may be added with a ``static`` keyword argument.  For example:
+
+.. code-block:: python
+   :linenos:
+
+   config = Configurator()
+   config.add_route('page', '/page/{action}', static=True)
+
+Routes added with a ``True`` ``static`` keyword argument will never be
+considered for matching at request time.  Static routes are useful for URL
+generation purposes only.  As a result, it is usually nonsensical to provide
+other non-``name`` and non-``pattern`` arguments to
+:meth:`~pyramid.config.Configurator.add_route` when ``static`` is passed as
+``True``, as none of the other arguments will ever be employed.  A single
+exception to this rule is use of the ``pregenerator`` argument, which is not
+ignored when ``static`` is ``True``.
+
+.. note:: the ``static`` argument to
+   :meth:`~pyramid.config.Configurator.add_route` is new as of :app:`Pyramid`
+   1.1.
+
+.. index::
    single: redirecting to slash-appended routes
 
 .. _redirecting_to_slash_appended_routes:

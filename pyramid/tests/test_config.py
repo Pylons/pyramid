@@ -1898,6 +1898,14 @@ class ConfiguratorTests(unittest.TestCase):
         route = config.add_route('name', 'path', factory=factory)
         self.assertEqual(route.factory, factory)
 
+    def test_add_route_with_static(self):
+        config = self._makeOne(autocommit=True)
+        route = config.add_route('name', 'path/{foo}', static=True)
+        self.assertEqual(route.name, 'name')
+        mapper = config.get_routes_mapper()
+        self.assertEqual(len(mapper.get_routes()), 0)
+        self.assertEqual(mapper.generate('name', {"foo":"a"}), '/path/a')
+
     def test_add_route_with_factory_dottedname(self):
         config = self._makeOne(autocommit=True)
         route = config.add_route(

@@ -32,6 +32,9 @@ Documentation
 - Added documentation for a "multidict" (e.g. the API of ``request.POST``) as
   interface API documentation.
 
+- Added a section to the "URL Dispatch" narrative chapter regarding the new
+  "static" route feature.
+
 Features
 --------
 
@@ -84,6 +87,13 @@ Features
   prints a summary of potentially matching views for a given path.  See the
   section entitled "Displaying Matching Views for a Given URL" in the "View
   Configuration" chapter of the narrative documentation for more information.
+
+- The ``add_route`` method of the Configurator now accepts a ``static``
+  argument.  If this argument is ``True``, the added route will never be
+  considered for matching when a request is handled.  Instead, it will only
+  be useful for URL generation via ``route_url`` and ``route_path``.  See the
+  section entitled "Static Routes" in the URL Dispatch narrative chapter for
+  more information.
 
 Bug Fixes
 ---------

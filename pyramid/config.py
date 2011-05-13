@@ -1453,6 +1453,7 @@ class Configurator(object):
                   use_global_views=False,
                   path=None,
                   pregenerator=None,
+                  static=False,
                   ):
         """ Add a :term:`route configuration` to the current
         configuration state, as well as possibly a :term:`view
@@ -1541,6 +1542,14 @@ class Configurator(object):
           that matches the route, try to fall back to using a view
           that otherwise matches the context, request, and view name
           (but which does not match the route_name predicate).
+
+        static
+
+          If ``static`` is ``True``, this route will never match an incoming
+          request; it will only be useful for URL generation.  By default,
+          ``static`` is ``False``.  See :ref:`static_route_narr`.
+
+          .. note:: New in :app:`Pyramid` 1.1.
 
         Predicate Arguments
 
@@ -1798,7 +1807,7 @@ class Configurator(object):
         self.action(discriminator, None)
 
         return mapper.connect(name, pattern, factory, predicates=predicates,
-                              pregenerator=pregenerator)
+                              pregenerator=pregenerator, static=static)
 
     def get_routes_mapper(self):
         """ Return the :term:`routes mapper` object associated with
