@@ -29,6 +29,9 @@ Documentation
   chapter in the narrative documentation section entitled "Adding a Custom
   Setting".
 
+- Added documentation for a "multidict" (e.g. the API of ``request.POST``) as
+  interface API documentation.
+
 Features
 --------
 

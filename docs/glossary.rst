@@ -630,10 +630,10 @@ Glossary
       more information.
 
    multidict
-     An ordered dictionary that can have multiple values for each
-     key. Adds the methods ``getall``, ``getone``, ``mixed``, and
-     ``add`` to the normal dictionary interface.  See
-     http://pythonpaste.org/webob/class-webob.multidict.MultiDict.html
+     An ordered dictionary that can have multiple values for each key. Adds
+     the methods ``getall``, ``getone``, ``mixed``, ``add`` and
+     ``dict_of_lists`` to the normal dictionary interface.  See
+     :ref:`multidict_narr` and :class:`pyramid.interfaces.IMultiDict`.
 
    PyPI
      `The Python Package Index <http://pypi.python.org/pypi>`_, a

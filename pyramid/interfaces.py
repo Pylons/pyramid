@@ -190,6 +190,43 @@ class IAuthorizationPolicy(Interface):
         ``pyramid.security.principals_allowed_by_permission`` API is
         used."""
 
+class IMultiDict(Interface): # docs-only interface
+    """
+    An ordered dictionary that can have multiple values for each key. A
+    multidict adds the methods ``getall``, ``getone``, ``mixed``, ``extend``
+    ``add``, and ``dict_of_lists`` to the normal dictionary interface.  A
+    multidict data structure is used as ``request.POST``, ``request.GET``,
+    and ``request.params`` within an :app:`Pyramid` application.
+    """
+
+    def add(key, value):
+        """ Add the key and value, not overwriting any previous value. """
+
+    def dict_of_lists():
+        """
+        Returns a dictionary where each key is associated with a list of
+        values.
+        """
+
+    def extend(other=None, **kwargs):
+        """ Add a set of keys and values, not overwriting any previous
+        values.  The ``other`` structure may be a list of two-tuples or a
+        dictionary.  If ``**kwargs`` is passed, its value *will* overwrite
+        existing values."""
+
+    def getall(key):
+        """ Return a list of all values matching the key (may be an empty
+        list) """
+
+    def getone(key):
+        """ Get one value matching the key, raising a KeyError if multiple
+        values were found. """
+
+    def mixed():
+        """ Returns a dictionary where the values are either single values,
+        or a list of values when a key/value appears more than once in this
+        dictionary. This is similar to the kind of dictionary often used to
+        represent the variables in a web request. """
 
 # internal interfaces
 

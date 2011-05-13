@@ -4,8 +4,6 @@ Pyramid TODOs
 Should-Have
 -----------
 
-- MultiDict documentation.
-
 - Speed up startup time (defer _bootstrap and registerCommonDirectives()
   until needed by ZCML, as well as unfound speedups).
 

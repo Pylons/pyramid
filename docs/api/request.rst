@@ -177,3 +177,9 @@
       (such as the status code, a header, the content type, etc) see,
       :ref:`response_prefixed_attrs`.
 
+.. note::
+
+   For information about the API of a :term:`multidict` structure (such as
+   that used as ``request.GET``, ``request.POST``, and ``request.params``),
+   see :class:`pyramid.interfaces.IMultiDict`.
+

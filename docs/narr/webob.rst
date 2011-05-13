@@ -208,6 +208,38 @@ If it is set, then ``req.POST``, ``req.GET``, ``req.params``, and
 corresponding ``req.str_*`` (e.g., ``req.str_POST``) that is always
 a ``str``, and never unicode.
 
+.. index::
+   single: multidict (WebOb)
+
+.. _multidict_narr:
+
+Multidict
++++++++++
+
+Several attributes of a WebOb request are "multidict"; structures (such as
+``request.GET``, ``request.POST``, and ``request.params``).  A multidict is a
+dictionary where a key can have multiple values.  The quintessential example
+is a query string like ``?pref=red&pref=blue``; the ``pref`` variable has two
+values: ``red`` and ``blue``.
+
+In a multidict, when you do ``request.GET['pref']`` you'll get back
+only ``'blue'`` (the last value of ``pref``).  Sometimes returning a
+string, and sometimes returning a list, is the cause of frequent
+exceptions.  If you want *all* the values back, use
+``request.GET.getall('pref')``.  If you want to be sure there is *one
+and only one* value, use ``request.GET.getone('pref')``, which will
+raise an exception if there is zero or more than one value for
+``pref``.
+
+When you use operations like ``request.GET.items()`` you'll get back
+something like ``[('pref', 'red'), ('pref', 'blue')]``.  All the
+key/value pairs will show up.  Similarly ``request.GET.keys()``
+returns ``['pref', 'pref']``.  Multidict is a view on a list of
+tuples; all the keys are ordered, and all the values are ordered.
+
+API documentation for a multidict exists as
+:class:`pyramid.interfaces.IMultiDict`.
+
 More Details
 ++++++++++++
 
@@ -371,9 +403,6 @@ The exceptions are still WSGI applications, but you cannot set
 attributes like ``content_type``, ``charset``, etc. on these exception
 objects.
 
-.. index::
-   single: multidict (WebOb)
-
 More Details
 ++++++++++++
 
@@ -381,27 +410,4 @@ More details about the response object API are available in the
 :mod:`pyramid.response` documentation.  More details about exception responses
 are in the :mod:`pyramid.httpexceptions` API documentation.  The `WebOb
 documentation <http://pythonpaste.org/webob>`_ is also useful.
-
-Multidict
-~~~~~~~~~
-
-Several parts of WebOb use a "multidict"; this is a dictionary where a
-key can have multiple values.  The quintessential example is a query
-string like ``?pref=red&pref=blue``; the ``pref`` variable has two
-values: ``red`` and ``blue``.
-
-In a multidict, when you do ``request.GET['pref']`` you'll get back
-only ``'blue'`` (the last value of ``pref``).  Sometimes returning a
-string, and sometimes returning a list, is the cause of frequent
-exceptions.  If you want *all* the values back, use
-``request.GET.getall('pref')``.  If you want to be sure there is *one
-and only one* value, use ``request.GET.getone('pref')``, which will
-raise an exception if there is zero or more than one value for
-``pref``.
-
-When you use operations like ``request.GET.items()`` you'll get back
-something like ``[('pref', 'red'), ('pref', 'blue')]``.  All the
-key/value pairs will show up.  Similarly ``request.GET.keys()``
-returns ``['pref', 'pref']``.  Multidict is a view on a list of
-tuples; all the keys are ordered, and all the values are ordered.
 
