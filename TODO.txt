@@ -13,9 +13,6 @@ Should-Have
 
 - Add narrative docs for wsgiapp and wsgiapp2.
 
-- Fix message catalog extraction / compilation documentation.  Chameleon 2
-  broke i18n extraction / compilation.
-
 - Review http://alexmarandon.com/articles/zodb_bfg_pyramid_notes .
 
 Nice-to-Have
