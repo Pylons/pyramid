@@ -225,7 +225,7 @@ needn't understand the ZCA API either.
 
 Hiding the ZCA API from application developers and code readers is a form of
 enhancing "domain specificity".  No application developer wants to need to
-understand the minutiae of the mechanics of how a web framework does its
+understand the small, detailed mechanics of how a web framework does its
 thing.  People want to deal in concepts that are closer to the domain they're
 working in: for example, web developers want to know about *users*, not
 *utilities*.  :app:`Pyramid` uses the ZCA as an implementation detail, not as
@@ -296,7 +296,7 @@ Rationale
 Here are the main rationales involved in the :app:`Pyramid` decision to use
 the ZCA registry:
 
-- Pedigree.  A nontrivial part of the answer to this question is "pedigree".
+- History.  A nontrivial part of the answer to this question is "history".
   Much of the design of :app:`Pyramid` is stolen directly from :term:`Zope`.
   Zope uses the ZCA registry to do a number of tricks.  :app:`Pyramid` mimics
   these tricks, and, because the ZCA registry works well for that set of
