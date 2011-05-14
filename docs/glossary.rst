@@ -747,7 +747,7 @@ Glossary
      application.
 
    Lingua
-     A package by Wichert Akkermann which provides :term:`Babel` message
+     A package by Wichert Akkerman which provides :term:`Babel` message
      extractors for Python source files and Chameleon ZPT template files.
 
    Message Identifier
