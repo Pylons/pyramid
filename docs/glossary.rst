@@ -746,6 +746,10 @@ Glossary
      additional locale functionality becomes available to your
      application.
 
+   Lingua
+     A package by Wichert Akkermann which provides :term:`Babel` message
+     extractors for Python source files and Chameleon ZPT template files.
+
    Message Identifier
      A string used as a translation lookup key during localization.
      The ``msgid`` argument to a :term:`translation string` is a

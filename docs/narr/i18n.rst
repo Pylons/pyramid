@@ -247,63 +247,67 @@ GNU gettext uses three types of files in the translation framework,
   is the ``.mo`` file. Compiling the translations to machine code
   makes the localized program run faster.
 
-The tool for working with :term:`gettext` translation files related to
-a :app:`Pyramid` application is :term:`Babel`.
+The tools for working with :term:`gettext` translation files related to a
+:app:`Pyramid` application is :term:`Babel` and :term:`Lingua`.  Lingua is a
+Balel extension that provides support for scraping i18n references out of
+Python and Chameleon files.
 
 .. index::
    single: Babel
+   single: Lingua
 
 .. _installing_babel:
 
-Installing Babel
-~~~~~~~~~~~~~~~~
+Installing Babel and Lingua
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In order for the commands related to working with ``gettext``
-translation files to work properly, you will need to have
-:term:`Babel` installed into the same environment in which
-:app:`Pyramid` is installed.
+In order for the commands related to working with ``gettext`` translation
+files to work properly, you will need to have :term:`Babel` and
+:term:`Lingua` installed into the same environment in which :app:`Pyramid` is
+installed.
 
 Installation on UNIX
 ++++++++++++++++++++
 
-If the :term:`virtualenv` into which you've installed your
-:app:`Pyramid` application lives in ``/my/virtualenv``, you can
-install Babel like so:
+If the :term:`virtualenv` into which you've installed your :app:`Pyramid`
+application lives in ``/my/virtualenv``, you can install Babel and Lingua
+like so:
 
 .. code-block:: text
 
    $ cd /my/virtualenv
-   $ bin/easy_install Babel
+   $ bin/easy_install Babel lingua
 
 Installation on Windows
 +++++++++++++++++++++++
 
-If the :term:`virtualenv` into which you've installed your
-:app:`Pyramid` application lives in ``C:\my\virtualenv``, you can
-install Babel like so:
+If the :term:`virtualenv` into which you've installed your :app:`Pyramid`
+application lives in ``C:\my\virtualenv``, you can install Babel and Lingua
+like so:
 
 .. code-block:: text
 
    C> cd \my\virtualenv
-   C> bin\easy_install Babel
+   C> bin\easy_install Babel lingua
 
 .. index::
    single: Babel; message extractors
+   single: Lingua
 
 Changing the ``setup.py``
 +++++++++++++++++++++++++
 
-You need to add a few boilerplate lines to your application's
-``setup.py`` file in order to properly generate :term:`gettext` files
-from your application.
+You need to add a few boilerplate lines to your application's ``setup.py``
+file in order to properly generate :term:`gettext` files from your
+application.
 
 .. note:: See :ref:`project_narr` to learn about about the
   composition of an application's ``setup.py`` file.
 
-In particular, add the ``Babel`` distribution to the
-``install_requires`` list and insert a set of references to
-:term:`Babel` *message extractors* within the call to
-:func:`setuptools.setup` inside your application's ``setup.py`` file:
+In particular, add the ``Babel`` and ``lingua`` distributions to the
+``install_requires`` list and insert a set of references to :term:`Babel`
+*message extractors* within the call to :func:`setuptools.setup` inside your
+application's ``setup.py`` file:
 
 .. code-block:: python
    :linenos:
@@ -313,16 +317,17 @@ In particular, add the ``Babel`` distribution to the
           install_requires = [
                 # ...
                 'Babel',
+                'lingua',
                 ],
           message_extractors = { '.': [
-                ('**.py',   'chameleon_python', None ),
-                ('**.pt',   'chameleon_xml', None ),
+                ('**.py',   'lingua_python', None ),
+                ('**.pt',   'lingua_xml', None ),
                 ]},
           )
 
-The ``message_extractors`` stanza placed into the ``setup.py`` file
-causes the :term:`Babel` message catalog extraction machinery to also
-consider ``**.pt`` files when doing message id extraction.
+The ``message_extractors`` stanza placed into the ``setup.py`` file causes
+the :term:`Babel` message catalog extraction machinery to also consider
+``*.pt`` files when doing message id extraction.
 
 .. index::
    pair: extracting; messages
@@ -332,11 +337,11 @@ consider ``**.pt`` files when doing message id extraction.
 Extracting Messages from Code and Templates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once :term:`Babel` is installed and your application's ``setup.py``
-file has the correct message extractor references, you may extract a
-message catalog template from the code and :term:`Chameleon` templates
-which reside in your :app:`Pyramid` application.  You run a
-``setup.py`` command to extract the messages:
+Once Babel and Lingua are installed and your application's ``setup.py`` file
+has the correct message extractor references, you may extract a message
+catalog template from the code and :term:`Chameleon` templates which reside
+in your :app:`Pyramid` application.  You run a ``setup.py`` command to
+extract the messages:
 
 .. code-block:: text
 
