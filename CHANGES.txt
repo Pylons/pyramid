@@ -35,6 +35,8 @@ Documentation
 - Added a section to the "URL Dispatch" narrative chapter regarding the new
   "static" route feature.
 
+- Added "What's New in Pyramid 1.1" to HTML rendering of documentation.
+
 Features
 --------
 

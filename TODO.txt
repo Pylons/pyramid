@@ -4,26 +4,22 @@ Pyramid TODOs
 Should-Have
 -----------
 
-- Speed up startup time (defer _bootstrap and registerCommonDirectives()
-  until needed by ZCML, as well as unfound speedups).
-
 - Consider adding a default exception view for HTTPException and attendant
   ``redirect`` and ``abort`` functions ala Pylons (promised Mike I'd enable
   this in 1.1).
 
 - Add narrative docs for wsgiapp and wsgiapp2.
 
-- Review http://alexmarandon.com/articles/zodb_bfg_pyramid_notes .
-
 Nice-to-Have
 ------------
+
+- Speed up startup time (defer _bootstrap and registerCommonDirectives()
+  until needed by ZCML, as well as unfound speedups).
 
 - Nicer Mako exceptions in WebError.
 
 - Response.RequestClass should probably be pyramid.request.Request but this
   may imply actually subclassing webob.Response
-
-- Consider per-form_id CSRF instead of per-session global CSRF token.
 
 - Better "Extending" chapter.
 
