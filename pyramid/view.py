@@ -28,7 +28,7 @@ def init_mimetypes(mimetypes):
 # fallout.
 init_mimetypes(mimetypes)
 
-# Nast BW compat hack: dont yet deprecate this (ever?)
+# Nasty BW compat hack: dont yet deprecate this (ever?)
 class static(static_view): # only subclass for purposes of autodoc
     __doc__ = static_view.__doc__
 
@@ -235,7 +235,7 @@ class view_config(object):
         settings['_info'] = info.codeinfo
         return wrapped
 
-bfg_view = view_config # permanent b/c
+bfg_view = view_config
 
 deprecated(
     'bfg_view',
@@ -313,14 +313,14 @@ append_slash_notfound_view.__doc__ = """\
 For behavior like Django's ``APPEND_SLASH=True``, use this view as the
 :term:`Not Found view` in your application.
 
-When this view is the Not Found view (indicating that no view was
-found), and any routes have been defined in the configuration of your
-application, if the value of the ``PATH_INFO`` WSGI environment
-variable does not already end in a slash, and if the value of
-``PATH_INFO`` *plus* a slash matches any route's path, do an HTTP
-redirect to the slash-appended PATH_INFO.  Note that this will *lose*
-``POST`` data information (turning it into a GET), so you shouldn't
-rely on this to redirect POST requests.
+When this view is the Not Found view (indicating that no view was found), and
+any routes have been defined in the configuration of your application, if the
+value of the ``PATH_INFO`` WSGI environment variable does not already end in
+a slash, and if the value of ``PATH_INFO`` *plus* a slash matches any route's
+path, do an HTTP redirect to the slash-appended PATH_INFO.  Note that this
+will *lose* ``POST`` data information (turning it into a GET), so you
+shouldn't rely on this to redirect POST requests.  Note also that static
+routes are not considered when attempting to find a matching route.
 
 Use the :meth:`pyramid.config.Configurator.add_view` method to configure this
 view as the Not Found view::
