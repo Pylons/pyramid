@@ -22,9 +22,10 @@ Front Matter
 ======================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    whatsnew-1.0
+   whatsnew-1.1
 
 Narrative documentation
 =======================

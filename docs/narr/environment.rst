@@ -381,6 +381,8 @@ around in overridden asset directories. ``reload_assets`` makes the system
 *very slow* when templates are in use.  Never set ``reload_assets`` to
 ``True`` on a production system.
 
+.. _adding_a_custom_setting:
+
 Adding A Custom Setting
 -----------------------
 
