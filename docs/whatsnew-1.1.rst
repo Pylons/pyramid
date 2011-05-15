@@ -60,10 +60,10 @@ Minor Feature Additions
   converted implicitly to strings in the result.  Previously passing integers
   or longs as elements would cause a TypeError.
 
-- ``pyramid_alchemy`` paster template now uses ``query.get`` rather than
+- ``pyramid_alchemy`` scaffold now uses ``query.get`` rather than
   ``query.filter_by`` to take better advantage of identity map caching.
 
-- ``pyramid_alchemy`` paster template now has unit tests.
+- ``pyramid_alchemy`` scaffold now has unit tests.
 
 - Added a :func:`pyramid.i18n.make_localizer` API.
 
