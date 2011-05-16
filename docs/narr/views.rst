@@ -365,7 +365,7 @@ An HTTP exception, instead of being raised, can alternately be *returned*
 Note that :class:`pyramid.exceptions.NotFound` is *not* the same as
 :class:`pyramid.httpexceptions.HTTPNotFound`.  If the latter is raised, the
 :term:`Not Found view` will *not* be called automatically.  Likewise,
-:class:`pyramid.exceptions.Foribdden` is not the same exception as
+:class:`pyramid.exceptions.Forbidden` is not the same exception as
 :class:`pyramid.httpexceptions.HTTPForbidden`.  If the latter is raised, the
 :term:`Forbidden view` will not be called automatically.
 
