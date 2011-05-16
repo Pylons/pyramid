@@ -59,6 +59,8 @@ from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import Forbidden
 from pyramid.exceptions import NotFound
 from pyramid.exceptions import PredicateMismatch
+from pyramid.httpexceptions import HTTPException
+from pyramid.httpexceptions import default_httpexception_view
 from pyramid.i18n import get_localizer
 from pyramid.log import make_stream_logger
 from pyramid.mako_templating import renderer_factory as mako_renderer_factory
@@ -139,7 +141,8 @@ class Configurator(object):
     ``package``, ``settings``, ``root_factory``, ``authentication_policy``,
     ``authorization_policy``, ``renderers`` ``debug_logger``,
     ``locale_negotiator``, ``request_factory``, ``renderer_globals_factory``,
-    ``default_permission``, ``session_factory``, and ``autocommit``.
+    ``default_permission``, ``session_factory``, ``default_view_mapper``,
+    ``autocommit``, and ``httpexception_view``.
 
     If the ``registry`` argument is passed as a non-``None`` value, it
     must be an instance of the :class:`pyramid.registry.Registry`
@@ -254,7 +257,17 @@ class Configurator(object):
     :term:`view mapper` factory for view configurations that don't otherwise
     specify one (see :class:`pyramid.interfaces.IViewMapperFactory`).  If a
     default_view_mapper is not passed, a superdefault view mapper will be
-    used.  """
+    used.
+
+    If ``httpexception_view`` is passed, it must be a :term:`view callable`
+    or ``None``.  If it is a view callable, it will be used as an exception
+    view callable when an :term:`HTTP exception` is raised (any named
+    exception from the ``pyramid.httpexceptions`` module) by
+    :func:`pyramid.httpexceptions.abort`,
+    :func:`pyramid.httpexceptions.redirect` or 'by hand'.  If it is ``None``,
+    no httpexception view will be registered.  By default, the
+    ``pyramid.httpexceptions.default_httpexception_view`` function is
+    used.  This behavior is new in Pyramid 1.1.  """
 
     manager = manager # for testing injection
     venusian = venusian # for testing injection
@@ -277,6 +290,7 @@ class Configurator(object):
                  session_factory=None,
                  default_view_mapper=None,
                  autocommit=False,
+                 httpexception_view=default_httpexception_view,
                  ):
         if package is None:
             package = caller_package()
@@ -302,6 +316,7 @@ class Configurator(object):
                 default_permission=default_permission,
                 session_factory=session_factory,
                 default_view_mapper=default_view_mapper,
+                httpexception_view=httpexception_view,
                 )
 
     def _set_settings(self, mapping):
@@ -658,7 +673,8 @@ class Configurator(object):
                        renderers=DEFAULT_RENDERERS, debug_logger=None,
                        locale_negotiator=None, request_factory=None,
                        renderer_globals_factory=None, default_permission=None,
-                       session_factory=None, default_view_mapper=None):
+                       session_factory=None, default_view_mapper=None,
+                       httpexception_view=default_httpexception_view):
         """ When you pass a non-``None`` ``registry`` argument to the
         :term:`Configurator` constructor, no initial 'setup' is performed
         against the registry.  This is because the registry you pass in may
@@ -690,6 +706,9 @@ class Configurator(object):
             self.add_renderer(name, renderer)
         self.add_view(default_exceptionresponse_view,
                       context=IExceptionResponse)
+        if httpexception_view is not None:
+            httpexception_view = self.maybe_dotted(httpexception_view)
+            self.add_view(httpexception_view, context=HTTPException)
         if locale_negotiator:
             locale_negotiator = self.maybe_dotted(locale_negotiator)
             registry.registerUtility(locale_negotiator, ILocaleNegotiator)

@@ -203,6 +203,38 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(config.registry.getUtility(IViewMapperFactory),
                          mapper)
 
+    def test_ctor_httpexception_view_default(self):
+        from zope.interface import implementedBy
+        from pyramid.httpexceptions import HTTPException
+        from pyramid.httpexceptions import default_httpexception_view
+        from pyramid.interfaces import IRequest
+        config = self._makeOne()
+        view = self._getViewCallable(config,
+                                     ctx_iface=implementedBy(HTTPException),
+                                     request_iface=IRequest)
+        self.failUnless(view is default_httpexception_view)
+
+    def test_ctor_httpexception_view_None(self):
+        from zope.interface import implementedBy
+        from pyramid.httpexceptions import HTTPException
+        from pyramid.interfaces import IRequest
+        config = self._makeOne(httpexception_view=None)
+        view = self._getViewCallable(config,
+                                     ctx_iface=implementedBy(HTTPException),
+                                     request_iface=IRequest)
+        self.failUnless(view is None)
+
+    def test_ctor_httpexception_view_custom(self):
+        from zope.interface import implementedBy
+        from pyramid.httpexceptions import HTTPException
+        from pyramid.interfaces import IRequest
+        def httpexception_view(context, request): pass
+        config = self._makeOne(httpexception_view=httpexception_view)
+        view = self._getViewCallable(config,
+                                     ctx_iface=implementedBy(HTTPException),
+                                     request_iface=IRequest)
+        self.failUnless(view is httpexception_view)
+
     def test_with_package_module(self):
         from pyramid.tests import test_configuration
         import pyramid.tests
@@ -288,6 +320,20 @@ class ConfiguratorTests(unittest.TestCase):
         config.setup_registry()
         self.assertEqual(views[0], ((default_exceptionresponse_view,),
                                     {'context':IExceptionResponse}))
+
+    def test_setup_registry_registers_default_httpexception_view(self):
+        from pyramid.httpexceptions import HTTPException
+        from pyramid.httpexceptions import default_httpexception_view
+        class DummyRegistry(object):
+            def registerUtility(self, *arg, **kw):
+                pass
+        reg = DummyRegistry()
+        config = self._makeOne(reg)
+        views = []
+        config.add_view = lambda *arg, **kw: views.append((arg, kw))
+        config.setup_registry()
+        self.assertEqual(views[1], ((default_httpexception_view,),
+                                    {'context':HTTPException}))
 
     def test_setup_registry_explicit_notfound_trumps_iexceptionresponse(self):
         from zope.interface import implementedBy

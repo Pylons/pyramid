@@ -48,3 +48,36 @@ from webob.exc import HTTPBadGateway
 from webob.exc import HTTPServiceUnavailable
 from webob.exc import HTTPGatewayTimeout
 from webob.exc import HTTPVersionNotSupported
+
+from webob.response import Response
+
+def abort(status_code, **kw):
+    """Aborts the request immediately by raising an HTTP exception.  The
+    values in ``*kw`` will be passed to the HTTP exception constructor.
+    Example::
+
+        abort(404) # raises an HTTPNotFound exception.
+    """
+    exc = status_map[status_code](**kw)
+    raise exc.exception
+
+
+def redirect(url, code=302, **kw):
+    """Raises a redirect exception to the specified URL.
+
+    Optionally, a code variable may be passed with the status code of
+    the redirect, ie::
+
+        redirect(route_url('foo', request), code=303)
+
+    """
+    exc = status_map[code]
+    raise exc(location=url, **kw).exception
+
+def default_httpexception_view(context, request):
+    if isinstance(context, Response):
+        # WSGIHTTPException, a Response (2.5+)
+        return context
+    # HTTPException, a WSGI app (2.4)
+    return request.get_response(context)
+

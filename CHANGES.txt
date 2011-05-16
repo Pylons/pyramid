@@ -37,6 +37,13 @@ Documentation
 
 - Added "What's New in Pyramid 1.1" to HTML rendering of documentation.
 
+- Added API docs for ``pyramid.httpexceptions.abort`` and
+  ``pyramid.httpexceptions.redirect``.
+
+- Added "HTTP Exceptions" section to Views narrative chapter including a
+  description of ``pyramid.httpexceptions.abort``; adjusted redirect section
+  to note ``pyramid.httpexceptions.redirect``.
+
 Features
 --------
 
@@ -96,6 +103,27 @@ Features
   be useful for URL generation via ``route_url`` and ``route_path``.  See the
   section entitled "Static Routes" in the URL Dispatch narrative chapter for
   more information.
+
+- A default exception view for the context ``webob.exc.HTTPException`` (aka
+  ``pyramid.httpexceptions.HTTPException``) is now registered by default.
+  This means that an instance of any exception class imported from
+  ``pyramid.httpexceptions`` (such as ``HTTPFound``) can now be raised from
+  within view code; when raised, this exception view will render the
+  exception to a response.
+
+- New functions named ``pyramid.httpexceptions.abort`` and
+  ``pyramid.httpexceptions.redirect`` perform the equivalent of their Pylons
+  brethren when an HTTP exception handler is registered.  These functions
+  take advantage of the newly registered exception view for
+  ``webob.exc.HTTPException``.
+
+- The Configurator now accepts an additional keyword argument named
+  ``httpexception_view``.  By default, this argument is populated with a
+  default exception view function that will be used when an HTTP exception is
+  raised.  When ``None`` is passed for this value, an exception view for HTTP
+  exceptions will not be registered.  Passing ``None`` returns the behavior
+  of raising an HTTP exception to that of Pyramid 1.0 (the exception will
+  propagate to middleware and to the WSGI server).
 
 Bug Fixes
 ---------

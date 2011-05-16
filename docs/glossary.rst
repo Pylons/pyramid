@@ -618,6 +618,12 @@ Glossary
       request processing.  See :ref:`exception_views` for more
       information.
 
+   HTTP Exception
+      The set of exception classes defined in :mod:`pyramid.httpexceptions`.
+      These can be used to generate responses with various status codes when
+      raised or returned from a :term:`view callable`.  See also
+      :ref:`http_exceptions`.
+
    thread local
       A thread-local variable is one which is essentially a global variable
       in terms of how it is accessed and treated, however, each `thread
