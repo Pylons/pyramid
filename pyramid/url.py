@@ -20,7 +20,7 @@ def route_url(route_name, request, *elements, **kw):
     """Generates a fully qualified URL for a named :app:`Pyramid`
     :term:`route configuration`.
 
-    .. note:: Calling :meth:`pyramid.Request.route_url` can be used to
+    .. note:: Calling :meth:`pyramid.request.Request.route_url` can be used to
               achieve the same result as :func:`pyramid.url.route_url`.
 
     Use the route's ``name`` as the first positional argument.  Use a
@@ -159,7 +159,7 @@ def route_path(route_name, request, *elements, **kw):
     """Generates a path (aka a 'relative URL', a URL minus the host, scheme,
     and port) for a named :app:`Pyramid` :term:`route configuration`.
 
-    .. note:: Calling :meth:`pyramid.Request.route_path` can be used to
+    .. note:: Calling :meth:`pyramid.request.Request.route_path` can be used to
               achieve the same result as :func:`pyramid.url.route_path`.
 
     This function accepts the same argument as :func:`pyramid.url.route_url`
@@ -191,7 +191,7 @@ def resource_url(resource, request, *elements, **kw):
     overall result of this function is always a UTF-8 encoded string
     (never Unicode).
 
-    .. note:: Calling :meth:`pyramid.Request.resource_url` can be used to
+    .. note:: Calling :meth:`pyramid.request.Request.resource_url` can be used to
               achieve the same result as :func:`pyramid.url.resource_url`.
 
     Examples::
@@ -325,7 +325,7 @@ def static_url(path, request, **kw):
     :meth:`pyramid.config.Configurator.add_static_view`
     :term:`configuration declaration` (see :ref:`static_assets_section`).
 
-    .. note:: Calling :meth:`pyramid.Request.static_url` can be used to
+    .. note:: Calling :meth:`pyramid.request.Request.static_url` can be used to
               achieve the same result as :func:`pyramid.url.static_url`.
 
     Example::
