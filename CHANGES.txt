@@ -37,8 +37,14 @@ Documentation
 
 - Added "What's New in Pyramid 1.1" to HTML rendering of documentation.
 
+- Added API docs for ``pyramid.authentication.SessionAuthenticationPolicy``.
+
 Features
 --------
+
+- New authentication policy:
+  ``pyramid.authentication.SessionAuthenticationPolicy``, which uses a session
+  to store credentials.
 
 - Accessing the ``response`` attribute of a ``pyramid.request.Request``
   object (e.g. ``request.response`` within a view) now produces a new

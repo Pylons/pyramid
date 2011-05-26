@@ -53,6 +53,10 @@ Static Routes
 Minor Feature Additions
 -----------------------
 
+- New authentication policy:
+  :ref:`pyramid.authentication.SessionAuthenticationPolicy`, which uses a
+  session to store credentials.
+
 - Integers and longs passed as ``elements`` to
   :func:`pyramid.url.resource_url` or
   :meth:`pyramid.request.Request.resource_url` e.g. ``resource_url(context,
