@@ -526,8 +526,10 @@ class AuthTktCookieHelper(object):
         return self._get_cookies(environ, cookie_value, max_age)
 
 class SessionAuthenticationPolicy(CallbackAuthenticationPolicy):
-    """ A :app:`Pyramid` authentication policy which gets its data from
-    the configured session.
+    """ A :app:`Pyramid` authentication policy which gets its data from the
+    configured :term:`session`.  For this authentication policy to work, you
+    will have to follow the instructions in the :ref:`sessions_chapter` to
+    configure a :term:`session factory`.
 
     Constructor Arguments
 
