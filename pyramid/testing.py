@@ -217,7 +217,7 @@ def registerView(name, result='', view=None, for_=(Interface, Interface),
     else:
         def _secure(context, request):
             if not has_permission(permission, context, request):
-                raise Forbidden('no permission')
+                raise Forbidden('no permission').exception
             else:
                 return view(context, request)
         _secure.__call_permissive__ = view

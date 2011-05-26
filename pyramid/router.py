@@ -153,7 +153,7 @@ class Router(object):
                             logger and logger.debug(msg)
                         else:
                             msg = request.path_info
-                        raise NotFound(msg)
+                        raise NotFound(msg).exception
                     else:
                         response = view_callable(context, request)
 

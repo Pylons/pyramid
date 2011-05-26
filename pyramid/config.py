@@ -56,11 +56,10 @@ from pyramid.compat import md5
 from pyramid.compat import any
 from pyramid.events import ApplicationCreated
 from pyramid.exceptions import ConfigurationError
+from pyramid.exceptions import default_exceptionresponse_view
 from pyramid.exceptions import Forbidden
 from pyramid.exceptions import NotFound
 from pyramid.exceptions import PredicateMismatch
-from pyramid.httpexceptions import HTTPException
-from pyramid.httpexceptions import default_httpexception_view
 from pyramid.i18n import get_localizer
 from pyramid.log import make_stream_logger
 from pyramid.mako_templating import renderer_factory as mako_renderer_factory
@@ -82,7 +81,6 @@ from pyramid.traversal import find_interface
 from pyramid.traversal import traversal_path
 from pyramid.urldispatch import RoutesMapper
 from pyramid.util import DottedNameResolver
-from pyramid.view import default_exceptionresponse_view
 from pyramid.view import render_view_to_response
 from pyramid.view import is_response
 
@@ -142,7 +140,7 @@ class Configurator(object):
     ``authorization_policy``, ``renderers`` ``debug_logger``,
     ``locale_negotiator``, ``request_factory``, ``renderer_globals_factory``,
     ``default_permission``, ``session_factory``, ``default_view_mapper``,
-    ``autocommit``, and ``httpexception_view``.
+    ``autocommit``, and ``exceptionresponse_view``.
 
     If the ``registry`` argument is passed as a non-``None`` value, it
     must be an instance of the :class:`pyramid.registry.Registry`
@@ -259,15 +257,18 @@ class Configurator(object):
     default_view_mapper is not passed, a superdefault view mapper will be
     used.
 
-    If ``httpexception_view`` is passed, it must be a :term:`view callable`
-    or ``None``.  If it is a view callable, it will be used as an exception
-    view callable when an :term:`HTTP exception` is raised (any named
-    exception from the ``pyramid.httpexceptions`` module) by
-    :func:`pyramid.httpexceptions.abort`,
-    :func:`pyramid.httpexceptions.redirect` or 'by hand'.  If it is ``None``,
-    no httpexception view will be registered.  By default, the
-    ``pyramid.httpexceptions.default_httpexception_view`` function is
-    used.  This behavior is new in Pyramid 1.1.  """
+    If ``exceptionresponse_view`` is passed, it must be a :term:`view
+    callable` or ``None``.  If it is a view callable, it will be used as an
+    exception view callable when an :term:`exception response` is raised (any
+    named exception from the ``pyramid.exceptions`` module that begins with
+    ``HTTP`` as well as the ``NotFound`` and ``Forbidden`` exceptions) as
+    well as exceptions raised via :func:`pyramid.exceptions.abort`,
+    :func:`pyramid.exceptions.redirect`.  If ``exceptionresponse_view`` is
+    ``None``, no exception response view will be registered, and all
+    raised exception responses will be bubbled up to Pyramid's caller.  By
+    default, the ``pyramid.exceptions.default_exceptionresponse_view``
+    function is used as the ``exceptionresponse_view``.  This argument is new
+    in Pyramid 1.1.  """
 
     manager = manager # for testing injection
     venusian = venusian # for testing injection
@@ -290,7 +291,7 @@ class Configurator(object):
                  session_factory=None,
                  default_view_mapper=None,
                  autocommit=False,
-                 httpexception_view=default_httpexception_view,
+                 exceptionresponse_view=default_exceptionresponse_view,
                  ):
         if package is None:
             package = caller_package()
@@ -316,7 +317,7 @@ class Configurator(object):
                 default_permission=default_permission,
                 session_factory=session_factory,
                 default_view_mapper=default_view_mapper,
-                httpexception_view=httpexception_view,
+                exceptionresponse_view=exceptionresponse_view,
                 )
 
     def _set_settings(self, mapping):
@@ -674,7 +675,7 @@ class Configurator(object):
                        locale_negotiator=None, request_factory=None,
                        renderer_globals_factory=None, default_permission=None,
                        session_factory=None, default_view_mapper=None,
-                       httpexception_view=default_httpexception_view):
+                       exceptionresponse_view=default_exceptionresponse_view):
         """ When you pass a non-``None`` ``registry`` argument to the
         :term:`Configurator` constructor, no initial 'setup' is performed
         against the registry.  This is because the registry you pass in may
@@ -704,11 +705,9 @@ class Configurator(object):
                                         authorization_policy)
         for name, renderer in renderers:
             self.add_renderer(name, renderer)
-        self.add_view(default_exceptionresponse_view,
-                      context=IExceptionResponse)
-        if httpexception_view is not None:
-            httpexception_view = self.maybe_dotted(httpexception_view)
-            self.add_view(httpexception_view, context=HTTPException)
+        if exceptionresponse_view is not None:
+            exceptionresponse_view = self.maybe_dotted(exceptionresponse_view)
+            self.add_view(exceptionresponse_view, context=IExceptionResponse)
         if locale_negotiator:
             locale_negotiator = self.maybe_dotted(locale_negotiator)
             registry.registerUtility(locale_negotiator, ILocaleNegotiator)
@@ -724,7 +723,7 @@ class Configurator(object):
         if session_factory is not None:
             self.set_session_factory(session_factory)
         # commit before adding default_view_mapper, as the
-        # default_exceptionresponse_view above requires the superdefault view
+        # exceptionresponse_view above requires the superdefault view
         # mapper
         self.commit()
         if default_view_mapper is not None:
@@ -2703,7 +2702,7 @@ class MultiView(object):
                 return view
             if view.__predicated__(context, request):
                 return view
-        raise PredicateMismatch(self.name)
+        raise PredicateMismatch(self.name).exception
 
     def __permitted__(self, context, request):
         view = self.match(context, request)
@@ -2722,7 +2721,7 @@ class MultiView(object):
                 return view(context, request)
             except PredicateMismatch:
                 continue
-        raise PredicateMismatch(self.name)
+        raise PredicateMismatch(self.name).exception
 
 def wraps_view(wrapped):
     def inner(self, view):
@@ -2845,7 +2844,7 @@ class ViewDeriver(object):
                     return view(context, request)
                 msg = getattr(request, 'authdebug_message',
                               'Unauthorized: %s failed permission check' % view)
-                raise Forbidden(msg, result)
+                raise Forbidden(msg, result=result).exception
             _secured_view.__call_permissive__ = view
             _secured_view.__permitted__ = _permitted
             _secured_view.__permission__ = permission
@@ -2894,7 +2893,8 @@ class ViewDeriver(object):
         def predicate_wrapper(context, request):
             if all((predicate(context, request) for predicate in predicates)):
                 return view(context, request)
-            raise PredicateMismatch('predicate mismatch for view %s' % view)
+            raise PredicateMismatch(
+                'predicate mismatch for view %s' % view).exception
         def checker(context, request):
             return all((predicate(context, request) for predicate in
                         predicates))

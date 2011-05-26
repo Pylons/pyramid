@@ -1,6 +1,4 @@
-from cgi import escape
 from webob import Response
-from pyramid.httpexceptions import HTTPForbidden
 from pyramid.exceptions import Forbidden
 
 def x_view(request): # pragma: no cover
@@ -10,7 +8,7 @@ def forbidden_view(context, request):
      msg = context.message
      result = context.result
      message = msg + '\n' + str(result)
-     resp = HTTPForbidden()
+     resp = Forbidden()
      resp.body = message
      return resp
 

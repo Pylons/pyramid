@@ -8,7 +8,9 @@ from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
 
-from pyramid.httpexceptions import HTTPFound
+from pyramid.exceptions import HTTPFound
+from pyramid.exceptions import default_exceptionresponse_view
+from pyramid.exceptions import is_response # API
 from pyramid.renderers import RendererHelper
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
@@ -130,21 +132,6 @@ def render_view(context, request, name='', secure=True):
         return None
     return ''.join(iterable)
 
-def is_response(ob):
-    """ Return ``True`` if ``ob`` implements the interface implied by
-    :ref:`the_response`. ``False`` if not.
-
-    .. note:: This isn't a true interface or subclass check.  Instead, it's a
-        duck-typing check, as response objects are not obligated to be of a
-        particular class or provide any particular Zope interface."""
-
-    # response objects aren't obligated to implement a Zope interface,
-    # so we do it the hard way
-    if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
-         hasattr(ob, 'status') ):
-        return True
-    return False
-
 class view_config(object):
     """ A function, class or method :term:`decorator` which allows a
     developer to create view registrations nearer to a :term:`view
@@ -243,14 +230,6 @@ deprecated(
     'pyramid.view.view_config instead (API-compat, simple '
     'rename).')
 
-def default_exceptionresponse_view(context, request):
-    if not isinstance(context, Exception):
-        # backwards compat for an exception response view registered via
-        # config.set_notfound_view or config.set_forbidden_view
-        # instead of as a proper exception view
-        context = request.exception or context
-    return context
-
 class AppendSlashNotFoundViewFactory(object):
     """ There can only be one :term:`Not Found view` in any
     :app:`Pyramid` application.  Even if you use
@@ -273,7 +252,7 @@ class AppendSlashNotFoundViewFactory(object):
 
        from pyramid.exceptions import NotFound
        from pyramid.view import AppendSlashNotFoundViewFactory
-       from pyramid.httpexceptions import HTTPNotFound
+       from pyramid.exceptions import HTTPNotFound
 
        def notfound_view(context, request): return HTTPNotFound('nope')
 
@@ -294,7 +273,7 @@ class AppendSlashNotFoundViewFactory(object):
         if not isinstance(context, Exception):
             # backwards compat for an append_notslash_view registered via
             # config.set_notfound_view instead of as a proper exception view
-            context = request.exception
+            context = getattr(request, 'exception', None) or context
         path = request.path
         registry = request.registry
         mapper = registry.queryUtility(IRoutesMapper)
