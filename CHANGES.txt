@@ -236,6 +236,13 @@ Deprecations
 Behavior Changes
 ----------------
 
+- The default Mako renderer is now configured to escape all HTML in
+  expression tags. This is intended to help prevent XSS attacks caused by
+  rendering unsanitized input from users. To revert this behavior in user's
+  templates, they need to filter the expression through the 'n' filter.
+  For example, ${ myhtml | n }.
+  See https://github.com/Pylons/pyramid/issues/193.
+
 - A custom request factory is now required to return a response object that
   has a ``response`` attribute (or "reified"/lazy property) if they the
   request is meant to be used in a view that uses a renderer.  This
