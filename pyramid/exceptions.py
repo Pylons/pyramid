@@ -246,9 +246,9 @@ ${body}''')
     def _default_app_iter(self):
         # This is a generator which defers the creation of the response page
         # body; we use a generator because we want to ensure that if
-        # attributes of this response are changed after it is constructed we
+        # attributes of this response are changed after it is constructed, we
         # use the changed values rather than the values at time of construction
-        # (e.g. self.content_type).
+        # (e.g. self.content_type or self.charset).
         html_comment = ''
         comment = self.comment or ''
         if 'html' in self.content_type or '':
