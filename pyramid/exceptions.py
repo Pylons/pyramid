@@ -220,7 +220,6 @@ ${body}''')
 
     ## Set this to True for responses that should have no request body
     empty_body = False
-    _default_called = False
 
     def __init__(self, detail=None, headers=None, comment=None,
                  body_template=None, **kw):
@@ -239,14 +238,17 @@ ${body}''')
             del self.content_type
             del self.content_length
         elif not ('unicode_body' in kw or 'body' in kw or 'app_iter' in kw):
-            self.app_iter = iter(self._default_app_iter, None)
+            self.app_iter = self._default_app_iter()
 
     def __str__(self):
         return self.detail or self.explanation
 
     def _default_app_iter(self):
-        if self._default_called:
-            return None
+        # This is a generator which defers the creation of the response page
+        # body; we use a generator because we want to ensure that if
+        # attributes of this response are changed after it is constructed we
+        # use the changed values rather than the values at time of construction
+        # (e.g. self.content_type).
         html_comment = ''
         comment = self.comment or ''
         if 'html' in self.content_type or '':
@@ -281,8 +283,8 @@ ${body}''')
         page = page_template.substitute(status=self.status, body=body)
         if isinstance(page, unicode):
             page = page.encode(self.charset)
-        self._default_called = True
-        return page
+        yield page
+        raise StopIteration
 
     def wsgi_response(self):
         return self
