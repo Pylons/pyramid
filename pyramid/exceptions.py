@@ -182,7 +182,7 @@ class WSGIHTTPException(Response, HTTPException):
     #     on request environ
     #
     #   - doesn't add request.environ keys to template substitutions unless
-    #     'request' is passed as a keyword argument.
+    #     'request' is passed as a constructor keyword argument.
     #
     # - doesn't use "strip_tags" (${br} placeholder for <br/>, no other html
     #   in default body template)
