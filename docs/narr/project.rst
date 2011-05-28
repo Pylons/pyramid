@@ -628,7 +628,7 @@ implementations.
 ``production.ini``
 ~~~~~~~~~~~~~~~~~~~
 
-The ``development.ini`` file is a :term:`PasteDeploy` configuration file with
+The ``production.ini`` file is a :term:`PasteDeploy` configuration file with
 a purpose much like that of ``development.ini``.  However, it disables the
 WebError interactive debugger, replacing it with a logger which outputs
 exception messages to ``stderr`` by default.  It also turns off template
