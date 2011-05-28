@@ -84,6 +84,12 @@ class HTTPNotFound(_HTTPNotFound):
         _HTTPNotFound.__init__(self, detail=detail, headers=headers,
                                comment=comment, body_template=body_template,
                                **kw)
+        if not ('body' in kw or 'app_iter' in kw):
+            if not self.empty_body:
+                body = self.html_body(self.environ)
+                if isinstance(body, unicode):
+                    body = body.encode(self.charset)
+                self.body = body
 
 class HTTPForbidden(_HTTPForbidden):
     """
@@ -114,6 +120,12 @@ class HTTPForbidden(_HTTPForbidden):
         _HTTPForbidden.__init__(self, detail=detail, headers=headers,
                                 comment=comment, body_template=body_template,
                                 **kw)
+        if not ('body' in kw or 'app_iter' in kw):
+            if not self.empty_body:
+                body = self.html_body(self.environ)
+                if isinstance(body, unicode):
+                    body = body.encode(self.charset)
+                self.body = body
 
 NotFound = HTTPNotFound # bw compat
 Forbidden = HTTPForbidden # bw compat
