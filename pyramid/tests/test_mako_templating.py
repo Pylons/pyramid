@@ -354,6 +354,11 @@ class TestIntegration(unittest.TestCase):
         self.assertRaises(TemplateLookupException, render,
                           'helloworld_not_here.mak', {})
 
+    def test_template_default_escaping(self):
+        from pyramid.renderers import render
+        result = render('nonminimal.mak', {'name':'<b>fred</b>'}).replace('\r','')
+        self.assertEqual(result, u'Hello, &lt;b&gt;fred&lt;/b&gt;!\n')
+
 class TestPkgResourceTemplateLookup(unittest.TestCase):
     def _makeOne(self, **kw):
         from pyramid.mako_templating import PkgResourceTemplateLookup
