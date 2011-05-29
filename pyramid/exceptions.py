@@ -2,14 +2,13 @@
 HTTP Exceptions
 ---------------
 
-This module contains Python exceptions that relate to HTTP status codes by
-defining a set of classes, all subclasses of HTTPException.  Each
-exception, in addition to being a Python exception that can be raised and
-caught, is also a ``Response`` object.
+This module contains Pyramid HTTP exception classes.  Each class relates to a
+single HTTP status code.  Each class is a subclass of the `~HTTPException`.
+Each exception class is also a :term:`response` object.
 
-This module defines exceptions according to RFC 2068 [1]_ : codes with
-100-300 are not really errors; 400's are client errors, and 500's are
-server errors.  
+Each exception class has a status code according to `RFC 2068
+<http://www.ietf.org/rfc/rfc2068.txt>`: codes with 100-300 are not really
+errors; 400's are client errors, and 500's are server errors.
 
 Exception
   HTTPException
@@ -69,12 +68,12 @@ Each HTTP exception has the following attributes:
    ``explanation``
        a plain-text explanation of the error message that is
        not subject to environment or header substitutions;
-       it is accessible in the template via %(explanation)s
+       it is accessible in the template via ${explanation}
 
    ``detail``
        a plain-text message customization that is not subject
        to environment or header substitutions; accessible in
-       the template via %(detail)s
+       the template via ${detail}
 
    ``body_template``
        a content fragment (in HTML) used for environment and
@@ -98,8 +97,9 @@ Each HTTP exception accepts the following parameters:
      a string.Template object containing a content fragment in HTML
      that frames the explanation and further detail
 
-Substitution of environment variables and headers into template values is
-performed if a ``request`` is passed to the exception constructor.
+Substitution of response headers into template values is always performed.
+Substitution of WSGI environment values is performed if a ``request`` is
+passed to the exception's constructor.
 
 The subclasses of :class:`~_HTTPMove` 
 (:class:`~HTTPMultipleChoices`, :class:`~HTTPMovedPermanently`,
@@ -107,22 +107,18 @@ The subclasses of :class:`~_HTTPMove`
 :class:`~HTTPTemporaryRedirect`) are redirections that require a ``Location`` 
 field. Reflecting this, these subclasses have one additional keyword argument:
 ``location``, which indicates the location to which to redirect.
-
-References:
-
-.. [1] http://www.python.org/peps/pep-0333.html#error-handling
 """
 
 import types
 from string import Template
 from webob import Response
-from webob import html_escape
+from webob import html_escape as _html_escape
 
 from zope.configuration.exceptions import ConfigurationError as ZCE
 from zope.interface import implements
 from pyramid.interfaces import IExceptionResponse
 
-def no_escape(value):
+def _no_escape(value):
     if value is None:
         return ''
     if not isinstance(value, basestring):
@@ -227,15 +223,15 @@ ${body}''')
         html_comment = ''
         comment = self.comment or ''
         if 'html' in self.content_type or '':
-            escape = html_escape
+            escape = _html_escape
             page_template = self.html_template_obj
             br = '<br/>'
             if comment:
                 html_comment = '<!-- %s -->' % escape(comment)
         else:
-            escape = no_escape
+            escape = _no_escape
             page_template = self.plain_template_obj
-            br = '\n'
+            br = '\r\n'
             if comment:
                 html_comment = escape(comment)
         args = {
@@ -262,14 +258,13 @@ ${body}''')
         raise StopIteration
 
     def wsgi_response(self):
+        # bw compat only
         return self
-
     wsgi_response = property(wsgi_response)
 
     def exception(self):
-        # bw compat
+        # bw compat only
         return self
-
     exception = property(exception)
 
 class HTTPError(WSGIHTTPException):
@@ -407,7 +402,7 @@ class _HTTPMove(HTTPRedirection):
     # - location keyword arg defaults to ''
     #
     # - ``add_slash`` argument is no longer accepted:  code that passes
-    #   add_slash argument will receive an exception.
+    #   add_slash argument to the constructor will receive an exception.
     explanation = 'The resource has been moved to'
     body_template_obj = Template('''\
 ${explanation} ${location};
@@ -534,8 +529,8 @@ class HTTPClientError(HTTPError):
     """
     code = 400
     title = 'Bad Request'
-    explanation = ('The server could not comply with the request since\r\n'
-                   'it is either malformed or otherwise incorrect.\r\n')
+    explanation = ('The server could not comply with the request since '
+                   'it is either malformed or otherwise incorrect.')
 
 class HTTPBadRequest(HTTPClientError):
     pass
@@ -551,10 +546,10 @@ class HTTPUnauthorized(HTTPClientError):
     code = 401
     title = 'Unauthorized'
     explanation = (
-        'This server could not verify that you are authorized to\r\n'
-        'access the document you requested.  Either you supplied the\r\n'
-        'wrong credentials (e.g., bad password), or your browser\r\n'
-        'does not understand how to supply the credentials required.\r\n')
+        'This server could not verify that you are authorized to '
+        'access the document you requested.  Either you supplied the '
+        'wrong credentials (e.g., bad password), or your browser '
+        'does not understand how to supply the credentials required.')
 
 class HTTPPaymentRequired(HTTPClientError):
     """
@@ -587,9 +582,9 @@ class HTTPForbidden(HTTPClientError):
     special keyword argument, ``result`` is usually an instance of
     :class:`pyramid.security.Denied` or :class:`pyramid.security.ACLDenied`
     each of which indicates a reason for the forbidden error.  However,
-    ``result`` is also permitted to be just a plain boolean ``False`` object.
-    The ``result`` value will be used as the ``result`` attribute of the
-    exception object.  It defaults to ``None``.
+    ``result`` is also permitted to be just a plain boolean ``False`` object
+    or ``None``.  The ``result`` value will be used as the ``result``
+    attribute of the exception object.  It defaults to ``None``.
 
     The :term:`Forbidden View` can use the attributes of a Forbidden
     exception as necessary to provide extended information in an error
@@ -895,8 +890,8 @@ class HTTPServerError(HTTPError):
     code = 500
     title = 'Internal Server Error'
     explanation = (
-      'The server has either erred or is incapable of performing\r\n'
-      'the requested operation.\r\n')
+      'The server has either erred or is incapable of performing '
+      'the requested operation.')
 
 class HTTPInternalServerError(HTTPServerError):
     pass
@@ -987,19 +982,6 @@ class HTTPInsufficientStorage(HTTPServerError):
     title = 'Insufficient Storage'
     explanation = ('There was not enough space to save the resource')
 
-__all__ = ['status_map']
-status_map={}
-for name, value in globals().items():
-    if (isinstance(value, (type, types.ClassType)) and
-        issubclass(value, HTTPException)
-        and not name.startswith('_')):
-        __all__.append(name)
-        if getattr(value, 'code', None):
-            status_map[value.code]=value
-        if hasattr(value, 'explanation'):
-            value.explanation = ' '.join(value.explanation.strip().split())
-del name, value
-
 NotFound = HTTPNotFound # bw compat
 Forbidden = HTTPForbidden # bw compat
 
@@ -1060,6 +1042,13 @@ def default_exceptionresponse_view(context, request):
     # WSGIHTTPException, a Response (2.5+)
     return context
 
-__all__.extend(['NotFound', 'Forbidden', 'PredicateMismatch', 'URLDecodeError',
-                'ConfigurationError', 'abort', 'redirect',
-                'default_exceptionresponse_view'])
+status_map={}
+for name, value in globals().items():
+    if (isinstance(value, (type, types.ClassType)) and
+        issubclass(value, HTTPException)
+        and not name.startswith('_')):
+        code = getattr(value, 'code', None)
+        if code:
+            status_map[code] = value
+del name, value
+
