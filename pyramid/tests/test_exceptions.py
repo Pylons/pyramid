@@ -94,10 +94,10 @@ class Test_default_exceptionresponse_view(unittest.TestCase):
         result = self._callFUT(None, request)
         self.assertEqual(result, context)
 
-class Test_no_escape(unittest.TestCase):
+class Test__no_escape(unittest.TestCase):
     def _callFUT(self, val):
-        from pyramid.exceptions import no_escape
-        return no_escape(val)
+        from pyramid.exceptions import _no_escape
+        return _no_escape(val)
 
     def test_null(self):
         self.assertEqual(self._callFUT(None), '')
@@ -111,6 +111,103 @@ class Test_no_escape(unittest.TestCase):
                 return u'42'
         duo = DummyUnicodeObject()
         self.assertEqual(self._callFUT(duo), u'42')
+
+class TestWSGIHTTPException(unittest.TestCase):
+    def _getTargetClass(self):
+        from pyramid.exceptions import WSGIHTTPException
+        return WSGIHTTPException
+
+    def _makeOne(self, *arg, **kw):
+        cls = self._getTargetClass()
+        return cls(*arg, **kw)
+
+    def test_ctor_sets_detail(self):
+        exc = self._makeOne('message')
+        self.assertEqual(exc.detail, 'message')
+
+    def test_ctor_sets_comment(self):
+        exc = self._makeOne(comment='comment')
+        self.assertEqual(exc.comment, 'comment')
+
+    def test_ctor_calls_Exception_ctor(self):
+        exc = self._makeOne('message')
+        self.assertEqual(exc.message, 'message')
+
+    def test_ctor_calls_Response_ctor(self):
+        exc = self._makeOne('message')
+        self.assertEqual(exc.status, 'None None')
+
+    def test_ctor_extends_headers(self):
+        exc = self._makeOne(headers=[('X-Foo', 'foo')])
+        self.assertEqual(exc.headers.get('X-Foo'), 'foo')
+
+    def test_ctor_sets_body_template_obj(self):
+        exc = self._makeOne(body_template='${foo}')
+        self.assertEqual(
+            exc.body_template_obj.substitute({'foo':'foo'}), 'foo')
+
+    def test_ctor_with_empty_body(self):
+        cls = self._getTargetClass()
+        class Subclass(cls):
+            empty_body = True
+        exc = Subclass()
+        self.assertEqual(exc.content_type, None)
+        self.assertEqual(exc.content_length, None)
+
+    def test_ctor_with_body_doesnt_set_default_app_iter(self):
+        exc = self._makeOne(body='123')
+        self.assertEqual(exc.app_iter, ['123'])
+
+    def test_ctor_with_unicode_body_doesnt_set_default_app_iter(self):
+        exc = self._makeOne(unicode_body=u'123')
+        self.assertEqual(exc.app_iter, ['123'])
+
+    def test_ctor_with_app_iter_doesnt_set_default_app_iter(self):
+        exc = self._makeOne(app_iter=['123'])
+        self.assertEqual(exc.app_iter, ['123'])
+
+    def test_ctor_with_body_sets_default_app_iter_html(self):
+        cls = self._getTargetClass()
+        class Subclass(cls):
+            code = '200'
+            title = 'OK'
+            explanation = 'explanation'
+        exc = Subclass('detail')
+        body = list(exc.app_iter)[0]
+        self.assertTrue(body.startswith('<html'))
+        self.assertTrue('200 OK' in body)
+        self.assertTrue('explanation' in body)
+        self.assertTrue('detail' in body)
+        
+    def test_ctor_with_body_sets_default_app_iter_text(self):
+        cls = self._getTargetClass()
+        class Subclass(cls):
+            code = '200'
+            title = 'OK'
+            explanation = 'explanation'
+        exc = Subclass('detail')
+        exc.content_type = 'text/plain'
+        body = list(exc.app_iter)[0]
+        self.assertEqual(body, '200 OK\n\nexplanation\n\n\ndetail\n\n')
+
+    def test__str__detail(self):
+        exc = self._makeOne()
+        exc.detail = 'abc'
+        self.assertEqual(str(exc), 'abc')
+        
+    def test__str__explanation(self):
+        exc = self._makeOne()
+        exc.explanation = 'def'
+        self.assertEqual(str(exc), 'def')
+
+    def test_wsgi_response(self):
+        exc = self._makeOne()
+        self.assertTrue(exc is exc.wsgi_response)
+
+    def test_exception(self):
+        exc = self._makeOne()
+        self.assertTrue(exc is exc.exception)
+        
 
 class DummyRequest(object):
     exception = None

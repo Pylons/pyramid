@@ -222,7 +222,8 @@ ${body}''')
         # (e.g. self.content_type or self.charset).
         html_comment = ''
         comment = self.comment or ''
-        if 'html' in self.content_type or '':
+        content_type = self.content_type or ''
+        if 'html' in content_type:
             escape = _html_escape
             page_template = self.html_template_obj
             br = '<br/>'
@@ -231,7 +232,7 @@ ${body}''')
         else:
             escape = _no_escape
             page_template = self.plain_template_obj
-            br = '\r\n'
+            br = '\n'
             if comment:
                 html_comment = escape(comment)
         args = {
@@ -257,15 +258,11 @@ ${body}''')
         yield page
         raise StopIteration
 
-    def wsgi_response(self):
-        # bw compat only
-        return self
-    wsgi_response = property(wsgi_response)
-
+    @property
     def exception(self):
         # bw compat only
         return self
-    exception = property(exception)
+    wsgi_response = exception # bw compat only
 
 class HTTPError(WSGIHTTPException):
     """
