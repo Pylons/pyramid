@@ -2702,7 +2702,7 @@ class MultiView(object):
                 return view
             if view.__predicated__(context, request):
                 return view
-        raise PredicateMismatch(self.name).exception
+        raise PredicateMismatch(self.name)
 
     def __permitted__(self, context, request):
         view = self.match(context, request)
@@ -2721,7 +2721,7 @@ class MultiView(object):
                 return view(context, request)
             except PredicateMismatch:
                 continue
-        raise PredicateMismatch(self.name).exception
+        raise PredicateMismatch(self.name)
 
 def wraps_view(wrapped):
     def inner(self, view):
@@ -2844,7 +2844,7 @@ class ViewDeriver(object):
                     return view(context, request)
                 msg = getattr(request, 'authdebug_message',
                               'Unauthorized: %s failed permission check' % view)
-                raise Forbidden(msg, result=result).exception
+                raise Forbidden(msg, result=result)
             _secured_view.__call_permissive__ = view
             _secured_view.__permitted__ = _permitted
             _secured_view.__permission__ = permission
@@ -2894,7 +2894,7 @@ class ViewDeriver(object):
             if all((predicate(context, request) for predicate in predicates)):
                 return view(context, request)
             raise PredicateMismatch(
-                'predicate mismatch for view %s' % view).exception
+                'predicate mismatch for view %s' % view)
         def checker(context, request):
             return all((predicate(context, request) for predicate in
                         predicates))

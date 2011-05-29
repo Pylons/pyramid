@@ -31,19 +31,17 @@ class Test_abort(unittest.TestCase):
 
     def test_status_404(self):
         from pyramid.exceptions import HTTPNotFound
-        self.assertRaises(HTTPNotFound().exception.__class__,
-                          self._callFUT, 404)
+        self.assertRaises(HTTPNotFound, self._callFUT, 404)
 
     def test_status_201(self):
         from pyramid.exceptions import HTTPCreated
-        self.assertRaises(HTTPCreated().exception.__class__,
-                          self._callFUT, 201)
+        self.assertRaises(HTTPCreated, self._callFUT, 201)
 
     def test_extra_kw(self):
         from pyramid.exceptions import HTTPNotFound
         try:
             self._callFUT(404,  headers=[('abc', 'def')])
-        except HTTPNotFound().exception.__class__, exc:
+        except HTTPNotFound, exc:
             self.assertEqual(exc.headers['abc'], 'def')
         else: # pragma: no cover
             raise AssertionError
@@ -57,7 +55,7 @@ class Test_redirect(unittest.TestCase):
         from pyramid.exceptions import HTTPFound
         try:
             self._callFUT('http://example.com')
-        except HTTPFound().exception.__class__, exc:
+        except HTTPFound, exc:
             self.assertEqual(exc.location, 'http://example.com')
             self.assertEqual(exc.status, '302 Found')
 
@@ -65,7 +63,7 @@ class Test_redirect(unittest.TestCase):
         from pyramid.exceptions import HTTPMovedPermanently
         try:
             self._callFUT('http://example.com', 301)
-        except HTTPMovedPermanently().exception.__class__, exc:
+        except HTTPMovedPermanently, exc:
             self.assertEqual(exc.location, 'http://example.com')
             self.assertEqual(exc.status, '301 Moved Permanently')
         
@@ -73,7 +71,7 @@ class Test_redirect(unittest.TestCase):
         from pyramid.exceptions import HTTPFound
         try:
             self._callFUT('http://example.com', headers=[('abc', 'def')])
-        except HTTPFound().exception.__class__, exc:
+        except HTTPFound, exc:
             self.assertEqual(exc.location, 'http://example.com')
             self.assertEqual(exc.status, '302 Found')
             self.assertEqual(exc.headers['abc'], 'def')

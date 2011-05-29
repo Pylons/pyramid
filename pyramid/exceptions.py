@@ -122,8 +122,6 @@ from zope.configuration.exceptions import ConfigurationError as ZCE
 from zope.interface import implements
 from pyramid.interfaces import IExceptionResponse
 
-newstyle_exceptions = issubclass(Exception, object)
-
 def no_escape(value):
     if value is None:
         return ''
@@ -135,37 +133,10 @@ def no_escape(value):
     return value
 
 class HTTPException(Exception):
-    implements(IExceptionResponse)
-    """
-    Exception used on pre-Python-2.5, where new-style classes cannot be used as
-    an exception.
-    """
-
-    def __init__(self, message, wsgi_response):
-        self.message = message
-        Exception.__init__(self, message)
-        self.__dict__['wsgi_response'] = wsgi_response
-
-    def exception(self):
-        return self
-
-    exception = property(exception)
-
-    # for old style exceptions
-    if not newstyle_exceptions:  #pragma NO COVERAGE
-        def __getattr__(self, attr):
-            if not attr.startswith('_'):
-                return getattr(self.wsgi_response, attr)
-            else:
-                raise AttributeError(attr)
-
-        def __setattr__(self, attr, value):
-            if attr.startswith('_') or attr in ('args',):
-                self.__dict__[attr] = value
-            else:
-                setattr(self.wsgi_response, attr, value)
+    pass
 
 class WSGIHTTPException(Response, HTTPException):
+    implements(IExceptionResponse)
 
     ## You should set in subclasses:
     # code = 200
@@ -193,6 +164,10 @@ class WSGIHTTPException(Response, HTTPException):
     # - explicitly sets self.message = detail to prevent whining by Python
     #   2.6.5+ Exception.message
     #
+    # - its base class of HTTPException is no longer a Python 2.4 compatibility
+    #   shim; it's purely a base class that inherits from Exception.  This
+    #   implies that this class' ``exception`` property always returns
+    #   ``self`` (only for bw compat at this point).
     code = None
     title = None
     explanation = ''
@@ -292,10 +267,8 @@ ${body}''')
     wsgi_response = property(wsgi_response)
 
     def exception(self):
-        if newstyle_exceptions:
-            return self
-        else:
-            return HTTPException(self.detail, self)
+        # bw compat
+        return self
 
     exception = property(exception)
 
@@ -1063,7 +1036,7 @@ def abort(status_code, **kw):
         abort(404) # raises an HTTPNotFound exception.
     """
     exc = status_map[status_code](**kw)
-    raise exc.exception
+    raise exc
 
 
 def redirect(url, code=302, **kw):
@@ -1076,7 +1049,7 @@ def redirect(url, code=302, **kw):
 
     """
     exc = status_map[code]
-    raise exc(location=url, **kw).exception
+    raise exc(location=url, **kw)
 
 def default_exceptionresponse_view(context, request):
     if not isinstance(context, Exception):
