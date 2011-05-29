@@ -3,8 +3,9 @@ HTTP Exceptions
 ---------------
 
 This module contains Pyramid HTTP exception classes.  Each class relates to a
-single HTTP status code.  Each class is a subclass of the `~HTTPException`.
-Each exception class is also a :term:`response` object.
+single HTTP status code.  Each class is a subclass of the
+:class:`~HTTPException`.  Each exception class is also a :term:`response`
+object.
 
 Each exception class has a status code according to `RFC 2068
 <http://www.ietf.org/rfc/rfc2068.txt>`: codes with 100-300 are not really
@@ -76,10 +77,10 @@ Each HTTP exception has the following attributes:
        the template via ${detail}
 
    ``body_template``
-       a content fragment (in HTML) used for environment and
-       header substitution; the default template includes both
+       a ``String.template``-format content fragment used for environment
+       and header substitution; the default template includes both
        the explanation and further detail provided in the
-       message
+       message.
 
 Each HTTP exception accepts the following parameters:
 
@@ -94,7 +95,7 @@ Each HTTP exception accepts the following parameters:
      usually stripped/hidden for end-users
 
    ``body_template``
-     a string.Template object containing a content fragment in HTML
+     a ``string.Template`` object containing a content fragment in HTML
      that frames the explanation and further detail
 
 Substitution of response headers into template values is always performed.
@@ -108,15 +109,14 @@ The subclasses of :class:`~_HTTPMove`
 field. Reflecting this, these subclasses have one additional keyword argument:
 ``location``, which indicates the location to which to redirect.
 """
-
 import types
 from string import Template
-from webob import Response
 from webob import html_escape as _html_escape
-
 from zope.configuration.exceptions import ConfigurationError as ZCE
 from zope.interface import implements
+
 from pyramid.interfaces import IExceptionResponse
+from pyramid.response import Response
 
 def _no_escape(value):
     if value is None:
@@ -1008,23 +1008,27 @@ class ConfigurationError(ZCE):
 
 
 def abort(status_code, **kw):
-    """Aborts the request immediately by raising an HTTP exception.  The
-    values in ``*kw`` will be passed to the HTTP exception constructor.
-    Example::
+    """Aborts the request immediately by raising an HTTP exception based on a
+    status code. Example::
 
         abort(404) # raises an HTTPNotFound exception.
+
+    The values passed as ``kw`` are provided to the exception's constructor.
     """
     exc = status_map[status_code](**kw)
     raise exc
 
 
 def redirect(url, code=302, **kw):
-    """Raises a redirect exception to the specified URL.
+    """Raises an :class:`~HTTPFound` (302) redirect exception to the
+    URL specified by ``url``.
 
     Optionally, a code variable may be passed with the status code of
     the redirect, ie::
 
         redirect(route_url('foo', request), code=303)
+
+    The values passed as ``kw`` are provided to the exception constructor.
 
     """
     exc = status_map[code]
