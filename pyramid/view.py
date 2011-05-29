@@ -10,7 +10,6 @@ from pyramid.interfaces import IViewClassifier
 
 from pyramid.exceptions import HTTPFound
 from pyramid.exceptions import default_exceptionresponse_view
-from pyramid.exceptions import is_response # API
 from pyramid.renderers import RendererHelper
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
@@ -312,4 +311,18 @@ See also :ref:`changing_the_notfound_view`.
 
 """
 
+def is_response(ob):
+    """ Return ``True`` if ``ob`` implements the interface implied by
+    :ref:`the_response`. ``False`` if not.
+
+    .. note:: This isn't a true interface or subclass check.  Instead, it's a
+        duck-typing check, as response objects are not obligated to be of a
+        particular class or provide any particular Zope interface."""
+
+    # response objects aren't obligated to implement a Zope interface,
+    # so we do it the hard way
+    if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
+         hasattr(ob, 'status') ):
+        return True
+    return False
 
