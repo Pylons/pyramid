@@ -117,6 +117,17 @@ class TestWSGIHTTPException(unittest.TestCase):
         from pyramid.exceptions import WSGIHTTPException
         return WSGIHTTPException
 
+    def _getTargetSubclass(self, code='200', title='OK',
+                           explanation='explanation', empty_body=False):
+        cls = self._getTargetClass()
+        class Subclass(cls):
+            pass
+        Subclass.empty_body = empty_body
+        Subclass.code = code
+        Subclass.title = title
+        Subclass.explanation = explanation
+        return Subclass
+
     def _makeOne(self, *arg, **kw):
         cls = self._getTargetClass()
         return cls(*arg, **kw)
@@ -147,10 +158,8 @@ class TestWSGIHTTPException(unittest.TestCase):
             exc.body_template_obj.substitute({'foo':'foo'}), 'foo')
 
     def test_ctor_with_empty_body(self):
-        cls = self._getTargetClass()
-        class Subclass(cls):
-            empty_body = True
-        exc = Subclass()
+        cls = self._getTargetSubclass(empty_body=True)
+        exc = cls()
         self.assertEqual(exc.content_type, None)
         self.assertEqual(exc.content_length, None)
 
@@ -167,12 +176,8 @@ class TestWSGIHTTPException(unittest.TestCase):
         self.assertEqual(exc.app_iter, ['123'])
 
     def test_ctor_with_body_sets_default_app_iter_html(self):
-        cls = self._getTargetClass()
-        class Subclass(cls):
-            code = '200'
-            title = 'OK'
-            explanation = 'explanation'
-        exc = Subclass('detail')
+        cls = self._getTargetSubclass()
+        exc = cls('detail')
         body = list(exc.app_iter)[0]
         self.assertTrue(body.startswith('<html'))
         self.assertTrue('200 OK' in body)
@@ -180,12 +185,8 @@ class TestWSGIHTTPException(unittest.TestCase):
         self.assertTrue('detail' in body)
         
     def test_ctor_with_body_sets_default_app_iter_text(self):
-        cls = self._getTargetClass()
-        class Subclass(cls):
-            code = '200'
-            title = 'OK'
-            explanation = 'explanation'
-        exc = Subclass('detail')
+        cls = self._getTargetSubclass()
+        exc = cls('detail')
         exc.content_type = 'text/plain'
         body = list(exc.app_iter)[0]
         self.assertEqual(body, '200 OK\n\nexplanation\n\n\ndetail\n\n')
@@ -207,8 +208,110 @@ class TestWSGIHTTPException(unittest.TestCase):
     def test_exception(self):
         exc = self._makeOne()
         self.assertTrue(exc is exc.exception)
-        
 
+    def test__default_app_iter_no_comment_plain(self):
+        cls = self._getTargetSubclass()
+        exc = cls()
+        exc.content_type = 'text/plain'
+        body = list(exc._default_app_iter())[0]
+        self.assertEqual(body, '200 OK\n\nexplanation\n\n\n\n\n')
+
+    def test__default_app_iter_with_comment_plain(self):
+        cls = self._getTargetSubclass()
+        exc = cls(comment='comment')
+        exc.content_type = 'text/plain'
+        body = list(exc._default_app_iter())[0]
+        self.assertEqual(body, '200 OK\n\nexplanation\n\n\n\ncomment\n')
+        
+    def test__default_app_iter_no_comment_html(self):
+        cls = self._getTargetSubclass()
+        exc = cls()
+        exc.content_type = 'text/html'
+        body = list(exc._default_app_iter())[0]
+        self.assertFalse('<!-- ' in body)
+
+    def test__default_app_iter_with_comment_html(self):
+        cls = self._getTargetSubclass()
+        exc = cls(comment='comment & comment')
+        exc.content_type = 'text/html'
+        body = list(exc._default_app_iter())[0]
+        self.assertTrue('<!-- comment &amp; comment -->' in body)
+
+    def test_custom_body_template_no_environ(self):
+        cls = self._getTargetSubclass()
+        exc = cls(body_template='${location}', location='foo')
+        exc.content_type = 'text/plain'
+        body = list(exc._default_app_iter())[0]
+        self.assertEqual(body, '200 OK\n\nfoo')
+
+    def test_custom_body_template_with_environ(self):
+        cls = self._getTargetSubclass()
+        from pyramid.request import Request
+        request = Request.blank('/')
+        exc = cls(body_template='${REQUEST_METHOD}', request=request)
+        exc.content_type = 'text/plain'
+        body = list(exc._default_app_iter())[0]
+        self.assertEqual(body, '200 OK\n\nGET')
+
+    def test_body_template_unicode(self):
+        from pyramid.request import Request
+        cls = self._getTargetSubclass()
+        la = unicode('/La Pe\xc3\xb1a', 'utf-8')
+        request = Request.blank('/')
+        request.environ['unicodeval'] = la
+        exc = cls(body_template='${unicodeval}', request=request)
+        exc.content_type = 'text/plain'
+        body = list(exc._default_app_iter())[0]
+        self.assertEqual(body, '200 OK\n\n/La Pe\xc3\xb1a')
+
+class TestRenderAllExceptionsWithoutArguments(unittest.TestCase):
+    def _doit(self, content_type):
+        from pyramid.exceptions import status_map
+        L = []
+        self.assertTrue(status_map)
+        for v in status_map.values():
+            exc = v()
+            exc.content_type = content_type
+            result = list(exc.app_iter)[0]
+            if exc.empty_body:
+                self.assertEqual(result, '')
+            else:
+                self.assertTrue(exc.status in result)
+            L.append(result)
+        self.assertEqual(len(L), len(status_map))
+            
+    def test_it_plain(self):
+        self._doit('text/plain')
+
+    def test_it_html(self):
+        self._doit('text/html')
+
+class Test_HTTPMove(unittest.TestCase):
+    def _makeOne(self, *arg, **kw):
+        from pyramid.exceptions import _HTTPMove
+        return _HTTPMove(*arg, **kw)
+
+    def test_it_location_not_passed(self):
+        exc = self._makeOne()
+        self.assertEqual(exc.location, '')
+
+    def test_it_location_passed(self):
+        exc = self._makeOne(location='foo')
+        self.assertEqual(exc.location, 'foo')
+
+class TestHTTPForbidden(unittest.TestCase):
+    def _makeOne(self, *arg, **kw):
+        from pyramid.exceptions import HTTPForbidden
+        return HTTPForbidden(*arg, **kw)
+
+    def test_it_result_not_passed(self):
+        exc = self._makeOne()
+        self.assertEqual(exc.result, None)
+
+    def test_it_result_passed(self):
+        exc = self._makeOne(result='foo')
+        self.assertEqual(exc.result, 'foo')
+        
 class DummyRequest(object):
     exception = None
 
