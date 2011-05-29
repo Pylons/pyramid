@@ -32,10 +32,17 @@ Adding Authentication and Authorization Policies
 
 We'll change our package's ``__init__.py`` file to enable an
 ``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy`` to enable
-declarative security checking.  When you're done, your ``__init__.py`` will
-look like so:
+declarative security checking. We need to import the new policies:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
+   :lines: 4-5,8
+   :linenos:
+   :language: python
+
+Then, we'll add those policies to the configuration:
+
+.. literalinclude:: src/authorization/tutorial/__init__.py
+   :lines: 16-18,26-28
    :linenos:
    :language: python
 
@@ -45,6 +52,13 @@ an encryption key used by the "authentication ticket" machinery represented
 by this policy: it is required.  The ``callback`` is a reference to a
 ``groupfinder`` function in the ``tutorial`` package's ``security.py`` file.
 We haven't added that module yet, but we're about to.
+
+When you're done, your ``__init__.py`` will
+look like so:
+
+.. literalinclude:: src/authorization/tutorial/__init__.py
+   :linenos:
+   :language: python
 
 Adding ``security.py``
 ~~~~~~~~~~~~~~~~~~~~~~
