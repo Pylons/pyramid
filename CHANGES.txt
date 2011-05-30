@@ -104,12 +104,13 @@ Features
   section entitled "Static Routes" in the URL Dispatch narrative chapter for
   more information.
 
-- A default exception view for the context ``webob.exc.HTTPException`` (aka
-  ``pyramid.httpexceptions.HTTPException``) is now registered by default.
-  This means that an instance of any exception class imported from
-  ``pyramid.httpexceptions`` (such as ``HTTPFound``) can now be raised from
-  within view code; when raised, this exception view will render the
-  exception to a response.
+- A default exception view for the context
+  ``pyramid.interfaces.IExceptionResponse`` (aka
+  ``pyramid.response.Response`` or ``pyramid.httpexceptions.HTTPException``)
+  is now registered by default.  This means that an instance of any exception
+  response class imported from ``pyramid.httpexceptions`` (such as
+  ``HTTPFound``) can now be raised from within view code; when raised, this
+  exception view will render the exception to a response.
 
 - New functions named ``pyramid.httpexceptions.abort`` and
   ``pyramid.httpexceptions.redirect`` perform the equivalent of their Pylons
@@ -118,12 +119,18 @@ Features
   ``webob.exc.HTTPException``.
 
 - The Configurator now accepts an additional keyword argument named
-  ``httpexception_view``.  By default, this argument is populated with a
-  default exception view function that will be used when an HTTP exception is
-  raised.  When ``None`` is passed for this value, an exception view for HTTP
-  exceptions will not be registered.  Passing ``None`` returns the behavior
-  of raising an HTTP exception to that of Pyramid 1.0 (the exception will
-  propagate to middleware and to the WSGI server).
+  ``exceptionresponse_view``.  By default, this argument is populated with a
+  default exception view function that will be used when a response is raised
+  as an exception. When ``None`` is passed for this value, an exception view
+  for responses will not be registered.  Passing ``None`` returns the
+  behavior of raising an HTTP exception to that of Pyramid 1.0 (the exception
+  will propagate to middleware and to the WSGI server).
+
+- The ``pyramid.request.Request`` class now has a ``ResponseClass`` interface
+  which points at ``pyramid.response.Response``.
+
+- The ``pyramid.request.Response`` class now has a ``RequestClass`` interface
+  which points at ``pyramid.response.Request``.
 
 Bug Fixes
 ---------
@@ -288,6 +295,12 @@ Behavior Changes
   provides the same behavior.  ``pyramid.request.Request`` no longer
   implements its own ``__getattr__``, ``__setattr__`` or ``__delattr__`` as a
   result.
+
+- ``pyramid.response.Response`` is now a *subclass* of
+  ``webob.response.Response``.  It also inherits from the built-in Python
+  ``Exception`` class and implements the
+  ``pyramid.interfaces.IExceptionResponse`` class so it can be raised as an
+  exception from view code.
 
 Dependencies
 ------------

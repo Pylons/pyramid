@@ -260,12 +260,13 @@ class Configurator(object):
     If ``exceptionresponse_view`` is passed, it must be a :term:`view
     callable` or ``None``.  If it is a view callable, it will be used as an
     exception view callable when an :term:`exception response` is raised (any
-    named exception from the ``pyramid.exceptions`` module that begins with
-    ``HTTP`` as well as the ``NotFound`` and ``Forbidden`` exceptions) as
-    well as exceptions raised via :func:`pyramid.exceptions.abort`,
-    :func:`pyramid.exceptions.redirect`.  If ``exceptionresponse_view`` is
-    ``None``, no exception response view will be registered, and all
-    raised exception responses will be bubbled up to Pyramid's caller.  By
+    object that implements the :class:`pyramid.interaces.IExceptionResponse`
+    interface, such as a :class:`pyramid.response.Response` object or any
+    ``HTTP`` exception documented in :mod:`pyramid.httpexceptions` as well as
+    exception responses raised via :func:`pyramid.exceptions.abort`,
+    :func:`pyramid.exceptions.redirect`).  If ``exceptionresponse_view`` is
+    ``None``, no exception response view will be registered, and all raised
+    exception responses will be bubbled up to Pyramid's caller.  By
     default, the ``pyramid.exceptions.default_exceptionresponse_view``
     function is used as the ``exceptionresponse_view``.  This argument is new
     in Pyramid 1.1.  """

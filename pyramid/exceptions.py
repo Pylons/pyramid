@@ -128,7 +128,8 @@ def _no_escape(value):
             value = str(value)
     return value
 
-class HTTPException(Exception):
+
+class HTTPException(Exception): # bw compat
     pass
 
 class WSGIHTTPException(Response, HTTPException):
@@ -1040,7 +1041,6 @@ def default_exceptionresponse_view(context, request):
         # config.set_notfound_view or config.set_forbidden_view
         # instead of as a proper exception view
         context = request.exception or context
-    # WSGIHTTPException, a Response (2.5+)
     return context
 
 status_map={}
