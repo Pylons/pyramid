@@ -77,7 +77,7 @@ class RoutesMapper(object):
 
 # stolen from bobo and modified
 old_route_re = re.compile(r'(\:[a-zA-Z]\w*)')
-star_in_brackets = re.compile(r'\{[^\}]*\*\w*[^\}]*\}')
+star_at_end = re.compile(r'\*\w*$')
 
 # The torturous nature of the regex named ``route_re`` below is due to the
 # fact that we need to support at least one level of "inner" squigglies
@@ -97,9 +97,9 @@ def _compile_route(route):
         route = '/' + route
 
     star = None
-
-    if '*' in route and not star_in_brackets.search(route):
+    if star_at_end.search(route):
         route, star = route.rsplit('*', 1)
+
     pat = route_re.split(route)
     pat.reverse()
     rpat = []
