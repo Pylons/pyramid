@@ -13,6 +13,19 @@ continue allowing anyone with access to the server to view pages.
 :term:`authentication`.  We'll make use of both features to provide security
 to our application.
 
+We will add an :term:`authentication policy` and an
+:term:`authorization policy` to our :term:`application
+registry`, add a ``security.py`` module, create a :term:`root factory`
+with an :term:`ACL`, and add :term:`permission` declarations to
+the ``edit_page`` and ``add_page`` views.
+
+Then we will add ``login`` and ``logout`` views, and modify the
+existing views to make them return a ``logged_in`` flag to the
+renderer.
+
+Finally, we will add a ``login.pt`` template and change the existing
+``view.pt`` and ``edit.pt`` to show a "Logout" link when not logged in.
+
 The source code for this tutorial stage can be browsed at
 `http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/authorization/
 <http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/authorization/>`_.
@@ -156,7 +169,7 @@ Add a ``security.py`` module within your package (in the same directory as
    :linenos:
    :language: python
 
-The groupfinder defined here is an :term:`authentication policy`
+The ``groupfinder`` function defined here is an :term:`authentication policy`
 "callback"; it is a callable that accepts a userid and a request.  If
 the userid exists in the system, the callback will return a sequence
 of group identifiers (or an empty sequence if the user isn't a member
@@ -245,6 +258,25 @@ class="app-welcome align-right">`` div:
       <a href="${request.application_url}/logout">Logout</a>
    </span>
 
+Seeing Our Changes To ``views.py`` and our Templates
+----------------------------------------------------
+
+Our ``views.py`` module will look something like this when we're done:
+
+.. literalinclude:: src/authorization/tutorial/views.py
+   :linenos:
+   :language: python
+
+Our ``edit.pt`` template will look something like this when we're done:
+
+.. literalinclude:: src/authorization/tutorial/templates/edit.pt
+   :language: xml
+
+Our ``view.pt`` template will look something like this when we're done:
+
+.. literalinclude:: src/authorization/tutorial/templates/view.pt
+   :language: xml
+
 Viewing the Application in a Browser
 ------------------------------------
 
@@ -272,31 +304,8 @@ try are as follows:
   credentials with the username ``editor``, password ``editor`` will
   display the edit page form.
 
-Seeing Our Changes To ``views.py`` and our Templates
-----------------------------------------------------
-
-Our ``views.py`` module will look something like this when we're done:
-
-.. literalinclude:: src/authorization/tutorial/views.py
-   :linenos:
-   :language: python
-
-Our ``edit.pt`` template will look something like this when we're done:
-
-.. literalinclude:: src/authorization/tutorial/templates/edit.pt
-   :language: xml
-
-Our ``view.pt`` template will look something like this when we're done:
-
-.. literalinclude:: src/authorization/tutorial/templates/view.pt
-   :language: xml
-
-Revisiting the Application
----------------------------
-
-When we revisit the application in a browser, and log in (as a result
-of hitting an edit or add page and submitting the login form with the
-``editor`` credentials), we'll see a Logout link in the upper right
-hand corner.  When we click it, we're logged out, and redirected back
-to the front page.
-
+- After logging in (as a result of hitting an edit or add page
+  and submitting the login form with the ``editor``
+  credentials), we'll see a Logout link in the upper right hand
+  corner.  When we click it, we're logged out, and redirected
+  back to the front page.
