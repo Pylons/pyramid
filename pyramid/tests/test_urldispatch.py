@@ -368,7 +368,6 @@ class TestCompileRouteMatchFunctional(unittest.TestCase):
         self.matches('/foo/:id.html', '/foo/bar.html', {'id':'bar'})
         self.matches('/{num:[0-9]+}/*traverse', '/555/abc/def',
                      {'num':'555', 'traverse':('abc', 'def')})
-        import pdb; pdb.set_trace()
         self.matches('/{num:[0-9]*}/*traverse', '/555/abc/def',
                      {'num':'555', 'traverse':('abc', 'def')})
         
