@@ -39,7 +39,7 @@ def main(global_config, **settings):
     config.add_view('tutorial.views.edit_page', route_name='edit_page',
                     renderer='tutorial:templates/edit.pt', permission='edit')
     config.add_view('tutorial.login.login',
-                    context='pyramid.exceptions.Forbidden',
+                    context='pyramid.response.HTTPForbidden',
                     renderer='tutorial:templates/login.pt')
     return config.make_wsgi_app()
 

@@ -21,7 +21,7 @@ configuration.
 
 The :term:`not found view` callable is a view callable like any other.  The
 :term:`view configuration` which causes it to be a "not found" view consists
-only of naming the :exc:`pyramid.exceptions.NotFound` class as the
+only of naming the :exc:`pyramid.response.HTTPNotFound` class as the
 ``context`` of the view configuration.
 
 If your application uses :term:`imperative configuration`, you can replace
@@ -31,9 +31,9 @@ method to register an "exception view":
 .. code-block:: python
    :linenos:
 
-   from pyramid.exceptions import NotFound
+   from pyramid.response import HTTPNotFound
    from helloworld.views import notfound_view
-   config.add_view(notfound_view, context=NotFound)
+   config.add_view(notfound_view, context=HTTPNotFound)
 
 Replace ``helloworld.views.notfound_view`` with a reference to the
 :term:`view callable` you want to use to represent the Not Found view.
@@ -42,7 +42,7 @@ Like any other view, the notfound view must accept at least a ``request``
 parameter, or both ``context`` and ``request``.  The ``request`` is the
 current :term:`request` representing the denied action.  The ``context`` (if
 used in the call signature) will be the instance of the
-:exc:`~pyramid.exceptions.NotFound` exception that caused the view to be
+:exc:`~pyramid.response.HTTPNotFound` exception that caused the view to be
 called.
 
 Here's some sample code that implements a minimal NotFound view callable:
@@ -50,25 +50,25 @@ Here's some sample code that implements a minimal NotFound view callable:
 .. code-block:: python
    :linenos:
 
-   from pyramid.httpexceptions import HTTPNotFound
+   from pyramid.response import HTTPNotFound
 
    def notfound_view(request):
        return HTTPNotFound()
 
 .. note:: When a NotFound view callable is invoked, it is passed a
-   :term:`request`.  The ``exception`` attribute of the request will
-   be an instance of the :exc:`~pyramid.exceptions.NotFound`
-   exception that caused the not found view to be called.  The value
-   of ``request.exception.args[0]`` will be a value explaining why the
-   not found error was raised.  This message will be different when
-   the ``debug_notfound`` environment setting is true than it is when
-   it is false.
+   :term:`request`.  The ``exception`` attribute of the request will be an
+   instance of the :exc:`~pyramid.response.HTTPNotFound` exception that
+   caused the not found view to be called.  The value of
+   ``request.exception.args[0]`` will be a value explaining why the not found
+   error was raised.  This message will be different when the
+   ``debug_notfound`` environment setting is true than it is when it is
+   false.
 
 .. warning:: When a NotFound view callable accepts an argument list as
    described in :ref:`request_and_context_view_definitions`, the ``context``
    passed as the first argument to the view callable will be the
-   :exc:`~pyramid.exceptions.NotFound` exception instance.  If available, the
-   resource context will still be available as ``request.context``.
+   :exc:`~pyramid.response.HTTPNotFound` exception instance.  If available,
+   the resource context will still be available as ``request.context``.
 
 .. index::
    single: forbidden view
@@ -85,7 +85,7 @@ the view which generates it can be overridden as necessary.
 
 The :term:`forbidden view` callable is a view callable like any other.  The
 :term:`view configuration` which causes it to be a "not found" view consists
-only of naming the :exc:`pyramid.exceptions.Forbidden` class as the
+only of naming the :exc:`pyramid.response.HTTPForbidden` class as the
 ``context`` of the view configuration.
 
 You can replace the forbidden view by using the
@@ -96,8 +96,8 @@ view":
    :linenos:
 
    from helloworld.views import forbidden_view
-   from pyramid.exceptions import Forbidden
-   config.add_view(forbidden_view, context=Forbidden)
+   from pyramid.response import HTTPForbidden
+   config.add_view(forbidden_view, context=HTTPForbidden)
 
 Replace ``helloworld.views.forbidden_view`` with a reference to the Python
 :term:`view callable` you want to use to represent the Forbidden view.
@@ -121,13 +121,13 @@ Here's some sample code that implements a minimal forbidden view:
        return Response('forbidden')
 
 .. note:: When a forbidden view callable is invoked, it is passed a
-   :term:`request`.  The ``exception`` attribute of the request will
-   be an instance of the :exc:`~pyramid.exceptions.Forbidden`
-   exception that caused the forbidden view to be called.  The value
-   of ``request.exception.args[0]`` will be a value explaining why the
-   forbidden was raised.  This message will be different when the
-   ``debug_authorization`` environment setting is true than it is when
-   it is false.
+   :term:`request`.  The ``exception`` attribute of the request will be an
+   instance of the :exc:`~pyramid.response.HTTPForbidden` exception that
+   caused the forbidden view to be called.  The value of
+   ``request.exception.args[0]`` will be a value explaining why the forbidden
+   was raised.  This message will be different when the
+   ``debug_authorization`` environment setting is true than it is when it is
+   false.
 
 .. index::
    single: request factory

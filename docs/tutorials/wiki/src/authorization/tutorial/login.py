@@ -1,4 +1,4 @@
-from pyramid.httpexceptions import HTTPFound
+from pyramid.response import HTTPFound
 
 from pyramid.security import remember
 from pyramid.security import forget
@@ -9,7 +9,7 @@ from tutorial.security import USERS
 
 @view_config(context='tutorial.models.Wiki', name='login',
              renderer='templates/login.pt')
-@view_config(context='pyramid.exceptions.Forbidden',
+@view_config(context='pyramid.response.HTTPForbidden',
              renderer='templates/login.pt')
 def login(request):
     login_url = resource_url(request.context, request, 'login')

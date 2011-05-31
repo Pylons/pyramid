@@ -8,8 +8,8 @@ from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
 
-from pyramid.exceptions import HTTPFound
-from pyramid.exceptions import default_exceptionresponse_view
+from pyramid.response import HTTPFound
+from pyramid.response import default_exceptionresponse_view
 from pyramid.renderers import RendererHelper
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
@@ -48,7 +48,7 @@ def render_view_to_response(context, request, name='', secure=True):
     protected by a permission, the permission will be checked before
     calling the view function.  If the permission check disallows view
     execution (based on the current :term:`authorization policy`), a
-    :exc:`pyramid.exceptions.Forbidden` exception will be raised.
+    :exc:`pyramid.response.HTTPForbidden` exception will be raised.
     The exception's ``args`` attribute explains why the view access
     was disallowed.
 
@@ -92,7 +92,7 @@ def render_view_to_iterable(context, request, name='', secure=True):
     permission, the permission will be checked before the view
     function is invoked.  If the permission check disallows view
     execution (based on the current :term:`authentication policy`), a
-    :exc:`pyramid.exceptions.Forbidden` exception will be raised;
+    :exc:`pyramid.response.HTTPForbidden` exception will be raised;
     its ``args`` attribute explains why the view access was
     disallowed.
 
@@ -121,7 +121,7 @@ def render_view(context, request, name='', secure=True):
     permission, the permission will be checked before the view is
     invoked.  If the permission check disallows view execution (based
     on the current :term:`authorization policy`), a
-    :exc:`pyramid.exceptions.Forbidden` exception will be raised;
+    :exc:`pyramid.response.HTTPForbidden` exception will be raised;
     its ``args`` attribute explains why the view access was
     disallowed.
 
@@ -249,14 +249,13 @@ class AppendSlashNotFoundViewFactory(object):
 
     .. code-block:: python
 
-       from pyramid.exceptions import NotFound
+       from pyramid.response import HTTPNotFound
        from pyramid.view import AppendSlashNotFoundViewFactory
-       from pyramid.exceptions import HTTPNotFound
 
        def notfound_view(context, request): return HTTPNotFound('nope')
 
        custom_append_slash = AppendSlashNotFoundViewFactory(notfound_view)
-       config.add_view(custom_append_slash, context=NotFound)
+       config.add_view(custom_append_slash, context=HTTPNotFound)
 
     The ``notfound_view`` supplied must adhere to the two-argument
     view callable calling convention of ``(context, request)``
@@ -303,9 +302,9 @@ routes are not considered when attempting to find a matching route.
 Use the :meth:`pyramid.config.Configurator.add_view` method to configure this
 view as the Not Found view::
 
-  from pyramid.exceptions import NotFound
+  from pyramid.response import HTTPNotFound
   from pyramid.view import append_slash_notfound_view
-  config.add_view(append_slash_notfound_view, context=NotFound)
+  config.add_view(append_slash_notfound_view, context=HTTPNotFound)
 
 See also :ref:`changing_the_notfound_view`.
 

@@ -131,7 +131,7 @@ callable.
 The first view configuration decorator configures the ``login`` view callable
 so it will be invoked when someone visits ``/login`` (when the context is a
 Wiki and the view name is ``login``).  The second decorator (with context of
-``pyramid.exceptions.Forbidden``) specifies a :term:`forbidden view`.  This
+``pyramid.response.HTTPForbidden``) specifies a :term:`forbidden view`.  This
 configures our login view to be presented to the user when :app:`Pyramid`
 detects that a view invocation can not be authorized.  Because we've
 configured a forbidden view, the ``login`` view callable will be invoked

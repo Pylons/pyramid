@@ -191,11 +191,11 @@ function.
    :linenos:
 
    from pyramid.security import has_permission
-   from pyramid.exceptions import Forbidden
+   from pyramid.response import HTTPForbidden
 
    def view_fn(request):
        if not has_permission('edit', request.context, request):
-           raise Forbidden
+           raise HTTPForbidden
        return {'greeting':'hello'}
 
 Without doing anything special during a unit test, the call to
@@ -207,7 +207,7 @@ application registry is not created and populated (e.g. by initializing the
 configurator with an authorization policy), like when you invoke application
 code via a unit test, :app:`Pyramid` API functions will tend to either fail
 or return default results.  So how do you test the branch of the code in this
-view function that raises :exc:`Forbidden`?
+view function that raises :exc:`HTTPForbidden`?
 
 The testing API provided by :app:`Pyramid` allows you to simulate various
 application registry registrations for use under a unit testing framework
@@ -230,16 +230,15 @@ without needing to invoke the actual application configuration implied by its
            testing.tearDown()
        
        def test_view_fn_forbidden(self):
-           from pyramid.exceptions import Forbidden
+           from pyramid.response import HTTPForbidden
            from my.package import view_fn
            self.config.testing_securitypolicy(userid='hank', 
                                               permissive=False)
            request = testing.DummyRequest()
            request.context = testing.DummyResource()
-           self.assertRaises(Forbidden, view_fn, request)
+           self.assertRaises(HTTPForbidden, view_fn, request)
 
        def test_view_fn_allowed(self):
-           from pyramid.exceptions import Forbidden
            from my.package import view_fn
            self.config.testing_securitypolicy(userid='hank', 
                                               permissive=True)
@@ -265,7 +264,7 @@ We call the function being tested with the manufactured request.  When the
 function is called, :func:`pyramid.security.has_permission` will call the
 "dummy" authentication policy we've registered through
 :meth:`~pyramid.config.Configuration.testing_securitypolicy`, which denies
-access.  We check that the view function raises a :exc:`Forbidden` error.
+access.  We check that the view function raises a :exc:`HTTPForbidden` error.
 
 The second test method, named ``test_view_fn_allowed`` tests the alternate
 case, where the authentication policy allows access.  Notice that we pass

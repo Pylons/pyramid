@@ -55,12 +55,13 @@ class IException(Interface): # not an API
     """ An interface representing a generic exception """
 
 class IExceptionResponse(IException, IResponse):
-    """ An interface representing a WSGI response which is also an
-    exception object.  Register an exception view using this interface
-    as a ``context`` to apply the registered view for all exception
-    types raised by :app:`Pyramid` internally
-    (:class:`pyramid.exceptions.NotFound` and
-    :class:`pyramid.exceptions.Forbidden`)."""
+    """ An interface representing a WSGI response which is also an exception
+    object.  Register an exception view using this interface as a ``context``
+    to apply the registered view for all exception types raised by
+    :app:`Pyramid` internally (any exception that inherits from
+    :class:`pyramid.response.Response`, including
+    :class:`pyramid.response.HTTPNotFound` and
+    :class:`pyramid.response.HTTPForbidden`)."""
 
 class IBeforeRender(Interface):
     """
@@ -274,9 +275,9 @@ class IExceptionViewClassifier(Interface):
 class IView(Interface):
     def __call__(context, request):
         """ Must return an object that implements IResponse.  May
-        optionally raise ``pyramid.exceptions.Forbidden`` if an
+        optionally raise ``pyramid.response.HTTPForbidden`` if an
         authorization failure is detected during view execution or
-        ``pyramid.exceptions.NotFound`` if the not found page is
+        ``pyramid.response.HTTPNotFound`` if the not found page is
         meant to be returned."""
 
 class ISecuredView(IView):

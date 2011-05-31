@@ -56,9 +56,9 @@ from pyramid.compat import md5
 from pyramid.compat import any
 from pyramid.events import ApplicationCreated
 from pyramid.exceptions import ConfigurationError
-from pyramid.exceptions import default_exceptionresponse_view
-from pyramid.exceptions import Forbidden
-from pyramid.exceptions import NotFound
+from pyramid.response import default_exceptionresponse_view
+from pyramid.response import HTTPForbidden
+from pyramid.response import HTTPNotFound
 from pyramid.exceptions import PredicateMismatch
 from pyramid.i18n import get_localizer
 from pyramid.log import make_stream_logger
@@ -1997,7 +1997,8 @@ class Configurator(object):
         def bwcompat_view(context, request):
             context = getattr(request, 'context', None)
             return view(context, request)
-        return self.add_view(bwcompat_view, context=Forbidden, wrapper=wrapper)
+        return self.add_view(bwcompat_view, context=HTTPForbidden,
+                             wrapper=wrapper)
 
     @action_method
     def set_notfound_view(self, view=None, attr=None, renderer=None,
@@ -2037,7 +2038,8 @@ class Configurator(object):
         def bwcompat_view(context, request):
             context = getattr(request, 'context', None)
             return view(context, request)
-        return self.add_view(bwcompat_view, context=NotFound, wrapper=wrapper)
+        return self.add_view(bwcompat_view, context=HTTPNotFound,
+                             wrapper=wrapper)
 
     @action_method
     def set_request_factory(self, factory):
@@ -2845,7 +2847,7 @@ class ViewDeriver(object):
                     return view(context, request)
                 msg = getattr(request, 'authdebug_message',
                               'Unauthorized: %s failed permission check' % view)
-                raise Forbidden(msg, result=result)
+                raise HTTPForbidden(msg, result=result)
             _secured_view.__call_permissive__ = view
             _secured_view.__permitted__ = _permitted
             _secured_view.__permission__ = permission

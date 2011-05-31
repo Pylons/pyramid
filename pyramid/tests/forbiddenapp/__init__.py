@@ -1,5 +1,5 @@
 from webob import Response
-from pyramid.exceptions import Forbidden
+from pyramid.response import HTTPForbidden
 
 def x_view(request): # pragma: no cover
      return Response('this is private!')
@@ -8,7 +8,7 @@ def forbidden_view(context, request):
      msg = context.message
      result = context.result
      message = msg + '\n' + str(result)
-     resp = Forbidden()
+     resp = HTTPForbidden()
      resp.body = message
      return resp
 
@@ -20,4 +20,4 @@ def includeme(config):
      config._set_authentication_policy(authn_policy)
      config._set_authorization_policy(authz_policy)
      config.add_view(x_view, name='x', permission='private')
-     config.add_view(forbidden_view, context=Forbidden)
+     config.add_view(forbidden_view, context=HTTPForbidden)

@@ -16,7 +16,7 @@ from pyramid.interfaces import IViewClassifier
 from pyramid.events import ContextFound
 from pyramid.events import NewRequest
 from pyramid.events import NewResponse
-from pyramid.exceptions import NotFound
+from pyramid.response import HTTPNotFound
 from pyramid.request import Request
 from pyramid.threadlocal import manager
 from pyramid.traversal import DefaultRootFactory
@@ -153,7 +153,7 @@ class Router(object):
                             logger and logger.debug(msg)
                         else:
                             msg = request.path_info
-                        raise NotFound(msg)
+                        raise HTTPNotFound(msg)
                     else:
                         response = view_callable(context, request)
 

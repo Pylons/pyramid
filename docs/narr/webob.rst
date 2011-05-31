@@ -362,11 +362,11 @@ To facilitate error responses like ``404 Not Found``, the module
 :mod:`webob.exc` contains classes for each kind of error response.  These
 include boring, but appropriate error bodies.  The exceptions exposed by this
 module, when used under :app:`Pyramid`, should be imported from the
-:mod:`pyramid.httpexceptions` "facade" module.  This import location is merely
-a facade for the original location of these exceptions: ``webob.exc``.
+:mod:`pyramid.response` module.  This import location contains subclasses and
+replacements that mirror those in the original ``webob.exc``.
 
-Each class is named ``pyramid.httpexceptions.HTTP*``, where ``*`` is the reason
-for the error.  For instance, :class:`pyramid.httpexceptions.HTTPNotFound`.  It
+Each class is named ``pyramid.response.HTTP*``, where ``*`` is the reason for
+the error.  For instance, :class:`pyramid.response.HTTPNotFound`.  It
 subclasses :class:`pyramid.Response`, so you can manipulate the instances in
 the same way.  A typical example is:
 
@@ -374,40 +374,18 @@ the same way.  A typical example is:
 .. code-block:: python
     :linenos:
 
-    from pyramid.httpexceptions import HTTPNotFound
-    from pyramid.httpexceptions import HTTPMovedPermanently
+    from pyramid.response import HTTPNotFound
+    from pyramid.response import HTTPMovedPermanently
 
     response = HTTPNotFound('There is no such resource')
     # or:
     response = HTTPMovedPermanently(location=new_url)
-
-These are not exceptions unless you are using Python 2.5+, because
-they are new-style classes which are not allowed as exceptions until
-Python 2.5.  To get an exception object use ``response.exception``.
-You can use this like:
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.httpexceptions import HTTPException
-   from pyramid.httpexceptions import HTTPNotFound
-
-   def aview(request):
-       try:
-           # ... stuff ...
-           raise HTTPNotFound('No such resource').exception
-       except HTTPException, e:
-           return request.get_response(e)
-
-The exceptions are still WSGI applications, but you cannot set
-attributes like ``content_type``, ``charset``, etc. on these exception
-objects.
 
 More Details
 ++++++++++++
 
 More details about the response object API are available in the
 :mod:`pyramid.response` documentation.  More details about exception responses
-are in the :mod:`pyramid.httpexceptions` API documentation.  The `WebOb
+are in the :mod:`pyramid.response` API documentation.  The `WebOb
 documentation <http://pythonpaste.org/webob>`_ is also useful.
 

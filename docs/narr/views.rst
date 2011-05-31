@@ -233,7 +233,7 @@ implements the :term:`Response` interface is to return a
 You don't need to always use :class:`~pyramid.response.Response` to represent
 a response.  :app:`Pyramid` provides a range of different "exception" classes
 which can act as response objects too.  For example, an instance of the class
-:class:`pyramid.httpexceptions.HTTPFound` is also a valid response object
+:class:`pyramid.response.HTTPFound` is also a valid response object
 (see :ref:`http_exceptions` and ref:`http_redirect`).  A view can actually
 return any object that has the following attributes.
 
@@ -275,17 +275,18 @@ exist: internal exceptions and HTTP exceptions.
 Internal Exceptions
 ~~~~~~~~~~~~~~~~~~~
 
-:exc:`pyramid.exceptions.NotFound` and :exc:`pyramid.exceptions.Forbidden`
-are exceptions often raised by Pyramid itself when it (respectively) cannot
-find a view to service a request or when authorization was forbidden by a
-security policy.  However, they can also be raised by application developers.
+:exc:`pyramid.response.HTTPNotFound` and
+:exc:`pyramid.response.HTTPForbidden` are exceptions often raised by Pyramid
+itself when it (respectively) cannot find a view to service a request or when
+authorization was forbidden by a security policy.  However, they can also be
+raised by application developers.
 
-If :exc:`~pyramid.exceptions.NotFound` is raised within view code, the result
-of the :term:`Not Found View` will be returned to the user agent which
+If :exc:`~pyramid.response.HTTPNotFound` is raised within view code, the
+result of the :term:`Not Found View` will be returned to the user agent which
 performed the request.
 
-If :exc:`~pyramid.exceptions.Forbidden` is raised within view code, the result
-of the :term:`Forbidden View` will be returned to the user agent which
+If :exc:`~pyramid.response.HTTPForbidden` is raised within view code, the
+result of the :term:`Forbidden View` will be returned to the user agent which
 performed the request.
 
 Both are exception classes which accept a single positional constructor
@@ -298,13 +299,10 @@ An example:
 .. code-block:: python
    :linenos:
 
-    from pyramid.exceptions import NotFound
+    from pyramid.response import HTTPNotFound
 
     def aview(request):
-        raise NotFound('not found!')
-
-Internal exceptions may not be *returned* in order to generate a response,
-they must always be *raised*.
+        raise HTTPNotFound('not found!')
 
 .. index::
    single: HTTP exceptions
@@ -314,32 +312,33 @@ they must always be *raised*.
 HTTP Exceptions
 ~~~~~~~~~~~~~~~
 
-All exception classes documented in the :mod:`pyramid.httpexceptions` module
-implement the :term:`Response` interface; an instance of any of these classes
-can be returned or raised from within a view.  The instance will be used as
-as the view's response.
+All classes documented in the :mod:`pyramid.response` module as inheriting
+from the :class:`pryamid.response.Response` object implement the
+:term:`Response` interface; an instance of any of these classes can be
+returned or raised from within a view.  The instance will be used as as the
+view's response.
 
-For example, the :class:`pyramid.httpexceptions.HTTPUnauthorized` exception
+For example, the :class:`pyramid.response.HTTPUnauthorized` exception
 can be raised.  This will cause a response to be generated with a ``401
 Unauthorized`` status:
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.httpexceptions import HTTPUnauthorized
+   from pyramid.response import HTTPUnauthorized
 
    def aview(request):
        raise HTTPUnauthorized()
 
 A shortcut for importing and raising an HTTP exception is the
-:func:`pyramid.httpexceptions.abort` function.  This function accepts an HTTP
+:func:`pyramid.response.abort` function.  This function accepts an HTTP
 status code and raises the corresponding HTTP exception.  For example, to
 raise HTTPUnauthorized, instead of the above, you could do:
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.httpexceptions import abort
+   from pyramid.response import abort
 
    def aview(request):
        abort(401)
@@ -347,8 +346,8 @@ raise HTTPUnauthorized, instead of the above, you could do:
 This is the case because ``401`` is the HTTP status code for "HTTP
 Unauthorized".  Therefore, ``abort(401)`` is functionally equivalent to
 ``raise HTTPUnauthorized()``.  Other exceptions in
-:mod:`pyramid.httpexceptions` can be raised via
-:func:`pyramid.httpexceptions.abort` as well, as long as the status code
+:mod:`pyramid.response` can be raised via
+:func:`pyramid.response.abort` as well, as long as the status code
 associated with the exception is provided to the function.
 
 An HTTP exception, instead of being raised, can alternately be *returned*
@@ -357,17 +356,10 @@ An HTTP exception, instead of being raised, can alternately be *returned*
 .. code-block:: python
    :linenos:
 
-   from pyramid.httpexceptions import HTTPUnauthorized
+   from pyramid.response import HTTPUnauthorized
 
    def aview(request):
        return HTTPUnauthorized()
-
-Note that :class:`pyramid.exceptions.NotFound` is *not* the same as
-:class:`pyramid.httpexceptions.HTTPNotFound`.  If the latter is raised, the
-:term:`Not Found view` will *not* be called automatically.  Likewise,
-:class:`pyramid.exceptions.Forbidden` is not the same exception as
-:class:`pyramid.httpexceptions.HTTPForbidden`.  If the latter is raised, the
-:term:`Forbidden view` will not be called automatically.
 
 .. index::
    single: exception views
@@ -377,11 +369,11 @@ Note that :class:`pyramid.exceptions.NotFound` is *not* the same as
 Custom Exception Views
 ----------------------
 
-The machinery which allows :exc:`~pyramid.exceptions.NotFound`,
-:exc:`~pyramid.exceptions.Forbidden` and HTTP exceptions to be caught by
-specialized views as described in :ref:`special_exceptions_in_callables` can
-also be used by application developers to convert arbitrary exceptions to
-responses.
+The machinery which allows :exc:`~pyramid.response.HTTPNotFound`,
+:exc:`~pyramid.response.HTTPForbidden` and other responses to be used as
+exceptions and caught by specialized views as described in
+:ref:`special_exceptions_in_callables` can also be used by application
+developers to convert arbitrary exceptions to responses.
 
 To register a view that should be called whenever a particular exception is
 raised from with :app:`Pyramid` view code, use the exception class or one of
@@ -474,14 +466,14 @@ Short Form
 ~~~~~~~~~~
 
 You can issue an HTTP redirect from within a view callable by using the
-:func:`pyramid.httpexceptions.redirect` function.  This function raises an
-:class:`pyramid.httpexceptions.HTTPFound` exception (a "302"), which is
-caught by an exception handler and turned into a response.
+:func:`pyramid.response.redirect` function.  This function raises an
+:class:`pyramid.response.HTTPFound` exception (a "302"), which is caught by
+the default exception response handler and turned into a response.
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.httpexceptions import redirect
+   from pyramid.response import redirect
 
    def myview(request):
        redirect('http://example.com')
@@ -490,16 +482,16 @@ Long Form
 ~~~~~~~~~
 
 You can issue an HTTP redirect from within a view "by hand" instead of
-relying on the :func:`pyramid.httpexceptions.redirect` function to do it for
+relying on the :func:`pyramid.response.redirect` function to do it for
 you.
 
-To do so, you can *return* a :class:`pyramid.httpexceptions.HTTPFound`
+To do so, you can *return* a :class:`pyramid.response.HTTPFound`
 instance.
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.httpexceptions import HTTPFound
+   from pyramid.response import HTTPFound
 
    def myview(request):
        return HTTPFound(location='http://example.com')
@@ -510,7 +502,7 @@ one.
 .. code-block:: python
    :linenos:
 
-   from pyramid.httpexceptions import HTTPFound
+   from pyramid.response import HTTPFound
 
    def myview(request):
        raise HTTPFound(location='http://example.com')

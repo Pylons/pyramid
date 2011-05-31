@@ -17,7 +17,7 @@ from pyramid.interfaces import ISession
 
 from pyramid.config import Configurator
 from pyramid.decorator import reify
-from pyramid.exceptions import Forbidden
+from pyramid.response import HTTPForbidden
 from pyramid.response import Response
 from pyramid.registry import Registry
 from pyramid.security import Authenticated
@@ -217,7 +217,7 @@ def registerView(name, result='', view=None, for_=(Interface, Interface),
     else:
         def _secure(context, request):
             if not has_permission(permission, context, request):
-                raise Forbidden('no permission').exception
+                raise HTTPForbidden('no permission')
             else:
                 return view(context, request)
         _secure.__call_permissive__ = view

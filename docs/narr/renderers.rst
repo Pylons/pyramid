@@ -73,30 +73,43 @@ When this configuration is added to an application, the
 which renders view return values to a :term:`JSON` response serialization.
 
 Other built-in renderers include renderers which use the :term:`Chameleon`
-templating language to render a dictionary to a response.
+templating language to render a dictionary to a response.  Additional
+renderers can be added by developers to the system as necessary (see
+:ref:`adding_and_overriding_renderers`).
+
+Views which use a renderer can vary non-body response attributes (such as
+headers and the HTTP status code) by attaching a property to the
+``request.response`` attribute See :ref:`request_response_attr`.
 
 If the :term:`view callable` associated with a :term:`view configuration`
 returns a Response object directly (an object with the attributes ``status``,
 ``headerlist`` and ``app_iter``), any renderer associated with the view
 configuration is ignored, and the response is passed back to :app:`Pyramid`
 unchanged.  For example, if your view callable returns an instance of the
-:class:`pyramid.httpexceptions.HTTPFound` class as a response, no renderer
-will be employed.
+:class:`pyramid.response.HTTPFound` class as a response, no renderer will be
+employed.
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.httpexceptions import HTTPFound
+   from pyramid.response import HTTPFound
 
    def view(request):
        return HTTPFound(location='http://example.com') # any renderer avoided
 
-Views which use a renderer can vary non-body response attributes (such as
-headers and the HTTP status code) by attaching a property to the
-``request.response`` attribute See :ref:`request_response_attr`.
+Likewise for a "plain old response":
 
-Additional renderers can be added by developers to the system as necessary
-(see :ref:`adding_and_overriding_renderers`).
+.. code-block:: python
+   :linenos:
+
+   from pyramid.response import Response
+
+   def view(request):
+       return Response('OK') # any renderer avoided
+
+Mutations to ``request.response`` in views which return a Response object
+like this directly (unless that response *is* ``request.response``) will be
+ignored.
 
 .. index::
    single: renderers (built-in)

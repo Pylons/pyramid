@@ -1,7 +1,7 @@
 from docutils.core import publish_parts
 import re
 
-from pyramid.httpexceptions import HTTPFound
+from pyramid.response import HTTPFound
 from pyramid.url import resource_url
 from pyramid.view import view_config
 
