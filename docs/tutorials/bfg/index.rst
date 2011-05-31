@@ -106,7 +106,7 @@ Here's how to convert a :mod:`repoze.bfg` application to a
 
    - ZCML files which contain directives that have attributes which
      name a ``repoze.bfg`` API module or attribute of an API module
-     (e.g. ``context="repoze.bfg.exeptions.NotFound"``) will be
+     (e.g. ``context="repoze.bfg.exceptions.NotFound"``) will be
      converted to :app:`Pyramid` compatible ZCML attributes
      (e.g. ``context="pyramid.exceptions.NotFound``).  Every ZCML file
      beneath the top-level path (files ending with ``.zcml``) will be
