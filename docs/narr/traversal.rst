@@ -12,7 +12,7 @@ file system.  Traversal walks down the path until it finds a published
 resource, analogous to a file system "directory" or "file".  The
 resource found as the result of a traversal becomes the
 :term:`context` of the :term:`request`.  Then, the :term:`view lookup`
-subsystem is used to find some view code willing "publish" this
+subsystem is used to find some view code willing to "publish" this
 resource by generating a :term:`response`.
 
 Using :term:`Traversal` to map a URL to code is optional.  It is often
@@ -49,17 +49,17 @@ For example, if the path info sequence is ``['a', 'b', 'c']``:
   can be configured to return whatever object is appropriate as the
   traversal root of your application.
 
-- Next, the first element (``a``) is popped from the path segment
+- Next, the first element (``'a'``) is popped from the path segment
   sequence and is used as a key to lookup the corresponding resource
   in the root. This invokes the root resource's ``__getitem__`` method
-  using that value (``a``) as an argument.
+  using that value (`'`a'``) as an argument.
 
-- If the root resource "contains" a resource with key ``a``, its
+- If the root resource "contains" a resource with key ``'a'``, its
   ``__getitem__`` method will return it. The :term:`context` temporarily
   becomes the "A" resource.
 
-- The next segment (``b``) is popped from the path sequence, and the "A"
-  resource's ``__getitem__`` is called with that value (``b``) as an
+- The next segment (``'b'``) is popped from the path sequence, and the "A"
+  resource's ``__getitem__`` is called with that value (``'b'``) as an
   argument; we'll presume it succeeds.
 
 - The "A" resource's ``__getitem__`` returns another resource, which
@@ -78,7 +78,7 @@ The results of a :term:`traversal` also include a :term:`view name`. If
 traversal ends before the path segment sequence is exhausted, the
 :term:`view name` is the *next* remaining path segment element. If the
 :term:`traversal` expends all of the path segments, then the :term:`view
-name` is the empty string (`''`).
+name` is the empty string (``''``).
 
 The combination of the context resource and the :term:`view name` found
 via traversal is used later in the same request by the :term:`view
@@ -263,26 +263,26 @@ system uses this algorithm to find a :term:`context` resource and a
     UTF-8 encoding.  If any URL-unquoted path segment in ``PATH_INFO`` is not
     decodeable using the UTF-8 decoding, a :exc:`TypeError` is raised.  A
     segment will be fully URL-unquoted and UTF8-decoded before it is passed
-    it to the ``__getitem__`` of any resource during traversal.
+    in to the ``__getitem__`` of any resource during traversal.
 
     Thus, a request with a ``PATH_INFO`` variable of ``/a/b/c`` maps to the
     traversal sequence ``[u'a', u'b', u'c']``.
 
 #.  :term:`Traversal` begins at the root resource returned by the root
     factory.  For the traversal sequence ``[u'a', u'b', u'c']``, the root
-    resource's ``__getitem__`` is called with the name ``a``.  Traversal
+    resource's ``__getitem__`` is called with the name ``'a'``.  Traversal
     continues through the sequence.  In our example, if the root resource's
     ``__getitem__`` called with the name ``a`` returns a resource (aka
-    "resource ``a``"), that resource's ``__getitem__`` is called with the
-    name ``b``.  If resource A returns a resource when asked for ``b``,
-    "resource ``b``"'s ``__getitem__`` is then asked for the name ``c``, and
-    may return "resource ``c``".
+    resource "A"), that resource's ``__getitem__`` is called with the name
+    ``'b'``.  If resource "A" returns a resource "B" when asked for ``'b'``,
+    resource B's ``__getitem__`` is then asked for the name ``'c'``, and may
+    return resource "C".
 
 #.  Traversal ends when a) the entire path is exhausted or b) when any
     resouce raises a :exc:`KeyError` from its ``__getitem__`` or c) when any
     non-final path element traversal does not have a ``__getitem__`` method
-    (resulting in a :exc:`NameError`) or d) when any path element is prefixed
-    with the set of characters ``@@`` (indicating that the characters
+    (resulting in a :exc:`AttributeError`) or d) when any path element is
+    prefixed with the set of characters ``@@`` (indicating that the characters
     following the ``@@`` token should be treated as a :term:`view name`).
 
 #.  When traversal ends for any of the reasons in the previous step, the last
