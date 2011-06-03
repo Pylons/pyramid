@@ -77,7 +77,7 @@ All forms of view configuration accept the same general types of arguments.
 Many arguments supplied during view configuration are :term:`view predicate`
 arguments.  View predicate arguments used during view configuration are used
 to narrow the set of circumstances in which :term:`view lookup` will find a
-particular view callable.  
+particular view callable.
 
 In general, the fewer number of predicates which are supplied to a
 particular view configuration, the more likely it is that the associated
@@ -112,7 +112,7 @@ Non-Predicate Arguments
   The name of a :term:`permission` that the user must possess in order to
   invoke the :term:`view callable`.  See :ref:`view_security_section` for
   more information about view security and permissions.
-  
+
   If ``permission`` is not supplied, no permission is registered for this
   view (it's accessible by any caller).
 
@@ -183,7 +183,7 @@ Non-Predicate Arguments
   argument.  The view callable it is passed will accept ``(context,
   request)``.  The decorator must return a replacement view callable which
   also accepts ``(context, request)``.
-          
+
 ``mapper``
   A Python object or :term:`dotted Python name` which refers to a :term:`view
   mapper`, or ``None``.  By default it is ``None``, which indicates that the
@@ -228,7 +228,7 @@ configured view.
   ``pattern``, representing a part of the path that will be used by
   :term:`traversal` against the result of the route's :term:`root factory`.
 
-  If ``route_name`` is not supplied, the view callable will be have a chance
+  If ``route_name`` is not supplied, the view callable will only have a chance
   of being invoked if no other route was matched. This is when the
   request/context pair found via :term:`resource location` does not indicate
   it matched any configured route.
@@ -400,7 +400,7 @@ configuration stanza:
 .. code-block:: python
    :linenos:
 
-   config.add_view('mypackage.views.my_view', name='my_view', request_method='POST', 
+   config.add_view('mypackage.views.my_view', name='my_view', request_method='POST',
                    context=MyResource, permission='read')
 
 All arguments to ``view_config`` may be omitted.  For example:
@@ -517,7 +517,7 @@ registration.  For example:
 
 This registers the same view under two different names.
 
-The decorator can also be used against class methods:
+The decorator can also be used against a method of a class:
 
 .. code-block:: python
    :linenos:
@@ -533,9 +533,9 @@ The decorator can also be used against class methods:
        def amethod(self):
            return Response('hello')
 
-When the decorator is used against a class method, a view is registered for
-the *class*, so the class constructor must accept an argument list in one of
-two forms: either it must accept a single argument ``request`` or it must
+When the decorator is used against a method of a class, a view is registered
+for the *class*, so the class constructor must accept an argument list in one
+of two forms: either it must accept a single argument ``request`` or it must
 accept two arguments, ``context, request``.
 
 The method which is decorated must return a :term:`response`.
@@ -760,7 +760,7 @@ Here is an example for a simple view configuration using :term:`traversal`:
    URL = /FrontPage
 
        context: <tutorial.models.Page object at 0xa12536c>
-       view name: 
+       view name:
 
        View:
        -----
@@ -791,7 +791,7 @@ A more complex configuration might generate something like this:
        route name: about
        route pattern: /about
        route path: /about
-       subpath: 
+       subpath:
        route predicates (request method = GET)
 
            View:
@@ -805,7 +805,7 @@ A more complex configuration might generate something like this:
        route name: about_post
        route pattern: /about
        route path: /about
-       subpath: 
+       subpath:
        route predicates (request method = POST)
 
            View:

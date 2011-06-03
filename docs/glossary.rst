@@ -55,7 +55,7 @@ Glossary
      For example, the asset specification
      ``my.package:static/baz.css`` identifies the file named
      ``baz.css`` in the ``static`` subdirectory of the ``my.package``
-     Python :term:`package`.  See :ref:`asset_specifications` for more 
+     Python :term:`package`.  See :ref:`asset_specifications` for more
      info.
 
    package
@@ -65,7 +65,7 @@ Glossary
 
    module
      A Python source file; a file on the filesystem that typically ends with
-     the extension ``.py`` or ``.pyc``.  Modules often live in a 
+     the extension ``.py`` or ``.pyc``.  Modules often live in a
      :term:`package`.
 
    project
@@ -214,9 +214,9 @@ Glossary
      a :term:`context` resource.  A permission is associated with a view name
      and a resource type by the developer.  Resources are decorated with
      security declarations (e.g. an :term:`ACL`), which reference these
-     tokens also.  Permissions are used by the active to security policy to
+     tokens also.  Permissions are used by the active security policy to
      match the view permission against the resources's statements about which
-     permissions are granted to which principal in a context in order to to
+     permissions are granted to which principal in a context in order to
      answer the question "is this user allowed to do this".  Examples of
      permissions: ``read``, or ``view_blog_entries``.
 
@@ -356,14 +356,14 @@ Glossary
    METAL
      `Macro Expansion for TAL <http://wiki.zope.org/ZPT/METAL>`_, a
      part of :term:`ZPT` which makes it possible to share common look
-     and feel between templates.  
+     and feel between templates.
 
    Genshi
      An `XML templating language <http://pypi.python.org/pypi/Genshi/>`_
      by Christopher Lenz.
 
    Jinja2
-     A `text templating language <http://jinja.pocoo.org/2/>`_ by Armin 
+     A `text templating language <http://jinja.pocoo.org/2/>`_ by Armin
      Ronacher.
 
    Routes
@@ -401,7 +401,7 @@ Glossary
    root
      The object at which :term:`traversal` begins when :app:`Pyramid`
      searches for a :term:`context` resource (for :term:`URL Dispatch`, the
-     root is *always* the context resource unless the ``traverse=`` argument 
+     root is *always* the context resource unless the ``traverse=`` argument
      is used in route configuration).
 
    subpath
@@ -856,7 +856,7 @@ Glossary
    ZCML
      `Zope Configuration Markup Language
      <http://www.muthukadan.net/docs/zca.html#zcml>`_, an XML dialect
-     used by Zope and :term:`pyramid_zcml` for configuration tasks.  
+     used by Zope and :term:`pyramid_zcml` for configuration tasks.
 
    ZCML directive
      A ZCML "tag" such as ``<view>`` or ``<route>``.
@@ -894,5 +894,5 @@ Glossary
      http://docs.python.org/distutils/index.html for more information.
      :term:`setuptools` is actually an *extension* of the Distutils.
 
-   
+
 
