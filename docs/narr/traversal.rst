@@ -52,7 +52,7 @@ For example, if the path info sequence is ``['a', 'b', 'c']``:
 - Next, the first element (``'a'``) is popped from the path segment
   sequence and is used as a key to lookup the corresponding resource
   in the root. This invokes the root resource's ``__getitem__`` method
-  using that value (`'`a'``) as an argument.
+  using that value (``'a'``) as an argument.
 
 - If the root resource "contains" a resource with key ``'a'``, its
   ``__getitem__`` method will return it. The :term:`context` temporarily
