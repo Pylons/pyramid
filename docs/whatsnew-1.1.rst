@@ -54,7 +54,7 @@ Minor Feature Additions
 -----------------------
 
 - New authentication policy:
-  :ref:`pyramid.authentication.SessionAuthenticationPolicy`, which uses a
+  :class:`pyramid.authentication.SessionAuthenticationPolicy`, which uses a
   session to store credentials.
 
 - Integers and longs passed as ``elements`` to
