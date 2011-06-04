@@ -88,7 +88,7 @@ Here's a sample resource tree, represented by a variable named ``root``:
     class Resource(dict):
         pass
 
-    root = Resource({'a': Resource({'b': Resource({'c': Resource()})})})
+    root = Resource({'a':Resource({'b':Resource({'c':Resource()})})})
 
 The resource tree we've created above is represented by a dictionary-like
 root object which has a single child named ``'a'``.  ``'a'`` has a single child

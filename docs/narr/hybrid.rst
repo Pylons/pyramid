@@ -251,12 +251,12 @@ configuration statement:
                     factory='mypackage.routes.root_factory')
 
 The ``factory`` above points at the function we've defined.  It will return
-an instance of the ``Traversable`` class as a root object whenever this route
-is matched.  Instances of the ``Resource`` class can be used for tree
-traversal because they have a ``__getitem__`` method that does something
-nominally useful. Since traversal uses ``__getitem__`` to walk the resources
-of a resource tree, using traversal against the root resource implied by our
-route statement is a reasonable thing to do.
+an instance of the ``Resource`` class as a root object whenever this route is
+matched.  Instances of the ``Resource`` class can be used for tree traversal
+because they have a ``__getitem__`` method that does something nominally
+useful. Since traversal uses ``__getitem__`` to walk the resources of a
+resource tree, using traversal against the root resource implied by our route
+statement is a reasonable thing to do.
 
 .. note::
 
