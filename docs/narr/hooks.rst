@@ -522,6 +522,42 @@ The default context URL generator is available for perusal as the class
 :term:`Pylons` GitHub Pyramid repository.
 
 .. index::
+   single: IResponder
+
+.. _using_iresponder:
+
+Changing How Pyramid Treats Response Objects
+--------------------------------------------
+
+It is possible to control how the Pyramid :term:`router` calls the WSGI
+``start_response`` callable and obtains the WSGI ``app_iter`` based on
+adapting the response object to the :class: `pyramid.interfaces.IResponder`
+interface.  The default ``IResponder`` uses the three attributes ``status``,
+``headerlist``, and ``app_iter`` attached to the response object, and calls
+``start_response`` with the status and headerlist, returning the
+``app_iter``.  To override the responder::
+
+     from pyramid.interfaces import IResponder
+     from pyramid.response import Response
+     from myapp import MyResponder
+
+     config.registry.registerAdapter(MyResponder, (Response,),
+                                     IResponder, name='')
+
+Overriding makes it possible to reuse response object implementations which
+have, for example, their own ``__call__`` expected to be used as a WSGI
+application (like :class:`pyramid.response.Response`), e.g.:
+
+     class MyResponder(object):
+         def __init__(self, response):
+             """ Obtain a reference to the response """
+             self.response = response
+         def __call__(self, request, start_response):
+             """ Call start_response and return an app_iter """
+             app_iter = self.response(request.environ, start_response)
+             return app_iter
+
+.. index::
    single: view mapper
 
 .. _using_a_view_mapper:

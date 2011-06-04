@@ -229,6 +229,14 @@ class IMultiDict(Interface): # docs-only interface
         dictionary. This is similar to the kind of dictionary often used to
         represent the variables in a web request. """
 
+class IResponder(Interface):
+    """ Adapter from IResponse to an IResponder.  See :ref:`using_iresponder`
+    for usage details.  New in Pyramid 1.1.
+    """
+    def __call__(self, request, start_response):
+        """ Call the WSGI ``start_response`` callable passed as
+        ``start_response`` and return an ``app_iter``."""
+
 # internal interfaces
 
 class IRequest(Interface):

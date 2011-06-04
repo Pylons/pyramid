@@ -21,7 +21,6 @@ def _no_escape(value):
             value = str(value)
     return value
 
-
 class HTTPException(Exception): # bw compat
     pass
 
@@ -40,7 +39,7 @@ class WSGIHTTPException(Response, HTTPException):
     #   as a result:
     #
     #   - bases plaintext vs. html result on self.content_type rather than
-    #     on request environ
+    #     on request accept header
     #
     #   - doesn't add request.environ keys to template substitutions unless
     #     'request' is passed as a constructor keyword argument.
@@ -49,7 +48,7 @@ class WSGIHTTPException(Response, HTTPException):
     #   in default body template)
     #
     # - sets a default app_iter if no body, app_iter, or unicode_body is
-    #   passed
+    #   passed using a template (ala the replaced version's "generate_response")
     #
     # - explicitly sets self.message = detail to prevent whining by Python
     #   2.6.5+ access of Exception.message

@@ -132,6 +132,32 @@ Features
 - The ``pyramid.request.Response`` class now has a ``RequestClass`` interface
   which points at ``pyramid.response.Request``.
 
+- It is now possible to control how the Pyramid router calls the WSGI
+  ``start_response`` callable and obtains the WSGI ``app_iter`` based on
+  adapting the response object to the new ``pyramid.interfaces.IResponder``
+  interface.  The default ``IResponder`` uses Pyramid 1.0's logic to do this.
+  To override the responder::
+
+     from pyramid.interfaces import IResponder
+     from pyramid.response import Response
+     from myapp import MyResponder
+
+     config.registry.registerAdapter(MyResponder, (Response,),
+                                     IResponder, name='')
+
+  This makes it possible to reuse response object implementations which have,
+  for example, their own ``__call__`` expected to be used as a WSGI
+  application (like ``pyramid.response.Response``), e.g.:
+
+     class MyResponder(object):
+         def __init__(self, response):
+             """ Obtain a reference to the response """
+             self.response = response
+         def __call__(self, request, start_response):
+             """ Call start_response and return an app_iter """
+             app_iter = self.response(request.environ, start_response)
+             return app_iter
+
 Bug Fixes
 ---------
 

@@ -12,6 +12,7 @@ from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import ITraverser
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
+from pyramid.interfaces import IResponder
 
 from pyramid.events import ContextFound
 from pyramid.events import NewRequest
@@ -58,6 +59,7 @@ class Router(object):
         logger = self.logger
         manager = self.threadlocal_manager
         request = None
+        responder = default_responder
         threadlocals = {'registry':registry, 'request':request}
         manager.push(threadlocals)
 
@@ -186,21 +188,30 @@ class Router(object):
                 if request.response_callbacks:
                     request._process_response_callbacks(response)
 
-                try:
-                    headers = response.headerlist
-                    app_iter = response.app_iter
-                    status = response.status
-                except AttributeError:
-                    raise ValueError(
-                        'Non-response object returned from view named %s '
-                        '(and no renderer): %r' % (view_name, response))
+                responder = adapters.queryAdapter(response, IResponder)
+                if responder is None:
+                    responder = default_responder(response)
 
             finally:
                 if request is not None and request.finished_callbacks:
                     request._process_finished_callbacks()
 
-            start_response(status, headers)
-            return app_iter
-            
+            return responder(request, start_response)
+
         finally:
             manager.pop()
+
+def default_responder(response):
+    def inner(request, start_response):
+        try:
+            headers = response.headerlist
+            app_iter = response.app_iter
+            status = response.status
+        except AttributeError:
+            raise ValueError(
+                'Non-response object returned from view '
+                '(and no renderer): %r' % (response))
+        start_response(status, headers)
+        return app_iter
+    return inner
+

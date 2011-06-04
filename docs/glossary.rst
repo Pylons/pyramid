@@ -900,5 +900,9 @@ Glossary
      http://docs.python.org/distutils/index.html for more information.
      :term:`setuptools` is actually an *extension* of the Distutils.
 
+   exception response
+     A :term:`response` that is generated as the result of a raised exception
+     being caught by an :term:`exception view`.
+
    
 

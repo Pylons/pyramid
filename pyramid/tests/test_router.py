@@ -449,6 +449,37 @@ class TestRouter(unittest.TestCase):
         exc_raised(NotImplementedError, router, environ, start_response)
         self.assertEqual(environ['called_back'], True)
 
+    def test_call_with_overridden_iresponder_factory(self):
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IResponder
+        context = DummyContext()
+        class IFoo(Interface):
+            pass
+        directlyProvides(context, IFoo)
+        self._registerTraverserFactory(context, subpath=[''])
+        class DummyResponder(object):
+            def __init__(self, response):
+                self.response = response
+            def __call__(self, request, start_response):
+                self.response.responder_used = True
+                return '123'
+        self.registry.registerAdapter(DummyResponder, (None,),
+                                      IResponder, name='')
+        response = DummyResponse('200 OK')
+        directlyProvides(response, IFoo)
+        def view(context, request):
+            return response
+        environ = self._makeEnviron()
+        self._registerView(view, '', IViewClassifier, IRequest, Interface)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        self.assertTrue(response.responder_used)
+        self.assertEqual(result, '123')
+
     def test_call_request_factory_raises(self):
         # making sure finally doesnt barf when a request cannot be created
         environ = self._makeEnviron()
