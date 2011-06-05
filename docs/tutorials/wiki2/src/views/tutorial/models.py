@@ -31,6 +31,7 @@ def initialize_sql(engine):
     Base.metadata.bind = engine
     Base.metadata.create_all(engine)
     try:
+        transaction.begin()
         session = DBSession()
         page = Page('FrontPage', 'initial data')
         session.add(page)

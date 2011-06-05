@@ -2,7 +2,7 @@ import re
 
 from docutils.core import publish_parts
 
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.url import route_url
 
 from tutorial.models import DBSession
@@ -18,7 +18,9 @@ def view_wiki(request):
 def view_page(request):
     matchdict = request.matchdict
     session = DBSession()
-    page = session.query(Page).filter_by(name=matchdict['pagename']).one()
+    page = session.query(Page).filter_by(name=pagename).first()
+    if page is None:
+        return HTTPNotFound('No such page')
 
     def check(match):
         word = match.group(1)
@@ -48,7 +50,7 @@ def add_page(request):
     save_url = route_url('add_page', request, pagename=name)
     page = Page('', '')
     return dict(page=page, save_url=save_url)
-    
+
 def edit_page(request):
     name = request.matchdict['pagename']
     session = DBSession()

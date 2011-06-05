@@ -32,8 +32,9 @@ def initialize_sql(engine):
     Base.metadata.bind = engine
     Base.metadata.create_all(engine)
     try:
+        transaction.begin()
         session = DBSession()
-        page = Page('FrontPage', 'initial data')
+        page = Page('FrontPage', 'This is the front page')
         session.add(page)
         transaction.commit()
     except IntegrityError:
