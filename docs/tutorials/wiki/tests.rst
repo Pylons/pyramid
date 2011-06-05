@@ -73,6 +73,6 @@ The expected result looks something like:
 
    .........
    ----------------------------------------------------------------------
-   Ran 9 tests in 0.203s
+   Ran 23 tests in 1.653s
    
    OK
