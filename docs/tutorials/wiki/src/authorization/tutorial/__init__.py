@@ -16,8 +16,8 @@ def main(global_config, **settings):
     authn_policy = AuthTktAuthenticationPolicy(secret='sosecret',
                                                callback=groupfinder)
     authz_policy = ACLAuthorizationPolicy()
-    zodb_uri = settings.get('zodb_uri')
-    if zodb_uri is None:
+    zodb_uri = settings.get('zodb_uri', False)
+    if zodb_uri is False:
         raise ValueError("No 'zodb_uri' in application configuration.")
 
     finder = PersistentApplicationFinder(zodb_uri, appmaker)
