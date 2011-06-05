@@ -122,7 +122,7 @@ Preparation, Windows
 
    .. code-block:: text
 
-     c:\pyramidtut> Scripts\easy_install docutils repoze.tm2 \
+     c:\pyramidtut> Scripts\easy_install docutils repoze.tm2 ^
            repoze.zodbconn nose coverage
 
 .. _making_a_project:
@@ -234,7 +234,7 @@ On Windows:
 
 .. code-block:: text
 
-  c:\pyramidtut\tutorial> ..\Scripts\nosetests --cover-package=tutorial \
+  c:\pyramidtut\tutorial> ..\Scripts\nosetests --cover-package=tutorial ^
        --cover-erase --with-coverage
 
 Looks like the code in the ``pyramid_zodb`` scaffold for ZODB projects is

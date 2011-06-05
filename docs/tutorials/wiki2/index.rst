@@ -11,8 +11,8 @@ basic Wiki application with authentication.
 
 For cut and paste purposes, the source code for all stages of this
 tutorial can be browsed at
-`http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/
-<http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/>`_.
+`http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/
+<http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/>`_.
 
 .. toctree::
    :maxdepth: 2

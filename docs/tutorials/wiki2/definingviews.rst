@@ -25,9 +25,9 @@ match has an attribute named ``matchdict`` that contains the elements placed
 into the URL by the ``pattern`` of a ``route`` statement.  For instance, if a
 call to :meth:`pyramid.config.Configurator.add_route` in ``__init__.py`` had
 the pattern ``{one}/{two}``, and the URL at ``http://example.com/foo/bar``
-was invoked, matching this pattern, the matchdict dictionary attached to the
-request passed to the view would have a ``one`` key with the value ``foo``
-and a ``two`` key with the value ``bar``.
+was invoked, matching this pattern, the ``matchdict`` dictionary attached to
+the request passed to the view would have a ``'one'`` key with the value
+``'foo'`` and a ``'two'`` key with the value ``'bar'``.
 
 The source code for this tutorial stage can be browsed at
 `http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/views/
@@ -80,9 +80,9 @@ to be edited.  We'll describe each one briefly and show the resulting
 The ``view_wiki`` view function
 -------------------------------
 
-The ``view_wiki`` function will respond as the :term:`default view` of a
-``Wiki`` model object.  It always redirects to a URL which represents the
-path to our "FrontPage".
+The ``view_wiki`` function is the :term:`default view` that will be called
+when a request is made to the root URL of our wiki.  It always redirects to
+a URL which represents the path to our "FrontPage".
 
 .. literalinclude:: src/views/tutorial/views.py
    :pyobject: view_wiki
@@ -99,11 +99,10 @@ page (e.g. ``http://localhost:6543/FrontPage``), and will use it as the
 The ``view_page`` view function
 -------------------------------
 
-The ``view_page`` function will respond as the :term:`default view` of
-a ``Page`` object.  The ``view_page`` function renders the
-:term:`ReStructuredText` body of a page (stored as the ``data``
-attribute of a Page object) as HTML.  Then it substitutes an HTML
-anchor for each *WikiWord* reference in the rendered HTML using a
+The ``view_page`` function will be used to show a single page of our
+wiki.  It renders the :term:`ReStructuredText` body of a page (stored as
+the ``data`` attribute of a Page object) as HTML.  Then it substitutes an
+HTML anchor for each *WikiWord* reference in the rendered HTML using a
 compiled regular expression.
 
 .. literalinclude:: src/views/tutorial/views.py
@@ -146,15 +145,15 @@ will have the values we need to construct URLs and find model objects.
    :linenos:
    :language: python
 
-The matchdict will have a ``pagename`` key that matches the name of the page
-we'd like to add.  If our add view is invoked via,
-e.g. ``http://localhost:6543/add_page/SomeName``, the ``pagename`` value in
-the matchdict will be ``SomeName``.
+The ``matchdict`` will have a ``'pagename'`` key that matches the name of
+the page we'd like to add.  If our add view is invoked via,
+e.g. ``http://localhost:6543/add_page/SomeName``, the value for
+``'pagename'`` in the ``matchdict`` will be ``'SomeName'``.
 
 If the view execution is *not* a result of a form submission (if the
 expression ``'form.submitted' in request.params`` is ``False``), the view
 callable renders a template.  To do so, it generates a "save url" which the
-template use as the form post URL during rendering.  We're lazy here, so
+template uses as the form post URL during rendering.  We're lazy here, so
 we're trying to use the same template (``templates/edit.pt``) for the add
 view as well as the page edit view, so we create a dummy Page object in order
 to satisfy the edit form's desire to have *some* page object exposed as
@@ -163,10 +162,10 @@ view to a response.
 
 If the view execution *is* a result of a form submission (if the expression
 ``'form.submitted' in request.params`` is ``True``), we scrape the page body
-from the form data, create a Page object using the name in the matchdict
-``pagename``, and obtain the page body from the request, and save it into the
-database using ``session.add``.  We then redirect back to the ``view_page``
-view (the :term:`default view` for a Page) for the newly created page.
+from the form data, create a Page object with this page body and the name
+taken from ``matchdict['pagename']``, and save it into the database using
+``session.add``.  We then redirect back to the ``view_page`` view for the
+newly created page.
 
 The ``edit_page`` view function
 -------------------------------
@@ -174,7 +173,7 @@ The ``edit_page`` view function
 The ``edit_page`` function will be invoked when a user clicks the "Edit this
 Page" button on the view form.  It renders an edit form but it also acts as
 the handler for the form it renders.  The ``matchdict`` attribute of the
-request passed to the ``edit_page`` view will have a ``pagename`` key
+request passed to the ``edit_page`` view will have a ``'pagename'`` key
 matching the name of the page the user wants to edit.
 
 .. literalinclude:: src/views/tutorial/views.py
@@ -184,14 +183,14 @@ matching the name of the page the user wants to edit.
 
 If the view execution is *not* a result of a form submission (if the
 expression ``'form.submitted' in request.params`` is ``False``), the view
-simply renders the edit form, passing the request, the page object, and a
-save_url which will be used as the action of the generated form.
+simply renders the edit form, passing the page object and a ``save_url``
+which will be used as the action of the generated form.
 
 If the view execution *is* a result of a form submission (if the expression
 ``'form.submitted' in request.params`` is ``True``), the view grabs the
-``body`` element of the request parameter and sets it as the ``data``
-attribute of the page object.  It then redirects to the default view of the
-wiki page, which will always be the ``view_page`` view.
+``body`` element of the request parameters and sets it as the ``data``
+attribute of the page object.  It then redirects to the ``view_page`` view
+of the wiki page.
 
 Viewing the Result of all Our Edits to ``views.py``
 ===================================================
@@ -274,7 +273,7 @@ Mapping Views to URLs in ``__init__.py``
 The ``__init__.py`` file contains
 :meth:`pyramid.config.Configurator.add_view` calls which serve to map
 routes via :term:`url dispatch` to views.  First, we’ll get rid of the
-existing route created by the template using the name ``home``. It’s only an
+existing route created by the template using the name ``'home'``. It’s only an
 example and isn’t relevant to our application.
 
 We then need to add four calls to ``add_route``.  Note that the *ordering* of
@@ -282,7 +281,7 @@ these declarations is very important.  ``route`` declarations are matched in
 the order they're found in the ``__init__.py`` file.
 
 #. Add a declaration which maps the pattern ``/`` (signifying the root URL)
-   to the route named ``view_wiki``.  
+   to the route named ``view_wiki``.
 
 #. Add a declaration which maps the pattern ``/{pagename}`` to the route named
    ``view_page``.  This is the regular view for a page.
@@ -372,7 +371,7 @@ The expected output is something like:
    writing top-level names to tutorial.egg-info/top_level.txt
    writing dependency_links to tutorial.egg-info/dependency_links.txt
    writing entry points to tutorial.egg-info/entry_points.txt
-   unrecognized .svn/entries format in 
+   unrecognized .svn/entries format in
    reading manifest file 'tutorial.egg-info/SOURCES.txt'
    writing manifest file 'tutorial.egg-info/SOURCES.txt'
    running build_ext
@@ -384,4 +383,4 @@ The expected output is something like:
 
 
 
-   
+

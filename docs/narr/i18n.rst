@@ -95,7 +95,7 @@ translations of the same msgid, in case they conflict.
    :linenos:
 
    from pyramid.i18n import TranslationString
-   ts = TranslationString('Add ${number}', mapping={'number':1}, 
+   ts = TranslationString('Add ${number}', mapping={'number':1},
                           domain='form')
 
 The above translation string named a domain of ``form``.  A
@@ -170,7 +170,7 @@ to:
    :linenos:
 
    from pyramid.i18n import TranslationString as _
-   ts = _('Add ${number}', msgid='add-number', mapping={'number':1}, 
+   ts = _('Add ${number}', msgid='add-number', mapping={'number':1},
           domain='pyramid')
 
 You can set up your own translation string factory much like the one
@@ -231,7 +231,7 @@ GNU gettext uses three types of files in the translation framework,
 
   A ``.pot`` file is created by a program which searches through your
   project's source code and which picks out every :term:`message
-  identifier` passed to one of the '``_()`` functions
+  identifier` passed to one of the ``_()`` functions
   (eg. :term:`translation string` constructions). The list of all
   message identifiers is placed into a ``.pot`` file, which serves as
   a template for creating ``.po`` files.
@@ -288,7 +288,7 @@ like so:
 .. code-block:: text
 
    C> cd \my\virtualenv
-   C> bin\easy_install Babel lingua
+   C> Scripts\easy_install Babel lingua
 
 .. index::
    single: Babel; message extractors
@@ -535,7 +535,7 @@ translation in a view component of an application might look like so:
    from pyramid.i18n import get_localizer
    from pyramid.i18n import TranslationString
 
-   ts = TranslationString('Add ${number}', mapping={'number':1}, 
+   ts = TranslationString('Add ${number}', mapping={'number':1},
                           domain='pyramid')
 
    def aview(request):
@@ -844,7 +844,7 @@ Then as a part of the code of a custom :term:`locale negotiator`:
 
 .. code-block:: python
    :linenos:
-    
+
    from pyramid.threadlocal import get_current_registry
    settings = get_current_registry().settings
    languages = settings['available_languages'].split()
@@ -897,7 +897,7 @@ application startup.  For example:
    :linenos:
 
    from pyramid.config import Configurator
-   config.add_translation_dirs('my.application:locale/', 
+   config.add_translation_dirs('my.application:locale/',
                                'another.application:locale/')
 
 A message catalog in a translation directory added via

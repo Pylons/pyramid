@@ -73,7 +73,7 @@ Preparation, Windows
 
    .. code-block:: text
 
-      c:\pyramidtut> Scripts\easy_install docutils \
+      c:\pyramidtut> Scripts\easy_install docutils ^
                nose coverage zope.sqlalchemy SQLAlchemy repoze.tm2
 
 
@@ -205,7 +205,7 @@ On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut\tutorial> ..\Scripts\nosetests --cover-package=tutorial \
+   c:\pyramidtut\tutorial> ..\Scripts\nosetests --cover-package=tutorial ^
          --cover-erase --with-coverage
 
 Looks like our package's ``models`` module doesn't quite have 100%
