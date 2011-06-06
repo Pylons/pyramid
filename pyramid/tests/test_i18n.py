@@ -200,6 +200,19 @@ class Test_make_localizer(unittest.TestCase):
         self.assertEqual(result.translate('Approve', 'deformsite'),
                          'Approve')
 
+    def test_territory_fallback(self):
+        import os
+        from pyramid.i18n import Localizer
+        here = os.path.dirname(__file__)
+        localedir = os.path.join(here, 'localeapp', 'locale')
+        localedirs = [localedir]
+        locale_name = 'de_DE'
+        result = self._callFUT(locale_name, localedirs)
+        self.assertEqual(result.__class__, Localizer)
+        self.assertEqual(result.translate('Approve', 'deformsite'),
+                         'Genehmigen')
+
+
 class Test_get_localizer(unittest.TestCase):
     def setUp(self):
         cleanUp()
