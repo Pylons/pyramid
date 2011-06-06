@@ -23,7 +23,7 @@ what type of application you're trying to construct.
 These scaffolds are rendered using the :term:`PasteDeploy` ``paster`` script.
 
 .. index::
-   single: scaffolds 
+   single: scaffolds
    single: pyramid_starter scaffold
    single: pyramid_zodb scaffold
    single: pyramid_alchemy scaffold
@@ -55,7 +55,7 @@ The included scaffolds are these:
 ``pyramid_zodb``
   URL mapping via :term:`traversal` and persistence via :term:`ZODB`.
 
-``pyramid_routesalchemy`` 
+``pyramid_routesalchemy``
   URL mapping via :term:`URL dispatch` and persistence via
   :term:`SQLAlchemy`
 
@@ -281,7 +281,7 @@ name ``MyProject`` as a section name:
 .. code-block:: text
 
    [chrism@vitaminf shellenv]$ ../bin/paster pshell development.ini MyProject
-   Python 2.4.5 (#1, Aug 29 2008, 12:27:37) 
+   Python 2.4.5 (#1, Aug 29 2008, 12:27:37)
    [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
    Type "help" for more information. "root" is the Pyramid app root object,
    "registry" is the Pyramid registry object.
@@ -335,7 +335,7 @@ example, if you have the following ``.ini`` file content:
    default_locale_name = en
 
    [pipeline:main]
-   pipeline = 
+   pipeline =
        egg:WebError#evalerror
        MyProject
 
@@ -606,7 +606,7 @@ for each request.
 
 .. note::
 
-  In general, :app:`Pyramid` applications generated from scaffolds 
+  In general, :app:`Pyramid` applications generated from scaffolds
   should be threading-aware.  It is not required that a :app:`Pyramid`
   application be nonblocking as all application code will run in its own
   thread, provided by the server you're using.
@@ -622,13 +622,13 @@ implementations.
    Such a section should consists of global parameters that are shared by all
    the applications, servers and :term:`middleware` defined within the
    configuration file.  The values in a ``[DEFAULT]`` section will be passed
-   to your application's ``main`` function as ``global_values`` (see
+   to your application's ``main`` function as ``global_config`` (see
    the reference to the ``main`` function in :ref:`init_py`).
 
 ``production.ini``
 ~~~~~~~~~~~~~~~~~~~
 
-The ``development.ini`` file is a :term:`PasteDeploy` configuration file with
+The ``production.ini`` file is a :term:`PasteDeploy` configuration file with
 a purpose much like that of ``development.ini``.  However, it disables the
 WebError interactive debugger, replacing it with a logger which outputs
 exception messages to ``stderr`` by default.  It also turns off template

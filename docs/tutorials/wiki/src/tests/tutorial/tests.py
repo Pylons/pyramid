@@ -139,16 +139,20 @@ class FunctionalTests(unittest.TestCase):
         self.tmpdir = tempfile.mkdtemp()
 
         dbpath = os.path.join( self.tmpdir, 'test.db')
-        settings = { 'zodb_uri' : 'file://' + dbpath }
+        from repoze.zodbconn.uri import db_from_uri
+        db = db_from_uri('file://' + dbpath)
+        settings = { 'zodb_uri' : None }
 
         app = main({}, **settings)
-        from repoze.zodbconn.middleware import EnvironmentDeleterMiddleware
-        app = EnvironmentDeleterMiddleware(app)
+        from repoze.zodbconn.connector import Connector
+        app = Connector(app, db)
+        self.db = db
         from webtest import TestApp
         self.testapp = TestApp(app)
 
     def tearDown(self):
         import shutil
+        self.db.close()
         shutil.rmtree( self.tmpdir )
 
     def test_root(self):

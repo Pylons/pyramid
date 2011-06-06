@@ -53,6 +53,10 @@ Static Routes
 Minor Feature Additions
 -----------------------
 
+- New authentication policy:
+  :class:`pyramid.authentication.SessionAuthenticationPolicy`, which uses a
+  session to store credentials.
+
 - Integers and longs passed as ``elements`` to
   :func:`pyramid.url.resource_url` or
   :meth:`pyramid.request.Request.resource_url` e.g. ``resource_url(context,
@@ -89,6 +93,15 @@ Minor Feature Additions
 
 Deprecations and Behavior Differences
 -------------------------------------
+
+- The default Mako renderer is now configured to escape all HTML in
+  expression tags. This is intended to help prevent XSS attacks caused by
+  rendering unsanitized input from users. To revert this behavior in user's
+  templates, they need to filter the expression through the 'n' filter::
+
+     ${ myhtml | n }.
+
+  See https://github.com/Pylons/pyramid/issues/193.
 
 - Deprecated all assignments to ``request.response_*`` attributes (for
   example ``request.response_content_type = 'foo'`` is now deprecated).

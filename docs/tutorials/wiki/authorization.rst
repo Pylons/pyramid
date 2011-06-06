@@ -32,10 +32,17 @@ Adding Authentication and Authorization Policies
 
 We'll change our package's ``__init__.py`` file to enable an
 ``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy`` to enable
-declarative security checking.  When you're done, your ``__init__.py`` will
-look like so:
+declarative security checking. We need to import the new policies:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
+   :lines: 4-5,8
+   :linenos:
+   :language: python
+
+Then, we'll add those policies to the configuration:
+
+.. literalinclude:: src/authorization/tutorial/__init__.py
+   :lines: 16-18,26-28
    :linenos:
    :language: python
 
@@ -45,6 +52,13 @@ an encryption key used by the "authentication ticket" machinery represented
 by this policy: it is required.  The ``callback`` is a reference to a
 ``groupfinder`` function in the ``tutorial`` package's ``security.py`` file.
 We haven't added that module yet, but we're about to.
+
+When you're done, your ``__init__.py`` will
+look like so:
+
+.. literalinclude:: src/authorization/tutorial/__init__.py
+   :linenos:
+   :language: python
 
 Adding ``security.py``
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -57,12 +71,12 @@ content:
    :linenos:
    :language: python
 
-The ``groupfinder`` function defined here is an authorization policy
+The ``groupfinder`` function defined here is an :term:`authentication policy`
 "callback"; it is a callable that accepts a userid and a request.  If the
-userid exists in the set of users known by the system, the callback will
+userid exists in the system, the callback will
 return a sequence of group identifiers (or an empty sequence if the user
 isn't a member of any groups).  If the userid *does not* exist in the system,
-the callback will return ``None``.  In a production system this data will
+the callback will return ``None``.  In a production system, user and group data will
 most often come from a database, but here we use "dummy" data to represent
 user and groups sources. Note that the ``editor`` user is a member of the
 ``group:editors`` group in our dummy group data (the ``GROUPS`` data

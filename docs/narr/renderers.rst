@@ -11,7 +11,6 @@ Response interface, :app:`Pyramid` will attempt to use a
 .. code-block:: python
    :linenos:
 
-   from pyramid.response import Response
    from pyramid.view import view_config
 
    @view_config(renderer='json')
@@ -193,11 +192,11 @@ You can configure a view to use the JSON renderer by naming ``json`` as the
 .. code-block:: python
    :linenos:
 
-   config.add_view('myproject.views.hello_world', 
+   config.add_view('myproject.views.hello_world',
                     name='hello',
                     context='myproject.resources.Hello',
                     renderer='json')
-    
+
 
 Views which use the JSON renderer can vary non-body response attributes by
 using the api of the ``request.response`` attribute.  See
@@ -221,7 +220,7 @@ See :ref:`chameleon_zpt_templates` for more information about ZPT templates.
 If the ``renderer`` attribute of a view configuration is an absolute path or
 a :term:`asset specification` which has a final path element with a filename
 extension of ``.txt``, the :term:`Chameleon` text renderer is used.  See
-:ref:`chameleon_zpt_templates` for more information about Chameleon text
+:ref:`chameleon_text_templates` for more information about Chameleon text
 templates.
 
 The behavior of these renderers is the same, except for the engine
@@ -239,7 +238,7 @@ dictionary, an error will be raised.
 
 Before passing keywords to the template, the keyword arguments derived from
 the dictionary returned by the view are augmented.  The callable object --
-whatever object was used to define the ``view`` -- will be automatically
+whatever object was used to define the view -- will be automatically
 inserted into the set of keyword arguments passed to the template as the
 ``view`` keyword.  If the view callable was a class, the ``view`` keyword
 will be an instance of that class.  Also inserted into the keywords passed to
@@ -286,7 +285,7 @@ the API of the ``request.response`` attribute.  See
 The ``Mako`` template renderer renders views using a Mako template.  When
 used, the view must return a Response object or a Python *dictionary*.  The
 dictionary items will then be used in the global template space. If the view
-callable returns anything but a Response object, or a dictionary, an error
+callable returns anything but a Response object or a dictionary, an error
 will be raised.
 
 When using a ``renderer`` argument to a :term:`view configuration` to specify
@@ -448,15 +447,15 @@ following interface:
 
    class RendererFactory:
        def __init__(self, info):
-           """ Constructor: info will be an object having the the
+           """ Constructor: info will be an object having the
            following attributes: name (the renderer name), package
            (the package that was 'current' at the time the
            renderer was registered), type (the renderer type
            name), registry (the current application registry) and
-           settings (the deployment settings dictionary).  """
+           settings (the deployment settings dictionary). """
 
        def __call__(self, value, system):
-           """ Call a the renderer implementation with the value
+           """ Call the renderer implementation with the value
            and the system value passed in as arguments and return
            the result (a string or unicode object).  The value is
            the return value of a view.  The system value is a
@@ -468,7 +467,7 @@ factory constructor is available as :class:`pyramid.interfaces.IRendererInfo`.
 
 There are essentially two different kinds of renderer factories:
 
-- A renderer factory which expects to accept a :term:`asset
+- A renderer factory which expects to accept an :term:`asset
   specification`, or an absolute path, as the ``name`` attribute of the
   ``info`` object fed to its constructor.  These renderer factories are
   registered with a ``name`` value that begins with a dot (``.``).  These
@@ -529,7 +528,7 @@ factory, which expects to be passed a filesystem path:
 .. code-block:: python
    :linenos:
 
-   config.add_renderer(name='.jinja2', 
+   config.add_renderer(name='.jinja2',
                        factory='my.package.MyJinja2Renderer')
 
 Adding the above code to your application startup will allow you to use the
@@ -559,7 +558,7 @@ to the ``MyJinja2Renderer`` constructor will be the full value that was
 set as ``renderer=`` in the view configuration.
 
 Changing an Existing Renderer
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can associate more than one filename extension with the same existing
 renderer implementation as necessary if you need to use a different file
@@ -626,9 +625,9 @@ sets an ``override_renderer`` attribute on the request itself, which is the
    def set_xmlrpc_params(event):
        request = event.request
        if (request.content_type == 'text/xml'
-           and request.method == 'POST'
-           and not 'soapaction' in request.headers
-           and not 'x-pyramid-avoid-xmlrpc' in request.headers):
+               and request.method == 'POST'
+               and not 'soapaction' in request.headers
+               and not 'x-pyramid-avoid-xmlrpc' in request.headers):
            params, method = parse_xmlrpc_request(request)
            request.xmlrpc_params, request.xmlrpc_method = params, method
            request.is_xmlrpc = True

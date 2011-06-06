@@ -91,9 +91,9 @@ Here's a sample resource tree, represented by a variable named ``root``:
     root = Resource({'a':Resource({'b':Resource({'c':Resource()})})})
 
 The resource tree we've created above is represented by a dictionary-like
-root object which has a single child named ``a``.  ``a`` has a single child
-named ``b``, and ``b`` has a single child named ``c``, which has no children.
-It is therefore possible to access ``c`` like so:
+root object which has a single child named ``'a'``.  ``'a'`` has a single child
+named ``'b'``, and ``'b'`` has a single child named ``'c'``, which has no
+children. It is therefore possible to access the ``'c'`` leaf resource like so:
 
 .. code-block:: python
    :linenos:
@@ -101,7 +101,7 @@ It is therefore possible to access ``c`` like so:
    root['a']['b']['c']
 
 If you returned the above ``root`` object from a :term:`root factory`, the
-path ``/a/b/c`` would find the ``c`` object in the resource tree as the
+path ``/a/b/c`` would find the ``'c'`` object in the resource tree as the
 result of :term:`traversal`.
 
 In this example, each of the resources in the tree is of the same class.
@@ -428,7 +428,7 @@ list, we will get:
 
 .. code-block:: python
    :linenos:
-    
+
    list(lineage(thing2))
    [ <Thing object at thing2>, <Thing object at thing1> ]
 
@@ -437,8 +437,8 @@ resource it was passed unconditionally.  Then, if the resource supplied a
 ``__parent__`` attribute, it returns the resource represented by
 ``resource.__parent__``.  If *that* resource has a ``__parent__`` attribute,
 return that resource's parent, and so on, until the resource being inspected
-either has no ``__parent__`` attribute or which has a ``__parent__``
-attribute of ``None``.
+either has no ``__parent__`` attribute or has a ``__parent__`` attribute of
+``None``.
 
 See the documentation for :func:`pyramid.location.lineage` for more
 information.
@@ -563,6 +563,7 @@ To do so, use the :func:`zope.interface.directlyProvides` function:
 .. code-block:: python
    :linenos:
 
+   import datetime
    from zope.interface import directlyProvides
    from zope.interface import Interface
 
@@ -587,6 +588,7 @@ the :func:`zope.interface.alsoProvides` function:
 .. code-block:: python
    :linenos:
 
+   import datetime
    from zope.interface import alsoProvides
    from zope.interface import directlyProvides
    from zope.interface import Interface

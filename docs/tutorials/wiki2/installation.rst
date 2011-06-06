@@ -73,7 +73,7 @@ Preparation, Windows
 
    .. code-block:: text
 
-      c:\pyramidtut> Scripts\easy_install -i docutils \
+      c:\pyramidtut> Scripts\easy_install docutils \
                nose coverage zope.sqlalchemy SQLAlchemy repoze.tm2
 
 

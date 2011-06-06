@@ -751,12 +751,106 @@ class TestAuthTktCookieHelper(unittest.TestCase):
                          'auth_tkt=""; Path=/; Domain=.localhost; Max-Age=0; '
                          'Expires=Wed, 31-Dec-97 23:59:59 GMT')
 
+
+class TestSessionAuthenticationPolicy(unittest.TestCase):
+    def _getTargetClass(self):
+        from pyramid.authentication import SessionAuthenticationPolicy
+        return SessionAuthenticationPolicy
+
+    def _makeOne(self, callback=None, prefix=''):
+        return self._getTargetClass()(prefix=prefix, callback=callback)
+
+    def test_class_implements_IAuthenticationPolicy(self):
+        from zope.interface.verify import verifyClass
+        from pyramid.interfaces import IAuthenticationPolicy
+        verifyClass(IAuthenticationPolicy, self._getTargetClass())
+
+    def test_instance_implements_IAuthenticationPolicy(self):
+        from zope.interface.verify import verifyObject
+        from pyramid.interfaces import IAuthenticationPolicy
+        verifyObject(IAuthenticationPolicy, self._makeOne())
+
+    def test_unauthenticated_userid_returns_None(self):
+        request = DummyRequest()
+        policy = self._makeOne()
+        self.assertEqual(policy.unauthenticated_userid(request), None)
+
+    def test_unauthenticated_userid(self):
+        request = DummyRequest(session={'userid':'fred'})
+        policy = self._makeOne()
+        self.assertEqual(policy.unauthenticated_userid(request), 'fred')
+
+    def test_authenticated_userid_no_cookie_identity(self):
+        request = DummyRequest()
+        policy = self._makeOne()
+        self.assertEqual(policy.authenticated_userid(request), None)
+
+    def test_authenticated_userid_callback_returns_None(self):
+        request = DummyRequest(session={'userid':'fred'})
+        def callback(userid, request):
+            return None
+        policy = self._makeOne(callback)
+        self.assertEqual(policy.authenticated_userid(request), None)
+
+    def test_authenticated_userid(self):
+        request = DummyRequest(session={'userid':'fred'})
+        def callback(userid, request):
+            return True
+        policy = self._makeOne(callback)
+        self.assertEqual(policy.authenticated_userid(request), 'fred')
+
+    def test_effective_principals_no_identity(self):
+        from pyramid.security import Everyone
+        request = DummyRequest()
+        policy = self._makeOne()
+        self.assertEqual(policy.effective_principals(request), [Everyone])
+
+    def test_effective_principals_callback_returns_None(self):
+        from pyramid.security import Everyone
+        request = DummyRequest(session={'userid':'fred'})
+        def callback(userid, request):
+            return None
+        policy = self._makeOne(callback)
+        self.assertEqual(policy.effective_principals(request), [Everyone])
+
+    def test_effective_principals(self):
+        from pyramid.security import Everyone
+        from pyramid.security import Authenticated
+        request = DummyRequest(session={'userid':'fred'})
+        def callback(userid, request):
+            return ['group.foo']
+        policy = self._makeOne(callback)
+        self.assertEqual(policy.effective_principals(request),
+                         [Everyone, Authenticated, 'fred', 'group.foo'])
+
+    def test_remember(self):
+        request = DummyRequest()
+        policy = self._makeOne()
+        result = policy.remember(request, 'fred')
+        self.assertEqual(request.session.get('userid'), 'fred')
+        self.assertEqual(result, [])
+
+    def test_forget(self):
+        request = DummyRequest(session={'userid':'fred'})
+        policy = self._makeOne()
+        result = policy.forget(request)
+        self.assertEqual(request.session.get('userid'), None)
+        self.assertEqual(result, [])
+
+    def test_forget_no_identity(self):
+        request = DummyRequest()
+        policy = self._makeOne()
+        result = policy.forget(request)
+        self.assertEqual(request.session.get('userid'), None)
+        self.assertEqual(result, [])
+
 class DummyContext:
     pass
 
 class DummyRequest:
-    def __init__(self, environ):
-        self.environ = environ
+    def __init__(self, environ=None, session=None):
+        self.environ = environ or {}
+        self.session = session or {}
         self.callbacks = []
 
     def add_response_callback(self, callback):

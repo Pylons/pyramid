@@ -175,7 +175,7 @@ match is straightforward.  When a route is matched:
    Root factories related to a route were explained previously within
    :ref:`route_factories`.  Both the global root factory and default
    root factory were explained previously within
-   :ref:`the_resource_tree`.  
+   :ref:`the_resource_tree`.
 
 .. _using_traverse_in_a_route_pattern:
 
@@ -216,7 +216,7 @@ root factory.  Once :term:`traversal` has found a :term:`context` resource,
 have been invoked in a "pure" traversal-based application.
 
 Let's assume there is no *global* :term:`root factory` configured in
-this application. The *default* :term:`root factory` cannot be traversed: 
+this application. The *default* :term:`root factory` cannot be traversed:
 it has no useful ``__getitem__`` method.  So we'll need to associate
 this route configuration with a custom root factory in order to
 create a useful hybrid application.  To that end, let's imagine that
@@ -233,8 +233,8 @@ we've created a root factory that looks like so in a module named
        def __getitem__(self, name):
           return self.subobjects[name]
 
-   root = Traversable(
-           {'a':Resource({'b':Resource({'c':Resource({})})})}
+   root = Resource(
+           {'a': Resource({'b': Resource({'c': Resource({})})})}
           )
 
    def root_factory(request):
@@ -247,20 +247,20 @@ configuration statement:
 .. code-block:: python
    :linenos:
 
-   config.add_route('home', '{foo}/{bar}/*traverse', 
+   config.add_route('home', '{foo}/{bar}/*traverse',
                     factory='mypackage.routes.root_factory')
 
 The ``factory`` above points at the function we've defined.  It will return
-an instance of the ``Traversable`` class as a root object whenever this route
-is matched.  Instances of the``Resource`` class can be used for tree
-traversal because they have a ``__getitem__`` method that does something
-nominally useful. Since traversal uses ``__getitem__`` to walk the resources
-of a resource tree, using traversal against the root resource implied by our
-route statement is a reasonable thing to do.
+an instance of the ``Resource`` class as a root object whenever this route is
+matched.  Instances of the ``Resource`` class can be used for tree traversal
+because they have a ``__getitem__`` method that does something nominally
+useful. Since traversal uses ``__getitem__`` to walk the resources of a
+resource tree, using traversal against the root resource implied by our route
+statement is a reasonable thing to do.
 
 .. note::
 
-  We could have also used our ``root_factory`` callable as the
+  We could have also used our ``root_factory`` function as the
   ``root_factory`` argument of the
   :class:`~pyramid.config.Configurator` constructor, instead
   of associating it with a particular route inside the route's
@@ -279,12 +279,12 @@ instance named ``root`` in ``routes.py``.
 If the URL that matched a route with the pattern ``{foo}/{bar}/*traverse``,
 is ``http://example.com/one/two/a/b/c``, the traversal path used
 against the root object will be ``a/b/c``.  As a result,
-:app:`Pyramid` will attempt to traverse through the edges ``a``,
-``b``, and ``c``, beginning at the root object.
+:app:`Pyramid` will attempt to traverse through the edges ``'a'``,
+``'b'``, and ``'c'``, beginning at the root object.
 
 In our above example, this particular set of traversal steps will mean that
-the :term:`context` resource of the view would be the ``Traversable`` object
-we've named ``c`` in our bogus resource tree and the :term:`view name`
+the :term:`context` resource of the view would be the ``Resource`` object
+we've named ``'c'`` in our bogus resource tree and the :term:`view name`
 resulting from traversal will be the empty string; if you need a refresher
 about why this outcome is presumed, see :ref:`traversal_algorithm`.
 
@@ -297,7 +297,7 @@ invoked after a route matches:
 .. code-block:: python
    :linenos:
 
-   config.add_route('home', '{foo}/{bar}/*traverse', 
+   config.add_route('home', '{foo}/{bar}/*traverse',
                     factory='mypackage.routes.root_factory')
    config.add_view('mypackage.views.myview', route_name='home')
 
@@ -327,11 +327,11 @@ when a hybrid route is matched:
 .. code-block:: python
    :linenos:
 
-   config.add_route('home', '{foo}/{bar}/*traverse', 
+   config.add_route('home', '{foo}/{bar}/*traverse',
                     factory='mypackage.routes.root_factory')
-   config.add_view('mypackage.views.myview', name='home')
-   config.add_view('mypackage.views.another_view', name='another', 
-                   route_name='home')
+   config.add_view('mypackage.views.myview', route_name='home')
+   config.add_view('mypackage.views.another_view', route_name='home',
+                   name='another')
 
 The ``add_view`` call for ``mypackage.views.another_view`` above names a
 different view and, more importantly, a different :term:`view name`.  The
@@ -373,12 +373,12 @@ Here's a use of the ``traverse`` pattern in a call to
    :linenos:
 
    config.add_route('abc', '/articles/{article}/edit',
-                    traverse='/articles/{article}')
+                    traverse='/{article}')
 
 The syntax of the ``traverse`` argument is the same as it is for
 ``pattern``.
 
-If, as above, the ``pattern`` provided is ``articles/{article}/edit``,
+If, as above, the ``pattern`` provided is ``/articles/{article}/edit``,
 and the ``traverse`` argument provided is ``/{article}``, when a
 request comes in that causes the route to match in such a way that the
 ``article`` match value is ``1`` (when the request URI is

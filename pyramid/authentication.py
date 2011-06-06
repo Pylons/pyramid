@@ -524,4 +524,46 @@ class AuthTktCookieHelper(object):
 
         cookie_value = ticket.cookie_value()
         return self._get_cookies(environ, cookie_value, max_age)
-    
+
+class SessionAuthenticationPolicy(CallbackAuthenticationPolicy):
+    """ A :app:`Pyramid` authentication policy which gets its data from the
+    configured :term:`session`.  For this authentication policy to work, you
+    will have to follow the instructions in the :ref:`sessions_chapter` to
+    configure a :term:`session factory`.
+
+    Constructor Arguments
+
+    ``prefix``
+
+       A prefix used when storing the authentication parameters in the
+       session. Defaults to 'auth.'. Optional.
+
+    ``callback``
+
+       Default: ``None``.  A callback passed the userid and the
+       request, expected to return ``None`` if the userid doesn't
+       exist or a sequence of principal identifiers (possibly empty) if
+       the user does exist.  If ``callback`` is ``None``, the userid
+       will be assumed to exist with no principals.  Optional.
+    """
+    implements(IAuthenticationPolicy)
+
+    def __init__(self, prefix='auth.', callback=None):
+        self.callback = callback
+        self.prefix = prefix or ''
+        self.userid_key = prefix + 'userid'
+
+    def remember(self, request, principal, **kw):
+        """ Store a principal in the session."""
+        request.session[self.userid_key] = principal
+        return []
+
+    def forget(self, request):
+        """ Remove the stored principal from the session."""
+        if self.userid_key in request.session:
+            del request.session[self.userid_key]
+        return []
+
+    def unauthenticated_userid(self, request):
+        return request.session.get(self.userid_key)
+
