@@ -16,7 +16,7 @@ def view_wiki(request):
                                           pagename='FrontPage'))
 
 def view_page(request):
-    matchdict = request.matchdict
+    pagename = request.matchdict['pagename']
     session = DBSession()
     page = session.query(Page).filter_by(name=pagename).first()
     if page is None:
@@ -34,8 +34,7 @@ def view_page(request):
 
     content = publish_parts(page.data, writer_name='html')['html_body']
     content = wikiwords.sub(check, content)
-    edit_url = route_url('edit_page', request,
-                         pagename=matchdict['pagename'])
+    edit_url = route_url('edit_page', request, pagename=pagename)
     return dict(page=page, content=content, edit_url=edit_url)
 
 def add_page(request):
