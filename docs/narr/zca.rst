@@ -38,10 +38,10 @@ code is high.
 While the ZCA is an excellent tool with which to build a *framework*
 such as :app:`Pyramid`, it is not always the best tool with which
 to build an *application* due to the opacity of the ``zope.component``
-APIs.  Accordingly, :app:`Pyramid` tends to hide the the presence
-of the ZCA from application developers.  You needn't understand the
-ZCA to create a :app:`Pyramid` application; its use is effectively
-only a framework implementation detail.
+APIs.  Accordingly, :app:`Pyramid` tends to hide the presence of the
+ZCA from application developers.  You needn't understand the ZCA to
+create a :app:`Pyramid` application; its use is effectively only a
+framework implementation detail.
 
 However, developers who are already used to writing :term:`Zope`
 applications often still wish to use the ZCA while building a

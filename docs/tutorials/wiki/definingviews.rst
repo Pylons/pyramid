@@ -23,7 +23,7 @@ assumed to return a :term:`response` object.
    the request as a single argument, you can obtain it via
    ``request.context``.
 
-We're going to define several :term:`view callable` functions then wire them
+We're going to define several :term:`view callable` functions, then wire them
 into :app:`Pyramid` using some :term:`view configuration`.
 
 The source code for this tutorial stage can be browsed via
@@ -202,8 +202,8 @@ the form post view callable for the form it renders.  The ``context`` of the
 
 If the view execution is *not* a result of a form submission (if the
 expression ``'form.submitted' in request.params`` is ``False``), the view
-simply renders the edit form, passing the request, the page resource, and a
-save_url which will be used as the action of the generated form.
+simply renders the edit form, passing the page resource, and a ``save_url``
+which will be used as the action of the generated form.
 
 If the view execution *is* a result of a form submission (if the expression
 ``'form.submitted' in request.params`` is ``True``), the view grabs the

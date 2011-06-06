@@ -23,14 +23,15 @@ class Page(Base):
     data = Column(Text)
 
     def __init__(self, name, data):
-       self.name = name
-       self.data = data
+        self.name = name
+        self.data = data
 
 def initialize_sql(engine):
     DBSession.configure(bind=engine)
     Base.metadata.bind = engine
     Base.metadata.create_all(engine)
     try:
+        transaction.begin()
         session = DBSession()
         page = Page('FrontPage', 'initial data')
         session.add(page)

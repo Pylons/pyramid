@@ -84,7 +84,7 @@ The default forbidden response has a 403 status code and is very plain, but
 the view which generates it can be overridden as necessary.
 
 The :term:`forbidden view` callable is a view callable like any other.  The
-:term:`view configuration` which causes it to be a "not found" view consists
+:term:`view configuration` which causes it to be a "forbidden" view consists
 only of naming the :exc:`pyramid.exceptions.Forbidden` class as the
 ``context`` of the view configuration.
 
@@ -182,7 +182,7 @@ Adding Renderer Globals
 -----------------------
 
 Whenever :app:`Pyramid` handles a request to perform a rendering (after a
-view with a ``renderer=`` configuration attribute is invoked, or when the any
+view with a ``renderer=`` configuration attribute is invoked, or when any
 of the methods beginning with ``render`` within the :mod:`pyramid.renderers`
 module are called), *renderer globals* can be injected into the *system*
 values sent to the renderer.  By default, no renderer globals are injected,
@@ -199,7 +199,7 @@ callable object or a :term:`dotted Python name` representing such a callable.
    :linenos:
 
    def renderer_globals_factory(system):
-       return {'a':1}
+       return {'a': 1}
 
    config = Configurator(
             renderer_globals_factory=renderer_globals_factory)
@@ -220,7 +220,7 @@ already constructed a :term:`configurator` it can also be registered via the
    from pyramid.config import Configurator
 
    def renderer_globals_factory(system):
-       return {'a':1}
+       return {'a': 1}
 
    config = Configurator()
    config.set_renderer_globals_factory(renderer_globals_factory)
@@ -237,8 +237,8 @@ Using The Before Render Event
 -----------------------------
 
 Subscribers to the :class:`pyramid.events.BeforeRender` event may introspect
-the and modify the set of :term:`renderer globals` before they are passed to
-a :term:`renderer`.  This event object iself has a dictionary-like interface
+and modify the set of :term:`renderer globals` before they are passed to a
+:term:`renderer`.  This event object iself has a dictionary-like interface
 that can be used for this purpose.  For example:
 
 .. code-block:: python
@@ -484,7 +484,7 @@ resource by adding a registerAdapter call for
    from myapp.traversal import URLGenerator
    from myapp.resources import MyRoot
 
-   config.registry.registerAdapter(URLGenerator, (MyRoot, Interface), 
+   config.registry.registerAdapter(URLGenerator, (MyRoot, Interface),
                                    IContextURL)
 
 In the above example, the ``myapp.traversal.URLGenerator`` class will be used
@@ -531,7 +531,7 @@ Using a View Mapper
 
 The default calling conventions for view callables are documented in the
 :ref:`views_chapter` chapter.  You can change the way users define view
-callbles by employing a :term:`view mapper`.
+callables by employing a :term:`view mapper`.
 
 A view mapper is an object that accepts a set of keyword arguments and which
 returns a callable.  The returned callable is called with the :term:`view
@@ -645,24 +645,22 @@ follows:
    :linenos:
 
    import venusian
-   from pyramid.threadlocal import get_current_registry
    from mypackage.interfaces import IMyUtility
-    
+
    class registerFunction(object):
-        
+
        def __init__(self, path):
            self.path = path
 
        def register(self, scanner, name, wrapped):
            registry = scanner.config.registry
            registry.getUtility(IMyUtility).register(
-               self.path, wrapped
-               )
-        
+               self.path, wrapped)
+
        def __call__(self, wrapped):
            venusian.attach(wrapped, self.register)
            return wrapped
-    
+
 This decorator could then be used to register functions throughout
 your code:
 
@@ -681,16 +679,17 @@ performed, enabling you to set up the utility in advance:
 
    from paste.httpserver import serve
    from pyramid.config import Configurator
+   from mypackage.interfaces import IMyUtility
 
    class UtilityImplementation:
 
-       implements(ISomething)
+       implements(IMyUtility)
 
        def __init__(self):
           self.registrations = {}
 
-       def register(self,path,callable_):
-          self.registrations[path]=callable_
+       def register(self, path, callable_):
+          self.registrations[path] = callable_
 
    if __name__ == '__main__':
        config = Configurator()
