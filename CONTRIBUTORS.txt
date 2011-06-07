@@ -140,3 +140,5 @@ Contributors
 - Philip Jenvey, 2011/04/24
 
 - Michael Merickel, 2011/5/25
+
+- Christoph Zwerschke, 2011/06/07
