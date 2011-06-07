@@ -92,7 +92,7 @@ use :meth:`pyramid.config.Configurator.add_view` in :term:`URL dispatch` to
 register views for the routes, mapping your patterns to code:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
-      :lines: 14
+      :lines: 14-15
       :language: py
 
 The first positional ``add_view`` argument ``tutorial.views.my_view`` is the
@@ -102,7 +102,7 @@ which returns a response or a dictionary.  This view also names a
 ``renderer``, which is a template which lives in the ``templates``
 subdirectory of the package.  When the ``tutorial.views.my_view`` view
 returns a dictionary, a :term:`renderer` will use this template to create a
-response.  This
+response.
 
 Finally, we use the :meth:`pyramid.config.Configurator.make_wsgi_app`
 method to return a :term:`WSGI` application:
@@ -133,7 +133,7 @@ Let's take a look. First, we need some imports to support later code.
       :linenos:
       :language: py
 
-Next we set up a SQLAlchemy "DBSession" object: 
+Next we set up a SQLAlchemy "DBSession" object:
 
    .. literalinclude:: src/basiclayout/tutorial/models.py
       :lines: 15-16

@@ -45,7 +45,7 @@ SQLAlchemy models are easier to use than directly-mapped ones.
    :language: python
 
 As you can see, our ``Page`` class has a class level attribute
-``__tablename__`` which equals the string ``pages``.  This means that
+``__tablename__`` which equals the string ``'pages'``.  This means that
 SQLAlchemy will store our wiki data in a SQL table named ``pages``.  Our Page
 class will also have class-level attributes named ``id``, ``name`` and
 ``data`` (all instances of :class:`sqlalchemy.Column`).  These will map to
@@ -67,7 +67,7 @@ Here, we're using a slightly different binding syntax.  It is otherwise
 largely the same as the ``initialize_sql`` in the paster-generated
 ``models.py``.
 
-Our DBSession assignment stays the same as the original generated
+Our ``DBSession`` assignment stays the same as the original generated
 ``models.py``.
 
 Looking at the Result of all Our Edits to ``models.py``

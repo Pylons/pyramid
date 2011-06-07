@@ -64,7 +64,7 @@ Adding ``security.py``
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Add a ``security.py`` module within your package (in the same
-directory as ``__init__.py``, ``views.py``, etc) with the following
+directory as ``__init__.py``, ``views.py``, etc.) with the following
 content:
 
 .. literalinclude:: src/authorization/tutorial/security.py
@@ -172,7 +172,7 @@ into its template.  We'll add something like this to each view body:
    logged_in = authenticated_userid(request)
 
 We'll then change the return value of each view that has an associated
-``renderer`` to pass the `resulting `logged_in`` value to the
+``renderer`` to pass the resulting ``logged_in`` value to the
 template.  For example:
 
 .. ignore-next-block
@@ -291,7 +291,7 @@ as follows:
   credentials with the username ``editor``, password ``editor`` will
   show the edit page form being displayed.
 
-- After logging in (as a result of hitting an edit or add page and 
+- After logging in (as a result of hitting an edit or add page and
   submitting the login form with the ``editor`` credentials), we'll see
   a Logout link in the upper right hand corner.  When we click it,
   we're logged out, and redirected back to the front page.

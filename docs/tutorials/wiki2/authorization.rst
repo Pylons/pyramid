@@ -76,7 +76,7 @@ information about what an :term:`ACL` represents.
    :meth:`pyramid.config.Configurator.add_route` for more info.
 
 We'll pass the ``RootFactory`` we created in the step above in as the
-``root_factory`` argument to a :term:`Configurator`.  
+``root_factory`` argument to a :term:`Configurator`.
 
 Configuring an Authorization Policy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -116,7 +116,7 @@ We'll also change ``__init__.py``, adding a call to
 :term:`view callable`.  This is also known as a :term:`forbidden view`:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 41-43
+   :lines: 25,41-43
    :linenos:
    :language: python
 
@@ -163,7 +163,7 @@ Adding ``security.py``
 ----------------------
 
 Add a ``security.py`` module within your package (in the same directory as
-:file:`__init__.py`, :file:`views.py`, etc) with the following content:
+:file:`__init__.py`, :file:`views.py`, etc.) with the following content:
 
 .. literalinclude:: src/authorization/tutorial/security.py
    :linenos:

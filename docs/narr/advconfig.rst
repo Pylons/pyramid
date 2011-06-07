@@ -86,9 +86,9 @@ that ends something like this:
        for action in resolveConflicts(self.actions):
      File "zope/configuration/config.py", line 1507, in resolveConflicts
        raise ConfigurationConflictError(conflicts)
-   zope.configuration.config.ConfigurationConflictError: 
+   zope.configuration.config.ConfigurationConflictError:
            Conflicting configuration actions
-     For: ('view', None, '', None, <InterfaceClass pyramid.interfaces.IView>, 
+     For: ('view', None, '', None, <InterfaceClass pyramid.interfaces.IView>,
            None, None, None, None, None, False, None, None, None)
     ('app.py', 14, '<module>', 'config.add_view(hello_world)')
     ('app.py', 17, '<module>', 'config.add_view(hello_world)')
@@ -291,7 +291,7 @@ These are the methods of the configurator which provide conflict detection:
 :meth:`~pyramid.config.Configurator.add_route`,
 :meth:`~pyramid.config.Configurator.add_renderer`,
 :meth:`~pyramid.config.Configurator.set_request_factory`,
-:meth:`~pyramid.config.Configurator.set_renderer_globals_factory`
+:meth:`~pyramid.config.Configurator.set_renderer_globals_factory`,
 :meth:`~pyramid.config.Configurator.set_locale_negotiator` and
 :meth:`~pyramid.config.Configurator.set_default_permission`.
 
@@ -425,7 +425,7 @@ For example:
 
    if __name__ == '__main__':
       config = Configurator()
-      config.add_directive('add_newrequest_subscriber', 
+      config.add_directive('add_newrequest_subscriber',
                            add_newrequest_subscriber)
 
 Once :meth:`~pyramid.config.Configurator.add_directive` is called, a user can
@@ -450,7 +450,7 @@ code in a package named ``pyramid_subscriberhelpers``:
    :linenos:
 
    def includeme(config)
-      config.add_directive('add_newrequest_subscriber', 
+      config.add_directive('add_newrequest_subscriber',
                            add_newrequest_subscriber)
 
 The user of the add-on package ``pyramid_subscriberhelpers`` would then be
