@@ -212,7 +212,6 @@ class FunctionalTests(unittest.TestCase):
 
     def test_unexisting_page(self):
         res = self.testapp.get('/SomePage', status=404)
-        self.assertTrue('No such page' in res.body, res.body)
 
     def test_successful_log_in(self):
         res = self.testapp.get(self.viewer_login, status=302)
