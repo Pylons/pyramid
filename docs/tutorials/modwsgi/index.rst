@@ -109,7 +109,7 @@ commands and files.
 
        <Directory /Users/chrism/modwsgi/env>
          WSGIProcessGroup pyramid
-         Order allow, deny
+         Order allow,deny
          Allow from all
        </Directory>
  
