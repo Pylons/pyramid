@@ -42,6 +42,12 @@ Documentation
 Features
 --------
 
+- Add support for language fallbacks: when trying to translate for a
+  specific territory (such as ``en_GB``) fall back to translations
+  for the language (ie ``en``). This brings the translation behaviour in line
+  with GNU gettext and fixes partially translated texts when using C
+  extensions.
+
 - New authentication policy:
   ``pyramid.authentication.SessionAuthenticationPolicy``, which uses a session
   to store credentials.

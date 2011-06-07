@@ -151,11 +151,16 @@ def make_localizer(current_locale_name, translation_directories):
     translations found in the list of translation directories."""
     translations = Translations()
     translations._catalog = {}
+
+    locales_to_try = [current_locale_name]
+    if '_' in current_locale_name:
+        locales_to_try.append(current_locale_name.split('_')[0])
+
     for tdir in translation_directories:
         locale_dirs = [ (lname, os.path.join(tdir, lname)) for lname in
                         os.listdir(tdir) ]
         for locale_name, locale_dir in locale_dirs:
-            if locale_name != current_locale_name:
+            if locale_name not in locales_to_try:
                 continue
             messages_dir = os.path.join(locale_dir, 'LC_MESSAGES')
             if not os.path.isdir(os.path.realpath(messages_dir)):
