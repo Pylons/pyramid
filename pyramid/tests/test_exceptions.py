@@ -1,5 +1,16 @@
 import unittest
 
+class TestBWCompat(unittest.TestCase):
+    def test_bwcompat_notfound(self):
+        from pyramid.exceptions import NotFound as one
+        from pyramid.httpexceptions import HTTPNotFound as two
+        self.assertTrue(one is two)
+
+    def test_bwcompat_forbidden(self):
+        from pyramid.exceptions import Forbidden as one
+        from pyramid.httpexceptions import HTTPForbidden as two
+        self.assertTrue(one is two)
+
 class TestNotFound(unittest.TestCase):
     def _makeOne(self, message):
         from pyramid.exceptions import NotFound
@@ -14,7 +25,7 @@ class TestNotFound(unittest.TestCase):
 
     def test_response_equivalence(self):
         from pyramid.exceptions import NotFound
-        from pyramid.response import HTTPNotFound
+        from pyramid.httpexceptions import HTTPNotFound
         self.assertTrue(NotFound is HTTPNotFound)
 
 class TestForbidden(unittest.TestCase):
@@ -31,6 +42,6 @@ class TestForbidden(unittest.TestCase):
 
     def test_response_equivalence(self):
         from pyramid.exceptions import Forbidden
-        from pyramid.response import HTTPForbidden
+        from pyramid.httpexceptions import HTTPForbidden
         self.assertTrue(Forbidden is HTTPForbidden)
 

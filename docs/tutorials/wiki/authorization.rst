@@ -131,17 +131,17 @@ callable.
 The first view configuration decorator configures the ``login`` view callable
 so it will be invoked when someone visits ``/login`` (when the context is a
 Wiki and the view name is ``login``).  The second decorator (with context of
-``pyramid.response.HTTPForbidden``) specifies a :term:`forbidden view`.  This
-configures our login view to be presented to the user when :app:`Pyramid`
-detects that a view invocation can not be authorized.  Because we've
-configured a forbidden view, the ``login`` view callable will be invoked
-whenever one of our users tries to execute a view callable that they are not
-allowed to invoke as determined by the :term:`authorization policy` in use.
-In our application, for example, this means that if a user has not logged in,
-and he tries to add or edit a Wiki page, he will be shown the login form.
-Before being allowed to continue on to the add or edit form, he will have to
-provide credentials that give him permission to add or edit via this login
-form.
+``pyramid.httpexceptions.HTTPForbidden``) specifies a :term:`forbidden view`.
+This configures our login view to be presented to the user when
+:app:`Pyramid` detects that a view invocation can not be authorized.  Because
+we've configured a forbidden view, the ``login`` view callable will be
+invoked whenever one of our users tries to execute a view callable that they
+are not allowed to invoke as determined by the :term:`authorization policy`
+in use.  In our application, for example, this means that if a user has not
+logged in, and he tries to add or edit a Wiki page, he will be shown the
+login form.  Before being allowed to continue on to the add or edit form, he
+will have to provide credentials that give him permission to add or edit via
+this login form.
 
 Changing Existing Views
 ~~~~~~~~~~~~~~~~~~~~~~~

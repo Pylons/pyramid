@@ -1,4 +1,4 @@
-from pyramid.response import HTTPFound
+from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember
 from pyramid.security import forget
 from pyramid.url import route_url

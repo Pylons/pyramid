@@ -11,7 +11,6 @@ Response interface, :app:`Pyramid` will attempt to use a
 .. code-block:: python
    :linenos:
 
-   from pyramid.response import Response
    from pyramid.view import view_config
 
    @view_config(renderer='json')
@@ -77,39 +76,52 @@ templating language to render a dictionary to a response.  Additional
 renderers can be added by developers to the system as necessary (see
 :ref:`adding_and_overriding_renderers`).
 
-Views which use a renderer can vary non-body response attributes (such as
-headers and the HTTP status code) by attaching a property to the
-``request.response`` attribute See :ref:`request_response_attr`.
+Views which use a renderer and return a non-Response value can vary non-body
+response attributes (such as headers and the HTTP status code) by attaching a
+property to the ``request.response`` attribute See
+:ref:`request_response_attr`.
 
 If the :term:`view callable` associated with a :term:`view configuration`
-returns a Response object directly (an object with the attributes ``status``,
-``headerlist`` and ``app_iter``), any renderer associated with the view
+returns a Response object directly, any renderer associated with the view
 configuration is ignored, and the response is passed back to :app:`Pyramid`
 unchanged.  For example, if your view callable returns an instance of the
-:class:`pyramid.response.HTTPFound` class as a response, no renderer will be
-employed.
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.response import HTTPFound
-
-   def view(request):
-       return HTTPFound(location='http://example.com') # any renderer avoided
-
-Likewise for a "plain old response":
+:class:`pyramid.response.Response` class as a response, no renderer
+will be employed.
 
 .. code-block:: python
    :linenos:
 
    from pyramid.response import Response
+   from pyramid.view import view_config
 
+   @view_config(renderer='json')
    def view(request):
-       return Response('OK') # any renderer avoided
+       return Response('OK') # json renderer avoided
 
-Mutations to ``request.response`` in views which return a Response object
-like this directly (unless that response *is* ``request.response``) will be
-ignored.
+Likewise for an :term:`HTTP exception` response:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.httpexceptions import HTTPNotFound
+   from pyramid.view import view_config
+
+   @view_config(renderer='json')
+   def view(request):
+       return HTTPFound(location='http://example.com') # json renderer avoided
+
+You can of course also return the ``request.response`` attribute instead to
+avoid rendering:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.view import view_config
+
+   @view_config(renderer='json')
+   def view(request):
+       request.response.body = 'OK'
+       return request.response # json renderer avoided
 
 .. index::
    single: renderers (built-in)
@@ -376,6 +388,31 @@ callable that uses a renderer, assign the ``status`` attribute to the
    def myview(request):
        request.response.status = '404 Not Found'
        return {'URL':request.URL}
+
+Note that mutations of ``request.response`` in views which return a Response
+object directly will have no effect unless the response object returned *is*
+``request.response``.  For example, the following example calls
+``request.response.set_cookie``, but this call will have no effect, because a
+different Response object is returned.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.response import Response
+
+   def view(request):
+       request.response.set_cookie('abc', '123') # this has no effect
+       return Response('OK') # because we're returning a different response
+
+If you mutate ``request.response`` and you'd like the mutations to have an
+effect, you must return ``request.response``:
+
+.. code-block:: python
+   :linenos:
+
+   def view(request):
+       request.response.set_cookie('abc', '123')
+       return request.response
 
 For more information on attributes of the request, see the API documentation
 in :ref:`request_module`.  For more information on the API of

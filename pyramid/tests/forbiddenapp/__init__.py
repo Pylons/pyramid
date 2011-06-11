@@ -1,5 +1,5 @@
 from webob import Response
-from pyramid.response import HTTPForbidden
+from pyramid.httpexceptions import HTTPForbidden
 
 def x_view(request): # pragma: no cover
      return Response('this is private!')

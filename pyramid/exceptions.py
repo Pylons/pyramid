@@ -1,12 +1,12 @@
 from zope.configuration.exceptions import ConfigurationError as ZCE
 
-from pyramid.response import HTTPNotFound
-from pyramid.response import HTTPForbidden
+from pyramid.httpexceptions import HTTPNotFound
+from pyramid.httpexceptions import HTTPForbidden
 
 NotFound = HTTPNotFound # bw compat
 Forbidden = HTTPForbidden # bw compat
 
-class PredicateMismatch(NotFound):
+class PredicateMismatch(HTTPNotFound):
     """
     Internal exception (not an API) raised by multiviews when no
     view matches.  This exception subclasses the ``NotFound``

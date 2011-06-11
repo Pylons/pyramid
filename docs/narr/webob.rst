@@ -362,20 +362,21 @@ To facilitate error responses like ``404 Not Found``, the module
 :mod:`webob.exc` contains classes for each kind of error response.  These
 include boring, but appropriate error bodies.  The exceptions exposed by this
 module, when used under :app:`Pyramid`, should be imported from the
-:mod:`pyramid.response` module.  This import location contains subclasses and
-replacements that mirror those in the original ``webob.exc``.
+:mod:`pyramid.httpexceptions` module.  This import location contains
+subclasses and replacements that mirror those in the original ``webob.exc``.
 
-Each class is named ``pyramid.response.HTTP*``, where ``*`` is the reason for
-the error.  For instance, :class:`pyramid.response.HTTPNotFound`.  It
-subclasses :class:`pyramid.Response`, so you can manipulate the instances in
-the same way.  A typical example is:
+Each class is named ``pyramid.httpexceptions.HTTP*``, where ``*`` is the
+reason for the error.  For instance,
+:class:`pyramid.httpexceptions.HTTPNotFound` subclasses
+:class:`pyramid.Response`, so you can manipulate the instances in the same
+way.  A typical example is:
 
 .. ignore-next-block
 .. code-block:: python
     :linenos:
 
-    from pyramid.response import HTTPNotFound
-    from pyramid.response import HTTPMovedPermanently
+    from pyramid.httpexceptions import HTTPNotFound
+    from pyramid.httpexceptions import HTTPMovedPermanently
 
     response = HTTPNotFound('There is no such resource')
     # or:
@@ -385,7 +386,7 @@ More Details
 ++++++++++++
 
 More details about the response object API are available in the
-:mod:`pyramid.response` documentation.  More details about exception responses
-are in the :mod:`pyramid.response` API documentation.  The `WebOb
-documentation <http://pythonpaste.org/webob>`_ is also useful.
+:mod:`pyramid.response` documentation.  More details about exception
+responses are in the :mod:`pyramid.httpexceptions` API documentation.  The
+`WebOb documentation <http://pythonpaste.org/webob>`_ is also useful.
 

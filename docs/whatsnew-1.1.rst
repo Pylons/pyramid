@@ -63,12 +63,6 @@ Default HTTP Exception View
   from within view code; when raised, this exception view will render the
   exception to a response.
 
-  New convenience functions named :func:`pyramid.httpexceptions.abort` and
-  :func:`pyramid.httpexceptions.redirect` perform the equivalent of their
-  Pylons brethren when an HTTP exception handler is registered.  These
-  functions take advantage of the newly registered exception view for
-  :exc:`webob.exc.HTTPException`.
-
   To allow for configuration of this feature, the :term:`Configurator` now
   accepts an additional keyword argument named ``httpexception_view``.  By
   default, this argument is populated with a default exception view function
@@ -80,6 +74,10 @@ Default HTTP Exception View
 
 Minor Feature Additions
 -----------------------
+
+- A function named :func:`pyramid.httpexceptions.responsecode` is a shortcut
+  that can be used to create HTTP exception response objects using an HTTP
+  integer status code.
 
 - Integers and longs passed as ``elements`` to
   :func:`pyramid.url.resource_url` or
@@ -177,7 +175,7 @@ Deprecations and Behavior Differences
   expected an environ object in BFG 1.0 and before).  In a future version,
   these methods will be removed entirely.
 
-- A custom request factory is now required to return a response object that
+- A custom request factory is now required to return a request object that
   has a ``response`` attribute (or "reified"/lazy property) if they the
   request is meant to be used in a view that uses a renderer.  This
   ``response`` attribute should be an instance of the class

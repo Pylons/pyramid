@@ -1,3 +1,5 @@
+import warnings
+
 from zope.interface import implements
 from zope.interface import providedBy
 
@@ -17,7 +19,7 @@ from pyramid.interfaces import IResponder
 from pyramid.events import ContextFound
 from pyramid.events import NewRequest
 from pyramid.events import NewResponse
-from pyramid.response import HTTPNotFound
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.request import Request
 from pyramid.threadlocal import manager
 from pyramid.traversal import DefaultRootFactory
@@ -203,6 +205,11 @@ class Router(object):
 
 def default_responder(response):
     def inner(request, start_response):
+        # __call__ is default 1.1 response API
+        call = getattr(response, '__call__', None)
+        if call is not None:
+            return call(request.environ, start_response)
+        # start 1.0 bw compat (use headerlist, app_iter, status)
         try:
             headers = response.headerlist
             app_iter = response.app_iter
@@ -212,6 +219,14 @@ def default_responder(response):
                 'Non-response object returned from view '
                 '(and no renderer): %r' % (response))
         start_response(status, headers)
+        warnings.warn(
+            'As of Pyramid 1.1, an object used as a response object is '
+            'required to have a "__call__" method if an IResponder adapter is '
+            'not registered for its type.  See "Deprecations" in "What\'s New '
+            'in Pyramid 1.1" within the general Pyramid documentation for '
+            'further details.',
+            DeprecationWarning,
+            3)
         return app_iter
     return inner
 

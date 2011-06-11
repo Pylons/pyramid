@@ -1,6 +1,6 @@
 from zope.interface import Interface
 from webob import Response
-from pyramid.response import HTTPForbidden
+from pyramid.httpexceptions import HTTPForbidden
 
 def fixture_view(context, request):
     """ """

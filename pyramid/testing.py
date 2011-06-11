@@ -17,7 +17,7 @@ from pyramid.interfaces import ISession
 
 from pyramid.config import Configurator
 from pyramid.decorator import reify
-from pyramid.response import HTTPForbidden
+from pyramid.httpexceptions import HTTPForbidden
 from pyramid.response import Response
 from pyramid.registry import Registry
 from pyramid.security import Authenticated

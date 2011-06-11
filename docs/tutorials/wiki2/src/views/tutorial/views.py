@@ -2,7 +2,7 @@ import re
 
 from docutils.core import publish_parts
 
-from pyramid.response import HTTPFound
+from pyramid.httpexceptions import HTTPFound
 from pyramid.url import route_url
 
 from tutorial.models import DBSession

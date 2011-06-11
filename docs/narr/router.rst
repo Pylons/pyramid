@@ -82,8 +82,8 @@ processing?
    combination of objects (based on the type of the context, the type of the
    request, and the value of the view name, and any :term:`predicate`
    attributes applied to the view configuration), :app:`Pyramid` raises a
-   :class:`~pyramid.response.HTTPNotFound` exception, which is meant to be
-   caught by a surrounding exception handler.
+   :class:`~pyramid.httpexceptions.HTTPNotFound` exception, which is meant to
+   be caught by a surrounding :term:`exception view`.
 
 #. If a view callable was found, :app:`Pyramid` attempts to call
    the view function.
@@ -95,13 +95,13 @@ processing?
    information in the request and security information attached to the
    context.  If it returns ``True``, :app:`Pyramid` calls the view callable
    to obtain a response.  If it returns ``False``, it raises a
-   :class:`~pyramid.response.HTTPForbidden` exception, which is meant to be
-   called by a surrounding exception handler.
+   :class:`~pyramid.httpexceptions.HTTPForbidden` exception, which is meant
+   to be called by a surrounding :term:`exception view`.
 
 #. If any exception was raised within a :term:`root factory`, by
    :term:`traversal`, by a :term:`view callable` or by :app:`Pyramid` itself
-   (such as when it raises :class:`~pyramid.response.HTTPNotFound` or
-   :class:`~pyramid.response.HTTPForbidden`), the router catches the
+   (such as when it raises :class:`~pyramid.httpexceptions.HTTPNotFound` or
+   :class:`~pyramid.httpexceptions.HTTPForbidden`), the router catches the
    exception, and attaches it to the request as the ``exception`` attribute.
    It then attempts to find a :term:`exception view` for the exception that
    was caught.  If it finds an exception view callable, that callable is

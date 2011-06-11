@@ -917,7 +917,7 @@ the application's startup configuration, adding the following stanza:
    :linenos:
 
    config.add_view('pyramid.view.append_slash_notfound_view', 
-                   context='pyramid.response.HTTPNotFound')
+                   context='pyramid.httpexceptions.HTTPNotFound')
 
 See :ref:`view_module` and :ref:`changing_the_notfound_view` for more
 information about the slash-appending not found view and for a more general
@@ -945,7 +945,7 @@ view as the first argument to its constructor.  For instance:
 .. code-block:: python
      :linenos:
 
-     from pyramid.response import HTTPNotFound
+     from pyramid.httpexceptions import HTTPNotFound
      from pyramid.view import AppendSlashNotFoundViewFactory
 
      def notfound_view(context, request):

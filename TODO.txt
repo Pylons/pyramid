@@ -1,6 +1,12 @@
 Pyramid TODOs
 =============
 
+Must-Have
+---------
+
+- Depend on only __call__ interface or only 3-attr interface in builtin code
+  that deals with response objects.
+
 Should-Have
 -----------
 

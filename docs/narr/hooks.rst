@@ -21,7 +21,7 @@ configuration.
 
 The :term:`not found view` callable is a view callable like any other.  The
 :term:`view configuration` which causes it to be a "not found" view consists
-only of naming the :exc:`pyramid.response.HTTPNotFound` class as the
+only of naming the :exc:`pyramid.httpexceptions.HTTPNotFound` class as the
 ``context`` of the view configuration.
 
 If your application uses :term:`imperative configuration`, you can replace
@@ -31,7 +31,7 @@ method to register an "exception view":
 .. code-block:: python
    :linenos:
 
-   from pyramid.response import HTTPNotFound
+   from pyramid.httpexceptions import HTTPNotFound
    from helloworld.views import notfound_view
    config.add_view(notfound_view, context=HTTPNotFound)
 
@@ -42,22 +42,22 @@ Like any other view, the notfound view must accept at least a ``request``
 parameter, or both ``context`` and ``request``.  The ``request`` is the
 current :term:`request` representing the denied action.  The ``context`` (if
 used in the call signature) will be the instance of the
-:exc:`~pyramid.response.HTTPNotFound` exception that caused the view to be
-called.
+:exc:`~pyramid.httpexceptions.HTTPNotFound` exception that caused the view to
+be called.
 
 Here's some sample code that implements a minimal NotFound view callable:
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.response import HTTPNotFound
+   from pyramid.httpexceptions import HTTPNotFound
 
    def notfound_view(request):
        return HTTPNotFound()
 
 .. note:: When a NotFound view callable is invoked, it is passed a
    :term:`request`.  The ``exception`` attribute of the request will be an
-   instance of the :exc:`~pyramid.response.HTTPNotFound` exception that
+   instance of the :exc:`~pyramid.httpexceptions.HTTPNotFound` exception that
    caused the not found view to be called.  The value of
    ``request.exception.args[0]`` will be a value explaining why the not found
    error was raised.  This message will be different when the
@@ -67,8 +67,9 @@ Here's some sample code that implements a minimal NotFound view callable:
 .. warning:: When a NotFound view callable accepts an argument list as
    described in :ref:`request_and_context_view_definitions`, the ``context``
    passed as the first argument to the view callable will be the
-   :exc:`~pyramid.response.HTTPNotFound` exception instance.  If available,
-   the resource context will still be available as ``request.context``.
+   :exc:`~pyramid.httpexceptions.HTTPNotFound` exception instance.  If
+   available, the resource context will still be available as
+   ``request.context``.
 
 .. index::
    single: forbidden view
@@ -85,7 +86,7 @@ the view which generates it can be overridden as necessary.
 
 The :term:`forbidden view` callable is a view callable like any other.  The
 :term:`view configuration` which causes it to be a "not found" view consists
-only of naming the :exc:`pyramid.response.HTTPForbidden` class as the
+only of naming the :exc:`pyramid.httpexceptions.HTTPForbidden` class as the
 ``context`` of the view configuration.
 
 You can replace the forbidden view by using the
@@ -96,7 +97,7 @@ view":
    :linenos:
 
    from helloworld.views import forbidden_view
-   from pyramid.response import HTTPForbidden
+   from pyramid.httpexceptions import HTTPForbidden
    config.add_view(forbidden_view, context=HTTPForbidden)
 
 Replace ``helloworld.views.forbidden_view`` with a reference to the Python
@@ -122,8 +123,8 @@ Here's some sample code that implements a minimal forbidden view:
 
 .. note:: When a forbidden view callable is invoked, it is passed a
    :term:`request`.  The ``exception`` attribute of the request will be an
-   instance of the :exc:`~pyramid.response.HTTPForbidden` exception that
-   caused the forbidden view to be called.  The value of
+   instance of the :exc:`~pyramid.httpexceptions.HTTPForbidden` exception
+   that caused the forbidden view to be called.  The value of
    ``request.exception.args[0]`` will be a value explaining why the forbidden
    was raised.  This message will be different when the
    ``debug_authorization`` environment setting is true than it is when it is
@@ -532,10 +533,10 @@ Changing How Pyramid Treats Response Objects
 It is possible to control how the Pyramid :term:`router` calls the WSGI
 ``start_response`` callable and obtains the WSGI ``app_iter`` based on
 adapting the response object to the :class: `pyramid.interfaces.IResponder`
-interface.  The default ``IResponder`` uses the three attributes ``status``,
-``headerlist``, and ``app_iter`` attached to the response object, and calls
-``start_response`` with the status and headerlist, returning the
-``app_iter``.  To override the responder::
+interface.  The default responder uses the ``__call__`` method of a response
+object, passing it the WSGI environ and the WSGI ``start_response`` callable
+(the response is assumed to be a WSGI application).  To override the
+responder::
 
      from pyramid.interfaces import IResponder
      from pyramid.response import Response
@@ -545,8 +546,9 @@ interface.  The default ``IResponder`` uses the three attributes ``status``,
                                      IResponder, name='')
 
 Overriding makes it possible to reuse response object implementations which
-have, for example, their own ``__call__`` expected to be used as a WSGI
-application (like :class:`pyramid.response.Response`), e.g.:
+have, for example, the ``app_iter``, ``headerlist`` and ``status`` attributes
+of an object returned as a response instead of trying to use the object's
+``__call__`` method::
 
      class MyResponder(object):
          def __init__(self, response):
@@ -554,8 +556,8 @@ application (like :class:`pyramid.response.Response`), e.g.:
              self.response = response
          def __call__(self, request, start_response):
              """ Call start_response and return an app_iter """
-             app_iter = self.response(request.environ, start_response)
-             return app_iter
+             start_response(self.response.status, self.response.headerlist)
+             return self.response.app_iter
 
 .. index::
    single: view mapper

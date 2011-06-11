@@ -594,7 +594,7 @@ Glossary
 
    Not Found view
       An :term:`exception view` invoked by :app:`Pyramid` when the
-      developer explicitly raises a ``pyramid.response.HTTPNotFound``
+      developer explicitly raises a ``pyramid.httpexceptions.HTTPNotFound``
       exception from within :term:`view` code or :term:`root factory`
       code, or when the current request doesn't match any :term:`view
       configuration`.  :app:`Pyramid` provides a default
@@ -604,7 +604,7 @@ Glossary
    Forbidden view
       An :term:`exception view` invoked by :app:`Pyramid` when the
       developer explicitly raises a
-      ``pyramid.response.HTTPForbidden`` exception from within
+      ``pyramid.httpexceptions.HTTPForbidden`` exception from within
       :term:`view` code or :term:`root factory` code, or when the
       :term:`view configuration` and :term:`authorization policy`
       found for a request disallows a particular view invocation.

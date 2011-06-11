@@ -56,10 +56,10 @@ from pyramid.compat import md5
 from pyramid.compat import any
 from pyramid.events import ApplicationCreated
 from pyramid.exceptions import ConfigurationError
-from pyramid.response import default_exceptionresponse_view
-from pyramid.response import HTTPForbidden
-from pyramid.response import HTTPNotFound
 from pyramid.exceptions import PredicateMismatch
+from pyramid.httpexceptions import default_exceptionresponse_view
+from pyramid.httpexceptions import HTTPForbidden
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.i18n import get_localizer
 from pyramid.log import make_stream_logger
 from pyramid.mako_templating import renderer_factory as mako_renderer_factory

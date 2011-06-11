@@ -191,7 +191,7 @@ function.
    :linenos:
 
    from pyramid.security import has_permission
-   from pyramid.response import HTTPForbidden
+   from pyramid.httpexceptions import HTTPForbidden
 
    def view_fn(request):
        if not has_permission('edit', request.context, request):
@@ -230,7 +230,7 @@ without needing to invoke the actual application configuration implied by its
            testing.tearDown()
        
        def test_view_fn_forbidden(self):
-           from pyramid.response import HTTPForbidden
+           from pyramid.httpexceptions import HTTPForbidden
            from my.package import view_fn
            self.config.testing_securitypolicy(userid='hank', 
                                               permissive=False)

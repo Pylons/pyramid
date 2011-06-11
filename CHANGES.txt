@@ -37,12 +37,10 @@ Documentation
 
 - Added "What's New in Pyramid 1.1" to HTML rendering of documentation.
 
-- Added API docs for ``pyramid.httpexceptions.abort`` and
-  ``pyramid.httpexceptions.redirect``.
+- Added API docs for ``pyramid.httpexceptions.responsecode``.
 
 - Added "HTTP Exceptions" section to Views narrative chapter including a
-  description of ``pyramid.httpexceptions.abort``; adjusted redirect section
-  to note ``pyramid.httpexceptions.redirect``.
+  description of ``pyramid.httpexceptions.responsecode``.
 
 Features
 --------
@@ -105,18 +103,15 @@ Features
   more information.
 
 - A default exception view for the context
-  ``pyramid.interfaces.IExceptionResponse`` (aka
-  ``pyramid.response.Response`` or ``pyramid.httpexceptions.HTTPException``)
-  is now registered by default.  This means that an instance of any exception
-  response class imported from ``pyramid.httpexceptions`` (such as
-  ``HTTPFound``) can now be raised from within view code; when raised, this
-  exception view will render the exception to a response.
+  ``pyramid.interfaces.IExceptionResponse`` is now registered by default.
+  This means that an instance of any exception response class imported from
+  ``pyramid.httpexceptions`` (such as ``HTTPFound``) can now be raised from
+  within view code; when raised, this exception view will render the
+  exception to a response.
 
-- New functions named ``pyramid.httpexceptions.abort`` and
-  ``pyramid.httpexceptions.redirect`` perform the equivalent of their Pylons
-  brethren when an HTTP exception handler is registered.  These functions
-  take advantage of the newly registered exception view for
-  ``webob.exc.HTTPException``.
+- A function named ``pyramid.httpexceptions.responsecode`` is a shortcut that
+  can be used to create HTTP exception response objects using an HTTP integer
+  status code.
 
 - The Configurator now accepts an additional keyword argument named
   ``exceptionresponse_view``.  By default, this argument is populated with a
@@ -135,28 +130,13 @@ Features
 - It is now possible to control how the Pyramid router calls the WSGI
   ``start_response`` callable and obtains the WSGI ``app_iter`` based on
   adapting the response object to the new ``pyramid.interfaces.IResponder``
-  interface.  The default ``IResponder`` uses Pyramid 1.0's logic to do this.
-  To override the responder::
+  interface.  See the section in the Hooks chapter of the documentation
+  entitled "Changing How Pyramid Treats Response Objects".
 
-     from pyramid.interfaces import IResponder
-     from pyramid.response import Response
-     from myapp import MyResponder
-
-     config.registry.registerAdapter(MyResponder, (Response,),
-                                     IResponder, name='')
-
-  This makes it possible to reuse response object implementations which have,
-  for example, their own ``__call__`` expected to be used as a WSGI
-  application (like ``pyramid.response.Response``), e.g.:
-
-     class MyResponder(object):
-         def __init__(self, response):
-             """ Obtain a reference to the response """
-             self.response = response
-         def __call__(self, request, start_response):
-             """ Call start_response and return an app_iter """
-             app_iter = self.response(request.environ, start_response)
-             return app_iter
+- The Pyramid router will now, by default, call the ``__call__`` method of
+  WebOb response objects when returning a WSGI response.  This means that,
+  among other things, the ``conditional_response`` feature of WebOb response
+  objects will now behave properly.
 
 Bug Fixes
 ---------
@@ -291,7 +271,7 @@ Deprecations
 Behavior Changes
 ----------------
 
-- A custom request factory is now required to return a response object that
+- A custom request factory is now required to return a request object that
   has a ``response`` attribute (or "reified"/lazy property) if they the
   request is meant to be used in a view that uses a renderer.  This
   ``response`` attribute should be an instance of the class
@@ -323,10 +303,25 @@ Behavior Changes
   result.
 
 - ``pyramid.response.Response`` is now a *subclass* of
-  ``webob.response.Response``.  It also inherits from the built-in Python
-  ``Exception`` class and implements the
-  ``pyramid.interfaces.IExceptionResponse`` class so it can be raised as an
-  exception from view code.
+  ``webob.response.Response`` (in order to directly implement the
+  ``pyramid.interfaces.IResponse`` interface).
+
+- The ``pyramid.interfaces.IResponse`` interface now includes a ``__call__``
+  method which has the WSGI application call signature (and which expects an
+  iterable as a result).
+
+- The Pyramid router now, by default, expects response objects returned from
+  views to implement the WSGI application interface (a ``__call__`` method
+  that accepts ``environ`` and ``start_response``, and which returns an
+  ``app_iter`` iterable).  If such a method exists, Pyramid will now call it
+  in order to satisfy the WSGI request.  Backwards compatibility code in the
+  default responder exists which will fall back to the older behavior, but
+  Pyramid will raise a deprecation warning if it is reached.  See the section
+  in the Hooks chapter of the documentation entitled "Changing How Pyramid
+  Treats Response Objects" to default back to the older behavior, where the
+  ``app_iter``, ``headerlist``, and ``status`` attributes of the object were
+  consulted directly (without any indirection through ``__call__``) to
+  silence the deprecation warnings.
 
 Dependencies
 ------------

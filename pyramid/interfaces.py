@@ -46,10 +46,14 @@ class IApplicationCreated(Interface):
 
 IWSGIApplicationCreatedEvent = IApplicationCreated # b /c
 
-class IResponse(Interface): # not an API
+class IResponse(Interface):
     status = Attribute('WSGI status code of response')
     headerlist = Attribute('List of response headers')
     app_iter = Attribute('Iterable representing the response body')
+
+    def __call__(environ, start_response):
+        """ WSGI call interface, should call the start_response callback
+        and should return an iterable """
 
 class IException(Interface): # not an API
     """ An interface representing a generic exception """
@@ -60,8 +64,8 @@ class IExceptionResponse(IException, IResponse):
     to apply the registered view for all exception types raised by
     :app:`Pyramid` internally (any exception that inherits from
     :class:`pyramid.response.Response`, including
-    :class:`pyramid.response.HTTPNotFound` and
-    :class:`pyramid.response.HTTPForbidden`)."""
+    :class:`pyramid.httpexceptions.HTTPNotFound` and
+    :class:`pyramid.httpexceptions.HTTPForbidden`)."""
 
 class IBeforeRender(Interface):
     """
@@ -282,11 +286,7 @@ class IExceptionViewClassifier(Interface):
 
 class IView(Interface):
     def __call__(context, request):
-        """ Must return an object that implements IResponse.  May
-        optionally raise ``pyramid.response.HTTPForbidden`` if an
-        authorization failure is detected during view execution or
-        ``pyramid.response.HTTPNotFound`` if the not found page is
-        meant to be returned."""
+        """ Must return an object that implements IResponse. """
 
 class ISecuredView(IView):
     """ *Internal only* interface.  Not an API. """

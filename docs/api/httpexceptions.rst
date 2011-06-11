@@ -5,15 +5,13 @@
 
 .. automodule:: pyramid.httpexceptions
 
-  .. autofunction:: abort
-
-  .. autofunction:: redirect
-
   .. attribute:: status_map
 
      A mapping of integer status code to exception class (eg. the
      integer "401" maps to
      :class:`pyramid.httpexceptions.HTTPUnauthorized`).
+
+  .. autofunction:: responsecode
 
   .. autoclass:: HTTPException
 
