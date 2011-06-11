@@ -7,6 +7,11 @@ Must-Have
 - Depend on only __call__ interface or only 3-attr interface in builtin code
   that deals with response objects.
 
+- Figure out what to do with ``is_response``.
+
+- Docs mention ``exception.args[0]`` as a way to get messages; check that
+  this works.
+
 Should-Have
 -----------
 
