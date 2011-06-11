@@ -13,7 +13,7 @@
    single: environment variables
    single: ini file settings
    single: PasteDeploy settings
-  
+
 .. _environment_chapter:
 
 Environment Variables and ``.ini`` File Settings
@@ -84,7 +84,7 @@ when this value is true.  See also :ref:`debug_authorization_section`.
 | ``PYRAMID_DEBUG_AUTHORIZATION`` |  ``debug_authorization``    |
 |                                 |                             |
 |                                 |                             |
-|                                 |                             | 
+|                                 |                             |
 +---------------------------------+-----------------------------+
 
 Debugging Not Found Errors
@@ -259,7 +259,7 @@ List of string filter names that will be applied to all Mako expressions.
 Mako Import
 +++++++++++
 
-String list of Python statements, typically individual “import” lines, which
+String list of Python statements, typically individual "import" lines, which
 will be placed into the module level preamble of all generated Python modules.
 
 
@@ -330,7 +330,7 @@ settings that do not start with ``debug_*`` such as
 ``reload_templates``.
 
 If you want to turn all ``reload`` settings (every setting that starts
-with ``reload_``). on in one fell swoop, you can use
+with ``reload_``) on in one fell swoop, you can use
 ``PYRAMID_RELOAD_ALL=1`` as an environment variable setting or you may use
 ``reload_all=true`` in the config file.  Note that this does not
 affect settings that do not start with ``reload_*`` such as
@@ -341,10 +341,10 @@ affect settings that do not start with ``reload_*`` such as
    most useful during development, where you may wish to augment or
    override the more permanent settings in the configuration file.
    This is useful because many of the reload and debug settings may
-   have performance or security (i.e., disclosure) implications 
+   have performance or security (i.e., disclosure) implications
    that make them undesirable in a production environment.
 
-.. index:: 
+.. index::
    single: reload_templates
    single: reload_assets
 
@@ -442,7 +442,7 @@ Here's how:
      registry = pyramid.threadlocal.get_current_registry()
      settings = registry.settings
      debug_frobnosticator = settings['debug_frobnosticator']
-   
 
-  
+
+
 

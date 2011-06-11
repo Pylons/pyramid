@@ -2,7 +2,7 @@ import re
 
 from docutils.core import publish_parts
 
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.security import authenticated_userid
 from pyramid.url import route_url
 
@@ -19,7 +19,9 @@ def view_wiki(request):
 def view_page(request):
     pagename = request.matchdict['pagename']
     session = DBSession()
-    page = session.query(Page).filter_by(name=pagename).one()
+    page = session.query(Page).filter_by(name=pagename).first()
+    if page is None:
+        return HTTPNotFound('No such page')
 
     def check(match):
         word = match.group(1)
@@ -51,7 +53,7 @@ def add_page(request):
     page = Page('', '')
     logged_in = authenticated_userid(request)
     return dict(page=page, save_url=save_url, logged_in=logged_in)
-    
+
 def edit_page(request):
     name = request.matchdict['pagename']
     session = DBSession()

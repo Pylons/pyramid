@@ -9,16 +9,13 @@ that it continues to work after some changes are made in the future.
 Testing the Models
 ==================
 
-We write tests for the model
-classes and the appmaker.  Changing ``tests.py``, we'll write a separate test
-class for each model class, and we'll write a test class for the
-``appmaker``.
+We write a test class for the model class ``Page`` and another test class
+for the ``initialize_sql`` function.
 
 To do so, we'll retain the ``tutorial.tests.ViewTests`` class provided as a
-result of the ``pyramid_zodb`` project generator.  We'll add three test
-classes: one for the ``Page`` model named ``PageModelTests``, one for the
-``Wiki`` model named ``WikiModelTests``, and one for the appmaker named
-``AppmakerTests``.
+result of the ``pyramid_routesalchemy`` project generator.  We'll add two
+test classes: one for the ``Page`` model named ``PageModelTests``, one for the
+``initialize_sql`` function named ``InitializeSqlTests``.
 
 Testing the Views
 =================
@@ -28,7 +25,6 @@ added above.  As a result, we'll *delete* the ``ViewTests`` test in the file,
 and add four other test classes: ``ViewWikiTests``, ``ViewPageTests``,
 ``AddPageTests``, and ``EditPageTests``.  These test the ``view_wiki``,
 ``view_page``, ``add_page``, and ``edit_page`` views respectively.
-
 
 Functional tests
 ================
@@ -71,8 +67,8 @@ The expected result looks something like:
 
 .. code-block:: text
 
-   .........
+   ......................
    ----------------------------------------------------------------------
-   Ran 23 tests in 1.653s
-   
+   Ran 22 tests in 2.700s
+
    OK

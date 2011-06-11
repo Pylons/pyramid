@@ -120,7 +120,7 @@ are declarations made using the :meth:`pyramid.config.Configurator.add_view`
 method.  Assets are files that are
 accessed by :app:`Pyramid` using the :term:`pkg_resources` API such as static
 files and templates via a :term:`asset specification`.  Other directives and
-configurator methods also deal in routes, views, and assets.  For example,
+configurator methods also deal in routes, views, and assets.  For example, the
 ``add_handler`` directive of the ``pyramid_handlers`` package adds a single
 route, and some number of views.
 
@@ -163,7 +163,7 @@ views or routes which performs overrides.
    if __name__ == '__main__':
        config.scan('someotherpackage')
        config.commit()
-       config.add_view('mypackage.views.myview', name='myview'
+       config.add_view('mypackage.views.myview', name='myview')
 
 Once this is done, you should be able to extend or override the application
 like any other (see :ref:`extending_the_application`).
@@ -201,7 +201,7 @@ like this:
   application (e.g. ``python setup.py develop`` or ``python setup.py
   install``).
 
-- Change the ``main`` function in the new package's ``__init__py`` to include
+- Change the ``main`` function in the new package's ``__init__.py`` to include
   the original :app:`Pyramid` application's configuration functions via
   :meth:`pyramid.config.Configurator.include` statements or a :term:`scan`.
 
