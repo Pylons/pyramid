@@ -4,6 +4,8 @@ Pyramid TODOs
 Must-Have
 ---------
 
+- To subclass or not subclass http exceptions.
+
 - Depend on only __call__ interface or only 3-attr interface in builtin code
   that deals with response objects.
 
