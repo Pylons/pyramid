@@ -289,27 +289,58 @@ class ConfiguratorTests(unittest.TestCase):
         result = config.absolute_asset_spec('templates')
         self.assertEqual(result, 'pyramid.tests:templates')
 
-    def test_setup_registry_fixed(self):
-        class DummyRegistry(object):
-            def subscribers(self, events, name):
-                self.events = events
-                return events
-            def registerUtility(self, *arg, **kw):
-                pass
+    def test__fix_registry_has_listeners(self):
+        reg = DummyRegistry()
+        config = self._makeOne(reg)
+        config._fix_registry()
+        self.assertEqual(reg.has_listeners, True)
+
+    def test__fix_registry_notify(self):
+        reg = DummyRegistry()
+        config = self._makeOne(reg)
+        config._fix_registry()
+        self.assertEqual(reg.notify(1), None)
+        self.assertEqual(reg.events, (1,))
+
+    def test__fix_registry_queryAdapterOrSelf(self):
+        from zope.interface import Interface
+        class IFoo(Interface):
+            pass
+        class Foo(object):
+            implements(IFoo)
+        class Bar(object):
+            pass
+        adaptation = ()
+        foo = Foo()
+        bar = Bar()
+        reg = DummyRegistry(adaptation)
+        config = self._makeOne(reg)
+        config._fix_registry()
+        self.assertTrue(reg.queryAdapterOrSelf(foo, IFoo) is foo)
+        self.assertTrue(reg.queryAdapterOrSelf(bar, IFoo) is adaptation)
+
+    def test__fix_registry_registerSelfAdapter(self):
+        reg = DummyRegistry()
+        config = self._makeOne(reg)
+        config._fix_registry()
+        reg.registerSelfAdapter('required', 'provided', name='abc')
+        self.assertEqual(len(reg.adapters), 1)
+        args, kw = reg.adapters[0]
+        self.assertEqual(args[0]('abc'), 'abc')
+        self.assertEqual(kw,
+                         {'info': u'', 'provided': 'provided',
+                          'required': 'required', 'name': 'abc', 'event': True})
+
+    def test_setup_registry_calls_fix_registry(self):
         reg = DummyRegistry()
         config = self._makeOne(reg)
         config.add_view = lambda *arg, **kw: False
         config.setup_registry()
         self.assertEqual(reg.has_listeners, True)
-        self.assertEqual(reg.notify(1), None)
-        self.assertEqual(reg.events, (1,))
 
     def test_setup_registry_registers_default_exceptionresponse_view(self):
         from pyramid.interfaces import IExceptionResponse
         from pyramid.view import default_exceptionresponse_view
-        class DummyRegistry(object):
-            def registerUtility(self, *arg, **kw):
-                pass
         reg = DummyRegistry()
         config = self._makeOne(reg)
         views = []
@@ -317,6 +348,15 @@ class ConfiguratorTests(unittest.TestCase):
         config.setup_registry()
         self.assertEqual(views[0], ((default_exceptionresponse_view,),
                                     {'context':IExceptionResponse}))
+
+    def test_setup_registry_registers_default_webob_iresponse_adapter(self):
+        from webob import Response
+        from pyramid.interfaces import IResponse
+        config = self._makeOne()
+        config.setup_registry()
+        response = Response()
+        self.assertTrue(
+            config.registry.queryAdapter(response, IResponse) is response)
 
     def test_setup_registry_explicit_notfound_trumps_iexceptionresponse(self):
         from zope.interface import implementedBy
@@ -5134,3 +5174,17 @@ def dummy_extend(config, discrim):
 def dummy_extend2(config, discrim):
     config.action(discrim, None, config.registry)
     
+class DummyRegistry(object):
+    def __init__(self, adaptation=None):
+        self.utilities = []
+        self.adapters = []
+        self.adaptation = adaptation
+    def subscribers(self, events, name):
+        self.events = events
+        return events
+    def registerUtility(self, *arg, **kw):
+        self.utilities.append((arg, kw))
+    def registerAdapter(self, *arg, **kw):
+        self.adapters.append((arg, kw))
+    def queryAdapter(self, *arg, **kw):
+        return self.adaptation

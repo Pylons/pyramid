@@ -115,9 +115,9 @@ processing?
    any :term:`response callback` functions attached via
    :meth:`~pyramid.request.Request.add_response_callback`.  A
    :class:`~pyramid.events.NewResponse` :term:`event` is then sent to any
-   subscribers.  The response object's ``app_iter``, ``status``, and
-   ``headerlist`` attributes are then used to generate a WSGI response.  The
-   response is sent back to the upstream WSGI server.
+   subscribers.  The response object's ``__call__`` method is then used to
+   generate a WSGI response.  The response is sent back to the upstream WSGI
+   server.
 
 #. :app:`Pyramid` will attempt to execute any :term:`finished
    callback` functions attached via

@@ -10,15 +10,15 @@ Request and Response Objects
 .. note:: This chapter is adapted from a portion of the :term:`WebOb`
    documentation, originally written by Ian Bicking.
 
-:app:`Pyramid` uses the :term:`WebOb` package to supply
+:app:`Pyramid` uses the :term:`WebOb` package as a basis for its
 :term:`request` and :term:`response` object implementations.  The
-:term:`request` object that is passed to a :app:`Pyramid`
-:term:`view` is an instance of the :class:`pyramid.request.Request`
-class, which is a subclass of :class:`webob.Request`.  The
-:term:`response` returned from a :app:`Pyramid` :term:`view`
-:term:`renderer` is an instance of the :mod:`webob.Response` class.
-Users can also return an instance of :mod:`webob.Response` directly
-from a view as necessary.
+:term:`request` object that is passed to a :app:`Pyramid` :term:`view` is an
+instance of the :class:`pyramid.request.Request` class, which is a subclass
+of :class:`webob.Request`.  The :term:`response` returned from a
+:app:`Pyramid` :term:`view` :term:`renderer` is an instance of the
+:mod:`pyramid.response.Response` class, which is a subclass of the
+:class:`webob.Response` class.  Users can also return an instance of
+:class:`pyramid.response.Response` directly from a view as necessary.
 
 WebOb is a project separate from :app:`Pyramid` with a separate set of
 authors and a fully separate `set of documentation
@@ -26,16 +26,15 @@ authors and a fully separate `set of documentation
 standard WebOb request, which is documented in the :ref:`request_module` API
 documentation.
 
-WebOb provides objects for HTTP requests and responses.  Specifically
-it does this by wrapping the `WSGI <http://wsgi.org>`_ request
-environment and response status/headers/app_iter (body).
+WebOb provides objects for HTTP requests and responses.  Specifically it does
+this by wrapping the `WSGI <http://wsgi.org>`_ request environment and
+response status, header list, and app_iter (body) values.
 
-WebOb request and response objects provide many conveniences for
-parsing WSGI requests and forming WSGI responses.  WebOb is a nice way
-to represent "raw" WSGI requests and responses; however, we won't
-cover that use case in this document, as users of :app:`Pyramid`
-don't typically need to use the WSGI-related features of WebOb
-directly.  The `reference documentation
+WebOb request and response objects provide many conveniences for parsing WSGI
+requests and forming WSGI responses.  WebOb is a nice way to represent "raw"
+WSGI requests and responses; however, we won't cover that use case in this
+document, as users of :app:`Pyramid` don't typically need to use the
+WSGI-related features of WebOb directly.  The `reference documentation
 <http://pythonpaste.org/webob/reference.html>`_ shows many examples of
 creating requests and using response objects in this manner, however.
 
@@ -170,9 +169,9 @@ of the request.  I'll show various values for an example URL
 Methods
 +++++++
 
-There are `several methods
-<http://pythonpaste.org/webob/class-webob.Request.html#__init__>`_ but
-only a few you'll use often:
+There are methods of request objects documented in
+:class:`pyramid.request.Request` but you'll find that you won't use very many
+of them.  Here are a couple that might be useful:
 
 ``Request.blank(base_url)``:
     Creates a new request with blank information, based at the given
@@ -183,9 +182,9 @@ only a few you'll use often:
     subrequests).
 
 ``req.get_response(wsgi_application)``:
-    This method calls the given WSGI application with this request,
-    and returns a `Response`_ object.  You can also use this for
-    subrequests, or testing.
+    This method calls the given WSGI application with this request, and
+    returns a :class:`pyramid.response.Response` object.  You can also use
+    this for subrequests, or testing.
 
 .. index::
    single: request (and unicode)
@@ -259,8 +258,10 @@ Response
 ~~~~~~~~
 
 The :app:`Pyramid` response object can be imported as
-:class:`pyramid.response.Response`.  This import location is merely a facade
-for its original location: ``webob.Response``.
+:class:`pyramid.response.Response`.  This class is a subclass of the
+``webob.Response`` class.  The subclass does not add or change any
+functionality, so the WebOb Response documentation will be completely
+relevant for this class as well.
 
 A response object has three fundamental parts:
 
@@ -283,8 +284,8 @@ A response object has three fundamental parts:
     ``response.body_file`` (a file-like object; writing to it appends
     to ``app_iter``).
 
-Everything else in the object derives from this underlying state.
-Here's the highlights:
+Everything else in the object typically derives from this underlying state.
+Here are some highlights:
 
 ``response.content_type``
     The content type *not* including the ``charset`` parameter.
@@ -359,11 +360,12 @@ Exception Responses
 +++++++++++++++++++
 
 To facilitate error responses like ``404 Not Found``, the module
-:mod:`webob.exc` contains classes for each kind of error response.  These
-include boring, but appropriate error bodies.  The exceptions exposed by this
-module, when used under :app:`Pyramid`, should be imported from the
-:mod:`pyramid.httpexceptions` module.  This import location contains
-subclasses and replacements that mirror those in the original ``webob.exc``.
+:mod:`pyramid.httpexceptions` contains classes for each kind of error
+response.  These include boring, but appropriate error bodies.  The
+exceptions exposed by this module, when used under :app:`Pyramid`, should be
+imported from the :mod:`pyramid.httpexceptions` module.  This import location
+contains subclasses and replacements that mirror those in the ``webob.exc``
+module.
 
 Each class is named ``pyramid.httpexceptions.HTTP*``, where ``*`` is the
 reason for the error.  For instance,

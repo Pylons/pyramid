@@ -19,6 +19,7 @@ from zope.interface import implementedBy
 from zope.interface.interfaces import IInterface
 from zope.interface import implements
 from zope.interface import classProvides
+from zope.interface import providedBy
 
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.interfaces import IAuthorizationPolicy
@@ -36,6 +37,7 @@ from pyramid.interfaces import IRendererFactory
 from pyramid.interfaces import IRendererGlobalsFactory
 from pyramid.interfaces import IRequest
 from pyramid.interfaces import IRequestFactory
+from pyramid.interfaces import IResponse
 from pyramid.interfaces import IRootFactory
 from pyramid.interfaces import IRouteRequest
 from pyramid.interfaces import IRoutesMapper
@@ -82,7 +84,6 @@ from pyramid.traversal import traversal_path
 from pyramid.urldispatch import RoutesMapper
 from pyramid.util import DottedNameResolver
 from pyramid.view import render_view_to_response
-from pyramid.view import is_response
 
 DEFAULT_RENDERERS = (
     ('.mak', mako_renderer_factory),
@@ -417,7 +418,8 @@ class Configurator(object):
     def _fix_registry(self):
         """ Fix up a ZCA component registry that is not a
         pyramid.registry.Registry by adding analogues of ``has_listeners``,
-        and ``notify`` through monkey-patching."""
+        ``notify``, ``queryAdapterOrSelf``, and ``registerSelfAdapter``
+        through monkey-patching."""
 
         _registry = self.registry
 
@@ -428,6 +430,24 @@ class Configurator(object):
 
         if not hasattr(_registry, 'has_listeners'):
             _registry.has_listeners = True
+
+        if not hasattr(_registry, 'queryAdapterOrSelf'):
+            def queryAdapterOrSelf(object, interface, name=u'', default=None):
+                provides = providedBy(object)
+                if not interface in provides:
+                    return _registry.queryAdapter(object, interface, name=name,
+                                                  default=default)
+                return object
+            _registry.queryAdapterOrSelf = queryAdapterOrSelf
+
+        if not hasattr(_registry, 'registerSelfAdapter'):
+            def registerSelfAdapter(required=None, provided=None,
+                                    name=u'', info=u'', event=True):
+                return _registry.registerAdapter(lambda x: x,
+                                                 required=required,
+                                                 provided=provided, name=name,
+                                                 info=info, event=event)
+            _registry.registerSelfAdapter = registerSelfAdapter
 
     def _make_context(self, autocommit=False):
         context = PyramidConfigurationMachine()
@@ -697,6 +717,9 @@ class Configurator(object):
         self._fix_registry()
         self._set_settings(settings)
         self._set_root_factory(root_factory)
+        # cope with WebOb response objects that aren't decorated with IResponse
+        from webob import Response as WebobResponse
+        registry.registerSelfAdapter((WebobResponse,), IResponse)
         debug_logger = self.maybe_dotted(debug_logger)
         if debug_logger is None:
             debug_logger = make_stream_logger('pyramid.debug', sys.stderr)
@@ -2942,22 +2965,24 @@ class ViewDeriver(object):
 
         def _rendered_view(context, request):
             renderer = static_renderer
-            response = wrapped_view(context, request)
-            if not is_response(response):
+            result = wrapped_view(context, request)
+            registry = self.kw['registry']
+            response = registry.queryAdapterOrSelf(result, IResponse)
+            if response is None:
                 attrs = getattr(request, '__dict__', {})
                 if 'override_renderer' in attrs:
                     # renderer overridden by newrequest event or other
                     renderer_name = attrs.pop('override_renderer')
                     renderer = RendererHelper(name=renderer_name,
                                               package=self.kw.get('package'),
-                                              registry = self.kw['registry'])
+                                              registry = registry)
                 if '__view__' in attrs:
                     view_inst = attrs.pop('__view__')
                 else:
                     view_inst = getattr(wrapped_view, '__original_view__',
                                         wrapped_view)
-                return renderer.render_view(request, response, view_inst,
-                                            context)
+                response = renderer.render_view(request, result, view_inst,
+                                                context)
             return response
 
         return _rendered_view

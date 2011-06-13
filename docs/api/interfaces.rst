@@ -57,6 +57,6 @@ Other Interfaces
   .. autointerface:: IMultiDict
      :members:
 
-  .. autointerface:: IResponder
+  .. autointerface:: IResponse
      :members:
 

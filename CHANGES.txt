@@ -127,11 +127,11 @@ Features
 - The ``pyramid.request.Response`` class now has a ``RequestClass`` interface
   which points at ``pyramid.response.Request``.
 
-- It is now possible to control how the Pyramid router calls the WSGI
-  ``start_response`` callable and obtains the WSGI ``app_iter`` based on
-  adapting the response object to the new ``pyramid.interfaces.IResponder``
-  interface.  See the section in the Hooks chapter of the documentation
-  entitled "Changing How Pyramid Treats Response Objects".
+- It is now possible to return an arbitrary object from a Pyramid view
+  callable even if a renderer is not used, as long as a suitable adapter to
+  ``pyramid.interfaces.IResponse`` is registered for the type of the returned
+  object.  See the section in the Hooks chapter of the documentation entitled
+  "Changing How Pyramid Treats View Responses".
 
 - The Pyramid router will now, by default, call the ``__call__`` method of
   WebOb response objects when returning a WSGI response.  This means that,
@@ -306,22 +306,26 @@ Behavior Changes
   ``webob.response.Response`` (in order to directly implement the
   ``pyramid.interfaces.IResponse`` interface).
 
-- The ``pyramid.interfaces.IResponse`` interface now includes a ``__call__``
-  method which has the WSGI application call signature (and which expects an
-  iterable as a result).
+Backwards Incompatibilities
+---------------------------
 
 - The Pyramid router now, by default, expects response objects returned from
-  views to implement the WSGI application interface (a ``__call__`` method
-  that accepts ``environ`` and ``start_response``, and which returns an
-  ``app_iter`` iterable).  If such a method exists, Pyramid will now call it
-  in order to satisfy the WSGI request.  Backwards compatibility code in the
-  default responder exists which will fall back to the older behavior, but
-  Pyramid will raise a deprecation warning if it is reached.  See the section
-  in the Hooks chapter of the documentation entitled "Changing How Pyramid
-  Treats Response Objects" to default back to the older behavior, where the
-  ``app_iter``, ``headerlist``, and ``status`` attributes of the object were
-  consulted directly (without any indirection through ``__call__``) to
-  silence the deprecation warnings.
+  view callables to implement the ``pyramid.interfaces.IResponse`` interface.
+  Unlike the Pyramid 1.0 version of this interface, objects which implement
+  IResponse now must define a ``__call__`` method that accepts ``environ``
+  and ``start_response``, and which returns an ``app_iter`` iterable, among
+  other things.  Previously, it was possible to return any object which had
+  the three WebOb ``app_iter``, ``headerlist``, and ``status`` attributes as
+  a response, so this is a backwards incompatibility.  It is possible to get
+  backwards compatibility back by registering an adapter to IResponse from
+  the type of object you're now returning from view callables.  See the
+  section in the Hooks chapter of the documentation entitled "Changing How
+  Pyramid Treats View Responses".
+
+- The ``pyramid.interfaces.IResponse`` interface is now much more extensive.
+  Previously it defined only ``app_iter``, ``status`` and ``headerlist``; now
+  it is basically intended to directly mirror the ``webob.Response`` API,
+  which has many methods and attributes.
 
 Dependencies
 ------------

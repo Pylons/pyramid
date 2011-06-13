@@ -1,5 +1,3 @@
-import warnings
-
 from zope.interface import implements
 from zope.interface import providedBy
 
@@ -14,7 +12,7 @@ from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import ITraverser
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
-from pyramid.interfaces import IResponder
+from pyramid.interfaces import IResponse
 
 from pyramid.events import ContextFound
 from pyramid.events import NewRequest
@@ -61,7 +59,6 @@ class Router(object):
         logger = self.logger
         manager = self.threadlocal_manager
         request = None
-        responder = default_responder
         threadlocals = {'registry':registry, 'request':request}
         manager.push(threadlocals)
 
@@ -159,7 +156,7 @@ class Router(object):
                             msg = request.path_info
                         raise HTTPNotFound(msg)
                     else:
-                        response = view_callable(context, request)
+                        result = view_callable(context, request)
 
                 # handle exceptions raised during root finding and view-exec
                 except Exception, why:
@@ -181,52 +178,26 @@ class Router(object):
                     # repoze.bfg.message docs-deprecated in Pyramid 1.0
                     environ['repoze.bfg.message'] = msg
 
-                    response = view_callable(why, request)
+                    result = view_callable(why, request)
 
                 # process the response
+                response = registry.queryAdapterOrSelf(result, IResponse)
+                if response is None:
+                    raise ValueError(
+                        'Could not convert view return value "%s" into a '
+                        'response' % (result,))
 
                 has_listeners and registry.notify(NewResponse(request,response))
 
                 if request.response_callbacks:
                     request._process_response_callbacks(response)
 
-                responder = adapters.queryAdapter(response, IResponder)
-                if responder is None:
-                    responder = default_responder(response)
-
             finally:
                 if request is not None and request.finished_callbacks:
                     request._process_finished_callbacks()
 
-            return responder(request, start_response)
+            return response(request.environ, start_response)
 
         finally:
             manager.pop()
-
-def default_responder(response):
-    def inner(request, start_response):
-        # __call__ is default 1.1 response API
-        call = getattr(response, '__call__', None)
-        if call is not None:
-            return call(request.environ, start_response)
-        # start 1.0 bw compat (use headerlist, app_iter, status)
-        try:
-            headers = response.headerlist
-            app_iter = response.app_iter
-            status = response.status
-        except AttributeError:
-            raise ValueError(
-                'Non-response object returned from view '
-                '(and no renderer): %r' % (response))
-        start_response(status, headers)
-        warnings.warn(
-            'As of Pyramid 1.1, an object used as a response object is '
-            'required to have a "__call__" method if an IResponder adapter is '
-            'not registered for its type.  See "Deprecations" in "What\'s New '
-            'in Pyramid 1.1" within the general Pyramid documentation for '
-            'further details.',
-            DeprecationWarning,
-            3)
-        return app_iter
-    return inner
 

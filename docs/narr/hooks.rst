@@ -523,41 +523,103 @@ The default context URL generator is available for perusal as the class
 :term:`Pylons` GitHub Pyramid repository.
 
 .. index::
-   single: IResponder
+   single: IResponse
 
-.. _using_iresponder:
+.. _using_iresponse:
 
-Changing How Pyramid Treats Response Objects
---------------------------------------------
+Changing How Pyramid Treats View Responses
+------------------------------------------
 
-It is possible to control how the Pyramid :term:`router` calls the WSGI
-``start_response`` callable and obtains the WSGI ``app_iter`` based on
-adapting the response object to the :class: `pyramid.interfaces.IResponder`
-interface.  The default responder uses the ``__call__`` method of a response
-object, passing it the WSGI environ and the WSGI ``start_response`` callable
-(the response is assumed to be a WSGI application).  To override the
-responder::
+It is possible to control how Pyramid treats the result of calling a view
+callable on a per-type basis by using a hook involving
+:class:`pyramid.interfaces.IResponse`.
 
-     from pyramid.interfaces import IResponder
-     from pyramid.response import Response
-     from myapp import MyResponder
+.. note:: This feature is new as of Pyramid 1.1.
 
-     config.registry.registerAdapter(MyResponder, (Response,),
-                                     IResponder, name='')
+Pyramid, in various places, adapts the result of calling a view callable to
+the :class:`~pyramid.interfaces.IResponse` interface to ensure that the
+object returned by the view callable is a "true" response object.  The vast
+majority of time, the result of this adaptation is the result object itself,
+as view callables written by "civilians" who read the narrative documentation
+contained in this manual will always return something that implements the
+:class:`~pyramid.interfaces.IResponse` interface.  Most typically, this will
+be an instance of the :class:`pyramid.response.Response` class or a subclass.
+If a civilian returns a non-Response object from a view callable that isn't
+configured to use a :term:`renderer`, he will typically expect the router to
+raise an error.  However, you can hook Pyramid in such a way that users can
+return arbitrary values from a view callable by providing an adapter which
+converts the arbitrary return value into something that implements
+:class:`~pyramid.interfaces.IResponse`.
 
-Overriding makes it possible to reuse response object implementations which
-have, for example, the ``app_iter``, ``headerlist`` and ``status`` attributes
-of an object returned as a response instead of trying to use the object's
-``__call__`` method::
+For example, if you'd like to allow view callables to return bare string
+objects (without requiring a a :term:`renderer` to convert a string to a
+response object), you can register an adapter which converts the string to a
+Response:
 
-     class MyResponder(object):
-         def __init__(self, response):
-             """ Obtain a reference to the response """
-             self.response = response
-         def __call__(self, request, start_response):
-             """ Call start_response and return an app_iter """
-             start_response(self.response.status, self.response.headerlist)
-             return self.response.app_iter
+.. code-block:: python
+   :linenos:
+
+   from pyramid.interfaces import IResponse
+   from pyramid.response import Response
+
+   def string_response_adapter(s):
+       response = Response(s)
+       return response
+
+   # config is an instance of pyramid.config.Configurator
+
+   config.registry.registerAdapter(string_response_adapter, (str,),
+                                   IResponse)
+
+Likewise, if you want to be able to return a simplified kind of response
+object from view callables, you can use the IResponse hook to register an
+adapter to the more complex IResponse interface:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.interfaces import IResponse
+   from pyramid.response import Response
+
+   class SimpleResponse(object):
+       def __init__(self, body):
+           self.body = body
+
+   def simple_response_adapter(simple_response):
+       response = Response(simple_response.body)
+       return response
+
+   # config is an instance of pyramid.config.Configurator
+
+   config.registry.registerAdapter(simple_response_adapter, 
+                                  (SimpleResponse,),
+                                   IResponse)
+
+If you want to implement your own Response object instead of using the
+:class:`pyramid.response.Response` object in any capacity at all, you'll have
+to make sure the object implements every attribute and method outlined in
+:class:`pyramid.interfaces.IResponse` *and* you'll have to ensure that it's
+marked up with ``zope.interface.implements(IResponse)``:
+
+   from pyramid.interfaces import IResponse
+   from zope.interface import implements
+
+   class MyResponse(object):
+       implements(IResponse)
+       # ... an implementation of every method and attribute 
+       # documented in IResponse should follow ...
+
+When an alternate response object implementation is returned by a view
+callable, if that object asserts that it implements
+:class:`~pyramid.interfaces.IResponse` (via
+``zope.interface.implements(IResponse)``) , an adapter needn't be registered
+for the object; Pyramid will use it directly.
+
+An IResponse adapter for ``webob.Response`` (as opposed to
+:class:`pyramid.response.Response`) is registered by Pyramid by default at
+startup time, as by their nature, instances of this class (and instances of
+subclasses of the class) will natively provide IResponse.  The adapter
+registered for ``webob.Response`` simply returns the response object.
 
 .. index::
    single: view mapper
@@ -628,7 +690,7 @@ A user might make use of these framework components like so:
 
    # user application
 
-   from webob import Response
+   from pyramid.response import Response
    from pyramid.config import Configurator
    import pyramid_handlers
    from paste.httpserver import serve

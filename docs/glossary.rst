@@ -16,12 +16,12 @@ Glossary
      positional argument, returns a ``WebOb`` compatible request.
 
    response
-     An object that has three attributes: ``app_iter`` (representing an
-     iterable body), ``headerlist`` (representing the http headers sent
-     to the user agent), and ``status`` (representing the http status
-     string sent to the user agent).  This is the interface defined for
-     ``WebOb`` response objects.  See :ref:`webob_chapter` for
-     information about response objects.
+     An object returned by a :term:`view callable` that represents response
+     data returned to the requesting user agent.  It must implements the
+     :class:`pyramid.interfaces.IResponse` interface.  A response object is
+     typically an instance of the :class:`pyramid.response.Response` class or
+     a subclass such as :class:`pyramid.httpexceptions.HTTPFound`.  See
+     :ref:`webob_chapter` for information about response objects.
 
    Repoze
      "Repoze" is essentially a "brand" of software developed by `Agendaless

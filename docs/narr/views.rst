@@ -230,29 +230,19 @@ implements the :term:`Response` interface is to return a
    def view(request):
        return Response('OK')
 
-You don't need to use :class:`~pyramid.response.Response` to represent a
-response.  A view can actually return any object that has a ``__call__``
-method that implements the :term:`WSGI` application call interface.  For
-example, an instance of the following class could be successfully returned by
-a view callable as a response object:
+:app:`Pyramid` provides a range of different "exception" classes which
+inherit from :class:`pyramid.response.Response`.  For example, an instance of
+the class :class:`pyramid.httpexceptions.HTTPFound` is also a valid response
+object because it inherits from :class:`~pyramid.response.Response`.  For
+examples, see :ref:`http_exceptions` and ref:`http_redirect`.
 
-.. code-block:: python
-   :linenos:
-
-   class SimpleResponse(object):
-       def __call__(self, environ, start_response):
-           """ Call the ``start_response`` callback and return 
-               an iterable """
-           body = 'Hello World!'
-           headers = [('Content-Type', 'text/plain'),
-                      ('Content-Length', str(len(body)))]
-           start_response('200 OK', headers)
-           return [body]
-
-:app:`Pyramid` provides a range of different "exception" classes which can
-act as response objects too.  For example, an instance of the class
-:class:`pyramid.httpexceptions.HTTPFound` is also a valid response object
-(see :ref:`http_exceptions` and ref:`http_redirect`).
+You can also return objects from view callables that aren't instances of (or
+instances of classes which are subclasses of)
+:class:`pyramid.response.Response` in various circumstances.  This can be
+helpful when writing tests and when attempting to share code between view
+callables.  See :ref:`renderers_chapter` for the common way to allow for
+this.  A much less common way to allow for view callables to return
+non-Response objects is documented in :ref:`using_iresponse`.
 
 .. index::
    single: view exceptions

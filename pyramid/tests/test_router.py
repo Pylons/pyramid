@@ -2,19 +2,6 @@ import unittest
 
 from pyramid import testing
 
-def hide_warnings(wrapped):
-    import warnings
-    def wrapper(*arg, **kw):
-        warnings.filterwarnings('ignore')
-        try:
-            wrapped(*arg, **kw)
-        finally:
-            warnings.resetwarnings()
-    wrapper.__name__ = wrapped.__name__
-    wrapper.__doc__ = wrapped.__doc__
-    return wrapper
-
-
 class TestRouter(unittest.TestCase):
     def setUp(self):
         testing.setUp()
@@ -249,7 +236,7 @@ class TestRouter(unittest.TestCase):
         self.assertTrue("view_name: ''" in message)
         self.assertTrue("subpath: []" in message)
 
-    def test_call_view_returns_nonresponse(self):
+    def test_call_view_returns_non_iresponse(self):
         from pyramid.interfaces import IViewClassifier
         context = DummyContext()
         self._registerTraverserFactory(context)
@@ -259,6 +246,24 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         start_response = DummyStartResponse()
         self.assertRaises(ValueError, router, environ, start_response)
+
+    def test_call_view_returns_adapted_response(self):
+        from pyramid.response import Response
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IResponse
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        environ = self._makeEnviron()
+        view = DummyView('abc')
+        self._registerView(view, '', IViewClassifier, None, None)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        def make_response(s):
+            return Response(s)
+        router.registry.registerAdapter(make_response, (str,), IResponse)
+        app_iter = router(environ, start_response)
+        self.assertEqual(app_iter, ['abc'])
+        self.assertEqual(start_response.status, '200 OK')
 
     def test_call_view_registered_nonspecific_default_path(self):
         from pyramid.interfaces import IViewClassifier
@@ -463,37 +468,6 @@ class TestRouter(unittest.TestCase):
         start_response = DummyStartResponse()
         exc_raised(NotImplementedError, router, environ, start_response)
         self.assertEqual(environ['called_back'], True)
-
-    def test_call_with_overridden_iresponder_factory(self):
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
-        from pyramid.interfaces import IRequest
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IResponder
-        context = DummyContext()
-        class IFoo(Interface):
-            pass
-        directlyProvides(context, IFoo)
-        self._registerTraverserFactory(context, subpath=[''])
-        class DummyResponder(object):
-            def __init__(self, response):
-                self.response = response
-            def __call__(self, request, start_response):
-                self.response.responder_used = True
-                return '123'
-        self.registry.registerAdapter(DummyResponder, (None,),
-                                      IResponder, name='')
-        response = DummyResponse('200 OK')
-        directlyProvides(response, IFoo)
-        def view(context, request):
-            return response
-        environ = self._makeEnviron()
-        self._registerView(view, '', IViewClassifier, IRequest, Interface)
-        router = self._makeOne()
-        start_response = DummyStartResponse()
-        result = router(environ, start_response)
-        self.assertTrue(response.responder_used)
-        self.assertEqual(result, '123')
 
     def test_call_request_factory_raises(self):
         # making sure finally doesnt barf when a request cannot be created
@@ -875,7 +849,7 @@ class TestRouter(unittest.TestCase):
         result = router(environ, start_response)
         self.assertEqual(result, ["Hello, world"])
 
-    def test_exception_view_returns_non_response(self):
+    def test_exception_view_returns_non_iresponse(self):
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IExceptionViewClassifier
@@ -1072,52 +1046,6 @@ class TestRouter(unittest.TestCase):
         start_response = DummyStartResponse()
         self.assertRaises(RuntimeError, router, environ, start_response)
 
-class Test_default_responder(unittest.TestCase):
-    def _makeOne(self, response):
-        from pyramid.router import default_responder
-        return default_responder(response)
-
-    def test_has_call(self):
-        response = DummyResponse()
-        response.app_iter = ['123']
-        response.headerlist = [('a', '1')]
-        responder = self._makeOne(response)
-        request = DummyRequest({'a':'1'})
-        start_response = DummyStartResponse()
-        app_iter = responder(request, start_response)
-        self.assertEqual(app_iter, response.app_iter)
-        self.assertEqual(start_response.status, response.status)
-        self.assertEqual(start_response.headers, response.headerlist)
-        self.assertEqual(response.environ, request.environ)
-
-    @hide_warnings
-    def test_without_call_success(self):
-        response = DummyResponseWithoutCall()
-        response.app_iter = ['123']
-        response.headerlist = [('a', '1')]
-        responder = self._makeOne(response)
-        request = DummyRequest({'a':'1'})
-        start_response = DummyStartResponse()
-        app_iter = responder(request, start_response)
-        self.assertEqual(app_iter, response.app_iter)
-        self.assertEqual(start_response.status, response.status)
-        self.assertEqual(start_response.headers, response.headerlist)
-
-    @hide_warnings
-    def test_without_call_exception(self):
-        response = DummyResponseWithoutCall()
-        del response.status
-        responder = self._makeOne(response)
-        request = DummyRequest({'a':'1'})
-        start_response = DummyStartResponse()
-        self.assertRaises(ValueError, responder, request, start_response)
-
-
-class DummyRequest(object):
-    def __init__(self, environ=None):
-        if environ is None: environ = {}
-        self.environ = environ
-
 class DummyContext:
     pass
 
@@ -1147,14 +1075,16 @@ class DummyStartResponse:
         self.status = status
         self.headers = headers
 
-class DummyResponseWithoutCall:
+from pyramid.interfaces import IResponse
+from zope.interface import implements
+
+class DummyResponse(object):
+    implements(IResponse)
     headerlist = ()
     app_iter = ()
+    environ = None
     def __init__(self, status='200 OK'):
         self.status = status
-        
-class DummyResponse(DummyResponseWithoutCall):
-    environ = None
 
     def __call__(self, environ, start_response):
         self.environ = environ

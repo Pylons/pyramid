@@ -358,7 +358,7 @@ do so, do things "by hand".  First define the view callable.
    :linenos:
 
    import os
-   from webob import Response
+   from pyramid.response import Response
 
    def favicon_view(request):
        here = os.path.dirname(__file__)

@@ -6,13 +6,26 @@ Must-Have
 
 - To subclass or not subclass http exceptions.
 
-- Depend on only __call__ interface or only 3-attr interface in builtin code
-  that deals with response objects.
+- Flesh out IResponse interface.  Attributes Used internally: unicode_body /
+  body / content_type / charset / cache_expires / headers/
+  default_content_type / set_cookie / headerlist / app_iter / status /
+  __call__.
 
-- Figure out what to do with ``is_response``.
+- Deprecate view.is_response?
+
+- Move is_response to response.py?
+
+- Make sure registering IResponse adapter for webob.Response doesn't make it
+  impossible to register an IResponse adapter for an interface that a
+  webob.Response happens to implement.
+
+- Run whatsitdoing tests.
 
 - Docs mention ``exception.args[0]`` as a way to get messages; check that
   this works.
+
+- Deprecate response_foo attrs on request at attribute set time rather than
+  lookup time.
 
 Should-Have
 -----------

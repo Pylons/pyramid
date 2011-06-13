@@ -5,12 +5,14 @@ from zope.interface.interface import InterfaceClass
 from webob import BaseRequest
 
 from pyramid.interfaces import IRequest
+from pyramid.interfaces import IResponse
 from pyramid.interfaces import ISessionFactory
 from pyramid.interfaces import IResponseFactory
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.decorator import reify
 from pyramid.response import Response
+from pyramid.threadlocal import get_current_registry
 from pyramid.url import resource_url
 from pyramid.url import route_url
 from pyramid.url import static_url

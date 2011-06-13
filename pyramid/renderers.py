@@ -316,9 +316,7 @@ class RendererHelper(object):
             'context':context,
             'request':request
             }
-        return self.render_to_response(response, system,
-                                       request=request)
-                
+        return self.render_to_response(response, system, request=request)
 
     def render(self, value, system_values, request=None):
         renderer = self.renderer

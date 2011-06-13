@@ -107,7 +107,9 @@
          return {'text':'Value that will be used by the renderer'}
 
      Mutations to this response object will be preserved in the response sent
-     to the client after rendering.
+     to the client after rendering.  For more information about using
+     ``request.response`` in conjunction with a renderer, see
+     :ref:`request_response_attr`.
 
      Non-renderer code can also make use of request.response instead of
      creating a response "by hand".  For example, in view code::
@@ -162,20 +164,21 @@
 
    .. attribute::  response_*
 
-      .. warning:: As of Pyramid 1.1, assignment to ``response_*`` attrs are
-         deprecated.  Assigning to one will cause a deprecation warning to be
-         emitted.  Instead of assigning ``response_*`` attributes to the
-         request, use API of the the :attr:`pyramid.request.Request.response`
-         object (exposed to view code as ``request.response``) to influence
-         response behavior.
-
-      You can set attributes on a :class:`pyramid.request.Request` which will
-      influence the behavor of *rendered* responses (views which use a
-      :term:`renderer` and which don't directly return a response).  These
-      attributes begin with ``response_``, such as ``response_headerlist``. If
-      you need to influence response values from a view that uses a renderer
-      (such as the status code, a header, the content type, etc) see,
-      :ref:`response_prefixed_attrs`.
+      In Pyramid 1.0, you could set attributes on a
+      :class:`pyramid.request.Request` which influenced the behavor of
+      *rendered* responses (views which use a :term:`renderer` and which
+      don't directly return a response).  These attributes began with
+      ``response_``, such as ``response_headerlist``. If you needed to
+      influence response values from a view that uses a renderer (such as the
+      status code, a header, the content type, etc) you would set these
+      attributes.  See :ref:`response_prefixed_attrs` for further discussion.
+      As of Pyramid 1.1, assignment to ``response_*`` attrs are deprecated.
+      Assigning to one is still supported but will cause a deprecation
+      warning to be emitted, and eventually the feature will be removed.  For
+      new code, instead of assigning ``response_*`` attributes to the
+      request, use API of the the :attr:`pyramid.request.Request.response`
+      object (exposed to view code as ``request.response``) to influence
+      rendered response behavior.
 
 .. note::
 

@@ -416,7 +416,7 @@ effect, you must return ``request.response``:
 
 For more information on attributes of the request, see the API documentation
 in :ref:`request_module`.  For more information on the API of
-``request.response``, see :class:`pyramid.response.Response`.
+``request.response``, see :attr:`pyramid.request.Request.response`.
 
 .. _response_prefixed_attrs:
 

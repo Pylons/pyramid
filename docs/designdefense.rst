@@ -428,7 +428,7 @@ allowing people to define "custom" view predicates:
    :linenos:
 
    from pyramid.view import view_config
-   from webob import Response
+   from pyramid.response import Response
 
    def subpath(context, request):
        return request.subpath and request.subpath[0] == 'abc'
@@ -1497,7 +1497,7 @@ comments take into account what we've discussed in the
 .. code-block:: python
    :linenos:
 
-   from webob import Response                 # explicit response objects, no TL
+   from pyramid.response import Response      # explicit response objects, no TL
    from paste.httpserver import serve         # explicitly WSGI
 
    def hello_world(request):  # accepts a request; no request thread local reqd

@@ -4,4 +4,4 @@ from pyramid.interfaces import IResponse
 
 class Response(_Response):
     implements(IResponse)
-    
+
