@@ -37,14 +37,13 @@ class Registry(Components, dict):
                                     provided=provided, name=name,
                                     info=info, event=event)
 
-    def queryAdapterOrSelf(self, object, interface, name=u'', default=None):
+    def queryAdapterOrSelf(self, object, interface, default=None):
         # queryAdapter analogue which returns the object if it implements
         # the interface, otherwise it will return an adaptation to the
         # interface
         provides = providedBy(object)
         if not interface in provides:
-            return self.queryAdapter(object, interface, name=name,
-                                     default=default)
+            return self.queryAdapter(object, interface, default=default)
         return object
 
     def registerHandler(self, *arg, **kw):

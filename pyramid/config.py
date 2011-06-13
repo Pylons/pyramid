@@ -432,10 +432,10 @@ class Configurator(object):
             _registry.has_listeners = True
 
         if not hasattr(_registry, 'queryAdapterOrSelf'):
-            def queryAdapterOrSelf(object, interface, name=u'', default=None):
+            def queryAdapterOrSelf(object, interface, default=None):
                 provides = providedBy(object)
                 if not interface in provides:
-                    return _registry.queryAdapter(object, interface, name=name,
+                    return _registry.queryAdapter(object, interface,
                                                   default=default)
                 return object
             _registry.queryAdapterOrSelf = queryAdapterOrSelf
