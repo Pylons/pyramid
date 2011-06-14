@@ -6,14 +6,11 @@ Must-Have
 
 - To subclass or not subclass http exceptions.
 
-- Flesh out IResponse interface.  Attributes Used internally: unicode_body /
-  body / content_type / charset / cache_expires / headers/
-  default_content_type / set_cookie / headerlist / app_iter / status /
-  __call__.
-
 - Deprecate view.is_response?
 
 - Move is_response to response.py?
+
+- Create add_response_adapter Configurator API?
 
 - Make sure registering IResponse adapter for webob.Response doesn't make it
   impossible to register an IResponse adapter for an interface that a
