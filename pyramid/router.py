@@ -185,7 +185,7 @@ class Router(object):
                 if response is None:
                     raise ValueError(
                         'Could not convert view return value "%s" into a '
-                        'response' % (result,))
+                        'response object' % (result,))
 
                 has_listeners and registry.notify(NewResponse(request,response))
 

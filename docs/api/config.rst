@@ -40,6 +40,8 @@
 
      .. automethod:: add_renderer(name, factory)
 
+     .. automethod:: add_response_adapter
+
      .. automethod:: add_route
 
      .. automethod:: add_static_view(name, path, cache_max_age=3600, permission='__no_permission_required__')

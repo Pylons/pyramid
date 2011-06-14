@@ -532,7 +532,7 @@ Changing How Pyramid Treats View Responses
 
 It is possible to control how Pyramid treats the result of calling a view
 callable on a per-type basis by using a hook involving
-:class:`pyramid.interfaces.IResponse`.
+:method:`pyramid.config.Configurator.add_response_adapter`.
 
 .. note:: This feature is new as of Pyramid 1.1.
 
@@ -559,7 +559,6 @@ Response:
 .. code-block:: python
    :linenos:
 
-   from pyramid.interfaces import IResponse
    from pyramid.response import Response
 
    def string_response_adapter(s):
@@ -568,8 +567,7 @@ Response:
 
    # config is an instance of pyramid.config.Configurator
 
-   config.registry.registerAdapter(string_response_adapter, (str,),
-                                   IResponse)
+   config.add_response_adapter(string_response_adapter, str)
 
 Likewise, if you want to be able to return a simplified kind of response
 object from view callables, you can use the IResponse hook to register an
@@ -578,7 +576,6 @@ adapter to the more complex IResponse interface:
 .. code-block:: python
    :linenos:
 
-   from pyramid.interfaces import IResponse
    from pyramid.response import Response
 
    class SimpleResponse(object):
@@ -591,14 +588,12 @@ adapter to the more complex IResponse interface:
 
    # config is an instance of pyramid.config.Configurator
 
-   config.registry.registerAdapter(simple_response_adapter, 
-                                  (SimpleResponse,),
-                                   IResponse)
+   config.add_response_adapter(simple_response_adapter, SimpleResponse)
 
 If you want to implement your own Response object instead of using the
 :class:`pyramid.response.Response` object in any capacity at all, you'll have
 to make sure the object implements every attribute and method outlined in
-:class:`pyramid.interfaces.IResponse` *and* you'll have to ensure that it's
+:class:`pyramid.interfaces.IResponse` and you'll have to ensure that it's
 marked up with ``zope.interface.implements(IResponse)``:
 
    from pyramid.interfaces import IResponse

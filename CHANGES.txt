@@ -130,8 +130,10 @@ Features
 - It is now possible to return an arbitrary object from a Pyramid view
   callable even if a renderer is not used, as long as a suitable adapter to
   ``pyramid.interfaces.IResponse`` is registered for the type of the returned
-  object.  See the section in the Hooks chapter of the documentation entitled
-  "Changing How Pyramid Treats View Responses".
+  object by using the new
+  ``pyramid.config.Configurator.add_response_adapter`` API.  See the section
+  in the Hooks chapter of the documentation entitled "Changing How Pyramid
+  Treats View Responses".
 
 - The Pyramid router will now, by default, call the ``__call__`` method of
   WebOb response objects when returning a WSGI response.  This means that,

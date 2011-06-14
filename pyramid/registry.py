@@ -41,8 +41,7 @@ class Registry(Components, dict):
         # queryAdapter analogue which returns the object if it implements
         # the interface, otherwise it will return an adaptation to the
         # interface
-        provides = providedBy(object)
-        if not interface in provides:
+        if not interface.providedBy(object):
             return self.queryAdapter(object, interface, default=default)
         return object
 

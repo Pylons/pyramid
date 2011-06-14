@@ -19,7 +19,6 @@ from zope.interface import implementedBy
 from zope.interface.interfaces import IInterface
 from zope.interface import implements
 from zope.interface import classProvides
-from zope.interface import providedBy
 
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.interfaces import IAuthorizationPolicy
@@ -260,15 +259,11 @@ class Configurator(object):
 
     If ``exceptionresponse_view`` is passed, it must be a :term:`view
     callable` or ``None``.  If it is a view callable, it will be used as an
-    exception view callable when an :term:`exception response` is raised (any
-    object that implements the :class:`pyramid.interaces.IExceptionResponse`
-    interface, such as a :class:`pyramid.response.Response` object or any
-    ``HTTP`` exception documented in :mod:`pyramid.httpexceptions` as well as
-    exception responses raised via :func:`pyramid.exceptions.abort`,
-    :func:`pyramid.exceptions.redirect`).  If ``exceptionresponse_view`` is
-    ``None``, no exception response view will be registered, and all raised
-    exception responses will be bubbled up to Pyramid's caller.  By
-    default, the ``pyramid.exceptions.default_exceptionresponse_view``
+    exception view callable when an :term:`exception response` is raised. If
+    ``exceptionresponse_view`` is ``None``, no exception response view will
+    be registered, and all raised exception responses will be bubbled up to
+    Pyramid's caller.  By
+    default, the ``pyramid.httpexceptions.default_exceptionresponse_view``
     function is used as the ``exceptionresponse_view``.  This argument is new
     in Pyramid 1.1.  """
 
@@ -433,8 +428,7 @@ class Configurator(object):
 
         if not hasattr(_registry, 'queryAdapterOrSelf'):
             def queryAdapterOrSelf(object, interface, default=None):
-                provides = providedBy(object)
-                if not interface in provides:
+                if not interface.providedBy(object):
                     return _registry.queryAdapter(object, interface,
                                                   default=default)
                 return object
@@ -892,6 +886,30 @@ class Configurator(object):
             self.registry.registerHandler(subscriber, iface)
         self.action(None, register)
         return subscriber
+
+    @action_method
+    def add_response_adapter(self, adapter, type_or_iface):
+        """ When an object of type (or interface) ``type_or_iface`` is
+        returned from a view callable, Pyramid will use the adapter
+        ``adapter`` to convert it into an object which implements the
+        :class:`pyramid.interfaces.IResponse` interface.  If ``adapter`` is
+        None, an object returned of type (or interface) ``type_or_iface``
+        will itself be used as a response object.
+
+        ``adapter`` and ``type_or_interface`` may be Python objects or
+        strings representing dotted names to importable Python global
+        objects.
+
+        See :ref:`using_iresponse` for more information."""
+        adapter = self.maybe_dotted(adapter)
+        type_or_iface = self.maybe_dotted(type_or_iface)
+        def register():
+            reg = self.registry
+            if adapter is None:
+                reg.registerSelfAdapter((type_or_iface,), IResponse)
+            else:
+                reg.registerAdapter(adapter, (type_or_iface,), IResponse)
+        self.action((IResponse, type_or_iface), register)
 
     def add_settings(self, settings=None, **kw):
         """Augment the ``settings`` argument passed in to the Configurator
