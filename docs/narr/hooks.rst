@@ -21,7 +21,7 @@ configuration.
 
 The :term:`not found view` callable is a view callable like any other.  The
 :term:`view configuration` which causes it to be a "not found" view consists
-only of naming the :exc:`pyramid.exceptions.NotFound` class as the
+only of naming the :exc:`pyramid.httpexceptions.HTTPNotFound` class as the
 ``context`` of the view configuration.
 
 If your application uses :term:`imperative configuration`, you can replace
@@ -31,9 +31,9 @@ method to register an "exception view":
 .. code-block:: python
    :linenos:
 
-   from pyramid.exceptions import NotFound
+   from pyramid.httpexceptions import HTTPNotFound
    from helloworld.views import notfound_view
-   config.add_view(notfound_view, context=NotFound)
+   config.add_view(notfound_view, context=HTTPNotFound)
 
 Replace ``helloworld.views.notfound_view`` with a reference to the
 :term:`view callable` you want to use to represent the Not Found view.
@@ -42,8 +42,8 @@ Like any other view, the notfound view must accept at least a ``request``
 parameter, or both ``context`` and ``request``.  The ``request`` is the
 current :term:`request` representing the denied action.  The ``context`` (if
 used in the call signature) will be the instance of the
-:exc:`~pyramid.exceptions.NotFound` exception that caused the view to be
-called.
+:exc:`~pyramid.httpexceptions.HTTPNotFound` exception that caused the view to
+be called.
 
 Here's some sample code that implements a minimal NotFound view callable:
 
@@ -56,19 +56,20 @@ Here's some sample code that implements a minimal NotFound view callable:
        return HTTPNotFound()
 
 .. note:: When a NotFound view callable is invoked, it is passed a
-   :term:`request`.  The ``exception`` attribute of the request will
-   be an instance of the :exc:`~pyramid.exceptions.NotFound`
-   exception that caused the not found view to be called.  The value
-   of ``request.exception.args[0]`` will be a value explaining why the
-   not found error was raised.  This message will be different when
-   the ``debug_notfound`` environment setting is true than it is when
-   it is false.
+   :term:`request`.  The ``exception`` attribute of the request will be an
+   instance of the :exc:`~pyramid.httpexceptions.HTTPNotFound` exception that
+   caused the not found view to be called.  The value of
+   ``request.exception.args[0]`` will be a value explaining why the not found
+   error was raised.  This message will be different when the
+   ``debug_notfound`` environment setting is true than it is when it is
+   false.
 
 .. warning:: When a NotFound view callable accepts an argument list as
    described in :ref:`request_and_context_view_definitions`, the ``context``
    passed as the first argument to the view callable will be the
-   :exc:`~pyramid.exceptions.NotFound` exception instance.  If available, the
-   resource context will still be available as ``request.context``.
+   :exc:`~pyramid.httpexceptions.HTTPNotFound` exception instance.  If
+   available, the resource context will still be available as
+   ``request.context``.
 
 .. index::
    single: forbidden view
@@ -85,7 +86,7 @@ the view which generates it can be overridden as necessary.
 
 The :term:`forbidden view` callable is a view callable like any other.  The
 :term:`view configuration` which causes it to be a "forbidden" view consists
-only of naming the :exc:`pyramid.exceptions.Forbidden` class as the
+only of naming the :exc:`pyramid.httpexceptions.HTTPForbidden` class as the
 ``context`` of the view configuration.
 
 You can replace the forbidden view by using the
@@ -96,8 +97,8 @@ view":
    :linenos:
 
    from helloworld.views import forbidden_view
-   from pyramid.exceptions import Forbidden
-   config.add_view(forbidden_view, context=Forbidden)
+   from pyramid.httpexceptions import HTTPForbidden
+   config.add_view(forbidden_view, context=HTTPForbidden)
 
 Replace ``helloworld.views.forbidden_view`` with a reference to the Python
 :term:`view callable` you want to use to represent the Forbidden view.
@@ -121,13 +122,13 @@ Here's some sample code that implements a minimal forbidden view:
        return Response('forbidden')
 
 .. note:: When a forbidden view callable is invoked, it is passed a
-   :term:`request`.  The ``exception`` attribute of the request will
-   be an instance of the :exc:`~pyramid.exceptions.Forbidden`
-   exception that caused the forbidden view to be called.  The value
-   of ``request.exception.args[0]`` will be a value explaining why the
-   forbidden was raised.  This message will be different when the
-   ``debug_authorization`` environment setting is true than it is when
-   it is false.
+   :term:`request`.  The ``exception`` attribute of the request will be an
+   instance of the :exc:`~pyramid.httpexceptions.HTTPForbidden` exception
+   that caused the forbidden view to be called.  The value of
+   ``request.exception.args[0]`` will be a value explaining why the forbidden
+   was raised.  This message will be different when the
+   ``debug_authorization`` environment setting is true than it is when it is
+   false.
 
 .. index::
    single: request factory
@@ -522,6 +523,100 @@ The default context URL generator is available for perusal as the class
 :term:`Pylons` GitHub Pyramid repository.
 
 .. index::
+   single: IResponse
+
+.. _using_iresponse:
+
+Changing How Pyramid Treats View Responses
+------------------------------------------
+
+It is possible to control how Pyramid treats the result of calling a view
+callable on a per-type basis by using a hook involving
+:method:`pyramid.config.Configurator.add_response_adapter`.
+
+.. note:: This feature is new as of Pyramid 1.1.
+
+Pyramid, in various places, adapts the result of calling a view callable to
+the :class:`~pyramid.interfaces.IResponse` interface to ensure that the
+object returned by the view callable is a "true" response object.  The vast
+majority of time, the result of this adaptation is the result object itself,
+as view callables written by "civilians" who read the narrative documentation
+contained in this manual will always return something that implements the
+:class:`~pyramid.interfaces.IResponse` interface.  Most typically, this will
+be an instance of the :class:`pyramid.response.Response` class or a subclass.
+If a civilian returns a non-Response object from a view callable that isn't
+configured to use a :term:`renderer`, he will typically expect the router to
+raise an error.  However, you can hook Pyramid in such a way that users can
+return arbitrary values from a view callable by providing an adapter which
+converts the arbitrary return value into something that implements
+:class:`~pyramid.interfaces.IResponse`.
+
+For example, if you'd like to allow view callables to return bare string
+objects (without requiring a a :term:`renderer` to convert a string to a
+response object), you can register an adapter which converts the string to a
+Response:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.response import Response
+
+   def string_response_adapter(s):
+       response = Response(s)
+       return response
+
+   # config is an instance of pyramid.config.Configurator
+
+   config.add_response_adapter(string_response_adapter, str)
+
+Likewise, if you want to be able to return a simplified kind of response
+object from view callables, you can use the IResponse hook to register an
+adapter to the more complex IResponse interface:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.response import Response
+
+   class SimpleResponse(object):
+       def __init__(self, body):
+           self.body = body
+
+   def simple_response_adapter(simple_response):
+       response = Response(simple_response.body)
+       return response
+
+   # config is an instance of pyramid.config.Configurator
+
+   config.add_response_adapter(simple_response_adapter, SimpleResponse)
+
+If you want to implement your own Response object instead of using the
+:class:`pyramid.response.Response` object in any capacity at all, you'll have
+to make sure the object implements every attribute and method outlined in
+:class:`pyramid.interfaces.IResponse` and you'll have to ensure that it's
+marked up with ``zope.interface.implements(IResponse)``:
+
+   from pyramid.interfaces import IResponse
+   from zope.interface import implements
+
+   class MyResponse(object):
+       implements(IResponse)
+       # ... an implementation of every method and attribute 
+       # documented in IResponse should follow ...
+
+When an alternate response object implementation is returned by a view
+callable, if that object asserts that it implements
+:class:`~pyramid.interfaces.IResponse` (via
+``zope.interface.implements(IResponse)``) , an adapter needn't be registered
+for the object; Pyramid will use it directly.
+
+An IResponse adapter for ``webob.Response`` (as opposed to
+:class:`pyramid.response.Response`) is registered by Pyramid by default at
+startup time, as by their nature, instances of this class (and instances of
+subclasses of the class) will natively provide IResponse.  The adapter
+registered for ``webob.Response`` simply returns the response object.
+
+.. index::
    single: view mapper
 
 .. _using_a_view_mapper:
@@ -590,7 +685,7 @@ A user might make use of these framework components like so:
 
    # user application
 
-   from webob import Response
+   from pyramid.response import Response
    from pyramid.config import Configurator
    import pyramid_handlers
    from paste.httpserver import serve

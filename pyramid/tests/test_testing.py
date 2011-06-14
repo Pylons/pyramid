@@ -150,7 +150,7 @@ class Test_registerView(TestBase):
 
     def test_registerView_with_permission_denying(self):
         from pyramid import testing
-        from pyramid.exceptions import Forbidden
+        from pyramid.httpexceptions import HTTPForbidden
         def view(context, request):
             """ """
         view = testing.registerView('moo.html', view=view, permission='bar')
@@ -160,7 +160,7 @@ class Test_registerView(TestBase):
         from pyramid.view import render_view_to_response
         request = DummyRequest()
         request.registry = self.registry
-        self.assertRaises(Forbidden, render_view_to_response,
+        self.assertRaises(HTTPForbidden, render_view_to_response,
                           None, request, 'moo.html')
 
     def test_registerView_with_permission_denying2(self):

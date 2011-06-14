@@ -120,6 +120,19 @@ class RenderViewToIterableTests(BaseTest, unittest.TestCase):
                                  secure=True)
         self.assertEqual(iterable, ())
 
+    def test_call_view_returns_iresponse_adaptable(self):
+        from pyramid.response import Response
+        request = self._makeRequest()
+        context = self._makeContext()
+        view = make_view('123')
+        self._registerView(request.registry, view, 'registered')
+        def str_response(s):
+            return Response(s)
+        request.registry.registerAdapter(str_response, (str,), IResponse)
+        iterable = self._callFUT(context, request, name='registered',
+                                 secure=True)
+        self.assertEqual(iterable, ['123'])
+
     def test_call_view_registered_insecure_no_call_permissive(self):
         context = self._makeContext()
         request = self._makeRequest()
@@ -185,6 +198,14 @@ class RenderViewTests(BaseTest, unittest.TestCase):
         self.assertEqual(s, 'anotherview')
 
 class TestIsResponse(unittest.TestCase):
+    def setUp(self):
+        from zope.deprecation import __show__
+        __show__.off()
+
+    def tearDown(self):
+        from zope.deprecation import __show__
+        __show__.on()
+        
     def _callFUT(self, *arg, **kw):
         from pyramid.view import is_response
         return is_response(*arg, **kw)
@@ -536,9 +557,15 @@ def make_view(response):
 class DummyRequest:
     exception = None
 
-class DummyResponse:
-    status = '200 OK'
+from pyramid.interfaces import IResponse
+from zope.interface import implements
+
+class DummyResponse(object):
+    implements(IResponse)
     headerlist = ()
+    app_iter = ()
+    status = '200 OK'
+    environ = None
     def __init__(self, body=None):
         if body is None:
             self.app_iter = ()

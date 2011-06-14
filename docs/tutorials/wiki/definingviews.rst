@@ -84,10 +84,12 @@ No renderer is necessary when a view returns a response object.
 The ``view_wiki`` view callable always redirects to the URL of a Page
 resource named "FrontPage".  To do so, it returns an instance of the
 :class:`pyramid.httpexceptions.HTTPFound` class (instances of which implement
-the WebOb :term:`response` interface).  The :func:`pyramid.url.resource_url`
-API.  :func:`pyramid.url.resource_url` constructs a URL to the ``FrontPage``
-page resource (e.g. ``http://localhost:6543/FrontPage``), and uses it as the
-"location" of the HTTPFound response, forming an HTTP redirect.
+the :class:`pyramid.interfaces.IResponse` interface like
+:class:`pyramid.response.Response` does).  The
+:func:`pyramid.url.resource_url` API.  :func:`pyramid.url.resource_url`
+constructs a URL to the ``FrontPage`` page resource
+(e.g. ``http://localhost:6543/FrontPage``), and uses it as the "location" of
+the HTTPFound response, forming an HTTP redirect.
 
 The ``view_page`` view function
 -------------------------------

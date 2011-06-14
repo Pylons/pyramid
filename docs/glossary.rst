@@ -16,12 +16,12 @@ Glossary
      positional argument, returns a ``WebOb`` compatible request.
 
    response
-     An object that has three attributes: ``app_iter`` (representing an
-     iterable body), ``headerlist`` (representing the http headers sent
-     to the user agent), and ``status`` (representing the http status
-     string sent to the user agent).  This is the interface defined for
-     ``WebOb`` response objects.  See :ref:`webob_chapter` for
-     information about response objects.
+     An object returned by a :term:`view callable` that represents response
+     data returned to the requesting user agent.  It must implements the
+     :class:`pyramid.interfaces.IResponse` interface.  A response object is
+     typically an instance of the :class:`pyramid.response.Response` class or
+     a subclass such as :class:`pyramid.httpexceptions.HTTPFound`.  See
+     :ref:`webob_chapter` for information about response objects.
 
    Repoze
      "Repoze" is essentially a "brand" of software developed by `Agendaless
@@ -594,7 +594,7 @@ Glossary
 
    Not Found view
       An :term:`exception view` invoked by :app:`Pyramid` when the
-      developer explicitly raises a ``pyramid.exceptions.NotFound``
+      developer explicitly raises a ``pyramid.httpexceptions.HTTPNotFound``
       exception from within :term:`view` code or :term:`root factory`
       code, or when the current request doesn't match any :term:`view
       configuration`.  :app:`Pyramid` provides a default
@@ -604,7 +604,7 @@ Glossary
    Forbidden view
       An :term:`exception view` invoked by :app:`Pyramid` when the
       developer explicitly raises a
-      ``pyramid.exceptions.Forbidden`` exception from within
+      ``pyramid.httpexceptions.HTTPForbidden`` exception from within
       :term:`view` code or :term:`root factory` code, or when the
       :term:`view configuration` and :term:`authorization policy`
       found for a request disallows a particular view invocation.
@@ -617,6 +617,12 @@ Glossary
       invoked by :app:`Pyramid` when an exception is raised during
       request processing.  See :ref:`exception_views` for more
       information.
+
+   HTTP Exception
+      The set of exception classes defined in :mod:`pyramid.httpexceptions`.
+      These can be used to generate responses with various status codes when
+      raised or returned from a :term:`view callable`.  See also
+      :ref:`http_exceptions`.
 
    thread local
       A thread-local variable is one which is essentially a global variable
@@ -894,5 +900,7 @@ Glossary
      http://docs.python.org/distutils/index.html for more information.
      :term:`setuptools` is actually an *extension* of the Distutils.
 
-
+   exception response
+     A :term:`response` that is generated as the result of a raised exception
+     being caught by an :term:`exception view`.
 

@@ -36,6 +36,7 @@ from pyramid.interfaces import IRendererFactory
 from pyramid.interfaces import IRendererGlobalsFactory
 from pyramid.interfaces import IRequest
 from pyramid.interfaces import IRequestFactory
+from pyramid.interfaces import IResponse
 from pyramid.interfaces import IRootFactory
 from pyramid.interfaces import IRouteRequest
 from pyramid.interfaces import IRoutesMapper
@@ -56,9 +57,10 @@ from pyramid.compat import md5
 from pyramid.compat import any
 from pyramid.events import ApplicationCreated
 from pyramid.exceptions import ConfigurationError
-from pyramid.exceptions import Forbidden
-from pyramid.exceptions import NotFound
 from pyramid.exceptions import PredicateMismatch
+from pyramid.httpexceptions import default_exceptionresponse_view
+from pyramid.httpexceptions import HTTPForbidden
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.i18n import get_localizer
 from pyramid.log import make_stream_logger
 from pyramid.mako_templating import renderer_factory as mako_renderer_factory
@@ -80,9 +82,7 @@ from pyramid.traversal import find_interface
 from pyramid.traversal import traversal_path
 from pyramid.urldispatch import RoutesMapper
 from pyramid.util import DottedNameResolver
-from pyramid.view import default_exceptionresponse_view
 from pyramid.view import render_view_to_response
-from pyramid.view import is_response
 
 DEFAULT_RENDERERS = (
     ('.mak', mako_renderer_factory),
@@ -139,7 +139,8 @@ class Configurator(object):
     ``package``, ``settings``, ``root_factory``, ``authentication_policy``,
     ``authorization_policy``, ``renderers`` ``debug_logger``,
     ``locale_negotiator``, ``request_factory``, ``renderer_globals_factory``,
-    ``default_permission``, ``session_factory``, and ``autocommit``.
+    ``default_permission``, ``session_factory``, ``default_view_mapper``,
+    ``autocommit``, and ``exceptionresponse_view``.
 
     If the ``registry`` argument is passed as a non-``None`` value, it
     must be an instance of the :class:`pyramid.registry.Registry`
@@ -254,7 +255,17 @@ class Configurator(object):
     :term:`view mapper` factory for view configurations that don't otherwise
     specify one (see :class:`pyramid.interfaces.IViewMapperFactory`).  If a
     default_view_mapper is not passed, a superdefault view mapper will be
-    used.  """
+    used.
+
+    If ``exceptionresponse_view`` is passed, it must be a :term:`view
+    callable` or ``None``.  If it is a view callable, it will be used as an
+    exception view callable when an :term:`exception response` is raised. If
+    ``exceptionresponse_view`` is ``None``, no exception response view will
+    be registered, and all raised exception responses will be bubbled up to
+    Pyramid's caller.  By
+    default, the ``pyramid.httpexceptions.default_exceptionresponse_view``
+    function is used as the ``exceptionresponse_view``.  This argument is new
+    in Pyramid 1.1.  """
 
     manager = manager # for testing injection
     venusian = venusian # for testing injection
@@ -277,6 +288,7 @@ class Configurator(object):
                  session_factory=None,
                  default_view_mapper=None,
                  autocommit=False,
+                 exceptionresponse_view=default_exceptionresponse_view,
                  ):
         if package is None:
             package = caller_package()
@@ -302,6 +314,7 @@ class Configurator(object):
                 default_permission=default_permission,
                 session_factory=session_factory,
                 default_view_mapper=default_view_mapper,
+                exceptionresponse_view=exceptionresponse_view,
                 )
 
     def _set_settings(self, mapping):
@@ -400,7 +413,8 @@ class Configurator(object):
     def _fix_registry(self):
         """ Fix up a ZCA component registry that is not a
         pyramid.registry.Registry by adding analogues of ``has_listeners``,
-        and ``notify`` through monkey-patching."""
+        ``notify``, ``queryAdapterOrSelf``, and ``registerSelfAdapter``
+        through monkey-patching."""
 
         _registry = self.registry
 
@@ -411,6 +425,23 @@ class Configurator(object):
 
         if not hasattr(_registry, 'has_listeners'):
             _registry.has_listeners = True
+
+        if not hasattr(_registry, 'queryAdapterOrSelf'):
+            def queryAdapterOrSelf(object, interface, default=None):
+                if not interface.providedBy(object):
+                    return _registry.queryAdapter(object, interface,
+                                                  default=default)
+                return object
+            _registry.queryAdapterOrSelf = queryAdapterOrSelf
+
+        if not hasattr(_registry, 'registerSelfAdapter'):
+            def registerSelfAdapter(required=None, provided=None,
+                                    name=u'', info=u'', event=True):
+                return _registry.registerAdapter(lambda x: x,
+                                                 required=required,
+                                                 provided=provided, name=name,
+                                                 info=info, event=event)
+            _registry.registerSelfAdapter = registerSelfAdapter
 
     def _make_context(self, autocommit=False):
         context = PyramidConfigurationMachine()
@@ -658,7 +689,8 @@ class Configurator(object):
                        renderers=DEFAULT_RENDERERS, debug_logger=None,
                        locale_negotiator=None, request_factory=None,
                        renderer_globals_factory=None, default_permission=None,
-                       session_factory=None, default_view_mapper=None):
+                       session_factory=None, default_view_mapper=None,
+                       exceptionresponse_view=default_exceptionresponse_view):
         """ When you pass a non-``None`` ``registry`` argument to the
         :term:`Configurator` constructor, no initial 'setup' is performed
         against the registry.  This is because the registry you pass in may
@@ -679,6 +711,9 @@ class Configurator(object):
         self._fix_registry()
         self._set_settings(settings)
         self._set_root_factory(root_factory)
+        # cope with WebOb response objects that aren't decorated with IResponse
+        from webob import Response as WebobResponse
+        registry.registerSelfAdapter((WebobResponse,), IResponse)
         debug_logger = self.maybe_dotted(debug_logger)
         if debug_logger is None:
             debug_logger = make_stream_logger('pyramid.debug', sys.stderr)
@@ -688,8 +723,9 @@ class Configurator(object):
                                         authorization_policy)
         for name, renderer in renderers:
             self.add_renderer(name, renderer)
-        self.add_view(default_exceptionresponse_view,
-                      context=IExceptionResponse)
+        if exceptionresponse_view is not None:
+            exceptionresponse_view = self.maybe_dotted(exceptionresponse_view)
+            self.add_view(exceptionresponse_view, context=IExceptionResponse)
         if locale_negotiator:
             locale_negotiator = self.maybe_dotted(locale_negotiator)
             registry.registerUtility(locale_negotiator, ILocaleNegotiator)
@@ -705,7 +741,7 @@ class Configurator(object):
         if session_factory is not None:
             self.set_session_factory(session_factory)
         # commit before adding default_view_mapper, as the
-        # default_exceptionresponse_view above requires the superdefault view
+        # exceptionresponse_view above requires the superdefault view
         # mapper
         self.commit()
         if default_view_mapper is not None:
@@ -850,6 +886,30 @@ class Configurator(object):
             self.registry.registerHandler(subscriber, iface)
         self.action(None, register)
         return subscriber
+
+    @action_method
+    def add_response_adapter(self, adapter, type_or_iface):
+        """ When an object of type (or interface) ``type_or_iface`` is
+        returned from a view callable, Pyramid will use the adapter
+        ``adapter`` to convert it into an object which implements the
+        :class:`pyramid.interfaces.IResponse` interface.  If ``adapter`` is
+        None, an object returned of type (or interface) ``type_or_iface``
+        will itself be used as a response object.
+
+        ``adapter`` and ``type_or_interface`` may be Python objects or
+        strings representing dotted names to importable Python global
+        objects.
+
+        See :ref:`using_iresponse` for more information."""
+        adapter = self.maybe_dotted(adapter)
+        type_or_iface = self.maybe_dotted(type_or_iface)
+        def register():
+            reg = self.registry
+            if adapter is None:
+                reg.registerSelfAdapter((type_or_iface,), IResponse)
+            else:
+                reg.registerAdapter(adapter, (type_or_iface,), IResponse)
+        self.action((IResponse, type_or_iface), register)
 
     def add_settings(self, settings=None, **kw):
         """Augment the ``settings`` argument passed in to the Configurator
@@ -1978,7 +2038,8 @@ class Configurator(object):
         def bwcompat_view(context, request):
             context = getattr(request, 'context', None)
             return view(context, request)
-        return self.add_view(bwcompat_view, context=Forbidden, wrapper=wrapper)
+        return self.add_view(bwcompat_view, context=HTTPForbidden,
+                             wrapper=wrapper)
 
     @action_method
     def set_notfound_view(self, view=None, attr=None, renderer=None,
@@ -2018,7 +2079,8 @@ class Configurator(object):
         def bwcompat_view(context, request):
             context = getattr(request, 'context', None)
             return view(context, request)
-        return self.add_view(bwcompat_view, context=NotFound, wrapper=wrapper)
+        return self.add_view(bwcompat_view, context=HTTPNotFound,
+                             wrapper=wrapper)
 
     @action_method
     def set_request_factory(self, factory):
@@ -2826,7 +2888,7 @@ class ViewDeriver(object):
                     return view(context, request)
                 msg = getattr(request, 'authdebug_message',
                               'Unauthorized: %s failed permission check' % view)
-                raise Forbidden(msg, result)
+                raise HTTPForbidden(msg, result=result)
             _secured_view.__call_permissive__ = view
             _secured_view.__permitted__ = _permitted
             _secured_view.__permission__ = permission
@@ -2875,7 +2937,8 @@ class ViewDeriver(object):
         def predicate_wrapper(context, request):
             if all((predicate(context, request) for predicate in predicates)):
                 return view(context, request)
-            raise PredicateMismatch('predicate mismatch for view %s' % view)
+            raise PredicateMismatch(
+                'predicate mismatch for view %s' % view)
         def checker(context, request):
             return all((predicate(context, request) for predicate in
                         predicates))
@@ -2920,22 +2983,24 @@ class ViewDeriver(object):
 
         def _rendered_view(context, request):
             renderer = static_renderer
-            response = wrapped_view(context, request)
-            if not is_response(response):
+            result = wrapped_view(context, request)
+            registry = self.kw['registry']
+            response = registry.queryAdapterOrSelf(result, IResponse)
+            if response is None:
                 attrs = getattr(request, '__dict__', {})
                 if 'override_renderer' in attrs:
                     # renderer overridden by newrequest event or other
                     renderer_name = attrs.pop('override_renderer')
                     renderer = RendererHelper(name=renderer_name,
                                               package=self.kw.get('package'),
-                                              registry = self.kw['registry'])
+                                              registry = registry)
                 if '__view__' in attrs:
                     view_inst = attrs.pop('__view__')
                 else:
                     view_inst = getattr(wrapped_view, '__original_view__',
                                         wrapped_view)
-                return renderer.render_view(request, response, view_inst,
-                                            context)
+                response = renderer.render_view(request, result, view_inst,
+                                                context)
             return response
 
         return _rendered_view

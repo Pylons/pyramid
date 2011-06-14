@@ -1,4 +1,5 @@
 from zope.component.registry import Components
+from zope.interface import providedBy
 
 from pyramid.interfaces import ISettings
 
@@ -27,6 +28,22 @@ class Registry(Components, dict):
         result = Components.registerSubscriptionAdapter(self, *arg, **kw)
         self.has_listeners = True
         return result
+
+    def registerSelfAdapter(self, required=None, provided=None, name=u'',
+                            info=u'', event=True):
+        # registerAdapter analogue which always returns the object itself
+        # when required is matched
+        return self.registerAdapter(lambda x: x, required=required,
+                                    provided=provided, name=name,
+                                    info=info, event=event)
+
+    def queryAdapterOrSelf(self, object, interface, default=None):
+        # queryAdapter analogue which returns the object if it implements
+        # the interface, otherwise it will return an adaptation to the
+        # interface
+        if not interface.providedBy(object):
+            return self.queryAdapter(object, interface, default=default)
+        return object
 
     def registerHandler(self, *arg, **kw):
         result = Components.registerHandler(self, *arg, **kw)

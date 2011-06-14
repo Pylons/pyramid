@@ -1,12 +1,20 @@
 Pyramid TODOs
 =============
 
+Must-Have
+---------
+
+- Copy exception templates from webob.exc into pyramid.httpexceptions and
+  ensure they all work.
+
+- Docs mention ``exception.args[0]`` as a way to get messages; check that
+  this works.
+
+- Deprecate response_foo attrs on request at attribute set time rather than
+  lookup time.
+
 Should-Have
 -----------
-
-- Consider adding a default exception view for HTTPException and attendant
-  ``redirect`` and ``abort`` functions ala Pylons (promised Mike I'd enable
-  this in 1.1).
 
 - Add narrative docs for wsgiapp and wsgiapp2.
 

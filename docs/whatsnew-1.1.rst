@@ -18,6 +18,9 @@ The major feature additions in Pyramid 1.1 are:
 
 - Support for "static" routes.
 
+- Default HTTP exception view and associated ``redirect`` and ``abort``
+  convenience functions.
+
 ``request.response``
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -50,12 +53,35 @@ Static Routes
   be useful for URL generation via ``route_url`` and ``route_path``.  See the
   section entitled :ref:`static_route_narr` for more information.
 
+Default HTTP Exception View
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- A default exception view for the context :exc:`webob.exc.HTTPException`
+  (aka :class:`pyramid.httpexceptions.HTTPException`) is now registered by
+  default.  This means that an instance of any exception class imported from
+  :mod:`pyramid.httpexceptions` (such as ``HTTPFound``) can now be raised
+  from within view code; when raised, this exception view will render the
+  exception to a response.
+
+  To allow for configuration of this feature, the :term:`Configurator` now
+  accepts an additional keyword argument named ``httpexception_view``.  By
+  default, this argument is populated with a default exception view function
+  that will be used when an HTTP exception is raised.  When ``None`` is
+  passed for this value, an exception view for HTTP exceptions will not be
+  registered.  Passing ``None`` returns the behavior of raising an HTTP
+  exception to that of Pyramid 1.0 (the exception will propagate to
+  middleware and to the WSGI server).
+
 Minor Feature Additions
 -----------------------
 
 - New authentication policy:
   :class:`pyramid.authentication.SessionAuthenticationPolicy`, which uses a
   session to store credentials.
+
+- A function named :func:`pyramid.httpexceptions.responsecode` is a shortcut
+  that can be used to create HTTP exception response objects using an HTTP
+  integer status code.
 
 - Integers and longs passed as ``elements`` to
   :func:`pyramid.url.resource_url` or
@@ -162,7 +188,7 @@ Deprecations and Behavior Differences
   expected an environ object in BFG 1.0 and before).  In a future version,
   these methods will be removed entirely.
 
-- A custom request factory is now required to return a response object that
+- A custom request factory is now required to return a request object that
   has a ``response`` attribute (or "reified"/lazy property) if they the
   request is meant to be used in a view that uses a renderer.  This
   ``response`` attribute should be an instance of the class
@@ -235,3 +261,10 @@ Documentation Enhancements
 
 - Added a section to the "URL Dispatch" narrative chapter regarding the new
   "static" route feature entitled :ref:`static_route_narr`.
+
+- Added API docs for :func:`pyramid.httpexceptions.abort` and
+  :func:`pyramid.httpexceptions.redirect`.
+
+- Added :ref:`http_exceptions` section to Views narrative chapter including a
+  description of :func:`pyramid.httpexceptions.abort`` and
+  :func:`pyramid.httpexceptions.redirect`.

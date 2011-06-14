@@ -11,6 +11,8 @@
      integer "401" maps to
      :class:`pyramid.httpexceptions.HTTPUnauthorized`).
 
+  .. autofunction:: responsecode
+
   .. autoclass:: HTTPException
 
   .. autoclass:: HTTPOk

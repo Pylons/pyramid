@@ -1,26 +1,15 @@
 import unittest
 
-class TestExceptionResponse(unittest.TestCase):
-    def _makeOne(self, message):
-        from pyramid.exceptions import ExceptionResponse
-        return ExceptionResponse(message)
-    
-    def test_app_iter(self):
-        exc = self._makeOne('')
-        self.assertTrue('<code></code>' in exc.app_iter[0])
+class TestBWCompat(unittest.TestCase):
+    def test_bwcompat_notfound(self):
+        from pyramid.exceptions import NotFound as one
+        from pyramid.httpexceptions import HTTPNotFound as two
+        self.assertTrue(one is two)
 
-    def test_headerlist(self):
-        exc = self._makeOne('')
-        headerlist = exc.headerlist
-        headerlist.sort()
-        app_iter = exc.app_iter
-        clen = str(len(app_iter[0]))
-        self.assertEqual(headerlist[0], ('Content-Length', clen))
-        self.assertEqual(headerlist[1], ('Content-Type', 'text/html'))
-
-    def test_withmessage(self):
-        exc = self._makeOne('abc&123')
-        self.assertTrue('<code>abc&amp;123</code>' in exc.app_iter[0])
+    def test_bwcompat_forbidden(self):
+        from pyramid.exceptions import Forbidden as one
+        from pyramid.httpexceptions import HTTPForbidden as two
+        self.assertTrue(one is two)
 
 class TestNotFound(unittest.TestCase):
     def _makeOne(self, message):
@@ -28,10 +17,16 @@ class TestNotFound(unittest.TestCase):
         return NotFound(message)
 
     def test_it(self):
-        from pyramid.exceptions import ExceptionResponse
+        from pyramid.interfaces import IExceptionResponse
         e = self._makeOne('notfound')
-        self.assertTrue(isinstance(e, ExceptionResponse))
+        self.assertTrue(IExceptionResponse.providedBy(e))
         self.assertEqual(e.status, '404 Not Found')
+        self.assertEqual(e.message, 'notfound')
+
+    def test_response_equivalence(self):
+        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
+        self.assertTrue(NotFound is HTTPNotFound)
 
 class TestForbidden(unittest.TestCase):
     def _makeOne(self, message):
@@ -39,7 +34,14 @@ class TestForbidden(unittest.TestCase):
         return Forbidden(message)
 
     def test_it(self):
-        from pyramid.exceptions import ExceptionResponse
-        e = self._makeOne('unauthorized')
-        self.assertTrue(isinstance(e, ExceptionResponse))
+        from pyramid.interfaces import IExceptionResponse
+        e = self._makeOne('forbidden')
+        self.assertTrue(IExceptionResponse.providedBy(e))
         self.assertEqual(e.status, '403 Forbidden')
+        self.assertEqual(e.message, 'forbidden')
+
+    def test_response_equivalence(self):
+        from pyramid.exceptions import Forbidden
+        from pyramid.httpexceptions import HTTPForbidden
+        self.assertTrue(Forbidden is HTTPForbidden)
+

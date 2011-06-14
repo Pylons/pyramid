@@ -4,11 +4,13 @@ import venusian
 from zope.interface import providedBy
 from zope.deprecation import deprecated
 
+from pyramid.interfaces import IResponse
 from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
 
 from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import default_exceptionresponse_view
 from pyramid.renderers import RendererHelper
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
@@ -44,12 +46,12 @@ def render_view_to_response(context, request, name='', secure=True):
     ``name`` / ``context`` / and ``request``).
 
     If `secure`` is ``True``, and the :term:`view callable` found is
-    protected by a permission, the permission will be checked before
-    calling the view function.  If the permission check disallows view
-    execution (based on the current :term:`authorization policy`), a
-    :exc:`pyramid.exceptions.Forbidden` exception will be raised.
-    The exception's ``args`` attribute explains why the view access
-    was disallowed.
+    protected by a permission, the permission will be checked before calling
+    the view function.  If the permission check disallows view execution
+    (based on the current :term:`authorization policy`), a
+    :exc:`pyramid.httpexceptions.HTTPForbidden` exception will be raised.
+    The exception's ``args`` attribute explains why the view access was
+    disallowed.
 
     If ``secure`` is ``False``, no permission checking is done."""
     provides = [IViewClassifier] + map(providedBy, (request, context))
@@ -87,19 +89,23 @@ def render_view_to_iterable(context, request, name='', secure=True):
     of this function by calling ``''.join(iterable)``, or just use
     :func:`pyramid.view.render_view` instead.
 
-    If ``secure`` is ``True``, and the view is protected by a
-    permission, the permission will be checked before the view
-    function is invoked.  If the permission check disallows view
-    execution (based on the current :term:`authentication policy`), a
-    :exc:`pyramid.exceptions.Forbidden` exception will be raised;
-    its ``args`` attribute explains why the view access was
-    disallowed.
+    If ``secure`` is ``True``, and the view is protected by a permission, the
+    permission will be checked before the view function is invoked.  If the
+    permission check disallows view execution (based on the current
+    :term:`authentication policy`), a
+    :exc:`pyramid.httpexceptions.HTTPForbidden` exception will be raised; its
+    ``args`` attribute explains why the view access was disallowed.
 
     If ``secure`` is ``False``, no permission checking is
     done."""
     response = render_view_to_response(context, request, name, secure)
     if response is None:
         return None
+    try:
+        reg = request.registry
+    except AttributeError:
+        reg = get_current_registry()
+    response = reg.queryAdapterOrSelf(response, IResponse)
     return response.app_iter
 
 def render_view(context, request, name='', secure=True):
@@ -116,12 +122,11 @@ def render_view(context, request, name='', secure=True):
     ``app_iter`` attribute. This function will return ``None`` if a
     corresponding view cannot be found.
 
-    If ``secure`` is ``True``, and the view is protected by a
-    permission, the permission will be checked before the view is
-    invoked.  If the permission check disallows view execution (based
-    on the current :term:`authorization policy`), a
-    :exc:`pyramid.exceptions.Forbidden` exception will be raised;
-    its ``args`` attribute explains why the view access was
+    If ``secure`` is ``True``, and the view is protected by a permission, the
+    permission will be checked before the view is invoked.  If the permission
+    check disallows view execution (based on the current :term:`authorization
+    policy`), a :exc:`pyramid.httpexceptions.HTTPForbidden` exception will be
+    raised; its ``args`` attribute explains why the view access was
     disallowed.
 
     If ``secure`` is ``False``, no permission checking is done."""
@@ -129,21 +134,6 @@ def render_view(context, request, name='', secure=True):
     if iterable is None:
         return None
     return ''.join(iterable)
-
-def is_response(ob):
-    """ Return ``True`` if ``ob`` implements the interface implied by
-    :ref:`the_response`. ``False`` if not.
-
-    .. note:: This isn't a true interface or subclass check.  Instead, it's a
-        duck-typing check, as response objects are not obligated to be of a
-        particular class or provide any particular Zope interface."""
-
-    # response objects aren't obligated to implement a Zope interface,
-    # so we do it the hard way
-    if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
-         hasattr(ob, 'status') ):
-        return True
-    return False
 
 class view_config(object):
     """ A function, class or method :term:`decorator` which allows a
@@ -243,14 +233,6 @@ deprecated(
     'pyramid.view.view_config instead (API-compat, simple '
     'rename).')
 
-def default_exceptionresponse_view(context, request):
-    if not isinstance(context, Exception):
-        # backwards compat for an exception response view registered via
-        # config.set_notfound_view or config.set_forbidden_view
-        # instead of as a proper exception view
-        context = request.exception or context
-    return context
-
 class AppendSlashNotFoundViewFactory(object):
     """ There can only be one :term:`Not Found view` in any
     :app:`Pyramid` application.  Even if you use
@@ -271,14 +253,13 @@ class AppendSlashNotFoundViewFactory(object):
 
     .. code-block:: python
 
-       from pyramid.exceptions import NotFound
-       from pyramid.view import AppendSlashNotFoundViewFactory
        from pyramid.httpexceptions import HTTPNotFound
+       from pyramid.view import AppendSlashNotFoundViewFactory
 
        def notfound_view(context, request): return HTTPNotFound('nope')
 
        custom_append_slash = AppendSlashNotFoundViewFactory(notfound_view)
-       config.add_view(custom_append_slash, context=NotFound)
+       config.add_view(custom_append_slash, context=HTTPNotFound)
 
     The ``notfound_view`` supplied must adhere to the two-argument
     view callable calling convention of ``(context, request)``
@@ -294,7 +275,7 @@ class AppendSlashNotFoundViewFactory(object):
         if not isinstance(context, Exception):
             # backwards compat for an append_notslash_view registered via
             # config.set_notfound_view instead of as a proper exception view
-            context = request.exception
+            context = getattr(request, 'exception', None) or context
         path = request.path
         registry = request.registry
         mapper = registry.queryUtility(IRoutesMapper)
@@ -325,12 +306,27 @@ routes are not considered when attempting to find a matching route.
 Use the :meth:`pyramid.config.Configurator.add_view` method to configure this
 view as the Not Found view::
 
-  from pyramid.exceptions import NotFound
+  from pyramid.httpexceptions import HTTPNotFound
   from pyramid.view import append_slash_notfound_view
-  config.add_view(append_slash_notfound_view, context=NotFound)
+  config.add_view(append_slash_notfound_view, context=HTTPNotFound)
 
 See also :ref:`changing_the_notfound_view`.
 
 """
 
+def is_response(ob):
+    """ Return ``True`` if ``ob`` implements the interface implied by
+    :ref:`the_response`. ``False`` if not.
 
+    .. warning:: This function is deprecated as of :app:`Pyramid` 1.1.  New
+       code should not use it.  Instead, new code should use the
+       :func:`pyramid.request.Request.is_response` method."""
+    if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
+         hasattr(ob, 'status') ):
+        return True
+    return False
+
+deprecated(
+    'is_response',
+    'pyramid.view.is_response is deprecated as of Pyramid 1.1.  Use '
+    'pyramid.request.Request.is_response instead.')

@@ -12,11 +12,12 @@ from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import ITraverser
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
+from pyramid.interfaces import IResponse
 
 from pyramid.events import ContextFound
 from pyramid.events import NewRequest
 from pyramid.events import NewResponse
-from pyramid.exceptions import NotFound
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.request import Request
 from pyramid.threadlocal import manager
 from pyramid.traversal import DefaultRootFactory
@@ -153,9 +154,9 @@ class Router(object):
                             logger and logger.debug(msg)
                         else:
                             msg = request.path_info
-                        raise NotFound(msg)
+                        raise HTTPNotFound(msg)
                     else:
-                        response = view_callable(context, request)
+                        result = view_callable(context, request)
 
                 # handle exceptions raised during root finding and view-exec
                 except Exception, why:
@@ -177,30 +178,26 @@ class Router(object):
                     # repoze.bfg.message docs-deprecated in Pyramid 1.0
                     environ['repoze.bfg.message'] = msg
 
-                    response = view_callable(why, request)
+                    result = view_callable(why, request)
 
                 # process the response
+                response = registry.queryAdapterOrSelf(result, IResponse)
+                if response is None:
+                    raise ValueError(
+                        'Could not convert view return value "%s" into a '
+                        'response object' % (result,))
 
                 has_listeners and registry.notify(NewResponse(request,response))
 
                 if request.response_callbacks:
                     request._process_response_callbacks(response)
 
-                try:
-                    headers = response.headerlist
-                    app_iter = response.app_iter
-                    status = response.status
-                except AttributeError:
-                    raise ValueError(
-                        'Non-response object returned from view named %s '
-                        '(and no renderer): %r' % (view_name, response))
-
             finally:
                 if request is not None and request.finished_callbacks:
                     request._process_finished_callbacks()
 
-            start_response(status, headers)
-            return app_iter
-            
+            return response(request.environ, start_response)
+
         finally:
             manager.pop()
+

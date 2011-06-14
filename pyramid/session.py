@@ -8,8 +8,6 @@ try:
 except ImportError: # pragma: no cover
     import pickle
 
-from webob import Response
-
 import base64
 import binascii
 import hmac
@@ -213,17 +211,7 @@ def UnencryptedCookieSessionFactoryConfig(
                     'Cookie value is too long to store (%s bytes)' %
                     len(cookieval)
                     )
-            if hasattr(response, 'set_cookie'):
-                # ``response`` is a "real" webob response
-                set_cookie = response.set_cookie
-            else:
-                # ``response`` is not a "real" webob response, cope
-                def set_cookie(*arg, **kw):
-                    tmp_response = Response()
-                    tmp_response.set_cookie(*arg, **kw)
-                    response.headerlist.append(
-                        tmp_response.headerlist[-1])
-            set_cookie(
+            response.set_cookie(
                 self._cookie_name,
                 value=cookieval,
                 max_age = self._cookie_max_age,

@@ -90,16 +90,8 @@ class TestUnencryptedCookieSession(unittest.TestCase):
         self.assertEqual(session._set_cookie(response), True)
         self.assertEqual(response.headerlist[-1][0], 'Set-Cookie')
 
-    def test__set_cookie_other_kind_of_response(self):
-        request = testing.DummyRequest()
-        request.exception = None
-        session = self._makeOne(request)
-        session['abc'] = 'x'
-        response = DummyResponse()
-        self.assertEqual(session._set_cookie(response), True)
-        self.assertEqual(len(response.headerlist), 1)
-
     def test__set_cookie_options(self):
+        from pyramid.response import Response
         request = testing.DummyRequest()
         request.exception = None
         session = self._makeOne(request,
@@ -110,10 +102,9 @@ class TestUnencryptedCookieSession(unittest.TestCase):
                                 cookie_httponly = True,
                                 )
         session['abc'] = 'x'
-        response = DummyResponse()
+        response = Response()
         self.assertEqual(session._set_cookie(response), True)
-        self.assertEqual(len(response.headerlist), 1)
-        cookieval= response.headerlist[0][1]
+        cookieval= response.headerlist[-1][1]
         val, domain, path, secure, httponly = [x.strip() for x in
                                                cookieval.split(';')]
         self.assertTrue(val.startswith('abc='))

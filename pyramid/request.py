@@ -5,12 +5,14 @@ from zope.interface.interface import InterfaceClass
 from webob import BaseRequest
 
 from pyramid.interfaces import IRequest
+from pyramid.interfaces import IResponse
 from pyramid.interfaces import ISessionFactory
 from pyramid.interfaces import IResponseFactory
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.decorator import reify
 from pyramid.response import Response
+from pyramid.threadlocal import get_current_registry
 from pyramid.url import resource_url
 from pyramid.url import route_url
 from pyramid.url import static_url
@@ -320,6 +322,15 @@ class Request(BaseRequest):
         response_factory = registry.queryUtility(IResponseFactory,
                                                  default=Response)
         return response_factory()
+
+    def is_response(self, ob):
+        """ Return ``True`` if the object passed as ``ob`` is a valid
+        response object, ``False`` otherwise."""
+        registry = self.registry
+        adapted = registry.queryAdapterOrSelf(ob, IResponse)
+        if adapted is None:
+            return False
+        return adapted is ob
 
     # b/c dict interface for "root factory" code that expects a bare
     # environ.  Explicitly omitted dict methods: clear (unnecessary),

@@ -50,8 +50,8 @@ class ConfiguratorTests(unittest.TestCase):
         return iface
 
     def _assertNotFound(self, wrapper, *arg):
-        from pyramid.exceptions import NotFound
-        self.assertRaises(NotFound, wrapper, *arg)
+        from pyramid.httpexceptions import HTTPNotFound
+        self.assertRaises(HTTPNotFound, wrapper, *arg)
 
     def _registerEventListener(self, config, event_iface=None):
         if event_iface is None: # pragma: no cover
@@ -203,6 +203,35 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(config.registry.getUtility(IViewMapperFactory),
                          mapper)
 
+    def test_ctor_httpexception_view_default(self):
+        from pyramid.interfaces import IExceptionResponse
+        from pyramid.httpexceptions import default_exceptionresponse_view
+        from pyramid.interfaces import IRequest
+        config = self._makeOne()
+        view = self._getViewCallable(config,
+                                     ctx_iface=IExceptionResponse,
+                                     request_iface=IRequest)
+        self.failUnless(view is default_exceptionresponse_view)
+
+    def test_ctor_exceptionresponse_view_None(self):
+        from pyramid.interfaces import IExceptionResponse
+        from pyramid.interfaces import IRequest
+        config = self._makeOne(exceptionresponse_view=None)
+        view = self._getViewCallable(config,
+                                     ctx_iface=IExceptionResponse,
+                                     request_iface=IRequest)
+        self.failUnless(view is None)
+
+    def test_ctor_exceptionresponse_view_custom(self):
+        from pyramid.interfaces import IExceptionResponse
+        from pyramid.interfaces import IRequest
+        def exceptionresponse_view(context, request): pass
+        config = self._makeOne(exceptionresponse_view=exceptionresponse_view)
+        view = self._getViewCallable(config,
+                                     ctx_iface=IExceptionResponse,
+                                     request_iface=IRequest)
+        self.failUnless(view is exceptionresponse_view)
+
     def test_with_package_module(self):
         from pyramid.tests import test_configuration
         import pyramid.tests
@@ -260,27 +289,58 @@ class ConfiguratorTests(unittest.TestCase):
         result = config.absolute_asset_spec('templates')
         self.assertEqual(result, 'pyramid.tests:templates')
 
-    def test_setup_registry_fixed(self):
-        class DummyRegistry(object):
-            def subscribers(self, events, name):
-                self.events = events
-                return events
-            def registerUtility(self, *arg, **kw):
-                pass
+    def test__fix_registry_has_listeners(self):
+        reg = DummyRegistry()
+        config = self._makeOne(reg)
+        config._fix_registry()
+        self.assertEqual(reg.has_listeners, True)
+
+    def test__fix_registry_notify(self):
+        reg = DummyRegistry()
+        config = self._makeOne(reg)
+        config._fix_registry()
+        self.assertEqual(reg.notify(1), None)
+        self.assertEqual(reg.events, (1,))
+
+    def test__fix_registry_queryAdapterOrSelf(self):
+        from zope.interface import Interface
+        class IFoo(Interface):
+            pass
+        class Foo(object):
+            implements(IFoo)
+        class Bar(object):
+            pass
+        adaptation = ()
+        foo = Foo()
+        bar = Bar()
+        reg = DummyRegistry(adaptation)
+        config = self._makeOne(reg)
+        config._fix_registry()
+        self.assertTrue(reg.queryAdapterOrSelf(foo, IFoo) is foo)
+        self.assertTrue(reg.queryAdapterOrSelf(bar, IFoo) is adaptation)
+
+    def test__fix_registry_registerSelfAdapter(self):
+        reg = DummyRegistry()
+        config = self._makeOne(reg)
+        config._fix_registry()
+        reg.registerSelfAdapter('required', 'provided', name='abc')
+        self.assertEqual(len(reg.adapters), 1)
+        args, kw = reg.adapters[0]
+        self.assertEqual(args[0]('abc'), 'abc')
+        self.assertEqual(kw,
+                         {'info': u'', 'provided': 'provided',
+                          'required': 'required', 'name': 'abc', 'event': True})
+
+    def test_setup_registry_calls_fix_registry(self):
         reg = DummyRegistry()
         config = self._makeOne(reg)
         config.add_view = lambda *arg, **kw: False
         config.setup_registry()
         self.assertEqual(reg.has_listeners, True)
-        self.assertEqual(reg.notify(1), None)
-        self.assertEqual(reg.events, (1,))
 
     def test_setup_registry_registers_default_exceptionresponse_view(self):
         from pyramid.interfaces import IExceptionResponse
         from pyramid.view import default_exceptionresponse_view
-        class DummyRegistry(object):
-            def registerUtility(self, *arg, **kw):
-                pass
         reg = DummyRegistry()
         config = self._makeOne(reg)
         views = []
@@ -289,19 +349,29 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(views[0], ((default_exceptionresponse_view,),
                                     {'context':IExceptionResponse}))
 
+    def test_setup_registry_registers_default_webob_iresponse_adapter(self):
+        from webob import Response
+        from pyramid.interfaces import IResponse
+        config = self._makeOne()
+        config.setup_registry()
+        response = Response()
+        self.assertTrue(
+            config.registry.queryAdapter(response, IResponse) is response)
+
     def test_setup_registry_explicit_notfound_trumps_iexceptionresponse(self):
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
-        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
         from pyramid.registry import Registry
         reg = Registry()
         config = self._makeOne(reg, autocommit=True)
         config.setup_registry() # registers IExceptionResponse default view
         def myview(context, request):
             return 'OK'
-        config.add_view(myview, context=NotFound)
+        config.add_view(myview, context=HTTPNotFound)
         request = self._makeRequest(config)
-        view = self._getViewCallable(config, ctx_iface=implementedBy(NotFound),
+        view = self._getViewCallable(config,
+                                     ctx_iface=implementedBy(HTTPNotFound),
                                      request_iface=IRequest)
         result = view(None, request)
         self.assertEqual(result, 'OK')
@@ -1665,14 +1735,14 @@ class ConfiguratorTests(unittest.TestCase):
         self._assertNotFound(wrapper, None, request)
 
     def test_add_view_with_header_val_missing(self):
-        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
         config.add_view(view=view, header=r'Host:\d')
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.headers = {'NoHost':'1'}
-        self.assertRaises(NotFound, wrapper, None, request)
+        self.assertRaises(HTTPNotFound, wrapper, None, request)
 
     def test_add_view_with_accept_match(self):
         view = lambda *arg: 'OK'
@@ -2199,12 +2269,13 @@ class ConfiguratorTests(unittest.TestCase):
     def test_set_notfound_view(self):
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
-        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
         config = self._makeOne(autocommit=True)
         view = lambda *arg: arg
         config.set_notfound_view(view)
         request = self._makeRequest(config)
-        view = self._getViewCallable(config, ctx_iface=implementedBy(NotFound),
+        view = self._getViewCallable(config,
+                                     ctx_iface=implementedBy(HTTPNotFound),
                                      request_iface=IRequest)
         result = view(None, request)
         self.assertEqual(result, (None, request))
@@ -2212,13 +2283,14 @@ class ConfiguratorTests(unittest.TestCase):
     def test_set_notfound_view_request_has_context(self):
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
-        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
         config = self._makeOne(autocommit=True)
         view = lambda *arg: arg
         config.set_notfound_view(view)
         request = self._makeRequest(config)
         request.context = 'abc'
-        view = self._getViewCallable(config, ctx_iface=implementedBy(NotFound),
+        view = self._getViewCallable(config,
+                                     ctx_iface=implementedBy(HTTPNotFound),
                                      request_iface=IRequest)
         result = view(None, request)
         self.assertEqual(result, ('abc', request))
@@ -2227,7 +2299,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_set_notfound_view_with_renderer(self):
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
-        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
         config = self._makeOne(autocommit=True)
         view = lambda *arg: {}
         config.set_notfound_view(view,
@@ -2236,7 +2308,7 @@ class ConfiguratorTests(unittest.TestCase):
         try: # chameleon depends on being able to find a threadlocal registry
             request = self._makeRequest(config)
             view = self._getViewCallable(config,
-                                         ctx_iface=implementedBy(NotFound),
+                                         ctx_iface=implementedBy(HTTPNotFound),
                                          request_iface=IRequest)
             result = view(None, request)
         finally:
@@ -2246,12 +2318,13 @@ class ConfiguratorTests(unittest.TestCase):
     def test_set_forbidden_view(self):
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
-        from pyramid.exceptions import Forbidden
+        from pyramid.httpexceptions import HTTPForbidden
         config = self._makeOne(autocommit=True)
         view = lambda *arg: 'OK'
         config.set_forbidden_view(view)
         request = self._makeRequest(config)
-        view = self._getViewCallable(config, ctx_iface=implementedBy(Forbidden),
+        view = self._getViewCallable(config,
+                                     ctx_iface=implementedBy(HTTPForbidden),
                                      request_iface=IRequest)
         result = view(None, request)
         self.assertEqual(result, 'OK')
@@ -2259,13 +2332,14 @@ class ConfiguratorTests(unittest.TestCase):
     def test_set_forbidden_view_request_has_context(self):
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
-        from pyramid.exceptions import Forbidden
+        from pyramid.httpexceptions import HTTPForbidden
         config = self._makeOne(autocommit=True)
         view = lambda *arg: arg
         config.set_forbidden_view(view)
         request = self._makeRequest(config)
         request.context = 'abc'
-        view = self._getViewCallable(config, ctx_iface=implementedBy(Forbidden),
+        view = self._getViewCallable(config,
+                                     ctx_iface=implementedBy(HTTPForbidden),
                                      request_iface=IRequest)
         result = view(None, request)
         self.assertEqual(result, ('abc', request))
@@ -2274,7 +2348,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_set_forbidden_view_with_renderer(self):
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
-        from pyramid.exceptions import Forbidden
+        from pyramid.httpexceptions import HTTPForbidden
         config = self._makeOne(autocommit=True)
         view = lambda *arg: {}
         config.set_forbidden_view(view,
@@ -2283,7 +2357,7 @@ class ConfiguratorTests(unittest.TestCase):
         try: # chameleon requires a threadlocal registry
             request = self._makeRequest(config)
             view = self._getViewCallable(config,
-                                         ctx_iface=implementedBy(Forbidden),
+                                         ctx_iface=implementedBy(HTTPForbidden),
                                          request_iface=IRequest)
             result = view(None, request)
         finally:
@@ -2553,6 +2627,34 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_renderer('name', 'pyramid.tests')
         self.assertEqual(config.registry.getUtility(IRendererFactory, 'name'),
                          pyramid.tests)
+
+    def test_add_response_adapter(self):
+        from pyramid.interfaces import IResponse
+        config = self._makeOne(autocommit=True)
+        class Adapter(object):
+            def __init__(self, other):
+                self.other = other
+        config.add_response_adapter(Adapter, str)
+        result = config.registry.queryAdapter('foo', IResponse)
+        self.assertTrue(result.other, 'foo')
+
+    def test_add_response_adapter_self(self):
+        from pyramid.interfaces import IResponse
+        config = self._makeOne(autocommit=True)
+        class Adapter(object):
+            pass
+        config.add_response_adapter(None, Adapter)
+        adapter = Adapter()
+        result = config.registry.queryAdapter(adapter, IResponse)
+        self.assertTrue(result is adapter)
+
+    def test_add_response_adapter_dottednames(self):
+        from pyramid.interfaces import IResponse
+        config = self._makeOne(autocommit=True)
+        config.add_response_adapter('pyramid.response.Response',
+                                    'types.StringType')
+        result = config.registry.queryAdapter('foo', IResponse)
+        self.assertTrue(result.body, 'foo')
 
     def test_scan_integration(self):
         import os
@@ -3653,7 +3755,7 @@ class TestViewDeriver(unittest.TestCase):
                          "None against context None): True")
 
     def test_debug_auth_permission_authpol_denied(self):
-        from pyramid.exceptions import Forbidden
+        from pyramid.httpexceptions import HTTPForbidden
         view = lambda *arg: 'OK'
         self.config.registry.settings = dict(
             debug_authorization=True, reload_templates=True)
@@ -3668,7 +3770,7 @@ class TestViewDeriver(unittest.TestCase):
         request = self._makeRequest()
         request.view_name = 'view_name'
         request.url = 'url'
-        self.assertRaises(Forbidden, result, None, request)
+        self.assertRaises(HTTPForbidden, result, None, request)
         self.assertEqual(len(logger.messages), 1)
         self.assertEqual(logger.messages[0],
                          "debug_authorization of url url (view name "
@@ -3781,7 +3883,7 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(predicates, [True, True])
 
     def test_with_predicates_notall(self):
-        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
         view = lambda *arg: 'OK'
         predicates = []
         def predicate1(context, request):
@@ -3794,7 +3896,7 @@ class TestViewDeriver(unittest.TestCase):
         result = deriver(view)
         request = self._makeRequest()
         request.method = 'POST'
-        self.assertRaises(NotFound, result, None, None)
+        self.assertRaises(HTTPNotFound, result, None, None)
         self.assertEqual(predicates, [True, True])
 
     def test_with_wrapper_viewname(self):
@@ -4589,14 +4691,14 @@ class TestMultiView(unittest.TestCase):
         self.assertEqual(mv.get_views(request), mv.views)
 
     def test_match_not_found(self):
-        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
         mv = self._makeOne()
         context = DummyContext()
         request = DummyRequest()
-        self.assertRaises(NotFound, mv.match, context, request)
+        self.assertRaises(HTTPNotFound, mv.match, context, request)
 
     def test_match_predicate_fails(self):
-        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
         mv = self._makeOne()
         def view(context, request):
             """ """
@@ -4604,7 +4706,7 @@ class TestMultiView(unittest.TestCase):
         mv.views = [(100, view, None)]
         context = DummyContext()
         request = DummyRequest()
-        self.assertRaises(NotFound, mv.match, context, request)
+        self.assertRaises(HTTPNotFound, mv.match, context, request)
 
     def test_match_predicate_succeeds(self):
         mv = self._makeOne()
@@ -4618,11 +4720,11 @@ class TestMultiView(unittest.TestCase):
         self.assertEqual(result, view)
 
     def test_permitted_no_views(self):
-        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
         mv = self._makeOne()
         context = DummyContext()
         request = DummyRequest()
-        self.assertRaises(NotFound, mv.__permitted__, context, request)
+        self.assertRaises(HTTPNotFound, mv.__permitted__, context, request)
 
     def test_permitted_no_match_with__permitted__(self):
         mv = self._makeOne()
@@ -4645,11 +4747,11 @@ class TestMultiView(unittest.TestCase):
         self.assertEqual(result, False)
 
     def test__call__not_found(self):
-        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
         mv = self._makeOne()
         context = DummyContext()
         request = DummyRequest()
-        self.assertRaises(NotFound, mv, context, request)
+        self.assertRaises(HTTPNotFound, mv, context, request)
 
     def test___call__intermediate_not_found(self):
         from pyramid.exceptions import PredicateMismatch
@@ -4667,17 +4769,17 @@ class TestMultiView(unittest.TestCase):
         self.assertEqual(response, expected_response)
 
     def test___call__raise_not_found_isnt_interpreted_as_pred_mismatch(self):
-        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
         mv = self._makeOne()
         context = DummyContext()
         request = DummyRequest()
         request.view_name = ''
         def view1(context, request):
-            raise NotFound
+            raise  HTTPNotFound
         def view2(context, request):
             """ """
         mv.views = [(100, view1, None), (99, view2, None)]
-        self.assertRaises(NotFound, mv, context, request)
+        self.assertRaises(HTTPNotFound, mv, context, request)
 
     def test___call__(self):
         mv = self._makeOne()
@@ -4692,11 +4794,11 @@ class TestMultiView(unittest.TestCase):
         self.assertEqual(response, expected_response)
 
     def test__call_permissive__not_found(self):
-        from pyramid.exceptions import NotFound
+        from pyramid.httpexceptions import HTTPNotFound
         mv = self._makeOne()
         context = DummyContext()
         request = DummyRequest()
-        self.assertRaises(NotFound, mv, context, request)
+        self.assertRaises(HTTPNotFound, mv, context, request)
 
     def test___call_permissive_has_call_permissive(self):
         mv = self._makeOne()
@@ -5100,3 +5202,17 @@ def dummy_extend(config, discrim):
 def dummy_extend2(config, discrim):
     config.action(discrim, None, config.registry)
     
+class DummyRegistry(object):
+    def __init__(self, adaptation=None):
+        self.utilities = []
+        self.adapters = []
+        self.adaptation = adaptation
+    def subscribers(self, events, name):
+        self.events = events
+        return events
+    def registerUtility(self, *arg, **kw):
+        self.utilities.append((arg, kw))
+    def registerAdapter(self, *arg, **kw):
+        self.adapters.append((arg, kw))
+    def queryAdapter(self, *arg, **kw):
+        return self.adaptation

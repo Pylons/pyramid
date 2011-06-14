@@ -91,7 +91,8 @@ a URL which represents the path to our "FrontPage".
 
 The ``view_wiki`` function returns an instance of the
 :class:`pyramid.httpexceptions.HTTPFound` class (instances of which implement
-the WebOb :term:`response` interface), It will use the
+the :class:`pyramid.interfaces.IResponse` interface like
+:class:`pyramid.response.Response` does), It will use the
 :func:`pyramid.url.route_url` API to construct a URL to the ``FrontPage``
 page (e.g. ``http://localhost:6543/FrontPage``), and will use it as the
 "location" of the HTTPFound response, forming an HTTP redirect.
