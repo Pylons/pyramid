@@ -8,8 +8,8 @@ single HTTP status code.  Each class is a subclass of the
 object.
 
 Each exception class has a status code according to `RFC 2068
-<http://www.ietf.org/rfc/rfc2068.txt>`: codes with 100-300 are not really
-errors; 400's are client errors, and 500's are server errors.
+<http://www.ietf.org/rfc/rfc2068.txt>`_: codes with 100-300 are not really
+errors; 400s are client errors, and 500s are server errors.
 
 Exception
   HTTPException
@@ -131,7 +131,7 @@ def _no_escape(value):
     return value
 
 class HTTPException(Exception): # bw compat
-    pass
+    """ Base class for all :term:`exception response` objects."""
 
 class WSGIHTTPException(Response, HTTPException):
     implements(IExceptionResponse)
@@ -271,16 +271,15 @@ ${body}''')
 
 class HTTPError(WSGIHTTPException):
     """
-    base class for status codes in the 400's and 500's
+    base class for exceptions with status codes in the 400s and 500s
 
     This is an exception which indicates that an error has occurred,
-    and that any work in progress should not be committed.  These are
-    typically results in the 400's and 500's.
+    and that any work in progress should not be committed.  
     """
 
 class HTTPRedirection(WSGIHTTPException):
     """
-    base class for 300's status code (redirections)
+    base class for exceptions with status codes in the 300s (redirections)
 
     This is an abstract base class for 3xx redirection.  It indicates
     that further action needs to be taken by the user agent in order
@@ -290,7 +289,8 @@ class HTTPRedirection(WSGIHTTPException):
 
 class HTTPOk(WSGIHTTPException):
     """
-    Base class for the 200's status code (successful responses)
+    Base class for exceptions with status codes in the 200s (successful
+    responses)
     
     code: 200, title: OK
     """
@@ -522,7 +522,7 @@ class HTTPTemporaryRedirect(_HTTPMove):
 
 class HTTPClientError(HTTPError):
     """
-    base class for the 400's, where the client is in error
+    base class for the 400s, where the client is in error
 
     This is an error condition in which the client is presumed to be
     in-error.  This is an expected problem, and thus is not considered
@@ -882,12 +882,10 @@ class HTTPFailedDependency(HTTPClientError):
 
 class HTTPServerError(HTTPError):
     """
-    base class for the 500's, where the server is in-error
+    base class for the 500s, where the server is in-error
 
     This is an error condition in which the server is presumed to be
-    in-error.  This is usually unexpected, and thus requires a traceback;
-    ideally, opening a support ticket for the customer. Unless specialized,
-    this is a '500 Internal Server Error'
+    in-error.  Unless specialized, this is a '500 Internal Server Error'.
     """
     code = 500
     title = 'Internal Server Error'
