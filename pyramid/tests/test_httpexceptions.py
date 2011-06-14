@@ -138,7 +138,9 @@ class TestWSGIHTTPException(unittest.TestCase):
     def test_ctor_with_body_sets_default_app_iter_html(self):
         cls = self._getTargetSubclass()
         exc = cls('detail')
-        body = list(exc.app_iter)[0]
+        environ = _makeEnviron()
+        start_response = DummyStartResponse()
+        body = list(exc(environ, start_response))[0]
         self.assertTrue(body.startswith('<html'))
         self.assertTrue('200 OK' in body)
         self.assertTrue('explanation' in body)
@@ -148,7 +150,9 @@ class TestWSGIHTTPException(unittest.TestCase):
         cls = self._getTargetSubclass()
         exc = cls('detail')
         exc.content_type = 'text/plain'
-        body = list(exc.app_iter)[0]
+        environ = _makeEnviron()
+        start_response = DummyStartResponse()
+        body = list(exc(environ, start_response))[0]
         self.assertEqual(body, '200 OK\n\nexplanation\n\n\ndetail\n\n')
 
     def test__str__detail(self):
@@ -169,59 +173,69 @@ class TestWSGIHTTPException(unittest.TestCase):
         exc = self._makeOne()
         self.assertTrue(exc is exc.exception)
 
+    def test__calls_start_response(self):
+        cls = self._getTargetSubclass()
+        exc = cls()
+        exc.content_type = 'text/plain'
+        environ = _makeEnviron()
+        start_response = DummyStartResponse()
+        exc(environ, start_response)
+        self.assertTrue(start_response.headerlist)
+        self.assertEqual(start_response.status, '200 OK')
+
     def test__default_app_iter_no_comment_plain(self):
         cls = self._getTargetSubclass()
         exc = cls()
         exc.content_type = 'text/plain'
-        body = list(exc._default_app_iter())[0]
+        environ = _makeEnviron()
+        start_response = DummyStartResponse()
+        body = list(exc(environ, start_response))[0]
         self.assertEqual(body, '200 OK\n\nexplanation\n\n\n\n\n')
 
     def test__default_app_iter_with_comment_plain(self):
         cls = self._getTargetSubclass()
         exc = cls(comment='comment')
         exc.content_type = 'text/plain'
-        body = list(exc._default_app_iter())[0]
+        environ = _makeEnviron()
+        start_response = DummyStartResponse()
+        body = list(exc(environ, start_response))[0]
         self.assertEqual(body, '200 OK\n\nexplanation\n\n\n\ncomment\n')
         
     def test__default_app_iter_no_comment_html(self):
         cls = self._getTargetSubclass()
         exc = cls()
         exc.content_type = 'text/html'
-        body = list(exc._default_app_iter())[0]
+        environ = _makeEnviron()
+        start_response = DummyStartResponse()
+        body = list(exc(environ, start_response))[0]
         self.assertFalse('<!-- ' in body)
 
     def test__default_app_iter_with_comment_html(self):
         cls = self._getTargetSubclass()
         exc = cls(comment='comment & comment')
         exc.content_type = 'text/html'
-        body = list(exc._default_app_iter())[0]
+        environ = _makeEnviron()
+        start_response = DummyStartResponse()
+        body = list(exc(environ, start_response))[0]
         self.assertTrue('<!-- comment &amp; comment -->' in body)
 
-    def test_custom_body_template_no_environ(self):
+    def test_custom_body_template(self):
         cls = self._getTargetSubclass()
-        exc = cls(body_template='${location}', location='foo')
+        exc = cls(body_template='${REQUEST_METHOD}')
         exc.content_type = 'text/plain'
-        body = list(exc._default_app_iter())[0]
-        self.assertEqual(body, '200 OK\n\nfoo')
-
-    def test_custom_body_template_with_environ(self):
-        cls = self._getTargetSubclass()
-        from pyramid.request import Request
-        request = Request.blank('/')
-        exc = cls(body_template='${REQUEST_METHOD}', request=request)
-        exc.content_type = 'text/plain'
-        body = list(exc._default_app_iter())[0]
+        environ = _makeEnviron()
+        start_response = DummyStartResponse()
+        body = list(exc(environ, start_response))[0]
         self.assertEqual(body, '200 OK\n\nGET')
 
     def test_body_template_unicode(self):
-        from pyramid.request import Request
         cls = self._getTargetSubclass()
         la = unicode('/La Pe\xc3\xb1a', 'utf-8')
-        request = Request.blank('/')
-        request.environ['unicodeval'] = la
-        exc = cls(body_template='${unicodeval}', request=request)
+        environ = _makeEnviron(unicodeval=la)
+        exc = cls(body_template='${unicodeval}')
         exc.content_type = 'text/plain'
-        body = list(exc._default_app_iter())[0]
+        start_response = DummyStartResponse()
+        body = list(exc(environ, start_response))[0]
         self.assertEqual(body, '200 OK\n\n/La Pe\xc3\xb1a')
 
 class TestRenderAllExceptionsWithoutArguments(unittest.TestCase):
@@ -230,9 +244,11 @@ class TestRenderAllExceptionsWithoutArguments(unittest.TestCase):
         L = []
         self.assertTrue(status_map)
         for v in status_map.values():
+            environ = _makeEnviron()
+            start_response = DummyStartResponse()
             exc = v()
             exc.content_type = content_type
-            result = list(exc.app_iter)[0]
+            result = list(exc(environ, start_response))[0]
             if exc.empty_body:
                 self.assertEqual(result, '')
             else:
@@ -274,4 +290,17 @@ class TestHTTPForbidden(unittest.TestCase):
         
 class DummyRequest(object):
     exception = None
+
+class DummyStartResponse(object):
+    def __call__(self, status, headerlist):
+        self.status = status
+        self.headerlist = headerlist
+        
+def _makeEnviron(**kw):
+    environ = {'REQUEST_METHOD':'GET',
+               'wsgi.url_scheme':'http',
+               'SERVER_NAME':'localhost',
+               'SERVER_PORT':'80'}
+    environ.update(kw)
+    return environ
 

@@ -143,21 +143,16 @@ class WSGIHTTPException(Response, HTTPException):
     # body_template_obj = Template('response template')
 
     # differences from webob.exc.WSGIHTTPException:
-    # - not a WSGI application (just a response)
     #
-    #   as a result:
-    #
-    #   - bases plaintext vs. html result on self.content_type rather than
-    #     on request accept header
-    #
-    #   - doesn't add request.environ keys to template substitutions unless
-    #     'request' is passed as a constructor keyword argument.
+    # - bases plaintext vs. html result on self.content_type rather than
+    #   on request accept header
     #
     # - doesn't use "strip_tags" (${br} placeholder for <br/>, no other html
     #   in default body template)
     #
-    # - sets a default app_iter if no body, app_iter, or unicode_body is
-    #   passed using a template (ala the replaced version's "generate_response")
+    # - sets a default app_iter onto self during __call__ using a template if
+    #   no body, app_iter, or unicode_body is set onto the response (instead of
+    #   the replaced version's "generate_response")
     #
     # - explicitly sets self.message = detail to prevent whining by Python
     #   2.6.5+ access of Exception.message
@@ -213,18 +208,11 @@ ${body}''')
         if self.empty_body:
             del self.content_type
             del self.content_length
-        elif not ('unicode_body' in kw or 'body' in kw or 'app_iter' in kw):
-            self.app_iter = self._default_app_iter()
 
     def __str__(self):
         return self.detail or self.explanation
 
-    def _default_app_iter(self):
-        # This is a generator which defers the creation of the response page
-        # body; we use a generator because we want to ensure that if
-        # attributes of this response are changed after it is constructed, we
-        # use the changed values rather than the values at time of construction
-        # (e.g. self.content_type or self.charset).
+    def _default_app_iter(self, environ):
         html_comment = ''
         comment = self.comment or ''
         content_type = self.content_type or ''
@@ -250,24 +238,27 @@ ${body}''')
         body_tmpl = self.body_template_obj
         if WSGIHTTPException.body_template_obj is not body_tmpl:
             # Custom template; add headers to args
-            environ = self.environ
-            if environ is not None:
-                for k, v in environ.items():
-                    args[k] = escape(v)
+            for k, v in environ.items():
+                args[k] = escape(v)
             for k, v in self.headers.items():
                 args[k.lower()] = escape(v)
         body = body_tmpl.substitute(args)
         page = page_template.substitute(status=self.status, body=body)
         if isinstance(page, unicode):
             page = page.encode(self.charset)
-        yield page
-        raise StopIteration
+        return [page]
 
     @property
-    def exception(self):
+    def wsgi_response(self):
         # bw compat only
         return self
-    wsgi_response = exception # bw compat only
+
+    exception = wsgi_response # bw compat only
+
+    def __call__(self, environ, start_response):
+        if not self.body and not self.empty_body:
+            self.app_iter = self._default_app_iter(environ)
+        return Response.__call__(self, environ, start_response)
 
 class HTTPError(WSGIHTTPException):
     """
