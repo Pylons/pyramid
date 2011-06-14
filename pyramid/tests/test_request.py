@@ -203,7 +203,35 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(result, 'abc')
         self.assertEqual(info.args,
                          ('pyramid.tests:static/foo.css', request, {}) )
+
+    def test_is_response_false(self):
+        request = self._makeOne({})
+        request.registry = self.config.registry
+        self.assertEqual(request.is_response('abc'), False)
+
+    def test_is_response_false_adapter_is_not_self(self):
+        from pyramid.interfaces import IResponse
+        request = self._makeOne({})
+        request.registry = self.config.registry
+        def adapter(ob):
+            return object()
+        class Foo(object):
+            pass
+        foo = Foo()
+        request.registry.registerAdapter(adapter, (Foo,), IResponse)
+        self.assertEqual(request.is_response(foo), False)
         
+    def test_is_response_adapter_true(self):
+        from pyramid.interfaces import IResponse
+        request = self._makeOne({})
+        request.registry = self.config.registry
+        class Foo(object):
+            pass
+        foo = Foo()
+        def adapter(ob):
+            return ob
+        request.registry.registerAdapter(adapter, (Foo,), IResponse)
+        self.assertEqual(request.is_response(foo), True)
 
 class TestRequestDeprecatedMethods(unittest.TestCase):
     def setUp(self):

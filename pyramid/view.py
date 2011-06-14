@@ -318,14 +318,15 @@ def is_response(ob):
     """ Return ``True`` if ``ob`` implements the interface implied by
     :ref:`the_response`. ``False`` if not.
 
-    .. note:: This isn't a true interface or subclass check.  Instead, it's a
-        duck-typing check, as response objects are not obligated to be of a
-        particular class or provide any particular Zope interface."""
-
-    # response objects aren't obligated to implement a Zope interface,
-    # so we do it the hard way
+    .. warning:: This function is deprecated as of :app:`Pyramid` 1.1.  New
+       code should not use it.  Instead, new code should use the
+       :func:`pyramid.request.Request.is_response` method."""
     if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
          hasattr(ob, 'status') ):
         return True
     return False
 
+deprecated(
+    'is_response',
+    'pyramid.view.is_response is deprecated as of Pyramid 1.1.  Use '
+    'pyramid.request.Request.is_response instead.')

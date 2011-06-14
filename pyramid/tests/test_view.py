@@ -198,6 +198,14 @@ class RenderViewTests(BaseTest, unittest.TestCase):
         self.assertEqual(s, 'anotherview')
 
 class TestIsResponse(unittest.TestCase):
+    def setUp(self):
+        from zope.deprecation import __show__
+        __show__.off()
+
+    def tearDown(self):
+        from zope.deprecation import __show__
+        __show__.on()
+        
     def _callFUT(self, *arg, **kw):
         from pyramid.view import is_response
         return is_response(*arg, **kw)

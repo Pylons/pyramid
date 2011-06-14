@@ -6,18 +6,6 @@ Must-Have
 
 - To subclass or not subclass http exceptions.
 
-- Deprecate view.is_response?
-
-- Move is_response to response.py?
-
-- Create add_response_adapter Configurator API?
-
-- Make sure registering IResponse adapter for webob.Response doesn't make it
-  impossible to register an IResponse adapter for an interface that a
-  webob.Response happens to implement.
-
-- Run whatsitdoing tests.
-
 - Docs mention ``exception.args[0]`` as a way to get messages; check that
   this works.
 

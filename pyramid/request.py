@@ -323,6 +323,15 @@ class Request(BaseRequest):
                                                  default=Response)
         return response_factory()
 
+    def is_response(self, ob):
+        """ Return ``True`` if the object passed as ``ob`` is a valid
+        response object, ``False`` otherwise."""
+        registry = self.registry
+        adapted = registry.queryAdapterOrSelf(ob, IResponse)
+        if adapted is None:
+            return False
+        return adapted is ob
+
     # b/c dict interface for "root factory" code that expects a bare
     # environ.  Explicitly omitted dict methods: clear (unnecessary),
     # copy (implemented by WebOb), fromkeys (unnecessary); deprecated
