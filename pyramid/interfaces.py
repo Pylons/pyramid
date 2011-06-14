@@ -47,13 +47,212 @@ class IApplicationCreated(Interface):
 IWSGIApplicationCreatedEvent = IApplicationCreated # b /c
 
 class IResponse(Interface):
-    status = Attribute('WSGI status code of response')
-    headerlist = Attribute('List of response headers')
-    app_iter = Attribute('Iterable representing the response body')
+    """ Represents a WSGI response using the WebOb response interface.  Some
+    attribute and method documentation of this interface references `RFC 2616
+    <http://www.w3.org/Protocols/rfc2616/>`_.
+
+    This interface is most famously implemented by
+    :class:`pyramid.response.Response` and the HTTP exception classes in
+    :mod:`pyramid.httpexceptions`."""
+
+    RequestClass = Attribute(
+        """ Alias for :class:`pyramid.request.Request` """)
 
     def __call__(environ, start_response):
-        """ WSGI call interface, should call the start_response callback
-        and should return an iterable """
+        """ :term:`WSGI` call interface, should call the start_response
+        callback and should return an iterable"""
+
+    accept_ranges = Attribute(
+        """Gets and sets and deletes the Accept-Ranges header. For more
+        information on Accept-Ranges see RFC 2616, section 14.5""")
+
+    age = Attribute(
+        """Gets and sets and deletes the Age header. Converts using int.
+        For more information on Age see RFC 2616, section 14.6.""")
+
+    allow = Attribute(
+        """Gets and sets and deletes the Allow header. Converts using
+        list. For more information on Allow see RFC 2616, Section 14.7.""")
+
+    app_iter = Attribute(
+        """Returns the app_iter of the response.
+
+        If body was set, this will create an app_iter from that body
+        (a single-item list)""")
+
+    def app_iter_range(start, stop):
+        """ Return a new app_iter built from the response app_iter that
+        serves up only the given start:stop range. """
+
+    body = Attribute(
+        """The body of the response, as a str. This will read in the entire
+        app_iter if necessary.""")
+
+    body_file = Attribute(
+        """A file-like object that can be used to write to the body. If you
+        passed in a list app_iter, that app_iter will be modified by writes.""")
+
+    cache_control = Attribute(
+        """Get/set/modify the Cache-Control header (RFC 2616 section 14.9)""")
+
+    cache_expires = Attribute(
+        """ Get/set the Cache-Control and Expires headers. This sets the
+            response to expire in the number of seconds passed when set. """)
+
+    charset = Attribute(
+        """Get/set the charset (in the Content-Type)""")
+
+    def conditional_response_app(environ, start_response):
+        """ Like the normal __call__ interface, but checks conditional
+        headers:
+
+        - If-Modified-Since (304 Not Modified; only on GET, HEAD)
+
+        - If-None-Match (304 Not Modified; only on GET, HEAD)
+
+        - Range (406 Partial Content; only on GET, HEAD)"""
+
+    content_disposition = Attribute(
+        """Gets and sets and deletes the Content-Disposition header.
+        For more information on Content-Disposition see RFC 2616 section
+        19.5.1.""")
+
+    content_encoding = Attribute(
+        """Gets and sets and deletes the Content-Encoding header.  For more
+        information about Content-Encoding see RFC 2616 section 14.11.""")
+
+    content_language = Attribute(
+        """Gets and sets and deletes the Content-Language header. Converts
+        using list.  For more information about Content-Language see RFC 2616
+        section 14.12.""")
+
+    content_length = Attribute(
+        """Gets and sets and deletes the Content-Length header. For more
+        information on Content-Length see RFC 2616 section 14.17.
+        Converts using int. """)
+
+    content_location = Attribute(
+        """Gets and sets and deletes the Content-Location header. For more
+        information on Content-Location see RFC 2616 section 14.14.""")
+
+    content_md5 = Attribute(
+        """Gets and sets and deletes the Content-MD5 header. For more
+        information on Content-MD5 see RFC 2616 section 14.14.""")
+
+    content_range  = Attribute(
+        """Gets and sets and deletes the Content-Range header. For more
+        information on Content-Range see section 14.16. Converts using
+        ContentRange object.""")
+
+    content_type = Attribute(
+        """Get/set the Content-Type header (or None), without the charset
+        or any parameters. If you include parameters (or ; at all) when
+        setting the content_type, any existing parameters will be deleted;
+        otherwise they will be preserved.""")
+
+    content_type_params = Attribute(
+        """A dictionary of all the parameters in the content type.  This is 
+        not a view, set to change, modifications of the dict would not
+        be applied otherwise.""")
+
+    def copy():
+        """ Makes a copy of the response and returns the copy. """
+
+    date = Attribute(
+        """Gets and sets and deletes the Date header. For more information on
+        Date see RFC 2616 section 14.18. Converts using HTTP date.""")
+
+    def delete_cookie(key, path='/', domain=None):
+        """ Delete a cookie from the client. Note that path and domain must
+        match how the cookie was originally set.  This sets the cookie to the
+        empty string, and max_age=0 so that it should expire immediately. """
+
+    def encode_content(encoding='gzip', lazy=False):
+        """ Encode the content with the given encoding (only gzip and
+        identity are supported)."""
+
+    environ = Attribute(
+        """Get/set the request environ associated with this response,
+        if any.""")
+
+    etag = Attribute(
+        """ Gets and sets and deletes the ETag header. For more information
+        on ETag see RFC 2616 section 14.19. Converts using Entity tag.""")
+
+    expires = Attribute(
+        """ Gets and sets and deletes the Expires header. For more
+        information on Expires see RFC 2616 section 14.21. Converts using
+        HTTP date.""")
+
+    headerlist = Attribute(
+        """ The list of response headers. """)
+
+    headers = Attribute(
+        """ The headers in a dictionary-like object """)
+
+    last_modified = Attribute(
+        """ Gets and sets and deletes the Last-Modified header. For more
+        information on Last-Modified see RFC 2616 section 14.29. Converts
+        using HTTP date.""")
+
+    location = Attribute(
+        """ Gets and sets and deletes the Location header. For more
+        information on Location see RFC 2616 section 14.30.""")
+
+    def md5_etag(body=None, set_content_md5=False):
+        """ Generate an etag for the response object using an MD5 hash of the
+        body (the body parameter, or self.body if not given).  Sets self.etag.
+        If set_content_md5 is True sets self.content_md5 as well """
+
+    def merge_cookies(resp):
+        """ Merge the cookies that were set on this response with the given
+        resp object (which can be any WSGI application).  If the resp is a
+        webob.Response object, then the other object will be modified
+        in-place. """
+
+    pragma = Attribute(
+        """ Gets and sets and deletes the Pragma header. For more information
+        on Pragma see RFC 2616 section 14.32. """)
+
+    request = Attribute(
+        """ Return the request associated with this response if any. """)
+
+    retry_after = Attribute(
+        """ Gets and sets and deletes the Retry-After header. For more
+        information on Retry-After see RFC 2616 section 14.37. Converts
+        using HTTP date or delta seconds.""")
+
+    server = Attribute(
+        """ Gets and sets and deletes the Server header. For more information
+        on Server see RFC216 section 14.38. """)
+
+    def set_cookie(key, value='', max_age=None, path='/', domain=None,
+                   secure=False, httponly=False, comment=None, expires=None,
+                   overwrite=False):
+        """ Set (add) a cookie for the response """
+
+    status = Attribute(
+        """ The status string. """)
+
+    status_int = Attribute(
+        """ The status as an integer """)
+
+    unicode_body = Attribute(
+        """ Get/set the unicode value of the body (using the charset of
+        the Content-Type)""")
+
+    def unset_cookie(key, strict=True):
+        """ Unset a cookie with the given name (remove it from the
+        response)."""
+
+    vary = Attribute(
+        """Gets and sets and deletes the Vary header. For more information
+        on Vary see section 14.44. Converts using list.""")
+
+    www_authenticate = Attribute(
+        """ Gets and sets and deletes the WWW-Authenticate header. For more
+        information on WWW-Authenticate see RFC 2616 section 14.47. Converts
+        using 'parse_auth' and 'serialize_auth'. """)
 
 class IException(Interface): # not an API
     """ An interface representing a generic exception """
