@@ -361,6 +361,9 @@ Behavior Changes
 Backwards Incompatibilities
 ---------------------------
 
+- Pyramid no longer supports Python 2.4.  Python 2.5 or better is required to
+  run Pyramid 1.1+.
+
 - The Pyramid router now, by default, expects response objects returned from
   view callables to implement the ``pyramid.interfaces.IResponse`` interface.
   Unlike the Pyramid 1.0 version of this interface, objects which implement
