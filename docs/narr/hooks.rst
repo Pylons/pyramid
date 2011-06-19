@@ -532,7 +532,7 @@ Changing How Pyramid Treats View Responses
 
 It is possible to control how Pyramid treats the result of calling a view
 callable on a per-type basis by using a hook involving
-:method:`pyramid.config.Configurator.add_response_adapter`.
+:meth:`pyramid.config.Configurator.add_response_adapter`.
 
 .. note:: This feature is new as of Pyramid 1.1.
 
