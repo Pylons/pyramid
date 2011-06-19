@@ -69,9 +69,9 @@ def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
 
 deprecated('registerDummySecurityPolicy',
            'The testing.registerDummySecurityPolicy API is deprecated as of '
-           'Pyramid 1.0. Instead use the'
+           'Pyramid 1.0. Instead use the '
            'pyramid.config.Configurator.testing_securitypolicy '
-           'method in your unit and integration tests. ')
+           'method in your unit and integration tests.')
 
 def registerResources(resources):
     """ Registers a dictionary of :term:`resource` objects that can be
@@ -101,17 +101,17 @@ def registerResources(resources):
 
 deprecated('registerResources',
            'The testing.registerResources API is deprecated as of '
-           'Pyramid 1.0. Instead use the'
+           'Pyramid 1.0. Instead use the '
            'pyramid.config.Configurator.testing_resources '
-           'method in your unit and integration tests. ')
+           'method in your unit and integration tests.')
 
 registerModels = registerResources
 
 deprecated('registerModels',
            'The testing.registerModels API is deprecated as of '
-           'Pyramid 1.0. Instead use the'
+           'Pyramid 1.0. Instead use the '
            'pyramid.config.Configurator.testing_resources '
-           'method in your unit and integration tests. ')
+           'method in your unit and integration tests.')
 
 def registerEventListener(event_iface=None):
     """ Registers an :term:`event` listener (aka :term:`subscriber`)
@@ -143,9 +143,9 @@ def registerEventListener(event_iface=None):
 
 deprecated('registerEventListener',
            'The testing.registerEventListener API is deprecated as of '
-           'Pyramid 1.0. Instead use the'
+           'Pyramid 1.0. Instead use the '
            'pyramid.config.Configurator.testing_add_subscriber '
-           'method in your unit and integration tests. ')
+           'method in your unit and integration tests.')
 
 def registerTemplateRenderer(path, renderer=None):
     """ Register a template renderer at ``path`` (usually a relative
@@ -171,9 +171,9 @@ def registerTemplateRenderer(path, renderer=None):
 
 deprecated('registerTemplateRenderer',
            'The testing.registerTemplateRenderer API is deprecated as of '
-           'Pyramid 1.0. Instead use the'
+           'Pyramid 1.0. Instead use the '
            'pyramid.config.Configurator.testing_add_renderer '
-           'method in your unit and integration tests. ')
+           'method in your unit and integration tests.')
 
 # registerDummyRenderer is a deprecated alias that should never be removed
 # (too much usage in the wild)
@@ -181,9 +181,9 @@ registerDummyRenderer = registerTemplateRenderer
 
 deprecated('registerDummyRenderer',
            'The testing.registerDummyRenderer API is deprecated as of '
-           'Pyramid 1.0. Instead use the'
+           'Pyramid 1.0. Instead use the '
            'pyramid.config.Configurator.testing_add_renderer '
-           'method in your unit and integration tests. ')
+           'method in your unit and integration tests.')
 
 def registerView(name, result='', view=None, for_=(Interface, Interface),
                  permission=None):
@@ -228,9 +228,9 @@ def registerView(name, result='', view=None, for_=(Interface, Interface),
 
 deprecated('registerView',
            'The registerView API is deprecated as of '
-           'Pyramid 1.0. Instead use the'
+           'Pyramid 1.0. Instead use the '
            'pyramid.config.Configurator.add_view '
-           'method in your unit and integration tests. ')
+           'method in your unit and integration tests.')
 
 def registerUtility(impl, iface=Interface, name=''):
     """ Register a ZCA utility component.
@@ -257,10 +257,10 @@ def registerUtility(impl, iface=Interface, name=''):
 
 deprecated('registerUtility',
            'The registerUtility API is deprecated as of '
-           'Pyramid 1.0. Instead use the'
+           'Pyramid 1.0. Instead use the '
            'pyramid.registry.registerUtility method (via '
            'e.g. "config.registry.registerUtility(..)" '
-           'method in your unit and integration tests. ')
+           'method in your unit and integration tests.')
 
 def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
     """ Register a ZCA adapter component.
@@ -296,10 +296,10 @@ def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
 
 deprecated('registerAdapter',
            'The registerAdapter API is deprecated as of '
-           'Pyramid 1.0. Instead use the'
+           'Pyramid 1.0. Instead use the '
            'pyramid.registry.registerAdapter method (via '
            'e.g. "config.registry.registerAdapter(..)" '
-           'method in your unit and integration tests. ')
+           'method in your unit and integration tests.')
 
 def registerSubscriber(subscriber, iface=Interface):
     """ Register a ZCA subscriber component.
@@ -329,9 +329,9 @@ def registerSubscriber(subscriber, iface=Interface):
 
 deprecated('registerSubscriber',
            'The testing.registerSubscriber API is deprecated as of '
-           'Pyramid 1.0. Instead use the'
+           'Pyramid 1.0. Instead use the '
            'pyramid.config.Configurator.add_subscriber '
-           'method in your unit and integration tests. ')
+           'method in your unit and integration tests.')
 
 def registerRoute(pattern, name, factory=None):
     """ Register a new :term:`route` using a pattern
@@ -358,9 +358,9 @@ def registerRoute(pattern, name, factory=None):
 
 deprecated('registerRoute',
            'The testing.registerRoute API is deprecated as of '
-           'Pyramid 1.0. Instead use the'
+           'Pyramid 1.0. Instead use the '
            'pyramid.config.Configurator.add_route '
-           'method in your unit and integration tests. ')
+           'method in your unit and integration tests.')
 
 def registerSettings(dictarg=None, **kw):
     """Register one or more 'setting' key/value pairs.  A setting is
@@ -390,9 +390,9 @@ def registerSettings(dictarg=None, **kw):
 
 deprecated('registerSettings',
            'The testing.registerSettings API is deprecated as of '
-           'Pyramid 1.0. Instead use the'
+           'Pyramid 1.0. Instead use the '
            'pyramid.config.Configurator.add_settings '
-           'method in your unit and integration tests. ')
+           'method in your unit and integration tests.')
 
 class DummyRootFactory(object):
     __parent__ = None
