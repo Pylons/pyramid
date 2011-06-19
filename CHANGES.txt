@@ -343,20 +343,9 @@ Behavior Changes
   (e.g. ``HTTPNotFound``) are no longer just import aliases for classes that
   actually live in ``webob.exc``.  Instead, we've defined our own exception
   classes within the module that mirror and emulate the ``webob.exc``
-  exception response objects almost entirely.  We do this in order to a)
-  allow the exception responses to subclass ``pyramid.response.Response``,
-  which speeds up response generation slightly due to the way the Pyramid
-  router works, b) allows us to provide alternate __call__ logic which also
-  speeds up response generation, c) allows the exception classes to provide
-  for the proper value of ``self.RequestClass`` (pyramid.request.Request), d)
-  allows us freedom from having to think about backwards compatibility code
-  present in ``webob.exc`` having to do with Python 2.4, which we no longer
-  support, e) We change the behavior of two classes (HTTPNotFound and
-  HTTPForbidden) in the module so that they can be used internally for
-  notfound and forbidden exceptions, f) allows us to influence the docstrings
-  of the exception classes to provide Pyramid-specific documentation, and g)
-  allows us to silence a stupid deprecation warning under Python 2.6 when the
-  response objects are used as exceptions (related to ``self.message``).
+  exception response objects almost entirely.  See the "Design Defense" doc
+  section named "Pyramid Uses its Own HTTP Exception Classes" for more
+  information.
 
 Backwards Incompatibilities
 ---------------------------
