@@ -75,22 +75,22 @@ class TestWSGIHTTPException(unittest.TestCase):
     def test_implements_IResponse(self):
         from pyramid.interfaces import IResponse
         cls = self._getTargetClass()
-        self.failUnless(IResponse.implementedBy(cls))
+        self.assertTrue(IResponse.implementedBy(cls))
 
     def test_provides_IResponse(self):
         from pyramid.interfaces import IResponse
         inst = self._getTargetClass()()
-        self.failUnless(IResponse.providedBy(inst))
+        self.assertTrue(IResponse.providedBy(inst))
 
     def test_implements_IExceptionResponse(self):
         from pyramid.interfaces import IExceptionResponse
         cls = self._getTargetClass()
-        self.failUnless(IExceptionResponse.implementedBy(cls))
+        self.assertTrue(IExceptionResponse.implementedBy(cls))
 
     def test_provides_IExceptionResponse(self):
         from pyramid.interfaces import IExceptionResponse
         inst = self._getTargetClass()()
-        self.failUnless(IExceptionResponse.providedBy(inst))
+        self.assertTrue(IExceptionResponse.providedBy(inst))
 
     def test_ctor_sets_detail(self):
         exc = self._makeOne('message')

@@ -211,7 +211,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = self._getViewCallable(config,
                                      ctx_iface=IExceptionResponse,
                                      request_iface=IRequest)
-        self.failUnless(view is default_exceptionresponse_view)
+        self.assertTrue(view is default_exceptionresponse_view)
 
     def test_ctor_exceptionresponse_view_None(self):
         from pyramid.interfaces import IExceptionResponse
@@ -220,7 +220,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = self._getViewCallable(config,
                                      ctx_iface=IExceptionResponse,
                                      request_iface=IRequest)
-        self.failUnless(view is None)
+        self.assertTrue(view is None)
 
     def test_ctor_exceptionresponse_view_custom(self):
         from pyramid.interfaces import IExceptionResponse
@@ -230,7 +230,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = self._getViewCallable(config,
                                      ctx_iface=IExceptionResponse,
                                      request_iface=IRequest)
-        self.failUnless(view is exceptionresponse_view)
+        self.assertTrue(view is exceptionresponse_view)
 
     def test_with_package_module(self):
         from pyramid.tests import test_configuration
