@@ -1,9 +1,9 @@
 import unittest
 
-class Test_responsecode(unittest.TestCase):
+class Test_exception_response(unittest.TestCase):
     def _callFUT(self, *arg, **kw):
-        from pyramid.httpexceptions import responsecode
-        return responsecode(*arg, **kw)
+        from pyramid.httpexceptions import exception_response
+        return exception_response(*arg, **kw)
 
     def test_status_404(self):
         from pyramid.httpexceptions import HTTPNotFound

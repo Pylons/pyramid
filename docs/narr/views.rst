@@ -300,26 +300,29 @@ An HTTP exception, instead of being raised, can alternately be *returned*
        return HTTPUnauthorized()
 
 A shortcut for creating an HTTP exception is the
-:func:`pyramid.httpexceptions.responsecode` function.  This function accepts
-an HTTP status code and returns the corresponding HTTP exception.  For
-example, instead of importing and constructing a
+:func:`pyramid.httpexceptions.exception_response` function.  This function
+accepts an HTTP status code and returns the corresponding HTTP exception.
+For example, instead of importing and constructing a
 :class:`~pyramid.httpexceptions.HTTPUnauthorized` response object, you can
-use the :func:`~pyramid.httpexceptions.responsecode` function to construct
-and return the same object.
+use the :func:`~pyramid.httpexceptions.exception_response` function to
+construct and return the same object.
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.httpexceptions import responsecode
+   from pyramid.httpexceptions import exception_response
 
    def aview(request):
-       raise responsecode(401)
+       raise exception_response(401)
 
 This is the case because ``401`` is the HTTP status code for "HTTP
-Unauthorized".  Therefore, ``raise responsecode(401)`` is functionally
+Unauthorized".  Therefore, ``raise exception_response(401)`` is functionally
 equivalent to ``raise HTTPUnauthorized()``.  Documentation which maps each
 HTTP response code to its purpose and its associated HTTP exception object is
 provided within :mod:`pyramid.httpexceptions`.
+
+.. note:: The :func:`~pyramid.httpexceptions.exception_response` function is
+   new as of Pyramid 1.1.
 
 How Pyramid Uses HTTP Exceptions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

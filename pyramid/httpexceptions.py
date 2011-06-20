@@ -978,7 +978,7 @@ class HTTPInsufficientStorage(HTTPServerError):
     title = 'Insufficient Storage'
     explanation = ('There was not enough space to save the resource')
 
-def responsecode(status_code, **kw):
+def exception_response(status_code, **kw):
     """Creates an HTTP exception based on a status code. Example::
 
         raise responsecode(404) # raises an HTTPNotFound exception.

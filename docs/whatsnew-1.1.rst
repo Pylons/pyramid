@@ -18,8 +18,7 @@ The major feature additions in Pyramid 1.1 are:
 
 - Support for "static" routes.
 
-- Default HTTP exception view and associated ``redirect`` and ``abort``
-  convenience functions.
+- Default HTTP exception view.
 
 ``request.response``
 ~~~~~~~~~~~~~~~~~~~~
@@ -56,8 +55,8 @@ Static Routes
 Default HTTP Exception View
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- A default exception view for the context :exc:`webob.exc.HTTPException`
-  (aka :class:`pyramid.httpexceptions.HTTPException`) is now registered by
+- A default exception view for the context
+  :class:`pyramid.interfaces.IExceptionResponse` is now registered by
   default.  This means that an instance of any exception class imported from
   :mod:`pyramid.httpexceptions` (such as ``HTTPFound``) can now be raised
   from within view code; when raised, this exception view will render the
@@ -79,9 +78,9 @@ Minor Feature Additions
   :class:`pyramid.authentication.SessionAuthenticationPolicy`, which uses a
   session to store credentials.
 
-- A function named :func:`pyramid.httpexceptions.responsecode` is a shortcut
-  that can be used to create HTTP exception response objects using an HTTP
-  integer status code.
+- A function named :func:`pyramid.httpexceptions.exception_response` is a
+  shortcut that can be used to create HTTP exception response objects using
+  an HTTP integer status code.
 
 - Integers and longs passed as ``elements`` to
   :func:`pyramid.url.resource_url` or

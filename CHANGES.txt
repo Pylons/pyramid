@@ -39,10 +39,10 @@ Documentation
 
 - Added API docs for ``pyramid.authentication.SessionAuthenticationPolicy``.
 
-- Added API docs for ``pyramid.httpexceptions.responsecode``.
+- Added API docs for ``pyramid.httpexceptions.exception_response``.
 
 - Added "HTTP Exceptions" section to Views narrative chapter including a
-  description of ``pyramid.httpexceptions.responsecode``.
+  description of ``pyramid.httpexceptions.exception_response``.
 
 Features
 --------
@@ -121,9 +121,9 @@ Features
   within view code; when raised, this exception view will render the
   exception to a response.
 
-- A function named ``pyramid.httpexceptions.responsecode`` is a shortcut that
-  can be used to create HTTP exception response objects using an HTTP integer
-  status code.
+- A function named ``pyramid.httpexceptions.exception_response`` is a
+  shortcut that can be used to create HTTP exception response objects using
+  an HTTP integer status code.
 
 - The Configurator now accepts an additional keyword argument named
   ``exceptionresponse_view``.  By default, this argument is populated with a
