@@ -275,8 +275,8 @@ Deprecations and Behavior Differences
   :class:`webob.request.Request` and implemented ``__getattr__``,
   ``__setattr__`` and ``__delattr__`` itself in order to override "adhoc
   attr" WebOb behavior where attributes of the request are stored in the
-  environ.  Now, :class:`pyramid.request.Request inherits from (the more
-  recent) :class:`webob.request.BaseRequest`` instead of
+  environ.  Now, :class:`pyramid.request.Request` inherits from (the more
+  recent) :class:`webob.request.BaseRequest` instead of
   :class:`webob.request.Request`, which provides the same behavior.
   :class:`pyramid.request.Request` no longer implements its own
   ``__getattr__``, ``__setattr__`` or ``__delattr__`` as a result.
