@@ -1011,8 +1011,10 @@ which returns Zope3-security-proxy-wrapped objects for each traversed object
 (including the :term:`context` and the :term:`root`).  This would have the
 effect of creating a more Zope3-like environment without much effort.
 
-Pyramid Uses its Own HTTP Exception Class Hierarchy Rather ``webob.exc``
-------------------------------------------------------------------------
+.. _http_exception_hierarchy:
+
+Pyramid Uses its Own HTTP Exception Class Hierarchy Rather Than ``webob.exc``
+-----------------------------------------------------------------------------
 
 .. note:: This defense is new as of Pyramid 1.1.
 

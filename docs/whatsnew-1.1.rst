@@ -55,7 +55,7 @@ Static Routes
 Default HTTP Exception View
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- A default exception view for the context
+- A default exception view for the interface
   :class:`pyramid.interfaces.IExceptionResponse` is now registered by
   default.  This means that an instance of any exception class imported from
   :mod:`pyramid.httpexceptions` (such as ``HTTPFound``) can now be raised
@@ -63,10 +63,10 @@ Default HTTP Exception View
   exception to a response.
 
   To allow for configuration of this feature, the :term:`Configurator` now
-  accepts an additional keyword argument named ``httpexception_view``.  By
-  default, this argument is populated with a default exception view function
-  that will be used when an HTTP exception is raised.  When ``None`` is
-  passed for this value, an exception view for HTTP exceptions will not be
+  accepts an additional keyword argument named ``exceptionresponse_view``.
+  By default, this argument is populated with a default exception view
+  function that will be used when an HTTP exception is raised.  When ``None``
+  is passed for this value, an exception view for HTTP exceptions will not be
   registered.  Passing ``None`` returns the behavior of raising an HTTP
   exception to that of Pyramid 1.0 (the exception will propagate to
   middleware and to the WSGI server).
@@ -115,6 +115,69 @@ Minor Feature Additions
   such a configuration would raise a ``ValueError``, now it's allowed,
   although typically nonsensical).  Allowing the nonsensical configuration
   made the code more understandable and required fewer tests.
+
+- The :class:`pyramid.request.Request` class now has a ``ResponseClass``
+  attribute which points at :class:`pyramid.response.Response`.
+
+- The :class:`pyramid.response.Response` class now has a ``RequestClass``
+  interface which points at :class:`pyramid.request.Request`.
+
+- It is now possible to return an arbitrary object from a Pyramid view
+  callable even if a renderer is not used, as long as a suitable adapter to
+  :class:`pyramid.interfaces.IResponse` is registered for the type of the
+  returned object by using the new
+  :meth:`pyramid.config.Configurator.add_response_adapter` API.  See the
+  section in the Hooks chapter of the documentation entitled
+  :ref:`using_iresponse`.
+
+- The Pyramid router will now, by default, call the ``__call__`` method of
+  response objects when returning a WSGI response.  This means that, among
+  other things, the ``conditional_response`` feature response objects
+  inherited from WebOb will now behave properly.
+
+- New method named :meth:`pyramid.request.Request.is_response`.  This method
+  should be used instead of the :func:`pyramid.view.is_response` function,
+  which has been deprecated.
+
+- :class:`pyramid.exceptions.NotFound` is now just an alias for
+  :class:`pyramid.httpexceptions.HTTPNotFound`.
+
+- :class:`pyramid.exceptions.NotFound` is now just an alias for
+  :class:`pyramid.httpexceptions.HTTPNotFound`.
+
+Backwards Incompatibilities
+---------------------------
+
+- Pyramid no longer supports Python 2.4.  Python 2.5 or better is required to
+  run Pyramid 1.1+.  Pyramid, however, does not work under any version of
+  Python 3 yet.
+
+- The Pyramid router now, by default, expects response objects returned from
+  view callables to implement the :class:`pyramid.interfaces.IResponse`
+  interface.  Unlike the Pyramid 1.0 version of this interface, objects which
+  implement IResponse now must define a ``__call__`` method that accepts
+  ``environ`` and ``start_response``, and which returns an ``app_iter``
+  iterable, among other things.  Previously, it was possible to return any
+  object which had the three WebOb ``app_iter``, ``headerlist``, and
+  ``status`` attributes as a response, so this is a backwards
+  incompatibility.  It is possible to get backwards compatibility back by
+  registering an adapter to IResponse from the type of object you're now
+  returning from view callables.  See the section in the Hooks chapter of the
+  documentation entitled :ref:`using_iresponse`.
+
+- The :class:`pyramid.interfaces.IResponse` interface is now much more
+  extensive.  Previously it defined only ``app_iter``, ``status`` and
+  ``headerlist``; now it is basically intended to directly mirror the
+  ``webob.Response`` API, which has many methods and attributes.
+
+- The :mod:`pyramid.httpexceptions` classes named ``HTTPFound``,
+  ``HTTPMultipleChoices``, ``HTTPMovedPermanently``, ``HTTPSeeOther``,
+  ``HTTPUseProxy``, and ``HTTPTemporaryRedirect`` now accept ``location`` as
+  their first positional argument rather than ``detail``.  This means that
+  you can do, e.g. ``return pyramid.httpexceptions.HTTPFound('http://foo')``
+  rather than ``return
+  pyramid.httpexceptions.HTTPFound(location='http//foo')`` (the latter will
+  of course continue to work).
 
 Deprecations and Behavior Differences
 -------------------------------------
@@ -218,6 +281,34 @@ Deprecations and Behavior Differences
   :class:`pyramid.request.Request` no longer implements its own
   ``__getattr__``, ``__setattr__`` or ``__delattr__`` as a result.
 
+- Deprecated :func:`pyramid.view.is_response` function in favor of
+  (newly-added) :meth:`pyramid.request.Request.is_response` method.
+  Determining if an object is truly a valid response object now requires
+  access to the registry, which is only easily available as a request
+  attribute.  The :func:`pyramid.view.is_response` function will still work
+  until it is removed, but now may return an incorrect answer under some
+  (very uncommon) circumstances.
+
+- :class:`pyramid.response.Response` is now a *subclass* of
+  ``webob.response.Response`` (in order to directly implement the
+  :class:`pyramid.interfaces.IResponse` interface, to speed up response
+  generation).
+
+- The "exception response" objects importable from ``pyramid.httpexceptions``
+  (e.g. ``HTTPNotFound``) are no longer just import aliases for classes that
+  actually live in ``webob.exc``.  Instead, we've defined our own exception
+  classes within the module that mirror and emulate the ``webob.exc``
+  exception response objects almost entirely.  See
+  :ref:`http_exception_hierarchy` in the Design Defense chapter for more
+  information.
+
+- When visiting a URL that represented a static view which resolved to a
+  subdirectory, the ``index.html`` of that subdirectory would not be served
+  properly.  Instead, a redirect to ``/subdir`` would be issued.  This has
+  been fixed, and now visiting a subdirectory that contains an ``index.html``
+  within a static view returns the index.html properly.  See also
+  https://github.com/Pylons/pyramid/issues/67.
+
 Dependency Changes
 ------------------
 
@@ -261,9 +352,10 @@ Documentation Enhancements
 - Added a section to the "URL Dispatch" narrative chapter regarding the new
   "static" route feature entitled :ref:`static_route_narr`.
 
-- Added API docs for :func:`pyramid.httpexceptions.abort` and
-  :func:`pyramid.httpexceptions.redirect`.
+- Added API docs for :func:`pyramid.httpexceptions.exception_response`.
 
 - Added :ref:`http_exceptions` section to Views narrative chapter including a
-  description of :func:`pyramid.httpexceptions.abort`` and
-  :func:`pyramid.httpexceptions.redirect`.
+  description of :func:`pyramid.httpexceptions.exception_response`.
+
+- Added API docs for
+  :class:`pyramid.authentication.SessionAuthenticationPolicy`.

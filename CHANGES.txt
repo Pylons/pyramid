@@ -136,8 +136,8 @@ Features
 - The ``pyramid.request.Request`` class now has a ``ResponseClass`` interface
   which points at ``pyramid.response.Response``.
 
-- The ``pyramid.request.Response`` class now has a ``RequestClass`` interface
-  which points at ``pyramid.response.Request``.
+- The ``pyramid.response.Response`` class now has a ``RequestClass``
+  interface which points at ``pyramid.request.Request``.
 
 - It is now possible to return an arbitrary object from a Pyramid view
   callable even if a renderer is not used, as long as a suitable adapter to
