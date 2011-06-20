@@ -6,9 +6,6 @@ Must-Have
 
 - Grep for IExceptionResponse, forgot what it does.
 
-- Copy exception templates from webob.exc into pyramid.httpexceptions and
-  ensure they all work.
-
 - Docs mention ``exception.args[0]`` as a way to get messages; check that
   this works.
 

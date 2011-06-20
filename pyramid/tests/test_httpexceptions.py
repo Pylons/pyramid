@@ -278,6 +278,19 @@ class Test_HTTPMove(unittest.TestCase):
         exc = self._makeOne(location='foo')
         self.assertEqual(exc.location, 'foo')
 
+    def test_it_location_firstarg(self):
+        exc = self._makeOne('foo')
+        self.assertEqual(exc.location, 'foo')
+
+    def test_it_call_with_default_body_tmpl(self):
+        exc = self._makeOne(location='foo')
+        environ = _makeEnviron()
+        start_response = DummyStartResponse()
+        app_iter = exc(environ, start_response)
+        self.assertEqual(app_iter[0],
+                         ('None None\n\nThe resource has been moved to foo; '
+                          'you should be redirected automatically.\n\n'))
+
 class TestHTTPForbidden(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.httpexceptions import HTTPForbidden
@@ -290,7 +303,22 @@ class TestHTTPForbidden(unittest.TestCase):
     def test_it_result_passed(self):
         exc = self._makeOne(result='foo')
         self.assertEqual(exc.result, 'foo')
-        
+
+class TestHTTPMethodNotAllowed(unittest.TestCase):
+    def _makeOne(self, *arg, **kw):
+        from pyramid.httpexceptions import HTTPMethodNotAllowed
+        return HTTPMethodNotAllowed(*arg, **kw)
+
+    def test_it_with_default_body_tmpl(self):
+        exc = self._makeOne()
+        environ = _makeEnviron()
+        start_response = DummyStartResponse()
+        app_iter = exc(environ, start_response)
+        self.assertEqual(app_iter[0],
+                         ('405 Method Not Allowed\n\nThe method GET is not '
+                          'allowed for this resource. \n\n\n'))
+
+
 class DummyRequest(object):
     exception = None
 
