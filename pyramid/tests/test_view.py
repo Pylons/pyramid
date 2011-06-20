@@ -1,14 +1,15 @@
 import unittest
 import sys
 
-from pyramid.testing import cleanUp
+from pyramid.testing import setUp
+from pyramid.testing import tearDown
 
 class BaseTest(object):
     def setUp(self):
-        cleanUp()
+        self.config = setUp()
 
     def tearDown(self):
-        cleanUp()
+        tearDown()
 
     def _registerView(self, reg, app, name):
         from pyramid.interfaces import IRequest
@@ -156,6 +157,18 @@ class RenderViewToIterableTests(BaseTest, unittest.TestCase):
                                  secure=False)
         self.assertEqual(iterable, ['anotherview'])
 
+    def test_call_request_has_no_registry(self):
+        request = self._makeRequest()
+        del request.registry
+        registry = self.config.registry
+        context = self._makeContext()
+        response = DummyResponse()
+        view = make_view(response)
+        self._registerView(registry, view, 'registered')
+        iterable = self._callFUT(context, request, name='registered',
+                                 secure=True)
+        self.assertEqual(iterable, ())
+
 class RenderViewTests(BaseTest, unittest.TestCase):
     def _callFUT(self, *arg, **kw):
         from pyramid.view import render_view
@@ -244,10 +257,10 @@ class TestIsResponse(unittest.TestCase):
 
 class TestViewConfigDecorator(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        setUp()
 
     def tearDown(self):
-        cleanUp()
+        tearDown()
 
     def _getTargetClass(self):
         from pyramid.view import view_config
