@@ -4,6 +4,8 @@ Pyramid TODOs
 Must-Have
 ---------
 
+- Grep for IExceptionResponse, forgot what it does.
+
 - Copy exception templates from webob.exc into pyramid.httpexceptions and
   ensure they all work.
 

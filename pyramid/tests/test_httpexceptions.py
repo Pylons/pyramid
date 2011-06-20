@@ -139,6 +139,7 @@ class TestWSGIHTTPException(unittest.TestCase):
         cls = self._getTargetSubclass()
         exc = cls('detail')
         environ = _makeEnviron()
+        environ['HTTP_ACCEPT'] = 'text/html'
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
         self.assertTrue(body.startswith('<html'))
@@ -149,7 +150,6 @@ class TestWSGIHTTPException(unittest.TestCase):
     def test_ctor_with_body_sets_default_app_iter_text(self):
         cls = self._getTargetSubclass()
         exc = cls('detail')
-        exc.content_type = 'text/plain'
         environ = _makeEnviron()
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
@@ -176,7 +176,6 @@ class TestWSGIHTTPException(unittest.TestCase):
     def test__calls_start_response(self):
         cls = self._getTargetSubclass()
         exc = cls()
-        exc.content_type = 'text/plain'
         environ = _makeEnviron()
         start_response = DummyStartResponse()
         exc(environ, start_response)
@@ -186,7 +185,6 @@ class TestWSGIHTTPException(unittest.TestCase):
     def test__default_app_iter_no_comment_plain(self):
         cls = self._getTargetSubclass()
         exc = cls()
-        exc.content_type = 'text/plain'
         environ = _makeEnviron()
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
@@ -195,7 +193,6 @@ class TestWSGIHTTPException(unittest.TestCase):
     def test__default_app_iter_with_comment_plain(self):
         cls = self._getTargetSubclass()
         exc = cls(comment='comment')
-        exc.content_type = 'text/plain'
         environ = _makeEnviron()
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
@@ -204,7 +201,6 @@ class TestWSGIHTTPException(unittest.TestCase):
     def test__default_app_iter_no_comment_html(self):
         cls = self._getTargetSubclass()
         exc = cls()
-        exc.content_type = 'text/html'
         environ = _makeEnviron()
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
@@ -213,8 +209,17 @@ class TestWSGIHTTPException(unittest.TestCase):
     def test__default_app_iter_with_comment_html(self):
         cls = self._getTargetSubclass()
         exc = cls(comment='comment & comment')
-        exc.content_type = 'text/html'
         environ = _makeEnviron()
+        environ['HTTP_ACCEPT'] = '*/*'
+        start_response = DummyStartResponse()
+        body = list(exc(environ, start_response))[0]
+        self.assertTrue('<!-- comment &amp; comment -->' in body)
+
+    def test__default_app_iter_with_comment_html2(self):
+        cls = self._getTargetSubclass()
+        exc = cls(comment='comment & comment')
+        environ = _makeEnviron()
+        environ['HTTP_ACCEPT'] = 'text/html'
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
         self.assertTrue('<!-- comment &amp; comment -->' in body)
@@ -222,7 +227,6 @@ class TestWSGIHTTPException(unittest.TestCase):
     def test_custom_body_template(self):
         cls = self._getTargetSubclass()
         exc = cls(body_template='${REQUEST_METHOD}')
-        exc.content_type = 'text/plain'
         environ = _makeEnviron()
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
@@ -233,7 +237,6 @@ class TestWSGIHTTPException(unittest.TestCase):
         la = unicode('/La Pe\xc3\xb1a', 'utf-8')
         environ = _makeEnviron(unicodeval=la)
         exc = cls(body_template='${unicodeval}')
-        exc.content_type = 'text/plain'
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
         self.assertEqual(body, '200 OK\n\n/La Pe\xc3\xb1a')

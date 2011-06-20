@@ -371,6 +371,15 @@ Backwards Incompatibilities
   it is basically intended to directly mirror the ``webob.Response`` API,
   which has many methods and attributes.
 
+- The ``pyramid.httpexceptions`` classes named ``HTTPFound``,
+  ``HTTPMultipleChoices``, ``HTTPMovedPermanently``, ``HTTPSeeOther``,
+  ``HTTPUseProxy``, and ``HTTPTemporaryRedirect`` now accept ``location`` as
+  their first positional argument rather than ``detail``.  This means that
+  you can do, e.g. ``return pyramid.httpexceptions.HTTPFound('http://foo')``
+  rather than ``return
+  pyramid.httpexceptions.HTTPFound(location='http//foo')`` (the latter will
+  of course continue to work).
+
 Dependencies
 ------------
 

@@ -144,15 +144,10 @@ class WSGIHTTPException(Response, HTTPException):
 
     # differences from webob.exc.WSGIHTTPException:
     #
-    # - bases plaintext vs. html result on self.content_type rather than
-    #   on request accept header
-    #
     # - doesn't use "strip_tags" (${br} placeholder for <br/>, no other html
     #   in default body template)
     #
-    # - sets a default app_iter onto self during __call__ using a template if
-    #   no body, app_iter, or unicode_body is set onto the response (instead of
-    #   the replaced version's "generate_response")
+    # - __call__ never generates a new Response, it always mutates self
     #
     # - explicitly sets self.message = detail to prevent whining by Python
     #   2.6.5+ access of Exception.message
@@ -160,7 +155,7 @@ class WSGIHTTPException(Response, HTTPException):
     # - its base class of HTTPException is no longer a Python 2.4 compatibility
     #   shim; it's purely a base class that inherits from Exception.  This
     #   implies that this class' ``exception`` property always returns
-    #   ``self`` (only for bw compat at this point).
+    #   ``self`` (it exists only for bw compat at this point).
     #
     # - documentation improvements (Pyramid-specific docstrings where necessary)
     #
@@ -212,17 +207,19 @@ ${body}''')
     def __str__(self):
         return self.detail or self.explanation
 
-    def _default_app_iter(self, environ):
+    def _set_default_attrs(self, environ):
         html_comment = ''
         comment = self.comment or ''
-        content_type = self.content_type or ''
-        if 'html' in content_type:
+        accept = environ.get('HTTP_ACCEPT', '')
+        if accept and 'html' in accept or '*/*' in accept:
+            self.content_type = 'text/html'
             escape = _html_escape
             page_template = self.html_template_obj
             br = '<br/>'
             if comment:
                 html_comment = '<!-- %s -->' % escape(comment)
         else:
+            self.content_type = 'text/plain'
             escape = _no_escape
             page_template = self.plain_template_obj
             br = '\n'
@@ -246,7 +243,7 @@ ${body}''')
         page = page_template.substitute(status=self.status, body=body)
         if isinstance(page, unicode):
             page = page.encode(self.charset)
-        return [page]
+        self.app_iter = [page]
 
     @property
     def wsgi_response(self):
@@ -256,8 +253,15 @@ ${body}''')
     exception = wsgi_response # bw compat only
 
     def __call__(self, environ, start_response):
+        # differences from webob.exc.WSGIHTTPException
+        #
+        # - does not try to deal with HEAD requests
+        #
+        # - does not manufacture a new response object when generating
+        #   the default response
+        #
         if not self.body and not self.empty_body:
-            self.app_iter = self._default_app_iter(environ)
+            self._set_default_attrs(environ)
         return Response.__call__(self, environ, start_response)
 
 class HTTPError(WSGIHTTPException):
@@ -388,23 +392,25 @@ class _HTTPMove(HTTPRedirection):
     """
     # differences from webob.exc._HTTPMove:
     #
-    # - not a wsgi app
-    #
     # - ${location} isn't wrapped in an <a> tag in body
     #
     # - location keyword arg defaults to ''
+    #
+    # - location isn't prepended with req.path_url when adding it as
+    #   a header
+    #
+    # - ``location`` is first keyword (and positional) argument
     #
     # - ``add_slash`` argument is no longer accepted:  code that passes
     #   add_slash argument to the constructor will receive an exception.
     explanation = 'The resource has been moved to'
     body_template_obj = Template('''\
-${explanation} ${location};
-you should be redirected automatically.
+${explanation} ${location}; you should be redirected automatically.
 ${detail}
 ${html_comment}''')
 
-    def __init__(self, detail=None, headers=None, comment=None,
-                 body_template=None, location='', **kw):
+    def __init__(self, location='', detail=None, headers=None, comment=None,
+                 body_template=None, **kw):
         super(_HTTPMove, self).__init__(
             detail=detail, headers=headers, comment=comment,
             body_template=body_template, location=location, **kw)
@@ -637,10 +643,12 @@ class HTTPMethodNotAllowed(HTTPClientError):
     """
     # differences from webob.exc.HTTPMethodNotAllowed:
     #
-    # - body_template_obj not overridden (it tried to use request environ's
-    #   REQUEST_METHOD)
+    # - body_template_obj uses ${br} instead of <br />
     code = 405
     title = 'Method Not Allowed'
+    body_template_obj = Template('''\
+The method ${REQUEST_METHOD} is not allowed for this resource. ${br}${br}
+${detail}''')
 
 class HTTPNotAcceptable(HTTPClientError):
     """
@@ -655,8 +663,7 @@ class HTTPNotAcceptable(HTTPClientError):
     """
     # differences from webob.exc.HTTPNotAcceptable:
     #
-    # - body_template_obj not overridden (it tried to use request environ's
-    #   HTTP_ACCEPT)
+    # - "template" attribute left off (useless, bug in webob?)
     code = 406
     title = 'Not Acceptable'
 
@@ -782,8 +789,7 @@ class HTTPUnsupportedMediaType(HTTPClientError):
     """
     # differences from webob.exc.HTTPUnsupportedMediaType:
     #
-    # - body_template_obj not overridden (it tried to use request environ's
-    #   CONTENT_TYPE)
+    # - "template_obj" attribute left off (useless, bug in webob?)
     code = 415
     title = 'Unsupported Media Type'
 
@@ -898,8 +904,7 @@ class HTTPNotImplemented(HTTPServerError):
     """
     # differences from webob.exc.HTTPNotAcceptable:
     #
-    # - body_template_obj not overridden (it tried to use request environ's
-    #   REQUEST_METHOD)
+    # - "template" attr left off (useless, bug in webob?)
     code = 501
     title = 'Not Implemented'
 
@@ -992,6 +997,7 @@ def default_exceptionresponse_view(context, request):
     return context
 
 status_map={}
+code = None
 for name, value in globals().items():
     if (isinstance(value, (type, types.ClassType)) and
         issubclass(value, HTTPException)
@@ -999,7 +1005,4 @@ for name, value in globals().items():
         code = getattr(value, 'code', None)
         if code:
             status_map[code] = value
-del name, value
-
-
-
+del name, value, code
