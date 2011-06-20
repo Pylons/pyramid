@@ -142,8 +142,8 @@ Minor Feature Additions
 - :class:`pyramid.exceptions.NotFound` is now just an alias for
   :class:`pyramid.httpexceptions.HTTPNotFound`.
 
-- :class:`pyramid.exceptions.NotFound` is now just an alias for
-  :class:`pyramid.httpexceptions.HTTPNotFound`.
+- :class:`pyramid.exceptions.Forbidden` is now just an alias for
+  :class:`pyramid.httpexceptions.HTTPForbidden`.
 
 Backwards Incompatibilities
 ---------------------------
