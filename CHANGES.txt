@@ -563,6 +563,11 @@ Deprecations
 Backwards Incompatibilities
 ---------------------------
 
+- Using ``testing.setUp`` now registers an ISettings utility as a side
+  effect.  Some test code which queries for this utility after
+  ``testing.setUp`` via queryAdapter will expect a return value of ``None``.
+  This code will need to be changed.
+
 - When a ``pyramid.exceptions.Forbidden`` error is raised, its status code
   now ``403 Forbidden``.  It was previously ``401 Unauthorized``, for
   backwards compatibility purposes with ``repoze.bfg``.  This change will
