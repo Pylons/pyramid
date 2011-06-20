@@ -994,7 +994,7 @@ def default_exceptionresponse_view(context, request):
         # config.set_notfound_view or config.set_forbidden_view
         # instead of as a proper exception view
         context = request.exception or context
-    return context
+    return context # assumed to be an IResponse
 
 status_map={}
 code = None

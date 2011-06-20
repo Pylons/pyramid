@@ -59,7 +59,7 @@ Here's some sample code that implements a minimal NotFound view callable:
    :term:`request`.  The ``exception`` attribute of the request will be an
    instance of the :exc:`~pyramid.httpexceptions.HTTPNotFound` exception that
    caused the not found view to be called.  The value of
-   ``request.exception.args[0]`` will be a value explaining why the not found
+   ``request.exception.message`` will be a value explaining why the not found
    error was raised.  This message will be different when the
    ``debug_notfound`` environment setting is true than it is when it is
    false.
@@ -125,8 +125,9 @@ Here's some sample code that implements a minimal forbidden view:
    :term:`request`.  The ``exception`` attribute of the request will be an
    instance of the :exc:`~pyramid.httpexceptions.HTTPForbidden` exception
    that caused the forbidden view to be called.  The value of
-   ``request.exception.args[0]`` will be a value explaining why the forbidden
-   was raised.  This message will be different when the
+   ``request.exception.message`` will be a value explaining why the forbidden
+   was raised and ``request.exception.result`` will be extended information
+   about the forbidden exception.  These messages will be different when the
    ``debug_authorization`` environment setting is true than it is when it is
    false.
 

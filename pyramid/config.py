@@ -713,6 +713,8 @@ class Configurator(object):
         self._set_root_factory(root_factory)
         # cope with WebOb response objects that aren't decorated with IResponse
         from webob import Response as WebobResponse
+        # cope with WebOb exc objects not decoratored with IExceptionResponse
+        from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
         registry.registerSelfAdapter((WebobResponse,), IResponse)
         debug_logger = self.maybe_dotted(debug_logger)
         if debug_logger is None:
@@ -726,6 +728,7 @@ class Configurator(object):
         if exceptionresponse_view is not None:
             exceptionresponse_view = self.maybe_dotted(exceptionresponse_view)
             self.add_view(exceptionresponse_view, context=IExceptionResponse)
+            self.add_view(exceptionresponse_view,context=WebobWSGIHTTPException)
         if locale_negotiator:
             locale_negotiator = self.maybe_dotted(locale_negotiator)
             registry.registerUtility(locale_negotiator, ILocaleNegotiator)

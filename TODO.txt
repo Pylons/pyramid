@@ -4,11 +4,6 @@ Pyramid TODOs
 Must-Have
 ---------
 
-- Grep for IExceptionResponse, forgot what it does.
-
-- Docs mention ``exception.args[0]`` as a way to get messages; check that
-  this works.
-
 - Deprecate response_foo attrs on request at attribute set time rather than
   lookup time.
 

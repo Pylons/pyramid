@@ -339,6 +339,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(reg.has_listeners, True)
 
     def test_setup_registry_registers_default_exceptionresponse_view(self):
+        from webob.exc import WSGIHTTPException
         from pyramid.interfaces import IExceptionResponse
         from pyramid.view import default_exceptionresponse_view
         reg = DummyRegistry()
@@ -348,6 +349,8 @@ class ConfiguratorTests(unittest.TestCase):
         config.setup_registry()
         self.assertEqual(views[0], ((default_exceptionresponse_view,),
                                     {'context':IExceptionResponse}))
+        self.assertEqual(views[1], ((default_exceptionresponse_view,),
+                                    {'context':WSGIHTTPException}))
 
     def test_setup_registry_registers_default_webob_iresponse_adapter(self):
         from webob import Response
