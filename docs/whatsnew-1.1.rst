@@ -40,8 +40,8 @@ The major feature additions in Pyramid 1.1 are:
 
 - A new paster command named ``paster pviews`` was added.  This command
   prints a summary of potentially matching views for a given path.  See
-  documentation the section entitled :ref:`displaying_matching_views` for
-  more information.
+  the section entitled :ref:`displaying_matching_views` for more
+  information.
 
 Static Routes
 ~~~~~~~~~~~~~
