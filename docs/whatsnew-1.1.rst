@@ -7,6 +7,15 @@ incompatibilities between the two versions and deprecations added to Pyramid
 1.1, as well as software dependency changes and notable documentation
 additions.
 
+Terminology Changes
+-------------------
+
+The term "template" used by the Pyramid documentation used to refer to both
+"paster templates" and "rendered templates" (templates created by a rendering
+engine.  i.e. Mako, Chameleon, Jinja, etc.).  "Paster templates" will now be
+refered to as "scaffolds", whereas the name for "rendered templates" will
+remain as "templates."
+
 Major Feature Additions
 -----------------------
 
@@ -23,17 +32,28 @@ The major feature additions in Pyramid 1.1 are:
 ``request.response``
 ~~~~~~~~~~~~~~~~~~~~
 
-- Accessing the ``response`` attribute of a :class:`pyramid.request.Request`
-  object (e.g. ``request.response`` within a view) now produces a new
-  :class:`pyramid.response.Response` object.  This feature is meant to be
-  used mainly when a view configured with a renderer needs to set response
-  attributes: all renderers will use the Response object implied by
-  ``request.response`` as the response object returned to the router.
+- Instances of the :class:`pyramid.request.Request` class now have a
+  ``response`` attribute.
 
-  ``request.response`` can also be used by code in a view that does not use a
-  renderer, however the response object that is produced by
-  ``request.response`` must be returned when a renderer is not in play (it is
-  not a "global" response).
+  The object passed to a view callable as ``request`` is an instance of
+  :class:`pyramid.request.Request`. ``request.response`` is an instance of
+  the class :class:`pyramid.request.Response`.  View callables that are
+  configured with a :term:`renderer` will return this response object to the
+  Pyramid router.  Therefore, code in a renderer-using view callable can set
+  response attributes such as ``request.response.content_type`` (before they
+  return, e.g. a dictionary to the renderer) and this will influence the HTTP
+  return value of the view callable.
+
+  ``request.response`` can also be used in view callable code that is not
+  configured to use a renderer.  For example, a view callable might do
+  ``request.response.body = '123'; return request.response``.  However, the
+  response object that is produced by ``request.response`` must be *returned*
+  when a renderer is not in play in order to have any effect on the HTTP
+  response (it is not a "global" response, and modifications to it are not
+  somehow merged into a separately returned response object).
+
+  The ``request.response`` object is lazily created, so its introduction does
+  not negatively impact performance.
 
 ``paster pviews``
 ~~~~~~~~~~~~~~~~~
@@ -320,11 +340,6 @@ Dependency Changes
 
 Documentation Enhancements
 --------------------------
-
-- The term "template" used to refer to both "paster templates" and "rendered
-  templates" (templates created by a rendering engine.  i.e. Mako, Chameleon,
-  Jinja, etc.).  "Paster templates" will now be refered to as "scaffolds",
-  whereas the name for "rendered templates" will remain as "templates."
 
 - The :ref:`bfg_wiki_tutorial` was updated slightly.
 
