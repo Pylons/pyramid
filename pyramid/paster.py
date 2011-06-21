@@ -2,10 +2,18 @@ import os
 import sys
 from code import interact
 
+import zope.deprecation
+
 from paste.deploy import loadapp
 from paste.script.command import Command
 
 from pyramid.scripting import get_root
+
+from pyramid.scaffolds import PyramidTemplate # bw compat
+zope.deprecation.deprecated(
+    'PyramidTemplate', ('pyramid.paster.PyramidTemplate was moved to '
+                        'pyramid.scaffolds.PyramidTemplate in Pyramid 1.1'),
+)
 
 def get_app(config_file, name, loadapp=loadapp):
     """ Return the WSGI application named ``name`` in the PasteDeploy
