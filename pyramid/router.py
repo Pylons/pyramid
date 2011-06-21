@@ -56,8 +56,11 @@ class Router(object):
         registry = self.registry
         adapters = registry.adapters
         has_listeners = registry.has_listeners
+        notify = registry.notify
         logger = self.logger
         manager = self.threadlocal_manager
+        routes_mapper = self.routes_mapper
+        debug_routematch = self.debug_routematch
         request = None
         threadlocals = {'registry':registry, 'request':request}
         manager.push(threadlocals)
@@ -75,14 +78,14 @@ class Router(object):
                 request_iface = IRequest
 
                 try: # matches except Exception (exception view execution)
-                    has_listeners and registry.notify(NewRequest(request))
+                    has_listeners and notify(NewRequest(request))
                     # find the root object
                     root_factory = self.root_factory
-                    if self.routes_mapper is not None:
-                        info = self.routes_mapper(request)
+                    if routes_mapper is not None:
+                        info = routes_mapper(request)
                         match, route = info['match'], info['route']
                         if route is None:
-                            if self.debug_routematch:
+                            if debug_routematch:
                                 msg = ('no route matched for url %s' %
                                        request.url)
                                 logger and logger.debug(msg)
@@ -96,7 +99,7 @@ class Router(object):
                             attrs['matchdict'] = match
                             attrs['matched_route'] = route
 
-                            if self.debug_routematch:
+                            if debug_routematch:
                                 msg = (
                                     'route matched for url %s; '
                                     'route_name: %r, '
@@ -131,7 +134,7 @@ class Router(object):
                         tdict['traversed'], tdict['virtual_root'],
                         tdict['virtual_root_path'])
                     attrs.update(tdict)
-                    has_listeners and registry.notify(ContextFound(request))
+                    has_listeners and notify(ContextFound(request))
 
                     # find a view callable
                     context_iface = providedBy(context)
@@ -179,7 +182,7 @@ class Router(object):
                         'Could not convert view return value "%s" into a '
                         'response object' % (result,))
 
-                has_listeners and registry.notify(NewResponse(request,response))
+                has_listeners and notify(NewResponse(request, response))
 
                 if request.response_callbacks:
                     request._process_response_callbacks(response)
