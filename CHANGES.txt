@@ -1,6 +1,13 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
+- 1.1a1 broke Akhet by not providing a backwards compatibility import shim
+  for ``pyramid.paster.PyramidTemplate``.  Now one has been added, although a
+  deprecation warning is raised.
+
 Backwards Incompatibilities
 ---------------------------
 
