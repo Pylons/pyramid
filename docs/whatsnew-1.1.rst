@@ -40,8 +40,8 @@ The major feature additions in Pyramid 1.1 are:
 
 - A new paster command named ``paster pviews`` was added.  This command
   prints a summary of potentially matching views for a given path.  See
-  documentation the section entitled :ref:`displaying_matching_views` for
-  more information.
+  the section entitled :ref:`displaying_matching_views` for more
+  information.
 
 Static Routes
 ~~~~~~~~~~~~~
@@ -273,10 +273,10 @@ Deprecations and Behavior Differences
 
 - Previously, :class:`pyramid.request.Request` inherited from
   :class:`webob.request.Request` and implemented ``__getattr__``,
-  ``__setattr__`` and ``__delattr__`` itself in order to overidde "adhoc
+  ``__setattr__`` and ``__delattr__`` itself in order to override "adhoc
   attr" WebOb behavior where attributes of the request are stored in the
-  environ.  Now, :class:`pyramid.request.Request inherits from (the more
-  recent) :class:`webob.request.BaseRequest`` instead of
+  environ.  Now, :class:`pyramid.request.Request` inherits from (the more
+  recent) :class:`webob.request.BaseRequest` instead of
   :class:`webob.request.Request`, which provides the same behavior.
   :class:`pyramid.request.Request` no longer implements its own
   ``__getattr__``, ``__setattr__`` or ``__delattr__`` as a result.
