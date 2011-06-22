@@ -8,6 +8,19 @@ Bug Fixes
   for ``pyramid.paster.PyramidTemplate``.  Now one has been added, although a
   deprecation warning is raised.
 
+- If multiple specs were provided in a single call to
+  ``config.add_translation_dirs``, the directories were inserted into the
+  beginning of the directory list in the wrong order: they were inserted in
+  the reverse of the order they were provided in the ``*specs`` list (items
+  later in the list trumped ones earlier in the list).  This is now fixed.
+
+  Note however, that later calls to ``config.add_translation_dirs`` continue
+  to insert directories into the beginning of the list of translation
+  directories created by earlier calls.  This means that the same translation
+  found in a directory added via ``add_translation_dirs`` later in the
+  configuration process will be found before one added earlier via a separate
+  call to ``add_translation_dirs`` in the configuration process.
+
 Backwards Incompatibilities
 ---------------------------
 

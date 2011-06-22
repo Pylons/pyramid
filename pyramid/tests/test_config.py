@@ -2499,6 +2499,32 @@ class ConfiguratorTests(unittest.TestCase):
         result = config.registry.getUtility(ITranslationDirectories)
         self.assertEqual(result, [locale, 'abc'])
 
+    def test_add_translation_dirs_multiple_specs(self):
+        import os
+        from pyramid.interfaces import ITranslationDirectories
+        config = self._makeOne(autocommit=True)
+        config.add_translation_dirs('pyramid.tests.localeapp:locale',
+                                    'pyramid.tests.localeapp:locale2')
+        here = os.path.dirname(__file__)
+        locale = os.path.join(here, 'localeapp', 'locale')
+        locale2 = os.path.join(here, 'localeapp', 'locale2')
+        self.assertEqual(config.registry.getUtility(ITranslationDirectories),
+                         [locale, locale2])
+
+    def test_add_translation_dirs_multiple_specs_multiple_calls(self):
+        import os
+        from pyramid.interfaces import ITranslationDirectories
+        config = self._makeOne(autocommit=True)
+        config.add_translation_dirs('pyramid.tests.localeapp:locale',
+                                    'pyramid.tests.localeapp:locale2')
+        config.add_translation_dirs('pyramid.tests.localeapp:locale3')
+        here = os.path.dirname(__file__)
+        locale = os.path.join(here, 'localeapp', 'locale')
+        locale2 = os.path.join(here, 'localeapp', 'locale2')
+        locale3 = os.path.join(here, 'localeapp', 'locale3')
+        self.assertEqual(config.registry.getUtility(ITranslationDirectories),
+                         [locale3, locale, locale2])
+
     def test_add_translation_dirs_registers_chameleon_translate(self):
         from pyramid.interfaces import IChameleonTranslate
         from pyramid.threadlocal import manager

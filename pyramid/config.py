@@ -2245,8 +2245,17 @@ class Configurator(object):
            config.add_translation_dirs('/usr/share/locale',
                                        'some.package:locale')
 
+        Later calls to ``add_translation_dir`` insert directories into the
+        beginning of the list of translation directories created by earlier
+        calls.  This means that the same translation found in a directory
+        added later in the configuration process will be found before one
+        added earlier in the configuration process.  However, if multiple
+        specs are provided in a single call to ``add_translation_dirs``, the
+        directories will be inserted into the beginning of the directory list
+        in the order they're provided in the ``*specs`` list argument (items
+        earlier in the list trump ones later in the list).
         """
-        for spec in specs:
+        for spec in specs[::-1]: # reversed
 
             package_name, filename = self._split_spec(spec)
             if package_name is None: # absolute filename
