@@ -12,14 +12,14 @@ Bug Fixes
   ``config.add_translation_dirs``, the directories were inserted into the
   beginning of the directory list in the wrong order: they were inserted in
   the reverse of the order they were provided in the ``*specs`` list (items
-  later in the list trumped ones earlier in the list).  This is now fixed.
+  later in the list were added before ones earlier in the list).  This is now
+  fixed.
 
   Note however, that later calls to ``config.add_translation_dirs`` continue
   to insert directories into the beginning of the list of translation
-  directories created by earlier calls.  This means that the same translation
-  found in a directory added via ``add_translation_dirs`` later in the
-  configuration process will be found before one added earlier via a separate
-  call to ``add_translation_dirs`` in the configuration process.
+  directories created by earlier calls.  This means that messages defined in
+  catalogs added earlier via ``add_translation_dirs`` take precedence over
+  the ones in catalogs added later.
 
 Backwards Incompatibilities
 ---------------------------
