@@ -199,6 +199,32 @@ Backwards Incompatibilities
   pyramid.httpexceptions.HTTPFound(location='http//foo')`` (the latter will
   of course continue to work).
 
+- The pyramid Router attempted to set a value into the key
+  ``environ['repoze.bfg.message']`` when it caught a view-related exception
+  for backwards compatibility with applications written for :mod:`repoze.bfg`
+  during error handling.  It did this by using code that looked like so::
+
+                    # "why" is an exception object
+                    try: 
+                        msg = why[0]
+                    except:
+                        msg = ''
+
+                    environ['repoze.bfg.message'] = msg
+
+  Use of the value ``environ['repoze.bfg.message']`` was docs-deprecated in
+  Pyramid 1.0.  Our standing policy is to not remove features after a
+  deprecation for two full major releases, so this code was originally slated
+  to be removed in Pyramid 1.2.  However, computing the
+  ``repoze.bfg.message`` value was the source of at least one bug found in
+  the wild (https://github.com/Pylons/pyramid/issues/199), and there isn't a
+  foolproof way to both preserve backwards compatibility and to fix the bug.
+  Therefore, the code which sets the value has been removed in this release.
+  Code in exception views which relies on this value's presence in the
+  environment should now use the ``exception`` attribute of the request
+  (e.g. ``request.exception[0]``) to retrieve the message instead of relying
+  on ``request.environ['repoze.bfg.message']``.
+
 Deprecations and Behavior Differences
 -------------------------------------
 

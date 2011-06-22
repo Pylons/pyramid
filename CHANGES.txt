@@ -1,12 +1,12 @@
-Next release
-============
+1.1a2 (2011-06-22)
+==================
 
 Bug Fixes
 ---------
 
 - 1.1a1 broke Akhet by not providing a backwards compatibility import shim
   for ``pyramid.paster.PyramidTemplate``.  Now one has been added, although a
-  deprecation warning is raised.
+  deprecation warning is emitted when Akhet imports it.
 
 - If multiple specs were provided in a single call to
   ``config.add_translation_dirs``, the directories were inserted into the
@@ -20,8 +20,8 @@ Backwards Incompatibilities
 
 - The pyramid Router attempted to set a value into the key
   ``environ['repoze.bfg.message']`` when it caught a view-related exception
-  for backwards compatibility with :mod:`repoze.bfg` during error handling.
-  It did this by using code that looked like so::
+  for backwards compatibility with applications written for ``repoze.bfg``
+  during error handling.  It did this by using code that looked like so::
 
                     # "why" is an exception object
                     try: 

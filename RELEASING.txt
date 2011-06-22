@@ -13,7 +13,7 @@ Releasing Pyramid
   communicate with contributors).
 
 - Copy relevant changes (delta bug fixes) from CHANGES.txt to
-  docs/whatsnew-X.X.
+  docs/whatsnew-X.X (if it's a major release).
 
 - Make sure docs render OK::
 
