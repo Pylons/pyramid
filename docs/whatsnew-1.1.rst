@@ -241,7 +241,7 @@ Deprecations and Behavior Differences
   spelled::
 
      config.add_route('home', '/')
-     config.add_view('mypackage.views.myview', route_name='home')
+     config.add_view('mypackage.views.myview', route_name='home',
                      renderer='some/renderer.pt')
 
   This deprecation was done to reduce confusion observed in IRC, as well as
