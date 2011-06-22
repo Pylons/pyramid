@@ -278,12 +278,14 @@ Deprecations and Behavior Differences
 
 - The JSON and string renderer factories now assign to
   ``request.response.content_type`` rather than
-  ``request.response_content_type``.  Each renderer factory determines
-  whether it should change the content type of the response by comparing the
-  response's content type against the response's default content type; if the
-  content type is not the default content type (usually ``text/html``), the
-  renderer changes the content type (to ``application/json`` or
-  ``text/plain`` for JSON and string renderers respectively).
+  ``request.response_content_type``.
+
+- Each built-in renderer factory now determines whether it should change the
+  content type of the response by comparing the response's content type
+  against the response's default content type; if the content type is the
+  default content type (usually ``text/html``), the renderer changes the
+  content type (to ``application/json`` or ``text/plain`` for JSON and string
+  renderers respectively).
 
 - The :func:`pyramid.wsgi.wsgiapp2` now uses a slightly different method of
   figuring out how to "fix" ``SCRIPT_NAME`` and ``PATH_INFO`` for the
