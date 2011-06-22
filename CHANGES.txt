@@ -15,12 +15,6 @@ Bug Fixes
   later in the list were added before ones earlier in the list).  This is now
   fixed.
 
-  Note however, that later calls to ``config.add_translation_dirs`` continue
-  to insert directories into the beginning of the list of translation
-  directories created by earlier calls.  This means that messages defined in
-  catalogs added earlier via ``add_translation_dirs`` take precedence over
-  the ones in catalogs added later.
-
 Backwards Incompatibilities
 ---------------------------
 
