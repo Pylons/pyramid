@@ -5218,14 +5218,12 @@ class DummyCustomPredicate(object):
     def __init__(self):
         self.__text__ = 'custom predicate'
 
-    def classmethod_predicate(*args):
-        pass
+    def classmethod_predicate(*args): pass
     classmethod_predicate.__text__ = 'classmethod predicate'
     classmethod_predicate = classmethod(classmethod_predicate)
 
     @classmethod
-    def classmethod_predicate_no_text(*args):
-        pass
+    def classmethod_predicate_no_text(*args): pass # pragma: no cover
 
 def dummy_view(request):
     return 'OK'

@@ -2699,7 +2699,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
                     # if this happens the predicate is probably a classmethod
                     if hasattr(predicate, '__func__'):
                         predicate.__func__.__text__ = text
-                    else: # 2.5 doesn't have __func__
+                    else: # # pragma: no cover ; 2.5 doesn't have __func__ 
                         predicate.im_func.__text__ = text
             predicates.append(predicate)
             # using hash() here rather than id() is intentional: we
