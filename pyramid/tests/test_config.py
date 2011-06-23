@@ -4626,7 +4626,9 @@ class Test__make_predicates(unittest.TestCase):
             accept='accept',
             containment='containment',
             request_type='request_type',
-            custom=(DummyCustomPredicate(),))
+            custom=(DummyCustomPredicate(),
+                    DummyCustomPredicate.classmethod_predicate,
+                    DummyCustomPredicate.classmethod_predicate_no_text))
         self.assertEqual(predicates[0].__text__, 'xhr = True')
         self.assertEqual(predicates[1].__text__,
                          'request method = request_method')
@@ -4637,6 +4639,8 @@ class Test__make_predicates(unittest.TestCase):
         self.assertEqual(predicates[6].__text__, 'containment = containment')
         self.assertEqual(predicates[7].__text__, 'request_type = request_type')
         self.assertEqual(predicates[8].__text__, 'custom predicate')
+        self.assertEqual(predicates[9].__text__, 'classmethod predicate')
+        self.assertEqual(predicates[10].__text__, '<unknown custom predicate>')
 
 class TestMultiView(unittest.TestCase):
     def _getTargetClass(self):
@@ -5213,6 +5217,15 @@ class DummyStaticURLInfo:
 class DummyCustomPredicate(object):
     def __init__(self):
         self.__text__ = 'custom predicate'
+
+    def classmethod_predicate(*args):
+        pass
+    classmethod_predicate.__text__ = 'classmethod predicate'
+    classmethod_predicate = classmethod(classmethod_predicate)
+
+    @classmethod
+    def classmethod_predicate_no_text(*args):
+        pass
 
 def dummy_view(request):
     return 'OK'
