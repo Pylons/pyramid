@@ -8,6 +8,9 @@ Bug fixes
   to set a ``__text__`` attribute on a custom predicate that was actually a
   classmethod.  See https://github.com/Pylons/pyramid/pull/217 .
 
+- Accessing or setting deprecated response_* attrs on request
+  (e.g. ``response_content_type``) now issues a deprecation warning at access
+  time rather than at rendering time.
 
 1.1a2 (2011-06-22)
 ==================

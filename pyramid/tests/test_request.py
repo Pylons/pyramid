@@ -236,20 +236,21 @@ class TestRequest(unittest.TestCase):
 class TestRequestDeprecatedMethods(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
-        self.config.begin()
-        import warnings
-        warnings.filterwarnings('ignore')
+        from zope.deprecation import __show__
+        __show__.off()
 
     def tearDown(self):
         testing.tearDown()
-        import warnings
-        warnings.resetwarnings()
+        from zope.deprecation import __show__
+        __show__.on()
 
     def _getTargetClass(self):
         from pyramid.request import Request
         return Request
 
-    def _makeOne(self, environ):
+    def _makeOne(self, environ=None):
+        if environ is None:
+            environ = {}
         return self._getTargetClass()(environ)
 
     def test___contains__(self):
@@ -348,6 +349,46 @@ class TestRequestDeprecatedMethods(unittest.TestCase):
         inst = self._makeOne(environ)
         result = inst.values()
         self.assertEqual(result, environ.values())
+
+    def test_response_content_type(self):
+        inst = self._makeOne()
+        self.assertFalse(hasattr(inst, 'response_content_type'))
+        inst.response_content_type = 'abc'
+        self.assertEqual(inst.response_content_type, 'abc')
+        del inst.response_content_type
+        self.assertFalse(hasattr(inst, 'response_content_type'))
+
+    def test_response_headerlist(self):
+        inst = self._makeOne()
+        self.assertFalse(hasattr(inst, 'response_headerlist'))
+        inst.response_headerlist = 'abc'
+        self.assertEqual(inst.response_headerlist, 'abc')
+        del inst.response_headerlist
+        self.assertFalse(hasattr(inst, 'response_headerlist'))
+
+    def test_response_status(self):
+        inst = self._makeOne()
+        self.assertFalse(hasattr(inst, 'response_status'))
+        inst.response_status = 'abc'
+        self.assertEqual(inst.response_status, 'abc')
+        del inst.response_status
+        self.assertFalse(hasattr(inst, 'response_status'))
+
+    def test_response_charset(self):
+        inst = self._makeOne()
+        self.assertFalse(hasattr(inst, 'response_charset'))
+        inst.response_charset = 'abc'
+        self.assertEqual(inst.response_charset, 'abc')
+        del inst.response_charset
+        self.assertFalse(hasattr(inst, 'response_charset'))
+
+    def test_response_cache_for(self):
+        inst = self._makeOne()
+        self.assertFalse(hasattr(inst, 'response_cache_for'))
+        inst.response_cache_for = 'abc'
+        self.assertEqual(inst.response_cache_for, 'abc')
+        del inst.response_cache_for
+        self.assertFalse(hasattr(inst, 'response_cache_for'))
 
 class Test_route_request_iface(unittest.TestCase):
     def _callFUT(self, name):

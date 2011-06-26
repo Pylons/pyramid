@@ -4,9 +4,6 @@ Pyramid TODOs
 Must-Have
 ---------
 
-- Deprecate response_foo attrs on request at attribute set time rather than
-  lookup time.
-
 - Investigate mod_wsgi tutorial to make sure it still works (2 reports say
   no; application package not found).
 

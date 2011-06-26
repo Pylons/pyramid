@@ -1,4 +1,5 @@
 from zope.deprecation import deprecate
+from zope.deprecation.deprecation import deprecated
 from zope.interface import implements
 from zope.interface.interface import InterfaceClass
 
@@ -12,7 +13,6 @@ from pyramid.interfaces import IResponseFactory
 from pyramid.exceptions import ConfigurationError
 from pyramid.decorator import reify
 from pyramid.response import Response
-from pyramid.threadlocal import get_current_registry
 from pyramid.url import resource_url
 from pyramid.url import route_url
 from pyramid.url import static_url
@@ -408,6 +408,83 @@ class Request(BaseRequest):
     @deprecate(dictlike)
     def values(self):
         return self.environ.values()
+
+    # 1.0 deprecated bw compat code for using response_* values
+
+    rr_dep = ('Accessing and setting "request.response_%s" is '
+              'deprecated as of Pyramid 1.1; access or set '
+              '"request.response.%s" instead.')
+
+    # response_content_type
+    def _response_content_type_get(self):
+        return self._response_content_type
+    def _response_content_type_set(self, value):
+        self._response_content_type = value
+    def _response_content_type_del(self):
+        del self._response_content_type
+    response_content_type = property(_response_content_type_get,
+                                     _response_content_type_set,
+                                     _response_content_type_del)
+    response_content_type = deprecated(
+        response_content_type,
+        rr_dep % ('content_type', 'content_type'))
+
+    # response_headerlist
+    def _response_headerlist_get(self):
+        return self._response_headerlist
+    def _response_headerlist_set(self, value):
+        self._response_headerlist = value
+    def _response_headerlist_del(self):
+        del self._response_headerlist
+    response_headerlist = property(_response_headerlist_get,
+                                   _response_headerlist_set,
+                                   _response_headerlist_del)
+    response_headerlist = deprecated(
+        response_headerlist,
+        rr_dep % ('headerlist', 'headerlist'))
+
+    # response_status
+    def _response_status_get(self):
+        return self._response_status
+    def _response_status_set(self, value):
+        self._response_status = value
+    def _response_status_del(self):
+        del self._response_status
+    response_status = property(_response_status_get,
+                               _response_status_set,
+                               _response_status_del)
+
+    response_status = deprecated(
+        response_status,
+        rr_dep % ('status', 'status'))
+
+    # response_charset
+    def _response_charset_get(self):
+        return self._response_charset
+    def _response_charset_set(self, value):
+        self._response_charset = value
+    def _response_charset_del(self):
+        del self._response_charset
+    response_charset = property(_response_charset_get,
+                                _response_charset_set,
+                                _response_charset_del)
+    response_charset = deprecated(
+        response_charset,
+        rr_dep % ('charset', 'charset'))
+
+    # response_cache_for
+    def _response_cache_for_get(self):
+        return self._response_cache_for
+    def _response_cache_for_set(self, value):
+        self._response_cache_for = value
+    def _response_cache_for_del(self):
+        del self._response_cache_for
+    response_cache_for = property(_response_cache_for_get,
+                                  _response_cache_for_set,
+                                  _response_cache_for_del)
+    response_cache_for = deprecated(
+        response_cache_for,
+        rr_dep % ('cache_for', 'cache_expires'))
 
 def route_request_iface(name, bases=()):
     iface = InterfaceClass('%s_IRequest' % name, bases=bases)
