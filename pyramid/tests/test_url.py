@@ -1,13 +1,14 @@
 import unittest
 
-from pyramid.testing import cleanUp
+from pyramid.testing import setUp
+from pyramid.testing import tearDown
 
 class ResourceURLTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        setUp()
 
     def tearDown(self):
-        cleanUp()
+        tearDown()
         
     def _callFUT(self, resource, request, *elements, **kw):
         from pyramid.url import resource_url
@@ -146,10 +147,10 @@ class ResourceURLTests(unittest.TestCase):
 
 class TestRouteUrl(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        self.config = setUp()
 
     def tearDown(self):
-        cleanUp()
+        tearDown()
         
     def _callFUT(self, *arg, **kw):
         from pyramid.url import route_url
@@ -264,12 +265,25 @@ class TestRouteUrl(unittest.TestCase):
         self.assertEqual(result,
                          'http://example2.com/1/2/3/element1?q=1#anchor')
 
+    def test_integration_with_real_request(self):
+        # to try to replicate https://github.com/Pylons/pyramid/issues/213
+        from pyramid.interfaces import IRoutesMapper
+        from pyramid.request import Request
+        request = Request.blank('/')
+        request.registry = self.config.registry
+        mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = self._callFUT('flub', request, 'extra1', 'extra2')
+        self.assertEqual(result,
+                         'http://localhost/1/2/3/extra1/extra2')
+        
+
 class TestCurrentRouteUrl(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        setUp()
 
     def tearDown(self):
-        cleanUp()
+        tearDown()
         
     def _callFUT(self, *arg, **kw):
         from pyramid.url import current_route_url
@@ -307,10 +321,10 @@ class TestCurrentRouteUrl(unittest.TestCase):
 
 class TestRoutePath(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        setUp()
 
     def tearDown(self):
-        cleanUp()
+        tearDown()
         
     def _callFUT(self, *arg, **kw):
         from pyramid.url import route_path
@@ -339,10 +353,10 @@ class TestRoutePath(unittest.TestCase):
         
 class TestStaticUrl(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        setUp()
 
     def tearDown(self):
-        cleanUp()
+        tearDown()
         
     def _callFUT(self, *arg, **kw):
         from pyramid.url import static_url
