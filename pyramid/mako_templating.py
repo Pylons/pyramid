@@ -69,6 +69,7 @@ def renderer_factory(info):
         default_filters = settings.get('mako.default_filters', 'h')
         imports = settings.get('mako.imports', None)
         strict_undefined = settings.get('mako.strict_undefined', 'false')
+        preprocessor = settings.get('mako.preprocessor', None)
         if directories is None:
             raise ConfigurationError(
                 'Mako template used without a ``mako.directories`` setting')
@@ -87,6 +88,10 @@ def renderer_factory(info):
             if not hasattr(imports, '__iter__'):
                 imports = filter(None, imports.splitlines())
         strict_undefined = asbool(strict_undefined)
+        if preprocessor is not None:
+            dotted = DottedNameResolver(info.package)
+            preprocessor = dotted.maybe_resolve(preprocessor)
+            
         
         lookup = PkgResourceTemplateLookup(directories=directories,
                                            module_directory=module_directory,
@@ -95,7 +100,8 @@ def renderer_factory(info):
                                            default_filters=default_filters,
                                            imports=imports,
                                            filesystem_checks=reload_templates,
-                                           strict_undefined=strict_undefined)
+                                           strict_undefined=strict_undefined,
+                                           preprocessor=preprocessor)
         registry_lock.acquire()
         try:
             registry.registerUtility(lookup, IMakoLookup)

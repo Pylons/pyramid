@@ -165,6 +165,10 @@ Minor Feature Additions
 - :class:`pyramid.exceptions.Forbidden` is now just an alias for
   :class:`pyramid.httpexceptions.HTTPForbidden`.
 
+- Added ``mako.preprocessor`` config file parameter; allows for a Mako
+  preprocessor to be specified as a Python callable or Python dotted name.
+  See https://github.com/Pylons/pyramid/pull/183 for rationale.
+
 Backwards Incompatibilities
 ---------------------------
 

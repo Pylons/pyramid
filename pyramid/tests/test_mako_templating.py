@@ -139,6 +139,21 @@ class Test_renderer_factory(Base, unittest.TestCase):
         lookup = self.config.registry.getUtility(IMakoLookup)
         self.assertEqual(lookup.template_args['error_handler'], pyramid.tests)
 
+    def test_with_preprocessor(self):
+        from pyramid.mako_templating import IMakoLookup
+        settings = {'mako.directories':self.templates_dir,
+                    'mako.preprocessor':'pyramid.tests'}
+        import pyramid.tests
+        info = DummyRendererInfo({
+            'name':'helloworld.mak',
+            'package':None,
+            'registry':self.config.registry,
+            'settings':settings,
+            })
+        self._callFUT(info)
+        lookup = self.config.registry.getUtility(IMakoLookup)
+        self.assertEqual(lookup.template_args['preprocessor'], pyramid.tests)
+
     def test_with_default_filters(self):
         from pyramid.mako_templating import IMakoLookup
         settings = {'mako.directories':self.templates_dir,

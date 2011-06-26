@@ -227,11 +227,11 @@ should be changed accordingly.
 Mako Error Handler
 ++++++++++++++++++
 
-Python callable which is called whenever Mako compile or runtime exceptions
-occur. The callable is passed the current context as well as the exception. If
-the callable returns True, the exception is considered to be handled, else it
-is re-raised after the function completes. Is used to provide custom
-error-rendering functions.
+A callable (or a :term:`dotted Python name` which names a callable) which is
+called whenever Mako compile or runtime exceptions occur. The callable is
+passed the current context as well as the exception. If the callable returns
+True, the exception is considered to be handled, else it is re-raised after
+the function completes. Is used to provide custom error-rendering functions.
 
 +-----------------------------+
 | Config File Setting Name    |
@@ -285,6 +285,25 @@ default, this is ``false``.
 | Config File Setting Name    |
 +=============================+
 |  ``mako.strict_undefined``  |
+|                             |
+|                             |
+|                             |
++-----------------------------+
+
+Mako Preprocessor
++++++++++++++++++
+
+A callable (or a :term:`dotted Python name` which names a callable) which is
+called to preprocess the source before the template is called.  The callable
+will be passed the full template source before it is parsed. The return
+result of the callable will be used as the template source code.
+
+.. note:: This feature is new in Pyramid 1.1.
+
++-----------------------------+
+| Config File Setting Name    |
++=============================+
+|  ``mako.preprocessor``      |
 |                             |
 |                             |
 |                             |

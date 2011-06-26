@@ -1,6 +1,13 @@
 Next release
 ============
 
+Features
+--------
+
+- Added ``mako.preprocessor`` config file parameter; allows for a Mako
+  preprocessor to be specified as a Python callable or Python dotted name.
+  See https://github.com/Pylons/pyramid/pull/183 for rationale.
+
 Bug fixes
 ---------
 
