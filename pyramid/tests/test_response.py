@@ -8,10 +8,10 @@ class TestResponse(unittest.TestCase):
     def test_implements_IResponse(self):
         from pyramid.interfaces import IResponse
         cls = self._getTargetClass()
-        self.failUnless(IResponse.implementedBy(cls))
+        self.assertTrue(IResponse.implementedBy(cls))
 
     def test_provides_IResponse(self):
         from pyramid.interfaces import IResponse
         inst = self._getTargetClass()()
-        self.failUnless(IResponse.providedBy(inst))
+        self.assertTrue(IResponse.providedBy(inst))
 
