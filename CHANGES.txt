@@ -1,3 +1,15 @@
+Next release
+============
+
+Bug Fixes
+---------
+
+- ``pyramid.testing.DummyRequest`` now raises deprecation warnings when
+  attributes deprecated for ``pyramid.request.Request`` are accessed (like
+  ``response_content_type``).  This is for the benefit of folks running unit
+  tests which use DummyRequest instead of a "real" request, so they know
+  things are deprecated without necessarily needing a functional test suite.
+
 1.1a3 (2011-06-26)
 ==================
 

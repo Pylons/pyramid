@@ -21,7 +21,164 @@ from pyramid.url import route_path
 class TemplateContext(object):
     pass
 
-class Request(BaseRequest):
+class DeprecatedRequestMethods(object):
+
+    # b/c dict interface for "root factory" code that expects a bare
+    # environ.  Explicitly omitted dict methods: clear (unnecessary),
+    # copy (implemented by WebOb), fromkeys (unnecessary); deprecated
+    # as of Pyramid 1.1.
+
+    dictlike = ('Use of the request as a dict-like object is deprecated as '
+                'of Pyramid 1.1.  Use dict-like methods of "request.environ" '
+                'instead.')
+
+    @deprecate(dictlike)
+    def __contains__(self, k):
+        return self.environ.__contains__(k)
+
+    @deprecate(dictlike)
+    def __delitem__(self, k):
+        return self.environ.__delitem__(k)
+
+    @deprecate(dictlike)
+    def __getitem__(self, k):
+        return self.environ.__getitem__(k)
+
+    @deprecate(dictlike)
+    def __iter__(self):
+        return iter(self.environ)
+
+    @deprecate(dictlike)
+    def __setitem__(self, k, v):
+        self.environ[k] = v
+
+    @deprecate(dictlike)
+    def get(self, k, default=None):
+        return self.environ.get(k, default)
+
+    @deprecate(dictlike)
+    def has_key(self, k):
+        return k in self.environ
+
+    @deprecate(dictlike)
+    def items(self):
+        return self.environ.items()
+
+    @deprecate(dictlike)
+    def iteritems(self):
+        return self.environ.iteritems()
+
+    @deprecate(dictlike)
+    def iterkeys(self):
+        return self.environ.iterkeys()
+
+    @deprecate(dictlike)
+    def itervalues(self):
+        return self.environ.itervalues()
+
+    @deprecate(dictlike)
+    def keys(self):
+        return self.environ.keys()
+
+    @deprecate(dictlike)
+    def pop(self, k):
+        return self.environ.pop(k)
+
+    @deprecate(dictlike)
+    def popitem(self):
+        return self.environ.popitem()
+
+    @deprecate(dictlike)
+    def setdefault(self, v, default):
+        return self.environ.setdefault(v, default)
+
+    @deprecate(dictlike)
+    def update(self, v, **kw):
+        return self.environ.update(v, **kw)
+
+    @deprecate(dictlike)
+    def values(self):
+        return self.environ.values()
+
+    # 1.0 deprecated bw compat code for using response_* values
+
+    rr_dep = ('Accessing and setting "request.response_%s" is '
+              'deprecated as of Pyramid 1.1; access or set '
+              '"request.response.%s" instead.')
+
+    # response_content_type
+    def _response_content_type_get(self):
+        return self._response_content_type
+    def _response_content_type_set(self, value):
+        self._response_content_type = value
+    def _response_content_type_del(self):
+        del self._response_content_type
+    response_content_type = property(_response_content_type_get,
+                                     _response_content_type_set,
+                                     _response_content_type_del)
+    response_content_type = deprecated(
+        response_content_type,
+        rr_dep % ('content_type', 'content_type'))
+
+    # response_headerlist
+    def _response_headerlist_get(self):
+        return self._response_headerlist
+    def _response_headerlist_set(self, value):
+        self._response_headerlist = value
+    def _response_headerlist_del(self):
+        del self._response_headerlist
+    response_headerlist = property(_response_headerlist_get,
+                                   _response_headerlist_set,
+                                   _response_headerlist_del)
+    response_headerlist = deprecated(
+        response_headerlist,
+        rr_dep % ('headerlist', 'headerlist'))
+
+    # response_status
+    def _response_status_get(self):
+        return self._response_status
+    def _response_status_set(self, value):
+        self._response_status = value
+    def _response_status_del(self):
+        del self._response_status
+    response_status = property(_response_status_get,
+                               _response_status_set,
+                               _response_status_del)
+
+    response_status = deprecated(
+        response_status,
+        rr_dep % ('status', 'status'))
+
+    # response_charset
+    def _response_charset_get(self):
+        return self._response_charset
+    def _response_charset_set(self, value):
+        self._response_charset = value
+    def _response_charset_del(self):
+        del self._response_charset
+    response_charset = property(_response_charset_get,
+                                _response_charset_set,
+                                _response_charset_del)
+    response_charset = deprecated(
+        response_charset,
+        rr_dep % ('charset', 'charset'))
+
+    # response_cache_for
+    def _response_cache_for_get(self):
+        return self._response_cache_for
+    def _response_cache_for_set(self, value):
+        self._response_cache_for = value
+    def _response_cache_for_del(self):
+        del self._response_cache_for
+    response_cache_for = property(_response_cache_for_get,
+                                  _response_cache_for_set,
+                                  _response_cache_for_del)
+    response_cache_for = deprecated(
+        response_cache_for,
+        rr_dep % ('cache_for', 'cache_expires'))
+
+
+class Request(BaseRequest, DeprecatedRequestMethods):
     """
     A subclass of the :term:`WebOb` Request class.  An instance of
     this class is created by the :term:`router` and is provided to a
@@ -331,160 +488,6 @@ class Request(BaseRequest):
         if adapted is None:
             return False
         return adapted is ob
-
-    # b/c dict interface for "root factory" code that expects a bare
-    # environ.  Explicitly omitted dict methods: clear (unnecessary),
-    # copy (implemented by WebOb), fromkeys (unnecessary); deprecated
-    # as of Pyramid 1.1.
-
-    dictlike = ('Use of the request as a dict-like object is deprecated as '
-                'of Pyramid 1.1.  Use dict-like methods of "request.environ" '
-                'instead.')
-
-    @deprecate(dictlike)
-    def __contains__(self, k):
-        return self.environ.__contains__(k)
-
-    @deprecate(dictlike)
-    def __delitem__(self, k):
-        return self.environ.__delitem__(k)
-
-    @deprecate(dictlike)
-    def __getitem__(self, k):
-        return self.environ.__getitem__(k)
-
-    @deprecate(dictlike)
-    def __iter__(self):
-        return iter(self.environ)
-
-    @deprecate(dictlike)
-    def __setitem__(self, k, v):
-        self.environ[k] = v
-
-    @deprecate(dictlike)
-    def get(self, k, default=None):
-        return self.environ.get(k, default)
-
-    @deprecate(dictlike)
-    def has_key(self, k):
-        return k in self.environ
-
-    @deprecate(dictlike)
-    def items(self):
-        return self.environ.items()
-
-    @deprecate(dictlike)
-    def iteritems(self):
-        return self.environ.iteritems()
-
-    @deprecate(dictlike)
-    def iterkeys(self):
-        return self.environ.iterkeys()
-
-    @deprecate(dictlike)
-    def itervalues(self):
-        return self.environ.itervalues()
-
-    @deprecate(dictlike)
-    def keys(self):
-        return self.environ.keys()
-
-    @deprecate(dictlike)
-    def pop(self, k):
-        return self.environ.pop(k)
-
-    @deprecate(dictlike)
-    def popitem(self):
-        return self.environ.popitem()
-
-    @deprecate(dictlike)
-    def setdefault(self, v, default):
-        return self.environ.setdefault(v, default)
-
-    @deprecate(dictlike)
-    def update(self, v, **kw):
-        return self.environ.update(v, **kw)
-
-    @deprecate(dictlike)
-    def values(self):
-        return self.environ.values()
-
-    # 1.0 deprecated bw compat code for using response_* values
-
-    rr_dep = ('Accessing and setting "request.response_%s" is '
-              'deprecated as of Pyramid 1.1; access or set '
-              '"request.response.%s" instead.')
-
-    # response_content_type
-    def _response_content_type_get(self):
-        return self._response_content_type
-    def _response_content_type_set(self, value):
-        self._response_content_type = value
-    def _response_content_type_del(self):
-        del self._response_content_type
-    response_content_type = property(_response_content_type_get,
-                                     _response_content_type_set,
-                                     _response_content_type_del)
-    response_content_type = deprecated(
-        response_content_type,
-        rr_dep % ('content_type', 'content_type'))
-
-    # response_headerlist
-    def _response_headerlist_get(self):
-        return self._response_headerlist
-    def _response_headerlist_set(self, value):
-        self._response_headerlist = value
-    def _response_headerlist_del(self):
-        del self._response_headerlist
-    response_headerlist = property(_response_headerlist_get,
-                                   _response_headerlist_set,
-                                   _response_headerlist_del)
-    response_headerlist = deprecated(
-        response_headerlist,
-        rr_dep % ('headerlist', 'headerlist'))
-
-    # response_status
-    def _response_status_get(self):
-        return self._response_status
-    def _response_status_set(self, value):
-        self._response_status = value
-    def _response_status_del(self):
-        del self._response_status
-    response_status = property(_response_status_get,
-                               _response_status_set,
-                               _response_status_del)
-
-    response_status = deprecated(
-        response_status,
-        rr_dep % ('status', 'status'))
-
-    # response_charset
-    def _response_charset_get(self):
-        return self._response_charset
-    def _response_charset_set(self, value):
-        self._response_charset = value
-    def _response_charset_del(self):
-        del self._response_charset
-    response_charset = property(_response_charset_get,
-                                _response_charset_set,
-                                _response_charset_del)
-    response_charset = deprecated(
-        response_charset,
-        rr_dep % ('charset', 'charset'))
-
-    # response_cache_for
-    def _response_cache_for_get(self):
-        return self._response_cache_for
-    def _response_cache_for_set(self, value):
-        self._response_cache_for = value
-    def _response_cache_for_del(self):
-        del self._response_cache_for
-    response_cache_for = property(_response_cache_for_get,
-                                  _response_cache_for_set,
-                                  _response_cache_for_del)
-    response_cache_for = deprecated(
-        response_cache_for,
-        rr_dep % ('cache_for', 'cache_expires'))
 
 def route_request_iface(name, bases=()):
     iface = InterfaceClass('%s_IRequest' % name, bases=bases)

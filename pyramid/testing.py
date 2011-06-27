@@ -25,6 +25,7 @@ from pyramid.security import Everyone
 from pyramid.security import has_permission
 from pyramid.threadlocal import get_current_registry
 from pyramid.threadlocal import manager
+from pyramid.request import DeprecatedRequestMethods
 
 _marker = object()
 
@@ -619,7 +620,7 @@ class DummySession(dict):
     def get_csrf_token(self):
         return self.get('_csrft_', None)
         
-class DummyRequest(object):
+class DummyRequest(DeprecatedRequestMethods):
     """ A DummyRequest object (incompletely) imitates a :term:`request` object.
 
     The ``params``, ``environ``, ``headers``, ``path``, and
