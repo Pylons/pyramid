@@ -1,7 +1,6 @@
 import os
 import pkg_resources
 import threading
-import warnings
 
 from zope.interface import implements
 
