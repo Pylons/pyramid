@@ -9,6 +9,8 @@ Must-Have
 
 - Deprecate ``renderer_global_factory`` arg to Configurator and related.
 
+- Maybe add ``add_renderer_globals`` method to Configurator.
+
 Should-Have
 -----------
 
