@@ -601,6 +601,7 @@ class Configurator(object):
                 context.includepath = _context.includepath + (spec,)
                 context.package = package_of(module)
                 config = self.__class__.with_context(context)
+                config.root_route_name = self.root_route_name
                 c(config)
 
     def with_root_route(self, route_name):
@@ -1561,10 +1562,13 @@ class Configurator(object):
                 root_route_name=route_name)
         return configurator
 
-    def mount(self, function, route_name):
-        function = self.maybe_dotted(function)
+    def mount(self, includeme, route_name):
+        """ mount subapplication on route named ``route_name``.
+        """
+
         config = self.with_root_route(route_name)
-        function(config)
+        config.include(includeme)
+
 
     @action_method
     def add_route(self,
