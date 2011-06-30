@@ -1157,7 +1157,7 @@ class Configurator(object):
 
         request_method
 
-          This value can either be one of the strings ``GET``,
+          This value can be one of the strings ``GET``,
           ``POST``, ``PUT``, ``DELETE``, or ``HEAD`` representing an
           HTTP ``REQUEST_METHOD``.  A view declaration with this
           argument ensures that the view will only be called when the
