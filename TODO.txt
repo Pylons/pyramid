@@ -7,6 +7,8 @@ Must-Have
 - Investigate mod_wsgi tutorial to make sure it still works (2 reports say
   no; application package not found).
 
+- Deprecate ``renderer_global_factory`` arg to Configurator and related.
+
 Should-Have
 -----------
 
