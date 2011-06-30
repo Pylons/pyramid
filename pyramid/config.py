@@ -1550,6 +1550,22 @@ class Configurator(object):
             DeprecationWarning,
             4)
 
+    def with_root_route(self, route_name):
+        mapper = self.get_routes_mapper()
+        route = mapper.get_route(route_name)
+        if route is None:
+            raise ConfigurationError
+        configurator = self.__class__(registry=self.registry,
+                package=self.package,
+                autocommit=self.autocommit,
+                root_route_name=route_name)
+        return configurator
+
+    def mount(self, function, route_name):
+        function = self.maybe_dotted(function)
+        config = self.with_root_route(route_name)
+        function(config)
+
     @action_method
     def add_route(self,
                   name,
