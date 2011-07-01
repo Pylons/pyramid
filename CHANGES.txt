@@ -25,9 +25,9 @@ Deprecations
 Documentation
 -------------
 
-- The Wiki2 tutorial "Tests" chapter had two bugs: it did not tell the user
-  to depend on WebTest, and 2 tests failed as the result of changes to
-  Pyramid itself.  These issues have been fixed.
+- The Wiki and Wiki2 tutorial "Tests" chapters each had two bugs: neither did
+  told the user to depend on WebTest, and 2 tests failed in each as the
+  result of changes to Pyramid itself.  These issues have been fixed.
 
 1.1a3 (2011-06-26)
 ==================

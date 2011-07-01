@@ -52,8 +52,34 @@ Running the Tests
 =================
 
 We can run these tests by using ``setup.py test`` in the same way we did in
-:ref:`running_tests`.  Assuming our shell's current working directory is the
-"tutorial" distribution directory:
+:ref:`running_tests`.  However, first we must edit our ``setup.py`` to
+include a dependency on WebTest, which we've used in our ``tests.py``.
+Change the ``requires`` list in ``setup.py`` to include ``WebTest``.
+
+.. literalinclude:: src/tests/setup.py
+   :linenos:
+   :language: python
+   :lines: 9-18
+
+After we've added a dependency on WebTest in ``setup.py``, we need to rerun
+``setup.py develop`` to get WebTest installed into our virtualenv.  Assuming
+our shell's current working directory is the "tutorial" distribution
+directory:
+
+On UNIX:
+
+.. code-block:: text
+
+   $ ../bin/python setup.py develop
+
+On Windows:
+
+.. code-block:: text
+
+   c:\pyramidtut\tutorial> ..\Scripts\python setup.py develop
+
+Once that command has completed successfully, we can run the tests
+themselves:
 
 On UNIX:
 

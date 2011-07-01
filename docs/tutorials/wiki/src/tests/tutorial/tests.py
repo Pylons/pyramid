@@ -157,7 +157,7 @@ class FunctionalTests(unittest.TestCase):
 
     def test_root(self):
         res = self.testapp.get('/', status=302)
-        self.assertTrue(not res.body)
+        self.assertEqual(res.location, 'http://localhost/FrontPage')
 
     def test_FrontPage(self):
         res = self.testapp.get('/FrontPage', status=200)
@@ -169,7 +169,7 @@ class FunctionalTests(unittest.TestCase):
 
     def test_successful_log_in(self):
         res = self.testapp.get( self.viewer_login, status=302)
-        self.assertTrue(res.location == 'FrontPage')
+        self.assertEqual(res.location, 'http://localhost/FrontPage')
 
     def test_failed_log_in(self):
         res = self.testapp.get( self.viewer_wrong_login, status=200)
