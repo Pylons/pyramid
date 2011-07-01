@@ -48,8 +48,17 @@ Running the Tests
 =================
 
 We can run these tests by using ``setup.py test`` in the same way we did in
-:ref:`running_tests`.  Assuming our shell's current working directory is the
-"tutorial" distribution directory:
+:ref:`running_tests`.  However, first we must edit our ``setup.py`` to
+include a dependency on WebTest, which we've used in our ``tests.py``.
+Change the ``requires`` list in ``setup.py`` to include ``WebTest``.
+
+.. literalinclude:: src/tests/setup.py
+   :linenos:
+   :language: python
+   :lines: 10-19
+
+After we've added a dependency on WebTest in ``setup.py``, assuming our
+shell's current working directory is the "tutorial" distribution directory:
 
 On UNIX:
 

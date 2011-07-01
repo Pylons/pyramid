@@ -204,18 +204,18 @@ class FunctionalTests(unittest.TestCase):
 
     def test_root(self):
         res = self.testapp.get('/', status=302)
-        self.assertTrue(not res.body)
+        self.assertTrue(res.location, 'http://localhost/FrontPage')
 
     def test_FrontPage(self):
         res = self.testapp.get('/FrontPage', status=200)
         self.assertTrue('FrontPage' in res.body)
 
     def test_unexisting_page(self):
-        res = self.testapp.get('/SomePage', status=404)
+        self.testapp.get('/SomePage', status=404)
 
     def test_successful_log_in(self):
         res = self.testapp.get(self.viewer_login, status=302)
-        self.assertTrue(res.location == 'FrontPage')
+        self.assertTrue(res.location == 'http://localhost/FrontPage')
 
     def test_failed_log_in(self):
         res = self.testapp.get(self.viewer_wrong_login, status=200)
