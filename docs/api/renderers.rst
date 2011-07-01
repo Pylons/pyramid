@@ -11,3 +11,5 @@
 
 .. autofunction:: render_to_response
 
+.. autoclass:: JSONP
+

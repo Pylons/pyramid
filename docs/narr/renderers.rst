@@ -228,6 +228,74 @@ Views which use the JSON renderer can vary non-body response attributes by
 using the api of the ``request.response`` attribute.  See
 :ref:`request_response_attr`.
 
+.. _jsonp_renderer:
+
+JSONP Renderer
+--------------
+
+.. note:: This feature is new in Pyramid 1.1.
+
+:class:`pyramid.renderers.JSONP` is a `JSONP
+<http://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper which
+implements a hybrid json/jsonp renderer.  JSONP is useful for making
+cross-domain AJAX requests.
+
+Unlike other renderers, a JSONP renderer needs to be configured at startup
+time "by hand".  Configure a JSONP renderer using the
+:meth:`pyramid.config.Configurator.add_renderer` method:
+
+.. code-block:: python
+
+   from pyramid.config import Configurator
+
+   config = Configurator()
+   config.add_renderer('jsonp', JSONP(param_name='callback'))
+
+Once this renderer is registered via
+:meth:`~pyramid.config.Configurator.add_renderer` as above, you can use
+``jsonp`` as the ``renderer=`` parameter to ``@view_config`` or
+:meth:`pyramid.config.Configurator.add_view``:
+
+.. code-block:: python
+
+   from pyramid.view import view_config
+
+   @view_config(renderer='jsonp')
+   def myview(request):
+       return {'greeting':'Hello world'}
+
+When a view is called that uses a JSONP renderer:
+
+- If there is a parameter in the request's HTTP query string (aka
+  ``request.GET``) that matches the ``param_name`` of the registered JSONP
+  renderer (by default, ``callback``), the renderer will return a JSONP
+  response.
+
+- If there is no callback parameter in the request's query string, the
+  renderer will return a 'plain' JSON response.
+
+Javscript library AJAX functionality will help you make JSONP requests.
+For example, JQuery has a `getJSON function
+<http://api.jquery.com/jQuery.getJSON/>`_, and has equivalent (but more
+complicated) functionality in its `ajax function
+<http://api.jquery.com/jQuery.ajax/>`_.
+
+For example (Javascript):
+
+.. code-block:: javascript
+
+   var api_url = 'http://api.geonames.org/timezoneJSON' +
+                 '?lat=38.301733840000004' +
+                 '&lng=-77.45869621' +
+                 '&username=fred' +
+                 '&callback=?';
+   jqhxr = $.getJSON(api_url);
+
+The string ``callback=?`` above in the the ``url`` param to the JQuery
+``getAjax`` function indicates to jQuery that the query should be made as
+a JSONP request; the ``callback`` parameter will be automatically filled
+in for you and used.
+
 .. index::
    pair: renderer; chameleon
 

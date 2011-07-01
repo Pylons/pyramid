@@ -10,6 +10,12 @@ Bug Fixes
   tests which use DummyRequest instead of a "real" request, so they know
   things are deprecated without necessarily needing a functional test suite.
 
+Features
+--------
+
+- Add JSONP renderer (see "JSONP renderer" in the Renderers chapter of the
+  documentation).
+
 1.1a3 (2011-06-26)
 ==================
 

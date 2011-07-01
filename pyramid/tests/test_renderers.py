@@ -798,6 +798,31 @@ class Test_get_renderer(unittest.TestCase):
         result = self._callFUT('abc/def.pt', package=pyramid.tests)
         self.assertEqual(result, renderer)
 
+class TestJSONP(unittest.TestCase):
+    def _makeOne(self, param_name='callback'):
+        from pyramid.renderers import JSONP
+        return JSONP(param_name)
+
+    def test_render_to_jsonp(self):
+        renderer_factory = self._makeOne()
+        renderer = renderer_factory(None)
+        request = testing.DummyRequest()
+        request.GET['callback'] = 'callback'
+        result = renderer({'a':'1'}, {'request':request})
+        self.assertEqual(result, 'callback({"a": "1"})')
+        self.assertEqual(request.response.content_type,
+                         'application/javascript')
+
+    def test_render_to_json(self):
+        renderer_factory = self._makeOne()
+        renderer = renderer_factory(None)
+        request = testing.DummyRequest()
+        result = renderer({'a':'1'}, {'request':request})
+        self.assertEqual(result, '{"a": "1"}')
+        self.assertEqual(request.response.content_type,
+                         'application/json')
+
+
 class Dummy:
     pass
 

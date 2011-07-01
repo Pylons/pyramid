@@ -127,7 +127,6 @@ def get_renderer(renderer_name, package=None):
     helper = RendererHelper(name=renderer_name, package=package)
     return helper.renderer
 
-
 # concrete renderer factory implementations (also API)
 
 def json_renderer_factory(info):
@@ -153,6 +152,73 @@ def string_renderer_factory(info):
                 response.content_type = 'text/plain'
         return value
     return _render
+
+class JSONP(object):
+    """ `JSONP <http://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper
+    which implements a hybrid json/jsonp renderer.  JSONP is useful for
+    making cross-domain AJAX requests.
+
+    Configure a JSONP renderer using the
+    :meth:`pyramid.config.Configurator.add_renderer` API at application
+    startup time:
+
+    .. code-block:: python
+
+       from pyramid.config import Configurator
+
+       config = Configurator()
+       config.add_renderer('jsonp', JSONP(param_name='callback'))
+
+    Once this renderer is registered via
+    :meth:`~pyramid.config.Configurator.add_renderer` as above, you can use
+    ``jsonp`` as the ``renderer=`` parameter to ``@view_config`` or
+    :meth:`pyramid.config.Configurator.add_view``:
+
+    .. code-block:: python
+
+       from pyramid.view import view_config
+
+       @view_config(renderer='jsonp')
+       def myview(request):
+           return {'greeting':'Hello world'}
+
+    When a view is called that uses the JSONP renderer:
+
+    - If there is a parameter in the request's HTTP query string that matches
+      the ``param_name`` of the registered JSONP renderer (by default,
+      ``callback``), the renderer will return a JSONP response.
+
+    - If there is no callback parameter in the request's query string, the
+      renderer will return a 'plain' JSON response.
+
+    .. note:: This feature is new in Pyramid 1.1.
+
+    See also: :ref:`jsonp_renderer`.
+    """
+    
+    def __init__(self, param_name='callback'):
+        self.param_name = param_name
+
+    def __call__(self, info):
+        """ Returns JSONP-encoded string with content-type
+        ``application/javascript`` if query parameter matching
+        ``self.param_name`` is present in request.GET; otherwise returns
+        plain-JSON encoded string with content-type ``application/json``"""
+        def _render(value, system):
+            request = system['request']
+            val =  json.dumps(value)
+            callback = request.GET.get(self.param_name)
+            if callback is None:
+                ct = 'application/json'
+                body = val
+            else:
+                ct = 'application/javascript'
+                body = '%s(%s)' % (callback, val)
+            response = request.response
+            if response.content_type == response.default_content_type:
+                response.content_type = ct
+            return body
+        return _render
 
 # utility functions, not API
 
