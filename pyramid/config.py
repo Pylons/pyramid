@@ -601,7 +601,6 @@ class Configurator(object):
                 context.includepath = _context.includepath + (spec,)
                 context.package = package_of(module)
                 config = self.__class__.with_context(context)
-                config.root_route_name = self.root_route_name
                 c(config)
 
     def with_root_route(self, route_name):
@@ -1550,24 +1549,6 @@ class Configurator(object):
             'within the general Pyramid documentation for further details.',
             DeprecationWarning,
             4)
-
-    def with_root_route(self, route_name):
-        mapper = self.get_routes_mapper()
-        route = mapper.get_route(route_name)
-        if route is None:
-            raise ConfigurationError
-        configurator = self.__class__(registry=self.registry,
-                package=self.package,
-                autocommit=self.autocommit,
-                root_route_name=route_name)
-        return configurator
-
-    def mount(self, includeme, route_name):
-        """ mount subapplication on route named ``route_name``.
-        """
-
-        config = self.with_root_route(route_name)
-        config.include(includeme)
 
 
     @action_method
