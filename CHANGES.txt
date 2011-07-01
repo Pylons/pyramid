@@ -27,7 +27,7 @@ Bug Fixes
   The behavior now matches the documentation. If you were relying on the
   buggy behavior of the 1.0 ``subscriber`` directive in order to register an
   object event subscriber, you must now pass a sequence to indicate you'd
-  like to register a subscriber for an object event. e.g.:
+  like to register a subscriber for an object event. e.g.::
 
      @subscriber([IFoo, IBar])
      def expects_object_event(object, event):
