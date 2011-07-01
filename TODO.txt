@@ -4,20 +4,20 @@ Pyramid TODOs
 Must-Have
 ---------
 
-- Investigate mod_wsgi tutorial to make sure it still works (2 reports say
-  no; application package not found).
-
-- Deprecate ``renderer_global_factory`` arg to Configurator and related.
-
-- Maybe add ``add_renderer_globals`` method to Configurator.
+- Github issues fixes.
 
 Should-Have
 -----------
+
+- Investigate mod_wsgi tutorial to make sure it still works (2 reports say
+  no; application package not found).
 
 - Add narrative docs for wsgiapp and wsgiapp2.
 
 Nice-to-Have
 ------------
+
+- Maybe add ``add_renderer_globals`` method to Configurator.
 
 - Speed up startup time (defer _bootstrap and registerCommonDirectives()
   until needed by ZCML, as well as unfound speedups).
