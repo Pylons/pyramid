@@ -57,8 +57,25 @@ Change the ``requires`` list in ``setup.py`` to include ``WebTest``.
    :language: python
    :lines: 10-19
 
-After we've added a dependency on WebTest in ``setup.py``, assuming our
-shell's current working directory is the "tutorial" distribution directory:
+After we've added a dependency on WebTest in ``setup.py``, we need to rerun
+``setup.py develop`` to get WebTest installed into our virtualenv.  Assuming
+our shell's current working directory is the "tutorial" distribution
+directory:
+
+On UNIX:
+
+.. code-block:: text
+
+   $ ../bin/python setup.py develop
+
+On Windows:
+
+.. code-block:: text
+
+   c:\pyramidtut\tutorial> ..\Scripts\python setup.py develop
+
+Once that command has completed successfully, we can run the tests
+themselves:
 
 On UNIX:
 
