@@ -1,5 +1,4 @@
 from zope.component.registry import Components
-from zope.interface import providedBy
 
 from pyramid.interfaces import ISettings
 

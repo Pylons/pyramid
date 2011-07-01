@@ -10,6 +10,29 @@ Bug Fixes
   tests which use DummyRequest instead of a "real" request, so they know
   things are deprecated without necessarily needing a functional test suite.
 
+- The ``pyramid.events.subscriber`` directive behaved contrary to the
+  documentation when passed more than one interface object to its
+  constructor.  For example, when the following listener was registered::
+
+     @subscriber(IFoo, IBar)
+     def expects_ifoo_events_and_ibar_events(event):
+         print event
+
+  The Events chapter docs claimed that the listener would be registered and
+  listening for both ``IFoo`` and ``IBar`` events.  Instead, it registered an
+  "object event" subscriber which would only be called if an IObjectEvent was
+  emitted where the object interface was ``IFoo`` and the event interface was
+  ``IBar``.
+
+  The behavior now matches the documentation. If you were relying on the
+  buggy behavior of the 1.0 ``subscriber`` directive in order to register an
+  object event subscriber, you must now pass a sequence to indicate you'd
+  like to register a subscriber for an object event. e.g.:
+
+     @subscriber([IFoo, IBar])
+     def expects_object_event(object, event):
+         print object, event
+
 Features
 --------
 

@@ -133,7 +133,19 @@ class TestSubscriber(unittest.TestCase):
         from pyramid.events import subscriber
         return subscriber(*ifaces)
 
-    def test_register(self):
+    def test_register_single(self):
+        from zope.interface import Interface
+        class IFoo(Interface): pass
+        class IBar(Interface): pass
+        dec = self._makeOne(IFoo)
+        def foo(): pass
+        config = DummyConfigurator()
+        scanner = Dummy()
+        scanner.config = config
+        dec.register(scanner, None, foo)
+        self.assertEqual(config.subscribed, [(foo, IFoo)])
+
+    def test_register_multi(self):
         from zope.interface import Interface
         class IFoo(Interface): pass
         class IBar(Interface): pass
@@ -143,7 +155,19 @@ class TestSubscriber(unittest.TestCase):
         scanner = Dummy()
         scanner.config = config
         dec.register(scanner, None, foo)
-        self.assertEqual(config.subscribed, [(foo, (IFoo, IBar))])
+        self.assertEqual(config.subscribed, [(foo, IFoo), (foo, IBar)])
+
+    def test_register_objectevent(self):
+        from zope.interface import Interface
+        class IFoo(Interface): pass
+        class IBar(Interface): pass
+        dec = self._makeOne([IFoo, IBar])
+        def foo(): pass
+        config = DummyConfigurator()
+        scanner = Dummy()
+        scanner.config = config
+        dec.register(scanner, None, foo)
+        self.assertEqual(config.subscribed, [(foo, [IFoo, IBar])])
 
     def test___call__(self):
         dec = self._makeOne()

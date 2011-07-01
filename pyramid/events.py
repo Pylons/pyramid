@@ -63,7 +63,8 @@ class subscriber(object):
 
     def register(self, scanner, name, wrapped):
         config = scanner.config
-        config.add_subscriber(wrapped, self.ifaces)
+        for iface in self.ifaces:
+            config.add_subscriber(wrapped, iface)
 
     def __call__(self, wrapped):
         self.venusian.attach(wrapped, self.register, category='pyramid')
