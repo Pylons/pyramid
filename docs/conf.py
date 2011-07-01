@@ -93,7 +93,7 @@ copyright = '%s, Agendaless Consulting' % datetime.datetime.now().year
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '1.1a3'
+version = '1.1a4'
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -456,7 +456,7 @@ def resig(app, what, name, obj, options, signature, return_annotation):
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = 'The Pyramid Web Application Development Framework, Version 1.0'
+epub_title = 'The Pyramid Web Application Development Framework, Version 1.1'
 epub_author = 'Chris McDonough'
 epub_publisher = 'Agendaless Consulting'
 epub_copyright = '2008-2011'
@@ -473,7 +473,7 @@ epub_scheme = 'ISBN'
 epub_identifier = '0615445675'
 
 # A unique identification for the text.
-epub_uid = 'The Pyramid Web Application Development Framework, Version 1.0'
+epub_uid = 'The Pyramid Web Application Development Framework, Version 1.1'
 
 # HTML files that should be inserted before the pages created by sphinx.
 # The format is a list of tuples containing the path and title.
