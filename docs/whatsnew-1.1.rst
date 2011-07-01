@@ -95,7 +95,7 @@ Minor Feature Additions
 -----------------------
 
 - A `JSONP <http://en.wikipedia.org/wiki/JSONP>`_ renderer.  See
-   :ref:`jsonp_renderer` for more details.
+  :ref:`jsonp_renderer` for more details.
 
 - New authentication policy:
   :class:`pyramid.authentication.SessionAuthenticationPolicy`, which uses a
