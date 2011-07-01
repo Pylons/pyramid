@@ -107,16 +107,19 @@ def renderer_factory(info):
             registry.registerUtility(lookup, IMakoLookup)
         finally:
             registry_lock.release()
-            
-    return MakoLookupTemplateRenderer(path, lookup)
+
+    debug_templates = asbool(settings.get('debug_templates', False))
+    return MakoLookupTemplateRenderer(path, lookup,
+                                      debug_templates = debug_templates)
 
 
 class MakoLookupTemplateRenderer(object):
     implements(ITemplateRenderer)
-    def __init__(self, path, lookup):
+    def __init__(self, path, lookup, debug_templates = False):
         self.path = path
         self.lookup = lookup
- 
+        self.debug_templates = debug_templates
+
     def implementation(self):
         return self.lookup.get_template(self.path)
 
@@ -134,5 +137,12 @@ class MakoLookupTemplateRenderer(object):
         template = self.implementation()
         if def_name is not None:
             template = template.get_def(def_name)
-        result = template.render_unicode(**system)
-        return result
+        if self.debug_templates:
+            try:
+                result = template.render_unicode(**system)
+                return result
+            except Exception, e:
+                return exceptions.html_error_template().render()
+        else:
+            result = template.render_unicode(**system)
+            return result
