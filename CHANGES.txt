@@ -16,6 +16,12 @@ Features
 - Add JSONP renderer (see "JSONP renderer" in the Renderers chapter of the
   documentation).
 
+Deprecations
+------------
+
+- Deprecated the ``set_renderer_globals_factory`` method of the Configurator
+  and the ``renderer_globals`` Configurator constructor parameter.
+
 1.1a3 (2011-06-26)
 ==================
 

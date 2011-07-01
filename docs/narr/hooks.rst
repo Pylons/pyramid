@@ -183,6 +183,10 @@ already constructed a :term:`configurator` it can also be registered via the
 Adding Renderer Globals
 -----------------------
 
+.. warning:: this feature is deprecated as of Pyramid 1.1.  A non-deprecated
+   mechanism which allows event subscribers to add renderer global values
+   is documented in :ref:`beforerender_event`.
+
 Whenever :app:`Pyramid` handles a request to perform a rendering (after a
 view with a ``renderer=`` configuration attribute is invoked, or when any
 of the methods beginning with ``render`` within the :mod:`pyramid.renderers`
@@ -226,9 +230,6 @@ already constructed a :term:`configurator` it can also be registered via the
 
    config = Configurator()
    config.set_renderer_globals_factory(renderer_globals_factory)
-
-Another mechanism which allows event subscribers to add renderer global values
-exists in :ref:`beforerender_event`.
 
 .. index::
    single: before render event

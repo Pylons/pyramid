@@ -215,6 +215,10 @@ class Configurator(object):
     See :ref:`adding_renderer_globals`.  By default, it is ``None``, which
     means use no renderer globals factory.
 
+    .. warning:: as of Pyramid 1.1, ``renderer_globals_factory`` is
+       deprecated.  Instead, use a BeforeRender event subscriber as per
+       :ref:`beforerender_event`.
+
     If ``default_permission`` is passed, it should be a
     :term:`permission` string to be used as the default permission for
     all view configuration registrations performed against this
@@ -736,9 +740,18 @@ class Configurator(object):
             request_factory = self.maybe_dotted(request_factory)
             self.set_request_factory(request_factory)
         if renderer_globals_factory:
+            warnings.warn(
+                'Passing ``renderer_globals_factory`` as a Configurator '
+                'constructor parameter is deprecated as of Pyramid 1.1. '
+                'Use a BeforeRender event subscriber as documented in the '
+                '"Hooks" chapter of the Pyramid narrative documentation '
+                'instead',
+                DeprecationWarning,
+                2)
             renderer_globals_factory = self.maybe_dotted(
                 renderer_globals_factory)
-            self.set_renderer_globals_factory(renderer_globals_factory)
+            self.set_renderer_globals_factory(renderer_globals_factory,
+                                              warn=False)
         if default_permission:
             self.set_default_permission(default_permission)
         if session_factory is not None:
@@ -2105,7 +2118,7 @@ class Configurator(object):
         self.action(IRequestFactory, register)
 
     @action_method
-    def set_renderer_globals_factory(self, factory):
+    def set_renderer_globals_factory(self, factory, warn=True):
         """ The object passed as ``factory`` should be an callable (or
         a :term:`dotted Python name` which refers to an callable) that
         will be used by the :app:`Pyramid` rendering machinery as a
@@ -2118,10 +2131,21 @@ class Configurator(object):
         dictionary, and therefore will be made available to the code
         which uses the renderer.
 
+        .. warning:: This method is deprecated as of Pyramid 1.1.
+
         .. note:: Using the ``renderer_globals_factory`` argument
            to the :class:`pyramid.config.Configurator` constructor
            can be used to achieve the same purpose.
         """
+        if warn:
+            warnings.warn(
+                'Calling the ``set_renderer_globals`` method of a Configurator '
+                'is deprecated as of Pyramid 1.1. Use a BeforeRender event '
+                'subscriber as documented in the "Hooks" chapter of the '
+                'Pyramid narrative documentation instead',
+                DeprecationWarning,
+                3)
+
         factory = self.maybe_dotted(factory)
         def register():
             self.registry.registerUtility(factory, IRendererGlobalsFactory)

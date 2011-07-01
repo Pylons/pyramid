@@ -74,7 +74,7 @@
 
      .. automethod:: set_request_factory
 
-     .. automethod:: set_renderer_globals_factory
+     .. automethod:: set_renderer_globals_factory(factory)
 
      .. automethod:: set_view_mapper
 

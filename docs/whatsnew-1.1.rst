@@ -364,6 +364,12 @@ Deprecations and Behavior Differences
   within a static view returns the index.html properly.  See also
   https://github.com/Pylons/pyramid/issues/67.
 
+- Deprecated the
+  :meth:`pyramid.config.Configurator.set_renderer_globals_factory` method and
+  the ``renderer_globals`` Configurator constructor parameter.  Users should
+  use convert code using this feature to use a BeforeRender event als
+  :ref:`beforerender_event`.
+
 Dependency Changes
 ------------------
 

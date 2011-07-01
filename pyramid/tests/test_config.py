@@ -521,24 +521,34 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(utility, pyramid.tests)
 
     def test_setup_registry_renderer_globals_factory(self):
-        from pyramid.registry import Registry
-        from pyramid.interfaces import IRendererGlobalsFactory
-        reg = Registry()
-        config = self._makeOne(reg)
-        factory = object()
-        config.setup_registry(renderer_globals_factory=factory)
-        utility = reg.getUtility(IRendererGlobalsFactory)
-        self.assertEqual(utility, factory)
+        import warnings
+        warnings.filterwarnings('ignore')
+        try:
+            from pyramid.registry import Registry
+            from pyramid.interfaces import IRendererGlobalsFactory
+            reg = Registry()
+            config = self._makeOne(reg)
+            factory = object()
+            config.setup_registry(renderer_globals_factory=factory)
+            utility = reg.getUtility(IRendererGlobalsFactory)
+            self.assertEqual(utility, factory)
+        finally:
+            warnings.resetwarnings()
 
     def test_setup_registry_renderer_globals_factory_dottedname(self):
-        from pyramid.registry import Registry
-        from pyramid.interfaces import IRendererGlobalsFactory
-        reg = Registry()
-        config = self._makeOne(reg)
-        import pyramid.tests
-        config.setup_registry(renderer_globals_factory='pyramid.tests')
-        utility = reg.getUtility(IRendererGlobalsFactory)
-        self.assertEqual(utility, pyramid.tests)
+        import warnings
+        warnings.filterwarnings('ignore')
+        try:
+            from pyramid.registry import Registry
+            from pyramid.interfaces import IRendererGlobalsFactory
+            reg = Registry()
+            config = self._makeOne(reg)
+            import pyramid.tests
+            config.setup_registry(renderer_globals_factory='pyramid.tests')
+            utility = reg.getUtility(IRendererGlobalsFactory)
+            self.assertEqual(utility, pyramid.tests)
+        finally:
+            warnings.resetwarnings()
 
     def test_setup_registry_alternate_renderers(self):
         from pyramid.registry import Registry
@@ -2415,20 +2425,32 @@ class ConfiguratorTests(unittest.TestCase):
                          dummyfactory)
 
     def test_set_renderer_globals_factory(self):
-        from pyramid.interfaces import IRendererGlobalsFactory
-        config = self._makeOne(autocommit=True)
-        factory = object()
-        config.set_renderer_globals_factory(factory)
-        self.assertEqual(config.registry.getUtility(IRendererGlobalsFactory),
-                         factory)
+        import warnings
+        warnings.filterwarnings('ignore')
+        try:
+            from pyramid.interfaces import IRendererGlobalsFactory
+            config = self._makeOne(autocommit=True)
+            factory = object()
+            config.set_renderer_globals_factory(factory)
+            self.assertEqual(
+                config.registry.getUtility(IRendererGlobalsFactory),
+                factory)
+        finally:
+            warnings.resetwarnings()
 
     def test_set_renderer_globals_factory_dottedname(self):
-        from pyramid.interfaces import IRendererGlobalsFactory
-        config = self._makeOne(autocommit=True)
-        config.set_renderer_globals_factory(
-            'pyramid.tests.test_config.dummyfactory')
-        self.assertEqual(config.registry.getUtility(IRendererGlobalsFactory),
-                         dummyfactory)
+        import warnings
+        warnings.filterwarnings('ignore')
+        try:
+            from pyramid.interfaces import IRendererGlobalsFactory
+            config = self._makeOne(autocommit=True)
+            config.set_renderer_globals_factory(
+                'pyramid.tests.test_config.dummyfactory')
+            self.assertEqual(
+                config.registry.getUtility(IRendererGlobalsFactory),
+                dummyfactory)
+        finally:
+            warnings.resetwarnings()
 
     def test_set_default_permission(self):
         from pyramid.interfaces import IDefaultPermission
