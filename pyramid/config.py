@@ -293,6 +293,7 @@ class Configurator(object):
                  default_view_mapper=None,
                  autocommit=False,
                  exceptionresponse_view=default_exceptionresponse_view,
+                 root_route_name=None,
                  ):
         if package is None:
             package = caller_package()
@@ -302,6 +303,7 @@ class Configurator(object):
         self.package = name_resolver.package
         self.registry = registry
         self.autocommit = autocommit
+        self.root_route_name = root_route_name
         if registry is None:
             registry = Registry(self.package_name)
             self.registry = registry
@@ -601,6 +603,50 @@ class Configurator(object):
                 context.package = package_of(module)
                 config = self.__class__.with_context(context)
                 c(config)
+
+    def with_root_route(self, route_name):
+        mapper = self.get_routes_mapper()
+        route = mapper.get_route(route_name)
+        if route is None:
+            raise ConfigurationError
+        configurator = self.__class__(registry=self.registry,
+                package=self.package,
+                autocommit=self.autocommit,
+                root_route_name=route_name)
+        return configurator
+
+    def mount(self, function, route_name):
+        """ mount subapplication on route named ``route_name``.
+
+
+        .. code-block:: python
+           :linenos:
+
+           from pyramid.config import Configurator
+
+           def main(global_config, **settings):
+               config = Configurator()
+               config.add_route('admin', '/admin')
+               config.mount('myapp.myconfig.includeme', 'admin')
+
+        Because the function is named ``includeme``, the function name can
+        also be omitted from the dotted name reference:
+
+        .. code-block:: python
+            :linenos:
+
+           from pyramid.config import Configurator
+
+           def includeme(config):
+               config.add_route('projects', 'projects')
+
+
+        Subapplication's routes are registerd under the ``root_route``.
+        In this case, ``projects`` route is registered with ``/admin/projects`` pattern.
+        """
+        function = self.maybe_dotted(function)
+        config = self.with_root_route(route_name)
+        function(config)
 
     def add_directive(self, name, directive, action_wrap=True):
         """
@@ -1929,6 +1975,12 @@ class Configurator(object):
             pattern = path
         if pattern is None:
             raise ConfigurationError('"pattern" argument may not be None')
+
+        if self.root_route_name is not None:
+            root_route = mapper.get_route(self.root_route_name)
+            if root_route is None:
+                raise ConfigurationError('route %s is not registered' % self.root_route_name)
+            pattern = root_route.pattern.rstrip() + '/' + pattern.lstrip()
 
         discriminator = ['route', name, xhr, request_method, path_info,
                          request_param, header, accept]
