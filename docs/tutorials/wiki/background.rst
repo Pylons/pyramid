@@ -11,7 +11,7 @@ Python web framework experience.
 
 To code along with this tutorial, the developer will need a UNIX
 machine with development tools (Mac OS X with XCode, any Linux or BSD
-variant, etc) *or* he will need a Windows system of any kind.
+variant, etc) *or* a Windows system of any kind.
 
 This tutorial targets :app:`Pyramid` version 1.0.
 
