@@ -24,7 +24,8 @@ class subscriber(object):
        def mysubscriber(event):
            event.request.foo = 1
 
-    More than one event type can be passed as a construtor argument:
+    More than one event type can be passed as a construtor argument.  The
+    decorated subscriber will be called for each event type.
         
     .. code-block:: python
     
