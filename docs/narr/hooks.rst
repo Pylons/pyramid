@@ -176,12 +176,54 @@ already constructed a :term:`configurator` it can also be registered via the
    config.set_request_factory(MyRequest)
 
 .. index::
+   single: before render event
+   single: adding renderer globals
+
+.. _beforerender_event:
+
+Using The Before Render Event
+-----------------------------
+
+Subscribers to the :class:`pyramid.events.BeforeRender` event may introspect
+and modify the set of :term:`renderer globals` before they are passed to a
+:term:`renderer`.  This event object iself has a dictionary-like interface
+that can be used for this purpose.  For example:
+
+.. code-block:: python
+   :linenos:
+
+    from pyramid.events import subscriber
+    from pyramid.events import BeforeRender
+
+    @subscriber(BeforeRender)
+    def add_global(event):
+        event['mykey'] = 'foo'
+
+An object of this type is sent as an event just before a :term:`renderer` is
+invoked (but *after* the application-level renderer globals factory added via
+:class:`~pyramid.config.Configurator.set_renderer_globals_factory`, if any,
+has injected its own keys into the renderer globals dictionary).
+
+If a subscriber attempts to add a key that already exist in the renderer
+globals dictionary, a :exc:`KeyError` is raised.  This limitation is enforced
+because event subscribers do not possess any relative ordering.  The set of
+keys added to the renderer globals dictionary by all
+:class:`pyramid.events.BeforeRender` subscribers and renderer globals
+factories must be unique.
+
+See the API documentation for the :class:`~pyramid.events.BeforeRender` event
+interface at :class:`pyramid.interfaces.IBeforeRender`.
+
+Another (deprecated) mechanism which allows event subscribers more control
+when adding renderer global values exists in :ref:`adding_renderer_globals`.
+
+.. index::
    single: renderer globals
 
 .. _adding_renderer_globals:
 
-Adding Renderer Globals
------------------------
+Adding Renderer Globals (Deprecated)
+------------------------------------
 
 .. warning:: this feature is deprecated as of Pyramid 1.1.  A non-deprecated
    mechanism which allows event subscribers to add renderer global values
@@ -231,46 +273,6 @@ already constructed a :term:`configurator` it can also be registered via the
    config = Configurator()
    config.set_renderer_globals_factory(renderer_globals_factory)
 
-.. index::
-   single: before render event
-
-.. _beforerender_event:
-
-Using The Before Render Event
------------------------------
-
-Subscribers to the :class:`pyramid.events.BeforeRender` event may introspect
-and modify the set of :term:`renderer globals` before they are passed to a
-:term:`renderer`.  This event object iself has a dictionary-like interface
-that can be used for this purpose.  For example:
-
-.. code-block:: python
-   :linenos:
-
-    from pyramid.events import subscriber
-    from pyramid.events import BeforeRender
-
-    @subscriber(BeforeRender)
-    def add_global(event):
-        event['mykey'] = 'foo'
-
-An object of this type is sent as an event just before a :term:`renderer` is
-invoked (but *after* the application-level renderer globals factory added via
-:class:`~pyramid.config.Configurator.set_renderer_globals_factory`, if any,
-has injected its own keys into the renderer globals dictionary).
-
-If a subscriber attempts to add a key that already exist in the renderer
-globals dictionary, a :exc:`KeyError` is raised.  This limitation is enforced
-because event subscribers do not possess any relative ordering.  The set of
-keys added to the renderer globals dictionary by all
-:class:`pyramid.events.BeforeRender` subscribers and renderer globals
-factories must be unique.
-
-See the API documentation for the :class:`~pyramid.events.BeforeRender` event
-interface at :class:`pyramid.interfaces.IBeforeRender`.
-
-Another mechanism which allows event subscribers more control when adding
-renderer global values exists in :ref:`adding_renderer_globals`.
 
 .. index::
    single: response callback
