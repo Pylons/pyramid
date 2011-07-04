@@ -10,6 +10,7 @@ from pyramid.interfaces import IResponse
 from pyramid.interfaces import ISessionFactory
 from pyramid.interfaces import IResponseFactory
 
+from pyramid.compat import json
 from pyramid.exceptions import ConfigurationError
 from pyramid.decorator import reify
 from pyramid.response import Response
@@ -488,6 +489,12 @@ class Request(BaseRequest, DeprecatedRequestMethods):
         if adapted is None:
             return False
         return adapted is ob
+
+    @property
+    def json(self):
+        if self.content_type == 'application/json':
+            return json.loads(self.body, encoding=self.charset)
+
 
 def route_request_iface(name, bases=()):
     iface = InterfaceClass('%s_IRequest' % name, bases=bases)

@@ -94,6 +94,11 @@ Default HTTP Exception View
 Minor Feature Additions
 -----------------------
 
+- New request attribute: ``json``. If the request's ``content_type`` is
+  ``application/json``, this attribute will contain the JSON-decoded
+  variant of the request body.  If the request's ``content_type`` is not
+  ``application/json``, this attribute will be ``None``.
+
 - A new value ``http_cache`` can be used as a :term:`view configuration`
   parameter.
 

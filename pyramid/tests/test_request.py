@@ -233,6 +233,26 @@ class TestRequest(unittest.TestCase):
         request.registry.registerAdapter(adapter, (Foo,), IResponse)
         self.assertEqual(request.is_response(foo), True)
 
+    def test_json_incorrect_mimetype(self):
+        request = self._makeOne({})
+        self.assertEqual(request.json, None)
+        
+    def test_json_correct_mimetype(self):
+        request = self._makeOne({})
+        request.content_type = 'application/json'
+        request.body = '{"a":1}'
+        self.assertEqual(request.json, {'a':1})
+
+    def test_json_alternate_charset(self):
+        from pyramid.compat import json
+        request = self._makeOne({})
+        request.content_type = 'application/json'
+        request.charset = 'latin-1'
+        la = unicode('La Pe\xc3\xb1a', 'utf-8')
+        body = json.dumps({'a':la}, encoding='latin-1')
+        request.body = body
+        self.assertEqual(request.json, {'a':la})
+
 class TestRequestDeprecatedMethods(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()

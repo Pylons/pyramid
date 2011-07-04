@@ -180,6 +180,13 @@
       object (exposed to view code as ``request.response``) to influence
       rendered response behavior.
 
+   .. attribute:: json
+
+      If the request's ``content_type`` is ``application/json``, this
+      attribute will contain the JSON-decoded variant of the request body.
+      If the request's ``content_type`` is not ``application/json``, this
+      attribute will be ``None``.
+
 .. note::
 
    For information about the API of a :term:`multidict` structure (such as
