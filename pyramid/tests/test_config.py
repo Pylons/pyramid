@@ -3972,7 +3972,7 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(predicates, [True, True])
 
     def test_with_wrapper_viewname(self):
-        from webob import Response
+        from pyramid.response import Response
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         inner_response = Response('OK')
@@ -3996,7 +3996,7 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(response.body, 'outer OK')
 
     def test_with_wrapper_viewname_notfound(self):
-        from webob import Response
+        from pyramid.response import Response
         inner_response = Response('OK')
         def inner_view(context, request):
             return inner_response
@@ -4198,7 +4198,7 @@ class TestViewDeriver(unittest.TestCase):
 
     def test_http_cached_view_integer(self):
         import datetime
-        from webob import Response
+        from pyramid.response import Response
         response = Response('OK')
         def inner_view(context, request):
             return response
@@ -4218,7 +4218,7 @@ class TestViewDeriver(unittest.TestCase):
         
     def test_http_cached_view_timedelta(self):
         import datetime
-        from webob import Response
+        from pyramid.response import Response
         response = Response('OK')
         def inner_view(context, request):
             return response
@@ -4238,7 +4238,7 @@ class TestViewDeriver(unittest.TestCase):
 
     def test_http_cached_view_tuple(self):
         import datetime
-        from webob import Response
+        from pyramid.response import Response
         response = Response('OK')
         def inner_view(context, request):
             return response
@@ -4257,7 +4257,7 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(headers['Cache-Control'], 'max-age=3600, public')
 
     def test_http_cached_view_tuple_seconds_None(self):
-        from webob import Response
+        from pyramid.response import Response
         response = Response('OK')
         def inner_view(context, request):
             return response
@@ -4274,8 +4274,10 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(headers['Cache-Control'], 'public')
 
     def test_http_cached_view_nonresponse_object_returned_downstream(self):
+        from pyramid.response import Response
+        response = Response()
         def inner_view(context, request):
-            return None
+            return response
         deriver = self._makeOne(http_cache=3600)
         result = deriver(inner_view)
         self.assertFalse(result is inner_view)
@@ -4283,7 +4285,7 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(inner_view.__doc__, result.__doc__)
         request = self._makeRequest()
         result = result(None, request)
-        self.assertEqual(result, None) # doesn't blow up
+        self.assertEqual(result, response) # doesn't blow up
 
     def test_http_cached_view_bad_tuple(self):
         from pyramid.exceptions import ConfigurationError

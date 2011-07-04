@@ -4,7 +4,6 @@ import venusian
 from zope.interface import providedBy
 from zope.deprecation import deprecated
 
-from pyramid.interfaces import IResponse
 from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
@@ -101,11 +100,6 @@ def render_view_to_iterable(context, request, name='', secure=True):
     response = render_view_to_response(context, request, name, secure)
     if response is None:
         return None
-    try:
-        reg = request.registry
-    except AttributeError:
-        reg = get_current_registry()
-    response = reg.queryAdapterOrSelf(response, IResponse)
     return response.app_iter
 
 def render_view(context, request, name='', secure=True):
