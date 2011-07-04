@@ -823,6 +823,27 @@ class ConfiguratorTests(unittest.TestCase):
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
 
+    def test_add_view_with_http_cache(self):
+        import datetime
+        from pyramid.response import Response
+        response = Response('OK')
+        def view(request):
+            """ ABC """
+            return response
+        config = self._makeOne(autocommit=True)
+        config.add_view(view=view, http_cache=(86400, {'public':True}))
+        wrapper = self._getViewCallable(config)
+        self.assertFalse(wrapper is view)
+        self.assertEqual(wrapper.__doc__, view.__doc__)
+        request = testing.DummyRequest()
+        when = datetime.datetime.utcnow() + datetime.timedelta(days=1)
+        result = wrapper(None, request)
+        self.assertEqual(result, response)
+        headers = dict(response.headerlist)
+        self.assertEqual(headers['Cache-Control'], 'max-age=86400, public')
+        expires = parse_httpdate(headers['Expires'])
+        assert_similar_datetime(expires, when)
+
     def test_add_view_as_instance(self):
         class AView:
             def __call__(self, context, request):
@@ -4175,6 +4196,101 @@ class TestViewDeriver(unittest.TestCase):
         result = deriver(view)
         self.assertNotEqual(result, view)
 
+    def test_http_cached_view_integer(self):
+        import datetime
+        from webob import Response
+        response = Response('OK')
+        def inner_view(context, request):
+            return response
+        deriver = self._makeOne(http_cache=3600)
+        result = deriver(inner_view)
+        self.assertFalse(result is inner_view)
+        self.assertEqual(inner_view.__module__, result.__module__)
+        self.assertEqual(inner_view.__doc__, result.__doc__)
+        request = self._makeRequest()
+        when = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+        result = result(None, request)
+        self.assertEqual(result, response)
+        headers = dict(result.headerlist)
+        expires = parse_httpdate(headers['Expires'])
+        assert_similar_datetime(expires, when)
+        self.assertEqual(headers['Cache-Control'], 'max-age=3600')
+        
+    def test_http_cached_view_timedelta(self):
+        import datetime
+        from webob import Response
+        response = Response('OK')
+        def inner_view(context, request):
+            return response
+        deriver = self._makeOne(http_cache=datetime.timedelta(hours=1))
+        result = deriver(inner_view)
+        self.assertFalse(result is inner_view)
+        self.assertEqual(inner_view.__module__, result.__module__)
+        self.assertEqual(inner_view.__doc__, result.__doc__)
+        request = self._makeRequest()
+        when = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+        result = result(None, request)
+        self.assertEqual(result, response)
+        headers = dict(result.headerlist)
+        expires = parse_httpdate(headers['Expires'])
+        assert_similar_datetime(expires, when)
+        self.assertEqual(headers['Cache-Control'], 'max-age=3600')
+
+    def test_http_cached_view_tuple(self):
+        import datetime
+        from webob import Response
+        response = Response('OK')
+        def inner_view(context, request):
+            return response
+        deriver = self._makeOne(http_cache=(3600, {'public':True}))
+        result = deriver(inner_view)
+        self.assertFalse(result is inner_view)
+        self.assertEqual(inner_view.__module__, result.__module__)
+        self.assertEqual(inner_view.__doc__, result.__doc__)
+        request = self._makeRequest()
+        when = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+        result = result(None, request)
+        self.assertEqual(result, response)
+        headers = dict(result.headerlist)
+        expires = parse_httpdate(headers['Expires'])
+        assert_similar_datetime(expires, when)
+        self.assertEqual(headers['Cache-Control'], 'max-age=3600, public')
+
+    def test_http_cached_view_tuple_seconds_None(self):
+        from webob import Response
+        response = Response('OK')
+        def inner_view(context, request):
+            return response
+        deriver = self._makeOne(http_cache=(None, {'public':True}))
+        result = deriver(inner_view)
+        self.assertFalse(result is inner_view)
+        self.assertEqual(inner_view.__module__, result.__module__)
+        self.assertEqual(inner_view.__doc__, result.__doc__)
+        request = self._makeRequest()
+        result = result(None, request)
+        self.assertEqual(result, response)
+        headers = dict(result.headerlist)
+        self.assertFalse('Expires' in headers)
+        self.assertEqual(headers['Cache-Control'], 'public')
+
+    def test_http_cached_view_nonresponse_object_returned_downstream(self):
+        def inner_view(context, request):
+            return None
+        deriver = self._makeOne(http_cache=3600)
+        result = deriver(inner_view)
+        self.assertFalse(result is inner_view)
+        self.assertEqual(inner_view.__module__, result.__module__)
+        self.assertEqual(inner_view.__doc__, result.__doc__)
+        request = self._makeRequest()
+        result = result(None, request)
+        self.assertEqual(result, None) # doesn't blow up
+
+    def test_http_cached_view_bad_tuple(self):
+        from pyramid.exceptions import ConfigurationError
+        deriver = self._makeOne(http_cache=(None,))
+        def view(request): pass
+        self.assertRaises(ConfigurationError, deriver, view)
+
 class TestDefaultViewMapper(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
@@ -5278,3 +5394,12 @@ class DummyRegistry(object):
         self.adapters.append((arg, kw))
     def queryAdapter(self, *arg, **kw):
         return self.adaptation
+
+def parse_httpdate(s):
+    import datetime
+    return datetime.datetime.strptime(s, "%a, %d %b %Y %H:%M:%S %Z")
+
+def assert_similar_datetime(one, two):
+    for attr in ('year', 'month', 'day', 'hour', 'minute'):
+        assert(getattr(one, attr) == getattr(two, attr))
+    

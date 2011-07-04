@@ -166,7 +166,7 @@ class view_config(object):
     :class:`pyramid.view.view_config`: ``context``, ``permission``, ``name``,
     ``request_type``, ``route_name``, ``request_method``, ``request_param``,
     ``containment``, ``xhr``, ``accept``, ``header``, ``path_info``,
-    ``custom_predicates``, ``decorator``, and ``mapper``.
+    ``custom_predicates``, ``decorator``, ``mapper``, and ``http_cache``.
 
     The meanings of these arguments are the same as the arguments passed to
     :meth:`pyramid.config.Configurator.add_view`.
@@ -181,7 +181,7 @@ class view_config(object):
                  containment=None, attr=None, renderer=None, wrapper=None,
                  xhr=False, accept=None, header=None, path_info=None,
                  custom_predicates=(), context=None, decorator=None,
-                 mapper=None):
+                 mapper=None, http_cache=None):
         self.name = name
         self.request_type = request_type
         self.context = context or for_
@@ -200,6 +200,7 @@ class view_config(object):
         self.custom_predicates = custom_predicates
         self.decorator = decorator
         self.mapper = mapper
+        self.http_cache = http_cache
 
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
