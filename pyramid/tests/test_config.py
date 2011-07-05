@@ -251,6 +251,7 @@ class ConfiguratorTests(unittest.TestCase):
         config._ctx = DummyContext()
         config._ctx.registry = None
         config._ctx.autocommit = True
+        config._ctx.route_prefix = None
         newconfig = config.with_package(pyramid.tests)
         self.assertEqual(newconfig.package, pyramid.tests)
 
@@ -734,6 +735,18 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(context_after.basepath, None)
         self.assertEqual(context_after.includepath, ())
         self.assertTrue(context_after is context_before)
+
+    def test_include_with_route_prefix(self):
+        root_config = self._makeOne(autocommit=True)
+        def dummy_subapp(config):
+            self.assertEqual(config.route_prefix, 'root')
+        root_config.include(dummy_subapp, route_prefix='root')
+
+    def test_include_with_nested_route_prefix(self):
+        root_config = self._makeOne(autocommit=True, route_prefix='root')
+        def dummy_subapp(config):
+            self.assertEqual(config.route_prefix, 'root/nested')
+        root_config.include(dummy_subapp, route_prefix='nested')
 
     def test_with_context(self):
         config = self._makeOne()
@@ -1997,7 +2010,6 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(route.name, 'name')
 
     def test_add_route_with_route_prefix(self):
-        from pyramid.interfaces import IRoutesMapper
         config = self._makeOne(autocommit=True)
         config.route_prefix = 'root'
         route = config.add_route('name', 'path')
@@ -2005,20 +2017,6 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(route.pattern, 'root/path')
 
         self._assertRoute(config, 'name', 'root/path')
-
-    def test_with_route_prefix(self):
-        root_config = self._makeOne(autocommit=True)
-        config = root_config.with_route_prefix('root')
-        self.assertEqual(config.registry, root_config.registry)
-        self.assertEqual(config.package, root_config.package)
-        self.assertEqual(config.route_prefix, 'root')
-
-    def test_mount_subapplication(self):
-        root_config = self._makeOne(autocommit=True)
-        def dummy_subapp(config):
-            self.assertEqual(config.route_prefix, 'root')
-        root_config.mount_subapplication(dummy_subapp, 
-                route_prefix='root')
 
     def test_add_route_with_factory(self):
         config = self._makeOne(autocommit=True)
