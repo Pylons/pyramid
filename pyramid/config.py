@@ -621,8 +621,8 @@ class Configurator(object):
                config = Configurator()
                config.mount('myapp.myconfig.includeme', '/admin')
 
-        Because the function is named ``includeme``, the function name can
-        also be omitted from the dotted name reference:
+        ``myapp.myconfig`` is subapplication 
+        and ``includeme`` is that mount point.
 
         .. code-block:: python
             :linenos:
@@ -630,7 +630,7 @@ class Configurator(object):
            from pyramid.config import Configurator
 
            def includeme(config):
-               config.add_route('projects', 'projects')
+               config.add_route('projects', '/projects')
 
 
         Subapplication's routes are registerd with the ``route_prefix``
