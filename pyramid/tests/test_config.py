@@ -1975,54 +1975,29 @@ class ConfiguratorTests(unittest.TestCase):
         self._assertRoute(config, 'name', 'path')
         self.assertEqual(route.name, 'name')
 
-    def test_add_route_with_root_route(self):
+    def test_add_route_with_route_prefix(self):
         from pyramid.interfaces import IRoutesMapper
-        root_config = self._makeOne(autocommit=True)
-        root_config.add_route('root_name', 'root')
-        config = self._makeOne(registry=root_config.registry, autocommit=True, root_route_name='root_name')
+        config = self._makeOne(autocommit=True)
+        config.route_prefix = 'root'
         route = config.add_route('name', 'path')
         self.assertEqual(route.name, 'name')
         self.assertEqual(route.pattern, 'root/path')
 
-        mapper = config.registry.getUtility(IRoutesMapper)
-        routes = mapper.get_routes()
-        route = routes[1]
-        self.assertEqual(len(routes), 2)
-        self.assertEqual(route.name, 'name')
-        self.assertEqual(route.path, 'root/path')
+        self._assertRoute(config, 'name', 'root/path')
 
-    def test_add_route_with_root_route_configrationerror(self):
-        from pyramid.exceptions import ConfigurationError
-        config = self._makeOne(autocommit=True, root_route_name='root_name')
-        try:
-            route = config.add_route('name', 'path')
-            self.fail()
-        except ConfigurationError:
-            pass
-
-    def test_with_root_route(self):
+    def test_with_route_prefix(self):
         root_config = self._makeOne(autocommit=True)
-        root_config.add_route('root_name', 'root')
-        config = root_config.with_root_route('root_name')
+        config = root_config.with_route_prefix('root')
         self.assertEqual(config.registry, root_config.registry)
         self.assertEqual(config.package, root_config.package)
-        self.assertEqual(config.root_route_name, 'root_name')
+        self.assertEqual(config.route_prefix, 'root')
 
-    def test_with_root_route_configerror(self):
-        from pyramid.exceptions import ConfigurationError
+    def test_mount_subapplication(self):
         root_config = self._makeOne(autocommit=True)
-        try:
-            config = root_config.with_root_route('root_name')
-            self.fail()
-        except ConfigurationError:
-            pass
-
-    def test_mount(self):
-        root_config = self._makeOne(autocommit=True)
-        root_config.add_route('root_name', 'root')
         def dummy_subapp(config):
-            self.assertEqual(config.root_route_name, 'root_name')
-        root_config.mount(dummy_subapp, 'root_name')
+            self.assertEqual(config.route_prefix, 'root')
+        root_config.mount_subapplication(dummy_subapp, 
+                route_prefix='root')
 
     def test_add_route_with_factory(self):
         config = self._makeOne(autocommit=True)
