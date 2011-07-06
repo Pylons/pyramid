@@ -594,12 +594,12 @@ class Configurator(object):
         configuration conflict by registering something with the same
         configuration parameters.
 
-        If the ``route_prefix`` argument is supplied, any calls to
+        If the ``route_prefix`` is supplied, any calls to
         :meth:`pyramid.config.Configurator.add_route` within the ``callable``
-        will have their pattern be prefixed by ``route_prefix``. This can
+        will have their pattern prefixed with ``route_prefix``. This can
         be used to help mount a set of routes at a different location than
-        the author intended while still keeping the same route names. This
-        parameter is new as of Pyramid 1.x."""
+        the ``callable``-author intended while still maintaining the same
+        route names. This parameter is new as of Pyramid 1.x."""
 
         _context = self._ctx
         if _context is None:
