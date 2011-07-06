@@ -1085,7 +1085,7 @@ class Configurator(object):
           The ``renderer`` attribute is optional.  If it is not
           defined, the "null" renderer is assumed (no rendering is
           performed and the value is passed back to the upstream
-          :app:`Pyramid` machinery unmolested).
+          :app:`Pyramid` machinery unmodified).
 
         http_cache
 
