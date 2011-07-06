@@ -1975,12 +1975,12 @@ class Configurator(object):
         The ``kw`` argument represents a set of keyword arguments to pass to
         the Venusian ``Scanner`` object's constructor.  See the
         :term:`venusian` documentation (its ``Scanner`` class) for more
-        information.  By default, the only keyword arguments passed to the
-        Scanner constructor are ``{'config':self}`` where ``self`` is this
-        configurator object.  This services the requirement of all built-in
-        Pyramid decorators, but extension systems may require additional
-        arguments.  Providing this argument is not often necessary; it's an
-        advanced usage.
+        information about the constructor.  By default, the only keyword
+        arguments passed to the Scanner constructor are ``{'config':self}``
+        where ``self`` is this configurator object.  This services the
+        requirement of all built-in Pyramid decorators, but extension systems
+        may require additional arguments.  Providing this argument is not
+        often necessary; it's an advanced usage.
 
         .. note:: the ``**kw`` argument is new in Pyramid 1.1
         """
