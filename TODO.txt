@@ -14,6 +14,8 @@ Must-Have
 
 - Allow views to override http_cache headers.
 
+- request.JSON dictionary?
+
 Should-Have
 -----------
 
