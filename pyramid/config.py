@@ -1950,7 +1950,7 @@ class Configurator(object):
         return mapper
 
     # this is *not* an action method (uses caller_package)
-    def scan(self, package=None, categories=None):
+    def scan(self, package=None, categories=None, **kw):
         """Scan a Python package and any of its subpackages for objects
         marked with :term:`configuration decoration` such as
         :class:`pyramid.view.view_config`.  Any decorated object found will
@@ -1970,12 +1970,28 @@ class Configurator(object):
         :class:`pyramid.view.view_config`.  See the :term:`Venusian`
         documentation for more information about limiting a scan by using an
         explicit set of categories.
+
+        To perform a ``scan``, Pyramid creates a Venusian ``Scanner`` object.
+        The ``kw`` argument represents a set of keyword arguments to pass to
+        the Venusian ``Scanner`` object's constructor.  See the
+        :term:`venusian` documentation (its ``Scanner`` class) for more
+        information.  By default, the only keyword arguments passed to the
+        Scanner constructor are ``{'config':self}`` where ``self`` is this
+        configurator object.  This services the requirement of all built-in
+        Pyramid decorators, but extension systems may require additional
+        arguments.  Providing this argument is not often necessary; it's an
+        advanced usage.
+
+        .. note:: the ``**kw`` argument is new in Pyramid 1.1
         """
         package = self.maybe_dotted(package)
         if package is None: # pragma: no cover
             package = caller_package()
 
-        scanner = self.venusian.Scanner(config=self)
+        scankw = {'config':self}
+        scankw.update(kw)
+
+        scanner = self.venusian.Scanner(**scankw)
         scanner.scan(package, categories=categories)
 
     @action_method

@@ -2848,6 +2848,11 @@ class ConfiguratorTests(unittest.TestCase):
         result = render_view_to_response(ctx, req, '')
         self.assertEqual(result, 'grokked')
 
+    def test_scan_integration_with_extra_kw(self):
+        config = self._makeOne(autocommit=True)
+        config.scan('pyramid.tests.venusianapp', a=1)
+        self.assertEqual(config.a, 1)
+
     def test_testing_securitypolicy(self):
         from pyramid.testing import DummySecurityPolicy
         config = self._makeOne(autocommit=True)

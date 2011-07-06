@@ -94,6 +94,11 @@ Default HTTP Exception View
 Minor Feature Additions
 -----------------------
 
+- The :meth:`pyramid.config.Configurator.scan` method has grown a ``**kw``
+  argument.  ``kw`` argument represents a set of keyword arguments to pass to
+  the Venusian ``Scanner`` object created by Pyramid.  (See the
+  :term:`Venusian` documentation for more information about ``Scanner``).
+
 - New request attribute: ``json``. If the request's ``content_type`` is
   ``application/json``, this attribute will contain the JSON-decoded
   variant of the request body.  If the request's ``content_type`` is not
