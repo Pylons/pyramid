@@ -485,7 +485,7 @@ class PViewsCommand(PCommand):
                 self.out("%sview predicates (%s)" % (indent, predicate_text))
 
     def command(self):
-        app_spec, url = self.args[0]
+        app_spec, url = self.args
         if not url.startswith('/'):
             url = '/%s' % url
         app = self.get_app(app_spec, loadapp=self.loadapp[0])
