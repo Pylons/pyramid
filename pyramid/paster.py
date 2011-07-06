@@ -1,8 +1,8 @@
+import ConfigParser
 import os
 import re
 import sys
 from code import interact
-from ConfigParser import ConfigParser
 
 import zope.deprecation
 
@@ -23,7 +23,7 @@ def get_app(config_file, name=None, loadapp=loadapp):
     config file ``config_file``.
 
     If the ``name`` is None, this will attempt to parse the name from
-    the ``config_file`` string expecting the format ``ini_path#name``.
+    the ``config_file`` string expecting the format ``ini_file#name``.
     If no name is found, the name will default to "main"."""
     if '#' in config_file:
         path, section = config_file.split('#', 1)
@@ -82,15 +82,19 @@ class PShellCommand(PCommand):
                       dest='disable_ipython',
                       help="Don't use IPython even if it is available")
 
-    ConfigParser = ConfigParser # testing
+    ConfigParser = ConfigParser.ConfigParser # testing
 
     def pshell_file_config(self, filename):
         resolver = DottedNameResolver(None)
         self.loaded_objects = {}
         self.object_help = {}
-        config = ConfigParser()
+        config = self.ConfigParser()
         config.read(filename)
-        for k, v in config.items('pshell'):
+        try:
+            items = config.items('pshell')
+        except ConfigParser.NoSectionError:
+            return
+        for k, v in items:
             self.loaded_objects[k] = resolver.maybe_resolve(v)
             self.object_help[k] = v
 
@@ -115,7 +119,8 @@ class PShellCommand(PCommand):
         default_variables = {'app': 'The WSGI Application'}
         if hasattr(app, 'registry'):
             root, closer = self.get_root(app)
-            shell_globals.update({'root':root, 'registry':app.registry})
+            shell_globals.update({'root':root, 'registry':app.registry,
+                                  'settings': app.registry.settings})
             default_variables.update({
                 'root': 'The root of the default resource tree.',
                 'registry': 'The Pyramid registry object.',

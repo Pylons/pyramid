@@ -15,7 +15,8 @@ class TestPShellCommand(unittest.TestCase):
         loadapp = DummyLoadApp(app)
         command.interact = (interact,)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini#myapp')
+        command.ConfigParser = makeDummyConfigParser({})
+        command.args = ('/foo/bar/myapp.ini#myapp',)
         class Options(object): pass
         command.options = Options()
         command.options.disable_ipython = False
@@ -27,8 +28,10 @@ class TestPShellCommand(unittest.TestCase):
         pushed = app.threadlocal_manager.pushed[0]
         self.assertEqual(pushed['registry'], dummy_registry)
         self.assertEqual(pushed['request'].registry, dummy_registry)
-        self.assertEqual(interact.local, {'root':dummy_root,
-                                          'registry':dummy_registry})
+        self.assertEqual(interact.local, {'app':app,
+                                          'root':dummy_root,
+                                          'registry':dummy_registry,
+                                          'settings':dummy_registry.settings})
         self.assertTrue(interact.banner)
         self.assertEqual(len(app.threadlocal_manager.popped), 1)
 
@@ -39,7 +42,8 @@ class TestPShellCommand(unittest.TestCase):
         loadapp = DummyLoadApp(app)
         command.interact = (interact,)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini#myapp')
+        command.ConfigParser = makeDummyConfigParser({})
+        command.args = ('/foo/bar/myapp.ini#myapp',)
         class Options(object): pass
         command.options = Options()
         command.options.disable_ipython = True
@@ -51,8 +55,10 @@ class TestPShellCommand(unittest.TestCase):
         pushed = app.threadlocal_manager.pushed[0]
         self.assertEqual(pushed['registry'], dummy_registry)
         self.assertEqual(pushed['request'].registry, dummy_registry)
-        self.assertEqual(interact.local, {'root':dummy_root,
-                                          'registry':dummy_registry})
+        self.assertEqual(interact.local, {'app':app,
+                                          'root':dummy_root,
+                                          'registry':dummy_registry,
+                                          'settings':dummy_registry.settings})
         self.assertTrue(interact.banner)
         self.assertEqual(len(app.threadlocal_manager.popped), 1)
 
@@ -61,8 +67,9 @@ class TestPShellCommand(unittest.TestCase):
         app = DummyApp()
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
+        command.ConfigParser = makeDummyConfigParser({})
         dummy_shell_factory = DummyIPShellFactory()
-        command.args = ('/foo/bar/myapp.ini#myapp')
+        command.args = ('/foo/bar/myapp.ini#myapp',)
         class Options(object): pass
         command.options = Options()
         command.options.disable_ipython = False
@@ -75,7 +82,9 @@ class TestPShellCommand(unittest.TestCase):
         self.assertEqual(pushed['registry'], dummy_registry)
         self.assertEqual(pushed['request'].registry, dummy_registry)
         self.assertEqual(dummy_shell_factory.shell.local_ns,
-                         {'root':dummy_root, 'registry':dummy_registry})
+                         {'app':app, 'root':dummy_root,
+                          'registry':dummy_registry,
+                          'settings':dummy_registry.settings})
         self.assertEqual(dummy_shell_factory.shell.global_ns, {})
         self.assertTrue('\n\n' in dummy_shell_factory.shell.IP.BANNER)
         self.assertEqual(len(app.threadlocal_manager.popped), 1)
@@ -92,7 +101,8 @@ class TestPShellCommand(unittest.TestCase):
         interact = DummyInteractor()
         app = DummyApp()
         command.interact = (interact,)
-        command.args = ('/foo/bar/myapp.ini#myapp')
+        command.ConfigParser = makeDummyConfigParser({})
+        command.args = ('/foo/bar/myapp.ini#myapp',)
         class Options(object): pass
         command.options = Options()
         command.options.disable_ipython =True
@@ -101,11 +111,13 @@ class TestPShellCommand(unittest.TestCase):
         pushed = app.threadlocal_manager.pushed[0]
         self.assertEqual(pushed['registry'], dummy_registry)
         self.assertEqual(pushed['request'].registry, dummy_registry)
-        self.assertEqual(interact.local, {'root':dummy_root,
-                                          'registry':dummy_registry})
+        self.assertEqual(interact.local, {'app': app,
+                                          'root':dummy_root,
+                                          'registry':dummy_registry,
+                                          'settings':dummy_registry.settings})
         self.assertTrue(interact.banner)
         self.assertEqual(len(app.threadlocal_manager.popped), 1)
-        self.assertEqual(apped, [(('/foo/bar/myapp.ini', 'myapp'),
+        self.assertEqual(apped, [(('/foo/bar/myapp.ini#myapp',),
                                   {'loadapp': loadapp})])
 
     def test_command_get_root_hookable(self):
@@ -115,13 +127,14 @@ class TestPShellCommand(unittest.TestCase):
         loadapp = DummyLoadApp(app)
         command.interact = (interact,)
         command.loadapp = (loadapp,)
+        command.ConfigParser = makeDummyConfigParser({})
         root = Dummy()
         apps = []
         def get_root(app):
             apps.append(app)
             return root, lambda *arg: None
         command.get_root =get_root
-        command.args = ('/foo/bar/myapp.ini#myapp')
+        command.args = ('/foo/bar/myapp.ini#myapp',)
         class Options(object): pass
         command.options = Options()
         command.options.disable_ipython =True
@@ -130,10 +143,107 @@ class TestPShellCommand(unittest.TestCase):
         self.assertEqual(loadapp.section_name, 'myapp')
         self.assertTrue(loadapp.relative_to)
         self.assertEqual(len(app.threadlocal_manager.pushed), 0)
-        self.assertEqual(interact.local, {'root':root,
-                                          'registry':dummy_registry})
+        self.assertEqual(interact.local, {'app':app,
+                                          'root':root,
+                                          'registry':dummy_registry,
+                                          'settings':dummy_registry.settings})
         self.assertTrue(interact.banner)
         self.assertEqual(apps, [app])
+
+    def test_command_loads_custom_items(self):
+        command = self._makeOne()
+        interact = DummyInteractor()
+        app = DummyApp()
+        loadapp = DummyLoadApp(app)
+        command.interact = (interact,)
+        command.loadapp = (loadapp,)
+        model = Dummy()
+        command.ConfigParser = makeDummyConfigParser([('m', model)])
+        command.args = ('/foo/bar/myapp.ini#myapp',)
+        class Options(object): pass
+        command.options = Options()
+        command.options.disable_ipython = False
+        command.command(IPShell=None)
+        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
+        self.assertEqual(loadapp.section_name, 'myapp')
+        self.assertTrue(loadapp.relative_to)
+        self.assertEqual(len(app.threadlocal_manager.pushed), 1)
+        pushed = app.threadlocal_manager.pushed[0]
+        self.assertEqual(pushed['registry'], dummy_registry)
+        self.assertEqual(pushed['request'].registry, dummy_registry)
+        self.assertEqual(interact.local, {'app':app,
+                                          'root':dummy_root,
+                                          'registry':dummy_registry,
+                                          'settings':dummy_registry.settings,
+                                          'm': model})
+        self.assertTrue(interact.banner)
+        self.assertEqual(len(app.threadlocal_manager.popped), 1)
+
+    def test_command_no_custom_section(self):
+        command = self._makeOne()
+        interact = DummyInteractor()
+        app = DummyApp()
+        loadapp = DummyLoadApp(app)
+        command.interact = (interact,)
+        command.loadapp = (loadapp,)
+        command.ConfigParser = makeDummyConfigParser(None)
+        command.args = ('/foo/bar/myapp.ini#myapp',)
+        class Options(object): pass
+        command.options = Options()
+        command.options.disable_ipython = False
+        command.command(IPShell=None)
+        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
+        self.assertEqual(loadapp.section_name, 'myapp')
+        self.assertTrue(loadapp.relative_to)
+        self.assertEqual(len(app.threadlocal_manager.pushed), 1)
+        pushed = app.threadlocal_manager.pushed[0]
+        self.assertEqual(pushed['registry'], dummy_registry)
+        self.assertEqual(pushed['request'].registry, dummy_registry)
+        self.assertEqual(interact.local, {'app':app,
+                                          'root':dummy_root,
+                                          'registry':dummy_registry,
+                                          'settings':dummy_registry.settings})
+        self.assertTrue(interact.banner)
+        self.assertEqual(len(app.threadlocal_manager.popped), 1)
+
+    def test_command_custom_section_override(self):
+        command = self._makeOne()
+        interact = DummyInteractor()
+        app = Dummy()
+        loadapp = DummyLoadApp(app)
+        command.interact = (interact,)
+        command.loadapp = (loadapp,)
+        model = Dummy()
+        command.ConfigParser = makeDummyConfigParser([('app', model)])
+        command.args = ('/foo/bar/myapp.ini#myapp',)
+        class Options(object): pass
+        command.options = Options()
+        command.options.disable_ipython = False
+        command.command(IPShell=None)
+        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
+        self.assertEqual(loadapp.section_name, 'myapp')
+        self.assertTrue(loadapp.relative_to)
+        self.assertEqual(interact.local, {'app':model})
+        self.assertTrue(interact.banner)
+
+    def test_command_generic_wsgi_app(self):
+        command = self._makeOne()
+        interact = DummyInteractor()
+        app = Dummy()
+        loadapp = DummyLoadApp(app)
+        command.interact = (interact,)
+        command.loadapp = (loadapp,)
+        command.ConfigParser = makeDummyConfigParser(None)
+        command.args = ('/foo/bar/myapp.ini#myapp',)
+        class Options(object): pass
+        command.options = Options()
+        command.options.disable_ipython = False
+        command.command(IPShell=None)
+        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
+        self.assertEqual(loadapp.section_name, 'myapp')
+        self.assertTrue(loadapp.relative_to)
+        self.assertEqual(interact.local, {'app':app})
+        self.assertTrue(interact.banner)
 
 class TestPRoutesCommand(unittest.TestCase):
     def _getTargetClass(self):
@@ -152,7 +262,7 @@ class TestPRoutesCommand(unittest.TestCase):
         app = DummyApp()
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini#myapp')
+        command.args = ('/foo/bar/myapp.ini#myapp',)
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L, [])
@@ -165,7 +275,7 @@ class TestPRoutesCommand(unittest.TestCase):
         app = DummyApp()
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini#myapp')
+        command.args = ('/foo/bar/myapp.ini#myapp',)
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L, [])
@@ -180,7 +290,7 @@ class TestPRoutesCommand(unittest.TestCase):
         app = DummyApp()
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini#myapp')
+        command.args = ('/foo/bar/myapp.ini#myapp',)
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(len(L), 3)
@@ -205,7 +315,7 @@ class TestPRoutesCommand(unittest.TestCase):
         app.registry = registry
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini#myapp')
+        command.args = ('/foo/bar/myapp.ini#myapp',)
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(len(L), 3)
@@ -235,7 +345,7 @@ class TestPRoutesCommand(unittest.TestCase):
         app.registry = registry
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini#myapp')
+        command.args = ('/foo/bar/myapp.ini#myapp',)
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(len(L), 3)
@@ -268,7 +378,7 @@ class TestPRoutesCommand(unittest.TestCase):
         app.registry = registry
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini#myapp')
+        command.args = ('/foo/bar/myapp.ini#myapp',)
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(len(L), 3)
@@ -844,6 +954,7 @@ class DummyIPShell(object):
 dummy_root = Dummy()
 
 class DummyRegistry(object):
+    settings = {}
     def queryUtility(self, iface, default=None, name=''):
         return default
 
@@ -925,3 +1036,15 @@ class DummyMultiView(object):
         self.views = [(None, view, None) for view in views]
         self.__request_attrs__ = attrs
 
+def makeDummyConfigParser(items):
+    class DummyConfigParser(object):
+        def read(self, filename):
+            self.filename = filename
+
+        def items(self, section):
+            self.section = section
+            if items is None:
+                from ConfigParser import NoSectionError
+                raise NoSectionError, section
+            return items
+    return DummyConfigParser
