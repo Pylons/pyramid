@@ -1,13 +1,16 @@
 import os
+import re
 import sys
 from code import interact
 
 import zope.deprecation
 
 from paste.deploy import loadapp
+from paste.script.command import BadCommand
 from paste.script.command import Command
 
 from pyramid.scripting import get_root
+from pyramid.util import DottedNameResolver
 
 from pyramid.scaffolds import PyramidTemplate # bw compat
 zope.deprecation.deprecated(
@@ -79,6 +82,45 @@ class PShellCommand(PCommand):
                       dest='disable_ipython',
                       help="Don't use IPython even if it is available")
 
+    _pshell_section_re = re.compile(r'^\s*\[\s*pshell\s*\]\s*$')
+    _section_re = re.compile(r'^\s*\[')
+
+    def pshell_file_config(self, filename):
+        vars = {
+            'here': os.path.dirname(filename),
+            '__file__': filename,
+        }
+        f = open(filename)
+        lines = f.readlines()
+        f.close()
+        lineno = 1
+        # find the pshell section
+        while lines:
+            if self._pshell_section_re.search(lines[0]):
+                lines.pop(0)
+                break
+            lines.pop(0)
+            lineno += 1
+        # parse pshell section for key/value pairs
+        resolver = DottedNameResolver(None)
+        self.loaded_objects = {}
+        self.object_help = {}
+        for line in lines:
+            lineno += 1
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
+            if self._section_re.search(line):
+                break
+            if '=' not in line:
+                raise BadCommand('Missing = in %s at %s: %r'
+                                 % (filename, lineno, line))
+            name, value = line.split('=', 1)
+            name = name.strip()
+            value = value.strip() % vars
+            self.loaded_objects[name] = resolver.maybe_resolve(value)
+            self.object_help[name] = value
+
     def command(self, IPShell=_marker):
         # IPShell passed to command method is for testing purposes
         if IPShell is _marker: # pragma: no cover
@@ -86,15 +128,58 @@ class PShellCommand(PCommand):
                 from IPython.Shell import IPShell
             except ImportError:
                 IPShell = None
-        cprt =('Type "help" for more information. "root" is the Pyramid app '
-               'root object, "registry" is the Pyramid registry object.')
+        cprt =('Type "help" for more information.')
         banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
         app_spec = self.args[0]
         config_file = app_spec.split('#', 1)[0]
         self.logging_file_config(config_file)
         app = self.get_app(app_spec, loadapp=self.loadapp[0])
-        root, closer = self.get_root(app)
-        shell_globals = {'root':root, 'registry':app.registry}
+
+        # load default globals
+        shell_globals = {
+            'app': app,
+        }
+        default_variables = {'app': 'The WSGI Application'}
+        if hasattr(app, 'registry'):
+            root, closer = self.get_root(app)
+            shell_globals.update({'root':root, 'registry':app.registry})
+            default_variables.update({
+                'root': 'The root of the default resource tree.',
+                'registry': 'The Pyramid registry object.',
+                'settings': 'The Pyramid settings object.',
+            })
+            warning = ''
+        else:
+            # warn the user that this isn't actually the Pyramid app
+            warning = """\n
+WARNING: You have loaded a generic WSGI application, therefore the
+"root" and "registry" are not available. To correct this, run "pshell"
+again and specify the INI section containing your Pyramid application."""
+            closer = lambda: None
+
+        # load the pshell section of the ini file
+        self.pshell_file_config(config_file)
+        shell_globals.update(self.loaded_objects)
+
+        # eliminate duplicates from default_variables
+        for k in self.loaded_objects:
+            if k in default_variables:
+                del default_variables[k]
+
+        # append the loaded variables
+        if default_variables:
+            banner += '\n\nDefault Variables:'
+            for var, txt in default_variables.iteritems():
+                banner += '\n  %-12s %s' % (var, txt)
+
+        if self.object_help:
+            banner += '\n\nCustom Variables:'
+            for var in sorted(self.object_help.keys()):
+                banner += '\n  %-12s %s' % (var, self.object_help[var])
+
+        # append the warning
+        banner += warning
+        banner += '\n'
 
         if (IPShell is None) or self.options.disable_ipython:
             try:
