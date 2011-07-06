@@ -15,7 +15,7 @@ class TestPShellCommand(unittest.TestCase):
         loadapp = DummyLoadApp(app)
         command.interact = (interact,)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini', 'myapp')
+        command.args = ('/foo/bar/myapp.ini#myapp')
         class Options(object): pass
         command.options = Options()
         command.options.disable_ipython = False
@@ -39,7 +39,7 @@ class TestPShellCommand(unittest.TestCase):
         loadapp = DummyLoadApp(app)
         command.interact = (interact,)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini', 'myapp')
+        command.args = ('/foo/bar/myapp.ini#myapp')
         class Options(object): pass
         command.options = Options()
         command.options.disable_ipython = True
@@ -62,7 +62,7 @@ class TestPShellCommand(unittest.TestCase):
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
         dummy_shell_factory = DummyIPShellFactory()
-        command.args = ('/foo/bar/myapp.ini', 'myapp')
+        command.args = ('/foo/bar/myapp.ini#myapp')
         class Options(object): pass
         command.options = Options()
         command.options.disable_ipython = False
@@ -92,7 +92,7 @@ class TestPShellCommand(unittest.TestCase):
         interact = DummyInteractor()
         app = DummyApp()
         command.interact = (interact,)
-        command.args = ('/foo/bar/myapp.ini', 'myapp')
+        command.args = ('/foo/bar/myapp.ini#myapp')
         class Options(object): pass
         command.options = Options()
         command.options.disable_ipython =True
@@ -121,7 +121,7 @@ class TestPShellCommand(unittest.TestCase):
             apps.append(app)
             return root, lambda *arg: None
         command.get_root =get_root
-        command.args = ('/foo/bar/myapp.ini', 'myapp')
+        command.args = ('/foo/bar/myapp.ini#myapp')
         class Options(object): pass
         command.options = Options()
         command.options.disable_ipython =True
@@ -152,7 +152,7 @@ class TestPRoutesCommand(unittest.TestCase):
         app = DummyApp()
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini', 'myapp')
+        command.args = ('/foo/bar/myapp.ini#myapp')
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L, [])
@@ -165,7 +165,7 @@ class TestPRoutesCommand(unittest.TestCase):
         app = DummyApp()
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini', 'myapp')
+        command.args = ('/foo/bar/myapp.ini#myapp')
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L, [])
@@ -180,7 +180,7 @@ class TestPRoutesCommand(unittest.TestCase):
         app = DummyApp()
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini', 'myapp')
+        command.args = ('/foo/bar/myapp.ini#myapp')
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(len(L), 3)
@@ -205,7 +205,7 @@ class TestPRoutesCommand(unittest.TestCase):
         app.registry = registry
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini', 'myapp')
+        command.args = ('/foo/bar/myapp.ini#myapp')
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(len(L), 3)
@@ -235,7 +235,7 @@ class TestPRoutesCommand(unittest.TestCase):
         app.registry = registry
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini', 'myapp')
+        command.args = ('/foo/bar/myapp.ini#myapp')
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(len(L), 3)
@@ -268,7 +268,7 @@ class TestPRoutesCommand(unittest.TestCase):
         app.registry = registry
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini', 'myapp')
+        command.args = ('/foo/bar/myapp.ini#myapp')
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(len(L), 3)
@@ -511,7 +511,7 @@ class TestPViewsCommand(unittest.TestCase):
         app.registry = registry
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini', 'myapp', '/a')
+        command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L[1], 'URL = /a')
@@ -528,7 +528,7 @@ class TestPViewsCommand(unittest.TestCase):
         app.registry = registry
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini', 'myapp', 'a')
+        command.args = ('/foo/bar/myapp.ini#myapp', 'a')
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L[1], 'URL = /a')
@@ -546,7 +546,7 @@ class TestPViewsCommand(unittest.TestCase):
         app.registry = registry
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini', 'myapp', '/a')
+        command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L[1], 'URL = /a')
@@ -567,7 +567,7 @@ class TestPViewsCommand(unittest.TestCase):
         app.registry = registry
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini', 'myapp', '/a')
+        command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L[1], 'URL = /a')
@@ -588,7 +588,7 @@ class TestPViewsCommand(unittest.TestCase):
         app.registry = registry
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini', 'myapp', '/a')
+        command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L[1], 'URL = /a')
@@ -612,7 +612,7 @@ class TestPViewsCommand(unittest.TestCase):
         app.registry = registry
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini', 'myapp', '/a')
+        command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L[1], 'URL = /a')
@@ -635,7 +635,7 @@ class TestPViewsCommand(unittest.TestCase):
         app.registry = registry
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini', 'myapp', '/a')
+        command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L[1], 'URL = /a')
@@ -665,7 +665,7 @@ class TestPViewsCommand(unittest.TestCase):
         app.registry = registry
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini', 'myapp', '/a')
+        command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L[1], 'URL = /a')
@@ -690,7 +690,7 @@ class TestPViewsCommand(unittest.TestCase):
         app.registry = registry
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini', 'myapp', '/a')
+        command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L[1], 'URL = /a')
@@ -719,7 +719,7 @@ class TestPViewsCommand(unittest.TestCase):
         app.registry = registry
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini', 'myapp', '/a')
+        command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L[1], 'URL = /a')
@@ -743,7 +743,7 @@ class TestPViewsCommand(unittest.TestCase):
         app.registry = registry
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini', 'myapp', '/a')
+        command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L[1], 'URL = /a')
@@ -770,7 +770,7 @@ class TestPViewsCommand(unittest.TestCase):
         app.registry = registry
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
-        command.args = ('/foo/bar/myapp.ini', 'myapp', '/a')
+        command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(L[1], 'URL = /a')
@@ -796,6 +796,26 @@ class TestGetApp(unittest.TestCase):
         result = self._callFUT('/foo/bar/myapp.ini', 'myapp', loadapp)
         self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
         self.assertEqual(loadapp.section_name, 'myapp')
+        self.assertEqual(loadapp.relative_to, os.getcwd())
+        self.assertEqual(result, app)
+
+    def test_it_with_hash(self):
+        import os
+        app = DummyApp()
+        loadapp = DummyLoadApp(app)
+        result = self._callFUT('/foo/bar/myapp.ini#myapp', None, loadapp)
+        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
+        self.assertEqual(loadapp.section_name, 'myapp')
+        self.assertEqual(loadapp.relative_to, os.getcwd())
+        self.assertEqual(result, app)
+
+    def test_it_with_hash_and_name_override(self):
+        import os
+        app = DummyApp()
+        loadapp = DummyLoadApp(app)
+        result = self._callFUT('/foo/bar/myapp.ini#myapp', 'yourapp', loadapp)
+        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
+        self.assertEqual(loadapp.section_name, 'yourapp')
         self.assertEqual(loadapp.relative_to, os.getcwd())
         self.assertEqual(result, app)
         
