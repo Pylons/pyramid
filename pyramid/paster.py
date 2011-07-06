@@ -2,11 +2,11 @@ import os
 import re
 import sys
 from code import interact
+from ConfigParser import ConfigParser
 
 import zope.deprecation
 
 from paste.deploy import loadapp
-from paste.script.command import BadCommand
 from paste.script.command import Command
 
 from pyramid.scripting import get_root
@@ -82,44 +82,17 @@ class PShellCommand(PCommand):
                       dest='disable_ipython',
                       help="Don't use IPython even if it is available")
 
-    _pshell_section_re = re.compile(r'^\s*\[\s*pshell\s*\]\s*$')
-    _section_re = re.compile(r'^\s*\[')
+    ConfigParser = ConfigParser # testing
 
     def pshell_file_config(self, filename):
-        vars = {
-            'here': os.path.dirname(filename),
-            '__file__': filename,
-        }
-        f = open(filename)
-        lines = f.readlines()
-        f.close()
-        lineno = 1
-        # find the pshell section
-        while lines:
-            if self._pshell_section_re.search(lines[0]):
-                lines.pop(0)
-                break
-            lines.pop(0)
-            lineno += 1
-        # parse pshell section for key/value pairs
         resolver = DottedNameResolver(None)
         self.loaded_objects = {}
         self.object_help = {}
-        for line in lines:
-            lineno += 1
-            line = line.strip()
-            if not line or line.startswith('#'):
-                continue
-            if self._section_re.search(line):
-                break
-            if '=' not in line:
-                raise BadCommand('Missing = in %s at %s: %r'
-                                 % (filename, lineno, line))
-            name, value = line.split('=', 1)
-            name = name.strip()
-            value = value.strip() % vars
-            self.loaded_objects[name] = resolver.maybe_resolve(value)
-            self.object_help[name] = value
+        config = ConfigParser()
+        config.read(filename)
+        for k, v in config.items('pshell'):
+            self.loaded_objects[k] = resolver.maybe_resolve(v)
+            self.object_help[k] = v
 
     def command(self, IPShell=_marker):
         # IPShell passed to command method is for testing purposes
