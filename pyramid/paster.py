@@ -15,12 +15,22 @@ zope.deprecation.deprecated(
                         'pyramid.scaffolds.PyramidTemplate in Pyramid 1.1'),
 )
 
-def get_app(config_file, name, loadapp=loadapp):
+def get_app(config_file, name=None, loadapp=loadapp):
     """ Return the WSGI application named ``name`` in the PasteDeploy
-    config file ``config_file``"""
-    config_name = 'config:%s' % config_file
+    config file ``config_file``.
+
+    If the ``name`` is None, this will attempt to parse the name from
+    the ``config_file`` string expecting the format ``ini_path#name``.
+    If no name is found, the name will default to "main"."""
+    if '#' in config_file:
+        path, section = config_file.split('#', 1)
+    else:
+        path, section = config_file, 'main'
+    if name:
+        section = name
+    config_name = 'config:%s' % path
     here_dir = os.getcwd()
-    app = loadapp(config_name, name=name, relative_to=here_dir)
+    app = loadapp(config_name, name=section, relative_to=here_dir)
     return app
 
 _marker = object()
@@ -42,17 +52,15 @@ class PCommand(Command):
 class PShellCommand(PCommand):
     """Open an interactive shell with a :app:`Pyramid` app loaded.
 
-    This command accepts two positional arguments:
+    This command accepts one positional argument:
 
-    ``config_file`` -- specifies the PasteDeploy config file to use
-    for the interactive shell.  
-
-    ``section_name`` -- specifies the section name in the PasteDeploy
-    config file that represents the application.
+    ``config_file#section_name`` -- specifies the PasteDeploy config file
+    to use for the interactive shell. If the section_name is left off,
+    ``main`` will be assumed.
 
     Example::
 
-        $ paster pshell myapp.ini main
+        $ paster pshell myapp.ini#main
 
     .. note:: You should use a ``section_name`` that refers to the
               actual ``app`` section in the config file that points at
@@ -62,8 +70,8 @@ class PShellCommand(PCommand):
     """
     summary = "Open an interactive shell with a Pyramid application loaded"
 
-    min_args = 2
-    max_args = 2
+    min_args = 1
+    max_args = 1
 
     parser = Command.standard_parser(simulate=True)
     parser.add_option('-d', '--disable-ipython',
@@ -81,9 +89,10 @@ class PShellCommand(PCommand):
         cprt =('Type "help" for more information. "root" is the Pyramid app '
                'root object, "registry" is the Pyramid registry object.')
         banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
-        config_file, section_name = self.args
+        app_spec = self.args[0]
+        config_file = app_spec.split('#', 1)[0]
         self.logging_file_config(config_file)
-        app = self.get_app(config_file, section_name, loadapp=self.loadapp[0])
+        app = self.get_app(app_spec, loadapp=self.loadapp[0])
         root, closer = self.get_root(app)
         shell_globals = {'root':root, 'registry':app.registry}
 
@@ -108,17 +117,15 @@ class PRoutesCommand(PCommand):
     route, the pattern of the route, and the view callable which will be
     invoked when the route is matched.
 
-    This command accepts two positional arguments:
+    This command accepts one positional argument:
 
-    ``config_file`` -- specifies the PasteDeploy config file to use
-    for the interactive shell.  
-
-    ``section_name`` -- specifies the section name in the PasteDeploy
-    config file that represents the application.
+    ``config_file#section_name`` -- specifies the PasteDeploy config file
+    to use for the interactive shell. If the section_name is left off,
+    ``main`` will be assumed.
 
     Example::
 
-        $ paster proutes myapp.ini main
+        $ paster proutes myapp.ini#main
 
     .. note:: You should use a ``section_name`` that refers to the
               actual ``app`` section in the config file that points at
@@ -126,8 +133,8 @@ class PRoutesCommand(PCommand):
               command will almost certainly fail.
     """
     summary = "Print all URL dispatch routes related to a Pyramid application"
-    min_args = 2
-    max_args = 2
+    min_args = 1
+    max_args = 1
     stdout = sys.stdout
 
     parser = Command.standard_parser(simulate=True)
@@ -146,8 +153,8 @@ class PRoutesCommand(PCommand):
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IView
         from zope.interface import Interface
-        config_file, section_name = self.args
-        app = self.get_app(config_file, section_name, loadapp=self.loadapp[0])
+        app_spec = self.args[0]
+        app = self.get_app(app_spec, loadapp=self.loadapp[0])
         registry = app.registry
         mapper = self._get_mapper(app)
         if mapper is not None:
@@ -179,19 +186,17 @@ class PViewsCommand(PCommand):
     each route+predicate set, print each view that might match and its
     predicates.
 
-    This command accepts three positional arguments:
+    This command accepts two positional arguments:
 
-    ``config_file`` -- specifies the PasteDeploy config file to use
-    for the interactive shell.  
-
-    ``section_name`` -- specifies the section name in the PasteDeploy
-    config file that represents the application.
+    ``config_file#section_name`` -- specifies the PasteDeploy config file
+    to use for the interactive shell. If the section_name is left off,
+    ``main`` will be assumed.
 
     ``url`` -- specifies the URL that will be used to find matching views.
 
     Example::
 
-        $ paster proutes myapp.ini main url
+        $ paster proutes myapp.ini#main url
 
     .. note:: You should use a ``section_name`` that refers to the
               actual ``app`` section in the config file that points at
@@ -199,8 +204,8 @@ class PViewsCommand(PCommand):
               command will almost certainly fail.
     """
     summary = "Print all views in an application that might match a URL"
-    min_args = 3
-    max_args = 3
+    min_args = 2
+    max_args = 2
     stdout = sys.stdout
 
     parser = Command.standard_parser(simulate=True)
@@ -395,10 +400,10 @@ class PViewsCommand(PCommand):
                 self.out("%sview predicates (%s)" % (indent, predicate_text))
 
     def command(self):
-        config_file, section_name, url = self.args
+        app_spec, url = self.args[0]
         if not url.startswith('/'):
             url = '/%s' % url
-        app = self.get_app(config_file, section_name, loadapp=self.loadapp[0])
+        app = self.get_app(app_spec, loadapp=self.loadapp[0])
         registry = app.registry
         view = self._find_view(url, registry)
         self.out('')
