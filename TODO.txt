@@ -12,6 +12,8 @@ Must-Have
   (DBSession.rollback()/transaction.abort() in scaffold vs. "pass" in
   tutorial)
 
+- Allow views to override http_cache headers.
+
 Should-Have
 -----------
 
