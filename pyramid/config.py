@@ -3122,22 +3122,26 @@ class ViewDeriver(object):
 
         def _rendered_view(context, request):
             renderer = static_renderer
-            response = wrapped_view(context, request)
+            result = wrapped_view(context, request)
             registry = self.kw['registry']
-            attrs = getattr(request, '__dict__', {})
-            if 'override_renderer' in attrs:
-                # renderer overridden by newrequest event or other
-                renderer_name = attrs.pop('override_renderer')
-                renderer = RendererHelper(name=renderer_name,
-                                          package=self.kw.get('package'),
-                                          registry = registry)
-            if '__view__' in attrs:
-                view_inst = attrs.pop('__view__')
-            else:
-                view_inst = getattr(wrapped_view, '__original_view__',
-                                    wrapped_view)
-            response = renderer.render_view(request, response, view_inst,
-                                            context)
+            # this must adapt, it can't do a simple interface check
+            # (webob responses)
+            response = registry.queryAdapterOrSelf(result, IResponse)
+            if response is None:
+                attrs = getattr(request, '__dict__', {})
+                if 'override_renderer' in attrs:
+                    # renderer overridden by newrequest event or other
+                    renderer_name = attrs.pop('override_renderer')
+                    renderer = RendererHelper(name=renderer_name,
+                                              package=self.kw.get('package'),
+                                              registry = registry)
+                if '__view__' in attrs:
+                    view_inst = attrs.pop('__view__')
+                else:
+                    view_inst = getattr(wrapped_view, '__original_view__',
+                                        wrapped_view)
+                response = renderer.render_view(request, result, view_inst,
+                                                context)
             return response
 
         return _rendered_view

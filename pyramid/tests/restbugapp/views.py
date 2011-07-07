@@ -1,4 +1,4 @@
-from webob import Response
+from pyramid.response import Response
 
 class BaseRESTView(object):
     def __init__(self, context, request):

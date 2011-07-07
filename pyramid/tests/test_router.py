@@ -4,9 +4,8 @@ from pyramid import testing
 
 class TestRouter(unittest.TestCase):
     def setUp(self):
-        testing.setUp()
-        from pyramid.threadlocal import get_current_registry
-        self.registry = get_current_registry()
+        self.config = testing.setUp()
+        self.registry = self.config.registry
 
     def tearDown(self):
         testing.tearDown()
@@ -242,7 +241,8 @@ class TestRouter(unittest.TestCase):
         self._registerTraverserFactory(context)
         environ = self._makeEnviron()
         view = DummyView('abc')
-        self._registerView(view, '', IViewClassifier, None, None)
+        self._registerView(self.config.derive_view(view), '', IViewClassifier,
+                           None, None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         self.assertRaises(ValueError, router, environ, start_response)
@@ -255,7 +255,8 @@ class TestRouter(unittest.TestCase):
         self._registerTraverserFactory(context)
         environ = self._makeEnviron()
         view = DummyView('abc')
-        self._registerView(view, '', IViewClassifier, None, None)
+        self._registerView(self.config.derive_view(view), '',
+                           IViewClassifier, None, None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         def make_response(s):
@@ -273,7 +274,8 @@ class TestRouter(unittest.TestCase):
         response.app_iter = ['Hello world']
         view = DummyView(response)
         environ = self._makeEnviron()
-        self._registerView(view, '', IViewClassifier, None, None)
+        self._registerView(self.config.derive_view(view), '',
+                           IViewClassifier, None, None)
         self._registerRootFactory(context)
         router = self._makeOne()
         start_response = DummyStartResponse()
@@ -856,9 +858,12 @@ class TestRouter(unittest.TestCase):
         environ = self._makeEnviron()
         response = DummyResponse()
         view = DummyView(response, raise_exception=RuntimeError)
-        self._registerView(view, '', IViewClassifier, IRequest, None)
+        
+        self._registerView(self.config.derive_view(view), '',
+                           IViewClassifier, IRequest, None)
         exception_view = DummyView(None)
-        self._registerView(exception_view, '', IExceptionViewClassifier,
+        self._registerView(self.config.derive_view(exception_view), '',
+                           IExceptionViewClassifier,
                            IRequest, RuntimeError)
         router = self._makeOne()
         start_response = DummyStartResponse()
