@@ -3981,7 +3981,8 @@ class TestViewDeriver(unittest.TestCase):
         def outer_view(context, request):
             self.assertEqual(request.wrapped_response, inner_response)
             self.assertEqual(request.wrapped_body, inner_response.body)
-            self.assertEqual(request.wrapped_view, inner_view)
+            self.assertEqual(request.wrapped_view.__original_view__,
+                             inner_view)
             return Response('outer ' + request.wrapped_body)
         self.config.registry.registerAdapter(
             outer_view, (IViewClassifier, None, None), IView, 'owrap')
