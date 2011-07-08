@@ -238,14 +238,14 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(request.json, None)
         
     def test_json_correct_mimetype(self):
-        request = self._makeOne({})
+        request = self._makeOne({'REQUEST_METHOD':'POST'})
         request.content_type = 'application/json'
         request.body = '{"a":1}'
         self.assertEqual(request.json, {'a':1})
 
     def test_json_alternate_charset(self):
         from pyramid.compat import json
-        request = self._makeOne({})
+        request = self._makeOne({'REQUEST_METHOD':'POST'})
         request.content_type = 'application/json'
         request.charset = 'latin-1'
         la = unicode('La Pe\xc3\xb1a', 'utf-8')
