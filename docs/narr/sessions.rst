@@ -288,7 +288,7 @@ Preventing Cross-Site Request Forgery Attacks
 `Cross-site request forgery
 <http://en.wikipedia.org/wiki/Cross-site_request_forgery>`_ attacks are a
 phenomenon whereby a user with an identity on your website might click on a
-URL or button on another website which unwittingly redirects the user to your
+URL or button on another website which secretly redirects the user to your
 application to perform some command that requires elevated privileges.
 
 You can avoid most of these attacks by making sure that the correct *CSRF
