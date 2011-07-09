@@ -2938,7 +2938,7 @@ class ViewDeriver(object):
     @wraps_view
     def response_resolved_view(self, view):
         registry = self.registry
-        def wrapper(context, request):
+        def viewresult_to_response(context, request):
             result = view(context, request)
             response = registry.queryAdapterOrSelf(result, IResponse)
             if response is None:
@@ -2946,7 +2946,7 @@ class ViewDeriver(object):
                     'Could not convert view return value "%s" into a '
                     'response object' % (result,))
             return response
-        return wrapper
+        return viewresult_to_response
 
     @wraps_view
     def mapped_view(self, view):
