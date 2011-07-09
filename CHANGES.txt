@@ -65,6 +65,14 @@ Features
   to only influence ``Cache-Control`` headers, pass a tuple as ``http_cache``
   with the first element of ``None``, e.g.: ``(None, {'public':True})``.
 
+Bug Fixes
+---------
+
+- Framework wrappers of the original view (such as http_cached and so on)
+  relied on being able to trust that the response they were receiving was an
+  IResponse.  It wasn't always, because the response was resolved by the
+  router instead of early in the view wrapping process.  This has been fixed.
+
 1.1a4 (2011-07-01)
 ==================
 
