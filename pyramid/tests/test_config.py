@@ -10,7 +10,9 @@ except:
 class ConfiguratorTests(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.config import Configurator
-        return Configurator(*arg, **kw)
+        config = Configurator(*arg, **kw)
+        config.registry._dont_resolve_responses = True
+        return config
 
     def _registerRenderer(self, config, name='.txt'):
         from pyramid.interfaces import IRendererFactory
@@ -211,7 +213,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = self._getViewCallable(config,
                                      ctx_iface=IExceptionResponse,
                                      request_iface=IRequest)
-        self.assertTrue(view is default_exceptionresponse_view)
+        self.assertTrue(view.__wraps__ is default_exceptionresponse_view)
 
     def test_ctor_exceptionresponse_view_None(self):
         from pyramid.interfaces import IExceptionResponse
@@ -230,7 +232,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = self._getViewCallable(config,
                                      ctx_iface=IExceptionResponse,
                                      request_iface=IRequest)
-        self.assertTrue(view is exceptionresponse_view)
+        self.assertTrue(view.__wraps__ is exceptionresponse_view)
 
     def test_with_package_module(self):
         from pyramid.tests import test_configuration
@@ -3195,8 +3197,10 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
 
     def _makeOne(self, *arg, **kw):
         from pyramid.config import Configurator
-        return Configurator(*arg, **kw)
-
+        config = Configurator(*arg, **kw)
+        config.registry._dont_resolve_responses = True
+        return config
+    
     def _getRouteRequestIface(self, config, name):
         from pyramid.interfaces import IRouteRequest
         iface = config.registry.getUtility(IRouteRequest, name)
@@ -3503,29 +3507,31 @@ class TestViewDeriver(unittest.TestCase):
         self.config.registry.registerUtility(policy, IAuthorizationPolicy)
 
     def test_requestonly_function(self):
+        response = DummyResponse()
         def view(request):
-            return 'OK'
+            return response
         deriver = self._makeOne()
         result = deriver(view)
         self.assertFalse(result is view)
-        self.assertEqual(result(None, None), 'OK')
+        self.assertEqual(result(None, None), response)
 
     def test_requestonly_function_with_renderer(self):
+        response = DummyResponse()
         class moo(object):
             def render_view(inself, req, resp, view_inst, ctx):
                 self.assertEqual(req, request)
                 self.assertEqual(resp, 'OK')
                 self.assertEqual(view_inst, view)
                 self.assertEqual(ctx, context)
-                return 'moo'
+                return response
         def view(request):
             return 'OK'
         deriver = self._makeOne(renderer=moo())
         result = deriver(view)
-        self.assertFalse(result is view)
+        self.assertFalse(result.__wraps__ is view)
         request = self._makeRequest()
         context = testing.DummyResource()
-        self.assertEqual(result(context, request), 'moo')
+        self.assertEqual(result(context, request), response)
 
     def test_requestonly_function_with_renderer_request_override(self):
         def moo(info):
@@ -3547,46 +3553,50 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(result(context, request).body, 'moo')
 
     def test_requestonly_function_with_renderer_request_has_view(self):
+        response = DummyResponse()
         class moo(object):
             def render_view(inself, req, resp, view_inst, ctx):
                 self.assertEqual(req, request)
                 self.assertEqual(resp, 'OK')
                 self.assertEqual(view_inst, 'view')
                 self.assertEqual(ctx, context)
-                return 'moo'
+                return response
         def view(request):
             return 'OK'
         deriver = self._makeOne(renderer=moo())
         result = deriver(view)
-        self.assertFalse(result is view)
+        self.assertFalse(result.__wraps__ is view)
         request = self._makeRequest()
         request.__view__ = 'view'
         context = testing.DummyResource()
-        self.assertEqual(result(context, request), 'moo')
+        r = result(context, request)
+        self.assertEqual(r, response)
         self.assertFalse(hasattr(request, '__view__'))
 
     def test_class_without_attr(self):
+        response = DummyResponse()
         class View(object):
             def __init__(self, request):
                 pass
             def __call__(self):
-                return 'OK'
+                return response
         deriver = self._makeOne()
         result = deriver(View)
         request = self._makeRequest()
-        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(result(None, request), response)
         self.assertEqual(request.__view__.__class__, View)
 
     def test_class_with_attr(self):
+        response = DummyResponse()
         class View(object):
             def __init__(self, request):
                 pass
             def another(self):
-                return 'OK'
+                return response
         deriver = self._makeOne(attr='another')
         result = deriver(View)
         request = self._makeRequest()
-        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(result(None, request), response)
         self.assertEqual(request.__view__.__class__, View)
 
     def test_as_function_context_and_request(self):
@@ -3594,13 +3604,14 @@ class TestViewDeriver(unittest.TestCase):
             return 'OK'
         deriver = self._makeOne()
         result = deriver(view)
-        self.assertTrue(result is view)
+        self.assertTrue(result.__wraps__ is view)
         self.assertFalse(hasattr(result, '__call_permissive__'))
         self.assertEqual(view(None, None), 'OK')
 
     def test_as_function_requestonly(self):
+        response = DummyResponse()
         def view(request):
-            return 'OK'
+            return response
         deriver = self._makeOne()
         result = deriver(view)
         self.assertFalse(result is view)
@@ -3608,14 +3619,15 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
         self.assertFalse(hasattr(result, '__call_permissive__'))
-        self.assertEqual(result(None, None), 'OK')
+        self.assertEqual(result(None, None), response)
 
     def test_as_newstyle_class_context_and_request(self):
+        response = DummyResponse()
         class view(object):
             def __init__(self, context, request):
                 pass
             def __call__(self):
-                return 'OK'
+                return response
         deriver = self._makeOne()
         result = deriver(view)
         self.assertFalse(result is view)
@@ -3624,15 +3636,16 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(view.__name__, result.__name__)
         self.assertFalse(hasattr(result, '__call_permissive__'))
         request = self._makeRequest()
-        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(result(None, request), response)
         self.assertEqual(request.__view__.__class__, view)
 
     def test_as_newstyle_class_requestonly(self):
+        response = DummyResponse()
         class view(object):
             def __init__(self, context, request):
                 pass
             def __call__(self):
-                return 'OK'
+                return response
         deriver = self._makeOne()
         result = deriver(view)
         self.assertFalse(result is view)
@@ -3641,15 +3654,16 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(view.__name__, result.__name__)
         self.assertFalse(hasattr(result, '__call_permissive__'))
         request = self._makeRequest()
-        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(result(None, request), response)
         self.assertEqual(request.__view__.__class__, view)
 
     def test_as_oldstyle_class_context_and_request(self):
+        response = DummyResponse()
         class view:
             def __init__(self, context, request):
                 pass
             def __call__(self):
-                return 'OK'
+                return response
         deriver = self._makeOne()
         result = deriver(view)
         self.assertFalse(result is view)
@@ -3658,15 +3672,16 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(view.__name__, result.__name__)
         self.assertFalse(hasattr(result, '__call_permissive__'))
         request = self._makeRequest()
-        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(result(None, request), response)
         self.assertEqual(request.__view__.__class__, view)
 
     def test_as_oldstyle_class_requestonly(self):
+        response = DummyResponse()
         class view:
             def __init__(self, context, request):
                 pass
             def __call__(self):
-                return 'OK'
+                return response
         deriver = self._makeOne()
         result = deriver(view)
         self.assertFalse(result is view)
@@ -3675,24 +3690,26 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(view.__name__, result.__name__)
         self.assertFalse(hasattr(result, '__call_permissive__'))
         request = self._makeRequest()
-        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(result(None, request), response)
         self.assertEqual(request.__view__.__class__, view)
 
     def test_as_instance_context_and_request(self):
+        response = DummyResponse()
         class View:
             def __call__(self, context, request):
-                return 'OK'
+                return response
         view = View()
         deriver = self._makeOne()
         result = deriver(view)
-        self.assertTrue(result is view)
+        self.assertTrue(result.__wraps__ is view)
         self.assertFalse(hasattr(result, '__call_permissive__'))
-        self.assertEqual(result(None, None), 'OK')
+        self.assertEqual(result(None, None), response)
 
     def test_as_instance_requestonly(self):
+        response = DummyResponse()
         class View:
             def __call__(self, request):
-                return 'OK'
+                return response
         view = View()
         deriver = self._makeOne()
         result = deriver(view)
@@ -3701,10 +3718,11 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertTrue('instance' in result.__name__)
         self.assertFalse(hasattr(result, '__call_permissive__'))
-        self.assertEqual(result(None, None), 'OK')
+        self.assertEqual(result(None, None), response)
 
     def test_with_debug_authorization_no_authpol(self):
-        view = lambda *arg: 'OK'
+        response = DummyResponse()
+        view = lambda *arg: response
         self.config.registry.settings = dict(
             debug_authorization=True, reload_templates=True)
         logger = self._registerLogger()
@@ -3717,7 +3735,7 @@ class TestViewDeriver(unittest.TestCase):
         request = self._makeRequest()
         request.view_name = 'view_name'
         request.url = 'url'
-        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(result(None, request), response)
         self.assertEqual(len(logger.messages), 1)
         self.assertEqual(logger.messages[0],
                          "debug_authorization of url url (view name "
@@ -3725,7 +3743,8 @@ class TestViewDeriver(unittest.TestCase):
                          "(no authorization policy in use)")
 
     def test_with_debug_authorization_authn_policy_no_authz_policy(self):
-        view = lambda *arg: 'OK'
+        response = DummyResponse()
+        view = lambda *arg: response
         self.config.registry.settings = dict(debug_authorization=True)
         from pyramid.interfaces import IAuthenticationPolicy
         policy = DummySecurityPolicy(False)
@@ -3740,7 +3759,7 @@ class TestViewDeriver(unittest.TestCase):
         request = self._makeRequest()
         request.view_name = 'view_name'
         request.url = 'url'
-        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(result(None, request), response)
         self.assertEqual(len(logger.messages), 1)
         self.assertEqual(logger.messages[0],
                          "debug_authorization of url url (view name "
@@ -3748,7 +3767,8 @@ class TestViewDeriver(unittest.TestCase):
                          "(no authorization policy in use)")
 
     def test_with_debug_authorization_authz_policy_no_authn_policy(self):
-        view = lambda *arg: 'OK'
+        response = DummyResponse()
+        view = lambda *arg: response
         self.config.registry.settings = dict(debug_authorization=True)
         from pyramid.interfaces import IAuthorizationPolicy
         policy = DummySecurityPolicy(False)
@@ -3763,7 +3783,7 @@ class TestViewDeriver(unittest.TestCase):
         request = self._makeRequest()
         request.view_name = 'view_name'
         request.url = 'url'
-        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(result(None, request), response)
         self.assertEqual(len(logger.messages), 1)
         self.assertEqual(logger.messages[0],
                          "debug_authorization of url url (view name "
@@ -3771,7 +3791,8 @@ class TestViewDeriver(unittest.TestCase):
                          "(no authorization policy in use)")
 
     def test_with_debug_authorization_no_permission(self):
-        view = lambda *arg: 'OK'
+        response = DummyResponse()
+        view = lambda *arg: response
         self.config.registry.settings = dict(
             debug_authorization=True, reload_templates=True)
         self._registerSecurityPolicy(True)
@@ -3785,7 +3806,7 @@ class TestViewDeriver(unittest.TestCase):
         request = self._makeRequest()
         request.view_name = 'view_name'
         request.url = 'url'
-        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(result(None, request), response)
         self.assertEqual(len(logger.messages), 1)
         self.assertEqual(logger.messages[0],
                          "debug_authorization of url url (view name "
@@ -3793,7 +3814,8 @@ class TestViewDeriver(unittest.TestCase):
                          "no permission registered)")
 
     def test_debug_auth_permission_authpol_permitted(self):
-        view = lambda *arg: 'OK'
+        response = DummyResponse()
+        view = lambda *arg: response
         self.config.registry.settings = dict(
             debug_authorization=True, reload_templates=True)
         logger = self._registerLogger()
@@ -3803,18 +3825,19 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result.__call_permissive__, view)
+        self.assertEqual(result.__call_permissive__.__wraps__, view)
         request = self._makeRequest()
         request.view_name = 'view_name'
         request.url = 'url'
-        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(result(None, request), response)
         self.assertEqual(len(logger.messages), 1)
         self.assertEqual(logger.messages[0],
                          "debug_authorization of url url (view name "
                          "'view_name' against context None): True")
 
     def test_debug_auth_permission_authpol_permitted_no_request(self):
-        view = lambda *arg: 'OK'
+        response = DummyResponse()
+        view = lambda *arg: response
         self.config.registry.settings = dict(
             debug_authorization=True, reload_templates=True)
         logger = self._registerLogger()
@@ -3824,8 +3847,8 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result.__call_permissive__, view)
-        self.assertEqual(result(None, None), 'OK')
+        self.assertEqual(result.__call_permissive__.__wraps__, view)
+        self.assertEqual(result(None, None), response)
         self.assertEqual(len(logger.messages), 1)
         self.assertEqual(logger.messages[0],
                          "debug_authorization of url None (view name "
@@ -3833,7 +3856,8 @@ class TestViewDeriver(unittest.TestCase):
 
     def test_debug_auth_permission_authpol_denied(self):
         from pyramid.httpexceptions import HTTPForbidden
-        view = lambda *arg: 'OK'
+        response = DummyResponse()
+        view = lambda *arg: response
         self.config.registry.settings = dict(
             debug_authorization=True, reload_templates=True)
         logger = self._registerLogger()
@@ -3843,7 +3867,7 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result.__call_permissive__, view)
+        self.assertEqual(result.__call_permissive__.__wraps__, view)
         request = self._makeRequest()
         request.view_name = 'view_name'
         request.url = 'url'
@@ -3871,7 +3895,8 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(permitted, False)
 
     def test_debug_auth_permission_authpol_overridden(self):
-        view = lambda *arg: 'OK'
+        response = DummyResponse()
+        view = lambda *arg: response
         self.config.registry.settings = dict(
             debug_authorization=True, reload_templates=True)
         logger = self._registerLogger()
@@ -3885,14 +3910,15 @@ class TestViewDeriver(unittest.TestCase):
         request = self._makeRequest()
         request.view_name = 'view_name'
         request.url = 'url'
-        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(result(None, request), response)
         self.assertEqual(len(logger.messages), 1)
         self.assertEqual(logger.messages[0],
                          "debug_authorization of url url (view name "
                          "'view_name' against context None): False")
 
     def test_secured_view_authn_policy_no_authz_policy(self):
-        view = lambda *arg: 'OK'
+        response = DummyResponse()
+        view = lambda *arg: response
         self.config.registry.settings = {}
         from pyramid.interfaces import IAuthenticationPolicy
         policy = DummySecurityPolicy(False)
@@ -3906,10 +3932,11 @@ class TestViewDeriver(unittest.TestCase):
         request = self._makeRequest()
         request.view_name = 'view_name'
         request.url = 'url'
-        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(result(None, request), response)
 
     def test_secured_view_authz_policy_no_authn_policy(self):
-        view = lambda *arg: 'OK'
+        response = DummyResponse()
+        view = lambda *arg: response
         self.config.registry.settings = {}
         from pyramid.interfaces import IAuthorizationPolicy
         policy = DummySecurityPolicy(False)
@@ -3923,10 +3950,11 @@ class TestViewDeriver(unittest.TestCase):
         request = self._makeRequest()
         request.view_name = 'view_name'
         request.url = 'url'
-        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(result(None, request), response)
 
     def test_with_predicates_all(self):
-        view = lambda *arg: 'OK'
+        response = DummyResponse()
+        view = lambda *arg: response
         predicates = []
         def predicate1(context, request):
             predicates.append(True)
@@ -3939,7 +3967,7 @@ class TestViewDeriver(unittest.TestCase):
         request = self._makeRequest()
         request.method = 'POST'
         next = result(None, None)
-        self.assertEqual(next, 'OK')
+        self.assertEqual(next, response)
         self.assertEqual(predicates, [True, True])
 
     def test_with_predicates_checker(self):
@@ -3977,7 +4005,7 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(predicates, [True, True])
 
     def test_with_wrapper_viewname(self):
-        from webob import Response
+        from pyramid.response import Response
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         inner_response = Response('OK')
@@ -3986,7 +4014,8 @@ class TestViewDeriver(unittest.TestCase):
         def outer_view(context, request):
             self.assertEqual(request.wrapped_response, inner_response)
             self.assertEqual(request.wrapped_body, inner_response.body)
-            self.assertEqual(request.wrapped_view, inner_view)
+            self.assertEqual(request.wrapped_view.__original_view__,
+                             inner_view)
             return Response('outer ' + request.wrapped_body)
         self.config.registry.registerAdapter(
             outer_view, (IViewClassifier, None, None), IView, 'owrap')
@@ -4001,7 +4030,7 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(response.body, 'outer OK')
 
     def test_with_wrapper_viewname_notfound(self):
-        from webob import Response
+        from pyramid.response import Response
         inner_response = Response('OK')
         def inner_view(context, request):
             return inner_response
@@ -4011,13 +4040,14 @@ class TestViewDeriver(unittest.TestCase):
         self.assertRaises(ValueError, wrapped, None, request)
 
     def test_as_newstyle_class_context_and_request_attr_and_renderer(self):
+        response = DummyResponse()
         class renderer(object):
             def render_view(inself, req, resp, view_inst, ctx):
                 self.assertEqual(req, request)
                 self.assertEqual(resp, {'a':'1'})
                 self.assertEqual(view_inst.__class__, View)
                 self.assertEqual(ctx, context)
-                return resp
+                return response
         class View(object):
             def __init__(self, context, request):
                 pass
@@ -4031,16 +4061,17 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(result.__name__, View.__name__)
         request = self._makeRequest()
         context = testing.DummyResource()
-        self.assertEqual(result(context, request), {'a':'1'})
+        self.assertEqual(result(context, request), response)
 
     def test_as_newstyle_class_requestonly_attr_and_renderer(self):
+        response = DummyResponse()
         class renderer(object):
             def render_view(inself, req, resp, view_inst, ctx):
                 self.assertEqual(req, request)
                 self.assertEqual(resp, {'a':'1'})
                 self.assertEqual(view_inst.__class__, View)
                 self.assertEqual(ctx, context)
-                return resp
+                return response
         class View(object):
             def __init__(self, request):
                 pass
@@ -4054,16 +4085,17 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(result.__name__, View.__name__)
         request = self._makeRequest()
         context = testing.DummyResource()
-        self.assertEqual(result(context, request), {'a':'1'})
+        self.assertEqual(result(context, request), response)
 
     def test_as_oldstyle_cls_context_request_attr_and_renderer(self):
+        response = DummyResponse()
         class renderer(object):
             def render_view(inself, req, resp, view_inst, ctx):
                 self.assertEqual(req, request)
                 self.assertEqual(resp, {'a':'1'})
                 self.assertEqual(view_inst.__class__, View)
                 self.assertEqual(ctx, context)
-                return resp
+                return response
         class View:
             def __init__(self, context, request):
                 pass
@@ -4077,16 +4109,17 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(result.__name__, View.__name__)
         request = self._makeRequest()
         context = testing.DummyResource()
-        self.assertEqual(result(context, request), {'a':'1'})
+        self.assertEqual(result(context, request), response)
 
     def test_as_oldstyle_cls_requestonly_attr_and_renderer(self):
+        response = DummyResponse()
         class renderer(object):
             def render_view(inself, req, resp, view_inst, ctx):
                 self.assertEqual(req, request)
                 self.assertEqual(resp, {'a':'1'})
                 self.assertEqual(view_inst.__class__, View)
                 self.assertEqual(ctx, context)
-                return resp
+                return response
         class View:
             def __init__(self, request):
                 pass
@@ -4100,16 +4133,17 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(result.__name__, View.__name__)
         request = self._makeRequest()
         context = testing.DummyResource()
-        self.assertEqual(result(context, request), {'a':'1'})
+        self.assertEqual(result(context, request), response)
 
     def test_as_instance_context_and_request_attr_and_renderer(self):
+        response = DummyResponse()
         class renderer(object):
             def render_view(inself, req, resp, view_inst, ctx):
                 self.assertEqual(req, request)
                 self.assertEqual(resp, {'a':'1'})
                 self.assertEqual(view_inst, view)
                 self.assertEqual(ctx, context)
-                return resp
+                return response
         class View:
             def index(self, context, request):
                 return {'a':'1'}
@@ -4121,16 +4155,17 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(result.__doc__, view.__doc__)
         request = self._makeRequest()
         context = testing.DummyResource()
-        self.assertEqual(result(context, request), {'a':'1'})
+        self.assertEqual(result(context, request), response)
 
     def test_as_instance_requestonly_attr_and_renderer(self):
+        response = DummyResponse()
         class renderer(object):
             def render_view(inself, req, resp, view_inst, ctx):
                 self.assertEqual(req, request)
                 self.assertEqual(resp, {'a':'1'})
                 self.assertEqual(view_inst, view)
                 self.assertEqual(ctx, context)
-                return resp
+                return response
         class View:
             def index(self, request):
                 return {'a':'1'}
@@ -4142,58 +4177,63 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(result.__doc__, view.__doc__)
         request = self._makeRequest()
         context = testing.DummyResource()
-        self.assertEqual(result(context, request), {'a':'1'})
+        self.assertEqual(result(context, request), response)
 
     def test_with_view_mapper_config_specified(self):
+        response = DummyResponse()
         class mapper(object):
             def __init__(self, **kw):
                 self.kw = kw
             def __call__(self, view):
                 def wrapped(context, request):
-                    return 'OK'
+                    return response
                 return wrapped
         def view(context, request): return 'NOTOK'
         deriver = self._makeOne(mapper=mapper)
         result = deriver(view)
-        self.assertFalse(result is view)
-        self.assertEqual(result(None, None), 'OK')
+        self.assertFalse(result.__wraps__ is view)
+        self.assertEqual(result(None, None), response)
 
     def test_with_view_mapper_view_specified(self):
+        from pyramid.response import Response
+        response = Response()
         def mapper(**kw):
             def inner(view):
                 def superinner(context, request):
                     self.assertEqual(request, None)
-                    return 'OK'
+                    return response
                 return superinner
             return inner
         def view(context, request): return 'NOTOK'
         view.__view_mapper__ = mapper
         deriver = self._makeOne()
         result = deriver(view)
-        self.assertFalse(result is view)
-        self.assertEqual(result(None, None), 'OK')
+        self.assertFalse(result.__wraps__ is view)
+        self.assertEqual(result(None, None), response)
 
     def test_with_view_mapper_default_mapper_specified(self):
+        from pyramid.response import Response
+        response = Response()
         def mapper(**kw):
             def inner(view):
                 def superinner(context, request):
                     self.assertEqual(request, None)
-                    return 'OK'
+                    return  response
                 return superinner
             return inner
         self.config.set_view_mapper(mapper)
         def view(context, request): return 'NOTOK'
         deriver = self._makeOne()
         result = deriver(view)
-        self.assertFalse(result is view)
-        self.assertEqual(result(None, None), 'OK')
+        self.assertFalse(result.__wraps__ is view)
+        self.assertEqual(result(None, None), response)
 
     def test_attr_wrapped_view_branching_default_phash(self):
         from pyramid.config import DEFAULT_PHASH
         def view(context, request): pass
         deriver = self._makeOne(phash=DEFAULT_PHASH)
         result = deriver(view)
-        self.assertEqual(result, view)
+        self.assertEqual(result.__wraps__, view)
 
     def test_attr_wrapped_view_branching_nondefault_phash(self):
         def view(context, request): pass
@@ -4203,7 +4243,7 @@ class TestViewDeriver(unittest.TestCase):
 
     def test_http_cached_view_integer(self):
         import datetime
-        from webob import Response
+        from pyramid.response import Response
         response = Response('OK')
         def inner_view(context, request):
             return response
@@ -4223,7 +4263,7 @@ class TestViewDeriver(unittest.TestCase):
         
     def test_http_cached_view_timedelta(self):
         import datetime
-        from webob import Response
+        from pyramid.response import Response
         response = Response('OK')
         def inner_view(context, request):
             return response
@@ -4243,7 +4283,7 @@ class TestViewDeriver(unittest.TestCase):
 
     def test_http_cached_view_tuple(self):
         import datetime
-        from webob import Response
+        from pyramid.response import Response
         response = Response('OK')
         def inner_view(context, request):
             return response
@@ -4262,7 +4302,7 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(headers['Cache-Control'], 'max-age=3600, public')
 
     def test_http_cached_view_tuple_seconds_None(self):
-        from webob import Response
+        from pyramid.response import Response
         response = Response('OK')
         def inner_view(context, request):
             return response
@@ -4279,8 +4319,10 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(headers['Cache-Control'], 'public')
 
     def test_http_cached_view_nonresponse_object_returned_downstream(self):
+        from pyramid.response import Response
+        response = Response()
         def inner_view(context, request):
-            return None
+            return response
         deriver = self._makeOne(http_cache=3600)
         result = deriver(inner_view)
         self.assertFalse(result is inner_view)
@@ -4288,7 +4330,7 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(inner_view.__doc__, result.__doc__)
         request = self._makeRequest()
         result = result(None, request)
-        self.assertEqual(result, None) # doesn't blow up
+        self.assertEqual(result, response) # doesn't blow up
 
     def test_http_cached_view_bad_tuple(self):
         from pyramid.exceptions import ConfigurationError
@@ -5407,4 +5449,8 @@ def parse_httpdate(s):
 def assert_similar_datetime(one, two):
     for attr in ('year', 'month', 'day', 'hour', 'minute'):
         assert(getattr(one, attr) == getattr(two, attr))
+
+from pyramid.interfaces import IResponse
+class DummyResponse(object):
+    implements(IResponse)
     

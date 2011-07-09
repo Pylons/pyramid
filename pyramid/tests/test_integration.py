@@ -39,7 +39,7 @@ class WGSIAppPlusViewConfigTests(unittest.TestCase):
         reg = config.registry
         view = reg.adapters.lookup(
             (IViewClassifier, IRequest, INothing), IView, name='')
-        self.assertEqual(view, wsgiapptest)
+        self.assertEqual(view.__original_view__, wsgiapptest)
 
 here = os.path.dirname(__file__)
 staticapp = static(os.path.join(here, 'fixtures'))

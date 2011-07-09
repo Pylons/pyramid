@@ -159,7 +159,7 @@ class Router(object):
                             msg = request.path_info
                         raise HTTPNotFound(msg)
                     else:
-                        result = view_callable(context, request)
+                        response = view_callable(context, request)
 
                 # handle exceptions raised during root finding and view-exec
                 except Exception, why:
@@ -173,14 +173,7 @@ class Router(object):
                     if view_callable is None:
                         raise
 
-                    result = view_callable(why, request)
-
-                # process the response
-                response = registry.queryAdapterOrSelf(result, IResponse)
-                if response is None:
-                    raise ValueError(
-                        'Could not convert view return value "%s" into a '
-                        'response object' % (result,))
+                    response = view_callable(why, request)
 
                 has_listeners and notify(NewResponse(request, response))
 
