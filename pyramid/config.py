@@ -2866,54 +2866,42 @@ class MultiView(object):
                 continue
         raise PredicateMismatch(self.name)
 
-def wraps_view(wrapped):
+def wraps_view(wrapper):
     def inner(self, view):
-        wrapped_view = wrapped(self, view)
-        return preserve_view_attrs(view, wrapped_view)
+        wrapper_view = wrapper(self, view)
+        return preserve_view_attrs(view, wrapper_view)
     return inner
 
-def preserve_view_attrs(view, wrapped_view):
-    if wrapped_view is view:
+def preserve_view_attrs(view, wrapper):
+    if wrapper is view:
         return view
+
     original_view = getattr(view, '__original_view__', None)
+
     if original_view is None:
         original_view = view
-    wrapped_view.__original_view__ = original_view
-    wrapped_view.__module__ = view.__module__
-    wrapped_view.__doc__ = view.__doc__
+
+    wrapper.__wraps__ = view
+    wrapper.__original_view__ = original_view
+    wrapper.__module__ = view.__module__
+    wrapper.__doc__ = view.__doc__
+
     try:
-        wrapped_view.__name__ = view.__name__
+        wrapper.__name__ = view.__name__
     except AttributeError:
-        wrapped_view.__name__ = repr(view)
-    try:
-        wrapped_view.__permitted__ = view.__permitted__
-    except AttributeError:
-        pass
-    try:
-        wrapped_view.__call_permissive__ = view.__call_permissive__
-    except AttributeError:
-        pass
-    try:
-        wrapped_view.__permission__ = view.__permission__
-    except AttributeError:
-        pass
-    try:
-        wrapped_view.__predicated__ = view.__predicated__
-    except AttributeError:
-        pass
-    try:
-        wrapped_view.__predicates__ = view.__predicates__
-    except AttributeError:
-        pass
-    try:
-        wrapped_view.__accept__ = view.__accept__
-    except AttributeError:
-        pass
-    try:
-        wrapped_view.__order__ = view.__order__
-    except AttributeError:
-        pass
-    return wrapped_view
+        wrapper.__name__ = repr(view)
+
+    # attrs that may not exist on "view", but, if so, must be attached to
+    # "wrapped view"
+    for attr in ('__permitted__', '__call_permissive__', '__permission__',
+                 '__predicated__', '__predicates__', '__accept__',
+                 '__order__'):
+        try:
+            setattr(wrapper, attr, getattr(view, attr))
+        except AttributeError:
+            pass
+
+    return wrapper
 
 class ViewDeriver(object):
     def __init__(self, **kw):
@@ -2938,6 +2926,10 @@ class ViewDeriver(object):
     @wraps_view
     def response_resolved_view(self, view):
         registry = self.registry
+        if hasattr(registry, '_dont_resolve_responses'):
+            # for Pyramid unit tests only
+            return view
+
         def viewresult_to_response(context, request):
             result = view(context, request)
             response = registry.queryAdapterOrSelf(result, IResponse)
@@ -2946,6 +2938,7 @@ class ViewDeriver(object):
                     'Could not convert view return value "%s" into a '
                     'response object' % (result,))
             return response
+
         return viewresult_to_response
 
     @wraps_view
