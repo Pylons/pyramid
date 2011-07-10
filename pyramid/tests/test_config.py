@@ -4318,19 +4318,20 @@ class TestViewDeriver(unittest.TestCase):
         self.assertFalse('Expires' in headers)
         self.assertEqual(headers['Cache-Control'], 'public')
 
-    def test_http_cached_view_nonresponse_object_returned_downstream(self):
+    def test_http_cached_view_prevent_auto_set(self):
         from pyramid.response import Response
         response = Response()
+        response.cache_control.prevent_auto = True
         def inner_view(context, request):
             return response
         deriver = self._makeOne(http_cache=3600)
         result = deriver(inner_view)
-        self.assertFalse(result is inner_view)
-        self.assertEqual(inner_view.__module__, result.__module__)
-        self.assertEqual(inner_view.__doc__, result.__doc__)
         request = self._makeRequest()
         result = result(None, request)
         self.assertEqual(result, response) # doesn't blow up
+        headers = dict(result.headerlist)
+        self.assertFalse('Expires' in headers)
+        self.assertFalse('Cache-Control' in headers)
 
     def test_http_cached_view_bad_tuple(self):
         from pyramid.exceptions import ConfigurationError

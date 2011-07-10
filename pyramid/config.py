@@ -1140,6 +1140,12 @@ class Configurator(object):
           tuple as ``http_cache`` with the first element of ``None``, e.g.:
           ``(None, {'public':True})``.
 
+          If you wish to prevent a view that uses ``http_cache`` in its
+          configuration from having its response changed by ``http_cache`` ,
+          set ``response.cache_control.prevent_auto = True`` before returning
+          the response.  This effectively disables any HTTP caching done by
+          ``http_cache`` for that response.
+
         wrapper
 
           The :term:`view name` of a different :term:`view
@@ -2990,7 +2996,9 @@ class ViewDeriver(object):
 
         def wrapper(context, request):
             response = view(context, request)
-            response.cache_expires(seconds, **options)
+            cache_control = response.cache_control
+            if not hasattr(cache_control, 'prevent_auto'):
+                response.cache_expires(seconds, **options)
             return response
 
         return wrapper
