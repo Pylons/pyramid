@@ -4,17 +4,14 @@ Pyramid TODOs
 Must-Have
 ---------
 
-- Github issues fixes.
-
 - add_route discriminator wrong
 
 - tutorial models.initialize_sql doesn't match scaffold
   (DBSession.rollback()/transaction.abort() in scaffold vs. "pass" in
   tutorial)
 
-- Allow views to override http_cache headers.
-
-- request.JSON dictionary?
+- deprecate request.add_response_callback (or at least review docs, in light
+  of request.response property).
 
 Should-Have
 -----------
