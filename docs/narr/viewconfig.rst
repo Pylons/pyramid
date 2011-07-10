@@ -795,10 +795,11 @@ For a big application with several views, it can be hard to keep the view
 configuration details in your head, even if you defined all the views
 yourself. You can use the ``paster pviews`` command in a terminal window to
 print a summary of matching routes and views for a given URL in your
-application. The ``paster pviews`` command accepts three arguments. The
-first argument to ``pviews`` is the path to your application's ``.ini`` file.
-The second is the ``app`` section name inside the ``.ini`` file which points
-to your application. The third is the URL to test for matching views.
+application. The ``paster pviews`` command accepts two arguments. The
+first argument to ``pviews`` is the path to your application's ``.ini`` file
+and section name inside the ``.ini`` file which points to your application.
+This should be of the format ``config_file#section_name``. The second argument
+is the URL to test for matching views.
 
 Here is an example for a simple view configuration using :term:`traversal`:
 
@@ -829,7 +830,7 @@ A more complex configuration might generate something like this:
 .. code-block:: text
    :linenos:
 
-   $ ../bin/paster pviews development.ini shootout /about
+   $ ../bin/paster pviews development.ini#shootout /about
 
    URL = /about
 

@@ -1084,16 +1084,17 @@ Displaying All Application Routes
 You can use the ``paster proutes`` command in a terminal window to print a
 summary of routes related to your application.  Much like the ``paster
 pshell`` command (see :ref:`interactive_shell`), the ``paster proutes``
-command accepts two arguments.  The first argument to ``proutes`` is the path
-to your application's ``.ini`` file.  The second is the ``app`` section name
-inside the ``.ini`` file which points to your application.
+command accepts one argument with the format ``config_file#section_name``.
+The ``config_file`` is the path to your application's ``.ini`` file,
+and ``section_name`` is the ``app`` section name inside the ``.ini`` file
+which points to your application.
 
 For example:
 
 .. code-block:: text
    :linenos:
 
-   [chrism@thinko MyProject]$ ../bin/paster proutes development.ini MyProject
+   [chrism@thinko MyProject]$ ../bin/paster proutes development.ini#MyProject
    Name            Pattern                        View
    ----            -------                        ----                     
    home            /                              <function my_view>
