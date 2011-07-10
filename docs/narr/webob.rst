@@ -78,6 +78,10 @@ object:
     ``PUT``.  You can also get ``req.body_file`` for a file-like
     object.
 
+``req.json_body``
+    The JSON-decoded contents of the body of the request. See
+    :ref:`request_json_body`.
+
 ``req.cookies``:
     A simple dictionary of all the cookies.
 
@@ -238,6 +242,57 @@ tuples; all the keys are ordered, and all the values are ordered.
 
 API documentation for a multidict exists as
 :class:`pyramid.interfaces.IMultiDict`.
+
+.. _request_json_body:
+
+Dealing With A JSON-Encoded Request Body
+++++++++++++++++++++++++++++++++++++++++
+
+.. note:: this feature is new as of Pyramid 1.1.
+
+:attr:`pyramid.request.Request.json_body` is a property that returns a
+:term:`JSON` -decoded representation of the request body.  If the request
+does not have a body, or the body is not a properly JSON-encoded value, an
+exception will be raised when this attribute is accessed.
+
+This attribute is useful when you invoke a Pyramid view callable via
+e.g. jQuery's ``$.post`` or ``$.ajax`` functions, which have the potential to
+send a JSON-encoded body or parameters.
+
+Using ``request.json_body`` is equivalent to:
+
+.. code-block:: python
+
+   from json import loads
+   loads(request.body, encoding=request.charset)
+
+Here's how to construct an AJAX request in Javascript using :term:`jQuery`
+that allows you to use the ``request.json_body`` attribute when the request
+is sent to a Pyramid application:
+
+.. code-block:: javascript
+
+    jQuery.ajax({type:'POST', 
+                 url: 'http://localhost:6543/', // the pyramid server
+                 data: JSON.stringify({'a':1}), 
+                 contentType: 'application/json; charset=utf-8', 
+                 dataType: 'json'});
+
+When such a request reaches a view in your application, the
+``request.json_body`` attribute will be available in the view callable body.
+
+.. code-block:: javascript
+
+    @view_config(renderer='json')
+    def aview(request):
+        print request.json_body
+        return {'result':'OK'}
+
+For the above view, printed to the console will be:
+
+.. code-block:: python
+
+    {u'a': 1}
 
 More Details
 ++++++++++++

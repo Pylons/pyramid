@@ -506,6 +506,9 @@ Glossary
      `JavaScript Object Notation <http://www.json.org/>`_ is a data
      serialization format.
 
+   jQuery
+     A popular `Javascript library <http://jquery.org>`_.
+
    renderer
      A serializer that can be referred to via :term:`view
      configuration` which converts a non-:term:`Response` return

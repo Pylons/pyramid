@@ -491,9 +491,8 @@ class Request(BaseRequest, DeprecatedRequestMethods):
         return adapted is ob
 
     @property
-    def json(self):
-        if self.content_type == 'application/json':
-            return json.loads(self.body, encoding=self.charset)
+    def json_body(self):
+        return json.loads(self.body, encoding=self.charset)
 
 
 def route_request_iface(name, bases=()):

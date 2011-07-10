@@ -9,10 +9,9 @@ Features
   object created by Pyramid.  (See the Venusian documentation for more
   information about ``Scanner``).
 
-- New request attribute: ``json``. If the request's ``content_type`` is
-  ``application/json``, this attribute will contain the JSON-decoded
-  variant of the request body.  If the request's ``content_type`` is not
-  ``application/json``, this attribute will be ``None``.
+- New request property: ``json_body``. This property will return the
+  JSON-decoded variant of the request body.  If the request body is not
+  well-formed JSON, this property will raise an exception.
 
 - A new value ``http_cache`` can be used as a view configuration
   parameter.
@@ -72,6 +71,12 @@ Bug Fixes
   relied on being able to trust that the response they were receiving was an
   IResponse.  It wasn't always, because the response was resolved by the
   router instead of early in the view wrapping process.  This has been fixed.
+
+Documentation
+-------------
+
+- Added a section in the "Webob" chapter named "Dealing With A JSON-Encoded
+  Request Body" (usage of ``request.json_body``).
 
 1.1a4 (2011-07-01)
 ==================

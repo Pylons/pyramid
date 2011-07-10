@@ -99,10 +99,9 @@ Minor Feature Additions
   the Venusian ``Scanner`` object created by Pyramid.  (See the
   :term:`Venusian` documentation for more information about ``Scanner``).
 
-- New request attribute: ``json``. If the request's ``content_type`` is
-  ``application/json``, this attribute will contain the JSON-decoded
-  variant of the request body.  If the request's ``content_type`` is not
-  ``application/json``, this attribute will be ``None``.
+- New request property: ``json_body``. This property will return the
+  JSON-decoded variant of the request body.  If the request body is not
+  well-formed JSON, this property will raise an exception.
 
 - A new value ``http_cache`` can be used as a :term:`view configuration`
   parameter.

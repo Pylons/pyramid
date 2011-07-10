@@ -180,12 +180,12 @@
       object (exposed to view code as ``request.response``) to influence
       rendered response behavior.
 
-   .. attribute:: json
+   .. attribute:: json_body
 
-      If the request's ``content_type`` is ``application/json``, this
-      attribute will contain the JSON-decoded variant of the request body.
-      If the request's ``content_type`` is not ``application/json``, this
-      attribute will be ``None``.
+       This property will return the JSON-decoded variant of the request
+       body.  If the request body is not well-formed JSON, or there is no
+       body associated with this request, this property will raise an
+       exception.  See also :ref:`request_json_body`.
 
 .. note::
 
