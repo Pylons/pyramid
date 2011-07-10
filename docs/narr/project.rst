@@ -336,6 +336,8 @@ development.ini#MyProject``).
 
 Press ``Ctrl-D`` to exit the interactive shell (or ``Ctrl-Z`` on Windows).
 
+.. _extending_pshell:
+
 Extending the Shell
 ~~~~~~~~~~~~~~~~~~~
 

@@ -94,6 +94,19 @@ Default HTTP Exception View
 Minor Feature Additions
 -----------------------
 
+- It is now possible to invoke ``paster pshell`` even if the paste ini file
+  section name pointed to in its argument is not actually a Pyramid WSGI
+  application.  The shell will work in a degraded mode, and will warn the
+  user.  See "The Interactive Shell" in the "Creating a Pyramid Project"
+  narrative documentation section.
+
+- ``paster pshell`` now offers more built-in global variables by default
+  (including ``app`` and ``settings``).  See :ref:`interactive_shell`.
+
+- It is now possible to add a ``[pshell]`` section to your application's .ini
+  configuration file, which influences the global names available to a pshell
+  session.  See :ref:`extending_pshell`.
+
 - The :meth:`pyramid.config.Configurator.scan` method has grown a ``**kw``
   argument.  ``kw`` argument represents a set of keyword arguments to pass to
   the Venusian ``Scanner`` object created by Pyramid.  (See the
@@ -294,6 +307,12 @@ Backwards Incompatibilities
 
 Deprecations and Behavior Differences
 -------------------------------------
+
+- The ``paster pshell``, ``paster proutes``, and ``paster pviews`` commands
+  now take a single argument in the form ``/path/to/config.ini#sectionname``
+  rather than the previous 2-argument spelling ``/path/to/config.ini
+  sectionname``.  ``#sectionname`` may be omitted, in which case ``#main`` is
+  assumed.
 
 - The default Mako renderer is now configured to escape all HTML in
   expression tags. This is intended to help prevent XSS attacks caused by

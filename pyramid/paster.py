@@ -1,6 +1,5 @@
 import ConfigParser
 import os
-import re
 import sys
 from code import interact
 
@@ -105,7 +104,7 @@ class PShellCommand(PCommand):
                 from IPython.Shell import IPShell
             except ImportError:
                 IPShell = None
-        cprt =('Type "help" for more information.')
+        cprt = 'Type "help" for more information.'
         banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
         app_spec = self.args[0]
         config_file = app_spec.split('#', 1)[0]
