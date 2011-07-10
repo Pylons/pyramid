@@ -2939,8 +2939,8 @@ class ViewDeriver(object):
                 self.authdebug_view(
                     self.secured_view(
                         self.owrapped_view(
-                            self.decorated_view(
-                                self.http_cached_view(
+                            self.http_cached_view(
+                                self.decorated_view(
                                     self.rendered_view(
                                         self.mapped_view(view)))))))))
 
