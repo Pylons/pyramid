@@ -48,4 +48,29 @@ Releasing Pyramid
 
 - Announce to Twitter.
 
+Announcement template
+----------------------
 
+Pyramid 1.1.X has been released.
+
+Here are the changes:
+
+<<changes>>
+
+A "What's New In Pyramid 1.1" document exists at
+http://docs.pylonsproject.org/projects/pyramid/1.1/whatsnew-1.1.html .
+
+You will be able to see the 1.1 release documentation (across all
+alphas and betas, as well as when it eventually gets to final release)
+at http://docs.pylonsproject.org/projects/pyramid/1.1/ .
+
+You can install it via PyPI:
+
+  easy_install Pyramid==1.1a4
+
+Enjoy, and please report any issues you find to the issue tracker at
+https://github.com/Pylons/pyramid/issues
+
+Thanks!
+
+- C
