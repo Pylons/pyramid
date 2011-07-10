@@ -1141,10 +1141,10 @@ class Configurator(object):
           ``(None, {'public':True})``.
 
           If you wish to prevent a view that uses ``http_cache`` in its
-          configuration from having its response changed by ``http_cache`` ,
-          set ``response.cache_control.prevent_auto = True`` before returning
-          the response.  This effectively disables any HTTP caching done by
-          ``http_cache`` for that response.
+          configuration from having its caching response headers changed by
+          this machinery, set ``response.cache_control.prevent_auto = True``
+          before returning the response from the view.  This effectively
+          disables any HTTP caching done by ``http_cache`` for that response.
 
         wrapper
 
