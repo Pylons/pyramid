@@ -2935,27 +2935,8 @@ class ViewDeriver(object):
                         self.owrapped_view(
                             self.decorated_view(
                                 self.http_cached_view(
-                                    self.response_resolved_view(
-                                        self.rendered_view(
-                                            self.mapped_view(view))))))))))
-
-    @wraps_view
-    def response_resolved_view(self, view):
-        registry = self.registry
-        if hasattr(registry, '_dont_resolve_responses'):
-            # for Pyramid unit tests only
-            return view
-
-        def viewresult_to_response(context, request):
-            result = view(context, request)
-            response = registry.queryAdapterOrSelf(result, IResponse)
-            if response is None:
-                raise ValueError(
-                    'Could not convert view return value "%s" into a '
-                    'response object' % (result,))
-            return response
-
-        return viewresult_to_response
+                                    self.rendered_view(
+                                        self.mapped_view(view)))))))))
 
     @wraps_view
     def mapped_view(self, view):
@@ -3119,21 +3100,23 @@ class ViewDeriver(object):
 
     @wraps_view
     def rendered_view(self, view):
-        wrapped_view = view
-        static_renderer = self.kw.get('renderer')
-        if static_renderer is None:
+        # one way or another this wrapper must produce a Response
+        renderer = self.kw.get('renderer')
+        if renderer is None:
             # register a default renderer if you want super-dynamic
             # rendering.  registering a default renderer will also allow
             # override_renderer to work if a renderer is left unspecified for
             # a view registration.
-            return view
+            return self._response_resolved_view(view)
+        return self._rendered_view(view, renderer)
 
-        def _rendered_view(context, request):
-            renderer = static_renderer
-            result = wrapped_view(context, request)
-            registry = self.kw['registry']
+    def _rendered_view(self, view, view_renderer):
+        def rendered_view(context, request):
+            renderer = view_renderer
+            result = view(context, request)
+            registry = self.registry
             # this must adapt, it can't do a simple interface check
-            # (webob responses)
+            # (avoid trying to render webob responses)
             response = registry.queryAdapterOrSelf(result, IResponse)
             if response is None:
                 attrs = getattr(request, '__dict__', {})
@@ -3146,13 +3129,29 @@ class ViewDeriver(object):
                 if '__view__' in attrs:
                     view_inst = attrs.pop('__view__')
                 else:
-                    view_inst = getattr(wrapped_view, '__original_view__',
-                                        wrapped_view)
+                    view_inst = getattr(view, '__original_view__', view)
                 response = renderer.render_view(request, result, view_inst,
                                                 context)
             return response
 
-        return _rendered_view
+        return rendered_view
+
+    def _response_resolved_view(self, view):
+        registry = self.registry
+        if hasattr(registry, '_dont_resolve_responses'):
+            # for Pyramid unit tests only
+            return view
+
+        def viewresult_to_response(context, request):
+            result = view(context, request)
+            response = registry.queryAdapterOrSelf(result, IResponse)
+            if response is None:
+                raise ValueError(
+                    'Could not convert view return value "%s" into a '
+                    'response object' % (result,))
+            return response
+
+        return viewresult_to_response
 
     @wraps_view
     def decorated_view(self, view):
