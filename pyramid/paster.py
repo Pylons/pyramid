@@ -129,9 +129,12 @@ class PShellCommand(PCommand):
         else:
             # warn the user that this isn't actually the Pyramid app
             warning = """\n
-WARNING: You have loaded a generic WSGI application, therefore the
-"root" and "registry" are not available. To correct this, run "pshell"
-again and specify the INI section containing your Pyramid application."""
+WARNING: You have loaded a generic WSGI application, therefore the "root",
+"registry", and "settings" global variables are not available. To correct
+this, run "pshell" again and specify the INI section containing your Pyramid
+application.  For example, if your app is in the '[app:myapp]' config file
+section, use 'development.ini#myapp' instead of 'development.ini' or
+'development.ini#main'."""
             closer = lambda: None
 
         # load the pshell section of the ini file
