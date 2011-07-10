@@ -562,7 +562,7 @@ that implements the following interface:
 .. code-block:: python
    :linenos:
 
-   class AuthenticationPolicy(object):
+   class IAuthenticationPolicy(object):
        """ An object representing a Pyramid authentication policy. """
 
        def authenticated_userid(self, request):
