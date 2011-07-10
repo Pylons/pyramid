@@ -5,6 +5,7 @@ import sys
 import types
 import traceback
 import warnings
+import weakref
 
 import venusian
 
@@ -989,6 +990,14 @@ class Configurator(object):
             self.registry.notify(ApplicationCreated(app))
         finally:
             self.manager.pop()
+
+        # see the comments on p.config.last_registry to understand why
+        def cleanup_last_registry(ref):
+            global last_registry
+            last_registry = None
+        global last_registry
+        last_registry = weakref.ref(self.registry, cleanup_last_registry)
+
         return app
 
     @action_method
@@ -3318,3 +3327,8 @@ def isexception(o):
         (inspect.isclass(o) and (issubclass(o, Exception)))
         )
 
+# last_registry is a hack to keep track of the registry for the last Pyramid
+# application created. This is useful to access the registry after the app
+# itself has been wrapped in a WSGI stack, specifically for scripting
+# purposes in pyramid.scripting.
+last_registry = None
