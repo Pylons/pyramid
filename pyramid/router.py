@@ -45,6 +45,58 @@ class Router(object):
             self.debug_notfound = settings['debug_notfound']
             self.debug_routematch = settings['debug_routematch']
 
+    def get_root_object(self, request):
+        attrs = request.__dict__
+        routes_mapper = self.routes_mapper
+        root_factory = self.root_factory
+        debug_routematch = self.debug_routematch
+        logger = self.logger
+        if routes_mapper is not None:
+            info = routes_mapper(request)
+            match, route = info['match'], info['route']
+            if route is None:
+                if debug_routematch:
+                    msg = ('no route matched for url %s' % request.url)
+                    logger and logger.debug(msg)
+            else:
+                # TODO: kill off bfg.routes.* environ keys when
+                # traverser requires request arg, and cant cope
+                # with environ anymore (they are docs-deprecated as
+                # of BFG 1.3)
+                environ = request.environ
+                environ['bfg.routes.route'] = route
+                environ['bfg.routes.matchdict'] = match
+                attrs['matchdict'] = match
+                attrs['matched_route'] = route
+
+                if debug_routematch:
+                    msg = (
+                        'route matched for url %s; '
+                        'route_name: %r, '
+                        'path_info: %r, '
+                        'pattern: %r, '
+                        'matchdict: %r, '
+                        'predicates: %r' % (
+                            request.url,
+                            route.name,
+                            request.path_info,
+                            route.pattern, match,
+                            route.predicates)
+                        )
+                    logger and logger.debug(msg)
+
+                root_factory = route.factory or self.root_factory
+        return root_factory(request)
+
+    def get_context(self, root, request):
+        traverser = self.registry.adapters.queryAdapter(root, ITraverser)
+        if traverser is None:
+            traverser = ResourceTreeTraverser(root)
+        tdict = traverser(request)
+        request.__dict__.update(tdict)
+        return tdict['context'], tdict['view_name']
+
+
     def __call__(self, environ, start_response):
         """
         Accept ``environ`` and ``start_response``; create a
@@ -59,8 +111,6 @@ class Router(object):
         notify = registry.notify
         logger = self.logger
         manager = self.threadlocal_manager
-        routes_mapper = self.routes_mapper
-        debug_routematch = self.debug_routematch
         request = None
         threadlocals = {'registry':registry, 'request':request}
         manager.push(threadlocals)
@@ -68,7 +118,7 @@ class Router(object):
         try: # matches finally: manager.pop()
 
             try: # matches finally:  ... call request finished callbacks ...
-                
+
                 # create the request
                 request = self.request_factory(environ)
                 context = None
@@ -80,60 +130,17 @@ class Router(object):
                 try: # matches except Exception (exception view execution)
                     has_listeners and notify(NewRequest(request))
                     # find the root object
-                    root_factory = self.root_factory
-                    if routes_mapper is not None:
-                        info = routes_mapper(request)
-                        match, route = info['match'], info['route']
-                        if route is None:
-                            if debug_routematch:
-                                msg = ('no route matched for url %s' %
-                                       request.url)
-                                logger and logger.debug(msg)
-                        else:
-                            # TODO: kill off bfg.routes.* environ keys when
-                            # traverser requires request arg, and cant cope
-                            # with environ anymore (they are docs-deprecated as
-                            # of BFG 1.3)
-                            environ['bfg.routes.route'] = route 
-                            environ['bfg.routes.matchdict'] = match
-                            attrs['matchdict'] = match
-                            attrs['matched_route'] = route
-
-                            if debug_routematch:
-                                msg = (
-                                    'route matched for url %s; '
-                                    'route_name: %r, '
-                                    'path_info: %r, '
-                                    'pattern: %r, '
-                                    'matchdict: %r, '
-                                    'predicates: %r' % (
-                                        request.url,
-                                        route.name,
-                                        request.path_info,
-                                        route.pattern, match,
-                                        route.predicates)
-                                    )
-                                logger and logger.debug(msg)
-
-                            request_iface = registry.queryUtility(
-                                IRouteRequest,
-                                name=route.name,
-                                default=IRequest)
-                            root_factory = route.factory or self.root_factory
-
-                    root = root_factory(request)
+                    root = self.get_root_object(request)
                     attrs['root'] = root
 
+                    if attrs.has_key('matched_route'):
+                        request_iface = registry.queryUtility(
+                            IRouteRequest,
+                            name=attrs['matched_route'].name,
+                            default=IRequest)
+
                     # find a context
-                    traverser = adapters.queryAdapter(root, ITraverser)
-                    if traverser is None:
-                        traverser = ResourceTreeTraverser(root)
-                    tdict = traverser(request)
-                    context, view_name, subpath, traversed, vroot, vroot_path =(
-                        tdict['context'], tdict['view_name'], tdict['subpath'],
-                        tdict['traversed'], tdict['virtual_root'],
-                        tdict['virtual_root_path'])
-                    attrs.update(tdict)
+                    context, view_name = self.get_context(root, request)
                     has_listeners and notify(ContextFound(request))
 
                     # find a view callable
@@ -152,7 +159,9 @@ class Router(object):
                                 'vroot_path: %r' % (
                                     request.url, request.path_info, context,
                                     view_name,
-                                    subpath, traversed, root, vroot, vroot_path)
+                                    attrs['subpath'], attrs['traversed'],
+                                    root, attrs['virtual_root'],
+                                    attrs['virtual_root_path'])
                                 )
                             logger and logger.debug(msg)
                         else:
