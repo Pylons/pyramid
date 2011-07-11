@@ -253,6 +253,7 @@ class ConfiguratorTests(unittest.TestCase):
         config._ctx = DummyContext()
         config._ctx.registry = None
         config._ctx.autocommit = True
+        config._ctx.route_prefix = None
         newconfig = config.with_package(pyramid.tests)
         self.assertEqual(newconfig.package, pyramid.tests)
 
@@ -736,6 +737,18 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(context_after.basepath, None)
         self.assertEqual(context_after.includepath, ())
         self.assertTrue(context_after is context_before)
+
+    def test_include_with_route_prefix(self):
+        root_config = self._makeOne(autocommit=True)
+        def dummy_subapp(config):
+            self.assertEqual(config.route_prefix, 'root')
+        root_config.include(dummy_subapp, route_prefix='root')
+
+    def test_include_with_nested_route_prefix(self):
+        root_config = self._makeOne(autocommit=True, route_prefix='root')
+        def dummy_subapp(config):
+            self.assertEqual(config.route_prefix, 'root/nested')
+        root_config.include(dummy_subapp, route_prefix='nested')
 
     def test_with_context(self):
         config = self._makeOne()
@@ -1997,6 +2010,15 @@ class ConfiguratorTests(unittest.TestCase):
         route = config.add_route('name', 'path')
         self._assertRoute(config, 'name', 'path')
         self.assertEqual(route.name, 'name')
+
+    def test_add_route_with_route_prefix(self):
+        config = self._makeOne(autocommit=True)
+        config.route_prefix = 'root'
+        route = config.add_route('name', 'path')
+        self.assertEqual(route.name, 'name')
+        self.assertEqual(route.pattern, 'root/path')
+
+        self._assertRoute(config, 'name', 'root/path')
 
     def test_add_route_with_factory(self):
         config = self._makeOne(autocommit=True)
@@ -5427,7 +5449,7 @@ def dummy_extend(config, discrim):
 
 def dummy_extend2(config, discrim):
     config.action(discrim, None, config.registry)
-    
+
 class DummyRegistry(object):
     def __init__(self, adaptation=None):
         self.utilities = []
