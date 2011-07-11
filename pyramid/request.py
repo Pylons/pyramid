@@ -206,6 +206,7 @@ class Request(BaseRequest, DeprecatedRequestMethods):
     exception = None
     matchdict = None
     matched_route = None
+    registry = None
 
     @reify
     def tmpl_context(self):
