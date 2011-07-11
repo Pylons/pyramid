@@ -135,80 +135,6 @@ related view callables.
    application uses :term:`URL dispatch` solely.
 
 .. index::
-   single: view calling convention
-
-.. _request_and_context_view_definitions:
-
-Alternate View Callable Argument/Calling Conventions
-----------------------------------------------------
-
-Usually, view callables are defined to accept only a single argument:
-``request``.  However, view callables may alternately be defined as classes,
-functions, or any callable that accept *two* positional arguments: a
-:term:`context` resource as the first argument and a :term:`request` as the
-second argument.
-
-The :term:`context` and :term:`request` arguments passed to a view function
-defined in this style can be defined as follows:
-
-context
-
-  The :term:`resource` object found via tree :term:`traversal` or :term:`URL
-  dispatch`.
-
-request
-  A :app:`Pyramid` Request object representing the current WSGI request.
-
-The following types work as view callables in this style:
-
-#. Functions that accept two arguments: ``context``, and ``request``,
-   e.g.:
-
-   .. code-block:: python
-	  :linenos:
-
-	  from pyramid.response import Response
-
-	  def view(context, request):
-		  return Response('OK')
-
-#. Classes that have an ``__init__`` method that accepts ``context,
-   request`` and a ``__call__`` method which accepts no arguments, e.g.:
-
-   .. code-block:: python
-	  :linenos:
-
-	  from pyramid.response import Response
-
-	  class view(object):
-		  def __init__(self, context, request):
-			  self.context = context
-			  self.request = request
-
-		  def __call__(self):
-			  return Response('OK')
-
-#. Arbitrary callables that have a ``__call__`` method that accepts
-   ``context, request``, e.g.:
-
-   .. code-block:: python
-	  :linenos:
-
-	  from pyramid.response import Response
-
-	  class View(object):
-		  def __call__(self, context, request):
-			  return Response('OK')
-	  view = View() # this is the view callable
-
-This style of calling convention is most useful for :term:`traversal` based
-applications, where the context object is frequently used within the view
-callable code itself.
-
-No matter which view calling convention is used, the view code always has
-access to the context via ``request.context``.
-
-.. index::
    single: view response
    single: response
 
@@ -234,7 +160,7 @@ implements the :term:`Response` interface is to return a
 inherit from :class:`pyramid.response.Response`.  For example, an instance of
 the class :class:`pyramid.httpexceptions.HTTPFound` is also a valid response
 object because it inherits from :class:`~pyramid.response.Response`.  For
-examples, see :ref:`http_exceptions` and ref:`http_redirect`.
+examples, see :ref:`http_exceptions` and :ref:`http_redirect`.
 
 You can also return objects from view callables that aren't instances of (or
 instances of classes which are subclasses of)
@@ -590,4 +516,78 @@ using your own response object, you will need to ensure you do this yourself.
    to Unicode objects implicitly in the :app:`Pyramid` default
    configuration.  The keys are still (byte) strings.
 
+
+.. index::
+   single: view calling convention
+
+.. _request_and_context_view_definitions:
+
+Alternate View Callable Argument/Calling Conventions
+----------------------------------------------------
+
+Usually, view callables are defined to accept only a single argument:
+``request``.  However, view callables may alternately be defined as classes,
+functions, or any callable that accept *two* positional arguments: a
+:term:`context` resource as the first argument and a :term:`request` as the
+second argument.
+
+The :term:`context` and :term:`request` arguments passed to a view function
+defined in this style can be defined as follows:
+
+context
+
+  The :term:`resource` object found via tree :term:`traversal` or :term:`URL
+  dispatch`.
+
+request
+  A :app:`Pyramid` Request object representing the current WSGI request.
+
+The following types work as view callables in this style:
+
+#. Functions that accept two arguments: ``context``, and ``request``,
+   e.g.:
+
+   .. code-block:: python
+	  :linenos:
+
+	  from pyramid.response import Response
+
+	  def view(context, request):
+		  return Response('OK')
+
+#. Classes that have an ``__init__`` method that accepts ``context,
+   request`` and a ``__call__`` method which accepts no arguments, e.g.:
+
+   .. code-block:: python
+	  :linenos:
+
+	  from pyramid.response import Response
+
+	  class view(object):
+		  def __init__(self, context, request):
+			  self.context = context
+			  self.request = request
+
+		  def __call__(self):
+			  return Response('OK')
+
+#. Arbitrary callables that have a ``__call__`` method that accepts
+   ``context, request``, e.g.:
+
+   .. code-block:: python
+	  :linenos:
+
+	  from pyramid.response import Response
+
+	  class View(object):
+		  def __call__(self, context, request):
+			  return Response('OK')
+	  view = View() # this is the view callable
+
+This style of calling convention is most useful for :term:`traversal` based
+applications, where the context object is frequently used within the view
+callable code itself.
+
+No matter which view calling convention is used, the view code always has
+access to the context via ``request.context``.
 
