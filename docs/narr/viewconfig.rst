@@ -47,7 +47,7 @@ to be invoked.
 A view configuration statement is made about information present in the
 :term:`context` resource and the :term:`request`.
 
-View configuration is performed in one of these ways:
+View configuration is performed in one of two ways:
 
 - by running a :term:`scan` against application source code which has a
   :class:`pyramid.view.view_config` decorator attached to a Python object as
@@ -55,17 +55,6 @@ View configuration is performed in one of these ways:
 
 - by using the :meth:`pyramid.config.Configurator.add_view` method as per
   :ref:`mapping_views_using_imperative_config_section`.
-
-- By specifying a view within a :term:`route configuration`.  View
-  configuration via a route configuration is performed by using the
-  :meth:`pyramid.config.Configurator.add_route` method, passing a ``view``
-  argument specifying a view callable. This pattern of view configuration is
-  deprecated as of :app:`Pyramid` 1.1.
-
-.. note:: A package named ``pyramid_handlers`` (available from PyPI) provides
-   an analogue of :term:`Pylons` -style "controllers", which are a special
-   kind of view class which provides more automation when your application
-   uses :term:`URL dispatch` solely.
 
 .. _view_configuration_parameters:
 
@@ -408,26 +397,25 @@ configured view.
 View Configuration Using the ``@view_config`` Decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For better locality of reference, you may use the
-:class:`pyramid.view.view_config` decorator to associate your view functions
-with URLs instead of using imperative configuration for the same purpose.
-
 .. warning::
 
    Using this feature tends to slows down application startup slightly, as
    more work is performed at application startup to scan for view
-   declarations.
+   declarations.  For maximum startup performance, use the view configuration
+   method described in :ref:`mapping_views_using_imperative_config_section`
+   instead.
 
 Usage of the ``view_config`` decorator is a form of :term:`declarative
-configuration` in decorator form.  :class:`~pyramid.view.view_config` can be
-used to associate :term:`view configuration` information -- as done via the
-equivalent imperative code -- with a function that acts as a :app:`Pyramid`
-view callable.  All arguments to the
-:meth:`pyramid.config.Configurator.add_view` method (save for the ``view``
-argument) are available in decorator form and mean precisely the same thing.
+configuration`.  The :class:`~pyramid.view.view_config` decorator can be used
+to associate :term:`view configuration` information with a function that acts
+as a :app:`Pyramid` view callable.  All arguments to the
+:class:`~pyramid.view.view_config` decorator mean precisely the same thing as
+they would if they were passed as arguments to the
+:meth:`pyramid.config.Configurator.add_view` method save for the ``view``
+argument.
 
-An example of the :class:`~pyramid.view.view_config` decorator might reside in
-a :app:`Pyramid` application module ``views.py``:
+Here's an example of the :class:`~pyramid.view.view_config` decorator that
+lives within a :app:`Pyramid` application module ``views.py``:
 
 .. ignore-next-block
 .. code-block:: python
@@ -618,9 +606,10 @@ View Registration Using :meth:`~pyramid.config.Configurator.add_view`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The :meth:`pyramid.config.Configurator.add_view` method within
-:ref:`configuration_module` is used to configure a view imperatively.  The
-arguments to this method are very similar to the arguments that you provide
-to the ``@view_config`` decorator.  For example:
+:ref:`configuration_module` is used to configure a view "imperatively"
+(without a :class:`~pyramid.view.view_config` decorator.  The arguments to
+this method are very similar to the arguments that you provide to the
+:class:`~pyramid.view.view_config` decorator.  For example:
 
 .. code-block:: python
    :linenos:
@@ -636,8 +625,13 @@ to the ``@view_config`` decorator.  For example:
 
 The first argument, ``view``, is required.  It must either be a Python object
 which is the view itself or a :term:`dotted Python name` to such an object.
-All other arguments are optional.  See
-:meth:`pyramid.config.Configurator.add_view` for more information.
+In the above example, ``view`` is the ``hello_world`` function.  All other
+arguments are optional.  See :meth:`pyramid.config.Configurator.add_view` for
+more information.
+
+When you use only :meth:`~pyramid.config.Configurator.add_view` to add view
+configurations, you don't need to issue a :term:`scan` in order for the view
+configuration to take effect.
 
 .. index::
    single: resource interfaces
