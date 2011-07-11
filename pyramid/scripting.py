@@ -39,7 +39,7 @@ def make_request(url, registry=None):
     templates.
 
     If ``registry`` is not supplied, the last registry loaded from
-    :meth:`pyramid.config.global_registries` will be used. If you have
+    :attr:`pyramid.config.global_registries` will be used. If you have
     loaded more than one :app:`Pyramid` application in the current
     process, you may not want to use the last registry loaded, thus
     you can search the ``global_registries`` and supply the appropriate

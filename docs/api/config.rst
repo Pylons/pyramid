@@ -86,3 +86,13 @@
 
      .. automethod:: testing_add_renderer
 
+  .. attribute:: global_registries
+
+     A set of registries that have been created for :app:`Pyramid`
+     applications. The object itself supports iteration and has a
+     ``last`` property containing the last registry loaded.
+
+     The registries contained in this object are stored as weakrefs,
+     thus they will only exist for the lifetime of the actual
+     applications for which they are being used.
+

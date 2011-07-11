@@ -7,3 +7,5 @@
 
   .. autofunction:: get_root
 
+  .. autofunction:: make_request
+
