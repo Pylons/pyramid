@@ -22,9 +22,9 @@ of :class:`webob.Request`.  The :term:`response` returned from a
 
 WebOb is a project separate from :app:`Pyramid` with a separate set of
 authors and a fully separate `set of documentation
-<http://pythonpaste.org/webob/>`_.  Pyramid adds some functionality to the
-standard WebOb request, which is documented in the :ref:`request_module` API
-documentation.
+<http://docs.webob.org/en/latest/index.html>`_.  Pyramid adds some
+functionality to the standard WebOb request, which is documented in the
+:ref:`request_module` API documentation.
 
 WebOb provides objects for HTTP requests and responses.  Specifically it does
 this by wrapping the `WSGI <http://wsgi.org>`_ request environment and
@@ -35,7 +35,7 @@ requests and forming WSGI responses.  WebOb is a nice way to represent "raw"
 WSGI requests and responses; however, we won't cover that use case in this
 document, as users of :app:`Pyramid` don't typically need to use the
 WSGI-related features of WebOb directly.  The `reference documentation
-<http://pythonpaste.org/webob/reference.html>`_ shows many examples of
+<http://docs.webob.org/en/latest/reference.html>`_ shows many examples of
 creating requests and using response objects in this manner, however.
 
 .. index::
@@ -300,8 +300,8 @@ More detail about the request object API is available in:
 
 - The :class:`pyramid.request.Request` API documentation.
 
-- The `WebOb documentation <http://pythonpaste.org/webob>`_.  All
-  methods and attributes of a ``webob.Request`` documented within the
+- The `WebOb documentation <http://docs.webob.org/en/latest/index.html>`_.
+  All methods and attributes of a ``webob.Request`` documented within the
   WebOb documentation will work with request objects created by
   :app:`Pyramid`.
 
@@ -385,7 +385,7 @@ properties.  These are parsed, so you can do things like
 ``response.last_modified = os.path.getmtime(filename)``.
 
 The details are available in the `extracted Response documentation
-<http://pythonpaste.org/webob/class-webob.Response.html>`_.
+<http://docs.webob.org/en/latest/modules/webob.html#headers>`_.
 
 .. index::
    single: response (creating)
@@ -444,5 +444,6 @@ More Details
 More details about the response object API are available in the
 :mod:`pyramid.response` documentation.  More details about exception
 responses are in the :mod:`pyramid.httpexceptions` API documentation.  The
-`WebOb documentation <http://pythonpaste.org/webob>`_ is also useful.
+`WebOb documentation <http://docs.webob.org/en/latest/index.html>`_ is also
+useful.
 

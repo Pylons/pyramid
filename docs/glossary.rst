@@ -326,7 +326,7 @@ Glossary
       :term:`ZODB` database.
 
    WebOb
-     `WebOb <http://pythonpaste.org/webob/>`_ is a WSGI request/response
+     `WebOb <http://webob.org>`_ is a WSGI request/response
      library created by Ian Bicking.
 
    Paste
