@@ -1,3 +1,4 @@
+import collections
 import inspect
 import os
 import re
@@ -982,6 +983,7 @@ class Configurator(object):
         self.commit()
         from pyramid.router import Router # avoid circdep
         app = Router(self.registry)
+        global_registries.add(self.registry)
         # We push the registry on to the stack here in case any code
         # that depends on the registry threadlocal APIs used in
         # listeners subscribed to the IApplicationCreated event.
@@ -990,13 +992,6 @@ class Configurator(object):
             self.registry.notify(ApplicationCreated(app))
         finally:
             self.manager.pop()
-
-        # see the comments on p.config.last_registry to understand why
-        def cleanup_last_registry(ref):
-            global last_registry
-            last_registry = None
-        global last_registry
-        last_registry = weakref.ref(self.registry, cleanup_last_registry)
 
         return app
 
@@ -3327,8 +3322,45 @@ def isexception(o):
         (inspect.isclass(o) and (issubclass(o, Exception)))
         )
 
-# last_registry is a hack to keep track of the registry for the last Pyramid
-# application created. This is useful to access the registry after the app
-# itself has been wrapped in a WSGI stack, specifically for scripting
-# purposes in pyramid.scripting.
-last_registry = None
+class WeakOrderedSet(object):
+    """ Maintain a set of items.
+
+    Each item is stored as a weakref to avoid extending their lifetime.
+
+    The values may be iterated over or the last item added may be
+    accessed via the ``last`` property.
+    """
+
+    def __init__(self):
+        self._items = {}
+        self._order = []
+
+    def add(self, item):
+        """ Add a registry to the set."""
+        oid = id(item)
+        if oid in self._items:
+            return
+        def cleanup(ref):
+            del self._items[oid]
+            self._order.remove(oid)
+        ref = weakref.ref(item, cleanup)
+        self._items[oid] = ref
+        self._order.append(oid)
+
+    def __len__(self):
+        return len(self._order)
+
+    def __contains__(self, item):
+        oid = id(item)
+        return oid in self._items
+
+    def __iter__(self):
+        return (self._items[oid]() for oid in self._order)
+
+    @property
+    def last(self):
+        if self._order:
+            oid = self._order[-1]
+            return self._items[oid]()
+
+global_registries = WeakOrderedSet()
