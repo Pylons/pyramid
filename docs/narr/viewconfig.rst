@@ -2,38 +2,23 @@
 
 .. _view_configuration:
 
+.. _view_lookup:
+
 View Configuration
 ==================
 
 .. index::
    single: view lookup
 
-:term:`View configuration` controls how :term:`view lookup` operates in
-your application. In earlier chapters, you have been exposed to a few
-simple view configuration declarations without much explanation. In this
-chapter we will explore the subject in detail.
-
-.. _view_lookup:
-
-View Lookup and Invocation
---------------------------
-
 :term:`View lookup` is the :app:`Pyramid` subsystem responsible for finding
-an invoking a :term:`view callable`.  The view lookup subsystem is passed a
-:term:`context` and a :term:`request` object.
+an invoking a :term:`view callable`.  :term:`View configuration` controls how
+:term:`view lookup` operates in your application.  During any given request,
+view configuration information is compared against request data by the view
+lookup subsystem in order to find the "best" view callable for that request.
 
-:term:`View configuration` information stored within in the
-:term:`application registry` is compared against the context and request by
-the view lookup subsystem in order to find the "best" view callable for the
-set of circumstances implied by the context and request.
-
-:term:`View predicate` attributes are an important part of view
-configuration that enables the :term:`View lookup` subsystem to find and
-invoke the appropriate view.  Predicate attributes can be thought of
-like "narrowers".  In general, the greater number of predicate
-attributes possessed by a view's configuration, the more specific the
-circumstances need to be before the registered view callable will be
-invoked.
+In earlier chapters, you have been exposed to a few simple view configuration
+declarations without much explanation. In this chapter we will explore the
+subject in detail.
 
 Mapping a Resource or URL Pattern to a View Callable
 ----------------------------------------------------
@@ -68,12 +53,15 @@ arguments.  View predicate arguments used during view configuration are used
 to narrow the set of circumstances in which :term:`view lookup` will find a
 particular view callable.
 
-In general, the fewer number of predicates which are supplied to a
-particular view configuration, the more likely it is that the associated
-view callable will be invoked.  The greater the number supplied, the
-less likely.  A view with five predicates will always be found and
-evaluated before a view with two, for example.  All predicates must
-match for the associated view to be called.
+:term:`View predicate` attributes are an important part of view configuration
+that enables the :term:`view lookup` subsystem to find and invoke the
+appropriate view.  The greater number of predicate attributes possessed by a
+view's configuration, the more specific the circumstances need to be before
+the registered view callable will be invoked.  The fewer number of predicates
+which are supplied to a particular view configuration, the more likely it is
+that the associated view callable will be invoked.  A view with five
+predicates will always be found and evaluated before a view with two, for
+example.  All predicates must match for the associated view to be called.
 
 This does not mean however, that :app:`Pyramid` "stops looking" when it
 finds a view registration with predicates that don't match.  If one set
@@ -88,8 +76,8 @@ the request, :app:`Pyramid` will return an error to the user's browser,
 representing a "not found" (404) page.  See :ref:`changing_the_notfound_view`
 for more information about changing the default notfound view.
 
-Some view configuration arguments are non-predicate arguments.  These tend to
-modify the response of the view callable or prevent the view callable from
+Other view configuration arguments are non-predicate arguments.  These tend
+to modify the response of the view callable or prevent the view callable from
 being invoked due to an authorization policy.  The presence of non-predicate
 arguments in a view configuration does not narrow the circumstances in which
 the view callable will be invoked.
@@ -394,25 +382,20 @@ configured view.
 
 .. _mapping_views_using_a_decorator_section:
 
-View Configuration Using the ``@view_config`` Decorator
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Adding View Configuration Using the ``@view_config`` Decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. warning::
 
    Using this feature tends to slows down application startup slightly, as
    more work is performed at application startup to scan for view
-   declarations.  For maximum startup performance, use the view configuration
-   method described in :ref:`mapping_views_using_imperative_config_section`
-   instead.
+   configuration declarations.  For maximum startup performance, use the view
+   configuration method described in
+   :ref:`mapping_views_using_imperative_config_section` instead.
 
-Usage of the ``view_config`` decorator is a form of :term:`declarative
-configuration`.  The :class:`~pyramid.view.view_config` decorator can be used
-to associate :term:`view configuration` information with a function that acts
-as a :app:`Pyramid` view callable.  All arguments to the
-:class:`~pyramid.view.view_config` decorator mean precisely the same thing as
-they would if they were passed as arguments to the
-:meth:`pyramid.config.Configurator.add_view` method save for the ``view``
-argument.
+The :class:`~pyramid.view.view_config` decorator can be used to associate
+:term:`view configuration` information with a function, method, or class that
+acts as a :app:`Pyramid` view callable.
 
 Here's an example of the :class:`~pyramid.view.view_config` decorator that
 lives within a :app:`Pyramid` application module ``views.py``:
@@ -481,6 +464,14 @@ See :ref:`configuration_module` for additional API arguments to the
 :meth:`~pyramid.config.Configurator.scan` method.  For example, the method
 allows you to supply a ``package`` argument to better control exactly *which*
 code will be scanned.
+
+All arguments to the :class:`~pyramid.view.view_config` decorator mean
+precisely the same thing as they would if they were passed as arguments to
+the :meth:`pyramid.config.Configurator.add_view` method save for the ``view``
+argument.  Usage of the :class:`~pyramid.view.view_config` decorator is a
+form of :term:`declarative configuration`, while
+:meth:`pyramid.config.Configurator.add_view` is a form of :term:`imperative
+configuration`.  However, they both do the same thing.
 
 ``@view_config`` Placement
 ++++++++++++++++++++++++++
@@ -602,12 +593,12 @@ against the ``amethod`` method could be spelled equivalently as the below:
 
 .. _mapping_views_using_imperative_config_section:
 
-View Registration Using :meth:`~pyramid.config.Configurator.add_view`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Adding View Configuration Using :meth:`~pyramid.config.Configurator.add_view`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The :meth:`pyramid.config.Configurator.add_view` method within
 :ref:`configuration_module` is used to configure a view "imperatively"
-(without a :class:`~pyramid.view.view_config` decorator.  The arguments to
+(without a :class:`~pyramid.view.view_config` decorator).  The arguments to
 this method are very similar to the arguments that you provide to the
 :class:`~pyramid.view.view_config` decorator.  For example:
 
