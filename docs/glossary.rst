@@ -592,8 +592,9 @@ Glossary
      declaration` required by your application.
 
    declarative configuration
-     The configuration mode in which you use :term:`ZCML` to make a set of
-     :term:`configuration declaration` statements.  See :term:`pyramid_zcml`.
+     The configuration mode in which you use the combination of
+     :term:`configuration decorator` decorations and a :term:`scan` to
+     configure your Pyramid application.
 
    Not Found view
       An :term:`exception view` invoked by :app:`Pyramid` when the
