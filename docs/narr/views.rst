@@ -129,11 +129,6 @@ statements with different ``attr`` values, each pointing at a different
 method of the class if you'd like the class to represent a collection of 
 related view callables.
 
-.. note:: A package named :term:`pyramid_handlers` (available from PyPI)
-   provides an analogue of :term:`Pylons` -style "controllers", which are a
-   special kind of view class which provides more automation when your
-   application uses :term:`URL dispatch` solely.
-
 .. index::
    single: view response
    single: response
@@ -590,4 +585,12 @@ callable code itself.
 
 No matter which view calling convention is used, the view code always has
 access to the context via ``request.context``.
+
+Pylons-1.0-Style "Controller" Dispatch
+--------------------------------------
+
+A package named :term:`pyramid_handlers` (available from PyPI) provides an
+analogue of :term:`Pylons` -style "controllers", which are a special kind of
+view class which provides more automation when your application uses
+:term:`URL dispatch` solely.
 
