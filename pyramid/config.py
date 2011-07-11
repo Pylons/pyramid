@@ -1,4 +1,3 @@
-import collections
 import inspect
 import os
 import re
@@ -6,7 +5,6 @@ import sys
 import types
 import traceback
 import warnings
-import weakref
 
 import venusian
 
@@ -84,6 +82,7 @@ from pyramid.traversal import find_interface
 from pyramid.traversal import traversal_path
 from pyramid.urldispatch import RoutesMapper
 from pyramid.util import DottedNameResolver
+from pyramid.util import WeakOrderedSet
 from pyramid.view import render_view_to_response
 
 DEFAULT_RENDERERS = (
@@ -3321,46 +3320,5 @@ def isexception(o):
         isinstance(o, Exception) or
         (inspect.isclass(o) and (issubclass(o, Exception)))
         )
-
-class WeakOrderedSet(object):
-    """ Maintain a set of items.
-
-    Each item is stored as a weakref to avoid extending their lifetime.
-
-    The values may be iterated over or the last item added may be
-    accessed via the ``last`` property.
-    """
-
-    def __init__(self):
-        self._items = {}
-        self._order = []
-
-    def add(self, item):
-        """ Add a registry to the set."""
-        oid = id(item)
-        if oid in self._items:
-            return
-        def cleanup(ref):
-            del self._items[oid]
-            self._order.remove(oid)
-        ref = weakref.ref(item, cleanup)
-        self._items[oid] = ref
-        self._order.append(oid)
-
-    def __len__(self):
-        return len(self._order)
-
-    def __contains__(self, item):
-        oid = id(item)
-        return oid in self._items
-
-    def __iter__(self):
-        return (self._items[oid]() for oid in self._order)
-
-    @property
-    def last(self):
-        if self._order:
-            oid = self._order[-1]
-            return self._items[oid]()
 
 global_registries = WeakOrderedSet()

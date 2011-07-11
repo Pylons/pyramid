@@ -1,5 +1,6 @@
 import pkg_resources
 import sys
+import weakref
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.path import package_of
@@ -143,4 +144,43 @@ class DottedNameResolver(object):
                 return self._zope_dottedname_style(dotted)
         return dotted
 
+class WeakOrderedSet(object):
+    """ Maintain a set of items.
 
+    Each item is stored as a weakref to avoid extending their lifetime.
+
+    The values may be iterated over or the last item added may be
+    accessed via the ``last`` property.
+    """
+
+    def __init__(self):
+        self._items = {}
+        self._order = []
+
+    def add(self, item):
+        """ Add a registry to the set."""
+        oid = id(item)
+        if oid in self._items:
+            return
+        def cleanup(ref):
+            del self._items[oid]
+            self._order.remove(oid)
+        ref = weakref.ref(item, cleanup)
+        self._items[oid] = ref
+        self._order.append(oid)
+
+    def __len__(self):
+        return len(self._order)
+
+    def __contains__(self, item):
+        oid = id(item)
+        return oid in self._items
+
+    def __iter__(self):
+        return (self._items[oid]() for oid in self._order)
+
+    @property
+    def last(self):
+        if self._order:
+            oid = self._order[-1]
+            return self._items[oid]()
