@@ -26,9 +26,9 @@ def get_root(app, request=None):
     root = app.root_factory(request)
     return root, closer
 
-def make_request(url, registry=None):
+def make_request(path, registry=None):
     """ Return a :meth:`pyramid.request.Request` object anchored at a
-    given URL. The object returned will be generated from the supplied
+    given path. The object returned will be generated from the supplied
     registry's :term:`Request Factory` using the
     :meth:`pyramid.interfaces.IRequestFactory.blank` method.
 
@@ -48,7 +48,7 @@ def make_request(url, registry=None):
     if registry is None:
         registry = global_registries.last
     request_factory = registry.queryUtility(IRequestFactory, default=Request)
-    request = request_factory.blank(url)
+    request = request_factory.blank(path)
     request.registry = registry
     return request
 

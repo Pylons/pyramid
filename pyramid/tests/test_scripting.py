@@ -2,11 +2,11 @@ import unittest
 
 class TestGetRoot(unittest.TestCase):
     def _callFUT(self, app, request=None):
-        from pyramid.paster import get_root
+        from pyramid.scripting import get_root
         return get_root(app, request)
 
     def test_it_norequest(self):
-        app = DummyApp()
+        app = DummyApp(registry=dummy_registry)
         root, closer = self._callFUT(app)
         self.assertEqual(len(app.threadlocal_manager.pushed), 1)
         pushed = app.threadlocal_manager.pushed[0]
@@ -17,7 +17,7 @@ class TestGetRoot(unittest.TestCase):
         self.assertEqual(len(app.threadlocal_manager.popped), 1)
 
     def test_it_withrequest(self):
-        app = DummyApp()
+        app = DummyApp(registry=dummy_registry)
         request = DummyRequest({})
         root, closer = self._callFUT(app, request)
         self.assertEqual(len(app.threadlocal_manager.pushed), 1)
@@ -29,23 +29,57 @@ class TestGetRoot(unittest.TestCase):
         self.assertEqual(len(app.threadlocal_manager.popped), 1)
 
     def test_it_requestfactory_overridden(self):
-        app = DummyApp()
-        request = Dummy()
-        class DummyFactory(object):
-            @classmethod
-            def blank(cls, path):
-                return request
-        registry = DummyRegistry(DummyFactory)
-        app.registry = registry
+        app = DummyApp(registry=dummy_registry)
         root, closer = self._callFUT(app)
         self.assertEqual(len(app.threadlocal_manager.pushed), 1)
         pushed = app.threadlocal_manager.pushed[0]
-        self.assertEqual(pushed['request'], request)
+        self.assertEqual(pushed['request'].environ['path'], '/')
+
+    def test_it_with_no_registry(self):
+        from pyramid.config import global_registries
+        app = DummyApp()
+        # keep registry local so that global_registries is cleared after
+        registry = DummyRegistry(DummyFactory)
+        global_registries.add(registry)
+        root, closer = self._callFUT(app)
+        self.assertEqual(len(app.threadlocal_manager.pushed), 1)
+        pushed = app.threadlocal_manager.pushed[0]
+        self.assertEqual(pushed['request'].registry, registry)
+
+class TestMakeRequest(unittest.TestCase):
+    def _callFUT(self, path='/', registry=None):
+        from pyramid.scripting import make_request
+        return make_request(path, registry)
+
+    def test_it(self):
+        request = self._callFUT('/', dummy_registry)
+        self.assertEqual(request.environ['path'], '/')
+        self.assertEqual(request.registry, dummy_registry)
+
+    def test_it_with_nondefault_path(self):
+        request = self._callFUT('/users/login', dummy_registry)
+        self.assertEqual(request.environ['path'], '/users/login')
+        self.assertEqual(request.registry, dummy_registry)
+
+    def test_it_with_no_registry(self):
+        from pyramid.config import global_registries
+        # keep registry local so that global_registries is cleared after
+        registry = DummyRegistry(DummyFactory)
+        global_registries.add(registry)
+        request = self._callFUT()
+        self.assertEqual(request.environ['path'], '/')
+        self.assertEqual(request.registry, registry)
 
 class Dummy:
     pass
 
 dummy_root = Dummy()
+
+class DummyFactory(object):
+    @classmethod
+    def blank(cls, path):
+        req = DummyRequest({'path': path})
+        return req
 
 class DummyRegistry(object):
     def __init__(self, result=None):
@@ -54,12 +88,13 @@ class DummyRegistry(object):
     def queryUtility(self, iface, default=None):
         return self.result or default
 
-dummy_registry = DummyRegistry()
+dummy_registry = DummyRegistry(DummyFactory)
 
 class DummyApp:
-    def __init__(self):
-        self.registry = dummy_registry
+    def __init__(self, registry=None):
         self.threadlocal_manager = DummyThreadLocalManager()
+        if registry:
+            self.registry = registry
 
     def root_factory(self, environ):
         return dummy_root
