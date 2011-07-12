@@ -6,22 +6,15 @@
 Application Configuration 
 =========================
 
-Each deployment of an application written using :app:`Pyramid` implies a
-specific *configuration* of the framework itself.  For example, an
-application which serves up MP3 files for your listening enjoyment might plug
-code into the framework that manages song files, while an application that
-manages corporate data might plug in code that manages accounting
-information.  The way in which code is plugged in to :app:`Pyramid` for a
-specific application is referred to as "configuration".
-
-Most people understand "configuration" as coarse settings that inform the
-high-level operation of a specific application deployment.  For instance,
-it's easy to think of the values implied by a ``.ini`` file parsed at
-application startup time as "configuration".  :app:`Pyramid` extends this
-pattern to application development, using the term "configuration" to express
-standardized ways that code gets plugged into a deployment of the framework
-itself.  When you plug code into the :app:`Pyramid` framework, you are
-"configuring" :app:`Pyramid` to create a particular application.
+The way in which code is plugged in to :app:`Pyramid` for a specific
+application is referred to as "configuration".  Most people understand
+"configuration" as coarse settings that inform the high-level operation of a
+specific application deployment.  For instance, it's easy to think of the
+values implied by a ``.ini`` file parsed at application startup time as
+"configuration".  However, :app:`Pyramid` also uses the word "configuration"
+to express standardized ways that code gets plugged into a deployment of the
+framework itself.  When you plug code into the :app:`Pyramid` framework, you
+are "configuring" :app:`Pyramid` to create a particular application.
 
 There are two ways to configure a :app:`Pyramid` application:
 :term:`imperative configuration` and :term:`declarative configuration`.  Both
