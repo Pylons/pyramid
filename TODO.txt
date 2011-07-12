@@ -16,9 +16,6 @@ Should-Have
 - Make "localizer" a property of request (instead of requiring
   "get_localizer(request)"?
 
-- Investigate mod_wsgi tutorial to make sure it still works (2 reports say
-  no; application package not found).
-
 - Add narrative docs for wsgiapp and wsgiapp2.
 
 Nice-to-Have
