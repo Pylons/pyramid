@@ -119,7 +119,7 @@ that references ``myroute`` as a ``route_name`` parameter:
 
    @view_config(route_name='myroute')
    def myview(request):
-       return Response('OK)
+       return Response('OK')
 
 THe above combination of ``add_route`` and ``scan`` is completely equivalent
 to using the previous combination of ``add_route`` and ``add_view``.
