@@ -13,10 +13,7 @@ def get_root(app, request=None):
     :app:`Pyramid` application root factory. A request is constructed
     using :meth:`pyramid.scripting.make_request` and passed to the root
     factory if ``request`` is None."""
-    if hasattr(app, 'registry'):
-        registry = app.registry
-    else:
-        registry = global_registries.last
+    registry = app.registry
     if request is None:
         request = make_request('/', registry)
     threadlocals = {'registry':registry, 'request':request}

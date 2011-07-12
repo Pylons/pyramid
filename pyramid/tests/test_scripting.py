@@ -35,30 +35,14 @@ class TestGetRoot(unittest.TestCase):
         pushed = app.threadlocal_manager.pushed[0]
         self.assertEqual(pushed['request'].environ['path'], '/')
 
-    def test_it_with_no_registry(self):
-        from pyramid.config import global_registries
-        app = DummyApp()
-        # keep registry local so that global_registries is cleared after
-        registry = DummyRegistry(DummyFactory)
-        global_registries.add(registry)
-        root, closer = self._callFUT(app)
-        self.assertEqual(len(app.threadlocal_manager.pushed), 1)
-        pushed = app.threadlocal_manager.pushed[0]
-        self.assertEqual(pushed['request'].registry, registry)
-
 class TestMakeRequest(unittest.TestCase):
     def _callFUT(self, path='/', registry=None):
         from pyramid.scripting import make_request
         return make_request(path, registry)
 
-    def test_it(self):
+    def test_it_with_registry(self):
         request = self._callFUT('/', dummy_registry)
         self.assertEqual(request.environ['path'], '/')
-        self.assertEqual(request.registry, dummy_registry)
-
-    def test_it_with_nondefault_path(self):
-        request = self._callFUT('/users/login', dummy_registry)
-        self.assertEqual(request.environ['path'], '/users/login')
         self.assertEqual(request.registry, dummy_registry)
 
     def test_it_with_no_registry(self):
@@ -66,8 +50,8 @@ class TestMakeRequest(unittest.TestCase):
         # keep registry local so that global_registries is cleared after
         registry = DummyRegistry(DummyFactory)
         global_registries.add(registry)
-        request = self._callFUT()
-        self.assertEqual(request.environ['path'], '/')
+        request = self._callFUT('/hello')
+        self.assertEqual(request.environ['path'], '/hello')
         self.assertEqual(request.registry, registry)
 
 class Dummy:
