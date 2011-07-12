@@ -88,14 +88,31 @@ class Router(object):
                 root_factory = route.factory or self.root_factory
         return root_factory(request)
 
+    def _get_request_iface(self, request):
+        attrs = request.__dict__
+        request_iface = IRequest
+        if attrs.has_key('matched_route'):
+            request_iface = self.registry.queryUtility(
+                IRouteRequest,
+                name=attrs['matched_route'].name,
+                default=IRequest)
+        return request_iface
+
     def get_context(self, root, request):
         traverser = self.registry.adapters.queryAdapter(root, ITraverser)
         if traverser is None:
             traverser = ResourceTreeTraverser(root)
         tdict = traverser(request)
         request.__dict__.update(tdict)
-        return tdict['context'], tdict['view_name']
+        return tdict['context']
 
+    def find_view_callable(self, context, request):
+        attrs = request.__dict__
+        request_iface = self._get_request_iface(request)
+        context_iface = providedBy(context)
+        return self.registry.adapters.lookup(
+            (IViewClassifier, request_iface, context_iface),
+            IView, name=attrs['view_name'], default=None)
 
     def __call__(self, environ, start_response):
         """
@@ -106,7 +123,6 @@ class Router(object):
         return an iterable.
         """
         registry = self.registry
-        adapters = registry.adapters
         has_listeners = registry.has_listeners
         notify = registry.notify
         logger = self.logger
@@ -125,7 +141,6 @@ class Router(object):
                 threadlocals['request'] = request
                 attrs = request.__dict__
                 attrs['registry'] = registry
-                request_iface = IRequest
 
                 try: # matches except Exception (exception view execution)
                     has_listeners and notify(NewRequest(request))
@@ -133,21 +148,12 @@ class Router(object):
                     root = self.get_root_object(request)
                     attrs['root'] = root
 
-                    if attrs.has_key('matched_route'):
-                        request_iface = registry.queryUtility(
-                            IRouteRequest,
-                            name=attrs['matched_route'].name,
-                            default=IRequest)
-
                     # find a context
-                    context, view_name = self.get_context(root, request)
+                    context = self.get_context(root, request)
                     has_listeners and notify(ContextFound(request))
 
                     # find a view callable
-                    context_iface = providedBy(context)
-                    view_callable = adapters.lookup(
-                        (IViewClassifier, request_iface, context_iface),
-                        IView, name=view_name, default=None)
+                    view_callable = self.find_view_callable(context, request)
 
                     # invoke the view callable
                     if view_callable is None:
@@ -158,7 +164,7 @@ class Router(object):
                                 'traversed: %r, root: %r, vroot: %r, '
                                 'vroot_path: %r' % (
                                     request.url, request.path_info, context,
-                                    view_name,
+                                    attrs['view_name'],
                                     attrs['subpath'], attrs['traversed'],
                                     root, attrs['virtual_root'],
                                     attrs['virtual_root_path'])
@@ -175,9 +181,9 @@ class Router(object):
                     attrs['exception'] = why
 
                     for_ = (IExceptionViewClassifier,
-                            request_iface.combined,
+                            self._get_request_iface(request).combined,
                             providedBy(why))
-                    view_callable = adapters.lookup(for_, IView, default=None)
+                    view_callable = registry.adapters.lookup(for_, IView, default=None)
 
                     if view_callable is None:
                         raise
