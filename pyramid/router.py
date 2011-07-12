@@ -12,7 +12,6 @@ from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import ITraverser
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
-from pyramid.interfaces import IResponse
 
 from pyramid.events import ContextFound
 from pyramid.events import NewRequest
