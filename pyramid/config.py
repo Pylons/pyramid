@@ -1801,12 +1801,11 @@ class Configurator(object):
            should only be used to support older code bases which depend upon
            them.* Use a separate call to
            :meth:`pyramid.config.Configurator.add_view` to associate a view
-           with a route.  See :ref:`add_route_view_config` for more info.
+           with a route using the ``route_name`` argument.
 
         view
 
-          .. warning:: Deprecated as of :app:`Pyramid` 1.1; see
-             :ref:`add_route_view_config`.
+          .. warning:: Deprecated as of :app:`Pyramid` 1.1.
 
           A Python object or :term:`dotted Python name` to the same
           object that will be used as a view callable when this route
@@ -1814,9 +1813,8 @@ class Configurator(object):
 
         view_context
 
-          .. warning:: Deprecated as of :app:`Pyramid` 1.1; see
-             :ref:`add_route_view_config`.
-
+          .. warning:: Deprecated as of :app:`Pyramid` 1.1.
+          
           A class or an :term:`interface` or :term:`dotted Python
           name` to the same object which the :term:`context` of the
           view should match for the view named by the route to be
@@ -1831,8 +1829,7 @@ class Configurator(object):
 
         view_permission
 
-          .. warning:: Deprecated as of :app:`Pyramid` 1.1; see
-             :ref:`add_route_view_config`.
+          .. warning:: Deprecated as of :app:`Pyramid` 1.1.
 
           The permission name required to invoke the view associated
           with this route.  e.g. ``edit``. (see
@@ -1846,8 +1843,7 @@ class Configurator(object):
 
         view_renderer
 
-          .. warning:: Deprecated as of :app:`Pyramid` 1.1; see
-             :ref:`add_route_view_config`.
+          .. warning:: Deprecated as of :app:`Pyramid` 1.1.
 
           This is either a single string term (e.g. ``json``) or a
           string implying a path or :term:`asset specification`
@@ -1871,8 +1867,7 @@ class Configurator(object):
 
         view_attr
 
-          .. warning:: Deprecated as of :app:`Pyramid` 1.1; see
-             :ref:`add_route_view_config`.
+          .. warning:: Deprecated as of :app:`Pyramid` 1.1.
 
           The view machinery defaults to using the ``__call__`` method
           of the view callable (or the function itself, if the view

@@ -394,12 +394,13 @@ the associated route to be considered a match during the route matching
 process.  Examples of route predicate arguments are ``pattern``, ``xhr``, and
 ``request_method``.
 
-Other arguments are view configuration related arguments.  These only have an
-effect when the route configuration names a ``view``. These arguments have
-been deprecated as of :app:`Pyramid` 1.1 (see :ref:`add_route_view_config`).
-
 Other arguments are ``name`` and ``factory``.  These arguments represent
 neither predicates nor view configuration information.
+
+.. warning:: Some arguments are view-configuration related arguments, such as
+   ``view_renderer``.  These only have an effect when the route configuration
+   names a ``view`` and these arguments have been deprecated as of
+   :app:`Pyramid` 1.1.
 
 .. _custom_route_predicates:
 
