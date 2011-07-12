@@ -9,17 +9,14 @@ Installing :app:`Pyramid`
 Before You Install
 ------------------
 
-You will need `Python <http://python.org>`_ version 2.4 or better to
+You will need `Python <http://python.org>`_ version 2.5 or better to
 run :app:`Pyramid`.  
 
 .. sidebar:: Python Versions
 
-    As of this writing, :app:`Pyramid` has been tested under Python
-    2.4.6, Python 2.5.4 and Python 2.6.2, and Python 2.7.  To ensure
-    backwards compatibility, development of :app:`Pyramid` is
-    currently done primarily under Python 2.4 and Python 2.5.
-    :app:`Pyramid` does not run under any version of Python before
-    2.4, and does not yet run under Python 3.X.
+    As of this writing, :app:`Pyramid` has been tested under Python 2.5.5 and
+    Python 2.6.6, and Python 2.7.2.  :app:`Pyramid` does not run under any
+    version of Python before 2.5, and does not yet run under Python 3.X.
 
 :app:`Pyramid` is known to run on all popular Unix-like systems such as
 Linux, MacOS X, and FreeBSD as well as on Windows platforms.  It is also
@@ -143,15 +140,15 @@ setuptools`` within the Python interpreter you'd like to run
 .. code-block:: text
 
    [chrism@vitaminf pyramid]$ python
-   Python 2.4.5 (#1, Aug 29 2008, 12:27:37) 
-   [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
+   Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32) 
+   [GCC 4.4.3] on linux2
    Type "help", "copyright", "credits" or "license" for more information.
    >>> import setuptools
 
 If running ``import setuptools`` does not raise an ``ImportError``, it
 means that setuptools is already installed into your Python
 interpreter.  If ``import setuptools`` fails, you will need to install
-setuptools manually.  Note that above we're using a Python 2.4-series
+setuptools manually.  Note that above we're using a Python 2.6-series
 interpreter on Mac OS X; your output may differ if you're using a
 later Python version or a different platform.
 
