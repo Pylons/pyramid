@@ -308,6 +308,15 @@ Backwards Incompatibilities
 Deprecations and Behavior Differences
 -------------------------------------
 
+.. note:: Under Python 2.7+, it's necessary to pass the Python interpreter
+   the correct warning flags to see deprecation warnings emitted by Pyramid
+   when porting your application from an older version of Pyramid.  Use the
+   ``PYTHONWARNINGS`` environment variable with the value ``all`` in the
+   shell you use to invoke ``paster serve`` to see these warnings, e.g. on
+   UNIX, ``PYTHONWARNINGS=all bin/paster serve development.ini``.  Python 2.5
+   and 2.6 show deprecation warnings by default, so this is unecessary there.
+   All deprecation warnings are emitted to the console.
+
 - The ``paster pshell``, ``paster proutes``, and ``paster pviews`` commands
   now take a single argument in the form ``/path/to/config.ini#sectionname``
   rather than the previous 2-argument spelling ``/path/to/config.ini
