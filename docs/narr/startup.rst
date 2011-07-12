@@ -53,6 +53,10 @@ Here's a high-level time-ordered overview of what happens when you press
    that particular composite to understand how to make it refer to your
    :app:`Pyramid` application.
 
+#. The PasteDeploy framework finds all :mod:`logging` related configuration
+   in the ``.ini`` file and uses it to configure the Python standard library
+   logging system for this application.
+
 #. The application's *constructor* (named by the entry point reference or
    dotted Python name on the ``use=`` line of the section representing your
    :app:`Pyramid` application) is passed the key/value parameters mentioned
