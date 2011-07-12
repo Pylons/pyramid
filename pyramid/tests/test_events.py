@@ -195,21 +195,26 @@ class TestBeforeRender(unittest.TestCase):
         event['a'] = 1
         self.assertEqual(system, {'a':1})
 
-    def test_setitem_fail(self):
-        system = {'a':1}
+    def test_setdefault_fail(self):
+        system = {}
         event = self._makeOne(system)
-        self.assertRaises(KeyError, event.__setitem__, 'a',  1)
+        result = event.setdefault('a', 1)
+        self.assertEqual(result, 1)
+        self.assertEqual(system, {'a':1})
+        
+    def test_setdefault_success(self):
+        system = {}
+        event = self._makeOne(system)
+        event['a'] = 1
+        result = event.setdefault('a', 2)
+        self.assertEqual(result, 1)
+        self.assertEqual(system, {'a':1})
 
     def test_update_success(self):
         system = {'a':1}
         event = self._makeOne(system)
         event.update({'b':2})
         self.assertEqual(system, {'a':1, 'b':2})
-
-    def test_update_fail(self):
-        system = {'a':1}
-        event = self._makeOne(system)
-        self.assertRaises(KeyError, event.update, {'a':1})
 
     def test__contains__True(self):
         system = {'a':1}

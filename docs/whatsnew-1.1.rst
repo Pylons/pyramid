@@ -481,6 +481,22 @@ Deprecations and Behavior Differences
      def expects_object_event(object, event):
          print object, event
 
+- In 1.0, if a :class:`pyramid.events.BeforeRender` event subscriber added a
+  value via the ``__setitem__`` or ``update`` methods of the event object
+  with a key that already existed in the renderer globals dictionary, a
+  ``KeyError`` was raised.  With the deprecation of the
+  "add_renderer_globals" feature of the configurator, there was no way to
+  override an existing value in the renderer globals dictionary that already
+  existed.  Now, the event object will overwrite an older value that is
+  already in the globals dictionary when its ``__setitem__`` or ``update`` is
+  called (as well as the new ``setdefault`` method), just like a plain old
+  dictionary.  As a result, for maximum interoperability with other
+  third-party subscribers, if you write an event subscriber meant to be used
+  as a BeforeRender subscriber, your subscriber code will now need to (using
+  ``.get`` or ``__contains__`` of the event object) ensure no value already
+  exists in the renderer globals dictionary before setting an overriding
+  value.
+
 Dependency Changes
 ------------------
 
