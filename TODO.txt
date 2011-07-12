@@ -10,9 +10,6 @@ Must-Have
   (DBSession.rollback()/transaction.abort() in scaffold vs. "pass" in
   tutorial)
 
-- deprecate request.add_response_callback (or at least review docs, in light
-  of request.response property).
-
 Should-Have
 -----------
 

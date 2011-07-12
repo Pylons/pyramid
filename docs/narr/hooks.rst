@@ -284,8 +284,8 @@ Using Response Callbacks
 
 Unlike many other web frameworks, :app:`Pyramid` does not eagerly create a
 global response object.  Adding a :term:`response callback` allows an
-application to register an action to be performed against a response object
-once it is created, usually in order to mutate it.
+application to register an action to be performed against whatever response
+object is returned by a view, usually in order to mutate the response.
 
 The :meth:`pyramid.request.Request.add_response_callback` method is used to
 register a response callback.
