@@ -143,6 +143,19 @@ class TestRouter(unittest.TestCase):
         root = router.get_root_object(request)
         self.assertTrue(isinstance(root, DefaultRootFactory))
 
+    def test_get_root_object_custom(self):
+        from pyramid.interfaces import IRootFactory
+        class CustomRootFactory():
+            def __init__(self, request):
+                pass
+        self.registry.registerUtility(CustomRootFactory, IRootFactory)
+        from pyramid.request import Request
+        request = Request.blank('/')
+        logger = self._registerLogger()
+        router = self._makeOne()
+        root = router.get_root_object(request)
+        self.assertTrue(isinstance(root, CustomRootFactory))
+
     def test_get_context_default(self):
         from pyramid.traversal import DefaultRootFactory
         from pyramid.request import Request
@@ -152,6 +165,25 @@ class TestRouter(unittest.TestCase):
         root = router.get_root_object(request)
         context = router.get_context(root, request)
         self.assertTrue(isinstance(context, DefaultRootFactory))
+
+    def test_get_context_custom(self):
+        from pyramid.interfaces import IRootFactory
+        class CustomContext():
+            def __init__(self, parent):
+                self.__parent__ = parent
+
+        class CustomRootFactory(dict):
+            def __init__(self, request):
+                self['custom'] = CustomContext(self)
+
+        self.registry.registerUtility(CustomRootFactory, IRootFactory)
+        from pyramid.request import Request
+        request = Request.blank('/custom')
+        logger = self._registerLogger()
+        router = self._makeOne()
+        root = router.get_root_object(request)
+        context = router.get_context(root, request)
+        self.assertTrue(isinstance(context, CustomContext))
 
     def test_call_traverser_default(self):
         from pyramid.httpexceptions import HTTPNotFound
