@@ -12,9 +12,9 @@ A project is a directory that contains at least one Python :term:`package`.
 You'll use a scaffold to create a project, and you'll create your application
 logic within a package that lives inside the project.  Even if your
 application is extremely simple, it is useful to place code that drives the
-application within a package, because a package is more easily extended with
-new code.  An application that lives inside a package can also be distributed
-more easily than one which does not live within a package.
+application within a package, because: 1) a package is more easily extended
+with new code and 2) an application that lives inside a package can also be
+distributed more easily than one which does not live within a package.
 
 :app:`Pyramid` comes with a variety of scaffolds that you can use to generate
 a project.  Each scaffold makes different configuration assumptions about
@@ -559,7 +559,8 @@ The generated ``development.ini`` file looks like so:
    :linenos:
 
 This file contains several "sections" including ``[app:MyProject]``,
-``[pipeline:main]``, and ``[server:main]``.
+``[pipeline:main]``, ``[server:main]`` and several other sections related to
+logging configuration.
 
 The ``[app:MyProject]`` section represents configuration for your
 application.  This section name represents the ``MyProject`` application (and
@@ -642,6 +643,16 @@ for each request.
   should be threading-aware.  It is not required that a :app:`Pyramid`
   application be nonblocking as all application code will run in its own
   thread, provided by the server you're using.
+
+The sections that live between the markers ``# Begin logging configuration``
+and ``# End logging configuration`` represent Python's standard library
+:mod:`logging` module configuration for your application.  The sections
+between these two markers are passed to the `logging module's config file
+configuration engine
+<http://docs.python.org/howto/logging.html#configuring-logging>`_ when the
+``paster serve`` or ``paster pshell`` commands are executed.  The default
+configuration sends application logging output to the standard error output
+of your terminal.
 
 See the :term:`PasteDeploy` documentation for more information about other
 types of things you can put into this ``.ini`` file, such as other
