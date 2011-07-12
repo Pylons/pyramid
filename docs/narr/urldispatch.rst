@@ -12,10 +12,10 @@ patterns is checked one-by-one.  If one of the patterns matches the path
 information associated with a request, a particular :term:`view
 callable` is invoked.  
 
-:term:`URL dispatch` is one of two ways to perform :term:`resource
-location` in :app:`Pyramid`; the other way is using :term:`traversal`.
-If no route is matched using :term:`URL dispatch`, :app:`Pyramid` falls
-back to :term:`traversal` to handle the :term:`request`.
+:term:`URL dispatch` is one of two ways to perform :term:`resource location`
+in :app:`Pyramid`; the other way is to use :term:`traversal`.  If no route is
+matched using :term:`URL dispatch`, :app:`Pyramid` falls back to
+:term:`traversal` to handle the :term:`request`.
 
 It is the responsibility of the :term:`resource location` subsystem
 (i.e., :term:`URL dispatch` or :term:`traversal`) to find the resource
@@ -67,8 +67,8 @@ attributes.
 
 .. _config-add-route:
 
-Configuring a Route via The ``add_route`` Configurator Method
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Configuring a Route to Match a View
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The :meth:`pyramid.config.Configurator.add_route` method adds a single
 :term:`route configuration` to the :term:`application registry`.  Here's an
@@ -84,90 +84,45 @@ example:
    config.add_route('myroute', '/prefix/{one}/{two}')
    config.add_view(myview, route_name='myroute')
 
-.. versionchanged:: 1.0a4
-    Prior to 1.0a4, routes allow for a marker starting with a ``:``, for
-    example ``/prefix/:one/:two``.  This style is now deprecated
-    in favor of ``{}`` usage which allows for additional functionality.
+When a :term:`view callable` added to the configuration by way of
+:meth:`~pyramid.config.Configurator.add_view` bcomes associated with a route
+via its ``route_name`` predicate, that view callable will always be found
+and invoked when the associated route pattern matches during a request.
 
-.. index::
-   single: route configuration; view callable
-
-.. _add_route_view_config:
-
-Route Configuration That Names a View Callable
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. warning:: This section describes a feature which has been deprecated in
-   Pyramid 1.1 and higher.  In order to reduce confusion and documentation
-   burden, passing view-related parameters to
-   :meth:`~pyramid.config.Configurator.add_route` is deprecated.
-
-   In versions earlier than 1.1, a view was permitted to be connected to a
-   route using a set of ``view*`` parameters passed to the
-   :meth:`~pyramid.config.Configurator.add_route`.  This was a shorthand
-   which replaced the need to perform a subsequent call to
-   :meth:`~pyramid.config.Configurator.add_view` as described in
-   :ref:`config-add-route`. For example, it was valid (and often recommended)
-   to do:
-
-   .. code-block:: python
-
-      config.add_route('home', '/', view='mypackage.views.myview',
-                        view_renderer='some/renderer.pt')
-
-   Instead of the equivalent:
-
-   .. code-block:: python
-
-     config.add_route('home', '/')
-     config.add_view('mypackage.views.myview', route_name='home')
-                     renderer='some/renderer.pt')
-
-   Passing ``view*`` arguments to ``add_route`` as shown in the first
-   example above is now deprecated in favor of connecting a view to a
-   predefined route via :meth:`~pyramid.config.Configurator.add_view` using
-   the route's ``route_name`` parameter, as shown in the second example
-   above.
-
-   A deprecation warning is now issued when any view-related parameter is
-   passed to ``Configurator.add_route``.  The recommended way to associate a
-   view with a route is documented in :ref:`config-add-route`.
-
-When a route configuration declaration names a ``view`` attribute, the value
-of the attribute will reference a :term:`view callable`.  This view callable
-will be invoked when the route matches.  A view callable, as described in
-:ref:`views_chapter`, is developer-supplied code that "does stuff" as the
-result of a request.
-
-Here's an example route configuration that references a view callable:
+More commonly, you will not use any ``add_view`` statements in your project's
+"setup" code, instead only using ``add_route`` statements using a
+:term:`scan` for to associate view callables with routes.  For example, if
+this is a portion of your project's ``__init__.py``:
 
 .. code-block:: python
-   :linenos:
 
-   # "config" below is presumed to be an instance of the
-   # pyramid.config.Configurator class; "myview" is assumed
-   # to be a "view callable" function
-   from myproject.views import myview
-   config.add_route('myroute', '/prefix/{one}/{two}', view=myview)
+   # in your project's __init__.py (mypackage.__init__)
 
-You can also pass a :term:`dotted Python name` as the ``view`` argument
-rather than an actual callable:
+   config.add_route('myroute', '/prefix/{one}/{two}')
+   config.scan('mypackage')
+
+Note that we don't call :meth:`~pyramid.config.Configurator.add_view` in this
+setup code.  However, the above :term:`scan` execution
+``config.scan('mypackage')`` will pick up all :term:`configuration
+decoration`, including any objects decorated with the
+:class:`pyramid.view.view_config` decorator in the ``mypackage`` Python
+pakage.  For example, if you have a ``views.py`` in your package, a scan will
+pick up any of its configuration decorators, so we can add one there that
+that references ``myroute`` as a ``route_name`` parameter:
 
 .. code-block:: python
-   :linenos:
 
-   # "config" below is presumed to be an instance of the
-   # pyramid.config.Configurator class; "myview" is assumed
-   # to be a "view callable" function
-   config.add_route('myroute', '/prefix/{one}/{two}', 
-                    view='myproject.views.myview')
+   # in your project's views.py module (mypackage.views)
 
-When a route configuration names a ``view`` attribute, the :term:`view
-callable` named as that ``view`` attribute will always be found and invoked
-when the associated route pattern matches during a request.
+   from pyramid.view import view_config
+   from pyramid.response import Response
 
-See :meth:`pyramid.config.Configurator.add_route` for a description of
-view-related arguments.
+   @view_config(route_name='myroute')
+   def myview(request):
+       return Response('OK)
+
+THe above combination of ``add_route`` and ``scan`` is completely equivalent
+to using the previous combination of ``add_route`` and ``add_view``.
 
 .. index::
    single: route path pattern syntax
