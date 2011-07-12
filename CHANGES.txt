@@ -19,6 +19,17 @@ Behavior Changes
   event object) ensure no value already exists in the renderer globals
   dictionary before setting an overriding value.
 
+Bug Fixes
+---------
+
+- The ``Configurator.add_route`` method allowed two routes with the same
+  route to be added without an intermediate ``config.commit()``.  If you now
+  receive a ``ConfigurationError`` at startup time that appears to be
+  ``add_route`` related, you'll need to either a) ensure that all of your
+  route names are unique or b) call ``config.commit()`` before adding a
+  second route with the name of a previously added name or c) use a
+  Configurator that works in ``autocommit`` mode.
+
 1.1b1 (2011-07-10)
 ==================
 

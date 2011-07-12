@@ -1998,6 +1998,13 @@ class ConfiguratorTests(unittest.TestCase):
         self._assertRoute(config, 'name', 'path')
         self.assertEqual(route.name, 'name')
 
+    def test_add_route_discriminator(self):
+        config = self._makeOne()
+        route = config.add_route('name', 'path')
+        self._assertRoute(config, 'name', 'path')
+        self.assertEqual(route.name, 'name')
+        self.assertEqual(config._ctx.actions[-1][0], ('route', 'name'))
+
     def test_add_route_with_factory(self):
         config = self._makeOne(autocommit=True)
         factory = object()

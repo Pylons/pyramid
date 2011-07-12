@@ -1931,11 +1931,7 @@ class Configurator(object):
         if pattern is None:
             raise ConfigurationError('"pattern" argument may not be None')
 
-        discriminator = ['route', name, xhr, request_method, path_info,
-                         request_param, header, accept]
-        discriminator.extend(sorted(custom_predicates))
-        discriminator = tuple(discriminator)
-
+        discriminator = ('route', name)
         self.action(discriminator, None)
 
         return mapper.connect(name, pattern, factory, predicates=predicates,

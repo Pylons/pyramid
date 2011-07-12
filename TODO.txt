@@ -4,8 +4,6 @@ Pyramid TODOs
 Must-Have
 ---------
 
-- add_route discriminator wrong
-
 - tutorial models.initialize_sql doesn't match scaffold
   (DBSession.rollback()/transaction.abort() in scaffold vs. "pass" in
   tutorial)
