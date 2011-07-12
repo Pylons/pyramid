@@ -39,4 +39,4 @@ def initialize_sql(engine):
         transaction.commit()
     except IntegrityError:
         # already created
-        pass
+        transaction.abort()

@@ -30,6 +30,17 @@ Bug Fixes
   second route with the name of a previously added name or c) use a
   Configurator that works in ``autocommit`` mode.
 
+- The ``pyramid_routesalchemy`` and ``pyramid_alchemy`` scaffolds
+  inappropriately used ``DBSession.rollback()`` instead of
+  ``transaction.abort()`` in one place.
+
+Documentation
+-------------
+
+- Wiki2 (SQLAlchemy + URL Dispatch) tutorial ``models.initialize_sql`` didn't
+  match the ``pyramid_routesalchemy`` scaffold function of the same name; it
+  didn't get synchronized when it was changed in the scaffold.
+
 1.1b1 (2011-07-10)
 ==================
 

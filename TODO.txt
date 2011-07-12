@@ -1,13 +1,6 @@
 Pyramid TODOs
 =============
 
-Must-Have
----------
-
-- tutorial models.initialize_sql doesn't match scaffold
-  (DBSession.rollback()/transaction.abort() in scaffold vs. "pass" in
-  tutorial)
-
 Should-Have
 -----------
 

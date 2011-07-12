@@ -40,4 +40,4 @@ def initialize_sql(engine):
     try:
         populate()
     except IntegrityError:
-        pass
+        transaction.abort()
