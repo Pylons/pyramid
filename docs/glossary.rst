@@ -908,3 +908,7 @@ Glossary
      A :term:`response` that is generated as the result of a raised exception
      being caught by an :term:`exception view`.
 
+   PyPy
+     PyPy is an "alternative implementation of the Python
+     language":http://pypy.org/
+
