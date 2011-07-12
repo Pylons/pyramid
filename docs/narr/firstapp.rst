@@ -12,8 +12,7 @@ more detail how it works.
 Hello World, Goodbye World
 --------------------------
 
-Here's one of the very simplest :app:`Pyramid` applications, configured
-imperatively:
+Here's one of the very simplest :app:`Pyramid` applications:
 
 .. code-block:: python
    :linenos:
