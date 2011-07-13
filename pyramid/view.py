@@ -205,6 +205,12 @@ class view_config(object):
                 renderer = RendererHelper(name=renderer,
                                           package=info.module,
                                           registry=context.config.registry)
+            else:
+                if renderer is not None and hasattr(renderer, "name"):
+                    renderer = RendererHelper(name=renderer.name,
+                                              package=info.module,
+                                              registry=context.config.registry)
+
             settings['renderer'] = renderer
             context.config.add_view(view=ob, **settings)
 

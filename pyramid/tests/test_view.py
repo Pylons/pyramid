@@ -384,6 +384,24 @@ class TestViewConfigDecorator(unittest.TestCase):
         self.assertEqual(renderer.package, pyramid.tests)
         self.assertEqual(renderer.registry.__class__, DummyRegistry)
 
+    def test_venusian_call_updates_renderer(self):
+        import pyramid.tests
+        decorator = self._makeOne(renderer='fixtures/minimal.test')
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        def foo(): pass
+        wrapped = decorator(foo)
+        self.assertTrue(wrapped is foo)
+        settings = call_venusian(venusian)
+        self.assertEqual(len(settings), 1)
+        renderer = settings[0]['renderer']
+        registry1 = renderer.registry
+        settings = call_venusian(venusian)
+        self.assertEqual(len(settings), 1)
+        renderer = settings[0]['renderer']
+        registry2 = renderer.registry     
+        self.assertNotEqual(registry1, registry2)
+
     def test_call_with_renderer_dict(self):
         decorator = self._makeOne(renderer={'a':1})
         venusian = DummyVenusian()
