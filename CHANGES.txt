@@ -1,5 +1,5 @@
-Next Release
-============
+1.1b2 (2011-07-13)
+==================
 
 Features
 --------
@@ -51,7 +51,7 @@ Bug Fixes
 
 - Views associated with routes with spaces in the route name may not have
   been looked up correctly when using Pyramid with ``zope.interface`` 3.6.4
-  and better.
+  and better.  See https://github.com/Pylons/pyramid/issues/232.
 
 Documentation
 -------------
