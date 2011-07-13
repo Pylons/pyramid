@@ -817,6 +817,11 @@ of a Pyramid application lifetime.  To do so, set the
 ``prevent_http_cache`` configuration value setting to a true value.  For more
 information, see :ref:`preventing_http_caching`.
 
+Note that setting ``prevent_http_cache`` will have no effect on caching
+headers that your application code itself sets.  It will only prevent caching
+headers that would have been set by the Pyramid HTTP caching machinery
+invoked as the result of the ``http_cache`` argument to view configuration.
+
 .. index::
    pair: matching views; printing
    single: paster pviews
