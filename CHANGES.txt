@@ -49,6 +49,10 @@ Bug Fixes
   exception view will be working with a request.response that has not been
   touched by any code prior to the exception.
 
+- Views associated with routes with spaces in the route name may not have
+  been looked up correctly when using Pyramid with ``zope.interface`` 3.6.4
+  and better.
+
 Documentation
 -------------
 

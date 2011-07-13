@@ -424,6 +424,15 @@ class Test_route_request_iface(unittest.TestCase):
         self.assertTrue(hasattr(iface, 'combined'))
         self.assertEqual(iface.combined.__name__, 'routename_combined_IRequest')
 
+    def test_it_routename_with_spaces(self):
+        #  see https://github.com/Pylons/pyramid/issues/232
+        iface = self._callFUT('routename with spaces')
+        self.assertEqual(iface.__name__, 'routename with spaces_IRequest')
+        self.assertTrue(hasattr(iface, 'combined'))
+        self.assertEqual(iface.combined.__name__,
+                         'routename with spaces_combined_IRequest')
+        
+
 class Test_add_global_response_headers(unittest.TestCase):
     def _callFUT(self, request, headerlist):
         from pyramid.request import add_global_response_headers
