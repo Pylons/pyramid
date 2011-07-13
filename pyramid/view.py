@@ -7,6 +7,7 @@ from zope.deprecation import deprecated
 from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
+from pyramid.interfaces import IRendererInfo
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid.httpexceptions import default_exceptionresponse_view
@@ -203,6 +204,12 @@ class view_config(object):
             renderer = settings.get('renderer')
             if isinstance(renderer, basestring):
                 renderer = RendererHelper(name=renderer,
+                                          package=info.module,
+                                          registry=context.config.registry)
+            elif IRendererInfo.providedBy(renderer):
+                # create a new rendererinfo to clear out old registry on a
+                # rescan, see https://github.com/Pylons/pyramid/pull/234
+                renderer = RendererHelper(name=renderer.name,
                                           package=info.module,
                                           registry=context.config.registry)
             settings['renderer'] = renderer

@@ -1,3 +1,13 @@
+Next release
+============
+
+Features
+--------
+
+- Fix corner case to ease semifunctional testing of views: create a new
+  rendererinfo to clear out old registry on a rescan.  See
+  https://github.com/Pylons/pyramid/pull/234.
+
 1.1b2 (2011-07-13)
 ==================
 
