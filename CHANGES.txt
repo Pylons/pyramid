@@ -45,6 +45,10 @@ Bug Fixes
   inappropriately used ``DBSession.rollback()`` instead of
   ``transaction.abort()`` in one place.
 
+- We now clear ``request.response`` before we invoke an exception view; an
+  exception view will be working with a request.response that has not been
+  touched by any code prior to the exception.
+
 Documentation
 -------------
 

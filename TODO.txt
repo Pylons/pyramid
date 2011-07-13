@@ -1,12 +1,6 @@
 Pyramid TODOs
 =============
 
-Must-Have
----------
-
-- Investigate whether we should replace request.response before we invoke an
-  exception view.
-
 Should-Have
 -----------
 

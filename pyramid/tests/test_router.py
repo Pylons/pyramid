@@ -403,6 +403,33 @@ class TestRouter(unittest.TestCase):
         why = exc_raised(HTTPNotFound, router, environ, start_response)
         self.assertEqual(why[0], 'notfound')
 
+    def test_call_view_raises_response_cleared(self):
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        from pyramid.interfaces import IExceptionViewClassifier
+        class IContext(Interface):
+            pass
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        context = DummyContext()
+        directlyProvides(context, IContext)
+        self._registerTraverserFactory(context, subpath=[''])
+        def view(context, request):
+            request.response.a = 1
+            raise KeyError
+        def exc_view(context, request):
+            self.failIf(hasattr(request.response, 'a'))
+            request.response.body = 'OK'
+            return request.response
+        environ = self._makeEnviron()
+        self._registerView(view, '', IViewClassifier, IRequest, IContext)
+        self._registerView(exc_view, '', IExceptionViewClassifier,
+                           IRequest, KeyError)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        itera = router(environ, start_response)
+        self.assertEqual(itera, ['OK'])
+
     def test_call_request_has_response_callbacks(self):
         from zope.interface import Interface
         from zope.interface import directlyProvides

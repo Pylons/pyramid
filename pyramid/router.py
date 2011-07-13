@@ -162,6 +162,12 @@ class Router(object):
 
                 # handle exceptions raised during root finding and view-exec
                 except Exception, why:
+                    # clear old generated request.response, if any; it may
+                    # have been mutated by the view, and its state is not
+                    # sane (e.g. caching headers)
+                    if 'response' in attrs:
+                        del attrs['response']
+
                     attrs['exception'] = why
 
                     for_ = (IExceptionViewClassifier,
