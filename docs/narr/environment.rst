@@ -117,6 +117,25 @@ this value is true.  See also :ref:`debug_routematch_section`.
 |                                 |                             |
 +---------------------------------+-----------------------------+
 
+.. _preventing_http_caching:
+
+Preventing HTTP Caching
+------------------------
+
+Prevent the ``http_cache`` view configuration argument from having any effect
+globally in this process when this value is true.  No http caching-related
+response headers will be set by the Pyramid ``http_cache`` view configuration
+feature when this is true.  See also :ref:`influencing_http_caching`.
+
++---------------------------------+-----------------------------+
+| Environment Variable Name       | Config File Setting Name    |
++=================================+=============================+
+| ``PYRAMID_PREVENT_HTTP_CACHE``  |  ``prevent_http_cache``     |
+|                                 |                             |
+|                                 |                             |
+|                                 |                             |
++---------------------------------+-----------------------------+
+
 Debugging All
 -------------
 

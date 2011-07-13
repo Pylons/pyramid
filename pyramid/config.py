@@ -2970,6 +2970,9 @@ class ViewDeriver(object):
 
     @wraps_view
     def http_cached_view(self, view):
+        if self.registry.settings.get('prevent_http_cache', False):
+            return view
+        
         seconds = self.kw.get('http_cache')
 
         if seconds is None:
@@ -2987,8 +2990,9 @@ class ViewDeriver(object):
 
         def wrapper(context, request):
             response = view(context, request)
-            cache_control = response.cache_control
-            if not hasattr(cache_control, 'prevent_auto'):
+            prevent_caching = getattr(response.cache_control, 'prevent_auto',
+                                      False)
+            if not prevent_caching:
                 response.cache_expires(seconds, **options)
             return response
 

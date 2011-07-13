@@ -1,6 +1,17 @@
 Next Release
 ============
 
+Features
+--------
+
+- New environment setting ``PYRAMID_PREVENT_HTTP_CACHE`` and new
+  configuration file value ``prevent_http_cache``.  These are synomymous and
+  allow you to prevent HTTP cache headers from being set by Pyramid's
+  ``http_cache`` machinery globally in a process.  see the "Influencing HTTP
+  Caching" section of the "View Configuration" narrative chapter and the
+  detailed documentation for this setting in the "Environment Variables and
+  Configuration Settings" narrative chapter.
+
 Behavior Changes
 ----------------
 
@@ -40,6 +51,9 @@ Documentation
 - Wiki2 (SQLAlchemy + URL Dispatch) tutorial ``models.initialize_sql`` didn't
   match the ``pyramid_routesalchemy`` scaffold function of the same name; it
   didn't get synchronized when it was changed in the scaffold.
+
+- New documentation section in View Configuration narrative chapter:
+  "Influencing HTTP Caching".
 
 1.1b1 (2011-07-10)
 ==================

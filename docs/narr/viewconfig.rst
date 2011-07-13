@@ -82,6 +82,8 @@ being invoked due to an authorization policy.  The presence of non-predicate
 arguments in a view configuration does not narrow the circumstances in which
 the view callable will be invoked.
 
+.. _nonpredicate_view_args:
+
 Non-Predicate Arguments
 +++++++++++++++++++++++
 
@@ -766,6 +768,54 @@ these errors, use the ``PYRAMID_DEBUG_NOTFOUND`` environment variable or the
 found will be printed to ``stderr``, and the browser representation of the
 error will include the same information.  See :ref:`environment_chapter` for
 more information about how, and where to set these values.
+
+.. index::
+   single: HTTP caching
+
+.. _influencing_http_caching:
+
+Influencing HTTP Caching
+------------------------
+
+.. note:: This feature is new in Pyramid 1.1.
+
+When a non-``None`` ``http_cache`` argument is passed to a view
+configuration, Pyramid will set ``Expires`` and ``Cache-Control`` response
+headers in the resulting response, causing browsers to cache the response
+data for some time.  See ``http_cache`` in :ref:`nonpredicate_view_args` for
+the its allowable values and what they mean.
+
+Sometimes it's undesirable to have these headers set as the result of
+returning a response from a view, even though you'd like to decorate the view
+with a view configuration decorator that has ``http_cache``.  Perhaps there's
+an alternate branch in your view code that returns a response that should
+never be cacheable, while the "normal" branch returns something that should
+always be cacheable.  If this is the case, set the ``prevent_auto`` attribute
+of the ``response.cache_control`` object to a non-``False`` value.  For
+example, the below view callable is configured with a ``@view_config``
+decorator that indicates any response from the view should be cached for 3600
+seconds.  However, the view itself prevents caching from taking place unless
+there's a ``should_cache`` GET or POST variable:
+
+.. code-block:: python
+
+   from pyramid.view import view_config
+
+   @view_config(http_cache=3600)
+   def view(request):
+       response = Response()
+       if not 'should_cache' in request.params:
+           response.cache_control.prevent_auto = True
+       return response
+
+Note that the ``http_cache`` machinery will overwrite or add to caching
+headers you set within the view itself unless you use ``preserve_auto``.
+
+You can also turn of the effect of ``http_cache`` entirely for the duration
+of a Pyramid application lifetime.  To do so, set the
+``PYRAMID_PREVENT_HTTP_CACHE`` environment variable or the
+``prevent_http_cache`` configuration value setting to a true value.  For more
+information, see :ref:`preventing_http_caching`.
 
 .. index::
    pair: matching views; printing

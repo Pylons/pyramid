@@ -4340,6 +4340,21 @@ class TestViewDeriver(unittest.TestCase):
         self.assertFalse('Expires' in headers)
         self.assertFalse('Cache-Control' in headers)
 
+    def test_http_cached_prevent_http_cache_in_settings(self):
+        self.config.registry.settings['prevent_http_cache'] = True
+        from pyramid.response import Response
+        response = Response()
+        def inner_view(context, request):
+            return response
+        deriver = self._makeOne(http_cache=3600)
+        result = deriver(inner_view)
+        request = self._makeRequest()
+        result = result(None, request)
+        self.assertEqual(result, response)
+        headers = dict(result.headerlist)
+        self.assertFalse('Expires' in headers)
+        self.assertFalse('Cache-Control' in headers)
+
     def test_http_cached_view_bad_tuple(self):
         from pyramid.exceptions import ConfigurationError
         deriver = self._makeOne(http_cache=(None,))
