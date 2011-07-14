@@ -1395,8 +1395,8 @@ predictability.
   a registry in another module.  This has the effect that
   double-registrations will never be performed.
 
-Routes (Usually) Need Relative Ordering
-+++++++++++++++++++++++++++++++++++++++
+Routes Need Relative Ordering
++++++++++++++++++++++++++++++
 
 Consider the following simple `Groundhog
 <https://github.com/Pylons/groundhog>`_ application:
@@ -1471,18 +1471,36 @@ the view associated with the ``/:action`` routing pattern will be invoked: it
 matches first.  A 404 error is raised.  This is not what we wanted; it just
 happened due to the order in which we defined our view functions.
 
-You may be willing to maintain an ordering of your view functions which
-reifies your routing policy.  Your application may be small enough where this
-will never cause an issue.  If it becomes large enough to matter, however, I
-don't envy you.  Maintaining that ordering as your application grows larger
-will be difficult.  At some point, you will also need to start controlling
-*import* ordering as well as function definition ordering.  When your
-application grows beyond the size of a single file, and when decorators are
-used to register views, the non-``__main__`` modules which contain
-configuration decorators must be imported somehow for their configuration to
-be executed.
+This is because "Groundhog" routes are added to the routing map in import
+order, and matched in the same order when a request comes in.  Bottle, like
+Groundhog, as of this writing, matches routes in the order in which they're
+defined at Python execution time.  Flask, on the other hand, does not order
+route matching based on import order; it reorders the routes you add to your
+application based on their "complexity".  Other microframeworks have varying
+strategies to do route ordering.
 
-Does that make you a little uncomfortable?  It should, because
+Your application may be small enough where route ordering will never cause an
+issue.  If your application becomes large enough, however, being able to
+specify or predict that ordering as your application grows larger will be
+difficult.  At some point, you will likely need to more explicitly start
+controlling route ordering, especially in applications that require
+extensibility.
+
+If your microframework orders route matching based on "complexity", you'll
+need to understand what that "complexity" ordering is and attempt to inject a
+"less complex" route to have it get matched before any "more complex" one to
+ensure that it's tried first.
+
+If your microframework orders its route matching based on relative
+import/execution of function decorator definitions, you will need to ensure
+you execute all of these statements in the "right" order, and you'll need to
+be cognizant of this import/execution ordering as you grow your application
+or try to extend it.  This is a difficult invariant to maintain for all but
+the smallest applications.
+
+In either case, your application must import the non-``__main__`` modules
+which contain configuration decorations somehow for their configuration to be
+executed.  Does that make you a little uncomfortable?  It should, because
 :ref:`you_dont_own_modulescope`.
 
 "Stacked Object Proxies" Are Too Clever / Thread Locals Are A Nuisance
