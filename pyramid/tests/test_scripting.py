@@ -35,6 +35,53 @@ class TestGetRoot(unittest.TestCase):
         pushed = app.threadlocal_manager.pushed[0]
         self.assertEqual(pushed['request'].environ['path'], '/')
 
+class TestGetRoot2(unittest.TestCase):
+    def _callFUT(self, request=None, registry=None):
+        from pyramid.scripting import get_root2
+        return get_root2(request, registry)
+
+    def _makeRegistry(self):
+        return DummyRegistry(DummyFactory)
+
+    def setUp(self):
+        from pyramid.threadlocal import manager
+        self.manager = manager
+        self.default = manager.get()
+
+    def tearDown(self):
+        self.assertEqual(self.default, self.manager.get())
+
+    def test_it_norequest(self):
+        registry = self._makeRegistry()
+        root, closer = self._callFUT(registry=registry)
+        pushed = self.manager.get()
+        self.assertEqual(pushed['registry'], registry)
+        self.assertEqual(pushed['request'].registry, registry)
+        self.assertEqual(root.a, (pushed['request'],))
+        closer()
+
+    def test_it_withrequest(self):
+        request = DummyRequest({})
+        registry = request.registry = self._makeRegistry()
+        root, closer = self._callFUT(request)
+        pushed = self.manager.get()
+        self.assertEqual(pushed['request'], request)
+        self.assertEqual(pushed['registry'], registry)
+        self.assertEqual(pushed['request'].registry, registry)
+        self.assertEqual(root.a, (request,))
+        closer()
+
+    def test_it_with_request_and_registry(self):
+        request = DummyRequest({})
+        registry = request.registry = self._makeRegistry()
+        root, closer = self._callFUT(request, registry)
+        pushed = self.manager.get()
+        self.assertEqual(pushed['request'], request)
+        self.assertEqual(pushed['registry'], registry)
+        self.assertEqual(pushed['request'].registry, registry)
+        self.assertEqual(root.a, (request,))
+        closer()
+
 class TestMakeRequest(unittest.TestCase):
     def _callFUT(self, path='/', registry=None):
         from pyramid.scripting import make_request
@@ -65,12 +112,16 @@ class DummyFactory(object):
         req = DummyRequest({'path': path})
         return req
 
+    def __init__(self, *a, **kw):
+        self.a = a
+        self.kw = kw
+
 class DummyRegistry(object):
-    def __init__(self, result=None):
-        self.result = result
+    def __init__(self, factory=None):
+        self.factory = factory
 
     def queryUtility(self, iface, default=None):
-        return self.result or default
+        return self.factory or default
 
 dummy_registry = DummyRegistry(DummyFactory)
 
