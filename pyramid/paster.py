@@ -57,8 +57,8 @@ class PShellCommand(PCommand):
     This command accepts one positional argument:
 
     ``config_uri`` -- specifies the PasteDeploy config file to use for the
-    interactive shell. The format is ``inifile#name``. If the name is left off,
-    ``main`` will be assumed.
+    interactive shell. The format is ``inifile#name``. If the name is left
+    off, ``main`` will be assumed.
 
     Example::
 
@@ -186,8 +186,8 @@ class PRoutesCommand(PCommand):
     This command accepts one positional argument:
 
     ``config_uri`` -- specifies the PasteDeploy config file to use for the
-    interactive shell. The format is ``inifile#name``. If the name is left off,
-    ``main`` will be assumed.
+    interactive shell. The format is ``inifile#name``. If the name is left
+    off, ``main`` will be assumed.
 
     Example::
 
@@ -255,8 +255,8 @@ class PViewsCommand(PCommand):
     This command accepts two positional arguments:
 
     ``config_uri`` -- specifies the PasteDeploy config file to use for the
-    interactive shell. The format is ``inifile#name``. If the name is left off,
-    ``main`` will be assumed.
+    interactive shell. The format is ``inifile#name``. If the name is left
+    off, ``main`` will be assumed.
 
     ``url`` -- specifies the URL that will be used to find matching views.
 
