@@ -11,7 +11,7 @@ View Configuration
    single: view lookup
 
 :term:`View lookup` is the :app:`Pyramid` subsystem responsible for finding
-an invoking a :term:`view callable`.  :term:`View configuration` controls how
+and invoking a :term:`view callable`.  :term:`View configuration` controls how
 :term:`view lookup` operates in your application.  During any given request,
 view configuration information is compared against request data by the view
 lookup subsystem in order to find the "best" view callable for that request.
