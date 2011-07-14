@@ -14,7 +14,7 @@ Features
   ``path_info``, attribute rather than it's ``subpath`` attribute (the
   inverse was true of ``pyramid.view.static``, and still is).
   ``pyramid.static.static_view`` exposes a ``use_subpath`` flag for use when
-  you don't want the static view to behave like the older deprecated version.
+  you want the static view to behave like the older deprecated version.
 
 Deprecations
 ------------

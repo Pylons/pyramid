@@ -264,8 +264,7 @@ Minor Feature Additions
   ``subpath`` attribute (the inverse was true of
   :class:`pyramid.view.static`, and still is).
   :class:`pyramid.static.static_view` exposes a ``use_subpath`` flag for use
-  when you don't want the static view to behave like the older deprecated
-  version.
+  when you want the static view to behave like the older deprecated version.
 
 Backwards Incompatibilities
 ---------------------------
