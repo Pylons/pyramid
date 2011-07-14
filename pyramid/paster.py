@@ -9,6 +9,7 @@ from paste.deploy import loadapp
 from paste.script.command import Command
 
 from pyramid.scripting import get_root
+from pyramid.scripting import get_root2
 from pyramid.util import DottedNameResolver
 
 from pyramid.scaffolds import PyramidTemplate # bw compat
@@ -34,6 +35,37 @@ def get_app(config_uri, name=None, loadapp=loadapp):
     here_dir = os.getcwd()
     app = loadapp(config_name, name=section, relative_to=here_dir)
     return app
+
+def bootstrap(config_uri, request=None):
+    """ Load a WSGI application from the PasteDeploy config file specified
+    by ``config_uri``.
+
+    .. note:: Most operations within :app:`Pyramid` expect to be invoked
+              within the context of a WSGI request, thus it's important when
+              loading your application to anchor it when executing scripts
+              and other code that is not normally invoked during active WSGI
+              requests.
+
+    .. note:: For a complex config file containing multiple :app:`Pyramid`
+              applications, this function will setup the environment under
+              the context of the last-loaded :app:`Pyramid` application. You
+              may load a specific application yourself by using the
+              lower-level functions :meth:`pyramid.paster.get_app` and
+              :meth:`pyramid.scripting.get_root2` in conjunction with
+              :attr:`pyramid.config.global_registries`.
+
+    ``config_uri`` -- specifies the PasteDeploy config file to use for the
+    interactive shell. The format is ``inifile#name``. If the name is left
+    off, ``main`` will be assumed.
+
+    ``request`` -- specified to anchor the script to a given set of WSGI
+    parameters. For example, most people would want to specify the host,
+    scheme and port such that their script will generate URLs in relation
+    to those parameters.
+    """
+    app = get_app(config_uri)
+    root, closer = get_root2(request)
+    return (app, root, closer)
 
 _marker = object()
 
