@@ -565,6 +565,48 @@ class Test_patch_mimetypes(unittest.TestCase):
         result = self._callFUT(module)
         self.assertEqual(result, False)
 
+class Test_static(unittest.TestCase):
+    def setUp(self):
+        from zope.deprecation import __show__
+        __show__.off()
+
+    def tearDown(self):
+        from zope.deprecation import __show__
+        __show__.on()
+
+    def _getTargetClass(self):
+        from pyramid.view import static
+        return static
+
+    def _makeOne(self, path, package_name=None):
+        return self._getTargetClass()(path, package_name=package_name)
+        
+    def _makeEnviron(self, **extras):
+        environ = {
+            'wsgi.url_scheme':'http',
+            'wsgi.version':(1,0),
+            'SERVER_NAME':'localhost',
+            'SERVER_PORT':'8080',
+            'REQUEST_METHOD':'GET',
+            }
+        environ.update(extras)
+        return environ
+
+
+    def test_relpath_subpath(self):
+        path = 'fixtures'
+        view = self._makeOne(path)
+        context = DummyContext()
+        request = DummyRequest()
+        request.subpath = ['__init__.py']
+        request.environ = self._makeEnviron()
+        response = view(context, request)
+        self.assertEqual(request.copied, True)
+        self.assertEqual(response.root_resource, 'fixtures')
+        self.assertEqual(response.resource_name, 'fixtures')
+        self.assertEqual(response.package_name, 'pyramid.tests')
+        self.assertEqual(response.cache_max_age, 3600)
+
 class ExceptionResponse(Exception):
     status = '404 Not Found'
     app_iter = ['Not Found']
@@ -580,6 +622,18 @@ def make_view(response):
 
 class DummyRequest:
     exception = None
+
+    def __init__(self, environ=None):
+        if environ is None:
+            environ = {}
+        self.environ = environ
+        
+    def get_response(self, application):
+        return application
+
+    def copy(self):
+        self.copied = True
+        return self
 
 from pyramid.interfaces import IResponse
 from zope.interface import implements

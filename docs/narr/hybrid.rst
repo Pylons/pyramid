@@ -431,8 +431,9 @@ Using ``*subpath`` in a Route Pattern
 There are certain extremely rare cases when you'd like to influence the
 traversal :term:`subpath` when a route matches without actually performing
 traversal.  For instance, the :func:`pyramid.wsgi.wsgiapp2` decorator and the
-:class:`pyramid.view.static` helper attempt to compute ``PATH_INFO`` from the
-request's subpath, so it's useful to be able to influence this value.
+:class:`pyramid.static.static_view` helper attempt to compute ``PATH_INFO``
+from the request's subpath when its ``use_subpath`` argument is ``True``, so
+it's useful to be able to influence this value.
 
 When ``*subpath`` exists in a pattern, no path is actually traversed,
 but the traversal algorithm will return a :term:`subpath` list implied
@@ -442,12 +443,16 @@ commonly in route declarations that look like this:
 .. code-block:: python
    :linenos:
 
-   config.add_route('static', '/static/*subpath')
-   config.add_view('mypackage.views.static_view', route_name='static')
+   from pryamid.static import static_view
 
-Where ``mypackage.views.static_view`` is an instance of
-:class:`pyramid.view.static`.  This effectively tells the static helper to
-traverse everything in the subpath as a filename.
+   www = static_view('mypackage:static', use_subpath=True)
+
+   config.add_route('static', '/static/*subpath')
+   config.add_view(www, route_name='static')
+
+``mypackage.views.www`` is an instance of
+:class:`pyramid.static.static_view`.  This effectively tells the static
+helper to traverse everything in the subpath as a filename.
 
 Corner Cases
 ------------
