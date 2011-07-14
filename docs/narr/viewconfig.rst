@@ -822,101 +822,10 @@ headers that your application code itself sets.  It will only prevent caching
 headers that would have been set by the Pyramid HTTP caching machinery
 invoked as the result of the ``http_cache`` argument to view configuration.
 
-.. index::
-   pair: matching views; printing
-   single: paster pviews
+Debugging View Configuration
+----------------------------
 
-.. _displaying_matching_views:
-
-Displaying Matching Views for a Given URL
------------------------------------------
-
-For a big application with several views, it can be hard to keep the view
-configuration details in your head, even if you defined all the views
-yourself. You can use the ``paster pviews`` command in a terminal window to
-print a summary of matching routes and views for a given URL in your
-application. The ``paster pviews`` command accepts two arguments. The
-first argument to ``pviews`` is the path to your application's ``.ini`` file
-and section name inside the ``.ini`` file which points to your application.
-This should be of the format ``config_file#section_name``. The second argument
-is the URL to test for matching views.
-
-Here is an example for a simple view configuration using :term:`traversal`:
-
-.. code-block:: text
-   :linenos:
-
-   $ ../bin/paster pviews development.ini tutorial /FrontPage
-
-   URL = /FrontPage
-
-       context: <tutorial.models.Page object at 0xa12536c>
-       view name:
-
-       View:
-       -----
-       tutorial.views.view_page
-       required permission = view
-
-The output always has the requested URL at the top and below that all the
-views that matched with their view configuration details. In this example
-only one view matches, so there is just a single *View* section. For each
-matching view, the full code path to the associated view callable is shown,
-along with any permissions and predicates that are part of that view
-configuration.
-
-A more complex configuration might generate something like this:
-
-.. code-block:: text
-   :linenos:
-
-   $ ../bin/paster pviews development.ini#shootout /about
-
-   URL = /about
-
-       context: <shootout.models.RootFactory object at 0xa56668c>
-       view name: about
-
-       Route:
-       ------
-       route name: about
-       route pattern: /about
-       route path: /about
-       subpath:
-       route predicates (request method = GET)
-
-           View:
-           -----
-           shootout.views.about_view
-           required permission = view
-           view predicates (request_param testing, header X/header)
-
-       Route:
-       ------
-       route name: about_post
-       route pattern: /about
-       route path: /about
-       subpath:
-       route predicates (request method = POST)
-
-           View:
-           -----
-           shootout.views.about_view_post
-           required permission = view
-           view predicates (request_param test)
-
-           View:
-           -----
-           shootout.views.about_view_post2
-           required permission = view
-           view predicates (request_param test2)
-
-In this case, we are dealing with a :term:`URL dispatch` application. This
-specific URL has two matching routes. The matching route information is
-displayed first, followed by any views that are associated with that route.
-As you can see from the second matching route output, a route can be
-associated with more than one view.
-
-For a URL that doesn't match any views, ``paster pviews`` will simply print
-out a *Not found* message.
-
+See :ref:`displaying_matching_views` for information about how to display
+each of the view callables that might match for a given URL.  This can be an
+effective way to figure out why a particular view callable is being called
+instead of the one you'd like to be called.

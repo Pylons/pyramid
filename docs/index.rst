@@ -59,6 +59,7 @@ Narrative documentation in chapter form explaining how to use
    narr/vhosting
    narr/events
    narr/environment
+   narr/commandline
    narr/testing
    narr/hooks
    narr/advconfig
