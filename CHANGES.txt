@@ -29,12 +29,12 @@ Bug Fixes
 
 - Without a mo-file loaded for the combination of domain/locale,
   ``pyramid.i18n.Localizer.pluralize`` run using that domain/locale
-  combination raised an inscrutable "translations object has no attr 'plural'
-  error.  Now, instead it "works" (it uses a germanic pluralization by
-  default).  This is not the "right" thing really (it's nonsensical to try to
-  pluralize something without translations for that locale/domain available),
-  but it matches the behavior of ``pyramid.i18n.Localizer.translate`` so it's
-  at least consistent; see https://github.com/Pylons/pyramid/issues/235.
+  combination raised an inscrutable "translations object has no attr
+  'plural'" error.  Now, instead it "works" (it uses a germanic pluralization
+  by default).  It's nonsensical to try to pluralize something without
+  translations for that locale/domain available, but this behavior matches
+  the behavior of ``pyramid.i18n.Localizer.translate`` so it's at least
+  consistent; see https://github.com/Pylons/pyramid/issues/235.
 
 1.1b2 (2011-07-13)
 ==================
