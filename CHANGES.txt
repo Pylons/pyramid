@@ -9,12 +9,12 @@ Features
   https://github.com/Pylons/pyramid/pull/234.
 
 - New API class: ``pyramid.static.static_view``.  This supersedes the
-  deprecated ``pyramid.view.static`` class.  ``pyramid.satic.static_view`` by
-  default serves up documents as the result of the request's ``path_info``,
-  attribute rather than it's ``subpath`` attribute (the inverse was true of
-  ``pyramid.view.static``, and still is).  ``pyramid.static.static_view``
-  exposes a ``use_subpath`` flag for use when you don't want the static view
-  to behave like the older deprecated version.
+  deprecated ``pyramid.view.static`` class.  ``pyramid.static.static_view``
+  by default serves up documents as the result of the request's
+  ``path_info``, attribute rather than it's ``subpath`` attribute (the
+  inverse was true of ``pyramid.view.static``, and still is).
+  ``pyramid.static.static_view`` exposes a ``use_subpath`` flag for use when
+  you don't want the static view to behave like the older deprecated version.
 
 Deprecations
 ------------

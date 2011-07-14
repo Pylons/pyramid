@@ -251,6 +251,16 @@ Minor Feature Additions
   preprocessor to be specified as a Python callable or Python dotted name.
   See https://github.com/Pylons/pyramid/pull/183 for rationale.
 
+- New API class: :class:`pyramid.static.static_view`.  This supersedes the
+  (now deprecated) :class:`pyramid.view.static` class.
+  :class:`pyramid.static.static_view`, by default, serves up documents as the
+  result of the request's ``path_info``, attribute rather than it's
+  ``subpath`` attribute (the inverse was true of
+  :class:`pyramid.view.static`, and still is).
+  :class:`pyramid.static.static_view` exposes a ``use_subpath`` flag for use
+  when you don't want the static view to behave like the older deprecated
+  version.
+
 Backwards Incompatibilities
 ---------------------------
 
@@ -322,6 +332,11 @@ Deprecations and Behavior Differences
    UNIX, ``PYTHONWARNINGS=all bin/paster serve development.ini``.  Python 2.5
    and 2.6 show deprecation warnings by default, so this is unecessary there.
    All deprecation warnings are emitted to the console.
+
+- The :class:`pyramid.view.static` class has been deprecated in favor of the
+  newer :class:`pyramid.static.static_view` class.  A deprecation warning is
+  raised when it is used.  You should replace it with a reference to
+  :class:`pyramid.static.static_view` with the ``use_subpath=True`` argument.
 
 - The ``paster pshell``, ``paster proutes``, and ``paster pviews`` commands
   now take a single argument in the form ``/path/to/config.ini#sectionname``
