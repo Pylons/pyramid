@@ -1503,12 +1503,19 @@ which contain configuration decorations somehow for their configuration to be
 executed.  Does that make you a little uncomfortable?  It should, because
 :ref:`you_dont_own_modulescope`.
 
-In the meantime, in Pyramid, if you don't want to have to maintain relative
-route ordering imperatively, you can use :term:`traversal` instead of route
-matching, which is a completely declarative (and completely predictable)
-mechanism to map code to URLs.  While URL dispatch is easier to understand
-for small non-extensible applications, traversal is a great fit for very
-large applications and applications that need to be arbitrarily extensible.
+Pyramid uses neither decorator import time ordering nor does it attempt to
+divine the relative "complexity" of one route to another in order to define a
+route match ordering.  In Pyramid, you have to maintain relative route
+ordering imperatively via the chronology of multiple executions of the
+:meth:`pyramid.config.Configurator.add_route` method.  The order in which you
+repeatedly call ``add_route`` becomes the order of route matching.
+
+If needing to maintain this imperative ordering truly bugs you, you can use
+:term:`traversal` instead of route matching, which is a completely
+declarative (and completely predictable) mechanism to map code to URLs.
+While URL dispatch is easier to understand for small non-extensible
+applications, traversal is a great fit for very large applications and
+applications that need to be arbitrarily extensible.
 
 "Stacked Object Proxies" Are Too Clever / Thread Locals Are A Nuisance
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
