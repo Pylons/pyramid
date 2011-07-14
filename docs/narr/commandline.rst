@@ -278,7 +278,7 @@ For example:
 
 ``paster proutes`` generates a table.  The table has three columns: a Name
 column, a Pattern column, and a View column.  The items listed in the
-Name column are route names, the items listen in the Pattern column are route
+Name column are route names, the items listed in the Pattern column are route
 patterns, and the items listed in the View column are representations of the
 view callable that will be invoked when a request matches the associated
 route pattern.  The view column may show ``None`` if no associated view
