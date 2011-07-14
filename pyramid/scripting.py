@@ -52,7 +52,6 @@ def get_root2(request=None, registry=None):
     threadlocal_manager.push(threadlocals)
     def closer(request=request): # keep request alive via this function default
         threadlocal_manager.pop()
-    q = registry.queryUtility
     root_factory = registry.queryUtility(IRootFactory,
                                          default=DefaultRootFactory)
     root = root_factory(request)
