@@ -73,9 +73,9 @@ manager.  For example, this works to do so on an Ubuntu Linux system:
 On Mac OS X, installing `XCode
 <http://developer.apple.com/tools/xcode/>`_ has much the same effect.
 
-Once you've got development tools installed on your system, On the
-same system, to install a Python 2.6 interpreter from *source*, use
-the following commands:
+Once you've got development tools installed on your system, you can
+install a Python 2.6 interpreter from *source*, on the same system,
+using the following commands:
 
 .. code-block:: text
 
