@@ -1503,6 +1503,13 @@ which contain configuration decorations somehow for their configuration to be
 executed.  Does that make you a little uncomfortable?  It should, because
 :ref:`you_dont_own_modulescope`.
 
+In the meantime, in Pyramid, if you don't want to have to maintain relative
+route ordering imperatively, you can use :term:`traversal` instead of route
+matching, which is a completely declarative (and completely predictable)
+mechanism to map code to URLs.  While URL dispatch is easier to understand
+for small non-extensible applications, traversal is a great fit for very
+large applications and applications that need to be arbitrarily extensible.
+
 "Stacked Object Proxies" Are Too Clever / Thread Locals Are A Nuisance
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
