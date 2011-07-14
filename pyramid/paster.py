@@ -38,7 +38,9 @@ def get_app(config_uri, name=None, loadapp=loadapp):
 
 def bootstrap(config_uri, request=None):
     """ Load a WSGI application from the PasteDeploy config file specified
-    by ``config_uri``.
+    by ``config_uri``. The environment will be configured as if it is
+    currently serving ``request``, leaving a natural environment in place
+    to write scripts that can generate URLs and utilize renderers.
 
     .. note:: Most operations within :app:`Pyramid` expect to be invoked
               within the context of a WSGI request, thus it's important when
@@ -65,7 +67,11 @@ def bootstrap(config_uri, request=None):
     """
     app = get_app(config_uri)
     root, closer = get_root2(request)
-    return (app, root, closer)
+    return {
+        'app': app,
+        'root': root,
+        'closer': closer,
+    }
 
 _marker = object()
 
