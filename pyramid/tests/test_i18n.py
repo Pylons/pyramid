@@ -65,6 +65,19 @@ class TestLocalizer(unittest.TestCase):
             )
         self.assertTrue(localizer.pluralizer is pluralizer)
 
+    def test_pluralize_default_translations(self):
+        # test that even without message ids loaded that
+        # "localizer.pluralize" "works" instead of raising an inscrutable
+        # "translations object has no attr 'plural' error; see
+        # see https://github.com/Pylons/pyramid/issues/235
+        from pyramid.i18n import Translations
+        translations = Translations()
+        translations._catalog = {}
+        localizer = self._makeOne(None, translations)
+        result = localizer.pluralize('singular', 'plural', 2, domain='1',
+                                     mapping={})
+        self.assertEqual(result, 'plural')
+
 class Test_negotiate_locale_name(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -468,6 +481,12 @@ class TestTranslations(unittest.TestCase):
         t = self._makeOne()
         self.assertEqual(t.dungettext('messages', 'foo1', 'foos1', 1), 'Voh1')
         self.assertEqual(t.dungettext('messages1', 'foo1', 'foos1', 1), 'VohD1')
+
+    def test_default_germanic_pluralization(self):
+        t = self._getTargetClass()()
+        t._catalog = {}
+        result = t.dungettext('messages', 'foo1', 'foos1', 2)
+        self.assertEqual(result, 'foos1')
 
 
 class DummyRequest(object):
