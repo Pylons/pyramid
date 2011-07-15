@@ -937,7 +937,7 @@ class TestBootstrap(unittest.TestCase):
     def setUp(self):
         import pyramid.paster
         self.original_get_app = pyramid.paster.get_app
-        self.original_getroot2 = pyramid.paster.get_root2
+        self.original_prepare = pyramid.paster.prepare
         self.app = app = DummyApp()
         self.root = root = Dummy()
 
@@ -948,17 +948,17 @@ class TestBootstrap(unittest.TestCase):
                 return app
         self.get_app = pyramid.paster.get_app = DummyGetApp()
 
-        class DummyGetRoot2(object):
+        class DummyPrepare(object):
             def __call__(self, *a, **kw):
                 self.a = a
                 self.kw = kw
-                return (root, lambda: None)
-        self.getroot = pyramid.paster.get_root2 = DummyGetRoot2()
+                return {'root':root, 'closer':lambda: None}
+        self.getroot = pyramid.paster.prepare = DummyPrepare()
 
     def tearDown(self):
         import pyramid.paster
         pyramid.paster.get_app = self.original_get_app
-        pyramid.paster.get_root2 = self.original_getroot2
+        pyramid.paster.prepare = self.original_prepare
 
     def test_it_request_with_registry(self):
         request = DummyRequest({})

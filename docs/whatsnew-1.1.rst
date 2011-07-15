@@ -266,6 +266,45 @@ Minor Feature Additions
   :class:`pyramid.static.static_view` exposes a ``use_subpath`` flag for use
   when you want the static view to behave like the older deprecated version.
 
+- A new API function :func:`pyramid.paster.bootstrap` has been added to make
+  writing scripts that bootstrap a Pyramid environment easier, e.g.:
+
+  .. code-block:: python
+
+      from pyramid.paster import bootstrap
+      info = bootstrap('/path/to/my/development.ini')
+      request = info['request']
+      print request.route_url('myroute')
+
+- A new api function :func:`pyramid.scripting.prepare` has been added.  It is
+  a lower-level analogue of :func:`pyramid.paster.boostrap` that accepts a
+  request and a registry instead of a config file argument, and is used for
+  the same purpose:
+
+  .. code-block:: python
+
+      from pyramid.scripting import prepare
+      info = prepare(registry=myregistry)
+      request = info['request']
+      print request.route_url('myroute')
+
+- A new API function :func:`pyramid.scripting.make_request` has been added.
+  The resulting request will have a ``registry`` attribute.  It is meant to
+  be used in conjunction with :func:`pyramid.scripting.prepare` and/or
+  :func:`pyramid.paster.bootstrap` (both of which accept a request as an
+  argument):
+
+  .. code-block:: python
+
+      from pyramid.scripting import make_request
+      request = make_request('/')
+
+- New API attribute :attr:`pyramid.config.global_registries` is an iterable
+  object that contains references to every Pyramid registry loaded into the
+  current process via :meth:`pyramid.config.Configurator.make_app`.  It also
+  has a ``last`` attribute containing the last registry loaded.  This is used
+  by the scripting machinery, and is available for introspection.
+
 Backwards Incompatibilities
 ---------------------------
 

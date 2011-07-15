@@ -9,7 +9,7 @@ from paste.deploy import loadapp
 from paste.script.command import Command
 
 from pyramid.scripting import get_root
-from pyramid.scripting import get_root2
+from pyramid.scripting import prepare
 from pyramid.util import DottedNameResolver
 
 from pyramid.scaffolds import PyramidTemplate # bw compat
@@ -72,12 +72,9 @@ def bootstrap(config_uri, request=None):
     to those parameters.
     """
     app = get_app(config_uri)
-    root, closer = get_root2(request)
-    return {
-        'app': app,
-        'root': root,
-        'closer': closer,
-    }
+    info = prepare(request)
+    info['app'] = app
+    return info
 
 _marker = object()
 

@@ -1,6 +1,6 @@
 import unittest
 
-class TestGetRoot(unittest.TestCase):
+class Test_get_root(unittest.TestCase):
     def _callFUT(self, app, request=None):
         from pyramid.scripting import get_root
         return get_root(app, request)
@@ -35,10 +35,10 @@ class TestGetRoot(unittest.TestCase):
         pushed = app.threadlocal_manager.pushed[0]
         self.assertEqual(pushed['request'].environ['path'], '/')
 
-class TestGetRoot2(unittest.TestCase):
+class Test_prepare(unittest.TestCase):
     def _callFUT(self, request=None, registry=None):
-        from pyramid.scripting import get_root2
-        return get_root2(request, registry)
+        from pyramid.scripting import prepare
+        return prepare(request, registry)
 
     def _makeRegistry(self):
         return DummyRegistry(DummyFactory)
@@ -48,39 +48,42 @@ class TestGetRoot2(unittest.TestCase):
         self.manager = manager
         self.default = manager.get()
 
-    def tearDown(self):
-        self.assertEqual(self.default, self.manager.get())
-
     def test_it_norequest(self):
         registry = self._makeRegistry()
-        root, closer = self._callFUT(registry=registry)
+        info = self._callFUT(registry=registry)
+        root, closer = info['root'], info['closer']
         pushed = self.manager.get()
         self.assertEqual(pushed['registry'], registry)
         self.assertEqual(pushed['request'].registry, registry)
         self.assertEqual(root.a, (pushed['request'],))
         closer()
+        self.assertEqual(self.default, self.manager.get())
 
     def test_it_withrequest(self):
         request = DummyRequest({})
         registry = request.registry = self._makeRegistry()
-        root, closer = self._callFUT(request)
+        info = self._callFUT(request=request)
+        root, closer = info['root'], info['closer']
         pushed = self.manager.get()
         self.assertEqual(pushed['request'], request)
         self.assertEqual(pushed['registry'], registry)
         self.assertEqual(pushed['request'].registry, registry)
         self.assertEqual(root.a, (request,))
         closer()
+        self.assertEqual(self.default, self.manager.get())
 
     def test_it_with_request_and_registry(self):
         request = DummyRequest({})
         registry = request.registry = self._makeRegistry()
-        root, closer = self._callFUT(request, registry)
+        info = self._callFUT(request=request, registry=registry)
+        root, closer = info['root'], info['closer']
         pushed = self.manager.get()
         self.assertEqual(pushed['request'], request)
         self.assertEqual(pushed['registry'], registry)
         self.assertEqual(pushed['request'].registry, registry)
         self.assertEqual(root.a, (request,))
         closer()
+        self.assertEqual(self.default, self.manager.get())
 
 class TestMakeRequest(unittest.TestCase):
     def _callFUT(self, path='/', registry=None):

@@ -26,15 +26,15 @@ def get_root(app, request=None):
     root = app.root_factory(request)
     return root, closer
 
-def get_root2(request=None, registry=None):
-    """ Return a tuple composed of ``(root, closer)``.  The ``root``
-    returned is the application's root object.  The ``closer`` returned
-    is a callable (accepting no arguments) that should be called when
-    your scripting application is finished using the root.
+def prepare(request=None, registry=None):
+    """ This function pushes data onto the Pyramid threadlocal stack (request
+    and registry), making those objects 'current'.  It returns a dictionary
+    useful for bootstrapping a Pyramid application in a scripting
+    environment.
 
-    If ``request`` is None, a default one is constructed using
-    :meth:`pyramid.scripting.make_request`. It is used as the request
-    passed to the :app:`Pyramid` application root factory.
+    If ``request`` is None, a default request is constructed using
+    :meth:`pyramid.scripting.make_request`. The request passed to the
+    :app:`Pyramid` application root factory to compute the root.
 
     If ``registry`` is not supplied, the last registry loaded from
     :attr:`pyramid.config.global_registries` will be used. If you have
@@ -42,6 +42,17 @@ def get_root2(request=None, registry=None):
     process, you may not want to use the last registry loaded, thus
     you can search the ``global_registries`` and supply the appropriate
     one based on your own criteria.
+
+    The function returns a dictionary composed of ``root``, ``closer``,
+    ``registry``, ``request`` and ``root_factory``.  The ``root`` returned is
+    the application's root resource object.  The ``closer`` returned is a
+    callable (accepting no arguments) that should be called when your
+    scripting application is finished using the root.  ``registry`` is the
+    registry object passed or the last registry loaded into
+    :attr:`pyramid.config.global_registries` if no registry is passed.
+    ``request`` is the request object passed or the constructed request if no
+    request is passed.  ``root_factory`` is the root factory used to
+    construct the root.
     """
     if registry is None:
         registry = getattr(request, 'registry', global_registries.last)
@@ -50,12 +61,13 @@ def get_root2(request=None, registry=None):
     request.registry = registry
     threadlocals = {'registry':registry, 'request':request}
     threadlocal_manager.push(threadlocals)
-    def closer(request=request): # keep request alive via this function default
+    def closer():
         threadlocal_manager.pop()
     root_factory = registry.queryUtility(IRootFactory,
                                          default=DefaultRootFactory)
     root = root_factory(request)
-    return root, closer
+    return {'root':root, 'closer':closer, 'registry':registry,
+            'request':request, 'root_factory':root_factory}
 
 def make_request(path, registry=None):
     """ Return a :meth:`pyramid.request.Request` object anchored at a

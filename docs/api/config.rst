@@ -88,9 +88,11 @@
 
   .. attribute:: global_registries
 
-     A set of registries that have been created for :app:`Pyramid`
-     applications. The object itself supports iteration and has a
-     ``last`` property containing the last registry loaded.
+     The set of registries that have been created for :app:`Pyramid`
+     applications, one per each call to
+     :meth:`pyramid.config.Configurator.make_app` in the current process. The
+     object itself supports iteration and has a ``last`` property containing
+     the last registry loaded.
 
      The registries contained in this object are stored as weakrefs,
      thus they will only exist for the lifetime of the actual
