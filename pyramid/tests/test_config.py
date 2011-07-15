@@ -5467,11 +5467,16 @@ class DummyRegistry(object):
 
 def parse_httpdate(s):
     import datetime
-    return datetime.datetime.strptime(s, "%a, %d %b %Y %H:%M:%S %Z")
+    # cannot use %Z, must use literal GMT; Jython honors timezone
+    # but CPython does not
+    return datetime.datetime.strptime(s, "%a, %d %b %Y %H:%M:%S GMT")
 
 def assert_similar_datetime(one, two):
     for attr in ('year', 'month', 'day', 'hour', 'minute'):
-        assert(getattr(one, attr) == getattr(two, attr))
+        one_attr = getattr(one, attr)
+        two_attr = getattr(two, attr)
+        if not one_attr == two_attr:
+            raise AssertionError('%r != %r in %s' % (one_attr, two_attr, attr))
 
 from pyramid.interfaces import IResponse
 class DummyResponse(object):
