@@ -82,6 +82,7 @@ from pyramid.traversal import find_interface
 from pyramid.traversal import traversal_path
 from pyramid.urldispatch import RoutesMapper
 from pyramid.util import DottedNameResolver
+from pyramid.util import WeakOrderedSet
 from pyramid.view import render_view_to_response
 
 DEFAULT_RENDERERS = (
@@ -981,6 +982,7 @@ class Configurator(object):
         self.commit()
         from pyramid.router import Router # avoid circdep
         app = Router(self.registry)
+        global_registries.add(self.registry)
         # We push the registry on to the stack here in case any code
         # that depends on the registry threadlocal APIs used in
         # listeners subscribed to the IApplicationCreated event.
@@ -989,6 +991,7 @@ class Configurator(object):
             self.registry.notify(ApplicationCreated(app))
         finally:
             self.manager.pop()
+
         return app
 
     @action_method
@@ -3318,3 +3321,4 @@ def isexception(o):
         (inspect.isclass(o) and (issubclass(o, Exception)))
         )
 
+global_registries = WeakOrderedSet()
