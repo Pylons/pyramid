@@ -42,6 +42,12 @@ def bootstrap(config_uri, request=None):
     currently serving ``request``, leaving a natural environment in place
     to write scripts that can generate URLs and utilize renderers.
 
+    This function returns a dictionary with ``app``, ``root`` and ``closer``
+    keys.  ``app`` is the WSGI app loaded (based on the ``config_uri``),
+    ``root`` is the traversal root resource of the Pyramid application, and
+    ``closer`` is a parameterless callback that may be called when your
+    script is complete (it pops a threadlocal stack).
+
     .. note:: Most operations within :app:`Pyramid` expect to be invoked
               within the context of a WSGI request, thus it's important when
               loading your application to anchor it when executing scripts
