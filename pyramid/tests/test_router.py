@@ -418,7 +418,7 @@ class TestRouter(unittest.TestCase):
             request.response.a = 1
             raise KeyError
         def exc_view(context, request):
-            self.failIf(hasattr(request.response, 'a'))
+            self.assertFalse(hasattr(request.response, 'a'))
             request.response.body = 'OK'
             return request.response
         environ = self._makeEnviron()
