@@ -977,8 +977,10 @@ class Configurator(object):
     def make_wsgi_app(self):
         """ Commits any pending configuration statements, sends a
         :class:`pyramid.events.ApplicationCreated` event to all listeners,
-        and returns a :app:`Pyramid` WSGI application representing the
-        committed configuration state."""
+        adds this configuration's reigstry to
+        :attr:`pyramid.config.global_registries`, and returns a
+        :app:`Pyramid` WSGI application representing the committed
+        configuration state."""
         self.commit()
         from pyramid.router import Router # avoid circdep
         app = Router(self.registry)
