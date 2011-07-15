@@ -463,7 +463,7 @@ class Configurator(object):
         :meth:`pyramid.config.Configuration.commit` is called (or executed
         immediately if ``autocommit`` is ``True``).
 
-        .. note:: This method is typically only used by :app:`Pyramid`
+        .. warning:: This method is typically only used by :app:`Pyramid`
            framework extension authors, not by :app:`Pyramid` application
            developers.
 
@@ -606,6 +606,10 @@ class Configurator(object):
     def add_directive(self, name, directive, action_wrap=True):
         """
         Add a directive method to the configurator.
+
+        .. warning:: This method is typically only used by :app:`Pyramid`
+           framework extension authors, not by :app:`Pyramid` application
+           developers.
 
         Framework extenders can add directive methods to a configurator by
         instructing their users to call ``config.add_directive('somename',
@@ -808,10 +812,13 @@ class Configurator(object):
 
     def derive_view(self, view, attr=None, renderer=None):
         """
-
         Create a :term:`view callable` using the function, instance,
         or class (or :term:`dotted Python name` referring to the same)
         provided as ``view`` object.
+
+        .. warning:: This method is typically only used by :app:`Pyramid`
+           framework extension authors, not by :app:`Pyramid` application
+           developers.
 
         This is API is useful to framework extenders who create
         pluggable systems which need to register 'proxy' view
