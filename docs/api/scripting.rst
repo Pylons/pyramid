@@ -7,3 +7,7 @@
 
   .. autofunction:: get_root
 
+  .. autofunction:: prepare
+
+  .. autofunction:: make_request
+

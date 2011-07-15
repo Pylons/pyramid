@@ -672,6 +672,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(len(L), 1)
 
     def test_make_wsgi_app(self):
+        import pyramid.config
         from pyramid.router import Router
         from pyramid.interfaces import IApplicationCreated
         manager = DummyThreadLocalManager()
@@ -683,8 +684,29 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(manager.pushed['registry'], config.registry)
         self.assertEqual(manager.pushed['request'], None)
         self.assertTrue(manager.popped)
+        self.assertEqual(pyramid.config.global_registries.last, app.registry)
         self.assertEqual(len(subscriber), 1)
         self.assertTrue(IApplicationCreated.providedBy(subscriber[0]))
+        pyramid.config.global_registries.empty()
+
+    def test_global_registries_empty(self):
+        from pyramid.config import global_registries
+        self.assertEqual(global_registries.last, None)
+
+    def test_global_registries(self):
+        from pyramid.config import global_registries
+        global_registries.empty()
+        config1 = self._makeOne()
+        config1.make_wsgi_app()
+        self.assertEqual(global_registries.last, config1.registry)
+        config2 = self._makeOne()
+        config2.make_wsgi_app()
+        self.assertEqual(global_registries.last, config2.registry)
+        self.assertEqual(list(global_registries),
+                         [config1.registry, config2.registry])
+        global_registries.remove(config2.registry)
+        self.assertEqual(global_registries.last, config1.registry)
+        global_registries.empty()
 
     def test_include_with_dotted_name(self):
         from pyramid import tests

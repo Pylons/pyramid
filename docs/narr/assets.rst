@@ -312,7 +312,7 @@ its behavior is almost exactly the same once it's configured.
    ``add_view`` (at least those without a ``route_name``).  A
    :class:`~pyramid.static.static_view` static view cannot be made
    root-relative when you use traversal unless it's registered as a
-   :term:`NotFound view`.
+   :term:`Not Found view`.
 
 To serve files within a directory located on your filesystem at
 ``/path/to/static/dir`` as the result of a "catchall" route hanging from the
