@@ -158,16 +158,25 @@ class WeakOrderedSet(object):
         self._order = []
 
     def add(self, item):
-        """ Add a registry to the set."""
+        """ Add an item to the set."""
         oid = id(item)
         if oid in self._items:
             return
-        def cleanup(ref):
-            del self._items[oid]
-            self._order.remove(oid)
-        ref = weakref.ref(item, cleanup)
+        ref = weakref.ref(item, lambda x: self.remove(item))
         self._items[oid] = ref
         self._order.append(oid)
+
+    def remove(self, item):
+        """ Remove an item from the set."""
+        oid = id(item)
+        if oid in self._items:
+            del self._items[oid]
+            self._order.remove(oid)
+
+    def empty(self):
+        """ Clear all objects from the set."""
+        self._items = {}
+        self._order = []
 
     def __len__(self):
         return len(self._order)

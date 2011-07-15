@@ -100,6 +100,7 @@ class TestMakeRequest(unittest.TestCase):
         request = self._callFUT('/hello')
         self.assertEqual(request.environ['path'], '/hello')
         self.assertEqual(request.registry, registry)
+        global_registries.empty()
 
 class Dummy:
     pass

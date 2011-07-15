@@ -216,28 +216,35 @@ class Test_WeakOrderedSet(unittest.TestCase):
         self.assertEqual(wos.last, reg)
 
     def test_weakref_removal(self):
-        import gc
         wos = self._makeOne()
         reg = Dummy()
         wos.add(reg)
-        del reg
-        gc.collect() # force gc
+        wos.remove(reg)
         self.assertEqual(len(wos), 0)
         self.assertEqual(list(wos), [])
         self.assertEqual(wos.last, None)
 
     def test_last_updated(self):
-        import gc
         wos = self._makeOne()
         reg = Dummy()
         reg2 = Dummy()
         wos.add(reg)
         wos.add(reg2)
-        del reg2
-        gc.collect() # force gc
+        wos.remove(reg2)
         self.assertEqual(len(wos), 1)
         self.assertEqual(list(wos), [reg])
         self.assertEqual(wos.last, reg)
+
+    def test_empty(self):
+        wos = self._makeOne()
+        reg = Dummy()
+        reg2 = Dummy()
+        wos.add(reg)
+        wos.add(reg2)
+        wos.empty()
+        self.assertEqual(len(wos), 0)
+        self.assertEqual(list(wos), [])
+        self.assertEqual(wos.last, None)
 
 class Dummy(object):
     pass

@@ -687,16 +687,15 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(pyramid.config.global_registries.last, app.registry)
         self.assertEqual(len(subscriber), 1)
         self.assertTrue(IApplicationCreated.providedBy(subscriber[0]))
+        pyramid.config.global_registries.empty()
 
     def test_global_registries_empty(self):
-        import gc
         from pyramid.config import global_registries
-        gc.collect() # force weakref updates
         self.assertEqual(global_registries.last, None)
 
     def test_global_registries(self):
-        import gc
         from pyramid.config import global_registries
+        global_registries.empty()
         config1 = self._makeOne()
         config1.make_wsgi_app()
         self.assertEqual(global_registries.last, config1.registry)
@@ -705,9 +704,9 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(global_registries.last, config2.registry)
         self.assertEqual(list(global_registries),
                          [config1.registry, config2.registry])
-        del config2
-        gc.collect() # force weakref updates
+        global_registries.remove(config2.registry)
         self.assertEqual(global_registries.last, config1.registry)
+        global_registries.empty()
 
     def test_include_with_dotted_name(self):
         from pyramid import tests
