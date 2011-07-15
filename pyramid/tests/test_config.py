@@ -5497,7 +5497,7 @@ def assert_similar_datetime(one, two):
     for attr in ('year', 'month', 'day', 'hour', 'minute'):
         one_attr = getattr(one, attr)
         two_attr = getattr(two, attr)
-        if not one_attr == two_attr:
+        if not one_attr == two_attr: # pragma: no cover
             raise AssertionError('%r != %r in %s' % (one_attr, two_attr, attr))
 
 from pyramid.interfaces import IResponse
