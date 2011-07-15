@@ -180,7 +180,7 @@ class Test_WeakOrderedSet(unittest.TestCase):
         from pyramid.config import WeakOrderedSet
         return WeakOrderedSet()
 
-    def test_empty(self):
+    def test_ctor(self):
         wos = self._makeOne()
         self.assertEqual(len(wos), 0)
         self.assertEqual(wos.last, None)
