@@ -977,7 +977,7 @@ class Configurator(object):
     def make_wsgi_app(self):
         """ Commits any pending configuration statements, sends a
         :class:`pyramid.events.ApplicationCreated` event to all listeners,
-        adds this configuration's reigstry to
+        adds this configuration's registry to
         :attr:`pyramid.config.global_registries`, and returns a
         :app:`Pyramid` WSGI application representing the committed
         configuration state."""
