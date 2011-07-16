@@ -315,6 +315,8 @@ environment much like the environment produced when a particular
 using the :func:`pyramid.paster.bootstrap` command in the body of your
 script.
 
+.. note:: This feature is new as of :app:`Pyramid` 1.1.
+
 In the simplest case, :func:`pyramid.paster.bootstrap` can be used with a
 single argument, which accepts the :term:`PasteDeploy` ``.ini`` file
 representing Pyramid your application configuration as a single argument:
@@ -329,7 +331,7 @@ representing Pyramid your application configuration as a single argument:
 framework-related information.  This dictionary will always contain a
 :term:`request` object as its ``request`` key.
 
-The following keys are also available in the ``info`` dictionary returned by
+The following keys are available in the ``info`` dictionary returned by
 :func:`~pyramid.paster.bootstrap`:
 
 request
@@ -379,8 +381,7 @@ this case, we'll be using a configuration that includes an ``app`` object
 which is wrapped in the WebError ``evalerror`` middleware.
 
 You can also specify a particular *section* of the PasteDeploy ``.ini`` file
-to load.  By default, Pyramid assumes the section name you want to load is
-``main``:
+to load instead of ``main``:
 
 .. code-block:: python
 
@@ -409,9 +410,9 @@ object present in the info dictionary returned by
 :func:`~pyramid.paster.bootstrap` will be a :app:`Pyramid` :term:`router`
 instead.
 
-By default, Pyramid will general a suitable request object in the ``info``
-dictionary anchored at the root path (``/``).  You can alternately supply
-your own :class:`pyramid.request.Request` instance to the
+By default, Pyramid will general a request object in the ``info`` dictionary
+anchored at the root path (``/``).  You can alternately supply your own
+:class:`pyramid.request.Request` instance to the
 :func:`~pyramid.paster.bootstrap` function, to set up request parameters
 beforehand:
 
