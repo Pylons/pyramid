@@ -32,6 +32,9 @@ The major feature additions in Pyramid 1.1 are:
 - ``http_cache`` view configuration parameter causes Pyramid to set HTTP
   caching headers.
 
+- Features that make it easier to write scripts that work in a :app:`Pyramid`
+  environment.
+
 ``request.response``
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -154,6 +157,21 @@ HTTP cache headers from being set by Pyramid's ``http_cache`` machinery
 globally in a process.  see :ref:`influencing_http_caching` and
 :ref:`preventing_http_caching`.
 
+Easier Scripting Writing
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+A new API function :func:`pyramid.paster.bootstrap` has been added to make
+writing scripts that need to work under Pyramid environment easier, e.g.:
+
+.. code-block:: python
+
+    from pyramid.paster import bootstrap
+    info = bootstrap('/path/to/my/development.ini')
+    request = info['request']
+    print request.route_url('myroute')
+
+See :ref:`writing_a_script` for more details.
+
 Minor Feature Additions
 -----------------------
 
@@ -265,16 +283,6 @@ Minor Feature Additions
   :class:`pyramid.view.static`, and still is).
   :class:`pyramid.static.static_view` exposes a ``use_subpath`` flag for use
   when you want the static view to behave like the older deprecated version.
-
-- A new API function :func:`pyramid.paster.bootstrap` has been added to make
-  writing scripts that bootstrap a Pyramid environment easier, e.g.:
-
-  .. code-block:: python
-
-      from pyramid.paster import bootstrap
-      info = bootstrap('/path/to/my/development.ini')
-      request = info['request']
-      print request.route_url('myroute')
 
 - A new api function :func:`pyramid.scripting.prepare` has been added.  It is
   a lower-level analogue of :func:`pyramid.paster.boostrap` that accepts a

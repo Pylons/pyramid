@@ -437,4 +437,3 @@ call the ``closer`` callback:
    info['closer']()
 
 
-
