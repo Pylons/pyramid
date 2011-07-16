@@ -332,7 +332,7 @@ framework-related information.  This dictionary will always contain a
 :term:`request` object as its ``request`` key.
 
 The following keys are available in the ``info`` dictionary returned by
-:func:`~pyramid.paster.bootstrap`:
+:func:`pyramid.paster.bootstrap`:
 
 request
 
