@@ -42,11 +42,12 @@ def bootstrap(config_uri, request=None):
     currently serving ``request``, leaving a natural environment in place
     to write scripts that can generate URLs and utilize renderers.
 
-    This function returns a dictionary with ``app``, ``root`` and ``closer``
-    keys.  ``app`` is the WSGI app loaded (based on the ``config_uri``),
-    ``root`` is the traversal root resource of the Pyramid application, and
-    ``closer`` is a parameterless callback that may be called when your
-    script is complete (it pops a threadlocal stack).
+    This function returns a dictionary with ``app``, ``root``, ``closer``,
+    ``request``, and ``registry`` keys.  ``app`` is the WSGI app loaded
+    (based on the ``config_uri``), ``root`` is the traversal root resource
+    of the Pyramid application, and ``closer`` is a parameterless callback
+    that may be called when your script is complete (it pops a threadlocal
+    stack).
 
     .. note:: Most operations within :app:`Pyramid` expect to be invoked
               within the context of a WSGI request, thus it's important when
@@ -59,7 +60,7 @@ def bootstrap(config_uri, request=None):
               the context of the last-loaded :app:`Pyramid` application. You
               may load a specific application yourself by using the
               lower-level functions :meth:`pyramid.paster.get_app` and
-              :meth:`pyramid.scripting.get_root2` in conjunction with
+              :meth:`pyramid.scripting.prepare` in conjunction with
               :attr:`pyramid.config.global_registries`.
 
     ``config_uri`` -- specifies the PasteDeploy config file to use for the
@@ -69,15 +70,17 @@ def bootstrap(config_uri, request=None):
     ``request`` -- specified to anchor the script to a given set of WSGI
     parameters. For example, most people would want to specify the host,
     scheme and port such that their script will generate URLs in relation
-    to those parameters.
+    to those parameters. A request with default parameters is constructed
+    for you if none is provided. You can mutate the request's ``environ``
+    later to setup a specific host/port/scheme/etc.
 
     See :ref:`writing_a_script` for more information about how to use this
     function.
     """
     app = get_app(config_uri)
-    info = prepare(request)
-    info['app'] = app
-    return info
+    env = prepare(request)
+    env['app'] = app
+    return env
 
 _marker = object()
 
@@ -126,6 +129,7 @@ class PShellCommand(PCommand):
                       dest='disable_ipython',
                       help="Don't use IPython even if it is available")
 
+    bootstrap = (bootstrap,) # testing
     ConfigParser = ConfigParser.ConfigParser # testing
 
     def pshell_file_config(self, filename):
@@ -149,72 +153,60 @@ class PShellCommand(PCommand):
                 from IPython.Shell import IPShell
             except ImportError:
                 IPShell = None
-        cprt = 'Type "help" for more information.'
-        banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
         config_uri = self.args[0]
         config_file = config_uri.split('#', 1)[0]
         self.logging_file_config(config_file)
-        app = self.get_app(config_uri, loadapp=self.loadapp[0])
+        self.pshell_file_config(config_file)
 
-        # load default globals
-        shell_globals = {
-            'app': app,
-        }
-        default_variables = {'app': 'The WSGI Application'}
-        if hasattr(app, 'registry'):
-            root, closer = self.get_root(app)
-            shell_globals.update({'root':root, 'registry':app.registry,
-                                  'settings': app.registry.settings})
-            default_variables.update({
-                'root': 'The root of the default resource tree.',
-                'registry': 'The Pyramid registry object.',
-                'settings': 'The Pyramid settings object.',
-            })
-            warning = ''
-        else:
-            # warn the user that this isn't actually the Pyramid app
-            warning = """\n
-WARNING: You have loaded a generic WSGI application, therefore the "root",
-"registry", and "settings" global variables are not available. To correct
-this, run "pshell" again and specify the INI section containing your Pyramid
-application.  For example, if your app is in the '[app:myapp]' config file
-section, use 'development.ini#myapp' instead of 'development.ini' or
-'development.ini#main'."""
-            closer = lambda: None
+        # bootstrap the environ
+        env = self.bootstrap[0](config_uri)
+
+        # remove the closer from the env
+        closer = env.pop('closer')
+
+        # setup help text for default environment
+        env_help = dict(env)
+        env_help['app'] = 'The WSGI application.'
+        env_help['root'] = 'Root of the default resource tree.'
+        env_help['registry'] = 'Active Pyramid registry.'
+        env_help['request'] = 'Active request object.'
+        env_help['root_factory'] = (
+            'Default root factory used to create `root`.')
 
         # load the pshell section of the ini file
-        self.pshell_file_config(config_file)
-        shell_globals.update(self.loaded_objects)
+        env.update(self.loaded_objects)
 
-        # eliminate duplicates from default_variables
+        # eliminate duplicates from env, allowing custom vars to override
         for k in self.loaded_objects:
-            if k in default_variables:
-                del default_variables[k]
+            if k in env_help:
+                del env_help[k]
 
-        # append the loaded variables
-        if default_variables:
-            banner += '\n\nDefault Variables:'
-            for var, txt in default_variables.iteritems():
-                banner += '\n  %-12s %s' % (var, txt)
+        # generate help text
+        help = '\n'
+        if env_help:
+            help += 'Environment:'
+            for var in sorted(env_help.keys()):
+                help += '\n  %-12s %s' % (var, env_help[var])
 
         if self.object_help:
-            banner += '\n\nCustom Variables:'
+            help += '\n\nCustom Variables:'
             for var in sorted(self.object_help.keys()):
-                banner += '\n  %-12s %s' % (var, self.object_help[var])
+                help += '\n  %-12s %s' % (var, self.object_help[var])
 
-        # append the warning
-        banner += warning
-        banner += '\n'
+        help += '\n'
 
         if (IPShell is None) or self.options.disable_ipython:
+            cprt = 'Type "help" for more information.'
+            banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
+            banner += '\n' + help
             try:
-                self.interact[0](banner, local=shell_globals)
+                self.interact[0](banner, local=env)
             finally:
                 closer()
         else:
             try:
-                shell = IPShell(argv=[], user_ns=shell_globals)
-                shell.IP.BANNER = shell.IP.BANNER + '\n\n' + banner
+                shell = IPShell(argv=[], user_ns=env)
+                shell.IP.BANNER = shell.IP.BANNER + help
                 shell.mainloop()
             finally:
                 closer()
