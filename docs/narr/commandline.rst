@@ -294,7 +294,7 @@ Writing a Script
 All web applications are, at their hearts, systems which accept a request and
 return a response.  When a request is accepted by a :app:`Pyramid`
 application, the system receives state from the request which is later relied
-on your application code.  For example, one :term:`view callable` may assume
+on by your application code.  For example, one :term:`view callable` may assume
 it's working against a request that has a ``request.matchdict`` of a
 particular composition, while another assumes a different composition of the
 matchdict.
@@ -410,7 +410,7 @@ object present in the info dictionary returned by
 :func:`pyramid.paster.bootstrap` will be a :app:`Pyramid` :term:`router`
 instead.
 
-By default, Pyramid will general a request object in the ``info`` dictionary
+By default, Pyramid will generate a request object in the ``info`` dictionary
 anchored at the root path (``/``).  You can alternately supply your own
 :class:`pyramid.request.Request` instance to the
 :func:`pyramid.paster.bootstrap` function, to set up request parameters
