@@ -390,39 +390,50 @@ to load instead of ``main``:
    print env['request'].route_url('home')
 
 The above example specifies the ``another`` ``app``, ``pipeline``, or
-``composite`` section of your PasteDeploy configuration file.  In the case
-that we're using a configuration file that looks like this:
-
-.. code-block:: ini
-
-   [pipeline:main]
-   pipeline = egg:WebError#evalerror
-              another
-
-   [app:another]
-   use = egg:MyProject
-
-It will mean that the ``/path/to/my/development.ini#another`` argument passed
-to bootstrap will imply the ``[app:another]`` section in our configuration
-file.  Therefore, it will not wrap the WSGI application present in the ``env``
-dictionary as ``app`` using WebError's ``evalerror`` middleware.  The ``app``
+``composite`` section of your PasteDeploy configuration file. The ``app``
 object present in the ``env`` dictionary returned by
-:func:`pyramid.paster.bootstrap` will be a :app:`Pyramid` :term:`router`
-instead.
+:func:`pyramid.paster.bootstrap` will be a :app:`Pyramid` :term:`router`.
+
+Changing the Request
+~~~~~~~~~~~~~~~~~~~~
 
 By default, Pyramid will generate a request object in the ``env`` dictionary
-anchored at the root path (``/``).  You can alternately supply your own
-:class:`pyramid.request.Request` instance to the
-:func:`pyramid.paster.bootstrap` function, to set up request parameters
-beforehand:
+for the URL ``http://localhost:80/``. This means that any URLs generated
+by Pyramid during the execution of your script will be anchored here. This
+is generally not what you want.
+
+So how do we make Pyramid generate the correct URLs?
+
+Assuming that you have a route configured in your application like so:
 
 .. code-block:: python
 
-   from pyramid.request import Request
-   request = Request.blank('/another/url')
+   config.add_route('verify', '/verify/{code}')
+
+You need to inform the Pyramid environment that the WSGI application is
+handling requests from a certain base. For example, we want to mount our
+application at `example.com/prefix` and the generated URLs should use HTTPS.
+This can be done by mutating the request object:
+
+.. code-block:: python
+
    from pyramid.paster import bootstrap
-   env = bootstrap('/path/to/my/development.ini#another', request=request)
-   print env['request'].path_info # will print '/another/url'
+   env = bootstrap('/path/to/my/development.ini#another')
+   env['request'].host = 'example.com'
+   env['request'].scheme = 'https'
+   env['request'].script_name = '/prefix'
+   print env['request'].application_url
+   # will print 'https://example.com/prefix/another/url'
+
+Now you can readily use Pyramid's APIs for generating URLs:
+
+.. code-block:: python
+
+   route_url('verify', env['request'], code='1337')
+   # will return 'https://example.com/prefix/verify/1337'
+
+Cleanup
+~~~~~~~
 
 When your scripting logic finishes, it's good manners (but not required) to
 call the ``closer`` callback:
@@ -435,5 +446,4 @@ call the ``closer`` callback:
    # .. do stuff ...
 
    env['closer']()
-
 
