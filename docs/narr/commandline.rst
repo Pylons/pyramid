@@ -407,13 +407,13 @@ to bootstrap will imply the ``[app:another]`` section in our configuration
 file.  Therefore, it will not wrap the WSGI application present in the info
 dictionary as ``app`` using WebError's ``evalerror`` middleware.  The ``app``
 object present in the info dictionary returned by
-:func:`~pyramid.paster.bootstrap` will be a :app:`Pyramid` :term:`router`
+:func:`pyramid.paster.bootstrap` will be a :app:`Pyramid` :term:`router`
 instead.
 
 By default, Pyramid will general a request object in the ``info`` dictionary
 anchored at the root path (``/``).  You can alternately supply your own
 :class:`pyramid.request.Request` instance to the
-:func:`~pyramid.paster.bootstrap` function, to set up request parameters
+:func:`pyramid.paster.bootstrap` function, to set up request parameters
 beforehand:
 
 .. code-block:: python
