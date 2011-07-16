@@ -324,14 +324,14 @@ representing Pyramid your application configuration as a single argument:
 .. code-block:: python
 
    from pyramid.paster import bootstrap
-   info = bootstrap('/path/to/my/development.ini')
-   print info['request'].route_url('home')
+   env = bootstrap('/path/to/my/development.ini')
+   print env['request'].route_url('home')
 
 :func:`pyramid.paster.bootstrap` returns a dictionary containing
 framework-related information.  This dictionary will always contain a
 :term:`request` object as its ``request`` key.
 
-The following keys are available in the ``info`` dictionary returned by
+The following keys are available in the ``env`` dictionary returned by
 :func:`pyramid.paster.bootstrap`:
 
 request
@@ -386,8 +386,8 @@ to load instead of ``main``:
 .. code-block:: python
 
    from pyramid.paster import bootstrap
-   info = bootstrap('/path/to/my/development.ini#another')
-   print info['request'].route_url('home')
+   env = bootstrap('/path/to/my/development.ini#another')
+   print env['request'].route_url('home')
 
 The above example specifies the ``another`` ``app``, ``pipeline``, or
 ``composite`` section of your PasteDeploy configuration file.  In the case
@@ -404,13 +404,13 @@ that we're using a configuration file that looks like this:
 
 It will mean that the ``/path/to/my/development.ini#another`` argument passed
 to bootstrap will imply the ``[app:another]`` section in our configuration
-file.  Therefore, it will not wrap the WSGI application present in the info
+file.  Therefore, it will not wrap the WSGI application present in the ``env``
 dictionary as ``app`` using WebError's ``evalerror`` middleware.  The ``app``
-object present in the info dictionary returned by
+object present in the ``env`` dictionary returned by
 :func:`pyramid.paster.bootstrap` will be a :app:`Pyramid` :term:`router`
 instead.
 
-By default, Pyramid will generate a request object in the ``info`` dictionary
+By default, Pyramid will generate a request object in the ``env`` dictionary
 anchored at the root path (``/``).  You can alternately supply your own
 :class:`pyramid.request.Request` instance to the
 :func:`pyramid.paster.bootstrap` function, to set up request parameters
@@ -421,8 +421,8 @@ beforehand:
    from pyramid.request import Request
    request = Request.blank('/another/url')
    from pyramid.paster import bootstrap
-   info = bootstrap('/path/to/my/development.ini#another', request=request)
-   print info['request'].path_info # will print '/another/url'
+   env = bootstrap('/path/to/my/development.ini#another', request=request)
+   print env['request'].path_info # will print '/another/url'
 
 When your scripting logic finishes, it's good manners (but not required) to
 call the ``closer`` callback:
@@ -430,10 +430,10 @@ call the ``closer`` callback:
 .. code-block:: python
 
    from pyramid.paster import bootstrap
-   info = bootstrap('/path/to/my/development.ini')
+   env = bootstrap('/path/to/my/development.ini')
 
    # .. do stuff ...
 
-   info['closer']()
+   env['closer']()
 
 
