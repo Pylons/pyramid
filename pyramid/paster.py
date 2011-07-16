@@ -70,6 +70,9 @@ def bootstrap(config_uri, request=None):
     parameters. For example, most people would want to specify the host,
     scheme and port such that their script will generate URLs in relation
     to those parameters.
+
+    See :ref:`writing_a_script` for more information about how to use this
+    function.
     """
     app = get_app(config_uri)
     info = prepare(request)

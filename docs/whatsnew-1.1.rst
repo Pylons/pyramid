@@ -583,6 +583,9 @@ Dependency Changes
 Documentation Enhancements
 --------------------------
 
+- Added a section entitled :ref:`writing_a_script` to the "Command-Line
+  Pyramid" chapter.
+
 - The :ref:`bfg_wiki_tutorial` was updated slightly.
 
 - The :ref:`bfg_sql_wiki_tutorial` was updated slightly.
