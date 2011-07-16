@@ -151,6 +151,17 @@ class WeakOrderedSet(object):
 
     The values may be iterated over or the last item added may be
     accessed via the ``last`` property.
+
+    If items are added more than once, the most recent addition will
+    be remembered in the order:
+
+        order = WeakOrderedSet()
+        order.add('1')
+        order.add('2')
+        order.add('1')
+
+        list(order) == ['2', '1']
+        order.last == '1'
     """
 
     def __init__(self):
@@ -161,6 +172,8 @@ class WeakOrderedSet(object):
         """ Add an item to the set."""
         oid = id(item)
         if oid in self._items:
+            self._order.remove(oid)
+            self._order.append(oid)
             return
         ref = weakref.ref(item, lambda x: self.remove(item))
         self._items[oid] = ref
