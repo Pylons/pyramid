@@ -232,6 +232,17 @@ class TestWSGIHTTPException(unittest.TestCase):
         body = list(exc(environ, start_response))[0]
         self.assertEqual(body, '200 OK\n\nGET')
 
+    def test_custom_body_template_with_custom_variable_doesnt_choke(self):
+        cls = self._getTargetSubclass()
+        exc = cls(body_template='${REQUEST_METHOD}')
+        environ = _makeEnviron()
+        class Choke(object):
+            def __str__(self): raise ValueError
+        environ['gardentheory.user'] = Choke()
+        start_response = DummyStartResponse()
+        body = list(exc(environ, start_response))[0]
+        self.assertEqual(body, '200 OK\n\nGET')
+
     def test_body_template_unicode(self):
         cls = self._getTargetSubclass()
         la = unicode('/La Pe\xc3\xb1a', 'utf-8')

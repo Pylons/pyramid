@@ -7,6 +7,14 @@ Documentation
 - Added a section entitled "Writing a Script" to the "Command-Line Pyramid"
   chapter.
 
+Bug Fixes
+---------
+
+- Omit custom environ variables when rendering a custom exception template in
+  ``pyramid.httpexceptions.WSGIHTTPException._set_default_attrs``;
+  stringifying thse may trigger code that should not be executed; see
+  https://github.com/Pylons/pyramid/issues/239
+
 1.1b3 (2011-07-15)
 ==================
 
