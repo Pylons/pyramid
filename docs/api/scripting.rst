@@ -9,5 +9,3 @@
 
   .. autofunction:: prepare
 
-  .. autofunction:: make_request
-
