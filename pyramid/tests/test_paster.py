@@ -5,8 +5,9 @@ class TestPShellCommand(unittest.TestCase):
         from pyramid.paster import PShellCommand
         return PShellCommand
 
-    def _patch(self, cmd, patch_interact=True, patch_bootstrap=True,
-               patch_config=True, patch_args=True, patch_options=True):
+    def _makeOne(self, patch_interact=True, patch_bootstrap=True,
+                 patch_config=True, patch_args=True, patch_options=True):
+        cmd = self._getTargetClass()('pshell')
         if patch_interact:
             self.interact = DummyInteractor()
             cmd.interact = (self.interact,)
@@ -24,15 +25,6 @@ class TestPShellCommand(unittest.TestCase):
             self.options = Options()
             self.options.disable_ipython = True
             cmd.options = self.options
-    def _makeOne(self, patch_interact=True, patch_bootstrap=True,
-                 patch_config=True, patch_args=True, patch_options=True):
-        cmd = self._getTargetClass()('pshell')
-        self._patch(cmd, patch_interact=patch_interact,
-                    patch_bootstrap=patch_bootstrap,
-                    patch_config=patch_config,
-                    patch_args=patch_args,
-                    patch_options=patch_options,
-                    )
         return cmd
 
     def test_command_ipshell_is_None_ipython_enabled(self):
