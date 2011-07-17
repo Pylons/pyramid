@@ -20,18 +20,19 @@ For a big application with several views, it can be hard to keep the view
 configuration details in your head, even if you defined all the views
 yourself. You can use the ``paster pviews`` command in a terminal window to
 print a summary of matching routes and views for a given URL in your
-application. The ``paster pviews`` command accepts two arguments. The
-first argument to ``pviews`` is the path to your application's ``.ini`` file
-and section name inside the ``.ini`` file which points to your application.
-This should be of the format ``config_file#section_name``. The second argument
-is the URL to test for matching views.
+application. The ``paster pviews`` command accepts two arguments. The first
+argument to ``pviews`` is the path to your application's ``.ini`` file and
+section name inside the ``.ini`` file which points to your application.  This
+should be of the format ``config_file#section_name``. The second argument is
+the URL to test for matching views.  The ``section_name`` may be omitted; if
+it is, it's considered to be ``main``.
 
 Here is an example for a simple view configuration using :term:`traversal`:
 
 .. code-block:: text
    :linenos:
 
-   $ ../bin/paster pviews development.ini tutorial /FrontPage
+   $ ../bin/paster pviews development.ini#tutorial /FrontPage
 
    URL = /FrontPage
 
@@ -125,9 +126,8 @@ application runs "for real".  To do so, use the ``paster pshell`` command.
 The argument to ``pshell`` follows the format ``config_file#section_name``
 where ``config_file`` is the path to your application's ``.ini`` file and
 ``section_name`` is the ``app`` section name inside the ``.ini`` file which
-points to *your application* as opposed to any other section within the
-``.ini`` file.  For example, if your application ``.ini`` file might have a
-``[app:MyProject]`` section that looks like so:
+points to your application.  For example, if your application ``.ini`` file
+might have a ``[app:MyProject]`` section that looks like so:
 
 .. code-block:: ini
    :linenos:
@@ -145,58 +145,41 @@ name ``MyProject`` as a section name:
 
 .. code-block:: text
 
-   [chrism@vitaminf shellenv]$ ../bin/paster pshell development.ini#MyProject
-   Python 2.4.5 (#1, Aug 29 2008, 12:27:37)
-   [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
+    chrism@thinko env26]$ bin/paster pshell starter/development.ini#MyProject
+    Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32) 
+    [GCC 4.4.3] on linux2
+    Type "help" for more information.
 
-   Default Variables:
-     app          The WSGI Application
-     root         The root of the default resource tree.
-     registry     The Pyramid registry object.
-     settings     The Pyramid settings object.
-
-   >>> root
-   <myproject.resources.MyResource object at 0x445270>
-   >>> registry
-   <Registry myproject>
-   >>> settings['debug_notfound']
-   False
-   >>> from myproject.views import my_view
-   >>> from pyramid.request import Request
-   >>> r = Request.blank('/')
-   >>> my_view(r)
-   {'project': 'myproject'}
+    Environment:
+      app          The WSGI application.
+      registry     Active Pyramid registry.
+      request      Active request object.
+      root         Root of the default resource tree.
+      root_factory Default root factory used to create `root`.
+    >>> root
+    <myproject.resources.MyResource object at 0x445270>
+    >>> registry
+    <Registry myproject>
+    >>> registry.settings['debug_notfound']
+    False
+    >>> from myproject.views import my_view
+    >>> from pyramid.request import Request
+    >>> r = Request.blank('/')
+    >>> my_view(r)
+    {'project': 'myproject'}
 
 The WSGI application that is loaded will be available in the shell as the
-``app`` global. Also, if the application that is loaded is the
-:app:`Pyramid` app with no surrounding middleware, the ``root`` object
-returned by the default :term:`root factory`, ``registry``, and ``settings``
-will be available.
+``app`` global. Also, if the application that is loaded is the :app:`Pyramid`
+app with no surrounding middleware, the ``root`` object returned by the
+default :term:`root factory`, ``registry``, and ``request`` will be
+available.
 
-The interactive shell will not be able to load some of the globals like
-``root``, ``registry`` and ``settings`` if the section name specified when
-loading ``pshell`` is not referencing your :app:`Pyramid` application directly.
-For example, if you have the following ``.ini`` file content:
+You can also simply rely on the ``main`` default section name by omitting any
+hash after the filename:
 
-.. code-block:: ini
-   :linenos:
+.. code-block:: text
 
-   [app:MyProject]
-   use = egg:MyProject
-   reload_templates = true
-   debug_authorization = false
-   debug_notfound = false
-   debug_templates = true
-   default_locale_name = en
-
-   [pipeline:main]
-   pipeline =
-       egg:WebError#evalerror
-       MyProject
-
-Use ``MyProject`` instead of ``main`` as the section name argument to
-``pshell`` against the above ``.ini`` file (e.g. ``paster pshell
-development.ini#MyProject``).
+    chrism@thinko env26]$ bin/paster pshell starter/development.ini
 
 Press ``Ctrl-D`` to exit the interactive shell (or ``Ctrl-Z`` on Windows).
 
@@ -224,8 +207,27 @@ Here, we'll assume your model is stored in the ``myapp.models`` package.
    t = transaction
 
 When this INI file is loaded, the extra variables ``m``, ``session`` and
-``t`` will be available for use immediately. This happens regardless of
-whether the ``registry`` and other special variables are loaded.
+``t`` will be available for use immediately. For example:
+
+.. code-block:: text
+
+    chrism@thinko env26]$ bin/paster pshell starter/development.ini
+    Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32) 
+    [GCC 4.4.3] on linux2
+    Type "help" for more information.
+
+    Environment:
+      app          The WSGI application.
+      registry     Active Pyramid registry.
+      request      Active request object.
+      root         Root of the default resource tree.
+      root_factory Default root factory used to create `root`.
+
+    Custom Variables:
+      m            myapp.models
+      session      myapp.models.DBSession
+      t            transaction
+    >>>
 
 IPython
 ~~~~~~~
@@ -258,9 +260,10 @@ You can use the ``paster proutes`` command in a terminal window to print a
 summary of routes related to your application.  Much like the ``paster
 pshell`` command (see :ref:`interactive_shell`), the ``paster proutes``
 command accepts one argument with the format ``config_file#section_name``.
-The ``config_file`` is the path to your application's ``.ini`` file,
-and ``section_name`` is the ``app`` section name inside the ``.ini`` file
-which points to your application.
+The ``config_file`` is the path to your application's ``.ini`` file, and
+``section_name`` is the ``app`` section name inside the ``.ini`` file which
+points to your application.  By default, the ``section_name`` is ``main`` and
+can be omitted.
 
 For example:
 

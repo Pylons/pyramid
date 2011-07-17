@@ -181,14 +181,12 @@ Minor Feature Additions
   user.  See "The Interactive Shell" in the "Creating a Pyramid Project"
   narrative documentation section.
 
-- ``paster pshell`` now offers more built-in global variables by default
-  (including ``app`` and ``settings``).  See :ref:`interactive_shell`.
-
-- The ``paster pshell`` command now under the hood uses
-  :func:`pyramid.paster.bootstrap`, which makes it possible to supply an
-  ``.ini`` file without naming the "right" section in the file that points at
-  the actual Pyramid application.  Instead, you can generally just run
-  ``paster pshell development.ini`` and it will do mostly the right thing.
+- The ``paster pshell``, ``paster pviews``, and ``paster proutes`` commands
+  each now under the hood uses :func:`pyramid.paster.bootstrap`, which makes
+  it possible to supply an ``.ini`` file without naming the "right" section
+  in the file that points at the actual Pyramid application.  Instead, you
+  can generally just run ``paster {pshell|proutes|pviews} development.ini``
+  and it will do mostly the right thing.
 
 - It is now possible to add a ``[pshell]`` section to your application's .ini
   configuration file, which influences the global names available to a pshell

@@ -17,11 +17,13 @@ Backwards Incompatibilities
 Features
 --------
 
-- The ``paster pshell`` command now under the hood uses
-  ``pyramid.paster.bootstrap``, which makes it possible to supply an
-  ``.ini`` file without naming the "right" section in the file that points at
-  the actual Pyramid application.  Instead, you can generally just run
-  ``paster pshell development.ini`` and it will do mostly the right thing.
+- The ``paster pshell``, ``paster pviews``, and ``paster proutes`` commands
+  each now under the hood uses ``pyramid.paster.bootstrap``, which makes it
+  possible to supply an ``.ini`` file without naming the "right" section in
+  the file that points at the actual Pyramid application.  Instead, you can
+  generally just run ``paster {pshell|proutes|pviews} development.ini`` and
+  it will do mostly the right thing.
+
 
 Bug Fixes
 ---------

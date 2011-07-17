@@ -90,6 +90,7 @@ class PCommand(Command):
     group_name = 'pyramid'
     interact = (interact,) # for testing
     loadapp = (loadapp,) # for testing
+    bootstrap = (bootstrap,) # testing
     verbose = 3
 
     def __init__(self, *arg, **kw):
@@ -129,7 +130,6 @@ class PShellCommand(PCommand):
                       dest='disable_ipython',
                       help="Don't use IPython even if it is available")
 
-    bootstrap = (bootstrap,) # testing
     ConfigParser = ConfigParser.ConfigParser # testing
 
     def pshell_file_config(self, filename):
@@ -229,10 +229,6 @@ class PRoutesCommand(PCommand):
 
         $ paster proutes myapp.ini#main
 
-    .. note:: You should use a ``section_name`` that refers to the
-              actual ``app`` section in the config file that points at
-              your Pyramid app without any middleware wrapping, or this
-              command will almost certainly fail.
     """
     summary = "Print all URL dispatch routes related to a Pyramid application"
     min_args = 1
@@ -241,9 +237,8 @@ class PRoutesCommand(PCommand):
 
     parser = Command.standard_parser(simulate=True)
 
-    def _get_mapper(self, app):
+    def _get_mapper(self, registry):
         from pyramid.config import Configurator
-        registry = app.registry
         config = Configurator(registry = registry)
         return config.get_routes_mapper()
 
@@ -256,9 +251,9 @@ class PRoutesCommand(PCommand):
         from pyramid.interfaces import IView
         from zope.interface import Interface
         config_uri = self.args[0]
-        app = self.get_app(config_uri, loadapp=self.loadapp[0])
-        registry = app.registry
-        mapper = self._get_mapper(app)
+        env = self.bootstrap[0](config_uri)
+        registry = env['registry']
+        mapper = self._get_mapper(registry)
         if mapper is not None:
             routes = mapper.get_routes()
             fmt = '%-15s %-30s %-25s'
@@ -300,10 +295,6 @@ class PViewsCommand(PCommand):
 
         $ paster proutes myapp.ini#main url
 
-    .. note:: You should use a ``section_name`` that refers to the
-              actual ``app`` section in the config file that points at
-              your Pyramid app without any middleware wrapping, or this
-              command will almost certainly fail.
     """
     summary = "Print all views in an application that might match a URL"
     min_args = 2
@@ -505,8 +496,8 @@ class PViewsCommand(PCommand):
         config_uri, url = self.args
         if not url.startswith('/'):
             url = '/%s' % url
-        app = self.get_app(config_uri, loadapp=self.loadapp[0])
-        registry = app.registry
+        env = self.bootstrap[0](config_uri)
+        registry = env['registry']
         view = self._find_view(url, registry)
         self.out('')
         self.out("URL = %s" % url)
