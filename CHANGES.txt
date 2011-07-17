@@ -7,6 +7,13 @@ Documentation
 - Added a section entitled "Writing a Script" to the "Command-Line Pyramid"
   chapter.
 
+Backwards Incompatibilities
+---------------------------
+
+- We added the ``pyramid.scripting.make_request`` API too hastily in 1.1b3.
+  It has been removed.  Sorry for any inconvenience.  Use the
+  ``pyramid.request.Request.blank`` API instead.
+
 Bug Fixes
 ---------
 
