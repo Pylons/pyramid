@@ -1,11 +1,6 @@
 Pyramid TODOs
 =============
 
-Must-Have
----------
-
-- Change paster pviews and paster proutes to use bootstrap.
-
 Should-Have
 -----------
 
