@@ -447,3 +447,15 @@ call the ``closer`` callback:
 
    env['closer']()
 
+Setting Up Logging
+~~~~~~~~~~~~~~~~~~
+
+By default, :func:`pyramid.paster.bootstrap` does not configure logging
+parameters present in the configuration file.  If you'd like to configure
+logging based on ``[logger]`` and related sections in the configuration file,
+use the following command:
+
+.. code-block:: python
+
+   import logging
+   logging.fileConfig('/path/to/my/development.ini')
