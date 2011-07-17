@@ -404,7 +404,7 @@ def current_route_url(request, *elements, **kw):
     ``/foo/1``.
 
     If the 'current route' has the route pattern ``/foo/{page}`` and the
-    current current url path is ``/foo/1``, the matchdict will be
+    current url path is ``/foo/1``, the matchdict will be
     ``{'page':'1'}``.  The result of ``current_route_url(request, page='2')``
     in this situation will be ``/foo/2``.
         
