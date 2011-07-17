@@ -48,6 +48,10 @@ class Test_prepare(unittest.TestCase):
         self.manager = manager
         self.default = manager.get()
 
+    def test_it_no_valid_apps(self):
+        from pyramid.exceptions import ConfigurationError
+        self.assertRaises(ConfigurationError, self._callFUT)
+
     def test_it_norequest(self):
         registry = self._makeRegistry()
         info = self._callFUT(registry=registry)
@@ -85,10 +89,10 @@ class Test_prepare(unittest.TestCase):
         closer()
         self.assertEqual(self.default, self.manager.get())
 
-class TestMakeRequest(unittest.TestCase):
+class Test__make_request(unittest.TestCase):
     def _callFUT(self, path='/', registry=None):
-        from pyramid.scripting import make_request
-        return make_request(path, registry)
+        from pyramid.scripting import _make_request
+        return _make_request(path, registry)
 
     def test_it_with_registry(self):
         request = self._callFUT('/', dummy_registry)

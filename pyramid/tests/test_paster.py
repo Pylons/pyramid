@@ -5,245 +5,117 @@ class TestPShellCommand(unittest.TestCase):
         from pyramid.paster import PShellCommand
         return PShellCommand
 
-    def _makeOne(self):
-        return self._getTargetClass()('pshell')
+    def _makeOne(self, patch_interact=True, patch_bootstrap=True,
+                 patch_config=True, patch_args=True, patch_options=True):
+        cmd = self._getTargetClass()('pshell')
+        if patch_interact:
+            self.interact = DummyInteractor()
+            cmd.interact = (self.interact,)
+        if patch_bootstrap:
+            self.bootstrap = DummyBootstrap()
+            cmd.bootstrap = (self.bootstrap,)
+        if patch_config:
+            self.config_factory = DummyConfigParserFactory()
+            cmd.ConfigParser = self.config_factory
+        if patch_args:
+            self.args = ('/foo/bar/myapp.ini#myapp',)
+            cmd.args = self.args
+        if patch_options:
+            class Options(object): pass
+            self.options = Options()
+            self.options.disable_ipython = True
+            cmd.options = self.options
+        return cmd
 
     def test_command_ipshell_is_None_ipython_enabled(self):
         command = self._makeOne()
-        interact = DummyInteractor()
-        app = DummyApp()
-        loadapp = DummyLoadApp(app)
-        command.interact = (interact,)
-        command.loadapp = (loadapp,)
-        command.ConfigParser = makeDummyConfigParser({})
-        command.args = ('/foo/bar/myapp.ini#myapp',)
-        class Options(object): pass
-        command.options = Options()
-        command.options.disable_ipython = False
+        command.options.disable_ipython = True
         command.command(IPShell=None)
-        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
-        self.assertEqual(loadapp.section_name, 'myapp')
-        self.assertTrue(loadapp.relative_to)
-        self.assertEqual(len(app.threadlocal_manager.pushed), 1)
-        pushed = app.threadlocal_manager.pushed[0]
-        self.assertEqual(pushed['registry'], dummy_registry)
-        self.assertEqual(pushed['request'].registry, dummy_registry)
-        self.assertEqual(interact.local, {'app':app,
-                                          'root':dummy_root,
-                                          'registry':dummy_registry,
-                                          'settings':dummy_registry.settings})
-        self.assertTrue(interact.banner)
-        self.assertEqual(len(app.threadlocal_manager.popped), 1)
+        self.assertTrue(self.config_factory.parser)
+        self.assertEqual(self.config_factory.parser.filename,
+                         '/foo/bar/myapp.ini')
+        self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
+        self.assertEqual(self.interact.local, {
+            'app':self.bootstrap.app, 'root':self.bootstrap.root,
+            'registry':self.bootstrap.registry,
+            'request':self.bootstrap.request,
+            'root_factory':self.bootstrap.root_factory,
+        })
+        self.assertTrue(self.bootstrap.closer.called)
+        self.assertTrue(self.interact.banner)
 
     def test_command_ipshell_is_not_None_ipython_disabled(self):
         command = self._makeOne()
-        interact = DummyInteractor()
-        app = DummyApp()
-        loadapp = DummyLoadApp(app)
-        command.interact = (interact,)
-        command.loadapp = (loadapp,)
-        command.ConfigParser = makeDummyConfigParser({})
-        command.args = ('/foo/bar/myapp.ini#myapp',)
-        class Options(object): pass
-        command.options = Options()
         command.options.disable_ipython = True
         command.command(IPShell='notnone')
-        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
-        self.assertEqual(loadapp.section_name, 'myapp')
-        self.assertTrue(loadapp.relative_to)
-        self.assertEqual(len(app.threadlocal_manager.pushed), 1)
-        pushed = app.threadlocal_manager.pushed[0]
-        self.assertEqual(pushed['registry'], dummy_registry)
-        self.assertEqual(pushed['request'].registry, dummy_registry)
-        self.assertEqual(interact.local, {'app':app,
-                                          'root':dummy_root,
-                                          'registry':dummy_registry,
-                                          'settings':dummy_registry.settings})
-        self.assertTrue(interact.banner)
-        self.assertEqual(len(app.threadlocal_manager.popped), 1)
+        self.assertTrue(self.config_factory.parser)
+        self.assertEqual(self.config_factory.parser.filename,
+                         '/foo/bar/myapp.ini')
+        self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
+        self.assertEqual(self.interact.local, {
+            'app':self.bootstrap.app, 'root':self.bootstrap.root,
+            'registry':self.bootstrap.registry,
+            'request':self.bootstrap.request,
+            'root_factory':self.bootstrap.root_factory,
+        })
+        self.assertTrue(self.bootstrap.closer.called)
+        self.assertTrue(self.interact.banner)
 
     def test_command_ipython_enabled(self):
-        command = self._makeOne()
-        app = DummyApp()
-        loadapp = DummyLoadApp(app)
-        command.loadapp = (loadapp,)
-        command.ConfigParser = makeDummyConfigParser({})
-        dummy_shell_factory = DummyIPShellFactory()
-        command.args = ('/foo/bar/myapp.ini#myapp',)
-        class Options(object): pass
-        command.options = Options()
+        command = self._makeOne(patch_interact=False)
         command.options.disable_ipython = False
+        dummy_shell_factory = DummyIPShellFactory()
         command.command(IPShell=dummy_shell_factory)
-        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
-        self.assertEqual(loadapp.section_name, 'myapp')
-        self.assertTrue(loadapp.relative_to)
-        self.assertEqual(len(app.threadlocal_manager.pushed), 1)
-        pushed = app.threadlocal_manager.pushed[0]
-        self.assertEqual(pushed['registry'], dummy_registry)
-        self.assertEqual(pushed['request'].registry, dummy_registry)
-        self.assertEqual(dummy_shell_factory.shell.local_ns,
-                         {'app':app, 'root':dummy_root,
-                          'registry':dummy_registry,
-                          'settings':dummy_registry.settings})
+        self.assertTrue(self.config_factory.parser)
+        self.assertEqual(self.config_factory.parser.filename,
+                         '/foo/bar/myapp.ini')
+        self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
+        self.assertEqual(dummy_shell_factory.shell.local_ns, {
+            'app':self.bootstrap.app, 'root':self.bootstrap.root,
+            'registry':self.bootstrap.registry,
+            'request':self.bootstrap.request,
+            'root_factory':self.bootstrap.root_factory,
+        })
         self.assertEqual(dummy_shell_factory.shell.global_ns, {})
-        self.assertTrue('\n\n' in dummy_shell_factory.shell.IP.BANNER)
-        self.assertEqual(len(app.threadlocal_manager.popped), 1)
-
-    def test_command_get_app_hookable(self):
-        from paste.deploy import loadapp
-        command = self._makeOne()
-        app = DummyApp()
-        apped = []
-        def get_app(*arg, **kw):
-            apped.append((arg, kw))
-            return app
-        command.get_app = get_app
-        interact = DummyInteractor()
-        app = DummyApp()
-        command.interact = (interact,)
-        command.ConfigParser = makeDummyConfigParser({})
-        command.args = ('/foo/bar/myapp.ini#myapp',)
-        class Options(object): pass
-        command.options = Options()
-        command.options.disable_ipython =True
-        command.command(IPShell=None)
-        self.assertEqual(len(app.threadlocal_manager.pushed), 1)
-        pushed = app.threadlocal_manager.pushed[0]
-        self.assertEqual(pushed['registry'], dummy_registry)
-        self.assertEqual(pushed['request'].registry, dummy_registry)
-        self.assertEqual(interact.local, {'app': app,
-                                          'root':dummy_root,
-                                          'registry':dummy_registry,
-                                          'settings':dummy_registry.settings})
-        self.assertTrue(interact.banner)
-        self.assertEqual(len(app.threadlocal_manager.popped), 1)
-        self.assertEqual(apped, [(('/foo/bar/myapp.ini#myapp',),
-                                  {'loadapp': loadapp})])
-
-    def test_command_get_root_hookable(self):
-        command = self._makeOne()
-        interact = DummyInteractor()
-        app = DummyApp()
-        loadapp = DummyLoadApp(app)
-        command.interact = (interact,)
-        command.loadapp = (loadapp,)
-        command.ConfigParser = makeDummyConfigParser({})
-        root = Dummy()
-        apps = []
-        def get_root(app):
-            apps.append(app)
-            return root, lambda *arg: None
-        command.get_root =get_root
-        command.args = ('/foo/bar/myapp.ini#myapp',)
-        class Options(object): pass
-        command.options = Options()
-        command.options.disable_ipython =True
-        command.command(IPShell=None)
-        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
-        self.assertEqual(loadapp.section_name, 'myapp')
-        self.assertTrue(loadapp.relative_to)
-        self.assertEqual(len(app.threadlocal_manager.pushed), 0)
-        self.assertEqual(interact.local, {'app':app,
-                                          'root':root,
-                                          'registry':dummy_registry,
-                                          'settings':dummy_registry.settings})
-        self.assertTrue(interact.banner)
-        self.assertEqual(apps, [app])
+        self.assertTrue(self.bootstrap.closer.called)
 
     def test_command_loads_custom_items(self):
         command = self._makeOne()
-        interact = DummyInteractor()
-        app = DummyApp()
-        loadapp = DummyLoadApp(app)
-        command.interact = (interact,)
-        command.loadapp = (loadapp,)
         model = Dummy()
-        command.ConfigParser = makeDummyConfigParser([('m', model)])
-        command.args = ('/foo/bar/myapp.ini#myapp',)
-        class Options(object): pass
-        command.options = Options()
-        command.options.disable_ipython = False
+        self.config_factory.items = [('m', model)]
+        command.options.disable_ipython = True
         command.command(IPShell=None)
-        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
-        self.assertEqual(loadapp.section_name, 'myapp')
-        self.assertTrue(loadapp.relative_to)
-        self.assertEqual(len(app.threadlocal_manager.pushed), 1)
-        pushed = app.threadlocal_manager.pushed[0]
-        self.assertEqual(pushed['registry'], dummy_registry)
-        self.assertEqual(pushed['request'].registry, dummy_registry)
-        self.assertEqual(interact.local, {'app':app,
-                                          'root':dummy_root,
-                                          'registry':dummy_registry,
-                                          'settings':dummy_registry.settings,
-                                          'm': model})
-        self.assertTrue(interact.banner)
-        self.assertEqual(len(app.threadlocal_manager.popped), 1)
-
-    def test_command_no_custom_section(self):
-        command = self._makeOne()
-        interact = DummyInteractor()
-        app = DummyApp()
-        loadapp = DummyLoadApp(app)
-        command.interact = (interact,)
-        command.loadapp = (loadapp,)
-        command.ConfigParser = makeDummyConfigParser(None)
-        command.args = ('/foo/bar/myapp.ini#myapp',)
-        class Options(object): pass
-        command.options = Options()
-        command.options.disable_ipython = False
-        command.command(IPShell=None)
-        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
-        self.assertEqual(loadapp.section_name, 'myapp')
-        self.assertTrue(loadapp.relative_to)
-        self.assertEqual(len(app.threadlocal_manager.pushed), 1)
-        pushed = app.threadlocal_manager.pushed[0]
-        self.assertEqual(pushed['registry'], dummy_registry)
-        self.assertEqual(pushed['request'].registry, dummy_registry)
-        self.assertEqual(interact.local, {'app':app,
-                                          'root':dummy_root,
-                                          'registry':dummy_registry,
-                                          'settings':dummy_registry.settings})
-        self.assertTrue(interact.banner)
-        self.assertEqual(len(app.threadlocal_manager.popped), 1)
+        self.assertTrue(self.config_factory.parser)
+        self.assertEqual(self.config_factory.parser.filename,
+                         '/foo/bar/myapp.ini')
+        self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
+        self.assertEqual(self.interact.local, {
+            'app':self.bootstrap.app, 'root':self.bootstrap.root,
+            'registry':self.bootstrap.registry,
+            'request':self.bootstrap.request,
+            'root_factory':self.bootstrap.root_factory,
+            'm':model,
+        })
+        self.assertTrue(self.bootstrap.closer.called)
+        self.assertTrue(self.interact.banner)
 
     def test_command_custom_section_override(self):
         command = self._makeOne()
-        interact = DummyInteractor()
-        app = Dummy()
-        loadapp = DummyLoadApp(app)
-        command.interact = (interact,)
-        command.loadapp = (loadapp,)
-        model = Dummy()
-        command.ConfigParser = makeDummyConfigParser([('app', model)])
-        command.args = ('/foo/bar/myapp.ini#myapp',)
-        class Options(object): pass
-        command.options = Options()
-        command.options.disable_ipython = False
+        dummy = Dummy()
+        self.config_factory.items = [('app', dummy), ('root', dummy),
+                                     ('registry', dummy), ('request', dummy)]
+        command.options.disable_ipython = True
         command.command(IPShell=None)
-        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
-        self.assertEqual(loadapp.section_name, 'myapp')
-        self.assertTrue(loadapp.relative_to)
-        self.assertEqual(interact.local, {'app':model})
-        self.assertTrue(interact.banner)
-
-    def test_command_generic_wsgi_app(self):
-        command = self._makeOne()
-        interact = DummyInteractor()
-        app = Dummy()
-        loadapp = DummyLoadApp(app)
-        command.interact = (interact,)
-        command.loadapp = (loadapp,)
-        command.ConfigParser = makeDummyConfigParser(None)
-        command.args = ('/foo/bar/myapp.ini#myapp',)
-        class Options(object): pass
-        command.options = Options()
-        command.options.disable_ipython = False
-        command.command(IPShell=None)
-        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
-        self.assertEqual(loadapp.section_name, 'myapp')
-        self.assertTrue(loadapp.relative_to)
-        self.assertEqual(interact.local, {'app':app})
-        self.assertTrue(interact.banner)
+        self.assertTrue(self.config_factory.parser)
+        self.assertEqual(self.config_factory.parser.filename,
+                         '/foo/bar/myapp.ini')
+        self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
+        self.assertEqual(self.interact.local, {
+            'app':dummy, 'root':dummy, 'registry':dummy, 'request':dummy,
+            'root_factory':self.bootstrap.root_factory,
+        })
+        self.assertTrue(self.bootstrap.closer.called)
+        self.assertTrue(self.interact.banner)
 
 class TestPRoutesCommand(unittest.TestCase):
     def _getTargetClass(self):
@@ -1015,22 +887,7 @@ class DummyLoadApp:
 class DummyApp:
     def __init__(self):
         self.registry = dummy_registry
-        self.threadlocal_manager = DummyThreadLocalManager()
 
-    def root_factory(self, environ):
-        return dummy_root
-
-class DummyThreadLocalManager:
-    def __init__(self):
-        self.pushed = []
-        self.popped = []
-        
-    def push(self, item):
-        self.pushed.append(item)
-
-    def pop(self):
-        self.popped.append(True)
-        
 class DummyMapper(object):
     def __init__(self, *routes):
         self.routes = routes
@@ -1073,15 +930,49 @@ class DummyMultiView(object):
         self.views = [(None, view, None) for view in views]
         self.__request_attrs__ = attrs
 
-def makeDummyConfigParser(items):
-    class DummyConfigParser(object):
-        def read(self, filename):
-            self.filename = filename
+class DummyConfigParser(object):
+    def __init__(self, result):
+        self.result = result
 
-        def items(self, section):
-            self.section = section
-            if items is None:
-                from ConfigParser import NoSectionError
-                raise NoSectionError, section
-            return items
-    return DummyConfigParser
+    def read(self, filename):
+        self.filename = filename
+
+    def items(self, section):
+        self.section = section
+        if self.result is None:
+            from ConfigParser import NoSectionError
+            raise NoSectionError, section
+        return self.result
+
+class DummyConfigParserFactory(object):
+    items = None
+
+    def __call__(self):
+        self.parser = DummyConfigParser(self.items)
+        return self.parser
+
+class DummyCloser(object):
+    def __call__(self):
+        self.called = True
+
+class DummyBootstrap(object):
+    def __init__(self, app=None, registry=None, request=None, root=None,
+                 root_factory=None, closer=None):
+        self.app = app or DummyApp()
+        self.registry = registry or dummy_registry
+        self.request = request or DummyRequest({})
+        self.root = root or dummy_root
+        self.root_factory = root_factory or Dummy()
+        self.closer = closer or DummyCloser()
+
+    def __call__(self, *a, **kw):
+        self.a = a
+        self.kw = kw
+        return {
+            'app': self.app,
+            'registry': self.registry,
+            'request': self.request,
+            'root': self.root,
+            'root_factory': self.root_factory,
+            'closer': self.closer,
+        }

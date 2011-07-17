@@ -294,7 +294,7 @@ Writing a Script
 All web applications are, at their hearts, systems which accept a request and
 return a response.  When a request is accepted by a :app:`Pyramid`
 application, the system receives state from the request which is later relied
-on your application code.  For example, one :term:`view callable` may assume
+on by your application code.  For example, one :term:`view callable` may assume
 it's working against a request that has a ``request.matchdict`` of a
 particular composition, while another assumes a different composition of the
 matchdict.
@@ -324,14 +324,14 @@ representing Pyramid your application configuration as a single argument:
 .. code-block:: python
 
    from pyramid.paster import bootstrap
-   info = bootstrap('/path/to/my/development.ini')
-   print info['request'].route_url('home')
+   env = bootstrap('/path/to/my/development.ini')
+   print env['request'].route_url('home')
 
 :func:`pyramid.paster.bootstrap` returns a dictionary containing
 framework-related information.  This dictionary will always contain a
 :term:`request` object as its ``request`` key.
 
-The following keys are available in the ``info`` dictionary returned by
+The following keys are available in the ``env`` dictionary returned by
 :func:`pyramid.paster.bootstrap`:
 
 request
@@ -386,43 +386,54 @@ to load instead of ``main``:
 .. code-block:: python
 
    from pyramid.paster import bootstrap
-   info = bootstrap('/path/to/my/development.ini#another')
-   print info['request'].route_url('home')
+   env = bootstrap('/path/to/my/development.ini#another')
+   print env['request'].route_url('home')
 
 The above example specifies the ``another`` ``app``, ``pipeline``, or
-``composite`` section of your PasteDeploy configuration file.  In the case
-that we're using a configuration file that looks like this:
+``composite`` section of your PasteDeploy configuration file. The ``app``
+object present in the ``env`` dictionary returned by
+:func:`pyramid.paster.bootstrap` will be a :app:`Pyramid` :term:`router`.
 
-.. code-block:: ini
+Changing the Request
+~~~~~~~~~~~~~~~~~~~~
 
-   [pipeline:main]
-   pipeline = egg:WebError#evalerror
-              another
+By default, Pyramid will generate a request object in the ``env`` dictionary
+for the URL ``http://localhost:80/``. This means that any URLs generated
+by Pyramid during the execution of your script will be anchored here. This
+is generally not what you want.
 
-   [app:another]
-   use = egg:MyProject
+So how do we make Pyramid generate the correct URLs?
 
-It will mean that the ``/path/to/my/development.ini#another`` argument passed
-to bootstrap will imply the ``[app:another]`` section in our configuration
-file.  Therefore, it will not wrap the WSGI application present in the info
-dictionary as ``app`` using WebError's ``evalerror`` middleware.  The ``app``
-object present in the info dictionary returned by
-:func:`pyramid.paster.bootstrap` will be a :app:`Pyramid` :term:`router`
-instead.
-
-By default, Pyramid will general a request object in the ``info`` dictionary
-anchored at the root path (``/``).  You can alternately supply your own
-:class:`pyramid.request.Request` instance to the
-:func:`pyramid.paster.bootstrap` function, to set up request parameters
-beforehand:
+Assuming that you have a route configured in your application like so:
 
 .. code-block:: python
 
-   from pyramid.request import Request
-   request = Request.blank('/another/url')
+   config.add_route('verify', '/verify/{code}')
+
+You need to inform the Pyramid environment that the WSGI application is
+handling requests from a certain base. For example, we want to mount our
+application at `example.com/prefix` and the generated URLs should use HTTPS.
+This can be done by mutating the request object:
+
+.. code-block:: python
+
    from pyramid.paster import bootstrap
-   info = bootstrap('/path/to/my/development.ini#another', request=request)
-   print info['request'].path_info # will print '/another/url'
+   env = bootstrap('/path/to/my/development.ini#another')
+   env['request'].host = 'example.com'
+   env['request'].scheme = 'https'
+   env['request'].script_name = '/prefix'
+   print env['request'].application_url
+   # will print 'https://example.com/prefix/another/url'
+
+Now you can readily use Pyramid's APIs for generating URLs:
+
+.. code-block:: python
+
+   route_url('verify', env['request'], code='1337')
+   # will return 'https://example.com/prefix/verify/1337'
+
+Cleanup
+~~~~~~~
 
 When your scripting logic finishes, it's good manners (but not required) to
 call the ``closer`` callback:
@@ -430,10 +441,9 @@ call the ``closer`` callback:
 .. code-block:: python
 
    from pyramid.paster import bootstrap
-   info = bootstrap('/path/to/my/development.ini')
+   env = bootstrap('/path/to/my/development.ini')
 
    # .. do stuff ...
 
-   info['closer']()
-
+   env['closer']()
 
