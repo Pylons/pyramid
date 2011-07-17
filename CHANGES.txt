@@ -18,7 +18,7 @@ Features
 --------
 
 - The ``paster pshell`` command now under the hood uses
-  ``pyramid.scripting.prepare``, which makes it possible to supply an
+  ``pyramid.paster.bootstrap``, which makes it possible to supply an
   ``.ini`` file without naming the "right" section in the file that points at
   the actual Pyramid application.  Instead, you can generally just run
   ``paster pshell development.ini`` and it will do mostly the right thing.
