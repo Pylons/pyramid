@@ -24,9 +24,6 @@ Nice-to-Have
 
 - Nicer Mako exceptions in WebError.
 
-- Response.RequestClass should probably be pyramid.request.Request but this
-  may imply actually subclassing webob.Response
-
 - Better "Extending" chapter.
 
 - Try to make test suite pass on IronPython.
@@ -68,6 +65,4 @@ Nice-to-Have
 - Consider implementing the API outlined in
   http://plope.com/pyramid_auth_design_api_postmortem, phasing out the
   current auth-n-auth abstractions in a backwards compatible way.
-
-- Add doc string for BeforeRender event with more details.
 
