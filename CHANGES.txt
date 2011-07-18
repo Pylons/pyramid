@@ -1,5 +1,5 @@
-Next release
-============
+1.1b4 (2011-07-18)
+==================
 
 Documentation
 -------------
@@ -23,7 +23,6 @@ Features
   the file that points at the actual Pyramid application.  Instead, you can
   generally just run ``paster {pshell|proutes|pviews} development.ini`` and
   it will do mostly the right thing.
-
 
 Bug Fixes
 ---------
