@@ -8,6 +8,8 @@ import zope.deprecation
 from paste.deploy import loadapp
 from paste.script.command import Command
 
+from pyramid.interfaces import IMultiView
+
 from pyramid.scripting import get_root
 from pyramid.scripting import prepare
 from pyramid.util import DottedNameResolver
@@ -274,8 +276,6 @@ class PRoutesCommand(PCommand):
                         IView, name='', default=None)
                     self.out(fmt % (route.name, route.pattern, view_callable))
 
-
-from pyramid.interfaces import IMultiView
 
 class PViewsCommand(PCommand):
     """Print, for a given URL, the views that might match. Underneath each
