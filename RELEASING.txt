@@ -1,6 +1,8 @@
 Releasing Pyramid
 =================
 
+- git pull
+
 - Make sure all unit tests pass and statement coverage is at 100%::
 
   $ python setup.py nosetests --with-coverage
