@@ -1,3 +1,11 @@
+Next release
+============
+
+Documentation
+-------------
+
+- Fixed two typos in wiki2 (SQLA + URL Dispatch) tutorial.
+
 1.1b4 (2011-07-18)
 ==================
 
