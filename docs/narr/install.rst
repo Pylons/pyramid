@@ -20,7 +20,8 @@ run :app:`Pyramid`.
 
 :app:`Pyramid` is known to run on all popular Unix-like systems such as
 Linux, MacOS X, and FreeBSD as well as on Windows platforms.  It is also
-known to run on Google's App Engine, :term:`PyPy`, and :term:`Jython`.
+known to run on Google's App Engine, :term:`PyPy` (1.5), and :term:`Jython`
+(2.5.2).
 
 :app:`Pyramid` installation does not require the compilation of any
 C code, so you need only a Python interpreter that meets the
