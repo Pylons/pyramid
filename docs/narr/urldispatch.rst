@@ -50,6 +50,9 @@ a context object).  But ironically, using URL dispatch (instead of
 terms of "resources" entirely, because it allows you to directly map a
 :term:`view callable` to a route.
 
+.. index::
+   single: route configuration
+
 Route Configuration
 -------------------
 
@@ -381,6 +384,9 @@ a separate :term:`ACL`, as documented in
 combine URL dispatch with :term:`traversal` as documented within
 :ref:`hybrid_chapter`.
 
+.. index::
+   single: route configuration arguments
+
 Route Configuration Arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -401,6 +407,9 @@ neither predicates nor view configuration information.
    ``view_renderer``.  These only have an effect when the route configuration
    names a ``view`` and these arguments have been deprecated as of
    :app:`Pyramid` 1.1.
+
+.. index::
+   single: route predicates (custom)
 
 .. _custom_route_predicates:
 
@@ -533,6 +542,9 @@ that the year match argument is '2010' if and only if the route name is
 
 See also :class:`pyramid.interfaces.IRoute` for more API documentation about
 route objects.
+
+.. index::
+   single: route matching
 
 Route Matching
 --------------
@@ -745,6 +757,9 @@ representing a :term:`SQLAlchemy` model.
    single: matching the root URL
    single: root url (matching)
 
+.. index::
+   pair: matching; root URL
+
 Matching the Root URL
 ---------------------
 
@@ -914,6 +929,9 @@ The ``notfound_view`` supplied must adhere to the two-argument view callable
 calling convention of ``(context, request)`` (``context`` will be the
 exception object).
 
+.. index::
+   single: cleaning up after request
+
 .. _cleaning_up_after_a_request:
 
 Cleaning Up After a Request
@@ -997,6 +1015,9 @@ our sample ``Article`` factory class is not very ambitious.
 .. note:: See :ref:`security_chapter` for more information about
    :app:`Pyramid` security and ACLs.
 
+.. index::
+   pair: debugging; route matching
+
 .. _debug_routematch_section:
 
 Debugging Route Matching
@@ -1031,6 +1052,9 @@ set these values.
 You can also use the ``paster proutes`` command to see a display of all the
 routes configured in your application; for more information, see
 :ref:`displaying_application_routes`.
+
+.. index::
+   pair: route; view callable lookup details
 
 Route View Callable Registration and Lookup Details
 ---------------------------------------------------

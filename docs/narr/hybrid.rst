@@ -79,6 +79,9 @@ Typically, an application that uses traversal exclusively won't perform any
 calls to :meth:`pyramid.config.Configurator.add_route` in its startup
 code.
 
+.. index::
+   single: hybrid applications
+
 Hybrid Applications
 -------------------
 
@@ -176,6 +179,9 @@ match is straightforward.  When a route is matched:
    :ref:`route_factories`.  Both the global root factory and default
    root factory were explained previously within
    :ref:`the_resource_tree`.
+
+.. index::
+   pair: hybrid applications; *traverse route pattern
 
 .. _using_traverse_in_a_route_pattern:
 
@@ -400,6 +406,9 @@ Traversal will begin at the root object implied by this route (either
 the global root, or the object returned by the ``factory`` associated
 with this route).
 
+.. index::
+   pair: hybrid applications; global views
+
 Making Global Views Match
 +++++++++++++++++++++++++
 
@@ -420,6 +429,7 @@ attribute.
    config.add_view('myproject.views.bazbuz', name='bazbuz')
 
 .. index::
+   pair: hybrid applications; *subpath
    single: route subpath
    single: subpath (route)
 
@@ -453,6 +463,9 @@ commonly in route declarations that look like this:
 ``mypackage.views.www`` is an instance of
 :class:`pyramid.static.static_view`.  This effectively tells the static
 helper to traverse everything in the subpath as a filename.
+
+.. index::
+   pair: hybrid applications; corner cases
 
 Corner Cases
 ------------

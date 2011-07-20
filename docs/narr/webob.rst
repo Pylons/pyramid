@@ -243,6 +243,9 @@ tuples; all the keys are ordered, and all the values are ordered.
 API documentation for a multidict exists as
 :class:`pyramid.interfaces.IMultiDict`.
 
+.. index::
+   pair: json_body; request
+
 .. _request_json_body:
 
 Dealing With A JSON-Encoded Request Body
@@ -408,7 +411,7 @@ anything, though if you subclass :class:`pyramid.response.Response` and set
 ``default_content_type`` you can override this behavior.
 
 .. index::
-   single: response exceptions
+   single: exception responses
 
 Exception Responses
 +++++++++++++++++++

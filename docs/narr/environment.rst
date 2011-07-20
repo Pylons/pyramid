@@ -8,9 +8,12 @@
    single: debug_all
    single: reload_all
    single: debug settings
+   single: debug_routematch
+   single: prevent_http_cache
    single: reload settings
    single: default_locale_name
    single: environment variables
+   single: Mako environment settings
    single: ini file settings
    single: PasteDeploy settings
 
@@ -418,6 +421,9 @@ template rendering.  However, it's convenient to enable when moving files
 around in overridden asset directories. ``reload_assets`` makes the system
 *very slow* when templates are in use.  Never set ``reload_assets`` to
 ``True`` on a production system.
+
+.. index::
+   par: settings; adding custom
 
 .. _adding_a_custom_setting:
 

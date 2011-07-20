@@ -20,6 +20,10 @@ In earlier chapters, you have been exposed to a few simple view configuration
 declarations without much explanation. In this chapter we will explore the
 subject in detail.
 
+.. index::
+   pair: resource; mapping to view callable
+   pair: URL pattern; mapping to view callable
+
 Mapping a Resource or URL Pattern to a View Callable
 ----------------------------------------------------
 
@@ -40,6 +44,9 @@ View configuration is performed in one of two ways:
 
 - by using the :meth:`pyramid.config.Configurator.add_view` method as per
   :ref:`mapping_views_using_imperative_config_section`.
+
+.. index::
+   single: view configuration parameters
 
 .. _view_configuration_parameters:
 
@@ -475,6 +482,9 @@ form of :term:`declarative configuration`, while
 :meth:`pyramid.config.Configurator.add_view` is a form of :term:`imperative
 configuration`.  However, they both do the same thing.
 
+.. index::
+   single: view_config placement
+
 ``@view_config`` Placement
 ++++++++++++++++++++++++++
 
@@ -822,7 +832,10 @@ headers that your application code itself sets.  It will only prevent caching
 headers that would have been set by the Pyramid HTTP caching machinery
 invoked as the result of the ``http_cache`` argument to view configuration.
 
-Debugging View Configuration
+.. index::
+   pair: view configuration; debugging
+
+ebugging View Configuration
 ----------------------------
 
 See :ref:`displaying_matching_views` for information about how to display

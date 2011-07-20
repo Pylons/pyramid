@@ -241,6 +241,9 @@ of :func:`~pyramid.renderers.render` (a string):
    single: renderer (template)
 
 
+.. index::
+   pair: renderer; system values
+
 .. _renderer_system_values:
 
 System Values Used During Rendering
@@ -276,6 +279,9 @@ What any particular renderer does with these system values is up to the
 renderer itself, but most template renderers, including Chameleon and
 Mako renderers, make these names available as top-level template
 variables.
+
+.. index::
+   pair: renderer; templates
 
 .. _templates_used_as_renderers:
 
@@ -426,7 +432,7 @@ See also :ref:`built_in_renderers` for more general information about
 renderers, including Chameleon ZPT renderers.
 
 .. index::
-   single: sample template
+   single: ZPT template (sample)
 
 A Sample ZPT Template
 ~~~~~~~~~~~~~~~~~~~~~
@@ -596,6 +602,9 @@ Note that I always name my Chameleon ZPT template files with a ``.pt``
 extension and my Chameleon text template files with a ``.txt``
 extension so that these ``svn:ignore`` patterns work.
 
+.. index::
+   pair: debugging; templates
+
 .. _debug_templates_section:
 
 Nicer Exceptions in Chameleon Templates
@@ -723,6 +732,9 @@ in the ``templates`` subdirectory of the ``mypackage`` Python package.  See
 :ref:`mako_template_renderer_settings` for more information about the
 ``mako.directories`` setting and other Mako-related settings that can be
 placed into the application's ``ini`` file.
+
+.. index::
+   single: Mako template (sample)
 
 A Sample Mako Template
 ~~~~~~~~~~~~~~~~~~~~~~

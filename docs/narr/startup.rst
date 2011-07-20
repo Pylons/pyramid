@@ -140,6 +140,10 @@ Here's a high-level time-ordered overview of what happens when you press
    The server serves the application, and the application is running, waiting
    to receive requests.
 
+.. index::
+   pair: settings; deployment
+   single: custom settings
+
 .. _deployment_settings:
 
 Deployment Settings

@@ -67,8 +67,7 @@ Openness
   open source license <http://repoze.org/license.html>`_.
 
 .. index::
-   single: Pylons
-   single: repoze namespace package
+   single: Pylons Project
 
 What Is The Pylons Project?
 ---------------------------

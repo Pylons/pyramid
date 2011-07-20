@@ -218,7 +218,7 @@ Another (deprecated) mechanism which allows event subscribers more control
 when adding renderer global values exists in :ref:`adding_renderer_globals`.
 
 .. index::
-   single: renderer globals
+   single: adding renderer globals
 
 .. _adding_renderer_globals:
 
@@ -528,6 +528,7 @@ The default context URL generator is available for perusal as the class
 
 .. index::
    single: IResponse
+   single: special view responses
 
 .. _using_iresponse:
 

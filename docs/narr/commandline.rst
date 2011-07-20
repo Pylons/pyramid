@@ -183,6 +183,9 @@ hash after the filename:
 
 Press ``Ctrl-D`` to exit the interactive shell (or ``Ctrl-Z`` on Windows).
 
+.. index::
+   pair: pshell; extending
+
 .. _extending_pshell:
 
 Extending the Shell
@@ -228,6 +231,9 @@ When this INI file is loaded, the extra variables ``m``, ``session`` and
       session      myapp.models.DBSession
       t            transaction
     >>>
+
+.. index::
+   single: IPython
 
 IPython
 ~~~~~~~
@@ -288,6 +294,10 @@ route pattern.  The view column may show ``None`` if no associated view
 callable could be found.  If no routes are configured within your
 application, nothing will be printed to the console when ``paster proutes``
 is executed.
+
+.. index::
+   single: scripting
+   single: bootstrap
 
 .. _writing_a_script:
 

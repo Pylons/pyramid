@@ -15,6 +15,9 @@ implementations :app:`Pyramid` provides out of the box, how to store and
 retrieve data from sessions, and two session-specific features: flash
 messages, and cross-site request forgery attack prevention.
 
+.. index::
+   single: session factory (default)
+
 .. _using_the_default_session_factory:
 
 Using The Default Session Factory
@@ -64,6 +67,9 @@ application by using the ``session_factory`` argument to the
    session factory implementation (preferably one which keeps session data on
    the server) for anything but the most basic of applications where "session
    security doesn't matter".
+
+.. index::
+   single: session object
 
 Using a Session Object
 ----------------------
@@ -137,6 +143,7 @@ Some gotchas:
 .. index::
    single: pyramid_beaker
    single: Beaker
+   single: session factory (alternates)
 
 .. _using_alternate_session_factories:
 
@@ -153,7 +160,7 @@ based sessions, and encrypted cookie-based sessions.  See
 ``pyramid_beaker``.
 
 .. index::
-   single: session factory
+   single: session factory (custom)
 
 Creating Your Own Session Factory
 ---------------------------------
@@ -183,6 +190,9 @@ the user after performing an internal redirect, and to allow generic code to
 log messages for single-time display without having direct access to an HTML
 template. The user interface consists of a number of methods of the
 :term:`session` object.
+
+.. index::
+   single: session.flash
 
 Using the ``session.flash`` Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -222,6 +232,9 @@ The ``allow_duplicate`` argument defaults to ``True``.  If this is
 ``False``, and you attempt to add a message value which is already
 present in the queue, it will not be added.
 
+.. index::
+   single: session.pop_flash
+
 Using the ``session.pop_flash`` Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -254,6 +267,9 @@ been popped.
    ['info message']
    >>> request.session.pop_flash()
    []
+
+.. index::
+   single: session.peek_flash
 
 Using the ``session.peek_flash`` Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -298,6 +314,9 @@ post.  To use CSRF token support, you must enable a :term:`session factory`
 as described in :ref:`using_the_default_session_factory` or
 :ref:`using_alternate_session_factories`.
 
+.. index::
+   single: session.get_csrf_token
+
 Using the ``session.get_csrf_token`` Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -329,6 +348,9 @@ input field named ``csrf_token``:
    token = request.session.get_csrf_token()
    if token != request.POST['csrf_token']:
        raise ValueError('CSRF token did not match')
+
+.. index::
+   single: session.new_csrf_token
 
 Using the ``session.new_csrf_token`` Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

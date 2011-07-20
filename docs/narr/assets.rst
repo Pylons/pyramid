@@ -35,6 +35,9 @@ static assets.  For example, there's a ``static`` directory which contains
 ``.css``, ``.js``, and ``.gif`` files.  These asset files are delivered when
 a user visits an application URL.
 
+.. index::
+   single: asset specifications
+
 .. _asset_specifications:
 
 Understanding Asset Specifications
@@ -85,6 +88,7 @@ individual documentation.
 
 .. index::
    single: add_static_view
+   pair: assets; serving
 
 .. _static_assets_section:
 
@@ -186,6 +190,7 @@ discussed in more detail later in this chapter.
 .. index::
    single: generating static asset urls
    single: static asset urls
+   pair:   assets; generating urls
 
 .. _generating_static_asset_urls:
 

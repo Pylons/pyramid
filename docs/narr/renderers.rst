@@ -228,6 +228,9 @@ Views which use the JSON renderer can vary non-body response attributes by
 using the api of the ``request.response`` attribute.  See
 :ref:`request_response_attr`.
 
+.. index::
+   pair: renderer; JSONP
+
 .. _jsonp_renderer:
 
 JSONP Renderer
@@ -522,9 +525,6 @@ people with older code bases.
   returning various values in the ``response_headerlist``, this is purely a
   convenience.
 
-.. index::
-   single: renderer (adding)
-
 .. _adding_and_overriding_renderers:
 
 Adding and Changing Renderers
@@ -549,6 +549,9 @@ For example, to add a renderer which renders views which have a
 The first argument is the renderer name.  The second argument is a reference
 to an implementation of a :term:`renderer factory` or a :term:`dotted Python
 name` referring to such an object.
+
+.. index::
+   pair: renderer; adding
 
 .. _adding_a_renderer:
 
@@ -676,6 +679,9 @@ ending with ``.jinja2`` in its ``renderer`` value.  The ``name`` passed
 to the ``MyJinja2Renderer`` constructor will be the full value that was
 set as ``renderer=`` in the view configuration.
 
+.. index::
+   pair: renderer; changing
+
 Changing an Existing Renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -714,6 +720,9 @@ the ``name`` attribute to the renderer tag:
    :linenos:
 
    config.add_renderer(None, 'mypackage.json_renderer_factory')
+
+.. index::
+   pair: renderer; overriding at runtime
 
 Overriding A Renderer At Runtime
 --------------------------------

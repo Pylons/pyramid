@@ -1,3 +1,6 @@
+.. index::
+   single: hello world program
+
 .. _firstapp_chapter:
 
 Creating Your First :app:`Pyramid` Application

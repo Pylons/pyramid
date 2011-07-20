@@ -35,6 +35,9 @@ This chapter describes how view callables work. In the
 :ref:`view_config_chapter` chapter, there are details about performing
 view configuration, and a detailed explanation of view lookup.
 
+.. index::
+   single: view callables
+
 View Callables
 --------------
 
@@ -585,6 +588,9 @@ callable code itself.
 
 No matter which view calling convention is used, the view code always has
 access to the context via ``request.context``.
+
+.. index::
+   single: Pylons-style controller dispatch
 
 Pylons-1.0-Style "Controller" Dispatch
 --------------------------------------
