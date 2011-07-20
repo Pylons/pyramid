@@ -235,8 +235,10 @@ arguments that are supplied, the more specific, and narrower the usage of the
 configured view.
 
 ``name``
-  The :term:`view name` required to match this view callable.  Read
-  :ref:`traversal_chapter` to understand the concept of a view name.
+  The :term:`view name` required to match this view callable.  A ``name``
+  argument is typically only used when your application uses
+  :term:`traversal`. Read :ref:`traversal_chapter` to understand the concept
+  of a view name.
 
   If ``name`` is not supplied, the empty string is used (implying the default
   view).
@@ -417,8 +419,7 @@ lives within a :app:`Pyramid` application module ``views.py``:
    from pyramid.view import view_config
    from pyramid.response import Response
 
-   @view_config(name='my_view', request_method='POST', context=MyResource,
-                permission='read')
+   @view_config(route_name='ok', request_method='POST', permission='read')
    def my_view(request):
        return Response('OK')
 
@@ -429,9 +430,8 @@ configuration stanza:
 .. code-block:: python
    :linenos:
 
-   config.add_view('mypackage.views.my_view', name='my_view', 
-                   request_method='POST', context=MyResource,
-                   permission='read')
+   config.add_view('mypackage.views.my_view', route_name='ok', 
+                   request_method='POST', permission='read')
 
 All arguments to ``view_config`` may be omitted.  For example:
 
@@ -499,7 +499,7 @@ If your view callable is a function, it may be used as a function decorator:
    from pyramid.view import view_config
    from pyramid.response import Response
 
-   @view_config(name='edit')
+   @view_config(route_name='edit')
    def edit(request):
        return Response('edited!')
 
@@ -514,7 +514,7 @@ against a class as when they are applied against a function.  For example:
    from pyramid.response import Response
    from pyramid.view import view_config
 
-   @view_config()
+   @view_config(route_name='hello')
    class MyView(object):
        def __init__(self, request):
            self.request = request
@@ -539,7 +539,7 @@ decorator syntactic sugar, if you wish:
        def __call__(self):
            return Response('hello')
 
-   my_view = view_config()(MyView)
+   my_view = view_config(route_name='hello')(MyView)
 
 More than one :class:`~pyramid.view.view_config` decorator can be stacked on
 top of any number of others.  Each decorator creates a separate view
@@ -551,8 +551,8 @@ registration.  For example:
    from pyramid.view import view_config
    from pyramid.response import Response
 
-   @view_config(name='edit')
-   @view_config(name='change')
+   @view_config(route_name='edit')
+   @view_config(route_name='change')
    def edit(request):
        return Response('edited!')
 
@@ -570,7 +570,7 @@ The decorator can also be used against a method of a class:
        def __init__(self, request):
            self.request = request
 
-       @view_config(name='hello')
+       @view_config(route_name='hello')
        def amethod(self):
            return Response('hello')
 
@@ -592,7 +592,7 @@ against the ``amethod`` method could be spelled equivalently as the below:
    from pyramid.response import Response
    from pyramid.view import view_config
 
-   @view_config(attr='amethod', name='hello')
+   @view_config(attr='amethod', route_name='hello')
    class MyView(object):
        def __init__(self, request):
            self.request = request
@@ -624,7 +624,7 @@ this method are very similar to the arguments that you provide to the
 
    # config is assumed to be an instance of the
    # pyramid.config.Configurator class
-   config.add_view(hello_world, name='hello.html')
+   config.add_view(hello_world, route_name='hello')
 
 The first argument, ``view``, is required.  It must either be a Python object
 which is the view itself or a :term:`dotted Python name` to such an object.
@@ -635,102 +635,6 @@ more information.
 When you use only :meth:`~pyramid.config.Configurator.add_view` to add view
 configurations, you don't need to issue a :term:`scan` in order for the view
 configuration to take effect.
-
-.. index::
-   single: resource interfaces
-
-.. _using_resource_interfaces:
-
-Using Resource Interfaces In View Configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Instead of registering your views with a ``context`` that names a Python
-resource *class*, you can optionally register a view callable with a
-``context`` which is an :term:`interface`.  An interface can be attached
-arbitrarily to any resource object.  View lookup treats context interfaces
-specially, and therefore the identity of a resource can be divorced from that
-of the class which implements it.  As a result, associating a view with an
-interface can provide more flexibility for sharing a single view between two
-or more different implementations of a resource type.  For example, if two
-resource objects of different Python class types share the same interface,
-you can use the same view configuration to specify both of them as a
-``context``.
-
-In order to make use of interfaces in your application during view dispatch,
-you must create an interface and mark up your resource classes or instances
-with interface declarations that refer to this interface.
-
-To attach an interface to a resource *class*, you define the interface and
-use the :func:`zope.interface.implements` function to associate the interface
-with the class.
-
-.. code-block:: python
-   :linenos:
-
-   from zope.interface import Interface
-   from zope.interface import implements
-
-   class IHello(Interface):
-       """ A marker interface """
-
-   class Hello(object):
-       implements(IHello)
-
-To attach an interface to a resource *instance*, you define the interface and
-use the :func:`zope.interface.alsoProvides` function to associate the
-interface with the instance.  This function mutates the instance in such a
-way that the interface is attached to it.
-
-.. code-block:: python
-   :linenos:
-
-   from zope.interface import Interface
-   from zope.interface import alsoProvides
-
-   class IHello(Interface):
-       """ A marker interface """
-
-   class Hello(object):
-       pass
-
-   def make_hello():
-       hello = Hello()
-       alsoProvides(hello, IHello)
-       return hello
-
-Regardless of how you associate an interface, with a resource instance, or a
-resource class, the resulting code to associate that interface with a view
-callable is the same.  Assuming the above code that defines an ``IHello``
-interface lives in the root of your application, and its module is named
-"resources.py", the interface declaration below will associate the
-``mypackage.views.hello_world`` view with resources that implement, or
-provide, this interface.
-
-.. code-block:: python
-   :linenos:
-
-   # config is an instance of pyramid.config.Configurator
-
-   config.add_view('mypackage.views.hello_world', name='hello.html',
-                   context='mypackage.resources.IHello')
-
-Any time a resource that is determined to be the :term:`context` provides
-this interface, and a view named ``hello.html`` is looked up against it as
-per the URL, the ``mypackage.views.hello_world`` view callable will be
-invoked.
-
-Note, in cases where a view is registered against a resource class, and a
-view is also registered against an interface that the resource class
-implements, an ambiguity arises. Views registered for the resource class take
-precedence over any views registered for any interface the resource class
-implements. Thus, if one view configuration names a ``context`` of both the
-class type of a resource, and another view configuration names a ``context``
-of interface implemented by the resource's class, and both view
-configurations are otherwise identical, the view registered for the context's
-class will "win".
-
-For more information about defining resources with interfaces for use within
-view configuration, see :ref:`resources_which_implement_interfaces`.
 
 .. index::
    single: view security
@@ -753,8 +657,9 @@ configuration using :meth:`~pyramid.config.Configurator.add_view`:
 
    # config is an instance of pyramid.config.Configurator
 
-   config.add_view('myproject.views.add_entry', name='add.html',
-                   context='myproject.resources.IBlog', permission='add')
+   config.add_route('add', '/add.html', factory='mypackage.Blog')
+   config.add_view('myproject.views.add_entry', route_name='add',
+                   permission='add')
 
 When an :term:`authorization policy` is enabled, this view will be protected
 with the ``add`` permission.  The view will *not be called* if the user does
@@ -835,7 +740,7 @@ invoked as the result of the ``http_cache`` argument to view configuration.
 .. index::
    pair: view configuration; debugging
 
-ebugging View Configuration
+Debugging View Configuration
 ----------------------------
 
 See :ref:`displaying_matching_views` for information about how to display

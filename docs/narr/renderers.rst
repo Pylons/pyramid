@@ -3,10 +3,10 @@
 Renderers
 =========
 
-A view needn't *always* return a :term:`Response` object.  If a view
-happens to return something which does not implement the Pyramid
-Response interface, :app:`Pyramid` will attempt to use a
-:term:`renderer` to construct a response.  For example:
+A view callable needn't *always* return a :term:`Response` object.  If a view
+happens to return something which does not implement the Pyramid Response
+interface, :app:`Pyramid` will attempt to use a :term:`renderer` to construct
+a response.  For example:
 
 .. code-block:: python
    :linenos:

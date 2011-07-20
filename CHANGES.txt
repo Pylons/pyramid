@@ -6,6 +6,10 @@ Documentation
 
 - Fixed two typos in wiki2 (SQLA + URL Dispatch) tutorial.
 
+- Reordered chapters in narrative section for better new user friendliness.
+
+- Added more indexing markers to sections in documentation.
+
 1.1b4 (2011-07-18)
 ==================
 
