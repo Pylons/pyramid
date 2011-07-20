@@ -12,7 +12,7 @@ in a ``.ini`` file parsed at application startup time as "configuration".
 However, if you're reasonably open-minded, it's easy to think of *code* as
 configuration too.  Since Pyramid, like most other web application platforms,
 is a *framework*, it calls into code that you write (as opposed to a
-*library*, which is code that exists purely for your to call).  The act of
+*library*, which is code that exists purely for you to call).  The act of
 plugging application code that you've written into :app:`Pyramid` is also
 referred to within this documentation as "configuration"; you are configuring
 :app:`Pyramid` to call the code that makes up your application.
