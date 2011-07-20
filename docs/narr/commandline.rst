@@ -192,10 +192,11 @@ Extending the Shell
 ~~~~~~~~~~~~~~~~~~~
 
 It is sometimes convenient when using the interactive shell often to have
-some variables significant to your application already loaded as globals
-when you start the ``pshell``. To facilitate this, ``pshell`` will look
-for a special ``[pshell]`` section in your INI file and expose the subsequent
-key/value pairs to the shell.
+some variables significant to your application already loaded as globals when
+you start the ``pshell``. To facilitate this, ``pshell`` will look for a
+special ``[pshell]`` section in your INI file and expose the subsequent
+key/value pairs to the shell.  Each key is a variable name that will be
+global within the pshell session; each value is a :term:`dotted Python name`.
 
 For example, you want to expose your model to the shell, along with the
 database session so that you can mutate the model on an actual database.
