@@ -412,6 +412,8 @@ class RendererHelper(object):
         return self._make_response(result, request)
 
     def _make_response(self, result, request):
+        # broken out of render_to_response as a separate method for testing
+        # purposes
         response = getattr(request, 'response', None)
         if response is None:
             # request is None or request is not a pyramid.response.Response
