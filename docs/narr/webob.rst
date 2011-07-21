@@ -296,6 +296,20 @@ For the above view, printed to the console will be:
 
     {u'a': 1}
 
+For bonus points, here's a bit of client-side code that will produce a
+request that has a body suitable for reading via ``request.json_body`` using
+Python's ``urllib2`` instead of a Javascript AJAX request:
+
+.. code-block:: python
+
+    import urllib2
+    import json        
+
+    json_payload = json.dumps({'a':1})
+    headers = {'Content-Type':'application/json; charset=utf-8'}
+    req = urllib2.Request('http://localhost:6543/', json_payload, headers)
+    resp = urllib2.urlopen(req)
+
 More Details
 ++++++++++++
 
