@@ -1017,7 +1017,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper, view)
 
     def test_add_view_same_phash_overrides_existing_single_view(self):
-        from pyramid.compat import md5
+        from hashlib import md5
         from zope.interface import Interface
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IView
@@ -1040,7 +1040,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_exc_same_phash_overrides_existing_single_view(self):
-        from pyramid.compat import md5
+        from hashlib import md5
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IView

@@ -5,6 +5,7 @@ import sys
 import types
 import traceback
 import warnings
+from hashlib import md5
 
 import venusian
 
@@ -52,9 +53,6 @@ from pyramid.interfaces import IViewMapperFactory
 
 from pyramid import renderers
 from pyramid.authorization import ACLAuthorizationPolicy
-from pyramid.compat import all
-from pyramid.compat import md5
-from pyramid.compat import any
 from pyramid.events import ApplicationCreated
 from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import PredicateMismatch

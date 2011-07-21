@@ -1,6 +1,12 @@
 Next release
 ============
 
+Internals
+---------
+
+- Remove ``compat`` code that served only the purpose of providing backwards
+  compatibility with Python 2.4.
+
 Documentation
 -------------
 
