@@ -3,6 +3,7 @@ import pkg_resources
 import threading
 
 from zope.interface import implements
+from zope.deprecation import deprecated
 
 from pyramid.interfaces import IChameleonLookup
 from pyramid.interfaces import IChameleonTranslate
@@ -335,9 +336,15 @@ def template_renderer_factory(info, impl, lock=registry_lock):
             lock.release()
     return lookup(info)
 
-# XXX deprecate
 def renderer_from_name(path, package=None):
     return RendererHelper(name=path, package=package).renderer
+
+deprecated(
+    'renderer_from_name',
+    'The "pyramid.renderers.renderer_from_name" function was never an API. '
+    'However, its use has been observed "in the wild."  It will disappear in '
+    'the next major release. To replace it, use the '
+    '``pyramid.renderers.get_renderer`` API instead. ')
 
 class RendererHelper(object):
     implements(IRendererInfo)
@@ -452,4 +459,13 @@ class RendererHelper(object):
             if cache_for is not None:
                 response.cache_expires = cache_for
         return response
+
+    def clone(self, name=None, package=None, registry=None):
+        if name is None:
+            name = self.name
+        if package is None:
+            package = self.package
+        if registry is None:
+            registry = self.registry
+        return self.__class__(name=name, package=package, registry=registry)
 

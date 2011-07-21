@@ -7,6 +7,12 @@ Internals
 - Remove ``compat`` code that served only the purpose of providing backwards
   compatibility with Python 2.4.
 
+- Add a deprecation warning for non-API function
+  ``pyramid.renderers.renderer_from_name`` which has seen use in the wild.
+
+- Add a ``clone`` method to ``pyramid.renderers.RendererHelper`` for use by
+  the ``pyramid.view.view_config`` decorator.
+
 Documentation
 -------------
 

@@ -399,10 +399,17 @@ class TestViewConfigDecorator(unittest.TestCase):
         # see https://github.com/Pylons/pyramid/pull/234
         from pyramid.interfaces import IRendererInfo
         import pyramid.tests
+        outerself = self
         class DummyRendererHelper(object):
             implements(IRendererInfo)
             name = 'fixtures/minimal.pt'
             package = pyramid.tests
+            def clone(self, name=None, package=None, registry=None):
+                outerself.assertEqual(name, self.name)
+                outerself.assertEqual(package, self.package)
+                outerself.assertEqual(registry, context.config.registry)
+                self.cloned = True
+                return self
         renderer_helper = DummyRendererHelper()
         decorator = self._makeOne(renderer=renderer_helper)
         venusian = DummyVenusian()
@@ -414,10 +421,8 @@ class TestViewConfigDecorator(unittest.TestCase):
         settings = call_venusian(venusian, context)
         self.assertEqual(len(settings), 1)
         renderer = settings[0]['renderer']
-        self.assertFalse(renderer is renderer_helper)
-        self.assertEqual(renderer.name, 'fixtures/minimal.pt')
-        self.assertEqual(renderer.package, pyramid.tests)
-        self.assertEqual(renderer.registry, context.config.registry)
+        self.assertTrue(renderer is renderer_helper)
+        self.assertTrue(renderer.cloned)
 
 class Test_append_slash_notfound_view(BaseTest, unittest.TestCase):
     def _callFUT(self, context, request):

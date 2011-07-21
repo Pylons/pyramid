@@ -1,6 +1,5 @@
 import mimetypes
 import venusian
-import warnings
 
 from zope.interface import providedBy
 from zope.deprecation import deprecated
@@ -226,7 +225,7 @@ class view_config(object):
             elif IRendererInfo.providedBy(renderer):
                 # create a new rendererinfo to clear out old registry on a
                 # rescan, see https://github.com/Pylons/pyramid/pull/234
-                renderer = RendererHelper(name=renderer.name,
+                renderer = renderer.clone(name=renderer.name,
                                           package=info.module,
                                           registry=context.config.registry)
             settings['renderer'] = renderer
