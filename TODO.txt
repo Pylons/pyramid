@@ -9,9 +9,6 @@ Should-Have
 
 - Add narrative docs for wsgiapp and wsgiapp2.
 
-- Symlink to current docs at docs.pylonsproject.org/curr and change all
-  scaffolds to use it instead of docs.pylonsproject.org/dev
-
 Nice-to-Have
 ------------
 

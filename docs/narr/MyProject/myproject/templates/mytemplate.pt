@@ -46,7 +46,7 @@
         <div id="left" class="align-right">
           <h2>Search documentation</h2>
           <form method="get"
-                action="http://docs.pylonsproject.org/pyramid/dev/search.html">
+                action="http://docs.pylonsproject.org/pyramid/current/search.html">
             <input type="text" id="q" name="q" value="" />
             <input type="submit" id="x" value="Go" />
           </form>
@@ -60,32 +60,32 @@
               </a>
             </li>
             <li>
-              <a href="http://docs.pylonsproject.org/projects/pyramid/dev/#narrative-documentation">
+              <a href="http://docs.pylonsproject.org/projects/pyramid/current/#narrative-documentation">
                 Narrative Documentation
               </a>
             </li>
             <li>
-              <a href="http://docs.pylonsproject.org/projects/pyramid/dev/#api-documentation">
+              <a href="http://docs.pylonsproject.org/projects/pyramid/current/#api-documentation">
                 API Documentation
               </a>
             </li>
             <li>
-              <a href="http://docs.pylonsproject.org/projects/pyramid/dev/#tutorials">
+              <a href="http://docs.pylonsproject.org/projects/pyramid/current/#tutorials">
                 Tutorials
               </a>
             </li>
             <li>
-              <a href="http://docs.pylonsproject.org/projects/pyramid/dev/#change-history">
+              <a href="http://docs.pylonsproject.org/projects/pyramid/current/#change-history">
                 Change History
               </a>
             </li>
             <li>
-              <a href="http://docs.pylonsproject.org/projects/pyramid/dev/#sample-applications">
+              <a href="http://docs.pylonsproject.org/projects/pyramid/current/#sample-applications">
                 Sample Applications
               </a>
             </li>
             <li>
-              <a href="http://docs.pylonsproject.org/projects/pyramid/dev/#support-and-development">
+              <a href="http://docs.pylonsproject.org/projects/pyramid/current/#support-and-development">
                 Support and Development
               </a>
             </li>

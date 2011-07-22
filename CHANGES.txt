@@ -16,6 +16,9 @@ Features
   been broken under 1.1 since 1.1b1; adding it allows us to make it work
   again.
 
+- Change all scaffolding templates that point to docs.pylonsproject.org to
+  use ``/projects/pyramid/current`` rather than ``/projects/pyramid/dev``.
+
 Internals
 ---------
 
