@@ -317,6 +317,16 @@ Minor Feature Additions
   has a ``last`` attribute containing the last registry loaded.  This is used
   by the scripting machinery, and is available for introspection.
 
+- Added the :attr:`pyramid.renderers.null_renderer` object as an API.  The
+  null renderer is an object that can be used in advanced integration cases
+  as input to the view configuration ``renderer=`` argument.  When the null
+  renderer is used as a view renderer argument, Pyramid avoids converting the
+  view callable result into a Response object.  This is useful if you want to
+  reuse the view configuration and lookup machinery outside the context of
+  its use by the Pyramid router.  (This feature was added for consumption by
+  the ``pyramid_rpc`` package, which uses view configuration and lookup
+  outside the context of a router in exactly this way.)
+
 Backwards Incompatibilities
 ---------------------------
 
