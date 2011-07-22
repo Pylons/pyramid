@@ -165,6 +165,7 @@ others' technology.
    single: Shipman, John
    single: Beelby, Chris
    single: Paez, Patricio
+   single: Merickel, Michael
 
 Thanks
 ======
@@ -179,8 +180,9 @@ software which it details would exist: Paul Everitt, Tres Seaver, Andrew
 Sawyers, Malthe Borch, Carlos de la Guardia, Chris Rossi, Shane Hathaway,
 Daniel Holth, Wichert Akkerman, Georg Brandl, Blaise Laflamme, Ben Bangert,
 Casey Duncan, Hugues Laflamme, Mike Orr, John Shipman, Chris Beelby, Patricio
-Paez, Simon Oram, Nat Hardwick, Ian Bicking, Jim Fulton, Tom Moroz of the
-Open Society Institute, and Todd Koym of Environmental Health Sciences.
+Paez, Simon Oram, Nat Hardwick, Ian Bicking, Jim Fulton, Michael Merickel,
+Tom Moroz of the Open Society Institute, and Todd Koym of Environmental
+Health Sciences.
 
 Thanks to Guido van Rossum and Tim Peters for Python.
 
