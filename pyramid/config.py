@@ -2124,7 +2124,7 @@ class Configurator(object):
             context = getattr(request, 'context', None)
             return view(context, request)
         return self.add_view(bwcompat_view, context=HTTPForbidden,
-                             wrapper=wrapper)
+                             wrapper=wrapper, renderer=renderer)
 
     @action_method
     def set_notfound_view(self, view=None, attr=None, renderer=None,
@@ -2165,7 +2165,7 @@ class Configurator(object):
             context = getattr(request, 'context', None)
             return view(context, request)
         return self.add_view(bwcompat_view, context=HTTPNotFound,
-                             wrapper=wrapper)
+                             wrapper=wrapper, renderer=renderer)
 
     @action_method
     def set_request_factory(self, factory):
@@ -3104,7 +3104,8 @@ class ViewDeriver(object):
 
     @wraps_view
     def rendered_view(self, view):
-        # one way or another this wrapper must produce a Response
+        # one way or another this wrapper must produce a Response (unless
+        # the renderer is a NullRendererHelper)
         renderer = self.kw.get('renderer')
         if renderer is None:
             # register a default renderer if you want super-dynamic
@@ -3112,6 +3113,8 @@ class ViewDeriver(object):
             # override_renderer to work if a renderer is left unspecified for
             # a view registration.
             return self._response_resolved_view(view)
+        if renderer is renderers.null_renderer:
+            return view
         return self._rendered_view(view, renderer)
 
     def _rendered_view(self, view, view_renderer):
@@ -3142,10 +3145,6 @@ class ViewDeriver(object):
 
     def _response_resolved_view(self, view):
         registry = self.registry
-        if hasattr(registry, '_dont_resolve_responses'):
-            # for Pyramid unit tests only
-            return view
-
         def viewresult_to_response(context, request):
             result = view(context, request)
             response = registry.queryAdapterOrSelf(result, IResponse)

@@ -866,4 +866,3 @@ class IRendererInfo(Interface):
     settings = Attribute('The deployment settings dictionary related '
                          'to the current application')
     
-

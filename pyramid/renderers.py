@@ -469,3 +469,22 @@ class RendererHelper(object):
             registry = self.registry
         return self.__class__(name=name, package=package, registry=registry)
 
+class NullRendererHelper(RendererHelper):
+    """ Special renderer helper that has render_* methods which simply return
+    the value they are fed rather than converting them to response objects;
+    useful for testing purposes and special case view configuration
+    registrations that want to use the view configuration machinery but do
+    not want actual rendering to happen ."""
+    def render_view(self, request, value, view, context):
+        return value
+
+    def render(self, value, system_values, request=None):
+        return value
+    
+    def render_to_response(self, value, system_values, request=None):
+        return value
+
+    def clone(self, name=None, package=None, registry=None):
+        return self
+    
+null_renderer = NullRendererHelper()

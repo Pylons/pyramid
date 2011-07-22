@@ -11,7 +11,6 @@ class ConfiguratorTests(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.config import Configurator
         config = Configurator(*arg, **kw)
-        config.registry._dont_resolve_responses = True
         return config
 
     def _registerRenderer(self, config, name='.txt'):
@@ -364,6 +363,7 @@ class ConfiguratorTests(unittest.TestCase):
             config.registry.queryAdapter(response, IResponse) is response)
 
     def test_setup_registry_explicit_notfound_trumps_iexceptionresponse(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
         from pyramid.httpexceptions import HTTPNotFound
@@ -373,7 +373,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.setup_registry() # registers IExceptionResponse default view
         def myview(context, request):
             return 'OK'
-        config.add_view(myview, context=HTTPNotFound)
+        config.add_view(myview, context=HTTPNotFound, renderer=null_renderer)
         request = self._makeRequest(config)
         view = self._getViewCallable(config,
                                      ctx_iface=implementedBy(HTTPNotFound),
@@ -778,12 +778,14 @@ class ConfiguratorTests(unittest.TestCase):
                           None, True, True)
 
     def test_add_view_with_request_type(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import directlyProvides
         from pyramid.interfaces import IRequest
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
         config.add_view(view=view,
-                        request_type='pyramid.interfaces.IRequest')
+                        request_type='pyramid.interfaces.IRequest',
+                        renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         request = DummyRequest()
         self._assertNotFound(wrapper, None, request)
@@ -809,29 +811,34 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper.__doc__, view.__doc__)
 
     def test_add_view_view_callable_dottedname(self):
+        from pyramid.renderers import null_renderer
         config = self._makeOne(autocommit=True)
-        config.add_view(view='pyramid.tests.test_config.dummy_view')
+        config.add_view(view='pyramid.tests.test_config.dummy_view',
+                        renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         self.assertEqual(wrapper(None, None), 'OK')
 
     def test_add_view_with_function_callable(self):
+        from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view)
+        config.add_view(view=view, renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
 
     def test_add_view_with_function_callable_requestonly(self):
+        from pyramid.renderers import null_renderer
         def view(request):
             return 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view)
+        config.add_view(view=view, renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
 
     def test_add_view_with_decorator(self):
+        from pyramid.renderers import null_renderer
         def view(request):
             """ ABC """
             return 'OK'
@@ -840,7 +847,8 @@ class ConfiguratorTests(unittest.TestCase):
                 return fn(context, request)
             return inner
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view, decorator=view_wrapper)
+        config.add_view(view=view, decorator=view_wrapper,
+                        renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         self.assertFalse(wrapper is view)
         self.assertEqual(wrapper.__doc__, view.__doc__)
@@ -869,30 +877,33 @@ class ConfiguratorTests(unittest.TestCase):
         assert_similar_datetime(expires, when)
 
     def test_add_view_as_instance(self):
+        from pyramid.renderers import null_renderer
         class AView:
             def __call__(self, context, request):
                 """ """
                 return 'OK'
         view = AView()
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view)
+        config.add_view(view=view, renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
 
     def test_add_view_as_instance_requestonly(self):
+        from pyramid.renderers import null_renderer
         class AView:
             def __call__(self, request):
                 """ """
                 return 'OK'
         view = AView()
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view)
+        config.add_view(view=view, renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
 
     def test_add_view_as_oldstyle_class(self):
+        from pyramid.renderers import null_renderer
         class view:
             def __init__(self, context, request):
                 self.context = context
@@ -901,7 +912,7 @@ class ConfiguratorTests(unittest.TestCase):
             def __call__(self):
                 return 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view)
+        config.add_view(view=view, renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         result = wrapper(None, request)
@@ -909,6 +920,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(request.__view__.__class__, view)
 
     def test_add_view_as_oldstyle_class_requestonly(self):
+        from pyramid.renderers import null_renderer
         class view:
             def __init__(self, request):
                 self.request = request
@@ -916,7 +928,7 @@ class ConfiguratorTests(unittest.TestCase):
             def __call__(self):
                 return 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view)
+        config.add_view(view=view, renderer=null_renderer)
         wrapper = self._getViewCallable(config)
 
         request = self._makeRequest(config)
@@ -925,70 +937,79 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(request.__view__.__class__, view)
 
     def test_add_view_context_as_class(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         view = lambda *arg: 'OK'
         class Foo:
             pass
         config = self._makeOne(autocommit=True)
-        config.add_view(context=Foo, view=view)
+        config.add_view(context=Foo, view=view, renderer=null_renderer)
         foo = implementedBy(Foo)
         wrapper = self._getViewCallable(config, foo)
         self.assertEqual(wrapper, view)
 
     def test_add_view_context_as_iface(self):
+        from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(context=IDummy, view=view)
+        config.add_view(context=IDummy, view=view, renderer=null_renderer)
         wrapper = self._getViewCallable(config, IDummy)
         self.assertEqual(wrapper, view)
 
     def test_add_view_context_as_dottedname(self):
+        from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
         config.add_view(context='pyramid.tests.test_config.IDummy',
-                        view=view)
+                        view=view,  renderer=null_renderer)
         wrapper = self._getViewCallable(config, IDummy)
         self.assertEqual(wrapper, view)
 
     def test_add_view_for__as_dottedname(self):
+        from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
         config.add_view(for_='pyramid.tests.test_config.IDummy',
-                        view=view)
+                        view=view, renderer=null_renderer)
         wrapper = self._getViewCallable(config, IDummy)
         self.assertEqual(wrapper, view)
 
     def test_add_view_for_as_class(self):
         # ``for_`` is older spelling for ``context``
+        from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         view = lambda *arg: 'OK'
         class Foo:
             pass
         config = self._makeOne(autocommit=True)
-        config.add_view(for_=Foo, view=view)
+        config.add_view(for_=Foo, view=view, renderer=null_renderer)
         foo = implementedBy(Foo)
         wrapper = self._getViewCallable(config, foo)
         self.assertEqual(wrapper, view)
 
     def test_add_view_for_as_iface(self):
         # ``for_`` is older spelling for ``context``
+        from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(for_=IDummy, view=view)
+        config.add_view(for_=IDummy, view=view, renderer=null_renderer)
         wrapper = self._getViewCallable(config, IDummy)
         self.assertEqual(wrapper, view)
 
     def test_add_view_context_trumps_for(self):
         # ``for_`` is older spelling for ``context``
+        from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
         class Foo:
             pass
-        config.add_view(context=IDummy, for_=Foo, view=view)
+        config.add_view(context=IDummy, for_=Foo, view=view,
+                        renderer=null_renderer)
         wrapper = self._getViewCallable(config, IDummy)
         self.assertEqual(wrapper, view)
 
     def test_add_view_register_secured_view(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import Interface
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import ISecuredView
@@ -996,13 +1017,14 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         view.__call_permissive__ = view
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view)
+        config.add_view(view=view, renderer=null_renderer)
         wrapper = config.registry.adapters.lookup(
             (IViewClassifier, IRequest, Interface),
             ISecuredView, name='', default=None)
         self.assertEqual(wrapper, view)
 
     def test_add_view_exception_register_secured_view(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IView
@@ -1010,13 +1032,14 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         view.__call_permissive__ = view
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view, context=RuntimeError)
+        config.add_view(view=view, context=RuntimeError, renderer=null_renderer)
         wrapper = config.registry.adapters.lookup(
             (IExceptionViewClassifier, IRequest, implementedBy(RuntimeError)),
             IView, name='', default=None)
         self.assertEqual(wrapper, view)
 
     def test_add_view_same_phash_overrides_existing_single_view(self):
+        from pyramid.renderers import null_renderer
         from hashlib import md5
         from zope.interface import Interface
         from pyramid.interfaces import IRequest
@@ -1032,7 +1055,7 @@ class ConfiguratorTests(unittest.TestCase):
             view, (IViewClassifier, IRequest, Interface), IView, name='')
         def newview(context, request):
             return 'OK'
-        config.add_view(view=newview, xhr=True)
+        config.add_view(view=newview, xhr=True, renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         self.assertFalse(IMultiView.providedBy(wrapper))
         request = DummyRequest()
@@ -1040,6 +1063,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_exc_same_phash_overrides_existing_single_view(self):
+        from pyramid.renderers import null_renderer
         from hashlib import md5
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
@@ -1057,7 +1081,8 @@ class ConfiguratorTests(unittest.TestCase):
             IView, name='')
         def newview(context, request):
             return 'OK'
-        config.add_view(view=newview, xhr=True, context=RuntimeError)
+        config.add_view(view=newview, xhr=True, context=RuntimeError,
+                        renderer=null_renderer)
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
         self.assertFalse(IMultiView.providedBy(wrapper))
@@ -1066,6 +1091,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_default_phash_overrides_no_phash(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import Interface
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IView
@@ -1077,7 +1103,7 @@ class ConfiguratorTests(unittest.TestCase):
             view, (IViewClassifier, IRequest, Interface), IView, name='')
         def newview(context, request):
             return 'OK'
-        config.add_view(view=newview)
+        config.add_view(view=newview, renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         self.assertFalse(IMultiView.providedBy(wrapper))
         request = DummyRequest()
@@ -1085,6 +1111,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_exc_default_phash_overrides_no_phash(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IView
@@ -1098,7 +1125,8 @@ class ConfiguratorTests(unittest.TestCase):
             IView, name='')
         def newview(context, request):
             return 'OK'
-        config.add_view(view=newview, context=RuntimeError)
+        config.add_view(view=newview, context=RuntimeError,
+                        renderer=null_renderer)
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
         self.assertFalse(IMultiView.providedBy(wrapper))
@@ -1107,6 +1135,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_default_phash_overrides_default_phash(self):
+        from pyramid.renderers import null_renderer
         from pyramid.config import DEFAULT_PHASH
         from zope.interface import Interface
         from pyramid.interfaces import IRequest
@@ -1120,7 +1149,7 @@ class ConfiguratorTests(unittest.TestCase):
             view, (IViewClassifier, IRequest, Interface), IView, name='')
         def newview(context, request):
             return 'OK'
-        config.add_view(view=newview)
+        config.add_view(view=newview, renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         self.assertFalse(IMultiView.providedBy(wrapper))
         request = DummyRequest()
@@ -1128,6 +1157,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_exc_default_phash_overrides_default_phash(self):
+        from pyramid.renderers import null_renderer
         from pyramid.config import DEFAULT_PHASH
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
@@ -1143,7 +1173,8 @@ class ConfiguratorTests(unittest.TestCase):
             IView, name='')
         def newview(context, request):
             return 'OK'
-        config.add_view(view=newview, context=RuntimeError)
+        config.add_view(view=newview, context=RuntimeError,
+                        renderer=null_renderer)
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
         self.assertFalse(IMultiView.providedBy(wrapper))
@@ -1152,6 +1183,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_multiview_replaces_existing_view(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import Interface
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IView
@@ -1162,12 +1194,13 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         config.registry.registerAdapter(
             view, (IViewClassifier, IRequest, Interface), IView, name='')
-        config.add_view(view=view)
+        config.add_view(view=view, renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         self.assertTrue(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper(None, None), 'OK')
 
     def test_add_view_exc_multiview_replaces_existing_view(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IView
@@ -1185,13 +1218,15 @@ class ConfiguratorTests(unittest.TestCase):
             view,
             (IExceptionViewClassifier, IRequest, implementedBy(RuntimeError)),
             IView, name='')
-        config.add_view(view=view, context=RuntimeError)
+        config.add_view(view=view, context=RuntimeError,
+                        renderer=null_renderer)
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
         self.assertTrue(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper(None, None), 'OK')
 
     def test_add_view_multiview_replaces_existing_securedview(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import Interface
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import ISecuredView
@@ -1203,12 +1238,13 @@ class ConfiguratorTests(unittest.TestCase):
         config.registry.registerAdapter(
             view, (IViewClassifier, IRequest, Interface),
             ISecuredView, name='')
-        config.add_view(view=view)
+        config.add_view(view=view, renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         self.assertTrue(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper(None, None), 'OK')
 
     def test_add_view_exc_multiview_replaces_existing_securedview(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import ISecuredView
@@ -1226,13 +1262,14 @@ class ConfiguratorTests(unittest.TestCase):
             view,
             (IExceptionViewClassifier, IRequest, implementedBy(RuntimeError)),
             ISecuredView, name='')
-        config.add_view(view=view, context=RuntimeError)
+        config.add_view(view=view, context=RuntimeError, renderer=null_renderer)
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
         self.assertTrue(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper(None, None), 'OK')
 
     def test_add_view_with_accept_multiview_replaces_existing_view(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import Interface
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IView
@@ -1245,7 +1282,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         config.registry.registerAdapter(
             view, (IViewClassifier, IRequest, Interface), IView, name='')
-        config.add_view(view=view2, accept='text/html')
+        config.add_view(view=view2, accept='text/html', renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         self.assertTrue(IMultiView.providedBy(wrapper))
         self.assertEqual(len(wrapper.views), 1)
@@ -1256,6 +1293,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(None, request), 'OK2')
 
     def test_add_view_exc_with_accept_multiview_replaces_existing_view(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IView
@@ -1275,7 +1313,8 @@ class ConfiguratorTests(unittest.TestCase):
             view,
             (IExceptionViewClassifier, IRequest, implementedBy(RuntimeError)),
             IView, name='')
-        config.add_view(view=view2, accept='text/html', context=RuntimeError)
+        config.add_view(view=view2, accept='text/html', context=RuntimeError,
+                        renderer=null_renderer)
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
         self.assertTrue(IMultiView.providedBy(wrapper))
@@ -1287,6 +1326,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(None, request), 'OK2')
 
     def test_add_view_multiview_replaces_existing_view_with___accept__(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import Interface
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IView
@@ -1301,7 +1341,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         config.registry.registerAdapter(
             view, (IViewClassifier, IRequest, Interface), IView, name='')
-        config.add_view(view=view2)
+        config.add_view(view=view2, renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         self.assertTrue(IMultiView.providedBy(wrapper))
         self.assertEqual(len(wrapper.views), 1)
@@ -1312,6 +1352,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_exc_mulview_replaces_existing_view_with___accept__(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IView
@@ -1333,7 +1374,8 @@ class ConfiguratorTests(unittest.TestCase):
             view,
             (IExceptionViewClassifier, IRequest, implementedBy(RuntimeError)),
             IView, name='')
-        config.add_view(view=view2, context=RuntimeError)
+        config.add_view(view=view2, context=RuntimeError,
+                        renderer=null_renderer)
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
         self.assertTrue(IMultiView.providedBy(wrapper))
@@ -1345,6 +1387,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_multiview_replaces_multiview(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import Interface
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IMultiView
@@ -1355,13 +1398,14 @@ class ConfiguratorTests(unittest.TestCase):
             view, (IViewClassifier, IRequest, Interface),
             IMultiView, name='')
         view2 = lambda *arg: 'OK2'
-        config.add_view(view=view2)
+        config.add_view(view=view2, renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         self.assertTrue(IMultiView.providedBy(wrapper))
         self.assertEqual([x[:2] for x in wrapper.views], [(view2, None)])
         self.assertEqual(wrapper(None, None), 'OK1')
 
     def test_add_view_exc_multiview_replaces_multiview(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IMultiView
@@ -1378,7 +1422,8 @@ class ConfiguratorTests(unittest.TestCase):
             (IExceptionViewClassifier, IRequest, implementedBy(RuntimeError)),
             IMultiView, name='')
         view2 = lambda *arg: 'OK2'
-        config.add_view(view=view2, context=RuntimeError)
+        config.add_view(view=view2, context=RuntimeError,
+                        renderer=null_renderer)
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
         self.assertTrue(IMultiView.providedBy(wrapper))
@@ -1386,6 +1431,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(None, None), 'OK1')
 
     def test_add_view_multiview_context_superclass_then_subclass(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import Interface
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IView
@@ -1400,7 +1446,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         config.registry.registerAdapter(
             view, (IViewClassifier, IRequest, ISuper), IView, name='')
-        config.add_view(view=view2, for_=ISub)
+        config.add_view(view=view2, for_=ISub, renderer=null_renderer)
         wrapper = self._getViewCallable(config, ISuper, IRequest)
         self.assertFalse(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper(None, None), 'OK')
@@ -1409,6 +1455,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(None, None), 'OK2')
 
     def test_add_view_multiview_exception_superclass_then_subclass(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IView
@@ -1426,7 +1473,7 @@ class ConfiguratorTests(unittest.TestCase):
             view, (IViewClassifier, IRequest, Super), IView, name='')
         config.registry.registerAdapter(
             view, (IExceptionViewClassifier, IRequest, Super), IView, name='')
-        config.add_view(view=view2, for_=Sub)
+        config.add_view(view=view2, for_=Sub, renderer=null_renderer)
         wrapper = self._getViewCallable(
             config, implementedBy(Super), IRequest)
         wrapper_exc_view = self._getViewCallable(
@@ -1443,6 +1490,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper_exc_view(None, None), 'OK2')
 
     def test_add_view_multiview_call_ordering(self):
+        from pyramid.renderers import null_renderer as nr
         from zope.interface import directlyProvides
         def view1(context, request): return 'view1'
         def view2(context, request): return 'view2'
@@ -1453,15 +1501,18 @@ class ConfiguratorTests(unittest.TestCase):
         def view7(context, request): return 'view7'
         def view8(context, request): return 'view8'
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view1)
-        config.add_view(view=view2, request_method='POST')
-        config.add_view(view=view3,request_param='param')
-        config.add_view(view=view4, containment=IDummy)
-        config.add_view(view=view5, request_method='POST',request_param='param')
-        config.add_view(view=view6, request_method='POST', containment=IDummy)
-        config.add_view(view=view7, request_param='param', containment=IDummy)
+        config.add_view(view=view1, renderer=nr)
+        config.add_view(view=view2, request_method='POST', renderer=nr)
+        config.add_view(view=view3,request_param='param', renderer=nr)
+        config.add_view(view=view4, containment=IDummy, renderer=nr)
+        config.add_view(view=view5, request_method='POST',
+                        request_param='param',  renderer=nr)
+        config.add_view(view=view6, request_method='POST', containment=IDummy,
+                        renderer=nr)
+        config.add_view(view=view7, request_param='param', containment=IDummy,
+                        renderer=nr)
         config.add_view(view=view8, request_method='POST',request_param='param',
-                        containment=IDummy)
+                        containment=IDummy, renderer=nr)
 
 
         wrapper = self._getViewCallable(config)
@@ -1585,11 +1636,12 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(result.settings, settings)
 
     def test_add_view_with_request_type_as_iface(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import directlyProvides
         def view(context, request):
             return 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(request_type=IDummy, view=view)
+        config.add_view(request_type=IDummy, view=view, renderer=null_renderer)
         wrapper = self._getViewCallable(config, None)
         request = self._makeRequest(config)
         directlyProvides(request, IDummy)
@@ -1604,10 +1656,11 @@ class ConfiguratorTests(unittest.TestCase):
                           config.add_view, view, '', None, None, object)
 
     def test_add_view_with_route_name(self):
+        from pyramid.renderers import null_renderer
         from zope.component import ComponentLookupError
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view, route_name='foo')
+        config.add_view(view=view, route_name='foo', renderer=null_renderer)
         self.assertEqual(len(config.registry.deferred_route_views), 1)
         infos = config.registry.deferred_route_views['foo']
         self.assertEqual(len(infos), 1)
@@ -1647,11 +1700,13 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(info['custom_predicates'], ('123',))
 
     def test_add_view_with_route_name_exception(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from zope.component import ComponentLookupError
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view, route_name='foo', context=RuntimeError)
+        config.add_view(view=view, route_name='foo', context=RuntimeError,
+                        renderer=null_renderer)
         self.assertEqual(len(config.registry.deferred_route_views), 1)
         infos = config.registry.deferred_route_views['foo']
         self.assertEqual(len(infos), 1)
@@ -1678,9 +1733,11 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper_exc_view(None, None), 'OK')
 
     def test_add_view_with_request_method_true(self):
+        from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view, request_method='POST')
+        config.add_view(view=view, request_method='POST',
+                        renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.method = 'POST'
@@ -1696,9 +1753,10 @@ class ConfiguratorTests(unittest.TestCase):
         self._assertNotFound(wrapper, None, request)
 
     def test_add_view_with_request_param_noval_true(self):
+        from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view, request_param='abc')
+        config.add_view(view=view, request_param='abc', renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.params = {'abc':''}
@@ -1714,9 +1772,11 @@ class ConfiguratorTests(unittest.TestCase):
         self._assertNotFound(wrapper, None, request)
 
     def test_add_view_with_request_param_val_true(self):
+        from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view, request_param='abc=123')
+        config.add_view(view=view, request_param='abc=123',
+                        renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.params = {'abc':'123'}
@@ -1732,9 +1792,10 @@ class ConfiguratorTests(unittest.TestCase):
         self._assertNotFound(wrapper, None, request)
 
     def test_add_view_with_xhr_true(self):
+        from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view, xhr=True)
+        config.add_view(view=view, xhr=True, renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.is_xhr = True
@@ -1757,9 +1818,10 @@ class ConfiguratorTests(unittest.TestCase):
                           config.add_view, view=view, header='Host:a\\')
 
     def test_add_view_with_header_noval_match(self):
+        from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view, header='Host')
+        config.add_view(view=view, header='Host', renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.headers = {'Host':'whatever'}
@@ -1775,9 +1837,10 @@ class ConfiguratorTests(unittest.TestCase):
         self._assertNotFound(wrapper, None, request)
 
     def test_add_view_with_header_val_match(self):
+        from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view, header=r'Host:\d')
+        config.add_view(view=view, header=r'Host:\d', renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.headers = {'Host':'1'}
@@ -1803,9 +1866,10 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertRaises(HTTPNotFound, wrapper, None, request)
 
     def test_add_view_with_accept_match(self):
+        from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view, accept='text/xml')
+        config.add_view(view=view, accept='text/xml', renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.accept = ['text/xml']
@@ -1821,10 +1885,11 @@ class ConfiguratorTests(unittest.TestCase):
         self._assertNotFound(wrapper, None, request)
 
     def test_add_view_with_containment_true(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import directlyProvides
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view, containment=IDummy)
+        config.add_view(view=view, containment=IDummy, renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         context = DummyContext()
         directlyProvides(context, IDummy)
@@ -1839,12 +1904,14 @@ class ConfiguratorTests(unittest.TestCase):
         self._assertNotFound(wrapper, context, None)
 
     def test_add_view_with_containment_dottedname(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import directlyProvides
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
         config.add_view(
             view=view,
-            containment='pyramid.tests.test_config.IDummy')
+            containment='pyramid.tests.test_config.IDummy',
+            renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         context = DummyContext()
         directlyProvides(context, IDummy)
@@ -1858,9 +1925,10 @@ class ConfiguratorTests(unittest.TestCase):
                           config.add_view, view=view, path_info='\\')
 
     def test_add_view_with_path_info_match(self):
+        from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view, path_info='/foo')
+        config.add_view(view=view, path_info='/foo', renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.path_info = '/foo'
@@ -1876,6 +1944,7 @@ class ConfiguratorTests(unittest.TestCase):
         self._assertNotFound(wrapper, None, request)
 
     def test_add_view_with_custom_predicates_match(self):
+        from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
         def pred1(context, request):
@@ -1883,7 +1952,8 @@ class ConfiguratorTests(unittest.TestCase):
         def pred2(context, request):
             return True
         predicates = (pred1, pred2)
-        config.add_view(view=view, custom_predicates=predicates)
+        config.add_view(view=view, custom_predicates=predicates,
+                        renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         self.assertEqual(wrapper(None, request), 'OK')
@@ -1902,24 +1972,30 @@ class ConfiguratorTests(unittest.TestCase):
         self._assertNotFound(wrapper, None, request)
 
     def test_add_view_custom_predicate_bests_standard_predicate(self):
+        from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         view2 = lambda *arg: 'NOT OK'
         config = self._makeOne(autocommit=True)
         def pred1(context, request):
             return True
-        config.add_view(view=view, custom_predicates=(pred1,))
-        config.add_view(view=view2, request_method='GET')
+        config.add_view(view=view, custom_predicates=(pred1,),
+                        renderer=null_renderer)
+        config.add_view(view=view2, request_method='GET',
+                        renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.method = 'GET'
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_custom_more_preds_first_bests_fewer_preds_last(self):
+        from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         view2 = lambda *arg: 'NOT OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view, request_method='GET', xhr=True)
-        config.add_view(view=view2, request_method='GET')
+        config.add_view(view=view, request_method='GET', xhr=True,
+                        renderer=null_renderer)
+        config.add_view(view=view2, request_method='GET',
+                        renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.method = 'GET'
@@ -1936,6 +2012,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertRaises(ConfigurationConflictError, config.commit)
 
     def test_add_view_with_permission(self):
+        from pyramid.renderers import null_renderer
         view1 = lambda *arg: 'OK'
         outerself = self
         class DummyPolicy(object):
@@ -1951,12 +2028,13 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(authorization_policy=policy,
                                authentication_policy=policy,
                                autocommit=True)
-        config.add_view(view=view1, permission='view')
+        config.add_view(view=view1, permission='view', renderer=null_renderer)
         view = self._getViewCallable(config)
         request = self._makeRequest(config)
         self.assertEqual(view(None, request), 'OK')
 
     def test_add_view_with_default_permission_no_explicit_permission(self):
+        from pyramid.renderers import null_renderer
         view1 = lambda *arg: 'OK'
         outerself = self
         class DummyPolicy(object):
@@ -1973,19 +2051,20 @@ class ConfiguratorTests(unittest.TestCase):
                                authentication_policy=policy,
                                default_permission='view',
                                autocommit=True)
-        config.add_view(view=view1)
+        config.add_view(view=view1, renderer=null_renderer)
         view = self._getViewCallable(config)
         request = self._makeRequest(config)
         self.assertEqual(view(None, request), 'OK')
 
     def test_add_view_with_no_default_permission_no_explicit_permission(self):
+        from pyramid.renderers import null_renderer
         view1 = lambda *arg: 'OK'
         class DummyPolicy(object): pass # wont be called
         policy = DummyPolicy()
         config = self._makeOne(authorization_policy=policy,
                                authentication_policy=policy,
                                autocommit=True)
-        config.add_view(view=view1)
+        config.add_view(view=view1, renderer=null_renderer)
         view = self._getViewCallable(config)
         request = self._makeRequest(config)
         self.assertEqual(view(None, request), 'OK')
@@ -2185,17 +2264,19 @@ class ConfiguratorTests(unittest.TestCase):
             raise AssertionError
 
     def test_derive_view_function(self):
+        from pyramid.renderers import null_renderer
         def view(request):
             return 'OK'
         config = self._makeOne()
-        result = config.derive_view(view)
+        result = config.derive_view(view, renderer=null_renderer)
         self.assertFalse(result is view)
         self.assertEqual(result(None, None), 'OK')
 
     def test_derive_view_dottedname(self):
+        from pyramid.renderers import null_renderer
         config = self._makeOne()
         result = config.derive_view(
-            'pyramid.tests.test_config.dummy_view')
+            'pyramid.tests.test_config.dummy_view', renderer=null_renderer)
         self.assertFalse(result is dummy_view)
         self.assertEqual(result(None, None), 'OK')
 
@@ -2288,18 +2369,21 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(config._ctx.info, 'abc')
 
     def test_add_static_here_no_utility_registered(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import Interface
         from pyramid.static import PackageURLParser
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         config = self._makeOne(autocommit=True)
-        config.add_static_view('static', 'fixtures/static')
+        config.add_static_view('static', 'fixtures/static',
+                               renderer=null_renderer)
         request_type = self._getRouteRequestIface(config, 'static/')
         self._assertRoute(config, 'static/', 'static/*subpath')
         wrapped = config.registry.adapters.lookup(
             (IViewClassifier, request_type, Interface), IView, name='')
         request = self._makeRequest(config)
-        self.assertEqual(wrapped(None, request).__class__, PackageURLParser)
+        result = wrapped(None, request)
+        self.assertEqual(result.__class__, PackageURLParser)
 
     def test_add_static_view_package_relative(self):
         from pyramid.interfaces import IStaticURLInfo
@@ -2332,12 +2416,13 @@ class ConfiguratorTests(unittest.TestCase):
                          [('static', static_path, {})])
 
     def test_set_notfound_view(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
         from pyramid.httpexceptions import HTTPNotFound
         config = self._makeOne(autocommit=True)
         view = lambda *arg: arg
-        config.set_notfound_view(view)
+        config.set_notfound_view(view, renderer=null_renderer)
         request = self._makeRequest(config)
         view = self._getViewCallable(config,
                                      ctx_iface=implementedBy(HTTPNotFound),
@@ -2346,12 +2431,13 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(result, (None, request))
 
     def test_set_notfound_view_request_has_context(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
         from pyramid.httpexceptions import HTTPNotFound
         config = self._makeOne(autocommit=True)
         view = lambda *arg: arg
-        config.set_notfound_view(view)
+        config.set_notfound_view(view, renderer=null_renderer)
         request = self._makeRequest(config)
         request.context = 'abc'
         view = self._getViewCallable(config,
@@ -2381,12 +2467,13 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertTrue('div' in result.body)
 
     def test_set_forbidden_view(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
         from pyramid.httpexceptions import HTTPForbidden
         config = self._makeOne(autocommit=True)
         view = lambda *arg: 'OK'
-        config.set_forbidden_view(view)
+        config.set_forbidden_view(view, renderer=null_renderer)
         request = self._makeRequest(config)
         view = self._getViewCallable(config,
                                      ctx_iface=implementedBy(HTTPForbidden),
@@ -2395,12 +2482,13 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(result, 'OK')
 
     def test_set_forbidden_view_request_has_context(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
         from pyramid.httpexceptions import HTTPForbidden
         config = self._makeOne(autocommit=True)
         view = lambda *arg: arg
-        config.set_forbidden_view(view)
+        config.set_forbidden_view(view, renderer=null_renderer)
         request = self._makeRequest(config)
         request.context = 'abc'
         view = self._getViewCallable(config,
@@ -3125,13 +3213,14 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(registeredview.__name__, 'view3')
 
     def test_autocommit_no_conflicts(self):
+        from pyramid.renderers import null_renderer
         config = self._makeOne(autocommit=True)
         def view1(request): pass
         def view2(request): pass
         def view3(request): pass
-        config.add_view(view1)
-        config.add_view(view2)
-        config.add_view(view3)
+        config.add_view(view1, renderer=null_renderer)
+        config.add_view(view2, renderer=null_renderer)
+        config.add_view(view3, renderer=null_renderer)
         config.commit()
         registeredview = self._getViewCallable(config)
         self.assertEqual(registeredview.__name__, 'view3')
@@ -3287,18 +3376,21 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
                 yield confinst[2]
 
     def test_add_route_with_view(self):
+        from pyramid.renderers import null_renderer
         config = self._makeOne(autocommit=True)
         view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view)
+        config.add_route('name', 'path', view=view, view_renderer=null_renderer)
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         self.assertEqual(wrapper(None, None), 'OK')
         self._assertRoute(config, 'name', 'path')
 
     def test_add_route_with_view_context(self):
+        from pyramid.renderers import null_renderer
         config = self._makeOne(autocommit=True)
         view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, view_context=IDummy)
+        config.add_route('name', 'path', view=view, view_context=IDummy,
+                         view_renderer=null_renderer)
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, IDummy, request_type)
         self.assertEqual(wrapper(None, None), 'OK')
@@ -3307,10 +3399,12 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
         self.assertEqual(wrapper, None)
 
     def test_add_route_with_view_exception(self):
+        from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         config = self._makeOne(autocommit=True)
         view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, view_context=RuntimeError)
+        config.add_route('name', 'path', view=view, view_context=RuntimeError,
+                         view_renderer=null_renderer)
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError),
@@ -3323,9 +3417,11 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
         self.assertEqual(wrapper, None)
 
     def test_add_route_with_view_for(self):
+        from pyramid.renderers import null_renderer
         config = self._makeOne(autocommit=True)
         view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, view_for=IDummy)
+        config.add_route('name', 'path', view=view, view_for=IDummy,
+                         view_renderer=null_renderer)
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, IDummy, request_type)
         self.assertEqual(wrapper(None, None), 'OK')
@@ -3334,9 +3430,11 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
         self.assertEqual(wrapper, None)
 
     def test_add_route_with_for_(self):
+        from pyramid.renderers import null_renderer
         config = self._makeOne(autocommit=True)
         view = lambda *arg: 'OK'
-        config.add_route('name', 'path', view=view, for_=IDummy)
+        config.add_route('name', 'path', view=view, for_=IDummy,
+                         view_renderer=null_renderer)
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, IDummy, request_type)
         self.assertEqual(wrapper(None, None), 'OK')
@@ -3356,6 +3454,7 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
         self.assertEqual(wrapper(None, None).body, 'Hello!')
 
     def test_add_route_with_view_attr(self):
+        from pyramid.renderers import null_renderer
         config = self._makeOne(autocommit=True)
         self._registerRenderer(config)
         class View(object):
@@ -3363,7 +3462,8 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
                 pass
             def alt(self):
                 return 'OK'
-        config.add_route('name', 'path', view=View, view_attr='alt')
+        config.add_route('name', 'path', view=View, view_attr='alt',
+                         view_renderer=null_renderer)
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         self._assertRoute(config, 'name', 'path')
