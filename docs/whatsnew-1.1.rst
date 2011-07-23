@@ -152,7 +152,7 @@ to only influence ``Cache-Control`` headers, pass a tuple as ``http_cache``
 with the first element of ``None``, e.g.: ``(None, {'public':True})``.
 
 The environment setting ``PYRAMID_PREVENT_HTTP_CACHE`` and configuration
-file value ``prevent_http_cache`` are synomymous and allow you to prevent
+file value ``prevent_http_cache`` are synonymous and allow you to prevent
 HTTP cache headers from being set by Pyramid's ``http_cache`` machinery
 globally in a process.  see :ref:`influencing_http_caching` and
 :ref:`preventing_http_caching`.
@@ -479,7 +479,7 @@ Deprecations and Behavior Differences
   these methods will be removed entirely.
 
 - A custom request factory is now required to return a request object that
-  has a ``response`` attribute (or "reified"/lazy property) if they the
+  has a ``response`` attribute (or "reified"/lazy property) if the
   request is meant to be used in a view that uses a renderer.  This
   ``response`` attribute should be an instance of the class
   :class:`pyramid.response.Response`.
@@ -542,8 +542,8 @@ Deprecations and Behavior Differences
 - Deprecated the
   :meth:`pyramid.config.Configurator.set_renderer_globals_factory` method and
   the ``renderer_globals`` Configurator constructor parameter.  Users should
-  use convert code using this feature to use a BeforeRender event als
-  :ref:`beforerender_event`.
+  convert code using this feature to use a BeforeRender event. See the section
+  :ref:`beforerender_event` in the Hooks chapter.
 
 - In Pyramid 1.0, the :class:`pyramid.events.subscriber` directive behaved
   contrary to the documentation when passed more than one interface object to
@@ -586,7 +586,7 @@ Deprecations and Behavior Differences
 
 - The :meth:`pyramid.config.Configurator.add_route` method allowed two routes
   with the same route to be added without an intermediate call to
-  :meth:`pyramid.config.Configurator.commit``.  If you now receive a
+  :meth:`pyramid.config.Configurator.commit`.  If you now receive a
   ``ConfigurationError`` at startup time that appears to be ``add_route``
   related, you'll need to either a) ensure that all of your route names are
   unique or b) call ``config.commit()`` before adding a second route with the

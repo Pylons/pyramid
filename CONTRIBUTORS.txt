@@ -142,3 +142,5 @@ Contributors
 - Michael Merickel, 2011/5/25
 
 - Christoph Zwerschke, 2011/06/07
+
+- Shane Hathaway, 2011/07/22
