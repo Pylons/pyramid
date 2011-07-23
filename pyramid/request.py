@@ -221,9 +221,9 @@ class Request(BaseRequest, DeprecatedRequestMethods):
         wrappers.append(wrapper)
         self.view_wrappers = wrappers
 
-    def _wrap_view(self, view, is_exc_view=False):
+    def _wrap_view(self, view, exc=None):
         for wrapper in self.view_wrappers:
-            view = wrapper(view, is_exc_view)
+            view = wrapper(view, self, exc)
         return view
 
     def add_response_callback(self, callback):

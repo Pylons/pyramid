@@ -141,11 +141,6 @@ class Router(object):
                         (IViewClassifier, request_iface, context_iface),
                         IView, name=view_name, default=None)
 
-                    # if there were any view wrappers set on the current
-                    # request, use them to wrap the view
-                    if request.view_wrappers:
-                        view_callable = request._wrap_view(view_callable)
-
                     # invoke the view callable
                     if view_callable is None:
                         if self.debug_notfound:
@@ -163,6 +158,11 @@ class Router(object):
                             msg = request.path_info
                         raise HTTPNotFound(msg)
                     else:
+                        # if there were any view wrappers for the current
+                        # request, use them to wrap the view
+                        if request.view_wrappers:
+                            view_callable = request._wrap_view(view_callable)
+
                         response = view_callable(context, request)
 
                 # handle exceptions raised during root finding and view-exec
@@ -184,7 +184,8 @@ class Router(object):
                         raise
 
                     if request.view_wrappers:
-                        view_callable = request._wrap_view(view_callable, True)
+                        view_callable = request._wrap_view(view_callable,
+                                                           exc=why)
 
                     response = view_callable(why, request)
 
