@@ -158,6 +158,11 @@ class Router(object):
                             msg = request.path_info
                         raise HTTPNotFound(msg)
                     else:
+                        # if there were any view wrappers for the current
+                        # request, use them to wrap the view
+                        if request.view_wrappers:
+                            view_callable = request._wrap_view(view_callable)
+
                         response = view_callable(context, request)
 
                 # handle exceptions raised during root finding and view-exec
@@ -177,6 +182,10 @@ class Router(object):
 
                     if view_callable is None:
                         raise
+
+                    if request.view_wrappers:
+                        view_callable = request._wrap_view(view_callable,
+                                                           exc=why)
 
                     response = view_callable(why, request)
 

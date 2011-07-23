@@ -203,6 +203,7 @@ class Request(BaseRequest, DeprecatedRequestMethods):
     implements(IRequest)
     response_callbacks = ()
     finished_callbacks = ()
+    view_wrappers = ()
     exception = None
     matchdict = None
     matched_route = None
@@ -211,6 +212,67 @@ class Request(BaseRequest, DeprecatedRequestMethods):
     def tmpl_context(self):
         """ Template context (for Pylons apps) """
         return TemplateContext()
+
+    def add_view_wrapper(self, wrapper):
+        """
+        Add a view wrapper factory.  A view wrapper is used to wrap the found
+        view callable before it is called by Pyramid's router.  This is a
+        feature usually only used by framework extensions, to provide, for
+        example, view timing support.
+
+        A view wrapper factory must be a callable which accepts three
+        arguments: ``view_callable``, ``request``, and ``exc``.  It must
+        return a view callable.  The view callable returned by the factory
+        must implement the ``context, request`` view callable calling
+        convention.  For example:
+
+        .. code-block:: python
+
+            import time
+
+            def wrapper_factory(view_callable, request, exc):
+                def wrapper(context, request):
+                    start = time.time()
+                    result = view_callable(context, request)
+                    end = time.time()
+                    request.view_timing = end - start
+                    return result
+                return wrapper
+
+        The ``view_callable`` argument to the factory will be the view
+        callable found by Pyramid via :term:`view lookup`.  The ``request``
+        argument to the factory will be the current request.  The ``exc``
+        argument to the factory will be an Exception object if the found view
+        is a :term:`exception view`; it will be ``None`` otherwise.
+
+        View wrappers only last for the duration of a single request.  You
+        can add such a factory for every request by using the
+        :class:`pyramid.events.NewRequest` subscriber:
+
+        .. code-block:: python
+
+            from pyramid.events import subscriber, NewRequest
+
+            @subscriber(NewRequest)
+            def newrequest(event):
+                event.request.add_view_wrapper(wrapper_factory)
+
+        If more than one view wrapper is registered during a single request,
+        a 'later' view wrapper factory will be called with the result of its
+        directly former view wrapper factory as its ``view_callable``
+        argument; this chain will be returned to Pyramid as a single view
+        callable.
+        """
+        wrappers = self.view_wrappers
+        if not wrappers:
+            wrappers = []
+        wrappers.append(wrapper)
+        self.view_wrappers = wrappers
+
+    def _wrap_view(self, view, exc=None):
+        for wrapper in self.view_wrappers:
+            view = wrapper(view, self, exc)
+        return view
 
     def add_response_callback(self, callback):
         """

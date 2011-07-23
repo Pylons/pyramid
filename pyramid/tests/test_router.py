@@ -498,6 +498,97 @@ class TestRouter(unittest.TestCase):
         exc_raised(NotImplementedError, router, environ, start_response)
         self.assertEqual(environ['called_back'], True)
 
+    def test_call_request_has_view_wrappers(self):
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        class IContext(Interface):
+            pass
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import INewRequest
+        wrappers = []
+        class ViewWrapper(object):
+            def __call__(self, view, request, exc):
+                self.view = view
+                self.exc = exc
+                wrappers.append(self)
+                return self.wrap
+            def wrap(self, context, request):
+                return self.view(context, request)
+        wrapper1 = ViewWrapper()
+        wrapper2 = ViewWrapper()
+        def newrequest(event):
+            event.request.view_wrappers = [wrapper1, wrapper2]
+        self.registry.registerHandler(newrequest, (INewRequest,))
+        context = DummyContext()
+        directlyProvides(context, IContext)
+        self._registerTraverserFactory(context, subpath=[''])
+        response = DummyResponse('200 OK')
+        response.app_iter = ['OK']
+        def view(context, request):
+            return response
+        environ = self._makeEnviron()
+        self._registerView(view, '', IViewClassifier, IRequest, IContext)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        itera = router(environ, start_response)
+        wrapper1, wrapper2 = wrappers
+        self.assertEqual(wrapper1.view, view)
+        self.assertEqual(wrapper2.view, wrapper1.wrap)
+        self.assertEqual(wrapper1.exc, None)
+        self.assertEqual(wrapper2.exc, None)
+        self.assertEqual(itera, ['OK'])
+
+    def test_call_request_has_view_wrappers_in_exception(self):
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        class IContext(Interface):
+            pass
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import INewRequest
+        from pyramid.interfaces import IExceptionViewClassifier
+        wrappers = []
+        class ViewWrapper(object):
+            def __init__(self):
+                self.views = []
+                self.exc = []
+            def __call__(self, view, request, exc):
+                self.views.append(view)
+                self.exc.append(exc)
+                wrappers.append(self)
+                return self.wrap
+            def wrap(self, context, request):
+                return self.views[-1](context, request)
+        wrapper1 = ViewWrapper()
+        wrapper2 = ViewWrapper()
+        def newrequest(event):
+            event.request.view_wrappers = [wrapper1, wrapper2]
+        self.registry.registerHandler(newrequest, (INewRequest,))
+        context = DummyContext()
+        directlyProvides(context, IContext)
+        self._registerTraverserFactory(context, subpath=[''])
+        error = NotImplementedError()
+        def view(context, request):
+            raise error
+        environ = self._makeEnviron()
+        self._registerView(view, '', IViewClassifier, IRequest, IContext)
+        exception_response = DummyResponse('404 Not Found')
+        exception_response.app_iter = ['Not Found']
+        exception_view = DummyView(exception_response)
+        environ = self._makeEnviron()
+        self._registerView(exception_view, '', IExceptionViewClassifier,
+                           IRequest, NotImplementedError)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        itera = router(environ, start_response)
+        wrapper1, wrapper2, wrapper3, wrapper4 = wrappers
+        self.assertEqual(wrapper1.views, [view, exception_view])
+        self.assertEqual(wrapper2.views, [wrapper1.wrap, wrapper1.wrap])
+        self.assertEqual(wrapper1.exc, [None, error])
+        self.assertEqual(wrapper2.exc, [None, error])
+        self.assertEqual(itera, ['Not Found'])
+
     def test_call_request_factory_raises(self):
         # making sure finally doesnt barf when a request cannot be created
         environ = self._makeEnviron()

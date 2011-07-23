@@ -145,6 +145,36 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(inst.called2, True)
         self.assertEqual(inst.finished_callbacks, [])
 
+    def test_add_view_wrapper(self):
+        inst = self._makeOne({})
+        wrapper = object()
+        inst.add_view_wrapper(wrapper)
+        self.assertEqual(inst.view_wrappers, [wrapper])
+
+    def test_add_view_wrapper_wrappers_exist(self):
+        inst = self._makeOne({})
+        inst.view_wrappers = [123]
+        wrapper = object()
+        inst.add_view_wrapper(wrapper)
+        self.assertEqual(inst.view_wrappers, [123, wrapper])
+
+    def test__wrap_view_no_wrappers(self):
+        inst = self._makeOne({})
+        wrapped = inst._wrap_view(lambda *arg: 'OK')
+        self.assertEqual(wrapped(), 'OK')
+
+    def test__wrap_view_with_wrappers_no_exc(self):
+        inst = self._makeOne({})
+        def view(*arg): return 'OK'
+        def view_wrapper(_view, request, exc):
+            self.assertEqual(_view, view)
+            self.assertEqual(request, inst)
+            self.assertEqual(exc, '123')
+            return _view
+        inst.view_wrappers = [view_wrapper]
+        wrapped = inst._wrap_view(view, exc='123')
+        self.assertEqual(wrapped(), 'OK')
+
     def test_resource_url(self):
         self._registerContextURL()
         inst = self._makeOne({})
