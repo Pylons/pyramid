@@ -8,8 +8,8 @@ Features
   ``rendering_val``.  This can be used to introspect the value returned by a
   view in a BeforeRender subscriber.
 
-- New method: ``pyramid.request.Request.add_view_mapper``.  A view wrapper is
-  used to wrap the found view callable before it is called by Pyramid's
+- New method: ``pyramid.request.Request.add_view_wrapper``.  A view wrapper
+  is used to wrap the found view callable before it is called by Pyramid's
   router.  This is a feature usually only used by framework extensions, to
   provide, for example, view timing support.
 
