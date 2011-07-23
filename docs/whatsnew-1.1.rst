@@ -479,7 +479,7 @@ Deprecations and Behavior Differences
   these methods will be removed entirely.
 
 - A custom request factory is now required to return a request object that
-  has a ``response`` attribute (or "reified"/lazy property) if they the
+  has a ``response`` attribute (or "reified"/lazy property) if the
   request is meant to be used in a view that uses a renderer.  This
   ``response`` attribute should be an instance of the class
   :class:`pyramid.response.Response`.
