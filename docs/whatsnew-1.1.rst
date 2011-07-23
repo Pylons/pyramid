@@ -152,7 +152,7 @@ to only influence ``Cache-Control`` headers, pass a tuple as ``http_cache``
 with the first element of ``None``, e.g.: ``(None, {'public':True})``.
 
 The environment setting ``PYRAMID_PREVENT_HTTP_CACHE`` and configuration
-file value ``prevent_http_cache`` are synomymous and allow you to prevent
+file value ``prevent_http_cache`` are synonymous and allow you to prevent
 HTTP cache headers from being set by Pyramid's ``http_cache`` machinery
 globally in a process.  see :ref:`influencing_http_caching` and
 :ref:`preventing_http_caching`.
