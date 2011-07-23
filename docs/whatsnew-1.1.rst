@@ -542,8 +542,8 @@ Deprecations and Behavior Differences
 - Deprecated the
   :meth:`pyramid.config.Configurator.set_renderer_globals_factory` method and
   the ``renderer_globals`` Configurator constructor parameter.  Users should
-  use convert code using this feature to use a BeforeRender event als
-  :ref:`beforerender_event`.
+  convert code using this feature to use a BeforeRender event. See the section
+  :ref:`beforerender_event` in the Hooks chapter.
 
 - In Pyramid 1.0, the :class:`pyramid.events.subscriber` directive behaved
   contrary to the documentation when passed more than one interface object to
