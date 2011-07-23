@@ -309,6 +309,10 @@ class IBeforeRender(Interface):
         """ Return the value for key ``k`` from the renderer globals
         dictionary, or the default if no such value exists."""
 
+    rendering_val = Attribute('The value returned by a view or passed to a '
+                              '``render`` method for this rendering. '
+                              'This feature is new in Pyramid 1.1.1.')
+
 class IRenderer(Interface):
     def __call__(value, system):
         """ Call a the renderer implementation with the result of the

@@ -601,6 +601,9 @@ to make sure the object implements every attribute and method outlined in
 :class:`pyramid.interfaces.IResponse` and you'll have to ensure that it's
 marked up with ``zope.interface.implements(IResponse)``:
 
+.. code-block:: python
+   :linenos:
+
    from pyramid.interfaces import IResponse
    from zope.interface import implements
 

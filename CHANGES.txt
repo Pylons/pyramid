@@ -1,3 +1,13 @@
+Next release
+============
+
+Features
+--------
+
+- The ``pyramid.events.BeforeRender`` event now has an attribute named
+  ``rendering_val``.  This can be used to introspect the value returned by a
+  view in a BeforeRender subscriber.
+
 1.1 (2011-07-22)
 ================
 
