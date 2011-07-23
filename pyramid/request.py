@@ -203,6 +203,7 @@ class Request(BaseRequest, DeprecatedRequestMethods):
     implements(IRequest)
     response_callbacks = ()
     finished_callbacks = ()
+    view_wrappers = ()
     exception = None
     matchdict = None
     matched_route = None
@@ -211,6 +212,19 @@ class Request(BaseRequest, DeprecatedRequestMethods):
     def tmpl_context(self):
         """ Template context (for Pylons apps) """
         return TemplateContext()
+
+    def add_view_wrapper(self, wrapper):
+        """ Add a view wrapper """
+        wrappers = self.view_wrappers
+        if not wrappers:
+            wrappers = []
+        wrappers.append(wrapper)
+        self.view_wrappers = wrappers
+
+    def _wrap_view(self, view, is_exc_view=False):
+        for wrapper in self.view_wrappers:
+            view = wrapper(view, is_exc_view)
+        return view
 
     def add_response_callback(self, callback):
         """

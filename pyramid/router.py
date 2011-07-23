@@ -141,6 +141,11 @@ class Router(object):
                         (IViewClassifier, request_iface, context_iface),
                         IView, name=view_name, default=None)
 
+                    # if there were any view wrappers set on the current
+                    # request, use them to wrap the view
+                    if request.view_wrappers:
+                        view_callable = request._wrap_view(view_callable)
+
                     # invoke the view callable
                     if view_callable is None:
                         if self.debug_notfound:
@@ -177,6 +182,9 @@ class Router(object):
 
                     if view_callable is None:
                         raise
+
+                    if request.view_wrappers:
+                        view_callable = request._wrap_view(view_callable, True)
 
                     response = view_callable(why, request)
 
