@@ -586,7 +586,7 @@ Deprecations and Behavior Differences
 
 - The :meth:`pyramid.config.Configurator.add_route` method allowed two routes
   with the same route to be added without an intermediate call to
-  :meth:`pyramid.config.Configurator.commit``.  If you now receive a
+  :meth:`pyramid.config.Configurator.commit`.  If you now receive a
   ``ConfigurationError`` at startup time that appears to be ``add_route``
   related, you'll need to either a) ensure that all of your route names are
   unique or b) call ``config.commit()`` before adding a second route with the
