@@ -409,7 +409,7 @@ class RendererHelper(object):
             if renderer_globals:
                 system_values.update(renderer_globals)
 
-        registry.notify(BeforeRender(system_values))
+        registry.notify(BeforeRender(system_values, value))
 
         result = renderer(value, system_values)
         return result

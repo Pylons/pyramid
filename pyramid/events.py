@@ -193,10 +193,16 @@ class BeforeRender(dict):
     BeforeRender subscriber, your subscriber code will need to (using
     ``.get`` or ``__contains__`` of the event object) ensure no value already
     exists in the renderer globals dictionary before setting an overriding
-    value."""
+    value.
 
-    def __init__(self, system):
+    The event has an additional attribute named ``rendering_val``.  This is
+    the (non-system) value returned by a view or passed to ``render*`` as
+    ``value``.  This feature is new in Pyramid 1.1.1.
+    """
+
+    def __init__(self, system, rendering_val=None):
         self._system = system
+        self.rendering_val = rendering_val
 
     def __setitem__(self, name, value):
         """ Set a name/value pair into the dictionary which is passed to a
@@ -230,4 +236,4 @@ class BeforeRender(dict):
         """ Return the value for key ``k`` from the renderer globals
         dictionary, or the default if no such value exists."""
         return self._system.get(k)
-            
+
