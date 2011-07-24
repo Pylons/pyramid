@@ -846,7 +846,7 @@ template.  It includes CSS and images.
 ``templates/mytemplate.pt``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The single :term:`Chameleon` template exists in the project.  Its contents
+The single :term:`Chameleon` template that exists in the project.  Its contents
 are too long to show here, but it displays a default page when rendered.  It
 is referenced by the call to ``add_view`` as the ``renderer`` attribute in
 the ``__init__`` file.  See :ref:`views_which_use_a_renderer` for more
