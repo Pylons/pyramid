@@ -467,7 +467,7 @@ the default.
 The ``use`` setting is the only setting *required* in the ``[app:MyProject]``
 section unless you've changed the callable referred to by the
 ``egg:MyProject`` entry point to accept more arguments: other settings you
-add to this section are passed as keywords arguments to the callable
+add to this section are passed as keyword arguments to the callable
 represented by this entry point (``main`` in our ``__init__.py`` module).
 You can provide startup-time configuration parameters to your application by
 adding more settings to this section.
