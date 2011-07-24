@@ -8,7 +8,7 @@ Features
   ``rendering_val``.  This can be used to introspect the value returned by a
   view in a BeforeRender subscriber.
 
-- New configurator directive:
+- New configurator directive:^
   ``pyramid.config.Configurator.add_request_handler``.  This directive adds
   a request handler factory.
 
@@ -65,6 +65,19 @@ Features
   key for conflict detection.  No two request handler factories may share the
   same name in the same configuration (unless automatic_conflict_resolution
   is able to resolve the conflict or this is an autocommitting configurator).
+
+- The Pyramid debug logger now uses the standard logging configuration
+  (usually set up by Paste as part of startup).  This means that output from
+  e.g. ``debug_notfound``, ``debug_authorization``, etc. will go to the
+  normal logging channels.  The logger name of the debug logger will be the
+  package name of the *caller* of the Configurator's constructor.
+
+Backwards Incompatibilities
+---------------------------
+
+- If a string is passed as the ``debug_logger`` parameter to a Configurator,
+  that string is considered to be the name of a global Python logger rather
+  than a dotted name to an instance of a logger.
 
 1.1 (2011-07-22)
 ================

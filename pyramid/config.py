@@ -1,4 +1,5 @@
 import inspect
+import logging
 import os
 import re
 import sys
@@ -62,7 +63,6 @@ from pyramid.httpexceptions import default_exceptionresponse_view
 from pyramid.httpexceptions import HTTPForbidden
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.i18n import get_localizer
-from pyramid.log import make_stream_logger
 from pyramid.mako_templating import renderer_factory as mako_renderer_factory
 from pyramid.path import caller_package
 from pyramid.path import package_path
@@ -195,12 +195,12 @@ class Configurator(object):
     :meth:`pyramid.config.Configurator.add_renderer`).  If
     it is not passed, a default set of renderer factories is used.
 
-    If ``debug_logger`` is not passed, a default debug logger that
-    logs to stderr will be used.  If it is passed, it should be an
-    instance of the :class:`logging.Logger` (PEP 282) standard library
-    class or a :term:`dotted Python name` to same.  The debug logger
-    is used by :app:`Pyramid` itself to log warnings and
-    authorization debugging information.
+    If ``debug_logger`` is not passed, a default debug logger that logs to a
+    logger will be used (the logger name will be the package name of the
+    *caller* of this configurator).  If it is passed, it should be an
+    instance of the :class:`logging.Logger` (PEP 282) standard library class
+    or a Python logger name.  The debug logger is used by :app:`Pyramid`
+    itself to log warnings and authorization debugging information.
 
     If ``locale_negotiator`` is passed, it should be a :term:`locale
     negotiator` implementation or a :term:`dotted Python name` to
@@ -726,9 +726,12 @@ class Configurator(object):
         # cope with WebOb exc objects not decoratored with IExceptionResponse
         from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
         registry.registerSelfAdapter((WebobResponse,), IResponse)
-        debug_logger = self.maybe_dotted(debug_logger)
+
         if debug_logger is None:
-            debug_logger = make_stream_logger('pyramid.debug', sys.stderr)
+            debug_logger = logging.getLogger(self.package_name)
+        elif isinstance(debug_logger, basestring):
+            debug_logger = logging.getLogger(debug_logger)
+                
         registry.registerUtility(debug_logger, IDebugLogger)
         if authentication_policy or authorization_policy:
             self._set_security_policies(authentication_policy,
@@ -953,16 +956,11 @@ class Configurator(object):
         """
         def register():
             registry = self.registry
-            existing_factory = registry.queryUtility(IRequestHandlerFactory,
-                                                     name=name)
             registry.registerUtility(handler_factory, IRequestHandlerFactory,
                                      name=name)
             existing_names = registry.queryUtility(IRequestHandlerFactories,
                                                    default=[])
-            if not existing_factory:
-                # don't replace a name if someone is trying to override
-                # through a commit
-                existing_names.append(name)
+            existing_names.append(name)
             registry.registerUtility(existing_names, IRequestHandlerFactories)
         self.action(('requesthandler', name), register)
         

@@ -153,7 +153,7 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IDebugLogger
         config = self._makeOne()
         logger = config.registry.getUtility(IDebugLogger)
-        self.assertEqual(logger.name, 'pyramid.debug')
+        self.assertEqual(logger.name, 'pyramid.tests')
 
     def test_ctor_noreg_debug_logger_non_None(self):
         from pyramid.interfaces import IDebugLogger
@@ -401,7 +401,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(reg)
         config.setup_registry()
         logger = reg.getUtility(IDebugLogger)
-        self.assertEqual(logger.name, 'pyramid.debug')
+        self.assertEqual(logger.name, 'pyramid.tests')
 
     def test_setup_registry_debug_logger_non_None(self):
         from pyramid.registry import Registry
@@ -413,15 +413,14 @@ class ConfiguratorTests(unittest.TestCase):
         result = reg.getUtility(IDebugLogger)
         self.assertEqual(logger, result)
 
-    def test_setup_registry_debug_logger_dottedname(self):
+    def test_setup_registry_debug_logger_name(self):
         from pyramid.registry import Registry
         from pyramid.interfaces import IDebugLogger
         reg = Registry()
         config = self._makeOne(reg)
-        config.setup_registry(debug_logger='pyramid.tests')
+        config.setup_registry(debug_logger='foo')
         result = reg.getUtility(IDebugLogger)
-        import pyramid.tests
-        self.assertEqual(result, pyramid.tests)
+        self.assertEqual(result.name, 'foo')
 
     def test_setup_registry_authentication_policy(self):
         from pyramid.registry import Registry
@@ -628,7 +627,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_request_handler(factory2, 'name2')
         config.add_request_handler(factory3, 'name1')
         names = config.registry.queryUtility(IRequestHandlerFactories)
-        self.assertEqual(names, ['name1', 'name2'])
+        self.assertEqual(names, ['name1', 'name2', 'name1'])
         f3 = config.registry.getUtility(IRequestHandlerFactory, name='name1')
         self.assertEqual(f3, factory3)
 
