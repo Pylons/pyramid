@@ -153,7 +153,7 @@ defined imports and function definitions, placed within the confines of an
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
-Let's break this down this piece-by-piece.
+Let's break this down piece-by-piece.
 
 Configurator Construction
 ~~~~~~~~~~~~~~~~~~~~~~~~~
