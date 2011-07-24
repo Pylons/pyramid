@@ -182,7 +182,7 @@ The ``config = Configurator()`` line above creates an instance of the
 :class:`~pyramid.config.Configurator` class.  The resulting ``config`` object
 represents an API which the script uses to configure this particular
 :app:`Pyramid` application.  Methods called on the Configurator will cause
-registrations to be made in a :term:`application registry` associated with
+registrations to be made in an :term:`application registry` associated with
 the application.
 
 .. _adding_configuration:
