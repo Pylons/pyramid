@@ -458,7 +458,7 @@ the default.
    point can thus be referred to as a "Paste application factory in the
    ``MyProject`` project which has the entry point named ``main`` where the
    entry point refers to a ``main`` function in the ``mypackage`` module".
-   If indeed if you open up the ``__init__.py`` module generated within the
+   Indeed, if you open up the ``__init__.py`` module generated within the
    ``myproject`` package, you'll see a ``main`` function.  This is the
    function called by :term:`PasteDeploy` when the ``paster serve`` command
    is invoked against our application.  It accepts a global configuration
