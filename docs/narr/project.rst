@@ -176,7 +176,7 @@ command ``python setup.py develop``
 The file named ``setup.py`` will be in the root of the paster-generated
 project directory.  The ``python`` you're invoking should be the one that
 lives in the ``bin`` directory of your virtual Python environment.  Your
-terminal's current working directory *must* the the newly created project
+terminal's current working directory *must* be the newly created project
 directory.  For example:
 
 .. code-block:: text
