@@ -262,6 +262,8 @@ class Request(BaseRequest, DeprecatedRequestMethods):
         directly former view wrapper factory as its ``view_callable``
         argument; this chain will be returned to Pyramid as a single view
         callable.
+
+        .. note:: This feature is new as of Pyramid 1.1.1.
         """
         wrappers = self.view_wrappers
         if not wrappers:

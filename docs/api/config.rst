@@ -78,6 +78,8 @@
 
      .. automethod:: set_view_mapper
 
+     .. automethod:: add_request_handler
+
      .. automethod:: testing_securitypolicy
 
      .. automethod:: testing_resources

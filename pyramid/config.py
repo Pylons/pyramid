@@ -37,6 +37,8 @@ from pyramid.interfaces import IRendererFactory
 from pyramid.interfaces import IRendererGlobalsFactory
 from pyramid.interfaces import IRequest
 from pyramid.interfaces import IRequestFactory
+from pyramid.interfaces import IRequestHandlerFactory
+from pyramid.interfaces import IRequestHandlerFactories
 from pyramid.interfaces import IResponse
 from pyramid.interfaces import IRootFactory
 from pyramid.interfaces import IRouteRequest
@@ -885,6 +887,85 @@ class Configurator(object):
         :term:`response` object.  """
         return self._derive_view(view, attr=attr, renderer=renderer)
 
+    @action_method
+    def add_request_handler(self, handler_factory, name):
+        """
+        Add a request handler factory.  A request handler factory is used to
+        wrap the Pyramid router's primary request handling function.  This is
+        a feature usually only used by framework extensions, to provide, for
+        example, view timing support and as a convenient place to hang
+        bookkeeping code that examines exceptions before they are returned to
+        the server.
+
+        A request handler factory (passed as ``handler_factory``) must be a
+        callable which accepts two arguments: ``handler`` and ``registry``.
+        ``handler`` will be the request handler being wrapped.  ``registry``
+        will be the Pyramid :term:`application registry` represented by this
+        Configurator.  A request handler factory must return a request
+        handler when it is called.
+
+        A request handler accepts a :term:`request` object and returns a
+        :term:`response` object.
+
+        Here's an example of creating both a handler factory and a handler,
+        and registering the handler factory:
+
+        .. code-block:: python
+
+            import time
+
+            def timing_handler_factory(handler, registry):
+                if registry.settings['do_timing']:
+                    # if timing support is enabled, return a wrapper
+                    def timing_handler(request):
+                        start = time.time()
+                        try:
+                            response = handler(request)
+                        finally:
+                            end = time.time()
+                            print: 'The request took %s seconds' % (end - start)
+                        return response
+                    return timing_handler
+                # if timing support is not enabled, return the original handler
+                return handler
+
+            config.add_request_handler(timing_handler_factory, 'timing')
+
+        The ``request`` argument to the handler will be the request created
+        by Pyramid's router when it receives a WSGI request.
+
+        If more than one request handler factory is registered into a single
+        configuration, the request handlers will be chained together.  The
+        first request handler factory added (in code execution order) will be
+        called with the default Pyramid request handler, the second handler
+        factory added will be called with the result of the first handler
+        factory, ad infinitum. The Pyramid router will use the outermost
+        wrapper in this chain (which is a bit like a WSGI middleware
+        "pipeline") as its handler function.
+
+        The ``name`` argument to this function is required.  The name is used
+        as a key for conflict detection.  No two request handler factories
+        may share the same name in the same configuration (unless
+        :ref:`automatic_conflict_resolution` is able to resolve the conflict
+        or this is an autocommitting configurator).
+
+        .. note:: This feature is new as of Pyramid 1.1.1.
+        """
+        def register():
+            registry = self.registry
+            existing_factory = registry.queryUtility(IRequestHandlerFactory,
+                                                     name=name)
+            registry.registerUtility(handler_factory, IRequestHandlerFactory,
+                                     name=name)
+            existing_names = registry.queryUtility(IRequestHandlerFactories,
+                                                   default=[])
+            if not existing_factory:
+                # don't replace a name if someone is trying to override
+                # through a commit
+                existing_names.append(name)
+            registry.registerUtility(existing_names, IRequestHandlerFactories)
+        self.action(('requesthandler', name), register)
+        
     @action_method
     def add_subscriber(self, subscriber, iface=None):
         """Add an event :term:`subscriber` for the event stream
