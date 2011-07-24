@@ -150,11 +150,6 @@ class PShellCommand(PCommand):
 
     def command(self, IPShell=_marker):
         # IPShell passed to command method is for testing purposes
-        if IPShell is _marker: # pragma: no cover
-            try:
-                from IPython.Shell import IPShell
-            except ImportError:
-                IPShell = None
         config_uri = self.args[0]
         config_file = config_uri.split('#', 1)[0]
         self.logging_file_config(config_file)
@@ -197,6 +192,18 @@ class PShellCommand(PCommand):
 
         help += '\n'
 
+        if IPShell is _marker:
+            try: #pragma no cover
+                try: #pragma no cover
+                    from IPython.frontend.terminal.embed import InteractiveShellEmbed
+                    IPShell = InteractiveShellEmbed(banner2=help, user_ns=env)
+                except ImportError: #pragma no cover
+                    from IPython.Shell import IPShellEmbed
+                    IPShell = IPShellEmbed(argv=[], user_ns=env)
+                    IPShell.IP.BANNER = IPShell.IP.BANNER + '\n\n' + help
+            except ImportError: #pragma no cover
+                IPShell = None
+
         if (IPShell is None) or self.options.disable_ipython:
             cprt = 'Type "help" for more information.'
             banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
@@ -207,9 +214,7 @@ class PShellCommand(PCommand):
                 closer()
         else:
             try:
-                shell = IPShell(argv=[], user_ns=env)
-                shell.IP.BANNER = shell.IP.BANNER + help
-                shell.mainloop()
+                IPShell()
             finally:
                 closer()
 
