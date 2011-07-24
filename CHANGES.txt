@@ -8,7 +8,7 @@ Features
   ``rendering_val``.  This can be used to introspect the value returned by a
   view in a BeforeRender subscriber.
 
-- New configurator directive:^
+- New configurator directive:
   ``pyramid.config.Configurator.add_request_handler``.  This directive adds
   a request handler factory.
 
