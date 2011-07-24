@@ -154,8 +154,6 @@
 
    .. automethod:: add_finished_callback
 
-   .. automethod:: add_view_wrapper
-
    .. automethod:: route_url
 
    .. automethod:: route_path
