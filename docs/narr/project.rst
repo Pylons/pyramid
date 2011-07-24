@@ -481,7 +481,7 @@ template changes will not require an application restart to be detected.  See
 The ``debug_templates`` setting in the ``[app:MyProject]`` section is a
 :app:`Pyramid` -specific setting which is passed into the framework.  If it
 exists, and its value is ``true``, :term:`Chameleon` template exceptions will
-contained more detailed and helpful information about the error than when
+contain more detailed and helpful information about the error than when
 this value is ``false``.  See :ref:`debug_templates_section` for more
 information.
 
