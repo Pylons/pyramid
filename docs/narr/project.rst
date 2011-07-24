@@ -99,9 +99,8 @@ We'll choose the ``pyramid_starter`` scaffold for this purpose.
 
    $ bin/paster create -t pyramid_starter
 
-The above command uses the ``paster`` command to create a project using the
-``pyramid_starter`` scaffold.  The ``paster create`` command creates project
-from a scaffold.  To use a different scaffold, such as
+The above command uses the ``paster create`` command to create a project with the
+``pyramid_starter`` scaffold.  To use a different scaffold, such as
 ``pyramid_routesalchemy``, you'd just change the last argument.  For example:
 
 .. code-block:: text
