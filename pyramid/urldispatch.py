@@ -10,7 +10,6 @@ from pyramid.exceptions import URLDecodeError
 from pyramid.traversal import traversal_path
 from pyramid.traversal import quote_path_segment
 
-
 _marker = object()
 
 class Route(object):

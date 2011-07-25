@@ -65,6 +65,7 @@ class Router(object):
         has_listeners = registry.has_listeners
         notify = registry.notify
         logger = self.logger
+
         try: # matches except Exception (exception view execution)
             has_listeners and notify(NewRequest(request))
             # find the root object
@@ -205,22 +206,17 @@ class Router(object):
         threadlocals = {'registry':registry, 'request':request}
         manager.push(threadlocals)
 
-        try: # matches finally: manager.pop()
-
-            try: # matches finally:  ... call request finished callbacks ...
-                
-                # create the request
+        try:
+            try:
                 request = self.request_factory(environ)
                 threadlocals['request'] = request
                 request.registry = registry
                 response = self.handle_request(request)
-
             finally:
                 if request is not None and request.finished_callbacks:
                     request._process_finished_callbacks()
 
             return response(request.environ, start_response)
-
         finally:
             manager.pop()
 
