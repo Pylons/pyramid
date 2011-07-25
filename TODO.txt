@@ -9,6 +9,10 @@ Should-Have
 
 - Add narrative docs for wsgiapp and wsgiapp2.
 
+- Provide a way to set the authentication policy and the authorization policy
+  during a config.include (they are related, so just exposing the currently
+  underscored-private _set_auth* methods won't cut it).
+
 Nice-to-Have
 ------------
 
