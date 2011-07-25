@@ -13,10 +13,13 @@ Should-Have
   during a config.include (they are related, so just exposing the currently
   underscored-private _set_auth* methods won't cut it).
 
+- Rename all config file values with a ``pyramid.`` prefix.
+
+- Try to figure out a way to keep "settings" as the original dictionary
+  passed to the Configurator instead of copying it.
+
 Nice-to-Have
 ------------
-
-- Rename all config file values with a ``pyramid.`` prefix.
 
 - Maybe add ``add_renderer_globals`` method to Configurator.
 
