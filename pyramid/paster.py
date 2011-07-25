@@ -200,7 +200,7 @@ class PShellCommand(PCommand):
                 except ImportError: #pragma no cover
                     from IPython.Shell import IPShellEmbed
                     IPShell = IPShellEmbed(argv=[], user_ns=env)
-                    IPShell.IP.BANNER = IPShell.IP.BANNER + '\n\n' + help
+                    IPShell.set_banner(IPShell.IP.BANNER + '\n' + help)
             except ImportError: #pragma no cover
                 IPShell = None
 
