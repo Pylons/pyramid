@@ -99,9 +99,8 @@ We'll choose the ``pyramid_starter`` scaffold for this purpose.
 
    $ bin/paster create -t pyramid_starter
 
-The above command uses the ``paster`` command to create a project using the
-``pyramid_starter`` scaffold.  The ``paster create`` command creates project
-from a scaffold.  To use a different scaffold, such as
+The above command uses the ``paster create`` command to create a project with the
+``pyramid_starter`` scaffold.  To use a different scaffold, such as
 ``pyramid_routesalchemy``, you'd just change the last argument.  For example:
 
 .. code-block:: text
@@ -177,7 +176,7 @@ command ``python setup.py develop``
 The file named ``setup.py`` will be in the root of the paster-generated
 project directory.  The ``python`` you're invoking should be the one that
 lives in the ``bin`` directory of your virtual Python environment.  Your
-terminal's current working directory *must* the the newly created project
+terminal's current working directory *must* be the newly created project
 directory.  For example:
 
 .. code-block:: text
@@ -459,7 +458,7 @@ the default.
    point can thus be referred to as a "Paste application factory in the
    ``MyProject`` project which has the entry point named ``main`` where the
    entry point refers to a ``main`` function in the ``mypackage`` module".
-   If indeed if you open up the ``__init__.py`` module generated within the
+   Indeed, if you open up the ``__init__.py`` module generated within the
    ``myproject`` package, you'll see a ``main`` function.  This is the
    function called by :term:`PasteDeploy` when the ``paster serve`` command
    is invoked against our application.  It accepts a global configuration
@@ -468,7 +467,7 @@ the default.
 The ``use`` setting is the only setting *required* in the ``[app:MyProject]``
 section unless you've changed the callable referred to by the
 ``egg:MyProject`` entry point to accept more arguments: other settings you
-add to this section are passed as keywords arguments to the callable
+add to this section are passed as keyword arguments to the callable
 represented by this entry point (``main`` in our ``__init__.py`` module).
 You can provide startup-time configuration parameters to your application by
 adding more settings to this section.
@@ -482,7 +481,7 @@ template changes will not require an application restart to be detected.  See
 The ``debug_templates`` setting in the ``[app:MyProject]`` section is a
 :app:`Pyramid` -specific setting which is passed into the framework.  If it
 exists, and its value is ``true``, :term:`Chameleon` template exceptions will
-contained more detailed and helpful information about the error than when
+contain more detailed and helpful information about the error than when
 this value is ``false``.  See :ref:`debug_templates_section` for more
 information.
 
@@ -847,7 +846,7 @@ template.  It includes CSS and images.
 ``templates/mytemplate.pt``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The single :term:`Chameleon` template exists in the project.  Its contents
+The single :term:`Chameleon` template that exists in the project.  Its contents
 are too long to show here, but it displays a default page when rendered.  It
 is referenced by the call to ``add_view`` as the ``renderer`` attribute in
 the ``__init__`` file.  See :ref:`views_which_use_a_renderer` for more

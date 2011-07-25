@@ -112,11 +112,11 @@ Here's a high-level time-ordered overview of what happens when you press
    (which is internal to Paste) such as ``reload_templates``,
    ``debug_authorization``, etc.
 
-#. The ``main`` function then calls various methods on the an instance of the
-   class :class:`~pyramid.config.Configurator` method.  The intent of
-   calling these methods is to populate an :term:`application registry`,
-   which represents the :app:`Pyramid` configuration related to the
-   application.
+#. The ``main`` function then calls various methods on the instance of the
+   class :class:`~pyramid.config.Configurator` created in the previous step.
+   The intent of calling these methods is to populate an
+   :term:`application registry`, which represents the :app:`Pyramid`
+   configuration related to the application.
 
 #. The :meth:`~pyramid.config.Configurator.make_wsgi_app` method is called.
    The result is a :term:`router` instance.  The router is associated with
