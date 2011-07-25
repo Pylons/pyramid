@@ -901,9 +901,10 @@ class Configurator(object):
         the server.
 
         A request handler factory (passed as ``handler_factory``) must be a
-        callable which accepts two arguments: ``handler`` and ``registry``.
-        ``handler`` will be the request handler being wrapped.  ``registry``
-        will be the Pyramid :term:`application registry` represented by this
+        callable (or a :term:`Python dotted name` to a callable) which
+        accepts two arguments: ``handler`` and ``registry``.  ``handler``
+        will be the request handler being wrapped.  ``registry`` will be the
+        Pyramid :term:`application registry` represented by this
         Configurator.  A request handler factory must return a request
         handler when it is called.
 
@@ -954,6 +955,7 @@ class Configurator(object):
 
         .. note:: This feature is new as of Pyramid 1.1.1.
         """
+        handler_factory = self.maybe_dotted(handler_factory)
         def register():
             registry = self.registry
             registry.registerUtility(handler_factory, IRequestHandlerFactory,

@@ -616,6 +616,18 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(f1, factory1)
         self.assertEqual(f2, factory2)
 
+    def test_add_request_handlers_dottednames(self):
+        import pyramid.tests
+        from pyramid.interfaces import IRequestHandlerFactories
+        from pyramid.interfaces import IRequestHandlerFactory
+        config = self._makeOne()
+        config.add_request_handler('pyramid.tests', 'name1')
+        config.commit()
+        names = config.registry.queryUtility(IRequestHandlerFactories)
+        self.assertEqual(names, ['name1'])
+        f1 = config.registry.getUtility(IRequestHandlerFactory, name='name1')
+        self.assertEqual(f1, pyramid.tests)
+
     def test_add_request_handlers_names_overlap(self):
         from pyramid.interfaces import IRequestHandlerFactories
         from pyramid.interfaces import IRequestHandlerFactory
