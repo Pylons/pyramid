@@ -1,28 +1,38 @@
 Pyramid TODOs
 =============
 
-Must-Have
----------
-
-- add_route discriminator wrong
-
-- tutorial models.initialize_sql doesn't match scaffold
-  (DBSession.rollback()/transaction.abort() in scaffold vs. "pass" in
-  tutorial)
-
-- deprecate request.add_response_callback (or at least review docs, in light
-  of request.response property).
-
 Should-Have
 -----------
 
 - Make "localizer" a property of request (instead of requiring
-  "get_localizer(request)"?
+  "get_localizer(request)"
 
-- Investigate mod_wsgi tutorial to make sure it still works (2 reports say
-  no; application package not found).
+- Make ``current_route_url`` a method of request.
+
+- Create a ``current_route_path`` function and make it a method of request.
 
 - Add narrative docs for wsgiapp and wsgiapp2.
+
+- Provide a way to set the authentication policy and the authorization policy
+  during a config.include (they are related, so just exposing the currently
+  underscored-private _set_auth* methods won't cut it).
+
+- Rename all config file values with a ``pyramid.`` prefix.
+
+- Try to figure out a way to keep "settings" as the original dictionary
+  passed to the Configurator instead of copying it.
+
+- Merge aodag's config.include(route_prefix=...) fork.
+
+- Michael's route group work.
+
+- Kill off ``bfg.routes`` envvars in router.
+
+- Provide a ``has_view`` function.
+
+- Alias the stupid long default session factory name.
+
+- Fix indirect circular import between router and config.
 
 Nice-to-Have
 ------------
@@ -33,9 +43,6 @@ Nice-to-Have
   until needed by ZCML, as well as unfound speedups).
 
 - Nicer Mako exceptions in WebError.
-
-- Response.RequestClass should probably be pyramid.request.Request but this
-  may imply actually subclassing webob.Response
 
 - Better "Extending" chapter.
 
@@ -78,6 +85,4 @@ Nice-to-Have
 - Consider implementing the API outlined in
   http://plope.com/pyramid_auth_design_api_postmortem, phasing out the
   current auth-n-auth abstractions in a backwards compatible way.
-
-- Add doc string for BeforeRender event with more details.
 

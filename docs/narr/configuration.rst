@@ -6,22 +6,16 @@
 Application Configuration 
 =========================
 
-Each deployment of an application written using :app:`Pyramid` implies a
-specific *configuration* of the framework itself.  For example, an
-application which serves up MP3 files for your listening enjoyment might plug
-code into the framework that manages song files, while an application that
-manages corporate data might plug in code that manages accounting
-information.  The way in which code is plugged in to :app:`Pyramid` for a
-specific application is referred to as "configuration".
-
-Most people understand "configuration" as coarse settings that inform the
-high-level operation of a specific application deployment.  For instance,
-it's easy to think of the values implied by a ``.ini`` file parsed at
-application startup time as "configuration".  :app:`Pyramid` extends this
-pattern to application development, using the term "configuration" to express
-standardized ways that code gets plugged into a deployment of the framework
-itself.  When you plug code into the :app:`Pyramid` framework, you are
-"configuring" :app:`Pyramid` to create a particular application.
+Most people already understand "configuration" as settings that influence the
+operation of an application.  For instance, it's easy to think of the values
+in a ``.ini`` file parsed at application startup time as "configuration".
+However, if you're reasonably open-minded, it's easy to think of *code* as
+configuration too.  Since Pyramid, like most other web application platforms,
+is a *framework*, it calls into code that you write (as opposed to a
+*library*, which is code that exists purely for you to call).  The act of
+plugging application code that you've written into :app:`Pyramid` is also
+referred to within this documentation as "configuration"; you are configuring
+:app:`Pyramid` to call the code that makes up your application.
 
 There are two ways to configure a :app:`Pyramid` application:
 :term:`imperative configuration` and :term:`declarative configuration`.  Both
@@ -151,3 +145,10 @@ In the example above, the scanner translates the arguments to
 
    config.add_view(hello)
 
+Summary
+-------
+
+There are two ways to configure a :app:`Pyramid` application: declaratively
+and imperatively.  You can choose the mode you're most comfortable with; both
+are completely equivalent.  Examples in this documentation will use both
+modes interchangeably.

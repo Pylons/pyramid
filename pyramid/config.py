@@ -1,10 +1,12 @@
 import inspect
+import logging
 import os
 import re
 import sys
 import types
 import traceback
 import warnings
+from hashlib import md5
 
 import venusian
 
@@ -36,6 +38,8 @@ from pyramid.interfaces import IRendererFactory
 from pyramid.interfaces import IRendererGlobalsFactory
 from pyramid.interfaces import IRequest
 from pyramid.interfaces import IRequestFactory
+from pyramid.interfaces import IRequestHandlerFactory
+from pyramid.interfaces import IRequestHandlerFactories
 from pyramid.interfaces import IResponse
 from pyramid.interfaces import IRootFactory
 from pyramid.interfaces import IRouteRequest
@@ -52,9 +56,6 @@ from pyramid.interfaces import IViewMapperFactory
 
 from pyramid import renderers
 from pyramid.authorization import ACLAuthorizationPolicy
-from pyramid.compat import all
-from pyramid.compat import md5
-from pyramid.compat import any
 from pyramid.events import ApplicationCreated
 from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import PredicateMismatch
@@ -62,7 +63,6 @@ from pyramid.httpexceptions import default_exceptionresponse_view
 from pyramid.httpexceptions import HTTPForbidden
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.i18n import get_localizer
-from pyramid.log import make_stream_logger
 from pyramid.mako_templating import renderer_factory as mako_renderer_factory
 from pyramid.path import caller_package
 from pyramid.path import package_path
@@ -82,6 +82,7 @@ from pyramid.traversal import find_interface
 from pyramid.traversal import traversal_path
 from pyramid.urldispatch import RoutesMapper
 from pyramid.util import DottedNameResolver
+from pyramid.util import WeakOrderedSet
 from pyramid.view import render_view_to_response
 
 DEFAULT_RENDERERS = (
@@ -194,12 +195,12 @@ class Configurator(object):
     :meth:`pyramid.config.Configurator.add_renderer`).  If
     it is not passed, a default set of renderer factories is used.
 
-    If ``debug_logger`` is not passed, a default debug logger that
-    logs to stderr will be used.  If it is passed, it should be an
-    instance of the :class:`logging.Logger` (PEP 282) standard library
-    class or a :term:`dotted Python name` to same.  The debug logger
-    is used by :app:`Pyramid` itself to log warnings and
-    authorization debugging information.
+    If ``debug_logger`` is not passed, a default debug logger that logs to a
+    logger will be used (the logger name will be the package name of the
+    *caller* of this configurator).  If it is passed, it should be an
+    instance of the :class:`logging.Logger` (PEP 282) standard library class
+    or a Python logger name.  The debug logger is used by :app:`Pyramid`
+    itself to log warnings and authorization debugging information.
 
     If ``locale_negotiator`` is passed, it should be a :term:`locale
     negotiator` implementation or a :term:`dotted Python name` to
@@ -462,7 +463,7 @@ class Configurator(object):
         :meth:`pyramid.config.Configuration.commit` is called (or executed
         immediately if ``autocommit`` is ``True``).
 
-        .. note:: This method is typically only used by :app:`Pyramid`
+        .. warning:: This method is typically only used by :app:`Pyramid`
            framework extension authors, not by :app:`Pyramid` application
            developers.
 
@@ -606,6 +607,10 @@ class Configurator(object):
         """
         Add a directive method to the configurator.
 
+        .. warning:: This method is typically only used by :app:`Pyramid`
+           framework extension authors, not by :app:`Pyramid` application
+           developers.
+
         Framework extenders can add directive methods to a configurator by
         instructing their users to call ``config.add_directive('somename',
         'some.callable')``.  This will make ``some.callable`` accessible as
@@ -721,9 +726,12 @@ class Configurator(object):
         # cope with WebOb exc objects not decoratored with IExceptionResponse
         from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
         registry.registerSelfAdapter((WebobResponse,), IResponse)
-        debug_logger = self.maybe_dotted(debug_logger)
+
         if debug_logger is None:
-            debug_logger = make_stream_logger('pyramid.debug', sys.stderr)
+            debug_logger = logging.getLogger(self.package_name)
+        elif isinstance(debug_logger, basestring):
+            debug_logger = logging.getLogger(debug_logger)
+                
         registry.registerUtility(debug_logger, IDebugLogger)
         if authentication_policy or authorization_policy:
             self._set_security_policies(authentication_policy,
@@ -807,10 +815,13 @@ class Configurator(object):
 
     def derive_view(self, view, attr=None, renderer=None):
         """
-
         Create a :term:`view callable` using the function, instance,
         or class (or :term:`dotted Python name` referring to the same)
         provided as ``view`` object.
+
+        .. warning:: This method is typically only used by :app:`Pyramid`
+           framework extension authors, not by :app:`Pyramid` application
+           developers.
 
         This is API is useful to framework extenders who create
         pluggable systems which need to register 'proxy' view
@@ -879,6 +890,82 @@ class Configurator(object):
         :term:`response` object.  """
         return self._derive_view(view, attr=attr, renderer=renderer)
 
+    @action_method
+    def add_request_handler(self, handler_factory, name):
+        """
+        Add a request handler factory.  A request handler factory is used to
+        wrap the Pyramid router's primary request handling function.  This is
+        a feature that may be used by framework extensions, to provide, for
+        example, view timing support and as a convenient place to hang
+        bookkeeping code that examines exceptions before they are returned to
+        the server.
+
+        A request handler factory (passed as ``handler_factory``) must be a
+        callable (or a :term:`Python dotted name` to a callable) which
+        accepts two arguments: ``handler`` and ``registry``.  ``handler``
+        will be the request handler being wrapped.  ``registry`` will be the
+        Pyramid :term:`application registry` represented by this
+        Configurator.  A request handler factory must return a request
+        handler when it is called.
+
+        A request handler accepts a :term:`request` object and returns a
+        :term:`response` object.
+
+        Here's an example of creating both a handler factory and a handler,
+        and registering the handler factory:
+
+        .. code-block:: python
+
+            import time
+
+            def timing_handler_factory(handler, registry):
+                if registry.settings['do_timing']:
+                    # if timing support is enabled, return a wrapper
+                    def timing_handler(request):
+                        start = time.time()
+                        try:
+                            response = handler(request)
+                        finally:
+                            end = time.time()
+                            print: 'The request took %s seconds' % (end - start)
+                        return response
+                    return timing_handler
+                # if timing support is not enabled, return the original handler
+                return handler
+
+            config.add_request_handler(timing_handler_factory, 'timing')
+
+        The ``request`` argument to the handler will be the request created
+        by Pyramid's router when it receives a WSGI request.
+
+        If more than one request handler factory is registered into a single
+        configuration, the request handlers will be chained together.  The
+        first request handler factory added (in code execution order) will be
+        called with the default Pyramid request handler, the second handler
+        factory added will be called with the result of the first handler
+        factory, ad infinitum. The Pyramid router will use the outermost
+        wrapper in this chain (which is a bit like a WSGI middleware
+        "pipeline") as its handler function.
+
+        The ``name`` argument to this function is required.  The name is used
+        as a key for conflict detection.  No two request handler factories
+        may share the same name in the same configuration (unless
+        :ref:`automatic_conflict_resolution` is able to resolve the conflict
+        or this is an autocommitting configurator).
+
+        .. note:: This feature is new as of Pyramid 1.1.1.
+        """
+        handler_factory = self.maybe_dotted(handler_factory)
+        def register():
+            registry = self.registry
+            registry.registerUtility(handler_factory, IRequestHandlerFactory,
+                                     name=name)
+            existing_names = registry.queryUtility(IRequestHandlerFactories,
+                                                   default=[])
+            existing_names.append(name)
+            registry.registerUtility(existing_names, IRequestHandlerFactories)
+        self.action(('requesthandler', name), register)
+        
     @action_method
     def add_subscriber(self, subscriber, iface=None):
         """Add an event :term:`subscriber` for the event stream
@@ -976,11 +1063,14 @@ class Configurator(object):
     def make_wsgi_app(self):
         """ Commits any pending configuration statements, sends a
         :class:`pyramid.events.ApplicationCreated` event to all listeners,
-        and returns a :app:`Pyramid` WSGI application representing the
-        committed configuration state."""
+        adds this configuration's registry to
+        :attr:`pyramid.config.global_registries`, and returns a
+        :app:`Pyramid` WSGI application representing the committed
+        configuration state."""
         self.commit()
         from pyramid.router import Router # avoid circdep
         app = Router(self.registry)
+        global_registries.add(self.registry)
         # We push the registry on to the stack here in case any code
         # that depends on the registry threadlocal APIs used in
         # listeners subscribed to the IApplicationCreated event.
@@ -989,6 +1079,7 @@ class Configurator(object):
             self.registry.notify(ApplicationCreated(app))
         finally:
             self.manager.pop()
+
         return app
 
     @action_method
@@ -1088,6 +1179,8 @@ class Configurator(object):
           :app:`Pyramid` machinery unmodified).
 
         http_cache
+
+          .. note:: This feature is new as of Pyramid 1.1.
 
           When you supply an ``http_cache`` value to a view configuration,
           the ``Expires`` and ``Cache-Control`` headers of a response
@@ -1208,18 +1301,7 @@ class Configurator(object):
 
           This value must match the ``name`` of a :term:`route
           configuration` declaration (see :ref:`urldispatch_chapter`)
-          that must match before this view will be called.  Note that
-          the ``route`` configuration referred to by ``route_name``
-          usually has a ``*traverse`` token in the value of its
-          ``path``, representing a part of the path that will be used
-          by :term:`traversal` against the result of the route's
-          :term:`root factory`.
-
-          .. warning:: Using this argument services an advanced
-             feature that isn't often used unless you want to perform
-             traversal *after* a route has matched. See
-             :ref:`hybrid_chapter` for more information on using this
-             advanced feature.
+          that must match before this view will be called.
 
         request_type
 
@@ -1801,12 +1883,11 @@ class Configurator(object):
            should only be used to support older code bases which depend upon
            them.* Use a separate call to
            :meth:`pyramid.config.Configurator.add_view` to associate a view
-           with a route.  See :ref:`add_route_view_config` for more info.
+           with a route using the ``route_name`` argument.
 
         view
 
-          .. warning:: Deprecated as of :app:`Pyramid` 1.1; see
-             :ref:`add_route_view_config`.
+          .. warning:: Deprecated as of :app:`Pyramid` 1.1.
 
           A Python object or :term:`dotted Python name` to the same
           object that will be used as a view callable when this route
@@ -1814,9 +1895,8 @@ class Configurator(object):
 
         view_context
 
-          .. warning:: Deprecated as of :app:`Pyramid` 1.1; see
-             :ref:`add_route_view_config`.
-
+          .. warning:: Deprecated as of :app:`Pyramid` 1.1.
+          
           A class or an :term:`interface` or :term:`dotted Python
           name` to the same object which the :term:`context` of the
           view should match for the view named by the route to be
@@ -1831,8 +1911,7 @@ class Configurator(object):
 
         view_permission
 
-          .. warning:: Deprecated as of :app:`Pyramid` 1.1; see
-             :ref:`add_route_view_config`.
+          .. warning:: Deprecated as of :app:`Pyramid` 1.1.
 
           The permission name required to invoke the view associated
           with this route.  e.g. ``edit``. (see
@@ -1846,8 +1925,7 @@ class Configurator(object):
 
         view_renderer
 
-          .. warning:: Deprecated as of :app:`Pyramid` 1.1; see
-             :ref:`add_route_view_config`.
+          .. warning:: Deprecated as of :app:`Pyramid` 1.1.
 
           This is either a single string term (e.g. ``json``) or a
           string implying a path or :term:`asset specification`
@@ -1871,8 +1949,7 @@ class Configurator(object):
 
         view_attr
 
-          .. warning:: Deprecated as of :app:`Pyramid` 1.1; see
-             :ref:`add_route_view_config`.
+          .. warning:: Deprecated as of :app:`Pyramid` 1.1.
 
           The view machinery defaults to using the ``__call__`` method
           of the view callable (or the function itself, if the view
@@ -1936,11 +2013,7 @@ class Configurator(object):
         if pattern is None:
             raise ConfigurationError('"pattern" argument may not be None')
 
-        discriminator = ['route', name, xhr, request_method, path_info,
-                         request_param, header, accept]
-        discriminator.extend(sorted(custom_predicates))
-        discriminator = tuple(discriminator)
-
+        discriminator = ('route', name)
         self.action(discriminator, None)
 
         return mapper.connect(name, pattern, factory, predicates=predicates,
@@ -2132,7 +2205,7 @@ class Configurator(object):
             context = getattr(request, 'context', None)
             return view(context, request)
         return self.add_view(bwcompat_view, context=HTTPForbidden,
-                             wrapper=wrapper)
+                             wrapper=wrapper, renderer=renderer)
 
     @action_method
     def set_notfound_view(self, view=None, attr=None, renderer=None,
@@ -2173,7 +2246,7 @@ class Configurator(object):
             context = getattr(request, 'context', None)
             return view(context, request)
         return self.add_view(bwcompat_view, context=HTTPNotFound,
-                             wrapper=wrapper)
+                             wrapper=wrapper, renderer=renderer)
 
     @action_method
     def set_request_factory(self, factory):
@@ -2979,6 +3052,9 @@ class ViewDeriver(object):
 
     @wraps_view
     def http_cached_view(self, view):
+        if self.registry.settings.get('prevent_http_cache', False):
+            return view
+        
         seconds = self.kw.get('http_cache')
 
         if seconds is None:
@@ -2996,8 +3072,9 @@ class ViewDeriver(object):
 
         def wrapper(context, request):
             response = view(context, request)
-            cache_control = response.cache_control
-            if not hasattr(cache_control, 'prevent_auto'):
+            prevent_caching = getattr(response.cache_control, 'prevent_auto',
+                                      False)
+            if not prevent_caching:
                 response.cache_expires(seconds, **options)
             return response
 
@@ -3108,7 +3185,8 @@ class ViewDeriver(object):
 
     @wraps_view
     def rendered_view(self, view):
-        # one way or another this wrapper must produce a Response
+        # one way or another this wrapper must produce a Response (unless
+        # the renderer is a NullRendererHelper)
         renderer = self.kw.get('renderer')
         if renderer is None:
             # register a default renderer if you want super-dynamic
@@ -3116,6 +3194,8 @@ class ViewDeriver(object):
             # override_renderer to work if a renderer is left unspecified for
             # a view registration.
             return self._response_resolved_view(view)
+        if renderer is renderers.null_renderer:
+            return view
         return self._rendered_view(view, renderer)
 
     def _rendered_view(self, view, view_renderer):
@@ -3146,10 +3226,6 @@ class ViewDeriver(object):
 
     def _response_resolved_view(self, view):
         registry = self.registry
-        if hasattr(registry, '_dont_resolve_responses'):
-            # for Pyramid unit tests only
-            return view
-
         def viewresult_to_response(context, request):
             result = view(context, request)
             response = registry.queryAdapterOrSelf(result, IResponse)
@@ -3323,3 +3399,4 @@ def isexception(o):
         (inspect.isclass(o) and (issubclass(o, Exception)))
         )
 
+global_registries = WeakOrderedSet()

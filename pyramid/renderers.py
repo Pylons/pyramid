@@ -3,6 +3,7 @@ import pkg_resources
 import threading
 
 from zope.interface import implements
+from zope.deprecation import deprecated
 
 from pyramid.interfaces import IChameleonLookup
 from pyramid.interfaces import IChameleonTranslate
@@ -335,9 +336,15 @@ def template_renderer_factory(info, impl, lock=registry_lock):
             lock.release()
     return lookup(info)
 
-# XXX deprecate
 def renderer_from_name(path, package=None):
     return RendererHelper(name=path, package=package).renderer
+
+deprecated(
+    'renderer_from_name',
+    'The "pyramid.renderers.renderer_from_name" function was never an API. '
+    'However, its use has been observed "in the wild."  It will disappear in '
+    'the next major release. To replace it, use the '
+    '``pyramid.renderers.get_renderer`` API instead. ')
 
 class RendererHelper(object):
     implements(IRendererInfo)
@@ -402,7 +409,7 @@ class RendererHelper(object):
             if renderer_globals:
                 system_values.update(renderer_globals)
 
-        registry.notify(BeforeRender(system_values))
+        registry.notify(BeforeRender(system_values, value))
 
         result = renderer(value, system_values)
         return result
@@ -412,6 +419,8 @@ class RendererHelper(object):
         return self._make_response(result, request)
 
     def _make_response(self, result, request):
+        # broken out of render_to_response as a separate method for testing
+        # purposes
         response = getattr(request, 'response', None)
         if response is None:
             # request is None or request is not a pyramid.response.Response
@@ -451,3 +460,31 @@ class RendererHelper(object):
                 response.cache_expires = cache_for
         return response
 
+    def clone(self, name=None, package=None, registry=None):
+        if name is None:
+            name = self.name
+        if package is None:
+            package = self.package
+        if registry is None:
+            registry = self.registry
+        return self.__class__(name=name, package=package, registry=registry)
+
+class NullRendererHelper(RendererHelper):
+    """ Special renderer helper that has render_* methods which simply return
+    the value they are fed rather than converting them to response objects;
+    useful for testing purposes and special case view configuration
+    registrations that want to use the view configuration machinery but do
+    not want actual rendering to happen ."""
+    def render_view(self, request, value, view, context):
+        return value
+
+    def render(self, value, system_values, request=None):
+        return value
+    
+    def render_to_response(self, value, system_values, request=None):
+        return value
+
+    def clone(self, name=None, package=None, registry=None):
+        return self
+    
+null_renderer = NullRendererHelper()

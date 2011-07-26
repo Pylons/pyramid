@@ -134,6 +134,54 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         self.assertEqual(router.request_factory, DummyRequestFactory)
 
+    def test_request_handler_factories(self):
+        from pyramid.interfaces import IRequestHandlerFactory
+        from pyramid.interfaces import IRequestHandlerFactories
+        L = []
+        def handler_factory1(handler, registry):
+            L.append((handler, registry))
+            def wrapper(request):
+                request.environ['handled'].append('one')
+                return handler(request)
+            wrapper.name = 'one'
+            wrapper.child = handler
+            return wrapper
+        def handler_factory2(handler, registry):
+            L.append((handler, registry))
+            def wrapper(request):
+                request.environ['handled'] = ['two']
+                return handler(request)
+            wrapper.name = 'two'
+            wrapper.child = handler
+            return wrapper
+        self.registry.registerUtility(['one', 'two'], IRequestHandlerFactories)
+        self.registry.registerUtility(handler_factory1,
+                                      IRequestHandlerFactory, name='one')
+        self.registry.registerUtility(handler_factory2,
+                                      IRequestHandlerFactory, name='two')
+        router = self._makeOne()
+        self.assertEqual(router.handle_request.name, 'two')
+        self.assertEqual(router.handle_request.child.name, 'one')
+        self.assertEqual(router.handle_request.child.child.__name__,
+                         'handle_request')
+        from pyramid.response import Response
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IResponse
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        environ = self._makeEnviron()
+        view = DummyView('abc')
+        self._registerView(self.config.derive_view(view), '',
+                           IViewClassifier, None, None)
+        start_response = DummyStartResponse()
+        def make_response(s):
+            return Response(s)
+        router.registry.registerAdapter(make_response, (str,), IResponse)
+        app_iter = router(environ, start_response)
+        self.assertEqual(app_iter, ['abc'])
+        self.assertEqual(start_response.status, '200 OK')
+        self.assertEqual(environ['handled'], ['two', 'one'])
+
     def test_call_traverser_default(self):
         from pyramid.httpexceptions import HTTPNotFound
         environ = self._makeEnviron()
@@ -402,6 +450,33 @@ class TestRouter(unittest.TestCase):
         start_response = DummyStartResponse()
         why = exc_raised(HTTPNotFound, router, environ, start_response)
         self.assertEqual(why[0], 'notfound')
+
+    def test_call_view_raises_response_cleared(self):
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        from pyramid.interfaces import IExceptionViewClassifier
+        class IContext(Interface):
+            pass
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        context = DummyContext()
+        directlyProvides(context, IContext)
+        self._registerTraverserFactory(context, subpath=[''])
+        def view(context, request):
+            request.response.a = 1
+            raise KeyError
+        def exc_view(context, request):
+            self.assertFalse(hasattr(request.response, 'a'))
+            request.response.body = 'OK'
+            return request.response
+        environ = self._makeEnviron()
+        self._registerView(view, '', IViewClassifier, IRequest, IContext)
+        self._registerView(exc_view, '', IExceptionViewClassifier,
+                           IRequest, KeyError)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        itera = router(environ, start_response)
+        self.assertEqual(itera, ['OK'])
 
     def test_call_request_has_response_callbacks(self):
         from zope.interface import Interface

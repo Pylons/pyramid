@@ -14,6 +14,9 @@ URL space that it does not "naturally" inhabit.
 a URL "prefix", as well as serving a *portion* of a :term:`traversal`
 based application under a root URL.
 
+.. index::
+   single: hosting an app under a prefix
+
 Hosting an Application Under a URL Prefix
 -----------------------------------------
 

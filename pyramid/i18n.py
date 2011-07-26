@@ -214,6 +214,11 @@ class Translations(gettext.GNUTranslations, object):
         :param fileobj: the file-like object the translation should be read
                         from
         """
+        # germanic plural by default; self.plural will be overwritten by
+        # GNUTranslations._parse (called as a side effect if fileobj is
+        # passed to GNUTranslations.__init__) with a "real" self.plural for
+        # this domain; see https://github.com/Pylons/pyramid/issues/235
+        self.plural = lambda n: int(n != 1) 
         gettext.GNUTranslations.__init__(self, fp=fileobj)
         self.files = filter(None, [getattr(fileobj, 'name', None)])
         self.domain = domain

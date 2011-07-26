@@ -62,8 +62,8 @@ fail if you do nothing to your existing :mod:`repoze.bfg` application.
 However, you won't have to do much to use your existing BFG applications on
 Pyramid. There's automation which will change most of your import statements
 and ZCML declarations. See
-http://docs.pylonshq.com/pyramid/dev/tutorials/bfg/index.html for upgrade
-instructions.
+http://docs.pylonsproject.org/projects/pyramid/current/tutorials/bfg/index.html
+for upgrade instructions.
 
 Pylons 1 users will need to do more work to use Pyramid, as Pyramid shares no
 "DNA" with Pylons.  It is hoped that over time documentation and upgrade code

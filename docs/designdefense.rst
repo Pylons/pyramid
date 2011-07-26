@@ -711,9 +711,9 @@ Pyramid Has Too Many Dependencies
 
 This is true.  At the time of this writing, the total number of Python
 package distributions that :app:`Pyramid` depends upon transitively is 18 if
-you use Python 2.6 or 2.7, or 16 if you use Python 2.4 or 2.5.  This is a lot
-more than zero package distribution dependencies: a metric which various
-Python microframeworks and Django boast.
+you use Python 2.6 or 2.7, or 16 if you use Python 2.5.  This is a lot more
+than zero package distribution dependencies: a metric which various Python
+microframeworks and Django boast.
 
 The :mod:`zope.component` and :mod:`zope.configuration` packages on which
 :app:`Pyramid` depends have transitive dependencies on several other packages
@@ -1395,8 +1395,8 @@ predictability.
   a registry in another module.  This has the effect that
   double-registrations will never be performed.
 
-Routes (Usually) Need Relative Ordering
-+++++++++++++++++++++++++++++++++++++++
+Routes Need Relative Ordering
++++++++++++++++++++++++++++++
 
 Consider the following simple `Groundhog
 <https://github.com/Pylons/groundhog>`_ application:
@@ -1471,19 +1471,51 @@ the view associated with the ``/:action`` routing pattern will be invoked: it
 matches first.  A 404 error is raised.  This is not what we wanted; it just
 happened due to the order in which we defined our view functions.
 
-You may be willing to maintain an ordering of your view functions which
-reifies your routing policy.  Your application may be small enough where this
-will never cause an issue.  If it becomes large enough to matter, however, I
-don't envy you.  Maintaining that ordering as your application grows larger
-will be difficult.  At some point, you will also need to start controlling
-*import* ordering as well as function definition ordering.  When your
-application grows beyond the size of a single file, and when decorators are
-used to register views, the non-``__main__`` modules which contain
-configuration decorators must be imported somehow for their configuration to
-be executed.
+This is because "Groundhog" routes are added to the routing map in import
+order, and matched in the same order when a request comes in.  Bottle, like
+Groundhog, as of this writing, matches routes in the order in which they're
+defined at Python execution time.  Flask, on the other hand, does not order
+route matching based on import order; it reorders the routes you add to your
+application based on their "complexity".  Other microframeworks have varying
+strategies to do route ordering.
 
-Does that make you a little uncomfortable?  It should, because
+Your application may be small enough where route ordering will never cause an
+issue.  If your application becomes large enough, however, being able to
+specify or predict that ordering as your application grows larger will be
+difficult.  At some point, you will likely need to more explicitly start
+controlling route ordering, especially in applications that require
+extensibility.
+
+If your microframework orders route matching based on "complexity", you'll
+need to understand what that "complexity" ordering is and attempt to inject a
+"less complex" route to have it get matched before any "more complex" one to
+ensure that it's tried first.
+
+If your microframework orders its route matching based on relative
+import/execution of function decorator definitions, you will need to ensure
+you execute all of these statements in the "right" order, and you'll need to
+be cognizant of this import/execution ordering as you grow your application
+or try to extend it.  This is a difficult invariant to maintain for all but
+the smallest applications.
+
+In either case, your application must import the non-``__main__`` modules
+which contain configuration decorations somehow for their configuration to be
+executed.  Does that make you a little uncomfortable?  It should, because
 :ref:`you_dont_own_modulescope`.
+
+Pyramid uses neither decorator import time ordering nor does it attempt to
+divine the relative "complexity" of one route to another in order to define a
+route match ordering.  In Pyramid, you have to maintain relative route
+ordering imperatively via the chronology of multiple executions of the
+:meth:`pyramid.config.Configurator.add_route` method.  The order in which you
+repeatedly call ``add_route`` becomes the order of route matching.
+
+If needing to maintain this imperative ordering truly bugs you, you can use
+:term:`traversal` instead of route matching, which is a completely
+declarative (and completely predictable) mechanism to map code to URLs.
+While URL dispatch is easier to understand for small non-extensible
+applications, traversal is a great fit for very large applications and
+applications that need to be arbitrarily extensible.
 
 "Stacked Object Proxies" Are Too Clever / Thread Locals Are A Nuisance
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -1729,7 +1761,7 @@ If you can understand this hello world program, you can use Pyramid:
 Pyramid has ~ 650 pages of documentation (printed), covering topics from the
 very basic to the most advanced.  *Nothing* is left undocumented, quite
 literally.  It also has an *awesome*, very helpful community.  Visit the
-#repoze and/or #pylons IRC channels on freenode.net and see.
+#pyramid and/or #pylons IRC channels on freenode.net and see.
 
 Hate Zope
 +++++++++

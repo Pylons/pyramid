@@ -168,6 +168,9 @@ normal application operations, the requesting user will need to possess the
 to invoke the ``blog_entry_add_view`` view.  If he does not, the
 :term:`Forbidden view` will be invoked.
 
+.. index::
+   pair: permission; default
+
 .. _setting_a_default_permission:
 
 Setting a Default Permission
@@ -212,6 +215,7 @@ When a default permission is registered:
 .. index::
    single: ACL
    single: access control list
+   pair: resource; ACL
 
 .. _assigning_acls:
 

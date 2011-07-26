@@ -39,6 +39,9 @@ web developer so you know when you might want to use them.  :term:`Traversal`
 is actually a straightforward metaphor easily comprehended by anyone who's
 ever used a run-of-the-mill file system with folders and files.
 
+.. index::
+   single: URL dispatch
+
 URL Dispatch
 ------------
 
@@ -100,11 +103,11 @@ from this process to the client as the final result.  The server
 configuration specified which files would trigger some dynamic code, with the
 default case being to just serve the static file.
 
+.. index::
+   single: traversal
+
 Traversal (aka Resource Location)
 ---------------------------------
-
-.. index::
-   single: traversal overview
 
 Believe it or not, if you understand how serving files from a file system
 works, you understand traversal.  And if you understand that a server might do
@@ -140,6 +143,9 @@ file that was retrieved in the file system example.  If a :exc:`KeyError` is
 generated anywhere along the way, :app:`Pyramid` will return 404.  (This
 isn't precisely true, as you'll see when we learn about view lookup below,
 but the basic idea holds.)
+
+.. index::
+   single: resource
 
 What Is a "Resource"?
 ---------------------
@@ -193,6 +199,9 @@ system.  Traversal is in fact a superset of file system lookup.
 
 .. note:: See the chapter entitled :ref:`resources_chapter` for a more
    technical overview of resources.
+
+.. index::
+   single: view lookup
 
 View Lookup
 -----------

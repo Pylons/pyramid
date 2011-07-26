@@ -8,9 +8,12 @@
    single: debug_all
    single: reload_all
    single: debug settings
+   single: debug_routematch
+   single: prevent_http_cache
    single: reload settings
    single: default_locale_name
    single: environment variables
+   single: Mako environment settings
    single: ini file settings
    single: PasteDeploy settings
 
@@ -112,6 +115,25 @@ this value is true.  See also :ref:`debug_routematch_section`.
 | Environment Variable Name       | Config File Setting Name    |
 +=================================+=============================+
 | ``PYRAMID_DEBUG_ROUTEMATCH``    |  ``debug_routematch``       |
+|                                 |                             |
+|                                 |                             |
+|                                 |                             |
++---------------------------------+-----------------------------+
+
+.. _preventing_http_caching:
+
+Preventing HTTP Caching
+------------------------
+
+Prevent the ``http_cache`` view configuration argument from having any effect
+globally in this process when this value is true.  No http caching-related
+response headers will be set by the Pyramid ``http_cache`` view configuration
+feature when this is true.  See also :ref:`influencing_http_caching`.
+
++---------------------------------+-----------------------------+
+| Environment Variable Name       | Config File Setting Name    |
++=================================+=============================+
+| ``PYRAMID_PREVENT_HTTP_CACHE``  |  ``prevent_http_cache``     |
 |                                 |                             |
 |                                 |                             |
 |                                 |                             |
@@ -399,6 +421,9 @@ template rendering.  However, it's convenient to enable when moving files
 around in overridden asset directories. ``reload_assets`` makes the system
 *very slow* when templates are in use.  Never set ``reload_assets`` to
 ``True`` on a production system.
+
+.. index::
+   par: settings; adding custom
 
 .. _adding_a_custom_setting:
 

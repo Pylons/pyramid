@@ -28,6 +28,21 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(settings['reload_templates'], False)
         self.assertEqual(settings['reload_resources'], False)
 
+    def test_prevent_http_cache(self):
+        settings = self._makeOne({})
+        self.assertEqual(settings['prevent_http_cache'], False)
+        result = self._makeOne({'prevent_http_cache':'false'})
+        self.assertEqual(result['prevent_http_cache'], False)
+        result = self._makeOne({'prevent_http_cache':'t'})
+        self.assertEqual(result['prevent_http_cache'], True)
+        result = self._makeOne({'prevent_http_cache':'1'})
+        self.assertEqual(result['prevent_http_cache'], True)
+        result = self._makeOne({}, {'PYRAMID_PREVENT_HTTP_CACHE':'1'})
+        self.assertEqual(result['prevent_http_cache'], True)
+        result = self._makeOne({'prevent_http_cache':'false'},
+                             {'PYRAMID_PREVENT_HTTP_CACHE':'1'})
+        self.assertEqual(result['prevent_http_cache'], True)
+
     def test_reload_templates(self):
         settings = self._makeOne({})
         self.assertEqual(settings['reload_templates'], False)

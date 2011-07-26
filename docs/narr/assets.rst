@@ -35,6 +35,9 @@ static assets.  For example, there's a ``static`` directory which contains
 ``.css``, ``.js``, and ``.gif`` files.  These asset files are delivered when
 a user visits an application URL.
 
+.. index::
+   single: asset specifications
+
 .. _asset_specifications:
 
 Understanding Asset Specifications
@@ -85,6 +88,7 @@ individual documentation.
 
 .. index::
    single: add_static_view
+   pair: assets; serving
 
 .. _static_assets_section:
 
@@ -186,6 +190,7 @@ discussed in more detail later in this chapter.
 .. index::
    single: generating static asset urls
    single: static asset urls
+   pair:   assets; generating urls
 
 .. _generating_static_asset_urls:
 
@@ -299,7 +304,7 @@ URLs against assets made accessible by registering a custom static view.
 Root-Relative Custom Static View (URL Dispatch Only)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :class:`pyramid.view.static` helper class generates a Pyramid view
+The :class:`pyramid.static.static_view` helper class generates a Pyramid view
 callable.  This view callable can serve static assets from a directory.  An
 instance of this class is actually used by the
 :meth:`~pyramid.config.Configurator.add_static_view` configuration method, so
@@ -310,26 +315,27 @@ its behavior is almost exactly the same once it's configured.
    exclusively.  The root-relative route we'll be registering will always be
    matched before traversal takes place, subverting any views registered via
    ``add_view`` (at least those without a ``route_name``).  A
-   :class:`~pyramid.view.static` static view cannot be made root-relative when
-   you use traversal.
+   :class:`~pyramid.static.static_view` static view cannot be made
+   root-relative when you use traversal unless it's registered as a
+   :term:`Not Found view`.
 
 To serve files within a directory located on your filesystem at
 ``/path/to/static/dir`` as the result of a "catchall" route hanging from the
 root that exists at the end of your routing table, create an instance of the
-:class:`~pyramid.view.static` class inside a ``static.py`` file in your
-application root as below.
+:class:`~pyramid.static.static_view` class inside a ``static.py`` file in
+your application root as below.
 
 .. ignore-next-block
 .. code-block:: python
    :linenos:
 
-   from pyramid.view import static
-   static_view = static('/path/to/static/dir')
+   from pyramid.static import static
+   static_view = static_view('/path/to/static/dir', use_subpath=True)
 
 .. note:: For better cross-system flexibility, use an :term:`asset
-   specification` as the argument to :class:`~pyramid.view.static` instead of
-   a physical absolute filesystem path, e.g. ``mypackage:static`` instead of
-   ``/path/to/mypackage/static``.
+   specification` as the argument to :class:`~pyramid.static.static_view`
+   instead of a physical absolute filesystem path, e.g. ``mypackage:static``
+   instead of ``/path/to/mypackage/static``.
 
 Subsequently, you may wire the files that are served by this view up to be
 accessible as ``/<filename>`` using a configuration method in your
@@ -345,8 +351,8 @@ application's startup code.
    config.add_view('myapp.static.static_view', route_name='catchall_static')
 
 The special name ``*subpath`` above is used by the
-:class:`~pyramid.view.static` view callable to signify the path of the file
-relative to the directory you're serving.
+:class:`~pyramid.static.static_view` view callable to signify the path of the
+file relative to the directory you're serving.
 
 Registering A View Callable to Serve a "Static" Asset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -425,10 +431,10 @@ feature, a :term:`Configurator` API exists named
 - A directory containing multiple Chameleon templates.
 
 - Individual static files served up by an instance of the
-  ``pyramid.view.static`` helper class.
+  ``pyramid.static.static_view`` helper class.
 
 - A directory of static files served up by an instance of the
-  ``pyramid.view.static`` helper class.
+  ``pyramid.static.static_view`` helper class.
 
 - Any other asset (or set of assets) addressed by code that uses the
   setuptools :term:`pkg_resources` API.

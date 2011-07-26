@@ -10,11 +10,8 @@
 ==============================
 
 :app:`Pyramid` is a general, open source, Python web application development
-*framework*. Its primary goal is to make it easier for a developer to create
-web applications. The type of application being created could be a
-spreadsheet, a corporate intranet, or a social networking platform; Pyramid's
-generality enables it to be used to build an unconstrained variety of web
-applications.
+*framework*. Its primary goal is to make it easier for a Python developer to
+create web applications.
 
 .. sidebar:: Frameworks vs. Libraries
 
@@ -33,34 +30,30 @@ applications.
    own via a set of libraries if the framework provides a set of
    facilities that fits your application requirements.
 
-The first release of Pyramid's predecessor (named :mod:`repoze.bfg`) was made
-in July of 2008. We have worked hard to ensure that Pyramid continues to
-follow the design and engineering principles that we consider to be the core
-characteristics of a successful framework:
+Pyramid attempts to follow these design and engineering principles:
 
 Simplicity
-  :app:`Pyramid` takes a *"pay only for what you eat"* approach.  This means
-  that you can get results even if you have only a partial understanding of
-  :app:`Pyramid`.  It doesn’t force you to use any particular technology to
-  produce an application, and we try to keep the core set of concepts that
-  you need to understand to a minimum.
+  :app:`Pyramid` takes a *"pay only for what you eat"* approach.  You can get
+  results even if you have only a partial understanding of :app:`Pyramid`.
+  It doesn’t force you to use any particular technology to produce an
+  application, and we try to keep the core set of concepts that you need to
+  understand to a minimum.
 
 Minimalism
-  :app:`Pyramid` concentrates on providing fast, high-quality solutions to
-  the fundamental problems of creating a web application: the mapping of URLs
-  to code, templating, security and serving static assets. We consider these
-  to be the core activities that are common to nearly all web applications.
+  :app:`Pyramid` tries to solve only the the fundamental problems of creating
+  a web application: the mapping of URLs to code, templating, security and
+  serving static assets. We consider these to be the core activities that are
+  common to nearly all web applications.
 
 Documentation
-  Pyramid's minimalism means that it is relatively easy for us to maintain
-  extensive and up-to-date documentation. It is our goal that no aspect of
-  Pyramid remains undocumented.
+  Pyramid's minimalism means that it is easier for us to maintain complete
+  and up-to-date documentation. It is our goal that no aspect of Pyramid
+  is undocumented.
 
 Speed
   :app:`Pyramid` is designed to provide noticeably fast execution for common
-  tasks such as templating and simple response generation. Although the
-  “hardware is cheap” mantra may appear to offer a ready solution to speed
-  problems, the limits of this approach become painfully evident when one
+  tasks such as templating and simple response generation. Although “hardware
+  is cheap", the limits of this approach become painfully evident when one
   finds him or herself responsible for managing a great many machines.
 
 Reliability
@@ -74,16 +67,14 @@ Openness
   open source license <http://repoze.org/license.html>`_.
 
 .. index::
-   single: Pylons
-   single: Agendaless Consulting
-   single: repoze namespace package
+   single: Pylons Project
 
 What Is The Pylons Project?
 ---------------------------
 
 :app:`Pyramid` is a member of the collection of software published under the
 Pylons Project.  Pylons software is written by a loose-knit community of
-contributors.  The `Pylons Project website <http://docs.pylonsproject.org>`_
+contributors.  The `Pylons Project website <http://pylonsproject.org>`_
 includes details about how :app:`Pyramid` relates to the Pylons Project.
 
 .. index::
@@ -96,23 +87,22 @@ includes details about how :app:`Pyramid` relates to the Pylons Project.
 :app:`Pyramid` and Other Web Frameworks
 ------------------------------------------
 
-Until the end of 2010, :app:`Pyramid` was known as :mod:`repoze.bfg`; it was
-merged into the Pylons project as :app:`Pyramid` in November of that year.
+The first release of Pyramid's predecessor (named :mod:`repoze.bfg`) was made
+in July of 2008.  At the end of 2010, we changed the name of
+:mod:`repoze.bfg` to :app:`Pyramid`.  It was merged into the Pylons project
+as :app:`Pyramid` in November of that year.
 
 :app:`Pyramid` was inspired by :term:`Zope`, :term:`Pylons` (version
 1.0) and :term:`Django`.  As a result, :app:`Pyramid` borrows several
 concepts and features from each, combining them into a unique web
 framework.
 
-Many features of :app:`Pyramid` trace their origins back to
-:term:`Zope`.  Like Zope applications, :app:`Pyramid` applications
-can be configured via a set of declarative configuration files.  Like
-Zope applications, :app:`Pyramid` applications can be easily
-extended: if you obey certain constraints, the application you produce
-can be reused, modified, re-integrated, or extended by third-party
-developers without forking the original application.  The concepts of
-:term:`traversal` and declarative security in :app:`Pyramid` were
-pioneered first in Zope.
+Many features of :app:`Pyramid` trace their origins back to :term:`Zope`.
+Like Zope applications, :app:`Pyramid` applications can be easily extended:
+if you obey certain constraints, the application you produce can be reused,
+modified, re-integrated, or extended by third-party developers without
+forking the original application.  The concepts of :term:`traversal` and
+declarative security in :app:`Pyramid` were pioneered first in Zope.
 
 The :app:`Pyramid` concept of :term:`URL dispatch` is inspired by the
 :term:`Routes` system used by :term:`Pylons` version 1.0.  Like Pylons
@@ -127,15 +117,14 @@ The concept of :term:`view` is used by :app:`Pyramid` mostly as it would be
 by Django.  :app:`Pyramid` has a documentation culture more like Django's
 than like Zope's.
 
-Like :term:`Pylons` version 1.0, but unlike :term:`Zope`, a
-:app:`Pyramid` application developer may use completely imperative
-code to perform common framework configuration tasks such as adding a
-view or a route.  In Zope, :term:`ZCML` is typically required for
-similar purposes.  In :term:`Grok`, a Zope-based web framework,
-:term:`decorator` objects and class-level declarations are used for
-this purpose.  :app:`Pyramid` supports :term:`ZCML` and
-decorator-based configuration, but does not require either. See
-:ref:`configuration_narr` for more information.
+Like :term:`Pylons` version 1.0, but unlike :term:`Zope`, a :app:`Pyramid`
+application developer may use completely imperative code to perform common
+framework configuration tasks such as adding a view or a route.  In Zope,
+:term:`ZCML` is typically required for similar purposes.  In :term:`Grok`, a
+Zope-based web framework, :term:`decorator` objects and class-level
+declarations are used for this purpose.  :app:`Pyramid` supports :term:`ZCML`
+and decorator-based :term:`declarative configuration`, but does not require
+either. See :ref:`configuration_narr` for more information.
 
 Also unlike :term:`Zope` and unlike other "full-stack" frameworks such
 as :term:`Django`, :app:`Pyramid` makes no assumptions about which

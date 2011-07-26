@@ -218,7 +218,7 @@ Another (deprecated) mechanism which allows event subscribers more control
 when adding renderer global values exists in :ref:`adding_renderer_globals`.
 
 .. index::
-   single: renderer globals
+   single: adding renderer globals
 
 .. _adding_renderer_globals:
 
@@ -284,8 +284,8 @@ Using Response Callbacks
 
 Unlike many other web frameworks, :app:`Pyramid` does not eagerly create a
 global response object.  Adding a :term:`response callback` allows an
-application to register an action to be performed against a response object
-once it is created, usually in order to mutate it.
+application to register an action to be performed against whatever response
+object is returned by a view, usually in order to mutate the response.
 
 The :meth:`pyramid.request.Request.add_response_callback` method is used to
 register a response callback.
@@ -528,6 +528,7 @@ The default context URL generator is available for perusal as the class
 
 .. index::
    single: IResponse
+   single: special view responses
 
 .. _using_iresponse:
 
@@ -614,6 +615,9 @@ If you want to implement your own Response object instead of using the
 to make sure the object implements every attribute and method outlined in
 :class:`pyramid.interfaces.IResponse` and you'll have to ensure that it's
 marked up with ``zope.interface.implements(IResponse)``:
+
+.. code-block:: python
+   :linenos:
 
    from pyramid.interfaces import IResponse
    from zope.interface import implements

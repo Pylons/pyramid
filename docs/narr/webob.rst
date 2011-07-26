@@ -243,6 +243,9 @@ tuples; all the keys are ordered, and all the values are ordered.
 API documentation for a multidict exists as
 :class:`pyramid.interfaces.IMultiDict`.
 
+.. index::
+   pair: json_body; request
+
 .. _request_json_body:
 
 Dealing With A JSON-Encoded Request Body
@@ -292,6 +295,20 @@ For the above view, printed to the console will be:
 .. code-block:: python
 
     {u'a': 1}
+
+For bonus points, here's a bit of client-side code that will produce a
+request that has a body suitable for reading via ``request.json_body`` using
+Python's ``urllib2`` instead of a Javascript AJAX request:
+
+.. code-block:: python
+
+    import urllib2
+    import json        
+
+    json_payload = json.dumps({'a':1})
+    headers = {'Content-Type':'application/json; charset=utf-8'}
+    req = urllib2.Request('http://localhost:6543/', json_payload, headers)
+    resp = urllib2.urlopen(req)
 
 More Details
 ++++++++++++
@@ -408,7 +425,7 @@ anything, though if you subclass :class:`pyramid.response.Response` and set
 ``default_content_type`` you can override this behavior.
 
 .. index::
-   single: response exceptions
+   single: exception responses
 
 Exception Responses
 +++++++++++++++++++

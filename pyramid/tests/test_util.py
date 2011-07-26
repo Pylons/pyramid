@@ -175,3 +175,76 @@ class TestDottedNameResolver(unittest.TestCase):
         self.assertEqual(typ.package, None)
         self.assertEqual(typ.package_name, None)
 
+class Test_WeakOrderedSet(unittest.TestCase):
+    def _makeOne(self):
+        from pyramid.config import WeakOrderedSet
+        return WeakOrderedSet()
+
+    def test_ctor(self):
+        wos = self._makeOne()
+        self.assertEqual(len(wos), 0)
+        self.assertEqual(wos.last, None)
+
+    def test_add_item(self):
+        wos = self._makeOne()
+        reg = Dummy()
+        wos.add(reg)
+        self.assertEqual(list(wos), [reg])
+        self.assert_(reg in wos)
+        self.assertEqual(wos.last, reg)
+
+    def test_add_multiple_items(self):
+        wos = self._makeOne()
+        reg1 = Dummy()
+        reg2 = Dummy()
+        wos.add(reg1)
+        wos.add(reg2)
+        self.assertEqual(len(wos), 2)
+        self.assertEqual(list(wos), [reg1, reg2])
+        self.assert_(reg1 in wos)
+        self.assert_(reg2 in wos)
+        self.assertEqual(wos.last, reg2)
+
+    def test_add_duplicate_items(self):
+        wos = self._makeOne()
+        reg = Dummy()
+        wos.add(reg)
+        wos.add(reg)
+        self.assertEqual(len(wos), 1)
+        self.assertEqual(list(wos), [reg])
+        self.assert_(reg in wos)
+        self.assertEqual(wos.last, reg)
+
+    def test_weakref_removal(self):
+        wos = self._makeOne()
+        reg = Dummy()
+        wos.add(reg)
+        wos.remove(reg)
+        self.assertEqual(len(wos), 0)
+        self.assertEqual(list(wos), [])
+        self.assertEqual(wos.last, None)
+
+    def test_last_updated(self):
+        wos = self._makeOne()
+        reg = Dummy()
+        reg2 = Dummy()
+        wos.add(reg)
+        wos.add(reg2)
+        wos.remove(reg2)
+        self.assertEqual(len(wos), 1)
+        self.assertEqual(list(wos), [reg])
+        self.assertEqual(wos.last, reg)
+
+    def test_empty(self):
+        wos = self._makeOne()
+        reg = Dummy()
+        reg2 = Dummy()
+        wos.add(reg)
+        wos.add(reg2)
+        wos.empty()
+        self.assertEqual(len(wos), 0)
+        self.assertEqual(list(wos), [])
+        self.assertEqual(wos.last, None)
+
+class Dummy(object):
+    pass

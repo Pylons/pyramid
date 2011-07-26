@@ -1,3 +1,296 @@
+Next release
+============
+
+Features
+--------
+
+- The ``pyramid.events.BeforeRender`` event now has an attribute named
+  ``rendering_val``.  This can be used to introspect the value returned by a
+  view in a BeforeRender subscriber.
+
+- New configurator directive:
+  ``pyramid.config.Configurator.add_request_handler``.  This directive adds
+  a request handler factory.
+
+  A request handler factory is used to wrap the Pyramid router's primary
+  request handling function.  This is a feature may be used by framework
+  extensions, to provide, for example, view timing support and as a
+  convenient place to hang bookkeeping code that examines exceptions before
+  they are returned to the server.
+
+  A request handler factory (passed as ``handler_factory``) must be a
+  callable which accepts two arguments: ``handler`` and ``registry``.
+  ``handler`` will be the request handler being wrapped.  ``registry`` will
+  be the Pyramid application registry represented by this Configurator.  A
+  request handler factory must return a request handler when it is called.
+
+  A request handler accepts a request object and returns a response object.
+
+  Here's an example of creating both a handler factory and a handler, and
+  registering the handler factory:
+
+  .. code-block:: python
+
+       import time
+
+       def timing_handler_factory(handler, registry):
+           if registry.settings['do_timing']:
+               # if timing support is enabled, return a wrapper
+               def timing_handler(request):
+                   start = time.time()
+                   try:
+                       response = handler(request)
+                   finally:
+                       end = time.time()
+                       print: 'The request took %s seconds' % (end - start)
+                   return response
+               return timing_handler
+           # if timing support is not enabled, return the original handler
+           return handler
+
+       config.add_request_handler(timing_handler_factory, 'timing')
+
+  The ``request`` argument to the handler will be the request created by
+  Pyramid's router when it receives a WSGI request.
+
+  If more than one request handler factory is registered into a single
+  configuration, the request handlers will be chained together.  The first
+  request handler factory added (in code execution order) will be called with
+  the default Pyramid request handler, the second handler factory added will
+  be called with the result of the first handler factory, ad infinitum. The
+  Pyramid router will use the outermost wrapper in this chain (which is a bit
+  like a WSGI middleware "pipeline") as its handler function.
+
+  The ``name`` argument to this function is required.  The name is used as a
+  key for conflict detection.  No two request handler factories may share the
+  same name in the same configuration (unless automatic_conflict_resolution
+  is able to resolve the conflict or this is an autocommitting configurator).
+
+- The Pyramid debug logger now uses the standard logging configuration
+  (usually set up by Paste as part of startup).  This means that output from
+  e.g. ``debug_notfound``, ``debug_authorization``, etc. will go to the
+  normal logging channels.  The logger name of the debug logger will be the
+  package name of the *caller* of the Configurator's constructor.
+
+Backwards Incompatibilities
+---------------------------
+
+- If a string is passed as the ``debug_logger`` parameter to a Configurator,
+  that string is considered to be the name of a global Python logger rather
+  than a dotted name to an instance of a logger.
+
+1.1 (2011-07-22)
+================
+
+Features
+--------
+
+- Added the ``pyramid.renderers.null_renderer`` object as an API.  The null
+  renderer is an object that can be used in advanced integration cases as
+  input to the view configuration ``renderer=`` argument.  When the null
+  renderer is used as a view renderer argument, Pyramid avoids converting the
+  view callable result into a Response object.  This is useful if you want to
+  reuse the view configuration and lookup machinery outside the context of
+  its use by the Pyramid router.  This feature was added for consumption by
+  the ``pyramid_rpc`` package, which uses view configuration and lookup
+  outside the context of a router in exactly this way.  ``pyramid_rpc`` has
+  been broken under 1.1 since 1.1b1; adding it allows us to make it work
+  again.
+
+- Change all scaffolding templates that point to docs.pylonsproject.org to
+  use ``/projects/pyramid/current`` rather than ``/projects/pyramid/dev``.
+
+Internals
+---------
+
+- Remove ``compat`` code that served only the purpose of providing backwards
+  compatibility with Python 2.4.
+
+- Add a deprecation warning for non-API function
+  ``pyramid.renderers.renderer_from_name`` which has seen use in the wild.
+
+- Add a ``clone`` method to ``pyramid.renderers.RendererHelper`` for use by
+  the ``pyramid.view.view_config`` decorator.
+
+Documentation
+-------------
+
+- Fixed two typos in wiki2 (SQLA + URL Dispatch) tutorial.
+
+- Reordered chapters in narrative section for better new user friendliness.
+
+- Added more indexing markers to sections in documentation.
+
+1.1b4 (2011-07-18)
+==================
+
+Documentation
+-------------
+
+- Added a section entitled "Writing a Script" to the "Command-Line Pyramid"
+  chapter.
+
+Backwards Incompatibilities
+---------------------------
+
+- We added the ``pyramid.scripting.make_request`` API too hastily in 1.1b3.
+  It has been removed.  Sorry for any inconvenience.  Use the
+  ``pyramid.request.Request.blank`` API instead.
+
+Features
+--------
+
+- The ``paster pshell``, ``paster pviews``, and ``paster proutes`` commands
+  each now under the hood uses ``pyramid.paster.bootstrap``, which makes it
+  possible to supply an ``.ini`` file without naming the "right" section in
+  the file that points at the actual Pyramid application.  Instead, you can
+  generally just run ``paster {pshell|proutes|pviews} development.ini`` and
+  it will do mostly the right thing.
+
+Bug Fixes
+---------
+
+- Omit custom environ variables when rendering a custom exception template in
+  ``pyramid.httpexceptions.WSGIHTTPException._set_default_attrs``;
+  stringifying thse may trigger code that should not be executed; see
+  https://github.com/Pylons/pyramid/issues/239
+
+1.1b3 (2011-07-15)
+==================
+
+Features
+--------
+
+- Fix corner case to ease semifunctional testing of views: create a new
+  rendererinfo to clear out old registry on a rescan.  See
+  https://github.com/Pylons/pyramid/pull/234.
+
+- New API class: ``pyramid.static.static_view``.  This supersedes the
+  deprecated ``pyramid.view.static`` class.  ``pyramid.static.static_view``
+  by default serves up documents as the result of the request's
+  ``path_info``, attribute rather than it's ``subpath`` attribute (the
+  inverse was true of ``pyramid.view.static``, and still is).
+  ``pyramid.static.static_view`` exposes a ``use_subpath`` flag for use when
+  you want the static view to behave like the older deprecated version.
+
+- A new API function ``pyramid.paster.bootstrap`` has been added to make
+  writing scripts that bootstrap a Pyramid environment easier, e.g.::
+
+      from pyramid.paster import bootstrap
+      info = bootstrap('/path/to/my/development.ini')
+      request = info['request']
+      print request.route_url('myroute')
+
+- A new API function ``pyramid.scripting.prepare`` has been added.  It is a
+  lower-level analogue of ``pyramid.paster.boostrap`` that accepts a request
+  and a registry instead of a config file argument, and is used for the same
+  purpose::
+
+      from pyramid.scripting import prepare
+      info = prepare(registry=myregistry)
+      request = info['request']
+      print request.route_url('myroute')
+
+- A new API function ``pyramid.scripting.make_request`` has been added.  The
+  resulting request will have a ``registry`` attribute.  It is meant to be
+  used in conjunction with ``pyramid.scripting.prepare`` and/or
+  ``pyramid.paster.bootstrap`` (both of which accept a request as an
+  argument)::
+
+      from pyramid.scripting import make_request
+      request = make_request('/')
+
+- New API attribute ``pyramid.config.global_registries`` is an iterable
+  object that contains references to every Pyramid registry loaded into the
+  current process via ``pyramid.config.Configurator.make_app``.  It also has
+  a ``last`` attribute containing the last registry loaded.  This is used by
+  the scripting machinery, and is available for introspection.
+
+Deprecations
+------------
+
+- The ``pyramid.view.static`` class has been deprecated in favor of the newer
+  ``pyramid.static.static_view`` class.  A deprecation warning is raised when
+  it is used.  You should replace it with a reference to
+  ``pyramid.static.static_view`` with the ``use_subpath=True`` argument.
+
+Bug Fixes
+---------
+
+- Without a mo-file loaded for the combination of domain/locale,
+  ``pyramid.i18n.Localizer.pluralize`` run using that domain/locale
+  combination raised an inscrutable "translations object has no attr
+  'plural'" error.  Now, instead it "works" (it uses a germanic pluralization
+  by default).  It's nonsensical to try to pluralize something without
+  translations for that locale/domain available, but this behavior matches
+  the behavior of ``pyramid.i18n.Localizer.translate`` so it's at least
+  consistent; see https://github.com/Pylons/pyramid/issues/235.
+
+1.1b2 (2011-07-13)
+==================
+
+Features
+--------
+
+- New environment setting ``PYRAMID_PREVENT_HTTP_CACHE`` and new
+  configuration file value ``prevent_http_cache``.  These are synomymous and
+  allow you to prevent HTTP cache headers from being set by Pyramid's
+  ``http_cache`` machinery globally in a process.  see the "Influencing HTTP
+  Caching" section of the "View Configuration" narrative chapter and the
+  detailed documentation for this setting in the "Environment Variables and
+  Configuration Settings" narrative chapter.
+
+Behavior Changes
+----------------
+
+- Previously, If a ``BeforeRender`` event subscriber added a value via the
+  ``__setitem__`` or ``update`` methods of the event object with a key that
+  already existed in the renderer globals dictionary, a ``KeyError`` was
+  raised.  With the deprecation of the "add_renderer_globals" feature of the
+  configurator, there was no way to override an existing value in the
+  renderer globals dictionary that already existed.  Now, the event object
+  will overwrite an older value that is already in the globals dictionary
+  when its ``__setitem__`` or ``update`` is called (as well as the new
+  ``setdefault`` method), just like a plain old dictionary.  As a result, for
+  maximum interoperability with other third-party subscribers, if you write
+  an event subscriber meant to be used as a BeforeRender subscriber, your
+  subscriber code will now need to (using ``.get`` or ``__contains__`` of the
+  event object) ensure no value already exists in the renderer globals
+  dictionary before setting an overriding value.
+
+Bug Fixes
+---------
+
+- The ``Configurator.add_route`` method allowed two routes with the same
+  route to be added without an intermediate ``config.commit()``.  If you now
+  receive a ``ConfigurationError`` at startup time that appears to be
+  ``add_route`` related, you'll need to either a) ensure that all of your
+  route names are unique or b) call ``config.commit()`` before adding a
+  second route with the name of a previously added name or c) use a
+  Configurator that works in ``autocommit`` mode.
+
+- The ``pyramid_routesalchemy`` and ``pyramid_alchemy`` scaffolds
+  inappropriately used ``DBSession.rollback()`` instead of
+  ``transaction.abort()`` in one place.
+
+- We now clear ``request.response`` before we invoke an exception view; an
+  exception view will be working with a request.response that has not been
+  touched by any code prior to the exception.
+
+- Views associated with routes with spaces in the route name may not have
+  been looked up correctly when using Pyramid with ``zope.interface`` 3.6.4
+  and better.  See https://github.com/Pylons/pyramid/issues/232.
+
+Documentation
+-------------
+
+- Wiki2 (SQLAlchemy + URL Dispatch) tutorial ``models.initialize_sql`` didn't
+  match the ``pyramid_routesalchemy`` scaffold function of the same name; it
+  didn't get synchronized when it was changed in the scaffold.
+
+- New documentation section in View Configuration narrative chapter:
+  "Influencing HTTP Caching".
+
 1.1b1 (2011-07-10)
 ==================
 

@@ -48,7 +48,11 @@ class Settings(dict):
         eff_reload_assets = reload_assets or reload_resources
         locale_name = self.get('default_locale_name', 'en')
         eff_locale_name = eget('PYRAMID_DEFAULT_LOCALE_NAME', locale_name)
-        
+
+        config_prevent_http_cache = self.get('prevent_http_cache', '')
+        eff_prevent_http_cache = asbool(eget('PYRAMID_PREVENT_HTTP_CACHE',
+                                             config_prevent_http_cache))
+
         update = {
             'debug_authorization': eff_debug_all or eff_debug_auth,
             'debug_notfound': eff_debug_all or eff_debug_notfound,
@@ -58,6 +62,7 @@ class Settings(dict):
             'reload_resources':eff_reload_all or eff_reload_assets,
             'reload_assets':eff_reload_all or eff_reload_assets,
             'default_locale_name':eff_locale_name,
+            'prevent_http_cache':eff_prevent_http_cache,
             }
 
         self.update(update)

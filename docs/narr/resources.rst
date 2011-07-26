@@ -286,6 +286,9 @@ The shortcut method of the :term:`request` named
 For more information about generating resource URLs, see the documentation
 for :func:`pyramid.url.resource_url`.
 
+.. index::
+   pair: resource URL generation; overriding
+
 .. _overriding_resource_url_generation:
 
 Overriding Resource URL Generation
@@ -333,6 +336,9 @@ qualified, should end in a slash, and should not contain any query string or
 anchor elements (only path elements) to work best with
 :func:`~pyramid.url.resource_url`.
 
+.. index::
+   single: resource path generation
+
 Generating the Path To a Resource
 ---------------------------------
 
@@ -367,6 +373,9 @@ The resource passed in must be :term:`location`-aware.
 
 The presence or absence of a :term:`virtual root` has no impact on the
 behavior of :func:`~pyramid.traversal.resource_path`.
+
+.. index::
+   pair: resource; finding by path
 
 Finding a Resource by Path
 --------------------------
@@ -403,6 +412,9 @@ tree does not exist), a :exc:`KeyError` will be raised.
 
 See the :func:`pyramid.traversal.find_resource` documentation for more
 information about resolving a path to a resource.
+
+.. index::
+   pair: resource; lineage
 
 Obtaining the Lineage of a Resource
 -----------------------------------
@@ -470,6 +482,9 @@ resource2)``.  ``resource1`` is 'inside' ``resource2`` if ``resource2`` is a
 parent (or one of its parent's parents, etc.) is an ancestor.
 
 See :func:`pyramid.location.inside` for more information.
+
+.. index::
+   pair: resource; finding root
 
 Finding the Root Resource
 -------------------------
@@ -616,6 +631,9 @@ directly provided by an instance instead of overwriting them like
 
 For more information about how resource interfaces can be used by view
 configuration, see :ref:`using_resource_interfaces`.
+
+.. index::
+   pair: resource; finding by interface or class
 
 Finding a Resource With a Class or Interface in Lineage
 -------------------------------------------------------

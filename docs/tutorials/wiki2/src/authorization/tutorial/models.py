@@ -41,7 +41,7 @@ def initialize_sql(engine):
         transaction.commit()
     except IntegrityError:
         # already created
-        pass
+        transaction.abort()
 
 class RootFactory(object):
     __acl__ = [ (Allow, Everyone, 'view'),

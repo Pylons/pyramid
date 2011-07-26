@@ -284,13 +284,18 @@ class IBeforeRender(Interface):
     """
     def __setitem__(name, value):
         """ Set a name/value pair into the dictionary which is passed to a
-        renderer as the renderer globals dictionary.  If the ``name`` already
-        exists in the target dictionary, a :exc:`KeyError` will be raised."""
+        renderer as the renderer globals dictionary.  """
+
+    def setdefault(name, default=None):
+        """ Return the existing value for ``name`` in the renderers globals
+        dictionary.  If no value with ``name`` exists in the dictionary, set
+        the ``default`` value into the renderer globals dictionary under the
+        name passed.  If a value already existed in the dictionary, return
+        it.  If a value did not exist in the dictionary, return the default"""
 
     def update(d):
         """ Update the renderer globals dictionary with another dictionary
-        ``d``.  If any of the key names in the source dictionary already exist
-        in the target dictionary, a :exc:`KeyError` will be raised"""
+        ``d``.  """
 
     def __contains__(k):
         """ Return ``True`` if ``k`` exists in the renderer globals
@@ -303,6 +308,10 @@ class IBeforeRender(Interface):
     def get(k, default=None):
         """ Return the value for key ``k`` from the renderer globals
         dictionary, or the default if no such value exists."""
+
+    rendering_val = Attribute('The value returned by a view or passed to a '
+                              '``render`` method for this rendering. '
+                              'This feature is new in Pyramid 1.1.1.')
 
 class IRenderer(Interface):
     def __call__(value, system):
@@ -436,6 +445,24 @@ class IMultiDict(Interface): # docs-only interface
 
 class IRequest(Interface):
     """ Request type interface attached to all request objects """
+
+class IRequestHandlerFactories(Interface):
+    """ Marker interface for utility registration representing the ordered
+    set of a configuration's request handler factories"""
+
+class IRequestHandlerFactory(Interface):
+    """ A request handler factory can be used to augment Pyramid's default
+    mainloop request handling."""
+    def __call__(self, handler, registry):
+        """ Return an IRequestHandler; the ``handler`` argument passed will
+        be the previous request handler added, or the default request handler
+        if no request handlers have yet been added ."""
+
+class IRequestHandler(Interface):
+    """ """
+    def __call__(self, request):
+        """ Must return an IResponse or raise an exception.  The ``request``
+        argument will be an instance of an object that provides IRequest."""
 
 IRequest.combined = IRequest # for exception view lookups 
 
@@ -861,4 +888,3 @@ class IRendererInfo(Interface):
     settings = Attribute('The deployment settings dictionary related '
                          'to the current application')
     
-

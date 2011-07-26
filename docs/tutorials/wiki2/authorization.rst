@@ -54,7 +54,7 @@ inside our ``models.py`` file.  Add the following statements to your
 ``models.py`` file:
 
 .. literalinclude:: src/authorization/tutorial/models.py
-   :lines: 3-4,45-49
+   :lines: 3-4,45-50
    :linenos:
    :language: python
 
@@ -228,7 +228,7 @@ We'll then change the return value of these views to pass the `resulting
 .. code-block:: python
    :linenos:
 
-   return dict(page = context,
+   return dict(page = page,
                content = content,
                logged_in = logged_in,
                edit_url = edit_url)

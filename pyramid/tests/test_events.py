@@ -179,9 +179,9 @@ class TestSubscriber(unittest.TestCase):
                          [(foo, dec.register, 'pyramid')])
 
 class TestBeforeRender(unittest.TestCase):
-    def _makeOne(self, system):
+    def _makeOne(self, system, val=None):
         from pyramid.events import BeforeRender
-        return BeforeRender(system)
+        return BeforeRender(system, val)
 
     def test_instance_conforms(self):
         from zope.interface.verify import verifyObject
@@ -195,21 +195,26 @@ class TestBeforeRender(unittest.TestCase):
         event['a'] = 1
         self.assertEqual(system, {'a':1})
 
-    def test_setitem_fail(self):
-        system = {'a':1}
+    def test_setdefault_fail(self):
+        system = {}
         event = self._makeOne(system)
-        self.assertRaises(KeyError, event.__setitem__, 'a',  1)
+        result = event.setdefault('a', 1)
+        self.assertEqual(result, 1)
+        self.assertEqual(system, {'a':1})
+        
+    def test_setdefault_success(self):
+        system = {}
+        event = self._makeOne(system)
+        event['a'] = 1
+        result = event.setdefault('a', 2)
+        self.assertEqual(result, 1)
+        self.assertEqual(system, {'a':1})
 
     def test_update_success(self):
         system = {'a':1}
         event = self._makeOne(system)
         event.update({'b':2})
         self.assertEqual(system, {'a':1, 'b':2})
-
-    def test_update_fail(self):
-        system = {'a':1}
-        event = self._makeOne(system)
-        self.assertRaises(KeyError, event.update, {'a':1})
 
     def test__contains__True(self):
         system = {'a':1}
@@ -241,6 +246,11 @@ class TestBeforeRender(unittest.TestCase):
         event = self._makeOne(system)
         self.assertEqual(event.get('a'), None)
 
+    def test_rendering_val(self):
+        system = {}
+        val = {}
+        event = self._makeOne(system, val)
+        self.assertTrue(event.rendering_val is val)
 
 class DummyConfigurator(object):
     def __init__(self):
