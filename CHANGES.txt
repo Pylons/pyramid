@@ -4,6 +4,10 @@ Next release
 Features
 --------
 
+- Added a decorator-based way to configure a response adapter:
+  ``pyramid.response.response_adapter``.  This decorator has the same use as
+  ``pyramid.config.Configurator.add_response_adapter`` but it's declarative.
+
 - The ``pyramid.events.BeforeRender`` event now has an attribute named
   ``rendering_val``.  This can be used to introspect the value returned by a
   view in a BeforeRender subscriber.

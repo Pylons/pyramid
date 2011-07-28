@@ -661,7 +661,7 @@ class Configurator(object):
         """ Return a new Configurator instance with the same registry
         as this configurator using the package supplied as the
         ``package`` argument to the new configurator.  ``package`` may
-        be an actual Python package object or a Python dotted name
+        be an actual Python package object or a :term:`dotted Python name`
         representing a package."""
         context = self._ctx
         if context is None:
@@ -901,7 +901,7 @@ class Configurator(object):
         the server.
 
         A request handler factory (passed as ``handler_factory``) must be a
-        callable (or a :term:`Python dotted name` to a callable) which
+        callable (or a :term:`dotted Python name` to a callable) which
         accepts two arguments: ``handler`` and ``registry``.  ``handler``
         will be the request handler being wrapped.  ``registry`` will be the
         Pyramid :term:`application registry` represented by this

@@ -23,6 +23,11 @@ Glossary
      a subclass such as :class:`pyramid.httpexceptions.HTTPFound`.  See
      :ref:`webob_chapter` for information about response objects.
 
+   response adapter
+     A callable which accepts an arbitrary object and "converts" it to a
+     :class:`pyramid.response.Response` object.  See :ref:`using_iresponse`
+     for more information.
+
    Repoze
      "Repoze" is essentially a "brand" of software developed by `Agendaless
      Consulting <http://agendaless.com>`_ and a set of contributors.  The

@@ -9,11 +9,11 @@ class Response(_Response):
 
 
 class response_adapter(object):
-    """ Decorator activated via a :term:`scan` which treats the
-    function being decorated as a response adapter for the set of types or
+    """ Decorator activated via a :term:`scan` which treats the function
+    being decorated as a :term:`response adapter` for the set of types or
     interfaces passed as ``*types_or_ifaces`` to the decorator constructor.
 
-    For example:
+    For example, if you scan the following response adapter:
 
     .. code-block:: python
 
@@ -23,6 +23,9 @@ class response_adapter(object):
         @response_adapter(int)
         def myadapter(i):
             return Response(status=i)
+
+    You can then return an integer from your view callables, and it will be
+    converted into a response with the integer as the status code.
 
     More than one type or interface can be passed as a constructor argument.
     The decorated response adapter will be called for each type or interface.

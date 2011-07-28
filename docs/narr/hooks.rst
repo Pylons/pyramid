@@ -575,20 +575,6 @@ Response:
 
    config.add_response_adapter(string_response_adapter, str)
 
-The above example using the :class:`~pyramid.response.response_adapter`
-decorator:
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.response import Response
-   from pyramid.response import response_adapter
-
-   @response_adapter(str)
-   def string_response_adapter(s):
-       response = Response(s)
-       return response
-
 Likewise, if you want to be able to return a simplified kind of response
 object from view callables, you can use the IResponse hook to register an
 adapter to the more complex IResponse interface:
@@ -638,6 +624,29 @@ An IResponse adapter for ``webob.Response`` (as opposed to
 startup time, as by their nature, instances of this class (and instances of
 subclasses of the class) will natively provide IResponse.  The adapter
 registered for ``webob.Response`` simply returns the response object.
+
+Instead of using :meth:`pyramid.config.Configurator.add_response_adapter`,
+you can use the :class:`pyramid.response.response_adapter` decorator:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.response import Response
+   from pyramid.response import response_adapter
+
+   @response_adapter(str)
+   def string_response_adapter(s):
+       response = Response(s)
+       return response
+
+The above example, when scanned, has the same effect as:
+
+.. code-block:: python
+
+   config.add_response_adapter(string_response_adapter, str)
+
+The :class:`~pyramid.response.response_adapter` decorator will have no effect
+until activated by a :term:`scan`.
 
 .. index::
    single: view mapper
