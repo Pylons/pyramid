@@ -537,7 +537,8 @@ Changing How Pyramid Treats View Responses
 
 It is possible to control how Pyramid treats the result of calling a view
 callable on a per-type basis by using a hook involving
-:meth:`pyramid.config.Configurator.add_response_adapter`.
+:meth:`pyramid.config.Configurator.add_response_adapter` or the
+:class:`~pyramid.response.response_adapter` decorator.
 
 .. note:: This feature is new as of Pyramid 1.1.
 
@@ -573,6 +574,20 @@ Response:
    # config is an instance of pyramid.config.Configurator
 
    config.add_response_adapter(string_response_adapter, str)
+
+The above example using the :class:`~pyramid.response.response_adapter`
+decorator:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.response import Response
+   from pyramid.response import response_adapter
+
+   @response_adapter(str)
+   def string_response_adapter(s):
+       response = Response(s)
+       return response
 
 Likewise, if you want to be able to return a simplified kind of response
 object from view callables, you can use the IResponse hook to register an
