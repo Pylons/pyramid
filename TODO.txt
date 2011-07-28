@@ -4,6 +4,9 @@ Pyramid TODOs
 Should-Have
 -----------
 
+- Merge https://github.com/Pylons/pyramid/pull/242 (IPython update; requires
+  test fixes and additional test coverage).
+
 - Make "localizer" a property of request (instead of requiring
   "get_localizer(request)"
 
