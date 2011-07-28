@@ -144,3 +144,5 @@ Contributors
 - Christoph Zwerschke, 2011/06/07
 
 - Shane Hathaway, 2011/07/22
+
+- Manuel Hermann, 2011/07/11
