@@ -34,10 +34,14 @@ Should-Have
 
 - Fix indirect circular import between router and config.
 
+- Debug option to print view matching decision (e.g. debug_viewlookup or so).
+
+- Eliminate non-deployment-non-scaffold-related Paste dependencies:
+  ``paste.urlparser.StaticURLParser``, ``paste.auth.auth_tkt`` (cutnpaste or
+  reimplement both).
+
 Nice-to-Have
 ------------
-
-- Maybe add ``add_renderer_globals`` method to Configurator.
 
 - Speed up startup time (defer _bootstrap and registerCommonDirectives()
   until needed by ZCML, as well as unfound speedups).
@@ -76,13 +80,16 @@ Nice-to-Have
 
 - Create a function which performs a recursive request.
 
-- Debug option to print view matching decision.
-
 - Update App engine chapter with less creaky directions.
+
+Probably Bad Ideas
+------------------
 
 - Add functionality that mocks the behavior of ``repoze.browserid``.
 
 - Consider implementing the API outlined in
   http://plope.com/pyramid_auth_design_api_postmortem, phasing out the
   current auth-n-auth abstractions in a backwards compatible way.
+
+- Maybe add ``add_renderer_globals`` method to Configurator.
 
