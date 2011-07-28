@@ -9,3 +9,8 @@
    :members:
    :inherited-members:
 
+Functions
+~~~~~~~~~
+
+.. autofunction:: response_adapter
+
