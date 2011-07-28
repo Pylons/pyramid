@@ -20,7 +20,8 @@ Should-Have
   during a config.include (they are related, so just exposing the currently
   underscored-private _set_auth* methods won't cut it).
 
-- Rename all config file values with a ``pyramid.`` prefix.
+- Rename all config file values with a ``pyramid.`` prefix.  Preserve bw
+  compat, though, for older config files.
 
 - Try to figure out a way to keep "settings" as the original dictionary
   passed to the Configurator instead of copying it.
