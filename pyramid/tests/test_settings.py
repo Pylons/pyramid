@@ -37,10 +37,16 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result['prevent_http_cache'], True)
         result = self._makeOne({'prevent_http_cache':'1'})
         self.assertEqual(result['prevent_http_cache'], True)
+        result = self._makeOne({'pyramid.prevent_http_cache':'t'})
+        self.assertEqual(result['prevent_http_cache'], True)
         result = self._makeOne({}, {'PYRAMID_PREVENT_HTTP_CACHE':'1'})
         self.assertEqual(result['prevent_http_cache'], True)
-        result = self._makeOne({'prevent_http_cache':'false'},
-                             {'PYRAMID_PREVENT_HTTP_CACHE':'1'})
+        result = self._makeOne({'prevent_http_cache':'false',
+                                'pyramid.prevent_http_cache':'1'})
+        self.assertEqual(result['prevent_http_cache'], True)
+        result = self._makeOne({'prevent_http_cache':'false',
+                                'pyramid.prevent_http_cache':'f'},
+                               {'PYRAMID_PREVENT_HTTP_CACHE':'1'})
         self.assertEqual(result['prevent_http_cache'], True)
 
     def test_reload_templates(self):
@@ -52,10 +58,15 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result['reload_templates'], True)
         result = self._makeOne({'reload_templates':'1'})
         self.assertEqual(result['reload_templates'], True)
+        result = self._makeOne({'pyramid.reload_templates':'1'})
+        self.assertEqual(result['reload_templates'], True)
         result = self._makeOne({}, {'PYRAMID_RELOAD_TEMPLATES':'1'})
         self.assertEqual(result['reload_templates'], True)
+        result = self._makeOne({'reload_templates':'false',
+                                'pyramid.reload_templates':'1'})
+        self.assertEqual(result['reload_templates'], True)
         result = self._makeOne({'reload_templates':'false'},
-                             {'PYRAMID_RELOAD_TEMPLATES':'1'})
+                               {'PYRAMID_RELOAD_TEMPLATES':'1'})
         self.assertEqual(result['reload_templates'], True)
 
     def test_reload_resources(self):
@@ -72,11 +83,19 @@ class TestSettings(unittest.TestCase):
         result = self._makeOne({'reload_resources':'1'})
         self.assertEqual(result['reload_resources'], True)
         self.assertEqual(result['reload_assets'], True)
+        result = self._makeOne({'pyramid.reload_resources':'1'})
+        self.assertEqual(result['reload_resources'], True)
+        self.assertEqual(result['reload_assets'], True)
         result = self._makeOne({}, {'PYRAMID_RELOAD_RESOURCES':'1'})
         self.assertEqual(result['reload_resources'], True)
         self.assertEqual(result['reload_assets'], True)
-        result = self._makeOne({'reload_resources':'false'},
-                             {'PYRAMID_RELOAD_RESOURCES':'1'})
+        result = self._makeOne({'reload_resources':'false',
+                                'pyramid.reload_resources':'1'})
+        self.assertEqual(result['reload_resources'], True)
+        self.assertEqual(result['reload_assets'], True)
+        result = self._makeOne({'reload_resources':'false',
+                                'pyramid.reload_resources':'false'},
+                               {'PYRAMID_RELOAD_RESOURCES':'1'})
         self.assertEqual(result['reload_resources'], True)
         self.assertEqual(result['reload_assets'], True)
 
@@ -94,11 +113,19 @@ class TestSettings(unittest.TestCase):
         result = self._makeOne({'reload_assets':'1'})
         self.assertEqual(result['reload_assets'], True)
         self.assertEqual(result['reload_resources'], True)
+        result = self._makeOne({'pyramid.reload_assets':'1'})
+        self.assertEqual(result['reload_assets'], True)
+        self.assertEqual(result['reload_resources'], True)
         result = self._makeOne({}, {'PYRAMID_RELOAD_ASSETS':'1'})
         self.assertEqual(result['reload_assets'], True)
         self.assertEqual(result['reload_resources'], True)
-        result = self._makeOne({'reload_assets':'false'},
-                             {'PYRAMID_RELOAD_ASSETS':'1'})
+        result = self._makeOne({'reload_assets':'false',
+                                'pyramid.reload_assets':'1'})
+        self.assertEqual(result['reload_assets'], True)
+        self.assertEqual(result['reload_resources'], True)
+        result = self._makeOne({'reload_assets':'false',
+                                'pyramid.reload_assets':'false'},
+                               {'PYRAMID_RELOAD_ASSETS':'1'})
         self.assertEqual(result['reload_assets'], True)
         self.assertEqual(result['reload_resources'], True)
 
@@ -120,12 +147,22 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result['reload_templates'], True)
         self.assertEqual(result['reload_resources'], True)
         self.assertEqual(result['reload_assets'], True)
+        result = self._makeOne({'pyramid.reload_all':'1'})
+        self.assertEqual(result['reload_templates'], True)
+        self.assertEqual(result['reload_resources'], True)
+        self.assertEqual(result['reload_assets'], True)
         result = self._makeOne({}, {'PYRAMID_RELOAD_ALL':'1'})
         self.assertEqual(result['reload_templates'], True)
         self.assertEqual(result['reload_resources'], True)
         self.assertEqual(result['reload_assets'], True)
-        result = self._makeOne({'reload_all':'false'},
-                             {'PYRAMID_RELOAD_ALL':'1'})
+        result = self._makeOne({'reload_all':'false',
+                                'pyramid.reload_all':'1'})
+        self.assertEqual(result['reload_templates'], True)
+        self.assertEqual(result['reload_resources'], True)
+        self.assertEqual(result['reload_assets'], True)
+        result = self._makeOne({'reload_all':'false',
+                                'pyramid.reload_all':'false'},
+                               {'PYRAMID_RELOAD_ALL':'1'})
         self.assertEqual(result['reload_templates'], True)
         self.assertEqual(result['reload_resources'], True)
         self.assertEqual(result['reload_assets'], True)
@@ -139,10 +176,16 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result['debug_authorization'], True)
         result = self._makeOne({'debug_authorization':'1'})
         self.assertEqual(result['debug_authorization'], True)
+        result = self._makeOne({'pyramid.debug_authorization':'1'})
+        self.assertEqual(result['debug_authorization'], True)
         result = self._makeOne({}, {'PYRAMID_DEBUG_AUTHORIZATION':'1'})
         self.assertEqual(result['debug_authorization'], True)
-        result = self._makeOne({'debug_authorization':'false'},
-                             {'PYRAMID_DEBUG_AUTHORIZATION':'1'})
+        result = self._makeOne({'debug_authorization':'false',
+                                'pyramid.debug_authorization':'1'})
+        self.assertEqual(result['debug_authorization'], True)
+        result = self._makeOne({'debug_authorization':'false',
+                                'pyramid.debug_authorization':'false'},
+                               {'PYRAMID_DEBUG_AUTHORIZATION':'1'})
         self.assertEqual(result['debug_authorization'], True)
 
     def test_debug_notfound(self):
@@ -154,10 +197,16 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result['debug_notfound'], True)
         result = self._makeOne({'debug_notfound':'1'})
         self.assertEqual(result['debug_notfound'], True)
+        result = self._makeOne({'pyramid.debug_notfound':'1'})
+        self.assertEqual(result['debug_notfound'], True)
         result = self._makeOne({}, {'PYRAMID_DEBUG_NOTFOUND':'1'})
         self.assertEqual(result['debug_notfound'], True)
-        result = self._makeOne({'debug_notfound':'false'},
-                             {'PYRAMID_DEBUG_NOTFOUND':'1'})
+        result = self._makeOne({'debug_notfound':'false',
+                                'pyramid.debug_notfound':'1'})
+        self.assertEqual(result['debug_notfound'], True)
+        result = self._makeOne({'debug_notfound':'false',
+                                'pyramid.debug_notfound':'false'},
+                               {'PYRAMID_DEBUG_NOTFOUND':'1'})
         self.assertEqual(result['debug_notfound'], True)
 
     def test_debug_routematch(self):
@@ -169,10 +218,16 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result['debug_routematch'], True)
         result = self._makeOne({'debug_routematch':'1'})
         self.assertEqual(result['debug_routematch'], True)
+        result = self._makeOne({'pyramid.debug_routematch':'1'})
+        self.assertEqual(result['debug_routematch'], True)
         result = self._makeOne({}, {'PYRAMID_DEBUG_ROUTEMATCH':'1'})
         self.assertEqual(result['debug_routematch'], True)
-        result = self._makeOne({'debug_routematch':'false'},
-                             {'PYRAMID_DEBUG_ROUTEMATCH':'1'})
+        result = self._makeOne({'debug_routematch':'false',
+                                'pyramid.debug_routematch':'1'})
+        self.assertEqual(result['debug_routematch'], True)
+        result = self._makeOne({'debug_routematch':'false',
+                                'pyramid.debug_routematch':'false'},
+                               {'PYRAMID_DEBUG_ROUTEMATCH':'1'})
         self.assertEqual(result['debug_routematch'], True)
 
     def test_debug_templates(self):
@@ -184,10 +239,16 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result['debug_templates'], True)
         result = self._makeOne({'debug_templates':'1'})
         self.assertEqual(result['debug_templates'], True)
+        result = self._makeOne({'pyramid.debug_templates':'1'})
+        self.assertEqual(result['debug_templates'], True)
         result = self._makeOne({}, {'PYRAMID_DEBUG_TEMPLATES':'1'})
         self.assertEqual(result['debug_templates'], True)
-        result = self._makeOne({'debug_templates':'false'},
-                             {'PYRAMID_DEBUG_TEMPLATES':'1'})
+        result = self._makeOne({'debug_templates':'false',
+                                'pyramid.debug_templates':'1'})
+        self.assertEqual(result['debug_templates'], True)
+        result = self._makeOne({'debug_templates':'false',
+                                'pyramid.debug_templates':'false'},
+                               {'PYRAMID_DEBUG_TEMPLATES':'1'})
         self.assertEqual(result['debug_templates'], True)
 
     def test_debug_all(self):
@@ -211,13 +272,25 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result['debug_routematch'], True)
         self.assertEqual(result['debug_authorization'], True)
         self.assertEqual(result['debug_templates'], True)
+        result = self._makeOne({'pyramid.debug_all':'1'})
+        self.assertEqual(result['debug_notfound'], True)
+        self.assertEqual(result['debug_routematch'], True)
+        self.assertEqual(result['debug_authorization'], True)
+        self.assertEqual(result['debug_templates'], True)
         result = self._makeOne({}, {'PYRAMID_DEBUG_ALL':'1'})
         self.assertEqual(result['debug_notfound'], True)
         self.assertEqual(result['debug_routematch'], True)
         self.assertEqual(result['debug_authorization'], True)
         self.assertEqual(result['debug_templates'], True)
-        result = self._makeOne({'debug_all':'false'},
-                             {'PYRAMID_DEBUG_ALL':'1'})
+        result = self._makeOne({'debug_all':'false',
+                                'pyramid.debug_all':'1'})
+        self.assertEqual(result['debug_notfound'], True)
+        self.assertEqual(result['debug_routematch'], True)
+        self.assertEqual(result['debug_authorization'], True)
+        self.assertEqual(result['debug_templates'], True)
+        result = self._makeOne({'debug_all':'false',
+                                'pyramid.debug_all':'false'},
+                               {'PYRAMID_DEBUG_ALL':'1'})
         self.assertEqual(result['debug_notfound'], True)
         self.assertEqual(result['debug_routematch'], True)
         self.assertEqual(result['debug_authorization'], True)
@@ -228,10 +301,16 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result['default_locale_name'], 'en')
         result = self._makeOne({'default_locale_name':'abc'})
         self.assertEqual(result['default_locale_name'], 'abc')
+        result = self._makeOne({'pyramid.default_locale_name':'abc'})
+        self.assertEqual(result['default_locale_name'], 'abc')
         result = self._makeOne({}, {'PYRAMID_DEFAULT_LOCALE_NAME':'abc'})
         self.assertEqual(result['default_locale_name'], 'abc')
-        result = self._makeOne({'default_locale_name':'def'},
-                             {'PYRAMID_DEFAULT_LOCALE_NAME':'abc'})
+        result = self._makeOne({'default_locale_name':'def',
+                                'pyramid.default_locale_name':'abc'})
+        self.assertEqual(result['default_locale_name'], 'abc')
+        result = self._makeOne({'default_locale_name':'def',
+                                'pyramid.default_locale_name':'ghi'},
+                               {'PYRAMID_DEFAULT_LOCALE_NAME':'abc'})
         self.assertEqual(result['default_locale_name'], 'abc')
 
     def test_originals_kept(self):
