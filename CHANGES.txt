@@ -76,6 +76,16 @@ Features
   normal logging channels.  The logger name of the debug logger will be the
   package name of the *caller* of the Configurator's constructor.
 
+Deprecations
+------------
+
+- All Pyramid-related deployment settings (e.g. ``debug_all``,
+  ``debug_notfound``) are now meant to be prefixed with the prefix
+  ``pyramid.``.  For example: ``debug_all`` -> ``pyramid.debug_all``.  The
+  old non-prefixed settings will continue to work indefinitely but supplying
+  them may print a deprecation warning.  All scaffolds and tutorials have
+  been changed to use prefixed settings.
+
 Backwards Incompatibilities
 ---------------------------
 
