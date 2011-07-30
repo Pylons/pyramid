@@ -472,22 +472,22 @@ represented by this entry point (``main`` in our ``__init__.py`` module).
 You can provide startup-time configuration parameters to your application by
 adding more settings to this section.
 
-The ``reload_templates`` setting in the ``[app:MyProject]`` section is a
-:app:`Pyramid` -specific setting which is passed into the framework.  If it
+The ``pyramid.reload_templates`` setting in the ``[app:MyProject]`` section is
+a :app:`Pyramid` -specific setting which is passed into the framework.  If it
 exists, and its value is ``true``, :term:`Chameleon` and :term:`Mako`
 template changes will not require an application restart to be detected.  See
 :ref:`reload_templates_section` for more information.
 
-The ``debug_templates`` setting in the ``[app:MyProject]`` section is a
+The ``pyramid.debug_templates`` setting in the ``[app:MyProject]`` section is a
 :app:`Pyramid` -specific setting which is passed into the framework.  If it
 exists, and its value is ``true``, :term:`Chameleon` template exceptions will
 contain more detailed and helpful information about the error than when
 this value is ``false``.  See :ref:`debug_templates_section` for more
 information.
 
-.. warning:: The ``reload_templates`` and ``debug_templates`` options should
-   be turned off for production applications, as template rendering is slowed
-   when either is turned on.
+.. warning:: The ``pyramid.reload_templates`` and ``pyramid.debug_templates``
+   options should be turned off for production applications, as template
+   rendering is slowed when either is turned on.
 
 Various other settings may exist in this section having to do with debugging
 or influencing runtime behavior of a :app:`Pyramid` application.  See
@@ -795,14 +795,14 @@ file call to ``add_view``).
 See :ref:`views_which_use_a_renderer` for more information about how views,
 renderers, and templates relate and cooperate.
 
-.. note:: Because our ``development.ini`` has a ``reload_templates =
+.. note:: Because our ``development.ini`` has a ``pyramid.reload_templates =
    true`` directive indicating that templates should be reloaded when
    they change, you won't need to restart the application server to
    see changes you make to templates.  During development, this is
    handy.  If this directive had been ``false`` (or if the directive
    did not exist), you would need to restart the application server
    for each template change.  For production applications, you should
-   set your project's ``reload_templates`` to ``false`` to increase
+   set your project's ``pyramid.reload_templates`` to ``false`` to increase
    the speed at which templates may be rendered.
 
 .. index::

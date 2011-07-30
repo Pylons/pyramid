@@ -569,6 +569,18 @@ class ConfiguratorTests(unittest.TestCase):
         config.setup_registry(default_permission='view')
         self.assertEqual(reg.getUtility(IDefaultPermission), 'view')
 
+    def test_setup_registry_includes(self):
+        from pyramid.registry import Registry
+        reg = Registry()
+        config = self._makeOne(reg)
+        settings = {
+            'pyramid.include': """pyramid.tests.test_config.dummy_include
+pyramid.tests.test_config.dummy_include2""",
+        }
+        config.setup_registry(settings=settings)
+        self.assert_(reg.included)
+        self.assert_(reg.also_included)
+
     def test_get_settings_nosettings(self):
         from pyramid.registry import Registry
         reg = Registry()
@@ -5604,6 +5616,11 @@ def dummyfactory(request):
     """ """
 
 def dummy_include(config):
+    config.registry.included = True
+    config.action('discrim', None, config.package)
+
+def dummy_include2(config):
+    config.registry.also_included = True
     config.action('discrim', None, config.package)
 
 includeme = dummy_include

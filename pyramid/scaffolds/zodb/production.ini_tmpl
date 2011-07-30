@@ -1,11 +1,13 @@
 [app:{{project}}]
 use = egg:{{project}}
-reload_templates = false
-debug_authorization = false
-debug_notfound = false
-debug_routematch = false
-debug_templates = false
-default_locale_name = en
+
+pyramid.reload_templates = false
+pyramid.debug_authorization = false
+pyramid.debug_notfound = false
+pyramid.debug_routematch = false
+pyramid.debug_templates = false
+pyramid.default_locale_name = en
+
 zodb_uri = file://%(here)s/Data.fs?connection_cache_size=20000
 
 [filter:weberror]

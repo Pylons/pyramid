@@ -57,7 +57,7 @@ The next step is to construct a :term:`Configurator`:
 ``settings`` is passed to the Configurator as a keyword argument with the
 dictionary values passed by PasteDeploy as the ``**settings`` argument.  This
 will be a dictionary of settings parsed from the ``.ini`` file, which
-contains deployment-related values such as ``reload_templates``,
+contains deployment-related values such as ``pyramid.reload_templates``,
 ``db_string``, etc.
 
 We now can call :meth:`pyramid.config.Configurator.add_static_view` with the

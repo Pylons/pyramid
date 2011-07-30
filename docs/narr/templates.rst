@@ -632,15 +632,15 @@ variable set to ``1``, For example:
   $ PYRAMID_DEBUG_TEMPLATES=1 bin/paster serve myproject.ini
 
 To use a setting in the application ``.ini`` file for the same
-purpose, set the ``debug_templates`` key to ``true`` within the
-application's configuration section, e.g.:
+purpose, set the ``pyramid.debug_templates`` key to ``true`` within
+the application's configuration section, e.g.:
 
 .. code-block:: ini
   :linenos:
 
   [app:MyProject]
   use = egg:MyProject#app
-  debug_templates = true
+  pyramid.debug_templates = true
 
 With template debugging off, a :exc:`NameError` exception resulting
 from rendering a template with an undefined variable
@@ -677,7 +677,7 @@ displaying the arguments passed to the template itself.
 
 .. note::
 
-   Turning on ``debug_templates`` has the same effect as using the
+   Turning on ``pyramid.debug_templates`` has the same effect as using the
    Chameleon environment variable ``CHAMELEON_DEBUG``.  See `Chameleon
    Environment Variables
    <http://chameleon.repoze.org/docs/latest/config.html#environment-variables>`_
@@ -793,7 +793,7 @@ variable set to ``1``, For example:
   $ PYRAMID_RELOAD_TEMPLATES=1 bin/paster serve myproject.ini
 
 To use a setting in the application ``.ini`` file for the same
-purpose, set the ``reload_templates`` key to ``true`` within the
+purpose, set the ``pyramid.reload_templates`` key to ``true`` within the
 application's configuration section, e.g.:
 
 .. code-block:: ini
@@ -801,7 +801,7 @@ application's configuration section, e.g.:
 
   [app:main]
   use = egg:MyProject#app
-  reload_templates = true
+  pyramid.reload_templates = true
 
 .. index::
    single: template system bindings

@@ -517,7 +517,7 @@ which ACL permitted or denied the authorization based on
 authentication information.
 
 This behavior can also be turned on in the application ``.ini`` file
-by setting the ``debug_authorization`` key to ``true`` within the
+by setting the ``pyramid.debug_authorization`` key to ``true`` within the
 application's configuration section, e.g.:
 
 .. code-block:: ini
@@ -525,7 +525,7 @@ application's configuration section, e.g.:
 
   [app:main]
   use = egg:MyProject#app
-  debug_authorization = true
+  pyramid.debug_authorization = true
 
 With this debug flag turned on, the response sent to the browser will
 also contain security debugging information in its body.
