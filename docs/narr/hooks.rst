@@ -61,8 +61,8 @@ Here's some sample code that implements a minimal NotFound view callable:
    caused the not found view to be called.  The value of
    ``request.exception.message`` will be a value explaining why the not found
    error was raised.  This message will be different when the
-   ``debug_notfound`` environment setting is true than it is when it is
-   false.
+   ``pyramid.debug_notfound`` environment setting is true than it is when it
+   is false.
 
 .. warning:: When a NotFound view callable accepts an argument list as
    described in :ref:`request_and_context_view_definitions`, the ``context``
@@ -128,8 +128,8 @@ Here's some sample code that implements a minimal forbidden view:
    ``request.exception.message`` will be a value explaining why the forbidden
    was raised and ``request.exception.result`` will be extended information
    about the forbidden exception.  These messages will be different when the
-   ``debug_authorization`` environment setting is true than it is when it is
-   false.
+   ``pyramid.debug_authorization`` environment setting is true than it is when
+   it is false.
 
 .. index::
    single: request factory

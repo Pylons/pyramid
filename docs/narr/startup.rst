@@ -92,10 +92,10 @@ Here's a high-level time-ordered overview of what happens when you press
    In this case, the ``myproject.__init__:main`` function referred to by the
    entry point URI ``egg:MyProject`` (see :ref:`MyProject_ini` for more
    information about entry point URIs, and how they relate to callables),
-   will receive the key/value pairs ``{'reload_templates':'true',
-   'debug_authorization':'false', 'debug_notfound':'false',
-   'debug_routematch':'false', 'debug_templates':'true',
-   'default_locale_name':'en'}``.
+   will receive the key/value pairs ``{'pyramid.reload_templates':'true',
+   'pyramid.debug_authorization':'false', 'pyramid.debug_notfound':'false',
+   'pyramid.debug_routematch':'false', 'pyramid.debug_templates':'true',
+   'pyramid.default_locale_name':'en'}``.
 
 #. The ``main`` function first constructs a
    :class:`~pyramid.config.Configurator` instance, passing a root resource
@@ -109,8 +109,8 @@ Here's a high-level time-ordered overview of what happens when you press
 
    The ``settings`` dictionary contains all the options in the
    ``[app:MyProject]`` section of our .ini file except the ``use`` option
-   (which is internal to Paste) such as ``reload_templates``,
-   ``debug_authorization``, etc.
+   (which is internal to Paste) such as ``pyramid.reload_templates``,
+   ``pyramid.debug_authorization``, etc.
 
 #. The ``main`` function then calls various methods on the instance of the
    class :class:`~pyramid.config.Configurator` created in the previous step.

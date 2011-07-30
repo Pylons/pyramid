@@ -134,11 +134,11 @@ might have a ``[app:MyProject]`` section that looks like so:
 
    [app:MyProject]
    use = egg:MyProject
-   reload_templates = true
-   debug_authorization = false
-   debug_notfound = false
-   debug_templates = true
-   default_locale_name = en
+   pyramid.reload_templates = true
+   pyramid.debug_authorization = false
+   pyramid.debug_notfound = false
+   pyramid.debug_templates = true
+   pyramid.default_locale_name = en
 
 If so, you can use the following command to invoke a debug shell using the
 name ``MyProject`` as a section name:
@@ -160,7 +160,7 @@ name ``MyProject`` as a section name:
     <myproject.resources.MyResource object at 0x445270>
     >>> registry
     <Registry myproject>
-    >>> registry.settings['debug_notfound']
+    >>> registry.settings['pyramid.debug_notfound']
     False
     >>> from myproject.views import my_view
     >>> from pyramid.request import Request

@@ -679,10 +679,10 @@ per :ref:`protecting_views`.
 It's useful to be able to debug :exc:`NotFound` error responses when they
 occur unexpectedly due to an application registry misconfiguration.  To debug
 these errors, use the ``PYRAMID_DEBUG_NOTFOUND`` environment variable or the
-``debug_notfound`` configuration file setting.  Details of why a view was not
-found will be printed to ``stderr``, and the browser representation of the
-error will include the same information.  See :ref:`environment_chapter` for
-more information about how, and where to set these values.
+``pyramid.debug_notfound`` configuration file setting.  Details of why a view
+was not found will be printed to ``stderr``, and the browser representation of
+the error will include the same information.  See :ref:`environment_chapter`
+for more information about how, and where to set these values.
 
 .. index::
    single: HTTP caching
@@ -729,10 +729,10 @@ headers you set within the view itself unless you use ``preserve_auto``.
 You can also turn of the effect of ``http_cache`` entirely for the duration
 of a Pyramid application lifetime.  To do so, set the
 ``PYRAMID_PREVENT_HTTP_CACHE`` environment variable or the
-``prevent_http_cache`` configuration value setting to a true value.  For more
-information, see :ref:`preventing_http_caching`.
+``pyramid.prevent_http_cache`` configuration value setting to a true value.
+For more information, see :ref:`preventing_http_caching`.
 
-Note that setting ``prevent_http_cache`` will have no effect on caching
+Note that setting ``pyramid.prevent_http_cache`` will have no effect on caching
 headers that your application code itself sets.  It will only prevent caching
 headers that would have been set by the Pyramid HTTP caching machinery
 invoked as the result of the ``http_cache`` argument to view configuration.

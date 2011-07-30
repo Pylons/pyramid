@@ -425,8 +425,9 @@ The above configuration will use the file named ``foo.mak`` in the
 ``templates`` directory of the ``mypackage`` package.
 
 The ``Mako`` template renderer can take additional arguments beyond the
-standard ``reload_templates`` setting, see the :ref:`environment_chapter` for
-additional :ref:`mako_template_renderer_settings`.
+standard ``pyramid.reload_templates`` setting, see the
+:ref:`environment_chapter` for additional
+:ref:`mako_template_renderer_settings`.
 
 .. index::
    single: response headers (from a renderer)
