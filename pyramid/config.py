@@ -717,6 +717,11 @@ class Configurator(object):
         policies, renderers, a debug logger, a locale negotiator, and various
         other settings using the configurator's current registry, as per the
         descriptions in the Configurator constructor."""
+        if settings:
+            includes = settings.pop('pyramid.include', '')
+            includes = [x.strip() for x in includes.splitlines()]
+        else:
+            includes = []
         registry = self.registry
         self._fix_registry()
         self._set_settings(settings)
@@ -772,6 +777,8 @@ class Configurator(object):
         if default_view_mapper is not None:
             self.set_view_mapper(default_view_mapper)
             self.commit()
+        for inc in includes:
+            self.include(inc)
         
     def hook_zca(self):
         """ Call :func:`zope.component.getSiteManager.sethook` with
