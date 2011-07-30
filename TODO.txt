@@ -18,9 +18,6 @@ Should-Have
   during a config.include (they are related, so just exposing the currently
   underscored-private _set_auth* methods won't cut it).
 
-- Rename all config file values with a ``pyramid.`` prefix.  Preserve bw
-  compat, though, for older config files.
-
 - Try to figure out a way to keep "settings" as the original dictionary
   passed to the Configurator instead of copying it.
 
@@ -38,6 +35,9 @@ Should-Have
   ``paste.urlparser.StaticURLParser``, ``paste.auth.auth_tkt`` (cutnpaste or
   reimplement both).
 
+- Use ``pyramid.include`` to add pyramid_debugtoolbar to all scaffolds and
+  remove weberror.
+
 Nice-to-Have
 ------------
 
@@ -50,7 +50,7 @@ Nice-to-Have
 - Speed up startup time (defer _bootstrap and registerCommonDirectives()
   until needed by ZCML, as well as unfound speedups).
 
-- Nicer Mako exceptions in WebError.
+- Nicer Mako exceptions in debug toolbar.
 
 - Better "Extending" chapter.
 
