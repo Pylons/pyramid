@@ -777,13 +777,13 @@ class ISession(Interface):
         """ Pop a queue from the flash storage.  The queue is removed from
         flash storage after this message is called.  The queue is returned;
         it is a list of flash messages added by
-        :meth:`pyramid.interfaces.ISesssion.flash`"""
+        :meth:`pyramid.interfaces.ISession.flash`"""
 
     def peek_flash(queue=''):
         """ Peek at a queue in the flash storage.  The queue remains in
         flash storage after this message is called.  The queue is returned;
         it is a list of flash messages added by
-        :meth:`pyramid.interfaces.ISesssion.flash`
+        :meth:`pyramid.interfaces.ISession.flash`
         """
 
     def new_csrf_token():
