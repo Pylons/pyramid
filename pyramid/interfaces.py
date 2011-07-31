@@ -631,7 +631,7 @@ class IRoute(Interface):
         'when this route matches (or ``None``)')
     predicates = Attribute(
         'A sequence of :term:`route predicate` objects used to '
-        'determine if a request matches this route or not or not after '
+        'determine if a request matches this route or not after '
         'basic pattern matching has been completed.')
     pregenerator = Attribute('This attribute should either be ``None`` or '
                              'a callable object implementing the '
