@@ -85,6 +85,17 @@
      of ``request.exception`` will be ``None`` within response and
      finished callbacks.
 
+   .. attribute:: exc_info
+
+     If an exception was raised by a :term:`root factory` or a :term:`view
+     callable`, or at various other points where :app:`Pyramid` executes
+     user-defined code during the processing of a request, result of
+     ``sys.exc_info()`` will be available as the ``exc_info`` attribute of
+     the request within a :term:`exception view`, a :term:`response callback`
+     or a :term:`finished callback`.  If no exception occurred, the value of
+     ``request.exc_info`` will be ``None`` within response and finished
+     callbacks.
+
    .. attribute:: response
 
      This attribute is actually a "reified" property which returns an

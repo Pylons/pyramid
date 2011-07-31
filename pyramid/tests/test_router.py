@@ -808,7 +808,8 @@ class TestRouter(unittest.TestCase):
         # ``exception`` must be attached to request even if a suitable
         # exception view cannot be found
         self.assertEqual(request.exception.__class__, RuntimeError)
-
+        self.assertEqual(request.exc_info[0], RuntimeError)
+        
     def test_call_view_raises_exception_view(self):
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IExceptionViewClassifier

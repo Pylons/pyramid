@@ -1,3 +1,5 @@
+import sys
+
 from zope.interface import implements
 from zope.interface import providedBy
 
@@ -166,6 +168,7 @@ class Router(object):
 
         # handle exceptions raised during root finding and view-exec
         except Exception, why:
+            exc_info = sys.exc_info()
             # clear old generated request.response, if any; it may
             # have been mutated by the view, and its state is not
             # sane (e.g. caching headers)
@@ -173,6 +176,7 @@ class Router(object):
                 del attrs['response']
 
             attrs['exception'] = why
+            attrs['exc_info'] = exc_info
 
             for_ = (IExceptionViewClassifier,
                     request_iface.combined,

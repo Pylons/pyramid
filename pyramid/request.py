@@ -204,6 +204,7 @@ class Request(BaseRequest, DeprecatedRequestMethods):
     response_callbacks = ()
     finished_callbacks = ()
     exception = None
+    exc_info = None
     matchdict = None
     matched_route = None
 

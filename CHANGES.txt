@@ -76,6 +76,10 @@ Features
   normal logging channels.  The logger name of the debug logger will be the
   package name of the *caller* of the Configurator's constructor.
 
+- A new attribute is available on request objects: ``exc_info``.  Its value
+  will be ``None`` until an exception is caught by the Pyramid router, after
+  which it will be the result of ``sys.exc_info()``.
+
 Deprecations
 ------------
 

@@ -4,8 +4,6 @@ Pyramid TODOs
 Should-Have
 -----------
 
-- Add request.exc_info during an exception.
-
 - Merge https://github.com/Pylons/pyramid/pull/242 (IPython update; requires
   test fixes and additional test coverage).
 
