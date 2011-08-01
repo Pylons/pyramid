@@ -87,11 +87,6 @@ def bootstrap(config_uri, request=None):
 _marker = object()
 
 class PCommand(Command):
-    get_app = staticmethod(get_app) # hook point
-    get_root = staticmethod(get_root) # hook point
-    group_name = 'pyramid'
-    interact = (interact,) # for testing
-    loadapp = (loadapp,) # for testing
     bootstrap = (bootstrap,) # testing
     verbose = 3
 
