@@ -105,7 +105,7 @@ and agrees to the terms above in the section within this document entitled
 Contributors
 ------------
 
-- Chris McDonough, 2010/11/08
+- Chris McDonough (a.k.a Pyramid BDFL), 2010/11/08
 
 - Tres Seaver, 2010/11/09
 
