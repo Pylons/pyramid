@@ -84,8 +84,6 @@ def bootstrap(config_uri, request=None):
     env['app'] = app
     return env
 
-_marker = object()
-
 class PCommand(Command):
     bootstrap = (bootstrap,) # testing
     verbose = 3
@@ -143,8 +141,7 @@ class PShellCommand(PCommand):
             self.loaded_objects[k] = resolver.maybe_resolve(v)
             self.object_help[k] = v
 
-    def command(self, IPShell=_marker):
-        # IPShell passed to command method is for testing purposes
+    def command(self, shell=None):
         config_uri = self.args[0]
         config_file = config_uri.split('#', 1)[0]
         self.logging_file_config(config_file)
@@ -185,33 +182,52 @@ class PShellCommand(PCommand):
             for var in sorted(self.object_help.keys()):
                 help += '\n  %-12s %s' % (var, self.object_help[var])
 
-        help += '\n'
+        if shell is None and not self.options.disable_ipython:
+            shell = self.make_ipython_v0_11_shell()
+            if shell is None:
+                shell = self.make_ipython_v0_10_shell()
 
-        if IPShell is _marker:
-            try: #pragma no cover
-                try: #pragma no cover
-                    from IPython.frontend.terminal.embed import InteractiveShellEmbed
-                    IPShell = InteractiveShellEmbed(banner2=help, user_ns=env)
-                except ImportError: #pragma no cover
-                    from IPython.Shell import IPShellEmbed
-                    IPShell = IPShellEmbed(argv=[], user_ns=env)
-                    IPShell.set_banner(IPShell.IP.BANNER + '\n' + help)
-            except ImportError: #pragma no cover
-                IPShell = None
+        if shell is None:
+            shell = self.make_default_shell()
 
-        if (IPShell is None) or self.options.disable_ipython:
+        try:
+            shell(env, help)
+        finally:
+            closer()
+
+    def make_default_shell(self, interact=interact):
+        def shell(env, help):
             cprt = 'Type "help" for more information.'
             banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
-            banner += '\n' + help
+            banner += '\n' + help + '\n'
+            interact(banner, local=env)
+        return shell
+
+    def make_ipython_v0_11_shell(self, IPShellFactory=None):
+        if IPShellFactory is None: # pragma: no cover
             try:
-                self.interact[0](banner, local=env)
-            finally:
-                closer()
-        else:
+                from IPython.frontend.terminal.embed import (
+                    InteractiveShellEmbed)
+                IPShellFactory = InteractiveShellEmbed
+            except ImportError:
+                return None
+        def shell(env, help):
+            IPShell = IPShellFactory(banner2=help, user_ns=env)
+            IPShell()
+        return shell
+
+    def make_ipython_v0_10_shell(self, IPShellFactory=None):
+        if IPShellFactory is None: # pragma: no cover
             try:
-                IPShell()
-            finally:
-                closer()
+                from IPython.Shell import IPShellEmbed
+                IPShellFactory = IPShellEmbed
+            except ImportError:
+                return None
+        def shell(env, help):
+            IPShell = IPShellFactory(argv=[], user_ns=env)
+            IPShell.set_banner(IPShell.IP.BANNER + '\n' + help + '\n')
+            IPShell()
+        return shell
 
 BFGShellCommand = PShellCommand # b/w compat forever
 
