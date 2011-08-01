@@ -5,12 +5,9 @@ class TestPShellCommand(unittest.TestCase):
         from pyramid.paster import PShellCommand
         return PShellCommand
 
-    def _makeOne(self, patch_interact=True, patch_bootstrap=True,
-                 patch_config=True, patch_args=True, patch_options=True):
+    def _makeOne(self, patch_bootstrap=True, patch_config=True,
+                 patch_args=True, patch_options=True):
         cmd = self._getTargetClass()('pshell')
-        if patch_interact:
-            self.interact = DummyInteractor()
-            cmd.interact = (self.interact,)
         if patch_bootstrap:
             self.bootstrap = DummyBootstrap()
             cmd.bootstrap = (self.bootstrap,)
@@ -27,69 +24,129 @@ class TestPShellCommand(unittest.TestCase):
             cmd.options = self.options
         return cmd
 
-    def test_command_ipshell_is_None_ipython_enabled(self):
+    def test_make_default_shell(self):
         command = self._makeOne()
-        command.options.disable_ipython = True
-        command.command(IPShell=None)
+        interact = DummyInteractor()
+        shell = command.make_default_shell(interact)
+        shell({'foo': 'bar'}, 'a help message')
+        self.assertEqual(interact.local, {'foo': 'bar'})
+        self.assertTrue('a help message' in interact.banner)
+
+    def test_make_ipython_v0_11_shell(self):
+        command = self._makeOne()
+        ipshell_factory = DummyIPShellFactory()
+        shell = command.make_ipython_v0_11_shell(ipshell_factory)
+        shell({'foo': 'bar'}, 'a help message')
+        self.assertEqual(ipshell_factory.kw['user_ns'], {'foo': 'bar'})
+        self.assertTrue('a help message' in ipshell_factory.kw['banner2'])
+        self.assertTrue(ipshell_factory.shell.called)
+
+    def test_make_ipython_v0_10_shell(self):
+        command = self._makeOne()
+        ipshell_factory = DummyIPShellFactory()
+        shell = command.make_ipython_v0_10_shell(ipshell_factory)
+        shell({'foo': 'bar'}, 'a help message')
+        self.assertEqual(ipshell_factory.kw['argv'], [])
+        self.assertEqual(ipshell_factory.kw['user_ns'], {'foo': 'bar'})
+        self.assertTrue('a help message' in ipshell_factory.shell.banner)
+        self.assertTrue(ipshell_factory.shell.called)
+
+    def test_command_loads_default_shell(self):
+        command = self._makeOne()
+        shell = DummyShell()
+        command.make_ipython_v0_11_shell = lambda: None
+        command.make_ipython_v0_10_shell = lambda: None
+        command.make_default_shell = lambda: shell
+        command.command()
         self.assertTrue(self.config_factory.parser)
         self.assertEqual(self.config_factory.parser.filename,
                          '/foo/bar/myapp.ini')
         self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
-        self.assertEqual(self.interact.local, {
+        self.assertEqual(shell.env, {
             'app':self.bootstrap.app, 'root':self.bootstrap.root,
             'registry':self.bootstrap.registry,
             'request':self.bootstrap.request,
             'root_factory':self.bootstrap.root_factory,
         })
         self.assertTrue(self.bootstrap.closer.called)
-        self.assertTrue(self.interact.banner)
+        self.assertTrue(shell.help)
 
-    def test_command_ipshell_is_not_None_ipython_disabled(self):
+    def test_command_loads_default_shell_with_ipython_disabled(self):
         command = self._makeOne()
+        shell = DummyShell()
+        bad_shell = DummyShell()
+        command.make_ipython_v0_11_shell = lambda: bad_shell
+        command.make_ipython_v0_10_shell = lambda: bad_shell
+        command.make_default_shell = lambda: shell
         command.options.disable_ipython = True
-        command.command(IPShell='notnone')
+        command.command()
         self.assertTrue(self.config_factory.parser)
         self.assertEqual(self.config_factory.parser.filename,
                          '/foo/bar/myapp.ini')
         self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
-        self.assertEqual(self.interact.local, {
+        self.assertEqual(shell.env, {
             'app':self.bootstrap.app, 'root':self.bootstrap.root,
             'registry':self.bootstrap.registry,
             'request':self.bootstrap.request,
             'root_factory':self.bootstrap.root_factory,
         })
+        self.assertEqual(bad_shell.env, {})
         self.assertTrue(self.bootstrap.closer.called)
-        self.assertTrue(self.interact.banner)
+        self.assertTrue(shell.help)
 
-    def test_command_ipython_enabled(self):
-        command = self._makeOne(patch_interact=False)
+    def test_command_loads_ipython_v0_11(self):
+        command = self._makeOne()
+        shell = DummyShell()
+        command.make_ipython_v0_11_shell = lambda: shell
+        command.make_ipython_v0_10_shell = lambda: None
+        command.make_default_shell = lambda: None
         command.options.disable_ipython = False
-        dummy_shell_factory = DummyIPShellFactory()
-        command.command(IPShell=dummy_shell_factory)
+        command.command()
         self.assertTrue(self.config_factory.parser)
         self.assertEqual(self.config_factory.parser.filename,
                          '/foo/bar/myapp.ini')
         self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
-        self.assertEqual(dummy_shell_factory.shell.local_ns, {
+        self.assertEqual(shell.env, {
             'app':self.bootstrap.app, 'root':self.bootstrap.root,
             'registry':self.bootstrap.registry,
             'request':self.bootstrap.request,
             'root_factory':self.bootstrap.root_factory,
         })
-        self.assertEqual(dummy_shell_factory.shell.global_ns, {})
         self.assertTrue(self.bootstrap.closer.called)
+        self.assertTrue(shell.help)
+
+    def test_command_loads_ipython_v0_10(self):
+        command = self._makeOne()
+        shell = DummyShell()
+        command.make_ipython_v0_11_shell = lambda: None
+        command.make_ipython_v0_10_shell = lambda: shell
+        command.make_default_shell = lambda: None
+        command.options.disable_ipython = False
+        command.command()
+        self.assertTrue(self.config_factory.parser)
+        self.assertEqual(self.config_factory.parser.filename,
+                         '/foo/bar/myapp.ini')
+        self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
+        self.assertEqual(shell.env, {
+            'app':self.bootstrap.app, 'root':self.bootstrap.root,
+            'registry':self.bootstrap.registry,
+            'request':self.bootstrap.request,
+            'root_factory':self.bootstrap.root_factory,
+        })
+        self.assertTrue(self.bootstrap.closer.called)
+        self.assertTrue(shell.help)
 
     def test_command_loads_custom_items(self):
         command = self._makeOne()
         model = Dummy()
         self.config_factory.items = [('m', model)]
-        command.options.disable_ipython = True
-        command.command(IPShell=None)
+        shell = DummyShell()
+        command.command(shell)
         self.assertTrue(self.config_factory.parser)
         self.assertEqual(self.config_factory.parser.filename,
                          '/foo/bar/myapp.ini')
         self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
-        self.assertEqual(self.interact.local, {
+        self.assertEqual(shell.env, {
             'app':self.bootstrap.app, 'root':self.bootstrap.root,
             'registry':self.bootstrap.registry,
             'request':self.bootstrap.request,
@@ -97,25 +154,25 @@ class TestPShellCommand(unittest.TestCase):
             'm':model,
         })
         self.assertTrue(self.bootstrap.closer.called)
-        self.assertTrue(self.interact.banner)
+        self.assertTrue(shell.help)
 
     def test_command_custom_section_override(self):
         command = self._makeOne()
         dummy = Dummy()
         self.config_factory.items = [('app', dummy), ('root', dummy),
                                      ('registry', dummy), ('request', dummy)]
-        command.options.disable_ipython = True
-        command.command(IPShell=None)
+        shell = DummyShell()
+        command.command(shell)
         self.assertTrue(self.config_factory.parser)
         self.assertEqual(self.config_factory.parser.filename,
                          '/foo/bar/myapp.ini')
         self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
-        self.assertEqual(self.interact.local, {
+        self.assertEqual(shell.env, {
             'app':dummy, 'root':dummy, 'registry':dummy, 'request':dummy,
             'root_factory':self.bootstrap.root_factory,
         })
         self.assertTrue(self.bootstrap.closer.called)
-        self.assertTrue(self.interact.banner)
+        self.assertTrue(shell.help)
 
 class TestPRoutesCommand(unittest.TestCase):
     def _getTargetClass(self):
@@ -770,23 +827,6 @@ class TestBootstrap(unittest.TestCase):
 class Dummy:
     pass
 
-class DummyIPShellFactory(object):
-    def __call__(self, argv, user_ns=None):
-        shell = DummyIPShell()
-        shell(user_ns, {})
-        self.shell = shell
-        return shell
-
-class DummyIPShell(object):
-    IP = Dummy()
-    IP.BANNER = 'foo'
-    def __call__(self, local_ns, global_ns):
-        self.local_ns = local_ns
-        self.global_ns = global_ns
-
-    def mainloop(self):
-        pass
-
 dummy_root = Dummy()
 
 class DummyRegistry(object):
@@ -796,10 +836,34 @@ class DummyRegistry(object):
 
 dummy_registry = DummyRegistry()
 
+class DummyShell(object):
+    env = {}
+    help = ''
+
+    def __call__(self, env, help):
+        self.env = env
+        self.help = help
+
 class DummyInteractor:
     def __call__(self, banner, local):
         self.banner = banner
         self.local = local
+
+class DummyIPShell(object):
+    IP = Dummy()
+    IP.BANNER = 'foo'
+
+    def set_banner(self, banner):
+        self.banner = banner
+
+    def __call__(self):
+        self.called = True
+
+class DummyIPShellFactory(object):
+    def __call__(self, **kw):
+        self.kw = kw
+        self.shell = DummyIPShell()
+        return self.shell
 
 class DummyLoadApp:
     def __init__(self, app):
