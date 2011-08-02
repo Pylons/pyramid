@@ -168,7 +168,6 @@ class Router(object):
 
         # handle exceptions raised during root finding and view-exec
         except Exception, why:
-            exc_info = sys.exc_info()
             # clear old generated request.response, if any; it may
             # have been mutated by the view, and its state is not
             # sane (e.g. caching headers)
@@ -176,7 +175,7 @@ class Router(object):
                 del attrs['response']
 
             attrs['exception'] = why
-            attrs['exc_info'] = exc_info
+            attrs['exc_info'] = sys.exc_info()
 
             for_ = (IExceptionViewClassifier,
                     request_iface.combined,
@@ -217,8 +216,10 @@ class Router(object):
                 request.registry = registry
                 response = self.handle_request(request)
             finally:
-                if request is not None and request.finished_callbacks:
-                    request._process_finished_callbacks()
+                if request is not None:
+                    if request.finished_callbacks:
+                        request._process_finished_callbacks()
+                    request.exc_info = None # avoid leak
 
             return response(request.environ, start_response)
         finally:
