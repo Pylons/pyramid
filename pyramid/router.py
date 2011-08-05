@@ -48,6 +48,9 @@ class Router(object):
                                                       name=name)
                 handler = handler_factory(handler, registry)
             self.handle_request = handler
+        else:
+            self.handle_request = exception_view_handler_factory(
+                self.handle_request, registry)
         self.root_policy = self.root_factory # b/w compat
         self.registry = registry
         settings = registry.settings
@@ -57,15 +60,11 @@ class Router(object):
             self.debug_routematch = settings['debug_routematch']
 
     def handle_request(self, request):
-        exc = None
         attrs = request.__dict__
         registry = attrs['registry']
 
-        try: # matches finally: manager.pop()
-            manager = self.threadlocal_manager
-            threadlocals = { 'registry':registry, 'request':request}
-            manager.push(threadlocals)
-            request_iface = IRequest
+        try: # matches finally: if request is not None
+            request.request_iface = IRequest
             context = None
             routes_mapper = self.routes_mapper
             debug_routematch = self.debug_routematch
@@ -74,143 +73,107 @@ class Router(object):
             notify = registry.notify
             logger = self.logger
 
-            try: # matches except Exception (exception view execution)
-                has_listeners and notify(NewRequest(request))
-                # find the root object
-                root_factory = self.root_factory
-                if routes_mapper is not None:
-                    info = routes_mapper(request)
-                    match, route = info['match'], info['route']
-                    if route is None:
-                        if debug_routematch:
-                            msg = ('no route matched for url %s' %
-                                   request.url)
-                            logger and logger.debug(msg)
-                    else:
-                        # TODO: kill off bfg.routes.* environ keys
-                        # when traverser requires request arg, and
-                        # cant cope with environ anymore (they are
-                        # docs-deprecated as of BFG 1.3)
-                        environ = request.environ
-                        environ['bfg.routes.route'] = route 
-                        environ['bfg.routes.matchdict'] = match
-                        attrs['matchdict'] = match
-                        attrs['matched_route'] = route
+            has_listeners and notify(NewRequest(request))
+            # find the root object
+            root_factory = self.root_factory
+            if routes_mapper is not None:
+                info = routes_mapper(request)
+                match, route = info['match'], info['route']
+                if route is None:
+                    if debug_routematch:
+                        msg = ('no route matched for url %s' %
+                               request.url)
+                        logger and logger.debug(msg)
+                else:
+                    # TODO: kill off bfg.routes.* environ keys
+                    # when traverser requires request arg, and
+                    # cant cope with environ anymore (they are
+                    # docs-deprecated as of BFG 1.3)
+                    environ = request.environ
+                    environ['bfg.routes.route'] = route 
+                    environ['bfg.routes.matchdict'] = match
+                    attrs['matchdict'] = match
+                    attrs['matched_route'] = route
 
-                        if debug_routematch:
-                            msg = (
-                                'route matched for url %s; '
-                                'route_name: %r, '
-                                'path_info: %r, '
-                                'pattern: %r, '
-                                'matchdict: %r, '
-                                'predicates: %r' % (
-                                    request.url,
-                                    route.name,
-                                    request.path_info,
-                                    route.pattern, match,
-                                    route.predicates)
-                                )
-                            logger and logger.debug(msg)
-
-                        request_iface = registry.queryUtility(
-                            IRouteRequest,
-                            name=route.name,
-                            default=IRequest)
-
-                        root_factory = route.factory or \
-                                       self.root_factory
-
-                root = root_factory(request)
-                attrs['root'] = root
-
-                # find a context
-                traverser = adapters.queryAdapter(root, ITraverser)
-                if traverser is None:
-                    traverser = ResourceTreeTraverser(root)
-                tdict = traverser(request)
-
-                context, view_name, subpath, traversed, vroot, \
-                    vroot_path = (
-                    tdict['context'],
-                    tdict['view_name'],
-                    tdict['subpath'],
-                    tdict['traversed'],
-                    tdict['virtual_root'],
-                    tdict['virtual_root_path']
-                    )
-
-                attrs.update(tdict)
-                has_listeners and notify(ContextFound(request))
-
-                # find a view callable
-                context_iface = providedBy(context)
-                view_callable = adapters.lookup(
-                    (IViewClassifier, request_iface, context_iface),
-                    IView, name=view_name, default=None)
-
-                # invoke the view callable
-                if view_callable is None:
-                    if self.debug_notfound:
+                    if debug_routematch:
                         msg = (
-                            'debug_notfound of url %s; path_info: %r, '
-                            'context: %r, view_name: %r, subpath: %r, '
-                            'traversed: %r, root: %r, vroot: %r, '
-                            'vroot_path: %r' % (
-                                request.url, request.path_info, context,
-                                view_name,
-                                subpath, traversed, root, vroot,
-                                vroot_path)
+                            'route matched for url %s; '
+                            'route_name: %r, '
+                            'path_info: %r, '
+                            'pattern: %r, '
+                            'matchdict: %r, '
+                            'predicates: %r' % (
+                                request.url,
+                                route.name,
+                                request.path_info,
+                                route.pattern, match,
+                                route.predicates)
                             )
                         logger and logger.debug(msg)
-                    else:
-                        msg = request.path_info
-                    raise HTTPNotFound(msg)
+
+                    request.request_iface = registry.queryUtility(
+                        IRouteRequest,
+                        name=route.name,
+                        default=IRequest)
+
+                    root_factory = route.factory or self.root_factory
+
+            root = root_factory(request)
+            attrs['root'] = root
+
+            # find a context
+            traverser = adapters.queryAdapter(root, ITraverser)
+            if traverser is None:
+                traverser = ResourceTreeTraverser(root)
+            tdict = traverser(request)
+
+            context, view_name, subpath, traversed, vroot, vroot_path = (
+                tdict['context'],
+                tdict['view_name'],
+                tdict['subpath'],
+                tdict['traversed'],
+                tdict['virtual_root'],
+                tdict['virtual_root_path']
+                )
+
+            attrs.update(tdict)
+            has_listeners and notify(ContextFound(request))
+
+            # find a view callable
+            context_iface = providedBy(context)
+            view_callable = adapters.lookup(
+                (IViewClassifier, request.request_iface, context_iface),
+                IView, name=view_name, default=None)
+
+            # invoke the view callable
+            if view_callable is None:
+                if self.debug_notfound:
+                    msg = (
+                        'debug_notfound of url %s; path_info: %r, '
+                        'context: %r, view_name: %r, subpath: %r, '
+                        'traversed: %r, root: %r, vroot: %r, '
+                        'vroot_path: %r' % (
+                            request.url, request.path_info, context,
+                            view_name, subpath, traversed, root, vroot,
+                            vroot_path)
+                        )
+                    logger and logger.debug(msg)
                 else:
-                    # if there were any view wrappers for the current
-                    # request, use them to wrap the view
-
-                    response = view_callable(context, request)
-
-            # handle exceptions raised during root finding and view-exec
-            except Exception, exc:
-                # WARNING: do not assign the result of sys.exc_info() to a
-                # local var here, doing so will cause a leak
-                attrs['exc_info'] = sys.exc_info()
-                attrs['exception'] = exc
-
-                # clear old generated request.response, if any; it may
-                # have been mutated by the view, and its state is not
-                # sane (e.g. caching headers)
-                if 'response' in attrs:
-                    del attrs['response']
-
-                for_ = (IExceptionViewClassifier,
-                        request_iface.combined,
-                        providedBy(exc))
-                view_callable = adapters.lookup(for_, IView,
-                                                default=None)
-
-                if view_callable is None:
-                    raise
-
-                response = view_callable(exc, request)
+                    msg = request.path_info
+                raise HTTPNotFound(msg)
+            else:
+                response = view_callable(context, request)
 
             has_listeners and notify(NewResponse(request, response))
 
             if request.response_callbacks:
                 request._process_response_callbacks(response)
 
-            return request, response, attrs.get('exc_info')
+            return request, response
 
         finally:
-            manager.pop()
-            if request is not None:
-                try:
-                    if request.finished_callbacks:
-                        request._process_finished_callbacks()
-                finally:
-                    request.exc_info = None
+            if request is not None and request.finished_callbacks:
+                request._process_finished_callbacks()
 
     def __call__(self, environ, start_response):
         """
@@ -220,8 +183,49 @@ class Router(object):
         within the application registry; call ``start_response`` and
         return an iterable.
         """
+        registry = self.registry
         request = self.request_factory(environ)
-        request.registry = self.registry
-        request, response = self.handle_request(request)[:2]
-        return response(request.environ, start_response)
+        threadlocals = {'registry':registry, 'request':request}
+        manager = self.threadlocal_manager
+        manager.push(threadlocals)
+        try:
+            request.registry = registry
+            request, response = self.handle_request(request)
+            return response(request.environ, start_response)
+        finally:
+            manager.pop()
+
+def exception_view_handler_factory(handler, registry):
+    has_listeners = registry.has_listeners
+    adapters = registry.adapters
+    notify = registry.notify
+
+    def exception_view_handler(request):
+        attrs = request.__dict__
+        try:
+            request, response = handler(request)
+        except Exception, exc:
+            # WARNING: do not assign the result of sys.exc_info() to a
+            # local var here, doing so will cause a leak
+            attrs['exc_info'] = sys.exc_info()
+            attrs['exception'] = exc
+            # clear old generated request.response, if any; it may
+            # have been mutated by the view, and its state is not
+            # sane (e.g. caching headers)
+            if 'response' in attrs:
+                del attrs['response']
+            request_iface = attrs['request_iface']
+            provides = providedBy(exc)
+            for_ = (IExceptionViewClassifier, request_iface.combined, provides)
+            view_callable = adapters.lookup(for_, IView, default=None)
+            if view_callable is None:
+                raise
+            response = view_callable(exc, request)
+            has_listeners and notify(NewResponse(request, response))
+        finally:
+            attrs['exc_info'] = None
+            attrs['exception'] = None
+        return request, response
+
+    return exception_view_handler
 
