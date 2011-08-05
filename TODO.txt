@@ -4,6 +4,9 @@ Pyramid TODOs
 Should-Have
 -----------
 
+- Deprecate pyramid.security.view_execution_permitted (it only works for
+  traversal).
+
 - Merge https://github.com/Pylons/pyramid/pull/242 (IPython update; requires
   test fixes and additional test coverage).
 
