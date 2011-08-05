@@ -268,7 +268,7 @@ def topological_sort(items, partial_order, ignore_missing_partials=True):
             cycledeps[k] = v[1:]
         raise CyclicDependencyError(cycledeps)
 
-    return sorted
+    return [ x for x in sorted if x in items ]
 
 class CyclicDependencyError(ConfigurationError):
     def __init__(self, cycles):

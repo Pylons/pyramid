@@ -277,11 +277,11 @@ class Test_topological_sort(unittest.TestCase):
 
     def test_partial_order_missing_partial_a(self):
         result = self._callFUT(['a', 'b', 'c', 'd'], [('d', 'c'), ('f', 'c')])
-        self.assertEqual(result, ['a', 'b', 'd', 'f', 'c'])
+        self.assertEqual(result, ['a', 'b', 'd', 'c'])
 
     def test_partial_order_missing_partial_b(self):
         result = self._callFUT(['a', 'b', 'c', 'd'], [('d', 'c'), ('c', 'f')])
-        self.assertEqual(result, ['a', 'b', 'd', 'c', 'f'])
+        self.assertEqual(result, ['a', 'b', 'd', 'c'])
 
     def test_cycle_direct(self):
         from pyramid.util import CyclicDependencyError
