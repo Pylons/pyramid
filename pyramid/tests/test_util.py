@@ -309,8 +309,5 @@ class TestCyclicDependencyError(unittest.TestCase):
         self.assertEqual(result,
                          "'a' depends on ['c', 'd']; 'c' depends on ['a']")
 
-def reraise(exc):
-    raise exc
-
 class Dummy(object):
     pass
