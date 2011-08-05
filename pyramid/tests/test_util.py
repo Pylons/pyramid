@@ -246,5 +246,71 @@ class Test_WeakOrderedSet(unittest.TestCase):
         self.assertEqual(list(wos), [])
         self.assertEqual(wos.last, None)
 
+class Test_topological_sort(unittest.TestCase):
+    def _callFUT(self, items, partial_order, ignore_missing_partials=True):
+        from pyramid.util import topological_sort
+        return topological_sort(items, partial_order, ignore_missing_partials)
+
+    def test_no_items_no_order(self):
+        result = self._callFUT([], [])
+        self.assertEqual(result, [])
+
+    def test_no_order(self):
+        result = self._callFUT(['a', 'b'], [])
+        self.assertEqual(result, ['a', 'b'])
+
+    def test_partial_order(self):
+        result = self._callFUT(['a', 'b', 'c'], [('b', 'c')])
+        self.assertEqual(result, ['a', 'b', 'c'])
+
+    def test_partial_order2(self):
+        result = self._callFUT(['a', 'b', 'c'], [('a', 'b'), ('b', 'c')])
+        self.assertEqual(result, ['a', 'b', 'c'])
+
+    def test_partial_order3(self):
+        result = self._callFUT(['a', 'b', 'c'], [('a', 'c'), ('b', 'a')])
+        self.assertEqual(result, ['b', 'a', 'c'])
+
+    def test_partial_order4(self):
+        result = self._callFUT(['a', 'b', 'c', 'd'], [('d', 'c')])
+        self.assertEqual(result, ['a', 'b', 'd', 'c'])
+
+    def test_partial_order_missing_partial_a(self):
+        result = self._callFUT(['a', 'b', 'c', 'd'], [('d', 'c'), ('f', 'c')])
+        self.assertEqual(result, ['a', 'b', 'd', 'f', 'c'])
+
+    def test_partial_order_missing_partial_b(self):
+        result = self._callFUT(['a', 'b', 'c', 'd'], [('d', 'c'), ('c', 'f')])
+        self.assertEqual(result, ['a', 'b', 'd', 'c', 'f'])
+
+    def test_cycle_direct(self):
+        from pyramid.util import CyclicDependencyError
+        self.assertRaises(
+            CyclicDependencyError,
+            self._callFUT,
+            ['a', 'b', 'c', 'd'], [('c', 'd'), ('d', 'c')])
+
+    def test_cycle_indirect(self):
+        from pyramid.util import CyclicDependencyError
+        self.assertRaises(
+            CyclicDependencyError,
+            self._callFUT,
+            ['a', 'b', 'c', 'd', 'e'],
+            [('c', 'd'), ('d', 'e'), ('e', 'c')])
+
+class TestCyclicDependencyError(unittest.TestCase):
+    def _makeOne(self, cycles):
+        from pyramid.util import CyclicDependencyError
+        return CyclicDependencyError(cycles)
+
+    def test___str__(self):
+        exc = self._makeOne({'a':['c', 'd'], 'c':['a']})
+        result = str(exc)
+        self.assertEqual(result,
+                         "'a' depends on ['c', 'd']; 'c' depends on ['a']")
+
+def reraise(exc):
+    raise exc
+
 class Dummy(object):
     pass
