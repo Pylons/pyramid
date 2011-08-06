@@ -717,9 +717,9 @@ class Configurator(object):
         other settings using the configurator's current registry, as per the
         descriptions in the Configurator constructor."""
         if settings:
-            includes = settings.pop('pyramid.include', '')
+            includes = settings.get('pyramid.include', '')
             includes = [x.strip() for x in includes.splitlines()]
-            expl_handler_factories = settings.pop('pyramid.request_handlers','')
+            expl_handler_factories = settings.get('pyramid.request_handlers','')
             expl_handler_factories = [x.strip() for x in
                                       expl_handler_factories.splitlines()]
         else:
