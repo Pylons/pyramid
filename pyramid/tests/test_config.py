@@ -630,7 +630,7 @@ pyramid.tests.test_config.dummy_include2""",
 
     def test_add_tweens_names_distinct(self):
         from pyramid.interfaces import ITweens
-        from pyramid.router import excview_tween_factory
+        from pyramid.tweens import excview_tween_factory
         def factory1(handler, registry): return handler
         def factory2(handler, registry): return handler
         config = self._makeOne()
@@ -640,13 +640,13 @@ pyramid.tests.test_config.dummy_include2""",
         tweens = config.registry.queryUtility(ITweens)
         self.assertEqual(
             tweens.implicit,
-            [('pyramid.router.excview_tween_factory', excview_tween_factory),
+            [('pyramid.tweens.excview_tween_factory', excview_tween_factory),
              ('pyramid.tests.test_config.factory1', factory1),
              ('pyramid.tests.test_config.factory2', factory2)])
 
     def test_add_tween_dottedname(self):
         from pyramid.interfaces import ITweens
-        from pyramid.router import excview_tween_factory
+        from pyramid.tweens import excview_tween_factory
         config = self._makeOne()
         config.add_tween('pyramid.tests.test_config.dummy_tween_factory')
         config.commit()
@@ -654,14 +654,14 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(
             tweens.implicit,
             [
-                ('pyramid.router.excview_tween_factory', excview_tween_factory),
+                ('pyramid.tweens.excview_tween_factory', excview_tween_factory),
                 ('pyramid.tests.test_config.dummy_tween_factory',
                  dummy_tween_factory)
                 ])
 
     def test_add_tween_instance(self):
         from pyramid.interfaces import ITweens
-        from pyramid.router import excview_tween_factory
+        from pyramid.tweens import excview_tween_factory
         class ATween(object): pass
         atween = ATween()
         config = self._makeOne()
@@ -671,7 +671,7 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(len(tweens.implicit), 2)
         self.assertEqual(
             tweens.implicit[0],
-            ('pyramid.router.excview_tween_factory', excview_tween_factory))
+            ('pyramid.tweens.excview_tween_factory', excview_tween_factory))
         self.assertTrue(
           tweens.implicit[1][0].startswith('pyramid.tests.test_config.ATween.'))
         self.assertEqual(tweens.implicit[1][1], atween)

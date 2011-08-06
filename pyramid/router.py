@@ -1,10 +1,7 @@
-import sys
-
 from zope.interface import implements
 from zope.interface import providedBy
 
 from pyramid.interfaces import IDebugLogger
-from pyramid.interfaces import IExceptionViewClassifier
 from pyramid.interfaces import IRequest
 from pyramid.interfaces import IRootFactory
 from pyramid.interfaces import IRouteRequest
@@ -24,6 +21,7 @@ from pyramid.request import Request
 from pyramid.threadlocal import manager
 from pyramid.traversal import DefaultRootFactory
 from pyramid.traversal import ResourceTreeTraverser
+from pyramid.tweens import excview_tween_factory
 
 class Router(object):
     implements(IRouter)
@@ -189,38 +187,4 @@ class Router(object):
             return response(request.environ, start_response)
         finally:
             manager.pop()
-
-def excview_tween_factory(handler, registry):
-    has_listeners = registry.has_listeners
-    adapters = registry.adapters
-    notify = registry.notify
-
-    def exception_view_handler(request):
-        attrs = request.__dict__
-        try:
-            request, response = handler(request)
-        except Exception, exc:
-            # WARNING: do not assign the result of sys.exc_info() to a
-            # local var here, doing so will cause a leak
-            attrs['exc_info'] = sys.exc_info()
-            attrs['exception'] = exc
-            # clear old generated request.response, if any; it may
-            # have been mutated by the view, and its state is not
-            # sane (e.g. caching headers)
-            if 'response' in attrs:
-                del attrs['response']
-            request_iface = attrs['request_iface']
-            provides = providedBy(exc)
-            for_ = (IExceptionViewClassifier, request_iface.combined, provides)
-            view_callable = adapters.lookup(for_, IView, default=None)
-            if view_callable is None:
-                raise
-            response = view_callable(exc, request)
-            has_listeners and notify(NewResponse(request, response))
-        finally:
-            attrs['exc_info'] = None
-
-        return request, response
-
-    return exception_view_handler
 
