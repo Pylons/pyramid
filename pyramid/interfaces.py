@@ -446,7 +446,7 @@ class IMultiDict(Interface): # docs-only interface
 class IRequest(Interface):
     """ Request type interface attached to all request objects """
 
-class IRequestHandlerManager(Interface):
+class IRequestHandlers(Interface):
     """ Marker interface for utility registration representing the ordered
     set of a configuration's request handler factories"""
 

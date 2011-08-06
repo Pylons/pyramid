@@ -14,7 +14,7 @@ from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import ITraverser
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
-from pyramid.interfaces import IRequestHandlerManager
+from pyramid.interfaces import IRequestHandlers
 
 from pyramid.events import ContextFound
 from pyramid.events import NewRequest
@@ -39,7 +39,7 @@ class Router(object):
         self.root_factory = q(IRootFactory, default=DefaultRootFactory)
         self.routes_mapper = q(IRoutesMapper)
         self.request_factory = q(IRequestFactory, default=Request)
-        handler_manager = q(IRequestHandlerManager)
+        handler_manager = q(IRequestHandlers)
         if handler_manager is None:
             self.handle_request = exc_view_handler_factory(self.handle_request,
                                                            registry)
@@ -219,7 +219,7 @@ def exc_view_handler_factory(handler, registry):
             has_listeners and notify(NewResponse(request, response))
         finally:
             attrs['exc_info'] = None
-            attrs['exception'] = None
+
         return request, response
 
     return exception_view_handler

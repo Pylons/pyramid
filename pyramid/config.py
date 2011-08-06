@@ -38,7 +38,7 @@ from pyramid.interfaces import IRendererFactory
 from pyramid.interfaces import IRendererGlobalsFactory
 from pyramid.interfaces import IRequest
 from pyramid.interfaces import IRequestFactory
-from pyramid.interfaces import IRequestHandlerManager
+from pyramid.interfaces import IRequestHandlers
 from pyramid.interfaces import IResponse
 from pyramid.interfaces import IRootFactory
 from pyramid.interfaces import IRouteRequest
@@ -735,8 +735,8 @@ class Configurator(object):
         from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
         registry.registerSelfAdapter((WebobResponse,), IResponse)
         # add a handler manager
-        handler_manager = RequestHandlerManager()
-        registry.registerUtility(handler_manager, IRequestHandlerManager)
+        handler_manager = RequestHandlers()
+        registry.registerUtility(handler_manager, IRequestHandlers)
         self._add_request_handler('pyramid.router.exc_view_handler_factory',
                                   explicit=False)
 
@@ -1016,7 +1016,7 @@ class Configurator(object):
                             str(id(handler_factory)))
         def register():
             registry = self.registry
-            handler_manager = registry.getUtility(IRequestHandlerManager)
+            handler_manager = registry.getUtility(IRequestHandlers)
             handler_manager.add(name, handler_factory, explicit)
         self.action(('request_handler', name), register)
         
@@ -3455,8 +3455,8 @@ def isexception(o):
 
 global_registries = WeakOrderedSet()
 
-class RequestHandlerManager(object):
-    implements(IRequestHandlerManager)
+class RequestHandlers(object):
+    implements(IRequestHandlers)
     def __init__(self):
         self.explicit = []
         self.implicit = []
@@ -3471,7 +3471,7 @@ class RequestHandlerManager(object):
         handler_factories = self.implicit
         if self.explicit:
             handler_factories = self.explicit
-        for name, factory in handler_factories[::-1]:
+        for name, factory in handler_factories:
             handler = factory(handler, registry)
         return handler
     
