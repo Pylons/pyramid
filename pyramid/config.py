@@ -1025,11 +1025,6 @@ class Configurator(object):
             handler_manager.add(name, tween_factory, explicit)
         self.action(('tween', name), register)
         
-    # XXX temporary bw compat for debugtoolbar
-    @action_method
-    def add_request_handler(self, factory, name): # pragma: no cover
-        return self._add_tween(factory, explicit=False)
-
     @action_method
     def add_subscriber(self, subscriber, iface=None):
         """Add an event :term:`subscriber` for the event stream
