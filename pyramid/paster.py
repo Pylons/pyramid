@@ -9,8 +9,8 @@ from paste.deploy import loadapp
 from paste.script.command import Command
 
 from pyramid.interfaces import IMultiView
+from pyramid.interfaces import ITweens
 
-from pyramid.scripting import get_root
 from pyramid.scripting import prepare
 from pyramid.util import DottedNameResolver
 
@@ -534,3 +534,67 @@ class PViewsCommand(PCommand):
                 self.out("    Not found.")
         self.out('')
 
+
+class PTweensCommand(PCommand):
+    """Print all implicit and explicit :term:`tween` objects used by a
+    Pyramid application.  The handler output includes whether the system is
+    using an explicit tweens ordering (will be true when the
+    ``pyramid.tweens`` setting is used) or an implicit tweens ordering (will
+    be true when the ``pyramid.tweens`` setting is *not* used).
+    
+    This command accepts one positional argument:
+
+    ``config_uri`` -- specifies the PasteDeploy config file to use for the
+    interactive shell. The format is ``inifile#name``. If the name is left
+    off, ``main`` will be assumed.
+
+    Example::
+
+        $ paster ptweens myapp.ini#main
+
+    """
+    summary = "Print all tweens related to a Pyramid application"
+    min_args = 1
+    max_args = 1
+    stdout = sys.stdout
+
+    parser = Command.standard_parser(simulate=True)
+
+    def _get_tweens(self, registry):
+        from pyramid.config import Configurator
+        config = Configurator(registry = registry)
+        return config.registry.queryUtility(ITweens)
+
+    def out(self, msg): # pragma: no cover
+        print msg
+    
+    def command(self):
+        config_uri = self.args[0]
+        env = self.bootstrap[0](config_uri)
+        registry = env['registry']
+        tweens = self._get_tweens(registry)
+        if tweens is not None:
+            ordering = []
+            if tweens.explicit:
+                self.out('"pyramid.tweens" config value set '
+                         '(explicitly ordered tweens used)')
+                self.out('')
+                ordering.append((tweens.explicit,
+                                 'Explicit Tween Chain (used)'))
+                ordering.append((tweens.implicit,
+                                 'Implicit Tween Chain (not used)'))
+            else:
+                self.out('"pyramid.tweens" config value NOT set '
+                         '(implicitly ordered tweens used)')
+                self.out('')
+                ordering.append((tweens.implicit, ''))
+            for L, title in ordering:
+                if title:
+                    self.out(title)
+                    self.out('')
+                fmt = '%-8s %-30s'
+                self.out(fmt % ('Position', 'Name'))
+                self.out(fmt % ('-'*len('Position'), '-'*len('Name')))
+                for pos, (name, item) in enumerate(L):
+                    self.out(fmt % (pos, name))
+                self.out('')

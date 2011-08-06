@@ -336,7 +336,7 @@ class ConfiguratorTests(unittest.TestCase):
         reg = DummyRegistry()
         config = self._makeOne(reg)
         config.add_view = lambda *arg, **kw: False
-        config._add_request_handler = lambda *arg, **kw: False
+        config._add_tween = lambda *arg, **kw: False
         config.setup_registry()
         self.assertEqual(reg.has_listeners, True)
 
@@ -348,7 +348,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(reg)
         views = []
         config.add_view = lambda *arg, **kw: views.append((arg, kw))
-        config._add_request_handler = lambda *arg, **kw: False
+        config._add_tween = lambda *arg, **kw: False
         config.setup_registry()
         self.assertEqual(views[0], ((default_exceptionresponse_view,),
                                     {'context':IExceptionResponse}))

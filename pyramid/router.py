@@ -14,7 +14,7 @@ from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import ITraverser
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
-from pyramid.interfaces import IRequestHandlers
+from pyramid.interfaces import ITweens
 
 from pyramid.events import ContextFound
 from pyramid.events import NewRequest
@@ -39,12 +39,12 @@ class Router(object):
         self.root_factory = q(IRootFactory, default=DefaultRootFactory)
         self.routes_mapper = q(IRoutesMapper)
         self.request_factory = q(IRequestFactory, default=Request)
-        handler_manager = q(IRequestHandlers)
-        if handler_manager is None:
-            self.handle_request = exc_view_handler_factory(self.handle_request,
-                                                           registry)
+        tweens = q(ITweens)
+        if tweens is None:
+            self.handle_request = exc_view_tween_factory(self.handle_request,
+                                                         registry)
         else:
-            self.handle_request = handler_manager(self.handle_request, registry)
+            self.handle_request = tweens(self.handle_request, registry)
             
         self.root_policy = self.root_factory # b/w compat
         self.registry = registry
@@ -190,7 +190,7 @@ class Router(object):
         finally:
             manager.pop()
 
-def exc_view_handler_factory(handler, registry):
+def exc_view_tween_factory(handler, registry):
     has_listeners = registry.has_listeners
     adapters = registry.adapters
     notify = registry.notify

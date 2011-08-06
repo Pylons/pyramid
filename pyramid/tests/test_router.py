@@ -134,13 +134,16 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         self.assertEqual(router.request_factory, DummyRequestFactory)
 
-    def test_request_handler_factories(self):
-        from pyramid.interfaces import IRequestHandlers
-        from pyramid.config import RequestHandlers
-        handler_manager = RequestHandlers()
-        self.registry.registerUtility(handler_manager, IRequestHandlers)
+    def test_tween_factories(self):
+        from pyramid.interfaces import ITweens
+        from pyramid.config import Tweens
+        from pyramid.response import Response
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IResponse
+        tweens = Tweens()
+        self.registry.registerUtility(tweens, ITweens)
         L = []
-        def handler_factory1(handler, registry):
+        def tween_factory1(handler, registry):
             L.append((handler, registry))
             def wrapper(request):
                 request.environ['handled'].append('one')
@@ -148,7 +151,7 @@ class TestRouter(unittest.TestCase):
             wrapper.name = 'one'
             wrapper.child = handler
             return wrapper
-        def handler_factory2(handler, registry):
+        def tween_factory2(handler, registry):
             L.append((handler, registry))
             def wrapper(request):
                 request.environ['handled'] = ['two']
@@ -156,16 +159,13 @@ class TestRouter(unittest.TestCase):
             wrapper.name = 'two'
             wrapper.child = handler
             return wrapper
-        handler_manager.add('one', handler_factory1)
-        handler_manager.add('two', handler_factory2)
+        tweens.add('one', tween_factory1)
+        tweens.add('two', tween_factory2)
         router = self._makeOne()
         self.assertEqual(router.handle_request.name, 'two')
         self.assertEqual(router.handle_request.child.name, 'one')
         self.assertEqual(router.handle_request.child.child.__name__,
                          'handle_request')
-        from pyramid.response import Response
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IResponse
         context = DummyContext()
         self._registerTraverserFactory(context)
         environ = self._makeEnviron()
