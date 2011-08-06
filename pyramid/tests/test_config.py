@@ -614,21 +614,16 @@ pyramid.tests.test_config.dummy_include2""",
         settings = reg.getUtility(ISettings)
         self.assertEqual(settings['a'], 1)
 
-    ## def test_add_request_handlers_names_distinct(self):
-    ##     from pyramid.interfaces import IRequestHandlerFactories
-    ##     from pyramid.interfaces import IRequestHandlerFactory
-    ##     def factory1(handler, registry): return handler
-    ##     def factory2(handler, registry): return handler
-    ##     config = self._makeOne()
-    ##     config.add_request_handler(factory1, 'name1')
-    ##     config.add_request_handler(factory2, 'name2')
-    ##     config.commit()
-    ##     names = config.registry.queryUtility(IRequestHandlerFactories)
-    ##     self.assertEqual(names, ['name1', 'name2'])
-    ##     f1 = config.registry.getUtility(IRequestHandlerFactory, name='name1')
-    ##     f2 = config.registry.getUtility(IRequestHandlerFactory, name='name2')
-    ##     self.assertEqual(f1, factory1)
-    ##     self.assertEqual(f2, factory2)
+    def test_add_tweens_names_distinct(self):
+        from pyramid.interfaces import ITweens
+        def factory1(handler, registry): return handler
+        def factory2(handler, registry): return handler
+        config = self._makeOne()
+        config.add_tween(factory1)
+        config.add_tween(factory2)
+        config.commit()
+        tweens = config.registry.queryUtility(ITweens)
+        self.assertEqual(tweens.implicit, None)
 
     ## def test_add_request_handlers_dottednames(self):
     ##     import pyramid.tests
