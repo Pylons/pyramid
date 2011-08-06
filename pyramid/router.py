@@ -41,8 +41,8 @@ class Router(object):
         self.request_factory = q(IRequestFactory, default=Request)
         tweens = q(ITweens)
         if tweens is None:
-            self.handle_request = exc_view_tween_factory(self.handle_request,
-                                                         registry)
+            self.handle_request = excview_tween_factory(self.handle_request,
+                                                        registry)
         else:
             self.handle_request = tweens(self.handle_request, registry)
             
@@ -190,7 +190,7 @@ class Router(object):
         finally:
             manager.pop()
 
-def exc_view_tween_factory(handler, registry):
+def excview_tween_factory(handler, registry):
     has_listeners = registry.has_listeners
     adapters = registry.adapters
     notify = registry.notify

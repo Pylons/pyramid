@@ -736,8 +736,7 @@ class Configurator(object):
         # add a handler manager
         tweens = Tweens()
         registry.registerUtility(tweens, ITweens)
-        self._add_tween('pyramid.router.exc_view_tween_factory',
-                        explicit=False)
+        self._add_tween('pyramid.router.excview_tween_factory', explicit=False)
 
         if debug_logger is None:
             debug_logger = logging.getLogger(self.package_name)
