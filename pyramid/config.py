@@ -719,11 +719,11 @@ class Configurator(object):
         if settings:
             includes = settings.get('pyramid.include', '')
             includes = [x.strip() for x in includes.splitlines()]
-            expl_tweens = settings.get('pyramid.tweens','')
-            expl_tweens = [x.strip() for x in expl_tweens.splitlines()]
+            tweens = settings.get('pyramid.tweens','')
+            tweens = [x.strip() for x in tweens.splitlines()]
         else:
             includes = []
-            expl_tweens = []
+            tweens = []
         registry = self.registry
         self._fix_registry()
         self._set_settings(settings)
@@ -734,9 +734,12 @@ class Configurator(object):
         from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
         registry.registerSelfAdapter((WebobResponse,), IResponse)
         # add a handler manager
-        tweens = Tweens()
-        registry.registerUtility(tweens, ITweens)
+        tweenreg = Tweens()
+        registry.registerUtility(tweenreg, ITweens)
         self._add_tween('pyramid.router.excview_tween_factory', explicit=False)
+
+        for factory in tweens:
+            self._add_tween(factory, explicit=True)
 
         if debug_logger is None:
             debug_logger = logging.getLogger(self.package_name)
@@ -783,8 +786,6 @@ class Configurator(object):
         if default_view_mapper is not None:
             self.set_view_mapper(default_view_mapper)
             self.commit()
-        for factory in expl_tweens:
-            self._add_tween(factory, explicit=True)
         for inc in includes:
             self.include(inc)
         

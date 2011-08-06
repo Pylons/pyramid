@@ -583,6 +583,20 @@ pyramid.tests.test_config.dummy_include2""",
         self.assert_(reg.included)
         self.assert_(reg.also_included)
 
+    def test_setup_registry_tweens(self):
+        from pyramid.interfaces import ITweens
+        from pyramid.registry import Registry
+        reg = Registry()
+        config = self._makeOne(reg)
+        settings = {
+            'pyramid.tweens': 'pyramid.tests.test_config.dummy_tween_factory'
+        }
+        config.setup_registry(settings=settings)
+        tweens = config.registry.getUtility(ITweens)
+        self.assertEqual(tweens.explicit,
+                         [('pyramid.tests.test_config.dummy_tween_factory',
+                           dummy_tween_factory)])
+
     def test_get_settings_nosettings(self):
         from pyramid.registry import Registry
         reg = Registry()
