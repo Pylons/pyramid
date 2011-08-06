@@ -824,6 +824,79 @@ class TestBootstrap(unittest.TestCase):
         self.assertEqual(result['root'], self.root)
         self.assert_('closer' in result)
 
+class TestPTweensCommand(unittest.TestCase):
+    def _getTargetClass(self):
+        from pyramid.paster import PTweensCommand
+        return PTweensCommand
+
+    def _makeOne(self):
+        cmd = self._getTargetClass()('ptweens')
+        cmd.bootstrap = (DummyBootstrap(),)
+        cmd.args = ('/foo/bar/myapp.ini#myapp',)
+        return cmd
+
+    def test_command_no_tweens(self):
+        command = self._makeOne()
+        command._get_tweens = lambda *arg: None
+        L = []
+        command.out = L.append
+        result = command.command()
+        self.assertEqual(result, None)
+        self.assertEqual(L, [])
+
+    def test_command_implicit_tweens_only(self):
+        command = self._makeOne()
+        tweens = DummyTweens([('name', 'item')], None)
+        command._get_tweens = lambda *arg: tweens
+        L = []
+        command.out = L.append
+        result = command.command()
+        self.assertEqual(result, None)
+        self.assertEqual(
+            L,
+            ['"pyramid.tweens" config value NOT set (implicitly ordered tweens used)',
+             '',
+             'Position Name                          ',
+             '-------- ----                          ',
+             '0        name                          ',
+             ''])
+
+    def test_command_implicit_and_explicit_tweens(self):
+        command = self._makeOne()
+        tweens = DummyTweens([('name', 'item')], [('name2', 'item2')])
+        command._get_tweens = lambda *arg: tweens
+        L = []
+        command.out = L.append
+        result = command.command()
+        self.assertEqual(result, None)
+        self.assertEqual(
+            L,
+            ['"pyramid.tweens" config value set (explicitly ordered tweens used)',
+             '',
+             'Explicit Tween Chain (used)',
+             '',
+             'Position Name                          ',
+             '-------- ----                          ',
+             '0        name2                         ',
+             '',
+             'Implicit Tween Chain (not used)',
+             '',
+             'Position Name                          ',
+             '-------- ----                          ',
+             '0        name                          ',
+             ''
+             ])
+
+    def test__get_tweens(self):
+        command = self._makeOne()
+        registry = DummyRegistry()
+        self.assertEqual(command._get_tweens(registry), None)
+
+class DummyTweens(object):
+    def __init__(self, implicit, explicit):
+        self.implicit = implicit
+        self.explicit = explicit
+                
 class Dummy:
     pass
 
