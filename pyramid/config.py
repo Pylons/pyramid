@@ -909,16 +909,16 @@ class Configurator(object):
     @action_method
     def add_tween(self, tween_factory):
         """
-        Add a 'tween factory'.  A 'tween' (think: 'between') is a bit of code
-        that sits between the Pyramid router's main request handling function
-        and the upstream WSGI component that uses :app:`Pyramid` as its
-        'app'.  This is a feature that may be used by framework extensions,
-        to provide, for example, Pyramid-specific view timing support
-        bookkeeping code that examines exceptions before they are returned to
-        the upstream WSGI application.  Tweens behave a bit like :mod:`WSGI`
-        'middleware' but they have the benefit of running in a context in
-        which they have access to the Pyramid :term:`application registry` as
-        well as the Pyramid rendering machinery.
+        Add a 'tween factory'.  A :term`tween` (think: 'between') is a bit of
+        code that sits between the Pyramid router's main request handling
+        function and the upstream WSGI component that uses :app:`Pyramid` as
+        its 'app'.  This is a feature that may be used by Pyramid framework
+        extensions, to provide, for example, Pyramid-specific view timing
+        support bookkeeping code that examines exceptions before they are
+        returned to the upstream WSGI application.  Tweens behave a bit like
+        :mod:`WSGI` 'middleware' but they have the benefit of running in a
+        context in which they have access to the Pyramid :term:`application
+        registry` as well as the Pyramid rendering machinery.
 
         A tween factory (passed as ``tween_factory``) must be a callable (or
         a :term:`dotted Python name` to such a callable) which accepts two
