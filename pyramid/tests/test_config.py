@@ -612,48 +612,48 @@ pyramid.tests.test_config.dummy_include2""",
         settings = reg.getUtility(ISettings)
         self.assertEqual(settings['a'], 1)
 
-    def test_add_request_handlers_names_distinct(self):
-        from pyramid.interfaces import IRequestHandlerFactories
-        from pyramid.interfaces import IRequestHandlerFactory
-        def factory1(handler, registry): return handler
-        def factory2(handler, registry): return handler
-        config = self._makeOne()
-        config.add_request_handler(factory1, 'name1')
-        config.add_request_handler(factory2, 'name2')
-        config.commit()
-        names = config.registry.queryUtility(IRequestHandlerFactories)
-        self.assertEqual(names, ['name1', 'name2'])
-        f1 = config.registry.getUtility(IRequestHandlerFactory, name='name1')
-        f2 = config.registry.getUtility(IRequestHandlerFactory, name='name2')
-        self.assertEqual(f1, factory1)
-        self.assertEqual(f2, factory2)
+    ## def test_add_request_handlers_names_distinct(self):
+    ##     from pyramid.interfaces import IRequestHandlerFactories
+    ##     from pyramid.interfaces import IRequestHandlerFactory
+    ##     def factory1(handler, registry): return handler
+    ##     def factory2(handler, registry): return handler
+    ##     config = self._makeOne()
+    ##     config.add_request_handler(factory1, 'name1')
+    ##     config.add_request_handler(factory2, 'name2')
+    ##     config.commit()
+    ##     names = config.registry.queryUtility(IRequestHandlerFactories)
+    ##     self.assertEqual(names, ['name1', 'name2'])
+    ##     f1 = config.registry.getUtility(IRequestHandlerFactory, name='name1')
+    ##     f2 = config.registry.getUtility(IRequestHandlerFactory, name='name2')
+    ##     self.assertEqual(f1, factory1)
+    ##     self.assertEqual(f2, factory2)
 
-    def test_add_request_handlers_dottednames(self):
-        import pyramid.tests
-        from pyramid.interfaces import IRequestHandlerFactories
-        from pyramid.interfaces import IRequestHandlerFactory
-        config = self._makeOne()
-        config.add_request_handler('pyramid.tests', 'name1')
-        config.commit()
-        names = config.registry.queryUtility(IRequestHandlerFactories)
-        self.assertEqual(names, ['name1'])
-        f1 = config.registry.getUtility(IRequestHandlerFactory, name='name1')
-        self.assertEqual(f1, pyramid.tests)
+    ## def test_add_request_handlers_dottednames(self):
+    ##     import pyramid.tests
+    ##     from pyramid.interfaces import IRequestHandlerFactories
+    ##     from pyramid.interfaces import IRequestHandlerFactory
+    ##     config = self._makeOne()
+    ##     config.add_request_handler('pyramid.tests', 'name1')
+    ##     config.commit()
+    ##     names = config.registry.queryUtility(IRequestHandlerFactories)
+    ##     self.assertEqual(names, ['name1'])
+    ##     f1 = config.registry.getUtility(IRequestHandlerFactory, name='name1')
+    ##     self.assertEqual(f1, pyramid.tests)
 
-    def test_add_request_handlers_names_overlap(self):
-        from pyramid.interfaces import IRequestHandlerFactories
-        from pyramid.interfaces import IRequestHandlerFactory
-        def factory1(handler, registry): return handler
-        def factory2(handler, registry): return handler
-        def factory3(handler, registry): return handler
-        config = self._makeOne(autocommit=True)
-        config.add_request_handler(factory1, 'name1')
-        config.add_request_handler(factory2, 'name2')
-        config.add_request_handler(factory3, 'name1')
-        names = config.registry.queryUtility(IRequestHandlerFactories)
-        self.assertEqual(names, ['name1', 'name2', 'name1'])
-        f3 = config.registry.getUtility(IRequestHandlerFactory, name='name1')
-        self.assertEqual(f3, factory3)
+    ## def test_add_request_handlers_names_overlap(self):
+    ##     from pyramid.interfaces import IRequestHandlerFactories
+    ##     from pyramid.interfaces import IRequestHandlerFactory
+    ##     def factory1(handler, registry): return handler
+    ##     def factory2(handler, registry): return handler
+    ##     def factory3(handler, registry): return handler
+    ##     config = self._makeOne(autocommit=True)
+    ##     config.add_request_handler(factory1, 'name1')
+    ##     config.add_request_handler(factory2, 'name2')
+    ##     config.add_request_handler(factory3, 'name1')
+    ##     names = config.registry.queryUtility(IRequestHandlerFactories)
+    ##     self.assertEqual(names, ['name1', 'name2', 'name1'])
+    ##     f3 = config.registry.getUtility(IRequestHandlerFactory, name='name1')
+    ##     self.assertEqual(f3, factory3)
 
     def test_add_subscriber_defaults(self):
         from zope.interface import implements
@@ -5645,6 +5645,8 @@ class DummyRegistry(object):
         self.adapters.append((arg, kw))
     def queryAdapter(self, *arg, **kw):
         return self.adaptation
+    def getUtility(self, *arg, **kw):
+        return self.utilities[-1]
 
 def parse_httpdate(s):
     import datetime

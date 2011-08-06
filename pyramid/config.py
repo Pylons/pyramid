@@ -38,8 +38,7 @@ from pyramid.interfaces import IRendererFactory
 from pyramid.interfaces import IRendererGlobalsFactory
 from pyramid.interfaces import IRequest
 from pyramid.interfaces import IRequestFactory
-from pyramid.interfaces import IRequestHandlerFactory
-from pyramid.interfaces import IRequestHandlerFactories
+from pyramid.interfaces import IRequestHandlerManager
 from pyramid.interfaces import IResponse
 from pyramid.interfaces import IRootFactory
 from pyramid.interfaces import IRouteRequest
@@ -720,8 +719,12 @@ class Configurator(object):
         if settings:
             includes = settings.pop('pyramid.include', '')
             includes = [x.strip() for x in includes.splitlines()]
+            expl_handler_factories = settings.pop('pyramid.request_handlers','')
+            expl_handler_factories = [x.strip() for x in
+                                      expl_handler_factories.splitlines()]
         else:
             includes = []
+            expl_handler_factories = []
         registry = self.registry
         self._fix_registry()
         self._set_settings(settings)
@@ -731,6 +734,11 @@ class Configurator(object):
         # cope with WebOb exc objects not decoratored with IExceptionResponse
         from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
         registry.registerSelfAdapter((WebobResponse,), IResponse)
+        # add a handler manager
+        handler_manager = RequestHandlerManager()
+        registry.registerUtility(handler_manager, IRequestHandlerManager)
+        self._add_request_handler('pyramid.router.exc_view_handler_factory',
+                                  explicit=False)
 
         if debug_logger is None:
             debug_logger = logging.getLogger(self.package_name)
@@ -777,6 +785,8 @@ class Configurator(object):
         if default_view_mapper is not None:
             self.set_view_mapper(default_view_mapper)
             self.commit()
+        for factory in expl_handler_factories:
+            self._add_request_handler(factory, explicit=True)
         for inc in includes:
             self.include(inc)
         
@@ -898,15 +908,17 @@ class Configurator(object):
         return self._derive_view(view, attr=attr, renderer=renderer)
 
     @action_method
-    def add_request_handler(self, handler_factory, before=None,
-                            after=None, name=None):
+    def add_request_handler(self, handler_factory):
         """
         Add a request handler factory.  A request handler factory is used to
-        wrap the Pyramid router's main request handling function.  This is
-        a feature that may be used by framework extensions, to provide, for
+        wrap the Pyramid router's main request handling function.  This is a
+        feature that may be used by framework extensions, to provide, for
         example, view timing support and as a convenient place to hang
         bookkeeping code that examines exceptions before they are returned to
-        the server.
+        the WSGI server.  Request handlers behave a bit like :mod:`WSGI`
+        'middleware' but they have the benefit of running in a context in
+        which they have access tot he Pyramid :term:`application registry` as
+        well as the Pyramid rendering machinery.
 
         A request handler factory (passed as ``handler_factory``) must be a
         callable (or a :term:`dotted Python name` to such a callable) which
@@ -919,15 +931,19 @@ class Configurator(object):
         A request handler accepts a :term:`request` object and returns a
         :term:`response` object.
 
-        Here's an example of creating both a handler factory and a handler,
-        and registering the handler factory:
+        Here's an example creating a handler factory and registering the
+        handler factory:
 
         .. code-block:: python
 
             import time
+            from pyramid.settings import asbool
+            import logging
+
+            log = logging.getLogger(__name__)
 
             def timing_handler_factory(handler, registry):
-                if registry.settings['do_timing']:
+                if asbool(registry.settings.get('do_timing')):
                     # if timing support is enabled, return a wrapper
                     def timing_handler(request):
                         start = time.time()
@@ -935,10 +951,12 @@ class Configurator(object):
                             response = handler(request)
                         finally:
                             end = time.time()
-                            print: 'The request took %s seconds' % (end - start)
+                            log.debug('The request took %s seconds' %
+                                      (end - start))
                         return response
                     return timing_handler
-                # if timing support is not enabled, return the original handler
+                # if timing support is not enabled, return the original
+                # handler
                 return handler
 
             config.add_request_handler(timing_handler_factory)
@@ -946,120 +964,61 @@ class Configurator(object):
         The ``request`` argument to the handler will be the request created
         by Pyramid's router when it receives a WSGI request.
 
-        If more than one request handler factory is registered into a single
-        configuration, request handlers will be chained together.  The first
-        request handler factory in the chain will be called with the default
-        Pyramid request handler, the second handler factory added will be
-        called with the result of the first handler factory, ad
-        infinitum. The Pyramid router will use the outermost wrapper in this
-        chain (which is a bit like a WSGI middleware "pipeline") as its
-        handler function.
+        If more than one call to ``add_request_handler`` is made within a
+        single application configuration, request handlers will be chained
+        together.  The first request handler factory added will be called
+        with the default Pyramid request handler as its ``handler`` argument,
+        the second handler factory added will be called with the result of
+        the first handler factory, and so on, ad infinitum. The Pyramid
+        router will use the outermost handler produced by this chain (the
+        very last handler added) as its handler function.
 
-        The deploying user can specify request handler inclusion and ordering
-        in his Pyramid configuration using the ``pyramid.handlers``
-        configuration value.  However, he is not required to do so.  Instead,
-        he can rely on hinting information provided by you (the framework
-        extender) which provides some clues about where in his request
-        handler pipeline a request handler should wind up.  This is achieved
-        by using the ``before`` and/or ``after`` arguments to
-        ``add_request_handler``.
+        By default, the ordering of the chain is controlled entirely by the
+        relative ordering of calls to ``add_request_handler``.  However, the
+        deploying user can override request handler inclusion and ordering in
+        his Pyramid configuration using the ``pyramid.request_handlers``
+        settings value.  When used, this settings value should be a list of
+        Python dotted names which imply the ordering (and inclusion) of
+        handler factories in the request handler chain.
 
-        The ``before`` and ``after`` arguments provide hints to Pyramid about
-        which position in the handler chain this handler must assume when the
-        deploying user has not defined a ``pyramid.handlers`` configuration
-        value.  ``before`` and ``after`` are relative to request *ingress*
-        order.  Therefore, ``before`` means 'closer to
-        request ingress' and ``after`` means 'closer to Pyramid's main request
-        handler'.
+        Pyramid will prevent the same request handler factory from being
+        added to the request handling chain more than once using
+        configuration conflict detection.  If you wish to add the same
+        handler factory more than once in a configuration, you should either:
+        a) use a handler that is an *instance* rather than a function or
+        class, or b) use a function or class with the same logic as the other
+        it conflicts with but with a different ``__name__`` attribute.  
 
-        ``before`` or ``after`` may be either the name of another handler,
-        the name ``main`` representing Pyramid's main request handler, the
-        name ``ingress`` representing the request ingress point, or a sequence
-        of handler names (the sequence can itself include ``main`` or
-        ``ingress``).  For example, if you'd like to hint that this handler
-        should always come before the
-        ``pyramid.router.exception_view_handler_factory`` handler but before
-        the ``pyramid_retry.retry_handler_factory`` handler:
-
-        .. code-block:: python
-           :linenos:
-
-           config.add_request_handler(
-               'mypkg.handler_factory',
-               before='pyramid.router.exception_view_handler_factory',
-               after='pyramid_retry.retry_handler_factory')
-
-        Or you might rather hint that a handler should always come before the
-        ``main`` handler but after retry and transaction management handlers:
-
-        .. code-block:: python
-           :linenos:
-
-           config.add_handler('mypkg.handler', before='main',
-                              after=('pyramid_retry.retry_handler_factory',
-                                     'pyramid_tm.tm_handler_factory')
-
-        Or you might hint that a handler should come after a browser
-        id-generating handler, but you don't want to hint that it comes
-        before anything:
-
-        .. code-block:: python
-           :linenos:
-
-           config.add_handler(
-               'mypkg.handler',
-                after='pyramid_browserid.browserid_handler_factory')
-
-        The names provided to ``before`` and ``after`` don't need to
-        represent handlers that actually exist in the current deployment.
-        For example, if you say
-        ``before='pyramid_retry.retry_handler_factory'`` and the
-        ``pyramid_retry.retry_handler_factory`` handler is not configured
-        into the current deployment at all, no error will be raised when the
-        add_request_handler statement is executed; instead, the hint will be
-        effectively ignored.
-
-        It is an error to specify an ``after`` value of ``main`` or a
-        ``before`` value of ``ingress``.
-
-        Pyramid does its best to configure a sensible handlers pipeline when
-        the user does not provide a ``pyramid.handlers`` configuration
-        setting in his Pyramid configuration, even in the face of conflicting
-        hints, by using a topological sort on all handlers configured into
-        the system using ``before`` and ``after`` hinting as input to the
-        sort.  However, ``before`` and ``after`` hinting are ignored
-        completely when the deploying user has specified an explicit
-        ``pyramid.handlers`` configuration value; this value specifies an
-        unambigous inclusion and ordering for handlers in a given deployment;
-        when it is provided, the topological sort that uses the ``before``
-        and ``after`` hint information is never performed.
-
-        A user can get both the effective and hinted handler ordering by
-        using the ``paster phandlers`` command.
-
-        The ``name`` argument to this function is optional.  The name is used
-        as a key for conflict detection.  No two request handler factories
-        may share the same name in the same configuration (unless
-        :ref:`automatic_conflict_resolution` is able to resolve the conflict
-        or this is an autocommitting configurator).  By default, a name will
-        be the :term:`Python dotted name` of the object passed as
-        ``handler_factory``.
+        A user can get a representation of both the implicit request handler
+        ordering (the ordering specified by calls to ``add_request_handler``)
+        and the explicit request handler ordering (specified by the
+        ``pyramid.request_handlers`` setting) orderings using the ``paster
+        phandlers`` command.  Handler factories which are functions or
+        classes will show up as a standard Python dotted name in the
+        ``phandlers`` output.  Handler factories which are *instances* will
+        show their module and class name; the Python object id of the
+        instance will be appended.
 
         .. note:: This feature is new as of Pyramid 1.1.1.
         """
+        return self._add_request_handler(handler_factory, explicit=False)
+
+    def _add_request_handler(self, handler_factory, explicit):
         handler_factory = self.maybe_dotted(handler_factory)
-        if name is None:
-            name = '.'.join(
-                (handler_factory.__module__, handler_factory.__name__))
+        if hasattr(handler_factory, '__name__'):
+            # function or class
+            name = '.'.join((handler_factory.__module__,
+                             handler_factory.__name__))
+        else:
+            # instance
+            name = '.'.join(handler_factory.__module__,
+                            handler_factory.__class__.__name__,
+                            str(id(handler_factory)))
         def register():
             registry = self.registry
-            registry.registerUtility(handler_factory, IRequestHandlerFactory,
-                                     name=name)
-            existing_names = registry.queryUtility(IRequestHandlerFactories,
-                                                   default=[])
-            existing_names.append(name)
-            registry.registerUtility(existing_names, IRequestHandlerFactories)
-        self.action(('requesthandler', name), register)
+            handler_manager = registry.getUtility(IRequestHandlerManager)
+            handler_manager.add(name, handler_factory, explicit)
+        self.action(('request_handler', name), register)
         
     @action_method
     def add_subscriber(self, subscriber, iface=None):
@@ -3495,3 +3454,24 @@ def isexception(o):
         )
 
 global_registries = WeakOrderedSet()
+
+class RequestHandlerManager(object):
+    implements(IRequestHandlerManager)
+    def __init__(self):
+        self.explicit = []
+        self.implicit = []
+
+    def add(self, name, factory, explicit=False):
+        if explicit:
+            self.explicit.append((name, factory))
+        else:
+            self.implicit.append((name, factory))
+
+    def __call__(self, handler, registry):
+        handler_factories = self.implicit
+        if self.explicit:
+            handler_factories = self.explicit
+        for name, factory in handler_factories[::-1]:
+            handler = factory(handler, registry)
+        return handler
+    
