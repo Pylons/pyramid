@@ -98,7 +98,9 @@ def render_to_response(renderer_name, value, request=None, package=None):
 
     Supply a ``request`` parameter in order to provide the renderer
     with the most correct 'system' values (``request`` and ``context``
-    in particular).
+    in particular). Keep in mind that if the ``request`` parameter is
+    not passed in, any changes to ``request.response`` attributes made
+    before calling this function will be ignored.
 
     """
     try:
