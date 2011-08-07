@@ -78,7 +78,7 @@
 
      .. automethod:: set_view_mapper
 
-     .. automethod:: add_request_handler
+     .. automethod:: add_tween
 
      .. automethod:: testing_securitypolicy
 

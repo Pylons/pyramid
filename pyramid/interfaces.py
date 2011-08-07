@@ -446,23 +446,16 @@ class IMultiDict(Interface): # docs-only interface
 class IRequest(Interface):
     """ Request type interface attached to all request objects """
 
-class IRequestHandlerFactories(Interface):
+class ITweens(Interface):
     """ Marker interface for utility registration representing the ordered
-    set of a configuration's request handler factories"""
-
-class IRequestHandlerFactory(Interface):
-    """ A request handler factory can be used to augment Pyramid's default
-    mainloop request handling."""
-    def __call__(self, handler, registry):
-        """ Return an IRequestHandler; the ``handler`` argument passed will
-        be the previous request handler added, or the default request handler
-        if no request handlers have yet been added ."""
+    set of a configuration's tween factories"""
 
 class IRequestHandler(Interface):
     """ """
     def __call__(self, request):
-        """ Must return an IResponse or raise an exception.  The ``request``
-        argument will be an instance of an object that provides IRequest."""
+        """ Must return a tuple of IReqest, IResponse or raise an exception.
+        The ``request`` argument will be an instance of an object that
+        provides IRequest."""
 
 IRequest.combined = IRequest # for exception view lookups 
 

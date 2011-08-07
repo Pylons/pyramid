@@ -32,6 +32,7 @@ documentation is organized alphabetically by module name.
    api/testing
    api/threadlocal
    api/traversal
+   api/tweens
    api/url
    api/view
    api/wsgi

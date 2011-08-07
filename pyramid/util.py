@@ -206,3 +206,4 @@ class WeakOrderedSet(object):
         if self._order:
             oid = self._order[-1]
             return self._items[oid]()
+

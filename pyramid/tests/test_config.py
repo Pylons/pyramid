@@ -336,6 +336,7 @@ class ConfiguratorTests(unittest.TestCase):
         reg = DummyRegistry()
         config = self._makeOne(reg)
         config.add_view = lambda *arg, **kw: False
+        config._add_tween = lambda *arg, **kw: False
         config.setup_registry()
         self.assertEqual(reg.has_listeners, True)
 
@@ -347,6 +348,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(reg)
         views = []
         config.add_view = lambda *arg, **kw: views.append((arg, kw))
+        config._add_tween = lambda *arg, **kw: False
         config.setup_registry()
         self.assertEqual(views[0], ((default_exceptionresponse_view,),
                                     {'context':IExceptionResponse}))
@@ -581,6 +583,20 @@ pyramid.tests.test_config.dummy_include2""",
         self.assert_(reg.included)
         self.assert_(reg.also_included)
 
+    def test_setup_registry_tweens(self):
+        from pyramid.interfaces import ITweens
+        from pyramid.registry import Registry
+        reg = Registry()
+        config = self._makeOne(reg)
+        settings = {
+            'pyramid.tweens': 'pyramid.tests.test_config.dummy_tween_factory'
+        }
+        config.setup_registry(settings=settings)
+        tweens = config.registry.getUtility(ITweens)
+        self.assertEqual(tweens.explicit,
+                         [('pyramid.tests.test_config.dummy_tween_factory',
+                           dummy_tween_factory)])
+
     def test_get_settings_nosettings(self):
         from pyramid.registry import Registry
         reg = Registry()
@@ -612,48 +628,66 @@ pyramid.tests.test_config.dummy_include2""",
         settings = reg.getUtility(ISettings)
         self.assertEqual(settings['a'], 1)
 
-    def test_add_request_handlers_names_distinct(self):
-        from pyramid.interfaces import IRequestHandlerFactories
-        from pyramid.interfaces import IRequestHandlerFactory
+    def test_add_tweens_names_distinct(self):
+        from pyramid.interfaces import ITweens
+        from pyramid.tweens import excview_tween_factory
         def factory1(handler, registry): return handler
         def factory2(handler, registry): return handler
         config = self._makeOne()
-        config.add_request_handler(factory1, 'name1')
-        config.add_request_handler(factory2, 'name2')
+        config.add_tween(factory1)
+        config.add_tween(factory2)
         config.commit()
-        names = config.registry.queryUtility(IRequestHandlerFactories)
-        self.assertEqual(names, ['name1', 'name2'])
-        f1 = config.registry.getUtility(IRequestHandlerFactory, name='name1')
-        f2 = config.registry.getUtility(IRequestHandlerFactory, name='name2')
-        self.assertEqual(f1, factory1)
-        self.assertEqual(f2, factory2)
+        tweens = config.registry.queryUtility(ITweens)
+        self.assertEqual(
+            tweens.implicit,
+            [('pyramid.tweens.excview_tween_factory', excview_tween_factory),
+             ('pyramid.tests.test_config.factory1', factory1),
+             ('pyramid.tests.test_config.factory2', factory2)])
 
-    def test_add_request_handlers_dottednames(self):
+    def test_add_tween_dottedname(self):
+        from pyramid.interfaces import ITweens
+        from pyramid.tweens import excview_tween_factory
+        config = self._makeOne()
+        config.add_tween('pyramid.tests.test_config.dummy_tween_factory')
+        config.commit()
+        tweens = config.registry.queryUtility(ITweens)
+        self.assertEqual(
+            tweens.implicit,
+            [
+                ('pyramid.tweens.excview_tween_factory', excview_tween_factory),
+                ('pyramid.tests.test_config.dummy_tween_factory',
+                 dummy_tween_factory)
+                ])
+
+    def test_add_tween_instance(self):
+        from pyramid.interfaces import ITweens
+        from pyramid.tweens import excview_tween_factory
+        class ATween(object): pass
+        atween = ATween()
+        config = self._makeOne()
+        config.add_tween(atween)
+        config.commit()
+        tweens = config.registry.queryUtility(ITweens)
+        self.assertEqual(len(tweens.implicit), 2)
+        self.assertEqual(
+            tweens.implicit[0],
+            ('pyramid.tweens.excview_tween_factory', excview_tween_factory))
+        self.assertTrue(
+          tweens.implicit[1][0].startswith('pyramid.tests.test_config.ATween.'))
+        self.assertEqual(tweens.implicit[1][1], atween)
+
+    def test_add_tween_unsuitable(self):
+        from pyramid.exceptions import ConfigurationError
         import pyramid.tests
-        from pyramid.interfaces import IRequestHandlerFactories
-        from pyramid.interfaces import IRequestHandlerFactory
         config = self._makeOne()
-        config.add_request_handler('pyramid.tests', 'name1')
-        config.commit()
-        names = config.registry.queryUtility(IRequestHandlerFactories)
-        self.assertEqual(names, ['name1'])
-        f1 = config.registry.getUtility(IRequestHandlerFactory, name='name1')
-        self.assertEqual(f1, pyramid.tests)
+        self.assertRaises(ConfigurationError, config.add_tween, pyramid.tests)
 
-    def test_add_request_handlers_names_overlap(self):
-        from pyramid.interfaces import IRequestHandlerFactories
-        from pyramid.interfaces import IRequestHandlerFactory
-        def factory1(handler, registry): return handler
-        def factory2(handler, registry): return handler
-        def factory3(handler, registry): return handler
-        config = self._makeOne(autocommit=True)
-        config.add_request_handler(factory1, 'name1')
-        config.add_request_handler(factory2, 'name2')
-        config.add_request_handler(factory3, 'name1')
-        names = config.registry.queryUtility(IRequestHandlerFactories)
-        self.assertEqual(names, ['name1', 'name2', 'name1'])
-        f3 = config.registry.getUtility(IRequestHandlerFactory, name='name1')
-        self.assertEqual(f3, factory3)
+    def test_add_tweens_conflict(self):
+        from zope.configuration.config import ConfigurationConflictError
+        config = self._makeOne()
+        config.add_tween('pyramid.tests.test_config.dummy_tween_factory')
+        config.add_tween('pyramid.tests.test_config.dummy_tween_factory')
+        self.assertRaises(ConfigurationConflictError, config.commit)
 
     def test_add_subscriber_defaults(self):
         from zope.interface import implements
@@ -5477,6 +5511,45 @@ class Test_isexception(unittest.TestCase):
             pass
         self.assertEqual(self._callFUT(ISubException), True)
 
+class TestTweens(unittest.TestCase):
+    def _makeOne(self):
+        from pyramid.config import Tweens
+        return Tweens()
+
+    def test_add_explicit(self):
+        tweens = self._makeOne()
+        tweens.add('name', 'factory', explicit=True)
+        self.assertEqual(tweens.explicit, [('name',  'factory')])
+        tweens.add('name2', 'factory2', explicit=True)
+        self.assertEqual(tweens.explicit, [('name',  'factory'),
+                                           ('name2', 'factory2')])
+
+    def test_add_implicit(self):
+        tweens = self._makeOne()
+        tweens.add('name', 'factory', explicit=False)
+        self.assertEqual(tweens.implicit, [('name',  'factory')])
+        tweens.add('name2', 'factory2', explicit=False)
+        self.assertEqual(tweens.implicit, [('name',  'factory'),
+                                           ('name2', 'factory2')])
+
+    def test___call___explicit(self):
+        tweens = self._makeOne()
+        def factory1(handler, registry):
+            return handler
+        def factory2(handler, registry):
+            return '123'
+        tweens.explicit = [('name', factory1), ('name', factory2)]
+        self.assertEqual(tweens(None, None), '123')
+
+    def test___call___implicit(self):
+        tweens = self._makeOne()
+        def factory1(handler, registry):
+            return handler
+        def factory2(handler, registry):
+            return '123'
+        tweens.implicit = [('name', factory1), ('name', factory2)]
+        self.assertEqual(tweens(None, None), '123')
+
 class DummyRequest:
     subpath = ()
     matchdict = None
@@ -5663,3 +5736,4 @@ from pyramid.interfaces import IResponse
 class DummyResponse(object):
     implements(IResponse)
     
+def dummy_tween_factory(handler, registry): pass

@@ -38,8 +38,7 @@ from pyramid.interfaces import IRendererFactory
 from pyramid.interfaces import IRendererGlobalsFactory
 from pyramid.interfaces import IRequest
 from pyramid.interfaces import IRequestFactory
-from pyramid.interfaces import IRequestHandlerFactory
-from pyramid.interfaces import IRequestHandlerFactories
+from pyramid.interfaces import ITweens
 from pyramid.interfaces import IResponse
 from pyramid.interfaces import IRootFactory
 from pyramid.interfaces import IRouteRequest
@@ -80,6 +79,7 @@ from pyramid.threadlocal import manager
 from pyramid.traversal import DefaultRootFactory
 from pyramid.traversal import find_interface
 from pyramid.traversal import traversal_path
+from pyramid.tweens import excview_tween_factory
 from pyramid.urldispatch import RoutesMapper
 from pyramid.util import DottedNameResolver
 from pyramid.util import WeakOrderedSet
@@ -717,11 +717,13 @@ class Configurator(object):
         policies, renderers, a debug logger, a locale negotiator, and various
         other settings using the configurator's current registry, as per the
         descriptions in the Configurator constructor."""
+        tweens = []
+        includes = []
         if settings:
-            includes = settings.pop('pyramid.include', '')
-            includes = [x.strip() for x in includes.splitlines()]
-        else:
-            includes = []
+            includes = [x.strip() for x in
+                        settings.get('pyramid.include', '').splitlines()]
+            tweens =   [x.strip() for x in
+                        settings.get('pyramid.tweens','').splitlines()]
         registry = self.registry
         self._fix_registry()
         self._set_settings(settings)
@@ -731,6 +733,9 @@ class Configurator(object):
         # cope with WebOb exc objects not decoratored with IExceptionResponse
         from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
         registry.registerSelfAdapter((WebobResponse,), IResponse)
+        # add a handler manager
+        for factory in tweens:
+            self._add_tween(factory, explicit=True)
 
         if debug_logger is None:
             debug_logger = logging.getLogger(self.package_name)
@@ -898,80 +903,45 @@ class Configurator(object):
         return self._derive_view(view, attr=attr, renderer=renderer)
 
     @action_method
-    def add_request_handler(self, handler_factory, name):
+    def add_tween(self, tween_factory):
         """
-        Add a request handler factory.  A request handler factory is used to
-        wrap the Pyramid router's primary request handling function.  This is
-        a feature that may be used by framework extensions, to provide, for
-        example, view timing support and as a convenient place to hang
-        bookkeeping code that examines exceptions before they are returned to
-        the server.
+        Add a 'tween factory'.  A :term:`tween` (think: 'between') is a bit
+        of code that sits between the Pyramid router's main request handling
+        function and the upstream WSGI component that uses :app:`Pyramid` as
+        its 'app'.  This is a feature that may be used by Pyramid framework
+        extensions, to provide, for example, Pyramid-specific view timing
+        support bookkeeping code that examines exceptions before they are
+        returned to the upstream WSGI application.  Tweens behave a bit like
+        :term:`WSGI` 'middleware' but they have the benefit of running in a
+        context in which they have access to the Pyramid :term:`application
+        registry` as well as the Pyramid rendering machinery.
 
-        A request handler factory (passed as ``handler_factory``) must be a
-        callable (or a :term:`dotted Python name` to a callable) which
-        accepts two arguments: ``handler`` and ``registry``.  ``handler``
-        will be the request handler being wrapped.  ``registry`` will be the
-        Pyramid :term:`application registry` represented by this
-        Configurator.  A request handler factory must return a request
-        handler when it is called.
-
-        A request handler accepts a :term:`request` object and returns a
-        :term:`response` object.
-
-        Here's an example of creating both a handler factory and a handler,
-        and registering the handler factory:
-
-        .. code-block:: python
-
-            import time
-
-            def timing_handler_factory(handler, registry):
-                if registry.settings['do_timing']:
-                    # if timing support is enabled, return a wrapper
-                    def timing_handler(request):
-                        start = time.time()
-                        try:
-                            response = handler(request)
-                        finally:
-                            end = time.time()
-                            print: 'The request took %s seconds' % (end - start)
-                        return response
-                    return timing_handler
-                # if timing support is not enabled, return the original handler
-                return handler
-
-            config.add_request_handler(timing_handler_factory, 'timing')
-
-        The ``request`` argument to the handler will be the request created
-        by Pyramid's router when it receives a WSGI request.
-
-        If more than one request handler factory is registered into a single
-        configuration, the request handlers will be chained together.  The
-        first request handler factory added (in code execution order) will be
-        called with the default Pyramid request handler, the second handler
-        factory added will be called with the result of the first handler
-        factory, ad infinitum. The Pyramid router will use the outermost
-        wrapper in this chain (which is a bit like a WSGI middleware
-        "pipeline") as its handler function.
-
-        The ``name`` argument to this function is required.  The name is used
-        as a key for conflict detection.  No two request handler factories
-        may share the same name in the same configuration (unless
-        :ref:`automatic_conflict_resolution` is able to resolve the conflict
-        or this is an autocommitting configurator).
+        For more information, see :ref:`registering_tweens`.
 
         .. note:: This feature is new as of Pyramid 1.1.1.
         """
-        handler_factory = self.maybe_dotted(handler_factory)
+        return self._add_tween(tween_factory, explicit=False)
+
+    def _add_tween(self, tween_factory, explicit):
+        tween_factory = self.maybe_dotted(tween_factory)
+        name = tween_factory_name(tween_factory)
         def register():
             registry = self.registry
-            registry.registerUtility(handler_factory, IRequestHandlerFactory,
-                                     name=name)
-            existing_names = registry.queryUtility(IRequestHandlerFactories,
-                                                   default=[])
-            existing_names.append(name)
-            registry.registerUtility(existing_names, IRequestHandlerFactories)
-        self.action(('requesthandler', name), register)
+            tweens = registry.queryUtility(ITweens)
+            if tweens is None:
+                tweens = Tweens()
+                registry.registerUtility(tweens, ITweens)
+                tweens.add(
+                    tween_factory_name(excview_tween_factory),
+                    excview_tween_factory,
+                    explicit=False)
+            tweens.add(name, tween_factory, explicit)
+        self.action(('tween', name, explicit), register)
+
+    @action_method
+    def add_request_handler(self, factory, name): # pragma: no cover
+        # XXX bw compat for debugtoolbar
+        return self._add_tween(factory, explicit=False)
         
     @action_method
     def add_subscriber(self, subscriber, iface=None):
@@ -3407,3 +3377,40 @@ def isexception(o):
         )
 
 global_registries = WeakOrderedSet()
+
+class Tweens(object):
+    implements(ITweens)
+    def __init__(self):
+        self.explicit = []
+        self.implicit = []
+
+    def add(self, name, factory, explicit=False):
+        if explicit:
+            self.explicit.append((name, factory))
+        else:
+            self.implicit.append((name, factory))
+
+    def __call__(self, handler, registry):
+        factories = self.implicit
+        if self.explicit:
+            factories = self.explicit
+        for name, factory in factories:
+            handler = factory(handler, registry)
+        return handler
+    
+def tween_factory_name(factory):
+    if (hasattr(factory, '__name__') and
+        hasattr(factory, '__module__')):
+        # function or class
+        name = '.'.join([factory.__module__,
+                         factory.__name__])
+    elif hasattr(factory, '__module__'):
+        # instance
+        name = '.'.join([factory.__module__,
+                         factory.__class__.__name__,
+                         str(id(factory))])
+    else:
+        raise ConfigurationError(
+            'A tween factory must be a class, an instance, or a function; '
+            '%s is not a suitable tween factory' % factory)
+    return name

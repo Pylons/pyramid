@@ -917,3 +917,14 @@ Glossary
      PyPy is an "alternative implementation of the Python
      language":http://pypy.org/
 
+   tween
+     A bit of code that sits between the Pyramid router's main request
+     handling function and the upstream WSGI component that uses
+     :app:`Pyramid` as its 'app'.  A tween may be used by Pyramid framework
+     extensions, to provide, for example, Pyramid-specific view timing
+     support bookkeeping code that examines exceptions before they are
+     returned to the upstream WSGI application.  Tweens behave a bit like
+     :mod:`WSGI` 'middleware' but they have the benefit of running in a
+     context in which they have access to the Pyramid :term:`application
+     registry` as well as the Pyramid rendering machinery.
+
