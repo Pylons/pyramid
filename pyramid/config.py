@@ -937,6 +937,11 @@ class Configurator(object):
                     explicit=False)
             tweens.add(name, tween_factory, explicit)
         self.action(('tween', name, explicit), register)
+
+    @action_method
+    def add_request_handler(self, factory, name): # pragma: no cover
+        # XXX bw compat for debugtoolbar
+        return self._add_tween(factory, explicit=False)
         
     @action_method
     def add_subscriber(self, subscriber, iface=None):
