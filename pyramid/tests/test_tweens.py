@@ -17,24 +17,25 @@ class TestTweens(unittest.TestCase):
         from pyramid.tweens import INGRESS
         tweens = self._makeOne()
         tweens.add_implicit('name', 'factory')
-        self.assertEqual(tweens.implicit_names, ['name'])
+        self.assertEqual(tweens.implicit_alias_names, ['name'])
         self.assertEqual(tweens.implicit_factories,
                          {'name':'factory'})
-        self.assertEqual(tweens.implicit_ingress_names, ['name'])
+        self.assertEqual(tweens.implicit_ingress_alias_names, ['name'])
         self.assertEqual(tweens.implicit_order, [('name', INGRESS)])
         tweens.add_implicit('name2', 'factory2')
-        self.assertEqual(tweens.implicit_names, ['name',  'name2'])
+        self.assertEqual(tweens.implicit_alias_names, ['name',  'name2'])
         self.assertEqual(tweens.implicit_factories,
                          {'name':'factory', 'name2':'factory2'})
-        self.assertEqual(tweens.implicit_ingress_names, ['name', 'name2'])
+        self.assertEqual(tweens.implicit_ingress_alias_names, ['name', 'name2'])
         self.assertEqual(tweens.implicit_order,
                          [('name', INGRESS), ('name2', INGRESS)])
         tweens.add_implicit('name3', 'factory3', below='name2')
-        self.assertEqual(tweens.implicit_names, ['name',  'name2', 'name3'])
+        self.assertEqual(tweens.implicit_alias_names,
+                         ['name',  'name2', 'name3'])
         self.assertEqual(tweens.implicit_factories,
                          {'name':'factory', 'name2':'factory2',
                           'name3':'factory3'})
-        self.assertEqual(tweens.implicit_ingress_names, ['name', 'name2'])
+        self.assertEqual(tweens.implicit_ingress_alias_names, ['name', 'name2'])
         self.assertEqual(tweens.implicit_order,
                          [('name', INGRESS), ('name2', INGRESS),
                           ('name2', 'name3')])
@@ -54,7 +55,19 @@ class TestTweens(unittest.TestCase):
             return handler
         def factory2(handler, registry):
             return '123'
-        tweens.implicit_names = ['name', 'name2']
+        tweens.implicit_alias_names = ['name', 'name2']
+        tweens.implicit_aliases = {'name':'name', 'name2':'name2'}
+        tweens.implicit_factories = {'name':factory1, 'name2':factory2}
+        self.assertEqual(tweens(None, None), '123')
+
+    def test___call___implicit_with_aliasnames_different_than_names(self):
+        tweens = self._makeOne()
+        def factory1(handler, registry):
+            return handler
+        def factory2(handler, registry):
+            return '123'
+        tweens.implicit_alias_names = ['foo1', 'foo2']
+        tweens.implicit_aliases = {'foo1':'name', 'foo2':'name2'}
         tweens.implicit_factories = {'name':factory1, 'name2':factory2}
         self.assertEqual(tweens(None, None), '123')
 

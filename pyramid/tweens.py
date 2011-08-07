@@ -61,26 +61,30 @@ class Tweens(object):
     implements(ITweens)
     def __init__(self):
         self.explicit = []
-        self.implicit_names = []
+        self.implicit_alias_names = []
         self.implicit_factories = {}
         self.implicit_order = []
-        self.implicit_ingress_names = []
+        self.implicit_ingress_alias_names = []
+        self.implicit_aliases = {}
 
     def add_explicit(self, name, factory):
         self.explicit.append((name, factory))
 
-    def add_implicit(self, name, factory, below=None, atop=None):
+    def add_implicit(self, name, factory, alias=None, below=None, atop=None):
+        if alias is None:
+            alias = name
+        self.implicit_aliases[alias] = name
+        self.implicit_alias_names.append(alias)
+        self.implicit_factories[name] = factory
         if below is None and atop is None:
-            atop = 'ingress'
-            self.implicit_ingress_names.append(name)
+            atop = INGRESS
+            self.implicit_ingress_alias_names.append(alias)
         if below is not None:
-            order = (below, name)
+            order = (below, alias)
             self.implicit_order.append(order)
         if atop is not None:
-            order = (name, atop)
+            order = (alias, atop)
             self.implicit_order.append(order)
-        self.implicit_names.append(name)
-        self.implicit_factories[name] = factory
 
     def implicit(self):
         roots = []
@@ -97,25 +101,25 @@ class Tweens(object):
             if tonode in roots:
                 roots.remove(tonode)
 
-        names = [MAIN, INGRESS] + self.implicit_names
+        aliases = [MAIN, INGRESS] + self.implicit_alias_names
 
         orders = {}
 
         for pos, (first, second) in enumerate(self.implicit_order):
-            has_first = first in names
-            has_second = second in names
+            has_first = first in aliases
+            has_second = second in aliases
             if (not has_first) or (not has_second):
                 self.implicit_order[pos] = None, None # FFF
             else:
                 orders[first] = orders[second] = True
 
-        for v in names:
-            # any name that doesn't have an ordering after we detect all
+        for v in aliases:
+            # any alias that doesn't have an ordering after we detect all
             # nodes with orders should get an ordering relative to INGRESS,
             # as if it were added with no below or atop
             if (not v in orders) and (v not in (INGRESS, MAIN)):
                 self.implicit_order.append((v, INGRESS))
-                self.implicit_ingress_names.append(v)
+                self.implicit_ingress_alias_names.append(v)
             add_node(graph, v)
 
         for a, b in self.implicit_order:
@@ -125,7 +129,7 @@ class Tweens(object):
         def sortroots(name):
             # sort roots so that roots (and their children) that depend only on
             # the ingress sort nearer the end (nearer the ingress)
-            if name in self.implicit_ingress_names:
+            if name in self.implicit_ingress_alias_names:
                 return 1
             children = graph[name][1:]
             for child in children:
@@ -135,11 +139,11 @@ class Tweens(object):
 
         roots.sort(key=sortroots)
 
-        sorted_tweens = []
+        sorted_aliases = []
 
         while roots:
             root = roots.pop(0)
-            sorted_tweens.append(root)
+            sorted_aliases.append(root)
             children = graph[root][1:]
             for child in children:
                 arcs = graph[child][0]
@@ -156,8 +160,14 @@ class Tweens(object):
                 cycledeps[k] = v[1:]
             raise CyclicDependencyError(cycledeps)
 
-        return [ (name, self.implicit_factories[name]) for name in
-                 sorted_tweens if name not in (MAIN, INGRESS) ]
+        result = []
+
+        for alias in sorted_aliases:
+            if alias not in (MAIN, INGRESS):
+                name = self.implicit_aliases[alias]
+                result.append((name, self.implicit_factories[name]))
+
+        return result
 
     def __call__(self, handler, registry):
         if self.explicit:
@@ -185,7 +195,7 @@ def tween_factory_name(factory):
             '%s is not a suitable tween factory' % factory)
     return name
 
-MAIN = 'main'
-INGRESS = 'ingress'
+MAIN = 'main-->'
+INGRESS = '<--ingress'
 EXCVIEW = tween_factory_name(excview_tween_factory)
 
