@@ -79,6 +79,7 @@ from pyramid.threadlocal import manager
 from pyramid.traversal import DefaultRootFactory
 from pyramid.traversal import find_interface
 from pyramid.traversal import traversal_path
+from pyramid.tweens import excview_tween_factory
 from pyramid.urldispatch import RoutesMapper
 from pyramid.util import DottedNameResolver
 from pyramid.util import WeakOrderedSet
@@ -716,14 +717,13 @@ class Configurator(object):
         policies, renderers, a debug logger, a locale negotiator, and various
         other settings using the configurator's current registry, as per the
         descriptions in the Configurator constructor."""
+        tweens = []
+        includes = []
         if settings:
-            includes = settings.get('pyramid.include', '')
-            includes = [x.strip() for x in includes.splitlines()]
-            tweens = settings.get('pyramid.tweens','')
-            tweens = [x.strip() for x in tweens.splitlines()]
-        else:
-            includes = []
-            tweens = []
+            includes = [x.strip() for x in
+                        settings.get('pyramid.include', '').splitlines()]
+            tweens =   [x.strip() for x in
+                        settings.get('pyramid.tweens','').splitlines()]
         registry = self.registry
         self._fix_registry()
         self._set_settings(settings)
@@ -734,10 +734,6 @@ class Configurator(object):
         from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
         registry.registerSelfAdapter((WebobResponse,), IResponse)
         # add a handler manager
-        tweenreg = Tweens()
-        registry.registerUtility(tweenreg, ITweens)
-        self._add_tween('pyramid.router.excview_tween_factory', explicit=False)
-
         for factory in tweens:
             self._add_tween(factory, explicit=True)
 
@@ -928,24 +924,18 @@ class Configurator(object):
 
     def _add_tween(self, tween_factory, explicit):
         tween_factory = self.maybe_dotted(tween_factory)
-        if (hasattr(tween_factory, '__name__') and
-            hasattr(tween_factory, '__module__')):
-            # function or class
-            name = '.'.join([tween_factory.__module__,
-                             tween_factory.__name__])
-        elif hasattr(tween_factory, '__module__'):
-            # instance
-            name = '.'.join([tween_factory.__module__,
-                            tween_factory.__class__.__name__,
-                            str(id(tween_factory))])
-        else:
-            raise ConfigurationError(
-                'A tween factory must be a class, an instance, or a function; '
-                '%s is not a suitable tween factory' % tween_factory)
+        name = tween_factory_name(tween_factory)
         def register():
             registry = self.registry
-            handler_manager = registry.getUtility(ITweens)
-            handler_manager.add(name, tween_factory, explicit)
+            tweens = registry.queryUtility(ITweens)
+            if tweens is None:
+                tweens = Tweens()
+                registry.registerUtility(tweens, ITweens)
+                tweens.add(
+                    tween_factory_name(excview_tween_factory),
+                    excview_tween_factory,
+                    explicit=False)
+            tweens.add(name, tween_factory, explicit)
         self.action(('tween', name, explicit), register)
         
     @action_method
@@ -3403,3 +3393,19 @@ class Tweens(object):
             handler = factory(handler, registry)
         return handler
     
+def tween_factory_name(factory):
+    if (hasattr(factory, '__name__') and
+        hasattr(factory, '__module__')):
+        # function or class
+        name = '.'.join([factory.__module__,
+                         factory.__name__])
+    elif hasattr(factory, '__module__'):
+        # instance
+        name = '.'.join([factory.__module__,
+                         factory.__class__.__name__,
+                         str(id(factory))])
+    else:
+        raise ConfigurationError(
+            'A tween factory must be a class, an instance, or a function; '
+            '%s is not a suitable tween factory' % factory)
+    return name
