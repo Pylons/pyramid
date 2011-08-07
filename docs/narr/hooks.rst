@@ -855,8 +855,7 @@ will be the Pyramid :term:`application registry` represented by this
 Configurator.  A tween factory must return a tween when it is called.
 
 A tween is a callable which accepts a :term:`request` object and returns a
-two-tuple consisting of a :term:`request` object and a :term:`response`
-object.
+two-tuple a :term:`response` object.
 
 Once you've created a tween factory, you can register it using the
 :meth:`pyramid.config.Configurator.add_tween` method.
@@ -878,12 +877,12 @@ Here's an example creating a tween factory and registering it:
             def timing_tween(request):
                 start = time.time()
                 try:
-                    request, response = handler(request)
+                    response = handler(request)
                 finally:
                     end = time.time()
                     log.debug('The request took %s seconds' %
                               (end - start))
-                return request, response
+                return response
             return timing_tween
         # if timing support is not enabled, return the original
         # handler

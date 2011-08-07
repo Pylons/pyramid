@@ -162,7 +162,7 @@ class Router(object):
             if request.response_callbacks:
                 request._process_response_callbacks(response)
 
-            return request, response
+            return response
 
         finally:
             if request is not None and request.finished_callbacks:
@@ -183,7 +183,7 @@ class Router(object):
         manager.push(threadlocals)
         try:
             request.registry = registry
-            request, response = self.handle_request(request)
+            response = self.handle_request(request)
             return response(request.environ, start_response)
         finally:
             manager.pop()

@@ -17,7 +17,7 @@ def excview_tween_factory(handler, registry):
     def excview_tween(request):
         attrs = request.__dict__
         try:
-            request, response = handler(request)
+            response = handler(request)
         except Exception, exc:
             # WARNING: do not assign the result of sys.exc_info() to a
             # local var here, doing so will cause a leak
@@ -39,7 +39,7 @@ def excview_tween_factory(handler, registry):
         finally:
             attrs['exc_info'] = None
 
-        return request, response
+        return response
 
     return excview_tween
 
