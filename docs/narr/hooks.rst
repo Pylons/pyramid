@@ -863,7 +863,7 @@ Once you've created a tween factory, you can register it using the
 Here's an example creating a tween factory and registering it:
 
 .. code-block:: python
-   :lineno:
+   :linenos:
 
     import time
     from pyramid.settings import asbool
