@@ -4,7 +4,6 @@ from pyramid.interfaces import IExceptionViewClassifier
 from pyramid.interfaces import IView
 from pyramid.interfaces import ITweens
 
-from pyramid.events import NewResponse
 from zope.interface import providedBy
 from zope.interface import implements
 
@@ -13,9 +12,7 @@ def excview_tween_factory(handler, registry):
     exception raised by downstream tweens (or the main Pyramid request
     handler) and, if possible, converts it into a Response using an
     :term:`exception view`."""
-    has_listeners = registry.has_listeners
     adapters = registry.adapters
-    notify = registry.notify
 
     def excview_tween(request):
         attrs = request.__dict__
@@ -38,8 +35,8 @@ def excview_tween_factory(handler, registry):
             if view_callable is None:
                 raise
             response = view_callable(exc, request)
-            has_listeners and notify(NewResponse(request, response))
         finally:
+            # prevent leakage
             attrs['exc_info'] = None
 
         return response
