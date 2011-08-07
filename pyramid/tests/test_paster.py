@@ -856,9 +856,11 @@ class TestPTweensCommand(unittest.TestCase):
             L,
             ['"pyramid.tweens" config value NOT set (implicitly ordered tweens used)',
              '',
-             'Position Name                          ',
-             '-------- ----                          ',
-             '0        name                          ',
+             'Position   Name                          ',
+             '--------   ----                          ',
+             '(implied)  main                          ',
+             '0          name                          ',
+             '(implied)  ingress                       ',
              ''])
 
     def test_command_implicit_and_explicit_tweens(self):
@@ -875,17 +877,20 @@ class TestPTweensCommand(unittest.TestCase):
              '',
              'Explicit Tween Chain (used)',
              '',
-             'Position Name                          ',
-             '-------- ----                          ',
-             '0        name2                         ',
+             'Position   Name                          ',
+             '--------   ----                          ',
+             '(implied)  main                          ',
+             '0          name2                         ',
+             '(implied)  ingress                       ',
              '',
              'Implicit Tween Chain (not used)',
              '',
-             'Position Name                          ',
-             '-------- ----                          ',
-             '0        name                          ',
-             ''
-             ])
+             'Position   Name                          ',
+             '--------   ----                          ',
+             '(implied)  main                          ',
+             '0          name                          ',
+             '(implied)  ingress                       ',
+             ''])
 
     def test__get_tweens(self):
         command = self._makeOne()
@@ -894,8 +899,10 @@ class TestPTweensCommand(unittest.TestCase):
 
 class DummyTweens(object):
     def __init__(self, implicit, explicit):
-        self.implicit = implicit
+        self._implicit = implicit
         self.explicit = explicit
+    def implicit(self):
+        return self._implicit
                 
 class Dummy:
     pass

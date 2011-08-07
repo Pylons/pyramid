@@ -574,27 +574,31 @@ class PTweensCommand(PCommand):
         registry = env['registry']
         tweens = self._get_tweens(registry)
         if tweens is not None:
+            implicit = tweens.implicit()
+            explicit = tweens.explicit
             ordering = []
-            if tweens.explicit:
+            if explicit:
                 self.out('"pyramid.tweens" config value set '
                          '(explicitly ordered tweens used)')
                 self.out('')
-                ordering.append((tweens.explicit,
+                ordering.append((explicit,
                                  'Explicit Tween Chain (used)'))
-                ordering.append((tweens.implicit,
+                ordering.append((implicit,
                                  'Implicit Tween Chain (not used)'))
             else:
                 self.out('"pyramid.tweens" config value NOT set '
                          '(implicitly ordered tweens used)')
                 self.out('')
-                ordering.append((tweens.implicit, ''))
+                ordering.append((implicit, ''))
             for L, title in ordering:
                 if title:
                     self.out(title)
                     self.out('')
-                fmt = '%-8s %-30s'
+                fmt = '%-10s %-30s'
                 self.out(fmt % ('Position', 'Name'))
                 self.out(fmt % ('-'*len('Position'), '-'*len('Name')))
+                self.out(fmt % ('(implied)', 'main'))
                 for pos, (name, item) in enumerate(L):
                     self.out(fmt % (pos, name))
+                self.out(fmt % ('(implied)', 'ingress'))
                 self.out('')

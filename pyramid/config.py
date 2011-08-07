@@ -80,6 +80,9 @@ from pyramid.traversal import DefaultRootFactory
 from pyramid.traversal import find_interface
 from pyramid.traversal import traversal_path
 from pyramid.tweens import excview_tween_factory
+from pyramid.tweens import Tweens
+from pyramid.tweens import tween_factory_name
+from pyramid.tweens import MAIN
 from pyramid.urldispatch import RoutesMapper
 from pyramid.util import DottedNameResolver
 from pyramid.util import WeakOrderedSet
@@ -733,9 +736,6 @@ class Configurator(object):
         # cope with WebOb exc objects not decoratored with IExceptionResponse
         from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
         registry.registerSelfAdapter((WebobResponse,), IResponse)
-        # add a handler manager
-        for factory in tweens:
-            self._add_tween(factory, explicit=True)
 
         if debug_logger is None:
             debug_logger = logging.getLogger(self.package_name)
@@ -784,6 +784,8 @@ class Configurator(object):
             self.commit()
         for inc in includes:
             self.include(inc)
+        for factory in tweens:
+            self._add_tween(factory, explicit=True)
         
     def hook_zca(self):
         """ Call :func:`zope.component.getSiteManager.sethook` with
@@ -903,7 +905,7 @@ class Configurator(object):
         return self._derive_view(view, attr=attr, renderer=renderer)
 
     @action_method
-    def add_tween(self, tween_factory):
+    def add_tween(self, tween_factory, below=None, atop=None):
         """
         Add a 'tween factory'.  A :term:`tween` (think: 'between') is a bit
         of code that sits between the Pyramid router's main request handling
@@ -920,9 +922,10 @@ class Configurator(object):
 
         .. note:: This feature is new as of Pyramid 1.1.1.
         """
-        return self._add_tween(tween_factory, explicit=False)
+        return self._add_tween(tween_factory, below=below, atop=atop,
+                               explicit=False)
 
-    def _add_tween(self, tween_factory, explicit):
+    def _add_tween(self, tween_factory, below=None, atop=None, explicit=False):
         tween_factory = self.maybe_dotted(tween_factory)
         name = tween_factory_name(tween_factory)
         def register():
@@ -931,11 +934,12 @@ class Configurator(object):
             if tweens is None:
                 tweens = Tweens()
                 registry.registerUtility(tweens, ITweens)
-                tweens.add(
-                    tween_factory_name(excview_tween_factory),
-                    excview_tween_factory,
-                    explicit=False)
-            tweens.add(name, tween_factory, explicit)
+                tweens.add_implicit(tween_factory_name(excview_tween_factory),
+                                    excview_tween_factory, below=MAIN)
+            if explicit:
+                tweens.add_explicit(name, tween_factory)
+            else:
+                tweens.add_implicit(name, tween_factory, below=below, atop=atop)
         self.action(('tween', name, explicit), register)
 
     @action_method
@@ -3378,39 +3382,3 @@ def isexception(o):
 
 global_registries = WeakOrderedSet()
 
-class Tweens(object):
-    implements(ITweens)
-    def __init__(self):
-        self.explicit = []
-        self.implicit = []
-
-    def add(self, name, factory, explicit=False):
-        if explicit:
-            self.explicit.append((name, factory))
-        else:
-            self.implicit.append((name, factory))
-
-    def __call__(self, handler, registry):
-        factories = self.implicit
-        if self.explicit:
-            factories = self.explicit
-        for name, factory in factories:
-            handler = factory(handler, registry)
-        return handler
-    
-def tween_factory_name(factory):
-    if (hasattr(factory, '__name__') and
-        hasattr(factory, '__module__')):
-        # function or class
-        name = '.'.join([factory.__module__,
-                         factory.__name__])
-    elif hasattr(factory, '__module__'):
-        # instance
-        name = '.'.join([factory.__module__,
-                         factory.__class__.__name__,
-                         str(id(factory))])
-    else:
-        raise ConfigurationError(
-            'A tween factory must be a class, an instance, or a function; '
-            '%s is not a suitable tween factory' % factory)
-    return name
