@@ -60,9 +60,6 @@ class CyclicDependencyError(Exception):
         msg = '; '.join(L)
         return msg
 
-MAIN = 'main'
-INGRESS = 'ingress'
-
 class Tweens(object):
     implements(ITweens)
     def __init__(self):
@@ -190,3 +187,8 @@ def tween_factory_name(factory):
             'A tween factory must be a class, an instance, or a function; '
             '%s is not a suitable tween factory' % factory)
     return name
+
+MAIN = 'main'
+INGRESS = 'ingress'
+EXCVIEW = tween_factory_name(excview_tween_factory)
+
