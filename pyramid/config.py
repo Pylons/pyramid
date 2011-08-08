@@ -939,12 +939,12 @@ class Configurator(object):
             registry.registerUtility(tweens, ITweens)
             tweens.add_implicit(tween_factory_name(excview_tween_factory),
                                 excview_tween_factory, alias=EXCVIEW,
-                                under=MAIN)
+                                over=MAIN)
         if explicit:
             tweens.add_explicit(name, tween_factory)
         else:
-            tweens.add_implicit(name, tween_factory, alias=alias,
-                                under=under, over=over)
+            tweens.add_implicit(name, tween_factory, alias=alias, under=under,
+                                over=over)
         self.action(('tween', name, explicit))
         if not explicit and alias is not None:
             self.action(('tween', alias, explicit))

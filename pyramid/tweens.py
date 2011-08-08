@@ -80,7 +80,7 @@ class Tweens(object):
         self.names.append(name)
         self.factories[name] = factory
         if under is None and over is None:
-            over = INGRESS
+            under = INGRESS
             self.ingress_alias_names.append(alias)
         if under is not None:
             self.order.append((under, alias))
@@ -92,7 +92,7 @@ class Tweens(object):
         roots = []
         graph = {}
         has_order = {}
-        aliases = [MAIN, INGRESS]
+        aliases = [INGRESS, MAIN]
         ingress_alias_names = self.ingress_alias_names[:]
 
         for name in self.names:
@@ -129,7 +129,7 @@ class Tweens(object):
             # nodes with orders should get an ordering relative to INGRESS,
             # as if it were added with no under or over in add_implicit
             if (not v in has_order) and (v not in (INGRESS, MAIN)):
-                order.append((v, INGRESS))
+                order.append((INGRESS, v))
                 ingress_alias_names.append(v)
             add_node(graph, v)
 
@@ -139,14 +139,14 @@ class Tweens(object):
 
         def sortroots(alias):
             # sort roots so that roots (and their children) that depend only
-            # on the ingress sort nearer the end (nearer the ingress)
+            # on the ingress sort nearer the  (nearer the ingress)
             if alias in ingress_alias_names:
-                return 1
+                return -1
             children = graph[alias][1:]
             for child in children:
-                if sortroots(child) == 1:
-                    return 1
-            return -1
+                if sortroots(child) == -1:
+                    return -1
+            return 1
 
         roots.sort(key=sortroots)
 
@@ -185,7 +185,7 @@ class Tweens(object):
             use = self.explicit
         else:
             use = self.implicit()
-        for name, factory in use:
+        for name, factory in use[::-1]:
             handler = factory(handler, registry)
         return handler
     

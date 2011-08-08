@@ -639,11 +639,15 @@ pyramid.tests.test_config.dummy_include2""",
         config.add_tween(factory2)
         config.commit()
         tweens = config.registry.queryUtility(ITweens)
+        implicit = tweens.implicit()
         self.assertEqual(
-            tweens.implicit(),
-            [('pyramid.tweens.excview_tween_factory', excview_tween_factory),
-             ('pyramid.tests.test_config.factory1', factory1),
-             ('pyramid.tests.test_config.factory2', factory2)])
+            implicit,
+            [
+                ('pyramid.tests.test_config.factory2', factory2),
+                ('pyramid.tests.test_config.factory1', factory1),
+                ('pyramid.tweens.excview_tween_factory', excview_tween_factory),
+                ]
+            )
 
     def test_add_tween_dottedname(self):
         from pyramid.interfaces import ITweens
@@ -655,9 +659,9 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(
             tweens.implicit(),
             [
-                ('pyramid.tweens.excview_tween_factory', excview_tween_factory),
                 ('pyramid.tests.test_config.dummy_tween_factory',
-                 dummy_tween_factory)
+                 dummy_tween_factory),
+                ('pyramid.tweens.excview_tween_factory', excview_tween_factory),
                 ])
 
     def test_add_tween_instance(self):
@@ -671,13 +675,13 @@ pyramid.tests.test_config.dummy_include2""",
         tweens = config.registry.queryUtility(ITweens)
         implicit = tweens.implicit()
         self.assertEqual(len(implicit), 2)
-        self.assertEqual(
-            implicit[0],
-            ('pyramid.tweens.excview_tween_factory', excview_tween_factory))
         self.assertTrue(
-          implicit[1][0].startswith(
+          implicit[0][0].startswith(
                 'pyramid.tests.test_config.ATween.'))
-        self.assertEqual(implicit[1][1], atween)
+        self.assertEqual(implicit[0][1], atween)
+        self.assertEqual(
+            implicit[1],
+            ('pyramid.tweens.excview_tween_factory', excview_tween_factory))
 
     def test_add_tween_unsuitable(self):
         from pyramid.exceptions import ConfigurationError
