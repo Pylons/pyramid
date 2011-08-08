@@ -61,34 +61,48 @@ class Tweens(object):
     implements(ITweens)
     def __init__(self):
         self.explicit = []
-        self.implicit_alias_names = []
-        self.implicit_factories = {}
-        self.implicit_order = []
-        self.implicit_ingress_alias_names = []
-        self.implicit_aliases = {}
+        self.names = []
+        self.factories = {}
+        self.order = []
+        self.ingress_alias_names = []
+        self.alias_to_name = {INGRESS:INGRESS, MAIN:MAIN}
+        self.name_to_alias = {INGRESS:INGRESS, MAIN:MAIN}
 
     def add_explicit(self, name, factory):
         self.explicit.append((name, factory))
 
     def add_implicit(self, name, factory, alias=None, below=None, atop=None):
-        if alias is None:
+        if alias is not None:
+            self.alias_to_name[alias] = name
+            self.name_to_alias[name] = alias
+        else:
             alias = name
-        self.implicit_aliases[alias] = name
-        self.implicit_alias_names.append(alias)
-        self.implicit_factories[name] = factory
+        self.names.append(name)
+        self.factories[name] = factory
         if below is None and atop is None:
             atop = INGRESS
-            self.implicit_ingress_alias_names.append(alias)
+            self.ingress_alias_names.append(alias)
         if below is not None:
-            order = (below, alias)
-            self.implicit_order.append(order)
+            self.order.append((below, alias))
         if atop is not None:
-            order = (alias, atop)
-            self.implicit_order.append(order)
+            self.order.append((alias, atop))
 
     def implicit(self):
+        order = []
         roots = []
         graph = {}
+        has_order = {}
+        aliases = [MAIN, INGRESS]
+        ingress_alias_names = self.ingress_alias_names[:]
+
+        for name in self.names:
+            aliases.append(self.name_to_alias.get(name, name))
+
+        for a, b in self.order:
+            # try to convert both a and b to an alias
+            a = self.name_to_alias.get(a, a)
+            b = self.name_to_alias.get(b, b)
+            order.append((a, b))
 
         def add_node(graph, node):
             if not graph.has_key(node):
@@ -101,37 +115,34 @@ class Tweens(object):
             if tonode in roots:
                 roots.remove(tonode)
 
-        aliases = [MAIN, INGRESS] + self.implicit_alias_names
-
-        orders = {}
-
-        for pos, (first, second) in enumerate(self.implicit_order):
+        # remove ordering information that mentions unknown names/aliases
+        for pos, (first, second) in enumerate(order):
             has_first = first in aliases
             has_second = second in aliases
             if (not has_first) or (not has_second):
-                self.implicit_order[pos] = None, None # FFF
+                order[pos] = None, None 
             else:
-                orders[first] = orders[second] = True
+                has_order[first] = has_order[second] = True
 
         for v in aliases:
             # any alias that doesn't have an ordering after we detect all
             # nodes with orders should get an ordering relative to INGRESS,
-            # as if it were added with no below or atop
-            if (not v in orders) and (v not in (INGRESS, MAIN)):
-                self.implicit_order.append((v, INGRESS))
-                self.implicit_ingress_alias_names.append(v)
+            # as if it were added with no below or atop in add_implicit
+            if (not v in has_order) and (v not in (INGRESS, MAIN)):
+                order.append((v, INGRESS))
+                ingress_alias_names.append(v)
             add_node(graph, v)
 
-        for a, b in self.implicit_order:
-            if a is not None and b is not None: # see FFF above
+        for a, b in order:
+            if a is not None and b is not None: # deal with removed orders
                 add_arc(graph, a, b)
 
-        def sortroots(name):
-            # sort roots so that roots (and their children) that depend only on
-            # the ingress sort nearer the end (nearer the ingress)
-            if name in self.implicit_ingress_alias_names:
+        def sortroots(alias):
+            # sort roots so that roots (and their children) that depend only
+            # on the ingress sort nearer the end (nearer the ingress)
+            if alias in ingress_alias_names:
                 return 1
-            children = graph[name][1:]
+            children = graph[alias][1:]
             for child in children:
                 if sortroots(child) == 1:
                     return 1
@@ -164,17 +175,17 @@ class Tweens(object):
 
         for alias in sorted_aliases:
             if alias not in (MAIN, INGRESS):
-                name = self.implicit_aliases[alias]
-                result.append((name, self.implicit_factories[name]))
+                name = self.alias_to_name.get(alias, alias)
+                result.append((name, self.factories[name]))
 
         return result
 
     def __call__(self, handler, registry):
         if self.explicit:
-            factories = self.explicit
+            use = self.explicit
         else:
-            factories = self.implicit()
-        for name, factory in factories:
+            use = self.implicit()
+        for name, factory in use:
             handler = factory(handler, registry)
         return handler
     
@@ -195,7 +206,7 @@ def tween_factory_name(factory):
             '%s is not a suitable tween factory' % factory)
     return name
 
-MAIN = 'main-->'
-INGRESS = '<--ingress'
+MAIN = 'MAIN'
+INGRESS = 'INGRESS'
 EXCVIEW = tween_factory_name(excview_tween_factory)
 

@@ -905,7 +905,7 @@ class Configurator(object):
         return self._derive_view(view, attr=attr, renderer=renderer)
 
     @action_method
-    def add_tween(self, tween_factory, below=None, atop=None):
+    def add_tween(self, tween_factory, alias=None, below=None, atop=None):
         """
         Add a 'tween factory'.  A :term:`tween` (think: 'between') is a bit
         of code that sits between the Pyramid router's main request handling
@@ -922,25 +922,27 @@ class Configurator(object):
 
         .. note:: This feature is new as of Pyramid 1.1.1.
         """
-        return self._add_tween(tween_factory, below=below, atop=atop,
-                               explicit=False)
+        return self._add_tween(tween_factory, alias=alias, below=below,
+                               atop=atop, explicit=False)
 
-    def _add_tween(self, tween_factory, below=None, atop=None, explicit=False):
+    def _add_tween(self, tween_factory, alias=None, below=None, atop=None,
+                   explicit=False):
         tween_factory = self.maybe_dotted(tween_factory)
         name = tween_factory_name(tween_factory)
-        def register():
-            registry = self.registry
-            tweens = registry.queryUtility(ITweens)
-            if tweens is None:
-                tweens = Tweens()
-                registry.registerUtility(tweens, ITweens)
-                tweens.add_implicit(tween_factory_name(excview_tween_factory),
-                                    excview_tween_factory, below=MAIN)
-            if explicit:
-                tweens.add_explicit(name, tween_factory)
-            else:
-                tweens.add_implicit(name, tween_factory, below=below, atop=atop)
-        self.action(('tween', name, explicit), register)
+        registry = self.registry
+        tweens = registry.queryUtility(ITweens)
+        if tweens is None:
+            tweens = Tweens()
+            registry.registerUtility(tweens, ITweens)
+            tweens.add_implicit(tween_factory_name(excview_tween_factory),
+                                excview_tween_factory, alias='excview',
+                                below=MAIN)
+        if explicit:
+            tweens.add_explicit(name, tween_factory)
+        else:
+            tweens.add_implicit(name, tween_factory, alias=alias,
+                                below=below, atop=atop)
+        self.action(('tween', name, explicit))
 
     @action_method
     def add_request_handler(self, factory, name): # pragma: no cover
