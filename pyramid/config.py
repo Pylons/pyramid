@@ -138,7 +138,7 @@ class Configurator(object):
 
     The Configurator accepts a number of arguments: ``registry``,
     ``package``, ``settings``, ``root_factory``, ``authentication_policy``,
-    ``authorization_policy``, ``renderers`` ``debug_logger``,
+    ``authorization_policy``, ``renderers``, ``debug_logger``,
     ``locale_negotiator``, ``request_factory``, ``renderer_globals_factory``,
     ``default_permission``, ``session_factory``, ``default_view_mapper``,
     ``autocommit``, and ``exceptionresponse_view``.
