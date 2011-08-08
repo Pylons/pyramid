@@ -35,7 +35,7 @@ class TestTweens(unittest.TestCase):
         self.assertEqual(tweens.order,
                          [('name', INGRESS), ('name2', INGRESS)])
         self.assertEqual(tweens.ingress_alias_names, ['name', 'name2'])
-        tweens.add_implicit('name3', 'factory3', below='name2')
+        tweens.add_implicit('name3', 'factory3', under='name2')
         self.assertEqual(tweens.names,
                          ['name',  'name2', 'name3'])
         self.assertEqual(tweens.factories,
@@ -68,7 +68,7 @@ class TestTweens(unittest.TestCase):
         self.assertEqual(tweens.order,
                          [('n1', INGRESS), ('n2', INGRESS)])
         self.assertEqual(tweens.ingress_alias_names, ['n1', 'n2'])
-        tweens.add_implicit('name3', 'factory3', alias='n3', below='name2')
+        tweens.add_implicit('name3', 'factory3', alias='n3', under='name2')
         self.assertEqual(tweens.names,
                          ['name1',  'name2', 'name3'])
         self.assertEqual(tweens.factories,
@@ -125,7 +125,7 @@ class TestTweens(unittest.TestCase):
         from pyramid.tweens import MAIN
         tweens = self._makeOne()
         tweens.add_implicit('name1', 'factory1')
-        tweens.add_implicit('name2', 'factory2', below=MAIN)
+        tweens.add_implicit('name2', 'factory2', under=MAIN)
         self.assertEqual(tweens.implicit(),
                          [('name2', 'factory2'), ('name1', 'factory1')])
 
@@ -133,12 +133,12 @@ class TestTweens(unittest.TestCase):
         from pyramid.tweens import MAIN
         tweens = self._makeOne()
         add = tweens.add_implicit
-        add('auth', 'auth_factory', atop='browserid')
+        add('auth', 'auth_factory', over='browserid')
         add('dbt', 'dbt_factory') 
-        add('retry', 'retry_factory', below='txnmgr', atop='exceptionview')
+        add('retry', 'retry_factory', under='txnmgr', over='exceptionview')
         add('browserid', 'browserid_factory')
-        add('txnmgr', 'txnmgr_factory', atop='exceptionview')
-        add('exceptionview', 'excview_factory', below=MAIN)
+        add('txnmgr', 'txnmgr_factory', over='exceptionview')
+        add('exceptionview', 'excview_factory', under=MAIN)
         self.assertEqual(tweens.implicit(),
                          [('txnmgr', 'txnmgr_factory'),
                           ('retry', 'retry_factory'),
@@ -151,11 +151,11 @@ class TestTweens(unittest.TestCase):
         from pyramid.tweens import MAIN
         tweens = self._makeOne()
         add = tweens.add_implicit
-        add('exceptionview', 'excview_factory', below=MAIN)
-        add('auth', 'auth_factory', atop='browserid')
-        add('retry', 'retry_factory', below='txnmgr', atop='exceptionview')
+        add('exceptionview', 'excview_factory', under=MAIN)
+        add('auth', 'auth_factory', over='browserid')
+        add('retry', 'retry_factory', under='txnmgr', over='exceptionview')
         add('browserid', 'browserid_factory')
-        add('txnmgr', 'txnmgr_factory', atop='exceptionview')
+        add('txnmgr', 'txnmgr_factory', over='exceptionview')
         add('dbt', 'dbt_factory') 
         self.assertEqual(tweens.implicit(),
                          [('txnmgr', 'txnmgr_factory'),
@@ -169,11 +169,11 @@ class TestTweens(unittest.TestCase):
         from pyramid.tweens import MAIN
         tweens = self._makeOne()
         add = tweens.add_implicit
-        add('exceptionview', 'excview_factory', alias='e', below=MAIN)
-        add('auth', 'auth_factory', atop='b')
-        add('retry', 'retry_factory', below='t', atop='exceptionview')
+        add('exceptionview', 'excview_factory', alias='e', under=MAIN)
+        add('auth', 'auth_factory', over='b')
+        add('retry', 'retry_factory', under='t', over='exceptionview')
         add('browserid', 'browserid_factory', alias='b')
-        add('txnmgr', 'txnmgr_factory', alias='t', atop='exceptionview')
+        add('txnmgr', 'txnmgr_factory', alias='t', over='exceptionview')
         add('dbt', 'dbt_factory') 
         self.assertEqual(tweens.implicit(),
                          [('txnmgr', 'txnmgr_factory'),
@@ -187,9 +187,9 @@ class TestTweens(unittest.TestCase):
         from pyramid.tweens import MAIN
         tweens = self._makeOne()
         add = tweens.add_implicit
-        add('exceptionview', 'excview_factory', below=MAIN)
-        add('auth', 'auth_factory', atop='browserid')
-        add('retry', 'retry_factory', below='txnmgr', atop='exceptionview')
+        add('exceptionview', 'excview_factory', under=MAIN)
+        add('auth', 'auth_factory', over='browserid')
+        add('retry', 'retry_factory', under='txnmgr', over='exceptionview')
         add('browserid', 'browserid_factory')
         add('dbt', 'dbt_factory') 
         self.assertEqual(tweens.implicit(),
@@ -203,8 +203,8 @@ class TestTweens(unittest.TestCase):
         tweens = self._makeOne()
         add = tweens.add_implicit
         add('dbt', 'dbt_factory')
-        add('auth', 'auth_factory', atop='browserid')
-        add('retry', 'retry_factory', below='txnmgr', atop='exceptionview')
+        add('auth', 'auth_factory', over='browserid')
+        add('retry', 'retry_factory', under='txnmgr', over='exceptionview')
         add('browserid', 'browserid_factory')
         self.assertEqual(tweens.implicit(),
                          [('dbt', 'dbt_factory'),
@@ -216,8 +216,8 @@ class TestTweens(unittest.TestCase):
         from pyramid.tweens import MAIN
         tweens = self._makeOne()
         add = tweens.add_implicit
-        add('exceptionview', 'excview_factory', below=MAIN)
-        add('retry', 'retry_factory', below='txnmgr', atop='exceptionview')
+        add('exceptionview', 'excview_factory', under=MAIN)
+        add('retry', 'retry_factory', under='txnmgr', over='exceptionview')
         add('browserid', 'browserid_factory')
         self.assertEqual(tweens.implicit(),
                          [('retry', 'retry_factory'),
@@ -228,8 +228,8 @@ class TestTweens(unittest.TestCase):
         from pyramid.tweens import MAIN
         tweens = self._makeOne()
         add = tweens.add_implicit
-        add('exceptionview', 'excview_factory', alias='e', below=MAIN)
-        add('retry', 'retry_factory', below='txnmgr', atop='e')
+        add('exceptionview', 'excview_factory', alias='e', under=MAIN)
+        add('retry', 'retry_factory', under='txnmgr', over='e')
         add('browserid', 'browserid_factory')
         self.assertEqual(tweens.implicit(),
                          [('retry', 'retry_factory'),
@@ -241,7 +241,7 @@ class TestTweens(unittest.TestCase):
         tweens = self._makeOne()
         add = tweens.add_implicit
         add('browserid', 'browserid_factory')
-        add('auth', 'auth_factory', atop='browserid', below='browserid')
+        add('auth', 'auth_factory', over='browserid', under='browserid')
         self.assertRaises(CyclicDependencyError, tweens.implicit)
 
     def test_implicit_ordering_conflict_indirect(self):
@@ -249,8 +249,8 @@ class TestTweens(unittest.TestCase):
         tweens = self._makeOne()
         add = tweens.add_implicit
         add('browserid', 'browserid_factory')
-        add('auth', 'auth_factory', atop='browserid')
-        add('dbt', 'dbt_factory', below='browserid', atop='auth')
+        add('auth', 'auth_factory', over='browserid')
+        add('dbt', 'dbt_factory', under='browserid', over='auth')
         self.assertRaises(CyclicDependencyError, tweens.implicit)
 
 class TestCyclicDependencyError(unittest.TestCase):
@@ -262,5 +262,5 @@ class TestCyclicDependencyError(unittest.TestCase):
         exc = self._makeOne({'a':['c', 'd'], 'c':['a']})
         result = str(exc)
         self.assertEqual(result,
-                         "'a' sorts atop ['c', 'd']; 'c' sorts atop ['a']")
+                         "'a' sorts over ['c', 'd']; 'c' sorts over ['a']")
 

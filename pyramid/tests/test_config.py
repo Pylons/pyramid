@@ -685,11 +685,37 @@ pyramid.tests.test_config.dummy_include2""",
         config = self._makeOne()
         self.assertRaises(ConfigurationError, config.add_tween, pyramid.tests)
 
+    def test_add_tween_alias_ingress(self):
+        from pyramid.exceptions import ConfigurationError
+        from pyramid.tweens import INGRESS
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError,
+            config.add_tween, 'pyramid.tests.test_config.dummy_tween_factory',
+            alias=INGRESS)
+
+    def test_add_tween_alias_main(self):
+        from pyramid.exceptions import ConfigurationError
+        from pyramid.tweens import MAIN
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError,
+            config.add_tween, 'pyramid.tests.test_config.dummy_tween_factory',
+            alias=MAIN)
+
     def test_add_tweens_conflict(self):
         from zope.configuration.config import ConfigurationConflictError
         config = self._makeOne()
         config.add_tween('pyramid.tests.test_config.dummy_tween_factory')
         config.add_tween('pyramid.tests.test_config.dummy_tween_factory')
+        self.assertRaises(ConfigurationConflictError, config.commit)
+
+    def test_add_tweens_conflict_same_alias(self):
+        from zope.configuration.config import ConfigurationConflictError
+        class ATween(object): pass
+        atween1 = ATween()
+        atween2 = ATween()
+        config = self._makeOne()
+        config.add_tween(atween1, alias='a')
+        config.add_tween(atween2, alias='a')
         self.assertRaises(ConfigurationConflictError, config.commit)
 
     def test_add_subscriber_defaults(self):

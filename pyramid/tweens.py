@@ -53,7 +53,7 @@ class CyclicDependencyError(Exception):
         for cycle in cycles:
             dependent = cycle
             dependees = cycles[cycle]
-            L.append('%r sorts atop %r' % (dependent, dependees))
+            L.append('%r sorts over %r' % (dependent, dependees))
         msg = '; '.join(L)
         return msg
 
@@ -71,7 +71,7 @@ class Tweens(object):
     def add_explicit(self, name, factory):
         self.explicit.append((name, factory))
 
-    def add_implicit(self, name, factory, alias=None, below=None, atop=None):
+    def add_implicit(self, name, factory, alias=None, under=None, over=None):
         if alias is not None:
             self.alias_to_name[alias] = name
             self.name_to_alias[name] = alias
@@ -79,13 +79,13 @@ class Tweens(object):
             alias = name
         self.names.append(name)
         self.factories[name] = factory
-        if below is None and atop is None:
-            atop = INGRESS
+        if under is None and over is None:
+            over = INGRESS
             self.ingress_alias_names.append(alias)
-        if below is not None:
-            self.order.append((below, alias))
-        if atop is not None:
-            self.order.append((alias, atop))
+        if under is not None:
+            self.order.append((under, alias))
+        if over is not None:
+            self.order.append((alias, over))
 
     def implicit(self):
         order = []
@@ -127,7 +127,7 @@ class Tweens(object):
         for v in aliases:
             # any alias that doesn't have an ordering after we detect all
             # nodes with orders should get an ordering relative to INGRESS,
-            # as if it were added with no below or atop in add_implicit
+            # as if it were added with no under or over in add_implicit
             if (not v in has_order) and (v not in (INGRESS, MAIN)):
                 order.append((v, INGRESS))
                 ingress_alias_names.append(v)
@@ -208,5 +208,5 @@ def tween_factory_name(factory):
 
 MAIN = 'MAIN'
 INGRESS = 'INGRESS'
-EXCVIEW = tween_factory_name(excview_tween_factory)
+EXCVIEW = 'excview'
 
