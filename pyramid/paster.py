@@ -577,21 +577,21 @@ class PTweensCommand(PCommand):
         self.out(fmt % ('Position', 'Name', 'Alias'))
         self.out(fmt % (
             '-'*len('Position'), '-'*len('Name'), '-'*len('Alias')))
-        self.out(fmt % ('-', '-', MAIN))
+        self.out(fmt % ('-', '-', INGRESS))
         for pos, (name, _) in enumerate(implicit):
             alias = tweens.name_to_alias.get(name, None)
             self.out(fmt % (pos, name, alias))
-        self.out(fmt % ('-', '-', INGRESS))
+        self.out(fmt % ('-', '-', MAIN))
 
     def show_explicit(self, tweens):
         explicit = tweens.explicit
         fmt = '%-10s  %-65s'
         self.out(fmt % ('Position', 'Name'))
         self.out(fmt % ('-'*len('Position'), '-'*len('Name')))
-        self.out(fmt % ('-', MAIN))
+        self.out(fmt % ('-', INGRESS))
         for pos, (name, _) in enumerate(explicit):
             self.out(fmt % (pos, name))
-        self.out(fmt % ('-', INGRESS))
+        self.out(fmt % ('-', MAIN))
     
     def command(self):
         config_uri = self.args[0]
