@@ -226,6 +226,18 @@ class TestTweens(unittest.TestCase):
                           ('exceptionview', 'excview_factory'),
                           ('browserid', 'browserid_factory')])
 
+    def test_implicit_ordering_missing_partial_with_aliases(self):
+        from pyramid.tweens import MAIN
+        tweens = self._makeOne()
+        add = tweens.add_implicit
+        add('exceptionview', 'excview_factory', alias='e', below=MAIN)
+        add('retry', 'retry_factory', below='txnmgr', atop='e')
+        add('browserid', 'browserid_factory')
+        self.assertEqual(tweens.implicit(),
+                         [('retry', 'retry_factory'),
+                          ('exceptionview', 'excview_factory'),
+                          ('browserid', 'browserid_factory')])
+
     def test_implicit_ordering_conflict_direct(self):
         from pyramid.tweens import CyclicDependencyError
         tweens = self._makeOne()
