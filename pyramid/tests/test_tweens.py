@@ -281,6 +281,6 @@ class TestCyclicDependencyError(unittest.TestCase):
     def test___str__(self):
         exc = self._makeOne({'a':['c', 'd'], 'c':['a']})
         result = str(exc)
-        self.assertEqual(result,
-                         "'a' sorts over ['c', 'd']; 'c' sorts over ['a']")
+        self.assertTrue("'a' sorts over ['c', 'd']" in result)
+        self.assertTrue("'c' sorts over ['a']" in result)
 
