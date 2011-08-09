@@ -245,7 +245,6 @@ registry at startup time instead of constructing a new one:
        globalreg = getGlobalSiteManager()
        config = Configurator(registry=globalreg)
        config.setup_registry(settings=settings)
-       config.hook_zca()
        config.include('some.other.application')
        return config.make_wsgi_app()
 
