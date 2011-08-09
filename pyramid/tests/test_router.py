@@ -159,8 +159,8 @@ class TestRouter(unittest.TestCase):
             wrapper.name = 'two'
             wrapper.child = handler
             return wrapper
-        tweens.add('one', tween_factory1)
-        tweens.add('two', tween_factory2)
+        tweens.add_implicit('one', tween_factory1)
+        tweens.add_implicit('two', tween_factory2)
         router = self._makeOne()
         self.assertEqual(router.handle_request.name, 'two')
         self.assertEqual(router.handle_request.child.name, 'one')

@@ -592,6 +592,7 @@ pyramid.tests.test_config.dummy_include2""",
             'pyramid.tweens': 'pyramid.tests.test_config.dummy_tween_factory'
         }
         config.setup_registry(settings=settings)
+        config.commit()
         tweens = config.registry.getUtility(ITweens)
         self.assertEqual(tweens.explicit,
                          [('pyramid.tests.test_config.dummy_tween_factory',
@@ -638,11 +639,36 @@ pyramid.tests.test_config.dummy_include2""",
         config.add_tween(factory2)
         config.commit()
         tweens = config.registry.queryUtility(ITweens)
+        implicit = tweens.implicit()
         self.assertEqual(
-            tweens.implicit,
-            [('pyramid.tweens.excview_tween_factory', excview_tween_factory),
-             ('pyramid.tests.test_config.factory1', factory1),
-             ('pyramid.tests.test_config.factory2', factory2)])
+            implicit,
+            [
+                ('pyramid.tests.test_config.factory2', factory2),
+                ('pyramid.tests.test_config.factory1', factory1),
+                ('pyramid.tweens.excview_tween_factory', excview_tween_factory),
+                ]
+            )
+
+    def test_add_tweens_names_with_underover(self):
+        from pyramid.interfaces import ITweens
+        from pyramid.tweens import excview_tween_factory
+        from pyramid.tweens import MAIN
+        def factory1(handler, registry): return handler
+        def factory2(handler, registry): return handler
+        config = self._makeOne()
+        config.add_tween(factory1, over=MAIN)
+        config.add_tween(factory2, over=MAIN,
+                         under='pyramid.tests.test_config.factory1')
+        config.commit()
+        tweens = config.registry.queryUtility(ITweens)
+        implicit = tweens.implicit()
+        self.assertEqual(
+            implicit,
+            [
+                ('pyramid.tweens.excview_tween_factory', excview_tween_factory),
+                ('pyramid.tests.test_config.factory1', factory1),
+                ('pyramid.tests.test_config.factory2', factory2),
+             ])
 
     def test_add_tween_dottedname(self):
         from pyramid.interfaces import ITweens
@@ -652,11 +678,11 @@ pyramid.tests.test_config.dummy_include2""",
         config.commit()
         tweens = config.registry.queryUtility(ITweens)
         self.assertEqual(
-            tweens.implicit,
+            tweens.implicit(),
             [
-                ('pyramid.tweens.excview_tween_factory', excview_tween_factory),
                 ('pyramid.tests.test_config.dummy_tween_factory',
-                 dummy_tween_factory)
+                 dummy_tween_factory),
+                ('pyramid.tweens.excview_tween_factory', excview_tween_factory),
                 ])
 
     def test_add_tween_instance(self):
@@ -668,13 +694,15 @@ pyramid.tests.test_config.dummy_include2""",
         config.add_tween(atween)
         config.commit()
         tweens = config.registry.queryUtility(ITweens)
-        self.assertEqual(len(tweens.implicit), 2)
-        self.assertEqual(
-            tweens.implicit[0],
-            ('pyramid.tweens.excview_tween_factory', excview_tween_factory))
+        implicit = tweens.implicit()
+        self.assertEqual(len(implicit), 2)
         self.assertTrue(
-          tweens.implicit[1][0].startswith('pyramid.tests.test_config.ATween.'))
-        self.assertEqual(tweens.implicit[1][1], atween)
+          implicit[0][0].startswith(
+                'pyramid.tests.test_config.ATween.'))
+        self.assertEqual(implicit[0][1], atween)
+        self.assertEqual(
+            implicit[1],
+            ('pyramid.tweens.excview_tween_factory', excview_tween_factory))
 
     def test_add_tween_unsuitable(self):
         from pyramid.exceptions import ConfigurationError
@@ -682,11 +710,37 @@ pyramid.tests.test_config.dummy_include2""",
         config = self._makeOne()
         self.assertRaises(ConfigurationError, config.add_tween, pyramid.tests)
 
+    def test_add_tween_alias_ingress(self):
+        from pyramid.exceptions import ConfigurationError
+        from pyramid.tweens import INGRESS
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError,
+            config.add_tween, 'pyramid.tests.test_config.dummy_tween_factory',
+            alias=INGRESS)
+
+    def test_add_tween_alias_main(self):
+        from pyramid.exceptions import ConfigurationError
+        from pyramid.tweens import MAIN
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError,
+            config.add_tween, 'pyramid.tests.test_config.dummy_tween_factory',
+            alias=MAIN)
+
     def test_add_tweens_conflict(self):
         from zope.configuration.config import ConfigurationConflictError
         config = self._makeOne()
         config.add_tween('pyramid.tests.test_config.dummy_tween_factory')
         config.add_tween('pyramid.tests.test_config.dummy_tween_factory')
+        self.assertRaises(ConfigurationConflictError, config.commit)
+
+    def test_add_tweens_conflict_same_alias(self):
+        from zope.configuration.config import ConfigurationConflictError
+        class ATween(object): pass
+        atween1 = ATween()
+        atween2 = ATween()
+        config = self._makeOne()
+        config.add_tween(atween1, alias='a')
+        config.add_tween(atween2, alias='a')
         self.assertRaises(ConfigurationConflictError, config.commit)
 
     def test_add_subscriber_defaults(self):
@@ -5510,45 +5564,6 @@ class Test_isexception(unittest.TestCase):
         class ISubException(IException):
             pass
         self.assertEqual(self._callFUT(ISubException), True)
-
-class TestTweens(unittest.TestCase):
-    def _makeOne(self):
-        from pyramid.config import Tweens
-        return Tweens()
-
-    def test_add_explicit(self):
-        tweens = self._makeOne()
-        tweens.add('name', 'factory', explicit=True)
-        self.assertEqual(tweens.explicit, [('name',  'factory')])
-        tweens.add('name2', 'factory2', explicit=True)
-        self.assertEqual(tweens.explicit, [('name',  'factory'),
-                                           ('name2', 'factory2')])
-
-    def test_add_implicit(self):
-        tweens = self._makeOne()
-        tweens.add('name', 'factory', explicit=False)
-        self.assertEqual(tweens.implicit, [('name',  'factory')])
-        tweens.add('name2', 'factory2', explicit=False)
-        self.assertEqual(tweens.implicit, [('name',  'factory'),
-                                           ('name2', 'factory2')])
-
-    def test___call___explicit(self):
-        tweens = self._makeOne()
-        def factory1(handler, registry):
-            return handler
-        def factory2(handler, registry):
-            return '123'
-        tweens.explicit = [('name', factory1), ('name', factory2)]
-        self.assertEqual(tweens(None, None), '123')
-
-    def test___call___implicit(self):
-        tweens = self._makeOne()
-        def factory1(handler, registry):
-            return handler
-        def factory2(handler, registry):
-            return '123'
-        tweens.implicit = [('name', factory1), ('name', factory2)]
-        self.assertEqual(tweens(None, None), '123')
 
 class DummyRequest:
     subpath = ()

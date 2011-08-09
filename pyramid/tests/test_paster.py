@@ -853,13 +853,9 @@ class TestPTweensCommand(unittest.TestCase):
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(
-            L,
-            ['"pyramid.tweens" config value NOT set (implicitly ordered tweens used)',
-             '',
-             'Position Name                          ',
-             '-------- ----                          ',
-             '0        name                          ',
-             ''])
+           L[0],
+           '"pyramid.tweens" config value NOT set (implicitly ordered tweens '
+            'used)')
 
     def test_command_implicit_and_explicit_tweens(self):
         command = self._makeOne()
@@ -870,22 +866,8 @@ class TestPTweensCommand(unittest.TestCase):
         result = command.command()
         self.assertEqual(result, None)
         self.assertEqual(
-            L,
-            ['"pyramid.tweens" config value set (explicitly ordered tweens used)',
-             '',
-             'Explicit Tween Chain (used)',
-             '',
-             'Position Name                          ',
-             '-------- ----                          ',
-             '0        name2                         ',
-             '',
-             'Implicit Tween Chain (not used)',
-             '',
-             'Position Name                          ',
-             '-------- ----                          ',
-             '0        name                          ',
-             ''
-             ])
+           L[0],
+           '"pyramid.tweens" config value set (explicitly ordered tweens used)')
 
     def test__get_tweens(self):
         command = self._makeOne()
@@ -894,8 +876,11 @@ class TestPTweensCommand(unittest.TestCase):
 
 class DummyTweens(object):
     def __init__(self, implicit, explicit):
-        self.implicit = implicit
+        self._implicit = implicit
         self.explicit = explicit
+        self.name_to_alias = {}
+    def implicit(self):
+        return self._implicit
                 
 class Dummy:
     pass

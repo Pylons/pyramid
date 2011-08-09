@@ -306,15 +306,16 @@ is executed.
 Displaying "Tweens"
 -------------------
 
-A user can get a representation of both the implicit :term:`tween` ordering
-(the ordering specified by calls to
-:meth:`pyramid.config.Configurator.add_tween`) and the explicit tween
-ordering (specified by the ``pyramid.tweens`` configuration setting)
-orderings using the ``paster ptweens`` command.  Handler factories which are
-functions or classes will show up as a standard Python dotted name in the
-``paster ptweens`` output.  Tween factories which are *instances* will show
-their module and class name; the Python object id of the instance will be
-appended.
+A :term:`tween` is a bit of code that sits between the main Pyramid
+application request handler and the WSGI application which calls it.  A user
+can get a representation of both the implicit tween ordering (the ordering
+specified by calls to :meth:`pyramid.config.Configurator.add_tween`) and the
+explicit tween ordering (specified by the ``pyramid.tweens`` configuration
+setting) orderings using the ``paster ptweens`` command.  Handler factories
+which are functions or classes will show up as a standard Python dotted name
+in the ``paster ptweens`` output.  Tween factories which are *instances* will
+show their module and class name; the Python object id of the instance will
+be appended.
 
 For example, here's the ``paster pwteens`` command run against a system
 configured without any explicit tweens:
@@ -322,12 +323,17 @@ configured without any explicit tweens:
 .. code-block:: text
    :linenos:
 
-   [chrism@thinko starter]$ ../bin/paster ptweens development.ini 
+   [chrism@thinko pyramid]$ paster ptweens development.ini 
    "pyramid.tweens" config value NOT set (implicitly ordered tweens used)
 
-   Position Name                          
-   -------- ----                          
-   0        pyramid.router.excview_tween_factory
+   Implicit Tween Chain
+
+   Position    Name                                                Alias 
+   --------    ----                                                -----
+   -           -                                                   INGRESS
+   0           pyramid_debugtoolbar.toolbar.toolbar_tween_factory  pdbt
+   1           pyramid.tweens.excview_tween_factory                excview
+   -           -                                                   MAIN
 
 Here's the ``paster pwteens`` command run against a system configured *with*
 explicit tweens defined in its ``development.ini`` file:
@@ -335,22 +341,27 @@ explicit tweens defined in its ``development.ini`` file:
 .. code-block:: text
    :linenos:
 
-   [chrism@thinko starter]$ ../bin/paster ptweens development.ini 
+   [chrism@thinko pyramid]$ paster ptweens development.ini  
    "pyramid.tweens" config value set (explicitly ordered tweens used)
 
    Explicit Tween Chain (used)
 
-   Position Name                          
-   -------- ----                          
-   0        pyramid.tweens.excview_tween_factory
-   1        starter.tween_factory1        
-   2        starter.tween_factory2        
+   Position    Name                                                             
+   --------    ----                                                             
+   -           INGRESS                                                          
+   0           starter.tween_factory2                                           
+   1           starter.tween_factory1                                           
+   2           pyramid.tweens.excview_tween_factory                             
+   -           MAIN                                                             
 
    Implicit Tween Chain (not used)
 
-   Position Name                          
-   -------- ----                          
-   0        pyramid.tweens.excview_tween_factory
+   Position    Name                                                Alias
+   --------    ----                                                -----
+   -           -                                                   INGRESS
+   0           pyramid_debugtoolbar.toolbar.toolbar_tween_factory  pdbt
+   1           pyramid.tweens.excview_tween_factory                excview
+   -           -                                                   MAIN
 
 Here's the application configuration section of the ``development.ini`` used
 by the above ``paster ptweens`` command which reprorts that the explicit
@@ -361,15 +372,18 @@ tween chain is used:
 
    [app:starter]
    use = egg:starter
-   pyramid.reload_templates = true
-   pyramid.debug_authorization = false
-   pyramid.debug_notfound = false
-   pyramid.debug_routematch = false
-   pyramid.debug_templates = true
-   pyramid.default_locale_name = en
-   pyramid.tweens = pyramid.tweens.excview_tween_factory
+   reload_templates = true
+   debug_authorization = false
+   debug_notfound = false
+   debug_routematch = false
+   debug_templates = true
+   default_locale_name = en
+   pyramid.include = pyramid_debugtoolbar
+   pyramid.tweens = starter.tween_factory2
                     starter.tween_factory1
-                    starter.tween_factory2
+                    pyramid.tweens.excview_tween_factory
+
+See :ref:`registering_tweens` for more information about tweens.
 
 .. _writing_a_script:
 

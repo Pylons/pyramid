@@ -14,6 +14,9 @@ from pyramid.interfaces import ITweens
 from pyramid.scripting import prepare
 from pyramid.util import DottedNameResolver
 
+from pyramid.tweens import MAIN
+from pyramid.tweens import INGRESS
+
 from pyramid.scaffolds import PyramidTemplate # bw compat
 zope.deprecation.deprecated(
     'PyramidTemplate', ('pyramid.paster.PyramidTemplate was moved to '
@@ -567,6 +570,28 @@ class PTweensCommand(PCommand):
 
     def out(self, msg): # pragma: no cover
         print msg
+
+    def show_implicit(self, tweens):
+        implicit = tweens.implicit()
+        fmt = '%-10s  %-50s  %-15s'
+        self.out(fmt % ('Position', 'Name', 'Alias'))
+        self.out(fmt % (
+            '-'*len('Position'), '-'*len('Name'), '-'*len('Alias')))
+        self.out(fmt % ('-', '-', INGRESS))
+        for pos, (name, _) in enumerate(implicit):
+            alias = tweens.name_to_alias.get(name, None)
+            self.out(fmt % (pos, name, alias))
+        self.out(fmt % ('-', '-', MAIN))
+
+    def show_explicit(self, tweens):
+        explicit = tweens.explicit
+        fmt = '%-10s  %-65s'
+        self.out(fmt % ('Position', 'Name'))
+        self.out(fmt % ('-'*len('Position'), '-'*len('Name')))
+        self.out(fmt % ('-', INGRESS))
+        for pos, (name, _) in enumerate(explicit):
+            self.out(fmt % (pos, name))
+        self.out(fmt % ('-', MAIN))
     
     def command(self):
         config_uri = self.args[0]
@@ -574,27 +599,22 @@ class PTweensCommand(PCommand):
         registry = env['registry']
         tweens = self._get_tweens(registry)
         if tweens is not None:
-            ordering = []
-            if tweens.explicit:
+            explicit = tweens.explicit
+            if explicit:
                 self.out('"pyramid.tweens" config value set '
                          '(explicitly ordered tweens used)')
                 self.out('')
-                ordering.append((tweens.explicit,
-                                 'Explicit Tween Chain (used)'))
-                ordering.append((tweens.implicit,
-                                 'Implicit Tween Chain (not used)'))
+                self.out('Explicit Tween Chain (used)')
+                self.out('')
+                self.show_explicit(tweens)
+                self.out('')
+                self.out('Implicit Tween Chain (not used)')
+                self.out('')
+                self.show_implicit(tweens)
             else:
                 self.out('"pyramid.tweens" config value NOT set '
                          '(implicitly ordered tweens used)')
                 self.out('')
-                ordering.append((tweens.implicit, ''))
-            for L, title in ordering:
-                if title:
-                    self.out(title)
-                    self.out('')
-                fmt = '%-8s %-30s'
-                self.out(fmt % ('Position', 'Name'))
-                self.out(fmt % ('-'*len('Position'), '-'*len('Name')))
-                for pos, (name, item) in enumerate(L):
-                    self.out(fmt % (pos, name))
+                self.out('Implicit Tween Chain')
                 self.out('')
+                self.show_implicit(tweens)

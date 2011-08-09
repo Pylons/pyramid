@@ -80,6 +80,9 @@ from pyramid.traversal import DefaultRootFactory
 from pyramid.traversal import find_interface
 from pyramid.traversal import traversal_path
 from pyramid.tweens import excview_tween_factory
+from pyramid.tweens import Tweens
+from pyramid.tweens import tween_factory_name
+from pyramid.tweens import MAIN, INGRESS, EXCVIEW
 from pyramid.urldispatch import RoutesMapper
 from pyramid.util import DottedNameResolver
 from pyramid.util import WeakOrderedSet
@@ -733,9 +736,6 @@ class Configurator(object):
         # cope with WebOb exc objects not decoratored with IExceptionResponse
         from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
         registry.registerSelfAdapter((WebobResponse,), IResponse)
-        # add a handler manager
-        for factory in tweens:
-            self._add_tween(factory, explicit=True)
 
         if debug_logger is None:
             debug_logger = logging.getLogger(self.package_name)
@@ -784,6 +784,8 @@ class Configurator(object):
             self.commit()
         for inc in includes:
             self.include(inc)
+        for factory in tweens:
+            self._add_tween(factory, explicit=True)
         
     def hook_zca(self):
         """ Call :func:`zope.component.getSiteManager.sethook` with
@@ -903,40 +905,110 @@ class Configurator(object):
         return self._derive_view(view, attr=attr, renderer=renderer)
 
     @action_method
-    def add_tween(self, tween_factory):
+    def add_tween(self, tween_factory, alias=None, under=None, over=None):
         """
-        Add a 'tween factory'.  A :term:`tween` (think: 'between') is a bit
-        of code that sits between the Pyramid router's main request handling
-        function and the upstream WSGI component that uses :app:`Pyramid` as
-        its 'app'.  This is a feature that may be used by Pyramid framework
-        extensions, to provide, for example, Pyramid-specific view timing
-        support bookkeeping code that examines exceptions before they are
-        returned to the upstream WSGI application.  Tweens behave a bit like
+        Add a 'tween factory'.  A :term:`tween` (a contraction of 'between')
+        is a bit of code that sits between the Pyramid router's main request
+        handling function and the upstream WSGI component that uses
+        :app:`Pyramid` as its 'app'.  This is a feature that may be used by
+        Pyramid framework extensions, to provide, for example,
+        Pyramid-specific view timing support, bookkeeping code that examines
+        exceptions before they are returned to the upstream WSGI application,
+        or a variety of other features.  Tweens behave a bit like
         :term:`WSGI` 'middleware' but they have the benefit of running in a
         context in which they have access to the Pyramid :term:`application
         registry` as well as the Pyramid rendering machinery.
+
+        .. note:: You can view the tween ordering configured into a given
+                  Pyramid application by using the ``paster ptweens``
+                  command.  See :ref:`displaying_tweens`.
+
+        The ``alias`` argument, if it is not ``None``, should be a string.
+        The string will represent a value that other callers of ``add_tween``
+        may pass as an ``under`` and ``over`` argument instead of a dotted
+        name to a tween factory.
+
+        The ``under`` and ``over`` arguments allow the caller of
+        ``add_tween`` to provide a hint about where in the tween chain this
+        tween factory should be placed when an implicit tween chain is used.
+        These hints are only used used when an explicit tween chain is not
+        used (when the ``pyramid.tweens`` configuration value is not set).
+        Allowable values for ``under`` or ``over`` (or both) are:
+
+        - ``None`` (the default).
+
+        - A :term:`dotted Python name` to a tween factory: a string
+          representing the predicted dotted name of a tween factory added in
+          a call to ``add_tween`` in the same configuration session.
+
+        - A tween alias: a string representing the predicted value of
+          ``alias`` in a separate call to ``add_tween`` in the same
+          configuration session
+        
+        - One of the constants :attr:`pyramid.tweens.MAIN`,
+          :attr:`pyramid.tweens.INGRESS`, or :attr:`pyramid.tweens.EXCVIEW`.
+        
+        ``under`` means 'closer to the main Pyramid application than',
+        ``over`` means 'closer to the request ingress than'.
+
+        For example, calling ``add_tween(factory, over=pyramid.tweens.MAIN)``
+        will attempt to place the tween factory represented by ``factory``
+        directly 'above' (in ``paster ptweens`` order) the main Pyramid
+        request handler.  Likewise, calling ``add_tween(factory,
+        over=pyramid.tweens.MAIN, under='someothertween')`` will attempt to
+        place this tween factory 'above' the main handler but 'below' (a
+        fictional) 'someothertween' tween factory (which was presumably added
+        via ``add_tween(factory, alias='someothertween')``).
+
+        If an ``under`` or ``over`` value is provided that does not match a
+        tween factory dotted name or alias in the current configuration, that
+        value will be ignored.  It is not an error to provide an ``under`` or
+        ``over`` value that matches an unused tween factory.
+
+        Specifying neither ``over`` nor ``under`` is equivalent to specifying
+        ``under=INGRESS``.
+
+        Implicit tween ordering is obviously only best-effort.  Pyramid will
+        attempt to present an implicit order of tweens as best it can, but
+        the only surefire way to get any particular ordering is to use an
+        explicit tween order.  A user may always override the implicit tween
+        ordering by using an explicit ``pyramid.tweens`` configuration value
+        setting.
+
+        ``alias``, ``under``, and ``over`` arguments are ignored when an
+        explicit tween chain is specified using the ``pyramid.tweens``
+        configuration value.
 
         For more information, see :ref:`registering_tweens`.
 
         .. note:: This feature is new as of Pyramid 1.1.1.
         """
-        return self._add_tween(tween_factory, explicit=False)
+        return self._add_tween(tween_factory, alias=alias, under=under,
+                               over=over, explicit=False)
 
-    def _add_tween(self, tween_factory, explicit):
+    def _add_tween(self, tween_factory, alias=None, under=None, over=None,
+                   explicit=False):
         tween_factory = self.maybe_dotted(tween_factory)
         name = tween_factory_name(tween_factory)
-        def register():
-            registry = self.registry
-            tweens = registry.queryUtility(ITweens)
-            if tweens is None:
-                tweens = Tweens()
-                registry.registerUtility(tweens, ITweens)
-                tweens.add(
-                    tween_factory_name(excview_tween_factory),
-                    excview_tween_factory,
-                    explicit=False)
-            tweens.add(name, tween_factory, explicit)
-        self.action(('tween', name, explicit), register)
+        if alias in (MAIN, INGRESS):
+            raise ConfigurationError('%s is a reserved tween name' % alias)
+            
+        registry = self.registry
+        tweens = registry.queryUtility(ITweens)
+        if tweens is None:
+            tweens = Tweens()
+            registry.registerUtility(tweens, ITweens)
+            tweens.add_implicit(tween_factory_name(excview_tween_factory),
+                                excview_tween_factory, alias=EXCVIEW,
+                                over=MAIN)
+        if explicit:
+            tweens.add_explicit(name, tween_factory)
+        else:
+            tweens.add_implicit(name, tween_factory, alias=alias, under=under,
+                                over=over)
+        self.action(('tween', name, explicit))
+        if not explicit and alias is not None:
+            self.action(('tween', alias, explicit))
 
     @action_method
     def add_request_handler(self, factory, name): # pragma: no cover
@@ -3378,39 +3450,3 @@ def isexception(o):
 
 global_registries = WeakOrderedSet()
 
-class Tweens(object):
-    implements(ITweens)
-    def __init__(self):
-        self.explicit = []
-        self.implicit = []
-
-    def add(self, name, factory, explicit=False):
-        if explicit:
-            self.explicit.append((name, factory))
-        else:
-            self.implicit.append((name, factory))
-
-    def __call__(self, handler, registry):
-        factories = self.implicit
-        if self.explicit:
-            factories = self.explicit
-        for name, factory in factories:
-            handler = factory(handler, registry)
-        return handler
-    
-def tween_factory_name(factory):
-    if (hasattr(factory, '__name__') and
-        hasattr(factory, '__module__')):
-        # function or class
-        name = '.'.join([factory.__module__,
-                         factory.__name__])
-    elif hasattr(factory, '__module__'):
-        # instance
-        name = '.'.join([factory.__module__,
-                         factory.__class__.__name__,
-                         str(id(factory))])
-    else:
-        raise ConfigurationError(
-            'A tween factory must be a class, an instance, or a function; '
-            '%s is not a suitable tween factory' % factory)
-    return name
