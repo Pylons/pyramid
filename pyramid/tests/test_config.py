@@ -649,6 +649,27 @@ pyramid.tests.test_config.dummy_include2""",
                 ]
             )
 
+    def test_add_tweens_names_with_underover(self):
+        from pyramid.interfaces import ITweens
+        from pyramid.tweens import excview_tween_factory
+        from pyramid.tweens import MAIN
+        def factory1(handler, registry): return handler
+        def factory2(handler, registry): return handler
+        config = self._makeOne()
+        config.add_tween(factory1, over=MAIN)
+        config.add_tween(factory2, over=MAIN,
+                         under='pyramid.tests.test_config.factory1')
+        config.commit()
+        tweens = config.registry.queryUtility(ITweens)
+        implicit = tweens.implicit()
+        self.assertEqual(
+            implicit,
+            [
+                ('pyramid.tweens.excview_tween_factory', excview_tween_factory),
+                ('pyramid.tests.test_config.factory1', factory1),
+                ('pyramid.tests.test_config.factory2', factory2),
+             ])
+
     def test_add_tween_dottedname(self):
         from pyramid.interfaces import ITweens
         from pyramid.tweens import excview_tween_factory

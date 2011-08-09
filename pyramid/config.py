@@ -907,16 +907,77 @@ class Configurator(object):
     @action_method
     def add_tween(self, tween_factory, alias=None, under=None, over=None):
         """
-        Add a 'tween factory'.  A :term:`tween` (think: 'between') is a bit
-        of code that sits between the Pyramid router's main request handling
-        function and the upstream WSGI component that uses :app:`Pyramid` as
-        its 'app'.  This is a feature that may be used by Pyramid framework
-        extensions, to provide, for example, Pyramid-specific view timing
-        support bookkeeping code that examines exceptions before they are
-        returned to the upstream WSGI application.  Tweens behave a bit like
+        Add a 'tween factory'.  A :term:`tween` (a contraction of 'between')
+        is a bit of code that sits between the Pyramid router's main request
+        handling function and the upstream WSGI component that uses
+        :app:`Pyramid` as its 'app'.  This is a feature that may be used by
+        Pyramid framework extensions, to provide, for example,
+        Pyramid-specific view timing support, bookkeeping code that examines
+        exceptions before they are returned to the upstream WSGI application,
+        or a variety of other features.  Tweens behave a bit like
         :term:`WSGI` 'middleware' but they have the benefit of running in a
         context in which they have access to the Pyramid :term:`application
         registry` as well as the Pyramid rendering machinery.
+
+        .. note:: You can view the tween ordering configured into a given
+                  Pyramid application by using the ``paster ptweens``
+                  command.  See :ref:`displaying_tweens`.
+
+        The ``alias`` argument, if it is not ``None``, should be a string.
+        The string will represent a value that other callers of ``add_tween``
+        may pass as an ``under`` and ``over`` argument instead of a dotted
+        name to a tween factory.
+
+        The ``under`` and ``over`` arguments allow the caller of
+        ``add_tween`` to provide a hint about where in the tween chain this
+        tween factory should be placed when an implicit tween chain is used.
+        These hints are only used used when an explicit tween chain is not
+        used (when the ``pyramid.tweens`` configuration value is not set).
+        Allowable values for ``under`` or ``over`` (or both) are:
+
+        - ``None`` (the default).
+
+        - A :term:`dotted Python name` to a tween factory: a string
+          representing the predicted dotted name of a tween factory added in
+          a call to ``add_tween`` in the same configuration session.
+
+        - A tween alias: a string representing the predicted value of
+          ``alias`` in a separate call to ``add_tween`` in the same
+          configuration session
+        
+        - One of the constants :attr:`pyramid.tweens.MAIN`,
+          :attr:`pyramid.tweens.INGRESS`, or :attr:`pyramid.tweens.EXCVIEW`.
+        
+        ``under`` means 'closer to the main Pyramid application than',
+        ``over`` means 'closer to the request ingress than'.
+
+        For example, calling ``add_tween(factory, over=pyramid.tweens.MAIN)``
+        will attempt to place the tween factory represented by ``factory``
+        directly 'above' (in ``paster ptweens`` order) the main Pyramid
+        request handler.  Likewise, calling ``add_tween(factory,
+        over=pyramid.tweens.MAIN, under='someothertween')`` will attempt to
+        place this tween factory 'above' the main handler but 'below' (a
+        fictional) 'someothertween' tween factory (which was presumably added
+        via ``add_tween(factory, alias='someothertween')``).
+
+        If an ``under`` or ``over`` value is provided that does not match a
+        tween factory dotted name or alias in the current configuration, that
+        value will be ignored.  It is not an error to provide an ``under`` or
+        ``over`` value that matches an unused tween factory.
+
+        Specifying neither ``over`` nor ``under`` is equivalent to specifying
+        ``under=INGRESS``.
+
+        Implicit tween ordering is obviously only best-effort.  Pyramid will
+        attempt to present an implicit order of tweens as best it can, but
+        the only surefire way to get any particular ordering is to use an
+        explicit tween order.  A user may always override the implicit tween
+        ordering by using an explicit ``pyramid.tweens`` configuration value
+        setting.
+
+        ``alias``, ``under``, and ``over`` arguments are ignored when an
+        explicit tween chain is specified using the ``pyramid.tweens``
+        configuration value.
 
         For more information, see :ref:`registering_tweens`.
 
