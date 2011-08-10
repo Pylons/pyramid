@@ -1,4 +1,5 @@
 from webob import Response
+from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.view import view_config
 
 @view_config(name='x')
@@ -9,7 +10,7 @@ def x_view(request): # pragma: no cover
 def y_view(request): # pragma: no cover
      return Response('this is private too!')
      
-@view_config(name='z', permission='__no_permission_required__')
+@view_config(name='z', permission=NO_PERMISSION_REQUIRED)
 def z_view(request):
      return Response('this is public')
 

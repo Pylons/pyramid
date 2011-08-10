@@ -24,6 +24,8 @@ class AllPermissionsList(object):
 ALL_PERMISSIONS = AllPermissionsList()
 DENY_ALL = (Deny, Everyone, ALL_PERMISSIONS)
 
+NO_PERMISSION_REQUIRED = '__no_permission_required__'
+
 def has_permission(permission, context, request):
     """ Provided a permission (a string or unicode object), a context
     (a :term:`resource` instance) and a request object, return an

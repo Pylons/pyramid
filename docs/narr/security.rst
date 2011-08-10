@@ -200,9 +200,9 @@ When a default permission is registered:
   permission is ignored for that view registration, and the
   view-configuration-named permission is used.
 
-- If a view configuration names an explicit permission as the string
-  ``__no_permission_required__``, the default permission is ignored,
-  and the view is registered *without* a permission (making it
+- If a view configuration names the permission
+  :data:`pyramid.security.NO_PERMISSION_REQUIRED`, the default permission
+  is ignored, and the view is registered *without* a permission (making it
   available to all callers regardless of their credentials).
 
 .. warning::
@@ -210,7 +210,8 @@ When a default permission is registered:
    When you register a default permission, *all* views (even :term:`exception
    view` views) are protected by a permission.  For all views which are truly
    meant to be anonymously accessible, you will need to associate the view's
-   configuration with the ``__no_permission_required__`` permission.
+   configuration with the :data:`pyramid.security.NO_PERMISSION_REQUIRED`
+   permission.
 
 .. index::
    single: ACL
