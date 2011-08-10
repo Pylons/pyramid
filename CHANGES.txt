@@ -18,6 +18,12 @@ Backported Features
   by the Pyramid router, after which it will be the result of
   ``sys.exc_info()``.
 
+Bug Fixes
+---------
+
+- Fixed an issue with the default renderer not working at certain times.  See
+  https://github.com/Pylons/pyramid/issues/249
+
 1.1 (2011-07-22)
 ================
 

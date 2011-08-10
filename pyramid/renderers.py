@@ -352,7 +352,8 @@ class RendererHelper(object):
         if name and '.' in name:
             rtype = os.path.splitext(name)[1]
         else:
-            rtype = name
+            # important.. must be a string; cannot be None; see issue 249
+            rtype = name or ''
 
         if registry is None:
             registry = get_current_registry()
