@@ -57,6 +57,8 @@ Constants
     last ACE in an ACL in systems that use an "inheriting" security
     policy, representing the concept "don't inherit any other ACEs".
 
+.. attribute:: NO_PERMISSION_REQUIRED
+
 Return Values
 -------------
 

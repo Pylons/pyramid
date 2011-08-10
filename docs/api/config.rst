@@ -44,7 +44,7 @@
 
      .. automethod:: add_route
 
-     .. automethod:: add_static_view(name, path, cache_max_age=3600, permission='__no_permission_required__')
+     .. automethod:: add_static_view(name, path, cache_max_age=3600, permission=NO_PERMISSION_REQUIRED)
 
      .. automethod:: add_settings
 
