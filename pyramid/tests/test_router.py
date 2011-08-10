@@ -812,10 +812,8 @@ class TestRouter(unittest.TestCase):
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(result, ['OK'])
-        # ``exception`` must be attached to request even if a suitable
-        # exception view cannot be found
-        self.assertEqual(request.exception.__class__, RuntimeError)
-        # we clean up the exc_info after the request
+        # we clean up the exc_info and exception after the request
+        self.assertEqual(request.exception, None)
         self.assertEqual(request.exc_info, None)
         
     def test_call_view_raises_exception_view(self):
@@ -826,7 +824,9 @@ class TestRouter(unittest.TestCase):
         exception_response = DummyResponse()
         exception_response.app_iter = ["Hello, world"]
         view = DummyView(response, raise_exception=RuntimeError)
-        exception_view = DummyView(exception_response)
+        def exception_view(context, request):
+            self.assertEqual(request.exception.__class__, RuntimeError)
+            return exception_response
         environ = self._makeEnviron()
         self._registerView(view, '', IViewClassifier, IRequest, None)
         self._registerView(exception_view, '', IExceptionViewClassifier,
@@ -835,7 +835,6 @@ class TestRouter(unittest.TestCase):
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(result, ["Hello, world"])
-        self.assertEqual(view.request.exception.__class__, RuntimeError)
 
     def test_call_view_raises_super_exception_sub_exception_view(self):
         from pyramid.interfaces import IViewClassifier

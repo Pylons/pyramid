@@ -36,8 +36,11 @@ def excview_tween_factory(handler, registry):
                 raise
             response = view_callable(exc, request)
         finally:
-            # prevent leakage
-            attrs['exc_info'] = None
+            # prevent leakage (wrt exc_info)
+            if 'exc_info' in attrs:
+                del attrs['exc_info']
+            if 'exception' in attrs:
+                del attrs['exception']
 
         return response
 
