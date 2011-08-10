@@ -7,15 +7,14 @@ Should-Have
 - Deprecate pyramid.security.view_execution_permitted (it only works for
   traversal).
 
-- Merge https://github.com/Pylons/pyramid/pull/242 (IPython update; requires
-  test fixes and additional test coverage).
-
 - Make "localizer" a property of request (instead of requiring
   "get_localizer(request)"
 
 - Make ``current_route_url`` a method of request.
 
 - Create a ``current_route_path`` function and make it a method of request.
+
+- "static_path" API (omit host and port).
 
 - Provide a way to set the authentication policy and the authorization policy
   during a config.include (they are related, so just exposing the currently
@@ -37,9 +36,6 @@ Should-Have
 - Eliminate non-deployment-non-scaffold-related Paste dependencies:
   ``paste.urlparser.StaticURLParser``, ``paste.auth.auth_tkt`` (cutnpaste or
   reimplement both).
-
-- Use ``pyramid.include`` to add pyramid_debugtoolbar to all scaffolds and
-  remove weberror.
 
 Nice-to-Have
 ------------
