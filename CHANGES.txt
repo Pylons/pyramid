@@ -75,6 +75,12 @@ Documentation
 - Added a "Displaying Tweens" section to the "Command-Line Pyramid" narrative
   chapter.
 
+Bug Fixes
+---------
+
+- Fixed an issue with the default renderer not working at certain times.  See
+  https://github.com/Pylons/pyramid/issues/249
+
 1.1 (2011-07-22)
 ================
 

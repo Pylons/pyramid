@@ -486,6 +486,13 @@ class TestRendererHelper(unittest.TestCase):
         helper = self._makeOne(registry=Dummy)
         self.assertEqual(helper.settings, {})
 
+    def test_settings_registry_name_is_None(self):
+        class Dummy(object):
+            settings = None
+        helper = self._makeOne(registry=Dummy)
+        self.assertEqual(helper.name, None)
+        self.assertEqual(helper.type, '')
+
     def test_settings_registry_settings_is_not_None(self):
         class Dummy(object):
             settings = {'a':1}
