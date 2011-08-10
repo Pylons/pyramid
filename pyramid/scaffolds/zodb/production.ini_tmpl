@@ -7,6 +7,8 @@ pyramid.debug_notfound = false
 pyramid.debug_routematch = false
 pyramid.debug_templates = false
 pyramid.default_locale_name = en
+pyramid.include = pyramid_tm
+pyramid_tm.attempts = 3
 
 zodb_uri = file://%(here)s/Data.fs?connection_cache_size=20000
 
@@ -24,16 +26,10 @@ debug = false
 ;smtp_use_tls =
 ;error_message =
 
-[filter:tm]
-use = egg:repoze.tm2#tm
-commit_veto = repoze.tm:default_commit_veto
-
 [pipeline:main]
 pipeline =
     weberror
     egg:repoze.zodbconn#closer
-    egg:repoze.retry#retry
-    tm
     {{project}}
 
 [server:main]

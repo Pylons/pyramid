@@ -7,10 +7,10 @@ pyramid.debug_notfound = false
 pyramid.debug_routematch = false
 pyramid.debug_templates = true
 pyramid.default_locale_name = en
+pyramid.include = pyramid_debugtoolbar
 
 [pipeline:main]
 pipeline =
-    egg:WebError#evalerror
     {{project}}
 
 [server:main]

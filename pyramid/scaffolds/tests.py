@@ -30,7 +30,6 @@ class TemplateTest(object):
                 [os.path.join(self.directory, 'bin', 'python'),
                  'setup.py', 'develop'])
             os.chdir(self.directory)
-
             subprocess.check_call(['bin/paster', 'create', '-t', tmpl_name,
                                    'Dingle'])
             os.chdir('Dingle')
@@ -38,23 +37,31 @@ class TemplateTest(object):
             subprocess.check_call([py, 'setup.py', 'install'])
             subprocess.check_call([py, 'setup.py', 'test'])
             paster = os.path.join(self.directory, 'bin', 'paster')
-            proc = subprocess.Popen([paster, 'serve', 'development.ini'])
-            try:
-                time.sleep(5)
-                proc.poll()
-                if proc.returncode is not None:
-                    raise RuntimeError('didnt start')
-                conn = httplib.HTTPConnection('localhost:6543')
-                conn.request('GET', '/')
-                resp = conn.getresponse()
-                assert(resp.status == 200)
-            finally:
-                if hasattr(proc, 'terminate'):
-                    # 2.6+
-                    proc.terminate()
-                else:
-                    # 2.5
-                    os.kill(proc.pid, signal.SIGTERM)
+            for ininame, hastoolbar in (('development.ini', True),
+                                        ('production.ini', False)):
+                proc = subprocess.Popen([paster, 'serve', ininame])
+                try:
+                    time.sleep(5)
+                    proc.poll()
+                    if proc.returncode is not None:
+                        raise RuntimeError('%s didnt start' % ininame)
+                    conn = httplib.HTTPConnection('localhost:6543')
+                    conn.request('GET', '/')
+                    resp = conn.getresponse()
+                    assert resp.status == 200, ininame
+                    data = resp.read()
+                    toolbarchunk = '<div id="flDebug"'
+                    if hastoolbar:
+                        assert toolbarchunk in data, ininame
+                    else:
+                        assert not toolbarchunk in data, ininame
+                finally:
+                    if hasattr(proc, 'terminate'):
+                        # 2.6+
+                        proc.terminate()
+                    else:
+                        # 2.5
+                        os.kill(proc.pid, signal.SIGTERM)
         finally:
             shutil.rmtree(self.directory)
             os.chdir(self.old_cwd)
