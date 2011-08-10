@@ -995,10 +995,10 @@ class Configurator(object):
             raise ConfigurationError('%s is a reserved tween name' % alias)
 
         if over is INGRESS:
-            raise ConfigurationError('%s cannot be over INGRESS')
+            raise ConfigurationError('%s cannot be over INGRESS' % name)
 
         if under is MAIN:
-            raise ConfigurationError('%s cannot be under MAIN')
+            raise ConfigurationError('%s cannot be under MAIN' % name)
 
         registry = self.registry
         tweens = registry.queryUtility(ITweens)
