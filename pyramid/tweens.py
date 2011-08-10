@@ -176,15 +176,12 @@ class Tweens(object):
         return handler
     
 def tween_factory_name(factory):
-    if (hasattr(factory, '__name__') and
-        hasattr(factory, '__module__')):
+    if (hasattr(factory, '__name__') and hasattr(factory, '__module__')):
         # function or class
-        name = '.'.join([factory.__module__,
-                         factory.__name__])
+        name = '.'.join([factory.__module__, factory.__name__])
     elif hasattr(factory, '__module__'):
         # instance
-        name = '.'.join([factory.__module__,
-                         factory.__class__.__name__,
+        name = '.'.join([factory.__module__, factory.__class__.__name__,
                          str(id(factory))])
     else:
         raise ConfigurationError(
