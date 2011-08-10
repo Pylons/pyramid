@@ -15,7 +15,6 @@ class TestTweens(unittest.TestCase):
 
     def test_add_implicit_noaliases(self):
         from pyramid.tweens import INGRESS
-        from pyramid.tweens import MAIN
         tweens = self._makeOne()
         tweens.add_implicit('name', 'factory')
         self.assertEqual(tweens.names, ['name'])
@@ -174,6 +173,26 @@ class TestTweens(unittest.TestCase):
                              ('txnmgr', 'txnmgr_factory'),
                              ])
 
+    def test_implicit_ordering_5(self):
+        from pyramid.tweens import MAIN, INGRESS
+        tweens = self._makeOne()
+        add = tweens.add_implicit
+        add('exceptionview', 'excview_factory', over=MAIN)
+        add('auth', 'auth_factory', under=INGRESS)
+        add('retry', 'retry_factory', over='txnmgr', under='exceptionview')
+        add('browserid', 'browserid_factory', under=INGRESS)
+        add('txnmgr', 'txnmgr_factory', under='exceptionview', over=MAIN)
+        add('dbt', 'dbt_factory') 
+        self.assertEqual(tweens.implicit(),
+                         [
+                             ('dbt', 'dbt_factory'),
+                             ('browserid', 'browserid_factory'),
+                             ('auth', 'auth_factory'),
+                             ('exceptionview', 'excview_factory'),
+                             ('retry', 'retry_factory'),
+                             ('txnmgr', 'txnmgr_factory'),
+                             ])
+
     def test_implicit_ordering_withaliases(self):
         from pyramid.tweens import MAIN
         tweens = self._makeOne()
@@ -184,6 +203,26 @@ class TestTweens(unittest.TestCase):
         add('browserid', 'browserid_factory', alias='b')
         add('txnmgr', 'txnmgr_factory', alias='t', under='exceptionview')
         add('dbt', 'dbt_factory') 
+        self.assertEqual(tweens.implicit(),
+                         [
+                             ('dbt', 'dbt_factory'),
+                             ('browserid', 'browserid_factory'),
+                             ('auth', 'auth_factory'),
+                             ('exceptionview', 'excview_factory'),
+                             ('retry', 'retry_factory'),
+                             ('txnmgr', 'txnmgr_factory'),
+                          ])
+
+    def test_implicit_ordering_withaliases2(self):
+        from pyramid.tweens import MAIN
+        tweens = self._makeOne()
+        add = tweens.add_implicit
+        add('exceptionview', 'excview_factory', alias='e', over=MAIN)
+        add('auth', 'auth_factory', alias='a', under='b')
+        add('retry', 'retry_factory', alias='r', over='t', under='e')
+        add('browserid', 'browserid_factory', alias='b')
+        add('txnmgr', 'txnmgr_factory', alias='t', under='e')
+        add('dbt', 'dbt_factory', alias='d') 
         self.assertEqual(tweens.implicit(),
                          [
                              ('dbt', 'dbt_factory'),

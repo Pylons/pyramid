@@ -87,7 +87,7 @@ class Tweens(object):
             self.order.append((alias, over))
 
     def implicit(self):
-        order = []
+        order = [(INGRESS, MAIN)]
         roots = []
         graph = {}
         has_order = {}
@@ -103,12 +103,12 @@ class Tweens(object):
             b = self.name_to_alias.get(b, b)
             order.append((a, b))
 
-        def add_node(graph, node):
+        def add_node(node):
             if not graph.has_key(node):
                 roots.append(node)
                 graph[node] = [0] # 0 = number of arcs coming into this node
 
-        def add_arc(graph, fromnode, tonode):
+        def add_arc(fromnode, tonode):
             graph[fromnode].append(tonode)
             graph[tonode][0] += 1
             if tonode in roots:
@@ -123,31 +123,18 @@ class Tweens(object):
             else:
                 has_order[first] = has_order[second] = True
 
-        for v in aliases:
+        for alias in aliases:
             # any alias that doesn't have an ordering after we detect all
             # nodes with orders should get an ordering relative to INGRESS,
             # as if it were added with no under or over in add_implicit
-            if (not v in has_order) and (v not in (INGRESS, MAIN)):
-                order.append((INGRESS, v))
-                ingress_alias_names.append(v)
-            add_node(graph, v)
+            if (not alias in has_order) and (alias not in (INGRESS, MAIN)):
+                order.append((INGRESS, alias))
+                ingress_alias_names.append(alias)
+            add_node(alias)
 
         for a, b in order:
             if a is not None and b is not None: # deal with removed orders
-                add_arc(graph, a, b)
-
-        def sortroots(alias):
-            # sort roots so that roots (and their children) that depend only
-            # on the ingress sort nearer the  (nearer the ingress)
-            if alias in ingress_alias_names:
-                return -1
-            children = graph[alias][1:]
-            for child in children:
-                if sortroots(child) == -1:
-                    return -1
-            return 1
-
-        roots.sort(key=sortroots)
+                add_arc(a, b)
 
         sorted_aliases = []
 
