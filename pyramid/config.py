@@ -71,6 +71,7 @@ from pyramid.renderers import RendererHelper
 from pyramid.request import route_request_iface
 from pyramid.asset import PackageOverrides
 from pyramid.asset import resolve_asset_spec
+from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.settings import Settings
 from pyramid.static import StaticURLInfo
 from pyramid.threadlocal import get_current_registry
@@ -1170,10 +1171,10 @@ class Configurator(object):
           ``default_permission`` argument, or if
           :meth:`pyramid.config.Configurator.set_default_permission`
           was used prior to this view registration.  Pass the string
-          ``__no_permission_required__`` as the permission argument to
-          explicitly indicate that the view should always be
-          executable by entirely anonymous users, regardless of the
-          default permission, bypassing any :term:`authorization
+          :data:`pyramid.security.NO_PERMISSION_REQUIRED` as the
+          permission argument to explicitly indicate that the view should
+          always be executable by entirely anonymous users, regardless of
+          the default permission, bypassing any :term:`authorization
           policy` that may be in effect.
 
         attr
@@ -2400,10 +2401,11 @@ class Configurator(object):
           If a default permission is in effect, view configurations meant to
           create a truly anonymously accessible view (even :term:`exception
           view` views) *must* use the explicit permission string
-          ``__no_permission_required__`` as the permission.  When this string
-          is used as the ``permission`` for a view configuration, the default
-          permission is ignored, and the view is registered, making it
-          available to all callers regardless of their credentials.
+          :data:`pyramid.security.NO_PERMISSION_REQUIRED` as the permission.
+          When this string is used as the ``permission`` for a view
+          configuration, the default permission is ignored, and the view is
+          registered, making it available to all callers regardless of their
+          credentials.
 
         See also :ref:`setting_a_default_permission`.
 
@@ -2530,10 +2532,10 @@ class Configurator(object):
 
         The ``permission`` keyword argument is used to specify the
         :term:`permission` required by a user to execute the static view.  By
-        default, it is the string ``__no_permission_required__``.  The
-        ``__no_permission_required__`` string is a special sentinel which
-        indicates that, even if a :term:`default permission` exists for the
-        current application, the static view should be renderered to
+        default, it is the string
+        :data:`pyramid.security.NO_PERMISSION_REQUIRED`, a special sentinel
+        which indicates that, even if a :term:`default permission` exists for
+        the current application, the static view should be renderered to
         completely anonymous users.  This default value is permissive
         because, in most web apps, static assets seldom need protection from
         viewing.  If ``permission`` is specified, the security checking will
@@ -3132,7 +3134,7 @@ class ViewDeriver(object):
     @wraps_view
     def secured_view(self, view):
         permission = self.kw.get('permission')
-        if permission == '__no_permission_required__':
+        if permission == NO_PERMISSION_REQUIRED:
             # allow views registered within configurations that have a
             # default permission to explicitly override the default
             # permission, replacing it with no permission at all

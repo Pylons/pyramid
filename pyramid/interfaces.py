@@ -866,8 +866,6 @@ class ISession(Interface):
     def __contains__(key):
         """Return true if a key exists in the mapping."""
 
-NO_PERMISSION_REQUIRED = '__no_permission_required__'
-
 class IRendererInfo(Interface):
     """ An object implementing this interface is passed to every
     :term:`renderer factory` constructor as its only argument (conventionally

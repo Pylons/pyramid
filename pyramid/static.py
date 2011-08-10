@@ -14,6 +14,7 @@ from pyramid.asset import resolve_asset_spec
 from pyramid.interfaces import IStaticURLInfo
 from pyramid.path import caller_package
 from pyramid.request import call_app_with_subpath_as_path_info
+from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.url import route_url
 
 class PackageURLParser(StaticURLParser):
@@ -149,7 +150,7 @@ class StaticURLInfo(object):
             if permission is None:
                 permission = extra.pop('permission', None)
             if permission is None:
-                permission = '__no_permission_required__'
+                permission = NO_PERMISSION_REQUIRED
 
             context = extra.pop('view_context', None)
             if context is None:

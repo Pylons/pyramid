@@ -4166,13 +4166,14 @@ class TestViewDeriver(unittest.TestCase):
         self.assertEqual(permitted, False)
 
     def test_debug_auth_permission_authpol_overridden(self):
+        from pyramid.security import NO_PERMISSION_REQUIRED
         response = DummyResponse()
         view = lambda *arg: response
         self.config.registry.settings = dict(
             debug_authorization=True, reload_templates=True)
         logger = self._registerLogger()
         self._registerSecurityPolicy(False)
-        deriver = self._makeOne(permission='__no_permission_required__')
+        deriver = self._makeOne(permission=NO_PERMISSION_REQUIRED)
         result = deriver(view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
