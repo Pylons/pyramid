@@ -4,6 +4,12 @@ Next release
 Features
 --------
 
+- Added a ``pyramid.security.NO_PERMISSION_REQUIRED`` constant for use in
+  ``permission=`` statements to view configuration.  This constant has a
+  value of the string ``__no_permission_required__``.  This string value was
+  previously referred to in documentation; now the documentation uses the
+  constant.
+
 - Added a decorator-based way to configure a response adapter:
   ``pyramid.response.response_adapter``.  This decorator has the same use as
   ``pyramid.config.Configurator.add_response_adapter`` but it's declarative.
