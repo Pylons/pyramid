@@ -16,7 +16,6 @@ class TestTweens(unittest.TestCase):
     def test_add_implicit_noaliases(self):
         from pyramid.tweens import INGRESS
         from pyramid.tweens import MAIN
-        D = {MAIN:MAIN, INGRESS:INGRESS}
         tweens = self._makeOne()
         tweens.add_implicit('name', 'factory')
         self.assertEqual(tweens.names, ['name'])
