@@ -4,6 +4,9 @@ Pyramid TODOs
 Should-Have
 -----------
 
+- BeforeRender event subclasses dict but implements a bunch of shit.  Its
+  repr is currently broken (it always shows empty).  Decide what to do.
+
 - Replace weberror for email-out in all production.ini.
 
 - Come up with an analogue of repoze.zodbconn that doesn't require a closer
