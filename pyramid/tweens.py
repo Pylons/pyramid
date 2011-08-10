@@ -54,7 +54,7 @@ class CyclicDependencyError(Exception):
             dependent = cycle
             dependees = cycles[cycle]
             L.append('%r sorts over %r' % (dependent, dependees))
-        msg = '; '.join(L)
+        msg = 'Implicit tween ordering cycle:' + '; '.join(L)
         return msg
 
 class Tweens(object):
