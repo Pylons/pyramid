@@ -478,6 +478,19 @@ class NullRendererHelper(RendererHelper):
     useful for testing purposes and special case view configuration
     registrations that want to use the view configuration machinery but do
     not want actual rendering to happen ."""
+    def __init__(self, name=None, package=None, registry=None):
+        # we override the initializer to avoid calling get_current_registry
+        # (it will return a reference to the global registry when this
+        # thing is called at module scope; we don't want that).
+        self.name = None
+        self.package = None
+        self.type = ''
+        self.registry = None
+
+    @property
+    def settings(self):
+        return get_current_registry().settings or {}
+
     def render_view(self, request, value, view, context):
         return value
 
