@@ -9,14 +9,19 @@ Event-Related Interfaces
 ++++++++++++++++++++++++
 
   .. autointerface:: IApplicationCreated
+     :members:
 
   .. autointerface:: INewRequest
+     :members:
 
   .. autointerface:: IContextFound
+     :members:
 
   .. autointerface:: INewResponse
+     :members:
 
   .. autointerface:: IBeforeRender
+     :members:
 
 Other Interfaces
 ++++++++++++++++
