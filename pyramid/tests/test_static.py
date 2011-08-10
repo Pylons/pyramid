@@ -410,6 +410,7 @@ class TestStaticURLInfo(unittest.TestCase):
         self.assertEqual(inst.registrations, expected)
 
     def test_add_viewname(self):
+        from pyramid.security import NO_PERMISSION_REQUIRED
         from pyramid.static import static_view
         config = DummyConfig()
         inst = self._makeOne(config)
@@ -417,8 +418,7 @@ class TestStaticURLInfo(unittest.TestCase):
         expected = [('view/', 'anotherpackage:path/', False)]
         self.assertEqual(inst.registrations, expected)
         self.assertEqual(config.route_args, ('view/', 'view/*subpath'))
-        self.assertEqual(config.view_kw['permission'],
-                         '__no_permission_required__')
+        self.assertEqual(config.view_kw['permission'], NO_PERMISSION_REQUIRED)
         self.assertEqual(config.view_kw['view'].__class__, static_view)
         self.assertEqual(config.view_kw['view'].app.cache_max_age, 1)
 
