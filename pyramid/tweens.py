@@ -72,11 +72,10 @@ class Tweens(object):
         self.explicit.append((name, factory))
 
     def add_implicit(self, name, factory, alias=None, under=None, over=None):
-        if alias is not None:
-            self.alias_to_name[alias] = name
-            self.name_to_alias[name] = alias
-        else:
+        if alias is None:
             alias = name
+        self.alias_to_name[alias] = name
+        self.name_to_alias[name] = alias
         self.names.append(name)
         self.factories[name] = factory
         if under is None and over is None:
@@ -96,7 +95,7 @@ class Tweens(object):
         ingress_alias_names = self.ingress_alias_names[:]
 
         for name in self.names:
-            aliases.append(self.name_to_alias.get(name, name))
+            aliases.append(self.name_to_alias[name])
 
         for a, b in self.order:
             # try to convert both a and b to an alias

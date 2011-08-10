@@ -22,16 +22,16 @@ class TestTweens(unittest.TestCase):
         self.assertEqual(tweens.names, ['name'])
         self.assertEqual(tweens.factories,
                          {'name':'factory'})
-        self.assertEqual(tweens.alias_to_name, D)
-        self.assertEqual(tweens.name_to_alias, D)
+        self.assertEqual(tweens.alias_to_name['name'], 'name')
+        self.assertEqual(tweens.name_to_alias['name'], 'name')
         self.assertEqual(tweens.order, [(INGRESS, 'name')])
         self.assertEqual(tweens.ingress_alias_names, ['name'])
         tweens.add_implicit('name2', 'factory2')
         self.assertEqual(tweens.names, ['name',  'name2'])
         self.assertEqual(tweens.factories,
                          {'name':'factory', 'name2':'factory2'})
-        self.assertEqual(tweens.alias_to_name, D)
-        self.assertEqual(tweens.name_to_alias, D)
+        self.assertEqual(tweens.alias_to_name['name2'], 'name2')
+        self.assertEqual(tweens.name_to_alias['name2'], 'name2')
         self.assertEqual(tweens.order,
                          [(INGRESS, 'name'), (INGRESS, 'name2')])
         self.assertEqual(tweens.ingress_alias_names, ['name', 'name2'])
@@ -41,8 +41,8 @@ class TestTweens(unittest.TestCase):
         self.assertEqual(tweens.factories,
                          {'name':'factory', 'name2':'factory2',
                           'name3':'factory3'})
-        self.assertEqual(tweens.alias_to_name, D)
-        self.assertEqual(tweens.name_to_alias, D)
+        self.assertEqual(tweens.alias_to_name['name3'], 'name3')
+        self.assertEqual(tweens.name_to_alias['name3'], 'name3')
         self.assertEqual(tweens.order,
                          [(INGRESS, 'name'), (INGRESS, 'name2'),
                           ('name3', 'name2')])
@@ -108,7 +108,7 @@ class TestTweens(unittest.TestCase):
             return handler
         def factory2(handler, registry):
             return '123'
-        tweens.names = ['foo1', 'foo2']
+        tweens.names = ['name', 'name2']
         tweens.alias_to_name = {'foo1':'name', 'foo2':'name2'}
         tweens.name_to_alias = {'name':'foo1', 'name2':'foo2'}
         tweens.factories = {'name':factory1, 'name2':factory2}
