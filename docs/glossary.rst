@@ -925,7 +925,7 @@ Glossary
      provide, for example, Pyramid-specific view timing support, bookkeeping
      code that examines exceptions before they are returned to the upstream
      WSGI application, or a variety of other features.  Tweens behave a bit
-     like :mod:`WSGI` 'middleware' but they have the benefit of running in a
+     like :term:`WSGI` 'middleware' but they have the benefit of running in a
      context in which they have access to the Pyramid :term:`application
      registry` as well as the Pyramid rendering machinery.  See
      :ref:`registering_tweens`.
