@@ -604,7 +604,7 @@ class Configurator(object):
         will have their pattern prefixed with ``route_prefix``. This can
         be used to help mount a set of routes at a different location than
         the ``callable``-author intended while still maintaining the same
-        route names. This parameter is new as of Pyramid 1.x."""
+        route names. This parameter is new as of Pyramid 1.2."""
 
         _context = self._ctx
         if _context is None:
