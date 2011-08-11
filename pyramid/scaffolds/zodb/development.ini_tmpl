@@ -9,7 +9,7 @@ pyramid.debug_templates = true
 pyramid.default_locale_name = en
 pyramid.include = pyramid_debugtoolbar
                   pyramid_tm
-pyramid_tm.attempts = 3
+tm.attempts = 3
 
 zodb_uri = file://%(here)s/Data.fs?connection_cache_size=20000
 
