@@ -274,7 +274,11 @@ class Configurator(object):
     Pyramid's caller.  By
     default, the ``pyramid.httpexceptions.default_exceptionresponse_view``
     function is used as the ``exceptionresponse_view``.  This argument is new
-    in Pyramid 1.1.  """
+    in Pyramid 1.1.
+
+    If ``route_prefix`` is passed, all routes added with
+    :meth:`pyramid.config.Configurator.add_route` will have the specified path
+    prepended to their pattern. This parameter is new in Pyramid 1.x."""
 
     manager = manager # for testing injection
     venusian = venusian # for testing injection
@@ -298,6 +302,7 @@ class Configurator(object):
                  default_view_mapper=None,
                  autocommit=False,
                  exceptionresponse_view=default_exceptionresponse_view,
+                 route_prefix=None,
                  ):
         if package is None:
             package = caller_package()
@@ -307,6 +312,7 @@ class Configurator(object):
         self.package = name_resolver.package
         self.registry = registry
         self.autocommit = autocommit
+        self.route_prefix = route_prefix
         if registry is None:
             registry = Registry(self.package_name)
             self.registry = registry
@@ -458,6 +464,7 @@ class Configurator(object):
         registerCommonDirectives(context)
         context.registry = self.registry
         context.autocommit = autocommit
+        context.route_prefix = self.route_prefix
         return context
 
     # API
@@ -525,9 +532,13 @@ class Configurator(object):
         # unwrap and reset the context
         self._ctx = None
 
-    def include(self, *callables):
-        """Include one or more configuration callables, to support imperative
+    def include(self, callable, route_prefix=None):
+        """Include a configuration callables, to support imperative
         application extensibility.
+
+        .. warning:: In versions of :app:`Pyramid` prior to 1.x, this
+            function accepted ``*callables``, but this has been changed
+            to support only a single callable.
 
         A configuration callable should be a callable that accepts a single
         argument named ``config``, which will be an instance of a
@@ -537,7 +548,7 @@ class Configurator(object):
         methods on the configurator passed to it which add configuration
         state.  The return value of a callable will be ignored.
 
-        Values allowed to be presented via the ``*callables`` argument to
+        Values allowed to be presented via the ``callable`` argument to
         this method: any callable Python object or any :term:`dotted Python
         name` which resolves to a callable Python object.  It may also be a
         Python :term:`module`, in which case, the module will be searched for
@@ -586,26 +597,41 @@ class Configurator(object):
         Included configuration statements will be overridden by local
         configuration statements if an included callable causes a
         configuration conflict by registering something with the same
-        configuration parameters."""
+        configuration parameters.
+
+        If the ``route_prefix`` is supplied, any calls to
+        :meth:`pyramid.config.Configurator.add_route` within the ``callable``
+        will have their pattern prefixed with ``route_prefix``. This can
+        be used to help mount a set of routes at a different location than
+        the ``callable``-author intended while still maintaining the same
+        route names. This parameter is new as of Pyramid 1.x."""
 
         _context = self._ctx
         if _context is None:
             _context = self._ctx = self._make_context(self.autocommit)
 
-        for c in callables:
-            c = self.maybe_dotted(c)
-            module = inspect.getmodule(c)
-            if module is c:
-                c = getattr(module, 'includeme')
-            spec = module.__name__ + ':' + c.__name__
-            sourcefile = inspect.getsourcefile(c)
-            if _context.processSpec(spec):
-                context = GroupingContextDecorator(_context)
-                context.basepath = os.path.dirname(sourcefile)
-                context.includepath = _context.includepath + (spec,)
-                context.package = package_of(module)
-                config = self.__class__.with_context(context)
-                c(config)
+        if self.route_prefix:
+            old_prefix = self.route_prefix.rstrip('/') + '/'
+        else:
+            old_prefix = ''
+
+        if route_prefix:
+            route_prefix = old_prefix + route_prefix.lstrip('/')
+
+        c = self.maybe_dotted(callable)
+        module = inspect.getmodule(c)
+        if module is c:
+            c = getattr(module, 'includeme')
+        spec = module.__name__ + ':' + c.__name__
+        sourcefile = inspect.getsourcefile(c)
+        if _context.processSpec(spec):
+            context = GroupingContextDecorator(_context)
+            context.basepath = os.path.dirname(sourcefile)
+            context.includepath = _context.includepath + (spec,)
+            context.package = package_of(module)
+            context.route_prefix = route_prefix
+            config = self.__class__.with_context(context)
+            c(config)
 
     def add_directive(self, name, directive, action_wrap=True):
         """
@@ -657,7 +683,8 @@ class Configurator(object):
         :meth:`pyramid.config.Configurator.include` to obtain a configurator
         with 'the right' context.  Returns a new Configurator instance."""
         configurator = cls(registry=context.registry, package=context.package,
-                           autocommit=context.autocommit)
+                           autocommit=context.autocommit,
+                           route_prefix=context.route_prefix)
         configurator._ctx = context
         return configurator
 
@@ -1703,6 +1730,7 @@ class Configurator(object):
             DeprecationWarning,
             4)
 
+
     @action_method
     def add_route(self,
                   name,
@@ -2068,6 +2096,9 @@ class Configurator(object):
             pattern = path
         if pattern is None:
             raise ConfigurationError('"pattern" argument may not be None')
+
+        if self.route_prefix:
+            pattern = self.route_prefix.rstrip('/') + '/' + pattern.lstrip('/')
 
         discriminator = ('route', name)
         self.action(discriminator, None)
