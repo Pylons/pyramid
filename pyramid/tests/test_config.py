@@ -1706,7 +1706,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(len(config.registry.deferred_route_views), 1)
         infos = config.registry.deferred_route_views['foo']
         self.assertEqual(len(infos), 1)
-        info = infos[0]
+        info = infos[0][0]
         self.assertEqual(info['route_name'], 'foo')
         self.assertEqual(info['view'], view)
         self.assertRaises(ComponentLookupError,
@@ -1737,7 +1737,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(len(config.registry.deferred_route_views), 1)
         infos = config.registry.deferred_route_views['foo']
         self.assertEqual(len(infos), 1)
-        info = infos[0]
+        info = infos[0][0]
         self.assertEqual(info['route_name'], 'foo')
         self.assertEqual(info['custom_predicates'], ('123',))
 
@@ -1752,7 +1752,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(len(config.registry.deferred_route_views), 1)
         infos = config.registry.deferred_route_views['foo']
         self.assertEqual(len(infos), 1)
-        info = infos[0]
+        info = infos[0][0]
         self.assertEqual(info['route_name'], 'foo')
         self.assertEqual(info['view'], view)
         self.assertRaises(ComponentLookupError,
@@ -3278,8 +3278,8 @@ class ConfiguratorTests(unittest.TestCase):
             config.commit()
         except ConfigurationConflictError, why:
             c1, c2 = self._conflictFunctions(why)
-            self.assertEqual(c1, 'test_conflict_set_notfound_view')
-            self.assertEqual(c2, 'test_conflict_set_notfound_view')
+            self.assertEqual(c1, 'set_notfound_view')
+            self.assertEqual(c2, 'set_notfound_view')
         else: # pragma: no cover
             raise AssertionError
 
@@ -3294,8 +3294,8 @@ class ConfiguratorTests(unittest.TestCase):
             config.commit()
         except ConfigurationConflictError, why:
             c1, c2 = self._conflictFunctions(why)
-            self.assertEqual(c1, 'test_conflict_set_forbidden_view')
-            self.assertEqual(c2, 'test_conflict_set_forbidden_view')
+            self.assertEqual(c1, 'set_forbidden_view')
+            self.assertEqual(c2, 'set_forbidden_view')
         else: # pragma: no cover
             raise AssertionError
 
