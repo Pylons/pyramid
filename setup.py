@@ -53,7 +53,7 @@ if sys.version_info[:2] < (2, 6):
     install_requires.append('simplejson')
     
 setup(name='pyramid',
-      version='1.1a4',
+      version='1.1.1dev',
       description=('The Pyramid web application development framework, a '
                    'Pylons project'),
       long_description=README + '\n\n' +  CHANGES,
@@ -86,6 +86,7 @@ setup(name='pyramid',
         pshell=pyramid.paster:PShellCommand
         proutes=pyramid.paster:PRoutesCommand
         pviews=pyramid.paster:PViewsCommand
+        ptweens=pyramid.paster:PTweensCommand
         [console_scripts]
         bfg2pyramid = pyramid.fixers.fix_bfg_imports:main
       """

@@ -341,11 +341,15 @@ class TestChameleonRendererLookup(unittest.TestCase):
 
 class TestRendererFromName(unittest.TestCase):
     def setUp(self):
+        from zope.deprecation import __show__
+        __show__.off()
         self.config = cleanUp()
 
     def tearDown(self):
         cleanUp()
-        
+        from zope.deprecation import __show__
+        __show__.on()
+
     def _callFUT(self, path, package=None):
         from pyramid.renderers import renderer_from_name
         return renderer_from_name(path, package)
@@ -481,6 +485,13 @@ class TestRendererHelper(unittest.TestCase):
             settings = None
         helper = self._makeOne(registry=Dummy)
         self.assertEqual(helper.settings, {})
+
+    def test_settings_registry_name_is_None(self):
+        class Dummy(object):
+            settings = None
+        helper = self._makeOne(registry=Dummy)
+        self.assertEqual(helper.name, None)
+        self.assertEqual(helper.type, '')
 
     def test_settings_registry_settings_is_not_None(self):
         class Dummy(object):
@@ -686,6 +697,56 @@ class TestRendererHelper(unittest.TestCase):
         response = helper._make_response('abc', request)
         self.assertEqual(response.status, '406 You Lose')
         self.assertEqual(response.body, 'abc')
+
+    def test_clone_noargs(self):
+        helper = self._makeOne('name', 'package', 'registry')
+        cloned_helper = helper.clone()
+        self.assertEqual(cloned_helper.name, 'name')
+        self.assertEqual(cloned_helper.package, 'package')
+        self.assertEqual(cloned_helper.registry, 'registry')
+        self.assertFalse(helper is cloned_helper)
+
+    def test_clone_allargs(self):
+        helper = self._makeOne('name', 'package', 'registry')
+        cloned_helper = helper.clone(name='name2', package='package2',
+                                     registry='registry2')
+        self.assertEqual(cloned_helper.name, 'name2')
+        self.assertEqual(cloned_helper.package, 'package2')
+        self.assertEqual(cloned_helper.registry, 'registry2')
+        self.assertFalse(helper is cloned_helper)
+
+class TestNullRendererHelper(unittest.TestCase):
+    def setUp(self):
+        self.config = cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _makeOne(self, *arg, **kw):
+        from pyramid.renderers import NullRendererHelper
+        return NullRendererHelper(*arg, **kw)
+
+    def test_instance_conforms(self):
+        from zope.interface.verify import verifyObject
+        from pyramid.interfaces import IRendererInfo
+        helper = self._makeOne()
+        verifyObject(IRendererInfo, helper)
+
+    def test_render_view(self):
+        helper = self._makeOne()
+        self.assertEqual(helper.render_view(None, True, None, None), True)
+
+    def test_render(self):
+        helper = self._makeOne()
+        self.assertEqual(helper.render(True, None, None), True)
+
+    def test_render_to_response(self):
+        helper = self._makeOne()
+        self.assertEqual(helper.render_to_response(True, None, None), True)
+
+    def test_clone(self):
+        helper = self._makeOne()
+        self.assertTrue(helper.clone() is helper)
 
 class Test_render(unittest.TestCase):
     def setUp(self):

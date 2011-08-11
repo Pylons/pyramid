@@ -85,6 +85,17 @@
      of ``request.exception`` will be ``None`` within response and
      finished callbacks.
 
+   .. attribute:: exc_info
+
+     If an exception was raised by a :term:`root factory` or a :term:`view
+     callable`, or at various other points where :app:`Pyramid` executes
+     user-defined code during the processing of a request, result of
+     ``sys.exc_info()`` will be available as the ``exc_info`` attribute of
+     the request within a :term:`exception view`, a :term:`response callback`
+     or a :term:`finished callback`.  If no exception occurred, the value of
+     ``request.exc_info`` will be ``None`` within response and finished
+     callbacks.
+
    .. attribute:: response
 
      This attribute is actually a "reified" property which returns an
@@ -180,12 +191,12 @@
       object (exposed to view code as ``request.response``) to influence
       rendered response behavior.
 
-   .. attribute:: json
+   .. attribute:: json_body
 
-      If the request's ``content_type`` is ``application/json``, this
-      attribute will contain the JSON-decoded variant of the request body.
-      If the request's ``content_type`` is not ``application/json``, this
-      attribute will be ``None``.
+       This property will return the JSON-decoded variant of the request
+       body.  If the request body is not well-formed JSON, or there is no
+       body associated with this request, this property will raise an
+       exception.  See also :ref:`request_json_body`.
 
 .. note::
 

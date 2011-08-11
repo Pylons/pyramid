@@ -1,3 +1,4 @@
+import ConfigParser
 import os
 import sys
 from code import interact
@@ -7,7 +8,14 @@ import zope.deprecation
 from paste.deploy import loadapp
 from paste.script.command import Command
 
-from pyramid.scripting import get_root
+from pyramid.interfaces import IMultiView
+from pyramid.interfaces import ITweens
+
+from pyramid.scripting import prepare
+from pyramid.util import DottedNameResolver
+
+from pyramid.tweens import MAIN
+from pyramid.tweens import INGRESS
 
 from pyramid.scaffolds import PyramidTemplate # bw compat
 zope.deprecation.deprecated(
@@ -15,22 +23,72 @@ zope.deprecation.deprecated(
                         'pyramid.scaffolds.PyramidTemplate in Pyramid 1.1'),
 )
 
-def get_app(config_file, name, loadapp=loadapp):
+def get_app(config_uri, name=None, loadapp=loadapp):
     """ Return the WSGI application named ``name`` in the PasteDeploy
-    config file ``config_file``"""
-    config_name = 'config:%s' % config_file
+    config file specified by ``config_uri``.
+
+    If the ``name`` is None, this will attempt to parse the name from
+    the ``config_uri`` string expecting the format ``inifile#name``.
+    If no name is found, the name will default to "main"."""
+    if '#' in config_uri:
+        path, section = config_uri.split('#', 1)
+    else:
+        path, section = config_uri, 'main'
+    if name:
+        section = name
+    config_name = 'config:%s' % path
     here_dir = os.getcwd()
-    app = loadapp(config_name, name=name, relative_to=here_dir)
+    app = loadapp(config_name, name=section, relative_to=here_dir)
     return app
 
-_marker = object()
+def bootstrap(config_uri, request=None):
+    """ Load a WSGI application from the PasteDeploy config file specified
+    by ``config_uri``. The environment will be configured as if it is
+    currently serving ``request``, leaving a natural environment in place
+    to write scripts that can generate URLs and utilize renderers.
+
+    This function returns a dictionary with ``app``, ``root``, ``closer``,
+    ``request``, and ``registry`` keys.  ``app`` is the WSGI app loaded
+    (based on the ``config_uri``), ``root`` is the traversal root resource
+    of the Pyramid application, and ``closer`` is a parameterless callback
+    that may be called when your script is complete (it pops a threadlocal
+    stack).
+
+    .. note:: Most operations within :app:`Pyramid` expect to be invoked
+              within the context of a WSGI request, thus it's important when
+              loading your application to anchor it when executing scripts
+              and other code that is not normally invoked during active WSGI
+              requests.
+
+    .. note:: For a complex config file containing multiple :app:`Pyramid`
+              applications, this function will setup the environment under
+              the context of the last-loaded :app:`Pyramid` application. You
+              may load a specific application yourself by using the
+              lower-level functions :meth:`pyramid.paster.get_app` and
+              :meth:`pyramid.scripting.prepare` in conjunction with
+              :attr:`pyramid.config.global_registries`.
+
+    ``config_uri`` -- specifies the PasteDeploy config file to use for the
+    interactive shell. The format is ``inifile#name``. If the name is left
+    off, ``main`` will be assumed.
+
+    ``request`` -- specified to anchor the script to a given set of WSGI
+    parameters. For example, most people would want to specify the host,
+    scheme and port such that their script will generate URLs in relation
+    to those parameters. A request with default parameters is constructed
+    for you if none is provided. You can mutate the request's ``environ``
+    later to setup a specific host/port/scheme/etc.
+
+    See :ref:`writing_a_script` for more information about how to use this
+    function.
+    """
+    app = get_app(config_uri)
+    env = prepare(request)
+    env['app'] = app
+    return env
 
 class PCommand(Command):
-    get_app = staticmethod(get_app) # hook point
-    get_root = staticmethod(get_root) # hook point
-    group_name = 'pyramid'
-    interact = (interact,) # for testing
-    loadapp = (loadapp,) # for testing
+    bootstrap = (bootstrap,) # testing
     verbose = 3
 
     def __init__(self, *arg, **kw):
@@ -42,28 +100,27 @@ class PCommand(Command):
 class PShellCommand(PCommand):
     """Open an interactive shell with a :app:`Pyramid` app loaded.
 
-    This command accepts two positional arguments:
+    This command accepts one positional argument:
 
-    ``config_file`` -- specifies the PasteDeploy config file to use
-    for the interactive shell.  
-
-    ``section_name`` -- specifies the section name in the PasteDeploy
-    config file that represents the application.
+    ``config_uri`` -- specifies the PasteDeploy config file to use for the
+    interactive shell. The format is ``inifile#name``. If the name is left
+    off, ``main`` will be assumed.
 
     Example::
 
-        $ paster pshell myapp.ini main
+        $ paster pshell myapp.ini#main
 
-    .. note:: You should use a ``section_name`` that refers to the
-              actual ``app`` section in the config file that points at
-              your Pyramid app without any middleware wrapping, or this
-              command will almost certainly fail.
+    .. note:: If you do not point the loader directly at the section of the
+              ini file containing your :app:`Pyramid` application, the
+              command will attempt to find the app for you. If you are
+              loading a pipeline that contains more than one :app:`Pyramid`
+              application within it, the loader will use the last one.
 
     """
     summary = "Open an interactive shell with a Pyramid application loaded"
 
-    min_args = 2
-    max_args = 2
+    min_args = 1
+    max_args = 1
 
     parser = Command.standard_parser(simulate=True)
     parser.add_option('-d', '--disable-ipython',
@@ -71,34 +128,109 @@ class PShellCommand(PCommand):
                       dest='disable_ipython',
                       help="Don't use IPython even if it is available")
 
-    def command(self, IPShell=_marker):
-        # IPShell passed to command method is for testing purposes
-        if IPShell is _marker: # pragma: no cover
-            try:
-                from IPython.Shell import IPShell
-            except ImportError:
-                IPShell = None
-        cprt =('Type "help" for more information. "root" is the Pyramid app '
-               'root object, "registry" is the Pyramid registry object.')
-        banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
-        config_file, section_name = self.args
-        self.logging_file_config(config_file)
-        app = self.get_app(config_file, section_name, loadapp=self.loadapp[0])
-        root, closer = self.get_root(app)
-        shell_globals = {'root':root, 'registry':app.registry}
+    ConfigParser = ConfigParser.ConfigParser # testing
 
-        if (IPShell is None) or self.options.disable_ipython:
+    def pshell_file_config(self, filename):
+        resolver = DottedNameResolver(None)
+        self.loaded_objects = {}
+        self.object_help = {}
+        config = self.ConfigParser()
+        config.read(filename)
+        try:
+            items = config.items('pshell')
+        except ConfigParser.NoSectionError:
+            return
+        for k, v in items:
+            self.loaded_objects[k] = resolver.maybe_resolve(v)
+            self.object_help[k] = v
+
+    def command(self, shell=None):
+        config_uri = self.args[0]
+        config_file = config_uri.split('#', 1)[0]
+        self.logging_file_config(config_file)
+        self.pshell_file_config(config_file)
+
+        # bootstrap the environ
+        env = self.bootstrap[0](config_uri)
+
+        # remove the closer from the env
+        closer = env.pop('closer')
+
+        # setup help text for default environment
+        env_help = dict(env)
+        env_help['app'] = 'The WSGI application.'
+        env_help['root'] = 'Root of the default resource tree.'
+        env_help['registry'] = 'Active Pyramid registry.'
+        env_help['request'] = 'Active request object.'
+        env_help['root_factory'] = (
+            'Default root factory used to create `root`.')
+
+        # load the pshell section of the ini file
+        env.update(self.loaded_objects)
+
+        # eliminate duplicates from env, allowing custom vars to override
+        for k in self.loaded_objects:
+            if k in env_help:
+                del env_help[k]
+
+        # generate help text
+        help = '\n'
+        if env_help:
+            help += 'Environment:'
+            for var in sorted(env_help.keys()):
+                help += '\n  %-12s %s' % (var, env_help[var])
+
+        if self.object_help:
+            help += '\n\nCustom Variables:'
+            for var in sorted(self.object_help.keys()):
+                help += '\n  %-12s %s' % (var, self.object_help[var])
+
+        if shell is None and not self.options.disable_ipython:
+            shell = self.make_ipython_v0_11_shell()
+            if shell is None:
+                shell = self.make_ipython_v0_10_shell()
+
+        if shell is None:
+            shell = self.make_default_shell()
+
+        try:
+            shell(env, help)
+        finally:
+            closer()
+
+    def make_default_shell(self, interact=interact):
+        def shell(env, help):
+            cprt = 'Type "help" for more information.'
+            banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
+            banner += '\n' + help + '\n'
+            interact(banner, local=env)
+        return shell
+
+    def make_ipython_v0_11_shell(self, IPShellFactory=None):
+        if IPShellFactory is None: # pragma: no cover
             try:
-                self.interact[0](banner, local=shell_globals)
-            finally:
-                closer()
-        else:
+                from IPython.frontend.terminal.embed import (
+                    InteractiveShellEmbed)
+                IPShellFactory = InteractiveShellEmbed
+            except ImportError:
+                return None
+        def shell(env, help):
+            IPShell = IPShellFactory(banner2=help, user_ns=env)
+            IPShell()
+        return shell
+
+    def make_ipython_v0_10_shell(self, IPShellFactory=None):
+        if IPShellFactory is None: # pragma: no cover
             try:
-                shell = IPShell(argv=[], user_ns=shell_globals)
-                shell.IP.BANNER = shell.IP.BANNER + '\n\n' + banner
-                shell.mainloop()
-            finally:
-                closer()
+                from IPython.Shell import IPShellEmbed
+                IPShellFactory = IPShellEmbed
+            except ImportError:
+                return None
+        def shell(env, help):
+            IPShell = IPShellFactory(argv=[], user_ns=env)
+            IPShell.set_banner(IPShell.IP.BANNER + '\n' + help + '\n')
+            IPShell()
+        return shell
 
 BFGShellCommand = PShellCommand # b/w compat forever
 
@@ -108,33 +240,26 @@ class PRoutesCommand(PCommand):
     route, the pattern of the route, and the view callable which will be
     invoked when the route is matched.
 
-    This command accepts two positional arguments:
+    This command accepts one positional argument:
 
-    ``config_file`` -- specifies the PasteDeploy config file to use
-    for the interactive shell.  
-
-    ``section_name`` -- specifies the section name in the PasteDeploy
-    config file that represents the application.
+    ``config_uri`` -- specifies the PasteDeploy config file to use for the
+    interactive shell. The format is ``inifile#name``. If the name is left
+    off, ``main`` will be assumed.
 
     Example::
 
-        $ paster proutes myapp.ini main
+        $ paster proutes myapp.ini#main
 
-    .. note:: You should use a ``section_name`` that refers to the
-              actual ``app`` section in the config file that points at
-              your Pyramid app without any middleware wrapping, or this
-              command will almost certainly fail.
     """
     summary = "Print all URL dispatch routes related to a Pyramid application"
-    min_args = 2
-    max_args = 2
+    min_args = 1
+    max_args = 1
     stdout = sys.stdout
 
     parser = Command.standard_parser(simulate=True)
 
-    def _get_mapper(self, app):
+    def _get_mapper(self, registry):
         from pyramid.config import Configurator
-        registry = app.registry
         config = Configurator(registry = registry)
         return config.get_routes_mapper()
 
@@ -146,10 +271,10 @@ class PRoutesCommand(PCommand):
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IView
         from zope.interface import Interface
-        config_file, section_name = self.args
-        app = self.get_app(config_file, section_name, loadapp=self.loadapp[0])
-        registry = app.registry
-        mapper = self._get_mapper(app)
+        config_uri = self.args[0]
+        env = self.bootstrap[0](config_uri)
+        registry = env['registry']
+        mapper = self._get_mapper(registry)
         if mapper is not None:
             routes = mapper.get_routes()
             fmt = '%-15s %-30s %-25s'
@@ -171,36 +296,28 @@ class PRoutesCommand(PCommand):
                     self.out(fmt % (route.name, route.pattern, view_callable))
 
 
-from pyramid.interfaces import IMultiView
-
 class PViewsCommand(PCommand):
     """Print, for a given URL, the views that might match. Underneath each
     potentially matching route, list the predicates required. Underneath
     each route+predicate set, print each view that might match and its
     predicates.
 
-    This command accepts three positional arguments:
+    This command accepts two positional arguments:
 
-    ``config_file`` -- specifies the PasteDeploy config file to use
-    for the interactive shell.  
-
-    ``section_name`` -- specifies the section name in the PasteDeploy
-    config file that represents the application.
+    ``config_uri`` -- specifies the PasteDeploy config file to use for the
+    interactive shell. The format is ``inifile#name``. If the name is left
+    off, ``main`` will be assumed.
 
     ``url`` -- specifies the URL that will be used to find matching views.
 
     Example::
 
-        $ paster proutes myapp.ini main url
+        $ paster proutes myapp.ini#main url
 
-    .. note:: You should use a ``section_name`` that refers to the
-              actual ``app`` section in the config file that points at
-              your Pyramid app without any middleware wrapping, or this
-              command will almost certainly fail.
     """
     summary = "Print all views in an application that might match a URL"
-    min_args = 3
-    max_args = 3
+    min_args = 2
+    max_args = 2
     stdout = sys.stdout
 
     parser = Command.standard_parser(simulate=True)
@@ -395,11 +512,11 @@ class PViewsCommand(PCommand):
                 self.out("%sview predicates (%s)" % (indent, predicate_text))
 
     def command(self):
-        config_file, section_name, url = self.args
+        config_uri, url = self.args
         if not url.startswith('/'):
             url = '/%s' % url
-        app = self.get_app(config_file, section_name, loadapp=self.loadapp[0])
-        registry = app.registry
+        env = self.bootstrap[0](config_uri)
+        registry = env['registry']
         view = self._find_view(url, registry)
         self.out('')
         self.out("URL = %s" % url)
@@ -420,3 +537,84 @@ class PViewsCommand(PCommand):
                 self.out("    Not found.")
         self.out('')
 
+
+class PTweensCommand(PCommand):
+    """Print all implicit and explicit :term:`tween` objects used by a
+    Pyramid application.  The handler output includes whether the system is
+    using an explicit tweens ordering (will be true when the
+    ``pyramid.tweens`` setting is used) or an implicit tweens ordering (will
+    be true when the ``pyramid.tweens`` setting is *not* used).
+    
+    This command accepts one positional argument:
+
+    ``config_uri`` -- specifies the PasteDeploy config file to use for the
+    interactive shell. The format is ``inifile#name``. If the name is left
+    off, ``main`` will be assumed.
+
+    Example::
+
+        $ paster ptweens myapp.ini#main
+
+    """
+    summary = "Print all tweens related to a Pyramid application"
+    min_args = 1
+    max_args = 1
+    stdout = sys.stdout
+
+    parser = Command.standard_parser(simulate=True)
+
+    def _get_tweens(self, registry):
+        from pyramid.config import Configurator
+        config = Configurator(registry = registry)
+        return config.registry.queryUtility(ITweens)
+
+    def out(self, msg): # pragma: no cover
+        print msg
+
+    def show_implicit(self, tweens):
+        implicit = tweens.implicit()
+        fmt = '%-10s  %-50s  %-15s'
+        self.out(fmt % ('Position', 'Name', 'Alias'))
+        self.out(fmt % (
+            '-'*len('Position'), '-'*len('Name'), '-'*len('Alias')))
+        self.out(fmt % ('-', '-', INGRESS))
+        for pos, (name, _) in enumerate(implicit):
+            alias = tweens.name_to_alias.get(name, None)
+            self.out(fmt % (pos, name, alias))
+        self.out(fmt % ('-', '-', MAIN))
+
+    def show_explicit(self, tweens):
+        explicit = tweens.explicit
+        fmt = '%-10s  %-65s'
+        self.out(fmt % ('Position', 'Name'))
+        self.out(fmt % ('-'*len('Position'), '-'*len('Name')))
+        self.out(fmt % ('-', INGRESS))
+        for pos, (name, _) in enumerate(explicit):
+            self.out(fmt % (pos, name))
+        self.out(fmt % ('-', MAIN))
+    
+    def command(self):
+        config_uri = self.args[0]
+        env = self.bootstrap[0](config_uri)
+        registry = env['registry']
+        tweens = self._get_tweens(registry)
+        if tweens is not None:
+            explicit = tweens.explicit
+            if explicit:
+                self.out('"pyramid.tweens" config value set '
+                         '(explicitly ordered tweens used)')
+                self.out('')
+                self.out('Explicit Tween Chain (used)')
+                self.out('')
+                self.show_explicit(tweens)
+                self.out('')
+                self.out('Implicit Tween Chain (not used)')
+                self.out('')
+                self.show_implicit(tweens)
+            else:
+                self.out('"pyramid.tweens" config value NOT set '
+                         '(implicitly ordered tweens used)')
+                self.out('')
+                self.out('Implicit Tween Chain')
+                self.out('')
+                self.show_implicit(tweens)

@@ -1,15 +1,16 @@
 [app:{{project}}]
 use = egg:{{project}}
-reload_templates = true
-debug_authorization = false
-debug_notfound = false
-debug_routematch = false
-debug_templates = true
-default_locale_name = en
+
+pyramid.reload_templates = true
+pyramid.debug_authorization = false
+pyramid.debug_notfound = false
+pyramid.debug_routematch = false
+pyramid.debug_templates = true
+pyramid.default_locale_name = en
+pyramid.include = pyramid_debugtoolbar
 
 [pipeline:main]
 pipeline =
-    egg:WebError#evalerror
     {{project}}
 
 [server:main]

@@ -53,6 +53,10 @@ Here's a high-level time-ordered overview of what happens when you press
    that particular composite to understand how to make it refer to your
    :app:`Pyramid` application.
 
+#. The PasteDeploy framework finds all :mod:`logging` related configuration
+   in the ``.ini`` file and uses it to configure the Python standard library
+   logging system for this application.
+
 #. The application's *constructor* (named by the entry point reference or
    dotted Python name on the ``use=`` line of the section representing your
    :app:`Pyramid` application) is passed the key/value parameters mentioned
@@ -88,10 +92,10 @@ Here's a high-level time-ordered overview of what happens when you press
    In this case, the ``myproject.__init__:main`` function referred to by the
    entry point URI ``egg:MyProject`` (see :ref:`MyProject_ini` for more
    information about entry point URIs, and how they relate to callables),
-   will receive the key/value pairs ``{'reload_templates':'true',
-   'debug_authorization':'false', 'debug_notfound':'false',
-   'debug_routematch':'false', 'debug_templates':'true',
-   'default_locale_name':'en'}``.
+   will receive the key/value pairs ``{'pyramid.reload_templates':'true',
+   'pyramid.debug_authorization':'false', 'pyramid.debug_notfound':'false',
+   'pyramid.debug_routematch':'false', 'pyramid.debug_templates':'true',
+   'pyramid.default_locale_name':'en'}``.
 
 #. The ``main`` function first constructs a
    :class:`~pyramid.config.Configurator` instance, passing a root resource
@@ -105,14 +109,14 @@ Here's a high-level time-ordered overview of what happens when you press
 
    The ``settings`` dictionary contains all the options in the
    ``[app:MyProject]`` section of our .ini file except the ``use`` option
-   (which is internal to Paste) such as ``reload_templates``,
-   ``debug_authorization``, etc.
+   (which is internal to Paste) such as ``pyramid.reload_templates``,
+   ``pyramid.debug_authorization``, etc.
 
-#. The ``main`` function then calls various methods on the an instance of the
-   class :class:`~pyramid.config.Configurator` method.  The intent of
-   calling these methods is to populate an :term:`application registry`,
-   which represents the :app:`Pyramid` configuration related to the
-   application.
+#. The ``main`` function then calls various methods on the instance of the
+   class :class:`~pyramid.config.Configurator` created in the previous step.
+   The intent of calling these methods is to populate an
+   :term:`application registry`, which represents the :app:`Pyramid`
+   configuration related to the application.
 
 #. The :meth:`~pyramid.config.Configurator.make_wsgi_app` method is called.
    The result is a :term:`router` instance.  The router is associated with
@@ -135,6 +139,10 @@ Here's a high-level time-ordered overview of what happens when you press
    is what prints ``serving on 0.0.0.0:6543 view at http://127.0.0.1:6543``.
    The server serves the application, and the application is running, waiting
    to receive requests.
+
+.. index::
+   pair: settings; deployment
+   single: custom settings
 
 .. _deployment_settings:
 

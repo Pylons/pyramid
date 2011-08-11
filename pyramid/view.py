@@ -4,13 +4,14 @@ import venusian
 from zope.interface import providedBy
 from zope.deprecation import deprecated
 
-from pyramid.interfaces import IResponse
 from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
+from pyramid.interfaces import IRendererInfo
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid.httpexceptions import default_exceptionresponse_view
+from pyramid.path import caller_package
 from pyramid.renderers import RendererHelper
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
@@ -30,11 +31,26 @@ def init_mimetypes(mimetypes):
 # fallout.
 init_mimetypes(mimetypes)
 
-# Nasty BW compat hack: dont yet deprecate this (ever?)
-class static(static_view): # only subclass for purposes of autodoc
-    __doc__ = static_view.__doc__
-
 _marker = object()
+
+class static(static_view): 
+    """ Backwards compatibility alias for
+    :class:`pyramid.static.static_view`; it overrides that class' constructor
+    to pass ``use_subpath=True`` by default.  This class is deprecated as of
+    :app:`Pyramid` 1.1.  Use :class:`pyramid.static.static_view` instead
+    (probably with a ``use_subpath=True`` argument).
+    """
+    def __init__(self, root_dir, cache_max_age=3600, package_name=None):
+        if package_name is None:
+            package_name = caller_package().__name__
+        static_view.__init__(self, root_dir, cache_max_age=cache_max_age,
+                             package_name=package_name, use_subpath=True)
+
+deprecated(
+    'static',
+    'The "pyramid.view.static" class is deprecated as of Pyramid 1.1; '
+    'use the "pyramid.static.static_view" class instead with the '
+    '"use_subpath" argument set to True.')
 
 def render_view_to_response(context, request, name='', secure=True):
     """ Call the :term:`view callable` configured with a :term:`view
@@ -101,11 +117,6 @@ def render_view_to_iterable(context, request, name='', secure=True):
     response = render_view_to_response(context, request, name, secure)
     if response is None:
         return None
-    try:
-        reg = request.registry
-    except AttributeError:
-        reg = get_current_registry()
-    response = reg.queryAdapterOrSelf(response, IResponse)
     return response.app_iter
 
 def render_view(context, request, name='', secure=True):
@@ -209,6 +220,12 @@ class view_config(object):
             renderer = settings.get('renderer')
             if isinstance(renderer, basestring):
                 renderer = RendererHelper(name=renderer,
+                                          package=info.module,
+                                          registry=context.config.registry)
+            elif IRendererInfo.providedBy(renderer):
+                # create a new rendererinfo to clear out old registry on a
+                # rescan, see https://github.com/Pylons/pyramid/pull/234
+                renderer = renderer.clone(name=renderer.name,
                                           package=info.module,
                                           registry=context.config.registry)
             settings['renderer'] = renderer

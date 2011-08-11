@@ -144,3 +144,7 @@ Contributors
 - Christoph Zwerschke, 2011/06/07
 
 - Atsushi Odagiri, 2011/07/02
+
+- Shane Hathaway, 2011/07/22
+
+- Manuel Hermann, 2011/07/11

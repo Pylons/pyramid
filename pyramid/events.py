@@ -179,35 +179,48 @@ class BeforeRender(dict):
           event['mykey'] = 'foo'
 
     An object of this type is sent as an event just before a :term:`renderer`
-    is invoked (but *after* the application-level renderer globals factory
-    added via
-    :class:`pyramid.config.Configurator.set_renderer_globals_factory`,
-    if any, has injected its own keys into the renderer globals dictionary).
+    is invoked (but *after* the -- deprecated -- application-level renderer
+    globals factory added via
+    :class:`pyramid.config.Configurator.set_renderer_globals_factory`, if
+    any, has injected its own keys into the renderer globals dictionary).
 
-    If a subscriber attempts to add a key that already exist in the renderer
-    globals dictionary, a :exc:`KeyError` is raised.  This limitation is
-    enforced because event subscribers do not possess any relative ordering.
-    The set of keys added to the renderer globals dictionary by all
-    :class:`pyramid.events.BeforeRender` subscribers and renderer globals
-    factories must be unique.  """
+    If a subscriber adds a key via ``__setitem__`` or that already exists in
+    the renderer globals dictionary, it will overwrite an older value that is
+    already in the globals dictionary.  This can be problematic because event
+    subscribers to the BeforeRender event do not possess any relative
+    ordering.  For maximum interoperability with other third-party
+    subscribers, if you write an event subscriber meant to be used as a
+    BeforeRender subscriber, your subscriber code will need to (using
+    ``.get`` or ``__contains__`` of the event object) ensure no value already
+    exists in the renderer globals dictionary before setting an overriding
+    value.
 
-    def __init__(self, system):
+    The event has an additional attribute named ``rendering_val``.  This is
+    the (non-system) value returned by a view or passed to ``render*`` as
+    ``value``.  This feature is new in Pyramid 1.1.1.
+    """
+
+    def __init__(self, system, rendering_val=None):
         self._system = system
+        self.rendering_val = rendering_val
 
     def __setitem__(self, name, value):
         """ Set a name/value pair into the dictionary which is passed to a
-        renderer as the renderer globals dictionary.  If the ``name`` already
-        exists in the target dictionary, a :exc:`KeyError` will be raised."""
-        if name in self._system:
-            raise KeyError('%s is already a renderer globals value' % name)
+        renderer as the renderer globals dictionary."""
         self._system[name] = value
+
+    def setdefault(self, name, default=None):
+        """ Return the existing value for ``name`` in the renderers globals
+        dictionary.  If no value with ``name`` exists in the dictionary, set
+        the ``default`` value into the renderer globals dictionary under the
+        name passed.  If a value already existed in the dictionary, return
+        it.  If a value did not exist in the dictionary, return the default"""
+        return self._system.setdefault(name, default)
 
     def update(self, d):
         """ Update the renderer globals dictionary with another dictionary
-        ``d``.  If any of the key names in the source dictionary already exist
-        in the target dictionary, a :exc:`KeyError` will be raised"""
-        for k, v in d.items():
-            self[k] = v
+        ``d``."""
+        return self._system.update(d)
 
     def __contains__(self, k):
         """ Return ``True`` if ``k`` exists in the renderer globals
@@ -223,4 +236,4 @@ class BeforeRender(dict):
         """ Return the value for key ``k`` from the renderer globals
         dictionary, or the default if no such value exists."""
         return self._system.get(k)
-            
+

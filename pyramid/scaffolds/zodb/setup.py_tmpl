@@ -9,8 +9,8 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 requires = [
     'pyramid',
     'repoze.zodbconn',
-    'repoze.tm2>=1.0b1', # default_commit_veto
-    'repoze.retry',
+    'pyramid_tm',
+    'pyramid_debugtoolbar',
     'ZODB3',
     'WebError',
     ]

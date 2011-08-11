@@ -24,8 +24,8 @@ Front Matter
 .. toctree::
    :maxdepth: 1
 
-   whatsnew-1.0
    whatsnew-1.1
+   whatsnew-1.0
 
 Narrative documentation
 =======================
@@ -43,23 +43,24 @@ Narrative documentation in chapter form explaining how to use
    narr/project
    narr/startup
    narr/urldispatch
-   narr/muchadoabouttraversal
-   narr/traversal
    narr/views
    narr/renderers
    narr/templates
    narr/viewconfig
-   narr/resources
    narr/assets
    narr/webob
    narr/sessions
-   narr/security
-   narr/hybrid
-   narr/i18n
-   narr/vhosting
    narr/events
    narr/environment
+   narr/commandline
+   narr/i18n
+   narr/vhosting
    narr/testing
+   narr/resources
+   narr/muchadoabouttraversal
+   narr/traversal
+   narr/security
+   narr/hybrid
    narr/hooks
    narr/advconfig
    narr/extending

@@ -190,11 +190,12 @@ class Test_static_view(unittest.TestCase):
         cleanUp()
 
     def _getTargetClass(self):
-        from pyramid.view import static
-        return static
+        from pyramid.static import static_view
+        return static_view
 
-    def _makeOne(self, path, package_name=None):
-        return self._getTargetClass()(path, package_name=package_name)
+    def _makeOne(self, path, package_name=None, use_subpath=False):
+        return self._getTargetClass()(path, package_name=package_name,
+                                      use_subpath=use_subpath)
         
     def _makeEnviron(self, **extras):
         environ = {
@@ -207,10 +208,10 @@ class Test_static_view(unittest.TestCase):
         environ.update(extras)
         return environ
 
-    def test_abspath(self):
+    def test_abspath_subpath(self):
         import os.path
         path = os.path.dirname(__file__)
-        view = self._makeOne(path)
+        view = self._makeOne(path, use_subpath=True)
         context = DummyContext()
         request = DummyRequest()
         request.subpath = ['__init__.py']
@@ -219,9 +220,9 @@ class Test_static_view(unittest.TestCase):
         self.assertEqual(request.copied, True)
         self.assertEqual(response.directory, os.path.normcase(path))
 
-    def test_relpath(self):
+    def test_relpath_subpath(self):
         path = 'fixtures'
-        view = self._makeOne(path)
+        view = self._makeOne(path, use_subpath=True)
         context = DummyContext()
         request = DummyRequest()
         request.subpath = ['__init__.py']
@@ -233,8 +234,22 @@ class Test_static_view(unittest.TestCase):
         self.assertEqual(response.package_name, 'pyramid.tests')
         self.assertEqual(response.cache_max_age, 3600)
 
-    def test_relpath_withpackage(self):
-        view = self._makeOne('another:fixtures')
+    def test_relpath_notsubpath(self):
+        path = 'fixtures'
+        view = self._makeOne(path)
+        context = DummyContext()
+        request = DummyRequest()
+        request.subpath = ['__init__.py']
+        request.environ = self._makeEnviron()
+        response = view(context, request)
+        self.assertTrue(not hasattr(request, 'copied'))
+        self.assertEqual(response.root_resource, 'fixtures')
+        self.assertEqual(response.resource_name, 'fixtures')
+        self.assertEqual(response.package_name, 'pyramid.tests')
+        self.assertEqual(response.cache_max_age, 3600)
+
+    def test_relpath_withpackage_subpath(self):
+        view = self._makeOne('another:fixtures', use_subpath=True)
         context = DummyContext()
         request = DummyRequest()
         request.subpath = ['__init__.py']
@@ -246,8 +261,9 @@ class Test_static_view(unittest.TestCase):
         self.assertEqual(response.package_name, 'another')
         self.assertEqual(response.cache_max_age, 3600)
 
-    def test_relpath_withpackage_name(self):
-        view = self._makeOne('fixtures', package_name='another')
+    def test_relpath_withpackage_name_subpath(self):
+        view = self._makeOne('fixtures', package_name='another',
+                             use_subpath=True)
         context = DummyContext()
         request = DummyRequest()
         request.subpath = ['__init__.py']
@@ -259,8 +275,9 @@ class Test_static_view(unittest.TestCase):
         self.assertEqual(response.package_name, 'another')
         self.assertEqual(response.cache_max_age, 3600)
 
-    def test_no_subpath_preserves_path_info_and_script_name(self):
-        view = self._makeOne('fixtures', package_name='another')
+    def test_no_subpath_preserves_path_info_and_script_name_subpath(self):
+        view = self._makeOne('fixtures', package_name='another',
+                             use_subpath=True)
         context = DummyContext()
         request = DummyRequest()
         request.subpath = ()
@@ -272,8 +289,9 @@ class Test_static_view(unittest.TestCase):
         self.assertEqual(request.environ['SCRIPT_NAME'],
                          '/script_name/path_info')
 
-    def test_with_subpath_path_info_ends_with_slash(self):
-        view = self._makeOne('fixtures', package_name='another')
+    def test_with_subpath_path_info_ends_with_slash_subpath(self):
+        view = self._makeOne('fixtures', package_name='another',
+                             use_subpath=True)
         context = DummyContext()
         request = DummyRequest()
         request.subpath = ('subpath',)
@@ -284,7 +302,8 @@ class Test_static_view(unittest.TestCase):
         self.assertEqual(request.environ['SCRIPT_NAME'], '/path_info')
 
     def test_with_subpath_original_script_name_preserved(self):
-        view = self._makeOne('fixtures', package_name='another')
+        view = self._makeOne('fixtures', package_name='another',
+                             use_subpath=True)
         context = DummyContext()
         request = DummyRequest()
         request.subpath = ('subpath',)
@@ -297,7 +316,8 @@ class Test_static_view(unittest.TestCase):
                          '/scriptname/path_info')
 
     def test_with_subpath_new_script_name_fixes_trailing_slashes(self):
-        view = self._makeOne('fixtures', package_name='another')
+        view = self._makeOne('fixtures', package_name='another',
+                             use_subpath=True)
         context = DummyContext()
         request = DummyRequest()
         request.subpath = ('sub', 'path')
@@ -390,6 +410,7 @@ class TestStaticURLInfo(unittest.TestCase):
         self.assertEqual(inst.registrations, expected)
 
     def test_add_viewname(self):
+        from pyramid.security import NO_PERMISSION_REQUIRED
         from pyramid.static import static_view
         config = DummyConfig()
         inst = self._makeOne(config)
@@ -397,8 +418,7 @@ class TestStaticURLInfo(unittest.TestCase):
         expected = [('view/', 'anotherpackage:path/', False)]
         self.assertEqual(inst.registrations, expected)
         self.assertEqual(config.route_args, ('view/', 'view/*subpath'))
-        self.assertEqual(config.view_kw['permission'],
-                         '__no_permission_required__')
+        self.assertEqual(config.view_kw['permission'], NO_PERMISSION_REQUIRED)
         self.assertEqual(config.view_kw['view'].__class__, static_view)
         self.assertEqual(config.view_kw['view'].app.cache_max_age, 1)
 

@@ -13,3 +13,12 @@
 
 .. autoclass:: JSONP
 
+.. attribute:: null_renderer
+
+   An object that can be used in advanced integration cases as input to the
+   view configuration ``renderer=`` argument.  When the null renderer is used
+   as a view renderer argument, Pyramid avoids converting the view callable
+   result into a Response object.  This is useful if you want to reuse the
+   view configuration and lookup machinery outside the context of its use by
+   the Pyramid router (e.g. the package named ``pyramid_rpc`` does this).
+

@@ -353,6 +353,9 @@ The message catalog ``.pot`` template will end up in:
 
 ``myapplication/locale/myapplication.pot``.
 
+.. index::
+   single: translation domains
+
 Translation Domains
 +++++++++++++++++++
 
@@ -494,6 +497,8 @@ translations will be available to :app:`Pyramid`.
 .. index::
    single: localizer
    single: get_localizer
+   single: translation
+   single: pluralization
 
 Using a Localizer
 -----------------
@@ -618,7 +623,7 @@ You can obtain the locale name related to a request by using the
 This returns the locale name negotiated by the currently active
 :term:`locale negotiator` or the :term:`default locale name` if the
 locale negotiator returns ``None``.  You can change the default locale
-name by changing the ``default_locale_name`` setting; see
+name by changing the ``pyramid.default_locale_name`` setting; see
 :ref:`default_locale_name_setting`.
 
 Once :func:`~pyramid.i18n.get_locale_name` is first run, the locale
@@ -744,6 +749,9 @@ this support out of the box and may need special code to do an
 equivalent.  For those, you can always use the more manual translation
 facility described in :ref:`performing_a_translation`.
 
+.. index::
+   single: Mako i18n
+
 Mako Pyramid I18N Support
 -------------------------
 
@@ -760,7 +768,7 @@ Internationalization" which explains how to add idiomatic I18N support to
 Localization-Related Deployment Settings
 ----------------------------------------
 
-A :app:`Pyramid` application will have a ``default_locale_name``
+A :app:`Pyramid` application will have a ``pyramid.default_locale_name``
 setting.  This value represents the :term:`default locale name` used
 when the :term:`locale negotiator` returns ``None``.  Pass it to the
 :mod:`~pyramid.config.Configurator` constructor at startup
@@ -770,9 +778,9 @@ time:
    :linenos:
 
    from pyramid.config import Configurator
-   config = Configurator(settings={'default_locale_name':'de'})
+   config = Configurator(settings={'pyramid.default_locale_name':'de'})
 
-You may alternately supply a ``default_locale_name`` via an
+You may alternately supply a ``pyramid.default_locale_name`` via an
 application's Paster ``.ini`` file:
 
 .. code-block:: ini
@@ -780,10 +788,10 @@ application's Paster ``.ini`` file:
 
    [app:main]
    use = egg:MyProject#app
-   reload_templates = true
-   debug_authorization = false
-   debug_notfound = false
-   default_locale_name = de
+   pyramid.reload_templates = true
+   pyramid.debug_authorization = false
+   pyramid.debug_notfound = false
+   pyramid.default_locale_name = de
 
 If this value is not supplied via the Configurator constructor or via
 a Paste config file, it will default to ``en``.
@@ -796,7 +804,10 @@ If this setting is supplied within the :app:`Pyramid` application
 
    from pyramid.threadlocal import get_current_registry
    settings = get_current_registry().settings
-   default_locale_name = settings['default_locale_name']
+   default_locale_name = settings['pyramid.default_locale_name']
+
+.. index::
+   single: detecting langauges
 
 "Detecting" Available Languages
 -------------------------------
@@ -857,6 +868,9 @@ languages" configuration scheme as necessary.
    pair: locale; negotiator
    single: translation directory
 
+.. index::
+   pair: activating; translation
+
 .. _activating_translation:
 
 Activating Translation
@@ -868,6 +882,9 @@ To turn translation on, you must:
 - add at least one :term:`translation directory` to your application.
 
 - ensure that your application sets the :term:`locale name` correctly.
+
+.. index::
+   pair: translation directory; adding
 
 .. _adding_a_translation_directory:
 
@@ -906,6 +923,9 @@ will be merged into translations from a message catalog added earlier
 if both translation directories contain translations for the same
 locale and :term:`translation domain`.
 
+.. index::
+   pair: setting; locale
+
 Setting the Locale
 ~~~~~~~~~~~~~~~~~~
 
@@ -935,6 +955,9 @@ things before any translations need to be performed:
    application, you can configure a custom :term:`locale negotiator`
    function into that application as required.  See
    :ref:`custom_locale_negotiator`.
+
+.. index::
+   single: locale negotiator
 
 .. _locale_negotiators:
 

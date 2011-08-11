@@ -236,6 +236,11 @@ ${body}''')
         if WSGIHTTPException.body_template_obj is not body_tmpl:
             # Custom template; add headers to args
             for k, v in environ.items():
+                if (not k.startswith('wsgi.')) and ('.' in k):
+                    # omit custom environ variables, stringifying them may
+                    # trigger code that should not be executed here; see
+                    # https://github.com/Pylons/pyramid/issues/239
+                    continue
                 args[k] = escape(v)
             for k, v in self.headers.items():
                 args[k.lower()] = escape(v)

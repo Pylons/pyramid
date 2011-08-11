@@ -6,22 +6,20 @@
 Application Configuration 
 =========================
 
-Each deployment of an application written using :app:`Pyramid` implies a
-specific *configuration* of the framework itself.  For example, an
-application which serves up MP3 files for your listening enjoyment might plug
-code into the framework that manages song files, while an application that
-manages corporate data might plug in code that manages accounting
-information.  The way in which code is plugged in to :app:`Pyramid` for a
-specific application is referred to as "configuration".
+Most people already understand "configuration" as settings that influence the
+operation of an application.  For instance, it's easy to think of the values
+in a ``.ini`` file parsed at application startup time as "configuration".
+However, if you're reasonably open-minded, it's easy to think of *code* as
+configuration too.  Since Pyramid, like most other web application platforms,
+is a *framework*, it calls into code that you write (as opposed to a
+*library*, which is code that exists purely for you to call).  The act of
+plugging application code that you've written into :app:`Pyramid` is also
+referred to within this documentation as "configuration"; you are configuring
+:app:`Pyramid` to call the code that makes up your application.
 
-Most people understand "configuration" as coarse settings that inform the
-high-level operation of a specific application deployment.  For instance,
-it's easy to think of the values implied by a ``.ini`` file parsed at
-application startup time as "configuration".  :app:`Pyramid` extends this
-pattern to application development, using the term "configuration" to express
-standardized ways that code gets plugged into a deployment of the framework
-itself.  When you plug code into the :app:`Pyramid` framework, you are
-"configuring" :app:`Pyramid` to create a particular application.
+There are two ways to configure a :app:`Pyramid` application:
+:term:`imperative configuration` and :term:`declarative configuration`.  Both
+are described below.
 
 .. index::
    single: imperative configuration
@@ -31,8 +29,9 @@ itself.  When you plug code into the :app:`Pyramid` framework, you are
 Imperative Configuration
 ------------------------
 
-Here's one of the simplest :app:`Pyramid` applications, configured
-imperatively:
+"Imperative configuration" just means configuration done by Python
+statements, one after the next.  Here's one of the simplest :app:`Pyramid`
+applications, configured imperatively:
 
 .. code-block:: python
    :linenos:
@@ -64,19 +63,17 @@ including conditionals, can be employed in this mode of configuration.
 
 .. _decorations_and_code_scanning:
 
-Configuration Decorations and Code Scanning
--------------------------------------------
+Declarative Configuration
+-------------------------
 
-A different mode of configuration gives more *locality of reference* to a
-:term:`configuration declaration`.  It's sometimes painful to have all
-configuration done in imperative code, because often the code for a single
-application may live in many files.  If the configuration is centralized in
-one place, you'll need to have at least two files open at once to see the
-"big picture": the file that represents the configuration, and the file that
-contains the implementation objects referenced by the configuration.  To
-avoid this, :app:`Pyramid` allows you to insert :term:`configuration
-decoration` statements very close to code that is referred to by the
-declaration itself.  For example:
+It's sometimes painful to have all configuration done by imperative code,
+because often the code for a single application may live in many files.  If
+the configuration is centralized in one place, you'll need to have at least
+two files open at once to see the "big picture": the file that represents the
+configuration, and the file that contains the implementation objects
+referenced by the configuration.  To avoid this, :app:`Pyramid` allows you to
+insert :term:`configuration decoration` statements very close to code that is
+referred to by the declaration itself.  For example:
 
 .. code-block:: python
    :linenos:
@@ -135,6 +132,9 @@ the scanner, a set of calls are made to a :term:`Configurator` on your
 behalf: these calls replace the need to add imperative configuration
 statements that don't live near the code being configured.
 
+The combination of :term:`configuration decoration` and the invocation of a
+:term:`scan` is collectively known as :term:`declarative configuration`.
+
 In the example above, the scanner translates the arguments to
 :class:`~pyramid.view.view_config` into a call to the
 :meth:`pyramid.config.Configurator.add_view` method, effectively:
@@ -145,13 +145,10 @@ In the example above, the scanner translates the arguments to
 
    config.add_view(hello)
 
-Declarative Configuration
--------------------------
+Summary
+-------
 
-A third mode of configuration can be employed when you create a
-:app:`Pyramid` application named *declarative configuration*.  This mode uses
-an XML language known as :term:`ZCML` to represent configuration statements
-rather than Python.  ZCML is not built-in to Pyramid, but almost everything
-that can be configured imperatively can also be configured via ZCML if you
-install the :term:`pyramid_zcml` package.
-
+There are two ways to configure a :app:`Pyramid` application: declaratively
+and imperatively.  You can choose the mode you're most comfortable with; both
+are completely equivalent.  Examples in this documentation will use both
+modes interchangeably.

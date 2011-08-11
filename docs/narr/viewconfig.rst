@@ -2,38 +2,27 @@
 
 .. _view_configuration:
 
+.. _view_lookup:
+
 View Configuration
 ==================
 
 .. index::
    single: view lookup
 
-:term:`View configuration` controls how :term:`view lookup` operates in
-your application. In earlier chapters, you have been exposed to a few
-simple view configuration declarations without much explanation. In this
-chapter we will explore the subject in detail.
-
-.. _view_lookup:
-
-View Lookup and Invocation
---------------------------
-
 :term:`View lookup` is the :app:`Pyramid` subsystem responsible for finding
-an invoking a :term:`view callable`.  The view lookup subsystem is passed a
-:term:`context` and a :term:`request` object.
+and invoking a :term:`view callable`.  :term:`View configuration` controls how
+:term:`view lookup` operates in your application.  During any given request,
+view configuration information is compared against request data by the view
+lookup subsystem in order to find the "best" view callable for that request.
 
-:term:`View configuration` information stored within in the
-:term:`application registry` is compared against the context and request by
-the view lookup subsystem in order to find the "best" view callable for the
-set of circumstances implied by the context and request.
+In earlier chapters, you have been exposed to a few simple view configuration
+declarations without much explanation. In this chapter we will explore the
+subject in detail.
 
-:term:`View predicate` attributes are an important part of view
-configuration that enables the :term:`View lookup` subsystem to find and
-invoke the appropriate view.  Predicate attributes can be thought of
-like "narrowers".  In general, the greater number of predicate
-attributes possessed by a view's configuration, the more specific the
-circumstances need to be before the registered view callable will be
-invoked.
+.. index::
+   pair: resource; mapping to view callable
+   pair: URL pattern; mapping to view callable
 
 Mapping a Resource or URL Pattern to a View Callable
 ----------------------------------------------------
@@ -47,7 +36,7 @@ to be invoked.
 A view configuration statement is made about information present in the
 :term:`context` resource and the :term:`request`.
 
-View configuration is performed in one of these ways:
+View configuration is performed in one of two ways:
 
 - by running a :term:`scan` against application source code which has a
   :class:`pyramid.view.view_config` decorator attached to a Python object as
@@ -56,16 +45,8 @@ View configuration is performed in one of these ways:
 - by using the :meth:`pyramid.config.Configurator.add_view` method as per
   :ref:`mapping_views_using_imperative_config_section`.
 
-- By specifying a view within a :term:`route configuration`.  View
-  configuration via a route configuration is performed by using the
-  :meth:`pyramid.config.Configurator.add_route` method, passing a ``view``
-  argument specifying a view callable. This pattern of view configuration is
-  deprecated as of :app:`Pyramid` 1.1.
-
-.. note:: A package named ``pyramid_handlers`` (available from PyPI) provides
-   an analogue of :term:`Pylons` -style "controllers", which are a special
-   kind of view class which provides more automation when your application
-   uses :term:`URL dispatch` solely.
+.. index::
+   single: view configuration parameters
 
 .. _view_configuration_parameters:
 
@@ -79,12 +60,15 @@ arguments.  View predicate arguments used during view configuration are used
 to narrow the set of circumstances in which :term:`view lookup` will find a
 particular view callable.
 
-In general, the fewer number of predicates which are supplied to a
-particular view configuration, the more likely it is that the associated
-view callable will be invoked.  The greater the number supplied, the
-less likely.  A view with five predicates will always be found and
-evaluated before a view with two, for example.  All predicates must
-match for the associated view to be called.
+:term:`View predicate` attributes are an important part of view configuration
+that enables the :term:`view lookup` subsystem to find and invoke the
+appropriate view.  The greater number of predicate attributes possessed by a
+view's configuration, the more specific the circumstances need to be before
+the registered view callable will be invoked.  The fewer number of predicates
+which are supplied to a particular view configuration, the more likely it is
+that the associated view callable will be invoked.  A view with five
+predicates will always be found and evaluated before a view with two, for
+example.  All predicates must match for the associated view to be called.
 
 This does not mean however, that :app:`Pyramid` "stops looking" when it
 finds a view registration with predicates that don't match.  If one set
@@ -99,11 +83,13 @@ the request, :app:`Pyramid` will return an error to the user's browser,
 representing a "not found" (404) page.  See :ref:`changing_the_notfound_view`
 for more information about changing the default notfound view.
 
-Some view configuration arguments are non-predicate arguments.  These tend to
-modify the response of the view callable or prevent the view callable from
+Other view configuration arguments are non-predicate arguments.  These tend
+to modify the response of the view callable or prevent the view callable from
 being invoked due to an authorization policy.  The presence of non-predicate
 arguments in a view configuration does not narrow the circumstances in which
 the view callable will be invoked.
+
+.. _nonpredicate_view_args:
 
 Non-Predicate Arguments
 +++++++++++++++++++++++
@@ -249,8 +235,10 @@ arguments that are supplied, the more specific, and narrower the usage of the
 configured view.
 
 ``name``
-  The :term:`view name` required to match this view callable.  Read
-  :ref:`traversal_chapter` to understand the concept of a view name.
+  The :term:`view name` required to match this view callable.  A ``name``
+  argument is typically only used when your application uses
+  :term:`traversal`. Read :ref:`traversal_chapter` to understand the concept
+  of a view name.
 
   If ``name`` is not supplied, the empty string is used (implying the default
   view).
@@ -405,29 +393,23 @@ configured view.
 
 .. _mapping_views_using_a_decorator_section:
 
-View Configuration Using the ``@view_config`` Decorator
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-For better locality of reference, you may use the
-:class:`pyramid.view.view_config` decorator to associate your view functions
-with URLs instead of using imperative configuration for the same purpose.
+Adding View Configuration Using the ``@view_config`` Decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. warning::
 
    Using this feature tends to slows down application startup slightly, as
    more work is performed at application startup to scan for view
-   declarations.
+   configuration declarations.  For maximum startup performance, use the view
+   configuration method described in
+   :ref:`mapping_views_using_imperative_config_section` instead.
 
-Usage of the ``view_config`` decorator is a form of :term:`declarative
-configuration` in decorator form.  :class:`~pyramid.view.view_config` can be
-used to associate :term:`view configuration` information -- as done via the
-equivalent imperative code -- with a function that acts as a :app:`Pyramid`
-view callable.  All arguments to the
-:meth:`pyramid.config.Configurator.add_view` method (save for the ``view``
-argument) are available in decorator form and mean precisely the same thing.
+The :class:`~pyramid.view.view_config` decorator can be used to associate
+:term:`view configuration` information with a function, method, or class that
+acts as a :app:`Pyramid` view callable.
 
-An example of the :class:`~pyramid.view.view_config` decorator might reside in
-a :app:`Pyramid` application module ``views.py``:
+Here's an example of the :class:`~pyramid.view.view_config` decorator that
+lives within a :app:`Pyramid` application module ``views.py``:
 
 .. ignore-next-block
 .. code-block:: python
@@ -437,8 +419,7 @@ a :app:`Pyramid` application module ``views.py``:
    from pyramid.view import view_config
    from pyramid.response import Response
 
-   @view_config(name='my_view', request_method='POST', context=MyResource,
-                permission='read')
+   @view_config(route_name='ok', request_method='POST', permission='read')
    def my_view(request):
        return Response('OK')
 
@@ -449,9 +430,8 @@ configuration stanza:
 .. code-block:: python
    :linenos:
 
-   config.add_view('mypackage.views.my_view', name='my_view', 
-                   request_method='POST', context=MyResource,
-                   permission='read')
+   config.add_view('mypackage.views.my_view', route_name='ok', 
+                   request_method='POST', permission='read')
 
 All arguments to ``view_config`` may be omitted.  For example:
 
@@ -494,6 +474,17 @@ See :ref:`configuration_module` for additional API arguments to the
 allows you to supply a ``package`` argument to better control exactly *which*
 code will be scanned.
 
+All arguments to the :class:`~pyramid.view.view_config` decorator mean
+precisely the same thing as they would if they were passed as arguments to
+the :meth:`pyramid.config.Configurator.add_view` method save for the ``view``
+argument.  Usage of the :class:`~pyramid.view.view_config` decorator is a
+form of :term:`declarative configuration`, while
+:meth:`pyramid.config.Configurator.add_view` is a form of :term:`imperative
+configuration`.  However, they both do the same thing.
+
+.. index::
+   single: view_config placement
+
 ``@view_config`` Placement
 ++++++++++++++++++++++++++
 
@@ -508,7 +499,7 @@ If your view callable is a function, it may be used as a function decorator:
    from pyramid.view import view_config
    from pyramid.response import Response
 
-   @view_config(name='edit')
+   @view_config(route_name='edit')
    def edit(request):
        return Response('edited!')
 
@@ -523,7 +514,7 @@ against a class as when they are applied against a function.  For example:
    from pyramid.response import Response
    from pyramid.view import view_config
 
-   @view_config()
+   @view_config(route_name='hello')
    class MyView(object):
        def __init__(self, request):
            self.request = request
@@ -548,7 +539,7 @@ decorator syntactic sugar, if you wish:
        def __call__(self):
            return Response('hello')
 
-   my_view = view_config()(MyView)
+   my_view = view_config(route_name='hello')(MyView)
 
 More than one :class:`~pyramid.view.view_config` decorator can be stacked on
 top of any number of others.  Each decorator creates a separate view
@@ -560,8 +551,8 @@ registration.  For example:
    from pyramid.view import view_config
    from pyramid.response import Response
 
-   @view_config(name='edit')
-   @view_config(name='change')
+   @view_config(route_name='edit')
+   @view_config(route_name='change')
    def edit(request):
        return Response('edited!')
 
@@ -579,7 +570,7 @@ The decorator can also be used against a method of a class:
        def __init__(self, request):
            self.request = request
 
-       @view_config(name='hello')
+       @view_config(route_name='hello')
        def amethod(self):
            return Response('hello')
 
@@ -601,7 +592,7 @@ against the ``amethod`` method could be spelled equivalently as the below:
    from pyramid.response import Response
    from pyramid.view import view_config
 
-   @view_config(attr='amethod', name='hello')
+   @view_config(attr='amethod', route_name='hello')
    class MyView(object):
        def __init__(self, request):
            self.request = request
@@ -614,13 +605,14 @@ against the ``amethod`` method could be spelled equivalently as the below:
 
 .. _mapping_views_using_imperative_config_section:
 
-View Registration Using :meth:`~pyramid.config.Configurator.add_view`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Adding View Configuration Using :meth:`~pyramid.config.Configurator.add_view`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The :meth:`pyramid.config.Configurator.add_view` method within
-:ref:`configuration_module` is used to configure a view imperatively.  The
-arguments to this method are very similar to the arguments that you provide
-to the ``@view_config`` decorator.  For example:
+:ref:`configuration_module` is used to configure a view "imperatively"
+(without a :class:`~pyramid.view.view_config` decorator).  The arguments to
+this method are very similar to the arguments that you provide to the
+:class:`~pyramid.view.view_config` decorator.  For example:
 
 .. code-block:: python
    :linenos:
@@ -632,108 +624,17 @@ to the ``@view_config`` decorator.  For example:
 
    # config is assumed to be an instance of the
    # pyramid.config.Configurator class
-   config.add_view(hello_world, name='hello.html')
+   config.add_view(hello_world, route_name='hello')
 
 The first argument, ``view``, is required.  It must either be a Python object
 which is the view itself or a :term:`dotted Python name` to such an object.
-All other arguments are optional.  See
-:meth:`pyramid.config.Configurator.add_view` for more information.
+In the above example, ``view`` is the ``hello_world`` function.  All other
+arguments are optional.  See :meth:`pyramid.config.Configurator.add_view` for
+more information.
 
-.. index::
-   single: resource interfaces
-
-.. _using_resource_interfaces:
-
-Using Resource Interfaces In View Configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Instead of registering your views with a ``context`` that names a Python
-resource *class*, you can optionally register a view callable with a
-``context`` which is an :term:`interface`.  An interface can be attached
-arbitrarily to any resource object.  View lookup treats context interfaces
-specially, and therefore the identity of a resource can be divorced from that
-of the class which implements it.  As a result, associating a view with an
-interface can provide more flexibility for sharing a single view between two
-or more different implementations of a resource type.  For example, if two
-resource objects of different Python class types share the same interface,
-you can use the same view configuration to specify both of them as a
-``context``.
-
-In order to make use of interfaces in your application during view dispatch,
-you must create an interface and mark up your resource classes or instances
-with interface declarations that refer to this interface.
-
-To attach an interface to a resource *class*, you define the interface and
-use the :func:`zope.interface.implements` function to associate the interface
-with the class.
-
-.. code-block:: python
-   :linenos:
-
-   from zope.interface import Interface
-   from zope.interface import implements
-
-   class IHello(Interface):
-       """ A marker interface """
-
-   class Hello(object):
-       implements(IHello)
-
-To attach an interface to a resource *instance*, you define the interface and
-use the :func:`zope.interface.alsoProvides` function to associate the
-interface with the instance.  This function mutates the instance in such a
-way that the interface is attached to it.
-
-.. code-block:: python
-   :linenos:
-
-   from zope.interface import Interface
-   from zope.interface import alsoProvides
-
-   class IHello(Interface):
-       """ A marker interface """
-
-   class Hello(object):
-       pass
-
-   def make_hello():
-       hello = Hello()
-       alsoProvides(hello, IHello)
-       return hello
-
-Regardless of how you associate an interface, with a resource instance, or a
-resource class, the resulting code to associate that interface with a view
-callable is the same.  Assuming the above code that defines an ``IHello``
-interface lives in the root of your application, and its module is named
-"resources.py", the interface declaration below will associate the
-``mypackage.views.hello_world`` view with resources that implement, or
-provide, this interface.
-
-.. code-block:: python
-   :linenos:
-
-   # config is an instance of pyramid.config.Configurator
-
-   config.add_view('mypackage.views.hello_world', name='hello.html',
-                   context='mypackage.resources.IHello')
-
-Any time a resource that is determined to be the :term:`context` provides
-this interface, and a view named ``hello.html`` is looked up against it as
-per the URL, the ``mypackage.views.hello_world`` view callable will be
-invoked.
-
-Note, in cases where a view is registered against a resource class, and a
-view is also registered against an interface that the resource class
-implements, an ambiguity arises. Views registered for the resource class take
-precedence over any views registered for any interface the resource class
-implements. Thus, if one view configuration names a ``context`` of both the
-class type of a resource, and another view configuration names a ``context``
-of interface implemented by the resource's class, and both view
-configurations are otherwise identical, the view registered for the context's
-class will "win".
-
-For more information about defining resources with interfaces for use within
-view configuration, see :ref:`resources_which_implement_interfaces`.
+When you use only :meth:`~pyramid.config.Configurator.add_view` to add view
+configurations, you don't need to issue a :term:`scan` in order for the view
+configuration to take effect.
 
 .. index::
    single: view security
@@ -756,8 +657,9 @@ configuration using :meth:`~pyramid.config.Configurator.add_view`:
 
    # config is an instance of pyramid.config.Configurator
 
-   config.add_view('myproject.views.add_entry', name='add.html',
-                   context='myproject.resources.IBlog', permission='add')
+   config.add_route('add', '/add.html', factory='mypackage.Blog')
+   config.add_view('myproject.views.add_entry', route_name='add',
+                   permission='add')
 
 When an :term:`authorization policy` is enabled, this view will be protected
 with the ``add`` permission.  The view will *not be called* if the user does
@@ -777,105 +679,71 @@ per :ref:`protecting_views`.
 It's useful to be able to debug :exc:`NotFound` error responses when they
 occur unexpectedly due to an application registry misconfiguration.  To debug
 these errors, use the ``PYRAMID_DEBUG_NOTFOUND`` environment variable or the
-``debug_notfound`` configuration file setting.  Details of why a view was not
-found will be printed to ``stderr``, and the browser representation of the
-error will include the same information.  See :ref:`environment_chapter` for
-more information about how, and where to set these values.
+``pyramid.debug_notfound`` configuration file setting.  Details of why a view
+was not found will be printed to ``stderr``, and the browser representation of
+the error will include the same information.  See :ref:`environment_chapter`
+for more information about how, and where to set these values.
 
 .. index::
-   pair: matching views; printing
-   single: paster pviews
+   single: HTTP caching
 
-.. _displaying_matching_views:
+.. _influencing_http_caching:
 
-Displaying Matching Views for a Given URL
------------------------------------------
+Influencing HTTP Caching
+------------------------
 
-For a big application with several views, it can be hard to keep the view
-configuration details in your head, even if you defined all the views
-yourself. You can use the ``paster pviews`` command in a terminal window to
-print a summary of matching routes and views for a given URL in your
-application. The ``paster pviews`` command accepts three arguments. The
-first argument to ``pviews`` is the path to your application's ``.ini`` file.
-The second is the ``app`` section name inside the ``.ini`` file which points
-to your application. The third is the URL to test for matching views.
+.. note:: This feature is new in Pyramid 1.1.
 
-Here is an example for a simple view configuration using :term:`traversal`:
+When a non-``None`` ``http_cache`` argument is passed to a view
+configuration, Pyramid will set ``Expires`` and ``Cache-Control`` response
+headers in the resulting response, causing browsers to cache the response
+data for some time.  See ``http_cache`` in :ref:`nonpredicate_view_args` for
+the its allowable values and what they mean.
 
-.. code-block:: text
-   :linenos:
+Sometimes it's undesirable to have these headers set as the result of
+returning a response from a view, even though you'd like to decorate the view
+with a view configuration decorator that has ``http_cache``.  Perhaps there's
+an alternate branch in your view code that returns a response that should
+never be cacheable, while the "normal" branch returns something that should
+always be cacheable.  If this is the case, set the ``prevent_auto`` attribute
+of the ``response.cache_control`` object to a non-``False`` value.  For
+example, the below view callable is configured with a ``@view_config``
+decorator that indicates any response from the view should be cached for 3600
+seconds.  However, the view itself prevents caching from taking place unless
+there's a ``should_cache`` GET or POST variable:
 
-   $ ../bin/paster pviews development.ini tutorial /FrontPage
+.. code-block:: python
 
-   URL = /FrontPage
+   from pyramid.view import view_config
 
-       context: <tutorial.models.Page object at 0xa12536c>
-       view name:
+   @view_config(http_cache=3600)
+   def view(request):
+       response = Response()
+       if not 'should_cache' in request.params:
+           response.cache_control.prevent_auto = True
+       return response
 
-       View:
-       -----
-       tutorial.views.view_page
-       required permission = view
+Note that the ``http_cache`` machinery will overwrite or add to caching
+headers you set within the view itself unless you use ``preserve_auto``.
 
-The output always has the requested URL at the top and below that all the
-views that matched with their view configuration details. In this example
-only one view matches, so there is just a single *View* section. For each
-matching view, the full code path to the associated view callable is shown,
-along with any permissions and predicates that are part of that view
-configuration.
+You can also turn of the effect of ``http_cache`` entirely for the duration
+of a Pyramid application lifetime.  To do so, set the
+``PYRAMID_PREVENT_HTTP_CACHE`` environment variable or the
+``pyramid.prevent_http_cache`` configuration value setting to a true value.
+For more information, see :ref:`preventing_http_caching`.
 
-A more complex configuration might generate something like this:
+Note that setting ``pyramid.prevent_http_cache`` will have no effect on caching
+headers that your application code itself sets.  It will only prevent caching
+headers that would have been set by the Pyramid HTTP caching machinery
+invoked as the result of the ``http_cache`` argument to view configuration.
 
-.. code-block:: text
-   :linenos:
+.. index::
+   pair: view configuration; debugging
 
-   $ ../bin/paster pviews development.ini shootout /about
+Debugging View Configuration
+----------------------------
 
-   URL = /about
-
-       context: <shootout.models.RootFactory object at 0xa56668c>
-       view name: about
-
-       Route:
-       ------
-       route name: about
-       route pattern: /about
-       route path: /about
-       subpath:
-       route predicates (request method = GET)
-
-           View:
-           -----
-           shootout.views.about_view
-           required permission = view
-           view predicates (request_param testing, header X/header)
-
-       Route:
-       ------
-       route name: about_post
-       route pattern: /about
-       route path: /about
-       subpath:
-       route predicates (request method = POST)
-
-           View:
-           -----
-           shootout.views.about_view_post
-           required permission = view
-           view predicates (request_param test)
-
-           View:
-           -----
-           shootout.views.about_view_post2
-           required permission = view
-           view predicates (request_param test2)
-
-In this case, we are dealing with a :term:`URL dispatch` application. This
-specific URL has two matching routes. The matching route information is
-displayed first, followed by any views that are associated with that route.
-As you can see from the second matching route output, a route can be
-associated with more than one view.
-
-For a URL that doesn't match any views, ``paster pviews`` will simply print
-out a *Not found* message.
-
+See :ref:`displaying_matching_views` for information about how to display
+each of the view callables that might match for a given URL.  This can be an
+effective way to figure out why a particular view callable is being called
+instead of the one you'd like to be called.

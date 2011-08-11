@@ -204,6 +204,7 @@ class Request(BaseRequest, DeprecatedRequestMethods):
     response_callbacks = ()
     finished_callbacks = ()
     exception = None
+    exc_info = None
     matchdict = None
     matched_route = None
 
@@ -491,16 +492,24 @@ class Request(BaseRequest, DeprecatedRequestMethods):
         return adapted is ob
 
     @property
-    def json(self):
-        if self.content_type == 'application/json':
-            return json.loads(self.body, encoding=self.charset)
+    def json_body(self):
+        return json.loads(self.body, encoding=self.charset)
 
 
 def route_request_iface(name, bases=()):
-    iface = InterfaceClass('%s_IRequest' % name, bases=bases)
+    # zope.interface treats the __name__ as the __doc__ and changes __name__
+    # to None for interfaces that contain spaces if you do not pass a
+    # nonempty __doc__ (insane); see
+    # zope.interface.interface.Element.__init__ and
+    # https://github.com/Pylons/pyramid/issues/232; as a result, always pass
+    # __doc__ to the InterfaceClass constructor.
+    iface = InterfaceClass('%s_IRequest' % name, bases=bases,
+                           __doc__="route_request_iface-generated interface")
     # for exception view lookups
-    iface.combined = InterfaceClass('%s_combined_IRequest' % name,
-                                    bases=(iface, IRequest))
+    iface.combined = InterfaceClass(
+        '%s_combined_IRequest' % name,
+        bases=(iface, IRequest),
+        __doc__ = 'route_request_iface-generated combined interface')
     return iface
 
 def add_global_response_headers(request, headerlist):

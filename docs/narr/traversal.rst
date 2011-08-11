@@ -456,6 +456,103 @@ as the sole argument: ``request``; it is expected to return a response.
    -specific request attributes are also available as described in
    :ref:`special_request_attributes`.
 
+.. index::
+   single: resource interfaces
+
+.. _using_resource_interfaces:
+
+Using Resource Interfaces In View Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Instead of registering your views with a ``context`` that names a Python
+resource *class*, you can optionally register a view callable with a
+``context`` which is an :term:`interface`.  An interface can be attached
+arbitrarily to any resource object.  View lookup treats context interfaces
+specially, and therefore the identity of a resource can be divorced from that
+of the class which implements it.  As a result, associating a view with an
+interface can provide more flexibility for sharing a single view between two
+or more different implementations of a resource type.  For example, if two
+resource objects of different Python class types share the same interface,
+you can use the same view configuration to specify both of them as a
+``context``.
+
+In order to make use of interfaces in your application during view dispatch,
+you must create an interface and mark up your resource classes or instances
+with interface declarations that refer to this interface.
+
+To attach an interface to a resource *class*, you define the interface and
+use the :func:`zope.interface.implements` function to associate the interface
+with the class.
+
+.. code-block:: python
+   :linenos:
+
+   from zope.interface import Interface
+   from zope.interface import implements
+
+   class IHello(Interface):
+       """ A marker interface """
+
+   class Hello(object):
+       implements(IHello)
+
+To attach an interface to a resource *instance*, you define the interface and
+use the :func:`zope.interface.alsoProvides` function to associate the
+interface with the instance.  This function mutates the instance in such a
+way that the interface is attached to it.
+
+.. code-block:: python
+   :linenos:
+
+   from zope.interface import Interface
+   from zope.interface import alsoProvides
+
+   class IHello(Interface):
+       """ A marker interface """
+
+   class Hello(object):
+       pass
+
+   def make_hello():
+       hello = Hello()
+       alsoProvides(hello, IHello)
+       return hello
+
+Regardless of how you associate an interface, with a resource instance, or a
+resource class, the resulting code to associate that interface with a view
+callable is the same.  Assuming the above code that defines an ``IHello``
+interface lives in the root of your application, and its module is named
+"resources.py", the interface declaration below will associate the
+``mypackage.views.hello_world`` view with resources that implement, or
+provide, this interface.
+
+.. code-block:: python
+   :linenos:
+
+   # config is an instance of pyramid.config.Configurator
+
+   config.add_view('mypackage.views.hello_world', name='hello.html',
+                   context='mypackage.resources.IHello')
+
+Any time a resource that is determined to be the :term:`context` provides
+this interface, and a view named ``hello.html`` is looked up against it as
+per the URL, the ``mypackage.views.hello_world`` view callable will be
+invoked.
+
+Note, in cases where a view is registered against a resource class, and a
+view is also registered against an interface that the resource class
+implements, an ambiguity arises. Views registered for the resource class take
+precedence over any views registered for any interface the resource class
+implements. Thus, if one view configuration names a ``context`` of both the
+class type of a resource, and another view configuration names a ``context``
+of interface implemented by the resource's class, and both view
+configurations are otherwise identical, the view registered for the context's
+class will "win".
+
+For more information about defining resources with interfaces for use within
+view configuration, see :ref:`resources_which_implement_interfaces`.
+
+
 References
 ----------
 

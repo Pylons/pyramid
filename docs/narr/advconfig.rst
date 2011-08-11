@@ -14,7 +14,7 @@ you to ignore relative configuration statement ordering in some
 circumstances.
 
 .. index::
-   single: imperative configuration
+   pair: configuration; conflict detection
 
 .. _conflict_detection:
 
@@ -299,6 +299,9 @@ These are the methods of the configurator which provide conflict detection:
 provides conflict detection, because it's implemented in terms of the
 conflict-aware ``add_route`` and ``add_view`` methods.
 
+.. index::
+   pair: configuration; including from external sources
+
 .. _including_configuration:
 
 Including Configuration from External Sources
@@ -396,6 +399,10 @@ Some configuration methods, such as
 constraints: the routes they imply require relative ordering.  Such ordering
 constraints are not absolved by two-phase configuration.  Routes are still
 added in configuration execution order.
+
+.. index::
+   single: add_directive
+   pair: configurator; adding directives
 
 .. _add_directive:
 

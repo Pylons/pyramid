@@ -1,3 +1,6 @@
+.. index::
+   single: hello world program
+
 .. _firstapp_chapter:
 
 Creating Your First :app:`Pyramid` Application
@@ -12,8 +15,7 @@ more detail how it works.
 Hello World, Goodbye World
 --------------------------
 
-Here's one of the very simplest :app:`Pyramid` applications, configured
-imperatively:
+Here's one of the very simplest :app:`Pyramid` applications:
 
 .. code-block:: python
    :linenos:
@@ -151,7 +153,7 @@ defined imports and function definitions, placed within the confines of an
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
-Let's break this down this piece-by-piece.
+Let's break this down piece-by-piece.
 
 Configurator Construction
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -180,7 +182,7 @@ The ``config = Configurator()`` line above creates an instance of the
 :class:`~pyramid.config.Configurator` class.  The resulting ``config`` object
 represents an API which the script uses to configure this particular
 :app:`Pyramid` application.  Methods called on the Configurator will cause
-registrations to be made in a :term:`application registry` associated with
+registrations to be made in an :term:`application registry` associated with
 the application.
 
 .. _adding_configuration:
@@ -320,6 +322,3 @@ see :class:`~pyramid.config.Configurator` .
 For more information about :term:`view configuration`, see
 :ref:`view_config_chapter`.
 
-An example of using *declarative* configuration (:term:`ZCML`) instead of
-imperative configuration to create a similar "hello world" is available
-within the documentation for :term:`pyramid_zcml`.

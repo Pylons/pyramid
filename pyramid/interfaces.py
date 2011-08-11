@@ -284,13 +284,18 @@ class IBeforeRender(Interface):
     """
     def __setitem__(name, value):
         """ Set a name/value pair into the dictionary which is passed to a
-        renderer as the renderer globals dictionary.  If the ``name`` already
-        exists in the target dictionary, a :exc:`KeyError` will be raised."""
+        renderer as the renderer globals dictionary.  """
+
+    def setdefault(name, default=None):
+        """ Return the existing value for ``name`` in the renderers globals
+        dictionary.  If no value with ``name`` exists in the dictionary, set
+        the ``default`` value into the renderer globals dictionary under the
+        name passed.  If a value already existed in the dictionary, return
+        it.  If a value did not exist in the dictionary, return the default"""
 
     def update(d):
         """ Update the renderer globals dictionary with another dictionary
-        ``d``.  If any of the key names in the source dictionary already exist
-        in the target dictionary, a :exc:`KeyError` will be raised"""
+        ``d``.  """
 
     def __contains__(k):
         """ Return ``True`` if ``k`` exists in the renderer globals
@@ -303,6 +308,10 @@ class IBeforeRender(Interface):
     def get(k, default=None):
         """ Return the value for key ``k`` from the renderer globals
         dictionary, or the default if no such value exists."""
+
+    rendering_val = Attribute('The value returned by a view or passed to a '
+                              '``render`` method for this rendering. '
+                              'This feature is new in Pyramid 1.1.1.')
 
 class IRenderer(Interface):
     def __call__(value, system):
@@ -436,6 +445,17 @@ class IMultiDict(Interface): # docs-only interface
 
 class IRequest(Interface):
     """ Request type interface attached to all request objects """
+
+class ITweens(Interface):
+    """ Marker interface for utility registration representing the ordered
+    set of a configuration's tween factories"""
+
+class IRequestHandler(Interface):
+    """ """
+    def __call__(self, request):
+        """ Must return a tuple of IReqest, IResponse or raise an exception.
+        The ``request`` argument will be an instance of an object that
+        provides IRequest."""
 
 IRequest.combined = IRequest # for exception view lookups 
 
@@ -604,7 +624,7 @@ class IRoute(Interface):
         'when this route matches (or ``None``)')
     predicates = Attribute(
         'A sequence of :term:`route predicate` objects used to '
-        'determine if a request matches this route or not or not after '
+        'determine if a request matches this route or not after '
         'basic pattern matching has been completed.')
     pregenerator = Attribute('This attribute should either be ``None`` or '
                              'a callable object implementing the '
@@ -750,13 +770,13 @@ class ISession(Interface):
         """ Pop a queue from the flash storage.  The queue is removed from
         flash storage after this message is called.  The queue is returned;
         it is a list of flash messages added by
-        :meth:`pyramid.interfaces.ISesssion.flash`"""
+        :meth:`pyramid.interfaces.ISession.flash`"""
 
     def peek_flash(queue=''):
         """ Peek at a queue in the flash storage.  The queue remains in
         flash storage after this message is called.  The queue is returned;
         it is a list of flash messages added by
-        :meth:`pyramid.interfaces.ISesssion.flash`
+        :meth:`pyramid.interfaces.ISession.flash`
         """
 
     def new_csrf_token():
@@ -846,8 +866,6 @@ class ISession(Interface):
     def __contains__(key):
         """Return true if a key exists in the mapping."""
 
-NO_PERMISSION_REQUIRED = '__no_permission_required__'
-
 class IRendererInfo(Interface):
     """ An object implementing this interface is passed to every
     :term:`renderer factory` constructor as its only argument (conventionally
@@ -861,4 +879,3 @@ class IRendererInfo(Interface):
     settings = Attribute('The deployment settings dictionary related '
                          'to the current application')
     
-

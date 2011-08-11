@@ -3,7 +3,7 @@ import unittest
 
 from pyramid.wsgi import wsgiapp
 from pyramid.view import view_config
-from pyramid.view import static
+from pyramid.static import static_view
 
 from zope.interface import Interface
 
@@ -39,10 +39,10 @@ class WGSIAppPlusViewConfigTests(unittest.TestCase):
         reg = config.registry
         view = reg.adapters.lookup(
             (IViewClassifier, IRequest, INothing), IView, name='')
-        self.assertEqual(view, wsgiapptest)
+        self.assertEqual(view.__original_view__, wsgiapptest)
 
 here = os.path.dirname(__file__)
-staticapp = static(os.path.join(here, 'fixtures'))
+staticapp = static_view(os.path.join(here, 'fixtures'), use_subpath=True)
 
 class TestStaticApp(unittest.TestCase):
     def test_basic(self):

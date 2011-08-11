@@ -233,25 +233,28 @@ class TestRequest(unittest.TestCase):
         request.registry.registerAdapter(adapter, (Foo,), IResponse)
         self.assertEqual(request.is_response(foo), True)
 
-    def test_json_incorrect_mimetype(self):
-        request = self._makeOne({})
-        self.assertEqual(request.json, None)
+    def test_json_body_invalid_json(self):
+        request = self._makeOne({'REQUEST_METHOD':'POST'})
+        request.body = '{'
+        self.assertRaises(ValueError, getattr, request, 'json_body')
         
-    def test_json_correct_mimetype(self):
-        request = self._makeOne({})
-        request.content_type = 'application/json'
+    def test_json_body_valid_json(self):
+        request = self._makeOne({'REQUEST_METHOD':'POST'})
         request.body = '{"a":1}'
-        self.assertEqual(request.json, {'a':1})
+        self.assertEqual(request.json_body, {'a':1})
 
-    def test_json_alternate_charset(self):
+    def test_json_body_alternate_charset(self):
         from pyramid.compat import json
-        request = self._makeOne({})
-        request.content_type = 'application/json'
+        request = self._makeOne({'REQUEST_METHOD':'POST'})
         request.charset = 'latin-1'
         la = unicode('La Pe\xc3\xb1a', 'utf-8')
         body = json.dumps({'a':la}, encoding='latin-1')
         request.body = body
-        self.assertEqual(request.json, {'a':la})
+        self.assertEqual(request.json_body, {'a':la})
+
+    def test_json_body_GET_request(self):
+        request = self._makeOne({'REQUEST_METHOD':'GET'})
+        self.assertRaises(ValueError, getattr, request, 'json_body')
 
 class TestRequestDeprecatedMethods(unittest.TestCase):
     def setUp(self):
@@ -420,6 +423,15 @@ class Test_route_request_iface(unittest.TestCase):
         self.assertEqual(iface.__name__, 'routename_IRequest')
         self.assertTrue(hasattr(iface, 'combined'))
         self.assertEqual(iface.combined.__name__, 'routename_combined_IRequest')
+
+    def test_it_routename_with_spaces(self):
+        #  see https://github.com/Pylons/pyramid/issues/232
+        iface = self._callFUT('routename with spaces')
+        self.assertEqual(iface.__name__, 'routename with spaces_IRequest')
+        self.assertTrue(hasattr(iface, 'combined'))
+        self.assertEqual(iface.combined.__name__,
+                         'routename with spaces_combined_IRequest')
+        
 
 class Test_add_global_response_headers(unittest.TestCase):
     def _callFUT(self, request, headerlist):

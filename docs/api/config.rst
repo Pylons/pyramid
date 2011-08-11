@@ -44,7 +44,7 @@
 
      .. automethod:: add_route
 
-     .. automethod:: add_static_view(name, path, cache_max_age=3600, permission='__no_permission_required__')
+     .. automethod:: add_static_view(name, path, cache_max_age=3600, permission=NO_PERMISSION_REQUIRED)
 
      .. automethod:: add_settings
 
@@ -78,6 +78,8 @@
 
      .. automethod:: set_view_mapper
 
+     .. automethod:: add_tween
+
      .. automethod:: testing_securitypolicy
 
      .. automethod:: testing_resources
@@ -85,4 +87,16 @@
      .. automethod:: testing_add_subscriber
 
      .. automethod:: testing_add_renderer
+
+  .. attribute:: global_registries
+
+     The set of registries that have been created for :app:`Pyramid`
+     applications, one per each call to
+     :meth:`pyramid.config.Configurator.make_wsgi_app` in the current
+     process. The object itself supports iteration and has a ``last``
+     property containing the last registry loaded.
+
+     The registries contained in this object are stored as weakrefs,
+     thus they will only exist for the lifetime of the actual
+     applications for which they are being used.
 

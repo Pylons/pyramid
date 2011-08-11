@@ -32,23 +32,24 @@ Narrative Documentation
    narr/firstapp
    narr/project
    narr/urldispatch
-   narr/muchadoabouttraversal
-   narr/traversal
    narr/views
    narr/renderers
    narr/templates
    narr/viewconfig
-   narr/resources
    narr/assets
    narr/webob
    narr/sessions
-   narr/security
-   narr/hybrid
-   narr/i18n
-   narr/vhosting
    narr/events
    narr/environment
+   narr/commandline
+   narr/i18n
+   narr/vhosting
    narr/testing
+   narr/resources
+   narr/muchadoabouttraversal
+   narr/traversal
+   narr/security
+   narr/hybrid
    narr/hooks
    narr/advconfig
    narr/extending

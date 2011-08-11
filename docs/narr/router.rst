@@ -2,6 +2,7 @@
    single: request processing
    single: request
    single: router
+   single: request lifecycle
 
 .. _router_chapter:
 

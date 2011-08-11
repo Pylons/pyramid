@@ -1,34 +1,63 @@
 Pyramid TODOs
 =============
 
-Must-Have
----------
-
-- Github issues fixes.
-
 Should-Have
 -----------
 
+- BeforeRender event subclasses dict but implements a bunch of shit.  Its
+  repr is currently broken (it always shows empty).  Decide what to do.
+
+- Replace weberror for email-out in all production.ini.
+
+- Come up with an analogue of repoze.zodbconn that doesn't require a closer
+  in the pipeline and use it in the ZODB scaffold and tutorial.
+
+- Deprecate pyramid.security.view_execution_permitted (it only works for
+  traversal).
+
 - Make "localizer" a property of request (instead of requiring
-  "get_localizer(request)"?
+  "get_localizer(request)"
 
-- Investigate mod_wsgi tutorial to make sure it still works (2 reports say
-  no; application package not found).
+- Make ``current_route_url`` a method of request.
 
-- Add narrative docs for wsgiapp and wsgiapp2.
+- Create a ``current_route_path`` function and make it a method of request.
+
+- "static_path" API (omit host and port).
+
+- Provide a way to set the authentication policy and the authorization policy
+  during a config.include (they are related, so just exposing the currently
+  underscored-private _set_auth* methods won't cut it).
+
+- Try to figure out a way to keep "settings" as the original dictionary
+  passed to the Configurator instead of copying it.
+
+- Merge aodag's config.include(route_prefix=...) fork.
+
+- Merge Michael's route group work.
+
+- Kill off ``bfg.routes`` envvars in router.
+
+- Alias the stupid long default session factory name.
+
+- Fix indirect circular import between router and config.
+
+- Eliminate non-deployment-non-scaffold-related Paste dependencies:
+  ``paste.urlparser.StaticURLParser``, ``paste.auth.auth_tkt`` (cutnpaste or
+  reimplement both).
 
 Nice-to-Have
 ------------
 
-- Maybe add ``add_renderer_globals`` method to Configurator.
+- Add narrative docs for wsgiapp and wsgiapp2.
+
+- Provide a ``has_view`` function.
+
+- Debug option to print view matching decision (e.g. debug_viewlookup or so).
 
 - Speed up startup time (defer _bootstrap and registerCommonDirectives()
   until needed by ZCML, as well as unfound speedups).
 
-- Nicer Mako exceptions in WebError.
-
-- Response.RequestClass should probably be pyramid.request.Request but this
-  may imply actually subclassing webob.Response
+- Nicer Mako exceptions in debug toolbar.
 
 - Better "Extending" chapter.
 
@@ -62,9 +91,10 @@ Nice-to-Have
 
 - Create a function which performs a recursive request.
 
-- Debug option to print view matching decision.
-
 - Update App engine chapter with less creaky directions.
+
+Probably Bad Ideas
+------------------
 
 - Add functionality that mocks the behavior of ``repoze.browserid``.
 
@@ -72,5 +102,5 @@ Nice-to-Have
   http://plope.com/pyramid_auth_design_api_postmortem, phasing out the
   current auth-n-auth abstractions in a backwards compatible way.
 
-- Add doc string for BeforeRender event with more details.
+- Maybe add ``add_renderer_globals`` method to Configurator.
 

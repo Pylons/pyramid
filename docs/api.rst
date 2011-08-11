@@ -28,9 +28,11 @@ documentation is organized alphabetically by module name.
    api/security
    api/session
    api/settings
+   api/static
    api/testing
    api/threadlocal
    api/traversal
+   api/tweens
    api/url
    api/view
    api/wsgi

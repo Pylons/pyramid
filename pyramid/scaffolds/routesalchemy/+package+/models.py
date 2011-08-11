@@ -39,4 +39,4 @@ def initialize_sql(engine):
     try:
         populate()
     except IntegrityError:
-        DBSession.rollback()
+        transaction.abort()

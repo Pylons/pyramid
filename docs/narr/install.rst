@@ -9,21 +9,19 @@ Installing :app:`Pyramid`
 Before You Install
 ------------------
 
-You will need `Python <http://python.org>`_ version 2.4 or better to
+You will need `Python <http://python.org>`_ version 2.5 or better to
 run :app:`Pyramid`.  
 
 .. sidebar:: Python Versions
 
-    As of this writing, :app:`Pyramid` has been tested under Python
-    2.4.6, Python 2.5.4 and Python 2.6.2, and Python 2.7.  To ensure
-    backwards compatibility, development of :app:`Pyramid` is
-    currently done primarily under Python 2.4 and Python 2.5.
-    :app:`Pyramid` does not run under any version of Python before
-    2.4, and does not yet run under Python 3.X.
+    As of this writing, :app:`Pyramid` has been tested under Python 2.5.5,
+    Python 2.6.6, and Python 2.7.2.  :app:`Pyramid` does not run under any
+    version of Python before 2.5, and does not yet run under Python 3.X.
 
 :app:`Pyramid` is known to run on all popular Unix-like systems such as
 Linux, MacOS X, and FreeBSD as well as on Windows platforms.  It is also
-known to run on Google's App Engine and :term:`Jython`.
+known to run on Google's App Engine, :term:`PyPy` (1.5), and :term:`Jython`
+(2.5.2).
 
 :app:`Pyramid` installation does not require the compilation of any
 C code, so you need only a Python interpreter that meets the
@@ -36,6 +34,9 @@ If your system doesn't have a Python interpreter, and you're on UNIX,
 you can either install Python using your operating system's package
 manager *or* you can install Python from source fairly easily on any
 UNIX system that has development tools.
+
+.. index::
+   pair: install; Python (from package, UNIX)
 
 Package Manager Method
 ++++++++++++++++++++++
@@ -54,6 +55,9 @@ command:
 
 Once these steps are performed, the Python interpreter will usually be
 invokable via ``python2.6`` from a shell prompt.
+
+.. index::
+   pair: install; Python (from source, UNIX)
 
 Source Compile Method
 +++++++++++++++++++++
@@ -76,9 +80,9 @@ manager.  For example, this works to do so on an Ubuntu Linux system:
 On Mac OS X, installing `XCode
 <http://developer.apple.com/tools/xcode/>`_ has much the same effect.
 
-Once you've got development tools installed on your system, On the
-same system, to install a Python 2.6 interpreter from *source*, use
-the following commands:
+Once you've got development tools installed on your system, you can
+install a Python 2.6 interpreter from *source*, on the same system,
+using the following commands:
 
 .. code-block:: text
 
@@ -97,6 +101,9 @@ the following commands:
 Once these steps are performed, the Python interpreter will be
 invokable via ``$HOME/opt/Python-2.6.4/bin/python`` from a shell
 prompt.
+
+.. index::
+   pair: install; Python (from package, Windows)
 
 If You Don't Yet Have A Python Interpreter (Windows)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -143,15 +150,15 @@ setuptools`` within the Python interpreter you'd like to run
 .. code-block:: text
 
    [chrism@vitaminf pyramid]$ python
-   Python 2.4.5 (#1, Aug 29 2008, 12:27:37) 
-   [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
+   Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32) 
+   [GCC 4.4.3] on linux2
    Type "help", "copyright", "credits" or "license" for more information.
    >>> import setuptools
 
 If running ``import setuptools`` does not raise an ``ImportError``, it
 means that setuptools is already installed into your Python
 interpreter.  If ``import setuptools`` fails, you will need to install
-setuptools manually.  Note that above we're using a Python 2.4-series
+setuptools manually.  Note that above we're using a Python 2.6-series
 interpreter on Mac OS X; your output may differ if you're using a
 later Python version or a different platform.
 
@@ -183,7 +190,7 @@ the script.  To remediate this, you may need to do:
    $ sudo python ez_setup.py
 
 .. index::
-   single: virtualenv
+   pair: install; virtualenv
 
 Installing the ``virtualenv`` Package
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -207,6 +214,7 @@ to install it as your system's administrative user.  For example:
 
 .. index::
    single: virtualenv
+   pair: Python; virtual environment
 
 Creating the Virtual Python Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -314,6 +322,9 @@ Installing :app:`Pyramid` on Google App Engine
 
 :ref:`appengine_tutorial` documents the steps required to install a
 :app:`Pyramid` application on Google App Engine.
+
+.. index::
+   single: installing on Jython
 
 Installing :app:`Pyramid` on Jython
 --------------------------------------

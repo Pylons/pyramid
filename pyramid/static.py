@@ -14,6 +14,7 @@ from pyramid.asset import resolve_asset_spec
 from pyramid.interfaces import IStaticURLInfo
 from pyramid.path import caller_package
 from pyramid.request import call_app_with_subpath_as_path_info
+from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.url import route_url
 
 class PackageURLParser(StaticURLParser):
@@ -136,7 +137,8 @@ class StaticURLInfo(object):
             # it's a view name
             cache_max_age = extra.pop('cache_max_age', None)
             # create a view
-            view = static_view(spec, cache_max_age=cache_max_age)
+            view = static_view(spec, cache_max_age=cache_max_age,
+                               use_subpath=True)
 
             # Mutate extra to allow factory, etc to be passed through here.
             # Treat permission specially because we'd like to default to
@@ -148,7 +150,7 @@ class StaticURLInfo(object):
             if permission is None:
                 permission = extra.pop('permission', None)
             if permission is None:
-                permission = '__no_permission_required__'
+                permission = NO_PERMISSION_REQUIRED
 
             context = extra.pop('view_context', None)
             if context is None:
@@ -199,6 +201,13 @@ class static_view(object):
     response headers returned by the view (default is 3600 seconds or
     five minutes).
 
+    ``use_subpath`` influences whether ``request.subpath`` will be used as
+    ``PATH_INFO`` when calling the underlying WSGI application which actually
+    serves the static files.  If it is ``True``, the static application will
+    consider ``request.subpath`` as ``PATH_INFO`` input.  If it is ``False``,
+    the static application will consider request.path_info as ``PATH_INFO``
+    input. By default, this is ``False``.
+
     .. note:: If the ``root_dir`` is relative to a :term:`package`, or
          is a :term:`asset specification` the :app:`Pyramid`
          :class:`pyramid.config.Configurator` method can be
@@ -207,7 +216,8 @@ class static_view(object):
          absolute, configuration will not be able to
          override the assets it contains.  """
     
-    def __init__(self, root_dir, cache_max_age=3600, package_name=None):
+    def __init__(self, root_dir, cache_max_age=3600, package_name=None,
+                 use_subpath=False):
         # package_name is for bw compat; it is preferred to pass in a
         # package-relative path as root_dir
         # (e.g. ``anotherpackage:foo/static``).
@@ -220,6 +230,9 @@ class static_view(object):
             app = PackageURLParser(
                 package_name, root_dir, cache_max_age=cache_max_age)
         self.app = app
+        self.use_subpath = use_subpath
 
     def __call__(self, context, request):
-        return call_app_with_subpath_as_path_info(request, self.app)
+        if self.use_subpath:
+            return call_app_with_subpath_as_path_info(request, self.app)
+        return request.get_response(self.app)

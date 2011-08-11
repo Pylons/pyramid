@@ -23,6 +23,11 @@ Glossary
      a subclass such as :class:`pyramid.httpexceptions.HTTPFound`.  See
      :ref:`webob_chapter` for information about response objects.
 
+   response adapter
+     A callable which accepts an arbitrary object and "converts" it to a
+     :class:`pyramid.response.Response` object.  See :ref:`using_iresponse`
+     for more information.
+
    Repoze
      "Repoze" is essentially a "brand" of software developed by `Agendaless
      Consulting <http://agendaless.com>`_ and a set of contributors.  The
@@ -326,7 +331,7 @@ Glossary
       :term:`ZODB` database.
 
    WebOb
-     `WebOb <http://pythonpaste.org/webob/>`_ is a WSGI request/response
+     `WebOb <http://webob.org>`_ is a WSGI request/response
      library created by Ian Bicking.
 
    Paste
@@ -506,6 +511,9 @@ Glossary
      `JavaScript Object Notation <http://www.json.org/>`_ is a data
      serialization format.
 
+   jQuery
+     A popular `Javascript library <http://jquery.org>`_.
+
    renderer
      A serializer that can be referred to via :term:`view
      configuration` which converts a non-:term:`Response` return
@@ -589,8 +597,9 @@ Glossary
      declaration` required by your application.
 
    declarative configuration
-     The configuration mode in which you use :term:`ZCML` to make a set of
-     :term:`configuration declaration` statements.  See :term:`pyramid_zcml`.
+     The configuration mode in which you use the combination of
+     :term:`configuration decoration` and a :term:`scan` to configure your
+     Pyramid application.
 
    Not Found view
       An :term:`exception view` invoked by :app:`Pyramid` when the
@@ -903,4 +912,21 @@ Glossary
    exception response
      A :term:`response` that is generated as the result of a raised exception
      being caught by an :term:`exception view`.
+
+   PyPy
+     PyPy is an "alternative implementation of the Python
+     language":http://pypy.org/
+
+   tween
+     A bit of code that sits between the Pyramid router's main request
+     handling function and the upstream WSGI component that uses
+     :app:`Pyramid` as its 'app'.  The word "tween" is a contraction of
+     "between".  A tween may be used by Pyramid framework extensions, to
+     provide, for example, Pyramid-specific view timing support, bookkeeping
+     code that examines exceptions before they are returned to the upstream
+     WSGI application, or a variety of other features.  Tweens behave a bit
+     like :mod:`WSGI` 'middleware' but they have the benefit of running in a
+     context in which they have access to the Pyramid :term:`application
+     registry` as well as the Pyramid rendering machinery.  See
+     :ref:`registering_tweens`.
 

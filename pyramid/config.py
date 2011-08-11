@@ -1,10 +1,12 @@
 import inspect
+import logging
 import os
 import re
 import sys
 import types
 import traceback
 import warnings
+from hashlib import md5
 
 import venusian
 
@@ -36,6 +38,7 @@ from pyramid.interfaces import IRendererFactory
 from pyramid.interfaces import IRendererGlobalsFactory
 from pyramid.interfaces import IRequest
 from pyramid.interfaces import IRequestFactory
+from pyramid.interfaces import ITweens
 from pyramid.interfaces import IResponse
 from pyramid.interfaces import IRootFactory
 from pyramid.interfaces import IRouteRequest
@@ -52,9 +55,6 @@ from pyramid.interfaces import IViewMapperFactory
 
 from pyramid import renderers
 from pyramid.authorization import ACLAuthorizationPolicy
-from pyramid.compat import all
-from pyramid.compat import md5
-from pyramid.compat import any
 from pyramid.events import ApplicationCreated
 from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import PredicateMismatch
@@ -62,7 +62,6 @@ from pyramid.httpexceptions import default_exceptionresponse_view
 from pyramid.httpexceptions import HTTPForbidden
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.i18n import get_localizer
-from pyramid.log import make_stream_logger
 from pyramid.mako_templating import renderer_factory as mako_renderer_factory
 from pyramid.path import caller_package
 from pyramid.path import package_path
@@ -72,6 +71,7 @@ from pyramid.renderers import RendererHelper
 from pyramid.request import route_request_iface
 from pyramid.asset import PackageOverrides
 from pyramid.asset import resolve_asset_spec
+from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.settings import Settings
 from pyramid.static import StaticURLInfo
 from pyramid.threadlocal import get_current_registry
@@ -80,8 +80,13 @@ from pyramid.threadlocal import manager
 from pyramid.traversal import DefaultRootFactory
 from pyramid.traversal import find_interface
 from pyramid.traversal import traversal_path
+from pyramid.tweens import excview_tween_factory
+from pyramid.tweens import Tweens
+from pyramid.tweens import tween_factory_name
+from pyramid.tweens import MAIN, INGRESS, EXCVIEW
 from pyramid.urldispatch import RoutesMapper
 from pyramid.util import DottedNameResolver
+from pyramid.util import WeakOrderedSet
 from pyramid.view import render_view_to_response
 
 DEFAULT_RENDERERS = (
@@ -137,7 +142,7 @@ class Configurator(object):
 
     The Configurator accepts a number of arguments: ``registry``,
     ``package``, ``settings``, ``root_factory``, ``authentication_policy``,
-    ``authorization_policy``, ``renderers`` ``debug_logger``,
+    ``authorization_policy``, ``renderers``, ``debug_logger``,
     ``locale_negotiator``, ``request_factory``, ``renderer_globals_factory``,
     ``default_permission``, ``session_factory``, ``default_view_mapper``,
     ``autocommit``, and ``exceptionresponse_view``.
@@ -194,12 +199,12 @@ class Configurator(object):
     :meth:`pyramid.config.Configurator.add_renderer`).  If
     it is not passed, a default set of renderer factories is used.
 
-    If ``debug_logger`` is not passed, a default debug logger that
-    logs to stderr will be used.  If it is passed, it should be an
-    instance of the :class:`logging.Logger` (PEP 282) standard library
-    class or a :term:`dotted Python name` to same.  The debug logger
-    is used by :app:`Pyramid` itself to log warnings and
-    authorization debugging information.
+    If ``debug_logger`` is not passed, a default debug logger that logs to a
+    logger will be used (the logger name will be the package name of the
+    *caller* of this configurator).  If it is passed, it should be an
+    instance of the :class:`logging.Logger` (PEP 282) standard library class
+    or a Python logger name.  The debug logger is used by :app:`Pyramid`
+    itself to log warnings and authorization debugging information.
 
     If ``locale_negotiator`` is passed, it should be a :term:`locale
     negotiator` implementation or a :term:`dotted Python name` to
@@ -469,7 +474,7 @@ class Configurator(object):
         :meth:`pyramid.config.Configuration.commit` is called (or executed
         immediately if ``autocommit`` is ``True``).
 
-        .. note:: This method is typically only used by :app:`Pyramid`
+        .. warning:: This method is typically only used by :app:`Pyramid`
            framework extension authors, not by :app:`Pyramid` application
            developers.
 
@@ -632,6 +637,10 @@ class Configurator(object):
         """
         Add a directive method to the configurator.
 
+        .. warning:: This method is typically only used by :app:`Pyramid`
+           framework extension authors, not by :app:`Pyramid` application
+           developers.
+
         Framework extenders can add directive methods to a configurator by
         instructing their users to call ``config.add_directive('somename',
         'some.callable')``.  This will make ``some.callable`` accessible as
@@ -683,7 +692,7 @@ class Configurator(object):
         """ Return a new Configurator instance with the same registry
         as this configurator using the package supplied as the
         ``package`` argument to the new configurator.  ``package`` may
-        be an actual Python package object or a Python dotted name
+        be an actual Python package object or a :term:`dotted Python name`
         representing a package."""
         context = self._ctx
         if context is None:
@@ -739,6 +748,13 @@ class Configurator(object):
         policies, renderers, a debug logger, a locale negotiator, and various
         other settings using the configurator's current registry, as per the
         descriptions in the Configurator constructor."""
+        tweens = []
+        includes = []
+        if settings:
+            includes = [x.strip() for x in
+                        settings.get('pyramid.include', '').splitlines()]
+            tweens =   [x.strip() for x in
+                        settings.get('pyramid.tweens','').splitlines()]
         registry = self.registry
         self._fix_registry()
         self._set_settings(settings)
@@ -748,9 +764,12 @@ class Configurator(object):
         # cope with WebOb exc objects not decoratored with IExceptionResponse
         from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
         registry.registerSelfAdapter((WebobResponse,), IResponse)
-        debug_logger = self.maybe_dotted(debug_logger)
+
         if debug_logger is None:
-            debug_logger = make_stream_logger('pyramid.debug', sys.stderr)
+            debug_logger = logging.getLogger(self.package_name)
+        elif isinstance(debug_logger, basestring):
+            debug_logger = logging.getLogger(debug_logger)
+                
         registry.registerUtility(debug_logger, IDebugLogger)
         if authentication_policy or authorization_policy:
             self._set_security_policies(authentication_policy,
@@ -791,6 +810,10 @@ class Configurator(object):
         if default_view_mapper is not None:
             self.set_view_mapper(default_view_mapper)
             self.commit()
+        for inc in includes:
+            self.include(inc)
+        for factory in tweens:
+            self._add_tween(factory, explicit=True)
         
     def hook_zca(self):
         """ Call :func:`zope.component.getSiteManager.sethook` with
@@ -834,10 +857,13 @@ class Configurator(object):
 
     def derive_view(self, view, attr=None, renderer=None):
         """
-
         Create a :term:`view callable` using the function, instance,
         or class (or :term:`dotted Python name` referring to the same)
         provided as ``view`` object.
+
+        .. warning:: This method is typically only used by :app:`Pyramid`
+           framework extension authors, not by :app:`Pyramid` application
+           developers.
 
         This is API is useful to framework extenders who create
         pluggable systems which need to register 'proxy' view
@@ -906,6 +932,123 @@ class Configurator(object):
         :term:`response` object.  """
         return self._derive_view(view, attr=attr, renderer=renderer)
 
+    @action_method
+    def add_tween(self, tween_factory, alias=None, under=None, over=None):
+        """
+        Add a 'tween factory'.  A :term:`tween` (a contraction of 'between')
+        is a bit of code that sits between the Pyramid router's main request
+        handling function and the upstream WSGI component that uses
+        :app:`Pyramid` as its 'app'.  This is a feature that may be used by
+        Pyramid framework extensions, to provide, for example,
+        Pyramid-specific view timing support, bookkeeping code that examines
+        exceptions before they are returned to the upstream WSGI application,
+        or a variety of other features.  Tweens behave a bit like
+        :term:`WSGI` 'middleware' but they have the benefit of running in a
+        context in which they have access to the Pyramid :term:`application
+        registry` as well as the Pyramid rendering machinery.
+
+        .. note:: You can view the tween ordering configured into a given
+                  Pyramid application by using the ``paster ptweens``
+                  command.  See :ref:`displaying_tweens`.
+
+        The ``alias`` argument, if it is not ``None``, should be a string.
+        The string will represent a value that other callers of ``add_tween``
+        may pass as an ``under`` and ``over`` argument instead of a dotted
+        name to a tween factory.
+
+        The ``under`` and ``over`` arguments allow the caller of
+        ``add_tween`` to provide a hint about where in the tween chain this
+        tween factory should be placed when an implicit tween chain is used.
+        These hints are only used used when an explicit tween chain is not
+        used (when the ``pyramid.tweens`` configuration value is not set).
+        Allowable values for ``under`` or ``over`` (or both) are:
+
+        - ``None`` (the default).
+
+        - A :term:`dotted Python name` to a tween factory: a string
+          representing the predicted dotted name of a tween factory added in
+          a call to ``add_tween`` in the same configuration session.
+
+        - A tween alias: a string representing the predicted value of
+          ``alias`` in a separate call to ``add_tween`` in the same
+          configuration session
+        
+        - One of the constants :attr:`pyramid.tweens.MAIN`,
+          :attr:`pyramid.tweens.INGRESS`, or :attr:`pyramid.tweens.EXCVIEW`.
+        
+        ``under`` means 'closer to the main Pyramid application than',
+        ``over`` means 'closer to the request ingress than'.
+
+        For example, calling ``add_tween(factory, over=pyramid.tweens.MAIN)``
+        will attempt to place the tween factory represented by ``factory``
+        directly 'above' (in ``paster ptweens`` order) the main Pyramid
+        request handler.  Likewise, calling ``add_tween(factory,
+        over=pyramid.tweens.MAIN, under='someothertween')`` will attempt to
+        place this tween factory 'above' the main handler but 'below' (a
+        fictional) 'someothertween' tween factory (which was presumably added
+        via ``add_tween(factory, alias='someothertween')``).
+
+        If an ``under`` or ``over`` value is provided that does not match a
+        tween factory dotted name or alias in the current configuration, that
+        value will be ignored.  It is not an error to provide an ``under`` or
+        ``over`` value that matches an unused tween factory.
+
+        Specifying neither ``over`` nor ``under`` is equivalent to specifying
+        ``under=INGRESS``.
+
+        Implicit tween ordering is obviously only best-effort.  Pyramid will
+        attempt to present an implicit order of tweens as best it can, but
+        the only surefire way to get any particular ordering is to use an
+        explicit tween order.  A user may always override the implicit tween
+        ordering by using an explicit ``pyramid.tweens`` configuration value
+        setting.
+
+        ``alias``, ``under``, and ``over`` arguments are ignored when an
+        explicit tween chain is specified using the ``pyramid.tweens``
+        configuration value.
+
+        For more information, see :ref:`registering_tweens`.
+
+        .. note:: This feature is new as of Pyramid 1.1.1.
+        """
+        return self._add_tween(tween_factory, alias=alias, under=under,
+                               over=over, explicit=False)
+
+    def _add_tween(self, tween_factory, alias=None, under=None, over=None,
+                   explicit=False):
+        tween_factory = self.maybe_dotted(tween_factory)
+        name = tween_factory_name(tween_factory)
+        if alias in (MAIN, INGRESS):
+            raise ConfigurationError('%s is a reserved tween name' % alias)
+
+        if over is INGRESS:
+            raise ConfigurationError('%s cannot be over INGRESS' % name)
+
+        if under is MAIN:
+            raise ConfigurationError('%s cannot be under MAIN' % name)
+
+        registry = self.registry
+        tweens = registry.queryUtility(ITweens)
+        if tweens is None:
+            tweens = Tweens()
+            registry.registerUtility(tweens, ITweens)
+            tweens.add_implicit(tween_factory_name(excview_tween_factory),
+                                excview_tween_factory, alias=EXCVIEW,
+                                over=MAIN)
+        if explicit:
+            tweens.add_explicit(name, tween_factory)
+        else:
+            tweens.add_implicit(name, tween_factory, alias=alias, under=under,
+                                over=over)
+        self.action(('tween', name, explicit))
+        if not explicit and alias is not None:
+            self.action(('tween', alias, explicit))
+
+    @action_method
+    def add_request_handler(self, factory, name): # pragma: no cover
+        # XXX bw compat for debugtoolbar
+        return self._add_tween(factory, explicit=False)
+        
     @action_method
     def add_subscriber(self, subscriber, iface=None):
         """Add an event :term:`subscriber` for the event stream
@@ -1003,11 +1146,14 @@ class Configurator(object):
     def make_wsgi_app(self):
         """ Commits any pending configuration statements, sends a
         :class:`pyramid.events.ApplicationCreated` event to all listeners,
-        and returns a :app:`Pyramid` WSGI application representing the
-        committed configuration state."""
+        adds this configuration's registry to
+        :attr:`pyramid.config.global_registries`, and returns a
+        :app:`Pyramid` WSGI application representing the committed
+        configuration state."""
         self.commit()
         from pyramid.router import Router # avoid circdep
         app = Router(self.registry)
+        global_registries.add(self.registry)
         # We push the registry on to the stack here in case any code
         # that depends on the registry threadlocal APIs used in
         # listeners subscribed to the IApplicationCreated event.
@@ -1016,6 +1162,7 @@ class Configurator(object):
             self.registry.notify(ApplicationCreated(app))
         finally:
             self.manager.pop()
+
         return app
 
     @action_method
@@ -1057,10 +1204,10 @@ class Configurator(object):
           ``default_permission`` argument, or if
           :meth:`pyramid.config.Configurator.set_default_permission`
           was used prior to this view registration.  Pass the string
-          ``__no_permission_required__`` as the permission argument to
-          explicitly indicate that the view should always be
-          executable by entirely anonymous users, regardless of the
-          default permission, bypassing any :term:`authorization
+          :data:`pyramid.security.NO_PERMISSION_REQUIRED` as the
+          permission argument to explicitly indicate that the view should
+          always be executable by entirely anonymous users, regardless of
+          the default permission, bypassing any :term:`authorization
           policy` that may be in effect.
 
         attr
@@ -1116,6 +1263,8 @@ class Configurator(object):
 
         http_cache
 
+          .. note:: This feature is new as of Pyramid 1.1.
+
           When you supply an ``http_cache`` value to a view configuration,
           the ``Expires`` and ``Cache-Control`` headers of a response
           generated by the associated view callable are modified.  The value
@@ -1166,6 +1315,12 @@ class Configurator(object):
           instead wish to only influence ``Cache-Control`` headers, pass a
           tuple as ``http_cache`` with the first element of ``None``, e.g.:
           ``(None, {'public':True})``.
+
+          If you wish to prevent a view that uses ``http_cache`` in its
+          configuration from having its caching response headers changed by
+          this machinery, set ``response.cache_control.prevent_auto = True``
+          before returning the response from the view.  This effectively
+          disables any HTTP caching done by ``http_cache`` for that response.
 
         wrapper
 
@@ -1229,18 +1384,7 @@ class Configurator(object):
 
           This value must match the ``name`` of a :term:`route
           configuration` declaration (see :ref:`urldispatch_chapter`)
-          that must match before this view will be called.  Note that
-          the ``route`` configuration referred to by ``route_name``
-          usually has a ``*traverse`` token in the value of its
-          ``path``, representing a part of the path that will be used
-          by :term:`traversal` against the result of the route's
-          :term:`root factory`.
-
-          .. warning:: Using this argument services an advanced
-             feature that isn't often used unless you want to perform
-             traversal *after* a route has matched. See
-             :ref:`hybrid_chapter` for more information on using this
-             advanced feature.
+          that must match before this view will be called.
 
         request_type
 
@@ -1823,12 +1967,11 @@ class Configurator(object):
            should only be used to support older code bases which depend upon
            them.* Use a separate call to
            :meth:`pyramid.config.Configurator.add_view` to associate a view
-           with a route.  See :ref:`add_route_view_config` for more info.
+           with a route using the ``route_name`` argument.
 
         view
 
-          .. warning:: Deprecated as of :app:`Pyramid` 1.1; see
-             :ref:`add_route_view_config`.
+          .. warning:: Deprecated as of :app:`Pyramid` 1.1.
 
           A Python object or :term:`dotted Python name` to the same
           object that will be used as a view callable when this route
@@ -1836,9 +1979,8 @@ class Configurator(object):
 
         view_context
 
-          .. warning:: Deprecated as of :app:`Pyramid` 1.1; see
-             :ref:`add_route_view_config`.
-
+          .. warning:: Deprecated as of :app:`Pyramid` 1.1.
+          
           A class or an :term:`interface` or :term:`dotted Python
           name` to the same object which the :term:`context` of the
           view should match for the view named by the route to be
@@ -1853,8 +1995,7 @@ class Configurator(object):
 
         view_permission
 
-          .. warning:: Deprecated as of :app:`Pyramid` 1.1; see
-             :ref:`add_route_view_config`.
+          .. warning:: Deprecated as of :app:`Pyramid` 1.1.
 
           The permission name required to invoke the view associated
           with this route.  e.g. ``edit``. (see
@@ -1868,8 +2009,7 @@ class Configurator(object):
 
         view_renderer
 
-          .. warning:: Deprecated as of :app:`Pyramid` 1.1; see
-             :ref:`add_route_view_config`.
+          .. warning:: Deprecated as of :app:`Pyramid` 1.1.
 
           This is either a single string term (e.g. ``json``) or a
           string implying a path or :term:`asset specification`
@@ -1893,8 +2033,7 @@ class Configurator(object):
 
         view_attr
 
-          .. warning:: Deprecated as of :app:`Pyramid` 1.1; see
-             :ref:`add_route_view_config`.
+          .. warning:: Deprecated as of :app:`Pyramid` 1.1.
 
           The view machinery defaults to using the ``__call__`` method
           of the view callable (or the function itself, if the view
@@ -1961,11 +2100,7 @@ class Configurator(object):
         if self.route_prefix:
             pattern = self.route_prefix.rstrip('/') + '/' + pattern.lstrip('/')
 
-        discriminator = ['route', name, xhr, request_method, path_info,
-                         request_param, header, accept]
-        discriminator.extend(sorted(custom_predicates))
-        discriminator = tuple(discriminator)
-
+        discriminator = ('route', name)
         self.action(discriminator, None)
 
         return mapper.connect(name, pattern, factory, predicates=predicates,
@@ -1981,7 +2116,7 @@ class Configurator(object):
         return mapper
 
     # this is *not* an action method (uses caller_package)
-    def scan(self, package=None, categories=None):
+    def scan(self, package=None, categories=None, **kw):
         """Scan a Python package and any of its subpackages for objects
         marked with :term:`configuration decoration` such as
         :class:`pyramid.view.view_config`.  Any decorated object found will
@@ -2001,12 +2136,28 @@ class Configurator(object):
         :class:`pyramid.view.view_config`.  See the :term:`Venusian`
         documentation for more information about limiting a scan by using an
         explicit set of categories.
+
+        To perform a ``scan``, Pyramid creates a Venusian ``Scanner`` object.
+        The ``kw`` argument represents a set of keyword arguments to pass to
+        the Venusian ``Scanner`` object's constructor.  See the
+        :term:`venusian` documentation (its ``Scanner`` class) for more
+        information about the constructor.  By default, the only keyword
+        arguments passed to the Scanner constructor are ``{'config':self}``
+        where ``self`` is this configurator object.  This services the
+        requirement of all built-in Pyramid decorators, but extension systems
+        may require additional arguments.  Providing this argument is not
+        often necessary; it's an advanced usage.
+
+        .. note:: the ``**kw`` argument is new in Pyramid 1.1
         """
         package = self.maybe_dotted(package)
         if package is None: # pragma: no cover
             package = caller_package()
 
-        scanner = self.venusian.Scanner(config=self)
+        scankw = {'config':self}
+        scankw.update(kw)
+
+        scanner = self.venusian.Scanner(**scankw)
         scanner.scan(package, categories=categories)
 
     @action_method
@@ -2141,7 +2292,7 @@ class Configurator(object):
             context = getattr(request, 'context', None)
             return view(context, request)
         return self.add_view(bwcompat_view, context=HTTPForbidden,
-                             wrapper=wrapper)
+                             wrapper=wrapper, renderer=renderer)
 
     @action_method
     def set_notfound_view(self, view=None, attr=None, renderer=None,
@@ -2182,7 +2333,7 @@ class Configurator(object):
             context = getattr(request, 'context', None)
             return view(context, request)
         return self.add_view(bwcompat_view, context=HTTPNotFound,
-                             wrapper=wrapper)
+                             wrapper=wrapper, renderer=renderer)
 
     @action_method
     def set_request_factory(self, factory):
@@ -2287,10 +2438,11 @@ class Configurator(object):
           If a default permission is in effect, view configurations meant to
           create a truly anonymously accessible view (even :term:`exception
           view` views) *must* use the explicit permission string
-          ``__no_permission_required__`` as the permission.  When this string
-          is used as the ``permission`` for a view configuration, the default
-          permission is ignored, and the view is registered, making it
-          available to all callers regardless of their credentials.
+          :data:`pyramid.security.NO_PERMISSION_REQUIRED` as the permission.
+          When this string is used as the ``permission`` for a view
+          configuration, the default permission is ignored, and the view is
+          registered, making it available to all callers regardless of their
+          credentials.
 
         See also :ref:`setting_a_default_permission`.
 
@@ -2417,10 +2569,10 @@ class Configurator(object):
 
         The ``permission`` keyword argument is used to specify the
         :term:`permission` required by a user to execute the static view.  By
-        default, it is the string ``__no_permission_required__``.  The
-        ``__no_permission_required__`` string is a special sentinel which
-        indicates that, even if a :term:`default permission` exists for the
-        current application, the static view should be renderered to
+        default, it is the string
+        :data:`pyramid.security.NO_PERMISSION_REQUIRED`, a special sentinel
+        which indicates that, even if a :term:`default permission` exists for
+        the current application, the static view should be renderered to
         completely anonymous users.  This default value is permissive
         because, in most web apps, static assets seldom need protection from
         viewing.  If ``permission`` is specified, the security checking will
@@ -2897,54 +3049,42 @@ class MultiView(object):
                 continue
         raise PredicateMismatch(self.name)
 
-def wraps_view(wrapped):
+def wraps_view(wrapper):
     def inner(self, view):
-        wrapped_view = wrapped(self, view)
-        return preserve_view_attrs(view, wrapped_view)
+        wrapper_view = wrapper(self, view)
+        return preserve_view_attrs(view, wrapper_view)
     return inner
 
-def preserve_view_attrs(view, wrapped_view):
-    if wrapped_view is view:
+def preserve_view_attrs(view, wrapper):
+    if wrapper is view:
         return view
+
     original_view = getattr(view, '__original_view__', None)
+
     if original_view is None:
         original_view = view
-    wrapped_view.__original_view__ = original_view
-    wrapped_view.__module__ = view.__module__
-    wrapped_view.__doc__ = view.__doc__
+
+    wrapper.__wraps__ = view
+    wrapper.__original_view__ = original_view
+    wrapper.__module__ = view.__module__
+    wrapper.__doc__ = view.__doc__
+
     try:
-        wrapped_view.__name__ = view.__name__
+        wrapper.__name__ = view.__name__
     except AttributeError:
-        wrapped_view.__name__ = repr(view)
-    try:
-        wrapped_view.__permitted__ = view.__permitted__
-    except AttributeError:
-        pass
-    try:
-        wrapped_view.__call_permissive__ = view.__call_permissive__
-    except AttributeError:
-        pass
-    try:
-        wrapped_view.__permission__ = view.__permission__
-    except AttributeError:
-        pass
-    try:
-        wrapped_view.__predicated__ = view.__predicated__
-    except AttributeError:
-        pass
-    try:
-        wrapped_view.__predicates__ = view.__predicates__
-    except AttributeError:
-        pass
-    try:
-        wrapped_view.__accept__ = view.__accept__
-    except AttributeError:
-        pass
-    try:
-        wrapped_view.__order__ = view.__order__
-    except AttributeError:
-        pass
-    return wrapped_view
+        wrapper.__name__ = repr(view)
+
+    # attrs that may not exist on "view", but, if so, must be attached to
+    # "wrapped view"
+    for attr in ('__permitted__', '__call_permissive__', '__permission__',
+                 '__predicated__', '__predicates__', '__accept__',
+                 '__order__'):
+        try:
+            setattr(wrapper, attr, getattr(view, attr))
+        except AttributeError:
+            pass
+
+    return wrapper
 
 class ViewDeriver(object):
     def __init__(self, **kw):
@@ -2960,8 +3100,8 @@ class ViewDeriver(object):
                 self.authdebug_view(
                     self.secured_view(
                         self.owrapped_view(
-                            self.decorated_view(
-                                self.http_cached_view(
+                            self.http_cached_view(
+                                self.decorated_view(
                                     self.rendered_view(
                                         self.mapped_view(view)))))))))
 
@@ -3000,11 +3140,15 @@ class ViewDeriver(object):
 
     @wraps_view
     def http_cached_view(self, view):
+        if self.registry.settings.get('prevent_http_cache', False):
+            return view
+        
         seconds = self.kw.get('http_cache')
-        options = {}
 
         if seconds is None:
             return view
+
+        options = {}
 
         if isinstance(seconds, (tuple, list)):
             try:
@@ -3016,9 +3160,10 @@ class ViewDeriver(object):
 
         def wrapper(context, request):
             response = view(context, request)
-            cache_expires = getattr(response, 'cache_expires', None)
-            if cache_expires is not None:
-                cache_expires(seconds, **options)
+            prevent_caching = getattr(response.cache_control, 'prevent_auto',
+                                      False)
+            if not prevent_caching:
+                response.cache_expires(seconds, **options)
             return response
 
         return wrapper
@@ -3026,7 +3171,7 @@ class ViewDeriver(object):
     @wraps_view
     def secured_view(self, view):
         permission = self.kw.get('permission')
-        if permission == '__no_permission_required__':
+        if permission == NO_PERMISSION_REQUIRED:
             # allow views registered within configurations that have a
             # default permission to explicitly override the default
             # permission, replacing it with no permission at all
@@ -3128,19 +3273,26 @@ class ViewDeriver(object):
 
     @wraps_view
     def rendered_view(self, view):
-        wrapped_view = view
-        static_renderer = self.kw.get('renderer')
-        if static_renderer is None:
+        # one way or another this wrapper must produce a Response (unless
+        # the renderer is a NullRendererHelper)
+        renderer = self.kw.get('renderer')
+        if renderer is None:
             # register a default renderer if you want super-dynamic
             # rendering.  registering a default renderer will also allow
             # override_renderer to work if a renderer is left unspecified for
             # a view registration.
+            return self._response_resolved_view(view)
+        if renderer is renderers.null_renderer:
             return view
+        return self._rendered_view(view, renderer)
 
-        def _rendered_view(context, request):
-            renderer = static_renderer
-            result = wrapped_view(context, request)
-            registry = self.kw['registry']
+    def _rendered_view(self, view, view_renderer):
+        def rendered_view(context, request):
+            renderer = view_renderer
+            result = view(context, request)
+            registry = self.registry
+            # this must adapt, it can't do a simple interface check
+            # (avoid trying to render webob responses)
             response = registry.queryAdapterOrSelf(result, IResponse)
             if response is None:
                 attrs = getattr(request, '__dict__', {})
@@ -3153,13 +3305,25 @@ class ViewDeriver(object):
                 if '__view__' in attrs:
                     view_inst = attrs.pop('__view__')
                 else:
-                    view_inst = getattr(wrapped_view, '__original_view__',
-                                        wrapped_view)
+                    view_inst = getattr(view, '__original_view__', view)
                 response = renderer.render_view(request, result, view_inst,
                                                 context)
             return response
 
-        return _rendered_view
+        return rendered_view
+
+    def _response_resolved_view(self, view):
+        registry = self.registry
+        def viewresult_to_response(context, request):
+            result = view(context, request)
+            response = registry.queryAdapterOrSelf(result, IResponse)
+            if response is None:
+                raise ValueError(
+                    'Could not convert view return value "%s" into a '
+                    'response object' % (result,))
+            return response
+
+        return viewresult_to_response
 
     @wraps_view
     def decorated_view(self, view):
@@ -3322,4 +3486,6 @@ def isexception(o):
         isinstance(o, Exception) or
         (inspect.isclass(o) and (issubclass(o, Exception)))
         )
+
+global_registries = WeakOrderedSet()
 
