@@ -4,6 +4,8 @@ Pyramid TODOs
 Should-Have
 -----------
 
+- Document aodag's route prefix stuff.
+
 - BeforeRender event subclasses dict but implements a bunch of shit.  Its
   repr is currently broken (it always shows empty).  Decide what to do.
 
@@ -30,8 +32,6 @@ Should-Have
 
 - Try to figure out a way to keep "settings" as the original dictionary
   passed to the Configurator instead of copying it.
-
-- Merge aodag's config.include(route_prefix=...) fork.
 
 - Merge Michael's route group work.
 
