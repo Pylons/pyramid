@@ -278,7 +278,7 @@ class Configurator(object):
 
     If ``route_prefix`` is passed, all routes added with
     :meth:`pyramid.config.Configurator.add_route` will have the specified path
-    prepended to their pattern. This parameter is new in Pyramid 1.x."""
+    prepended to their pattern. This parameter is new in Pyramid 1.2."""
 
     manager = manager # for testing injection
     venusian = venusian # for testing injection
@@ -1009,7 +1009,7 @@ class Configurator(object):
 
         For more information, see :ref:`registering_tweens`.
 
-        .. note:: This feature is new as of Pyramid 1.1.1.
+        .. note:: This feature is new as of Pyramid 1.2.
         """
         return self._add_tween(tween_factory, alias=alias, under=under,
                                over=over, explicit=False)

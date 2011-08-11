@@ -311,7 +311,7 @@ class IBeforeRender(Interface):
 
     rendering_val = Attribute('The value returned by a view or passed to a '
                               '``render`` method for this rendering. '
-                              'This feature is new in Pyramid 1.1.1.')
+                              'This feature is new in Pyramid 1.2.')
 
 class IRenderer(Interface):
     def __call__(value, system):

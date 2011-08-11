@@ -833,7 +833,7 @@ For full details, please read the `Venusian documentation
 Registering "Tweens"
 --------------------
 
-.. note:: Tweens are a feature which were added in Pyramid 1.1.1.  They are
+.. note:: Tweens are a feature which were added in Pyramid 1.2.  They are
    not available in any previous version.
 
 A :term:`tween` (a contraction of the word "between") is a bit of code that

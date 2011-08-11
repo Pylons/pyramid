@@ -197,7 +197,7 @@ class BeforeRender(dict):
 
     The event has an additional attribute named ``rendering_val``.  This is
     the (non-system) value returned by a view or passed to ``render*`` as
-    ``value``.  This feature is new in Pyramid 1.1.1.
+    ``value``.  This feature is new in Pyramid 1.2.
     """
 
     def __init__(self, system, rendering_val=None):
