@@ -4,8 +4,6 @@ Pyramid TODOs
 Should-Have
 -----------
 
-- Document aodag's route prefix stuff.
-
 - BeforeRender event subclasses dict but implements a bunch of shit.  Its
   repr is currently broken (it always shows empty).  Decide what to do.
 
