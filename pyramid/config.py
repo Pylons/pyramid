@@ -536,7 +536,7 @@ class Configurator(object):
         """Include a configuration callables, to support imperative
         application extensibility.
 
-        .. warning:: In versions of :app:`Pyramid` prior to 1.x, this
+        .. warning:: In versions of :app:`Pyramid` prior to 1.2, this
             function accepted ``*callables``, but this has been changed
             to support only a single callable.
 
@@ -599,12 +599,32 @@ class Configurator(object):
         configuration conflict by registering something with the same
         configuration parameters.
 
-        If the ``route_prefix`` is supplied, any calls to
-        :meth:`pyramid.config.Configurator.add_route` within the ``callable``
-        will have their pattern prefixed with ``route_prefix``. This can
-        be used to help mount a set of routes at a different location than
-        the ``callable``-author intended while still maintaining the same
-        route names. This parameter is new as of Pyramid 1.2."""
+        If the ``route_prefix`` is supplied, it must be a string.  Any calls
+        to :meth:`pyramid.config.Configurator.add_route` within the included
+        callable will have their pattern prefixed with the value of
+        ``route_prefix``. This can be used to help mount a set of routes at a
+        different location than the included callable's author intended while
+        still maintaining the same route names.  For example:
+            
+        .. code-block:: python
+           :linenos:
+
+           from pyramid.config import Configurator
+
+           def included(config):
+               config.add_route('show_users', '/show')
+               
+           def main(global_config, **settings):
+               config = Configurator()
+               config.include(included, route_prefix='/users')
+
+        In the above configuration, the ``show_users`` route will have an
+        effective route pattern of ``/users/show``, instead of ``/show``
+        because the ``route_prefix`` argument will be prepended to the
+        pattern.
+
+        The ``route_prefix`` parameter is new as of Pyramid 1.2.
+        """
 
         _context = self._ctx
         if _context is None:

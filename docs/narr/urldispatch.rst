@@ -1082,6 +1082,96 @@ either of them in detail.
 If no route is matched using :term:`URL dispatch`, :app:`Pyramid` falls back
 to :term:`traversal` to handle the :term:`request`.
 
+.. _route_prefix:
+
+Using a Route Prefix to Compose Applications
+--------------------------------------------
+
+.. note:: This feature is new as of :app:`Pyramid` 1.2.
+
+The :meth:`pyramid.config.Configurator.include` method allows configuration
+statements to be included from separate files.  See
+:ref:`building_an_extensible_app` for information about this method.  Using
+:meth:`pyramid.config.Configurator.include` allows you to build your
+application from small and potentially reusable components.
+
+The :meth:`pyramid.config.Configurator.include` method accepts an argument
+named ``route_prefix`` which can be useful to authors of URL-dispatch-based
+applications.  If ``route_prefix`` is supplied to the include method, it must
+be a string.  This string represents a route prefix that will be prepended to
+all route patterns added by the *included* configuration.  Any calls to
+:meth:`pyramid.config.Configurator.add_route` within the included callable
+will have their pattern prefixed with the value of ``route_prefix``. This can
+be used to help mount a set of routes at a different location than the
+included callable's author intended while still maintaining the same route
+names.  For example:
+            
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+
+   def users_include(config):
+       config.add_route('show_users', '/show')
+       
+   def main(global_config, **settings):
+       config = Configurator()
+       config.include(users_include, route_prefix='/users')
+
+In the above configuration, the ``show_users`` route will have an effective
+route pattern of ``/users/show``, instead of ``/show`` because the
+``route_prefix`` argument will be prepended to the pattern.  The route will
+then only match if the URL path is ``/users/show``, and when the
+:func:`pyramid.url.route_url` function is called with the route name
+``show_users``, it will generate a URL with that same path.
+
+Route prefixes are recursive, so if a callable executed via an include itself
+turns around and includes another callable, the second-level route prefix
+will be prepended with the first:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+
+   def timing_include(config):
+       config.add_route('show_times', /times')
+       
+   def users_include(config):
+       config.add_route('show_users', '/show')
+       config.include(timing_include, route_prefix='/timing')
+
+   def main(global_config, **settings):
+       config = Configurator()
+       config.include(users_include, route_prefix='/users')
+
+In the above configuration, the ``show_users`` route will still have an
+effective route pattern of ``/users/show``.  The ``show_times`` route
+however, will have an effective pattern of ``/users/timing/show_times``.
+
+Route prefixes have no impact on the requirement that the set of route
+*names* in any given Pyramid configuration must be entirely unique.  If you
+compose your URL dispatch application out of many small subapplications using
+:meth:`pyramid.config.Configurator.include`, it's wise to use a dotted name
+for your route names, so they'll be unlikely to conflict with other packages
+that may be added in the future.  For example:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+
+   def timing_include(config):
+       config.add_route('timing.show_times', /times')
+       
+   def users_include(config):
+       config.add_route('users.show_users', '/show')
+       config.include(timing_include, route_prefix='/timing')
+
+   def main(global_config, **settings):
+       config = Configurator()
+       config.include(users_include, route_prefix='/users')
+
 References
 ----------
 

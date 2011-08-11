@@ -4,6 +4,12 @@ Next release
 Features
 --------
 
+- Added a ``route_prefix`` argument to the
+  ``pyramid.config.Configurator.include`` method.  This argument allows you
+  to compose URL dispatch applications together.  See the section entitled
+  "Using a Route Prefix to Compose Applications" in the "URL Dispatch"
+  narrative documentation chapter.
+
 - Added a ``pyramid.security.NO_PERMISSION_REQUIRED`` constant for use in
   ``permission=`` statements to view configuration.  This constant has a
   value of the string ``__no_permission_required__``.  This string value was
@@ -65,8 +71,17 @@ Backwards Incompatibilities
   that string is considered to be the name of a global Python logger rather
   than a dotted name to an instance of a logger.
 
+- The ``pyramid.config.Configurator.include`` method now accepts only a
+  single ``callable`` argument (a sequence of callables used to be
+  permitted).  If you are passing more than one ``callable`` to
+  ``pyramid.config.Configurator.include``, it will break.  You now must now
+  instead make a separate call to the method for each callable.
+
 Documentation
 -------------
+
+- Added a section entitled "Using a Route Prefix to Compose Applications" to
+  the "URL Dispatch" narrative documentation chapter.
 
 - Added a new module to the API docs: ``pyramid.tweens``.
 

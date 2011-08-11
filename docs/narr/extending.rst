@@ -62,6 +62,8 @@ Pyramid applications are *extensible*.
 .. index::
    single: extensible application
 
+.. _building_an_extensible_app:
+
 Rules for Building An Extensible Application
 --------------------------------------------
 
