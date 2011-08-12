@@ -995,6 +995,9 @@ class Configurator(object):
         
         - One of the constants :attr:`pyramid.tweens.MAIN`,
           :attr:`pyramid.tweens.INGRESS`, or :attr:`pyramid.tweens.EXCVIEW`.
+
+        - A tuple of any combination of the above. This allows the user
+          to specify fallbacks if the desired tween is not included.
         
         ``under`` means 'closer to the main Pyramid application than',
         ``over`` means 'closer to the request ingress than'.
