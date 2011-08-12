@@ -327,7 +327,7 @@ when you use the ``production.ini`` file instead of the ``development.ini``
 ini file to run the application.
 
 You can also turn the debug toolbar off by editing ``development.ini`` and
-commenting out the line ``pyramid.include = pyramid_debugtoolbar``.  For
+commenting out the line ``pyramid.includes = pyramid_debugtoolbar``.  For
 example, instead of:
 
 .. code-block:: ini
@@ -335,16 +335,16 @@ example, instead of:
 
    [app:MyApp]
    ...
-   pyramid.include = pyramid_debugtoolbar
+   pyramid.includes = pyramid_debugtoolbar
 
-Put a hash mark in front of the ``pyramid.include`` line:
+Put a hash mark in front of the ``pyramid.includes`` line:
 
 .. code-block:: ini
    :linenos:
 
    [app:MyApp]
    ...
-   #pyramid.include = pyramid_debugtoolbar
+   #pyramid.includes = pyramid_debugtoolbar
 
 Then restart the application to see that the toolbar has been turned off.
 
@@ -526,9 +526,9 @@ information.
    options should be turned off for production applications, as template
    rendering is slowed when either is turned on.
 
-The ``pyramid.include`` setting in the ``[app:MyProject]`` section tells
+The ``pyramid.includes`` setting in the ``[app:MyProject]`` section tells
 Pyramid to "include" configuration from another package.  In this case, the
-line ``pyramid.include = pyramid_debugtoolbar`` tells Pyramid to include
+line ``pyramid.includes = pyramid_debugtoolbar`` tells Pyramid to include
 configuration from the ``pyramid_debugtoolbar`` package.  This turns on a
 debugging panel in development mode which will be shown on the right hand
 side of the screen.  Including the debug toolbar will also make it possible
