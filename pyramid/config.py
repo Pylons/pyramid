@@ -979,8 +979,8 @@ class Configurator(object):
         The ``under`` and ``over`` arguments allow the caller of
         ``add_tween`` to provide a hint about where in the tween chain this
         tween factory should be placed when an implicit tween chain is used.
-        These hints are only used used when an explicit tween chain is not
-        used (when the ``pyramid.tweens`` configuration value is not set).
+        These hints are only used when an explicit tween chain is not used
+        (when the ``pyramid.tweens`` configuration value is not set).
         Allowable values for ``under`` or ``over`` (or both) are:
 
         - ``None`` (the default).
