@@ -577,7 +577,7 @@ class ConfiguratorTests(unittest.TestCase):
         reg = Registry()
         config = self._makeOne(reg)
         settings = {
-            'pyramid.include': """pyramid.tests.test_config.dummy_include
+            'pyramid.includes': """pyramid.tests.test_config.dummy_include
 pyramid.tests.test_config.dummy_include2""",
         }
         config.setup_registry(settings=settings)
