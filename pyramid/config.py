@@ -73,6 +73,7 @@ from pyramid.asset import PackageOverrides
 from pyramid.asset import resolve_asset_spec
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.settings import Settings
+from pyramid.settings import aslist
 from pyramid.static import StaticURLInfo
 from pyramid.threadlocal import get_current_registry
 from pyramid.threadlocal import get_current_request
@@ -771,10 +772,8 @@ class Configurator(object):
         tweens = []
         includes = []
         if settings:
-            includes = [x.strip() for x in
-                        settings.get('pyramid.includes', '').splitlines()]
-            tweens =   [x.strip() for x in
-                        settings.get('pyramid.tweens','').splitlines()]
+            includes = aslist(settings.get('pyramid.includes', ''))
+            tweens   = aslist(settings.get('pyramid.tweens', ''))
         registry = self.registry
         self._fix_registry()
         self._set_settings(settings)

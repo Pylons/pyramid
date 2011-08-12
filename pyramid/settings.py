@@ -6,6 +6,7 @@ from zope.interface import implements
 from pyramid.interfaces import ISettings
 
 from pyramid.threadlocal import get_current_registry
+from pyramid.util import DottedNameResolver
 
 class Settings(dict):
     """ Deployment settings.  Update application settings (usually
@@ -138,3 +139,15 @@ def asbool(s):
     s = str(s).strip()
     return s.lower() in ('t', 'true', 'y', 'yes', 'on', '1')
 
+def aslist_cronly(value):
+    if isinstance(value, basestring):
+        value = filter(None, [x.strip() for x in value.splitlines()])
+    return value
+
+def aslist(value):
+    values = aslist_cronly(value)
+    result = []
+    for value in values:
+        subvalues = value.split()
+        result.extend(subvalues)
+    return result

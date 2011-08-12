@@ -584,6 +584,17 @@ pyramid.tests.test_config.dummy_include2""",
         self.assert_(reg.included)
         self.assert_(reg.also_included)
 
+    def test_setup_registry_includes_spaces(self):
+        from pyramid.registry import Registry
+        reg = Registry()
+        config = self._makeOne(reg)
+        settings = {
+            'pyramid.includes': """pyramid.tests.test_config.dummy_include pyramid.tests.test_config.dummy_include2""",
+        }
+        config.setup_registry(settings=settings)
+        self.assert_(reg.included)
+        self.assert_(reg.also_included)
+
     def test_setup_registry_tweens(self):
         from pyramid.interfaces import ITweens
         from pyramid.registry import Registry

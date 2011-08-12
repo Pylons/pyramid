@@ -185,6 +185,104 @@ The value supplied here is used as the default locale name when a
 |                                 |                                   |
 +---------------------------------+-----------------------------------+
 
+Including Packages
+------------------
+
+``pyramid.includes`` instructs your application to include other packages.
+Using the setting is equivalent to using the
+:meth:`pyramid.config.Configurator.include` method.  
+
++---------------------------------+
+| Config File Setting Name        |
++=================================+
+| ``pyramid.includes``            |
+|                                 |
+|                                 |
+|                                 |
++---------------------------------+
+
+The value supplied as ``pyramid.includes`` should be a sequence.  The
+sequence can take several different forms.
+
+1) It can be a string.
+
+   If it is a string, the package names can be separated by spaces::
+
+      package1 package2 package3
+
+    The package names can also be separated by carriage returns::
+
+       package1
+       package2
+       package3
+
+2) It can be a Python list, where the values are strings::
+
+   ['package1', 'package2', 'package3']
+
+Each value in the sequence should be a :term:`dotted Python name`.
+
+``pyramid.includes`` vs. :meth:`pyramid.config.Configurator.include`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+PasteDeploy
++++++++++++
+
+Using the following ``pyramid.includes`` setting in the PasteDeploy ``.ini``
+file in your application:
+
+.. code-block:: ini
+
+  [app:myapp]
+  pyramid.includes = pyramid_debugtoolbar
+                     pyramid_tm
+
+Is equivalent to using the following statements in your configuration code:
+
+.. code-block:: python
+   :linenos:
+
+  from pyramid.config import Configurator
+
+  def main(global_config, **settings):
+      config = Configurator(settings=settings)
+      # ...
+      config.include('pyramid_debugtoolbar')
+      config.include('pyramid_tm')
+      # ...
+
+It is fine to use both or either form.
+
+Plain Python
+++++++++++++
+
+Using the following ``pyramid.includes`` setting in your plain-Python Pyramid
+application: 
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+
+   if __name__ == '__main__':
+       settings = {'pyramid.includes':'pyramid_debugtoolbar pyramid_tm'}
+       config = Configurator(settings=settings)
+
+Is equivalent to using the following statements in your configuration code:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+
+   if __name__ == '__main__':
+       settings = {}
+       config = Configurator(settings=settings)
+       config.include('pyramid_debugtoolbar')
+       config.include('pyramid_tm')
+
+It is fine to use both or either form.
+
 .. _mako_template_renderer_settings:
 
 Mako Template Render Settings
