@@ -1050,10 +1050,10 @@ class Configurator(object):
         if alias in (MAIN, INGRESS):
             raise ConfigurationError('%s is a reserved tween name' % alias)
 
-        if over is INGRESS:
+        if over is INGRESS or hasattr(over, '__iter__') and INGRESS in over:
             raise ConfigurationError('%s cannot be over INGRESS' % name)
 
-        if under is MAIN:
+        if under is MAIN or hasattr(under, '__iter__') and MAIN in under:
             raise ConfigurationError('%s cannot be under MAIN' % name)
 
         registry = self.registry

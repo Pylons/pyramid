@@ -752,6 +752,14 @@ pyramid.tests.test_config.dummy_include2""",
             config.add_tween, 'pyramid.tests.test_config.dummy_tween_factory',
             over=INGRESS)
 
+    def test_add_tween_over_ingress_iterable(self):
+        from pyramid.exceptions import ConfigurationError
+        from pyramid.tweens import INGRESS
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError,
+            config.add_tween, 'pyramid.tests.test_config.dummy_tween_factory',
+            over=('a', INGRESS))
+
     def test_add_tween_under_main(self):
         from pyramid.exceptions import ConfigurationError
         from pyramid.tweens import MAIN
@@ -759,6 +767,14 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertRaises(ConfigurationError,
             config.add_tween, 'pyramid.tests.test_config.dummy_tween_factory',
             under=MAIN)
+
+    def test_add_tween_under_main_iterable(self):
+        from pyramid.exceptions import ConfigurationError
+        from pyramid.tweens import MAIN
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError,
+            config.add_tween, 'pyramid.tests.test_config.dummy_tween_factory',
+            under=('a', MAIN))
 
     def test_add_subscriber_defaults(self):
         from zope.interface import implements
