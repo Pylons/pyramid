@@ -225,31 +225,35 @@ Each value in the sequence should be a :term:`dotted Python name`.
 ``pyramid.includes`` vs. :meth:`pyramid.config.Configurator.include`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-PasteDeploy
-+++++++++++
+Two methods exist for including packages: ``pyramid.includes`` and
+:meth:`pyramid.config.Configurator.include`.  This section explains their
+equivalence.
+
+Using PasteDeploy
++++++++++++++++++
 
 Using the following ``pyramid.includes`` setting in the PasteDeploy ``.ini``
 file in your application:
 
 .. code-block:: ini
 
-  [app:myapp]
-  pyramid.includes = pyramid_debugtoolbar
-                     pyramid_tm
+   [app:myapp]
+   pyramid.includes = pyramid_debugtoolbar
+                      pyramid_tm
 
 Is equivalent to using the following statements in your configuration code:
 
 .. code-block:: python
    :linenos:
 
-  from pyramid.config import Configurator
+   from pyramid.config import Configurator
 
-  def main(global_config, **settings):
-      config = Configurator(settings=settings)
-      # ...
-      config.include('pyramid_debugtoolbar')
-      config.include('pyramid_tm')
-      # ...
+   def main(global_config, **settings):
+       config = Configurator(settings=settings)
+       # ...
+       config.include('pyramid_debugtoolbar')
+       config.include('pyramid_tm')
+       # ...
 
 It is fine to use both or either form.
 
@@ -337,32 +341,32 @@ sequence can take several different forms.
 Each value in the sequence should be a :term:`dotted Python name`.
 
 Paste Configuration vs. Plain-Python Configuration
-++++++++++++++++++++++++++++++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Using the following ``pyramid.tweens`` setting in the PasteDeploy ``.ini``
 file in your application:
 
 .. code-block:: ini
 
-  [app:myapp]
-  pyramid.tweens = pyramid_debugtoolbar.toolbar.tween_factory
-                   pyramid.tweens.excview_tween_factory
-                   pyramid_tm.tm_tween_factory
+   [app:myapp]
+   pyramid.tweens = pyramid_debugtoolbar.toolbar.tween_factory
+                    pyramid.tweens.excview_tween_factory
+                    pyramid_tm.tm_tween_factory
 
 Is equivalent to using the following statements in your configuration code:
 
 .. code-block:: python
    :linenos:
 
-  from pyramid.config import Configurator
-
-  def main(global_config, **settings):
-      settings['pyramid.tweens'] = [
-              'pyramid_debugtoolbar.toolbar.tween_factory',
-              'pyramid.tweebs.excview_tween_factory',
-              'pyramid_tm.tm_tween_factory',
-               ]
-      config = Configurator(settings=settings)
+   from pyramid.config import Configurator
+ 
+   def main(global_config, **settings):
+       settings['pyramid.tweens'] = [
+               'pyramid_debugtoolbar.toolbar.tween_factory',
+               'pyramid.tweebs.excview_tween_factory',
+               'pyramid_tm.tm_tween_factory',
+                ]
+       config = Configurator(settings=settings)
 
 It is fine to use both or either form.
 
@@ -379,7 +383,7 @@ Renderer uses a subclass of Mako's `template lookup
 several arguments to configure it.
 
 Mako Directories
-++++++++++++++++
+~~~~~~~~~~~~~~~~
 
 The value(s) supplied here are passed in as the template directories. They
 should be in :term:`asset specification` format, for example:
@@ -395,7 +399,7 @@ should be in :term:`asset specification` format, for example:
 +-----------------------------+
 
 Mako Module Directory
-+++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~
 
 The value supplied here tells Mako where to store compiled Mako templates. If
 omitted, compiled templates will be stored in memory. This value should be an
@@ -412,7 +416,7 @@ called ``data/templates`` in the same parent directory as the INI file.
 +-----------------------------+
 
 Mako Input Encoding
-+++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~
 
 The encoding that Mako templates are assumed to have. By default this is set
 to ``utf-8``. If you wish to use a different template encoding, this value
@@ -428,7 +432,7 @@ should be changed accordingly.
 +-----------------------------+
 
 Mako Error Handler
-++++++++++++++++++
+~~~~~~~~~~~~~~~~~~
 
 A callable (or a :term:`dotted Python name` which names a callable) which is
 called whenever Mako compile or runtime exceptions occur. The callable is
@@ -446,7 +450,7 @@ the function completes. Is used to provide custom error-rendering functions.
 +-----------------------------+
 
 Mako Default Filters
-++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~
 
 List of string filter names that will be applied to all Mako expressions.
 
@@ -460,7 +464,7 @@ List of string filter names that will be applied to all Mako expressions.
 +-----------------------------+
 
 Mako Import
-+++++++++++
+~~~~~~~~~~~
 
 String list of Python statements, typically individual "import" lines, which
 will be placed into the module level preamble of all generated Python modules.
@@ -477,7 +481,7 @@ will be placed into the module level preamble of all generated Python modules.
 
 
 Mako Strict Undefined
-+++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~
 
 ``true`` or ``false``, representing the "strict undefined" behavior of Mako
 (see `Mako Context Variables
@@ -494,7 +498,7 @@ default, this is ``false``.
 +-----------------------------+
 
 Mako Preprocessor
-+++++++++++++++++
+~~~~~~~~~~~~~~~~~
 
 A callable (or a :term:`dotted Python name` which names a callable) which is
 called to preprocess the source before the template is called.  The callable

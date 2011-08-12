@@ -931,9 +931,9 @@ entirely by the relative ordering of calls to
 add_tween can provide an optional hint that can influence the implicit tween
 chain ordering by supplying ``under`` or ``over`` (or both) arguments to
 :meth:`~pyramid.config.Configurator.add_tween`.  These hints are only used
-used when an explicit tween chain is not used (when the ``pyramid.tweens``
-configuration value is not set).  See :ref:`explicit_tweens` for a
-description of how to set an explicit tweens list.
+used when an explicit tween ordering is not used. See
+:ref:`explicit_tween_ordering` for a description of how to set an explicit
+tween ordering.
 
 Allowable values for ``under`` or ``over`` (or both) are:
 

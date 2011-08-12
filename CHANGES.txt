@@ -4,6 +4,10 @@ Next release
 Features
 --------
 
+- A new configuration setting named ``pyramid.includes`` is now available.
+  It is described in the "Environment Variables and ``.ini`` Files Settings"
+  narrative documentation chapter.
+
 - Added a ``route_prefix`` argument to the
   ``pyramid.config.Configurator.include`` method.  This argument allows you
   to compose URL dispatch applications together.  See the section entitled
@@ -89,6 +93,10 @@ Documentation
 
 - Added a "Displaying Tweens" section to the "Command-Line Pyramid" narrative
   chapter.
+
+- Added documentation for the ``pyramid.tweens`` and ``pyramid.includes``
+  configuration settings to the "Environment Variables and ``.ini`` Files
+  Settings" chapter.
 
 Bug Fixes
 ---------
