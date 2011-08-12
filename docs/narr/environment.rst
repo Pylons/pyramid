@@ -283,6 +283,89 @@ Is equivalent to using the following statements in your configuration code:
 
 It is fine to use both or either form.
 
+Explicit Tween Configuration
+----------------------------
+
+This value allows you to perform explicit :term:`tween` ordering in your
+configuration.  Tweens are bits of code used by add-on authors to extend
+Pyramid.  They form a chain, and require ordering.
+
+Ideally, you won't need to use the ``pyramid.tweens`` setting at all.  Tweens
+are generally ordered and included "implicitly" when an add-on package which
+registers a tween is "included".  Packages are included when you name a
+``pyramid.includes`` setting in your configuration or when you call
+:meth:`pyramid.config.Configuration.include`.
+
+Authors of included add-ons provide "implicit" tween configuration ordering
+hints to Pyramid when their packages are included.  However, the implicit
+tween ordering is only best-effort.  Pyramid will attempt to provide an
+implicit order of tweens as best it can using hints provided by add-on
+authors, but because it's only best-effort, if very precise tween ordering is
+required, the only surefire way to get it is to use an explicit tween order.
+You may be required to inspect your tween ordering (see
+:ref:`displaying_tweens`) and add a ``pyramid.tweens`` configuration value at
+the behest of an add-on author.
+
++---------------------------------+
+| Config File Setting Name        |
++=================================+
+| ``pyramid.tweens``              |
+|                                 |
+|                                 |
+|                                 |
++---------------------------------+
+
+The value supplied as ``pyramid.tweens`` should be a sequence.  The
+sequence can take several different forms.
+
+1) It can be a string.
+
+   If it is a string, the tween names can be separated by spaces::
+
+      pkg.tween_factory1 pkg.tween_factory2 pkg.tween_factory3
+
+    The tween names can also be separated by carriage returns::
+
+       pkg.tween_factory1
+       pkg.tween_factory2
+       pkg.tween_factory3
+
+2) It can be a Python list, where the values are strings::
+
+   ['pkg.tween_factory1', 'pkg.tween_factory2', 'pkg.tween_factory3']
+
+Each value in the sequence should be a :term:`dotted Python name`.
+
+Paste Configuration vs. Plain-Python Configuration
+++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Using the following ``pyramid.tweens`` setting in the PasteDeploy ``.ini``
+file in your application:
+
+.. code-block:: ini
+
+  [app:myapp]
+  pyramid.tweens = pyramid_debugtoolbar.toolbar.tween_factory
+                   pyramid.tweens.excview_tween_factory
+                   pyramid_tm.tm_tween_factory
+
+Is equivalent to using the following statements in your configuration code:
+
+.. code-block:: python
+   :linenos:
+
+  from pyramid.config import Configurator
+
+  def main(global_config, **settings):
+      settings['pyramid.tweens'] = [
+              'pyramid_debugtoolbar.toolbar.tween_factory',
+              'pyramid.tweebs.excview_tween_factory',
+              'pyramid_tm.tm_tween_factory',
+               ]
+      config = Configurator(settings=settings)
+
+It is fine to use both or either form.
+
 .. _mako_template_renderer_settings:
 
 Mako Template Render Settings

@@ -932,7 +932,8 @@ add_tween can provide an optional hint that can influence the implicit tween
 chain ordering by supplying ``under`` or ``over`` (or both) arguments to
 :meth:`~pyramid.config.Configurator.add_tween`.  These hints are only used
 used when an explicit tween chain is not used (when the ``pyramid.tweens``
-configuration value is not set).
+configuration value is not set).  See :ref:`explicit_tweens` for a
+description of how to set an explicit tweens list.
 
 Allowable values for ``under`` or ``over`` (or both) are:
 
@@ -1026,6 +1027,11 @@ For example:
 Alias names are only useful in relation to ``under`` and ``over`` values.
 They cannot be used in explicit tween chain configuration, or anywhere else.
 
+.. _explicit_tween_ordering:
+
+Explicit Tween Ordering
+~~~~~~~~~~~~~~~~~~~~~~~
+
 Implicit tween ordering is obviously only best-effort.  Pyramid will attempt
 to provide an implicit order of tweens as best it can using hints provided by
 calls to :meth:`~pyramid.config.Configurator.add_tween`, but because it's
@@ -1069,6 +1075,9 @@ handler is implicit, and always "at the bottom".
    ``pyramid.tweens`` configuration setting list explicitly.  If it is not
    present, Pyramid will not perform exception view handling.
 
+Tween Conflicts and Ordering Cycles
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Pyramid will prevent the same tween factory from being added to the tween
 chain more than once using configuration conflict detection.  If you wish to
 add the same tween factory more than once in a configuration, you should
@@ -1081,6 +1090,9 @@ to :meth:`pyramid.config.Configurator.add_tween`.
 If a cycle is detected in implicit tween ordering when ``over`` and ``under``
 are used in any call to "add_tween", an exception will be raised at startup
 time.
+
+Displaying Tween Ordering
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``paster ptweens`` command-line utility can be used to report the current
 implict and explicit tween chains used by an application.  See
