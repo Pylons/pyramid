@@ -769,7 +769,14 @@ class TestRouter(unittest.TestCase):
         exception_response = DummyResponse()
         exception_response.app_iter = ["Hello, world"]
         view = DummyView(response, raise_exception=RuntimeError)
-        exception_view = DummyView(exception_response)
+
+        class SimpleView(DummyView):
+            def __call__(self, context, request):
+                self.last_exception = getattr(request, 'exception', None)
+                self.last_exc_info = getattr(request, 'exc_info', None)
+                return DummyView.__call__(self, context, request)
+
+        exception_view = SimpleView(exception_response)
         environ = self._makeEnviron()
         self._registerView(view, '', IViewClassifier, IRequest, None)
         self._registerView(exception_view, '', IExceptionViewClassifier,
@@ -778,7 +785,8 @@ class TestRouter(unittest.TestCase):
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(result, ["Hello, world"])
-        self.assertEqual(view.request.exception.__class__, RuntimeError)
+        self.assertEqual(exception_view.last_exception.__class__, RuntimeError)
+        self.assertTrue(exception_view.last_exc_info is not None)
 
     def test_call_view_raises_super_exception_sub_exception_view(self):
         from pyramid.interfaces import IViewClassifier
