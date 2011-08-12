@@ -1,3 +1,4 @@
+import sys
 from zope.interface import implements
 from zope.interface import providedBy
 
@@ -160,6 +161,7 @@ class Router(object):
                 # handle exceptions raised during root finding and view-exec
                 except Exception, why:
                     attrs['exception'] = why
+                    attrs['exc_info'] = sys.exc_info()
 
                     for_ = (IExceptionViewClassifier,
                             request_iface.combined,
@@ -177,7 +179,13 @@ class Router(object):
                     # repoze.bfg.message docs-deprecated in Pyramid 1.0
                     environ['repoze.bfg.message'] = msg
 
-                    response = view_callable(why, request)
+                    try:
+                        response = view_callable(why, request)
+                    finally:
+                        if 'exc_info' in attrs:
+                            del attrs['exc_info']
+                        if 'exception' in attrs:
+                            del attrs['exception']
 
                 # process the response
 
