@@ -4,6 +4,11 @@ Pyramid TODOs
 Should-Have
 -----------
 
+- Make it possible to use tween aliases in explicit tween config?  If not,
+  the tween factories of all add-ons must be APIs.
+
+- Tween factories that are instances get a weird name.  Disallow?
+
 - BeforeRender event subclasses dict but implements a bunch of shit.  Its
   repr is currently broken (it always shows empty).  Decide what to do.
 
