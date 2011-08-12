@@ -98,6 +98,12 @@ Documentation
   configuration settings to the "Environment Variables and ``.ini`` Files
   Settings" chapter.
 
+Dependency Changes
+------------------
+
+- Pyramid now relies on PasteScript >= 1.7.4.  This version contains a
+  feature important for allowing flexible logging configuration.
+
 Bug Fixes
 ---------
 

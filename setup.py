@@ -30,7 +30,7 @@ install_requires=[
     'Mako >= 0.3.6', # strict_undefined
     'Paste > 1.7', # temp version pin to prevent PyPi install failure :-(
     'PasteDeploy',
-    'PasteScript',
+    'PasteScript >= 1.7.4', # "here" in logging fileConfig
     'WebOb >= 1.0.2', # no "default_charset"; request.script_name doesnt error
     'repoze.lru',
     'setuptools',
