@@ -67,7 +67,6 @@ class Tweens(object):
         self.names = []
         self.factories = {}
         self.order = []
-        self.ingress_alias_names = []
         self.alias_to_name = {INGRESS:INGRESS, MAIN:MAIN}
         self.name_to_alias = {INGRESS:INGRESS, MAIN:MAIN}
 
@@ -83,7 +82,6 @@ class Tweens(object):
         self.factories[name] = factory
         if under is None and over is None:
             under = INGRESS
-            self.ingress_alias_names.append(alias)
         if under is not None:
             self.order.append((under, alias))
         if over is not None:
@@ -95,7 +93,6 @@ class Tweens(object):
         graph = {}
         has_order = {}
         aliases = [INGRESS, MAIN]
-        ingress_alias_names = self.ingress_alias_names[:]
 
         for name in self.names:
             aliases.append(self.name_to_alias[name])
@@ -132,7 +129,6 @@ class Tweens(object):
             # as if it were added with no under or over in add_implicit
             if (not alias in has_order) and (alias not in (INGRESS, MAIN)):
                 order.append((INGRESS, alias))
-                ingress_alias_names.append(alias)
             add_node(alias)
 
         for a, b in order:
@@ -163,8 +159,8 @@ class Tweens(object):
         result = []
 
         for alias in sorted_aliases:
-            if alias not in (MAIN, INGRESS):
-                name = self.alias_to_name.get(alias, alias)
+            name = self.alias_to_name.get(alias, alias)
+            if name in self.names:
                 result.append((name, self.factories[name]))
 
         return result

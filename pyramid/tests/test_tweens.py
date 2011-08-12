@@ -23,7 +23,6 @@ class TestTweens(unittest.TestCase):
         self.assertEqual(tweens.alias_to_name['name'], 'name')
         self.assertEqual(tweens.name_to_alias['name'], 'name')
         self.assertEqual(tweens.order, [(INGRESS, 'name')])
-        self.assertEqual(tweens.ingress_alias_names, ['name'])
         tweens.add_implicit('name2', 'factory2')
         self.assertEqual(tweens.names, ['name',  'name2'])
         self.assertEqual(tweens.factories,
@@ -32,7 +31,6 @@ class TestTweens(unittest.TestCase):
         self.assertEqual(tweens.name_to_alias['name2'], 'name2')
         self.assertEqual(tweens.order,
                          [(INGRESS, 'name'), (INGRESS, 'name2')])
-        self.assertEqual(tweens.ingress_alias_names, ['name', 'name2'])
         tweens.add_implicit('name3', 'factory3', over='name2')
         self.assertEqual(tweens.names,
                          ['name',  'name2', 'name3'])
@@ -44,7 +42,6 @@ class TestTweens(unittest.TestCase):
         self.assertEqual(tweens.order,
                          [(INGRESS, 'name'), (INGRESS, 'name2'),
                           ('name3', 'name2')])
-        self.assertEqual(tweens.ingress_alias_names, ['name', 'name2'])
 
     def test_add_implicit_withaliases(self):
         from pyramid.tweens import INGRESS
@@ -56,7 +53,6 @@ class TestTweens(unittest.TestCase):
         self.assertEqual(tweens.alias_to_name['n1'], 'name1')
         self.assertEqual(tweens.name_to_alias['name1'], 'n1')
         self.assertEqual(tweens.order, [(INGRESS, 'n1')])
-        self.assertEqual(tweens.ingress_alias_names, ['n1'])
         tweens.add_implicit('name2', 'factory2', alias='n2')
         self.assertEqual(tweens.names, ['name1',  'name2'])
         self.assertEqual(tweens.factories,
@@ -65,7 +61,6 @@ class TestTweens(unittest.TestCase):
         self.assertEqual(tweens.name_to_alias['name2'], 'n2')
         self.assertEqual(tweens.order,
                          [(INGRESS, 'n1'), (INGRESS, 'n2')])
-        self.assertEqual(tweens.ingress_alias_names, ['n1', 'n2'])
         tweens.add_implicit('name3', 'factory3', alias='n3', over='name2')
         self.assertEqual(tweens.names,
                          ['name1',  'name2', 'name3'])
@@ -77,7 +72,6 @@ class TestTweens(unittest.TestCase):
         self.assertEqual(tweens.order,
                          [(INGRESS, 'n1'), (INGRESS, 'n2'),
                           ('n3', 'name2')])
-        self.assertEqual(tweens.ingress_alias_names, ['n1', 'n2'])
 
     def test___call___explicit(self):
         tweens = self._makeOne()
