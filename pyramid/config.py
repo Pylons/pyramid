@@ -772,7 +772,7 @@ class Configurator(object):
         includes = []
         if settings:
             includes = [x.strip() for x in
-                        settings.get('pyramid.include', '').splitlines()]
+                        settings.get('pyramid.includes', '').splitlines()]
             tweens =   [x.strip() for x in
                         settings.get('pyramid.tweens','').splitlines()]
         registry = self.registry
