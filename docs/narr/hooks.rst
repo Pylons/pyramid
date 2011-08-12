@@ -949,6 +949,10 @@ Allowable values for ``under`` or ``over`` (or both) are:
 - One of the constants :attr:`pyramid.tweens.MAIN`,
   :attr:`pyramid.tweens.INGRESS`, or :attr:`pyramid.tweens.EXCVIEW`.
 
+- An iterable of any combination of the above. This allows the user to specify
+  fallbacks if the desired tween is not included, as well as compatibility
+  with multiple other tweens.
+
 Effectively, ``under`` means "closer to the main Pyramid application than",
 ``over`` means "closer to the request ingress than".
 
@@ -1000,10 +1004,14 @@ this::
 Specifying neither ``over`` nor ``under`` is equivalent to specifying
 ``under=INGRESS``.
 
-If an ``under`` or ``over`` value is provided that does not match a tween
-factory dotted name or alias in the current configuration, that value will be
-ignored.  It is not an error to provide an ``under`` or ``over`` value that
-matches an unused tween factory.
+If all options for ``under`` (or ``over``) cannot be found in the current
+configuration, it is an error. If some options are specified purely for
+compatibilty with other tweens, just add a fallback of MAIN or INGRESS.
+For example, ``under=('someothertween', 'someothertween2', INGRESS)``.
+This constraint will require the tween to be located under both the
+'someothertween' tween, the 'someothertween2' tween, and INGRESS. If any of
+these is not in the current configuration, this constraint will only organize
+itself based on the tweens that are present.
 
 :meth:`~pyramid.config.Configurator.add_tween` also accepts an ``alias``
 argument.  If ``alias`` is not ``None``, should be a string.  The string will

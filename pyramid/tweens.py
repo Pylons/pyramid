@@ -65,9 +65,10 @@ class Tweens(object):
     def __init__(self):
         self.explicit = []
         self.names = []
+        self.req_over = set()
+        self.req_under = set()
         self.factories = {}
         self.order = []
-        self.ingress_alias_names = []
         self.alias_to_name = {INGRESS:INGRESS, MAIN:MAIN}
         self.name_to_alias = {INGRESS:INGRESS, MAIN:MAIN}
 
@@ -83,19 +84,22 @@ class Tweens(object):
         self.factories[name] = factory
         if under is None and over is None:
             under = INGRESS
-            self.ingress_alias_names.append(alias)
         if under is not None:
-            self.order.append((under, alias))
+            if not hasattr(under, '__iter__'):
+                under = (under,)
+            self.order += [(u, alias) for u in under]
+            self.req_under.add(alias)
         if over is not None:
-            self.order.append((alias, over))
+            if not hasattr(over, '__iter__'):
+                over = (over,)
+            self.order += [(alias, o) for o in over]
+            self.req_over.add(alias)
 
     def implicit(self):
         order = [(INGRESS, MAIN)]
         roots = []
         graph = {}
-        has_order = {}
         aliases = [INGRESS, MAIN]
-        ingress_alias_names = self.ingress_alias_names[:]
 
         for name in self.names:
             aliases.append(self.name_to_alias[name])
@@ -117,27 +121,26 @@ class Tweens(object):
             if tonode in roots:
                 roots.remove(tonode)
 
-        # remove ordering information that mentions unknown names/aliases
-        for pos, (first, second) in enumerate(order):
-            has_first = first in aliases
-            has_second = second in aliases
-            if (not has_first) or (not has_second):
-                order[pos] = None, None 
-            else:
-                has_order[first] = has_order[second] = True
-
         for alias in aliases:
-            # any alias that doesn't have an ordering after we detect all
-            # nodes with orders should get an ordering relative to INGRESS,
-            # as if it were added with no under or over in add_implicit
-            if (not alias in has_order) and (alias not in (INGRESS, MAIN)):
-                order.append((INGRESS, alias))
-                ingress_alias_names.append(alias)
             add_node(alias)
 
+        has_over, has_under = set(), set()
         for a, b in order:
-            if a is not None and b is not None: # deal with removed orders
+            if a in aliases and b in aliases: # deal with missing dependencies
                 add_arc(a, b)
+                has_over.add(a)
+                has_under.add(b)
+
+        if not self.req_over.issubset(has_over):
+            raise ConfigurationError(
+                'Detected tweens with no satisfied over dependencies: %s'
+                % (', '.join(sorted(self.req_over - has_over)))
+            )
+        if not self.req_under.issubset(has_under):
+            raise ConfigurationError(
+                'Detected tweens with no satisfied under dependencies: %s'
+                % (', '.join(sorted(self.req_under - has_under)))
+            )
 
         sorted_aliases = []
 
@@ -163,8 +166,8 @@ class Tweens(object):
         result = []
 
         for alias in sorted_aliases:
-            if alias not in (MAIN, INGRESS):
-                name = self.alias_to_name.get(alias, alias)
+            name = self.alias_to_name.get(alias, alias)
+            if name in self.names:
                 result.append((name, self.factories[name]))
 
         return result
