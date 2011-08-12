@@ -4,6 +4,9 @@ Pyramid TODOs
 Should-Have
 -----------
 
+- Render HTML versions of http exceptions by default for use by debug
+  toolbar.
+
 - Make it possible to use tween aliases in explicit tween config?  If not,
   the tween factories of all add-ons must be APIs.
 
@@ -12,7 +15,8 @@ Should-Have
 - BeforeRender event subclasses dict but implements a bunch of shit.  Its
   repr is currently broken (it always shows empty).  Decide what to do.
 
-- Replace weberror for email-out in all production.ini.
+- Replace weberror with pyramid_exclog for exception logging/email-out in all
+  production.ini.
 
 - Come up with an analogue of repoze.zodbconn that doesn't require a closer
   in the pipeline and use it in the ZODB scaffold and tutorial.
