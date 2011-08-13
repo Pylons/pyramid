@@ -179,24 +179,9 @@ configurations don't use a pipeline: instead they expose a single WSGI
 application as "main".  Our setup is more complicated, so we use a pipeline
 composed of :term:`middleware`.
 
-The ``egg:WebError#evalerror`` middleware is at the "top" of the pipeline.
-This is middleware which displays debuggable errors in the browser while
-you're developing (not recommended for a production system).
-
-The ``egg:repoze.zodbconn#closer`` middleware is in the middle of the
-pipeline.  This is a piece of middleware which closes the ZODB connection
-opened by the ``PersistentApplicationFinder`` at the end of the request.
-
-The ``egg:repoze.retry#retry`` middleware catches ``ConflictError``
-exceptions from ZODB and retries the request up to three times (ZODB is an
-optimistic concurrency database that relies on application-level transaction
-retries when a conflict occurs).
-
-The ``tm`` middleware is the last piece of middleware in the pipeline.  This
-commits a transaction near the end of the request unless there's an exception
-raised or the HTTP response code is an error code.  The ``tm`` refers to the
-``[filter:tm]`` section beneath the pipeline declaration, which configures
-the transaction manager.
+The ``egg:repoze.zodbconn#closer`` middleware is at the top of the pipeline.
+This is a piece of middleware which closes the ZODB connection opened by the
+``PersistentApplicationFinder`` at the end of the request.
 
 The final line in the ``[pipeline:main]`` section is ``tutorial``, which
 refers to the ``[app:tutorial]`` section above it.  The ``[app:tutorial]``

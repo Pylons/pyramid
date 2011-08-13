@@ -12,23 +12,8 @@ tm.attempts = 3
 
 zodb_uri = file://%(here)s/Data.fs?connection_cache_size=20000
 
-[filter:weberror]
-use = egg:WebError#error_catcher
-debug = false
-;error_log = 
-;show_exceptions_in_wsgi_errors = true
-;smtp_server = localhost
-;error_email = janitor@example.com
-;smtp_username = janitor
-;smtp_password = "janitor's password"
-;from_address = paste@localhost
-;error_subject_prefix = "Pyramid Error"
-;smtp_use_tls =
-;error_message =
-
 [pipeline:main]
 pipeline =
-    weberror
     egg:repoze.zodbconn#closer
     {{project}}
 

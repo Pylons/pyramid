@@ -588,13 +588,11 @@ implementations.
 
 The ``production.ini`` file is a :term:`PasteDeploy` configuration file with
 a purpose much like that of ``development.ini``.  However, it disables the
-debug toolbar, replacing it with a logger which outputs exception messages to
-``stderr`` by default.  It also turns off template development options such
-that templates are not automatically reloaded when changed, and turns off all
-debugging options.  It allows you to configure a ``weberror#error_catcher``
-section that will cause exceptions to be sent to an email address when they
-are uncaught.  You can use this file instead of ``development.ini`` when you
-put your application into production.
+debug toolbar, and filters all log messages except those above the WARN
+level.  It also turns off template development options such that templates
+are not automatically reloaded when changed, and turns off all debugging
+options.  This file is appropriate to use instead of ``development.ini`` when
+you put your application into production.
 
 .. index::
    single: MANIFEST.in

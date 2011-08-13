@@ -466,8 +466,13 @@ example above looks like so:
 .. code-block:: ini
 
    [pipeline:main]
-   pipeline = egg:WebError#evalerror
+   pipeline = translogger
               another
+
+   [filter:translogger]
+   filter_app_factory = egg:Paste#translogger
+   setup_console_handler = False
+   logger_name = wsgi
 
    [app:another]
    use = egg:MyProject
@@ -477,7 +482,8 @@ configuration implied by the ``[pipeline:main]`` section of your
 configuration file by default.  Specifying ``/path/to/my/development.ini`` is
 logically equivalent to specifying ``/path/to/my/development.ini#main``.  In
 this case, we'll be using a configuration that includes an ``app`` object
-which is wrapped in the WebError ``evalerror`` middleware.
+which is wrapped in the Paste "translogger" middleware (which logs requests
+to the console).
 
 You can also specify a particular *section* of the PasteDeploy ``.ini`` file
 to load instead of ``main``:

@@ -104,6 +104,21 @@ Dependency Changes
 - Pyramid now relies on PasteScript >= 1.7.4.  This version contains a
   feature important for allowing flexible logging configuration.
 
+Scaffolds
+----------
+
+- All scaffolds now use the ``pyramid_tm`` package rather than the
+  ``repoze.tm2`` middleware to manage transaction management.
+
+- All scaffolds now use the ``pyramid_debugtoolbar`` package rather than the
+  ``WebError`` package to provide interactive debugging features.
+
+- Projects created via a scaffold no longer depend on the ``WebError``
+  package at all; configuration in the ``production.ini`` file which used to
+  require its ``error_catcher`` middleware has been removed.  Configuring
+  error catching / email sending is now the domain of the ``pyramid_exclog``
+  package (see https://docs.pylonsproject.org/projects/pyramid_exclog/dev/).
+
 Bug Fixes
 ---------
 

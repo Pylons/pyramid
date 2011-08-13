@@ -319,4 +319,4 @@ browser.  The views we'll try are as follows:
 - To generate an error, visit ``http://localhost:6543/add_page`` which
   will generate an ``IndexError`` for the expression
   ``request.subpath[0]``.  You'll see an interactive traceback
-  facility provided by :term:`WebError`.
+  facility provided by :term:`pyramid_debugtoolbar`.

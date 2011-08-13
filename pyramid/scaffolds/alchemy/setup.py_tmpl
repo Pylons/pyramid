@@ -13,7 +13,6 @@ requires = [
     'pyramid_debugtoolbar',
     'sqlalchemy',
     'zope.sqlalchemy',
-    'WebError',
     ]
 
 if sys.version_info[:3] < (2,5,0):

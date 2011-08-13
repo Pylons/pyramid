@@ -12,7 +12,6 @@ requires = [
     'pyramid_tm',
     'pyramid_debugtoolbar',
     'ZODB3',
-    'WebError',
     ]
 
 setup(name='tutorial',

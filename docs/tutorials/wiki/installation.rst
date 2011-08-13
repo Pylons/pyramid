@@ -65,12 +65,12 @@ Preparation, UNIX
 
      $ bin/easy_install pyramid
 
-#. Use ``easy_install`` to install ``docutils``, ``repoze.tm2``,
+#. Use ``easy_install`` to install ``docutils``, ``pyramid_tm``,
    ``repoze.zodbconn``, ``nose`` and ``coverage``:
 
    .. code-block:: text
 
-     $ bin/easy_install docutils repoze.tm2 repoze.zodbconn \
+     $ bin/easy_install docutils pyramid_tm repoze.zodbconn \
                nose coverage
 
 Preparation, Windows
@@ -117,12 +117,12 @@ Preparation, Windows
 
      c:\pyramidtut> Scripts\easy_install pyramid
 
-#. Use ``easy_install`` to install ``docutils``, ``repoze.tm2``,
+#. Use ``easy_install`` to install ``docutils``, ``pyramid_tm``,
    ``repoze.zodbconn``, ``nose`` and ``coverage``:
 
    .. code-block:: text
 
-     c:\pyramidtut> Scripts\easy_install docutils repoze.tm2 ^
+     c:\pyramidtut> Scripts\easy_install docutils pyramid_tm \
            repoze.zodbconn nose coverage
 
 .. _making_a_project:

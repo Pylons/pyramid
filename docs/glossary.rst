@@ -845,11 +845,6 @@ Glossary
      `WebTest <http://pythonpaste.org/webtest/>`_ is a package which can help
      you write functional tests for your WSGI application.
 
-   WebError
-     WSGI middleware which can display debuggable traceback information in
-     the browser when an exception is raised by a Pyramid application.  See
-     http://pypi.python.org/pypi/WebError .
-
    view mapper
     A view mapper is a class which implements the
     :class:`pyramid.interfaces.IViewMapperFactory` interface, which performs
@@ -929,4 +924,17 @@ Glossary
      context in which they have access to the Pyramid :term:`application
      registry` as well as the Pyramid rendering machinery.  See
      :ref:`registering_tweens`.
+
+   pyramid_debugtoolbar
+     A Pyramid add on which displays a helpful debug toolbar "on top of" HTML
+     pages rendered by your application, displaying request, routing, and
+     database information.  ``pyramid_debugtoolbar`` is configured into the
+     ``development.ini`` of all applications which use a Pyramid
+     :term:`scaffold`.  For more information, see
+     https://docs.pylonsproject.org/projects/pyramid_debugtoolbar/dev/ .
+
+   scaffold
+     A project template that helps users get started writing a Pyramid
+     application quickly.  Scaffolds are usually used via the ``paster
+     create`` command.
 
