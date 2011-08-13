@@ -52,6 +52,7 @@ Narrative documentation in chapter form explaining how to use
    narr/sessions
    narr/events
    narr/environment
+   narr/logging
    narr/commandline
    narr/i18n
    narr/vhosting

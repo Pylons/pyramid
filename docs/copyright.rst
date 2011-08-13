@@ -59,7 +59,8 @@ Contributors:
   Merickel, Eric Ongerth, Niall O'Higgins, Christoph Zwerschke, John
   Anderson, Atsushi Odagiri, Kirk Strauser, JD Navarro, Joe Dallago,
   Savoir-Faire Linux, Łukasz Fidosz, Christopher Lambacher, Claus Conrad,
-  Chris Beelby, and a number of people with only psuedonyms on GitHub.
+  Chris Beelby, Phil Jenvey and a number of people with only psuedonyms on
+  GitHub.
 
 Cover Designer:
    Hugues Laflamme of `Kemeneur <http://www.kemeneur.com/>`_.
@@ -71,6 +72,9 @@ Used with permission:
 
    The :ref:`much_ado_about_traversal_chapter` chapter is adapted,
    with permission, from an article written by Rob Miller.
+
+   The :ref:`logging_chapter` is adapted, with permission, from the Pylons
+   documentation logging chapter, originally written by Phil Jenvey.
 
 Print Production
 ----------------

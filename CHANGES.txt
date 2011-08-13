@@ -98,6 +98,9 @@ Documentation
   configuration settings to the "Environment Variables and ``.ini`` Files
   Settings" chapter.
 
+- Added a Logging chapter to the narrative docs (based on the Pylons logging
+  docs, thanks Phil).
+
 Dependency Changes
 ------------------
 
