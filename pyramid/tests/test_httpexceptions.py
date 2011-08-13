@@ -182,6 +182,16 @@ class TestWSGIHTTPException(unittest.TestCase):
         self.assertTrue(start_response.headerlist)
         self.assertEqual(start_response.status, '200 OK')
 
+    def test_call_returns_same_body_called_twice(self):
+        # optimization
+        cls = self._getTargetSubclass()
+        exc = cls()
+        environ = _makeEnviron()
+        environ['HTTP_ACCEPT'] = '*/*'
+        start_response = DummyStartResponse()
+        app_iter = exc(environ, start_response)
+        self.assertEqual(app_iter[0], exc.body)
+
     def test__default_app_iter_no_comment_plain(self):
         cls = self._getTargetSubclass()
         exc = cls()

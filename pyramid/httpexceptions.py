@@ -207,48 +207,50 @@ ${body}''')
     def __str__(self):
         return self.detail or self.explanation
 
-    def _set_default_attrs(self, environ):
-        html_comment = ''
-        comment = self.comment or ''
-        accept = environ.get('HTTP_ACCEPT', '')
-        if accept and 'html' in accept or '*/*' in accept:
-            self.content_type = 'text/html'
-            escape = _html_escape
-            page_template = self.html_template_obj
-            br = '<br/>'
-            if comment:
-                html_comment = '<!-- %s -->' % escape(comment)
-        else:
-            self.content_type = 'text/plain'
-            escape = _no_escape
-            page_template = self.plain_template_obj
-            br = '\n'
-            if comment:
-                html_comment = escape(comment)
-        args = {
-            'br':br,
-            'explanation': escape(self.explanation),
-            'detail': escape(self.detail or ''),
-            'comment': escape(comment),
-            'html_comment':html_comment,
-            }
-        body_tmpl = self.body_template_obj
-        if WSGIHTTPException.body_template_obj is not body_tmpl:
-            # Custom template; add headers to args
-            for k, v in environ.items():
-                if (not k.startswith('wsgi.')) and ('.' in k):
-                    # omit custom environ variables, stringifying them may
-                    # trigger code that should not be executed here; see
-                    # https://github.com/Pylons/pyramid/issues/239
-                    continue
-                args[k] = escape(v)
-            for k, v in self.headers.items():
-                args[k.lower()] = escape(v)
-        body = body_tmpl.substitute(args)
-        page = page_template.substitute(status=self.status, body=body)
-        if isinstance(page, unicode):
-            page = page.encode(self.charset)
-        self.app_iter = [page]
+    def prepare(self, environ):
+        if not self.body and not self.empty_body:
+            html_comment = ''
+            comment = self.comment or ''
+            accept = environ.get('HTTP_ACCEPT', '')
+            if accept and 'html' in accept or '*/*' in accept:
+                self.content_type = 'text/html'
+                escape = _html_escape
+                page_template = self.html_template_obj
+                br = '<br/>'
+                if comment:
+                    html_comment = '<!-- %s -->' % escape(comment)
+            else:
+                self.content_type = 'text/plain'
+                escape = _no_escape
+                page_template = self.plain_template_obj
+                br = '\n'
+                if comment:
+                    html_comment = escape(comment)
+            args = {
+                'br':br,
+                'explanation': escape(self.explanation),
+                'detail': escape(self.detail or ''),
+                'comment': escape(comment),
+                'html_comment':html_comment,
+                }
+            body_tmpl = self.body_template_obj
+            if WSGIHTTPException.body_template_obj is not body_tmpl:
+                # Custom template; add headers to args
+                for k, v in environ.items():
+                    if (not k.startswith('wsgi.')) and ('.' in k):
+                        # omit custom environ variables, stringifying them may
+                        # trigger code that should not be executed here; see
+                        # https://github.com/Pylons/pyramid/issues/239
+                        continue
+                    args[k] = escape(v)
+                for k, v in self.headers.items():
+                    args[k.lower()] = escape(v)
+            body = body_tmpl.substitute(args)
+            page = page_template.substitute(status=self.status, body=body)
+            if isinstance(page, unicode):
+                page = page.encode(self.charset)
+            self.app_iter = [page]
+            self.body = page
 
     @property
     def wsgi_response(self):
@@ -265,8 +267,7 @@ ${body}''')
         # - does not manufacture a new response object when generating
         #   the default response
         #
-        if not self.body and not self.empty_body:
-            self._set_default_attrs(environ)
+        self.prepare(environ)
         return Response.__call__(self, environ, start_response)
 
 class HTTPError(WSGIHTTPException):

@@ -58,6 +58,14 @@ Internal
 - The Pyramid "exception view" machinery is now implemented as a "tween"
   (``pyramid.tweens.excview_tween_factory``).
 
+- WSGIHTTPException (HTTPFound, HTTPNotFound, etc) now has a new API named
+  "prepare" which renders the body and content type when it is provided with
+  a WSGI environ.  Required for debug toolbar.
+
+- Once ``__call__`` or ``prepare`` is called on a WSGIHTTPException, the body
+  will be set, and subsequent calls to ``__call__`` will always return the
+  same body.  Delete the body attribute to rerender the exception body.
+
 Deprecations
 ------------
 

@@ -265,6 +265,8 @@ class IExceptionResponse(IException, IResponse):
     :class:`pyramid.response.Response`, including
     :class:`pyramid.httpexceptions.HTTPNotFound` and
     :class:`pyramid.httpexceptions.HTTPForbidden`)."""
+    def prepare(environ):
+        """ Prepares the response for being called as a WSGI application """
 
 class IBeforeRender(Interface):
     """
