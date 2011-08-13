@@ -311,11 +311,9 @@ application request handler and the WSGI application which calls it.  A user
 can get a representation of both the implicit tween ordering (the ordering
 specified by calls to :meth:`pyramid.config.Configurator.add_tween`) and the
 explicit tween ordering (specified by the ``pyramid.tweens`` configuration
-setting) orderings using the ``paster ptweens`` command.  Handler factories
-which are functions or classes will show up as a standard Python dotted name
-in the ``paster ptweens`` output.  Tween factories which are *instances* will
-show their module and class name; the Python object id of the instance will
-be appended.
+setting) orderings using the ``paster ptweens`` command.  Tween factories
+will show up represented by their standard Python dotted name in the
+``paster ptweens`` output.
 
 For example, here's the ``paster pwteens`` command run against a system
 configured without any explicit tweens:

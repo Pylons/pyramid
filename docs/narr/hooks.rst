@@ -847,12 +847,12 @@ running in a context in which they have access to the Pyramid
 :term:`application registry` as well as the Pyramid rendering machinery.
 
 To make use of tweens, you must construct a "tween factory".  A tween factory
-must be a callable (or a :term:`dotted Python name` to such a callable) which
-accepts two arguments: ``handler`` and ``registry``.  ``handler`` will be the
-either the main Pyramid request handling function or another tween (if more
-than one tween is configured into the request handling chain).  ``registry``
-will be the Pyramid :term:`application registry` represented by this
-Configurator.  A tween factory must return a tween when it is called.
+must be a globally importable callable (or a :term:`dotted Python name` to
+such a callable) which accepts two arguments: ``handler`` and ``registry``.
+``handler`` will be the either the main Pyramid request handling function or
+another tween.  ``registry`` will be the Pyramid :term:`application registry`
+represented by this Configurator.  A tween factory must return a tween when
+it is called.
 
 A tween is a callable which accepts a :term:`request` object and returns a
 two-tuple a :term:`response` object.
@@ -1089,11 +1089,12 @@ Tween Conflicts and Ordering Cycles
 Pyramid will prevent the same tween factory from being added to the tween
 chain more than once using configuration conflict detection.  If you wish to
 add the same tween factory more than once in a configuration, you should
-either: a) use a tween factory that is an instance rather than a function or
-class, b) use a function or class as a tween factory with the same logic as
-the other tween factory it conflicts with but with a different ``__name__``
-attribute or c) call :meth:`pyramid.config.Configurator.commit` between calls
-to :meth:`pyramid.config.Configurator.add_tween`.
+either: a) use a tween factory that is a separate globally importable
+instance object from the factory that it conflicts with b) use a function or
+class as a tween factory with the same logic as the other tween factory it
+conflicts with but with a different ``__name__`` attribute or c) call
+:meth:`pyramid.config.Configurator.commit` between calls to
+:meth:`pyramid.config.Configurator.add_tween`.
 
 If a cycle is detected in implicit tween ordering when ``over`` and ``under``
 are used in any call to "add_tween", an exception will be raised at startup

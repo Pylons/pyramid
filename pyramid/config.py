@@ -83,7 +83,6 @@ from pyramid.traversal import find_interface
 from pyramid.traversal import traversal_path
 from pyramid.tweens import excview_tween_factory
 from pyramid.tweens import Tweens
-from pyramid.tweens import tween_factory_name
 from pyramid.tweens import MAIN, INGRESS, EXCVIEW
 from pyramid.urldispatch import RoutesMapper
 from pyramid.util import DottedNameResolver
@@ -970,6 +969,10 @@ class Configurator(object):
                   Pyramid application by using the ``paster ptweens``
                   command.  See :ref:`displaying_tweens`.
 
+        The ``tween_factory`` argument must be a globally importable function
+        or class or a :term:`dotted Python name` to a global object
+        representing the tween factory.
+
         The ``alias`` argument, if it is not ``None``, should be a string.
         The string will represent a value that other callers of ``add_tween``
         may pass as an ``under`` and ``over`` argument instead of a dotted
@@ -1044,8 +1047,21 @@ class Configurator(object):
 
     def _add_tween(self, tween_factory, alias=None, under=None, over=None,
                    explicit=False):
-        tween_factory = self.maybe_dotted(tween_factory)
-        name = tween_factory_name(tween_factory)
+        if isinstance(tween_factory, basestring):
+            name = tween_factory
+            tween_factory = self.maybe_dotted(tween_factory)
+        else:
+            if (hasattr(tween_factory, '__name__') and
+                hasattr(tween_factory, '__module__')):
+                name = '.'.join([tween_factory.__module__,
+                                 tween_factory.__name__])
+            else:
+                raise ConfigurationError(
+                    'If it is provided as an object, a tween factory must be a '
+                    'globally importable object; %s is not a suitable tween '
+                    'factory (maybe pass tween_factory as a dotted name '
+                    'string to your instance instead)' % tween_factory)
+
         if alias in (MAIN, INGRESS):
             raise ConfigurationError('%s is a reserved tween name' % alias)
 
@@ -1060,7 +1076,7 @@ class Configurator(object):
         if tweens is None:
             tweens = Tweens()
             registry.registerUtility(tweens, ITweens)
-            tweens.add_implicit(tween_factory_name(excview_tween_factory),
+            tweens.add_implicit('pyramid.tweens.excview_tween_factory',
                                 excview_tween_factory, alias=EXCVIEW,
                                 over=MAIN)
         if explicit:

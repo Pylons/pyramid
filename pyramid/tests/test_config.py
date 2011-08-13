@@ -698,23 +698,11 @@ pyramid.tests.test_config.dummy_include2""",
                 ])
 
     def test_add_tween_instance(self):
-        from pyramid.interfaces import ITweens
-        from pyramid.tweens import excview_tween_factory
+        from pyramid.exceptions import ConfigurationError
         class ATween(object): pass
         atween = ATween()
         config = self._makeOne()
-        config.add_tween(atween)
-        config.commit()
-        tweens = config.registry.queryUtility(ITweens)
-        implicit = tweens.implicit()
-        self.assertEqual(len(implicit), 2)
-        self.assertTrue(
-          implicit[0][0].startswith(
-                'pyramid.tests.test_config.ATween.'))
-        self.assertEqual(implicit[0][1], atween)
-        self.assertEqual(
-            implicit[1],
-            ('pyramid.tweens.excview_tween_factory', excview_tween_factory))
+        self.assertRaises(ConfigurationError, config.add_tween, atween)
 
     def test_add_tween_unsuitable(self):
         from pyramid.exceptions import ConfigurationError
@@ -747,9 +735,8 @@ pyramid.tests.test_config.dummy_include2""",
 
     def test_add_tweens_conflict_same_alias(self):
         from zope.configuration.config import ConfigurationConflictError
-        class ATween(object): pass
-        atween1 = ATween()
-        atween2 = ATween()
+        def atween1(): pass
+        def atween2(): pass
         config = self._makeOne()
         config.add_tween(atween1, alias='a')
         config.add_tween(atween2, alias='a')
