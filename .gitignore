@@ -16,3 +16,6 @@ jyenv/
 pypyenv/
 build/
 dist/
+.idea/
+.tox/
+nosetests.xml
