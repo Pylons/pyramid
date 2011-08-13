@@ -938,3 +938,10 @@ Glossary
      application quickly.  Scaffolds are usually used via the ``paster
      create`` command.
 
+   pyramid_exclog
+     A package which logs Pyramid application exception (error) information
+     to a standard Python logger.  This add-on is most useful when
+     used in production applications, because the logger can be configured to
+     log to a file, to UNIX syslog, to the Windows Event Log, or even to
+     email. See its `documentation
+     <https://docs.pylonsproject.org/projects/pyramid_exclog/dev/>`_.
