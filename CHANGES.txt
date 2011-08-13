@@ -1,12 +1,12 @@
-1.0.x (unreleased)
+1.0.1 (2011-08-13)
 ==================
 
-Additions
----------
+Backported Features
+-------------------
 
-- Backport from 1.1.x: A new attribute is available on request objects:
-  ``exc_info``.  Its value will be ``None`` until an exception is caught
-  by the Pyramid router, after which it will be the result of
+- Backport from 1.2dev: A new attribute is available on request objects:
+  ``exc_info``.  Its value will be ``None`` until an exception is caught by
+  the Pyramid router, after which it will be the result of
   ``sys.exc_info()``.
 
 1.0 (2011-01-30)

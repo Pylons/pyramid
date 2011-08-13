@@ -53,7 +53,7 @@ if sys.version_info[:2] < (2, 6):
     install_requires.append('simplejson')
     
 setup(name='pyramid',
-      version='1.0',
+      version='1.0.1',
       description='The Pyramid web application framework, a Pylons project',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
