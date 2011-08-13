@@ -4,6 +4,9 @@ Pyramid TODOs
 Should-Have
 -----------
 
+- Debugging setting for detecting why authenticated_userid(request) might
+  return None.
+
 - Render HTML versions of http exceptions by default for use by debug
   toolbar.
 
