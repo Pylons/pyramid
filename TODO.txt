@@ -22,6 +22,10 @@ Should-Have
 - Make "localizer" a property of request (instead of requiring
   "get_localizer(request)"
 
+- Fix tutorials that use ``route_url``, ``route_path``, ``resource_url``,
+  ``static_url``, and ``current_route_url`` functions to use methods of the
+  request instead.
+
 - Make ``current_route_url`` a method of request.
 
 - Create a ``current_route_path`` function and make it a method of request.
