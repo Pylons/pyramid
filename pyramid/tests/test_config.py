@@ -647,17 +647,20 @@ pyramid.tests.test_config.dummy_include2""",
         def factory1(handler, registry): return handler
         def factory2(handler, registry): return handler
         config = self._makeOne()
-        config.add_tween(factory1)
-        config.add_tween(factory2)
+        config.add_tween('pyramid.tests.test_config.dummy_tween_factory')
+        config.add_tween('pyramid.tests.test_config.dummy_tween_factory2')
         config.commit()
         tweens = config.registry.queryUtility(ITweens)
         implicit = tweens.implicit()
         self.assertEqual(
             implicit,
             [
-                ('pyramid.tests.test_config.factory2', factory2),
-                ('pyramid.tests.test_config.factory1', factory1),
-                ('pyramid.tweens.excview_tween_factory', excview_tween_factory),
+                ('pyramid.tests.test_config.dummy_tween_factory2',
+                 dummy_tween_factory2),
+                ('pyramid.tests.test_config.dummy_tween_factory',
+                 dummy_tween_factory),
+                ('pyramid.tweens.excview_tween_factory',
+                 excview_tween_factory),
                 ]
             )
 
@@ -665,12 +668,12 @@ pyramid.tests.test_config.dummy_include2""",
         from pyramid.interfaces import ITweens
         from pyramid.tweens import excview_tween_factory
         from pyramid.tweens import MAIN
-        def factory1(handler, registry): return handler
-        def factory2(handler, registry): return handler
         config = self._makeOne()
-        config.add_tween(factory1, over=MAIN)
-        config.add_tween(factory2, over=MAIN,
-                         under='pyramid.tests.test_config.factory1')
+        config.add_tween('pyramid.tests.test_config.dummy_tween_factory',
+                         over=MAIN)
+        config.add_tween('pyramid.tests.test_config.dummy_tween_factory2',
+                         over=MAIN,
+                         under='pyramid.tests.test_config.dummy_tween_factory')
         config.commit()
         tweens = config.registry.queryUtility(ITweens)
         implicit = tweens.implicit()
@@ -678,9 +681,25 @@ pyramid.tests.test_config.dummy_include2""",
             implicit,
             [
                 ('pyramid.tweens.excview_tween_factory', excview_tween_factory),
-                ('pyramid.tests.test_config.factory1', factory1),
-                ('pyramid.tests.test_config.factory2', factory2),
+                ('pyramid.tests.test_config.dummy_tween_factory',
+                 dummy_tween_factory),
+                ('pyramid.tests.test_config.dummy_tween_factory2',
+                 dummy_tween_factory2),
              ])
+
+    def test_add_tweens_names_with_under_nonstringoriter(self):
+        from pyramid.exceptions import ConfigurationError
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError, config.add_tween,
+                          'pyramid.tests.test_config.dummy_tween_factory',
+                          under=False)
+
+    def test_add_tweens_names_with_over_nonstringoriter(self):
+        from pyramid.exceptions import ConfigurationError
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError, config.add_tween,
+                          'pyramid.tests.test_config.dummy_tween_factory',
+                          over=False)
 
     def test_add_tween_dottedname(self):
         from pyramid.interfaces import ITweens
@@ -735,11 +754,11 @@ pyramid.tests.test_config.dummy_include2""",
 
     def test_add_tweens_conflict_same_alias(self):
         from zope.configuration.config import ConfigurationConflictError
-        def atween1(): pass
-        def atween2(): pass
         config = self._makeOne()
-        config.add_tween(atween1, alias='a')
-        config.add_tween(atween2, alias='a')
+        config.add_tween('pyramid.tests.test_config.dummy_tween_factory',
+                         alias='a')
+        config.add_tween('pyramid.tests.test_config.dummy_tween_factory2',
+                         alias='a')
         self.assertRaises(ConfigurationConflictError, config.commit)
 
     def test_add_tween_over_ingress(self):
@@ -5805,3 +5824,5 @@ class DummyResponse(object):
     implements(IResponse)
     
 def dummy_tween_factory(handler, registry): pass
+
+def dummy_tween_factory2(handler, registry): pass

@@ -956,8 +956,8 @@ class Configurator(object):
         Add a 'tween factory'.  A :term:`tween` (a contraction of 'between')
         is a bit of code that sits between the Pyramid router's main request
         handling function and the upstream WSGI component that uses
-        :app:`Pyramid` as its 'app'.  This is a feature that may be used by
-        Pyramid framework extensions, to provide, for example,
+        :app:`Pyramid` as its 'app'.  Tweens are a feature that may be used
+        by Pyramid framework extensions, to provide, for example,
         Pyramid-specific view timing support, bookkeeping code that examines
         exceptions before they are returned to the upstream WSGI application,
         or a variety of other features.  Tweens behave a bit like
@@ -969,14 +969,13 @@ class Configurator(object):
                   Pyramid application by using the ``paster ptweens``
                   command.  See :ref:`displaying_tweens`.
 
-        The ``tween_factory`` argument must be a globally importable function
-        or class or a :term:`dotted Python name` to a global object
-        representing the tween factory.
+        The ``tween_factory`` argument must be a :term:`dotted Python name`
+        to a global object representing the tween factory.
 
         The ``alias`` argument, if it is not ``None``, should be a string.
         The string will represent a value that other callers of ``add_tween``
-        may pass as an ``under`` and ``over`` argument instead of a dotted
-        name to a tween factory.
+        may pass as an ``under`` and ``over`` argument instead of this
+        tween's factory name.
 
         The ``under`` and ``over`` arguments allow the caller of
         ``add_tween`` to provide a hint about where in the tween chain this
@@ -988,8 +987,8 @@ class Configurator(object):
         - ``None`` (the default).
 
         - A :term:`dotted Python name` to a tween factory: a string
-          representing the predicted dotted name of a tween factory added in
-          a call to ``add_tween`` in the same configuration session.
+          representing the dotted name of a tween factory added in a call to
+          ``add_tween`` in the same configuration session.
 
         - A tween alias: a string representing the predicted value of
           ``alias`` in a separate call to ``add_tween`` in the same
@@ -1005,14 +1004,15 @@ class Configurator(object):
         ``under`` means 'closer to the main Pyramid application than',
         ``over`` means 'closer to the request ingress than'.
 
-        For example, calling ``add_tween(factory, over=pyramid.tweens.MAIN)``
-        will attempt to place the tween factory represented by ``factory``
-        directly 'above' (in ``paster ptweens`` order) the main Pyramid
-        request handler.  Likewise, calling ``add_tween(factory,
+        For example, calling ``add_tween('myapp.tfactory',
+        over=pyramid.tweens.MAIN)`` will attempt to place the tween factory
+        represented by the dotted name ``myapp.tfactory`` directly 'above' (in
+        ``paster ptweens`` order) the main Pyramid request handler.
+        Likewise, calling ``add_tween('myapp.tfactory',
         over=pyramid.tweens.MAIN, under='someothertween')`` will attempt to
         place this tween factory 'above' the main handler but 'below' (a
         fictional) 'someothertween' tween factory (which was presumably added
-        via ``add_tween(factory, alias='someothertween')``).
+        via ``add_tween('myapp.tfactory', alias='someothertween')``).
 
         If all options for ``under`` (or ``over``) cannot be found in the
         current configuration, it is an error. If some options are specified
@@ -1047,20 +1047,27 @@ class Configurator(object):
 
     def _add_tween(self, tween_factory, alias=None, under=None, over=None,
                    explicit=False):
-        if isinstance(tween_factory, basestring):
-            name = tween_factory
-            tween_factory = self.maybe_dotted(tween_factory)
-        else:
-            if (hasattr(tween_factory, '__name__') and
-                hasattr(tween_factory, '__module__')):
-                name = '.'.join([tween_factory.__module__,
-                                 tween_factory.__name__])
-            else:
-                raise ConfigurationError(
-                    'If it is provided as an object, a tween factory must be a '
-                    'globally importable object; %s is not a suitable tween '
-                    'factory (maybe pass tween_factory as a dotted name '
-                    'string to your instance instead)' % tween_factory)
+
+        if not isinstance(tween_factory, basestring):
+            raise ConfigurationError(
+                'The "tween_factory" argument to add_tween must be a '
+                'dotted name to a globally importable object, not %r' %
+                tween_factory)
+
+        name = tween_factory
+        tween_factory = self.maybe_dotted(tween_factory)
+
+        def is_string_or_iterable(v):
+            if isinstance(v, basestring):
+                return True
+            if hasattr(v, '__iter__'):
+                return True
+
+        for t, p in [('over', over), ('under', under)]:
+            if p is not None:
+                if not is_string_or_iterable(p):
+                    raise ConfigurationError(
+                        '"%s" must be a string or iterable, not %s' % (t, p))
 
         if alias in (MAIN, INGRESS):
             raise ConfigurationError('%s is a reserved tween name' % alias)
