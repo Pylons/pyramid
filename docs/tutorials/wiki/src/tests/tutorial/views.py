@@ -2,7 +2,6 @@ from docutils.core import publish_parts
 import re
 
 from pyramid.httpexceptions import HTTPFound
-from pyramid.url import resource_url
 from pyramid.view import view_config
 from pyramid.security import authenticated_userid
 
@@ -13,7 +12,7 @@ wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
 
 @view_config(context='tutorial.models.Wiki', permission='view')
 def view_wiki(context, request):
-    return HTTPFound(location=resource_url(context, request, 'FrontPage'))
+    return HTTPFound(location=request.resource_url(context, 'FrontPage'))
 
 @view_config(context='tutorial.models.Page',
              renderer='templates/view.pt', permission='view')
@@ -24,7 +23,7 @@ def view_page(context, request):
         word = match.group(1)
         if word in wiki:
             page = wiki[word]
-            view_url = resource_url(page, request)
+            view_url = request.resource_url(page)
             return '<a href="%s">%s</a>' % (view_url, word)
         else:
             add_url = request.application_url + '/add_page/' + word 
@@ -32,7 +31,7 @@ def view_page(context, request):
 
     content = publish_parts(context.data, writer_name='html')['html_body']
     content = wikiwords.sub(check, content)
-    edit_url = resource_url(context, request, 'edit_page')
+    edit_url = request.resource_url(context, 'edit_page')
 
     logged_in = authenticated_userid(request)
 
@@ -50,8 +49,8 @@ def add_page(context, request):
         page.__name__ = name
         page.__parent__ = context
         context[name] = page
-        return HTTPFound(location = resource_url(page, request))
-    save_url = resource_url(context, request, 'add_page', name)
+        return HTTPFound(location = request.resource_url(page))
+    save_url = request.resource_url(context, 'add_page', name)
     page = Page('')
     page.__name__ = name
     page.__parent__ = context
@@ -66,11 +65,11 @@ def add_page(context, request):
 def edit_page(context, request):
     if 'form.submitted' in request.params:
         context.data = request.params['body']
-        return HTTPFound(location = resource_url(context, request))
+        return HTTPFound(location = request.resource_url(context))
 
     logged_in = authenticated_userid(request)
 
     return dict(page = context,
-                save_url = resource_url(context, request, 'edit_page'),
+                save_url = request.resource_url(context, 'edit_page'),
                 logged_in = logged_in)
     

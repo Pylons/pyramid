@@ -80,15 +80,14 @@ class AddPageTests(unittest.TestCase):
         return add_page(context, request)
 
     def test_it_notsubmitted(self):
-        from pyramid.url import resource_url
         context = testing.DummyResource()
         request = testing.DummyRequest()
         request.subpath = ['AnotherPage']
         info = self._callFUT(context, request)
         self.assertEqual(info['page'].data,'')
         self.assertEqual(info['save_url'],
-                         resource_url(
-                             context, request, 'add_page', 'AnotherPage'))
+                         request.resource_url(
+                             context, 'add_page', 'AnotherPage'))
         
     def test_it_submitted(self):
         context = testing.DummyResource()
@@ -107,13 +106,12 @@ class EditPageTests(unittest.TestCase):
         return edit_page(context, request)
 
     def test_it_notsubmitted(self):
-        from pyramid.url import resource_url
         context = testing.DummyResource()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         self.assertEqual(info['page'], context)
         self.assertEqual(info['save_url'],
-                         resource_url(context, request, 'edit_page'))
+                         request.resource_url(context, 'edit_page'))
         
     def test_it_submitted(self):
         context = testing.DummyResource()

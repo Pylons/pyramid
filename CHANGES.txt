@@ -134,6 +134,10 @@ Documentation
   of a dictionary, for documentation purposes only (IMultiDict and
   IBeforeRender inherit from it).
 
+- All tutorials now use - The ``route_url``, ``route_path``,
+  ``resource_url``, ``static_url``, and ``current_route_url`` methods of the
+  request rather than the function variants imported from ``pyramid.url``.
+
 Dependency Changes
 ------------------
 

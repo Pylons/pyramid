@@ -1,12 +1,11 @@
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember
 from pyramid.security import forget
-from pyramid.url import route_url
 
 from tutorial.security import USERS
 
 def login(request):
-    login_url = route_url('login', request)
+    login_url = request.route_url('login')
     referrer = request.url
     if referrer == login_url:
         referrer = '/' # never use the login form itself as came_from
@@ -33,6 +32,6 @@ def login(request):
     
 def logout(request):
     headers = forget(request)
-    return HTTPFound(location = route_url('view_wiki', request),
+    return HTTPFound(location = request.route_url('view_wiki'),
                      headers = headers)
     
