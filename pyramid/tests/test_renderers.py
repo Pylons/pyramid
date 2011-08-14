@@ -522,7 +522,8 @@ class TestRendererHelper(unittest.TestCase):
         helper = self._makeOne('loo.foo')
         response = helper.render_to_response('values', {},
                                              request=request)
-        self.assertEqual(response.body, ('values', {}))
+        self.assertEqual(response.body[0], 'values')
+        self.assertEqual(response.body[1], {})
 
     def test_render_view(self):
         self._registerRendererFactory()
@@ -534,13 +535,13 @@ class TestRendererHelper(unittest.TestCase):
         request = testing.DummyRequest()
         response = 'response'
         response = helper.render_view(request, response, view, context)
-        self.assertEqual(response.body,
-                         ('response',
+        self.assertEqual(response.body[0], 'response')
+        self.assertEqual(response.body[1],
                           {'renderer_info': helper,
                            'renderer_name': 'loo.foo',
                            'request': request,
                            'context': 'context',
-                           'view': 'view'})
+                           'view': 'view'}
                          )
 
     def test_render_explicit_registry(self):
@@ -556,7 +557,8 @@ class TestRendererHelper(unittest.TestCase):
         reg = DummyRegistry()
         helper = self._makeOne('loo.foo', registry=reg)
         result = helper.render('value', {})
-        self.assertEqual(result, ('value', {}))
+        self.assertEqual(result[0], 'value')
+        self.assertEqual(result[1], {})
         self.assertTrue(reg.queried)
         self.assertEqual(reg.event, {})
         self.assertEqual(reg.event.__class__.__name__, 'BeforeRender')
@@ -574,7 +576,8 @@ class TestRendererHelper(unittest.TestCase):
                   'view':None,
                   'renderer_info':helper
                   }
-        self.assertEqual(result, ('values', system))
+        self.assertEqual(result[0], 'values')
+        self.assertEqual(result[1], system)
 
     def test_render_renderer_globals_factory_active(self):
         self._registerRendererFactory()
