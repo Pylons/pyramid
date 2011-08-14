@@ -81,6 +81,10 @@ Deprecations
   them may print a deprecation warning.  All scaffolds and tutorials have
   been changed to use prefixed settings.
 
+- The ``settings`` dictionary now raises a deprecation warning when you
+  attempt to access its values via ``__getattr__`` instead of
+  via ``__getitem__``.
+
 Backwards Incompatibilities
 ---------------------------
 

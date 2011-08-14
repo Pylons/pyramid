@@ -2,6 +2,14 @@ import unittest
 from pyramid import testing
 
 class TestSettings(unittest.TestCase):
+    def setUp(self):
+        from zope.deprecation import __show__
+        __show__.off()
+
+    def tearDown(self):
+        from zope.deprecation import __show__
+        __show__.on()
+        
     def _getTargetClass(self):
         from pyramid.settings import Settings
         return Settings

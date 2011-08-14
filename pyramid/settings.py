@@ -1,12 +1,12 @@
 import os
 
 from zope.deprecation import deprecated
+from zope.deprecation import deprecate
 from zope.interface import implements
 
 from pyramid.interfaces import ISettings
 
 from pyramid.threadlocal import get_current_registry
-from pyramid.util import DottedNameResolver
 
 class Settings(dict):
     """ Deployment settings.  Update application settings (usually
@@ -95,9 +95,15 @@ class Settings(dict):
             }
 
         self.update(update)
-        
+
+    dictlike = ('Use of the request as a dict-like object is deprecated as '
+                'of Pyramid 1.1.  Use dict-like methods of "request.environ" '
+                'instead.')
+
+    @deprecate('Obtaining settings via attributes of the settings dictionary '
+               'is deprecated as of Pyramid 1.2; use settings["foo"] instead '
+               'of settings.foo')
     def __getattr__(self, name):
-        # backwards compatibility
         try:
             return self[name]
         except KeyError:

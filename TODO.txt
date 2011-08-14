@@ -4,14 +4,17 @@ Pyramid TODOs
 Should-Have
 -----------
 
-- Debugging setting for detecting why authenticated_userid(request) might
-  return None.
-
 - Make it possible to use tween aliases in explicit tween config?  If not,
   the tween factories of all add-ons must be APIs.
 
+- Provide a way to set the authentication policy and the authorization policy
+  during a config.include (they are related, so just exposing the currently
+  underscored-private _set_auth* methods won't cut it).
+
 - Come up with an analogue of repoze.zodbconn that doesn't require a closer
   in the pipeline and use it in the ZODB scaffold and tutorial.
+
+- Merge Michael's route group work.
 
 - Deprecate pyramid.security.view_execution_permitted (it only works for
   traversal).
@@ -25,27 +28,22 @@ Should-Have
 
 - "static_path" API (omit host and port).
 
-- Provide a way to set the authentication policy and the authorization policy
-  during a config.include (they are related, so just exposing the currently
-  underscored-private _set_auth* methods won't cut it).
-
-- Try to figure out a way to keep "settings" as the original dictionary
-  passed to the Configurator instead of copying it.
-
-- Merge Michael's route group work.
-
 - Kill off ``bfg.routes`` envvars in router.
 
-- Alias the stupid long default session factory name.
+- Debugging setting for detecting why authenticated_userid(request) might
+  return None.
 
-- Fix indirect circular import between router and config.
+
+Nice-to-Have
+------------
 
 - Eliminate non-deployment-non-scaffold-related Paste dependencies:
   ``paste.urlparser.StaticURLParser``, ``paste.auth.auth_tkt`` (cutnpaste or
   reimplement both).
 
-Nice-to-Have
-------------
+- Alias the stupid long default session factory name.
+
+- Fix indirect circular import between router and config.
 
 - Add narrative docs for wsgiapp and wsgiapp2.
 
