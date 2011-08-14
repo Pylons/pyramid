@@ -37,6 +37,10 @@ Should-Have
 Nice-to-Have
 ------------
 
+- 1.4: turn ``pyramid.settings.Settings`` into a function that returns the
+  original dict (after ``__getattr__`` deprecation period, it was deprecated
+  in 1.2).
+
 - Eliminate non-deployment-non-scaffold-related Paste dependencies:
   ``paste.urlparser.StaticURLParser``, ``paste.auth.auth_tkt`` (cutnpaste or
   reimplement both).
