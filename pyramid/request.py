@@ -14,10 +14,7 @@ from pyramid.compat import json
 from pyramid.exceptions import ConfigurationError
 from pyramid.decorator import reify
 from pyramid.response import Response
-from pyramid.url import resource_url
-from pyramid.url import route_url
-from pyramid.url import static_url
-from pyramid.url import route_path
+from pyramid.url import URLMethodsMixin
 
 class TemplateContext(object):
     pass
@@ -179,7 +176,7 @@ class DeprecatedRequestMethods(object):
         rr_dep % ('cache_for', 'cache_expires'))
 
 
-class Request(BaseRequest, DeprecatedRequestMethods):
+class Request(BaseRequest, DeprecatedRequestMethods, URLMethodsMixin):
     """
     A subclass of the :term:`WebOb` Request class.  An instance of
     this class is created by the :term:`router` and is provided to a
@@ -331,137 +328,6 @@ class Request(BaseRequest, DeprecatedRequestMethods):
                 '(see the Sessions chapter of the Pyramid documentation)')
         return factory(self)
 
-    def route_url(self, route_name, *elements, **kw):
-        """ Return the URL for the route named ``route_name``, using
-        ``*elements`` and ``**kw`` as modifiers.
-
-        This is a convenience method.  The result of calling
-        :meth:`pyramid.request.Request.route_url` is the same as calling
-        :func:`pyramid.url.route_url` with an explicit ``request``
-        parameter.
-
-        The :meth:`pyramid.request.Request.route_url` method calls the
-        :func:`pyramid.url.route_url` function using the Request object as
-        the ``request`` argument.  The ``route_name``, ``*elements`` and
-        ``*kw`` arguments passed to :meth:`pyramid.request.Request.route_url`
-        are passed through to :func:`pyramid.url.route_url` unchanged and its
-        result is returned.
-
-        This call to :meth:`pyramid.request.Request.route_url`::
-
-          request.route_url('route_name')
-
-        Is completely equivalent to calling :func:`pyramid.url.route_url`
-        like this::
-
-          from pyramid.url import route_url
-          route_url('route_name', request)
-        """
-        return route_url(route_name, self, *elements, **kw)
-
-    def resource_url(self, resource, *elements, **kw):
-        """ Return the URL for the :term:`resource` object named ``resource``,
-        using ``*elements`` and ``**kw`` as modifiers.
-
-        This is a convenience method.  The result of calling
-        :meth:`pyramid.request.Request.resource_url` is the same as calling
-        :func:`pyramid.url.resource_url` with an explicit ``request`` parameter.
-
-        The :meth:`pyramid.request.Request.resource_url` method calls the
-        :func:`pyramid.url.resource_url` function using the Request object as
-        the ``request`` argument.  The ``resource``, ``*elements`` and ``*kw``
-        arguments passed to :meth:`pyramid.request.Request.resource_url` are
-        passed through to :func:`pyramid.url.resource_url` unchanged and its
-        result is returned.
-
-        This call to :meth:`pyramid.request.Request.resource_url`::
-
-          request.resource_url(myresource)
-
-        Is completely equivalent to calling :func:`pyramid.url.resource_url`
-        like this::
-
-          from pyramid.url import resource_url
-          resource_url(resource, request)
-
-        .. note:: For backwards compatibility purposes, this method can also
-                  be called as :meth:`pyramid.request.Request.model_url`.
-        """
-        return resource_url(resource, self, *elements, **kw)
-
-    model_url = resource_url # b/w compat forever
-
-    def static_url(self, path, **kw):
-        """
-        Generates a fully qualified URL for a static :term:`asset`.  The
-        asset must live within a location defined via the
-        :meth:`pyramid.config.Configurator.add_static_view`
-        :term:`configuration declaration` directive (see
-        :ref:`static_assets_section`).
-
-        This is a convenience method.  The result of calling
-        :meth:`pyramid.request.Request.static_url` is the same as calling
-        :func:`pyramid.url.static_url` with an explicit ``request`` parameter.
-
-        The :meth:`pyramid.request.Request.static_url` method calls the
-        :func:`pyramid.url.static_url` function using the Request object as
-        the ``request`` argument.  The ``*kw`` arguments passed to
-        :meth:`pyramid.request.Request.static_url` are passed through to
-        :func:`pyramid.url.static_url` unchanged and its result is returned.
-
-        This call to :meth:`pyramid.request.Request.static_url`::
-
-          request.static_url('mypackage:static/foo.css')
-
-        Is completely equivalent to calling :func:`pyramid.url.static_url`
-        like this::
-
-          from pyramid.url import static_url
-          static_url('mypackage:static/foo.css', request)
-
-        See :func:`pyramid.url.static_url` for more information
-        
-        """
-        return static_url(path, self, **kw)
-
-    def route_path(self, route_name, *elements, **kw):
-        """Generates a path (aka a 'relative URL', a URL minus the host,
-        scheme, and port) for a named :app:`Pyramid`
-        :term:`route configuration`.
-        
-        This is a convenience method.  The result of calling
-        :meth:`pyramid.request.Request.route_path` is the same as calling
-        :func:`pyramid.url.route_path` with an explicit ``request``
-        parameter.
-
-        This method accepts the same arguments as
-        :meth:`pyramid.request.Request.route_url` and performs the same duty.
-        It just omits the host, port, and scheme information in the return
-        value; only the script name, path, query parameters, and anchor data
-        are present in the returned string.
-
-        The :meth:`pyramid.request.Request.route_path` method calls the
-        :func:`pyramid.url.route_path` function using the Request object as
-        the ``request`` argument.  The ``*elements`` and ``*kw`` arguments
-        passed to :meth:`pyramid.request.Request.route_path` are passed
-        through to :func:`pyramid.url.route_path` unchanged and its result is
-        returned.
-
-        This call to :meth:`pyramid.request.Request.route_path`::
-
-          request.route_path('foobar')
-
-        Is completely equivalent to calling :func:`pyramid.url.route_path`
-        like this::
-
-          from pyramid.url import route_path
-          route_path('foobar', request)
-
-        See :func:`pyramid.url.route_path` for more information
-
-        """
-        return route_path(route_name, self, *elements, **kw)
-
     @reify
     def response(self):
         """This attribute is actually a "reified" property which returns an
@@ -494,7 +360,6 @@ class Request(BaseRequest, DeprecatedRequestMethods):
     @property
     def json_body(self):
         return json.loads(self.body, encoding=self.charset)
-
 
 def route_request_iface(name, bases=()):
     # zope.interface treats the __name__ as the __doc__ and changes __name__

@@ -251,15 +251,16 @@ class Test_registerSubscriber(TestBase):
 
 class Test_registerRoute(TestBase):
     def test_registerRoute(self):
-        from pyramid.url import route_url
+        from pyramid.request import Request
         from pyramid.interfaces import IRoutesMapper
         from pyramid.testing import registerRoute
         registerRoute(':pagename', 'home', DummyFactory)
         mapper = self.registry.getUtility(IRoutesMapper)
         self.assertEqual(len(mapper.routelist), 1)
-        request = DummyRequest()
-        self.assertEqual(route_url('home', request, pagename='abc'),
-                         'http://example.com/abc')
+        request = Request.blank('/')
+        request.registry = self.registry
+        self.assertEqual(request.route_url('home', pagename='abc'),
+                         'http://localhost/abc')
 
 class Test_registerSettings(TestBase):
     def test_registerSettings(self):

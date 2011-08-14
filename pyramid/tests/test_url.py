@@ -3,16 +3,20 @@ import unittest
 from pyramid.testing import setUp
 from pyramid.testing import tearDown
 
-class ResourceURLTests(unittest.TestCase):
+class TestURLMethodsMixin(unittest.TestCase):
     def setUp(self):
-        setUp()
+        self.config = setUp()
 
     def tearDown(self):
         tearDown()
         
-    def _callFUT(self, resource, request, *elements, **kw):
-        from pyramid.url import resource_url
-        return resource_url(resource, request, *elements, **kw)
+    def _makeOne(self):
+        from pyramid.url import URLMethodsMixin
+        class Request(URLMethodsMixin):
+            application_url = 'http://example.com:5432'
+        request = Request()
+        request.registry = self.config.registry
+        return request
 
     def _registerContextURL(self, reg):
         from pyramid.interfaces import IContextURL
@@ -25,247 +29,233 @@ class ResourceURLTests(unittest.TestCase):
         reg.registerAdapter(DummyContextURL, (Interface, Interface),
                             IContextURL)
 
-    def test_root_default(self):
-        request = _makeRequest()
+    def test_resource_url_root_default(self):
+        request = self._makeOne()
         self._registerContextURL(request.registry)
         root = DummyContext()
-        result = self._callFUT(root, request)
+        result = request.resource_url(root)
         self.assertEqual(result, 'http://example.com/context/')
 
-    def test_extra_args(self):
-        request = _makeRequest()
+    def test_resource_url_extra_args(self):
+        request = self._makeOne()
         self._registerContextURL(request.registry)
         context = DummyContext()
-        result = self._callFUT(context, request, 'this/theotherthing', 'that')
+        result = request.resource_url(context, 'this/theotherthing', 'that')
         self.assertEqual(
             result,
             'http://example.com/context/this%2Ftheotherthing/that')
 
-    def test_unicode_in_element_names(self):
-        request = _makeRequest()
+    def test_resource_url_unicode_in_element_names(self):
+        request = self._makeOne()
         self._registerContextURL(request.registry)
         uc = unicode('La Pe\xc3\xb1a', 'utf-8')
         context = DummyContext()
-        result = self._callFUT(context, request, uc)
+        result = request.resource_url(context, uc)
         self.assertEqual(result,
                      'http://example.com/context/La%20Pe%C3%B1a')
 
-    def test_at_sign_in_element_names(self):
-        request = _makeRequest()
+    def test_resource_url_at_sign_in_element_names(self):
+        request = self._makeOne()
         self._registerContextURL(request.registry)
         context = DummyContext()
-        result = self._callFUT(context, request, '@@myview')
+        result = request.resource_url(context, '@@myview')
         self.assertEqual(result,
                      'http://example.com/context/@@myview')
 
-    def test_element_names_url_quoted(self):
-        request = _makeRequest()
+    def test_resource_url_element_names_url_quoted(self):
+        request = self._makeOne()
         self._registerContextURL(request.registry)
         context = DummyContext()
-        result = self._callFUT(context, request, 'a b c')
+        result = request.resource_url(context, 'a b c')
         self.assertEqual(result, 'http://example.com/context/a%20b%20c')
 
-    def test_with_query_dict(self):
-        request = _makeRequest()
+    def test_resource_url_with_query_dict(self):
+        request = self._makeOne()
         self._registerContextURL(request.registry)
         context = DummyContext()
         uc = unicode('La Pe\xc3\xb1a', 'utf-8')
-        result = self._callFUT(context, request, 'a', query={'a':uc})
+        result = request.resource_url(context, 'a', query={'a':uc})
         self.assertEqual(result,
                          'http://example.com/context/a?a=La+Pe%C3%B1a')
 
-    def test_with_query_seq(self):
-        request = _makeRequest()
+    def test_resource_url_with_query_seq(self):
+        request = self._makeOne()
         self._registerContextURL(request.registry)
         context = DummyContext()
         uc = unicode('La Pe\xc3\xb1a', 'utf-8')
-        result = self._callFUT(context, request, 'a', query=[('a', 'hi there'),
+        result = request.resource_url(context, 'a', query=[('a', 'hi there'),
                                                              ('b', uc)])
         self.assertEqual(result,
                      'http://example.com/context/a?a=hi+there&b=La+Pe%C3%B1a')
 
-    def test_anchor_is_after_root_when_no_elements(self):
-        request = _makeRequest()
+    def test_resource_url_anchor_is_after_root_when_no_elements(self):
+        request = self._makeOne()
         self._registerContextURL(request.registry)
         context = DummyContext()
-        result = self._callFUT(context, request, anchor='a')
+        result = request.resource_url(context, anchor='a')
         self.assertEqual(result,
                          'http://example.com/context/#a')
 
-    def test_anchor_is_after_elements_when_no_qs(self):
-        request = _makeRequest()
+    def test_resource_url_anchor_is_after_elements_when_no_qs(self):
+        request = self._makeOne()
         self._registerContextURL(request.registry)
         context = DummyContext()
-        result = self._callFUT(context, request, 'a', anchor='b')
+        result = request.resource_url(context, 'a', anchor='b')
         self.assertEqual(result,
                          'http://example.com/context/a#b')
 
-    def test_anchor_is_after_qs_when_qs_is_present(self):
-        request = _makeRequest()
+    def test_resource_url_anchor_is_after_qs_when_qs_is_present(self):
+        request = self._makeOne()
         self._registerContextURL(request.registry)
         context = DummyContext()
-        result = self._callFUT(context, request, 'a', 
-                                query={'b':'c'}, anchor='d')
+        result = request.resource_url(context, 'a', 
+                                      query={'b':'c'}, anchor='d')
         self.assertEqual(result,
                          'http://example.com/context/a?b=c#d')
 
-    def test_anchor_is_encoded_utf8_if_unicode(self):
-        request = _makeRequest()
+    def test_resource_url_anchor_is_encoded_utf8_if_unicode(self):
+        request = self._makeOne()
         self._registerContextURL(request.registry)
         context = DummyContext()
         uc = unicode('La Pe\xc3\xb1a', 'utf-8') 
-        result = self._callFUT(context, request, anchor=uc)
+        result = request.resource_url(context, anchor=uc)
         self.assertEqual(result,
                          'http://example.com/context/#La Pe\xc3\xb1a')
 
-    def test_anchor_is_not_urlencoded(self):
-        request = _makeRequest()
+    def test_resource_url_anchor_is_not_urlencoded(self):
+        request = self._makeOne()
         self._registerContextURL(request.registry)
         context = DummyContext()
-        result = self._callFUT(context, request, anchor=' /#')
+        result = request.resource_url(context, anchor=' /#')
         self.assertEqual(result,
                          'http://example.com/context/# /#')
 
-    def test_no_IContextURL_registered(self):
+    def test_resource_url_no_IContextURL_registered(self):
         # falls back to TraversalContextURL
         root = DummyContext()
         root.__name__ = ''
         root.__parent__ = None
-        request = _makeRequest()
+        request = self._makeOne()
         request.environ = {}
-        result = self._callFUT(root, request)
+        result = request.resource_url(root)
         self.assertEqual(result, 'http://example.com:5432/')
 
-    def test_no_registry_on_request(self):
-        from pyramid.threadlocal import get_current_registry
-        reg = get_current_registry()
-        request = DummyRequest()
-        self._registerContextURL(reg)
+    def test_resource_url_no_registry_on_request(self):
+        request = self._makeOne()
+        self._registerContextURL(request.registry)
+        del request.registry
         root = DummyContext()
-        result = self._callFUT(root, request)
+        result = request.resource_url(root)
         self.assertEqual(result, 'http://example.com/context/')
 
-class TestRouteUrl(unittest.TestCase):
-    def setUp(self):
-        self.config = setUp()
-
-    def tearDown(self):
-        tearDown()
-        
-    def _callFUT(self, *arg, **kw):
-        from pyramid.url import route_url
-        return route_url(*arg, **kw)
-
-    def test_with_elements(self):
+    def test_route_url_with_elements(self):
         from pyramid.interfaces import IRoutesMapper
-        request = _makeRequest()
+        request = self._makeOne()
         mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
         request.registry.registerUtility(mapper, IRoutesMapper)
-        result = self._callFUT('flub', request, 'extra1', 'extra2')
+        result = request.route_url('flub', 'extra1', 'extra2')
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3/extra1/extra2')
 
-    def test_with_elements_path_endswith_slash(self):
+    def test_route_url_with_elements_path_endswith_slash(self):
         from pyramid.interfaces import IRoutesMapper
-        request = _makeRequest()
+        request = self._makeOne()
         mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3/'))
         request.registry.registerUtility(mapper, IRoutesMapper)
-        result = self._callFUT('flub', request, 'extra1', 'extra2')
+        result = request.route_url('flub', 'extra1', 'extra2')
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3/extra1/extra2')
 
-    def test_no_elements(self):
+    def test_route_url_no_elements(self):
         from pyramid.interfaces import IRoutesMapper
-        request = _makeRequest()
+        request = self._makeOne()
         mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
         request.registry.registerUtility(mapper, IRoutesMapper)
-        result = self._callFUT('flub', request, a=1, b=2, c=3, _query={'a':1},
-                               _anchor=u"foo")
+        result = request.route_url('flub', a=1, b=2, c=3, _query={'a':1},
+                                   _anchor=u"foo")
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3?a=1#foo')
 
-    def test_with_anchor_string(self):
+    def test_route_url_with_anchor_string(self):
         from pyramid.interfaces import IRoutesMapper
-        request = _makeRequest()
+        request = self._makeOne()
         mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
         request.registry.registerUtility(mapper, IRoutesMapper)
-        result = self._callFUT('flub', request, _anchor="La Pe\xc3\xb1a")
+        result = request.route_url('flub', _anchor="La Pe\xc3\xb1a")
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3#La Pe\xc3\xb1a')
 
-    def test_with_anchor_unicode(self):
+    def test_route_url_with_anchor_unicode(self):
         from pyramid.interfaces import IRoutesMapper
-        request = _makeRequest()
+        request = self._makeOne()
         mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
         request.registry.registerUtility(mapper, IRoutesMapper)
         anchor = unicode('La Pe\xc3\xb1a', 'utf-8')
-        result = self._callFUT('flub', request, _anchor=anchor)
+        result = request.route_url('flub', _anchor=anchor)
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3#La Pe\xc3\xb1a')
 
-    def test_with_query(self):
+    def test_route_url_with_query(self):
         from pyramid.interfaces import IRoutesMapper
-        request = _makeRequest()
+        request = self._makeOne()
         mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
         request.registry.registerUtility(mapper, IRoutesMapper)
-        result = self._callFUT('flub', request, _query={'q':'1'})
+        result = request.route_url('flub', _query={'q':'1'})
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3?q=1')
 
-    def test_with_app_url(self):
+    def test_route_url_with_app_url(self):
         from pyramid.interfaces import IRoutesMapper
-        request = _makeRequest()
+        request = self._makeOne()
         mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
         request.registry.registerUtility(mapper, IRoutesMapper)
-        result = self._callFUT('flub', request, _app_url='http://example2.com')
+        result = request.route_url('flub', _app_url='http://example2.com')
         self.assertEqual(result,
                          'http://example2.com/1/2/3')
 
-    def test_it_generation_error(self):
+    def test_route_url_generation_error(self):
         from pyramid.interfaces import IRoutesMapper
-        request = _makeRequest()
+        request = self._makeOne()
         mapper = DummyRoutesMapper(raise_exc=KeyError)
         request.registry.registerUtility(mapper, IRoutesMapper)
         mapper.raise_exc = KeyError
-        self.assertRaises(KeyError, self._callFUT, 'flub', request, a=1)
+        self.assertRaises(KeyError, request.route_url, 'flub', request, a=1)
 
-    def test_generate_doesnt_receive_query_or_anchor(self):
+    def test_route_url_generate_doesnt_receive_query_or_anchor(self):
         from pyramid.interfaces import IRoutesMapper
+        request = self._makeOne()
         route = DummyRoute(result='')
         mapper = DummyRoutesMapper(route=route)
-        from zope.component import getSiteManager
-        sm = getSiteManager()
-        sm.registerUtility(mapper, IRoutesMapper)
-        request = DummyRequest()
-        result = self._callFUT('flub', request, _query=dict(name='some_name'))
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = request.route_url('flub', _query=dict(name='some_name'))
         self.assertEqual(route.kw, {}) # shouldnt have anchor/query
         self.assertEqual(result, 'http://example.com:5432?name=some_name')
 
-    def test_with_pregenerator(self):
+    def test_route_url_with_pregenerator(self):
         from pyramid.interfaces import IRoutesMapper
-        request = _makeRequest()
+        request = self._makeOne()
         route = DummyRoute(result='/1/2/3')
         def pregenerator(request, elements, kw):
             return ('a',), {'_app_url':'http://example2.com'}
         route.pregenerator = pregenerator
         mapper = DummyRoutesMapper(route=route)
         request.registry.registerUtility(mapper, IRoutesMapper)
-        result = self._callFUT('flub', request)
+        result = request.route_url('flub')
         self.assertEqual(result,  'http://example2.com/1/2/3/a')
         self.assertEqual(route.kw, {}) # shouldnt have anchor/query
 
-    def test_with_anchor_app_url_elements_and_query(self):
+    def test_route_url_with_anchor_app_url_elements_and_query(self):
         from pyramid.interfaces import IRoutesMapper
-        request = _makeRequest()
+        request = self._makeOne()
         mapper = DummyRoutesMapper(route=DummyRoute(result='/1/2/3'))
         request.registry.registerUtility(mapper, IRoutesMapper)
-        result = self._callFUT('flub', request, 'element1',
-                               _app_url='http://example2.com',
-                               _anchor='anchor', _query={'q':'1'})
+        result = request.route_url('flub', 'element1',
+                                   _app_url='http://example2.com',
+                                   _anchor='anchor', _query={'q':'1'})
         self.assertEqual(result,
                          'http://example2.com/1/2/3/element1?q=1#anchor')
 
-    def test_integration_with_real_request(self):
+    def test_route_url_integration_with_real_request(self):
         # to try to replicate https://github.com/Pylons/pyramid/issues/213
         from pyramid.interfaces import IRoutesMapper
         from pyramid.request import Request
@@ -273,147 +263,213 @@ class TestRouteUrl(unittest.TestCase):
         request.registry = self.config.registry
         mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
         request.registry.registerUtility(mapper, IRoutesMapper)
-        result = self._callFUT('flub', request, 'extra1', 'extra2')
+        result = request.route_url('flub', 'extra1', 'extra2')
         self.assertEqual(result,
                          'http://localhost/1/2/3/extra1/extra2')
         
 
-class TestCurrentRouteUrl(unittest.TestCase):
-    def setUp(self):
-        setUp()
+    def test_current_route_url_current_request_has_no_route(self):
+        request = self._makeOne()
+        self.assertRaises(ValueError, request.current_route_url)
 
-    def tearDown(self):
-        tearDown()
-        
-    def _callFUT(self, *arg, **kw):
-        from pyramid.url import current_route_url
-        return current_route_url(*arg, **kw)
-
-    def test_current_request_has_no_route(self):
-        request = _makeRequest()
-        self.assertRaises(ValueError, self._callFUT, request)
-
-    def test_with_elements_query_and_anchor(self):
+    def test_current_route_url_with_elements_query_and_anchor(self):
         from pyramid.interfaces import IRoutesMapper
-        request = _makeRequest()
+        request = self._makeOne()
         route = DummyRoute('/1/2/3')
         mapper = DummyRoutesMapper(route=route)
         request.matched_route = route
         request.matchdict = {}
         request.registry.registerUtility(mapper, IRoutesMapper)
-        result = self._callFUT(request, 'extra1', 'extra2', _query={'a':1},
-                               _anchor=u"foo")
+        result = request.current_route_url('extra1', 'extra2', _query={'a':1},
+                                           _anchor=u"foo")
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3/extra1/extra2?a=1#foo')
 
-    def test_with__route_name(self):
+    def test_current_route_url_with_route_name(self):
         from pyramid.interfaces import IRoutesMapper
-        request = _makeRequest()
+        request = self._makeOne()
         route = DummyRoute('/1/2/3')
         mapper = DummyRoutesMapper(route=route)
         request.matched_route = route
         request.matchdict = {}
         request.registry.registerUtility(mapper, IRoutesMapper)
-        result = self._callFUT(request, 'extra1', 'extra2', _query={'a':1},
-                               _anchor=u"foo", _route_name='bar')
+        result = request.current_route_url('extra1', 'extra2', _query={'a':1},
+                                           _anchor=u"foo", _route_name='bar')
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3/extra1/extra2?a=1#foo')
 
-class TestRoutePath(unittest.TestCase):
-    def setUp(self):
-        setUp()
-
-    def tearDown(self):
-        tearDown()
-        
-    def _callFUT(self, *arg, **kw):
-        from pyramid.url import route_path
-        return route_path(*arg, **kw)
-
-    def test_with_elements(self):
+    def test_route_path_with_elements(self):
         from pyramid.interfaces import IRoutesMapper
-        request = _makeRequest()
+        request = self._makeOne()
         mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
         request.registry.registerUtility(mapper, IRoutesMapper)
-        result = self._callFUT('flub', request, 'extra1', 'extra2',
-                               a=1, b=2, c=3, _query={'a':1},
-                               _anchor=u"foo")
+        request.script_name = ''
+        result = request.route_path('flub', 'extra1', 'extra2',
+                                    a=1, b=2, c=3, _query={'a':1},
+                                    _anchor=u"foo")
         self.assertEqual(result, '/1/2/3/extra1/extra2?a=1#foo')
 
-    def test_with_script_name(self):
+    def test_route_path_with_script_name(self):
         from pyramid.interfaces import IRoutesMapper
-        request = _makeRequest()
+        request = self._makeOne()
         request.script_name = '/foo'
         mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
         request.registry.registerUtility(mapper, IRoutesMapper)
-        result = self._callFUT('flub', request, 'extra1', 'extra2',
-                               a=1, b=2, c=3, _query={'a':1},
-                               _anchor=u"foo")
+        result = request.route_path('flub', 'extra1', 'extra2',
+                                    a=1, b=2, c=3, _query={'a':1},
+                                    _anchor=u"foo")
         self.assertEqual(result, '/foo/1/2/3/extra1/extra2?a=1#foo')
         
-class TestStaticUrl(unittest.TestCase):
-    def setUp(self):
-        setUp()
+    def test_static_url_staticurlinfo_notfound(self):
+        request = self._makeOne()
+        self.assertRaises(ValueError, request.static_url, 'static/foo.css')
 
-    def tearDown(self):
-        tearDown()
-        
-    def _callFUT(self, *arg, **kw):
-        from pyramid.url import static_url
-        return static_url(*arg, **kw)
+    def test_static_url_abspath(self):
+        request = self._makeOne()
+        self.assertRaises(ValueError, request.static_url, '/static/foo.css')
 
-    def test_staticurlinfo_notfound(self):
-        request = _makeRequest()
-        self.assertRaises(ValueError, self._callFUT, 'static/foo.css', request)
-
-    def test_abspath(self):
-        request = _makeRequest()
-        self.assertRaises(ValueError, self._callFUT, '/static/foo.css', request)
-
-    def test_found_rel(self):
+    def test_static_url_found_rel(self):
         from pyramid.interfaces import IStaticURLInfo
-        request = _makeRequest()
+        request = self._makeOne()
         info = DummyStaticURLInfo('abc')
         request.registry.registerUtility(info, IStaticURLInfo)
-        result = self._callFUT('static/foo.css', request)
+        result = request.static_url('static/foo.css')
         self.assertEqual(result, 'abc')
         self.assertEqual(info.args,
                          ('pyramid.tests:static/foo.css', request, {}) )
 
-    def test_found_abs(self):
+    def test_static_url_abs(self):
         from pyramid.interfaces import IStaticURLInfo
-        request = _makeRequest()
+        request = self._makeOne()
         info = DummyStaticURLInfo('abc')
         request.registry.registerUtility(info, IStaticURLInfo)
-        result = self._callFUT('pyramid.tests:static/foo.css', request)
+        result = request.static_url('pyramid.tests:static/foo.css')
         self.assertEqual(result, 'abc')
         self.assertEqual(info.args,
                          ('pyramid.tests:static/foo.css', request, {}) )
 
-    def test_found_abs_no_registry_on_request(self):
-        from pyramid.threadlocal import get_current_registry
+    def test_static_url_found_abs_no_registry_on_request(self):
         from pyramid.interfaces import IStaticURLInfo
-        request = DummyRequest()
-        registry = get_current_registry()
+        request = self._makeOne()
+        registry = request.registry
         info = DummyStaticURLInfo('abc')
         registry.registerUtility(info, IStaticURLInfo)
-        result = self._callFUT('pyramid.tests:static/foo.css', request)
+        del request.registry
+        result = request.static_url('pyramid.tests:static/foo.css')
         self.assertEqual(result, 'abc')
         self.assertEqual(info.args,
                          ('pyramid.tests:static/foo.css', request, {}) )
+
+class Test_route_url(unittest.TestCase):
+    def _callFUT(self, route_name, request, *elements, **kw):
+        from pyramid.url import route_url
+        return route_url(route_name, request, *elements, **kw)
+
+    def _makeRequest(self):
+        class Request(object):
+            def route_url(self, route_name, *elements, **kw):
+                self.route_name = route_name
+                self.elements = elements
+                self.kw = kw
+                return 'route url'
+        return Request()
+
+    def test_it(self):
+        request = self._makeRequest()
+        result = self._callFUT('abc', request, 'a', _app_url='')
+        self.assertEqual(result, 'route url')
+        self.assertEqual(request.route_name, 'abc')
+        self.assertEqual(request.elements, ('a',))
+        self.assertEqual(request.kw, {'_app_url':''})
+
+class Test_route_path(unittest.TestCase):
+    def _callFUT(self, route_name, request, *elements, **kw):
+        from pyramid.url import route_path
+        return route_path(route_name, request, *elements, **kw)
+
+    def _makeRequest(self):
+        class Request(object):
+            def route_path(self, route_name, *elements, **kw):
+                self.route_name = route_name
+                self.elements = elements
+                self.kw = kw
+                return 'route path'
+        return Request()
+
+    def test_it(self):
+        request = self._makeRequest()
+        result = self._callFUT('abc', request, 'a', _app_url='')
+        self.assertEqual(result, 'route path')
+        self.assertEqual(request.route_name, 'abc')
+        self.assertEqual(request.elements, ('a',))
+        self.assertEqual(request.kw, {'_app_url':''})
+
+class Test_resource_url(unittest.TestCase):
+    def _callFUT(self, resource, request, *elements, **kw):
+        from pyramid.url import resource_url
+        return resource_url(resource, request, *elements, **kw)
+
+    def _makeRequest(self):
+        class Request(object):
+            def resource_url(self, resource, *elements, **kw):
+                self.resource = resource
+                self.elements = elements
+                self.kw = kw
+                return 'resource url'
+        return Request()
+
+    def test_it(self):
+        request = self._makeRequest()
+        result = self._callFUT('abc', request, 'a', _app_url='')
+        self.assertEqual(result, 'resource url')
+        self.assertEqual(request.resource, 'abc')
+        self.assertEqual(request.elements, ('a',))
+        self.assertEqual(request.kw, {'_app_url':''})
+
+class Test_static_url(unittest.TestCase):
+    def _callFUT(self, path, request, **kw):
+        from pyramid.url import static_url
+        return static_url(path, request, **kw)
+
+    def _makeRequest(self):
+        class Request(object):
+            def static_url(self, path, **kw):
+                self.path = path
+                self.kw = kw
+                return 'static url'
+        return Request()
+
+    def test_it(self):
+        request = self._makeRequest()
+        result = self._callFUT('abc', request, _app_url='')
+        self.assertEqual(result, 'static url')
+        self.assertEqual(request.path, 'abc')
+        self.assertEqual(request.kw, {'_app_url':''})
+
+class Test_current_route_url(unittest.TestCase):
+    def _callFUT(self, request, *elements, **kw):
+        from pyramid.url import current_route_url
+        return current_route_url(request, *elements, **kw)
+
+    def _makeRequest(self):
+        class Request(object):
+            def current_route_url(self, *elements, **kw):
+                self.elements = elements
+                self.kw = kw
+                return 'current route url'
+        return Request()
+
+    def test_it(self):
+        request = self._makeRequest()
+        result = self._callFUT(request, 'abc', _app_url='')
+        self.assertEqual(result, 'current route url')
+        self.assertEqual(request.elements, ('abc',))
+        self.assertEqual(request.kw, {'_app_url':''})
 
 class DummyContext(object):
     def __init__(self, next=None):
         self.next = next
         
-class DummyRequest:
-    application_url = 'http://example.com:5432' # app_url never ends with slash
-    script_name = ''
-    def __init__(self, environ=None):
-        if environ is None:
-            environ = {}
-        self.environ = environ
-
 class DummyRoutesMapper:
     raise_exc = None
     def __init__(self, route=None, raise_exc=False):
@@ -432,12 +488,6 @@ class DummyRoute:
         self.kw = kw
         return self.result
     
-def _makeRequest(environ=None):
-    from pyramid.registry import Registry
-    request = DummyRequest(environ)
-    request.registry = Registry()
-    return request
-        
 class DummyStaticURLInfo:
     def __init__(self, result):
         self.result = result

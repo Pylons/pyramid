@@ -532,7 +532,7 @@ Now you can readily use Pyramid's APIs for generating URLs:
 
 .. code-block:: python
 
-   route_url('verify', env['request'], code='1337')
+   env['request'].route_url('verify', code='1337')
    # will return 'https://example.com/prefix/verify/1337'
 
 Cleanup

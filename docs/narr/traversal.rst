@@ -565,6 +565,6 @@ See the :ref:`view_config_chapter` chapter for detailed information about
 The :mod:`pyramid.traversal` module contains API functions that deal with
 traversal, such as traversal invocation from within application code.
 
-The :func:`pyramid.url.resource_url` function generates a URL when given a
-resource retrieved from a resource tree.
+The :meth:`pyramid.request.Request.resource_url` method generates a URL when
+given a resource retrieved from a resource tree.
 

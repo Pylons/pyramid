@@ -634,12 +634,13 @@ ILogger = IDebugLogger # b/c
 
 class IRoutePregenerator(Interface):
     def __call__(request, elements, kw):
-        """ A pregenerator is a function associated by a developer
-        with a :term:`route`. The pregenerator for a route is called
-        by :func:`pyramid.url.route_url` in order to adjust the set
-        of arguments passed to it by the user for special purposes,
-        such as Pylons 'subdomain' support.  It will influence the URL
-        returned by ``route_url``.
+
+        """ A pregenerator is a function associated by a developer with a
+        :term:`route`. The pregenerator for a route is called by
+        :meth:`pyramid.request.Request.route_url` in order to adjust the set
+        of arguments passed to it by the user for special purposes, such as
+        Pylons 'subdomain' support.  It will influence the URL returned by
+        ``route_url``.
 
         A pregenerator should return a two-tuple of ``(elements, kw)``
         after examining the originals passed to this function, which

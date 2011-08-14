@@ -765,20 +765,19 @@ Or provide the literal string ``/`` as the pattern:
 Generating Route URLs
 ---------------------
 
-Use the :func:`pyramid.url.route_url` function to generate URLs based on
-route patterns.  For example, if you've configured a route with the ``name``
-"foo" and the ``pattern`` "{a}/{b}/{c}", you might do this.
+Use the :meth:`pyramid.request.Request.route_url` method to generate URLs
+based on route patterns.  For example, if you've configured a route with the
+``name`` "foo" and the ``pattern`` "{a}/{b}/{c}", you might do this.
 
 .. ignore-next-block
 .. code-block:: python
    :linenos:
 
-   from pyramid.url import route_url
-   url = route_url('foo', request, a='1', b='2', c='3')
+   url = request.route_url('foo', a='1', b='2', c='3')
 
 This would return something like the string ``http://example.com/1/2/3`` (at
 least if the current protocol and hostname implied ``http://example.com``).
-See the :func:`~pyramid.url.route_url` API documentation for more
+See the :meth:`~pyramid.request.Request.route_url` API documentation for more
 information.
 
 .. index::
@@ -1122,8 +1121,8 @@ In the above configuration, the ``show_users`` route will have an effective
 route pattern of ``/users/show``, instead of ``/show`` because the
 ``route_prefix`` argument will be prepended to the pattern.  The route will
 then only match if the URL path is ``/users/show``, and when the
-:func:`pyramid.url.route_url` function is called with the route name
-``show_users``, it will generate a URL with that same path.
+:meth:`pyramid.request.Request.route_url` function is called with the route
+name ``show_users``, it will generate a URL with that same path.
 
 Route prefixes are recursive, so if a callable executed via an include itself
 turns around and includes another callable, the second-level route prefix

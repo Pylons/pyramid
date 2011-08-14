@@ -468,17 +468,18 @@ when the application :term:`root factory` returned an instance of the
 
 .. _changing_resource_url:
 
-Changing How :mod:`pyramid.url.resource_url` Generates a URL
-------------------------------------------------------------
+Changing How :meth:`pyramid.request.Request.resource_url` Generates a URL
+-------------------------------------------------------------------------
 
 When you add a traverser as described in :ref:`changing_the_traverser`, it's
-often convenient to continue to use the :func:`pyramid.url.resource_url` API.
-However, since the way traversal is done will have been modified, the URLs it
-generates by default may be incorrect.
+often convenient to continue to use the
+:meth:`pyramid.request.Request.resource_url` API.  However, since the way
+traversal is done will have been modified, the URLs it generates by default
+may be incorrect.
 
 If you've added a traverser, you can change how
-:func:`~pyramid.url.resource_url` generates a URL for a specific type of
-resource by adding a registerAdapter call for
+:meth:`~pyramid.request.Request.resource_url` generates a URL for a specific
+type of resource by adding a registerAdapter call for
 :class:`pyramid.interfaces.IContextURL` to your application:
 
 .. code-block:: python
@@ -493,8 +494,8 @@ resource by adding a registerAdapter call for
                                    IContextURL)
 
 In the above example, the ``myapp.traversal.URLGenerator`` class will be used
-to provide services to :func:`~pyramid.url.resource_url` any time the
-:term:`context` passed to ``resource_url`` is of class
+to provide services to :meth:`~pyramid.request.Request.resource_url` any time
+the :term:`context` passed to ``resource_url`` is of class
 ``myapp.resources.MyRoot``.  The second argument in the ``(MyRoot,
 Interface)`` tuple represents the type of interface that must be possessed by
 the :term:`request` (in this case, any interface, represented by

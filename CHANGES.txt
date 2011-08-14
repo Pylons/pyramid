@@ -71,6 +71,13 @@ Internal
   (it inherits from ``dict``), and it's the value that is passed to templates
   as a top-level dictionary.
 
+- The ``route_url``, ``route_path``, ``resource_url``, ``static_url``, and
+  ``current_route_url`` functions in the ``pyramid.url`` package now delegate
+  to a method on the request they've been passed, instead of the other way
+  around.  The pyramid.request.Request object now inherits from a mixin named
+  pyramid.url.URLMethodsMixin to make this possible, and all url/path
+  generation logic is embedded in this mixin.
+
 Deprecations
 ------------
 
@@ -100,6 +107,11 @@ Backwards Incompatibilities
 
 Documentation
 -------------
+
+- Narrative and API documentation which used the ``route_url``,
+  ``route_path``, ``resource_url``, ``static_url``, and ``current_route_url``
+  functions in the ``pyramid.url`` package have now been changed to use
+  eponymous methods of the request instead.
 
 - Added a section entitled "Using a Route Prefix to Compose Applications" to
   the "URL Dispatch" narrative documentation chapter.
