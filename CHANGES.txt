@@ -66,6 +66,11 @@ Internal
   will be set, and subsequent calls to ``__call__`` will always return the
   same body.  Delete the body attribute to rerender the exception body.
 
+- Previously the ``pyramid.events.BeforeRender`` event *wrapped* a dictionary
+  (it addressed it as its ``_system`` attribute).  Now it *is* a dictionary
+  (it inherits from ``dict``), and it's the value that is passed to templates
+  as a top-level dictionary.
+
 Deprecations
 ------------
 
@@ -108,6 +113,10 @@ Documentation
 
 - Added a Logging chapter to the narrative docs (based on the Pylons logging
   docs, thanks Phil).
+
+- Added the ``pyramid.interfaces.IDict`` interface representing the methods
+  of a dictionary, for documentation purposes only (IMultiDict and
+  IBeforeRender inherit from it).
 
 Dependency Changes
 ------------------

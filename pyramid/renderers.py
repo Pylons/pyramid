@@ -384,13 +384,12 @@ class RendererHelper(object):
         return self.renderer
 
     def render_view(self, request, response, view, context):
-        system = {
-            'view':view,
-            'renderer_name':self.name, # b/c
-            'renderer_info':self,
-            'context':context,
-            'request':request
-            }
+        system = {'view':view,
+                  'renderer_name':self.name, # b/c
+                  'renderer_info':self,
+                  'context':context,
+                  'request':request
+                  }
         return self.render_to_response(response, system, request=request)
 
     def render(self, value, system_values, request=None):
@@ -404,6 +403,8 @@ class RendererHelper(object):
                 'request':request,
                 }
 
+        system_values = BeforeRender(system_values, value)
+
         registry = self.registry
         globals_factory = registry.queryUtility(IRendererGlobalsFactory)
 
@@ -412,7 +413,7 @@ class RendererHelper(object):
             if renderer_globals:
                 system_values.update(renderer_globals)
 
-        registry.notify(BeforeRender(system_values, value))
+        registry.notify(system_values)
 
         result = renderer(value, system_values)
         return result

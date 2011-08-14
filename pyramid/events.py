@@ -164,7 +164,6 @@ class ApplicationCreated(object):
 WSGIApplicationCreatedEvent = ApplicationCreated # b/c (as of 1.0)
 
 class BeforeRender(dict):
-    implements(IBeforeRender)
     """
     Subscribers to this event may introspect the and modify the set of
     :term:`renderer globals` before they are passed to a :term:`renderer`.
@@ -172,9 +171,9 @@ class BeforeRender(dict):
     for this purpose.  For example::
 
       from repoze.events import subscriber
-      from pyramid.interfaces import IBeforeRender
+      from pyramid.events import BeforeRender
 
-      @subscriber(IBeforeRender)
+      @subscriber(BeforeRender)
       def add_global(event):
           event['mykey'] = 'foo'
 
@@ -198,42 +197,12 @@ class BeforeRender(dict):
     The event has an additional attribute named ``rendering_val``.  This is
     the (non-system) value returned by a view or passed to ``render*`` as
     ``value``.  This feature is new in Pyramid 1.2.
-    """
 
+    See also :class:`pyramid.interfaces.IBeforeRender`.
+    """
+    implements(IBeforeRender)
     def __init__(self, system, rendering_val=None):
-        self._system = system
+        dict.__init__(self, system)
         self.rendering_val = rendering_val
 
-    def __setitem__(self, name, value):
-        """ Set a name/value pair into the dictionary which is passed to a
-        renderer as the renderer globals dictionary."""
-        self._system[name] = value
-
-    def setdefault(self, name, default=None):
-        """ Return the existing value for ``name`` in the renderers globals
-        dictionary.  If no value with ``name`` exists in the dictionary, set
-        the ``default`` value into the renderer globals dictionary under the
-        name passed.  If a value already existed in the dictionary, return
-        it.  If a value did not exist in the dictionary, return the default"""
-        return self._system.setdefault(name, default)
-
-    def update(self, d):
-        """ Update the renderer globals dictionary with another dictionary
-        ``d``."""
-        return self._system.update(d)
-
-    def __contains__(self, k):
-        """ Return ``True`` if ``k`` exists in the renderer globals
-        dictionary."""
-        return k in self._system
-
-    def __getitem__(self, k):
-        """ Return the value for key ``k`` from the renderer globals
-        dictionary."""
-        return self._system[k]
-
-    def get(self, k, default=None):
-        """ Return the value for key ``k`` from the renderer globals
-        dictionary, or the default if no such value exists."""
-        return self._system.get(k)
 

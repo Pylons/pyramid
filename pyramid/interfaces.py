@@ -268,13 +268,80 @@ class IExceptionResponse(IException, IResponse):
     def prepare(environ):
         """ Prepares the response for being called as a WSGI application """
 
-class IBeforeRender(Interface):
+class IDict(Interface):
+    # Documentation-only interface
+
+    def __contains__(k):
+        """ Return ``True`` if key ``k`` exists in the dictionary."""
+
+    def __setitem__(k, value):
+        """ Set a key/value pair into the dictionary"""
+        
+    def __delitem__(k):
+        """ Delete an item from the dictionary which is passed to the
+        renderer as the renderer globals dictionary."""
+            
+    def __getitem__(k):
+        """ Return the value for key ``k`` from the dictionary or raise a
+        KeyError if the key doesn't exist"""
+
+    def __iter__():
+        """ Return an iterator over the keys of this dictionary """
+            
+    def get(k, default=None):
+        """ Return the value for key ``k`` from the renderer dictionary, or
+        the default if no such value exists."""
+
+    has_key = __contains__
+
+    def items():
+        """ Return a list of [(k,v)] pairs from the dictionary """
+
+    def iteritems():
+        """ Return an iterator of (k,v) pairs from the dictionary """
+
+    def keys():
+        """ Return a list of keys from the dictionary """
+
+    def iterkeys():
+        """ Return an iterator of keys from the dictionary """
+
+    def values():
+        """ Return a list of values from the dictionary """
+
+    def itervalues():
+        """ Return an iterator of values from the dictionary """
+
+    def pop(k, default=None):
+        """ Pop the key k from the dictionary and return its value.  If k
+        doesn't exist, and default is provided, return the default.  If k
+        doesn't exist and default is not provided, raise a KeyError."""
+
+    def popitem():
+        """ Pop the item with key k from the dictionary and return it as a
+        two-tuple (k, v).  If k doesn't exist, raise a KeyError."""
+
+    def setdefault(k, default=None):
+        """ Return the existing value for key ``k`` in the dictionary.  If no
+         value with ``k`` exists in the dictionary, set the ``default``
+         value into the dictionary under the k name passed.  If a value already
+         existed in the dictionary, return it.  If a value did not exist in
+         the dictionary, return the default"""
+    
+    def update(d):
+        """ Update the renderer dictionary with another dictionary ``d``."""
+
+    def clear():
+        """ Clear all values from the dictionary """
+
+class IBeforeRender(IDict):
     """
     Subscribers to this event may introspect the and modify the set of
     :term:`renderer globals` before they are passed to a :term:`renderer`.
-    This event object iself has a dictionary-like interface that can be used
-    for this purpose.  For example::
-
+    The event object itself provides a dictionary-like interface for adding
+    and removing :term:`renderer globals`.  The keys and values of the
+    dictionary are those globals.  For example::
+    
       from repoze.events import subscriber
       from pyramid.interfaces import IBeforeRender
 
@@ -284,33 +351,6 @@ class IBeforeRender(Interface):
 
     See also :ref:`beforerender_event`.
     """
-    def __setitem__(name, value):
-        """ Set a name/value pair into the dictionary which is passed to a
-        renderer as the renderer globals dictionary.  """
-
-    def setdefault(name, default=None):
-        """ Return the existing value for ``name`` in the renderers globals
-        dictionary.  If no value with ``name`` exists in the dictionary, set
-        the ``default`` value into the renderer globals dictionary under the
-        name passed.  If a value already existed in the dictionary, return
-        it.  If a value did not exist in the dictionary, return the default"""
-
-    def update(d):
-        """ Update the renderer globals dictionary with another dictionary
-        ``d``.  """
-
-    def __contains__(k):
-        """ Return ``True`` if ``k`` exists in the renderer globals
-        dictionary."""
-
-    def __getitem__(k):
-        """ Return the value for key ``k`` from the renderer globals
-        dictionary."""
-
-    def get(k, default=None):
-        """ Return the value for key ``k`` from the renderer globals
-        dictionary, or the default if no such value exists."""
-
     rendering_val = Attribute('The value returned by a view or passed to a '
                               '``render`` method for this rendering. '
                               'This feature is new in Pyramid 1.2.')
@@ -405,7 +445,7 @@ class IAuthorizationPolicy(Interface):
         ``pyramid.security.principals_allowed_by_permission`` API is
         used."""
 
-class IMultiDict(Interface): # docs-only interface
+class IMultiDict(IDict): # docs-only interface
     """
     An ordered dictionary that can have multiple values for each key. A
     multidict adds the methods ``getall``, ``getone``, ``mixed``, ``extend``

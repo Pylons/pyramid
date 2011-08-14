@@ -190,31 +190,27 @@ class TestBeforeRender(unittest.TestCase):
         verifyObject(IBeforeRender, event)
 
     def test_setitem_success(self):
-        system = {}
-        event = self._makeOne(system)
+        event = self._makeOne({})
         event['a'] = 1
-        self.assertEqual(system, {'a':1})
+        self.assertEqual(event, {'a':1})
 
     def test_setdefault_fail(self):
-        system = {}
-        event = self._makeOne(system)
+        event = self._makeOne({})
         result = event.setdefault('a', 1)
         self.assertEqual(result, 1)
-        self.assertEqual(system, {'a':1})
+        self.assertEqual(event, {'a':1})
         
     def test_setdefault_success(self):
-        system = {}
-        event = self._makeOne(system)
+        event = self._makeOne({})
         event['a'] = 1
         result = event.setdefault('a', 2)
         self.assertEqual(result, 1)
-        self.assertEqual(system, {'a':1})
+        self.assertEqual(event, {'a':1})
 
     def test_update_success(self):
-        system = {'a':1}
-        event = self._makeOne(system)
+        event = self._makeOne({'a':1})
         event.update({'b':2})
-        self.assertEqual(system, {'a':1, 'b':2})
+        self.assertEqual(event, {'a':1, 'b':2})
 
     def test__contains__True(self):
         system = {'a':1}

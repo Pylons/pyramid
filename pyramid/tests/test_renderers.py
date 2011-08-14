@@ -520,9 +520,9 @@ class TestRendererHelper(unittest.TestCase):
         self._registerResponseFactory()
         request = Dummy()
         helper = self._makeOne('loo.foo')
-        response = helper.render_to_response('values', 'system_values',
+        response = helper.render_to_response('values', {},
                                              request=request)
-        self.assertEqual(response.body, ('values', 'system_values'))
+        self.assertEqual(response.body, ('values', {}))
 
     def test_render_view(self):
         self._registerRendererFactory()
@@ -558,7 +558,7 @@ class TestRendererHelper(unittest.TestCase):
         result = helper.render('value', {})
         self.assertEqual(result, ('value', {}))
         self.assertTrue(reg.queried)
-        self.assertEqual(reg.event._system, {})
+        self.assertEqual(reg.event, {})
         self.assertEqual(reg.event.__class__.__name__, 'BeforeRender')
 
     def test_render_system_values_is_None(self):

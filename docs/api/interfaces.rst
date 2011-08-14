@@ -59,6 +59,9 @@ Other Interfaces
   .. autointerface:: IViewMapper
      :members:
 
+  .. autointerface:: IDict
+     :members:
+
   .. autointerface:: IMultiDict
      :members:
 
