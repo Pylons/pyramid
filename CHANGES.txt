@@ -85,6 +85,8 @@ Internal
   pyramid.url.URLMethodsMixin to make this possible, and all url/path
   generation logic is embedded in this mixin.
 
+- Refactor ``pyramid.config`` into a package.
+
 Deprecations
 ------------
 

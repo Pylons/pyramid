@@ -75,7 +75,7 @@ setup(name='pyramid',
       zip_safe=False,
       install_requires = install_requires,
       tests_require = tests_require,
-      test_suite="pyramid.tests",
+      test_suite="pyramid",
       entry_points = """\
         [paste.paster_create_template]
         pyramid_starter=pyramid.scaffolds:StarterProjectTemplate

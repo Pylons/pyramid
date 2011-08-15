@@ -1,5 +1,5 @@
 from pyramid.config import Configurator as BaseConfigurator
-from pyramid.config import ConfigurationError # API
+from pyramid.exceptions import ConfigurationError # API
 from pyramid.config import DEFAULT_RENDERERS
 from pyramid.path import caller_package
 

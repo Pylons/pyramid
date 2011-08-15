@@ -136,7 +136,7 @@ class TestRouter(unittest.TestCase):
 
     def test_tween_factories(self):
         from pyramid.interfaces import ITweens
-        from pyramid.config import Tweens
+        from pyramid.config.tweens import Tweens
         from pyramid.response import Response
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IResponse
