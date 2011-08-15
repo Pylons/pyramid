@@ -8,14 +8,13 @@ pyramid.debug_routematch = false
 pyramid.debug_templates = true
 pyramid.default_locale_name = en
 pyramid.includes = pyramid_debugtoolbar
+                   pyramid_zodbconn
                    pyramid_tm
 tm.attempts = 3
-
-zodb_uri = file://%(here)s/Data.fs?connection_cache_size=20000
+zodbconn.uri = file://%(here)s/Data.fs?connection_cache_size=20000
 
 [pipeline:main]
 pipeline =
-    egg:repoze.zodbconn#closer
     {{project}}
 
 [server:main]

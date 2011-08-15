@@ -8,7 +8,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
     'pyramid',
-    'repoze.zodbconn',
+    'pyramid_zodbconn',
     'pyramid_tm',
     'pyramid_debugtoolbar',
     'ZODB3',

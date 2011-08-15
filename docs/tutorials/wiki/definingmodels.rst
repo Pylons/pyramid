@@ -73,12 +73,6 @@ front page) into the Wiki within the ``appmaker``.  This will provide
 :term:`traversal` a :term:`resource tree` to work against when it attempts to
 resolve URLs to resources.
 
-We're using a mini-framework callable named ``PersistentApplicationFinder``
-in our application (see ``__init__.py``).  A ``PersistentApplicationFinder``
-accepts a ZODB URL as well as an "appmaker" callback.  This callback
-typically lives in the ``models.py`` file.  We'll just change this function,
-making the necessary edits.
-
 Looking at the Result of Our Edits to ``models.py``
 ---------------------------------------------------
 

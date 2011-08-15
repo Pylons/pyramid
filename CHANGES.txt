@@ -141,6 +141,9 @@ Documentation
   ``resource_url``, ``static_url``, and ``current_route_url`` methods of the
   request rather than the function variants imported from ``pyramid.url``.
 
+- The ZODB wiki tutorial now uses the ``pyramid_zodbconn`` package rather
+  than the ``repoze.zodbconn`` package to provide ZODB integration.
+
 Dependency Changes
 ------------------
 
@@ -152,6 +155,9 @@ Scaffolds
 
 - All scaffolds now use the ``pyramid_tm`` package rather than the
   ``repoze.tm2`` middleware to manage transaction management.
+
+- The ZODB scaffold now uses the ``pyramid_zodbconn`` package rather than the
+  ``repoze.zodbconn`` package to provide ZODB integration.
 
 - All scaffolds now use the ``pyramid_debugtoolbar`` package rather than the
   ``WebError`` package to provide interactive debugging features.

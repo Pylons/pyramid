@@ -137,14 +137,12 @@ class FunctionalTests(unittest.TestCase):
         self.tmpdir = tempfile.mkdtemp()
 
         dbpath = os.path.join( self.tmpdir, 'test.db')
-        from repoze.zodbconn.uri import db_from_uri
-        db = db_from_uri('file://' + dbpath)
-        settings = { 'zodb_uri' : None }
+        uri = 'file://' + dbpath
+        settings = { 'zodbconn.uri' : uri ,
+                     'pyramid.includes': ['pyramid_zodbconn', 'pyramid_tm'] }
 
         app = main({}, **settings)
-        from repoze.zodbconn.connector import Connector
-        app = Connector(app, db)
-        self.db = db
+        self.db = app.registry.zodb_database
         from webtest import TestApp
         self.testapp = TestApp(app)
 

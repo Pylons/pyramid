@@ -31,23 +31,13 @@ point happens to be the ``main`` function within the file named
 
 #. *Lines 1-3*.  Perform some dependency imports.
 
-#. *Line 8*. Get the ZODB configuration from the ``development.ini``
-   file's ``[app:main]`` section represented by the ``settings``
-   dictionary passed to our ``app`` function.  This will be a URI
-   (something like ``file:///path/to/Data.fs``).
+#. *Lines 5-7*  Define a root factory for our Pyramid application.
 
-#. *Line 12*. We create a "finder" object using the
-   ``PersistentApplicationFinder`` helper class, passing it the ZODB
-   URI and the "appmaker" we've imported from ``models.py``.
-
-#. *Lines 13 - 14*.  We create a :term:`root factory` which uses the
-   finder to return a ZODB root object.
-
-#. *Line 15*.  We construct a :term:`Configurator` with a :term:`root
+#. *Line 12*.  We construct a :term:`Configurator` with a :term:`root
    factory` and the settings keywords parsed by PasteDeploy.  The root
    factory is named ``get_root``.
 
-#. *Line 16*.  Register a 'static view' which answers requests which start
+#. *Line 13*.  Register a 'static view' which answers requests which start
    with with URL path ``/static`` using the
    :meth:`pyramid.config.Configurator.add_static_view method`.  This
    statement registers a view that will serve up static assets, such as CSS
@@ -59,14 +49,14 @@ point happens to be the ``main`` function within the file named
    should serve within the ``static`` directory inside the ``tutorial``
    package.
 
-#. *Line 17*.  Perform a :term:`scan`.  A scan will find :term:`configuration
+#. *Line 14*.  Perform a :term:`scan`.  A scan will find :term:`configuration
    decoration`, such as view configuration decorators
    (e.g. ``@view_config``) in the source code of the ``tutorial`` package and
    will take actions based on these decorators.  The argument to
    :meth:`~pyramid.config.Configurator.scan` is the package name to scan,
    which is ``tutorial``.
 
-#. *Line 18*.  Use the
+#. *Line 15*.  Use the
    :meth:`pyramid.config.Configurator.make_wsgi_app` method
    to return a :term:`WSGI` application.
 
@@ -100,7 +90,8 @@ Here is the source for ``models.py``:
    root* object.  It is called on *every request* to the
    :app:`Pyramid` application.  It also performs bootstrapping by
    *creating* an application root (inside the ZODB root object) if one
-   does not already exist.
+   does not already exist.  It is used by the "root_factory" we've defined
+   in our ``__init__.py``.
  
    We do so by first seeing if the database has the persistent
    application root.  If not, we make an instance, store it, and
@@ -162,8 +153,8 @@ Let's try to understand the components in this module:
    dictionary is used by the template named by the ``mytemplate.pt`` asset
    specification to fill in certain values on the page.
 
-The WSGI Pipeline in ``development.ini``
-----------------------------------------
+Configuration in ``development.ini``
+------------------------------------
 
 The ``development.ini`` (in the tutorial :term:`project` directory, as
 opposed to the tutorial :term:`package` directory) looks like this:
@@ -171,19 +162,14 @@ opposed to the tutorial :term:`package` directory) looks like this:
 .. literalinclude:: src/views/development.ini
    :language: ini
 
-
 Note the existence of a ``[pipeline:main]`` section which specifies our WSGI
 pipeline.  This "pipeline" will be served up as our WSGI application.  As far
-as the WSGI server is concerned the pipeline *is* our application.  Simpler
-configurations don't use a pipeline: instead they expose a single WSGI
-application as "main".  Our setup is more complicated, so we use a pipeline
-composed of :term:`middleware`.
+as the WSGI server is concerned the pipeline *is* our application.
 
-The ``egg:repoze.zodbconn#closer`` middleware is at the top of the pipeline.
-This is a piece of middleware which closes the ZODB connection opened by the
-``PersistentApplicationFinder`` at the end of the request.
+Our ZODB database settings are specified as the ``zodbconn.uri`` setting in
+the application section.
 
-The final line in the ``[pipeline:main]`` section is ``tutorial``, which
+The only line in the ``[pipeline:main]`` section is ``tutorial``, which
 refers to the ``[app:tutorial]`` section above it.  The ``[app:tutorial]``
 section is the section which actually defines our application settings.  The
 values within this section are passed as ``**settings`` to the ``main``

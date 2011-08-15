@@ -1,11 +1,15 @@
-from repoze.zodbconn.finder import PersistentApplicationFinder
-
 from pyramid.config import Configurator
+from pyramid_zodbconn import get_connection
+
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 
 from tutorial.models import appmaker
 from tutorial.security import groupfinder
+
+def root_factory(request):
+    conn = get_connection(request)
+    return appmaker(conn.root())
 
 def main(global_config, **settings):
     """ This function returns a WSGI application.
@@ -16,14 +20,7 @@ def main(global_config, **settings):
     authn_policy = AuthTktAuthenticationPolicy(secret='sosecret',
                                                callback=groupfinder)
     authz_policy = ACLAuthorizationPolicy()
-    zodb_uri = settings.get('zodb_uri', False)
-    if zodb_uri is False:
-        raise ValueError("No 'zodb_uri' in application configuration.")
-
-    finder = PersistentApplicationFinder(zodb_uri, appmaker)
-    def get_root(request):
-        return finder(request.environ)
-    config = Configurator(root_factory=get_root, settings=settings,
+    config = Configurator(root_factory=root_factory, settings=settings,
                           authentication_policy=authn_policy,
                           authorization_policy=authz_policy)
     config.add_static_view('static', 'tutorial:static')

@@ -42,7 +42,7 @@ declarative security checking. We need to import the new policies:
 Then, we'll add those policies to the configuration:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 16-18,26-28
+   :lines: 20-25
    :linenos:
    :language: python
 

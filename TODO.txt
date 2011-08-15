@@ -4,6 +4,13 @@ Pyramid TODOs
 Should-Have
 -----------
 
+- Name WSGI app "main" instead of pipeline in scaffold configs?
+
+- Turn off debugtoolbar redirect catcher in scaffolding (makes tutorials
+  weird).
+
+- Mention debug toolbar in tutorials.
+
 - Make it possible to use tween aliases in explicit tween config?  If not,
   the tween factories of all add-ons must be APIs.
 
