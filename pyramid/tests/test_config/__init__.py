@@ -1,0 +1,42 @@
+# package
+
+from zope.interface import implements
+from zope.interface import Interface
+
+class IFactory(Interface):
+    pass
+
+def dummy_tween_factory(handler, registry): pass
+
+def dummy_tween_factory2(handler, registry): pass
+
+def dummy_include(config):
+    config.registry.included = True
+    config.action('discrim', None, config.package)
+
+def dummy_include2(config):
+    config.registry.also_included = True
+    config.action('discrim', None, config.package)
+
+includeme = dummy_include
+
+class DummyFactory(object):
+    implements(IFactory)
+    def __call__(self):
+        """ """
+
+def dummyfactory(request):
+    """ """
+
+class IDummy(Interface):
+    pass
+
+def dummy_view(request):
+    return 'OK'
+
+def dummy_extend(config, discrim):
+    config.action(discrim, None, config.package)
+
+def dummy_extend2(config, discrim):
+    config.action(discrim, None, config.registry)
+

@@ -6,11 +6,20 @@ import os
 
 here = os.path.dirname(__file__)
 locale = os.path.abspath(
-    os.path.join(here, '..', '..', 'tests', 'localeapp', 'locale'))
+    os.path.join(here, '..', 'localeapp', 'locale'))
 locale2 = os.path.abspath(
-    os.path.join(here, '..', '..', 'tests', 'localeapp', 'locale2'))
+    os.path.join(here, '..', 'localeapp', 'locale2'))
 locale3 = os.path.abspath(
-    os.path.join(here, '..', '..', 'tests', 'localeapp', 'locale3'))
+    os.path.join(here, '..', 'localeapp', 'locale3'))
+
+from pyramid.tests.test_config import dummy_tween_factory
+from pyramid.tests.test_config import dummy_tween_factory2
+from pyramid.tests.test_config import dummyfactory
+from pyramid.tests.test_config import dummy_include
+from pyramid.tests.test_config import dummy_view
+from pyramid.tests.test_config import dummy_extend
+from pyramid.tests.test_config import dummy_extend2
+from pyramid.tests.test_config import IDummy
 
 try:
     import __pypy__
@@ -91,7 +100,7 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.config import Configurator
         from pyramid.interfaces import IRendererFactory
         config = Configurator()
-        this_pkg = sys.modules['pyramid.config.tests']
+        this_pkg = sys.modules['pyramid.tests.test_config']
         self.assertTrue(config.registry.getUtility(ISettings))
         self.assertEqual(config.package, this_pkg)
         self.assertTrue(config.registry.getUtility(IRendererFactory, 'json'))
@@ -163,7 +172,7 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IDebugLogger
         config = self._makeOne()
         logger = config.registry.getUtility(IDebugLogger)
-        self.assertEqual(logger.name, 'pyramid.config.tests')
+        self.assertEqual(logger.name, 'pyramid.tests.test_config')
 
     def test_ctor_noreg_debug_logger_non_None(self):
         from pyramid.interfaces import IDebugLogger
@@ -414,7 +423,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(reg)
         config.setup_registry()
         logger = reg.getUtility(IDebugLogger)
-        self.assertEqual(logger.name, 'pyramid.config.tests')
+        self.assertEqual(logger.name, 'pyramid.tests.test_config')
 
     def test_setup_registry_debug_logger_non_None(self):
         from pyramid.registry import Registry
@@ -588,8 +597,8 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(reg)
         settings = {
             'pyramid.includes':
-"""pyramid.config.tests.test_config.dummy_include
-pyramid.config.tests.test_config.dummy_include2""",
+"""pyramid.tests.test_config.dummy_include
+pyramid.tests.test_config.dummy_include2""",
         }
         config.setup_registry(settings=settings)
         self.assert_(reg.included)
@@ -601,7 +610,7 @@ pyramid.config.tests.test_config.dummy_include2""",
         config = self._makeOne(reg)
         settings = {
             'pyramid.includes':
-"""pyramid.config.tests.test_config.dummy_include pyramid.config.tests.test_config.dummy_include2""",
+"""pyramid.tests.test_config.dummy_include pyramid.tests.test_config.dummy_include2""",
         }
         config.setup_registry(settings=settings)
         self.assert_(reg.included)
@@ -614,14 +623,14 @@ pyramid.config.tests.test_config.dummy_include2""",
         config = self._makeOne(reg)
         settings = {
             'pyramid.tweens':
-                    'pyramid.config.tests.test_config.dummy_tween_factory'
+                    'pyramid.tests.test_config.dummy_tween_factory'
         }
         config.setup_registry(settings=settings)
         config.commit()
         tweens = config.registry.getUtility(ITweens)
         self.assertEqual(
             tweens.explicit,
-            [('pyramid.config.tests.test_config.dummy_tween_factory',
+            [('pyramid.tests.test_config.dummy_tween_factory',
               dummy_tween_factory)])
 
     def test_get_settings_nosettings(self):
@@ -662,18 +671,18 @@ pyramid.config.tests.test_config.dummy_include2""",
         def factory2(handler, registry): return handler
         config = self._makeOne()
         config.add_tween(
-            'pyramid.config.tests.test_config.dummy_tween_factory')
+            'pyramid.tests.test_config.dummy_tween_factory')
         config.add_tween(
-            'pyramid.config.tests.test_config.dummy_tween_factory2')
+            'pyramid.tests.test_config.dummy_tween_factory2')
         config.commit()
         tweens = config.registry.queryUtility(ITweens)
         implicit = tweens.implicit()
         self.assertEqual(
             implicit,
             [
-                ('pyramid.config.tests.test_config.dummy_tween_factory2',
+                ('pyramid.tests.test_config.dummy_tween_factory2',
                  dummy_tween_factory2),
-                ('pyramid.config.tests.test_config.dummy_tween_factory',
+                ('pyramid.tests.test_config.dummy_tween_factory',
                  dummy_tween_factory),
                 ('pyramid.tweens.excview_tween_factory',
                  excview_tween_factory),
@@ -686,12 +695,12 @@ pyramid.config.tests.test_config.dummy_include2""",
         from pyramid.tweens import MAIN
         config = self._makeOne()
         config.add_tween(
-            'pyramid.config.tests.test_config.dummy_tween_factory',
+            'pyramid.tests.test_config.dummy_tween_factory',
             over=MAIN)
         config.add_tween(
-            'pyramid.config.tests.test_config.dummy_tween_factory2',
+            'pyramid.tests.test_config.dummy_tween_factory2',
             over=MAIN,
-            under='pyramid.config.tests.test_config.dummy_tween_factory')
+            under='pyramid.tests.test_config.dummy_tween_factory')
         config.commit()
         tweens = config.registry.queryUtility(ITweens)
         implicit = tweens.implicit()
@@ -699,9 +708,9 @@ pyramid.config.tests.test_config.dummy_include2""",
             implicit,
             [
                 ('pyramid.tweens.excview_tween_factory', excview_tween_factory),
-                ('pyramid.config.tests.test_config.dummy_tween_factory',
+                ('pyramid.tests.test_config.dummy_tween_factory',
                  dummy_tween_factory),
-                ('pyramid.config.tests.test_config.dummy_tween_factory2',
+                ('pyramid.tests.test_config.dummy_tween_factory2',
                  dummy_tween_factory2),
              ])
 
@@ -710,7 +719,7 @@ pyramid.config.tests.test_config.dummy_include2""",
         config = self._makeOne()
         self.assertRaises(
             ConfigurationError, config.add_tween,
-            'pyramid.config.tests.test_config.dummy_tween_factory',
+            'pyramid.tests.test_config.dummy_tween_factory',
             under=False)
 
     def test_add_tweens_names_with_over_nonstringoriter(self):
@@ -718,20 +727,20 @@ pyramid.config.tests.test_config.dummy_include2""",
         config = self._makeOne()
         self.assertRaises(
             ConfigurationError, config.add_tween,
-            'pyramid.config.tests.test_config.dummy_tween_factory',
+            'pyramid.tests.test_config.dummy_tween_factory',
             over=False)
 
     def test_add_tween_dottedname(self):
         from pyramid.interfaces import ITweens
         from pyramid.tweens import excview_tween_factory
         config = self._makeOne()
-        config.add_tween('pyramid.config.tests.test_config.dummy_tween_factory')
+        config.add_tween('pyramid.tests.test_config.dummy_tween_factory')
         config.commit()
         tweens = config.registry.queryUtility(ITweens)
         self.assertEqual(
             tweens.implicit(),
             [
-                ('pyramid.config.tests.test_config.dummy_tween_factory',
+                ('pyramid.tests.test_config.dummy_tween_factory',
                  dummy_tween_factory),
                 ('pyramid.tweens.excview_tween_factory',
                  excview_tween_factory),
@@ -757,7 +766,7 @@ pyramid.config.tests.test_config.dummy_include2""",
         self.assertRaises(
             ConfigurationError,
             config.add_tween,
-            'pyramid.config.tests.test_config.dummy_tween_factory',
+            'pyramid.tests.test_config.dummy_tween_factory',
             alias=INGRESS)
 
     def test_add_tween_alias_main(self):
@@ -767,24 +776,24 @@ pyramid.config.tests.test_config.dummy_include2""",
         self.assertRaises(
             ConfigurationError,
             config.add_tween,
-            'pyramid.config.tests.test_config.dummy_tween_factory',
+            'pyramid.tests.test_config.dummy_tween_factory',
             alias=MAIN)
 
     def test_add_tweens_conflict(self):
         from zope.configuration.config import ConfigurationConflictError
         config = self._makeOne()
-        config.add_tween('pyramid.config.tests.test_config.dummy_tween_factory')
-        config.add_tween('pyramid.config.tests.test_config.dummy_tween_factory')
+        config.add_tween('pyramid.tests.test_config.dummy_tween_factory')
+        config.add_tween('pyramid.tests.test_config.dummy_tween_factory')
         self.assertRaises(ConfigurationConflictError, config.commit)
 
     def test_add_tweens_conflict_same_alias(self):
         from zope.configuration.config import ConfigurationConflictError
         config = self._makeOne()
         config.add_tween(
-            'pyramid.config.tests.test_config.dummy_tween_factory',
+            'pyramid.tests.test_config.dummy_tween_factory',
             alias='a')
         config.add_tween(
-            'pyramid.config.tests.test_config.dummy_tween_factory2',
+            'pyramid.tests.test_config.dummy_tween_factory2',
             alias='a')
         self.assertRaises(ConfigurationConflictError, config.commit)
 
@@ -795,7 +804,7 @@ pyramid.config.tests.test_config.dummy_include2""",
         self.assertRaises(
             ConfigurationError,
             config.add_tween,
-            'pyramid.config.tests.test_config.dummy_tween_factory',
+            'pyramid.tests.test_config.dummy_tween_factory',
             over=INGRESS)
 
     def test_add_tween_over_ingress_iterable(self):
@@ -805,7 +814,7 @@ pyramid.config.tests.test_config.dummy_include2""",
         self.assertRaises(
             ConfigurationError,
             config.add_tween,
-            'pyramid.config.tests.test_config.dummy_tween_factory',
+            'pyramid.tests.test_config.dummy_tween_factory',
             over=('a', INGRESS))
 
     def test_add_tween_under_main(self):
@@ -815,7 +824,7 @@ pyramid.config.tests.test_config.dummy_include2""",
         self.assertRaises(
             ConfigurationError,
             config.add_tween,
-            'pyramid.config.tests.test_config.dummy_tween_factory',
+            'pyramid.tests.test_config.dummy_tween_factory',
             under=MAIN)
 
     def test_add_tween_under_main_iterable(self):
@@ -825,7 +834,7 @@ pyramid.config.tests.test_config.dummy_include2""",
         self.assertRaises(
             ConfigurationError,
             config.add_tween,
-            'pyramid.config.tests.test_config.dummy_tween_factory',
+            'pyramid.tests.test_config.dummy_tween_factory',
             under=('a', MAIN))
 
     def test_add_subscriber_defaults(self):
@@ -936,24 +945,24 @@ pyramid.config.tests.test_config.dummy_include2""",
         global_registries.empty()
 
     def test_include_with_dotted_name(self):
-        from pyramid.config import tests
+        from pyramid.tests import test_config
         config = self._makeOne()
         context_before = config._make_context()
         config._ctx = context_before
-        config.include('pyramid.config.tests.test_config.dummy_include')
+        config.include('pyramid.tests.test_config.dummy_include')
         context_after = config._ctx
         actions = context_after.actions
         self.assertEqual(len(actions), 1)
         self.assertEqual(
             context_after.actions[0][:3],
-            ('discrim', None, tests),
+            ('discrim', None, test_config),
             )
         self.assertEqual(context_after.basepath, None)
         self.assertEqual(context_after.includepath, ())
         self.assertTrue(context_after is context_before)
 
     def test_include_with_python_callable(self):
-        from pyramid.config import tests
+        from pyramid.tests import test_config
         config = self._makeOne()
         context_before = config._make_context()
         config._ctx = context_before
@@ -963,24 +972,24 @@ pyramid.config.tests.test_config.dummy_include2""",
         self.assertEqual(len(actions), 1)
         self.assertEqual(
             actions[0][:3],
-            ('discrim', None, tests),
+            ('discrim', None, test_config),
             )
         self.assertEqual(context_after.basepath, None)
         self.assertEqual(context_after.includepath, ())
         self.assertTrue(context_after is context_before)
 
     def test_include_with_module_defaults_to_includeme(self):
-        from pyramid.config import tests
+        from pyramid.tests import test_config
         config = self._makeOne()
         context_before = config._make_context()
         config._ctx = context_before
-        config.include('pyramid.config.tests.test_config')
+        config.include('pyramid.tests.test_config')
         context_after = config._ctx
         actions = context_after.actions
         self.assertEqual(len(actions), 1)
         self.assertEqual(
             actions[0][:3],
-            ('discrim', None, tests),
+            ('discrim', None, test_config),
             )
         self.assertEqual(context_after.basepath, None)
         self.assertEqual(context_after.includepath, ())
@@ -1052,7 +1061,7 @@ pyramid.config.tests.test_config.dummy_include2""",
     def test_add_view_view_callable_dottedname(self):
         from pyramid.renderers import null_renderer
         config = self._makeOne(autocommit=True)
-        config.add_view(view='pyramid.config.tests.test_config.dummy_view',
+        config.add_view(view='pyramid.tests.test_config.dummy_view',
                         renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         self.assertEqual(wrapper(None, None), 'OK')
@@ -1199,7 +1208,7 @@ pyramid.config.tests.test_config.dummy_include2""",
         from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(context='pyramid.config.tests.test_config.IDummy',
+        config.add_view(context='pyramid.tests.test_config.IDummy',
                         view=view,  renderer=null_renderer)
         wrapper = self._getViewCallable(config, IDummy)
         self.assertEqual(wrapper, view)
@@ -1208,7 +1217,7 @@ pyramid.config.tests.test_config.dummy_include2""",
         from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(for_='pyramid.config.tests.test_config.IDummy',
+        config.add_view(for_='pyramid.tests.test_config.IDummy',
                         view=view, renderer=null_renderer)
         wrapper = self._getViewCallable(config, IDummy)
         self.assertEqual(wrapper, view)
@@ -1809,7 +1818,7 @@ pyramid.config.tests.test_config.dummy_include2""",
         self.assertEqual(wrapper(ctx, request), 'view8')
 
     def test_add_view_with_template_renderer(self):
-        import pyramid.config.tests
+        from pyramid.tests import test_config
         from pyramid.interfaces import ISettings
         class view(object):
             def __init__(self, context, request):
@@ -1830,7 +1839,7 @@ pyramid.config.tests.test_config.dummy_include2""",
         result = renderer.info
         self.assertEqual(result.registry, config.registry)
         self.assertEqual(result.type, '.txt')
-        self.assertEqual(result.package, pyramid.config.tests)
+        self.assertEqual(result.package, test_config)
         self.assertEqual(result.name, fixture)
         self.assertEqual(result.settings, settings)
 
@@ -1856,7 +1865,7 @@ pyramid.config.tests.test_config.dummy_include2""",
         self.assertEqual(result.body, 'moo')
 
     def test_add_view_with_template_renderer_no_callable(self):
-        import pyramid.config.tests
+        from pyramid.tests import test_config
         from pyramid.interfaces import ISettings
         config = self._makeOne(autocommit=True)
         renderer = self._registerRenderer(config)
@@ -1870,7 +1879,7 @@ pyramid.config.tests.test_config.dummy_include2""",
         result = renderer.info
         self.assertEqual(result.registry, config.registry)
         self.assertEqual(result.type, '.txt')
-        self.assertEqual(result.package, pyramid.config.tests)
+        self.assertEqual(result.package, test_config)
         self.assertEqual(result.name, fixture)
         self.assertEqual(result.settings, settings)
 
@@ -2149,7 +2158,7 @@ pyramid.config.tests.test_config.dummy_include2""",
         config = self._makeOne(autocommit=True)
         config.add_view(
             view=view,
-            containment='pyramid.config.tests.test_config.IDummy',
+            containment='pyramid.tests.test_config.IDummy',
             renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         context = DummyContext()
@@ -2372,7 +2381,7 @@ pyramid.config.tests.test_config.dummy_include2""",
         config = self._makeOne(autocommit=True)
         route = config.add_route(
             'name', 'path',
-            factory='pyramid.config.tests.test_config.dummyfactory')
+            factory='pyramid.tests.test_config.dummyfactory')
         self.assertEqual(route.factory, dummyfactory)
 
     def test_add_route_with_xhr(self):
@@ -2524,7 +2533,7 @@ pyramid.config.tests.test_config.dummy_include2""",
         from pyramid.renderers import null_renderer
         config = self._makeOne()
         result = config.derive_view(
-            'pyramid.config.tests.test_config.dummy_view',
+            'pyramid.tests.test_config.dummy_view',
             renderer=null_renderer)
         self.assertFalse(result is dummy_view)
         self.assertEqual(result(None, None), 'OK')
@@ -2652,7 +2661,7 @@ pyramid.config.tests.test_config.dummy_include2""",
         config.add_static_view('static', 'fixtures/static')
         self.assertEqual(
             info.added,
-            [('static', 'pyramid.config.tests:fixtures/static', {})])
+            [('static', 'pyramid.tests.test_config:fixtures/static', {})])
 
     def test_add_static_view_absolute(self):
         import os
@@ -2857,7 +2866,7 @@ pyramid.config.tests.test_config.dummy_include2""",
         from pyramid.interfaces import ILocaleNegotiator
         config = self._makeOne(autocommit=True)
         config.set_locale_negotiator(
-            'pyramid.config.tests.test_config.dummyfactory')
+            'pyramid.tests.test_config.dummyfactory')
         self.assertEqual(config.registry.getUtility(ILocaleNegotiator),
                          dummyfactory)
 
@@ -2872,7 +2881,7 @@ pyramid.config.tests.test_config.dummy_include2""",
         from pyramid.interfaces import IRequestFactory
         config = self._makeOne(autocommit=True)
         config.set_request_factory(
-            'pyramid.config.tests.test_config.dummyfactory')
+            'pyramid.tests.test_config.dummyfactory')
         self.assertEqual(config.registry.getUtility(IRequestFactory),
                          dummyfactory)
 
@@ -2897,7 +2906,7 @@ pyramid.config.tests.test_config.dummy_include2""",
             from pyramid.interfaces import IRendererGlobalsFactory
             config = self._makeOne(autocommit=True)
             config.set_renderer_globals_factory(
-                'pyramid.config.tests.test_config.dummyfactory')
+                'pyramid.tests.test_config.dummyfactory')
             self.assertEqual(
                 config.registry.getUtility(IRendererGlobalsFactory),
                 dummyfactory)
@@ -2922,9 +2931,9 @@ pyramid.config.tests.test_config.dummy_include2""",
     def test_add_view_mapper_dottedname(self):
         from pyramid.interfaces import IViewMapperFactory
         config = self._makeOne(autocommit=True)
-        config.set_view_mapper('pyramid.config.tests.test_config')
+        config.set_view_mapper('pyramid.tests.test_config')
         result = config.registry.getUtility(IViewMapperFactory)
-        from pyramid.config.tests import test_config
+        from pyramid.tests import test_config
         self.assertEqual(result, test_config)
 
     def test_set_session_factory(self):
@@ -3323,7 +3332,7 @@ pyramid.config.tests.test_config.dummy_include2""",
     def test_testing_add_subscriber_dottedname(self):
         config = self._makeOne(autocommit=True)
         L = config.testing_add_subscriber(
-            'pyramid.config.tests.test_config.IDummy')
+            'pyramid.tests.test_config.test_init.IDummy')
         event = DummyEvent()
         config.registry.notify(event)
         self.assertEqual(len(L), 1)
@@ -3829,10 +3838,10 @@ class TestConfigurator_add_directive(unittest.TestCase):
         self.config = Configurator()
 
     def test_extend_with_dotted_name(self):
-        from pyramid.config import tests
+        from pyramid.tests import test_config
         config = self.config
         config.add_directive(
-            'dummy_extend', 'pyramid.config.tests.test_config.dummy_extend')
+            'dummy_extend', 'pyramid.tests.test_config.dummy_extend')
         self.assert_(hasattr(config, 'dummy_extend'))
         config.dummy_extend('discrim')
         context_after = config._ctx
@@ -3840,11 +3849,11 @@ class TestConfigurator_add_directive(unittest.TestCase):
         self.assertEqual(len(actions), 1)
         self.assertEqual(
             context_after.actions[0][:3],
-            ('discrim', None, tests),
+            ('discrim', None, test_config),
             )
 
     def test_extend_with_python_callable(self):
-        from pyramid.config import tests
+        from pyramid.tests import test_config
         config = self.config
         config.add_directive(
             'dummy_extend', dummy_extend)
@@ -3855,7 +3864,7 @@ class TestConfigurator_add_directive(unittest.TestCase):
         self.assertEqual(len(actions), 1)
         self.assertEqual(
             context_after.actions[0][:3],
-            ('discrim', None, tests),
+            ('discrim', None, test_config),
             )
 
     def test_extend_same_name_doesnt_conflict(self):
@@ -3937,36 +3946,11 @@ class DummyUnderOverride:
         self.override_package = override_package
         self.override_prefix = override_prefix
 
-from zope.interface import Interface
-class IDummy(Interface):
-    pass
-
-class IOther(Interface):
-    pass
-
 class DummyResponse:
     status = '200 OK'
     headerlist = ()
     app_iter = ()
     body = ''
-
-class DummyLogger:
-    def __init__(self):
-        self.messages = []
-    def info(self, msg):
-        self.messages.append(msg)
-    warn = info
-    debug = info
-
-class DummySecurityPolicy:
-    def __init__(self, permitted=True):
-        self.permitted = permitted
-
-    def effective_principals(self, request):
-        return []
-
-    def permits(self, context, principals, permission):
-        return self.permitted
 
 from zope.interface import implements
 from pyramid.interfaces import IMultiView
@@ -3990,14 +3974,6 @@ class DummyThreadLocalManager(object):
     def pop(self):
         self.popped = True
 
-class IFactory(Interface):
-    pass
-
-class DummyFactory(object):
-    implements(IFactory)
-    def __call__(self):
-        """ """
-
 class DummyEvent:
     implements(IDummy)
 
@@ -4007,28 +3983,6 @@ class DummyStaticURLInfo:
 
     def add(self, name, spec, **kw):
         self.added.append((name, spec, kw))
-
-def dummy_view(request):
-    return 'OK'
-
-def dummyfactory(request):
-    """ """
-
-def dummy_include(config):
-    config.registry.included = True
-    config.action('discrim', None, config.package)
-
-def dummy_include2(config):
-    config.registry.also_included = True
-    config.action('discrim', None, config.package)
-
-includeme = dummy_include
-
-def dummy_extend(config, discrim):
-    config.action(discrim, None, config.package)
-
-def dummy_extend2(config, discrim):
-    config.action(discrim, None, config.registry)
 
 class DummyRegistry(object):
     def __init__(self, adaptation=None):
@@ -4049,10 +4003,6 @@ from pyramid.interfaces import IResponse
 class DummyResponse(object):
     implements(IResponse)
     
-def dummy_tween_factory(handler, registry): pass
-
-def dummy_tween_factory2(handler, registry): pass
-
 class DummyAccept(object):
     def __init__(self, *matches):
         self.matches = list(matches)
@@ -4078,3 +4028,8 @@ def assert_similar_datetime(one, two):
         two_attr = getattr(two, attr)
         if not one_attr == two_attr: # pragma: no cover
             raise AssertionError('%r != %r in %s' % (one_attr, two_attr, attr))
+
+from zope.interface import Interface
+class IOther(Interface):
+    pass
+

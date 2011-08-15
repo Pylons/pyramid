@@ -1595,10 +1595,6 @@ class DummyRequest:
         self.environ = environ
         self.params = {}
         self.cookies = {}
-    def copy(self):
-        return self
-    def get_response(self, app):
-        return app
 
 class DummyContext:
     pass
@@ -1618,8 +1614,6 @@ class DummyAccept(object):
                 if match in offered:
                     self.matches.remove(match)
                     return match
-    def __contains__(self, val):
-        return val in self.matches
 
 class DummyLogger:
     def __init__(self):
