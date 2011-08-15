@@ -297,18 +297,6 @@ class TestViewPermissionBug(IntegrationBase):
 class TestDefaultViewPermissionBug(IntegrationBase):
     # default_view_permission bug as reported by Wiggy at http://lists.repoze.org/pipermail/repoze-dev/2010-October/003602.html
     package = 'pyramid.tests.defpermbugapp'
-    def setUp(self):
-        from pyramid.config import Configurator
-        config = Configurator(root_factory=self.root_factory,
-                              package=self.package)
-        config.begin()
-        config.include(self.package)
-        config.commit()
-        app = config.make_wsgi_app()
-        from webtest import TestApp
-        self.testapp = TestApp(app)
-        self.config = config
-
     def test_x(self):
         res = self.testapp.get('/x', status=403)
         self.assertTrue('failed permission check' in res.body)

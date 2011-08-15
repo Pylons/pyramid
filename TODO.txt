@@ -19,8 +19,6 @@ Should-Have
 - Deprecate pyramid.security.view_execution_permitted (it only works for
   traversal).
 
-- Kill off ``bfg.routes`` envvars in router.
-
 - Debugging setting for detecting why authenticated_userid(request) might
   return None.
 
@@ -33,6 +31,8 @@ Should-Have
 
 Nice-to-Have
 ------------
+
+- Kill off ``bfg.routes`` envvars in router.
 
 - Some sort of API for rendering a view callable object to a response from
   within another view callable.
