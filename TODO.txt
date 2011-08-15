@@ -4,6 +4,10 @@ Pyramid TODOs
 Should-Have
 -----------
 
+- Consider moving the call to _set_security_policies after the initial
+  commit, so that authn and authz policies specified by the user in the
+  constructor override included ones.
+
 - Name WSGI app "main" instead of pipeline in scaffold configs?
 
 - Make another release of debug toolbar (has now redirects turned off by
@@ -31,6 +35,8 @@ Should-Have
 
 Nice-to-Have
 ------------
+
+- Turn "config" into a package.
 
 - Kill off ``bfg.routes`` envvars in router.
 
