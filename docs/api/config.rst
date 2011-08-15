@@ -78,6 +78,10 @@
 
      .. automethod:: set_view_mapper
 
+     .. automethod:: set_authentication_policy
+
+     .. automethod:: set_authorization_policy
+
      .. automethod:: add_tween
 
      .. automethod:: testing_securitypolicy

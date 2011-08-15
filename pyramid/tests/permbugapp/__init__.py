@@ -16,7 +16,7 @@ def includeme(config):
      from pyramid.authorization import ACLAuthorizationPolicy
      authn_policy = AuthTktAuthenticationPolicy('seekt1t')
      authz_policy = ACLAuthorizationPolicy()
-     config._set_authentication_policy(authn_policy)
-     config._set_authorization_policy(authz_policy)
+     config.set_authentication_policy(authn_policy)
+     config.set_authorization_policy(authz_policy)
      config.add_view(test, name='test')
      config.add_view(x_view, name='x', permission='private')

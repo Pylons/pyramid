@@ -55,6 +55,10 @@ Features
 - ``pyramid.testing.DummyRequest`` now implements the
   ``add_finished_callback`` and ``add_response_callback`` methods.
 
+- New methods of the ``pyramid.config.Configurator`` class:
+  ``set_authentication_policy`` and ``set_authorization_policy``.  These are
+  meant to be consumed mostly by add-on authors.
+
 Internal
 --------
 

@@ -6,17 +6,13 @@ Should-Have
 
 - Name WSGI app "main" instead of pipeline in scaffold configs?
 
-- Turn off debugtoolbar redirect catcher in scaffolding (makes tutorials
-  weird).
+- Make another release of debug toolbar (has now redirects turned off by
+  default so tutorials aren't weird).
 
 - Mention debug toolbar in tutorials.
 
 - Make it possible to use tween aliases in explicit tween config?  If not,
   the tween factories of all add-ons must be APIs.
-
-- Provide a way to set the authentication policy and the authorization policy
-  during a config.include (they are related, so just exposing the currently
-  underscored-private _set_auth* methods won't cut it).
 
 - Merge Michael's route group work.
 

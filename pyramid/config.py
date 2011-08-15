@@ -353,22 +353,61 @@ class Configurator(object):
         self.action(IRootFactory, register)
 
     @action_method
+    def set_authentication_policy(self, policy):
+        """ Override the :app:`Pyramid` :term:`authentication policy` in the
+        current configuration.  The ``policy`` argument must be an instance
+        of an authentication policy or a :term:`dotted Python name`
+        that points at an instance of an authentication policy.
+        """
+        self._set_authentication_policy(policy)
+        def ensure():
+            if self.autocommit:
+                return
+            if self.registry.queryUtility(IAuthorizationPolicy) is None:
+                raise ConfigurationError(
+                    'Cannot configure an authentication policy without '
+                    'also configuring an authorization policy '
+                    '(see the set_authorization_policy method)')
+        self.action(IAuthenticationPolicy, callable=ensure)
+
+    @action_method
     def _set_authentication_policy(self, policy):
-        """ Add a :app:`Pyramid` :term:`authentication policy` to
-        the current configuration."""
         policy = self.maybe_dotted(policy)
         self.registry.registerUtility(policy, IAuthenticationPolicy)
-        self.action(IAuthenticationPolicy)
+
+    @action_method
+    def set_authorization_policy(self, policy):
+        """ Override the :app:`Pyramid` :term:`authorization policy` in the
+        current configuration.  The ``policy`` argument must be an instance
+        of an authorization policy or a :term:`dotted Python name` that points
+        at an instance of an authorization policy.
+        """
+        self._set_authorization_policy(policy)
+        def ensure():
+            if self.registry.queryUtility(IAuthenticationPolicy) is None:
+                raise ConfigurationError(
+                    'Cannot configure an authorization policy without also '
+                    'configuring an authentication policy '
+                    '(see the set_authentication_policy method)')
+        self.action(IAuthorizationPolicy, callable=ensure)
 
     @action_method
     def _set_authorization_policy(self, policy):
-        """ Add a :app:`Pyramid` :term:`authorization policy` to
-        the current configuration state (also accepts a :term:`dotted
-        Python name`."""
         policy = self.maybe_dotted(policy)
         self.registry.registerUtility(policy, IAuthorizationPolicy)
-        self.action(IAuthorizationPolicy, None)
-            
+
+    @action_method
+    def _set_security_policies(self, authentication, authorization=None):
+        if (authorization is not None) and (not authentication):
+            raise ConfigurationError(
+                'If the "authorization" is passed a value, '
+                'the "authentication" argument must also be '
+                'passed a value; authorization requires authentication.')
+        if authorization is None:
+            authorization = ACLAuthorizationPolicy() # default
+        self._set_authentication_policy(authentication)
+        self._set_authorization_policy(authorization)
+
     def _make_spec(self, path_or_spec):
         package, filename = resolve_asset_spec(path_or_spec,
                                                self.package_name)
@@ -413,18 +452,6 @@ class Configurator(object):
                               http_cache=http_cache)
         
         return deriver(view)
-
-    @action_method
-    def _set_security_policies(self, authentication, authorization=None):
-        if (authorization is not None) and (not authentication):
-            raise ConfigurationError(
-                'If the "authorization" is passed a value, '
-                'the "authentication" argument must also be '
-                'passed a value; authorization requires authentication.')
-        if authorization is None:
-            authorization = ACLAuthorizationPolicy() # default
-        self._set_authentication_policy(authentication)
-        self._set_authorization_policy(authorization)
 
     def _fix_registry(self):
         """ Fix up a ZCA component registry that is not a
