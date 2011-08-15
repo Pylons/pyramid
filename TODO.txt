@@ -11,32 +11,22 @@ Should-Have
   during a config.include (they are related, so just exposing the currently
   underscored-private _set_auth* methods won't cut it).
 
-- Come up with an analogue of repoze.zodbconn that doesn't require a closer
-  in the pipeline and use it in the ZODB scaffold and tutorial.
-
 - Merge Michael's route group work.
 
 - Deprecate pyramid.security.view_execution_permitted (it only works for
   traversal).
-
-- Make "localizer" a property of request (instead of requiring
-  "get_localizer(request)"
-
-- Fix tutorials that use ``route_url``, ``route_path``, ``resource_url``,
-  ``static_url``, and ``current_route_url`` functions to use methods of the
-  request instead.
-
-- Make ``current_route_url`` a method of request.
-
-- Create a ``current_route_path`` function and make it a method of request.
-
-- "static_path" API (omit host and port).
 
 - Kill off ``bfg.routes`` envvars in router.
 
 - Debugging setting for detecting why authenticated_userid(request) might
   return None.
 
+- Make "localizer" a property of request (instead of requiring
+  "get_localizer(request)"?
+
+- Create a ``current_route_path`` function and make it a method of request?
+
+- "static_path" API (omit host and port)?
 
 Nice-to-Have
 ------------

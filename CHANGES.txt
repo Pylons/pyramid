@@ -52,6 +52,9 @@ Features
   will be ``None`` until an exception is caught by the Pyramid router, after
   which it will be the result of ``sys.exc_info()``.
 
+- ``pyramid.testing.DummyRequest`` now implements the
+  ``add_finished_callback`` and ``add_response_callback`` methods.
+
 Internal
 --------
 
