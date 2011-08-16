@@ -132,19 +132,28 @@ class PShellCommand(PCommand):
 
     ConfigParser = ConfigParser.ConfigParser # testing
 
+    loaded_objects = {}
+    object_help = {}
+    use_script = None
+
     def pshell_file_config(self, filename):
-        resolver = DottedNameResolver(None)
-        self.loaded_objects = {}
-        self.object_help = {}
         config = self.ConfigParser()
         config.read(filename)
         try:
             items = config.items('pshell')
         except ConfigParser.NoSectionError:
             return
+
+        resolver = DottedNameResolver(None)
+        self.loaded_objects = {}
+        self.object_help = {}
+        self.use_script = None
         for k, v in items:
-            self.loaded_objects[k] = resolver.maybe_resolve(v)
-            self.object_help[k] = v
+            if k == 'import':
+                self.use_script = v
+            else:
+                self.loaded_objects[k] = resolver.maybe_resolve(v)
+                self.object_help[k] = v
 
     def command(self, shell=None):
         config_uri = self.args[0]
@@ -167,6 +176,19 @@ class PShellCommand(PCommand):
         env_help['root_factory'] = (
             'Default root factory used to create `root`.')
 
+        if self.use_script:
+            # store the env before muddling it with the script
+            orig_env = env.copy()
+
+            # do this instead of an eval() to respect __all__
+            exec 'from %s import *' % self.use_script in env
+            env.pop('__builtins__', None)
+
+            # remove any objects from default help that were overidden
+            for k, v in orig_env.iteritems():
+                if env[k] != orig_env[k]:
+                    del env_help[k]
+
         # load the pshell section of the ini file
         env.update(self.loaded_objects)
 
@@ -186,6 +208,9 @@ class PShellCommand(PCommand):
             help += '\n\nCustom Variables:'
             for var in sorted(self.object_help.keys()):
                 help += '\n  %-12s %s' % (var, self.object_help[var])
+
+        if self.use_script:
+            help += '\n\nAll objects from %s are available.' % self.use_script
 
         if shell is None and not self.options.disable_ipython:
             shell = self.make_ipython_v0_11_shell()

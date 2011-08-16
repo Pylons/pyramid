@@ -156,6 +156,46 @@ class TestPShellCommand(unittest.TestCase):
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
 
+    def test_command_loads_use_script(self):
+        command = self._makeOne()
+        self.config_factory.items = [('import', 'pyramid.tests.pshellapp')]
+        shell = DummyShell()
+        command.command(shell)
+        self.assertTrue(self.config_factory.parser)
+        self.assertEqual(self.config_factory.parser.filename,
+                         '/foo/bar/myapp.ini')
+        self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
+        self.assertEqual(shell.env, {
+            'app':self.bootstrap.app, 'root':'root override',
+            'registry':self.bootstrap.registry,
+            'request':self.bootstrap.request,
+            'root_factory':self.bootstrap.root_factory,
+            'a': 1, 'm': 'model override',
+        })
+        self.assertTrue(self.bootstrap.closer.called)
+        self.assertTrue(shell.help)
+
+    def test_command_loads_use_script_check_order(self):
+        command = self._makeOne()
+        model = Dummy()
+        self.config_factory.items = [('import', 'pyramid.tests.pshellapp'),
+                                     ('m', model)]
+        shell = DummyShell()
+        command.command(shell)
+        self.assertTrue(self.config_factory.parser)
+        self.assertEqual(self.config_factory.parser.filename,
+                         '/foo/bar/myapp.ini')
+        self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
+        self.assertEqual(shell.env, {
+            'app':self.bootstrap.app, 'root':'root override',
+            'registry':self.bootstrap.registry,
+            'request':self.bootstrap.request,
+            'root_factory':self.bootstrap.root_factory,
+            'a':1, 'm':model,
+        })
+        self.assertTrue(self.bootstrap.closer.called)
+        self.assertTrue(shell.help)
+
     def test_command_custom_section_override(self):
         command = self._makeOne()
         dummy = Dummy()
