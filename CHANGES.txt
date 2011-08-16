@@ -4,6 +4,11 @@ Next release
 Features
 --------
 
+- The ``[pshell]`` section in an ini configuration file now treats a
+  ``setup`` key as a dotted name that points to a callable that is passed the
+  bootstrap environment.  It can mutate the environment as necessary for
+  great justice.
+
 - A new configuration setting named ``pyramid.includes`` is now available.
   It is described in the "Environment Variables and ``.ini`` Files Settings"
   narrative documentation chapter.
