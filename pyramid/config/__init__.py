@@ -276,29 +276,28 @@ class Configurator(
         policies, renderers, a debug logger, a locale negotiator, and various
         other settings using the configurator's current registry, as per the
         descriptions in the Configurator constructor."""
+
         from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
 
-        tweens = []
-        includes = []
-        if settings:
-            includes = aslist(settings.get('pyramid.includes', ''))
-            tweens   = aslist(settings.get('pyramid.tweens', ''))
         registry = self.registry
+
         self._fix_registry()
         self._set_settings(settings)
         self._set_root_factory(root_factory)
         self._register_response_adapters()
 
+        if isinstance(debug_logger, basestring):
+            debug_logger = logging.getLogger(debug_logger)
+
         if debug_logger is None:
             debug_logger = logging.getLogger(self.package_name)
-        elif isinstance(debug_logger, basestring):
-            debug_logger = logging.getLogger(debug_logger)
                 
         registry.registerUtility(debug_logger, IDebugLogger)
 
         if authentication_policy or authorization_policy:
             self._set_security_policies(authentication_policy,
                                         authorization_policy)
+
         for name, renderer in renderers:
             self.add_renderer(name, renderer)
 
@@ -330,17 +329,21 @@ class Configurator(
         if session_factory is not None:
             self.set_session_factory(session_factory)
 
+        self.commit()
+
         # commit before adding default_view_mapper, as the
         # exceptionresponse_view above requires the superdefault view
         # mapper
-        self.commit()
+
         if default_view_mapper is not None:
             self.set_view_mapper(default_view_mapper)
             self.commit()
 
+        includes = aslist(registry.settings.get('pyramid.includes', []))
         for inc in includes:
             self.include(inc)
 
+        tweens   = aslist(registry.settings.get('pyramid.tweens', []))
         for factory in tweens:
             self._add_tween(factory, explicit=True)
         

@@ -4,9 +4,18 @@ Pyramid TODOs
 Should-Have
 -----------
 
-- Consider moving the call to _set_security_policies after the initial
-  commit, so that authn and authz policies specified by the user in the
-  constructor override included ones.
+- Consider moving the call to _set_security_policies (and like params) after
+  the initial commit, so that authn and authz policies specified by the user
+  (and like settings) in the constructor override included ones.  Rationale:
+  I want the configurator to behave like someone did::
+
+    config = Configurator()
+    config.set_foo(...)
+    config.set_bar(..)
+
+  when they do::
+
+    config = Config(foo=... bar=...)
 
 - Name WSGI app "main" instead of pipeline in scaffold configs?
 
