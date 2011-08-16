@@ -21,7 +21,7 @@ class TestPShellCommand(unittest.TestCase):
             class Options(object): pass
             self.options = Options()
             self.options.disable_ipython = True
-            self.options.use_script = None
+            self.options.setup = None
             cmd.options = self.options
         return cmd
 
@@ -157,10 +157,12 @@ class TestPShellCommand(unittest.TestCase):
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
 
-    def test_command_loads_use_script_with_all(self):
+    def test_command_setup(self):
         command = self._makeOne()
-        self.config_factory.items = [
-            ('import', 'pyramid.tests.pshellapp.with_all')]
+        def setup(env):
+            env['a'] = 1
+            env['root'] = 'root override'
+        self.config_factory.items = [('setup', setup)]
         shell = DummyShell()
         command.command(shell)
         self.assertTrue(self.config_factory.parser)
@@ -172,27 +174,7 @@ class TestPShellCommand(unittest.TestCase):
             'registry':self.bootstrap.registry,
             'request':self.bootstrap.request,
             'root_factory':self.bootstrap.root_factory,
-            'a': 1, 'm': 'model override',
-        })
-        self.assertTrue(self.bootstrap.closer.called)
-        self.assertTrue(shell.help)
-
-    def test_command_loads_use_script_without_all(self):
-        command = self._makeOne()
-        self.config_factory.items = [
-            ('import', 'pyramid.tests.pshellapp.no_all')]
-        shell = DummyShell()
-        command.command(shell)
-        self.assertTrue(self.config_factory.parser)
-        self.assertEqual(self.config_factory.parser.filename,
-                         '/foo/bar/myapp.ini')
-        self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
-        self.assertEqual(shell.env, {
-            'app':self.bootstrap.app, 'root':'root override',
-            'registry':self.bootstrap.registry,
-            'request':self.bootstrap.request,
-            'root_factory':self.bootstrap.root_factory,
-            'a': 1, 'b': 2, 'm': 'model override',
+            'a':1,
         })
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
@@ -200,8 +182,11 @@ class TestPShellCommand(unittest.TestCase):
     def test_command_loads_check_variable_override_order(self):
         command = self._makeOne()
         model = Dummy()
-        self.config_factory.items = [
-            ('import', 'pyramid.tests.pshellapp.with_all'), ('m', model)]
+        def setup(env):
+            env['a'] = 1
+            env['m'] = 'model override'
+            env['root'] = 'root override'
+        self.config_factory.items = [('setup', setup), ('m', model)]
         shell = DummyShell()
         command.command(shell)
         self.assertTrue(self.config_factory.parser)
@@ -218,12 +203,15 @@ class TestPShellCommand(unittest.TestCase):
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
 
-    def test_command_loads_use_script_override(self):
+    def test_command_loads_setup_from_options(self):
         command = self._makeOne()
+        def setup(env):
+            env['a'] = 1
+            env['root'] = 'root override'
         model = Dummy()
-        self.config_factory.items = [('import', 'abc'),
+        self.config_factory.items = [('setup', 'abc'),
                                      ('m', model)]
-        command.options.use_script = 'pyramid.tests.pshellapp.with_all'
+        command.options.setup = setup
         shell = DummyShell()
         command.command(shell)
         self.assertTrue(self.config_factory.parser)

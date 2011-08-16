@@ -129,17 +129,18 @@ class PShellCommand(PCommand):
                       action='store_true',
                       dest='disable_ipython',
                       help="Don't use IPython even if it is available")
-    parser.add_option('--import-script',
-                      dest='use_script',
-                      help=("Execute the script and import all variables from "
-                            "a dotted Python path. This option will override "
-                            "the 'import' key in the [pshell] ini section."))
+    parser.add_option('--setup',
+                      dest='setup',
+                      help=("A callable that will be passed the environment "
+                            "before it is made available to the shell. This "
+                            "option will override the 'setup' key in the "
+                            "[pshell] ini section."))
 
     ConfigParser = ConfigParser.ConfigParser # testing
 
     loaded_objects = {}
     object_help = {}
-    use_script = None
+    setup = None
 
     def pshell_file_config(self, filename):
         config = self.ConfigParser()
@@ -152,10 +153,10 @@ class PShellCommand(PCommand):
         resolver = DottedNameResolver(None)
         self.loaded_objects = {}
         self.object_help = {}
-        self.use_script = None
+        self.setup = None
         for k, v in items:
-            if k == 'import':
-                self.use_script = v
+            if k == 'setup':
+                self.setup = v
             else:
                 self.loaded_objects[k] = resolver.maybe_resolve(v)
                 self.object_help[k] = v
@@ -182,21 +183,22 @@ class PShellCommand(PCommand):
             'Default root factory used to create `root`.')
 
         # override use_script with command-line options
-        if self.options.use_script:
-            self.use_script = self.options.use_script
+        if self.options.setup:
+            self.setup = self.options.setup
 
-        if self.use_script:
+        if self.setup:
             # store the env before muddling it with the script
             orig_env = env.copy()
 
-            # do this instead of an eval() to respect __all__
-            exec 'from %s import *' % self.use_script in env
-            env.pop('__builtins__', None)
+            # call the setup callable
+            resolver = DottedNameResolver(None)
+            setup = resolver.maybe_resolve(self.setup)
+            setup(env)
 
             # remove any objects from default help that were overidden
-            for k, v in orig_env.iteritems():
-                if env[k] != orig_env[k]:
-                    del env_help[k]
+            for k, v in env.iteritems():
+                if k not in orig_env or env[k] != orig_env[k]:
+                    env_help[k] = v
 
         # load the pshell section of the ini file
         env.update(self.loaded_objects)
@@ -217,9 +219,6 @@ class PShellCommand(PCommand):
             help += '\n\nCustom Variables:'
             for var in sorted(self.object_help.keys()):
                 help += '\n  %-12s %s' % (var, self.object_help[var])
-
-        if self.use_script:
-            help += '\n\nAll objects from %s are available.' % self.use_script
 
         if shell is None and not self.options.disable_ipython:
             shell = self.make_ipython_v0_11_shell()
