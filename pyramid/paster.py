@@ -129,6 +129,11 @@ class PShellCommand(PCommand):
                       action='store_true',
                       dest='disable_ipython',
                       help="Don't use IPython even if it is available")
+    parser.add_option('--import-script',
+                      dest='use_script',
+                      help=("Execute the script and import all variables from "
+                            "a dotted Python path. This option will override "
+                            "the 'import' key in the [pshell] ini section."))
 
     ConfigParser = ConfigParser.ConfigParser # testing
 
@@ -175,6 +180,10 @@ class PShellCommand(PCommand):
         env_help['request'] = 'Active request object.'
         env_help['root_factory'] = (
             'Default root factory used to create `root`.')
+
+        # override use_script with command-line options
+        if self.options.use_script:
+            self.use_script = self.options.use_script
 
         if self.use_script:
             # store the env before muddling it with the script
