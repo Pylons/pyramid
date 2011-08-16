@@ -28,6 +28,7 @@ class Configurator(BaseConfigurator):
                  default_permission=None,
                  session_factory=None,
                  autocommit=True,
+                 route_prefix=None,
                  ):
         if package is None:
             package = caller_package()
@@ -47,6 +48,7 @@ class Configurator(BaseConfigurator):
             default_permission=default_permission,
             session_factory=session_factory,
             autocommit=autocommit,
+            route_prefix=route_prefix,
             )
             
 deprecated(
