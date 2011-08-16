@@ -763,6 +763,7 @@ class Configurator(
 
 class PyramidConfigurationMachine(ConfigurationMachine):
     autocommit = False
+    route_prefix = None
 
     def processSpec(self, spec):
         """Check whether a callable needs to be processed.  The ``spec``

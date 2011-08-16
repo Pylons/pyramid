@@ -3908,6 +3908,12 @@ class TestConfigurator_add_directive(unittest.TestCase):
             ('discrim', None, config2.package),
             )
 
+class TestPyramidConfigurationMachine(unittest.TestCase):
+    def test_it(self):
+        from pyramid.config import PyramidConfigurationMachine
+        m = PyramidConfigurationMachine()
+        self.assertEqual(m.autocommit, False)
+        self.assertEqual(m.route_prefix, None)
 
 class DummyRequest:
     subpath = ()
