@@ -207,7 +207,7 @@ class PShellCommand(PCommand):
                 del env_help[k]
 
         # generate help text
-        help = '\n'
+        help = ''
         if env_help:
             help += 'Environment:'
             for var in sorted(env_help.keys()):
@@ -238,7 +238,7 @@ class PShellCommand(PCommand):
         def shell(env, help):
             cprt = 'Type "help" for more information.'
             banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
-            banner += '\n' + help + '\n'
+            banner += '\n\n' + help + '\n'
             interact(banner, local=env)
         return shell
 
@@ -251,7 +251,7 @@ class PShellCommand(PCommand):
             except ImportError:
                 return None
         def shell(env, help):
-            IPShell = IPShellFactory(banner2=help, user_ns=env)
+            IPShell = IPShellFactory(banner2=help + '\n', user_ns=env)
             IPShell()
         return shell
 
