@@ -18,6 +18,8 @@ from pyramid.tweens import MAIN
 from pyramid.tweens import INGRESS
 
 from pyramid.scaffolds import PyramidTemplate # bw compat
+PyramidTemplate = PyramidTemplate # pyflakes
+
 zope.deprecation.deprecated(
     'PyramidTemplate', ('pyramid.paster.PyramidTemplate was moved to '
                         'pyramid.scaffolds.PyramidTemplate in Pyramid 1.1'),

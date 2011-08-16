@@ -1,13 +1,10 @@
-try:
-    from hashlib import sha1
-except ImportError: # pragma: no cover
-    import sha as sha1
 
 try:
     import cPickle as pickle
 except ImportError: # pragma: no cover
     import pickle
 
+from hashlib import sha1
 import base64
 import binascii
 import hmac
