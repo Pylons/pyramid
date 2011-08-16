@@ -156,6 +156,7 @@ name ``MyProject`` as a section name:
       request      Active request object.
       root         Root of the default resource tree.
       root_factory Default root factory used to create `root`.
+
     >>> root
     <myproject.resources.MyResource object at 0x445270>
     >>> registry
@@ -191,12 +192,18 @@ Press ``Ctrl-D`` to exit the interactive shell (or ``Ctrl-Z`` on Windows).
 Extending the Shell
 ~~~~~~~~~~~~~~~~~~~
 
-It is sometimes convenient when using the interactive shell often to have
-some variables significant to your application already loaded as globals when
+It is convenient when using the interactive shell often to have some
+variables significant to your application already loaded as globals when
 you start the ``pshell``. To facilitate this, ``pshell`` will look for a
 special ``[pshell]`` section in your INI file and expose the subsequent
 key/value pairs to the shell.  Each key is a variable name that will be
 global within the pshell session; each value is a :term:`dotted Python name`.
+If specified, the special key ``setup`` should be a :term:`dotted Python name`
+pointing to a callable that accepts the dictionary of globals that will
+be loaded into the shell. This allows for some custom initializing code
+to be executed each time the ``pshell`` is run. The ``setup`` callable
+can also be specified from the commandline using the ``--setup`` option
+which will override the key in the INI file.
 
 For example, you want to expose your model to the shell, along with the
 database session so that you can mutate the model on an actual database.
@@ -206,12 +213,33 @@ Here, we'll assume your model is stored in the ``myapp.models`` package.
    :linenos:
 
    [pshell]
+   setup = myapp.lib.pshell.setup
    m = myapp.models
    session = myapp.models.DBSession
    t = transaction
 
+By defining the ``setup`` callable, we will create the module
+``myapp.lib.pshell`` containing a callable named ``setup`` that will receive
+the global environment before it is exposed to the shell. Here we mutate the
+environment's request as well as add a new value containing a WebTest version
+of the application to which we can easily submit requests.
+
+.. code-block:: python
+    :linenos:
+
+    # myapp/lib/pshell.py
+    from webtest import TestApp
+
+    def setup(env):
+        env['request'].host = 'www.example.com'
+        env['request'].scheme = 'https'
+        env['testapp'] = TestApp(env['app'])
+
 When this INI file is loaded, the extra variables ``m``, ``session`` and
-``t`` will be available for use immediately. For example:
+``t`` will be available for use immediately. Since a ``setup`` callable
+was also specified, it is executed and a new variable ``testapp`` is
+exposed, and the request is configured to generate urls from the host
+``http://www.example.com``. For example:
 
 .. code-block:: text
 
@@ -226,12 +254,17 @@ When this INI file is loaded, the extra variables ``m``, ``session`` and
       request      Active request object.
       root         Root of the default resource tree.
       root_factory Default root factory used to create `root`.
+      testapp      <webtest.TestApp object at ...>
 
     Custom Variables:
       m            myapp.models
       session      myapp.models.DBSession
       t            transaction
-    >>>
+
+    >>> testapp.get('/')
+    <200 OK text/html body='<!DOCTYPE...l>\n'/3337>
+    >>> request.route_url('home')
+    'https://www.example.com/'
 
 .. index::
    single: IPython

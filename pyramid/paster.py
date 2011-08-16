@@ -129,22 +129,37 @@ class PShellCommand(PCommand):
                       action='store_true',
                       dest='disable_ipython',
                       help="Don't use IPython even if it is available")
+    parser.add_option('--setup',
+                      dest='setup',
+                      help=("A callable that will be passed the environment "
+                            "before it is made available to the shell. This "
+                            "option will override the 'setup' key in the "
+                            "[pshell] ini section."))
 
     ConfigParser = ConfigParser.ConfigParser # testing
 
+    loaded_objects = {}
+    object_help = {}
+    setup = None
+
     def pshell_file_config(self, filename):
-        resolver = DottedNameResolver(None)
-        self.loaded_objects = {}
-        self.object_help = {}
         config = self.ConfigParser()
         config.read(filename)
         try:
             items = config.items('pshell')
         except ConfigParser.NoSectionError:
             return
+
+        resolver = DottedNameResolver(None)
+        self.loaded_objects = {}
+        self.object_help = {}
+        self.setup = None
         for k, v in items:
-            self.loaded_objects[k] = resolver.maybe_resolve(v)
-            self.object_help[k] = v
+            if k == 'setup':
+                self.setup = v
+            else:
+                self.loaded_objects[k] = resolver.maybe_resolve(v)
+                self.object_help[k] = v
 
     def command(self, shell=None):
         config_uri = self.args[0]
@@ -167,6 +182,24 @@ class PShellCommand(PCommand):
         env_help['root_factory'] = (
             'Default root factory used to create `root`.')
 
+        # override use_script with command-line options
+        if self.options.setup:
+            self.setup = self.options.setup
+
+        if self.setup:
+            # store the env before muddling it with the script
+            orig_env = env.copy()
+
+            # call the setup callable
+            resolver = DottedNameResolver(None)
+            setup = resolver.maybe_resolve(self.setup)
+            setup(env)
+
+            # remove any objects from default help that were overidden
+            for k, v in env.iteritems():
+                if k not in orig_env or env[k] != orig_env[k]:
+                    env_help[k] = v
+
         # load the pshell section of the ini file
         env.update(self.loaded_objects)
 
@@ -176,7 +209,7 @@ class PShellCommand(PCommand):
                 del env_help[k]
 
         # generate help text
-        help = '\n'
+        help = ''
         if env_help:
             help += 'Environment:'
             for var in sorted(env_help.keys()):
@@ -204,7 +237,7 @@ class PShellCommand(PCommand):
         def shell(env, help):
             cprt = 'Type "help" for more information.'
             banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
-            banner += '\n' + help + '\n'
+            banner += '\n\n' + help + '\n'
             interact(banner, local=env)
         return shell
 
@@ -217,7 +250,7 @@ class PShellCommand(PCommand):
             except ImportError:
                 return None
         def shell(env, help):
-            IPShell = IPShellFactory(banner2=help, user_ns=env)
+            IPShell = IPShellFactory(banner2=help + '\n', user_ns=env)
             IPShell()
         return shell
 

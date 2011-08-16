@@ -21,6 +21,7 @@ class TestPShellCommand(unittest.TestCase):
             class Options(object): pass
             self.options = Options()
             self.options.disable_ipython = True
+            self.options.setup = None
             cmd.options = self.options
         return cmd
 
@@ -152,6 +153,77 @@ class TestPShellCommand(unittest.TestCase):
             'request':self.bootstrap.request,
             'root_factory':self.bootstrap.root_factory,
             'm':model,
+        })
+        self.assertTrue(self.bootstrap.closer.called)
+        self.assertTrue(shell.help)
+
+    def test_command_setup(self):
+        command = self._makeOne()
+        def setup(env):
+            env['a'] = 1
+            env['root'] = 'root override'
+        self.config_factory.items = [('setup', setup)]
+        shell = DummyShell()
+        command.command(shell)
+        self.assertTrue(self.config_factory.parser)
+        self.assertEqual(self.config_factory.parser.filename,
+                         '/foo/bar/myapp.ini')
+        self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
+        self.assertEqual(shell.env, {
+            'app':self.bootstrap.app, 'root':'root override',
+            'registry':self.bootstrap.registry,
+            'request':self.bootstrap.request,
+            'root_factory':self.bootstrap.root_factory,
+            'a':1,
+        })
+        self.assertTrue(self.bootstrap.closer.called)
+        self.assertTrue(shell.help)
+
+    def test_command_loads_check_variable_override_order(self):
+        command = self._makeOne()
+        model = Dummy()
+        def setup(env):
+            env['a'] = 1
+            env['m'] = 'model override'
+            env['root'] = 'root override'
+        self.config_factory.items = [('setup', setup), ('m', model)]
+        shell = DummyShell()
+        command.command(shell)
+        self.assertTrue(self.config_factory.parser)
+        self.assertEqual(self.config_factory.parser.filename,
+                         '/foo/bar/myapp.ini')
+        self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
+        self.assertEqual(shell.env, {
+            'app':self.bootstrap.app, 'root':'root override',
+            'registry':self.bootstrap.registry,
+            'request':self.bootstrap.request,
+            'root_factory':self.bootstrap.root_factory,
+            'a':1, 'm':model,
+        })
+        self.assertTrue(self.bootstrap.closer.called)
+        self.assertTrue(shell.help)
+
+    def test_command_loads_setup_from_options(self):
+        command = self._makeOne()
+        def setup(env):
+            env['a'] = 1
+            env['root'] = 'root override'
+        model = Dummy()
+        self.config_factory.items = [('setup', 'abc'),
+                                     ('m', model)]
+        command.options.setup = setup
+        shell = DummyShell()
+        command.command(shell)
+        self.assertTrue(self.config_factory.parser)
+        self.assertEqual(self.config_factory.parser.filename,
+                         '/foo/bar/myapp.ini')
+        self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
+        self.assertEqual(shell.env, {
+            'app':self.bootstrap.app, 'root':'root override',
+            'registry':self.bootstrap.registry,
+            'request':self.bootstrap.request,
+            'root_factory':self.bootstrap.root_factory,
+            'a':1, 'm':model,
         })
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
