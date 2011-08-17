@@ -1,3 +1,12 @@
+Next release
+============
+
+Bug Fixes
+---------
+
+- Fix ``pyramid.config.preserve_view_attrs`` to not choke when the view it is
+  passed is ``None`` (FBO: pyramid_formish).
+
 1.1.1 (2011-08-13)
 ==================
 

@@ -2890,6 +2890,9 @@ def preserve_view_attrs(view, wrapper):
     if wrapper is view:
         return view
 
+    if view is None:
+        return wrapper
+
     original_view = getattr(view, '__original_view__', None)
 
     if original_view is None:

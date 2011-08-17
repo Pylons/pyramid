@@ -4689,6 +4689,12 @@ class Test_preserve_view_attrs(unittest.TestCase):
         result = self._callFUT(view, view)
         self.assertTrue(result is view)
 
+    def test_view_is_None(self):
+        def view(context, request):
+            """ """
+        result = self._callFUT(None, view)
+        self.assertTrue(result is view)
+
     def test_it_different_with_existing_original_view(self):
         def view1(context, request): pass
         view1.__original_view__ = 'abc'
