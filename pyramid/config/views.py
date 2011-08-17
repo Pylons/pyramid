@@ -45,6 +45,9 @@ def wraps_view(wrapper):
     return inner
 
 def preserve_view_attrs(view, wrapper):
+    if view is None:
+        return wrapper
+
     if wrapper is view:
         return view
 
