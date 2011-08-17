@@ -7,6 +7,9 @@ Bug Fixes
 - Fix ``pyramid.config.preserve_view_attrs`` to not choke when the view it is
   passed is ``None`` (FBO: pyramid_formish).
 
+- Fixed an issue with the default renderer not working at certain times.  See
+  https://github.com/Pylons/pyramid/issues/249 (backport from trunk).
+
 1.1.1 (2011-08-13)
 ==================
 
@@ -17,12 +20,6 @@ Backported Features
   ``exc_info``.  Its value will be ``None`` until an exception is caught
   by the Pyramid router, after which it will be the result of
   ``sys.exc_info()``.
-
-Bug Fixes
----------
-
-- Fixed an issue with the default renderer not working at certain times.  See
-  https://github.com/Pylons/pyramid/issues/249
 
 1.1 (2011-07-22)
 ================
