@@ -180,7 +180,7 @@ class ViewDeriver(object):
                 if result:
                     return view(context, request)
                 msg = getattr(request, 'authdebug_message',
-                              'Unauthorized: %s failed permission check' % view)
+                              'Unauthorized: %s failed permission check' % view.__name__)
                 raise HTTPForbidden(msg, result=result)
             _secured_view.__call_permissive__ = view
             _secured_view.__permitted__ = _permitted
@@ -231,7 +231,7 @@ class ViewDeriver(object):
             if all((predicate(context, request) for predicate in predicates)):
                 return view(context, request)
             raise PredicateMismatch(
-                'predicate mismatch for view %s' % view)
+                'predicate mismatch for view %s' % view.__name__)
         def checker(context, request):
             return all((predicate(context, request) for predicate in
                         predicates))
