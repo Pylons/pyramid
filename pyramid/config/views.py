@@ -179,8 +179,10 @@ class ViewDeriver(object):
                 result = _permitted(context, request)
                 if result:
                     return view(context, request)
-                msg = getattr(request, 'authdebug_message',
-                              'Unauthorized: %s failed permission check' % view)
+                view_name = getattr(view, '__name__', view)
+                msg = getattr(
+                    request, 'authdebug_message',
+                    'Unauthorized: %s failed permission check' % view_name)
                 raise HTTPForbidden(msg, result=result)
             _secured_view.__call_permissive__ = view
             _secured_view.__permitted__ = _permitted
@@ -230,8 +232,9 @@ class ViewDeriver(object):
         def predicate_wrapper(context, request):
             if all((predicate(context, request) for predicate in predicates)):
                 return view(context, request)
+            view_name = getattr(view, '__name__', view)
             raise PredicateMismatch(
-                'predicate mismatch for view %s' % view)
+                'predicate mismatch for view %s' % view_name)
         def checker(context, request):
             return all((predicate(context, request) for predicate in
                         predicates))

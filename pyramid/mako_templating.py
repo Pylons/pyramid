@@ -1,4 +1,5 @@
 import os
+import sys
 import threading
 
 from zope.interface import implements
@@ -110,6 +111,14 @@ def renderer_factory(info):
             
     return MakoLookupTemplateRenderer(path, lookup)
 
+class MakoRenderingException(Exception):
+    def __init__(self, text):
+        self.text = text
+
+    def __repr__(self):
+        return self.text
+
+    __str__ = __repr__
 
 class MakoLookupTemplateRenderer(object):
     implements(ITemplateRenderer)
@@ -134,5 +143,16 @@ class MakoLookupTemplateRenderer(object):
         template = self.implementation()
         if def_name is not None:
             template = template.get_def(def_name)
-        result = template.render_unicode(**system)
+        try:
+            result = template.render_unicode(**system)
+        except:
+            try:
+                exc_info = sys.exc_info()
+                errtext = exceptions.text_error_template().render(
+                    error=exc_info[0],
+                    traceback=exc_info[2])
+                raise MakoRenderingException(errtext)
+            finally:
+                del exc_info
+
         return result
