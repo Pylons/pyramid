@@ -929,6 +929,84 @@ class TestViewDeriver(unittest.TestCase):
         request.url = 'url'
         self.assertEqual(result(None, request), response)
 
+    def test_secured_view_raises_forbidden_no_name(self):
+        from pyramid.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.httpexceptions import HTTPForbidden
+        response = DummyResponse()
+        view = lambda *arg: response
+        self.config.registry.settings = {}
+        policy = DummySecurityPolicy(False)
+        self.config.registry.registerUtility(policy, IAuthenticationPolicy)
+        self.config.registry.registerUtility(policy, IAuthorizationPolicy)
+        deriver = self._makeOne(permission='view')
+        result = deriver(view)
+        request = self._makeRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        try:
+            result(None, request)
+        except HTTPForbidden, e:
+            self.assertEqual(e.message,
+                             'Unauthorized: <lambda> failed permission check')
+        else:
+            raise AssertionError
+
+    def test_secured_view_raises_forbidden_with_name(self):
+        from pyramid.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.httpexceptions import HTTPForbidden
+        def myview(request): pass
+        self.config.registry.settings = {}
+        policy = DummySecurityPolicy(False)
+        self.config.registry.registerUtility(policy, IAuthenticationPolicy)
+        self.config.registry.registerUtility(policy, IAuthorizationPolicy)
+        deriver = self._makeOne(permission='view')
+        result = deriver(myview)
+        request = self._makeRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        try:
+            result(None, request)
+        except HTTPForbidden, e:
+            self.assertEqual(e.message,
+                             'Unauthorized: myview failed permission check')
+        else:
+            raise AssertionError
+
+    def test_predicate_mismatch_view_has_no_name(self):
+        from pyramid.exceptions import PredicateMismatch
+        response = DummyResponse()
+        view = lambda *arg: response
+        def predicate1(context, request):
+            return False
+        deriver = self._makeOne(predicates=[predicate1])
+        result = deriver(view)
+        request = self._makeRequest()
+        request.method = 'POST'
+        try:
+            result(None, None)
+        except PredicateMismatch, e:
+            self.assertEqual(e.detail, 'predicate mismatch for view <lambda>')
+        else:
+            raise AssertionError
+
+    def test_predicate_mismatch_view_has_name(self):
+        from pyramid.exceptions import PredicateMismatch
+        def myview(request): pass
+        def predicate1(context, request):
+            return False
+        deriver = self._makeOne(predicates=[predicate1])
+        result = deriver(myview)
+        request = self._makeRequest()
+        request.method = 'POST'
+        try:
+            result(None, None)
+        except PredicateMismatch, e:
+            self.assertEqual(e.detail, 'predicate mismatch for view myview')
+        else:
+            raise AssertionError
+            
     def test_with_predicates_all(self):
         response = DummyResponse()
         view = lambda *arg: response
