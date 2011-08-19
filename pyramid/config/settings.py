@@ -9,11 +9,8 @@ class SettingsConfiguratorMixin(object):
         return settings
 
     def add_settings(self, settings=None, **kw):
-        """Augment the ``settings`` argument passed in to the Configurator
-        constructor with one or more 'setting' key/value pairs.  A setting is
-        a single key/value pair in the dictionary-ish object returned from
-        the API :attr:`pyramid.registry.Registry.settings` and
-        :meth:`pyramid.config.Configurator.get_settings`.
+        """Augment the :term:`deployment settings` with one or more
+        key/value pairs. 
 
         You may pass a dictionary::
 
@@ -42,11 +39,7 @@ class SettingsConfiguratorMixin(object):
         application.  A deployment settings object is a dictionary-like
         object that contains key/value pairs based on the dictionary passed
         as the ``settings`` argument to the
-        :class:`pyramid.config.Configurator` constructor or the
-        :func:`pyramid.router.make_app` API.
-
-        .. note:: For backwards compatibility, dictionary keys can also be
-           looked up as attributes of the settings object.
+        :class:`pyramid.config.Configurator` constructor.
 
         .. note:: the :attr:`pyramid.registry.Registry.settings` API
            performs the same duty.

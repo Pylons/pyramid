@@ -12,7 +12,12 @@ class FactoriesConfiguratorMixin(object):
     def set_root_factory(self, factory):
         """ Add a :term:`root factory` to the current configuration
         state.  If the ``factory`` argument is ``None`` a default root
-        factory will be registered."""
+        factory will be registered.
+
+        .. note:: Using the ``root_factory`` argument to the
+           :class:`pyramid.config.Configurator` constructor
+           can be used to achieve the same purpose.
+        """
         factory = self.maybe_dotted(factory)
         if factory is None:
             factory = DefaultRootFactory

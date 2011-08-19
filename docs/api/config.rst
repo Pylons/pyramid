@@ -5,7 +5,7 @@
 
 .. automodule:: pyramid.config
 
-  .. autoclass:: Configurator(registry=None, package=None, settings=None, root_factory=None, authentication_policy=None, authorization_policy=None, renderers=DEFAULT_RENDERERS, debug_logger=None, locale_negotiator=None, request_factory=None, renderer_globals_factory=None, default_permission=None, session_factory=None, autocommit=False)
+  .. autoclass:: Configurator
 
      .. attribute:: registry
 
@@ -36,9 +36,9 @@
 
      .. automethod:: absolute_asset_spec
 
-     .. automethod:: setup_registry(settings=None, root_factory=None, authentication_policy=None, renderers=DEFAULT_RENDERERS, debug_logger=None, locale_negotiator=None, request_factory=None, renderer_globals_factory=None)
+     .. automethod:: setup_registry
 
-     .. automethod:: add_renderer(name, factory)
+     .. automethod:: add_renderer
 
      .. automethod:: add_response_adapter
 
@@ -64,10 +64,6 @@
 
      .. automethod:: scan
 
-     .. automethod:: set_forbidden_view
-
-     .. automethod:: set_notfound_view
-
      .. automethod:: set_locale_negotiator
 
      .. automethod:: set_default_permission
@@ -77,8 +73,6 @@
      .. automethod:: set_request_factory
 
      .. automethod:: set_root_factory
-
-     .. automethod:: set_renderer_globals_factory(factory)
 
      .. automethod:: set_view_mapper
 
@@ -93,6 +87,13 @@
      .. automethod:: testing_add_subscriber
 
      .. automethod:: testing_add_renderer
+
+     .. automethod:: set_forbidden_view
+
+     .. automethod:: set_notfound_view
+
+     .. automethod:: set_renderer_globals_factory(factory)
+
 
   .. attribute:: global_registries
 

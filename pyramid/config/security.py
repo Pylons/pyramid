@@ -2,7 +2,6 @@ from pyramid.interfaces import IAuthorizationPolicy
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.interfaces import IDefaultPermission
 
-from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.exceptions import ConfigurationError
 from pyramid.config.util import action_method
 
@@ -13,6 +12,11 @@ class SecurityConfiguratorMixin(object):
         current configuration.  The ``policy`` argument must be an instance
         of an authentication policy or a :term:`dotted Python name`
         that points at an instance of an authentication policy.
+
+        .. note:: Using the ``authentication_policy`` argument to the
+           :class:`pyramid.config.Configurator` constructor
+           can be used to achieve the same purpose.
+        
         """
         self._set_authentication_policy(policy)
         def ensure():
@@ -36,6 +40,10 @@ class SecurityConfiguratorMixin(object):
         current configuration.  The ``policy`` argument must be an instance
         of an authorization policy or a :term:`dotted Python name` that points
         at an instance of an authorization policy.
+
+        .. note:: Using the ``authorization_policy`` argument to the
+           :class:`pyramid.config.Configurator` constructor
+           can be used to achieve the same purpose.
         """
         self._set_authorization_policy(policy)
         def ensure():
@@ -76,12 +84,11 @@ class SecurityConfiguratorMixin(object):
 
           If a default permission is in effect, view configurations meant to
           create a truly anonymously accessible view (even :term:`exception
-          view` views) *must* use the explicit permission string
-          :data:`pyramid.security.NO_PERMISSION_REQUIRED` as the permission.
-          When this string is used as the ``permission`` for a view
-          configuration, the default permission is ignored, and the view is
-          registered, making it available to all callers regardless of their
-          credentials.
+          view` views) *must* use the value of the permission importable as
+          :data:`pyramid.security.NO_PERMISSION_REQUIRED`.  When this string
+          is used as the ``permission`` for a view configuration, the default
+          permission is ignored, and the view is registered, making it
+          available to all callers regardless of their credentials.
 
         See also :ref:`setting_a_default_permission`.
 

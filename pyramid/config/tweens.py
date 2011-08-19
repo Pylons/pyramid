@@ -11,6 +11,8 @@ class TweensConfiguratorMixin(object):
     @action_method
     def add_tween(self, tween_factory, alias=None, under=None, over=None):
         """
+        .. note:: This feature is new as of Pyramid 1.2.
+
         Add a 'tween factory'.  A :term:`tween` (a contraction of 'between')
         is a bit of code that sits between the Pyramid router's main request
         handling function and the upstream WSGI component that uses
@@ -98,7 +100,6 @@ class TweensConfiguratorMixin(object):
 
         For more information, see :ref:`registering_tweens`.
 
-        .. note:: This feature is new as of Pyramid 1.2.
         """
         return self._add_tween(tween_factory, alias=alias, under=under,
                                over=over, explicit=False)

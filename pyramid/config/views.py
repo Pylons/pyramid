@@ -1249,14 +1249,15 @@ class ViewsConfiguratorMixin(object):
 
         The ``mapper`` should argument be an object implementing
         :class:`pyramid.interfaces.IViewMapperFactory` or a :term:`dotted
-        Python name` to such an object.
+        Python name` to such an object.  The provided ``mapper`` will become
+        the default view mapper to be used by all subsequent :term:`view
+        configuration` registrations.
 
-        The provided ``mapper`` will become the default view mapper to be
-        used by all subsequent :term:`view configuration` registrations, as
-        if you had passed a ``default_view_mapper`` argument to the
-        :class:`pyramid.config.Configurator` constructor.
-        
         See also :ref:`using_a_view_mapper`.
+
+        .. note:: Using the ``default_view_mapper`` argument to the
+           :class:`pyramid.config.Configurator` constructor
+           can be used to achieve the same purpose.
         """
         mapper = self.maybe_dotted(mapper)
         self.registry.registerUtility(mapper, IViewMapperFactory)
@@ -1293,7 +1294,7 @@ class ViewsConfiguratorMixin(object):
         be performed against the default root factory ACL.
 
         Any other keyword arguments sent to ``add_static_view`` are passed on
-        to :meth:`pyramid.config.Configuration.add_route` (e.g. ``factory``,
+        to :meth:`pyramid.config.Configurator.add_route` (e.g. ``factory``,
         perhaps to define a custom factory with a custom ACL for this static
         view).
 

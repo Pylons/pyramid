@@ -71,48 +71,46 @@ class Configurator(
     ``authorization_policy``, ``renderers``, ``debug_logger``,
     ``locale_negotiator``, ``request_factory``, ``renderer_globals_factory``,
     ``default_permission``, ``session_factory``, ``default_view_mapper``,
-    ``autocommit``, and ``exceptionresponse_view``.
+    ``autocommit``, ``exceptionresponse_view`` and ``route_prefix``.
 
-    If the ``registry`` argument is passed as a non-``None`` value, it
-    must be an instance of the :class:`pyramid.registry.Registry`
-    class representing the registry to configure.  If ``registry`` is
-    ``None``, the configurator will create a
-    :class:`pyramid.registry.Registry` instance itself; it will
-    also perform some default configuration that would not otherwise
-    be done.  After construction, the configurator may be used to add
-    configuration to the registry.  The overall state of a registry is
-    called the 'configuration state'.
+    If the ``registry`` argument is passed as a non-``None`` value, it must
+    be an instance of the :class:`pyramid.registry.Registry` class
+    representing the registry to configure.  If ``registry`` is ``None``, the
+    configurator will create a :class:`pyramid.registry.Registry` instance
+    itself; it will also perform some default configuration that would not
+    otherwise be done.  After its construction, the configurator may be used
+    to add further configuration to the registry.
 
     .. warning:: If a ``registry`` is passed to the Configurator
        constructor, all other constructor arguments except ``package``
        are ignored.
 
-    If the ``package`` argument is passed, it must be a reference to a
-    Python :term:`package` (e.g. ``sys.modules['thepackage']``) or a
-    :term:`dotted Python name` to same.  This value is used as a basis
-    to convert relative paths passed to various configuration methods,
-    such as methods which accept a ``renderer`` argument, into
-    absolute paths.  If ``None`` is passed (the default), the package
-    is assumed to be the Python package in which the *caller* of the
-    ``Configurator`` constructor lives.
+    If the ``package`` argument is passed, it must be a reference to a Python
+    :term:`package` (e.g. ``sys.modules['thepackage']``) or a :term:`dotted
+    Python name` to the same.  This value is used as a basis to convert
+    relative paths passed to various configuration methods, such as methods
+    which accept a ``renderer`` argument, into absolute paths.  If ``None``
+    is passed (the default), the package is assumed to be the Python package
+    in which the *caller* of the ``Configurator`` constructor lives.
 
     If the ``settings`` argument is passed, it should be a Python dictionary
-    representing the deployment settings for this application.  These are
-    later retrievable using the :attr:`pyramid.registry.Registry.settings`
-    attribute (aka ``request.registry.settings``).
+    representing the :term:`deployment settings` for this application.  These
+    are later retrievable using the
+    :attr:`pyramid.registry.Registry.settings` attribute (aka
+    ``request.registry.settings``).
 
     If the ``root_factory`` argument is passed, it should be an object
-    representing the default :term:`root factory` for your application
-    or a :term:`dotted Python name` to same.  If it is ``None``, a
-    default root factory will be used.
+    representing the default :term:`root factory` for your application or a
+    :term:`dotted Python name` to the same.  If it is ``None``, a default
+    root factory will be used.
 
     If ``authentication_policy`` is passed, it should be an instance
     of an :term:`authentication policy` or a :term:`dotted Python
-    name` to same.
+    name` to the same.
 
     If ``authorization_policy`` is passed, it should be an instance of
     an :term:`authorization policy` or a :term:`dotted Python name` to
-    same.
+    the same.
 
     .. note:: A ``ConfigurationError`` will be raised when an
        authorization policy is supplied without also supplying an
@@ -137,14 +135,14 @@ class Configurator(
     same.  See :ref:`custom_locale_negotiator`.
 
     If ``request_factory`` is passed, it should be a :term:`request
-    factory` implementation or a :term:`dotted Python name` to same.
+    factory` implementation or a :term:`dotted Python name` to the same.
     See :ref:`changing_the_request_factory`.  By default it is ``None``,
     which means use the default request factory.
 
     If ``renderer_globals_factory`` is passed, it should be a :term:`renderer
-    globals` factory implementation or a :term:`dotted Python name` to same.
-    See :ref:`adding_renderer_globals`.  By default, it is ``None``, which
-    means use no renderer globals factory.
+    globals` factory implementation or a :term:`dotted Python name` to the
+    same.  See :ref:`adding_renderer_globals`.  By default, it is ``None``,
+    which means use no renderer globals factory.
 
     .. warning:: as of Pyramid 1.1, ``renderer_globals_factory`` is
        deprecated.  Instead, use a BeforeRender event subscriber as per
@@ -266,16 +264,15 @@ class Configurator(
                        session_factory=None, default_view_mapper=None,
                        exceptionresponse_view=default_exceptionresponse_view):
         """ When you pass a non-``None`` ``registry`` argument to the
-        :term:`Configurator` constructor, no initial 'setup' is performed
+        :term:`Configurator` constructor, no initial setup is performed
         against the registry.  This is because the registry you pass in may
         have already been initialized for use under :app:`Pyramid` via a
         different configurator.  However, in some circumstances (such as when
-        you want to use the Zope 'global` registry instead of a registry
-        created as a result of the Configurator constructor), or when you
-        want to reset the initial setup of a registry, you *do* want to
-        explicitly initialize the registry associated with a Configurator for
-        use under :app:`Pyramid`.  Use ``setup_registry`` to do this
-        initialization.
+        you want to use a global registry instead of a registry created as a
+        result of the Configurator constructor), or when you want to reset
+        the initial setup of a registry, you *do* want to explicitly
+        initialize the registry associated with a Configurator for use under
+        :app:`Pyramid`.  Use ``setup_registry`` to do this initialization.
 
         ``setup_registry`` configures settings, a root factory, security
         policies, renderers, a debug logger, a locale negotiator, and various
@@ -421,7 +418,7 @@ class Configurator(
 
     def action(self, discriminator, callable=None, args=(), kw=None, order=0):
         """ Register an action which will be executed when
-        :meth:`pyramid.config.Configuration.commit` is called (or executed
+        :meth:`pyramid.config.Configurator.commit` is called (or executed
         immediately if ``autocommit`` is ``True``).
 
         .. warning:: This method is typically only used by :app:`Pyramid`
@@ -471,7 +468,7 @@ class Configurator(
 
     def commit(self):
         """ Commit any pending configuration actions. If a configuration
-        conflict is detected in the pending configuration actins, this method
+        conflict is detected in the pending configuration actions, this method
         will raise a :exc:`ConfigurationConflictError`; within the traceback
         of this error will be information about the source of the conflict,
         usually including file names and line numbers of the cause of the
