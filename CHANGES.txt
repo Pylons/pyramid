@@ -64,6 +64,14 @@ Features
   ``set_authentication_policy`` and ``set_authorization_policy``.  These are
   meant to be consumed mostly by add-on authors.
 
+- New Configurator method: ``set_root_factory``.
+
+- Pyramid no longer eagerly commits some default configuration statements at
+  Configurator construction time, which permits values passed in as
+  constructor arguments (e.g. ``authentication_policy`` and
+  ``authorization_policy``) to override the same settings obtained via an
+  "include".
+
 Internal
 --------
 

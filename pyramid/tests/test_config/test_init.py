@@ -189,14 +189,16 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(policy, result)
 
     def test_ctor_authorization_policy_only(self):
-        from pyramid.exceptions import ConfigurationError
+        from zope.configuration.config import ConfigurationExecutionError
         policy = object()
-        self.assertRaises(ConfigurationError,
-                          self._makeOne, authorization_policy=policy)
+        config = self._makeOne(authorization_policy=policy)
+        self.assertRaises(ConfigurationExecutionError, config.commit)
 
     def test_ctor_no_root_factory(self):
         from pyramid.interfaces import IRootFactory
         config = self._makeOne()
+        self.assertEqual(config.registry.queryUtility(IRootFactory), None)
+        config.commit()
         self.assertTrue(config.registry.getUtility(IRootFactory))
 
     def test_ctor_alternate_renderers(self):
@@ -214,6 +216,8 @@ class ConfiguratorTests(unittest.TestCase):
     def test_ctor_session_factory(self):
         from pyramid.interfaces import ISessionFactory
         config = self._makeOne(session_factory='factory')
+        self.assertEqual(config.registry.queryUtility(ISessionFactory), None)
+        config.commit()
         self.assertEqual(config.registry.getUtility(ISessionFactory), 'factory')
 
     def test_ctor_default_view_mapper(self):
@@ -477,14 +481,13 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(result, pyramid.tests)
 
     def test_setup_registry_authorization_policy_only(self):
+        from zope.configuration.config import ConfigurationExecutionError
         from pyramid.registry import Registry
-        from pyramid.exceptions import ConfigurationError
         policy = object()
         reg = Registry()
         config = self._makeOne(reg)
-        config = self.assertRaises(ConfigurationError,
-                                   config.setup_registry,
-                                   authorization_policy=policy)
+        config.setup_registry(authorization_policy=policy)
+        config = self.assertRaises(ConfigurationExecutionError, config.commit)
 
     def test_setup_registry_default_root_factory(self):
         from pyramid.registry import Registry
@@ -492,6 +495,8 @@ class ConfiguratorTests(unittest.TestCase):
         reg = Registry()
         config = self._makeOne(reg)
         config.setup_registry()
+        self.assertEqual(reg.queryUtility(IRootFactory), None)
+        config.commit()
         self.assertTrue(reg.getUtility(IRootFactory))
 
     def test_setup_registry_dottedname_root_factory(self):
@@ -501,6 +506,8 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(reg)
         import pyramid.tests
         config.setup_registry(root_factory='pyramid.tests')
+        self.assertEqual(reg.queryUtility(IRootFactory), None)
+        config.commit()
         self.assertEqual(reg.getUtility(IRootFactory), pyramid.tests)
 
     def test_setup_registry_locale_negotiator_dottedname(self):
@@ -510,6 +517,8 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(reg)
         import pyramid.tests
         config.setup_registry(locale_negotiator='pyramid.tests')
+        self.assertEqual(reg.queryUtility(ILocaleNegotiator), None)
+        config.commit()
         utility = reg.getUtility(ILocaleNegotiator)
         self.assertEqual(utility, pyramid.tests)
 
@@ -520,6 +529,8 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(reg)
         negotiator = object()
         config.setup_registry(locale_negotiator=negotiator)
+        self.assertEqual(reg.queryUtility(ILocaleNegotiator), None)
+        config.commit()
         utility = reg.getUtility(ILocaleNegotiator)
         self.assertEqual(utility, negotiator)
 
@@ -530,6 +541,8 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(reg)
         factory = object()
         config.setup_registry(request_factory=factory)
+        self.assertEqual(reg.queryUtility(IRequestFactory), None)
+        config.commit()
         utility = reg.getUtility(IRequestFactory)
         self.assertEqual(utility, factory)
 
@@ -540,6 +553,8 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(reg)
         import pyramid.tests
         config.setup_registry(request_factory='pyramid.tests')
+        self.assertEqual(reg.queryUtility(IRequestFactory), None)
+        config.commit()
         utility = reg.getUtility(IRequestFactory)
         self.assertEqual(utility, pyramid.tests)
 
@@ -553,6 +568,8 @@ class ConfiguratorTests(unittest.TestCase):
             config = self._makeOne(reg)
             factory = object()
             config.setup_registry(renderer_globals_factory=factory)
+            self.assertEqual(reg.queryUtility(IRendererGlobalsFactory), None)
+            config.commit()
             utility = reg.getUtility(IRendererGlobalsFactory)
             self.assertEqual(utility, factory)
         finally:
@@ -568,6 +585,8 @@ class ConfiguratorTests(unittest.TestCase):
             config = self._makeOne(reg)
             import pyramid.tests
             config.setup_registry(renderer_globals_factory='pyramid.tests')
+            self.assertEqual(reg.queryUtility(IRendererGlobalsFactory), None)
+            config.commit()
             utility = reg.getUtility(IRendererGlobalsFactory)
             self.assertEqual(utility, pyramid.tests)
         finally:
@@ -3845,10 +3864,8 @@ class TestConfigurator_add_directive(unittest.TestCase):
         self.assert_(hasattr(config, 'dummy_extend'))
         config.dummy_extend('discrim')
         context_after = config._ctx
-        actions = context_after.actions
-        self.assertEqual(len(actions), 1)
         self.assertEqual(
-            context_after.actions[0][:3],
+            context_after.actions[-1][:3],
             ('discrim', None, test_config),
             )
 
@@ -3860,10 +3877,8 @@ class TestConfigurator_add_directive(unittest.TestCase):
         self.assert_(hasattr(config, 'dummy_extend'))
         config.dummy_extend('discrim')
         context_after = config._ctx
-        actions = context_after.actions
-        self.assertEqual(len(actions), 1)
         self.assertEqual(
-            context_after.actions[0][:3],
+            context_after.actions[-1][:3],
             ('discrim', None, test_config),
             )
 
@@ -3876,10 +3891,8 @@ class TestConfigurator_add_directive(unittest.TestCase):
         self.assert_(hasattr(config, 'dummy_extend'))
         config.dummy_extend('discrim')
         context_after = config._ctx
-        actions = context_after.actions
-        self.assertEqual(len(actions), 1)
         self.assertEqual(
-            context_after.actions[0][:3],
+            context_after.actions[-1][:3],
             ('discrim', None, config.registry),
             )
 

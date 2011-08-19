@@ -54,6 +54,8 @@
 
      .. automethod:: add_view
 
+     .. automethod:: add_tween
+
      .. automethod:: derive_view
 
      .. automethod:: make_wsgi_app()
@@ -74,6 +76,8 @@
 
      .. automethod:: set_request_factory
 
+     .. automethod:: set_root_factory
+
      .. automethod:: set_renderer_globals_factory(factory)
 
      .. automethod:: set_view_mapper
@@ -81,8 +85,6 @@
      .. automethod:: set_authentication_policy
 
      .. automethod:: set_authorization_policy
-
-     .. automethod:: add_tween
 
      .. automethod:: testing_securitypolicy
 

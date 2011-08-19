@@ -57,5 +57,4 @@ class AdaptersConfiguratorMixin(object):
     def _register_response_adapters(self):
         # cope with WebOb response objects that aren't decorated with IResponse
         from webob import Response as WebobResponse
-        # cope with WebOb exc objects not decoratored with IExceptionResponse
         self.registry.registerSelfAdapter((WebobResponse,), IResponse)

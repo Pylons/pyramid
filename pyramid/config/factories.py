@@ -9,7 +9,7 @@ from pyramid.traversal import DefaultRootFactory
 
 class FactoriesConfiguratorMixin(object):
     @action_method
-    def _set_root_factory(self, factory):
+    def set_root_factory(self, factory):
         """ Add a :term:`root factory` to the current configuration
         state.  If the ``factory`` argument is ``None`` a default root
         factory will be registered."""
@@ -20,6 +20,8 @@ class FactoriesConfiguratorMixin(object):
             self.registry.registerUtility(factory, IRootFactory)
             self.registry.registerUtility(factory, IDefaultRootFactory) # b/c
         self.action(IRootFactory, register)
+
+    _set_root_factory = set_root_factory # bw compat
 
     @action_method
     def set_session_factory(self, session_factory):

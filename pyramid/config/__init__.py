@@ -6,6 +6,9 @@ import warnings
 
 import venusian
 
+
+from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
+
 from zope.configuration.config import GroupingContextDecorator
 from zope.configuration.config import ConfigurationMachine
 from zope.configuration.xmlconfig import registerCommonDirectives
@@ -277,13 +280,10 @@ class Configurator(
         other settings using the configurator's current registry, as per the
         descriptions in the Configurator constructor."""
 
-        from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
-
         registry = self.registry
 
         self._fix_registry()
         self._set_settings(settings)
-        self._set_root_factory(root_factory)
         self._register_response_adapters()
 
         if isinstance(debug_logger, basestring):
@@ -294,20 +294,39 @@ class Configurator(
                 
         registry.registerUtility(debug_logger, IDebugLogger)
 
-        if authentication_policy or authorization_policy:
-            self._set_security_policies(authentication_policy,
-                                        authorization_policy)
-
-        for name, renderer in renderers:
-            self.add_renderer(name, renderer)
-
         if exceptionresponse_view is not None:
             exceptionresponse_view = self.maybe_dotted(exceptionresponse_view)
             self.add_view(exceptionresponse_view, context=IExceptionResponse)
             self.add_view(exceptionresponse_view,context=WebobWSGIHTTPException)
 
+        # commit before adding default_view_mapper, as the
+        # exceptionresponse_view above requires the superdefault view
+        # mapper
+
+        self.commit()
+
+        if default_view_mapper is not None:
+            self.set_view_mapper(default_view_mapper)
+            self.commit()
+
+        # The following registrations should be treated as if the methods had
+        # been called after configurator construction (commit should not be
+        # called after this).  Rationale: user-supplied implementations
+        # should be preferred rather than add-on author implementations (as
+        # per automatic conflict resolution).
+
+        if authentication_policy:
+            self.set_authentication_policy(authentication_policy)
+        if authorization_policy:
+            self.set_authorization_policy(authorization_policy)
+
+        self.set_root_factory(root_factory)
+
+        for name, renderer in renderers:
+            self.add_renderer(name, renderer)
+
         if locale_negotiator:
-            self._set_locale_negotiator(locale_negotiator)
+            self.set_locale_negotiator(locale_negotiator)
 
         if request_factory:
             self.set_request_factory(request_factory)
@@ -329,24 +348,14 @@ class Configurator(
         if session_factory is not None:
             self.set_session_factory(session_factory)
 
-        self.commit()
-
-        # commit before adding default_view_mapper, as the
-        # exceptionresponse_view above requires the superdefault view
-        # mapper
-
-        if default_view_mapper is not None:
-            self.set_view_mapper(default_view_mapper)
-            self.commit()
-
-        includes = aslist(registry.settings.get('pyramid.includes', []))
-        for inc in includes:
-            self.include(inc)
-
         tweens   = aslist(registry.settings.get('pyramid.tweens', []))
         for factory in tweens:
             self._add_tween(factory, explicit=True)
         
+        includes = aslist(registry.settings.get('pyramid.includes', []))
+        for inc in includes:
+            self.include(inc)
+
     def _make_spec(self, path_or_spec):
         package, filename = resolve_asset_spec(path_or_spec,
                                                self.package_name)
