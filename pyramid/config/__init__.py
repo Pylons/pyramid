@@ -16,6 +16,7 @@ from zope.configuration.xmlconfig import registerCommonDirectives
 from pyramid.interfaces import IExceptionResponse
 from pyramid.interfaces import IDebugLogger
 
+from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.events import ApplicationCreated
 from pyramid.exceptions import ConfigurationError # bw compat
 from pyramid.httpexceptions import default_exceptionresponse_view
@@ -314,6 +315,9 @@ class Configurator(
         # called after this).  Rationale: user-supplied implementations
         # should be preferred rather than add-on author implementations (as
         # per automatic conflict resolution).
+
+        if authentication_policy and not authorization_policy:
+            authorization_policy = ACLAuthorizationPolicy() # default
 
         if authentication_policy:
             self.set_authentication_policy(authentication_policy)

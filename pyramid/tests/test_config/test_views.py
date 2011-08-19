@@ -949,7 +949,7 @@ class TestViewDeriver(unittest.TestCase):
         except HTTPForbidden, e:
             self.assertEqual(e.message,
                              'Unauthorized: <lambda> failed permission check')
-        else:
+        else: # pragma: no cover
             raise AssertionError
 
     def test_secured_view_raises_forbidden_with_name(self):
@@ -971,7 +971,7 @@ class TestViewDeriver(unittest.TestCase):
         except HTTPForbidden, e:
             self.assertEqual(e.message,
                              'Unauthorized: myview failed permission check')
-        else:
+        else: # pragma: no cover
             raise AssertionError
 
     def test_predicate_mismatch_view_has_no_name(self):
@@ -988,7 +988,7 @@ class TestViewDeriver(unittest.TestCase):
             result(None, None)
         except PredicateMismatch, e:
             self.assertEqual(e.detail, 'predicate mismatch for view <lambda>')
-        else:
+        else: # pragma: no cover
             raise AssertionError
 
     def test_predicate_mismatch_view_has_name(self):
@@ -1004,7 +1004,7 @@ class TestViewDeriver(unittest.TestCase):
             result(None, None)
         except PredicateMismatch, e:
             self.assertEqual(e.detail, 'predicate mismatch for view myview')
-        else:
+        else: # pragma: no cover
             raise AssertionError
             
     def test_with_predicates_all(self):

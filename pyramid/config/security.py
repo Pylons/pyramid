@@ -52,18 +52,6 @@ class SecurityConfiguratorMixin(object):
         self.registry.registerUtility(policy, IAuthorizationPolicy)
 
     @action_method
-    def _set_security_policies(self, authentication, authorization=None):
-        if (authorization is not None) and (not authentication):
-            raise ConfigurationError(
-                'If the "authorization" is passed a value, '
-                'the "authentication" argument must also be '
-                'passed a value; authorization requires authentication.')
-        if authorization is None:
-            authorization = ACLAuthorizationPolicy() # default
-        self._set_authentication_policy(authentication)
-        self._set_authorization_policy(authorization)
-
-    @action_method
     def set_default_permission(self, permission):
         """
         Set the default permission to be used by all subsequent

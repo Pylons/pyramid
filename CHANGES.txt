@@ -100,6 +100,8 @@ Internal
 
 - Refactor ``pyramid.config`` into a package.
 
+- Removed the ``_set_security_policies`` method of the Configurator.
+
 Deprecations
 ------------
 
