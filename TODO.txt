@@ -11,21 +11,21 @@ Should-Have
 - Make it possible to use tween aliases in explicit tween config?  If not,
   the tween factories of all add-ons must be APIs.
 
-- Deprecate pyramid.security.view_execution_permitted (it only works for
-  traversal).
-
-- Debugging setting for detecting why authenticated_userid(request) might
-  return None.
-
-- Make "localizer" a property of request (instead of requiring
-  "get_localizer(request)"?
-
 - Create a ``current_route_path`` function and make it a method of request?
 
 - "static_path" API (omit host and port)?
 
 Nice-to-Have
 ------------
+
+- Make "localizer" a property of request (instead of requiring
+  "get_localizer(request)"?
+
+- Debugging setting for detecting why authenticated_userid(request) might
+  return None.
+
+- Deprecate pyramid.security.view_execution_permitted (it only works for
+  traversal).
 
 - Merge Michael's route group work (maybe a 1.3 thing).
 
