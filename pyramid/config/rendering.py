@@ -42,13 +42,6 @@ class RenderingConfiguratorMixin(object):
         The ``factory`` argument is Python reference to an
         implementation of a :term:`renderer` factory or a
         :term:`dotted Python name` to same.
-
-        Note that this function must be called *before* any
-        ``add_view`` invocation that names the renderer name as an
-        argument.  As a result, it's usually a better idea to pass
-        globally used renderers into the ``Configurator`` constructor
-        in the sequence of renderers passed as ``renderer`` than it is
-        to use this method.
         """
         factory = self.maybe_dotted(factory)
         # if name is None or the empty string, we're trying to register

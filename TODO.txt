@@ -11,8 +11,6 @@ Should-Have
 - Make it possible to use tween aliases in explicit tween config?  If not,
   the tween factories of all add-ons must be APIs.
 
-- Merge Michael's route group work (maybe a 1.3 thing).
-
 - Deprecate pyramid.security.view_execution_permitted (it only works for
   traversal).
 
@@ -29,6 +27,8 @@ Should-Have
 Nice-to-Have
 ------------
 
+- Merge Michael's route group work (maybe a 1.3 thing).
+
 - Kill off ``bfg.routes`` envvars in router.
 
 - Some sort of API for rendering a view callable object to a response from
@@ -43,8 +43,6 @@ Nice-to-Have
   reimplement both).
 
 - Alias the stupid long default session factory name.
-
-- Fix indirect circular import between router and config.
 
 - Add narrative docs for wsgiapp and wsgiapp2.
 

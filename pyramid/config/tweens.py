@@ -153,8 +153,3 @@ class TweensConfiguratorMixin(object):
         if not explicit and alias is not None:
             self.action(('tween', alias, explicit))
 
-    @action_method
-    def add_request_handler(self, factory, name): # pragma: no cover
-        # XXX bw compat for debugtoolbar
-        return self._add_tween(factory, explicit=False)
-        

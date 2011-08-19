@@ -16,6 +16,7 @@ from zope.configuration.xmlconfig import registerCommonDirectives
 from pyramid.interfaces import IExceptionResponse
 from pyramid.interfaces import IDebugLogger
 
+from pyramid.asset import resolve_asset_spec
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.events import ApplicationCreated
 from pyramid.exceptions import ConfigurationError # bw compat
@@ -23,7 +24,7 @@ from pyramid.httpexceptions import default_exceptionresponse_view
 from pyramid.path import caller_package
 from pyramid.path import package_of
 from pyramid.registry import Registry
-from pyramid.asset import resolve_asset_spec
+from pyramid.router import Router
 from pyramid.settings import aslist
 from pyramid.threadlocal import manager
 from pyramid.util import DottedNameResolver
@@ -217,7 +218,7 @@ class Configurator(
                  root_factory=None,
                  authentication_policy=None,
                  authorization_policy=None,
-                 renderers=DEFAULT_RENDERERS,
+                 renderers=None,
                  debug_logger=None,
                  locale_negotiator=None,
                  request_factory=None,
@@ -259,7 +260,7 @@ class Configurator(
 
     def setup_registry(self, settings=None, root_factory=None,
                        authentication_policy=None, authorization_policy=None,
-                       renderers=DEFAULT_RENDERERS, debug_logger=None,
+                       renderers=None, debug_logger=None,
                        locale_negotiator=None, request_factory=None,
                        renderer_globals_factory=None, default_permission=None,
                        session_factory=None, default_view_mapper=None,
@@ -295,6 +296,11 @@ class Configurator(
                 
         registry.registerUtility(debug_logger, IDebugLogger)
 
+        if renderers is None:
+            for name, renderer in DEFAULT_RENDERERS:
+                self.add_renderer(name, renderer)
+            renderers = []
+
         if exceptionresponse_view is not None:
             exceptionresponse_view = self.maybe_dotted(exceptionresponse_view)
             self.add_view(exceptionresponse_view, context=IExceptionResponse)
@@ -324,10 +330,10 @@ class Configurator(
         if authorization_policy:
             self.set_authorization_policy(authorization_policy)
 
-        self.set_root_factory(root_factory)
-
         for name, renderer in renderers:
             self.add_renderer(name, renderer)
+
+        self.set_root_factory(root_factory)
 
         if locale_negotiator:
             self.set_locale_negotiator(locale_negotiator)
@@ -760,12 +766,15 @@ class Configurator(
         :app:`Pyramid` WSGI application representing the committed
         configuration state."""
         self.commit()
-        from pyramid.router import Router # avoid circdep
         app = Router(self.registry)
+
+        # Allow tools like "paster pshell development.ini" to find the 'last'
+        # registry configured.
         global_registries.add(self.registry)
-        # We push the registry on to the stack here in case any code
-        # that depends on the registry threadlocal APIs used in
-        # listeners subscribed to the IApplicationCreated event.
+
+        # Push the registry on to the stack in case any code that depends on
+        # the registry threadlocal APIs used in listeners subscribed to the
+        # IApplicationCreated event.
         self.manager.push({'registry':self.registry, 'request':None})
         try:
             self.registry.notify(ApplicationCreated(app))
