@@ -279,6 +279,14 @@ class ConfiguratorTests(unittest.TestCase):
         newconfig = config.with_package(pyramid.tests)
         self.assertEqual(newconfig.package, pyramid.tests)
 
+    def test_with_package_context_is_None(self):
+        import pyramid.tests
+        config = self._makeOne()
+        config._ctx = None
+        newconfig = config.with_package(pyramid.tests)
+        self.assertEqual(newconfig.package, pyramid.tests)
+        self.assertEqual(config._ctx.package, None)
+
     def test_maybe_dotted_string_success(self):
         import pyramid.tests
         config = self._makeOne()
