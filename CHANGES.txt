@@ -72,6 +72,9 @@ Features
   ``authorization_policy``) to override the same settings obtained via an
   "include".
 
+- Better Mako rendering exceptions via
+  ``pyramid.mako_templating.MakoRenderingException``
+
 Internal
 --------
 

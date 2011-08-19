@@ -300,6 +300,17 @@ class MakoLookupTemplateRendererTests(Base, unittest.TestCase):
         instance = self._makeOne('path', lookup)
         self.assertRaises(ValueError, instance, None, {})
 
+    def test_call_render_raises(self):
+        from pyramid.mako_templating import MakoRenderingException
+        lookup = DummyLookup(exc=NotImplementedError)
+        instance = self._makeOne('path', lookup)
+        try:
+            instance({}, {})
+        except MakoRenderingException, e:
+            self.assertTrue('NotImplementedError' in e.text)
+        else: # pragma: no cover
+            raise AssertionError
+
     def test_implementation(self):
         lookup = DummyLookup()
         instance = self._makeOne('path', lookup)
@@ -412,7 +423,20 @@ class TestPkgResourceTemplateLookup(unittest.TestCase):
         self.assertRaises(TopLevelLookupException, inst.get_template,
                           'pyramid.tests:fixtures/notthere.mak')
 
+class TestMakoRenderingException(unittest.TestCase):
+    def _makeOne(self, text):
+        from pyramid.mako_templating import MakoRenderingException
+        return MakoRenderingException(text)
+    
+    def test_repr_and_str(self):
+        exc = self._makeOne('text')
+        self.assertEqual(str(exc), 'text')
+        self.assertEqual(repr(exc), 'text')
+
 class DummyLookup(object):
+    def __init__(self, exc=None):
+        self.exc = exc
+        
     def get_template(self, path):
         self.path = path
         return self
@@ -422,6 +446,8 @@ class DummyLookup(object):
         return self
 
     def render_unicode(self, **values):
+        if self.exc:
+            raise self.exc
         self.values = values
         return u'result'
         
