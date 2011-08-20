@@ -89,6 +89,15 @@ Features
   Previously, trying to generate a URL to an asset using an absolute file
   path would raise a ValueError.
 
+- The ``RemoteUserAuthenticationPolicy ``, ``AuthTktAuthenticationPolicy``,
+  and ``SessionAuthenticationPolicy`` constructors now accept an additional
+  keyword argument named ``debug``.  By default, this keyword argument is
+  ``False``.  When it is ``True``, debug information will be sent to the
+  Pyramid debug logger (usually on stderr) when the ``authenticated_userid``
+  or ``effective_principals`` method is called on any of these policies.  The
+  output produced can be useful when trying to diagnose
+  authentication-related problems.
+
 Internal
 --------
 

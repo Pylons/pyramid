@@ -14,11 +14,10 @@ Should-Have
 Nice-to-Have
 ------------
 
+- _fix_registry should dictify the registry being fixed.
+
 - Make "localizer" a property of request (instead of requiring
   "get_localizer(request)"?
-
-- Debugging setting for detecting why authenticated_userid(request) might
-  return None.
 
 - Deprecate pyramid.security.view_execution_permitted (it only works for
   traversal).

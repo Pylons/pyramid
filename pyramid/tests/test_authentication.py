@@ -1,4 +1,144 @@
 import unittest
+from pyramid import testing
+
+class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
+    def setUp(self):
+        from pyramid.interfaces import IDebugLogger
+        self.config = testing.setUp()
+        self.config.registry.registerUtility(self, IDebugLogger)
+        self.messages = []
+
+    def tearDown(self):
+        del self.config
+        
+    def debug(self, msg):
+        self.messages.append(msg)
+
+    def _makeOne(self, userid=None, callback=None):
+        from pyramid.authentication import CallbackAuthenticationPolicy
+        class MyAuthenticationPolicy(CallbackAuthenticationPolicy):
+            def unauthenticated_userid(self, request):
+                return userid
+        policy = MyAuthenticationPolicy()
+        policy.debug = True
+        policy.callback = callback
+        return policy
+
+    def test_authenticated_userid_no_unauthenticated_userid(self):
+        request = DummyRequest(registry=self.config.registry)
+        policy = self._makeOne()
+        self.assertEqual(policy.authenticated_userid(request), None)
+        self.assertEqual(len(self.messages), 1)
+        self.assertEqual(
+            self.messages[0],
+            'pyramid.tests.test_authentication.MyAuthenticationPolicy.'
+            'authenticated_userid: call to unauthenticated_userid returned '
+            'None; returning None')
+
+    def test_authenticated_userid_no_callback(self):
+        request = DummyRequest(registry=self.config.registry)
+        policy = self._makeOne(userid='fred')
+        self.assertEqual(policy.authenticated_userid(request), 'fred')
+        self.assertEqual(len(self.messages), 1)
+        self.assertEqual(
+            self.messages[0],
+             "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "authenticated_userid: there was no groupfinder callback; "
+            "returning 'fred'")
+
+    def test_authenticated_userid_with_callback_fail(self):
+        request = DummyRequest(registry=self.config.registry)
+        def callback(userid, request):
+            return None
+        policy = self._makeOne(userid='fred', callback=callback)
+        self.assertEqual(policy.authenticated_userid(request), None)
+        self.assertEqual(len(self.messages), 1)
+        self.assertEqual(
+            self.messages[0],
+            'pyramid.tests.test_authentication.MyAuthenticationPolicy.'
+            'authenticated_userid: groupfinder callback returned None; '
+            'returning None')
+
+    def test_authenticated_userid_with_callback_success(self):
+        request = DummyRequest(registry=self.config.registry)
+        def callback(userid, request):
+            return []
+        policy = self._makeOne(userid='fred', callback=callback)
+        self.assertEqual(policy.authenticated_userid(request), 'fred')
+        self.assertEqual(len(self.messages), 1)
+        self.assertEqual(
+            self.messages[0],
+            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "authenticated_userid: groupfinder callback returned []; "
+            "returning 'fred'")
+
+    def test_effective_principals_no_unauthenticated_userid(self):
+        request = DummyRequest(registry=self.config.registry)
+        policy = self._makeOne()
+        self.assertEqual(policy.effective_principals(request),
+                         ['system.Everyone'])
+        self.assertEqual(len(self.messages), 1)
+        self.assertEqual(
+            self.messages[0],
+            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "effective_principals: authenticated_userid returned None; "
+            "returning ['system.Everyone']")
+
+    def test_effective_principals_no_callback(self):
+        request = DummyRequest(registry=self.config.registry)
+        policy = self._makeOne(userid='fred')
+        self.assertEqual(
+            policy.effective_principals(request),
+            ['system.Everyone', 'system.Authenticated', 'fred'])
+        self.assertEqual(len(self.messages), 2)
+        self.assertEqual(
+            self.messages[0],
+            'pyramid.tests.test_authentication.MyAuthenticationPolicy.'
+            'effective_principals: groupfinder callback is None, so groups '
+            'is []')
+        self.assertEqual(
+            self.messages[1],
+            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "effective_principals: returning effective principals: "
+            "['system.Everyone', 'system.Authenticated', 'fred']")
+
+    def test_effective_principals_with_callback_fail(self):
+        request = DummyRequest(registry=self.config.registry)
+        def callback(userid, request):
+            return None
+        policy = self._makeOne(userid='fred', callback=callback)
+        self.assertEqual(
+            policy.effective_principals(request), ['system.Everyone'])
+        self.assertEqual(len(self.messages), 2)
+        self.assertEqual(
+            self.messages[0],
+            'pyramid.tests.test_authentication.MyAuthenticationPolicy.'
+            'effective_principals: groupfinder callback returned None as '
+            'groups')
+        self.assertEqual(
+            self.messages[1],
+            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "effective_principals: returning effective principals: "
+            "['system.Everyone']")
+
+    def test_effective_principals_with_callback_success(self):
+        request = DummyRequest(registry=self.config.registry)
+        def callback(userid, request):
+            return []
+        policy = self._makeOne(userid='fred', callback=callback)
+        self.assertEqual(
+            policy.effective_principals(request),
+            ['system.Everyone', 'system.Authenticated', 'fred'])
+        self.assertEqual(len(self.messages), 2)
+        self.assertEqual(
+            self.messages[0],
+            'pyramid.tests.test_authentication.MyAuthenticationPolicy.'
+            'effective_principals: groupfinder callback returned [] as groups')
+        self.assertEqual(
+            self.messages[1],
+            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "effective_principals: returning effective principals: "
+            "['system.Everyone', 'system.Authenticated', 'fred']")
 
 class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
     def _getTargetClass(self):
@@ -848,9 +988,10 @@ class DummyContext:
     pass
 
 class DummyRequest:
-    def __init__(self, environ=None, session=None):
+    def __init__(self, environ=None, session=None, registry=None):
         self.environ = environ or {}
         self.session = session or {}
+        self.registry = registry
         self.callbacks = []
 
     def add_response_callback(self, callback):

@@ -10,6 +10,7 @@ from paste.request import get_cookies
 from zope.interface import implements
 
 from pyramid.interfaces import IAuthenticationPolicy
+from pyramid.interfaces import IDebugLogger
 
 from pyramid.request import add_global_response_headers
 from pyramid.security import Authenticated
@@ -20,30 +21,91 @@ VALID_TOKEN = re.compile(r"^[A-Za-z][A-Za-z0-9+_-]*$")
 
 class CallbackAuthenticationPolicy(object):
     """ Abstract class """
+
+    debug = False
+    callback = None
+
+    def _log(self, msg, methodname, request):
+        logger = request.registry.queryUtility(IDebugLogger)
+        if logger:
+            cls = self.__class__
+            classname = cls.__module__ + '.' + cls.__name__
+            methodname = classname + '.' + methodname
+            logger.debug(methodname + ': ' + msg)
+
     def authenticated_userid(self, request):
+        debug = self.debug
         userid = self.unauthenticated_userid(request)
         if userid is None:
+            debug and self._log(
+                'call to unauthenticated_userid returned None; returning None',
+                'authenticated_userid',
+                request)
             return None
         if self.callback is None:
+            debug and self._log(
+                'there was no groupfinder callback; returning %r' % (userid,),
+                'authenticated_userid',
+                request)
             return userid
-        if self.callback(userid, request) is not None: # is not None!
+        callback_ok = self.callback(userid, request)
+        if callback_ok is not None: # is not None!
+            debug and self._log(
+                'groupfinder callback returned %r; returning %r' % (
+                    callback_ok, userid),
+                'authenticated_userid',
+                request
+                )
             return userid
+        debug and self._log(
+            'groupfinder callback returned None; returning None',
+            'authenticated_userid',
+            request
+            )
 
     def effective_principals(self, request):
+        debug = self.debug
         effective_principals = [Everyone]
         userid = self.unauthenticated_userid(request)
         if userid is None:
+            debug and self._log(
+                'authenticated_userid returned %r; returning %r' % (
+                    userid, effective_principals),
+                'effective_principals',
+                request
+                )
             return effective_principals
         if self.callback is None:
+            debug and self._log(
+                'groupfinder callback is None, so groups is []',
+                'effective_principals',
+                request)
             groups = []
         else:
             groups = self.callback(userid, request)
+            debug and self._log(
+                'groupfinder callback returned %r as groups' % (groups,),
+                'effective_principals',
+                request)
         if groups is None: # is None!
+            debug and self._log(
+                'returning effective principals: %r' % (
+                    effective_principals,),
+                'effective_principals',
+                request
+                )
             return effective_principals
+
         effective_principals.append(Authenticated)
         effective_principals.append(userid)
         effective_principals.extend(groups)
 
+        debug and self._log(
+            'returning effective principals: %r' % (
+                effective_principals,),
+            'effective_principals',
+            request
+             )
         return effective_principals
 
 
@@ -154,14 +216,22 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
         user does exist.  If ``callback`` is None, the userid will be assumed
         to exist with no group principals.
 
+    ``debug``
+
+        Default: ``False``.  If ``debug`` is ``True``, log messages to the
+        Pyramid debug logger about the results of various authentication
+        steps.  The output from debugging is useful for reporting to maillist
+        or IRC channels when asking for support.
+
     Objects of this class implement the interface described by
     :class:`pyramid.interfaces.IAuthenticationPolicy`.
     """
     implements(IAuthenticationPolicy)
 
-    def __init__(self, environ_key='REMOTE_USER', callback=None):
+    def __init__(self, environ_key='REMOTE_USER', callback=None, debug=False):
         self.environ_key = environ_key
         self.callback = callback
+        self.debug = debug
 
     def unauthenticated_userid(self, request):
         return request.environ.get(self.environ_key)
@@ -264,6 +334,13 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
        wildcard domain.
        Optional.
 
+    ``debug``
+
+        Default: ``False``.  If ``debug`` is ``True``, log messages to the
+        Pyramid debug logger about the results of various authentication
+        steps.  The output from debugging is useful for reporting to maillist
+        or IRC channels when asking for support.
+
     Objects of this class implement the interface described by
     :class:`pyramid.interfaces.IAuthenticationPolicy`.
     """
@@ -280,6 +357,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
                  path="/",
                  http_only=False,
                  wild_domain=True,
+                 debug=False,
                  ):
         self.cookie = AuthTktCookieHelper(
             secret,
@@ -294,6 +372,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
             wild_domain=wild_domain,
             )
         self.callback = callback
+        self.debug = debug
 
     def unauthenticated_userid(self, request):
         result = self.cookie.identify(request)
@@ -545,13 +624,22 @@ class SessionAuthenticationPolicy(CallbackAuthenticationPolicy):
        exist or a sequence of principal identifiers (possibly empty) if
        the user does exist.  If ``callback`` is ``None``, the userid
        will be assumed to exist with no principals.  Optional.
+
+    ``debug``
+
+        Default: ``False``.  If ``debug`` is ``True``, log messages to the
+        Pyramid debug logger about the results of various authentication
+        steps.  The output from debugging is useful for reporting to maillist
+        or IRC channels when asking for support.
+       
     """
     implements(IAuthenticationPolicy)
 
-    def __init__(self, prefix='auth.', callback=None):
+    def __init__(self, prefix='auth.', callback=None, debug=False):
         self.callback = callback
         self.prefix = prefix or ''
         self.userid_key = prefix + 'userid'
+        self.debug = debug
 
     def remember(self, request, principal, **kw):
         """ Store a principal in the session."""
