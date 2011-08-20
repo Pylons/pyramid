@@ -31,7 +31,7 @@ def populate():
     session.add(model)
     session.flush()
     transaction.commit()
-    
+
 def initialize_sql(engine):
     DBSession.configure(bind=engine)
     Base.metadata.bind = engine
