@@ -368,8 +368,47 @@ class URLMethodsMixin(object):
 
         return info.generate(path, self, **kw)
 
-    def current_route_url(self, *elements, **kw):
+    def static_path(self, path, **kw):
+        """
+        Generates a path (aka a 'relative URL', a URL minus the host, scheme,
+        and port) for a static resource.
 
+        This function accepts the same argument as
+        :meth:`pyramid.request.Request.current_static_url` and performs the
+        same duty.  It just omits the host, port, and scheme information in
+        the return value; only the script_name, path, query parameters, and
+        anchor data are present in the returned string.
+
+        Example::
+
+            request.static_path('mypackage:static/foo.css') =>
+
+                                    /static/foo.css
+
+        .. note:: Calling ``request.static_path(apath)`` is the same
+           as calling ``request.static_url(apath,
+           _app_url=request.script_name)``.
+           :meth:`pyramid.request.Request.static_path` is, in fact,
+           implemented in terms of
+           `:meth:`pyramid.request.Request.static_url` in just this
+           way. As a result, any ``_app_url`` passed within the ``**kw``
+           values to ``static_path`` will be ignored.
+        """
+        if os.path.isabs(path):
+            raise ValueError('Absolute paths cannot be used to generate static '
+                             'urls (use a package-relative path or an asset '
+                             'specification).')
+        if not ':' in path:
+            # if it's not a package:relative/name and it's not an
+            # /absolute/path it's a relative/path; this means its relative
+            # to the package in which the caller's module is defined.
+            package = caller_package()
+            path = '%s:%s' % (package.__name__, path)
+
+        kw['_app_url'] = self.script_name
+        return self.static_url(path, **kw)
+
+    def current_route_url(self, *elements, **kw):
         """
         Generates a fully qualified URL for a named :app:`Pyramid`
         :term:`route configuration` based on the 'current route'.
@@ -456,7 +495,7 @@ class URLMethodsMixin(object):
            way. As a result, any ``_app_url`` passed within the ``**kw``
            values to ``current_route_path`` will be ignored.
         """
-        kw['_app_url'] = ''
+        kw['_app_url'] = self.script_name
         return self.current_route_url(*elements, **kw)
         
         
@@ -511,6 +550,17 @@ def static_url(path, request, **kw):
     See :meth:`pyramid.request.Request.static_url` for more information.
     """
     return request.static_url(path, **kw)
+
+def static_path(path, request, **kw):
+    """
+    This is a backwards compatibility function.  Its result is the same as
+    calling::
+
+        request.static_path(path, **kw)
+
+    See :meth:`pyramid.request.Request.static_path` for more information.
+    """
+    return request.static_path(path, **kw)
 
 def current_route_url(request, *elements, **kw):
     """

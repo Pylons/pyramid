@@ -11,8 +11,6 @@ Should-Have
 - Make it possible to use tween aliases in explicit tween config?  If not,
   the tween factories of all add-ons must be APIs.
 
-- "static_path" API (omit host and port)?
-
 Nice-to-Have
 ------------
 

@@ -167,15 +167,17 @@
 
    .. automethod:: route_url
 
-   .. automethod:: current_route_url
-
    .. automethod:: route_path
+
+   .. automethod:: current_route_url
 
    .. automethod:: current_route_path
 
-   .. automethod:: resource_url
-
    .. automethod:: static_url
+
+   .. automethod:: static_path
+
+   .. automethod:: resource_url
 
    .. attribute::  response_*
 

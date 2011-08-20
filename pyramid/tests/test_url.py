@@ -305,10 +305,11 @@ class TestURLMethodsMixin(unittest.TestCase):
         mapper = DummyRoutesMapper(route=route)
         request.matched_route = route
         request.matchdict = {}
+        request.script_name = '/script_name'
         request.registry.registerUtility(mapper, IRoutesMapper)
         result = request.current_route_path('extra1', 'extra2', _query={'a':1},
                                             _anchor=u"foo")
-        self.assertEqual(result, '/1/2/3/extra1/extra2?a=1#foo')
+        self.assertEqual(result, '/script_name/1/2/3/extra1/extra2?a=1#foo')
         
     def test_route_path_with_elements(self):
         from pyramid.interfaces import IRoutesMapper
@@ -371,6 +372,49 @@ class TestURLMethodsMixin(unittest.TestCase):
         self.assertEqual(result, 'abc')
         self.assertEqual(info.args,
                          ('pyramid.tests:static/foo.css', request, {}) )
+
+    def test_static_path_abspath(self):
+        request = self._makeOne()
+        self.assertRaises(ValueError, request.static_path, '/static/foo.css')
+
+    def test_static_path_found_rel(self):
+        from pyramid.interfaces import IStaticURLInfo
+        request = self._makeOne()
+        request.script_name = '/foo'
+        info = DummyStaticURLInfo('abc')
+        request.registry.registerUtility(info, IStaticURLInfo)
+        result = request.static_path('static/foo.css')
+        self.assertEqual(result, 'abc')
+        self.assertEqual(info.args,
+                         ('pyramid.tests:static/foo.css', request,
+                          {'_app_url':'/foo'})
+                         )
+
+    def test_static_path_abs(self):
+        from pyramid.interfaces import IStaticURLInfo
+        request = self._makeOne()
+        request.script_name = '/foo'
+        info = DummyStaticURLInfo('abc')
+        request.registry.registerUtility(info, IStaticURLInfo)
+        result = request.static_path('pyramid.tests:static/foo.css')
+        self.assertEqual(result, 'abc')
+        self.assertEqual(info.args,
+                         ('pyramid.tests:static/foo.css', request,
+                          {'_app_url':'/foo'})
+                         )
+
+    def test_static_path(self):
+        from pyramid.interfaces import IStaticURLInfo
+        request = self._makeOne()
+        request.script_name = '/foo'
+        info = DummyStaticURLInfo('abc')
+        request.registry.registerUtility(info, IStaticURLInfo)
+        result = request.static_path('static/foo.css')
+        self.assertEqual(result, 'abc')
+        self.assertEqual(info.args,
+                         ('pyramid.tests:static/foo.css', request,
+                          {'_app_url':'/foo'})
+                         )
 
 class Test_route_url(unittest.TestCase):
     def _callFUT(self, route_name, request, *elements, **kw):
@@ -457,6 +501,26 @@ class Test_static_url(unittest.TestCase):
         self.assertEqual(result, 'static url')
         self.assertEqual(request.path, 'abc')
         self.assertEqual(request.kw, {'_app_url':''})
+
+class Test_static_path(unittest.TestCase):
+    def _callFUT(self, path, request, **kw):
+        from pyramid.url import static_path
+        return static_path(path, request, **kw)
+
+    def _makeRequest(self):
+        class Request(object):
+            def static_path(self, path, **kw):
+                self.path = path
+                self.kw = kw
+                return 'static path'
+        return Request()
+
+    def test_it(self):
+        request = self._makeRequest()
+        result = self._callFUT('abc', request, _anchor='anchor')
+        self.assertEqual(result, 'static path')
+        self.assertEqual(request.path, 'abc')
+        self.assertEqual(request.kw, {'_anchor':'anchor'})
 
 class Test_current_route_url(unittest.TestCase):
     def _callFUT(self, request, *elements, **kw):

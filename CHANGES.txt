@@ -75,9 +75,11 @@ Features
 - Better Mako rendering exceptions via
   ``pyramid.mako_templating.MakoRenderingException``
 
-- New request methods: ``current_route_url``, ``current_route_path``.
+- New request methods: ``current_route_url``, ``current_route_path``, and
+  ``static_path``.
 
-- New function in ``pyramid.url``: ``current_route_path``.
+- New functions in ``pyramid.url``: ``current_route_path`` and
+  ``static_path``.
 
 Internal
 --------

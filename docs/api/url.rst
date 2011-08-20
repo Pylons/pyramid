@@ -13,7 +13,11 @@
 
   .. autofunction:: route_path
 
+  .. autofunction:: current_route_path
+
   .. autofunction:: static_url
+
+  .. autofunction:: static_path
 
   .. autofunction:: urlencode
 
