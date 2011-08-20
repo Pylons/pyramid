@@ -2,7 +2,7 @@ import unittest
 
 class TestTweens(unittest.TestCase):
     def _makeOne(self):
-        from pyramid.tweens import Tweens
+        from pyramid.config.tweens import Tweens
         return Tweens()
 
     def test_add_explicit(self):
@@ -353,7 +353,7 @@ class TestTweens(unittest.TestCase):
         self.assertRaises(ConfigurationError, tweens.implicit)
 
     def test_implicit_ordering_conflict_direct(self):
-        from pyramid.tweens import CyclicDependencyError
+        from pyramid.config.tweens import CyclicDependencyError
         tweens = self._makeOne()
         add = tweens.add_implicit
         add('browserid', 'browserid_factory')
@@ -361,7 +361,7 @@ class TestTweens(unittest.TestCase):
         self.assertRaises(CyclicDependencyError, tweens.implicit)
 
     def test_implicit_ordering_conflict_indirect(self):
-        from pyramid.tweens import CyclicDependencyError
+        from pyramid.config.tweens import CyclicDependencyError
         tweens = self._makeOne()
         add = tweens.add_implicit
         add('browserid', 'browserid_factory')
@@ -371,7 +371,7 @@ class TestTweens(unittest.TestCase):
 
 class TestCyclicDependencyError(unittest.TestCase):
     def _makeOne(self, cycles):
-        from pyramid.tweens import CyclicDependencyError
+        from pyramid.config.tweens import CyclicDependencyError
         return CyclicDependencyError(cycles)
 
     def test___str__(self):
