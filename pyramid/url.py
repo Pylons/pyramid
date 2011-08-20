@@ -427,6 +427,39 @@ class URLMethodsMixin(object):
         newkw.update(self.matchdict)
         newkw.update(kw)
         return self.route_url(route_name, *elements, **newkw)
+
+    def current_route_path(self, *elements, **kw):
+        """
+        Generates a path (aka a 'relative URL', a URL minus the host, scheme,
+        and port) for the :app:`Pyramid` :term:`route configuration` matched
+        by the current request.
+
+        This function accepts the same argument as
+        :meth:`pyramid.request.Request.current_route_url` and performs the
+        same duty.  It just omits the host, port, and scheme information in
+        the return value; only the script_name, path, query parameters, and
+        anchor data are present in the returned string.
+
+        For example, if the route matched by the current request is named
+        'foobar' with the path ``/{foo}/{bar}``, this call to
+        ``current_route_path``::
+
+            request.route_path(foo='1', bar='2')
+
+        Will return the string ``/1/2``.
+
+        .. note:: Calling ``request.current_route_path('route')`` is the same
+           as calling ``request.current_route_url('route',
+           _app_url=request.script_name)``.
+           :meth:`pyramid.request.Request.current_route_path` is, in fact,
+           implemented in terms of
+           `:meth:`pyramid.request.Request.current_route_url` in just this
+           way. As a result, any ``_app_url`` passed within the ``**kw``
+           values to ``current_route_path`` will be ignored.
+        """
+        kw['_app_url'] = ''
+        return self.current_route_url(*elements, **kw)
+        
         
 def route_url(route_name, request, *elements, **kw):
     """
@@ -491,6 +524,18 @@ def current_route_url(request, *elements, **kw):
     information.
     """
     return request.current_route_url(*elements, **kw)
+
+def current_route_path(request, *elements, **kw):
+    """
+    This is a backwards compatibility function.  Its result is the same as
+    calling::
+
+        request.current_route_path(*elements, **kw)
+
+    See :meth:`pyramid.request.Request.current_route_path` for more
+    information.
+    """
+    return request.current_route_path(*elements, **kw)
 
 @lru_cache(1000)
 def _join_elements(elements):

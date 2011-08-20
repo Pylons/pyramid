@@ -167,7 +167,11 @@
 
    .. automethod:: route_url
 
+   .. automethod:: current_route_url
+
    .. automethod:: route_path
+
+   .. automethod:: current_route_path
 
    .. automethod:: resource_url
 

@@ -298,6 +298,18 @@ class TestURLMethodsMixin(unittest.TestCase):
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3/extra1/extra2?a=1#foo')
 
+    def test_current_route_path(self):
+        from pyramid.interfaces import IRoutesMapper
+        request = self._makeOne()
+        route = DummyRoute('/1/2/3')
+        mapper = DummyRoutesMapper(route=route)
+        request.matched_route = route
+        request.matchdict = {}
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = request.current_route_path('extra1', 'extra2', _query={'a':1},
+                                            _anchor=u"foo")
+        self.assertEqual(result, '/1/2/3/extra1/extra2?a=1#foo')
+        
     def test_route_path_with_elements(self):
         from pyramid.interfaces import IRoutesMapper
         request = self._makeOne()
@@ -465,6 +477,26 @@ class Test_current_route_url(unittest.TestCase):
         self.assertEqual(result, 'current route url')
         self.assertEqual(request.elements, ('abc',))
         self.assertEqual(request.kw, {'_app_url':''})
+
+class Test_current_route_path(unittest.TestCase):
+    def _callFUT(self, request, *elements, **kw):
+        from pyramid.url import current_route_path
+        return current_route_path(request, *elements, **kw)
+
+    def _makeRequest(self):
+        class Request(object):
+            def current_route_path(self, *elements, **kw):
+                self.elements = elements
+                self.kw = kw
+                return 'current route path'
+        return Request()
+
+    def test_it(self):
+        request = self._makeRequest()
+        result = self._callFUT(request, 'abc', _anchor='abc')
+        self.assertEqual(result, 'current route path')
+        self.assertEqual(request.elements, ('abc',))
+        self.assertEqual(request.kw, {'_anchor':'abc'})
 
 class DummyContext(object):
     def __init__(self, next=None):

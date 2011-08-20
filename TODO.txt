@@ -11,8 +11,6 @@ Should-Have
 - Make it possible to use tween aliases in explicit tween config?  If not,
   the tween factories of all add-ons must be APIs.
 
-- Create a ``current_route_path`` function and make it a method of request?
-
 - "static_path" API (omit host and port)?
 
 Nice-to-Have
@@ -34,7 +32,7 @@ Nice-to-Have
 - Some sort of API for rendering a view callable object to a response from
   within another view callable.
 
-- 1.4: turn ``pyramid.settings.Settings`` into a function that returns the
+- 1.5: turn ``pyramid.settings.Settings`` into a function that returns the
   original dict (after ``__getattr__`` deprecation period, it was deprecated
   in 1.2).
 
