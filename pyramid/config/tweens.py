@@ -9,7 +9,6 @@ from pyramid.tweens import MAIN, INGRESS, EXCVIEW
 from pyramid.config.util import action_method
 
 class TweensConfiguratorMixin(object):
-    @action_method
     def add_tween(self, tween_factory, alias=None, under=None, over=None):
         """
         .. note:: This feature is new as of Pyramid 1.2.
@@ -105,6 +104,7 @@ class TweensConfiguratorMixin(object):
         return self._add_tween(tween_factory, alias=alias, under=under,
                                over=over, explicit=False)
 
+    @action_method
     def _add_tween(self, tween_factory, alias=None, under=None, over=None,
                    explicit=False):
 
