@@ -14,6 +14,11 @@ Should-Have
 Nice-to-Have
 ------------
 
+- Move configuration-related stuff in "static" to config/views, from
+  "settings" to config/settings, "renderers" to config/rendering, "asset" to
+  config/assets, and possibly mako/chameleon rendering stuff to
+  config/rendering.
+
 - _fix_registry should dictify the registry being fixed.
 
 - Make "localizer" a property of request (instead of requiring
