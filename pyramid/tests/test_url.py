@@ -338,8 +338,16 @@ class TestURLMethodsMixin(unittest.TestCase):
         self.assertRaises(ValueError, request.static_url, 'static/foo.css')
 
     def test_static_url_abspath(self):
+        from pyramid.interfaces import IStaticURLInfo
         request = self._makeOne()
-        self.assertRaises(ValueError, request.static_url, '/static/foo.css')
+        info = DummyStaticURLInfo('abc')
+        registry = request.registry
+        registry.registerUtility(info, IStaticURLInfo)
+        abspath = makeabs('static', 'foo.css')
+        result = request.static_url(abspath)
+        self.assertEqual(result, 'abc')
+        self.assertEqual(info.args, ('/static/foo.css', request, {}))
+        request = self._makeOne()
 
     def test_static_url_found_rel(self):
         from pyramid.interfaces import IStaticURLInfo
@@ -373,9 +381,34 @@ class TestURLMethodsMixin(unittest.TestCase):
         self.assertEqual(info.args,
                          ('pyramid.tests:static/foo.css', request, {}) )
 
-    def test_static_path_abspath(self):
+    def test_static_url_abspath_integration_with_staticurlinfo(self):
+        import os
+        from pyramid.interfaces import IStaticURLInfo
+        from pyramid.static import StaticURLInfo
+        info = StaticURLInfo(self.config)
+        here = os.path.abspath(os.path.dirname(__file__))
+        info.add('absstatic', here)
         request = self._makeOne()
-        self.assertRaises(ValueError, request.static_path, '/static/foo.css')
+        registry = request.registry
+        registry.registerUtility(info, IStaticURLInfo)
+        abspath = os.path.join(here, 'test_url.py')
+        result = request.static_url(abspath)
+        self.assertEqual(result,
+                         'http://example.com:5432/absstatic/test_url.py')
+
+    def test_static_path_abspath(self):
+        from pyramid.interfaces import IStaticURLInfo
+        request = self._makeOne()
+        request.script_name = '/foo'
+        info = DummyStaticURLInfo('abc')
+        registry = request.registry
+        registry.registerUtility(info, IStaticURLInfo)
+        abspath = makeabs('static', 'foo.css')
+        result = request.static_path(abspath)
+        self.assertEqual(result, 'abc')
+        self.assertEqual(info.args, ('/static/foo.css', request,
+                                     {'_app_url':'/foo'})
+                         )
 
     def test_static_path_found_rel(self):
         from pyramid.interfaces import IStaticURLInfo
@@ -592,3 +625,6 @@ class DummyStaticURLInfo:
         self.args = path, request, kw
         return self.result
     
+def makeabs(*elements):
+    import os
+    return os.path.sep + os.path.sep.join(elements)

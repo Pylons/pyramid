@@ -346,16 +346,13 @@ class URLMethodsMixin(object):
         definition cannot be found which matches the path specification.
 
         """
-        if os.path.isabs(path):
-            raise ValueError('Absolute paths cannot be used to generate static '
-                             'urls (use a package-relative path or an asset '
-                             'specification).')
-        if not ':' in path:
-            # if it's not a package:relative/name and it's not an
-            # /absolute/path it's a relative/path; this means its relative
-            # to the package in which the caller's module is defined.
-            package = caller_package()
-            path = '%s:%s' % (package.__name__, path)
+        if not os.path.isabs(path):
+            if not ':' in path:
+                # if it's not a package:relative/name and it's not an
+                # /absolute/path it's a relative/path; this means its relative
+                # to the package in which the caller's module is defined.
+                package = caller_package()
+                path = '%s:%s' % (package.__name__, path)
 
         try:
             reg = self.registry
@@ -394,16 +391,13 @@ class URLMethodsMixin(object):
            way. As a result, any ``_app_url`` passed within the ``**kw``
            values to ``static_path`` will be ignored.
         """
-        if os.path.isabs(path):
-            raise ValueError('Absolute paths cannot be used to generate static '
-                             'urls (use a package-relative path or an asset '
-                             'specification).')
-        if not ':' in path:
-            # if it's not a package:relative/name and it's not an
-            # /absolute/path it's a relative/path; this means its relative
-            # to the package in which the caller's module is defined.
-            package = caller_package()
-            path = '%s:%s' % (package.__name__, path)
+        if not os.path.isabs(path):
+            if not ':' in path:
+                # if it's not a package:relative/name and it's not an
+                # /absolute/path it's a relative/path; this means its relative
+                # to the package in which the caller's module is defined.
+                package = caller_package()
+                path = '%s:%s' % (package.__name__, path)
 
         kw['_app_url'] = self.script_name
         return self.static_url(path, **kw)

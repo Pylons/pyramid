@@ -81,6 +81,14 @@ Features
 - New functions in ``pyramid.url``: ``current_route_path`` and
   ``static_path``.
 
+- The ``pyramid.request.Request.static_url`` API (and its brethren
+  ``pyramid.request.Request.static_path``, ``pyramid.url.static_url``, and
+  ``pyramid.url.static_path``) now accept an asbolute filename as a "path"
+  argument.  This will generate a URL to an asset as long as the filename is
+  in a directory which was previously registered as a static view.
+  Previously, trying to generate a URL to an asset using an absolute file
+  path would raise a ValueError.
+
 Internal
 --------
 
