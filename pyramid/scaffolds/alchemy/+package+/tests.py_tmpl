@@ -16,7 +16,7 @@ class TestMyRoot(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
         self.session.remove()
-        
+
     def _makeOne(self):
         from {{package}}.models import MyRoot
         return MyRoot()
@@ -57,4 +57,3 @@ class TestMyRoot(unittest.TestCase):
         self.assertEqual(len(result), 1)
         model = result[0]
         self.assertEqual(model.id, 1)
-        

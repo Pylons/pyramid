@@ -10,12 +10,10 @@ def main(global_config, **settings):
     get_root = appmaker(engine)
     config = Configurator(settings=settings, root_factory=get_root)
     config.add_static_view('static', '{{package}}:static')
-    config.add_view('{{package}}.views.view_root', 
-                    context='{{package}}.models.MyRoot', 
+    config.add_view('{{package}}.views.view_root',
+                    context='{{package}}.models.MyRoot',
                     renderer="templates/root.pt")
     config.add_view('{{package}}.views.view_model',
                     context='{{package}}.models.MyModel',
                     renderer="templates/model.pt")
     return config.make_wsgi_app()
-
-
