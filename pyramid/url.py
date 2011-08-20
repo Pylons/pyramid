@@ -440,11 +440,10 @@ class URLMethodsMixin(object):
         the return value; only the script_name, path, query parameters, and
         anchor data are present in the returned string.
 
-        For example, if the route matched by the current request is named
-        'foobar' with the path ``/{foo}/{bar}``, this call to
-        ``current_route_path``::
+        For example, if the route matched by the current request has the
+        pattern ``/{foo}/{bar}``, this call to ``current_route_path``::
 
-            request.route_path(foo='1', bar='2')
+            request.current_route_path(foo='1', bar='2')
 
         Will return the string ``/1/2``.
 
