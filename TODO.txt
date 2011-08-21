@@ -24,14 +24,8 @@ Nice-to-Have
 
 - Merge Michael's route group work (maybe a 1.3 thing).
 
-- Kill off ``bfg.routes`` envvars in router.
-
 - Some sort of API for rendering a view callable object to a response from
   within another view callable.
-
-- 1.5: turn ``pyramid.settings.Settings`` into a function that returns the
-  original dict (after ``__getattr__`` deprecation period, it was deprecated
-  in 1.2).
 
 - Eliminate non-deployment-non-scaffold-related Paste dependencies:
   ``paste.urlparser.StaticURLParser``, ``paste.auth.auth_tkt`` (cutnpaste or
@@ -47,8 +41,6 @@ Nice-to-Have
 
 - Speed up startup time (defer _bootstrap and registerCommonDirectives()
   until needed by ZCML, as well as unfound speedups).
-
-- Nicer Mako exceptions in debug toolbar.
 
 - Better "Extending" chapter.
 
@@ -83,6 +75,15 @@ Nice-to-Have
 - Create a function which performs a recursive request.
 
 - Update App engine chapter with less creaky directions.
+
+Future
+------
+
+- 1.5: turn ``pyramid.settings.Settings`` into a function that returns the
+  original dict (after ``__getattr__`` deprecation period, it was deprecated
+  in 1.2).
+
+- 1.3: Kill off ``bfg.routes`` envvars in router.
 
 Probably Bad Ideas
 ------------------
