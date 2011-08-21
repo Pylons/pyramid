@@ -606,28 +606,15 @@ class PTweensCommand(PCommand):
     def out(self, msg): # pragma: no cover
         print msg
 
-    def show_implicit(self, tweens):
-        implicit = tweens.implicit()
-        fmt = '%-10s  %-50s  %-15s'
-        self.out(fmt % ('Position', 'Name', 'Alias'))
-        self.out(fmt % (
-            '-'*len('Position'), '-'*len('Name'), '-'*len('Alias')))
-        self.out(fmt % ('-', '-', INGRESS))
-        for pos, (name, _) in enumerate(implicit):
-            alias = tweens.name_to_alias.get(name, None)
-            self.out(fmt % (pos, name, alias))
-        self.out(fmt % ('-', '-', MAIN))
-
-    def show_explicit(self, tweens):
-        explicit = tweens.explicit
+    def show_chain(self, chain):
         fmt = '%-10s  %-65s'
         self.out(fmt % ('Position', 'Name'))
         self.out(fmt % ('-'*len('Position'), '-'*len('Name')))
         self.out(fmt % ('-', INGRESS))
-        for pos, (name, _) in enumerate(explicit):
+        for pos, (name, _) in enumerate(chain):
             self.out(fmt % (pos, name))
         self.out(fmt % ('-', MAIN))
-    
+
     def command(self):
         config_uri = self.args[0]
         env = self.bootstrap[0](config_uri)
@@ -641,15 +628,15 @@ class PTweensCommand(PCommand):
                 self.out('')
                 self.out('Explicit Tween Chain (used)')
                 self.out('')
-                self.show_explicit(tweens)
+                self.show_chain(tweens.explicit)
                 self.out('')
                 self.out('Implicit Tween Chain (not used)')
                 self.out('')
-                self.show_implicit(tweens)
+                self.show_chain(tweens.implicit())
             else:
                 self.out('"pyramid.tweens" config value NOT set '
                          '(implicitly ordered tweens used)')
                 self.out('')
                 self.out('Implicit Tween Chain')
                 self.out('')
-                self.show_implicit(tweens)
+                self.show_chain(tweens.implicit())

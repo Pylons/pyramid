@@ -9,7 +9,7 @@ from pyramid.tweens import MAIN, INGRESS, EXCVIEW
 from pyramid.config.util import action_method
 
 class TweensConfiguratorMixin(object):
-    def add_tween(self, tween_factory, alias=None, under=None, over=None):
+    def add_tween(self, tween_factory, under=None, over=None):
         """
         .. note:: This feature is new as of Pyramid 1.2.
 
@@ -32,11 +32,6 @@ class TweensConfiguratorMixin(object):
         The ``tween_factory`` argument must be a :term:`dotted Python name`
         to a global object representing the tween factory.
 
-        The ``alias`` argument, if it is not ``None``, should be a string.
-        The string will represent a value that other callers of ``add_tween``
-        may pass as an ``under`` and ``over`` argument instead of this
-        tween's factory name.
-
         The ``under`` and ``over`` arguments allow the caller of
         ``add_tween`` to provide a hint about where in the tween chain this
         tween factory should be placed when an implicit tween chain is used.
@@ -50,10 +45,6 @@ class TweensConfiguratorMixin(object):
           representing the dotted name of a tween factory added in a call to
           ``add_tween`` in the same configuration session.
 
-        - A tween alias: a string representing the predicted value of
-          ``alias`` in a separate call to ``add_tween`` in the same
-          configuration session
-        
         - One of the constants :attr:`pyramid.tweens.MAIN`,
           :attr:`pyramid.tweens.INGRESS`, or :attr:`pyramid.tweens.EXCVIEW`.
 
@@ -66,23 +57,22 @@ class TweensConfiguratorMixin(object):
 
         For example, calling ``add_tween('myapp.tfactory',
         over=pyramid.tweens.MAIN)`` will attempt to place the tween factory
-        represented by the dotted name ``myapp.tfactory`` directly 'above' (in
-        ``paster ptweens`` order) the main Pyramid request handler.
+        represented by the dotted name ``myapp.tfactory`` directly 'above'
+        (in ``paster ptweens`` order) the main Pyramid request handler.
         Likewise, calling ``add_tween('myapp.tfactory',
-        over=pyramid.tweens.MAIN, under='someothertween')`` will attempt to
-        place this tween factory 'above' the main handler but 'below' (a
-        fictional) 'someothertween' tween factory (which was presumably added
-        via ``add_tween('myapp.tfactory', alias='someothertween')``).
+        over=pyramid.tweens.MAIN, under='mypkg.someothertween')`` will
+        attempt to place this tween factory 'above' the main handler but
+        'below' (a fictional) 'mypkg.someothertween' tween factory.
 
         If all options for ``under`` (or ``over``) cannot be found in the
         current configuration, it is an error. If some options are specified
         purely for compatibilty with other tweens, just add a fallback of
-        MAIN or INGRESS. For example,
-        ``under=('someothertween', 'someothertween2', INGRESS)``.
-        This constraint will require the tween to be located under both the
-        'someothertween' tween, the 'someothertween2' tween, and INGRESS. If
-        any of these is not in the current configuration, this constraint will
-        only organize itself based on the tweens that are present.
+        MAIN or INGRESS. For example, ``under=('mypkg.someothertween',
+        'mypkg.someothertween2', INGRESS)``.  This constraint will require
+        the tween to be located under both the 'mypkg.someothertween' tween,
+        the 'mypkg.someothertween2' tween, and INGRESS. If any of these is
+        not in the current configuration, this constraint will only organize
+        itself based on the tweens that are present.
 
         Specifying neither ``over`` nor ``under`` is equivalent to specifying
         ``under=INGRESS``.
@@ -94,19 +84,17 @@ class TweensConfiguratorMixin(object):
         ordering by using an explicit ``pyramid.tweens`` configuration value
         setting.
 
-        ``alias``, ``under``, and ``over`` arguments are ignored when an
-        explicit tween chain is specified using the ``pyramid.tweens``
-        configuration value.
+        ``under``, and ``over`` arguments are ignored when an explicit tween
+        chain is specified using the ``pyramid.tweens`` configuration value.
 
         For more information, see :ref:`registering_tweens`.
 
         """
-        return self._add_tween(tween_factory, alias=alias, under=under,
-                               over=over, explicit=False)
+        return self._add_tween(tween_factory, under=under, over=over,
+                               explicit=False)
 
     @action_method
-    def _add_tween(self, tween_factory, alias=None, under=None, over=None,
-                   explicit=False):
+    def _add_tween(self, tween_factory, under=None, over=None, explicit=False):
 
         if not isinstance(tween_factory, basestring):
             raise ConfigurationError(
@@ -115,6 +103,10 @@ class TweensConfiguratorMixin(object):
                 tween_factory)
 
         name = tween_factory
+
+        if name in (MAIN, INGRESS):
+            raise ConfigurationError('%s is a reserved tween name' % name)
+
         tween_factory = self.maybe_dotted(tween_factory)
 
         def is_string_or_iterable(v):
@@ -129,9 +121,6 @@ class TweensConfiguratorMixin(object):
                     raise ConfigurationError(
                         '"%s" must be a string or iterable, not %s' % (t, p))
 
-        if alias in (MAIN, INGRESS):
-            raise ConfigurationError('%s is a reserved tween name' % alias)
-
         if over is INGRESS or hasattr(over, '__iter__') and INGRESS in over:
             raise ConfigurationError('%s cannot be over INGRESS' % name)
 
@@ -143,18 +132,13 @@ class TweensConfiguratorMixin(object):
         if tweens is None:
             tweens = Tweens()
             registry.registerUtility(tweens, ITweens)
-            tweens.add_implicit('pyramid.tweens.excview_tween_factory',
-                                excview_tween_factory, alias=EXCVIEW,
-                                over=MAIN)
+            tweens.add_implicit(EXCVIEW, excview_tween_factory, over=MAIN)
         if explicit:
             tweens.add_explicit(name, tween_factory)
         else:
-            tweens.add_implicit(name, tween_factory, alias=alias, under=under,
-                                over=over)
-        self.action(('tween', name, explicit))
-        if not explicit and alias is not None:
-            self.action(('tween', alias, explicit))
+            tweens.add_implicit(name, tween_factory, under=under, over=over)
 
+        self.action(('tween', name, explicit))
 
 class CyclicDependencyError(Exception):
     def __init__(self, cycles):
@@ -179,17 +163,11 @@ class Tweens(object):
         self.req_under = set()
         self.factories = {}
         self.order = []
-        self.alias_to_name = {INGRESS:INGRESS, MAIN:MAIN}
-        self.name_to_alias = {INGRESS:INGRESS, MAIN:MAIN}
 
     def add_explicit(self, name, factory):
         self.explicit.append((name, factory))
 
-    def add_implicit(self, name, factory, alias=None, under=None, over=None):
-        if alias is None:
-            alias = name
-        self.alias_to_name[alias] = name
-        self.name_to_alias[name] = alias
+    def add_implicit(self, name, factory, under=None, over=None):
         self.names.append(name)
         self.factories[name] = factory
         if under is None and over is None:
@@ -197,27 +175,22 @@ class Tweens(object):
         if under is not None:
             if not hasattr(under, '__iter__'):
                 under = (under,)
-            self.order += [(u, alias) for u in under]
-            self.req_under.add(alias)
+            self.order += [(u, name) for u in under]
+            self.req_under.add(name)
         if over is not None:
             if not hasattr(over, '__iter__'):
                 over = (over,)
-            self.order += [(alias, o) for o in over]
-            self.req_over.add(alias)
+            self.order += [(name, o) for o in over]
+            self.req_over.add(name)
 
     def implicit(self):
         order = [(INGRESS, MAIN)]
         roots = []
         graph = {}
-        aliases = [INGRESS, MAIN]
-
-        for name in self.names:
-            aliases.append(self.name_to_alias[name])
+        names = [INGRESS, MAIN]
+        names.extend(self.names)
 
         for a, b in self.order:
-            # try to convert both a and b to an alias
-            a = self.name_to_alias.get(a, a)
-            b = self.name_to_alias.get(b, b)
             order.append((a, b))
 
         def add_node(node):
@@ -231,12 +204,12 @@ class Tweens(object):
             if tonode in roots:
                 roots.remove(tonode)
 
-        for alias in aliases:
-            add_node(alias)
+        for name in names:
+            add_node(name)
 
         has_over, has_under = set(), set()
         for a, b in order:
-            if a in aliases and b in aliases: # deal with missing dependencies
+            if a in names and b in names: # deal with missing dependencies
                 add_arc(a, b)
                 has_over.add(a)
                 has_under.add(b)
@@ -252,11 +225,11 @@ class Tweens(object):
                 % (', '.join(sorted(self.req_under - has_under)))
             )
 
-        sorted_aliases = []
+        sorted_names = []
 
         while roots:
             root = roots.pop(0)
-            sorted_aliases.append(root)
+            sorted_names.append(root)
             children = graph[root][1:]
             for child in children:
                 arcs = graph[child][0]
@@ -275,8 +248,7 @@ class Tweens(object):
 
         result = []
 
-        for alias in sorted_aliases:
-            name = self.alias_to_name.get(alias, alias)
+        for name in sorted_names:
             if name in self.names:
                 result.append((name, self.factories[name]))
 
@@ -290,4 +262,3 @@ class Tweens(object):
         for name, factory in use[::-1]:
             handler = factory(handler, registry)
         return handler
-    

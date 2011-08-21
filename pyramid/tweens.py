@@ -45,4 +45,4 @@ def excview_tween_factory(handler, registry):
 
 MAIN = 'MAIN'
 INGRESS = 'INGRESS'
-EXCVIEW = 'excview'
+EXCVIEW = 'pyramid.tweens.excview_tween_factory'
