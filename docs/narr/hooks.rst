@@ -930,10 +930,10 @@ tween in a Pyramid application:
 Note that you must use a :term:`dotted Python name` as the first argument to
 :meth:`pyramid.config.Configurator.add_tween`; this must point at a tween
 factory.  You cannot pass the tween factory object itself to the method: it
-must be a globally importable object.  In the above example, we assume that a
-``timing_tween_factory`` tween factory was defined in a module named
-``myapp.tweens``, so the tween factory is importable as
-``myapp.tweens.timing_tween_factory``.
+must be :term:`dotted Python name` that points to a globally importable
+object.  In the above example, we assume that a ``timing_tween_factory``
+tween factory was defined in a module named ``myapp.tweens``, so the tween
+factory is importable as ``myapp.tweens.timing_tween_factory``.
 
 When you use :meth:`pyramid.config.Configurator.add_tween`, you're
 instructing the system to use your tween factory at startup time unless the
@@ -992,9 +992,6 @@ Allowable values for ``under`` or ``over`` (or both) are:
 - A :term:`dotted Python name` to a tween factory: a string representing the
   predicted dotted name of a tween factory added in a call to ``add_tween``
   in the same configuration session.
-
-- A "tween alias": a string representing the predicted value of ``alias`` in
-  a separate call to ``add_tween`` in the same configuration session
 
 - One of the constants :attr:`pyramid.tweens.MAIN`,
   :attr:`pyramid.tweens.INGRESS`, or :attr:`pyramid.tweens.EXCVIEW`.
@@ -1062,28 +1059,6 @@ This constraint will require the tween to be located under both the
 'someothertween' tween, the 'someothertween2' tween, and INGRESS. If any of
 these is not in the current configuration, this constraint will only organize
 itself based on the tweens that are present.
-
-:meth:`~pyramid.config.Configurator.add_tween` also accepts an ``alias``
-argument.  If ``alias`` is not ``None``, should be a string.  The string will
-represent a value that other callers of ``add_tween`` may pass as an
-``under`` and ``over`` argument instead of a dotted name to a tween factory.
-For example:
-
-.. code-block:: python
-   :linenos:
-
-   import pyramid.tweens
-
-   config.add_tween('myapp.tween_factory1',
-                    alias='one'
-                    over=pyramid.tweens.MAIN)
-   config.add_tween('myapp.tween_factory2',
-                    alias='two'
-                    over=pyramid.tweens.MAIN,
-                    under='one')
-
-Alias names are only useful in relation to ``under`` and ``over`` values.
-They cannot be used in explicit tween chain configuration, or anywhere else.
 
 .. _explicit_tween_ordering:
 
