@@ -85,6 +85,10 @@ Future
 
 - 1.3: Kill off ``bfg.routes`` envvars in router.
 
+- 1.3: Kill off dependencies on Paste for non-deployment-related features.
+
+- 1.3: use zope.registry rather than zope.component.
+
 Probably Bad Ideas
 ------------------
 
