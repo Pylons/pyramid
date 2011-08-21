@@ -8,9 +8,6 @@ Should-Have
 
 - Mention debug toolbar in tutorials.
 
-- Make it possible to use tween aliases in explicit tween config?  If not,
-  the tween factories of all add-ons must be APIs.
-
 Nice-to-Have
 ------------
 
