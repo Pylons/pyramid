@@ -95,7 +95,7 @@ class Router(object):
                             route.name,
                             request.path_info,
                             route.pattern, match,
-                            route.predicates)
+                            ', '.join([p.__text__ for p in route.predicates]))
                         )
                     logger and logger.debug(msg)
 
