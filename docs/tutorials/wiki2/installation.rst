@@ -217,6 +217,11 @@ Visit the Application in a Browser
 In a browser, visit ``http://localhost:6543/``.  You will see the
 generated application's default page.
 
+One thing you'll notice is the "debug toolbar" icon on right hand side of the
+page.  You can read more about the purpose of the icon at
+:ref:`debug_toolbar`.  It allows you to get information about your
+application while you develop.
+
 Decisions the ``pyramid_routesalchemy`` Scaffold Has Made For You
 =================================================================
 

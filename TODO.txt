@@ -6,8 +6,6 @@ Should-Have
 
 - Name WSGI app "main" instead of pipeline in scaffold configs?
 
-- Mention debug toolbar in tutorials.
-
 Nice-to-Have
 ------------
 
