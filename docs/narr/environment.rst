@@ -185,6 +185,8 @@ The value supplied here is used as the default locale name when a
 |                                 |                                   |
 +---------------------------------+-----------------------------------+
 
+.. _including_packages:
+
 Including Packages
 ------------------
 
@@ -286,6 +288,8 @@ Is equivalent to using the following statements in your configuration code:
        config.include('pyramid_tm')
 
 It is fine to use both or either form.
+
+.. _explicit_tween_config:
 
 Explicit Tween Configuration
 ----------------------------
