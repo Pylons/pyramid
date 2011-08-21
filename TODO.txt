@@ -89,6 +89,8 @@ Future
 
 - 1.3: use zope.registry rather than zope.component.
 
+- 1.3: get rid of zope.configuration dependency.
+
 Probably Bad Ideas
 ------------------
 
