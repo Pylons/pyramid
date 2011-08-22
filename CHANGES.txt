@@ -134,6 +134,10 @@ Internal
 - Move the ``Settings`` class from ``pyramid.settings`` to
   ``pyramid.config.settings``.
 
+- Move the ``OverrideProvider``, ``PackageOverrides``, ``DirectoryOverride``,
+  and ``FileOverride`` classes from ``pyramid.asset`` to
+  ``pyramid.config.assets``.
+
 Deprecations
 ------------
 
