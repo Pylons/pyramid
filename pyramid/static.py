@@ -1,21 +1,14 @@
 import os
 import pkg_resources
-from urlparse import urljoin
-from urlparse import urlparse
 
 from paste import httpexceptions
 from paste import request
 from paste.httpheaders import ETAG
 from paste.urlparser import StaticURLParser
 
-from zope.interface import implements
-
 from pyramid.asset import resolve_asset_spec
-from pyramid.interfaces import IStaticURLInfo
 from pyramid.path import caller_package
 from pyramid.request import call_app_with_subpath_as_path_info
-from pyramid.security import NO_PERMISSION_REQUIRED
-from pyramid.url import route_url
 
 class PackageURLParser(StaticURLParser):
     """ This probably won't work with zipimported resources """
@@ -84,94 +77,6 @@ class PackageURLParser(StaticURLParser):
         return '<%s %s:%s at %s>' % (self.__class__.__name__, self.package_name,
                                      self.root_resource, id(self))
 
-class StaticURLInfo(object):
-    implements(IStaticURLInfo)
-
-    route_url = staticmethod(route_url) # for testing only
-
-    def __init__(self, config):
-        self.config = config
-        self.registrations = []
-
-    def generate(self, path, request, **kw):
-        for (name, spec, is_url) in self.registrations:
-            if path.startswith(spec):
-                subpath = path[len(spec):]
-                if is_url:
-                    return urljoin(name, subpath)
-                else:
-                    kw['subpath'] = subpath
-                    return self.route_url(name, request, **kw)
-
-        raise ValueError('No static URL definition matching %s' % path)
-
-    def add(self, name, spec, **extra):
-        # This feature only allows for the serving of a directory and
-        # the files contained within, not of a single asset;
-        # appending a slash here if the spec doesn't have one is
-        # required for proper prefix matching done in ``generate``
-        # (``subpath = path[len(spec):]``).
-        if not spec.endswith('/'):
-            spec = spec + '/'
-
-        # we also make sure the name ends with a slash, purely as a
-        # convenience: a name that is a url is required to end in a
-        # slash, so that ``urljoin(name, subpath))`` will work above
-        # when the name is a URL, and it doesn't hurt things for it to
-        # have a name that ends in a slash if it's used as a route
-        # name instead of a URL.
-        if not name.endswith('/'):
-            # make sure it ends with a slash
-            name = name + '/'
-
-        names = [ t[0] for t in self.registrations ]
-
-        if name in names:
-            idx = names.index(name)
-            self.registrations.pop(idx)
-
-        if urlparse(name)[0]:
-            # it's a URL
-            self.registrations.append((name, spec, True))
-        else:
-            # it's a view name
-            cache_max_age = extra.pop('cache_max_age', None)
-            # create a view
-            view = static_view(spec, cache_max_age=cache_max_age,
-                               use_subpath=True)
-
-            # Mutate extra to allow factory, etc to be passed through here.
-            # Treat permission specially because we'd like to default to
-            # permissiveness (see docs of config.add_static_view).  We need
-            # to deal with both ``view_permission`` and ``permission``
-            # because ``permission`` is used in the docs for add_static_view,
-            # but ``add_route`` prefers ``view_permission``
-            permission = extra.pop('view_permission', None)
-            if permission is None:
-                permission = extra.pop('permission', None)
-            if permission is None:
-                permission = NO_PERMISSION_REQUIRED
-
-            context = extra.pop('view_context', None)
-            if context is None:
-                context = extra.pop('view_for', None)
-            if context is None:
-                context = extra.pop('for_', None)
-
-            renderer = extra.pop('view_renderer', None)
-            if renderer is None:
-                renderer = extra.pop('renderer', None)
-
-            attr = extra.pop('view_attr', None)
-
-            # register a route using the computed view, permission, and 
-            # pattern, plus any extras passed to us via add_static_view
-            pattern = "%s*subpath" % name # name already ends with slash
-            self.config.add_route(name, pattern, **extra)
-            self.config.add_view(route_name=name, view=view,
-                                 permission=permission, context=context,
-                                 renderer=renderer, attr=attr)
-            self.registrations.append((name, spec, False))
 
 class static_view(object):
     """ An instance of this class is a callable which can act as a

@@ -128,6 +128,9 @@ Internal
 
 - Removed the ``_set_security_policies`` method of the Configurator.
 
+- Moved the ``StaticURLInfo`` class from ``pyramid.static`` to
+  ``pyramid.config.views``.
+
 Deprecations
 ------------
 
@@ -135,8 +138,8 @@ Deprecations
   ``debug_notfound``) are now meant to be prefixed with the prefix
   ``pyramid.``.  For example: ``debug_all`` -> ``pyramid.debug_all``.  The
   old non-prefixed settings will continue to work indefinitely but supplying
-  them may print a deprecation warning.  All scaffolds and tutorials have
-  been changed to use prefixed settings.
+  them may eventually print a deprecation warning.  All scaffolds and
+  tutorials have been changed to use prefixed settings.
 
 - The ``settings`` dictionary now raises a deprecation warning when you
   attempt to access its values via ``__getattr__`` instead of
@@ -153,7 +156,8 @@ Backwards Incompatibilities
   single ``callable`` argument (a sequence of callables used to be
   permitted).  If you are passing more than one ``callable`` to
   ``pyramid.config.Configurator.include``, it will break.  You now must now
-  instead make a separate call to the method for each callable.
+  instead make a separate call to the method for each callable.  This change
+  was introduced to support the ``route_prefix`` feature of include.
 
 Documentation
 -------------
@@ -179,6 +183,9 @@ Documentation
 
 - Added a Logging chapter to the narrative docs (based on the Pylons logging
   docs, thanks Phil).
+
+- Added a Paste chapter to the narrative docs (moved content from the Project
+  chapter).
 
 - Added the ``pyramid.interfaces.IDict`` interface representing the methods
   of a dictionary, for documentation purposes only (IMultiDict and

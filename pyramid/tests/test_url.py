@@ -384,7 +384,7 @@ class TestURLMethodsMixin(unittest.TestCase):
     def test_static_url_abspath_integration_with_staticurlinfo(self):
         import os
         from pyramid.interfaces import IStaticURLInfo
-        from pyramid.static import StaticURLInfo
+        from pyramid.config.views import StaticURLInfo
         info = StaticURLInfo(self.config)
         here = os.path.abspath(os.path.dirname(__file__))
         info.add('absstatic', here)
