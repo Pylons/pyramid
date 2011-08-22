@@ -5,7 +5,7 @@ Creating a :app:`Pyramid` Project
 
 As we saw in :ref:`firstapp_chapter`, it's possible to create a
 :app:`Pyramid` application completely manually.  However, it's usually more
-convenient to use a *scaffold* to generate a basic :app:`Pyramid`
+convenient to use a :term:`scaffold` to generate a basic :app:`Pyramid`
 :term:`project`.
 
 A project is a directory that contains at least one Python :term:`package`.
@@ -20,7 +20,8 @@ distributed more easily than one which does not live within a package.
 a project.  Each scaffold makes different configuration assumptions about
 what type of application you're trying to construct.
 
-These scaffolds are rendered using the :term:`PasteDeploy` ``paster`` script.
+These scaffolds are rendered using the :term:`PasteDeploy` ``paster create``
+command.
 
 .. index::
    single: scaffolds
@@ -441,7 +442,7 @@ The generated ``development.ini`` file looks like so:
    :language: ini
    :linenos:
 
-This file contains several "sections" including ``[app:main]``,
+This file contains several sections including ``[app:main]``,
 ``[server:main]`` and several other sections related to logging
 configuration.
 
