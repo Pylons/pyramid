@@ -1,6 +1,16 @@
 Pyramid TODOs
 =============
 
+Should-Have
+-----------
+
+- Example of using paste prefix middleware to fix https-vs-http when
+  deploying via proxy:
+  https://docs.pylonsproject.org/projects/pyramid_cookbook/dev/deployment/nginx.html#step-2-starting-paster
+
+- Fix conflict behavior for routes and auth policies (define phases and use
+  order=).
+
 Nice-to-Have
 ------------
 
