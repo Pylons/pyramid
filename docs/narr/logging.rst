@@ -301,11 +301,24 @@ requests using the `Apache Combined Log Format
 with a FileHandler can be used to create an ``access.log`` file similar to 
 Apache's. 
 
-Like any standard middleware with a Paste entry point, TransLogger can be 
-configured to wrap your application in the ``[app:main]`` section of the ini 
-file: 
+Like any standard middleware with a Paste entry point, TransLogger can be
+configured to wrap your application using ``.ini`` file syntax.  First,
+rename your Pyramid ``.ini`` file's ``[app:main]`` section to
+``[app:mypyramidapp]``, then add a ``[filter:translogger]`` section, then use
+a ``[pipeline:main]`` section file to form a WSGI pipeline with both the
+translogger and your application in it.  For instance, change from this:
 
 .. code-block:: ini 
+
+    [app:main]
+    use = egg:MyProject
+
+To this:
+
+.. code-block:: ini 
+
+    [app:mypyramidapp]
+    use = egg:MyProject
 
     [filter:translogger] 
     paste.filter_app_factory = egg:Paste#translogger 
@@ -313,10 +326,11 @@ file:
 
     [pipeline:main]
     pipeline = translogger
-               myapp
+               mypyramidapp
 
-This is equivalent to wrapping your app in a TransLogger instance via the
-bottom the ``main`` function of your project's ``__init__`` file:
+Using PasteDeploy this way to form and serve a pipeline is equivalent to
+wrapping your app in a TransLogger instance via the bottom the ``main``
+function of your project's ``__init__`` file:
 
 .. code-block:: python 
 

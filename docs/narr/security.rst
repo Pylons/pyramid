@@ -525,7 +525,7 @@ application's configuration section, e.g.:
   :linenos:
 
   [app:main]
-  use = egg:MyProject#app
+  use = egg:MyProject
   pyramid.debug_authorization = true
 
 With this debug flag turned on, the response sent to the browser will

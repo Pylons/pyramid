@@ -1,4 +1,4 @@
-[app:{{project}}]
+[app:main]
 use = egg:{{project}}
 
 pyramid.reload_templates = true
@@ -11,10 +11,6 @@ pyramid.includes = pyramid_debugtoolbar
                    pyramid_tm
 
 sqlalchemy.url = sqlite:///%(here)s/{{project}}.db
-
-[pipeline:main]
-pipeline =
-    {{project}}
 
 [server:main]
 use = egg:Paste#http

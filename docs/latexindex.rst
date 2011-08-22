@@ -42,6 +42,7 @@ Narrative Documentation
    narr/events
    narr/environment
    narr/logging
+   narr/paste
    narr/commandline
    narr/i18n
    narr/vhosting

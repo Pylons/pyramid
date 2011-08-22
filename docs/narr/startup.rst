@@ -51,7 +51,9 @@ Here's a high-level time-ordered overview of what happens when you press
    If instead of a simple application or a pipeline, you're using a Paste
    "composite" (e.g. ``[composite:main]``), refer to the documentation for
    that particular composite to understand how to make it refer to your
-   :app:`Pyramid` application.
+   :app:`Pyramid` application.  In most cases, a Pyramid application built
+   from a scaffold will have a single ``[app:main]`` section in it, and this
+   will be the application served.
 
 #. The PasteDeploy framework finds all :mod:`logging` related configuration
    in the ``.ini`` file and uses it to configure the Python standard library
@@ -78,10 +80,9 @@ Here's a high-level time-ordered overview of what happens when you press
    section of an ``.ini`` file.  It also accepts a ``**settings`` argument,
    which collects another set of arbitrary key/value pairs.  The arbitrary
    key/value pairs received by this function in ``**settings`` will be
-   composed of all the key/value pairs that are present in the
-   ``[app:MyProject]`` section (except for the ``use=`` setting) when this
-   function is called by the :term:`PasteDeploy` framework when you run
-   ``paster serve``.
+   composed of all the key/value pairs that are present in the ``[app:main]``
+   section (except for the ``use=`` setting) when this function is called by
+   the :term:`PasteDeploy` framework when you run ``paster serve``.
 
    Our generated ``development.ini`` file looks like so:
 
@@ -107,9 +108,9 @@ Here's a high-level time-ordered overview of what happens when you press
    application's root resource.  It is not called during startup, only when a
    request is handled.
 
-   The ``settings`` dictionary contains all the options in the
-   ``[app:MyProject]`` section of our .ini file except the ``use`` option
-   (which is internal to Paste) such as ``pyramid.reload_templates``,
+   The ``settings`` dictionary contains all the options in the ``[app:main]``
+   section of our .ini file except the ``use`` option (which is internal to
+   Paste) such as ``pyramid.reload_templates``,
    ``pyramid.debug_authorization``, etc.
 
 #. The ``main`` function then calls various methods on the instance of the
@@ -128,9 +129,9 @@ Here's a high-level time-ordered overview of what happens when you press
    :ref:`events_chapter` for more information about events).
 
 #. Assuming there were no errors, the ``main`` function in ``myproject``
-   returns the router instance created by ``make_wsgi_app`` back to
-   PasteDeploy.  As far as PasteDeploy is concerned, it is "just another WSGI
-   application".
+   returns the router instance created by
+   :meth:`pyramid.config.Configurator.make_wsgi_app` back to PasteDeploy.  As
+   far as PasteDeploy is concerned, it is "just another WSGI application".
 
 #. PasteDeploy starts the WSGI *server* defined within the ``[server:main]``
    section.  In our case, this is the ``Paste#http`` server (``use =

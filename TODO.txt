@@ -1,13 +1,10 @@
 Pyramid TODOs
 =============
 
-Should-Have
------------
-
-- Name WSGI app "main" instead of pipeline in scaffold configs?
-
 Nice-to-Have
 ------------
+
+- Flesh out "paste" chapter.
 
 - Move configuration-related stuff in "static" to config/views, from
   "settings" to config/settings, "renderers" to config/rendering, "asset" to

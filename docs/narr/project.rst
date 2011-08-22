@@ -153,8 +153,7 @@ Another :term:`PasteDeploy` ``.ini`` file named ``production.ini`` will also
 be created in the project directory.  It sports configuration that disables
 any interactive debugger (to prevent inappropriate access and disclosure),
 and turns off a number of debugging settings.  You can use this file to put
-your application into production, and you can modify it to do things like
-send email when an exception occurs.
+your application into production.
 
 The ``MyProject`` project directory contains an additional subdirectory named
 ``myproject`` (note the case difference) representing a Python
@@ -294,7 +293,6 @@ configuration file settings that influence startup and runtime behavior, see
 :ref:`environment_chapter`.
 
 .. index::
-   single: mod_wsgi
    single: WSGI
 
 Viewing the Application
@@ -341,7 +339,7 @@ example, instead of:
 .. code-block:: ini
    :linenos:
 
-   [app:MyApp]
+   [app:main]
    ...
    pyramid.includes = pyramid_debugtoolbar
 
@@ -350,7 +348,7 @@ Put a hash mark in front of the ``pyramid.includes`` line:
 .. code-block:: ini
    :linenos:
 
-   [app:MyApp]
+   [app:main]
    ...
    #pyramid.includes = pyramid_debugtoolbar
 
@@ -443,73 +441,41 @@ The generated ``development.ini`` file looks like so:
    :language: ini
    :linenos:
 
-This file contains several "sections" including ``[app:MyProject]``,
-``[pipeline:main]``, ``[server:main]`` and several other sections related to
-logging configuration.
+This file contains several "sections" including ``[app:main]``,
+``[server:main]`` and several other sections related to logging
+configuration.
 
-The ``[app:MyProject]`` section represents configuration for your
-application.  This section name represents the ``MyProject`` application (and
-it's an ``app`` -lication, thus ``app:MyProject``)
-
-The ``use`` setting is required in the ``[app:MyProject]`` section.  The
-``use`` setting points at a :term:`setuptools` :term:`entry point` named
-``MyProject`` (the ``egg:`` prefix in ``egg:MyProject`` indicates that this
-is an entry point *URI* specifier, where the "scheme" is "egg").
-``egg:MyProject`` is actually shorthand for a longer spelling:
-``egg:MyProject#main``.  The ``#main`` part is omitted for brevity, as it is
-the default.
-
-.. sidebar::  ``setuptools`` Entry Points and PasteDeploy ``.ini`` Files
-
-   This part of configuration can be confusing so let's try to clear things
-   up a bit.  Take a look at the generated ``setup.py`` file for this
-   project.  Note that the ``entry_point`` line in ``setup.py`` points at a
-   string which looks a lot like an ``.ini`` file.  This string
-   representation of an ``.ini`` file has a section named
-   ``[paste.app_factory]``.  Within this section, there is a key named
-   ``main`` (the entry point name) which has a value ``myproject:main``.  The
-   *key* ``main`` is what our ``egg:MyProject#main`` value of the ``use``
-   section in our config file is pointing at (although it is actually
-   shortened to ``egg:MyProject`` there).  The value represents a
-   :term:`dotted Python name` path, which refers to a callable in our
-   ``myproject`` package's ``__init__.py`` module.  In English, this entry
-   point can thus be referred to as a "Paste application factory in the
-   ``MyProject`` project which has the entry point named ``main`` where the
-   entry point refers to a ``main`` function in the ``mypackage`` module".
-   Indeed, if you open up the ``__init__.py`` module generated within the
-   ``myproject`` package, you'll see a ``main`` function.  This is the
-   function called by :term:`PasteDeploy` when the ``paster serve`` command
-   is invoked against our application.  It accepts a global configuration
-   object and *returns* an instance of our application.
-
-The ``use`` setting is the only setting *required* in the ``[app:MyProject]``
-section unless you've changed the callable referred to by the
-``egg:MyProject`` entry point to accept more arguments: other settings you
-add to this section are passed as keyword arguments to the callable
-represented by this entry point (``main`` in our ``__init__.py`` module).
-You can provide startup-time configuration parameters to your application by
+The ``[app:main]`` section represents configuration for your :app:`Pyramid`
+application.  The ``use`` setting is the only setting required to be present
+in the ``[app:main]`` section.  Its default value, ``egg:MyProject``,
+indicates that our MyProject project contains the application that should be
+served.  Other settings added to this section are passed as keyword arguments
+to the function named ``main`` in our package's ``__init__.py`` module.  You
+can provide startup-time configuration parameters to your application by
 adding more settings to this section.
 
-The ``pyramid.reload_templates`` setting in the ``[app:MyProject]`` section is
-a :app:`Pyramid` -specific setting which is passed into the framework.  If it
+.. note:: See :ref:`pastedeploy_entry_points` for more information about the
+   meaning of the ``use = egg:MyProject`` value in this section.
+
+The ``pyramid.reload_templates`` setting in the ``[app:main]`` section is a
+:app:`Pyramid` -specific setting which is passed into the framework.  If it
 exists, and its value is ``true``, :term:`Chameleon` and :term:`Mako`
 template changes will not require an application restart to be detected.  See
 :ref:`reload_templates_section` for more information.
 
-The ``pyramid.debug_templates`` setting in the ``[app:MyProject]`` section is a
+The ``pyramid.debug_templates`` setting in the ``[app:main]`` section is a
 :app:`Pyramid` -specific setting which is passed into the framework.  If it
 exists, and its value is ``true``, :term:`Chameleon` template exceptions will
-contain more detailed and helpful information about the error than when
-this value is ``false``.  See :ref:`debug_templates_section` for more
-information.
+contain more detailed and helpful information about the error than when this
+value is ``false``.  See :ref:`debug_templates_section` for more information.
 
 .. warning:: The ``pyramid.reload_templates`` and ``pyramid.debug_templates``
    options should be turned off for production applications, as template
    rendering is slowed when either is turned on.
 
-The ``pyramid.includes`` setting in the ``[app:MyProject]`` section tells
-Pyramid to "include" configuration from another package.  In this case, the
-line ``pyramid.includes = pyramid_debugtoolbar`` tells Pyramid to include
+The ``pyramid.includes`` setting in the ``[app:main]`` section tells Pyramid
+to "include" configuration from another package.  In this case, the line
+``pyramid.includes = pyramid_debugtoolbar`` tells Pyramid to include
 configuration from the ``pyramid_debugtoolbar`` package.  This turns on a
 debugging panel in development mode which will be shown on the right hand
 side of the screen.  Including the debug toolbar will also make it possible
@@ -519,23 +485,15 @@ Various other settings may exist in this section having to do with debugging
 or influencing runtime behavior of a :app:`Pyramid` application.  See
 :ref:`environment_chapter` for more information about these settings.
 
-``[pipeline:main]``, has the name ``main`` signifying that this is the
-default 'application' (although it's actually a pipeline of middleware and an
-application) run by ``paster serve`` when it is invoked against this
+The name ``main`` in ``[app:main]`` signifies that this is the default
+application run by ``paster serve`` when it is invoked against this
 configuration file.  The name ``main`` is a convention used by PasteDeploy
 signifying that it is the default application.
 
 The ``[server:main]`` section of the configuration file configures a WSGI
 server which listens on TCP port 6543.  It is configured to listen on all
-interfaces (``0.0.0.0``).  The ``Paste#http`` server will create a new thread
-for each request.
-
-.. note::
-
-  In general, :app:`Pyramid` applications generated from scaffolds
-  should be threading-aware.  It is not required that a :app:`Pyramid`
-  application be nonblocking as all application code will run in its own
-  thread, provided by the server you're using.
+interfaces (``0.0.0.0``).  This means that any remote system which has TCP
+access to your system can see your Pyramid application.
 
 The sections that live between the markers ``# Begin logging configuration``
 and ``# End logging configuration`` represent Python's standard library
@@ -545,21 +503,13 @@ configuration engine
 <http://docs.python.org/howto/logging.html#configuring-logging>`_ when the
 ``paster serve`` or ``paster pshell`` commands are executed.  The default
 configuration sends application logging output to the standard error output
-of your terminal.
+of your terminal.  For more information about logging configuration, see
+:ref:`logging_chapter`.
 
 See the :term:`PasteDeploy` documentation for more information about other
 types of things you can put into this ``.ini`` file, such as other
 applications, :term:`middleware` and alternate :term:`WSGI` server
 implementations.
-
-.. note::
-
-   You can add a ``[DEFAULT]`` section to your ``development.ini`` file.
-   Such a section should consists of global parameters that are shared by all
-   the applications, servers and :term:`middleware` defined within the
-   configuration file.  The values in a ``[DEFAULT]`` section will be passed
-   to your application's ``main`` function as ``global_config`` (see
-   the reference to the ``main`` function in :ref:`init_py`).
 
 .. index::
    single: production.ini
@@ -644,9 +594,12 @@ will be run when ``setup.py test`` is invoked.  We examined ``entry_points``
 in our discussion of the ``development.ini`` file; this file defines the
 ``main`` entry point that represents our project's application.
 
-Usually you only need to think about the contents of the ``setup.py`` file
-when distributing your application to other people, or when versioning your
-application for your own use.  For fun, you can try this command now:
+A more exhaustive explanation of the purpose and composition of ``setup.py``
+is available at `The Hitchhiker's Guide to Packaging
+<http://guide.python-distribute.org/>`_.  Usually you only need to think
+about the contents of the ``setup.py`` file when distributing your
+application to other people, or when versioning your application for your own
+use.  For fun, you can try this command now:
 
 .. code-block:: text
 

@@ -46,7 +46,7 @@ a ``urlmap`` composite.
   :linenos:
 
   [app:mypyramidapp]
-  use = egg:mypyramidapp#app
+  use = egg:mypyramidapp
 
   [composite:main]
   use = egg:Paste#urlmap

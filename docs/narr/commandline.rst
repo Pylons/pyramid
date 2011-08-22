@@ -127,12 +127,12 @@ The argument to ``pshell`` follows the format ``config_file#section_name``
 where ``config_file`` is the path to your application's ``.ini`` file and
 ``section_name`` is the ``app`` section name inside the ``.ini`` file which
 points to your application.  For example, if your application ``.ini`` file
-might have a ``[app:MyProject]`` section that looks like so:
+might have a ``[app:main]`` section that looks like so:
 
 .. code-block:: ini
    :linenos:
 
-   [app:MyProject]
+   [app:main]
    use = egg:MyProject
    pyramid.reload_templates = true
    pyramid.debug_authorization = false
@@ -401,7 +401,7 @@ tween chain is used:
 .. code-block:: text
    :linenos:
 
-   [app:starter]
+   [app:main]
    use = egg:starter
    reload_templates = true
    debug_authorization = false

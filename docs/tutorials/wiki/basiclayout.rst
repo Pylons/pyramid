@@ -162,16 +162,9 @@ opposed to the tutorial :term:`package` directory) looks like this:
 .. literalinclude:: src/views/development.ini
    :language: ini
 
-Note the existence of a ``[pipeline:main]`` section which specifies our WSGI
-pipeline.  This "pipeline" will be served up as our WSGI application.  As far
-as the WSGI server is concerned the pipeline *is* our application.
-
-Our ZODB database settings are specified as the ``zodbconn.uri`` setting in
-the application section.
-
-The only line in the ``[pipeline:main]`` section is ``tutorial``, which
-refers to the ``[app:tutorial]`` section above it.  The ``[app:tutorial]``
-section is the section which actually defines our application settings.  The
+Note the existence of an ``[app:main]`` section which specifies our WSGI
+application.  Our ZODB database settings are specified as the
+``zodbconn.uri`` setting within this section.  This value, and the other
 values within this section are passed as ``**settings`` to the ``main``
 function we defined in ``__init__.py`` when the server is started via
 ``paster serve``.

@@ -239,7 +239,7 @@ file in your application:
 
 .. code-block:: ini
 
-   [app:myapp]
+   [app:main]
    pyramid.includes = pyramid_debugtoolbar
                       pyramid_tm
 
@@ -352,7 +352,7 @@ file in your application:
 
 .. code-block:: ini
 
-   [app:myapp]
+   [app:main]
    pyramid.tweens = pyramid_debugtoolbar.toolbar.tween_factory
                     pyramid.tweens.excview_tween_factory
                     pyramid_tm.tm_tween_factory
@@ -534,7 +534,7 @@ an example of such a section:
   :linenos:
 
   [app:main]
-  use = egg:MyProject#app
+  use = egg:MyProject
   pyramid.reload_templates = true
   pyramid.debug_authorization = true
 
@@ -628,7 +628,7 @@ Here's how:
 
   .. code-block:: ini
 
-    [app:myapp]
+    [app:main]
     # .. other settings
     debug_frobnosticator = True
 

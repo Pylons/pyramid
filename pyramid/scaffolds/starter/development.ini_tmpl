@@ -1,4 +1,4 @@
-[app:{{project}}]
+[app:main]
 use = egg:{{project}}
 
 pyramid.reload_templates = true
@@ -8,10 +8,6 @@ pyramid.debug_routematch = false
 pyramid.debug_templates = true
 pyramid.default_locale_name = en
 pyramid.includes = pyramid_debugtoolbar
-
-[pipeline:main]
-pipeline =
-    {{project}}
 
 [server:main]
 use = egg:Paste#http

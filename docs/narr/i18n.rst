@@ -787,7 +787,7 @@ application's Paster ``.ini`` file:
    :linenos:
 
    [app:main]
-   use = egg:MyProject#app
+   use = egg:MyProject
    pyramid.reload_templates = true
    pyramid.debug_authorization = false
    pyramid.debug_notfound = false
@@ -847,7 +847,7 @@ Allow a deployer to modify your application's PasteDeploy .ini file:
    :linenos:
 
    [app:main]
-   use = egg:MyProject#app
+   use = egg:MyProject
    # ...
    available_languages = fr de en ru
 

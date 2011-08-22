@@ -638,8 +638,8 @@ the application's configuration section, e.g.:
 .. code-block:: ini
   :linenos:
 
-  [app:MyProject]
-  use = egg:MyProject#app
+  [app:main]
+  use = egg:MyProject
   pyramid.debug_templates = true
 
 With template debugging off, a :exc:`NameError` exception resulting
@@ -800,7 +800,7 @@ application's configuration section, e.g.:
   :linenos:
 
   [app:main]
-  use = egg:MyProject#app
+  use = egg:MyProject
   pyramid.reload_templates = true
 
 .. index::

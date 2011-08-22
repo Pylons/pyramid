@@ -1,4 +1,4 @@
-[app:{{project}}]
+[app:main]
 use = egg:{{project}}
 
 pyramid.reload_templates = true
@@ -12,10 +12,6 @@ pyramid.includes = pyramid_debugtoolbar
                    pyramid_tm
 tm.attempts = 3
 zodbconn.uri = file://%(here)s/Data.fs?connection_cache_size=20000
-
-[pipeline:main]
-pipeline =
-    {{project}}
 
 [server:main]
 use = egg:Paste#http

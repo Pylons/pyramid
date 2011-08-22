@@ -19,10 +19,11 @@ package.  We use ``__init__.py`` both as a package marker and to contain
 configuration code.
 
 The generated ``development.ini`` file is read by ``paster`` which looks for
-the application module in the ``use`` variable of the ``app:tutorial``
+the application module in the ``use`` variable of the ``app:main``
 section. The *entry point* is defined in the Setuptools configuration of this
 module, specifically in the ``setup.py`` file. For this tutorial, the *entry
-point* is defined as ``tutorial:main`` and points to a function named ``main``.
+point* is defined as ``tutorial:main`` and points to a function named
+``main``.
 
 First we need some imports to support later code:
 
@@ -33,7 +34,7 @@ First we need some imports to support later code:
 
 Next we define the main function and create a SQLAlchemy database engine from
 the ``sqlalchemy.`` prefixed settings in the ``development.ini`` file's
-``[app:tutorial]`` section.  This will be a URI (something like
+``[app:main]`` section.  This will be a URI (something like
 ``sqlite://``):
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
