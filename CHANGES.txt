@@ -131,6 +131,9 @@ Internal
 - Moved the ``StaticURLInfo`` class from ``pyramid.static`` to
   ``pyramid.config.views``.
 
+- Move the ``Settings`` class from ``pyramid.settings`` to
+  ``pyramid.config.settings``.
+
 Deprecations
 ------------
 

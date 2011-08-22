@@ -6,8 +6,7 @@ Nice-to-Have
 
 - Flesh out "paste" chapter.
 
-- Move configuration-related stuff in "static" to config/views, from
-  "settings" to config/settings, "renderers" to config/rendering, "asset" to
+- Move config-related stuff from "renderers" to config/rendering, "asset" to
   config/assets, and possibly mako/chameleon rendering stuff to
   config/rendering.
 
