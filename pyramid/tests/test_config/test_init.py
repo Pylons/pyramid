@@ -1933,6 +1933,14 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertNotEqual(wrapper, None)
         self.assertEqual(wrapper(None, None), 'OK')
 
+    def test_add_view_with_nonexistant_route_name(self):
+        from pyramid.renderers import null_renderer
+        from zope.configuration.config import ConfigurationExecutionError
+        view = lambda *arg: 'OK'
+        config = self._makeOne()
+        config.add_view(view=view, route_name='foo', renderer=null_renderer)
+        self.assertRaises(ConfigurationExecutionError, config.commit)
+
     def test_add_view_with_route_name_exception(self):
         from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
