@@ -192,17 +192,6 @@ class TestCCBug(IntegrationBase):
     # "unordered" as reported in IRC by author of
     # http://labs.creativecommons.org/2010/01/13/cc-engine-and-web-non-frameworks/
     package = 'pyramid.tests.ccbugapp'
-
-    def setUp(self):
-        from pyramid.config import Configurator
-        config = Configurator(root_factory=self.root_factory,
-                              package=self.package)
-        config.include(self.package)
-        app = config.make_wsgi_app()
-        from webtest import TestApp
-        self.testapp = TestApp(app)
-        self.config = config
-
     def test_rdf(self):
         res = self.testapp.get('/licenses/1/v1/rdf', status=200)
         self.assertEqual(res.body, 'rdf')
