@@ -2357,45 +2357,40 @@ pyramid.tests.test_config.dummy_include2""",
 
     def test_add_route_defaults(self):
         config = self._makeOne(autocommit=True)
-        route = config.add_route('name', 'path')
+        config.add_route('name', 'path')
         self._assertRoute(config, 'name', 'path')
-        self.assertEqual(route.name, 'name')
 
     def test_add_route_with_route_prefix(self):
         config = self._makeOne(autocommit=True)
         config.route_prefix = 'root'
-        route = config.add_route('name', 'path')
-        self.assertEqual(route.name, 'name')
-        self.assertEqual(route.pattern, 'root/path')
-
+        config.add_route('name', 'path')
         self._assertRoute(config, 'name', 'root/path')
 
     def test_add_route_discriminator(self):
         config = self._makeOne()
-        route = config.add_route('name', 'path')
-        self._assertRoute(config, 'name', 'path')
-        self.assertEqual(route.name, 'name')
+        config.add_route('name', 'path')
         self.assertEqual(config._ctx.actions[-1][0], ('route', 'name'))
 
     def test_add_route_with_factory(self):
         config = self._makeOne(autocommit=True)
         factory = object()
-        route = config.add_route('name', 'path', factory=factory)
+        config.add_route('name', 'path', factory=factory)
+        route = self._assertRoute(config, 'name', 'path')
         self.assertEqual(route.factory, factory)
 
     def test_add_route_with_static(self):
         config = self._makeOne(autocommit=True)
-        route = config.add_route('name', 'path/{foo}', static=True)
-        self.assertEqual(route.name, 'name')
+        config.add_route('name', 'path/{foo}', static=True)
         mapper = config.get_routes_mapper()
         self.assertEqual(len(mapper.get_routes()), 0)
         self.assertEqual(mapper.generate('name', {"foo":"a"}), '/path/a')
 
     def test_add_route_with_factory_dottedname(self):
         config = self._makeOne(autocommit=True)
-        route = config.add_route(
+        config.add_route(
             'name', 'path',
             factory='pyramid.tests.test_config.dummyfactory')
+        route = self._assertRoute(config, 'name', 'path')
         self.assertEqual(route.factory, dummyfactory)
 
     def test_add_route_with_xhr(self):
@@ -2480,9 +2475,8 @@ pyramid.tests.test_config.dummy_include2""",
 
     def test_add_route_no_pattern_with_path(self):
         config = self._makeOne(autocommit=True)
-        route = config.add_route('name', path='path')
+        config.add_route('name', path='path')
         self._assertRoute(config, 'name', 'path')
-        self.assertEqual(route.name, 'name')
 
     def test_add_route_no_path_no_pattern(self):
         from pyramid.exceptions import ConfigurationError
@@ -2491,7 +2485,8 @@ pyramid.tests.test_config.dummy_include2""",
 
     def test_add_route_with_pregenerator(self):
         config = self._makeOne(autocommit=True)
-        route = config.add_route('name', 'pattern', pregenerator='123')
+        config.add_route('name', 'pattern', pregenerator='123')
+        route = self._assertRoute(config, 'name', 'pattern')
         self.assertEqual(route.pregenerator, '123')
 
     def test_add_route_no_view_with_view_attr(self):
