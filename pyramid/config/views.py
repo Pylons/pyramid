@@ -531,7 +531,8 @@ class ViewsConfiguratorMixin(object):
                  request_param=None, containment=None, attr=None,
                  renderer=None, wrapper=None, xhr=False, accept=None,
                  header=None, path_info=None, custom_predicates=(),
-                 context=None, decorator=None, mapper=None, http_cache=None):
+                 context=None, decorator=None, mapper=None, http_cache=None,
+                 match_param=None):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
         down below into *predicate* arguments and *non-predicate*
@@ -775,6 +776,23 @@ class ViewsConfiguratorMixin(object):
           the value must match the right hand side of the expression
           (``123``) for the view to "match" the current request.
 
+        match_param
+
+          .. note:: This feature is new as of :app:`Pyramid` 1.2.
+
+          This param may be either a single string of the format "key=value"
+          or a dict of key/value pairs.
+
+          A view declaration with this argument ensures that the view will
+          only be called when the :term:`request` has key/value pairs in
+          the ``matchdict`` that equal those supplied in the predicate.
+          e.g. ``match_param="action=edit" would require the ``action``
+          parameter in the ``matchdict`` match the right hande side of the
+          expression (``edit``) for the view to "match" the current request.
+
+          If the ``match_param`` is a dict, every key/value pair must match
+          for the predicate to pass.
+
         containment
 
           This value should be a Python class or :term:`interface` (or a
@@ -832,7 +850,6 @@ class ViewsConfiguratorMixin(object):
           variable.  If the regex matches, this predicate will be
           ``True``.
 
-
         custom_predicates
 
           This value should be a sequence of references to custom
@@ -885,6 +902,7 @@ class ViewsConfiguratorMixin(object):
                     containment=containment, attr=attr,
                     renderer=renderer, wrapper=wrapper, xhr=xhr, accept=accept,
                     header=header, path_info=path_info,
+                    match_param=match_param,
                     custom_predicates=custom_predicates, context=context,
                     mapper = mapper, http_cache = http_cache,
                     )
@@ -896,7 +914,7 @@ class ViewsConfiguratorMixin(object):
             request_method=request_method, path_info=path_info,
             request_param=request_param, header=header, accept=accept,
             containment=containment, request_type=request_type,
-            custom=custom_predicates)
+            match_param=match_param, custom=custom_predicates)
 
         if context is None:
             context = for_
@@ -1040,7 +1058,7 @@ class ViewsConfiguratorMixin(object):
 
         discriminator = [
             'view', context, name, request_type, IView, containment,
-            request_param, request_method, route_name, attr,
+            request_param, request_method, match_param, route_name, attr,
             xhr, accept, header, path_info]
         discriminator.extend(sorted(custom_predicates))
         discriminator = tuple(discriminator)
