@@ -35,8 +35,8 @@ def action_method(wrapped):
     return wrapper
 
 def make_predicates(xhr=None, request_method=None, path_info=None,
-                    request_param=None, header=None, accept=None,
-                    containment=None, request_type=None,
+                    request_param=None, match_param=None, header=None,
+                    accept=None, containment=None, request_type=None,
                     traverse=None, custom=()):
 
     # PREDICATES
@@ -183,6 +183,21 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         weights.append(1 << 8)
         predicates.append(request_type_predicate)
         h.update('request_type:%r' % hash(request_type))
+
+    if match_param is not None:
+        if isinstance(match_param, basestring):
+            match_param, match_param_val = match_param.split('=', 1)
+            match_param = {match_param: match_param_val}
+        text = "match_param %s" % match_param
+        def match_param_predicate(context, request):
+            for k, v in match_param.iteritems():
+                if request.matchdict.get(k) != v:
+                    return False
+            return True
+        match_param_predicate.__text__ = text
+        weights.append(1 << 9)
+        predicates.append(match_param_predicate)
+        h.update('match_param:%r' % match_param)
 
     if traverse is not None:
         # ``traverse`` can only be used as a *route* "predicate"; it
