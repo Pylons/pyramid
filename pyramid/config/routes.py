@@ -345,16 +345,6 @@ class RoutesConfiguratorMixin(object):
             custom=custom_predicates
             )
 
-        request_iface = self.registry.queryUtility(IRouteRequest, name=name)
-        if request_iface is None:
-            if use_global_views:
-                bases = (IRequest,)
-            else:
-                bases = ()
-            request_iface = route_request_iface(name, bases)
-            self.registry.registerUtility(
-                request_iface, IRouteRequest, name=name)
-
         # deprecated adding views from add_route
         if any([view, view_context, view_permission, view_renderer,
                 view_for, for_, permission, renderer, view_attr]):
@@ -379,6 +369,16 @@ class RoutesConfiguratorMixin(object):
         mapper = self.get_routes_mapper()
 
         def register():
+            request_iface = self.registry.queryUtility(IRouteRequest, name=name)
+            if request_iface is None:
+                if use_global_views:
+                    bases = (IRequest,)
+                else:
+                    bases = ()
+                request_iface = route_request_iface(name, bases)
+                self.registry.registerUtility(
+                    request_iface, IRouteRequest, name=name)
+
             return mapper.connect(name, pattern, factory, predicates=predicates,
                                   pregenerator=pregenerator, static=static)
 

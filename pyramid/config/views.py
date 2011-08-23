@@ -870,17 +870,6 @@ class ViewsConfiguratorMixin(object):
                 raise ConfigurationError(
                     'request_type must be an interface, not %s' % request_type)
 
-        request_iface = IRequest
-
-        if route_name is not None:
-            request_iface = self.registry.queryUtility(IRouteRequest,
-                                                       name=route_name)
-            if request_iface is None:
-                # route configuration should have already happened
-                raise ConfigurationError(
-                    'No route named %s found for view registration' %
-                    route_name)
-                                         
         order, predicates, phash = make_predicates(xhr=xhr,
             request_method=request_method, path_info=path_info,
             request_param=request_param, header=header, accept=accept,
@@ -902,6 +891,16 @@ class ViewsConfiguratorMixin(object):
                 registry = self.registry)
 
         def register(permission=permission, renderer=renderer):
+            request_iface = IRequest
+            if route_name is not None:
+                request_iface = self.registry.queryUtility(IRouteRequest,
+                                                           name=route_name)
+                if request_iface is None:
+                    # route configuration should have already happened
+                    raise ConfigurationError(
+                        'No route named %s found for view registration' %
+                        route_name)
+
             if renderer is None:
                 # use default renderer if one exists (reg'd in phase 1)
                 if self.registry.queryUtility(IRendererFactory) is not None:
