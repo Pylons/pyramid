@@ -375,7 +375,7 @@ class RoutesConfiguratorMixin(object):
         # We have to connect routes in the order they were provided;
         # we can't use a phase to do that, because when the actions are
         # sorted, actions in the same phase lose relative ordering
-        self.action(None, register_connect)
+        self.action(('route-connect', name), register_connect)
 
         # But IRouteRequest interfaces must be registered before we begin to
         # process view registrations (in phase 3)

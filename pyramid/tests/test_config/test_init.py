@@ -3716,11 +3716,13 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
         try:
             config.commit()
         except ConfigurationConflictError, why:
-            c1, c2, c3, c4 = self._conflictFunctions(why)
+            c1, c2, c3, c4, c5, c6 = self._conflictFunctions(why)
             self.assertEqual(c1, 'test_conflict_route_with_view')
             self.assertEqual(c2, 'test_conflict_route_with_view')
             self.assertEqual(c3, 'test_conflict_route_with_view')
             self.assertEqual(c4, 'test_conflict_route_with_view')
+            self.assertEqual(c5, 'test_conflict_route_with_view')
+            self.assertEqual(c6, 'test_conflict_route_with_view')
         else: # pragma: no cover
             raise AssertionError
         
