@@ -293,11 +293,6 @@ class Configurator(
                 
         registry.registerUtility(debug_logger, IDebugLogger)
 
-        if renderers is None:
-            for name, renderer in DEFAULT_RENDERERS:
-                self.add_renderer(name, renderer)
-            renderers = []
-
         if exceptionresponse_view is not None:
             exceptionresponse_view = self.maybe_dotted(exceptionresponse_view)
             self.add_view(exceptionresponse_view, context=IExceptionResponse)
@@ -325,6 +320,9 @@ class Configurator(
 
         if default_view_mapper is not None:
             self.set_view_mapper(default_view_mapper)
+
+        if renderers is None:
+            renderers = DEFAULT_RENDERERS
 
         for name, renderer in renderers:
             self.add_renderer(name, renderer)

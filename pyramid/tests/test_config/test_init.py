@@ -211,6 +211,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_ctor_default_permission(self):
         from pyramid.interfaces import IDefaultPermission
         config = self._makeOne(default_permission='view')
+        config.commit()
         self.assertEqual(config.registry.getUtility(IDefaultPermission), 'view')
 
     def test_ctor_session_factory(self):
@@ -463,6 +464,7 @@ class ConfiguratorTests(unittest.TestCase):
         reg = Registry()
         config = self._makeOne(reg)
         config.setup_registry(authentication_policy=policy)
+        config.commit()
         result = reg.getUtility(IAuthenticationPolicy)
         self.assertEqual(policy, result)
 
@@ -472,6 +474,7 @@ class ConfiguratorTests(unittest.TestCase):
         reg = Registry()
         config = self._makeOne(reg)
         config.setup_registry(authentication_policy='pyramid.tests')
+        config.commit()
         result = reg.getUtility(IAuthenticationPolicy)
         import pyramid.tests
         self.assertEqual(result, pyramid.tests)
@@ -484,6 +487,7 @@ class ConfiguratorTests(unittest.TestCase):
         dummy = object()
         config.setup_registry(authentication_policy=dummy,
                               authorization_policy='pyramid.tests')
+        config.commit()
         result = reg.getUtility(IAuthorizationPolicy)
         import pyramid.tests
         self.assertEqual(result, pyramid.tests)
@@ -607,6 +611,7 @@ class ConfiguratorTests(unittest.TestCase):
         reg = Registry()
         config = self._makeOne(reg)
         config.setup_registry(renderers=[('yeah', renderer)])
+        config.commit()
         self.assertEqual(reg.getUtility(IRendererFactory, 'yeah'),
                          renderer)
 
@@ -616,6 +621,7 @@ class ConfiguratorTests(unittest.TestCase):
         reg = Registry()
         config = self._makeOne(reg)
         config.setup_registry(default_permission='view')
+        config.commit()
         self.assertEqual(reg.getUtility(IDefaultPermission), 'view')
 
     def test_setup_registry_includes(self):
@@ -2554,6 +2560,7 @@ pyramid.tests.test_config.dummy_include2""",
             def __call__(self, *arg, **kw):
                 return 'moo'
         config.add_renderer(None, moo)
+        config.commit()
         def view(request):
             return 'OK'
         result = config.derive_view(view)
@@ -2572,6 +2579,7 @@ pyramid.tests.test_config.dummy_include2""",
         config = self._makeOne()
         config.add_renderer(None, moo)
         config.add_renderer('foo', foo)
+        config.commit()
         result = config.derive_view(view, renderer='foo')
         self.assertFalse(result is view)
         request = self._makeRequest(config)
