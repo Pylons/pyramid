@@ -144,6 +144,11 @@ Minor Feature Additions
   any of these policies.  The output produced can be useful when trying to
   diagnose authentication-related problems.
 
+- New view predicate: ``match_param``.  Example: a view added via
+  ``config.add_view(aview, match_param='action=edit')`` will be called only
+  when the ``request.matchdict`` has a value inside it named ``action`` with
+  a value of ``edit``.
+
 Deprecations
 ------------
 
