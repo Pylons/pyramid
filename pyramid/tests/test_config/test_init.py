@@ -103,6 +103,7 @@ class ConfiguratorTests(unittest.TestCase):
         this_pkg = sys.modules['pyramid.tests.test_config']
         self.assertTrue(config.registry.getUtility(ISettings))
         self.assertEqual(config.package, this_pkg)
+        config.commit()
         self.assertTrue(config.registry.getUtility(IRendererFactory, 'json'))
         self.assertTrue(config.registry.getUtility(IRendererFactory, 'string'))
         if not __pypy__:
@@ -185,6 +186,7 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IAuthenticationPolicy
         policy = object()
         config = self._makeOne(authentication_policy=policy)
+        config.commit()
         result = config.registry.getUtility(IAuthenticationPolicy)
         self.assertEqual(policy, result)
 
@@ -205,6 +207,7 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IRendererFactory
         renderer = object()
         config = self._makeOne(renderers=[('yeah', renderer)])
+        config.commit()
         self.assertEqual(config.registry.getUtility(IRendererFactory, 'yeah'),
                          renderer)
 
@@ -225,6 +228,7 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IViewMapperFactory
         mapper = object()
         config = self._makeOne(default_view_mapper=mapper)
+        config.commit()
         self.assertEqual(config.registry.getUtility(IViewMapperFactory),
                          mapper)
 
@@ -1919,71 +1923,25 @@ pyramid.tests.test_config.dummy_include2""",
 
     def test_add_view_with_route_name(self):
         from pyramid.renderers import null_renderer
-        from zope.component import ComponentLookupError
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view, route_name='foo', renderer=null_renderer)
-        self.assertEqual(len(config.registry.deferred_route_views), 1)
-        infos = config.registry.deferred_route_views['foo']
-        self.assertEqual(len(infos), 1)
-        info = infos[0]
-        self.assertEqual(info['route_name'], 'foo')
-        self.assertEqual(info['view'], view)
-        self.assertRaises(ComponentLookupError,
-                          self._getRouteRequestIface, config, 'foo')
-        wrapper = self._getViewCallable(config, None)
-        self.assertEqual(wrapper, None)
         config.add_route('foo', '/a/b')
+        config.add_view(view=view, route_name='foo', renderer=null_renderer)
         request_iface = self._getRouteRequestIface(config, 'foo')
         self.assertNotEqual(request_iface, None)
         wrapper = self._getViewCallable(config, request_iface=request_iface)
         self.assertNotEqual(wrapper, None)
         self.assertEqual(wrapper(None, None), 'OK')
 
-    def test_add_view_with_route_name_deferred_views_already_exist(self):
-        view = lambda *arg: 'OK'
-        config = self._makeOne(autocommit=True)
-        config.registry.deferred_route_views = {'bar':[]}
-        config.add_view(view=view, route_name='foo')
-        self.assertEqual(len(config.registry.deferred_route_views), 2)
-        self.assertEqual(config.registry.deferred_route_views['bar'], [])
-        infos = config.registry.deferred_route_views['foo']
-        self.assertEqual(len(infos), 1)
-
-    def test_deferred_route_views_retains_custom_predicates(self):
-        view = lambda *arg: 'OK'
-        config = self._makeOne(autocommit=True)
-        config.add_view(view=view, route_name='foo', custom_predicates=('123',))
-        self.assertEqual(len(config.registry.deferred_route_views), 1)
-        infos = config.registry.deferred_route_views['foo']
-        self.assertEqual(len(infos), 1)
-        info = infos[0]
-        self.assertEqual(info['route_name'], 'foo')
-        self.assertEqual(info['custom_predicates'], ('123',))
-
     def test_add_view_with_route_name_exception(self):
         from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
-        from zope.component import ComponentLookupError
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
+        config.add_route('foo', '/a/b')
         config.add_view(view=view, route_name='foo', context=RuntimeError,
                         renderer=null_renderer)
-        self.assertEqual(len(config.registry.deferred_route_views), 1)
-        infos = config.registry.deferred_route_views['foo']
-        self.assertEqual(len(infos), 1)
-        info = infos[0]
-        self.assertEqual(info['route_name'], 'foo')
-        self.assertEqual(info['view'], view)
-        self.assertRaises(ComponentLookupError,
-                          self._getRouteRequestIface, config, 'foo')
-        wrapper_exc_view = self._getViewCallable(
-            config, ctx_iface=implementedBy(RuntimeError),
-            exception_view=True)
-        self.assertEqual(wrapper_exc_view, None)
-        config.add_route('foo', '/a/b')
         request_iface = self._getRouteRequestIface(config, 'foo')
-        self.assertNotEqual(request_iface, None)
         wrapper_exc_view = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError),
             request_iface=request_iface, exception_view=True)

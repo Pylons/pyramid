@@ -345,18 +345,6 @@ class RoutesConfiguratorMixin(object):
             custom=custom_predicates
             )
 
-        # deprecated adding views from add_route
-        if any([view, view_context, view_permission, view_renderer,
-                view_for, for_, permission, renderer, view_attr]):
-            self._add_view_from_route(
-                route_name=name,
-                view=view,
-                permission=view_permission or permission,
-                context=view_context or view_for or for_,
-                renderer=view_renderer or renderer,
-                attr=view_attr,
-            )
-
         factory = self.maybe_dotted(factory)
         if pattern is None:
             pattern = path
@@ -368,7 +356,7 @@ class RoutesConfiguratorMixin(object):
 
         mapper = self.get_routes_mapper()
 
-        def register():
+        def register_route():
             request_iface = self.registry.queryUtility(IRouteRequest, name=name)
             if request_iface is None:
                 if use_global_views:
@@ -386,7 +374,20 @@ class RoutesConfiguratorMixin(object):
         # route actions must run before view registration actions; all
         # IRouteRequest interfaces must be registered before we begin to
         # process view registrations
-        self.action(('route', name), register, order=PHASE2_CONFIG)
+        self.action(('route', name), register_route, order=PHASE2_CONFIG)
+
+        # deprecated adding views from add_route; must come after
+        # route registration for purposes of autocommit ordering
+        if any([view, view_context, view_permission, view_renderer,
+                view_for, for_, permission, renderer, view_attr]):
+            self._add_view_from_route(
+                route_name=name,
+                view=view,
+                permission=view_permission or permission,
+                context=view_context or view_for or for_,
+                renderer=view_renderer or renderer,
+                attr=view_attr,
+            )
 
     def get_routes_mapper(self):
         """ Return the :term:`routes mapper` object associated with

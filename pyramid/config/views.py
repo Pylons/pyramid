@@ -896,7 +896,8 @@ class ViewsConfiguratorMixin(object):
                 request_iface = self.registry.queryUtility(IRouteRequest,
                                                            name=route_name)
                 if request_iface is None:
-                    # route configuration should have already happened
+                    # route configuration should have already happened in
+                    # phase 2
                     raise ConfigurationError(
                         'No route named %s found for view registration' %
                         route_name)
