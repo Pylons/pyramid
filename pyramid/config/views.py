@@ -25,6 +25,8 @@ from pyramid.interfaces import IViewClassifier
 from pyramid.interfaces import IRequest
 from pyramid.interfaces import IRouteRequest
 from pyramid.interfaces import IRendererFactory
+from pyramid.interfaces import PHASE1_CONFIG
+from pyramid.interfaces import PHASE3_CONFIG
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import PredicateMismatch
@@ -874,24 +876,11 @@ class ViewsConfiguratorMixin(object):
             request_iface = self.registry.queryUtility(IRouteRequest,
                                                        name=route_name)
             if request_iface is None:
-                deferred_views = getattr(self.registry,
-                                         'deferred_route_views', None)
-                if deferred_views is None:
-                    deferred_views = self.registry.deferred_route_views = {}
-                info = dict(
-                    view=view, name=name, for_=for_, permission=permission,
-                    request_type=request_type, route_name=route_name,
-                    request_method=request_method, request_param=request_param,
-                    containment=containment, attr=attr,
-                    renderer=renderer, wrapper=wrapper, xhr=xhr, accept=accept,
-                    header=header, path_info=path_info,
-                    custom_predicates=custom_predicates, context=context,
-                    mapper = mapper, http_cache = http_cache,
-                    )
-                view_info = deferred_views.setdefault(route_name, [])
-                view_info.append(info)
-                return
-
+                # route configuration should have already happened
+                raise ConfigurationError(
+                    'No route named %s found for view registration' %
+                    route_name)
+                                         
         order, predicates, phash = make_predicates(xhr=xhr,
             request_method=request_method, path_info=path_info,
             request_param=request_param, header=header, accept=accept,
@@ -914,7 +903,7 @@ class ViewsConfiguratorMixin(object):
 
         def register(permission=permission, renderer=renderer):
             if renderer is None:
-                # use default renderer if one exists
+                # use default renderer if one exists (reg'd in phase 1)
                 if self.registry.queryUtility(IRendererFactory) is not None:
                     renderer = renderers.RendererHelper(
                         name=None,
@@ -923,6 +912,7 @@ class ViewsConfiguratorMixin(object):
 
             if permission is None:
                 # intent: will be None if no default permission is registered
+                # (reg'd in phase 1)
                 permission = self.registry.queryUtility(IDefaultPermission)
 
             # __no_permission_required__ handled by _secure_view
@@ -1044,7 +1034,7 @@ class ViewsConfiguratorMixin(object):
             xhr, accept, header, path_info]
         discriminator.extend(sorted(custom_predicates))
         discriminator = tuple(discriminator)
-        self.action(discriminator, register)
+        self.action(discriminator, register, order=PHASE3_CONFIG)
     
     def derive_view(self, view, attr=None, renderer=None):
         """
@@ -1263,8 +1253,11 @@ class ViewsConfiguratorMixin(object):
            can be used to achieve the same purpose.
         """
         mapper = self.maybe_dotted(mapper)
-        self.registry.registerUtility(mapper, IViewMapperFactory)
-        self.action(IViewMapperFactory, None)
+        def register():
+            self.registry.registerUtility(mapper, IViewMapperFactory)
+        # IViewMapperFactory is looked up as the result of view config
+        # in phase 3
+        self.action(IViewMapperFactory, register, order=PHASE1_CONFIG)
 
     @action_method
     def add_static_view(self, name, path, **kw):

@@ -847,4 +847,12 @@ class IRendererInfo(Interface):
                          'renderer was created')
     settings = Attribute('The deployment settings dictionary related '
                          'to the current application')
-    
+
+
+# configuration phases: a lower phase number means the actions associated
+# with this phase will be executed earlier than those with later phase
+# numbers
+
+PHASE1_CONFIG = -20
+PHASE2_CONFIG = -10
+PHASE3_CONFIG = 0

@@ -1,6 +1,7 @@
 from zope.interface import Interface
 
 from pyramid.interfaces import IResponse
+from pyramid.interfaces import PHASE3_CONFIG
 
 from pyramid.config.util import action_method
 
@@ -27,7 +28,7 @@ class AdaptersConfiguratorMixin(object):
             iface = (iface,)
         def register():
             self.registry.registerHandler(subscriber, iface)
-        self.action(None, register)
+        self.action(None, register, order=PHASE3_CONFIG)
         return subscriber
 
     @action_method
@@ -52,7 +53,7 @@ class AdaptersConfiguratorMixin(object):
                 reg.registerSelfAdapter((type_or_iface,), IResponse)
             else:
                 reg.registerAdapter(adapter, (type_or_iface,), IResponse)
-        self.action((IResponse, type_or_iface), register)
+        self.action((IResponse, type_or_iface), register, order=PHASE3_CONFIG)
 
     def _register_response_adapters(self):
         # cope with WebOb response objects that aren't decorated with IResponse

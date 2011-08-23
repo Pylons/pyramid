@@ -3,6 +3,7 @@ import warnings
 from pyramid.interfaces import IRequest
 from pyramid.interfaces import IRouteRequest
 from pyramid.interfaces import IRoutesMapper
+from pyramid.interfaces import PHASE2_CONFIG
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.request import route_request_iface
@@ -353,10 +354,6 @@ class RoutesConfiguratorMixin(object):
             request_iface = route_request_iface(name, bases)
             self.registry.registerUtility(
                 request_iface, IRouteRequest, name=name)
-            deferred_views = getattr(self.registry, 'deferred_route_views', {})
-            view_info = deferred_views.pop(name, ())
-            for info in view_info:
-                self.add_view(**info)
 
         # deprecated adding views from add_route
         if any([view, view_context, view_permission, view_renderer,
@@ -370,8 +367,6 @@ class RoutesConfiguratorMixin(object):
                 attr=view_attr,
             )
 
-        mapper = self.get_routes_mapper()
-
         factory = self.maybe_dotted(factory)
         if pattern is None:
             pattern = path
@@ -381,11 +376,17 @@ class RoutesConfiguratorMixin(object):
         if self.route_prefix:
             pattern = self.route_prefix.rstrip('/') + '/' + pattern.lstrip('/')
 
-        discriminator = ('route', name)
-        self.action(discriminator, None)
+        mapper = self.get_routes_mapper()
 
-        return mapper.connect(name, pattern, factory, predicates=predicates,
-                              pregenerator=pregenerator, static=static)
+        def register():
+            return mapper.connect(name, pattern, factory, predicates=predicates,
+                                  pregenerator=pregenerator, static=static)
+
+
+        # route actions must run before view registration actions; all
+        # IRouteRequest interfaces must be registered before we begin to
+        # process view registrations
+        self.action(('route', name), register, order=PHASE2_CONFIG)
 
     def get_routes_mapper(self):
         """ Return the :term:`routes mapper` object associated with

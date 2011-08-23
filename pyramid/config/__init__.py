@@ -309,10 +309,6 @@ class Configurator(
 
         self.commit()
 
-        if default_view_mapper is not None:
-            self.set_view_mapper(default_view_mapper)
-            self.commit()
-
         # The following registrations should be treated as if the methods had
         # been called after configurator construction (commit should not be
         # called after this).  Rationale: user-supplied implementations
@@ -322,10 +318,13 @@ class Configurator(
         if authentication_policy and not authorization_policy:
             authorization_policy = ACLAuthorizationPolicy() # default
 
-        if authentication_policy:
-            self.set_authentication_policy(authentication_policy)
         if authorization_policy:
             self.set_authorization_policy(authorization_policy)
+        if authentication_policy:
+            self.set_authentication_policy(authentication_policy)
+
+        if default_view_mapper is not None:
+            self.set_view_mapper(default_view_mapper)
 
         for name, renderer in renderers:
             self.add_renderer(name, renderer)
