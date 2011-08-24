@@ -8,8 +8,6 @@ deployment more fun, more predictable, and more productive.
 Pyramid is the newest web framework produced by the `Pylons Project
 <http://pylonsproject.org/>`_.
 
-Pyramid was previously known as `repoze.bfg <http://bfg.repoze.org>`_.
-
 Support and Documentation
 -------------------------
 
