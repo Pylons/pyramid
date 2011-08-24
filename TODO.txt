@@ -11,6 +11,9 @@ Should-Have
 Nice-to-Have
 ------------
 
+- Add a default-view-config-params decorator that can be applied to a class
+  which names defaults for method-based view_config decorator options.
+
 - Flesh out "paste" chapter.
 
 - Move config-related stuff from "renderers" to config/rendering, and
