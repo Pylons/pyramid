@@ -303,17 +303,22 @@ class Configurator(
             self.add_view(exceptionresponse_view, context=IExceptionResponse)
             self.add_view(exceptionresponse_view,context=WebobWSGIHTTPException)
 
-        # commit before adding default_view_mapper, as the
-        # exceptionresponse_view above requires the superdefault view
-        # mapper
+        # commit below because:
+        #
+        # - the default exceptionresponse_view requires the superdefault view
+        #   mapper, so we need to configure it before adding default_view_mapper
+        #
+        # - provided default renderers should be overrideable without requiring
+        #   the user to commit before calling config.add_renderer
 
         self.commit()
 
-        # The following registrations should be treated as if the methods had
-        # been called after configurator construction (commit should not be
-        # called after this).  Rationale: user-supplied implementations
-        # should be preferred rather than add-on author implementations (as
-        # per automatic conflict resolution).
+        # self.commit() should not be called after this point because the
+        # following registrations should be treated as analogues of methods
+        # called by the user after configurator construction.  Rationale:
+        # user-supplied implementations should be preferred rather than
+        # add-on author implementations with the help of automatic conflict
+        # resolution.
 
         if authentication_policy and not authorization_policy:
             authorization_policy = ACLAuthorizationPolicy() # default
