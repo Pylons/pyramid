@@ -308,7 +308,7 @@ class Configurator(
         # - the default exceptionresponse_view requires the superdefault view
         #   mapper, so we need to configure it before adding default_view_mapper
         #
-        # - provided default renderers should be overrideable without requiring
+        # - superdefault renderers should be overrideable without requiring
         #   the user to commit before calling config.add_renderer
 
         self.commit()
