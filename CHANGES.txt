@@ -1,3 +1,11 @@
+Next release
+============
+
+- When a ``renderers=`` argument is not specified to the Configurator
+  constructor, eagerly register and commit the default renderer set.  This
+  permits the overriding of the default renderers, which was broken in 1.2a1
+  without a commit directly after Configurator construction.
+
 1.2a1 (2011-08-24)
 ==================
 

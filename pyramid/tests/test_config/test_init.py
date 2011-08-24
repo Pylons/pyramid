@@ -211,6 +211,13 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(config.registry.getUtility(IRendererFactory, 'yeah'),
                          renderer)
 
+    def test_ctor_default_renderers(self):
+        from pyramid.interfaces import IRendererFactory
+        from pyramid.renderers import json_renderer_factory
+        config = self._makeOne()
+        self.assertEqual(config.registry.getUtility(IRendererFactory, 'json'),
+                         json_renderer_factory)
+
     def test_ctor_default_permission(self):
         from pyramid.interfaces import IDefaultPermission
         config = self._makeOne(default_permission='view')
