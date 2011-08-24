@@ -2,6 +2,8 @@ import warnings
 
 from pyramid.interfaces import IRendererFactory
 from pyramid.interfaces import IRendererGlobalsFactory
+from pyramid.interfaces import PHASE1_CONFIG
+from pyramid.interfaces import PHASE3_CONFIG
 
 from pyramid.config.util import action_method
 
@@ -49,10 +51,11 @@ class RenderingConfiguratorMixin(object):
         # as a name
         if not name: 
             name = ''
-        # we need to register renderers eagerly because they are used during
-        # view configuration
-        self.registry.registerUtility(factory, IRendererFactory, name=name)
-        self.action((IRendererFactory, name), None)
+        def register():
+            self.registry.registerUtility(factory, IRendererFactory, name=name)
+        # we need to register renderers early (in phase 1) because they are
+        # used during view configuration (which happens in phase 3)
+        self.action((IRendererFactory, name), register, order=PHASE1_CONFIG)
 
     @action_method
     def set_renderer_globals_factory(self, factory, warn=True):
@@ -86,5 +89,4 @@ class RenderingConfiguratorMixin(object):
         factory = self.maybe_dotted(factory)
         def register():
             self.registry.registerUtility(factory, IRendererGlobalsFactory)
-        self.action(IRendererGlobalsFactory, register)
-
+        self.action(IRendererGlobalsFactory, register, order=PHASE3_CONFIG)

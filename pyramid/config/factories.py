@@ -4,6 +4,7 @@ from pyramid.interfaces import IDefaultRootFactory
 from pyramid.interfaces import IRequestFactory
 from pyramid.interfaces import IRootFactory
 from pyramid.interfaces import ISessionFactory
+from pyramid.interfaces import PHASE3_CONFIG
 
 from pyramid.traversal import DefaultRootFactory
 
@@ -24,7 +25,7 @@ class FactoriesConfiguratorMixin(object):
         def register():
             self.registry.registerUtility(factory, IRootFactory)
             self.registry.registerUtility(factory, IDefaultRootFactory) # b/c
-        self.action(IRootFactory, register)
+        self.action(IRootFactory, register, order=PHASE3_CONFIG)
 
     _set_root_factory = set_root_factory # bw compat
 
@@ -41,7 +42,7 @@ class FactoriesConfiguratorMixin(object):
         """
         def register():
             self.registry.registerUtility(session_factory, ISessionFactory)
-        self.action(ISessionFactory, register)
+        self.action(ISessionFactory, register, order=PHASE3_CONFIG)
 
     @action_method
     def set_request_factory(self, factory):
@@ -60,5 +61,5 @@ class FactoriesConfiguratorMixin(object):
         factory = self.maybe_dotted(factory)
         def register():
             self.registry.registerUtility(factory, IRequestFactory)
-        self.action(IRequestFactory, register)
+        self.action(IRequestFactory, register, order=PHASE3_CONFIG)
 

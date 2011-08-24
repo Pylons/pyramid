@@ -3,6 +3,7 @@ import warnings
 from pyramid.interfaces import IRequest
 from pyramid.interfaces import IRouteRequest
 from pyramid.interfaces import IRoutesMapper
+from pyramid.interfaces import PHASE2_CONFIG
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.request import route_request_iface
@@ -344,21 +345,45 @@ class RoutesConfiguratorMixin(object):
             custom=custom_predicates
             )
 
-        request_iface = self.registry.queryUtility(IRouteRequest, name=name)
-        if request_iface is None:
-            if use_global_views:
-                bases = (IRequest,)
-            else:
-                bases = ()
-            request_iface = route_request_iface(name, bases)
-            self.registry.registerUtility(
-                request_iface, IRouteRequest, name=name)
-            deferred_views = getattr(self.registry, 'deferred_route_views', {})
-            view_info = deferred_views.pop(name, ())
-            for info in view_info:
-                self.add_view(**info)
+        factory = self.maybe_dotted(factory)
+        if pattern is None:
+            pattern = path
+        if pattern is None:
+            raise ConfigurationError('"pattern" argument may not be None')
 
-        # deprecated adding views from add_route
+        if self.route_prefix:
+            pattern = self.route_prefix.rstrip('/') + '/' + pattern.lstrip('/')
+
+        mapper = self.get_routes_mapper()
+
+        def register_route_request_iface():
+            request_iface = self.registry.queryUtility(IRouteRequest, name=name)
+            if request_iface is None:
+                if use_global_views:
+                    bases = (IRequest,)
+                else:
+                    bases = ()
+                request_iface = route_request_iface(name, bases)
+                self.registry.registerUtility(
+                    request_iface, IRouteRequest, name=name)
+
+        def register_connect():
+            return mapper.connect(name, pattern, factory, predicates=predicates,
+                                  pregenerator=pregenerator, static=static)
+
+
+        # We have to connect routes in the order they were provided;
+        # we can't use a phase to do that, because when the actions are
+        # sorted, actions in the same phase lose relative ordering
+        self.action(('route-connect', name), register_connect)
+
+        # But IRouteRequest interfaces must be registered before we begin to
+        # process view registrations (in phase 3)
+        self.action(('route', name), register_route_request_iface,
+                    order=PHASE2_CONFIG)
+
+        # deprecated adding views from add_route; must come after
+        # route registration for purposes of autocommit ordering
         if any([view, view_context, view_permission, view_renderer,
                 view_for, for_, permission, renderer, view_attr]):
             self._add_view_from_route(
@@ -369,23 +394,6 @@ class RoutesConfiguratorMixin(object):
                 renderer=view_renderer or renderer,
                 attr=view_attr,
             )
-
-        mapper = self.get_routes_mapper()
-
-        factory = self.maybe_dotted(factory)
-        if pattern is None:
-            pattern = path
-        if pattern is None:
-            raise ConfigurationError('"pattern" argument may not be None')
-
-        if self.route_prefix:
-            pattern = self.route_prefix.rstrip('/') + '/' + pattern.lstrip('/')
-
-        discriminator = ('route', name)
-        self.action(discriminator, None)
-
-        return mapper.connect(name, pattern, factory, predicates=predicates,
-                              pregenerator=pregenerator, static=static)
 
     def get_routes_mapper(self):
         """ Return the :term:`routes mapper` object associated with

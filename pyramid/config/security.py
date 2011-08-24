@@ -1,6 +1,9 @@
 from pyramid.interfaces import IAuthorizationPolicy
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.interfaces import IDefaultPermission
+from pyramid.interfaces import PHASE1_CONFIG
+from pyramid.interfaces import PHASE2_CONFIG
+from pyramid.interfaces import PHASE3_CONFIG
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.config.util import action_method
@@ -18,18 +21,16 @@ class SecurityConfiguratorMixin(object):
            can be used to achieve the same purpose.
         
         """
-        self._set_authentication_policy(policy)
-        def ensure():
-            if self.autocommit:
-                return
+        def register():
+            self._set_authentication_policy(policy)
             if self.registry.queryUtility(IAuthorizationPolicy) is None:
                 raise ConfigurationError(
                     'Cannot configure an authentication policy without '
                     'also configuring an authorization policy '
-                    '(see the set_authorization_policy method)')
-        self.action(IAuthenticationPolicy, callable=ensure)
+                    '(use the set_authorization_policy method)')
+        # authentication policy used by view config (phase 3)
+        self.action(IAuthenticationPolicy, register, order=PHASE2_CONFIG)
 
-    @action_method
     def _set_authentication_policy(self, policy):
         policy = self.maybe_dotted(policy)
         self.registry.registerUtility(policy, IAuthenticationPolicy)
@@ -45,16 +46,22 @@ class SecurityConfiguratorMixin(object):
            :class:`pyramid.config.Configurator` constructor
            can be used to achieve the same purpose.
         """
-        self._set_authorization_policy(policy)
+        def register():
+            self._set_authorization_policy(policy)
         def ensure():
+            if self.autocommit:
+                return
             if self.registry.queryUtility(IAuthenticationPolicy) is None:
                 raise ConfigurationError(
-                    'Cannot configure an authorization policy without also '
-                    'configuring an authentication policy '
-                    '(see the set_authentication_policy method)')
-        self.action(IAuthorizationPolicy, callable=ensure)
+                    'Cannot configure an authorization policy without '
+                    'also configuring an authentication policy '
+                    '(use the set_authorization_policy method)')
+            
+        # authorization policy used by view config (phase 3) and
+        # authentication policy (phase 2)
+        self.action(IAuthorizationPolicy, register, order=PHASE1_CONFIG)
+        self.action(None, ensure, order=PHASE3_CONFIG)
 
-    @action_method
     def _set_authorization_policy(self, policy):
         policy = self.maybe_dotted(policy)
         self.registry.registerUtility(policy, IAuthorizationPolicy)
@@ -96,8 +103,9 @@ class SecurityConfiguratorMixin(object):
            :class:`pyramid.config.Configurator` constructor
            can be used to achieve the same purpose.
         """
-        # default permission used during view registration
-        self.registry.registerUtility(permission, IDefaultPermission)
-        self.action(IDefaultPermission, None)
+        # default permission used during view registration (phase 3)
+        def register():
+            self.registry.registerUtility(permission, IDefaultPermission)
+        self.action(IDefaultPermission, register, order=PHASE1_CONFIG)
 
 

@@ -344,6 +344,71 @@ class TestExceptionViewsApp(IntegrationBase):
         res = self.testapp.get('/route_raise_exception4', status=200)
         self.assertTrue('whoa' in res.body)
 
+class TestConflictApp(unittest.TestCase):
+    package = 'pyramid.tests.conflictapp'
+    def _makeConfig(self):
+        from pyramid.config import Configurator
+        config = Configurator()
+        return config
+
+    def test_autoresolved_view(self):
+        config = self._makeConfig()
+        config.include(self.package)
+        app = config.make_wsgi_app()
+        from webtest import TestApp
+        self.testapp = TestApp(app)
+        res = self.testapp.get('/')
+        self.assertTrue('a view' in res.body)
+        res = self.testapp.get('/route')
+        self.assertTrue('route view' in res.body)
+
+    def test_overridden_autoresolved_view(self):
+        from pyramid.response import Response
+        config = self._makeConfig()
+        config.include(self.package)
+        def thisview(request):
+            return Response('this view')
+        config.add_view(thisview)
+        app = config.make_wsgi_app()
+        from webtest import TestApp
+        self.testapp = TestApp(app)
+        res = self.testapp.get('/')
+        self.assertTrue('this view' in res.body)
+
+    def test_overridden_route_view(self):
+        from pyramid.response import Response
+        config = self._makeConfig()
+        config.include(self.package)
+        def thisview(request):
+            return Response('this view')
+        config.add_view(thisview, route_name='aroute')
+        app = config.make_wsgi_app()
+        from webtest import TestApp
+        self.testapp = TestApp(app)
+        res = self.testapp.get('/route')
+        self.assertTrue('this view' in res.body)
+
+    def test_nonoverridden_authorization_policy(self):
+        config = self._makeConfig()
+        config.include(self.package)
+        app = config.make_wsgi_app()
+        from webtest import TestApp
+        self.testapp = TestApp(app)
+        res = self.testapp.get('/protected', status=403)
+        self.assertTrue('403 Forbidden' in res)
+
+    def test_overridden_authorization_policy(self):
+        config = self._makeConfig()
+        config.include(self.package)
+        from pyramid.testing import DummySecurityPolicy
+        config.set_authorization_policy(DummySecurityPolicy('fred'))
+        config.set_authentication_policy(DummySecurityPolicy(permissive=True))
+        app = config.make_wsgi_app()
+        from webtest import TestApp
+        self.testapp = TestApp(app)
+        res = self.testapp.get('/protected', status=200)
+        self.assertTrue('protected view' in res)
+
 class ImperativeIncludeConfigurationTest(unittest.TestCase):
     def setUp(self):
         from pyramid.config import Configurator
