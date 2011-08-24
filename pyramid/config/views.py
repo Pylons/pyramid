@@ -1047,8 +1047,8 @@ class ViewsConfiguratorMixin(object):
 
         discriminator = [
             'view', context, name, request_type, IView, containment,
-            request_param, request_method, match_param, route_name, attr,
-            xhr, accept, header, path_info]
+            request_param, request_method, route_name, attr,
+            xhr, accept, header, path_info, match_param]
         discriminator.extend(sorted(custom_predicates))
         discriminator = tuple(discriminator)
         self.action(discriminator, register, order=PHASE3_CONFIG)
