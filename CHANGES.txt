@@ -1,6 +1,14 @@
 Next release
 ============
 
+- When a ``renderers=`` argument is not specified to the Configurator
+  constructor, eagerly register and commit the default renderer set.  This
+  permits the overriding of the default renderers, which was broken in 1.2a1
+  without a commit directly after Configurator construction.
+
+1.2a1 (2011-08-24)
+==================
+
 Features
 --------
 
@@ -170,6 +178,33 @@ Backwards Incompatibilities
   ``pyramid.config.Configurator.include``, it will break.  You now must now
   instead make a separate call to the method for each callable.  This change
   was introduced to support the ``route_prefix`` feature of include.
+
+- It may be necessary to more strictly order configuration route and view
+  statements when using an "autocommitting" Configurator.  In the past, it
+  was possible to add a view which named a route name before adding a route
+  with that name when you used an autocommitting configurator.  For example::
+
+    config = Configurator(autocommit=True)
+    config.add_view('my.pkg.someview', route_name='foo')
+    config.add_route('foo', '/foo')
+
+  The above will raise an exception when the view attempts to add itself.
+  Now you must add the route before adding the view::
+
+    config = Configurator(autocommit=True)
+    config.add_route('foo', '/foo')
+    config.add_view('my.pkg.someview', route_name='foo')
+
+  This won't effect "normal" users, only people who have legacy BFG codebases
+  that used an autommitting configurator and possibly tests that use the
+  configurator API (the configurator returned by ``pyramid.testing.setUp`` is
+  an autocommitting configurator).  The right way to get around this is to
+  use a non-autocommitting configurator (the default), which does not have
+  these directive ordering requirements.
+
+- The ``pyramid.config.Configurator.add_route`` directive no longer returns a
+  route object.  This change was required to make route vs. view
+  configuration processing work properly.
 
 Documentation
 -------------

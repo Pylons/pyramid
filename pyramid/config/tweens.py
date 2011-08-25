@@ -1,6 +1,7 @@
 from zope.interface import implements
 
 from pyramid.interfaces import ITweens
+from pyramid.interfaces import PHASE3_CONFIG
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.tweens import excview_tween_factory
@@ -128,17 +129,20 @@ class TweensConfiguratorMixin(object):
             raise ConfigurationError('%s cannot be under MAIN' % name)
 
         registry = self.registry
+
         tweens = registry.queryUtility(ITweens)
         if tweens is None:
             tweens = Tweens()
             registry.registerUtility(tweens, ITweens)
             tweens.add_implicit(EXCVIEW, excview_tween_factory, over=MAIN)
-        if explicit:
-            tweens.add_explicit(name, tween_factory)
-        else:
-            tweens.add_implicit(name, tween_factory, under=under, over=over)
 
-        self.action(('tween', name, explicit))
+        def register():
+            if explicit:
+                tweens.add_explicit(name, tween_factory)
+            else:
+                tweens.add_implicit(name, tween_factory, under=under, over=over)
+
+        self.action(('tween', name, explicit), register, order=PHASE3_CONFIG)
 
 class CyclicDependencyError(Exception):
     def __init__(self, cycles):

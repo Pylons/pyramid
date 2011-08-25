@@ -8,11 +8,11 @@ Should-Have
   deploying via proxy:
   https://docs.pylonsproject.org/projects/pyramid_cookbook/dev/deployment/nginx.html#step-2-starting-paster
 
-- Fix conflict behavior for routes and auth policies (define phases and use
-  order=).
-
 Nice-to-Have
 ------------
+
+- Add a default-view-config-params decorator that can be applied to a class
+  which names defaults for method-based view_config decorator options.
 
 - Flesh out "paste" chapter.
 

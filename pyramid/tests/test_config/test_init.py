@@ -103,6 +103,7 @@ class ConfiguratorTests(unittest.TestCase):
         this_pkg = sys.modules['pyramid.tests.test_config']
         self.assertTrue(config.registry.getUtility(ISettings))
         self.assertEqual(config.package, this_pkg)
+        config.commit()
         self.assertTrue(config.registry.getUtility(IRendererFactory, 'json'))
         self.assertTrue(config.registry.getUtility(IRendererFactory, 'string'))
         if not __pypy__:
@@ -185,6 +186,7 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IAuthenticationPolicy
         policy = object()
         config = self._makeOne(authentication_policy=policy)
+        config.commit()
         result = config.registry.getUtility(IAuthenticationPolicy)
         self.assertEqual(policy, result)
 
@@ -205,12 +207,21 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IRendererFactory
         renderer = object()
         config = self._makeOne(renderers=[('yeah', renderer)])
+        config.commit()
         self.assertEqual(config.registry.getUtility(IRendererFactory, 'yeah'),
                          renderer)
+
+    def test_ctor_default_renderers(self):
+        from pyramid.interfaces import IRendererFactory
+        from pyramid.renderers import json_renderer_factory
+        config = self._makeOne()
+        self.assertEqual(config.registry.getUtility(IRendererFactory, 'json'),
+                         json_renderer_factory)
 
     def test_ctor_default_permission(self):
         from pyramid.interfaces import IDefaultPermission
         config = self._makeOne(default_permission='view')
+        config.commit()
         self.assertEqual(config.registry.getUtility(IDefaultPermission), 'view')
 
     def test_ctor_session_factory(self):
@@ -224,6 +235,7 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IViewMapperFactory
         mapper = object()
         config = self._makeOne(default_view_mapper=mapper)
+        config.commit()
         self.assertEqual(config.registry.getUtility(IViewMapperFactory),
                          mapper)
 
@@ -463,6 +475,7 @@ class ConfiguratorTests(unittest.TestCase):
         reg = Registry()
         config = self._makeOne(reg)
         config.setup_registry(authentication_policy=policy)
+        config.commit()
         result = reg.getUtility(IAuthenticationPolicy)
         self.assertEqual(policy, result)
 
@@ -472,6 +485,7 @@ class ConfiguratorTests(unittest.TestCase):
         reg = Registry()
         config = self._makeOne(reg)
         config.setup_registry(authentication_policy='pyramid.tests')
+        config.commit()
         result = reg.getUtility(IAuthenticationPolicy)
         import pyramid.tests
         self.assertEqual(result, pyramid.tests)
@@ -484,6 +498,7 @@ class ConfiguratorTests(unittest.TestCase):
         dummy = object()
         config.setup_registry(authentication_policy=dummy,
                               authorization_policy='pyramid.tests')
+        config.commit()
         result = reg.getUtility(IAuthorizationPolicy)
         import pyramid.tests
         self.assertEqual(result, pyramid.tests)
@@ -607,6 +622,7 @@ class ConfiguratorTests(unittest.TestCase):
         reg = Registry()
         config = self._makeOne(reg)
         config.setup_registry(renderers=[('yeah', renderer)])
+        config.commit()
         self.assertEqual(reg.getUtility(IRendererFactory, 'yeah'),
                          renderer)
 
@@ -616,6 +632,7 @@ class ConfiguratorTests(unittest.TestCase):
         reg = Registry()
         config = self._makeOne(reg)
         config.setup_registry(default_permission='view')
+        config.commit()
         self.assertEqual(reg.getUtility(IDefaultPermission), 'view')
 
     def test_setup_registry_includes(self):
@@ -1913,71 +1930,33 @@ pyramid.tests.test_config.dummy_include2""",
 
     def test_add_view_with_route_name(self):
         from pyramid.renderers import null_renderer
-        from zope.component import ComponentLookupError
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view, route_name='foo', renderer=null_renderer)
-        self.assertEqual(len(config.registry.deferred_route_views), 1)
-        infos = config.registry.deferred_route_views['foo']
-        self.assertEqual(len(infos), 1)
-        info = infos[0]
-        self.assertEqual(info['route_name'], 'foo')
-        self.assertEqual(info['view'], view)
-        self.assertRaises(ComponentLookupError,
-                          self._getRouteRequestIface, config, 'foo')
-        wrapper = self._getViewCallable(config, None)
-        self.assertEqual(wrapper, None)
         config.add_route('foo', '/a/b')
+        config.add_view(view=view, route_name='foo', renderer=null_renderer)
         request_iface = self._getRouteRequestIface(config, 'foo')
         self.assertNotEqual(request_iface, None)
         wrapper = self._getViewCallable(config, request_iface=request_iface)
         self.assertNotEqual(wrapper, None)
         self.assertEqual(wrapper(None, None), 'OK')
 
-    def test_add_view_with_route_name_deferred_views_already_exist(self):
+    def test_add_view_with_nonexistant_route_name(self):
+        from pyramid.renderers import null_renderer
+        from zope.configuration.config import ConfigurationExecutionError
         view = lambda *arg: 'OK'
-        config = self._makeOne(autocommit=True)
-        config.registry.deferred_route_views = {'bar':[]}
-        config.add_view(view=view, route_name='foo')
-        self.assertEqual(len(config.registry.deferred_route_views), 2)
-        self.assertEqual(config.registry.deferred_route_views['bar'], [])
-        infos = config.registry.deferred_route_views['foo']
-        self.assertEqual(len(infos), 1)
-
-    def test_deferred_route_views_retains_custom_predicates(self):
-        view = lambda *arg: 'OK'
-        config = self._makeOne(autocommit=True)
-        config.add_view(view=view, route_name='foo', custom_predicates=('123',))
-        self.assertEqual(len(config.registry.deferred_route_views), 1)
-        infos = config.registry.deferred_route_views['foo']
-        self.assertEqual(len(infos), 1)
-        info = infos[0]
-        self.assertEqual(info['route_name'], 'foo')
-        self.assertEqual(info['custom_predicates'], ('123',))
+        config = self._makeOne()
+        config.add_view(view=view, route_name='foo', renderer=null_renderer)
+        self.assertRaises(ConfigurationExecutionError, config.commit)
 
     def test_add_view_with_route_name_exception(self):
         from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
-        from zope.component import ComponentLookupError
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
+        config.add_route('foo', '/a/b')
         config.add_view(view=view, route_name='foo', context=RuntimeError,
                         renderer=null_renderer)
-        self.assertEqual(len(config.registry.deferred_route_views), 1)
-        infos = config.registry.deferred_route_views['foo']
-        self.assertEqual(len(infos), 1)
-        info = infos[0]
-        self.assertEqual(info['route_name'], 'foo')
-        self.assertEqual(info['view'], view)
-        self.assertRaises(ComponentLookupError,
-                          self._getRouteRequestIface, config, 'foo')
-        wrapper_exc_view = self._getViewCallable(
-            config, ctx_iface=implementedBy(RuntimeError),
-            exception_view=True)
-        self.assertEqual(wrapper_exc_view, None)
-        config.add_route('foo', '/a/b')
         request_iface = self._getRouteRequestIface(config, 'foo')
-        self.assertNotEqual(request_iface, None)
         wrapper_exc_view = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError),
             request_iface=request_iface, exception_view=True)
@@ -2351,45 +2330,40 @@ pyramid.tests.test_config.dummy_include2""",
 
     def test_add_route_defaults(self):
         config = self._makeOne(autocommit=True)
-        route = config.add_route('name', 'path')
+        config.add_route('name', 'path')
         self._assertRoute(config, 'name', 'path')
-        self.assertEqual(route.name, 'name')
 
     def test_add_route_with_route_prefix(self):
         config = self._makeOne(autocommit=True)
         config.route_prefix = 'root'
-        route = config.add_route('name', 'path')
-        self.assertEqual(route.name, 'name')
-        self.assertEqual(route.pattern, 'root/path')
-
+        config.add_route('name', 'path')
         self._assertRoute(config, 'name', 'root/path')
 
     def test_add_route_discriminator(self):
         config = self._makeOne()
-        route = config.add_route('name', 'path')
-        self._assertRoute(config, 'name', 'path')
-        self.assertEqual(route.name, 'name')
+        config.add_route('name', 'path')
         self.assertEqual(config._ctx.actions[-1][0], ('route', 'name'))
 
     def test_add_route_with_factory(self):
         config = self._makeOne(autocommit=True)
         factory = object()
-        route = config.add_route('name', 'path', factory=factory)
+        config.add_route('name', 'path', factory=factory)
+        route = self._assertRoute(config, 'name', 'path')
         self.assertEqual(route.factory, factory)
 
     def test_add_route_with_static(self):
         config = self._makeOne(autocommit=True)
-        route = config.add_route('name', 'path/{foo}', static=True)
-        self.assertEqual(route.name, 'name')
+        config.add_route('name', 'path/{foo}', static=True)
         mapper = config.get_routes_mapper()
         self.assertEqual(len(mapper.get_routes()), 0)
         self.assertEqual(mapper.generate('name', {"foo":"a"}), '/path/a')
 
     def test_add_route_with_factory_dottedname(self):
         config = self._makeOne(autocommit=True)
-        route = config.add_route(
+        config.add_route(
             'name', 'path',
             factory='pyramid.tests.test_config.dummyfactory')
+        route = self._assertRoute(config, 'name', 'path')
         self.assertEqual(route.factory, dummyfactory)
 
     def test_add_route_with_xhr(self):
@@ -2474,9 +2448,8 @@ pyramid.tests.test_config.dummy_include2""",
 
     def test_add_route_no_pattern_with_path(self):
         config = self._makeOne(autocommit=True)
-        route = config.add_route('name', path='path')
+        config.add_route('name', path='path')
         self._assertRoute(config, 'name', 'path')
-        self.assertEqual(route.name, 'name')
 
     def test_add_route_no_path_no_pattern(self):
         from pyramid.exceptions import ConfigurationError
@@ -2485,7 +2458,8 @@ pyramid.tests.test_config.dummy_include2""",
 
     def test_add_route_with_pregenerator(self):
         config = self._makeOne(autocommit=True)
-        route = config.add_route('name', 'pattern', pregenerator='123')
+        config.add_route('name', 'pattern', pregenerator='123')
+        route = self._assertRoute(config, 'name', 'pattern')
         self.assertEqual(route.pregenerator, '123')
 
     def test_add_route_no_view_with_view_attr(self):
@@ -2554,6 +2528,7 @@ pyramid.tests.test_config.dummy_include2""",
             def __call__(self, *arg, **kw):
                 return 'moo'
         config.add_renderer(None, moo)
+        config.commit()
         def view(request):
             return 'OK'
         result = config.derive_view(view)
@@ -2572,6 +2547,7 @@ pyramid.tests.test_config.dummy_include2""",
         config = self._makeOne()
         config.add_renderer(None, moo)
         config.add_renderer('foo', foo)
+        config.commit()
         result = config.derive_view(view, renderer='foo')
         self.assertFalse(result is view)
         request = self._makeRequest(config)
@@ -2786,81 +2762,6 @@ pyramid.tests.test_config.dummy_include2""",
         finally:
             config.end()
         self.assertTrue('div' in result.body)
-
-    def test_set_authentication_policy_no_authz_policy(self):
-        from zope.configuration.config import ConfigurationExecutionError
-        config = self._makeOne()
-        policy = object()
-        config.set_authentication_policy(policy)
-        self.assertRaises(ConfigurationExecutionError, config.commit)
-
-    def test_set_authentication_policy_no_authz_policy_autocommit(self):
-        from pyramid.interfaces import IAuthenticationPolicy
-        config = self._makeOne(autocommit=True)
-        policy = object()
-        config.set_authentication_policy(policy)
-        self.assertEqual(
-            config.registry.getUtility(IAuthenticationPolicy), policy)
-
-    def test_set_authentication_policy_with_authz_policy(self):
-        from pyramid.interfaces import IAuthenticationPolicy
-        from pyramid.interfaces import IAuthorizationPolicy
-        config = self._makeOne()
-        authn_policy = object()
-        authz_policy = object()
-        config.registry.registerUtility(authz_policy, IAuthorizationPolicy)
-        config.set_authentication_policy(authn_policy)
-        config.commit()
-        self.assertEqual(
-            config.registry.getUtility(IAuthenticationPolicy), authn_policy)
-
-    def test_set_authentication_policy_with_authz_policy_autocommit(self):
-        from pyramid.interfaces import IAuthenticationPolicy
-        from pyramid.interfaces import IAuthorizationPolicy
-        config = self._makeOne(autocommit=True)
-        authn_policy = object()
-        authz_policy = object()
-        config.registry.registerUtility(authz_policy, IAuthorizationPolicy)
-        config.set_authentication_policy(authn_policy)
-        config.commit()
-        self.assertEqual(
-            config.registry.getUtility(IAuthenticationPolicy), authn_policy)
-
-    def test_set_authorization_policy_no_authn_policy(self):
-        from zope.configuration.config import ConfigurationExecutionError
-        config = self._makeOne()
-        policy = object()
-        config.set_authorization_policy(policy)
-        self.assertRaises(ConfigurationExecutionError, config.commit)
-
-    def test_set_authorization_policy_no_authn_policy_autocommit(self):
-        from pyramid.exceptions import ConfigurationError
-        config = self._makeOne(autocommit=True)
-        policy = object()
-        self.assertRaises(ConfigurationError,
-                          config.set_authorization_policy, policy)
-
-    def test_set_authorization_policy_with_authn_policy(self):
-        from pyramid.interfaces import IAuthorizationPolicy
-        from pyramid.interfaces import IAuthenticationPolicy
-        config = self._makeOne()
-        authn_policy = object()
-        authz_policy = object()
-        config.registry.registerUtility(authn_policy, IAuthenticationPolicy)
-        config.set_authorization_policy(authz_policy)
-        self.assertEqual(
-            config.registry.getUtility(IAuthorizationPolicy), authz_policy)
-
-    def test_set_authorization_policy_with_authn_policy_autocommit(self):
-        from pyramid.interfaces import IAuthorizationPolicy
-        from pyramid.interfaces import IAuthenticationPolicy
-        config = self._makeOne(autocommit=True)
-        authn_policy = object()
-        authz_policy = object()
-        config.registry.registerUtility(authn_policy, IAuthenticationPolicy)
-        config.set_authorization_policy(authz_policy)
-        self.assertEqual(
-            config.registry.getUtility(IAuthorizationPolicy), authz_policy)
 
     def test_set_locale_negotiator(self):
         from pyramid.interfaces import ILocaleNegotiator
@@ -3830,11 +3731,13 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
         try:
             config.commit()
         except ConfigurationConflictError, why:
-            c1, c2, c3, c4 = self._conflictFunctions(why)
+            c1, c2, c3, c4, c5, c6 = self._conflictFunctions(why)
             self.assertEqual(c1, 'test_conflict_route_with_view')
             self.assertEqual(c2, 'test_conflict_route_with_view')
             self.assertEqual(c3, 'test_conflict_route_with_view')
             self.assertEqual(c4, 'test_conflict_route_with_view')
+            self.assertEqual(c5, 'test_conflict_route_with_view')
+            self.assertEqual(c6, 'test_conflict_route_with_view')
         else: # pragma: no cover
             raise AssertionError
         

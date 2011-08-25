@@ -235,6 +235,7 @@ class AssetsConfiguratorMixin(object):
             from_package = sys.modules[package]
             to_package = sys.modules[override_package]
             override(from_package, path, to_package, override_prefix)
+
         self.action(None, register)
 
     override_resource = override_asset # bw compat

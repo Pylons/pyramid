@@ -176,6 +176,46 @@ Backwards Incompatibilities
   :meth:`pyramid.config.Configurator.include`, it will break.  You now must
   now instead make a separate call to the method for each callable.
 
+- It may be necessary to more strictly order configuration route and view
+  statements when using an "autocommitting" :term:`Configurator`.  In the
+  past, it was possible to add a view which named a route name before adding
+  a route with that name when you used an autocommitting configurator.  For
+  example:
+
+  .. code-block:: python
+
+     config = Configurator(autocommit=True)
+     config.add_view('my.pkg.someview', route_name='foo')
+     config.add_route('foo', '/foo')
+
+  The above will raise an exception when the view attempts to add itself.
+  Now you must add the route before adding the view:
+
+  .. code-block:: python
+
+     config = Configurator(autocommit=True)
+     config.add_route('foo', '/foo')
+     config.add_view('my.pkg.someview', route_name='foo')
+
+  This won't effect "normal" users, only people who have legacy BFG codebases
+  that used an autommitting configurator and possibly tests that use the
+  configurator API (the configurator returned by
+  :func:`pyramid.testing.setUp` is an autocommitting configurator).  The
+  right way to get around this is to use a default non-autocommitting
+  configurator, which does not have these directive ordering requirements:
+
+  .. code-block:: python
+
+     config = Configurator()
+     config.add_view('my.pkg.someview', route_name='foo')
+     config.add_route('foo', '/foo')
+
+   The above will work fine.
+
+- The :meth:`pyramid.config.Configurator.add_route` directive no longer
+  returns a route object.  This change was required to make route vs. view
+  configuration processing work properly.
+
 Documentation Enhancements
 --------------------------
 

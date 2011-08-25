@@ -987,7 +987,7 @@ class HTTPInsufficientStorage(HTTPServerError):
 def exception_response(status_code, **kw):
     """Creates an HTTP exception based on a status code. Example::
 
-        raise responsecode(404) # raises an HTTPNotFound exception.
+        raise exception_response(404) # raises an HTTPNotFound exception.
 
     The values passed as ``kw`` are provided to the exception's constructor.
     """
