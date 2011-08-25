@@ -945,3 +945,4 @@ Glossary
      log to a file, to UNIX syslog, to the Windows Event Log, or even to
      email. See its `documentation
      <https://docs.pylonsproject.org/projects/pyramid_exclog/dev/>`_.
+
