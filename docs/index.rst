@@ -9,6 +9,16 @@ development framework.  It is developed as part of the `Pylons Project
 <http://docs.pylonsproject.org/>`_.  It is licensed under a `BSD-like license
 <http://repoze.org/license.html>`_.
 
+Here is one of the simplest :app:`Pyramid` applications you can make.
+
+.. literalinclude:: narr/helloworld.py
+
+See :ref:`firstapp_chapter` for a full explanation of how this
+:ref:`helloworld_imperative` app works. Read the
+:ref:`narrative_documentation` to understand how :app:`Pyramid` is designed
+to scale from these simple beginnings to handle the largest of web
+application needs.
+
 Front Matter
 ============
 
@@ -27,6 +37,8 @@ Front Matter
    whatsnew-1.2
    whatsnew-1.1
    whatsnew-1.0
+
+.. _narrative_documentation:
 
 Narrative documentation
 =======================
