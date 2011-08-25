@@ -13,11 +13,11 @@ Here is one of the simplest :app:`Pyramid` applications you can make.
 
 .. literalinclude:: narr/helloworld.py
 
-See :ref:`firstapp_chapter` for a full explanation of how this :ref:`helloworld_imperative`
-app works. Read the :ref:`narrative_documentation` to understand how :app:`Pyramid` is designed
-to scale from these simple beginnings to handle the largest of web application needs. If your
-familiar with other web frameworks you might want to look at :ref:`design_defense` to understand
-why :app:`Pyramid` has been designed the way it has.
+See :ref:`firstapp_chapter` for a full explanation of how this
+:ref:`helloworld_imperative` app works. Read the
+:ref:`narrative_documentation` to understand how :app:`Pyramid` is designed
+to scale from these simple beginnings to handle the largest of web
+application needs.
 
 Front Matter
 ============

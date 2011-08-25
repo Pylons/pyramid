@@ -20,7 +20,6 @@ Here's one of the very simplest :app:`Pyramid` applications:
 .. literalinclude:: helloworld.py
    :linenos:
 
-
 When this code is inserted into a Python script named ``helloworld.py`` and
 executed by a Python interpreter which has the :app:`Pyramid` software
 installed, an HTTP server is started on TCP port 8080:
@@ -30,8 +29,8 @@ installed, an HTTP server is started on TCP port 8080:
    $ python helloworld.py
    serving on 0.0.0.0:8080 view at http://127.0.0.1:8080
 
-When port 8080 is visited by a browser on the  URL (``/hello/world``), the server
-will simply serve up the text "Hello world!" 
+When port 8080 is visited by a browser on the URL ``/hello/world``, the
+server will simply serve up the text "Hello world!"
 
 Press ``Ctrl-C`` to stop the application.
 
@@ -46,7 +45,7 @@ statements:
 
 .. literalinclude:: helloworld.py
    :linenos:
-   :lines: 1-2
+   :lines: 1-3
 
 The script imports the :class:`~pyramid.config.Configurator` class from the
 :mod:`pyramid.config` module.  An instance of the
@@ -59,6 +58,9 @@ protocol to connect an application and a web server together.  The
 convenience, as the ``paste`` package is a dependency of :app:`Pyramid`
 itself.
 
+The script also imports the :class:`pyramid.response.Response` class for
+later use.  An instance of this class will be used to create a web response.
+
 View Callable Declarations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -70,8 +72,10 @@ named ``hello_world``.
    :pyobject: hello_world
 
 This function doesn't do anything very difficult.  The functions accepts a
-single argument (``request``).  The ``hello_world`` function returns a value
-computed from arguments matched from the url route.
+single argument (``request``).  The ``hello_world`` function returns an
+instance of the :class:`pyramid.response.Response`.  The single argument to
+the class' constructor is value computed from arguments matched from the url
+route.  This value becomes the body of the response.
 
 This function is known as a :term:`view callable`.  A view callable
 accepts a single argument, ``request``.  It is expected to return a
@@ -85,16 +89,11 @@ active :term:`WSGI` server.
 
 A view callable is required to return a :term:`response` object because a
 response object has all the information necessary to formulate an actual HTTP
-response; this object is then converted to text by the upstream :term:`WSGI`
-server and sent back to the requesting browser.  To return a response, each
-view callable creates an instance of the :class:`~pyramid.response.Response`
-class.  In the ``hello_world`` function, the string is passed.
-
-.. note:: As we'll see in later chapters, returning a literal
-   :term:`response` object from a view callable is not always required; we
-   can instead use a :term:`renderer` in our view configurations.  If we use
-   a renderer, our view callable is allowed to return a value that the
-   renderer understands, and the renderer generates a response on our behalf.
+response; this object is then converted to text by the :term:`WSGI` server
+which called Pyramid and it is sent back to the requesting browser.  To
+return a response, each view callable creates an instance of the
+:class:`~pyramid.response.Response` class.  In the ``hello_world`` function,
+a string is passed as the body to the response.
 
 .. index::
    single: imperative configuration
@@ -113,7 +112,7 @@ defined imports and function definitions, placed within the confines of an
 
 .. literalinclude:: helloworld.py
    :linenos:
-   :lines: 7-12
+   :lines: 8-13
 
 Let's break this down piece-by-piece.
 
@@ -122,7 +121,7 @@ Configurator Construction
 
 .. literalinclude:: helloworld.py
    :linenos:
-   :lines: 7-8
+   :lines: 8-9
 
 The ``if __name__ == '__main__':`` line in the code sample above represents a
 Python idiom: the code inside this if clause is not invoked unless the script
@@ -155,41 +154,15 @@ Adding Configuration
 .. ignore-next-block
 .. literalinclude:: helloworld.py
    :linenos:
-   :lines: 9-10
+   :lines: 10-11
 
-First line is to call the :meth:`pyramid.config.Configurator.add_route`
-which registers a :term:`route` to match any url with ``/hello/`` followed
-by a string. The :meth:`pyramid.config.Configurator.add_view` method of
-a configurator registers a :term:`view configuration` within the
-:term:`application registry`.  A :term:`view configuration` and
-:term:`route configuration` represents a set of circumstances related to the
-:term:`request` that will cause a specific :term:`view callable` to be
-invoked.  This "set of circumstances" is provided as one or more keyword
-arguments to the ``add_view`` method.  Each of these keyword arguments is
-known as a view configuration :term:`predicate`.
+First line above calls the :meth:`pyramid.config.Configurator.add_route`
+method, which registers a :term:`route` to match any url path that begins
+with ``/hello/`` followed by a string.
 
-The line ``config.add_view(hello_world, route_name='hello')`` registers the
-``hello_world`` function as a view callable.  The ``add_view`` method
-of a Configurator must be called with a view callable object or a
-:term:`dotted Python name` as its
-first argument, so the first argument passed is the ``hello_world`` function.
-This line calls ``add_view`` with a ``route_name`` ``predicate`` value of
-``hello``.  This means that we're instructing
-:app:`Pyramid` to invoke the ``hello_world`` view callable if the
-:term:`route` is matched is ``hello``.  In :app:`Pyramid` the use of a
-:term:`route` is only one of ways you can link a url to a :term:`view callable`
-and is called :term:`URL Dispatch`.
-
-Each invocation of the ``add_view`` method registers a :term:`view
-configuration`.  Each :term:`predicate` provided as a keyword argument to the
-``add_view`` method narrows the set of circumstances which would cause the
-view configuration's callable to be invoked.  In general, a greater number of
-predicates supplied along with a view configuration will more strictly limit
-the applicability of its associated view callable.  When :app:`Pyramid`
-processes a request, the view callable with the *most specific* view
-configuration (the view configuration that matches the most specific set of
-predicates) is always invoked. In this application, :app:`Pyramid` chooses the most specific view callable
-based only on view :term:`predicate` applicability.
+The second line, ``config.add_view(hello_world, route_name='hello')``,
+registers the ``hello_world`` function as a :term:`view callable` and makes
+sure that it will be called when the ``hello`` route is matched.
 
 .. index::
    single: make_wsgi_app
@@ -201,7 +174,7 @@ WSGI Application Creation
 .. ignore-next-block
 .. literalinclude:: helloworld.py
    :linenos:
-   :lines: 11
+   :lines: 12
 
 After configuring views and ending configuration, the script creates a WSGI
 *application* via the :meth:`pyramid.config.Configurator.make_wsgi_app`
@@ -230,7 +203,7 @@ WSGI Application Serving
 .. ignore-next-block
 .. literalinclude:: helloworld.py
    :linenos:
-   :lines: 12
+   :lines: 13
 
 Finally, we actually serve the application to requestors by starting up a
 WSGI server.  We happen to use the :func:`paste.httpserver.serve` WSGI server
@@ -243,9 +216,9 @@ from a local system.  We don't specify a TCP port number to listen on; this
 means we want to use the default TCP port, which is 8080.
 
 When this line is invoked, it causes the server to start listening on TCP
-port 8080.  It will serve requests forever, or at least until we stop it by
-killing the process which runs it (usually by pressing ``Ctrl-C`` in the
-terminal we used to start it).
+port 8080.  The server will serve requests forever, or at least until we stop
+it by killing the process which runs it (usually by pressing ``Ctrl-C`` in
+the terminal we used to start it).
 
 Conclusion
 ~~~~~~~~~~
