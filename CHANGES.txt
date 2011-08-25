@@ -6,6 +6,8 @@ Next release
   permits the overriding of the default renderers, which was broken in 1.2a1
   without a commit directly after Configurator construction.
 
+- Mako rendering exceptions had the wrong value for an error message.
+
 1.2a1 (2011-08-24)
 ==================
 
