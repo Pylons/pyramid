@@ -15,8 +15,8 @@ Here is one of the simplest :app:`Pyramid` applications you can make.
 
 See :ref:`firstapp_chapter` for a full explanation of how this
 :ref:`helloworld_imperative` app works. Read the
-:ref:`narrative_documentation` to understand how :app:`Pyramid` is designed
-to scale from these simple beginnings to handle the largest of web
+:ref:`html_narrative_documentation` to understand how :app:`Pyramid` is
+designed to scale from these simple beginnings to handle the largest of web
 application needs.
 
 Front Matter
@@ -38,7 +38,7 @@ Front Matter
    whatsnew-1.1
    whatsnew-1.0
 
-.. _narrative_documentation:
+.. _html_narrative_documentation:
 
 Narrative documentation
 =======================
