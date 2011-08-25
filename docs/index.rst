@@ -9,6 +9,29 @@ development framework.  It is developed as part of the `Pylons Project
 <http://docs.pylonsproject.org/>`_.  It is licensed under a `BSD-like license
 <http://repoze.org/license.html>`_.
 
+Here is one of the simplest :app:`Pyramid` applications you can make.
+
+.. code-block:: python
+
+   from paste.httpserver import serve
+   from pyramid.configuration import Configurator
+
+   def hello_world(request):
+      return 'Hello %(name)s!' % request.matchdict
+
+   if __name__ == '__main__':
+      config = Configurator()
+      config.add_route('hello', '/hello/{name}')
+      config.add_view(hello_world, route_name='hello')
+      app = config.make_wsgi_app()
+      serve(app, host='0.0.0.0')
+
+See :ref:`firstapp_chapter` for a full explanation of how this :ref:`helloworld_imperative`
+app works. Read the :ref:`narrative_documentation` to understand how :app:`Pyramid` is designed
+to scale from these simple beginnings to handle the largest of web application needs. If your
+familiar with other web frameworks you might want to look at :ref:`design_defense` to understand
+why :app:`Pyramid` has been designed the way it has.
+
 Front Matter
 ============
 
@@ -27,6 +50,8 @@ Front Matter
    whatsnew-1.2
    whatsnew-1.1
    whatsnew-1.0
+
+.. _narrative_documentation:
 
 Narrative documentation
 =======================
