@@ -62,7 +62,10 @@ Exception
         * 505 - HTTPVersionNotSupported
         * 507 - HTTPInsufficientStorage
 
-Each HTTP exception has the following attributes:
+HTTP exceptions are also :term:`response` objects, thus they accept most of
+the same parameters that can be passed to a regular
+:class:`~pyramid.response.Response`. Each HTTP exception also has the
+following attributes:
 
    ``code``
        the HTTP status code for the exception
@@ -86,7 +89,8 @@ Each HTTP exception has the following attributes:
        the explanation and further detail provided in the
        message.
 
-Each HTTP exception accepts the following parameters:
+Each HTTP exception accepts the following parameters, any others will
+be forwarded to its :class:`~pyramid.response.Response` superclass:
 
    ``detail``
      a plain-text override of the default ``detail``
@@ -101,6 +105,10 @@ Each HTTP exception accepts the following parameters:
    ``body_template``
      a ``string.Template`` object containing a content fragment in HTML
      that frames the explanation and further detail
+
+   ``body``
+     a string that will override the ``body_template`` and be used as the
+     body of the response.
 
 Substitution of response headers into template values is always performed.
 Substitution of WSGI environment values is performed if a ``request`` is
