@@ -50,6 +50,9 @@ Exception
         * 415 - HTTPUnsupportedMediaType
         * 416 - HTTPRequestRangeNotSatisfiable
         * 417 - HTTPExpectationFailed
+        * 422 - HTTPUnprocessableEntity
+        * 423 - HTTPLocked
+        * 424 - HTTPFailedDependency
       HTTPServerError
         * 500 - HTTPInternalServerError
         * 501 - HTTPNotImplemented
@@ -57,6 +60,7 @@ Exception
         * 503 - HTTPServiceUnavailable
         * 504 - HTTPGatewayTimeout
         * 505 - HTTPVersionNotSupported
+        * 507 - HTTPInsufficientStorage
 
 Each HTTP exception has the following attributes:
 

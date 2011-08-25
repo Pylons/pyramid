@@ -87,6 +87,12 @@
 
   .. autoclass:: HTTPExpectationFailed
 
+  .. autoclass:: HTTPUnprocessableEntity
+
+  .. autoclass:: HTTPLocked
+
+  .. autoclass:: HTTPFailedDependency
+
   .. autoclass:: HTTPInternalServerError
 
   .. autoclass:: HTTPNotImplemented
@@ -98,3 +104,5 @@
   .. autoclass:: HTTPGatewayTimeout
 
   .. autoclass:: HTTPVersionNotSupported
+
+  .. autoclass:: HTTPInsufficientStorage
