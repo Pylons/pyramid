@@ -11,20 +11,7 @@ development framework.  It is developed as part of the `Pylons Project
 
 Here is one of the simplest :app:`Pyramid` applications you can make.
 
-.. code-block:: python
-
-   from paste.httpserver import serve
-   from pyramid.configuration import Configurator
-
-   def hello_world(request):
-      return 'Hello %(name)s!' % request.matchdict
-
-   if __name__ == '__main__':
-      config = Configurator()
-      config.add_route('hello', '/hello/{name}')
-      config.add_view(hello_world, route_name='hello')
-      app = config.make_wsgi_app()
-      serve(app, host='0.0.0.0')
+.. literalinclude:: narr/helloworld.py
 
 See :ref:`firstapp_chapter` for a full explanation of how this :ref:`helloworld_imperative`
 app works. Read the :ref:`narrative_documentation` to understand how :app:`Pyramid` is designed
