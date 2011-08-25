@@ -149,8 +149,9 @@ class MakoLookupTemplateRenderer(object):
             try:
                 exc_info = sys.exc_info()
                 errtext = exceptions.text_error_template().render(
-                    error=exc_info[0],
-                    traceback=exc_info[2])
+                    error=exc_info[1],
+                    traceback=exc_info[2]
+                    )
                 raise MakoRenderingException(errtext)
             finally:
                 del exc_info
