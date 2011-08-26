@@ -13,6 +13,15 @@ Here is one of the simplest :app:`Pyramid` applications you can make.
 
 .. literalinclude:: narr/helloworld.py
 
+Which when saved to ``helloworld.py`` can be run by
+
+.. code-block:: text
+
+   $ easy_install pyramid
+   $ python helloworld.py
+   serving on 0.0.0.0:8080 view at http://127.0.0.1:8080
+
+
 See :ref:`firstapp_chapter` for a full explanation of how this
 :ref:`helloworld_imperative` app works. Read the
 :ref:`narrative_documentation` to understand how :app:`Pyramid` is designed
@@ -51,8 +60,8 @@ Narrative documentation in chapter form explaining how to use
 
    narr/introduction
    narr/install
-   narr/configuration
    narr/firstapp
+   narr/configuration
    narr/project
    narr/startup
    narr/urldispatch
