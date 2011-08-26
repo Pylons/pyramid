@@ -234,10 +234,11 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_ctor_session_factory(self):
         from pyramid.interfaces import ISessionFactory
-        config = self._makeOne(session_factory='factory')
+        factory = object()
+        config = self._makeOne(session_factory=factory)
         self.assertEqual(config.registry.queryUtility(ISessionFactory), None)
         config.commit()
-        self.assertEqual(config.registry.getUtility(ISessionFactory), 'factory')
+        self.assertEqual(config.registry.getUtility(ISessionFactory), factory)
 
     def test_ctor_default_view_mapper(self):
         from pyramid.interfaces import IViewMapperFactory
@@ -2786,21 +2787,6 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(config.registry.getUtility(ILocaleNegotiator),
                          dummyfactory)
 
-    def test_set_request_factory(self):
-        from pyramid.interfaces import IRequestFactory
-        config = self._makeOne(autocommit=True)
-        factory = object()
-        config.set_request_factory(factory)
-        self.assertEqual(config.registry.getUtility(IRequestFactory), factory)
-
-    def test_set_request_factory_dottedname(self):
-        from pyramid.interfaces import IRequestFactory
-        config = self._makeOne(autocommit=True)
-        config.set_request_factory(
-            'pyramid.tests.test_config.dummyfactory')
-        self.assertEqual(config.registry.getUtility(IRequestFactory),
-                         dummyfactory)
-
     def test_set_renderer_globals_factory(self):
         import warnings
         warnings.filterwarnings('ignore')
@@ -2851,13 +2837,6 @@ pyramid.tests.test_config.dummy_include2""",
         result = config.registry.getUtility(IViewMapperFactory)
         from pyramid.tests import test_config
         self.assertEqual(result, test_config)
-
-    def test_set_session_factory(self):
-        from pyramid.interfaces import ISessionFactory
-        config = self._makeOne(autocommit=True)
-        config.set_session_factory('factory')
-        self.assertEqual(config.registry.getUtility(ISessionFactory),
-                         'factory')
 
     def test_add_translation_dirs_missing_dir(self):
         from pyramid.exceptions import ConfigurationError

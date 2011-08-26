@@ -32,14 +32,15 @@ class FactoriesConfiguratorMixin(object):
     @action_method
     def set_session_factory(self, session_factory):
         """
-        Configure the application with a :term:`session factory`.  If
-        this method is called, the ``session_factory`` argument must
-        be a session factory callable.
+        Configure the application with a :term:`session factory`.  If this
+        method is called, the ``session_factory`` argument must be a session
+        factory callable or a :term:`dotted Python name` to that factory.
 
         .. note:: Using the ``session_factory`` argument to the
            :class:`pyramid.config.Configurator` constructor
            can be used to achieve the same purpose.
         """
+        session_factory = self.maybe_dotted(session_factory)
         def register():
             self.registry.registerUtility(session_factory, ISessionFactory)
         self.action(ISessionFactory, register, order=PHASE3_CONFIG)

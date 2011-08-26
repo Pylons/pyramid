@@ -293,10 +293,8 @@ class Configurator(
                 
         registry.registerUtility(debug_logger, IDebugLogger)
 
-        if renderers is None:
-            for name, renderer in DEFAULT_RENDERERS:
-                self.add_renderer(name, renderer)
-            renderers = []
+        for name, renderer in DEFAULT_RENDERERS:
+            self.add_renderer(name, renderer)
 
         if exceptionresponse_view is not None:
             exceptionresponse_view = self.maybe_dotted(exceptionresponse_view)
@@ -325,14 +323,16 @@ class Configurator(
 
         if authorization_policy:
             self.set_authorization_policy(authorization_policy)
+
         if authentication_policy:
             self.set_authentication_policy(authentication_policy)
 
         if default_view_mapper is not None:
             self.set_view_mapper(default_view_mapper)
 
-        for name, renderer in renderers:
-            self.add_renderer(name, renderer)
+        if renderers:
+            for name, renderer in renderers:
+                self.add_renderer(name, renderer)
 
         if root_factory is not None:
             self.set_root_factory(root_factory)
