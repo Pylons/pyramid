@@ -8,6 +8,10 @@ Next release
 
 - Mako rendering exceptions had the wrong value for an error message.
 
+- An include could not set a root factory successfully because the
+  Configurator constructor unconditionally registered one that would be
+  treated as if it were "the word of the user".
+
 1.2a1 (2011-08-24)
 ==================
 

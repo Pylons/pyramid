@@ -201,7 +201,15 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         self.assertEqual(config.registry.queryUtility(IRootFactory), None)
         config.commit()
-        self.assertTrue(config.registry.getUtility(IRootFactory))
+        self.assertEqual(config.registry.queryUtility(IRootFactory), None)
+
+    def test_ctor_with_root_factory(self):
+        from pyramid.interfaces import IRootFactory
+        factory = object()
+        config = self._makeOne(root_factory=factory)
+        self.assertEqual(config.registry.queryUtility(IRootFactory), None)
+        config.commit()
+        self.assertEqual(config.registry.queryUtility(IRootFactory), factory)
 
     def test_ctor_alternate_renderers(self):
         from pyramid.interfaces import IRendererFactory
@@ -512,15 +520,14 @@ class ConfiguratorTests(unittest.TestCase):
         config.setup_registry(authorization_policy=policy)
         config = self.assertRaises(ConfigurationExecutionError, config.commit)
 
-    def test_setup_registry_default_root_factory(self):
+    def test_setup_registry_no_default_root_factory(self):
         from pyramid.registry import Registry
         from pyramid.interfaces import IRootFactory
         reg = Registry()
         config = self._makeOne(reg)
         config.setup_registry()
-        self.assertEqual(reg.queryUtility(IRootFactory), None)
         config.commit()
-        self.assertTrue(reg.getUtility(IRootFactory))
+        self.assertEqual(reg.queryUtility(IRootFactory), None)
 
     def test_setup_registry_dottedname_root_factory(self):
         from pyramid.registry import Registry

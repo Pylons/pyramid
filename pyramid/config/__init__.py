@@ -334,7 +334,8 @@ class Configurator(
         for name, renderer in renderers:
             self.add_renderer(name, renderer)
 
-        self.set_root_factory(root_factory)
+        if root_factory is not None:
+            self.set_root_factory(root_factory)
 
         if locale_negotiator:
             self.set_locale_negotiator(locale_negotiator)
