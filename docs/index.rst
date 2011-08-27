@@ -9,11 +9,11 @@ development framework.  It is developed as part of the `Pylons Project
 <http://docs.pylonsproject.org/>`_.  It is licensed under a `BSD-like license
 <http://repoze.org/license.html>`_.
 
-Here is one of the simplest :app:`Pyramid` applications you can make.
+Here is one of the simplest :app:`Pyramid` applications you can make:
 
 .. literalinclude:: narr/helloworld.py
 
-Which when saved to ``helloworld.py`` can be run by
+When saved to ``helloworld.py``, the above application can be run via:
 
 .. code-block:: text
 
@@ -22,11 +22,10 @@ Which when saved to ``helloworld.py`` can be run by
    serving on 0.0.0.0:8080 view at http://127.0.0.1:8080
 
 
-See :ref:`firstapp_chapter` for a full explanation of how this
-:ref:`helloworld_imperative` app works. Read the
-:ref:`html_narrative_documentation` to understand how :app:`Pyramid` is
-designed to scale from these simple beginnings to handle the largest of web
-application needs.
+See :ref:`firstapp_chapter` for a full explanation of how this application
+works. Read the :ref:`html_narrative_documentation` to understand how
+:app:`Pyramid` is designed to scale from simple beginnings like this to the
+largest of web applications.
 
 Front Matter
 ============
