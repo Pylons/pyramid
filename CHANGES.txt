@@ -1,5 +1,8 @@
-Next release
-============
+1.2a2 (2011-08-27)
+==================
+
+Bug Fixes
+---------
 
 - When a ``renderers=`` argument is not specified to the Configurator
   constructor, eagerly register and commit the default renderer set.  This
@@ -11,6 +14,9 @@ Next release
 - An include could not set a root factory successfully because the
   Configurator constructor unconditionally registered one that would be
   treated as if it were "the word of the user".
+
+Features
+--------
 
 - A session factory can now be passed in using the dotted name syntax.
 
