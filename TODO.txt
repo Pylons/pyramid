@@ -11,6 +11,8 @@ Should-Have
 Nice-to-Have
 ------------
 
+- Expose ``onerror`` callback to venusian scan (requires venusian >=1.0a1).
+
 - Add a default-view-config-params decorator that can be applied to a class
   which names defaults for method-based view_config decorator options.
 
