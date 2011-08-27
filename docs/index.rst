@@ -21,6 +21,8 @@ When saved to ``helloworld.py``, the above application can be run via:
    $ python helloworld.py
    serving on 0.0.0.0:8080 view at http://127.0.0.1:8080
 
+And when you visit ``http://localhost:8080/hello/world`` in a browser, you
+will see the text ``Hello, world!``.
 
 See :ref:`firstapp_chapter` for a full explanation of how this application
 works. Read the :ref:`html_narrative_documentation` to understand how
