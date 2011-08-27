@@ -24,8 +24,8 @@ When saved to ``helloworld.py``, the above application can be run via:
 
 See :ref:`firstapp_chapter` for a full explanation of how this application
 works. Read the :ref:`html_narrative_documentation` to understand how
-:app:`Pyramid` is designed to scale from simple beginnings like this to the
-largest of web applications.
+:app:`Pyramid` is designed to scale from simple applications like this to
+very large web applications.
 
 Front Matter
 ============
