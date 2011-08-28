@@ -289,7 +289,8 @@ class TestViewConfigDecorator(unittest.TestCase):
         def foo(): pass
         wrapped = decorator(foo)
         self.assertTrue(wrapped is foo)
-        settings = call_venusian(venusian)
+        config = call_venusian(venusian)
+        settings = config.settings
         self.assertEqual(len(settings), 1)
         self.assertEqual(settings[0]['permission'], None)
         self.assertEqual(settings[0]['context'], None)
@@ -303,7 +304,8 @@ class TestViewConfigDecorator(unittest.TestCase):
         class foo(object): pass
         wrapped = decorator(foo)
         self.assertTrue(wrapped is foo)
-        settings = call_venusian(venusian)
+        config = call_venusian(venusian)
+        settings = config.settings
         self.assertEqual(len(settings), 1)
         self.assertEqual(settings[0]['permission'], None)
         self.assertEqual(settings[0]['context'], None)
@@ -318,7 +320,8 @@ class TestViewConfigDecorator(unittest.TestCase):
         class foo(object): pass
         wrapped = decorator(foo)
         self.assertTrue(wrapped is foo)
-        settings = call_venusian(venusian)
+        config = call_venusian(venusian)
+        settings = config.settings
         self.assertEqual(len(settings), 1)
         self.assertEqual(settings[0]['permission'], None)
         self.assertEqual(settings[0]['context'], None)
@@ -337,12 +340,12 @@ class TestViewConfigDecorator(unittest.TestCase):
         wrapped2 = decorator2(wrapped1)
         self.assertTrue(wrapped1 is foo)
         self.assertTrue(wrapped2 is foo)
-        settings1 = call_venusian(venusian1)
-        self.assertEqual(len(settings1), 1)
-        self.assertEqual(settings1[0]['name'], '1')
-        settings2 = call_venusian(venusian2)
-        self.assertEqual(len(settings2), 1)
-        self.assertEqual(settings2[0]['name'], '2')
+        config1 = call_venusian(venusian1)
+        self.assertEqual(len(config1.settings), 1)
+        self.assertEqual(config1.settings[0]['name'], '1')
+        config2 = call_venusian(venusian2)
+        self.assertEqual(len(config2.settings), 1)
+        self.assertEqual(config2.settings[0]['name'], '2')
 
     def test_call_as_method(self):
         decorator = self._makeOne()
@@ -354,7 +357,8 @@ class TestViewConfigDecorator(unittest.TestCase):
         class foo(object):
             foomethod = decorator(foo)
             barmethod = decorator(bar)
-        settings = call_venusian(venusian)
+        config = call_venusian(venusian)
+        settings = config.settings
         self.assertEqual(len(settings), 2)
         self.assertEqual(settings[0]['attr'], 'foo')
         self.assertEqual(settings[1]['attr'], 'bar')
@@ -366,7 +370,8 @@ class TestViewConfigDecorator(unittest.TestCase):
         def foo(context, request): pass
         decorated = decorator(foo)
         self.assertTrue(decorated is foo)
-        settings = call_venusian(venusian)
+        config = call_venusian(venusian)
+        settings = config.settings
         self.assertEqual(settings[0]['custom_predicates'], (1,))
 
     def test_call_with_renderer_string(self):
@@ -377,39 +382,32 @@ class TestViewConfigDecorator(unittest.TestCase):
         def foo(): pass
         wrapped = decorator(foo)
         self.assertTrue(wrapped is foo)
-        settings = call_venusian(venusian)
+        config = call_venusian(venusian)
+        settings = config.settings
         self.assertEqual(len(settings), 1)
         renderer = settings[0]['renderer']
-        self.assertEqual(renderer.name, 'fixtures/minimal.pt')
-        self.assertEqual(renderer.package, pyramid.tests)
-        self.assertEqual(renderer.registry.__class__, DummyRegistry)
+        self.assertEqual(renderer, 'fixtures/minimal.pt')
+        self.assertEqual(config.pkg, pyramid.tests)
 
     def test_call_with_renderer_dict(self):
+        import pyramid.tests
         decorator = self._makeOne(renderer={'a':1})
         venusian = DummyVenusian()
         decorator.venusian = venusian
         def foo(): pass
         wrapped = decorator(foo)
         self.assertTrue(wrapped is foo)
-        settings = call_venusian(venusian)
+        config = call_venusian(venusian)
+        settings = config.settings
         self.assertEqual(len(settings), 1)
         self.assertEqual(settings[0]['renderer'], {'a':1})
+        self.assertEqual(config.pkg, pyramid.tests)
 
     def test_call_with_renderer_IRendererInfo(self):
-        # see https://github.com/Pylons/pyramid/pull/234
-        from pyramid.interfaces import IRendererInfo
         import pyramid.tests
-        outerself = self
+        from pyramid.interfaces import IRendererInfo
         class DummyRendererHelper(object):
             implements(IRendererInfo)
-            name = 'fixtures/minimal.pt'
-            package = pyramid.tests
-            def clone(self, name=None, package=None, registry=None):
-                outerself.assertEqual(name, self.name)
-                outerself.assertEqual(package, self.package)
-                outerself.assertEqual(registry, context.config.registry)
-                self.cloned = True
-                return self
         renderer_helper = DummyRendererHelper()
         decorator = self._makeOne(renderer=renderer_helper)
         venusian = DummyVenusian()
@@ -418,11 +416,12 @@ class TestViewConfigDecorator(unittest.TestCase):
         wrapped = decorator(foo)
         self.assertTrue(wrapped is foo)
         context = DummyVenusianContext()
-        settings = call_venusian(venusian, context)
+        config = call_venusian(venusian, context)
+        settings = config.settings
         self.assertEqual(len(settings), 1)
         renderer = settings[0]['renderer']
         self.assertTrue(renderer is renderer_helper)
-        self.assertTrue(renderer.cloned)
+        self.assertEqual(config.pkg, pyramid.tests)
 
 class Test_append_slash_notfound_view(BaseTest, unittest.TestCase):
     def _callFUT(self, context, request):
@@ -686,6 +685,10 @@ class DummyConfig(object):
     def add_view(self, **kw):
         self.settings.append(kw)
 
+    def with_package(self, pkg):
+        self.pkg = pkg
+        return self
+
 class DummyVenusianContext(object):
     def __init__(self):
         self.config = DummyConfig()
@@ -695,5 +698,5 @@ def call_venusian(venusian, context=None):
         context = DummyVenusianContext()
     for wrapped, callback, category in venusian.attachments:
         callback(context, None, None)
-    return context.config.settings
+    return context.config
 

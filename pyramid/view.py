@@ -217,19 +217,8 @@ class view_config(object):
         settings = self.__dict__.copy()
 
         def callback(context, name, ob):
-            renderer = settings.get('renderer')
-            if isinstance(renderer, basestring):
-                renderer = RendererHelper(name=renderer,
-                                          package=info.module,
-                                          registry=context.config.registry)
-            elif IRendererInfo.providedBy(renderer):
-                # create a new rendererinfo to clear out old registry on a
-                # rescan, see https://github.com/Pylons/pyramid/pull/234
-                renderer = renderer.clone(name=renderer.name,
-                                          package=info.module,
-                                          registry=context.config.registry)
-            settings['renderer'] = renderer
-            context.config.add_view(view=ob, **settings)
+            config = context.config.with_package(info.module)
+            config.add_view(view=ob, **settings)
 
         info = self.venusian.attach(wrapped, callback, category='pyramid')
 
@@ -240,7 +229,7 @@ class view_config(object):
             if settings['attr'] is None:
                 settings['attr'] = wrapped.__name__
 
-        settings['_info'] = info.codeinfo
+        settings['_info'] = info.codeinfo # fbo "action_method"
         return wrapped
 
 bfg_view = view_config
