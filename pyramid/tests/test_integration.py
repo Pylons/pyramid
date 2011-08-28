@@ -471,6 +471,16 @@ class WSGIApp2AppTest(unittest.TestCase):
         res = self.testapp.get('/hello', status=200)
         self.assertTrue('Hello' in res.body)
 
+class RendererScanAppTest(IntegrationBase):
+    package = 'pyramid.tests.rendererscanapp'
+    def test_root(self):
+        res = self.testapp.get('/one', status=200)
+        self.assertTrue('One!' in res.body)
+
+    def test_two(self):
+        res = self.testapp.get('/two', status=200)
+        self.assertTrue('Two!' in res.body)
+
 class DummyContext(object):
     pass
 
