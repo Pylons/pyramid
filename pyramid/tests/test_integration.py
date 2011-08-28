@@ -481,6 +481,16 @@ class RendererScanAppTest(IntegrationBase):
         res = self.testapp.get('/two', status=200)
         self.assertTrue('Two!' in res.body)
 
+    def test_rescan(self):
+        self.config.scan('pyramid.tests.rendererscanapp')
+        app = self.config.make_wsgi_app()
+        from webtest import TestApp
+        testapp = TestApp(app)
+        res = testapp.get('/one', status=200)
+        self.assertTrue('One!' in res.body)
+        res = testapp.get('/two', status=200)
+        self.assertTrue('Two!' in res.body)
+
 class DummyContext(object):
     pass
 
