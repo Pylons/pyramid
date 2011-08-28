@@ -11,10 +11,6 @@ Should-Have
 Nice-to-Have
 ------------
 
-- Change ``view_config`` to use ``config.with_package`` to recycle renderers
-  rather than the stream-of-consciousness stuff it does now to create a
-  renderer and reuse one.
-
 - Expose ``onerror`` callback to venusian scan (requires venusian >=1.0a1).
 
 - Add a default-view-config-params decorator that can be applied to a class
