@@ -528,11 +528,25 @@ class Test_static_url(unittest.TestCase):
                 return 'static url'
         return Request()
 
-    def test_it(self):
+    def test_it_abs(self):
+        request = self._makeRequest()
+        result = self._callFUT('/foo/bar/abc', request, _app_url='')
+        self.assertEqual(result, 'static url')
+        self.assertEqual(request.path, '/foo/bar/abc')
+        self.assertEqual(request.kw, {'_app_url':''})
+
+    def test_it_absspec(self):
+        request = self._makeRequest()
+        result = self._callFUT('foo:abc', request, _anchor='anchor')
+        self.assertEqual(result, 'static url')
+        self.assertEqual(request.path, 'foo:abc')
+        self.assertEqual(request.kw, {'_anchor':'anchor'})
+
+    def test_it_rel(self):
         request = self._makeRequest()
         result = self._callFUT('abc', request, _app_url='')
         self.assertEqual(result, 'static url')
-        self.assertEqual(request.path, 'abc')
+        self.assertEqual(request.path, 'pyramid.tests:abc')
         self.assertEqual(request.kw, {'_app_url':''})
 
 class Test_static_path(unittest.TestCase):
@@ -548,12 +562,26 @@ class Test_static_path(unittest.TestCase):
                 return 'static path'
         return Request()
 
-    def test_it(self):
+    def test_it_abs(self):
         request = self._makeRequest()
-        result = self._callFUT('abc', request, _anchor='anchor')
+        result = self._callFUT('/foo/bar/abc', request, _anchor='anchor')
         self.assertEqual(result, 'static path')
-        self.assertEqual(request.path, 'abc')
+        self.assertEqual(request.path, '/foo/bar/abc')
         self.assertEqual(request.kw, {'_anchor':'anchor'})
+
+    def test_it_absspec(self):
+        request = self._makeRequest()
+        result = self._callFUT('foo:abc', request, _anchor='anchor')
+        self.assertEqual(result, 'static path')
+        self.assertEqual(request.path, 'foo:abc')
+        self.assertEqual(request.kw, {'_anchor':'anchor'})
+
+    def test_it_rel(self):
+        request = self._makeRequest()
+        result = self._callFUT('abc', request, _app_url='')
+        self.assertEqual(result, 'static path')
+        self.assertEqual(request.path, 'pyramid.tests:abc')
+        self.assertEqual(request.kw, {'_app_url':''})
 
 class Test_current_route_url(unittest.TestCase):
     def _callFUT(self, request, *elements, **kw):

@@ -543,6 +543,13 @@ def static_url(path, request, **kw):
 
     See :meth:`pyramid.request.Request.static_url` for more information.
     """
+    if not os.path.isabs(path):
+        if not ':' in path:
+            # if it's not a package:relative/name and it's not an
+            # /absolute/path it's a relative/path; this means its relative
+            # to the package in which the caller's module is defined.
+            package = caller_package()
+            path = '%s:%s' % (package.__name__, path)
     return request.static_url(path, **kw)
 
 def static_path(path, request, **kw):
@@ -554,6 +561,13 @@ def static_path(path, request, **kw):
 
     See :meth:`pyramid.request.Request.static_path` for more information.
     """
+    if not os.path.isabs(path):
+        if not ':' in path:
+            # if it's not a package:relative/name and it's not an
+            # /absolute/path it's a relative/path; this means its relative
+            # to the package in which the caller's module is defined.
+            package = caller_package()
+            path = '%s:%s' % (package.__name__, path)
     return request.static_path(path, **kw)
 
 def current_route_url(request, *elements, **kw):

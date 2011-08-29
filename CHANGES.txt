@@ -1,6 +1,13 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
+- Pyramid did not properly generate static URLs using
+  ``pyramid.url.static_url`` when passed a caller-package relative path due
+  to a refactoring.
+
 Internal
 --------
 
