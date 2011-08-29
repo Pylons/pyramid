@@ -304,6 +304,25 @@ configured view.
   If ``request_param`` is not supplied, the view will be invoked without
   consideration of keys and values in the ``request.params`` dictionary.
 
+``match_param``
+  .. note:: This feature is new as of :app:`Pyramid` 1.2.
+
+  This param may be either a single string of the format "key=value" or a
+  dict of key/value pairs.
+
+  This argument ensures that the view will only be called when the
+  :term:`request` has key/value pairs in its :term:`matchdict` that equal
+  those supplied in the predicate.  e.g. ``match_param="action=edit" would
+  require the ``action`` parameter in the :term:`matchdict` match the right
+  hande side of the expression (``edit``) for the view to "match" the current
+  request.
+
+  If the ``match_param`` is a dict, every key/value pair must match for the
+  predicate to pass.
+
+  If ``match_param`` is not supplied, the view will be invoked without
+  consideration of the keys and values in ``request.matchdict``.
+
 ``containment``
   This value should be a reference to a Python class or :term:`interface`
   that a parent object in the context resource's :term:`lineage` must provide
