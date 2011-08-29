@@ -441,9 +441,6 @@ feature, a :term:`Configurator` API exists named
 - Any other asset (or set of assets) addressed by code that uses the
   setuptools :term:`pkg_resources` API.
 
-.. note:: The :term:`ZCML` directive named ``asset`` serves the same purpose
-   as the :meth:`~pyramid.config.Configurator.override_asset` method.
-
 .. index::
    single: override_asset
 

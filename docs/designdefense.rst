@@ -61,10 +61,11 @@ features we found compelling in other frameworks (such as :term:`url
 dispatch`).  After the initial public release of BFG, as time went on,
 features were added to support people allergic to various Zope-isms in the
 system, such as the ability to configure the application using
-:term:`imperative configuration` rather than solely using :term:`ZCML`, and
-the elimination of the required use of :term:`interface` objects.  It soon
-became clear that we had a system that was very generic, and was beginning to
-appeal to non-Zope users as well as ex-Zope users.
+:term:`imperative configuration` and :term:`configuration decoration` rather
+than solely using :term:`ZCML`, and the elimination of the required use of
+:term:`interface` objects.  It soon became clear that we had a system that
+was very generic, and was beginning to appeal to non-Zope users as well as
+ex-Zope users.
 
 As the result of this generalization, it became obvious BFG shared 90% of its
 featureset with the featureset of Pylons 1, and thus had a very similar
@@ -323,9 +324,9 @@ the ZCA registry:
 
 - Composability.  A ZCA component registry can be populated imperatively, or
   there's an existing mechanism to populate a registry via the use of a
-  configuration file (ZCML, via :term:`pyramid_zcml`).  We didn't need to
-  write a frontend from scratch to make use of configuration-file-driven
-  registry population.
+  configuration file (ZCML, via the optional :term:`pyramid_zcml` package).
+  We didn't need to write a frontend from scratch to make use of
+  configuration-file-driven registry population.
 
 - Pluggability.  Use of the ZCA registry allows for framework extensibility
   via a well-defined and widely understood plugin architecture.  As long as

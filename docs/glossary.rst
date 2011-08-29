@@ -859,20 +859,14 @@ Glossary
 
    pyramid_zcml
      An add-on package to :app:`Pyramid` which allows applications to be
-     configured via ZCML.  It is available on :term:`PyPI`.  If you use
-     ``pyramid_zcml``, you can use ZCML as an alternative to
-     :term:`imperative configuration`.
+     configured via :term:`ZCML`.  It is available on :term:`PyPI`.  If you
+     use ``pyramid_zcml``, you can use ZCML as an alternative to
+     :term:`imperative configuration` or :term:`configuration decoration`.
 
    ZCML
      `Zope Configuration Markup Language
      <http://www.muthukadan.net/docs/zca.html#zcml>`_, an XML dialect
      used by Zope and :term:`pyramid_zcml` for configuration tasks.
-
-   ZCML directive
-     A ZCML "tag" such as ``<view>`` or ``<route>``.
-
-   ZCML declaration
-     The concrete use of a :term:`ZCML directive` within a ZCML file.
 
    pyramid_handlers
      An add-on package which allows :app:`Pyramid` users to create classes

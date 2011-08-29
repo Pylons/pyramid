@@ -232,9 +232,6 @@ the following assumptions:
 
 - you are willing to use :term:`url dispatch` to map URLs to code.
 
-- you want to configure your application *imperatively* (no
-  :term:`declarative configuration` such as ZCML).
-
 .. note::
 
    :app:`Pyramid` supports any persistent storage mechanism (e.g. object

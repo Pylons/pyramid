@@ -262,9 +262,6 @@ assumptions:
 
 - you are willing to use :term:`traversal` to map URLs to code.
 
-- you want to use imperative code plus a :term:`scan` to perform
-  configuration.
-
 .. note::
 
    :app:`Pyramid` supports any persistent storage mechanism (e.g. a SQL

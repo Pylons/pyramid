@@ -122,9 +122,9 @@ application developer may use completely imperative code to perform common
 framework configuration tasks such as adding a view or a route.  In Zope,
 :term:`ZCML` is typically required for similar purposes.  In :term:`Grok`, a
 Zope-based web framework, :term:`decorator` objects and class-level
-declarations are used for this purpose.  :app:`Pyramid` supports :term:`ZCML`
-and decorator-based :term:`declarative configuration`, but does not require
-either. See :ref:`configuration_narr` for more information.
+declarations are used for this purpose.  Out of the box, Pyramid supports
+imperative and decorator-based configuration; :term:`ZCML` may be used via an
+add-on package named ``pyramid_zcml``.
 
 Also unlike :term:`Zope` and unlike other "full-stack" frameworks such
 as :term:`Django`, :app:`Pyramid` makes no assumptions about which

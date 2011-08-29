@@ -335,9 +335,8 @@ template renderer:
    function.  View-configuration-relative asset specifications work only
    in Chameleon, not in Mako templates.
 
-Similar renderer configuration can be done imperatively and via
-:term:`ZCML`.  See :ref:`views_which_use_a_renderer`.  See also
-:ref:`built_in_renderers`.
+Similar renderer configuration can be done imperatively.  See
+:ref:`views_which_use_a_renderer`.  See also :ref:`built_in_renderers`.
 
 Although a renderer path is usually just a simple relative pathname, a path
 named as a renderer can be absolute, starting with a slash on UNIX or a drive
@@ -366,12 +365,7 @@ templates as renderers.  See :ref:`available_template_system_bindings`.
    with renderers externally via view configuration typically return a
    dictionary, as above.  Making assertions about results returned in a
    dictionary is almost always more direct and straightforward than
-   needing to parse HTML.  Specifying a renderer from within
-   :term:`ZCML` (as opposed to imperatively or via a ``view_config``
-   decorator, or using a template directly from within a view callable)
-   also makes it possible for someone to modify the template used to
-   render a view without needing to fork your code to do so.  See
-   :ref:`extending_chapter` for more information.
+   needing to parse HTML.
 
 By default, views rendered via a template renderer return a :term:`Response`
 object which has a *status code* of ``200 OK``, and a *content-type* of
