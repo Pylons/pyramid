@@ -8,6 +8,8 @@ Should-Have
   deploying via proxy:
   https://docs.pylonsproject.org/projects/pyramid_cookbook/dev/deployment/nginx.html#step-2-starting-paster
 
+- Allow ``request_method`` predicate to be a list of methods.
+
 Nice-to-Have
 ------------
 
