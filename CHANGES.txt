@@ -6,7 +6,13 @@ Bug Fixes
 
 - Pyramid did not properly generate static URLs using
   ``pyramid.url.static_url`` when passed a caller-package relative path due
-  to a refactoring.
+  to a refactoring done in 1.2a1.
+
+- The ``settings`` object emitted a deprecation warning any time
+  ``__getattr__`` was called upon it.  However, there are legitimate
+  situations in which ``__getattr__`` is called on arbitrary objects
+  (e.g. ``hasattr``).  Now, the ``settings`` object only emits the warning
+  upon successful lookup.
 
 Internal
 --------

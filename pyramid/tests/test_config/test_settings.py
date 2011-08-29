@@ -2,12 +2,19 @@ import unittest
 
 class TestSettings(unittest.TestCase):
     def setUp(self):
-        from zope.deprecation import __show__
-        __show__.off()
+        self.warnings = []
+        import warnings
+        warnings.old_showwarning = warnings.showwarning
+        warnings.showwarning = self._showwarning
 
     def tearDown(self):
-        from zope.deprecation import __show__
-        __show__.on()
+        del self.warnings
+        import warnings
+        warnings.showwarning = warnings.old_showwarning
+
+    def _showwarning(self, message, category, filename, lineno, file=None,
+                     line=None):
+        self.warnings.append(message)
         
     def _getTargetClass(self):
         from pyramid.config.settings import Settings
@@ -19,9 +26,15 @@ class TestSettings(unittest.TestCase):
         klass = self._getTargetClass()
         return klass(d, _environ_=environ)
 
-    def test_getattr(self):
+    def test_getattr_success(self):
         settings = self._makeOne({'reload_templates':False})
         self.assertEqual(settings.reload_templates, False)
+        self.assertEqual(len(self.warnings), 1)
+
+    def test_getattr_fail(self):
+        settings = self._makeOne({})
+        self.assertRaises(AttributeError, settings.__getattr__, 'wontexist')
+        self.assertEqual(len(self.warnings), 0)
 
     def test_getattr_raises_attribute_error(self):
         settings = self._makeOne()
