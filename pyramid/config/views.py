@@ -42,6 +42,7 @@ from pyramid.config.util import MAX_ORDER
 from pyramid.config.util import DEFAULT_PHASH
 from pyramid.config.util import action_method
 from pyramid.config.util import make_predicates
+from pyramid.config.util import as_sorted_tuple
 
 def wraps_view(wrapper):
     def inner(self, view):
@@ -758,12 +759,17 @@ class ViewsConfiguratorMixin(object):
 
         request_method
 
-          This value can be one of the strings ``GET``,
-          ``POST``, ``PUT``, ``DELETE``, or ``HEAD`` representing an
-          HTTP ``REQUEST_METHOD``.  A view declaration with this
-          argument ensures that the view will only be called when the
-          request's ``method`` attribute (aka the ``REQUEST_METHOD`` of
-          the WSGI environment) string matches the supplied value.
+          This value can be one of the strings ``GET``, ``POST``, ``PUT``,
+          ``DELETE``, or ``HEAD`` representing an HTTP ``REQUEST_METHOD``, or
+          a tuple containing one or more of these strings.  A view
+          declaration with this argument ensures that the view will only be
+          called when the request's ``method`` attribute (aka the
+          ``REQUEST_METHOD`` of the WSGI environment) string matches a
+          supplied value.
+
+          .. note:: The ability to pass a tuple of items as
+                   ``request_method`` is new as of Pyramid 1.2.  Previous
+                   versions allowed only a string.
 
         request_param
 
@@ -887,6 +893,9 @@ class ViewsConfiguratorMixin(object):
             if not IInterface.providedBy(request_type):
                 raise ConfigurationError(
                     'request_type must be an interface, not %s' % request_type)
+
+        if request_method is not None:
+            request_method = as_sorted_tuple(request_method)
 
         order, predicates, phash = make_predicates(xhr=xhr,
             request_method=request_method, path_info=path_info,

@@ -96,13 +96,17 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         h.update('xhr:%r' % bool(xhr))
 
     if request_method is not None:
+        if not hasattr(request_method, '__iter__'):
+            request_method = (request_method,)
+        request_method = sorted(request_method)
         def request_method_predicate(context, request):
-            return request.method == request_method
-        text = "request method = %s"
-        request_method_predicate.__text__ = text % request_method
+            return request.method in request_method
+        text = "request method = %s" % repr(request_method)
+        request_method_predicate.__text__ = text
         weights.append(1 << 2)
         predicates.append(request_method_predicate)
-        h.update('request_method:%r' % request_method)
+        for m in request_method:
+            h.update('request_method:%r' % m)
 
     if path_info is not None:
         try:
@@ -249,3 +253,9 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
     phash = h.hexdigest()
     return order, predicates, phash
 
+def as_sorted_tuple(val):
+    if not hasattr(val, '__iter__'):
+        val = (val,)
+    val = tuple(sorted(val))
+    return val
+    

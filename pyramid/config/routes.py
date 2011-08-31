@@ -164,11 +164,15 @@ class RoutesConfiguratorMixin(object):
 
         request_method
 
-          A string representing an HTTP method name, e.g. ``GET``,
-          ``POST``, ``HEAD``, ``DELETE``, ``PUT``.  If this argument
-          is not specified, this route will match if the request has
-          *any* request method.  If this predicate returns ``False``,
-          route matching continues.
+          A string representing an HTTP method name, e.g. ``GET``, ``POST``,
+          ``HEAD``, ``DELETE``, ``PUT`` or a tuple of elements containing
+          HTTP method names.  If this argument is not specified, this route
+          will match if the request has *any* request method.  If this
+          predicate returns ``False``, route matching continues.
+
+          .. note:: The ability to pass a tuple of items as
+                   ``request_method`` is new as of Pyramid 1.2.  Previous
+                   versions allowed only a string.
 
         path_info
 

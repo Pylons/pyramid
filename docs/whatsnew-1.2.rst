@@ -154,6 +154,12 @@ Minor Feature Additions
   :meth:`venusian.Scanner.scan` to influence error behavior when an exception
   is raised during scanning.
 
+- The ``request_method`` predicate argument to
+  :meth:`pyramid.config.Configurator.add_view` and
+  :meth:`pyramid.config.Configurator.add_route` is now permitted to be a
+  tuple of HTTP method names.  Previously it was restricted to being a string
+  representing a single HTTP method name.
+
 Deprecations
 ------------
 

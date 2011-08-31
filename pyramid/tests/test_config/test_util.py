@@ -243,7 +243,7 @@ class Test__make_predicates(unittest.TestCase):
             match_param='foo=bar')
         self.assertEqual(predicates[0].__text__, 'xhr = True')
         self.assertEqual(predicates[1].__text__,
-                         'request method = request_method')
+                         "request method = ['request_method']")
         self.assertEqual(predicates[2].__text__, 'path_info = path_info')
         self.assertEqual(predicates[3].__text__, 'request_param param')
         self.assertEqual(predicates[4].__text__, 'header header')
@@ -278,6 +278,24 @@ class Test__make_predicates(unittest.TestCase):
         request = DummyRequest()
         request.matchdict = {'foo':'bar', 'baz':'foo'}
         self.assertFalse(predicates[0](Dummy(), request))
+
+    def test_request_method_sequence(self):
+        _, predicates, _ = self._callFUT(request_method=('GET', 'HEAD'))
+        request = DummyRequest()
+        request.method = 'HEAD'
+        self.assertTrue(predicates[0](Dummy(), request))
+        request.method = 'GET'
+        self.assertTrue(predicates[0](Dummy(), request))
+        request.method = 'POST'
+        self.assertFalse(predicates[0](Dummy(), request))
+
+    def test_request_method_ordering_hashes_same(self):
+        hash1, _, __= self._callFUT(request_method=('GET', 'HEAD'))
+        hash2, _, __= self._callFUT(request_method=('HEAD', 'GET'))
+        self.assertEqual(hash1, hash2)
+        hash1, _, __= self._callFUT(request_method=('GET',))
+        hash2, _, __= self._callFUT(request_method='GET')
+        self.assertEqual(hash1, hash2)
 
 class DummyCustomPredicate(object):
     def __init__(self):

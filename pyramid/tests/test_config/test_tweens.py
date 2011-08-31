@@ -1,5 +1,169 @@
 import unittest
 
+from pyramid.tests.test_config import dummy_tween_factory
+from pyramid.tests.test_config import dummy_tween_factory2
+
+class TestTweensConfiguratorMixin(unittest.TestCase):
+    def _makeOne(self, *arg, **kw):
+        from pyramid.config import Configurator
+        config = Configurator(*arg, **kw)
+        return config
+
+    def test_add_tweens_names_distinct(self):
+        from pyramid.interfaces import ITweens
+        from pyramid.tweens import excview_tween_factory
+        def factory1(handler, registry): return handler
+        def factory2(handler, registry): return handler
+        config = self._makeOne()
+        config.add_tween(
+            'pyramid.tests.test_config.dummy_tween_factory')
+        config.add_tween(
+            'pyramid.tests.test_config.dummy_tween_factory2')
+        config.commit()
+        tweens = config.registry.queryUtility(ITweens)
+        implicit = tweens.implicit()
+        self.assertEqual(
+            implicit,
+            [
+                ('pyramid.tests.test_config.dummy_tween_factory2',
+                 dummy_tween_factory2),
+                ('pyramid.tests.test_config.dummy_tween_factory',
+                 dummy_tween_factory),
+                ('pyramid.tweens.excview_tween_factory',
+                 excview_tween_factory),
+                ]
+            )
+
+    def test_add_tweens_names_with_underover(self):
+        from pyramid.interfaces import ITweens
+        from pyramid.tweens import excview_tween_factory
+        from pyramid.tweens import MAIN
+        config = self._makeOne()
+        config.add_tween(
+            'pyramid.tests.test_config.dummy_tween_factory',
+            over=MAIN)
+        config.add_tween(
+            'pyramid.tests.test_config.dummy_tween_factory2',
+            over=MAIN,
+            under='pyramid.tests.test_config.dummy_tween_factory')
+        config.commit()
+        tweens = config.registry.queryUtility(ITweens)
+        implicit = tweens.implicit()
+        self.assertEqual(
+            implicit,
+            [
+                ('pyramid.tweens.excview_tween_factory', excview_tween_factory),
+                ('pyramid.tests.test_config.dummy_tween_factory',
+                 dummy_tween_factory),
+                ('pyramid.tests.test_config.dummy_tween_factory2',
+                 dummy_tween_factory2),
+             ])
+
+    def test_add_tweens_names_with_under_nonstringoriter(self):
+        from pyramid.exceptions import ConfigurationError
+        config = self._makeOne()
+        self.assertRaises(
+            ConfigurationError, config.add_tween,
+            'pyramid.tests.test_config.dummy_tween_factory',
+            under=False)
+
+    def test_add_tweens_names_with_over_nonstringoriter(self):
+        from pyramid.exceptions import ConfigurationError
+        config = self._makeOne()
+        self.assertRaises(
+            ConfigurationError, config.add_tween,
+            'pyramid.tests.test_config.dummy_tween_factory',
+            over=False)
+
+    def test_add_tween_dottedname(self):
+        from pyramid.interfaces import ITweens
+        from pyramid.tweens import excview_tween_factory
+        config = self._makeOne()
+        config.add_tween('pyramid.tests.test_config.dummy_tween_factory')
+        config.commit()
+        tweens = config.registry.queryUtility(ITweens)
+        self.assertEqual(
+            tweens.implicit(),
+            [
+                ('pyramid.tests.test_config.dummy_tween_factory',
+                 dummy_tween_factory),
+                ('pyramid.tweens.excview_tween_factory',
+                 excview_tween_factory),
+                ])
+
+    def test_add_tween_instance(self):
+        from pyramid.exceptions import ConfigurationError
+        class ATween(object): pass
+        atween = ATween()
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError, config.add_tween, atween)
+
+    def test_add_tween_unsuitable(self):
+        from pyramid.exceptions import ConfigurationError
+        import pyramid.tests.test_config
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError, config.add_tween,
+                          pyramid.tests.test_config)
+
+    def test_add_tween_name_ingress(self):
+        from pyramid.exceptions import ConfigurationError
+        from pyramid.tweens import INGRESS
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError, config.add_tween, INGRESS)
+
+    def test_add_tween_name_main(self):
+        from pyramid.exceptions import ConfigurationError
+        from pyramid.tweens import MAIN
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError, config.add_tween, MAIN)
+
+    def test_add_tweens_conflict(self):
+        from zope.configuration.config import ConfigurationConflictError
+        config = self._makeOne()
+        config.add_tween('pyramid.tests.test_config.dummy_tween_factory')
+        config.add_tween('pyramid.tests.test_config.dummy_tween_factory')
+        self.assertRaises(ConfigurationConflictError, config.commit)
+
+    def test_add_tween_over_ingress(self):
+        from pyramid.exceptions import ConfigurationError
+        from pyramid.tweens import INGRESS
+        config = self._makeOne()
+        self.assertRaises(
+            ConfigurationError,
+            config.add_tween,
+            'pyramid.tests.test_config.dummy_tween_factory',
+            over=INGRESS)
+
+    def test_add_tween_over_ingress_iterable(self):
+        from pyramid.exceptions import ConfigurationError
+        from pyramid.tweens import INGRESS
+        config = self._makeOne()
+        self.assertRaises(
+            ConfigurationError,
+            config.add_tween,
+            'pyramid.tests.test_config.dummy_tween_factory',
+            over=('a', INGRESS))
+
+    def test_add_tween_under_main(self):
+        from pyramid.exceptions import ConfigurationError
+        from pyramid.tweens import MAIN
+        config = self._makeOne()
+        self.assertRaises(
+            ConfigurationError,
+            config.add_tween,
+            'pyramid.tests.test_config.dummy_tween_factory',
+            under=MAIN)
+
+    def test_add_tween_under_main_iterable(self):
+        from pyramid.exceptions import ConfigurationError
+        from pyramid.tweens import MAIN
+        config = self._makeOne()
+        self.assertRaises(
+            ConfigurationError,
+            config.add_tween,
+            'pyramid.tests.test_config.dummy_tween_factory',
+            under=('a', MAIN))
+
 class TestTweens(unittest.TestCase):
     def _makeOne(self):
         from pyramid.config.tweens import Tweens
