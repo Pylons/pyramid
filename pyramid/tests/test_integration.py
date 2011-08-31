@@ -437,7 +437,7 @@ class ImperativeIncludeConfigurationTest(unittest.TestCase):
 
 class SelfScanAppTest(unittest.TestCase):
     def setUp(self):
-        from pyramid.tests.selfscanapp import main
+        from pyramid.tests.test_config.pkgs.selfscan import main
         config = main()
         app = config.make_wsgi_app()
         from webtest import TestApp

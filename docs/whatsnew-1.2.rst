@@ -149,6 +149,11 @@ Minor Feature Additions
   when the ``request.matchdict`` has a value inside it named ``action`` with
   a value of ``edit``.
 
+- Support an ``onerror`` keyword argument to
+  :meth:`pyramid.config.Configurator.scan``.  This argument is passed to
+  :meth:`venusian.Scanner.scan` to influence error behavior when an exception
+  is raised during scanning.
+
 Deprecations
 ------------
 
@@ -254,3 +259,5 @@ Dependency Changes
 - Pyramid now relies on PasteScript >= 1.7.4.  This version contains a
   feature important for allowing flexible logging configuration.
 
+- Pyramid now requires Venusian 1.0a1 or better to support the ``onerror``
+  keyword argument to :meth:`pyramid.config.Configurator.scan`.

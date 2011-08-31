@@ -278,41 +278,41 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertTrue(view.__wraps__ is exceptionresponse_view)
 
     def test_with_package_module(self):
-        from pyramid.tests import test_configuration
+        from pyramid.tests.test_config import test_init
         import pyramid.tests
         config = self._makeOne()
-        newconfig = config.with_package(test_configuration)
-        self.assertEqual(newconfig.package, pyramid.tests)
+        newconfig = config.with_package(test_init)
+        self.assertEqual(newconfig.package, pyramid.tests.test_config)
 
     def test_with_package_package(self):
-        import pyramid.tests
+        import pyramid.tests.test_config
         config = self._makeOne()
-        newconfig = config.with_package(pyramid.tests)
-        self.assertEqual(newconfig.package, pyramid.tests)
+        newconfig = config.with_package(pyramid.tests.test_config)
+        self.assertEqual(newconfig.package, pyramid.tests.test_config)
 
     def test_with_package_context_is_not_None(self):
-        import pyramid.tests
+        import pyramid.tests.test_config
         config = self._makeOne()
         config._ctx = DummyContext()
         config._ctx.registry = None
         config._ctx.autocommit = True
         config._ctx.route_prefix = None
-        newconfig = config.with_package(pyramid.tests)
-        self.assertEqual(newconfig.package, pyramid.tests)
+        newconfig = config.with_package(pyramid.tests.test_config)
+        self.assertEqual(newconfig.package, pyramid.tests.test_config)
 
     def test_with_package_context_is_None(self):
-        import pyramid.tests
+        import pyramid.tests.test_config
         config = self._makeOne()
         config._ctx = None
-        newconfig = config.with_package(pyramid.tests)
-        self.assertEqual(newconfig.package, pyramid.tests)
+        newconfig = config.with_package(pyramid.tests.test_config)
+        self.assertEqual(newconfig.package, pyramid.tests.test_config)
         self.assertEqual(config._ctx.package, None)
 
     def test_maybe_dotted_string_success(self):
-        import pyramid.tests
+        import pyramid.tests.test_config
         config = self._makeOne()
-        result = config.maybe_dotted('pyramid.tests')
-        self.assertEqual(result, pyramid.tests)
+        result = config.maybe_dotted('pyramid.tests.test_config')
+        self.assertEqual(result, pyramid.tests.test_config)
 
     def test_maybe_dotted_string_fail(self):
         config = self._makeOne()
@@ -320,28 +320,28 @@ class ConfiguratorTests(unittest.TestCase):
                           config.maybe_dotted, 'cant.be.found')
 
     def test_maybe_dotted_notstring_success(self):
-        import pyramid.tests
+        import pyramid.tests.test_config
         config = self._makeOne()
-        result = config.maybe_dotted(pyramid.tests)
-        self.assertEqual(result, pyramid.tests)
+        result = config.maybe_dotted(pyramid.tests.test_config)
+        self.assertEqual(result, pyramid.tests.test_config)
 
     def test_absolute_asset_spec_already_absolute(self):
-        import pyramid.tests
-        config = self._makeOne(package=pyramid.tests)
+        import pyramid.tests.test_config
+        config = self._makeOne(package=pyramid.tests.test_config)
         result = config.absolute_asset_spec('already:absolute')
         self.assertEqual(result, 'already:absolute')
 
     def test_absolute_asset_spec_notastring(self):
-        import pyramid.tests
-        config = self._makeOne(package=pyramid.tests)
+        import pyramid.tests.test_config
+        config = self._makeOne(package=pyramid.tests.test_config)
         result = config.absolute_asset_spec(None)
         self.assertEqual(result, None)
 
     def test_absolute_asset_spec_relative(self):
-        import pyramid.tests
-        config = self._makeOne(package=pyramid.tests)
-        result = config.absolute_asset_spec('templates')
-        self.assertEqual(result, 'pyramid.tests:templates')
+        import pyramid.tests.test_config
+        config = self._makeOne(package=pyramid.tests.test_config)
+        result = config.absolute_asset_spec('files')
+        self.assertEqual(result, 'pyramid.tests.test_config:files')
 
     def test__fix_registry_has_listeners(self):
         reg = DummyRegistry()
@@ -493,11 +493,11 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IAuthenticationPolicy
         reg = Registry()
         config = self._makeOne(reg)
-        config.setup_registry(authentication_policy='pyramid.tests')
+        config.setup_registry(authentication_policy='pyramid.tests.test_config')
         config.commit()
         result = reg.getUtility(IAuthenticationPolicy)
-        import pyramid.tests
-        self.assertEqual(result, pyramid.tests)
+        import pyramid.tests.test_config
+        self.assertEqual(result, pyramid.tests.test_config)
 
     def test_setup_registry_authorization_policy_dottedname(self):
         from pyramid.registry import Registry
@@ -506,11 +506,11 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(reg)
         dummy = object()
         config.setup_registry(authentication_policy=dummy,
-                              authorization_policy='pyramid.tests')
+                              authorization_policy='pyramid.tests.test_config')
         config.commit()
         result = reg.getUtility(IAuthorizationPolicy)
-        import pyramid.tests
-        self.assertEqual(result, pyramid.tests)
+        import pyramid.tests.test_config
+        self.assertEqual(result, pyramid.tests.test_config)
 
     def test_setup_registry_authorization_policy_only(self):
         from zope.configuration.config import ConfigurationExecutionError
@@ -535,23 +535,24 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IRootFactory
         reg = Registry()
         config = self._makeOne(reg)
-        import pyramid.tests
-        config.setup_registry(root_factory='pyramid.tests')
+        import pyramid.tests.test_config
+        config.setup_registry(root_factory='pyramid.tests.test_config')
         self.assertEqual(reg.queryUtility(IRootFactory), None)
         config.commit()
-        self.assertEqual(reg.getUtility(IRootFactory), pyramid.tests)
+        self.assertEqual(reg.getUtility(IRootFactory),
+                         pyramid.tests.test_config)
 
     def test_setup_registry_locale_negotiator_dottedname(self):
         from pyramid.registry import Registry
         from pyramid.interfaces import ILocaleNegotiator
         reg = Registry()
         config = self._makeOne(reg)
-        import pyramid.tests
-        config.setup_registry(locale_negotiator='pyramid.tests')
+        import pyramid.tests.test_config
+        config.setup_registry(locale_negotiator='pyramid.tests.test_config')
         self.assertEqual(reg.queryUtility(ILocaleNegotiator), None)
         config.commit()
         utility = reg.getUtility(ILocaleNegotiator)
-        self.assertEqual(utility, pyramid.tests)
+        self.assertEqual(utility, pyramid.tests.test_config)
 
     def test_setup_registry_locale_negotiator(self):
         from pyramid.registry import Registry
@@ -582,12 +583,12 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IRequestFactory
         reg = Registry()
         config = self._makeOne(reg)
-        import pyramid.tests
-        config.setup_registry(request_factory='pyramid.tests')
+        import pyramid.tests.test_config
+        config.setup_registry(request_factory='pyramid.tests.test_config')
         self.assertEqual(reg.queryUtility(IRequestFactory), None)
         config.commit()
         utility = reg.getUtility(IRequestFactory)
-        self.assertEqual(utility, pyramid.tests)
+        self.assertEqual(utility, pyramid.tests.test_config)
 
     def test_setup_registry_renderer_globals_factory(self):
         import warnings
@@ -614,12 +615,13 @@ class ConfiguratorTests(unittest.TestCase):
             from pyramid.interfaces import IRendererGlobalsFactory
             reg = Registry()
             config = self._makeOne(reg)
-            import pyramid.tests
-            config.setup_registry(renderer_globals_factory='pyramid.tests')
+            import pyramid.tests.test_config
+            config.setup_registry(
+                renderer_globals_factory='pyramid.tests.test_config')
             self.assertEqual(reg.queryUtility(IRendererGlobalsFactory), None)
             config.commit()
             utility = reg.getUtility(IRendererGlobalsFactory)
-            self.assertEqual(utility, pyramid.tests)
+            self.assertEqual(utility, pyramid.tests.test_config)
         finally:
             warnings.resetwarnings()
 
@@ -807,9 +809,10 @@ pyramid.tests.test_config.dummy_include2""",
 
     def test_add_tween_unsuitable(self):
         from pyramid.exceptions import ConfigurationError
-        import pyramid.tests
+        import pyramid.tests.test_config
         config = self._makeOne()
-        self.assertRaises(ConfigurationError, config.add_tween, pyramid.tests)
+        self.assertRaises(ConfigurationError, config.add_tween,
+                          pyramid.tests.test_config)
 
     def test_add_tween_name_ingress(self):
         from pyramid.exceptions import ConfigurationError
@@ -909,15 +912,15 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(len(L), 1)
 
     def test_add_subscriber_dottednames(self):
-        import pyramid.tests
+        import pyramid.tests.test_config
         from pyramid.interfaces import INewRequest
         config = self._makeOne(autocommit=True)
-        config.add_subscriber('pyramid.tests',
+        config.add_subscriber('pyramid.tests.test_config',
                               'pyramid.interfaces.INewRequest')
         handlers = list(config.registry.registeredHandlers())
         self.assertEqual(len(handlers), 1)
         handler = handlers[0]
-        self.assertEqual(handler.handler, pyramid.tests)
+        self.assertEqual(handler.handler, pyramid.tests.test_config)
         self.assertEqual(handler.required, (INewRequest,))
 
     def test_add_object_event_subscriber(self):
@@ -1862,7 +1865,7 @@ pyramid.tests.test_config.dummy_include2""",
                 return {'a':'1'}
         config = self._makeOne(autocommit=True)
         renderer = self._registerRenderer(config)
-        fixture = 'pyramid.tests:fixtures/minimal.txt'
+        fixture = 'pyramid.tests.test_config:files/minimal.txt'
         config.add_view(view=view, renderer=fixture)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
@@ -1902,7 +1905,7 @@ pyramid.tests.test_config.dummy_include2""",
         from pyramid.interfaces import ISettings
         config = self._makeOne(autocommit=True)
         renderer = self._registerRenderer(config)
-        fixture = 'pyramid.tests:fixtures/minimal.txt'
+        fixture = 'pyramid.tests.test_config:files/minimal.txt'
         config.add_view(view=None, renderer=fixture)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
@@ -2625,7 +2628,7 @@ pyramid.tests.test_config.dummy_include2""",
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         config = self._makeOne(autocommit=True)
-        config.add_static_view('static', 'fixtures/static',
+        config.add_static_view('static', 'files',
                                renderer=null_renderer)
         request_type = self._getRouteRequestIface(config, 'static/')
         self._assertRoute(config, 'static/', 'static/*subpath')
@@ -2640,20 +2643,21 @@ pyramid.tests.test_config.dummy_include2""",
         info = DummyStaticURLInfo()
         config = self._makeOne(autocommit=True)
         config.registry.registerUtility(info, IStaticURLInfo)
-        config.add_static_view('static', 'pyramid.tests:fixtures/static')
+        config.add_static_view('static',
+                               'pyramid.tests.test_config:files')
         self.assertEqual(
             info.added,
-            [('static', 'pyramid.tests:fixtures/static', {})])
+            [('static', 'pyramid.tests.test_config:files', {})])
 
     def test_add_static_view_package_here_relative(self):
         from pyramid.interfaces import IStaticURLInfo
         info = DummyStaticURLInfo()
         config = self._makeOne(autocommit=True)
         config.registry.registerUtility(info, IStaticURLInfo)
-        config.add_static_view('static', 'fixtures/static')
+        config.add_static_view('static', 'files')
         self.assertEqual(
             info.added,
-            [('static', 'pyramid.tests.test_config:fixtures/static', {})])
+            [('static', 'pyramid.tests.test_config:files', {})])
 
     def test_add_static_view_absolute(self):
         import os
@@ -2662,7 +2666,7 @@ pyramid.tests.test_config.dummy_include2""",
         config = self._makeOne(autocommit=True)
         config.registry.registerUtility(info, IStaticURLInfo)
         here = os.path.dirname(__file__)
-        static_path = os.path.join(here, 'fixtures', 'static')
+        static_path = os.path.join(here, 'files')
         config.add_static_view('static', static_path)
         self.assertEqual(info.added,
                          [('static', static_path, {})])
@@ -2707,7 +2711,7 @@ pyramid.tests.test_config.dummy_include2""",
         view = lambda *arg: {}
         config.set_notfound_view(
             view,
-            renderer='pyramid.tests:fixtures/minimal.pt')
+            renderer='pyramid.tests.test_config:files/minimal.pt')
         config.begin()
         try: # chameleon depends on being able to find a threadlocal registry
             request = self._makeRequest(config)
@@ -2759,7 +2763,7 @@ pyramid.tests.test_config.dummy_include2""",
         view = lambda *arg: {}
         config.set_forbidden_view(
             view,
-            renderer='pyramid.tests:fixtures/minimal.pt')
+            renderer='pyramid.tests.test_config:files/minimal.pt')
         config.begin()
         try: # chameleon requires a threadlocal registry
             request = self._makeRequest(config)
@@ -2935,12 +2939,12 @@ pyramid.tests.test_config.dummy_include2""",
         config = self._makeOne(autocommit=True)
         override = DummyUnderOverride()
         config.override_asset(
-            'pyramid.tests.fixtureapp:templates/foo.pt',
-            'pyramid.tests.fixtureapp.subpackage:templates/bar.pt',
+            'pyramid.tests.test_config.pkgs.asset:templates/foo.pt',
+            'pyramid.tests.test_config.pkgs.asset.subpackage:templates/bar.pt',
             _override=override)
-        from pyramid.tests import fixtureapp
-        from pyramid.tests.fixtureapp import subpackage
-        self.assertEqual(override.package, fixtureapp)
+        from pyramid.tests.test_config.pkgs import asset
+        from pyramid.tests.test_config.pkgs.asset import subpackage
+        self.assertEqual(override.package, asset)
         self.assertEqual(override.path, 'templates/foo.pt')
         self.assertEqual(override.override_package, subpackage)
         self.assertEqual(override.override_prefix, 'templates/bar.pt')
@@ -2949,12 +2953,12 @@ pyramid.tests.test_config.dummy_include2""",
         config = self._makeOne(autocommit=True)
         override = DummyUnderOverride()
         config.override_asset(
-            'pyramid.tests.fixtureapp',
-            'pyramid.tests.fixtureapp.subpackage',
+            'pyramid.tests.test_config.pkgs.asset',
+            'pyramid.tests.test_config.pkgs.asset.subpackage',
             _override=override)
-        from pyramid.tests import fixtureapp
-        from pyramid.tests.fixtureapp import subpackage
-        self.assertEqual(override.package, fixtureapp)
+        from pyramid.tests.test_config.pkgs import asset
+        from pyramid.tests.test_config.pkgs.asset import subpackage
+        self.assertEqual(override.package, asset)
         self.assertEqual(override.path, '')
         self.assertEqual(override.override_package, subpackage)
         self.assertEqual(override.override_prefix, '')
@@ -2963,12 +2967,12 @@ pyramid.tests.test_config.dummy_include2""",
         config = self._makeOne(autocommit=True)
         override = DummyUnderOverride()
         config.override_asset(
-            'pyramid.tests.fixtureapp:templates/',
-            'pyramid.tests.fixtureapp.subpackage:templates/',
+            'pyramid.tests.test_config.pkgs.asset:templates/',
+            'pyramid.tests.test_config.pkgs.asset.subpackage:templates/',
             _override=override)
-        from pyramid.tests import fixtureapp
-        from pyramid.tests.fixtureapp import subpackage
-        self.assertEqual(override.package, fixtureapp)
+        from pyramid.tests.test_config.pkgs import asset
+        from pyramid.tests.test_config.pkgs.asset import subpackage
+        self.assertEqual(override.package, asset)
         self.assertEqual(override.path, 'templates/')
         self.assertEqual(override.override_package, subpackage)
         self.assertEqual(override.override_prefix, 'templates/')
@@ -2977,12 +2981,12 @@ pyramid.tests.test_config.dummy_include2""",
         config = self._makeOne(autocommit=True)
         override = DummyUnderOverride()
         config.override_asset(
-            'pyramid.tests.fixtureapp:templates/',
-            'pyramid.tests.fixtureapp.subpackage',
+            'pyramid.tests.test_config.pkgs.asset:templates/',
+            'pyramid.tests.test_config.pkgs.asset.subpackage',
             _override=override)
-        from pyramid.tests import fixtureapp
-        from pyramid.tests.fixtureapp import subpackage
-        self.assertEqual(override.package, fixtureapp)
+        from pyramid.tests.test_config.pkgs import asset
+        from pyramid.tests.test_config.pkgs.asset import subpackage
+        self.assertEqual(override.package, asset)
         self.assertEqual(override.path, 'templates/')
         self.assertEqual(override.override_package, subpackage)
         self.assertEqual(override.override_prefix, '')
@@ -2991,12 +2995,12 @@ pyramid.tests.test_config.dummy_include2""",
         config = self._makeOne(autocommit=True)
         override = DummyUnderOverride()
         config.override_asset(
-            'pyramid.tests.fixtureapp',
-            'pyramid.tests.fixtureapp.subpackage:templates/',
+            'pyramid.tests.test_config.pkgs.asset',
+            'pyramid.tests.test_config.pkgs.asset.subpackage:templates/',
             _override=override)
-        from pyramid.tests import fixtureapp
-        from pyramid.tests.fixtureapp import subpackage
-        self.assertEqual(override.package, fixtureapp)
+        from pyramid.tests.test_config.pkgs import asset
+        from pyramid.tests.test_config.pkgs.asset import subpackage
+        self.assertEqual(override.package, asset)
         self.assertEqual(override.path, '')
         self.assertEqual(override.override_package, subpackage)
         self.assertEqual(override.override_prefix, 'templates/')
@@ -3012,10 +3016,10 @@ pyramid.tests.test_config.dummy_include2""",
     def test_add_renderer_dottedname_factory(self):
         from pyramid.interfaces import IRendererFactory
         config = self._makeOne(autocommit=True)
-        import pyramid.tests
-        config.add_renderer('name', 'pyramid.tests')
+        import pyramid.tests.test_config
+        config.add_renderer('name', 'pyramid.tests.test_config')
         self.assertEqual(config.registry.getUtility(IRendererFactory, 'name'),
-                         pyramid.tests)
+                         pyramid.tests.test_config)
 
     def test_add_response_adapter(self):
         from pyramid.interfaces import IResponse
@@ -3050,7 +3054,7 @@ pyramid.tests.test_config.dummy_include2""",
         from zope.interface import alsoProvides
         from pyramid.interfaces import IRequest
         from pyramid.view import render_view_to_response
-        import pyramid.tests.grokkedapp as package
+        import pyramid.tests.test_config.pkgs.scannable as package
         config = self._makeOne(autocommit=True)
         config.scan(package)
 
@@ -3154,7 +3158,7 @@ pyramid.tests.test_config.dummy_include2""",
         from pyramid.interfaces import IRequest
         from pyramid.view import render_view_to_response
         config = self._makeOne(autocommit=True)
-        config.scan('pyramid.tests.grokkedapp')
+        config.scan('pyramid.tests.test_config.pkgs.scannable')
 
         ctx = DummyContext()
         req = DummyRequest()
@@ -3167,8 +3171,48 @@ pyramid.tests.test_config.dummy_include2""",
 
     def test_scan_integration_with_extra_kw(self):
         config = self._makeOne(autocommit=True)
-        config.scan('pyramid.tests.venusianapp', a=1)
+        config.scan('pyramid.tests.test_config.pkgs.scanextrakw', a=1)
         self.assertEqual(config.a, 1)
+
+    def test_scan_integration_with_onerror(self):
+        # fancy sys.path manipulation here to appease "setup.py test" which
+        # fails miserably when it can't import something in the package
+        import sys
+        try:
+            here = os.path.dirname(__file__)
+            path = os.path.join(here, 'path')
+            sys.path.append(path)
+            config = self._makeOne(autocommit=True)
+            class FooException(Exception):
+                pass
+            def onerror(name):
+                raise FooException
+            self.assertRaises(FooException, config.scan, 'scanerror',
+                              onerror=onerror)
+        finally:
+            sys.path.remove(path)
+
+    def test_scan_integration_conflict(self):
+        from zope.configuration.config import ConfigurationConflictError
+        from pyramid.tests.test_config.pkgs import selfscan
+        from pyramid.config import Configurator
+        c = Configurator()
+        c.scan(selfscan)
+        c.scan(selfscan)
+        try:
+            c.commit()
+        except ConfigurationConflictError, why:
+            def scanconflicts(e):
+                conflicts = e._conflicts.values()
+                for conflict in conflicts:
+                    for confinst in conflict:
+                        yield confinst[3]
+            which = list(scanconflicts(why))
+            self.assertEqual(len(which), 4)
+            self.assertTrue("@view_config(renderer='string')" in which)
+            self.assertTrue("@view_config(name='two', renderer='string')" in
+                            which)
+
 
     def test_testing_securitypolicy(self):
         from pyramid.testing import DummySecurityPolicy
@@ -3455,27 +3499,6 @@ pyramid.tests.test_config.dummy_include2""",
         else: # pragma: no cover
             raise AssertionError
 
-    def test_scan_conflict(self):
-        from zope.configuration.config import ConfigurationConflictError
-        from pyramid.tests import selfscanapp
-        from pyramid.config import Configurator
-        c = Configurator()
-        c.scan(selfscanapp)
-        c.scan(selfscanapp)
-        try:
-            c.commit()
-        except ConfigurationConflictError, why:
-            def scanconflicts(e):
-                conflicts = e._conflicts.values()
-                for conflict in conflicts:
-                    for confinst in conflict:
-                        yield confinst[3]
-            which = list(scanconflicts(why))
-            self.assertEqual(len(which), 4)
-            self.assertTrue("@view_config(renderer='string')" in which)
-            self.assertTrue("@view_config(name='two', renderer='string')" in
-                            which)
-
     def test___getattr__missing_when_directives_exist(self):
         config = self._makeOne()
         directives = {}
@@ -3645,7 +3668,7 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
         self._registerRenderer(config)
         view = lambda *arg: 'OK'
         config.add_route('name', 'path', view=view,
-                         view_renderer='fixtures/minimal.txt')
+                         view_renderer='files/minimal.txt')
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         self._assertRoute(config, 'name', 'path')
@@ -3673,7 +3696,7 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
         self._registerRenderer(config)
         view = lambda *arg: 'OK'
         config.add_route('name', 'path', view=view,
-                         renderer='fixtures/minimal.txt')
+                         renderer='files/minimal.txt')
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         self._assertRoute(config, 'name', 'path')

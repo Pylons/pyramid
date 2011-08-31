@@ -1,3 +1,20 @@
+Next release
+============
+
+Features
+--------
+
+- Support an ``onerror`` keyword argument to
+  ``pyramid.config.Configurator.scan()``.  This onerror keyword argument is
+  passed to ``venusian.Scanner.scan()`` to influence error behavior when
+  an exception is raised during scanning.
+
+Dependencies
+------------
+
+- Pyramid now requires Venusian 1.0a1 or better to support the ``onerror``
+  keyword argument to ``pyramid.config.Configurator.scan``.
+
 1.2a3 (2011-08-29)
 ==================
 

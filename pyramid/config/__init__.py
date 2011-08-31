@@ -716,7 +716,7 @@ class Configurator(
         return self.manager.pop()
 
     # this is *not* an action method (uses caller_package)
-    def scan(self, package=None, categories=None, **kw):
+    def scan(self, package=None, categories=None, onerror=None, **kw):
         """Scan a Python package and any of its subpackages for objects
         marked with :term:`configuration decoration` such as
         :class:`pyramid.view.view_config`.  Any decorated object found will
@@ -737,6 +737,13 @@ class Configurator(
         documentation for more information about limiting a scan by using an
         explicit set of categories.
 
+        The ``onerror`` argument, if provided, should be a Venusian
+        ``onerror`` callback function.  The onerror function is passed to
+        :meth:`venusian.Scanner.scan` to influence error behavior when an
+        exception is raised during the scanning process.  See the
+        :term:`Venusian` documentation for more information about ``onerror``
+        callbacks.
+
         To perform a ``scan``, Pyramid creates a Venusian ``Scanner`` object.
         The ``kw`` argument represents a set of keyword arguments to pass to
         the Venusian ``Scanner`` object's constructor.  See the
@@ -754,11 +761,11 @@ class Configurator(
         if package is None: # pragma: no cover
             package = caller_package()
 
-        scankw = {'config':self}
-        scankw.update(kw)
+        ctorkw = {'config':self}
+        ctorkw.update(kw)
 
-        scanner = self.venusian.Scanner(**scankw)
-        scanner.scan(package, categories=categories)
+        scanner = self.venusian.Scanner(**ctorkw)
+        scanner.scan(package, categories=categories, onerror=onerror)
 
     def make_wsgi_app(self):
         """ Commits any pending configuration statements, sends a

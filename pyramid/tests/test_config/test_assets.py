@@ -61,7 +61,7 @@ class TestOverrideProvider(unittest.TestCase):
 
     def test_resource_isdir_no_overrides(self):
         file_resource_name = 'test_assets.py'
-        directory_resource_name = 'fixtures'
+        directory_resource_name = 'files'
         import pyramid.tests.test_config
         provider = self._makeOne(pyramid.tests.test_config)
         result = provider.resource_isdir(file_resource_name)
@@ -70,7 +70,7 @@ class TestOverrideProvider(unittest.TestCase):
         self.assertEqual(result, True)
 
     def test_resource_listdir_no_overrides(self):
-        resource_name = 'fixtures'
+        resource_name = 'files'
         import pyramid.tests.test_config
         provider = self._makeOne(pyramid.tests.test_config)
         result = provider.resource_listdir(resource_name)
@@ -124,7 +124,7 @@ class TestOverrideProvider(unittest.TestCase):
     def test_resource_isdir_override_returns_None(self):
         overrides = DummyOverrides(None)
         self._registerOverrides(overrides)
-        resource_name = 'fixtures'
+        resource_name = 'files'
         import pyramid.tests.test_config
         provider = self._makeOne(pyramid.tests.test_config)
         result = provider.resource_isdir(resource_name)
@@ -133,7 +133,7 @@ class TestOverrideProvider(unittest.TestCase):
     def test_resource_listdir_override_returns_None(self):
         overrides = DummyOverrides(None)
         self._registerOverrides(overrides)
-        resource_name = 'fixtures'
+        resource_name = 'files'
         import pyramid.tests.test_config
         provider = self._makeOne(pyramid.tests.test_config)
         result = provider.resource_listdir(resource_name)
@@ -176,7 +176,7 @@ class TestOverrideProvider(unittest.TestCase):
         import pyramid.tests.test_config
         self._registerOverrides(overrides)
         provider = self._makeOne(pyramid.tests.test_config)
-        result = provider.resource_isdir('fixtures')
+        result = provider.resource_isdir('files')
         self.assertEqual(result, False)
 
     def test_resource_listdir_override_returns_values(self):
@@ -184,7 +184,7 @@ class TestOverrideProvider(unittest.TestCase):
         import pyramid.tests.test_config
         self._registerOverrides(overrides)
         provider = self._makeOne(pyramid.tests.test_config)
-        result = provider.resource_listdir('fixtures')
+        result = provider.resource_listdir('files')
         self.assertEqual(result, ['a'])
 
 class TestPackageOverrides(unittest.TestCase):
@@ -351,7 +351,7 @@ class TestPackageOverrides(unittest.TestCase):
         
     def test_isdir_true(self):
         overrides = [ DummyOverride(
-            ('pyramid.tests.test_config', 'fixtures'))]
+            ('pyramid.tests.test_config', 'files'))]
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides= overrides
@@ -367,7 +367,7 @@ class TestPackageOverrides(unittest.TestCase):
 
     def test_listdir(self):
         overrides = [ DummyOverride(
-            ('pyramid.tests.test_config', 'fixtures'))]
+            ('pyramid.tests.test_config', 'files'))]
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides= overrides
