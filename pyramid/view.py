@@ -230,13 +230,7 @@ class view_config(object):
         settings['_info'] = info.codeinfo # fbo "action_method"
         return wrapped
 
-bfg_view = view_config
-
-deprecated(
-    'bfg_view',
-    'pyramid.view.bfg_view is deprecated as of Pyramid 1.0.  Use '
-    'pyramid.view.view_config instead (API-compat, simple '
-    'rename).')
+bfg_view = view_config # bw compat (forever)
 
 class AppendSlashNotFoundViewFactory(object):
     """ There can only be one :term:`Not Found view` in any

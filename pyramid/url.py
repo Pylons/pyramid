@@ -2,8 +2,6 @@
 
 import os
 
-from zope.deprecation import deprecated
-
 from repoze.lru import lru_cache
 
 from pyramid.interfaces import IContextURL
@@ -527,12 +525,6 @@ def resource_url(resource, request, *elements, **kw):
     return request.resource_url(resource, *elements, **kw)
 
 model_url = resource_url # b/w compat (forever)
-
-deprecated(
-    'model_url',
-    'pyramid.url.model_url is deprecated as of Pyramid 1.0.  Use '
-    '``pyramid.url.resource_url`` instead (API-compat, simple '
-    'rename) or the ``pyramid.request.Request.resource_url`` method.')
 
 def static_url(path, request, **kw):
     """

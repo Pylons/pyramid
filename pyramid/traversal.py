@@ -3,7 +3,6 @@ import warnings
 
 from zope.interface import implements
 from zope.interface.interfaces import IInterface
-from zope.deprecation import deprecated
 
 from repoze.lru import lru_cache
 
@@ -85,13 +84,7 @@ def find_resource(resource, path):
         raise KeyError('%r has no subelement %s' % (context, view_name))
     return context
 
-find_model = find_resource # b/w compat
-
-deprecated(
-    'find_model',
-    'pyramid.traversal.find_model is deprecated as of Pyramid 1.0.  Use'
-    '``pyramid.traversal.find_resource`` instead (API-compat, simple '
-    'rename).')
+find_model = find_resource # b/w compat (forever)
 
 def find_interface(resource, class_or_interface):
     """
@@ -159,13 +152,7 @@ def resource_path(resource, *elements):
     # which caches the joined result for us
     return _join_path_tuple(resource_path_tuple(resource, *elements))
 
-model_path = resource_path # b/w compat
-
-deprecated(
-    'model_path',
-    'pyramid.traversal.model_path is deprecated as of Pyramid 1.0.  Use'
-    '``pyramid.traversal.resource_path`` instead (API-compat, simple rename).')
-
+model_path = resource_path # b/w compat (forever)
 
 def traverse(resource, path):
     """Given a resource object as ``resource`` and a string or tuple
@@ -369,13 +356,7 @@ def resource_path_tuple(resource, *elements):
     """
     return tuple(_resource_path_list(resource, *elements))
 
-model_path_tuple = resource_path_tuple  # b/w compat
-
-deprecated(
-    'model_path_tuple',
-    'pyramid.traversal.model_path_tuple is deprecated as of Pyramid 1.0.  Use'
-    '``pyramid.traversal.resource_path_tuple`` instead (API-compat, simple '
-    'rename).')
+model_path_tuple = resource_path_tuple  # b/w compat (forever)
 
 def _resource_path_list(resource, *elements):
     """ Implementation detail shared by resource_path and resource_path_tuple"""

@@ -160,6 +160,16 @@ Minor Feature Additions
   tuple of HTTP method names.  Previously it was restricted to being a string
   representing a single HTTP method name.
 
+- Undeprecated ``pyramid.traversal.find_model``,
+  ``pyramid.traversal.model_path``, ``pyramid.traversal.model_path_tuple``,
+  and ``pyramid.url.model_url``, which were all deprecated in Pyramid 1.0.
+  There's just not much cost to keeping them around forever as aliases to
+  their renamed ``resource_*`` prefixed functions.
+
+- Undeprecated ``pyramid.view.bfg_view``, which was deprecated in Pyramid
+  1.0.  This is a low-cost alias to ``pyramid.view.view_config`` which we'll
+  just keep around forever.
+
 Deprecations
 ------------
 

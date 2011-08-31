@@ -100,6 +100,20 @@ Future
 - 1.3: Add a default-view-config-params decorator that can be applied to a
   class which names defaults for method-based view_config decorator options.
 
+- 1.4: Remove ``chameleon_text`` / ``chameleon_zpt`` deprecated functions
+  (render_*)
+
+- 1.4: Remove ``pyramid.configuration.ConfigurationError`` (deprecated).
+
+- 1.4: Remove ``pyramid.paster.PyramidTemplate`` (deprecated).
+
+- 1.3: Remove ``pyramid.renderers.renderer_from_name`` (deprecated).
+
+- 1.5: Remove ``pyramid.requests.DeprecatedRequestMethodsMixin``.
+
+- 1.4: Remove ``pyramid.settings.get_settings`` (deprecated).
+
+- 1.5: Remove all deprecated ``pyramid.testing`` functions.
 
 Probably Bad Ideas
 ------------------
