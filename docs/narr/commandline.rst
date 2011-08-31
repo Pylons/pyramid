@@ -593,5 +593,5 @@ use the following command:
 
 .. code-block:: python
 
-   import logging
-   logging.fileConfig('/path/to/my/development.ini')
+   import logging.config
+   logging.config.fileConfig('/path/to/my/development.ini')
