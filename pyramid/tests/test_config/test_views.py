@@ -3507,4 +3507,3 @@ class DummyStaticURLInfo:
 
     def add(self, name, spec, **kw):
         self.added.append((name, spec, kw))
-

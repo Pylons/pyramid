@@ -19,7 +19,7 @@ def includeme(config):
      from pyramid.authentication import AuthTktAuthenticationPolicy
      authn_policy = AuthTktAuthenticationPolicy('seekt1t')
      authz_policy = ACLAuthorizationPolicy()
-     config.scan('pyramid.tests.defpermbugapp')
+     config.scan('pyramid.tests.pkgs.defpermbugapp')
      config._set_authentication_policy(authn_policy)
      config._set_authorization_policy(authz_policy)
      config.set_default_permission('private')

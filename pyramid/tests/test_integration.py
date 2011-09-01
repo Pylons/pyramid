@@ -138,7 +138,7 @@ class IntegrationBase(unittest.TestCase):
         self.config.end()
 
 class TestFixtureApp(IntegrationBase):
-    package = 'pyramid.tests.fixtureapp'
+    package = 'pyramid.tests.pkgs.fixtureapp'
     def test_another(self):
         res = self.testapp.get('/another.html', status=200)
         self.assertEqual(res.body, 'fixture')
@@ -158,8 +158,8 @@ class TestFixtureApp(IntegrationBase):
         self.testapp.get('/protected.html', status=403)
 
 class TestStaticPermApp(IntegrationBase):
-    package = 'pyramid.tests.staticpermapp'
-    root_factory = 'pyramid.tests.staticpermapp:RootFactory'
+    package = 'pyramid.tests.pkgs.staticpermapp'
+    root_factory = 'pyramid.tests.pkgs.staticpermapp:RootFactory'
     def test_allowed(self):
         result = self.testapp.get('/allowed/index.html', status=200)
         self.assertEqual(
@@ -191,7 +191,7 @@ class TestStaticPermApp(IntegrationBase):
 class TestCCBug(IntegrationBase):
     # "unordered" as reported in IRC by author of
     # http://labs.creativecommons.org/2010/01/13/cc-engine-and-web-non-frameworks/
-    package = 'pyramid.tests.ccbugapp'
+    package = 'pyramid.tests.pkgs.ccbugapp'
     def test_rdf(self):
         res = self.testapp.get('/licenses/1/v1/rdf', status=200)
         self.assertEqual(res.body, 'rdf')
@@ -204,7 +204,7 @@ class TestHybridApp(IntegrationBase):
     # make sure views registered for a route "win" over views registered
     # without one, even though the context of the non-route view may
     # be more specific than the route view.
-    package = 'pyramid.tests.hybridapp'
+    package = 'pyramid.tests.pkgs.hybridapp'
     def test_root(self):
         res = self.testapp.get('/', status=200)
         self.assertEqual(res.body, 'global')
@@ -245,14 +245,14 @@ class TestHybridApp(IntegrationBase):
 
 class TestRestBugApp(IntegrationBase):
     # test bug reported by delijati 2010/2/3 (http://pastebin.com/d4cc15515)
-    package = 'pyramid.tests.restbugapp'
+    package = 'pyramid.tests.pkgs.restbugapp'
     def test_it(self):
         res = self.testapp.get('/pet', status=200)
         self.assertEqual(res.body, 'gotten')
 
 class TestForbiddenAppHasResult(IntegrationBase):
     # test that forbidden exception has ACLDenied result attached
-    package = 'pyramid.tests.forbiddenapp'
+    package = 'pyramid.tests.pkgs.forbiddenapp'
     def test_it(self):
         res = self.testapp.get('/x', status=403)
         message, result = [x.strip() for x in res.body.split('\n')]
@@ -266,9 +266,11 @@ class TestForbiddenAppHasResult(IntegrationBase):
             result.endswith("for principals ['system.Everyone']"))
 
 class TestViewDecoratorApp(IntegrationBase):
-    package = 'pyramid.tests.viewdecoratorapp'
+    package = 'pyramid.tests.pkgs.viewdecoratorapp'
     def _configure_mako(self):
-        tmpldir = os.path.join(os.path.dirname(__file__), 'viewdecoratorapp',
+        tmpldir = os.path.join(os.path.dirname(__file__),
+                               'pkgs',
+                               'viewdecoratorapp',
                                'views')
         self.config.registry.settings['mako.directories'] = tmpldir
 
@@ -286,7 +288,7 @@ class TestViewDecoratorApp(IntegrationBase):
 
 class TestViewPermissionBug(IntegrationBase):
     # view_execution_permitted bug as reported by Shane at http://lists.repoze.org/pipermail/repoze-dev/2010-October/003603.html
-    package = 'pyramid.tests.permbugapp'
+    package = 'pyramid.tests.pkgs.permbugapp'
     def test_test(self):
         res = self.testapp.get('/test', status=200)
         self.assertTrue('ACLDenied' in res.body)
@@ -296,7 +298,7 @@ class TestViewPermissionBug(IntegrationBase):
 
 class TestDefaultViewPermissionBug(IntegrationBase):
     # default_view_permission bug as reported by Wiggy at http://lists.repoze.org/pipermail/repoze-dev/2010-October/003602.html
-    package = 'pyramid.tests.defpermbugapp'
+    package = 'pyramid.tests.pkgs.defpermbugapp'
     def test_x(self):
         res = self.testapp.get('/x', status=403)
         self.assertTrue('failed permission check' in res.body)
@@ -309,12 +311,13 @@ class TestDefaultViewPermissionBug(IntegrationBase):
         res = self.testapp.get('/z', status=200)
         self.assertTrue('public' in res.body)
 
-from pyramid.tests.exceptionviewapp.models import AnException, NotAnException
+from pyramid.tests.pkgs.exceptionviewapp.models import \
+     AnException, NotAnException
 excroot = {'anexception':AnException(),
            'notanexception':NotAnException()}
 
 class TestExceptionViewsApp(IntegrationBase):
-    package = 'pyramid.tests.exceptionviewapp'
+    package = 'pyramid.tests.pkgs.exceptionviewapp'
     root_factory = lambda *arg: excroot
     def test_root(self):
         res = self.testapp.get('/', status=200)
@@ -345,7 +348,7 @@ class TestExceptionViewsApp(IntegrationBase):
         self.assertTrue('whoa' in res.body)
 
 class TestConflictApp(unittest.TestCase):
-    package = 'pyramid.tests.conflictapp'
+    package = 'pyramid.tests.pkgs.conflictapp'
     def _makeConfig(self):
         from pyramid.config import Configurator
         config = Configurator()
@@ -413,7 +416,7 @@ class ImperativeIncludeConfigurationTest(unittest.TestCase):
     def setUp(self):
         from pyramid.config import Configurator
         config = Configurator()
-        from pyramid.tests.includeapp1.root import configure
+        from pyramid.tests.pkgs.includeapp1.root import configure
         configure(config)
         app = config.make_wsgi_app()
         from webtest import TestApp
@@ -457,7 +460,7 @@ class SelfScanAppTest(unittest.TestCase):
 
 class WSGIApp2AppTest(unittest.TestCase):
     def setUp(self):
-        from pyramid.tests.wsgiapp2app import main
+        from pyramid.tests.pkgs.wsgiapp2app import main
         config = main()
         app = config.make_wsgi_app()
         from webtest import TestApp
@@ -473,7 +476,7 @@ class WSGIApp2AppTest(unittest.TestCase):
 
 if os.name != 'java': # uses chameleon
     class RendererScanAppTest(IntegrationBase):
-        package = 'pyramid.tests.rendererscanapp'
+        package = 'pyramid.tests.pkgs.rendererscanapp'
         def test_root(self):
             res = self.testapp.get('/one', status=200)
             self.assertTrue('One!' in res.body)
@@ -483,7 +486,7 @@ if os.name != 'java': # uses chameleon
             self.assertTrue('Two!' in res.body)
 
         def test_rescan(self):
-            self.config.scan('pyramid.tests.rendererscanapp')
+            self.config.scan('pyramid.tests.pkgs.rendererscanapp')
             app = self.config.make_wsgi_app()
             from webtest import TestApp
             testapp = TestApp(app)

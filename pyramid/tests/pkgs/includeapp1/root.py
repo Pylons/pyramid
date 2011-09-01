@@ -5,6 +5,6 @@ def aview(request):
 
 def configure(config):
     config.add_view(aview)
-    config.include('pyramid.tests.includeapp1.two.configure')
+    config.include('pyramid.tests.pkgs.includeapp1.two.configure')
     config.commit()
     

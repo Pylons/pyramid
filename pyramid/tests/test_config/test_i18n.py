@@ -5,11 +5,11 @@ from pyramid.tests.test_config import dummyfactory
 
 here = os.path.dirname(__file__)
 locale = os.path.abspath(
-    os.path.join(here, '..', 'localeapp', 'locale'))
+    os.path.join(here, '..', 'pkgs', 'localeapp', 'locale'))
 locale2 = os.path.abspath(
-    os.path.join(here, '..', 'localeapp', 'locale2'))
+    os.path.join(here, '..', 'pkgs', 'localeapp', 'locale2'))
 locale3 = os.path.abspath(
-    os.path.join(here, '..', 'localeapp', 'locale3'))
+    os.path.join(here, '..', 'pkgs', 'localeapp', 'locale3'))
 
 class TestI18NConfiguratorMixin(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
@@ -53,7 +53,7 @@ class TestI18NConfiguratorMixin(unittest.TestCase):
     def test_add_translation_dirs_asset_spec(self):
         from pyramid.interfaces import ITranslationDirectories
         config = self._makeOne(autocommit=True)
-        config.add_translation_dirs('pyramid.tests.localeapp:locale')
+        config.add_translation_dirs('pyramid.tests.pkgs.localeapp:locale')
         self.assertEqual(config.registry.getUtility(ITranslationDirectories),
                          [locale])
 
@@ -62,24 +62,24 @@ class TestI18NConfiguratorMixin(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         directories = ['abc']
         config.registry.registerUtility(directories, ITranslationDirectories)
-        config.add_translation_dirs('pyramid.tests.localeapp:locale')
+        config.add_translation_dirs('pyramid.tests.pkgs.localeapp:locale')
         result = config.registry.getUtility(ITranslationDirectories)
         self.assertEqual(result, [locale, 'abc'])
 
     def test_add_translation_dirs_multiple_specs(self):
         from pyramid.interfaces import ITranslationDirectories
         config = self._makeOne(autocommit=True)
-        config.add_translation_dirs('pyramid.tests.localeapp:locale',
-                                    'pyramid.tests.localeapp:locale2')
+        config.add_translation_dirs('pyramid.tests.pkgs.localeapp:locale',
+                                    'pyramid.tests.pkgs.localeapp:locale2')
         self.assertEqual(config.registry.getUtility(ITranslationDirectories),
                          [locale, locale2])
 
     def test_add_translation_dirs_multiple_specs_multiple_calls(self):
         from pyramid.interfaces import ITranslationDirectories
         config = self._makeOne(autocommit=True)
-        config.add_translation_dirs('pyramid.tests.localeapp:locale',
-                                    'pyramid.tests.localeapp:locale2')
-        config.add_translation_dirs('pyramid.tests.localeapp:locale3')
+        config.add_translation_dirs('pyramid.tests.pkgs.localeapp:locale',
+                                    'pyramid.tests.pkgs.localeapp:locale2')
+        config.add_translation_dirs('pyramid.tests.pkgs.localeapp:locale3')
         self.assertEqual(config.registry.getUtility(ITranslationDirectories),
                          [locale3, locale, locale2])
 
@@ -90,7 +90,7 @@ class TestI18NConfiguratorMixin(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         manager.push({'request':request, 'registry':config.registry})
         try:
-            config.add_translation_dirs('pyramid.tests.localeapp:locale')
+            config.add_translation_dirs('pyramid.tests.pkgs.localeapp:locale')
             translate = config.registry.getUtility(IChameleonTranslate)
             self.assertEqual(translate('Approve'), u'Approve')
         finally:

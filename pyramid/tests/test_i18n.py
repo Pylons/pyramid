@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 #
+import os
+
+here = os.path.dirname(__file__)
+localedir = os.path.join(here, 'pkgs', 'localeapp', 'locale')
 
 import unittest
 from pyramid.testing import cleanUp
@@ -176,10 +180,7 @@ class Test_make_localizer(unittest.TestCase):
         return make_localizer(locale, tdirs)
 
     def test_locale_from_mo(self):
-        import os
         from pyramid.i18n import Localizer
-        here = os.path.dirname(__file__)
-        localedir = os.path.join(here, 'localeapp', 'locale')
         localedirs = [localedir]
         locale_name = 'de'
         result = self._callFUT(locale_name, localedirs)
@@ -190,10 +191,7 @@ class Test_make_localizer(unittest.TestCase):
         self.assertTrue(hasattr(result, 'pluralize'))
 
     def test_locale_from_mo_bad_mo(self):
-        import os
         from pyramid.i18n import Localizer
-        here = os.path.dirname(__file__)
-        localedir = os.path.join(here, 'localeapp', 'locale')
         localedirs = [localedir]
         locale_name = 'be'
         result = self._callFUT(locale_name, localedirs)
@@ -202,10 +200,7 @@ class Test_make_localizer(unittest.TestCase):
                          'Approve')
 
     def test_locale_from_mo_mo_isdir(self):
-        import os
         from pyramid.i18n import Localizer
-        here = os.path.dirname(__file__)
-        localedir = os.path.join(here, 'localeapp', 'locale')
         localedirs = [localedir]
         locale_name = 'gb'
         result = self._callFUT(locale_name, localedirs)
@@ -214,10 +209,7 @@ class Test_make_localizer(unittest.TestCase):
                          'Approve')
 
     def test_territory_fallback(self):
-        import os
         from pyramid.i18n import Localizer
-        here = os.path.dirname(__file__)
-        localedir = os.path.join(here, 'localeapp', 'locale')
         localedirs = [localedir]
         locale_name = 'de_DE'
         result = self._callFUT(locale_name, localedirs)
@@ -270,13 +262,10 @@ class Test_get_localizer(unittest.TestCase):
         self.assertEqual(result, 'abc')
 
     def test_locale_from_mo(self):
-        import os
         from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import ITranslationDirectories
         from pyramid.i18n import Localizer
         registry = get_current_registry()
-        here = os.path.dirname(__file__)
-        localedir = os.path.join(here, 'localeapp', 'locale')
         localedirs = [localedir]
         registry.registerUtility(localedirs, ITranslationDirectories)
         request = DummyRequest()
@@ -289,13 +278,10 @@ class Test_get_localizer(unittest.TestCase):
         self.assertTrue(hasattr(result, 'pluralize'))
 
     def test_locale_from_mo_bad_mo(self):
-        import os
         from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import ITranslationDirectories
         from pyramid.i18n import Localizer
         registry = get_current_registry()
-        here = os.path.dirname(__file__)
-        localedir = os.path.join(here, 'localeapp', 'locale')
         localedirs = [localedir]
         registry.registerUtility(localedirs, ITranslationDirectories)
         request = DummyRequest()
@@ -367,36 +353,24 @@ class TestTranslations(unittest.TestCase):
 
     def test_load_locales_None(self):
         import gettext
-        import os
-        here = os.path.dirname(__file__)
-        localedir = os.path.join(here, 'localeapp', 'locale')
         klass = self._getTargetClass()
         result = klass.load(localedir, None, domain=None)
         self.assertEqual(result.__class__, gettext.NullTranslations)
 
     def test_load_domain_None(self):
         import gettext
-        import os
-        here = os.path.dirname(__file__)
-        localedir = os.path.join(here, 'localeapp', 'locale')
         locales = ['de', 'en']
         klass = self._getTargetClass()
         result = klass.load(localedir, locales, domain=None)
         self.assertEqual(result.__class__, gettext.NullTranslations)
 
     def test_load_found_locale_and_domain(self):
-        import os
-        here = os.path.dirname(__file__)
-        localedir = os.path.join(here, 'localeapp', 'locale')
         locales = ['de', 'en']
         klass = self._getTargetClass()
         result = klass.load(localedir, locales, domain='deformsite')
         self.assertEqual(result.__class__, klass)
 
     def test_load_found_locale_and_domain_locale_is_string(self):
-        import os
-        here = os.path.dirname(__file__)
-        localedir = os.path.join(here, 'localeapp', 'locale')
         locales = 'de'
         klass = self._getTargetClass()
         result = klass.load(localedir, locales, domain='deformsite')
