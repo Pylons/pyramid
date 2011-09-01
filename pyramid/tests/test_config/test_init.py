@@ -693,25 +693,6 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertTrue(IApplicationCreated.providedBy(subscriber[0]))
         pyramid.config.global_registries.empty()
 
-    def test_global_registries_empty(self):
-        from pyramid.config import global_registries
-        self.assertEqual(global_registries.last, None)
-
-    def test_global_registries(self):
-        from pyramid.config import global_registries
-        global_registries.empty()
-        config1 = self._makeOne()
-        config1.make_wsgi_app()
-        self.assertEqual(global_registries.last, config1.registry)
-        config2 = self._makeOne()
-        config2.make_wsgi_app()
-        self.assertEqual(global_registries.last, config2.registry)
-        self.assertEqual(list(global_registries),
-                         [config1.registry, config2.registry])
-        global_registries.remove(config2.registry)
-        self.assertEqual(global_registries.last, config1.registry)
-        global_registries.empty()
-
     def test_include_with_dotted_name(self):
         from pyramid.tests import test_config
         config = self._makeOne()
@@ -1787,6 +1768,36 @@ class TestPyramidConfigurationMachine(unittest.TestCase):
         m = PyramidConfigurationMachine()
         self.assertEqual(m.autocommit, False)
         self.assertEqual(m.route_prefix, None)
+
+class TestGlobalRegistriesIntegration(unittest.TestCase):
+    def setUp(self):
+        from pyramid.config import global_registries
+        global_registries.empty()
+
+    tearDown = setUp
+
+    def _makeConfigurator(self, *arg, **kw):
+        from pyramid.config import Configurator
+        config = Configurator(*arg, **kw)
+        return config
+
+    def test_global_registries_empty(self):
+        from pyramid.config import global_registries
+        self.assertEqual(global_registries.last, None)
+
+    def test_global_registries(self):
+        from pyramid.config import global_registries
+        config1 = self._makeConfigurator()
+        config1.make_wsgi_app()
+        self.assertEqual(global_registries.last, config1.registry)
+        config2 = self._makeConfigurator()
+        config2.make_wsgi_app()
+        self.assertEqual(global_registries.last, config2.registry)
+        self.assertEqual(list(global_registries),
+                         [config1.registry, config2.registry])
+        global_registries.remove(config2.registry)
+        self.assertEqual(global_registries.last, config1.registry)
+
 
 class DummyRequest:
     subpath = ()
