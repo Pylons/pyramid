@@ -71,12 +71,6 @@ class ConfiguratorTests(unittest.TestCase):
         request.registry = config.registry
         return request
 
-    def _conflictFunctions(self, e):
-        conflicts = e._conflicts.values()
-        for conflict in conflicts:
-            for confinst in conflict:
-                yield confinst[2]
-
     def _assertRoute(self, config, name, path, num_predicates=0):
         from pyramid.interfaces import IRoutesMapper
         mapper = config.registry.getUtility(IRoutesMapper)
@@ -839,31 +833,6 @@ pyramid.tests.test_config.dummy_include2""",
         request = self._makeRequest(config)
         self.assertEqual(result(None, request).body, 'foo')
 
-    def test__override_not_yet_registered(self):
-        from pyramid.interfaces import IPackageOverrides
-        package = DummyPackage('package')
-        opackage = DummyPackage('opackage')
-        config = self._makeOne()
-        config._override(package, 'path', opackage, 'oprefix',
-                         PackageOverrides=DummyOverrides)
-        overrides = config.registry.queryUtility(IPackageOverrides,
-                                                 name='package')
-        self.assertEqual(overrides.inserted, [('path', 'opackage', 'oprefix')])
-        self.assertEqual(overrides.package, package)
-
-    def test__override_already_registered(self):
-        from pyramid.interfaces import IPackageOverrides
-        package = DummyPackage('package')
-        opackage = DummyPackage('opackage')
-        overrides = DummyOverrides(package)
-        config = self._makeOne()
-        config.registry.registerUtility(overrides, IPackageOverrides,
-                                        name='package')
-        config._override(package, 'path', opackage, 'oprefix',
-                         PackageOverrides=DummyOverrides)
-        self.assertEqual(overrides.inserted, [('path', 'opackage', 'oprefix')])
-        self.assertEqual(overrides.package, package)
-
     def test_action_branching_kw_is_None(self):
         config = self._makeOne(autocommit=True)
         self.assertEqual(config.action('discrim'), None)
@@ -896,7 +865,7 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(config._ctx.actions, [])
         self.assertEqual(config._ctx.info, 'abc')
 
-    def test_add_static_here_no_utility_registered(self):
+    def test_add_static_view_here_no_utility_registered(self):
         from pyramid.renderers import null_renderer
         from zope.interface import Interface
         from pyramid.static import PackageURLParser
@@ -1367,26 +1336,6 @@ pyramid.tests.test_config.dummy_include2""",
             self.assertTrue("@view_config(name='two', renderer='string')" in
                             which)
 
-    def test_conflict_route_with_view(self):
-        from zope.configuration.config import ConfigurationConflictError
-        config = self._makeOne()
-        def view1(request): pass
-        def view2(request): pass
-        config.add_route('a', '/a', view=view1)
-        config.add_route('a', '/a', view=view2)
-        try:
-            config.commit()
-        except ConfigurationConflictError, why:
-            c1, c2, c3, c4, c5, c6 = self._conflictFunctions(why)
-            self.assertEqual(c1, 'test_conflict_route_with_view')
-            self.assertEqual(c2, 'test_conflict_route_with_view')
-            self.assertEqual(c3, 'test_conflict_route_with_view')
-            self.assertEqual(c4, 'test_conflict_route_with_view')
-            self.assertEqual(c5, 'test_conflict_route_with_view')
-            self.assertEqual(c6, 'test_conflict_route_with_view')
-        else: # pragma: no cover
-            raise AssertionError
-
     def test_hook_zca(self):
         from zope.component import getSiteManager
         def foo():
@@ -1449,7 +1398,7 @@ pyramid.tests.test_config.dummy_include2""",
         try:
             config.commit()
         except ConfigurationConflictError, why:
-            c1, c2 = self._conflictFunctions(why)
+            c1, c2 = _conflictFunctions(why)
             self.assertEqual(c1, 'includeme1')
             self.assertEqual(c2, 'includeme2')
         else: #pragma: no cover
@@ -1494,7 +1443,7 @@ pyramid.tests.test_config.dummy_include2""",
         try:
             config.commit()
         except ConfigurationConflictError, why:
-            c1, c2 = self._conflictFunctions(why)
+            c1, c2 = _conflictFunctions(why)
             self.assertEqual(c1, 'test_conflict_set_notfound_view')
             self.assertEqual(c2, 'test_conflict_set_notfound_view')
         else: # pragma: no cover
@@ -1510,7 +1459,7 @@ pyramid.tests.test_config.dummy_include2""",
         try:
             config.commit()
         except ConfigurationConflictError, why:
-            c1, c2 = self._conflictFunctions(why)
+            c1, c2 = _conflictFunctions(why)
             self.assertEqual(c1, 'test_conflict_set_forbidden_view')
             self.assertEqual(c2, 'test_conflict_set_forbidden_view')
         else: # pragma: no cover
@@ -1741,6 +1690,26 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
         self._assertRoute(config, 'name', 'path')
         self.assertTrue(hasattr(wrapper, '__call_permissive__'))
 
+    def test_conflict_route_with_view(self):
+        from zope.configuration.config import ConfigurationConflictError
+        config = self._makeOne()
+        def view1(request): pass
+        def view2(request): pass
+        config.add_route('a', '/a', view=view1)
+        config.add_route('a', '/a', view=view2)
+        try:
+            config.commit()
+        except ConfigurationConflictError, why:
+            c1, c2, c3, c4, c5, c6 = _conflictFunctions(why)
+            self.assertEqual(c1, 'test_conflict_route_with_view')
+            self.assertEqual(c2, 'test_conflict_route_with_view')
+            self.assertEqual(c3, 'test_conflict_route_with_view')
+            self.assertEqual(c4, 'test_conflict_route_with_view')
+            self.assertEqual(c5, 'test_conflict_route_with_view')
+            self.assertEqual(c6, 'test_conflict_route_with_view')
+        else: # pragma: no cover
+            raise AssertionError
+
 class TestConfigurator_add_directive(unittest.TestCase):
 
     def setUp(self):
@@ -1833,18 +1802,6 @@ class DummyRequest:
     def get_response(self, app):
         return app
 
-class DummyPackage:
-    def __init__(self, name):
-        self.__name__ = name
-
-class DummyOverrides:
-    def __init__(self, package):
-        self.package = package
-        self.inserted = []
-
-    def insert(self, path, package, prefix):
-        self.inserted.append((path, package, prefix))
-
 class DummyResponse:
     status = '200 OK'
     headerlist = ()
@@ -1892,4 +1849,10 @@ class DummyResponse(object):
 from zope.interface import Interface
 class IOther(Interface):
     pass
+
+def _conflictFunctions(e):
+    conflicts = e._conflicts.values()
+    for conflict in conflicts:
+        for confinst in conflict:
+            yield confinst[2]
 

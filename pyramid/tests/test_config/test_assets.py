@@ -100,6 +100,32 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(override.override_package, subpackage)
         self.assertEqual(override.override_prefix, 'templates/')
 
+    def test__override_not_yet_registered(self):
+        from pyramid.interfaces import IPackageOverrides
+        package = DummyPackage('package')
+        opackage = DummyPackage('opackage')
+        config = self._makeOne()
+        config._override(package, 'path', opackage, 'oprefix',
+                         PackageOverrides=DummyPackageOverrides)
+        overrides = config.registry.queryUtility(IPackageOverrides,
+                                                 name='package')
+        self.assertEqual(overrides.inserted, [('path', 'opackage', 'oprefix')])
+        self.assertEqual(overrides.package, package)
+
+    def test__override_already_registered(self):
+        from pyramid.interfaces import IPackageOverrides
+        package = DummyPackage('package')
+        opackage = DummyPackage('opackage')
+        overrides = DummyPackageOverrides(package)
+        config = self._makeOne()
+        config.registry.registerUtility(overrides, IPackageOverrides,
+                                        name='package')
+        config._override(package, 'path', opackage, 'oprefix',
+                         PackageOverrides=DummyPackageOverrides)
+        self.assertEqual(overrides.inserted, [('path', 'opackage', 'oprefix')])
+        self.assertEqual(overrides.package, package)
+
+
 class TestOverrideProvider(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -533,6 +559,14 @@ class DummyOverrides:
         return self.result
 
     listdir = isdir = has_resource = get_stream = get_string = get_filename
+
+class DummyPackageOverrides:
+    def __init__(self, package):
+        self.package = package
+        self.inserted = []
+
+    def insert(self, path, package, prefix):
+        self.inserted.append((path, package, prefix))
     
 class DummyPkgResources:
     def __init__(self):
