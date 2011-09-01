@@ -6,6 +6,16 @@ class TestSettingsConfiguratorMixin(unittest.TestCase):
         config = Configurator(*arg, **kw)
         return config
 
+    def test__set_settings_as_None(self):
+        config = self._makeOne()
+        settings = config._set_settings(None)
+        self.assertTrue(settings)
+
+    def test__set_settings_as_dictwithvalues(self):
+        config = self._makeOne()
+        settings = config._set_settings({'a':'1'})
+        self.assertEqual(settings['a'], '1')
+
     def test_get_settings_nosettings(self):
         from pyramid.registry import Registry
         reg = Registry()
