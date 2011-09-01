@@ -50,11 +50,6 @@ class ConfiguratorTests(unittest.TestCase):
             (classifier, request_iface, ctx_iface), IView, name=name,
             default=None)
 
-    def _getRouteRequestIface(self, config, name):
-        from pyramid.interfaces import IRouteRequest
-        iface = config.registry.getUtility(IRouteRequest, name)
-        return iface
-
     def _registerEventListener(self, config, event_iface=None):
         if event_iface is None: # pragma: no cover
             from zope.interface import Interface
@@ -69,17 +64,6 @@ class ConfiguratorTests(unittest.TestCase):
         request = DummyRequest()
         request.registry = config.registry
         return request
-
-    def _assertRoute(self, config, name, path, num_predicates=0):
-        from pyramid.interfaces import IRoutesMapper
-        mapper = config.registry.getUtility(IRoutesMapper)
-        routes = mapper.get_routes()
-        route = routes[0]
-        self.assertEqual(len(routes), 1)
-        self.assertEqual(route.name, name)
-        self.assertEqual(route.path, path)
-        self.assertEqual(len(routes[0].predicates), num_predicates)
-        return route
 
     def test_ctor_no_registry(self):
         import sys
@@ -793,55 +777,6 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(config._ctx.actions, [])
         self.assertEqual(config._ctx.info, 'abc')
 
-    def test_add_static_view_here_no_utility_registered(self):
-        from pyramid.renderers import null_renderer
-        from zope.interface import Interface
-        from pyramid.static import PackageURLParser
-        from pyramid.interfaces import IView
-        from pyramid.interfaces import IViewClassifier
-        config = self._makeOne(autocommit=True)
-        config.add_static_view('static', 'files',
-                               renderer=null_renderer)
-        request_type = self._getRouteRequestIface(config, 'static/')
-        self._assertRoute(config, 'static/', 'static/*subpath')
-        wrapped = config.registry.adapters.lookup(
-            (IViewClassifier, request_type, Interface), IView, name='')
-        request = self._makeRequest(config)
-        result = wrapped(None, request)
-        self.assertEqual(result.__class__, PackageURLParser)
-
-    def test_add_static_view_package_relative(self):
-        from pyramid.interfaces import IStaticURLInfo
-        info = DummyStaticURLInfo()
-        config = self._makeOne(autocommit=True)
-        config.registry.registerUtility(info, IStaticURLInfo)
-        config.add_static_view('static',
-                               'pyramid.tests.test_config:files')
-        self.assertEqual(
-            info.added,
-            [('static', 'pyramid.tests.test_config:files', {})])
-
-    def test_add_static_view_package_here_relative(self):
-        from pyramid.interfaces import IStaticURLInfo
-        info = DummyStaticURLInfo()
-        config = self._makeOne(autocommit=True)
-        config.registry.registerUtility(info, IStaticURLInfo)
-        config.add_static_view('static', 'files')
-        self.assertEqual(
-            info.added,
-            [('static', 'pyramid.tests.test_config:files', {})])
-
-    def test_add_static_view_absolute(self):
-        import os
-        from pyramid.interfaces import IStaticURLInfo
-        info = DummyStaticURLInfo()
-        config = self._makeOne(autocommit=True)
-        config.registry.registerUtility(info, IStaticURLInfo)
-        here = os.path.dirname(__file__)
-        static_path = os.path.join(here, 'files')
-        config.add_static_view('static', static_path)
-        self.assertEqual(info.added,
-                         [('static', static_path, {})])
 
     def test_set_notfound_view(self):
         from pyramid.renderers import null_renderer
@@ -1755,10 +1690,6 @@ class DummyRequest:
         self.environ = environ
         self.params = {}
         self.cookies = {}
-    def copy(self):
-        return self
-    def get_response(self, app):
-        return app
 
 class DummyResponse:
     status = '200 OK'
@@ -1777,13 +1708,6 @@ class DummyThreadLocalManager(object):
 from zope.interface import implements
 class DummyEvent:
     implements(IDummy)
-
-class DummyStaticURLInfo:
-    def __init__(self):
-        self.added = []
-
-    def add(self, name, spec, **kw):
-        self.added.append((name, spec, kw))
 
 class DummyRegistry(object):
     def __init__(self, adaptation=None):
