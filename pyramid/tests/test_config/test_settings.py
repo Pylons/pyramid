@@ -1,5 +1,42 @@
 import unittest
 
+class TestSettingsConfiguratorMixin(unittest.TestCase):
+    def _makeOne(self, *arg, **kw):
+        from pyramid.config import Configurator
+        config = Configurator(*arg, **kw)
+        return config
+
+    def test_get_settings_nosettings(self):
+        from pyramid.registry import Registry
+        reg = Registry()
+        config = self._makeOne(reg)
+        self.assertEqual(config.get_settings(), None)
+
+    def test_get_settings_withsettings(self):
+        settings = {'a':1}
+        config = self._makeOne()
+        config.registry.settings = settings
+        self.assertEqual(config.get_settings(), settings)
+
+    def test_add_settings_settings_already_registered(self):
+        from pyramid.registry import Registry
+        reg = Registry()
+        config = self._makeOne(reg)
+        config._set_settings({'a':1})
+        config.add_settings({'b':2})
+        settings = reg.settings
+        self.assertEqual(settings['a'], 1)
+        self.assertEqual(settings['b'], 2)
+
+    def test_add_settings_settings_not_yet_registered(self):
+        from pyramid.registry import Registry
+        from pyramid.interfaces import ISettings
+        reg = Registry()
+        config = self._makeOne(reg)
+        config.add_settings({'a':1})
+        settings = reg.getUtility(ISettings)
+        self.assertEqual(settings['a'], 1)
+
 class TestSettings(unittest.TestCase):
     def setUp(self):
         self.warnings = []

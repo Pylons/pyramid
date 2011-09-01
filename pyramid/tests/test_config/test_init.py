@@ -680,37 +680,6 @@ pyramid.tests.test_config.dummy_include2""",
             [('pyramid.tests.test_config.dummy_tween_factory',
               dummy_tween_factory)])
 
-    def test_get_settings_nosettings(self):
-        from pyramid.registry import Registry
-        reg = Registry()
-        config = self._makeOne(reg)
-        self.assertEqual(config.get_settings(), None)
-
-    def test_get_settings_withsettings(self):
-        settings = {'a':1}
-        config = self._makeOne()
-        config.registry.settings = settings
-        self.assertEqual(config.get_settings(), settings)
-
-    def test_add_settings_settings_already_registered(self):
-        from pyramid.registry import Registry
-        reg = Registry()
-        config = self._makeOne(reg)
-        config._set_settings({'a':1})
-        config.add_settings({'b':2})
-        settings = reg.settings
-        self.assertEqual(settings['a'], 1)
-        self.assertEqual(settings['b'], 2)
-
-    def test_add_settings_settings_not_yet_registered(self):
-        from pyramid.registry import Registry
-        from pyramid.interfaces import ISettings
-        reg = Registry()
-        config = self._makeOne(reg)
-        config.add_settings({'a':1})
-        settings = reg.getUtility(ISettings)
-        self.assertEqual(settings['a'], 1)
-
     def test_add_subscriber_defaults(self):
         from zope.interface import implements
         from zope.interface import Interface
