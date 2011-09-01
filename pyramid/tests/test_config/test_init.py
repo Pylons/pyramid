@@ -1367,6 +1367,26 @@ pyramid.tests.test_config.dummy_include2""",
             self.assertTrue("@view_config(name='two', renderer='string')" in
                             which)
 
+    def test_conflict_route_with_view(self):
+        from zope.configuration.config import ConfigurationConflictError
+        config = self._makeOne()
+        def view1(request): pass
+        def view2(request): pass
+        config.add_route('a', '/a', view=view1)
+        config.add_route('a', '/a', view=view2)
+        try:
+            config.commit()
+        except ConfigurationConflictError, why:
+            c1, c2, c3, c4, c5, c6 = self._conflictFunctions(why)
+            self.assertEqual(c1, 'test_conflict_route_with_view')
+            self.assertEqual(c2, 'test_conflict_route_with_view')
+            self.assertEqual(c3, 'test_conflict_route_with_view')
+            self.assertEqual(c4, 'test_conflict_route_with_view')
+            self.assertEqual(c5, 'test_conflict_route_with_view')
+            self.assertEqual(c6, 'test_conflict_route_with_view')
+        else: # pragma: no cover
+            raise AssertionError
+
     def test_hook_zca(self):
         from zope.component import getSiteManager
         def foo():
@@ -1587,12 +1607,6 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
         request.registry = config.registry
         return request
 
-    def _conflictFunctions(self, e):
-        conflicts = e._conflicts.values()
-        for conflict in conflicts:
-            for confinst in conflict:
-                yield confinst[2]
-
     def test_add_route_with_view(self):
         from pyramid.renderers import null_renderer
         config = self._makeOne(autocommit=True)
@@ -1726,27 +1740,6 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
         wrapper = self._getViewCallable(config, None, request_type)
         self._assertRoute(config, 'name', 'path')
         self.assertTrue(hasattr(wrapper, '__call_permissive__'))
-
-    def test_conflict_route_with_view(self):
-        from zope.configuration.config import ConfigurationConflictError
-        config = self._makeOne()
-        def view1(request): pass
-        def view2(request): pass
-        config.add_route('a', '/a', view=view1)
-        config.add_route('a', '/a', view=view2)
-        try:
-            config.commit()
-        except ConfigurationConflictError, why:
-            c1, c2, c3, c4, c5, c6 = self._conflictFunctions(why)
-            self.assertEqual(c1, 'test_conflict_route_with_view')
-            self.assertEqual(c2, 'test_conflict_route_with_view')
-            self.assertEqual(c3, 'test_conflict_route_with_view')
-            self.assertEqual(c4, 'test_conflict_route_with_view')
-            self.assertEqual(c5, 'test_conflict_route_with_view')
-            self.assertEqual(c6, 'test_conflict_route_with_view')
-        else: # pragma: no cover
-            raise AssertionError
-        
 
 class TestConfigurator_add_directive(unittest.TestCase):
 
