@@ -1388,34 +1388,6 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(config.registry.getUtility(IRendererFactory, 'name'),
                          pyramid.tests.test_config)
 
-    def test_add_response_adapter(self):
-        from pyramid.interfaces import IResponse
-        config = self._makeOne(autocommit=True)
-        class Adapter(object):
-            def __init__(self, other):
-                self.other = other
-        config.add_response_adapter(Adapter, str)
-        result = config.registry.queryAdapter('foo', IResponse)
-        self.assertTrue(result.other, 'foo')
-
-    def test_add_response_adapter_self(self):
-        from pyramid.interfaces import IResponse
-        config = self._makeOne(autocommit=True)
-        class Adapter(object):
-            pass
-        config.add_response_adapter(None, Adapter)
-        adapter = Adapter()
-        result = config.registry.queryAdapter(adapter, IResponse)
-        self.assertTrue(result is adapter)
-
-    def test_add_response_adapter_dottednames(self):
-        from pyramid.interfaces import IResponse
-        config = self._makeOne(autocommit=True)
-        config.add_response_adapter('pyramid.response.Response',
-                                    'types.StringType')
-        result = config.registry.queryAdapter('foo', IResponse)
-        self.assertTrue(result.body, 'foo')
-
     def test_scan_integration(self):
         import os
         from zope.interface import alsoProvides
