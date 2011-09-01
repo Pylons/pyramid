@@ -20,6 +20,9 @@ def dummy_include2(config):
 
 includeme = dummy_include
 
+class DummyContext:
+    pass
+
 class DummyFactory(object):
     implements(IFactory)
     def __call__(self):

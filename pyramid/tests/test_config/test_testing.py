@@ -179,8 +179,4 @@ class DummyRequest:
         self.environ = environ
         self.params = {}
         self.cookies = {}
-    def copy(self):
-        return self
-    def get_response(self, app):
-        return app
 
