@@ -766,13 +766,6 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(config._ctx.actions, [])
         self.assertEqual(config._ctx.info, 'abc')
 
-    def test_set_default_permission(self):
-        from pyramid.interfaces import IDefaultPermission
-        config = self._makeOne(autocommit=True)
-        config.set_default_permission('view')
-        self.assertEqual(config.registry.getUtility(IDefaultPermission),
-                         'view')
-
     def test_scan_integration(self):
         from zope.interface import alsoProvides
         from pyramid.interfaces import IRequest

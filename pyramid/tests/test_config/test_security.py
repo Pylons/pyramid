@@ -82,3 +82,10 @@ class ConfiguratorSecurityMethodsTests(unittest.TestCase):
         self.assertEqual(
             config.registry.getUtility(IAuthorizationPolicy), authz_policy)
 
+    def test_set_default_permission(self):
+        from pyramid.interfaces import IDefaultPermission
+        config = self._makeOne(autocommit=True)
+        config.set_default_permission('view')
+        self.assertEqual(config.registry.getUtility(IDefaultPermission),
+                         'view')
+
