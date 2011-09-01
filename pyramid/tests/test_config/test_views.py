@@ -3,6 +3,8 @@ from pyramid import testing
 
 from pyramid.tests.test_config import IDummy
 
+from pyramid.tests.test_config import dummy_view
+
 class TestViewsConfigurationMixin(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.config import Configurator
@@ -1351,6 +1353,58 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         view = self._getViewCallable(config)
         request = self._makeRequest(config)
         self.assertEqual(view(None, request), 'OK')
+
+    def test_derive_view_function(self):
+        from pyramid.renderers import null_renderer
+        def view(request):
+            return 'OK'
+        config = self._makeOne()
+        result = config.derive_view(view, renderer=null_renderer)
+        self.assertFalse(result is view)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test_derive_view_dottedname(self):
+        from pyramid.renderers import null_renderer
+        config = self._makeOne()
+        result = config.derive_view(
+            'pyramid.tests.test_config.dummy_view',
+            renderer=null_renderer)
+        self.assertFalse(result is dummy_view)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test_derive_view_with_default_renderer_no_explicit_renderer(self):
+        config = self._makeOne()
+        class moo(object):
+            def __init__(self, view):
+                pass
+            def __call__(self, *arg, **kw):
+                return 'moo'
+        config.add_renderer(None, moo)
+        config.commit()
+        def view(request):
+            return 'OK'
+        result = config.derive_view(view)
+        self.assertFalse(result is view)
+        self.assertEqual(result(None, None).body, 'moo')
+
+    def test_derive_view_with_default_renderer_with_explicit_renderer(self):
+        class moo(object): pass
+        class foo(object):
+            def __init__(self, view):
+                pass
+            def __call__(self, *arg, **kw):
+                return 'foo'
+        def view(request):
+            return 'OK'
+        config = self._makeOne()
+        config.add_renderer(None, moo)
+        config.add_renderer('foo', foo)
+        config.commit()
+        result = config.derive_view(view, renderer='foo')
+        self.assertFalse(result is view)
+        request = self._makeRequest(config)
+        self.assertEqual(result(None, request).body, 'foo')
+
     
 
 class Test_requestonly(unittest.TestCase):
