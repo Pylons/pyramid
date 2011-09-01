@@ -1,11 +1,8 @@
 import unittest
 
-from pyramid import testing
-
 import os
 
 from pyramid.tests.test_config import dummy_tween_factory
-from pyramid.tests.test_config import dummyfactory
 from pyramid.tests.test_config import dummy_include
 from pyramid.tests.test_config import dummy_extend
 from pyramid.tests.test_config import dummy_extend2
@@ -769,34 +766,6 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(config._ctx.actions, [])
         self.assertEqual(config._ctx.info, 'abc')
 
-    def test_set_renderer_globals_factory(self):
-        import warnings
-        warnings.filterwarnings('ignore')
-        try:
-            from pyramid.interfaces import IRendererGlobalsFactory
-            config = self._makeOne(autocommit=True)
-            factory = object()
-            config.set_renderer_globals_factory(factory)
-            self.assertEqual(
-                config.registry.getUtility(IRendererGlobalsFactory),
-                factory)
-        finally:
-            warnings.resetwarnings()
-
-    def test_set_renderer_globals_factory_dottedname(self):
-        import warnings
-        warnings.filterwarnings('ignore')
-        try:
-            from pyramid.interfaces import IRendererGlobalsFactory
-            config = self._makeOne(autocommit=True)
-            config.set_renderer_globals_factory(
-                'pyramid.tests.test_config.dummyfactory')
-            self.assertEqual(
-                config.registry.getUtility(IRendererGlobalsFactory),
-                dummyfactory)
-        finally:
-            warnings.resetwarnings()
-
     def test_set_default_permission(self):
         from pyramid.interfaces import IDefaultPermission
         config = self._makeOne(autocommit=True)
@@ -804,24 +773,7 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(config.registry.getUtility(IDefaultPermission),
                          'view')
 
-    def test_add_renderer(self):
-        from pyramid.interfaces import IRendererFactory
-        config = self._makeOne(autocommit=True)
-        renderer = object()
-        config.add_renderer('name', renderer)
-        self.assertEqual(config.registry.getUtility(IRendererFactory, 'name'),
-                         renderer)
-
-    def test_add_renderer_dottedname_factory(self):
-        from pyramid.interfaces import IRendererFactory
-        config = self._makeOne(autocommit=True)
-        import pyramid.tests.test_config
-        config.add_renderer('name', 'pyramid.tests.test_config')
-        self.assertEqual(config.registry.getUtility(IRendererFactory, 'name'),
-                         pyramid.tests.test_config)
-
     def test_scan_integration(self):
-        import os
         from zope.interface import alsoProvides
         from pyramid.interfaces import IRequest
         from pyramid.view import render_view_to_response
@@ -1009,7 +961,6 @@ pyramid.tests.test_config.dummy_include2""",
             self.assertNotEqual(sm, '123')
         finally:
             getSiteManager.reset()
-        
 
     def test_commit_conflict_simple(self):
         from zope.configuration.config import ConfigurationConflictError
