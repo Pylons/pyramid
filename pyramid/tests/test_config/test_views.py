@@ -1572,6 +1572,22 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             config.end()
         self.assertTrue('div' in result.body)
 
+    def test_set_view_mapper(self):
+        from pyramid.interfaces import IViewMapperFactory
+        config = self._makeOne(autocommit=True)
+        mapper = object()
+        config.set_view_mapper(mapper)
+        result = config.registry.getUtility(IViewMapperFactory)
+        self.assertEqual(result, mapper)
+
+    def test_set_view_mapper_dottedname(self):
+        from pyramid.interfaces import IViewMapperFactory
+        config = self._makeOne(autocommit=True)
+        config.set_view_mapper('pyramid.tests.test_config')
+        result = config.registry.getUtility(IViewMapperFactory)
+        from pyramid.tests import test_config
+        self.assertEqual(result, test_config)
+
 
 class Test_requestonly(unittest.TestCase):
     def _callFUT(self, view, attr=None):

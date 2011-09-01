@@ -777,22 +777,6 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(config._ctx.actions, [])
         self.assertEqual(config._ctx.info, 'abc')
 
-    def test_set_locale_negotiator(self):
-        from pyramid.interfaces import ILocaleNegotiator
-        config = self._makeOne(autocommit=True)
-        def negotiator(request): pass
-        config.set_locale_negotiator(negotiator)
-        self.assertEqual(config.registry.getUtility(ILocaleNegotiator),
-                         negotiator)
-
-    def test_set_locale_negotiator_dottedname(self):
-        from pyramid.interfaces import ILocaleNegotiator
-        config = self._makeOne(autocommit=True)
-        config.set_locale_negotiator(
-            'pyramid.tests.test_config.dummyfactory')
-        self.assertEqual(config.registry.getUtility(ILocaleNegotiator),
-                         dummyfactory)
-
     def test_set_renderer_globals_factory(self):
         import warnings
         warnings.filterwarnings('ignore')
@@ -828,21 +812,21 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(config.registry.getUtility(IDefaultPermission),
                          'view')
 
-    def test_add_view_mapper(self):
-        from pyramid.interfaces import IViewMapperFactory
+    def test_set_locale_negotiator(self):
+        from pyramid.interfaces import ILocaleNegotiator
         config = self._makeOne(autocommit=True)
-        mapper = object()
-        config.set_view_mapper(mapper)
-        result = config.registry.getUtility(IViewMapperFactory)
-        self.assertEqual(result, mapper)
+        def negotiator(request): pass
+        config.set_locale_negotiator(negotiator)
+        self.assertEqual(config.registry.getUtility(ILocaleNegotiator),
+                         negotiator)
 
-    def test_add_view_mapper_dottedname(self):
-        from pyramid.interfaces import IViewMapperFactory
+    def test_set_locale_negotiator_dottedname(self):
+        from pyramid.interfaces import ILocaleNegotiator
         config = self._makeOne(autocommit=True)
-        config.set_view_mapper('pyramid.tests.test_config')
-        result = config.registry.getUtility(IViewMapperFactory)
-        from pyramid.tests import test_config
-        self.assertEqual(result, test_config)
+        config.set_locale_negotiator(
+            'pyramid.tests.test_config.dummyfactory')
+        self.assertEqual(config.registry.getUtility(ILocaleNegotiator),
+                         dummyfactory)
 
     def test_add_translation_dirs_missing_dir(self):
         from pyramid.exceptions import ConfigurationError
