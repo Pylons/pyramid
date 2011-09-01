@@ -1,6 +1,105 @@
 import unittest
 from pyramid.testing import cleanUp
 
+class TestAssetsConfiguratorMixin(unittest.TestCase):
+    def _makeOne(self, *arg, **kw):
+        from pyramid.config import Configurator
+        config = Configurator(*arg, **kw)
+        return config
+
+    def test_override_asset_samename(self):
+        from pyramid.exceptions import ConfigurationError
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError, config.override_asset,'a', 'a')
+
+    def test_override_asset_directory_with_file(self):
+        from pyramid.exceptions import ConfigurationError
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError, config.override_asset,
+                          'a:foo/', 'a:foo.pt')
+
+    def test_override_asset_file_with_directory(self):
+        from pyramid.exceptions import ConfigurationError
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError, config.override_asset,
+                          'a:foo.pt', 'a:foo/')
+
+    def test_override_asset_file_with_package(self):
+        from pyramid.exceptions import ConfigurationError
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError, config.override_asset,
+                          'a:foo.pt', 'a')
+
+    def test_override_asset_file_with_file(self):
+        config = self._makeOne(autocommit=True)
+        override = DummyUnderOverride()
+        config.override_asset(
+            'pyramid.tests.test_config.pkgs.asset:templates/foo.pt',
+            'pyramid.tests.test_config.pkgs.asset.subpackage:templates/bar.pt',
+            _override=override)
+        from pyramid.tests.test_config.pkgs import asset
+        from pyramid.tests.test_config.pkgs.asset import subpackage
+        self.assertEqual(override.package, asset)
+        self.assertEqual(override.path, 'templates/foo.pt')
+        self.assertEqual(override.override_package, subpackage)
+        self.assertEqual(override.override_prefix, 'templates/bar.pt')
+
+    def test_override_asset_package_with_package(self):
+        config = self._makeOne(autocommit=True)
+        override = DummyUnderOverride()
+        config.override_asset(
+            'pyramid.tests.test_config.pkgs.asset',
+            'pyramid.tests.test_config.pkgs.asset.subpackage',
+            _override=override)
+        from pyramid.tests.test_config.pkgs import asset
+        from pyramid.tests.test_config.pkgs.asset import subpackage
+        self.assertEqual(override.package, asset)
+        self.assertEqual(override.path, '')
+        self.assertEqual(override.override_package, subpackage)
+        self.assertEqual(override.override_prefix, '')
+
+    def test_override_asset_directory_with_directory(self):
+        config = self._makeOne(autocommit=True)
+        override = DummyUnderOverride()
+        config.override_asset(
+            'pyramid.tests.test_config.pkgs.asset:templates/',
+            'pyramid.tests.test_config.pkgs.asset.subpackage:templates/',
+            _override=override)
+        from pyramid.tests.test_config.pkgs import asset
+        from pyramid.tests.test_config.pkgs.asset import subpackage
+        self.assertEqual(override.package, asset)
+        self.assertEqual(override.path, 'templates/')
+        self.assertEqual(override.override_package, subpackage)
+        self.assertEqual(override.override_prefix, 'templates/')
+
+    def test_override_asset_directory_with_package(self):
+        config = self._makeOne(autocommit=True)
+        override = DummyUnderOverride()
+        config.override_asset(
+            'pyramid.tests.test_config.pkgs.asset:templates/',
+            'pyramid.tests.test_config.pkgs.asset.subpackage',
+            _override=override)
+        from pyramid.tests.test_config.pkgs import asset
+        from pyramid.tests.test_config.pkgs.asset import subpackage
+        self.assertEqual(override.package, asset)
+        self.assertEqual(override.path, 'templates/')
+        self.assertEqual(override.override_package, subpackage)
+        self.assertEqual(override.override_prefix, '')
+
+    def test_override_asset_package_with_directory(self):
+        config = self._makeOne(autocommit=True)
+        override = DummyUnderOverride()
+        config.override_asset(
+            'pyramid.tests.test_config.pkgs.asset',
+            'pyramid.tests.test_config.pkgs.asset.subpackage:templates/',
+            _override=override)
+        from pyramid.tests.test_config.pkgs import asset
+        from pyramid.tests.test_config.pkgs.asset import subpackage
+        self.assertEqual(override.package, asset)
+        self.assertEqual(override.path, '')
+        self.assertEqual(override.override_package, subpackage)
+        self.assertEqual(override.override_prefix, 'templates/')
+
 class TestOverrideProvider(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -445,3 +544,12 @@ class DummyPkgResources:
 class DummyPackage:
     def __init__(self, name):
         self.__name__ = name
+
+class DummyUnderOverride:
+    def __call__(self, package, path, override_package, override_prefix,
+                 _info=u''):
+        self.package = package
+        self.path = path
+        self.override_package = override_package
+        self.override_prefix = override_prefix
+
