@@ -31,12 +31,6 @@ Dependencies
 - Pyramid now requires Venusian 1.0a1 or better to support the ``onerror``
   keyword argument to ``pyramid.config.Configurator.scan``.
 
-Documentation
--------------
-
-- Added a "Fixing HTTP vs. HTTP When Deploying Behind a Proxy" section to the
-  "Virtual Hosting" chapter.
-
 1.2a3 (2011-08-29)
 ==================
 
