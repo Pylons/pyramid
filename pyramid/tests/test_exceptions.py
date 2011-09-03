@@ -45,3 +45,32 @@ class TestForbidden(unittest.TestCase):
         from pyramid.httpexceptions import HTTPForbidden
         self.assertTrue(Forbidden is HTTPForbidden)
 
+class TestConfigurationConflictError(unittest.TestCase):
+    def _makeOne(self, conflicts):
+        from pyramid.exceptions import ConfigurationConflictError
+        return ConfigurationConflictError(conflicts)
+
+    def test_str(self):
+        conflicts = {'a':('1', '2', '3'), 'b':('4', '5', '6')}
+        exc = self._makeOne(conflicts)
+        self.assertEqual(str(exc),
+"""\
+Conflicting configuration actions
+  For: a
+    1
+    2
+    3
+  For: b
+    4
+    5
+    6""")
+
+class TestConfigurationExecutionError(unittest.TestCase):
+    def _makeOne(self, etype, evalue, info):
+        from pyramid.exceptions import ConfigurationExecutionError
+        return ConfigurationExecutionError(etype, evalue, info)
+
+    def test_str(self):
+        exc = self._makeOne('etype', 'evalue', 'info')
+        self.assertEqual(str(exc), 'etype: evalue\n  in:\n  info')
+        

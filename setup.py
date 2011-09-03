@@ -35,9 +35,8 @@ install_requires=[
     'repoze.lru',
     'setuptools',
     'zope.component >= 3.6.0', # independent of zope.hookable
-    'zope.configuration',
-    'zope.deprecation',
     'zope.interface >= 3.5.1',  # 3.5.0 comment: "allow to bootstrap on jython"
+    'zope.deprecation',
     'venusian >= 1.0a1', # ``onerror``
     'translationstring',
     ]

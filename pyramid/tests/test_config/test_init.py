@@ -14,6 +14,10 @@ try:
 except:
     __pypy__ = None
 
+from pyramid.exceptions import ConfigurationExecutionError
+from pyramid.exceptions import ConfigurationConflictError
+from pyramid.exceptions import ConfigurationError
+
 class ConfiguratorTests(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.config import Configurator
@@ -141,7 +145,6 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(policy, result)
 
     def test_ctor_authorization_policy_only(self):
-        from zope.configuration.config import ConfigurationExecutionError
         policy = object()
         config = self._makeOne(authorization_policy=policy)
         self.assertRaises(ConfigurationExecutionError, config.commit)
@@ -266,8 +269,7 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_maybe_dotted_string_fail(self):
         config = self._makeOne()
-        self.assertRaises(ImportError,
-                          config.maybe_dotted, 'cant.be.found')
+        self.assertRaises(ImportError, config.maybe_dotted, 'cant.be.found')
 
     def test_maybe_dotted_notstring_success(self):
         import pyramid.tests.test_config
@@ -463,7 +465,6 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(result, pyramid.tests.test_config)
 
     def test_setup_registry_authorization_policy_only(self):
-        from zope.configuration.config import ConfigurationExecutionError
         from pyramid.registry import Registry
         policy = object()
         reg = Registry()
@@ -899,7 +900,6 @@ pyramid.tests.test_config.dummy_include2""",
             sys.path.remove(path)
 
     def test_scan_integration_conflict(self):
-        from zope.configuration.config import ConfigurationConflictError
         from pyramid.tests.test_config.pkgs import selfscan
         from pyramid.config import Configurator
         c = Configurator()
@@ -946,7 +946,6 @@ pyramid.tests.test_config.dummy_include2""",
             getSiteManager.reset()
 
     def test_commit_conflict_simple(self):
-        from zope.configuration.config import ConfigurationConflictError
         config = self._makeOne()
         def view1(request): pass
         def view2(request): pass
@@ -967,7 +966,6 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(registeredview.__name__, 'view1')
 
     def test_commit_conflict_with_two_includes(self):
-        from zope.configuration.config import ConfigurationConflictError
         config = self._makeOne()
         def view1(request): pass
         def view2(request): pass
@@ -1016,7 +1014,6 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(registeredview.__name__, 'view3')
 
     def test_conflict_set_notfound_view(self):
-        from zope.configuration.config import ConfigurationConflictError
         config = self._makeOne()
         def view1(request): pass
         def view2(request): pass
@@ -1032,7 +1029,6 @@ pyramid.tests.test_config.dummy_include2""",
             raise AssertionError
 
     def test_conflict_set_forbidden_view(self):
-        from zope.configuration.config import ConfigurationConflictError
         config = self._makeOne()
         def view1(request): pass
         def view2(request): pass
@@ -1273,7 +1269,6 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
         self.assertTrue(hasattr(wrapper, '__call_permissive__'))
 
     def test_conflict_route_with_view(self):
-        from zope.configuration.config import ConfigurationConflictError
         config = self._makeOne()
         def view1(request): pass
         def view2(request): pass
@@ -1339,7 +1334,6 @@ class TestConfigurator_add_directive(unittest.TestCase):
             )
 
     def test_extend_action_method_successful(self):
-        from zope.configuration.config import ConfigurationConflictError
         config = self.config
         config.add_directive(
             'dummy_extend', dummy_extend)
@@ -1348,11 +1342,11 @@ class TestConfigurator_add_directive(unittest.TestCase):
         self.assertRaises(ConfigurationConflictError, config.commit)
 
     def test_directive_persists_across_configurator_creations(self):
-        from zope.configuration.config import GroupingContextDecorator
+        from pyramid.config import ActionStateWrapper
         config = self.config
         config.add_directive('dummy_extend', dummy_extend)
         context = config._make_context(autocommit=False)
-        context = GroupingContextDecorator(context)
+        context = ActionStateWrapper(context)
         config2 = config.with_context(context)
         config2.dummy_extend('discrim')
         context_after = config2._ctx
@@ -1363,12 +1357,137 @@ class TestConfigurator_add_directive(unittest.TestCase):
             ('discrim', None, config2.package),
             )
 
-class TestPyramidConfigurationMachine(unittest.TestCase):
+class TestActionState(unittest.TestCase):
+    def _makeOne(self):
+        from pyramid.config import ActionState
+        return ActionState()
+    
     def test_it(self):
-        from pyramid.config import PyramidConfigurationMachine
-        m = PyramidConfigurationMachine()
-        self.assertEqual(m.autocommit, False)
-        self.assertEqual(m.route_prefix, None)
+        c = self._makeOne()
+        self.assertEqual(c.autocommit, False)
+        self.assertEqual(c.route_prefix, None)
+
+    def test_action_simple(self):
+        from pyramid.tests.test_config import dummyfactory as f
+        c = self._makeOne()
+        c.actions = []
+        c.action(1, f, (1,), {'x':1})
+        self.assertEqual(c.actions, [(1, f, (1,), {'x': 1})])
+        c.action(None)
+        self.assertEqual(c.actions, [(1, f, (1,), {'x': 1}), (None, None)])
+
+    def test_action_with_includepath_and_info(self):
+        c = self._makeOne()
+        c.actions = []
+        c.includepath = ('foo.zcml',)
+        c.info = '?'
+        c.action(None)
+        self.assertEqual(c.actions,
+                         [(None, None, (), {}, ('foo.zcml',), '?')])
+
+    def test_action_with_order(self):
+        c = self._makeOne()
+        c.actions = []
+        c.action(None, order=99999)
+        self.assertEqual(c.actions, [(None, None, (), {}, (), '', 99999)])
+
+    def test_action_with_includepath_dynamic(self):
+        c = self._makeOne()
+        c.actions = []
+        c.action(None, includepath=('abc',))
+        self.assertEqual(c.actions, [(None, None, (), {}, ('abc',))])
+
+    def test_action_with_info_dynamic(self):
+        c = self._makeOne()
+        c.actions = []
+        c.action(None, info='abc')
+        self.assertEqual(c.actions, [(None, None, (), {}, (), 'abc')])
+
+    def test_processSpec(self):
+        c = self._makeOne()
+        self.assertTrue(c.processSpec('spec'))
+        self.assertFalse(c.processSpec('spec'))
+
+    def test_execute_actions_simple(self):
+        output = []
+        def f(*a, **k):
+            output.append(('f', a, k))
+        c = self._makeOne()
+        c.actions = [
+            (1, f, (1,)),
+            (1, f, (11,), {}, ('x', )),
+            (2, f, (2,)),
+            (None, None),
+            ]
+        c.execute_actions()
+        self.assertEqual(output,  [('f', (1,), {}), ('f', (2,), {})])
+
+    def test_execute_actions_error(self):
+        output = []
+        def f(*a, **k):
+            output.append(('f', a, k))
+        def bad():
+            raise NotImplementedError
+        c = self._makeOne()
+        c.actions = [
+            (1, f, (1,)),
+            (1, f, (11,), {}, ('x', )),
+            (2, f, (2,)),
+            (3, bad, (), {}, (), 'oops')
+            ]
+        self.assertRaises(ConfigurationExecutionError, c.execute_actions)
+        self.assertEqual(output, [('f', (1,), {}), ('f', (2,), {})])
+
+class TestActionStateWrapper(unittest.TestCase):
+    def _makeOne(self, state):
+        from pyramid.config import ActionStateWrapper
+        return ActionStateWrapper(state)
+
+    def test___getattr__(self):
+        state = DummyContext()
+        state.foo = 1
+        state.bar = 2
+        wrapper = self._makeOne(state)
+        self.assertEqual(wrapper.foo, 1)
+        wrapper.bar = 2
+        self.assertEqual(state.bar, 2)
+
+class Test_resolveConflicts(unittest.TestCase):
+    def _callFUT(self, actions):
+        from pyramid.config import resolveConflicts
+        return resolveConflicts(actions)
+
+    def test_it_success(self):
+        from pyramid.tests.test_config import dummyfactory as f
+        result = self._callFUT([
+            (None, f),
+            (1, f, (1,), {}, (), 'first'),
+            (1, f, (2,), {}, ('x',), 'second'),
+            (1, f, (3,), {}, ('y',), 'third'),
+            (4, f, (4,), {}, ('y',), 'should be last', 99999),
+            (3, f, (3,), {}, ('y',)),
+            (None, f, (5,), {}, ('y',)),
+            ])
+        self.assertEqual(result,
+                         [(None, f),
+                          (1, f, (1,), {}, (), 'first'),
+                          (3, f, (3,), {}, ('y',)),
+                          (None, f, (5,), {}, ('y',)),
+                          (4, f, (4,), {}, ('y',), 'should be last')])
+
+    def test_it_conflict(self):
+        from pyramid.tests.test_config import dummyfactory as f
+        self.assertRaises(
+            ConfigurationConflictError,
+            self._callFUT, [
+                (None, f),
+                (1, f, (2,), {}, ('x',), 'eek'),
+                (1, f, (3,), {}, ('y',), 'ack'),
+                (4, f, (4,), {}, ('y',)),
+                (3, f, (3,), {}, ('y',)),
+                (None, f, (5,), {}, ('y',)),
+                ]
+            )
 
 class TestGlobalRegistriesIntegration(unittest.TestCase):
     def setUp(self):

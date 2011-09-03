@@ -3,6 +3,8 @@ import unittest
 from pyramid.tests.test_config import dummy_tween_factory
 from pyramid.tests.test_config import dummy_tween_factory2
 
+from pyramid.exceptions import ConfigurationConflictError
+
 class TestTweensConfiguratorMixin(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.config import Configurator
@@ -118,7 +120,6 @@ class TestTweensConfiguratorMixin(unittest.TestCase):
         self.assertRaises(ConfigurationError, config.add_tween, MAIN)
 
     def test_add_tweens_conflict(self):
-        from zope.configuration.config import ConfigurationConflictError
         config = self._makeOne()
         config.add_tween('pyramid.tests.test_config.dummy_tween_factory')
         config.add_tween('pyramid.tests.test_config.dummy_tween_factory')
