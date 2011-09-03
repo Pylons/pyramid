@@ -733,29 +733,30 @@ pyramid.tests.test_config.dummy_include2""",
         config = self._makeOne(autocommit=True)
         self.assertEqual(config.action('discrim', kw={'a':1}), None)
 
-    def test_action_branching_nonautocommit_without_context_info(self):
-        config = self._makeOne(autocommit=False)
-        config._ctx = DummyContext()
-        config._ctx.info = None
-        config._ctx.autocommit = False
-        config._ctx.actions = []
-        self.assertEqual(config.action('discrim', kw={'a':1}), None)
-        self.assertEqual(config._ctx.actions, [('discrim', None, (), {'a': 1})])
-        # info is not set on ctx, it's set on the groupingcontextdecorator,
-        # and then lost
-
     def test_action_branching_nonautocommit_with_context_info(self):
         config = self._makeOne(autocommit=False)
-        config._ctx = DummyContext()
-        config._ctx.info = 'abc'
-        config._ctx.autocommit = False
-        config._ctx.actions = []
-        config._ctx.action = lambda *arg, **kw: self.assertEqual(
-            arg,
-            ('discrim', None, (), {'a': 1}, 0))
-        self.assertEqual(config.action('discrim', kw={'a':1}), None)
-        self.assertEqual(config._ctx.actions, [])
-        self.assertEqual(config._ctx.info, 'abc')
+        state = DummyActionState()
+        state.autocommit = False
+        state.info = 'abc'
+        config._ctx = state
+        config.action('discrim', kw={'a':1})
+        self.assertEqual(
+            state.actions,
+            [(('discrim', None, (), {'a': 1}, 0), {'info': 'abc'})]
+            )
+
+    def test_action_branching_nonautocommit_without_context_info(self):
+        config = self._makeOne(autocommit=False)
+        state = DummyActionState()
+        state.autocommit = False
+        state.info = ''
+        config._ctx = state
+        config._ainfo = ['z']
+        config.action('discrim', kw={'a':1})
+        self.assertEqual(
+            state.actions,
+            [(('discrim', None, (), {'a': 1}, 0), {'info': 'z'})]
+            )
 
     def test_scan_integration(self):
         from zope.interface import alsoProvides
@@ -1575,3 +1576,10 @@ def _conflictFunctions(e):
         for confinst in conflict:
             yield confinst[2]
 
+class DummyActionState(object):
+    autocommit = False
+    info = ''
+    def __init__(self):
+        self.actions = []
+    def action(self, *arg, **kw):
+        self.actions.append((arg, kw))
