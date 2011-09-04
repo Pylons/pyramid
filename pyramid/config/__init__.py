@@ -577,18 +577,26 @@ class Configurator(
 
         The ``route_prefix`` parameter is new as of Pyramid 1.2.
         """
+        # """ <-- emacs
 
         _context = self._ctx
         if _context is None:
             _context = self._ctx = self._make_context(self.autocommit)
 
-        if self.route_prefix:
-            old_prefix = self.route_prefix.rstrip('/') + '/'
-        else:
-            old_prefix = ''
+        if route_prefix is None:
+            route_prefix = ''
 
-        if route_prefix:
-            route_prefix = old_prefix + route_prefix.lstrip('/')
+        old_route_prefix = self.route_prefix
+        if old_route_prefix is None:
+            old_route_prefix = ''
+
+        route_prefix = '%s/%s' % (
+            old_route_prefix.rstrip('/'),
+            route_prefix.lstrip('/')
+            )
+        route_prefix = route_prefix.lstrip('/').rstrip('/')
+        if not route_prefix:
+            route_prefix = None
 
         c = self.maybe_dotted(callable)
         module = inspect.getmodule(c)
