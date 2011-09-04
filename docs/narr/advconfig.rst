@@ -82,11 +82,8 @@ that ends something like this:
        self.commit()
      File "pyramid/pyramid/config.py", line 473, in commit
        self._ctx.execute_actions()
-     File "zope/configuration/config.py", line 600, in execute_actions
-       for action in resolveConflicts(self.actions):
-     File "zope/configuration/config.py", line 1507, in resolveConflicts
-       raise ConfigurationConflictError(conflicts)
-   zope.configuration.config.ConfigurationConflictError:
+     ... more code ...
+   pyramid.exceptions.ConfigurationConflictError:
            Conflicting configuration actions
      For: ('view', None, '', None, <InterfaceClass pyramid.interfaces.IView>,
            None, None, None, None, None, False, None, None, None)

@@ -711,39 +711,32 @@ Pyramid Has Too Many Dependencies
 ---------------------------------
 
 This is true.  At the time of this writing, the total number of Python
-package distributions that :app:`Pyramid` depends upon transitively is 18 if
-you use Python 2.6 or 2.7, or 16 if you use Python 2.5.  This is a lot more
+package distributions that :app:`Pyramid` depends upon transitively is 15 if
+you use Python 2.7, or 17 if you use Python 2.5 or 2.6.  This is a lot more
 than zero package distribution dependencies: a metric which various Python
 microframeworks and Django boast.
 
-The :mod:`zope.component` and :mod:`zope.configuration` packages on which
-:app:`Pyramid` depends have transitive dependencies on several other packages
-(:mod:`zope.schema`, :mod:`zope.i18n`, :mod:`zope.event`,
-:mod:`zope.interface`, :mod:`zope.deprecation`, :mod:`zope.i18nmessageid`).
-We've been working with the Zope community to try to collapse and untangle
-some of these dependencies.  We'd prefer that these packages have fewer
-packages as transitive dependencies, and that much of the functionality of
-these packages was moved into a smaller *number* of packages.
-
-:app:`Pyramid` also has its own direct dependencies, such as :term:`Paste`,
-:term:`Chameleon`, :term:`Mako` and :term:`WebOb`, and some of these in turn
-have their own transitive dependencies.
-
-It should be noted that :app:`Pyramid` is positively lithe compared to
-:term:`Grok`, a different Zope-based framework.  As of this writing, in its
-default configuration, Grok has 109 package distribution dependencies. The
-number of dependencies required by :app:`Pyramid` is many times fewer than
-Grok (or Zope itself, upon which Grok is based).  :app:`Pyramid` has a number
-of package distribution dependencies comparable to similarly-targeted
-frameworks such as Pylons 1.X.
+The :mod:`zope.component`, package on which :app:`Pyramid` depends has
+transitive dependencies on several other packages (:mod:`zope.event`, and
+:mod:`zope.interface`).  :app:`Pyramid` also has its own direct dependencies,
+such as :term:`Paste`, :term:`Chameleon`, :term:`Mako` :term:`WebOb`,
+:mod:`zope.deprecation` and some of these in turn have their own transitive
+dependencies.
 
 We try not to reinvent too many wheels (at least the ones that don't need
 reinventing), and this comes at the cost of some number of dependencies.
 However, "number of package distributions" is just not a terribly great
 metric to measure complexity.  For example, the :mod:`zope.event`
 distribution on which :app:`Pyramid` depends has a grand total of four lines
-of runtime code.  As noted above, we're continually trying to agitate for a
-collapsing of these sorts of packages into fewer distribution files.
+of runtime code.
+
+In the meantime, :app:`Pyramid` has a number of package distribution
+dependencies comparable to similarly-targeted frameworks such as Pylons 1.X.
+It may be in the future that we shed more dependencies as the result of a
+port to Python 3 (the less code we need to port, the better).  In the future,
+we may also move templating system dependencies out of the core and place
+them in add-on packages, to be included by developers instead of by the
+framework.  This would reduce the number of core dependencies by about five.
 
 Pyramid "Cheats" To Obtain Speed
 --------------------------------

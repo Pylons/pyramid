@@ -79,9 +79,6 @@ Future
 
 - 1.3/1.4: use zope.registry rather than zope.component.
 
-- 1.3/1.4: get rid of zope.configuration dependency.  This will also speed up
-  startup time (defer _bootstrap and registerCommonDirectives() until needed).
-
 - 1.3: Michael's route group work
 
 - 1.3: Add a default-view-config-params decorator that can be applied to a
