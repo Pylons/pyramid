@@ -7,13 +7,14 @@ Glossary
    :sorted:
 
    request
-     A ``WebOb`` request object.  See :ref:`webob_chapter` (narrative)
-     and :ref:`request_module` (API documentation) for information
-     about request objects.
+     An object that represents an HTTP request, usually an instance of the
+     :class:`pyramid.request.Request` class.  See :ref:`webob_chapter`
+     (narrative) and :ref:`request_module` (API documentation) for
+     information about request objects.
 
    request factory
-     An object which, provided a WSGI environment as a single
-     positional argument, returns a ``WebOb`` compatible request.
+     An object which, provided a :term:`WSGI` environment as a single
+     positional argument, returns a Pyramid-compatible request.
 
    response
      An object returned by a :term:`view callable` that represents response
@@ -455,7 +456,7 @@ Glossary
      :term:`request` object that :app:`Pyramid` generates and
      manipulates has one or more :term:`interface` objects attached to
      it.  The default interface attached to a request object is
-     ``pyramid.interfaces.IRequest``.
+     :class:`pyramid.interfaces.IRequest`.
 
    repoze.lemonade
      Zope2 CMF-like `data structures and helper facilities
@@ -569,11 +570,13 @@ Glossary
    configuration declaration
      An individual method call made to an instance of a :app:`Pyramid`
      :term:`Configurator` object which performs an arbitrary action, such as
-     registering a :term:`view configuration` (via the ``add_view`` method of
-     the configurator) or :term:`route configuration` (via the ``add_route``
-     method of the configurator).  A set of configuration declarations is
-     also implied by the :term:`configuration decoration` detected by a
-     :term:`scan` of code in a package.
+     registering a :term:`view configuration` (via the
+     :meth:`~pyramid.config.Configurator.add_view` method of the
+     configurator) or :term:`route configuration` (via the
+     :meth:`~pyramid.config.Configurator.add_route` method of the
+     configurator).  A set of configuration declarations is also implied by
+     the :term:`configuration decoration` detected by a :term:`scan` of code
+     in a package.
 
    configuration decoration
      Metadata implying one or more :term:`configuration declaration`
@@ -589,7 +592,7 @@ Glossary
    configurator
      An object used to do :term:`configuration declaration` within an
      application.  The most common configurator is an instance of the
-     ``pyramid.config.Configurator`` class.
+     :class:`pyramid.config.Configurator` class.
 
    imperative configuration
      The configuration mode in which you use Python to call methods on
@@ -602,24 +605,22 @@ Glossary
      Pyramid application.
 
    Not Found view
-      An :term:`exception view` invoked by :app:`Pyramid` when the
-      developer explicitly raises a ``pyramid.httpexceptions.HTTPNotFound``
-      exception from within :term:`view` code or :term:`root factory`
-      code, or when the current request doesn't match any :term:`view
-      configuration`.  :app:`Pyramid` provides a default
-      implementation of a not found view; it can be overridden.  See
+      An :term:`exception view` invoked by :app:`Pyramid` when the developer
+      explicitly raises a :class:`pyramid.httpexceptions.HTTPNotFound`
+      exception from within :term:`view` code or :term:`root factory` code,
+      or when the current request doesn't match any :term:`view
+      configuration`.  :app:`Pyramid` provides a default implementation of a
+      not found view; it can be overridden.  See
       :ref:`changing_the_notfound_view`.
 
    Forbidden view
-      An :term:`exception view` invoked by :app:`Pyramid` when the
-      developer explicitly raises a
-      ``pyramid.httpexceptions.HTTPForbidden`` exception from within
-      :term:`view` code or :term:`root factory` code, or when the
-      :term:`view configuration` and :term:`authorization policy`
+      An :term:`exception view` invoked by :app:`Pyramid` when the developer
+      explicitly raises a :class:`pyramid.httpexceptions.HTTPForbidden`
+      exception from within :term:`view` code or :term:`root factory` code,
+      or when the :term:`view configuration` and :term:`authorization policy`
       found for a request disallows a particular view invocation.
-      :app:`Pyramid` provides a default implementation of a
-      forbidden view; it can be overridden.  See
-      :ref:`changing_the_forbidden_view`.
+      :app:`Pyramid` provides a default implementation of a forbidden view;
+      it can be overridden.  See :ref:`changing_the_forbidden_view`.
 
    Exception view
       An exception view is a :term:`view callable` which may be
@@ -713,11 +714,10 @@ Glossary
      within one or more :term:`translation directory` directories.
 
    Translator
-     A callable which receives a :term:`translation string` and
-     returns a translated Unicode object for the purposes of
-     internationalization.  A :term:`localizer` supplies a
-     translator to a :app:`Pyramid` application accessible via its
-     ``translate`` method.
+     A callable which receives a :term:`translation string` and returns a
+     translated Unicode object for the purposes of internationalization.  A
+     :term:`localizer` supplies a translator to a :app:`Pyramid` application
+     accessible via its :class:`~pyramid.i18n.Localizer.translate` method.
 
    Translation Directory
      A translation directory is a :term:`gettext` translation
@@ -805,12 +805,12 @@ Glossary
 
    pregenerator
       A pregenerator is a function associated by a developer with a
-      :term:`route`.  It is called by :func:`pyramid.url.route_url`
-      in order to adjust the set of arguments passed to it by the user
-      for special purposes.  It will influence the URL returned by
-      ``route_url``.  See
-      :class:`pyramid.interfaces.IRoutePregenerator` for more
-      information.
+      :term:`route`.  It is called by
+      :meth:`~pyramid.request.Request.route_url` in order to adjust the set
+      of arguments passed to it by the user for special purposes.  It will
+      influence the URL returned by
+      :meth:`~pyramid.request.Request.route_url`.  See
+      :class:`pyramid.interfaces.IRoutePregenerator` for more information.
 
    session
       A namespace that is valid for some period of continual activity
@@ -838,8 +838,9 @@ Glossary
    Deployment settings
      Deployment settings are settings passed to the :term:`Configurator` as a
      ``settings`` argument.  These are later accessible via a
-     ``request.registry.settings`` dictionary.  Deployment settings can be
-     used as global application values.
+     ``request.registry.settings`` dictionary in views or as
+     ``config.registry.settings`` in configuration code.  Deployment settings
+     can be used as global application values.
 
    WebTest
      `WebTest <http://pythonpaste.org/webtest/>`_ is a package which can help
@@ -860,7 +861,7 @@ Glossary
    pyramid_zcml
      An add-on package to :app:`Pyramid` which allows applications to be
      configured via :term:`ZCML`.  It is available on :term:`PyPI`.  If you
-     use ``pyramid_zcml``, you can use ZCML as an alternative to
+     use :mod:`pyramid_zcml`, you can use ZCML as an alternative to
      :term:`imperative configuration` or :term:`configuration decoration`.
 
    ZCML
@@ -922,8 +923,8 @@ Glossary
    pyramid_debugtoolbar
      A Pyramid add on which displays a helpful debug toolbar "on top of" HTML
      pages rendered by your application, displaying request, routing, and
-     database information.  ``pyramid_debugtoolbar`` is configured into the
-     ``development.ini`` of all applications which use a Pyramid
+     database information.  :mod:`pyramid_debugtoolbar` is configured into
+     the ``development.ini`` of all applications which use a Pyramid
      :term:`scaffold`.  For more information, see
      https://docs.pylonsproject.org/projects/pyramid_debugtoolbar/dev/ .
 
