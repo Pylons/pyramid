@@ -478,6 +478,8 @@ class Configurator(
 
     action_state = property(_get_action_state, _set_action_state)
 
+    _ctx = action_state # bw compat
+
     def commit(self):
         """ Commit any pending configuration actions. If a configuration
         conflict is detected in the pending configuration actions, this method
