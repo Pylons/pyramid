@@ -816,6 +816,7 @@ class Configurator(
 
         return app
 
+# this class is licensed under the ZPL (stolen from Zope)
 class ActionState(object):
     def __init__(self):
         self.actions = []
@@ -838,65 +839,6 @@ class ActionState(object):
     def action(self, discriminator, callable=None, args=(), kw=None, order=0,
                includepath=(), info=''):
         """Add an action with the given discriminator, callable and arguments
-
-        For testing purposes, the callable and arguments may be omitted.
-        In that case, a default noop callable is used.
-
-        The discriminator must be given, but it can be None, to indicate that
-        the action never conflicts.
-
-        Let's look at some examples:
-
-        >>> c = ConfigurationContext()
-
-        Normally, the context gets actions from subclasses. We'll provide
-        an actions attribute ourselves:
-
-        >>> c.actions = []
-
-        We'll use a test callable that has a convenient string representation
-
-        >>> from zope.configmachine.tests.directives import f
-
-        >>> c.action(1, f, (1, ), {'x': 1})
-        >>> c.actions
-        [(1, f, (1,), {'x': 1})]
-
-        >>> c.action(None)
-        >>> c.actions
-        [(1, f, (1,), {'x': 1}), (None, None)]
-
-        Now set the include path and info:
-
-        >>> c.includepath = ('foo.zcml',)
-        >>> c.info = "?"
-        >>> c.action(None)
-        >>> c.actions[-1]
-        (None, None, (), {}, ('foo.zcml',), '?')
-
-        We can add an order argument to crudely control the order
-        of execution:
-
-        >>> c.action(None, order=99999)
-        >>> c.actions[-1]
-        (None, None, (), {}, ('foo.zcml',), '?', 99999)
-
-        We can also pass an includepath argument, which will be used as the the
-        includepath for the action.  (if includepath is None, self.includepath
-        will be used):
-
-        >>> c.action(None, includepath=('abc',))
-        >>> c.actions[-1]
-        (None, None, (), {}, ('abc',), '?')
-
-        We can also pass an info argument, which will be used as the the
-        source line info for the action.  (if info is None, self.info will be
-        used):
-
-        >>> c.action(None, info='abc')
-        >>> c.actions[-1]
-        (None, None, (), {}, ('foo.zcml',), 'abc')
-        
         """
         if kw is None:
             kw = {}
@@ -916,7 +858,7 @@ class ActionState(object):
         >>> output = []
         >>> def f(*a, **k):
         ...    output.append(('f', a, k))
-        >>> context = ConfigurationMachine()
+        >>> context = ActionState()
         >>> context.actions = [
         ...   (1, f, (1,)),
         ...   (1, f, (11,), {}, ('x', )),
@@ -974,6 +916,7 @@ class ActionState(object):
             if clear:
                 del self.actions[:]
 
+# this function is licensed under the ZPL (stolen from Zope)
 def resolveConflicts(actions):
     """Resolve conflicting actions
 
