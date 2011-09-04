@@ -1025,6 +1025,7 @@ def resolveConflicts(actions):
 
     return r
 
+# this function is licensed under the ZPL (stolen from Zope)
 def expand_action(discriminator, callable=None, args=(), kw=None,
                    includepath=(), info='', order=0):
     if kw is None:
