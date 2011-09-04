@@ -819,7 +819,7 @@ class Configurator(
 # this class is licensed under the ZPL (stolen from Zope)
 class ActionState(object):
     def __init__(self):
-        self.actions = []
+        self.actions = [] # NB "actions" is an API, dep'd upon by pyramid_zcml
         self._seen_files = set()
 
     def processSpec(self, spec):
@@ -840,6 +840,10 @@ class ActionState(object):
                includepath=(), info=''):
         """Add an action with the given discriminator, callable and arguments
         """
+        # NB: note that the ordering and composition of the action tuple should
+        # not change without first ensuring that ``pyramid_zcml`` appends
+        # similarly-composed actions to our .actions variable (as silly as
+        # the composition and ordering is).
         if kw is None:
             kw = {}
         action = (discriminator, callable, args, kw, includepath, info, order)
