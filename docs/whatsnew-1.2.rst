@@ -277,3 +277,5 @@ Dependency Changes
 
 - Pyramid now requires Venusian 1.0a1 or better to support the ``onerror``
   keyword argument to :meth:`pyramid.config.Configurator.scan`.
+
+- The ``zope.configuration`` package is no longer a dependency.

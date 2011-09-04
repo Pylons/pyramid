@@ -8,6 +8,11 @@ Bug Fixes
   when registering routes in certain circumstances.  See
   https://github.com/Pylons/pyramid/issues/260
 
+Dependencies
+------------
+
+- The ``zope.configuration`` package is no longer a dependency.
+
 1.2a4 (2011-09-02)
 ==================
 
