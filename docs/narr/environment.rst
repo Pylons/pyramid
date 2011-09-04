@@ -654,7 +654,18 @@ Here's how:
      dictionary with the converted version of the variable *before* passing
      it to the Configurator: the configurator makes a *copy* of ``settings``,
      it doesn't use the one you pass directly.
-
+     
+-  When creating an ``includeme`` function that will be later added to your 
+   application's configuration you may access the ``settings`` dictionary
+   through the instance of the :term:`Configurator` that is passed into the
+   function as its only argument.  For Example:
+  
+  .. code-block:: python
+     
+     def includeme(config):
+         settings = config.registry.settings
+         debug_frobnosticator = settings['debug_frobnosticator']
+     
 - In the runtime code that you need to access the new settings value, find
   the value in the ``registry.settings`` dictionary and use it.  In
   :term:`view` code (or any other code that has access to the request), the
@@ -662,7 +673,7 @@ Here's how:
 
   .. code-block:: python
 
-     registry = request.registry.settings
+     settings = request.registry.settings
      debug_frobnosticator = settings['debug_frobnosticator']
 
   If you wish to use the value in code that does not have access to the
