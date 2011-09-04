@@ -3,7 +3,6 @@ from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.interfaces import IDefaultPermission
 from pyramid.interfaces import PHASE1_CONFIG
 from pyramid.interfaces import PHASE2_CONFIG
-from pyramid.interfaces import PHASE3_CONFIG
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.config.util import action_method
@@ -60,7 +59,7 @@ class SecurityConfiguratorMixin(object):
         # authorization policy used by view config (phase 3) and
         # authentication policy (phase 2)
         self.action(IAuthorizationPolicy, register, order=PHASE1_CONFIG)
-        self.action(None, ensure, order=PHASE3_CONFIG)
+        self.action(None, ensure)
 
     def _set_authorization_policy(self, policy):
         policy = self.maybe_dotted(policy)

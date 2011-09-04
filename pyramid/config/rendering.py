@@ -3,7 +3,6 @@ import warnings
 from pyramid.interfaces import IRendererFactory
 from pyramid.interfaces import IRendererGlobalsFactory
 from pyramid.interfaces import PHASE1_CONFIG
-from pyramid.interfaces import PHASE3_CONFIG
 
 from pyramid.config.util import action_method
 
@@ -89,4 +88,4 @@ class RenderingConfiguratorMixin(object):
         factory = self.maybe_dotted(factory)
         def register():
             self.registry.registerUtility(factory, IRendererGlobalsFactory)
-        self.action(IRendererGlobalsFactory, register, order=PHASE3_CONFIG)
+        self.action(IRendererGlobalsFactory, register)

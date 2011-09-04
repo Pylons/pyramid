@@ -26,7 +26,6 @@ from pyramid.interfaces import IViewClassifier
 from pyramid.interfaces import IViewMapper
 from pyramid.interfaces import IViewMapperFactory
 from pyramid.interfaces import PHASE1_CONFIG
-from pyramid.interfaces import PHASE3_CONFIG
 
 from pyramid import renderers
 from pyramid.exceptions import ConfigurationError
@@ -1061,7 +1060,7 @@ class ViewsConfiguratorMixin(object):
             xhr, accept, header, path_info, match_param]
         discriminator.extend(sorted(custom_predicates))
         discriminator = tuple(discriminator)
-        self.action(discriminator, register, order=PHASE3_CONFIG)
+        self.action(discriminator, register)
     
     def derive_view(self, view, attr=None, renderer=None):
         """

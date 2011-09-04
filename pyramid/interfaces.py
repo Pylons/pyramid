@@ -851,8 +851,7 @@ class IRendererInfo(Interface):
 
 # configuration phases: a lower phase number means the actions associated
 # with this phase will be executed earlier than those with later phase
-# numbers
+# numbers.  The default phase number is 0, FTR.
 
 PHASE1_CONFIG = -20
 PHASE2_CONFIG = -10
-PHASE3_CONFIG = 0

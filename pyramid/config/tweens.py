@@ -1,7 +1,6 @@
 from zope.interface import implements
 
 from pyramid.interfaces import ITweens
-from pyramid.interfaces import PHASE3_CONFIG
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.tweens import excview_tween_factory
@@ -142,7 +141,7 @@ class TweensConfiguratorMixin(object):
             else:
                 tweens.add_implicit(name, tween_factory, under=under, over=over)
 
-        self.action(('tween', name, explicit), register, order=PHASE3_CONFIG)
+        self.action(('tween', name, explicit), register)
 
 class CyclicDependencyError(Exception):
     def __init__(self, cycles):
