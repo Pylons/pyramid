@@ -23,6 +23,10 @@ class Registry(Components, dict):
     has_listeners = False
     _settings = None
 
+    def __nonzero__(self):
+        # defeat bool determination via dict.__len__
+        return True
+
     def registerSubscriptionAdapter(self, *arg, **kw):
         result = Components.registerSubscriptionAdapter(self, *arg, **kw)
         self.has_listeners = True

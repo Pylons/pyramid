@@ -1,5 +1,8 @@
 import unittest
 
+from pyramid.exceptions import ConfigurationExecutionError
+from pyramid.exceptions import ConfigurationError
+
 class ConfiguratorSecurityMethodsTests(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.config import Configurator
@@ -7,14 +10,12 @@ class ConfiguratorSecurityMethodsTests(unittest.TestCase):
         return config
 
     def test_set_authentication_policy_no_authz_policy(self):
-        from zope.configuration.config import ConfigurationExecutionError
         config = self._makeOne()
         policy = object()
         config.set_authentication_policy(policy)
         self.assertRaises(ConfigurationExecutionError, config.commit)
 
     def test_set_authentication_policy_no_authz_policy_autocommit(self):
-        from pyramid.exceptions import ConfigurationError
         config = self._makeOne(autocommit=True)
         policy = object()
         self.assertRaises(ConfigurationError,
@@ -45,7 +46,6 @@ class ConfiguratorSecurityMethodsTests(unittest.TestCase):
             config.registry.getUtility(IAuthenticationPolicy), authn_policy)
 
     def test_set_authorization_policy_no_authn_policy(self):
-        from zope.configuration.config import ConfigurationExecutionError
         config = self._makeOne()
         policy = object()
         config.set_authorization_policy(policy)

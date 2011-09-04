@@ -52,7 +52,7 @@ class RoutesConfiguratorMixinTests(unittest.TestCase):
     def test_add_route_discriminator(self):
         config = self._makeOne()
         config.add_route('name', 'path')
-        self.assertEqual(config._ctx.actions[-1][0], ('route', 'name'))
+        self.assertEqual(config.action_state.actions[-1][0], ('route', 'name'))
 
     def test_add_route_with_factory(self):
         config = self._makeOne(autocommit=True)

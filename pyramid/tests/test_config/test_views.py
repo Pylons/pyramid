@@ -5,6 +5,10 @@ from pyramid.tests.test_config import IDummy
 
 from pyramid.tests.test_config import dummy_view
 
+from pyramid.exceptions import ConfigurationError
+from pyramid.exceptions import ConfigurationExecutionError
+from pyramid.exceptions import ConfigurationConflictError
+
 class TestViewsConfigurationMixin(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.config import Configurator
@@ -69,12 +73,10 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         return route
 
     def test_add_view_view_callable_None_no_renderer(self):
-        from pyramid.exceptions import ConfigurationError
         config = self._makeOne(autocommit=True)
         self.assertRaises(ConfigurationError, config.add_view)
 
     def test_add_view_with_request_type_and_route_name(self):
-        from pyramid.exceptions import ConfigurationError
         config = self._makeOne(autocommit=True)
         view = lambda *arg: 'OK'
         self.assertRaises(ConfigurationError, config.add_view, view, '', None,
@@ -952,7 +954,6 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         self.assertEqual(result, 'OK')
 
     def test_add_view_with_request_type_as_noniface(self):
-        from pyramid.exceptions import ConfigurationError
         view = lambda *arg: 'OK'
         config = self._makeOne()
         self.assertRaises(ConfigurationError,
@@ -972,7 +973,6 @@ class TestViewsConfigurationMixin(unittest.TestCase):
 
     def test_add_view_with_nonexistant_route_name(self):
         from pyramid.renderers import null_renderer
-        from zope.configuration.config import ConfigurationExecutionError
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, route_name='foo', renderer=null_renderer)
@@ -1030,7 +1030,6 @@ class TestViewsConfigurationMixin(unittest.TestCase):
 
     def test_add_view_with_request_method_sequence_conflict(self):
         from pyramid.renderers import null_renderer
-        from zope.configuration.config import ConfigurationConflictError
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, request_method=('POST', 'GET'),
@@ -1107,7 +1106,6 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         self._assertNotFound(wrapper, None, request)
 
     def test_add_view_with_header_badregex(self):
-        from pyramid.exceptions import ConfigurationError
         view = lambda *arg: 'OK'
         config = self._makeOne()
         self.assertRaises(ConfigurationError,
@@ -1214,7 +1212,6 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         self.assertEqual(wrapper(context, None), 'OK')
 
     def test_add_view_with_path_info_badregex(self):
-        from pyramid.exceptions import ConfigurationError
         view = lambda *arg: 'OK'
         config = self._makeOne()
         self.assertRaises(ConfigurationError,
@@ -1299,7 +1296,6 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_same_predicates(self):
-        from zope.configuration.config import ConfigurationConflictError
         view2 = lambda *arg: 'second'
         view1 = lambda *arg: 'first'
         config = self._makeOne()
@@ -2992,7 +2988,6 @@ class TestViewDeriver(unittest.TestCase):
         self.assertFalse('Cache-Control' in headers)
 
     def test_http_cached_view_bad_tuple(self):
-        from pyramid.exceptions import ConfigurationError
         deriver = self._makeOne(http_cache=(None,))
         def view(request): pass
         self.assertRaises(ConfigurationError, deriver, view)

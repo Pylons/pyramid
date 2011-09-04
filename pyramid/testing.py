@@ -1,7 +1,6 @@
 import copy
 import os
 
-from zope.configuration.xmlconfig import _clearContext
 from zope.deprecation import deprecated
 
 from zope.interface import implements
@@ -836,7 +835,6 @@ def tearDown(unhook_zca=True):
                 # however maybe somebody's using a registry we don't
                 # understand, let's not blow up
                 pass
-    _clearContext() # XXX why?
 
 def cleanUp(*arg, **kw):
     """ :func:`pyramid.testing.cleanUp` is an alias for

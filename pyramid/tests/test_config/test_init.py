@@ -14,6 +14,10 @@ try:
 except:
     __pypy__ = None
 
+from pyramid.exceptions import ConfigurationExecutionError
+from pyramid.exceptions import ConfigurationConflictError
+from pyramid.exceptions import ConfigurationError
+
 class ConfiguratorTests(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.config import Configurator
@@ -141,7 +145,6 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(policy, result)
 
     def test_ctor_authorization_policy_only(self):
-        from zope.configuration.config import ConfigurationExecutionError
         policy = object()
         config = self._makeOne(authorization_policy=policy)
         self.assertRaises(ConfigurationExecutionError, config.commit)
@@ -240,23 +243,22 @@ class ConfiguratorTests(unittest.TestCase):
         newconfig = config.with_package(pyramid.tests.test_config)
         self.assertEqual(newconfig.package, pyramid.tests.test_config)
 
-    def test_with_package_context_is_not_None(self):
-        import pyramid.tests.test_config
+    def test_with_package(self):
+        import pyramid.tests
         config = self._makeOne()
-        config._ctx = DummyContext()
-        config._ctx.registry = None
-        config._ctx.autocommit = True
-        config._ctx.route_prefix = None
-        newconfig = config.with_package(pyramid.tests.test_config)
-        self.assertEqual(newconfig.package, pyramid.tests.test_config)
-
-    def test_with_package_context_is_None(self):
-        import pyramid.tests.test_config
-        config = self._makeOne()
-        config._ctx = None
-        newconfig = config.with_package(pyramid.tests.test_config)
-        self.assertEqual(newconfig.package, pyramid.tests.test_config)
-        self.assertEqual(config._ctx.package, None)
+        config.basepath = 'basepath'
+        config.info = 'info'
+        config.includepath = ('spec',)
+        config.autocommit = True
+        config.route_prefix = 'prefix'
+        newconfig = config.with_package(pyramid.tests)
+        self.assertEqual(newconfig.package, pyramid.tests)
+        self.assertEqual(newconfig.registry, config.registry)
+        self.assertEqual(newconfig.autocommit, True)
+        self.assertEqual(newconfig.route_prefix, 'prefix')
+        self.assertEqual(newconfig.info, 'info')
+        self.assertEqual(newconfig.basepath, 'basepath')
+        self.assertEqual(newconfig.includepath, ('spec',))
 
     def test_maybe_dotted_string_success(self):
         import pyramid.tests.test_config
@@ -266,8 +268,7 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_maybe_dotted_string_fail(self):
         config = self._makeOne()
-        self.assertRaises(ImportError,
-                          config.maybe_dotted, 'cant.be.found')
+        self.assertRaises(ImportError, config.maybe_dotted, 'cant.be.found')
 
     def test_maybe_dotted_notstring_success(self):
         import pyramid.tests.test_config
@@ -463,7 +464,6 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(result, pyramid.tests.test_config)
 
     def test_setup_registry_authorization_policy_only(self):
-        from zope.configuration.config import ConfigurationExecutionError
         from pyramid.registry import Registry
         policy = object()
         reg = Registry()
@@ -658,53 +658,38 @@ pyramid.tests.test_config.dummy_include2""",
     def test_include_with_dotted_name(self):
         from pyramid.tests import test_config
         config = self._makeOne()
-        context_before = config._make_context()
-        config._ctx = context_before
         config.include('pyramid.tests.test_config.dummy_include')
-        context_after = config._ctx
-        actions = context_after.actions
+        after = config.action_state
+        actions = after.actions
         self.assertEqual(len(actions), 1)
         self.assertEqual(
-            context_after.actions[0][:3],
+            after.actions[0][:3],
             ('discrim', None, test_config),
             )
-        self.assertEqual(context_after.basepath, None)
-        self.assertEqual(context_after.includepath, ())
-        self.assertTrue(context_after is context_before)
 
     def test_include_with_python_callable(self):
         from pyramid.tests import test_config
         config = self._makeOne()
-        context_before = config._make_context()
-        config._ctx = context_before
         config.include(dummy_include)
-        context_after = config._ctx
-        actions = context_after.actions
+        after = config.action_state
+        actions = after.actions
         self.assertEqual(len(actions), 1)
         self.assertEqual(
             actions[0][:3],
             ('discrim', None, test_config),
             )
-        self.assertEqual(context_after.basepath, None)
-        self.assertEqual(context_after.includepath, ())
-        self.assertTrue(context_after is context_before)
 
     def test_include_with_module_defaults_to_includeme(self):
         from pyramid.tests import test_config
         config = self._makeOne()
-        context_before = config._make_context()
-        config._ctx = context_before
         config.include('pyramid.tests.test_config')
-        context_after = config._ctx
-        actions = context_after.actions
+        after = config.action_state
+        actions = after.actions
         self.assertEqual(len(actions), 1)
         self.assertEqual(
             actions[0][:3],
             ('discrim', None, test_config),
             )
-        self.assertEqual(context_after.basepath, None)
-        self.assertEqual(context_after.includepath, ())
-        self.assertTrue(context_after is context_before)
 
     def test_include_with_route_prefix(self):
         root_config = self._makeOne(autocommit=True)
@@ -730,9 +715,22 @@ pyramid.tests.test_config.dummy_include2""",
 
     def test_with_context(self):
         config = self._makeOne()
-        ctx = config._make_context()
-        newconfig = config.with_context(ctx)
-        self.assertEqual(newconfig._ctx, ctx)
+        context = DummyZCMLContext()
+        context.basepath = 'basepath'
+        context.includepath = ('spec',)
+        context.package = 'pyramid'
+        context.autocommit = True
+        context.registry = 'abc'
+        context.route_prefix = 'buz'
+        context.info = 'info'
+        newconfig = config.with_context(context)
+        self.assertEqual(newconfig.package_name, 'pyramid')
+        self.assertEqual(newconfig.autocommit, True)
+        self.assertEqual(newconfig.registry, 'abc')
+        self.assertEqual(newconfig.route_prefix, 'buz')
+        self.assertEqual(newconfig.basepath, 'basepath')
+        self.assertEqual(newconfig.includepath, ('spec',))
+        self.assertEqual(newconfig.info, 'info')
 
     def test_action_branching_kw_is_None(self):
         config = self._makeOne(autocommit=True)
@@ -742,29 +740,32 @@ pyramid.tests.test_config.dummy_include2""",
         config = self._makeOne(autocommit=True)
         self.assertEqual(config.action('discrim', kw={'a':1}), None)
 
-    def test_action_branching_nonautocommit_without_context_info(self):
+    def test_action_branching_nonautocommit_with_config_info(self):
         config = self._makeOne(autocommit=False)
-        config._ctx = DummyContext()
-        config._ctx.info = None
-        config._ctx.autocommit = False
-        config._ctx.actions = []
-        self.assertEqual(config.action('discrim', kw={'a':1}), None)
-        self.assertEqual(config._ctx.actions, [('discrim', None, (), {'a': 1})])
-        # info is not set on ctx, it's set on the groupingcontextdecorator,
-        # and then lost
+        config.info = 'abc'
+        state = DummyActionState()
+        state.autocommit = False
+        config.action_state = state
+        config.action('discrim', kw={'a':1})
+        self.assertEqual(
+            state.actions,
+            [(('discrim', None, (), {'a': 1}, 0),
+              {'info': 'abc', 'includepath':()})]
+            )
 
-    def test_action_branching_nonautocommit_with_context_info(self):
+    def test_action_branching_nonautocommit_without_config_info(self):
         config = self._makeOne(autocommit=False)
-        config._ctx = DummyContext()
-        config._ctx.info = 'abc'
-        config._ctx.autocommit = False
-        config._ctx.actions = []
-        config._ctx.action = lambda *arg, **kw: self.assertEqual(
-            arg,
-            ('discrim', None, (), {'a': 1}, 0))
-        self.assertEqual(config.action('discrim', kw={'a':1}), None)
-        self.assertEqual(config._ctx.actions, [])
-        self.assertEqual(config._ctx.info, 'abc')
+        config.info = ''
+        config._ainfo = ['z']
+        state = DummyActionState()
+        config.action_state = state
+        state.autocommit = False
+        config.action('discrim', kw={'a':1})
+        self.assertEqual(
+            state.actions,
+            [(('discrim', None, (), {'a': 1}, 0),
+              {'info': 'z', 'includepath':()})]
+            )
 
     def test_scan_integration(self):
         from zope.interface import alsoProvides
@@ -909,7 +910,6 @@ pyramid.tests.test_config.dummy_include2""",
             sys.path.remove(path)
 
     def test_scan_integration_conflict(self):
-        from zope.configuration.config import ConfigurationConflictError
         from pyramid.tests.test_config.pkgs import selfscan
         from pyramid.config import Configurator
         c = Configurator()
@@ -956,7 +956,6 @@ pyramid.tests.test_config.dummy_include2""",
             getSiteManager.reset()
 
     def test_commit_conflict_simple(self):
-        from zope.configuration.config import ConfigurationConflictError
         config = self._makeOne()
         def view1(request): pass
         def view2(request): pass
@@ -977,7 +976,6 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(registeredview.__name__, 'view1')
 
     def test_commit_conflict_with_two_includes(self):
-        from zope.configuration.config import ConfigurationConflictError
         config = self._makeOne()
         def view1(request): pass
         def view2(request): pass
@@ -1026,7 +1024,6 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(registeredview.__name__, 'view3')
 
     def test_conflict_set_notfound_view(self):
-        from zope.configuration.config import ConfigurationConflictError
         config = self._makeOne()
         def view1(request): pass
         def view2(request): pass
@@ -1042,7 +1039,6 @@ pyramid.tests.test_config.dummy_include2""",
             raise AssertionError
 
     def test_conflict_set_forbidden_view(self):
-        from zope.configuration.config import ConfigurationConflictError
         config = self._makeOne()
         def view1(request): pass
         def view2(request): pass
@@ -1283,7 +1279,6 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
         self.assertTrue(hasattr(wrapper, '__call_permissive__'))
 
     def test_conflict_route_with_view(self):
-        from zope.configuration.config import ConfigurationConflictError
         config = self._makeOne()
         def view1(request): pass
         def view2(request): pass
@@ -1315,9 +1310,9 @@ class TestConfigurator_add_directive(unittest.TestCase):
             'dummy_extend', 'pyramid.tests.test_config.dummy_extend')
         self.assert_(hasattr(config, 'dummy_extend'))
         config.dummy_extend('discrim')
-        context_after = config._ctx
+        after = config.action_state
         self.assertEqual(
-            context_after.actions[-1][:3],
+            after.actions[-1][:3],
             ('discrim', None, test_config),
             )
 
@@ -1328,9 +1323,9 @@ class TestConfigurator_add_directive(unittest.TestCase):
             'dummy_extend', dummy_extend)
         self.assert_(hasattr(config, 'dummy_extend'))
         config.dummy_extend('discrim')
-        context_after = config._ctx
+        after = config.action_state
         self.assertEqual(
-            context_after.actions[-1][:3],
+            after.actions[-1][:3],
             ('discrim', None, test_config),
             )
 
@@ -1342,14 +1337,13 @@ class TestConfigurator_add_directive(unittest.TestCase):
             'dummy_extend', dummy_extend2)
         self.assert_(hasattr(config, 'dummy_extend'))
         config.dummy_extend('discrim')
-        context_after = config._ctx
+        after = config.action_state
         self.assertEqual(
-            context_after.actions[-1][:3],
+            after.actions[-1][:3],
             ('discrim', None, config.registry),
             )
 
     def test_extend_action_method_successful(self):
-        from zope.configuration.config import ConfigurationConflictError
         config = self.config
         config.add_directive(
             'dummy_extend', dummy_extend)
@@ -1358,27 +1352,130 @@ class TestConfigurator_add_directive(unittest.TestCase):
         self.assertRaises(ConfigurationConflictError, config.commit)
 
     def test_directive_persists_across_configurator_creations(self):
-        from zope.configuration.config import GroupingContextDecorator
         config = self.config
         config.add_directive('dummy_extend', dummy_extend)
-        context = config._make_context(autocommit=False)
-        context = GroupingContextDecorator(context)
-        config2 = config.with_context(context)
+        config2 = config.with_package('pyramid.tests')
         config2.dummy_extend('discrim')
-        context_after = config2._ctx
-        actions = context_after.actions
+        after = config2.action_state
+        actions = after.actions
         self.assertEqual(len(actions), 1)
         self.assertEqual(
-            context_after.actions[0][:3],
+            after.actions[0][:3],
             ('discrim', None, config2.package),
             )
 
-class TestPyramidConfigurationMachine(unittest.TestCase):
+class TestActionState(unittest.TestCase):
+    def _makeOne(self):
+        from pyramid.config import ActionState
+        return ActionState()
+    
     def test_it(self):
-        from pyramid.config import PyramidConfigurationMachine
-        m = PyramidConfigurationMachine()
-        self.assertEqual(m.autocommit, False)
-        self.assertEqual(m.route_prefix, None)
+        c = self._makeOne()
+        self.assertEqual(c.actions, [])
+
+    def test_action_simple(self):
+        from pyramid.tests.test_config import dummyfactory as f
+        c = self._makeOne()
+        c.actions = []
+        c.action(1, f, (1,), {'x':1})
+        self.assertEqual(c.actions, [(1, f, (1,), {'x': 1})])
+        c.action(None)
+        self.assertEqual(c.actions, [(1, f, (1,), {'x': 1}), (None, None)])
+
+    def test_action_with_includepath(self):
+        c = self._makeOne()
+        c.actions = []
+        c.action(None, includepath=('abc',))
+        self.assertEqual(c.actions, [(None, None, (), {}, ('abc',))])
+
+    def test_action_with_info(self):
+        c = self._makeOne()
+        c.action(None, info='abc')
+        self.assertEqual(c.actions, [(None, None, (), {}, (), 'abc')])
+
+    def test_action_with_includepath_and_info(self):
+        c = self._makeOne()
+        c.action(None, includepath=('spec',), info='bleh')
+        self.assertEqual(c.actions,
+                         [(None, None, (), {}, ('spec',), 'bleh')])
+
+    def test_action_with_order(self):
+        c = self._makeOne()
+        c.actions = []
+        c.action(None, order=99999)
+        self.assertEqual(c.actions, [(None, None, (), {}, (), '', 99999)])
+
+    def test_processSpec(self):
+        c = self._makeOne()
+        self.assertTrue(c.processSpec('spec'))
+        self.assertFalse(c.processSpec('spec'))
+
+    def test_execute_actions_simple(self):
+        output = []
+        def f(*a, **k):
+            output.append(('f', a, k))
+        c = self._makeOne()
+        c.actions = [
+            (1, f, (1,)),
+            (1, f, (11,), {}, ('x', )),
+            (2, f, (2,)),
+            (None, None),
+            ]
+        c.execute_actions()
+        self.assertEqual(output,  [('f', (1,), {}), ('f', (2,), {})])
+
+    def test_execute_actions_error(self):
+        output = []
+        def f(*a, **k):
+            output.append(('f', a, k))
+        def bad():
+            raise NotImplementedError
+        c = self._makeOne()
+        c.actions = [
+            (1, f, (1,)),
+            (1, f, (11,), {}, ('x', )),
+            (2, f, (2,)),
+            (3, bad, (), {}, (), 'oops')
+            ]
+        self.assertRaises(ConfigurationExecutionError, c.execute_actions)
+        self.assertEqual(output, [('f', (1,), {}), ('f', (2,), {})])
+
+class Test_resolveConflicts(unittest.TestCase):
+    def _callFUT(self, actions):
+        from pyramid.config import resolveConflicts
+        return resolveConflicts(actions)
+
+    def test_it_success(self):
+        from pyramid.tests.test_config import dummyfactory as f
+        result = self._callFUT([
+            (None, f),
+            (1, f, (1,), {}, (), 'first'),
+            (1, f, (2,), {}, ('x',), 'second'),
+            (1, f, (3,), {}, ('y',), 'third'),
+            (4, f, (4,), {}, ('y',), 'should be last', 99999),
+            (3, f, (3,), {}, ('y',)),
+            (None, f, (5,), {}, ('y',)),
+            ])
+        self.assertEqual(result,
+                         [(None, f),
+                          (1, f, (1,), {}, (), 'first'),
+                          (3, f, (3,), {}, ('y',)),
+                          (None, f, (5,), {}, ('y',)),
+                          (4, f, (4,), {}, ('y',), 'should be last')])
+
+    def test_it_conflict(self):
+        from pyramid.tests.test_config import dummyfactory as f
+        self.assertRaises(
+            ConfigurationConflictError,
+            self._callFUT, [
+                (None, f),
+                (1, f, (2,), {}, ('x',), 'eek'),
+                (1, f, (3,), {}, ('y',), 'ack'),
+                (4, f, (4,), {}, ('y',)),
+                (3, f, (3,), {}, ('y',)),
+                (None, f, (5,), {}, ('y',)),
+                ]
+            )
 
 class TestGlobalRegistriesIntegration(unittest.TestCase):
     def setUp(self):
@@ -1466,3 +1563,20 @@ def _conflictFunctions(e):
         for confinst in conflict:
             yield confinst[2]
 
+class DummyActionState(object):
+    autocommit = False
+    info = ''
+    def __init__(self):
+        self.actions = []
+    def action(self, *arg, **kw):
+        self.actions.append((arg, kw))
+
+class DummyZCMLContext(object):
+    package = None
+    registry = None
+    autocommit = False
+    route_prefix = None
+    basepath = None
+    includepath = ()
+    info = ''
+    

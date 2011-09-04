@@ -1,5 +1,3 @@
-from zope.configuration.exceptions import ConfigurationError as ZCE
-
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.httpexceptions import HTTPForbidden
 
@@ -26,8 +24,36 @@ class URLDecodeError(UnicodeDecodeError):
     decoded.
     """
 
-class ConfigurationError(ZCE):
+class ConfigurationError(Exception):
     """ Raised when inappropriate input values are supplied to an API
     method of a :term:`Configurator`"""
 
+class ConfigurationConflictError(ConfigurationError):
+    """ Raised when a configuration conflict is detected during action
+    processing"""
 
+    def __init__(self, conflicts):
+        self._conflicts = conflicts
+
+    def __str__(self):
+        r = ["Conflicting configuration actions"]
+        items = self._conflicts.items()
+        items.sort()
+        for discriminator, infos in items:
+            r.append("  For: %s" % (discriminator, ))
+            for info in infos:
+                for line in unicode(info).rstrip().split(u'\n'):
+                    r.append(u"    "+line)
+
+        return "\n".join(r)
+
+
+class ConfigurationExecutionError(ConfigurationError):
+    """An error occurred during execution of a configuration action
+    """
+
+    def __init__(self, etype, evalue, info):
+        self.etype, self.evalue, self.info = etype, evalue, info
+
+    def __str__(self):
+        return "%s: %s\n  in:\n  %s" % (self.etype, self.evalue, self.info)

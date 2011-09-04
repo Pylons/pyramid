@@ -8,6 +8,10 @@ class TestRegistry(unittest.TestCase):
     def _makeOne(self):
         return self._getTargetClass()()
 
+    def test___nonzero__(self):
+        registry = self._makeOne()
+        self.assertEqual(registry.__nonzero__(), True)
+
     def test_registerHandler_and_notify(self):
         registry = self._makeOne()
         self.assertEqual(registry.has_listeners, False)
