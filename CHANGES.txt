@@ -1,3 +1,13 @@
+Next release
+============
+
+Bug Fixes
+---------
+
+- The ``route_prefix`` of a configurator was not properly taken into account
+  when registering routes in certain circumstances.  See
+  https://github.com/Pylons/pyramid/issues/260
+
 1.2a4 (2011-09-02)
 ==================
 
