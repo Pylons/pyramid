@@ -2,32 +2,33 @@ import inspect
 from urlparse import urljoin
 from urlparse import urlparse
 
-from zope.interface import classProvides
-from zope.interface import implements
-from zope.interface import implementedBy
-from zope.interface.interfaces import IInterface
 from zope.interface import Interface
+from zope.interface import classProvides
+from zope.interface import implementedBy
+from zope.interface import implements
+from zope.interface.interfaces import IInterface
 
-from pyramid.interfaces import IStaticURLInfo
-from pyramid.interfaces import IException
-from pyramid.interfaces import IViewMapper
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.interfaces import IAuthorizationPolicy
 from pyramid.interfaces import IDebugLogger
-from pyramid.interfaces import IViewMapperFactory
-from pyramid.interfaces import IResponse
-from pyramid.interfaces import IMultiView
 from pyramid.interfaces import IDefaultPermission
+from pyramid.interfaces import IException
 from pyramid.interfaces import IExceptionViewClassifier
+from pyramid.interfaces import IMultiView
+from pyramid.interfaces import IRendererFactory
+from pyramid.interfaces import IRequest
+from pyramid.interfaces import IResponse
+from pyramid.interfaces import IRouteRequest
 from pyramid.interfaces import ISecuredView
+from pyramid.interfaces import IStaticURLInfo
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
-from pyramid.interfaces import IRequest
-from pyramid.interfaces import IRouteRequest
-from pyramid.interfaces import IRendererFactory
+from pyramid.interfaces import IViewMapper
+from pyramid.interfaces import IViewMapperFactory
 from pyramid.interfaces import PHASE1_CONFIG
 from pyramid.interfaces import PHASE3_CONFIG
 
+from pyramid import renderers
 from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import PredicateMismatch
 from pyramid.httpexceptions import HTTPForbidden
@@ -36,13 +37,12 @@ from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.static import static_view
 from pyramid.url import route_url
 from pyramid.view import render_view_to_response
-from pyramid import renderers
 
-from pyramid.config.util import MAX_ORDER
 from pyramid.config.util import DEFAULT_PHASH
+from pyramid.config.util import MAX_ORDER
 from pyramid.config.util import action_method
-from pyramid.config.util import make_predicates
 from pyramid.config.util import as_sorted_tuple
+from pyramid.config.util import make_predicates
 
 def wraps_view(wrapper):
     def inner(self, view):
