@@ -5,8 +5,7 @@ Pyramid is a small, fast, down-to-earth, open source Python web application
 development framework. It makes real-world web application development and
 deployment more fun, more predictable, and more productive.
 
-Pyramid is the newest web framework produced by the `Pylons Project
-<http://pylonsproject.org/>`_.
+Pyramid is produced by the `Pylons Project <http://pylonsproject.org/>`_.
 
 Support and Documentation
 -------------------------
