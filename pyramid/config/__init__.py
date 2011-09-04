@@ -411,13 +411,6 @@ class Configurator(
                                                  info=info, event=event)
             _registry.registerSelfAdapter = registerSelfAdapter
 
-    def _make_context(self, autocommit=False):
-        context = ActionState()
-        context.registry = self.registry
-        context.autocommit = autocommit
-        context.route_prefix = self.route_prefix
-        return context
-
     # API
 
     def action(self, discriminator, callable=None, args=(), kw=None, order=0):
