@@ -3,9 +3,9 @@ import sys
 
 from translationstring import ChameleonTranslate
 
-from pyramid.interfaces import ITranslationDirectories
 from pyramid.interfaces import IChameleonTranslate
 from pyramid.interfaces import ILocaleNegotiator
+from pyramid.interfaces import ITranslationDirectories
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.i18n import get_localizer
