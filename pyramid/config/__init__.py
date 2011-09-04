@@ -205,8 +205,10 @@ class Configurator(
 
     manager = manager # for testing injection
     venusian = venusian # for testing injection
-    _ctx = None
     _ainfo = None
+    basepath = None
+    includepath = ()
+    info = ''
 
     def __init__(self,
                  registry=None,
@@ -442,20 +444,14 @@ class Configurator(
         if kw is None:
             kw = {}
 
-        context = self._ctx
-
-        if context is None:
-            autocommit = self.autocommit
-        else:
-            autocommit = context.autocommit
+        autocommit = self.autocommit
 
         if autocommit:
             if callable is not None:
                 callable(*args, **kw)
+
         else:
-            if context is None: # defer expensive creation of context
-                context = self._ctx = self._make_context(self.autocommit)
-            info = context.info
+            info = self.info
             if not info:
                 # Try to provide more accurate info for conflict reports by
                 # wrapping the context in a decorator and attaching caller info
@@ -465,7 +461,29 @@ class Configurator(
                     info = self._ainfo[0]
                 else:
                     info = ''
-            context.action(discriminator, callable, args, kw, order, info=info)
+            self.action_state.action(
+                discriminator,
+                callable,
+                args,
+                kw,
+                order,
+                info=info,
+                includepath=self.includepath,
+                )
+
+    def _get_action_state(self):
+        registry = self.registry
+        try:
+            state = registry.action_state
+        except AttributeError:
+            state = ActionState()
+            registry.action_state = state
+        return state
+
+    def _set_action_state(self, state):
+        self.registry.action_state = state
+
+    action_state = property(_get_action_state, _set_action_state)
 
     def commit(self):
         """ Commit any pending configuration actions. If a configuration
@@ -474,11 +492,8 @@ class Configurator(
         of this error will be information about the source of the conflict,
         usually including file names and line numbers of the cause of the
         configuration conflicts."""
-        if self._ctx is None:
-            return
-        self._ctx.execute_actions()
-        # unwrap and reset the context
-        self._ctx = None
+        self.action_state.execute_actions()
+        self.action_state = ActionState() # old actions have been processed
 
     def include(self, callable, route_prefix=None):
         """Include a configuration callables, to support imperative
@@ -502,7 +517,7 @@ class Configurator(
         Python :term:`module`, in which case, the module will be searched for
         a callable named ``includeme``, which will be treated as the
         configuration callable.
-        
+
         For example, if the ``includeme`` function below lives in a module
         named ``myapp.myconfig``:
 
@@ -573,10 +588,9 @@ class Configurator(
 
         The ``route_prefix`` parameter is new as of Pyramid 1.2.
         """
+        ## """ <-- emacs gets confused if this isn't here
 
-        _context = self._ctx
-        if _context is None:
-            _context = self._ctx = self._make_context(self.autocommit)
+        action_state = self.action_state
 
         if self.route_prefix:
             old_prefix = self.route_prefix.rstrip('/') + '/'
@@ -592,15 +606,18 @@ class Configurator(
             c = getattr(module, 'includeme')
         spec = module.__name__ + ':' + c.__name__
         sourcefile = inspect.getsourcefile(c)
-        if _context.processSpec(spec):
-            context = ActionStateWrapper(_context)
-            context.basepath = os.path.dirname(sourcefile)
-            context.includepath = _context.includepath + (spec,)
-            context.package = package_of(module)
-            context.route_prefix = route_prefix
-            config = self.__class__.with_context(context)
-            c(config)
 
+        if action_state.processSpec(spec):
+            configurator = self.__class__(
+                registry=self.registry,
+                package=package_of(module),
+                autocommit=self.autocommit,
+                route_prefix=route_prefix,
+                )
+            configurator.basepath = os.path.dirname(sourcefile)
+            configurator.includepath = self.includepath + (spec,)
+            c(configurator)
+            
     def add_directive(self, name, directive, action_wrap=True):
         """
         Add a directive method to the configurator.
@@ -650,10 +667,15 @@ class Configurator(
         :meth:`pyramid.config.Configurator.with_package`, and
         :meth:`pyramid.config.Configurator.include` to obtain a configurator
         with 'the right' context.  Returns a new Configurator instance."""
-        configurator = cls(registry=context.registry, package=context.package,
-                           autocommit=context.autocommit,
-                           route_prefix=context.route_prefix)
-        configurator._ctx = context
+        configurator = cls(
+            registry=context.registry,
+            package=context.package,
+            autocommit=context.autocommit,
+            route_prefix=context.route_prefix
+            )
+        configurator.basepath = context.basepath
+        configurator.includepath = context.includepath
+        configurator.info = context.info
         return configurator
 
     def with_package(self, package):
@@ -662,12 +684,16 @@ class Configurator(
         ``package`` argument to the new configurator.  ``package`` may
         be an actual Python package object or a :term:`dotted Python name`
         representing a package."""
-        context = self._ctx
-        if context is None:
-            context = self._ctx = self._make_context(self.autocommit)
-        context = ActionStateWrapper(context)
-        context.package = package
-        return self.__class__.with_context(context)
+        configurator = self.__class__(
+            registry=self.registry,
+            package=package,
+            autocommit=self.autocommit,
+            route_prefix=self.route_prefix,
+            )
+        configurator.basepath = self.basepath
+        configurator.includepath = self.includepath
+        configurator.info = self.info
+        return configurator
 
     def maybe_dotted(self, dotted):
         """ Resolve the :term:`dotted Python name` ``dotted`` to a
@@ -788,8 +814,9 @@ class Configurator(
 
         return app
 
-class ActionStateBase(object):
+class ActionState(object):
     def __init__(self):
+        self.actions = []
         self._seen_files = set()
 
     def processSpec(self, spec):
@@ -806,8 +833,8 @@ class ActionStateBase(object):
         self._seen_files.add(spec)
         return True
 
-    def action(self, discriminator, callable=None, args=(), kw={}, order=0,
-               includepath=None, info=None):
+    def action(self, discriminator, callable=None, args=(), kw=None, order=0,
+               includepath=(), info=''):
         """Add an action with the given discriminator, callable and arguments
 
         For testing purposes, the callable and arguments may be omitted.
@@ -869,44 +896,13 @@ class ActionStateBase(object):
         (None, None, (), {}, ('foo.zcml',), 'abc')
         
         """
-        if info is None:
-            info = getattr(self, 'info', '')
-
-        if includepath is None:
-            includepath = getattr(self, 'includepath', ())
-            
+        if kw is None:
+            kw = {}
         action = (discriminator, callable, args, kw, includepath, info, order)
-
         # remove trailing false items
         while (len(action) > 2) and not action[-1]:
             action = action[:-1]
-
         self.actions.append(action)
-
-
-class ActionStateWrapper(ActionStateBase):
-    """ Wrap an action state.
-    """
-    def __init__(self, state):
-        self.state = state
-
-    def __getattr__(self, name):
-        v = getattr(self.state, name)
-        # cache result in self
-        setattr(self, name, v)
-        return v
-
-class ActionState(ActionStateBase):
-    autocommit = False
-    route_prefix = None
-    package = None
-    basepath = None
-    includepath = ()
-    info = ''
-
-    def __init__(self):
-        super(ActionState, self).__init__()
-        self.actions = []
 
     def execute_actions(self, clear=True):
         """Execute the configuration actions
@@ -959,8 +955,7 @@ class ActionState(ActionStateBase):
         """
         try:
             for action in resolveConflicts(self.actions):
-                (discriminator, callable, args, kw, includepath, info, order
-                 ) = expand_action(*action)
+                _, callable, args, kw, _, info, _ = expand_action(*action)
                 if callable is None:
                     continue
                 try:
@@ -969,7 +964,10 @@ class ActionState(ActionStateBase):
                     raise
                 except:
                     t, v, tb = sys.exc_info()
-                    raise ConfigurationExecutionError(t, v, info), None, tb
+                    try:
+                        raise ConfigurationExecutionError(t, v, info), None, tb
+                    finally:
+                       del t, v, tb
         finally:
             if clear:
                 del self.actions[:]
@@ -1082,10 +1080,11 @@ def resolveConflicts(actions):
 
     return r
 
-def expand_action(discriminator, callable=None, args=(), kw={},
+def expand_action(discriminator, callable=None, args=(), kw=None,
                    includepath=(), info='', order=0):
-    return (discriminator, callable, args, kw,
-            includepath, info, order)
+    if kw is None:
+        kw = {}
+    return (discriminator, callable, args, kw, includepath, info, order)
 
 global_registries = WeakOrderedSet()
 

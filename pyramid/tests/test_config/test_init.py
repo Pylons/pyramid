@@ -243,23 +243,22 @@ class ConfiguratorTests(unittest.TestCase):
         newconfig = config.with_package(pyramid.tests.test_config)
         self.assertEqual(newconfig.package, pyramid.tests.test_config)
 
-    def test_with_package_context_is_not_None(self):
-        import pyramid.tests.test_config
+    def test_with_package(self):
+        import pyramid.tests
         config = self._makeOne()
-        config._ctx = DummyContext()
-        config._ctx.registry = None
-        config._ctx.autocommit = True
-        config._ctx.route_prefix = None
-        newconfig = config.with_package(pyramid.tests.test_config)
-        self.assertEqual(newconfig.package, pyramid.tests.test_config)
-
-    def test_with_package_context_is_None(self):
-        import pyramid.tests.test_config
-        config = self._makeOne()
-        config._ctx = None
-        newconfig = config.with_package(pyramid.tests.test_config)
-        self.assertEqual(newconfig.package, pyramid.tests.test_config)
-        self.assertEqual(config._ctx.package, None)
+        config.basepath = 'basepath'
+        config.info = 'info'
+        config.includepath = ('spec',)
+        config.autocommit = True
+        config.route_prefix = 'prefix'
+        newconfig = config.with_package(pyramid.tests)
+        self.assertEqual(newconfig.package, pyramid.tests)
+        self.assertEqual(newconfig.registry, config.registry)
+        self.assertEqual(newconfig.autocommit, True)
+        self.assertEqual(newconfig.route_prefix, 'prefix')
+        self.assertEqual(newconfig.info, 'info')
+        self.assertEqual(newconfig.basepath, 'basepath')
+        self.assertEqual(newconfig.includepath, ('spec',))
 
     def test_maybe_dotted_string_success(self):
         import pyramid.tests.test_config
@@ -659,53 +658,38 @@ pyramid.tests.test_config.dummy_include2""",
     def test_include_with_dotted_name(self):
         from pyramid.tests import test_config
         config = self._makeOne()
-        context_before = config._make_context()
-        config._ctx = context_before
         config.include('pyramid.tests.test_config.dummy_include')
-        context_after = config._ctx
-        actions = context_after.actions
+        after = config.action_state
+        actions = after.actions
         self.assertEqual(len(actions), 1)
         self.assertEqual(
-            context_after.actions[0][:3],
+            after.actions[0][:3],
             ('discrim', None, test_config),
             )
-        self.assertEqual(context_after.basepath, None)
-        self.assertEqual(context_after.includepath, ())
-        self.assertTrue(context_after is context_before)
 
     def test_include_with_python_callable(self):
         from pyramid.tests import test_config
         config = self._makeOne()
-        context_before = config._make_context()
-        config._ctx = context_before
         config.include(dummy_include)
-        context_after = config._ctx
-        actions = context_after.actions
+        after = config.action_state
+        actions = after.actions
         self.assertEqual(len(actions), 1)
         self.assertEqual(
             actions[0][:3],
             ('discrim', None, test_config),
             )
-        self.assertEqual(context_after.basepath, None)
-        self.assertEqual(context_after.includepath, ())
-        self.assertTrue(context_after is context_before)
 
     def test_include_with_module_defaults_to_includeme(self):
         from pyramid.tests import test_config
         config = self._makeOne()
-        context_before = config._make_context()
-        config._ctx = context_before
         config.include('pyramid.tests.test_config')
-        context_after = config._ctx
-        actions = context_after.actions
+        after = config.action_state
+        actions = after.actions
         self.assertEqual(len(actions), 1)
         self.assertEqual(
             actions[0][:3],
             ('discrim', None, test_config),
             )
-        self.assertEqual(context_after.basepath, None)
-        self.assertEqual(context_after.includepath, ())
-        self.assertTrue(context_after is context_before)
 
     def test_include_with_route_prefix(self):
         root_config = self._makeOne(autocommit=True)
@@ -721,9 +705,22 @@ pyramid.tests.test_config.dummy_include2""",
 
     def test_with_context(self):
         config = self._makeOne()
-        ctx = config._make_context()
-        newconfig = config.with_context(ctx)
-        self.assertEqual(newconfig._ctx, ctx)
+        context = DummyZCMLContext()
+        context.basepath = 'basepath'
+        context.includepath = ('spec',)
+        context.package = 'pyramid'
+        context.autocommit = True
+        context.registry = 'abc'
+        context.route_prefix = 'buz'
+        context.info = 'info'
+        newconfig = config.with_context(context)
+        self.assertEqual(newconfig.package_name, 'pyramid')
+        self.assertEqual(newconfig.autocommit, True)
+        self.assertEqual(newconfig.registry, 'abc')
+        self.assertEqual(newconfig.route_prefix, 'buz')
+        self.assertEqual(newconfig.basepath, 'basepath')
+        self.assertEqual(newconfig.includepath, ('spec',))
+        self.assertEqual(newconfig.info, 'info')
 
     def test_action_branching_kw_is_None(self):
         config = self._makeOne(autocommit=True)
@@ -733,29 +730,31 @@ pyramid.tests.test_config.dummy_include2""",
         config = self._makeOne(autocommit=True)
         self.assertEqual(config.action('discrim', kw={'a':1}), None)
 
-    def test_action_branching_nonautocommit_with_context_info(self):
+    def test_action_branching_nonautocommit_with_config_info(self):
         config = self._makeOne(autocommit=False)
+        config.info = 'abc'
         state = DummyActionState()
         state.autocommit = False
-        state.info = 'abc'
-        config._ctx = state
+        config.action_state = state
         config.action('discrim', kw={'a':1})
         self.assertEqual(
             state.actions,
-            [(('discrim', None, (), {'a': 1}, 0), {'info': 'abc'})]
+            [(('discrim', None, (), {'a': 1}, 0),
+              {'info': 'abc', 'includepath':()})]
             )
 
-    def test_action_branching_nonautocommit_without_context_info(self):
+    def test_action_branching_nonautocommit_without_config_info(self):
         config = self._makeOne(autocommit=False)
-        state = DummyActionState()
-        state.autocommit = False
-        state.info = ''
-        config._ctx = state
+        config.info = ''
         config._ainfo = ['z']
+        state = DummyActionState()
+        config.action_state = state
+        state.autocommit = False
         config.action('discrim', kw={'a':1})
         self.assertEqual(
             state.actions,
-            [(('discrim', None, (), {'a': 1}, 0), {'info': 'z'})]
+            [(('discrim', None, (), {'a': 1}, 0),
+              {'info': 'z', 'includepath':()})]
             )
 
     def test_scan_integration(self):
@@ -1301,9 +1300,9 @@ class TestConfigurator_add_directive(unittest.TestCase):
             'dummy_extend', 'pyramid.tests.test_config.dummy_extend')
         self.assert_(hasattr(config, 'dummy_extend'))
         config.dummy_extend('discrim')
-        context_after = config._ctx
+        after = config.action_state
         self.assertEqual(
-            context_after.actions[-1][:3],
+            after.actions[-1][:3],
             ('discrim', None, test_config),
             )
 
@@ -1314,9 +1313,9 @@ class TestConfigurator_add_directive(unittest.TestCase):
             'dummy_extend', dummy_extend)
         self.assert_(hasattr(config, 'dummy_extend'))
         config.dummy_extend('discrim')
-        context_after = config._ctx
+        after = config.action_state
         self.assertEqual(
-            context_after.actions[-1][:3],
+            after.actions[-1][:3],
             ('discrim', None, test_config),
             )
 
@@ -1328,9 +1327,9 @@ class TestConfigurator_add_directive(unittest.TestCase):
             'dummy_extend', dummy_extend2)
         self.assert_(hasattr(config, 'dummy_extend'))
         config.dummy_extend('discrim')
-        context_after = config._ctx
+        after = config.action_state
         self.assertEqual(
-            context_after.actions[-1][:3],
+            after.actions[-1][:3],
             ('discrim', None, config.registry),
             )
 
@@ -1343,18 +1342,15 @@ class TestConfigurator_add_directive(unittest.TestCase):
         self.assertRaises(ConfigurationConflictError, config.commit)
 
     def test_directive_persists_across_configurator_creations(self):
-        from pyramid.config import ActionStateWrapper
         config = self.config
         config.add_directive('dummy_extend', dummy_extend)
-        context = config._make_context(autocommit=False)
-        context = ActionStateWrapper(context)
-        config2 = config.with_context(context)
+        config2 = config.with_package('pyramid.tests')
         config2.dummy_extend('discrim')
-        context_after = config2._ctx
-        actions = context_after.actions
+        after = config2.action_state
+        actions = after.actions
         self.assertEqual(len(actions), 1)
         self.assertEqual(
-            context_after.actions[0][:3],
+            after.actions[0][:3],
             ('discrim', None, config2.package),
             )
 
@@ -1365,8 +1361,7 @@ class TestActionState(unittest.TestCase):
     
     def test_it(self):
         c = self._makeOne()
-        self.assertEqual(c.autocommit, False)
-        self.assertEqual(c.route_prefix, None)
+        self.assertEqual(c.actions, [])
 
     def test_action_simple(self):
         from pyramid.tests.test_config import dummyfactory as f
@@ -1377,32 +1372,28 @@ class TestActionState(unittest.TestCase):
         c.action(None)
         self.assertEqual(c.actions, [(1, f, (1,), {'x': 1}), (None, None)])
 
-    def test_action_with_includepath_and_info(self):
+    def test_action_with_includepath(self):
         c = self._makeOne()
         c.actions = []
-        c.includepath = ('foo.zcml',)
-        c.info = '?'
-        c.action(None)
+        c.action(None, includepath=('abc',))
+        self.assertEqual(c.actions, [(None, None, (), {}, ('abc',))])
+
+    def test_action_with_info(self):
+        c = self._makeOne()
+        c.action(None, info='abc')
+        self.assertEqual(c.actions, [(None, None, (), {}, (), 'abc')])
+
+    def test_action_with_includepath_and_info(self):
+        c = self._makeOne()
+        c.action(None, includepath=('spec',), info='bleh')
         self.assertEqual(c.actions,
-                         [(None, None, (), {}, ('foo.zcml',), '?')])
+                         [(None, None, (), {}, ('spec',), 'bleh')])
 
     def test_action_with_order(self):
         c = self._makeOne()
         c.actions = []
         c.action(None, order=99999)
         self.assertEqual(c.actions, [(None, None, (), {}, (), '', 99999)])
-
-    def test_action_with_includepath_dynamic(self):
-        c = self._makeOne()
-        c.actions = []
-        c.action(None, includepath=('abc',))
-        self.assertEqual(c.actions, [(None, None, (), {}, ('abc',))])
-
-    def test_action_with_info_dynamic(self):
-        c = self._makeOne()
-        c.actions = []
-        c.action(None, info='abc')
-        self.assertEqual(c.actions, [(None, None, (), {}, (), 'abc')])
 
     def test_processSpec(self):
         c = self._makeOne()
@@ -1438,20 +1429,6 @@ class TestActionState(unittest.TestCase):
             ]
         self.assertRaises(ConfigurationExecutionError, c.execute_actions)
         self.assertEqual(output, [('f', (1,), {}), ('f', (2,), {})])
-
-class TestActionStateWrapper(unittest.TestCase):
-    def _makeOne(self, state):
-        from pyramid.config import ActionStateWrapper
-        return ActionStateWrapper(state)
-
-    def test___getattr__(self):
-        state = DummyContext()
-        state.foo = 1
-        state.bar = 2
-        wrapper = self._makeOne(state)
-        self.assertEqual(wrapper.foo, 1)
-        wrapper.bar = 2
-        self.assertEqual(state.bar, 2)
 
 class Test_resolveConflicts(unittest.TestCase):
     def _callFUT(self, actions):
@@ -1583,3 +1560,13 @@ class DummyActionState(object):
         self.actions = []
     def action(self, *arg, **kw):
         self.actions.append((arg, kw))
+
+class DummyZCMLContext(object):
+    package = None
+    registry = None
+    autocommit = False
+    route_prefix = None
+    basepath = None
+    includepath = ()
+    info = ''
+    
