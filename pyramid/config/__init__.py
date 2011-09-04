@@ -4,20 +4,18 @@ import os
 import sys
 import types
 import warnings
-
 import venusian
-
 
 from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
 
-from pyramid.interfaces import IExceptionResponse
 from pyramid.interfaces import IDebugLogger
+from pyramid.interfaces import IExceptionResponse
 
 from pyramid.asset import resolve_asset_spec
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.events import ApplicationCreated
-from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import ConfigurationConflictError
+from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import ConfigurationExecutionError
 from pyramid.httpexceptions import default_exceptionresponse_view
 from pyramid.path import caller_package
@@ -29,21 +27,20 @@ from pyramid.threadlocal import manager
 from pyramid.util import DottedNameResolver
 from pyramid.util import WeakOrderedSet
 
-from pyramid.config.util import action_method
-
+from pyramid.config.adapters import AdaptersConfiguratorMixin
+from pyramid.config.assets import AssetsConfiguratorMixin
+from pyramid.config.factories import FactoriesConfiguratorMixin
+from pyramid.config.i18n import I18NConfiguratorMixin
+from pyramid.config.rendering import DEFAULT_RENDERERS
+from pyramid.config.rendering import RenderingConfiguratorMixin
+from pyramid.config.routes import RoutesConfiguratorMixin
+from pyramid.config.security import SecurityConfiguratorMixin
+from pyramid.config.settings import SettingsConfiguratorMixin
 from pyramid.config.testing import TestingConfiguratorMixin
 from pyramid.config.tweens import TweensConfiguratorMixin
-from pyramid.config.security import SecurityConfiguratorMixin
+from pyramid.config.util import action_method
 from pyramid.config.views import ViewsConfiguratorMixin
-from pyramid.config.routes import RoutesConfiguratorMixin
 from pyramid.config.zca import ZCAConfiguratorMixin
-from pyramid.config.i18n import I18NConfiguratorMixin
-from pyramid.config.rendering import RenderingConfiguratorMixin
-from pyramid.config.rendering import DEFAULT_RENDERERS
-from pyramid.config.assets import AssetsConfiguratorMixin
-from pyramid.config.settings import SettingsConfiguratorMixin
-from pyramid.config.factories import FactoriesConfiguratorMixin
-from pyramid.config.adapters import AdaptersConfiguratorMixin
 
 ConfigurationError = ConfigurationError # pyflakes
 
