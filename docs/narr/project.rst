@@ -92,25 +92,38 @@ the ``virtualenv`` command.  To start a :app:`Pyramid` :term:`project`, use
 the ``paster`` facility installed within the virtualenv.  In
 :ref:`installing_chapter` we called the virtualenv directory ``env``; the
 following command assumes that our current working directory is that
-directory.
+directory.  We'll choose the ``pyramid_starter`` scaffold for this purpose.
 
-We'll choose the ``pyramid_starter`` scaffold for this purpose.
+On UNIX:
 
 .. code-block:: text
 
    $ bin/paster create -t pyramid_starter
 
+Or on Windows:
+
+.. code-block:: text
+
+   $ Scripts\paster.exe create -t pyramid_starter
+
 The above command uses the ``paster create`` command to create a project with
 the ``pyramid_starter`` scaffold.  To use a different scaffold, such as
-``pyramid_routesalchemy``, you'd just change the last argument.  For example:
+``pyramid_routesalchemy``, you'd just change the last argument.  For example,
+on UNIX:
 
 .. code-block:: text
 
    $ bin/paster create -t pyramid_routesalchemy
 
+Or on Windows:
+
+.. code-block:: text
+
+   $ Scripts\paster.exe create -t pyramid_routesalchemy
+
 ``paster create`` will ask you a single question: the *name* of the project.
 You should use a string without spaces and with only letters in it.  Here's
-sample output from a run of ``paster create`` for a project we name
+sample output from a run of ``paster create`` on UNIX for a project we name
 ``MyProject``:
 
 .. code-block:: text
@@ -135,9 +148,9 @@ sample output from a run of ``paster create`` for a project we name
 
 .. note:: You may encounter an error when using ``paster create`` if a
    dependent Python package is not installed. This will result in a traceback
-   ending in ``pkg_resources.DistributionNotFound: <package name>``.
-   Simply run ``bin/easy_install``, with the missing package name from the
-   error message to work around this issue.
+   ending in ``pkg_resources.DistributionNotFound: <package name>``.  Simply
+   run ``bin/easy_install`` (or ``Script\easy_install.exe`` on Windows), with
+   the missing package name from the error message to work around this issue.
 
 As a result of invoking the ``paster create`` command, a project is created
 in a directory named ``MyProject``.  That directory is a :term:`project`
@@ -175,18 +188,29 @@ command ``python setup.py develop``
 
 The file named ``setup.py`` will be in the root of the paster-generated
 project directory.  The ``python`` you're invoking should be the one that
-lives in the ``bin`` directory of your virtual Python environment.  Your
-terminal's current working directory *must* be the newly created project
-directory.  For example:
+lives in the ``bin`` (or ``Scripts`` on Windows) directory of your virtual
+Python environment.  Your terminal's current working directory *must* be the
+newly created project directory.
+
+On UNIX:
 
 .. code-block:: text
 
+   $ cd MyProject
    $ ../bin/python setup.py develop
 
-Elided output from a run of this command is shown below:
+Or on Windows:
 
 .. code-block:: text
 
+   $ cd MyProject
+   $ ..\Scripts\python.exe setup.py develop
+
+Elided output from a run of this command on UNIX is shown below:
+
+.. code-block:: text
+
+   $ cd MyProject
    $ ../bin/python setup.py develop
    ...
    Finished processing dependencies for MyProject==0.0
@@ -206,17 +230,25 @@ Running The Tests For Your Application
 To run unit tests for your application, you should invoke them using the
 Python interpreter from the :term:`virtualenv` you created during
 :ref:`installing_chapter` (the ``python`` command that lives in the ``bin``
-directory of your virtualenv):
+directory of your virtualenv).
+
+On UNIX:
 
 .. code-block:: text
 
    $ ../bin/python setup.py test -q
 
-Here's sample output from a test run:
+Or on Windows:
 
 .. code-block:: text
 
-   $ python setup.py test -q
+   $ ..\Scripts\python.exe setup.py test -q
+
+Here's sample output from a test run on UNIX:
+
+.. code-block:: text
+
+   $ ../bin/python setup.py test -q
    running test
    running egg_info
    writing requirements to MyProject.egg-info/requires.txt
@@ -254,13 +286,21 @@ Running The Project Application
 
 Once a project is installed for development, you can run the application it
 represents using the ``paster serve`` command against the generated
-configuration file.  In our case, this file is named ``development.ini``:
+configuration file.  In our case, this file is named ``development.ini``.
+
+On UNIX:
 
 .. code-block:: text
 
    $ ../bin/paster serve development.ini
 
-Here's sample output from a run of ``paster serve``:
+On Windows:
+
+.. code-block:: text
+
+   $ ..\Scripts\paster.exe serve development.ini
+
+Here's sample output from a run of ``paster serve`` on UNIX:
 
 .. code-block:: text
 
@@ -279,7 +319,7 @@ restart.  This typically makes development easier, as changes to Python code
 made within a :app:`Pyramid` application is not put into effect until the
 server restarts.
 
-For example:
+For example, on UNIX:
 
 .. code-block:: text
 

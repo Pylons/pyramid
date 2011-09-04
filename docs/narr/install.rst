@@ -18,10 +18,10 @@ run :app:`Pyramid`.
     Python 2.6.6, and Python 2.7.2.  :app:`Pyramid` does not run under any
     version of Python before 2.5, and does not yet run under Python 3.X.
 
-:app:`Pyramid` is known to run on all popular Unix-like systems such as
+:app:`Pyramid` is known to run on all popular UNIX-like systems such as
 Linux, MacOS X, and FreeBSD as well as on Windows platforms.  It is also
-known to run on Google's App Engine, :term:`PyPy` (1.5), and :term:`Jython`
-(2.5.2).
+known to run on Google's App Engine, :term:`PyPy` (1.5 and 1.6), and
+:term:`Jython` (2.5.2).
 
 :app:`Pyramid` installation does not require the compilation of any
 C code, so you need only a Python interpreter that meets the
@@ -204,9 +204,9 @@ into your setuptools-enabled Python interpreter, use the
 
    $ easy_install virtualenv
 
-This command should succeed, and tell you that the virtualenv package
-is now installed.  If it fails due to permission errors, you may need
-to install it as your system's administrative user.  For example:
+This command should succeed, and tell you that the virtualenv package is now
+installed.  If it fails due to permission errors, you may need to install it
+as your system's administrative user.  For example:
 
 .. code-block:: text
 
@@ -238,7 +238,7 @@ following:
    depending on the packages you've already got installed into your
    Python's "main" site-packages dir.
 
-.. warning:: If you're on UNIX, *do not* use ``sudo`` to run the
+.. warning:: *do not* use ``sudo`` to run the
    ``virtualenv`` script.  It's perfectly acceptable (and desirable)
    to create a virtualenv as a normal user.
 
@@ -250,7 +250,7 @@ Installing :app:`Pyramid` Into the Virtual Python Environment
 
 After you've got your ``env`` virtualenv installed, you may install
 :app:`Pyramid` itself using the following commands from within the
-virtualenv (``env``) directory you created in the last step:
+virtualenv (``env``) directory you created in the last step.
 
 .. code-block:: text
 
