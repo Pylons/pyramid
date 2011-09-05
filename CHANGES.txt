@@ -1,3 +1,12 @@
+Next release
+============
+
+Internal
+--------
+
+- Internalize code previously depended upon as imports from the
+  ``paste.auth`` module (futureproof).
+
 1.2a5 (2011-09-04)
 ==================
 
