@@ -566,6 +566,13 @@ are not automatically reloaded when changed, and turns off all debugging
 options.  This file is appropriate to use instead of ``development.ini`` when
 you put your application into production.
 
+It's important to use ``production.ini`` (and *not* ``development.ini``) to
+benchmark your application and put it into production.  ``development.ini``
+configures your system with a debug toolbar that helps development, but the
+inclusion of this toolbar slows down page rendering times by over an order of
+magnitude.  The debug toolbar is also a potential security risk if you have
+it configured incorrectly.
+
 .. index::
    single: MANIFEST.in
 
