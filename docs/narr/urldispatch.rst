@@ -324,43 +324,6 @@ matched. This is because the match ordering will always match
 never be evaluated.
 
 .. index::
-   single: route factory
-
-.. _route_factories:
-
-Route Factories
-~~~~~~~~~~~~~~~
-
-A "route" configuration declaration can mention a "factory".  When that route
-matches a request, and a factory is attached to a route, the :term:`root
-factory` passed at startup time to the :term:`Configurator` is ignored;
-instead the factory associated with the route is used to generate a
-:term:`root` object.  This object will usually be used as the :term:`context`
-resource of the view callable ultimately found via :term:`view lookup`.
-
-.. code-block:: python
-   :linenos:
-
-   config.add_route('abc', '/abc', 
-                    factory='myproject.resources.root_factory')
-   config.add_view('myproject.views.theview', route_name='abc')
-
-The factory can either be a Python object or a :term:`dotted Python name` (a
-string) which points to such a Python object, as it is above.
-
-In this way, each route can use a different factory, making it possible to
-supply a different :term:`context` resource object to the view related to
-each particular route.
-
-Supplying a different resource factory for each route is useful when you're
-trying to use a :app:`Pyramid` :term:`authorization policy` to provide
-declarative, "context sensitive" security checks; each resource can maintain
-a separate :term:`ACL`, as documented in
-:ref:`using_security_with_urldispatch`.  It is also useful when you wish to
-combine URL dispatch with :term:`traversal` as documented within
-:ref:`hybrid_chapter`.
-
-.. index::
    single: route configuration arguments
 
 Route Configuration Arguments
@@ -383,141 +346,6 @@ neither predicates nor view configuration information.
    ``view_renderer``.  These only have an effect when the route configuration
    names a ``view`` and these arguments have been deprecated as of
    :app:`Pyramid` 1.1.
-
-.. index::
-   single: route predicates (custom)
-
-.. _custom_route_predicates:
-
-Custom Route Predicates
-~~~~~~~~~~~~~~~~~~~~~~~
-
-Each of the predicate callables fed to the ``custom_predicates`` argument of
-:meth:`~pyramid.config.Configurator.add_route` must be a callable accepting
-two arguments.  The first argument passed to a custom predicate is a
-dictionary conventionally named ``info``.  The second argument is the current
-:term:`request` object.
-
-The ``info`` dictionary has a number of contained values: ``match`` is a
-dictionary: it represents the arguments matched in the URL by the route.
-``route`` is an object representing the route which was matched (see
-:class:`pyramid.interfaces.IRoute` for the API of such a route object).
-
-``info['match']`` is useful when predicates need access to the route match.
-For example:
-
-.. code-block:: python
-   :linenos:
-
-   def any_of(segment_name, *allowed):
-       def predicate(info, request):
-           if info['match'][segment_name] in allowed:
-               return True
-       return predicate
-
-   num_one_two_or_three = any_of('num', 'one', 'two', 'three')
-
-   config.add_route('route_to_num', '/{num}', 
-                    custom_predicates=(num_one_two_or_three,))
-
-The above ``any_of`` function generates a predicate which ensures that the
-match value named ``segment_name`` is in the set of allowable values
-represented by ``allowed``.  We use this ``any_of`` function to generate a
-predicate function named ``num_one_two_or_three``, which ensures that the
-``num`` segment is one of the values ``one``, ``two``, or ``three`` , and use
-the result as a custom predicate by feeding it inside a tuple to the
-``custom_predicates`` argument to
-:meth:`~pyramid.config.Configurator.add_route`.
-
-A custom route predicate may also *modify* the ``match`` dictionary.  For
-instance, a predicate might do some type conversion of values:
-
-.. code-block:: python
-   :linenos:
-
-    def integers(*segment_names):
-        def predicate(info, request):
-            match = info['match']
-            for segment_name in segment_names:
-                try:
-                    match[segment_name] = int(match[segment_name])
-                except (TypeError, ValueError):
-                    pass
-            return True
-        return predicate
-
-    ymd_to_int = integers('year', 'month', 'day')
-
-    config.add_route('ymd', '/{year}/{month}/{day}', 
-                     custom_predicates=(ymd_to_int,))
-
-Note that a conversion predicate is still a predicate so it must return
-``True`` or ``False``; a predicate that does *only* conversion, such as the
-one we demonstrate above should unconditionally return ``True``.
-
-To avoid the try/except uncertainty, the route pattern can contain regular
-expressions specifying requirements for that marker. For instance:
-
-.. code-block:: python
-   :linenos:
-
-    def integers(*segment_names):
-        def predicate(info, request):
-            match = info['match']
-            for segment_name in segment_names:
-                match[segment_name] = int(match[segment_name])
-            return True
-        return predicate
-
-    ymd_to_int = integers('year', 'month', 'day')
-
-    config.add_route('ymd', '/{year:\d+}/{month:\d+}/{day:\d+}', 
-                     custom_predicates=(ymd_to_int,))
-
-Now the try/except is no longer needed because the route will not match at
-all unless these markers match ``\d+`` which requires them to be valid digits
-for an ``int`` type conversion.
-
-The ``match`` dictionary passed within ``info`` to each predicate attached to
-a route will be the same dictionary.  Therefore, when registering a custom
-predicate which modifies the ``match`` dict, the code registering the
-predicate should usually arrange for the predicate to be the *last* custom
-predicate in the custom predicate list.  Otherwise, custom predicates which
-fire subsequent to the predicate which performs the ``match`` modification
-will receive the *modified* match dictionary.
-
-.. warning::
-
-   It is a poor idea to rely on ordering of custom predicates to build a
-   conversion pipeline, where one predicate depends on the side effect of
-   another.  For instance, it's a poor idea to register two custom
-   predicates, one which handles conversion of a value to an int, the next
-   which handles conversion of that integer to some custom object.  Just do
-   all that in a single custom predicate.
-
-The ``route`` object in the ``info`` dict is an object that has two useful
-attributes: ``name`` and ``pattern``.  The ``name`` attribute is the route
-name.  The ``pattern`` attribute is the route pattern.  An example of using
-the route in a set of route predicates:
-
-.. code-block:: python
-   :linenos:
-
-    def twenty_ten(info, request):
-        if info['route'].name in ('ymd', 'ym', 'y'):
-            return info['match']['year'] == '2010'
-
-    config.add_route('y', '/{year}', custom_predicates=(twenty_ten,))
-    config.add_route('ym', '/{year}/{month}', custom_predicates=(twenty_ten,))
-    config.add_route('ymd', '/{year}/{month}/{day}', 
-                     custom_predicates=(twenty_ten,))
-
-The above predicate, when added to a number of route configurations ensures
-that the year match argument is '2010' if and only if the route name is
-'ymd', 'ym', or 'y'.
-
-See also :class:`pyramid.interfaces.IRoute` for more API documentation about
-route objects.
 
 .. index::
    single: route matching
@@ -732,11 +560,11 @@ request in its ``__init__``.  For example:
 In a more complicated application, this root factory might be a class
 representing a :term:`SQLAlchemy` model.
 
+See :ref:`route_factories` for more details about how to use route factories.
+
 .. index::
    single: matching the root URL
    single: root url (matching)
-
-.. index::
    pair: matching; root URL
 
 Matching the Root URL
@@ -908,92 +736,6 @@ calling convention of ``(context, request)`` (``context`` will be the
 exception object).
 
 .. index::
-   single: cleaning up after request
-
-.. _cleaning_up_after_a_request:
-
-Cleaning Up After a Request
----------------------------
-
-Sometimes it's required that some cleanup be performed at the end of a
-request when a database connection is involved.  
-
-For example, let's say you have a ``mypackage`` :app:`Pyramid` application
-package that uses SQLAlchemy, and you'd like the current SQLAlchemy database
-session to be removed after each request.  Put the following in the
-``mypackage.__init__`` module:
-
-.. ignore-next-block
-.. code-block:: python
-   :linenos:
-
-   from mypackage.models import DBSession
-
-   from pyramid.events import subscriber
-   from pyramid.events import NewRequest
-
-   def cleanup_callback(request):
-       DBSession.remove()
-
-   @subscriber(NewRequest)
-   def add_cleanup_callback(event):
-       event.request.add_finished_callback(cleanup_callback)
-
-Registering the ``cleanup_callback`` finished callback at the start of a
-request (by causing the ``add_cleanup_callback`` to receive a
-:class:`pyramid.events.NewRequest` event at the start of each request) will
-cause the DBSession to be removed whenever request processing has ended.
-Note that in the example above, for the :class:`pyramid.events.subscriber`
-decorator to "work", the :meth:`pyramid.config.Configurator.scan` method must
-be called against your ``mypackage`` package during application
-initialization.
-
-.. note:: This is only an example.  In particular, it is not necessary to
-   cause ``DBSession.remove`` to be called in an application generated from
-   any :app:`Pyramid` scaffold, because these all use the
-   ``repoze.tm2`` middleware.  The cleanup done by ``DBSession.remove`` is
-   unnecessary when ``repoze.tm2`` middleware is in the WSGI pipeline.
-
-.. index::
-   pair: URL dispatch; security
-
-.. _using_security_with_urldispatch:
-
-Using :app:`Pyramid` Security With URL Dispatch
---------------------------------------------------
-
-:app:`Pyramid` provides its own security framework which consults an
-:term:`authorization policy` before allowing any application code to be
-called.  This framework operates in terms of an access control list, which is
-stored as an ``__acl__`` attribute of a resource object.  A common thing to
-want to do is to attach an ``__acl__`` to the resource object dynamically for
-declarative security purposes.  You can use the ``factory`` argument that
-points at a factory which attaches a custom ``__acl__`` to an object at its
-creation time.
-
-Such a ``factory`` might look like so:
-
-.. code-block:: python
-   :linenos:
-
-   class Article(object):
-       def __init__(self, request):
-          matchdict = request.matchdict
-          article = matchdict.get('article', None)
-          if article == '1':
-              self.__acl__ = [ (Allow, 'editor', 'view') ]
-
-If the route ``archives/{article}`` is matched, and the article number is
-``1``, :app:`Pyramid` will generate an ``Article`` :term:`context` resource
-with an ACL on it that allows the ``editor`` principal the ``view``
-permission.  Obviously you can do more generic things than inspect the routes
-match dict to see if the ``article`` argument matches a particular string;
-our sample ``Article`` factory class is not very ambitious.
-
-.. note:: See :ref:`security_chapter` for more information about
-   :app:`Pyramid` security and ACLs.
-
-.. index::
    pair: debugging; route matching
 
 .. _debug_routematch_section:
@@ -1030,56 +772,6 @@ set these values.
 You can also use the ``paster proutes`` command to see a display of all the
 routes configured in your application; for more information, see
 :ref:`displaying_application_routes`.
-
-.. index::
-   pair: route; view callable lookup details
-
-Route View Callable Registration and Lookup Details
----------------------------------------------------
-
-When a request enters the system which matches the pattern of the route, the
-usual result is simple: the view callable associated with the route is
-invoked with the request that caused the invocation.
-
-For most usage, you needn't understand more than this; how it works is an
-implementation detail.  In the interest of completeness, however, we'll
-explain how it *does* work in the this section.  You can skip it if you're
-uninterested.
-
-When a view is associated with a route configuration, :app:`Pyramid` ensures
-that a :term:`view configuration` is registered that will always be found
-when the route pattern is matched during a request.  To do so:
-
-- A special route-specific :term:`interface` is created at startup time for
-  each route configuration declaration.
-
-- When an ``add_view`` statement mentions a ``route name`` attribute, a
-  :term:`view configuration` is registered at startup time.  This view
-  configuration uses a route-specific interface as a :term:`request` type.
-
-- At runtime, when a request causes any route to match, the :term:`request`
-  object is decorated with the route-specific interface.
-
-- The fact that the request is decorated with a route-specific interface
-  causes the :term:`view lookup` machinery to always use the view callable
-  registered using that interface by the route configuration to service
-  requests that match the route pattern.
-
-As we can see from the above description, technically, URL dispatch doesn't
-actually map a URL pattern directly to a view callable.  Instead, URL
-dispatch is a :term:`resource location` mechanism.  A :app:`Pyramid`
-:term:`resource location` subsystem (i.e., :term:`URL dispatch` or
-:term:`traversal`) finds a :term:`resource` object that is the
-:term:`context` of a :term:`request`. Once the :term:`context` is determined,
-a separate subsystem named :term:`view lookup` is then responsible for
-finding and invoking a :term:`view callable` based on information available
-in the context and the request.  When URL dispatch is used, the resource
-location and view lookup subsystems provided by :app:`Pyramid` are still
-being utilized, but in a way which does not require a developer to understand
-either of them in detail.
-
-If no route is matched using :term:`URL dispatch`, :app:`Pyramid` falls back
-to :term:`traversal` to handle the :term:`request`.
 
 .. _route_prefix:
 
@@ -1170,6 +862,268 @@ that may be added in the future.  For example:
    def main(global_config, **settings):
        config = Configurator()
        config.include(users_include, route_prefix='/users')
+
+.. index::
+   single: route predicates (custom)
+
+.. _custom_route_predicates:
+
+Custom Route Predicates
+-----------------------
+
+Each of the predicate callables fed to the ``custom_predicates`` argument of
+:meth:`~pyramid.config.Configurator.add_route` must be a callable accepting
+two arguments.  The first argument passed to a custom predicate is a
+dictionary conventionally named ``info``.  The second argument is the current
+:term:`request` object.
+
+The ``info`` dictionary has a number of contained values: ``match`` is a
+dictionary: it represents the arguments matched in the URL by the route.
+``route`` is an object representing the route which was matched (see
+:class:`pyramid.interfaces.IRoute` for the API of such a route object).
+
+``info['match']`` is useful when predicates need access to the route match.
+For example:
+
+.. code-block:: python
+   :linenos:
+
+   def any_of(segment_name, *allowed):
+       def predicate(info, request):
+           if info['match'][segment_name] in allowed:
+               return True
+       return predicate
+
+   num_one_two_or_three = any_of('num', 'one', 'two', 'three')
+
+   config.add_route('route_to_num', '/{num}', 
+                    custom_predicates=(num_one_two_or_three,))
+
+The above ``any_of`` function generates a predicate which ensures that the
+match value named ``segment_name`` is in the set of allowable values
+represented by ``allowed``.  We use this ``any_of`` function to generate a
+predicate function named ``num_one_two_or_three``, which ensures that the
+``num`` segment is one of the values ``one``, ``two``, or ``three`` , and use
+the result as a custom predicate by feeding it inside a tuple to the
+``custom_predicates`` argument to
+:meth:`~pyramid.config.Configurator.add_route`.
+
+A custom route predicate may also *modify* the ``match`` dictionary.  For
+instance, a predicate might do some type conversion of values:
+
+.. code-block:: python
+   :linenos:
+
+    def integers(*segment_names):
+        def predicate(info, request):
+            match = info['match']
+            for segment_name in segment_names:
+                try:
+                    match[segment_name] = int(match[segment_name])
+                except (TypeError, ValueError):
+                    pass
+            return True
+        return predicate
+
+    ymd_to_int = integers('year', 'month', 'day')
+
+    config.add_route('ymd', '/{year}/{month}/{day}', 
+                     custom_predicates=(ymd_to_int,))
+
+Note that a conversion predicate is still a predicate so it must return
+``True`` or ``False``; a predicate that does *only* conversion, such as the
+one we demonstrate above should unconditionally return ``True``.
+
+To avoid the try/except uncertainty, the route pattern can contain regular
+expressions specifying requirements for that marker. For instance:
+
+.. code-block:: python
+   :linenos:
+
+    def integers(*segment_names):
+        def predicate(info, request):
+            match = info['match']
+            for segment_name in segment_names:
+                match[segment_name] = int(match[segment_name])
+            return True
+        return predicate
+
+    ymd_to_int = integers('year', 'month', 'day')
+
+    config.add_route('ymd', '/{year:\d+}/{month:\d+}/{day:\d+}', 
+                     custom_predicates=(ymd_to_int,))
+
+Now the try/except is no longer needed because the route will not match at
+all unless these markers match ``\d+`` which requires them to be valid digits
+for an ``int`` type conversion.
+
+The ``match`` dictionary passed within ``info`` to each predicate attached to
+a route will be the same dictionary.  Therefore, when registering a custom
+predicate which modifies the ``match`` dict, the code registering the
+predicate should usually arrange for the predicate to be the *last* custom
+predicate in the custom predicate list.  Otherwise, custom predicates which
+fire subsequent to the predicate which performs the ``match`` modification
+will receive the *modified* match dictionary.
+
+.. warning::
+
+   It is a poor idea to rely on ordering of custom predicates to build a
+   conversion pipeline, where one predicate depends on the side effect of
+   another.  For instance, it's a poor idea to register two custom
+   predicates, one which handles conversion of a value to an int, the next
+   which handles conversion of that integer to some custom object.  Just do
+   all that in a single custom predicate.
+
+The ``route`` object in the ``info`` dict is an object that has two useful
+attributes: ``name`` and ``pattern``.  The ``name`` attribute is the route
+name.  The ``pattern`` attribute is the route pattern.  An example of using
+the route in a set of route predicates:
+
+.. code-block:: python
+   :linenos:
+
+    def twenty_ten(info, request):
+        if info['route'].name in ('ymd', 'ym', 'y'):
+            return info['match']['year'] == '2010'
+
+    config.add_route('y', '/{year}', custom_predicates=(twenty_ten,))
+    config.add_route('ym', '/{year}/{month}', custom_predicates=(twenty_ten,))
+    config.add_route('ymd', '/{year}/{month}/{day}', 
+                     custom_predicates=(twenty_ten,))
+
+The above predicate, when added to a number of route configurations ensures
+that the year match argument is '2010' if and only if the route name is
+'ymd', 'ym', or 'y'.
+
+See also :class:`pyramid.interfaces.IRoute` for more API documentation about
+route objects.
+
+.. index::
+   single: route factory
+
+.. _route_factories:
+
+Route Factories
+---------------
+
+Although it is not a particular common need in basic applications, a "route"
+configuration declaration can mention a "factory".  When that route matches a
+request, and a factory is attached to a route, the :term:`root factory`
+passed at startup time to the :term:`Configurator` is ignored; instead the
+factory associated with the route is used to generate a :term:`root` object.
+This object will usually be used as the :term:`context` resource of the view
+callable ultimately found via :term:`view lookup`.
+
+.. code-block:: python
+   :linenos:
+
+   config.add_route('abc', '/abc', 
+                    factory='myproject.resources.root_factory')
+   config.add_view('myproject.views.theview', route_name='abc')
+
+The factory can either be a Python object or a :term:`dotted Python name` (a
+string) which points to such a Python object, as it is above.
+
+In this way, each route can use a different factory, making it possible to
+supply a different :term:`context` resource object to the view related to
+each particular route.
+
+Supplying a different resource factory for each route is useful when you're
+trying to use a :app:`Pyramid` :term:`authorization policy` to provide
+declarative, "context sensitive" security checks; each resource can maintain
+a separate :term:`ACL`, as documented in
+:ref:`using_security_with_urldispatch`.  It is also useful when you wish to
+combine URL dispatch with :term:`traversal` as documented within
+:ref:`hybrid_chapter`.
+
+.. index::
+   pair: URL dispatch; security
+
+.. _using_security_with_urldispatch:
+
+Using :app:`Pyramid` Security With URL Dispatch
+--------------------------------------------------
+
+:app:`Pyramid` provides its own security framework which consults an
+:term:`authorization policy` before allowing any application code to be
+called.  This framework operates in terms of an access control list, which is
+stored as an ``__acl__`` attribute of a resource object.  A common thing to
+want to do is to attach an ``__acl__`` to the resource object dynamically for
+declarative security purposes.  You can use the ``factory`` argument that
+points at a factory which attaches a custom ``__acl__`` to an object at its
+creation time.
+
+Such a ``factory`` might look like so:
+
+.. code-block:: python
+   :linenos:
+
+   class Article(object):
+       def __init__(self, request):
+          matchdict = request.matchdict
+          article = matchdict.get('article', None)
+          if article == '1':
+              self.__acl__ = [ (Allow, 'editor', 'view') ]
+
+If the route ``archives/{article}`` is matched, and the article number is
+``1``, :app:`Pyramid` will generate an ``Article`` :term:`context` resource
+with an ACL on it that allows the ``editor`` principal the ``view``
+permission.  Obviously you can do more generic things than inspect the routes
+match dict to see if the ``article`` argument matches a particular string;
+our sample ``Article`` factory class is not very ambitious.
+
+.. note:: See :ref:`security_chapter` for more information about
+   :app:`Pyramid` security and ACLs.
+
+.. index::
+   pair: route; view callable lookup details
+
+Route View Callable Registration and Lookup Details
+---------------------------------------------------
+
+When a request enters the system which matches the pattern of the route, the
+usual result is simple: the view callable associated with the route is
+invoked with the request that caused the invocation.
+
+For most usage, you needn't understand more than this; how it works is an
+implementation detail.  In the interest of completeness, however, we'll
+explain how it *does* work in the this section.  You can skip it if you're
+uninterested.
+
+When a view is associated with a route configuration, :app:`Pyramid` ensures
+that a :term:`view configuration` is registered that will always be found
+when the route pattern is matched during a request.  To do so:
+
+- A special route-specific :term:`interface` is created at startup time for
+  each route configuration declaration.
+
+- When an ``add_view`` statement mentions a ``route name`` attribute, a
+  :term:`view configuration` is registered at startup time.  This view
+  configuration uses a route-specific interface as a :term:`request` type.
+
+- At runtime, when a request causes any route to match, the :term:`request`
+  object is decorated with the route-specific interface.
+
+- The fact that the request is decorated with a route-specific interface
+  causes the :term:`view lookup` machinery to always use the view callable
+  registered using that interface by the route configuration to service
+  requests that match the route pattern.
+
+As we can see from the above description, technically, URL dispatch doesn't
+actually map a URL pattern directly to a view callable.  Instead, URL
+dispatch is a :term:`resource location` mechanism.  A :app:`Pyramid`
+:term:`resource location` subsystem (i.e., :term:`URL dispatch` or
+:term:`traversal`) finds a :term:`resource` object that is the
+:term:`context` of a :term:`request`. Once the :term:`context` is determined,
+a separate subsystem named :term:`view lookup` is then responsible for
+finding and invoking a :term:`view callable` based on information available
+in the context and the request.  When URL dispatch is used, the resource
+location and view lookup subsystems provided by :app:`Pyramid` are still
+being utilized, but in a way which does not require a developer to understand
+either of them in detail.
+
+If no route is matched using :term:`URL dispatch`, :app:`Pyramid` falls back
+to :term:`traversal` to handle the :term:`request`.
 
 References
 ----------

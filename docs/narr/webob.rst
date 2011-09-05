@@ -310,6 +310,53 @@ Python's ``urllib2`` instead of a Javascript AJAX request:
     req = urllib2.Request('http://localhost:6543/', json_payload, headers)
     resp = urllib2.urlopen(req)
 
+.. index::
+   single: cleaning up after request
+
+.. _cleaning_up_after_a_request:
+
+Cleaning Up After a Request
++++++++++++++++++++++++++++
+
+Sometimes it's required that some cleanup be performed at the end of a
+request when a database connection is involved.  
+
+For example, let's say you have a ``mypackage`` :app:`Pyramid` application
+package that uses SQLAlchemy, and you'd like the current SQLAlchemy database
+session to be removed after each request.  Put the following in the
+``mypackage.__init__`` module:
+
+.. ignore-next-block
+.. code-block:: python
+   :linenos:
+
+   from mypackage.models import DBSession
+
+   from pyramid.events import subscriber
+   from pyramid.events import NewRequest
+
+   def cleanup_callback(request):
+       DBSession.remove()
+
+   @subscriber(NewRequest)
+   def add_cleanup_callback(event):
+       event.request.add_finished_callback(cleanup_callback)
+
+Registering the ``cleanup_callback`` finished callback at the start of a
+request (by causing the ``add_cleanup_callback`` to receive a
+:class:`pyramid.events.NewRequest` event at the start of each request) will
+cause the DBSession to be removed whenever request processing has ended.
+Note that in the example above, for the :class:`pyramid.events.subscriber`
+decorator to "work", the :meth:`pyramid.config.Configurator.scan` method must
+be called against your ``mypackage`` package during application
+initialization.
+
+.. note:: This is only an example.  In particular, it is not necessary to
+   cause ``DBSession.remove`` to be called in an application generated from
+   any :app:`Pyramid` scaffold, because these all use the ``pyramid_tm``
+   package.  The cleanup done by ``DBSession.remove`` is unnecessary when
+   ``pyramid_tm`` middleware is configured into the application.
+
 More Details
 ++++++++++++
 
