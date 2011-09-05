@@ -6,3 +6,5 @@ Portions (c) Django Project (http://djangoproject.com/).
 Portions (c) Zope Foundation and contributors (http://www.zope.org/).
 
 Portions (c) Edgewall Software (http://edgewall.org)
+
+Portions (c) Ian Bicking.
