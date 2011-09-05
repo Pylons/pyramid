@@ -787,5 +787,3 @@ class SessionAuthenticationPolicy(CallbackAuthenticationPolicy):
     def unauthenticated_userid(self, request):
         return request.session.get(self.userid_key)
 
-
-# 14a3263f21e58dc0c1a4c994ab640bff4e6448d1ZWRpdG9y!userid_type:b64unicode
