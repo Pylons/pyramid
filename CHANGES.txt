@@ -7,6 +7,9 @@ Internal
 - Internalize code previously depended upon as imports from the
   ``paste.auth`` module (futureproof).
 
+- Fixed test suite; on some systems tests would fail due to indeterminate
+  test run ordering and a double-push-single-pop of a shared test variable.
+
 1.2a5 (2011-09-04)
 ==================
 
