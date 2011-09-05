@@ -227,6 +227,21 @@ class Test__make_predicates(unittest.TestCase):
         self.assertEqual(info, {'match':
                                 {'a':'a', 'b':'b', 'traverse':('1', 'a', 'b')}})
 
+    def test_custom_predicates_can_affect_traversal(self):
+        def custom(info, request):
+            m = info['match']
+            m['dummy'] = 'foo'
+            return True
+        _, predicates, _ = self._callFUT(custom=(custom,),
+                                         traverse='/1/:dummy/:a')
+        self.assertEqual(len(predicates), 2)
+        info = {'match':{'a':'a'}}
+        request = DummyRequest()
+        self.assertTrue(all([p(info, request) for p in predicates]))
+        self.assertEqual(info, {'match':
+                                {'a':'a', 'dummy':'foo',
+                                 'traverse':('1', 'foo', 'a')}})
+
     def test_predicate_text_is_correct(self):
         _, predicates, _ = self._callFUT(
             xhr='xhr',

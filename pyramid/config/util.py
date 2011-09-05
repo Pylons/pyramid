@@ -203,6 +203,28 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         predicates.append(match_param_predicate)
         h.update('match_param:%r' % match_param)
 
+    if custom:
+        for num, predicate in enumerate(custom):
+            if getattr(predicate, '__text__', None) is None:
+                text = '<unknown custom predicate>'
+                try:
+                    predicate.__text__ = text
+                except AttributeError:
+                    # if this happens the predicate is probably a classmethod
+                    if hasattr(predicate, '__func__'):
+                        predicate.__func__.__text__ = text
+                    else: # pragma: no cover ; 2.5 doesn't have __func__
+                        predicate.im_func.__text__ = text
+            predicates.append(predicate)
+            # using hash() here rather than id() is intentional: we
+            # want to allow custom predicates that are part of
+            # frameworks to be able to define custom __hash__
+            # functions for custom predicates, so that the hash output
+            # of predicate instances which are "logically the same"
+            # may compare equal.
+            h.update('custom%s:%r' % (num, hash(predicate)))
+        weights.append(1 << 10)
+
     if traverse is not None:
         # ``traverse`` can only be used as a *route* "predicate"; it
         # adds 'traverse' to the matchdict if it's specified in the
@@ -223,28 +245,6 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         # returns True, and we don't need to update the hash or attach
         # a weight to it
         predicates.append(traverse_predicate)
-
-    if custom:
-        for num, predicate in enumerate(custom):
-            if getattr(predicate, '__text__', None) is None:
-                text = '<unknown custom predicate>'
-                try:
-                    predicate.__text__ = text
-                except AttributeError:
-                    # if this happens the predicate is probably a classmethod
-                    if hasattr(predicate, '__func__'):
-                        predicate.__func__.__text__ = text
-                    else: # # pragma: no cover ; 2.5 doesn't have __func__ 
-                        predicate.im_func.__text__ = text
-            predicates.append(predicate)
-            # using hash() here rather than id() is intentional: we
-            # want to allow custom predicates that are part of
-            # frameworks to be able to define custom __hash__
-            # functions for custom predicates, so that the hash output
-            # of predicate instances which are "logically the same"
-            # may compare equal.
-            h.update('custom%s:%r' % (num, hash(predicate)))
-        weights.append(1 << 10)
 
     score = 0
     for bit in weights:
