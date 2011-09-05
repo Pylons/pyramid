@@ -617,7 +617,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertTrue(result)
         self.assertEqual(len(request.callbacks), 1)
         response = DummyResponse()
-        request.callbacks[0](None, response)
+        request.callbacks[0](request, response)
         self.assertEqual(len(response.headerlist), 3)
         self.assertEqual(response.headerlist[0][0], 'Set-Cookie')
 
@@ -658,7 +658,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertTrue(result)
         self.assertEqual(len(request.callbacks), 1)
         response = DummyResponse()
-        request.callbacks[0](None, response)
+        request.callbacks[0](request, response)
         self.assertEqual(len(response.headerlist), 0)
 
     def test_identify_cookie_reissue_revoked_by_remember(self):
@@ -675,7 +675,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertTrue(result)
         self.assertEqual(len(request.callbacks), 1)
         response = DummyResponse()
-        request.callbacks[0](None, response)
+        request.callbacks[0](request, response)
         self.assertEqual(len(response.headerlist), 0)
 
     def test_identify_cookie_reissue_with_tokens_default(self):
