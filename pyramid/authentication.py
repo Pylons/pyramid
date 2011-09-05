@@ -1,11 +1,10 @@
 from codecs import utf_8_decode
 from codecs import utf_8_encode
+from hashlib import md5
 import datetime
 import re
-import time
-
-from paste.auth import auth_tkt
-from paste.request import get_cookies
+import time as time_mod
+import urllib
 
 from zope.interface import implements
 
@@ -15,7 +14,6 @@ from pyramid.interfaces import IDebugLogger
 from pyramid.request import add_global_response_headers
 from pyramid.security import Authenticated
 from pyramid.security import Everyone
-
 
 VALID_TOKEN = re.compile(r"^[A-Za-z][A-Za-z0-9+_-]*$")
 
@@ -107,7 +105,6 @@ class CallbackAuthenticationPolicy(object):
             request
              )
         return effective_principals
-
 
 class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
     """ A :app:`Pyramid` :term:`authentication policy` which
@@ -392,6 +389,140 @@ def b64encode(v):
 def b64decode(v):
     return v.decode('base64')
 
+# this class licensed under the MIT license (stolen from Paste)
+class AuthTicket(object):
+    """
+    This class represents an authentication token.  You must pass in
+    the shared secret, the userid, and the IP address.  Optionally you
+    can include tokens (a list of strings, representing role names),
+    'user_data', which is arbitrary data available for your own use in
+    later scripts.  Lastly, you can override the cookie name and
+    timestamp.
+
+    Once you provide all the arguments, use .cookie_value() to
+    generate the appropriate authentication ticket.
+
+    CGI usage::
+
+        token = auth_tkt.AuthTick('sharedsecret', 'username',
+            os.environ['REMOTE_ADDR'], tokens=['admin'])
+        print 'Status: 200 OK'
+        print 'Content-type: text/html'
+        print token.cookie()
+        print
+        ... redirect HTML ...
+
+    Webware usage::
+
+        token = auth_tkt.AuthTick('sharedsecret', 'username',
+            self.request().environ()['REMOTE_ADDR'], tokens=['admin'])
+        self.response().setCookie('auth_tkt', token.cookie_value())
+    """
+
+    def __init__(self, secret, userid, ip, tokens=(), user_data='',
+                 time=None, cookie_name='auth_tkt',
+                 secure=False):
+        self.secret = secret
+        self.userid = userid
+        self.ip = ip
+        self.tokens = ','.join(tokens)
+        self.user_data = user_data
+        if time is None:
+            self.time = time_mod.time()
+        else:
+            self.time = time
+        self.cookie_name = cookie_name
+        self.secure = secure
+
+    def digest(self):
+        return calculate_digest(
+            self.ip, self.time, self.secret, self.userid, self.tokens,
+            self.user_data)
+
+    def cookie_value(self):
+        v = '%s%08x%s!' % (self.digest(), int(self.time),
+                           urllib.quote(self.userid))
+        if self.tokens:
+            v += self.tokens + '!'
+        v += self.user_data
+        return v
+
+# this class licensed under the MIT license (stolen from Paste)
+class BadTicket(Exception):
+    """
+    Exception raised when a ticket can't be parsed.  If we get far enough to
+    determine what the expected digest should have been, expected is set.
+    This should not be shown by default, but can be useful for debugging.
+    """
+    def __init__(self, msg, expected=None):
+        self.expected = expected
+        Exception.__init__(self, msg)
+
+# this function licensed under the MIT license (stolen from Paste)
+def parse_ticket(secret, ticket, ip):
+    """
+    Parse the ticket, returning (timestamp, userid, tokens, user_data).
+
+    If the ticket cannot be parsed, a ``BadTicket`` exception will be raised
+    with an explanation.
+    """
+    ticket = ticket.strip('"')
+    digest = ticket[:32]
+    try:
+        timestamp = int(ticket[32:40], 16)
+    except ValueError, e:
+        raise BadTicket('Timestamp is not a hex integer: %s' % e)
+    try:
+        userid, data = ticket[40:].split('!', 1)
+    except ValueError:
+        raise BadTicket('userid is not followed by !')
+    userid = urllib.unquote(userid)
+    if '!' in data:
+        tokens, user_data = data.split('!', 1)
+    else: # pragma: no cover (never generated)
+        # @@: Is this the right order?
+        tokens = ''
+        user_data = data
+
+    expected = calculate_digest(ip, timestamp, secret,
+                                userid, tokens, user_data)
+
+    if expected != digest:
+        raise BadTicket('Digest signature is not correct',
+                        expected=(expected, digest))
+
+    tokens = tokens.split(',')
+
+    return (timestamp, userid, tokens, user_data)
+
+# this function licensed under the MIT license (stolen from Paste)
+def calculate_digest(ip, timestamp, secret, userid, tokens, user_data):
+    secret = maybe_encode(secret)
+    userid = maybe_encode(userid)
+    tokens = maybe_encode(tokens)
+    user_data = maybe_encode(user_data)
+    digest0 = md5(
+        encode_ip_timestamp(ip, timestamp) + secret + userid + '\0'
+        + tokens + '\0' + user_data).hexdigest()
+    digest = md5(digest0 + secret).hexdigest()
+    return digest
+
+# this function licensed under the MIT license (stolen from Paste)
+def encode_ip_timestamp(ip, timestamp):
+    ip_chars = ''.join(map(chr, map(int, ip.split('.'))))
+    t = int(timestamp)
+    ts = ((t & 0xff000000) >> 24,
+          (t & 0xff0000) >> 16,
+          (t & 0xff00) >> 8,
+          t & 0xff)
+    ts_chars = ''.join(map(chr, ts))
+    return ip_chars + ts_chars
+
+def maybe_encode(s, encoding='utf8'):
+    if isinstance(s, unicode):
+        s = s.encode(encoding)
+    return s
+
 EXPIRE = object()
 
 class AuthTktCookieHelper(object):
@@ -401,7 +532,9 @@ class AuthTktCookieHelper(object):
     :class:`pyramid.authentication.AuthTktAuthenticationPolicy` for the
     meanings of the constructor arguments.
     """
-    auth_tkt = auth_tkt # for tests
+    parse_ticket = staticmethod(parse_ticket) # for tests
+    AuthTicket = AuthTicket # for tests
+    BadTicket = BadTicket # for tests
     now = None # for tests
 
     userid_type_decoders = {
@@ -487,10 +620,9 @@ class AuthTktCookieHelper(object):
         """ Return a dictionary with authentication information, or ``None``
         if no valid auth_tkt is attached to ``request``"""
         environ = request.environ
-        cookies = get_cookies(environ)
-        cookie = cookies.get(self.cookie_name)
+        cookie = request.cookies.get(self.cookie_name)
 
-        if cookie is None or not cookie.value:
+        if cookie is None:
             return None
 
         if self.include_ip:
@@ -499,15 +631,15 @@ class AuthTktCookieHelper(object):
             remote_addr = '0.0.0.0'
         
         try:
-            timestamp, userid, tokens, user_data = self.auth_tkt.parse_ticket(
-                self.secret, cookie.value, remote_addr)
-        except self.auth_tkt.BadTicket:
+            timestamp, userid, tokens, user_data = self.parse_ticket(
+                self.secret, cookie, remote_addr)
+        except self.BadTicket:
             return None
 
         now = self.now # service tests
 
         if now is None: 
-            now = time.time()
+            now = time_mod.time()
 
         if self.timeout and ( (timestamp + self.timeout) < now ):
             # the auth_tkt data has expired
@@ -592,7 +724,7 @@ class AuthTktCookieHelper(object):
             if not (isinstance(token, str) and VALID_TOKEN.match(token)):
                 raise ValueError("Invalid token %r" % (token,))
 
-        ticket = self.auth_tkt.AuthTicket(
+        ticket = self.AuthTicket(
             self.secret,
             userid,
             remote_addr,
@@ -655,3 +787,5 @@ class SessionAuthenticationPolicy(CallbackAuthenticationPolicy):
     def unauthenticated_userid(self, request):
         return request.session.get(self.userid_key)
 
+
+# 14a3263f21e58dc0c1a4c994ab640bff4e6448d1ZWRpdG9y!userid_type:b64unicode
