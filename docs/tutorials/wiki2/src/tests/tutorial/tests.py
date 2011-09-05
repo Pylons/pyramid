@@ -115,7 +115,6 @@ class AddPageTests(unittest.TestCase):
     def setUp(self):
         self.session = _initTestingDB()
         self.config = testing.setUp()
-        self.config.begin()
 
     def tearDown(self):
         self.session.remove()

@@ -6,7 +6,6 @@ class TestGetSettings(unittest.TestCase):
         from pyramid.registry import Registry
         registry = Registry('testing')
         self.config = testing.setUp(registry=registry)
-        self.config.begin()
         from zope.deprecation import __show__
         __show__.off()
 

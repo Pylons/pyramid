@@ -37,7 +37,6 @@ class TestResponseAdapter(unittest.TestCase):
     def setUp(self):
         registry = Dummy()
         self.config = testing.setUp(registry=registry)
-        self.config.begin()
 
     def tearDown(self):
         self.config.end()

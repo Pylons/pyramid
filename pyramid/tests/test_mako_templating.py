@@ -322,7 +322,6 @@ class TestIntegration(unittest.TestCase):
     def setUp(self):
         import pyramid.mako_templating
         self.config = testing.setUp()
-        self.config.begin()
         self.config.add_settings({'mako.directories':
                                   'pyramid.tests:fixtures'})
         self.config.add_renderer('.mak',

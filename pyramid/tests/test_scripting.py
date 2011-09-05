@@ -104,10 +104,12 @@ class Test__make_request(unittest.TestCase):
         # keep registry local so that global_registries is cleared after
         registry = DummyRegistry(DummyFactory)
         global_registries.add(registry)
-        request = self._callFUT('/hello')
-        self.assertEqual(request.environ['path'], '/hello')
-        self.assertEqual(request.registry, registry)
-        global_registries.empty()
+        try:
+            request = self._callFUT('/hello')
+            self.assertEqual(request.environ['path'], '/hello')
+            self.assertEqual(request.registry, registry)
+        finally:
+            global_registries.empty()
 
 class Dummy:
     pass
