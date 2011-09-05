@@ -644,6 +644,40 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertTrue(result)
         self.assertEqual(len(request.callbacks), 0)
 
+    def test_identify_cookie_reissue_revoked_by_forget(self):
+        import time
+        helper = self._makeOne('secret', timeout=10, reissue_time=0)
+        now = time.time()
+        helper.auth_tkt.timestamp = now
+        helper.now = now + 1
+        request = self._makeRequest('bogus')
+        result = helper.identify(request)
+        self.assertTrue(result)
+        self.assertEqual(len(request.callbacks), 1)
+        result = helper.forget(request)
+        self.assertTrue(result)
+        self.assertEqual(len(request.callbacks), 1)
+        response = DummyResponse()
+        request.callbacks[0](None, response)
+        self.assertEqual(len(response.headerlist), 0)
+
+    def test_identify_cookie_reissue_revoked_by_remember(self):
+        import time
+        helper = self._makeOne('secret', timeout=10, reissue_time=0)
+        now = time.time()
+        helper.auth_tkt.timestamp = now
+        helper.now = now + 1
+        request = self._makeRequest('bogus')
+        result = helper.identify(request)
+        self.assertTrue(result)
+        self.assertEqual(len(request.callbacks), 1)
+        result = helper.remember(request, 'bob')
+        self.assertTrue(result)
+        self.assertEqual(len(request.callbacks), 1)
+        response = DummyResponse()
+        request.callbacks[0](None, response)
+        self.assertEqual(len(response.headerlist), 0)
+
     def test_identify_cookie_reissue_with_tokens_default(self):
         # see https://github.com/Pylons/pyramid/issues#issue/108
         import time
