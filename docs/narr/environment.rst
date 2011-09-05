@@ -51,7 +51,7 @@ third-party template rendering extensions.
 | Environment Variable Name       | Config File Setting Name       |
 +=================================+================================+
 | ``PYRAMID_RELOAD_TEMPLATES``    |  ``pyramid.reload_templates``  |
-|                                 |                                |
+|                                 |   or ``reload_templates``      |
 |                                 |                                |
 |                                 |                                |
 +---------------------------------+--------------------------------+
@@ -66,7 +66,7 @@ also :ref:`overriding_assets_section`.
 | Environment Variable Name       | Config File Setting Name    |
 +=================================+=============================+
 | ``PYRAMID_RELOAD_ASSETS``       |  ``pyramid.reload_assets``  |
-|                                 |                             |
+|                                 |  or ``reload_assets``       |
 |                                 |                             |
 |                                 |                             |
 +---------------------------------+-----------------------------+
@@ -85,7 +85,7 @@ when this value is true.  See also :ref:`debug_authorization_section`.
 | Environment Variable Name       | Config File Setting Name          |
 +=================================+===================================+
 | ``PYRAMID_DEBUG_AUTHORIZATION`` |  ``pyramid.debug_authorization``  |
-|                                 |                                   |
+|                                 |  or ``debug_authorization``       |
 |                                 |                                   |
 |                                 |                                   |
 +---------------------------------+-----------------------------------+
@@ -100,7 +100,7 @@ when this value is true.  See also :ref:`debug_notfound_section`.
 | Environment Variable Name       | Config File Setting Name     |
 +=================================+==============================+
 | ``PYRAMID_DEBUG_NOTFOUND``      |  ``pyramid.debug_notfound``  |
-|                                 |                              |
+|                                 |  or ``debug_notfound``       |
 |                                 |                              |
 |                                 |                              |
 +---------------------------------+------------------------------+
@@ -115,7 +115,7 @@ this value is true.  See also :ref:`debug_routematch_section`.
 | Environment Variable Name       | Config File Setting Name       |
 +=================================+================================+
 | ``PYRAMID_DEBUG_ROUTEMATCH``    |  ``pyramid.debug_routematch``  |
-|                                 |                                |
+|                                 |  or ``debug_routematch``       |
 |                                 |                                |
 |                                 |                                |
 +---------------------------------+--------------------------------+
@@ -134,7 +134,7 @@ feature when this is true.  See also :ref:`influencing_http_caching`.
 | Environment Variable Name       | Config File Setting Name         |
 +=================================+==================================+
 | ``PYRAMID_PREVENT_HTTP_CACHE``  |  ``pyramid.prevent_http_cache``  |
-|                                 |                                  |
+|                                 |  or ``prevent_http_cache``       |
 |                                 |                                  |
 |                                 |                                  |
 +---------------------------------+----------------------------------+
@@ -148,7 +148,7 @@ Turns on all ``debug*`` settings.
 | Environment Variable Name       | Config File Setting Name    |
 +=================================+=============================+
 | ``PYRAMID_DEBUG_ALL``           |  ``pyramid.debug_all``      |
-|                                 |                             |
+|                                 |  or ``debug_all``           |
 |                                 |                             |
 |                                 |                             |
 +---------------------------------+-----------------------------+
@@ -162,7 +162,7 @@ Turns on all ``reload*`` settings.
 | Environment Variable Name       | Config File Setting Name    |
 +=================================+=============================+
 | ``PYRAMID_RELOAD_ALL``          |  ``pyramid.reload_all``     |
-|                                 |                             |
+|                                 |  or ``reload_all``          |
 |                                 |                             |
 |                                 |                             |
 +---------------------------------+-----------------------------+
@@ -180,7 +180,7 @@ The value supplied here is used as the default locale name when a
 | Environment Variable Name       | Config File Setting Name          |
 +=================================+===================================+
 | ``PYRAMID_DEFAULT_LOCALE_NAME`` |  ``pyramid.default_locale_name``  |
-|                                 |                                   |
+|                                 |  or ``default_locale_name``       |
 |                                 |                                   |
 |                                 |                                   |
 +---------------------------------+-----------------------------------+
