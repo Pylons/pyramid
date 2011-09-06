@@ -1,82 +1,95 @@
-import os
-import pkg_resources
+from datetime import datetime, timedelta
+from os.path import normcase, normpath, join, getmtime, getsize, isdir, exists
+from pkg_resources import resource_exists, resource_filename, resource_isdir
+import mimetypes
 
-from paste import httpexceptions
-from paste import request
-from paste.httpheaders import ETAG
-from paste.urlparser import StaticURLParser
+from repoze.lru import lru_cache
 
 from pyramid.asset import resolve_asset_spec
+from pyramid.httpexceptions import HTTPNotFound
+from pyramid.httpexceptions import HTTPMovedPermanently
 from pyramid.path import caller_package
-from pyramid.request import call_app_with_subpath_as_path_info
+from pyramid.response import Response
+from pyramid.traversal import traversal_path
+from pyramid.traversal import quote_path_segment
 
-class PackageURLParser(StaticURLParser):
-    """ This probably won't work with zipimported resources """
-    def __init__(self, package_name, resource_name, root_resource=None,
-                 cache_max_age=None):
-        self.package_name = package_name
-        self.resource_name = os.path.normpath(resource_name)
-        if root_resource is None:
-            root_resource = self.resource_name
-        self.root_resource = root_resource
-        self.cache_max_age = cache_max_age
+DEFAULT_CHUNKSIZE = 1<<16 # 64 kilobytes
 
-    def __call__(self, environ, start_response):
-        path_info = environ.get('PATH_INFO', '')
-        if not path_info:
-            return self.add_slash(environ, start_response)
-        if path_info == '/':
-            # @@: This should obviously be configurable
-            filename = 'index.html'
-        else:
-            filename = request.path_info_pop(environ)
-        resource = os.path.normcase(os.path.normpath(
-                    self.resource_name + '/' + filename))
-        if not resource.startswith(self.root_resource):
-            # Out of bounds
-            return self.not_found(environ, start_response)
-        if not pkg_resources.resource_exists(self.package_name, resource):
-            return self.not_found(environ, start_response)
-        if pkg_resources.resource_isdir(self.package_name, resource):
-            # @@: Cache?
-            return self.__class__(
-                self.package_name, resource, root_resource=self.resource_name,
-                cache_max_age=self.cache_max_age)(environ, start_response)
-        pi = environ.get('PATH_INFO')
-        if pi and pi != '/':
-            return self.error_extra_path(environ, start_response) 
-        full = pkg_resources.resource_filename(self.package_name, resource)
-        if_none_match = environ.get('HTTP_IF_NONE_MATCH')
-        if if_none_match:
-            mytime = os.stat(full).st_mtime
-            if str(mytime) == if_none_match:
-                headers = []
-                ETAG.update(headers, mytime)
-                start_response('304 Not Modified', headers)
-                return [''] # empty body
+def init_mimetypes(mimetypes):
+    # this is a function so it can be unittested
+    if hasattr(mimetypes, 'init'):
+        mimetypes.init()
+        return True
+    return False
 
-        fa = self.make_app(full)
-        if self.cache_max_age:
-            fa.cache_control(max_age=self.cache_max_age)
-        return fa(environ, start_response)
+# See http://bugs.python.org/issue5853 which is a recursion bug
+# that seems to effect Python 2.6, Python 2.6.1, and 2.6.2 (a fix
+# has been applied on the Python 2 trunk).
+init_mimetypes(mimetypes)
 
-    def not_found(self, environ, start_response, debug_message=None):
-        comment=('SCRIPT_NAME=%r; PATH_INFO=%r; looking in package %s; '
-                 'subdir %s ;debug: %s' % (environ.get('SCRIPT_NAME'),
-                                           environ.get('PATH_INFO'),
-                                           self.package_name,
-                                           self.resource_name,
-                                           debug_message or '(none)'))
-        exc = httpexceptions.HTTPNotFound(
-            'The resource at %s could not be found'
-            % request.construct_url(environ),
-            comment=comment)
-        return exc.wsgi_application(environ, start_response)
+class FileResponse(Response):
+    """
+    Serves a static filelike object.
+    """
+    def __init__(self, path, request, expires, chunksize=DEFAULT_CHUNKSIZE):
+        super(FileResponse, self).__init__()
+        self.request = request
+        self.last_modified = datetime.utcfromtimestamp(getmtime(path))
 
-    def __repr__(self):
-        return '<%s %s:%s at %s>' % (self.__class__.__name__, self.package_name,
-                                     self.root_resource, id(self))
+        # Check 'If-Modified-Since' request header
+        # Browser might already have in cache
+        modified_since = request.if_modified_since
+        if modified_since is not None:
+            if self.last_modified <= modified_since:
+                self.status = 304
+                return
 
+        # Provide partial response if requested
+        content_length = getsize(path)
+        request_range = self._get_range(content_length)
+        if request_range is not None:
+            start, end = request_range
+            if start >= content_length:
+                self.status_int = 416 # Request range not satisfiable
+                return
+
+            self.status_int = 206 # Partial Content
+            self.headers['Content-Range'] = 'bytes %d-%d/%d' % (
+                start, end-1, content_length)
+            content_length = end - start
+
+        self.date = datetime.utcnow()
+        self.app_iter = _file_iter(path, chunksize, request_range)
+        self.content_type = mimetypes.guess_type(path, strict=False)[0]
+
+        self.content_length = content_length
+        if expires is not None:
+            self.expires = self.date + expires
+
+    def _get_range(self, content_length):
+        # WebOb earlier than 0.9.7 has broken range parser implementation.
+        # The current released version at this time is 0.9.6, so we do this
+        # ourselves.  (It is fixed on trunk, though.)
+        request = self.request
+        range_header = request.headers.get('Range', None)
+        if range_header is None:
+            return None
+
+        # Refuse to parse multiple byte ranges.  They are just plain silly.
+        if ',' in range_header:
+            return None
+
+        unit, range_s = range_header.split('=', 1)
+        if unit != 'bytes':
+            # Other units are not supported
+            return None
+
+        if range_s.startswith('-'):
+            start = content_length - int(range_s[1:])
+            return start, content_length
+
+        start, end = map(int, range_s.split('-'))
+        return start, end + 1
 
 class static_view(object):
     """ An instance of this class is a callable which can act as a
@@ -120,24 +133,110 @@ class static_view(object):
          package-relative directory.  However, if the ``root_dir`` is
          absolute, configuration will not be able to
          override the assets it contains.  """
-    
+
+    FileResponse = FileResponse # override point
+
     def __init__(self, root_dir, cache_max_age=3600, package_name=None,
-                 use_subpath=False):
+                 use_subpath=False, index='index.html',
+                 chunksize=DEFAULT_CHUNKSIZE):
         # package_name is for bw compat; it is preferred to pass in a
         # package-relative path as root_dir
         # (e.g. ``anotherpackage:foo/static``).
+        if isinstance(cache_max_age, int):
+            cache_max_age = timedelta(seconds=cache_max_age)
+        self.expires = cache_max_age
         if package_name is None:
             package_name = caller_package().__name__
-        package_name, root_dir = resolve_asset_spec(root_dir, package_name)
-        if package_name is None:
-            app = StaticURLParser(root_dir, cache_max_age=cache_max_age)
-        else:
-            app = PackageURLParser(
-                package_name, root_dir, cache_max_age=cache_max_age)
-        self.app = app
+        package_name, docroot = resolve_asset_spec(root_dir, package_name)
         self.use_subpath = use_subpath
+        self.package_name = package_name
+        self.docroot = docroot
+        self.norm_docroot = normcase(normpath(docroot))
+        self.chunksize = chunksize
+        self.index = index
 
     def __call__(self, context, request):
         if self.use_subpath:
-            return call_app_with_subpath_as_path_info(request, self.app)
-        return request.get_response(self.app)
+            path_tuple = request.subpath
+        else:
+            path_tuple = traversal_path(request.path_info)
+
+        path = secure_path(path_tuple)
+
+        if path is None:
+            # belt-and-suspenders security; this should never be true
+            # unless someone screws up the traversal_path code
+            # (request.subpath is computed via traversal_path too)
+            return HTTPNotFound('Out of bounds: %s' % request.url)
+
+        if self.package_name: # package resource
+
+            resource_path ='%s/%s' % (self.docroot.rstrip('/'), path)
+            if resource_isdir(self.package_name, resource_path):
+                if not request.path_url.endswith('/'):
+                    return self.add_slash_redirect(request)
+                resource_path = '%s/%s' % (resource_path.rstrip('/'),self.index)
+            if not resource_exists(self.package_name, resource_path):
+                return HTTPNotFound(request.url)
+            filepath = resource_filename(self.package_name, resource_path)
+
+        else: # filesystem file
+
+            # os.path.normpath converts / to \ on windows
+            filepath = normcase(normpath(join(self.norm_docroot, path)))
+            if isdir(filepath):
+                if not request.path_url.endswith('/'):
+                    return self.add_slash_redirect(request)
+                filepath = join(filepath, self.index)
+            if not exists(filepath):
+                return HTTPNotFound(request.url)
+
+        return self.FileResponse(filepath, request,self.expires,self.chunksize)
+
+    def add_slash_redirect(self, request):
+        url = request.path_url + '/'
+        qs = request.query_string
+        if qs:
+            url = url + '?' + qs
+        return HTTPMovedPermanently(url)
+
+def _file_iter(path, chunksize, content_range=None):
+    file = open(path, 'rb')
+    
+    if content_range is not None:
+
+        class ByteReader(object):
+            def __init__(self, n_bytes):
+                self.bytes_left = n_bytes
+
+            def __call__(self):
+                b = file.read(min(self.bytes_left, chunksize))
+                self.bytes_left -= len(b)
+                return b
+
+        start, end = content_range
+        file.seek(start)
+        get_bytes = ByteReader(end - start)
+
+    else:
+        def get_bytes():
+            return file.read(chunksize)
+
+    try:
+        buf = get_bytes()
+        while buf:
+            yield buf
+            buf = get_bytes()
+    finally:
+        if hasattr(file, 'close'):
+            file.close()
+
+@lru_cache(1000)
+def secure_path(path_tuple):
+    if '' in path_tuple:
+        return None
+    for item in path_tuple:
+        for val in ['.', '/']:
+            if item.startswith(val):
+                return None
+    return '/'.join([quote_path_segment(x) for x in path_tuple])

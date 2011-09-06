@@ -42,82 +42,177 @@ class WGSIAppPlusViewConfigTests(unittest.TestCase):
         self.assertEqual(view.__original_view__, wsgiapptest)
 
 here = os.path.dirname(__file__)
-staticapp = static_view(os.path.join(here, 'fixtures'), use_subpath=True)
 
-class TestStaticApp(unittest.TestCase):
-    def test_basic(self):
-        from webob import Request
-        context = DummyContext()
+class TestStaticAppBase(object):
+    def _makeRequest(self, extra=None):
+        if extra is None:
+            extra = {}
+        from pyramid.request import Request
         from StringIO import StringIO
-        request = Request({'PATH_INFO':'',
-                           'SCRIPT_NAME':'',
-                           'SERVER_NAME':'localhost',
-                           'SERVER_PORT':'80',
-                           'REQUEST_METHOD':'GET',
-                           'wsgi.version':(1,0),
-                           'wsgi.url_scheme':'http',
-                           'wsgi.input':StringIO()})
-        request.subpath = ('minimal.pt',)
-        result = staticapp(context, request)
-        self.assertEqual(result.status, '200 OK')
+        kw = {'PATH_INFO':'',
+              'SCRIPT_NAME':'',
+              'SERVER_NAME':'localhost',
+              'SERVER_PORT':'80',
+              'REQUEST_METHOD':'GET',
+              'wsgi.version':(1,0),
+              'wsgi.url_scheme':'http',
+              'wsgi.input':StringIO()}
+        kw.update(extra)
+        request = Request(kw)
+        return request
+
+    def _assertBody(self, body, filename):
         self.assertEqual(
-            result.body.replace('\r', ''),
-            open(os.path.join(here, 'fixtures/minimal.pt'), 'r').read())
+            body.replace('\r', ''),
+            open(filename, 'r').read()
+            )
+
+class TestStaticAppTests(TestStaticAppBase):
+    def test_basic(self):
+        request = self._makeRequest()
+        context = DummyContext()
+        request.subpath = ('minimal.pt',)
+        result = self.staticapp(context, request)
+        self.assertEqual(result.status, '200 OK')
+        self._assertBody(result.body, os.path.join(here, 'fixtures/minimal.pt'))
+
+    def test_not_modified(self):
+        request = self._makeRequest()
+        context = DummyContext()
+        request.subpath = ('minimal.pt',)
+        request.if_modified_since = pow(2, 32)-1
+        result = self.staticapp(context, request)
+        self.assertEqual(result.status, '304 Not Modified') # CR only
 
     def test_file_in_subdir(self):
-        from webob import Request
+        request = self._makeRequest()
         context = DummyContext()
-        from StringIO import StringIO
-        request = Request({'PATH_INFO':'',
-                           'SCRIPT_NAME':'',
-                           'SERVER_NAME':'localhost',
-                           'SERVER_PORT':'80',
-                           'REQUEST_METHOD':'GET',
-                           'wsgi.version':(1,0),
-                           'wsgi.url_scheme':'http',
-                           'wsgi.input':StringIO()})
         request.subpath = ('static', 'index.html',)
-        result = staticapp(context, request)
+        result = self.staticapp(context, request)
         self.assertEqual(result.status, '200 OK')
-        self.assertEqual(
-            result.body.replace('\r', ''),
-            open(os.path.join(here, 'fixtures/static/index.html'), 'r').read())
+        self._assertBody(result.body,
+                         os.path.join(here, 'fixtures/static/index.html'))
 
-    def test_redirect_to_subdir(self):
-        from webob import Request
+    def test_directory_noslash_redir(self):
+        request = self._makeRequest({'PATH_INFO':'/static'})
         context = DummyContext()
-        from StringIO import StringIO
-        request = Request({'PATH_INFO':'',
-                           'SCRIPT_NAME':'',
-                           'SERVER_NAME':'localhost',
-                           'SERVER_PORT':'80',
-                           'REQUEST_METHOD':'GET',
-                           'wsgi.version':(1,0),
-                           'wsgi.url_scheme':'http',
-                           'wsgi.input':StringIO()})
         request.subpath = ('static',)
-        result = staticapp(context, request)
+        result = self.staticapp(context, request)
         self.assertEqual(result.status, '301 Moved Permanently')
         self.assertEqual(result.location, 'http://localhost/static/')
 
-    def test_redirect_to_subdir_with_existing_script_name(self):
-        from webob import Request
+    def test_directory_noslash_redir_preserves_qs(self):
+        request = self._makeRequest({'PATH_INFO':'/static',
+                                     'QUERY_STRING':'a=1&b=2'})
         context = DummyContext()
-        from StringIO import StringIO
-        request = Request({'PATH_INFO':'/static',
-                           'SCRIPT_NAME':'/script_name',
-                           'SERVER_NAME':'localhost',
-                           'SERVER_PORT':'80',
-                           'REQUEST_METHOD':'GET',
-                           'wsgi.version':(1,0),
-                           'wsgi.url_scheme':'http',
-                           'wsgi.input':StringIO()})
         request.subpath = ('static',)
-        result = staticapp(context, request)
+        result = self.staticapp(context, request)
         self.assertEqual(result.status, '301 Moved Permanently')
-        self.assertEqual(result.location, 
+        self.assertEqual(result.location, 'http://localhost/static/?a=1&b=2')
+
+    def test_directory_noslash_redir_with_scriptname(self):
+        request = self._makeRequest({'SCRIPT_NAME':'/script_name',
+                                     'PATH_INFO':'/static'})
+        context = DummyContext()
+        request.subpath = ('static',)
+        result = self.staticapp(context, request)
+        self.assertEqual(result.status, '301 Moved Permanently')
+        self.assertEqual(result.location,
                          'http://localhost/script_name/static/')
 
+    def test_directory_withslash(self):
+        request = self._makeRequest({'PATH_INFO':'/static/'})
+        context = DummyContext()
+        request.subpath = ('static',)
+        result = self.staticapp(context, request)
+        self.assertEqual(result.status, '200 OK')
+        self._assertBody(result.body,
+                         os.path.join(here, 'fixtures/static/index.html'))
+
+    def test_range_inclusive(self):
+        request = self._makeRequest({'HTTP_RANGE':'bytes=1-2'})
+        context = DummyContext()
+        request.subpath = ('static', 'index.html')
+        result = self.staticapp(context, request)
+        self.assertEqual(result.status, '206 Partial Content')
+        self.assertEqual(result.body, 'ht')
+
+    def test_range_tilend(self):
+        request = self._makeRequest({'HTTP_RANGE':'bytes=-5'})
+        context = DummyContext()
+        request.subpath = ('static', 'index.html')
+        result = self.staticapp(context, request)
+        self.assertEqual(result.status, '206 Partial Content')
+        self.assertEqual(result.body, 'tml>\n') # CR only
+
+    def test_range_notbytes(self):
+        request = self._makeRequest({'HTTP_RANGE':'kilohertz=10'})
+        context = DummyContext()
+        request.subpath = ('static', 'index.html')
+        result = self.staticapp(context, request)
+        self.assertEqual(result.status, '200 OK')
+        self._assertBody(result.body,
+                         os.path.join(here, 'fixtures/static/index.html'))
+
+    def test_range_multiple(self):
+        request = self._makeRequest({'HTTP_RANGE':'bytes=10,11'})
+        context = DummyContext()
+        request.subpath = ('static', 'index.html')
+        result = self.staticapp(context, request)
+        self.assertEqual(result.status, '200 OK')
+        self._assertBody(result.body,
+                         os.path.join(here, 'fixtures/static/index.html'))
+
+    def test_range_oob(self):
+        request = self._makeRequest({'HTTP_RANGE':'bytes=1000-1002'})
+        context = DummyContext()
+        request.subpath = ('static', 'index.html')
+        result = self.staticapp(context, request)
+        self.assertEqual(result.status_int, 416)
+
+    def test_notfound(self):
+        request = self._makeRequest()
+        context = DummyContext()
+        request.subpath = ('static', 'wontbefound.x')
+        result = self.staticapp(context, request)
+        self.assertEqual(result.status, '404 Not Found')
+
+    def test_oob_doubledot(self):
+        request = self._makeRequest()
+        context = DummyContext()
+        request.subpath = ('..', 'test_integration.py')
+        result = self.staticapp(context, request)
+        self.assertEqual(result.status, '404 Not Found')
+
+    def test_oob_slash(self):
+        request = self._makeRequest()
+        context = DummyContext()
+        request.subpath = ('/', 'test_integration.py')
+        result = self.staticapp(context, request)
+        self.assertEqual(result.status, '404 Not Found')
+
+    def test_oob_empty(self):
+        request = self._makeRequest()
+        context = DummyContext()
+        request.subpath = ('', 'test_integration.py')
+        result = self.staticapp(context, request)
+        self.assertEqual(result.status, '404 Not Found')
+
+class TestStaticAppUsingAbsPath(unittest.TestCase, TestStaticAppTests):
+    staticapp = static_view(os.path.join(here, 'fixtures'), use_subpath=True)
+
+
+class TestStaticAppUsingResourcePath(unittest.TestCase, TestStaticAppTests):
+    staticapp = static_view('pyramid.tests:fixtures', use_subpath=True)
+
+class TestStaticAppNoSubpath(unittest.TestCase, TestStaticAppBase):
+    staticapp = static_view(os.path.join(here, 'fixtures'), use_subpath=False)
+    def test_basic(self):
+        request = self._makeRequest({'PATH_INFO':'/minimal.pt'})
+        context = DummyContext()
+        result = self.staticapp(context, request)
+        self.assertEqual(result.status, '200 OK')
+        self._assertBody(result.body, os.path.join(here, 'fixtures/minimal.pt'))
 
 class IntegrationBase(unittest.TestCase):
     root_factory = None

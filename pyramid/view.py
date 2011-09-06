@@ -1,4 +1,3 @@
-import mimetypes
 import venusian
 
 from zope.interface import providedBy
@@ -13,21 +12,6 @@ from pyramid.httpexceptions import default_exceptionresponse_view
 from pyramid.path import caller_package
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
-
-def init_mimetypes(mimetypes):
-    # this is a function so it can be unittested
-    if hasattr(mimetypes, 'init'):
-        mimetypes.init()
-        return True
-    return False
-
-# See http://bugs.python.org/issue5853 which is a recursion bug
-# that seems to effect Python 2.6, Python 2.6.1, and 2.6.2 (a fix
-# has been applied on the Python 2 trunk).  This workaround should
-# really be in Paste if anywhere, but it's easiest to just do it
-# here and get it over with to avoid needing to deal with any
-# fallout.
-init_mimetypes(mimetypes)
 
 _marker = object()
 

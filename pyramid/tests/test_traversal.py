@@ -19,6 +19,9 @@ class TraversalPathTests(unittest.TestCase):
     def test_twodots(self):
         self.assertEqual(self._callFUT('foo/../bar'), (u'bar',))
 
+    def test_twodots_at_start(self):
+        self.assertEqual(self._callFUT('../../bar'), (u'bar',))
+
     def test_element_urllquoted(self):
         self.assertEqual(self._callFUT('/foo/space%20thing/bar'),
                          (u'foo', u'space thing', u'bar'))

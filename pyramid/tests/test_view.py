@@ -548,27 +548,6 @@ class Test_default_exceptionresponse_view(unittest.TestCase):
         result = self._callFUT(context, request)
         self.assertEqual(result, 'abc')
 
-class Test_patch_mimetypes(unittest.TestCase):
-    def _callFUT(self, module):
-        from pyramid.view import init_mimetypes
-        return init_mimetypes(module)
-
-    def test_has_init(self):
-        class DummyMimetypes(object):
-            def init(self):
-                self.initted = True
-        module = DummyMimetypes()
-        result = self._callFUT(module)
-        self.assertEqual(result, True)
-        self.assertEqual(module.initted, True)
-        
-    def test_missing_init(self):
-        class DummyMimetypes(object):
-            pass
-        module = DummyMimetypes()
-        result = self._callFUT(module)
-        self.assertEqual(result, False)
-
 class Test_static(unittest.TestCase):
     def setUp(self):
         from zope.deprecation import __show__
@@ -578,38 +557,14 @@ class Test_static(unittest.TestCase):
         from zope.deprecation import __show__
         __show__.on()
 
-    def _getTargetClass(self):
+    def _makeOne(self, path, package_name):
         from pyramid.view import static
-        return static
-
-    def _makeOne(self, path, package_name=None):
-        return self._getTargetClass()(path, package_name=package_name)
+        return static(path, package_name)
         
-    def _makeEnviron(self, **extras):
-        environ = {
-            'wsgi.url_scheme':'http',
-            'wsgi.version':(1,0),
-            'SERVER_NAME':'localhost',
-            'SERVER_PORT':'8080',
-            'REQUEST_METHOD':'GET',
-            }
-        environ.update(extras)
-        return environ
-
-
-    def test_relpath_subpath(self):
+    def test_it(self):
         path = 'fixtures'
-        view = self._makeOne(path)
-        context = DummyContext()
-        request = DummyRequest()
-        request.subpath = ['__init__.py']
-        request.environ = self._makeEnviron()
-        response = view(context, request)
-        self.assertEqual(request.copied, True)
-        self.assertEqual(response.root_resource, 'fixtures')
-        self.assertEqual(response.resource_name, 'fixtures')
-        self.assertEqual(response.package_name, 'pyramid.tests')
-        self.assertEqual(response.cache_max_age, 3600)
+        view = self._makeOne(path, None)
+        self.assertEqual(view.docroot, 'fixtures')
 
 class ExceptionResponse(Exception):
     status = '404 Not Found'
@@ -632,13 +587,6 @@ class DummyRequest:
             environ = {}
         self.environ = environ
         
-    def get_response(self, application):
-        return application
-
-    def copy(self):
-        self.copied = True
-        return self
-
 from pyramid.interfaces import IResponse
 from zope.interface import implements
 
