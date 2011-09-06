@@ -41,9 +41,111 @@ class WGSIAppPlusViewConfigTests(unittest.TestCase):
             (IViewClassifier, IRequest, INothing), IView, name='')
         self.assertEqual(view.__original_view__, wsgiapptest)
 
+class IntegrationBase(object):
+    root_factory = None
+    package = None
+    def setUp(self):
+        from pyramid.config import Configurator
+        config = Configurator(root_factory=self.root_factory,
+                              package=self.package)
+        config.include(self.package)
+        app = config.make_wsgi_app()
+        from webtest import TestApp
+        self.testapp = TestApp(app)
+        self.config = config
+
+    def tearDown(self):
+        self.config.end()
+
 here = os.path.dirname(__file__)
 
-class TestStaticAppBase(object):
+class TestStaticAppBase(IntegrationBase):
+    def _assertBody(self, body, filename):
+        self.assertEqual(
+            body.replace('\r', ''),
+            open(filename, 'r').read()
+            )
+
+    def test_basic(self):
+        res = self.testapp.get('/minimal.pt', status=200)
+        self._assertBody(res.body, os.path.join(here, 'fixtures/minimal.pt'))
+
+    def test_not_modified(self):
+        self.testapp.extra_environ = {
+            'HTTP_IF_MODIFIED_SINCE':httpdate(pow(2, 32)-1)}
+        res = self.testapp.get('/minimal.pt', status=304)
+        self.assertEqual(res.body, '')
+
+    def test_file_in_subdir(self):
+        fn = os.path.join(here, 'fixtures/static/index.html')
+        res = self.testapp.get('/static/index.html', status=200)
+        self._assertBody(res.body, fn)
+
+    def test_directory_noslash_redir(self):
+        res = self.testapp.get('/static', status=301)
+        self.assertEqual(res.headers['Location'], 'http://localhost/static/')
+
+    def test_directory_noslash_redir_preserves_qs(self):
+        res = self.testapp.get('/static?a=1&b=2', status=301)
+        self.assertEqual(res.headers['Location'],
+                         'http://localhost/static/?a=1&b=2')
+
+    def test_directory_noslash_redir_with_scriptname(self):
+        self.testapp.extra_environ = {'SCRIPT_NAME':'/script_name'}
+        res = self.testapp.get('/static', status=301)
+        self.assertEqual(res.headers['Location'],
+                         'http://localhost/script_name/static/')
+
+    def test_directory_withslash(self):
+        fn = os.path.join(here, 'fixtures/static/index.html')
+        res = self.testapp.get('/static/', status=200)
+        self._assertBody(res.body, fn)
+
+    def test_range_inclusive(self):
+        self.testapp.extra_environ = {'HTTP_RANGE':'bytes=1-2'}
+        res = self.testapp.get('/static/index.html', status=206)
+        self.assertEqual(res.body, 'ht')
+
+    def test_range_tilend(self):
+        self.testapp.extra_environ = {'HTTP_RANGE':'bytes=-5'}
+        res = self.testapp.get('/static/index.html', status=206)
+        self.assertEqual(res.body, 'tml>\n')
+
+    def test_range_notbytes(self):
+        self.testapp.extra_environ = {'HTTP_RANGE':'kHz=-5'}
+        res = self.testapp.get('/static/index.html', status=200)
+        self._assertBody(res.body,
+                         os.path.join(here, 'fixtures/static/index.html'))
+
+    def test_range_multiple(self):
+        res = self.testapp.get('/static/index.html',
+                               [('HTTP_RANGE', 'bytes=10,11')],
+                               status=200)
+        self._assertBody(res.body,
+                         os.path.join(here, 'fixtures/static/index.html'))
+
+    def test_range_oob(self):
+        self.testapp.extra_environ = {'HTTP_RANGE':'bytes=1000-1002'}
+        self.testapp.get('/static/index.html', status=416)
+
+    def test_notfound(self):
+        self.testapp.get('/static/wontbefound.html', status=404)
+
+    def test_oob_doubledot(self):
+        self.testapp.get('/static/../../test_integration.py', status=404)
+
+    def test_oob_slash(self):
+        self.testapp.get('/%2F/test_integration.py', status=404)
+        # XXX pdb this
+
+class TestStaticAppUsingAbsPath(TestStaticAppBase, unittest.TestCase):
+    package = 'pyramid.tests.pkgs.static_abspath'
+
+class TestStaticAppUsingAssetSpec(TestStaticAppBase, unittest.TestCase):
+    package = 'pyramid.tests.pkgs.static_assetspec'
+
+class TestStaticAppNoSubpath(unittest.TestCase):
+    staticapp = static_view(os.path.join(here, 'fixtures'), use_subpath=False)
     def _makeRequest(self, extra=None):
         if extra is None:
             extra = {}
@@ -67,146 +169,6 @@ class TestStaticAppBase(object):
             open(filename, 'r').read()
             )
 
-class TestStaticAppTests(TestStaticAppBase):
-    def test_basic(self):
-        request = self._makeRequest()
-        context = DummyContext()
-        request.subpath = ('minimal.pt',)
-        result = self.staticapp(context, request)
-        self.assertEqual(result.status, '200 OK')
-        self._assertBody(result.body, os.path.join(here, 'fixtures/minimal.pt'))
-
-    def test_not_modified(self):
-        request = self._makeRequest()
-        context = DummyContext()
-        request.subpath = ('minimal.pt',)
-        request.if_modified_since = pow(2, 32)-1
-        result = self.staticapp(context, request)
-        self.assertEqual(result.status, '304 Not Modified') # CR only
-
-    def test_file_in_subdir(self):
-        request = self._makeRequest()
-        context = DummyContext()
-        request.subpath = ('static', 'index.html',)
-        result = self.staticapp(context, request)
-        self.assertEqual(result.status, '200 OK')
-        self._assertBody(result.body,
-                         os.path.join(here, 'fixtures/static/index.html'))
-
-    def test_directory_noslash_redir(self):
-        request = self._makeRequest({'PATH_INFO':'/static'})
-        context = DummyContext()
-        request.subpath = ('static',)
-        result = self.staticapp(context, request)
-        self.assertEqual(result.status, '301 Moved Permanently')
-        self.assertEqual(result.location, 'http://localhost/static/')
-
-    def test_directory_noslash_redir_preserves_qs(self):
-        request = self._makeRequest({'PATH_INFO':'/static',
-                                     'QUERY_STRING':'a=1&b=2'})
-        context = DummyContext()
-        request.subpath = ('static',)
-        result = self.staticapp(context, request)
-        self.assertEqual(result.status, '301 Moved Permanently')
-        self.assertEqual(result.location, 'http://localhost/static/?a=1&b=2')
-
-    def test_directory_noslash_redir_with_scriptname(self):
-        request = self._makeRequest({'SCRIPT_NAME':'/script_name',
-                                     'PATH_INFO':'/static'})
-        context = DummyContext()
-        request.subpath = ('static',)
-        result = self.staticapp(context, request)
-        self.assertEqual(result.status, '301 Moved Permanently')
-        self.assertEqual(result.location,
-                         'http://localhost/script_name/static/')
-
-    def test_directory_withslash(self):
-        request = self._makeRequest({'PATH_INFO':'/static/'})
-        context = DummyContext()
-        request.subpath = ('static',)
-        result = self.staticapp(context, request)
-        self.assertEqual(result.status, '200 OK')
-        self._assertBody(result.body,
-                         os.path.join(here, 'fixtures/static/index.html'))
-
-    def test_range_inclusive(self):
-        request = self._makeRequest({'HTTP_RANGE':'bytes=1-2'})
-        context = DummyContext()
-        request.subpath = ('static', 'index.html')
-        result = self.staticapp(context, request)
-        self.assertEqual(result.status, '206 Partial Content')
-        self.assertEqual(result.body, 'ht')
-
-    def test_range_tilend(self):
-        request = self._makeRequest({'HTTP_RANGE':'bytes=-5'})
-        context = DummyContext()
-        request.subpath = ('static', 'index.html')
-        result = self.staticapp(context, request)
-        self.assertEqual(result.status, '206 Partial Content')
-        self.assertEqual(result.body, 'tml>\n') # CR only
-
-    def test_range_notbytes(self):
-        request = self._makeRequest({'HTTP_RANGE':'kilohertz=10'})
-        context = DummyContext()
-        request.subpath = ('static', 'index.html')
-        result = self.staticapp(context, request)
-        self.assertEqual(result.status, '200 OK')
-        self._assertBody(result.body,
-                         os.path.join(here, 'fixtures/static/index.html'))
-
-    def test_range_multiple(self):
-        request = self._makeRequest({'HTTP_RANGE':'bytes=10,11'})
-        context = DummyContext()
-        request.subpath = ('static', 'index.html')
-        result = self.staticapp(context, request)
-        self.assertEqual(result.status, '200 OK')
-        self._assertBody(result.body,
-                         os.path.join(here, 'fixtures/static/index.html'))
-
-    def test_range_oob(self):
-        request = self._makeRequest({'HTTP_RANGE':'bytes=1000-1002'})
-        context = DummyContext()
-        request.subpath = ('static', 'index.html')
-        result = self.staticapp(context, request)
-        self.assertEqual(result.status_int, 416)
-
-    def test_notfound(self):
-        request = self._makeRequest()
-        context = DummyContext()
-        request.subpath = ('static', 'wontbefound.x')
-        result = self.staticapp(context, request)
-        self.assertEqual(result.status, '404 Not Found')
-
-    def test_oob_doubledot(self):
-        request = self._makeRequest()
-        context = DummyContext()
-        request.subpath = ('..', 'test_integration.py')
-        result = self.staticapp(context, request)
-        self.assertEqual(result.status, '404 Not Found')
-
-    def test_oob_slash(self):
-        request = self._makeRequest()
-        context = DummyContext()
-        request.subpath = ('/', 'test_integration.py')
-        result = self.staticapp(context, request)
-        self.assertEqual(result.status, '404 Not Found')
-
-    def test_oob_empty(self):
-        request = self._makeRequest()
-        context = DummyContext()
-        request.subpath = ('', 'test_integration.py')
-        result = self.staticapp(context, request)
-        self.assertEqual(result.status, '404 Not Found')
-
-class TestStaticAppUsingAbsPath(unittest.TestCase, TestStaticAppTests):
-    staticapp = static_view(os.path.join(here, 'fixtures'), use_subpath=True)
-
-
-class TestStaticAppUsingResourcePath(unittest.TestCase, TestStaticAppTests):
-    staticapp = static_view('pyramid.tests:fixtures', use_subpath=True)
-
-class TestStaticAppNoSubpath(unittest.TestCase, TestStaticAppBase):
-    staticapp = static_view(os.path.join(here, 'fixtures'), use_subpath=False)
     def test_basic(self):
         request = self._makeRequest({'PATH_INFO':'/minimal.pt'})
         context = DummyContext()
@@ -214,25 +176,7 @@ class TestStaticAppNoSubpath(unittest.TestCase, TestStaticAppBase):
         self.assertEqual(result.status, '200 OK')
         self._assertBody(result.body, os.path.join(here, 'fixtures/minimal.pt'))
 
-class IntegrationBase(unittest.TestCase):
-    root_factory = None
-    package = None
-    def setUp(self):
-        from pyramid.config import Configurator
-        config = Configurator(root_factory=self.root_factory,
-                              package=self.package)
-        config.begin()
-        config.include(self.package)
-        config.commit()
-        app = config.make_wsgi_app()
-        from webtest import TestApp
-        self.testapp = TestApp(app)
-        self.config = config
-
-    def tearDown(self):
-        self.config.end()
-
-class TestFixtureApp(IntegrationBase):
+class TestFixtureApp(IntegrationBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.fixtureapp'
     def test_another(self):
         res = self.testapp.get('/another.html', status=200)
@@ -252,7 +196,7 @@ class TestFixtureApp(IntegrationBase):
     def test_protected(self):
         self.testapp.get('/protected.html', status=403)
 
-class TestStaticPermApp(IntegrationBase):
+class TestStaticPermApp(IntegrationBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.staticpermapp'
     root_factory = 'pyramid.tests.pkgs.staticpermapp:RootFactory'
     def test_allowed(self):
@@ -283,7 +227,7 @@ class TestStaticPermApp(IntegrationBase):
             result.body.replace('\r', ''),
             open(os.path.join(here, 'fixtures/static/index.html'), 'r').read())
 
-class TestCCBug(IntegrationBase):
+class TestCCBug(IntegrationBase, unittest.TestCase):
     # "unordered" as reported in IRC by author of
     # http://labs.creativecommons.org/2010/01/13/cc-engine-and-web-non-frameworks/
     package = 'pyramid.tests.pkgs.ccbugapp'
@@ -295,7 +239,7 @@ class TestCCBug(IntegrationBase):
         res = self.testapp.get('/licenses/1/v1/juri', status=200)
         self.assertEqual(res.body, 'juri')
 
-class TestHybridApp(IntegrationBase):
+class TestHybridApp(IntegrationBase, unittest.TestCase):
     # make sure views registered for a route "win" over views registered
     # without one, even though the context of the non-route view may
     # be more specific than the route view.
@@ -338,14 +282,14 @@ class TestHybridApp(IntegrationBase):
         res = self.testapp.get('/error_sub', status=200)
         self.assertEqual(res.body, 'supressed2')
 
-class TestRestBugApp(IntegrationBase):
+class TestRestBugApp(IntegrationBase, unittest.TestCase):
     # test bug reported by delijati 2010/2/3 (http://pastebin.com/d4cc15515)
     package = 'pyramid.tests.pkgs.restbugapp'
     def test_it(self):
         res = self.testapp.get('/pet', status=200)
         self.assertEqual(res.body, 'gotten')
 
-class TestForbiddenAppHasResult(IntegrationBase):
+class TestForbiddenAppHasResult(IntegrationBase, unittest.TestCase):
     # test that forbidden exception has ACLDenied result attached
     package = 'pyramid.tests.pkgs.forbiddenapp'
     def test_it(self):
@@ -360,7 +304,7 @@ class TestForbiddenAppHasResult(IntegrationBase):
         self.assertTrue(
             result.endswith("for principals ['system.Everyone']"))
 
-class TestViewDecoratorApp(IntegrationBase):
+class TestViewDecoratorApp(IntegrationBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.viewdecoratorapp'
     def _configure_mako(self):
         tmpldir = os.path.join(os.path.dirname(__file__),
@@ -381,7 +325,7 @@ class TestViewDecoratorApp(IntegrationBase):
         res = self.testapp.get('/second', status=200)
         self.assertTrue('OK2' in res.body)
 
-class TestViewPermissionBug(IntegrationBase):
+class TestViewPermissionBug(IntegrationBase, unittest.TestCase):
     # view_execution_permitted bug as reported by Shane at http://lists.repoze.org/pipermail/repoze-dev/2010-October/003603.html
     package = 'pyramid.tests.pkgs.permbugapp'
     def test_test(self):
@@ -391,7 +335,7 @@ class TestViewPermissionBug(IntegrationBase):
     def test_x(self):
         self.testapp.get('/x', status=403)
 
-class TestDefaultViewPermissionBug(IntegrationBase):
+class TestDefaultViewPermissionBug(IntegrationBase, unittest.TestCase):
     # default_view_permission bug as reported by Wiggy at http://lists.repoze.org/pipermail/repoze-dev/2010-October/003602.html
     package = 'pyramid.tests.pkgs.defpermbugapp'
     def test_x(self):
@@ -411,7 +355,7 @@ from pyramid.tests.pkgs.exceptionviewapp.models import \
 excroot = {'anexception':AnException(),
            'notanexception':NotAnException()}
 
-class TestExceptionViewsApp(IntegrationBase):
+class TestExceptionViewsApp(IntegrationBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.exceptionviewapp'
     root_factory = lambda *arg: excroot
     def test_root(self):
@@ -570,7 +514,7 @@ class WSGIApp2AppTest(unittest.TestCase):
         self.assertTrue('Hello' in res.body)
 
 if os.name != 'java': # uses chameleon
-    class RendererScanAppTest(IntegrationBase):
+    class RendererScanAppTest(IntegrationBase, unittest.TestCase):
         package = 'pyramid.tests.pkgs.rendererscanapp'
         def test_root(self):
             res = self.testapp.get('/one', status=200)
@@ -600,3 +544,7 @@ class DummyRequest:
     def get_response(self, application):
         return application(None, None)
 
+def httpdate(ts):
+    import datetime
+    ts = datetime.datetime.utcfromtimestamp(ts)
+    return ts.strftime("%a, %d %b %Y %H:%M:%S GMT")

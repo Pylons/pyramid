@@ -4,6 +4,7 @@ from pkg_resources import resource_exists, resource_filename, resource_isdir
 import mimetypes
 
 from repoze.lru import lru_cache
+from webob import UTC
 
 from pyramid.asset import resolve_asset_spec
 from pyramid.httpexceptions import HTTPNotFound
@@ -34,15 +35,21 @@ class FileResponse(Response):
     def __init__(self, path, request, expires, chunksize=DEFAULT_CHUNKSIZE):
         super(FileResponse, self).__init__()
         self.request = request
-        self.last_modified = datetime.utcfromtimestamp(getmtime(path))
+        last_modified = datetime.fromtimestamp(getmtime(path), tz=UTC)
 
-        # Check 'If-Modified-Since' request header
-        # Browser might already have in cache
+        # Check 'If-Modified-Since' request header Browser might already have
+        # in cache
         modified_since = request.if_modified_since
         if modified_since is not None:
-            if self.last_modified <= modified_since:
+            if last_modified <= modified_since:
+                self.content_type = None
+                self.content_length = None
                 self.status = 304
                 return
+
+        content_type = mimetypes.guess_type(path, strict=False)[0]
+        if content_type is None:
+            content_type = 'application/octet-stream'
 
         # Provide partial response if requested
         content_length = getsize(path)
@@ -50,6 +57,8 @@ class FileResponse(Response):
         if request_range is not None:
             start, end = request_range
             if start >= content_length:
+                self.content_type = content_type
+                self.content_length = None
                 self.status_int = 416 # Request range not satisfiable
                 return
 
@@ -60,9 +69,14 @@ class FileResponse(Response):
 
         self.date = datetime.utcnow()
         self.app_iter = _file_iter(path, chunksize, request_range)
-        self.content_type = mimetypes.guess_type(path, strict=False)[0]
 
-        self.content_length = content_length
+        if content_length:
+            self.content_length = content_length
+            self.content_type = content_type
+            self.last_modified = last_modified
+        else:
+            self.content_length = None
+
         if expires is not None:
             self.expires = self.date + expires
 
