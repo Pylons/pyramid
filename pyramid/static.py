@@ -14,8 +14,6 @@ from pyramid.response import Response
 from pyramid.traversal import traversal_path
 from pyramid.traversal import quote_path_segment
 
-DEFAULT_CHUNKSIZE = 1<<16 # 64 kilobytes
-
 def init_mimetypes(mimetypes):
     # this is a function so it can be unittested
     if hasattr(mimetypes, 'init'):
@@ -32,7 +30,7 @@ class FileResponse(Response):
     """
     Serves a static filelike object.
     """
-    def __init__(self, path, expires, chunksize=DEFAULT_CHUNKSIZE):
+    def __init__(self, path, expires):
         super(FileResponse, self).__init__(conditional_response=True)
         self.last_modified = datetime.fromtimestamp(getmtime(path), tz=UTC)
         self.date = datetime.utcnow()
@@ -91,8 +89,7 @@ class static_view(object):
     FileResponse = FileResponse # override point
 
     def __init__(self, root_dir, cache_max_age=3600, package_name=None,
-                 use_subpath=False, index='index.html',
-                 chunksize=DEFAULT_CHUNKSIZE):
+                 use_subpath=False, index='index.html'):
         # package_name is for bw compat; it is preferred to pass in a
         # package-relative path as root_dir
         # (e.g. ``anotherpackage:foo/static``).
@@ -106,7 +103,6 @@ class static_view(object):
         self.package_name = package_name
         self.docroot = docroot
         self.norm_docroot = normcase(normpath(docroot))
-        self.chunksize = chunksize
         self.index = index
 
     def __call__(self, context, request):
@@ -145,7 +141,7 @@ class static_view(object):
             if not exists(filepath):
                 return HTTPNotFound(request.url)
 
-        return self.FileResponse(filepath ,self.expires, self.chunksize)
+        return self.FileResponse(filepath ,self.expires)
 
     def add_slash_redirect(self, request):
         url = request.path_url + '/'
