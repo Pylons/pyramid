@@ -108,7 +108,10 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         request.if_modified_since = pow(2, 32) -1
         context = DummyContext()
         response = inst(context, request)
-        self.assertEqual(response.status, '304 Not Modified')
+        start_response = DummyStartResponse()
+        app_iter = response(request.environ, start_response)
+        self.assertEqual(start_response.status, '304 Not Modified')
+        self.assertEqual(list(app_iter), [])
 
     def test_not_found(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
@@ -234,7 +237,10 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         request.subpath = ('index.html',)
         context = DummyContext()
         response = inst(context, request)
-        self.assertEqual(response.status, '304 Not Modified')
+        start_response = DummyStartResponse()
+        app_iter = response(request.environ, start_response)
+        self.assertEqual(start_response.status, '304 Not Modified')
+        self.assertEqual(list(app_iter), [])
 
     def test_not_found(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
@@ -268,3 +274,9 @@ class Test_patch_mimetypes(unittest.TestCase):
 class DummyContext:
     pass
 
+class DummyStartResponse:
+    status = ()
+    headers = ()
+    def __call__(self, status, headers):
+        self.status = status
+        self.headers = headers

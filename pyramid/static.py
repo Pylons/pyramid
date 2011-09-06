@@ -32,78 +32,18 @@ class FileResponse(Response):
     """
     Serves a static filelike object.
     """
-    def __init__(self, path, request, expires, chunksize=DEFAULT_CHUNKSIZE):
-        super(FileResponse, self).__init__()
-        self.request = request
-        last_modified = datetime.fromtimestamp(getmtime(path), tz=UTC)
-
-        # Check 'If-Modified-Since' request header Browser might already have
-        # in cache
-        modified_since = request.if_modified_since
-        if modified_since is not None:
-            if last_modified <= modified_since:
-                self.content_type = None
-                self.content_length = None
-                self.status = 304
-                return
-
+    def __init__(self, path, expires, chunksize=DEFAULT_CHUNKSIZE):
+        super(FileResponse, self).__init__(conditional_response=True)
+        self.last_modified = datetime.fromtimestamp(getmtime(path), tz=UTC)
+        self.date = datetime.utcnow()
+        self.app_iter = open(path, 'rb')
         content_type = mimetypes.guess_type(path, strict=False)[0]
         if content_type is None:
             content_type = 'application/octet-stream'
-
-        # Provide partial response if requested
-        content_length = getsize(path)
-        request_range = self._get_range(content_length)
-        if request_range is not None:
-            start, end = request_range
-            if start >= content_length:
-                self.content_type = content_type
-                self.content_length = None
-                self.status_int = 416 # Request range not satisfiable
-                return
-
-            self.status_int = 206 # Partial Content
-            self.headers['Content-Range'] = 'bytes %d-%d/%d' % (
-                start, end-1, content_length)
-            content_length = end - start
-
-        self.date = datetime.utcnow()
-        self.app_iter = _file_iter(path, chunksize, request_range)
-
-        if content_length:
-            self.content_length = content_length
-            self.content_type = content_type
-            self.last_modified = last_modified
-        else:
-            self.content_length = None
-
+        self.content_type = content_type
+        self.content_length = getsize(path)
         if expires is not None:
             self.expires = self.date + expires
-
-    def _get_range(self, content_length):
-        # WebOb earlier than 0.9.7 has broken range parser implementation.
-        # The current released version at this time is 0.9.6, so we do this
-        # ourselves.  (It is fixed on trunk, though.)
-        request = self.request
-        range_header = request.headers.get('Range', None)
-        if range_header is None:
-            return None
-
-        # Refuse to parse multiple byte ranges.  They are just plain silly.
-        if ',' in range_header:
-            return None
-
-        unit, range_s = range_header.split('=', 1)
-        if unit != 'bytes':
-            # Other units are not supported
-            return None
-
-        if range_s.startswith('-'):
-            start = content_length - int(range_s[1:])
-            return start, content_length
-
-        start, end = map(int, range_s.split('-'))
-        return start, end + 1
 
 class static_view(object):
     """ An instance of this class is a callable which can act as a
@@ -205,7 +145,7 @@ class static_view(object):
             if not exists(filepath):
                 return HTTPNotFound(request.url)
 
-        return self.FileResponse(filepath, request,self.expires,self.chunksize)
+        return self.FileResponse(filepath ,self.expires, self.chunksize)
 
     def add_slash_redirect(self, request):
         url = request.path_url + '/'
@@ -213,37 +153,6 @@ class static_view(object):
         if qs:
             url = url + '?' + qs
         return HTTPMovedPermanently(url)
-
-def _file_iter(path, chunksize, content_range=None):
-    file = open(path, 'rb')
-    
-    if content_range is not None:
-
-        class ByteReader(object):
-            def __init__(self, n_bytes):
-                self.bytes_left = n_bytes
-
-            def __call__(self):
-                b = file.read(min(self.bytes_left, chunksize))
-                self.bytes_left -= len(b)
-                return b
-
-        start, end = content_range
-        file.seek(start)
-        get_bytes = ByteReader(end - start)
-
-    else:
-        def get_bytes():
-            return file.read(chunksize)
-
-    try:
-        buf = get_bytes()
-        while buf:
-            yield buf
-            buf = get_bytes()
-    finally:
-        if hasattr(file, 'close'):
-            file.close()
 
 @lru_cache(1000)
 def secure_path(path_tuple):

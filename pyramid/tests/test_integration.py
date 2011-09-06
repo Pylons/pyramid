@@ -146,9 +146,7 @@ class TestStaticAppUsingAssetSpec(TestStaticAppBase, unittest.TestCase):
 
 class TestStaticAppNoSubpath(unittest.TestCase):
     staticapp = static_view(os.path.join(here, 'fixtures'), use_subpath=False)
-    def _makeRequest(self, extra=None):
-        if extra is None:
-            extra = {}
+    def _makeRequest(self, extra):
         from pyramid.request import Request
         from StringIO import StringIO
         kw = {'PATH_INFO':'',
