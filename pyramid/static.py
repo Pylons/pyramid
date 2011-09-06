@@ -134,7 +134,7 @@ class static_view(object):
             if not exists(filepath):
                 return HTTPNotFound(request.url)
 
-        return self.FileResponse(filepath ,self.cache_max_age)
+        return FileResponse(filepath ,self.cache_max_age)
 
     def add_slash_redirect(self, request):
         url = request.path_url + '/'
