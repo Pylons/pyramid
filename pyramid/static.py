@@ -83,8 +83,6 @@ class static_view(object):
          absolute, configuration will not be able to
          override the assets it contains.  """
 
-    FileResponse = FileResponse # override point
-
     def __init__(self, root_dir, cache_max_age=3600, package_name=None,
                  use_subpath=False, index='index.html'):
         # package_name is for bw compat; it is preferred to pass in a
