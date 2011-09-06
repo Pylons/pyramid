@@ -662,7 +662,11 @@ class AuthTktCookieHelper(object):
                 tokens = filter(None, tokens)
                 headers = self.remember(request, userid, max_age=self.max_age,
                                         tokens=tokens)
-                add_global_response_headers(request, headers)
+                def reissue_authtkt(request, response):
+                    if not hasattr(request, '_authtkt_reissue_revoked'):
+                        for k, v in headers:
+                            response.headerlist.append((k, v))
+                request.add_response_callback(reissue_authtkt)
                 request._authtkt_reissued = True
 
         environ['REMOTE_USER_TOKENS'] = tokens
@@ -680,6 +684,7 @@ class AuthTktCookieHelper(object):
         """ Return a set of expires Set-Cookie headers, which will destroy
         any existing auth_tkt cookie when attached to a response"""
         environ = request.environ
+        request._authtkt_reissue_revoked = True
         return self._get_cookies(environ, '', max_age=EXPIRE)
     
     def remember(self, request, userid, max_age=None, tokens=()):
@@ -723,6 +728,9 @@ class AuthTktCookieHelper(object):
         for token in tokens:
             if not (isinstance(token, str) and VALID_TOKEN.match(token)):
                 raise ValueError("Invalid token %r" % (token,))
+
+        if hasattr(request, '_authtkt_reissued'):
+            request._authtkt_reissue_revoked = True
 
         ticket = self.AuthTicket(
             self.secret,
