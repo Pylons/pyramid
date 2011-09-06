@@ -87,11 +87,9 @@ Future
 
   ``wsgi.file_wrapper`` support (FileApp.get)
 
-  'HEAD' method support (FileApp.get)
-
   handling file permission exceptions (FileApp.get).
 
-  Features we won't supportL ETAG and if-none-match
+  Features we won't support: ETAG and if-none-match
   support (DataApp.get); replace with if-modified-since handling.
 
 - 1.3: use zope.registry rather than zope.component.

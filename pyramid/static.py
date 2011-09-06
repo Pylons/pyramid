@@ -1,10 +1,8 @@
-from datetime import datetime
 from os.path import normcase, normpath, join, getmtime, getsize, isdir, exists
 from pkg_resources import resource_exists, resource_filename, resource_isdir
 import mimetypes
 
 from repoze.lru import lru_cache
-from webob import UTC
 
 from pyramid.asset import resolve_asset_spec
 from pyramid.httpexceptions import HTTPNotFound
