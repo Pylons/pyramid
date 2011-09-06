@@ -28,7 +28,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         inst = self._makeOne('package:resource_name')
         self.assertEqual(inst.package_name, 'package')
         self.assertEqual(inst.docroot, 'resource_name')
-        self.assertEqual(inst.expires, datetime.timedelta(seconds=3600))
+        self.assertEqual(inst.cache_max_age, 3600)
         self.assertEqual(inst.index, 'index.html')
 
     def test_call_adds_slash_path_info_empty(self):
@@ -85,8 +85,8 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         header_names = [ x[0] for x in response.headerlist ]
         header_names.sort()
         self.assertEqual(header_names,
-                         ['Content-Length', 'Content-Type', 'Date', 'Expires',
-                          'Last-Modified'])
+                         ['Cache-Control', 'Content-Length', 'Content-Type',
+                          'Expires', 'Last-Modified'])
 
     def test_resource_is_file_with_no_cache_max_age(self):
         inst = self._makeOne('pyramid.tests:fixtures/static',
@@ -95,12 +95,12 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         context = DummyContext()
         response = inst(context, request)
         self.assertTrue('<html>static</html>' in response.body)
-        self.assertEqual(len(response.headerlist), 4)
+        self.assertEqual(len(response.headerlist), 3)
         header_names = [ x[0] for x in response.headerlist ]
         header_names.sort()
         self.assertEqual(
             header_names,
-            ['Content-Length', 'Content-Type', 'Date', 'Last-Modified'])
+            ['Content-Length', 'Content-Type', 'Last-Modified'])
 
     def test_resource_notmodified(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
@@ -148,7 +148,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         inst = self._makeOne('package:resource_name')
         self.assertEqual(inst.package_name, 'package')
         self.assertEqual(inst.docroot, 'resource_name')
-        self.assertEqual(inst.expires, datetime.timedelta(seconds=3600))
+        self.assertEqual(inst.cache_max_age, 3600)
         self.assertEqual(inst.index, 'index.html')
 
     def test_call_adds_slash_path_info_empty(self):
@@ -212,8 +212,8 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         header_names = [ x[0] for x in response.headerlist ]
         header_names.sort()
         self.assertEqual(header_names,
-                         ['Content-Length', 'Content-Type', 'Date', 'Expires',
-                          'Last-Modified'])
+                         ['Cache-Control', 'Content-Length', 'Content-Type',
+                          'Expires', 'Last-Modified'])
 
     def test_resource_is_file_with_no_cache_max_age(self):
         inst = self._makeOne('pyramid.tests:fixtures/static',
@@ -223,12 +223,12 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         context = DummyContext()
         response = inst(context, request)
         self.assertTrue('<html>static</html>' in response.body)
-        self.assertEqual(len(response.headerlist), 4)
+        self.assertEqual(len(response.headerlist), 3)
         header_names = [ x[0] for x in response.headerlist ]
         header_names.sort()
         self.assertEqual(
             header_names,
-            ['Content-Length', 'Content-Type', 'Date', 'Last-Modified'])
+            ['Content-Length', 'Content-Type', 'Last-Modified'])
 
     def test_resource_notmodified(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from os.path import normcase, normpath, join, getmtime, getsize, isdir, exists
 from pkg_resources import resource_exists, resource_filename, resource_isdir
 import mimetypes
@@ -30,18 +30,17 @@ class FileResponse(Response):
     """
     Serves a static filelike object.
     """
-    def __init__(self, path, expires):
+    def __init__(self, path, cache_max_age):
         super(FileResponse, self).__init__(conditional_response=True)
-        self.last_modified = datetime.fromtimestamp(getmtime(path), tz=UTC)
-        self.date = datetime.utcnow()
+        self.last_modified = getmtime(path)
         self.app_iter = open(path, 'rb')
         content_type = mimetypes.guess_type(path, strict=False)[0]
         if content_type is None:
             content_type = 'application/octet-stream'
         self.content_type = content_type
         self.content_length = getsize(path)
-        if expires is not None:
-            self.expires = self.date + expires
+        if cache_max_age is not None:
+            self.cache_expires = cache_max_age
 
 class static_view(object):
     """ An instance of this class is a callable which can act as a
@@ -93,9 +92,7 @@ class static_view(object):
         # package_name is for bw compat; it is preferred to pass in a
         # package-relative path as root_dir
         # (e.g. ``anotherpackage:foo/static``).
-        if isinstance(cache_max_age, int):
-            cache_max_age = timedelta(seconds=cache_max_age)
-        self.expires = cache_max_age
+        self.cache_max_age = cache_max_age
         if package_name is None:
             package_name = caller_package().__name__
         package_name, docroot = resolve_asset_spec(root_dir, package_name)
@@ -141,7 +138,7 @@ class static_view(object):
             if not exists(filepath):
                 return HTTPNotFound(request.url)
 
-        return self.FileResponse(filepath ,self.expires)
+        return self.FileResponse(filepath ,self.cache_max_age)
 
     def add_slash_redirect(self, request):
         url = request.path_url + '/'

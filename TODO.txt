@@ -7,6 +7,8 @@ Should-Have
 - Consider adding exclog to all scaffolds to print tracebacks to the console
   while the debug toolbar is enabled.
 
+- Add cache_max_age=3600 to add_static_view of all scaffolds.
+
 Nice-to-Have
 ------------
 
