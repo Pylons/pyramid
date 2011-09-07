@@ -116,7 +116,7 @@ prototyping, bug reproduction, and very small applications.  These
 applications are easy to understand because all the information about the
 application lives in a single place, and you can deploy them without needing
 to understand much about Python distributions and packaging.  Pyramid isn't
-really marketed as a "microframework", but it allows you to do almost
+really marketed as a microframework, but it allows you to do almost
 everything that frameworks that are marketed as "micro" offer in very similar
 ways.
 
@@ -134,16 +134,16 @@ decorators to localize the configuration.  For example::
    def fred_view(request):
        return Response('fred')
 
-However, unlike other systems (various "microframeworks" come to mind), using
-decorators for configuration does not make your application difficult,
-extend, test or reuse.  The ``view_config`` decorator, for example, does not
-actually *change* the input or output of the function it decorates, so
-testing it is a "WYSIWYG" operation; you don't need to understand the
-framework to test your own code, you just behave as if the decorator is not
-there.  You can also instruct Pyramid to ignore some decorators, or use
-completely imperative configuration instead of decorators to add views.
-Pyramid decorators are inert instead of eager: you detect and activate them
-with a ``scan``.  They're basically just markers.
+However, unlike some other systems, using decorators for Pyramid
+configuration does not make your application difficult to extend, test or
+reuse.  The ``view_config`` decorator, for example, does not actually
+*change* the input or output of the function it decorates, so testing it is a
+"WYSIWYG" operation; you don't need to understand the framework to test your
+own code, you just behave as if the decorator is not there.  You can also
+instruct Pyramid to ignore some decorators, or use completely imperative
+configuration instead of decorators to add views.  Pyramid decorators are
+inert instead of eager: you detect and activate them with a ``scan``.
+They're basically just markers.
 
 Example: :ref:`mapping_views_using_a_decorator_section`.
 
