@@ -224,8 +224,8 @@ they can be used for the same purposes.
 
 Example: :ref:`view_config_placement`.
 
-Views can return dictionaries
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Rendered views can return dictionaries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you use a :term:`renderer`, you don't have to return a special kind of
 "webby" ``Response`` object from a view.  Instead, you can return a
@@ -235,6 +235,28 @@ test, because you don't have to parse HTML in your tests; just make an
 assertion instead that the view returns "the right stuff" in the dictionary
 it returns.  You can write "real" unit tests instead of functionally testing
 all of your views.
+
+For example, instead of:
+
+.. code-block:: python
+   :linenos:
+
+    from pyramid.renderers import render_to_response
+
+    def myview(request):
+        return render_to_response('myapp:templates/mytemplate.pt', {'a':1},
+                                  request=request)
+
+You can do this:
+
+.. code-block:: python
+   :linenos:
+
+    from pyramid.view import view_config
+
+    @view_config(renderer='myapp:templates/mytemplate.pt')
+    def myview(request):
+        return {'a':1}
 
 Example: :ref:`renderers_chapter`.
 
@@ -353,6 +375,112 @@ permission to do something.  In the former case, you can show a pretty "Not
 Found" page; in the latter case you might show a login form.
 
 Example: :ref:`exception_views`.
+
+View Response Adapters
+----------------------
+
+A lot is made of the aesthetics of what *kind* of objects you're allowed to
+return from view callables in various frameworks.  Some frameworks allow
+you return strings or tuples from view callables, and they make much of it.
+When frameworks allow for this, code looks slightly prettier, because fewer
+imports need to be done, and there is less code.  For example, compare this:
+
+.. code-block:: python
+   :linenos:
+
+   def aview(request):
+       return "Hello world!"
+
+To this:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.response import Response
+
+   def aview(request):
+       return Response("Hello world!")
+
+The former is "prettier", right?
+
+Out of the box, if you define the former view callable (the one that simply
+returns a string) in Pyramid, when it is executed, Pyramid will raise an
+exception.  This is because "explicit is better than implicit", in most
+cases, and by default, Pyramid wants you to return a :term:`Response` object
+from a view callable.  This is because there's usually a heck of a lot more
+to a response object than just its body.  But if you're the kind of person
+who values such aesthetics, we have an easy way to allow for this sort of
+thing:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+   from pyramid.response import Response
+
+   def string_response_adapter(s):
+       response = Response(s)
+       response.content_type = 'text/html'
+       return response
+
+   if __name__ == '__main__':
+       config = Configurator()
+       config.add_response_adapter(string_response_adapter, basestring)
+
+Do that once in your Pyramid application at startup.  Now you can return
+strings from any of your view callables, e.g.:
+
+.. code-block:: python
+   :linenos:
+
+   def helloview(request):
+       return "Hello world!"
+
+   def goodbyeview(request):
+       return "Goodbye world!"
+
+Oh noes!  What if you want to indicate a custom content type?  And a custom
+status code?  No fear:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+
+   def tuple_response_adapter(val):
+       status_int, content_type, body = val
+       response = Response(body)
+       response.content_type = content_type
+       response.status_int = status_int
+       return response
+
+   def string_response_adapter(body):
+       response = Response(body)
+       response.content_type = 'text/html'
+       response.status_int = 200
+       return response
+
+   if __name__ == '__main__':
+       config = Configurator()
+       config.add_response_adapter(string_response_adapter, basestring)
+       config.add_response_adapter(tuple_response_adapter, tuple)
+
+Once this is done, both of these view callables will work:
+
+.. code-block:: python
+   :linenos:
+
+   def aview(request):
+       return "Hello world!"
+
+   def anotherview(request):
+       return (403, 'text/plain', "Forbidden")
+
+Pyramid defaults to explicit behavior, because it's the most generally
+useful, but provide hooks that allow you to adapt the framework to localized
+aesthetic desires.
+
+See also :ref:`using_iresponse`.
 
 Asset specifications
 ~~~~~~~~~~~~~~~~~~~~
