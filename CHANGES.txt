@@ -10,7 +10,8 @@ Internal
 - Fixed test suite; on some systems tests would fail due to indeterminate
   test run ordering and a double-push-single-pop of a shared test variable.
 
-- Replaced use of ``paste.urlparser.StaticURLParser`` with a derivative of Chris Rossi's "happy" static file serving code.
+- Replaced use of ``paste.urlparser.StaticURLParser`` with a derivative of
+  Chris Rossi's "happy" static file serving code.
 
 Behavior Differences
 --------------------
