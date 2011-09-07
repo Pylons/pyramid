@@ -152,16 +152,27 @@ def make_localizer(current_locale_name, translation_directories):
     translations = Translations()
     translations._catalog = {}
 
-    locales_to_try = [current_locale_name]
+    locales_to_try = []
     if '_' in current_locale_name:
-        locales_to_try.append(current_locale_name.split('_')[0])
+        locales_to_try = [current_locale_name.split('_')[0]]
+    locales_to_try.append(current_locale_name)
+
+    # intent: order locales left to right in least specific to most specific,
+    # e.g. ['de', 'de_DE'].  This services the intent of creating a
+    # translations object that returns a "more specific" translation for a
+    # region, but will fall back to a "less specific" translation for the
+    # locale if necessary.  Ordering from least specific to most specific
+    # allows us to call translations.add in the below loop to get this
+    # behavior.
 
     for tdir in translation_directories:
-        locale_dirs = [ (lname, os.path.join(tdir, lname)) for lname in
-                        os.listdir(tdir) ]
-        for locale_name, locale_dir in locale_dirs:
-            if locale_name not in locales_to_try:
-                continue
+        locale_dirs = []
+        for lname in locales_to_try:
+            ldir = os.path.realpath(os.path.join(tdir, lname))
+            if os.path.isdir(ldir):
+                locale_dirs.append(ldir)
+
+        for locale_dir in locale_dirs:
             messages_dir = os.path.join(locale_dir, 'LC_MESSAGES')
             if not os.path.isdir(os.path.realpath(messages_dir)):
                 continue

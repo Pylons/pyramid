@@ -1,6 +1,13 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
+- Sometimes falling back from territory translations (``de_DE``) to language
+  translations (``de``) would not work properly when using a localizer.  See
+  https://github.com/Pylons/pyramid/issues/263
+
 Documentation
 -------------
 
