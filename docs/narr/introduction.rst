@@ -487,7 +487,8 @@ it up and calling :meth:`~pyramid.config.Configurator.add_directive` from
 within a function called when another user uses the
 :meth:`~pyramid.config.Configurator.include` method against your code.
 
-Example: :ref:`building_an_extensible_app`.
+Examples: :ref:`building_an_extensible_app`, :ref:`including_configuration`
+and :ref:`add_directive`.
 
 Flexible authentication and authorization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
