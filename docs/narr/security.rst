@@ -60,6 +60,8 @@ policies.
 .. index::
    single: authorization policy
 
+.. _enabling_authorization_policy:
+
 Enabling an Authorization Policy
 --------------------------------
 

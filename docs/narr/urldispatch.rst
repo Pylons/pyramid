@@ -590,6 +590,8 @@ Or provide the literal string ``/`` as the pattern:
    single: generating route URLs
    single: route URLs
 
+.. _generating_route_urls:
+
 Generating Route URLs
 ---------------------
 

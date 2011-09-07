@@ -504,6 +504,8 @@ configuration`.  However, they both do the same thing.
 .. index::
    single: view_config placement
 
+.. _view_config_placement:
+
 ``@view_config`` Placement
 ++++++++++++++++++++++++++
 
