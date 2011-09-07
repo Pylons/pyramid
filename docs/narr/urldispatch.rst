@@ -1030,6 +1030,19 @@ In this way, each route can use a different factory, making it possible to
 supply a different :term:`context` resource object to the view related to
 each particular route.
 
+A factory must be a callable which accepts a request and returns an arbitrary
+Python object.  For example, the below class can be used as a factory:
+
+.. code-block:: python
+   :linenos:
+
+   class Mine(object):
+       def __init__(self, request):
+           pass
+
+A route factory is actually conceptually identical to the :term:`root
+factory` described at :ref:`the_resource_tree`.
+
 Supplying a different resource factory for each route is useful when you're
 trying to use a :app:`Pyramid` :term:`authorization policy` to provide
 declarative, "context sensitive" security checks; each resource can maintain
