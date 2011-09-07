@@ -94,12 +94,12 @@ typically sacrifice "big app" features, and vice versa.
 
 We don't think it's a universally reasonable suggestion to write "small apps"
 in a "small framework" and "big apps" in a "big framework".  You can't really
-know what size every application will eventually grow to.  We don't really
+know to what size every application will eventually grow.  We don't really
 want to have to rewrite a previously small application in another framework
 when it gets "too big".  We believe the current binary distinction between
-"small" and "large" frameworks is just false; a well-designed framework
-should be able to be good at both.  Pyramid strives to be that kind of
-framework.
+frameworks for small and large applications is just false; a well-designed
+framework should be able to be good at both.  Pyramid strives to be that kind
+of framework.
 
 To this end, Pyramid provides a set of features, that, combined, are unique
 amongst Python web frameworks.  Lots of other frameworks contain some
