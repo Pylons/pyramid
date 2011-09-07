@@ -214,9 +214,10 @@ class Test_make_localizer(unittest.TestCase):
         locale_name = 'de_DE'
         result = self._callFUT(locale_name, localedirs)
         self.assertEqual(result.__class__, Localizer)
+        self.assertEqual(result.translate('Submit', 'deformsite'),
+                         'different') # prefer translations from de_DE locale
         self.assertEqual(result.translate('Approve', 'deformsite'),
-                         'Genehmigen')
-
+                         'Genehmigen') # missing from de_DE locale, but in de
 
 class Test_get_localizer(unittest.TestCase):
     def setUp(self):
