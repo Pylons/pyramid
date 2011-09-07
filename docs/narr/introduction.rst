@@ -260,26 +260,6 @@ You can do this:
 
 Example: :ref:`renderers_chapter`.
 
-Event system
-~~~~~~~~~~~~
-
-Pyramid emits *events* during its request processing lifecycle.  You can
-subscribe any number of listeners to these events.  For example, to be
-notified of a new request, you can subscribe to the ``NewRequest`` event.  To
-be notified that a template is about to be rendered, you can subscribe to the
-``BeforeRender`` event, and so forth.  Using an event publishing system as a
-framework notification feature instead of hardcoded hook points tends to make
-systems based on that framework less brittle.
-
-You can also use Pyramid's event system to send your *own* events.  For
-example, if you'd like to create a system that is itself a framework, and may
-want to notify subscribers that a document has just been indexed, you can
-create your own event type (``DocumentIndexed`` perhaps) and send the event
-via Pyramid.  Users of this framework can then subscribe to your event like
-they'd subscribe to the events that are normally sent by Pyramid itself.
-
-Example: :ref:`events_chapter` and :ref:`event_types`.
-
 Extensible templating
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -292,98 +272,22 @@ favorite templating system.  You'll then be able to use that templating
 system from within Pyramid just as you'd use one of the "built-in" templating
 systems.
 
+Pyramid does not make you use a single templating system exclusively.  You
+can use multiple templating systems, even in the same project.
+
 Example: :ref:`templates_used_directly`.
 
-Speed
-~~~~~
-
-The Pyramid core is, as far as we can tell, at least marginally faster than
-any other existing Python web framework.  It has been engineered from the
-ground up for speed.  It only does as much work as absolutely necessary when
-you ask it to get a job done.  Extraneous function calls and suboptimal
-algorithms in its core codepaths are avoided.  It is feasible to get, for
-example, between 3500 and 4000 requests per second from a simple Pyramid view
-on commodity dual-core laptop hardware and an appropriate WSGI server
-(mod_wsgi or gunicorn).  In any case, performance statstics are largely
-useless without requirements and goals, but if you need speed, Pyramid will
-almost certainly never be your application's bottleneck; at least no more
-than Python will be a bottleneck.
-
-Example: http://blog.curiasolutions.com/the-great-web-framework-shootout/
-
-Sessions
-~~~~~~~~
-
-Pyramid has built-in HTTP sessioning.  This allows you to associate data with
-otherwise anonymous users between requests.  Lots of systems do this.  But
-Pyramid also allows you to plug in your own sessioning system by creating
-some code that adheres to a documented interface.  Currently there is a
-binding package for the third-part Beaker sessioning system that does exactly
-this.  But if you have a specialized need (perhaps you want to store your
-session data in MongoDB), you can.  You can even switch between
-implementations without changing your application code.
-
-Example: :ref:`sessions_chapter`.
-
-No singletons
-~~~~~~~~~~~~~
-
-Pyramid is written in such a way that it has exactly zero "singleton" data
-structures.  Or, put another way, Pyramid constructs no "mutable globals".
-Or put even a different way, an import of a Pyramid application needn't have
-any "import time side effects".  This is esoteric-sounding, but if you've
-ever tried to cope with parameterizing a Django "settings.py" file for
-multiple installations of the same application, or if you've ever needed to
-monkey-patch some framework fixture so that it behaves properly for your use
-case, or if you've ever wanted to deploy your system using an asynchronous
-server, you'll end up appreciating this feature.  It just won't be a problem.
-You can even run multiple copies of a similar but not identically configured
-Pyramid application within the same Python process.  This is good for shared
-hosting environments, where RAM is at a premium.
-
-View Predicates and Many Views Per Route
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Unlike many other systems, Pyramid allows you to associate more than one view
-per route.  For example, you can create a route with the pattern ``/items``
-and when the route is matched, you can shuffle off the request to one view if
-the request method is GET, another view if the request method is POST, etc.
-A system known as "view predicates" allows for this.  Request method matching
-is the very most basic thing you can do with a view predicate.  You can also
-associate views with other request parameters such as the elements in the
-query string, the Accept header, whether the request is an XHR request or
-not, and lots of other things.  This feature allows you to keep your
-individual views "clean"; they won't need much conditional logic, so they'll
-be easier to test.
-
-Example: :ref:`view_configuration_parameters`.
-
-Exception views
-~~~~~~~~~~~~~~~
-
-Exceptions happen.  Rather than deal with exceptions that might present
-themselves to a user in production in an ad-hoc way, Pyramid allows you to
-register an :term:`exception view`.  Exception views are like regular Pyramid
-views, but they're only invoked when an exception "bubbles up" to Pyramid
-itself.  For example, you might register an exception view for the
-:exc:`Exception` exception, which will catch *all* exceptions, and present a
-pretty "well, this is embarrassing" page.  Or you might choose to register an
-exception view for only specific kinds of application-specific exceptions,
-such as an exception that happens when a file is not found, or an exception
-that happens when action cannot be performed because the user doesn't have
-permission to do something.  In the former case, you can show a pretty "Not
-Found" page; in the latter case you might show a login form.
-
-Example: :ref:`exception_views`.
-
 View Response Adapters
-----------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
-A lot is made of the aesthetics of what *kind* of objects you're allowed to
-return from view callables in various frameworks.  Some frameworks allow
-you return strings or tuples from view callables, and they make much of it.
-When frameworks allow for this, code looks slightly prettier, because fewer
-imports need to be done, and there is less code.  For example, compare this:
+A lot is made of the aesthetics of what *kinds* of objects you're allowed to
+return from view callables in various frameworks.  In a previous section in
+this document we showed you that, if you use a :term:`renderer`, you can
+usually return a dictionary from a view callable instead of a full-on
+:term:`Response` object.  But some frameworks allow you return strings or
+tuples from view callables, and they make much of it.  When frameworks allow
+for this, code looks slightly prettier, because fewer imports need to be
+done, and there is less code.  For example, compare this:
 
 .. code-block:: python
    :linenos:
@@ -481,6 +385,126 @@ useful, but provide hooks that allow you to adapt the framework to localized
 aesthetic desires.
 
 See also :ref:`using_iresponse`.
+
+"Global" Response Object
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+"Constructing these response objects in my view callables is such a chore!
+And I'm way too lazy to register a response adapter, as per the prior
+section," you say.  Fine.  Be that way:
+
+.. code-block:: python
+   :linenos:
+
+   def aview(request):
+       response = request.response
+       response.body = 'Hello world!'
+       response.content_type = 'text/plain'
+       return response
+
+See also :ref:`request_response_attr`.
+
+Event system
+~~~~~~~~~~~~
+
+Pyramid emits *events* during its request processing lifecycle.  You can
+subscribe any number of listeners to these events.  For example, to be
+notified of a new request, you can subscribe to the ``NewRequest`` event.  To
+be notified that a template is about to be rendered, you can subscribe to the
+``BeforeRender`` event, and so forth.  Using an event publishing system as a
+framework notification feature instead of hardcoded hook points tends to make
+systems based on that framework less brittle.
+
+You can also use Pyramid's event system to send your *own* events.  For
+example, if you'd like to create a system that is itself a framework, and may
+want to notify subscribers that a document has just been indexed, you can
+create your own event type (``DocumentIndexed`` perhaps) and send the event
+via Pyramid.  Users of this framework can then subscribe to your event like
+they'd subscribe to the events that are normally sent by Pyramid itself.
+
+Example: :ref:`events_chapter` and :ref:`event_types`.
+
+Speed
+~~~~~
+
+The Pyramid core is, as far as we can tell, at least marginally faster than
+any other existing Python web framework.  It has been engineered from the
+ground up for speed.  It only does as much work as absolutely necessary when
+you ask it to get a job done.  Extraneous function calls and suboptimal
+algorithms in its core codepaths are avoided.  It is feasible to get, for
+example, between 3500 and 4000 requests per second from a simple Pyramid view
+on commodity dual-core laptop hardware and an appropriate WSGI server
+(mod_wsgi or gunicorn).  In any case, performance statstics are largely
+useless without requirements and goals, but if you need speed, Pyramid will
+almost certainly never be your application's bottleneck; at least no more
+than Python will be a bottleneck.
+
+Example: http://blog.curiasolutions.com/the-great-web-framework-shootout/
+
+Sessions
+~~~~~~~~
+
+Pyramid has built-in HTTP sessioning.  This allows you to associate data with
+otherwise anonymous users between requests.  Lots of systems do this.  But
+Pyramid also allows you to plug in your own sessioning system by creating
+some code that adheres to a documented interface.  Currently there is a
+binding package for the third-part Beaker sessioning system that does exactly
+this.  But if you have a specialized need (perhaps you want to store your
+session data in MongoDB), you can.  You can even switch between
+implementations without changing your application code.
+
+Example: :ref:`sessions_chapter`.
+
+No singletons
+~~~~~~~~~~~~~
+
+Pyramid is written in such a way that it has exactly zero "singleton" data
+structures.  Or, put another way, Pyramid constructs no "mutable globals".
+Or put even a different way, an import of a Pyramid application needn't have
+any "import time side effects".  This is esoteric-sounding, but if you've
+ever tried to cope with parameterizing a Django "settings.py" file for
+multiple installations of the same application, or if you've ever needed to
+monkey-patch some framework fixture so that it behaves properly for your use
+case, or if you've ever wanted to deploy your system using an asynchronous
+server, you'll end up appreciating this feature.  It just won't be a problem.
+You can even run multiple copies of a similar but not identically configured
+Pyramid application within the same Python process.  This is good for shared
+hosting environments, where RAM is at a premium.
+
+View Predicates and Many Views Per Route
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Unlike many other systems, Pyramid allows you to associate more than one view
+per route.  For example, you can create a route with the pattern ``/items``
+and when the route is matched, you can shuffle off the request to one view if
+the request method is GET, another view if the request method is POST, etc.
+A system known as "view predicates" allows for this.  Request method matching
+is the very most basic thing you can do with a view predicate.  You can also
+associate views with other request parameters such as the elements in the
+query string, the Accept header, whether the request is an XHR request or
+not, and lots of other things.  This feature allows you to keep your
+individual views "clean"; they won't need much conditional logic, so they'll
+be easier to test.
+
+Example: :ref:`view_configuration_parameters`.
+
+Exception views
+~~~~~~~~~~~~~~~
+
+Exceptions happen.  Rather than deal with exceptions that might present
+themselves to a user in production in an ad-hoc way, Pyramid allows you to
+register an :term:`exception view`.  Exception views are like regular Pyramid
+views, but they're only invoked when an exception "bubbles up" to Pyramid
+itself.  For example, you might register an exception view for the
+:exc:`Exception` exception, which will catch *all* exceptions, and present a
+pretty "well, this is embarrassing" page.  Or you might choose to register an
+exception view for only specific kinds of application-specific exceptions,
+such as an exception that happens when a file is not found, or an exception
+that happens when action cannot be performed because the user doesn't have
+permission to do something.  In the former case, you can show a pretty "Not
+Found" page; in the latter case you might show a login form.
+
+Example: :ref:`exception_views`.
 
 Asset specifications
 ~~~~~~~~~~~~~~~~~~~~
