@@ -434,6 +434,59 @@ just use the ``include`` statement with a ``route_prefix``; the new
 application will live within your application at a URL prefix.  It's not a
 big deal, and requires little up-front engineering effort.
 
+Does Pyramid's configurator allow you to do something, but you just want it a
+little less verbose?  Or you'd like to offer up some handy configuration
+feature to other Pyramid users without requiring that we change Pyramid?  You
+can extend Pyramid's :term:`Configurator` with your own directives.  For
+example, let's say you find yourself doing this a lot:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+
+   config = Configurator()
+   config.add_route('xhr_route', '/xhr/{id}')
+   config.add_view('my.package.GET_view', route_name='xhr_route',
+                   xhr=True,  permission='view', request_method='GET')
+   config.add_view('my.package.POST_view', route_name='xhr_route',
+                   xhr=True, permission='view', request_method='POST')
+   config.add_view('my.package.HEAD_view', route_name='xhr_route',
+                   xhr=True, permission='view', request_method='HEAD')
+
+Pretty tedious right?  You can add a directive to the Pyramid configurator to
+automate some of the tedium away:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+
+   def add_protected_xhr_views(config, module):
+       module = config.maybe_dotted(module)
+       for method in ('GET', 'POST', 'HEAD'):
+           view = getattr(module, 'xhr_%s_view' % method, None)
+           if view is not None:
+               config.add_view(view, route_name='xhr_route', xhr=True, 
+                              permission='view', request_method=method)
+
+   config = Configurator()
+   config.add_directive('add_protected_xhr_views', add_protected_xhr_views)
+
+Once that's done, you can call the directive you've just added as a method of
+the Configurator object:
+
+.. code-block:: python
+   :linenos:
+
+   config.add_route('xhr_route', '/xhr/{id}')
+   config.add_protected_xhr_views('my.package')
+
+You can share your configuration code with others this way too by packaging
+it up and calling :meth:`~pyramid.config.Configurator.add_directive` from
+within a function called when another user uses the
+:meth:`~pyramid.config.Configurator.include` method against your code.
+
 Example: :ref:`building_an_extensible_app`.
 
 Flexible authentication and authorization
