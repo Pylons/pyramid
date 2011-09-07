@@ -73,8 +73,8 @@ What Makes Pyramid Unique
 Understandably, people don't usually want to hear about squishy engineering
 principles, they want to hear about concrete stuff that solves their
 problems.  With that in mind, what would make someone want to use Pyramid
-instead of the dozens-of-odd other web frameworks available today?  What
-makes Pyramid unique?
+instead of one of the many other web frameworks available today?  What makes
+Pyramid unique?
 
 This is a hard question to answer, because there are lots of excellent
 choices, and it's actually quite hard to make a wrong choice, particularly in
@@ -97,8 +97,9 @@ in a "small framework" and "big apps" in a "big framework".  You can't really
 know what size every application will eventually grow to.  We don't really
 want to have to rewrite a previously small application in another framework
 when it gets "too big".  We believe the current binary distinction between
-"small" and "large" frameworks is just false; one framework should be able to
-be good at both if it's well-designed.  Pyramid is such a framework.
+"small" and "large" frameworks is just false; a well-designed framework
+should be able to be good at both.  Pyramid strives to be that kind of
+framework.
 
 To this end, Pyramid provides a set of features, that, combined, are unique
 amongst Python web frameworks.  Lots of other frameworks contain some
@@ -216,6 +217,19 @@ views are easy to understand and use and operate similarly.  There is no
 phony distinction between them; they can be used for the same purposes.
 
 Example: :ref:`view_config_placement`.
+
+Views can return dictionaries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you use a :term:`renderer`, you don't have to return a special kind of
+"webby" ``Response`` object from a view.  Instead, you can return a
+dictionary instead, and Pyramid will take care of converting that dictionary
+to a Response using a template of your behalf.  This makes the view easier
+to test, because you don't have to parse HTML in your tests; just make an
+assertion instead that the view returns "the right stuff" in the dictionary
+it returns.
+
+Example: :ref:`renderers_chapter`.
 
 Event system
 ~~~~~~~~~~~~
