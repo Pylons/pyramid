@@ -270,7 +270,7 @@ The Pyramid core is, as far as we can tell, at least marginally faster than
 any other existing Python web framework.  It has been engineered from the
 ground up for speed.  It only does as much work as absolutely necessary when
 you ask it to get a job done.  Extraneous function calls and suboptimal
-algorithms in its core codepaths are avoided religiously.  It is feasible to
+algorithms in its core codepaths are studiously avoided.  It is feasible to
 get, for example, between 3500 and 4000 requests per second from a simple
 Pyramid view on commodity dual-core laptop hardware and an appropriate WSGI
 server (mod_wsgi or gunicorn).  In any case, performance statstics are
