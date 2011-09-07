@@ -284,6 +284,10 @@ Documentation Enhancements
 - The ZODB wiki tutorial now uses the ``pyramid_zodbconn`` package rather
   than the ``repoze.zodbconn`` package to provide ZODB integration.
 
+- Added :ref:`what_makes_pyramid_unique` to the Introduction narrative
+  chapter.
+
+
 Dependency Changes
 ------------------
 

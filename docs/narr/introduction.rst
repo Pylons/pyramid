@@ -65,6 +65,8 @@ Openness
   As with Python, the Pyramid software is distributed under a `permissive
   open source license <http://repoze.org/license.html>`_.
 
+.. _what_makes_pyramid_unique:
+
 What Makes Pyramid Unique
 -------------------------
 
