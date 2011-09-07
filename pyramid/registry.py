@@ -7,10 +7,10 @@ class Registry(Components, dict):
     the framework itself to perform mappings of URLs to view callables, as
     well as servicing other various framework duties. A registry has its own
     internal API, but this API is rarely used by Pyramid application
-    developers (usually obly by developers of the Pyramid framework).  But it
-    has a number of attributes that may be useful to application developers
-    within application code, such as ``settings``, which is a dictionary
-    containing application deployment settings.
+    developers (it's usually only used by developers of the Pyramid
+    framework).  But it has a number of attributes that may be useful to
+    application developers within application code, such as ``settings``,
+    which is a dictionary containing application deployment settings.
 
     For information about the purpose and usage of the application registry,
     see :ref:`zca_chapter`.
