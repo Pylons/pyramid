@@ -341,16 +341,16 @@ Exception views
 
 Exceptions happen.  Rather than deal with exceptions that might present
 themselves to a user in production in an ad-hoc way, Pyramid allows you to
-register *exception views*.  Exception views are like regular Pyramid views,
-but they're only invoked when an exception "bubbles up" to Pyramid itself.
-For example, you might register an exception view for the ``Exception``
-exception, which will catch *all* exceptions, and present a pretty "whoops,
-this is embarrassing" page.  Or you might choose to register an exception
-view for only specific kinds of application-specific exceptions, such as an
-exception that happens when a file is not found, or an exception that happens
-when action cannot be performed because the user doesn't have permission to
-do something.  In the former case, you can show a pretty "Not Found" page; in
-the latter case you might show a login form.
+register an :term:`exception view`.  Exception views are like regular Pyramid
+views, but they're only invoked when an exception "bubbles up" to Pyramid
+itself.  For example, you might register an exception view for the
+:exc:`Exception` exception, which will catch *all* exceptions, and present a
+pretty "well, this is embarrassing" page.  Or you might choose to register an
+exception view for only specific kinds of application-specific exceptions,
+such as an exception that happens when a file is not found, or an exception
+that happens when action cannot be performed because the user doesn't have
+permission to do something.  In the former case, you can show a pretty "Not
+Found" page; in the latter case you might show a login form.
 
 Example: :ref:`exception_views`.
 
@@ -385,15 +385,16 @@ Pyramid's :term:`scaffold` system renders projects that include a
 transaction management system, you cease being responsible for committing
 your data anymore.  Instead, Pyramid takes care of committing: it commits at
 the end of a request or aborts if there's an exception.  Why is that a good
-thing?  Transaction boundaries are awfully hard to get right.  If you add a
-``session.commit`` call in your application logic, and your code goes on to
-do other important things after that commit, and error happens in the later
-code, sometimes, you're kind of screwed.  Some data will have been written to
-the database that probably should not have.  Having a centralized commit
-point saves you from needing to think about this.  Also, Pyramid's
-transaction management system allows you to synchronize commits between
-multiple databases, and allows you to do things like conditionally send email
-if a transaction commits, but otherwise keep quiet.
+thing?  Having a centralized place for transaction management is a great
+thing.  If you instead add a ``session.commit`` call in your application
+logic itself, and your code goes on to do other important things after that
+commit, and error happens in the later code, you can easily wind up in a bad
+place.  Some data will have been written to the database that probably should
+not have.  Having a centralized commit point saves you from needing to think
+about this.  Also, Pyramid's transaction management system allows you to
+synchronize commits between multiple databases, and allows you to do things
+like conditionally send email if a transaction commits, but otherwise keep
+quiet.
 
 Example: :ref:`bfg_sql_wiki_tutorial` (note the lack of commit statements
 anywhere in application code).
@@ -409,29 +410,29 @@ and if you accidentally add two that are identical, or Pyramid can't make
 sense out of what it would mean to have both statements active at the same
 time, it will complain loudly at startup time.  It's not dumb though: it will
 automatically resolve conflicting configuration statements on its own if you
-use the configuration ``include`` system: "more local" statements are
-preferred over "less local" ones.  This allows you to intelligently factor
-large systems into smaller ones.
+use the configuration :meth:`~pyramid.config.Configurator.include` system:
+"more local" statements are preferred over "less local" ones.  This allows
+you to intelligently factor large systems into smaller ones.
 
 Example: :ref:`conflict_detection`.
 
 Configuration extensibility
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Unlike other systems, Pyramid provides a structured ``include`` mechanism
-that allows you compose applications from multiple Python packages.  All the
-configuration statements that can be performed in your "main" Pyramid
-application can also be performed by included packages (including the
-addition of views, routes, subscribers, and even authentication and
-authorization policies). You can even extend or override an existing
-application by including another application's configuration in your own, and
-overriding or adding new views and routes to it.  This has the potential to
-allow you to compose a big application out of many other smaller ones.  For
-example, if you want to reuse an existing application that already has a
-bunch of routes, you can just use the ``include`` statement with a
-``route_prefix``; the new application will live within your application at a
-URL prefix.  It's not a big deal, and requires little up-front engineering
-effort.
+Unlike other systems, Pyramid provides a structured "include" mechanism (see
+:meth:`~pyramid.config.Configurator.include`) that allows you compose
+applications from multiple Python packages.  All the configuration statements
+that can be performed in your "main" Pyramid application can also be
+performed by included packages (including the addition of views, routes,
+subscribers, and even authentication and authorization policies). You can
+even extend or override an existing application by including another
+application's configuration in your own, and overriding or adding new views
+and routes to it.  This has the potential to allow you to compose a big
+application out of many other smaller ones.  For example, if you want to
+reuse an existing application that already has a bunch of routes, you can
+just use the ``include`` statement with a ``route_prefix``; the new
+application will live within your application at a URL prefix.  It's not a
+big deal, and requires little up-front engineering effort.
 
 Example: :ref:`building_an_extensible_app`.
 
@@ -468,7 +469,7 @@ Traversal
 :term:`Traversal` is a concept stolen from :term:`Zope`.  It allows you to
 create a tree of resources, each of which can be addressed by one or more
 URLs.  Each of those resources can have one or more *views* associated with
-it. Iif your data isn't naturally treelike (or you're unwilling to create a
+it. If your data isn't naturally treelike (or you're unwilling to create a
 treelike representation of your data), you aren't going to find traversal
 very useful.  However, traversal is absolutely fantastic for sites that need
 to be arbitrarily extensible: it's a lot easier to add a node to a tree than
@@ -495,7 +496,7 @@ statement, and it will take care of the rest::
 Pyramid will add appropriate ``Cache-Control`` and ``Expires`` headers to
 responses generated when this view is invoked.
 
-See the :meth:`pyramid.config.Configurator.add_view` statement's
+See the :meth:`~pyramid.config.Configurator.add_view` method's
 ``http_cache`` documentation for more information.
 
 Tweens
@@ -550,7 +551,8 @@ demonstrations of common integration scenarios, too specific to add to the
 official narrative docs.  In any case, the Pyramid documentation is
 comprehensive.
 
-Example: The rest of this documentation.
+Example: The rest of this documentation and the cookbook at
+https://docs.pylonsproject.org/projects/pyramid_cookbook/dev/ .
 
 .. index::
    single: Pylons Project
