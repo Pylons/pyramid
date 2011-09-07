@@ -372,7 +372,7 @@ Transaction management
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Pyramid's :term:`scaffold` system renders projects that include a
-*transaction management* system, also stolen from Zope.  When you use this
+*transaction management* system, stolen from Zope.  When you use this
 transaction management system, you cease being responsible for committing
 your data anymore.  Instead, Pyramid takes care of committing: it commits at
 the end of a request or aborts if there's an exception.  Why is that a good
