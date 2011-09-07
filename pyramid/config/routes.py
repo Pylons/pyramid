@@ -63,7 +63,8 @@ class RoutesConfiguratorMixin(object):
           Python name` which refers to the same object that will generate a
           :app:`Pyramid` root resource object when this route matches. For
           example, ``mypackage.resources.MyFactory``.  If this argument is
-          not specified, a default root factory will be used.
+          not specified, a default root factory will be used.  See
+          :ref:`the_resource_tree` for more information about root factories.
 
         traverse
 
