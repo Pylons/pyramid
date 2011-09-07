@@ -119,7 +119,7 @@ class TestStaticAppBase(IntegrationBase):
 
     def test_range_multiple(self):
         res = self.testapp.get('/static/index.html',
-                               [('HTTP_RANGE', 'bytes=10,11')],
+                               [('HTTP_RANGE', 'bytes=10-11,11-12')],
                                status=200)
         self._assertBody(res.body,
                          os.path.join(here, 'fixtures/static/index.html'))
