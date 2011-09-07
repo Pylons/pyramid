@@ -1,6 +1,12 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
+- AuthTktAuthenticationPolicy with a ``reissue_time`` interfered with logout.
+  See https://github.com/Pylons/pyramid/issues/262.
+
 Internal
 --------
 
