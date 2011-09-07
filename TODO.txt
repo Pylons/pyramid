@@ -83,13 +83,12 @@ Future
 
 - 1.3: - Eliminate non-deployment-non-scaffold-related Paste dependency:
   ``paste.urlparser.StaticURLParser`` (cutnpaste or reimplement, possibly
-  using chrisrossi's happy stuff as a base).   Still need: 
+  using chrisrossi's happy stuff as a base).
 
-  handling file permission exceptions (FileApp.get).
-
-  Features we won't support: ETAG and if-none-match support (DataApp.get);
-  replace with if-modified-since handling, ``wsgi.file_wrapper`` support
-  (FileApp.get).
+  Features we no longer support: ETAG and if-none-match support
+  (DataApp.get); replace with if-modified-since handling,
+  ``wsgi.file_wrapper`` support (FileApp.get), returning 403 when handling
+  file permission exceptions (FileApp.get).
 
 - 1.3: use zope.registry rather than zope.component.
 

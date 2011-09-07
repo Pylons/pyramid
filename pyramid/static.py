@@ -24,21 +24,47 @@ def init_mimetypes(mimetypes):
 # has been applied on the Python 2 trunk).
 init_mimetypes(mimetypes)
 
-class FileResponse(Response):
+class _FileResponse(Response):
     """
     Serves a static filelike object.
     """
     def __init__(self, path, cache_max_age):
-        super(FileResponse, self).__init__(conditional_response=True)
+        super(_FileResponse, self).__init__(conditional_response=True)
         self.last_modified = getmtime(path)
-        self.app_iter = open(path, 'rb')
         content_type = mimetypes.guess_type(path, strict=False)[0]
         if content_type is None:
             content_type = 'application/octet-stream'
         self.content_type = content_type
-        self.content_length = getsize(path)
+        content_length = getsize(path)
+        self.app_iter = _FileIter(open(path, 'rb'), content_length)
+        # assignment of content_length must come after assignment of app_iter
+        self.content_length = content_length 
         if cache_max_age is not None:
             self.cache_expires = cache_max_age
+
+class _FileIter(object):
+    block_size = 4096 * 64 # (256K)
+
+    def __init__(self, file, size=None):
+        self.file = file
+        self.size = size
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        chunk_size = self.block_size
+        if self.size is not None:
+            if chunk_size > self.size:
+                chunk_size = self.size
+            self.size -= chunk_size
+        data = self.file.read(chunk_size)
+        if not data:
+            raise StopIteration
+        return data
+
+    def close(self):
+        self.file.close()
 
 class static_view(object):
     """ An instance of this class is a callable which can act as a
@@ -104,7 +130,7 @@ class static_view(object):
         else:
             path_tuple = traversal_path(request.path_info)
 
-        path = secure_path(path_tuple)
+        path = _secure_path(path_tuple)
 
         if path is None:
             # belt-and-suspenders security; this should never be true
@@ -134,7 +160,7 @@ class static_view(object):
             if not exists(filepath):
                 return HTTPNotFound(request.url)
 
-        return FileResponse(filepath ,self.cache_max_age)
+        return _FileResponse(filepath ,self.cache_max_age)
 
     def add_slash_redirect(self, request):
         url = request.path_url + '/'
@@ -144,7 +170,7 @@ class static_view(object):
         return HTTPMovedPermanently(url)
 
 @lru_cache(1000)
-def secure_path(path_tuple):
+def _secure_path(path_tuple):
     if '' in path_tuple:
         return None
     for item in path_tuple:
