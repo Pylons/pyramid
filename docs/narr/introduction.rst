@@ -129,7 +129,12 @@ Decorator-Based Configuration
 If you like the idea of framework configuration statements living next to the
 code it configures, so you don't have to constantly switch between files to
 refer to framework configuration when adding new code, you can use Pyramid
-decorators to localize the configuration.  For example::
+decorators to localize the configuration.  For example:
+
+.. code-block:: python
+
+   from pyramid.view import view_config
+   from pyramid.response import Response
 
    @view_config(route_name='fred')
    def fred_view(request):
@@ -137,14 +142,14 @@ decorators to localize the configuration.  For example::
 
 However, unlike some other systems, using decorators for Pyramid
 configuration does not make your application difficult to extend, test or
-reuse.  The ``view_config`` decorator, for example, does not actually
-*change* the input or output of the function it decorates, so testing it is a
-"WYSIWYG" operation; you don't need to understand the framework to test your
-own code, you just behave as if the decorator is not there.  You can also
-instruct Pyramid to ignore some decorators, or use completely imperative
-configuration instead of decorators to add views.  Pyramid decorators are
-inert instead of eager: you detect and activate them with a ``scan``.
-They're basically just markers.
+reuse.  The :class:`~pyramid.view.view_config` decorator, for example, does
+not actually *change* the input or output of the function it decorates, so
+testing it is a "WYSIWYG" operation; you don't need to understand the
+framework to test your own code, you just behave as if the decorator is not
+there.  You can also instruct Pyramid to ignore some decorators, or use
+completely imperative configuration instead of decorators to add views.
+Pyramid decorators are inert instead of eager: you detect and activate them
+with a :term:`scan`.
 
 Example: :ref:`mapping_views_using_a_decorator_section`.
 
@@ -206,15 +211,16 @@ Example: :ref:`debug_authorization_section` and :ref:`command_line_chapter`.
 Class-Based and Function-Based Views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Pyramid has a structured, unified conception of views.  Views can be
-functions, methods of classes, or even instances.  When you add a new view,
-you can choose to make it a function or a method of a class; in either case,
-Pyramid treats it largely the same way.  You can change your mind later, and
-move code between methods of classes and functions.  A collection of similar
-view callables can be attached to a single class as methods, if that floats
-your boat, and they can share initialization code as necessary.  All kinds of
-views are easy to understand and use and operate similarly.  There is no
-phony distinction between them; they can be used for the same purposes.
+Pyramid has a structured, unified conception of a :term:`view callable`.
+View callables can be functions, methods of classes, or even instances.  When
+you add a new view callable, you can choose to make it a function or a method
+of a class; in either case, Pyramid treats it largely the same way.  You can
+change your mind later, and move code between methods of classes and
+functions.  A collection of similar view callables can be attached to a
+single class as methods, if that floats your boat, and they can share
+initialization code as necessary.  All kinds of views are easy to understand
+and use and operate similarly.  There is no phony distinction between them;
+they can be used for the same purposes.
 
 Example: :ref:`view_config_placement`.
 
@@ -224,10 +230,11 @@ Views can return dictionaries
 If you use a :term:`renderer`, you don't have to return a special kind of
 "webby" ``Response`` object from a view.  Instead, you can return a
 dictionary instead, and Pyramid will take care of converting that dictionary
-to a Response using a template of your behalf.  This makes the view easier
-to test, because you don't have to parse HTML in your tests; just make an
+to a Response using a template on your behalf.  This makes the view easier to
+test, because you don't have to parse HTML in your tests; just make an
 assertion instead that the view returns "the right stuff" in the dictionary
-it returns.
+it returns.  You can write "real" unit tests instead of functionally testing
+all of your views.
 
 Example: :ref:`renderers_chapter`.
 
@@ -240,13 +247,14 @@ notified of a new request, you can subscribe to the ``NewRequest`` event.  To
 be notified that a template is about to be rendered, you can subscribe to the
 ``BeforeRender`` event, and so forth.  Using an event publishing system as a
 framework notification feature instead of hardcoded hook points tends to make
-systems based on that framework less brittle.  You can also use Pyramid's
-event system to send your *own* events.  For example, if you'd like to create
-a system that is itself a framework, and may want to notify subscribers that
-a document has just been indexed, you can create your own event type
-(``DocumentIndexed`` perhaps) and send the event via Pyramid.  Users of this
-framework can then subscribe to your event like they'd subscribe to the
-events that are normally sent by Pyramid itself.
+systems based on that framework less brittle.
+
+You can also use Pyramid's event system to send your *own* events.  For
+example, if you'd like to create a system that is itself a framework, and may
+want to notify subscribers that a document has just been indexed, you can
+create your own event type (``DocumentIndexed`` perhaps) and send the event
+via Pyramid.  Users of this framework can then subscribe to your event like
+they'd subscribe to the events that are normally sent by Pyramid itself.
 
 Example: :ref:`events_chapter` and :ref:`event_types`.
 
@@ -258,8 +266,9 @@ Templating systems such as Mako, Genshi, Chameleon, and Jinja2 can be treated
 as renderers.  Renderer bindings for all of these templating systems already
 exist for use in Pyramid.  But if you'd rather use another, it's not a big
 deal.  Just copy the code from an existing renderer package, and plug in your
-own.  You'll then be able to use your templating system from within Pyramid
-just as you'd use one of the "built-in" templating systems.
+favorite templating system.  You'll then be able to use that templating
+system from within Pyramid just as you'd use one of the "built-in" templating
+systems.
 
 Example: :ref:`templates_used_directly`.
 
@@ -270,13 +279,13 @@ The Pyramid core is, as far as we can tell, at least marginally faster than
 any other existing Python web framework.  It has been engineered from the
 ground up for speed.  It only does as much work as absolutely necessary when
 you ask it to get a job done.  Extraneous function calls and suboptimal
-algorithms in its core codepaths are studiously avoided.  It is feasible to
-get, for example, between 3500 and 4000 requests per second from a simple
-Pyramid view on commodity dual-core laptop hardware and an appropriate WSGI
-server (mod_wsgi or gunicorn).  In any case, performance statstics are
-largely useless without requirements and goals, but if you need speed,
-Pyramid will almost certainly never be your application's bottleneck; at
-least no more than Python will be a bottleneck.
+algorithms in its core codepaths are avoided.  It is feasible to get, for
+example, between 3500 and 4000 requests per second from a simple Pyramid view
+on commodity dual-core laptop hardware and an appropriate WSGI server
+(mod_wsgi or gunicorn).  In any case, performance statstics are largely
+useless without requirements and goals, but if you need speed, Pyramid will
+almost certainly never be your application's bottleneck; at least no more
+than Python will be a bottleneck.
 
 Example: http://blog.curiasolutions.com/the-great-web-framework-shootout/
 
@@ -287,10 +296,10 @@ Pyramid has built-in HTTP sessioning.  This allows you to associate data with
 otherwise anonymous users between requests.  Lots of systems do this.  But
 Pyramid also allows you to plug in your own sessioning system by creating
 some code that adheres to a documented interface.  Currently there is a
-binding package for the Beaker sessioning system that does exactly this.  But
-if you have a specialized need (perhaps you want to store your session data
-in MongoDB), you can.  You can even switch between implementations without
-changing your application code.
+binding package for the third-part Beaker sessioning system that does exactly
+this.  But if you have a specialized need (perhaps you want to store your
+session data in MongoDB), you can.  You can even switch between
+implementations without changing your application code.
 
 Example: :ref:`sessions_chapter`.
 
@@ -511,8 +520,8 @@ greater than 95% decision/condition coverage as measured by the
 Jenkins tool on Python 2.5, Python 2.6, Python 2.7, Jython and PyPy after
 each commit to its GitHub repository.  Official Pyramid add-ons are held to a
 similar testing standard.  We still find bugs in Pyramid and its official
-add-ons, but we find a lot fewer of them than if we didn't have a strict
-testing regime.
+add-ons, but we've noticed we find a lot fewer of them than while working on
+other projects that don't have a good testing regime.
 
 Example: http://jenkins.pylonsproject.org/
 
@@ -521,10 +530,10 @@ Support
 
 It's our goal that no Pyramid question go unanswered.  Whether you ask a
 question on IRC, on the Pylons-discuss maillist, or on StackOverflow, you're
-likely to get a reasonaly prompt response.  We don't tolerate "tech trolls"
-or other people who seem to get their rocks off by berating fellow users in
-our various offical support channels.  We try to keep it well-lit and
-new-user-friendly.
+likely to get a reasonably prompt response.  We don't tolerate "support
+trolls" or other people who seem to get their rocks off by berating fellow
+users in our various offical support channels.  We try to keep it well-lit
+and new-user-friendly.
 
 Example: Visit irc://freenode.net#pyramid (the ``#pyramid`` channel on
 irc.freenode.net in an IRC client) or the pylons-discuss maillist at
