@@ -105,7 +105,7 @@ To this end, Pyramid provides a set of features, that, combined, are unique
 amongst Python web frameworks.  Lots of other frameworks contain some
 combination of these features; Pyramid of course actually stole many of them
 from those other frameworks.  But Pyramid is the only one that has all of
-them in one place, documented appropriately, and useful ala-carte without
+them in one place, documented appropriately, and useful a la carte without
 necessarily paying for the entire banquet.  These are detailed below.
 
 Single-File Applications
