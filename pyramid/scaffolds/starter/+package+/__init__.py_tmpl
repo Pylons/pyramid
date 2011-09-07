@@ -8,5 +8,5 @@ def main(global_config, **settings):
     config.add_view('{{package}}.views.my_view',
                     context='{{package}}:resources.Root',
                     renderer='{{package}}:templates/mytemplate.pt')
-    config.add_static_view('static', '{{package}}:static')
+    config.add_static_view('static', '{{package}}:static', cache_max_age=3600)
     return config.make_wsgi_app()

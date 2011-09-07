@@ -1,5 +1,5 @@
-Next release
-============
+1.2a6 (2011-09-06)
+==================
 
 Bug Fixes
 ---------
@@ -13,11 +13,11 @@ Internal
 - Internalize code previously depended upon as imports from the
   ``paste.auth`` module (futureproof).
 
+- Replaced use of ``paste.urlparser.StaticURLParser`` with a derivative of
+  Chris Rossi's "happy" static file serving code (futureproof).
+
 - Fixed test suite; on some systems tests would fail due to indeterminate
   test run ordering and a double-push-single-pop of a shared test variable.
-
-- Replaced use of ``paste.urlparser.StaticURLParser`` with a derivative of
-  Chris Rossi's "happy" static file serving code.
 
 Behavior Differences
 --------------------
@@ -30,6 +30,12 @@ Behavior Differences
 - Instead of returning a ``403 Forbidden`` error when a static file is served
   that cannot be accessed by the Pyramid process' user due to file
   permissions, an IOError (or similar) will be raised.
+
+Scaffolds
+---------
+
+- All scaffolds now send the ``cache_max_age`` parameter to the
+  ``add_static_view`` method.
 
 1.2a5 (2011-09-04)
 ==================

@@ -58,6 +58,9 @@ Scaffolding Changes
   error catching / email sending is now the domain of the ``pyramid_exclog``
   package (see https://docs.pylonsproject.org/projects/pyramid_exclog/dev/).
 
+- All scaffolds now send the ``cache_max_age`` parameter to the
+  ``add_static_view`` method.
+
 Minor Feature Additions
 -----------------------
 
@@ -236,6 +239,18 @@ Backwards Incompatibilities
 - The :meth:`pyramid.config.Configurator.add_route` directive no longer
   returns a route object.  This change was required to make route vs. view
   configuration processing work properly.
+
+Behavior Differences
+--------------------
+
+- An ETag header is no longer set when serving a static file.  A
+  Last-Modified header is set instead.
+
+- Static file serving no longer supports the ``wsgi.file_wrapper`` extension.
+
+- Instead of returning a ``403 Forbidden`` error when a static file is served
+  that cannot be accessed by the Pyramid process' user due to file
+  permissions, an IOError (or similar) will be raised.
 
 Documentation Enhancements
 --------------------------

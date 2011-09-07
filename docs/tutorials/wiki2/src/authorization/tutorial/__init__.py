@@ -19,7 +19,7 @@ def main(global_config, **settings):
                           root_factory='tutorial.models.RootFactory',
                           authentication_policy=authn_policy,
                           authorization_policy=authz_policy)
-    config.add_static_view('static', 'tutorial:static')
+    config.add_static_view('static', 'tutorial:static', cache_max_age=3600)
 
     config.add_route('view_wiki', '/')
     config.add_route('login', '/login')
