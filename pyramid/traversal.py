@@ -479,7 +479,8 @@ def traversal_path(path):
         if not segment or segment=='.':
             continue
         elif segment == '..':
-            del clean[-1]
+            if clean:
+                del clean[-1]
         else:
             try:
                 segment = segment.decode('utf-8')

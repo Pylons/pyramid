@@ -1415,19 +1415,19 @@ class TestViewsConfigurationMixin(unittest.TestCase):
     def test_add_static_view_here_no_utility_registered(self):
         from pyramid.renderers import null_renderer
         from zope.interface import Interface
-        from pyramid.static import PackageURLParser
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         config = self._makeOne(autocommit=True)
-        config.add_static_view('static', 'files',
-                               renderer=null_renderer)
+        config.add_static_view('static', 'files', renderer=null_renderer)
         request_type = self._getRouteRequestIface(config, 'static/')
         self._assertRoute(config, 'static/', 'static/*subpath')
         wrapped = config.registry.adapters.lookup(
             (IViewClassifier, request_type, Interface), IView, name='')
-        request = self._makeRequest(config)
+        from pyramid.request import Request
+        request = Request.blank('/static/minimal.pt')
+        request.subpath = ('minimal.pt', )
         result = wrapped(None, request)
-        self.assertEqual(result.__class__, PackageURLParser)
+        self.assertEqual(result.status, '200 OK')
 
     def test_add_static_view_package_relative(self):
         from pyramid.interfaces import IStaticURLInfo
@@ -3346,7 +3346,6 @@ class TestStaticURLInfo(unittest.TestCase):
         self.assertEqual(config.route_args, ('view/', 'view/*subpath'))
         self.assertEqual(config.view_kw['permission'], NO_PERMISSION_REQUIRED)
         self.assertEqual(config.view_kw['view'].__class__, static_view)
-        self.assertEqual(config.view_kw['view'].app.cache_max_age, 1)
 
     def test_add_viewname_with_permission(self):
         config = DummyConfig()
@@ -3416,10 +3415,6 @@ class DummyRequest:
         self.environ = environ
         self.params = {}
         self.cookies = {}
-    def copy(self):
-        return self
-    def get_response(self, app):
-        return app
 
 class DummyContext:
     pass
