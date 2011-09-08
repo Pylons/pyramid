@@ -458,12 +458,13 @@ Example: :ref:`sessions_chapter`.
 No singletons
 ~~~~~~~~~~~~~
 
-Pyramid is written in such a way that it has exactly zero "singleton" data
-structures.  Or, put another way, Pyramid constructs no "mutable globals".
-Or put even a different way, an import of a Pyramid application needn't have
-any "import time side effects".  This is esoteric-sounding, but if you've
-ever tried to cope with parameterizing a Django "settings.py" file for
-multiple installations of the same application, or if you've ever needed to
+Pyramid is written in such a way that it requires your application to have
+exactly zero "singleton" data structures.  Or, put another way, Pyramid
+doesn't requires you to construct any "mutable globals".  Or put even a
+different way, an import of a Pyramid application needn't have any "import
+time side effects".  This is esoteric-sounding, but if you've ever tried to
+cope with parameterizing a Django "settings.py" file for multiple
+installations of the same application, or if you've ever needed to
 monkey-patch some framework fixture so that it behaves properly for your use
 case, or if you've ever wanted to deploy your system using an asynchronous
 server, you'll end up appreciating this feature.  It just won't be a problem.
