@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 from os.path import normcase, normpath, join, getmtime, getsize, isdir, exists
 from pkg_resources import resource_exists, resource_filename, resource_isdir
@@ -178,4 +179,6 @@ def _secure_path(path_tuple):
         return None
     if any([contains_slash(item) for item in path_tuple]):
         return None
-    return '/'.join([x.encode('utf-8') for x in path_tuple])
+    encoded = u'/'.join(path_tuple) # will be unicode
+    return encoded
+

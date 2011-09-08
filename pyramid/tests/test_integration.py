@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 import unittest
 
@@ -72,20 +74,22 @@ class TestStaticAppBase(IntegrationBase):
 
     def test_hidden(self):
         res = self.testapp.get('/static/.hiddenfile', status=200)
-        self._assertBody(res.body, os.path.join(here,
-                                                'fixtures/static/.hiddenfile'))
+        self._assertBody(
+            res.body,
+            os.path.join(here, 'fixtures/static/.hiddenfile')
+            )
 
     def test_highchars_in_pathelement(self):
-        res = self.testapp.get('/static/h\xc3\xa9h\xc3\xa9/index.html',
-                               status=200)
-        self._assertBody(res.body, os.path.join(
-            here, 'fixtures/static/h\xc3\xa9h\xc3\xa9/index.html'))
+        res = self.testapp.get('/static/héhé/index.html', status=200)
+        self._assertBody(
+            res.body, os.path.join(here, u'fixtures/static/héhé/index.html')
+            )
 
     def test_highchars_in_filename(self):
-        res = self.testapp.get('/static/h\xc3\xa9h\xc3\xa9.html',
-                               status=200)
-        self._assertBody(res.body, os.path.join(
-            here, 'fixtures/static/h\xc3\xa9h\xc3\xa9.html'))
+        res = self.testapp.get('/static/héhé.html', status=200)
+        self._assertBody(
+            res.body, os.path.join(here, u'fixtures/static/héhé.html')
+            )
 
     def test_not_modified(self):
         self.testapp.extra_environ = {
