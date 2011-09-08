@@ -434,7 +434,7 @@ you ask it to get a job done.  Extraneous function calls and suboptimal
 algorithms in its core codepaths are avoided.  It is feasible to get, for
 example, between 3500 and 4000 requests per second from a simple Pyramid view
 on commodity dual-core laptop hardware and an appropriate WSGI server
-(mod_wsgi or gunicorn).  In any case, performance statstics are largely
+(mod_wsgi or gunicorn).  In any case, performance statistics are largely
 useless without requirements and goals, but if you need speed, Pyramid will
 almost certainly never be your application's bottleneck; at least no more
 than Python will be a bottleneck.
