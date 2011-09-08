@@ -206,7 +206,7 @@ routes for an application in the order they'll be evaluated for matching;
 ``paster pviews`` shows all configured views for any given URL.  These are
 also WTF-crushers in some circumstances.
 
-Example: :ref:`debug_authorization_section` and :ref:`command_line_chapter`.
+Examples: :ref:`debug_authorization_section` and :ref:`command_line_chapter`.
 
 Class-Based and Function-Based Views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -512,14 +512,13 @@ Asset specifications
 
 Asset specifications are strings that contain both a Python package name and
 a file or directory name, e.g. ``MyPackage:static/index.html``.  Use of these
-specifications is omnipresent in Pyramid.  You can refer to a template using
-an asset specification, a translation directory, and other package-bound
-static resources using one.  This makes a system built on Pyramid extensible,
-because you don't have to rely on globals ("*the* static directory") or
-lookup schemes ("*the* ordered set of template directories") to address your
-files.  You can move files around as necessary, and include other packages
-that may not share your system's templates or static files without
-encountering conflicts.
+specifications is omnipresent in Pyramid.  An asset specification can refer
+to a template, a translation directory, or any other package-bound static
+resource.  This makes a system built on Pyramid extensible, because you don't
+have to rely on globals ("*the* static directory") or lookup schemes ("*the*
+ordered set of template directories") to address your files.  You can move
+files around as necessary, and include other packages that may not share your
+system's templates or static files without encountering conflicts.
 
 Because asset specifications are used heavily in Pyramid, we've also provided
 a way to allow users to override assets.  Say you love a system that someone
@@ -528,7 +527,7 @@ to make it all better.  No need to fork the application.  Just override the
 asset specification for that template with your own inside a wrapper, and
 you're good to go.
 
-Example: :ref:`asset_specifications`.
+Examples: :ref:`asset_specifications` and :ref:`overriding_assets_section`.
 
 Transaction management
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -586,7 +585,7 @@ that can be performed in your "main" Pyramid application can also be
 performed by included packages including the addition of views, routes,
 subscribers, and even authentication and authorization policies. You can even
 extend or override an existing application by including another application's
-configuration in your own, and overriding or adding new views and routes to
+configuration in your own, overriding or adding new views and routes to
 it.  This has the potential to allow you to compose a big application out of
 many other smaller ones.  For example, if you want to reuse an existing
 application that already has a bunch of routes, you can just use the
