@@ -515,11 +515,11 @@ a file or directory name, e.g. ``MyPackage:static/index.html``.  Use of these
 specifications is omnipresent in Pyramid.  You can refer to a template using
 an asset specification, a translation directory, and other package-bound
 static resources using one.  This makes a system built on Pyramid extensible,
-because you don't have to rely on globals ("the static directory") or lookup
-schemes ("the ordered set of template directories") to address your files.
-You can move files around as necessary, and include other packages that may
-not share your system's templates or static files without encountering
-conflicts.
+because you don't have to rely on globals ("*the* static directory") or
+lookup schemes ("*the* ordered set of template directories") to address your
+files.  You can move files around as necessary, and include other packages
+that may not share your system's templates or static files without
+encountering conflicts.
 
 Because asset specifications are used heavily in Pyramid, we've also provided
 a way to allow users to override assets.  Say you love a system that someone
@@ -539,15 +539,22 @@ transaction management system, you cease being responsible for committing
 your data anymore.  Instead, Pyramid takes care of committing: it commits at
 the end of a request or aborts if there's an exception.  Why is that a good
 thing?  Having a centralized place for transaction management is a great
-thing.  If you instead add a ``session.commit`` call in your application
-logic itself, and your code goes on to do other important things after that
-commit, and error happens in the later code, you can easily wind up in a bad
-place.  Some data will have been written to the database that probably should
-not have.  Having a centralized commit point saves you from needing to think
-about this.  Also, Pyramid's transaction management system allows you to
-synchronize commits between multiple databases, and allows you to do things
-like conditionally send email if a transaction commits, but otherwise keep
-quiet.
+thing.  If, instead of managing your transactions in a centralized place, you
+sprikle ``session.commit`` calls in your application logic itself, you can
+wind up in a bad place.  Wherever you manually commit data to your database,
+it's likely that some of your other code is going to run *after* your commit.
+If that code goes on to do other important things after that commit, and
+error happens in the later code, you can easily wind up with inconsistent
+data if you're not extremely careful.  Some data will have been written to
+the database that probably should not have.  Having a centralized commit
+point saves you from needing to think about this; it's great for lazy people
+who also care about data integrity.  Either the request completes
+successfully, and all chages are committed, or it does not, and all changes
+are aborted.
+
+Also, Pyramid's transaction management system allows you to synchronize
+commits between multiple databases, and allows you to do things like
+conditionally send email if a transaction commits, but otherwise keep quiet.
 
 Example: :ref:`bfg_sql_wiki_tutorial` (note the lack of commit statements
 anywhere in application code).
@@ -576,16 +583,16 @@ Unlike other systems, Pyramid provides a structured "include" mechanism (see
 :meth:`~pyramid.config.Configurator.include`) that allows you compose
 applications from multiple Python packages.  All the configuration statements
 that can be performed in your "main" Pyramid application can also be
-performed by included packages (including the addition of views, routes,
-subscribers, and even authentication and authorization policies). You can
-even extend or override an existing application by including another
-application's configuration in your own, and overriding or adding new views
-and routes to it.  This has the potential to allow you to compose a big
-application out of many other smaller ones.  For example, if you want to
-reuse an existing application that already has a bunch of routes, you can
-just use the ``include`` statement with a ``route_prefix``; the new
-application will live within your application at a URL prefix.  It's not a
-big deal, and requires little up-front engineering effort.
+performed by included packages including the addition of views, routes,
+subscribers, and even authentication and authorization policies. You can even
+extend or override an existing application by including another application's
+configuration in your own, and overriding or adding new views and routes to
+it.  This has the potential to allow you to compose a big application out of
+many other smaller ones.  For example, if you want to reuse an existing
+application that already has a bunch of routes, you can just use the
+``include`` statement with a ``route_prefix``; the new application will live
+within your application at a URL prefix.  It's not a big deal, and requires
+little up-front engineering effort.
 
 Does Pyramid's configurator allow you to do something, but you just want it a
 little less verbose?  Or you'd like to offer up some handy configuration
@@ -634,6 +641,9 @@ the Configurator object:
 
    config.add_route('xhr_route', '/xhr/{id}')
    config.add_protected_xhr_views('my.package')
+
+Your previously multiple repetitive configuration lines have now morphed into
+one line.
 
 You can share your configuration code with others this way too by packaging
 it up and calling :meth:`~pyramid.config.Configurator.add_directive` from
