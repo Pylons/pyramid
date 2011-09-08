@@ -10,7 +10,6 @@ from pyramid.httpexceptions import HTTPMovedPermanently
 from pyramid.path import caller_package
 from pyramid.response import Response
 from pyramid.traversal import traversal_path
-from pyramid.traversal import quote_path_segment
 
 def init_mimetypes(mimetypes):
     # this is a function so it can be unittested
