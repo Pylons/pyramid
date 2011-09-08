@@ -169,12 +169,13 @@ class static_view(object):
             url = url + '?' + qs
         return HTTPMovedPermanently(url)
 
+has_insecure_pathelement = set(['..', '.', '/', '']).intersection
+
 @lru_cache(1000)
 def _secure_path(path_tuple):
-    if '' in path_tuple:
+    if has_insecure_pathelement(path_tuple):
         return None
     for item in path_tuple:
-        for val in ['.', '/']:
-            if item.startswith(val):
-                return None
-    return '/'.join([quote_path_segment(x) for x in path_tuple])
+        if '../' in item:
+            return None
+    return '/'.join([x.encode('utf-8') for x in path_tuple])

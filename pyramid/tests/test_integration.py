@@ -70,6 +70,23 @@ class TestStaticAppBase(IntegrationBase):
         res = self.testapp.get('/minimal.pt', status=200)
         self._assertBody(res.body, os.path.join(here, 'fixtures/minimal.pt'))
 
+    def test_hidden(self):
+        res = self.testapp.get('/static/.hiddenfile', status=200)
+        self._assertBody(res.body, os.path.join(here,
+                                                'fixtures/static/.hiddenfile'))
+
+    def test_highchars_in_pathelement(self):
+        res = self.testapp.get('/static/h\xc3\xa9h\xc3\xa9/index.html',
+                               status=200)
+        self._assertBody(res.body, os.path.join(
+            here, 'fixtures/static/h\xc3\xa9h\xc3\xa9/index.html'))
+
+    def test_highchars_in_filename(self):
+        res = self.testapp.get('/static/h\xc3\xa9h\xc3\xa9.html',
+                               status=200)
+        self._assertBody(res.body, os.path.join(
+            here, 'fixtures/static/h\xc3\xa9h\xc3\xa9.html'))
+
     def test_not_modified(self):
         self.testapp.extra_environ = {
             'HTTP_IF_MODIFIED_SINCE':httpdate(pow(2, 32)-1)}
@@ -140,7 +157,9 @@ class TestStaticAppBase(IntegrationBase):
 
     def test_oob_slash(self):
         self.testapp.get('/%2F/test_integration.py', status=404)
-        # XXX pdb this
+
+    def test_oob_dotdotslash_encoded(self):
+        self.testapp.get('/static/%2E%2E%2F/test_integration.py', status=404)
 
 
 class TestStaticAppUsingAbsPath(TestStaticAppBase, unittest.TestCase):

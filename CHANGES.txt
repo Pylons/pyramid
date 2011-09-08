@@ -8,6 +8,12 @@ Bug Fixes
   translations (``de``) would not work properly when using a localizer.  See
   https://github.com/Pylons/pyramid/issues/263
 
+- The static file serving machinery could not serve files that started with a
+  ``.`` (dot) character (hidden files).
+
+- The static file serving machinery inappropriately URL-quoted path segments
+  in filenames when asking for files from the filesystem.
+
 Documentation
 -------------
 
