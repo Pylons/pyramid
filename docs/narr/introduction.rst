@@ -737,8 +737,8 @@ greater than 95% decision/condition coverage as measured by the
 Jenkins tool on Python 2.5, Python 2.6, Python 2.7, Jython and PyPy after
 each commit to its GitHub repository.  Official Pyramid add-ons are held to a
 similar testing standard.  We still find bugs in Pyramid and its official
-add-ons, but we've noticed we find a lot fewer of them than while working on
-other projects that don't have a good testing regime.
+add-ons, but we've noticed we find a lot more of them while working on other
+projects that don't have a good testing regime.
 
 Example: http://jenkins.pylonsproject.org/
 
