@@ -9,10 +9,12 @@ Bug Fixes
   https://github.com/Pylons/pyramid/issues/263
 
 - The static file serving machinery could not serve files that started with a
-  ``.`` (dot) character (hidden files).
+  ``.`` (dot) character.
 
-- The static file serving machinery inappropriately URL-quoted path segments
-  in filenames when asking for files from the filesystem.
+- Static files with high-order (extra-ASCII) characters in their names could
+  not be served by a static view.  The static file serving machinery
+  inappropriately URL-quoted path segments in filenames when asking for files
+  from the filesystem.
 
 Documentation
 -------------
