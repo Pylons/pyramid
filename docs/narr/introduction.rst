@@ -285,9 +285,9 @@ return from view callables in various frameworks.  In a previous section in
 this document we showed you that, if you use a :term:`renderer`, you can
 usually return a dictionary from a view callable instead of a full-on
 :term:`Response` object.  But some frameworks allow you return strings or
-tuples from view callables, and they make much of it.  When frameworks allow
-for this, code looks slightly prettier, because fewer imports need to be
-done, and there is less code.  For example, compare this:
+tuples from view callables.  When frameworks allow for this, code looks
+slightly prettier, because fewer imports need to be done, and there is less
+code.  For example, compare this:
 
 .. code-block:: python
    :linenos:
