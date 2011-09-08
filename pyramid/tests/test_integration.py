@@ -131,12 +131,17 @@ class TestStaticAppBase(IntegrationBase):
     def test_notfound(self):
         self.testapp.get('/static/wontbefound.html', status=404)
 
-    def test_oob_doubledot(self):
+    def test_oob_dotdotslash(self):
         self.testapp.get('/static/../../test_integration.py', status=404)
+
+    def test_oob_dotdotslash_encoded(self):
+        self.testapp.get('/static/%2E%2E%2F/test_integration.py', status=404)
+        # XXX pdb this
 
     def test_oob_slash(self):
         self.testapp.get('/%2F/test_integration.py', status=404)
         # XXX pdb this
+
 
 class TestStaticAppUsingAbsPath(TestStaticAppBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.static_abspath'
