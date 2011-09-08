@@ -46,9 +46,43 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         response = inst(context, request)
         self.assertTrue('<html>static</html>' in response.body)
 
-    def test_resource_out_of_bounds(self):
+    def test_oob_singledot(self):
+        inst = self._makeOne('pyramid.tests:fixtures/static')
+        request = self._makeRequest({'PATH_INFO':'/./index.html'})
+        context = DummyContext()
+        response = inst(context, request)
+        self.assertEqual(response.status, '200 OK')
+        self.assertTrue('<html>static</html>' in response.body)
+
+    def test_oob_emptyelement(self):
+        inst = self._makeOne('pyramid.tests:fixtures/static')
+        request = self._makeRequest({'PATH_INFO':'//index.html'})
+        context = DummyContext()
+        response = inst(context, request)
+        self.assertEqual(response.status, '200 OK')
+        self.assertTrue('<html>static</html>' in response.body)
+
+    def test_oob_dotdotslash(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':'/subdir/../../minimal.pt'})
+        context = DummyContext()
+        response = inst(context, request)
+        self.assertEqual(response.status, '404 Not Found')
+
+    def test_oob_dotdotslash_encoded(self):
+        inst = self._makeOne('pyramid.tests:fixtures/static')
+        request = self._makeRequest(
+            {'PATH_INFO':'/subdir/%2E%2E%2F%2E%2E/minimal.pt'})
+        context = DummyContext()
+        response = inst(context, request)
+        self.assertEqual(response.status, '404 Not Found')
+
+    def test_oob_os_sep(self):
+        import os
+        inst = self._makeOne('pyramid.tests:fixtures/static')
+        dds = '..' + os.sep
+        request = self._makeRequest({'PATH_INFO':'/subdir/%s%sminimal.pt' %
+                                     (dds, dds)})
         context = DummyContext()
         response = inst(context, request)
         self.assertEqual(response.status, '404 Not Found')
@@ -168,10 +202,44 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         response = inst(context, request)
         self.assertTrue('<html>static</html>' in response.body)
 
-    def test_resource_out_of_bounds(self):
+    def test_oob_singledot(self):
+        inst = self._makeOne('pyramid.tests:fixtures/static')
+        request = self._makeRequest()
+        request.subpath = ('.', 'index.html')
+        context = DummyContext()
+        response = inst(context, request)
+        self.assertEqual(response.status, '404 Not Found')
+
+    def test_oob_emptyelement(self):
+        inst = self._makeOne('pyramid.tests:fixtures/static')
+        request = self._makeRequest()
+        request.subpath = ('', 'index.html')
+        context = DummyContext()
+        response = inst(context, request)
+        self.assertEqual(response.status, '404 Not Found')
+
+    def test_oob_dotdotslash(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest()
         request.subpath = ('subdir', '..', '..', 'minimal.pt')
+        context = DummyContext()
+        response = inst(context, request)
+        self.assertEqual(response.status, '404 Not Found')
+
+    def test_oob_dotdotslash_encoded(self):
+        inst = self._makeOne('pyramid.tests:fixtures/static')
+        request = self._makeRequest()
+        request.subpath = ('subdir', '%2E%2E', '%2E%2E', 'minimal.pt')
+        context = DummyContext()
+        response = inst(context, request)
+        self.assertEqual(response.status, '404 Not Found')
+
+    def test_oob_os_sep(self):
+        import os
+        inst = self._makeOne('pyramid.tests:fixtures/static')
+        dds = '..' + os.sep
+        request = self._makeRequest()
+        request.subpath = ('subdir', dds, dds, 'minimal.pt')
         context = DummyContext()
         response = inst(context, request)
         self.assertEqual(response.status, '404 Not Found')

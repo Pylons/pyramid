@@ -1,3 +1,4 @@
+import os
 from os.path import normcase, normpath, join, getmtime, getsize, isdir, exists
 from pkg_resources import resource_exists, resource_filename, resource_isdir
 import mimetypes
@@ -132,9 +133,6 @@ class static_view(object):
         path = _secure_path(path_tuple)
 
         if path is None:
-            # belt-and-suspenders security; this should never be true
-            # unless someone screws up the traversal_path code
-            # (request.subpath is computed via traversal_path too)
             return HTTPNotFound('Out of bounds: %s' % request.url)
 
         if self.package_name: # package resource
@@ -168,13 +166,16 @@ class static_view(object):
             url = url + '?' + qs
         return HTTPMovedPermanently(url)
 
-has_insecure_pathelement = set(['..', '.', '/', '']).intersection
+has_insecure_pathelement = set(['..', '.', '']).intersection
+contains_slash = set(['/', os.sep]).intersection
 
 @lru_cache(1000)
 def _secure_path(path_tuple):
     if has_insecure_pathelement(path_tuple):
+        # belt-and-suspenders security; this should never be true
+        # unless someone screws up the traversal_path code
+        # (request.subpath is computed via traversal_path too)
         return None
-    for item in path_tuple:
-        if '../' in item:
-            return None
+    if any([contains_slash(item) for item in path_tuple]):
+        return None
     return '/'.join([x.encode('utf-8') for x in path_tuple])
