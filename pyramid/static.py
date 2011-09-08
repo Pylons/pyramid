@@ -167,21 +167,21 @@ class static_view(object):
             url = url + '?' + qs
         return HTTPMovedPermanently(url)
 
-has_insecure_pathelement = set(['..', '.', '']).intersection
-seps = set(['/', os.sep])
-def contains_slash(item):
-    for sep in seps:
+_has_insecure_pathelement = set(['..', '.', '']).intersection
+_seps = set(['/', os.sep])
+def _contains_slash(item):
+    for sep in _seps:
         if sep in item:
             return True
 
 @lru_cache(1000)
 def _secure_path(path_tuple):
-    if has_insecure_pathelement(path_tuple):
+    if _has_insecure_pathelement(path_tuple):
         # belt-and-suspenders security; this should never be true
         # unless someone screws up the traversal_path code
         # (request.subpath is computed via traversal_path too)
         return None
-    if any([contains_slash(item) for item in path_tuple]):
+    if any([_contains_slash(item) for item in path_tuple]):
         return None
     encoded = u'/'.join(path_tuple) # will be unicode
     return encoded
