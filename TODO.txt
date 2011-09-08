@@ -1,12 +1,6 @@
 Pyramid TODOs
 =============
 
-Should-Have
------------
-
-- Consider adding exclog to all scaffolds to print tracebacks to the console
-  while the debug toolbar is enabled.
-
 Nice-to-Have
 ------------
 

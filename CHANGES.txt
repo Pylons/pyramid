@@ -11,7 +11,7 @@ Bug Fixes
 - The static file serving machinery could not serve files that started with a
   ``.`` (dot) character.
 
-- Static files with high-order (extra-ASCII) characters in their names could
+- Static files with high-order (super-ASCII) characters in their names could
   not be served by a static view.  The static file serving machinery
   inappropriately URL-quoted path segments in filenames when asking for files
   from the filesystem.
