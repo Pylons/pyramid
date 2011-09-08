@@ -40,7 +40,7 @@ Simplicity
   understand to a minimum.
 
 Minimalism
-  :app:`Pyramid` tries to solve only the the fundamental problems of creating
+  :app:`Pyramid` tries to solve only the fundamental problems of creating
   a web application: the mapping of URLs to code, templating, security and
   serving static assets. We consider these to be the core activities that are
   common to nearly all web applications.
@@ -211,7 +211,7 @@ Examples: :ref:`debug_authorization_section` and :ref:`command_line_chapter`.
 Class-Based and Function-Based Views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Pyramid has a structured, unified conception of a :term:`view callable`.
+Pyramid has a structured, unified concept of a :term:`view callable`.
 View callables can be functions, methods of classes, or even instances.  When
 you add a new view callable, you can choose to make it a function or a method
 of a class; in either case, Pyramid treats it largely the same way.  You can
@@ -448,7 +448,7 @@ Pyramid has built-in HTTP sessioning.  This allows you to associate data with
 otherwise anonymous users between requests.  Lots of systems do this.  But
 Pyramid also allows you to plug in your own sessioning system by creating
 some code that adheres to a documented interface.  Currently there is a
-binding package for the third-part Beaker sessioning system that does exactly
+binding package for the third-party Beaker sessioning system that does exactly
 this.  But if you have a specialized need (perhaps you want to store your
 session data in MongoDB), you can.  You can even switch between
 implementations without changing your application code.
@@ -460,8 +460,8 @@ No singletons
 
 Pyramid is written in such a way that it requires your application to have
 exactly zero "singleton" data structures.  Or, put another way, Pyramid
-doesn't requires you to construct any "mutable globals".  Or put even a
-different way, an import of a Pyramid application needn't have any "import
+doesn't require you to construct any "mutable globals".  Or put even a
+different way, an import of a Pyramid application needn't have any "import-
 time side effects".  This is esoteric-sounding, but if you've ever tried to
 cope with parameterizing a Django "settings.py" file for multiple
 installations of the same application, or if you've ever needed to
@@ -501,7 +501,7 @@ itself.  For example, you might register an exception view for the
 pretty "well, this is embarrassing" page.  Or you might choose to register an
 exception view for only specific kinds of application-specific exceptions,
 such as an exception that happens when a file is not found, or an exception
-that happens when action cannot be performed because the user doesn't have
+that happens when an action cannot be performed because the user doesn't have
 permission to do something.  In the former case, you can show a pretty "Not
 Found" page; in the latter case you might show a login form.
 
@@ -539,10 +539,10 @@ your data anymore.  Instead, Pyramid takes care of committing: it commits at
 the end of a request or aborts if there's an exception.  Why is that a good
 thing?  Having a centralized place for transaction management is a great
 thing.  If, instead of managing your transactions in a centralized place, you
-sprikle ``session.commit`` calls in your application logic itself, you can
+sprinkle ``session.commit`` calls in your application logic itself, you can
 wind up in a bad place.  Wherever you manually commit data to your database,
 it's likely that some of your other code is going to run *after* your commit.
-If that code goes on to do other important things after that commit, and
+If that code goes on to do other important things after that commit, and an
 error happens in the later code, you can easily wind up with inconsistent
 data if you're not extremely careful.  Some data will have been written to
 the database that probably should not have.  Having a centralized commit
@@ -561,7 +561,7 @@ anywhere in application code).
 Configuration conflict detection
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When a system is small, it's reasonably easy to keep it in all in your head.
+When a system is small, it's reasonably easy to keep it all in your head.
 But when systems grow large, you may have hundreds or thousands of
 configuration statements which add a view, add a route, and so forth.
 Pyramid's configuration system keeps track of your configuration statements,
@@ -641,8 +641,7 @@ the Configurator object:
    config.add_route('xhr_route', '/xhr/{id}')
    config.add_protected_xhr_views('my.package')
 
-Your previously multiple repetitive configuration lines have now morphed into
-one line.
+Your previously repetitive configuration lines have now morphed into one line.
 
 You can share your configuration code with others this way too by packaging
 it up and calling :meth:`~pyramid.config.Configurator.add_directive` from
