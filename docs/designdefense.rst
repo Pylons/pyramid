@@ -1755,7 +1755,7 @@ If you can understand this hello world program, you can use Pyramid:
 Pyramid has ~ 650 pages of documentation (printed), covering topics from the
 very basic to the most advanced.  *Nothing* is left undocumented, quite
 literally.  It also has an *awesome*, very helpful community.  Visit the
-#pyramid and/or #pylons IRC channels on freenode.net and see.
+#pyramid IRC channels on freenode.net and see.
 
 Hate Zope
 +++++++++
