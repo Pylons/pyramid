@@ -168,7 +168,11 @@ class static_view(object):
         return HTTPMovedPermanently(url)
 
 has_insecure_pathelement = set(['..', '.', '']).intersection
-contains_slash = set(['/', os.sep]).intersection
+seps = set(['/', os.sep])
+def contains_slash(item):
+    for sep in seps:
+        if sep in item:
+            return True
 
 @lru_cache(1000)
 def _secure_path(path_tuple):
