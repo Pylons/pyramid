@@ -1,3 +1,21 @@
+1.2b2 (2011-09-08)
+==================
+
+Bug Fixes
+---------
+
+- The 1.2b1 tarball was a brownbag (particularly for Windows users) because
+  it contained filenames with stray quotation marks in inappropriate places.
+  We depend on ``setuptools-git`` to produce release tarballs, and when it
+  was run to produce the 1.2b1 tarball, it didn't yet cope well with files
+  present in git repositories with high-order characters in their filenames.
+
+Documentation
+-------------
+
+- Minor tweaks to the "Introduction" narrative chapter example app and
+  wording.
+
 1.2b1 (2011-09-08)
 ==================
 
