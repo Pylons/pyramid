@@ -40,7 +40,7 @@ Simplicity
   understand to a minimum.
 
 Minimalism
-  :app:`Pyramid` tries to solve only the the fundamental problems of creating
+  :app:`Pyramid` tries to solve only the fundamental problems of creating
   a web application: the mapping of URLs to code, templating, security and
   serving static assets. We consider these to be the core activities that are
   common to nearly all web applications.
