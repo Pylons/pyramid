@@ -206,8 +206,8 @@ To report bugs, use the `issue tracker
 
 If you've got questions that aren't answered by this documentation,
 contact the `Pylons-devel maillist
-<http://groups.google.com/group/pylons-devel>`_ or join the `#pylons
-IRC channel <irc://irc.freenode.net/#pylons>`_.
+<http://groups.google.com/group/pylons-devel>`_ or join the `#pyramid
+IRC channel <irc://irc.freenode.net/#pyramid>`_.
 
 Browse and check out tagged and trunk versions of :app:`Pyramid` via
 the `Pyramid GitHub repository <http://github.com/Pylons/pyramid/>`_.
