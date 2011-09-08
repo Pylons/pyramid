@@ -475,19 +475,17 @@ def traversal_path(path):
     path = path.strip('/')
     clean = []
     for segment in path.split('/'):
-        segment = urllib.unquote(segment) # deal with spaces in path segment
-        if not segment or segment=='.':
+        segment = urllib.unquote(segment)
+        try:
+            segment = segment.decode('utf-8')
+        except UnicodeDecodeError, e:
+            raise URLDecodeError(e.encoding, e.object, e.start, e.end, e.reason)
+        if not segment or segment == '.':
             continue
         elif segment == '..':
             if clean:
                 del clean[-1]
         else:
-            try:
-                segment = segment.decode('utf-8')
-            except UnicodeDecodeError, e:
-                raise URLDecodeError(
-                    e.encoding, e.object, e.start, e.end, e.reason
-                    )
             clean.append(segment)
     return tuple(clean)
 

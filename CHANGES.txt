@@ -16,6 +16,17 @@ Bug Fixes
   inappropriately URL-quoted path segments in filenames when asking for files
   from the filesystem.
 
+- Within ``pyramid.traversal.traversal_path`` , canonicalize URL segments
+  from UTF-8 to Unicode before checking whether a segment matches literally
+  one of ``.``, the empty string, or ``..`` in case there's some sneaky way
+  someone might tunnel those strings via UTF-8 that don't match the literals
+  before decoded.
+
+Features
+--------
+
+- Belt-and-suspenders security measure: canonicalize encoded URL
+
 Documentation
 -------------
 
