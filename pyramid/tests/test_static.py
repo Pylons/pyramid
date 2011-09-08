@@ -1,5 +1,4 @@
 import unittest
-import datetime
 
 class Test_static_view_use_subpath_False(unittest.TestCase):
     def _getTargetClass(self):
