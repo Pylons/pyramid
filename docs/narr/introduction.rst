@@ -377,7 +377,7 @@ Example: :ref:`events_chapter` and :ref:`event_types`.
 Built-in internationalization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Pyramid ships with internalization-related features in its core:
+Pyramid ships with internationalization-related features in its core:
 localization, pluralization, and creating message catalogs from source files
 and templates.  Pyramid allows for a plurality of message catalog via the use
 of translation domains: you can create a system that has its own translations
