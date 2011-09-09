@@ -1419,8 +1419,8 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.interfaces import IViewClassifier
         config = self._makeOne(autocommit=True)
         config.add_static_view('static', 'files', renderer=null_renderer)
-        request_type = self._getRouteRequestIface(config, 'static/')
-        self._assertRoute(config, 'static/', 'static/*subpath')
+        request_type = self._getRouteRequestIface(config, '__static/')
+        self._assertRoute(config, '__static/', 'static/*subpath')
         wrapped = config.registry.adapters.lookup(
             (IViewClassifier, request_type, Interface), IView, name='')
         from pyramid.request import Request
@@ -3294,8 +3294,8 @@ class TestStaticURLInfo(unittest.TestCase):
 
     def test_generate_registration_miss(self):
         inst = self._makeOne()
-        registrations = [('name', 'spec', False),
-                         ('http://example.com/foo/', 'package:path/',True)]
+        registrations = [(None, 'spec', 'route_name'),
+                         ('http://example.com/foo/', 'package:path/', None)]
         inst._get_registrations = lambda *x: registrations
         request = self._makeRequest()
         result = inst.generate('package:path/abc', request)
@@ -3303,7 +3303,7 @@ class TestStaticURLInfo(unittest.TestCase):
 
     def test_generate_slash_in_name1(self):
         inst = self._makeOne()
-        registrations = [('http://example.com/foo/', 'package:path/',True)]
+        registrations = [('http://example.com/foo/', 'package:path/', None)]
         inst._get_registrations = lambda *x: registrations
         request = self._makeRequest()
         result = inst.generate('package:path/abc', request)
@@ -3311,7 +3311,7 @@ class TestStaticURLInfo(unittest.TestCase):
 
     def test_generate_slash_in_name2(self):
         inst = self._makeOne()
-        registrations = [('http://example.com/foo/', 'package:path/',True)]
+        registrations = [('http://example.com/foo/', 'package:path/', None)]
         inst._get_registrations = lambda *x: registrations
         request = self._makeRequest()
         result = inst.generate('package:path/', request)
@@ -3319,10 +3319,10 @@ class TestStaticURLInfo(unittest.TestCase):
 
     def test_generate_route_url(self):
         inst = self._makeOne()
-        registrations = [('viewname/', 'package:path/', False)]
+        registrations = [(None, 'package:path/', '__viewname/')]
         inst._get_registrations = lambda *x: registrations
         def route_url(n, **kw):
-            self.assertEqual(n, 'viewname/')
+            self.assertEqual(n, '__viewname/')
             self.assertEqual(kw, {'subpath':'abc', 'a':1})
             return 'url'
         request = self._makeRequest()
@@ -3333,23 +3333,23 @@ class TestStaticURLInfo(unittest.TestCase):
     def test_add_already_exists(self):
         inst = self._makeOne()
         config = self._makeConfig(
-            [('http://example.com/', 'package:path/', True)])
+            [('http://example.com/', 'package:path/', None)])
         inst.add(config, 'http://example.com', 'anotherpackage:path')
-        expected = [('http://example.com/',  'anotherpackage:path/', True)]
+        expected = [('http://example.com/',  'anotherpackage:path/', None)]
         self._assertRegistrations(config, expected)
 
     def test_add_url_withendslash(self):
         inst = self._makeOne()
         config = self._makeConfig()
         inst.add(config, 'http://example.com/', 'anotherpackage:path')
-        expected = [('http://example.com/', 'anotherpackage:path/', True)]
+        expected = [('http://example.com/', 'anotherpackage:path/', None)]
         self._assertRegistrations(config, expected)
 
     def test_add_url_noendslash(self):
         inst = self._makeOne()
         config = self._makeConfig()
         inst.add(config, 'http://example.com', 'anotherpackage:path')
-        expected = [('http://example.com/', 'anotherpackage:path/', True)]
+        expected = [('http://example.com/', 'anotherpackage:path/', None)]
         self._assertRegistrations(config, expected)
 
     def test_add_viewname(self):
@@ -3358,11 +3358,20 @@ class TestStaticURLInfo(unittest.TestCase):
         config = self._makeConfig()
         inst = self._makeOne()
         inst.add(config, 'view', 'anotherpackage:path', cache_max_age=1)
-        expected = [('view/', 'anotherpackage:path/', False)]
+        expected = [(None, 'anotherpackage:path/', '__view/')]
         self._assertRegistrations(config, expected)
-        self.assertEqual(config.route_args, ('view/', 'view/*subpath'))
+        self.assertEqual(config.route_args, ('__view/', 'view/*subpath'))
         self.assertEqual(config.view_kw['permission'], NO_PERMISSION_REQUIRED)
         self.assertEqual(config.view_kw['view'].__class__, static_view)
+
+    def test_add_viewname_with_route_prefix(self):
+        config = self._makeConfig()
+        config.route_prefix = '/abc'
+        inst = self._makeOne()
+        inst.add(config, 'view', 'anotherpackage:path',)
+        expected = [(None, 'anotherpackage:path/', '__/abc/view/')]
+        self._assertRegistrations(config, expected)
+        self.assertEqual(config.route_args, ('__/abc/view/', 'view/*subpath'))
 
     def test_add_viewname_with_permission(self):
         config = self._makeConfig()
@@ -3475,6 +3484,7 @@ class DummySecurityPolicy:
         return self.permitted
 
 class DummyConfig:
+    route_prefix = ''
     def add_route(self, *args, **kw):
         self.route_args = args
         self.route_kw = kw
@@ -3482,6 +3492,9 @@ class DummyConfig:
     def add_view(self, *args, **kw):
         self.view_args = args
         self.view_kw = kw
+
+    def action(self, discriminator, callable):
+        callable()
 
 from zope.interface import implements
 from pyramid.interfaces import IMultiView

@@ -34,7 +34,6 @@ from pyramid.httpexceptions import HTTPForbidden
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.static import static_view
-from pyramid.url import route_url
 from pyramid.view import render_view_to_response
 
 from pyramid.config.util import DEFAULT_PHASH
@@ -1412,14 +1411,15 @@ class StaticURLInfo(object):
         return reg
 
     def generate(self, path, request, **kw):
-        for (name, spec, is_url) in self._get_registrations(request.registry):
+        registry = request.registry
+        for (url, spec, route_name) in self._get_registrations(registry):
             if path.startswith(spec):
                 subpath = path[len(spec):]
-                if is_url:
-                    return urljoin(name, subpath)
-                else:
+                if url is None:
                     kw['subpath'] = subpath
-                    return request.route_url(name, **kw)
+                    return request.route_url(route_name, **kw)
+                else:
+                    return urljoin(url, subpath)
 
         raise ValueError('No static URL definition matching %s' % path)
 
@@ -1442,19 +1442,14 @@ class StaticURLInfo(object):
             # make sure it ends with a slash
             name = name + '/'
 
-        registrations = self._get_registrations(config.registry)
-
-        names = [ t[0] for t in  registrations ]
-
-        if name in names:
-            idx = names.index(name)
-            registrations.pop(idx)
-
         if urlparse(name)[0]:
             # it's a URL
-            registrations.append((name, spec, True))
+            # url, spec, route_name
+            url = name
+            route_name = None
         else:
             # it's a view name
+            url = None
             cache_max_age = extra.pop('cache_max_age', None)
             # create a view
             view = static_view(spec, cache_max_age=cache_max_age,
@@ -1487,14 +1482,32 @@ class StaticURLInfo(object):
             # register a route using the computed view, permission, and 
             # pattern, plus any extras passed to us via add_static_view
             pattern = "%s*subpath" % name # name already ends with slash
-            config.add_route(name, pattern, **extra)
+            if config.route_prefix:
+                route_name = '__%s/%s' % (config.route_prefix, name)
+            else:
+                route_name = '__%s' % name
+            config.add_route(route_name, pattern, **extra)
             config.add_view(
-                route_name=name,
+                route_name=route_name,
                 view=view,
                 permission=permission,
                 context=context,
                 renderer=renderer,
                 attr=attr
                 )
-            registrations.append((name, spec, False))
+
+        def register():
+            registrations = self._get_registrations(config.registry)
+
+            names = [ t[0] for t in  registrations ]
+
+            if name in names:
+                idx = names.index(name)
+                registrations.pop(idx)
+
+            # url, spec, route_name
+            registrations.append((url, spec, route_name))
+
+        config.action(None, callable=register)
+
 

@@ -197,6 +197,25 @@ class TestStaticAppNoSubpath(unittest.TestCase):
         self.assertEqual(result.status, '200 OK')
         self._assertBody(result.body, os.path.join(here, 'fixtures/minimal.pt'))
 
+class TestStaticAppWithRoutePrefix(IntegrationBase, unittest.TestCase):
+    package = 'pyramid.tests.pkgs.static_routeprefix'
+    def _assertBody(self, body, filename):
+        self.assertEqual(
+            body.replace('\r', ''),
+            open(filename, 'r').read()
+            )
+
+    def test_includelevel1(self):
+        res = self.testapp.get('/static/minimal.pt', status=200)
+        self._assertBody(res.body,
+                         os.path.join(here, 'fixtures/minimal.pt'))
+
+    def test_includelevel2(self):
+        res = self.testapp.get('/prefix/static/index.html', status=200)
+        self._assertBody(res.body,
+                         os.path.join(here, 'fixtures/static/index.html'))
+
+
 class TestFixtureApp(IntegrationBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.fixtureapp'
     def test_another(self):
