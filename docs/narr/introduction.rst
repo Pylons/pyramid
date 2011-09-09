@@ -208,6 +208,17 @@ also WTF-crushers in some circumstances.
 
 Examples: :ref:`debug_authorization_section` and :ref:`command_line_chapter`.
 
+Add-ons
+~~~~~~~~
+
+Pyramid has an extensive set of add-ons held to the same quality standards as
+the Pyramid core itself.  Add-ons are packages which provide functionality
+that the Pyramid core doesn't.  Add-on packages already exist which let you
+easily send email, let you use the Jinja2 templating system, let you use
+XML-RPC or JSON-RPC, let you integrate with jQuery Mobile, etc.
+
+Examples: https://docs.pylonsproject.org/docs/pyramid.html#pyramid-add-on-documentation
+
 Class-Based and Function-Based Views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -222,7 +233,39 @@ initialization code as necessary.  All kinds of views are easy to understand
 and use and operate similarly.  There is no phony distinction between them;
 they can be used for the same purposes.
 
-Example: :ref:`view_config_placement`.
+Here's a view callable defined as a function:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.response import Response
+   from pyramid.view import view_config
+
+   @view_config(route_name='aview')
+   def aview(request):
+       return Response('one')
+
+Here's a few views defined as methods of a class instead:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.response import Response
+   from pyramid.view import view_config
+
+   class AView(object):
+       def __init__(self, request):
+           self.request = request
+
+       @view_config(route_name='view_one')
+       def view_one(request):
+           return Response('one')
+
+       @view_config(route_name='view_two')
+       def view_two(request):
+           return Response('two')
+
+See also :ref:`view_config_placement`.
 
 Rendered views can return dictionaries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -603,66 +646,20 @@ application that already has a bunch of routes, you can just use the
 within your application at a URL prefix.  It's not a big deal, and requires
 little up-front engineering effort.
 
-Does Pyramid's configurator allow you to do something, but you just want it a
-little less verbose?  Or you'd like to offer up some handy configuration
-feature to other Pyramid users without requiring that we change Pyramid?  You
-can extend Pyramid's :term:`Configurator` with your own directives.  For
-example, let's say you find yourself calling
-:meth:`pyramid.config.Configurator.add_view` repetitively.  Usually you can
-take the boring away by using existing shortcuts, but let's say that this is
-a case such a way that no existing shortcut works to take the boring away:
+For example:
 
 .. code-block:: python
    :linenos:
 
    from pyramid.config import Configurator
 
-   config = Configurator()
-   config.add_route('xhr_route', '/xhr/{id}')
-   config.add_view('my.package.GET_view', route_name='xhr_route',
-                   xhr=True,  permission='view', request_method='GET')
-   config.add_view('my.package.POST_view', route_name='xhr_route',
-                   xhr=True, permission='view', request_method='POST')
-   config.add_view('my.package.HEAD_view', route_name='xhr_route',
-                   xhr=True, permission='view', request_method='HEAD')
+   if __name__ == '__main__':
+      config = Configurator()
+      config.include('pyramid_jinja2')
+      config.include('pyramid_exclog')
+      config.include('some.other.guys.package', route_prefix='/someotherguy')
 
-Pretty tedious right?  You can add a directive to the Pyramid configurator to
-automate some of the tedium away:
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.config import Configurator
-
-   def add_protected_xhr_views(config, module):
-       module = config.maybe_dotted(module)
-       for method in ('GET', 'POST', 'HEAD'):
-           view = getattr(module, 'xhr_%s_view' % method, None)
-           if view is not None:
-               config.add_view(view, route_name='xhr_route', xhr=True, 
-                              permission='view', request_method=method)
-
-   config = Configurator()
-   config.add_directive('add_protected_xhr_views', add_protected_xhr_views)
-
-Once that's done, you can call the directive you've just added as a method of
-the Configurator object:
-
-.. code-block:: python
-   :linenos:
-
-   config.add_route('xhr_route', '/xhr/{id}')
-   config.add_protected_xhr_views('my.package')
-
-Your previously repetitive configuration lines have now morphed into one line.
-
-You can share your configuration code with others this way too by packaging
-it up and calling :meth:`~pyramid.config.Configurator.add_directive` from
-within a function called when another user uses the
-:meth:`~pyramid.config.Configurator.include` method against your code.
-
-Examples: :ref:`building_an_extensible_app`, :ref:`including_configuration`
-and :ref:`add_directive`.
+See also :ref:`including_configuration` and :ref:`building_an_extensible_app`
 
 Flexible authentication and authorization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -738,6 +735,69 @@ Pyramid itself, meaning you have access to templates and other renderers, a
 "real" request object, and other niceties.
 
 Example: :ref:`registering_tweens`.
+
+Automating repetitive configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Does Pyramid's configurator allow you to do something, but you're a little
+adventurous and just want it a little less verbose?  Or you'd like to offer
+up some handy configuration feature to other Pyramid users without requiring
+that we change Pyramid?  You can extend Pyramid's :term:`Configurator` with
+your own directives.  For example, let's say you find yourself calling
+:meth:`pyramid.config.Configurator.add_view` repetitively.  Usually you can
+take the boring away by using existing shortcuts, but let's say that this is
+a case such a way that no existing shortcut works to take the boring away:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+
+   config = Configurator()
+   config.add_route('xhr_route', '/xhr/{id}')
+   config.add_view('my.package.GET_view', route_name='xhr_route',
+                   xhr=True,  permission='view', request_method='GET')
+   config.add_view('my.package.POST_view', route_name='xhr_route',
+                   xhr=True, permission='view', request_method='POST')
+   config.add_view('my.package.HEAD_view', route_name='xhr_route',
+                   xhr=True, permission='view', request_method='HEAD')
+
+Pretty tedious right?  You can add a directive to the Pyramid configurator to
+automate some of the tedium away:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+
+   def add_protected_xhr_views(config, module):
+       module = config.maybe_dotted(module)
+       for method in ('GET', 'POST', 'HEAD'):
+           view = getattr(module, 'xhr_%s_view' % method, None)
+           if view is not None:
+               config.add_view(view, route_name='xhr_route', xhr=True, 
+                              permission='view', request_method=method)
+
+   config = Configurator()
+   config.add_directive('add_protected_xhr_views', add_protected_xhr_views)
+
+Once that's done, you can call the directive you've just added as a method of
+the Configurator object:
+
+.. code-block:: python
+   :linenos:
+
+   config.add_route('xhr_route', '/xhr/{id}')
+   config.add_protected_xhr_views('my.package')
+
+Your previously repetitive configuration lines have now morphed into one line.
+
+You can share your configuration code with others this way too by packaging
+it up and calling :meth:`~pyramid.config.Configurator.add_directive` from
+within a function called when another user uses the
+:meth:`~pyramid.config.Configurator.include` method against your code.
+
+See also :ref:`add_directive`.
 
 Testing
 ~~~~~~~
