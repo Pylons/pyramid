@@ -534,7 +534,7 @@ Configuration extensibility
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Unlike other systems, Pyramid provides a structured "include" mechanism (see
-:meth:`~pyramid.config.Configurator.include`) that allows you compose
+:meth:`~pyramid.config.Configurator.include`) that allows you to compose
 applications from multiple Python packages.  All the configuration statements
 that can be performed in your "main" Pyramid application can also be
 performed by included packages including the addition of views, routes,
