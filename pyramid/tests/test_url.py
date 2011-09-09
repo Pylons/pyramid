@@ -385,9 +385,9 @@ class TestURLMethodsMixin(unittest.TestCase):
         import os
         from pyramid.interfaces import IStaticURLInfo
         from pyramid.config.views import StaticURLInfo
-        info = StaticURLInfo(self.config)
+        info = StaticURLInfo()
         here = os.path.abspath(os.path.dirname(__file__))
-        info.add('absstatic', here)
+        info.add(self.config, 'absstatic', here)
         request = self._makeOne()
         registry = request.registry
         registry.registerUtility(info, IStaticURLInfo)

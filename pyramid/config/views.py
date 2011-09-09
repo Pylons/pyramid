@@ -1386,11 +1386,10 @@ class ViewsConfiguratorMixin(object):
         spec = self._make_spec(path)
         info = self.registry.queryUtility(IStaticURLInfo)
         if info is None:
-            info = StaticURLInfo(self)
+            info = StaticURLInfo()
             self.registry.registerUtility(info, IStaticURLInfo)
 
-        info.add(name, spec, **kw)
-
+        info.add(self, name, spec, **kw)
 
 def isexception(o):
     if IInterface.providedBy(o):
@@ -1405,25 +1404,26 @@ def isexception(o):
 class StaticURLInfo(object):
     implements(IStaticURLInfo)
 
-    route_url = staticmethod(route_url) # for testing only
-
-    def __init__(self, config):
-        self.config = config
-        self.registrations = []
+    def _get_registrations(self, registry):
+        try:
+            reg = registry._static_url_registrations
+        except AttributeError:
+            reg = registry._static_url_registrations = []
+        return reg
 
     def generate(self, path, request, **kw):
-        for (name, spec, is_url) in self.registrations:
+        for (name, spec, is_url) in self._get_registrations(request.registry):
             if path.startswith(spec):
                 subpath = path[len(spec):]
                 if is_url:
                     return urljoin(name, subpath)
                 else:
                     kw['subpath'] = subpath
-                    return self.route_url(name, request, **kw)
+                    return request.route_url(name, **kw)
 
         raise ValueError('No static URL definition matching %s' % path)
 
-    def add(self, name, spec, **extra):
+    def add(self, config, name, spec, **extra):
         # This feature only allows for the serving of a directory and
         # the files contained within, not of a single asset;
         # appending a slash here if the spec doesn't have one is
@@ -1442,15 +1442,17 @@ class StaticURLInfo(object):
             # make sure it ends with a slash
             name = name + '/'
 
-        names = [ t[0] for t in self.registrations ]
+        registrations = self._get_registrations(config.registry)
+
+        names = [ t[0] for t in  registrations ]
 
         if name in names:
             idx = names.index(name)
-            self.registrations.pop(idx)
+            registrations.pop(idx)
 
         if urlparse(name)[0]:
             # it's a URL
-            self.registrations.append((name, spec, True))
+            registrations.append((name, spec, True))
         else:
             # it's a view name
             cache_max_age = extra.pop('cache_max_age', None)
@@ -1485,9 +1487,14 @@ class StaticURLInfo(object):
             # register a route using the computed view, permission, and 
             # pattern, plus any extras passed to us via add_static_view
             pattern = "%s*subpath" % name # name already ends with slash
-            self.config.add_route(name, pattern, **extra)
-            self.config.add_view(route_name=name, view=view,
-                                 permission=permission, context=context,
-                                 renderer=renderer, attr=attr)
-            self.registrations.append((name, spec, False))
+            config.add_route(name, pattern, **extra)
+            config.add_view(
+                route_name=name,
+                view=view,
+                permission=permission,
+                context=context,
+                renderer=renderer,
+                attr=attr
+                )
+            registrations.append((name, spec, False))
 

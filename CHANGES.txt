@@ -1,3 +1,12 @@
+Next release
+============
+
+Bug Fixes
+---------
+
+- The route prefix was not taken into account when a static view was added in
+  an "include".  See https://github.com/Pylons/pyramid/issues/266 .
+
 1.2b2 (2011-09-08)
 ==================
 

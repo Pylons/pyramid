@@ -507,7 +507,7 @@ class IRouteRequest(Interface):
 
 class IStaticURLInfo(Interface):
     """ A policy for generating URLs to static assets """
-    def add(name, spec, **extra):
+    def add(config, name, spec, **extra):
         """ Add a new static info registration """
 
     def generate(path, request, **kw):

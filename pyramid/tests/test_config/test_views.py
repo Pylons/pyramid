@@ -1438,7 +1438,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
                                'pyramid.tests.test_config:files')
         self.assertEqual(
             info.added,
-            [('static', 'pyramid.tests.test_config:files', {})])
+            [(config, 'static', 'pyramid.tests.test_config:files', {})])
 
     def test_add_static_view_package_here_relative(self):
         from pyramid.interfaces import IStaticURLInfo
@@ -1448,7 +1448,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config.add_static_view('static', 'files')
         self.assertEqual(
             info.added,
-            [('static', 'pyramid.tests.test_config:files', {})])
+            [(config, 'static', 'pyramid.tests.test_config:files', {})])
 
     def test_add_static_view_absolute(self):
         import os
@@ -1460,7 +1460,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         static_path = os.path.join(here, 'files')
         config.add_static_view('static', static_path)
         self.assertEqual(info.added,
-                         [('static', static_path, {})])
+                         [(config, 'static', static_path, {})])
     
     def test_set_forbidden_view(self):
         from pyramid.renderers import null_renderer
@@ -3258,8 +3258,24 @@ class TestStaticURLInfo(unittest.TestCase):
         from pyramid.config.views import StaticURLInfo
         return StaticURLInfo
     
-    def _makeOne(self, config):
-        return self._getTargetClass()(config)
+    def _makeOne(self):
+        return self._getTargetClass()()
+
+    def _makeConfig(self, registrations=None):
+        config = DummyConfig()
+        registry = DummyRegistry()
+        if registrations is not None:
+            registry._static_url_registrations = registrations
+        config.registry = registry
+        return config
+
+    def _makeRequest(self):
+        request = DummyRequest()
+        request.registry = DummyRegistry()
+        return request
+
+    def _assertRegistrations(self, config, expected):
+        self.assertEqual(config.registry._static_url_registrations, expected)
 
     def test_verifyClass(self):
         from pyramid.interfaces import IStaticURLInfo
@@ -3269,142 +3285,145 @@ class TestStaticURLInfo(unittest.TestCase):
     def test_verifyObject(self):
         from pyramid.interfaces import IStaticURLInfo
         from zope.interface.verify import verifyObject
-        verifyObject(IStaticURLInfo, self._makeOne(None))
-
-    def test_ctor(self):
-        info = self._makeOne(None)
-        self.assertEqual(info.registrations, [])
-        self.assertEqual(info.config, None)
+        verifyObject(IStaticURLInfo, self._makeOne())
 
     def test_generate_missing(self):
-        inst = self._makeOne(None)
-        request = DummyRequest()
+        inst = self._makeOne()
+        request = self._makeRequest()
         self.assertRaises(ValueError, inst.generate, 'path', request)
 
     def test_generate_registration_miss(self):
-        inst = self._makeOne(None)
-        inst.registrations = [('name', 'spec', False),
-                              ('http://example.com/foo/', 'package:path/',True)]
-        request = DummyRequest()
+        inst = self._makeOne()
+        registrations = [('name', 'spec', False),
+                         ('http://example.com/foo/', 'package:path/',True)]
+        inst._get_registrations = lambda *x: registrations
+        request = self._makeRequest()
         result = inst.generate('package:path/abc', request)
         self.assertEqual(result, 'http://example.com/foo/abc')
 
     def test_generate_slash_in_name1(self):
-        inst = self._makeOne(None)
-        inst.registrations = [('http://example.com/foo/', 'package:path/',True)]
-        request = DummyRequest()
+        inst = self._makeOne()
+        registrations = [('http://example.com/foo/', 'package:path/',True)]
+        inst._get_registrations = lambda *x: registrations
+        request = self._makeRequest()
         result = inst.generate('package:path/abc', request)
         self.assertEqual(result, 'http://example.com/foo/abc')
 
     def test_generate_slash_in_name2(self):
-        inst = self._makeOne(None)
-        inst.registrations = [('http://example.com/foo/', 'package:path/',True)]
-        request = DummyRequest()
+        inst = self._makeOne()
+        registrations = [('http://example.com/foo/', 'package:path/',True)]
+        inst._get_registrations = lambda *x: registrations
+        request = self._makeRequest()
         result = inst.generate('package:path/', request)
         self.assertEqual(result, 'http://example.com/foo/')
 
     def test_generate_route_url(self):
-        inst = self._makeOne(None)
-        inst.registrations = [('viewname/', 'package:path/', False)]
-        def route_url(n, r, **kw):
+        inst = self._makeOne()
+        registrations = [('viewname/', 'package:path/', False)]
+        inst._get_registrations = lambda *x: registrations
+        def route_url(n, **kw):
             self.assertEqual(n, 'viewname/')
-            self.assertEqual(r, request)
             self.assertEqual(kw, {'subpath':'abc', 'a':1})
             return 'url'
-        request = DummyRequest()
-        inst.route_url = route_url
+        request = self._makeRequest()
+        request.route_url = route_url
         result = inst.generate('package:path/abc', request, a=1)
         self.assertEqual(result, 'url')
 
     def test_add_already_exists(self):
-        inst = self._makeOne(None)
-        inst.registrations = [('http://example.com/', 'package:path/', True)]
-        inst.add('http://example.com', 'anotherpackage:path')
+        inst = self._makeOne()
+        config = self._makeConfig(
+            [('http://example.com/', 'package:path/', True)])
+        inst.add(config, 'http://example.com', 'anotherpackage:path')
         expected = [('http://example.com/',  'anotherpackage:path/', True)]
-        self.assertEqual(inst.registrations, expected)
+        self._assertRegistrations(config, expected)
 
     def test_add_url_withendslash(self):
-        inst = self._makeOne(None)
-        inst.add('http://example.com/', 'anotherpackage:path')
+        inst = self._makeOne()
+        config = self._makeConfig()
+        inst.add(config, 'http://example.com/', 'anotherpackage:path')
         expected = [('http://example.com/', 'anotherpackage:path/', True)]
-        self.assertEqual(inst.registrations, expected)
+        self._assertRegistrations(config, expected)
 
     def test_add_url_noendslash(self):
-        inst = self._makeOne(None)
-        inst.add('http://example.com', 'anotherpackage:path')
+        inst = self._makeOne()
+        config = self._makeConfig()
+        inst.add(config, 'http://example.com', 'anotherpackage:path')
         expected = [('http://example.com/', 'anotherpackage:path/', True)]
-        self.assertEqual(inst.registrations, expected)
+        self._assertRegistrations(config, expected)
 
     def test_add_viewname(self):
         from pyramid.security import NO_PERMISSION_REQUIRED
         from pyramid.static import static_view
-        config = DummyConfig()
-        inst = self._makeOne(config)
-        inst.add('view', 'anotherpackage:path', cache_max_age=1)
+        config = self._makeConfig()
+        inst = self._makeOne()
+        inst.add(config, 'view', 'anotherpackage:path', cache_max_age=1)
         expected = [('view/', 'anotherpackage:path/', False)]
-        self.assertEqual(inst.registrations, expected)
+        self._assertRegistrations(config, expected)
         self.assertEqual(config.route_args, ('view/', 'view/*subpath'))
         self.assertEqual(config.view_kw['permission'], NO_PERMISSION_REQUIRED)
         self.assertEqual(config.view_kw['view'].__class__, static_view)
 
     def test_add_viewname_with_permission(self):
-        config = DummyConfig()
-        inst = self._makeOne(config)
-        inst.add('view', 'anotherpackage:path', cache_max_age=1,
+        config = self._makeConfig()
+        inst = self._makeOne()
+        inst.add(config, 'view', 'anotherpackage:path', cache_max_age=1,
                  permission='abc')
         self.assertEqual(config.view_kw['permission'], 'abc')
 
     def test_add_viewname_with_view_permission(self):
-        config = DummyConfig()
-        inst = self._makeOne(config)
-        inst.add('view', 'anotherpackage:path', cache_max_age=1,
+        config = self._makeConfig()
+        inst = self._makeOne()
+        inst.add(config, 'view', 'anotherpackage:path', cache_max_age=1,
                  view_permission='abc')
         self.assertEqual(config.view_kw['permission'], 'abc')
 
     def test_add_viewname_with_view_context(self):
-        config = DummyConfig()
-        inst = self._makeOne(config)
-        inst.add('view', 'anotherpackage:path', cache_max_age=1,
+        config = self._makeConfig()
+        inst = self._makeOne()
+        inst.add(config, 'view', 'anotherpackage:path', cache_max_age=1,
                  view_context=DummyContext)
         self.assertEqual(config.view_kw['context'], DummyContext)
 
     def test_add_viewname_with_view_for(self):
-        config = DummyConfig()
-        inst = self._makeOne(config)
-        inst.add('view', 'anotherpackage:path', cache_max_age=1,
+        config = self._makeConfig()
+        inst = self._makeOne()
+        inst.add(config, 'view', 'anotherpackage:path', cache_max_age=1,
                  view_for=DummyContext)
         self.assertEqual(config.view_kw['context'], DummyContext)
 
     def test_add_viewname_with_for_(self):
-        config = DummyConfig()
-        inst = self._makeOne(config)
-        inst.add('view', 'anotherpackage:path', cache_max_age=1,
+        config = self._makeConfig()
+        inst = self._makeOne()
+        inst.add(config, 'view', 'anotherpackage:path', cache_max_age=1,
                  for_=DummyContext)
         self.assertEqual(config.view_kw['context'], DummyContext)
 
     def test_add_viewname_with_view_renderer(self):
-        config = DummyConfig()
-        inst = self._makeOne(config)
-        inst.add('view', 'anotherpackage:path', cache_max_age=1,
+        config = self._makeConfig()
+        inst = self._makeOne()
+        inst.add(config, 'view', 'anotherpackage:path', cache_max_age=1,
                  view_renderer='mypackage:templates/index.pt')
         self.assertEqual(config.view_kw['renderer'],
                          'mypackage:templates/index.pt')
 
     def test_add_viewname_with_renderer(self):
-        config = DummyConfig()
-        inst = self._makeOne(config)
-        inst.add('view', 'anotherpackage:path', cache_max_age=1,
+        config = self._makeConfig()
+        inst = self._makeOne()
+        inst.add(config, 'view', 'anotherpackage:path', cache_max_age=1,
                  renderer='mypackage:templates/index.pt')
         self.assertEqual(config.view_kw['renderer'],
                          'mypackage:templates/index.pt')
 
     def test_add_viewname_with_view_attr(self):
-        config = DummyConfig()
-        inst = self._makeOne(config)
-        inst.add('view', 'anotherpackage:path', cache_max_age=1,
+        config = self._makeConfig()
+        inst = self._makeOne()
+        inst.add(config, 'view', 'anotherpackage:path', cache_max_age=1,
                  view_attr='attr')
         self.assertEqual(config.view_kw['attr'], 'attr')
 
+class DummyRegistry:
+    pass
 
 class DummyRequest:
     subpath = ()
@@ -3495,5 +3514,5 @@ class DummyStaticURLInfo:
     def __init__(self):
         self.added = []
 
-    def add(self, name, spec, **kw):
-        self.added.append((name, spec, kw))
+    def add(self, config, name, spec, **kw):
+        self.added.append((config, name, spec, kw))
