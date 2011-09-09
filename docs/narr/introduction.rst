@@ -503,7 +503,7 @@ data if you're not extremely careful.  Some data will have been written to
 the database that probably should not have.  Having a centralized commit
 point saves you from needing to think about this; it's great for lazy people
 who also care about data integrity.  Either the request completes
-successfully, and all chages are committed, or it does not, and all changes
+successfully, and all changes are committed, or it does not, and all changes
 are aborted.
 
 Also, Pyramid's transaction management system allows you to synchronize
