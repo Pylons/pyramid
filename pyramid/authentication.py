@@ -11,7 +11,6 @@ from zope.interface import implements
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.interfaces import IDebugLogger
 
-from pyramid.request import add_global_response_headers
 from pyramid.security import Authenticated
 from pyramid.security import Everyone
 
