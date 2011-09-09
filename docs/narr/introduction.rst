@@ -715,7 +715,7 @@ Once this is done, both of these view callables will work:
        return (403, 'text/plain', "Forbidden")
 
 Pyramid defaults to explicit behavior, because it's the most generally
-useful, but provide hooks that allow you to adapt the framework to localized
+useful, but provides hooks that allow you to adapt the framework to localized
 aesthetic desires.
 
 See also :ref:`using_iresponse`.
