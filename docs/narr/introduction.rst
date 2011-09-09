@@ -456,9 +456,9 @@ No singletons
 Pyramid is written in such a way that it requires your application to have
 exactly zero "singleton" data structures.  Or, put another way, Pyramid
 doesn't require you to construct any "mutable globals".  Or put even a
-different way, an import of a Pyramid application needn't have any "import-
-time side effects".  This is esoteric-sounding, but if you've ever tried to
-cope with parameterizing a Django "settings.py" file for multiple
+different way, an import of a Pyramid application needn't have any
+"import-time side effects".  This is esoteric-sounding, but if you've ever
+tried to cope with parameterizing a Django "settings.py" file for multiple
 installations of the same application, or if you've ever needed to
 monkey-patch some framework fixture so that it behaves properly for your use
 case, or if you've ever wanted to deploy your system using an asynchronous
