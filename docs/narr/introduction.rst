@@ -608,7 +608,7 @@ little less verbose?  Or you'd like to offer up some handy configuration
 feature to other Pyramid users without requiring that we change Pyramid?  You
 can extend Pyramid's :term:`Configurator` with your own directives.  For
 example, let's say you find yourself calling
-:meth:`pyramid.config.Configurator.add_view` repetitvely.  Usually you can
+:meth:`pyramid.config.Configurator.add_view` repetitively.  Usually you can
 take the boring away by using existing shortcuts, but let's say that this is
 a case such a way that no existing shortcut works to take the boring away:
 
