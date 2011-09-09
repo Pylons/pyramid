@@ -377,7 +377,7 @@ Example: :ref:`events_chapter` and :ref:`event_types`.
 Built-in internationalization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Pyramid ships with internalization-related features in its core:
+Pyramid ships with internationalization-related features in its core:
 localization, pluralization, and creating message catalogs from source files
 and templates.  Pyramid allows for a plurality of message catalog via the use
 of translation domains: you can create a system that has its own translations
@@ -456,9 +456,9 @@ No singletons
 Pyramid is written in such a way that it requires your application to have
 exactly zero "singleton" data structures.  Or, put another way, Pyramid
 doesn't require you to construct any "mutable globals".  Or put even a
-different way, an import of a Pyramid application needn't have any "import-
-time side effects".  This is esoteric-sounding, but if you've ever tried to
-cope with parameterizing a Django "settings.py" file for multiple
+different way, an import of a Pyramid application needn't have any
+"import-time side effects".  This is esoteric-sounding, but if you've ever
+tried to cope with parameterizing a Django "settings.py" file for multiple
 installations of the same application, or if you've ever needed to
 monkey-patch some framework fixture so that it behaves properly for your use
 case, or if you've ever wanted to deploy your system using an asynchronous
@@ -503,7 +503,7 @@ data if you're not extremely careful.  Some data will have been written to
 the database that probably should not have.  Having a centralized commit
 point saves you from needing to think about this; it's great for lazy people
 who also care about data integrity.  Either the request completes
-successfully, and all chages are committed, or it does not, and all changes
+successfully, and all changes are committed, or it does not, and all changes
 are aborted.
 
 Also, Pyramid's transaction management system allows you to synchronize
@@ -534,7 +534,7 @@ Configuration extensibility
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Unlike other systems, Pyramid provides a structured "include" mechanism (see
-:meth:`~pyramid.config.Configurator.include`) that allows you compose
+:meth:`~pyramid.config.Configurator.include`) that allows you to compose
 applications from multiple Python packages.  All the configuration statements
 that can be performed in your "main" Pyramid application can also be
 performed by included packages including the addition of views, routes,
@@ -592,8 +592,8 @@ to be arbitrarily extensible: it's a lot easier to add a node to a tree than
 it is to shoehorn a route into an ordered list of other routes, or to create
 another entire instance of an application to service a department and glue
 code to allow disparate apps to share data.  It's a great fit for sites that
-naturally lend themselves to changing departmental hierarchies, such as CMS
-systems and document management systems.  Traversal also lends itself well to
+naturally lend themselves to changing departmental hierarchies, such as
+content management systems and document management systems.  Traversal also lends itself well to
 systems that require very granular security ("Bob can edit *this* document"
 as opposed to "Bob can edit documents").
 
@@ -618,7 +618,7 @@ A lot is made of the aesthetics of what *kinds* of objects you're allowed to
 return from view callables in various frameworks.  In a previous section in
 this document we showed you that, if you use a :term:`renderer`, you can
 usually return a dictionary from a view callable instead of a full-on
-:term:`Response` object.  But some frameworks allow you return strings or
+:term:`Response` object.  But some frameworks allow you to return strings or
 tuples from view callables.  When frameworks allow for this, code looks
 slightly prettier, because fewer imports need to be done, and there is less
 code.  For example, compare this:
@@ -715,7 +715,7 @@ Once this is done, both of these view callables will work:
        return (403, 'text/plain', "Forbidden")
 
 Pyramid defaults to explicit behavior, because it's the most generally
-useful, but provide hooks that allow you to adapt the framework to localized
+useful, but provides hooks that allow you to adapt the framework to localized
 aesthetic desires.
 
 See also :ref:`using_iresponse`.
