@@ -7,27 +7,18 @@ from pyramid.interfaces import PHASE1_CONFIG
 from pyramid.config.util import action_method
 
 from pyramid import renderers
+from pyramid import chameleon_text
+from pyramid import chameleon_zpt
 from pyramid.mako_templating import renderer_factory as mako_renderer_factory
 
 DEFAULT_RENDERERS = (
+    ('.txt', chameleon_text.renderer_factory),
+    ('.pt', chameleon_zpt.renderer_factory),
     ('.mak', mako_renderer_factory),
     ('.mako', mako_renderer_factory),
     ('json', renderers.json_renderer_factory),
     ('string', renderers.string_renderer_factory),
     )
-
-try:
-    from pyramid import chameleon_text
-    DEFAULT_RENDERERS += (('.txt', chameleon_text.renderer_factory),)
-except TypeError:  # pragma: no cover
-    pass # pypy
-
-try: 
-    from pyramid import chameleon_zpt
-    DEFAULT_RENDERERS += (('.pt', chameleon_zpt.renderer_factory),)
-except TypeError: # pragma: no cover
-    pass #pypy
-
 
 class RenderingConfiguratorMixin(object):
     @action_method
