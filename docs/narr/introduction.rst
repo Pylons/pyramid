@@ -258,6 +258,14 @@ You can do this:
     def myview(request):
         return {'a':1}
 
+When this view callable is called by Pyramid, the ``{'a':1}`` dictionary will
+be rendered to a response on your behalf.  The string passed as ``renderer=``
+above is an :term:`asset specification`.  It is in the form
+``packagename:directoryname/filename.ext``.  In this case, it names the
+``mytemplate.pt`` file in the ``templates`` directory within the ``myapp``
+Python package.  Asset specifications are omnipresent in Pyramid: see
+:ref:`intro_asset_specs` for more information.
+
 Example: :ref:`renderers_chapter`.
 
 Extensible templating
@@ -507,6 +515,8 @@ Found" page; in the latter case you might show a login form.
 
 Example: :ref:`exception_views`.
 
+.. _intro_asset_specs:
+
 Asset specifications
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -597,7 +607,10 @@ Does Pyramid's configurator allow you to do something, but you just want it a
 little less verbose?  Or you'd like to offer up some handy configuration
 feature to other Pyramid users without requiring that we change Pyramid?  You
 can extend Pyramid's :term:`Configurator` with your own directives.  For
-example, let's say you find yourself doing this a lot:
+example, let's say you find yourself calling
+:meth:`pyramid.config.Configurator.add_view` repetitvely.  Usually you can
+take the boring away by using existing shortcuts, but let's say that this is
+a case such a way that no existing shortcut works to take the boring away:
 
 .. code-block:: python
    :linenos:
