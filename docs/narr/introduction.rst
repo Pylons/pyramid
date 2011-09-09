@@ -618,7 +618,7 @@ A lot is made of the aesthetics of what *kinds* of objects you're allowed to
 return from view callables in various frameworks.  In a previous section in
 this document we showed you that, if you use a :term:`renderer`, you can
 usually return a dictionary from a view callable instead of a full-on
-:term:`Response` object.  But some frameworks allow you return strings or
+:term:`Response` object.  But some frameworks allow you to return strings or
 tuples from view callables.  When frameworks allow for this, code looks
 slightly prettier, because fewer imports need to be done, and there is less
 code.  For example, compare this:
