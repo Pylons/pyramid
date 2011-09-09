@@ -108,22 +108,24 @@ from those other frameworks.  But Pyramid is the only one that has all of
 them in one place, documented appropriately, and useful a la carte without
 necessarily paying for the entire banquet.  These are detailed below.
 
-Single-File Applications
+Single-file applications
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can write a Pyramid application that lives entirely in one Python file,
-not unlike existing Python microframeworks.  This is beneficial for "one off"
+not unlike existing Python microframeworks.  This is beneficial for one-off
 prototyping, bug reproduction, and very small applications.  These
 applications are easy to understand because all the information about the
 application lives in a single place, and you can deploy them without needing
 to understand much about Python distributions and packaging.  Pyramid isn't
 really marketed as a microframework, but it allows you to do almost
-everything that frameworks that are marketed as "micro" offer in very similar
+everything that frameworks that are marketed as micro offer in very similar
 ways.
 
-Example: :ref:`firstapp_chapter`.
+.. literalinclude:: helloworld.py
 
-Decorator-Based Configuration
+See also :ref:`firstapp_chapter`.
+
+Decorator-based configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you like the idea of framework configuration statements living next to the
@@ -153,7 +155,7 @@ with a :term:`scan`.
 
 Example: :ref:`mapping_views_using_a_decorator_section`.
 
-URL Generation
+URL generation
 ~~~~~~~~~~~~~~
 
 Pyramid is capable of generating URLs for resources, routes, and static
@@ -219,7 +221,7 @@ XML-RPC or JSON-RPC, let you integrate with jQuery Mobile, etc.
 
 Examples: https://docs.pylonsproject.org/docs/pyramid.html#pyramid-add-on-documentation
 
-Class-Based and Function-Based Views
+Class-based and function-based views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Pyramid has a structured, unified concept of a :term:`view callable`.
@@ -328,7 +330,7 @@ can use multiple templating systems, even in the same project.
 
 Example: :ref:`templates_used_directly`.
 
-View Response Adapters
+View response adapters
 ~~~~~~~~~~~~~~~~~~~~~~
 
 A lot is made of the aesthetics of what *kinds* of objects you're allowed to
@@ -437,7 +439,7 @@ aesthetic desires.
 
 See also :ref:`using_iresponse`.
 
-"Global" Response Object
+"Global" response object
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 "Constructing these response objects in my view callables is such a chore!
@@ -523,7 +525,7 @@ You can even run multiple copies of a similar but not identically configured
 Pyramid application within the same Python process.  This is good for shared
 hosting environments, where RAM is at a premium.
 
-View Predicates and Many Views Per Route
+View predicates and many views per route
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Unlike many other systems, Pyramid allows you to associate more than one view
@@ -677,7 +679,7 @@ system.
 
 Example: :ref:`enabling_authorization_policy`.
 
-Built-in Internationalization
+Built-in internationalization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Pyramid ships with internalization-related features in its core:
@@ -708,7 +710,7 @@ as opposed to "Bob can edit documents").
 
 Example: :ref:`much_ado_about_traversal_chapter`.
 
-HTTP Caching
+HTTP caching
 ~~~~~~~~~~~~
 
 Pyramid provides an easy way to associate views with HTTP caching policies.
