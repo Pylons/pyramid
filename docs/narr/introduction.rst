@@ -269,6 +269,47 @@ Here's a few views defined as methods of a class instead:
 
 See also :ref:`view_config_placement`.
 
+.. _intro_asset_specs:
+
+Asset specifications
+~~~~~~~~~~~~~~~~~~~~
+
+Asset specifications are strings that contain both a Python package name and
+a file or directory name, e.g. ``MyPackage:static/index.html``.  Use of these
+specifications is omnipresent in Pyramid.  An asset specification can refer
+to a template, a translation directory, or any other package-bound static
+resource.  This makes a system built on Pyramid extensible, because you don't
+have to rely on globals ("*the* static directory") or lookup schemes ("*the*
+ordered set of template directories") to address your files.  You can move
+files around as necessary, and include other packages that may not share your
+system's templates or static files without encountering conflicts.
+
+Because asset specifications are used heavily in Pyramid, we've also provided
+a way to allow users to override assets.  Say you love a system that someone
+else has created with Pyramid but you just need to change "that one template"
+to make it all better.  No need to fork the application.  Just override the
+asset specification for that template with your own inside a wrapper, and
+you're good to go.
+
+Examples: :ref:`asset_specifications` and :ref:`overriding_assets_section`.
+
+Extensible templating
+~~~~~~~~~~~~~~~~~~~~~
+
+Pyramid has a structured API that allows for pluggability of "renderers".
+Templating systems such as Mako, Genshi, Chameleon, and Jinja2 can be treated
+as renderers.  Renderer bindings for all of these templating systems already
+exist for use in Pyramid.  But if you'd rather use another, it's not a big
+deal.  Just copy the code from an existing renderer package, and plug in your
+favorite templating system.  You'll then be able to use that templating
+system from within Pyramid just as you'd use one of the "built-in" templating
+systems.
+
+Pyramid does not make you use a single templating system exclusively.  You
+can use multiple templating systems, even in the same project.
+
+Example: :ref:`templates_used_directly`.
+
 Rendered views can return dictionaries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -313,22 +354,262 @@ Python package.  Asset specifications are omnipresent in Pyramid: see
 
 Example: :ref:`renderers_chapter`.
 
-Extensible templating
-~~~~~~~~~~~~~~~~~~~~~
+Event system
+~~~~~~~~~~~~
 
-Pyramid has a structured API that allows for pluggability of "renderers".
-Templating systems such as Mako, Genshi, Chameleon, and Jinja2 can be treated
-as renderers.  Renderer bindings for all of these templating systems already
-exist for use in Pyramid.  But if you'd rather use another, it's not a big
-deal.  Just copy the code from an existing renderer package, and plug in your
-favorite templating system.  You'll then be able to use that templating
-system from within Pyramid just as you'd use one of the "built-in" templating
-systems.
+Pyramid emits *events* during its request processing lifecycle.  You can
+subscribe any number of listeners to these events.  For example, to be
+notified of a new request, you can subscribe to the ``NewRequest`` event.  To
+be notified that a template is about to be rendered, you can subscribe to the
+``BeforeRender`` event, and so forth.  Using an event publishing system as a
+framework notification feature instead of hardcoded hook points tends to make
+systems based on that framework less brittle.
 
-Pyramid does not make you use a single templating system exclusively.  You
-can use multiple templating systems, even in the same project.
+You can also use Pyramid's event system to send your *own* events.  For
+example, if you'd like to create a system that is itself a framework, and may
+want to notify subscribers that a document has just been indexed, you can
+create your own event type (``DocumentIndexed`` perhaps) and send the event
+via Pyramid.  Users of this framework can then subscribe to your event like
+they'd subscribe to the events that are normally sent by Pyramid itself.
 
-Example: :ref:`templates_used_directly`.
+Example: :ref:`events_chapter` and :ref:`event_types`.
+
+Built-in internationalization
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Pyramid ships with internalization-related features in its core:
+localization, pluralization, and creating message catalogs from source files
+and templates.  Pyramid allows for a plurality of message catalog via the use
+of translation domains: you can create a system that has its own translations
+without conflict with other translations in other domains.
+
+Example: :ref:`i18n_chapter`.
+
+HTTP caching
+~~~~~~~~~~~~
+
+Pyramid provides an easy way to associate views with HTTP caching policies.
+You can just tell Pyramid to configure your view with an ``http_cache``
+statement, and it will take care of the rest::
+
+   @view_config(http_cache=3600) # 60 minutes
+   def myview(request): ....
+
+Pyramid will add appropriate ``Cache-Control`` and ``Expires`` headers to
+responses generated when this view is invoked.
+
+See the :meth:`~pyramid.config.Configurator.add_view` method's
+``http_cache`` documentation for more information.
+
+Sessions
+~~~~~~~~
+
+Pyramid has built-in HTTP sessioning.  This allows you to associate data with
+otherwise anonymous users between requests.  Lots of systems do this.  But
+Pyramid also allows you to plug in your own sessioning system by creating
+some code that adheres to a documented interface.  Currently there is a
+binding package for the third-party Beaker sessioning system that does exactly
+this.  But if you have a specialized need (perhaps you want to store your
+session data in MongoDB), you can.  You can even switch between
+implementations without changing your application code.
+
+Example: :ref:`sessions_chapter`.
+
+Speed
+~~~~~
+
+The Pyramid core is, as far as we can tell, at least marginally faster than
+any other existing Python web framework.  It has been engineered from the
+ground up for speed.  It only does as much work as absolutely necessary when
+you ask it to get a job done.  Extraneous function calls and suboptimal
+algorithms in its core codepaths are avoided.  It is feasible to get, for
+example, between 3500 and 4000 requests per second from a simple Pyramid view
+on commodity dual-core laptop hardware and an appropriate WSGI server
+(mod_wsgi or gunicorn).  In any case, performance statistics are largely
+useless without requirements and goals, but if you need speed, Pyramid will
+almost certainly never be your application's bottleneck; at least no more
+than Python will be a bottleneck.
+
+Example: http://blog.curiasolutions.com/the-great-web-framework-shootout/
+
+Exception views
+~~~~~~~~~~~~~~~
+
+Exceptions happen.  Rather than deal with exceptions that might present
+themselves to a user in production in an ad-hoc way, Pyramid allows you to
+register an :term:`exception view`.  Exception views are like regular Pyramid
+views, but they're only invoked when an exception "bubbles up" to Pyramid
+itself.  For example, you might register an exception view for the
+:exc:`Exception` exception, which will catch *all* exceptions, and present a
+pretty "well, this is embarrassing" page.  Or you might choose to register an
+exception view for only specific kinds of application-specific exceptions,
+such as an exception that happens when a file is not found, or an exception
+that happens when an action cannot be performed because the user doesn't have
+permission to do something.  In the former case, you can show a pretty "Not
+Found" page; in the latter case you might show a login form.
+
+Example: :ref:`exception_views`.
+
+No singletons
+~~~~~~~~~~~~~
+
+Pyramid is written in such a way that it requires your application to have
+exactly zero "singleton" data structures.  Or, put another way, Pyramid
+doesn't require you to construct any "mutable globals".  Or put even a
+different way, an import of a Pyramid application needn't have any "import-
+time side effects".  This is esoteric-sounding, but if you've ever tried to
+cope with parameterizing a Django "settings.py" file for multiple
+installations of the same application, or if you've ever needed to
+monkey-patch some framework fixture so that it behaves properly for your use
+case, or if you've ever wanted to deploy your system using an asynchronous
+server, you'll end up appreciating this feature.  It just won't be a problem.
+You can even run multiple copies of a similar but not identically configured
+Pyramid application within the same Python process.  This is good for shared
+hosting environments, where RAM is at a premium.
+
+View predicates and many views per route
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Unlike many other systems, Pyramid allows you to associate more than one view
+per route.  For example, you can create a route with the pattern ``/items``
+and when the route is matched, you can shuffle off the request to one view if
+the request method is GET, another view if the request method is POST, etc.
+A system known as "view predicates" allows for this.  Request method matching
+is the very most basic thing you can do with a view predicate.  You can also
+associate views with other request parameters such as the elements in the
+query string, the Accept header, whether the request is an XHR request or
+not, and lots of other things.  This feature allows you to keep your
+individual views "clean"; they won't need much conditional logic, so they'll
+be easier to test.
+
+Example: :ref:`view_configuration_parameters`.
+
+Transaction management
+~~~~~~~~~~~~~~~~~~~~~~
+
+Pyramid's :term:`scaffold` system renders projects that include a
+*transaction management* system, stolen from Zope.  When you use this
+transaction management system, you cease being responsible for committing
+your data anymore.  Instead, Pyramid takes care of committing: it commits at
+the end of a request or aborts if there's an exception.  Why is that a good
+thing?  Having a centralized place for transaction management is a great
+thing.  If, instead of managing your transactions in a centralized place, you
+sprinkle ``session.commit`` calls in your application logic itself, you can
+wind up in a bad place.  Wherever you manually commit data to your database,
+it's likely that some of your other code is going to run *after* your commit.
+If that code goes on to do other important things after that commit, and an
+error happens in the later code, you can easily wind up with inconsistent
+data if you're not extremely careful.  Some data will have been written to
+the database that probably should not have.  Having a centralized commit
+point saves you from needing to think about this; it's great for lazy people
+who also care about data integrity.  Either the request completes
+successfully, and all chages are committed, or it does not, and all changes
+are aborted.
+
+Also, Pyramid's transaction management system allows you to synchronize
+commits between multiple databases, and allows you to do things like
+conditionally send email if a transaction commits, but otherwise keep quiet.
+
+Example: :ref:`bfg_sql_wiki_tutorial` (note the lack of commit statements
+anywhere in application code).
+
+Configuration conflict detection
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When a system is small, it's reasonably easy to keep it all in your head.
+But when systems grow large, you may have hundreds or thousands of
+configuration statements which add a view, add a route, and so forth.
+Pyramid's configuration system keeps track of your configuration statements,
+and if you accidentally add two that are identical, or Pyramid can't make
+sense out of what it would mean to have both statements active at the same
+time, it will complain loudly at startup time.  It's not dumb though: it will
+automatically resolve conflicting configuration statements on its own if you
+use the configuration :meth:`~pyramid.config.Configurator.include` system:
+"more local" statements are preferred over "less local" ones.  This allows
+you to intelligently factor large systems into smaller ones.
+
+Example: :ref:`conflict_detection`.
+
+Configuration extensibility
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Unlike other systems, Pyramid provides a structured "include" mechanism (see
+:meth:`~pyramid.config.Configurator.include`) that allows you compose
+applications from multiple Python packages.  All the configuration statements
+that can be performed in your "main" Pyramid application can also be
+performed by included packages including the addition of views, routes,
+subscribers, and even authentication and authorization policies. You can even
+extend or override an existing application by including another application's
+configuration in your own, overriding or adding new views and routes to
+it.  This has the potential to allow you to compose a big application out of
+many other smaller ones.  For example, if you want to reuse an existing
+application that already has a bunch of routes, you can just use the
+``include`` statement with a ``route_prefix``; the new application will live
+within your application at a URL prefix.  It's not a big deal, and requires
+little up-front engineering effort.
+
+For example:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+
+   if __name__ == '__main__':
+      config = Configurator()
+      config.include('pyramid_jinja2')
+      config.include('pyramid_exclog')
+      config.include('some.other.guys.package', route_prefix='/someotherguy')
+
+See also :ref:`including_configuration` and :ref:`building_an_extensible_app`
+
+Flexible authentication and authorization
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Pyramid includes a flexible, pluggable authentication and authorization
+system.  No matter where your user data is stored, or what scheme you'd like
+to use to permit your users to access your data, you can use a predefined
+Pyramid plugpoint to plug in your custom authentication and authorization
+code.  If you want to change these schemes later, you can just change it in
+one place rather than everywhere in your code.  It also ships with prebuilt
+well-tested authentication and authorization schemes out of the box.  But
+what if you don't want to use Pyramid's built-in system?  You don't have to.
+You can just write your own bespoke security code as you would in any other
+system.
+
+Example: :ref:`enabling_authorization_policy`.
+
+Traversal
+~~~~~~~~~
+
+:term:`Traversal` is a concept stolen from :term:`Zope`.  It allows you to
+create a tree of resources, each of which can be addressed by one or more
+URLs.  Each of those resources can have one or more *views* associated with
+it. If your data isn't naturally treelike (or you're unwilling to create a
+treelike representation of your data), you aren't going to find traversal
+very useful.  However, traversal is absolutely fantastic for sites that need
+to be arbitrarily extensible: it's a lot easier to add a node to a tree than
+it is to shoehorn a route into an ordered list of other routes, or to create
+another entire instance of an application to service a department and glue
+code to allow disparate apps to share data.  It's a great fit for sites that
+naturally lend themselves to changing departmental hierarchies, such as CMS
+systems and document management systems.  Traversal also lends itself well to
+systems that require very granular security ("Bob can edit *this* document"
+as opposed to "Bob can edit documents").
+
+Example: :ref:`much_ado_about_traversal_chapter`.
+
+Tweens
+~~~~~~
+
+Pyramid has a sort of internal WSGI-middleware-ish pipeline that can be
+hooked by arbitrary add-ons named "tweens".  The debug toolbar is a "tween",
+and the ``pyramid_tm`` transaction manager is also.  Tweens are more useful
+than WSGI middleware in some circumstances because they run in the context of
+Pyramid itself, meaning you have access to templates and other renderers, a
+"real" request object, and other niceties.
+
+Example: :ref:`registering_tweens`.
 
 View response adapters
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -456,287 +737,6 @@ section," you say.  Fine.  Be that way:
        return response
 
 See also :ref:`request_response_attr`.
-
-Event system
-~~~~~~~~~~~~
-
-Pyramid emits *events* during its request processing lifecycle.  You can
-subscribe any number of listeners to these events.  For example, to be
-notified of a new request, you can subscribe to the ``NewRequest`` event.  To
-be notified that a template is about to be rendered, you can subscribe to the
-``BeforeRender`` event, and so forth.  Using an event publishing system as a
-framework notification feature instead of hardcoded hook points tends to make
-systems based on that framework less brittle.
-
-You can also use Pyramid's event system to send your *own* events.  For
-example, if you'd like to create a system that is itself a framework, and may
-want to notify subscribers that a document has just been indexed, you can
-create your own event type (``DocumentIndexed`` perhaps) and send the event
-via Pyramid.  Users of this framework can then subscribe to your event like
-they'd subscribe to the events that are normally sent by Pyramid itself.
-
-Example: :ref:`events_chapter` and :ref:`event_types`.
-
-Speed
-~~~~~
-
-The Pyramid core is, as far as we can tell, at least marginally faster than
-any other existing Python web framework.  It has been engineered from the
-ground up for speed.  It only does as much work as absolutely necessary when
-you ask it to get a job done.  Extraneous function calls and suboptimal
-algorithms in its core codepaths are avoided.  It is feasible to get, for
-example, between 3500 and 4000 requests per second from a simple Pyramid view
-on commodity dual-core laptop hardware and an appropriate WSGI server
-(mod_wsgi or gunicorn).  In any case, performance statistics are largely
-useless without requirements and goals, but if you need speed, Pyramid will
-almost certainly never be your application's bottleneck; at least no more
-than Python will be a bottleneck.
-
-Example: http://blog.curiasolutions.com/the-great-web-framework-shootout/
-
-Sessions
-~~~~~~~~
-
-Pyramid has built-in HTTP sessioning.  This allows you to associate data with
-otherwise anonymous users between requests.  Lots of systems do this.  But
-Pyramid also allows you to plug in your own sessioning system by creating
-some code that adheres to a documented interface.  Currently there is a
-binding package for the third-party Beaker sessioning system that does exactly
-this.  But if you have a specialized need (perhaps you want to store your
-session data in MongoDB), you can.  You can even switch between
-implementations without changing your application code.
-
-Example: :ref:`sessions_chapter`.
-
-No singletons
-~~~~~~~~~~~~~
-
-Pyramid is written in such a way that it requires your application to have
-exactly zero "singleton" data structures.  Or, put another way, Pyramid
-doesn't require you to construct any "mutable globals".  Or put even a
-different way, an import of a Pyramid application needn't have any "import-
-time side effects".  This is esoteric-sounding, but if you've ever tried to
-cope with parameterizing a Django "settings.py" file for multiple
-installations of the same application, or if you've ever needed to
-monkey-patch some framework fixture so that it behaves properly for your use
-case, or if you've ever wanted to deploy your system using an asynchronous
-server, you'll end up appreciating this feature.  It just won't be a problem.
-You can even run multiple copies of a similar but not identically configured
-Pyramid application within the same Python process.  This is good for shared
-hosting environments, where RAM is at a premium.
-
-View predicates and many views per route
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Unlike many other systems, Pyramid allows you to associate more than one view
-per route.  For example, you can create a route with the pattern ``/items``
-and when the route is matched, you can shuffle off the request to one view if
-the request method is GET, another view if the request method is POST, etc.
-A system known as "view predicates" allows for this.  Request method matching
-is the very most basic thing you can do with a view predicate.  You can also
-associate views with other request parameters such as the elements in the
-query string, the Accept header, whether the request is an XHR request or
-not, and lots of other things.  This feature allows you to keep your
-individual views "clean"; they won't need much conditional logic, so they'll
-be easier to test.
-
-Example: :ref:`view_configuration_parameters`.
-
-Exception views
-~~~~~~~~~~~~~~~
-
-Exceptions happen.  Rather than deal with exceptions that might present
-themselves to a user in production in an ad-hoc way, Pyramid allows you to
-register an :term:`exception view`.  Exception views are like regular Pyramid
-views, but they're only invoked when an exception "bubbles up" to Pyramid
-itself.  For example, you might register an exception view for the
-:exc:`Exception` exception, which will catch *all* exceptions, and present a
-pretty "well, this is embarrassing" page.  Or you might choose to register an
-exception view for only specific kinds of application-specific exceptions,
-such as an exception that happens when a file is not found, or an exception
-that happens when an action cannot be performed because the user doesn't have
-permission to do something.  In the former case, you can show a pretty "Not
-Found" page; in the latter case you might show a login form.
-
-Example: :ref:`exception_views`.
-
-.. _intro_asset_specs:
-
-Asset specifications
-~~~~~~~~~~~~~~~~~~~~
-
-Asset specifications are strings that contain both a Python package name and
-a file or directory name, e.g. ``MyPackage:static/index.html``.  Use of these
-specifications is omnipresent in Pyramid.  An asset specification can refer
-to a template, a translation directory, or any other package-bound static
-resource.  This makes a system built on Pyramid extensible, because you don't
-have to rely on globals ("*the* static directory") or lookup schemes ("*the*
-ordered set of template directories") to address your files.  You can move
-files around as necessary, and include other packages that may not share your
-system's templates or static files without encountering conflicts.
-
-Because asset specifications are used heavily in Pyramid, we've also provided
-a way to allow users to override assets.  Say you love a system that someone
-else has created with Pyramid but you just need to change "that one template"
-to make it all better.  No need to fork the application.  Just override the
-asset specification for that template with your own inside a wrapper, and
-you're good to go.
-
-Examples: :ref:`asset_specifications` and :ref:`overriding_assets_section`.
-
-Transaction management
-~~~~~~~~~~~~~~~~~~~~~~
-
-Pyramid's :term:`scaffold` system renders projects that include a
-*transaction management* system, stolen from Zope.  When you use this
-transaction management system, you cease being responsible for committing
-your data anymore.  Instead, Pyramid takes care of committing: it commits at
-the end of a request or aborts if there's an exception.  Why is that a good
-thing?  Having a centralized place for transaction management is a great
-thing.  If, instead of managing your transactions in a centralized place, you
-sprinkle ``session.commit`` calls in your application logic itself, you can
-wind up in a bad place.  Wherever you manually commit data to your database,
-it's likely that some of your other code is going to run *after* your commit.
-If that code goes on to do other important things after that commit, and an
-error happens in the later code, you can easily wind up with inconsistent
-data if you're not extremely careful.  Some data will have been written to
-the database that probably should not have.  Having a centralized commit
-point saves you from needing to think about this; it's great for lazy people
-who also care about data integrity.  Either the request completes
-successfully, and all chages are committed, or it does not, and all changes
-are aborted.
-
-Also, Pyramid's transaction management system allows you to synchronize
-commits between multiple databases, and allows you to do things like
-conditionally send email if a transaction commits, but otherwise keep quiet.
-
-Example: :ref:`bfg_sql_wiki_tutorial` (note the lack of commit statements
-anywhere in application code).
-
-Configuration conflict detection
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When a system is small, it's reasonably easy to keep it all in your head.
-But when systems grow large, you may have hundreds or thousands of
-configuration statements which add a view, add a route, and so forth.
-Pyramid's configuration system keeps track of your configuration statements,
-and if you accidentally add two that are identical, or Pyramid can't make
-sense out of what it would mean to have both statements active at the same
-time, it will complain loudly at startup time.  It's not dumb though: it will
-automatically resolve conflicting configuration statements on its own if you
-use the configuration :meth:`~pyramid.config.Configurator.include` system:
-"more local" statements are preferred over "less local" ones.  This allows
-you to intelligently factor large systems into smaller ones.
-
-Example: :ref:`conflict_detection`.
-
-Configuration extensibility
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Unlike other systems, Pyramid provides a structured "include" mechanism (see
-:meth:`~pyramid.config.Configurator.include`) that allows you compose
-applications from multiple Python packages.  All the configuration statements
-that can be performed in your "main" Pyramid application can also be
-performed by included packages including the addition of views, routes,
-subscribers, and even authentication and authorization policies. You can even
-extend or override an existing application by including another application's
-configuration in your own, overriding or adding new views and routes to
-it.  This has the potential to allow you to compose a big application out of
-many other smaller ones.  For example, if you want to reuse an existing
-application that already has a bunch of routes, you can just use the
-``include`` statement with a ``route_prefix``; the new application will live
-within your application at a URL prefix.  It's not a big deal, and requires
-little up-front engineering effort.
-
-For example:
-
-.. code-block:: python
-   :linenos:
-
-   from pyramid.config import Configurator
-
-   if __name__ == '__main__':
-      config = Configurator()
-      config.include('pyramid_jinja2')
-      config.include('pyramid_exclog')
-      config.include('some.other.guys.package', route_prefix='/someotherguy')
-
-See also :ref:`including_configuration` and :ref:`building_an_extensible_app`
-
-Flexible authentication and authorization
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Pyramid includes a flexible, pluggable authentication and authorization
-system.  No matter where your user data is stored, or what scheme you'd like
-to use to permit your users to access your data, you can use a predefined
-Pyramid plugpoint to plug in your custom authentication and authorization
-code.  If you want to change these schemes later, you can just change it in
-one place rather than everywhere in your code.  It also ships with prebuilt
-well-tested authentication and authorization schemes out of the box.  But
-what if you don't want to use Pyramid's built-in system?  You don't have to.
-You can just write your own bespoke security code as you would in any other
-system.
-
-Example: :ref:`enabling_authorization_policy`.
-
-Built-in internationalization
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Pyramid ships with internalization-related features in its core:
-localization, pluralization, and creating message catalogs from source files
-and templates.  Pyramid allows for a plurality of message catalog via the use
-of translation domains: you can create a system that has its own translations
-without conflict with other translations in other domains.
-
-Example: :ref:`i18n_chapter`.
-
-Traversal
-~~~~~~~~~
-
-:term:`Traversal` is a concept stolen from :term:`Zope`.  It allows you to
-create a tree of resources, each of which can be addressed by one or more
-URLs.  Each of those resources can have one or more *views* associated with
-it. If your data isn't naturally treelike (or you're unwilling to create a
-treelike representation of your data), you aren't going to find traversal
-very useful.  However, traversal is absolutely fantastic for sites that need
-to be arbitrarily extensible: it's a lot easier to add a node to a tree than
-it is to shoehorn a route into an ordered list of other routes, or to create
-another entire instance of an application to service a department and glue
-code to allow disparate apps to share data.  It's a great fit for sites that
-naturally lend themselves to changing departmental hierarchies, such as CMS
-systems and document management systems.  Traversal also lends itself well to
-systems that require very granular security ("Bob can edit *this* document"
-as opposed to "Bob can edit documents").
-
-Example: :ref:`much_ado_about_traversal_chapter`.
-
-HTTP caching
-~~~~~~~~~~~~
-
-Pyramid provides an easy way to associate views with HTTP caching policies.
-You can just tell Pyramid to configure your view with an ``http_cache``
-statement, and it will take care of the rest::
-
-   @view_config(http_cache=3600) # 60 minutes
-   def myview(request): ....
-
-Pyramid will add appropriate ``Cache-Control`` and ``Expires`` headers to
-responses generated when this view is invoked.
-
-See the :meth:`~pyramid.config.Configurator.add_view` method's
-``http_cache`` documentation for more information.
-
-Tweens
-~~~~~~
-
-Pyramid has a sort of internal WSGI-middleware-ish pipeline that can be
-hooked by arbitrary add-ons named "tweens".  The debug toolbar is a "tween",
-and the ``pyramid_tm`` transaction manager is also.  Tweens are more useful
-than WSGI middleware in some circumstances because they run in the context of
-Pyramid itself, meaning you have access to templates and other renderers, a
-"real" request object, and other niceties.
-
-Example: :ref:`registering_tweens`.
 
 Automating repetitive configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
