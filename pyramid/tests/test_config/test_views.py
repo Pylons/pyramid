@@ -3301,6 +3301,15 @@ class TestStaticURLInfo(unittest.TestCase):
         result = inst.generate('package:path/abc', request)
         self.assertEqual(result, 'http://example.com/foo/abc')
 
+    def test_generate_registration_no_registry_on_request(self):
+        inst = self._makeOne()
+        registrations = [('http://example.com/foo/', 'package:path/', None)]
+        inst._get_registrations = lambda *x: registrations
+        request = self._makeRequest()
+        del request.registry
+        result = inst.generate('package:path/abc', request)
+        self.assertEqual(result, 'http://example.com/foo/abc')
+
     def test_generate_slash_in_name1(self):
         inst = self._makeOne()
         registrations = [('http://example.com/foo/', 'package:path/', None)]

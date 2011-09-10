@@ -34,6 +34,7 @@ from pyramid.httpexceptions import HTTPForbidden
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.static import static_view
+from pyramid.threadlocal import get_current_registry
 from pyramid.view import render_view_to_response
 
 from pyramid.config.util import DEFAULT_PHASH
@@ -1411,7 +1412,10 @@ class StaticURLInfo(object):
         return reg
 
     def generate(self, path, request, **kw):
-        registry = request.registry
+        try:
+            registry = request.registry
+        except AttributeError: # bw compat (for tests)
+            registry = get_current_registry()
         for (url, spec, route_name) in self._get_registrations(registry):
             if path.startswith(spec):
                 subpath = path[len(spec):]
