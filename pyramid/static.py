@@ -1,8 +1,16 @@
 # -*- coding: utf-8 -*-
-import os
-from os.path import normcase, normpath, join, getmtime, getsize, isdir, exists
-from pkg_resources import resource_exists, resource_filename, resource_isdir
 import mimetypes
+import os
+from os.path import normcase
+from os.path import normpath
+from os.path import join
+from os.path import getmtime
+from os.path import getsize
+from os.path import isdir
+from os.path import exists
+from pkg_resources import resource_exists
+from pkg_resources import resource_filename
+from pkg_resources import resource_isdir
 
 from repoze.lru import lru_cache
 
@@ -167,12 +175,13 @@ class static_view(object):
             url = url + '?' + qs
         return HTTPMovedPermanently(url)
 
-_has_insecure_pathelement = set(['..', '.', '']).intersection
 _seps = set(['/', os.sep])
 def _contains_slash(item):
     for sep in _seps:
         if sep in item:
             return True
+
+_has_insecure_pathelement = set(['..', '.', '']).intersection
 
 @lru_cache(1000)
 def _secure_path(path_tuple):
