@@ -13,19 +13,20 @@ def url_quote(s, safe=''):
     different set of reserved characters that must be quoted.
 
     RFC 2396 Uniform Resource Identifiers (URI): Generic Syntax lists
-    the following reserved characters.
+    the following reserved characters::
 
-    reserved    = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" |
-                  "$" | ","
+     reserved    = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" |
+                   "$" | ","
 
     Each of these characters is reserved in some component of a URL,
     but not necessarily in all of them.
 
-    Unlike the default version of this function in the Python stdlib,
-    by default, the url_quote function is intended for quoting individual
-    path segments instead of an already composed path that might have
-    '/' characters in it.  Thus, it *will* encode any '/' character it
-    finds in a string.  It is also slightly faster than the stdlib version.
+    Unlike the default version of this function in the Python stdlib, by
+    default, the url_quote function is intended for quoting individual path
+    segments instead of an already composed path that might have ``/``
+    characters in it.  Thus, it *will* encode any ``/`` character it finds in a
+    string unless ``/`` is marked as 'safe'.  It is also slightly faster than
+    the stdlib version.
     """
     cachekey = (safe, always_safe)
     try:
