@@ -1,5 +1,4 @@
 import sys
-import threading
 
 from zope.deprecation import deprecated
 from zope.interface import implements
@@ -20,9 +19,7 @@ from pyramid.decorator import reify
 from pyramid.path import caller_package
 from pyramid import renderers
 
-registry_lock = threading.Lock()
-    
-def renderer_factory(info, lock=registry_lock):
+def renderer_factory(info):
     return renderers.template_renderer_factory(info, ZPTTemplateRenderer)
 
 class ZPTTemplateRenderer(object):
