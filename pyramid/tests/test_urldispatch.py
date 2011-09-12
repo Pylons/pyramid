@@ -334,7 +334,7 @@ class TestCompileRoute(unittest.TestCase):
         self.assertEqual(generator({'buz':'2001-Nov-15'}), '/2001-Nov-15')
         self.assertEqual(generator({'buz':'99-June-10'}), '/99-June-10')
 
-class TestCompileRouteMatchFunctional(unittest.TestCase):
+class TestCompileRouteFunctional(unittest.TestCase):
     def matches(self, pattern, path, expected):
         from pyramid.urldispatch import _compile_route
         matcher = _compile_route(pattern)[0]
@@ -345,16 +345,41 @@ class TestCompileRouteMatchFunctional(unittest.TestCase):
         from pyramid.urldispatch import _compile_route
         self.assertEqual(_compile_route(pattern)[1](dict), result)
 
-    def test_matcher_functional(self):
+    def test_matcher_functional_notdynamic(self):
         self.matches('/', '', None)
         self.matches('', '', None)
         self.matches('/', '/foo', None)
         self.matches('/foo/', '/foo', None)
+        self.matches('', '/', {})
+        self.matches('/', '/', {})
+
+    def test_matcher_functional_newstyle(self):
+        self.matches('/{x}', '', None)
+        self.matches('/{x}', '/', None)
+        self.matches('/abc/{def}', '/abc/', None)
+        self.matches('/{x}', '/a', {'x':'a'})
+        self.matches('zzz/{x}', '/zzz/abc', {'x':'abc'})
+        self.matches('zzz/{x}*traverse', '/zzz/abc', {'x':'abc', 'traverse':()})
+        self.matches('zzz/{x}*traverse', '/zzz/abc/def/g',
+                     {'x':'abc', 'traverse':('def', 'g')})
+        self.matches('*traverse', '/zzz/abc', {'traverse':('zzz', 'abc')})
+        self.matches('*traverse', '/zzz/%20abc', {'traverse':('zzz', ' abc')})
+        self.matches('{x}', '/La%20Pe%C3%B1a', {'x':u'La Pe\xf1a'})
+        self.matches('*traverse', '/La%20Pe%C3%B1a/x',
+                     {'traverse':(u'La Pe\xf1a', 'x')})
+        self.matches('/foo/{id}.html', '/foo/bar.html', {'id':'bar'})
+        self.matches('/{num:[0-9]+}/*traverse', '/555/abc/def',
+                     {'num':'555', 'traverse':('abc', 'def')})
+        self.matches('/{num:[0-9]*}/*traverse', '/555/abc/def',
+                     {'num':'555', 'traverse':('abc', 'def')})
+        self.matches('zzz/{_}', '/zzz/abc', {'_':'abc'})
+        self.matches('zzz/{_abc}', '/zzz/abc', {'_abc':'abc'})
+        self.matches('zzz/{abc_def}', '/zzz/abc', {'abc_def':'abc'})
+
+    def test_matcher_functional_oldstyle(self):
         self.matches('/:x', '', None)
         self.matches('/:x', '/', None)
         self.matches('/abc/:def', '/abc/', None)
-        self.matches('', '/', {})
-        self.matches('/', '/', {})
         self.matches('/:x', '/a', {'x':'a'})
         self.matches('zzz/:x', '/zzz/abc', {'x':'abc'})
         self.matches('zzz/:x*traverse', '/zzz/abc', {'x':'abc', 'traverse':()})
@@ -366,14 +391,36 @@ class TestCompileRouteMatchFunctional(unittest.TestCase):
         self.matches('*traverse', '/La%20Pe%C3%B1a/x',
                      {'traverse':(u'La Pe\xf1a', 'x')})
         self.matches('/foo/:id.html', '/foo/bar.html', {'id':'bar'})
-        self.matches('/{num:[0-9]+}/*traverse', '/555/abc/def',
-                     {'num':'555', 'traverse':('abc', 'def')})
-        self.matches('/{num:[0-9]*}/*traverse', '/555/abc/def',
-                     {'num':'555', 'traverse':('abc', 'def')})
-        
-    def test_generator_functional(self):
+        self.matches('/foo/:id_html', '/foo/bar_html', {'id_html':'bar_html'})
+        self.matches('zzz/:_', '/zzz/abc', {'_':'abc'})
+        self.matches('zzz/:_abc', '/zzz/abc', {'_abc':'abc'})
+        self.matches('zzz/:abc_def', '/zzz/abc', {'abc_def':'abc'})
+
+    def test_generator_functional_notdynamic(self):
         self.generates('', {}, '/')
         self.generates('/', {}, '/')
+
+    def test_generator_functional_newstyle(self):
+        self.generates('/{x}', {'x':''}, '/')
+        self.generates('/{x}', {'x':'a'}, '/a')
+        self.generates('zzz/{x}', {'x':'abc'}, '/zzz/abc')
+        self.generates('zzz/{x}*traverse', {'x':'abc', 'traverse':''},
+                       '/zzz/abc')
+        self.generates('zzz/{x}*traverse', {'x':'abc', 'traverse':'/def/g'},
+                       '/zzz/abc/def/g')
+        self.generates('/{x}', {'x':unicode('/La Pe\xc3\xb1a', 'utf-8')},
+                       '/%2FLa%20Pe%C3%B1a')
+        self.generates('/{x}*y', {'x':unicode('/La Pe\xc3\xb1a', 'utf-8'),
+                                 'y':'/rest/of/path'},
+                       '/%2FLa%20Pe%C3%B1a/rest/of/path')
+        self.generates('*traverse', {'traverse':('a', u'La Pe\xf1a')},
+                       '/a/La%20Pe%C3%B1a')
+        self.generates('/foo/{id}.html', {'id':'bar'}, '/foo/bar.html')
+        self.generates('/foo/{_}', {'_':'20'}, '/foo/20')
+        self.generates('/foo/{_abc}', {'_abc':'20'}, '/foo/20')
+        self.generates('/foo/{abc_def}', {'abc_def':'20'}, '/foo/20')
+        
+    def test_generator_functional_oldstyle(self):
         self.generates('/:x', {'x':''}, '/')
         self.generates('/:x', {'x':'a'}, '/a')
         self.generates('zzz/:x', {'x':'abc'}, '/zzz/abc')
@@ -389,6 +436,9 @@ class TestCompileRouteMatchFunctional(unittest.TestCase):
         self.generates('*traverse', {'traverse':('a', u'La Pe\xf1a')},
                        '/a/La%20Pe%C3%B1a')
         self.generates('/foo/:id.html', {'id':'bar'}, '/foo/bar.html')
+        self.generates('/foo/:_', {'_':'20'}, '/foo/20')
+        self.generates('/foo/:_abc', {'_abc':'20'}, '/foo/20')
+        self.generates('/foo/:abc_def', {'abc_def':'20'}, '/foo/20')
 
 class DummyContext(object):
     """ """

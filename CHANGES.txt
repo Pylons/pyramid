@@ -1,3 +1,12 @@
+Next release
+============
+
+Features
+--------
+
+- Route pattern replacement marker names can now begin with an underscore.
+  See https://github.com/Pylons/pyramid/issues/276.
+
 1.2b3 (2011-09-11)
 ==================
 
