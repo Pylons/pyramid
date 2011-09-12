@@ -4,6 +4,9 @@ Pyramid TODOs
 Nice-to-Have
 ------------
 
+- Have ``remember`` and ``forget`` actually set headers on the response using
+  a response callback (and return the empty list)?
+
 - Add narrative docs for wsgiapp and wsgiapp2.
 
 - Better "Extending" chapter.
