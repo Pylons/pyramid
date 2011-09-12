@@ -138,11 +138,22 @@ replacement marker does not need to be preceded by a ``/`` character.
 
 A replacement marker is in the format ``{name}``, where this means "accept
 any characters up to the next slash character and use this as the ``name``
-:term:`matchdict` value."  A matchdict is the dictionary representing the
-dynamic parts extracted from a URL based on the routing pattern.  It is
-available as ``request.matchdict``.  For example, the following pattern
-defines one literal segment (``foo``) and two replacement markers (``baz``,
-and ``bar``):
+:term:`matchdict` value."
+
+A replacement marker in a pattern must begin with an uppercase or lowercase
+ASCII letter or an underscore, and can be composed only of uppercase or
+lowercase ASCII letters, underscores, and numbers.  For example: ``a``,
+``a_b``, ``_b``, and ``b9`` are all valid replacement marker names, but
+``0a`` is not.
+
+.. note:: A replacement marker could not start with an underscore until
+   Pyramid 1.2.  Previous versions required that the replacement marker start
+   with an uppercase or lowercase letter.
+
+A matchdict is the dictionary representing the dynamic parts extracted from a
+URL based on the routing pattern.  It is available as ``request.matchdict``.
+For example, the following pattern defines one literal segment (``foo``) and
+two replacement markers (``baz``, and ``bar``):
 
 .. code-block:: text
 
