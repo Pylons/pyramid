@@ -59,6 +59,12 @@ Constants
 
 .. attribute:: NO_PERMISSION_REQUIRED
 
+	A special permission which indicates that the view should always
+	be executable by entirely anonymous users, regardless of the
+	default permission, bypassing any :term:`authorization policy`
+	that may be in effect.  Its actual value is the string
+	'__no_permission_required__'.
+
 Return Values
 -------------
 
