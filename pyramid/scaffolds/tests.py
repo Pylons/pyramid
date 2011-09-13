@@ -50,7 +50,7 @@ class TemplateTest(object):
                     resp = conn.getresponse()
                     assert resp.status == 200, ininame
                     data = resp.read()
-                    toolbarchunk = '<div id="flDebug"'
+                    toolbarchunk = '<div id="pDebug"'
                     if hastoolbar:
                         assert toolbarchunk in data, ininame
                     else:
