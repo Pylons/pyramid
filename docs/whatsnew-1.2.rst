@@ -12,6 +12,13 @@ Major Feature Additions
 
 The major feature additions in Pyramid 1.2 follow.
 
+Debug Toolbar
+~~~~~~~~~~~~~
+
+The scaffolding packages that come with Pyramid now include a debug toolbar
+component which can be used to interactively debug an application.  See
+:ref:`debug_toolbar` for more information.
+
 ``route_prefix`` Argument to include
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
