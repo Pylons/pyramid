@@ -173,6 +173,9 @@ Minor Feature Additions
   1.0.  This is a low-cost alias to ``pyramid.view.view_config`` which we'll
   just keep around forever.
 
+- Route pattern replacement marker names can now begin with an underscore.
+  See https://github.com/Pylons/pyramid/issues/276.
+
 Deprecations
 ------------
 
