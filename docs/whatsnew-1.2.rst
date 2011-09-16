@@ -139,7 +139,7 @@ Minor Feature Additions
 - The :meth:`pyramid.request.Request.static_url` API (and its brethren
   :meth:`pyramid.request.Request.static_path`,
   :func:`pyramid.url.static_url`, and :func:`pyramid.url.static_path`) now
-  accept an asbolute filename as a "path" argument.  This will generate a URL
+  accept an absolute filename as a "path" argument.  This will generate a URL
   to an asset as long as the filename is in a directory which was previously
   registered as a static view.  Previously, trying to generate a URL to an
   asset using an absolute file path would raise a ValueError.
