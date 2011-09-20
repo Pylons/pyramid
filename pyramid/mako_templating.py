@@ -50,7 +50,7 @@ class PkgResourceTemplateLookup(TemplateLookup):
                 if os.path.isfile(srcfile):
                     return self._load(srcfile, uri)
                 raise exceptions.TopLevelLookupException(
-                    "Cant locate template for uri %r" % uri)
+                    "Can not locate template for uri %r" % uri)
         return TemplateLookup.get_template(self, uri)
 
 
