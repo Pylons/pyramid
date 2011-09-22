@@ -333,7 +333,7 @@ class ConfiguratorTests(unittest.TestCase):
         args, kw = reg.adapters[0]
         self.assertEqual(args[0]('abc'), 'abc')
         self.assertEqual(kw,
-                         {'info': u'', 'provided': 'provided',
+                         {'info': '', 'provided': 'provided',
                           'required': 'required', 'name': 'abc', 'event': True})
 
     def test_setup_registry_calls_fix_registry(self):

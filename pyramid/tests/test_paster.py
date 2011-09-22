@@ -1062,7 +1062,7 @@ class DummyConfigParser(object):
         self.section = section
         if self.result is None:
             from ConfigParser import NoSectionError
-            raise NoSectionError, section
+            raise NoSectionError(section)
         return self.result
 
 class DummyConfigParserFactory(object):

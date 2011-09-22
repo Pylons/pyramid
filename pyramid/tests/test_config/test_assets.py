@@ -581,7 +581,7 @@ class DummyPackage:
 
 class DummyUnderOverride:
     def __call__(self, package, path, override_package, override_prefix,
-                 _info=u''):
+                 _info=''):
         self.package = package
         self.path = path
         self.override_package = override_package

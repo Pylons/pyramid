@@ -2,6 +2,7 @@
 
 import unittest
 from pyramid import testing
+from pyramid.compat import text_
 
 class Base(object):
     def setUp(self):
@@ -276,7 +277,7 @@ class MakoLookupTemplateRendererTests(Base, unittest.TestCase):
         instance = self._makeOne('path', lookup)
         result = instance({}, {'system':1})
         self.assertTrue(isinstance(result, unicode))
-        self.assertEqual(result, u'result')
+        self.assertEqual(result, text_('result'))
 
     def test_call_with_system_context(self):
         # lame
@@ -284,7 +285,7 @@ class MakoLookupTemplateRendererTests(Base, unittest.TestCase):
         instance = self._makeOne('path', lookup)
         result = instance({}, {'context':1})
         self.assertTrue(isinstance(result, unicode))
-        self.assertEqual(result, u'result')
+        self.assertEqual(result, text_('result'))
         self.assertEqual(lookup.values, {'_context':1})
 
     def test_call_with_tuple_value(self):
@@ -292,7 +293,7 @@ class MakoLookupTemplateRendererTests(Base, unittest.TestCase):
         instance = self._makeOne('path', lookup)
         result = instance(('fub', {}), {'context':1})
         self.assertEqual(lookup.deffed, 'fub')
-        self.assertEqual(result, u'result')
+        self.assertEqual(result, text_('result'))
         self.assertEqual(lookup.values, {'_context':1})
 
     def test_call_with_nondict_value(self):
@@ -316,7 +317,7 @@ class MakoLookupTemplateRendererTests(Base, unittest.TestCase):
         instance = self._makeOne('path', lookup)
         result = instance.implementation().render_unicode()
         self.assertTrue(isinstance(result, unicode))
-        self.assertEqual(result, u'result')
+        self.assertEqual(result, text_('result'))
         
 class TestIntegration(unittest.TestCase):
     def setUp(self):
@@ -333,45 +334,48 @@ class TestIntegration(unittest.TestCase):
     def test_render(self):
         from pyramid.renderers import render
         result = render('helloworld.mak', {'a':1}).replace('\r','')
-        self.assertEqual(result, u'\nHello föö\n')
+        self.assertEqual(result, text_('\nHello föö\n', 'utf-8'))
 
     def test_render_from_fs(self):
         from pyramid.renderers import render
         self.config.add_settings({'reload_templates': True})
         result = render('helloworld.mak', {'a':1}).replace('\r','')
-        self.assertEqual(result, u'\nHello föö\n')
+        self.assertEqual(result, text_('\nHello föö\n', 'utf-8'))
     
     def test_render_inheritance(self):
         from pyramid.renderers import render
         result = render('helloinherit.mak', {}).replace('\r','')
-        self.assertEqual(result, u'Layout\nHello World!\n')
+        self.assertEqual(result, text_('Layout\nHello World!\n'))
 
     def test_render_inheritance_pkg_spec(self):
         from pyramid.renderers import render
         result = render('hello_inherit_pkg.mak', {}).replace('\r','')
-        self.assertEqual(result, u'Layout\nHello World!\n')
+        self.assertEqual(result, text_('Layout\nHello World!\n'))
 
     def test_render_to_response(self):
         from pyramid.renderers import render_to_response
         result = render_to_response('helloworld.mak', {'a':1})
-        self.assertEqual(result.ubody.replace('\r',''), u'\nHello föö\n')
+        self.assertEqual(result.ubody.replace('\r',''),
+                         text_('\nHello föö\n', 'utf-8'))
 
     def test_render_to_response_pkg_spec(self):
         from pyramid.renderers import render_to_response
         result = render_to_response('pyramid.tests:fixtures/helloworld.mak',
                                     {'a':1})
-        self.assertEqual(result.ubody.replace('\r', ''), u'\nHello föö\n')
+        self.assertEqual(result.ubody.replace('\r', ''),
+                         text_('\nHello föö\n', 'utf-8'))
     
     def test_render_with_abs_path(self):
         from pyramid.renderers import render
         result = render('/helloworld.mak', {'a':1}).replace('\r','')
-        self.assertEqual(result, u'\nHello föö\n')
+        self.assertEqual(result, text_('\nHello föö\n', 'utf-8'))
 
     def test_get_renderer(self):
         from pyramid.renderers import get_renderer
         result = get_renderer('helloworld.mak')
-        self.assertEqual(result.implementation().render_unicode().replace('\r',''),
-                         u'\nHello föö\n')
+        self.assertEqual(
+            result.implementation().render_unicode().replace('\r',''),
+            text_('\nHello föö\n', 'utf-8'))
     
     def test_template_not_found(self):
         from pyramid.renderers import render
@@ -381,8 +385,9 @@ class TestIntegration(unittest.TestCase):
 
     def test_template_default_escaping(self):
         from pyramid.renderers import render
-        result = render('nonminimal.mak', {'name':'<b>fred</b>'}).replace('\r','')
-        self.assertEqual(result, u'Hello, &lt;b&gt;fred&lt;/b&gt;!\n')
+        result = render('nonminimal.mak',
+                        {'name':'<b>fred</b>'}).replace('\r','')
+        self.assertEqual(result, text_('Hello, &lt;b&gt;fred&lt;/b&gt;!\n'))
 
 class TestPkgResourceTemplateLookup(unittest.TestCase):
     def _makeOne(self, **kw):
@@ -448,7 +453,7 @@ class DummyLookup(object):
         if self.exc:
             raise self.exc
         self.values = values
-        return u'result'
+        return text_('result')
         
 class DummyRendererInfo(object):
     def __init__(self, kw):

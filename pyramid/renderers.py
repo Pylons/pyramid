@@ -15,6 +15,8 @@ from pyramid.interfaces import IRendererInfo
 
 from pyramid.asset import asset_spec_from_abspath
 from pyramid.compat import json
+from pyramid.compat import string_types
+from pyramid.compat import native_
 from pyramid.decorator import reify
 from pyramid.events import BeforeRender
 from pyramid.path import caller_package
@@ -145,8 +147,8 @@ def json_renderer_factory(info):
 
 def string_renderer_factory(info):
     def _render(value, system):
-        if not isinstance(value, basestring):
-            value = str(value)
+        if not isinstance(value, string_types):
+            value = native_(value, 'utf-8')
         request = system.get('request')
         if request is not None:
             response = request.response

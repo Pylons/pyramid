@@ -3,6 +3,8 @@ import sys
 from zope.deprecation import deprecated
 from zope.interface import implements
 
+from pyramid.compat import reraise
+
 try:
     from chameleon.zpt.template import PageTemplateFile
     PageTemplateFile # prevent pyflakes complaining about a redefinition below
@@ -11,7 +13,7 @@ except ImportError: # pragma: no cover
     # Chameleon doesn't work on non-CPython platforms
     class PageTemplateFile(object):
         def __init__(self, *arg, **kw):
-            raise ImportError, exc, tb
+            reraise(ImportError, exc, tb)
 
 from pyramid.interfaces import ITemplateRenderer
 

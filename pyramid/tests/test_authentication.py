@@ -1,5 +1,6 @@
 import unittest
 from pyramid import testing
+from pyramid.compat import text_
 
 class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
     def setUp(self):
@@ -903,7 +904,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         helper = self._makeOne('secret')
         request = self._makeRequest()
         self.assertRaises(ValueError, helper.remember, request, 'other',
-                          tokens=(u'foo',))
+                          tokens=(text_('foo'),))
 
     def test_remember_invalid_token_format(self):
         helper = self._makeOne('secret')
@@ -1092,8 +1093,8 @@ class Test_maybe_encode(unittest.TestCase):
         return maybe_encode(s, encoding)
 
     def test_unicode(self):
-        result = self._callFUT(u'abc')
-        self.assertEqual(result, 'abc')
+        result = self._callFUT(text_('abc'))
+        self.assertEqual(result, text_('abc'))
 
 class DummyContext:
     pass

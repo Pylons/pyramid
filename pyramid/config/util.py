@@ -1,4 +1,5 @@
 import re
+import sys
 import traceback
 
 from pyramid.exceptions import ConfigurationError
@@ -111,7 +112,8 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
     if path_info is not None:
         try:
             path_info_val = re.compile(path_info)
-        except re.error, why:
+        except re.error:
+            why = sys.exc_info()[1]
             raise ConfigurationError(why[0])
         def path_info_predicate(context, request):
             return path_info_val.match(request.path_info) is not None
@@ -145,7 +147,8 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
             header_name, header_val = header.split(':', 1)
             try:
                 header_val = re.compile(header_val)
-            except re.error, why:
+            except re.error:
+                why = sys.exc_info()[1]
                 raise ConfigurationError(why[0])
         if header_val is None:
             text = "header %s" % header_name

@@ -18,6 +18,9 @@ import sys
 
 from setuptools import setup, find_packages
 
+PY3 = sys.version_info[0] == 3
+JYTHON = platform.system() != 'Java'
+
 here = os.path.abspath(os.path.dirname(__file__))
 try:
     README = open(os.path.join(here, 'README.rst')).read()
@@ -28,9 +31,6 @@ except IOError:
 install_requires=[
     'Chameleon >= 1.2.3',
     'Mako >= 0.3.6', # strict_undefined
-    'Paste > 1.7', # temp version pin to prevent PyPi install failure :-(
-    'PasteDeploy',
-    'PasteScript >= 1.7.4', # "here" in logging fileConfig
     'WebOb >= 1.0.2', # no "default_charset"; request.script_name doesnt error
     'repoze.lru',
     'setuptools',
@@ -40,21 +40,29 @@ install_requires=[
     'translationstring',
     ]
 
-if platform.system() == 'Java':
-    tests_require = install_requires + [
-        'WebTest',
-        'virtualenv',
-        'zope.component>=3.11.0',
-        ]
-else:
-    tests_require= install_requires + [
+if not PY3:
+    install_requires.extend([
+        'Paste > 1.7', # temp version pin to prevent PyPi install failure :-(
+        'PasteDeploy',
+        'PasteScript >= 1.7.4', # "here" in logging fileConfig
+        ])
+
+tests_require = install_requires + [
+    'WebTest',
+    'virtualenv',
+    ]
+
+if not JYTHON:
+    tests_require.extend([
         'Sphinx',
         'docutils',
         'repoze.sphinx.autointerface',
-        'WebTest', 
-        'virtualenv',
+        ])
+
+if not PY3:
+    tests_require.extend([
         'zope.component>=3.11.0',
-        ]
+        ])
 
 if sys.version_info[:2] < (2, 6):
     install_requires.append('simplejson')

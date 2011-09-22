@@ -1,3 +1,4 @@
+import sys
 import urllib
 import warnings
 
@@ -11,10 +12,13 @@ from pyramid.interfaces import IRequestFactory
 from pyramid.interfaces import ITraverser
 from pyramid.interfaces import VH_ROOT_KEY
 
+from pyramid.compat import text_
 from pyramid.encode import url_quote
 from pyramid.exceptions import URLDecodeError
 from pyramid.location import lineage
 from pyramid.threadlocal import get_current_registry
+
+empty = text_('')
 
 def find_root(resource):
     """ Find the root node in the resource tree to which ``resource``
@@ -478,7 +482,8 @@ def traversal_path(path):
         segment = urllib.unquote(segment)
         try:
             segment = segment.decode('utf-8')
-        except UnicodeDecodeError, e:
+        except UnicodeDecodeError:
+            e = sys.exc_info()[1]
             raise URLDecodeError(e.encoding, e.object, e.start, e.end, e.reason)
         if not segment or segment == '.':
             continue
@@ -639,7 +644,7 @@ class ResourceTreeTraverser(object):
                 ob = next
                 i += 1
 
-        return {'context':ob, 'view_name':u'', 'subpath':subpath,
+        return {'context':ob, 'view_name':empty, 'subpath':subpath,
                 'traversed':vpath_tuple, 'virtual_root':vroot,
                 'virtual_root_path':vroot_tuple, 'root':root}
 

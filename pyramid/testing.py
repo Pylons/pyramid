@@ -28,6 +28,13 @@ from pyramid.request import DeprecatedRequestMethodsMixin
 from pyramid.request import CallbackMethodsMixin
 from pyramid.url import URLMethodsMixin
 
+try:
+    import zope.component
+    zope.component
+    have_zca = True
+except ImportError:
+    have_zca = False
+
 _marker = object()
 
 def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
@@ -801,7 +808,7 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
             # any existing renderer factory lookup system.
             config.add_renderer(name, renderer)
     config.commit()
-    hook_zca and config.hook_zca()
+    have_zca and hook_zca and config.hook_zca()
     config.begin(request=request)
     return config
 

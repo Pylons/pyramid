@@ -1,6 +1,7 @@
 import unittest
 
 from pyramid.testing import cleanUp
+from pyramid.compat import text_
 
 class TraversalPathTests(unittest.TestCase):
     def _callFUT(self, path):
@@ -8,23 +9,24 @@ class TraversalPathTests(unittest.TestCase):
         return traversal_path(path)
 
     def test_path_startswith_endswith(self):
-        self.assertEqual(self._callFUT('/foo/'), (u'foo',))
+        self.assertEqual(self._callFUT('/foo/'), (text_('foo'),))
 
     def test_empty_elements(self):
-        self.assertEqual(self._callFUT('foo///'), (u'foo',))
+        self.assertEqual(self._callFUT('foo///'), (text_('foo'),))
 
     def test_onedot(self):
-        self.assertEqual(self._callFUT('foo/./bar'), (u'foo', u'bar'))
+        self.assertEqual(self._callFUT('foo/./bar'),
+                         (text_('foo'), text_('bar')))
 
     def test_twodots(self):
-        self.assertEqual(self._callFUT('foo/../bar'), (u'bar',))
+        self.assertEqual(self._callFUT('foo/../bar'), (text_('bar'),))
 
     def test_twodots_at_start(self):
-        self.assertEqual(self._callFUT('../../bar'), (u'bar',))
+        self.assertEqual(self._callFUT('../../bar'), (text_('bar'),))
 
     def test_element_urllquoted(self):
         self.assertEqual(self._callFUT('/foo/space%20thing/bar'),
-                         (u'foo', u'space thing', u'bar'))
+                         (text_('foo'), text_('space thing'), text_('bar')))
 
     def test_segments_are_unicode(self):
         result = self._callFUT('/foo/bar')
@@ -34,8 +36,8 @@ class TraversalPathTests(unittest.TestCase):
     def test_same_value_returned_if_cached(self):
         result1 = self._callFUT('/foo/bar')
         result2 = self._callFUT('/foo/bar')
-        self.assertEqual(result1, (u'foo', u'bar'))
-        self.assertEqual(result2, (u'foo', u'bar'))
+        self.assertEqual(result1, (text_('foo'), text_('bar')))
+        self.assertEqual(result2, (text_('foo'), text_('bar')))
 
     def test_utf8(self):
         import urllib
@@ -54,15 +56,16 @@ class TraversalPathTests(unittest.TestCase):
         self.assertRaises(URLDecodeError, self._callFUT, path)
 
     def test_unicode_highorder_chars(self):
-        path = u'/%E6%B5%81%E8%A1%8C%E8%B6%8B%E5%8A%BF'
-        self.assertEqual(self._callFUT(path), (u'\u6d41\u884c\u8d8b\u52bf',))
+        path = text_('/%E6%B5%81%E8%A1%8C%E8%B6%8B%E5%8A%BF')
+        self.assertEqual(self._callFUT(path),
+                         (text_('\u6d41\u884c\u8d8b\u52bf'),))
 
     def test_unicode_simple(self):
-        path = u'/abc'
-        self.assertEqual(self._callFUT(path), (u'abc',))
+        path = text_('/abc')
+        self.assertEqual(self._callFUT(path), (text_('abc'),))
 
     def test_unicode_undecodeable_to_ascii(self):
-        path = unicode('/La Pe\xc3\xb1a', 'utf-8')
+        path = text_('/La Pe\xc3\xb1a', 'utf-8')
         self.assertRaises(UnicodeEncodeError, self._callFUT, path)
 
 class ResourceTreeTraverserTests(unittest.TestCase):
@@ -146,7 +149,7 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         self.assertEqual(result['context'], foo)
         self.assertEqual(result['view_name'], 'bar')
         self.assertEqual(result['subpath'], ())
-        self.assertEqual(result['traversed'], (u'foo',))
+        self.assertEqual(result['traversed'], (text_('foo'),))
         self.assertEqual(result['root'], root)
         self.assertEqual(result['virtual_root'], root)
         self.assertEqual(result['virtual_root_path'], ())
@@ -161,7 +164,7 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         self.assertEqual(result['context'], foo)
         self.assertEqual(result['view_name'], 'bar')
         self.assertEqual(result['subpath'], ('baz', 'buz'))
-        self.assertEqual(result['traversed'], (u'foo',))
+        self.assertEqual(result['traversed'], (text_('foo'),))
         self.assertEqual(result['root'], root)
         self.assertEqual(result['virtual_root'], root)
         self.assertEqual(result['virtual_root_path'], ())
@@ -194,10 +197,12 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         self.assertEqual(result['context'], baz)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
-        self.assertEqual(result['traversed'], (u'foo', u'bar', u'baz'))
+        self.assertEqual(result['traversed'],
+                         (text_('foo'), text_('bar'), text_('baz')))
         self.assertEqual(result['root'], root)
         self.assertEqual(result['virtual_root'], bar)
-        self.assertEqual(result['virtual_root_path'], (u'foo', u'bar'))
+        self.assertEqual(result['virtual_root_path'],
+                         (text_('foo'), text_('bar')))
 
     def test_call_with_vh_root2(self):
         environ = self._getEnviron(PATH_INFO='/bar/baz',
@@ -212,10 +217,11 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         self.assertEqual(result['context'], baz)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
-        self.assertEqual(result['traversed'], (u'foo', u'bar', u'baz'))
+        self.assertEqual(result['traversed'],
+                         (text_('foo'), text_('bar'), text_('baz')))
         self.assertEqual(result['root'], root)
         self.assertEqual(result['virtual_root'], foo)
-        self.assertEqual(result['virtual_root_path'], (u'foo',))
+        self.assertEqual(result['virtual_root_path'], (text_('foo'),))
 
     def test_call_with_vh_root3(self):
         environ = self._getEnviron(PATH_INFO='/foo/bar/baz',
@@ -230,7 +236,8 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         self.assertEqual(result['context'], baz)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
-        self.assertEqual(result['traversed'], (u'foo', u'bar', u'baz'))
+        self.assertEqual(result['traversed'],
+                         (text_('foo'), text_('bar'), text_('baz')))
         self.assertEqual(result['root'], root)
         self.assertEqual(result['virtual_root'], root)
         self.assertEqual(result['virtual_root_path'], ())
@@ -248,10 +255,12 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         self.assertEqual(result['context'], baz)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
-        self.assertEqual(result['traversed'], (u'foo', u'bar', u'baz'))
+        self.assertEqual(result['traversed'],
+                         (text_('foo'), text_('bar'), text_('baz')))
         self.assertEqual(result['root'], root)
         self.assertEqual(result['virtual_root'], baz)
-        self.assertEqual(result['virtual_root_path'], (u'foo', u'bar', u'baz'))
+        self.assertEqual(result['virtual_root_path'],
+                         (text_('foo'), text_('bar'), text_('baz')))
 
     def test_call_with_vh_root_path_root(self):
         policy = self._makeOne(None)
@@ -592,13 +601,15 @@ class FindResourceTests(unittest.TestCase):
         unprintable = DummyContext()
         root = DummyContext(unprintable)
         unprintable.__parent__ = root
-        unprintable.__name__ = unicode(
+        unprintable.__name__ = text_(
             '/\xe6\xb5\x81\xe8\xa1\x8c\xe8\xb6\x8b\xe5\x8a\xbf', 'utf-8')
         root.__parent__ = None
         root.__name__ = None
         traverser = ResourceTreeTraverser
         self._registerTraverser(traverser)
-        result = self._callFUT(root, u'/%E6%B5%81%E8%A1%8C%E8%B6%8B%E5%8A%BF')
+        result = self._callFUT(
+            root,
+            text_('/%E6%B5%81%E8%A1%8C%E8%B6%8B%E5%8A%BF'))
         self.assertEqual(result, unprintable)
 
 class ResourcePathTests(unittest.TestCase):
@@ -1168,7 +1179,7 @@ class DummyContext(object):
 
     def __getitem__(self, name):
         if self.next is None:
-            raise KeyError, name
+            raise KeyError(name)
         return self.next
 
     def __repr__(self):

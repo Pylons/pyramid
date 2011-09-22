@@ -122,7 +122,6 @@ field. Reflecting this, these subclasses have one additional keyword argument:
 ``location``, which indicates the location to which to redirect.
 """
 
-import types
 from string import Template
 
 from zope.interface import implements
@@ -131,6 +130,7 @@ from webob import html_escape as _html_escape
 
 from pyramid.interfaces import IExceptionResponse
 from pyramid.response import Response
+from pyramid.compat import class_types
 
 def _no_escape(value):
     if value is None:
@@ -1016,8 +1016,8 @@ def default_exceptionresponse_view(context, request):
 
 status_map={}
 code = None
-for name, value in globals().items():
-    if (isinstance(value, (type, types.ClassType)) and
+for name, value in list(globals().items()):
+    if (isinstance(value, class_types) and
         issubclass(value, HTTPException)
         and not name.startswith('_')):
         code = getattr(value, 'code', None)

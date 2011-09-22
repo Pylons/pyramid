@@ -42,7 +42,7 @@ class IApplicationCreated(Interface):
        versions before 1.0, this interface can also be imported as
        :class:`pyramid.interfaces.IWSGIApplicationCreatedEvent`.
     """
-    app = Attribute(u"Created application")
+    app = Attribute("Created application")
 
 IWSGIApplicationCreatedEvent = IApplicationCreated # b /c
 

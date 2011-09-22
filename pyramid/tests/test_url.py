@@ -2,6 +2,7 @@ import unittest
 
 from pyramid.testing import setUp
 from pyramid.testing import tearDown
+from pyramid.compat import text_
 
 class TestURLMethodsMixin(unittest.TestCase):
     def setUp(self):
@@ -172,7 +173,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
         request.registry.registerUtility(mapper, IRoutesMapper)
         result = request.route_url('flub', a=1, b=2, c=3, _query={'a':1},
-                                   _anchor=u"foo")
+                                   _anchor=text_("foo"))
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3?a=1#foo')
 
@@ -281,7 +282,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         request.matchdict = {}
         request.registry.registerUtility(mapper, IRoutesMapper)
         result = request.current_route_url('extra1', 'extra2', _query={'a':1},
-                                           _anchor=u"foo")
+                                           _anchor=text_("foo"))
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3/extra1/extra2?a=1#foo')
 
@@ -294,7 +295,8 @@ class TestURLMethodsMixin(unittest.TestCase):
         request.matchdict = {}
         request.registry.registerUtility(mapper, IRoutesMapper)
         result = request.current_route_url('extra1', 'extra2', _query={'a':1},
-                                           _anchor=u"foo", _route_name='bar')
+                                           _anchor=text_("foo"),
+                                           _route_name='bar')
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3/extra1/extra2?a=1#foo')
 
@@ -308,7 +310,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         request.script_name = '/script_name'
         request.registry.registerUtility(mapper, IRoutesMapper)
         result = request.current_route_path('extra1', 'extra2', _query={'a':1},
-                                            _anchor=u"foo")
+                                            _anchor=text_("foo"))
         self.assertEqual(result, '/script_name/1/2/3/extra1/extra2?a=1#foo')
         
     def test_route_path_with_elements(self):
@@ -319,7 +321,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         request.script_name = ''
         result = request.route_path('flub', 'extra1', 'extra2',
                                     a=1, b=2, c=3, _query={'a':1},
-                                    _anchor=u"foo")
+                                    _anchor=text_("foo"))
         self.assertEqual(result, '/1/2/3/extra1/extra2?a=1#foo')
 
     def test_route_path_with_script_name(self):
@@ -330,7 +332,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         request.registry.registerUtility(mapper, IRoutesMapper)
         result = request.route_path('flub', 'extra1', 'extra2',
                                     a=1, b=2, c=3, _query={'a':1},
-                                    _anchor=u"foo")
+                                    _anchor=text_("foo"))
         self.assertEqual(result, '/foo/1/2/3/extra1/extra2?a=1#foo')
         
     def test_static_url_staticurlinfo_notfound(self):

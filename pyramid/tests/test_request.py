@@ -1,6 +1,8 @@
 import unittest
 from pyramid import testing
 
+from pyramid.compat import text_
+
 class TestRequest(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
@@ -50,7 +52,7 @@ class TestRequest(unittest.TestCase):
             }
         request = self._makeOne(environ)
         request.charset = None
-        self.assertEqual(request.GET['la'], u'La Pe\xf1a')
+        self.assertEqual(request.GET['la'], text_('La Pe\xf1a', 'utf-8'))
 
     def test_class_implements(self):
         from pyramid.interfaces import IRequest
@@ -166,7 +168,7 @@ class TestRequest(unittest.TestCase):
         self.config.registry.registerUtility(mapper, IRoutesMapper)
         result = inst.route_url('flub', 'extra1', 'extra2',
                                 a=1, b=2, c=3, _query={'a':1},
-                                _anchor=u"foo")
+                                _anchor=text_("foo"))
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3/extra1/extra2?a=1#foo')
 
@@ -184,7 +186,7 @@ class TestRequest(unittest.TestCase):
         self.config.registry.registerUtility(mapper, IRoutesMapper)
         result = inst.route_path('flub', 'extra1', 'extra2',
                                 a=1, b=2, c=3, _query={'a':1},
-                                _anchor=u"foo")
+                                _anchor=text_("foo"))
         self.assertEqual(result, '/1/2/3/extra1/extra2?a=1#foo')
 
     def test_static_url(self):

@@ -1,10 +1,11 @@
 import re
-from urllib import unquote
+import sys
 from zope.interface import implements
 
 from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import IRoute
 
+from pyramid.compat import url_unquote
 from pyramid.encode import url_quote
 from pyramid.exceptions import URLDecodeError
 from pyramid.traversal import traversal_path
@@ -133,14 +134,15 @@ def _compile_route(route):
         if m is None:
             return m
         d = {}
-        for k, v in m.groupdict().iteritems():
+        for k, v in m.groupdict().items():
             if k == star:
                 d[k] = traversal_path(v)
             else:
-                encoded = unquote(v)
+                encoded = url_unquote(v)
                 try:
                     d[k] = encoded.decode('utf-8')
-                except UnicodeDecodeError, e:
+                except UnicodeDecodeError:
+                    e = sys.exc_info()[1]
                     raise URLDecodeError(
                         e.encoding, e.object, e.start, e.end, e.reason
                         )

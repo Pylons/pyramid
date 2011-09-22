@@ -6,6 +6,7 @@ import unittest
 from pyramid.wsgi import wsgiapp
 from pyramid.view import view_config
 from pyramid.static import static_view
+from pyramid.compat import text_
 
 from zope.interface import Interface
 
@@ -82,13 +83,17 @@ class TestStaticAppBase(IntegrationBase):
     def test_highchars_in_pathelement(self):
         res = self.testapp.get('/static/héhé/index.html', status=200)
         self._assertBody(
-            res.body, os.path.join(here, u'fixtures/static/héhé/index.html')
+            res.body, os.path.join(
+                here,
+                text_('fixtures/static/héhé/index.html', 'utf-8'))
             )
 
     def test_highchars_in_filename(self):
         res = self.testapp.get('/static/héhé.html', status=200)
         self._assertBody(
-            res.body, os.path.join(here, u'fixtures/static/héhé.html')
+            res.body, os.path.join(
+                here,
+                text_('fixtures/static/héhé.html', 'utf-8'))
             )
 
     def test_not_modified(self):

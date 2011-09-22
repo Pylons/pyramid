@@ -1,6 +1,4 @@
 import inspect
-from urlparse import urljoin
-from urlparse import urlparse
 
 from zope.interface import Interface
 from zope.interface import classProvides
@@ -28,6 +26,7 @@ from pyramid.interfaces import IViewMapperFactory
 from pyramid.interfaces import PHASE1_CONFIG
 
 from pyramid import renderers
+from pyramid.compat import urlparse
 from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import PredicateMismatch
 from pyramid.httpexceptions import HTTPForbidden
@@ -42,6 +41,8 @@ from pyramid.config.util import MAX_ORDER
 from pyramid.config.util import action_method
 from pyramid.config.util import as_sorted_tuple
 from pyramid.config.util import make_predicates
+
+urljoin = urlparse.urljoin
 
 def wraps_view(wrapper):
     def inner(self, view):

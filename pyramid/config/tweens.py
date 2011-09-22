@@ -197,7 +197,7 @@ class Tweens(object):
             order.append((a, b))
 
         def add_node(node):
-            if not graph.has_key(node):
+            if not node in graph:
                 roots.append(node)
                 graph[node] = [0] # 0 = number of arcs coming into this node
 

@@ -1,18 +1,14 @@
-
-try:
-    import cPickle as pickle
-except ImportError: # pragma: no cover
-    import pickle
-
 from hashlib import sha1
 import base64
 import binascii
 import hmac
+import sys
 import time
 import os
 
 from zope.interface import implements
 
+from pyramid.compat import pickle
 from pyramid.interfaces import ISession
 
 def manage_accessed(wrapped):
@@ -255,8 +251,9 @@ def signed_deserialize(serialized, secret, hmac=hmac):
     try:
         input_sig, pickled = (serialized[:40],
                               base64.standard_b64decode(serialized[40:]))
-    except (binascii.Error, TypeError), e:
+    except (binascii.Error, TypeError):
         # Badly formed data can make base64 die
+        e = sys.exc_info()[1]
         raise ValueError('Badly formed base64 data: %s' % e)
 
     sig = hmac.new(secret, pickled, sha1).hexdigest()

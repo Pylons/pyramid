@@ -15,11 +15,14 @@ from pkg_resources import resource_isdir
 from repoze.lru import lru_cache
 
 from pyramid.asset import resolve_asset_spec
+from pyramid.compat import text_
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.httpexceptions import HTTPMovedPermanently
 from pyramid.path import caller_package
 from pyramid.response import Response
 from pyramid.traversal import traversal_path
+
+slash = text_('/')
 
 def init_mimetypes(mimetypes):
     # this is a function so it can be unittested
@@ -192,6 +195,6 @@ def _secure_path(path_tuple):
         return None
     if any([_contains_slash(item) for item in path_tuple]):
         return None
-    encoded = u'/'.join(path_tuple) # will be unicode
+    encoded = slash.join(path_tuple) # will be unicode
     return encoded
 

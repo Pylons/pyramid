@@ -13,6 +13,9 @@ from pyramid.interfaces import IExceptionResponse
 
 from pyramid.asset import resolve_asset_spec
 from pyramid.authorization import ACLAuthorizationPolicy
+from pyramid.compat import text_
+from pyramid.compat import reraise
+from pyramid.compat import string_types
 from pyramid.events import ApplicationCreated
 from pyramid.exceptions import ConfigurationConflictError
 from pyramid.exceptions import ConfigurationError
@@ -41,6 +44,8 @@ from pyramid.config.tweens import TweensConfiguratorMixin
 from pyramid.config.util import action_method
 from pyramid.config.views import ViewsConfiguratorMixin
 from pyramid.config.zca import ZCAConfiguratorMixin
+
+empty = text_('')
 
 ConfigurationError = ConfigurationError # pyflakes
 
@@ -283,7 +288,7 @@ class Configurator(
         self._set_settings(settings)
         self._register_response_adapters()
 
-        if isinstance(debug_logger, basestring):
+        if isinstance(debug_logger, string_types):
             debug_logger = logging.getLogger(debug_logger)
 
         if debug_logger is None:
@@ -401,7 +406,7 @@ class Configurator(
 
         if not hasattr(_registry, 'registerSelfAdapter'):
             def registerSelfAdapter(required=None, provided=None,
-                                    name=u'', info=u'', event=True):
+                                    name=empty, info=empty, event=True):
                 return _registry.registerAdapter(lambda x: x,
                                                  required=required,
                                                  provided=provided, name=name,
@@ -709,7 +714,7 @@ class Configurator(
         when generating an absolute asset specification.  If the
         provided ``relative_spec`` argument is already absolute, or if
         the ``relative_spec`` is not a string, it is simply returned."""
-        if not isinstance(relative_spec, basestring):
+        if not isinstance(relative_spec, string_types):
             return relative_spec
         return self._make_spec(relative_spec)
 
@@ -907,7 +912,8 @@ class ActionState(object):
                 except:
                     t, v, tb = sys.exc_info()
                     try:
-                        raise ConfigurationExecutionError(t, v, info), None, tb
+                        reraise(
+                            ConfigurationExecutionError(t, v, info), None, tb)
                     finally:
                        del t, v, tb
         finally:

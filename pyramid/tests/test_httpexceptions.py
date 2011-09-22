@@ -1,4 +1,5 @@
 import unittest
+from pyramid.compat import text_
 
 class Test_exception_response(unittest.TestCase):
     def _callFUT(self, *arg, **kw):
@@ -48,9 +49,9 @@ class Test__no_escape(unittest.TestCase):
     def test_unicode(self):
         class DummyUnicodeObject(object):
             def __unicode__(self):
-                return u'42'
+                return text_('42')
         duo = DummyUnicodeObject()
-        self.assertEqual(self._callFUT(duo), u'42')
+        self.assertEqual(self._callFUT(duo), text_('42'))
 
 class TestWSGIHTTPException(unittest.TestCase):
     def _getTargetClass(self):
@@ -128,7 +129,7 @@ class TestWSGIHTTPException(unittest.TestCase):
         self.assertEqual(exc.app_iter, ['123'])
 
     def test_ctor_with_unicode_body_doesnt_set_default_app_iter(self):
-        exc = self._makeOne(unicode_body=u'123')
+        exc = self._makeOne(unicode_body=text_('123'))
         self.assertEqual(exc.app_iter, ['123'])
 
     def test_ctor_with_app_iter_doesnt_set_default_app_iter(self):
