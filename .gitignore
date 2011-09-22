@@ -10,13 +10,6 @@
 nosetests.xml
 pyramid/coverage.xml
 tutorial.db
-env26/
-env26-debug/
-bookenv/
-env24/
-env27/
-jyenv/
-pypyenv/
 build/
 dist/
 bin/
@@ -24,3 +17,7 @@ lib/
 include/
 .idea/
 distribute-*.tar.gz
+bookenv/
+jyenv/
+pypyenv/
+env*/
