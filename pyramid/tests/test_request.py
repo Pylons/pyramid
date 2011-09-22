@@ -52,7 +52,7 @@ class TestRequest(unittest.TestCase):
             }
         request = self._makeOne(environ)
         request.charset = None
-        self.assertEqual(request.GET['la'], text_('La Pe\xf1a', 'utf-8'))
+        self.assertEqual(request.GET['la'], text_('La Pe\xf1a'))
 
     def test_class_implements(self):
         from pyramid.interfaces import IRequest

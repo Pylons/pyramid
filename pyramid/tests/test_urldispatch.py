@@ -365,10 +365,9 @@ class TestCompileRouteFunctional(unittest.TestCase):
                      {'x':'abc', 'traverse':('def', 'g')})
         self.matches('*traverse', '/zzz/abc', {'traverse':('zzz', 'abc')})
         self.matches('*traverse', '/zzz/%20abc', {'traverse':('zzz', ' abc')})
-        self.matches('{x}', '/La%20Pe%C3%B1a',
-                     {'x':text_('La Pe\xf1a', 'utf-8')})
+        self.matches('{x}', '/La%20Pe%C3%B1a', {'x':text_('La Pe\xf1a')})
         self.matches('*traverse', '/La%20Pe%C3%B1a/x',
-                     {'traverse':(text_('La Pe\xf1a', 'utf-8'), 'x')})
+                     {'traverse':(text_('La Pe\xf1a'), 'x')})
         self.matches('/foo/{id}.html', '/foo/bar.html', {'id':'bar'})
         self.matches('/{num:[0-9]+}/*traverse', '/555/abc/def',
                      {'num':'555', 'traverse':('abc', 'def')})
@@ -390,9 +389,9 @@ class TestCompileRouteFunctional(unittest.TestCase):
         self.matches('*traverse', '/zzz/abc', {'traverse':('zzz', 'abc')})
         self.matches('*traverse', '/zzz/%20abc', {'traverse':('zzz', ' abc')})
         self.matches(':x', '/La%20Pe%C3%B1a',
-                     {'x':text_('La Pe\xf1a', 'utf-8')})
+                     {'x':text_('La Pe\xf1a')})
         self.matches('*traverse', '/La%20Pe%C3%B1a/x',
-                     {'traverse':(text_('La Pe\xf1a', 'utf-8'), 'x')})
+                     {'traverse':(text_('La Pe\xf1a'), 'x')})
         self.matches('/foo/:id.html', '/foo/bar.html', {'id':'bar'})
         self.matches('/foo/:id_html', '/foo/bar_html', {'id_html':'bar_html'})
         self.matches('zzz/:_', '/zzz/abc', {'_':'abc'})
@@ -411,13 +410,12 @@ class TestCompileRouteFunctional(unittest.TestCase):
                        '/zzz/abc')
         self.generates('zzz/{x}*traverse', {'x':'abc', 'traverse':'/def/g'},
                        '/zzz/abc/def/g')
-        self.generates('/{x}', {'x':unicode('/La Pe\xc3\xb1a', 'utf-8')},
+        self.generates('/{x}', {'x':text_('/La Pe\xc3\xb1a', 'utf-8')},
                        '/%2FLa%20Pe%C3%B1a')
-        self.generates('/{x}*y', {'x':unicode('/La Pe\xc3\xb1a', 'utf-8'),
+        self.generates('/{x}*y', {'x':text_('/La Pe\xc3\xb1a', 'utf-8'),
                                  'y':'/rest/of/path'},
                        '/%2FLa%20Pe%C3%B1a/rest/of/path')
-        self.generates('*traverse', {'traverse':('a',
-                                                 text_('La Pe\xf1a', 'utf-8'))},
+        self.generates('*traverse', {'traverse':('a', text_('La Pe\xf1a'))},
                        '/a/La%20Pe%C3%B1a')
         self.generates('/foo/{id}.html', {'id':'bar'}, '/foo/bar.html')
         self.generates('/foo/{_}', {'_':'20'}, '/foo/20')
@@ -432,13 +430,12 @@ class TestCompileRouteFunctional(unittest.TestCase):
                        '/zzz/abc')
         self.generates('zzz/:x*traverse', {'x':'abc', 'traverse':'/def/g'},
                        '/zzz/abc/def/g')
-        self.generates('/:x', {'x':unicode('/La Pe\xc3\xb1a', 'utf-8')},
+        self.generates('/:x', {'x':text_('/La Pe\xc3\xb1a', 'utf-8')},
                        '/%2FLa%20Pe%C3%B1a')
-        self.generates('/:x*y', {'x':unicode('/La Pe\xc3\xb1a', 'utf-8'),
+        self.generates('/:x*y', {'x':text_('/La Pe\xc3\xb1a', 'utf-8'),
                                  'y':'/rest/of/path'},
                        '/%2FLa%20Pe%C3%B1a/rest/of/path')
-        self.generates('*traverse', {'traverse':('a',
-                                                 text_('La Pe\xf1a', 'utf-8'))},
+        self.generates('*traverse', {'traverse':('a', text_('La Pe\xf1a'))},
                        '/a/La%20Pe%C3%B1a')
         self.generates('/foo/:id.html', {'id':'bar'}, '/foo/bar.html')
         self.generates('/foo/:_', {'_':'20'}, '/foo/20')

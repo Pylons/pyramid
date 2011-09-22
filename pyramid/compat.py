@@ -32,6 +32,7 @@ else:
     class_types = (type, types.ClassType)
     text_type = unicode
     binary_type = str
+    long = long
     def ords_(s):
         return [ord(x) for x in s]
 

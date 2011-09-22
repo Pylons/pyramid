@@ -58,7 +58,7 @@ class TraversalPathTests(unittest.TestCase):
     def test_unicode_highorder_chars(self):
         path = text_('/%E6%B5%81%E8%A1%8C%E8%B6%8B%E5%8A%BF')
         self.assertEqual(self._callFUT(path),
-                         (text_('\u6d41\u884c\u8d8b\u52bf'),))
+                         (text_('\u6d41\u884c\u8d8b\u52bf', 'unicode_escape'),))
 
     def test_unicode_simple(self):
         path = text_('/abc')

@@ -43,6 +43,7 @@ from pyramid.config.util import as_sorted_tuple
 from pyramid.config.util import make_predicates
 
 urljoin = urlparse.urljoin
+url_parse = urlparse.urlparse
 
 def wraps_view(wrapper):
     def inner(self, view):
@@ -1447,7 +1448,7 @@ class StaticURLInfo(object):
             # make sure it ends with a slash
             name = name + '/'
 
-        if urlparse(name)[0]:
+        if url_parse(name)[0]:
             # it's a URL
             # url, spec, route_name
             url = name
