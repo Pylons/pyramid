@@ -9,6 +9,7 @@ import urllib
 from zope.interface import implementer
 
 from pyramid.compat import long
+from pyramid.compat import text_type
 
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.interfaces import IDebugLogger
@@ -548,7 +549,7 @@ class AuthTktCookieHelper(object):
     userid_type_encoders = {
         int: ('int', str),
         long: ('int', str),
-        unicode: ('b64unicode', lambda x: b64encode(utf_8_encode(x)[0])),
+        text_type: ('b64unicode', lambda x: b64encode(utf_8_encode(x)[0])),
         str: ('b64str', lambda x: b64encode(x)),
         }
     
