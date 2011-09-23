@@ -483,7 +483,7 @@ def traversal_path(path):
     for segment in path.split('/'):
         segment = url_unquote(segment)
         try:
-            segment = native_(segment, 'utf-8')
+            segment = text_(segment, 'utf-8')
         except UnicodeDecodeError as e:
             raise URLDecodeError(e.encoding, e.object, e.start, e.end, e.reason)
         if not segment or segment == '.':
@@ -531,7 +531,7 @@ def quote_path_segment(segment, safe=''):
         return _segment_cache[(segment, safe)]
     except KeyError:
         if segment.__class__ is text_type: # isinstance slighly slower (~15%)
-            result = url_quote(native_(segment, 'utf-8'), safe)
+            result = url_quote(segment.encode('utf-8'), safe)
         else:
             result = url_quote(native_(segment), safe)
         # we don't need a lock to mutate _segment_cache, as the below
