@@ -2,7 +2,6 @@ from hashlib import sha1
 import base64
 import binascii
 import hmac
-import sys
 import time
 import os
 
@@ -254,9 +253,8 @@ def signed_deserialize(serialized, secret, hmac=hmac):
     try:
         input_sig, pickled = (serialized[:40],
                               base64.standard_b64decode(serialized[40:]))
-    except (binascii.Error, TypeError):
+    except (binascii.Error, TypeError) as e:
         # Badly formed data can make base64 die
-        e = sys.exc_info()[1]
         raise ValueError('Badly formed base64 data: %s' % e)
 
     sig = hmac.new(secret, pickled, sha1).hexdigest()

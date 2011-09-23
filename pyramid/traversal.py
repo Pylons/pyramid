@@ -1,4 +1,3 @@
-import sys
 import urllib
 import warnings
 
@@ -484,8 +483,7 @@ def traversal_path(path):
         segment = urllib.unquote(segment)
         try:
             segment = segment.decode('utf-8')
-        except UnicodeDecodeError:
-            e = sys.exc_info()[1]
+        except UnicodeDecodeError as e:
             raise URLDecodeError(e.encoding, e.object, e.start, e.end, e.reason)
         if not segment or segment == '.':
             continue

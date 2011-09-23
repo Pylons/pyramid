@@ -3,7 +3,6 @@ from codecs import utf_8_encode
 from hashlib import md5
 import datetime
 import re
-import sys
 import time as time_mod
 import urllib
 
@@ -472,8 +471,7 @@ def parse_ticket(secret, ticket, ip):
     digest = ticket[:32]
     try:
         timestamp = int(ticket[32:40], 16)
-    except ValueError:
-        e = sys.exc_info()[1]
+    except ValueError as e:
         raise BadTicket('Timestamp is not a hex integer: %s' % e)
     try:
         userid, data = ticket[40:].split('!', 1)

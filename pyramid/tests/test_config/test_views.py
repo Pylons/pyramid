@@ -1,5 +1,4 @@
 import unittest
-import sys
 from pyramid import testing
 
 from pyramid.tests.test_config import IDummy
@@ -2531,8 +2530,7 @@ class TestViewDeriver(unittest.TestCase):
         request.url = 'url'
         try:
             result(None, request)
-        except HTTPForbidden:
-            e = sys.exc_info()[1]
+        except HTTPForbidden as e:
             self.assertEqual(e.message,
                              'Unauthorized: <lambda> failed permission check')
         else: # pragma: no cover
@@ -2554,8 +2552,7 @@ class TestViewDeriver(unittest.TestCase):
         request.url = 'url'
         try:
             result(None, request)
-        except HTTPForbidden:
-            e = sys.exc_info()[1]
+        except HTTPForbidden as e:
             self.assertEqual(e.message,
                              'Unauthorized: myview failed permission check')
         else: # pragma: no cover
@@ -2573,8 +2570,7 @@ class TestViewDeriver(unittest.TestCase):
         request.method = 'POST'
         try:
             result(None, None)
-        except PredicateMismatch:
-            e = sys.exc_info()[1]
+        except PredicateMismatch as e:
             self.assertEqual(e.detail, 'predicate mismatch for view <lambda>')
         else: # pragma: no cover
             raise AssertionError
@@ -2590,8 +2586,7 @@ class TestViewDeriver(unittest.TestCase):
         request.method = 'POST'
         try:
             result(None, None)
-        except PredicateMismatch:
-            e = sys.exc_info()[1]
+        except PredicateMismatch as e:
             self.assertEqual(e.detail, 'predicate mismatch for view myview')
         else: # pragma: no cover
             raise AssertionError

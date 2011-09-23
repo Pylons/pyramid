@@ -1,5 +1,4 @@
 import unittest
-import sys
 
 class TestDottedNameResolver(unittest.TestCase):
     def _makeOne(self, package=None):
@@ -10,8 +9,7 @@ class TestDottedNameResolver(unittest.TestCase):
         from pyramid.exceptions import ConfigurationError
         try:
             func(*arg, **kw)
-        except ConfigurationError:
-            e = sys.exc_info()[1]
+        except ConfigurationError as e:
             return e
         else:
             raise AssertionError('Invalid not raised') # pragma: no cover

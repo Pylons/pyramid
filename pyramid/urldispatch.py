@@ -1,5 +1,4 @@
 import re
-import sys
 from zope.interface import implementer
 
 from pyramid.interfaces import IRoutesMapper
@@ -141,8 +140,7 @@ def _compile_route(route):
                 encoded = url_unquote(v)
                 try:
                     d[k] = encoded.decode('utf-8')
-                except UnicodeDecodeError:
-                    e = sys.exc_info()[1]
+                except UnicodeDecodeError as e:
                     raise URLDecodeError(
                         e.encoding, e.object, e.start, e.end, e.reason
                         )

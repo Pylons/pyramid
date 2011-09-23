@@ -1,4 +1,3 @@
-import sys
 import unittest
 
 from pyramid import testing
@@ -1205,8 +1204,7 @@ class DummyLogger:
 def exc_raised(exc, func, *arg, **kw):
     try:
         func(*arg, **kw)
-    except exc:
-        e = sys.exc_info()[1]
+    except exc as e:
         return e
     else:
         raise AssertionError('%s not raised' % exc) # pragma: no cover
