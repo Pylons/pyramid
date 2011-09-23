@@ -38,9 +38,9 @@ class TestViewsConfigurationMixin(unittest.TestCase):
     def _registerRenderer(self, config, name='.txt'):
         from pyramid.interfaces import IRendererFactory
         from pyramid.interfaces import ITemplateRenderer
-        from zope.interface import implements
+        from zope.interface import implementer
+        @implementer(ITemplateRenderer)
         class Renderer:
-            implements(ITemplateRenderer)
             def __init__(self, info):
                 self.__class__.info = info
             def __call__(self, *arg):
@@ -3461,10 +3461,11 @@ class DummyRequest:
 class DummyContext:
     pass
 
-from zope.interface import implements
+from zope.interface import implementer
 from pyramid.interfaces import IResponse
+@implementer(IResponse)
 class DummyResponse(object):
-    implements(IResponse)
+    pass
 
 class DummyAccept(object):
     def __init__(self, *matches):
@@ -3510,10 +3511,10 @@ class DummyConfig:
     def action(self, discriminator, callable):
         callable()
 
-from zope.interface import implements
+from zope.interface import implementer
 from pyramid.interfaces import IMultiView
+@implementer(IMultiView)
 class DummyMultiView:
-    implements(IMultiView)
     def __init__(self):
         self.views = []
         self.name = 'name'

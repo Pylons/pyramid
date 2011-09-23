@@ -3,7 +3,7 @@ import os
 
 from zope.deprecation import deprecated
 
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface import Interface
 from zope.interface import alsoProvides
 
@@ -597,8 +597,8 @@ class DummyResource:
 
 DummyModel = DummyResource # b/w compat (forever)
 
+@implementer(ISession)
 class DummySession(dict):
-    implements(ISession)
     created = None
     new = True
     def changed(self):
@@ -628,6 +628,7 @@ class DummySession(dict):
     def get_csrf_token(self):
         return self.get('_csrft_', None)
         
+@implementer(IRequest)
 class DummyRequest(DeprecatedRequestMethodsMixin, URLMethodsMixin,
                    CallbackMethodsMixin):
     """ A DummyRequest object (incompletely) imitates a :term:`request` object.
@@ -656,7 +657,6 @@ class DummyRequest(DeprecatedRequestMethodsMixin, URLMethodsMixin,
     a Request, use the :class:`pyramid.request.Request` class itself rather
     than this class while writing tests.
     """
-    implements(IRequest)
     method = 'GET'
     application_url = 'http://example.com'
     host = 'example.com:80'

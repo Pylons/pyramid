@@ -182,3 +182,8 @@ if PY3:
 else:
     map_ = map
     
+try:
+    import __pypy__
+except:
+    __pypy__ = None
+

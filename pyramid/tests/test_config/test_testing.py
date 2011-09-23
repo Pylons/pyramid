@@ -166,9 +166,10 @@ class TestingConfiguratorMixinTests(unittest.TestCase):
         renderer.assert_(bar=2)
         renderer.assert_(request=request)
 
-from zope.interface import implements
+from zope.interface import implementer
+@implementer(IDummy)
 class DummyEvent:
-    implements(IDummy)
+    pass
 
 class DummyRequest:
     subpath = ()

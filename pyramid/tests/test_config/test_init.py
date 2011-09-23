@@ -2,6 +2,8 @@ import unittest
 
 import os
 
+from pyramid.compat import __pypy__
+
 from pyramid.tests.test_config import dummy_tween_factory
 from pyramid.tests.test_config import dummy_include
 from pyramid.tests.test_config import dummy_extend
@@ -9,14 +11,8 @@ from pyramid.tests.test_config import dummy_extend2
 from pyramid.tests.test_config import IDummy
 from pyramid.tests.test_config import DummyContext
 
-try:
-    import __pypy__
-except:
-    __pypy__ = None
-
 from pyramid.exceptions import ConfigurationExecutionError
 from pyramid.exceptions import ConfigurationConflictError
-from pyramid.exceptions import ConfigurationError
 
 class ConfiguratorTests(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
@@ -309,10 +305,12 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test__fix_registry_queryAdapterOrSelf(self):
         from zope.interface import Interface
+        from zope.interface import implementer
         class IFoo(Interface):
             pass
+        @implementer(IFoo)
         class Foo(object):
-            implements(IFoo)
+            pass
         class Bar(object):
             pass
         adaptation = ()
@@ -1118,9 +1116,9 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
     def _registerRenderer(self, config, name='.txt'):
         from pyramid.interfaces import IRendererFactory
         from pyramid.interfaces import ITemplateRenderer
-        from zope.interface import implements
+        from zope.interface import implementer
+        @implementer(ITemplateRenderer)
         class Renderer:
-            implements(ITemplateRenderer)
             def __init__(self, info):
                 self.__class__.info = info
             def __call__(self, *arg):
@@ -1530,9 +1528,10 @@ class DummyThreadLocalManager(object):
     def pop(self):
         self.popped = True
 
-from zope.interface import implements
+from zope.interface import implementer
+@implementer(IDummy)
 class DummyEvent:
-    implements(IDummy)
+    pass
 
 class DummyRegistry(object):
     def __init__(self, adaptation=None):
@@ -1550,8 +1549,9 @@ class DummyRegistry(object):
         return self.adaptation
 
 from pyramid.interfaces import IResponse
+@implementer(IResponse)
 class DummyResponse(object):
-    implements(IResponse)
+    pass
     
 from zope.interface import Interface
 class IOther(Interface):

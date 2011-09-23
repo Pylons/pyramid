@@ -1,6 +1,6 @@
 from zope.deprecation import deprecate
 from zope.deprecation.deprecation import deprecated
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface.interface import InterfaceClass
 
 from webob import BaseRequest
@@ -283,6 +283,7 @@ class CallbackMethodsMixin(object):
             callback = callbacks.pop(0)
             callback(self)
 
+@implementer(IRequest)
 class Request(BaseRequest, DeprecatedRequestMethodsMixin, URLMethodsMixin,
               CallbackMethodsMixin):
     """
@@ -305,7 +306,6 @@ class Request(BaseRequest, DeprecatedRequestMethodsMixin, URLMethodsMixin,
     release of this :app:`Pyramid` version.  See
     http://pythonpaste.org/webob/ for further information.
     """
-    implements(IRequest)
     exception = None
     exc_info = None
     matchdict = None

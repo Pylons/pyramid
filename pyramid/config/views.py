@@ -3,7 +3,7 @@ import inspect
 from zope.interface import Interface
 from zope.interface import classProvides
 from zope.interface import implementedBy
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface.interfaces import IInterface
 
 from pyramid.interfaces import IAuthenticationPolicy
@@ -335,9 +335,9 @@ class ViewDeriver(object):
             return view
         return decorator(view)
 
+@implementer(IViewMapper)
 class DefaultViewMapper(object):
     classProvides(IViewMapperFactory)
-    implements(IViewMapper)
     def __init__(self, **kw):
         self.attr = kw.get('attr')
 
@@ -459,8 +459,8 @@ def requestonly(view, attr=None):
 
     return False
 
+@implementer(IMultiView)
 class MultiView(object):
-    implements(IMultiView)
 
     def __init__(self, name):
         self.name = name
@@ -1403,8 +1403,8 @@ def isexception(o):
         )
 
 
+@implementer(IStaticURLInfo)
 class StaticURLInfo(object):
-    implements(IStaticURLInfo)
 
     def _get_registrations(self, registry):
         try:

@@ -124,7 +124,7 @@ field. Reflecting this, these subclasses have one additional keyword argument:
 
 from string import Template
 
-from zope.interface import implements
+from zope.interface import implementer
 
 from webob import html_escape as _html_escape
 
@@ -145,8 +145,8 @@ def _no_escape(value):
 class HTTPException(Exception): # bw compat
     """ Base class for all :term:`exception response` objects."""
 
+@implementer(IExceptionResponse)
 class WSGIHTTPException(Response, HTTPException):
-    implements(IExceptionResponse)
 
     ## You should set in subclasses:
     # code = 200

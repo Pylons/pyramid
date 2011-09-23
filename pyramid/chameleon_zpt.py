@@ -1,7 +1,7 @@
 import sys
 
 from zope.deprecation import deprecated
-from zope.interface import implements
+from zope.interface import implementer
 
 from pyramid.compat import reraise
 
@@ -24,8 +24,8 @@ from pyramid import renderers
 def renderer_factory(info):
     return renderers.template_renderer_factory(info, ZPTTemplateRenderer)
 
+@implementer(ITemplateRenderer)
 class ZPTTemplateRenderer(object):
-    implements(ITemplateRenderer)
     def __init__(self, path, lookup):
         self.path = path
         self.lookup = lookup

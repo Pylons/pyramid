@@ -7,7 +7,7 @@ import sys
 import time as time_mod
 import urllib
 
-from zope.interface import implements
+from zope.interface import implementer
 
 from pyramid.compat import long
 
@@ -108,6 +108,7 @@ class CallbackAuthenticationPolicy(object):
              )
         return effective_principals
 
+@implementer(IAuthenticationPolicy)
 class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
     """ A :app:`Pyramid` :term:`authentication policy` which
     obtains data from the :mod:`repoze.who` 1.X WSGI 'API' (the
@@ -132,7 +133,6 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
     Objects of this class implement the interface described by
     :class:`pyramid.interfaces.IAuthenticationPolicy`.
     """
-    implements(IAuthenticationPolicy)
 
     def __init__(self, identifier_name='auth_tkt', callback=None):
         self.identifier_name = identifier_name
@@ -196,6 +196,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         identity = self._get_identity(request)
         return identifier.forget(request.environ, identity)
 
+@implementer(IAuthenticationPolicy)
 class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
     """ A :app:`Pyramid` :term:`authentication policy` which
     obtains data from the ``REMOTE_USER`` WSGI environment variable.
@@ -225,7 +226,6 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
     Objects of this class implement the interface described by
     :class:`pyramid.interfaces.IAuthenticationPolicy`.
     """
-    implements(IAuthenticationPolicy)
 
     def __init__(self, environ_key='REMOTE_USER', callback=None, debug=False):
         self.environ_key = environ_key
@@ -241,6 +241,7 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
     def forget(self, request):
         return []
 
+@implementer(IAuthenticationPolicy)
 class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
     """ A :app:`Pyramid` :term:`authentication policy` which
     obtains data from an :class:`paste.auth.auth_tkt` cookie.
@@ -343,7 +344,6 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
     Objects of this class implement the interface described by
     :class:`pyramid.interfaces.IAuthenticationPolicy`.
     """
-    implements(IAuthenticationPolicy)
     def __init__(self,
                  secret,
                  callback=None,
@@ -747,6 +747,7 @@ class AuthTktCookieHelper(object):
         cookie_value = ticket.cookie_value()
         return self._get_cookies(environ, cookie_value, max_age)
 
+@implementer(IAuthenticationPolicy)
 class SessionAuthenticationPolicy(CallbackAuthenticationPolicy):
     """ A :app:`Pyramid` authentication policy which gets its data from the
     configured :term:`session`.  For this authentication policy to work, you
@@ -776,7 +777,6 @@ class SessionAuthenticationPolicy(CallbackAuthenticationPolicy):
         or IRC channels when asking for support.
        
     """
-    implements(IAuthenticationPolicy)
 
     def __init__(self, prefix='auth.', callback=None, debug=False):
         self.callback = callback

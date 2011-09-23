@@ -222,12 +222,12 @@ class Test_registerAdapter(TestBase):
 
 class Test_registerUtility(TestBase):
     def test_registerUtility(self):
-        from zope.interface import implements
+        from zope.interface import implementer
         from zope.interface import Interface
         class iface(Interface):
             pass
+        @implementer(iface)
         class impl:
-            implements(iface)
             def __call__(self):
                 return 'foo'
         utility = impl()
@@ -888,13 +888,15 @@ class TestDummySession(unittest.TestCase):
 
 
 from zope.interface import Interface
-from zope.interface import implements
+from zope.interface import implementer
         
 class IDummy(Interface):
     pass
 
+@implementer(IDummy)
 class DummyEvent:
-    implements(IDummy)
+    pass
+    
 
 class DummyRequest:
     application_url = 'http://example.com'

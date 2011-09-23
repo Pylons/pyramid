@@ -378,7 +378,7 @@ class PViewsCommand(PCommand):
         configuration` within the application registry; return the view.
         """
         from zope.interface import providedBy
-        from zope.interface import implements
+        from zope.interface import implementer
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IRootFactory
         from pyramid.interfaces import IRouteRequest
@@ -399,8 +399,8 @@ class PViewsCommand(PCommand):
         adapters = registry.adapters
         request = None
 
+        @implementer(IMultiView)
         class RoutesMultiView(object):
-            implements(IMultiView)
 
             def __init__(self, infos, context_iface, root_factory, request):
                 self.views = []

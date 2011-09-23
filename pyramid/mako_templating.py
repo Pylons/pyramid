@@ -2,7 +2,7 @@ import os
 import sys
 import threading
 
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface import Interface
 
 from pyramid.asset import resolve_asset_spec
@@ -120,8 +120,8 @@ class MakoRenderingException(Exception):
 
     __str__ = __repr__
 
+@implementer(ITemplateRenderer)
 class MakoLookupTemplateRenderer(object):
-    implements(ITemplateRenderer)
     def __init__(self, path, lookup):
         self.path = path
         self.lookup = lookup

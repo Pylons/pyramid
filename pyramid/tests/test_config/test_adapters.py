@@ -9,12 +9,13 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         return config
 
     def test_add_subscriber_defaults(self):
-        from zope.interface import implements
+        from zope.interface import implementer
         from zope.interface import Interface
         class IEvent(Interface):
             pass
+        @implementer(IEvent)
         class Event:
-            implements(IEvent)
+            pass
         L = []
         def subscriber(event):
             L.append(event)
@@ -28,12 +29,13 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(len(L), 2)
 
     def test_add_subscriber_iface_specified(self):
-        from zope.interface import implements
+        from zope.interface import implementer
         from zope.interface import Interface
         class IEvent(Interface):
             pass
+        @implementer(IEvent)
         class Event:
-            implements(IEvent)
+            pass
         L = []
         def subscriber(event):
             L.append(event)
@@ -59,13 +61,13 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(handler.required, (INewRequest,))
 
     def test_add_object_event_subscriber(self):
-        from zope.interface import implements
+        from zope.interface import implementer
         from zope.interface import Interface
         class IEvent(Interface):
             pass
+        @implementer(IEvent)
         class Event:
             object = 'foo'
-            implements(IEvent)
         event = Event()
         L = []
         def subscriber(object, event):

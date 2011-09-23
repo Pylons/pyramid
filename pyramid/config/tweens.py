@@ -1,4 +1,4 @@
-from zope.interface import implements
+from zope.interface import implementer
 
 from pyramid.interfaces import ITweens
 
@@ -157,8 +157,8 @@ class CyclicDependencyError(Exception):
         msg = 'Implicit tween ordering cycle:' + '; '.join(L)
         return msg
 
+@implementer(ITweens)
 class Tweens(object):
-    implements(ITweens)
     def __init__(self):
         self.explicit = []
         self.names = []

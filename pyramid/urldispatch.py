@@ -1,6 +1,6 @@
 import re
 import sys
-from zope.interface import implements
+from zope.interface import implementer
 
 from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import IRoute
@@ -13,8 +13,8 @@ from pyramid.traversal import quote_path_segment
 
 _marker = object()
 
+@implementer(IRoute)
 class Route(object):
-    implements(IRoute)
     def __init__(self, name, pattern, factory=None, predicates=(),
                  pregenerator=None):
         self.pattern = pattern
@@ -25,8 +25,8 @@ class Route(object):
         self.predicates = predicates
         self.pregenerator = pregenerator
 
+@implementer(IRoutesMapper)
 class RoutesMapper(object):
-    implements(IRoutesMapper)
     def __init__(self):
         self.routelist = []
         self.routes = {}

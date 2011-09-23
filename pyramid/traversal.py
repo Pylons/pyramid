@@ -2,7 +2,7 @@ import sys
 import urllib
 import warnings
 
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface.interfaces import IInterface
 
 from repoze.lru import lru_cache
@@ -12,7 +12,9 @@ from pyramid.interfaces import IRequestFactory
 from pyramid.interfaces import ITraverser
 from pyramid.interfaces import VH_ROOT_KEY
 
+from pyramid.compat import native_
 from pyramid.compat import text_
+from pyramid.compat import text_type
 from pyramid.encode import url_quote
 from pyramid.exceptions import URLDecodeError
 from pyramid.location import lineage
@@ -529,22 +531,22 @@ def quote_path_segment(segment, safe=''):
     try:
         return _segment_cache[(segment, safe)]
     except KeyError:
-        if segment.__class__ is unicode: # isinstance slighly slower (~15%)
+        if segment.__class__ is text_type: # isinstance slighly slower (~15%)
             result = url_quote(segment.encode('utf-8'), safe)
         else:
-            result = url_quote(str(segment), safe)
+            result = url_quote(native_(segment), safe)
         # we don't need a lock to mutate _segment_cache, as the below
         # will generate exactly one Python bytecode (STORE_SUBSCR)
         _segment_cache[(segment, safe)] = result
         return result
 
+@implementer(ITraverser)
 class ResourceTreeTraverser(object):
     """ A resource tree traverser that should be used (for speed) when
     every resource in the tree supplies a ``__name__`` and
     ``__parent__`` attribute (ie. every resource in the tree is
     :term:`location` aware) ."""
 
-    implements(ITraverser)
 
     VIEW_SELECTOR = '@@'
 
@@ -650,10 +652,10 @@ class ResourceTreeTraverser(object):
 
 ModelGraphTraverser = ResourceTreeTraverser # b/w compat, not API, used in wild
 
+@implementer(IContextURL)
 class TraversalContextURL(object):
     """ The IContextURL adapter used to generate URLs for a resource in a
     resource tree"""
-    implements(IContextURL)
 
     vroot_varname = VH_ROOT_KEY
 

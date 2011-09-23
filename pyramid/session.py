@@ -6,7 +6,7 @@ import sys
 import time
 import os
 
-from zope.interface import implements
+from zope.interface import implementer
 
 from pyramid.compat import pickle
 from pyramid.interfaces import ISession
@@ -84,9 +84,9 @@ def UnencryptedCookieSessionFactoryConfig(
 
     """
 
+    @implementer(ISession)
     class UnencryptedCookieSessionFactory(dict):
         """ Dictionary-like session object """
-        implements(ISession)
 
         # configuration parameters
         _cookie_name = cookie_name

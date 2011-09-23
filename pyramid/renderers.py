@@ -2,7 +2,7 @@ import os
 import pkg_resources
 import threading
 
-from zope.interface import implements
+from zope.interface import implementer
 from zope.deprecation import deprecated
 
 from pyramid.interfaces import IChameleonLookup
@@ -227,8 +227,8 @@ class JSONP(object):
 
 # utility functions, not API
 
+@implementer(IChameleonLookup)
 class ChameleonRendererLookup(object):
-    implements(IChameleonLookup)
     def __init__(self, impl, registry):
         self.impl = impl
         self.registry = registry
@@ -350,8 +350,8 @@ deprecated(
     'the next major release. To replace it, use the '
     '``pyramid.renderers.get_renderer`` API instead. ')
 
+@implementer(IRendererInfo)
 class RendererHelper(object):
-    implements(IRendererInfo)
     def __init__(self, name=None, package=None, registry=None):
         if name and '.' in name:
             rtype = os.path.splitext(name)[1]

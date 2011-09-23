@@ -1,7 +1,7 @@
 import os
 import warnings
 
-from zope.interface import implements
+from zope.interface import implementer
 
 from pyramid.interfaces import ISettings
 
@@ -54,12 +54,12 @@ class SettingsConfiguratorMixin(object):
         return self.registry.settings
 
 
+@implementer(ISettings)
 class Settings(dict):
     """ Deployment settings.  Update application settings (usually
     from PasteDeploy keywords) with framework-specific key/value pairs
     (e.g. find ``PYRAMID_DEBUG_AUTHORIZATION`` in os.environ and jam into
     keyword args)."""
-    implements(ISettings)
     # _environ_ is dep inj for testing
     def __init__(self, d=None, _environ_=os.environ, **kw):
         if d is None:

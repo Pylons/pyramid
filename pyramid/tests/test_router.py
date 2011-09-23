@@ -1165,10 +1165,10 @@ class DummyStartResponse:
         self.headers = headers
 
 from pyramid.interfaces import IResponse
-from zope.interface import implements
+from zope.interface import implementer
 
+@implementer(IResponse)
 class DummyResponse(object):
-    implements(IResponse)
     headerlist = ()
     app_iter = ()
     environ = None
