@@ -177,7 +177,7 @@ class TestRouter(unittest.TestCase):
             return Response(s)
         router.registry.registerAdapter(make_response, (str,), IResponse)
         app_iter = router(environ, start_response)
-        self.assertEqual(app_iter, ['abc'])
+        self.assertEqual(app_iter, [b'abc'])
         self.assertEqual(start_response.status, '200 OK')
         self.assertEqual(environ['handled'], ['two', 'one'])
 
@@ -310,7 +310,7 @@ class TestRouter(unittest.TestCase):
             return Response(s)
         router.registry.registerAdapter(make_response, (str,), IResponse)
         app_iter = router(environ, start_response)
-        self.assertEqual(app_iter, ['abc'])
+        self.assertEqual(app_iter, [b'abc'])
         self.assertEqual(start_response.status, '200 OK')
 
     def test_call_view_registered_nonspecific_default_path(self):
@@ -466,7 +466,7 @@ class TestRouter(unittest.TestCase):
             raise KeyError
         def exc_view(context, request):
             self.assertFalse(hasattr(request.response, 'a'))
-            request.response.body = 'OK'
+            request.response.body = b'OK'
             return request.response
         environ = self._makeEnviron()
         self._registerView(view, '', IViewClassifier, IRequest, IContext)
@@ -475,7 +475,7 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         start_response = DummyStartResponse()
         itera = router(environ, start_response)
-        self.assertEqual(itera, ['OK'])
+        self.assertEqual(itera, [b'OK'])
 
     def test_call_request_has_response_callbacks(self):
         from zope.interface import Interface

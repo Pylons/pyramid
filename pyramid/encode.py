@@ -1,5 +1,9 @@
 import re
 
+from pyramid.compat import text_type
+from pyramid.compat import native_
+from pyramid.compat import is_nonstr_iter
+
 always_safe = ('ABCDEFGHIJKLMNOPQRSTUVWXYZ'
                'abcdefghijklmnopqrstuvwxyz'
                '0123456789' '_.-')
@@ -88,19 +92,19 @@ def urlencode(query, doseq=True):
     prefix = ''
 
     for (k, v) in query:
-        if k.__class__ is unicode:
-            k = k.encode('utf-8')
+        if k.__class__ is text_type:
+            k = native_(k, 'utf-8')
         k = quote_plus(str(k))
-        if hasattr(v, '__iter__'):
+        if is_nonstr_iter(v):
             for x in v:
-                if x.__class__ is unicode:
-                    x = x.encode('utf-8')
+                if x.__class__ is text_type:
+                    x = native_(x, 'utf-8')
                 x = quote_plus(str(x))
                 result += '%s%s=%s' % (prefix, k, x)
                 prefix = '&'
         else:
-            if v.__class__ is unicode:
-                v = v.encode('utf-8')
+            if v.__class__ is text_type:
+                v = native_(v, 'utf-8')
             v = quote_plus(str(v))
             result += '%s%s=%s' % (prefix, k, v)
         prefix = '&'

@@ -35,8 +35,10 @@ class Test_registerDummySecurityPolicy(TestBase):
 
 class Test_registerResources(TestBase):
     def test_it(self):
-        ob1 = object()
-        ob2 = object()
+        class Dummy:
+            pass
+        ob1 = Dummy()
+        ob2 = Dummy()
         resources = {'/ob1':ob1, '/ob2':ob2}
         from pyramid import testing
         testing.registerResources(resources)

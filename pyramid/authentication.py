@@ -1,15 +1,18 @@
 from codecs import utf_8_decode
 from codecs import utf_8_encode
 from hashlib import md5
+import base64
 import datetime
 import re
 import time as time_mod
-import urllib
 
 from zope.interface import implementer
 
 from pyramid.compat import long
 from pyramid.compat import text_type
+from pyramid.compat import url_unquote
+from pyramid.compat import url_quote
+from pyramid.compat import bytes_
 
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.interfaces import IDebugLogger
@@ -386,10 +389,10 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
         return self.cookie.forget(request)
 
 def b64encode(v):
-    return v.encode('base64').strip().replace('\n', '')
+    return base64.b64encode(v).strip().replace('\n', '')
 
 def b64decode(v):
-    return v.decode('base64')
+    return base64.b64decode(v)
 
 # this class licensed under the MIT license (stolen from Paste)
 class AuthTicket(object):
@@ -443,7 +446,7 @@ class AuthTicket(object):
 
     def cookie_value(self):
         v = '%s%08x%s!' % (self.digest(), int(self.time),
-                           urllib.quote(self.userid))
+                           url_quote(self.userid))
         if self.tokens:
             v += self.tokens + '!'
         v += self.user_data
@@ -478,7 +481,7 @@ def parse_ticket(secret, ticket, ip):
         userid, data = ticket[40:].split('!', 1)
     except ValueError:
         raise BadTicket('userid is not followed by !')
-    userid = urllib.unquote(userid)
+    userid = url_unquote(userid)
     if '!' in data:
         tokens, user_data = data.split('!', 1)
     else: # pragma: no cover (never generated)
@@ -499,10 +502,10 @@ def parse_ticket(secret, ticket, ip):
 
 # this function licensed under the MIT license (stolen from Paste)
 def calculate_digest(ip, timestamp, secret, userid, tokens, user_data):
-    secret = maybe_encode(secret)
-    userid = maybe_encode(userid)
-    tokens = maybe_encode(tokens)
-    user_data = maybe_encode(user_data)
+    secret = bytes_(secret, 'utf-8')
+    userid = bytes_(userid, 'utf-8')
+    tokens = bytes_(tokens, 'utf-8')
+    user_data = bytes_(user_data, 'utf-8')
     digest0 = md5(
         encode_ip_timestamp(ip, timestamp) + secret + userid + '\0'
         + tokens + '\0' + user_data).hexdigest()
@@ -519,11 +522,6 @@ def encode_ip_timestamp(ip, timestamp):
           t & 0xff)
     ts_chars = ''.join(map(chr, ts))
     return ip_chars + ts_chars
-
-def maybe_encode(s, encoding='utf8'):
-    if isinstance(s, unicode):
-        s = s.encode(encoding)
-    return s
 
 EXPIRE = object()
 

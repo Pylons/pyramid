@@ -131,15 +131,20 @@ from webob import html_escape as _html_escape
 from pyramid.interfaces import IExceptionResponse
 from pyramid.response import Response
 from pyramid.compat import class_types
+from pyramid.compat import text_type
+from pyramid.compat import binary_type
+from pyramid.compat import text_
 
 def _no_escape(value):
     if value is None:
         return ''
-    if not isinstance(value, basestring):
+    if not isinstance(value, text_type):
         if hasattr(value, '__unicode__'):
-            value = unicode(value)
+            value = value.__unicode__()
+        if isinstance(value, binary_type):
+            value = text_(value, 'utf-8')
         else:
-            value = str(value)
+            value = text_type(value)
     return value
 
 class HTTPException(Exception): # bw compat
@@ -259,7 +264,7 @@ ${body}''')
                     args[k.lower()] = escape(v)
             body = body_tmpl.substitute(args)
             page = page_template.substitute(status=self.status, body=body)
-            if isinstance(page, unicode):
+            if isinstance(page, text_type):
                 page = page.encode(self.charset)
             self.app_iter = [page]
             self.body = page

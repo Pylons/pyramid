@@ -4,6 +4,7 @@ from pyramid.interfaces import ITweens
 
 from pyramid.compat import string_types
 from pyramid.compat import is_nonstr_iter
+from pyramid.compat import string_types
 from pyramid.exceptions import ConfigurationError
 from pyramid.tweens import excview_tween_factory
 from pyramid.tweens import MAIN, INGRESS, EXCVIEW
@@ -98,7 +99,7 @@ class TweensConfiguratorMixin(object):
     @action_method
     def _add_tween(self, tween_factory, under=None, over=None, explicit=False):
 
-        if not isinstance(tween_factory, basestring):
+        if not isinstance(tween_factory, string_types):
             raise ConfigurationError(
                 'The "tween_factory" argument to add_tween must be a '
                 'dotted name to a globally importable object, not %r' %

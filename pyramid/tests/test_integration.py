@@ -66,7 +66,7 @@ class TestStaticAppBase(IntegrationBase):
     def _assertBody(self, body, filename):
         self.assertEqual(
             body.replace('\r', ''),
-            open(filename, 'r').read()
+            open(filename, 'rb').read()
             )
 
     def test_basic(self):
@@ -100,7 +100,7 @@ class TestStaticAppBase(IntegrationBase):
         self.testapp.extra_environ = {
             'HTTP_IF_MODIFIED_SINCE':httpdate(pow(2, 32)-1)}
         res = self.testapp.get('/minimal.pt', status=304)
-        self.assertEqual(res.body, '')
+        self.assertEqual(res.body, b'')
 
     def test_file_in_subdir(self):
         fn = os.path.join(here, 'fixtures/static/index.html')
@@ -130,12 +130,12 @@ class TestStaticAppBase(IntegrationBase):
     def test_range_inclusive(self):
         self.testapp.extra_environ = {'HTTP_RANGE':'bytes=1-2'}
         res = self.testapp.get('/static/index.html', status=206)
-        self.assertEqual(res.body, 'ht')
+        self.assertEqual(res.body, b'ht')
 
     def test_range_tilend(self):
         self.testapp.extra_environ = {'HTTP_RANGE':'bytes=-5'}
         res = self.testapp.get('/static/index.html', status=206)
-        self.assertEqual(res.body, 'tml>\n')
+        self.assertEqual(res.body, b'tml>\n')
 
     def test_range_notbytes(self):
         self.testapp.extra_environ = {'HTTP_RANGE':'kHz=-5'}
@@ -176,7 +176,7 @@ class TestStaticAppNoSubpath(unittest.TestCase):
     staticapp = static_view(os.path.join(here, 'fixtures'), use_subpath=False)
     def _makeRequest(self, extra):
         from pyramid.request import Request
-        from StringIO import StringIO
+        from io import BytesIO
         kw = {'PATH_INFO':'',
               'SCRIPT_NAME':'',
               'SERVER_NAME':'localhost',
@@ -184,7 +184,7 @@ class TestStaticAppNoSubpath(unittest.TestCase):
               'REQUEST_METHOD':'GET',
               'wsgi.version':(1,0),
               'wsgi.url_scheme':'http',
-              'wsgi.input':StringIO()}
+              'wsgi.input':BytesIO()}
         kw.update(extra)
         request = Request(kw)
         return request
@@ -192,7 +192,7 @@ class TestStaticAppNoSubpath(unittest.TestCase):
     def _assertBody(self, body, filename):
         self.assertEqual(
             body.replace('\r', ''),
-            open(filename, 'r').read()
+            open(filename, 'rb').read()
             )
 
     def test_basic(self):
@@ -207,7 +207,7 @@ class TestStaticAppWithRoutePrefix(IntegrationBase, unittest.TestCase):
     def _assertBody(self, body, filename):
         self.assertEqual(
             body.replace('\r', ''),
-            open(filename, 'r').read()
+            open(filename, 'rb').read()
             )
 
     def test_includelevel1(self):
@@ -225,18 +225,18 @@ class TestFixtureApp(IntegrationBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.fixtureapp'
     def test_another(self):
         res = self.testapp.get('/another.html', status=200)
-        self.assertEqual(res.body, 'fixture')
+        self.assertEqual(res.body, b'fixture')
 
     def test_root(self):
         res = self.testapp.get('/', status=200)
-        self.assertEqual(res.body, 'fixture')
+        self.assertEqual(res.body, b'fixture')
 
     def test_dummyskin(self):
         self.testapp.get('/dummyskin.html', status=404)
 
     def test_error(self):
         res = self.testapp.get('/error.html', status=200)
-        self.assertEqual(res.body, 'supressed')
+        self.assertEqual(res.body, b'supressed')
 
     def test_protected(self):
         self.testapp.get('/protected.html', status=403)
@@ -247,8 +247,8 @@ class TestStaticPermApp(IntegrationBase, unittest.TestCase):
     def test_allowed(self):
         result = self.testapp.get('/allowed/index.html', status=200)
         self.assertEqual(
-            result.body.replace('\r', ''),
-            open(os.path.join(here, 'fixtures/static/index.html'), 'r').read())
+            result.body.replace(b'\r', b''),
+            open(os.path.join(here, 'fixtures/static/index.html'), 'rb').read())
 
     def test_denied_via_acl_global_root_factory(self):
         self.testapp.extra_environ = {'REMOTE_USER':'bob'}
@@ -258,8 +258,8 @@ class TestStaticPermApp(IntegrationBase, unittest.TestCase):
         self.testapp.extra_environ = {'REMOTE_USER':'fred'}
         result = self.testapp.get('/protected/index.html', status=200)
         self.assertEqual(
-            result.body.replace('\r', ''),
-            open(os.path.join(here, 'fixtures/static/index.html'), 'r').read())
+            result.body.replace(b'\r', b''),
+            open(os.path.join(here, 'fixtures/static/index.html'), 'rb').read())
 
     def test_denied_via_acl_local_root_factory(self):
         self.testapp.extra_environ = {'REMOTE_USER':'fred'}
@@ -269,8 +269,8 @@ class TestStaticPermApp(IntegrationBase, unittest.TestCase):
         self.testapp.extra_environ = {'REMOTE_USER':'bob'}
         result = self.testapp.get('/factory_protected/index.html', status=200)
         self.assertEqual(
-            result.body.replace('\r', ''),
-            open(os.path.join(here, 'fixtures/static/index.html'), 'r').read())
+            result.body.replace(b'\r', b''),
+            open(os.path.join(here, 'fixtures/static/index.html'), 'rb').read())
 
 class TestCCBug(IntegrationBase, unittest.TestCase):
     # "unordered" as reported in IRC by author of
@@ -278,11 +278,11 @@ class TestCCBug(IntegrationBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.ccbugapp'
     def test_rdf(self):
         res = self.testapp.get('/licenses/1/v1/rdf', status=200)
-        self.assertEqual(res.body, 'rdf')
+        self.assertEqual(res.body, b'rdf')
 
     def test_juri(self):
         res = self.testapp.get('/licenses/1/v1/juri', status=200)
-        self.assertEqual(res.body, 'juri')
+        self.assertEqual(res.body, b'juri')
 
 class TestHybridApp(IntegrationBase, unittest.TestCase):
     # make sure views registered for a route "win" over views registered
@@ -291,19 +291,19 @@ class TestHybridApp(IntegrationBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.hybridapp'
     def test_root(self):
         res = self.testapp.get('/', status=200)
-        self.assertEqual(res.body, 'global')
+        self.assertEqual(res.body, b'global')
 
     def test_abc(self):
         res = self.testapp.get('/abc', status=200)
-        self.assertEqual(res.body, 'route')
+        self.assertEqual(res.body, b'route')
 
     def test_def(self):
         res = self.testapp.get('/def', status=200)
-        self.assertEqual(res.body, 'route2')
+        self.assertEqual(res.body, b'route2')
 
     def test_ghi(self):
         res = self.testapp.get('/ghi', status=200)
-        self.assertEqual(res.body, 'global')
+        self.assertEqual(res.body, b'global')
 
     def test_jkl(self):
         self.testapp.get('/jkl', status=404)
@@ -313,41 +313,41 @@ class TestHybridApp(IntegrationBase, unittest.TestCase):
 
     def test_pqr_global2(self):
         res = self.testapp.get('/pqr/global2', status=200)
-        self.assertEqual(res.body, 'global2')
+        self.assertEqual(res.body, b'global2')
 
     def test_error(self):
         res = self.testapp.get('/error', status=200)
-        self.assertEqual(res.body, 'supressed')
+        self.assertEqual(res.body, b'supressed')
 
     def test_error2(self):
         res = self.testapp.get('/error2', status=200)
-        self.assertEqual(res.body, 'supressed2')
+        self.assertEqual(res.body, b'supressed2')
 
     def test_error_sub(self):
         res = self.testapp.get('/error_sub', status=200)
-        self.assertEqual(res.body, 'supressed2')
+        self.assertEqual(res.body, b'supressed2')
 
 class TestRestBugApp(IntegrationBase, unittest.TestCase):
     # test bug reported by delijati 2010/2/3 (http://pastebin.com/d4cc15515)
     package = 'pyramid.tests.pkgs.restbugapp'
     def test_it(self):
         res = self.testapp.get('/pet', status=200)
-        self.assertEqual(res.body, 'gotten')
+        self.assertEqual(res.body, b'gotten')
 
 class TestForbiddenAppHasResult(IntegrationBase, unittest.TestCase):
     # test that forbidden exception has ACLDenied result attached
     package = 'pyramid.tests.pkgs.forbiddenapp'
     def test_it(self):
         res = self.testapp.get('/x', status=403)
-        message, result = [x.strip() for x in res.body.split('\n')]
-        self.assertTrue(message.endswith('failed permission check'))
+        message, result = [x.strip() for x in res.body.split(b'\n')]
+        self.assertTrue(message.endswith(b'failed permission check'))
         self.assertTrue(
-            result.startswith("ACLDenied permission 'private' via ACE "
-                              "'<default deny>' in ACL "
-                              "'<No ACL found on any object in resource "
-                              "lineage>' on context"))
+            result.startswith(b"ACLDenied permission 'private' via ACE "
+                              b"'<default deny>' in ACL "
+                              b"'<No ACL found on any object in resource "
+                              b"lineage>' on context"))
         self.assertTrue(
-            result.endswith("for principals ['system.Everyone']"))
+            result.endswith(b"for principals ['system.Everyone']"))
 
 class TestViewDecoratorApp(IntegrationBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.viewdecoratorapp'
@@ -362,20 +362,20 @@ class TestViewDecoratorApp(IntegrationBase, unittest.TestCase):
         # we use mako here instead of chameleon because it works on Jython
         self._configure_mako()
         res = self.testapp.get('/first', status=200)
-        self.assertTrue('OK' in res.body)
+        self.assertTrue(b'OK' in res.body)
 
     def test_second(self):
         # we use mako here instead of chameleon because it works on Jython
         self._configure_mako()
         res = self.testapp.get('/second', status=200)
-        self.assertTrue('OK2' in res.body)
+        self.assertTrue(b'OK2' in res.body)
 
 class TestViewPermissionBug(IntegrationBase, unittest.TestCase):
     # view_execution_permitted bug as reported by Shane at http://lists.repoze.org/pipermail/repoze-dev/2010-October/003603.html
     package = 'pyramid.tests.pkgs.permbugapp'
     def test_test(self):
         res = self.testapp.get('/test', status=200)
-        self.assertTrue('ACLDenied' in res.body)
+        self.assertTrue(b'ACLDenied' in res.body)
 
     def test_x(self):
         self.testapp.get('/x', status=403)
@@ -385,15 +385,15 @@ class TestDefaultViewPermissionBug(IntegrationBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.defpermbugapp'
     def test_x(self):
         res = self.testapp.get('/x', status=403)
-        self.assertTrue('failed permission check' in res.body)
+        self.assertTrue(b'failed permission check' in res.body)
 
     def test_y(self):
         res = self.testapp.get('/y', status=403)
-        self.assertTrue('failed permission check' in res.body)
+        self.assertTrue(b'failed permission check' in res.body)
 
     def test_z(self):
         res = self.testapp.get('/z', status=200)
-        self.assertTrue('public' in res.body)
+        self.assertTrue(b'public' in res.body)
 
 from pyramid.tests.pkgs.exceptionviewapp.models import \
      AnException, NotAnException
@@ -405,31 +405,31 @@ class TestExceptionViewsApp(IntegrationBase, unittest.TestCase):
     root_factory = lambda *arg: excroot
     def test_root(self):
         res = self.testapp.get('/', status=200)
-        self.assertTrue('maybe' in res.body)
+        self.assertTrue(b'maybe' in res.body)
 
     def test_notanexception(self):
         res = self.testapp.get('/notanexception', status=200)
-        self.assertTrue('no' in res.body)
+        self.assertTrue(b'no' in res.body)
 
     def test_anexception(self):
         res = self.testapp.get('/anexception', status=200)
-        self.assertTrue('yes' in res.body)
+        self.assertTrue(b'yes' in res.body)
 
     def test_route_raise_exception(self):
         res = self.testapp.get('/route_raise_exception', status=200)
-        self.assertTrue('yes' in res.body)
+        self.assertTrue(b'yes' in res.body)
 
     def test_route_raise_exception2(self):
         res = self.testapp.get('/route_raise_exception2', status=200)
-        self.assertTrue('yes' in res.body)
+        self.assertTrue(b'yes' in res.body)
 
     def test_route_raise_exception3(self):
         res = self.testapp.get('/route_raise_exception3', status=200)
-        self.assertTrue('whoa' in res.body)
+        self.assertTrue(b'whoa' in res.body)
 
     def test_route_raise_exception4(self):
         res = self.testapp.get('/route_raise_exception4', status=200)
-        self.assertTrue('whoa' in res.body)
+        self.assertTrue(b'whoa' in res.body)
 
 class TestConflictApp(unittest.TestCase):
     package = 'pyramid.tests.pkgs.conflictapp'
@@ -445,9 +445,9 @@ class TestConflictApp(unittest.TestCase):
         from webtest import TestApp
         self.testapp = TestApp(app)
         res = self.testapp.get('/')
-        self.assertTrue('a view' in res.body)
+        self.assertTrue(b'a view' in res.body)
         res = self.testapp.get('/route')
-        self.assertTrue('route view' in res.body)
+        self.assertTrue(b'route view' in res.body)
 
     def test_overridden_autoresolved_view(self):
         from pyramid.response import Response
@@ -460,7 +460,7 @@ class TestConflictApp(unittest.TestCase):
         from webtest import TestApp
         self.testapp = TestApp(app)
         res = self.testapp.get('/')
-        self.assertTrue('this view' in res.body)
+        self.assertTrue(b'this view' in res.body)
 
     def test_overridden_route_view(self):
         from pyramid.response import Response
@@ -473,7 +473,7 @@ class TestConflictApp(unittest.TestCase):
         from webtest import TestApp
         self.testapp = TestApp(app)
         res = self.testapp.get('/route')
-        self.assertTrue('this view' in res.body)
+        self.assertTrue(b'this view' in res.body)
 
     def test_nonoverridden_authorization_policy(self):
         config = self._makeConfig()
@@ -482,7 +482,7 @@ class TestConflictApp(unittest.TestCase):
         from webtest import TestApp
         self.testapp = TestApp(app)
         res = self.testapp.get('/protected', status=403)
-        self.assertTrue('403 Forbidden' in res)
+        self.assertTrue(b'403 Forbidden' in res.body)
 
     def test_overridden_authorization_policy(self):
         config = self._makeConfig()
@@ -512,15 +512,15 @@ class ImperativeIncludeConfigurationTest(unittest.TestCase):
 
     def test_root(self):
         res = self.testapp.get('/', status=200)
-        self.assertTrue('root' in res.body)
+        self.assertTrue(b'root' in res.body)
 
     def test_two(self):
         res = self.testapp.get('/two', status=200)
-        self.assertTrue('two' in res.body)
+        self.assertTrue(b'two' in res.body)
 
     def test_three(self):
         res = self.testapp.get('/three', status=200)
-        self.assertTrue('three' in res.body)
+        self.assertTrue(b'three' in res.body)
 
 class SelfScanAppTest(unittest.TestCase):
     def setUp(self):
@@ -536,11 +536,11 @@ class SelfScanAppTest(unittest.TestCase):
 
     def test_root(self):
         res = self.testapp.get('/', status=200)
-        self.assertTrue('root' in res.body)
+        self.assertTrue(b'root' in res.body)
 
     def test_two(self):
         res = self.testapp.get('/two', status=200)
-        self.assertTrue('two' in res.body)
+        self.assertTrue(b'two' in res.body)
 
 class WSGIApp2AppTest(unittest.TestCase):
     def setUp(self):
@@ -556,18 +556,18 @@ class WSGIApp2AppTest(unittest.TestCase):
 
     def test_hello(self):
         res = self.testapp.get('/hello', status=200)
-        self.assertTrue('Hello' in res.body)
+        self.assertTrue(b'Hello' in res.body)
 
 if os.name != 'java': # uses chameleon
     class RendererScanAppTest(IntegrationBase, unittest.TestCase):
         package = 'pyramid.tests.pkgs.rendererscanapp'
         def test_root(self):
             res = self.testapp.get('/one', status=200)
-            self.assertTrue('One!' in res.body)
+            self.assertTrue(b'One!' in res.body)
 
         def test_two(self):
             res = self.testapp.get('/two', status=200)
-            self.assertTrue('Two!' in res.body)
+            self.assertTrue(b'Two!' in res.body)
 
         def test_rescan(self):
             self.config.scan('pyramid.tests.pkgs.rendererscanapp')
@@ -575,9 +575,9 @@ if os.name != 'java': # uses chameleon
             from webtest import TestApp
             testapp = TestApp(app)
             res = testapp.get('/one', status=200)
-            self.assertTrue('One!' in res.body)
+            self.assertTrue(b'One!' in res.body)
             res = testapp.get('/two', status=200)
-            self.assertTrue('Two!' in res.body)
+            self.assertTrue(b'Two!' in res.body)
 
 class DummyContext(object):
     pass

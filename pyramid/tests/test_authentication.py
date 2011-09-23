@@ -586,7 +586,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         result = helper.identify(request)
         self.assertEqual(len(result), 4)
         self.assertEqual(result['tokens'], ())
-        self.assertEqual(result['userid'], unicode('\xc3\xa9ncoded', 'utf-8'))
+        self.assertEqual(result['userid'], text_('\xc3\xa9ncoded', 'utf-8'))
         self.assertEqual(result['userdata'], 'userid_type:b64unicode')
         self.assertEqual(result['timestamp'], 0)
         environ = request.environ
@@ -856,7 +856,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
     def test_remember_unicode_userid(self):
         helper = self._makeOne('secret')
         request = self._makeRequest()
-        userid = unicode('\xc2\xa9', 'utf-8')
+        userid = text_('\xc2\xa9', 'utf-8')
         result = helper.remember(request, userid)
         values = self._parseHeaders(result)
         self.assertEqual(len(result), 3)
@@ -1086,15 +1086,6 @@ class TestSessionAuthenticationPolicy(unittest.TestCase):
         result = policy.forget(request)
         self.assertEqual(request.session.get('userid'), None)
         self.assertEqual(result, [])
-
-class Test_maybe_encode(unittest.TestCase):
-    def _callFUT(self, s, encoding='utf-8'):
-        from pyramid.authentication import maybe_encode
-        return maybe_encode(s, encoding)
-
-    def test_unicode(self):
-        result = self._callFUT(text_('abc'))
-        self.assertEqual(result, text_('abc'))
 
 class DummyContext:
     pass

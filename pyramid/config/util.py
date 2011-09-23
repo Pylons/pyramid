@@ -1,6 +1,8 @@
 import re
 import traceback
 
+from pyramid.compat import string_types
+from pyramid.compat import bytes_
 from pyramid.exceptions import ConfigurationError
 from pyramid.traversal import find_interface
 from pyramid.traversal import traversal_path
@@ -177,7 +179,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         containment_predicate.__text__ = "containment = %s" % containment
         weights.append(1 << 7)
         predicates.append(containment_predicate)
-        h.update('containment:%r' % hash(containment))
+        h.update('containment:%r' % hash_(containment))
 
     if request_type is not None:
         def request_type_predicate(context, request):
@@ -186,10 +188,10 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         request_type_predicate.__text__ = text % request_type
         weights.append(1 << 8)
         predicates.append(request_type_predicate)
-        h.update('request_type:%r' % hash(request_type))
+        h.update('request_type:%r' % hash_(request_type))
 
     if match_param is not None:
-        if isinstance(match_param, basestring):
+        if isinstance(match_param, string_types):
             match_param, match_param_val = match_param.split('=', 1)
             match_param = {match_param: match_param_val}
         text = "match_param %s" % match_param
@@ -222,7 +224,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
             # functions for custom predicates, so that the hash output
             # of predicate instances which are "logically the same"
             # may compare equal.
-            h.update('custom%s:%r' % (num, hash(predicate)))
+            h.update('custom%s:%r' % (num, hash_(predicate)))
         weights.append(1 << 10)
 
     if traverse is not None:
@@ -259,3 +261,5 @@ def as_sorted_tuple(val):
     val = tuple(sorted(val))
     return val
     
+def hash_(v):
+    return bytes_(hash(v))

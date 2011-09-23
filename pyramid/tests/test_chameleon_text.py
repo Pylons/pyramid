@@ -149,7 +149,7 @@ class RenderTemplateToResponseTests(Base, unittest.TestCase):
         result = self._callFUT(minimal)
         from webob import Response
         self.assertTrue(isinstance(result, Response))
-        self.assertEqual(result.app_iter, ['Hello.\n'])
+        self.assertEqual(result.app_iter, [b'Hello.\n'])
         self.assertEqual(result.status, '200 OK')
         self.assertEqual(len(result.headerlist), 2)
 

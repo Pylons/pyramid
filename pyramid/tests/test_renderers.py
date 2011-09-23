@@ -2,6 +2,7 @@ import unittest
 
 from pyramid.testing import cleanUp
 from pyramid import testing
+from pyramid.compat import text_
 
 class TestTemplateRendererFactory(unittest.TestCase):
     def setUp(self):
@@ -433,7 +434,7 @@ class Test_string_renderer_factory(unittest.TestCase):
 
     def test_it_unicode(self):
         renderer = self._callFUT(None)
-        value = unicode('La Pe\xc3\xb1a', 'utf-8')
+        value = text_('La Pe\xc3\xb1a', 'utf-8')
         result = renderer(value, {})
         self.assertEqual(result, value)
                           
@@ -593,7 +594,7 @@ class TestRendererHelper(unittest.TestCase):
         request = None
         helper = self._makeOne('loo.foo')
         response = helper._make_response('abc', request)
-        self.assertEqual(response.body, 'abc')
+        self.assertEqual(response.body, b'abc')
 
     def test__make_response_request_is_None_response_factory_exists(self):
         self._registerResponseFactory()
@@ -601,14 +602,14 @@ class TestRendererHelper(unittest.TestCase):
         helper = self._makeOne('loo.foo')
         response = helper._make_response('abc', request)
         self.assertEqual(response.__class__.__name__, 'ResponseFactory')
-        self.assertEqual(response.body, 'abc')
+        self.assertEqual(response.body, b'abc')
 
     def test__make_response_result_is_unicode(self):
         from pyramid.response import Response
         request = testing.DummyRequest()
         request.response = Response()
         helper = self._makeOne('loo.foo')
-        la = unicode('/La Pe\xc3\xb1a', 'utf-8')
+        la = text_('/La Pe\xc3\xb1a', 'utf-8')
         response = helper._make_response(la, request)
         self.assertEqual(response.body, la.encode('utf-8'))
 
@@ -617,7 +618,7 @@ class TestRendererHelper(unittest.TestCase):
         request = testing.DummyRequest()
         request.response = Response()
         helper = self._makeOne('loo.foo')
-        la = unicode('/La Pe\xc3\xb1a', 'utf-8')
+        la = text_('/La Pe\xc3\xb1a', 'utf-8')
         response = helper._make_response(la.encode('utf-8'), request)
         self.assertEqual(response.body, la.encode('utf-8'))
 
@@ -630,7 +631,7 @@ class TestRendererHelper(unittest.TestCase):
         helper = self._makeOne('loo.foo')
         response = helper._make_response('abc', request)
         self.assertEqual(response.content_type, 'text/nonsense')
-        self.assertEqual(response.body, 'abc')
+        self.assertEqual(response.body, b'abc')
 
     def test__make_response_with_headerlist(self):
         from pyramid.response import Response
@@ -645,7 +646,7 @@ class TestRendererHelper(unittest.TestCase):
                           ('Content-Length', '3'),
                           ('a', '1'),
                           ('b', '2')])
-        self.assertEqual(response.body, 'abc')
+        self.assertEqual(response.body, b'abc')
 
     def test__make_response_with_status(self):
         from pyramid.response import Response
@@ -656,7 +657,7 @@ class TestRendererHelper(unittest.TestCase):
         helper = self._makeOne('loo.foo')
         response = helper._make_response('abc', request)
         self.assertEqual(response.status, '406 You Lose')
-        self.assertEqual(response.body, 'abc')
+        self.assertEqual(response.body, b'abc')
 
     def test__make_response_with_charset(self):
         from pyramid.response import Response
@@ -688,7 +689,7 @@ class TestRendererHelper(unittest.TestCase):
         helper = self._makeOne('loo.foo')
         response = helper._make_response('abc', request)
         self.assertEqual(response.__class__, ResponseFactory)
-        self.assertEqual(response.body, 'abc')
+        self.assertEqual(response.body, b'abc')
 
     def test__make_response_with_real_request(self):
         # functional
@@ -699,7 +700,7 @@ class TestRendererHelper(unittest.TestCase):
         helper = self._makeOne('loo.foo')
         response = helper._make_response('abc', request)
         self.assertEqual(response.status, '406 You Lose')
-        self.assertEqual(response.body, 'abc')
+        self.assertEqual(response.body, b'abc')
 
     def test_clone_noargs(self):
         helper = self._makeOne('name', 'package', 'registry')
@@ -811,7 +812,7 @@ class Test_render_to_response(unittest.TestCase):
             'pyramid.tests:abc/def.pt')
         renderer.string_response = 'abc'
         response = self._callFUT('abc/def.pt', dict(a=1))
-        self.assertEqual(response.body, 'abc')
+        self.assertEqual(response.body, b'abc')
         renderer.assert_(a=1)
         renderer.assert_(request=None)
         
@@ -822,7 +823,7 @@ class Test_render_to_response(unittest.TestCase):
         request = testing.DummyRequest()
         response = self._callFUT('abc/def.pt',
                                  dict(a=1), request=request)
-        self.assertEqual(response.body, 'abc')
+        self.assertEqual(response.body, b'abc')
         renderer.assert_(a=1)
         renderer.assert_(request=request)
 
@@ -834,7 +835,7 @@ class Test_render_to_response(unittest.TestCase):
         request = testing.DummyRequest()
         response = self._callFUT('abc/def.pt', dict(a=1), request=request,
                                  package=pyramid.tests)
-        self.assertEqual(response.body, 'abc')
+        self.assertEqual(response.body, b'abc')
         renderer.assert_(a=1)
         renderer.assert_(request=request)
 

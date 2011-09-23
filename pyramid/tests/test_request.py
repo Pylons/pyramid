@@ -237,19 +237,19 @@ class TestRequest(unittest.TestCase):
 
     def test_json_body_invalid_json(self):
         request = self._makeOne({'REQUEST_METHOD':'POST'})
-        request.body = '{'
+        request.body = b'{'
         self.assertRaises(ValueError, getattr, request, 'json_body')
         
     def test_json_body_valid_json(self):
         request = self._makeOne({'REQUEST_METHOD':'POST'})
-        request.body = '{"a":1}'
+        request.body = b'{"a":1}'
         self.assertEqual(request.json_body, {'a':1})
 
     def test_json_body_alternate_charset(self):
         from pyramid.compat import json
         request = self._makeOne({'REQUEST_METHOD':'POST'})
         request.charset = 'latin-1'
-        la = unicode('La Pe\xc3\xb1a', 'utf-8')
+        la = text_('La Pe\xc3\xb1a', 'utf-8')
         body = json.dumps({'a':la}, encoding='latin-1')
         request.body = body
         self.assertEqual(request.json_body, {'a':la})
@@ -501,7 +501,7 @@ class Test_call_app_with_subpath_as_path_info(unittest.TestCase):
     def test_subpath_path_info_and_script_name_have_utf8(self):
         la = 'La Pe\xc3\xb1a'
         request = DummyRequest({'PATH_INFO':'/'+la, 'SCRIPT_NAME':'/'+la})
-        request.subpath = (unicode(la, 'utf-8'), )
+        request.subpath = (text_(la, 'utf-8'), )
         response = self._callFUT(request, 'app')
         self.assertTrue(request.copied)
         self.assertEqual(response, 'app')

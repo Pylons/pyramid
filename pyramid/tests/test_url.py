@@ -49,7 +49,7 @@ class TestURLMethodsMixin(unittest.TestCase):
     def test_resource_url_unicode_in_element_names(self):
         request = self._makeOne()
         self._registerContextURL(request.registry)
-        uc = unicode('La Pe\xc3\xb1a', 'utf-8')
+        uc = text_('La Pe\xc3\xb1a', 'utf-8')
         context = DummyContext()
         result = request.resource_url(context, uc)
         self.assertEqual(result,
@@ -74,7 +74,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         request = self._makeOne()
         self._registerContextURL(request.registry)
         context = DummyContext()
-        uc = unicode('La Pe\xc3\xb1a', 'utf-8')
+        uc = text_('La Pe\xc3\xb1a', 'utf-8')
         result = request.resource_url(context, 'a', query={'a':uc})
         self.assertEqual(result,
                          'http://example.com/context/a?a=La+Pe%C3%B1a')
@@ -83,7 +83,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         request = self._makeOne()
         self._registerContextURL(request.registry)
         context = DummyContext()
-        uc = unicode('La Pe\xc3\xb1a', 'utf-8')
+        uc = text_('La Pe\xc3\xb1a', 'utf-8')
         result = request.resource_url(context, 'a', query=[('a', 'hi there'),
                                                              ('b', uc)])
         self.assertEqual(result,
@@ -118,7 +118,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         request = self._makeOne()
         self._registerContextURL(request.registry)
         context = DummyContext()
-        uc = unicode('La Pe\xc3\xb1a', 'utf-8') 
+        uc = text_('La Pe\xc3\xb1a', 'utf-8') 
         result = request.resource_url(context, anchor=uc)
         self.assertEqual(result,
                          'http://example.com/context/#La Pe\xc3\xb1a')
@@ -191,7 +191,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         request = self._makeOne()
         mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
         request.registry.registerUtility(mapper, IRoutesMapper)
-        anchor = unicode('La Pe\xc3\xb1a', 'utf-8')
+        anchor = text_('La Pe\xc3\xb1a', 'utf-8')
         result = request.route_url('flub', _anchor=anchor)
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3#La Pe\xc3\xb1a')

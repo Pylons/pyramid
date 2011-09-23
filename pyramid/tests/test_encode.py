@@ -1,4 +1,5 @@
 import unittest
+from pyramid.compat import text_
 
 class UrlEncodeTests(unittest.TestCase):
     def _callFUT(self, query, doseq=False):
@@ -10,17 +11,17 @@ class UrlEncodeTests(unittest.TestCase):
         self.assertEqual(result, 'a=1&b=2')
 
     def test_unicode_key(self):
-        la = unicode('LaPe\xc3\xb1a', 'utf-8')
+        la = text_('LaPe\xc3\xb1a', 'utf-8')
         result = self._callFUT([(la, 1), ('b',2)])
         self.assertEqual(result, 'LaPe%C3%B1a=1&b=2')
 
     def test_unicode_val_single(self):
-        la = unicode('LaPe\xc3\xb1a', 'utf-8')
+        la = text_('LaPe\xc3\xb1a', 'utf-8')
         result = self._callFUT([('a', la), ('b',2)])
         self.assertEqual(result, 'a=LaPe%C3%B1a&b=2')
 
     def test_unicode_val_multiple(self):
-        la = [unicode('LaPe\xc3\xb1a', 'utf-8')] * 2
+        la = [text_('LaPe\xc3\xb1a', 'utf-8')] * 2
         result = self._callFUT([('a', la), ('b',2)], doseq=True)
         self.assertEqual(result, 'a=LaPe%C3%B1a&a=LaPe%C3%B1a&b=2')
 

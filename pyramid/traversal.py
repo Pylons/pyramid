@@ -1,4 +1,3 @@
-import urllib
 import warnings
 
 from zope.interface import implementer
@@ -14,6 +13,8 @@ from pyramid.interfaces import VH_ROOT_KEY
 from pyramid.compat import native_
 from pyramid.compat import text_
 from pyramid.compat import text_type
+from pyramid.compat import url_unquote
+from pyramid.compat import is_nonstr_iter
 from pyramid.encode import url_quote
 from pyramid.exceptions import URLDecodeError
 from pyramid.location import lineage
@@ -278,7 +279,7 @@ def traverse(resource, path):
     and will be URL-decoded.
     """
 
-    if hasattr(path, '__iter__'):
+    if is_nonstr_iter(path):
         # the traverser factory expects PATH_INFO to be a string, not
         # unicode and it expects path segments to be utf-8 and
         # urlencoded (it's the same traverser which accepts PATH_INFO
@@ -296,8 +297,8 @@ def traverse(resource, path):
     # step rather than later down the line as the result of calling
     # ``traversal_path``).
 
-    if isinstance(path, unicode):
-        path = path.encode('ascii')
+    if isinstance(path, text_type):
+        path = native_(path, 'ascii')
 
     if path and path[0] == '/':
         resource = find_root(resource)
@@ -475,14 +476,14 @@ def traversal_path(path):
               their own traversal machinery, as opposed to users
               writing applications in :app:`Pyramid`.
     """
-    if isinstance(path, unicode):
-        path = path.encode('ascii')
+    if isinstance(path, text_type):
+        path = native_(path, 'ascii')
     path = path.strip('/')
     clean = []
     for segment in path.split('/'):
-        segment = urllib.unquote(segment)
+        segment = url_unquote(segment)
         try:
-            segment = segment.decode('utf-8')
+            segment = native_(segment, 'utf-8')
         except UnicodeDecodeError as e:
             raise URLDecodeError(e.encoding, e.object, e.start, e.end, e.reason)
         if not segment or segment == '.':
@@ -530,7 +531,7 @@ def quote_path_segment(segment, safe=''):
         return _segment_cache[(segment, safe)]
     except KeyError:
         if segment.__class__ is text_type: # isinstance slighly slower (~15%)
-            result = url_quote(segment.encode('utf-8'), safe)
+            result = url_quote(native_(segment, 'utf-8'), safe)
         else:
             result = url_quote(native_(segment), safe)
         # we don't need a lock to mutate _segment_cache, as the below
@@ -568,12 +569,12 @@ class ResourceTreeTraverser(object):
             matchdict = environ['bfg.routes.matchdict']
 
             path = matchdict.get('traverse', '/') or '/'
-            if hasattr(path, '__iter__'):
+            if is_nonstr_iter(path):
                 # this is a *traverse stararg (not a {traverse})
                 path = '/'.join([quote_path_segment(x) for x in path]) or '/'
 
             subpath = matchdict.get('subpath', ())
-            if not hasattr(subpath, '__iter__'):
+            if not is_nonstr_iter(subpath):
                 # this is not a *subpath stararg (just a {subpath})
                 subpath = traversal_path(subpath)
 

@@ -190,7 +190,7 @@ class Test_WeakOrderedSet(unittest.TestCase):
         reg = Dummy()
         wos.add(reg)
         self.assertEqual(list(wos), [reg])
-        self.assert_(reg in wos)
+        self.assertTrue(reg in wos)
         self.assertEqual(wos.last, reg)
 
     def test_add_multiple_items(self):
@@ -201,8 +201,8 @@ class Test_WeakOrderedSet(unittest.TestCase):
         wos.add(reg2)
         self.assertEqual(len(wos), 2)
         self.assertEqual(list(wos), [reg1, reg2])
-        self.assert_(reg1 in wos)
-        self.assert_(reg2 in wos)
+        self.assertTrue(reg1 in wos)
+        self.assertTrue(reg2 in wos)
         self.assertEqual(wos.last, reg2)
 
     def test_add_duplicate_items(self):
@@ -212,7 +212,7 @@ class Test_WeakOrderedSet(unittest.TestCase):
         wos.add(reg)
         self.assertEqual(len(wos), 1)
         self.assertEqual(list(wos), [reg])
-        self.assert_(reg in wos)
+        self.assertTrue(reg in wos)
         self.assertEqual(wos.last, reg)
 
     def test_weakref_removal(self):

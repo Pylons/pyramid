@@ -8,6 +8,8 @@ from pyramid.interfaces import IContextURL
 from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import IStaticURLInfo
 
+from pyramid.compat import native_
+from pyramid.compat import text_type
 from pyramid.encode import urlencode
 from pyramid.path import caller_package
 from pyramid.threadlocal import get_current_registry
@@ -135,8 +137,8 @@ class URLMethodsMixin(object):
 
         if '_anchor' in kw:
             anchor = kw.pop('_anchor')
-            if isinstance(anchor, unicode):
-                anchor = anchor.encode('utf-8')
+            if isinstance(anchor, text_type):
+                anchor = native_(anchor, 'utf-8')
             anchor = '#' + anchor
 
         if '_app_url' in kw:
@@ -300,8 +302,8 @@ class URLMethodsMixin(object):
 
         if 'anchor' in kw:
             anchor = kw['anchor']
-            if isinstance(anchor, unicode):
-                anchor = anchor.encode('utf-8')
+            if isinstance(anchor, text_type):
+                anchor = native_(anchor, 'utf-8')
             anchor = '#' + anchor
 
         if elements:

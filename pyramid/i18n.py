@@ -231,7 +231,7 @@ class Translations(gettext.GNUTranslations, object):
         # this domain; see https://github.com/Pylons/pyramid/issues/235
         self.plural = lambda n: int(n != 1) 
         gettext.GNUTranslations.__init__(self, fp=fileobj)
-        self.files = filter(None, [getattr(fileobj, 'name', None)])
+        self.files = list(filter(None, [getattr(fileobj, 'name', None)]))
         self.domain = domain
         self._domains = {}
 

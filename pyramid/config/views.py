@@ -1153,7 +1153,7 @@ class ViewsConfiguratorMixin(object):
                      mapper=None, http_cache=None):
         view = self.maybe_dotted(view)
         mapper = self.maybe_dotted(mapper)
-        if isinstance(renderer, basestring):
+        if isinstance(renderer, string_types):
             renderer = renderers.RendererHelper(
                 name=renderer, package=self.package,
                 registry = self.registry)
@@ -1211,7 +1211,7 @@ class ViewsConfiguratorMixin(object):
         The ``wrapper`` argument should be the name of another view
         which will wrap this view when rendered (see the ``add_view``
         method's ``wrapper`` argument for a description)."""
-        if isinstance(renderer, basestring):
+        if isinstance(renderer, string_types):
             renderer = renderers.RendererHelper(
                 name=renderer, package=self.package,
                 registry = self.registry)
@@ -1253,7 +1253,7 @@ class ViewsConfiguratorMixin(object):
         which will wrap this view when rendered (see the ``add_view``
         method's ``wrapper`` argument for a description).
         """
-        if isinstance(renderer, basestring):
+        if isinstance(renderer, string_types):
             renderer = renderers.RendererHelper(
                 name=renderer, package=self.package,
                 registry=self.registry)

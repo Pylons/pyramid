@@ -915,7 +915,7 @@ pyramid.tests.test_config.dummy_include2""",
         c.scan(selfscan)
         try:
             c.commit()
-        except ConfigurationConflictError, why:
+        except ConfigurationConflictError as why:
             def scanconflicts(e):
                 conflicts = e._conflicts.values()
                 for conflict in conflicts:
@@ -985,7 +985,7 @@ pyramid.tests.test_config.dummy_include2""",
         config.include(includeme2)
         try:
             config.commit()
-        except ConfigurationConflictError, why:
+        except ConfigurationConflictError as why:
             c1, c2 = _conflictFunctions(why)
             self.assertEqual(c1, 'includeme1')
             self.assertEqual(c2, 'includeme2')
@@ -1029,7 +1029,7 @@ pyramid.tests.test_config.dummy_include2""",
         config.set_notfound_view(view2)
         try:
             config.commit()
-        except ConfigurationConflictError, why:
+        except ConfigurationConflictError as why:
             c1, c2 = _conflictFunctions(why)
             self.assertEqual(c1, 'test_conflict_set_notfound_view')
             self.assertEqual(c2, 'test_conflict_set_notfound_view')
@@ -1044,7 +1044,7 @@ pyramid.tests.test_config.dummy_include2""",
         config.set_forbidden_view(view2)
         try:
             config.commit()
-        except ConfigurationConflictError, why:
+        except ConfigurationConflictError as why:
             c1, c2 = _conflictFunctions(why)
             self.assertEqual(c1, 'test_conflict_set_forbidden_view')
             self.assertEqual(c2, 'test_conflict_set_forbidden_view')
@@ -1284,7 +1284,7 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
         config.add_route('a', '/a', view=view2)
         try:
             config.commit()
-        except ConfigurationConflictError, why:
+        except ConfigurationConflictError as why:
             c1, c2, c3, c4, c5, c6 = _conflictFunctions(why)
             self.assertEqual(c1, 'test_conflict_route_with_view')
             self.assertEqual(c2, 'test_conflict_route_with_view')

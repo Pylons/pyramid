@@ -5,6 +5,9 @@ from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import IRoute
 
 from pyramid.compat import url_unquote
+from pyramid.compat import native_
+from pyramid.compat import text_type
+from pyramid.compat import text_
 from pyramid.encode import url_quote
 from pyramid.exceptions import URLDecodeError
 from pyramid.traversal import traversal_path
@@ -139,7 +142,7 @@ def _compile_route(route):
             else:
                 encoded = url_unquote(v)
                 try:
-                    d[k] = encoded.decode('utf-8')
+                    d[k] = text_(encoded, 'utf-8')
                 except UnicodeDecodeError as e:
                     raise URLDecodeError(
                         e.encoding, e.object, e.start, e.end, e.reason
@@ -153,8 +156,8 @@ def _compile_route(route):
     def generator(dict):
         newdict = {}
         for k, v in dict.items():
-            if isinstance(v, unicode):
-                v = v.encode('utf-8')
+            if isinstance(v, text_type):
+                v = native_(v, 'utf-8')
             if k == star and hasattr(v, '__iter__'):
                 v = '/'.join([quote_path_segment(x) for x in v])
             elif k != star:

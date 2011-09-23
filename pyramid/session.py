@@ -9,6 +9,7 @@ from zope.interface import implementer
 
 from pyramid.compat import pickle
 from pyramid.compat import PY3
+from pyramid.compat import text_
 from pyramid.interfaces import ISession
 
 def manage_accessed(wrapped):
@@ -181,7 +182,7 @@ def UnencryptedCookieSessionFactoryConfig(
         # CSRF API methods
         @manage_accessed
         def new_csrf_token(self):
-            token = os.urandom(20).encode('hex')
+            token = text_(binascii.hexlify(os.urandom(20)))
             self['_csrft_'] = token
             return token
 

@@ -75,6 +75,8 @@ class _FileIter(object):
             raise StopIteration
         return data
 
+    __next__ = next # py3
+
     def close(self):
         self.file.close()
 

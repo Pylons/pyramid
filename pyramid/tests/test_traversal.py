@@ -2,6 +2,7 @@ import unittest
 
 from pyramid.testing import cleanUp
 from pyramid.compat import text_
+from pyramid.compat import text_type
 
 class TraversalPathTests(unittest.TestCase):
     def _callFUT(self, path):
@@ -30,8 +31,8 @@ class TraversalPathTests(unittest.TestCase):
 
     def test_segments_are_unicode(self):
         result = self._callFUT('/foo/bar')
-        self.assertEqual(type(result[0]), unicode)
-        self.assertEqual(type(result[1]), unicode)
+        self.assertEqual(type(result[0]), text_type)
+        self.assertEqual(type(result[1]), text_type)
 
     def test_same_value_returned_if_cached(self):
         result1 = self._callFUT('/foo/bar')
@@ -43,14 +44,14 @@ class TraversalPathTests(unittest.TestCase):
         import urllib
         la = 'La Pe\xc3\xb1a'
         encoded = urllib.quote(la)
-        decoded = unicode(la, 'utf-8')
+        decoded = text_(la, 'utf-8')
         path = '/'.join([encoded, encoded])
         self.assertEqual(self._callFUT(path), (decoded, decoded))
 
     def test_utf16(self):
         from pyramid.exceptions import URLDecodeError
         import urllib
-        la = unicode('La Pe\xc3\xb1a', 'utf-8').encode('utf-16')
+        la = text_('La Pe\xc3\xb1a', 'utf-8').encode('utf-16')
         encoded = urllib.quote(la)
         path = '/'.join([encoded, encoded])
         self.assertRaises(URLDecodeError, self._callFUT, path)
@@ -280,7 +281,7 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         foo = DummyContext()
         root = DummyContext(foo)
         policy = self._makeOne(root)
-        segment = unicode('LaPe\xc3\xb1a', 'utf-8').encode('utf-16')
+        segment = text_('LaPe\xc3\xb1a', 'utf-8').encode('utf-16')
         environ = self._getEnviron(PATH_INFO='/%s' % segment)
         request = DummyRequest(environ)
         from pyramid.exceptions import URLDecodeError
@@ -290,7 +291,7 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         foo = DummyContext()
         root = DummyContext(foo)
         policy = self._makeOne(root)
-        segment = unicode('LaPe\xc3\xb1a', 'utf-8').encode('utf-16')
+        segment = text_('LaPe\xc3\xb1a', 'utf-8').encode('utf-16')
         environ = self._getEnviron(PATH_INFO='/%s' % segment)
         request = DummyRequest(environ)
         from pyramid.exceptions import URLDecodeError
@@ -755,7 +756,7 @@ class QuotePathSegmentTests(unittest.TestCase):
         return quote_path_segment(s)
 
     def test_unicode(self):
-        la = unicode('/La Pe\xc3\xb1a', 'utf-8')
+        la = text_('/La Pe\xc3\xb1a', 'utf-8')
         result = self._callFUT(la)
         self.assertEqual(result, '%2FLa%20Pe%C3%B1a')
 
@@ -845,7 +846,7 @@ class TraversalContextURLTests(unittest.TestCase):
         root.__name__ = None
         one = DummyContext()
         one.__parent__ = root
-        one.__name__ = unicode('La Pe\xc3\xb1a', 'utf-8')
+        one.__name__ = text_('La Pe\xc3\xb1a', 'utf-8')
         two = DummyContext()
         two.__parent__ = one
         two.__name__ = 'La Pe\xc3\xb1a'

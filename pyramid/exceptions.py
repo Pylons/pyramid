@@ -39,12 +39,11 @@ class ConfigurationConflictError(ConfigurationError):
 
     def __str__(self):
         r = ["Conflicting configuration actions"]
-        items = self._conflicts.items()
-        items.sort()
+        items = sorted(self._conflicts.items())
         for discriminator, infos in items:
             r.append("  For: %s" % (discriminator, ))
             for info in infos:
-                for line in unicode(info).rstrip().split(CR):
+                for line in str(info).rstrip().split(CR):
                     r.append("    "+line)
 
         return CR.join(r)

@@ -16,6 +16,7 @@ from pyramid.interfaces import IRendererInfo
 from pyramid.asset import asset_spec_from_abspath
 from pyramid.compat import json
 from pyramid.compat import string_types
+from pyramid.compat import text_type
 from pyramid.compat import native_
 from pyramid.decorator import reify
 from pyramid.events import BeforeRender
@@ -439,7 +440,7 @@ class RendererHelper(object):
         if result is None:
             result = ''
 
-        if isinstance(result, unicode):
+        if isinstance(result, text_type):
             response.unicode_body = result
         else:
             response.body = result

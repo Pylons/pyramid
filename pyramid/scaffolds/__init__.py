@@ -3,13 +3,13 @@ import os
 try:
     from paste.script.templates import Template
 except ImportError:
-    class Template(object):
+    class Template:
         pass
 
 try:
     from paste.util.template import paste_script_template_renderer
 except ImportError:
-    def paste_script_template_renderer(self):
+    def paste_script_template_renderer():
         pass
 
 class PyramidTemplate(Template):

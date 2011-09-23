@@ -3,6 +3,7 @@
 import unittest
 from pyramid import testing
 from pyramid.compat import text_
+from pyramid.compat import text_type
 
 class Base(object):
     def setUp(self):
@@ -276,7 +277,7 @@ class MakoLookupTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         instance = self._makeOne('path', lookup)
         result = instance({}, {'system':1})
-        self.assertTrue(isinstance(result, unicode))
+        self.assertTrue(isinstance(result, text_type))
         self.assertEqual(result, text_('result'))
 
     def test_call_with_system_context(self):
@@ -284,7 +285,7 @@ class MakoLookupTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         instance = self._makeOne('path', lookup)
         result = instance({}, {'context':1})
-        self.assertTrue(isinstance(result, unicode))
+        self.assertTrue(isinstance(result, text_type))
         self.assertEqual(result, text_('result'))
         self.assertEqual(lookup.values, {'_context':1})
 
@@ -307,7 +308,7 @@ class MakoLookupTemplateRendererTests(Base, unittest.TestCase):
         instance = self._makeOne('path', lookup)
         try:
             instance({}, {})
-        except MakoRenderingException, e:
+        except MakoRenderingException as e:
             self.assertTrue('NotImplementedError' in e.text)
         else: # pragma: no cover
             raise AssertionError
@@ -316,7 +317,7 @@ class MakoLookupTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         instance = self._makeOne('path', lookup)
         result = instance.implementation().render_unicode()
-        self.assertTrue(isinstance(result, unicode))
+        self.assertTrue(isinstance(result, text_type))
         self.assertEqual(result, text_('result'))
         
 class TestIntegration(unittest.TestCase):

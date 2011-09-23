@@ -169,11 +169,15 @@ if PY3: # pragma: no cover
         return d.items()
     def itervalues_(d):
         return d.values()
+    def iterkeys_(d):
+        return d.keys()
 else:
     def iteritems_(d):
         return d.iteritems()
     def itervalues_(d):
         return d.itervalues()
+    def iterkeys_(d):
+        return d.iterkeys()
 
 
 if PY3:
@@ -200,3 +204,9 @@ if PY3: # pragma: no cover
     im_func = '__func__'
 else:
     im_func = 'im_func'
+
+try:
+    import configparser
+except ImportError:
+    import ConfigParser
+    configparser = ConfigParser
