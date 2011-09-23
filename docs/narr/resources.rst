@@ -229,7 +229,7 @@ this:
 .. code-block:: python
    :linenos:
 
-   url = request.resource_url(resource, request)
+   url = request.resource_url(resource)
 
 The ``request`` in the above example is an instance of a :app:`Pyramid`
 :term:`request` object.
