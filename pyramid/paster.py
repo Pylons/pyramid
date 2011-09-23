@@ -12,7 +12,7 @@ except ImportError: # pragma: no cover
 
 try:
     from paste.script.command import Command
-except ImportError:
+except ImportError: # pragma: no cover
     class Command:
         pass
 

@@ -2,7 +2,7 @@ import unittest
 
 import os
 
-from pyramid.compat import __pypy__
+from pyramid.compat import PYPY
 
 from pyramid.tests.test_config import dummy_tween_factory
 from pyramid.tests.test_config import dummy_include
@@ -66,7 +66,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.commit()
         self.assertTrue(config.registry.getUtility(IRendererFactory, 'json'))
         self.assertTrue(config.registry.getUtility(IRendererFactory, 'string'))
-        if not __pypy__:
+        if not PYPY:
             self.assertTrue(config.registry.getUtility(IRendererFactory, '.pt'))
             self.assertTrue(config.registry.getUtility(IRendererFactory,'.txt'))
         self.assertTrue(config.registry.getUtility(IRendererFactory, '.mak'))

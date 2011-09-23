@@ -32,7 +32,7 @@ try:
     import zope.component
     zope.component
     have_zca = True
-except ImportError:
+except ImportError: # pragma: no cover
     have_zca = False
 
 _marker = object()

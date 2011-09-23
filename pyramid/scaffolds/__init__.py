@@ -2,13 +2,13 @@ import os
 
 try:
     from paste.script.templates import Template
-except ImportError:
+except ImportError: # pragma: no cover
     class Template:
         pass
 
 try:
     from paste.util.template import paste_script_template_renderer
-except ImportError:
+except ImportError: # pragma: no cover
     def paste_script_template_renderer():
         pass
 

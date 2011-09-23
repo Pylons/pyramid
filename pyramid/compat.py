@@ -1,6 +1,13 @@
 import sys
 import types
 
+try: # pragma: no cover
+    import __pypy__
+    PYPY = True
+except: # pragma: no cover
+    __pypy__ = None
+    PYPY = False
+
 try:
     import cPickle as pickle
 except ImportError: # pragma: no cover
@@ -24,8 +31,6 @@ if PY3: # pragma: no cover
     text_type = str
     binary_type = bytes
     long = int
-    def ords_(b):
-        return b
 else:
     string_types = basestring,
     integer_types = (int, long)
@@ -33,8 +38,6 @@ else:
     text_type = unicode
     binary_type = str
     long = long
-    def ords_(s):
-        return [ord(x) for x in s]
 
 def text_(s, encoding='latin-1', errors='strict'):
     if isinstance(s, binary_type):
@@ -56,21 +59,6 @@ else:
         if isinstance(s, text_type):
             return s.encode(encoding, errors)
         return str(s)
-
-if PY3: # pragma: no cover
-    fsenc = sys.getfilesystemencoding()
-    def text_to_wsgi(u):
-        # On Python 3, convert an environment variable to a WSGI
-        # "bytes-as-unicode" string
-        return u.encode(fsenc, 'surrogateescape').decode('latin-1')
-else:
-    def text_to_wsgi(u):
-        return u.encode('latin-1', 'surrogateescape')
-
-try:
-    from queue import Queue, Empty
-except ImportError:
-    from Queue import Queue, Empty
 
 try: # pragma: no cover
     from urllib import parse
@@ -180,17 +168,12 @@ else:
         return d.iterkeys()
 
 
-if PY3:
+if PY3: # pragma: no cover
     def map_(*arg):
         return list(map(*arg))
 else:
     map_ = map
     
-try:
-    import __pypy__
-except:
-    __pypy__ = None
-
 if PY3: # pragma: no cover
     def is_nonstr_iter(v):
         if isinstance(v, str):
@@ -205,8 +188,8 @@ if PY3: # pragma: no cover
 else:
     im_func = 'im_func'
 
-try:
+try: # pragma: no cover
     import configparser
-except ImportError:
+except ImportError: # pragma: no cover
     import ConfigParser
     configparser = ConfigParser
