@@ -28,6 +28,7 @@ from pyramid.interfaces import PHASE1_CONFIG
 from pyramid import renderers
 from pyramid.compat import string_types
 from pyramid.compat import urlparse
+from pyramid.compat import im_func
 from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import PredicateMismatch
 from pyramid.httpexceptions import HTTPForbidden
@@ -417,6 +418,7 @@ class DefaultViewMapper(object):
         return _attr_view
 
 def requestonly(view, attr=None):
+    ismethod = False
     if attr is None:
         attr = '__call__'
     if inspect.isfunction(view):
@@ -426,6 +428,7 @@ def requestonly(view, attr=None):
             fn = view.__init__
         except AttributeError:
             return False
+        ismethod = hasattr(fn, '__call__')
     else:
         try:
             fn = getattr(view, attr)
@@ -439,8 +442,8 @@ def requestonly(view, attr=None):
 
     args = argspec[0]
 
-    if hasattr(fn, 'im_func'):
-        # it's an instance method
+    if hasattr(fn, im_func) or ismethod:
+        # it's an instance method (or unbound method on py2)
         if not args:
             return False
         args = args[1:]

@@ -196,3 +196,7 @@ else:
     def is_nonstr_iter(v):
         return hasattr(v, '__iter__')
     
+if PY3: # pragma: no cover
+    im_func = '__func__'
+else:
+    im_func = 'im_func'

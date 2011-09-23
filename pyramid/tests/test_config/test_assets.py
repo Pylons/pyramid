@@ -273,12 +273,13 @@ class TestOverrideProvider(unittest.TestCase):
         self.assertEqual(result, 'value')
 
     def test_get_resource_stream_override_returns_value(self):
-        overrides = DummyOverrides('value')
+        from io import StringIO
+        overrides = DummyOverrides(StringIO('value'))
         import pyramid.tests.test_config
         self._registerOverrides(overrides)
         provider = self._makeOne(pyramid.tests.test_config)
-        with provider.get_resource_stream(None, 'test_assets.py') as result:
-            self.assertEqual(result, 'value')
+        with provider.get_resource_stream(None, 'test_assets.py') as stream:
+            self.assertEqual(stream.getvalue(), 'value')
 
     def test_get_resource_string_override_returns_value(self):
         overrides = DummyOverrides('value')
