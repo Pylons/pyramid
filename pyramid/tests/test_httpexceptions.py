@@ -126,15 +126,15 @@ class TestWSGIHTTPException(unittest.TestCase):
 
     def test_ctor_with_body_doesnt_set_default_app_iter(self):
         exc = self._makeOne(body='123')
-        self.assertEqual(exc.app_iter, ['123'])
+        self.assertEqual(exc.app_iter, [b'123'])
 
     def test_ctor_with_unicode_body_doesnt_set_default_app_iter(self):
         exc = self._makeOne(unicode_body=text_('123'))
-        self.assertEqual(exc.app_iter, ['123'])
+        self.assertEqual(exc.app_iter, [b'123'])
 
     def test_ctor_with_app_iter_doesnt_set_default_app_iter(self):
-        exc = self._makeOne(app_iter=['123'])
-        self.assertEqual(exc.app_iter, ['123'])
+        exc = self._makeOne(app_iter=[b'123'])
+        self.assertEqual(exc.app_iter, [b'123'])
 
     def test_ctor_with_body_sets_default_app_iter_html(self):
         cls = self._getTargetSubclass()

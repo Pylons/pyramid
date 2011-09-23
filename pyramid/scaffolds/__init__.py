@@ -1,7 +1,16 @@
 import os
 
-from paste.script.templates import Template
-from paste.util.template import paste_script_template_renderer
+try:
+    from paste.script.templates import Template
+except ImportError:
+    class Template(object):
+        pass
+
+try:
+    from paste.util.template import paste_script_template_renderer
+except ImportError:
+    def paste_script_template_renderer(self):
+        pass
 
 class PyramidTemplate(Template):
     def pre(self, command, output_dir, vars):

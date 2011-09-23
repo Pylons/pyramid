@@ -9,6 +9,7 @@ import os
 from zope.interface import implementer
 
 from pyramid.compat import pickle
+from pyramid.compat import PY3
 from pyramid.interfaces import ISession
 
 def manage_accessed(wrapped):
@@ -140,15 +141,17 @@ def UnencryptedCookieSessionFactoryConfig(
         get = manage_accessed(dict.get)
         __getitem__ = manage_accessed(dict.__getitem__)
         items = manage_accessed(dict.items)
-        iteritems = manage_accessed(dict.iteritems)
         values = manage_accessed(dict.values)
-        itervalues = manage_accessed(dict.itervalues)
         keys = manage_accessed(dict.keys)
-        iterkeys = manage_accessed(dict.iterkeys)
         __contains__ = manage_accessed(dict.__contains__)
-        has_key = manage_accessed(dict.has_key)
         __len__ = manage_accessed(dict.__len__)
         __iter__ = manage_accessed(dict.__iter__)
+
+        if not PY3:
+            iteritems = manage_accessed(dict.iteritems)
+            itervalues = manage_accessed(dict.itervalues)
+            iterkeys = manage_accessed(dict.iterkeys)
+            has_key = manage_accessed(dict.has_key)
 
         # modifying dictionary methods
         clear = manage_accessed(dict.clear)

@@ -26,6 +26,7 @@ from pyramid.interfaces import IViewMapperFactory
 from pyramid.interfaces import PHASE1_CONFIG
 
 from pyramid import renderers
+from pyramid.compat import string_types
 from pyramid.compat import urlparse
 from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import PredicateMismatch
@@ -913,7 +914,7 @@ class ViewsConfiguratorMixin(object):
         if not IInterface.providedBy(r_context):
             r_context = implementedBy(r_context)
 
-        if isinstance(renderer, basestring):
+        if isinstance(renderer, string_types):
             renderer = renderers.RendererHelper(
                 name=renderer, package=self.package,
                 registry = self.registry)

@@ -132,7 +132,7 @@ class Test_registerView(TestBase):
         request = DummyRequest()
         request.registry = self.registry
         response = render_view_to_response(None, request, 'moo.html')
-        self.assertEqual(response.body, 'yo')
+        self.assertEqual(response.body, b'yo')
 
     def test_registerView_custom(self):
         from pyramid import testing
@@ -146,7 +146,7 @@ class Test_registerView(TestBase):
         request = DummyRequest()
         request.registry = self.registry
         response = render_view_to_response(None, request, 'moo.html')
-        self.assertEqual(response.body, '123')
+        self.assertEqual(response.body, b'123')
 
     def test_registerView_with_permission_denying(self):
         from pyramid import testing
@@ -188,7 +188,7 @@ class Test_registerView(TestBase):
         request = DummyRequest()
         request.registry = self.registry
         result = render_view_to_response(None, request, 'moo.html')
-        self.assertEqual(result.app_iter, ['123'])
+        self.assertEqual(result.app_iter, [b'123'])
 
 
 class Test_registerAdapter(TestBase):
@@ -380,9 +380,10 @@ class TestDummyResource(unittest.TestCase):
         resource = self._makeOne()
         resource['abc'] = Dummy()
         resource['def'] = Dummy()
-        self.assertEqual(resource.values(), resource.subs.values())
-        self.assertEqual(resource.items(), resource.subs.items())
-        self.assertEqual(resource.keys(), resource.subs.keys())
+        L = list
+        self.assertEqual(L(resource.values()), L(resource.subs.values()))
+        self.assertEqual(L(resource.items()), L(resource.subs.items()))
+        self.assertEqual(L(resource.keys()), L(resource.subs.keys()))
         self.assertEqual(len(resource), 2)
 
     def test_nonzero(self):

@@ -1,6 +1,8 @@
 from zope.interface import Attribute
 from zope.interface import Interface
 
+from pyramid.compat import PY3
+
 # public API interfaces
 
 class IContextFound(Interface):
@@ -292,25 +294,27 @@ class IDict(Interface):
         """ Return the value for key ``k`` from the renderer dictionary, or
         the default if no such value exists."""
 
-    has_key = __contains__
-
     def items():
         """ Return a list of [(k,v)] pairs from the dictionary """
-
-    def iteritems():
-        """ Return an iterator of (k,v) pairs from the dictionary """
 
     def keys():
         """ Return a list of keys from the dictionary """
 
-    def iterkeys():
-        """ Return an iterator of keys from the dictionary """
-
     def values():
         """ Return a list of values from the dictionary """
 
-    def itervalues():
-        """ Return an iterator of values from the dictionary """
+    if not PY3:
+
+        def iterkeys():
+            """ Return an iterator of keys from the dictionary """
+
+        def iteritems():
+            """ Return an iterator of (k,v) pairs from the dictionary """
+
+        def itervalues():
+            """ Return an iterator of values from the dictionary """
+
+        has_key = __contains__
 
     def pop(k, default=None):
         """ Pop the key k from the dictionary and return its value.  If k

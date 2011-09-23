@@ -770,6 +770,7 @@ class QuotePathSegmentTests(unittest.TestCase):
         self.assertEqual(result, '12345')
         
     def test_long(self):
+        from pyramid.compat import long
         import sys
         s = long(sys.maxint + 1)
         result = self._callFUT(s)

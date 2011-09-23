@@ -372,8 +372,8 @@ class TestRequestDeprecatedMethods(unittest.TestCase):
     def test_values(self):
         environ = {'zooma':1}
         inst = self._makeOne(environ)
-        result = inst.values()
-        self.assertEqual(result, environ.values())
+        result = list(inst.values())
+        self.assertEqual(result, list(environ.values()))
 
     def test_response_content_type(self):
         inst = self._makeOne()
