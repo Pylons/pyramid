@@ -65,6 +65,7 @@ try: # pragma: no cover
     urlparse = parse
     from urllib.parse import quote as url_quote
     from urllib.parse import unquote as url_unquote
+    url_unquote_text = url_unquote
     from urllib.parse import urlencode as url_encode
     from urllib.request import urlopen as url_open
 except ImportError:
@@ -73,6 +74,9 @@ except ImportError:
     from urllib import unquote as url_unquote
     from urllib import urlencode as url_encode
     from urllib2 import urlopen as url_open
+    def url_unquote_text(v, encoding='utf-8', errors='replace'):
+        v = url_unquote(v)
+        return v.decode(encoding, errors)
 
 if PY3: # pragma: no cover
     import builtins

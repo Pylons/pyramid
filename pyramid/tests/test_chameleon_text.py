@@ -1,5 +1,6 @@
 import unittest
 
+from pyramid.compat import binary_type
 from pyramid.testing import skip_on
 from pyramid import testing
 
@@ -98,8 +99,8 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         instance = self._makeOne(minimal, lookup)
         result = instance({}, {})
-        self.assertTrue(isinstance(result, str))
-        self.assertEqual(result, 'Hello.\n')
+        self.assertTrue(isinstance(result, binary_type))
+        self.assertEqual(result, b'Hello.\n')
 
     @skip_on('java')
     def test_call_with_nondict_value(self):
@@ -114,8 +115,8 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         instance = self._makeOne(nonminimal, lookup)
         result = instance({'name':'Chris'}, {})
-        self.assertTrue(isinstance(result, str))
-        self.assertEqual(result, 'Hello, Chris!\n')
+        self.assertTrue(isinstance(result, binary_type))
+        self.assertEqual(result, b'Hello, Chris!\n')
 
     @skip_on('java')
     def test_implementation(self):
@@ -123,8 +124,8 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         instance = self._makeOne(minimal, lookup)
         result = instance.implementation()()
-        self.assertTrue(isinstance(result, str))
-        self.assertEqual(result, 'Hello.\n')
+        self.assertTrue(isinstance(result, binary_type))
+        self.assertEqual(result, b'Hello.\n')
 
 class RenderTemplateTests(Base, unittest.TestCase):
     def _callFUT(self, name, **kw):
@@ -135,8 +136,8 @@ class RenderTemplateTests(Base, unittest.TestCase):
     def test_it(self):
         minimal = self._getTemplatePath('minimal.txt')
         result = self._callFUT(minimal)
-        self.assertTrue(isinstance(result, str))
-        self.assertEqual(result, 'Hello.\n')
+        self.assertTrue(isinstance(result, binary_type))
+        self.assertEqual(result, b'Hello.\n')
 
 class RenderTemplateToResponseTests(Base, unittest.TestCase):
     def _callFUT(self, name, **kw):

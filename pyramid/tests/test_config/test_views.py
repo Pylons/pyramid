@@ -2276,7 +2276,7 @@ class TestViewDeriver(unittest.TestCase):
         self.assertFalse(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
-        self.assertTrue('instance' in result.__name__)
+        self.assertTrue('test_views' in result.__name__)
         self.assertFalse(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), response)
 

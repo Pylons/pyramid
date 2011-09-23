@@ -8,7 +8,7 @@ def hello(environ, start_response):
     assert environ['SCRIPT_NAME'] == '/hello'
     response_headers = [('Content-Type', 'text/plain')]
     start_response('200 OK', response_headers)
-    return ['Hello!']
+    return [b'Hello!']
 
 def main():
     from pyramid.config import Configurator

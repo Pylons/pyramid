@@ -2,6 +2,7 @@ import unittest
 
 from pyramid.testing import cleanUp
 from pyramid.compat import text_
+from pyramid.compat import native_
 from pyramid.compat import text_type
 
 class TraversalPathTests(unittest.TestCase):
@@ -281,7 +282,7 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         foo = DummyContext()
         root = DummyContext(foo)
         policy = self._makeOne(root)
-        segment = text_('LaPe\xc3\xb1a', 'utf-8').encode('utf-16')
+        segment = native_(text_(b'LaPe\xc3\xb1a', 'utf-8'), 'utf-16')
         environ = self._getEnviron(PATH_INFO='/%s' % segment)
         request = DummyRequest(environ)
         from pyramid.exceptions import URLDecodeError
@@ -291,7 +292,7 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         foo = DummyContext()
         root = DummyContext(foo)
         policy = self._makeOne(root)
-        segment = text_('LaPe\xc3\xb1a', 'utf-8').encode('utf-16')
+        segment = native_(text_(b'LaPe\xc3\xb1a', 'utf-8'), 'utf-16')
         environ = self._getEnviron(PATH_INFO='/%s' % segment)
         request = DummyRequest(environ)
         from pyramid.exceptions import URLDecodeError

@@ -256,7 +256,7 @@ class TestWSGIHTTPException(unittest.TestCase):
 
     def test_body_template_unicode(self):
         cls = self._getTargetSubclass()
-        la = text_('/La Pe\xc3\xb1a', 'utf-8')
+        la = text_(b'/La Pe\xc3\xb1a', 'utf-8')
         environ = _makeEnviron(unicodeval=la)
         exc = cls(body_template='${unicodeval}')
         start_response = DummyStartResponse()

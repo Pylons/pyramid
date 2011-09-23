@@ -1218,7 +1218,7 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         self._assertRoute(config, 'name', 'path')
-        self.assertEqual(wrapper(None, None).body, 'Hello!')
+        self.assertEqual(wrapper(None, None).body, b'Hello!')
 
     def test_add_route_with_view_attr(self):
         from pyramid.renderers import null_renderer
@@ -1246,7 +1246,7 @@ class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         self._assertRoute(config, 'name', 'path')
-        self.assertEqual(wrapper(None, None).body, 'Hello!')
+        self.assertEqual(wrapper(None, None).body, b'Hello!')
 
     def test_add_route_with_view_permission(self):
         from pyramid.interfaces import IAuthenticationPolicy
