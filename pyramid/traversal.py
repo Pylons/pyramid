@@ -478,9 +478,8 @@ def traversal_path(path):
               their own traversal machinery, as opposed to users
               writing applications in :app:`Pyramid`.
     """
-    if (not PY3) and (isinstance(path, text_type)):
-        # XXX this stinks
-        path = path.encode('ascii')
+    if isinstance(path, text_type):
+        path.encode('ascii') # check for asci-only-ness
     path = path.strip('/')
     clean = []
     for segment in path.split('/'):

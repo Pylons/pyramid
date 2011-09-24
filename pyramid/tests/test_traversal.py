@@ -284,8 +284,7 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         segment = native_(text_(b'LaPe\xc3\xb1a', 'utf-8'), 'utf-16')
         environ = self._getEnviron(PATH_INFO='/%s' % segment)
         request = DummyRequest(environ)
-        from pyramid.exceptions import URLDecodeError
-        self.assertRaises(URLDecodeError, policy, request)
+        self.assertRaises(UnicodeEncodeError, policy, request)
 
     def test_non_utf8_path_segment_settings_unicode_path_segments_fails(self):
         foo = DummyContext()
@@ -294,8 +293,7 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         segment = native_(text_(b'LaPe\xc3\xb1a', 'utf-8'), 'utf-16')
         environ = self._getEnviron(PATH_INFO='/%s' % segment)
         request = DummyRequest(environ)
-        from pyramid.exceptions import URLDecodeError
-        self.assertRaises(URLDecodeError, policy, request)
+        self.assertRaises(UnicodeEncodeError, policy, request)
 
     def test_withroute_nothingfancy(self):
         resource = DummyContext()
