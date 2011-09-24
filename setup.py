@@ -29,15 +29,15 @@ except IOError:
     README = CHANGES = ''
 
 install_requires=[
+    'setuptools',
     'Chameleon >= 1.2.3',
     'Mako >= 0.3.6', # strict_undefined
     'WebOb >= 1.2dev', # response.text / py3 compat
-    'repoze.lru',
-    'setuptools',
+    'repoze.lru >= 0.4', # py3 compat
     'zope.interface >= 3.8.0',  # has zope.interface.registry
-    'zope.deprecation',
+    'zope.deprecation >= 3.5.0', # py3 compat
     'venusian >= 1.0a1', # ``onerror``
-    'translationstring',
+    'translationstring >= 0.4', # py3 compat
     ]
 
 if not PY3:
@@ -48,11 +48,11 @@ if not PY3:
         ])
 
 tests_require = install_requires + [
-    'WebTest',
+    'WebTest >= 1.3.1', # py3 compat
     'virtualenv',
     ]
 
-if not JYTHON:
+if not (JYTHON or PY3):
     tests_require.extend([
         'Sphinx',
         'docutils',
