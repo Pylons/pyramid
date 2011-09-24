@@ -416,7 +416,7 @@ class DefaultViewMapper(object):
 def requestonly(view, attr=None):
     if attr is None:
         attr = '__call__'
-    if inspect.isfunction(view):
+    if inspect.isroutine(view):
         fn = view
     elif inspect.isclass(view):
         try:
@@ -436,8 +436,7 @@ def requestonly(view, attr=None):
 
     args = argspec[0]
 
-    if hasattr(fn, 'im_func'):
-        # it's an instance method
+    if inspect.ismethod(fn):
         if not args:
             return False
         args = args[1:]
