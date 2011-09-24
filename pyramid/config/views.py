@@ -139,7 +139,7 @@ class ViewDeriver(object):
     def http_cached_view(self, view):
         if self.registry.settings.get('prevent_http_cache', False):
             return view
-        
+
         seconds = self.kw.get('http_cache')
 
         if seconds is None:
@@ -365,7 +365,7 @@ class DefaultViewMapper(object):
         elif self.attr:
             mapped_view = self.map_nonclass_attr(view)
         return mapped_view
-        
+
     def map_class_requestonly(self, view):
         # its a class that has an __init__ which only accepts request
         attr = self.attr
@@ -713,7 +713,7 @@ class ViewsConfiguratorMixin(object):
           accept ``(context, request)``.  The decorator must return a
           replacement view callable which also accepts ``(context,
           request)``.
-          
+
         mapper
 
           A Python object or :term:`dotted Python name` which refers to a
@@ -722,7 +722,7 @@ class ViewsConfiguratorMixin(object):
           plug-point is useful for Pyramid extension developers, but it's not
           very useful for 'civilians' who are just developing stock Pyramid
           applications. Pay no attention to the man behind the curtain.
-          
+
         Predicate Arguments
 
         name
@@ -1061,16 +1061,17 @@ class ViewsConfiguratorMixin(object):
         discriminator.extend(sorted(custom_predicates))
         discriminator = tuple(discriminator)
         self.action(discriminator, register)
-    
+
     def derive_view(self, view, attr=None, renderer=None):
         """
         Create a :term:`view callable` using the function, instance,
         or class (or :term:`dotted Python name` referring to the same)
         provided as ``view`` object.
 
-        .. warning:: This method is typically only used by :app:`Pyramid`
-           framework extension authors, not by :app:`Pyramid` application
-           developers.
+        .. warning::
+
+           This method is typically only used by :app:`Pyramid` framework
+           extension authors, not by :app:`Pyramid` application developers.
 
         This is API is useful to framework extenders who create
         pluggable systems which need to register 'proxy' view
@@ -1173,7 +1174,7 @@ class ViewsConfiguratorMixin(object):
                               mapper=mapper,
                               decorator=decorator,
                               http_cache=http_cache)
-        
+
         return deriver(view)
 
     @action_method
@@ -1182,11 +1183,12 @@ class ViewsConfiguratorMixin(object):
         """ Add a default forbidden view to the current configuration
         state.
 
-        .. warning:: This method has been deprecated in :app:`Pyramid`
-           1.0.  *Do not use it for new development; it should only be
-           used to support older code bases which depend upon it.* See
-           :ref:`changing_the_forbidden_view` to see how a forbidden
-           view should be registered in new projects.
+        .. warning::
+
+           This method has been deprecated in :app:`Pyramid` 1.0.  *Do not use
+           it for new development; it should only be used to support older code
+           bases which depend upon it.* See :ref:`changing_the_forbidden_view`
+           to see how a forbidden view should be registered in new projects.
 
         The ``view`` argument should be a :term:`view callable` or a
         :term:`dotted Python name` which refers to a view callable.
@@ -1222,12 +1224,12 @@ class ViewsConfiguratorMixin(object):
         """ Add a default not found view to the current configuration
         state.
 
-        .. warning:: This method has been deprecated in
-           :app:`Pyramid` 1.0.  *Do not use it for new development;
-           it should only be used to support older code bases which
-           depend upon it.* See :ref:`changing_the_notfound_view` to
-           see how a not found view should be registered in new
-           projects.
+        .. warning::
+
+           This method has been deprecated in :app:`Pyramid` 1.0.  *Do not use
+           it for new development; it should only be used to support older code
+           bases which depend upon it.* See :ref:`changing_the_notfound_view` to
+           see how a not found view should be registered in new projects.
 
         The ``view`` argument should be a :term:`view callable` or a
         :term:`dotted Python name` which refers to a view callable.
@@ -1274,7 +1276,9 @@ class ViewsConfiguratorMixin(object):
 
         See also :ref:`using_a_view_mapper`.
 
-        .. note:: Using the ``default_view_mapper`` argument to the
+        .. note::
+
+           Using the ``default_view_mapper`` argument to the
            :class:`pyramid.config.Configurator` constructor
            can be used to achieve the same purpose.
         """
@@ -1483,7 +1487,7 @@ class StaticURLInfo(object):
 
             attr = extra.pop('view_attr', None)
 
-            # register a route using the computed view, permission, and 
+            # register a route using the computed view, permission, and
             # pattern, plus any extras passed to us via add_static_view
             pattern = "%s*subpath" % name # name already ends with slash
             if config.route_prefix:

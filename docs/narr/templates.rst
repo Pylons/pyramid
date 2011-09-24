@@ -46,7 +46,9 @@ within the body of a view callable like so:
                                  {'foo':1, 'bar':2}, 
                                  request=request)
 
-.. warning:: Earlier iterations of this documentation
+.. warning::
+
+   Earlier iterations of this documentation
    (pre-version-1.3) encouraged the application developer to use
    ZPT-specific APIs such as
    :func:`pyramid.chameleon_zpt.render_template_to_response` and

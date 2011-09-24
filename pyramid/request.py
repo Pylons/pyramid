@@ -409,7 +409,7 @@ def call_app_with_subpath_as_path_info(request, app):
     if new_path_info != '/': # don't want a sole double-slash
         if path_info != '/': # if orig path_info is '/', we're already done
             if path_info.endswith('/'):
-                # readd trailing slash stripped by subpath (traversal) 
+                # readd trailing slash stripped by subpath (traversal)
                 # conversion
                 new_path_info += '/'
 
@@ -428,7 +428,7 @@ def call_app_with_subpath_as_path_info(request, app):
     # to end of script_name
     while workback and (workback[-1] == ''):
         workback = workback[:-1]
-            
+
     new_script_name = '/'.join(workback)
 
     new_request = request.copy()

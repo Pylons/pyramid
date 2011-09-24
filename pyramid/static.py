@@ -47,7 +47,7 @@ class _FileResponse(Response):
         content_length = getsize(path)
         self.app_iter = _FileIter(open(path, 'rb'), content_length)
         # assignment of content_length must come after assignment of app_iter
-        self.content_length = content_length 
+        self.content_length = content_length
         if cache_max_age is not None:
             self.cache_expires = cache_max_age
 
@@ -110,13 +110,15 @@ class static_view(object):
     the static application will consider request.path_info as ``PATH_INFO``
     input. By default, this is ``False``.
 
-    .. note:: If the ``root_dir`` is relative to a :term:`package`, or
-         is a :term:`asset specification` the :app:`Pyramid`
-         :class:`pyramid.config.Configurator` method can be
-         used to override assets within the named ``root_dir``
-         package-relative directory.  However, if the ``root_dir`` is
-         absolute, configuration will not be able to
-         override the assets it contains.  """
+    .. note::
+
+       If the ``root_dir`` is relative to a :term:`package`, or is a
+       :term:`asset specification` the :app:`Pyramid`
+       :class:`pyramid.config.Configurator` method can be used to override
+       assets within the named ``root_dir`` package-relative directory.
+       However, if the ``root_dir`` is absolute, configuration will not be able
+       to override the assets it contains.
+    """
 
     def __init__(self, root_dir, cache_max_age=3600, package_name=None,
                  use_subpath=False, index='index.html'):

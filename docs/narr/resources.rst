@@ -160,7 +160,9 @@ resource in the resource tree, you will eventually come to the root resource,
 just like if you keep executing the ``cd ..`` filesystem command, eventually
 you will reach the filesystem root directory.
 
-.. warning:: If your root resource has a ``__name__`` argument that is not
+.. warning::
+
+   If your root resource has a ``__name__`` argument that is not
    ``None`` or the empty string, URLs returned by the
    :func:`~pyramid.request.Request.resource_url` function and paths generated
    by the :func:`~pyramid.traversal.resource_path` and

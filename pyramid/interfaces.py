@@ -9,7 +9,9 @@ class IContextFound(Interface):
     documentation attached to :class:`pyramid.events.ContextFound`
     for more information.
 
-    .. note:: For backwards compatibility with versions of
+    .. note::
+
+       For backwards compatibility with versions of
        :app:`Pyramid` before 1.0, this event interface can also be
        imported as :class:`pyramid.interfaces.IAfterTraversal`.
     """
@@ -22,7 +24,7 @@ class INewRequest(Interface):
     begins to process a new request.  See the documentation attached
     to :class:`pyramid.events.NewRequest` for more information."""
     request = Attribute('The request object')
-    
+
 class INewResponse(Interface):
     """ An event type that is emitted whenever any :app:`Pyramid`
     view returns a response. See the
@@ -38,7 +40,9 @@ class IApplicationCreated(Interface):
     :class:`pyramid.events.ApplicationCreated` for more
     information.
 
-    .. note:: For backwards compatibility with :app:`Pyramid`
+    .. note::
+
+       For backwards compatibility with :app:`Pyramid`
        versions before 1.0, this interface can also be imported as
        :class:`pyramid.interfaces.IWSGIApplicationCreatedEvent`.
     """
@@ -151,7 +155,7 @@ class IResponse(Interface):
         otherwise they will be preserved.""")
 
     content_type_params = Attribute(
-        """A dictionary of all the parameters in the content type.  This is 
+        """A dictionary of all the parameters in the content type.  This is
         not a view, set to change, modifications of the dict would not
         be applied otherwise.""")
 
@@ -276,18 +280,18 @@ class IDict(Interface):
 
     def __setitem__(k, value):
         """ Set a key/value pair into the dictionary"""
-        
+
     def __delitem__(k):
         """ Delete an item from the dictionary which is passed to the
         renderer as the renderer globals dictionary."""
-            
+
     def __getitem__(k):
         """ Return the value for key ``k`` from the dictionary or raise a
         KeyError if the key doesn't exist"""
 
     def __iter__():
         """ Return an iterator over the keys of this dictionary """
-            
+
     def get(k, default=None):
         """ Return the value for key ``k`` from the renderer dictionary, or
         the default if no such value exists."""
@@ -327,7 +331,7 @@ class IDict(Interface):
          value into the dictionary under the k name passed.  If a value already
          existed in the dictionary, return it.  If a value did not exist in
          the dictionary, return the default"""
-    
+
     def update(d):
         """ Update the renderer dictionary with another dictionary ``d``."""
 
@@ -341,7 +345,7 @@ class IBeforeRender(IDict):
     The event object itself provides a dictionary-like interface for adding
     and removing :term:`renderer globals`.  The keys and values of the
     dictionary are those globals.  For example::
-    
+
       from repoze.events import subscriber
       from pyramid.interfaces import IBeforeRender
 
@@ -424,7 +428,7 @@ class IAuthenticationPolicy(Interface):
         principal named ``principal`` when set in a response.  An
         individual authentication policy and its consumers can decide
         on the composition and meaning of ``**kw.`` """
-    
+
     def forget(request):
         """ Return a set of headers suitable for 'forgetting' the
         current user on subsequent requests. """
@@ -435,7 +439,7 @@ class IAuthorizationPolicy(Interface):
         """ Return ``True`` if any of the ``principals`` is allowed the
         ``permission`` in the current ``context``, else return ``False``
         """
-        
+
     def principals_allowed_by_permission(context, permission):
         """ Return a set of principal identifiers allowed by the
         ``permission`` in ``context``.  This behavior is optional; if you
@@ -499,7 +503,7 @@ class IRequestHandler(Interface):
         The ``request`` argument will be an instance of an object that
         provides IRequest."""
 
-IRequest.combined = IRequest # for exception view lookups 
+IRequest.combined = IRequest # for exception view lookups
 
 class IRouteRequest(Interface):
     """ *internal only* interface used as in a utility lookup to find
@@ -614,12 +618,12 @@ class IRouter(Interface):
     a view registry."""
     registry = Attribute(
         """Component architecture registry local to this application.""")
-    
+
 class ISettings(Interface):
     """ Runtime settings utility for pyramid; represents the
     deployment settings for the application.  Implements a mapping
     interface."""
-    
+
 # this interface, even if it becomes unused within Pyramid, is
 # imported by other packages (such as traversalwrapper)
 class ILocation(Interface):
@@ -749,7 +753,7 @@ class IChameleonTranslate(Interface):
 
 class ILocalizer(Interface):
     """ Localizer for a specific language """
-        
+
 class ILocaleNegotiator(Interface):
     def __call__(request):
         """ Return a locale name """

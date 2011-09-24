@@ -353,7 +353,9 @@ process.  Examples of route predicate arguments are ``pattern``, ``xhr``, and
 Other arguments are ``name`` and ``factory``.  These arguments represent
 neither predicates nor view configuration information.
 
-.. warning:: Some arguments are view-configuration related arguments, such as
+.. warning::
+
+   Some arguments are view-configuration related arguments, such as
    ``view_renderer``.  These only have an effect when the route configuration
    names a ``view`` and these arguments have been deprecated as of
    :app:`Pyramid` 1.1.
@@ -646,7 +648,9 @@ other non-``name`` and non-``pattern`` arguments to
 exception to this rule is use of the ``pregenerator`` argument, which is not
 ignored when ``static`` is ``True``.
 
-.. note:: the ``static`` argument to
+.. note::
+
+   the ``static`` argument to
    :meth:`~pyramid.config.Configurator.add_route` is new as of :app:`Pyramid`
    1.1.
 
@@ -1098,7 +1102,9 @@ permission.  Obviously you can do more generic things than inspect the routes
 match dict to see if the ``article`` argument matches a particular string;
 our sample ``Article`` factory class is not very ambitious.
 
-.. note:: See :ref:`security_chapter` for more information about
+.. note::
+
+   See :ref:`security_chapter` for more information about
    :app:`Pyramid` security and ACLs.
 
 .. index::

@@ -64,7 +64,9 @@ The included scaffolds are these:
   URL mapping via :term:`traversal` and persistence via
   :term:`SQLAlchemy`
 
-.. note:: At this time, each of these scaffolds uses the :term:`Chameleon`
+.. note::
+
+   At this time, each of these scaffolds uses the :term:`Chameleon`
    templating system, which is incompatible with Jython.  To use scaffolds to
    build applications which will run on Jython, you can try the
    ``pyramid_jinja2_starter`` scaffold which ships as part of the

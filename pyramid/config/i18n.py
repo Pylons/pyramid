@@ -30,9 +30,11 @@ class I18NConfiguratorMixin(object):
         application.  See :ref:`activating_translation` for more
         information.
 
-        .. note:: Using the ``locale_negotiator`` argument to the
-           :class:`pyramid.config.Configurator` constructor
-           can be used to achieve the same purpose.
+        .. note::
+
+           Using the ``locale_negotiator`` argument to the
+           :class:`pyramid.config.Configurator` constructor can be used to
+           achieve the same purpose.
         """
         def register():
             self._set_locale_negotiator(negotiator)

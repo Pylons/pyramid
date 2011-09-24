@@ -140,9 +140,10 @@ class Configurator(
     same.  See :ref:`adding_renderer_globals`.  By default, it is ``None``,
     which means use no renderer globals factory.
 
-    .. warning:: as of Pyramid 1.1, ``renderer_globals_factory`` is
-       deprecated.  Instead, use a BeforeRender event subscriber as per
-       :ref:`beforerender_event`.
+    .. warning::
+
+       as of Pyramid 1.1, ``renderer_globals_factory`` is deprecated.  Instead,
+       use a BeforeRender event subscriber as per :ref:`beforerender_event`.
 
     If ``default_permission`` is passed, it should be a
     :term:`permission` string to be used as the default permission for
@@ -288,7 +289,7 @@ class Configurator(
 
         if debug_logger is None:
             debug_logger = logging.getLogger(self.package_name)
-                
+
         registry.registerUtility(debug_logger, IDebugLogger)
 
         for name, renderer in DEFAULT_RENDERERS:
@@ -361,7 +362,7 @@ class Configurator(
         tweens   = aslist(registry.settings.get('pyramid.tweens', []))
         for factory in tweens:
             self._add_tween(factory, explicit=True)
-        
+
         includes = aslist(registry.settings.get('pyramid.includes', []))
         for inc in includes:
             self.include(inc)
@@ -557,7 +558,7 @@ class Configurator(
         ``route_prefix``. This can be used to help mount a set of routes at a
         different location than the included callable's author intended while
         still maintaining the same route names.  For example:
-            
+
         .. code-block:: python
            :linenos:
 
@@ -565,7 +566,7 @@ class Configurator(
 
            def included(config):
                config.add_route('show_users', '/show')
-               
+
            def main(global_config, **settings):
                config = Configurator()
                config.include(included, route_prefix='/users')
@@ -613,7 +614,7 @@ class Configurator(
             configurator.basepath = os.path.dirname(sourcefile)
             configurator.includepath = self.includepath + (spec,)
             c(configurator)
-            
+
     def add_directive(self, name, directive, action_wrap=True):
         """
         Add a directive method to the configurator.
@@ -636,7 +637,7 @@ class Configurator(
         discriminators.  ``action_wrap`` will cause the directive to be
         wrapped in a decorator which provides more accurate conflict
         cause information.
-        
+
         ``add_directive`` does not participate in conflict detection, and
         later calls to ``add_directive`` will override earlier calls.
         """

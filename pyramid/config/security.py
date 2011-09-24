@@ -15,10 +15,12 @@ class SecurityConfiguratorMixin(object):
         of an authentication policy or a :term:`dotted Python name`
         that points at an instance of an authentication policy.
 
-        .. note:: Using the ``authentication_policy`` argument to the
-           :class:`pyramid.config.Configurator` constructor
-           can be used to achieve the same purpose.
-        
+        .. note::
+
+           Using the ``authentication_policy`` argument to the
+           :class:`pyramid.config.Configurator` constructor can be used to
+           achieve the same purpose.
+
         """
         def register():
             self._set_authentication_policy(policy)
@@ -41,9 +43,11 @@ class SecurityConfiguratorMixin(object):
         of an authorization policy or a :term:`dotted Python name` that points
         at an instance of an authorization policy.
 
-        .. note:: Using the ``authorization_policy`` argument to the
-           :class:`pyramid.config.Configurator` constructor
-           can be used to achieve the same purpose.
+        .. note::
+
+           Using the ``authorization_policy`` argument to the
+           :class:`pyramid.config.Configurator` constructor can be used to
+           achieve the same purpose.
         """
         def register():
             self._set_authorization_policy(policy)
@@ -55,7 +59,7 @@ class SecurityConfiguratorMixin(object):
                     'Cannot configure an authorization policy without '
                     'also configuring an authentication policy '
                     '(use the set_authorization_policy method)')
-            
+
         # authorization policy used by view config (phase 3) and
         # authentication policy (phase 2)
         self.action(IAuthorizationPolicy, register, order=PHASE1_CONFIG)
@@ -98,9 +102,11 @@ class SecurityConfiguratorMixin(object):
 
         See also :ref:`setting_a_default_permission`.
 
-        .. note:: Using the ``default_permission`` argument to the
-           :class:`pyramid.config.Configurator` constructor
-           can be used to achieve the same purpose.
+        .. note::
+
+           Using the ``default_permission`` argument to the
+           :class:`pyramid.config.Configurator` constructor can be used to
+           achieve the same purpose.
         """
         # default permission used during view registration (phase 3)
         def register():
