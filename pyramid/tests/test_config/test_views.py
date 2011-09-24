@@ -353,7 +353,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IMultiView
         phash = md5()
-        phash.update('xhr:True')
+        phash.update(b'xhr:True')
         view = lambda *arg: 'NOT OK'
         view.__phash__ = phash.hexdigest()
         config = self._makeOne(autocommit=True)
@@ -377,7 +377,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.interfaces import IExceptionViewClassifier
         from pyramid.interfaces import IMultiView
         phash = md5()
-        phash.update('xhr:True')
+        phash.update(b'xhr:True')
         view = lambda *arg: 'NOT OK'
         view.__phash__ = phash.hexdigest()
         config = self._makeOne(autocommit=True)
@@ -2656,7 +2656,7 @@ class TestViewDeriver(unittest.TestCase):
             self.assertEqual(request.wrapped_body, inner_response.body)
             self.assertEqual(request.wrapped_view.__original_view__,
                              inner_view)
-            return Response('outer ' + request.wrapped_body)
+            return Response(b'outer ' + request.wrapped_body)
         self.config.registry.registerAdapter(
             outer_view, (IViewClassifier, None, None), IView, 'owrap')
         deriver = self._makeOne(viewname='inner',

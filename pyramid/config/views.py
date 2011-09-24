@@ -1064,7 +1064,7 @@ class ViewsConfiguratorMixin(object):
             'view', context, name, request_type, IView, containment,
             request_param, request_method, route_name, attr,
             xhr, accept, header, path_info, match_param]
-        discriminator.extend(sorted(custom_predicates))
+        discriminator.extend(sorted([hash(x) for x in custom_predicates]))
         discriminator = tuple(discriminator)
         self.action(discriminator, register)
     
