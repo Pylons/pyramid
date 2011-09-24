@@ -165,7 +165,7 @@ class TestOverrideProvider(unittest.TestCase):
         here = os.path.dirname(os.path.abspath(__file__))
         expected = read_(os.path.join(here, resource_name))
         with provider.get_resource_stream(None, resource_name) as result:
-            self.assertEqual(result.read().replace('\r', ''), expected)
+            self.assertEqual(result.read().replace(b'\r', b''), expected)
 
     def test_get_resource_string_no_overrides(self):
         import os
@@ -175,7 +175,7 @@ class TestOverrideProvider(unittest.TestCase):
         here = os.path.dirname(os.path.abspath(__file__))
         expected = read_(os.path.join(here, resource_name))
         result = provider.get_resource_string(None, resource_name)
-        self.assertEqual(result.replace('\r', ''), expected)
+        self.assertEqual(result.replace(b'\r', b''), expected)
 
     def test_has_resource_no_overrides(self):
         resource_name = 'test_assets.py'
@@ -422,7 +422,7 @@ class TestPackageOverrides(unittest.TestCase):
         here = os.path.dirname(os.path.abspath(__file__))
         expected = read_(os.path.join(here, 'test_assets.py'))
         with po.get_stream('whatever') as stream:
-            self.assertEqual(stream.read().replace('\r', ''),
+            self.assertEqual(stream.read().replace(b'\r', b''),
                              expected)
         
     def test_get_stream_file_doesnt_exist(self):
@@ -442,7 +442,8 @@ class TestPackageOverrides(unittest.TestCase):
         po.overrides= overrides
         here = os.path.dirname(os.path.abspath(__file__))
         expected = read_(os.path.join(here, 'test_assets.py'))
-        self.assertEqual(po.get_string('whatever').replace('\r', ''), expected)
+        self.assertEqual(po.get_string('whatever').replace(b'\r', b''),
+                         expected)
         
     def test_get_string_file_doesnt_exist(self):
         overrides = [ DummyOverride(None), DummyOverride(
