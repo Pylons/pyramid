@@ -912,7 +912,7 @@ class ActionState(object):
                 except:
                     t, v, tb = sys.exc_info()
                     try:
-                        reraise(None,
+                        reraise(ConfigurationExecutionError,
                                 ConfigurationExecutionError(t, v, info),
                                 tb)
                     finally:
