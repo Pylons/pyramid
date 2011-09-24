@@ -156,8 +156,8 @@ class RenderTemplateToResponseTests(Base, unittest.TestCase):
         result = self._callFUT(minimal)
         from webob import Response
         self.assertTrue(isinstance(result, Response))
-        self.assertEqual(result.app_iter[0].rstrip('\n'),
-                     '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
+        self.assertEqual(result.app_iter[0].rstrip(b'\n'),
+                     b'<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
         self.assertEqual(result.status, '200 OK')
         self.assertEqual(len(result.headerlist), 2)
 
