@@ -190,7 +190,7 @@ at the end of the segment represented by ``{name}.html`` (it only contains
 To capture both segments, two replacement markers can be used:
 
 .. code-block:: text
-    
+
     foo/{name}.{ext}
 
 The literal path ``/foo/biz.html`` will match the above route pattern, and
@@ -256,10 +256,10 @@ The above pattern will match these URLs, generating the following matchdicts:
 
 .. code-block:: text
 
-   foo/1/2/           -> 
+   foo/1/2/           ->
             {'baz':u'1', 'bar':u'2', 'fizzle':()}
 
-   foo/abc/def/a/b/c  -> 
+   foo/abc/def/a/b/c  ->
             {'baz':u'abc', 'bar':u'def', 'fizzle':(u'a', u'b', u'c')}
 
 Note that when a ``*stararg`` remainder match is matched, the value put into
@@ -288,7 +288,7 @@ split by segment. Changing the regular expression used to match a marker can
 also capture the remainder of the URL, for example:
 
 .. code-block:: text
-    
+
     foo/{baz}/{bar}{fizzle:.*}
 
 The above pattern will match these URLs, generating the following matchdicts:
@@ -699,10 +699,10 @@ route with an appended slash.
 
 .. warning::
 
-	You **should not** rely on this mechanism to redirect ``POST`` requests.
-	The redirect  of the slash-appending not found view will turn a ``POST``
-	request into a ``GET``, losing any ``POST`` data in the original
-	request.
+   You **should not** rely on this mechanism to redirect ``POST`` requests.
+   The redirect  of the slash-appending not found view will turn a ``POST``
+   request into a ``GET``, losing any ``POST`` data in the original
+   request.
 
 To configure the slash-appending not found view in your application, change
 the application's startup configuration, adding the following stanza:
@@ -710,7 +710,7 @@ the application's startup configuration, adding the following stanza:
 .. code-block:: python
    :linenos:
 
-   config.add_view('pyramid.view.append_slash_notfound_view', 
+   config.add_view('pyramid.view.append_slash_notfound_view',
                    context='pyramid.httpexceptions.HTTPNotFound')
 
 See :ref:`view_module` and :ref:`changing_the_notfound_view` for more
@@ -772,7 +772,7 @@ which you started the application from.  For example:
    :linenos:
 
     [chrism@thinko pylonsbasic]$ PYRAMID_DEBUG_ROUTEMATCH=true \
-                                 bin/paster serve development.ini 
+                                 bin/paster serve development.ini
     Starting server in PID 13586.
     serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
     2010-12-16 14:45:19,956 no route matched for url \
@@ -813,7 +813,7 @@ will have their pattern prefixed with the value of ``route_prefix``. This can
 be used to help mount a set of routes at a different location than the
 included callable's author intended while still maintaining the same route
 names.  For example:
-            
+
 .. code-block:: python
    :linenos:
 
@@ -821,7 +821,7 @@ names.  For example:
 
    def users_include(config):
        config.add_route('show_users', '/show')
-       
+
    def main(global_config, **settings):
        config = Configurator()
        config.include(users_include, route_prefix='/users')
@@ -844,7 +844,7 @@ will be prepended with the first:
 
    def timing_include(config):
        config.add_route('show_times', /times')
-       
+
    def users_include(config):
        config.add_route('show_users', '/show')
        config.include(timing_include, route_prefix='/timing')
@@ -871,7 +871,7 @@ that may be added in the future.  For example:
 
    def timing_include(config):
        config.add_route('timing.show_times', /times')
-       
+
    def users_include(config):
        config.add_route('users.show_users', '/show')
        config.include(timing_include, route_prefix='/timing')
@@ -913,7 +913,7 @@ For example:
 
    num_one_two_or_three = any_of('num', 'one', 'two', 'three')
 
-   config.add_route('route_to_num', '/{num}', 
+   config.add_route('route_to_num', '/{num}',
                     custom_predicates=(num_one_two_or_three,))
 
 The above ``any_of`` function generates a predicate which ensures that the
@@ -944,7 +944,7 @@ instance, a predicate might do some type conversion of values:
 
     ymd_to_int = integers('year', 'month', 'day')
 
-    config.add_route('ymd', '/{year}/{month}/{day}', 
+    config.add_route('ymd', '/{year}/{month}/{day}',
                      custom_predicates=(ymd_to_int,))
 
 Note that a conversion predicate is still a predicate so it must return
@@ -967,7 +967,7 @@ expressions specifying requirements for that marker. For instance:
 
     ymd_to_int = integers('year', 'month', 'day')
 
-    config.add_route('ymd', '/{year:\d+}/{month:\d+}/{day:\d+}', 
+    config.add_route('ymd', '/{year:\d+}/{month:\d+}/{day:\d+}',
                      custom_predicates=(ymd_to_int,))
 
 Now the try/except is no longer needed because the route will not match at
@@ -1005,12 +1005,53 @@ the route in a set of route predicates:
 
     config.add_route('y', '/{year}', custom_predicates=(twenty_ten,))
     config.add_route('ym', '/{year}/{month}', custom_predicates=(twenty_ten,))
-    config.add_route('ymd', '/{year}/{month}/{day}', 
+    config.add_route('ymd', '/{year}/{month}/{day}',
                      custom_predicates=(twenty_ten,))
 
 The above predicate, when added to a number of route configurations ensures
 that the year match argument is '2010' if and only if the route name is
 'ymd', 'ym', or 'y'.
+
+You can also caption the predicates by setting the ``__text__`` attribute. This
+will help you with the ``paster pviews`` command (see
+:ref:`displaying_application_routes`) and the ``pyramid_debugtoolbar``.
+
+If a predicate is a class just add __text__ property in a standard manner.
+
+.. code-block:: python
+   :linenos:
+
+   class DummyCustomPredicate1(object):
+       def __init__(self):
+           self.__text__ = 'my custom class predicate'
+
+   class DummyCustomPredicate2(object):
+       __text__ = 'my custom class predicate'
+
+If a predicate is a method you'll need to assign it after method declaration
+(see `PEP 232 <http://www.python.org/dev/peps/pep-0232/>`_)
+
+.. code-block:: python
+   :linenos:
+
+   def custom_predicate():
+       pass
+   custom_predicate.__text__ = 'my custom method predicate'
+
+If a predicate is a classmethod using @classmethod will not work, but you can
+still easily do it by wrapping it in classmethod call.
+
+.. code-block:: python
+   :linenos:
+
+   def classmethod_predicate():
+       pass
+   classmethod_predicate.__text__ = 'my classmethod predicate'
+   classmethod_predicate = classmethod(classmethod_predicate)
+
+Same will work with staticmethod, just use ``staticmethod`` instead of
+``classmethod``.
+
 
 See also :class:`pyramid.interfaces.IRoute` for more API documentation about
 route objects.
@@ -1034,7 +1075,7 @@ callable ultimately found via :term:`view lookup`.
 .. code-block:: python
    :linenos:
 
-   config.add_route('abc', '/abc', 
+   config.add_route('abc', '/abc',
                     factory='myproject.resources.root_factory')
    config.add_view('myproject.views.theview', route_name='abc')
 
