@@ -63,37 +63,28 @@ class IntegrationBase(object):
 here = os.path.dirname(__file__)
 
 class TestStaticAppBase(IntegrationBase):
-    def _assertBody(self, body, filename):
-        self.assertEqual(
-            body.replace(b'\r', b''),
-            open(filename, 'rb').read()
-            )
-
     def test_basic(self):
         res = self.testapp.get('/minimal.pt', status=200)
-        self._assertBody(res.body, os.path.join(here, 'fixtures/minimal.pt'))
+        _assertBody(res.body, os.path.join(here, 'fixtures/minimal.pt'))
 
     def test_hidden(self):
         res = self.testapp.get('/static/.hiddenfile', status=200)
-        self._assertBody(
-            res.body,
-            os.path.join(here, 'fixtures/static/.hiddenfile')
-            )
+        _assertBody(res.body, os.path.join(here, 'fixtures/static/.hiddenfile'))
 
     def test_highchars_in_pathelement(self):
         res = self.testapp.get('/static/héhé/index.html', status=200)
-        self._assertBody(
-            res.body, os.path.join(
-                here,
-                text_('fixtures/static/héhé/index.html', 'utf-8'))
+        _assertBody(
+            res.body,
+            os.path.join(here,
+                         text_('fixtures/static/héhé/index.html', 'utf-8'))
             )
 
     def test_highchars_in_filename(self):
         res = self.testapp.get('/static/héhé.html', status=200)
-        self._assertBody(
-            res.body, os.path.join(
-                here,
-                text_('fixtures/static/héhé.html', 'utf-8'))
+        _assertBody(
+            res.body,
+            os.path.join(here,
+                         text_('fixtures/static/héhé.html', 'utf-8'))
             )
 
     def test_not_modified(self):
@@ -105,7 +96,7 @@ class TestStaticAppBase(IntegrationBase):
     def test_file_in_subdir(self):
         fn = os.path.join(here, 'fixtures/static/index.html')
         res = self.testapp.get('/static/index.html', status=200)
-        self._assertBody(res.body, fn)
+        _assertBody(res.body, fn)
 
     def test_directory_noslash_redir(self):
         res = self.testapp.get('/static', status=301)
@@ -125,7 +116,7 @@ class TestStaticAppBase(IntegrationBase):
     def test_directory_withslash(self):
         fn = os.path.join(here, 'fixtures/static/index.html')
         res = self.testapp.get('/static/', status=200)
-        self._assertBody(res.body, fn)
+        _assertBody(res.body, fn)
 
     def test_range_inclusive(self):
         self.testapp.extra_environ = {'HTTP_RANGE':'bytes=1-2'}
@@ -140,15 +131,15 @@ class TestStaticAppBase(IntegrationBase):
     def test_range_notbytes(self):
         self.testapp.extra_environ = {'HTTP_RANGE':'kHz=-5'}
         res = self.testapp.get('/static/index.html', status=200)
-        self._assertBody(res.body,
-                         os.path.join(here, 'fixtures/static/index.html'))
+        _assertBody(res.body,
+                    os.path.join(here, 'fixtures/static/index.html'))
 
     def test_range_multiple(self):
         res = self.testapp.get('/static/index.html',
                                [('HTTP_RANGE', 'bytes=10-11,11-12')],
                                status=200)
-        self._assertBody(res.body,
-                         os.path.join(here, 'fixtures/static/index.html'))
+        _assertBody(res.body,
+                    os.path.join(here, 'fixtures/static/index.html'))
 
     def test_range_oob(self):
         self.testapp.extra_environ = {'HTTP_RANGE':'bytes=1000-1002'}
@@ -189,36 +180,25 @@ class TestStaticAppNoSubpath(unittest.TestCase):
         request = Request(kw)
         return request
 
-    def _assertBody(self, body, filename):
-        self.assertEqual(
-            body.replace(b'\r', b''),
-            open(filename, 'rb').read()
-            )
-
     def test_basic(self):
         request = self._makeRequest({'PATH_INFO':'/minimal.pt'})
         context = DummyContext()
         result = self.staticapp(context, request)
         self.assertEqual(result.status, '200 OK')
-        self._assertBody(result.body, os.path.join(here, 'fixtures/minimal.pt'))
+        _assertBody(result.body, os.path.join(here, 'fixtures/minimal.pt'))
 
 class TestStaticAppWithRoutePrefix(IntegrationBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.static_routeprefix'
-    def _assertBody(self, body, filename):
-        self.assertEqual(
-            body.replace(b'\r', b''),
-            open(filename, 'rb').read()
-            )
 
     def test_includelevel1(self):
         res = self.testapp.get('/static/minimal.pt', status=200)
-        self._assertBody(res.body,
-                         os.path.join(here, 'fixtures/minimal.pt'))
+        _assertBody(res.body,
+                    os.path.join(here, 'fixtures/minimal.pt'))
 
     def test_includelevel2(self):
         res = self.testapp.get('/prefix/static/index.html', status=200)
-        self._assertBody(res.body,
-                         os.path.join(here, 'fixtures/static/index.html'))
+        _assertBody(res.body,
+                    os.path.join(here, 'fixtures/static/index.html'))
 
 
 class TestFixtureApp(IntegrationBase, unittest.TestCase):
@@ -593,3 +573,12 @@ def httpdate(ts):
     import datetime
     ts = datetime.datetime.utcfromtimestamp(ts)
     return ts.strftime("%a, %d %b %Y %H:%M:%S GMT")
+
+def read_(filename):
+    with open(filename, 'rb') as fp:
+        val = fp.read()
+        return val
+    
+def _assertBody(body, filename):
+    assert(body.replace(b'\r', b'') == read_(filename))
+
