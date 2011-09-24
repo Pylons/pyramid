@@ -29,6 +29,10 @@ class UrlEncodeTests(unittest.TestCase):
         result = self._callFUT([('a', s)], doseq=True)
         self.assertEqual(result, 'a=1&a=2')
 
+    def test_with_spaces(self):
+        result = self._callFUT([('a', '123 456')], doseq=True)
+        self.assertEqual(result, 'a=123+456')
+
     def test_dict(self):
         result = self._callFUT({'a':1})
         self.assertEqual(result, 'a=1')
