@@ -16,6 +16,7 @@ from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.compat import text_
 from pyramid.compat import reraise
 from pyramid.compat import string_types
+from pyramid.compat import PY3
 from pyramid.events import ApplicationCreated
 from pyramid.exceptions import ConfigurationConflictError
 from pyramid.exceptions import ConfigurationError
@@ -659,7 +660,10 @@ class Configurator(
         c, action_wrap = c
         if action_wrap:
             c = action_method(c)
-        m = types.MethodType(c, self, self.__class__)
+        if PY3:
+            m = types.MethodType(c, self)
+        else:
+            m = types.MethodType(c, self, self.__class__)
         return m
 
     @classmethod
@@ -1000,7 +1004,11 @@ def resolveConflicts(actions):
 
         # We need to sort the actions by the paths so that the shortest
         # path with a given prefix comes first:
-        dups.sort()
+        def allbutfunc(stupid):
+            # f me with a shovel, py3 cant cope with sorting when the
+            # callable function is in the list
+            return stupid[0:2] + stupid[3:]
+        dups.sort(key=allbutfunc)
         (basepath, i, callable, args, kw, baseinfo) = dups[0]
         output.append(
             (i, discriminator, callable, args, kw, basepath, baseinfo)

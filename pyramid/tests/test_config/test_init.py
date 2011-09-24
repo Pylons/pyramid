@@ -3,6 +3,8 @@ import unittest
 import os
 
 from pyramid.compat import PYPY
+from pyramid.compat import im_func
+from pyramid.testing import skip_on
 
 from pyramid.tests.test_config import dummy_tween_factory
 from pyramid.tests.test_config import dummy_include
@@ -927,6 +929,7 @@ pyramid.tests.test_config.dummy_include2""",
             self.assertTrue("@view_config(name='two', renderer='string')" in
                             which)
 
+    @skip_on('py3')
     def test_hook_zca(self):
         from zope.component import getSiteManager
         def foo():
@@ -940,6 +943,7 @@ pyramid.tests.test_config.dummy_include2""",
         finally:
             getSiteManager.reset()
 
+    @skip_on('py3')
     def test_unhook_zca(self):
         from zope.component import getSiteManager
         def foo():
@@ -1067,7 +1071,7 @@ pyramid.tests.test_config.dummy_include2""",
         directives = {'foo':(foo, True)}
         config.registry._directives = directives
         foo_meth = config.foo
-        self.assertTrue(foo_meth.im_func.__docobj__ is foo)
+        self.assertTrue(getattr(foo_meth, im_func).__docobj__ is foo)
 
     def test___getattr__matches_no_action_wrap(self):
         config = self._makeOne()
@@ -1075,7 +1079,7 @@ pyramid.tests.test_config.dummy_include2""",
         directives = {'foo':(foo, False)}
         config.registry._directives = directives
         foo_meth = config.foo
-        self.assertTrue(foo_meth.im_func is foo)
+        self.assertTrue(getattr(foo_meth, im_func) is foo)
 
 class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
     def setUp(self):
@@ -1306,7 +1310,7 @@ class TestConfigurator_add_directive(unittest.TestCase):
         config = self.config
         config.add_directive(
             'dummy_extend', 'pyramid.tests.test_config.dummy_extend')
-        self.assert_(hasattr(config, 'dummy_extend'))
+        self.assertTrue(hasattr(config, 'dummy_extend'))
         config.dummy_extend('discrim')
         after = config.action_state
         self.assertEqual(
@@ -1319,7 +1323,7 @@ class TestConfigurator_add_directive(unittest.TestCase):
         config = self.config
         config.add_directive(
             'dummy_extend', dummy_extend)
-        self.assert_(hasattr(config, 'dummy_extend'))
+        self.assertTrue(hasattr(config, 'dummy_extend'))
         config.dummy_extend('discrim')
         after = config.action_state
         self.assertEqual(
@@ -1333,7 +1337,7 @@ class TestConfigurator_add_directive(unittest.TestCase):
             'dummy_extend', dummy_extend)
         config.add_directive(
             'dummy_extend', dummy_extend2)
-        self.assert_(hasattr(config, 'dummy_extend'))
+        self.assertTrue(hasattr(config, 'dummy_extend'))
         config.dummy_extend('discrim')
         after = config.action_state
         self.assertEqual(
