@@ -453,14 +453,14 @@ class Test_string_renderer_factory(unittest.TestCase):
     def test_with_request_content_type_notset(self):
         request = testing.DummyRequest()
         renderer = self._callFUT(None)
-        renderer(None, {'request':request})
+        renderer('', {'request':request})
         self.assertEqual(request.response.content_type, 'text/plain')
 
     def test_with_request_content_type_set(self):
         request = testing.DummyRequest()
         request.response.content_type = 'text/mishmash'
         renderer = self._callFUT(None)
-        renderer(None, {'request':request})
+        renderer('', {'request':request})
         self.assertEqual(request.response.content_type, 'text/mishmash')
 
 
@@ -600,7 +600,7 @@ class TestRendererHelper(unittest.TestCase):
         self._registerResponseFactory()
         request = None
         helper = self._makeOne('loo.foo')
-        response = helper._make_response('abc', request)
+        response = helper._make_response(b'abc', request)
         self.assertEqual(response.__class__.__name__, 'ResponseFactory')
         self.assertEqual(response.body, b'abc')
 
@@ -687,7 +687,7 @@ class TestRendererHelper(unittest.TestCase):
         self.config.registry.registerUtility(ResponseFactory, IResponseFactory)
         request = testing.DummyRequest()
         helper = self._makeOne('loo.foo')
-        response = helper._make_response('abc', request)
+        response = helper._make_response(b'abc', request)
         self.assertEqual(response.__class__, ResponseFactory)
         self.assertEqual(response.body, b'abc')
 

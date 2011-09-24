@@ -31,7 +31,7 @@ except IOError:
 install_requires=[
     'Chameleon >= 1.2.3',
     'Mako >= 0.3.6', # strict_undefined
-    'WebOb >= 1.0.2', # no "default_charset"; request.script_name doesnt error
+    'WebOb >= 1.2dev', # response.text / py3 compat
     'repoze.lru',
     'setuptools',
     'zope.interface >= 3.8.0',  # has zope.interface.registry

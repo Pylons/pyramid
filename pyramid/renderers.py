@@ -149,7 +149,7 @@ def json_renderer_factory(info):
 def string_renderer_factory(info):
     def _render(value, system):
         if not isinstance(value, string_types):
-            value = native_(value, 'utf-8')
+            value = str(value)
         request = system.get('request')
         if request is not None:
             response = request.response
@@ -441,7 +441,7 @@ class RendererHelper(object):
             result = ''
 
         if isinstance(result, text_type):
-            response.unicode_body = result
+            response.text = result
         else:
             response.body = result
 
