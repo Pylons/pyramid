@@ -3,6 +3,7 @@ import traceback
 
 from pyramid.compat import string_types
 from pyramid.compat import bytes_
+from pyramid.compat import is_nonstr_iter
 from pyramid.exceptions import ConfigurationError
 from pyramid.traversal import find_interface
 from pyramid.traversal import traversal_path
@@ -180,7 +181,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         containment_predicate.__text__ = "containment = %s" % containment
         weights.append(1 << 7)
         predicates.append(containment_predicate)
-        h.update(bytes_('containment:%r' % containment))
+        h.update(bytes_('containment:%r' % hash(containment)))
 
     if request_type is not None:
         def request_type_predicate(context, request):
@@ -189,7 +190,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         request_type_predicate.__text__ = text % request_type
         weights.append(1 << 8)
         predicates.append(request_type_predicate)
-        h.update(bytes_('request_type:%r' % request_type))
+        h.update(bytes_('request_type:%r' % hash(request_type)))
 
     if match_param is not None:
         if isinstance(match_param, string_types):
@@ -225,7 +226,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
             # functions for custom predicates, so that the hash output
             # of predicate instances which are "logically the same"
             # may compare equal.
-            h.update(bytes_('custom%s:%r' % (num, predicate)))
+            h.update(bytes_('custom%s:%r' % (num, hash(predicate))))
         weights.append(1 << 10)
 
     if traverse is not None:
@@ -257,7 +258,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
     return order, predicates, phash
 
 def as_sorted_tuple(val):
-    if not hasattr(val, '__iter__'):
+    if not is_nonstr_iter(val):
         val = (val,)
     val = tuple(sorted(val))
     return val
