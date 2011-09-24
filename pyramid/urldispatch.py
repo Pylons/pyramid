@@ -7,6 +7,7 @@ from pyramid.interfaces import IRoute
 from pyramid.compat import url_unquote_text
 from pyramid.compat import native_
 from pyramid.compat import text_type
+from pyramid.compat import string_types
 from pyramid.compat import is_nonstr_iter
 from pyramid.compat import url_quote
 from pyramid.exceptions import URLDecodeError
@@ -157,11 +158,13 @@ def _compile_route(route):
     def generator(dict):
         newdict = {}
         for k, v in dict.items():
-            if isinstance(v, text_type):
+            if v.__class__ is text_type:
                 v = native_(v, 'utf-8')
             if k == star and is_nonstr_iter(v):
                 v = '/'.join([quote_path_segment(x) for x in v])
             elif k != star:
+                if v.__class__ not in string_types:
+                    v = str(v)
                 try:
                     v = url_quote(v, safe='')
                 except TypeError:
