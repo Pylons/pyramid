@@ -1,5 +1,6 @@
 from webob import Response
 from pyramid.httpexceptions import HTTPForbidden
+from pyramid.compat import bytes_
 
 def x_view(request): # pragma: no cover
      return Response('this is private!')
@@ -9,7 +10,7 @@ def forbidden_view(context, request):
      result = context.result
      message = msg + '\n' + str(result)
      resp = HTTPForbidden()
-     resp.body = message
+     resp.body = bytes_(message)
      return resp
 
 def includeme(config):

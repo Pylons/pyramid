@@ -1,4 +1,6 @@
 import unittest
+
+from pyramid.compat import bytes_
 from pyramid.compat import text_
 
 class Test_exception_response(unittest.TestCase):
@@ -277,7 +279,7 @@ class TestRenderAllExceptionsWithoutArguments(unittest.TestCase):
             if exc.empty_body:
                 self.assertEqual(result, '')
             else:
-                self.assertTrue(exc.status in result)
+                self.assertTrue(bytes_(exc.status) in result)
             L.append(result)
         self.assertEqual(len(L), len(status_map))
             

@@ -99,7 +99,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         h.update(bytes_('xhr:%r' % bool(xhr)))
 
     if request_method is not None:
-        if not hasattr(request_method, '__iter__'):
+        if not is_nonstr_iter(request_method):
             request_method = (request_method,)
         request_method = sorted(request_method)
         def request_method_predicate(context, request):

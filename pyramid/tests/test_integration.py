@@ -191,7 +191,7 @@ class TestStaticAppNoSubpath(unittest.TestCase):
 
     def _assertBody(self, body, filename):
         self.assertEqual(
-            body.replace('\r', ''),
+            body.replace(r'\r', r''),
             open(filename, 'rb').read()
             )
 
