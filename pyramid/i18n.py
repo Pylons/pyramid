@@ -180,10 +180,10 @@ def make_localizer(current_locale_name, translation_directories):
                 mopath = os.path.realpath(os.path.join(messages_dir,
                                                        mofile))
                 if mofile.endswith('.mo') and os.path.isfile(mopath):
-                    mofp = open(mopath, 'rb')
-                    domain = mofile[:-3]
-                    dtrans = Translations(mofp, domain)
-                    translations.add(dtrans)
+                    with open(mopath, 'rb') as mofp:
+                        domain = mofile[:-3]
+                        dtrans = Translations(mofp, domain)
+                        translations.add(dtrans)
 
     return Localizer(locale_name=current_locale_name,
                           translations=translations)
@@ -257,7 +257,8 @@ class Translations(gettext.GNUTranslations, object):
         filename = gettext.find(domain, dirname, locales)
         if not filename:
             return gettext.NullTranslations()
-        return cls(fileobj=open(filename, 'rb'), domain=domain)
+        with open(filename, 'rb') as fp:
+            return cls(fileobj=fp, domain=domain)
 
     def __repr__(self):
         return '<%s: "%s">' % (type(self).__name__,

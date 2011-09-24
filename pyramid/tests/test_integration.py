@@ -228,7 +228,7 @@ class TestStaticPermApp(IntegrationBase, unittest.TestCase):
         result = self.testapp.get('/allowed/index.html', status=200)
         self.assertEqual(
             result.body.replace(b'\r', b''),
-            open(os.path.join(here, 'fixtures/static/index.html'), 'rb').read())
+            read_(os.path.join(here, 'fixtures/static/index.html')))
 
     def test_denied_via_acl_global_root_factory(self):
         self.testapp.extra_environ = {'REMOTE_USER':'bob'}
@@ -239,7 +239,7 @@ class TestStaticPermApp(IntegrationBase, unittest.TestCase):
         result = self.testapp.get('/protected/index.html', status=200)
         self.assertEqual(
             result.body.replace(b'\r', b''),
-            open(os.path.join(here, 'fixtures/static/index.html'), 'rb').read())
+            read_(os.path.join(here, 'fixtures/static/index.html')))
 
     def test_denied_via_acl_local_root_factory(self):
         self.testapp.extra_environ = {'REMOTE_USER':'fred'}
@@ -250,7 +250,7 @@ class TestStaticPermApp(IntegrationBase, unittest.TestCase):
         result = self.testapp.get('/factory_protected/index.html', status=200)
         self.assertEqual(
             result.body.replace(b'\r', b''),
-            open(os.path.join(here, 'fixtures/static/index.html'), 'rb').read())
+            read_(os.path.join(here, 'fixtures/static/index.html')))
 
 class TestCCBug(IntegrationBase, unittest.TestCase):
     # "unordered" as reported in IRC by author of
