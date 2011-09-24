@@ -133,11 +133,6 @@ add_module_names = False
 if book:
     pygments_style = 'bw'
 
-# do not include book material for online docs
-if not book:
-    exclude_patterns.extend(['foreword.rst', 'latexindex.rst',
-                             'authorintro.rst'])
-
 # The default language to highlight source code in.
 #highlight_language = 'guess'
 
