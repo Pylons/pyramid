@@ -1,5 +1,7 @@
 import unittest
+from pyramid.testing import skip_on
 
+@skip_on('py3')
 class TestPyramidTemplate(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.scaffolds import PyramidTemplate

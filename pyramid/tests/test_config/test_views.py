@@ -5,6 +5,7 @@ from pyramid.tests.test_config import IDummy
 
 from pyramid.tests.test_config import dummy_view
 
+from pyramid.compat import im_func
 from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import ConfigurationExecutionError
 from pyramid.exceptions import ConfigurationConflictError
@@ -3245,12 +3246,12 @@ class Test_preserve_view_attrs(unittest.TestCase):
         self.assertTrue(view1.__doc__ is view2.__doc__)
         self.assertTrue(view1.__module__ is view2.__module__)
         self.assertTrue(view1.__name__ is view2.__name__)
-        self.assertTrue(view1.__call_permissive__.im_func is
-                        view2.__call_permissive__.im_func)
-        self.assertTrue(view1.__permitted__.im_func is
-                        view2.__permitted__.im_func)
-        self.assertTrue(view1.__predicated__.im_func is
-                        view2.__predicated__.im_func)
+        self.assertTrue(getattr(view1.__call_permissive__, im_func) is
+                        getattr(view2.__call_permissive__, im_func))
+        self.assertTrue(getattr(view1.__permitted__, im_func) is
+                        getattr(view2.__permitted__, im_func))
+        self.assertTrue(getattr(view1.__predicated__, im_func) is
+                        getattr(view2.__predicated__, im_func))
 
 
 class TestStaticURLInfo(unittest.TestCase):

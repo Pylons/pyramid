@@ -8,7 +8,7 @@ from pyramid.compat import url_unquote_text
 from pyramid.compat import native_
 from pyramid.compat import text_type
 from pyramid.compat import is_nonstr_iter
-from pyramid.encode import url_quote
+from pyramid.compat import url_quote
 from pyramid.exceptions import URLDecodeError
 from pyramid.traversal import traversal_path
 from pyramid.traversal import quote_path_segment
@@ -163,7 +163,7 @@ def _compile_route(route):
                 v = '/'.join([quote_path_segment(x) for x in v])
             elif k != star:
                 try:
-                    v = url_quote(v)
+                    v = url_quote(v, safe='')
                 except TypeError:
                     pass
             newdict[k] = v

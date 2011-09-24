@@ -277,7 +277,7 @@ class TestRenderAllExceptionsWithoutArguments(unittest.TestCase):
             exc.content_type = content_type
             result = list(exc(environ, start_response))[0]
             if exc.empty_body:
-                self.assertEqual(result, '')
+                self.assertEqual(result, b'')
             else:
                 self.assertTrue(bytes_(exc.status) in result)
             L.append(result)

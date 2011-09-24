@@ -14,6 +14,9 @@ from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
 from pyramid.interfaces import ISession
 
+from pyramid.compat import PY3
+from pyramid.compat import PYPY
+from pyramid.compat import class_types
 from pyramid.config import Configurator
 from pyramid.decorator import reify
 from pyramid.httpexceptions import HTTPForbidden
@@ -896,21 +899,25 @@ class MockTemplate(object):
         return self.response
 
 def skip_on(*platforms):
+    skip = False
+    for platform in platforms:
+        if skip_on.os_name.startswith(platform):
+            skip = True
+        if platform == 'pypy' and PYPY: # pragma: no cover
+            skip = True
+        if platform == 'py3' and PY3: # pragma: no cover
+            skip = True
     def decorator(func):
-        def wrapper(*args, **kw):
-            for platform in platforms:
-                if skip_on.os_name.startswith(platform):
+        if isinstance(func, class_types):
+            if skip: return None
+            else: return func
+        else:
+            def wrapper(*args, **kw):
+                if skip:
                     return
-                if platform == 'pypy' and skip_on.pypy: # pragma: no cover
-                    return
-            return func(*args, **kw)
-        wrapper.__name__ = func.__name__
-        wrapper.__doc__ = func.__doc__
-        return wrapper
+                return func(*args, **kw)
+            wrapper.__name__ = func.__name__
+            wrapper.__doc__ = func.__doc__
+            return wrapper
     return decorator
 skip_on.os_name = os.name # for testing
-try: # pragma: no cover
-    import __pypy__
-    skip_on.pypy = True
-except ImportError:
-    skip_on.pypy = False

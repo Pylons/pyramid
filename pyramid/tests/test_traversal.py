@@ -4,6 +4,7 @@ from pyramid.testing import cleanUp
 from pyramid.compat import text_
 from pyramid.compat import native_
 from pyramid.compat import text_type
+from pyramid.compat import url_quote
 
 class TraversalPathTests(unittest.TestCase):
     def _callFUT(self, path):
@@ -42,18 +43,16 @@ class TraversalPathTests(unittest.TestCase):
         self.assertEqual(result2, (text_('foo'), text_('bar')))
 
     def test_utf8(self):
-        import urllib
-        la = 'La Pe\xc3\xb1a'
-        encoded = urllib.quote(la)
+        la = b'La Pe\xc3\xb1a'
+        encoded = url_quote(la)
         decoded = text_(la, 'utf-8')
         path = '/'.join([encoded, encoded])
         self.assertEqual(self._callFUT(path), (decoded, decoded))
 
     def test_utf16(self):
         from pyramid.exceptions import URLDecodeError
-        import urllib
-        la = text_('La Pe\xc3\xb1a', 'utf-8').encode('utf-16')
-        encoded = urllib.quote(la)
+        la = text_(b'La Pe\xc3\xb1a', 'utf-8').encode('utf-16')
+        encoded = url_quote(la)
         path = '/'.join([encoded, encoded])
         self.assertRaises(URLDecodeError, self._callFUT, path)
 
@@ -67,7 +66,7 @@ class TraversalPathTests(unittest.TestCase):
         self.assertEqual(self._callFUT(path), (text_('abc'),))
 
     def test_unicode_undecodeable_to_ascii(self):
-        path = text_('/La Pe\xc3\xb1a', 'utf-8')
+        path = text_(b'/La Pe\xc3\xb1a', 'utf-8')
         self.assertRaises(UnicodeEncodeError, self._callFUT, path)
 
 class ResourceTreeTraverserTests(unittest.TestCase):
@@ -604,7 +603,7 @@ class FindResourceTests(unittest.TestCase):
         root = DummyContext(unprintable)
         unprintable.__parent__ = root
         unprintable.__name__ = text_(
-            '/\xe6\xb5\x81\xe8\xa1\x8c\xe8\xb6\x8b\xe5\x8a\xbf', 'utf-8')
+            b'/\xe6\xb5\x81\xe8\xa1\x8c\xe8\xb6\x8b\xe5\x8a\xbf', 'utf-8')
         root.__parent__ = None
         root.__name__ = None
         traverser = ResourceTreeTraverser
@@ -757,7 +756,7 @@ class QuotePathSegmentTests(unittest.TestCase):
         return quote_path_segment(s)
 
     def test_unicode(self):
-        la = text_('/La Pe\xc3\xb1a', 'utf-8')
+        la = text_(b'/La Pe\xc3\xb1a', 'utf-8')
         result = self._callFUT(la)
         self.assertEqual(result, '%2FLa%20Pe%C3%B1a')
 
@@ -774,7 +773,7 @@ class QuotePathSegmentTests(unittest.TestCase):
     def test_long(self):
         from pyramid.compat import long
         import sys
-        s = long(sys.maxint + 1)
+        s = long(sys.maxsize + 1)
         result = self._callFUT(s)
         expected = str(s)
         self.assertEqual(result, expected)
@@ -847,7 +846,7 @@ class TraversalContextURLTests(unittest.TestCase):
         root.__name__ = None
         one = DummyContext()
         one.__parent__ = root
-        one.__name__ = text_('La Pe\xc3\xb1a', 'utf-8')
+        one.__name__ = text_(b'La Pe\xc3\xb1a', 'utf-8')
         two = DummyContext()
         two.__parent__ = one
         two.__name__ = 'La Pe\xc3\xb1a'

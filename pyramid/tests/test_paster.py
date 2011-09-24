@@ -1,5 +1,7 @@
 import unittest
+from pyramid.testing import skip_on
 
+@skip_on('py3')
 class TestPShellCommand(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.paster import PShellCommand
@@ -246,6 +248,7 @@ class TestPShellCommand(unittest.TestCase):
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
 
+@skip_on('py3')
 class TestPRoutesCommand(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.paster import PRoutesCommand
@@ -372,6 +375,7 @@ class TestPRoutesCommand(unittest.TestCase):
         result = command._get_mapper(registry)
         self.assertEqual(result.__class__, RoutesMapper)
         
+@skip_on('py3')
 class TestPViewsCommand(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.paster import PViewsCommand
@@ -824,6 +828,7 @@ class TestPViewsCommand(unittest.TestCase):
         self.assertEqual(L[8], '    pyramid.tests.test_paster.view.call')
         self.assertEqual(L[9], '    view predicates (predicate = x)')
 
+@skip_on('py3')
 class TestGetApp(unittest.TestCase):
     def _callFUT(self, config_file, section_name, loadapp):
         from pyramid.paster import get_app
@@ -859,6 +864,7 @@ class TestGetApp(unittest.TestCase):
         self.assertEqual(loadapp.relative_to, os.getcwd())
         self.assertEqual(result, app)
 
+@skip_on('py3')
 class TestBootstrap(unittest.TestCase):
     def _callFUT(self, config_uri, request=None):
         from pyramid.paster import bootstrap
@@ -898,6 +904,7 @@ class TestBootstrap(unittest.TestCase):
         self.assertEqual(result['root'], self.root)
         self.assert_('closer' in result)
 
+@skip_on('py3')
 class TestPTweensCommand(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.paster import PTweensCommand

@@ -64,13 +64,15 @@ try: # pragma: no cover
     from urllib import parse
     urlparse = parse
     from urllib.parse import quote as url_quote
+    from urllib.parse import quote_plus as url_quote_plus
     from urllib.parse import unquote as url_unquote
-    url_unquote_text = url_unquote
     from urllib.parse import urlencode as url_encode
     from urllib.request import urlopen as url_open
+    url_unquote_text = url_unquote
 except ImportError:
     import urlparse
     from urllib import quote as url_quote
+    from urllib import quote_plus as url_quote_plus
     from urllib import unquote as url_unquote
     from urllib import urlencode as url_encode
     from urllib2 import urlopen as url_open
