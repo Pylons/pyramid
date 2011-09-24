@@ -34,7 +34,8 @@ install_requires=[
     'WebOb >= 1.0.2', # no "default_charset"; request.script_name doesnt error
     'repoze.lru',
     'setuptools',
-    'zope.interface >= 3.8.0',  # has zope.interface.registry
+    'zope.component >= 3.6.0', # independent of zope.hookable
+    'zope.interface >= 3.5.1',   # 3.5.0 comment: "allow to bootstrap on jython"
     'zope.deprecation',
     'venusian >= 1.0a1', # ``onerror``
     'translationstring',
@@ -44,7 +45,6 @@ if platform.system() == 'Java':
     tests_require = install_requires + [
         'WebTest',
         'virtualenv',
-        'zope.component>=3.11.0',
         ]
 else:
     tests_require= install_requires + [
@@ -53,7 +53,6 @@ else:
         'repoze.sphinx.autointerface',
         'WebTest', 
         'virtualenv',
-        'zope.component>=3.11.0',
         ]
 
 if sys.version_info[:2] < (2, 6):
