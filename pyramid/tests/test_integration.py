@@ -65,7 +65,7 @@ here = os.path.dirname(__file__)
 class TestStaticAppBase(IntegrationBase):
     def _assertBody(self, body, filename):
         self.assertEqual(
-            body.replace('\r', ''),
+            body.replace(b'\r', b''),
             open(filename, 'rb').read()
             )
 
@@ -206,7 +206,7 @@ class TestStaticAppWithRoutePrefix(IntegrationBase, unittest.TestCase):
     package = 'pyramid.tests.pkgs.static_routeprefix'
     def _assertBody(self, body, filename):
         self.assertEqual(
-            body.replace('\r', ''),
+            body.replace(b'\r', b''),
             open(filename, 'rb').read()
             )
 

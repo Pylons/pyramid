@@ -95,7 +95,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         xhr_predicate.__text__ = "xhr = True"
         weights.append(1 << 1)
         predicates.append(xhr_predicate)
-        h.update('xhr:%r' % bool(xhr))
+        h.update(bytes_('xhr:%r' % bool(xhr)))
 
     if request_method is not None:
         if not hasattr(request_method, '__iter__'):
@@ -108,7 +108,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         weights.append(1 << 2)
         predicates.append(request_method_predicate)
         for m in request_method:
-            h.update('request_method:%r' % m)
+            h.update(bytes_('request_method:%r' % m))
 
     if path_info is not None:
         try:
@@ -121,7 +121,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         path_info_predicate.__text__ = text % path_info
         weights.append(1 << 3)
         predicates.append(path_info_predicate)
-        h.update('path_info:%r' % path_info)
+        h.update(bytes_('path_info:%r' % path_info))
 
     if request_param is not None:
         request_param_val = None
@@ -138,7 +138,8 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         request_param_predicate.__text__ = text
         weights.append(1 << 4)
         predicates.append(request_param_predicate)
-        h.update('request_param:%r=%r' % (request_param, request_param_val))
+        h.update(
+            bytes_('request_param:%r=%r' % (request_param, request_param_val)))
 
     if header is not None:
         header_name = header
@@ -163,7 +164,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         header_predicate.__text__ = text
         weights.append(1 << 5)
         predicates.append(header_predicate)
-        h.update('header:%r=%r' % (header_name, header_val))
+        h.update(bytes_('header:%r=%r' % (header_name, header_val)))
 
     if accept is not None:
         def accept_predicate(context, request):
@@ -171,7 +172,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         accept_predicate.__text__ = "accept = %s" % accept
         weights.append(1 << 6)
         predicates.append(accept_predicate)
-        h.update('accept:%r' % accept)
+        h.update(bytes_('accept:%r' % accept))
 
     if containment is not None:
         def containment_predicate(context, request):
@@ -179,7 +180,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         containment_predicate.__text__ = "containment = %s" % containment
         weights.append(1 << 7)
         predicates.append(containment_predicate)
-        h.update('containment:%r' % hash_(containment))
+        h.update(bytes_('containment:%r' % containment))
 
     if request_type is not None:
         def request_type_predicate(context, request):
@@ -188,7 +189,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         request_type_predicate.__text__ = text % request_type
         weights.append(1 << 8)
         predicates.append(request_type_predicate)
-        h.update('request_type:%r' % hash_(request_type))
+        h.update(bytes_('request_type:%r' % request_type))
 
     if match_param is not None:
         if isinstance(match_param, string_types):
@@ -203,7 +204,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         match_param_predicate.__text__ = text
         weights.append(1 << 9)
         predicates.append(match_param_predicate)
-        h.update('match_param:%r' % match_param)
+        h.update(bytes_('match_param:%r' % match_param))
 
     if custom:
         for num, predicate in enumerate(custom):
@@ -224,7 +225,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
             # functions for custom predicates, so that the hash output
             # of predicate instances which are "logically the same"
             # may compare equal.
-            h.update('custom%s:%r' % (num, hash_(predicate)))
+            h.update(bytes_('custom%s:%r' % (num, predicate)))
         weights.append(1 << 10)
 
     if traverse is not None:
@@ -261,5 +262,3 @@ def as_sorted_tuple(val):
     val = tuple(sorted(val))
     return val
     
-def hash_(v):
-    return bytes_(hash(v))

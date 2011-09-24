@@ -1,5 +1,7 @@
 import os
 
+from pyramid.compat import print_
+
 try:
     from paste.script.templates import Template
 except ImportError: # pragma: no cover
@@ -27,7 +29,7 @@ class PyramidTemplate(Template):
         return Template.post(self, command, output_dir, vars)
 
     def out(self, msg): # pragma: no cover (replaceable testing hook)
-        print msg
+        print_(msg)
 
 class StarterProjectTemplate(PyramidTemplate):
     _template_dir = 'starter'
