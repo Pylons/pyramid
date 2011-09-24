@@ -11,8 +11,8 @@ from pyramid.interfaces import ISessionFactory
 from pyramid.interfaces import IResponseFactory
 
 from pyramid.compat import json
-from pyramid.compat import native_
 from pyramid.compat import iterkeys_, itervalues_, iteritems_
+from pyramid.compat import text_
 from pyramid.exceptions import ConfigurationError
 from pyramid.decorator import reify
 from pyramid.response import Response
@@ -362,7 +362,7 @@ class Request(BaseRequest, DeprecatedRequestMethodsMixin, URLMethodsMixin,
 
     @property
     def json_body(self):
-        return json.loads(self.body, encoding=self.charset)
+        return json.loads(text_(self.body, self.charset))
 
 def route_request_iface(name, bases=()):
     # zope.interface treats the __name__ as the __doc__ and changes __name__

@@ -2,6 +2,8 @@ import unittest
 from pyramid import testing
 
 from pyramid.compat import text_
+from pyramid.compat import bytes_
+from pyramid.compat import iteritems_, iterkeys_, itervalues_
 
 class TestRequest(unittest.TestCase):
     def setUp(self):
@@ -52,7 +54,7 @@ class TestRequest(unittest.TestCase):
             }
         request = self._makeOne(environ)
         request.charset = None
-        self.assertEqual(request.GET['la'], text_('La Pe\xf1a'))
+        self.assertEqual(request.GET['la'], text_(b'La Pe\xf1a'))
 
     def test_class_implements(self):
         from pyramid.interfaces import IRequest
@@ -249,8 +251,8 @@ class TestRequest(unittest.TestCase):
         from pyramid.compat import json
         request = self._makeOne({'REQUEST_METHOD':'POST'})
         request.charset = 'latin-1'
-        la = text_('La Pe\xc3\xb1a', 'utf-8')
-        body = json.dumps({'a':la}, encoding='latin-1')
+        la = text_(b'La Pe\xc3\xb1a', 'utf-8')
+        body = bytes_(json.dumps({'a':la}), 'latin-1')
         request.body = body
         self.assertEqual(request.json_body, {'a':la})
 
@@ -324,17 +326,17 @@ class TestRequestDeprecatedMethods(unittest.TestCase):
     def test_iteritems(self):
         environ = {'zooma':1}
         inst = self._makeOne(environ)
-        self.assertEqual(list(inst.iteritems()), list(environ.iteritems()))
+        self.assertEqual(list(inst.iteritems()), list(iteritems_(environ)))
 
     def test_iterkeys(self):
         environ = {'zooma':1}
         inst = self._makeOne(environ)
-        self.assertEqual(list(inst.iterkeys()), list(environ.iterkeys()))
+        self.assertEqual(list(inst.iterkeys()), list(iterkeys_(environ)))
 
     def test_itervalues(self):
         environ = {'zooma':1}
         inst = self._makeOne(environ)
-        self.assertEqual(list(inst.itervalues()), list(environ.itervalues()))
+        self.assertEqual(list(inst.itervalues()), list(itervalues_(environ)))
 
     def test_keys(self):
         environ = {'zooma':1}
