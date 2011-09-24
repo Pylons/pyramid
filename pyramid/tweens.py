@@ -15,11 +15,11 @@ def excview_tween_factory(handler, registry):
         attrs = request.__dict__
         try:
             response = handler(request)
-        except Exception:
+        except Exception as exc:
             # WARNING: do not assign the result of sys.exc_info() to a
             # local var here, doing so will cause a leak
             attrs['exc_info'] = sys.exc_info()
-            exc = attrs['exception'] = attrs['exc_info'][1]
+            attrs['exception'] = exc
             # clear old generated request.response, if any; it may
             # have been mutated by the view, and its state is not
             # sane (e.g. caching headers)
