@@ -13,13 +13,14 @@
 ##############################################################################
 
 import os
-import platform
 import sys
 
 from setuptools import setup, find_packages
 
+if sys.version_info[:2] < (2, 6):
+    raise RuntimeError('Requires Python 2.6 or better')
+
 PY3 = sys.version_info[0] == 3
-JYTHON = platform.system() != 'Java'
 
 here = os.path.abspath(os.path.dirname(__file__))
 try:
@@ -52,21 +53,14 @@ tests_require = install_requires + [
     'virtualenv',
     ]
 
-if not (JYTHON or PY3):
+if not PY3:
     tests_require.extend([
         'Sphinx',
         'docutils',
         'repoze.sphinx.autointerface',
-        ])
-
-if not PY3:
-    tests_require.extend([
         'zope.component>=3.11.0',
         ])
 
-if sys.version_info[:2] < (2, 6):
-    install_requires.append('simplejson')
-    
 setup(name='pyramid',
       version='1.2',
       description=('The Pyramid web application development framework, a '
