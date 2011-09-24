@@ -55,7 +55,9 @@ Here's some sample code that implements a minimal NotFound view callable:
    def notfound_view(request):
        return HTTPNotFound()
 
-.. note:: When a NotFound view callable is invoked, it is passed a
+.. note::
+
+   When a NotFound view callable is invoked, it is passed a
    :term:`request`.  The ``exception`` attribute of the request will be an
    instance of the :exc:`~pyramid.httpexceptions.HTTPNotFound` exception that
    caused the not found view to be called.  The value of
@@ -64,7 +66,9 @@ Here's some sample code that implements a minimal NotFound view callable:
    ``pyramid.debug_notfound`` environment setting is true than it is when it
    is false.
 
-.. warning:: When a NotFound view callable accepts an argument list as
+.. warning::
+
+   When a NotFound view callable accepts an argument list as
    described in :ref:`request_and_context_view_definitions`, the ``context``
    passed as the first argument to the view callable will be the
    :exc:`~pyramid.httpexceptions.HTTPNotFound` exception instance.  If
@@ -121,7 +125,9 @@ Here's some sample code that implements a minimal forbidden view:
    def forbidden_view(request):
        return Response('forbidden')
 
-.. note:: When a forbidden view callable is invoked, it is passed a
+.. note::
+
+   When a forbidden view callable is invoked, it is passed a
    :term:`request`.  The ``exception`` attribute of the request will be an
    instance of the :exc:`~pyramid.httpexceptions.HTTPForbidden` exception
    that caused the forbidden view to be called.  The value of
@@ -1100,7 +1106,9 @@ in the ``pyramid.tweens`` list will be used as the producer of the effective
 declared directly "below" it, ad infinitum.  The "main" Pyramid request
 handler is implicit, and always "at the bottom".
 
-.. note:: Pyramid's own :term:`exception view` handling logic is implemented
+.. note::
+
+   Pyramid's own :term:`exception view` handling logic is implemented
    as a tween factory function: :func:`pyramid.tweens.excview_tween_factory`.
    If Pyramid exception view handling is desired, and tween factories are
    specified via the ``pyramid.tweens`` configuration setting, the

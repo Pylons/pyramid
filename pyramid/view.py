@@ -15,7 +15,7 @@ from pyramid.threadlocal import get_current_registry
 
 _marker = object()
 
-class static(static_view): 
+class static(static_view):
     """ Backwards compatibility alias for
     :class:`pyramid.static.static_view`; it overrides that class' constructor
     to pass ``use_subpath=True`` by default.  This class is deprecated as of
@@ -301,7 +301,9 @@ def is_response(ob):
     """ Return ``True`` if ``ob`` implements the interface implied by
     :ref:`the_response`. ``False`` if not.
 
-    .. warning:: This function is deprecated as of :app:`Pyramid` 1.1.  New
+    .. warning::
+
+       This function is deprecated as of :app:`Pyramid` 1.1.  New
        code should not use it.  Instead, new code should use the
        :func:`pyramid.request.Request.is_response` method."""
     if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and

@@ -229,7 +229,9 @@ following:
    New python executable in env/bin/python
    Installing setuptools.............done.
 
-.. warning:: Using ``--no-site-packages`` when generating your
+.. warning::
+
+   Using ``--no-site-packages`` when generating your
    virtualenv is *very important*. This flag provides the necessary
    isolation for running the set of packages required by
    :app:`Pyramid`.  If you do not specify ``--no-site-packages``,

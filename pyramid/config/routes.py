@@ -147,12 +147,14 @@ class RoutesConfiguratorMixin(object):
           pattern doesn't match the current URL, route matching
           continues.
 
-          .. note:: For backwards compatibility purposes (as of
-             :app:`Pyramid` 1.0), a ``path`` keyword argument passed
-             to this function will be used to represent the pattern
-             value if the ``pattern`` argument is ``None``.  If both
-             ``path`` and ``pattern`` are passed, ``pattern`` wins.
-        
+          .. note::
+
+             For backwards compatibility purposes (as of :app:`Pyramid` 1.0), a
+             ``path`` keyword argument passed to this function will be used to
+             represent the pattern value if the ``pattern`` argument is
+             ``None``.  If both ``path`` and ``pattern`` are passed, ``pattern``
+             wins.
+
         xhr
 
           This value should be either ``True`` or ``False``.  If this
@@ -249,7 +251,9 @@ class RoutesConfiguratorMixin(object):
 
         View-Related Arguments
 
-        .. warning:: The arguments described below have been deprecated as of
+        .. warning::
+
+           The arguments described below have been deprecated as of
            :app:`Pyramid` 1.1. *Do not use these for new development; they
            should only be used to support older code bases which depend upon
            them.* Use a separate call to
@@ -267,7 +271,7 @@ class RoutesConfiguratorMixin(object):
         view_context
 
           .. warning:: Deprecated as of :app:`Pyramid` 1.1.
-          
+
           A class or an :term:`interface` or :term:`dotted Python
           name` to the same object which the :term:`context` of the
           view should match for the view named by the route to be

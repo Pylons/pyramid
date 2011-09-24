@@ -125,26 +125,29 @@ def resource_path(resource, *elements):
 
     The ``resource`` passed in *must* be :term:`location`-aware.
 
-    .. note:: Each segment in the path string returned will use the
-              ``__name__`` attribute of the resource it represents within
-              the resource tree.  Each of these segments *should* be a unicode
-              or string object (as per the contract of
-              :term:`location`-awareness).  However, no conversion or
-              safety checking of resource names is performed.  For
-              instance, if one of the resources in your tree has a
-              ``__name__`` which (by error) is a dictionary, the
-              :func:`pyramid.traversal.resource_path` function will
-              attempt to append it to a string and it will cause a
-              :exc:`pyramid.exceptions.URLDecodeError`.
+    .. note::
 
-    .. note:: The :term:`root` resource *must* have a ``__name__``
-              attribute with a value of either ``None`` or the empty
-              string for paths to be generated properly.  If the root
-              resource has a non-null ``__name__`` attribute, its name
-              will be prepended to the generated path rather than a
-              single leading '/' character.
+       Each segment in the path string returned will use the ``__name__``
+       attribute of the resource it represents within the resource tree.  Each
+       of these segments *should* be a unicode or string object (as per the
+       contract of :term:`location`-awareness).  However, no conversion or
+       safety checking of resource names is performed.  For instance, if one of
+       the resources in your tree has a ``__name__`` which (by error) is a
+       dictionary, the :func:`pyramid.traversal.resource_path` function will
+       attempt to append it to a string and it will cause a
+       :exc:`pyramid.exceptions.URLDecodeError`.
 
-    .. note:: For backwards compatibility purposes, this function can also
+    .. note::
+
+       The :term:`root` resource *must* have a ``__name__`` attribute with a
+       value of either ``None`` or the empty string for paths to be generated
+       properly.  If the root resource has a non-null ``__name__`` attribute,
+       its name will be prepended to the generated path rather than a single
+       leading '/' character.
+
+    .. note::
+
+       For backwards compatibility purposes, this function can also
        be imported as ``model_path``, although doing so will cause
        a deprecation warning to be emitted.
     """
@@ -298,7 +301,7 @@ def traverse(resource, path):
         resource = find_root(resource)
 
     reg = get_current_registry()
-    
+
     request_factory = reg.queryUtility(IRequestFactory)
     if request_factory is None:
         from pyramid.request import Request # avoid circdep
@@ -331,28 +334,30 @@ def resource_path_tuple(resource, *elements):
 
     The ``resource`` passed in *must* be :term:`location`-aware.
 
-    .. note:: Each segment in the path tuple returned will equal the
-              ``__name__`` attribute of the resource it represents within
-              the resource tree.  Each of these segments *should* be a unicode
-              or string object (as per the contract of
-              :term:`location`-awareness).  However, no conversion or
-              safety checking of resource names is performed.  For
-              instance, if one of the resources in your tree has a
-              ``__name__`` which (by error) is a dictionary, that
-              dictionary will be placed in the path tuple; no warning
-              or error will be given.
+    .. note::
 
-    .. note:: The :term:`root` resource *must* have a ``__name__``
-              attribute with a value of either ``None`` or the empty
-              string for path tuples to be generated properly.  If
-              the root resource has a non-null ``__name__`` attribute,
-              its name will be the first element in the generated
-              path tuple rather than the empty string.
+       Each segment in the path tuple returned will equal the ``__name__``
+       attribute of the resource it represents within the resource tree.  Each
+       of these segments *should* be a unicode or string object (as per the
+       contract of :term:`location`-awareness).  However, no conversion or
+       safety checking of resource names is performed.  For instance, if one of
+       the resources in your tree has a ``__name__`` which (by error) is a
+       dictionary, that dictionary will be placed in the path tuple; no warning
+       or error will be given.
 
-    .. note:: For backwards compatibility purposes, this function can also be
-       imported as ``model_path_tuple``, although doing so will cause a
-       deprecation warning to be emitted.
+    .. note::
 
+       The :term:`root` resource *must* have a ``__name__`` attribute with a
+       value of either ``None`` or the empty string for path tuples to be
+       generated properly.  If the root resource has a non-null ``__name__``
+       attribute, its name will be the first element in the generated path tuple
+       rather than the empty string.
+
+    .. note::
+
+       For backwards compatibility purposes, this function can also be imported
+       as ``model_path_tuple``, although doing so will cause a deprecation
+       warning to be emitted.
     """
     return tuple(_resource_path_list(resource, *elements))
 
@@ -457,18 +462,17 @@ def traversal_path(path):
 
         (u'archives', u'<unprintable unicode>')
 
-    .. note:: This function does not generate the same type of tuples
-              that :func:`pyramid.traversal.resource_path_tuple` does.
-              In particular, the leading empty string is not present
-              in the tuple it returns, unlike tuples returned by
-              :func:`pyramid.traversal.resource_path_tuple`.  As a
-              result, tuples generated by ``traversal_path`` are not
-              resolveable by the
-              :func:`pyramid.traversal.find_resource` API.
-              ``traversal_path`` is a function mostly used by the
-              internals of :app:`Pyramid` and by people writing
-              their own traversal machinery, as opposed to users
-              writing applications in :app:`Pyramid`.
+    .. note::
+
+      This function does not generate the same type of tuples that
+      :func:`pyramid.traversal.resource_path_tuple` does.  In particular, the
+      leading empty string is not present in the tuple it returns, unlike tuples
+      returned by :func:`pyramid.traversal.resource_path_tuple`.  As a result,
+      tuples generated by ``traversal_path`` are not resolveable by the
+      :func:`pyramid.traversal.find_resource` API.  ``traversal_path`` is a
+      function mostly used by the internals of :app:`Pyramid` and by people
+      writing their own traversal machinery, as opposed to users writing
+      applications in :app:`Pyramid`.
     """
     if isinstance(path, unicode):
         path = path.encode('ascii')

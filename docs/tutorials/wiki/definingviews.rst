@@ -7,7 +7,9 @@ application is typically a simple Python function that accepts two
 parameters: :term:`context` and :term:`request`.  A view callable is
 assumed to return a :term:`response` object.
 
-.. note:: A :app:`Pyramid` view can also be defined as callable
+.. note::
+
+   A :app:`Pyramid` view can also be defined as callable
    which accepts *only* a :term:`request` argument.  You'll see
    this one-argument pattern used in other :app:`Pyramid` tutorials
    and applications.  Either calling convention will work in any
@@ -253,7 +255,9 @@ the below:
 .. literalinclude:: src/views/tutorial/templates/view.pt
    :language: xml
 
-.. note:: The names available for our use in a template are always those that
+.. note::
+
+   The names available for our use in a template are always those that
    are present in the dictionary returned by the view callable.  But our
    templates make use of a ``request`` object that none of our tutorial views
    return in their dictionary.  This value appears as if "by magic".
