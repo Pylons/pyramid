@@ -1763,6 +1763,13 @@ class Test_requestonly(unittest.TestCase):
         class Foo: pass
         foo = Foo()
         self.assertFalse(self._callFUT(foo))
+    
+    def test_method_onearg_named_request(self):
+        class Foo:
+            def method(self, request):
+                """ """
+        foo = Foo()
+        self.assertTrue(self._callFUT(foo.method))
 
 class Test_isexception(unittest.TestCase):
     def _callFUT(self, ob):
