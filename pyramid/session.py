@@ -10,6 +10,8 @@ from zope.interface import implementer
 from pyramid.compat import pickle
 from pyramid.compat import PY3
 from pyramid.compat import text_
+from pyramid.compat import bytes_
+from pyramid.compat import native_
 from pyramid.interfaces import ISession
 
 def manage_accessed(wrapped):
@@ -234,8 +236,8 @@ def signed_serialize(data, secret):
        response.set_cookie('signed_cookie', cookieval)
     """
     pickled = pickle.dumps(data, pickle.HIGHEST_PROTOCOL)
-    sig = hmac.new(secret, pickled, sha1).hexdigest()
-    return sig + base64.standard_b64encode(pickled)
+    sig = hmac.new(bytes_(secret), pickled, sha1).hexdigest()
+    return sig + native_(base64.b64encode(pickled))
 
 def signed_deserialize(serialized, secret, hmac=hmac):
     """ Deserialize the value returned from ``signed_serialize``.  If
@@ -253,12 +255,12 @@ def signed_deserialize(serialized, secret, hmac=hmac):
     # hmac parameterized only for unit tests
     try:
         input_sig, pickled = (serialized[:40],
-                              base64.standard_b64decode(serialized[40:]))
+                              base64.b64decode(bytes_(serialized[40:])))
     except (binascii.Error, TypeError) as e:
         # Badly formed data can make base64 die
         raise ValueError('Badly formed base64 data: %s' % e)
 
-    sig = hmac.new(secret, pickled, sha1).hexdigest()
+    sig = hmac.new(bytes_(secret), pickled, sha1).hexdigest()
 
     if len(sig) != len(input_sig):
         raise ValueError('Wrong signature length')
