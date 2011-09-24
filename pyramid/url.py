@@ -70,13 +70,14 @@ class URLMethodsMixin(object):
         data is turned into a query string, a leading ``?`` is prepended,
         and the resulting string is appended to the generated URL.
 
-        .. note:: Python data structures that are passed as ``_query``
-                  which are sequences or dictionaries are turned into a
-                  string under the same rules as when run through
-                  :func:`urllib.urlencode` with the ``doseq`` argument
-                  equal to ``True``.  This means that sequences can be
-                  passed as values, and a k=v pair will be placed into the
-                  query string for each value.
+        .. note::
+
+           Python data structures that are passed as ``_query`` which are
+           sequences or dictionaries are turned into a string under the same
+           rules as when run through :func:`urllib.urlencode` with the ``doseq``
+           argument equal to ``True``.  This means that sequences can be passed
+           as values, and a k=v pair will be placed into the query string for
+           each value.
 
         If a keyword argument ``_anchor`` is present, its string
         representation will be used as a named anchor in the generated URL
@@ -84,11 +85,12 @@ class URLMethodsMixin(object):
         ``http://example.com/route/url``, the resulting generated URL will
         be ``http://example.com/route/url#foo``).
 
-        .. note:: If ``_anchor`` is passed as a string, it should be UTF-8
-                  encoded. If ``_anchor`` is passed as a Unicode object, it
-                  will be converted to UTF-8 before being appended to the
-                  URL.  The anchor value is not quoted in any way before
-                  being appended to the generated URL.
+        .. note::
+
+           If ``_anchor`` is passed as a string, it should be UTF-8 encoded. If
+           ``_anchor`` is passed as a Unicode object, it will be converted to
+           UTF-8 before being appended to the URL.  The anchor value is not
+           quoted in any way before being appended to the generated URL.
 
         If both ``_anchor`` and ``_query`` are specified, the anchor
         element will always follow the query element,
@@ -177,13 +179,14 @@ class URLMethodsMixin(object):
 
         Will return the string ``/1/2``.
 
-        .. note:: Calling ``request.route_path('route')`` is the same as
-           calling ``request.route_url('route',
-           _app_url=request.script_name)``.
-           :meth:`pyramid.request.Request.route_path` is, in fact,
-           implemented in terms of `:meth:`pyramid.request.Request.route_url`
-           in just this way. As a result, any ``_app_url`` passed within the
-           ``**kw`` values to ``route_path`` will be ignored.
+        .. note::
+
+           Calling ``request.route_path('route')`` is the same as calling
+           ``request.route_url('route', _app_url=request.script_name)``.
+           :meth:`pyramid.request.Request.route_path` is, in fact, implemented
+           in terms of `:meth:`pyramid.request.Request.route_url` in just this
+           way. As a result, any ``_app_url`` passed within the ``**kw`` values
+           to ``route_path`` will be ignored.
         """
         kw['_app_url'] = self.script_name
         return self.route_url(route_name, *elements, **kw)
@@ -238,13 +241,14 @@ class URLMethodsMixin(object):
         into a query string, a leading ``?`` is prepended, and the resulting
         string is appended to the generated URL.
 
-        .. note:: Python data structures that are passed as ``query`` which
-                  are sequences or dictionaries are turned into a string
-                  under the same rules as when run through
-                  :func:`urllib.urlencode` with the ``doseq`` argument equal
-                  to ``True``.  This means that sequences can be passed as
-                  values, and a k=v pair will be placed into the query string
-                  for each value.
+        .. note::
+
+           Python data structures that are passed as ``query`` which are
+           sequences or dictionaries are turned into a string under the same
+           rules as when run through :func:`urllib.urlencode` with the ``doseq``
+           argument equal to ``True``.  This means that sequences can be passed
+           as values, and a k=v pair will be placed into the query string for
+           each value.
 
         If a keyword argument ``anchor`` is present, its string
         representation will be used as a named anchor in the generated URL
@@ -252,11 +256,12 @@ class URLMethodsMixin(object):
         ``http://example.com/resource/url``, the resulting generated URL will
         be ``http://example.com/resource/url#foo``).
 
-        .. note:: If ``anchor`` is passed as a string, it should be UTF-8
-                  encoded. If ``anchor`` is passed as a Unicode object, it
-                  will be converted to UTF-8 before being appended to the
-                  URL.  The anchor value is not quoted in any way before
-                  being appended to the generated URL.
+        .. note::
+
+           If ``anchor`` is passed as a string, it should be UTF-8 encoded. If
+           ``anchor`` is passed as a Unicode object, it will be converted to
+           UTF-8 before being appended to the URL.  The anchor value is not
+           quoted in any way before being appended to the generated URL.
 
         If both ``anchor`` and ``query`` are specified, the anchor element
         will always follow the query element,
@@ -267,19 +272,24 @@ class URLMethodsMixin(object):
         the base resource which is operated upon by this function.  See also
         :ref:`overriding_resource_url_generation`.
 
-        .. note:: If the :term:`resource` used is the result of a
-                 :term:`traversal`, it must be :term:`location`-aware.  The
-                 resource can also be the context of a :term:`URL dispatch`;
-                 contexts found this way do not need to be location-aware.
+        .. note::
 
-        .. note:: If a 'virtual root path' is present in the request
-                  environment (the value of the WSGI environ key
-                  ``HTTP_X_VHM_ROOT``), and the resource was obtained via
-                  :term:`traversal`, the URL path will not include the
-                  virtual root prefix (it will be stripped off the left hand
-                  side of the generated URL).
+           If the :term:`resource` used is the result of a :term:`traversal`, it
+           must be :term:`location`-aware.  The resource can also be the context
+           of a :term:`URL dispatch`; contexts found this way do not need to be
+           location-aware.
 
-        .. note:: For backwards compatibility purposes, this method is also
+        .. note::
+
+           If a 'virtual root path' is present in the request environment (the
+           value of the WSGI environ key ``HTTP_X_VHM_ROOT``), and the resource
+           was obtained via :term:`traversal`, the URL path will not include the
+           virtual root prefix (it will be stripped off the left hand side of
+           the generated URL).
+
+        .. note::
+
+           For backwards compatibility purposes, this method is also
            aliased as the ``model_url`` method of request.
         """
         try:
@@ -310,7 +320,7 @@ class URLMethodsMixin(object):
             suffix = ''
 
         return resource_url + suffix + qs + anchor
-                     
+
     model_url = resource_url # b/w compat forever
 
     def static_url(self, path, **kw):
@@ -380,14 +390,14 @@ class URLMethodsMixin(object):
 
                                     /static/foo.css
 
-        .. note:: Calling ``request.static_path(apath)`` is the same
-           as calling ``request.static_url(apath,
-           _app_url=request.script_name)``.
-           :meth:`pyramid.request.Request.static_path` is, in fact,
-           implemented in terms of
-           `:meth:`pyramid.request.Request.static_url` in just this
-           way. As a result, any ``_app_url`` passed within the ``**kw``
-           values to ``static_path`` will be ignored.
+        .. note::
+
+           Calling ``request.static_path(apath)`` is the same as calling
+           ``request.static_url(apath, _app_url=request.script_name)``.
+           :meth:`pyramid.request.Request.static_path` is, in fact, implemented
+           in terms of `:meth:`pyramid.request.Request.static_url` in just this
+           way. As a result, any ``_app_url`` passed within the ``**kw`` values
+           to ``static_path`` will be ignored.
         """
         if not os.path.isabs(path):
             if not ':' in path:
@@ -478,7 +488,9 @@ class URLMethodsMixin(object):
 
         Will return the string ``/1/2``.
 
-        .. note:: Calling ``request.current_route_path('route')`` is the same
+        .. note::
+
+           Calling ``request.current_route_path('route')`` is the same
            as calling ``request.current_route_url('route',
            _app_url=request.script_name)``.
            :meth:`pyramid.request.Request.current_route_path` is, in fact,
@@ -489,8 +501,8 @@ class URLMethodsMixin(object):
         """
         kw['_app_url'] = self.script_name
         return self.current_route_url(*elements, **kw)
-        
-        
+
+
 def route_url(route_name, request, *elements, **kw):
     """
     This is a backwards compatibility function.  Its result is the same as

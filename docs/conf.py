@@ -106,6 +106,10 @@ today_fmt = '%B %d, %Y'
 # List of documents that shouldn't be included in the build.
 #unused_docs = []
 
+# List of patterns, relative to source directory, that match files and
+# directories to ignore when looking for source files.
+exclude_patterns = ['_themes/README.rst',]
+
 # List of directories, relative to source directories, that shouldn't be searched
 # for source files.
 #exclude_dirs = []
@@ -128,6 +132,11 @@ add_module_names = False
 #pygments_style = book and 'bw' or 'tango'
 if book:
     pygments_style = 'bw'
+
+# do not include book material for online docs
+if not book:
+    exclude_patterns.extend(['foreword.rst', 'latexindex.rst',
+                             'authorintro.rst'])
 
 # The default language to highlight source code in.
 #highlight_language = 'guess'
