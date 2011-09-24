@@ -204,3 +204,8 @@ try:
     from Cookie import SimpleCookie
 except ImportError: # pragma: no cover
     from http.cookies import SimpleCookie
+
+if PY3: # pragma: no cover
+    from html import escape
+else:
+    from cgi import escape
