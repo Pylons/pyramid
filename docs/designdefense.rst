@@ -245,7 +245,9 @@ its API is much nicer than the ZCA registry API, work on it was largely
 abandoned and it is not used in :app:`Pyramid`.  We continued to use a ZCA
 registry within :app:`Pyramid` because it ultimately proved a better fit.
 
-.. note:: We continued using ZCA registry rather than disusing it in
+.. note::
+
+   We continued using ZCA registry rather than disusing it in
    favor of using the registry implementation in
    :mod:`repoze.component` largely because the ZCA concept of
    interfaces provides for use of an interface hierarchy, which is

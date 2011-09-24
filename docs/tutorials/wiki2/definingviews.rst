@@ -7,7 +7,9 @@ application is typically a simple Python function that accepts a single
 parameter named :term:`request`.  A view callable is assumed to return a
 :term:`response` object.
 
-.. note:: A :app:`Pyramid` view can also be defined as callable
+.. note::
+
+   A :app:`Pyramid` view can also be defined as callable
    which accepts *two* arguments: a :term:`context` and a
    :term:`request`.  You'll see this two-argument pattern used in
    other :app:`Pyramid` tutorials and applications.  Either calling

@@ -39,7 +39,7 @@ class RenderingConfiguratorMixin(object):
         # if name is None or the empty string, we're trying to register
         # a default renderer, but registerUtility is too dumb to accept None
         # as a name
-        if not name: 
+        if not name:
             name = ''
         def register():
             self.registry.registerUtility(factory, IRendererFactory, name=name)
@@ -61,9 +61,13 @@ class RenderingConfiguratorMixin(object):
         dictionary, and therefore will be made available to the code
         which uses the renderer.
 
-        .. warning:: This method is deprecated as of Pyramid 1.1.
+        .. warning::
 
-        .. note:: Using the ``renderer_globals_factory`` argument
+           This method is deprecated as of Pyramid 1.1.
+
+        .. note::
+
+           Using the ``renderer_globals_factory`` argument
            to the :class:`pyramid.config.Configurator` constructor
            can be used to achieve the same purpose.
         """

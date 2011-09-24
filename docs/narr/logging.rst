@@ -7,7 +7,9 @@ Logging
 :mod:`logging` module.  This chapter describes how to configure logging and
 how to send log messages to loggers that you've configured.
 
-.. warning:: This chapter assumes you've used a :term:`scaffold` to create a
+.. warning::
+
+   This chapter assumes you've used a :term:`scaffold` to create a
    project which contains ``development.ini`` and ``production.ini`` files
    which help configure logging.  All of the scaffolds which ship along with
    :app:`Pyramid` do this.  If you're not using a scaffold, or if you've used

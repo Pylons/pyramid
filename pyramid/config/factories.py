@@ -14,9 +14,11 @@ class FactoriesConfiguratorMixin(object):
         state.  If the ``factory`` argument is ``None`` a default root
         factory will be registered.
 
-        .. note:: Using the ``root_factory`` argument to the
-           :class:`pyramid.config.Configurator` constructor
-           can be used to achieve the same purpose.
+        .. note::
+
+           Using the ``root_factory`` argument to the
+           :class:`pyramid.config.Configurator` constructor can be used to
+           achieve the same purpose.
         """
         factory = self.maybe_dotted(factory)
         if factory is None:
@@ -35,9 +37,11 @@ class FactoriesConfiguratorMixin(object):
         method is called, the ``session_factory`` argument must be a session
         factory callable or a :term:`dotted Python name` to that factory.
 
-        .. note:: Using the ``session_factory`` argument to the
-           :class:`pyramid.config.Configurator` constructor
-           can be used to achieve the same purpose.
+        .. note::
+
+           Using the ``session_factory`` argument to the
+           :class:`pyramid.config.Configurator` constructor can be used to
+           achieve the same purpose.
         """
         session_factory = self.maybe_dotted(session_factory)
         def register():
@@ -54,7 +58,9 @@ class FactoriesConfiguratorMixin(object):
         :class:`pyramid.request.Request` class (particularly
         ``__call__``, and ``blank``).
 
-        .. note:: Using the ``request_factory`` argument to the
+        .. note::
+
+           Using the ``request_factory`` argument to the
            :class:`pyramid.config.Configurator` constructor
            can be used to achieve the same purpose.
         """

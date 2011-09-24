@@ -227,3 +227,12 @@ Index and Glossary
 * :ref:`glossary`
 * :ref:`genindex`
 * :ref:`search`
+
+
+.. add glossary in hidden toc tree so it does not complain its not included
+
+.. toctree::
+   :hidden:
+
+   glossary
+
