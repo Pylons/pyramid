@@ -188,8 +188,8 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         start_response = DummyStartResponse()
         why = exc_raised(HTTPNotFound, router, environ, start_response)
-        self.assertTrue('/' in why[0], why)
-        self.assertFalse('debug_notfound' in why[0])
+        self.assertTrue('/' in why.args[0], why)
+        self.assertFalse('debug_notfound' in why.args[0])
         self.assertEqual(len(logger.messages), 0)
 
     def test_traverser_raises_notfound_class(self):
@@ -209,7 +209,7 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         start_response = DummyStartResponse()
         why = exc_raised(HTTPNotFound, router, environ, start_response)
-        self.assertTrue('foo' in why[0], why)
+        self.assertTrue('foo' in why.args[0], why)
 
     def test_traverser_raises_forbidden_class(self):
         from pyramid.httpexceptions import HTTPForbidden
@@ -229,7 +229,7 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         start_response = DummyStartResponse()
         why = exc_raised(HTTPForbidden, router, environ, start_response)
-        self.assertTrue('foo' in why[0], why)
+        self.assertTrue('foo' in why.args[0], why)
 
     def test_call_no_view_registered_no_isettings(self):
         from pyramid.httpexceptions import HTTPNotFound
@@ -240,8 +240,8 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         start_response = DummyStartResponse()
         why = exc_raised(HTTPNotFound, router, environ, start_response)
-        self.assertTrue('/' in why[0], why)
-        self.assertFalse('debug_notfound' in why[0])
+        self.assertTrue('/' in why.args[0], why)
+        self.assertFalse('debug_notfound' in why.args[0])
         self.assertEqual(len(logger.messages), 0)
 
     def test_call_no_view_registered_debug_notfound_false(self):
@@ -254,8 +254,8 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         start_response = DummyStartResponse()
         why = exc_raised(HTTPNotFound, router, environ, start_response)
-        self.assertTrue('/' in why[0], why)
-        self.assertFalse('debug_notfound' in why[0])
+        self.assertTrue('/' in why.args[0], why)
+        self.assertFalse('debug_notfound' in why.args[0])
         self.assertEqual(len(logger.messages), 0)
 
     def test_call_no_view_registered_debug_notfound_true(self):
@@ -270,15 +270,15 @@ class TestRouter(unittest.TestCase):
         why = exc_raised(HTTPNotFound, router, environ, start_response)
         self.assertTrue(
             "debug_notfound of url http://localhost:8080/; path_info: '/', "
-            "context:" in why[0])
-        self.assertTrue("view_name: '', subpath: []" in why[0])
-        self.assertTrue('http://localhost:8080' in why[0], why)
+            "context:" in why.args[0])
+        self.assertTrue("view_name: '', subpath: []" in why.args[0])
+        self.assertTrue('http://localhost:8080' in why.args[0], why)
 
         self.assertEqual(len(logger.messages), 1)
         message = logger.messages[0]
         self.assertTrue('of url http://localhost:8080' in message)
         self.assertTrue("path_info: '/'" in message)
-        self.assertTrue('DummyContext instance at' in message)
+        self.assertTrue('DummyContext' in message)
         self.assertTrue("view_name: ''" in message)
         self.assertTrue("subpath: []" in message)
 
@@ -428,7 +428,7 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         start_response = DummyStartResponse()
         why = exc_raised(HTTPForbidden, router, environ, start_response)
-        self.assertEqual(why[0], 'unauthorized')
+        self.assertEqual(why.args[0], 'unauthorized')
 
     def test_call_view_raises_notfound(self):
         from zope.interface import Interface
@@ -448,7 +448,7 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         start_response = DummyStartResponse()
         why = exc_raised(HTTPNotFound, router, environ, start_response)
-        self.assertEqual(why[0], 'notfound')
+        self.assertEqual(why.args[0], 'notfound')
 
     def test_call_view_raises_response_cleared(self):
         from zope.interface import Interface
@@ -737,7 +737,7 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         start_response = DummyStartResponse()
         why = exc_raised(HTTPNotFound, router, environ, start_response)
-        self.assertTrue('from root factory' in why[0])
+        self.assertTrue('from root factory' in why.args[0])
 
     def test_root_factory_raises_forbidden(self):
         from pyramid.interfaces import IRootFactory
@@ -755,7 +755,7 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         start_response = DummyStartResponse()
         why = exc_raised(HTTPForbidden, router, environ, start_response)
-        self.assertTrue('from root factory' in why[0])
+        self.assertTrue('from root factory' in why.args[0])
 
     def test_root_factory_exception_propagating(self):
         from pyramid.interfaces import IRootFactory
