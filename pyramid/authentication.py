@@ -10,6 +10,7 @@ from zope.interface import implementer
 
 from pyramid.compat import long
 from pyramid.compat import text_type
+from pyramid.compat import binary_type
 from pyramid.compat import url_unquote
 from pyramid.compat import url_quote
 from pyramid.compat import bytes_
@@ -389,10 +390,10 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
         return self.cookie.forget(request)
 
 def b64encode(v):
-    return base64.b64encode(v).strip().replace('\n', '')
+    return base64.b64encode(bytes_(v)).strip().replace(b'\n', b'')
 
 def b64decode(v):
-    return base64.b64decode(v)
+    return base64.b64decode(bytes_(v))
 
 # this class licensed under the MIT license (stolen from Paste)
 class AuthTicket(object):
@@ -507,9 +508,9 @@ def calculate_digest(ip, timestamp, secret, userid, tokens, user_data):
     tokens = bytes_(tokens, 'utf-8')
     user_data = bytes_(user_data, 'utf-8')
     digest0 = md5(
-        encode_ip_timestamp(ip, timestamp) + secret + userid + '\0'
-        + tokens + '\0' + user_data).hexdigest()
-    digest = md5(digest0 + secret).hexdigest()
+        encode_ip_timestamp(ip, timestamp) + secret + userid + b'\0'
+        + tokens + b'\0' + user_data).hexdigest()
+    digest = md5(bytes_(digest0) + secret).hexdigest()
     return digest
 
 # this function licensed under the MIT license (stolen from Paste)
@@ -521,7 +522,7 @@ def encode_ip_timestamp(ip, timestamp):
           (t & 0xff00) >> 8,
           t & 0xff)
     ts_chars = ''.join(map(chr, ts))
-    return ip_chars + ts_chars
+    return bytes_(ip_chars + ts_chars)
 
 EXPIRE = object()
 
@@ -548,7 +549,7 @@ class AuthTktCookieHelper(object):
         int: ('int', str),
         long: ('int', str),
         text_type: ('b64unicode', lambda x: b64encode(utf_8_encode(x)[0])),
-        str: ('b64str', lambda x: b64encode(x)),
+        binary_type: ('b64str', lambda x: b64encode(x)),
         }
     
     def __init__(self, secret, cookie_name='auth_tkt', secure=False,
@@ -659,7 +660,7 @@ class AuthTktCookieHelper(object):
         if reissue and not hasattr(request, '_authtkt_reissued'):
             if ( (now - timestamp) > self.reissue_time ):
                 # work around https://github.com/Pylons/pyramid/issues#issue/108
-                tokens = filter(None, tokens)
+                tokens = list(filter(None, tokens))
                 headers = self.remember(request, userid, max_age=self.max_age,
                                         tokens=tokens)
                 def reissue_authtkt(request, response):
@@ -726,6 +727,11 @@ class AuthTktCookieHelper(object):
             user_data = 'userid_type:%s' % encoding
         
         for token in tokens:
+            if isinstance(token, text_type):
+                try:
+                    token.encode('ascii')
+                except UnicodeEncodeError:
+                    raise ValueError("Invalid token %r" % (token,))
             if not (isinstance(token, str) and VALID_TOKEN.match(token)):
                 raise ValueError("Invalid token %r" % (token,))
 

@@ -199,3 +199,8 @@ try: # pragma: no cover
 except ImportError: # pragma: no cover
     import ConfigParser
     configparser = ConfigParser
+
+try:
+    from Cookie import SimpleCookie
+except ImportError: # pragma: no cover
+    from http.cookies import SimpleCookie
