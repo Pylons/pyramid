@@ -606,8 +606,6 @@ class FindResourceTests(unittest.TestCase):
         root.__name__ = None
         traverser = ResourceTreeTraverser
         self._registerTraverser(traverser)
-        # fails on py3
-        # path_info is /<chinesechars> on py3, likely not so much on py2
         result = self._callFUT(
             root,
             text_(b'/%E6%B5%81%E8%A1%8C%E8%B6%8B%E5%8A%BF')
