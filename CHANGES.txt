@@ -1,6 +1,12 @@
 Next release
 ============
 
+Features
+--------
+
+- Lone instance methods can now be treated as view callables (see
+  https://github.com/Pylons/pyramid/pull/283).
+
 Dependencies
 ------------
 
