@@ -1,5 +1,6 @@
 import unittest
 
+from pyramid.compat import text_
 from pyramid.tests.test_config import IDummy
 
 class TestingConfiguratorMixinTests(unittest.TestCase):
@@ -35,14 +36,14 @@ class TestingConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(result['context'], ob1)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
-        self.assertEqual(result['traversed'], (u'ob1',))
+        self.assertEqual(result['traversed'], (text_('ob1'),))
         self.assertEqual(result['virtual_root'], ob1)
         self.assertEqual(result['virtual_root_path'], ())
         result = adapter(DummyRequest({'PATH_INFO':'/ob2'}))
         self.assertEqual(result['context'], ob2)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
-        self.assertEqual(result['traversed'], (u'ob2',))
+        self.assertEqual(result['traversed'], (text_('ob2'),))
         self.assertEqual(result['virtual_root'], ob2)
         self.assertEqual(result['virtual_root_path'], ())
         self.assertRaises(KeyError, adapter, DummyRequest({'PATH_INFO':'/ob3'}))

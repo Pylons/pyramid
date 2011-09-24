@@ -115,7 +115,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         try:
             path_info_val = re.compile(path_info)
         except re.error as why:
-            raise ConfigurationError(why[0])
+            raise ConfigurationError(why.args[0])
         def path_info_predicate(context, request):
             return path_info_val.match(request.path_info) is not None
         text = "path_info = %s"
@@ -150,7 +150,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
             try:
                 header_val = re.compile(header_val)
             except re.error as why:
-                raise ConfigurationError(why[0])
+                raise ConfigurationError(why.args[0])
         if header_val is None:
             text = "header %s" % header_name
         else:
@@ -198,7 +198,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
             match_param = {match_param: match_param_val}
         text = "match_param %s" % match_param
         def match_param_predicate(context, request):
-            for k, v in match_param.iteritems():
+            for k, v in match_param.items():
                 if request.matchdict.get(k) != v:
                     return False
             return True

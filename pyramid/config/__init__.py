@@ -912,8 +912,9 @@ class ActionState(object):
                 except:
                     t, v, tb = sys.exc_info()
                     try:
-                        reraise(
-                            ConfigurationExecutionError(t, v, info), None, tb)
+                        reraise(None,
+                                ConfigurationExecutionError(t, v, info),
+                                tb)
                     finally:
                        del t, v, tb
         finally:
