@@ -653,7 +653,6 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(request.matched_route.name, 'foo')
 
         self.assertEqual(len(logger.messages), 1)
-        import pdb; pdb.set_trace()
         self.assertTrue(
             logger.messages[0].startswith(
             "route matched for url http://localhost:8080"
