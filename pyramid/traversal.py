@@ -10,9 +10,11 @@ from pyramid.interfaces import IRequestFactory
 from pyramid.interfaces import ITraverser
 from pyramid.interfaces import VH_ROOT_KEY
 
+from pyramid.compat import PY3
 from pyramid.compat import native_
 from pyramid.compat import text_
 from pyramid.compat import text_type
+from pyramid.compat import binary_type
 from pyramid.compat import url_unquote_text
 from pyramid.compat import is_nonstr_iter
 from pyramid.encode import url_quote
@@ -476,8 +478,9 @@ def traversal_path(path):
               their own traversal machinery, as opposed to users
               writing applications in :app:`Pyramid`.
     """
-    if isinstance(path, text_type):
-        path = native_(path.encode('ascii'))
+    if (not PY3) and (isinstance(path, text_type)):
+        # XXX this stinks
+        path = path.encode('ascii')
     path = path.strip('/')
     clean = []
     for segment in path.split('/'):
@@ -496,47 +499,74 @@ def traversal_path(path):
 
 _segment_cache = {}
 
-def quote_path_segment(segment, safe=''):
-    """ Return a quoted representation of a 'path segment' (such as
-    the string ``__name__`` attribute of a resource) as a string.  If the
-    ``segment`` passed in is a unicode object, it is converted to a
-    UTF-8 string, then it is URL-quoted using Python's
-    ``urllib.quote``.  If the ``segment`` passed in is a string, it is
-    URL-quoted using Python's :mod:`urllib.quote`.  If the segment
-    passed in is not a string or unicode object, an error will be
-    raised.  The return value of ``quote_path_segment`` is always a
-    string, never Unicode.
+quote_path_segment_doc = """ \
+Return a quoted representation of a 'path segment' (such as
+the string ``__name__`` attribute of a resource) as a string.  If the
+``segment`` passed in is a unicode object, it is converted to a
+UTF-8 string, then it is URL-quoted using Python's
+``urllib.quote``.  If the ``segment`` passed in is a string, it is
+URL-quoted using Python's :mod:`urllib.quote`.  If the segment
+passed in is not a string or unicode object, an error will be
+raised.  The return value of ``quote_path_segment`` is always a
+string, never Unicode.
 
-    You may pass a string of characters that need not be encoded as
-    the ``safe`` argument to this function.  This corresponds to the
-    ``safe`` argument to :mod:`urllib.quote`.
+You may pass a string of characters that need not be encoded as
+the ``safe`` argument to this function.  This corresponds to the
+``safe`` argument to :mod:`urllib.quote`.
 
-    .. note:: The return value for each segment passed to this
-              function is cached in a module-scope dictionary for
-              speed: the cached version is returned when possible
-              rather than recomputing the quoted version.  No cache
-              emptying is ever done for the lifetime of an
-              application, however.  If you pass arbitrary
-              user-supplied strings to this function (as opposed to
-              some bounded set of values from a 'working set' known to
-              your application), it may become a memory leak.
-    """
-    # The bit of this code that deals with ``_segment_cache`` is an
-    # optimization: we cache all the computation of URL path segments
-    # in this module-scope dictionary with the original string (or
-    # unicode value) as the key, so we can look it up later without
-    # needing to reencode or re-url-quote it
-    try:
-        return _segment_cache[(segment, safe)]
-    except KeyError:
-        ## if segment.__class__ is text_type: # isinstance slighly slower (~15%)
-        ##     result = url_quote(segment.encode('utf-8'), safe)
-        ## else:
-        result = url_quote(native_(segment, 'utf-8'), safe)
-        # we don't need a lock to mutate _segment_cache, as the below
-        # will generate exactly one Python bytecode (STORE_SUBSCR)
-        _segment_cache[(segment, safe)] = result
-        return result
+.. note::
+
+   The return value for each segment passed to this
+   function is cached in a module-scope dictionary for
+   speed: the cached version is returned when possible
+   rather than recomputing the quoted version.  No cache
+   emptying is ever done for the lifetime of an
+   application, however.  If you pass arbitrary
+   user-supplied strings to this function (as opposed to
+   some bounded set of values from a 'working set' known to
+   your application), it may become a memory leak.
+"""
+
+
+if PY3: # pragma: no cover
+    # special-case on Python 2 for speed?  unchecked
+    def quote_path_segment(segment, safe=''):
+        """ %s """ % quote_path_segment_doc
+        # The bit of this code that deals with ``_segment_cache`` is an
+        # optimization: we cache all the computation of URL path segments
+        # in this module-scope dictionary with the original string (or
+        # unicode value) as the key, so we can look it up later without
+        # needing to reencode or re-url-quote it
+        try:
+            return _segment_cache[(segment, safe)]
+        except KeyError:
+            if segment.__class__ not in (text_type, binary_type):
+                segment = str(segment)
+            result = url_quote(native_(segment, 'utf-8'), safe)
+            # we don't need a lock to mutate _segment_cache, as the below
+            # will generate exactly one Python bytecode (STORE_SUBSCR)
+            _segment_cache[(segment, safe)] = result
+            return result
+else:
+    def quote_path_segment(segment, safe=''):
+        """ %s """ % quote_path_segment_doc
+        # The bit of this code that deals with ``_segment_cache`` is an
+        # optimization: we cache all the computation of URL path segments
+        # in this module-scope dictionary with the original string (or
+        # unicode value) as the key, so we can look it up later without
+        # needing to reencode or re-url-quote it
+        try:
+            return _segment_cache[(segment, safe)]
+        except KeyError:
+            if segment.__class__ is text_type: #isinstance slighly slower (~15%)
+                result = url_quote(segment.encode('utf-8'), safe)
+            else:
+                result = url_quote(str(segment), safe)
+            # we don't need a lock to mutate _segment_cache, as the below
+            # will generate exactly one Python bytecode (STORE_SUBSCR)
+            _segment_cache[(segment, safe)] = result
+            return result
+    
 
 @implementer(ITraverser)
 class ResourceTreeTraverser(object):

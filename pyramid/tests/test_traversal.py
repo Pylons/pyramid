@@ -608,9 +608,12 @@ class FindResourceTests(unittest.TestCase):
         root.__name__ = None
         traverser = ResourceTreeTraverser
         self._registerTraverser(traverser)
+        # fails on py3
+        # path_info is /<chinesechars> on py3, likely not so much on py2
         result = self._callFUT(
             root,
-            text_('/%E6%B5%81%E8%A1%8C%E8%B6%8B%E5%8A%BF'))
+            text_(b'/%E6%B5%81%E8%A1%8C%E8%B6%8B%E5%8A%BF')
+            )
         self.assertEqual(result, unprintable)
 
 class ResourcePathTests(unittest.TestCase):
@@ -849,12 +852,13 @@ class TraversalContextURLTests(unittest.TestCase):
         one.__name__ = text_(b'La Pe\xc3\xb1a', 'utf-8')
         two = DummyContext()
         two.__parent__ = one
-        two.__name__ = 'La Pe\xc3\xb1a'
+        two.__name__ = b'La Pe\xc3\xb1a'
         request = DummyRequest()
         context_url = self._makeOne(two, request)
         result = context_url()
-        self.assertEqual(result,
-                     'http://example.com:5432/La%20Pe%C3%B1a/La%20Pe%C3%B1a/')
+        self.assertEqual(
+            result,
+            'http://example.com:5432/La%20Pe%C3%B1a/La%20Pe%C3%B1a/')
 
     def test_call_with_virtual_root_path(self):
         from pyramid.interfaces import VH_ROOT_KEY
