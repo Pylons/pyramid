@@ -7,7 +7,7 @@ from pyramid.wsgi import wsgiapp
 from pyramid.view import view_config
 from pyramid.static import static_view
 from pyramid.compat import text_
-from pyramid.compat import native_
+from pyramid.compat import url_quote
 
 from zope.interface import Interface
 
@@ -73,7 +73,8 @@ class TestStaticAppBase(IntegrationBase):
         _assertBody(res.body, os.path.join(here, 'fixtures/static/.hiddenfile'))
 
     def test_highchars_in_pathelement(self):
-        res = self.testapp.get('/static/héhé/index.html', status=200)
+        url = url_quote('/static/héhé/index.html')
+        res = self.testapp.get(url, status=200)
         _assertBody(
             res.body,
             os.path.join(here,
@@ -81,7 +82,8 @@ class TestStaticAppBase(IntegrationBase):
             )
 
     def test_highchars_in_filename(self):
-        res = self.testapp.get('/static/héhé.html', status=200)
+        url = url_quote('/static/héhé.html')
+        res = self.testapp.get(url, status=200)
         _assertBody(
             res.body,
             os.path.join(here,
