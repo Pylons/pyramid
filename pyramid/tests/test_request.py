@@ -3,6 +3,7 @@ from pyramid import testing
 
 from pyramid.compat import text_
 from pyramid.compat import bytes_
+from pyramid.compat import native_
 from pyramid.compat import iteritems_, iterkeys_, itervalues_
 
 class TestRequest(unittest.TestCase):
@@ -501,14 +502,16 @@ class Test_call_app_with_subpath_as_path_info(unittest.TestCase):
         self.assertEqual(request.environ['PATH_INFO'], '/hello/')
 
     def test_subpath_path_info_and_script_name_have_utf8(self):
-        la = 'La Pe\xc3\xb1a'
-        request = DummyRequest({'PATH_INFO':'/'+la, 'SCRIPT_NAME':'/'+la})
-        request.subpath = (text_(la, 'utf-8'), )
+        encoded = native_(text_(b'La Pe\xc3\xb1a'))
+        decoded = text_(bytes_(encoded), 'utf-8')
+        request = DummyRequest({'PATH_INFO':'/' + encoded,
+                                'SCRIPT_NAME':'/' + encoded})
+        request.subpath = (decoded, )
         response = self._callFUT(request, 'app')
         self.assertTrue(request.copied)
         self.assertEqual(response, 'app')
-        self.assertEqual(request.environ['SCRIPT_NAME'], '/' + la)
-        self.assertEqual(request.environ['PATH_INFO'], '/' + la)
+        self.assertEqual(request.environ['SCRIPT_NAME'], '/' + encoded)
+        self.assertEqual(request.environ['PATH_INFO'], '/' + encoded)
 
 class DummyRequest:
     def __init__(self, environ=None):

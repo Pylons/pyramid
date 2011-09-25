@@ -13,6 +13,8 @@ from pyramid.interfaces import IResponseFactory
 from pyramid.compat import json
 from pyramid.compat import iterkeys_, itervalues_, iteritems_
 from pyramid.compat import text_
+from pyramid.compat import bytes_
+from pyramid.compat import native_
 from pyramid.exceptions import ConfigurationError
 from pyramid.decorator import reify
 from pyramid.response import Response
@@ -406,7 +408,8 @@ def call_app_with_subpath_as_path_info(request, app):
     new_script_name = ''
 
     # compute new_path_info
-    new_path_info = '/' + '/'.join([x.encode('utf-8') for x in subpath])
+    new_path_info = '/' + '/'.join([native_(x.encode('utf-8'), 'latin-1')
+                                    for x in subpath])
 
     if new_path_info != '/': # don't want a sole double-slash
         if path_info != '/': # if orig path_info is '/', we're already done
@@ -424,7 +427,7 @@ def call_app_with_subpath_as_path_info(request, app):
             break
         el = workback.pop()
         if el:
-            tmp.insert(0, el.decode('utf-8'))
+            tmp.insert(0, text_(bytes_(el, 'latin-1'), 'utf-8'))
 
     # strip all trailing slashes from workback to avoid appending undue slashes
     # to end of script_name
