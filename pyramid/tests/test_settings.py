@@ -87,7 +87,7 @@ class Test_aslist(unittest.TestCase):
 
     def test_with_list(self):
         result = self._callFUT(['abc', 'def'])
-        self.assertEqual(result, ['abc', 'def'])
+        self.assertEqual(list(result), ['abc', 'def'])
         
     def test_with_string(self):
         result = self._callFUT('abc def')

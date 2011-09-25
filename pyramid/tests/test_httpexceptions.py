@@ -1,5 +1,8 @@
 import unittest
 
+from pyramid.compat import bytes_
+from pyramid.compat import text_
+
 class Test_exception_response(unittest.TestCase):
     def _callFUT(self, *arg, **kw):
         from pyramid.httpexceptions import exception_response
@@ -48,9 +51,9 @@ class Test__no_escape(unittest.TestCase):
     def test_unicode(self):
         class DummyUnicodeObject(object):
             def __unicode__(self):
-                return u'42'
+                return text_('42')
         duo = DummyUnicodeObject()
-        self.assertEqual(self._callFUT(duo), u'42')
+        self.assertEqual(self._callFUT(duo), text_('42'))
 
 class TestWSGIHTTPException(unittest.TestCase):
     def _getTargetClass(self):
@@ -124,16 +127,16 @@ class TestWSGIHTTPException(unittest.TestCase):
         self.assertEqual(exc.content_length, None)
 
     def test_ctor_with_body_doesnt_set_default_app_iter(self):
-        exc = self._makeOne(body='123')
-        self.assertEqual(exc.app_iter, ['123'])
+        exc = self._makeOne(body=b'123')
+        self.assertEqual(exc.app_iter, [b'123'])
 
     def test_ctor_with_unicode_body_doesnt_set_default_app_iter(self):
-        exc = self._makeOne(unicode_body=u'123')
-        self.assertEqual(exc.app_iter, ['123'])
+        exc = self._makeOne(unicode_body=text_('123'))
+        self.assertEqual(exc.app_iter, [b'123'])
 
     def test_ctor_with_app_iter_doesnt_set_default_app_iter(self):
-        exc = self._makeOne(app_iter=['123'])
-        self.assertEqual(exc.app_iter, ['123'])
+        exc = self._makeOne(app_iter=[b'123'])
+        self.assertEqual(exc.app_iter, [b'123'])
 
     def test_ctor_with_body_sets_default_app_iter_html(self):
         cls = self._getTargetSubclass()
@@ -142,10 +145,10 @@ class TestWSGIHTTPException(unittest.TestCase):
         environ['HTTP_ACCEPT'] = 'text/html'
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
-        self.assertTrue(body.startswith('<html'))
-        self.assertTrue('200 OK' in body)
-        self.assertTrue('explanation' in body)
-        self.assertTrue('detail' in body)
+        self.assertTrue(body.startswith(b'<html'))
+        self.assertTrue(b'200 OK' in body)
+        self.assertTrue(b'explanation' in body)
+        self.assertTrue(b'detail' in body)
         
     def test_ctor_with_body_sets_default_app_iter_text(self):
         cls = self._getTargetSubclass()
@@ -153,7 +156,7 @@ class TestWSGIHTTPException(unittest.TestCase):
         environ = _makeEnviron()
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
-        self.assertEqual(body, '200 OK\n\nexplanation\n\n\ndetail\n\n')
+        self.assertEqual(body, b'200 OK\n\nexplanation\n\n\ndetail\n\n')
 
     def test__str__detail(self):
         exc = self._makeOne()
@@ -198,7 +201,7 @@ class TestWSGIHTTPException(unittest.TestCase):
         environ = _makeEnviron()
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
-        self.assertEqual(body, '200 OK\n\nexplanation\n\n\n\n\n')
+        self.assertEqual(body, b'200 OK\n\nexplanation\n\n\n\n\n')
 
     def test__default_app_iter_with_comment_plain(self):
         cls = self._getTargetSubclass()
@@ -206,7 +209,7 @@ class TestWSGIHTTPException(unittest.TestCase):
         environ = _makeEnviron()
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
-        self.assertEqual(body, '200 OK\n\nexplanation\n\n\n\ncomment\n')
+        self.assertEqual(body, b'200 OK\n\nexplanation\n\n\n\ncomment\n')
         
     def test__default_app_iter_no_comment_html(self):
         cls = self._getTargetSubclass()
@@ -214,7 +217,7 @@ class TestWSGIHTTPException(unittest.TestCase):
         environ = _makeEnviron()
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
-        self.assertFalse('<!-- ' in body)
+        self.assertFalse(b'<!-- ' in body)
 
     def test__default_app_iter_with_comment_html(self):
         cls = self._getTargetSubclass()
@@ -223,7 +226,7 @@ class TestWSGIHTTPException(unittest.TestCase):
         environ['HTTP_ACCEPT'] = '*/*'
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
-        self.assertTrue('<!-- comment &amp; comment -->' in body)
+        self.assertTrue(b'<!-- comment &amp; comment -->' in body)
 
     def test__default_app_iter_with_comment_html2(self):
         cls = self._getTargetSubclass()
@@ -232,7 +235,7 @@ class TestWSGIHTTPException(unittest.TestCase):
         environ['HTTP_ACCEPT'] = 'text/html'
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
-        self.assertTrue('<!-- comment &amp; comment -->' in body)
+        self.assertTrue(b'<!-- comment &amp; comment -->' in body)
 
     def test_custom_body_template(self):
         cls = self._getTargetSubclass()
@@ -240,7 +243,7 @@ class TestWSGIHTTPException(unittest.TestCase):
         environ = _makeEnviron()
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
-        self.assertEqual(body, '200 OK\n\nGET')
+        self.assertEqual(body, b'200 OK\n\nGET')
 
     def test_custom_body_template_with_custom_variable_doesnt_choke(self):
         cls = self._getTargetSubclass()
@@ -251,16 +254,16 @@ class TestWSGIHTTPException(unittest.TestCase):
         environ['gardentheory.user'] = Choke()
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
-        self.assertEqual(body, '200 OK\n\nGET')
+        self.assertEqual(body, b'200 OK\n\nGET')
 
     def test_body_template_unicode(self):
         cls = self._getTargetSubclass()
-        la = unicode('/La Pe\xc3\xb1a', 'utf-8')
+        la = text_(b'/La Pe\xc3\xb1a', 'utf-8')
         environ = _makeEnviron(unicodeval=la)
         exc = cls(body_template='${unicodeval}')
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
-        self.assertEqual(body, '200 OK\n\n/La Pe\xc3\xb1a')
+        self.assertEqual(body, b'200 OK\n\n/La Pe\xc3\xb1a')
 
 class TestRenderAllExceptionsWithoutArguments(unittest.TestCase):
     def _doit(self, content_type):
@@ -274,9 +277,9 @@ class TestRenderAllExceptionsWithoutArguments(unittest.TestCase):
             exc.content_type = content_type
             result = list(exc(environ, start_response))[0]
             if exc.empty_body:
-                self.assertEqual(result, '')
+                self.assertEqual(result, b'')
             else:
-                self.assertTrue(exc.status in result)
+                self.assertTrue(bytes_(exc.status) in result)
             L.append(result)
         self.assertEqual(len(L), len(status_map))
             
@@ -309,8 +312,8 @@ class Test_HTTPMove(unittest.TestCase):
         start_response = DummyStartResponse()
         app_iter = exc(environ, start_response)
         self.assertEqual(app_iter[0],
-                         ('None None\n\nThe resource has been moved to foo; '
-                          'you should be redirected automatically.\n\n'))
+                         (b'None None\n\nThe resource has been moved to foo; '
+                          b'you should be redirected automatically.\n\n'))
 
 class TestHTTPForbidden(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
@@ -336,8 +339,8 @@ class TestHTTPMethodNotAllowed(unittest.TestCase):
         start_response = DummyStartResponse()
         app_iter = exc(environ, start_response)
         self.assertEqual(app_iter[0],
-                         ('405 Method Not Allowed\n\nThe method GET is not '
-                          'allowed for this resource. \n\n\n'))
+                         (b'405 Method Not Allowed\n\nThe method GET is not '
+                          b'allowed for this resource. \n\n\n'))
 
 
 class DummyRequest(object):

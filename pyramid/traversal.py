@@ -1,7 +1,6 @@
-import urllib
 import warnings
 
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface.interfaces import IInterface
 
 from repoze.lru import lru_cache
@@ -11,10 +10,21 @@ from pyramid.interfaces import IRequestFactory
 from pyramid.interfaces import ITraverser
 from pyramid.interfaces import VH_ROOT_KEY
 
+from pyramid.compat import PY3
+from pyramid.compat import native_
+from pyramid.compat import text_
+from pyramid.compat import bytes_
+from pyramid.compat import ascii_native_
+from pyramid.compat import text_type
+from pyramid.compat import binary_type
+from pyramid.compat import url_unquote_native
+from pyramid.compat import is_nonstr_iter
 from pyramid.encode import url_quote
 from pyramid.exceptions import URLDecodeError
 from pyramid.location import lineage
 from pyramid.threadlocal import get_current_registry
+
+empty = text_('')
 
 def find_root(resource):
     """ Find the root node in the resource tree to which ``resource``
@@ -58,6 +68,10 @@ def find_resource(resource, path):
     :func:`pyramid.traversal.resource_path` function generates strings
     which follow these rules (albeit only absolute ones).
 
+    Rules for passing *text* (Unicode) as the ``path`` argument are the same
+    as those for a string.  In particular, the text may not have any nonascii
+    characters in it.
+
     Rules for passing a *tuple* as the ``path`` argument: if the first
     element in the path tuple is the empty string (for example ``('',
     'a', 'b', 'c')``, the path is considered absolute and the resource tree
@@ -77,6 +91,8 @@ def find_resource(resource, path):
        be imported as :func:`pyramid.traversal.find_model`, although doing so
        will emit a deprecation warning.
     """
+    if isinstance(path, text_type):
+        path = ascii_native_(path)
     D = traverse(resource, path)
     view_name = D['view_name']
     context = D['context']
@@ -276,7 +292,7 @@ def traverse(resource, path):
     and will be URL-decoded.
     """
 
-    if hasattr(path, '__iter__'):
+    if is_nonstr_iter(path):
         # the traverser factory expects PATH_INFO to be a string, not
         # unicode and it expects path segments to be utf-8 and
         # urlencoded (it's the same traverser which accepts PATH_INFO
@@ -294,8 +310,7 @@ def traverse(resource, path):
     # step rather than later down the line as the result of calling
     # ``traversal_path``).
 
-    if isinstance(path, unicode):
-        path = path.encode('ascii')
+    path = ascii_native_(path)
 
     if path and path[0] == '/':
         resource = find_root(resource)
@@ -407,26 +422,35 @@ def virtual_root(resource, request):
         urlgenerator = TraversalContextURL(resource, request)
     return urlgenerator.virtual_root()
 
-@lru_cache(1000)
 def traversal_path(path):
-    """ Given a ``PATH_INFO`` string (slash-separated path segments),
-    return a tuple representing that path which can be used to
-    traverse a resource tree.
+    """ Variant of :func:`pyramid.traversal.traversal_path_info` suitable for
+    decoding paths that are URL-encoded."""
+    path = ascii_native_(path)
+    path = url_unquote_native(path, 'latin-1', 'strict')
+    return traversal_path_info(path)
 
-    The ``PATH_INFO`` is split on slashes, creating a list of
-    segments.  Each segment is URL-unquoted, and subsequently decoded
-    into Unicode. Each segment is assumed to be encoded using the
-    UTF-8 encoding (or a subset, such as ASCII); a
-    :exc:`pyramid.exceptions.URLDecodeError` is raised if a segment
-    cannot be decoded.  If a segment name is empty or if it is ``.``,
-    it is ignored.  If a segment name is ``..``, the previous segment
-    is deleted, and the ``..`` is ignored.
+@lru_cache(1000)
+def traversal_path_info(path):
+    """ Given a ``PATH_INFO`` environ value (slash-separated path segments),
+    return a tuple representing that path which can be used to traverse a
+    resource tree.
 
-    If this function is passed a Unicode object instead of a string,
-    that Unicode object *must* directly encodeable to ASCII.  For
-    example, u'/foo' will work but u'/<unprintable unicode>' (a
-    Unicode object with characters that cannot be encoded to ascii)
-    will not.
+    ``PATH_INFO`` is assumed to already be URL-decoded.  It is encoded to
+    bytes using the Latin-1 encoding; the resulting set of bytes is
+    subsequently decoded to text using the UTF-8 encoding; a
+    :exc:`pyramid.exc.URLDecodeError` is raised if a the URL cannot be
+    decoded.
+
+    The ``PATH_INFO`` is split on slashes, creating a list of segments.  Each
+    segment subsequently decoded into Unicode.  If a segment name is empty or
+    if it is ``.``, it is ignored.  If a segment name is ``..``, the previous
+    segment is deleted, and the ``..`` is ignored.
+
+    If this function is passed a Unicode object instead of a string, that
+    Unicode object *must* directly encodeable to ASCII.  For example, u'/foo'
+    will work but u'/<unprintable unicode>' (a Unicode object with characters
+    that cannot be encoded to ascii) will not. A :exc:`UnicodeError` will be
+    raised if the Unicode cannot be encoded directly to ASCII.
 
     Examples:
 
@@ -474,16 +498,13 @@ def traversal_path(path):
       writing their own traversal machinery, as opposed to users writing
       applications in :app:`Pyramid`.
     """
-    if isinstance(path, unicode):
-        path = path.encode('ascii')
+    try:
+        path = bytes_(path, 'latin-1').decode('utf-8')
+    except UnicodeDecodeError as e:
+        raise URLDecodeError(e.encoding, e.object, e.start, e.end, e.reason)
     path = path.strip('/')
     clean = []
     for segment in path.split('/'):
-        segment = urllib.unquote(segment)
-        try:
-            segment = segment.decode('utf-8')
-        except UnicodeDecodeError, e:
-            raise URLDecodeError(e.encoding, e.object, e.start, e.end, e.reason)
         if not segment or segment == '.':
             continue
         elif segment == '..':
@@ -495,55 +516,82 @@ def traversal_path(path):
 
 _segment_cache = {}
 
-def quote_path_segment(segment, safe=''):
-    """ Return a quoted representation of a 'path segment' (such as
-    the string ``__name__`` attribute of a resource) as a string.  If the
-    ``segment`` passed in is a unicode object, it is converted to a
-    UTF-8 string, then it is URL-quoted using Python's
-    ``urllib.quote``.  If the ``segment`` passed in is a string, it is
-    URL-quoted using Python's :mod:`urllib.quote`.  If the segment
-    passed in is not a string or unicode object, an error will be
-    raised.  The return value of ``quote_path_segment`` is always a
-    string, never Unicode.
+quote_path_segment_doc = """ \
+Return a quoted representation of a 'path segment' (such as
+the string ``__name__`` attribute of a resource) as a string.  If the
+``segment`` passed in is a unicode object, it is converted to a
+UTF-8 string, then it is URL-quoted using Python's
+``urllib.quote``.  If the ``segment`` passed in is a string, it is
+URL-quoted using Python's :mod:`urllib.quote`.  If the segment
+passed in is not a string or unicode object, an error will be
+raised.  The return value of ``quote_path_segment`` is always a
+string, never Unicode.
 
-    You may pass a string of characters that need not be encoded as
-    the ``safe`` argument to this function.  This corresponds to the
-    ``safe`` argument to :mod:`urllib.quote`.
+You may pass a string of characters that need not be encoded as
+the ``safe`` argument to this function.  This corresponds to the
+``safe`` argument to :mod:`urllib.quote`.
 
-    .. note:: The return value for each segment passed to this
-              function is cached in a module-scope dictionary for
-              speed: the cached version is returned when possible
-              rather than recomputing the quoted version.  No cache
-              emptying is ever done for the lifetime of an
-              application, however.  If you pass arbitrary
-              user-supplied strings to this function (as opposed to
-              some bounded set of values from a 'working set' known to
-              your application), it may become a memory leak.
-    """
-    # The bit of this code that deals with ``_segment_cache`` is an
-    # optimization: we cache all the computation of URL path segments
-    # in this module-scope dictionary with the original string (or
-    # unicode value) as the key, so we can look it up later without
-    # needing to reencode or re-url-quote it
-    try:
-        return _segment_cache[(segment, safe)]
-    except KeyError:
-        if segment.__class__ is unicode: # isinstance slighly slower (~15%)
-            result = url_quote(segment.encode('utf-8'), safe)
-        else:
-            result = url_quote(str(segment), safe)
-        # we don't need a lock to mutate _segment_cache, as the below
-        # will generate exactly one Python bytecode (STORE_SUBSCR)
-        _segment_cache[(segment, safe)] = result
-        return result
+.. note::
 
+   The return value for each segment passed to this
+   function is cached in a module-scope dictionary for
+   speed: the cached version is returned when possible
+   rather than recomputing the quoted version.  No cache
+   emptying is ever done for the lifetime of an
+   application, however.  If you pass arbitrary
+   user-supplied strings to this function (as opposed to
+   some bounded set of values from a 'working set' known to
+   your application), it may become a memory leak.
+"""
+
+
+if PY3: # pragma: no cover
+    # special-case on Python 2 for speed?  unchecked
+    def quote_path_segment(segment, safe=''):
+        """ %s """ % quote_path_segment_doc
+        # The bit of this code that deals with ``_segment_cache`` is an
+        # optimization: we cache all the computation of URL path segments
+        # in this module-scope dictionary with the original string (or
+        # unicode value) as the key, so we can look it up later without
+        # needing to reencode or re-url-quote it
+        try:
+            return _segment_cache[(segment, safe)]
+        except KeyError:
+            if segment.__class__ not in (text_type, binary_type):
+                segment = str(segment)
+            result = url_quote(native_(segment, 'utf-8'), safe)
+            # we don't need a lock to mutate _segment_cache, as the below
+            # will generate exactly one Python bytecode (STORE_SUBSCR)
+            _segment_cache[(segment, safe)] = result
+            return result
+else:
+    def quote_path_segment(segment, safe=''):
+        """ %s """ % quote_path_segment_doc
+        # The bit of this code that deals with ``_segment_cache`` is an
+        # optimization: we cache all the computation of URL path segments
+        # in this module-scope dictionary with the original string (or
+        # unicode value) as the key, so we can look it up later without
+        # needing to reencode or re-url-quote it
+        try:
+            return _segment_cache[(segment, safe)]
+        except KeyError:
+            if segment.__class__ is text_type: #isinstance slighly slower (~15%)
+                result = url_quote(segment.encode('utf-8'), safe)
+            else:
+                result = url_quote(str(segment), safe)
+            # we don't need a lock to mutate _segment_cache, as the below
+            # will generate exactly one Python bytecode (STORE_SUBSCR)
+            _segment_cache[(segment, safe)] = result
+            return result
+    
+
+@implementer(ITraverser)
 class ResourceTreeTraverser(object):
     """ A resource tree traverser that should be used (for speed) when
     every resource in the tree supplies a ``__name__`` and
     ``__parent__`` attribute (ie. every resource in the tree is
     :term:`location` aware) ."""
 
-    implements(ITraverser)
 
     VIEW_SELECTOR = '@@'
 
@@ -567,14 +615,14 @@ class ResourceTreeTraverser(object):
             matchdict = environ['bfg.routes.matchdict']
 
             path = matchdict.get('traverse', '/') or '/'
-            if hasattr(path, '__iter__'):
+            if is_nonstr_iter(path):
                 # this is a *traverse stararg (not a {traverse})
                 path = '/'.join([quote_path_segment(x) for x in path]) or '/'
 
             subpath = matchdict.get('subpath', ())
-            if not hasattr(subpath, '__iter__'):
+            if not is_nonstr_iter(subpath):
                 # this is not a *subpath stararg (just a {subpath})
-                subpath = traversal_path(subpath)
+                subpath = traversal_path_info(subpath)
 
         else:
             # this request did not match a route
@@ -586,7 +634,7 @@ class ResourceTreeTraverser(object):
 
         if VH_ROOT_KEY in environ:
             vroot_path = environ[VH_ROOT_KEY]
-            vroot_tuple = traversal_path(vroot_path)
+            vroot_tuple = traversal_path_info(vroot_path)
             vpath = vroot_path + path
             vroot_idx = len(vroot_tuple) -1
         else:
@@ -607,7 +655,7 @@ class ResourceTreeTraverser(object):
             # and this hurts readability; apologies
             i = 0
             view_selector = self.VIEW_SELECTOR
-            vpath_tuple = traversal_path(vpath)
+            vpath_tuple = traversal_path_info(vpath)
             for segment in vpath_tuple:
                 if segment[:2] == view_selector:
                     return {'context':ob,
@@ -643,16 +691,16 @@ class ResourceTreeTraverser(object):
                 ob = next
                 i += 1
 
-        return {'context':ob, 'view_name':u'', 'subpath':subpath,
+        return {'context':ob, 'view_name':empty, 'subpath':subpath,
                 'traversed':vpath_tuple, 'virtual_root':vroot,
                 'virtual_root_path':vroot_tuple, 'root':root}
 
 ModelGraphTraverser = ResourceTreeTraverser # b/w compat, not API, used in wild
 
+@implementer(IContextURL)
 class TraversalContextURL(object):
     """ The IContextURL adapter used to generate URLs for a resource in a
     resource tree"""
-    implements(IContextURL)
 
     vroot_varname = VH_ROOT_KEY
 

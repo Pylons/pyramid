@@ -1,6 +1,11 @@
 import unittest
 from pyramid import testing
 
+from pyramid.compat import text_
+from pyramid.compat import bytes_
+from pyramid.compat import native_
+from pyramid.compat import iteritems_, iterkeys_, itervalues_
+
 class TestRequest(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
@@ -50,7 +55,7 @@ class TestRequest(unittest.TestCase):
             }
         request = self._makeOne(environ)
         request.charset = None
-        self.assertEqual(request.GET['la'], u'La Pe\xf1a')
+        self.assertEqual(request.GET['la'], text_(b'La Pe\xf1a'))
 
     def test_class_implements(self):
         from pyramid.interfaces import IRequest
@@ -166,7 +171,7 @@ class TestRequest(unittest.TestCase):
         self.config.registry.registerUtility(mapper, IRoutesMapper)
         result = inst.route_url('flub', 'extra1', 'extra2',
                                 a=1, b=2, c=3, _query={'a':1},
-                                _anchor=u"foo")
+                                _anchor=text_("foo"))
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3/extra1/extra2?a=1#foo')
 
@@ -184,7 +189,7 @@ class TestRequest(unittest.TestCase):
         self.config.registry.registerUtility(mapper, IRoutesMapper)
         result = inst.route_path('flub', 'extra1', 'extra2',
                                 a=1, b=2, c=3, _query={'a':1},
-                                _anchor=u"foo")
+                                _anchor=text_("foo"))
         self.assertEqual(result, '/1/2/3/extra1/extra2?a=1#foo')
 
     def test_static_url(self):
@@ -235,20 +240,20 @@ class TestRequest(unittest.TestCase):
 
     def test_json_body_invalid_json(self):
         request = self._makeOne({'REQUEST_METHOD':'POST'})
-        request.body = '{'
+        request.body = b'{'
         self.assertRaises(ValueError, getattr, request, 'json_body')
         
     def test_json_body_valid_json(self):
         request = self._makeOne({'REQUEST_METHOD':'POST'})
-        request.body = '{"a":1}'
+        request.body = b'{"a":1}'
         self.assertEqual(request.json_body, {'a':1})
 
     def test_json_body_alternate_charset(self):
         from pyramid.compat import json
         request = self._makeOne({'REQUEST_METHOD':'POST'})
         request.charset = 'latin-1'
-        la = unicode('La Pe\xc3\xb1a', 'utf-8')
-        body = json.dumps({'a':la}, encoding='latin-1')
+        la = text_(b'La Pe\xc3\xb1a', 'utf-8')
+        body = bytes_(json.dumps({'a':la}), 'latin-1')
         request.body = body
         self.assertEqual(request.json_body, {'a':la})
 
@@ -322,17 +327,17 @@ class TestRequestDeprecatedMethods(unittest.TestCase):
     def test_iteritems(self):
         environ = {'zooma':1}
         inst = self._makeOne(environ)
-        self.assertEqual(list(inst.iteritems()), list(environ.iteritems()))
+        self.assertEqual(list(inst.iteritems()), list(iteritems_(environ)))
 
     def test_iterkeys(self):
         environ = {'zooma':1}
         inst = self._makeOne(environ)
-        self.assertEqual(list(inst.iterkeys()), list(environ.iterkeys()))
+        self.assertEqual(list(inst.iterkeys()), list(iterkeys_(environ)))
 
     def test_itervalues(self):
         environ = {'zooma':1}
         inst = self._makeOne(environ)
-        self.assertEqual(list(inst.itervalues()), list(environ.itervalues()))
+        self.assertEqual(list(inst.itervalues()), list(itervalues_(environ)))
 
     def test_keys(self):
         environ = {'zooma':1}
@@ -370,8 +375,8 @@ class TestRequestDeprecatedMethods(unittest.TestCase):
     def test_values(self):
         environ = {'zooma':1}
         inst = self._makeOne(environ)
-        result = inst.values()
-        self.assertEqual(result, environ.values())
+        result = list(inst.values())
+        self.assertEqual(result, list(environ.values()))
 
     def test_response_content_type(self):
         inst = self._makeOne()
@@ -497,14 +502,16 @@ class Test_call_app_with_subpath_as_path_info(unittest.TestCase):
         self.assertEqual(request.environ['PATH_INFO'], '/hello/')
 
     def test_subpath_path_info_and_script_name_have_utf8(self):
-        la = 'La Pe\xc3\xb1a'
-        request = DummyRequest({'PATH_INFO':'/'+la, 'SCRIPT_NAME':'/'+la})
-        request.subpath = (unicode(la, 'utf-8'), )
+        encoded = native_(text_(b'La Pe\xc3\xb1a'))
+        decoded = text_(bytes_(encoded), 'utf-8')
+        request = DummyRequest({'PATH_INFO':'/' + encoded,
+                                'SCRIPT_NAME':'/' + encoded})
+        request.subpath = (decoded, )
         response = self._callFUT(request, 'app')
         self.assertTrue(request.copied)
         self.assertEqual(response, 'app')
-        self.assertEqual(request.environ['SCRIPT_NAME'], '/' + la)
-        self.assertEqual(request.environ['PATH_INFO'], '/' + la)
+        self.assertEqual(request.environ['SCRIPT_NAME'], '/' + encoded)
+        self.assertEqual(request.environ['PATH_INFO'], '/' + encoded)
 
 class DummyRequest:
     def __init__(self, environ=None):

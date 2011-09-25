@@ -1,5 +1,7 @@
 import unittest
 from pyramid import testing
+from pyramid.compat import text_
+from pyramid.compat import bytes_
 
 class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
     def setUp(self):
@@ -462,7 +464,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         return cookie
 
     def _parseCookie(self, cookie):
-        from Cookie import SimpleCookie
+        from pyramid.compat import SimpleCookie
         cookies = SimpleCookie()
         cookies.load(cookie)
         return cookies.get('auth_tkt')
@@ -562,14 +564,15 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(environ['AUTH_TYPE'],'cookie')
 
     def test_identify_good_cookie_b64str_useridtype(self):
+        from base64 import b64encode
         helper = self._makeOne('secret', include_ip=False)
-        helper.auth_tkt.userid = 'encoded'.encode('base64').strip()
+        helper.auth_tkt.userid = b64encode(b'encoded').strip()
         helper.auth_tkt.user_data = 'userid_type:b64str'
         request = self._makeRequest('ticket')
         result = helper.identify(request)
         self.assertEqual(len(result), 4)
         self.assertEqual(result['tokens'], ())
-        self.assertEqual(result['userid'], 'encoded')
+        self.assertEqual(result['userid'], b'encoded')
         self.assertEqual(result['userdata'], 'userid_type:b64str')
         self.assertEqual(result['timestamp'], 0)
         environ = request.environ
@@ -578,14 +581,15 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(environ['AUTH_TYPE'],'cookie')
 
     def test_identify_good_cookie_b64unicode_useridtype(self):
+        from base64 import b64encode
         helper = self._makeOne('secret', include_ip=False)
-        helper.auth_tkt.userid = '\xc3\xa9ncoded'.encode('base64').strip()
+        helper.auth_tkt.userid = b64encode(b'\xc3\xa9ncoded').strip()
         helper.auth_tkt.user_data = 'userid_type:b64unicode'
         request = self._makeRequest('ticket')
         result = helper.identify(request)
         self.assertEqual(len(result), 4)
         self.assertEqual(result['tokens'], ())
-        self.assertEqual(result['userid'], unicode('\xc3\xa9ncoded', 'utf-8'))
+        self.assertEqual(result['userid'], text_(b'\xc3\xa9ncoded', 'utf-8'))
         self.assertEqual(result['userdata'], 'userid_type:b64unicode')
         self.assertEqual(result['timestamp'], 0)
         environ = request.environ
@@ -822,14 +826,16 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertTrue(result[1][1].endswith('; Path=/; Domain=example.com'))
         self.assertTrue(result[1][1].startswith('auth_tkt='))
         
-    def test_remember_string_userid(self):
+    def test_remember_binary_userid(self):
+        import base64
         helper = self._makeOne('secret')
         request = self._makeRequest()
-        result = helper.remember(request, 'userid')
+        result = helper.remember(request, b'userid')
         values = self._parseHeaders(result)
         self.assertEqual(len(result), 3)
         val = self._cookieValue(values[0])
-        self.assertEqual(val['userid'], 'userid'.encode('base64').strip())
+        self.assertEqual(val['userid'],
+                         bytes_(base64.b64encode(b'userid').strip()))
         self.assertEqual(val['user_data'], 'userid_type:b64str')
 
     def test_remember_int_userid(self):
@@ -843,6 +849,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(val['user_data'], 'userid_type:int')
 
     def test_remember_long_userid(self):
+        from pyramid.compat import long
         helper = self._makeOne('secret')
         request = self._makeRequest()
         result = helper.remember(request, long(1))
@@ -853,15 +860,16 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(val['user_data'], 'userid_type:int')
 
     def test_remember_unicode_userid(self):
+        import base64
         helper = self._makeOne('secret')
         request = self._makeRequest()
-        userid = unicode('\xc2\xa9', 'utf-8')
+        userid = text_(b'\xc2\xa9', 'utf-8')
         result = helper.remember(request, userid)
         values = self._parseHeaders(result)
         self.assertEqual(len(result), 3)
         val = self._cookieValue(values[0])
         self.assertEqual(val['userid'],
-                         userid.encode('utf-8').encode('base64').strip())
+                         base64.b64encode(userid.encode('utf-8')))
         self.assertEqual(val['user_data'], 'userid_type:b64unicode')
 
     def test_remember_insane_userid(self):
@@ -899,11 +907,12 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(result[2][0], 'Set-Cookie')
         self.assertTrue("'tokens': ('foo', 'bar')" in result[2][1])
 
-    def test_remember_non_string_token(self):
+    def test_remember_nonascii_token(self):
         helper = self._makeOne('secret')
         request = self._makeRequest()
+        la = text_(b'La Pe\xc3\xb1a', 'utf-8')
         self.assertRaises(ValueError, helper.remember, request, 'other',
-                          tokens=(u'foo',))
+                          tokens=(la,))
 
     def test_remember_invalid_token_format(self):
         helper = self._makeOne('secret')
@@ -1085,15 +1094,6 @@ class TestSessionAuthenticationPolicy(unittest.TestCase):
         result = policy.forget(request)
         self.assertEqual(request.session.get('userid'), None)
         self.assertEqual(result, [])
-
-class Test_maybe_encode(unittest.TestCase):
-    def _callFUT(self, s, encoding='utf-8'):
-        from pyramid.authentication import maybe_encode
-        return maybe_encode(s, encoding)
-
-    def test_unicode(self):
-        result = self._callFUT(u'abc')
-        self.assertEqual(result, 'abc')
 
 class DummyContext:
     pass

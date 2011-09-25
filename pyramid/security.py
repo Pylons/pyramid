@@ -5,6 +5,7 @@ from pyramid.interfaces import IAuthorizationPolicy
 from pyramid.interfaces import ISecuredView
 from pyramid.interfaces import IViewClassifier
 
+from pyramid.compat import map_
 from pyramid.threadlocal import get_current_registry
 
 Everyone = 'system.Everyone'
@@ -134,7 +135,7 @@ def view_execution_permitted(context, request, name=''):
         reg = request.registry
     except AttributeError:
         reg = get_current_registry() # b/c
-    provides = [IViewClassifier] + map(providedBy, (request, context))
+    provides = [IViewClassifier] + map_(providedBy, (request, context))
     view = reg.adapters.lookup(provides, ISecuredView, name=name)
     if view is None:
         return Allowed(

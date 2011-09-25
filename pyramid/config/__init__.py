@@ -13,6 +13,10 @@ from pyramid.interfaces import IExceptionResponse
 
 from pyramid.asset import resolve_asset_spec
 from pyramid.authorization import ACLAuthorizationPolicy
+from pyramid.compat import text_
+from pyramid.compat import reraise
+from pyramid.compat import string_types
+from pyramid.compat import PY3
 from pyramid.events import ApplicationCreated
 from pyramid.exceptions import ConfigurationConflictError
 from pyramid.exceptions import ConfigurationError
@@ -41,6 +45,8 @@ from pyramid.config.tweens import TweensConfiguratorMixin
 from pyramid.config.util import action_method
 from pyramid.config.views import ViewsConfiguratorMixin
 from pyramid.config.zca import ZCAConfiguratorMixin
+
+empty = text_('')
 
 ConfigurationError = ConfigurationError # pyflakes
 
@@ -284,7 +290,7 @@ class Configurator(
         self._set_settings(settings)
         self._register_response_adapters()
 
-        if isinstance(debug_logger, basestring):
+        if isinstance(debug_logger, string_types):
             debug_logger = logging.getLogger(debug_logger)
 
         if debug_logger is None:
@@ -402,7 +408,7 @@ class Configurator(
 
         if not hasattr(_registry, 'registerSelfAdapter'):
             def registerSelfAdapter(required=None, provided=None,
-                                    name=u'', info=u'', event=True):
+                                    name=empty, info=empty, event=True):
                 return _registry.registerAdapter(lambda x: x,
                                                  required=required,
                                                  provided=provided, name=name,
@@ -655,7 +661,10 @@ class Configurator(
         c, action_wrap = c
         if action_wrap:
             c = action_method(c)
-        m = types.MethodType(c, self, self.__class__)
+        if PY3: # pragma: no cover
+            m = types.MethodType(c, self)
+        else:
+            m = types.MethodType(c, self, self.__class__)
         return m
 
     @classmethod
@@ -710,7 +719,7 @@ class Configurator(
         when generating an absolute asset specification.  If the
         provided ``relative_spec`` argument is already absolute, or if
         the ``relative_spec`` is not a string, it is simply returned."""
-        if not isinstance(relative_spec, basestring):
+        if not isinstance(relative_spec, string_types):
             return relative_spec
         return self._make_spec(relative_spec)
 
@@ -908,7 +917,9 @@ class ActionState(object):
                 except:
                     t, v, tb = sys.exc_info()
                     try:
-                        raise ConfigurationExecutionError(t, v, info), None, tb
+                        reraise(ConfigurationExecutionError,
+                                ConfigurationExecutionError(t, v, info),
+                                tb)
                     finally:
                        del t, v, tb
         finally:
@@ -994,7 +1005,11 @@ def resolveConflicts(actions):
 
         # We need to sort the actions by the paths so that the shortest
         # path with a given prefix comes first:
-        dups.sort()
+        def allbutfunc(stupid):
+            # f me with a shovel, py3 cant cope with sorting when the
+            # callable function is in the list
+            return stupid[0:2] + stupid[3:]
+        dups.sort(key=allbutfunc)
         (basepath, i, callable, args, kw, baseinfo) = dups[0]
         output.append(
             (i, discriminator, callable, args, kw, basepath, baseinfo)

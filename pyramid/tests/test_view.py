@@ -1,6 +1,8 @@
 import unittest
 import sys
 
+from zope.interface import implementer
+
 from pyramid.testing import setUp
 from pyramid.testing import tearDown
 
@@ -406,8 +408,9 @@ class TestViewConfigDecorator(unittest.TestCase):
     def test_call_with_renderer_IRendererInfo(self):
         import pyramid.tests
         from pyramid.interfaces import IRendererInfo
+        @implementer(IRendererInfo)
         class DummyRendererHelper(object):
-            implements(IRendererInfo)
+            pass
         renderer_helper = DummyRendererHelper()
         decorator = self._makeOne(renderer=renderer_helper)
         venusian = DummyVenusian()
@@ -588,10 +591,9 @@ class DummyRequest:
         self.environ = environ
         
 from pyramid.interfaces import IResponse
-from zope.interface import implements
 
+@implementer(IResponse)
 class DummyResponse(object):
-    implements(IResponse)
     headerlist = ()
     app_iter = ()
     status = '200 OK'

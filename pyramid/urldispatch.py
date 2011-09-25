@@ -1,19 +1,23 @@
 import re
-from urllib import unquote
-from zope.interface import implements
+from zope.interface import implementer
 
 from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import IRoute
 
-from pyramid.encode import url_quote
+from pyramid.compat import native_
+from pyramid.compat import bytes_
+from pyramid.compat import text_type
+from pyramid.compat import string_types
+from pyramid.compat import is_nonstr_iter
+from pyramid.compat import url_quote
 from pyramid.exceptions import URLDecodeError
-from pyramid.traversal import traversal_path
+from pyramid.traversal import traversal_path_info
 from pyramid.traversal import quote_path_segment
 
 _marker = object()
 
+@implementer(IRoute)
 class Route(object):
-    implements(IRoute)
     def __init__(self, name, pattern, factory=None, predicates=(),
                  pregenerator=None):
         self.pattern = pattern
@@ -24,8 +28,8 @@ class Route(object):
         self.predicates = predicates
         self.pregenerator = pregenerator
 
+@implementer(IRoutesMapper)
 class RoutesMapper(object):
-    implements(IRoutesMapper)
     def __init__(self):
         self.routelist = []
         self.routes = {}
@@ -133,14 +137,14 @@ def _compile_route(route):
         if m is None:
             return m
         d = {}
-        for k, v in m.groupdict().iteritems():
+        for k, v in m.groupdict().items():
             if k == star:
-                d[k] = traversal_path(v)
+                d[k] = traversal_path_info(v)
             else:
-                encoded = unquote(v)
                 try:
-                    d[k] = encoded.decode('utf-8')
-                except UnicodeDecodeError, e:
+                    val = bytes_(v).decode('utf-8', 'strict')
+                    d[k] = val
+                except UnicodeDecodeError as e:
                     raise URLDecodeError(
                         e.encoding, e.object, e.start, e.end, e.reason
                         )
@@ -153,15 +157,14 @@ def _compile_route(route):
     def generator(dict):
         newdict = {}
         for k, v in dict.items():
-            if isinstance(v, unicode):
-                v = v.encode('utf-8')
-            if k == star and hasattr(v, '__iter__'):
+            if v.__class__ is text_type:
+                v = native_(v, 'utf-8')
+            if k == star and is_nonstr_iter(v):
                 v = '/'.join([quote_path_segment(x) for x in v])
             elif k != star:
-                try:
-                    v = url_quote(v)
-                except TypeError:
-                    pass
+                if v.__class__ not in string_types:
+                    v = str(v)
+                v = url_quote(v, safe='')
             newdict[k] = v
         return gen % newdict
 

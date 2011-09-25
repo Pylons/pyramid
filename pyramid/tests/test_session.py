@@ -263,21 +263,15 @@ class Test_manage_accessed(unittest.TestCase):
         self.assertEqual(session.response, response)
 
 def serialize(data, secret):
-    try:
-        from hashlib import sha1
-    except ImportError: # pragma: no cover
-        import sha as sha1
-
-    try:
-        import cPickle as pickle
-    except ImportError: # pragma: no cover
-        import pickle
-
     import hmac
     import base64
-    pickled = pickle.dumps('123', pickle.HIGHEST_PROTOCOL)
-    sig = hmac.new(secret, pickled, sha1).hexdigest()
-    return sig + base64.standard_b64encode(pickled)
+    from hashlib import sha1
+    from pyramid.compat import bytes_
+    from pyramid.compat import native_
+    from pyramid.compat import pickle
+    pickled = pickle.dumps(data, pickle.HIGHEST_PROTOCOL)
+    sig = hmac.new(bytes_(secret), pickled, sha1).hexdigest()
+    return sig + native_(base64.b64encode(pickled))
 
 class Test_signed_serialize(unittest.TestCase):
     def _callFUT(self, data, secret):

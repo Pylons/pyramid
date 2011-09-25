@@ -2,7 +2,7 @@ import os
 import pkg_resources
 import threading
 
-from zope.interface import implements
+from zope.interface import implementer
 from zope.deprecation import deprecated
 
 from pyramid.interfaces import IChameleonLookup
@@ -15,6 +15,9 @@ from pyramid.interfaces import IRendererInfo
 
 from pyramid.asset import asset_spec_from_abspath
 from pyramid.compat import json
+from pyramid.compat import string_types
+from pyramid.compat import text_type
+from pyramid.compat import native_
 from pyramid.decorator import reify
 from pyramid.events import BeforeRender
 from pyramid.path import caller_package
@@ -145,7 +148,7 @@ def json_renderer_factory(info):
 
 def string_renderer_factory(info):
     def _render(value, system):
-        if not isinstance(value, basestring):
+        if not isinstance(value, string_types):
             value = str(value)
         request = system.get('request')
         if request is not None:
@@ -225,8 +228,8 @@ class JSONP(object):
 
 # utility functions, not API
 
+@implementer(IChameleonLookup)
 class ChameleonRendererLookup(object):
-    implements(IChameleonLookup)
     def __init__(self, impl, registry):
         self.impl = impl
         self.registry = registry
@@ -348,8 +351,8 @@ deprecated(
     'the next major release. To replace it, use the '
     '``pyramid.renderers.get_renderer`` API instead. ')
 
+@implementer(IRendererInfo)
 class RendererHelper(object):
-    implements(IRendererInfo)
     def __init__(self, name=None, package=None, registry=None):
         if name and '.' in name:
             rtype = os.path.splitext(name)[1]
@@ -437,8 +440,8 @@ class RendererHelper(object):
         if result is None:
             result = ''
 
-        if isinstance(result, unicode):
-            response.unicode_body = result
+        if isinstance(result, text_type):
+            response.text = result
         else:
             response.body = result
 

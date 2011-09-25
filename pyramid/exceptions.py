@@ -4,6 +4,8 @@ from pyramid.httpexceptions import HTTPForbidden
 NotFound = HTTPNotFound # bw compat
 Forbidden = HTTPForbidden # bw compat
 
+CR = '\n'
+
 class PredicateMismatch(HTTPNotFound):
     """
     Internal exception (not an API) raised by multiviews when no
@@ -37,15 +39,14 @@ class ConfigurationConflictError(ConfigurationError):
 
     def __str__(self):
         r = ["Conflicting configuration actions"]
-        items = self._conflicts.items()
-        items.sort()
+        items = sorted(self._conflicts.items())
         for discriminator, infos in items:
             r.append("  For: %s" % (discriminator, ))
             for info in infos:
-                for line in unicode(info).rstrip().split(u'\n'):
-                    r.append(u"    "+line)
+                for line in str(info).rstrip().split(CR):
+                    r.append("    "+line)
 
-        return "\n".join(r)
+        return CR.join(r)
 
 
 class ConfigurationExecutionError(ConfigurationError):

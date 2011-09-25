@@ -3,7 +3,7 @@ import os
 
 from zope.deprecation import deprecated
 
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface import Interface
 from zope.interface import alsoProvides
 
@@ -14,6 +14,9 @@ from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
 from pyramid.interfaces import ISession
 
+from pyramid.compat import PY3
+from pyramid.compat import PYPY
+from pyramid.compat import class_types
 from pyramid.config import Configurator
 from pyramid.decorator import reify
 from pyramid.httpexceptions import HTTPForbidden
@@ -27,6 +30,13 @@ from pyramid.threadlocal import manager
 from pyramid.request import DeprecatedRequestMethodsMixin
 from pyramid.request import CallbackMethodsMixin
 from pyramid.url import URLMethodsMixin
+
+try:
+    import zope.component
+    zope.component
+    have_zca = True
+except ImportError: # pragma: no cover
+    have_zca = False
 
 _marker = object()
 
@@ -590,8 +600,8 @@ class DummyResource:
 
 DummyModel = DummyResource # b/w compat (forever)
 
+@implementer(ISession)
 class DummySession(dict):
-    implements(ISession)
     created = None
     new = True
     def changed(self):
@@ -621,6 +631,7 @@ class DummySession(dict):
     def get_csrf_token(self):
         return self.get('_csrft_', None)
         
+@implementer(IRequest)
 class DummyRequest(DeprecatedRequestMethodsMixin, URLMethodsMixin,
                    CallbackMethodsMixin):
     """ A DummyRequest object (incompletely) imitates a :term:`request` object.
@@ -649,7 +660,6 @@ class DummyRequest(DeprecatedRequestMethodsMixin, URLMethodsMixin,
     a Request, use the :class:`pyramid.request.Request` class itself rather
     than this class while writing tests.
     """
-    implements(IRequest)
     method = 'GET'
     application_url = 'http://example.com'
     host = 'example.com:80'
@@ -801,7 +811,7 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
             # any existing renderer factory lookup system.
             config.add_renderer(name, renderer)
     config.commit()
-    hook_zca and config.hook_zca()
+    have_zca and hook_zca and config.hook_zca()
     config.begin(request=request)
     return config
 
@@ -889,21 +899,25 @@ class MockTemplate(object):
         return self.response
 
 def skip_on(*platforms):
+    skip = False
+    for platform in platforms:
+        if skip_on.os_name.startswith(platform):
+            skip = True
+        if platform == 'pypy' and PYPY: # pragma: no cover
+            skip = True
+        if platform == 'py3' and PY3: # pragma: no cover
+            skip = True
     def decorator(func):
-        def wrapper(*args, **kw):
-            for platform in platforms:
-                if skip_on.os_name.startswith(platform):
+        if isinstance(func, class_types):
+            if skip: return None
+            else: return func
+        else:
+            def wrapper(*args, **kw):
+                if skip:
                     return
-                if platform == 'pypy' and skip_on.pypy: # pragma: no cover
-                    return
-            return func(*args, **kw)
-        wrapper.__name__ = func.__name__
-        wrapper.__doc__ = func.__doc__
-        return wrapper
+                return func(*args, **kw)
+            wrapper.__name__ = func.__name__
+            wrapper.__doc__ = func.__doc__
+            return wrapper
     return decorator
 skip_on.os_name = os.name # for testing
-try: # pragma: no cover
-    import __pypy__
-    skip_on.pypy = True
-except ImportError:
-    skip_on.pypy = False

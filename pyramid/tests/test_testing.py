@@ -1,5 +1,5 @@
-
 import unittest
+from pyramid.compat import text_
 
 class TestBase(unittest.TestCase):
     def setUp(self):
@@ -35,8 +35,10 @@ class Test_registerDummySecurityPolicy(TestBase):
 
 class Test_registerResources(TestBase):
     def test_it(self):
-        ob1 = object()
-        ob2 = object()
+        class Dummy:
+            pass
+        ob1 = Dummy()
+        ob2 = Dummy()
         resources = {'/ob1':ob1, '/ob2':ob2}
         from pyramid import testing
         testing.registerResources(resources)
@@ -46,14 +48,14 @@ class Test_registerResources(TestBase):
         self.assertEqual(result['context'], ob1)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
-        self.assertEqual(result['traversed'], (u'ob1',))
+        self.assertEqual(result['traversed'], (text_('ob1'),))
         self.assertEqual(result['virtual_root'], ob1)
         self.assertEqual(result['virtual_root_path'], ())
         result = adapter(DummyRequest({'PATH_INFO':'/ob2'}))
         self.assertEqual(result['context'], ob2)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
-        self.assertEqual(result['traversed'], (u'ob2',))
+        self.assertEqual(result['traversed'], (text_('ob2'),))
         self.assertEqual(result['virtual_root'], ob2)
         self.assertEqual(result['virtual_root_path'], ())
         self.assertRaises(KeyError, adapter, DummyRequest({'PATH_INFO':'/ob3'}))
@@ -132,7 +134,7 @@ class Test_registerView(TestBase):
         request = DummyRequest()
         request.registry = self.registry
         response = render_view_to_response(None, request, 'moo.html')
-        self.assertEqual(response.body, 'yo')
+        self.assertEqual(response.body, b'yo')
 
     def test_registerView_custom(self):
         from pyramid import testing
@@ -146,7 +148,7 @@ class Test_registerView(TestBase):
         request = DummyRequest()
         request.registry = self.registry
         response = render_view_to_response(None, request, 'moo.html')
-        self.assertEqual(response.body, '123')
+        self.assertEqual(response.body, b'123')
 
     def test_registerView_with_permission_denying(self):
         from pyramid import testing
@@ -188,7 +190,7 @@ class Test_registerView(TestBase):
         request = DummyRequest()
         request.registry = self.registry
         result = render_view_to_response(None, request, 'moo.html')
-        self.assertEqual(result.app_iter, ['123'])
+        self.assertEqual(result.app_iter, [b'123'])
 
 
 class Test_registerAdapter(TestBase):
@@ -222,12 +224,12 @@ class Test_registerAdapter(TestBase):
 
 class Test_registerUtility(TestBase):
     def test_registerUtility(self):
-        from zope.interface import implements
+        from zope.interface import implementer
         from zope.interface import Interface
         class iface(Interface):
             pass
+        @implementer(iface)
         class impl:
-            implements(iface)
             def __call__(self):
                 return 'foo'
         utility = impl()
@@ -380,9 +382,10 @@ class TestDummyResource(unittest.TestCase):
         resource = self._makeOne()
         resource['abc'] = Dummy()
         resource['def'] = Dummy()
-        self.assertEqual(resource.values(), resource.subs.values())
-        self.assertEqual(resource.items(), resource.subs.items())
-        self.assertEqual(resource.keys(), resource.subs.keys())
+        L = list
+        self.assertEqual(L(resource.values()), L(resource.subs.values()))
+        self.assertEqual(L(resource.items()), L(resource.subs.items()))
+        self.assertEqual(L(resource.keys()), L(resource.subs.keys()))
         self.assertEqual(len(resource), 2)
 
     def test_nonzero(self):
@@ -586,87 +589,73 @@ class Test_setUp(unittest.TestCase):
         from pyramid.testing import setUp
         return setUp(**kw)
 
+    def tearDown(self):
+        from pyramid.threadlocal import manager
+        manager.clear()
+        getSiteManager = self._getSM()
+        if getSiteManager is not None:
+            getSiteManager.reset()
+
+    def _getSM(self):
+        try:
+            from zope.component import getSiteManager
+        except ImportError: # pragma: no cover
+            getSiteManager = None
+        return getSiteManager
+
+    def _assertSMHook(self, hook):
+        getSiteManager = self._getSM()
+        if getSiteManager is not None:
+            result = getSiteManager.sethook(None)
+            self.assertEqual(result, hook)
+
     def test_it_defaults(self):
         from pyramid.threadlocal import manager
         from pyramid.threadlocal import get_current_registry
         from pyramid.registry import Registry
-        from zope.component import getSiteManager
         old = True
         manager.push(old)
-        try:
-            config = self._callFUT()
-            current = manager.get()
-            self.assertFalse(current is old)
-            self.assertEqual(config.registry, current['registry'])
-            self.assertEqual(current['registry'].__class__, Registry)
-            self.assertEqual(current['request'], None)
-        finally:
-            result = getSiteManager.sethook(None)
-            self.assertEqual(result, get_current_registry)
-            getSiteManager.reset()
-            manager.clear()
+        config = self._callFUT()
+        current = manager.get()
+        self.assertFalse(current is old)
+        self.assertEqual(config.registry, current['registry'])
+        self.assertEqual(current['registry'].__class__, Registry)
+        self.assertEqual(current['request'], None)
+        self._assertSMHook(get_current_registry)
 
     def test_it_with_registry(self):
         from pyramid.registry import Registry
-        from zope.component import getSiteManager
         from pyramid.threadlocal import manager
         registry = Registry()
-        try:
-            self._callFUT(registry=registry)
-            current = manager.get()
-            self.assertEqual(current['registry'], registry)
-        finally:
-            getSiteManager.reset()
-            manager.clear()
+        self._callFUT(registry=registry)
+        current = manager.get()
+        self.assertEqual(current['registry'], registry)
             
     def test_it_with_request(self):
-        from zope.component import getSiteManager
         from pyramid.threadlocal import manager
         request = object()
-        try:
-            self._callFUT(request=request)
-            current = manager.get()
-            self.assertEqual(current['request'], request)
-        finally:
-            getSiteManager.reset()
-            manager.clear()
+        self._callFUT(request=request)
+        current = manager.get()
+        self.assertEqual(current['request'], request)
 
     def test_it_with_hook_zca_false(self):
-        from zope.component import getSiteManager
-        from pyramid.threadlocal import manager
         from pyramid.registry import Registry
         registry = Registry()
-        try:
-            self._callFUT(registry=registry, hook_zca=False)
+        self._callFUT(registry=registry, hook_zca=False)
+        getSiteManager = self._getSM()
+        if getSiteManager is not None:
             sm = getSiteManager()
             self.assertFalse(sm is registry)
-        finally:
-            getSiteManager.reset()
-            manager.clear()
 
     def test_it_with_settings_passed_explicit_registry(self):
-        from zope.component import getSiteManager
-        from pyramid.threadlocal import manager
         from pyramid.registry import Registry
         registry = Registry()
-        try:
-            self._callFUT(registry=registry, hook_zca=False,
-                          settings=dict(a=1))
-            self.assertEqual(registry.settings['a'], 1)
-        finally:
-            getSiteManager.reset()
-            manager.clear()
+        self._callFUT(registry=registry, hook_zca=False, settings=dict(a=1))
+        self.assertEqual(registry.settings['a'], 1)
         
     def test_it_with_settings_passed_implicit_registry(self):
-        from zope.component import getSiteManager
-        from pyramid.threadlocal import manager
-        try:
-            config = self._callFUT(hook_zca=False,
-                                   settings=dict(a=1))
-            self.assertEqual(config.registry.settings['a'], 1)
-        finally:
-            getSiteManager.reset()
-            manager.clear()
+        config = self._callFUT(hook_zca=False, settings=dict(a=1))
+        self.assertEqual(config.registry.settings['a'], 1)
 
 class Test_cleanUp(Test_setUp):
     def _callFUT(self, *arg, **kw):
@@ -678,24 +667,48 @@ class Test_tearDown(unittest.TestCase):
         from pyramid.testing import tearDown
         return tearDown(**kw)
 
+    def tearDown(self):
+        from pyramid.threadlocal import manager
+        manager.clear()
+        getSiteManager = self._getSM()
+        if getSiteManager is not None:
+            getSiteManager.reset()
+
+    def _getSM(self):
+        try:
+            from zope.component import getSiteManager
+        except ImportError: # pragma: no cover
+            getSiteManager = None
+        return getSiteManager
+
+    def _assertSMHook(self, hook):
+        getSiteManager = self._getSM()
+        if getSiteManager is not None:
+            result = getSiteManager.sethook(None)
+            self.assertEqual(result, hook)
+
+    def _setSMHook(self, hook):
+        getSiteManager = self._getSM()
+        if getSiteManager is not None:
+            getSiteManager.sethook(hook)
+
     def test_defaults(self):
         from pyramid.threadlocal import manager
-        from zope.component import getSiteManager
         registry = DummyRegistry()
         old = {'registry':registry}
         hook = lambda *arg: None
         try:
-            getSiteManager.sethook(hook)
+            self._setSMHook(hook)
             manager.push(old)
             self._callFUT()
             current = manager.get()
             self.assertNotEqual(current, old)
             self.assertEqual(registry.inited, 2)
         finally:
-            result = getSiteManager.sethook(None)
-            self.assertNotEqual(result, hook)
-            getSiteManager.reset()
-            manager.clear()
+            getSiteManager = self._getSM()
+            if getSiteManager is not None:
+                result = getSiteManager.sethook(None)
+                self.assertNotEqual(result, hook)
 
     def test_registry_cannot_be_inited(self):
         from pyramid.threadlocal import manager
@@ -714,17 +727,12 @@ class Test_tearDown(unittest.TestCase):
             manager.clear()
 
     def test_unhook_zc_false(self):
-        from pyramid.threadlocal import manager
-        from zope.component import getSiteManager
         hook = lambda *arg: None
         try:
-            getSiteManager.sethook(hook)
+            self._setSMHook(hook)
             self._callFUT(unhook_zca=False)
         finally:
-            result = getSiteManager.sethook(None)
-            self.assertEqual(result, hook)
-            getSiteManager.reset()
-            manager.clear()
+            self._assertSMHook(hook)
 
 class TestDummyRendererFactory(unittest.TestCase):
     def _makeOne(self, name, factory):
@@ -888,13 +896,15 @@ class TestDummySession(unittest.TestCase):
 
 
 from zope.interface import Interface
-from zope.interface import implements
+from zope.interface import implementer
         
 class IDummy(Interface):
     pass
 
+@implementer(IDummy)
 class DummyEvent:
-    implements(IDummy)
+    pass
+    
 
 class DummyRequest:
     application_url = 'http://example.com'

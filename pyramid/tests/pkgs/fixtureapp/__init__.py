@@ -5,7 +5,7 @@ def includeme(config):
     config.add_view('.views.erroneous_view', name='error.html')
     config.add_view('.views.fixture_view', name='dummyskin.html',
                     request_type='.views.IDummy')
-    from models import fixture, IFixture
+    from .models import fixture, IFixture
     config.registry.registerUtility(fixture, IFixture)
     config.add_view('.views.fixture_view', name='another.html')
 

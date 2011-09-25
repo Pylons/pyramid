@@ -50,9 +50,9 @@ class TestLocalizer(unittest.TestCase):
     def test_pluralize(self):
         translations = DummyTranslations()
         localizer = self._makeOne(None, translations)
-        self.assertEqual(localizer.pluralize('singular', 'plural', 1,
-                                             domain='1', mapping={}),
-                         'singular')
+        result = localizer.pluralize('singular', 'plural', 1,
+                                     domain='1', mapping={})
+        self.assertEqual(result, 'singular')
         self.assertTrue(localizer.pluralizer)
 
     def test_pluralize_pluralizer_already_added(self):
@@ -434,8 +434,8 @@ class TestTranslations(unittest.TestCase):
 
     def test_ldgettext(self):
         t = self._makeOne()
-        self.assertEqual(t.ldgettext('messages', 'foo'), 'Voh')
-        self.assertEqual(t.ldgettext('messages1', 'foo'), 'VohD')
+        self.assertEqual(t.ldgettext('messages', 'foo'), b'Voh')
+        self.assertEqual(t.ldgettext('messages1', 'foo'), b'VohD')
 
     def test_dugettext(self):
         t = self._makeOne()
@@ -449,8 +449,8 @@ class TestTranslations(unittest.TestCase):
         
     def test_ldngettext(self):
         t = self._makeOne()
-        self.assertEqual(t.ldngettext('messages', 'foo1', 'foos1', 1), 'Voh1')
-        self.assertEqual(t.ldngettext('messages1', 'foo1', 'foos1', 1), 'VohD1')
+        self.assertEqual(t.ldngettext('messages', 'foo1', 'foos1', 1), b'Voh1')
+        self.assertEqual(t.ldngettext('messages1', 'foo1', 'foos1', 1),b'VohD1')
 
     def test_dungettext(self):
         t = self._makeOne()
@@ -476,5 +476,9 @@ class DummyTranslations(object):
     def ugettext(self, text):
         return text
 
+    gettext = ugettext
+
     def ungettext(self, singular, plural, n):
         return singular
+
+    ngettext = ungettext

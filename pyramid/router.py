@@ -1,4 +1,4 @@
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface import providedBy
 
 from pyramid.interfaces import IDebugLogger
@@ -23,8 +23,8 @@ from pyramid.traversal import DefaultRootFactory
 from pyramid.traversal import ResourceTreeTraverser
 from pyramid.tweens import excview_tween_factory
 
+@implementer(IRouter)
 class Router(object):
-    implements(IRouter)
 
     debug_notfound = False
     debug_routematch = False

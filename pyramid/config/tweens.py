@@ -1,7 +1,10 @@
-from zope.interface import implements
+from zope.interface import implementer
 
 from pyramid.interfaces import ITweens
 
+from pyramid.compat import string_types
+from pyramid.compat import is_nonstr_iter
+from pyramid.compat import string_types
 from pyramid.exceptions import ConfigurationError
 from pyramid.tweens import excview_tween_factory
 from pyramid.tweens import MAIN, INGRESS, EXCVIEW
@@ -96,7 +99,7 @@ class TweensConfiguratorMixin(object):
     @action_method
     def _add_tween(self, tween_factory, under=None, over=None, explicit=False):
 
-        if not isinstance(tween_factory, basestring):
+        if not isinstance(tween_factory, string_types):
             raise ConfigurationError(
                 'The "tween_factory" argument to add_tween must be a '
                 'dotted name to a globally importable object, not %r' %
@@ -110,7 +113,7 @@ class TweensConfiguratorMixin(object):
         tween_factory = self.maybe_dotted(tween_factory)
 
         def is_string_or_iterable(v):
-            if isinstance(v, basestring):
+            if isinstance(v, string_types):
                 return True
             if hasattr(v, '__iter__'):
                 return True
@@ -121,10 +124,10 @@ class TweensConfiguratorMixin(object):
                     raise ConfigurationError(
                         '"%s" must be a string or iterable, not %s' % (t, p))
 
-        if over is INGRESS or hasattr(over, '__iter__') and INGRESS in over:
+        if over is INGRESS or is_nonstr_iter(over) and INGRESS in over:
             raise ConfigurationError('%s cannot be over INGRESS' % name)
 
-        if under is MAIN or hasattr(under, '__iter__') and MAIN in under:
+        if under is MAIN or is_nonstr_iter(under) and MAIN in under:
             raise ConfigurationError('%s cannot be under MAIN' % name)
 
         registry = self.registry
@@ -157,8 +160,8 @@ class CyclicDependencyError(Exception):
         msg = 'Implicit tween ordering cycle:' + '; '.join(L)
         return msg
 
+@implementer(ITweens)
 class Tweens(object):
-    implements(ITweens)
     def __init__(self):
         self.explicit = []
         self.names = []
@@ -176,12 +179,12 @@ class Tweens(object):
         if under is None and over is None:
             under = INGRESS
         if under is not None:
-            if not hasattr(under, '__iter__'):
+            if not is_nonstr_iter(under):
                 under = (under,)
             self.order += [(u, name) for u in under]
             self.req_under.add(name)
         if over is not None:
-            if not hasattr(over, '__iter__'):
+            if not is_nonstr_iter(over): #hasattr(over, '__iter__'):
                 over = (over,)
             self.order += [(name, o) for o in over]
             self.req_over.add(name)
@@ -197,7 +200,7 @@ class Tweens(object):
             order.append((a, b))
 
         def add_node(node):
-            if not graph.has_key(node):
+            if not node in graph:
                 roots.append(node)
                 graph[node] = [0] # 0 = number of arcs coming into this node
 

@@ -1,6 +1,6 @@
 import venusian
 
-from zope.interface import implements
+from zope.interface import implementer
 
 from pyramid.interfaces import IContextFound
 from pyramid.interfaces import INewRequest
@@ -71,16 +71,17 @@ class subscriber(object):
         self.venusian.attach(wrapped, self.register, category='pyramid')
         return wrapped
 
+@implementer(INewRequest)
 class NewRequest(object):
     """ An instance of this class is emitted as an :term:`event`
     whenever :app:`Pyramid` begins to process a new request.  The
     even instance has an attribute, ``request``, which is a
     :term:`request` object.  This event class implements the
     :class:`pyramid.interfaces.INewRequest` interface."""
-    implements(INewRequest)
     def __init__(self, request):
         self.request = request
 
+@implementer(INewResponse)
 class NewResponse(object):
     """ An instance of this class is emitted as an :term:`event`
     whenever any :app:`Pyramid` :term:`view` or :term:`exception
@@ -112,11 +113,11 @@ class NewResponse(object):
        almost purely for symmetry with the
        :class:`pyramid.interfaces.INewRequest` event.
     """
-    implements(INewResponse)
     def __init__(self, request, response):
         self.request = request
         self.response = response
 
+@implementer(IContextFound)
 class ContextFound(object):
     """ An instance of this class is emitted as an :term:`event` after
     the :app:`Pyramid` :term:`router` finds a :term:`context`
@@ -137,13 +138,13 @@ class ContextFound(object):
        As of :app:`Pyramid` 1.0, for backwards compatibility purposes, this
        event may also be imported as :class:`pyramid.events.AfterTraversal`.
     """
-    implements(IContextFound)
     def __init__(self, request):
         self.request = request
 
 AfterTraversal = ContextFound # b/c as of 1.0
 
-class ApplicationCreated(object):
+@implementer(IApplicationCreated)
+class ApplicationCreated(object):    
     """ An instance of this class is emitted as an :term:`event` when
     the :meth:`pyramid.config.Configurator.make_wsgi_app` is
     called.  The instance has an attribute, ``app``, which is an
@@ -157,13 +158,13 @@ class ApplicationCreated(object):
        :class:`pyramid.events.WSGIApplicationCreatedEvent`.  This was the name
        of the event class before :app:`Pyramid` 1.0.
     """
-    implements(IApplicationCreated)
     def __init__(self, app):
         self.app = app
         self.object = app
 
 WSGIApplicationCreatedEvent = ApplicationCreated # b/c (as of 1.0)
 
+@implementer(IBeforeRender)
 class BeforeRender(dict):
     """
     Subscribers to this event may introspect the and modify the set of
@@ -201,7 +202,6 @@ class BeforeRender(dict):
 
     See also :class:`pyramid.interfaces.IBeforeRender`.
     """
-    implements(IBeforeRender)
     def __init__(self, system, rendering_val=None):
         dict.__init__(self, system)
         self.rendering_val = rendering_val

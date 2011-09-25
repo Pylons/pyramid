@@ -15,11 +15,14 @@ from pkg_resources import resource_isdir
 from repoze.lru import lru_cache
 
 from pyramid.asset import resolve_asset_spec
+from pyramid.compat import text_
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.httpexceptions import HTTPMovedPermanently
 from pyramid.path import caller_package
 from pyramid.response import Response
-from pyramid.traversal import traversal_path
+from pyramid.traversal import traversal_path_info
+
+slash = text_('/')
 
 def init_mimetypes(mimetypes):
     # this is a function so it can be unittested
@@ -72,6 +75,8 @@ class _FileIter(object):
             raise StopIteration
         return data
 
+    __next__ = next # py3
+
     def close(self):
         self.file.close()
 
@@ -107,8 +112,8 @@ class static_view(object):
     ``PATH_INFO`` when calling the underlying WSGI application which actually
     serves the static files.  If it is ``True``, the static application will
     consider ``request.subpath`` as ``PATH_INFO`` input.  If it is ``False``,
-    the static application will consider request.path_info as ``PATH_INFO``
-    input. By default, this is ``False``.
+    the static application will consider request.environ[``PATH_INFO``] as
+    ``PATH_INFO`` input. By default, this is ``False``.
 
     .. note::
 
@@ -139,7 +144,7 @@ class static_view(object):
         if self.use_subpath:
             path_tuple = request.subpath
         else:
-            path_tuple = traversal_path(request.path_info)
+            path_tuple = traversal_path_info(request.environ['PATH_INFO'])
 
         path = _secure_path(path_tuple)
 
@@ -194,6 +199,6 @@ def _secure_path(path_tuple):
         return None
     if any([_contains_slash(item) for item in path_tuple]):
         return None
-    encoded = u'/'.join(path_tuple) # will be unicode
+    encoded = slash.join(path_tuple) # will be unicode
     return encoded
 

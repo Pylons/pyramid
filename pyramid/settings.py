@@ -1,6 +1,7 @@
 from zope.deprecation import deprecated
 
 from pyramid.threadlocal import get_current_registry
+from pyramid.compat import string_types
 
 def get_settings():
     """
@@ -39,9 +40,9 @@ def asbool(s):
     return s.lower() in ('t', 'true', 'y', 'yes', 'on', '1')
 
 def aslist_cronly(value):
-    if isinstance(value, basestring):
+    if isinstance(value, string_types):
         value = filter(None, [x.strip() for x in value.splitlines()])
-    return value
+    return list(value)
 
 def aslist(value):
     values = aslist_cronly(value)

@@ -1,7 +1,9 @@
 import sys
 
 from zope.deprecation import deprecated
-from zope.interface import implements
+from zope.interface import implementer
+
+from pyramid.compat import reraise
 
 try:
     from chameleon.zpt.template import PageTextTemplateFile
@@ -12,7 +14,7 @@ except ImportError: # pragma: no cover
     # Chameleon doesn't work on non-CPython platforms
     class PageTextTemplateFile(object):
         def __init__(self, *arg, **kw):
-            raise ImportError, exc, tb
+            reraise(ImportError, exc, tb)
 
 from pyramid.interfaces import ITemplateRenderer
 
@@ -23,8 +25,8 @@ from pyramid.path import caller_package
 def renderer_factory(info):
     return renderers.template_renderer_factory(info, TextTemplateRenderer)
 
+@implementer(ITemplateRenderer)
 class TextTemplateRenderer(object):
-    implements(ITemplateRenderer)
     def __init__(self, path, lookup):
         self.path = path
         self.lookup = lookup

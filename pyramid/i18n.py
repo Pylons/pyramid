@@ -9,6 +9,7 @@ from translationstring import TranslationStringFactory # API
 TranslationString = TranslationString # PyFlakes
 TranslationStringFactory = TranslationStringFactory # PyFlakes
 
+from pyramid.compat import PY3
 from pyramid.interfaces import ILocalizer
 from pyramid.interfaces import ITranslationDirectories
 from pyramid.interfaces import ILocaleNegotiator
@@ -180,10 +181,10 @@ def make_localizer(current_locale_name, translation_directories):
                 mopath = os.path.realpath(os.path.join(messages_dir,
                                                        mofile))
                 if mofile.endswith('.mo') and os.path.isfile(mopath):
-                    mofp = open(mopath, 'rb')
-                    domain = mofile[:-3]
-                    dtrans = Translations(mofp, domain)
-                    translations.add(dtrans)
+                    with open(mopath, 'rb') as mofp:
+                        domain = mofile[:-3]
+                        dtrans = Translations(mofp, domain)
+                        translations.add(dtrans)
 
     return Localizer(locale_name=current_locale_name,
                           translations=translations)
@@ -231,7 +232,7 @@ class Translations(gettext.GNUTranslations, object):
         # this domain; see https://github.com/Pylons/pyramid/issues/235
         self.plural = lambda n: int(n != 1) 
         gettext.GNUTranslations.__init__(self, fp=fileobj)
-        self.files = filter(None, [getattr(fileobj, 'name', None)])
+        self.files = list(filter(None, [getattr(fileobj, 'name', None)]))
         self.domain = domain
         self._domains = {}
 
@@ -257,7 +258,8 @@ class Translations(gettext.GNUTranslations, object):
         filename = gettext.find(domain, dirname, locales)
         if not filename:
             return gettext.NullTranslations()
-        return cls(fileobj=open(filename, 'rb'), domain=domain)
+        with open(filename, 'rb') as fp:
+            return cls(fileobj=fp, domain=domain)
 
     def __repr__(self):
         return '<%s: "%s">' % (type(self).__name__,
@@ -327,7 +329,10 @@ class Translations(gettext.GNUTranslations, object):
         """Like ``ugettext()``, but look the message up in the specified
         domain.
         """
-        return self._domains.get(domain, self).ugettext(message)
+        if PY3: # pragma: no cover
+            return self._domains.get(domain, self).gettext(message)
+        else: # pragma: no cover
+            return self._domains.get(domain, self).ugettext(message)
     
     def dngettext(self, domain, singular, plural, num):
         """Like ``ngettext()``, but look the message up in the specified
@@ -345,5 +350,10 @@ class Translations(gettext.GNUTranslations, object):
         """Like ``ungettext()`` but look the message up in the specified
         domain.
         """
-        return self._domains.get(domain, self).ungettext(singular, plural, num)
+        if PY3: # pragma: no cover
+            return self._domains.get(domain, self).ngettext(
+                singular, plural, num)
+        else: # pragma: no cover
+            return self._domains.get(domain, self).ungettext(
+                singular, plural, num)
 

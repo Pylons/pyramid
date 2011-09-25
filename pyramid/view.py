@@ -7,6 +7,7 @@ from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
 
+from pyramid.compat import map_
 from pyramid.httpexceptions import HTTPFound
 from pyramid.httpexceptions import default_exceptionresponse_view
 from pyramid.path import caller_package
@@ -52,7 +53,7 @@ def render_view_to_response(context, request, name='', secure=True):
     disallowed.
 
     If ``secure`` is ``False``, no permission checking is done."""
-    provides = [IViewClassifier] + map(providedBy, (request, context))
+    provides = [IViewClassifier] + map_(providedBy, (request, context))
     try:
         reg = request.registry
     except AttributeError:
