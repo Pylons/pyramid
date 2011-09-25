@@ -42,7 +42,7 @@ else:
 def text_(s, encoding='latin-1', errors='strict'):
     if isinstance(s, binary_type):
         return s.decode(encoding, errors)
-    return s
+    return s # pragma: no cover
 
 def bytes_(s, encoding='latin-1', errors='strict'):
     if isinstance(s, text_type):

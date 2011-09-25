@@ -605,8 +605,8 @@ class ConfiguratorTests(unittest.TestCase):
 pyramid.tests.test_config.dummy_include2""",
         }
         config.setup_registry(settings=settings)
-        self.assert_(reg.included)
-        self.assert_(reg.also_included)
+        self.assertTrue(reg.included)
+        self.assertTrue(reg.also_included)
 
     def test_setup_registry_includes_spaces(self):
         from pyramid.registry import Registry
@@ -617,8 +617,8 @@ pyramid.tests.test_config.dummy_include2""",
 """pyramid.tests.test_config.dummy_include pyramid.tests.test_config.dummy_include2""",
         }
         config.setup_registry(settings=settings)
-        self.assert_(reg.included)
-        self.assert_(reg.also_included)
+        self.assertTrue(reg.included)
+        self.assertTrue(reg.also_included)
 
     def test_setup_registry_tweens(self):
         from pyramid.interfaces import ITweens
