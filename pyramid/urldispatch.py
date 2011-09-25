@@ -164,10 +164,7 @@ def _compile_route(route):
             elif k != star:
                 if v.__class__ not in string_types:
                     v = str(v)
-                try:
-                    v = url_quote(v, safe='')
-                except TypeError:
-                    pass
+                v = url_quote(v, safe='')
             newdict[k] = v
         return gen % newdict
 

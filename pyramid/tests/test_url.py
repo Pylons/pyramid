@@ -3,6 +3,7 @@ import unittest
 from pyramid.testing import setUp
 from pyramid.testing import tearDown
 from pyramid.compat import text_
+from pyramid.compat import native_
 
 class TestURLMethodsMixin(unittest.TestCase):
     def setUp(self):
@@ -120,8 +121,13 @@ class TestURLMethodsMixin(unittest.TestCase):
         context = DummyContext()
         uc = text_(b'La Pe\xc3\xb1a', 'utf-8') 
         result = request.resource_url(context, anchor=uc)
-        self.assertEqual(result,
-                         'http://example.com/context/#La Pe\xc3\xb1a')
+        self.assertEqual(
+            result,
+            native_(
+                text_(b'http://example.com/context/#La Pe\xc3\xb1a',
+                      'utf-8'),
+                'utf-8')
+            )
 
     def test_resource_url_anchor_is_not_urlencoded(self):
         request = self._makeOne()
@@ -177,14 +183,21 @@ class TestURLMethodsMixin(unittest.TestCase):
         self.assertEqual(result,
                          'http://example.com:5432/1/2/3?a=1#foo')
 
-    def test_route_url_with_anchor_string(self):
+    def test_route_url_with_anchor_binary(self):
         from pyramid.interfaces import IRoutesMapper
         request = self._makeOne()
         mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
         request.registry.registerUtility(mapper, IRoutesMapper)
-        result = request.route_url('flub', _anchor="La Pe\xc3\xb1a")
-        self.assertEqual(result,
-                         'http://example.com:5432/1/2/3#La Pe\xc3\xb1a')
+        result = request.route_url('flub', _anchor=b"La Pe\xc3\xb1a")
+
+        self.assertEqual(
+            result,
+            native_(
+                text_(
+                    b'http://example.com:5432/1/2/3#La Pe\xc3\xb1a',
+                    'utf-8'),
+                'utf-8')
+            )
 
     def test_route_url_with_anchor_unicode(self):
         from pyramid.interfaces import IRoutesMapper
@@ -193,8 +206,15 @@ class TestURLMethodsMixin(unittest.TestCase):
         request.registry.registerUtility(mapper, IRoutesMapper)
         anchor = text_(b'La Pe\xc3\xb1a', 'utf-8')
         result = request.route_url('flub', _anchor=anchor)
-        self.assertEqual(result,
-                         'http://example.com:5432/1/2/3#La Pe\xc3\xb1a')
+
+        self.assertEqual(
+            result,
+            native_(
+                text_(
+                    b'http://example.com:5432/1/2/3#La Pe\xc3\xb1a',
+                    'utf-8'),
+                'utf-8')
+            )
 
     def test_route_url_with_query(self):
         from pyramid.interfaces import IRoutesMapper

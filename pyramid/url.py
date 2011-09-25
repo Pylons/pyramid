@@ -137,8 +137,7 @@ class URLMethodsMixin(object):
 
         if '_anchor' in kw:
             anchor = kw.pop('_anchor')
-            if isinstance(anchor, text_type):
-                anchor = native_(anchor, 'utf-8')
+            anchor = native_(anchor, 'utf-8')
             anchor = '#' + anchor
 
         if '_app_url' in kw:
