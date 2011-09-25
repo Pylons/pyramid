@@ -9,6 +9,7 @@ from translationstring import TranslationStringFactory # API
 TranslationString = TranslationString # PyFlakes
 TranslationStringFactory = TranslationStringFactory # PyFlakes
 
+from pyramid.compat import PY3
 from pyramid.interfaces import ILocalizer
 from pyramid.interfaces import ITranslationDirectories
 from pyramid.interfaces import ILocaleNegotiator
@@ -328,7 +329,10 @@ class Translations(gettext.GNUTranslations, object):
         """Like ``ugettext()``, but look the message up in the specified
         domain.
         """
-        return self._domains.get(domain, self).ugettext(message)
+        if PY3: # pragma: no cover
+            return self._domains.get(domain, self).gettext(message)
+        else: # pragma: no cover
+            return self._domains.get(domain, self).ugettext(message)
     
     def dngettext(self, domain, singular, plural, num):
         """Like ``ngettext()``, but look the message up in the specified
@@ -346,5 +350,10 @@ class Translations(gettext.GNUTranslations, object):
         """Like ``ungettext()`` but look the message up in the specified
         domain.
         """
-        return self._domains.get(domain, self).ungettext(singular, plural, num)
+        if PY3: # pragma: no cover
+            return self._domains.get(domain, self).ngettext(
+                singular, plural, num)
+        else: # pragma: no cover
+            return self._domains.get(domain, self).ungettext(
+                singular, plural, num)
 

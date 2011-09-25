@@ -7,6 +7,7 @@ from pyramid.wsgi import wsgiapp
 from pyramid.view import view_config
 from pyramid.static import static_view
 from pyramid.compat import text_
+from pyramid.compat import native_
 
 from zope.interface import Interface
 
