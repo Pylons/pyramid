@@ -20,7 +20,7 @@ from pyramid.httpexceptions import HTTPNotFound
 from pyramid.httpexceptions import HTTPMovedPermanently
 from pyramid.path import caller_package
 from pyramid.response import Response
-from pyramid.traversal import traversal_path
+from pyramid.traversal import traversal_path_info
 
 slash = text_('/')
 
@@ -112,8 +112,8 @@ class static_view(object):
     ``PATH_INFO`` when calling the underlying WSGI application which actually
     serves the static files.  If it is ``True``, the static application will
     consider ``request.subpath`` as ``PATH_INFO`` input.  If it is ``False``,
-    the static application will consider request.path_info as ``PATH_INFO``
-    input. By default, this is ``False``.
+    the static application will consider request.environ[``PATH_INFO``] as
+    ``PATH_INFO`` input. By default, this is ``False``.
 
     .. note:: If the ``root_dir`` is relative to a :term:`package`, or
          is a :term:`asset specification` the :app:`Pyramid`
@@ -142,7 +142,7 @@ class static_view(object):
         if self.use_subpath:
             path_tuple = request.subpath
         else:
-            path_tuple = traversal_path(request.path_info)
+            path_tuple = traversal_path_info(request.environ['PATH_INFO'])
 
         path = _secure_path(path_tuple)
 

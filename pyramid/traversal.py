@@ -13,9 +13,11 @@ from pyramid.interfaces import VH_ROOT_KEY
 from pyramid.compat import PY3
 from pyramid.compat import native_
 from pyramid.compat import text_
+from pyramid.compat import bytes_
+from pyramid.compat import ascii_native_
 from pyramid.compat import text_type
 from pyramid.compat import binary_type
-from pyramid.compat import url_unquote_text
+from pyramid.compat import url_unquote_native
 from pyramid.compat import is_nonstr_iter
 from pyramid.encode import url_quote
 from pyramid.exceptions import URLDecodeError
@@ -66,6 +68,10 @@ def find_resource(resource, path):
     :func:`pyramid.traversal.resource_path` function generates strings
     which follow these rules (albeit only absolute ones).
 
+    Rules for passing *text* (Unicode) as the ``path`` argument are the same
+    as those for a string.  In particular, the text may not have any nonascii
+    characters in it.
+
     Rules for passing a *tuple* as the ``path`` argument: if the first
     element in the path tuple is the empty string (for example ``('',
     'a', 'b', 'c')``, the path is considered absolute and the resource tree
@@ -85,6 +91,8 @@ def find_resource(resource, path):
        be imported as :func:`pyramid.traversal.find_model`, although doing so
        will emit a deprecation warning.
     """
+    if isinstance(path, text_type):
+        path = ascii_native_(path)
     D = traverse(resource, path)
     view_name = D['view_name']
     context = D['context']
@@ -299,8 +307,7 @@ def traverse(resource, path):
     # step rather than later down the line as the result of calling
     # ``traversal_path``).
 
-    if isinstance(path, text_type):
-        path = native_(path, 'ascii')
+    path = ascii_native_(path)
 
     if path and path[0] == '/':
         resource = find_root(resource)
@@ -410,26 +417,35 @@ def virtual_root(resource, request):
         urlgenerator = TraversalContextURL(resource, request)
     return urlgenerator.virtual_root()
 
-@lru_cache(1000)
 def traversal_path(path):
-    """ Given a ``PATH_INFO`` string (slash-separated path segments),
-    return a tuple representing that path which can be used to
-    traverse a resource tree.
+    """ Variant of :func:`pyramid.traversal.traversal_path_info` suitable for
+    decoding paths that are URL-encoded."""
+    path = ascii_native_(path)
+    path = url_unquote_native(path, 'latin-1', 'strict')
+    return traversal_path_info(path)
 
-    The ``PATH_INFO`` is split on slashes, creating a list of
-    segments.  Each segment is URL-unquoted, and subsequently decoded
-    into Unicode. Each segment is assumed to be encoded using the
-    UTF-8 encoding (or a subset, such as ASCII); a
-    :exc:`pyramid.exceptions.URLDecodeError` is raised if a segment
-    cannot be decoded.  If a segment name is empty or if it is ``.``,
-    it is ignored.  If a segment name is ``..``, the previous segment
-    is deleted, and the ``..`` is ignored.
+@lru_cache(1000)
+def traversal_path_info(path):
+    """ Given a ``PATH_INFO`` environ value (slash-separated path segments),
+    return a tuple representing that path which can be used to traverse a
+    resource tree.
 
-    If this function is passed a Unicode object instead of a string,
-    that Unicode object *must* directly encodeable to ASCII.  For
-    example, u'/foo' will work but u'/<unprintable unicode>' (a
-    Unicode object with characters that cannot be encoded to ascii)
-    will not.
+    ``PATH_INFO`` is assumed to already be URL-decoded.  It is encoded to
+    bytes using the Latin-1 encoding; the resulting set of bytes is
+    subsequently decoded to text using the UTF-8 encoding; a
+    :exc:`pyramid.exc.URLDecodeError` is raised if a the URL cannot be
+    decoded.
+
+    The ``PATH_INFO`` is split on slashes, creating a list of segments.  Each
+    segment subsequently decoded into Unicode.  If a segment name is empty or
+    if it is ``.``, it is ignored.  If a segment name is ``..``, the previous
+    segment is deleted, and the ``..`` is ignored.
+
+    If this function is passed a Unicode object instead of a string, that
+    Unicode object *must* directly encodeable to ASCII.  For example, u'/foo'
+    will work but u'/<unprintable unicode>' (a Unicode object with characters
+    that cannot be encoded to ascii) will not. A :exc:`UnicodeError` will be
+    raised if the Unicode cannot be encoded directly to ASCII.
 
     Examples:
 
@@ -478,15 +494,13 @@ def traversal_path(path):
               their own traversal machinery, as opposed to users
               writing applications in :app:`Pyramid`.
     """
-    if isinstance(path, text_type):
-        path.encode('ascii') # check for asci-only-ness
+    try:
+        path = bytes_(path, 'latin-1').decode('utf-8')
+    except UnicodeDecodeError as e:
+        raise URLDecodeError(e.encoding, e.object, e.start, e.end, e.reason)
     path = path.strip('/')
     clean = []
     for segment in path.split('/'):
-        try:
-            segment = url_unquote_text(segment, 'utf-8', 'strict')
-        except UnicodeDecodeError as e:
-            raise URLDecodeError(e.encoding, e.object, e.start, e.end, e.reason)
         if not segment or segment == '.':
             continue
         elif segment == '..':
@@ -604,7 +618,7 @@ class ResourceTreeTraverser(object):
             subpath = matchdict.get('subpath', ())
             if not is_nonstr_iter(subpath):
                 # this is not a *subpath stararg (just a {subpath})
-                subpath = traversal_path(subpath)
+                subpath = traversal_path_info(subpath)
 
         else:
             # this request did not match a route
@@ -616,7 +630,7 @@ class ResourceTreeTraverser(object):
 
         if VH_ROOT_KEY in environ:
             vroot_path = environ[VH_ROOT_KEY]
-            vroot_tuple = traversal_path(vroot_path)
+            vroot_tuple = traversal_path_info(vroot_path)
             vpath = vroot_path + path
             vroot_idx = len(vroot_tuple) -1
         else:
@@ -637,7 +651,7 @@ class ResourceTreeTraverser(object):
             # and this hurts readability; apologies
             i = 0
             view_selector = self.VIEW_SELECTOR
-            vpath_tuple = traversal_path(vpath)
+            vpath_tuple = traversal_path_info(vpath)
             for segment in vpath_tuple:
                 if segment[:2] == view_selector:
                     return {'context':ob,

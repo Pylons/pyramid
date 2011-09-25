@@ -1,6 +1,7 @@
 import unittest
 from pyramid import testing
 from pyramid.compat import text_
+from pyramid.compat import native_
 
 class TestRoute(unittest.TestCase):
     def _getTargetClass(self):
@@ -294,7 +295,8 @@ class TestCompileRoute(unittest.TestCase):
     def test_url_decode_error(self):
         from pyramid.exceptions import URLDecodeError
         matcher, generator = self._callFUT('/:foo')
-        self.assertRaises(URLDecodeError, matcher, '/%FF%FE%8B%00')
+        self.assertRaises(URLDecodeError, matcher,
+                          native_(b'/\xff\xfe\x8b\x00'))
     
     def test_custom_regex(self):
         matcher, generator = self._callFUT('foo/{baz}/biz/{buz:[^/\.]+}.{bar}')
@@ -364,9 +366,12 @@ class TestCompileRouteFunctional(unittest.TestCase):
         self.matches('zzz/{x}*traverse', '/zzz/abc/def/g',
                      {'x':'abc', 'traverse':('def', 'g')})
         self.matches('*traverse', '/zzz/abc', {'traverse':('zzz', 'abc')})
-        self.matches('*traverse', '/zzz/%20abc', {'traverse':('zzz', ' abc')})
-        self.matches('{x}', '/La%20Pe%C3%B1a', {'x':text_(b'La Pe\xf1a')})
-        self.matches('*traverse', '/La%20Pe%C3%B1a/x',
+        self.matches('*traverse', '/zzz/ abc', {'traverse':('zzz', ' abc')})
+        #'/La%20Pe%C3%B1a'
+        self.matches('{x}', native_(b'/La Pe\xc3\xb1a'),
+                     {'x':text_(b'La Pe\xf1a')})
+        # '/La%20Pe%C3%B1a/x'
+        self.matches('*traverse', native_(b'/La Pe\xc3\xb1a/x'),
                      {'traverse':(text_(b'La Pe\xf1a'), 'x')})
         self.matches('/foo/{id}.html', '/foo/bar.html', {'id':'bar'})
         self.matches('/{num:[0-9]+}/*traverse', '/555/abc/def',
@@ -387,10 +392,12 @@ class TestCompileRouteFunctional(unittest.TestCase):
         self.matches('zzz/:x*traverse', '/zzz/abc/def/g',
                      {'x':'abc', 'traverse':('def', 'g')})
         self.matches('*traverse', '/zzz/abc', {'traverse':('zzz', 'abc')})
-        self.matches('*traverse', '/zzz/%20abc', {'traverse':('zzz', ' abc')})
-        self.matches(':x', '/La%20Pe%C3%B1a',
+        self.matches('*traverse', '/zzz/ abc', {'traverse':('zzz', ' abc')})
+        #'/La%20Pe%C3%B1a'
+        self.matches(':x', native_(b'/La Pe\xc3\xb1a'),
                      {'x':text_(b'La Pe\xf1a')})
-        self.matches('*traverse', '/La%20Pe%C3%B1a/x',
+        # '/La%20Pe%C3%B1a/x'
+        self.matches('*traverse', native_(b'/La Pe\xc3\xb1a/x'),
                      {'traverse':(text_(b'La Pe\xf1a'), 'x')})
         self.matches('/foo/:id.html', '/foo/bar.html', {'id':'bar'})
         self.matches('/foo/:id_html', '/foo/bar_html', {'id_html':'bar_html'})

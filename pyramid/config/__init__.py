@@ -660,7 +660,7 @@ class Configurator(
         c, action_wrap = c
         if action_wrap:
             c = action_method(c)
-        if PY3:
+        if PY3: # pragma: no cover
             m = types.MethodType(c, self)
         else:
             m = types.MethodType(c, self, self.__class__)

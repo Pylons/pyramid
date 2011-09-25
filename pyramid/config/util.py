@@ -6,7 +6,7 @@ from pyramid.compat import bytes_
 from pyramid.compat import is_nonstr_iter
 from pyramid.exceptions import ConfigurationError
 from pyramid.traversal import find_interface
-from pyramid.traversal import traversal_path
+from pyramid.traversal import traversal_path_info
 
 from hashlib import md5
 
@@ -241,7 +241,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
                 return True
             m = context['match']
             tvalue = tgenerate(m)
-            m['traverse'] = traversal_path(tvalue)
+            m['traverse'] = traversal_path_info(tvalue)
             return True
         # This isn't actually a predicate, it's just a infodict
         # modifier that injects ``traverse`` into the matchdict.  As a

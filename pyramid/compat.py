@@ -50,6 +50,17 @@ def bytes_(s, encoding='latin-1', errors='strict'):
     return s
 
 if PY3: # pragma: no cover
+    def ascii_native_(s):
+        if isinstance(s, text_type):
+            s = s.encode('ascii')
+        return str(s, 'ascii', 'strict')
+else:
+    def ascii_native_(s):
+        if isinstance(s, text_type):
+            s = s.encode('ascii')
+        return str(s)
+
+if PY3: # pragma: no cover
     def native_(s, encoding='latin-1', errors='strict'):
         if isinstance(s, text_type):
             return s
@@ -60,7 +71,7 @@ else:
             return s.encode(encoding, errors)
         return str(s)
 
-try: # pragma: no cover
+if PY3: # pragma: no cover
     from urllib import parse
     urlparse = parse
     from urllib.parse import quote as url_quote
@@ -69,7 +80,8 @@ try: # pragma: no cover
     from urllib.parse import urlencode as url_encode
     from urllib.request import urlopen as url_open
     url_unquote_text = url_unquote
-except ImportError:
+    url_unquote_native = url_unquote
+else:
     import urlparse
     from urllib import quote as url_quote
     from urllib import quote_plus as url_quote_plus
@@ -79,6 +91,9 @@ except ImportError:
     def url_unquote_text(v, encoding='utf-8', errors='replace'):
         v = url_unquote(v)
         return v.decode(encoding, errors)
+    def url_unquote_native(v, encoding='utf-8', errors='replace'):
+        return native_(url_unquote_text(v, encoding, errors))
+        
 
 if PY3: # pragma: no cover
     import builtins

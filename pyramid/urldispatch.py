@@ -4,14 +4,14 @@ from zope.interface import implementer
 from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import IRoute
 
-from pyramid.compat import url_unquote_text
 from pyramid.compat import native_
+from pyramid.compat import bytes_
 from pyramid.compat import text_type
 from pyramid.compat import string_types
 from pyramid.compat import is_nonstr_iter
 from pyramid.compat import url_quote
 from pyramid.exceptions import URLDecodeError
-from pyramid.traversal import traversal_path
+from pyramid.traversal import traversal_path_info
 from pyramid.traversal import quote_path_segment
 
 _marker = object()
@@ -139,11 +139,10 @@ def _compile_route(route):
         d = {}
         for k, v in m.groupdict().items():
             if k == star:
-                d[k] = traversal_path(v)
+                d[k] = traversal_path_info(v)
             else:
                 try:
-                    val = url_unquote_text(
-                        v, encoding='utf-8', errors='strict')
+                    val = bytes_(v).decode('utf-8', 'strict')
                     d[k] = val
                 except UnicodeDecodeError as e:
                     raise URLDecodeError(

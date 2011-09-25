@@ -11,6 +11,39 @@ class TraversalPathTests(unittest.TestCase):
         from pyramid.traversal import traversal_path
         return traversal_path(path)
 
+    def test_utf8(self):
+        la = b'La Pe\xc3\xb1a'
+        encoded = url_quote(la)
+        decoded = text_(la, 'utf-8')
+        path = '/'.join([encoded, encoded])
+        result = self._callFUT(path)
+        self.assertEqual(result, (decoded, decoded))
+
+    def test_utf16(self):
+        from pyramid.exceptions import URLDecodeError
+        la = text_(b'La Pe\xc3\xb1a', 'utf-8').encode('utf-16')
+        encoded = url_quote(la)
+        path = '/'.join([encoded, encoded])
+        self.assertRaises(URLDecodeError, self._callFUT, path)
+
+    def test_unicode_highorder_chars(self):
+        path = text_('/%E6%B5%81%E8%A1%8C%E8%B6%8B%E5%8A%BF')
+        self.assertEqual(self._callFUT(path),
+                         (text_('\u6d41\u884c\u8d8b\u52bf', 'unicode_escape'),))
+
+    def test_element_urllquoted(self):
+        self.assertEqual(self._callFUT('/foo/space%20thing/bar'),
+                         (text_('foo'), text_('space thing'), text_('bar')))
+
+    def test_unicode_undecodeable_to_ascii(self):
+        path = text_(b'/La Pe\xc3\xb1a', 'utf-8')
+        self.assertRaises(UnicodeEncodeError, self._callFUT, path)
+
+class TraversalPathInfoTests(unittest.TestCase):
+    def _callFUT(self, path):
+        from pyramid.traversal import traversal_path_info
+        return traversal_path_info(path)
+
     def test_path_startswith_endswith(self):
         self.assertEqual(self._callFUT('/foo/'), (text_('foo'),))
 
@@ -27,10 +60,6 @@ class TraversalPathTests(unittest.TestCase):
     def test_twodots_at_start(self):
         self.assertEqual(self._callFUT('../../bar'), (text_('bar'),))
 
-    def test_element_urllquoted(self):
-        self.assertEqual(self._callFUT('/foo/space%20thing/bar'),
-                         (text_('foo'), text_('space thing'), text_('bar')))
-
     def test_segments_are_unicode(self):
         result = self._callFUT('/foo/bar')
         self.assertEqual(type(result[0]), text_type)
@@ -42,32 +71,21 @@ class TraversalPathTests(unittest.TestCase):
         self.assertEqual(result1, (text_('foo'), text_('bar')))
         self.assertEqual(result2, (text_('foo'), text_('bar')))
 
-    def test_utf8(self):
-        la = b'La Pe\xc3\xb1a'
-        encoded = url_quote(la)
-        decoded = text_(la, 'utf-8')
-        path = '/'.join([encoded, encoded])
-        self.assertEqual(self._callFUT(path), (decoded, decoded))
-
-    def test_utf16(self):
-        from pyramid.exceptions import URLDecodeError
-        la = text_(b'La Pe\xc3\xb1a', 'utf-8').encode('utf-16')
-        encoded = url_quote(la)
-        path = '/'.join([encoded, encoded])
-        self.assertRaises(URLDecodeError, self._callFUT, path)
-
-    def test_unicode_highorder_chars(self):
-        path = text_('/%E6%B5%81%E8%A1%8C%E8%B6%8B%E5%8A%BF')
-        self.assertEqual(self._callFUT(path),
-                         (text_('\u6d41\u884c\u8d8b\u52bf', 'unicode_escape'),))
-
     def test_unicode_simple(self):
         path = text_('/abc')
         self.assertEqual(self._callFUT(path), (text_('abc'),))
 
-    def test_unicode_undecodeable_to_ascii(self):
-        path = text_(b'/La Pe\xc3\xb1a', 'utf-8')
-        self.assertRaises(UnicodeEncodeError, self._callFUT, path)
+    def test_highorder(self):
+        la = b'La Pe\xc3\xb1a'
+        latin1 = native_(la)
+        result = self._callFUT(latin1)
+        self.assertEqual(result, (text_(la, 'utf-8'),))
+
+    def test_highorder_undecodeable(self):
+        from pyramid.exceptions import URLDecodeError
+        la = text_(b'La Pe\xc3\xb1a', 'utf-8')
+        notlatin1 = native_(la)
+        self.assertRaises(URLDecodeError, self._callFUT, notlatin1)
 
 class ResourceTreeTraverserTests(unittest.TestCase):
     def setUp(self):
@@ -278,22 +296,24 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         self.assertEqual(result['virtual_root_path'], ())
 
     def test_non_utf8_path_segment_unicode_path_segments_fails(self):
+        from pyramid.exceptions import URLDecodeError
         foo = DummyContext()
         root = DummyContext(foo)
         policy = self._makeOne(root)
         segment = native_(text_(b'LaPe\xc3\xb1a', 'utf-8'), 'utf-16')
         environ = self._getEnviron(PATH_INFO='/%s' % segment)
         request = DummyRequest(environ)
-        self.assertRaises(UnicodeEncodeError, policy, request)
+        self.assertRaises(URLDecodeError, policy, request)
 
     def test_non_utf8_path_segment_settings_unicode_path_segments_fails(self):
+        from pyramid.exceptions import URLDecodeError
         foo = DummyContext()
         root = DummyContext(foo)
         policy = self._makeOne(root)
         segment = native_(text_(b'LaPe\xc3\xb1a', 'utf-8'), 'utf-16')
         environ = self._getEnviron(PATH_INFO='/%s' % segment)
         request = DummyRequest(environ)
-        self.assertRaises(UnicodeEncodeError, policy, request)
+        self.assertRaises(URLDecodeError, policy, request)
 
     def test_withroute_nothingfancy(self):
         resource = DummyContext()
@@ -1047,6 +1067,13 @@ class TraverseTests(unittest.TestCase):
         traverser = make_traverser({'context':resource, 'view_name':''})
         self._registerTraverser(traverser)
         self._callFUT(resource, '')
+        self.assertEqual(resource.request.environ['PATH_INFO'], '')
+
+    def test_self_unicode_found(self):
+        resource = DummyContext()
+        traverser = make_traverser({'context':resource, 'view_name':''})
+        self._registerTraverser(traverser)
+        self._callFUT(resource, text_(''))
         self.assertEqual(resource.request.environ['PATH_INFO'], '')
 
     def test_self_tuple_found(self):
