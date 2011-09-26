@@ -256,7 +256,7 @@ class TestRequest(unittest.TestCase):
             b'/\xe6\xb5\x81\xe8\xa1\x8c\xe8\xb6\x8b\xe5\x8a\xbf',
             'utf-8'
             )
-        if PY3:
+        if PY3: # pragma: no cover
             body = bytes(json.dumps({'a':inp}), 'utf-16')
         else:
             body = json.dumps({'a':inp}).decode('utf-8').encode('utf-16')
