@@ -1,6 +1,7 @@
 import unittest
 from pyramid import testing
 
+from pyramid.compat import PY3
 from pyramid.compat import text_
 from pyramid.compat import bytes_
 from pyramid.compat import native_
@@ -251,11 +252,17 @@ class TestRequest(unittest.TestCase):
     def test_json_body_alternate_charset(self):
         from pyramid.compat import json
         request = self._makeOne({'REQUEST_METHOD':'POST'})
-        request = request.decode('latin-1')
-        la = text_(b'La Pe\xc3\xb1a', 'utf-8')
-        body = bytes_(json.dumps({'a':la}), 'latin-1')
+        inp = text_(
+            b'/\xe6\xb5\x81\xe8\xa1\x8c\xe8\xb6\x8b\xe5\x8a\xbf',
+            'utf-8'
+            )
+        if PY3:
+            body = bytes(json.dumps({'a':inp}), 'utf-16')
+        else:
+            body = json.dumps({'a':inp}).decode('utf-8').encode('utf-16')
         request.body = body
-        self.assertEqual(request.json_body, {'a':la})
+        request.content_type = 'application/json; charset=utf-16'
+        self.assertEqual(request.json_body, {'a':inp})
 
     def test_json_body_GET_request(self):
         request = self._makeOne({'REQUEST_METHOD':'GET'})
