@@ -251,7 +251,7 @@ class TestRequest(unittest.TestCase):
     def test_json_body_alternate_charset(self):
         from pyramid.compat import json
         request = self._makeOne({'REQUEST_METHOD':'POST'})
-        request.charset = 'latin-1'
+        request = request.decode('latin-1')
         la = text_(b'La Pe\xc3\xb1a', 'utf-8')
         body = bytes_(json.dumps({'a':la}), 'latin-1')
         request.body = body
