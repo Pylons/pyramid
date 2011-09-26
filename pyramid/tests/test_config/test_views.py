@@ -1429,6 +1429,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         request.subpath = ('minimal.pt', )
         result = wrapped(None, request)
         self.assertEqual(result.status, '200 OK')
+        self.assertTrue(result.body.startswith(b'<div'))
 
     def test_add_static_view_package_relative(self):
         from pyramid.interfaces import IStaticURLInfo

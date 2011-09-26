@@ -17,7 +17,6 @@ from pyramid.asset import asset_spec_from_abspath
 from pyramid.compat import json
 from pyramid.compat import string_types
 from pyramid.compat import text_type
-from pyramid.compat import native_
 from pyramid.decorator import reify
 from pyramid.events import BeforeRender
 from pyramid.path import caller_package

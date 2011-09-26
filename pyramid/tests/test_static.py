@@ -143,8 +143,11 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         response = inst(context, request)
         start_response = DummyStartResponse()
         app_iter = response(request.environ, start_response)
-        self.assertEqual(start_response.status, '304 Not Modified')
-        self.assertEqual(list(app_iter), [])
+        try:
+            self.assertEqual(start_response.status, '304 Not Modified')
+            self.assertEqual(list(app_iter), [])
+        finally:
+            app_iter.close()
 
     def test_not_found(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
@@ -306,8 +309,11 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         response = inst(context, request)
         start_response = DummyStartResponse()
         app_iter = response(request.environ, start_response)
-        self.assertEqual(start_response.status, '304 Not Modified')
-        self.assertEqual(list(app_iter), [])
+        try:
+            self.assertEqual(start_response.status, '304 Not Modified')
+            self.assertEqual(list(app_iter), [])
+        finally:
+            app_iter.close()
 
     def test_not_found(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
