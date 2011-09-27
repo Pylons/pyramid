@@ -1,4 +1,5 @@
 import unittest
+from pyramid.compat import PY3
 
 class TestDottedNameResolver(unittest.TestCase):
     def _makeOne(self, package=None):
@@ -13,6 +14,14 @@ class TestDottedNameResolver(unittest.TestCase):
             return e
         else:
             raise AssertionError('Invalid not raised') # pragma: no cover
+
+    def test_zope_dottedname_style_resolve_builtin(self):
+        typ = self._makeOne()
+        if PY3:
+            result = typ._zope_dottedname_style('builtins.str')
+        else:
+            result = typ._zope_dottedname_style('__builtin__.str')
+        self.assertEqual(result, str)
 
     def test_zope_dottedname_style_resolve_absolute(self):
         typ = self._makeOne()
