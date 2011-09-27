@@ -31,13 +31,6 @@ from pyramid.request import DeprecatedRequestMethodsMixin
 from pyramid.request import CallbackMethodsMixin
 from pyramid.url import URLMethodsMixin
 
-try:
-    import zope.component
-    zope.component
-    have_zca = True
-except ImportError: # pragma: no cover
-    have_zca = False
-
 _marker = object()
 
 def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
@@ -135,9 +128,7 @@ def registerEventListener(event_iface=None):
     event will be appended to the list.  You can then compare the
     values in the list to expected event notifications.  This method
     is useful when testing code that wants to call
-    :meth:`pyramid.registry.Registry.notify`,
-    :func:`zope.component.event.dispatch` or
-    :func:`zope.component.event.objectEventNotify`.
+    :meth:`pyramid.registry.Registry.notify`.
 
     The default value of ``event_iface`` (``None``) implies a
     subscriber registered for *any* kind of event.
@@ -727,6 +718,8 @@ class DummyRequest(DeprecatedRequestMethodsMixin, URLMethodsMixin,
         f =  self.registry.queryUtility(IResponseFactory, default=Response)
         return f()
 
+have_zca = True
+
 def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
           settings=None):
     """
@@ -811,7 +804,12 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
             # any existing renderer factory lookup system.
             config.add_renderer(name, renderer)
     config.commit()
-    have_zca and hook_zca and config.hook_zca()
+    global have_zca
+    try:
+        have_zca and hook_zca and config.hook_zca()
+    except ImportError:
+        # pragma: no cover (dont choke on not being able to import z.component)
+        have_zca = False
     config.begin(request=request)
     return config
 
@@ -826,12 +824,13 @@ def tearDown(unhook_zca=True):
     argument ``hook_zca=True``.  If :mod:`zope.component` cannot be
     imported, ignore the argument.
     """
-    if unhook_zca:
+    global have_zca
+    if unhook_zca and have_zca:
         try:
             from zope.component import getSiteManager
             getSiteManager.reset()
         except ImportError: # pragma: no cover
-            pass
+            have_zca = False
     info = manager.pop()
     manager.clear()
     if info is not None:
