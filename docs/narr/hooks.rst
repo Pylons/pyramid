@@ -863,8 +863,8 @@ Pyramid request handling function or another tween.  ``registry`` will be the
 Pyramid :term:`application registry` represented by this Configurator.  A
 tween factory must return a tween when it is called.
 
-A tween is a callable which accepts a :term:`request` object and returns a
-two-tuple a :term:`response` object.
+A tween is a callable which accepts a :term:`request` object and returns
+a :term:`response` object.
 
 Here's an example of a tween factory:
 
