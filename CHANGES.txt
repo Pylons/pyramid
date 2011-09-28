@@ -1,20 +1,11 @@
-Next release
-============
+1.2.1 (2011-09-28)
+==================
 
 Features
 --------
 
 - Lone instance methods can now be treated as view callables (see
   https://github.com/Pylons/pyramid/pull/283).
-
-Dependencies
-------------
-
-- Pyramid no longer depends on the zope.component package, except as a
-  testing dependency.
-
-- Pyramid now depends on a ``zope.interface`` version greater than or equal
-  to 3.8.0.
 
 Bug Fixes
 ---------
