@@ -16,6 +16,13 @@ Dependencies
 - Pyramid now depends on a ``zope.interface`` version greater than or equal
   to 3.8.0.
 
+Bug Fixes
+---------
+
+- Update auth_tkt authentication policy to accept unicode tokens as long as
+  they only contain ASCII content. See
+  https://github.com/Pylons/pyramid/issues/293.
+
 1.2 (2011-09-12)
 ================
 
