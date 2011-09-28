@@ -245,7 +245,9 @@ its API is much nicer than the ZCA registry API, work on it was largely
 abandoned and it is not used in :app:`Pyramid`.  We continued to use a ZCA
 registry within :app:`Pyramid` because it ultimately proved a better fit.
 
-.. note:: We continued using ZCA registry rather than disusing it in
+.. note::
+
+   We continued using ZCA registry rather than disusing it in
    favor of using the registry implementation in
    :mod:`repoze.component` largely because the ZCA concept of
    interfaces provides for use of an interface hierarchy, which is
@@ -406,7 +408,7 @@ predicate that narrows matching to something that accepts a JSON response:
    :linenos:
 
    from pyramid.view import view_config
-   @view_config(name='post_view', request_method='POST', 
+   @view_config(name='post_view', request_method='POST',
                 accept='application/json', renderer='json')
    def post_view(request):
        return 'POSTed'
@@ -791,12 +793,12 @@ very well in general. Quoting from the `Model-View-Controller Wikipedia entry
     often via a registered handler or callback and converts the event
     into appropriate user action, understandable for the model.
 
-    The controller notifies the model of the user action, possibly  
+    The controller notifies the model of the user action, possibly
     resulting in a change in the model's state. (For example, the
     controller updates the user's shopping cart.)[5]
 
     A view queries the model in order to generate an appropriate
-    user interface (for example, the view lists the shopping cart's     
+    user interface (for example, the view lists the shopping cart's
     contents). Note that the view gets its own data from the model.
 
     The controller may (in some implementations) issue a general
@@ -1206,7 +1208,7 @@ printed, right?  Sadly, no:
 
 .. code-block:: text
 
-    [chrism@thinko]$ python app.py 
+    [chrism@thinko]$ python app.py
     [<function foo at 0x7f4ea41ab1b8>,
      <function foo at 0x7f4ea41ab230>,
      <function bar at 0x7f4ea41ab2a8>]
@@ -1539,7 +1541,7 @@ global*:
             else:
                 error = 'Invalid username/password'
         # this is executed if the request method was GET or the
-        # credentials were invalid    
+        # credentials were invalid
 
 The `Pylons 1.X <http://pylonsproject.org>`_ web framework uses a similar
 strategy.  It calls these things "Stacked Object Proxies", so, for purposes
@@ -1639,7 +1641,7 @@ comments take into account what we've discussed in the
 
    def hello_world(request):  # accepts a request; no request thread local reqd
        # explicit response object means no response threadlocal
-       return Response('Hello world!') 
+       return Response('Hello world!')
 
    if __name__ == '__main__':
        from pyramid.config import Configurator
@@ -1658,48 +1660,48 @@ be done from within other includes.  Any directive can be used within an
 include that can be used outside of one (such as
 :meth:`~pyramid.config.Configurator.add_view`, etc).
 
-Pyramid has a conflict detection system that will throw an error if two 
-included externals try to add "the same" configuration in a conflicting 
-way (such as both externals trying to add a route using the same name, 
-or both externals trying to add a view with the same set of predicates). 
-It's awful tempting to call this set of features something that can be 
-used to compose a system out of "pluggable applications".  But in 
-reality, there are a number of problems with claiming this: 
+Pyramid has a conflict detection system that will throw an error if two
+included externals try to add "the same" configuration in a conflicting
+way (such as both externals trying to add a route using the same name,
+or both externals trying to add a view with the same set of predicates).
+It's awful tempting to call this set of features something that can be
+used to compose a system out of "pluggable applications".  But in
+reality, there are a number of problems with claiming this:
 
-- The terminology is strained. Pyramid really has no notion of a 
-  plurality of "applications", just a way to compose configuration 
-  from multiple sources to create a single WSGI application.  That 
-  WSGI application may gain behavior by including or disincluding 
-  configuration, but once it's all composed together, Pyramid 
-  doesn't really provide any machinery which can be used to demarcate 
-  the boundaries of one "application" (in the sense of configuration 
-  from an external that adds routes, views, etc) from another. 
+- The terminology is strained. Pyramid really has no notion of a
+  plurality of "applications", just a way to compose configuration
+  from multiple sources to create a single WSGI application.  That
+  WSGI application may gain behavior by including or disincluding
+  configuration, but once it's all composed together, Pyramid
+  doesn't really provide any machinery which can be used to demarcate
+  the boundaries of one "application" (in the sense of configuration
+  from an external that adds routes, views, etc) from another.
 
-- Pyramid doesn't provide enough "rails" to make it possible to 
-  integrate truly honest-to-god, download-an-app-from-a-random-place 
-  and-plug-it-in-to-create-a-system "pluggable" applications. 
-  Because Pyramid itself isn't opinionated (it doesn't mandate a 
-  particular kind of database, it offers multiple ways to map URLs 
-  to code, etc), it's unlikely that someone who creates something 
-  "application-like" will be able to casually redistribute it 
-  to J. Random Pyramid User and have it "just work" by asking him 
-  to config.include a function from the package. 
-  This is particularly true of very high level components such 
-  as blogs, wikis, twitter clones, commenting systems, etc. 
-  The "integrator" (the Pyramid developer who has downloaded a 
-  package advertised as a "pluggable app") will almost certainly 
-  have made different choices about e.g. what type of persistence 
-  system he's using, and for the integrator to appease the 
-  requirements of the "pluggable application", he may be required 
-  to set up a different database, make changes to his own code 
-  to prevent his application from "shadowing" the pluggable 
-  app (or vice versa), and any other number of arbitrary 
-  changes. 
+- Pyramid doesn't provide enough "rails" to make it possible to
+  integrate truly honest-to-god, download-an-app-from-a-random-place
+  and-plug-it-in-to-create-a-system "pluggable" applications.
+  Because Pyramid itself isn't opinionated (it doesn't mandate a
+  particular kind of database, it offers multiple ways to map URLs
+  to code, etc), it's unlikely that someone who creates something
+  "application-like" will be able to casually redistribute it
+  to J. Random Pyramid User and have it "just work" by asking him
+  to config.include a function from the package.
+  This is particularly true of very high level components such
+  as blogs, wikis, twitter clones, commenting systems, etc.
+  The "integrator" (the Pyramid developer who has downloaded a
+  package advertised as a "pluggable app") will almost certainly
+  have made different choices about e.g. what type of persistence
+  system he's using, and for the integrator to appease the
+  requirements of the "pluggable application", he may be required
+  to set up a different database, make changes to his own code
+  to prevent his application from "shadowing" the pluggable
+  app (or vice versa), and any other number of arbitrary
+  changes.
 
-For this reason, we claim that Pyramid has "extensible" applications, 
-not pluggable applications.  Any Pyramid application can be extended 
-without forking it as long as its configuration statements have been 
-composed into things that can be pulled in via "config.include". 
+For this reason, we claim that Pyramid has "extensible" applications,
+not pluggable applications.  Any Pyramid application can be extended
+without forking it as long as its configuration statements have been
+composed into things that can be pulled in via "config.include".
 
 It's also perfectly reasonable for a single developer or team to create a set
 of interoperating components which can be enabled or disabled by using

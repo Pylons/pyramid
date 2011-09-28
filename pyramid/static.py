@@ -50,7 +50,7 @@ class PackageURLParser(StaticURLParser):
                 cache_max_age=self.cache_max_age)(environ, start_response)
         pi = environ.get('PATH_INFO')
         if pi and pi != '/':
-            return self.error_extra_path(environ, start_response) 
+            return self.error_extra_path(environ, start_response)
         full = pkg_resources.resource_filename(self.package_name, resource)
         if_none_match = environ.get('HTTP_IF_NONE_MATCH')
         if if_none_match:
@@ -163,7 +163,7 @@ class StaticURLInfo(object):
 
             attr = extra.pop('view_attr', None)
 
-            # register a route using the computed view, permission, and 
+            # register a route using the computed view, permission, and
             # pattern, plus any extras passed to us via add_static_view
             pattern = "%s*subpath" % name # name already ends with slash
             self.config.add_route(name, pattern, **extra)
@@ -207,14 +207,15 @@ class static_view(object):
     the static application will consider request.path_info as ``PATH_INFO``
     input. By default, this is ``False``.
 
-    .. note:: If the ``root_dir`` is relative to a :term:`package`, or
-         is a :term:`asset specification` the :app:`Pyramid`
-         :class:`pyramid.config.Configurator` method can be
-         used to override assets within the named ``root_dir``
-         package-relative directory.  However, if the ``root_dir`` is
-         absolute, configuration will not be able to
-         override the assets it contains.  """
-    
+    .. note::
+
+       If the ``root_dir`` is relative to a :term:`package`, or is a
+       :term:`asset specification` the :app:`Pyramid`
+       :class:`pyramid.config.Configurator` method can be used to override
+       assets within the named ``root_dir`` package-relative directory.
+       However, if the ``root_dir`` is absolute, configuration will not be able
+       to override the assets it contains.  """
+
     def __init__(self, root_dir, cache_max_age=3600, package_name=None,
                  use_subpath=False):
         # package_name is for bw compat; it is preferred to pass in a

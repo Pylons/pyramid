@@ -7,21 +7,20 @@ application is typically a simple Python function that accepts two
 parameters: :term:`context` and :term:`request`.  A view callable is
 assumed to return a :term:`response` object.
 
-.. note:: A :app:`Pyramid` view can also be defined as callable
-   which accepts *only* a :term:`request` argument.  You'll see
-   this one-argument pattern used in other :app:`Pyramid` tutorials
-   and applications.  Either calling convention will work in any
-   :app:`Pyramid` application; the calling conventions can be used
-   interchangeably as necessary. In :term:`traversal` based applications,
-   URLs are mapped to a context :term:`resource`, and since our
-   :term:`resource tree` also represents our application's
-   "domain model", we're often interested in the context, because
-   it represents the persistent storage of our application.  For
-   this reason, in this tutorial we define views as callables that
-   accept ``context`` in the callable argument list.  If you do
-   need the ``context`` within a view function that only takes
-   the request as a single argument, you can obtain it via
-   ``request.context``.
+.. note::
+
+   A :app:`Pyramid` view can also be defined as callable which accepts *only* a
+   :term:`request` argument.  You'll see this one-argument pattern used in other
+   :app:`Pyramid` tutorials and applications.  Either calling convention will
+   work in any :app:`Pyramid` application; the calling conventions can be used
+   interchangeably as necessary. In :term:`traversal` based applications, URLs
+   are mapped to a context :term:`resource`, and since our :term:`resource tree`
+   also represents our application's "domain model", we're often interested in
+   the context, because it represents the persistent storage of our application.
+   For this reason, in this tutorial we define views as callables that accept
+   ``context`` in the callable argument list.  If you do need the ``context``
+   within a view function that only takes the request as a single argument, you
+   can obtain it via ``request.context``.
 
 We're going to define several :term:`view callable` functions, then wire them
 into :app:`Pyramid` using some :term:`view configuration`.
@@ -252,15 +251,16 @@ the below:
 .. literalinclude:: src/views/tutorial/templates/view.pt
    :language: xml
 
-.. note:: The names available for our use in a template are always those that
-   are present in the dictionary returned by the view callable.  But our
-   templates make use of a ``request`` object that none of our tutorial views
-   return in their dictionary.  This value appears as if "by magic".
-   However, ``request`` is one of several names that are available "by
-   default" in a template when a template renderer is used.  See
-   :ref:`chameleon_template_renderers` for more information about other names
-   that are available by default in a template when a template is used as a
-   renderer.
+.. note::
+
+   The names available for our use in a template are always those that are
+   present in the dictionary returned by the view callable.  But our templates
+   make use of a ``request`` object that none of our tutorial views return in
+   their dictionary.  This value appears as if "by magic".  However, ``request``
+   is one of several names that are available "by default" in a template when a
+   template renderer is used.  See :ref:`chameleon_template_renderers` for more
+   information about other names that are available by default in a template
+   when a template is used as a renderer.
 
 The ``edit.pt`` Template
 ------------------------

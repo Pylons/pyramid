@@ -122,11 +122,13 @@ class.  In the ``hello_world`` function, the string ``'Hello world!'`` is
 passed to the ``Response`` constructor as the *body* of the response.  In the
 ``goodbye_world`` function, the string ``'Goodbye world!'`` is passed.
 
-.. note:: As we'll see in later chapters, returning a literal
-   :term:`response` object from a view callable is not always required; we
-   can instead use a :term:`renderer` in our view configurations.  If we use
-   a renderer, our view callable is allowed to return a value that the
-   renderer understands, and the renderer generates a response on our behalf.
+.. note::
+
+   As we'll see in later chapters, returning a literal :term:`response` object
+   from a view callable is not always required; we can instead use a
+   :term:`renderer` in our view configurations.  If we use a renderer, our view
+   callable is allowed to return a value that the renderer understands, and the
+   renderer generates a response on our behalf.
 
 .. index::
    single: imperative configuration

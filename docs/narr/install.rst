@@ -10,7 +10,7 @@ Before You Install
 ------------------
 
 You will need `Python <http://python.org>`_ version 2.5 or better to
-run :app:`Pyramid`.  
+run :app:`Pyramid`.
 
 .. sidebar:: Python Versions
 
@@ -150,7 +150,7 @@ setuptools`` within the Python interpreter you'd like to run
 .. code-block:: text
 
    [chrism@vitaminf pyramid]$ python
-   Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32) 
+   Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32)
    [GCC 4.4.3] on linux2
    Type "help", "copyright", "credits" or "license" for more information.
    >>> import setuptools
@@ -229,14 +229,15 @@ following:
    New python executable in env/bin/python
    Installing setuptools.............done.
 
-.. warning:: Using ``--no-site-packages`` when generating your
-   virtualenv is *very important*. This flag provides the necessary
-   isolation for running the set of packages required by
-   :app:`Pyramid`.  If you do not specify ``--no-site-packages``,
-   it's possible that :app:`Pyramid` will not install properly into
-   the virtualenv, or, even if it does, may not run properly,
-   depending on the packages you've already got installed into your
-   Python's "main" site-packages dir.
+.. warning::
+
+   Using ``--no-site-packages`` when generating your virtualenv is *very
+   important*. This flag provides the necessary isolation for running the set of
+   packages required by :app:`Pyramid`.  If you do not specify
+   ``--no-site-packages``, it's possible that :app:`Pyramid` will not install
+   properly into the virtualenv, or, even if it does, may not run properly,
+   depending on the packages you've already got installed into your Python's
+   "main" site-packages dir.
 
 .. warning:: If you're on UNIX, *do not* use ``sudo`` to run the
    ``virtualenv`` script.  It's perfectly acceptable (and desirable)
@@ -350,5 +351,5 @@ various Chameleon libraries, WebOb, Paste, PasteScript, and
 PasteDeploy libraries are installed.
 
 Additionally, as chronicled in :ref:`project_narr`, scaffolds will be registered,
-which make it easy to start a new :app:`Pyramid` project. 
+which make it easy to start a new :app:`Pyramid` project.
 

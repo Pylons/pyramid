@@ -55,18 +55,21 @@ Here's some sample code that implements a minimal NotFound view callable:
    def notfound_view(request):
        return HTTPNotFound()
 
-.. note:: When a NotFound view callable is invoked, it is passed a
-   :term:`request`.  The ``exception`` attribute of the request will be an
-   instance of the :exc:`~pyramid.httpexceptions.HTTPNotFound` exception that
-   caused the not found view to be called.  The value of
-   ``request.exception.message`` will be a value explaining why the not found
-   error was raised.  This message will be different when the
-   ``debug_notfound`` environment setting is true than it is when it is
-   false.
+.. note::
 
-.. warning:: When a NotFound view callable accepts an argument list as
-   described in :ref:`request_and_context_view_definitions`, the ``context``
-   passed as the first argument to the view callable will be the
+   When a NotFound view callable is invoked, it is passed a :term:`request`.
+   The ``exception`` attribute of the request will be an instance of the
+   :exc:`~pyramid.httpexceptions.HTTPNotFound` exception that caused the not
+   found view to be called.  The value of ``request.exception.message`` will be
+   a value explaining why the not found error was raised.  This message will be
+   different when the ``debug_notfound`` environment setting is true than it is
+   when it is false.
+
+.. warning::
+
+   When a NotFound view callable accepts an argument list as described in
+   :ref:`request_and_context_view_definitions`, the ``context`` passed as the
+   first argument to the view callable will be the
    :exc:`~pyramid.httpexceptions.HTTPNotFound` exception instance.  If
    available, the resource context will still be available as
    ``request.context``.
@@ -121,15 +124,16 @@ Here's some sample code that implements a minimal forbidden view:
    def forbidden_view(request):
        return Response('forbidden')
 
-.. note:: When a forbidden view callable is invoked, it is passed a
-   :term:`request`.  The ``exception`` attribute of the request will be an
-   instance of the :exc:`~pyramid.httpexceptions.HTTPForbidden` exception
-   that caused the forbidden view to be called.  The value of
-   ``request.exception.message`` will be a value explaining why the forbidden
-   was raised and ``request.exception.result`` will be extended information
-   about the forbidden exception.  These messages will be different when the
-   ``debug_authorization`` environment setting is true than it is when it is
-   false.
+.. note::
+
+   When a forbidden view callable is invoked, it is passed a :term:`request`.
+   The ``exception`` attribute of the request will be an instance of the
+   :exc:`~pyramid.httpexceptions.HTTPForbidden` exception that caused the
+   forbidden view to be called.  The value of ``request.exception.message`` will
+   be a value explaining why the forbidden was raised and
+   ``request.exception.result`` will be extended information about the forbidden
+   exception.  These messages will be different when the ``debug_authorization``
+   environment setting is true than it is when it is false.
 
 .. index::
    single: request factory
@@ -606,7 +610,7 @@ marked up with ``zope.interface.implements(IResponse)``:
 
    class MyResponse(object):
        implements(IResponse)
-       # ... an implementation of every method and attribute 
+       # ... an implementation of every method and attribute
        # documented in IResponse should follow ...
 
 When an alternate response object implementation is returned by a view

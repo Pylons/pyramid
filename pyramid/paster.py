@@ -57,13 +57,14 @@ def bootstrap(config_uri, request=None):
               and other code that is not normally invoked during active WSGI
               requests.
 
-    .. note:: For a complex config file containing multiple :app:`Pyramid`
-              applications, this function will setup the environment under
-              the context of the last-loaded :app:`Pyramid` application. You
-              may load a specific application yourself by using the
-              lower-level functions :meth:`pyramid.paster.get_app` and
-              :meth:`pyramid.scripting.prepare` in conjunction with
-              :attr:`pyramid.config.global_registries`.
+    .. note::
+
+       For a complex config file containing multiple :app:`Pyramid`
+       applications, this function will setup the environment under the context
+       of the last-loaded :app:`Pyramid` application. You may load a specific
+       application yourself by using the lower-level functions
+       :meth:`pyramid.paster.get_app` and :meth:`pyramid.scripting.prepare` in
+       conjunction with :attr:`pyramid.config.global_registries`.
 
     ``config_uri`` -- specifies the PasteDeploy config file to use for the
     interactive shell. The format is ``inifile#name``. If the name is left
@@ -246,7 +247,7 @@ class PRoutesCommand(PCommand):
 
     def out(self, msg): # pragma: no cover
         print msg
-    
+
     def command(self):
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IViewClassifier
@@ -305,7 +306,7 @@ class PViewsCommand(PCommand):
 
     def out(self, msg): # pragma: no cover
         print msg
-    
+
     def _find_multi_routes(self, mapper, request):
         infos = []
         path = request.environ['PATH_INFO']
@@ -336,7 +337,7 @@ class PViewsCommand(PCommand):
         from pyramid.request import Request
         from pyramid.traversal import DefaultRootFactory
         from pyramid.traversal import ResourceTreeTraverser
-            
+
         q = registry.queryUtility
         root_factory = q(IRootFactory, default=DefaultRootFactory)
         routes_mapper = q(IRoutesMapper)
