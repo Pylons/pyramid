@@ -14,6 +14,7 @@ from pyramid.compat import binary_type
 from pyramid.compat import url_unquote
 from pyramid.compat import url_quote
 from pyramid.compat import bytes_
+from pyramid.compat import ascii_native_
 
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.interfaces import IDebugLogger
@@ -729,7 +730,7 @@ class AuthTktCookieHelper(object):
         for token in tokens:
             if isinstance(token, text_type):
                 try:
-                    token = token.encode('ascii')
+                    token = ascii_native_(token)
                 except UnicodeEncodeError:
                     raise ValueError("Invalid token %r" % (token,))
             if not (isinstance(token, str) and VALID_TOKEN.match(token)):

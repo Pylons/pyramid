@@ -616,7 +616,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         now = time.time()
         helper.auth_tkt.timestamp = now
         helper.now = now + 1
-        helper.auth_tkt.tokens = (u'a', )
+        helper.auth_tkt.tokens = (text_('a'), )
         request = self._makeRequest('bogus')
         result = helper.identify(request)
         self.assertTrue(result)
