@@ -1,3 +1,11 @@
+Next release (on 1.1 branch)
+============================
+
+Documentation
+-------------
+
+- Documentation ``..note`` and ``..warning`` fixes.
+
 1.1.2 (2011-08-17)
 ==================
 
