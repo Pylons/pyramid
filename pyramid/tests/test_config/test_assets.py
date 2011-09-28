@@ -163,9 +163,9 @@ class TestOverrideProvider(unittest.TestCase):
         import pyramid.tests.test_config
         provider = self._makeOne(pyramid.tests.test_config)
         here = os.path.dirname(os.path.abspath(__file__))
-        expected = open(os.path.join(here, resource_name)).read()
-        result = provider.get_resource_stream(None, resource_name)
-        self.assertEqual(result.read().replace('\r', ''), expected)
+        expected = read_(os.path.join(here, resource_name))
+        with provider.get_resource_stream(None, resource_name) as result:
+            self.assertEqual(result.read().replace(b'\r', b''), expected)
 
     def test_get_resource_string_no_overrides(self):
         import os
@@ -173,9 +173,9 @@ class TestOverrideProvider(unittest.TestCase):
         import pyramid.tests.test_config
         provider = self._makeOne(pyramid.tests.test_config)
         here = os.path.dirname(os.path.abspath(__file__))
-        expected = open(os.path.join(here, resource_name)).read()
+        expected = read_(os.path.join(here, resource_name))
         result = provider.get_resource_string(None, resource_name)
-        self.assertEqual(result.replace('\r', ''), expected)
+        self.assertEqual(result.replace(b'\r', b''), expected)
 
     def test_has_resource_no_overrides(self):
         resource_name = 'test_assets.py'
@@ -221,9 +221,9 @@ class TestOverrideProvider(unittest.TestCase):
         import pyramid.tests.test_config
         provider = self._makeOne(pyramid.tests.test_config)
         here = os.path.dirname(os.path.abspath(__file__))
-        expected = open(os.path.join(here, resource_name)).read()
-        result = provider.get_resource_stream(None, resource_name)
-        self.assertEqual(result.read(), expected)
+        expected = read_(os.path.join(here, resource_name))
+        with provider.get_resource_stream(None, resource_name) as result:
+            self.assertEqual(result.read(), expected)
 
     def test_get_resource_string_override_returns_None(self):
         overrides = DummyOverrides(None)
@@ -233,7 +233,7 @@ class TestOverrideProvider(unittest.TestCase):
         import pyramid.tests.test_config
         provider = self._makeOne(pyramid.tests.test_config)
         here = os.path.dirname(os.path.abspath(__file__))
-        expected = open(os.path.join(here, resource_name)).read()
+        expected = read_(os.path.join(here, resource_name))
         result = provider.get_resource_string(None, resource_name)
         self.assertEqual(result, expected)
 
@@ -273,12 +273,13 @@ class TestOverrideProvider(unittest.TestCase):
         self.assertEqual(result, 'value')
 
     def test_get_resource_stream_override_returns_value(self):
-        overrides = DummyOverrides('value')
+        from io import BytesIO
+        overrides = DummyOverrides(BytesIO(b'value'))
         import pyramid.tests.test_config
         self._registerOverrides(overrides)
         provider = self._makeOne(pyramid.tests.test_config)
-        result = provider.get_resource_stream(None, 'test_assets.py')
-        self.assertEqual(result, 'value')
+        with provider.get_resource_stream(None, 'test_assets.py') as stream:
+            self.assertEqual(stream.getvalue(), b'value')
 
     def test_get_resource_string_override_returns_value(self):
         overrides = DummyOverrides('value')
@@ -419,9 +420,10 @@ class TestPackageOverrides(unittest.TestCase):
         po = self._makeOne(package)
         po.overrides= overrides
         here = os.path.dirname(os.path.abspath(__file__))
-        expected = open(os.path.join(here, 'test_assets.py')).read()
-        self.assertEqual(po.get_stream('whatever').read().replace('\r', ''),
-                         expected)
+        expected = read_(os.path.join(here, 'test_assets.py'))
+        with po.get_stream('whatever') as stream:
+            self.assertEqual(stream.read().replace(b'\r', b''),
+                             expected)
         
     def test_get_stream_file_doesnt_exist(self):
         overrides = [ DummyOverride(None), DummyOverride(
@@ -439,8 +441,9 @@ class TestPackageOverrides(unittest.TestCase):
         po = self._makeOne(package)
         po.overrides= overrides
         here = os.path.dirname(os.path.abspath(__file__))
-        expected = open(os.path.join(here, 'test_assets.py')).read()
-        self.assertEqual(po.get_string('whatever').replace('\r', ''), expected)
+        expected = read_(os.path.join(here, 'test_assets.py'))
+        self.assertEqual(po.get_string('whatever').replace(b'\r', b''),
+                         expected)
         
     def test_get_string_file_doesnt_exist(self):
         overrides = [ DummyOverride(None), DummyOverride(
@@ -581,9 +584,14 @@ class DummyPackage:
 
 class DummyUnderOverride:
     def __call__(self, package, path, override_package, override_prefix,
-                 _info=u''):
+                 _info=''):
         self.package = package
         self.path = path
         self.override_package = override_package
         self.override_prefix = override_prefix
+
+def read_(src):
+    with open(src, 'rb') as f:
+        contents = f.read()
+    return contents
 

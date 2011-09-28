@@ -1,19 +1,28 @@
-import ConfigParser
 import os
 import sys
 from code import interact
 
 import zope.deprecation
 
-from paste.deploy import loadapp
-from paste.script.command import Command
+try:
+    from paste.deploy import loadapp
+except ImportError: # pragma: no cover
+    def loadapp(*arg, **kw):
+        raise NotImplementedError
+
+try:
+    from paste.script.command import Command
+except ImportError: # pragma: no cover
+    class Command:
+        pass
 
 from pyramid.interfaces import IMultiView
 from pyramid.interfaces import ITweens
 
+from pyramid.compat import print_
+from pyramid.compat import configparser
 from pyramid.scripting import prepare
 from pyramid.util import DottedNameResolver
-
 from pyramid.tweens import MAIN
 from pyramid.tweens import INGRESS
 
@@ -138,7 +147,7 @@ class PShellCommand(PCommand):
                             "option will override the 'setup' key in the "
                             "[pshell] ini section."))
 
-    ConfigParser = ConfigParser.ConfigParser # testing
+    ConfigParser = configparser.ConfigParser # testing
 
     loaded_objects = {}
     object_help = {}
@@ -149,7 +158,7 @@ class PShellCommand(PCommand):
         config.read(filename)
         try:
             items = config.items('pshell')
-        except ConfigParser.NoSectionError:
+        except configparser.NoSectionError:
             return
 
         resolver = DottedNameResolver(None)
@@ -301,8 +310,8 @@ class PRoutesCommand(PCommand):
         return config.get_routes_mapper()
 
     def out(self, msg): # pragma: no cover
-        print msg
-
+        print_(msg)
+    
     def command(self):
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IViewClassifier
@@ -360,8 +369,8 @@ class PViewsCommand(PCommand):
     parser = Command.standard_parser(simulate=True)
 
     def out(self, msg): # pragma: no cover
-        print msg
-
+        print_(msg)
+    
     def _find_multi_routes(self, mapper, request):
         infos = []
         path = request.environ['PATH_INFO']
@@ -380,7 +389,7 @@ class PViewsCommand(PCommand):
         configuration` within the application registry; return the view.
         """
         from zope.interface import providedBy
-        from zope.interface import implements
+        from zope.interface import implementer
         from pyramid.interfaces import IRequest
         from pyramid.interfaces import IRootFactory
         from pyramid.interfaces import IRouteRequest
@@ -401,8 +410,8 @@ class PViewsCommand(PCommand):
         adapters = registry.adapters
         request = None
 
+        @implementer(IMultiView)
         class RoutesMultiView(object):
-            implements(IMultiView)
 
             def __init__(self, infos, context_iface, root_factory, request):
                 self.views = []
@@ -606,7 +615,7 @@ class PTweensCommand(PCommand):
         return config.registry.queryUtility(ITweens)
 
     def out(self, msg): # pragma: no cover
-        print msg
+        print_(msg)
 
     def show_chain(self, chain):
         fmt = '%-10s  %-65s'

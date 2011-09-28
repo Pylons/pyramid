@@ -48,9 +48,11 @@ class DummyModule:
     __file__ = ''
 
 from zope.interface import Interface
-from zope.interface import implements
+from zope.interface import implementer
 class IDummyEvent(Interface):
     pass
 
+@implementer(IDummyEvent)
 class DummyEvent(object):
-    implements(IDummyEvent)
+    pass
+    

@@ -1,12 +1,19 @@
 from codecs import utf_8_decode
 from codecs import utf_8_encode
 from hashlib import md5
+import base64
 import datetime
 import re
 import time as time_mod
-import urllib
 
-from zope.interface import implements
+from zope.interface import implementer
+
+from pyramid.compat import long
+from pyramid.compat import text_type
+from pyramid.compat import binary_type
+from pyramid.compat import url_unquote
+from pyramid.compat import url_quote
+from pyramid.compat import bytes_
 
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.interfaces import IDebugLogger
@@ -105,6 +112,7 @@ class CallbackAuthenticationPolicy(object):
              )
         return effective_principals
 
+@implementer(IAuthenticationPolicy)
 class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
     """ A :app:`Pyramid` :term:`authentication policy` which
     obtains data from the :mod:`repoze.who` 1.X WSGI 'API' (the
@@ -129,7 +137,6 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
     Objects of this class implement the interface described by
     :class:`pyramid.interfaces.IAuthenticationPolicy`.
     """
-    implements(IAuthenticationPolicy)
 
     def __init__(self, identifier_name='auth_tkt', callback=None):
         self.identifier_name = identifier_name
@@ -193,6 +200,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         identity = self._get_identity(request)
         return identifier.forget(request.environ, identity)
 
+@implementer(IAuthenticationPolicy)
 class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
     """ A :app:`Pyramid` :term:`authentication policy` which
     obtains data from the ``REMOTE_USER`` WSGI environment variable.
@@ -222,7 +230,6 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
     Objects of this class implement the interface described by
     :class:`pyramid.interfaces.IAuthenticationPolicy`.
     """
-    implements(IAuthenticationPolicy)
 
     def __init__(self, environ_key='REMOTE_USER', callback=None, debug=False):
         self.environ_key = environ_key
@@ -238,6 +245,7 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
     def forget(self, request):
         return []
 
+@implementer(IAuthenticationPolicy)
 class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
     """ A :app:`Pyramid` :term:`authentication policy` which
     obtains data from an :class:`paste.auth.auth_tkt` cookie.
@@ -340,7 +348,6 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
     Objects of this class implement the interface described by
     :class:`pyramid.interfaces.IAuthenticationPolicy`.
     """
-    implements(IAuthenticationPolicy)
     def __init__(self,
                  secret,
                  callback=None,
@@ -383,10 +390,10 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
         return self.cookie.forget(request)
 
 def b64encode(v):
-    return v.encode('base64').strip().replace('\n', '')
+    return base64.b64encode(bytes_(v)).strip().replace(b'\n', b'')
 
 def b64decode(v):
-    return v.decode('base64')
+    return base64.b64decode(bytes_(v))
 
 # this class licensed under the MIT license (stolen from Paste)
 class AuthTicket(object):
@@ -440,7 +447,7 @@ class AuthTicket(object):
 
     def cookie_value(self):
         v = '%s%08x%s!' % (self.digest(), int(self.time),
-                           urllib.quote(self.userid))
+                           url_quote(self.userid))
         if self.tokens:
             v += self.tokens + '!'
         v += self.user_data
@@ -469,13 +476,13 @@ def parse_ticket(secret, ticket, ip):
     digest = ticket[:32]
     try:
         timestamp = int(ticket[32:40], 16)
-    except ValueError, e:
+    except ValueError as e:
         raise BadTicket('Timestamp is not a hex integer: %s' % e)
     try:
         userid, data = ticket[40:].split('!', 1)
     except ValueError:
         raise BadTicket('userid is not followed by !')
-    userid = urllib.unquote(userid)
+    userid = url_unquote(userid)
     if '!' in data:
         tokens, user_data = data.split('!', 1)
     else: # pragma: no cover (never generated)
@@ -496,14 +503,14 @@ def parse_ticket(secret, ticket, ip):
 
 # this function licensed under the MIT license (stolen from Paste)
 def calculate_digest(ip, timestamp, secret, userid, tokens, user_data):
-    secret = maybe_encode(secret)
-    userid = maybe_encode(userid)
-    tokens = maybe_encode(tokens)
-    user_data = maybe_encode(user_data)
+    secret = bytes_(secret, 'utf-8')
+    userid = bytes_(userid, 'utf-8')
+    tokens = bytes_(tokens, 'utf-8')
+    user_data = bytes_(user_data, 'utf-8')
     digest0 = md5(
-        encode_ip_timestamp(ip, timestamp) + secret + userid + '\0'
-        + tokens + '\0' + user_data).hexdigest()
-    digest = md5(digest0 + secret).hexdigest()
+        encode_ip_timestamp(ip, timestamp) + secret + userid + b'\0'
+        + tokens + b'\0' + user_data).hexdigest()
+    digest = md5(bytes_(digest0) + secret).hexdigest()
     return digest
 
 # this function licensed under the MIT license (stolen from Paste)
@@ -515,12 +522,7 @@ def encode_ip_timestamp(ip, timestamp):
           (t & 0xff00) >> 8,
           t & 0xff)
     ts_chars = ''.join(map(chr, ts))
-    return ip_chars + ts_chars
-
-def maybe_encode(s, encoding='utf8'):
-    if isinstance(s, unicode):
-        s = s.encode(encoding)
-    return s
+    return bytes_(ip_chars + ts_chars)
 
 EXPIRE = object()
 
@@ -546,8 +548,8 @@ class AuthTktCookieHelper(object):
     userid_type_encoders = {
         int: ('int', str),
         long: ('int', str),
-        unicode: ('b64unicode', lambda x: b64encode(utf_8_encode(x)[0])),
-        str: ('b64str', lambda x: b64encode(x)),
+        text_type: ('b64unicode', lambda x: b64encode(utf_8_encode(x)[0])),
+        binary_type: ('b64str', lambda x: b64encode(x)),
         }
     
     def __init__(self, secret, cookie_name='auth_tkt', secure=False,
@@ -658,7 +660,7 @@ class AuthTktCookieHelper(object):
         if reissue and not hasattr(request, '_authtkt_reissued'):
             if ( (now - timestamp) > self.reissue_time ):
                 # work around https://github.com/Pylons/pyramid/issues#issue/108
-                tokens = filter(None, tokens)
+                tokens = list(filter(None, tokens))
                 headers = self.remember(request, userid, max_age=self.max_age,
                                         tokens=tokens)
                 def reissue_authtkt(request, response):
@@ -725,6 +727,11 @@ class AuthTktCookieHelper(object):
             user_data = 'userid_type:%s' % encoding
         
         for token in tokens:
+            if isinstance(token, text_type):
+                try:
+                    token = token.encode('ascii')
+                except UnicodeEncodeError:
+                    raise ValueError("Invalid token %r" % (token,))
             if not (isinstance(token, str) and VALID_TOKEN.match(token)):
                 raise ValueError("Invalid token %r" % (token,))
 
@@ -743,6 +750,7 @@ class AuthTktCookieHelper(object):
         cookie_value = ticket.cookie_value()
         return self._get_cookies(environ, cookie_value, max_age)
 
+@implementer(IAuthenticationPolicy)
 class SessionAuthenticationPolicy(CallbackAuthenticationPolicy):
     """ A :app:`Pyramid` authentication policy which gets its data from the
     configured :term:`session`.  For this authentication policy to work, you
@@ -772,7 +780,6 @@ class SessionAuthenticationPolicy(CallbackAuthenticationPolicy):
         or IRC channels when asking for support.
        
     """
-    implements(IAuthenticationPolicy)
 
     def __init__(self, prefix='auth.', callback=None, debug=False):
         self.callback = callback

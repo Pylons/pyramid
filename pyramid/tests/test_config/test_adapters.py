@@ -1,5 +1,6 @@
 import unittest
 
+from pyramid.compat import PY3
 from pyramid.tests.test_config import IDummy
 
 class AdaptersConfiguratorMixinTests(unittest.TestCase):
@@ -9,12 +10,13 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         return config
 
     def test_add_subscriber_defaults(self):
-        from zope.interface import implements
+        from zope.interface import implementer
         from zope.interface import Interface
         class IEvent(Interface):
             pass
+        @implementer(IEvent)
         class Event:
-            implements(IEvent)
+            pass
         L = []
         def subscriber(event):
             L.append(event)
@@ -28,12 +30,13 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(len(L), 2)
 
     def test_add_subscriber_iface_specified(self):
-        from zope.interface import implements
+        from zope.interface import implementer
         from zope.interface import Interface
         class IEvent(Interface):
             pass
+        @implementer(IEvent)
         class Event:
-            implements(IEvent)
+            pass
         L = []
         def subscriber(event):
             L.append(event)
@@ -59,13 +62,13 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(handler.required, (INewRequest,))
 
     def test_add_object_event_subscriber(self):
-        from zope.interface import implements
+        from zope.interface import implementer
         from zope.interface import Interface
         class IEvent(Interface):
             pass
+        @implementer(IEvent)
         class Event:
             object = 'foo'
-            implements(IEvent)
         event = Event()
         L = []
         def subscriber(object, event):
@@ -101,8 +104,11 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
     def test_add_response_adapter_dottednames(self):
         from pyramid.interfaces import IResponse
         config = self._makeOne(autocommit=True)
-        config.add_response_adapter('pyramid.response.Response',
-                                    'types.StringType')
+        if PY3: # pragma: no cover
+            str_name = 'builtins.str'
+        else:
+            str_name = '__builtin__.str'
+        config.add_response_adapter('pyramid.response.Response', str_name)
         result = config.registry.queryAdapter('foo', IResponse)
-        self.assertTrue(result.body, 'foo')
+        self.assertTrue(result.body, b'foo')
 

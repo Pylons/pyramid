@@ -92,7 +92,7 @@ class TestI18NConfiguratorMixin(unittest.TestCase):
         try:
             config.add_translation_dirs('pyramid.tests.pkgs.localeapp:locale')
             translate = config.registry.getUtility(IChameleonTranslate)
-            self.assertEqual(translate('Approve'), u'Approve')
+            self.assertEqual(translate('Approve'), 'Approve')
         finally:
             manager.pop()
 

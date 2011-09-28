@@ -3,7 +3,7 @@ import os
 
 from zope.deprecation import deprecated
 
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface import Interface
 from zope.interface import alsoProvides
 
@@ -14,6 +14,9 @@ from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
 from pyramid.interfaces import ISession
 
+from pyramid.compat import PY3
+from pyramid.compat import PYPY
+from pyramid.compat import class_types
 from pyramid.config import Configurator
 from pyramid.decorator import reify
 from pyramid.httpexceptions import HTTPForbidden
@@ -125,9 +128,7 @@ def registerEventListener(event_iface=None):
     event will be appended to the list.  You can then compare the
     values in the list to expected event notifications.  This method
     is useful when testing code that wants to call
-    :meth:`pyramid.registry.Registry.notify`,
-    :func:`zope.component.event.dispatch` or
-    :func:`zope.component.event.objectEventNotify`.
+    :meth:`pyramid.registry.Registry.notify`.
 
     The default value of ``event_iface`` (``None``) implies a
     subscriber registered for *any* kind of event.
@@ -590,8 +591,8 @@ class DummyResource:
 
 DummyModel = DummyResource # b/w compat (forever)
 
+@implementer(ISession)
 class DummySession(dict):
-    implements(ISession)
     created = None
     new = True
     def changed(self):
@@ -621,6 +622,7 @@ class DummySession(dict):
     def get_csrf_token(self):
         return self.get('_csrft_', None)
         
+@implementer(IRequest)
 class DummyRequest(DeprecatedRequestMethodsMixin, URLMethodsMixin,
                    CallbackMethodsMixin):
     """ A DummyRequest object (incompletely) imitates a :term:`request` object.
@@ -649,7 +651,6 @@ class DummyRequest(DeprecatedRequestMethodsMixin, URLMethodsMixin,
     a Request, use the :class:`pyramid.request.Request` class itself rather
     than this class while writing tests.
     """
-    implements(IRequest)
     method = 'GET'
     application_url = 'http://example.com'
     host = 'example.com:80'
@@ -716,6 +717,8 @@ class DummyRequest(DeprecatedRequestMethodsMixin, URLMethodsMixin,
     def response(self):
         f =  self.registry.queryUtility(IResponseFactory, default=Response)
         return f()
+
+have_zca = True
 
 def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
           settings=None):
@@ -801,7 +804,12 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
             # any existing renderer factory lookup system.
             config.add_renderer(name, renderer)
     config.commit()
-    hook_zca and config.hook_zca()
+    global have_zca
+    try:
+        have_zca and hook_zca and config.hook_zca()
+    except ImportError:
+        # pragma: no cover (dont choke on not being able to import z.component)
+        have_zca = False
     config.begin(request=request)
     return config
 
@@ -816,12 +824,13 @@ def tearDown(unhook_zca=True):
     argument ``hook_zca=True``.  If :mod:`zope.component` cannot be
     imported, ignore the argument.
     """
-    if unhook_zca:
+    global have_zca
+    if unhook_zca and have_zca:
         try:
             from zope.component import getSiteManager
             getSiteManager.reset()
         except ImportError: # pragma: no cover
-            pass
+            have_zca = False
     info = manager.pop()
     manager.clear()
     if info is not None:
@@ -889,21 +898,25 @@ class MockTemplate(object):
         return self.response
 
 def skip_on(*platforms):
+    skip = False
+    for platform in platforms:
+        if skip_on.os_name.startswith(platform):
+            skip = True
+        if platform == 'pypy' and PYPY: # pragma: no cover
+            skip = True
+        if platform == 'py3' and PY3: # pragma: no cover
+            skip = True
     def decorator(func):
-        def wrapper(*args, **kw):
-            for platform in platforms:
-                if skip_on.os_name.startswith(platform):
+        if isinstance(func, class_types):
+            if skip: return None
+            else: return func
+        else:
+            def wrapper(*args, **kw):
+                if skip:
                     return
-                if platform == 'pypy' and skip_on.pypy: # pragma: no cover
-                    return
-            return func(*args, **kw)
-        wrapper.__name__ = func.__name__
-        wrapper.__doc__ = func.__doc__
-        return wrapper
+                return func(*args, **kw)
+            wrapper.__name__ = func.__name__
+            wrapper.__doc__ = func.__doc__
+            return wrapper
     return decorator
 skip_on.os_name = os.name # for testing
-try: # pragma: no cover
-    import __pypy__
-    skip_on.pypy = True
-except ImportError:
-    skip_on.pypy = False

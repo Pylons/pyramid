@@ -2,6 +2,7 @@ import pkg_resources
 import sys
 import weakref
 
+from pyramid.compat import string_types
 from pyramid.exceptions import ConfigurationError
 from pyramid.path import package_of
 
@@ -69,7 +70,7 @@ class DottedNameResolver(object):
             self.package_name = None
             self.package = None
         else:
-            if isinstance(package, basestring):
+            if isinstance(package, string_types):
                 try:
                     __import__(package)
                 except ImportError:
@@ -132,12 +133,12 @@ class DottedNameResolver(object):
         return found
 
     def resolve(self, dotted):
-        if not isinstance(dotted, basestring):
+        if not isinstance(dotted, string_types):
             raise ConfigurationError('%r is not a string' % (dotted,))
         return self.maybe_resolve(dotted)
 
     def maybe_resolve(self, dotted):
-        if isinstance(dotted, basestring):
+        if isinstance(dotted, string_types):
             if ':' in dotted:
                 return self._pkg_resources_style(dotted)
             else:

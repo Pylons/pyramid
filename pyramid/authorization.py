@@ -1,4 +1,4 @@
-from zope.interface import implements
+from zope.interface import implementer
 
 from pyramid.interfaces import IAuthorizationPolicy
 
@@ -9,6 +9,7 @@ from pyramid.security import Allow
 from pyramid.security import Deny
 from pyramid.security import Everyone
 
+@implementer(IAuthorizationPolicy)
 class ACLAuthorizationPolicy(object):
     """ An :term:`authorization policy` which consults an :term:`ACL`
     object attached to a :term:`context` to determine authorization
@@ -59,8 +60,6 @@ class ACLAuthorizationPolicy(object):
     Objects of this class implement the
     :class:`pyramid.interfaces.IAuthorizationPolicy` interface.
     """
-
-    implements(IAuthorizationPolicy)
 
     def permits(self, context, principals, permission):
         """ Return an instance of

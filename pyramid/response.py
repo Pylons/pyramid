@@ -1,12 +1,12 @@
 import venusian
 
 from webob import Response as _Response
-from zope.interface import implements
+from zope.interface import implementer
 from pyramid.interfaces import IResponse
 
+@implementer(IResponse)
 class Response(_Response):
-    implements(IResponse)
-
+    pass
 
 class response_adapter(object):
     """ Decorator activated via a :term:`scan` which treats the function

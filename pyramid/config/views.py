@@ -1,11 +1,9 @@
 import inspect
-from urlparse import urljoin
-from urlparse import urlparse
 
 from zope.interface import Interface
 from zope.interface import classProvides
 from zope.interface import implementedBy
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface.interfaces import IInterface
 
 from pyramid.interfaces import IAuthenticationPolicy
@@ -28,6 +26,9 @@ from pyramid.interfaces import IViewMapperFactory
 from pyramid.interfaces import PHASE1_CONFIG
 
 from pyramid import renderers
+from pyramid.compat import string_types
+from pyramid.compat import urlparse
+from pyramid.compat import im_func
 from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import PredicateMismatch
 from pyramid.httpexceptions import HTTPForbidden
@@ -42,6 +43,9 @@ from pyramid.config.util import MAX_ORDER
 from pyramid.config.util import action_method
 from pyramid.config.util import as_sorted_tuple
 from pyramid.config.util import make_predicates
+
+urljoin = urlparse.urljoin
+url_parse = urlparse.urlparse
 
 def wraps_view(wrapper):
     def inner(self, view):
@@ -333,9 +337,9 @@ class ViewDeriver(object):
             return view
         return decorator(view)
 
+@implementer(IViewMapper)
 class DefaultViewMapper(object):
     classProvides(IViewMapperFactory)
-    implements(IViewMapper)
     def __init__(self, **kw):
         self.attr = kw.get('attr')
 
@@ -414,6 +418,7 @@ class DefaultViewMapper(object):
         return _attr_view
 
 def requestonly(view, attr=None):
+    ismethod = False
     if attr is None:
         attr = '__call__'
     if inspect.isroutine(view):
@@ -423,6 +428,7 @@ def requestonly(view, attr=None):
             fn = view.__init__
         except AttributeError:
             return False
+        ismethod = hasattr(fn, '__call__')
     else:
         try:
             fn = getattr(view, attr)
@@ -436,7 +442,8 @@ def requestonly(view, attr=None):
 
     args = argspec[0]
 
-    if inspect.ismethod(fn):
+    if hasattr(fn, im_func) or ismethod:
+        # it's an instance method (or unbound method on py2)
         if not args:
             return False
         args = args[1:]
@@ -456,8 +463,8 @@ def requestonly(view, attr=None):
 
     return False
 
+@implementer(IMultiView)
 class MultiView(object):
-    implements(IMultiView)
 
     def __init__(self, name):
         self.name = name
@@ -910,7 +917,7 @@ class ViewsConfiguratorMixin(object):
         if not IInterface.providedBy(r_context):
             r_context = implementedBy(r_context)
 
-        if isinstance(renderer, basestring):
+        if isinstance(renderer, string_types):
             renderer = renderers.RendererHelper(
                 name=renderer, package=self.package,
                 registry = self.registry)
@@ -1057,7 +1064,7 @@ class ViewsConfiguratorMixin(object):
             'view', context, name, request_type, IView, containment,
             request_param, request_method, route_name, attr,
             xhr, accept, header, path_info, match_param]
-        discriminator.extend(sorted(custom_predicates))
+        discriminator.extend(sorted([hash(x) for x in custom_predicates]))
         discriminator = tuple(discriminator)
         self.action(discriminator, register)
 
@@ -1147,7 +1154,7 @@ class ViewsConfiguratorMixin(object):
                      mapper=None, http_cache=None):
         view = self.maybe_dotted(view)
         mapper = self.maybe_dotted(mapper)
-        if isinstance(renderer, basestring):
+        if isinstance(renderer, string_types):
             renderer = renderers.RendererHelper(
                 name=renderer, package=self.package,
                 registry = self.registry)
@@ -1206,7 +1213,7 @@ class ViewsConfiguratorMixin(object):
         The ``wrapper`` argument should be the name of another view
         which will wrap this view when rendered (see the ``add_view``
         method's ``wrapper`` argument for a description)."""
-        if isinstance(renderer, basestring):
+        if isinstance(renderer, string_types):
             renderer = renderers.RendererHelper(
                 name=renderer, package=self.package,
                 registry = self.registry)
@@ -1248,7 +1255,7 @@ class ViewsConfiguratorMixin(object):
         which will wrap this view when rendered (see the ``add_view``
         method's ``wrapper`` argument for a description).
         """
-        if isinstance(renderer, basestring):
+        if isinstance(renderer, string_types):
             renderer = renderers.RendererHelper(
                 name=renderer, package=self.package,
                 registry=self.registry)
@@ -1404,8 +1411,8 @@ def isexception(o):
         )
 
 
+@implementer(IStaticURLInfo)
 class StaticURLInfo(object):
-    implements(IStaticURLInfo)
 
     def _get_registrations(self, registry):
         try:
@@ -1449,7 +1456,7 @@ class StaticURLInfo(object):
             # make sure it ends with a slash
             name = name + '/'
 
-        if urlparse(name)[0]:
+        if url_parse(name)[0]:
             # it's a URL
             # url, spec, route_name
             url = name

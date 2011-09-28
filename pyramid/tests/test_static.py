@@ -37,14 +37,14 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         response = inst(context, request)
         response.prepare(request.environ)
         self.assertEqual(response.status, '301 Moved Permanently')
-        self.assertTrue('http://example.com:6543/' in response.body)
+        self.assertTrue(b'http://example.com:6543/' in response.body)
         
     def test_path_info_slash_means_index_html(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest()
         context = DummyContext()
         response = inst(context, request)
-        self.assertTrue('<html>static</html>' in response.body)
+        self.assertTrue(b'<html>static</html>' in response.body)
 
     def test_oob_singledot(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
@@ -52,7 +52,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         context = DummyContext()
         response = inst(context, request)
         self.assertEqual(response.status, '200 OK')
-        self.assertTrue('<html>static</html>' in response.body)
+        self.assertTrue(b'<html>static</html>' in response.body)
 
     def test_oob_emptyelement(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
@@ -60,7 +60,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         context = DummyContext()
         response = inst(context, request)
         self.assertEqual(response.status, '200 OK')
-        self.assertTrue('<html>static</html>' in response.body)
+        self.assertTrue(b'<html>static</html>' in response.body)
 
     def test_oob_dotdotslash(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
@@ -99,21 +99,21 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         request = self._makeRequest({'PATH_INFO':'/subdir/'})
         context = DummyContext()
         response = inst(context, request)
-        self.assertTrue('<html>subdir</html>' in response.body)
+        self.assertTrue(b'<html>subdir</html>' in response.body)
 
     def test_resource_is_file(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':'/index.html'})
         context = DummyContext()
         response = inst(context, request)
-        self.assertTrue('<html>static</html>' in response.body)
+        self.assertTrue(b'<html>static</html>' in response.body)
 
     def test_resource_is_file_with_cache_max_age(self):
         inst = self._makeOne('pyramid.tests:fixtures/static', cache_max_age=600)
         request = self._makeRequest({'PATH_INFO':'/index.html'})
         context = DummyContext()
         response = inst(context, request)
-        self.assertTrue('<html>static</html>' in response.body)
+        self.assertTrue(b'<html>static</html>' in response.body)
         self.assertEqual(len(response.headerlist), 5)
         header_names = [ x[0] for x in response.headerlist ]
         header_names.sort()
@@ -127,7 +127,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         request = self._makeRequest({'PATH_INFO':'/index.html'})
         context = DummyContext()
         response = inst(context, request)
-        self.assertTrue('<html>static</html>' in response.body)
+        self.assertTrue(b'<html>static</html>' in response.body)
         self.assertEqual(len(response.headerlist), 3)
         header_names = [ x[0] for x in response.headerlist ]
         header_names.sort()
@@ -143,8 +143,11 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         response = inst(context, request)
         start_response = DummyStartResponse()
         app_iter = response(request.environ, start_response)
-        self.assertEqual(start_response.status, '304 Not Modified')
-        self.assertEqual(list(app_iter), [])
+        try:
+            self.assertEqual(start_response.status, '304 Not Modified')
+            self.assertEqual(list(app_iter), [])
+        finally:
+            app_iter.close()
 
     def test_not_found(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
@@ -192,7 +195,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         response = inst(context, request)
         response.prepare(request.environ)
         self.assertEqual(response.status, '301 Moved Permanently')
-        self.assertTrue('http://example.com:6543/' in response.body)
+        self.assertTrue(b'http://example.com:6543/' in response.body)
         
     def test_path_info_slash_means_index_html(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
@@ -200,7 +203,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         request.subpath = ()
         context = DummyContext()
         response = inst(context, request)
-        self.assertTrue('<html>static</html>' in response.body)
+        self.assertTrue(b'<html>static</html>' in response.body)
 
     def test_oob_singledot(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
@@ -258,7 +261,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         request.subpath = ('subdir',)
         context = DummyContext()
         response = inst(context, request)
-        self.assertTrue('<html>subdir</html>' in response.body)
+        self.assertTrue(b'<html>subdir</html>' in response.body)
 
     def test_resource_is_file(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
@@ -266,7 +269,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         request.subpath = ('index.html',)
         context = DummyContext()
         response = inst(context, request)
-        self.assertTrue('<html>static</html>' in response.body)
+        self.assertTrue(b'<html>static</html>' in response.body)
 
     def test_resource_is_file_with_cache_max_age(self):
         inst = self._makeOne('pyramid.tests:fixtures/static', cache_max_age=600)
@@ -274,7 +277,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         request.subpath = ('index.html',)
         context = DummyContext()
         response = inst(context, request)
-        self.assertTrue('<html>static</html>' in response.body)
+        self.assertTrue(b'<html>static</html>' in response.body)
         self.assertEqual(len(response.headerlist), 5)
         header_names = [ x[0] for x in response.headerlist ]
         header_names.sort()
@@ -289,7 +292,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         request.subpath = ('index.html',)
         context = DummyContext()
         response = inst(context, request)
-        self.assertTrue('<html>static</html>' in response.body)
+        self.assertTrue(b'<html>static</html>' in response.body)
         self.assertEqual(len(response.headerlist), 3)
         header_names = [ x[0] for x in response.headerlist ]
         header_names.sort()
@@ -306,8 +309,11 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         response = inst(context, request)
         start_response = DummyStartResponse()
         app_iter = response(request.environ, start_response)
-        self.assertEqual(start_response.status, '304 Not Modified')
-        self.assertEqual(list(app_iter), [])
+        try:
+            self.assertEqual(start_response.status, '304 Not Modified')
+            self.assertEqual(list(app_iter), [])
+        finally:
+            app_iter.close()
 
     def test_not_found(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')

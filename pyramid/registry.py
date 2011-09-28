@@ -1,6 +1,9 @@
-from zope.component.registry import Components
+from zope.interface.registry import Components
 
+from pyramid.compat import text_
 from pyramid.interfaces import ISettings
+
+empty = text_('')
 
 class Registry(Components, dict):
     """ A registry object is an :term:`application registry`.  It is used by
@@ -34,8 +37,8 @@ class Registry(Components, dict):
         self.has_listeners = True
         return result
 
-    def registerSelfAdapter(self, required=None, provided=None, name=u'',
-                            info=u'', event=True):
+    def registerSelfAdapter(self, required=None, provided=None, name=empty,
+                            info=empty, event=True):
         # registerAdapter analogue which always returns the object itself
         # when required is matched
         return self.registerAdapter(lambda x: x, required=required,

@@ -1,9 +1,3 @@
-
-try:
-    import cPickle as pickle
-except ImportError: # pragma: no cover
-    import pickle
-
 from hashlib import sha1
 import base64
 import binascii
@@ -11,8 +5,13 @@ import hmac
 import time
 import os
 
-from zope.interface import implements
+from zope.interface import implementer
 
+from pyramid.compat import pickle
+from pyramid.compat import PY3
+from pyramid.compat import text_
+from pyramid.compat import bytes_
+from pyramid.compat import native_
 from pyramid.interfaces import ISession
 
 def manage_accessed(wrapped):
@@ -88,9 +87,9 @@ def UnencryptedCookieSessionFactoryConfig(
 
     """
 
+    @implementer(ISession)
     class UnencryptedCookieSessionFactory(dict):
         """ Dictionary-like session object """
-        implements(ISession)
 
         # configuration parameters
         _cookie_name = cookie_name
@@ -144,15 +143,17 @@ def UnencryptedCookieSessionFactoryConfig(
         get = manage_accessed(dict.get)
         __getitem__ = manage_accessed(dict.__getitem__)
         items = manage_accessed(dict.items)
-        iteritems = manage_accessed(dict.iteritems)
         values = manage_accessed(dict.values)
-        itervalues = manage_accessed(dict.itervalues)
         keys = manage_accessed(dict.keys)
-        iterkeys = manage_accessed(dict.iterkeys)
         __contains__ = manage_accessed(dict.__contains__)
-        has_key = manage_accessed(dict.has_key)
         __len__ = manage_accessed(dict.__len__)
         __iter__ = manage_accessed(dict.__iter__)
+
+        if not PY3:
+            iteritems = manage_accessed(dict.iteritems)
+            itervalues = manage_accessed(dict.itervalues)
+            iterkeys = manage_accessed(dict.iterkeys)
+            has_key = manage_accessed(dict.has_key)
 
         # modifying dictionary methods
         clear = manage_accessed(dict.clear)
@@ -183,7 +184,7 @@ def UnencryptedCookieSessionFactoryConfig(
         # CSRF API methods
         @manage_accessed
         def new_csrf_token(self):
-            token = os.urandom(20).encode('hex')
+            token = text_(binascii.hexlify(os.urandom(20)))
             self['_csrft_'] = token
             return token
 
@@ -235,8 +236,8 @@ def signed_serialize(data, secret):
        response.set_cookie('signed_cookie', cookieval)
     """
     pickled = pickle.dumps(data, pickle.HIGHEST_PROTOCOL)
-    sig = hmac.new(secret, pickled, sha1).hexdigest()
-    return sig + base64.standard_b64encode(pickled)
+    sig = hmac.new(bytes_(secret), pickled, sha1).hexdigest()
+    return sig + native_(base64.b64encode(pickled))
 
 def signed_deserialize(serialized, secret, hmac=hmac):
     """ Deserialize the value returned from ``signed_serialize``.  If
@@ -254,12 +255,12 @@ def signed_deserialize(serialized, secret, hmac=hmac):
     # hmac parameterized only for unit tests
     try:
         input_sig, pickled = (serialized[:40],
-                              base64.standard_b64decode(serialized[40:]))
-    except (binascii.Error, TypeError), e:
+                              base64.b64decode(bytes_(serialized[40:])))
+    except (binascii.Error, TypeError) as e:
         # Badly formed data can make base64 die
         raise ValueError('Badly formed base64 data: %s' % e)
 
-    sig = hmac.new(secret, pickled, sha1).hexdigest()
+    sig = hmac.new(bytes_(secret), pickled, sha1).hexdigest()
 
     if len(sig) != len(input_sig):
         raise ValueError('Wrong signature length')

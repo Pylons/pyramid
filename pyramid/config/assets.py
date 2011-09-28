@@ -1,7 +1,7 @@
 import pkg_resources
 import sys
 
-from zope.interface import implements
+from zope.interface import implementer
 
 from pyramid.interfaces import IPackageOverrides
 
@@ -80,8 +80,8 @@ class OverrideProvider(pkg_resources.DefaultProvider):
         return pkg_resources.DefaultProvider.resource_listdir(
             self, resource_name)
         
+@implementer(IPackageOverrides)
 class PackageOverrides:
-    implements(IPackageOverrides)
     # pkg_resources arg in kw args below for testing
     def __init__(self, package, pkg_resources=pkg_resources):
         if hasattr(package, '__loader__') and not isinstance(package.__loader__,

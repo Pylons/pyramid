@@ -122,31 +122,36 @@ field. Reflecting this, these subclasses have one additional keyword argument:
 ``location``, which indicates the location to which to redirect.
 """
 
-import types
 from string import Template
 
-from zope.interface import implements
+from zope.interface import implementer
 
 from webob import html_escape as _html_escape
 
 from pyramid.interfaces import IExceptionResponse
 from pyramid.response import Response
+from pyramid.compat import class_types
+from pyramid.compat import text_type
+from pyramid.compat import binary_type
+from pyramid.compat import text_
 
 def _no_escape(value):
     if value is None:
         return ''
-    if not isinstance(value, basestring):
+    if not isinstance(value, text_type):
         if hasattr(value, '__unicode__'):
-            value = unicode(value)
+            value = value.__unicode__()
+        if isinstance(value, binary_type):
+            value = text_(value, 'utf-8')
         else:
-            value = str(value)
+            value = text_type(value)
     return value
 
 class HTTPException(Exception): # bw compat
     """ Base class for all :term:`exception response` objects."""
 
+@implementer(IExceptionResponse)
 class WSGIHTTPException(Response, HTTPException):
-    implements(IExceptionResponse)
 
     ## You should set in subclasses:
     # code = 200
@@ -259,7 +264,7 @@ ${body}''')
                     args[k.lower()] = escape(v)
             body = body_tmpl.substitute(args)
             page = page_template.substitute(status=self.status, body=body)
-            if isinstance(page, unicode):
+            if isinstance(page, text_type):
                 page = page.encode(self.charset)
             self.app_iter = [page]
             self.body = page
@@ -1016,8 +1021,8 @@ def default_exceptionresponse_view(context, request):
 
 status_map={}
 code = None
-for name, value in globals().items():
-    if (isinstance(value, (type, types.ClassType)) and
+for name, value in list(globals().items()):
+    if (isinstance(value, class_types) and
         issubclass(value, HTTPException)
         and not name.startswith('_')):
         code = getattr(value, 'code', None)

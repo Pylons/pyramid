@@ -1,3 +1,3 @@
 ## -*- coding: utf-8 -*-
-<% a, b = 'foo', u'föö' %>
-Hello ${u'föö'}
+<%!from pyramid.compat import text_%><% a, b = 'foo', text_('föö', 'utf-8') %>
+Hello ${text_('föö', 'utf-8')}

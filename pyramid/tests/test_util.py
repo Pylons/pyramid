@@ -1,4 +1,5 @@
 import unittest
+from pyramid.compat import PY3
 
 class TestDottedNameResolver(unittest.TestCase):
     def _makeOne(self, package=None):
@@ -9,10 +10,18 @@ class TestDottedNameResolver(unittest.TestCase):
         from pyramid.exceptions import ConfigurationError
         try:
             func(*arg, **kw)
-        except ConfigurationError, e:
+        except ConfigurationError as e:
             return e
         else:
             raise AssertionError('Invalid not raised') # pragma: no cover
+
+    def test_zope_dottedname_style_resolve_builtin(self):
+        typ = self._makeOne()
+        if PY3:
+            result = typ._zope_dottedname_style('builtins.str')
+        else:
+            result = typ._zope_dottedname_style('__builtin__.str')
+        self.assertEqual(result, str)
 
     def test_zope_dottedname_style_resolve_absolute(self):
         typ = self._makeOne()
@@ -190,7 +199,7 @@ class Test_WeakOrderedSet(unittest.TestCase):
         reg = Dummy()
         wos.add(reg)
         self.assertEqual(list(wos), [reg])
-        self.assert_(reg in wos)
+        self.assertTrue(reg in wos)
         self.assertEqual(wos.last, reg)
 
     def test_add_multiple_items(self):
@@ -201,8 +210,8 @@ class Test_WeakOrderedSet(unittest.TestCase):
         wos.add(reg2)
         self.assertEqual(len(wos), 2)
         self.assertEqual(list(wos), [reg1, reg2])
-        self.assert_(reg1 in wos)
-        self.assert_(reg2 in wos)
+        self.assertTrue(reg1 in wos)
+        self.assertTrue(reg2 in wos)
         self.assertEqual(wos.last, reg2)
 
     def test_add_duplicate_items(self):
@@ -212,7 +221,7 @@ class Test_WeakOrderedSet(unittest.TestCase):
         wos.add(reg)
         self.assertEqual(len(wos), 1)
         self.assertEqual(list(wos), [reg])
-        self.assert_(reg in wos)
+        self.assertTrue(reg in wos)
         self.assertEqual(wos.last, reg)
 
     def test_weakref_removal(self):

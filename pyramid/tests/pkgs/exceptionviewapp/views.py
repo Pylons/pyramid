@@ -1,5 +1,5 @@
 from webob import Response
-from models import AnException
+from .models import AnException
 
 def no(request):
     return Response('no')

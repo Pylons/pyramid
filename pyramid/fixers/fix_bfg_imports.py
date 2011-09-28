@@ -199,6 +199,7 @@ def fix_zcml(path):
                     newf.write(newt)
                     newf.flush()
                     newf.close()
+                text.close()
                 
         for dir in dirs:
             if dir.startswith('.'):

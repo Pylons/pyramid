@@ -1,9 +1,12 @@
 import re
 import traceback
 
+from pyramid.compat import string_types
+from pyramid.compat import bytes_
+from pyramid.compat import is_nonstr_iter
 from pyramid.exceptions import ConfigurationError
 from pyramid.traversal import find_interface
-from pyramid.traversal import traversal_path
+from pyramid.traversal import traversal_path_info
 
 from hashlib import md5
 
@@ -93,10 +96,10 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         xhr_predicate.__text__ = "xhr = True"
         weights.append(1 << 1)
         predicates.append(xhr_predicate)
-        h.update('xhr:%r' % bool(xhr))
+        h.update(bytes_('xhr:%r' % bool(xhr)))
 
     if request_method is not None:
-        if not hasattr(request_method, '__iter__'):
+        if not is_nonstr_iter(request_method):
             request_method = (request_method,)
         request_method = sorted(request_method)
         def request_method_predicate(context, request):
@@ -106,20 +109,20 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         weights.append(1 << 2)
         predicates.append(request_method_predicate)
         for m in request_method:
-            h.update('request_method:%r' % m)
+            h.update(bytes_('request_method:%r' % m))
 
     if path_info is not None:
         try:
             path_info_val = re.compile(path_info)
-        except re.error, why:
-            raise ConfigurationError(why[0])
+        except re.error as why:
+            raise ConfigurationError(why.args[0])
         def path_info_predicate(context, request):
             return path_info_val.match(request.path_info) is not None
         text = "path_info = %s"
         path_info_predicate.__text__ = text % path_info
         weights.append(1 << 3)
         predicates.append(path_info_predicate)
-        h.update('path_info:%r' % path_info)
+        h.update(bytes_('path_info:%r' % path_info))
 
     if request_param is not None:
         request_param_val = None
@@ -136,7 +139,8 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         request_param_predicate.__text__ = text
         weights.append(1 << 4)
         predicates.append(request_param_predicate)
-        h.update('request_param:%r=%r' % (request_param, request_param_val))
+        h.update(
+            bytes_('request_param:%r=%r' % (request_param, request_param_val)))
 
     if header is not None:
         header_name = header
@@ -145,8 +149,8 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
             header_name, header_val = header.split(':', 1)
             try:
                 header_val = re.compile(header_val)
-            except re.error, why:
-                raise ConfigurationError(why[0])
+            except re.error as why:
+                raise ConfigurationError(why.args[0])
         if header_val is None:
             text = "header %s" % header_name
         else:
@@ -161,7 +165,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         header_predicate.__text__ = text
         weights.append(1 << 5)
         predicates.append(header_predicate)
-        h.update('header:%r=%r' % (header_name, header_val))
+        h.update(bytes_('header:%r=%r' % (header_name, header_val)))
 
     if accept is not None:
         def accept_predicate(context, request):
@@ -169,7 +173,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         accept_predicate.__text__ = "accept = %s" % accept
         weights.append(1 << 6)
         predicates.append(accept_predicate)
-        h.update('accept:%r' % accept)
+        h.update(bytes_('accept:%r' % accept))
 
     if containment is not None:
         def containment_predicate(context, request):
@@ -177,7 +181,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         containment_predicate.__text__ = "containment = %s" % containment
         weights.append(1 << 7)
         predicates.append(containment_predicate)
-        h.update('containment:%r' % hash(containment))
+        h.update(bytes_('containment:%r' % hash(containment)))
 
     if request_type is not None:
         def request_type_predicate(context, request):
@@ -186,22 +190,22 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         request_type_predicate.__text__ = text % request_type
         weights.append(1 << 8)
         predicates.append(request_type_predicate)
-        h.update('request_type:%r' % hash(request_type))
+        h.update(bytes_('request_type:%r' % hash(request_type)))
 
     if match_param is not None:
-        if isinstance(match_param, basestring):
+        if isinstance(match_param, string_types):
             match_param, match_param_val = match_param.split('=', 1)
             match_param = {match_param: match_param_val}
         text = "match_param %s" % match_param
         def match_param_predicate(context, request):
-            for k, v in match_param.iteritems():
+            for k, v in match_param.items():
                 if request.matchdict.get(k) != v:
                     return False
             return True
         match_param_predicate.__text__ = text
         weights.append(1 << 9)
         predicates.append(match_param_predicate)
-        h.update('match_param:%r' % match_param)
+        h.update(bytes_('match_param:%r' % match_param))
 
     if custom:
         for num, predicate in enumerate(custom):
@@ -222,7 +226,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
             # functions for custom predicates, so that the hash output
             # of predicate instances which are "logically the same"
             # may compare equal.
-            h.update('custom%s:%r' % (num, hash(predicate)))
+            h.update(bytes_('custom%s:%r' % (num, hash(predicate))))
         weights.append(1 << 10)
 
     if traverse is not None:
@@ -237,7 +241,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
                 return True
             m = context['match']
             tvalue = tgenerate(m)
-            m['traverse'] = traversal_path(tvalue)
+            m['traverse'] = traversal_path_info(tvalue)
             return True
         # This isn't actually a predicate, it's just a infodict
         # modifier that injects ``traverse`` into the matchdict.  As a
@@ -254,7 +258,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
     return order, predicates, phash
 
 def as_sorted_tuple(val):
-    if not hasattr(val, '__iter__'):
+    if not is_nonstr_iter(val):
         val = (val,)
     val = tuple(sorted(val))
     return val

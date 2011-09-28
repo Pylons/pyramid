@@ -1,5 +1,4 @@
 import sys
-import httplib
 import os
 import pkg_resources
 import shutil
@@ -7,6 +6,11 @@ import subprocess
 import tempfile
 import time
 import signal
+
+try:
+    import httplib
+except ImportError: # pragma: no cover
+    import http.client as httplib
 
 class TemplateTest(object):
     def make_venv(self, directory): # pragma: no cover

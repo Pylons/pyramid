@@ -1,6 +1,6 @@
 # package
 
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface import Interface
 
 class IFactory(Interface):
@@ -23,8 +23,8 @@ includeme = dummy_include
 class DummyContext:
     pass
 
+@implementer(IFactory)
 class DummyFactory(object):
-    implements(IFactory)
     def __call__(self):
         """ """
 

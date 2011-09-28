@@ -1,6 +1,6 @@
 from zope.deprecation import deprecate
 from zope.deprecation.deprecation import deprecated
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface.interface import InterfaceClass
 
 from webob import BaseRequest
@@ -11,6 +11,10 @@ from pyramid.interfaces import ISessionFactory
 from pyramid.interfaces import IResponseFactory
 
 from pyramid.compat import json
+from pyramid.compat import iterkeys_, itervalues_, iteritems_
+from pyramid.compat import text_
+from pyramid.compat import bytes_
+from pyramid.compat import native_
 from pyramid.exceptions import ConfigurationError
 from pyramid.decorator import reify
 from pyramid.response import Response
@@ -64,15 +68,15 @@ class DeprecatedRequestMethodsMixin(object):
 
     @deprecate(dictlike)
     def iteritems(self):
-        return self.environ.iteritems()
+        return iteritems_(self.environ)
 
     @deprecate(dictlike)
     def iterkeys(self):
-        return self.environ.iterkeys()
+        return iterkeys_(self.environ)
 
     @deprecate(dictlike)
     def itervalues(self):
-        return self.environ.itervalues()
+        return itervalues_(self.environ)
 
     @deprecate(dictlike)
     def keys(self):
@@ -283,6 +287,7 @@ class CallbackMethodsMixin(object):
             callback = callbacks.pop(0)
             callback(self)
 
+@implementer(IRequest)
 class Request(BaseRequest, DeprecatedRequestMethodsMixin, URLMethodsMixin,
               CallbackMethodsMixin):
     """
@@ -305,7 +310,6 @@ class Request(BaseRequest, DeprecatedRequestMethodsMixin, URLMethodsMixin,
     release of this :app:`Pyramid` version.  See
     http://pythonpaste.org/webob/ for further information.
     """
-    implements(IRequest)
     exception = None
     exc_info = None
     matchdict = None
@@ -360,7 +364,7 @@ class Request(BaseRequest, DeprecatedRequestMethodsMixin, URLMethodsMixin,
 
     @property
     def json_body(self):
-        return json.loads(self.body, encoding=self.charset)
+        return json.loads(text_(self.body, self.charset))
 
 def route_request_iface(name, bases=()):
     # zope.interface treats the __name__ as the __doc__ and changes __name__
@@ -404,7 +408,8 @@ def call_app_with_subpath_as_path_info(request, app):
     new_script_name = ''
 
     # compute new_path_info
-    new_path_info = '/' + '/'.join([x.encode('utf-8') for x in subpath])
+    new_path_info = '/' + '/'.join([native_(x.encode('utf-8'), 'latin-1')
+                                    for x in subpath])
 
     if new_path_info != '/': # don't want a sole double-slash
         if path_info != '/': # if orig path_info is '/', we're already done
@@ -422,7 +427,7 @@ def call_app_with_subpath_as_path_info(request, app):
             break
         el = workback.pop()
         if el:
-            tmp.insert(0, el.decode('utf-8'))
+            tmp.insert(0, text_(bytes_(el, 'latin-1'), 'utf-8'))
 
     # strip all trailing slashes from workback to avoid appending undue slashes
     # to end of script_name

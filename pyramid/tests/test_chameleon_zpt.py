@@ -2,6 +2,7 @@ import unittest
 
 from pyramid.testing import skip_on
 from pyramid import testing
+from pyramid.compat import text_type
 
 class Base(object):
     def setUp(self):
@@ -51,7 +52,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         instance = self._makeOne(minimal, lookup)
         result = instance({}, {})
-        self.assertTrue(isinstance(result, unicode))
+        self.assertTrue(isinstance(result, text_type))
         self.assertEqual(result.rstrip('\n'),
                      '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
 
@@ -126,7 +127,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         lookup = DummyLookup()
         instance = self._makeOne(minimal, lookup)
         result = instance.implementation()()
-        self.assertTrue(isinstance(result, unicode))
+        self.assertTrue(isinstance(result, text_type))
         self.assertEqual(result.rstrip('\n'),
                      '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
         
@@ -140,7 +141,7 @@ class RenderTemplateTests(Base, unittest.TestCase):
     def test_it(self):
         minimal = self._getTemplatePath('minimal.pt')
         result = self._callFUT(minimal)
-        self.assertTrue(isinstance(result, unicode))
+        self.assertTrue(isinstance(result, text_type))
         self.assertEqual(result.rstrip('\n'),
                      '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
 
@@ -155,8 +156,8 @@ class RenderTemplateToResponseTests(Base, unittest.TestCase):
         result = self._callFUT(minimal)
         from webob import Response
         self.assertTrue(isinstance(result, Response))
-        self.assertEqual(result.app_iter[0].rstrip('\n'),
-                     '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
+        self.assertEqual(result.app_iter[0].rstrip(b'\n'),
+                     b'<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
         self.assertEqual(result.status, '200 OK')
         self.assertEqual(len(result.headerlist), 2)
 
