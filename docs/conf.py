@@ -106,6 +106,10 @@ today_fmt = '%B %d, %Y'
 # List of documents that shouldn't be included in the build.
 #unused_docs = []
 
+# List of patterns, relative to source directory, that match files and
+# directories to ignore when looking for source files.
+exclude_patterns = ['_themes/README.rst',]
+
 # List of directories, relative to source directories, that shouldn't be searched
 # for source files.
 #exclude_dirs = []

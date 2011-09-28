@@ -65,13 +65,13 @@ def route_url(route_name, request, *elements, **kw):
     data is turned into a query string, a leading ``?`` is prepended,
     and the resulting string is appended to the generated URL.
 
-    .. note:: Python data structures that are passed as ``_query``
-              which are sequences or dictionaries are turned into a
-              string under the same rules as when run through
-              :func:`urllib.urlencode` with the ``doseq`` argument
-              equal to ``True``.  This means that sequences can be
-              passed as values, and a k=v pair will be placed into the
-              query string for each value.
+    .. note::
+
+       Python data structures that are passed as ``_query`` which are sequences
+       or dictionaries are turned into a string under the same rules as when run
+       through :func:`urllib.urlencode` with the ``doseq`` argument equal to
+       ``True``.  This means that sequences can be passed as values, and a k=v
+       pair will be placed into the query string for each value.
 
     If a keyword argument ``_anchor`` is present, its string
     representation will be used as a named anchor in the generated URL
@@ -235,13 +235,13 @@ def resource_url(resource, request, *elements, **kw):
     turned into a query string, a leading ``?`` is prepended, and the
     resulting string is appended to the generated URL.
 
-    .. note:: Python data structures that are passed as ``query``
-              which are sequences or dictionaries are turned into a
-              string under the same rules as when run through
-              :func:`urllib.urlencode` with the ``doseq`` argument
-              equal to ``True``.  This means that sequences can be
-              passed as values, and a k=v pair will be placed into the
-              query string for each value.
+    .. note::
+
+       Python data structures that are passed as ``query`` which are sequences
+       or dictionaries are turned into a string under the same rules as when run
+       through :func:`urllib.urlencode` with the ``doseq`` argument equal to
+       ``True``.  This means that sequences can be passed as values, and a k=v
+       pair will be placed into the query string for each value.
 
     If a keyword argument ``anchor`` is present, its string
     representation will be used as a named anchor in the generated URL
@@ -264,18 +264,20 @@ def resource_url(resource, request, *elements, **kw):
     resource which is operated upon by this function.  See also
     :ref:`overriding_resource_url_generation`.
 
-    .. note:: If the :term:`resource` used is the result of a
-             :term:`traversal`, it must be :term:`location`-aware.
-             The resource can also be the context of a :term:`URL
-             dispatch`; contexts found this way do not need to be
-             location-aware.
+    .. note::
 
-    .. note:: If a 'virtual root path' is present in the request
-              environment (the value of the WSGI environ key
-              ``HTTP_X_VHM_ROOT``), and the resource was obtained via
-              :term:`traversal`, the URL path will not include the
-              virtual root prefix (it will be stripped off the
-              left hand side of the generated URL).
+       If the :term:`resource` used is the result of a :term:`traversal`, it
+       must be :term:`location`-aware.  The resource can also be the context of
+       a :term:`URL dispatch`; contexts found this way do not need to be
+       location-aware.
+
+    .. note::
+
+       If a 'virtual root path' is present in the request environment (the value
+       of the WSGI environ key ``HTTP_X_VHM_ROOT``), and the resource was
+       obtained via :term:`traversal`, the URL path will not include the virtual
+       root prefix (it will be stripped off the left hand side of the generated
+       URL).
 
     .. note:: For backwards compatibility purposes, this function can also be
        imported as ``model_url``, although doing so will emit a deprecation
@@ -285,7 +287,7 @@ def resource_url(resource, request, *elements, **kw):
         reg = request.registry
     except AttributeError:
         reg = get_current_registry() # b/c
-    
+
     context_url = reg.queryMultiAdapter((resource, request), IContextURL)
     if context_url is None:
         context_url = TraversalContextURL(resource, request)
@@ -369,17 +371,17 @@ def static_url(path, request, **kw):
         reg = request.registry
     except AttributeError:
         reg = get_current_registry() # b/c
-    
+
     info = reg.queryUtility(IStaticURLInfo)
     if info is None:
         raise ValueError('No static URL definition matching %s' % path)
-        
+
     return info.generate(path, request, **kw)
 
 def current_route_url(request, *elements, **kw):
     """Generates a fully qualified URL for a named :app:`Pyramid`
     :term:`route configuration` based on the 'current route'.
-    
+
     This function supplements :func:`pyramid.url.route_url`. It presents an
     easy way to generate a URL for the 'current route' (defined as the route
     which matched when the request was generated).
@@ -407,7 +409,7 @@ def current_route_url(request, *elements, **kw):
     current url path is ``/foo/1``, the matchdict will be
     ``{'page':'1'}``.  The result of ``current_route_url(request, page='2')``
     in this situation will be ``/foo/2``.
-        
+
     Usage of the ``_route_name`` keyword argument: if our routing table
     defines routes ``/foo/{action}`` named 'foo' and ``/foo/{action}/{page}``
     named ``fooaction``, and the current url pattern is ``/foo/view`` (which

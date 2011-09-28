@@ -107,11 +107,12 @@ def principals_allowed_by_permission(context, permission):
     :mod:`pyramid.security.Everyone` (the special principal
     identifier representing all principals).
 
-    .. note:: even if an :term:`authorization policy` is in effect,
-       some (exotic) authorization policies may not implement the
-       required machinery for this function; those will cause a
-       :exc:`NotImplementedError` exception to be raised when this
-       function is invoked.
+    .. note::
+
+       even if an :term:`authorization policy` is in effect, some (exotic)
+       authorization policies may not implement the required machinery for this
+       function; those will cause a :exc:`NotImplementedError` exception to be
+       raised when this function is invoked.
     """
     reg = get_current_registry()
     policy = reg.queryUtility(IAuthorizationPolicy)
@@ -190,14 +191,14 @@ def forget(request):
         return []
     else:
         return policy.forget(request)
-    
+
 class PermitsResult(int):
     def __new__(cls, s, *args):
         inst = int.__new__(cls, cls.boolval)
         inst.s = s
         inst.args = args
         return inst
-        
+
     @property
     def msg(self):
         return self.s % self.args

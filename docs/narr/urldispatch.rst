@@ -179,7 +179,7 @@ at the end of the segment represented by ``{name}.html`` (it only contains
 To capture both segments, two replacement markers can be used:
 
 .. code-block:: text
-    
+
     foo/{name}.{ext}
 
 The literal path ``/foo/biz.html`` will match the above route pattern, and
@@ -245,10 +245,10 @@ The above pattern will match these URLs, generating the following matchdicts:
 
 .. code-block:: text
 
-   foo/1/2/           -> 
+   foo/1/2/           ->
             {'baz':u'1', 'bar':u'2', 'fizzle':()}
 
-   foo/abc/def/a/b/c  -> 
+   foo/abc/def/a/b/c  ->
             {'baz':u'abc', 'bar':u'def', 'fizzle':(u'a', u'b', u'c')}
 
 Note that when a ``*stararg`` remainder match is matched, the value put into
@@ -277,7 +277,7 @@ split by segment. Changing the regular expression used to match a marker can
 also capture the remainder of the URL, for example:
 
 .. code-block:: text
-    
+
     foo/{baz}/{bar}{fizzle:.*}
 
 The above pattern will match these URLs, generating the following matchdicts:
@@ -341,7 +341,7 @@ resource of the view callable ultimately found via :term:`view lookup`.
 .. code-block:: python
    :linenos:
 
-   config.add_route('abc', '/abc', 
+   config.add_route('abc', '/abc',
                     factory='myproject.resources.root_factory')
    config.add_view('myproject.views.theview', route_name='abc')
 
@@ -379,7 +379,9 @@ process.  Examples of route predicate arguments are ``pattern``, ``xhr``, and
 Other arguments are ``name`` and ``factory``.  These arguments represent
 neither predicates nor view configuration information.
 
-.. warning:: Some arguments are view-configuration related arguments, such as
+.. warning::
+
+   Some arguments are view-configuration related arguments, such as
    ``view_renderer``.  These only have an effect when the route configuration
    names a ``view`` and these arguments have been deprecated as of
    :app:`Pyramid` 1.1.
@@ -417,7 +419,7 @@ For example:
 
    num_one_two_or_three = any_of('num', 'one', 'two', 'three')
 
-   config.add_route('route_to_num', '/{num}', 
+   config.add_route('route_to_num', '/{num}',
                     custom_predicates=(num_one_two_or_three,))
 
 The above ``any_of`` function generates a predicate which ensures that the
@@ -448,7 +450,7 @@ instance, a predicate might do some type conversion of values:
 
     ymd_to_int = integers('year', 'month', 'day')
 
-    config.add_route('ymd', '/{year}/{month}/{day}', 
+    config.add_route('ymd', '/{year}/{month}/{day}',
                      custom_predicates=(ymd_to_int,))
 
 Note that a conversion predicate is still a predicate so it must return
@@ -471,7 +473,7 @@ expressions specifying requirements for that marker. For instance:
 
     ymd_to_int = integers('year', 'month', 'day')
 
-    config.add_route('ymd', '/{year:\d+}/{month:\d+}/{day:\d+}', 
+    config.add_route('ymd', '/{year:\d+}/{month:\d+}/{day:\d+}',
                      custom_predicates=(ymd_to_int,))
 
 Now the try/except is no longer needed because the route will not match at
@@ -509,7 +511,7 @@ the route in a set of route predicates:
 
     config.add_route('y', '/{year}', custom_predicates=(twenty_ten,))
     config.add_route('ym', '/{year}/{month}', custom_predicates=(twenty_ten,))
-    config.add_route('ymd', '/{year}/{month}/{day}', 
+    config.add_route('ymd', '/{year}/{month}/{day}',
                      custom_predicates=(twenty_ten,))
 
 The above predicate, when added to a number of route configurations ensures
@@ -806,9 +808,10 @@ other non-``name`` and non-``pattern`` arguments to
 exception to this rule is use of the ``pregenerator`` argument, which is not
 ignored when ``static`` is ``True``.
 
-.. note:: the ``static`` argument to
-   :meth:`~pyramid.config.Configurator.add_route` is new as of :app:`Pyramid`
-   1.1.
+.. note::
+
+   the ``static`` argument to :meth:`~pyramid.config.Configurator.add_route` is
+   new as of :app:`Pyramid` 1.1.
 
 .. index::
    single: redirecting to slash-appended routes
@@ -866,7 +869,7 @@ the application's startup configuration, adding the following stanza:
 .. code-block:: python
    :linenos:
 
-   config.add_view('pyramid.view.append_slash_notfound_view', 
+   config.add_view('pyramid.view.append_slash_notfound_view',
                    context='pyramid.httpexceptions.HTTPNotFound')
 
 See :ref:`view_module` and :ref:`changing_the_notfound_view` for more
@@ -917,7 +920,7 @@ Cleaning Up After a Request
 ---------------------------
 
 Sometimes it's required that some cleanup be performed at the end of a
-request when a database connection is involved.  
+request when a database connection is involved.
 
 For example, let's say you have a ``mypackage`` :app:`Pyramid` application
 package that uses SQLAlchemy, and you'd like the current SQLAlchemy database
@@ -991,8 +994,10 @@ permission.  Obviously you can do more generic things than inspect the routes
 match dict to see if the ``article`` argument matches a particular string;
 our sample ``Article`` factory class is not very ambitious.
 
-.. note:: See :ref:`security_chapter` for more information about
-   :app:`Pyramid` security and ACLs.
+.. note::
+
+   See :ref:`security_chapter` for more information about :app:`Pyramid`
+   security and ACLs.
 
 .. index::
    pair: debugging; route matching
@@ -1014,7 +1019,7 @@ which you started the application from.  For example:
    :linenos:
 
     [chrism@thinko pylonsbasic]$ PYRAMID_DEBUG_ROUTEMATCH=true \
-                                 bin/paster serve development.ini 
+                                 bin/paster serve development.ini
     Starting server in PID 13586.
     serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
     2010-12-16 14:45:19,956 no route matched for url \

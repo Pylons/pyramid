@@ -63,13 +63,14 @@ The included scaffolds are these:
   URL mapping via :term:`traversal` and persistence via
   :term:`SQLAlchemy`
 
-.. note:: At this time, each of these scaffolds uses the :term:`Chameleon`
-   templating system, which is incompatible with Jython.  To use scaffolds to
-   build applications which will run on Jython, you can try the
+.. note::
+
+   At this time, each of these scaffolds uses the :term:`Chameleon` templating
+   system, which is incompatible with Jython.  To use scaffolds to build
+   applications which will run on Jython, you can try the
    ``pyramid_jinja2_starter`` scaffold which ships as part of the
-   :term:`pyramid_jinja2` package.  You can also just use any above scaffold
-   and replace the Chameleon template it includes with a :term:`Mako`
-   analogue.
+   :term:`pyramid_jinja2` package.  You can also just use any above scaffold and
+   replace the Chameleon template it includes with a :term:`Mako` analogue.
 
 Rather than use any of the above scaffolds, Pylons 1 users may feel more
 comfortable installing the :term:`Akhet` development environment, which

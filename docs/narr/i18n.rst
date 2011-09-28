@@ -518,7 +518,9 @@ negotiator is registered.
    def aview(request):
        locale = get_localizer(request)
 
-.. note:: If you need to create a localizer for a locale use the
+.. note::
+
+    If you need to create a localizer for a locale use the
     :func:`pyramid.i18n.make_localizer` function.
 
 .. index::
@@ -555,7 +557,9 @@ represented by the request.  The translation returned from its
 ``domain`` attribute of the provided translation string as well as the
 locale of the localizer.
 
-.. note:: If you're using :term:`Chameleon` templates, you don't need
+.. note::
+
+   If you're using :term:`Chameleon` templates, you don't need
    to pre-translate translation strings this way.  See
    :ref:`chameleon_translation_strings`.
 
