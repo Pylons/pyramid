@@ -666,6 +666,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         helper = self._makeOne('secret', timeout=10, reissue_time=0)
         now = time.time()
         helper.auth_tkt.timestamp = now
+        helper.auth_tkt.tokens = (u'foo',)
         helper.now = now + 1
         request = self._makeRequest('bogus')
         result = helper.identify(request)
@@ -899,11 +900,16 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(result[2][0], 'Set-Cookie')
         self.assertTrue("'tokens': ('foo', 'bar')" in result[2][1])
 
-    def test_remember_non_string_token(self):
+    def test_remember_token_unicode_with_ascii_data(self):
+        helper = self._makeOne('secret')
+        request = self._makeRequest()
+        helper.remember(request, 'other', tokens=(u'foo',))
+
+    def test_remember_token_full_on_unicode(self):
         helper = self._makeOne('secret')
         request = self._makeRequest()
         self.assertRaises(ValueError, helper.remember, request, 'other',
-                          tokens=(u'foo',))
+                          tokens=(u'f\u1234',))
 
     def test_remember_invalid_token_format(self):
         helper = self._makeOne('secret')

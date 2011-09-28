@@ -725,6 +725,11 @@ class AuthTktCookieHelper(object):
             user_data = 'userid_type:%s' % encoding
         
         for token in tokens:
+            if isinstance(token, unicode):
+                try:
+                    token = token.encode('ascii')
+                except UnicodeEncodeError:
+                    pass
             if not (isinstance(token, str) and VALID_TOKEN.match(token)):
                 raise ValueError("Invalid token %r" % (token,))
 
