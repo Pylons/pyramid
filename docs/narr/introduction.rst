@@ -826,7 +826,7 @@ trolls" or other people who seem to get their rocks off by berating fellow
 users in our various offical support channels.  We try to keep it well-lit
 and new-user-friendly.
 
-Example: Visit irc://freenode.net#pyramid (the ``#pyramid`` channel on
+Example: Visit irc\://freenode.net#pyramid (the ``#pyramid`` channel on
 irc.freenode.net in an IRC client) or the pylons-discuss maillist at
 http://groups.google.com/group/pylons-discuss/ .
 
