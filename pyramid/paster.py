@@ -3,18 +3,8 @@ import sys
 from code import interact
 
 import zope.deprecation
-
-try:
-    from paste.deploy import loadapp
-except ImportError: # pragma: no cover
-    def loadapp(*arg, **kw):
-        raise NotImplementedError
-
-try:
-    from paste.script.command import Command
-except ImportError: # pragma: no cover
-    class Command:
-        pass
+from paste.deploy import loadapp
+from glue.command import Command
 
 from pyramid.interfaces import IMultiView
 from pyramid.interfaces import ITweens
@@ -121,7 +111,7 @@ class PShellCommand(PCommand):
 
     Example::
 
-        $ paster pshell myapp.ini#main
+        $ glue pshell myapp.ini#main
 
     .. note:: If you do not point the loader directly at the section of the
               ini file containing your :app:`Pyramid` application, the
@@ -294,7 +284,7 @@ class PRoutesCommand(PCommand):
 
     Example::
 
-        $ paster proutes myapp.ini#main
+        $ glue proutes myapp.ini#main
 
     """
     summary = "Print all URL dispatch routes related to a Pyramid application"
@@ -358,7 +348,7 @@ class PViewsCommand(PCommand):
 
     Example::
 
-        $ paster proutes myapp.ini#main url
+        $ glue proutes myapp.ini#main url
 
     """
     summary = "Print all views in an application that might match a URL"
@@ -599,7 +589,7 @@ class PTweensCommand(PCommand):
 
     Example::
 
-        $ paster ptweens myapp.ini#main
+        $ glue ptweens myapp.ini#main
 
     """
     summary = "Print all tweens related to a Pyramid application"
