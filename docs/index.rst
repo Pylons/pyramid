@@ -229,10 +229,12 @@ Index and Glossary
 * :ref:`search`
 
 
-.. add glossary in hidden toc tree so it does not complain its not included
+.. add glossary, foreword, and latexindex in a hidden toc to avoid warnings
 
 .. toctree::
    :hidden:
 
    glossary
+   foreword.rst
+   latexindex.rst
 
