@@ -27,7 +27,7 @@ class MyModel(Base):
 
 def populate():
     session = DBSession()
-    model = MyModel(name=u'root', value=55)
+    model = MyModel(name='root', value=55)
     session.add(model)
     session.flush()
     transaction.commit()

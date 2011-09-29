@@ -13,7 +13,7 @@ pyramid.includes = pyramid_debugtoolbar
 sqlalchemy.url = sqlite:///%(here)s/{{project}}.db
 
 [server:main]
-use = egg:Paste#http
+use = egg:glue#wsgiref
 host = 0.0.0.0
 port = 6543
 
