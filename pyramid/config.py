@@ -50,7 +50,7 @@ try:
     from pyramid import chameleon_text
 except TypeError:  # pragma: no cover
     chameleon_text = None # pypy
-try: 
+try:
     from pyramid import chameleon_zpt
 except TypeError: # pragma: no cover
     chameleon_zpt = None # pypy
@@ -336,7 +336,7 @@ class Configurator(object):
         policy = self.maybe_dotted(policy)
         self.registry.registerUtility(policy, IAuthorizationPolicy)
         self.action(IAuthorizationPolicy, None)
-            
+
     def _make_spec(self, path_or_spec):
         package, filename = resolve_asset_spec(path_or_spec,
                                                self.package_name)
@@ -378,7 +378,7 @@ class Configurator(object):
                               package=self.package,
                               mapper=mapper,
                               decorator=decorator)
-        
+
         return deriver(view)
 
     def _override(self, package, path, override_package, override_prefix,
@@ -510,7 +510,7 @@ class Configurator(object):
         Python :term:`module`, in which case, the module will be searched for
         a callable named ``includeme``, which will be treated as the
         configuration callable.
-        
+
         For example, if the ``includeme`` function below lives in a module
         named ``myapp.myconfig``:
 
@@ -592,7 +592,7 @@ class Configurator(object):
         discriminators.  ``action_wrap`` will cause the directive to be
         wrapped in a decorator which provides more accurate conflict
         cause information.
-        
+
         ``add_directive`` does not participate in conflict detection, and
         later calls to ``add_directive`` will override earlier calls.
         """
@@ -719,7 +719,7 @@ class Configurator(object):
         if default_view_mapper is not None:
             self.set_view_mapper(default_view_mapper)
             self.commit()
-        
+
     # getSiteManager is a unit testing dep injection
     def hook_zca(self, getSiteManager=None):
         """ Call :func:`zope.component.getSiteManager.sethook` with
@@ -1050,7 +1050,7 @@ class Configurator(object):
           accept ``(context, request)``.  The decorator must return a
           replacement view callable which also accepts ``(context,
           request)``.
-          
+
         mapper
 
           A Python object or :term:`dotted Python name` which refers to a
@@ -1059,7 +1059,7 @@ class Configurator(object):
           plug-point is useful for Pyramid extension developers, but it's not
           very useful for 'civilians' who are just developing stock Pyramid
           applications. Pay no attention to the man behind the curtain.
-          
+
         Predicate Arguments
 
         name
@@ -1091,11 +1091,12 @@ class Configurator(object):
           by :term:`traversal` against the result of the route's
           :term:`root factory`.
 
-          .. warning:: Using this argument services an advanced
-             feature that isn't often used unless you want to perform
-             traversal *after* a route has matched. See
-             :ref:`hybrid_chapter` for more information on using this
-             advanced feature.
+          .. warning::
+
+             Using this argument services an advanced feature that isn't often
+             used unless you want to perform traversal *after* a route has
+             matched. See :ref:`hybrid_chapter` for more information on using
+             this advanced feature.
 
         request_type
 
@@ -1510,12 +1511,14 @@ class Configurator(object):
           pattern doesn't match the current URL, route matching
           continues.
 
-          .. note:: For backwards compatibility purposes (as of
-             :app:`Pyramid` 1.0), a ``path`` keyword argument passed
-             to this function will be used to represent the pattern
-             value if the ``pattern`` argument is ``None``.  If both
-             ``path`` and ``pattern`` are passed, ``pattern`` wins.
-        
+          .. note::
+
+             For backwards compatibility purposes (as of :app:`Pyramid` 1.0), a
+             ``path`` keyword argument passed to this function will be used to
+             represent the pattern value if the ``pattern`` argument is
+             ``None``.  If both ``path`` and ``pattern`` are passed, ``pattern``
+             wins.
+
         xhr
 
           This value should be either ``True`` or ``False``.  If this
@@ -1829,7 +1832,7 @@ class Configurator(object):
         # if name is None or the empty string, we're trying to register
         # a default renderer, but registerUtility is too dumb to accept None
         # as a name
-        if not name: 
+        if not name:
             name = ''
         # we need to register renderers eagerly because they are used during
         # view configuration
@@ -1892,11 +1895,12 @@ class Configurator(object):
         """ Add a default forbidden view to the current configuration
         state.
 
-        .. warning:: This method has been deprecated in :app:`Pyramid`
-           1.0.  *Do not use it for new development; it should only be
-           used to support older code bases which depend upon it.* See
-           :ref:`changing_the_forbidden_view` to see how a forbidden
-           view should be registered in new projects.
+        .. warning::
+
+           This method has been deprecated in :app:`Pyramid` 1.0.  *Do not use
+           it for new development; it should only be used to support older code
+           bases which depend upon it.* See :ref:`changing_the_forbidden_view`
+           to see how a forbidden view should be registered in new projects.
 
         The ``view`` argument should be a :term:`view callable` or a
         :term:`dotted Python name` which refers to a view callable.
@@ -1930,12 +1934,12 @@ class Configurator(object):
         """ Add a default not found view to the current configuration
         state.
 
-        .. warning:: This method has been deprecated in
-           :app:`Pyramid` 1.0.  *Do not use it for new development;
-           it should only be used to support older code bases which
-           depend upon it.* See :ref:`changing_the_notfound_view` to
-           see how a not found view should be registered in new
-           projects.
+        .. warning::
+
+           This method has been deprecated in :app:`Pyramid` 1.0.  *Do not use
+           it for new development; it should only be used to support older code
+           bases which depend upon it.* See :ref:`changing_the_notfound_view` to
+           see how a not found view should be registered in new projects.
 
         The ``view`` argument should be a :term:`view callable` or a
         :term:`dotted Python name` which refers to a view callable.
@@ -1974,9 +1978,11 @@ class Configurator(object):
         :class:`pyramid.request.Request` class (particularly
         ``__call__``, and ``blank``).
 
-        .. note:: Using the :meth:``request_factory`` argument to the
-           :class:`pyramid.config.Configurator` constructor
-           can be used to achieve the same purpose.
+        .. note::
+
+           Using the :meth:``request_factory`` argument to the
+           :class:`pyramid.config.Configurator` constructor can be used to
+           achieve the same purpose.
         """
         factory = self.maybe_dotted(factory)
         def register():
@@ -1997,10 +2003,11 @@ class Configurator(object):
         dictionary, and therefore will be made available to the code
         which uses the renderer.
 
-        .. note:: Using the :meth:`renderer_globals_factory`
-           argument to the
-           :class:`pyramid.config.Configurator` constructor
-           can be used to achieve the same purpose.
+        .. note::
+
+           Using the :meth:`renderer_globals_factory` argument to the
+           :class:`pyramid.config.Configurator` constructor can be used to
+           achieve the same purpose.
         """
         factory = self.maybe_dotted(factory)
         def register():
@@ -2022,9 +2029,11 @@ class Configurator(object):
         application.  See :ref:`activating_translation` for more
         information.
 
-        .. note:: Using the ``locale_negotiator`` argument to the
-           :class:`pyramid.config.Configurator` constructor
-           can be used to achieve the same purpose.
+        .. note::
+
+           Using the ``locale_negotiator`` argument to the
+           :class:`pyramid.config.Configurator` constructor can be used to
+           achieve the same purpose.
         """
         negotiator = self.maybe_dotted(negotiator)
         def register():
@@ -2064,9 +2073,11 @@ class Configurator(object):
 
         See also :ref:`setting_a_default_permission`.
 
-        .. note:: Using the ``default_permission`` argument to the
-           :class:`pyramid.config.Configurator` constructor
-           can be used to achieve the same purpose.
+        .. note::
+
+           Using the ``default_permission`` argument to the
+           :class:`pyramid.config.Configurator` constructor can be used to
+           achieve the same purpose.
         """
         # default permission used during view registration
         self.registry.registerUtility(permission, IDefaultPermission)
@@ -2088,7 +2099,7 @@ class Configurator(object):
         used by all subsequent :term:`view configuration` registrations, as
         if you had passed a ``default_view_mapper`` argument to the
         :class:`pyramid.config.Configurator` constructor.
-        
+
         See also :ref:`using_an_alternate_view_mapper`.
         """
         mapper = self.maybe_dotted(mapper)
@@ -2879,7 +2890,7 @@ class DefaultViewMapper(object):
         elif self.attr:
             mapped_view = self.map_nonclass_attr(view)
         return mapped_view
-        
+
     def map_class_requestonly(self, view):
         # its a class that has an __init__ which only accepts request
         attr = self.attr

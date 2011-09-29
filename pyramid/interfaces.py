@@ -9,9 +9,11 @@ class IContextFound(Interface):
     documentation attached to :class:`pyramid.events.ContextFound`
     for more information.
 
-    .. note:: For backwards compatibility with versions of
-       :app:`Pyramid` before 1.0, this event interface can also be
-       imported as :class:`pyramid.interfaces.IAfterTraversal`.
+    .. note::
+
+       For backwards compatibility with versions of :app:`Pyramid` before 1.0,
+       this event interface can also be imported as
+       :class:`pyramid.interfaces.IAfterTraversal`.
     """
     request = Attribute('The request object')
 
@@ -22,7 +24,7 @@ class INewRequest(Interface):
     begins to process a new request.  See the documentation attached
     to :class:`pyramid.events.NewRequest` for more information."""
     request = Attribute('The request object')
-    
+
 class INewResponse(Interface):
     """ An event type that is emitted whenever any :app:`Pyramid`
     view returns a response. See the
@@ -38,8 +40,10 @@ class IApplicationCreated(Interface):
     :class:`pyramid.events.ApplicationCreated` for more
     information.
 
-    .. note:: For backwards compatibility with :app:`Pyramid`
-       versions before 1.0, this interface can also be imported as
+    .. note::
+
+       For backwards compatibility with :app:`Pyramid` versions before 1.0, this
+       interface can also be imported as
        :class:`pyramid.interfaces.IWSGIApplicationCreatedEvent`.
     """
     app = Attribute(u"Created application")
@@ -146,7 +150,7 @@ class IViewMapperFactory(Interface):
 class IRequest(Interface):
     """ Request type interface attached to all request objects """
 
-IRequest.combined = IRequest # for exception view lookups 
+IRequest.combined = IRequest # for exception view lookups
 
 class IRouteRequest(Interface):
     """ *internal only* interface used as in a utility lookup to find
@@ -180,7 +184,7 @@ class IAuthenticationPolicy(Interface):
         principal named ``principal`` when set in a response.  An
         individual authentication policy and its consumers can decide
         on the composition and meaning of **kw. """
-    
+
     def forget(request):
         """ Return a set of headers suitable for 'forgetting' the
         current user on subsequent requests. """
@@ -191,7 +195,7 @@ class IAuthorizationPolicy(Interface):
         """ Return ``True`` if any of the ``principals`` is allowed the
         ``permission`` in the current ``context``, else return ``False``
         """
-        
+
     def principals_allowed_by_permission(context, permission):
         """ Return a set of principal identifiers allowed by the
         ``permission`` in ``context``.  This behavior is optional; if you
@@ -314,12 +318,12 @@ class IRouter(Interface):
     a view registry."""
     registry = Attribute(
         """Component architecture registry local to this application.""")
-    
+
 class ISettings(Interface):
     """ Runtime settings utility for pyramid; represents the
     deployment settings for the application.  Implements a mapping
     interface."""
-    
+
 # this interface, even if it becomes unused within Pyramid, is
 # imported by other packages (such as traversalwrapper)
 class ILocation(Interface):
@@ -446,7 +450,7 @@ class IChameleonTranslate(Interface):
 
 class ILocalizer(Interface):
     """ Localizer for a specific language """
-        
+
 class ILocaleNegotiator(Interface):
     def __call__(request):
         """ Return a locale name """
@@ -533,7 +537,7 @@ class ISession(Interface):
         """
 
     # mapping methods
-    
+
     def __getitem__(key):
         """Get a value for a key
 
@@ -578,19 +582,19 @@ class ISession(Interface):
 
     def clear():
         "delete all items"
-    
+
     def update(d):
         " Update D from E: for k in E.keys(): D[k] = E[k]"
-    
+
     def setdefault(key, default=None):
         " D.setdefault(k[,d]) -> D.get(k,d), also set D[k]=d if k not in D "
-    
+
     def pop(k, *args):
         """remove specified key and return the corresponding value
         ``*args`` may contain a single default value, or may not be supplied.
-        If key is not found, default is returned if given, otherwise 
+        If key is not found, default is returned if given, otherwise
         ``KeyError`` is raised"""
-    
+
     def popitem():
         """remove and return some (key, value) pair as a
         2-tuple; but raise ``KeyError`` if mapping is empty"""
@@ -620,5 +624,5 @@ class IRendererInfo(Interface):
                          'renderer was created')
     settings = Attribute('The deployment settings dictionary related '
                          'to the current application')
-    
+
 

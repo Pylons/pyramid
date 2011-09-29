@@ -42,21 +42,22 @@ within the body of a view callable like so:
    from pyramid.renderers import render_to_response
 
    def sample_view(request):
-       return render_to_response('templates/foo.pt', 
-                                 {'foo':1, 'bar':2}, 
+       return render_to_response('templates/foo.pt',
+                                 {'foo':1, 'bar':2},
                                  request=request)
 
-.. warning:: Earlier iterations of this documentation
-   (pre-version-1.3) encouraged the application developer to use
-   ZPT-specific APIs such as
+.. warning::
+
+   Earlier iterations of this documentation (pre-version-1.3) encouraged the
+   application developer to use ZPT-specific APIs such as
    :func:`pyramid.chameleon_zpt.render_template_to_response` and
-   :func:`pyramid.chameleon_zpt.render_template` to render templates
-   directly.  This style of rendering still works, but at least for
-   purposes of this documentation, those functions are deprecated.
-   Application developers are encouraged instead to use the functions
-   available in the :mod:`pyramid.renderers` module to perform
-   rendering tasks.  This set of functions works to render templates
-   for all renderer extensions registered with :app:`Pyramid`.
+   :func:`pyramid.chameleon_zpt.render_template` to render templates directly.
+   This style of rendering still works, but at least for purposes of this
+   documentation, those functions are deprecated.  Application developers are
+   encouraged instead to use the functions available in the
+   :mod:`pyramid.renderers` module to perform rendering tasks.  This set of
+   functions works to render templates for all renderer extensions registered
+   with :app:`Pyramid`.
 
 The ``sample_view`` :term:`view callable` function above returns a
 :term:`response` object which contains the body of the
@@ -128,8 +129,8 @@ Every view must return a :term:`response` object, except for views
 which use a :term:`renderer` named via view configuration (which we'll
 see shortly).  The :func:`pyramid.renderers.render_to_response`
 function is a shortcut function that actually returns a response
-object. This allows the example view above to simply return the result 
-of its call to ``render_to_response()`` directly. 
+object. This allows the example view above to simply return the result
+of its call to ``render_to_response()`` directly.
 
 Obviously not all APIs you might call to get response data will return a
 response object. For example, you might render one or more templates to
@@ -145,8 +146,8 @@ as the body of the response:
    from pyramid.response import Response
 
    def sample_view(request):
-       result = render('mypackage:templates/foo.pt', 
-                       {'foo':1, 'bar':2}, 
+       result = render('mypackage:templates/foo.pt',
+                       {'foo':1, 'bar':2},
                        request=request)
        response = Response(result)
        return response
@@ -229,7 +230,7 @@ of :func:`~pyramid.renderers.render` (a string):
 
    def sample_view(request):
        result = render('mypackage:templates/foo.pt',
-                       {'foo':1, 'bar':2}, 
+                       {'foo':1, 'bar':2},
                        request=request)
        response = Response(result)
        response.content_type = 'text/plain'
@@ -263,7 +264,7 @@ values are provided in a dictionary to the renderer and include:
   The renderer name used to perform the rendering,
   e.g. ``mypackage:templates/foo.pt``.
 
-``renderer_info`` 
+``renderer_info``
   An object implementing the :class:`pyramid.interfaces.IRendererInfo`
   interface.  Basically, an object with the following attributes:
   ``name``, ``package`` and ``type``.
@@ -285,7 +286,7 @@ Templates Used as Renderers via Configuration
 An alternative to using :func:`~pyramid.renderers.render_to_response`
 to render templates manually in your view callable code, is
 to specify the template as a :term:`renderer` in your
-*view configuration*. This can be done with any of the 
+*view configuration*. This can be done with any of the
 templating languages supported by :app:`Pyramid`.
 
 To use a renderer via view configuration, specify a template
@@ -401,7 +402,7 @@ The language definition documentation for Chameleon ZPT-style
 templates is available from `the Chameleon website
 <http://chameleon.repoze.org/>`_.
 
-.. warning:: 
+.. warning::
 
    :term:`Chameleon` only works on :term:`CPython` platforms and
    :term:`Google App Engine`.  On :term:`Jython` and other non-CPython
@@ -437,7 +438,7 @@ Here's what a simple :term:`Chameleon` ZPT template used under
 .. code-block:: xml
    :linenos:
 
-    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml"
           xmlns:tal="http://xml.zope.org/namespaces/tal">
@@ -500,7 +501,7 @@ Where ``templates/master.pt`` might look like so:
 .. code-block:: xml
    :linenos:
 
-    <html xmlns="http://www.w3.org/1999/xhtml" 
+    <html xmlns="http://www.w3.org/1999/xhtml"
           xmlns:tal="http://xml.zope.org/namespaces/tal"
           xmlns:metal="http://xml.zope.org/namespaces/metal">
       <span metal:define-macro="hello">
@@ -515,7 +516,7 @@ And ``templates/mytemplate.pt`` might look like so:
 .. code-block:: xml
    :linenos:
 
-    <html xmlns="http://www.w3.org/1999/xhtml" 
+    <html xmlns="http://www.w3.org/1999/xhtml"
           xmlns:tal="http://xml.zope.org/namespaces/tal"
           xmlns:metal="http://xml.zope.org/namespaces/metal">
       <span metal:use-macro="main.macros['hello']">
@@ -734,7 +735,7 @@ look like:
 .. code-block:: xml
    :linenos:
 
-    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml"
           xmlns:tal="http://xml.zope.org/namespaces/tal">
@@ -807,7 +808,7 @@ Available Add-On Template System Bindings
 
 Jinja2 template bindings are available for :app:`Pyramid` in the
 ``pyramid_jinja2`` package. You can get the latest release of
-this package from the 
+this package from the
 `Python package index <http://pypi.python.org/pypi/pyramid_jinja2>`_
 (pypi).
 

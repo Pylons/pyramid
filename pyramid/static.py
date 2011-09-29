@@ -52,7 +52,7 @@ class PackageURLParser(StaticURLParser):
                 cache_max_age=self.cache_max_age)(environ, start_response)
         if (environ.get('PATH_INFO')
             and environ.get('PATH_INFO') != '/'): # pragma: no cover
-            return self.error_extra_path(environ, start_response) 
+            return self.error_extra_path(environ, start_response)
         full = pkg_resources.resource_filename(self.package_name, resource)
         if_none_match = environ.get('HTTP_IF_NONE_MATCH')
         if if_none_match:
@@ -178,14 +178,16 @@ class static_view(object):
     response headers returned by the view (default is 3600 seconds or
     five minutes).
 
-    .. note:: If the ``root_dir`` is relative to a :term:`package`, or
+    .. note::
+
+         If the ``root_dir`` is relative to a :term:`package`, or
          is a :term:`asset specification` the :app:`Pyramid`
          :class:`pyramid.config.Configurator` method can be
          used to override assets within the named ``root_dir``
          package-relative directory.  However, if the ``root_dir`` is
          absolute, configuration will not be able to
          override the assets it contains.  """
-    
+
     def __init__(self, root_dir, cache_max_age=3600, package_name=None):
         # package_name is for bw compat; it is preferred to pass in a
         # package-relative path as root_dir

@@ -7,18 +7,18 @@ A :term:`view callable` in a :term:`url dispatch` -based
 accepts a single parameter named :term:`request`.  A view callable is
 assumed to return a :term:`response` object.
 
-.. note:: A :app:`Pyramid` view can also be defined as callable
-   which accepts *two* arguments: a :term:`context` and a
-   :term:`request`.  You'll see this two-argument pattern used in
-   other :app:`Pyramid` tutorials and applications.  Either calling
-   convention will work in any :app:`Pyramid` application; the
-   calling conventions can be used interchangeably as necessary.  In
-   :term:`url dispatch` based applications, however, the context
-   object is rarely used in the view body itself, so within this
-   tutorial we define views as callables that accept only a request to
-   avoid the visual "noise".  If you do need the ``context`` within a
-   view function that only takes the request as a single argument, you
-   can obtain it via ``request.context``.
+.. note::
+
+   A :app:`Pyramid` view can also be defined as callable which accepts *two*
+   arguments: a :term:`context` and a :term:`request`.  You'll see this
+   two-argument pattern used in other :app:`Pyramid` tutorials and applications.
+   Either calling convention will work in any :app:`Pyramid` application; the
+   calling conventions can be used interchangeably as necessary.  In :term:`url
+   dispatch` based applications, however, the context object is rarely used in
+   the view body itself, so within this tutorial we define views as callables
+   that accept only a request to avoid the visual "noise".  If you do need the
+   ``context`` within a view function that only takes the request as a single
+   argument, you can obtain it via ``request.context``.
 
 The request passed to every view that is called as the result of a route
 match has an attribute named ``matchdict`` that contains the elements placed
@@ -350,7 +350,7 @@ The expected output is something like:
    writing top-level names to tutorial.egg-info/top_level.txt
    writing dependency_links to tutorial.egg-info/dependency_links.txt
    writing entry points to tutorial.egg-info/entry_points.txt
-   unrecognized .svn/entries format in 
+   unrecognized .svn/entries format in
    reading manifest file 'tutorial.egg-info/SOURCES.txt'
    writing manifest file 'tutorial.egg-info/SOURCES.txt'
    running build_ext
@@ -362,4 +362,4 @@ The expected output is something like:
 
 
 
-   
+
