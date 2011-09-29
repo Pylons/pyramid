@@ -75,6 +75,10 @@ class Test_renderer_factory(Base, unittest.TestCase):
         self._callFUT(info)
         lookup = self.config.registry.getUtility(IMakoLookup)
         module_path = os.path.dirname(sys.modules['__main__'].__file__)
+        # if tests are run with "python ./setup test" as opposite to the "python
+        # setup.py test" the dirname for the file will be ".". so fix it up.
+        if module_path == '.':
+            module_path = ''
         self.assertEqual(lookup.directories, [
             os.path.join(module_path, 'a'),
             os.path.join(module_path, 'b')])
