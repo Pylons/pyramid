@@ -74,7 +74,8 @@ class Test_renderer_factory(Base, unittest.TestCase):
             })
         self._callFUT(info)
         lookup = self.config.registry.getUtility(IMakoLookup)
-        module_path = os.path.dirname(sys.modules['__main__'].__file__)
+        module_path = os.path.dirname(
+            sys.modules['__main__'].__file__).rstrip('.') # ./setup.py
         self.assertEqual(lookup.directories, [
             os.path.join(module_path, 'a'),
             os.path.join(module_path, 'b')])
