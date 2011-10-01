@@ -10,7 +10,7 @@ Before You Install
 ------------------
 
 You will need `Python <http://python.org>`_ version 2.4 or better to
-run :app:`Pyramid`.  
+run :app:`Pyramid`.
 
 .. sidebar:: Python Versions
 
@@ -143,7 +143,7 @@ setuptools`` within the Python interpreter you'd like to run
 .. code-block:: text
 
    [chrism@vitaminf pyramid]$ python
-   Python 2.4.5 (#1, Aug 29 2008, 12:27:37) 
+   Python 2.4.5 (#1, Aug 29 2008, 12:27:37)
    [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
    Type "help", "copyright", "credits" or "license" for more information.
    >>> import setuptools
@@ -221,14 +221,15 @@ following:
    New python executable in env/bin/python
    Installing setuptools.............done.
 
-.. warning:: Using ``--no-site-packages`` when generating your
-   virtualenv is *very important*. This flag provides the necessary
-   isolation for running the set of packages required by
-   :app:`Pyramid`.  If you do not specify ``--no-site-packages``,
-   it's possible that :app:`Pyramid` will not install properly into
-   the virtualenv, or, even if it does, may not run properly,
-   depending on the packages you've already got installed into your
-   Python's "main" site-packages dir.
+.. warning::
+
+   Using ``--no-site-packages`` when generating your virtualenv is *very
+   important*. This flag provides the necessary isolation for running the set of
+   packages required by :app:`Pyramid`.  If you do not specify
+   ``--no-site-packages``, it's possible that :app:`Pyramid` will not install
+   properly into the virtualenv, or, even if it does, may not run properly,
+   depending on the packages you've already got installed into your Python's
+   "main" site-packages dir.
 
 .. warning:: If you're on UNIX, *do not* use ``sudo`` to run the
    ``virtualenv`` script.  It's perfectly acceptable (and desirable)

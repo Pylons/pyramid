@@ -10,7 +10,7 @@ URL Dispatch
 code using a simple pattern matching language.  An ordered set of
 patterns is checked one-by-one.  If one of the patterns matches the path
 information associated with a request, a particular :term:`view
-callable` is invoked.  
+callable` is invoked.
 
 :term:`URL dispatch` is one of two ways to perform :term:`resource
 location` in :app:`Pyramid`; the other way is using :term:`traversal`.
@@ -118,7 +118,7 @@ rather than an actual callable:
    # "config" below is presumed to be an instance of the
    # pyramid.config.Configurator class; "myview" is assumed
    # to be a "view callable" function
-   config.add_route('myroute', '/prefix/{one}/{two}', 
+   config.add_route('myroute', '/prefix/{one}/{two}',
                     view='myproject.views.myview')
 
 When a route configuration names a ``view`` attribute, the :term:`view
@@ -200,7 +200,7 @@ at the end of the segment represented by ``{name}.html`` (it only contains
 To capture both segments, two replacement markers can be used:
 
 .. code-block:: text
-    
+
     foo/{name}.{ext}
 
 The literal path ``/foo/biz.html`` will match the above route pattern, and
@@ -266,10 +266,10 @@ The above pattern will match these URLs, generating the following matchdicts:
 
 .. code-block:: text
 
-   foo/1/2/           -> 
+   foo/1/2/           ->
             {'baz':u'1', 'bar':u'2', 'fizzle':()}
 
-   foo/abc/def/a/b/c  -> 
+   foo/abc/def/a/b/c  ->
             {'baz':u'abc', 'bar':u'def', 'fizzle':(u'a', u'b', u'c')}
 
 Note that when a ``*stararg`` remainder match is matched, the value put into
@@ -298,7 +298,7 @@ split by segment. Changing the regular expression used to match a marker can
 also capture the remainder of the URL, for example:
 
 .. code-block:: text
-    
+
     foo/{baz}/{bar}{fizzle:.*}
 
 The above pattern will match these URLs, generating the following matchdicts:
@@ -363,7 +363,7 @@ resource of the view callable ultimately found via :term:`view lookup`.
 .. code-block:: python
    :linenos:
 
-   config.add_route('abc', '/abc', view='myproject.views.theview', 
+   config.add_route('abc', '/abc', view='myproject.views.theview',
                     factory='myproject.resources.root_factory')
 
 The factory can either be a Python object or a :term:`dotted Python name` (a
@@ -430,7 +430,7 @@ For example:
 
    num_one_two_or_three = any_of('num', 'one', 'two', 'three')
 
-   config.add_route('num', '/{num}', 
+   config.add_route('num', '/{num}',
                     custom_predicates=(num_one_two_or_three,))
 
 The above ``any_of`` function generates a predicate which ensures that the
@@ -461,7 +461,7 @@ instance, a predicate might do some type conversion of values:
 
     ymd_to_int = integers('year', 'month', 'day')
 
-    config.add_route('num', '/{year}/{month}/{day}', 
+    config.add_route('num', '/{year}/{month}/{day}',
                      custom_predicates=(ymd_to_int,))
 
 Note that a conversion predicate is still a predicate so it must return
@@ -484,7 +484,7 @@ expressions specifying requirements for that marker. For instance:
 
     ymd_to_int = integers('year', 'month', 'day')
 
-    config.add_route('num', '/{year:\d+}/{month:\d+}/{day:\d+}', 
+    config.add_route('num', '/{year:\d+}/{month:\d+}/{day:\d+}',
                      custom_predicates=(ymd_to_int,))
 
 Now the try/except is no longer needed because the route will not match at
@@ -522,7 +522,7 @@ the route in a set of route predicates:
 
     config.add_route('y', '/{year}', custom_predicates=(twenty_ten,))
     config.add_route('ym', '/{year}/{month}', custom_predicates=(twenty_ten,))
-    config.add_route('ymd', '/{year}/{month}/{day}', 
+    config.add_route('ymd', '/{year}/{month}/{day}',
                      custom_predicates=(twenty_ten,))
 
 The above predicate, when added to a number of route configurations ensures
@@ -717,7 +717,7 @@ An example of using a route with a factory:
 .. code-block:: python
    :linenos:
 
-   config.add_route('idea', 'ideas/{idea}', 
+   config.add_route('idea', 'ideas/{idea}',
                     view='myproject.views.idea_view',
                     factory='myproject.resources.Idea')
 
@@ -835,7 +835,7 @@ route configuration looks like so:
 
    config.add_route('noslash', 'no_slash',
                     view='myproject.views.no_slash')
-   config.add_route('hasslash', 'has_slash/', 
+   config.add_route('hasslash', 'has_slash/',
                     view='myproject.views.has_slash')
 
 If a request enters the application with the ``PATH_INFO`` value of
@@ -911,7 +911,7 @@ Cleaning Up After a Request
 ---------------------------
 
 Sometimes it's required that some cleanup be performed at the end of a
-request when a database connection is involved.  
+request when a database connection is involved.
 
 For example, let's say you have a ``mypackage`` :app:`Pyramid` application
 package that uses SQLAlchemy, and you'd like the current SQLAlchemy database
@@ -985,8 +985,10 @@ permission.  Obviously you can do more generic things than inspect the routes
 match dict to see if the ``article`` argument matches a particular string;
 our sample ``Article`` factory class is not very ambitious.
 
-.. note:: See :ref:`security_chapter` for more information about
-   :app:`Pyramid` security and ACLs.
+.. note::
+
+   See :ref:`security_chapter` for more information about :app:`Pyramid`
+   security and ACLs.
 
 .. _debug_routematch_section:
 
@@ -1005,7 +1007,7 @@ which you started the application from.  For example:
    :linenos:
 
     [chrism@thinko pylonsbasic]$ PYRAMID_DEBUG_ROUTEMATCH=true \
-                                 bin/paster serve development.ini 
+                                 bin/paster serve development.ini
     Starting server in PID 13586.
     serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
     2010-12-16 14:45:19,956 no route matched for url \
@@ -1042,10 +1044,10 @@ For example:
 
    [chrism@thinko MyProject]$ ../bin/paster proutes development.ini MyProject
    Name            Pattern                        View
-   ----            -------                        ----                     
+   ----            -------                        ----
    home            /                              <function my_view>
    home2           /                              <function my_view>
-   another         /another                       None                     
+   another         /another                       None
    static/         static/*subpath                <static_view object>
    catchall        /*subpath                      <function static_view>
 

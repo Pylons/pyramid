@@ -21,7 +21,7 @@ from pyramid.path import caller_package
 from pyramid import renderers
 
 registry_lock = threading.Lock()
-    
+
 def renderer_factory(info, lock=registry_lock):
     return renderers.template_renderer_factory(info, ZPTTemplateRenderer)
 
@@ -43,7 +43,7 @@ class ZPTTemplateRenderer(object):
 
     def implementation(self):
         return self.template
-    
+
     def __call__(self, value, system):
         try:
             system.update(value)
@@ -58,7 +58,7 @@ def get_renderer(path):
     ``path`` argument.  The ``path`` argument may be a
     package-relative path, an absolute path, or a :term:`asset
     specification`.
-    
+
     .. warning:: This API is deprecated in :app:`Pyramid` 1.0.  Use
        :func:`pyramid.renderers.get_renderer` instead.
     """
@@ -77,8 +77,10 @@ def get_template(path):
     The ``path`` argument may be a package-relative path, an absolute
     path, or a :term:`asset specification`.
 
-    .. warning:: This API is deprecated in :app:`Pyramid` 1.0.  Use
-       the ``implementation()`` method of a template renderer retrieved via
+    .. warning::
+
+       This API is deprecated in :app:`Pyramid` 1.0.  Use the
+       ``implementation()`` method of a template renderer retrieved via
        :func:`pyramid.renderers.get_renderer` instead.
     """
     package = caller_package()
@@ -99,7 +101,9 @@ def render_template(path, **kw):
     names to the template, and so may be used within the template
     itself.  Returns a string.
 
-    .. warning:: This API is deprecated in :app:`Pyramid` 1.0.  Use
+    .. warning::
+
+       This API is deprecated in :app:`Pyramid` 1.0.  Use
        :func:`pyramid.renderers.render` instead.
     """
     package = caller_package()
@@ -121,7 +125,9 @@ def render_template_to_response(path, **kw):
     itself.  Returns a :term:`Response` object with the body as the
     template result.
 
-    .. warning:: This API is deprecated in :app:`Pyramid` 1.0.  Use
+    .. warning::
+
+       This API is deprecated in :app:`Pyramid` 1.0.  Use
        :func:`pyramid.renderers.render_to_response` instead.
     """
     package = caller_package()

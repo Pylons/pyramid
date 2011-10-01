@@ -245,14 +245,14 @@ its API is much nicer than the ZCA registry API, work on it was largely
 abandoned and it is not used in :app:`Pyramid`.  We continued to use a ZCA
 registry within :app:`Pyramid` because it ultimately proved a better fit.
 
-.. note:: We continued using ZCA registry rather than disusing it in
-   favor of using the registry implementation in
-   :mod:`repoze.component` largely because the ZCA concept of
-   interfaces provides for use of an interface hierarchy, which is
-   useful in a lot of scenarios (such as context type inheritance).
-   Coming up with a marker type that was something like an interface
-   that allowed for this functionality seemed like it was just
-   reinventing the wheel.
+.. note::
+
+   We continued using ZCA registry rather than disusing it in favor of using the
+   registry implementation in :mod:`repoze.component` largely because the ZCA
+   concept of interfaces provides for use of an interface hierarchy, which is
+   useful in a lot of scenarios (such as context type inheritance).  Coming up
+   with a marker type that was something like an interface that allowed for this
+   functionality seemed like it was just reinventing the wheel.
 
 Making framework developers and extenders understand the ZCA registry API is
 a trade-off.  We (the :app:`Pyramid` developers) like the features that the
@@ -406,7 +406,7 @@ predicate that narrows matching to something that accepts a JSON response:
    :linenos:
 
    from pyramid.view import view_config
-   @view_config(name='post_view', request_method='POST', 
+   @view_config(name='post_view', request_method='POST',
                 accept='application/json', renderer='json')
    def post_view(request):
        return 'POSTed'
@@ -791,12 +791,12 @@ very well in general. Quoting from the `Model-View-Controller Wikipedia entry
     often via a registered handler or callback and converts the event
     into appropriate user action, understandable for the model.
 
-    The controller notifies the model of the user action, possibly  
+    The controller notifies the model of the user action, possibly
     resulting in a change in the model's state. (For example, the
     controller updates the user's shopping cart.)[5]
 
     A view queries the model in order to generate an appropriate
-    user interface (for example, the view lists the shopping cart's     
+    user interface (for example, the view lists the shopping cart's
     contents). Note that the view gets its own data from the model.
 
     The controller may (in some implementations) issue a general
@@ -1101,7 +1101,7 @@ printed, right?  Sadly, no:
 
 .. code-block:: text
 
-    [chrism@thinko]$ python app.py 
+    [chrism@thinko]$ python app.py
     [<function foo at 0x7f4ea41ab1b8>,
      <function foo at 0x7f4ea41ab230>,
      <function bar at 0x7f4ea41ab2a8>]
@@ -1402,7 +1402,7 @@ global*:
             else:
                 error = 'Invalid username/password'
         # this is executed if the request method was GET or the
-        # credentials were invalid    
+        # credentials were invalid
 
 The `Pylons 1.X <http://pylonsproject.org>`_ web framework uses a similar
 strategy.  It calls these things "Stacked Object Proxies", so, for purposes
@@ -1502,7 +1502,7 @@ comments take into account what we've discussed in the
 
    def hello_world(request):  # accepts a request; no request thread local reqd
        # explicit response object means no response threadlocal
-       return Response('Hello world!') 
+       return Response('Hello world!')
 
    if __name__ == '__main__':
        from pyramid.config import Configurator
