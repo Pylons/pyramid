@@ -12,7 +12,7 @@ Traversal is an alternative to :term:`URL dispatch` which allows
 :app:`Pyramid` applications to map URLs to code.
 
 .. note::
-   
+
    Ex-Zope users whom are already familiar with traversal and view lookup
    conceptually may want to skip directly to the :ref:`traversal_chapter`
    chapter, which discusses technical details.  This chapter is mostly aimed
@@ -161,7 +161,7 @@ interpreter prompt if you don't believe us:
 .. code-block:: text
    :linenos:
 
-   Python 2.4.6 (#2, Apr 29 2010, 00:31:48) 
+   Python 2.4.6 (#2, Apr 29 2010, 00:31:48)
    [GCC 4.4.3] on linux2
    Type "help", "copyright", "credits" or "license" for more information.
    >>> adict = {}
@@ -304,6 +304,8 @@ don't require it, great: stick with :term:`URL dispatch`.  But if you're
 using :app:`Pyramid` and you ever find that you *do* need to support one of
 these use cases, you'll be glad you have traversal in your toolkit.
 
-.. note:: It is even possible to mix and match :term:`traversal` with
-   :term:`URL dispatch` in the same :app:`Pyramid` application. See the
+.. note::
+
+   It is even possible to mix and match :term:`traversal` with :term:`URL
+   dispatch` in the same :app:`Pyramid` application. See the
    :ref:`hybrid_chapter` chapter for details.

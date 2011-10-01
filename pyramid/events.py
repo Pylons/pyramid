@@ -16,7 +16,7 @@ class subscriber(object):
     For example:
 
     .. code-block:: python
-    
+
        from pyramid.events import NewRequest
        from pyramid.events import subscriber
 
@@ -25,9 +25,9 @@ class subscriber(object):
            event.request.foo = 1
 
     More than one event type can be passed as a construtor argument:
-        
+
     .. code-block:: python
-    
+
        from pyramid.events import NewRequest, NewResponse
        from pyramid.events import subscriber
 
@@ -39,7 +39,7 @@ class subscriber(object):
     the function it decorates is called for every event sent:
 
     .. code-block:: python
-    
+
        from pyramid.events import subscriber
 
        @subscriber()
@@ -50,7 +50,7 @@ class subscriber(object):
     against the package or module which contains it, ala:
 
     .. code-block:: python
-    
+
        from pyramid.config import Configurator
        config = Configurator()
        config.scan('somepackage_containing_subscribers')
@@ -130,17 +130,18 @@ class ContextFound(object):
     This class implements the
     :class:`pyramid.interfaces.IContextFound` interface.
 
-    .. note:: As of :app:`Pyramid` 1.0, for backwards compatibility
-       purposes, this event may also be imported as
-       :class:`pyramid.events.AfterTraversal`.
+    .. note::
+
+       As of :app:`Pyramid` 1.0, for backwards compatibility purposes, this
+       event may also be imported as :class:`pyramid.events.AfterTraversal`.
     """
     implements(IContextFound)
     def __init__(self, request):
         self.request = request
 
 AfterTraversal = ContextFound # b/c as of 1.0
-    
-class ApplicationCreated(object):    
+
+class ApplicationCreated(object):
     """ An instance of this class is emitted as an :term:`event` when
     the :meth:`pyramid.config.Configurator.make_wsgi_app` is
     called.  The instance has an attribute, ``app``, which is an
@@ -148,11 +149,11 @@ class ApplicationCreated(object):
     This class implements the
     :class:`pyramid.interfaces.IApplicationCreated` interface.
 
-    .. note:: For backwards compatibility purposes, this class can
-       also be imported as
-       :class:`pyramid.events.WSGIApplicationCreatedEvent`.  This
-       was the name of the event class before :app:`Pyramid` 1.0.
+    .. note::
 
+       For backwards compatibility purposes, this class can also be imported as
+       :class:`pyramid.events.WSGIApplicationCreatedEvent`.  This was the name
+       of the event class before :app:`Pyramid` 1.0.
     """
     implements(IApplicationCreated)
     def __init__(self, app):
@@ -221,4 +222,4 @@ class BeforeRender(dict):
         """ Return the value for key ``k`` from the renderer globals
         dictionary, or the default if no such value exists."""
         return self._system.get(k)
-            
+

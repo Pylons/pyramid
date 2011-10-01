@@ -55,18 +55,21 @@ Here's some sample code that implements a minimal NotFound view callable:
    def notfound_view(request):
        return HTTPNotFound()
 
-.. note:: When a NotFound view callable is invoked, it is passed a
-   :term:`request`.  The ``exception`` attribute of the request will
-   be an instance of the :exc:`~pyramid.exceptions.NotFound`
-   exception that caused the not found view to be called.  The value
-   of ``request.exception.args[0]`` will be a value explaining why the
-   not found error was raised.  This message will be different when
-   the ``debug_notfound`` environment setting is true than it is when
-   it is false.
+.. note::
 
-.. warning:: When a NotFound view callable accepts an argument list as
-   described in :ref:`request_and_context_view_definitions`, the ``context``
-   passed as the first argument to the view callable will be the
+   When a NotFound view callable is invoked, it is passed a :term:`request`.
+   The ``exception`` attribute of the request will be an instance of the
+   :exc:`~pyramid.exceptions.NotFound` exception that caused the not found view
+   to be called.  The value of ``request.exception.args[0]`` will be a value
+   explaining why the not found error was raised.  This message will be
+   different when the ``debug_notfound`` environment setting is true than it is
+   when it is false.
+
+.. warning::
+
+   When a NotFound view callable accepts an argument list as described in
+   :ref:`request_and_context_view_definitions`, the ``context`` passed as the
+   first argument to the view callable will be the
    :exc:`~pyramid.exceptions.NotFound` exception instance.  If available, the
    resource context will still be available as ``request.context``.
 
@@ -120,14 +123,15 @@ Here's some sample code that implements a minimal forbidden view:
    def forbidden_view(request):
        return Response('forbidden')
 
-.. note:: When a forbidden view callable is invoked, it is passed a
-   :term:`request`.  The ``exception`` attribute of the request will
-   be an instance of the :exc:`~pyramid.exceptions.Forbidden`
-   exception that caused the forbidden view to be called.  The value
-   of ``request.exception.args[0]`` will be a value explaining why the
-   forbidden was raised.  This message will be different when the
-   ``debug_authorization`` environment setting is true than it is when
-   it is false.
+.. note::
+
+   When a forbidden view callable is invoked, it is passed a :term:`request`.
+   The ``exception`` attribute of the request will be an instance of the
+   :exc:`~pyramid.exceptions.Forbidden` exception that caused the forbidden view
+   to be called.  The value of ``request.exception.args[0]`` will be a value
+   explaining why the forbidden was raised.  This message will be different when
+   the ``debug_authorization`` environment setting is true than it is when it is
+   false.
 
 .. index::
    single: request factory
@@ -484,7 +488,7 @@ resource by adding a registerAdapter call for
    from myapp.traversal import URLGenerator
    from myapp.resources import MyRoot
 
-   config.registry.registerAdapter(URLGenerator, (MyRoot, Interface), 
+   config.registry.registerAdapter(URLGenerator, (MyRoot, Interface),
                                    IContextURL)
 
 In the above example, the ``myapp.traversal.URLGenerator`` class will be used
@@ -647,9 +651,9 @@ follows:
    import venusian
    from pyramid.threadlocal import get_current_registry
    from mypackage.interfaces import IMyUtility
-    
+
    class registerFunction(object):
-        
+
        def __init__(self, path):
            self.path = path
 
@@ -658,11 +662,11 @@ follows:
            registry.getUtility(IMyUtility).register(
                self.path, wrapped
                )
-        
+
        def __call__(self, wrapped):
            venusian.attach(wrapped, self.register)
            return wrapped
-    
+
 This decorator could then be used to register functions throughout
 your code:
 

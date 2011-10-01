@@ -327,5 +327,3 @@ view as the Not Found view::
 See also :ref:`changing_the_notfound_view`.
 
 """
-
-

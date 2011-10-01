@@ -232,15 +232,16 @@ the below:
 .. literalinclude:: src/views/tutorial/templates/view.pt
    :language: xml
 
-.. note:: The names available for our use in a template are always those that
-   are present in the dictionary returned by the view callable.  But our
-   templates make use of a ``request`` object that none of our tutorial views
-   return in their dictionary.  This value appears as if "by magic".
-   However, ``request`` is one of several names that are available "by
-   default" in a template when a template renderer is used.  See
-   :ref:`chameleon_template_renderers` for more information about other names
-   that are available by default in a template when a template is used as a
-   renderer.
+.. note::
+
+   The names available for our use in a template are always those that are
+   present in the dictionary returned by the view callable.  But our templates
+   make use of a ``request`` object that none of our tutorial views return in
+   their dictionary.  This value appears as if "by magic".  However, ``request``
+   is one of several names that are available "by default" in a template when a
+   template renderer is used.  See :ref:`chameleon_template_renderers` for more
+   information about other names that are available by default in a template
+   when a template is used as a renderer.
 
 The ``edit.pt`` Template
 ------------------------
@@ -317,7 +318,7 @@ The expected result looks something like:
    .........
    ----------------------------------------------------------------------
    Ran 9 tests in 0.203s
-   
+
    OK
 
 Viewing the Application in a Browser
