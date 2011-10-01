@@ -11,7 +11,8 @@
 # All configuration values have a default value; values that are commented out
 # serve to show the default value.
 
-import sys, os
+import sys
+import os
 import datetime
 import inspect
 import warnings
@@ -389,7 +390,7 @@ def frontmatter(name, arguments, options, content, lineno,
 % reset page counter
 \setcounter{page}{1}
 % suppress first toc pagenum
-\addtocontents{toc}{\protect\thispagestyle{empty}} 
+\addtocontents{toc}{\protect\thispagestyle{empty}}
 """,
         format='latex')]
 
@@ -402,7 +403,7 @@ def mainmatter(name, arguments, options, content, lineno,
 % allow part/chapter/section numbering
 \setcounter{secnumdepth}{2}
 % get headers back
-\pagestyle{fancy} 
+\pagestyle{fancy}
 \fancyhf{}
 \renewcommand{\headrulewidth}{0.5pt}
 \renewcommand{\footrulewidth}{0pt}
@@ -488,7 +489,9 @@ epub_uid = 'The Pyramid Web Application Development Framework, Version 1.2'
 #epub_post_files = []
 
 # A list of files that should not be packed into the epub file.
-#epub_exclude_files = []
+epub_exclude_files = ['_static/opensearch.xml', '_static/doctools.js',
+    '_static/jquery.js', '_static/searchtools.js', '_static/underscore.js',
+    '_static/basic.css', 'search.html']
 
 # The depth of the table of contents in toc.ncx.
 epub_tocdepth = 3
