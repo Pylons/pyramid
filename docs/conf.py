@@ -485,7 +485,9 @@ epub_uid = 'The Pyramid Web Application Development Framework, Version 1.0'
 #epub_post_files = []
 
 # A list of files that should not be packed into the epub file.
-#epub_exclude_files = []
+epub_exclude_files = ['_static/opensearch.xml', '_static/doctools.js',
+    '_static/jquery.js', '_static/searchtools.js', '_static/underscore.js',
+    '_static/basic.css', 'search.html']
 
 # The depth of the table of contents in toc.ncx.
 epub_tocdepth = 3
