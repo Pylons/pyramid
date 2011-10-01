@@ -106,6 +106,10 @@ today_fmt = '%B %d, %Y'
 # List of documents that shouldn't be included in the build.
 #unused_docs = []
 
+# List of patterns, relative to source directory, that match files and
+# directories to ignore when looking for source files.
+exclude_patterns = ['_themes/README.rst',]
+
 # List of directories, relative to source directories, that shouldn't be searched
 # for source files.
 #exclude_dirs = []
@@ -381,7 +385,7 @@ def frontmatter(name, arguments, options, content, lineno,
 % reset page counter
 \setcounter{page}{1}
 % suppress first toc pagenum
-\addtocontents{toc}{\protect\thispagestyle{empty}} 
+\addtocontents{toc}{\protect\thispagestyle{empty}}
 """,
         format='latex')]
 
@@ -394,7 +398,7 @@ def mainmatter(name, arguments, options, content, lineno,
 % allow part/chapter/section numbering
 \setcounter{secnumdepth}{2}
 % get headers back
-\pagestyle{fancy} 
+\pagestyle{fancy}
 \fancyhf{}
 \renewcommand{\headrulewidth}{0.5pt}
 \renewcommand{\footrulewidth}{0pt}
