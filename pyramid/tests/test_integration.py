@@ -91,8 +91,9 @@ class TestStaticAppBase(IntegrationBase):
             )
 
     def test_not_modified(self):
+        # 5 years from now (more or less)
         self.testapp.extra_environ = {
-            'HTTP_IF_MODIFIED_SINCE':httpdate(pow(2, 32)-1)}
+            'HTTP_IF_MODIFIED_SINCE':httpdate_future(5*365)}
         res = self.testapp.get('/minimal.pt', status=304)
         self.assertEqual(res.body, b'')
 
@@ -572,9 +573,9 @@ class DummyRequest:
     def get_response(self, application):
         return application(None, None)
 
-def httpdate(ts):
+def httpdate_future(days):
     import datetime
-    ts = datetime.datetime.utcfromtimestamp(ts)
+    ts = datetime.datetime.utcnow() + datetime.timedelta(days)
     return ts.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
 def read_(filename):
