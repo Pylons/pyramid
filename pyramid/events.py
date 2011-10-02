@@ -172,7 +172,7 @@ class BeforeRender(dict):
     This event object iself has a dictionary-like interface that can be used
     for this purpose.  For example::
 
-      from repoze.events import subscriber
+      from pyramid.events import subscriber
       from pyramid.events import BeforeRender
 
       @subscriber(BeforeRender)
