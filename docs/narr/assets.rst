@@ -335,7 +335,7 @@ your application root as below.
 .. code-block:: python
    :linenos:
 
-   from pyramid.static import static
+   from pyramid.static import static_view
    static_view = static_view('/path/to/static/dir', use_subpath=True)
 
 .. note:: For better cross-system flexibility, use an :term:`asset
