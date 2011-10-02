@@ -174,7 +174,7 @@ class view_config(object):
                  containment=None, attr=None, renderer=None, wrapper=None,
                  xhr=False, accept=None, header=None, path_info=None,
                  custom_predicates=(), context=None, decorator=None,
-                 mapper=None, http_cache=None):
+                 mapper=None, http_cache=None, match_param=None):
         self.name = name
         self.request_type = request_type
         self.context = context or for_
@@ -194,6 +194,7 @@ class view_config(object):
         self.decorator = decorator
         self.mapper = mapper
         self.http_cache = http_cache
+        self.match_param = match_param
 
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
