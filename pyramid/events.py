@@ -75,7 +75,7 @@ class subscriber(object):
 class NewRequest(object):
     """ An instance of this class is emitted as an :term:`event`
     whenever :app:`Pyramid` begins to process a new request.  The
-    even instance has an attribute, ``request``, which is a
+    event instance has an attribute, ``request``, which is a
     :term:`request` object.  This event class implements the
     :class:`pyramid.interfaces.INewRequest` interface."""
     def __init__(self, request):
