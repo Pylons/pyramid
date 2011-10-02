@@ -2,6 +2,7 @@
 
 import os
 import unittest
+from locale import getdefaultlocale
 
 from pyramid.wsgi import wsgiapp
 from pyramid.view import view_config
@@ -583,5 +584,8 @@ def read_(filename):
         return val
     
 def _assertBody(body, filename):
+    # If system locale does not have an encoding then default to utf-8
+    if getdefaultlocale()[1] == None:
+        filename = filename.encode('utf-8')
     assert(body.replace(b'\r', b'') == read_(filename))
 
