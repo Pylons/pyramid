@@ -13,7 +13,7 @@ Features
 Bug Fixes
 ---------
 
-- Make test suite pass on 32-bit systems; fixes #286.
+- Make test suite pass on 32-bit systems; closes #286.  closes #306.
   See also https://github.com/Pylons/pyramid/issues/286
 
 Backwards Incompatibilities
