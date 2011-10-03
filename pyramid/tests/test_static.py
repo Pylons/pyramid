@@ -138,7 +138,8 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
     def test_resource_notmodified(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':'/index.html'})
-        request.if_modified_since = pow(2, 32) -1
+        # 5 years from now (more or less)
+        request.if_modified_since = httpdate_future(5*365)
         context = DummyContext()
         response = inst(context, request)
         start_response = DummyStartResponse()
@@ -303,7 +304,8 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
     def test_resource_notmodified(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest()
-        request.if_modified_since = pow(2, 32) -1
+        # 5 years from now (more or less)
+        request.if_modified_since = httpdate_future(5*365)
         request.subpath = ('index.html',)
         context = DummyContext()
         response = inst(context, request)
@@ -353,3 +355,9 @@ class DummyStartResponse:
     def __call__(self, status, headers):
         self.status = status
         self.headers = headers
+
+def httpdate_future(days):
+    import datetime
+    ts = datetime.datetime.utcnow() + datetime.timedelta(days)
+    return ts.strftime("%a, %d %b %Y %H:%M:%S GMT")
+

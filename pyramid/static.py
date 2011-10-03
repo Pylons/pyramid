@@ -11,6 +11,7 @@ from os.path import exists
 from pkg_resources import resource_exists
 from pkg_resources import resource_filename
 from pkg_resources import resource_isdir
+from locale import getdefaultlocale
 
 from repoze.lru import lru_cache
 
@@ -153,7 +154,8 @@ class static_view(object):
 
         if self.package_name: # package resource
 
-            resource_path ='%s/%s' % (self.docroot.rstrip('/'), path)
+            resource_path = _encode_default_utf8('%s/%s' % \
+                                (self.docroot.rstrip('/'), path))
             if resource_isdir(self.package_name, resource_path):
                 if not request.path_url.endswith('/'):
                     return self.add_slash_redirect(request)
@@ -165,7 +167,8 @@ class static_view(object):
         else: # filesystem file
 
             # os.path.normpath converts / to \ on windows
-            filepath = normcase(normpath(join(self.norm_docroot, path)))
+            filepath = _encode_default_utf8(normcase(normpath(\
+                                            join(self.norm_docroot, path))))
             if isdir(filepath):
                 if not request.path_url.endswith('/'):
                     return self.add_slash_redirect(request)
@@ -181,6 +184,17 @@ class static_view(object):
         if qs:
             url = url + '?' + qs
         return HTTPMovedPermanently(url)
+
+
+def _encode_default_utf8(string):
+    """
+    If system locale does not have an encoding then default to utf-8
+    """
+    
+    if getdefaultlocale()[1] == None:
+        return string.encode('utf-8')
+    return string
+    
 
 _seps = set(['/', os.sep])
 def _contains_slash(item):
