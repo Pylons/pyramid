@@ -1,4 +1,8 @@
+import datetime
 import unittest
+
+# 5 years from now (more or less)
+fiveyrsfuture = datetime.datetime.utcnow() + datetime.timedelta(5*365)
 
 class Test_static_view_use_subpath_False(unittest.TestCase):
     def _getTargetClass(self):
@@ -138,7 +142,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
     def test_resource_notmodified(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':'/index.html'})
-        request.if_modified_since = pow(2, 32) -1
+        request.if_modified_since = fiveyrsfuture
         context = DummyContext()
         response = inst(context, request)
         start_response = DummyStartResponse()
@@ -303,7 +307,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
     def test_resource_notmodified(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest()
-        request.if_modified_since = pow(2, 32) -1
+        request.if_modified_since = fiveyrsfuture
         request.subpath = ('index.html',)
         context = DummyContext()
         response = inst(context, request)
