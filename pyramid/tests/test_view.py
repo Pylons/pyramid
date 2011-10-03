@@ -276,13 +276,14 @@ class TestViewConfigDecorator(unittest.TestCase):
     def test_create_nondefaults(self):
         decorator = self._makeOne(name=None, request_type=None, for_=None,
                                   permission='foo', mapper='mapper',
-                                  decorator='decorator')
+                                  decorator='decorator', match_param='match_param')
         self.assertEqual(decorator.name, None)
         self.assertEqual(decorator.request_type, None)
         self.assertEqual(decorator.context, None)
         self.assertEqual(decorator.permission, 'foo')
         self.assertEqual(decorator.mapper, 'mapper')
         self.assertEqual(decorator.decorator, 'decorator')
+        self.assertEqual(decorator.match_param, 'match_param')
         
     def test_call_function(self):
         decorator = self._makeOne()
