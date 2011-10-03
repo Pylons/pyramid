@@ -16,6 +16,9 @@ Bug Fixes
 - Make test suite pass on 32-bit systems; closes #286.  closes #306.
   See also https://github.com/Pylons/pyramid/issues/286
 
+- The ``pryamid.view.view_config`` decorator did not accept a ``match_params``
+  predicate argument.  See https://github.com/Pylons/pyramid/pull/308
+
 Backwards Incompatibilities
 ---------------------------
 
