@@ -26,7 +26,7 @@ from pyramid.threadlocal import get_current_registry
 
 # API
 
-def render(renderer_name, value, request=None, package=None):
+def render(renderer_name, value=None, request=None, package=None):
     """ Using the renderer specified as ``renderer_name`` (a template
     or a static renderer) render the value (or set of values) present
     in ``value``. Return the result of the renderer's ``__call__``
@@ -48,7 +48,9 @@ def render(renderer_name, value, request=None, package=None):
     The ``value`` provided will be supplied as the input to the
     renderer.  Usually, for template renderings, this should be a
     dictionary.  For other renderers, this will need to be whatever
-    sort of value the renderer expects.
+    sort of value the renderer expects. If you do not supply a
+    ``value`` (or ``value`` is ``None``), then an empty dictionary
+    will be used by default instead.
 
     The 'system' values supplied to the renderer will include a basic
     set of top-level system names, such as ``request``, ``context``,
@@ -66,11 +68,13 @@ def render(renderer_name, value, request=None, package=None):
         registry = None
     if package is None:
         package = caller_package()
+    if value is None:
+        value = {}
     helper = RendererHelper(name=renderer_name, package=package,
                             registry=registry)
     return helper.render(value, None, request=request)
 
-def render_to_response(renderer_name, value, request=None, package=None):
+def render_to_response(renderer_name, value=None, request=None, package=None):
     """ Using the renderer specified as ``renderer_name`` (a template
     or a static renderer) render the value (or set of values) using
     the result of the renderer's ``__call__`` method (usually a string
@@ -91,7 +95,9 @@ def render_to_response(renderer_name, value, request=None, package=None):
     The ``value`` provided will be supplied as the input to the
     renderer.  Usually, for template renderings, this should be a
     dictionary.  For other renderers, this will need to be whatever
-    sort of value the renderer expects.
+    sort of value the renderer expects. If you do not supply a
+    ``value`` (or ``value`` is ``None``), then an empty dictionary
+    will be used by default instead.
 
     The 'system' values supplied to the renderer will include a basic
     set of top-level system names, such as ``request``, ``context``,
@@ -111,6 +117,8 @@ def render_to_response(renderer_name, value, request=None, package=None):
         registry = None
     if package is None:
         package = caller_package()
+    if value is None:
+        value = {}
     helper = RendererHelper(name=renderer_name, package=package,
                             registry=registry)
     return helper.render_to_response(value, None, request=request)
