@@ -10,6 +10,12 @@ Features
 - Lone instance methods can now be treated as view callables (see
   https://github.com/Pylons/pyramid/pull/283).
 
+Bug Fixes
+---------
+
+- Make test suite pass on 32-bit systems; fixes #286.
+  See also https://github.com/Pylons/pyramid/issues/286
+
 Backwards Incompatibilities
 ---------------------------
 
