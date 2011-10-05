@@ -979,8 +979,8 @@ class DummyConfigParser(object):
     def items(self, section):
         self.section = section
         if self.result is None:
-            from ConfigParser import NoSectionError
-            raise NoSectionError(section)
+            from pyramid.compat import configparser
+            raise configparser.NoSectionError(section)
         return self.result
 
 class DummyConfigParserFactory(object):

@@ -113,7 +113,7 @@ class PShellCommand(object):
             setup(env)
 
             # remove any objects from default help that were overidden
-            for k, v in env.iteritems():
+            for k, v in env.items():
                 if k not in orig_env or env[k] != orig_env[k]:
                     env_help[k] = v
 
