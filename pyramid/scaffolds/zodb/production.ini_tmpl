@@ -13,7 +13,7 @@ tm.attempts = 3
 zodbconn.uri = file://%(here)s/Data.fs?connection_cache_size=20000
 
 [server:main]
-use = egg:glue#wsgiref
+use = egg:pyramid#wsgiref
 host = 0.0.0.0
 port = 6543
 

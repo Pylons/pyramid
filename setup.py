@@ -39,7 +39,7 @@ install_requires=[
     'zope.deprecation >= 3.5.0', # py3 compat
     'venusian >= 1.0a1', # ``onerror``
     'translationstring >= 0.4', # py3 compat
-    'glue',
+    'PasteDeploy >= 1.5.0', # py3 compat
     ]
 
 tests_require = install_requires + [
@@ -89,15 +89,14 @@ setup(name='pyramid',
         zodb=pyramid.scaffolds:ZODBProjectTemplate
         routesalchemy=pyramid.scaffolds:RoutesAlchemyProjectTemplate
         alchemy=pyramid.scaffolds:AlchemyProjectTemplate
-        [glue.command]
-        pshell=pyramid.paster:PShellCommand
-        proutes=pyramid.paster:PRoutesCommand
-        pviews=pyramid.paster:PViewsCommand
-        ptweens=pyramid.paster:PTweensCommand
         [console_scripts]
         bfg2pyramid = pyramid.fixers.fix_bfg_imports:main
         pcreate = pyramid.scripts.pcreate:main
         pserve = pyramid.scripts.pserve:main
+        pshell = pyramid.scripts.pshell:main
+        proutes = pyramid.scripts.proutes:main
+        pviews = pyramid.scripts.pviews:main
+        ptweens = pyramid.scripts.ptweens:main
         [paste.server_runner]
         wsgiref = pyramid.scripts.pserve:wsgiref_server_runner
       """

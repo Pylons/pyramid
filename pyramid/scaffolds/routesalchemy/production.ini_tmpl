@@ -12,7 +12,7 @@ pyramid.includes = pyramid_tm
 sqlalchemy.url = sqlite:///%(here)s/{{project}}.db
 
 [server:main]
-use = egg:glue#wsgiref
+use = egg:pyramid#wsgiref
 host = 0.0.0.0
 port = 6543
 
