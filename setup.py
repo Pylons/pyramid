@@ -84,11 +84,11 @@ setup(name='pyramid',
       tests_require = tests_require,
       test_suite="pyramid.tests",
       entry_points = """\
-        [glue.create_template]
-        pyramid_starter=pyramid.scaffolds:StarterProjectTemplate
-        pyramid_zodb=pyramid.scaffolds:ZODBProjectTemplate
-        pyramid_routesalchemy=pyramid.scaffolds:RoutesAlchemyProjectTemplate
-        pyramid_alchemy=pyramid.scaffolds:AlchemyProjectTemplate
+        [pyramid.scaffold]
+        starter=pyramid.scaffolds:StarterProjectTemplate
+        zodb=pyramid.scaffolds:ZODBProjectTemplate
+        routesalchemy=pyramid.scaffolds:RoutesAlchemyProjectTemplate
+        alchemy=pyramid.scaffolds:AlchemyProjectTemplate
         [glue.command]
         pshell=pyramid.paster:PShellCommand
         proutes=pyramid.paster:PRoutesCommand
@@ -96,6 +96,7 @@ setup(name='pyramid',
         ptweens=pyramid.paster:PTweensCommand
         [console_scripts]
         bfg2pyramid = pyramid.fixers.fix_bfg_imports:main
+        pcreate = pyramid.scripts.pcreate:main
       """
       )
 
