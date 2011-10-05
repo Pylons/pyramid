@@ -79,8 +79,6 @@ class Dummy:
 
 class DummyRegistry(object):
     settings = {}
-    def queryUtility(self, iface, default=None, name=''):
-        return default
 
 dummy_registry = DummyRegistry()
 

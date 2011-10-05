@@ -807,8 +807,8 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
     global have_zca
     try:
         have_zca and hook_zca and config.hook_zca()
-    except ImportError:
-        # pragma: no cover (dont choke on not being able to import z.component)
+    except ImportError: # pragma: no cover
+        # (dont choke on not being able to import z.component)
         have_zca = False
     config.begin(request=request)
     return config

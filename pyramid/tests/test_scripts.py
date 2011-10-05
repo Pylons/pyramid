@@ -923,16 +923,6 @@ class DummyIPShellFactory(object):
         self.shell = DummyIPShell()
         return self.shell
 
-class DummyLoadApp:
-    def __init__(self, app):
-        self.app = app
-
-    def __call__(self, config_name, name=None, relative_to=None):
-        self.config_name = config_name
-        self.section_name = name
-        self.relative_to = relative_to
-        return self.app
-
 class DummyApp:
     def __init__(self):
         self.registry = dummy_registry

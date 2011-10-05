@@ -212,8 +212,7 @@ else:
 try: # pragma: no cover
     import configparser
 except ImportError: # pragma: no cover
-    import ConfigParser
-    configparser = ConfigParser
+    import ConfigParser as configparser
 
 try:
     from Cookie import SimpleCookie
@@ -225,12 +224,8 @@ if PY3: # pragma: no cover
 else:
     from cgi import escape
 
-try:
+try: # pragma: no cover
     input_ = raw_input
-except NameError:
+except NameError: # pragma: no cover
     input_ = input
 
-try: # pragma: no cover
-    import configparser
-except ImportError:
-    import ConfigParser as configparser
