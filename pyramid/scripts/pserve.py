@@ -1,9 +1,12 @@
 # (c) 2005 Ian Bicking and contributors; written for Paste
 # (http://pythonpaste.org) Licensed under the MIT license:
-# http://www.opensource.org/licenses/mit-license.php @@: This should be moved
-# to paste.deploy For discussion of daemonizing:
-# http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/278731 Code taken
-# also from QP: http://www.mems-exchange.org/software/qp/ From lib/site.py
+# http://www.opensource.org/licenses/mit-license.php
+#
+# For discussion of daemonizing:
+# http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/278731
+#
+# Code taken also from QP: http://www.mems-exchange.org/software/qp/ From
+# lib/site.py
 
 import re
 import optparse
