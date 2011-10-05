@@ -72,7 +72,7 @@ class TestBootstrap(unittest.TestCase):
         result = self._callFUT('/foo/bar/myapp.ini', request)
         self.assertEqual(result['app'], self.app)
         self.assertEqual(result['root'], self.root)
-        self.assert_('closer' in result)
+        self.assertTrue('closer' in result)
 
 class Dummy:
     pass
