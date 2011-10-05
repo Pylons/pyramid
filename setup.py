@@ -97,6 +97,9 @@ setup(name='pyramid',
         [console_scripts]
         bfg2pyramid = pyramid.fixers.fix_bfg_imports:main
         pcreate = pyramid.scripts.pcreate:main
+        pserve = pyramid.scripts.pserve:main
+        [paste.server_runner]
+        wsgiref = pyramid.scripts.pserve:wsgiref_server_runner
       """
       )
 

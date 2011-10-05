@@ -6,7 +6,7 @@ from pyramid.compat import (
     native_
     )
 
-from glue.template import Template
+from pyramid.scaffolds.template import Template
 
 class PyramidTemplate(Template):
     def pre(self, command, output_dir, vars):

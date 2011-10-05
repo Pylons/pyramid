@@ -34,8 +34,7 @@ class TemplateTest(object):
                 [os.path.join(self.directory, 'bin', 'python'),
                  'setup.py', 'develop'])
             os.chdir(self.directory)
-            subprocess.check_call(['bin/paster', 'create', '-t', tmpl_name,
-                                   'Dingle'])
+            subprocess.check_call(['bin/pcreate', '-s', tmpl_name, 'Dingle'])
             os.chdir('Dingle')
             py = os.path.join(self.directory, 'bin', 'python')
             subprocess.check_call([py, 'setup.py', 'install'])
@@ -79,10 +78,10 @@ if __name__ == '__main__':     # pragma: no cover
                 raise ValueError(returncode)
         subprocess.check_call = check_call
 
-    templates = ['pyramid_starter', 'pyramid_alchemy', 'pyramid_routesalchemy',]
+    templates = ['starter', 'alchemy', 'routesalchemy',]
 
-    if sys.version_info >= (2, 5):
-        templates.append('pyramid_zodb')
+    if sys.version_info >= (2, 5) and sys.version_info < (3, 0):
+        templates.append('zodb')
 
     for name in templates:
         test = TemplateTest()

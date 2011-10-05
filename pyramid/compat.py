@@ -224,3 +224,13 @@ if PY3: # pragma: no cover
     from html import escape
 else:
     from cgi import escape
+
+try:
+    input_ = raw_input
+except NameError:
+    input_ = input
+
+try: # pragma: no cover
+    import configparser
+except ImportError:
+    import ConfigParser as configparser
