@@ -9,8 +9,8 @@ from pyramid.paster import bootstrap
 
 from pyramid.compat import print_
 
-def main(argv=sys.argv):
-    command = PTweensCommand(argv)
+def main(argv=sys.argv, quiet=False):
+    command = PTweensCommand(argv, quiet)
     command.run()
 
 class PTweensCommand(object):
@@ -40,7 +40,8 @@ class PTweensCommand(object):
 
     bootstrap = (bootstrap,) # testing
 
-    def __init__(self, argv):
+    def __init__(self, argv, quiet=False):
+        self.quiet = quiet
         self.options, self.args = self.parser.parse_args(argv[1:])
 
     def _get_tweens(self, registry):
@@ -49,7 +50,8 @@ class PTweensCommand(object):
         return config.registry.queryUtility(ITweens)
 
     def out(self, msg): # pragma: no cover
-        print_(msg)
+        if not self.quiet:
+            print_(msg)
 
     def show_chain(self, chain):
         fmt = '%-10s  %-65s'
@@ -61,6 +63,9 @@ class PTweensCommand(object):
         self.out(fmt % ('-', MAIN))
 
     def run(self):
+        if not self.args:
+            self.out('Requires a config file argument')
+            return
         config_uri = self.args[0]
         env = self.bootstrap[0](config_uri)
         registry = env['registry']

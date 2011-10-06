@@ -97,10 +97,10 @@ class TestPCreateCommand(unittest.TestCase):
 class Test_main(unittest.TestCase):
     def _callFUT(self, argv):
         from pyramid.scripts.pcreate import main
-        return main(argv)
+        return main(argv, quiet=True)
 
     def test_it(self):
-        result = self._callFUT(['pcreate', '-q'])
+        result = self._callFUT(['pcreate'])
         self.assertEqual(result, None)
 
 class DummyScaffold(object):

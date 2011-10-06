@@ -5,8 +5,8 @@ from pyramid.compat import print_
 from pyramid.interfaces import IMultiView
 from pyramid.paster import bootstrap
 
-def main(argv=sys.argv):
-    command = PViewsCommand(argv)
+def main(argv=sys.argv, quiet=False):
+    command = PViewsCommand(argv, quiet)
     command.run()
 
 class PViewsCommand(object):
@@ -37,11 +37,13 @@ class PViewsCommand(object):
 
     bootstrap = (bootstrap,) # testing
 
-    def __init__(self, argv):
+    def __init__(self, argv, quiet=False):
+        self.quiet = quiet
         self.options, self.args = self.parser.parse_args(argv[1:])
 
     def out(self, msg): # pragma: no cover
-        print_(msg)
+        if not self.quiet:
+            print_(msg)
     
     def _find_multi_routes(self, mapper, request):
         infos = []
@@ -230,6 +232,9 @@ class PViewsCommand(object):
                 self.out("%sview predicates (%s)" % (indent, predicate_text))
 
     def run(self):
+        if len(self.args) < 2:
+            self.out('Command requires a config file arg and a url arg')
+            return
         config_uri, url = self.args
         if not url.startswith('/'):
             url = '/%s' % url

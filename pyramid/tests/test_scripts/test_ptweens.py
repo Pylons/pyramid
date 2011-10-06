@@ -51,3 +51,11 @@ class TestPTweensCommand(unittest.TestCase):
         registry = dummy.DummyRegistry()
         self.assertEqual(command._get_tweens(registry), None)
 
+class Test_main(unittest.TestCase):
+    def _callFUT(self, argv):
+        from pyramid.scripts.ptweens import main
+        return main(argv, quiet=True)
+
+    def test_it(self):
+        result = self._callFUT(['ptweens'])
+        self.assertEqual(result, None)

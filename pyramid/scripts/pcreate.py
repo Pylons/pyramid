@@ -10,8 +10,8 @@ import sys
 
 _bad_chars_re = re.compile('[^a-zA-Z0-9_]')
 
-def main(argv=sys.argv):
-    command = PCreateCommand(argv)
+def main(argv=sys.argv, quiet=False):
+    command = PCreateCommand(argv, quiet)
     return command.run()
 
 class PCreateCommand(object):
@@ -37,12 +37,9 @@ class PCreateCommand(object):
                       dest='overwrite',
                       action='store_true',
                       help='Always overwrite')
-    parser.add_option('-q', '--quiet',
-                      dest='quiet',
-                      action='store_true',
-                      help='Dont emit any output')
 
-    def __init__(self, argv):
+    def __init__(self, argv, quiet=False):
+        self.quiet = quiet
         self.options, self.args = self.parser.parse_args(argv[1:])
         self.scaffolds = self.all_scaffolds()
 
@@ -108,7 +105,7 @@ class PCreateCommand(object):
         return scaffolds
 
     def out(self, msg): # pragma: no cover
-        if not self.options.quiet:
+        if not self.quiet:
             print(msg)
 
 

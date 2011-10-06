@@ -127,3 +127,12 @@ class TestPRoutesCommand(unittest.TestCase):
         result = command._get_mapper(registry)
         self.assertEqual(result.__class__, RoutesMapper)
         
+class Test_main(unittest.TestCase):
+    def _callFUT(self, argv):
+        from pyramid.scripts.proutes import main
+        return main(argv, quiet=True)
+
+    def test_it(self):
+        result = self._callFUT(['proutes'])
+        self.assertEqual(result, None)
+

@@ -247,3 +247,13 @@ class TestPShellCommand(unittest.TestCase):
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
 
+
+class Test_main(unittest.TestCase):
+    def _callFUT(self, argv):
+        from pyramid.scripts.pshell import main
+        return main(argv, quiet=True)
+
+    def test_it(self):
+        result = self._callFUT(['pshell'])
+        self.assertEqual(result, None)
+

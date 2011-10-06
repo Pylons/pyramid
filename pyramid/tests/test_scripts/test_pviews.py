@@ -465,3 +465,11 @@ class TestPViewsCommand(unittest.TestCase):
                          '    pyramid.tests.test_scripts.dummy.view.call')
         self.assertEqual(L[9], '    view predicates (predicate = x)')
 
+class Test_main(unittest.TestCase):
+    def _callFUT(self, argv):
+        from pyramid.scripts.pviews import main
+        return main(argv, quiet=True)
+
+    def test_it(self):
+        result = self._callFUT(['pviews'])
+        self.assertEqual(result, None)

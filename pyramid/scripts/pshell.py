@@ -8,8 +8,8 @@ from pyramid.paster import bootstrap
 
 from pyramid.scripts.common import logging_file_config
 
-def main(argv=sys.argv):
-    command = PShellCommand(argv)
+def main(argv=sys.argv, quiet=False):
+    command = PShellCommand(argv, quiet)
     return command.run()
 
 class PShellCommand(object):
@@ -56,7 +56,8 @@ class PShellCommand(object):
     object_help = {}
     setup = None
 
-    def __init__(self, argv):
+    def __init__(self, argv, quiet=False):
+        self.quiet = quiet
         self.options, self.args = self.parser.parse_args(argv[1:])
 
     def pshell_file_config(self, filename):
@@ -78,7 +79,14 @@ class PShellCommand(object):
                 self.loaded_objects[k] = resolver.maybe_resolve(v)
                 self.object_help[k] = v
 
+    def out(self, msg): # pragma: no cover
+        if not self.quiet:
+            print(msg)
+
     def run(self, shell=None):
+        if not self.args:
+            self.out('Requires a config file argument')
+            return
         config_uri = self.args[0]
         config_file = config_uri.split('#', 1)[0]
         logging_file_config(config_file)

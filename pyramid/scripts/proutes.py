@@ -4,8 +4,8 @@ import sys
 from pyramid.compat import print_
 from pyramid.paster import bootstrap
 
-def main(argv=sys.argv):
-    command = PRoutesCommand(argv)
+def main(argv=sys.argv, quiet=False):
+    command = PRoutesCommand(argv, quiet)
     command.run()
 
 class PRoutesCommand(object):
@@ -33,8 +33,9 @@ class PRoutesCommand(object):
 
     parser = optparse.OptionParser()
 
-    def __init__(self, argv):
+    def __init__(self, argv, quiet=False):
         self.options, self.args = self.parser.parse_args(argv[1:])
+        self.quiet = quiet
 
     def _get_mapper(self, registry):
         from pyramid.config import Configurator
@@ -42,9 +43,13 @@ class PRoutesCommand(object):
         return config.get_routes_mapper()
 
     def out(self, msg): # pragma: no cover
-        print_(msg)
+        if not self.quiet:
+            print_(msg)
     
-    def run(self):
+    def run(self, quiet=False):
+        if not self.args:
+            self.out('requires a config file argument')
+            return
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IView
