@@ -16,6 +16,8 @@ from pyramid.scaffolds import copydir
 fsenc = sys.getfilesystemencoding()
 
 class Template(object):
+    copydir = copydir # for testing
+    _template_dir = None
 
     def __init__(self, name):
         self.name = name
@@ -47,13 +49,13 @@ class Template(object):
         self.write_files(command, output_dir, vars)
         self.post(command, output_dir, vars)
 
-    def pre(self, command, output_dir, vars):
+    def pre(self, command, output_dir, vars): # pragma: no cover
         """
         Called before template is applied.
         """
         pass
 
-    def post(self, command, output_dir, vars):
+    def post(self, command, output_dir, vars): # pragma: no cover
         """
         Called after template is applied.
         """
@@ -61,21 +63,32 @@ class Template(object):
 
     def write_files(self, command, output_dir, vars):
         template_dir = self.template_dir()
-        if not os.path.exists(output_dir):
-            print("Creating directory %s" % output_dir)
+        if not self.exists(output_dir):
+            self.out("Creating directory %s" % output_dir)
             if not command.simulate:
                 # Don't let copydir create this top-level directory,
                 # since copydir will svn add it sometimes:
-                os.makedirs(output_dir)
-        copydir.copy_dir(template_dir, output_dir,
-                         vars,
-                         verbosity=command.verbose,
-                         simulate=command.options.simulate,
-                         interactive=command.interactive,
-                         overwrite=command.options.overwrite,
-                         indent=1,
-                         template_renderer=self.template_renderer)
+                self.makedirs(output_dir)
+        self.copydir.copy_dir(
+            template_dir,
+            output_dir,
+            vars,
+            verbosity=command.verbose,
+            simulate=command.options.simulate,
+            interactive=command.interactive,
+            overwrite=command.options.overwrite,
+            indent=1,
+            template_renderer=self.template_renderer
+            )
 
+    def makedirs(self, dir): # pragma: no cover
+        return os.makedirs(dir)
+
+    def exists(self, path): # pragma: no cover
+        return os.path.exists(path)
+
+    def out(self, msg): # pragma: no cover
+        print(msg)
 
 class TypeMapper(dict):
 
@@ -109,7 +122,7 @@ def substitute_double_braces(content, values):
         return values[value]
     return double_brace_pattern.sub(double_bracerepl, content)
     
-def _add_except(exc, info):
+def _add_except(exc, info): # pragma: no cover
     if not hasattr(exc, 'args') or exc.args is None:
         return
     args = list(exc.args)
