@@ -20,22 +20,22 @@ class TestTemplate(unittest.TestCase):
     def test_template_renderer_expr_success(self):
         inst = self._makeOne()
         result = inst.template_renderer('{{a.lower()}}', {'a':'A'})
-        self.assertEqual(result, 'a')
+        self.assertEqual(result, b'a')
 
     def test_template_renderer_expr_success_via_pipe(self):
         inst = self._makeOne()
         result = inst.template_renderer('{{b|c|a.lower()}}', {'a':'A'})
-        self.assertEqual(result, 'a')
+        self.assertEqual(result, b'a')
 
     def test_template_renderer_expr_success_via_pipe2(self):
         inst = self._makeOne()
         result = inst.template_renderer('{{b|a.lower()|c}}', {'a':'A'})
-        self.assertEqual(result, 'a')
+        self.assertEqual(result, b'a')
 
     def test_template_renderer_expr_value_is_None(self):
         inst = self._makeOne()
         result = inst.template_renderer('{{a}}', {'a':None})
-        self.assertEqual(result, '')
+        self.assertEqual(result, b'')
 
     def test_module_dir(self):
         import sys
