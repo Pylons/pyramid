@@ -229,3 +229,9 @@ try: # pragma: no cover
 except NameError: # pragma: no cover
     input_ = input
 
+
+try: 
+    from StringIO import StringIO as NativeIO
+except ImportError: # pragma: no cover
+    from io import StringIO as NativeIO
+    

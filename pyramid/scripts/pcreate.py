@@ -11,14 +11,14 @@ import sys
 _bad_chars_re = re.compile('[^a-zA-Z0-9_]')
 
 def main(argv=sys.argv):
-    command = CreateCommand(argv)
+    command = PCreateCommand(argv)
     return command.run()
 
-class CreateCommand(object):
+class PCreateCommand(object):
     verbose = True
     interactive = False
     simulate = False
-    usage = "usage: %prog [options] project"
+    usage = "usage: %prog [options] distribution_name"
     parser = optparse.OptionParser(usage)
     parser.add_option('-s', '--scaffold',
                       dest='scaffold_name',
@@ -37,37 +37,41 @@ class CreateCommand(object):
                       dest='overwrite',
                       action='store_true',
                       help='Always overwrite')
+    parser.add_option('-q', '--quiet',
+                      dest='quiet',
+                      action='store_true',
+                      help='Dont emit any output')
 
     def __init__(self, argv):
         self.options, self.args = self.parser.parse_args(argv[1:])
-        self.scaffolds = all_scaffolds()
-        self.available_scaffoldnames = [x.name for x in self.scaffolds]
+        self.scaffolds = self.all_scaffolds()
 
     def run(self):
         if self.options.list:
             return self.show_scaffolds()
         if not self.options.scaffold_name:
-            print('You must provide at least one scaffold name')
+            self.out('You must provide at least one scaffold name')
             return
         if not self.args:
-            print('You must provide a project name')
+            self.out('You must provide a project name')
             return
-        diff = set(self.options.scaffold_name).difference(
-            self.available_scaffoldnames)
+        available = [x.name for x in self.scaffolds]
+        diff = set(self.options.scaffold_name).difference(available)
         if diff:
-            print('Unavailable scaffolds: %s' % list(diff))
-        self.render_scaffolds()
+            self.out('Unavailable scaffolds: %s' % list(diff))
+            return
+        return self.render_scaffolds()
 
     def render_scaffolds(self):
         options = self.options
         args = self.args
-        dist_name = args[0].lstrip(os.path.sep)
-        output_dir = os.path.normpath(os.path.join(os.getcwd(), dist_name))
-        pkg_name = _bad_chars_re.sub('', dist_name.lower())
-        safe_name = pkg_resources.safe_name(dist_name)
-        egg_name = pkg_resources.to_filename(safe_name),
+        project_name = args[0].lstrip(os.path.sep)
+        output_dir = os.path.normpath(os.path.join(os.getcwd(), project_name))
+        pkg_name = _bad_chars_re.sub('', project_name.lower())
+        safe_name = pkg_resources.safe_name(project_name)
+        egg_name = pkg_resources.to_filename(safe_name)
         vars = {
-            'project': dist_name,
+            'project': project_name,
             'package': pkg_name,
             'egg': egg_name,
             }
@@ -75,28 +79,36 @@ class CreateCommand(object):
             for scaffold in self.scaffolds:
                 if scaffold.name == scaffold_name:
                     scaffold.run(self, output_dir, vars)
+        return True
 
     def show_scaffolds(self):
-        scaffolds = list(self.scaffolds)
-        max_name = max([len(t.name) for t in scaffolds])
-        scaffolds.sort(key=lambda x: x.name)
-        print('Available scaffolds:')
-        for scaffold in scaffolds:
-            print('  %s:%s  %s' % (
-                scaffold.name,
-                ' '*(max_name-len(scaffold.name)), scaffold.summary))
+        scaffolds = sorted(self.scaffolds, key=lambda x: x.name)
+        if scaffolds:
+            max_name = max([len(t.name) for t in scaffolds])
+            self.out('Available scaffolds:')
+            for scaffold in scaffolds:
+                self.out('  %s:%s  %s' % (
+                    scaffold.name,
+                    ' '*(max_name-len(scaffold.name)), scaffold.summary))
+        else:
+            self.out('No scaffolds available')
+        return True
 
+    def all_scaffolds(self):
+        scaffolds = []
+        eps = list(pkg_resources.iter_entry_points('pyramid.scaffold'))
+        for entry in eps:
+            try:
+                scaffold_class = entry.load()
+                scaffold = scaffold_class(entry.name)
+                scaffolds.append(scaffold)
+            except Exception as e: # pragma: no cover
+                self.out('Warning: could not load entry point %s (%s: %s)' % (
+                    entry.name, e.__class__.__name__, e))
+        return scaffolds
 
-def all_scaffolds():
-    scaffolds = []
-    eps = list(pkg_resources.iter_entry_points('pyramid.scaffold'))
-    for entry in eps:
-        try:
-            scaffold_class = entry.load()
-            scaffold = scaffold_class(entry.name)
-            scaffolds.append(scaffold)
-        except Exception as e:
-            print('Warning: could not load entry point %s (%s: %s)' % (
-                entry.name, e.__class__.__name__, e))
-    return scaffolds
+    def out(self, msg): # pragma: no cover
+        if not self.options.quiet:
+            print(msg)
+
 
