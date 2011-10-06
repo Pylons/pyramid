@@ -3,8 +3,16 @@ import os
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, 'README.txt')).read()
-CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+
+def _read(path):
+    f = open(path)
+    try:
+        return f.read()
+    finally:
+        f.close()
+
+README = _read(os.path.join(here, 'README.txt'))
+CHANGES = _read(os.path.join(here, 'CHANGES.txt'))
 
 requires = ['pyramid', 'pyramid_debugtoolbar']
 
