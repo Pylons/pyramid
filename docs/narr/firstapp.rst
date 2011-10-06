@@ -209,7 +209,7 @@ Finally, we actually serve the application to requestors by starting up a
 WSGI server.  We happen to use the :func:`paste.httpserver.serve` WSGI server
 runner, passing it the ``app`` object (a :term:`router`) as the application
 we wish to serve.  We also pass in an argument ``host=='0.0.0.0'``, meaning
-"listen on all TCP interfaces."  By default, the Paste HTTP server listens
+"listen on all TCP interfaces."  By default, the HTTP server listens
 only on the ``127.0.0.1`` interface, which is problematic if you're running
 the server on a remote system and you wish to access it with a web browser
 from a local system.  We don't specify a TCP port number to listen on; this

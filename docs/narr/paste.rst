@@ -20,7 +20,7 @@ setting deployment values, and to provide new users with a standardized way
 of starting, stopping, and debugging an application.  
 
 This chapter is not a replacement for documentation about PasteDeploy; it
-only contextualizes the use of Paste within Pyramid.  For detailed
+only contextualizes the use of PasteDeploy within Pyramid.  For detailed
 documentation, see http://pythonpaste.org.
 
 PasteDeploy
@@ -76,14 +76,14 @@ The ``egg:`` prefix in ``egg:MyProject`` indicates that this is an entry
 point *URI* specifier, where the "scheme" is "egg".  An "egg" is created when
 you run ``setup.py install`` or ``setup.py develop`` within your project.
 
-In English, this entry point can thus be referred to as a "Paste application
-factory in the ``MyProject`` project which has the entry point named ``main``
-where the entry point refers to a ``main`` function in the ``mypackage``
-module".  Indeed, if you open up the ``__init__.py`` module generated within
-any scaffold-generated package, you'll see a ``main`` function.  This is the
-function called by :term:`PasteDeploy` when the ``pserve`` command is invoked
-against our application.  It accepts a global configuration object and
-*returns* an instance of our application.
+In English, this entry point can thus be referred to as a "PasteDeploy
+application factory in the ``MyProject`` project which has the entry point
+named ``main`` where the entry point refers to a ``main`` function in the
+``mypackage`` module".  Indeed, if you open up the ``__init__.py`` module
+generated within any scaffold-generated package, you'll see a ``main``
+function.  This is the function called by :term:`PasteDeploy` when the
+``pserve`` command is invoked against our application.  It accepts a global
+configuration object and *returns* an instance of our application.
 
 ``[DEFAULTS]`` Section of a PasteDeploy ``.ini`` File
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

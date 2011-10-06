@@ -683,7 +683,8 @@ The ``myproject`` :term:`package` lives inside the ``MyProject``
 
 #. An ``__init__.py`` file signifies that this is a Python :term:`package`.
    It also contains code that helps users run the application, including a
-   ``main`` function which is used as a Paste entry point.
+   ``main`` function which is used as a entry point for commands such as
+   ``pserve``, ``pshell``, ``pviews``, and others.
 
 #. A ``resources.py`` module, which contains :term:`resource` code.
 
@@ -750,7 +751,7 @@ also informs Python that the directory which contains it is a *package*.
    directory of the ``mypackage`` package).
 
    Line 12 returns a :term:`WSGI` application to the caller of the function
-   (Paste).
+   (Pyramid's pserve).
 
 .. index::
    single: views.py

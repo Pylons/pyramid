@@ -365,10 +365,10 @@ be performed to localize your application.  By default, the
 translation domain is the :term:`project` name of your
 :app:`Pyramid` application.
 
-To change the translation domain of the extracted messages in your
-project, edit the ``setup.cfg`` file of your application, The default
-``setup.cfg`` file of a Paster-generated :app:`Pyramid` application
-has stanzas in it that look something like the following:
+To change the translation domain of the extracted messages in your project,
+edit the ``setup.cfg`` file of your application, The default ``setup.cfg``
+file of a ``pcreate`` -generated :app:`Pyramid` application has stanzas in it
+that look something like the following:
 
 .. code-block:: ini
    :linenos:
@@ -785,7 +785,7 @@ time:
    config = Configurator(settings={'pyramid.default_locale_name':'de'})
 
 You may alternately supply a ``pyramid.default_locale_name`` via an
-application's Paster ``.ini`` file:
+application's ``.ini`` file:
 
 .. code-block:: ini
    :linenos:
@@ -797,8 +797,8 @@ application's Paster ``.ini`` file:
    pyramid.debug_notfound = false
    pyramid.default_locale_name = de
 
-If this value is not supplied via the Configurator constructor or via
-a Paste config file, it will default to ``en``.
+If this value is not supplied via the Configurator constructor or via a
+config file, it will default to ``en``.
 
 If this setting is supplied within the :app:`Pyramid` application
 ``.ini`` file, it will be available as a settings key:
@@ -845,7 +845,7 @@ You can set up a system to allow a deployer to select available
 languages based on convention by using the :mod:`pyramid.settings`
 mechanism:
 
-Allow a deployer to modify your application's PasteDeploy .ini file:
+Allow a deployer to modify your application's ``.ini`` file:
 
 .. code-block:: ini
    :linenos:

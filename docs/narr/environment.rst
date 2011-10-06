@@ -344,8 +344,8 @@ sequence can take several different forms.
 
 Each value in the sequence should be a :term:`dotted Python name`.
 
-Paste Configuration vs. Plain-Python Configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+PasteDeploy Configuration vs. Plain-Python Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Using the following ``pyramid.tweens`` setting in the PasteDeploy ``.ini``
 file in your application:

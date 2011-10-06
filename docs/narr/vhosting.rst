@@ -25,11 +25,11 @@ can host a :app:`Pyramid` application as a "subset" of some other site
 (e.g. under ``http://example.com/mypyramidapplication/`` as opposed to
 under ``http://example.com/``).
 
-If you use a "pure Python" environment, this functionality is provided
-by Paste's `urlmap <http://pythonpaste.org/modules/urlmap.html>`_
-"composite" WSGI application.  Alternately, you can use
-:term:`mod_wsgi` to serve your application, which handles this virtual
-hosting translation for you "under the hood".
+If you use a "pure Python" environment, this functionality can be provided by
+Paste's `urlmap <http://pythonpaste.org/modules/urlmap.html>`_ "composite"
+WSGI application.  Alternately, you can use :term:`mod_wsgi` to serve your
+application, which handles this virtual hosting translation for you "under
+the hood".
 
 If you use the ``urlmap`` composite application "in front" of a
 :app:`Pyramid` application or if you use :term:`mod_wsgi` to serve
