@@ -29,7 +29,7 @@ class TweensConfiguratorMixin(object):
         registry` as well as the Pyramid rendering machinery.
 
         .. note:: You can view the tween ordering configured into a given
-                  Pyramid application by using the ``paster ptweens``
+                  Pyramid application by using the ``ptweens``
                   command.  See :ref:`displaying_tweens`.
 
         The ``tween_factory`` argument must be a :term:`dotted Python name`
@@ -61,7 +61,7 @@ class TweensConfiguratorMixin(object):
         For example, calling ``add_tween('myapp.tfactory',
         over=pyramid.tweens.MAIN)`` will attempt to place the tween factory
         represented by the dotted name ``myapp.tfactory`` directly 'above'
-        (in ``paster ptweens`` order) the main Pyramid request handler.
+        (in ``ptweens`` order) the main Pyramid request handler.
         Likewise, calling ``add_tween('myapp.tfactory',
         over=pyramid.tweens.MAIN, under='mypkg.someothertween')`` will
         attempt to place this tween factory 'above' the main handler but

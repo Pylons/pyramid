@@ -930,8 +930,8 @@ Glossary
 
    scaffold
      A project template that helps users get started writing a Pyramid
-     application quickly.  Scaffolds are usually used via the ``paster
-     create`` command.
+     application quickly.  Scaffolds are usually used via the ``pcreate``
+     command.
 
    pyramid_exclog
      A package which logs Pyramid application exception (error) information

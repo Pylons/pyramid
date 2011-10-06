@@ -39,10 +39,10 @@ class TemplateTest(object):
             py = os.path.join(self.directory, 'bin', 'python')
             subprocess.check_call([py, 'setup.py', 'install'])
             subprocess.check_call([py, 'setup.py', 'test'])
-            paster = os.path.join(self.directory, 'bin', 'paster')
+            pserve = os.path.join(self.directory, 'bin', 'pserve')
             for ininame, hastoolbar in (('development.ini', True),
                                         ('production.ini', False)):
-                proc = subprocess.Popen([paster, 'serve', ininame])
+                proc = subprocess.Popen([pserve, ininame])
                 try:
                     time.sleep(5)
                     proc.poll()

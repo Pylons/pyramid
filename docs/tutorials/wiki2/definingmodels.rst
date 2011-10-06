@@ -2,9 +2,9 @@
 Defining the Domain Model
 =========================
 
-The first change we'll make to our stock paster-generated application will be
-to define a :term:`domain model` constructor representing a wiki page.  We'll
-do this inside our ``models.py`` file.
+The first change we'll make to our stock pcreate-generated application will
+be to define a :term:`domain model` constructor representing a wiki page.
+We'll do this inside our ``models.py`` file.
 
 The source code for this tutorial stage can be browsed at
 `http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/models/
@@ -64,7 +64,7 @@ FrontPage object to our database at startup time.
    :language: python
 
 Here, we're using a slightly different binding syntax.  It is otherwise
-largely the same as the ``initialize_sql`` in the paster-generated
+largely the same as the ``initialize_sql`` in the pcreate-generated
 ``models.py``.
 
 Our ``DBSession`` assignment stays the same as the original generated

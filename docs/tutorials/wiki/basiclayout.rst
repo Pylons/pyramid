@@ -18,7 +18,7 @@ an ``__init__.py`` file.  Even if empty, this marks a directory as a Python
 package.  Our application uses ``__init__.py`` as both a package marker, as
 well as to contain application configuration code.
 
-When you run the application using the ``paster`` command using the
+When you run the application using the ``pserve`` command using the
 ``development.ini`` generated config file, the application configuration
 points at a Setuptools *entry point* described as ``egg:tutorial``.  In our
 application, because the application's ``setup.py`` file says so, this entry
@@ -34,7 +34,7 @@ point happens to be the ``main`` function within the file named
 #. *Lines 5-7*  Define a root factory for our Pyramid application.
 
 #. *Line 12*.  We construct a :term:`Configurator` with a :term:`root
-   factory` and the settings keywords parsed by PasteDeploy.  The root
+   factory` and the settings keywords parsed by :term:`PasteDeploy`.  The root
    factory is named ``get_root``.
 
 #. *Line 13*.  Register a 'static view' which answers requests which start
@@ -167,4 +167,4 @@ application.  Our ZODB database settings are specified as the
 ``zodbconn.uri`` setting within this section.  This value, and the other
 values within this section are passed as ``**settings`` to the ``main``
 function we defined in ``__init__.py`` when the server is started via
-``paster serve``.
+``pserve``.

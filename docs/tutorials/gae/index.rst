@@ -64,7 +64,7 @@ system.
 
       $ cd app
       $ rm -rf pyramidapp
-      $ bin/paster create -t pyramid_starter pyramidapp
+      $ bin/pcreate -s starter pyramidapp
       $ mv pyramidapp aside
       $ mv aside/pyramidapp .
       $ rm -rf aside

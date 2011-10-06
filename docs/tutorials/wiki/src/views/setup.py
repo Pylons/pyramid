@@ -40,5 +40,4 @@ setup(name='tutorial',
       [paste.app_factory]
       main = tutorial:main
       """,
-      paster_plugins=['pyramid'],
       )

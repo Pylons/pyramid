@@ -64,7 +64,7 @@ commands and files.
     .. code-block:: text
 
        $ cd ~/modwsgi/env
-       $ bin/paster create -t pyramid_starter myapp
+       $ bin/pcreate -s starter myapp
        $ cd myapp
        $ ../bin/python setup.py install
 

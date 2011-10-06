@@ -18,7 +18,7 @@ an ``__init__.py`` file.  Even if empty, this marks a directory as a Python
 package.  We use ``__init__.py`` both as a package marker and to contain
 configuration code.
 
-The generated ``development.ini`` file is read by ``paster`` which looks for
+The generated ``development.ini`` file is read by ``pserve`` which looks for
 the application module in the ``use`` variable of the ``app:main``
 section. The *entry point* is defined in the Setuptools configuration of this
 module, specifically in the ``setup.py`` file. For this tutorial, the *entry

@@ -727,7 +727,7 @@ A user might make use of these framework components like so:
    from pyramid.response import Response
    from pyramid.config import Configurator
    import pyramid_handlers
-   from paste.httpserver import serve
+   from wsgiref.simple_server import make_server
 
    class MyController(BaseController):
        def index(self, id):
@@ -738,7 +738,8 @@ A user might make use of these framework components like so:
        config.include(pyramid_handlers)
        config.add_handler('one', '/{id}', MyController, action='index')
        config.add_handler('two', '/{action}/{id}', MyController)
-       serve(config.make_wsgi_app())
+       server.make_server('0.0.0.0', 8080, config.make_wsgi_app())
+       server.serve_forever()
 
 The :meth:`pyramid.config.Configurator.set_view_mapper` method can be used to
 set a *default* view mapper (overriding the superdefault view mapper used by
@@ -1012,7 +1013,7 @@ Effectively, ``under`` means "closer to the main Pyramid application than",
 For example, the following call to
 :meth:`~pyramid.config.Configurator.add_tween` will attempt to place the
 tween factory represented by ``myapp.tween_factory`` directly 'above' (in
-``paster ptweens`` order) the main Pyramid request handler.
+``ptweens`` order) the main Pyramid request handler.
 
 .. code-block:: python
    :linenos:
@@ -1136,6 +1137,6 @@ time.
 Displaying Tween Ordering
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``paster ptweens`` command-line utility can be used to report the current
+The ``ptweens`` command-line utility can be used to report the current
 implict and explicit tween chains used by an application.  See
 :ref:`displaying_tweens`.

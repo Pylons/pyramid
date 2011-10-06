@@ -8,12 +8,12 @@ you'll see something much like this show up on the console:
 
 .. code-block:: text
 
-  $ paster serve myproject/MyProject.ini
+  $ pserve myproject/MyProject.ini
   Starting server in PID 16601.
   serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
 
 This chapter explains what happens between the time you press the "Return"
-key on your keyboard after typing ``paster serve myproject/MyProject.ini``
+key on your keyboard after typing ``pserve myproject/MyProject.ini``
 and the time the line ``serving on 0.0.0.0:6543 ...`` is output to your
 console.
 
@@ -24,22 +24,21 @@ The Startup Process
 -------------------
 
 The easiest and best-documented way to start and serve a :app:`Pyramid`
-application is to use the ``paster serve`` command against a
+application is to use the ``pserve`` command against a
 :term:`PasteDeploy` ``.ini`` file.  This uses the ``.ini`` file to infer
 settings and starts a server listening on a port.  For the purposes of this
 discussion, we'll assume that you are using this command to run your
 :app:`Pyramid` application.
 
 Here's a high-level time-ordered overview of what happens when you press
-``return`` after running ``paster serve development.ini``.
+``return`` after running ``pserve development.ini``.
 
-#. The :term:`PasteDeploy` ``paster`` command is invoked under your shell
-   with the arguments ``serve`` and ``development.ini``.  As a result, the
-   :term:`PasteDeploy` framework recognizes that it is meant to begin to run
-   and serve an application using the information contained within the
-   ``development.ini`` file.
+#. The ``pserve`` command is invoked under your shell with the argument
+   ``development.ini``.  As a result, Pyramid recognizes that it is meant to
+   begin to run and serve an application using the information contained
+   within the ``development.ini`` file.
 
-#. The PasteDeploy framework finds a section named either ``[app:main]``,
+#. The framework finds a section named either ``[app:main]``,
    ``[pipeline:main]``, or ``[composite:main]`` in the ``.ini`` file.  This
    section represents the configuration of a :term:`WSGI` application that
    will be served.  If you're using a simple application (e.g.
@@ -48,16 +47,16 @@ Here's a high-level time-ordered overview of what happens when you press
    configuration.  If, instead of a simple application, you're using a WSGI
    :term:`pipeline` (e.g. a ``[pipeline:main]`` section), the application
    named on the "last" element will refer to your :app:`Pyramid` application.
-   If instead of a simple application or a pipeline, you're using a Paste
+   If instead of a simple application or a pipeline, you're using a
    "composite" (e.g. ``[composite:main]``), refer to the documentation for
    that particular composite to understand how to make it refer to your
    :app:`Pyramid` application.  In most cases, a Pyramid application built
    from a scaffold will have a single ``[app:main]`` section in it, and this
    will be the application served.
 
-#. The PasteDeploy framework finds all :mod:`logging` related configuration
-   in the ``.ini`` file and uses it to configure the Python standard library
-   logging system for this application.
+#. The framework finds all :mod:`logging` related configuration in the
+   ``.ini`` file and uses it to configure the Python standard library logging
+   system for this application.
 
 #. The application's *constructor* (named by the entry point reference or
    dotted Python name on the ``use=`` line of the section representing your
@@ -82,7 +81,7 @@ Here's a high-level time-ordered overview of what happens when you press
    key/value pairs received by this function in ``**settings`` will be
    composed of all the key/value pairs that are present in the ``[app:main]``
    section (except for the ``use=`` setting) when this function is called by
-   the :term:`PasteDeploy` framework when you run ``paster serve``.
+   when you run ``pserve``.
 
    Our generated ``development.ini`` file looks like so:
 
@@ -110,7 +109,7 @@ Here's a high-level time-ordered overview of what happens when you press
 
    The ``settings`` dictionary contains all the options in the ``[app:main]``
    section of our .ini file except the ``use`` option (which is internal to
-   Paste) such as ``pyramid.reload_templates``,
+   PasteDeploy) such as ``pyramid.reload_templates``,
    ``pyramid.debug_authorization``, etc.
 
 #. The ``main`` function then calls various methods on the instance of the
@@ -130,12 +129,12 @@ Here's a high-level time-ordered overview of what happens when you press
 
 #. Assuming there were no errors, the ``main`` function in ``myproject``
    returns the router instance created by
-   :meth:`pyramid.config.Configurator.make_wsgi_app` back to PasteDeploy.  As
-   far as PasteDeploy is concerned, it is "just another WSGI application".
+   :meth:`pyramid.config.Configurator.make_wsgi_app` back to ``pserve``.  As
+   far as ``pserve`` is concerned, it is "just another WSGI application".
 
-#. PasteDeploy starts the WSGI *server* defined within the ``[server:main]``
-   section.  In our case, this is the ``Paste#http`` server (``use =
-   egg:Paste#http``), and it will listen on all interfaces (``host =
+#. ``pserve`` starts the WSGI *server* defined within the ``[server:main]``
+   section.  In our case, this is the ``egg:pyramid#wsgiref`` server (``use =
+   egg:pyramid#wsgiref``), and it will listen on all interfaces (``host =
    0.0.0.0``), on port number 6543 (``port = 6543``).  The server code itself
    is what prints ``serving on 0.0.0.0:6543 view at http://127.0.0.1:6543``.
    The server serves the application, and the application is running, waiting

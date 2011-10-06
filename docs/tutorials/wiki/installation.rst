@@ -130,9 +130,9 @@ Preparation, Windows
 Making a Project
 ================
 
-Your next step is to create a project.  :app:`Pyramid` supplies a
-variety of scaffolds to generate sample projects.  For this tutorial,
-we will use the :term:`ZODB` -oriented scaffold named ``pyramid_zodb``.
+Your next step is to create a project.  :app:`Pyramid` supplies a variety of
+scaffolds to generate sample projects.  For this tutorial, we will use the
+:term:`ZODB` -oriented scaffold named ``zodb``.
 
 The below instructions assume your current working directory is the
 "virtualenv" named "pyramidtut".
@@ -141,15 +141,15 @@ On UNIX:
 
 .. code-block:: text
 
-  $ bin/paster create -t pyramid_zodb tutorial
+  $ bin/pcreate -s zodb tutorial
 
 On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut> Scripts\paster create -t pyramid_zodb tutorial
+   c:\pyramidtut> Scripts\pcreate -s zodb tutorial
 
-.. note:: If you are using Windows, the ``pyramid_zodb`` Paster scaffold
+.. note:: If you are using Windows, the ``zodb`` scaffold
    doesn't currently deal gracefully with installation into a location
    that contains spaces in the path.  If you experience startup
    problems, try putting both the virtualenv and the project into
@@ -207,13 +207,13 @@ On UNIX:
 
 .. code-block:: text
 
-  $ ../bin/paster serve development.ini --reload
+  $ ../bin/pserve development.ini --reload
 
 On Windows:
 
 .. code-block:: text
 
-  c:\pyramidtut\tutorial> ..\Scripts\paster serve development.ini --reload
+  c:\pyramidtut\tutorial> ..\Scripts\pserve development.ini --reload
 
 Exposing Test Coverage Information
 ==================================
