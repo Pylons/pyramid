@@ -625,7 +625,7 @@ variable set to ``1``, For example:
 
 .. code-block:: text
 
-  $ PYRAMID_DEBUG_TEMPLATES=1 bin/paster serve myproject.ini
+  $ PYRAMID_DEBUG_TEMPLATES=1 bin/pserve myproject.ini
 
 To use a setting in the application ``.ini`` file for the same
 purpose, set the ``pyramid.debug_templates`` key to ``true`` within
@@ -786,7 +786,7 @@ variable set to ``1``, For example:
 
 .. code-block:: text
 
-  $ PYRAMID_RELOAD_TEMPLATES=1 bin/paster serve myproject.ini
+  $ PYRAMID_RELOAD_TEMPLATES=1 bin/pserve myproject.ini
 
 To use a setting in the application ``.ini`` file for the same
 purpose, set the ``pyramid.reload_templates`` key to ``true`` within the

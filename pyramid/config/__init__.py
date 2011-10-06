@@ -805,7 +805,7 @@ class Configurator(
         self.commit()
         app = Router(self.registry)
 
-        # Allow tools like "paster pshell development.ini" to find the 'last'
+        # Allow tools like "pshell development.ini" to find the 'last'
         # registry configured.
         global_registries.add(self.registry)
 

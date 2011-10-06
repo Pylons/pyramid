@@ -202,11 +202,11 @@ turn on "debug_authorization", which lets you know why a view execution was
 allowed or denied by printing a message to the console.  These features are
 useful for those WTF moments.
 
-There are also a number of ``paster`` commands that allow you to introspect
-the configuration of your system: ``paster proutes`` shows all configured
-routes for an application in the order they'll be evaluated for matching;
-``paster pviews`` shows all configured views for any given URL.  These are
-also WTF-crushers in some circumstances.
+There are also a number of commands that you can invoke within a Pyramid
+environment that allow you to introspect the configuration of your system:
+``proutes`` shows all configured routes for an application in the order
+they'll be evaluated for matching; ``pviews`` shows all configured views for
+any given URL.  These are also WTF-crushers in some circumstances.
 
 Examples: :ref:`debug_authorization_section` and :ref:`command_line_chapter`.
 

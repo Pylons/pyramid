@@ -94,13 +94,13 @@ On UNIX:
 
 .. code-block:: text
 
-   $ bin/paster create -t pyramid_routesalchemy tutorial
+   $ bin/pcreate -s routesalchemy tutorial
 
 On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut> Scripts\paster create -t pyramid_routesalchemy tutorial
+   c:\pyramidtut> Scripts\pcreate -s routesalchemy tutorial
 
 .. note:: If you are using Windows, the ``pyramid_routesalchemy``
    scaffold may not deal gracefully with installation into a
@@ -160,13 +160,13 @@ On UNIX:
 
 .. code-block:: text
 
-   $ ../bin/paster serve development.ini --reload
+   $ ../bin/pserve development.ini --reload
 
 On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut\tutorial> ..\Scripts\paster serve development.ini --reload
+   c:\pyramidtut\tutorial> ..\Scripts\pserve development.ini --reload
 
 Exposing Test Coverage Information
 ==================================

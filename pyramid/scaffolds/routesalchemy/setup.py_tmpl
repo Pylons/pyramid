@@ -42,6 +42,5 @@ setup(name='{{project}}',
       [paste.app_factory]
       main = {{package}}:main
       """,
-      paster_plugins=['pyramid'],
       )
 

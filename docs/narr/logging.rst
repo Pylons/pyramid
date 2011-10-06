@@ -32,13 +32,13 @@ format used as the Python `logging module's Configuration file format
 <http://docs.python.org/lib/logging-config-fileformat.html>`_.  The
 application-related and logging-related sections in the configuration file
 can coexist peacefully, and the logging-related sections in the file are used
-from when you run ``paster serve``.
+from when you run ``pserve``.
 
-The ``paster serve`` command calls the `logging.fileConfig function
+The ``pserve`` command calls the `logging.fileConfig function
 <http://docs.python.org/lib/logging-config-api.html>`_ using the specified
 ini file if it contains a ``[loggers]`` section (all of the
 scaffold-generated ``.ini`` files do). ``logging.fileConfig`` reads the
-logging configuration from the ini file upon which ``paster serve`` was
+logging configuration from the ini file upon which ``pserve`` was
 invoked.
 
 Default logging configuration is provided in both the default
@@ -89,7 +89,7 @@ project.  For instance, if you do:
 .. code-block:: text
    :linenos:
 
-   paster create -t pyramid_starter MyApp
+   pcreate -s starter MyApp
 
 The logging configuration will literally be:
 

@@ -2,7 +2,7 @@
 Defining the Domain Model
 =========================
 
-The first change we'll make to our stock paster-generated application will be
+The first change we'll make to our stock pcreate-generated application will be
 to define two :term:`resource` constructors, one representing a wiki page,
 and another representing the wiki as a mapping of wiki page names to page
 objects.  We'll do this inside our ``models.py`` file.

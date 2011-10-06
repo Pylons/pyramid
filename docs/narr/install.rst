@@ -347,10 +347,9 @@ Jython; use it instead.
 What Gets Installed
 -------------------
 
-When you ``easy_install`` :app:`Pyramid`, various Zope libraries,
-various Chameleon libraries, WebOb, Paste, PasteScript, and
-PasteDeploy libraries are installed.
+When you ``easy_install`` :app:`Pyramid`, various other libraries such as
+WebOb, PasteDeploy, and others are installed.
 
-Additionally, as chronicled in :ref:`project_narr`, scaffolds will be registered,
-which make it easy to start a new :app:`Pyramid` project. 
+Additionally, as chronicled in :ref:`project_narr`, scaffolds will be
+registered, which make it easy to start a new :app:`Pyramid` project.
 

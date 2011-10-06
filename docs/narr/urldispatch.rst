@@ -390,7 +390,7 @@ lookup` subsystem takes over to find the most reasonable view callable for
 the matched route.  Most often, there's only one view that will match (a view
 configured with a ``route_name`` argument matching the matched route).  To
 gain a better understanding of how routes and views are associated in a real
-application, you can use the ``paster pviews`` command, as documented in
+application, you can use the ``pviews`` command, as documented in
 :ref:`displaying_matching_views`.
 
 If no route matches after all route patterns are exhausted, :app:`Pyramid`
@@ -772,7 +772,7 @@ which you started the application from.  For example:
    :linenos:
 
     [chrism@thinko pylonsbasic]$ PYRAMID_DEBUG_ROUTEMATCH=true \
-                                 bin/paster serve development.ini
+                                 bin/pserve development.ini
     Starting server in PID 13586.
     serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
     2010-12-16 14:45:19,956 no route matched for url \
@@ -786,7 +786,7 @@ which you started the application from.  For example:
 See :ref:`environment_chapter` for more information about how, and where to
 set these values.
 
-You can also use the ``paster proutes`` command to see a display of all the
+You can also use the ``proutes`` command to see a display of all the
 routes configured in your application; for more information, see
 :ref:`displaying_application_routes`.
 
@@ -1012,8 +1012,8 @@ The above predicate, when added to a number of route configurations ensures
 that the year match argument is '2010' if and only if the route name is
 'ymd', 'ym', or 'y'.
 
-You can also caption the predicates by setting the ``__text__`` attribute. This
-will help you with the ``paster pviews`` command (see
+You can also caption the predicates by setting the ``__text__``
+attribute. This will help you with the ``pviews`` command (see
 :ref:`displaying_application_routes`) and the ``pyramid_debugtoolbar``.
 
 If a predicate is a class just add __text__ property in a standard manner.

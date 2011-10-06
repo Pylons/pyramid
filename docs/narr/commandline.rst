@@ -9,7 +9,7 @@ chapter.
 
 .. index::
    pair: matching views; printing
-   single: paster pviews
+   single: pviews
 
 .. _displaying_matching_views:
 
@@ -18,9 +18,9 @@ Displaying Matching Views for a Given URL
 
 For a big application with several views, it can be hard to keep the view
 configuration details in your head, even if you defined all the views
-yourself. You can use the ``paster pviews`` command in a terminal window to
+yourself. You can use the ``pviews`` command in a terminal window to
 print a summary of matching routes and views for a given URL in your
-application. The ``paster pviews`` command accepts two arguments. The first
+application. The ``pviews`` command accepts two arguments. The first
 argument to ``pviews`` is the path to your application's ``.ini`` file and
 section name inside the ``.ini`` file which points to your application.  This
 should be of the format ``config_file#section_name``. The second argument is
@@ -32,7 +32,7 @@ Here is an example for a simple view configuration using :term:`traversal`:
 .. code-block:: text
    :linenos:
 
-   $ ../bin/paster pviews development.ini#tutorial /FrontPage
+   $ ../bin/pviews development.ini#tutorial /FrontPage
 
    URL = /FrontPage
 
@@ -56,7 +56,7 @@ A more complex configuration might generate something like this:
 .. code-block:: text
    :linenos:
 
-   $ ../bin/paster pviews development.ini#shootout /about
+   $ ../bin/pviews development.ini#shootout /about
 
    URL = /about
 
@@ -103,14 +103,13 @@ displayed first, followed by any views that are associated with that route.
 As you can see from the second matching route output, a route can be
 associated with more than one view.
 
-For a URL that doesn't match any views, ``paster pviews`` will simply print
-out a *Not found* message.
+For a URL that doesn't match any views, ``pviews`` will simply print out a
+*Not found* message.
 
 
 .. index::
    single: interactive shell
    single: IPython
-   single: paster pshell
    single: pshell
 
 .. _interactive_shell:
@@ -121,7 +120,7 @@ The Interactive Shell
 Once you've installed your program for development using ``setup.py
 develop``, you can use an interactive Python shell to execute expressions in
 a Python environment exactly like the one that will be used when your
-application runs "for real".  To do so, use the ``paster pshell`` command.
+application runs "for real".  To do so, use the ``pshell`` command.
 
 The argument to ``pshell`` follows the format ``config_file#section_name``
 where ``config_file`` is the path to your application's ``.ini`` file and
@@ -145,7 +144,7 @@ name ``MyProject`` as a section name:
 
 .. code-block:: text
 
-    chrism@thinko env26]$ bin/paster pshell starter/development.ini#MyProject
+    chrism@thinko env26]$ bin/pshell starter/development.ini#MyProject
     Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32) 
     [GCC 4.4.3] on linux2
     Type "help" for more information.
@@ -180,7 +179,7 @@ hash after the filename:
 
 .. code-block:: text
 
-    chrism@thinko env26]$ bin/paster pshell starter/development.ini
+    chrism@thinko env26]$ bin/pshell starter/development.ini
 
 Press ``Ctrl-D`` to exit the interactive shell (or ``Ctrl-Z`` on Windows).
 
@@ -243,7 +242,7 @@ exposed, and the request is configured to generate urls from the host
 
 .. code-block:: text
 
-    chrism@thinko env26]$ bin/paster pshell starter/development.ini
+    chrism@thinko env26]$ bin/pshell starter/development.ini
     Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32) 
     [GCC 4.4.3] on linux2
     Type "help" for more information.
@@ -273,22 +272,20 @@ IPython
 ~~~~~~~
 
 If you have `IPython <http://en.wikipedia.org/wiki/IPython>`_ installed in
-the interpreter you use to invoke the ``paster`` command, the ``pshell``
-command will use an IPython interactive shell instead of a standard Python
-interpreter shell.  If you don't want this to happen, even if you have
-IPython installed, you can pass the ``--disable-ipython`` flag to the
-``pshell`` command to use a standard Python interpreter shell
-unconditionally.
+the interpreter you use to invoke the ``pshell`` command, ``pshell`` will use
+an IPython interactive shell instead of a standard Python interpreter shell.
+If you don't want this to happen, even if you have IPython installed, you can
+pass the ``--disable-ipython`` flag to the ``pshell`` command to use a
+standard Python interpreter shell unconditionally.
 
 .. code-block:: text
 
-   [chrism@vitaminf shellenv]$ ../bin/paster pshell --disable-ipython \
+   [chrism@vitaminf shellenv]$ ../bin/pshell --disable-ipython \
                                 development.ini#MyProject
 
 
 .. index::
    pair: routes; printing
-   single: paster proutes
    single: proutes
 
 .. _displaying_application_routes:
@@ -296,11 +293,11 @@ unconditionally.
 Displaying All Application Routes
 ---------------------------------
 
-You can use the ``paster proutes`` command in a terminal window to print a
-summary of routes related to your application.  Much like the ``paster
-pshell`` command (see :ref:`interactive_shell`), the ``paster proutes``
-command accepts one argument with the format ``config_file#section_name``.
-The ``config_file`` is the path to your application's ``.ini`` file, and
+You can use the ``proutes`` command in a terminal window to print a summary
+of routes related to your application.  Much like the ``pshell``
+command (see :ref:`interactive_shell`), the ``proutes`` command
+accepts one argument with the format ``config_file#section_name``.  The
+``config_file`` is the path to your application's ``.ini`` file, and
 ``section_name`` is the ``app`` section name inside the ``.ini`` file which
 points to your application.  By default, the ``section_name`` is ``main`` and
 can be omitted.
@@ -310,7 +307,7 @@ For example:
 .. code-block:: text
    :linenos:
 
-   [chrism@thinko MyProject]$ ../bin/paster proutes development.ini#MyProject
+   [chrism@thinko MyProject]$ ../bin/proutes development.ini#MyProject
    Name            Pattern                        View
    ----            -------                        ----                     
    home            /                              <function my_view>
@@ -319,19 +316,18 @@ For example:
    static/         static/*subpath                <static_view object>
    catchall        /*subpath                      <function static_view>
 
-``paster proutes`` generates a table.  The table has three columns: a Name
+``proutes`` generates a table.  The table has three columns: a Name
 column, a Pattern column, and a View column.  The items listed in the
 Name column are route names, the items listed in the Pattern column are route
 patterns, and the items listed in the View column are representations of the
 view callable that will be invoked when a request matches the associated
 route pattern.  The view column may show ``None`` if no associated view
 callable could be found.  If no routes are configured within your
-application, nothing will be printed to the console when ``paster proutes``
+application, nothing will be printed to the console when ``proutes``
 is executed.
 
 .. index::
    pair: tweens; printing
-   single: paster ptweens
    single: ptweens
 
 .. _displaying_tweens:
@@ -344,17 +340,17 @@ application request handler and the WSGI application which calls it.  A user
 can get a representation of both the implicit tween ordering (the ordering
 specified by calls to :meth:`pyramid.config.Configurator.add_tween`) and the
 explicit tween ordering (specified by the ``pyramid.tweens`` configuration
-setting) orderings using the ``paster ptweens`` command.  Tween factories
+setting) orderings using the ``ptweens`` command.  Tween factories
 will show up represented by their standard Python dotted name in the
-``paster ptweens`` output.
+``ptweens`` output.
 
-For example, here's the ``paster pwteens`` command run against a system
+For example, here's the ``pwteens`` command run against a system
 configured without any explicit tweens:
 
 .. code-block:: text
    :linenos:
 
-   [chrism@thinko pyramid]$ paster ptweens development.ini 
+   [chrism@thinko pyramid]$ ptweens development.ini 
    "pyramid.tweens" config value NOT set (implicitly ordered tweens used)
 
    Implicit Tween Chain
@@ -366,13 +362,13 @@ configured without any explicit tweens:
    1           pyramid.tweens.excview_tween_factory                excview
    -           -                                                   MAIN
 
-Here's the ``paster pwteens`` command run against a system configured *with*
+Here's the ``pwteens`` command run against a system configured *with*
 explicit tweens defined in its ``development.ini`` file:
 
 .. code-block:: text
    :linenos:
 
-   [chrism@thinko pyramid]$ paster ptweens development.ini  
+   [chrism@thinko pyramid]$ ptweens development.ini  
    "pyramid.tweens" config value set (explicitly ordered tweens used)
 
    Explicit Tween Chain (used)
@@ -395,8 +391,8 @@ explicit tweens defined in its ``development.ini`` file:
    -           -                                                   MAIN
 
 Here's the application configuration section of the ``development.ini`` used
-by the above ``paster ptweens`` command which reprorts that the explicit
-tween chain is used:
+by the above ``ptweens`` command which reports that the explicit tween chain
+is used:
 
 .. code-block:: text
    :linenos:

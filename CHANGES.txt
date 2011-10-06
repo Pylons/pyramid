@@ -25,6 +25,20 @@ Backwards Incompatibilities
 - Pyramid no longer runs on Python 2.5 (which includes the most recent
   release of Jython, and the current version of GAE).
 
+- The ``paster`` command is no longer the documented way to create projects,
+  start the server, or run debugging commands.  To create projects from
+  scaffolds, ``paster create`` is replaced by the ``pcreate`` console script.
+  To serve up a project, ``paster serve`` is replaced by the ``pserve``
+  console script.  New console scripts named ``pshell``, ``pviews``,
+  ``proutes``, and ``ptweens`` do what their ``paster <commandname>``
+  equivalents used to do.  Rationale: the Paste and PasteScript packages do
+  not run under Python 3.
+
+- The default WSGI server run as the result of ``pserve`` from newly rendered
+  scaffolding is now the ``wsgiref`` WSGI server instead of the
+  ``paste.httpserver`` server.  Rationale: Rationale: the Paste and
+  PasteScript packages do not run under Python 3.
+
 Dependencies
 ------------
 
@@ -35,4 +49,7 @@ Dependencies
   repoze.lru>=0.4, zope.deprecation>=3.5.0, translationstring>=0.4 (for
   Python 3 compatibility purposes).  It also, as a testing dependency,
   depends on WebTest>=1.3.1 for the same reason.
+
+- Pyramid no longer depends on the Paste or PasteScript packages.
+
 

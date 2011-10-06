@@ -64,7 +64,7 @@ commands and files.
     .. code-block:: text
 
        $ cd ~/modwsgi/env
-       $ bin/paster create -t pyramid_starter myapp
+       $ bin/pcreate -s starter myapp
        $ cd myapp
        $ ../bin/python setup.py install
 
@@ -77,7 +77,7 @@ commands and files.
        application = get_app(
          '/Users/chrism/modwsgi/env/myapp/production.ini', 'main')
 
-    The first argument to ``get_app`` is the project Paste configuration file
+    The first argument to ``get_app`` is the project configuration file
     name.  It's best to use the ``production.ini`` file provided by your
     scaffold, as it contains settings appropriate for
     production.  The second is the name of the section within the .ini file

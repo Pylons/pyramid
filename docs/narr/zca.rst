@@ -61,14 +61,13 @@ Using the ZCA Global API in a :app:`Pyramid` Application
 effectively making it impossible to run more than one Zope application
 in a single process.
 
-However, for ease of deployment, it's often useful to be able to run
-more than a single application per process.  For example, use of a
-:term:`Paste` "composite" allows you to run separate individual WSGI
+However, for ease of deployment, it's often useful to be able to run more
+than a single application per process.  For example, use of a
+:term:`PasteDeploy` "composite" allows you to run separate individual WSGI
 applications in the same process, each answering requests for some URL
-prefix.  This makes it possible to run, for example, a TurboGears
-application at ``/turbogears`` and a :app:`Pyramid` application at
-``/pyramid``, both served up using the same :term:`WSGI` server
-within a single Python process.
+prefix.  This makes it possible to run, for example, a TurboGears application
+at ``/turbogears`` and a :app:`Pyramid` application at ``/pyramid``, both
+served up using the same :term:`WSGI` server within a single Python process.
 
 Most production Zope applications are relatively large, making it
 impractical due to memory constraints to run more than one Zope

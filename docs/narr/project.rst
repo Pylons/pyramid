@@ -20,15 +20,15 @@ distributed more easily than one which does not live within a package.
 a project.  Each scaffold makes different configuration assumptions about
 what type of application you're trying to construct.
 
-These scaffolds are rendered using the :term:`PasteDeploy` ``paster create``
-command.
+These scaffolds are rendered using the ``pcreate`` command that is installed
+as part of Pyramid.
 
 .. index::
    single: scaffolds
-   single: pyramid_starter scaffold
-   single: pyramid_zodb scaffold
-   single: pyramid_alchemy scaffold
-   single: pyramid_routesalchemy scaffold
+   single: starter scaffold
+   single: zodb scaffold
+   single: alchemy scaffold
+   single: routesalchemy scaffold
 
 .. _additional_paster_scaffolds:
 
@@ -44,35 +44,23 @@ each other on a number of axes:
 - the mechanism they use to map URLs to code (:term:`traversal` or :term:`URL
   dispatch`).
 
-- whether or not the ``pyramid_beaker`` library is relied upon as the
-  sessioning implementation (as opposed to no sessioning or default
-  sessioning).
-
 The included scaffolds are these:
 
-``pyramid_starter``
+``starter``
   URL mapping via :term:`traversal` and no persistence mechanism.
 
-``pyramid_zodb``
+``zodb``
   URL mapping via :term:`traversal` and persistence via :term:`ZODB`.
 
-``pyramid_routesalchemy``
+``routesalchemy``
   URL mapping via :term:`URL dispatch` and persistence via
   :term:`SQLAlchemy`
 
-``pyramid_alchemy``
+``alchemy``
   URL mapping via :term:`traversal` and persistence via
   :term:`SQLAlchemy`
 
 .. note::
-
-   At this time, each of these scaffolds uses the :term:`Chameleon`
-   templating system, which is incompatible with Jython.  To use scaffolds to
-   build applications which will run on Jython, you can try the
-   ``pyramid_jinja2_starter`` scaffold which ships as part of the
-   :term:`pyramid_jinja2` package.  You can also just use any above scaffold
-   and replace the Chameleon template it includes with a :term:`Mako`
-   analogue.
 
 Rather than use any of the above scaffolds, Pylons 1 users may feel more
 comfortable installing the :term:`Akhet` development environment, which
@@ -91,85 +79,64 @@ Creating the Project
 
 In :ref:`installing_chapter`, you created a virtual Python environment via
 the ``virtualenv`` command.  To start a :app:`Pyramid` :term:`project`, use
-the ``paster`` facility installed within the virtualenv.  In
+the ``pcreate`` command installed within the virtualenv.  In
 :ref:`installing_chapter` we called the virtualenv directory ``env``; the
 following command assumes that our current working directory is that
-directory.  We'll choose the ``pyramid_starter`` scaffold for this purpose.
+directory.  We'll choose the ``starter`` scaffold for this purpose.
 
 On UNIX:
 
 .. code-block:: text
 
-   $ bin/paster create -t pyramid_starter
+   $ bin/pcreate -s starter MyProject
 
 Or on Windows:
 
 .. code-block:: text
 
-   $ Scripts\paster.exe create -t pyramid_starter
+   $ Scripts\pcreate -s starter MyProject
 
-The above command uses the ``paster create`` command to create a project with
-the ``pyramid_starter`` scaffold.  To use a different scaffold, such as
-``pyramid_routesalchemy``, you'd just change the last argument.  For example,
+The above command uses the ``pcreate`` command to create a project with the
+``starter`` scaffold.  To use a different scaffold, such as
+``routesalchemy``, you'd just change the ``-s`` argument value.  For example,
 on UNIX:
 
 .. code-block:: text
 
-   $ bin/paster create -t pyramid_routesalchemy
+   $ bin/pcreate -s routesalchemy MyProject
 
 Or on Windows:
 
 .. code-block:: text
 
-   $ Scripts\paster.exe create -t pyramid_routesalchemy
+   $ Scripts\pcreate routesalchemy MyProject
 
-``paster create`` will ask you a single question: the *name* of the project.
-You should use a string without spaces and with only letters in it.  Here's
-sample output from a run of ``paster create`` on UNIX for a project we name
+Here's sample output from a run of ``pcreate`` on UNIX for a project we name
 ``MyProject``:
 
 .. code-block:: text
 
-   $ bin/paster create -t pyramid_starter
-   Selected and implied templates:
-     pyramid#pyramid_starter  pyramid starter project
-
-   Enter project name: MyProject
-   Variables:
-     egg:      MyProject
-     package:  myproject
-     project:  MyProject
+   $ bin/pcreate -s starter MyProject
    Creating template pyramid
    Creating directory ./MyProject
    # ... more output ...
    Running /Users/chrism/projects/pyramid/bin/python setup.py egg_info
 
-.. note:: You can skip the interrogative question about a project
-   name during ``paster create`` by adding the project name to the
-   command line, e.g. ``paster create -t pyramid_starter MyProject``.
-
-.. note:: You may encounter an error when using ``paster create`` if a
-   dependent Python package is not installed. This will result in a traceback
-   ending in ``pkg_resources.DistributionNotFound: <package name>``.  Simply
-   run ``bin/easy_install`` (or ``Script\easy_install.exe`` on Windows), with
-   the missing package name from the error message to work around this issue.
-
-As a result of invoking the ``paster create`` command, a project is created
-in a directory named ``MyProject``.  That directory is a :term:`project`
+As a result of invoking the ``pcreate`` command, a project is created in a
+directory named ``MyProject``.  That directory is a :term:`project`
 directory.  The ``setup.py`` file in that directory can be used to distribute
 your application, or install your application for deployment or development.
 
-A :term:`PasteDeploy` ``.ini`` file named ``development.ini`` will be created
-in the project directory.  You will use this ``.ini`` file to configure a
-server, to run your application, and to debug your application.  It sports
-configuration that enables an interactive debugger and settings optimized for
-development.
+A ``.ini`` file named ``development.ini`` will be created in the project
+directory.  You will use this ``.ini`` file to configure a server, to run
+your application, and to debug your application.  It sports configuration
+that enables an interactive debugger and settings optimized for development.
 
-Another :term:`PasteDeploy` ``.ini`` file named ``production.ini`` will also
-be created in the project directory.  It sports configuration that disables
-any interactive debugger (to prevent inappropriate access and disclosure),
-and turns off a number of debugging settings.  You can use this file to put
-your application into production.
+Another ``.ini`` file named ``production.ini`` will also be created in the
+project directory.  It sports configuration that disables any interactive
+debugger (to prevent inappropriate access and disclosure), and turns off a
+number of debugging settings.  You can use this file to put your application
+into production.
 
 The ``MyProject`` project directory contains an additional subdirectory named
 ``myproject`` (note the case difference) representing a Python
@@ -188,7 +155,7 @@ newly created project directory and use the Python interpreter from the
 :term:`virtualenv` you created during :ref:`installing_chapter` to invoke the
 command ``python setup.py develop``
 
-The file named ``setup.py`` will be in the root of the paster-generated
+The file named ``setup.py`` will be in the root of the pcreate-generated
 project directory.  The ``python`` you're invoking should be the one that
 lives in the ``bin`` (or ``Scripts`` on Windows) directory of your virtual
 Python environment.  Your terminal's current working directory *must* be the
@@ -219,8 +186,8 @@ Elided output from a run of this command on UNIX is shown below:
 
 This will install a :term:`distribution` representing your project into the
 interpreter's library set so it can be found by ``import`` statements and by
-:term:`PasteDeploy` commands such as ``paster serve``, ``paster pshell``,
-``paster proutes`` and ``paster pviews``.
+other console scripts such as ``pserve``, ``pshell``, ``proutes`` and
+``pviews``.
 
 .. index::
    single: running tests
@@ -273,13 +240,13 @@ Here's sample output from a test run on UNIX:
    output to a stream of dots.  If you don't pass ``-q``, you'll see more
    verbose test result output (which normally isn't very useful).
 
-The tests themselves are found in the ``tests.py`` module in your ``paster
-create`` -generated project.  Within a project generated by the
-``pyramid_starter`` scaffold, a single sample test exists.
+The tests themselves are found in the ``tests.py`` module in your ``pcreate``
+generated project.  Within a project generated by the ``starter`` scaffold, a
+single sample test exists.
 
 .. index::
    single: running an application
-   single: paster serve
+   single: pserve
    single: reload
    single: startup
 
@@ -287,26 +254,26 @@ Running The Project Application
 -------------------------------
 
 Once a project is installed for development, you can run the application it
-represents using the ``paster serve`` command against the generated
-configuration file.  In our case, this file is named ``development.ini``.
+represents using the ``pserve`` command against the generated configuration
+file.  In our case, this file is named ``development.ini``.
 
 On UNIX:
 
 .. code-block:: text
 
-   $ ../bin/paster serve development.ini
+   $ ../bin/pserve development.ini
 
 On Windows:
 
 .. code-block:: text
 
-   $ ..\Scripts\paster.exe serve development.ini
+   $ ..\Scripts\pserve development.ini
 
-Here's sample output from a run of ``paster serve`` on UNIX:
+Here's sample output from a run of ``pserve`` on UNIX:
 
 .. code-block:: text
 
-   $ ../bin/paster serve development.ini
+   $ ../bin/pserve development.ini
    Starting server in PID 16601.
    serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
 
@@ -314,18 +281,17 @@ By default, :app:`Pyramid` applications generated from a scaffold
 will listen on TCP port 6543.  You can shut down a server started this way by
 pressing ``Ctrl-C``.
 
-During development, it's often useful to run ``paster serve`` using its
-``--reload`` option.  When ``--reload`` is passed to ``paster serve``,
-changes to any Python module your project uses will cause the server to
-restart.  This typically makes development easier, as changes to Python code
-made within a :app:`Pyramid` application is not put into effect until the
-server restarts.
+During development, it's often useful to run ``pserve`` using its
+``--reload`` option.  When ``--reload`` is passed to ``pserve``, changes to
+any Python module your project uses will cause the server to restart.  This
+typically makes development easier, as changes to Python code made within a
+:app:`Pyramid` application is not put into effect until the server restarts.
 
 For example, on UNIX:
 
 .. code-block:: text
 
-   $ ../bin/paster serve development.ini --reload
+   $ ../bin/pserve development.ini --reload
    Starting subprocess with file monitor
    Starting server in PID 16601.
    serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
@@ -341,14 +307,14 @@ configuration file settings that influence startup and runtime behavior, see
 Viewing the Application
 -----------------------
 
-Once your application is running via ``paster serve``, you may visit
+Once your application is running via ``pserve``, you may visit
 ``http://localhost:6543/`` in your browser.  You will see something in your
 browser like what is displayed in the following image:
 
 .. image:: project.png
 
-This is the page shown by default when you visit an unmodified ``paster
-create`` -generated ``pyramid_starter`` application in a browser.
+This is the page shown by default when you visit an unmodified ``pcreate``
+generated ``starter`` application in a browser.
 
 .. index::
    single: debug toolbar
@@ -403,13 +369,12 @@ Then restart the application to see that the toolbar has been turned off.
 The Project Structure
 ---------------------
 
-The ``pyramid_starter`` scaffold generated a :term:`project` (named
-``MyProject``), which contains a Python :term:`package`.  The package is
-*also* named ``myproject``, but it's lowercased; the scaffold
-generates a project which contains a package that shares its name except for
-case.
+The ``starter`` scaffold generated a :term:`project` (named ``MyProject``),
+which contains a Python :term:`package`.  The package is *also* named
+``myproject``, but it's lowercased; the scaffold generates a project which
+contains a package that shares its name except for case.
 
-All :app:`Pyramid` ``paster`` -generated projects share a similar structure.
+All :app:`Pyramid` ``pcreate`` -generated projects share a similar structure.
 The ``MyProject`` project we've generated has the following directory
 structure:
 
@@ -475,8 +440,8 @@ describe, run, and test your application.
 ~~~~~~~~~~~~~~~~~~~
 
 The ``development.ini`` file is a :term:`PasteDeploy` configuration file.
-Its purpose is to specify an application to run when you invoke ``paster
-serve``, as well as the deployment settings provided to that application.
+Its purpose is to specify an application to run when you invoke ``pserve``,
+as well as the deployment settings provided to that application.
 
 The generated ``development.ini`` file looks like so:
 
@@ -529,9 +494,9 @@ or influencing runtime behavior of a :app:`Pyramid` application.  See
 :ref:`environment_chapter` for more information about these settings.
 
 The name ``main`` in ``[app:main]`` signifies that this is the default
-application run by ``paster serve`` when it is invoked against this
-configuration file.  The name ``main`` is a convention used by PasteDeploy
-signifying that it is the default application.
+application run by ``pserve`` when it is invoked against this configuration
+file.  The name ``main`` is a convention used by PasteDeploy signifying that
+it is the default application.
 
 The ``[server:main]`` section of the configuration file configures a WSGI
 server which listens on TCP port 6543.  It is configured to listen on all
@@ -544,7 +509,7 @@ and ``# End logging configuration`` represent Python's standard library
 between these two markers are passed to the `logging module's config file
 configuration engine
 <http://docs.python.org/howto/logging.html#configuring-logging>`_ when the
-``paster serve`` or ``paster pshell`` commands are executed.  The default
+``pserve`` or ``pshell`` commands are executed.  The default
 configuration sends application logging output to the standard error output
 of your terminal.  For more information about logging configuration, see
 :ref:`logging_chapter`.
@@ -718,7 +683,8 @@ The ``myproject`` :term:`package` lives inside the ``MyProject``
 
 #. An ``__init__.py`` file signifies that this is a Python :term:`package`.
    It also contains code that helps users run the application, including a
-   ``main`` function which is used as a Paste entry point.
+   ``main`` function which is used as a entry point for commands such as
+   ``pserve``, ``pshell``, ``pviews``, and others.
 
 #. A ``resources.py`` module, which contains :term:`resource` code.
 
@@ -762,7 +728,7 @@ also informs Python that the directory which contains it is a *package*.
 
 #. Lines 4-12 define a function named ``main`` that returns a :app:`Pyramid`
    WSGI application.  This function is meant to be called by the
-   :term:`PasteDeploy` framework as a result of running ``paster serve``.
+   :term:`PasteDeploy` framework as a result of running ``pserve``.
 
    Within this function, application configuration is performed.
 
@@ -785,7 +751,7 @@ also informs Python that the directory which contains it is a *package*.
    directory of the ``mypackage`` package).
 
    Line 12 returns a :term:`WSGI` application to the caller of the function
-   (Paste).
+   (Pyramid's pserve).
 
 .. index::
    single: views.py
@@ -922,10 +888,10 @@ way you see fit.
 For example, the configuration method named
 :meth:`~pyramid.config.Configurator.add_view` requires you to pass a
 :term:`dotted Python name` or a direct object reference as the class or
-function to be used as a view.  By default, the ``pyramid_starter`` scaffold
-would have you add view functions to the ``views.py`` module in your
-package.  However, you might be more comfortable creating a ``views``
-*directory*, and adding a single file for each view.
+function to be used as a view.  By default, the ``starter`` scaffold would
+have you add view functions to the ``views.py`` module in your package.
+However, you might be more comfortable creating a ``views`` *directory*, and
+adding a single file for each view.
 
 If your project package name was ``myproject`` and you wanted to arrange all
 your views in a Python subpackage within the ``myproject`` :term:`package`
@@ -980,33 +946,32 @@ Using the Interactive Shell
 
 It is possible to use a Python interpreter prompt loaded with a similar
 configuration as would be loaded if you were running your Pyramid application
-via ``paster serve``.  This can be a useful debugging tool.  See
+via ``pserve``.  This can be a useful debugging tool.  See
 :ref:`interactive_shell` for more details.
 
 Using an Alternate WSGI Server
 ------------------------------
 
 The code generated by a :app:`Pyramid` scaffold assumes that you will be
-using the ``paster serve`` command to start your application while you do
-development.  However, ``paster serve`` is by no means the only way to start
-up and serve a :app:`Pyramid` application.  As we saw in
-:ref:`firstapp_chapter`, ``paster serve`` needn't be invoked at all to run a
-:app:`Pyramid` application.  The use of ``paster serve`` to run a
-:app:`Pyramid` application is purely conventional based on the output of its
-scaffold.
+using the ``pserve`` command to start your application while you do
+development.  However, ``pserve`` is by no means the only way to start up and
+serve a :app:`Pyramid` application.  As we saw in :ref:`firstapp_chapter`,
+``pserve`` needn't be invoked at all to run a :app:`Pyramid` application.
+The use of ``pserve`` to run a :app:`Pyramid` application is purely
+conventional based on the output of its scaffold.
 
 Any :term:`WSGI` server is capable of running a :app:`Pyramid` application.
-Some WSGI servers don't require the :term:`PasteDeploy` framework's ``paster
-serve`` command to do server process management at all.  Each :term:`WSGI`
+Some WSGI servers don't require the :term:`PasteDeploy` framework's
+``pserve`` command to do server process management at all.  Each :term:`WSGI`
 server has its own documentation about how it creates a process to run an
 application, and there are many of them, so we cannot provide the details for
 each here.  But the concepts are largely the same, whatever server you happen
 to use.
 
-One popular production alternative to a ``paster``-invoked server is
+One popular production alternative to a ``pserve``-invoked server is
 :term:`mod_wsgi`. You can also use :term:`mod_wsgi` to serve your
 :app:`Pyramid` application using the Apache web server rather than any
-"pure-Python" server that is started as a result of ``paster serve``.  See
+"pure-Python" server that is started as a result of ``pserve``.  See
 :ref:`modwsgi_tutorial` for details.  However, it is usually easier to
-*develop* an application using a ``paster serve`` -invoked webserver, as
+*develop* an application using a ``pserve`` -invoked webserver, as
 exception and debugging output will be sent to the console.

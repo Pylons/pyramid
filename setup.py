@@ -39,14 +39,8 @@ install_requires=[
     'zope.deprecation >= 3.5.0', # py3 compat
     'venusian >= 1.0a1', # ``onerror``
     'translationstring >= 0.4', # py3 compat
+    'PasteDeploy >= 1.5.0', # py3 compat
     ]
-
-if not PY3:
-    install_requires.extend([
-        'Paste > 1.7', # temp version pin to prevent PyPi install failure :-(
-        'PasteDeploy',
-        'PasteScript >= 1.7.4', # "here" in logging fileConfig
-        ])
 
 tests_require = install_requires + [
     'WebTest >= 1.3.1', # py3 compat
@@ -90,18 +84,21 @@ setup(name='pyramid',
       tests_require = tests_require,
       test_suite="pyramid.tests",
       entry_points = """\
-        [paste.paster_create_template]
-        pyramid_starter=pyramid.scaffolds:StarterProjectTemplate
-        pyramid_zodb=pyramid.scaffolds:ZODBProjectTemplate
-        pyramid_routesalchemy=pyramid.scaffolds:RoutesAlchemyProjectTemplate
-        pyramid_alchemy=pyramid.scaffolds:AlchemyProjectTemplate
-        [paste.paster_command]
-        pshell=pyramid.paster:PShellCommand
-        proutes=pyramid.paster:PRoutesCommand
-        pviews=pyramid.paster:PViewsCommand
-        ptweens=pyramid.paster:PTweensCommand
+        [pyramid.scaffold]
+        starter=pyramid.scaffolds:StarterProjectTemplate
+        zodb=pyramid.scaffolds:ZODBProjectTemplate
+        routesalchemy=pyramid.scaffolds:RoutesAlchemyProjectTemplate
+        alchemy=pyramid.scaffolds:AlchemyProjectTemplate
         [console_scripts]
         bfg2pyramid = pyramid.fixers.fix_bfg_imports:main
+        pcreate = pyramid.scripts.pcreate:main
+        pserve = pyramid.scripts.pserve:main
+        pshell = pyramid.scripts.pshell:main
+        proutes = pyramid.scripts.proutes:main
+        pviews = pyramid.scripts.pviews:main
+        ptweens = pyramid.scripts.ptweens:main
+        [paste.server_runner]
+        wsgiref = pyramid.scripts.pserve:wsgiref_server_runner
       """
       )
 

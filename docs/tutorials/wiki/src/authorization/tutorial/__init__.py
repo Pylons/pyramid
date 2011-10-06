@@ -13,9 +13,6 @@ def root_factory(request):
 
 def main(global_config, **settings):
     """ This function returns a WSGI application.
-    
-    It is usually called by the PasteDeploy framework during 
-    ``paster serve``.
     """
     authn_policy = AuthTktAuthenticationPolicy(secret='sosecret',
                                                callback=groupfinder)

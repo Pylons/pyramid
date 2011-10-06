@@ -212,8 +212,7 @@ else:
 try: # pragma: no cover
     import configparser
 except ImportError: # pragma: no cover
-    import ConfigParser
-    configparser = ConfigParser
+    import ConfigParser as configparser
 
 try:
     from Cookie import SimpleCookie
@@ -224,3 +223,15 @@ if PY3: # pragma: no cover
     from html import escape
 else:
     from cgi import escape
+
+try: # pragma: no cover
+    input_ = raw_input
+except NameError: # pragma: no cover
+    input_ = input
+
+
+try: 
+    from StringIO import StringIO as NativeIO
+except ImportError: # pragma: no cover
+    from io import StringIO as NativeIO
+    

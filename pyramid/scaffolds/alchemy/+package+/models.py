@@ -64,7 +64,7 @@ def root_factory(request):
 
 def populate():
     session = DBSession()
-    model = MyModel(name=u'test name', value=55)
+    model = MyModel(name='test name', value=55)
     session.add(model)
     session.flush()
     transaction.commit()

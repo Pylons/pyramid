@@ -95,7 +95,7 @@ Glossary
 
    dotted Python name
      A reference to a Python object by name using a string, in the form
-     ``path.to.modulename:attributename``.  Often used in Paste and
+     ``path.to.modulename:attributename``.  Often used in Pyramid and
      setuptools configurations.  A variant is used in dotted names within
      configurator method arguments that name objects (such as the "add_view"
      method's "view" and "context" attributes): the colon (``:``) is not
@@ -304,7 +304,7 @@ Glossary
      application.
 
    pipeline
-     The :term:`Paste` term for a single configuration of a WSGI
+     The :term:`PasteDeploy` term for a single configuration of a WSGI
      server, a WSGI application, with a set of middleware in-between.
 
    Zope
@@ -335,15 +335,11 @@ Glossary
      `WebOb <http://webob.org>`_ is a WSGI request/response
      library created by Ian Bicking.
 
-   Paste
-     `Paste <http://pythonpaste.org>`_ is a WSGI development and
-     deployment system developed by Ian Bicking.
-
    PasteDeploy
      `PasteDeploy <http://pythonpaste.org>`_ is a library used by
      :app:`Pyramid` which makes it possible to configure
      :term:`WSGI` components together declaratively within an ``.ini``
-     file.  It was developed by Ian Bicking as part of :term:`Paste`.
+     file.  It was developed by Ian Bicking.
 
    Chameleon
      `chameleon <http://chameleon.repoze.org>`_ is an attribute
@@ -930,8 +926,8 @@ Glossary
 
    scaffold
      A project template that helps users get started writing a Pyramid
-     application quickly.  Scaffolds are usually used via the ``paster
-     create`` command.
+     application quickly.  Scaffolds are usually used via the ``pcreate``
+     command.
 
    pyramid_exclog
      A package which logs Pyramid application exception (error) information

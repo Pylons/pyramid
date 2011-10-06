@@ -720,7 +720,7 @@ microframeworks and Django boast.
 The :mod:`zope.component`, package on which :app:`Pyramid` depends has
 transitive dependencies on several other packages (:mod:`zope.event`, and
 :mod:`zope.interface`).  :app:`Pyramid` also has its own direct dependencies,
-such as :term:`Paste`, :term:`Chameleon`, :term:`Mako` :term:`WebOb`,
+such as :term:`PasteDeploy`, :term:`Chameleon`, :term:`Mako` :term:`WebOb`,
 :mod:`zope.deprecation` and some of these in turn have their own transitive
 dependencies.
 

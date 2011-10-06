@@ -328,7 +328,7 @@ class Request(BaseRequest, DeprecatedRequestMethodsMixin, URLMethodsMixin,
         :class:`pyramid.exceptions.ConfigurationError` will be raised"""
         factory = self.registry.queryUtility(ISessionFactory)
         if factory is None:
-            raise ConfigurationError(
+            raise AttributeError(
                 'No session factory registered '
                 '(see the Sessions chapter of the Pyramid documentation)')
         return factory(self)

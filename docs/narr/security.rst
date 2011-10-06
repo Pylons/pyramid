@@ -512,7 +512,7 @@ example:
 
 .. code-block:: text
 
-  $ PYRAMID_DEBUG_AUTHORIZATION=1 bin/paster serve myproject.ini
+  $ PYRAMID_DEBUG_AUTHORIZATION=1 bin/pserve myproject.ini
 
 When any authorization takes place during a top-level view rendering,
 a message will be logged to the console (to stderr) about what ACE in
