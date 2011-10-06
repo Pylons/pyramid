@@ -297,7 +297,7 @@ Request Logging with Paste's TransLogger
 ----------------------------------------
 
 Paste provides the `TransLogger 
-<http://pythonpaste.org/module-paste.translogger.html>`_ middleware for logging 
+<http://pythonpaste.org/modules/translogger.html>`_ middleware for logging 
 requests using the `Apache Combined Log Format 
 <http://httpd.apache.org/docs/2.2/logs.html#combined>`_. TransLogger combined 
 with a FileHandler can be used to create an ``access.log`` file similar to 
@@ -323,7 +323,7 @@ To this:
     use = egg:MyProject
 
     [filter:translogger] 
-    paste.filter_app_factory = egg:Paste#translogger 
+    use = egg:Paste#translogger 
     setup_console_handler = False
 
     [pipeline:main]
