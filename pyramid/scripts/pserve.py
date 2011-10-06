@@ -737,7 +737,7 @@ class _methodwrapper(object):
         self.type = type
 
     def __call__(self, *args, **kw):
-        assert not kw.has_key('self') and not kw.has_key('cls'), (
+        assert not 'self' in kw and not 'cls' in kw, (
             "You cannot use 'self' or 'cls' arguments to a "
             "classinstancemethod")
         return self.func(*((self.obj, self.type) + args), **kw)
@@ -841,7 +841,7 @@ class Monitor(object):
                 continue
             if filename.endswith('.pyc') and os.path.exists(filename[:-1]):
                 mtime = max(os.stat(filename[:-1]).st_mtime, mtime)
-            if not self.module_mtimes.has_key(filename):
+            if not filename in self.module_mtimes:
                 self.module_mtimes[filename] = mtime
             elif self.module_mtimes[filename] < mtime:
                 print("%s changed; reloading..." % filename)
