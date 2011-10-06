@@ -1,5 +1,4 @@
 import unittest
-from pyramid.tests.test_scripts import dummy
 
 class TestPCreateCommand(unittest.TestCase):
     def setUp(self):
@@ -17,7 +16,6 @@ class TestPCreateCommand(unittest.TestCase):
         effargs = ['pcreate']
         effargs.extend(args)
         cmd = self._getTargetClass()(effargs)
-        cmd.bootstrap = (dummy.DummyBootstrap(),)
         cmd.out = self.out
         return cmd
 
