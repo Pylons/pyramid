@@ -1,12 +1,12 @@
 from code import interact
 import optparse
-import os
 import sys
-from logging.config import fileConfig
 
 from pyramid.compat import configparser
 from pyramid.util import DottedNameResolver
 from pyramid.paster import bootstrap
+
+from pyramid.scripts.common import logging_file_config
 
 def main(argv=sys.argv):
     command = PShellCommand(argv)
@@ -81,7 +81,7 @@ class PShellCommand(object):
     def run(self, shell=None):
         config_uri = self.args[0]
         config_file = config_uri.split('#', 1)[0]
-        self.logging_file_config(config_file)
+        logging_file_config(config_file)
         self.pshell_file_config(config_file)
 
         # bootstrap the environ
@@ -184,17 +184,3 @@ class PShellCommand(object):
             IPShell()
         return shell
 
-    def logging_file_config(self, config_file):
-        """
-        Setup logging via the logging module's fileConfig function with the
-        specified ``config_file``, if applicable.
-
-        ConfigParser defaults are specified for the special ``__file__``
-        and ``here`` variables, similar to PasteDeploy config loading.
-        """
-        parser = configparser.ConfigParser()
-        parser.read([config_file])
-        if parser.has_section('loggers'):
-            config_file = os.path.abspath(config_file)
-            fileConfig(config_file, dict(__file__=config_file,
-                                         here=os.path.dirname(config_file)))

@@ -20,11 +20,9 @@ import threading
 import time
 import traceback
 
-from logging.config import fileConfig
-
-from pyramid.compat import configparser
-
 from paste.deploy import loadapp, loadserver
+
+from pyramid.scripts.common import logging_file_config
 
 MAXFD = 1024
 
@@ -285,7 +283,7 @@ class PServeCommand(object):
             log_fn = None
         if log_fn:
             log_fn = os.path.join(base, log_fn)
-            self.logging_file_config(log_fn)
+            logging_file_config(log_fn)
 
         server = self.loadserver(server_spec, name=server_name,
                                  relative_to=base, global_conf=vars)
@@ -315,13 +313,10 @@ class PServeCommand(object):
 
     def loadserver(self, server_spec, name, relative_to, **kw):
             return loadserver(
-                server_spec, name=name,
-                relative_to=relative_to, **kw)
+                server_spec, name=name, relative_to=relative_to, **kw)
 
     def loadapp(self, app_spec, name, relative_to, **kw):
-            return loadapp(
-                app_spec, name=name, relative_to=relative_to,
-                **kw)
+            return loadapp(app_spec, name=name, relative_to=relative_to, **kw)
 
     def parse_vars(self, args):
         """
@@ -338,21 +333,6 @@ class PServeCommand(object):
             result[name] = value
         return result
 
-    def logging_file_config(self, config_file):
-        """
-        Setup logging via the logging module's fileConfig function with the
-        specified ``config_file``, if applicable.
-
-        ConfigParser defaults are specified for the special ``__file__``
-        and ``here`` variables, similar to PasteDeploy config loading.
-        """
-        parser = configparser.ConfigParser()
-        parser.read([config_file])
-        if parser.has_section('loggers'):
-            config_file = os.path.abspath(config_file)
-            fileConfig(config_file, dict(__file__=config_file,
-                                         here=os.path.dirname(config_file)))
-        
     def quote_first_command_arg(self, arg):
         """
         There's a bug in Windows when running an executable that's
@@ -373,7 +353,7 @@ class PServeCommand(object):
         arg = win32api.GetShortPathName(arg)
         return arg
 
-    def daemonize(self):
+    def daemonize(self): # pragma: no cover (nfw)
         pid = live_pidfile(self.options.pid_file)
         if pid:
             raise DaemonizeException(
@@ -455,7 +435,7 @@ class PServeCommand(object):
         else:
             self.out('Stale PID removed')
 
-    def record_pid(self, pid_file):
+    def record_pid(self, pid_file): # pragma: no cover (nfw)
         pid = os.getpid()
         if self.verbose > 1:
             self.out('Writing PID %s to %s' % (pid, pid_file))
@@ -464,7 +444,7 @@ class PServeCommand(object):
         f.close()
         atexit.register(self._remove_pid_file, pid, pid_file, self.verbose)
 
-    def stop_daemon(self):
+    def stop_daemon(self): # pragma: no cover (nfw)
         pid_file = self.options.pid_file or 'pyramid.pid'
         if not os.path.exists(pid_file):
             self.out('No PID file exists in %s' % pid_file)
@@ -511,10 +491,10 @@ class PServeCommand(object):
         self.out('Server running in PID %s' % pid)
         return 0
 
-    def restart_with_reloader(self):
+    def restart_with_reloader(self): # pragma: no cover (nfw)
         self.restart_with_monitor(reloader=True)
 
-    def restart_with_monitor(self, reloader=False):
+    def restart_with_monitor(self, reloader=False): # pragma: no cover (nfw)
         if self.verbose > 0:
             if reloader:
                 self.out('Starting subprocess with file monitor')
@@ -556,7 +536,7 @@ class PServeCommand(object):
             if self.verbose > 0:
                 self.out('%s %s %s' % ('-'*20, 'Restarting', '-'*20))
 
-    def change_user_group(self, user, group):
+    def change_user_group(self, user, group): # pragma: no cover (nfw)
         if not user and not group:
             return
         import pwd, grp
@@ -629,7 +609,7 @@ class LazyWriter(object):
     def flush(self):
         self.open().flush()
 
-def live_pidfile(pidfile):
+def live_pidfile(pidfile): # pragma: no cover (nfw)
     """(pidfile:str) -> int | None
     Returns an int found in the named file, if there is one,
     and if there is a running process with that process id.
@@ -657,7 +637,8 @@ def read_pidfile(filename):
     else:
         return None
 
-def ensure_port_cleanup(bound_addresses, maxtries=30, sleeptime=2):
+def ensure_port_cleanup(
+    bound_addresses, maxtries=30, sleeptime=2): # pragma: no cover (nfw)
     """
     This makes sure any open ports are closed.
 
@@ -669,7 +650,8 @@ def ensure_port_cleanup(bound_addresses, maxtries=30, sleeptime=2):
     atexit.register(_cleanup_ports, bound_addresses, maxtries=maxtries,
                     sleeptime=sleeptime)
 
-def _cleanup_ports(bound_addresses, maxtries=30, sleeptime=2):
+def _cleanup_ports(
+    bound_addresses, maxtries=30, sleeptime=2): # pragma: no cover (nfw)
     # Wait for the server to bind to the port.
     import socket
     import errno
@@ -688,7 +670,7 @@ def _cleanup_ports(bound_addresses, maxtries=30, sleeptime=2):
             raise SystemExit('Timeout waiting for port.')
         sock.close()
 
-def _turn_sigterm_into_systemexit():
+def _turn_sigterm_into_systemexit(): # pragma: no cover (nfw)
     """
     Attempts to turn a SIGTERM exception into a SystemExit exception.
     """
@@ -700,7 +682,7 @@ def _turn_sigterm_into_systemexit():
         raise SystemExit
     signal.signal(signal.SIGTERM, handle_term)
 
-def install_reloader(poll_interval=1):
+def install_reloader(poll_interval=1): # pragma: no cover (nfw)
     """
     Install the reloading monitor.
 
@@ -802,9 +784,9 @@ class Monitor(object):
         self.instances.append(self)
         self.file_callbacks = list(self.global_file_callbacks)
 
-    def periodic_reload(self):
+    def periodic_reload(self): # pragma: no cover (nfw)
         while True:
-            if not self.check_reload():
+            if not self.check_reload(): 
                 # use os._exit() here and not sys.exit() since within a
                 # thread sys.exit() just closes the given thread and
                 # won't kill the process; note os._exit does not call
@@ -876,7 +858,7 @@ watch_file = Monitor.watch_file
 add_file_callback = Monitor.add_file_callback
 
 # For paste.deploy server instantiation (egg:pyramid#wsgiref)
-def wsgiref_server_runner(wsgi_app, global_conf, **kw):
+def wsgiref_server_runner(wsgi_app, global_conf, **kw): # pragma: no cover
     from wsgiref.simple_server import make_server
     host = kw.get('host', '0.0.0.0')
     port = int(kw.get('port', 8080))

@@ -897,14 +897,14 @@ class MockTemplate(object):
         self._received.update(kw)
         return self.response
 
-def skip_on(*platforms):
+def skip_on(*platforms): # pragma: no  cover
     skip = False
     for platform in platforms:
         if skip_on.os_name.startswith(platform):
             skip = True
-        if platform == 'pypy' and PYPY: # pragma: no cover
+        if platform == 'pypy' and PYPY:
             skip = True
-        if platform == 'py3' and PY3: # pragma: no cover
+        if platform == 'py3' and PY3:
             skip = True
     def decorator(func):
         if isinstance(func, class_types):
