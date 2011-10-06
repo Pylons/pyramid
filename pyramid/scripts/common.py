@@ -2,7 +2,8 @@ import os
 from pyramid.compat import configparser
 from logging.config import fileConfig
 
-def logging_file_config(config_file, fileConfig=fileConfig):
+def logging_file_config(config_file, fileConfig=fileConfig,
+                        configparser=configparser):
     """
     Setup logging via the logging module's fileConfig function with the
     specified ``config_file``, if applicable.
@@ -14,7 +15,7 @@ def logging_file_config(config_file, fileConfig=fileConfig):
     parser.read([config_file])
     if parser.has_section('loggers'):
         config_file = os.path.abspath(config_file)
-        fileConfig(
+        return fileConfig(
             config_file,
             dict(__file__=config_file, here=os.path.dirname(config_file))
             )
