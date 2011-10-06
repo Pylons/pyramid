@@ -85,10 +85,9 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(inst.__dict__['session'], 'orangejuice')
 
     def test_session_not_configured(self):
-        from pyramid.exceptions import ConfigurationError
         inst = self._makeOne({})
         inst.registry = self.config.registry
-        self.assertRaises(ConfigurationError, getattr, inst, 'session')
+        self.assertRaises(AttributeError, getattr, inst, 'session')
 
     def test_setattr_and_getattr_dotnotation(self):
         inst = self._makeOne({})

@@ -577,9 +577,6 @@ class DummyRequest:
         return application(None, None)
 
 def httpdate(ts):
-    import datetime
-    if isinstance(ts, int):
-        ts = datetime.datetime.utcfromtimestamp(ts)
     return ts.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
 def read_(filename):
