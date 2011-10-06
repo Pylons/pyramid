@@ -1,10 +1,7 @@
 import binascii
 import os
 
-from pyramid.compat import (
-    print_,
-    native_
-    )
+from pyramid.compat import native_
 
 from pyramid.scaffolds.template import Template
 
@@ -18,12 +15,12 @@ class PyramidTemplate(Template):
         vars['package_logger'] = package_logger
         return Template.pre(self, command, output_dir, vars)
 
-    def post(self, command, output_dir, vars):
+    def post(self, command, output_dir, vars): # pragma: no cover
         self.out('Welcome to Pyramid.  Sorry for the convenience.')
         return Template.post(self, command, output_dir, vars)
 
     def out(self, msg): # pragma: no cover (replaceable testing hook)
-        print_(msg)
+        print(msg)
 
 class StarterProjectTemplate(PyramidTemplate):
     _template_dir = 'starter'
