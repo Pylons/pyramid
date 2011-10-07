@@ -333,7 +333,7 @@ class PServeCommand(object):
             result[name] = value
         return result
 
-    def quote_first_command_arg(self, arg):
+    def quote_first_command_arg(self, arg): # pragma: no cover
         """
         There's a bug in Windows when running an executable that's
         located inside a path with a space in it.  This method handles
