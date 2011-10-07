@@ -669,10 +669,9 @@ class Configurator(
 
     @classmethod
     def with_context(cls, context):
-        """A classmethod used by ZCML directives,
-        :meth:`pyramid.config.Configurator.with_package`, and
-        :meth:`pyramid.config.Configurator.include` to obtain a configurator
-        with 'the right' context.  Returns a new Configurator instance."""
+        """A classmethod used by ``pyramid_zcml`` directives to obtain a
+        configurator with 'the right' context.  Returns a new Configurator
+        instance."""
         configurator = cls(
             registry=context.registry,
             package=context.package,
@@ -823,7 +822,8 @@ class Configurator(
 # this class is licensed under the ZPL (stolen from Zope)
 class ActionState(object):
     def __init__(self):
-        self.actions = [] # NB "actions" is an API, dep'd upon by pyramid_zcml
+        # NB "actions" is an API, dep'd upon by pyramid_zcml's load_zcml func
+        self.actions = [] 
         self._seen_files = set()
 
     def processSpec(self, spec):
