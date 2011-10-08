@@ -30,7 +30,8 @@ class TestPServeCommand(unittest.TestCase):
         path = os.path.join(os.path.dirname(__file__), 'wontexist.pid')
         inst = self._makeOne('--stop-daemon', '--pid-file=%s' % path)
         inst.run()
-        self.assertEqual(self.out_.getvalue(),'No PID file exists in %s' % path)
+        self.assertEqual(self.out_.getvalue(),'No PID file exists in %s' %
+                         path)
         
     def test_run_stop_daemon_bad_pid_file(self):
         path = __file__
