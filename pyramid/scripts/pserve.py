@@ -26,8 +26,8 @@ from pyramid.scripts.common import logging_file_config
 
 MAXFD = 1024
 
-def main(argv=sys.argv):
-    command = PServeCommand(argv)
+def main(argv=sys.argv, quiet=False):
+    command = PServeCommand(argv, quiet=quiet)
     return command.run()
 
 class DaemonizeException(Exception):
@@ -38,9 +38,10 @@ class PServeCommand(object):
     min_args = 0
     usage = 'CONFIG_FILE [start|stop|restart|status] [var=value]'
     takes_config_file = 1
-    summary = "Serve the described application"
+    summary = ("Serve the application described in CONFIG_FILE or control "
+               "daemon status"),
     description = """\
-    This command serves a web application that uses a paste.deploy
+    This command serves a web application that uses a PasteDeploy
     configuration file for the server and application.
 
     If start/stop/restart is given, then --daemon is implied, and it will
@@ -50,9 +51,6 @@ class PServeCommand(object):
     and then use %(http_port)s in your config files.
     """
     verbose = 1
-
-    # used by subclasses that configure apps and servers differently
-    requires_config_file = True
 
     parser = optparse.OptionParser()
     parser.add_option(
@@ -109,11 +107,6 @@ class PServeCommand(object):
         action='store_true',
         dest='show_status',
         help="Show the status of the (presumably daemonized) server")
-    parser.add_option(
-        '-q', '--quiet',
-        action='store_true',
-        dest='quiet',
-        help='Produce little or no output')
 
     if hasattr(os, 'setuid'):
         # I don't think these are available on Windows
@@ -144,14 +137,15 @@ class PServeCommand(object):
 
     possible_subcommands = ('start', 'stop', 'restart', 'status')
 
-    def __init__(self, argv):
+    def __init__(self, argv, quiet=False):
+        self.quiet = quiet
         self.options, self.args = self.parser.parse_args(argv[1:])
 
-    def out(self, msg):
-        if not self.options.quiet:
+    def out(self, msg): # pragma: no cover
+        if not self.quiet:
             print(msg)
 
-    def run(self):
+    def run(self): # pragma: no cover
         if self.options.stop_daemon:
             return self.stop_daemon()
 
@@ -163,27 +157,17 @@ class PServeCommand(object):
         self.change_user_group(
             self.options.set_user, self.options.set_group)
 
-        if self.requires_config_file:
-            if not self.args:
-                self.out('You must give a config file')
-                return
-            app_spec = self.args[0]
-            if (len(self.args) > 1
-                and self.args[1] in self.possible_subcommands):
-                cmd = self.args[1]
-                restvars = self.args[2:]
-            else:
-                cmd = None
-                restvars = self.args[1:]
+        if not self.args:
+            self.out('You must give a config file')
+            return
+        app_spec = self.args[0]
+        if (len(self.args) > 1
+            and self.args[1] in self.possible_subcommands):
+            cmd = self.args[1]
+            restvars = self.args[2:]
         else:
-            app_spec = ""
-            if (self.args
-                and self.args[0] in self.possible_subcommands):
-                cmd = self.args[0]
-                restvars = self.args[1:]
-            else:
-                cmd = None
-                restvars = self.args[:]
+            cmd = None
+            restvars = self.args[1:]
 
         if self.options.reload:
             if os.environ.get(self._reloader_environ_key):
@@ -311,12 +295,12 @@ class PServeCommand(object):
 
         serve()
 
-    def loadserver(self, server_spec, name, relative_to, **kw):
-            return loadserver(
-                server_spec, name=name, relative_to=relative_to, **kw)
+    def loadserver(self, server_spec, name, relative_to, **kw):# pragma:no cover
+        return loadserver(
+            server_spec, name=name, relative_to=relative_to, **kw)
 
-    def loadapp(self, app_spec, name, relative_to, **kw):
-            return loadapp(app_spec, name=name, relative_to=relative_to, **kw)
+    def loadapp(self, app_spec, name, relative_to, **kw): # pragma: no cover
+        return loadapp(app_spec, name=name, relative_to=relative_to, **kw)
 
     def parse_vars(self, args):
         """
@@ -353,7 +337,7 @@ class PServeCommand(object):
         arg = win32api.GetShortPathName(arg)
         return arg
 
-    def daemonize(self): # pragma: no cover (nfw)
+    def daemonize(self): # pragma: no cover
         pid = live_pidfile(self.options.pid_file)
         if pid:
             raise DaemonizeException(
@@ -397,7 +381,8 @@ class PServeCommand(object):
         os.dup2(0, 1)  # standard output (1)
         os.dup2(0, 2)  # standard error (2)
 
-    def _remove_pid_file(self, written_pid, filename, verbosity):
+    def _remove_pid_file(self, written_pid, filename,
+                         verbosity): # pragma: no cover
         current_pid = os.getpid()
         if written_pid != current_pid:
             # A forked process must be exiting, not the process that
@@ -435,7 +420,7 @@ class PServeCommand(object):
         else:
             self.out('Stale PID removed')
 
-    def record_pid(self, pid_file): # pragma: no cover (nfw)
+    def record_pid(self, pid_file): # pragma: no cover
         pid = os.getpid()
         if self.verbose > 1:
             self.out('Writing PID %s to %s' % (pid, pid_file))
@@ -444,7 +429,7 @@ class PServeCommand(object):
         f.close()
         atexit.register(self._remove_pid_file, pid, pid_file, self.verbose)
 
-    def stop_daemon(self): # pragma: no cover (nfw)
+    def stop_daemon(self): # pragma: no cover
         pid_file = self.options.pid_file or 'pyramid.pid'
         if not os.path.exists(pid_file):
             self.out('No PID file exists in %s' % pid_file)
@@ -475,7 +460,7 @@ class PServeCommand(object):
             os.unlink(pid_file)
         return 0
 
-    def show_status(self):
+    def show_status(self): # pragma: no cover
         pid_file = self.options.pid_file or 'pyramid.pid'
         if not os.path.exists(pid_file):
             self.out('No PID file %s' % pid_file)
@@ -491,10 +476,10 @@ class PServeCommand(object):
         self.out('Server running in PID %s' % pid)
         return 0
 
-    def restart_with_reloader(self): # pragma: no cover (nfw)
+    def restart_with_reloader(self): # pragma: no cover
         self.restart_with_monitor(reloader=True)
 
-    def restart_with_monitor(self, reloader=False): # pragma: no cover (nfw)
+    def restart_with_monitor(self, reloader=False): # pragma: no cover
         if self.verbose > 0:
             if reloader:
                 self.out('Starting subprocess with file monitor')
@@ -536,7 +521,7 @@ class PServeCommand(object):
             if self.verbose > 0:
                 self.out('%s %s %s' % ('-'*20, 'Restarting', '-'*20))
 
-    def change_user_group(self, user, group): # pragma: no cover (nfw)
+    def change_user_group(self, user, group): # pragma: no cover
         if not user and not group:
             return
         import pwd, grp
@@ -609,7 +594,7 @@ class LazyWriter(object):
     def flush(self):
         self.open().flush()
 
-def live_pidfile(pidfile): # pragma: no cover (nfw)
+def live_pidfile(pidfile): # pragma: no cover
     """(pidfile:str) -> int | None
     Returns an int found in the named file, if there is one,
     and if there is a running process with that process id.
@@ -625,7 +610,7 @@ def live_pidfile(pidfile): # pragma: no cover (nfw)
                 return pid
     return None
 
-def read_pidfile(filename):
+def read_pidfile(filename): # pragma: no cover
     if os.path.exists(filename):
         try:
             f = open(filename)
@@ -638,7 +623,7 @@ def read_pidfile(filename):
         return None
 
 def ensure_port_cleanup(
-    bound_addresses, maxtries=30, sleeptime=2): # pragma: no cover (nfw)
+    bound_addresses, maxtries=30, sleeptime=2): # pragma: no cover
     """
     This makes sure any open ports are closed.
 
@@ -651,7 +636,7 @@ def ensure_port_cleanup(
                     sleeptime=sleeptime)
 
 def _cleanup_ports(
-    bound_addresses, maxtries=30, sleeptime=2): # pragma: no cover (nfw)
+    bound_addresses, maxtries=30, sleeptime=2): # pragma: no cover
     # Wait for the server to bind to the port.
     import socket
     import errno
@@ -670,7 +655,7 @@ def _cleanup_ports(
             raise SystemExit('Timeout waiting for port.')
         sock.close()
 
-def _turn_sigterm_into_systemexit(): # pragma: no cover (nfw)
+def _turn_sigterm_into_systemexit(): # pragma: no cover
     """
     Attempts to turn a SIGTERM exception into a SystemExit exception.
     """
@@ -682,7 +667,7 @@ def _turn_sigterm_into_systemexit(): # pragma: no cover (nfw)
         raise SystemExit
     signal.signal(signal.SIGTERM, handle_term)
 
-def install_reloader(poll_interval=1): # pragma: no cover (nfw)
+def install_reloader(poll_interval=1): # pragma: no cover
     """
     Install the reloading monitor.
 
@@ -723,15 +708,6 @@ class _methodwrapper(object):
             "You cannot use 'self' or 'cls' arguments to a "
             "classinstancemethod")
         return self.func(*((self.obj, self.type) + args), **kw)
-
-    def __repr__(self):
-        if self.obj is None:
-            return ('<bound class method %s.%s>'
-                    % (self.type.__name__, self.func.func_name))
-        else:
-            return ('<bound method %s.%s of %r>'
-                    % (self.type.__name__, self.func.func_name, self.obj))
-
 
 class Monitor(object):
     """
@@ -784,19 +760,22 @@ class Monitor(object):
         self.instances.append(self)
         self.file_callbacks = list(self.global_file_callbacks)
 
-    def periodic_reload(self): # pragma: no cover (nfw)
+    def _exit(self):
+        # use os._exit() here and not sys.exit() since within a
+        # thread sys.exit() just closes the given thread and
+        # won't kill the process; note os._exit does not call
+        # any atexit callbacks, nor does it do finally blocks,
+        # flush open files, etc.  In otherwords, it is rude.
+        os._exit(3)
+
+    def periodic_reload(self): # pragma: no cover
         while True:
             if not self.check_reload(): 
-                # use os._exit() here and not sys.exit() since within a
-                # thread sys.exit() just closes the given thread and
-                # won't kill the process; note os._exit does not call
-                # any atexit callbacks, nor does it do finally blocks,
-                # flush open files, etc.  In otherwords, it is rude.
-                os._exit(3)
+                self._exit()
                 break
             time.sleep(self.poll_interval)
 
-    def check_reload(self):
+    def check_reload(self): # pragma: no cover
         filenames = list(self.extra_files)
         for file_callback in self.file_callbacks:
             try:
@@ -830,7 +809,7 @@ class Monitor(object):
                 return False
         return True
 
-    def watch_file(self, cls, filename):
+    def watch_file(self, cls, filename): # pragma: no cover
         """Watch the named file for changes"""
         filename = os.path.abspath(filename)
         if self is None:
@@ -842,7 +821,7 @@ class Monitor(object):
 
     watch_file = classinstancemethod(watch_file)
 
-    def add_file_callback(self, cls, callback):
+    def add_file_callback(self, cls, callback): # pragma: no cover
         """Add a callback -- a function that takes no parameters -- that will
         return a list of filenames to watch for changes."""
         if self is None:
