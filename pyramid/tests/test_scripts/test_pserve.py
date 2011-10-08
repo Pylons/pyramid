@@ -42,7 +42,7 @@ class TestPServeCommand(unittest.TestCase):
     def test_run_stop_daemon_invalid_pid_in_file(self):
         import tempfile
         tmp = tempfile.NamedTemporaryFile()
-        tmp.write('9999999')
+        tmp.write(b'9999999')
         tmp.flush()
         tmpname = tmp.name
         inst = self._makeOne('--stop-daemon', '--pid-file=%s' % tmpname)
