@@ -709,7 +709,7 @@ class _methodwrapper(object):
             "classinstancemethod")
         return self.func(*((self.obj, self.type) + args), **kw)
 
-class Monitor(object):
+class Monitor(object): # pragma: no cover
     """
     A file monitor and server restarter.
 
@@ -768,14 +768,14 @@ class Monitor(object):
         # flush open files, etc.  In otherwords, it is rude.
         os._exit(3)
 
-    def periodic_reload(self): # pragma: no cover
+    def periodic_reload(self):
         while True:
             if not self.check_reload(): 
                 self._exit()
                 break
             time.sleep(self.poll_interval)
 
-    def check_reload(self): # pragma: no cover
+    def check_reload(self):
         filenames = list(self.extra_files)
         for file_callback in self.file_callbacks:
             try:
@@ -809,7 +809,7 @@ class Monitor(object):
                 return False
         return True
 
-    def watch_file(self, cls, filename): # pragma: no cover
+    def watch_file(self, cls, filename):
         """Watch the named file for changes"""
         filename = os.path.abspath(filename)
         if self is None:
@@ -821,7 +821,7 @@ class Monitor(object):
 
     watch_file = classinstancemethod(watch_file)
 
-    def add_file_callback(self, cls, callback): # pragma: no cover
+    def add_file_callback(self, cls, callback):
         """Add a callback -- a function that takes no parameters -- that will
         return a list of filenames to watch for changes."""
         if self is None:
