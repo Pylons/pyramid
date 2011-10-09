@@ -14,6 +14,7 @@ class Test_copy_dir(unittest.TestCase):
     def tearDown(self):
         import shutil
         shutil.rmtree(self.dirname, ignore_errors=True)
+        self.out.close()
 
     def _callFUT(self, *arg, **kw):
         kw['out_'] = self.out
