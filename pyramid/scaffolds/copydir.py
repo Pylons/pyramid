@@ -23,7 +23,7 @@ class SkipTemplate(Exception):
 
 def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
              sub_vars=True, interactive=False, overwrite=True,
-             template_renderer=None):
+             template_renderer=None, out_=sys.stdout):
     """
     Copies the ``source`` directory to the ``dest`` directory.
 
@@ -48,6 +48,9 @@ def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
     ``template_renderer(content_as_string, vars_as_dict,
     filename=filename)``.
     """
+    def out(msg):
+        out_.write(msg)
+        out_.flush()
     # This allows you to use a leading +dot+ in filenames which would
     # otherwise be skipped because leading dots make the file hidden:
     vars.setdefault('dot', '.')
@@ -60,11 +63,11 @@ def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
     pad = ' '*(indent*2)
     if not os.path.exists(dest):
         if verbosity >= 1:
-            print('%sCreating %s/' % (pad, dest))
+            out('%sCreating %s/' % (pad, dest))
         if not simulate:
             makedirs(dest, verbosity=verbosity, pad=pad)
     elif verbosity >= 2:
-        print('%sDirectory %s exists' % (pad, dest))
+        out('%sDirectory %s exists' % (pad, dest))
     for name in names:
         if use_pkg_resources:
             full = '/'.join([source[1], name])
@@ -74,7 +77,7 @@ def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
         if reason:
             if verbosity >= 2:
                 reason = pad + reason % {'filename': full}
-                print(reason)
+                out(reason)
             continue
         if sub_vars:
             dest_full = os.path.join(dest, substitute_filename(name, vars))
@@ -84,19 +87,19 @@ def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
             sub_file = sub_vars
         if use_pkg_resources and pkg_resources.resource_isdir(source[0], full):
             if verbosity:
-                print('%sRecursing into %s' % (pad, os.path.basename(full)))
+                out('%sRecursing into %s' % (pad, os.path.basename(full)))
             copy_dir((source[0], full), dest_full, vars, verbosity, simulate,
                      indent=indent+1,
                      sub_vars=sub_vars, interactive=interactive,
-                     template_renderer=template_renderer)
+                     template_renderer=template_renderer, out_=out_)
             continue
         elif not use_pkg_resources and os.path.isdir(full):
             if verbosity:
-                print('%sRecursing into %s' % (pad, os.path.basename(full)))
+                out('%sRecursing into %s' % (pad, os.path.basename(full)))
             copy_dir(full, dest_full, vars, verbosity, simulate,
                      indent=indent+1,
                      sub_vars=sub_vars, interactive=interactive,
-                     template_renderer=template_renderer)
+                     template_renderer=template_renderer, out_=out_)
             continue
         elif use_pkg_resources:
             content = pkg_resources.resource_string(source[0], full)
@@ -121,22 +124,23 @@ def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
             f.close()
             if old_content == content:
                 if verbosity:
-                    print('%s%s already exists (same content)' %
+                    out('%s%s already exists (same content)' %
                           (pad, dest_full))
                 continue
             if interactive:
                 if not query_interactive(
                     native_(full, fsenc), native_(dest_full, fsenc),
                     native_(content, fsenc), native_(old_content, fsenc),
-                    simulate=simulate):
+                    simulate=simulate, out_=out_):
                     continue
             elif not overwrite:
                 continue
         if verbosity and use_pkg_resources:
-            print('%sCopying %s to %s' % (pad, full, dest_full))
+            out('%sCopying %s to %s' % (pad, full, dest_full))
         elif verbosity:
-            print(
-                '%sCopying %s to %s' % (pad, os.path.basename(full), dest_full))
+            out(
+                '%sCopying %s to %s' % (pad, os.path.basename(full),
+                                        dest_full))
         if not simulate:
             f = open(dest_full, 'wb')
             f.write(content)
@@ -165,7 +169,10 @@ def should_skip_file(name):
 all_answer = None
 
 def query_interactive(src_fn, dest_fn, src_content, dest_content,
-                      simulate):
+                      simulate, out_=sys.stdout):
+    def out(msg):
+        out_.write(msg)
+        out_.flush()
     global all_answer
     from difflib import unified_diff, context_diff
     u_diff = list(unified_diff(
@@ -186,7 +193,7 @@ def query_interactive(src_fn, dest_fn, src_content, dest_content,
         msg = '; %i lines removed' % (removed-added)
     else:
         msg = ''
-    print('Replace %i bytes with %i bytes (%i/%i lines changed%s)' % (
+    out('Replace %i bytes with %i bytes (%i/%i lines changed%s)' % (
         len(dest_content), len(src_content),
         removed, len(dest_content.splitlines()), msg))
     prompt = 'Overwrite %s [y/n/d/B/?] ' % dest_fn
@@ -202,14 +209,14 @@ def query_interactive(src_fn, dest_fn, src_content, dest_content,
             while os.path.exists(new_dest_fn):
                 n += 1
                 new_dest_fn = dest_fn + '.bak' + str(n)
-            print('Backing up %s to %s' % (dest_fn, new_dest_fn))
+            out('Backing up %s to %s' % (dest_fn, new_dest_fn))
             if not simulate:
                 shutil.copyfile(dest_fn, new_dest_fn)
             return True
         elif response.startswith('all '):
             rest = response[4:].strip()
             if not rest or rest[0] not in ('y', 'n', 'b'):
-                print(query_usage)
+                out(query_usage)
                 continue
             response = all_answer = rest[0]
         if response[0] == 'y':
@@ -217,11 +224,11 @@ def query_interactive(src_fn, dest_fn, src_content, dest_content,
         elif response[0] == 'n':
             return False
         elif response == 'dc':
-            print('\n'.join(c_diff))
+            out('\n'.join(c_diff))
         elif response[0] == 'd':
-            print('\n'.join(u_diff))
+            out('\n'.join(u_diff))
         else:
-            print(query_usage)
+            out(query_usage)
 
 query_usage = """\
 Responses:
