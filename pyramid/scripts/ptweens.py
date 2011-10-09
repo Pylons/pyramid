@@ -32,8 +32,6 @@ class PTweensCommand(object):
 
     """
     summary = "Print all tweens related to a Pyramid application"
-    min_args = 1
-    max_args = 1
     stdout = sys.stdout
 
     parser = optparse.OptionParser()

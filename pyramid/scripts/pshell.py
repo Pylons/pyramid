@@ -35,9 +35,6 @@ class PShellCommand(object):
     bootstrap = (bootstrap,) # for testing
     summary = "Open an interactive shell with a Pyramid application loaded"
 
-    min_args = 1
-    max_args = 1
-
     parser = optparse.OptionParser()
     parser.add_option('-d', '--disable-ipython',
                       action='store_true',

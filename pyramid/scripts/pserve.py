@@ -35,7 +35,6 @@ class DaemonizeException(Exception):
 
 class PServeCommand(object):
 
-    min_args = 0
     usage = 'CONFIG_FILE [start|stop|restart|status] [var=value]'
     takes_config_file = 1
     summary = ("Serve the application described in CONFIG_FILE or control "

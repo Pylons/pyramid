@@ -29,8 +29,6 @@ class PViewsCommand(object):
 
     """
     summary = "Print all views in an application that might match a URL"
-    min_args = 2
-    max_args = 2
     stdout = sys.stdout
 
     parser = optparse.OptionParser()
