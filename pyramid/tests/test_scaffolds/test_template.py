@@ -85,8 +85,8 @@ class TestTemplate(unittest.TestCase):
         self.assertEqual(copydir.kw,
                          {'template_renderer':inst.template_renderer,
                           'indent':1,
-                          'verbosity':True,
-                          'simulate':True,
+                          'verbosity':1,
+                          'simulate':False,
                           'overwrite':False,
                           'interactive':False,
                           })
@@ -125,13 +125,12 @@ class DummyCopydir(object):
         self.kw = kw
 
 class DummyOptions(object):
-    simulate = True
+    simulate = False
     overwrite = False
+    interactive = False
         
 class DummyCommand(object):
     options = DummyOptions()
-    verbose = True
-    interactive = False
-    simulate = False
+    verbosity = 1
     
     

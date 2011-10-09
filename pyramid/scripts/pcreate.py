@@ -15,9 +15,7 @@ def main(argv=sys.argv, quiet=False):
     return command.run()
 
 class PCreateCommand(object):
-    verbose = True
-    interactive = False
-    simulate = False
+    verbosity = 1
     usage = "usage: %prog [options] distribution_name"
     parser = optparse.OptionParser(usage)
     parser.add_option('-s', '--scaffold',
@@ -37,6 +35,10 @@ class PCreateCommand(object):
                       dest='overwrite',
                       action='store_true',
                       help='Always overwrite')
+    parser.add_option('--interactive',
+                      dest='interactive',
+                      action='store_true',
+                      help='When a file would be overwritten, interrogate')
 
     def __init__(self, argv, quiet=False):
         self.quiet = quiet

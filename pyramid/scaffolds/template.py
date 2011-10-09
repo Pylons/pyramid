@@ -65,7 +65,7 @@ class Template(object):
         template_dir = self.template_dir()
         if not self.exists(output_dir):
             self.out("Creating directory %s" % output_dir)
-            if not command.simulate:
+            if not command.options.simulate:
                 # Don't let copydir create this top-level directory,
                 # since copydir will svn add it sometimes:
                 self.makedirs(output_dir)
@@ -73,9 +73,9 @@ class Template(object):
             template_dir,
             output_dir,
             vars,
-            verbosity=command.verbose,
+            verbosity=command.verbosity,
             simulate=command.options.simulate,
-            interactive=command.interactive,
+            interactive=command.options.interactive,
             overwrite=command.options.overwrite,
             indent=1,
             template_renderer=self.template_renderer
