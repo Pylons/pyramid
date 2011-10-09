@@ -64,12 +64,7 @@ class TemplateTest(object):
                     else:
                         assert not toolbarchunk in data, ininame
                 finally:
-                    if hasattr(proc, 'terminate'):
-                        # 2.6+
-                        proc.terminate()
-                    else:
-                        # 2.5
-                        os.kill(proc.pid, signal.SIGTERM)
+                    proc.terminate()
         finally:
             shutil.rmtree(self.directory)
             os.chdir(self.old_cwd)
@@ -77,7 +72,7 @@ class TemplateTest(object):
 if __name__ == '__main__':     # pragma: no cover
     templates = ['starter', 'alchemy', 'routesalchemy',]
 
-    if sys.version_info >= (2, 5) and sys.version_info < (3, 0):
+    if sys.version_info >= (2, 6) and sys.version_info < (3, 0):
         templates.append('zodb')
 
     for name in templates:
