@@ -5,7 +5,6 @@ import shutil
 import subprocess
 import tempfile
 import time
-import signal
 
 try:
     import httplib
