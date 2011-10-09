@@ -12,6 +12,8 @@ try:
 except ImportError: # pragma: no cover
     import http.client as httplib
 
+from pyramid.compat import PY3
+
 class TemplateTest(object):
     def make_venv(self, directory): # pragma: no cover
         import virtualenv
@@ -23,7 +25,7 @@ class TemplateTest(object):
                                       site_packages=False,
                                       clear=False,
                                       unzip_setuptools=True,
-                                      use_distribute=False)
+                                      use_distribute=PY3)
     def install(self, tmpl_name): # pragma: no cover
         try:
             self.old_cwd = os.getcwd()
@@ -56,7 +58,7 @@ class TemplateTest(object):
                     resp = conn.getresponse()
                     assert resp.status == 200, ininame
                     data = resp.read()
-                    toolbarchunk = '<div id="pDebug"'
+                    toolbarchunk = b'<div id="pDebug"'
                     if hastoolbar:
                         assert toolbarchunk in data, ininame
                     else:
@@ -73,14 +75,6 @@ class TemplateTest(object):
             os.chdir(self.old_cwd)
 
 if __name__ == '__main__':     # pragma: no cover
-    if not hasattr(subprocess, 'check_call'):
-        # 2.4
-        def check_call(*arg, **kw):
-            returncode = subprocess.call(*arg, **kw)
-            if returncode:
-                raise ValueError(returncode)
-        subprocess.check_call = check_call
-
     templates = ['starter', 'alchemy', 'routesalchemy',]
 
     if sys.version_info >= (2, 5) and sys.version_info < (3, 0):
