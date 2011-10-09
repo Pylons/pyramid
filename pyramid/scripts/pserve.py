@@ -28,7 +28,7 @@ MAXFD = 1024
 
 def main(argv=sys.argv, quiet=False):
     command = PServeCommand(argv, quiet=quiet)
-    return command.run()
+    command.run()
 
 class DaemonizeException(Exception):
     pass

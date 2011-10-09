@@ -12,7 +12,7 @@ _bad_chars_re = re.compile('[^a-zA-Z0-9_]')
 
 def main(argv=sys.argv, quiet=False):
     command = PCreateCommand(argv, quiet)
-    return command.run()
+    command.run()
 
 class PCreateCommand(object):
     verbosity = 1

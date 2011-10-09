@@ -10,7 +10,7 @@ from pyramid.scripts.common import logging_file_config
 
 def main(argv=sys.argv, quiet=False):
     command = PShellCommand(argv, quiet)
-    return command.run()
+    command.run()
 
 class PShellCommand(object):
     """Open an interactive shell with a :app:`Pyramid` app loaded.

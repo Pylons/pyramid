@@ -30,6 +30,9 @@ class TemplateTest(object):
             self.directory = tempfile.mkdtemp()
             self.make_venv(self.directory)
             os.chdir(pkg_resources.get_distribution('pyramid').location)
+            subprocess.check_call( # XXX remove later
+                [os.path.join(self.directory, 'bin', 'easy_install'),
+                 'https://github.com/Pylons/webob/zipball/master'])
             subprocess.check_call(
                 [os.path.join(self.directory, 'bin', 'python'),
                  'setup.py', 'develop'])

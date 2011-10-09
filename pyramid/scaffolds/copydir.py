@@ -50,6 +50,7 @@ def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
     """
     def out(msg):
         out_.write(msg)
+        out_.write('\n')
         out_.flush()
     # This allows you to use a leading +dot+ in filenames which would
     # otherwise be skipped because leading dots make the file hidden:
@@ -172,6 +173,7 @@ def query_interactive(src_fn, dest_fn, src_content, dest_content,
                       simulate, out_=sys.stdout):
     def out(msg):
         out_.write(msg)
+        out_.write('\n')
         out_.flush()
     global all_answer
     from difflib import unified_diff, context_diff
