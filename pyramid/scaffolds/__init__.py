@@ -24,17 +24,17 @@ class PyramidTemplate(Template):
 
 class StarterProjectTemplate(PyramidTemplate):
     _template_dir = 'starter'
-    summary = 'pyramid starter project'
+    summary = 'Pyramid starter project'
 
 class ZODBProjectTemplate(PyramidTemplate):
     _template_dir = 'zodb'
-    summary = 'pyramid ZODB starter project'
+    summary = 'Pyramid ZODB starter project'
 
 class RoutesAlchemyProjectTemplate(PyramidTemplate):
     _template_dir = 'routesalchemy'
-    summary = 'pyramid SQLAlchemy project using url dispatch (no traversal)'
+    summary = 'Pyramid SQLAlchemy project using url dispatch (no traversal)'
 
 class AlchemyProjectTemplate(PyramidTemplate):
     _template_dir = 'alchemy'
-    summary = 'pyramid SQLAlchemy project using traversal'
+    summary = 'Pyramid SQLAlchemy project using traversal'
 
