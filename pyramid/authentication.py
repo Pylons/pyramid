@@ -410,26 +410,16 @@ class AuthTicket(object):
     Once you provide all the arguments, use .cookie_value() to
     generate the appropriate authentication ticket.
 
-    CGI usage::
+    Usage::
 
-        token = auth_tkt.AuthTick('sharedsecret', 'username',
+        token = AuthTicket('sharedsecret', 'username',
             os.environ['REMOTE_ADDR'], tokens=['admin'])
-        print 'Status: 200 OK'
-        print 'Content-type: text/html'
-        print token.cookie()
-        print
-        ... redirect HTML ...
+        val = token.cookie_value()
 
-    Webware usage::
-
-        token = auth_tkt.AuthTick('sharedsecret', 'username',
-            self.request().environ()['REMOTE_ADDR'], tokens=['admin'])
-        self.response().setCookie('auth_tkt', token.cookie_value())
     """
 
     def __init__(self, secret, userid, ip, tokens=(), user_data='',
-                 time=None, cookie_name='auth_tkt',
-                 secure=False):
+                 time=None, cookie_name='auth_tkt', secure=False):
         self.secret = secret
         self.userid = userid
         self.ip = ip
