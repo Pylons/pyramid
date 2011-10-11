@@ -703,7 +703,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         request.callbacks[0](None, response)
         self.assertEqual(len(response.headerlist), 3)
         self.assertEqual(response.headerlist[0][0], 'Set-Cookie')
-        self.assertTrue("'tokens': []" in response.headerlist[0][1])
+        self.assertTrue("'tokens': ()" in response.headerlist[0][1])
 
     def test_remember(self):
         helper = self._makeOne('secret')
@@ -912,7 +912,9 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         helper = self._makeOne('secret')
         request = self._makeRequest()
         la = text_(b'foo', 'utf-8')
-        helper.remember(request, 'other', tokens=(la,))
+        result = helper.remember(request, 'other', tokens=(la,))
+        # tokens must be str type on both Python 2 and 3
+        self.assertTrue("'tokens': ('foo',)" in result[0][1])
 
     def test_remember_nonascii_token(self):
         helper = self._makeOne('secret')

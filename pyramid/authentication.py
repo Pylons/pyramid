@@ -726,7 +726,8 @@ class AuthTktCookieHelper(object):
             encoding, encoder = encoding_data
             userid = encoder(userid)
             user_data = 'userid_type:%s' % encoding
-        
+
+        new_tokens = []
         for token in tokens:
             if isinstance(token, text_type):
                 try:
@@ -735,6 +736,8 @@ class AuthTktCookieHelper(object):
                     raise ValueError("Invalid token %r" % (token,))
             if not (isinstance(token, str) and VALID_TOKEN.match(token)):
                 raise ValueError("Invalid token %r" % (token,))
+            new_tokens.append(token)
+        tokens = tuple(new_tokens)
 
         if hasattr(request, '_authtkt_reissued'):
             request._authtkt_reissue_revoked = True
