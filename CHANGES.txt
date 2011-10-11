@@ -19,6 +19,10 @@ Bug Fixes
 - The ``pryamid.view.view_config`` decorator did not accept a ``match_params``
   predicate argument.  See https://github.com/Pylons/pyramid/pull/308
 
+- The AuthTktCookieHelper could potentially generate Unicode headers
+  inappropriately when the ``tokens`` argument to remember was used.  See 
+  https://github.com/Pylons/pyramid/pull/314.
+
 Backwards Incompatibilities
 ---------------------------
 
