@@ -4,11 +4,7 @@ Next release
 Features
 --------
 
-- Python 3.2 compatibility (except for Paste scaffolding and paster commands,
-  which do not work, because Paste has not been ported to Python 3 yet).
-
-- Lone instance methods can now be treated as view callables (see
-  https://github.com/Pylons/pyramid/pull/283).
+- Python 3.2 compatibility.
 
 Bug Fixes
 ---------
