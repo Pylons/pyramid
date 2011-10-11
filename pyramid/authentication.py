@@ -249,7 +249,7 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
 @implementer(IAuthenticationPolicy)
 class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
     """ A :app:`Pyramid` :term:`authentication policy` which
-    obtains data from an :class:`paste.auth.auth_tkt` cookie.
+    obtains data from a Pyramid "auth ticket" cookie.
 
     Constructor Arguments
 
