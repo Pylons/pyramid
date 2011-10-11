@@ -27,7 +27,7 @@ Backwards Incompatibilities
 ---------------------------
 
 - Pyramid no longer runs on Python 2.5 (which includes the most recent
-  release of Jython, and the current version of GAE).
+  release of Jython, and the current version of GAE as of this writing).
 
 - The ``paster`` command is no longer the documented way to create projects,
   start the server, or run debugging commands.  To create projects from
