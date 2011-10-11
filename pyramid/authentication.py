@@ -384,7 +384,8 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
             return result['userid']
 
     def remember(self, request, principal, **kw):
-        """ Accepts the following kw args: ``max_age``."""
+        """ Accepts the following kw args: ``max_age=<int-seconds>,
+        ``tokens=<sequence-of-ascii-strings>``"""
         return self.cookie.remember(request, principal, **kw)
 
     def forget(self, request):
