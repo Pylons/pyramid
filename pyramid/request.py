@@ -132,9 +132,14 @@ class DeprecatedRequestMethodsMixin(object):
     response_headerlist = property(_response_headerlist_get,
                                    _response_headerlist_set,
                                    _response_headerlist_del)
-    response_headerlist = deprecated(
-        response_headerlist,
-        rr_dep % ('headerlist', 'headerlist'))
+
+    hl_dep = ('Accessing and setting "request.response_headerlist" is '
+              'deprecated as of Pyramid 1.1; access the headerlist via '
+              '"request.response.headerlist" and extend headers via '
+              '"request.response.headerlist.extend(alist)" instead of '
+              '"request.response_headerlist = alist"')
+
+    response_headerlist = deprecated(response_headerlist, hl_dep)
 
     # response_status
     def _response_status_get(self):
