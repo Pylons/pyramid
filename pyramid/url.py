@@ -380,7 +380,7 @@ class URLMethodsMixin(object):
         and port) for a static resource.
 
         This function accepts the same argument as
-        :meth:`pyramid.request.Request.current_static_url` and performs the
+        :meth:`pyramid.request.Request.static_url` and performs the
         same duty.  It just omits the host, port, and scheme information in
         the return value; only the script_name, path, query parameters, and
         anchor data are present in the returned string.
