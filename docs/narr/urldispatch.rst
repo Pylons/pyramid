@@ -65,7 +65,7 @@ example:
    config.add_view(myview, route_name='myroute')
 
 When a :term:`view callable` added to the configuration by way of
-:meth:`~pyramid.config.Configurator.add_view` bcomes associated with a route
+:meth:`~pyramid.config.Configurator.add_view` becomes associated with a route
 via its ``route_name`` predicate, that view callable will always be found and
 invoked when the associated route pattern matches during a request.
 
