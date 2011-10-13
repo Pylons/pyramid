@@ -10,7 +10,9 @@ import urllib
 
 from pyramid.compat import (
     input_,
-    native_
+    native_,
+    url_quote as compat_url_quote,
+    escape,
     )
 
 fsenc = sys.getfilesystemencoding()
@@ -79,7 +81,7 @@ def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
             if verbosity >= 2:
                 reason = pad + reason % {'filename': full}
                 out(reason)
-            continue
+            continue # pragma: no cover
         if sub_vars:
             dest_full = os.path.join(dest, substitute_filename(name, vars))
         sub_file = False
@@ -114,10 +116,10 @@ def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
                     content, vars, filename=full,
                     template_renderer=template_renderer
                     )
-            except SkipTemplate:
-                continue
-            if content is None:
-                continue
+            except SkipTemplate: 
+                continue # pragma: no cover
+            if content is None:  
+                continue  # pragma: no cover
         already_exists = os.path.exists(dest_full)
         if already_exists:
             f = open(dest_full, 'rb')
@@ -127,7 +129,7 @@ def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
                 if verbosity:
                     out('%s%s already exists (same content)' %
                           (pad, dest_full))
-                continue
+                continue # pragma: no cover
             if interactive:
                 if not query_interactive(
                     native_(full, fsenc), native_(dest_full, fsenc),
@@ -135,7 +137,7 @@ def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
                     simulate=simulate, out_=out_):
                     continue
             elif not overwrite:
-                continue
+                continue # pragma: no cover 
         if verbosity and use_pkg_resources:
             out('%sCopying %s to %s' % (pad, full, dest_full))
         elif verbosity:
@@ -160,6 +162,7 @@ def should_skip_file(name):
         return 'Skipping backup file %(filename)s'
     if name.endswith('.pyc') or name.endswith('.pyo'):
         return 'Skipping %s file %(filename)s' % os.path.splitext(name)[1]
+        # return 'Skipping %s file ' % os.path.splitext(name)[1] + '%(filename)s'
     if name.endswith('$py.class'):
         return 'Skipping $py.class file %(filename)s'
     if name in ('CVS', '_darcs'):
@@ -262,12 +265,12 @@ def substitute_content(content, vars, filename='<string>',
 def html_quote(s):
     if s is None:
         return ''
-    return cgi.escape(str(s), 1)
+    return escape(str(s), 1)
 
 def url_quote(s):
     if s is None:
         return ''
-    return urllib.quote(str(s))
+    return compat_url_quote(str(s))
 
 def test(conf, true_cond, false_cond=None):
     if conf:
