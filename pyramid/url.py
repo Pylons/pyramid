@@ -340,10 +340,9 @@ class URLMethodsMixin(object):
 
         The ``path`` argument points at a file or directory on disk which
         a URL should be generated for.  The ``path`` may be either a
-        relative path (e.g. ``static/foo.css``) or a :term:`asset
-        specification` (e.g. ``mypackage:static/foo.css``).  A ``path``
-        may not be an absolute filesystem path (a :exc:`ValueError` will
-        be raised if this function is supplied with an absolute path).
+        relative path (e.g. ``static/foo.css``) or an absolute path (e.g.
+        ``/abspath/to/static/foo.css``) or a :term:`asset specification`
+        (e.g. ``mypackage:static/foo.css``).
 
         The purpose of the ``**kw`` argument is the same as the purpose of
         the :meth:`pyramid.request.Request.route_url` ``**kw`` argument.  See
