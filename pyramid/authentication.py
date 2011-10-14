@@ -485,13 +485,27 @@ def parse_ticket(secret, ticket, ip):
     expected = calculate_digest(ip, timestamp, secret,
                                 userid, tokens, user_data)
 
-    if expected != digest:
+    if strings_differ(expected, digest):
         raise BadTicket('Digest signature is not correct',
                         expected=(expected, digest))
 
     tokens = tokens.split(',')
 
     return (timestamp, userid, tokens, user_data)
+
+def strings_differ(string1, string2):
+    """Check whether two strings differ while avoiding timing attacks.
+    
+    This function returns True if the given strings differ and False
+    if they are equal.  More importantly, it doesn't leak information
+    about *where* they differ as a result of its running time.
+    """
+    if len(string1) != len(string2):
+        return True
+    differs = 0
+    for i in xrange(len(string1)):
+        differs |= ord(string1[i]) ^ ord(string2[i])
+    return differs
 
 # this function licensed under the MIT license (stolen from Paste)
 def calculate_digest(ip, timestamp, secret, userid, tokens, user_data):
