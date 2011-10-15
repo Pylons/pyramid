@@ -13,6 +13,7 @@ from pyramid.compat import text_
 from pyramid.compat import bytes_
 from pyramid.compat import native_
 from pyramid.interfaces import ISession
+from pyramid.util import strings_differ
 
 def manage_accessed(wrapped):
     """ Decorator which causes a cookie to be set when a wrapped
@@ -262,17 +263,10 @@ def signed_deserialize(serialized, secret, hmac=hmac):
 
     sig = hmac.new(bytes_(secret), pickled, sha1).hexdigest()
 
-    if len(sig) != len(input_sig):
-        raise ValueError('Wrong signature length')
-
     # Avoid timing attacks (see
     # http://seb.dbzteam.org/crypto/python-oauth-timing-hmac.pdf)
-    invalid_bits = 0
-    for a, b in zip(sig, input_sig):
-        invalid_bits += a != b
-
-    if invalid_bits:
-        raise ValueError('Invalid bits in signature')
+    if strings_differ(sig, input_sig):
+        raise ValueError('Invalid signature')
 
     return pickle.loads(pickled)
 
