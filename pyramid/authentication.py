@@ -22,6 +22,8 @@ from pyramid.interfaces import IDebugLogger
 from pyramid.security import Authenticated
 from pyramid.security import Everyone
 
+from pyramid.util import strings_differ
+
 VALID_TOKEN = re.compile(r"^[A-Za-z][A-Za-z0-9+_-]*$")
 
 class CallbackAuthenticationPolicy(object):
@@ -485,7 +487,9 @@ def parse_ticket(secret, ticket, ip):
     expected = calculate_digest(ip, timestamp, secret,
                                 userid, tokens, user_data)
 
-    if expected != digest:
+    # Avoid timing attacks (see
+    # http://seb.dbzteam.org/crypto/python-oauth-timing-hmac.pdf)
+    if strings_differ(expected, digest):
         raise BadTicket('Digest signature is not correct',
                         expected=(expected, digest))
 
