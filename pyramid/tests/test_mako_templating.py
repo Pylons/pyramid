@@ -22,14 +22,20 @@ class Test_renderer_factory(Base, unittest.TestCase):
         return renderer_factory(info)
 
     def test_no_directories(self):
-        from pyramid.exceptions import ConfigurationError
+        from pyramid.mako_templating import IMakoLookup
         info = DummyRendererInfo({
-            'name':'helloworld.mak',
+            'name':'pyramid.tests:fixtures/helloworld.mak',
             'package':None,
             'registry':self.config.registry,
             'settings':{},
             })
-        self.assertRaises(ConfigurationError, self._callFUT, info)
+        renderer = self._callFUT(info)
+        lookup = self.config.registry.getUtility(IMakoLookup)
+        self.assertEqual(lookup.directories, [])
+        self.assertEqual(lookup.filesystem_checks, False)
+        self.assertEqual(renderer.path,
+                         'pyramid.tests:fixtures/helloworld.mak')
+        self.assertEqual(renderer.lookup, lookup)
 
     def test_no_lookup(self):
         from pyramid.mako_templating import IMakoLookup

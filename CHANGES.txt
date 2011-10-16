@@ -6,6 +6,11 @@ Features
 
 - Python 3.2 compatibility.
 
+- A ``mako.directories`` setting is no longer required to use Mako templates
+  Rationale: Mako template renderers can be specified using an absolute asset
+  spec.  An entire application can be written with such asset specs,
+  requiring no ordered lookup path.
+
 Bug Fixes
 ---------
 

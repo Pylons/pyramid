@@ -64,7 +64,7 @@ def renderer_factory(info):
     lookup = registry.queryUtility(IMakoLookup)
     if lookup is None:
         reload_templates = settings.get('reload_templates', False)
-        directories = settings.get('mako.directories', None)
+        directories = settings.get('mako.directories', [])
         module_directory = settings.get('mako.module_directory', None)
         input_encoding = settings.get('mako.input_encoding', 'utf-8')
         error_handler = settings.get('mako.error_handler', None)
@@ -72,9 +72,6 @@ def renderer_factory(info):
         imports = settings.get('mako.imports', None)
         strict_undefined = settings.get('mako.strict_undefined', 'false')
         preprocessor = settings.get('mako.preprocessor', None)
-        if directories is None:
-            raise ConfigurationError(
-                'Mako template used without a ``mako.directories`` setting')
         if not is_nonstr_iter(directories):
             directories = list(filter(None, directories.splitlines()))
         directories = [ abspath_from_asset_spec(d) for d in directories ]
