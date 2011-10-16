@@ -24,6 +24,9 @@ Bug Fixes
   inappropriately when the ``tokens`` argument to remember was used.  See 
   https://github.com/Pylons/pyramid/pull/314.
 
+- The AuthTktAuthenticationPolicy did not use a timing-attack-aware string
+  comparator.  See https://github.com/Pylons/pyramid/pull/320 for more info.
+
 Backwards Incompatibilities
 ---------------------------
 
