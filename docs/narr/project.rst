@@ -62,11 +62,12 @@ The included scaffolds are these:
 
 .. note::
 
-Rather than use any of the above scaffolds, Pylons 1 users may feel more
-comfortable installing the :term:`Akhet` development environment, which
-provides a scaffold named ``akhet``.  This scaffold configures a Pyramid
-application in a "Pylons-esque" way, including the use of a :term:`view
-handler` to map URLs to code (a handler is much like a Pylons "controller").
+   Rather than use any of the above scaffolds, Pylons 1 users may feel more
+   comfortable installing the :term:`Akhet` development environment, which
+   provides a scaffold named ``akhet``.  This scaffold configures a Pyramid
+   application in a "Pylons-esque" way, including the use of a :term:`view
+   handler` to map URLs to code (a handler is much like a Pylons
+   "controller").
 
 .. index::
    single: creating a project
