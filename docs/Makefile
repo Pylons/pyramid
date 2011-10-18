@@ -85,4 +85,4 @@ epub:
 	@echo "Build finished. The epub file is in _build/epub."
 
 _themes:
-	git clone git://github.com/Pylons/pylons_sphinx_theme.git _themes
+	cd ..; git submodule update --init; cd docs
