@@ -151,7 +151,7 @@ class MakoLookupTemplateRenderer(object):
                     error=exc_info[1],
                     traceback=exc_info[2]
                     )
-                raise MakoRenderingException(errtext)
+                raise MakoRenderingException(errtext), None, exc_info[2]
             finally:
                 del exc_info
 
