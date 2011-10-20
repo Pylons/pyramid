@@ -8,7 +8,7 @@ from zope.interface import Interface
 from pyramid.asset import resolve_asset_spec
 from pyramid.asset import abspath_from_asset_spec
 from pyramid.compat import is_nonstr_iter
-from pyramid.exceptions import ConfigurationError
+from pyramid.compat import reraise
 from pyramid.interfaces import ITemplateRenderer
 from pyramid.settings import asbool
 from pyramid.util import DottedNameResolver
@@ -151,7 +151,7 @@ class MakoLookupTemplateRenderer(object):
                     error=exc_info[1],
                     traceback=exc_info[2]
                     )
-                raise MakoRenderingException(errtext), None, exc_info[2]
+                reraise(MakoRenderingException(errtext), None, exc_info[2])
             finally:
                 del exc_info
 
