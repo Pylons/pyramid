@@ -101,7 +101,7 @@ that references ``myroute`` as a ``route_name`` parameter:
    def myview(request):
        return Response('OK')
 
-THe above combination of ``add_route`` and ``scan`` is completely equivalent
+The above combination of ``add_route`` and ``scan`` is completely equivalent
 to using the previous combination of ``add_route`` and ``add_view``.
 
 .. index::
