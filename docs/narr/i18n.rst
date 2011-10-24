@@ -249,7 +249,7 @@ GNU gettext uses three types of files in the translation framework,
 
 The tools for working with :term:`gettext` translation files related to a
 :app:`Pyramid` application is :term:`Babel` and :term:`Lingua`.  Lingua is a
-Balel extension that provides support for scraping i18n references out of
+Babel extension that provides support for scraping i18n references out of
 Python and Chameleon files.
 
 .. index::
