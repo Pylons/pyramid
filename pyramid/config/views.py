@@ -1,4 +1,5 @@
 import inspect
+import operator
 
 from zope.interface import Interface
 from zope.interface import classProvides
@@ -481,7 +482,7 @@ class MultiView(object):
 
         if accept is None or '*' in accept:
             self.views.append((order, view, phash))
-            self.views.sort(key=lambda x: x[0])
+            self.views.sort(key=operator.itemgetter(0))
         else:
             subset = self.media_views.setdefault(accept, [])
             subset.append((order, view, phash))

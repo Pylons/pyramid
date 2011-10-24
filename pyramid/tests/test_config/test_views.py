@@ -1844,9 +1844,23 @@ class TestMultiView(unittest.TestCase):
         mv.add('view', 100, phash='abc')
         self.assertEqual(mv.views, [(100, 'view', 'abc')])
         mv.add('view', 100, phash='def')
-        self.assertEqual(mv.views, [(100, 'view', 'abc'), (100, 'view', 'def')])
+        self.assertEqual(mv.views, [(100, 'view', 'abc'),
+                                    (100, 'view', 'def')])
         mv.add('view', 100, phash='abc')
-        self.assertEqual(mv.views, [(100, 'view', 'abc'), (100, 'view', 'def')])
+        self.assertEqual(mv.views, [(100, 'view', 'abc'),
+                                    (100, 'view', 'def')])
+
+    def test_multiple_with_functions_as_views(self):
+        # this failed on py3 at one point, because functions aren't orderable
+        # and we were sorting the views via a plain sort() rather than
+        # sort(key=itemgetter(0)).
+        def view1(request): pass
+        def view2(request): pass
+        mv = self._makeOne()
+        mv.add(view1, 100, None)
+        self.assertEqual(mv.views, [(100, view1, None)])
+        mv.add(view2, 100, None)
+        self.assertEqual(mv.views, [(100, view1, None), (100, view2, None)])
 
     def test_get_views_request_has_no_accept(self):
         request = DummyRequest()
