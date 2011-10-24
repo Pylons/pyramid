@@ -481,7 +481,7 @@ class MultiView(object):
 
         if accept is None or '*' in accept:
             self.views.append((order, view, phash))
-            self.views.sort()
+            self.views.sort(key=lambda x: x[0])
         else:
             subset = self.media_views.setdefault(accept, [])
             subset.append((order, view, phash))
