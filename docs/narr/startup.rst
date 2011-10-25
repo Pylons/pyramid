@@ -76,8 +76,10 @@ Here's a high-level time-ordered overview of what happens when you press
 
    Note that the constructor function accepts a ``global_config`` argument,
    which is a dictionary of key/value pairs mentioned in the ``[DEFAULT]``
-   section of an ``.ini`` file (if ``[DEFAULT]`` is present).  It also accepts
-   a ``**settings`` argument, which collects another set of arbitrary
+   section of an ``.ini`` file (if `[DEFAULT]
+   <http://docs.pylonsproject.org/projects/pyramid/dev/narr/paste.html
+   #defaults-section-of-a-pastedeploy-ini-file>`__ is present).  It also
+   accepts a ``**settings`` argument, which collects another set of arbitrary
    key/value pairs.  The arbitrary key/value pairs received by this function
    in ``**settings`` will be composed of all the key/value pairs that are
    present in the ``[app:main]`` section (except for the ``use=`` setting)
