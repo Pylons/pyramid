@@ -52,7 +52,7 @@ The suggested mechanism for unit and integration testing of a :app:`Pyramid`
 application is the Python :mod:`unittest` module.  Although this module is
 named :mod:`unittest`, it is actually capable of driving both unit and
 integration tests.  A good :mod:`unittest` tutorial is available within `Dive
-Into Python <http://diveintopython.org/unit_testing/index.html>`_ by Mark
+Into Python <http://diveintopython.nfshost.com/unit_testing/index.html>`_ by Mark
 Pilgrim.
 
 :app:`Pyramid` provides a number of facilities that make unit, integration,
