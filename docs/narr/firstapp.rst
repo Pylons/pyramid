@@ -134,7 +134,7 @@ Using the ``if`` clause is necessary -- or at least best practice -- because
 code in a Python ``.py`` file may be eventually imported via the Python
 ``import`` statement by another ``.py`` file.  ``.py`` files that are
 imported by other ``.py`` files are referred to as *modules*.  By using the
-``if __name__ == 'main':`` idiom, the script above is indicating that it does
+``if __name__ == '__main__':`` idiom, the script above is indicating that it does
 not want the code within the ``if`` statement to execute if this module is
 imported from another; the code within the ``if`` block should only be run
 during a direct script execution.
@@ -208,7 +208,7 @@ WSGI Application Serving
 Finally, we actually serve the application to requestors by starting up a
 WSGI server.  We happen to use the :func:`paste.httpserver.serve` WSGI server
 runner, passing it the ``app`` object (a :term:`router`) as the application
-we wish to serve.  We also pass in an argument ``host=='0.0.0.0'``, meaning
+we wish to serve.  We also pass in an argument ``host='0.0.0.0'``, meaning
 "listen on all TCP interfaces."  By default, the HTTP server listens
 only on the ``127.0.0.1`` interface, which is problematic if you're running
 the server on a remote system and you wish to access it with a web browser
