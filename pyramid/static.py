@@ -43,10 +43,11 @@ class _FileResponse(Response):
     def __init__(self, path, cache_max_age):
         super(_FileResponse, self).__init__(conditional_response=True)
         self.last_modified = getmtime(path)
-        content_type = mimetypes.guess_type(path, strict=False)[0]
+        content_type, content_encoding = mimetypes.guess_type(path, strict=False)
         if content_type is None:
             content_type = 'application/octet-stream'
         self.content_type = content_type
+        self.content_encoding = content_encoding
         content_length = getsize(path)
         self.app_iter = _FileIter(open(path, 'rb'), content_length)
         # assignment of content_length must come after assignment of app_iter

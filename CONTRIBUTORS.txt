@@ -148,3 +148,5 @@ Contributors
 - Shane Hathaway, 2011/07/22
 
 - Manuel Hermann, 2011/07/11
+
+- Klee Dienes, 2011/10/30
