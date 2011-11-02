@@ -894,6 +894,11 @@ class TestDummySession(unittest.TestCase):
         self.assertEqual(token, 'token')
         self.assertTrue('_csrft_' in session)
 
+    def test_get_csrf_token_generates_token(self):
+        session = self._makeOne()
+        token = session.get_csrf_token()
+        self.assertNotEqual(token, None)
+        self.assertTrue(len(token) >= 1)
 
 from zope.interface import Interface
 from zope.interface import implementer
