@@ -66,7 +66,7 @@ class PCreateCommand(object):
         options = self.options
         args = self.args
         project_name = os.path.basename(args[0])
-        output_dir = os.path.normpath(args[0])
+        output_dir = os.path.abspath(os.path.normpath(args[0]))
         pkg_name = _bad_chars_re.sub('', project_name.lower())
         safe_name = pkg_resources.safe_name(project_name)
         egg_name = pkg_resources.to_filename(safe_name)
