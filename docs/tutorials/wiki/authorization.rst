@@ -4,7 +4,7 @@ Adding Authorization
 
 Our application currently allows anyone with access to the server to view,
 edit, and add pages to our wiki.  For purposes of demonstration we'll change
-our application to allow people whom are members of a *group* named
+our application to allow people who are members of a *group* named
 ``group:editors`` to add and edit wiki pages but we'll continue allowing
 anyone with access to the server to view pages.  :app:`Pyramid` provides
 facilities for :term:`authorization` and :term:`authentication`.  We'll make
