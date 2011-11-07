@@ -909,3 +909,8 @@ class IAssetDescriptor(Interface):
         Returns iterable of filenames of directory contents.  Raises an
         exception if asset is not a directory.
         """
+
+    def exists():
+        """
+        Returns True if asset exists, otherwise returns False.
+        """
