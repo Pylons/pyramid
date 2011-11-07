@@ -149,6 +149,8 @@ Contributors
 
 - Manuel Hermann, 2011/07/11
 
+- Richard Barrell, 2011/11/07
+
 - Chris Shenton, 2011/11/07
 
 - Ken Manheimer, 2011/11/07
