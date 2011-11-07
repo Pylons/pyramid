@@ -1,5 +1,4 @@
 import os
-import pkg_resources
 import threading
 
 from zope.interface import implementer
@@ -14,6 +13,7 @@ from pyramid.interfaces import ITemplateRenderer
 from pyramid.interfaces import IRendererInfo
 
 from pyramid.asset import asset_spec_from_abspath
+from pyramid.asset import lookup_asset
 from pyramid.compat import json
 from pyramid.compat import string_types
 from pyramid.compat import text_type
@@ -200,7 +200,7 @@ class JSONP(object):
 
     See also: :ref:`jsonp_renderer`.
     """
-    
+
     def __init__(self, param_name='callback'):
         self.param_name = param_name
 
@@ -308,9 +308,9 @@ class ChameleonRendererLookup(object):
                     # should die
                     package_name = caller_package(4).__name__
                     filename = spec
-                abspath = pkg_resources.resource_filename(package_name,
-                                                          filename)
-                if not pkg_resources.resource_exists(package_name, filename):
+                asset = lookup_asset(registry, package_name, filename)
+                abspath = asset.abspath()
+                if not asset.exists():
                     raise ValueError(
                         'Missing template asset: %s (%s)' % (spec, abspath))
                 renderer = self.impl(abspath, self)
@@ -499,11 +499,11 @@ class NullRendererHelper(RendererHelper):
 
     def render(self, value, system_values, request=None):
         return value
-    
+
     def render_to_response(self, value, system_values, request=None):
         return value
 
     def clone(self, name=None, package=None, registry=None):
         return self
-    
+
 null_renderer = NullRendererHelper()

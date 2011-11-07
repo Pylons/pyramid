@@ -80,6 +80,9 @@ class PkgResourcesAssetDescriptor(object):
     def listdir(self):
         pkg_resources.resource_listdir(self.pkg_name, self.path)
 
+    def exists(self):
+        pkg_resources.resource_exists(self.pkg_name, self.path)
+
 
 class FSAssetDescriptor(object):
     implements(IAssetDescriptor)
@@ -98,3 +101,6 @@ class FSAssetDescriptor(object):
 
     def listdir(self):
         return os.listdir(self.path)
+
+    def exists(self):
+        return os.path.exists(self.path)
