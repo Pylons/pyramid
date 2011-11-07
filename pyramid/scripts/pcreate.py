@@ -4,6 +4,7 @@
 
 import optparse
 import os
+import os.path
 import pkg_resources
 import re
 import sys
@@ -64,8 +65,8 @@ class PCreateCommand(object):
     def render_scaffolds(self):
         options = self.options
         args = self.args
-        project_name = args[0].lstrip(os.path.sep)
-        output_dir = os.path.normpath(os.path.join(os.getcwd(), project_name))
+        project_name = os.path.basename(args[0])
+        output_dir = os.path.normpath(args[0])
         pkg_name = _bad_chars_re.sub('', project_name.lower())
         safe_name = pkg_resources.safe_name(project_name)
         egg_name = pkg_resources.to_filename(safe_name)
