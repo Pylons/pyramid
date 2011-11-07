@@ -42,10 +42,10 @@ checkout.
   $ ../env/bin/python setup.py develop
 
 - At that point, you should be able to create new Pyramid projects by using
-  ``paster create``::
+  ``pcreate``::
 
   $ cd ../env
-  $ bin/paster create -t pyramid_starter starter
+  $ bin/pcreate -s starter starter
 
 - And install those projects (also using ``setup.py develop``) into the
   virtualenv::
