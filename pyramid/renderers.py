@@ -308,7 +308,7 @@ class ChameleonRendererLookup(object):
                     # should die
                     package_name = caller_package(4).__name__
                     filename = spec
-                asset = lookup_asset(registry, package_name, filename)
+                asset = lookup_asset(registry, filename, package_name)
                 abspath = asset.abspath()
                 if not asset.exists():
                     raise ValueError(
