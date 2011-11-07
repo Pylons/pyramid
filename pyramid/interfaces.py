@@ -863,3 +863,49 @@ class IRendererInfo(Interface):
 
 PHASE1_CONFIG = -20
 PHASE2_CONFIG = -10
+
+
+class IAssetResolver(Interface):
+    """
+    A Pyramid application uses exactly one IAssetResolver utility which is
+    responsible for resolving assets given an asset spec.  This can be used
+    as an override point for add-on packaes to provide skin or theming
+    functionality to a Pyramid application.
+    """
+
+    def __call__(pkg_name, path, request):
+        """
+        Given an asset spec, returns an instance of IAssetDescriptor or None.
+        `request` is an argument since it's conceivable some implementations
+        might need access to the request.  The default implemntation will not
+        really need access to the request.  Any implementation must be able
+        to handle `request` being None.
+        """
+
+
+class IAssetDescriptor(Interface):
+    """
+    Describes an asset.
+    """
+
+    def abspath():
+        """
+        Returns an absolute path in the filesystem to the asset.
+        """
+
+    def stream():
+        """
+        Returns an input stream for reading asset contents.  Raises an
+        exception if the asset is a directory.
+        """
+
+    def isdir():
+        """
+        Returns True if the asset is a directory, otherwise returns False.
+        """
+
+    def listdir():
+        """
+        Returns iterable of filenames of directory contents.  Raises an
+        exception if asset is not a directory.
+        """
