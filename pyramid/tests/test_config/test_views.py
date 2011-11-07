@@ -1427,6 +1427,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.request import Request
         request = Request.blank('/static/minimal.pt')
         request.subpath = ('minimal.pt', )
+        request.registry = testing.Registry()
         result = wrapped(None, request)
         self.assertEqual(result.status, '200 OK')
         self.assertTrue(result.body.startswith(b'<div'))
@@ -1463,7 +1464,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config.add_static_view('static', static_path)
         self.assertEqual(info.added,
                          [(config, 'static', static_path, {})])
-    
+
     def test_set_forbidden_view(self):
         from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
@@ -1765,7 +1766,7 @@ class Test_requestonly(unittest.TestCase):
         class Foo: pass
         foo = Foo()
         self.assertFalse(self._callFUT(foo))
-    
+
     def test_method_onearg_named_request(self):
         class Foo:
             def method(self, request):
@@ -2065,12 +2066,12 @@ class TestViewDeriver(unittest.TestCase):
 
     def tearDown(self):
         self.config = None
-        
+
     def _makeOne(self, **kw):
         kw['registry'] = self.config.registry
         from pyramid.config.views import ViewDeriver
         return ViewDeriver(**kw)
-    
+
     def _makeRequest(self):
         request = DummyRequest()
         request.registry = self.config.registry
@@ -2613,7 +2614,7 @@ class TestViewDeriver(unittest.TestCase):
             self.assertEqual(e.detail, 'predicate mismatch for view myview')
         else: # pragma: no cover
             raise AssertionError
-            
+
     def test_with_predicates_all(self):
         response = DummyResponse()
         view = lambda *arg: response
@@ -2922,7 +2923,7 @@ class TestViewDeriver(unittest.TestCase):
         expires = parse_httpdate(headers['Expires'])
         assert_similar_datetime(expires, when)
         self.assertEqual(headers['Cache-Control'], 'max-age=3600')
-        
+
     def test_http_cached_view_timedelta(self):
         import datetime
         from pyramid.response import Response
@@ -3018,7 +3019,7 @@ class TestViewDeriver(unittest.TestCase):
 class TestDefaultViewMapper(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
-        self.registry = self.config.registry 
+        self.registry = self.config.registry
 
     def tearDown(self):
         del self.registry
@@ -3280,7 +3281,7 @@ class TestStaticURLInfo(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.config.views import StaticURLInfo
         return StaticURLInfo
-    
+
     def _makeOne(self):
         return self._getTargetClass()()
 
