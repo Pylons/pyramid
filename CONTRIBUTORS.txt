@@ -1,4 +1,4 @@
-Pylons Project Contributor Agreement
+ Pylons Project Contributor Agreement
 ====================================
 
 The submitter agrees by adding his or her name within the section below named
@@ -150,3 +150,5 @@ Contributors
 - Manuel Hermann, 2011/07/11
 
 - Chris Shenton, 2011/11/07
+
+- Ken Manheimer, 2011/11/07
