@@ -8,12 +8,10 @@ from os.path import getmtime
 from os.path import getsize
 from os.path import isdir
 from os.path import exists
-from pkg_resources import resource_exists
-from pkg_resources import resource_filename
-from pkg_resources import resource_isdir
 
 from repoze.lru import lru_cache
 
+from pyramid.asset import lookup_asset
 from pyramid.asset import resolve_asset_spec
 from pyramid.compat import text_
 from pyramid.httpexceptions import HTTPNotFound
@@ -152,15 +150,18 @@ class static_view(object):
             return HTTPNotFound('Out of bounds: %s' % request.url)
 
         if self.package_name: # package resource
-
-            resource_path ='%s/%s' % (self.docroot.rstrip('/'), path)
-            if resource_isdir(self.package_name, resource_path):
+            registry = request.registry
+            pkg_name = self.package_name
+            asset_path ='%s/%s' % (self.docroot.rstrip('/'), path)
+            asset = lookup_asset(registry, asset_path, pkg_name, request)
+            if asset.isdir():
                 if not request.path_url.endswith('/'):
                     return self.add_slash_redirect(request)
-                resource_path = '%s/%s' % (resource_path.rstrip('/'),self.index)
-            if not resource_exists(self.package_name, resource_path):
+                asset_path = '%s/%s' % (asset_path.rstrip('/'),self.index)
+                asset = lookup_asset(registry, asset_path, pkg_name, request)
+            if not asset.exists():
                 return HTTPNotFound(request.url)
-            filepath = resource_filename(self.package_name, resource_path)
+            filepath = asset.abspath()
 
         else: # filesystem file
 

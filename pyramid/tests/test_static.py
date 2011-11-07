@@ -1,6 +1,8 @@
 import datetime
 import unittest
 
+from pyramid import testing
+
 # 5 years from now (more or less)
 fiveyrsfuture = datetime.datetime.utcnow() + datetime.timedelta(5*365)
 
@@ -25,8 +27,10 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
             }
         if kw is not None:
             environ.update(kw)
-        return Request(environ=environ)
-    
+        request = Request(environ=environ)
+        request.registry = testing.Registry()
+        return request
+
     def test_ctor_defaultargs(self):
         inst = self._makeOne('package:resource_name')
         self.assertEqual(inst.package_name, 'package')
@@ -42,7 +46,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         response.prepare(request.environ)
         self.assertEqual(response.status, '301 Moved Permanently')
         self.assertTrue(b'http://example.com:6543/' in response.body)
-        
+
     def test_path_info_slash_means_index_html(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest()
@@ -182,8 +186,10 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
             }
         if kw is not None:
             environ.update(kw)
-        return Request(environ=environ)
-    
+        request = Request(environ=environ)
+        request.registry = testing.Registry()
+        return request
+
     def test_ctor_defaultargs(self):
         inst = self._makeOne('package:resource_name')
         self.assertEqual(inst.package_name, 'package')
@@ -200,7 +206,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         response.prepare(request.environ)
         self.assertEqual(response.status, '301 Moved Permanently')
         self.assertTrue(b'http://example.com:6543/' in response.body)
-        
+
     def test_path_info_slash_means_index_html(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest()
@@ -340,7 +346,7 @@ class Test_patch_mimetypes(unittest.TestCase):
         result = self._callFUT(module)
         self.assertEqual(result, True)
         self.assertEqual(module.initted, True)
-        
+
     def test_missing_init(self):
         class DummyMimetypes(object):
             pass
