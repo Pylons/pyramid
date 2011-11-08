@@ -87,9 +87,55 @@ class Test_asset_spec_from_abspath(unittest.TestCase):
         pkg = DummyPackage('pyramid.tests')
         result = self._callFUT(abspath, pkg)
         self.assertEqual(result, abspath)
+
+class TestPkgResourcesAssetDescriptor(unittest.TestCase):
+    def setUp(self):
+        from pyramid.asset import PkgResourcesAssetDescriptor
+        self.asset_descr = PkgResourcesAssetDescriptor('pyramid.tests','abc')
+    
+    def test_abspath(self):
+        import os
+        here = os.path.dirname(__file__)
+        path = os.path.abspath(here)
+        self.assertEqual(self.asset_descr.abspath(), os.path.join(path, 'abc'))
+
+    def test_stream(self):
+        """ checks to make sure call is correct """
+        self.asset_descr.pkg_resources = DummyPkgResource()
+        self.asset_descr.pkg_resources.resource_stream = lambda x,y: '%s:%s'\
+                                                            % (x,y)
         
+        self.assertEqual(self.asset_descr.stream(),
+                         '%s:%s' % ('pyramid.tests','abc'))
+        
+    def test_isdir(self):
+        """ checks to make sure call is correct """
+        self.asset_descr.pkg_resources = DummyPkgResource()
+        self.asset_descr.pkg_resources.resource_isdir= lambda x,y: '%s:%s'\
+                                                            % (x,y)
+        
+        self.assertEqual(self.asset_descr.isdir(),
+                         '%s:%s' % ('pyramid.tests','abc'))
+
+    def test_listdir(self):
+        self.asset_descr.pkg_resources = DummyPkgResource()
+        self.asset_descr.pkg_resources.resource_listdir = lambda x,y: '%s:%s'\
+                                                            % (x,y)
+        
+        self.assertEqual(self.asset_descr.listdir(),
+                         '%s:%s' % ('pyramid.tests','abc'))
+
+    def test_exists(self):
+        self.asset_descr.pkg_resources = DummyPkgResource()
+        self.asset_descr.pkg_resources.resource_exists = lambda x,y: '%s:%s'\
+                                                            % (x,y)
+        
+        self.assertEqual(self.asset_descr.exists(),
+                         '%s:%s' % ('pyramid.tests','abc'))
 
 class DummyPackage:
     def __init__(self, name):
         self.__name__ = name
-    
+
+class DummyPkgResource(object):
+    pass    
