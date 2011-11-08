@@ -4,8 +4,8 @@ from pyramid_zodbconn import get_connection
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 
-from tutorial.models import appmaker
-from tutorial.security import groupfinder
+from .models import appmaker
+from .security import groupfinder
 
 def root_factory(request):
     conn = get_connection(request)
@@ -20,6 +20,6 @@ def main(global_config, **settings):
     config = Configurator(root_factory=root_factory, settings=settings,
                           authentication_policy=authn_policy,
                           authorization_policy=authz_policy)
-    config.add_static_view('static', 'tutorial:static', cache_max_age=3600)
+    config.add_static_view('static', 'static', cache_max_age=3600)
     config.scan('tutorial')
     return config.make_wsgi_app()

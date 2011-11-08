@@ -4,17 +4,17 @@ import re
 from pyramid.httpexceptions import HTTPFound
 from pyramid.view import view_config
 
-from tutorial.models import Page
+from .models import Page
 
 # regular expression used to find WikiWords
 wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
 
-@view_config(context='tutorial.models.Wiki')
+@view_config(context='.models.Wiki')
 def view_wiki(context, request):
     return HTTPFound(location=request.resource_url(context, 'FrontPage'))
 
-@view_config(context='tutorial.models.Page',
-             renderer='tutorial:templates/view.pt')
+@view_config(context='.models.Page',
+             renderer='templates/view.pt')
 def view_page(context, request):
     wiki = context.__parent__
 
@@ -33,8 +33,8 @@ def view_page(context, request):
     edit_url = request.resource_url(context, 'edit_page')
     return dict(page = context, content = content, edit_url = edit_url)
 
-@view_config(name='add_page', context='tutorial.models.Wiki',
-             renderer='tutorial:templates/edit.pt')
+@view_config(name='add_page', context='.models.Wiki',
+             renderer='templates/edit.pt')
 def add_page(context, request):
     name = request.subpath[0]
     if 'form.submitted' in request.params:
@@ -50,8 +50,8 @@ def add_page(context, request):
     page.__parent__ = context
     return dict(page = page, save_url = save_url)
 
-@view_config(name='edit_page', context='tutorial.models.Page',
-             renderer='tutorial:templates/edit.pt')
+@view_config(name='edit_page', context='.models.Page',
+             renderer='templates/edit.pt')
 def edit_page(context, request):
     if 'form.submitted' in request.params:
         context.data = request.params['body']
@@ -59,5 +59,3 @@ def edit_page(context, request):
 
     return dict(page = context,
                 save_url = request.resource_url(context, 'edit_page'))
-    
-    

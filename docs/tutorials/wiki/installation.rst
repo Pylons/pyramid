@@ -149,6 +149,10 @@ On Windows:
 
    c:\pyramidtut> Scripts\pcreate -s zodb tutorial
 
+.. note:: You don't have to call it `tutorial` -- the code uses
+   relative paths for imports and finding templates and static
+   resources.
+
 .. note:: If you are using Windows, the ``zodb`` scaffold
    doesn't currently deal gracefully with installation into a location
    that contains spaces in the path.  If you experience startup
