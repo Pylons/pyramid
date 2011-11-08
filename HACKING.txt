@@ -29,11 +29,6 @@ checkout.
 
   $ env/bin/easy_install setuptools-git
 
-- Install ``nose`` and ``coverage`` into the virtualenv (for running nose
-  tests with coverage via ``setup.py nosetests --with-coverage``)::
-
-  $ env/bin/easy_install nose coverage
-
 - Install Pyramid from the checkout into the virtualenv using ``setup.py
   develop`` (running ``setup.py develop`` *must* be done while the current
   working directory is the ``pyramid`` checkout directory)::
@@ -62,7 +57,9 @@ In order to add a feature to Pyramid:
   documentation (in ``docs/``).
 
 - The feature must work fully on the following CPython versions: 2.6,
-  and 2.7 on both UNIX and Windows.
+  2.7, and 3.2 on both UNIX and Windows.
+
+- The feature must work on the latest version of PyPy.
 
 - The feature must not cause installation or runtime failure on Jython
   or App Engine.  If it doesn't cause installation or runtime failure,
@@ -88,12 +85,33 @@ Coding Style
   2 newlines between classes.  But 80-column lines, in particular, are
   mandatory.
 
+Running Tests
+--------------
+
+- To run tests for Pyramid on a single Python version, run ``python setup.py
+  test`` against the using the Python interpreter from virtualenv into which
+  you've ``setup.py develop``-ed Pyramid.
+
+- To run the full set of Pyramid tests on all platforms, install ``tox``
+  (http://codespeak.net/~hpk/tox/) into a system Python.  The ``tox`` console
+  script will be installed into the scripts location for that Python.  While
+  ``cd``'ed to the Pyramid checkout root directory (it contains ``tox.ini``),
+  invoke the ``tox`` console script.  This will read the ``tox.ini`` file and
+  execute the tests on multiple Python versions and platforms; while it runs,
+  it creates a virtualenv for each version/platform combination.  For
+  example::
+
+   $ /usr/bin/easy_install tox
+   $ cd ~/hack-on-pyramid/pyramid
+   $ /usr/bin/tox
+
 Test Coverage
 -------------
 
-- The codebase *must* have 100% test statement coverage after each
-  commit.  You can test coverage via ``python setup.py nosetests
-  --with-coverage`` (requires the ``nose`` and ``coverage`` packages).
+- The codebase *must* have 100% test statement coverage after each commit.
+  You can test coverage via ``tox -e coverage``, or alternately by installing
+  ``nose`` and ``coverage`` into your virtualenv, and running ``setup.py
+  nosetests --with-coverage``.
 
 Documentation Coverage
 ----------------------
