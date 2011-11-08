@@ -13,7 +13,7 @@ We write a test class for the model class ``Page`` and another test class
 for the ``initialize_sql`` function.
 
 To do so, we'll retain the ``tutorial.tests.ViewTests`` class provided as a
-result of the ``pyramid_routesalchemy`` project generator.  We'll add two
+result of the ``routesalchemy`` project generator.  We'll add two
 test classes: one for the ``Page`` model named ``PageModelTests``, one for the
 ``initialize_sql`` function named ``InitializeSqlTests``.
 
