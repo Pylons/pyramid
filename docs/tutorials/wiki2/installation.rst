@@ -108,6 +108,10 @@ On Windows:
    startup problems, try putting both the virtualenv and the project
    into directories that do not contain spaces in their paths.
 
+.. note:: You don't have to call it `tutorial` -- the code uses
+   relative paths for imports and finding templates and static
+   resources. 
+
 Installing the Project in "Development Mode"
 ============================================
 
