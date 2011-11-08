@@ -23,7 +23,11 @@ the application module in the ``use`` variable of the ``app:main``
 section. The *entry point* is defined in the Setuptools configuration of this
 module, specifically in the ``setup.py`` file. For this tutorial, the *entry
 point* is defined as ``tutorial:main`` and points to a function named
-``main``.
+``main``. 
+
+.. note:: If you chose a differnt scaffolding name (e.g., ``mytutorial`` this
+   will be ``mytutorial:main``). The same is true for the module name in the
+   imports, paths to templates and static resources, etc.
 
 First we need some imports to support later code:
 
