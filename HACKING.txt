@@ -61,8 +61,8 @@ In order to add a feature to Pyramid:
 - The feature must be documented in both the API and narrative
   documentation (in ``docs/``).
 
-- The feature must work fully on the following CPython versions: 2.4,
-  2.5, 2.6, and 2.7 on both UNIX and Windows.
+- The feature must work fully on the following CPython versions: 2.6,
+  and 2.7 on both UNIX and Windows.
 
 - The feature must not cause installation or runtime failure on Jython
   or App Engine.  If it doesn't cause installation or runtime failure,
