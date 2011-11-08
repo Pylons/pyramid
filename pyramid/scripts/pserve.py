@@ -173,8 +173,8 @@ class PServeCommand(object):
                 if self.verbose > 1:
                     self.out('Running reloading file monitor')
                 install_reloader(int(self.options.reload_interval))
-                if self.requires_config_file:
-                    watch_file(self.args[0])
+                # if self.requires_config_file:
+                #     watch_file(self.args[0])
             else:
                 return self.restart_with_reloader()
 
