@@ -1,6 +1,6 @@
 We specifically use relative package references where possible so this demo
 works even if the user names their package (in the 'bin/paster create -t
-pyramid_zodb ...' step) something other than 'tutorial'.
+zodb ...' step) something other than 'tutorial'.
 
 Specifically:
 

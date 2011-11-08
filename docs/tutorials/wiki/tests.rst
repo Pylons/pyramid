@@ -15,7 +15,7 @@ class for each model class, and we'll write a test class for the
 ``appmaker``.
 
 To do so, we'll retain the ``tutorial.tests.ViewTests`` class provided as a
-result of the ``pyramid_zodb`` project generator.  We'll add three test
+result of the ``zodb`` project generator.  We'll add three test
 classes: one for the ``Page`` model named ``PageModelTests``, one for the
 ``Wiki`` model named ``WikiModelTests``, and one for the appmaker named
 ``AppmakerTests``.

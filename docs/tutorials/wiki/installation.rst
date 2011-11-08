@@ -224,7 +224,7 @@ On Windows:
   c:\pyramidtut\tutorial> ..\Scripts\nosetests --cover-package=tutorial ^
        --cover-erase --with-coverage
 
-Looks like the code in the ``pyramid_zodb`` scaffold for ZODB projects is
+Looks like the code in the ``zodb`` scaffold for ZODB projects is
 missing some test coverage, particularly in the file named
 ``models.py``.
 
@@ -261,10 +261,10 @@ page.  You can read more about the purpose of the icon at
 :ref:`debug_toolbar`.  It allows you to get information about your
 application while you develop.
 
-Decisions the ``pyramid_zodb`` Scaffold Has Made For You
-========================================================
+Decisions the ``zodb`` Scaffold Has Made For You
+================================================
 
-Creating a project using the ``pyramid_zodb`` scaffold makes the following
+Creating a project using the ``zodb`` scaffold makes the following
 assumptions:
 
 - you are willing to use :term:`ZODB` as persistent storage
