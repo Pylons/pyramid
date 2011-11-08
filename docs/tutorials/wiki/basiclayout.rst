@@ -35,7 +35,7 @@ point happens to be the ``main`` function within the file named
 
 #. *Line 12*.  We construct a :term:`Configurator` with a :term:`root
    factory` and the settings keywords parsed by :term:`PasteDeploy`.  The root
-   factory is named ``get_root``.
+   factory is named ``root_factory``.
 
 #. *Line 13*.  Register a 'static view' which answers requests which start
    with with URL path ``/static`` using the
