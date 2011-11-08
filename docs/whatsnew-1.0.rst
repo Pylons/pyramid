@@ -110,7 +110,7 @@ Scaffold Improvements
   (``starter``, ``routesalchemy``, ``alchemy``, ``zodb``) instead of ZCML
   configuration.
 
-- The ``pyramid_zodb``, ``pyramid_routesalchemy`` and ``pyramid_alchemy``
+- The ``pyramid_zodb``, ``routesalchemy`` and ``pyramid_alchemy``
   scaffolds now use a default "commit veto" hook when configuring the
   ``repoze.tm2`` transaction manager in ``development.ini``.  This prevents a
   transaction from being committed when the response status code is within

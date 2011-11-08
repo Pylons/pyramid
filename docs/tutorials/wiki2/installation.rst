@@ -84,7 +84,7 @@ Making a Project
 
 Your next step is to create a project.  :app:`Pyramid` supplies a
 variety of scaffolds to generate sample projects.  We will use the
-``pyramid_routesalchemy`` scaffold, which generates an application
+``routesalchemy`` scaffold, which generates an application
 that uses :term:`SQLAlchemy` and :term:`URL dispatch`.
 
 The below instructions assume your current working directory is the
@@ -102,7 +102,7 @@ On Windows:
 
    c:\pyramidtut> Scripts\pcreate -s routesalchemy tutorial
 
-.. note:: If you are using Windows, the ``pyramid_routesalchemy``
+.. note:: If you are using Windows, the ``routesalchemy``
    scaffold may not deal gracefully with installation into a
    location that contains spaces in the path.  If you experience
    startup problems, try putting both the virtualenv and the project
@@ -226,10 +226,10 @@ page.  You can read more about the purpose of the icon at
 :ref:`debug_toolbar`.  It allows you to get information about your
 application while you develop.
 
-Decisions the ``pyramid_routesalchemy`` Scaffold Has Made For You
+Decisions the ``routesalchemy`` Scaffold Has Made For You
 =================================================================
 
-Creating a project using the ``pyramid_routesalchemy`` scaffold makes
+Creating a project using the ``routesalchemy`` scaffold makes
 the following assumptions:
 
 - you are willing to use :term:`SQLAlchemy` as a database access tool
