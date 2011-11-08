@@ -202,23 +202,6 @@ On Windows:
 
   c:\pyramidtut\tutorial> ..\Scripts\python setup.py test -q
 
-Starting the Application
-========================
-
-Start the application.
-
-On UNIX:
-
-.. code-block:: text
-
-  $ ../bin/pserve development.ini --reload
-
-On Windows:
-
-.. code-block:: text
-
-  c:\pyramidtut\tutorial> ..\Scripts\pserve development.ini --reload
-
 Exposing Test Coverage Information
 ==================================
 
@@ -244,6 +227,23 @@ On Windows:
 Looks like the code in the ``pyramid_zodb`` scaffold for ZODB projects is
 missing some test coverage, particularly in the file named
 ``models.py``.
+
+Starting the Application
+========================
+
+Start the application.
+
+On UNIX:
+
+.. code-block:: text
+
+  $ ../bin/pserve development.ini --reload
+
+On Windows:
+
+.. code-block:: text
+
+  c:\pyramidtut\tutorial> ..\Scripts\pserve development.ini --reload
 
 Visit the Application in a Browser
 ==================================
