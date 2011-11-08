@@ -245,6 +245,11 @@ On Windows:
 
   c:\pyramidtut\tutorial> ..\Scripts\pserve development.ini --reload
 
+.. note::
+
+   Your OS firewall, if any, may pop up a dialog asking for authorization
+   to allow python to accept incoming network connections.
+
 Visit the Application in a Browser
 ==================================
 
