@@ -127,8 +127,8 @@ Preparation, Windows
 
 .. _making_a_project:
 
-Making a Project
-================
+Make a Project
+==============
 
 Your next step is to create a project.  :app:`Pyramid` supplies a variety of
 scaffolds to generate sample projects.  For this tutorial, we will use the
@@ -159,8 +159,8 @@ On Windows:
    problems, try putting both the virtualenv and the project into
    directories that do not contain spaces in their paths.
 
-Installing the Project in "Development Mode"
-============================================
+Install the Project in "Development Mode"
+=========================================
 
 In order to do development on the project easily, you must "register"
 the project as a development egg in your workspace using the
@@ -184,8 +184,8 @@ On Windows:
 
 .. _running_tests:
 
-Running the Tests
-=================
+Run the Tests
+=============
 
 After you've installed the project in development mode, you may run
 the tests for the project.
@@ -202,8 +202,8 @@ On Windows:
 
   c:\pyramidtut\tutorial> ..\Scripts\python setup.py test -q
 
-Exposing Test Coverage Information
-==================================
+Expose Test Coverage Information
+================================
 
 You can run the ``nosetests`` command to see test coverage
 information.  This runs the tests in the same way that ``setup.py
@@ -228,8 +228,8 @@ Looks like the code in the ``pyramid_zodb`` scaffold for ZODB projects is
 missing some test coverage, particularly in the file named
 ``models.py``.
 
-Starting the Application
-========================
+Start the Application
+=====================
 
 Start the application.
 
