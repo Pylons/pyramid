@@ -67,21 +67,22 @@ class PkgResourcesAssetDescriptor(object):
     def __init__(self, pkg_name, path):
         self.pkg_name = pkg_name
         self.path = path
+        self.pkg_resources = pkg_resources
 
     def abspath(self):
-        return pkg_resources.resource_filename(self.pkg_name, self.path)
+        return self.pkg_resources.resource_filename(self.pkg_name, self.path)
 
     def stream(self):
-        return pkg_resources.resource_stream(self.pkg_name, self.path)
+        return self.pkg_resources.resource_stream(self.pkg_name, self.path)
 
     def isdir(self):
-        return pkg_resources.resource_isdir(self.pkg_name, self.path)
+        return self.pkg_resources.resource_isdir(self.pkg_name, self.path)
 
     def listdir(self):
-        return pkg_resources.resource_listdir(self.pkg_name, self.path)
+        return self.pkg_resources.resource_listdir(self.pkg_name, self.path)
 
     def exists(self):
-        return pkg_resources.resource_exists(self.pkg_name, self.path)
+        return self.pkg_resources.resource_exists(self.pkg_name, self.path)
 
 
 class FSAssetDescriptor(object):
