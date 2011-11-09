@@ -60,6 +60,10 @@ look like so:
    :linenos:
    :language: python
 
+.. note::
+   (Your ``config.scan('tutorial')`` needs the package name you used
+   instead of "tutorial", if you used a different name.)
+
 Add ``security.py``
 ~~~~~~~~~~~~~~~~~~~
 
