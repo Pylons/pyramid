@@ -9,4 +9,6 @@
 
   .. autofunction:: asbool
 
+  .. autofunction:: aslist
+
 
