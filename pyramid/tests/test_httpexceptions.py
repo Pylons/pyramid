@@ -298,11 +298,8 @@ class Test_HTTPMove(unittest.TestCase):
         """ Constructing a HTTPMove instance with location=None should
             throw a ValueError from __init__ so that a more-confusing
             exception won't be thrown later from .prepare(environ) """
-        try:
+        with self.assertRaises(ValueError):
             exc = self._makeOne(location=None)
-            self.assertEqual(1, 0)
-        except ValueError, e:
-            pass
 
     def test_it_location_not_passed(self):
         exc = self._makeOne()
