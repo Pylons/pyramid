@@ -434,6 +434,8 @@ ${html_comment}''')
 
     def __init__(self, location='', detail=None, headers=None, comment=None,
                  body_template=None, **kw):
+        if location is None:
+            raise ValueError("HTTP redirects need a location to redirect to.")
         super(_HTTPMove, self).__init__(
             detail=detail, headers=headers, comment=comment,
             body_template=body_template, location=location, **kw)
