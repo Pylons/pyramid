@@ -294,6 +294,12 @@ class Test_HTTPMove(unittest.TestCase):
         from pyramid.httpexceptions import _HTTPMove
         return _HTTPMove(*arg, **kw)
 
+    def test_it_location_none_valueerrors(self):
+        # Constructing a HTTPMove instance with location=None should
+        # throw a ValueError from __init__ so that a more-confusing
+        # exception won't be thrown later from .prepare(environ)
+        self.assertRaises(ValueError, self._makeOne, location=None)
+
     def test_it_location_not_passed(self):
         exc = self._makeOne()
         self.assertEqual(exc.location, '')
