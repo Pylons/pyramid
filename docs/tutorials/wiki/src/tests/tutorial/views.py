@@ -72,4 +72,3 @@ def edit_page(context, request):
     return dict(page = context,
                 save_url = request.resource_url(context, 'edit_page'),
                 logged_in = logged_in)
-    
