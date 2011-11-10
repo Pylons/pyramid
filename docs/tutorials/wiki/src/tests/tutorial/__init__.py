@@ -4,8 +4,8 @@ from pyramid_zodbconn import get_connection
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 
-from tutorial.models import appmaker
-from tutorial.security import groupfinder
+from .models import appmaker
+from .security import groupfinder
 
 def root_factory(request):
     conn = get_connection(request)
