@@ -4,9 +4,9 @@ from pyramid.security import remember
 from pyramid.security import forget
 from pyramid.view import view_config
 
-from tutorial.security import USERS
+from .security import USERS
 
-@view_config(context='tutorial.models.Wiki', name='login',
+@view_config(context='.models.Wiki', name='login',
              renderer='templates/login.pt')
 @view_config(context='pyramid.httpexceptions.HTTPForbidden',
              renderer='templates/login.pt')
@@ -35,10 +35,9 @@ def login(request):
         login = login,
         password = password,
         )
-    
-@view_config(context='tutorial.models.Wiki', name='logout')
+
+@view_config(context='.models.Wiki', name='logout')
 def logout(request):
     headers = forget(request)
     return HTTPFound(location = request.resource_url(request.context),
                      headers = headers)
-    
