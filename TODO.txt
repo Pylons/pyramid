@@ -1,6 +1,13 @@
 Pyramid TODOs
 =============
 
+Must-Have
+---------
+
+- Fix ZODB scaffolding to match ZODB tutorial docs (Ken made relocatable).
+
+- Fix SQLA tutorial (and scaffolding) to match ZODB tutorial.
+
 Nice-to-Have
 ------------
 
