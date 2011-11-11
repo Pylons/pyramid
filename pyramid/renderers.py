@@ -1,3 +1,4 @@
+import json
 import os
 import pkg_resources
 import threading
@@ -14,7 +15,6 @@ from pyramid.interfaces import ITemplateRenderer
 from pyramid.interfaces import IRendererInfo
 
 from pyramid.asset import asset_spec_from_abspath
-from pyramid.compat import json
 from pyramid.compat import string_types
 from pyramid.compat import text_type
 from pyramid.decorator import reify

@@ -1,7 +1,6 @@
 import optparse
 import sys
 
-from pyramid.compat import print_
 from pyramid.interfaces import IMultiView
 from pyramid.paster import bootstrap
 
@@ -41,7 +40,7 @@ class PViewsCommand(object):
 
     def out(self, msg): # pragma: no cover
         if not self.quiet:
-            print_(msg)
+            print(msg)
     
     def _find_multi_routes(self, mapper, request):
         infos = []

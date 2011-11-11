@@ -13,14 +13,6 @@ try:
 except ImportError: # pragma: no cover
     import pickle
 
-try:
-    import json
-except ImportError: # pragma: no cover
-    try:
-        import simplejson as json
-    except NotImplementedError:
-        from django.utils import simplejson as json # GAE
-
 # True if we are running on Python 3.
 PY3 = sys.version_info[0] == 3
 
@@ -40,11 +32,15 @@ else:
     long = long
 
 def text_(s, encoding='latin-1', errors='strict'):
+    """ If ``s`` is an instance of ``binary_type``, return
+    ``s.encode(encoding, errors)``, otherwise return ``s``"""
     if isinstance(s, binary_type):
         return s.decode(encoding, errors)
     return s # pragma: no cover
 
 def bytes_(s, encoding='latin-1', errors='strict'):
+    """ If ``s`` is an instance of ``text_type``, return
+    ``s.encode(encoding, errors)``, otherwise return ``s``"""
     if isinstance(s, text_type):
         return s.encode(encoding, errors)
     return s
@@ -60,16 +56,37 @@ else:
             s = s.encode('ascii')
         return str(s)
 
+ascii_native_.__doc__ = """
+Python 3: If ``s`` is an instance of ``text_type``, return
+``s.encode('ascii')``, otherwise return ``str(s, 'ascii', 'strict')``
+
+Python 2: If ``s`` is an instance of ``text_type``, return
+``s.encode('ascii')``, otherwise return ``str(s)``
+"""
+
+
 if PY3: # pragma: no cover
     def native_(s, encoding='latin-1', errors='strict'):
+        """ If ``s`` is an instance of ``text_type``, return
+        ``s``, otherwise return ``str(s, encoding, errors)``"""
         if isinstance(s, text_type):
             return s
         return str(s, encoding, errors)
 else:
     def native_(s, encoding='latin-1', errors='strict'):
+        """ If ``s`` is an instance of ``text_type``, return
+        ``s.encode(encoding, errors)``, otherwise return ``str(s)``"""
         if isinstance(s, text_type):
             return s.encode(encoding, errors)
         return str(s)
+
+native_.__doc__ = """
+Python 3: If ``s`` is an instance of ``text_type``, return ``s``, otherwise
+return ``str(s, encoding, errors)``
+
+Python 2: If ``s`` is an instance of ``text_type``, return
+``s.encode(encoding, errors)``, otherwise return ``str(s)``
+"""
 
 if PY3: # pragma: no cover
     from urllib import parse
@@ -108,7 +125,6 @@ if PY3: # pragma: no cover
         raise value
 
 
-    print_ = getattr(builtins, "print")
     del builtins
 
 else: # pragma: no cover
@@ -129,51 +145,6 @@ else: # pragma: no cover
     raise tp, value, tb
 """)
 
-
-    def print_(*args, **kwargs):
-        """The new-style print function."""
-        fp = kwargs.pop("file", sys.stdout)
-        if fp is None:
-            return
-        def write(data):
-            if not isinstance(data, basestring):
-                data = str(data)
-            fp.write(data)
-        want_unicode = False
-        sep = kwargs.pop("sep", None)
-        if sep is not None:
-            if isinstance(sep, unicode):
-                want_unicode = True
-            elif not isinstance(sep, str):
-                raise TypeError("sep must be None or a string")
-        end = kwargs.pop("end", None)
-        if end is not None:
-            if isinstance(end, unicode):
-                want_unicode = True
-            elif not isinstance(end, str):
-                raise TypeError("end must be None or a string")
-        if kwargs:
-            raise TypeError("invalid keyword arguments to print()")
-        if not want_unicode:
-            for arg in args:
-                if isinstance(arg, unicode):
-                    want_unicode = True
-                    break
-        if want_unicode:
-            newline = unicode("\n")
-            space = unicode(" ")
-        else:
-            newline = "\n"
-            space = " "
-        if sep is None:
-            sep = space
-        if end is None:
-            end = newline
-        for i, arg in enumerate(args):
-            if i:
-                write(sep)
-            write(arg)
-        write(end)
 
 if PY3: # pragma: no cover
     def iteritems_(d):

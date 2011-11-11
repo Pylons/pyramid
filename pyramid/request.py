@@ -1,3 +1,5 @@
+import json
+
 from zope.deprecation import deprecate
 from zope.deprecation.deprecation import deprecated
 from zope.interface import implementer
@@ -10,12 +12,10 @@ from pyramid.interfaces import IResponse
 from pyramid.interfaces import ISessionFactory
 from pyramid.interfaces import IResponseFactory
 
-from pyramid.compat import json
 from pyramid.compat import iterkeys_, itervalues_, iteritems_
 from pyramid.compat import text_
 from pyramid.compat import bytes_
 from pyramid.compat import native_
-from pyramid.exceptions import ConfigurationError
 from pyramid.decorator import reify
 from pyramid.response import Response
 from pyramid.url import URLMethodsMixin

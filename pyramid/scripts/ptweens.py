@@ -7,8 +7,6 @@ from pyramid.tweens import MAIN
 from pyramid.tweens import INGRESS
 from pyramid.paster import bootstrap
 
-from pyramid.compat import print_
-
 def main(argv=sys.argv, quiet=False):
     command = PTweensCommand(argv, quiet)
     command.run()
@@ -49,7 +47,7 @@ class PTweensCommand(object):
 
     def out(self, msg): # pragma: no cover
         if not self.quiet:
-            print_(msg)
+            print(msg)
 
     def show_chain(self, chain):
         fmt = '%-10s  %-65s'

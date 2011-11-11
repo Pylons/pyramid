@@ -6,6 +6,9 @@ Features
 
 - Python 3.2 compatibility.
 
+- New ``pyramid.compat`` module and API documentation which provides Python
+  2/3 straddling support for Pyramid add-ons and development environments.
+
 - A ``mako.directories`` setting is no longer required to use Mako templates
   Rationale: Mako template renderers can be specified using an absolute asset
   spec.  An entire application can be written with such asset specs,

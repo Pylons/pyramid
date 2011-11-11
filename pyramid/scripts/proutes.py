@@ -1,7 +1,6 @@
 import optparse
 import sys
 
-from pyramid.compat import print_
 from pyramid.paster import bootstrap
 
 def main(argv=sys.argv, quiet=False):
@@ -42,7 +41,7 @@ class PRoutesCommand(object):
 
     def out(self, msg): # pragma: no cover
         if not self.quiet:
-            print_(msg)
+            print(msg)
     
     def run(self, quiet=False):
         if not self.args:

@@ -1,5 +1,4 @@
 import unittest
-from pyramid.compat import print_
 
 if 0:
     # no released version of manuel actually works with :lineno:
@@ -32,5 +31,5 @@ if 0:
                     if filename.endswith('.rst'):
                         docs.append(os.path.join(root, filename))
 
-            print_(path)
+            print(path)
             return manuel.testing.TestSuite(m, *docs)
