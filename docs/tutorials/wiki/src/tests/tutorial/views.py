@@ -5,16 +5,16 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.view import view_config
 from pyramid.security import authenticated_userid
 
-from tutorial.models import Page
+from .models import Page
 
 # regular expression used to find WikiWords
 wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
 
-@view_config(context='tutorial.models.Wiki', permission='view')
+@view_config(context='.models.Wiki', permission='view')
 def view_wiki(context, request):
     return HTTPFound(location=request.resource_url(context, 'FrontPage'))
 
-@view_config(context='tutorial.models.Page',
+@view_config(context='.models.Page',
              renderer='templates/view.pt', permission='view')
 def view_page(context, request):
     wiki = context.__parent__
@@ -38,7 +38,7 @@ def view_page(context, request):
     return dict(page = context, content = content, edit_url = edit_url,
                 logged_in = logged_in)
 
-@view_config(name='add_page', context='tutorial.models.Wiki',
+@view_config(name='add_page', context='.models.Wiki',
              renderer='templates/edit.pt',
              permission='edit')
 def add_page(context, request):
@@ -59,7 +59,7 @@ def add_page(context, request):
 
     return dict(page = page, save_url = save_url, logged_in = logged_in)
 
-@view_config(name='edit_page', context='tutorial.models.Page',
+@view_config(name='edit_page', context='.models.Page',
              renderer='templates/edit.pt',
              permission='edit')
 def edit_page(context, request):
@@ -72,4 +72,3 @@ def edit_page(context, request):
     return dict(page = context,
                 save_url = request.resource_url(context, 'edit_page'),
                 logged_in = logged_in)
-    

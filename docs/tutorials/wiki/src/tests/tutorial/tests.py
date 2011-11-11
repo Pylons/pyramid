@@ -5,7 +5,7 @@ from pyramid import testing
 class PageModelTests(unittest.TestCase):
 
     def _getTargetClass(self):
-        from tutorial.models import Page
+        from .models import Page
         return Page
 
     def _makeOne(self, data=u'some data'):
@@ -18,7 +18,7 @@ class PageModelTests(unittest.TestCase):
 class WikiModelTests(unittest.TestCase):
 
     def _getTargetClass(self):
-        from tutorial.models import Wiki
+        from .models import Wiki
         return Wiki
 
     def _makeOne(self):
@@ -31,7 +31,7 @@ class WikiModelTests(unittest.TestCase):
 
 class AppmakerTests(unittest.TestCase):
     def _callFUT(self, zodb_root):
-        from tutorial.models import appmaker
+        from .models import appmaker
         return appmaker(zodb_root)
 
     def test_it(self):
@@ -42,7 +42,7 @@ class AppmakerTests(unittest.TestCase):
 
 class ViewWikiTests(unittest.TestCase):
     def test_it(self):
-        from tutorial.views import view_wiki
+        from .views import view_wiki
         context = testing.DummyResource()
         request = testing.DummyRequest()
         response = view_wiki(context, request)
@@ -50,7 +50,7 @@ class ViewWikiTests(unittest.TestCase):
 
 class ViewPageTests(unittest.TestCase):
     def _callFUT(self, context, request):
-        from tutorial.views import view_page
+        from .views import view_page
         return view_page(context, request)
 
     def test_it(self):
@@ -76,7 +76,7 @@ class ViewPageTests(unittest.TestCase):
 
 class AddPageTests(unittest.TestCase):
     def _callFUT(self, context, request):
-        from tutorial.views import add_page
+        from .views import add_page
         return add_page(context, request)
 
     def test_it_notsubmitted(self):
@@ -102,7 +102,7 @@ class AddPageTests(unittest.TestCase):
 
 class EditPageTests(unittest.TestCase):
     def _callFUT(self, context, request):
-        from tutorial.views import edit_page
+        from .views import edit_page
         return edit_page(context, request)
 
     def test_it_notsubmitted(self):
@@ -133,7 +133,7 @@ class FunctionalTests(unittest.TestCase):
     def setUp(self):
         import tempfile
         import os.path
-        from tutorial import main
+        from . import main
         self.tmpdir = tempfile.mkdtemp()
 
         dbpath = os.path.join( self.tmpdir, 'test.db')

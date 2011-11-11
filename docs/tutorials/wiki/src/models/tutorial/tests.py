@@ -5,7 +5,7 @@ from pyramid import testing
 class PageModelTests(unittest.TestCase):
 
     def _getTargetClass(self):
-        from tutorial.models import Page
+        from .models import Page
         return Page
 
     def _makeOne(self, data=u'some data'):
@@ -14,11 +14,11 @@ class PageModelTests(unittest.TestCase):
     def test_constructor(self):
         instance = self._makeOne()
         self.assertEqual(instance.data, u'some data')
-        
+
 class WikiModelTests(unittest.TestCase):
 
     def _getTargetClass(self):
-        from tutorial.models import Wiki
+        from .models import Wiki
         return Wiki
 
     def _makeOne(self):
@@ -32,7 +32,7 @@ class WikiModelTests(unittest.TestCase):
 class AppmakerTests(unittest.TestCase):
 
     def _callFUT(self, zodb_root):
-        from tutorial.models import appmaker
+        from .models import appmaker
         return appmaker(zodb_root)
 
     def test_no_app_root(self):
@@ -55,7 +55,7 @@ class ViewTests(unittest.TestCase):
         testing.tearDown()
 
     def test_my_view(self):
-        from tutorial.views import my_view
+        from .views import my_view
         request = testing.DummyRequest()
         info = my_view(request)
         self.assertEqual(info['project'], 'tutorial')

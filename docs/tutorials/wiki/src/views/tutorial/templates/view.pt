@@ -9,13 +9,13 @@
   <meta name="keywords" content="python web application" />
   <meta name="description" content="pyramid web application" />
   <link rel="shortcut icon"
-        href="${request.static_url('tutorial:static/favicon.ico')}" />
+        href="/static/favicon.ico" />
   <link rel="stylesheet"
-        href="${request.static_url('tutorial:static/pylons.css')}"
+        href="/static/pylons.css"
         type="text/css" media="screen" charset="utf-8" />
   <!--[if lte IE 6]>
   <link rel="stylesheet"
-        href="${request.static_url('tutorial:static/ie6.css')}"
+        href="/static/ie6.css"
         type="text/css" media="screen" charset="utf-8" />
   <![endif]-->
 </head>
@@ -25,7 +25,7 @@
       <div class="top-small align-center">
         <div>
           <img width="220" height="50" alt="pyramid"
-        src="${request.static_url('tutorial:static/pyramid-small.png')}" />
+        src="/static/pyramid-small.png" />
         </div>
       </div>
     </div>
