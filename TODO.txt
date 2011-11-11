@@ -6,6 +6,9 @@ Must-Have
 
 - Fix ZODB scaffolding to match ZODB tutorial docs (Ken made relocatable).
 
+- Fix ZODB tutorial docs to match ZODB tutorial code (I removed program name
+  from ``scan``).
+
 - Fix SQLA tutorial (and scaffolding) to match ZODB tutorial.
 
 Nice-to-Have
