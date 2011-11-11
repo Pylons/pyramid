@@ -11,6 +11,6 @@ def main(global_config, **settings):
     """
     config = Configurator(root_factory=root_factory, settings=settings)
     config.add_static_view('static', 'static', cache_max_age=3600)
-    config.scan('tutorial')
+    config.scan()
     return config.make_wsgi_app()
 
