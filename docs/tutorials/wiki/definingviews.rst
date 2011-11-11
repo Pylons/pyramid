@@ -296,9 +296,7 @@ This CSS file will be accessed via
 e.g. ``http://localhost:6543/static/pylons.css`` by virtue of the call to
 ``add_static_view`` directive we've made in the ``__init__.py`` file.  Any
 number and type of static assets can be placed in this directory (or
-subdirectories) and are just referred to by URL or by using the convenience
-method ``static_url`` e.g. ``request.static_url('{{package}}:static/foo.css')``
-within templates.
+subdirectories) and are just referred to by URL.
 
 Viewing the Application in a Browser
 ====================================

@@ -18,8 +18,8 @@ The source code for this tutorial stage can be browsed via
 `http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/models/
 <http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/models/>`_.
 
-Deleting the Database
----------------------
+Delete the Database
+-------------------
 
 In the next step, we're going to remove the ``MyModel`` Python model
 class from our ``models.py`` file.  Since this class is referred to within
@@ -30,8 +30,8 @@ directory before proceeding any further.  It's always fine to do this as long
 as you don't care about the content of the database; the database itself will
 be recreated as necessary.
 
-Making Edits to ``models.py``
------------------------------
+Edit ``models.py``
+------------------
 
 .. note::
 
@@ -73,8 +73,8 @@ front page) into the Wiki within the ``appmaker``.  This will provide
 :term:`traversal` a :term:`resource tree` to work against when it attempts to
 resolve URLs to resources.
 
-Looking at the Result of Our Edits to ``models.py``
----------------------------------------------------
+Look at the Result of Our Edits to ``models.py``
+------------------------------------------------
 
 The result of all of our edits to ``models.py`` will end up looking
 something like this:
@@ -83,8 +83,8 @@ something like this:
    :linenos:
    :language: python
 
-Viewing the Application in a Browser
-------------------------------------
+View the Application in a Browser
+---------------------------------
 
 We can't.  At this point, our system is in a "non-runnable" state; we'll need
 to change view-related files in the next chapter to be able to start the

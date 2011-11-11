@@ -4,7 +4,7 @@ Adding Authorization
 
 Our application currently allows anyone with access to the server to view,
 edit, and add pages to our wiki.  For purposes of demonstration we'll change
-our application to allow people whom are members of a *group* named
+our application to allow people who are members of a *group* named
 ``group:editors`` to add and edit wiki pages but we'll continue allowing
 anyone with access to the server to view pages.  :app:`Pyramid` provides
 facilities for :term:`authorization` and :term:`authentication`.  We'll make
@@ -27,8 +27,8 @@ The source code for this tutorial stage can be browsed via
 `http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/authorization/
 <http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/authorization/>`_.
 
-Adding Authentication and Authorization Policies
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Add Authentication and Authorization Policies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We'll change our package's ``__init__.py`` file to enable an
 ``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy`` to enable
@@ -60,8 +60,12 @@ look like so:
    :linenos:
    :language: python
 
-Adding ``security.py``
-~~~~~~~~~~~~~~~~~~~~~~
+.. note::
+   (Your ``config.scan('tutorial')`` needs the package name you used
+   instead of "tutorial", if you used a different name.)
+
+Add ``security.py``
+~~~~~~~~~~~~~~~~~~~
 
 Add a ``security.py`` module within your package (in the same
 directory as ``__init__.py``, ``views.py``, etc.) with the following
@@ -82,8 +86,8 @@ user and groups sources. Note that the ``editor`` user is a member of the
 ``group:editors`` group in our dummy group data (the ``GROUPS`` data
 structure).
 
-Giving Our Root Resource an ACL
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Give Our Root Resource an ACL
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We need to give our root resource object an :term:`ACL`.  This ACL will be
 sufficient to provide enough information to the :app:`Pyramid` security
@@ -119,8 +123,8 @@ Our resulting ``models.py`` file will now look like so:
    :linenos:
    :language: python
 
-Adding Login and Logout Views
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Add Login and Logout Views
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We'll add a ``login`` view which renders a login form and processes
 the post from the login form, checking credentials.
@@ -157,8 +161,8 @@ login form.  Before being allowed to continue on to the add or edit form, he
 will have to provide credentials that give him permission to add or edit via
 this login form.
 
-Changing Existing Views
-~~~~~~~~~~~~~~~~~~~~~~~
+Change Existing Views
+~~~~~~~~~~~~~~~~~~~~~
 
 Then we need to change each of our ``view_page``, ``edit_page`` and
 ``add_page`` views in ``views.py`` to pass a "logged in" parameter
@@ -184,8 +188,8 @@ template.  For example:
                logged_in = logged_in,
                edit_url = edit_url)
 
-Adding ``permission`` Declarations to our ``view_config`` Decorators
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Add ``permission`` Declarations to our ``view_config`` Decorators
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To protect each of our views with a particular permission, we need to pass a
 ``permission`` argument to each of our :class:`pyramid.view.view_config`
@@ -216,8 +220,8 @@ decorators.  To do so, within ``views.py``:
   function consults the ``GROUPS`` data structure.  This means
   that the ``editor`` user can add and edit pages.
 
-Adding the ``login.pt`` Template
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Add the ``login.pt`` Template
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Add a ``login.pt`` template to your templates directory.  It's
 referred to within the login view we just added to ``login.py``.
@@ -241,8 +245,8 @@ class="app-welcome align-right">`` div:
       <a href="${request.application_url}/logout">Logout</a>
    </span>
 
-Seeing Our Changes To ``views.py`` and our Templates
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+See Our Changes To ``views.py`` and our Templates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Our ``views.py`` module will look something like this when we're done:
 
@@ -262,8 +266,8 @@ Our ``view.pt`` template will look something like this when we're done:
    :linenos:
    :language: xml
 
-Viewing the Application in a Browser
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+View the Application in a Browser
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We can finally examine our application in a browser.  The views we'll try are
 as follows:

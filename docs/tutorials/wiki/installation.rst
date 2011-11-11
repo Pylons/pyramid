@@ -127,8 +127,8 @@ Preparation, Windows
 
 .. _making_a_project:
 
-Making a Project
-================
+Make a Project
+==============
 
 Your next step is to create a project.  :app:`Pyramid` supplies a variety of
 scaffolds to generate sample projects.  For this tutorial, we will use the
@@ -149,14 +149,18 @@ On Windows:
 
    c:\pyramidtut> Scripts\pcreate -s zodb tutorial
 
+.. note:: You don't have to call it `tutorial` -- the code uses
+   relative paths for imports and finding templates and static
+   resources.
+
 .. note:: If you are using Windows, the ``zodb`` scaffold
    doesn't currently deal gracefully with installation into a location
    that contains spaces in the path.  If you experience startup
    problems, try putting both the virtualenv and the project into
    directories that do not contain spaces in their paths.
 
-Installing the Project in "Development Mode"
-============================================
+Install the Project in "Development Mode"
+=========================================
 
 In order to do development on the project easily, you must "register"
 the project as a development egg in your workspace using the
@@ -180,8 +184,8 @@ On Windows:
 
 .. _running_tests:
 
-Running the Tests
-=================
+Run the Tests
+=============
 
 After you've installed the project in development mode, you may run
 the tests for the project.
@@ -198,25 +202,8 @@ On Windows:
 
   c:\pyramidtut\tutorial> ..\Scripts\python setup.py test -q
 
-Starting the Application
-========================
-
-Start the application.
-
-On UNIX:
-
-.. code-block:: text
-
-  $ ../bin/pserve development.ini --reload
-
-On Windows:
-
-.. code-block:: text
-
-  c:\pyramidtut\tutorial> ..\Scripts\pserve development.ini --reload
-
-Exposing Test Coverage Information
-==================================
+Expose Test Coverage Information
+================================
 
 You can run the ``nosetests`` command to see test coverage
 information.  This runs the tests in the same way that ``setup.py
@@ -237,9 +224,31 @@ On Windows:
   c:\pyramidtut\tutorial> ..\Scripts\nosetests --cover-package=tutorial ^
        --cover-erase --with-coverage
 
-Looks like the code in the ``pyramid_zodb`` scaffold for ZODB projects is
+Looks like the code in the ``zodb`` scaffold for ZODB projects is
 missing some test coverage, particularly in the file named
 ``models.py``.
+
+Start the Application
+=====================
+
+Start the application.
+
+On UNIX:
+
+.. code-block:: text
+
+  $ ../bin/pserve development.ini --reload
+
+On Windows:
+
+.. code-block:: text
+
+  c:\pyramidtut\tutorial> ..\Scripts\pserve development.ini --reload
+
+.. note::
+
+   Your OS firewall, if any, may pop up a dialog asking for authorization
+   to allow python to accept incoming network connections.
 
 Visit the Application in a Browser
 ==================================
@@ -252,10 +261,10 @@ page.  You can read more about the purpose of the icon at
 :ref:`debug_toolbar`.  It allows you to get information about your
 application while you develop.
 
-Decisions the ``pyramid_zodb`` Scaffold Has Made For You
-========================================================
+Decisions the ``zodb`` Scaffold Has Made For You
+================================================
 
-Creating a project using the ``pyramid_zodb`` scaffold makes the following
+Creating a project using the ``zodb`` scaffold makes the following
 assumptions:
 
 - you are willing to use :term:`ZODB` as persistent storage
