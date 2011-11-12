@@ -167,7 +167,7 @@ WSGIApplicationCreatedEvent = ApplicationCreated # b/c (as of 1.0)
 @implementer(IBeforeRender)
 class BeforeRender(dict):
     """
-    Subscribers to this event may introspect the and modify the set of
+    Subscribers to this event may introspect and modify the set of
     :term:`renderer globals` before they are passed to a :term:`renderer`.
     This event object iself has a dictionary-like interface that can be used
     for this purpose.  For example::
@@ -185,20 +185,22 @@ class BeforeRender(dict):
     :class:`pyramid.config.Configurator.set_renderer_globals_factory`, if
     any, has injected its own keys into the renderer globals dictionary).
 
-    If a subscriber adds a key via ``__setitem__`` or that already exists in
-    the renderer globals dictionary, it will overwrite an older value that is
-    already in the globals dictionary.  This can be problematic because event
-    subscribers to the BeforeRender event do not possess any relative
-    ordering.  For maximum interoperability with other third-party
-    subscribers, if you write an event subscriber meant to be used as a
-    BeforeRender subscriber, your subscriber code will need to (using
-    ``.get`` or ``__contains__`` of the event object) ensure no value already
-    exists in the renderer globals dictionary before setting an overriding
-    value.
+    If a subscriber adds a key via ``__setitem__`` that already exists in
+    the renderer globals dictionary, it will overwrite the older value there.
+    This can be problematic because event subscribers to the BeforeRender
+    event do not possess any relative ordering.  For maximum interoperability
+    with other third-party subscribers, if you write an event subscriber meant
+    to be used as a BeforeRender subscriber, your subscriber code will need to
+    ensure no value already exists in the renderer globals dictionary before
+    setting an overriding value (which can be done using ``.get`` or
+    ``__contains__`` of the event object).
 
     The event has an additional attribute named ``rendering_val``.  This is
     the (non-system) value returned by a view or passed to ``render*`` as
     ``value``.  This feature is new in Pyramid 1.2.
+    
+    For a description of the values present in the renderer globals dictionary,
+    see :ref:`renderer_system_values`.
 
     See also :class:`pyramid.interfaces.IBeforeRender`.
     """
