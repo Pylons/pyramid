@@ -198,6 +198,9 @@ class BeforeRender(dict):
     The event has an additional attribute named ``rendering_val``.  This is
     the (non-system) value returned by a view or passed to ``render*`` as
     ``value``.  This feature is new in Pyramid 1.2.
+    
+    For a description of the values present in the renderer globals dictionary,
+    see :ref:`renderer_system_values`.
 
     See also :class:`pyramid.interfaces.IBeforeRender`.
     """
