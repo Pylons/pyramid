@@ -344,7 +344,7 @@ class IDict(Interface):
 
 class IBeforeRender(IDict):
     """
-    Subscribers to this event may introspect the and modify the set of
+    Subscribers to this event may introspect and modify the set of
     :term:`renderer globals` before they are passed to a :term:`renderer`.
     The event object itself provides a dictionary-like interface for adding
     and removing :term:`renderer globals`.  The keys and values of the
