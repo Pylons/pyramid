@@ -1,12 +1,10 @@
 from pyramid.config import Configurator
-from myproject.resources import Root
+from .resources import Root
 
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
     config = Configurator(root_factory=Root, settings=settings)
-    config.add_view('myproject.views.my_view',
-                    context='myproject.resources.Root',
-                    renderer='myproject:templates/mytemplate.pt')
-    config.add_static_view('static', 'myproject:static')
+    config.add_static_view('static', 'static', cache_max_age=3600)
+    config.scan()
     return config.make_wsgi_app()

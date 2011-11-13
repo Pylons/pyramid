@@ -727,31 +727,22 @@ also informs Python that the directory which contains it is a *package*.
 #. Line 2 imports the ``Root`` class from :mod:`myproject.resources` that we
    use later.
 
-#. Lines 4-12 define a function named ``main`` that returns a :app:`Pyramid`
+#. Lines 4-10 define a function named ``main`` that returns a :app:`Pyramid`
    WSGI application.  This function is meant to be called by the
    :term:`PasteDeploy` framework as a result of running ``pserve``.
 
    Within this function, application configuration is performed.
 
-   Lines 8-10 register a "default view" (a view that has no ``name``
-   attribute).  It is registered so that it will be found when the
-   :term:`context` of the request is an instance of the
-   :class:`myproject.resources.Root` class.  The first argument to
-   ``add_view`` points at a Python function that does all the work for this
-   view, also known as a :term:`view callable`, via a :term:`dotted Python
-   name`.  The view declaration also names a ``renderer``, which in this case
-   is a template that will be used to render the result of the view callable.
-   This particular view declaration points at
-   ``myproject:templates/mytemplate.pt``, which is a :term:`asset
-   specification` that specifies the ``mytemplate.pt`` file within the
-   ``templates`` directory of the ``myproject`` package.  The template file
-   it actually points to is a :term:`Chameleon` ZPT template file.
+   Line 7 creates an instance of a :term:`Configurator`.
 
-   Line 11 registers a static view, which will serve up the files from the
+   Line 8 registers a static view, which will serve up the files from the
    ``mypackage:static`` :term:`asset specification` (the ``static``
    directory of the ``mypackage`` package).
 
-   Line 12 returns a :term:`WSGI` application to the caller of the function
+   Line 9 calls ``config.scan()``, which picks up view registrations declared
+   elsewhere in the package (in this case, in the ``view.py`` module).
+
+   Line 10 returns a :term:`WSGI` application to the caller of the function
    (Pyramid's pserve).
 
 .. index::
@@ -769,10 +760,20 @@ and which returns a :term:`response`.
    :language: python
    :linenos:
 
-This bit of code was registered as the view callable within ``__init__.py``
-(via ``add_view``).  ``add_view`` said that the default URL for instances
-that are of the class :class:`myproject.resources.Root` should run this
-:func:`myproject.views.my_view` function.
+Lines 4-6 define and register a :term:`view callable` named ``my_view``.  The
+function named ``my_view`` is decorated with a ``view_config`` decorator
+(which is processed by the ``config.scan()`` line in our ``__init__.py``).
+The view_config decorator asserts that this view be found when the
+:term:`context` of the request is an instance of the
+:class:`myproject.resources.Root` class.  The view_config decorator also
+names a ``renderer``, which in this case is a template that will be used to
+render the result of the view callable.  This particular view declaration
+points at ``templates/mytemplate.pt``, which is a :term:`asset specification`
+that specifies the ``mytemplate.pt`` file within the ``templates`` directory
+of the ``myproject`` package.  The asset specification could have also been
+specified as ``myproject:templates/mytemplate.pt``; the leading package name
+and colon is optional.  The template file it actually points to is a
+:term:`Chameleon` ZPT template file.
 
 This view callable function is handed a single piece of information: the
 :term:`request`.  The *request* is an instance of the :term:`WebOb`
@@ -839,11 +840,11 @@ template.  It includes CSS and images.
 ``templates/mytemplate.pt``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The single :term:`Chameleon` template that exists in the project.  Its contents
-are too long to show here, but it displays a default page when rendered.  It
-is referenced by the call to ``add_view`` as the ``renderer`` attribute in
-the ``__init__`` file.  See :ref:`views_which_use_a_renderer` for more
-information about renderers.
+The single :term:`Chameleon` template that exists in the project.  Its
+contents are too long to show here, but it displays a default page when
+rendered.  It is referenced by the call to ``@view_config`` as the
+``renderer`` of the ``my_view`` view callable in the ``views.py`` file.  See
+:ref:`views_which_use_a_renderer` for more information about renderers.
 
 Templates are accessed and used by view configurations and sometimes by view
 functions themselves.  See :ref:`templates_used_directly` and
