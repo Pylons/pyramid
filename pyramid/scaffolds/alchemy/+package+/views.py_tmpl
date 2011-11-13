@@ -1,5 +1,7 @@
-def view_root(context, request):
-    return {'items':list(context), 'project':'{{project}}'}
+from {{package}}.models import DBSession
+from {{package}}.models import MyModel
 
-def view_model(context, request):
-    return {'item':context, 'project':'{{project}}'}
+def my_view(request):
+    dbsession = DBSession()
+    root = dbsession.query(MyModel).filter(MyModel.name=='root').first()
+    return {'root':root, 'project':'{{project}}'}

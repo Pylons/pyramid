@@ -9,7 +9,9 @@ Must-Have
 
 - Fix SQLA tutorial to match ZODB tutorial.
 
-- Fix other scaffolds to match ZODB scaffold.
+- Fix routesalchemy scaffold to match ZODB scaffold.
+
+- Remove alchemy scaffold.
 
 Nice-to-Have
 ------------

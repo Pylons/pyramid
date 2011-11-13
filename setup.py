@@ -87,7 +87,6 @@ setup(name='pyramid',
         [pyramid.scaffold]
         starter=pyramid.scaffolds:StarterProjectTemplate
         zodb=pyramid.scaffolds:ZODBProjectTemplate
-        routesalchemy=pyramid.scaffolds:RoutesAlchemyProjectTemplate
         alchemy=pyramid.scaffolds:AlchemyProjectTemplate
         [console_scripts]
         bfg2pyramid = pyramid.fixers.fix_bfg_imports:main

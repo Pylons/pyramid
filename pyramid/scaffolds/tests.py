@@ -66,7 +66,7 @@ class TemplateTest(object):
             os.chdir(self.old_cwd)
 
 if __name__ == '__main__':     # pragma: no cover
-    templates = ['starter', 'alchemy', 'routesalchemy',]
+    templates = ['starter', 'alchemy',]
 
     if sys.version_info >= (2, 6) and sys.version_info < (3, 0):
         templates.append('zodb')

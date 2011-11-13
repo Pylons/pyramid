@@ -28,13 +28,9 @@ class StarterProjectTemplate(PyramidTemplate):
 
 class ZODBProjectTemplate(PyramidTemplate):
     _template_dir = 'zodb'
-    summary = 'Pyramid ZODB starter project'
-
-class RoutesAlchemyProjectTemplate(PyramidTemplate):
-    _template_dir = 'routesalchemy'
-    summary = 'Pyramid SQLAlchemy project using url dispatch (no traversal)'
+    summary = 'Pyramid ZODB project using traversal'
 
 class AlchemyProjectTemplate(PyramidTemplate):
     _template_dir = 'alchemy'
-    summary = 'Pyramid SQLAlchemy project using traversal'
+    summary = 'Pyramid SQLAlchemy project using url dispatch'
 

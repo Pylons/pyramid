@@ -28,7 +28,6 @@ as part of Pyramid.
    single: starter scaffold
    single: zodb scaffold
    single: alchemy scaffold
-   single: routesalchemy scaffold
 
 .. _additional_paster_scaffolds:
 
@@ -52,12 +51,8 @@ The included scaffolds are these:
 ``zodb``
   URL mapping via :term:`traversal` and persistence via :term:`ZODB`.
 
-``routesalchemy``
-  URL mapping via :term:`URL dispatch` and persistence via
-  :term:`SQLAlchemy`
-
 ``alchemy``
-  URL mapping via :term:`traversal` and persistence via
+  URL mapping via :term:`URL dispatch` and persistence via
   :term:`SQLAlchemy`
 
 .. note::
@@ -99,18 +94,18 @@ Or on Windows:
 
 The above command uses the ``pcreate`` command to create a project with the
 ``starter`` scaffold.  To use a different scaffold, such as
-``routesalchemy``, you'd just change the ``-s`` argument value.  For example,
+``alchemy``, you'd just change the ``-s`` argument value.  For example,
 on UNIX:
 
 .. code-block:: text
 
-   $ bin/pcreate -s routesalchemy MyProject
+   $ bin/pcreate -s alchemy MyProject
 
 Or on Windows:
 
 .. code-block:: text
 
-   $ Scripts\pcreate routesalchemy MyProject
+   $ Scripts\pcreate alchemy MyProject
 
 Here's sample output from a run of ``pcreate`` on UNIX for a project we name
 ``MyProject``:

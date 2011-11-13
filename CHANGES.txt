@@ -67,3 +67,13 @@ Dependencies
 - Pyramid no longer depends on the Paste or PasteScript packages.
 
 
+Scaffolds
+---------
+
+- Rendered scaffolds have now been changed to be more relocatable (fewer
+  mentions of the package name within files in the package).
+
+- The ``alchemy`` scaffold has been removed.
+
+- The ``routesalchemy`` scaffold has been renamed ``alchemy``.
+
