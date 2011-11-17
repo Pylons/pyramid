@@ -43,6 +43,18 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(len(L), 3)
         self.assertEqual(L[-1].split(), ['a', '/a', '<unknown>'])
 
+    def test_route_with_no_slash_prefix(self):
+        command = self._makeOne()
+        route = dummy.DummyRoute('a', 'a')
+        mapper = dummy.DummyMapper(route)
+        command._get_mapper = lambda *arg: mapper
+        L = []
+        command.out = L.append
+        result = command.run()
+        self.assertEqual(result, None)
+        self.assertEqual(len(L), 3)
+        self.assertEqual(L[-1].split(), ['a', '/a', '<unknown>'])
+
     def test_single_route_no_views_registered(self):
         from zope.interface import Interface
         from pyramid.registry import Registry
