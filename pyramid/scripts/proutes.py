@@ -64,14 +64,17 @@ class PRoutesCommand(object):
             self.out(
                 fmt % ('-'*len('Name'), '-'*len('Pattern'), '-'*len('View')))
             for route in routes:
+                pattern = route.pattern
+                if not pattern.startswith('/'):
+                    pattern = '/' + pattern
                 request_iface = registry.queryUtility(IRouteRequest,
                                                       name=route.name)
                 view_callable = None
                 if (request_iface is None) or (route.factory is not None):
-                    self.out(fmt % (route.name, route.pattern, '<unknown>'))
+                    self.out(fmt % (route.name, pattern, '<unknown>'))
                 else:
                     view_callable = registry.adapters.lookup(
                         (IViewClassifier, request_iface, Interface),
                         IView, name='', default=None)
-                    self.out(fmt % (route.name, route.pattern, view_callable))
+                    self.out(fmt % (route.name, pattern, view_callable))
 
