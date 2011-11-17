@@ -162,6 +162,11 @@ class TestPackageName(unittest.TestCase):
     def test_it_None(self):
         result = self._callFUT(None)
         self.assertEqual(result, '__main__')
+
+    def test_it_main(self):
+        import __main__
+        result = self._callFUT(__main__)
+        self.assertEqual(result, '__main__')
     
 class DummyPackageOrModule:
     def __init__(self, real_package_or_module, raise_exc=None):
