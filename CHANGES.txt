@@ -34,7 +34,8 @@ Bug Fixes
   one doesn't yet exist.
 
 - ``request.static_url`` now generates URL-quoted URLs when fed a ``path``
-  argument which contains characters that are unsuitable for URLs.
+  argument which contains characters that are unsuitable for URLs.  See
+  https://github.com/Pylons/pyramid/issues/349 for more info.
 
 Backwards Incompatibilities
 ---------------------------
