@@ -489,7 +489,7 @@ def traversal_path_info(path):
     """
     try:
         path = path.decode('utf-8')
-    except UnicodeDecodeError as e:
+    except UnicodeDecodeError, e:
         raise URLDecodeError(e.encoding, e.object, e.start, e.end, e.reason)
     path = path.strip('/')
     clean = []

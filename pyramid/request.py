@@ -365,7 +365,7 @@ class Request(BaseRequest, DeprecatedRequestMethodsMixin, URLMethodsMixin,
 
     @property
     def json_body(self):
-        return json.loads(self.body, encoding=self.charset)
+        return json.loads(self.body.decode(self.charset))
 
 def route_request_iface(name, bases=()):
     # zope.interface treats the __name__ as the __doc__ and changes __name__

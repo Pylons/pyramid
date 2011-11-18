@@ -1,6 +1,7 @@
 import inspect
 from urlparse import urljoin
 from urlparse import urlparse
+import urllib
 
 from zope.interface import Interface
 from zope.interface import classProvides
@@ -1421,7 +1422,7 @@ class StaticURLInfo(object):
             registry = get_current_registry()
         for (url, spec, route_name) in self._get_registrations(registry):
             if path.startswith(spec):
-                subpath = path[len(spec):]
+                subpath = urllib.quote(path[len(spec):])
                 if url is None:
                     kw['subpath'] = subpath
                     return request.route_url(route_name, **kw)

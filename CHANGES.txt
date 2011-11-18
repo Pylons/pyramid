@@ -18,6 +18,19 @@ Bug Fixes
   and can still be used when a path is encoded.  See
   https://github.com/Pylons/pyramid/issues/349 for more information.
 
+- Backport fix from master: ``request.static_url`` now generates URL-quoted
+  URLs when fed a ``path`` argument which contains characters that are
+  unsuitable for URLs.  See https://github.com/Pylons/pyramid/issues/349 for
+  more information.
+
+- Backport from master: fix ``request.json_body`` to deal with alternate
+  request charsets.
+
+Testing
+-------
+
+- Make tox use WebOb 1.1 for Python 2.5-based systems (WebOb 1.2 is 2.6+).
+
 1.2.1 (2011-09-28)
 ==================
 

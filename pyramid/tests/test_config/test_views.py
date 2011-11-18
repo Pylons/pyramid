@@ -3346,6 +3346,27 @@ class TestStaticURLInfo(unittest.TestCase):
         result = inst.generate('package:path/abc', request, a=1)
         self.assertEqual(result, 'url')
 
+    def test_generate_url_quoted_local(self):
+        inst = self._makeOne()
+        registrations = [(None, 'package:path/', '__viewname/')]
+        inst._get_registrations = lambda *x: registrations
+        def route_url(n, **kw):
+            self.assertEqual(n, '__viewname/')
+            self.assertEqual(kw, {'subpath':'abc%20def', 'a':1})
+            return 'url'
+        request = self._makeRequest()
+        request.route_url = route_url
+        result = inst.generate('package:path/abc def', request, a=1)
+        self.assertEqual(result, 'url')
+
+    def test_generate_url_quoted_remote(self):
+        inst = self._makeOne()
+        registrations = [('http://example.com/', 'package:path/', None)]
+        inst._get_registrations = lambda *x: registrations
+        request = self._makeRequest()
+        result = inst.generate('package:path/abc def', request, a=1)
+        self.assertEqual(result, 'http://example.com/abc%20def')
+
     def test_add_already_exists(self):
         inst = self._makeOne()
         config = self._makeConfig(
