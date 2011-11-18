@@ -43,7 +43,8 @@ class _FileResponse(Response):
     def __init__(self, path, cache_max_age):
         super(_FileResponse, self).__init__(conditional_response=True)
         self.last_modified = getmtime(path)
-        content_type, content_encoding = mimetypes.guess_type(path, strict=False)
+        content_type, content_encoding = mimetypes.guess_type(path,
+                                                              strict=False)
         if content_type is None:
             content_type = 'application/octet-stream'
         self.content_type = content_type
