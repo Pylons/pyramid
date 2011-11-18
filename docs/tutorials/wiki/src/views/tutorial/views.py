@@ -13,8 +13,7 @@ wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
 def view_wiki(context, request):
     return HTTPFound(location=request.resource_url(context, 'FrontPage'))
 
-@view_config(context='.models.Page',
-             renderer='templates/view.pt')
+@view_config(context='.models.Page', renderer='templates/view.pt')
 def view_page(context, request):
     wiki = context.__parent__
 

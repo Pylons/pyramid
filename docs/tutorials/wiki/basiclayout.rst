@@ -45,16 +45,19 @@ point happens to be the ``main`` function within the file named
    ``http://localhost:6543/static/`` and below.  The first argument is the
    "name" ``static``, which indicates that the URL path prefix of the view
    will be ``/static``.  the The second argument of this tag is the "path",
-   which is an :term:`asset specification`, so it finds the resources it
-   should serve within the ``static`` directory inside the ``tutorial``
-   package.
+   which is a relative :term:`asset specification`, so it finds the resources
+   it should serve within the ``static`` directory inside the ``tutorial``
+   package.  The scaffold could have alternately used an *absolute* asset
+   specification as the path (``tutorial:static``) but it does not.
 
 #. *Line 14*.  Perform a :term:`scan`.  A scan will find :term:`configuration
-   decoration`, such as view configuration decorators
-   (e.g. ``@view_config``) in the source code of the ``tutorial`` package and
-   will take actions based on these decorators.  The argument to
-   :meth:`~pyramid.config.Configurator.scan` is the package name to scan,
-   which is ``tutorial``.
+   decoration`, such as view configuration decorators (e.g. ``@view_config``)
+   in the source code of the ``tutorial`` package and will take actions based
+   on these decorators.  We don't pass any arguments to
+   :meth:`~pyramid.config.Configurator.scan`, which implies that the scan
+   should take place in the current package (in this case, ``tutorial``).
+   The scaffold could have equivalently said ``config.scan('tutorial')`` but
+   it chose to omit the package name argument.
 
 #. *Line 15*.  Use the
    :meth:`pyramid.config.Configurator.make_wsgi_app` method
@@ -119,7 +122,7 @@ Let's try to understand the components in this module:
    decoration` to perform a :term:`view configuration` registration.  This
    view configuration registration will be activated when the application is
    started.  It will be activated by virtue of it being found as the result
-   of a :term:`scan` (when Line 17 of ``__init__.py`` is run).
+   of a :term:`scan` (when Line 14 of ``__init__.py`` is run).
 
    The ``@view_config`` decorator accepts a number of keyword arguments.  We
    use two keyword arguments here: ``context`` and ``renderer``.
@@ -131,12 +134,15 @@ Let's try to understand the components in this module:
    model, this view callable will be invoked.
 
    The ``renderer`` argument names an :term:`asset specification` of
-   ``tutorial:templates/mytemplate.pt``.  This asset specification points at
-   a :term:`Chameleon` template which lives in the ``mytemplate.pt`` file
+   ``templates/mytemplate.pt``.  This asset specification points at a
+   :term:`Chameleon` template which lives in the ``mytemplate.pt`` file
    within the ``templates`` directory of the ``tutorial`` package.  And
    indeed if you look in the ``templates`` directory of this package, you'll
    see a ``mytemplate.pt`` template file, which renders the default home page
-   of the generated project.
+   of the generated project.  This asset specification is *relative* (to the
+   view.py's current package).  We could have alternately an used the
+   absolute asset specification ``tutorial:templates/mytemplate.pt``, but
+   chose to use the relative version.
 
    Since this call to ``@view_config`` doesn't pass a ``name`` argument, the
    ``my_view`` function which it decorates represents the "default" view

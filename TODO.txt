@@ -4,9 +4,6 @@ Pyramid TODOs
 Must-Have
 ---------
 
-- Fix ZODB tutorial docs to match ZODB tutorial code (I removed program name
-  from ``scan``).
-
 - Fix SQLA tutorial to match ZODB tutorial.
 
 - Fix routesalchemy scaffold to match ZODB scaffold.

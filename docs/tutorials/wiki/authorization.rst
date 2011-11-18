@@ -42,7 +42,7 @@ declarative security checking. We need to import the new policies:
 Then, we'll add those policies to the configuration:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 20-25
+   :lines: 17-22
    :linenos:
    :language: python
 
@@ -60,10 +60,6 @@ look like so:
    :linenos:
    :language: python
 
-.. note::
-   (Your ``config.scan('tutorial')`` needs the package name you used
-   instead of "tutorial", if you used a different name.)
-
 Add ``security.py``
 ~~~~~~~~~~~~~~~~~~~
 
@@ -77,14 +73,13 @@ content:
 
 The ``groupfinder`` function defined here is an :term:`authentication policy`
 "callback"; it is a callable that accepts a userid and a request.  If the
-userid exists in the system, the callback will
-return a sequence of group identifiers (or an empty sequence if the user
-isn't a member of any groups).  If the userid *does not* exist in the system,
-the callback will return ``None``.  In a production system, user and group data will
-most often come from a database, but here we use "dummy" data to represent
-user and groups sources. Note that the ``editor`` user is a member of the
-``group:editors`` group in our dummy group data (the ``GROUPS`` data
-structure).
+userid exists in the system, the callback will return a sequence of group
+identifiers (or an empty sequence if the user isn't a member of any groups).
+If the userid *does not* exist in the system, the callback will return
+``None``.  In a production system, user and group data will most often come
+from a database, but here we use "dummy" data to represent user and groups
+sources. Note that the ``editor`` user is a member of the ``group:editors``
+group in our dummy group data (the ``GROUPS`` data structure).
 
 Give Our Root Resource an ACL
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
