@@ -61,10 +61,10 @@ In order to add a feature to Pyramid:
 
 - The feature must work on the latest version of PyPy.
 
-- The feature must not cause installation or runtime failure on Jython
-  or App Engine.  If it doesn't cause installation or runtime failure,
-  but doesn't actually *work* on these platforms, that caveat should be
-  spelled out in the documentation.
+- The feature must not cause installation or runtime failure on App Engine.
+  If it doesn't cause installation or runtime failure, but doesn't actually
+  *work* on these platforms, that caveat should be spelled out in the
+  documentation.
 
 - The feature must not depend on any particular persistence layer
   (filesystem, SQL, etc).
