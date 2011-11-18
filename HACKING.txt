@@ -121,6 +121,16 @@ Documentation Coverage
   that API or behavior must change to reflect the bug fix, ideally in
   the same commit that fixes the bug or adds the feature.
 
+- To build and review docs:
+
+  1. Install ``tests_require`` dependencies from Pyramid's setup.py into your
+     virtualenv.
+
+  2. From the ``docs`` directory of the Pyramid checkout run ``make html
+     SPHINXBUILD=/path/to/your/virtualenv/bin/sphinx-build``.
+
+  3.  Open the _build/html/index.html file to see the resulting rendering.
+
 Change Log
 ----------
 
