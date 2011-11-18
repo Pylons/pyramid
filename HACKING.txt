@@ -73,10 +73,10 @@ In order to add a feature to Pyramid:
   "unnecessary" is of course subjective, but new dependencies should
   be discussed).
 
-The above requirements are relaxed for paster template dependencies.
-If a paster template has an install-time dependency on something that
-doesn't work on a particular platform, that caveat should be spelled
-out clearly in *its* documentation (within its ``docs/`` directory).
+The above requirements are relaxed for scaffolding dependencies.  If a
+scaffold has an install-time dependency on something that doesn't work on a
+particular platform, that caveat should be spelled out clearly in *its*
+documentation (within its ``docs/`` directory).
 
 Coding Style
 ------------
