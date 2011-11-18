@@ -81,9 +81,9 @@ class Test_aslist_cronly(unittest.TestCase):
         self.assertEqual(result, ['abc', 'def'])
 
 class Test_aslist(unittest.TestCase):
-    def _callFUT(self, val):
+    def _callFUT(self, val, **kw):
         from pyramid.settings import aslist
-        return aslist(val)
+        return aslist(val, **kw)
 
     def test_with_list(self):
         result = self._callFUT(['abc', 'def'])
@@ -100,3 +100,7 @@ class Test_aslist(unittest.TestCase):
     def test_with_string_crsep_spacesep(self):
         result = self._callFUT(' abc\n def ghi')
         self.assertEqual(result, ['abc', 'def', 'ghi'])
+
+    def test_with_string_crsep_spacesep_no_flatten(self):
+        result = self._callFUT(' abc\n def ghi ', flatten=False)
+        self.assertEqual(result, ['abc', 'def ghi'])
