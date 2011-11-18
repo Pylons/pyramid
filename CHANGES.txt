@@ -33,6 +33,9 @@ Bug Fixes
 - The DummySession in ``pyramid.testing`` now generates a new CSRF token if
   one doesn't yet exist.
 
+- ``request.static_url`` now generates URL-quoted URLs when fed a ``path``
+  argument which contains characters that are unsuitable for URLs.
+
 Backwards Incompatibilities
 ---------------------------
 

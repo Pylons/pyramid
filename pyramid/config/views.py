@@ -30,6 +30,7 @@ from pyramid import renderers
 from pyramid.compat import string_types
 from pyramid.compat import urlparse
 from pyramid.compat import im_func
+from pyramid.compat import url_quote
 from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import PredicateMismatch
 from pyramid.httpexceptions import HTTPForbidden
@@ -1429,7 +1430,7 @@ class StaticURLInfo(object):
             registry = get_current_registry()
         for (url, spec, route_name) in self._get_registrations(registry):
             if path.startswith(spec):
-                subpath = path[len(spec):]
+                subpath = url_quote(path[len(spec):])
                 if url is None:
                     kw['subpath'] = subpath
                     return request.route_url(route_name, **kw)
