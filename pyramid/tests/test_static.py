@@ -160,6 +160,24 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         response = inst(context, request)
         self.assertEqual(response.status, '404 Not Found')
 
+    def test_resource_with_content_encoding(self):
+        inst = self._makeOne('pyramid.tests:fixtures/static')
+        request = self._makeRequest({'PATH_INFO':'/arcs.svg.tgz'})
+        context = DummyContext()
+        response = inst(context, request)
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(response.content_type, 'application/x-tar')
+        self.assertEqual(response.content_encoding, 'gzip')
+
+    def test_resource_no_content_encoding(self):
+        inst = self._makeOne('pyramid.tests:fixtures/static')
+        request = self._makeRequest({'PATH_INFO':'/index.html'})
+        context = DummyContext()
+        response = inst(context, request)
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(response.content_type, 'text/html')
+        self.assertEqual(response.content_encoding, None)
+
 class Test_static_view_use_subpath_True(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.static import static_view
