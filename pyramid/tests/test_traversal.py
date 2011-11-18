@@ -2,10 +2,10 @@ import unittest
 
 from pyramid.testing import cleanUp
 
-class TraversalPathTests(unittest.TestCase):
+class TraversalPathInfoTests(unittest.TestCase):
     def _callFUT(self, path):
-        from pyramid.traversal import traversal_path
-        return traversal_path(path)
+        from pyramid.traversal import traversal_path_info
+        return traversal_path_info(path)
 
     def test_path_startswith_endswith(self):
         self.assertEqual(self._callFUT('/foo/'), (u'foo',))
@@ -24,7 +24,7 @@ class TraversalPathTests(unittest.TestCase):
 
     def test_element_urllquoted(self):
         self.assertEqual(self._callFUT('/foo/space%20thing/bar'),
-                         (u'foo', u'space thing', u'bar'))
+                         (u'foo', u'space%20thing', u'bar'))
 
     def test_segments_are_unicode(self):
         result = self._callFUT('/foo/bar')
@@ -38,6 +38,44 @@ class TraversalPathTests(unittest.TestCase):
         self.assertEqual(result2, (u'foo', u'bar'))
 
     def test_utf8(self):
+        la = 'La Pe\xc3\xb1a'
+        decoded = unicode(la, 'utf-8')
+        path = '/'.join([la, la])
+        self.assertEqual(self._callFUT(path), (decoded, decoded))
+
+    def test_utf16(self):
+        from pyramid.exceptions import URLDecodeError
+        la = unicode('La Pe\xc3\xb1a', 'utf-8').encode('utf-16')
+        path = '/'.join([la, la])
+        self.assertRaises(URLDecodeError, self._callFUT, path)
+
+    def test_unicode_highorder_chars(self):
+        path = '/\xe6\xb5\x81\xe8\xa1\x8c\xe8\xb6\x8b\xe5\x8a\xbf'
+        self.assertEqual(self._callFUT(path), (u'\u6d41\u884c\u8d8b\u52bf',))
+
+    def test_unicode_simple(self):
+        path = u'/abc'
+        self.assertEqual(self._callFUT(path), (u'abc',))
+
+    def test_unicode_undecodeable_to_ascii(self):
+        path = unicode('/La Pe\xc3\xb1a', 'utf-8')
+        self.assertRaises(UnicodeEncodeError, self._callFUT, path)
+
+class TraversalPathTests(unittest.TestCase):
+    def _callFUT(self, path):
+        from pyramid.traversal import traversal_path
+        return traversal_path(path)
+
+    def test_element_urllquoted(self):
+        self.assertEqual(self._callFUT('/foo/space%20thing/bar'),
+                         (u'foo', u'space thing', u'bar'))
+
+    def test_segments_are_unicode(self):
+        result = self._callFUT('/foo/bar')
+        self.assertEqual(type(result[0]), unicode)
+        self.assertEqual(type(result[1]), unicode)
+
+    def test_utf8(self):
         import urllib
         la = 'La Pe\xc3\xb1a'
         encoded = urllib.quote(la)
@@ -46,8 +84,8 @@ class TraversalPathTests(unittest.TestCase):
         self.assertEqual(self._callFUT(path), (decoded, decoded))
 
     def test_utf16(self):
-        from pyramid.exceptions import URLDecodeError
         import urllib
+        from pyramid.exceptions import URLDecodeError
         la = unicode('La Pe\xc3\xb1a', 'utf-8').encode('utf-16')
         encoded = urllib.quote(la)
         path = '/'.join([encoded, encoded])

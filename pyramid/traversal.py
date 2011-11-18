@@ -407,26 +407,39 @@ def virtual_root(resource, request):
         urlgenerator = TraversalContextURL(resource, request)
     return urlgenerator.virtual_root()
 
-@lru_cache(1000)
 def traversal_path(path):
-    """ Given a ``PATH_INFO`` string (slash-separated path segments),
-    return a tuple representing that path which can be used to
-    traverse a resource tree.
+    """ Variant of :func:`pyramid.traversal.traversal_path_info` suitable for
+    decoding paths that are URL-encoded (traversal_path_info does not decode
+    URL-encoded paths).
 
-    The ``PATH_INFO`` is split on slashes, creating a list of
-    segments.  Each segment is URL-unquoted, and subsequently decoded
-    into Unicode. Each segment is assumed to be encoded using the
-    UTF-8 encoding (or a subset, such as ASCII); a
-    :exc:`pyramid.exceptions.URLDecodeError` is raised if a segment
-    cannot be decoded.  If a segment name is empty or if it is ``.``,
-    it is ignored.  If a segment name is ``..``, the previous segment
-    is deleted, and the ``..`` is ignored.
+    If this function is passed a Unicode object instead of a string, that
+    Unicode object *must* directly encodeable to ASCII.  For example, u'/foo'
+    will work but u'/<unprintable unicode>' (a Unicode object with characters
+    that cannot be encoded to ascii) will not. A :exc:`UnicodeError` will be
+    raised if the Unicode cannot be encoded directly to ASCII.
+    """
+    if isinstance(path, unicode):
+        path = path.encode('ascii')
+    path = urllib.unquote(path)
+    return traversal_path_info(path)
 
-    If this function is passed a Unicode object instead of a string,
-    that Unicode object *must* directly encodeable to ASCII.  For
-    example, u'/foo' will work but u'/<unprintable unicode>' (a
-    Unicode object with characters that cannot be encoded to ascii)
-    will not.
+@lru_cache(1000)
+def traversal_path_info(path):
+    """ Given a ``PATH_INFO`` environ value (a string), return a tuple
+    representing that path which can be used to traverse a resource tree.
+
+    ``PATH_INFO`` is assumed to already be URL-decoded (as per the WSGI
+    specification).  It is decoded to text using ``path.decode('utf-8')``.  A
+    :exc:`pyramid.exc.URLDecodeError` is raised if a the URL cannot be
+    decoded.
+
+    This API cannot be passed a Unicode ``path`` value.  A
+    :exc:`UnicodeEncodeError` will result if it is passed such a value.
+
+    The ``PATH_INFO`` is split on slashes, creating a list of segments.  If a
+    segment name is empty or if it is ``.``, it is ignored.  If a segment
+    name is ``..``, the previous segment is deleted, and the ``..`` is
+    ignored.
 
     Examples:
 
@@ -474,16 +487,13 @@ def traversal_path(path):
       writing their own traversal machinery, as opposed to users writing
       applications in :app:`Pyramid`.
     """
-    if isinstance(path, unicode):
-        path = path.encode('ascii')
+    try:
+        path = path.decode('utf-8')
+    except UnicodeDecodeError as e:
+        raise URLDecodeError(e.encoding, e.object, e.start, e.end, e.reason)
     path = path.strip('/')
     clean = []
     for segment in path.split('/'):
-        segment = urllib.unquote(segment)
-        try:
-            segment = segment.decode('utf-8')
-        except UnicodeDecodeError, e:
-            raise URLDecodeError(e.encoding, e.object, e.start, e.end, e.reason)
         if not segment or segment == '.':
             continue
         elif segment == '..':
@@ -574,7 +584,7 @@ class ResourceTreeTraverser(object):
             subpath = matchdict.get('subpath', ())
             if not hasattr(subpath, '__iter__'):
                 # this is not a *subpath stararg (just a {subpath})
-                subpath = traversal_path(subpath)
+                subpath = traversal_path_info(subpath)
 
         else:
             # this request did not match a route
@@ -586,7 +596,7 @@ class ResourceTreeTraverser(object):
 
         if VH_ROOT_KEY in environ:
             vroot_path = environ[VH_ROOT_KEY]
-            vroot_tuple = traversal_path(vroot_path)
+            vroot_tuple = traversal_path_info(vroot_path)
             vpath = vroot_path + path
             vroot_idx = len(vroot_tuple) -1
         else:
@@ -607,7 +617,7 @@ class ResourceTreeTraverser(object):
             # and this hurts readability; apologies
             i = 0
             view_selector = self.VIEW_SELECTOR
-            vpath_tuple = traversal_path(vpath)
+            vpath_tuple = traversal_path_info(vpath)
             for segment in vpath_tuple:
                 if segment[:2] == view_selector:
                     return {'context':ob,

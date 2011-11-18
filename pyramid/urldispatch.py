@@ -7,7 +7,7 @@ from pyramid.interfaces import IRoute
 
 from pyramid.encode import url_quote
 from pyramid.exceptions import URLDecodeError
-from pyramid.traversal import traversal_path
+from pyramid.traversal import traversal_path_info
 from pyramid.traversal import quote_path_segment
 
 _marker = object()
@@ -135,11 +135,10 @@ def _compile_route(route):
         d = {}
         for k, v in m.groupdict().iteritems():
             if k == star:
-                d[k] = traversal_path(v)
+                d[k] = traversal_path_info(v)
             else:
-                encoded = unquote(v)
                 try:
-                    d[k] = encoded.decode('utf-8')
+                    d[k] = v.decode('utf-8')
                 except UnicodeDecodeError, e:
                     raise URLDecodeError(
                         e.encoding, e.object, e.start, e.end, e.reason

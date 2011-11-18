@@ -19,7 +19,7 @@ from pyramid.httpexceptions import HTTPNotFound
 from pyramid.httpexceptions import HTTPMovedPermanently
 from pyramid.path import caller_package
 from pyramid.response import Response
-from pyramid.traversal import traversal_path
+from pyramid.traversal import traversal_path_info
 
 def init_mimetypes(mimetypes):
     # this is a function so it can be unittested
@@ -139,7 +139,7 @@ class static_view(object):
         if self.use_subpath:
             path_tuple = request.subpath
         else:
-            path_tuple = traversal_path(request.path_info)
+            path_tuple = traversal_path_info(request.environ['PATH_INFO'])
 
         path = _secure_path(path_tuple)
 

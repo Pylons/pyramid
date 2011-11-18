@@ -21,5 +21,7 @@
 
   .. autofunction:: traverse
 
+  .. autofunction:: traversal_path_info(path)
+
   .. autofunction:: traversal_path(path)
 

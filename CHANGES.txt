@@ -7,6 +7,17 @@ Bug Fixes
 - The ``pryamid.view.view_config`` decorator did not accept a ``match_params``
   predicate argument.  See https://github.com/Pylons/pyramid/pull/308
 
+- Backport fixes from master regarding URL decoding.  URL segments are
+  no-longer "double-decoded" during traversal and when encountered in a route
+  subpath (or other star-arg pattern).  As a result, a new API named
+  ``pyramid.traversal.traversal_path_info`` was added to the system.  This
+  function accepts an already-URL-decoded string and returns a tuple of
+  Unicode objects.  This API is used internally by Pyramid in all places that
+  ``pyramid.traversal.traversal_path`` used to be used.  The
+  ``traversal_path`` function remains for backwards compatibility, however,
+  and can still be used when a path is encoded.  See
+  https://github.com/Pylons/pyramid/issues/349 for more information.
+
 1.2.1 (2011-09-28)
 ==================
 
