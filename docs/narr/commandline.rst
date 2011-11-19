@@ -111,6 +111,7 @@ For a URL that doesn't match any views, ``pviews`` will simply print out a
    single: interactive shell
    single: IPython
    single: pshell
+   single: bpython
 
 .. _interactive_shell:
 
@@ -283,6 +284,19 @@ standard Python interpreter shell unconditionally.
    [chrism@vitaminf shellenv]$ ../bin/pshell --disable-ipython \
                                 development.ini#MyProject
 
+
+bpython
+~~~~~~~
+
+If you have `bpython <http://bpython-interpreter.org/>`_ installed in
+the interpreter you use to invoke the ``pshell`` command, ``pshell`` will use
+a bpython interactive shell instead of a standard Python if you pass the ``-b`` 
+or ``--enable-bpython`` flag to the ``pshell`` command.
+
+.. code-block:: text
+
+   [chrism@vitaminf shellenv]$ ../bin/pshell --enable-bpython \
+                                development.ini#MyProject
 
 .. index::
    pair: routes; printing

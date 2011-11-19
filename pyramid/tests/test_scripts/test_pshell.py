@@ -22,6 +22,7 @@ class TestPShellCommand(unittest.TestCase):
             class Options(object): pass
             self.options = Options()
             self.options.disable_ipython = True
+            self.options.enable_bpython = False
             self.options.setup = None
             cmd.options = self.options
         return cmd
@@ -33,6 +34,14 @@ class TestPShellCommand(unittest.TestCase):
         shell({'foo': 'bar'}, 'a help message')
         self.assertEqual(interact.local, {'foo': 'bar'})
         self.assertTrue('a help message' in interact.banner)
+
+    def test_make_bpython_shell(self):
+        command = self._makeOne()
+        bpython = dummy.DummyBPythonShell()
+        shell = command.make_bpython_shell(bpython)
+        shell({'foo': 'bar'}, 'a help message')
+        self.assertEqual(bpython.locals_, {'foo': 'bar'})
+        self.assertTrue('a help message' in bpython.banner)
 
     def test_make_ipython_v0_11_shell(self):
         command = self._makeOne()
