@@ -40,6 +40,10 @@ class PShellCommand(object):
                       action='store_true',
                       dest='disable_ipython',
                       help="Don't use IPython even if it is available")
+    parser.add_option('-b', '--enable-bpython',
+                      action='store_true',
+                      dest='enable_bpython',
+                      help="Use bpython as pshell")
     parser.add_option('--setup',
                       dest='setup',
                       help=("A callable that will be passed the environment "
@@ -142,6 +146,9 @@ class PShellCommand(object):
             for var in sorted(self.object_help.keys()):
                 help += '\n  %-12s %s' % (var, self.object_help[var])
 
+        if shell is None and self.options.enable_bpython:
+            shell = self.make_bpython_shell()
+
         if shell is None and not self.options.disable_ipython:
             shell = self.make_ipython_v0_11_shell()
             if shell is None:
@@ -161,6 +168,17 @@ class PShellCommand(object):
             banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
             banner += '\n\n' + help + '\n'
             interact(banner, local=env)
+        return shell
+
+    def make_bpython_shell(self, BPShellFactory=None):
+        if BPShellFactory is None: # pragma: no cover
+            try:
+                from bpython import embed
+                BPShellFactory = embed
+            except ImportError:
+                return None
+        def shell(env, help):
+            BPShell = BPShellFactory(locals_=env, banner=help + '\n')
         return shell
 
     def make_ipython_v0_11_shell(self, IPShellFactory=None):
