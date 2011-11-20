@@ -35,6 +35,9 @@ Bug Fixes
   timing-attack-aware string comparator.  See
   https://github.com/Pylons/pyramid/pull/320 for more info.
 
+- Backport from master: the DummySession in ``pyramid.testing`` now generates
+  a new CSRF token if one doesn't yet exist.
+
 Testing
 -------
 
