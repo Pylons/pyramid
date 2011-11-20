@@ -425,21 +425,23 @@ def traversal_path(path):
 
 @lru_cache(1000)
 def traversal_path_info(path):
-    """ Given a ``PATH_INFO`` environ value (a string), return a tuple
-    representing that path which can be used to traverse a resource tree.
+    """ Given a string ``path`` arguemnt (which is assumed, usually, to be a
+    ``PATH_INFO`` :term:`WSGI` environ value) , return a tuple of Unicode
+    values representing the path which can be used to traverse a resource
+    tree.
 
-    ``PATH_INFO`` is assumed to already be URL-decoded (as per the WSGI
-    specification).  It is decoded to text using ``path.decode('utf-8')``.  A
-    :exc:`pyramid.exc.URLDecodeError` is raised if a the URL cannot be
-    decoded.
+    This API must be passed a ``str`` (*not* ``unicode``) ``path`` value.  An
+    exception will result if it is passed a non-``str`` value.
 
-    This API cannot be passed a Unicode ``path`` value.  A
-    :exc:`UnicodeEncodeError` will result if it is passed such a value.
+    ``path`` is assumed to already be URL-decoded (ala the ``PATH_INFO``
+    :term:`WSGI` environment variable).  It is decoded to text using
+    ``path.decode('utf-8')``.  A :exc:`pyramid.exc.URLDecodeError` is raised
+    if a the URL cannot be decoded from utf-8.
 
-    The ``PATH_INFO`` is split on slashes, creating a list of segments.  If a
-    segment name is empty or if it is ``.``, it is ignored.  If a segment
-    name is ``..``, the previous segment is deleted, and the ``..`` is
-    ignored.
+    The utf8-decoded ``path`` is split on slashes, creating a list of
+    segments.  If a segment name is empty or if it is ``.``, it is ignored.
+    If a segment name is ``..``, the previous segment is deleted, and the
+    ``..`` is ignored.
 
     Examples:
 

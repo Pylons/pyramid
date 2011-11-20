@@ -49,17 +49,18 @@ class TraversalPathInfoTests(unittest.TestCase):
         path = '/'.join([la, la])
         self.assertRaises(URLDecodeError, self._callFUT, path)
 
-    def test_unicode_highorder_chars(self):
+    def test_highorder_chars(self):
         path = '/\xe6\xb5\x81\xe8\xa1\x8c\xe8\xb6\x8b\xe5\x8a\xbf'
         self.assertEqual(self._callFUT(path), (u'\u6d41\u884c\u8d8b\u52bf',))
 
-    def test_unicode_simple(self):
+    def test_unicode_ascii(self):
         path = u'/abc'
         self.assertEqual(self._callFUT(path), (u'abc',))
 
-    def test_unicode_undecodeable_to_ascii(self):
+    def test_unicode_nonascii(self):
         path = unicode('/La Pe\xc3\xb1a', 'utf-8')
-        self.assertRaises(UnicodeEncodeError, self._callFUT, path)
+        # UnicodeEncodeError in CPython, URLDecodeError in Jython
+        self.assertRaises(UnicodeError, self._callFUT, path)
 
 class TraversalPathTests(unittest.TestCase):
     def _callFUT(self, path):
