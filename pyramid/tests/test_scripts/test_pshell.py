@@ -82,6 +82,25 @@ class TestPShellCommand(unittest.TestCase):
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
 
+    def test_command_loads_bpython_shell(self):
+        command = self._makeOne()
+        shell = dummy.DummyBPythonShell()
+        command.make_bpython_shell = lambda: shell
+        command.options.enable_bpython = True
+        command.run()
+        self.assertTrue(self.config_factory.parser)
+        self.assertEqual(self.config_factory.parser.filename,
+                         '/foo/bar/myapp.ini')
+        self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
+        self.assertEqual(shell.locals_, {
+            'app':self.bootstrap.app, 'root':self.bootstrap.root,
+            'registry':self.bootstrap.registry,
+            'request':self.bootstrap.request,
+            'root_factory':self.bootstrap.root_factory,
+        })
+        self.assertTrue(self.bootstrap.closer.called)
+        self.assertTrue(shell.banner)
+
     def test_command_loads_default_shell_with_ipython_disabled(self):
         command = self._makeOne()
         shell = dummy.DummyShell()
