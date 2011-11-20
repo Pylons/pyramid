@@ -699,7 +699,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         request.callbacks[0](None, response)
         self.assertEqual(len(response.headerlist), 3)
         self.assertEqual(response.headerlist[0][0], 'Set-Cookie')
-        self.assertTrue("'tokens': []" in response.headerlist[0][1])
+        self.assertTrue("'tokens': ()" in response.headerlist[0][1])
 
     def test_remember(self):
         helper = self._makeOne('secret')
@@ -900,16 +900,20 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(result[2][0], 'Set-Cookie')
         self.assertTrue("'tokens': ('foo', 'bar')" in result[2][1])
 
-    def test_remember_token_unicode_with_ascii_data(self):
+    def test_remember_unicode_but_ascii_token(self):
         helper = self._makeOne('secret')
         request = self._makeRequest()
-        helper.remember(request, 'other', tokens=(u'foo',))
+        la = unicode('foo', 'utf-8')
+        result = helper.remember(request, 'other', tokens=(la,))
+        # tokens must be str type on both Python 2 and 3
+        self.assertTrue("'tokens': ('foo',)" in result[0][1])
 
-    def test_remember_token_full_on_unicode(self):
+    def test_remember_nonascii_token(self):
         helper = self._makeOne('secret')
         request = self._makeRequest()
+        la = unicode('La Pe\xc3\xb1a', 'utf-8')
         self.assertRaises(ValueError, helper.remember, request, 'other',
-                          tokens=(u'f\u1234',))
+                          tokens=(la,))
 
     def test_remember_invalid_token_format(self):
         helper = self._makeOne('secret')

@@ -26,6 +26,10 @@ Bug Fixes
 - Backport from master: fix ``request.json_body`` to deal with alternate
   request charsets.
 
+- Backport from master: The AuthTktCookieHelper could potentially generate
+  Unicode headers inappropriately when the ``tokens`` argument to remember
+  was used.  See https://github.com/Pylons/pyramid/pull/314.
+
 Testing
 -------
 
