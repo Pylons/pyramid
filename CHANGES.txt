@@ -4,8 +4,9 @@ Next release
 Bug Fixes
 ---------
 
-- The ``pryamid.view.view_config`` decorator did not accept a ``match_params``
-  predicate argument.  See https://github.com/Pylons/pyramid/pull/308
+- Backport from master: The ``pryamid.view.view_config`` decorator did not
+  accept a ``match_params`` predicate argument.  See
+  https://github.com/Pylons/pyramid/pull/308
 
 - Backport fixes from master regarding URL decoding.  URL segments are
   no-longer "double-decoded" during traversal and when encountered in a route
@@ -26,9 +27,13 @@ Bug Fixes
 - Backport from master: fix ``request.json_body`` to deal with alternate
   request charsets.
 
-- Backport from master: The AuthTktCookieHelper could potentially generate
+- Backport from master: the AuthTktCookieHelper could potentially generate
   Unicode headers inappropriately when the ``tokens`` argument to remember
   was used.  See https://github.com/Pylons/pyramid/pull/314.
+
+- Backport from master: the AuthTktAuthenticationPolicy did not use a
+  timing-attack-aware string comparator.  See
+  https://github.com/Pylons/pyramid/pull/320 for more info.
 
 Testing
 -------
