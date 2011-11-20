@@ -110,6 +110,7 @@ out a *Not found* message.
 .. index::
    single: interactive shell
    single: IPython
+   single: bpython
    single: paster pshell
    single: pshell
 
@@ -284,6 +285,21 @@ unconditionally.
 
    [chrism@vitaminf shellenv]$ ../bin/paster pshell --disable-ipython \
                                 development.ini#MyProject
+
+
+bpython
+~~~~~~~
+
+If you have `bpython <http://bpython-interpreter.org/>`_ installed in
+the interpreter you use to invoke the ``pshell`` command, ``pshell`` will use
+a bpython interactive shell instead of a standard Python if you pass the ``-b`` 
+or ``--enable-bpython`` flag to the ``pshell`` command.
+
+.. code-block:: text
+
+   [chrism@vitaminf shellenv]$ ../bin/paster pshell --enable-bpython \
+                                development.ini#MyProject
+
 
 
 .. index::
