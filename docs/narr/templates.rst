@@ -403,14 +403,6 @@ The language definition documentation for Chameleon ZPT-style
 templates is available from `the Chameleon website
 <http://chameleon.repoze.org/>`_.
 
-.. warning:: 
-
-   :term:`Chameleon` only works on :term:`CPython` platforms and
-   :term:`Google App Engine`.  On :term:`Jython` and other non-CPython
-   platforms, you should use Mako (see :ref:`mako_templates`) or
-   ``pyramid_jinja2`` instead.  See
-   :ref:`available_template_system_bindings`.
-
 Given a :term:`Chameleon` ZPT template named ``foo.pt`` in a directory
 in your application named ``templates``, you can render the template as
 a :term:`renderer` like so:
