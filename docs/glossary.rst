@@ -342,14 +342,13 @@ Glossary
      file.  It was developed by Ian Bicking.
 
    Chameleon
-     `chameleon <http://chameleon.repoze.org>`_ is an attribute
-     language template compiler which supports both the :term:`ZPT` and
-     :term:`Genshi` templating specifications.  It is written and
-     maintained by Malthe Borch.  It has several extensions, such as
-     the ability to use bracketed (Genshi-style) ``${name}`` syntax,
-     even within ZPT.  It is also much faster than the reference
-     implementations of both ZPT and Genshi.  :app:`Pyramid` offers
-     Chameleon templating out of the box in ZPT and text flavors.
+     `chameleon <http://chameleon.repoze.org>`_ is an attribute language
+     template compiler which supports the :term:`ZPT` templating
+     specification.  It is written and maintained by Malthe Borch.  It has
+     several extensions, such as the ability to use bracketed (Mako-style)
+     ``${name}`` syntax.  It is also much faster than the reference
+     implementation of ZPT.  :app:`Pyramid` offers Chameleon templating out
+     of the box in ZPT and text flavors.
 
    ZPT
      The `Zope Page Template <http://wiki.zope.org/ZPT/FrontPage>`_
