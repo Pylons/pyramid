@@ -36,10 +36,9 @@ class PShellCommand(object):
     summary = "Open an interactive shell with a Pyramid application loaded"
 
     parser = optparse.OptionParser()
-    parser.add_option('-d', '--disable-ipython',
-                      action='store_true',
-                      dest='disable_ipython',
-                      help="Don't use IPython even if it is available")
+    parser.add_option('-p', '--python-shell',
+                      action='store', type='string', dest='python_shell',
+                      default = '', help='ipython | bpython | python')
     parser.add_option('--setup',
                       dest='setup',
                       help=("A callable that will be passed the environment "
@@ -142,10 +141,22 @@ class PShellCommand(object):
             for var in sorted(self.object_help.keys()):
                 help += '\n  %-12s %s' % (var, self.object_help[var])
 
-        if shell is None and not self.options.disable_ipython:
+        user_shell = self.options.python_shell.lower()
+        if not user_shell:
+            if shell is None:
+                shell = self.make_ipython_v0_11_shell()
+                if shell is None:
+                    shell = self.make_ipython_v0_10_shell()
+                if shell is None:
+                    shell = self.make_bpython_shell()
+
+        if shell is None and user_shell == 'ipython':
             shell = self.make_ipython_v0_11_shell()
             if shell is None:
                 shell = self.make_ipython_v0_10_shell()
+
+        if shell is None and user_shell == 'bpython':
+            shell = self.make_bpython_shell()
 
         if shell is None:
             shell = self.make_default_shell()
@@ -161,6 +172,17 @@ class PShellCommand(object):
             banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
             banner += '\n\n' + help + '\n'
             interact(banner, local=env)
+        return shell
+
+    def make_bpython_shell(self, BPShellFactory=None):
+        if BPShellFactory is None: # pragma: no cover
+            try:
+                from bpython import embed
+                BPShellFactory = embed
+            except ImportError:
+                return None
+        def shell(env, help):
+            BPShell = BPShellFactory(locals_=env, banner=help + '\n')
         return shell
 
     def make_ipython_v0_11_shell(self, IPShellFactory=None):
