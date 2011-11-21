@@ -127,14 +127,9 @@ class PShellCommand(PCommand):
     max_args = 1
 
     parser = Command.standard_parser(simulate=True)
-    parser.add_option('-d', '--disable-ipython',
-                      action='store_true',
-                      dest='disable_ipython',
-                      help="Don't use IPython even if it is available")
-    parser.add_option('-b', '--enable-bpython',
-                      action='store_true',
-                      dest='enable_bpython',
-                      help="Use bpython as pshell")
+    parser.add_option('-p', '--python-shell',
+                      action='store', type='string', dest='python_shell',
+                      default = '', help='ipython | bpython | python')
     parser.add_option('--setup',
                       dest='setup',
                       help=("A callable that will be passed the environment "
@@ -226,13 +221,22 @@ class PShellCommand(PCommand):
             for var in sorted(self.object_help.keys()):
                 help += '\n  %-12s %s' % (var, self.object_help[var])
 
-        if shell is None and self.options.enable_bpython:
-            shell = self.make_bpython_shell()
+        user_shell = self.options.python_shell.lower()
+        if not user_shell:
+            if shell is None:
+                shell = self.make_ipython_v0_11_shell()
+                if shell is None:
+                    shell = self.make_ipython_v0_10_shell()
+                if shell is None:
+                    shell = self.make_bpython_shell()
 
-        if shell is None and not self.options.disable_ipython:
+        if shell is None and user_shell == 'ipython':
             shell = self.make_ipython_v0_11_shell()
             if shell is None:
                 shell = self.make_ipython_v0_10_shell()
+
+        if shell is None and user_shell == 'bpython':
+            shell = self.make_bpython_shell()
 
         if shell is None:
             shell = self.make_default_shell()

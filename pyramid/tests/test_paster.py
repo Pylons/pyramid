@@ -20,9 +20,8 @@ class TestPShellCommand(unittest.TestCase):
         if patch_options:
             class Options(object): pass
             self.options = Options()
-            self.options.disable_ipython = True
-            self.options.enable_bpython = False
             self.options.setup = None
+            self.options.python_shell = ''
             cmd.options = self.options
         return cmd
 
@@ -66,6 +65,7 @@ class TestPShellCommand(unittest.TestCase):
         shell = DummyShell()
         command.make_ipython_v0_11_shell = lambda: None
         command.make_ipython_v0_10_shell = lambda: None
+        command.make_bpython_shell = lambda: None
         command.make_default_shell = lambda: shell
         command.command()
         self.assertTrue(self.config_factory.parser)
@@ -81,33 +81,15 @@ class TestPShellCommand(unittest.TestCase):
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
 
-    def test_command_loads_bpython_shell(self):
-        command = self._makeOne()
-        shell = DummyBPythonShell()
-        command.make_bpython_shell = lambda: shell
-        command.options.enable_bpython = True
-        command.command()
-        self.assertTrue(self.config_factory.parser)
-        self.assertEqual(self.config_factory.parser.filename,
-                         '/foo/bar/myapp.ini')
-        self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
-        self.assertEqual(shell.locals_, {
-            'app':self.bootstrap.app, 'root':self.bootstrap.root,
-            'registry':self.bootstrap.registry,
-            'request':self.bootstrap.request,
-            'root_factory':self.bootstrap.root_factory,
-        })
-        self.assertTrue(self.bootstrap.closer.called)
-        self.assertTrue(shell.banner)
-
-    def test_command_loads_default_shell_with_ipython_disabled(self):
+    def test_command_loads_default_shell_with_unknow_shell(self):
         command = self._makeOne()
         shell = DummyShell()
         bad_shell = DummyShell()
         command.make_ipython_v0_11_shell = lambda: bad_shell
         command.make_ipython_v0_10_shell = lambda: bad_shell
+        command.make_bpython_shell = lambda: bad_shell
         command.make_default_shell = lambda: shell
-        command.options.disable_ipython = True
+        command.options.python_shell = 'unknow_python_shell'
         command.command()
         self.assertTrue(self.config_factory.parser)
         self.assertEqual(self.config_factory.parser.filename,
@@ -128,8 +110,9 @@ class TestPShellCommand(unittest.TestCase):
         shell = DummyShell()
         command.make_ipython_v0_11_shell = lambda: shell
         command.make_ipython_v0_10_shell = lambda: None
+        command.make_bpython_shell = lambda: None
         command.make_default_shell = lambda: None
-        command.options.disable_ipython = False
+        command.options.python_shell = 'ipython'
         command.command()
         self.assertTrue(self.config_factory.parser)
         self.assertEqual(self.config_factory.parser.filename,
@@ -149,8 +132,9 @@ class TestPShellCommand(unittest.TestCase):
         shell = DummyShell()
         command.make_ipython_v0_11_shell = lambda: None
         command.make_ipython_v0_10_shell = lambda: shell
+        command.make_bpython_shell = lambda: None
         command.make_default_shell = lambda: None
-        command.options.disable_ipython = False
+        command.options.python_shell = 'ipython'
         command.command()
         self.assertTrue(self.config_factory.parser)
         self.assertEqual(self.config_factory.parser.filename,
@@ -164,6 +148,27 @@ class TestPShellCommand(unittest.TestCase):
         })
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
+
+    def test_command_loads_bpython_shell(self):
+        command = self._makeOne()
+        shell = DummyBPythonShell()
+        command.make_ipython_v0_11_shell = lambda: None
+        command.make_ipython_v0_10_shell = lambda: None
+        command.make_bpython_shell = lambda: shell
+        command.options.python_shell = 'bpython'
+        command.command()
+        self.assertTrue(self.config_factory.parser)
+        self.assertEqual(self.config_factory.parser.filename,
+                         '/foo/bar/myapp.ini')
+        self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
+        self.assertEqual(shell.locals_, {
+            'app':self.bootstrap.app, 'root':self.bootstrap.root,
+            'registry':self.bootstrap.registry,
+            'request':self.bootstrap.request,
+            'root_factory':self.bootstrap.root_factory,
+        })
+        self.assertTrue(self.bootstrap.closer.called)
+        self.assertTrue(shell.banner)
 
     def test_command_loads_custom_items(self):
         command = self._makeOne()
