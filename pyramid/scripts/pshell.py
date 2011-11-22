@@ -38,7 +38,7 @@ class PShellCommand(object):
     parser = optparse.OptionParser()
     parser.add_option('-p', '--python-shell',
                       action='store', type='string', dest='python_shell',
-                      default = '', help='ipython | bpython | python')
+                      default='', help='ipython | bpython | python')
     parser.add_option('--setup',
                       dest='setup',
                       help=("A callable that will be passed the environment "
@@ -141,30 +141,36 @@ class PShellCommand(object):
             for var in sorted(self.object_help.keys()):
                 help += '\n  %-12s %s' % (var, self.object_help[var])
 
-        user_shell = self.options.python_shell.lower()
-        if not user_shell:
-            if shell is None:
-                shell = self.make_ipython_v0_11_shell()
-                if shell is None:
-                    shell = self.make_ipython_v0_10_shell()
-                if shell is None:
-                    shell = self.make_bpython_shell()
-
-        if shell is None and user_shell == 'ipython':
-            shell = self.make_ipython_v0_11_shell()
-            if shell is None:
-                shell = self.make_ipython_v0_10_shell()
-
-        if shell is None and user_shell == 'bpython':
-            shell = self.make_bpython_shell()
-
         if shell is None:
-            shell = self.make_default_shell()
+            shell = self.make_shell()
 
         try:
             shell(env, help)
         finally:
             closer()
+
+    def make_shell(self):
+        shell = None
+        user_shell = self.options.python_shell.lower()
+        if not user_shell:
+            shell = self.make_ipython_v0_11_shell()
+            if shell is None:
+                shell = self.make_ipython_v0_10_shell()
+            if shell is None:
+                shell = self.make_bpython_shell()
+
+        elif user_shell == 'ipython':
+            shell = self.make_ipython_v0_11_shell()
+            if shell is None:
+                shell = self.make_ipython_v0_10_shell()
+
+        elif user_shell == 'bpython':
+            shell = self.make_bpython_shell()
+
+        if shell is None:
+            shell = self.make_default_shell()
+
+        return shell
 
     def make_default_shell(self, interact=interact):
         def shell(env, help):
@@ -174,8 +180,8 @@ class PShellCommand(object):
             interact(banner, local=env)
         return shell
 
-    def make_bpython_shell(self, BPShellFactory=None):
-        if BPShellFactory is None: # pragma: no cover
+    def make_bpython_shell(self, BPShell=None):
+        if BPShell is None: # pragma: no cover
             try:
                 from bpython import embed
                 BPShell = embed
