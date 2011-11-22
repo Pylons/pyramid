@@ -20,8 +20,8 @@ class TestPShellCommand(unittest.TestCase):
         if patch_options:
             class Options(object): pass
             self.options = Options()
-            self.options.disable_ipython = True
             self.options.setup = None
+            self.options.python_shell = ''
             cmd.options = self.options
         return cmd
 
@@ -32,6 +32,14 @@ class TestPShellCommand(unittest.TestCase):
         shell({'foo': 'bar'}, 'a help message')
         self.assertEqual(interact.local, {'foo': 'bar'})
         self.assertTrue('a help message' in interact.banner)
+
+    def test_make_bpython_shell(self):
+        command = self._makeOne()
+        bpython = DummyBPythonShell()
+        shell = command.make_bpython_shell(bpython)
+        shell({'foo': 'bar'}, 'a help message')
+        self.assertEqual(bpython.locals_, {'foo': 'bar'})
+        self.assertTrue('a help message' in bpython.banner)
 
     def test_make_ipython_v0_11_shell(self):
         command = self._makeOne()
@@ -57,6 +65,7 @@ class TestPShellCommand(unittest.TestCase):
         shell = DummyShell()
         command.make_ipython_v0_11_shell = lambda: None
         command.make_ipython_v0_10_shell = lambda: None
+        command.make_bpython_shell = lambda: None
         command.make_default_shell = lambda: shell
         command.command()
         self.assertTrue(self.config_factory.parser)
@@ -72,14 +81,15 @@ class TestPShellCommand(unittest.TestCase):
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
 
-    def test_command_loads_default_shell_with_ipython_disabled(self):
+    def test_command_loads_default_shell_with_unknown_shell(self):
         command = self._makeOne()
         shell = DummyShell()
         bad_shell = DummyShell()
         command.make_ipython_v0_11_shell = lambda: bad_shell
         command.make_ipython_v0_10_shell = lambda: bad_shell
+        command.make_bpython_shell = lambda: bad_shell
         command.make_default_shell = lambda: shell
-        command.options.disable_ipython = True
+        command.options.python_shell = 'unknow_python_shell'
         command.command()
         self.assertTrue(self.config_factory.parser)
         self.assertEqual(self.config_factory.parser.filename,
@@ -100,8 +110,9 @@ class TestPShellCommand(unittest.TestCase):
         shell = DummyShell()
         command.make_ipython_v0_11_shell = lambda: shell
         command.make_ipython_v0_10_shell = lambda: None
+        command.make_bpython_shell = lambda: None
         command.make_default_shell = lambda: None
-        command.options.disable_ipython = False
+        command.options.python_shell = 'ipython'
         command.command()
         self.assertTrue(self.config_factory.parser)
         self.assertEqual(self.config_factory.parser.filename,
@@ -121,8 +132,9 @@ class TestPShellCommand(unittest.TestCase):
         shell = DummyShell()
         command.make_ipython_v0_11_shell = lambda: None
         command.make_ipython_v0_10_shell = lambda: shell
+        command.make_bpython_shell = lambda: None
         command.make_default_shell = lambda: None
-        command.options.disable_ipython = False
+        command.options.python_shell = 'ipython'
         command.command()
         self.assertTrue(self.config_factory.parser)
         self.assertEqual(self.config_factory.parser.filename,
@@ -136,6 +148,76 @@ class TestPShellCommand(unittest.TestCase):
         })
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
+
+    def test_command_loads_bpython_shell(self):
+        command = self._makeOne()
+        shell = DummyBPythonShell()
+        command.make_ipython_v0_11_shell = lambda: None
+        command.make_ipython_v0_10_shell = lambda: None
+        command.make_bpython_shell = lambda: shell
+        command.options.python_shell = 'bpython'
+        command.command()
+        self.assertTrue(self.config_factory.parser)
+        self.assertEqual(self.config_factory.parser.filename,
+                         '/foo/bar/myapp.ini')
+        self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
+        self.assertEqual(shell.locals_, {
+            'app':self.bootstrap.app, 'root':self.bootstrap.root,
+            'registry':self.bootstrap.registry,
+            'request':self.bootstrap.request,
+            'root_factory':self.bootstrap.root_factory,
+        })
+        self.assertTrue(self.bootstrap.closer.called)
+        self.assertTrue(shell.banner)
+
+    def test_shell_ipython_ordering(self):
+        command = self._makeOne()
+        shell0_11 = DummyShell()
+        shell0_10 = DummyShell()
+        command.make_ipython_v0_11_shell = lambda: shell0_11
+        command.make_ipython_v0_10_shell = lambda: shell0_10
+        command.make_bpython_shell = lambda: None
+        shell = command.make_shell()
+        self.assertEqual(shell, shell0_11)
+
+        command.options.python_shell = 'ipython'
+        shell = command.make_shell()
+        self.assertEqual(shell, shell0_11)
+
+    def test_shell_ordering(self):
+        command = self._makeOne()
+        ipshell = DummyShell()
+        bpshell = DummyShell()
+        dshell = DummyShell()
+        command.make_ipython_v0_11_shell = lambda: None
+        command.make_ipython_v0_10_shell = lambda: None
+        command.make_bpython_shell = lambda: None
+        command.make_default_shell = lambda: dshell
+
+        shell = command.make_shell()
+        self.assertEqual(shell, dshell)
+
+        command.options.python_shell = 'ipython'
+        shell = command.make_shell()
+        self.assertEqual(shell, dshell)
+
+        command.options.python_shell = 'bpython'
+        shell = command.make_shell()
+        self.assertEqual(shell, dshell)
+
+        command.make_ipython_v0_11_shell = lambda: ipshell
+        command.make_bpython_shell = lambda: bpshell
+        command.options.python_shell = 'ipython'
+        shell = command.make_shell()
+        self.assertEqual(shell, ipshell)
+
+        command.options.python_shell = 'bpython'
+        shell = command.make_shell()
+        self.assertEqual(shell, bpshell)
+
+        command.options.python_shell = 'python'
+        shell = command.make_shell()
+        self.assertEqual(shell, dshell)
 
     def test_command_loads_custom_items(self):
         command = self._makeOne()
@@ -334,7 +416,7 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(result, None)
         self.assertEqual(len(L), 3)
         self.assertEqual(L[-1].split()[:4], ['a', '/a', '<function', 'view'])
-        
+
     def test_single_route_one_view_registered_with_factory(self):
         from zope.interface import Interface
         from pyramid.registry import Registry
@@ -371,7 +453,7 @@ class TestPRoutesCommand(unittest.TestCase):
         registry = Registry()
         result = command._get_mapper(registry)
         self.assertEqual(result.__class__, RoutesMapper)
-        
+
 class TestPViewsCommand(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.paster import PViewsCommand
@@ -570,7 +652,7 @@ class TestPViewsCommand(unittest.TestCase):
         result = command._find_multi_routes(mapper, request)
         self.assertEqual(result, [{'match':{}, 'route':routes[0]},
                                   {'match':{}, 'route':routes[1]}])
-        
+
     def test__find_multi_routes_some_match(self):
         command = self._makeOne()
         def factory(request): pass
@@ -580,7 +662,7 @@ class TestPViewsCommand(unittest.TestCase):
         request = DummyRequest({'PATH_INFO':'/a'})
         result = command._find_multi_routes(mapper, request)
         self.assertEqual(result, [{'match':{}, 'route':routes[1]}])
-        
+
     def test__find_multi_routes_none_match(self):
         command = self._makeOne()
         def factory(request): pass
@@ -590,7 +672,7 @@ class TestPViewsCommand(unittest.TestCase):
         request = DummyRequest({'PATH_INFO':'/a'})
         result = command._find_multi_routes(mapper, request)
         self.assertEqual(result, [])
-        
+
     def test_views_command_not_found(self):
         from pyramid.registry import Registry
         registry = Registry()
@@ -953,7 +1035,7 @@ class DummyTweens(object):
         self.name_to_alias = {}
     def implicit(self):
         return self._implicit
-                
+
 class Dummy:
     pass
 
@@ -978,6 +1060,11 @@ class DummyInteractor:
     def __call__(self, banner, local):
         self.banner = banner
         self.local = local
+
+class DummyBPythonShell:
+    def __call__(self, locals_, banner):
+        self.locals_ = locals_
+        self.banner = banner
 
 class DummyIPShell(object):
     IP = Dummy()
@@ -1030,7 +1117,7 @@ class DummyRoute(object):
 
     def match(self, route):
         return self.matchdict
-        
+
 class DummyRequest:
     application_url = 'http://example.com:5432'
     script_name = ''

@@ -127,10 +127,9 @@ class PShellCommand(PCommand):
     max_args = 1
 
     parser = Command.standard_parser(simulate=True)
-    parser.add_option('-d', '--disable-ipython',
-                      action='store_true',
-                      dest='disable_ipython',
-                      help="Don't use IPython even if it is available")
+    parser.add_option('-p', '--python-shell',
+                      action='store', type='string', dest='python_shell',
+                      default='', help='ipython | bpython | python')
     parser.add_option('--setup',
                       dest='setup',
                       help=("A callable that will be passed the environment "
@@ -222,18 +221,36 @@ class PShellCommand(PCommand):
             for var in sorted(self.object_help.keys()):
                 help += '\n  %-12s %s' % (var, self.object_help[var])
 
-        if shell is None and not self.options.disable_ipython:
-            shell = self.make_ipython_v0_11_shell()
-            if shell is None:
-                shell = self.make_ipython_v0_10_shell()
-
         if shell is None:
-            shell = self.make_default_shell()
+            shell = self.make_shell()
 
         try:
             shell(env, help)
         finally:
             closer()
+
+    def make_shell(self):
+        shell = None
+        user_shell = self.options.python_shell.lower()
+        if not user_shell:
+            shell = self.make_ipython_v0_11_shell()
+            if shell is None:
+                shell = self.make_ipython_v0_10_shell()
+            if shell is None:
+                shell = self.make_bpython_shell()
+
+        elif user_shell == 'ipython':
+            shell = self.make_ipython_v0_11_shell()
+            if shell is None:
+                shell = self.make_ipython_v0_10_shell()
+
+        elif user_shell == 'bpython':
+            shell = self.make_bpython_shell()
+
+        if shell is None:
+            shell = self.make_default_shell()
+
+        return shell
 
     def make_default_shell(self, interact=interact):
         def shell(env, help):
@@ -241,6 +258,17 @@ class PShellCommand(PCommand):
             banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
             banner += '\n\n' + help + '\n'
             interact(banner, local=env)
+        return shell
+
+    def make_bpython_shell(self, BPShell=None):
+        if BPShell is None: # pragma: no cover
+            try:
+                from bpython import embed
+                BPShell = embed
+            except ImportError:
+                return None
+        def shell(env, help):
+            BPShell(locals_=env, banner=help + '\n')
         return shell
 
     def make_ipython_v0_11_shell(self, IPShellFactory=None):
