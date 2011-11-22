@@ -81,7 +81,7 @@ class TestPShellCommand(unittest.TestCase):
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
 
-    def test_command_loads_default_shell_with_unknow_shell(self):
+    def test_command_loads_default_shell_with_unknown_shell(self):
         command = self._makeOne()
         shell = DummyShell()
         bad_shell = DummyShell()
@@ -169,6 +169,55 @@ class TestPShellCommand(unittest.TestCase):
         })
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.banner)
+
+    def test_shell_ipython_ordering(self):
+        command = self._makeOne()
+        shell0_11 = DummyShell()
+        shell0_10 = DummyShell()
+        command.make_ipython_v0_11_shell = lambda: shell0_11
+        command.make_ipython_v0_10_shell = lambda: shell0_10
+        command.make_bpython_shell = lambda: None
+        shell = command.make_shell()
+        self.assertEqual(shell, shell0_11)
+
+        command.options.python_shell = 'ipython'
+        shell = command.make_shell()
+        self.assertEqual(shell, shell0_11)
+
+    def test_shell_ordering(self):
+        command = self._makeOne()
+        ipshell = DummyShell()
+        bpshell = DummyShell()
+        dshell = DummyShell()
+        command.make_ipython_v0_11_shell = lambda: None
+        command.make_ipython_v0_10_shell = lambda: None
+        command.make_bpython_shell = lambda: None
+        command.make_default_shell = lambda: dshell
+
+        shell = command.make_shell()
+        self.assertEqual(shell, dshell)
+
+        command.options.python_shell = 'ipython'
+        shell = command.make_shell()
+        self.assertEqual(shell, dshell)
+
+        command.options.python_shell = 'bpython'
+        shell = command.make_shell()
+        self.assertEqual(shell, dshell)
+
+        command.make_ipython_v0_11_shell = lambda: ipshell
+        command.make_bpython_shell = lambda: bpshell
+        command.options.python_shell = 'ipython'
+        shell = command.make_shell()
+        self.assertEqual(shell, ipshell)
+
+        command.options.python_shell = 'bpython'
+        shell = command.make_shell()
+        self.assertEqual(shell, bpshell)
+
+        command.options.python_shell = 'python'
+        shell = command.make_shell()
+        self.assertEqual(shell, dshell)
 
     def test_command_loads_custom_items(self):
         command = self._makeOne()
