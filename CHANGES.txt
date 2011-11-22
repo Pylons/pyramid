@@ -14,6 +14,9 @@ Features
   spec.  An entire application can be written with such asset specs,
   requiring no ordered lookup path.
 
+- ``bpython`` interpreter compatibility in ``pshell``.  See the "Command-Line
+  Pyramid" narrative docs chapter for more information.
+
 Bug Fixes
 ---------
 
@@ -57,6 +60,11 @@ Backwards Incompatibilities
   ``paste.httpserver`` server.  Rationale: Rationale: the Paste and
   PasteScript packages do not run under Python 3.
 
+- The ``pshell`` command (nee "paster pshell") no longer accepts a
+  ``--disable-ipython`` command-line argument.  Instead, it accepts a ``-p``
+  or ``--python-shell`` argument, which can be any of the values ``python``,
+  ``ipython`` or ``bpython``.
+
 Dependencies
 ------------
 
@@ -77,7 +85,6 @@ Scaffolds
 - Rendered scaffolds have now been changed to be more relocatable (fewer
   mentions of the package name within files in the package).
 
-- The ``alchemy`` scaffold has been removed.
-
-- The ``routesalchemy`` scaffold has been renamed ``alchemy``.
+- The ``routesalchemy`` scaffold has been renamed ``alchemy``, replacing the
+  older (traversal-based) ``alchemy`` scaffold (which has been retired).
 
