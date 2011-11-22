@@ -178,11 +178,11 @@ class PShellCommand(object):
         if BPShellFactory is None: # pragma: no cover
             try:
                 from bpython import embed
-                BPShellFactory = embed
+                BPShell = embed
             except ImportError:
                 return None
         def shell(env, help):
-            BPShell = BPShellFactory(locals_=env, banner=help + '\n')
+            BPShell(locals_=env, banner=help + '\n')
         return shell
 
     def make_ipython_v0_11_shell(self, IPShellFactory=None):
