@@ -82,7 +82,7 @@ class TestPShellCommand(unittest.TestCase):
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
 
-    def test_command_loads_default_shell_with_unknow_shell(self):
+    def test_command_loads_default_shell_with_unknown_shell(self):
         command = self._makeOne()
         shell = dummy.DummyShell()
         bad_shell = dummy.DummyShell()
