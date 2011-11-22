@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 import os
 import unittest
 
@@ -8,6 +9,9 @@ from pyramid.view import view_config
 from pyramid.static import static_view
 
 from zope.interface import Interface
+
+# 5 years from now (more or less)
+fiveyrsfuture = datetime.datetime.utcnow() + datetime.timedelta(5*365)
 
 class INothing(Interface):
     pass
@@ -93,7 +97,7 @@ class TestStaticAppBase(IntegrationBase):
 
     def test_not_modified(self):
         self.testapp.extra_environ = {
-            'HTTP_IF_MODIFIED_SINCE':httpdate(pow(2, 32)-1)}
+            'HTTP_IF_MODIFIED_SINCE':httpdate(fiveyrsfuture)}
         res = self.testapp.get('/minimal.pt', status=304)
         self.assertEqual(res.body, '')
 
@@ -585,6 +589,4 @@ class DummyRequest:
         return application(None, None)
 
 def httpdate(ts):
-    import datetime
-    ts = datetime.datetime.utcfromtimestamp(ts)
     return ts.strftime("%a, %d %b %Y %H:%M:%S GMT")
