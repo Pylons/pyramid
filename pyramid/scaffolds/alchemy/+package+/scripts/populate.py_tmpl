@@ -23,5 +23,5 @@ def main(argv=sys.argv):
     DBSession.configure(bind=engine)
     Base.metadata.create_all(engine)
     with transaction.manager:
-        model = MyModel(name=u'first', value=55)
+        model = MyModel(name={{repr(one)}}, value=1)
         DBSession.add(model)

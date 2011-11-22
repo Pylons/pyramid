@@ -5,5 +5,5 @@ from .models import MyModel
 
 @view_config(route_name='home', renderer='templates/mytemplate.pt')
 def my_view(request):
-    first = DBSession.query(MyModel).filter(MyModel.name==u'first').first()
-    return {'first':first, 'project':'{{project}}'}
+    one = DBSession.query(MyModel).filter(MyModel.name=={{repr(one)}}).first()
+    return {'one':one, 'project':'{{project}}'}

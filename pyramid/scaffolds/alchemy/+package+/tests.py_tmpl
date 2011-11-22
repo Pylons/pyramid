@@ -17,7 +17,7 @@ class TestMyView(unittest.TestCase):
         DBSession.configure(bind=engine)
         Base.metadata.create_all(engine)
         with transaction.manager:
-            model = MyModel(name=u'first', value=55)
+            model = MyModel(name={{repr(one)}}, value=55)
             DBSession.add(model)
 
     def tearDown(self):
@@ -28,5 +28,5 @@ class TestMyView(unittest.TestCase):
         from .views import my_view
         request = testing.DummyRequest()
         info = my_view(request)
-        self.assertEqual(info['first'].name, 'first')
+        self.assertEqual(info['one'].name, 'one')
         self.assertEqual(info['project'], '{{project}}')
