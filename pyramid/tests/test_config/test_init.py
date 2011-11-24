@@ -662,10 +662,10 @@ pyramid.tests.test_config.dummy_include2""",
         after = config.action_state
         actions = after.actions
         self.assertEqual(len(actions), 1)
-        self.assertEqual(
-            after.actions[0][:3],
-            ('discrim', None, test_config),
-            )
+        action = after.actions[0]
+        self.assertEqual(action['discriminator'], 'discrim')
+        self.assertEqual(action['callable'], None)
+        self.assertEqual(action['args'], test_config)
 
     def test_include_with_python_callable(self):
         from pyramid.tests import test_config
@@ -674,10 +674,10 @@ pyramid.tests.test_config.dummy_include2""",
         after = config.action_state
         actions = after.actions
         self.assertEqual(len(actions), 1)
-        self.assertEqual(
-            actions[0][:3],
-            ('discrim', None, test_config),
-            )
+        action = actions[0]
+        self.assertEqual(action['discriminator'], 'discrim')
+        self.assertEqual(action['callable'], None)
+        self.assertEqual(action['args'], test_config)
 
     def test_include_with_module_defaults_to_includeme(self):
         from pyramid.tests import test_config
@@ -686,10 +686,10 @@ pyramid.tests.test_config.dummy_include2""",
         after = config.action_state
         actions = after.actions
         self.assertEqual(len(actions), 1)
-        self.assertEqual(
-            actions[0][:3],
-            ('discrim', None, test_config),
-            )
+        action = actions[0]
+        self.assertEqual(action['discriminator'], 'discrim')
+        self.assertEqual(action['callable'], None)
+        self.assertEqual(action['args'], test_config)
 
     def test_include_with_route_prefix(self):
         root_config = self._makeOne(autocommit=True)
@@ -749,9 +749,15 @@ pyramid.tests.test_config.dummy_include2""",
         config.action('discrim', kw={'a':1})
         self.assertEqual(
             state.actions,
-            [(('discrim', None, (), {'a': 1}, 0),
-              {'info': 'abc', 'includepath':(), 'introspectables':()})]
-            )
+            [((),
+             {'args': (),
+             'callable': None,
+             'discriminator': 'discrim',
+             'includepath': (),
+             'info': 'abc',
+             'introspectables': (),
+             'kw': {'a': 1},
+             'order': None})])
 
     def test_action_branching_nonautocommit_without_config_info(self):
         config = self._makeOne(autocommit=False)
@@ -763,9 +769,15 @@ pyramid.tests.test_config.dummy_include2""",
         config.action('discrim', kw={'a':1})
         self.assertEqual(
             state.actions,
-            [(('discrim', None, (), {'a': 1}, 0),
-              {'info': 'z', 'includepath':(), 'introspectables':()})]
-            )
+            [((),
+             {'args': (),
+             'callable': None,
+             'discriminator': 'discrim',
+             'includepath': (),
+             'info': 'z',
+             'introspectables': (),
+             'kw': {'a': 1},
+             'order': None})])
 
     def test_scan_integration(self):
         from zope.interface import alsoProvides
@@ -1313,10 +1325,10 @@ class TestConfigurator_add_directive(unittest.TestCase):
         self.assertTrue(hasattr(config, 'dummy_extend'))
         config.dummy_extend('discrim')
         after = config.action_state
-        self.assertEqual(
-            after.actions[-1][:3],
-            ('discrim', None, test_config),
-            )
+        action = after.actions[-1]
+        self.assertEqual(action['discriminator'], 'discrim')
+        self.assertEqual(action['callable'], None)
+        self.assertEqual(action['args'], test_config)
 
     def test_extend_with_python_callable(self):
         from pyramid.tests import test_config
@@ -1326,10 +1338,10 @@ class TestConfigurator_add_directive(unittest.TestCase):
         self.assertTrue(hasattr(config, 'dummy_extend'))
         config.dummy_extend('discrim')
         after = config.action_state
-        self.assertEqual(
-            after.actions[-1][:3],
-            ('discrim', None, test_config),
-            )
+        action = after.actions[-1]
+        self.assertEqual(action['discriminator'], 'discrim')
+        self.assertEqual(action['callable'], None)
+        self.assertEqual(action['args'], test_config)
 
     def test_extend_same_name_doesnt_conflict(self):
         config = self.config
@@ -1340,10 +1352,10 @@ class TestConfigurator_add_directive(unittest.TestCase):
         self.assertTrue(hasattr(config, 'dummy_extend'))
         config.dummy_extend('discrim')
         after = config.action_state
-        self.assertEqual(
-            after.actions[-1][:3],
-            ('discrim', None, config.registry),
-            )
+        action = after.actions[-1]
+        self.assertEqual(action['discriminator'], 'discrim')
+        self.assertEqual(action['callable'], None)
+        self.assertEqual(action['args'], config.registry)
 
     def test_extend_action_method_successful(self):
         config = self.config
@@ -1361,10 +1373,10 @@ class TestConfigurator_add_directive(unittest.TestCase):
         after = config2.action_state
         actions = after.actions
         self.assertEqual(len(actions), 1)
-        self.assertEqual(
-            after.actions[0][:3],
-            ('discrim', None, config2.package),
-            )
+        action = actions[0]
+        self.assertEqual(action['discriminator'], 'discrim')
+        self.assertEqual(action['callable'], None)
+        self.assertEqual(action['args'], config2.package)
 
 class TestActionState(unittest.TestCase):
     def _makeOne(self):
@@ -1380,32 +1392,94 @@ class TestActionState(unittest.TestCase):
         c = self._makeOne()
         c.actions = []
         c.action(1, f, (1,), {'x':1})
-        self.assertEqual(c.actions, [(1, f, (1,), {'x': 1})])
+        self.assertEqual(
+            c.actions,
+            [{'args': (1,),
+             'callable': f,
+             'discriminator': 1,
+             'includepath': (),
+             'info': '',
+             'introspectables': (),
+             'kw': {'x': 1},
+             'order': None}])
         c.action(None)
-        self.assertEqual(c.actions, [(1, f, (1,), {'x': 1}), (None, None)])
+        self.assertEqual(
+            c.actions,
+            [{'args': (1,),
+             'callable': f,
+             'discriminator': 1,
+             'includepath': (),
+             'info': '',
+             'introspectables': (),
+             'kw': {'x': 1},
+             'order': None},
+
+             {'args': (),
+             'callable': None,
+             'discriminator': None,
+             'includepath': (),
+             'info': '',
+             'introspectables': (),
+             'kw': {},
+             'order': None},])
 
     def test_action_with_includepath(self):
         c = self._makeOne()
         c.actions = []
         c.action(None, includepath=('abc',))
-        self.assertEqual(c.actions, [(None, None, (), {}, ('abc',))])
+        self.assertEqual(
+            c.actions,
+            [{'args': (),
+             'callable': None,
+             'discriminator': None,
+             'includepath': ('abc',),
+             'info': '',
+             'introspectables': (),
+             'kw': {},
+             'order': None}])
 
     def test_action_with_info(self):
         c = self._makeOne()
         c.action(None, info='abc')
-        self.assertEqual(c.actions, [(None, None, (), {}, (), 'abc')])
+        self.assertEqual(
+            c.actions,
+            [{'args': (),
+             'callable': None,
+             'discriminator': None,
+             'includepath': (),
+             'info': 'abc',
+             'introspectables': (),
+             'kw': {},
+             'order': None}])
 
     def test_action_with_includepath_and_info(self):
         c = self._makeOne()
         c.action(None, includepath=('spec',), info='bleh')
-        self.assertEqual(c.actions,
-                         [(None, None, (), {}, ('spec',), 'bleh')])
+        self.assertEqual(
+            c.actions,
+            [{'args': (),
+             'callable': None,
+             'discriminator': None,
+             'includepath': ('spec',),
+             'info': 'bleh',
+             'introspectables': (),
+             'kw': {},
+             'order': None}])
 
     def test_action_with_order(self):
         c = self._makeOne()
         c.actions = []
         c.action(None, order=99999)
-        self.assertEqual(c.actions, [(None, None, (), {}, (), '', 99999)])
+        self.assertEqual(
+            c.actions,
+            [{'args': (),
+             'callable': None,
+             'discriminator': None,
+             'includepath': (),
+             'info': '',
+             'introspectables': (),
+             'kw': {},
+             'order': 99999}])
 
     def test_processSpec(self):
         c = self._makeOne()
@@ -1458,12 +1532,54 @@ class Test_resolveConflicts(unittest.TestCase):
             (3, f, (3,), {}, ('y',)),
             (None, f, (5,), {}, ('y',)),
             ])
-        self.assertEqual(result,
-                         [(None, f),
-                          (1, f, (1,), {}, (), 'first'),
-                          (3, f, (3,), {}, ('y',)),
-                          (None, f, (5,), {}, ('y',)),
-                          (4, f, (4,), {}, ('y',), 'should be last')])
+        self.assertEqual(
+            result,
+            [{'info': '',
+              'args': (),
+              'callable': f,
+              'introspectables': (),
+              'kw': {},
+              'discriminator': None,
+              'includepath': (),
+              'order': 0},
+
+              {'info': 'first',
+               'args': (1,),
+               'callable': f,
+               'introspectables': (),
+               'kw': {},
+               'discriminator': 1,
+               'includepath': (),
+               'order': 1},
+
+               {'info': '',
+                'args': (3,),
+                'callable': f,
+                'introspectables': (),
+                'kw': {},
+                'discriminator': 3,
+                'includepath': ('y',),
+                'order': 5},
+
+                {'info': '',
+                 'args': (5,),
+                 'callable': f,
+                 'introspectables': (),
+                 'kw': {},
+                 'discriminator': None,
+                 'includepath': ('y',),
+                 'order': 6},
+
+                 {'info': 'should be last',
+                  'args': (4,),
+                  'callable': f,
+                  'introspectables': (),
+                  'kw': {},
+                  'discriminator': 4,
+                  'includepath': ('y',),
+                  'order': 99999}
+                  ]
+                  )
 
     def test_it_conflict(self):
         from pyramid.tests.test_config import dummyfactory as f

@@ -1,5 +1,6 @@
 import inspect
 import logging
+import operator
 import os
 import sys
 import types
@@ -449,7 +450,7 @@ class Configurator(
                 info = ''
         return info
 
-    def action(self, discriminator, callable=None, args=(), kw=None, order=0,
+    def action(self, discriminator, callable=None, args=(), kw=None, order=None,
                introspectables=()):
         """ Register an action which will be executed when
         :meth:`pyramid.config.Configurator.commit` is called (or executed
@@ -485,11 +486,11 @@ class Configurator(
 
         else:
             self.action_state.action(
-                discriminator,
-                callable,
-                args,
-                kw,
-                order,
+                discriminator=discriminator,
+                callable=callable,
+                args=args,
+                kw=kw,
+                order=order,
                 info=action_info,
                 includepath=self.includepath,
                 introspectables=introspectables,
@@ -870,21 +871,22 @@ class ActionState(object):
         self._seen_files.add(spec)
         return True
 
-    def action(self, discriminator, callable=None, args=(), kw=None, order=0,
+    def action(self, discriminator, callable=None, args=(), kw=None, order=None,
                includepath=(), info='', introspectables=()):
         """Add an action with the given discriminator, callable and arguments
         """
-        # NB: note that the ordering and composition of the action tuple should
-        # not change without first ensuring that ``pyramid_zcml`` appends
-        # similarly-composed actions to our .actions variable (as silly as
-        # the composition and ordering is).
         if kw is None:
             kw = {}
-        action = (discriminator, callable, args, kw, includepath, info, order,
-                  introspectables)
-        # remove trailing false items
-        while (len(action) > 2) and not action[-1]:
-            action = action[:-1]
+        action = dict(
+            discriminator=discriminator,
+            callable=callable,
+            args=args,
+            kw=kw,
+            includepath=includepath,
+            info=info,
+            order=order,
+            introspectables=introspectables,
+            )
         self.actions.append(action)
 
     def execute_actions(self, clear=True, introspector=None):
@@ -936,10 +938,14 @@ class ActionState(object):
 
 
         """
+
         try:
             for action in resolveConflicts(self.actions):
-                (_, callable, args, kw, _, info, _,
-                 introspectables) = expand_action(*action)
+                callable = action['callable']
+                args = action['args']
+                kw = action['kw']
+                info = action['info']
+                introspectables = action['introspectables']
                 if callable is None:
                     continue
                 try:
@@ -966,125 +972,73 @@ def resolveConflicts(actions):
     """Resolve conflicting actions
 
     Given an actions list, identify and try to resolve conflicting actions.
-    Actions conflict if they have the same non-null discriminator.
+    Actions conflict if they have the same non-None discriminator.
     Conflicting actions can be resolved if the include path of one of
     the actions is a prefix of the includepaths of the other
     conflicting actions and is unequal to the include paths in the
     other conflicting actions.
-
-    Here are some examples to illustrate how this works:
-
-    >>> from zope.configmachine.tests.directives import f
-    >>> from pprint import PrettyPrinter
-    >>> pprint=PrettyPrinter(width=60).pprint
-    >>> pprint(resolveConflicts([
-    ...    (None, f),
-    ...    (1, f, (1,), {}, (), 'first'),
-    ...    (1, f, (2,), {}, ('x',), 'second'),
-    ...    (1, f, (3,), {}, ('y',), 'third'),
-    ...    (4, f, (4,), {}, ('y',), 'should be last', 99999),
-    ...    (3, f, (3,), {}, ('y',)),
-    ...    (None, f, (5,), {}, ('y',)),
-    ... ]))
-    [(None, f),
-     (1, f, (1,), {}, (), 'first'),
-     (3, f, (3,), {}, ('y',)),
-     (None, f, (5,), {}, ('y',)),
-     (4, f, (4,), {}, ('y',), 'should be last')]
-
-    >>> try:
-    ...     v = resolveConflicts([
-    ...        (None, f),
-    ...        (1, f, (2,), {}, ('x',), 'eek'),
-    ...        (1, f, (3,), {}, ('y',), 'ack'),
-    ...        (4, f, (4,), {}, ('y',)),
-    ...        (3, f, (3,), {}, ('y',)),
-    ...        (None, f, (5,), {}, ('y',)),
-    ...     ])
-    ... except ConfigurationConflictError, v:
-    ...    pass
-    >>> print v
-    Conflicting configuration actions
-      For: 1
-        eek
-        ack
-
     """
 
     # organize actions by discriminators
     unique = {}
     output = []
     for i in range(len(actions)):
-        (discriminator, callable, args, kw, includepath, info, order,
-         introspectables
-         ) = expand_action(*(actions[i]))
-
-        order = order or i
+        action = actions[i]
+        if not isinstance(action, dict):
+            # old-style ZCML tuple action
+            action = expand_action(*action)
+        order = action['order']
+        if order is None:
+            action['order'] = i
+        discriminator = action['discriminator']
         if discriminator is None:
-            # The discriminator is None, so this directive can
-            # never conflict. We can add it directly to the
-            # configuration actions.
-            output.append(
-                (order, discriminator, callable, args, kw, includepath, info,
-                 introspectables)
-                )
+            # The discriminator is None, so this action can never
+            # conflict. We can add it directly to the result.
+            output.append(action)
             continue
-
-
-        a = unique.setdefault(discriminator, [])
-        a.append(
-            (includepath, order, callable, args, kw, info, introspectables)
-            )
+        L = unique.setdefault(discriminator, [])
+        L.append(action)
 
     # Check for conflicts
     conflicts = {}
     for discriminator, dups in unique.items():
-
         # We need to sort the actions by the paths so that the shortest
         # path with a given prefix comes first:
-        def allbutfunc(stupid):
-            # f me with a shovel, py3 cant cope with sorting when the
-            # callable function is in the list
-            return stupid[0:2] + stupid[3:]
-        dups.sort(key=allbutfunc)
-        (basepath, i, callable, args, kw, baseinfo, introspectables) = dups[0]
-        output.append(
-            (i, discriminator, callable, args, kw, basepath, baseinfo,
-             introspectables)
-            )
-        for (includepath, i, callable, args, kw, info,
-             introspectables) in dups[1:]:
+        def bypath(action):
+            return (action['includepath'], action['order'])
+        dups.sort(key=bypath)
+        output.append(dups[0])
+        basepath = dups[0]['includepath']
+        baseinfo = dups[0]['info']
+        discriminator = dups[0]['discriminator']
+        for dup in dups[1:]:
+            includepath = dup['includepath']
             # Test whether path is a prefix of opath
             if (includepath[:len(basepath)] != basepath # not a prefix
-                or
-                (includepath == basepath)
-                ):
-                if discriminator not in conflicts:
-                    conflicts[discriminator] = [baseinfo]
-                conflicts[discriminator].append(info)
-
+                or includepath == basepath):
+                L = conflicts.setdefault(discriminator, [baseinfo])
+                L.append(dup['info'])
 
     if conflicts:
         raise ConfigurationConflictError(conflicts)
 
-    # Now put the output back in the original order, and return it:
-    output.sort()
-    r = []
-    for o in output:
-        action = o[1:]
-        while len(action) > 2 and not action[-1]:
-            action = action[:-1]
-        r.append(action)
+    output.sort(key=operator.itemgetter('order'))
+    return output
 
-    return r
-
-# this function is licensed under the ZPL (stolen from Zope)
 def expand_action(discriminator, callable=None, args=(), kw=None,
-                   includepath=(), info='', order=0, introspectables=()):
+                  includepath=(), info='', order=None, introspectables=()):
     if kw is None:
         kw = {}
-    return (discriminator, callable, args, kw, includepath, info, order,
-            introspectables)
+    return dict(
+        discriminator=discriminator,
+        callable=callable,
+        args=args,
+        kw=kw,
+        includepath=includepath,
+        info=info,
+        order=order,
+        introspectables=introspectables,
+        )
 
 global_registries = WeakOrderedSet()
 

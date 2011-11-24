@@ -40,12 +40,20 @@ class Introspector(object):
         intr = category.get(discriminator, default)
         return intr
 
-    def getall(self, category_name, sort_fn=None):
+    def get_category(self, category_name, sort_fn=None):
         if sort_fn is None:
             sort_fn = operator.attrgetter('order')
         category = self._categories[category_name]
         values = category.values()
-        return sorted(set(values), key=sort_fn)
+        values = sorted(set(values), key=sort_fn)
+        return [{'introspectable':intr, 'related':self.related(intr)} for
+                intr in values]
+
+    def categorized(self, sort_fn=None):
+        L = []
+        for category_name in sorted(self._categories.keys()):
+            L.append((category_name, self.get_category(category_name, sort_fn)))
+        return L
 
     def remove(self, category_name, discriminator):
         intr = self.get(category_name, discriminator)
@@ -130,6 +138,13 @@ class Introspectable(dict):
     def related(self, introspector):
         return introspector.related(self)
 
+    def text(self):
+        result = [repr(self.discriminator)]
+        for k, v in self.items():
+            result.append('%s: %s' % (k, v))
+        result.append('action_info: %s' % (self.action_info,))
+        return '\n'.join(result)
+
     def __hash__(self):
         return hash((self.category_name,) + (self.discriminator,))
 
@@ -137,6 +152,11 @@ class Introspectable(dict):
         return '<%s category %r, discriminator %r>' % (self.__class__.__name__,
                                                        self.category_name,
                                                        self.discriminator)
+
+    def __nonzero__(self):
+        return True
+
+    __bool__ = __nonzero__ # py3
                                                        
 class IntrospectionConfiguratorMixin(object):
     introspectable = Introspectable

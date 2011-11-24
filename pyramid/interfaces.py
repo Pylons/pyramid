@@ -873,10 +873,23 @@ class IIntrospector(Interface):
         discriminator (or discriminator hash) ``discriminator``.  If it does
         not exist in the introspector, return ``default`` """
 
-    def getall(category_name, sort_fn=None):
-        """ Get a sequence of IIntrospectable objects related to
-        ``category_name`` .  If ``sort_fn`` is ``None``, the sequence of
-        introspectable objects will be returned in the order they were added
+    def get_category(category_name, sort_fn=None):
+        """ Get a sequence of dictionaries in the form
+        ``[{'introspectable':IIntrospectable, 'related':[sequence of related
+        IIntrospectables]}, ...]`` where each introspectable is part of the
+        category associated with ``category_name`` .  If ``sort_fn`` is
+        ``None``, the sequence will be returned in the order the
+        introspectables were added to the introspector.  Otherwise, sort_fn
+        should be a function that accepts an IIntrospectable and returns a
+        value from it (ala the ``key`` function of Python's ``sorted``
+        callable)."""
+
+    def categorized(sort_fn=None):
+        """ Get a sequence of tuples in the form ``[(category_name,
+        [{'introspectable':IIntrospectable, 'related':[sequence of related
+        IIntrospectables]}, ...])]`` representing all known
+        introspectables.  If ``sort_fn`` is ``None``, each introspectables
+        sequence will be returned in the order the introspectables were added
         to the introspector.  Otherwise, sort_fn should be a function that
         accepts an IIntrospectable and returns a value from it (ala the
         ``key`` function of Python's ``sorted`` callable)."""
