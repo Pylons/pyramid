@@ -928,7 +928,7 @@ class IIntrospectable(Interface):
     must also implement all the methods of Python's
     ``collections.MutableMapping`` (the "dictionary interface")."""
 
-    order = Attribute('order added to introspector')
+    order = Attribute('integer order in which registered with introspector')
     category_name = Attribute('introspection category name')
     discriminator = Attribute('introspectable discriminator (within category) '
                               '(must be hashable)')
