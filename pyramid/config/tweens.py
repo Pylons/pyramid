@@ -4,7 +4,6 @@ from pyramid.interfaces import ITweens
 
 from pyramid.compat import string_types
 from pyramid.compat import is_nonstr_iter
-from pyramid.compat import string_types
 from pyramid.exceptions import ConfigurationError
 from pyramid.tweens import excview_tween_factory
 from pyramid.tweens import MAIN, INGRESS, EXCVIEW

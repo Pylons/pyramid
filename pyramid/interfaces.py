@@ -857,9 +857,95 @@ class IRendererInfo(Interface):
                          'to the current application')
 
 
+class IIntrospector(Interface):
+    def add(category_name, discriminator):
+        """ If the introspectable of category_name with ``discriminator``
+        already exists, return it; otherwise create an IIntrospectable object
+        and return it"""
+
+    def add_intr(intr):
+        """ Add the IIntrospectable ``intr`` (use
+        instead of :meth:`pyramid.interfaces.IIntrospector.add` when you have
+        a custom IIntrospectable). """
+
+    def get(category_name, discriminator, default=None):
+        """ Get the IIntrospectable related to the category_name and the
+        discriminator (or discriminator hash) ``discriminator``.  If it does
+        not exist in the introspector, return ``default`` """
+
+    def getall(category_name, sort_fn=None):
+        """ Get a sequence of IIntrospectable objects related to
+        ``category_name`` .  If ``sort_fn`` is ``None``, the sequence of
+        introspectable objects will be returned in the order they were added
+        to the introspector.  Otherwise, sort_fn should be a function that
+        accepts an IIntrospectable and returns a value from it (ala the
+        ``key`` function of Python's ``sorted`` callable)."""
+
+    def remove(category_name, discriminator):
+        """ Remove the IIntrospectable related to ``category_name`` and
+        ``discriminator`` from the introspector. This method will not raise
+        an error if the intrpsectable does not exist. """
+
+    def relate(*pairs):
+        """ Given any number of of ``(category_name, discriminator)`` pairs
+        passed as positional arguments, relate the associated introspectables
+        to each other. The introspectable related to each pair must have
+        already been added via ``.add`` or ``.add_intr``; a :exc:`KeyError`
+        will result if this is not true.  An error will not be raised if any
+        pair has already been associated with another."""
+
+    def unrelate(*pairs):
+        """ Given any number of of ``(category_name, discriminator)`` pairs
+        passed as positional arguments, unrelate the associated introspectables
+        from each other. The introspectable related to each pair must have
+        already been added via ``.add`` or ``.add_intr``; a :exc:`KeyError`
+        will result if this is not true.  An error will not be raised if any
+        pair is not already related to another."""
+
+    def related(category_name, discriminator):
+        """ Return a sequence of IIntrospectables related to the
+        IIntrospectable associated with (``category_name``,
+        ``discriminator``). Return the empty sequence if no relations for
+        exist."""
+
+
+class IIntrospectable(Interface):
+    """ An introspectable object used for configuration introspection.  In
+    addition to the methods below, objects which implement this interface
+    must also implement all the methods of Python's
+    ``collections.MutableMapping`` (the "dictionary interface")."""
+
+    order = Attribute('order added to introspector')
+    category_name = Attribute('introspection category name')
+    discriminator = Attribute('introspectable discriminator (within category) '
+                              '(must be hashable)')
+    discriminator_hash = Attribute('an integer hash of the discriminator')
+
+    def relate(category_name, discriminator):
+        """ Relate this IIntrospectable with another IIntrospectable (the one
+        associated with the ``category_name`` and ``discriminator``). The
+        introspectable you wish to relate to must have already been added via
+        :meth:`pyramid.interfaces.IIntrospector.add` or
+        :meth:`pyramid.interfaces.IIntrospector.add_intr`; a :exc:`KeyError`
+        will result if this is not true.
+        """
+
+    def unrelate(self, category_name, discriminator):
+        """ Break any relationship between this IIntrospectable and another
+        IIntrospectable (the one associated with the ``category_name`` and
+        ``discriminator``). The introspectable you wish to unrelate from must
+        have already been added via
+        :meth:`pyramid.interfaces.IIntrospector.add` or
+        :meth:`pyramid.interfaces.IIntrospector.add_intr`; a :exc:`KeyError`
+        will result if this is not true.  """
+
+    def related(self):
+        """ Return a set of related IIntrospectables """
+
 # configuration phases: a lower phase number means the actions associated
 # with this phase will be executed earlier than those with later phase
 # numbers.  The default phase number is 0, FTR.
 
 PHASE1_CONFIG = -20
 PHASE2_CONFIG = -10
+

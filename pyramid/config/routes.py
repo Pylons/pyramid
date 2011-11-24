@@ -365,6 +365,15 @@ class RoutesConfiguratorMixin(object):
 
         mapper = self.get_routes_mapper()
 
+        intr = self.introspectable('route', name)
+        intr['name'] = name
+        intr['pattern'] = pattern
+        intr['factory'] = factory
+        intr['predicates'] = predicates
+        intr['pregenerator'] = pregenerator
+        intr['static'] = static
+        intr['use_global_views'] = use_global_views
+
         def register_route_request_iface():
             request_iface = self.registry.queryUtility(IRouteRequest, name=name)
             if request_iface is None:
@@ -377,9 +386,12 @@ class RoutesConfiguratorMixin(object):
                     request_iface, IRouteRequest, name=name)
 
         def register_connect():
-            return mapper.connect(name, pattern, factory, predicates=predicates,
-                                  pregenerator=pregenerator, static=static)
-
+            route = mapper.connect(
+                name, pattern, factory, predicates=predicates,
+                pregenerator=pregenerator, static=static
+                )
+            intr['object'] = route
+            return route
 
         # We have to connect routes in the order they were provided;
         # we can't use a phase to do that, because when the actions are
@@ -389,7 +401,7 @@ class RoutesConfiguratorMixin(object):
         # But IRouteRequest interfaces must be registered before we begin to
         # process view registrations (in phase 3)
         self.action(('route', name), register_route_request_iface,
-                    order=PHASE2_CONFIG)
+                    order=PHASE2_CONFIG, introspectables=(intr,))
 
         # deprecated adding views from add_route; must come after
         # route registration for purposes of autocommit ordering

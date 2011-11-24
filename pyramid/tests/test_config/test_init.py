@@ -750,7 +750,7 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(
             state.actions,
             [(('discrim', None, (), {'a': 1}, 0),
-              {'info': 'abc', 'includepath':()})]
+              {'info': 'abc', 'includepath':(), 'introspectables':()})]
             )
 
     def test_action_branching_nonautocommit_without_config_info(self):
@@ -764,7 +764,7 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(
             state.actions,
             [(('discrim', None, (), {'a': 1}, 0),
-              {'info': 'z', 'includepath':()})]
+              {'info': 'z', 'includepath':(), 'introspectables':()})]
             )
 
     def test_scan_integration(self):

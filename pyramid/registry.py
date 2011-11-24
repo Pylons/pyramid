@@ -1,7 +1,10 @@
 from zope.interface.registry import Components
 
 from pyramid.compat import text_
-from pyramid.interfaces import ISettings
+from pyramid.interfaces import (
+    ISettings,
+    IIntrospector
+    )
 
 empty = text_('')
 
@@ -26,6 +29,7 @@ class Registry(Components, dict):
     # for optimization purposes, if no listeners are listening, don't try
     # to notify them
     has_listeners = False
+
     _settings = None
 
     def __nonzero__(self):
@@ -73,5 +77,17 @@ class Registry(Components, dict):
         self._settings = settings
 
     settings = property(_get_settings, _set_settings)
+
+    def _get_introspector(self):
+        return self.queryUtility(IIntrospector)
+
+    def _set_introspector(self, introspector):
+        self.registerUtility(introspector, IIntrospector)
+
+    def _del_introspector(self):
+        self.unregisterUtility(IIntrospector)
+
+    introspector = property(_get_introspector, _set_introspector,
+                            _del_introspector)
 
 global_registry = Registry('global')

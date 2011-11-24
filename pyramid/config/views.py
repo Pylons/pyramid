@@ -1068,7 +1068,20 @@ class ViewsConfiguratorMixin(object):
             xhr, accept, header, path_info, match_param]
         discriminator.extend(sorted([hash(x) for x in custom_predicates]))
         discriminator = tuple(discriminator)
-        self.action(discriminator, register)
+        introspectables = []
+        view_intr = self.introspectable('view', discriminator)
+        introspectables.append(view_intr)
+        if route_name:
+            view_intr.relate('route', route_name) # see add_route
+        if renderer is not None and renderer.name and '.' in renderer.name:
+            tmpl_intr = self.introspectable('template', discriminator)
+            tmpl_intr.relate('view', discriminator)
+            introspectables.append(tmpl_intr)
+        if permission is not None:
+            perm_intr = self.introspectable('permission', permission)
+            perm_intr.relate('view', discriminator)
+            introspectables.append(perm_intr)
+        self.action(discriminator, register, introspectables=introspectables)
 
     def derive_view(self, view, attr=None, renderer=None):
         """

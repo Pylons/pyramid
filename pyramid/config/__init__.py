@@ -8,8 +8,11 @@ import venusian
 
 from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
 
-from pyramid.interfaces import IDebugLogger
-from pyramid.interfaces import IExceptionResponse
+from pyramid.interfaces import (
+    IDebugLogger,
+    IExceptionResponse,
+    IIntrospector,
+    )
 
 from pyramid.asset import resolve_asset_spec
 from pyramid.authorization import ACLAuthorizationPolicy
@@ -45,6 +48,7 @@ from pyramid.config.tweens import TweensConfiguratorMixin
 from pyramid.config.util import action_method
 from pyramid.config.views import ViewsConfiguratorMixin
 from pyramid.config.zca import ZCAConfiguratorMixin
+from pyramid.config.introspection import IntrospectionConfiguratorMixin
 
 empty = text_('')
 
@@ -63,6 +67,7 @@ class Configurator(
     SettingsConfiguratorMixin,
     FactoriesConfiguratorMixin,
     AdaptersConfiguratorMixin,
+    IntrospectionConfiguratorMixin,
     ):
     """
     A Configurator is used to configure a :app:`Pyramid`
@@ -415,9 +420,37 @@ class Configurator(
                                                  info=info, event=event)
             _registry.registerSelfAdapter = registerSelfAdapter
 
+        if not hasattr(_registry, 'introspector'):
+            def _get_introspector(reg):
+                return reg.queryUtility(IIntrospector)
+
+            def _set_introspector(reg, introspector):
+                reg.registerUtility(introspector, IIntrospector)
+
+            def _del_introspector(reg):
+                reg.unregisterUtility(IIntrospector)
+
+            introspector = property(_get_introspector, _set_introspector,
+                                    _del_introspector)
+
+            _registry.__class__.introspector = introspector
+
+
     # API
 
-    def action(self, discriminator, callable=None, args=(), kw=None, order=0):
+    @property
+    def action_info(self):
+        info = self.info # usually a ZCML action if self.info has data
+        if not info:
+            # Try to provide more accurate info for conflict reports
+            if self._ainfo:
+                info = self._ainfo[0]
+            else:
+                info = ''
+        return info
+
+    def action(self, discriminator, callable=None, args=(), kw=None, order=0,
+               introspectables=()):
         """ Register an action which will be executed when
         :meth:`pyramid.config.Configurator.commit` is called (or executed
         immediately if ``autocommit`` is ``True``).
@@ -442,27 +475,24 @@ class Configurator(
             kw = {}
 
         autocommit = self.autocommit
+        action_info = self.action_info
 
         if autocommit:
             if callable is not None:
                 callable(*args, **kw)
+            for introspectable in introspectables:
+                introspectable(self.introspector, action_info)
 
         else:
-            info = self.info # usually a ZCML action if self.info has data
-            if not info:
-                # Try to provide more accurate info for conflict reports
-                if self._ainfo:
-                    info = self._ainfo[0]
-                else:
-                    info = ''
             self.action_state.action(
                 discriminator,
                 callable,
                 args,
                 kw,
                 order,
-                info=info,
+                info=action_info,
                 includepath=self.includepath,
+                introspectables=introspectables,
                 )
 
     def _get_action_state(self):
@@ -488,7 +518,7 @@ class Configurator(
         of this error will be information about the source of the conflict,
         usually including file names and line numbers of the cause of the
         configuration conflicts."""
-        self.action_state.execute_actions()
+        self.action_state.execute_actions(introspector=self.introspector)
         self.action_state = ActionState() # old actions have been processed
 
     def include(self, callable, route_prefix=None):
@@ -841,7 +871,7 @@ class ActionState(object):
         return True
 
     def action(self, discriminator, callable=None, args=(), kw=None, order=0,
-               includepath=(), info=''):
+               includepath=(), info='', introspectables=()):
         """Add an action with the given discriminator, callable and arguments
         """
         # NB: note that the ordering and composition of the action tuple should
@@ -850,13 +880,14 @@ class ActionState(object):
         # the composition and ordering is).
         if kw is None:
             kw = {}
-        action = (discriminator, callable, args, kw, includepath, info, order)
+        action = (discriminator, callable, args, kw, includepath, info, order,
+                  introspectables)
         # remove trailing false items
         while (len(action) > 2) and not action[-1]:
             action = action[:-1]
         self.actions.append(action)
 
-    def execute_actions(self, clear=True):
+    def execute_actions(self, clear=True, introspector=None):
         """Execute the configuration actions
 
         This calls the action callables after resolving conflicts
@@ -907,7 +938,8 @@ class ActionState(object):
         """
         try:
             for action in resolveConflicts(self.actions):
-                _, callable, args, kw, _, info, _ = expand_action(*action)
+                (_, callable, args, kw, _, info, _,
+                 introspectables) = expand_action(*action)
                 if callable is None:
                     continue
                 try:
@@ -922,6 +954,9 @@ class ActionState(object):
                                 tb)
                     finally:
                        del t, v, tb
+                for introspectable in introspectables:
+                    introspectable(introspector, info)
+                
         finally:
             if clear:
                 del self.actions[:]
@@ -980,7 +1015,8 @@ def resolveConflicts(actions):
     unique = {}
     output = []
     for i in range(len(actions)):
-        (discriminator, callable, args, kw, includepath, info, order
+        (discriminator, callable, args, kw, includepath, info, order,
+         introspectables
          ) = expand_action(*(actions[i]))
 
         order = order or i
@@ -989,14 +1025,15 @@ def resolveConflicts(actions):
             # never conflict. We can add it directly to the
             # configuration actions.
             output.append(
-                (order, discriminator, callable, args, kw, includepath, info)
+                (order, discriminator, callable, args, kw, includepath, info,
+                 introspectables)
                 )
             continue
 
 
         a = unique.setdefault(discriminator, [])
         a.append(
-            (includepath, order, callable, args, kw, info)
+            (includepath, order, callable, args, kw, info, introspectables)
             )
 
     # Check for conflicts
@@ -1010,11 +1047,13 @@ def resolveConflicts(actions):
             # callable function is in the list
             return stupid[0:2] + stupid[3:]
         dups.sort(key=allbutfunc)
-        (basepath, i, callable, args, kw, baseinfo) = dups[0]
+        (basepath, i, callable, args, kw, baseinfo, introspectables) = dups[0]
         output.append(
-            (i, discriminator, callable, args, kw, basepath, baseinfo)
+            (i, discriminator, callable, args, kw, basepath, baseinfo,
+             introspectables)
             )
-        for includepath, i, callable, args, kw, info in dups[1:]:
+        for (includepath, i, callable, args, kw, info,
+             introspectables) in dups[1:]:
             # Test whether path is a prefix of opath
             if (includepath[:len(basepath)] != basepath # not a prefix
                 or
@@ -1041,10 +1080,11 @@ def resolveConflicts(actions):
 
 # this function is licensed under the ZPL (stolen from Zope)
 def expand_action(discriminator, callable=None, args=(), kw=None,
-                   includepath=(), info='', order=0):
+                   includepath=(), info='', order=0, introspectables=()):
     if kw is None:
         kw = {}
-    return (discriminator, callable, args, kw, includepath, info, order)
+    return (discriminator, callable, args, kw, includepath, info, order,
+            introspectables)
 
 global_registries = WeakOrderedSet()
 
