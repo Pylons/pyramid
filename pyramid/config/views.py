@@ -931,7 +931,8 @@ class ViewsConfiguratorMixin(object):
             xhr, accept, header, path_info, match_param]
         discriminator.extend(sorted([hash(x) for x in custom_predicates]))
         discriminator = tuple(discriminator)
-        view_intr = self.introspectable('view', discriminator, 'view')
+        view_intr = self.introspectable('views', discriminator, repr(view),
+                                        'view')
         view_intr.update(
             dict(name=name,
                  context=context,
@@ -1092,20 +1093,20 @@ class ViewsConfiguratorMixin(object):
                         IMultiView, name=name)
 
         if route_name:
-            view_intr.relate('route', route_name) # see add_route
+            view_intr.relate('routes', route_name) # see add_route
         if renderer is not None and renderer.name and '.' in renderer.name:
-            tmpl_intr = self.introspectable('template', discriminator,
-                                            renderer.name)
-            tmpl_intr.relate('view', discriminator)
+            tmpl_intr = self.introspectable('templates', discriminator,
+                                            renderer.name, 'template')
+            tmpl_intr.relate('views', discriminator)
             tmpl_intr['name'] = renderer.name
             tmpl_intr['type'] = renderer.type
             tmpl_intr['renderer'] = renderer
             introspectables.append(tmpl_intr)
         if permission is not None:
-            perm_intr = self.introspectable('permission', permission,
-                                            permission)
+            perm_intr = self.introspectable('permissions', permission,
+                                            permission, 'permission')
             perm_intr['value'] = permission
-            perm_intr.relate('view', discriminator)
+            perm_intr.relate('views', discriminator)
             introspectables.append(perm_intr)
         self.action(discriminator, register, introspectables=introspectables)
 

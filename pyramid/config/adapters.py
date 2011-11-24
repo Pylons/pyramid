@@ -27,7 +27,10 @@ class AdaptersConfiguratorMixin(object):
             iface = (iface,)
         def register():
             self.registry.registerHandler(subscriber, iface)
-        intr = self.introspectable('subscriber', id(subscriber), 'subscriber')
+        intr = self.introspectable('subscribers',
+                                   id(subscriber),
+                                   repr(subscriber),
+                                   'subscriber')
         intr['subscriber'] = subscriber
         intr['interfaces'] = iface
         self.action(None, register, introspectables=(intr,))
@@ -56,8 +59,11 @@ class AdaptersConfiguratorMixin(object):
             else:
                 reg.registerAdapter(adapter, (type_or_iface,), IResponse)
         discriminator = (IResponse, type_or_iface)
-        intr = self.introspectable('response adapter', discriminator,
-                                   'response adapter')
+        intr = self.introspectable(
+            'response adapters',
+            discriminator,
+            repr(adapter),
+            'response adapter')
         intr['adapter'] = adapter
         intr['type'] = type_or_iface
         self.action(discriminator, register, introspectables=(intr,))

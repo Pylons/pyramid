@@ -237,8 +237,10 @@ class AssetsConfiguratorMixin(object):
             override(from_package, path, to_package, override_prefix)
 
         intr = self.introspectable(
-            'asset override',
+            'asset overrides',
             (package, override_package, path, override_prefix),
+            '%s/%s -> %s/%s' % (package, path, override_package,
+                                override_prefix),
             'asset override',
             )
         intr['package'] = package

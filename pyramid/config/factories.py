@@ -27,17 +27,18 @@ class FactoriesConfiguratorMixin(object):
             self.registry.registerUtility(factory, IRootFactory)
             self.registry.registerUtility(factory, IDefaultRootFactory) # b/c
 
-        intr = self.introspectable('root factory', None, 'root factory')
+        intr = self.introspectable('root factories', None, repr(factory),
+                                   'root factory')
         intr['factory'] = factory
         self.action(IRootFactory, register, introspectables=(intr,))
 
     _set_root_factory = set_root_factory # bw compat
 
     @action_method
-    def set_session_factory(self, session_factory):
+    def set_session_factory(self, factory):
         """
         Configure the application with a :term:`session factory`.  If this
-        method is called, the ``session_factory`` argument must be a session
+        method is called, the ``factory`` argument must be a session
         factory callable or a :term:`dotted Python name` to that factory.
 
         .. note::
@@ -46,11 +47,12 @@ class FactoriesConfiguratorMixin(object):
            :class:`pyramid.config.Configurator` constructor can be used to
            achieve the same purpose.
         """
-        session_factory = self.maybe_dotted(session_factory)
+        factory = self.maybe_dotted(factory)
         def register():
-            self.registry.registerUtility(session_factory, ISessionFactory)
-        intr = self.introspectable('session factory', None, 'session factory')
-        intr['factory'] = session_factory
+            self.registry.registerUtility(factory, ISessionFactory)
+        intr = self.introspectable('session factory', None, repr(factory),
+                                   'session factory')
+        intr['factory'] = factory
         self.action(ISessionFactory, register, introspectables=(intr,))
 
     @action_method
@@ -72,7 +74,8 @@ class FactoriesConfiguratorMixin(object):
         factory = self.maybe_dotted(factory)
         def register():
             self.registry.registerUtility(factory, IRequestFactory)
-        intr = self.introspectable('request factory', None, 'request factory')
+        intr = self.introspectable('request factory', None, repr(factory),
+                                   'request factory')
         intr['factory'] = factory
         self.action(IRequestFactory, register, introspectables=(intr,))
 

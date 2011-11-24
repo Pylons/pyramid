@@ -3,32 +3,18 @@ import operator
 from zope.interface import implementer
 
 from pyramid.interfaces import (
-    IIntrospector,
-    IIntrospectable
+    IIntrospectable,
+    IIntrospector
     )
 
 @implementer(IIntrospector)
 class Introspector(object):
-    action_info = None
     def __init__(self):
         self._refs = {}
         self._categories = {}
         self._counter = 0
 
-    def add(self, category_name, discriminator):
-        category = self._categories.setdefault(category_name, {})
-        intr = category.get(discriminator)
-        if intr is None:
-            intr = Introspectable(category_name, discriminator)
-            category[intr.discriminator] = intr
-            category[intr.discriminator_hash] = intr
-            intr.order = self._counter
-        self._counter += 1
-        return intr
-
-    # for adding custom introspectables (instead of using .add)
-
-    def add_intr(self, intr):
+    def add(self, intr):
         category = self._categories.setdefault(intr.category_name, {})
         category[intr.discriminator] = intr
         category[intr.discriminator_hash] = intr
@@ -49,9 +35,12 @@ class Introspector(object):
         return [{'introspectable':intr, 'related':self.related(intr)} for
                 intr in values]
 
+    def categories(self):
+        return sorted(self._categories.keys())
+
     def categorized(self, sort_fn=None):
         L = []
-        for category_name in sorted(self._categories.keys()):
+        for category_name in self.categories():
             L.append((category_name, self.get_category(category_name, sort_fn)))
         return L
 
@@ -73,7 +62,6 @@ class Introspector(object):
             category_name, discriminator = pair
             intr = self._categories.get(category_name, {}).get(discriminator)
             if intr is None:
-                import pdb; pdb.set_trace()
                 raise KeyError((category_name, discriminator))
             introspectables.append(intr)
         return introspectables
@@ -101,16 +89,30 @@ class Introspector(object):
             raise KeyError((category_name, discriminator))
         return self._refs.get(intr, [])
 
+    def register(self, introspectable, action_info=''):
+        introspectable.action_info = action_info
+        self.add(introspectable)
+        for category_name, discriminator in introspectable.relations:
+            self.relate((
+                introspectable.category_name, introspectable.discriminator),
+                (category_name, discriminator))
+
+        for category_name, discriminator in introspectable.unrelations:
+            self.unrelate((
+                introspectable.category_name, introspectable.discriminator),
+                (category_name, discriminator))
+
 @implementer(IIntrospectable)
 class Introspectable(dict):
 
-    order = 0 # mutated by .add/.add_intr
-    action_info = ''
+    order = 0 # mutated by introspector.add/introspector.add_intr
+    action_info = '' # mutated by introspector.register
 
-    def __init__(self, category_name, discriminator, title):
+    def __init__(self, category_name, discriminator, title, type_name):
         self.category_name = category_name
         self.discriminator = discriminator
         self.title = title
+        self.type_name = type_name
         self.relations = []
         self.unrelations = []
 
@@ -120,24 +122,9 @@ class Introspectable(dict):
     def unrelate(self, category_name, discriminator):
         self.unrelations.append((category_name, discriminator))
 
-    def __call__(self, introspector, action_info):
-        self.action_info = action_info
-        introspector.add_intr(self)
-        for category_name, discriminator in self.relations:
-            introspector.relate((self.category_name, self.discriminator),
-                                (category_name, discriminator))
-
-        for category_name, discriminator in self.unrelations:
-            introspector.unrelate((self.category_name, self.discriminator),
-                                  (category_name, discriminator))
-
     @property
     def discriminator_hash(self):
         return hash(self.discriminator)
-
-    @property
-    def related(self, introspector):
-        return introspector.related(self)
 
     def __hash__(self):
         return hash((self.category_name,) + (self.discriminator,))

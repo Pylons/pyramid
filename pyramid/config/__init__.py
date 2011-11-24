@@ -477,12 +477,14 @@ class Configurator(
 
         autocommit = self.autocommit
         action_info = self.action_info
+        introspector = self.introspector
 
         if autocommit:
             if callable is not None:
                 callable(*args, **kw)
             for introspectable in introspectables:
-                introspectable(self.introspector, action_info)
+                if introspector is not None:
+                    introspector.register(introspectable, action_info)
 
         else:
             self.action_state.action(
@@ -960,8 +962,9 @@ class ActionState(object):
                                 tb)
                     finally:
                        del t, v, tb
-                for introspectable in introspectables:
-                    introspectable(introspector, info)
+                if introspector is not None:
+                    for introspectable in introspectables:
+                        introspector.register(introspectable, info)
                 
         finally:
             if clear:
