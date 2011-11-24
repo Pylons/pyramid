@@ -107,9 +107,10 @@ class Introspectable(dict):
     order = 0 # mutated by .add/.add_intr
     action_info = ''
 
-    def __init__(self, category_name, discriminator):
+    def __init__(self, category_name, discriminator, title):
         self.category_name = category_name
         self.discriminator = discriminator
+        self.title = title
         self.relations = []
         self.unrelations = []
 
@@ -137,13 +138,6 @@ class Introspectable(dict):
     @property
     def related(self, introspector):
         return introspector.related(self)
-
-    def text(self):
-        result = [repr(self.discriminator)]
-        for k, v in self.items():
-            result.append('%s: %s' % (k, v))
-        result.append('action_info: %s' % (self.action_info,))
-        return '\n'.join(result)
 
     def __hash__(self):
         return hash((self.category_name,) + (self.discriminator,))

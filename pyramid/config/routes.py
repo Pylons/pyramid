@@ -365,7 +365,7 @@ class RoutesConfiguratorMixin(object):
 
         mapper = self.get_routes_mapper()
 
-        intr = self.introspectable('route', name)
+        intr = self.introspectable('route', name, name)
         intr['name'] = name
         intr['pattern'] = pattern
         intr['factory'] = factory

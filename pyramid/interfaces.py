@@ -871,7 +871,7 @@ class IIntrospector(Interface):
     def get(category_name, discriminator, default=None):
         """ Get the IIntrospectable related to the category_name and the
         discriminator (or discriminator hash) ``discriminator``.  If it does
-        not exist in the introspector, return ``default`` """
+        not exist in the introspector, return the value of ``default`` """
 
     def get_category(category_name, sort_fn=None):
         """ Get a sequence of dictionaries in the form

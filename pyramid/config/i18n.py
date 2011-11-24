@@ -38,7 +38,8 @@ class I18NConfiguratorMixin(object):
         """
         def register():
             self._set_locale_negotiator(negotiator)
-        intr = self.introspectable('locale negotiator', None)
+        intr = self.introspectable('locale negotiator', None,
+                                   'locale negotiator')
         intr['negotiator'] = negotiator
         self.action(ILocaleNegotiator, register, introspectables=(intr,))
 
@@ -86,7 +87,7 @@ class I18NConfiguratorMixin(object):
             if not os.path.isdir(os.path.realpath(directory)):
                 raise ConfigurationError('"%s" is not a directory' %
                                          directory)
-            intr = self.introspectable('translation directory', directory)
+            intr = self.introspectable('translation directory', directory, spec)
             intr['directory'] = directory
             introspectables.append(intr)
             directories.append(directory)

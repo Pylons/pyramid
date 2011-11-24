@@ -924,6 +924,34 @@ class ViewsConfiguratorMixin(object):
                 name=renderer, package=self.package,
                 registry = self.registry)
 
+        introspectables = []
+        discriminator = [
+            'view', context, name, request_type, IView, containment,
+            request_param, request_method, route_name, attr,
+            xhr, accept, header, path_info, match_param]
+        discriminator.extend(sorted([hash(x) for x in custom_predicates]))
+        discriminator = tuple(discriminator)
+        view_intr = self.introspectable('view', discriminator, 'view')
+        view_intr.update(
+            dict(name=name,
+                 context=context,
+                 containment=containment,
+                 request_param=request_param,
+                 request_method=request_method,
+                 route_name=route_name,
+                 attr=attr,
+                 xhr=xhr,
+                 accept=accept,
+                 header=header,
+                 path_info=path_info,
+                 match_param=match_param,
+                 callable=view,
+                 mapper=mapper,
+                 decorator=decorator,
+                 )
+            )
+        introspectables.append(view_intr)
+
         def register(permission=permission, renderer=renderer):
             request_iface = IRequest
             if route_name is not None:
@@ -965,6 +993,7 @@ class ViewsConfiguratorMixin(object):
                                   decorator=decorator,
                                   http_cache=http_cache)
             derived_view = deriver(view)
+            view_intr['derived_callable'] = derived_view
 
             registered = self.registry.adapters.registered
 
@@ -1062,23 +1091,20 @@ class ViewsConfiguratorMixin(object):
                         (IExceptionViewClassifier, request_iface, context),
                         IMultiView, name=name)
 
-        discriminator = [
-            'view', context, name, request_type, IView, containment,
-            request_param, request_method, route_name, attr,
-            xhr, accept, header, path_info, match_param]
-        discriminator.extend(sorted([hash(x) for x in custom_predicates]))
-        discriminator = tuple(discriminator)
-        introspectables = []
-        view_intr = self.introspectable('view', discriminator)
-        introspectables.append(view_intr)
         if route_name:
             view_intr.relate('route', route_name) # see add_route
         if renderer is not None and renderer.name and '.' in renderer.name:
-            tmpl_intr = self.introspectable('template', discriminator)
+            tmpl_intr = self.introspectable('template', discriminator,
+                                            renderer.name)
             tmpl_intr.relate('view', discriminator)
+            tmpl_intr['name'] = renderer.name
+            tmpl_intr['type'] = renderer.type
+            tmpl_intr['renderer'] = renderer
             introspectables.append(tmpl_intr)
         if permission is not None:
-            perm_intr = self.introspectable('permission', permission)
+            perm_intr = self.introspectable('permission', permission,
+                                            permission)
+            perm_intr['value'] = permission
             perm_intr.relate('view', discriminator)
             introspectables.append(perm_intr)
         self.action(discriminator, register, introspectables=introspectables)

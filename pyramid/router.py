@@ -178,7 +178,7 @@ class Router(object):
 
                 if request.response_callbacks:
                     request._process_response_callbacks(response)
-                    
+
                 return response(request.environ, start_response)
 
             finally:
