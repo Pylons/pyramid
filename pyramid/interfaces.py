@@ -943,7 +943,7 @@ class IIntrospectable(Interface):
         will result if this is not true.
         """
 
-    def unrelate(self, category_name, discriminator):
+    def unrelate(category_name, discriminator):
         """ Break any relationship between this IIntrospectable and another
         IIntrospectable (the one associated with the ``category_name`` and
         ``discriminator``). The introspectable you wish to unrelate from must
@@ -952,8 +952,11 @@ class IIntrospectable(Interface):
         :meth:`pyramid.interfaces.IIntrospector.add_intr`; a :exc:`KeyError`
         will result if this is not true.  """
 
-    def related(self):
-        """ Return a set of related IIntrospectables """
+    def related(introspector):
+        """ Return a sequence of related IIntrospectables """
+
+    def __call__(introspector, action_info):
+        """ Register this IIntrospectable with the introspector """
 
 # configuration phases: a lower phase number means the actions associated
 # with this phase will be executed earlier than those with later phase
