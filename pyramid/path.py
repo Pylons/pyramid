@@ -25,7 +25,7 @@ def package_name(pkg_or_module):
     package name of the package in which the module lives.  If this
     function is passed a package, return the dotted Python package
     name of the package itself."""
-    if pkg_or_module is None:
+    if pkg_or_module is None or pkg_or_module.__name__ == '__main__':
         return '__main__'
     pkg_filename = pkg_or_module.__file__
     pkg_name = pkg_or_module.__name__

@@ -4,14 +4,11 @@ Pyramid TODOs
 Must-Have
 ---------
 
-- Fix ZODB tutorial docs to match ZODB tutorial code (I removed program name
-  from ``scan``).
-
 - Fix SQLA tutorial to match ZODB tutorial.
 
-- Fix routesalchemy scaffold to match ZODB scaffold.
-
-- Remove alchemy scaffold.
+- Fix SQLA tutorial to match alchemy scaffold.  See
+  https://github.com/Pylons/pyramid/issues/359 for additional suggestions
+  from Mike.
 
 Nice-to-Have
 ------------

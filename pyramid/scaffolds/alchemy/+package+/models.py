@@ -1,10 +1,7 @@
-import transaction
-
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import Unicode
 
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy.orm import scoped_session
@@ -25,18 +22,3 @@ class MyModel(Base):
         self.name = name
         self.value = value
 
-def populate():
-    session = DBSession()
-    model = MyModel(name='root', value=55)
-    session.add(model)
-    session.flush()
-    transaction.commit()
-
-def initialize_sql(engine):
-    DBSession.configure(bind=engine)
-    Base.metadata.bind = engine
-    Base.metadata.create_all(engine)
-    try:
-        populate()
-    except IntegrityError:
-        transaction.abort()

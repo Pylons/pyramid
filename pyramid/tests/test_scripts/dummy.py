@@ -5,7 +5,7 @@ class DummyTweens(object):
         self.name_to_alias = {}
     def implicit(self):
         return self._implicit
-                
+
 class Dummy:
     pass
 
@@ -30,6 +30,11 @@ class DummyInteractor:
     def __call__(self, banner, local):
         self.banner = banner
         self.local = local
+
+class DummyBPythonShell:
+    def __call__(self, locals_, banner):
+        self.locals_ = locals_
+        self.banner = banner
 
 class DummyIPShell(object):
     IP = Dummy()
@@ -72,7 +77,7 @@ class DummyRoute(object):
 
     def match(self, route):
         return self.matchdict
-        
+
 class DummyRequest:
     application_url = 'http://example.com:5432'
     script_name = ''

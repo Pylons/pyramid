@@ -9,19 +9,18 @@ Installing :app:`Pyramid`
 Before You Install
 ------------------
 
-You will need `Python <http://python.org>`_ version 2.5 or better to
+You will need `Python <http://python.org>`_ version 2.6 or better to
 run :app:`Pyramid`.  
 
 .. sidebar:: Python Versions
 
-    As of this writing, :app:`Pyramid` has been tested under Python 2.5.5,
-    Python 2.6.6, and Python 2.7.2.  :app:`Pyramid` does not run under any
-    version of Python before 2.5, and does not yet run under Python 3.X.
+    As of this writing, :app:`Pyramid` has been tested under Python 2.6.6,
+    Python 2.7.2, and Python 3.2.  :app:`Pyramid` does not run under any
+    version of Python before 2.6.
 
 :app:`Pyramid` is known to run on all popular UNIX-like systems such as
 Linux, MacOS X, and FreeBSD as well as on Windows platforms.  It is also
-known to run on Google's App Engine, :term:`PyPy` (1.5 and 1.6), and
-:term:`Jython` (2.5.2).
+known to run on Google's App Engine, and :term:`PyPy` (1.6+).
 
 :app:`Pyramid` installation does not require the compilation of any
 C code, so you need only a Python interpreter that meets the
@@ -324,25 +323,6 @@ Installing :app:`Pyramid` on Google App Engine
 
 :ref:`appengine_tutorial` documents the steps required to install a
 :app:`Pyramid` application on Google App Engine.
-
-.. index::
-   single: installing on Jython
-
-Installing :app:`Pyramid` on Jython
---------------------------------------
-
-:app:`Pyramid` is known to work under :term:`Jython` version 2.5.1.
-Install :term:`Jython`, and then follow the installation steps for
-:app:`Pyramid` on your platform described in one of the sections
-entitled :ref:`installing_unix` or :ref:`installing_windows` above,
-replacing the ``python`` command with ``jython`` as necessary.  The
-steps are exactly the same except you should use the ``jython``
-command name instead of the ``python`` command name.
-
-One caveat exists to using :app:`Pyramid` under Jython: the :term:`Chameleon`
-templating engine does not work on Jython.  However, the :term:`Mako`
-templating system, which is also included with Pyramid, does work under
-Jython; use it instead.
 
 What Gets Installed
 -------------------

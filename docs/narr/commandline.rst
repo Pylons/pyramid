@@ -111,6 +111,7 @@ For a URL that doesn't match any views, ``pviews`` will simply print out a
    single: interactive shell
    single: IPython
    single: pshell
+   single: bpython
 
 .. _interactive_shell:
 
@@ -267,22 +268,23 @@ exposed, and the request is configured to generate urls from the host
 
 .. index::
    single: IPython
+   single: bpython
 
-IPython
-~~~~~~~
+IPython or bpython
+~~~~~~~~~~~~~~~~~~
 
-If you have `IPython <http://en.wikipedia.org/wiki/IPython>`_ installed in
-the interpreter you use to invoke the ``pshell`` command, ``pshell`` will use
-an IPython interactive shell instead of a standard Python interpreter shell.
-If you don't want this to happen, even if you have IPython installed, you can
-pass the ``--disable-ipython`` flag to the ``pshell`` command to use a
-standard Python interpreter shell unconditionally.
+If you have `IPython <http://en.wikipedia.org/wiki/IPython>`_ or 
+`bpython <http://bpython-interpreter.org/>`_ or both installed in
+the interpreter you use to invoke the ``pshell`` command, ``pshell`` will 
+autodiscover them and use the first respectively found in this order :
+IPython, bpython, standard Python interpreter. However you could 
+specifically invoke one of your choice with the ``-p choice`` or 
+``--python-shell choice`` option.
 
 .. code-block:: text
 
-   [chrism@vitaminf shellenv]$ ../bin/pshell --disable-ipython \
+   [chrism@vitaminf shellenv]$ ../bin/pshell -p ipython | bpython | python \
                                 development.ini#MyProject
-
 
 .. index::
    pair: routes; printing

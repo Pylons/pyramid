@@ -41,6 +41,8 @@ setup(name='{{project}}',
       entry_points = """\
       [paste.app_factory]
       main = {{package}}:main
+      [console_scripts]
+      populate_{{project}} = {{package}}.scripts.populate:main
       """,
       )
 

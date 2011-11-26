@@ -14,6 +14,9 @@ Features
   spec.  An entire application can be written with such asset specs,
   requiring no ordered lookup path.
 
+- ``bpython`` interpreter compatibility in ``pshell``.  See the "Command-Line
+  Pyramid" narrative docs chapter for more information.
+
 Bug Fixes
 ---------
 
@@ -33,11 +36,15 @@ Bug Fixes
 - The DummySession in ``pyramid.testing`` now generates a new CSRF token if
   one doesn't yet exist.
 
+- ``request.static_url`` now generates URL-quoted URLs when fed a ``path``
+  argument which contains characters that are unsuitable for URLs.  See
+  https://github.com/Pylons/pyramid/issues/349 for more info.
+
 Backwards Incompatibilities
 ---------------------------
 
 - Pyramid no longer runs on Python 2.5 (which includes the most recent
-  release of Jython, and the current version of GAE as of this writing).
+  release of Jython and the Python 2.5 version of GAE as of this writing).
 
 - The ``paster`` command is no longer the documented way to create projects,
   start the server, or run debugging commands.  To create projects from
@@ -52,6 +59,11 @@ Backwards Incompatibilities
   scaffolding is now the ``wsgiref`` WSGI server instead of the
   ``paste.httpserver`` server.  Rationale: Rationale: the Paste and
   PasteScript packages do not run under Python 3.
+
+- The ``pshell`` command (see "paster pshell") no longer accepts a
+  ``--disable-ipython`` command-line argument.  Instead, it accepts a ``-p``
+  or ``--python-shell`` argument, which can be any of the values ``python``,
+  ``ipython`` or ``bpython``.
 
 Dependencies
 ------------
@@ -73,7 +85,6 @@ Scaffolds
 - Rendered scaffolds have now been changed to be more relocatable (fewer
   mentions of the package name within files in the package).
 
-- The ``alchemy`` scaffold has been removed.
-
-- The ``routesalchemy`` scaffold has been renamed ``alchemy``.
+- The ``routesalchemy`` scaffold has been renamed ``alchemy``, replacing the
+  older (traversal-based) ``alchemy`` scaffold (which has been retired).
 

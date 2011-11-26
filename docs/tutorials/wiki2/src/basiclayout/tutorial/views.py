@@ -1,7 +1,9 @@
-from tutorial.models import DBSession
-from tutorial.models import MyModel
+from pyramid.view import view_config
 
+from .models import DBSession
+from .models import MyModel
+
+@view_config(route_name='home', renderer='templates/mytemplate.pt')
 def my_view(request):
-    dbsession = DBSession()
-    root = dbsession.query(MyModel).filter(MyModel.name==u'root').first()
-    return {'root':root, 'project':'tutorial'}
+    one = DBSession.query(MyModel).filter(MyModel.name==u'root').first()
+    return {'one':one, 'project':'tutorial'}

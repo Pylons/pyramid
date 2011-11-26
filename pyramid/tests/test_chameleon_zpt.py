@@ -121,7 +121,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         instance = self._makeOne(minimal, lookup)
         self.assertRaises(ValueError, instance, None, {})
 
-    @skip_on('java', 'pypy')
+    @skip_on('java')
     def test_implementation(self):
         minimal = self._getTemplatePath('minimal.pt')
         lookup = DummyLookup()
