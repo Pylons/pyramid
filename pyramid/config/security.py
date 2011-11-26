@@ -29,8 +29,13 @@ class SecurityConfiguratorMixin(object):
                     'Cannot configure an authentication policy without '
                     'also configuring an authorization policy '
                     '(use the set_authorization_policy method)')
+        intr = self.introspectable('authentication policy', None,
+                                   self.object_description(policy),
+                                   'authentication policy')
+        intr['policy'] = policy
         # authentication policy used by view config (phase 3)
-        self.action(IAuthenticationPolicy, register, order=PHASE2_CONFIG)
+        self.action(IAuthenticationPolicy, register, order=PHASE2_CONFIG,
+                    introspectables=(intr,))
 
     def _set_authentication_policy(self, policy):
         policy = self.maybe_dotted(policy)
@@ -60,6 +65,10 @@ class SecurityConfiguratorMixin(object):
                     'also configuring an authentication policy '
                     '(use the set_authorization_policy method)')
 
+        intr = self.introspectable('authorization policy', None,
+                                   self.object_description(policy),
+                                   'authorization policy')
+        intr['policy'] = policy
         # authorization policy used by view config (phase 3) and
         # authentication policy (phase 2)
         self.action(IAuthorizationPolicy, register, order=PHASE1_CONFIG)
@@ -108,9 +117,18 @@ class SecurityConfiguratorMixin(object):
            :class:`pyramid.config.Configurator` constructor can be used to
            achieve the same purpose.
         """
-        # default permission used during view registration (phase 3)
         def register():
             self.registry.registerUtility(permission, IDefaultPermission)
-        self.action(IDefaultPermission, register, order=PHASE1_CONFIG)
+        intr = self.introspectable('default permission',
+                                   None,
+                                   permission,
+                                   'default permission')
+        intr['value'] = permission
+        perm_intr = self.introspectable('permissions', permission,
+                                        permission, 'permission')
+        perm_intr['value'] = permission
+        # default permission used during view registration (phase 3)
+        self.action(IDefaultPermission, register, order=PHASE1_CONFIG,
+                    introspectables=(intr, perm_intr,))
 
 

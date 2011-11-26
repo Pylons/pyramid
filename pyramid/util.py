@@ -265,6 +265,8 @@ def object_description(object):
     if isinstance(object, dict):
         return shortrepr(object, '}')
     module = inspect.getmodule(object)
+    if module is None:
+        return 'object %s' % str(object)
     modulename = module.__name__
     if inspect.ismodule(object):
         return 'module %s' % modulename
@@ -272,9 +274,8 @@ def object_description(object):
         oself = getattr(object, '__self__', None)
         if oself is None:
             oself = getattr(object, 'im_self', None)
-        oself.__class__
-        return 'method %s of class %s.%s' (object.__name__, modulename,
-                                           oself.__class__.__name___)
+        return 'method %s of class %s.%s' % (object.__name__, modulename,
+                                             oself.__class__.__name__)
     
     if inspect.isclass(object):
         dottedname = '%s.%s' % (modulename, object.__name__)

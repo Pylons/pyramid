@@ -1108,6 +1108,7 @@ class ViewsConfiguratorMixin(object):
             tmpl_intr['name'] = renderer.name
             tmpl_intr['type'] = renderer.type
             tmpl_intr['renderer'] = renderer
+            tmpl_intr.relate('renderer factories', renderer.type)
             introspectables.append(tmpl_intr)
         if permission is not None:
             perm_intr = self.introspectable('permissions', permission,
