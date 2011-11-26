@@ -1,5 +1,7 @@
+import inspect
 import pkg_resources
 import sys
+import types
 import weakref
 
 from pyramid.compat import string_types
@@ -228,3 +230,67 @@ def strings_differ(string1, string2):
 
     return invalid_bits != 0
 
+def object_description(object):
+    """ Produce a human-consumable string description of ``object``, usually
+    involving a Python dotted name. For example:
+
+    .. code-block:: python
+
+       >>> object_description(None)
+       'None'
+       >>> from xml.dom import minidom
+       >>> object_description(minidom)
+       'module xml.dom.minidom'
+       >>> object_description(minidom.Attr)
+       'class xml.dom.minidom.Attr'
+       >>> object_description(minidom.Attr.appendChild)
+       'method appendChild of class xml.dom.minidom.Attr'
+       >>> 
+
+    If this method cannot identify the type of the object, a generic
+    description ala ``object <object.__name__>`` will be returned.
+
+    If the object passed is already a string, it is simply returned.  If it
+    is a boolean, an integer, a list, a tuple, a set, or ``None``, a
+    (possibly shortened) string representation is returned.
+    """
+    if isinstance(object, string_types):
+        return object
+    if isinstance(object, (bool, int, float, long, types.NoneType)):
+        return str(object)
+    if isinstance(object, (tuple, set)):
+        return shortrepr(object, ')')
+    if isinstance(object, list):
+        return shortrepr(object, ']')
+    if isinstance(object, dict):
+        return shortrepr(object, '}')
+    module = inspect.getmodule(object)
+    modulename = module.__name__
+    if inspect.ismodule(object):
+        return 'module %s' % modulename
+    if inspect.ismethod(object):
+        oself = getattr(object, '__self__', None)
+        if oself is None:
+            oself = getattr(object, 'im_self', None)
+        oself.__class__
+        return 'method %s of class %s.%s' (object.__name__, modulename,
+                                           oself.__class__.__name___)
+    
+    if inspect.isclass(object):
+        dottedname = '%s.%s' % (modulename, object.__name__)
+        return 'class %s' % dottedname
+    if inspect.isfunction(object):
+        dottedname = '%s.%s' % (modulename, object.__name__)
+        return 'function %s' % dottedname
+    if inspect.isbuiltin(object):
+        dottedname = '%s.%s' % (modulename, object.__name__)
+        return 'builtin %s' % dottedname
+    if hasattr(object, '__name__'):
+        return 'object %s' % object.__name__
+    return 'object %s' % str(object)
+
+def shortrepr(object, closer):
+    r = str(object)
+    if len(r) > 100:
+        r = r[:100] + '... %s' % closer
+    return r

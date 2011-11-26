@@ -27,7 +27,8 @@ class FactoriesConfiguratorMixin(object):
             self.registry.registerUtility(factory, IRootFactory)
             self.registry.registerUtility(factory, IDefaultRootFactory) # b/c
 
-        intr = self.introspectable('root factories', None, repr(factory),
+        intr = self.introspectable('root factories', None,
+                                   self.object_description(factory),
                                    'root factory')
         intr['factory'] = factory
         self.action(IRootFactory, register, introspectables=(intr,))
@@ -50,7 +51,8 @@ class FactoriesConfiguratorMixin(object):
         factory = self.maybe_dotted(factory)
         def register():
             self.registry.registerUtility(factory, ISessionFactory)
-        intr = self.introspectable('session factory', None, repr(factory),
+        intr = self.introspectable('session factory', None,
+                                   self.object_description(factory),
                                    'session factory')
         intr['factory'] = factory
         self.action(ISessionFactory, register, introspectables=(intr,))
@@ -74,7 +76,8 @@ class FactoriesConfiguratorMixin(object):
         factory = self.maybe_dotted(factory)
         def register():
             self.registry.registerUtility(factory, IRequestFactory)
-        intr = self.introspectable('request factory', None, repr(factory),
+        intr = self.introspectable('request factory', None,
+                                   self.object_description(factory),
                                    'request factory')
         intr['factory'] = factory
         self.action(IRequestFactory, register, introspectables=(intr,))

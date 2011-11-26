@@ -29,7 +29,7 @@ class AdaptersConfiguratorMixin(object):
             self.registry.registerHandler(subscriber, iface)
         intr = self.introspectable('subscribers',
                                    id(subscriber),
-                                   repr(subscriber),
+                                   self.object_description(subscriber),
                                    'subscriber')
         intr['subscriber'] = subscriber
         intr['interfaces'] = iface
@@ -62,7 +62,7 @@ class AdaptersConfiguratorMixin(object):
         intr = self.introspectable(
             'response adapters',
             discriminator,
-            repr(adapter),
+            self.object_description(adapter),
             'response adapter')
         intr['adapter'] = adapter
         intr['type'] = type_or_iface

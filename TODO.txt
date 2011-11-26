@@ -8,6 +8,20 @@ Must-Have
 
 - Fix SQLA tutorial to match alchemy scaffold.
 
+- Introspection:
+
+  * More specific filename/lineno info instead of opaque string (or a way to
+    parse the opaque string into filename/lineno info).
+
+  * categorize() return value ordering not right yet.
+
+  * implement ptweens and proutes based on introspection instead of current
+    state of affairs.
+
+  * introspection hiding for directives?
+
+  * usage docs.
+
 Nice-to-Have
 ------------
 

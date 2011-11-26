@@ -931,7 +931,14 @@ class ViewsConfiguratorMixin(object):
             xhr, accept, header, path_info, match_param]
         discriminator.extend(sorted([hash(x) for x in custom_predicates]))
         discriminator = tuple(discriminator)
-        view_intr = self.introspectable('views', discriminator, repr(view),
+        if inspect.isclass(view) and attr:
+            view_desc = 'method %r of %s' % (
+                attr, self.object_description(view))
+        else:
+            view_desc = self.object_description(view)
+        view_intr = self.introspectable('views',
+                                        discriminator,
+                                        view_desc,
                                         'view')
         view_intr.update(
             dict(name=name,

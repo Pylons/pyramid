@@ -34,6 +34,7 @@ from pyramid.settings import aslist
 from pyramid.threadlocal import manager
 from pyramid.util import DottedNameResolver
 from pyramid.util import WeakOrderedSet
+from pyramid.util import object_description
 
 from pyramid.config.adapters import AdaptersConfiguratorMixin
 from pyramid.config.assets import AssetsConfiguratorMixin
@@ -219,6 +220,7 @@ class Configurator(
     basepath = None
     includepath = ()
     info = ''
+    object_description = staticmethod(object_description)
 
     def __init__(self,
                  registry=None,
