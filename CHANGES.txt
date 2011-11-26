@@ -60,7 +60,7 @@ Backwards Incompatibilities
   ``paste.httpserver`` server.  Rationale: Rationale: the Paste and
   PasteScript packages do not run under Python 3.
 
-- The ``pshell`` command (nee "paster pshell") no longer accepts a
+- The ``pshell`` command (see "paster pshell") no longer accepts a
   ``--disable-ipython`` command-line argument.  Instead, it accepts a ``-p``
   or ``--python-shell`` argument, which can be any of the values ``python``,
   ``ipython`` or ``bpython``.
