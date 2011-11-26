@@ -156,11 +156,12 @@ class view_config(object):
              backwards compatibility purposes, as the name
              :class:`pyramid.view.bfg_view`.
 
-    The following arguments are supported as arguments to
+    The following arguments are supported to
     :class:`pyramid.view.view_config`: ``context``, ``permission``, ``name``,
     ``request_type``, ``route_name``, ``request_method``, ``request_param``,
     ``containment``, ``xhr``, ``accept``, ``header``, ``path_info``,
-    ``custom_predicates``, ``decorator``, ``mapper``, and ``http_cache``.
+    ``custom_predicates``, ``decorator``, ``mapper``, ``http_cache``,
+    and ``match_param``.
 
     The meanings of these arguments are the same as the arguments passed to
     :meth:`pyramid.config.Configurator.add_view`.
