@@ -37,4 +37,11 @@ class ZODBProjectTemplate(PyramidTemplate):
 class AlchemyProjectTemplate(PyramidTemplate):
     _template_dir = 'alchemy'
     summary = 'Pyramid SQLAlchemy project using url dispatch'
-
+    def post(self, command, output_dir, vars): # pragma: no cover
+        val = PyramidTemplate.post(self, command, output_dir, vars)
+        self.out('')
+        self.out('Please run the "populate_%(package)s" script to set up the '
+                 'SQL database before starting the application (e.g. '
+                 '"$myvirtualenv/bin/populate_%(package)s development.ini".)'
+                 % vars)
+        return val

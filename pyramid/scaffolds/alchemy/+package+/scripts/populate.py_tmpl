@@ -1,5 +1,6 @@
 import os
 import sys
+import logging.config
 
 from paste.deploy.loadwsgi import appconfig
 from sqlalchemy import engine_from_config
@@ -18,7 +19,9 @@ def main(argv=sys.argv):
         config_filename = argv[1]
     except IndexError:
         usage(argv)
-    settings = appconfig('config:' + os.path.abspath(config_filename))
+    config_filename = os.path.abspath(config_filename)
+    logging.config.fileConfig(config_filename)
+    settings = appconfig('config:' + config_filename)
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
     Base.metadata.create_all(engine)

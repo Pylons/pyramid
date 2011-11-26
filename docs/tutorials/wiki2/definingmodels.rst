@@ -80,6 +80,11 @@ something like this:
    :linenos:
    :language: python
 
+Populating the Database
+-----------------------
+
+XXX The ``populate_tutorial`` :term:`console script``.
+
 Viewing the Application in a Browser
 ------------------------------------
 
