@@ -6,7 +6,9 @@ Must-Have
 
 - Fix SQLA tutorial to match ZODB tutorial.
 
-- Fix SQLA tutorial to match alchemy scaffold.
+- Fix SQLA tutorial to match alchemy scaffold.  See
+  https://github.com/Pylons/pyramid/issues/359 for additional suggestions
+  from Mike.
 
 Nice-to-Have
 ------------
