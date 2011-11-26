@@ -22,6 +22,8 @@ Must-Have
 
   * usage docs.
 
+  * make it possible to disuse introspection?
+
 Nice-to-Have
 ------------
 
