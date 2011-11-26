@@ -147,6 +147,7 @@ html_theme = 'pyramid'
 
 html_theme_options = {
     'github_url': 'https://github.com/Pylons/pyramid'
+    'in_progress': True
 }
 
 # The style sheet to use for HTML and HTML Help pages. A file of that name
