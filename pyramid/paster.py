@@ -1,7 +1,11 @@
 import os
 
 import zope.deprecation
-from paste.deploy import loadapp
+
+from paste.deploy import (
+    loadapp,
+    appconfig,
+    )
 
 from pyramid.scripting import prepare
 
@@ -20,16 +24,32 @@ def get_app(config_uri, name=None, loadapp=loadapp):
     If the ``name`` is None, this will attempt to parse the name from
     the ``config_uri`` string expecting the format ``inifile#name``.
     If no name is found, the name will default to "main"."""
+    path, section = _getpathsec(config_uri, name)
+    config_name = 'config:%s' % path
+    here_dir = os.getcwd()
+    app = loadapp(config_name, name=section, relative_to=here_dir)
+    return app
+
+def get_appsettings(config_uri, name=None, appconfig=appconfig):
+    """ Return a dictionary representing the key/value pairs in an ``app`
+    section within the file represented by ``config_uri``.
+
+    If the ``name`` is None, this will attempt to parse the name from
+    the ``config_uri`` string expecting the format ``inifile#name``.
+    If no name is found, the name will default to "main"."""
+    path, section = _getpathsec(config_uri, name)
+    config_name = 'config:%s' % path
+    here_dir = os.getcwd()
+    return appconfig(config_name, name=section, relative_to=here_dir)
+
+def _getpathsec(config_uri, name):
     if '#' in config_uri:
         path, section = config_uri.split('#', 1)
     else:
         path, section = config_uri, 'main'
     if name:
         section = name
-    config_name = 'config:%s' % path
-    here_dir = os.getcwd()
-    app = loadapp(config_name, name=section, relative_to=here_dir)
-    return app
+    return path, section
 
 def bootstrap(config_uri, request=None):
     """ Load a WSGI application from the PasteDeploy config file specified

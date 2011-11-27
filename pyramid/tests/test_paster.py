@@ -1,6 +1,6 @@
 import unittest
 
-class TestGetApp(unittest.TestCase):
+class Test_get_app(unittest.TestCase):
     def _callFUT(self, config_file, section_name, loadapp):
         from pyramid.paster import get_app
         return get_app(config_file, section_name, loadapp)
@@ -8,7 +8,7 @@ class TestGetApp(unittest.TestCase):
     def test_it(self):
         import os
         app = DummyApp()
-        loadapp = DummyLoadApp(app)
+        loadapp = DummyLoadWSGI(app)
         result = self._callFUT('/foo/bar/myapp.ini', 'myapp', loadapp)
         self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
         self.assertEqual(loadapp.section_name, 'myapp')
@@ -18,7 +18,7 @@ class TestGetApp(unittest.TestCase):
     def test_it_with_hash(self):
         import os
         app = DummyApp()
-        loadapp = DummyLoadApp(app)
+        loadapp = DummyLoadWSGI(app)
         result = self._callFUT('/foo/bar/myapp.ini#myapp', None, loadapp)
         self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
         self.assertEqual(loadapp.section_name, 'myapp')
@@ -28,12 +28,47 @@ class TestGetApp(unittest.TestCase):
     def test_it_with_hash_and_name_override(self):
         import os
         app = DummyApp()
-        loadapp = DummyLoadApp(app)
+        loadapp = DummyLoadWSGI(app)
         result = self._callFUT('/foo/bar/myapp.ini#myapp', 'yourapp', loadapp)
         self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
         self.assertEqual(loadapp.section_name, 'yourapp')
         self.assertEqual(loadapp.relative_to, os.getcwd())
         self.assertEqual(result, app)
+
+class Test_get_appsettings(unittest.TestCase):
+    def _callFUT(self, config_file, section_name, appconfig):
+        from pyramid.paster import get_appsettings
+        return get_appsettings(config_file, section_name, appconfig)
+
+    def test_it(self):
+        import os
+        values = {'a':1}
+        appconfig = DummyLoadWSGI(values)
+        result = self._callFUT('/foo/bar/myapp.ini', 'myapp', appconfig)
+        self.assertEqual(appconfig.config_name, 'config:/foo/bar/myapp.ini')
+        self.assertEqual(appconfig.section_name, 'myapp')
+        self.assertEqual(appconfig.relative_to, os.getcwd())
+        self.assertEqual(result, values)
+
+    def test_it_with_hash(self):
+        import os
+        values = {'a':1}
+        appconfig = DummyLoadWSGI(values)
+        result = self._callFUT('/foo/bar/myapp.ini#myapp', None, appconfig)
+        self.assertEqual(appconfig.config_name, 'config:/foo/bar/myapp.ini')
+        self.assertEqual(appconfig.section_name, 'myapp')
+        self.assertEqual(appconfig.relative_to, os.getcwd())
+        self.assertEqual(result, values)
+
+    def test_it_with_hash_and_name_override(self):
+        import os
+        values = {'a':1}
+        appconfig = DummyLoadWSGI(values)
+        result = self._callFUT('/foo/bar/myapp.ini#myapp', 'yourapp', appconfig)
+        self.assertEqual(appconfig.config_name, 'config:/foo/bar/myapp.ini')
+        self.assertEqual(appconfig.section_name, 'yourapp')
+        self.assertEqual(appconfig.relative_to, os.getcwd())
+        self.assertEqual(result, values)
 
 class TestBootstrap(unittest.TestCase):
     def _callFUT(self, config_uri, request=None):
@@ -82,15 +117,15 @@ class DummyRegistry(object):
 
 dummy_registry = DummyRegistry()
 
-class DummyLoadApp:
-    def __init__(self, app):
-        self.app = app
+class DummyLoadWSGI:
+    def __init__(self, result):
+        self.result = result
 
     def __call__(self, config_name, name=None, relative_to=None):
         self.config_name = config_name
         self.section_name = name
         self.relative_to = relative_to
-        return self.app
+        return self.result
 
 class DummyApp:
     def __init__(self):
