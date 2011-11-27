@@ -11,8 +11,8 @@ authentication.
 
 For cut and paste purposes, the source code for all stages of this
 tutorial can be browsed at
-`http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/
-<http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/>`_.
+`http://github.com/Pylons/pyramid/tree/1.2-branch/docs/tutorials/wiki/src/
+<http://github.com/Pylons/pyramid/tree/1.2-branch/docs/tutorials/wiki/src/>`_.
 
 .. toctree::
    :maxdepth: 2

@@ -15,8 +15,8 @@ single instance of the "Wiki" class will serve as a container for "Page"
 objects, which will be instances of the "Page" class.
 
 The source code for this tutorial stage can be browsed via
-`http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/models/
-<http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/models/>`_.
+`http://github.com/Pylons/pyramid/tree/1.2-branch/docs/tutorials/wiki/src/models/
+<http://github.com/Pylons/pyramid/tree/1.2-branch/docs/tutorials/wiki/src/models/>`_.
 
 Deleting the Database
 ---------------------

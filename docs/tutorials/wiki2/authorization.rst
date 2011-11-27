@@ -27,8 +27,8 @@ Finally, we will add a ``login.pt`` template and change the existing
 ``view.pt`` and ``edit.pt`` to show a "Logout" link when not logged in.
 
 The source code for this tutorial stage can be browsed at
-`http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/authorization/
-<http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/authorization/>`_.
+`http://github.com/Pylons/pyramid/tree/1.2-branch/docs/tutorials/wiki2/src/authorization/
+<http://github.com/Pylons/pyramid/tree/1.2-branch/docs/tutorials/wiki2/src/authorization/>`_.
 
 Changing ``__init__.py`` For Authorization
 -------------------------------------------

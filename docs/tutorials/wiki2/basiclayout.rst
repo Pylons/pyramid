@@ -7,8 +7,8 @@ basic, but they provide a good orientation for the high-level patterns common
 to most :term:`url dispatch` -based :app:`Pyramid` projects.
 
 The source code for this tutorial stage can be browsed at
-`http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/basiclayout/
-<http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/basiclayout/>`_.
+`http://github.com/Pylons/pyramid/tree/1.2-branch/docs/tutorials/wiki2/src/basiclayout/
+<http://github.com/Pylons/pyramid/tree/1.2-branch/docs/tutorials/wiki2/src/basiclayout/>`_.
 
 App Startup with ``__init__.py``
 --------------------------------
