@@ -38,6 +38,7 @@ LaTeXTranslator.visit_inline = nothing
 LaTeXTranslator.depart_inline = nothing
 
 book = os.environ.get('BOOK')
+rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 # If your extensions are in another directory, add it here. If the directory
 # is relative to the documentation root, use os.path.abspath to make it
@@ -47,6 +48,11 @@ sys.path.append(os.path.abspath(parent))
 wd = os.getcwd()
 os.chdir(parent)
 os.system('%s setup.py test -q' % sys.executable)
+if rtd:
+    from subprocess import Popen, PIPE
+    p = Popen('which git', shell=True, stdout=PIPE)
+    git = p.stdout.read().strip()
+    os.system('{0} submodule update --init; {0} submodule foreach git pull origin master;'.format(git))
 os.chdir(wd)
 
 for item in os.listdir(parent):
@@ -146,7 +152,8 @@ html_theme_path = ['_themes']
 html_theme = 'pyramid'
 
 html_theme_options = {
-    'github_url': 'https://github.com/Pylons/pyramid'
+    'github_url': 'https://github.com/Pylons/pyramid',
+    'in_progress': True
 }
 
 # The style sheet to use for HTML and HTML Help pages. A file of that name
