@@ -14,8 +14,8 @@ continue allowing anyone with access to the server to view pages.
 to our application.
 
 The source code for this tutorial stage can be browsed at
-`http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/authorization/
-<http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/authorization/>`_.
+`http://github.com/Pylons/pyramid/tree/1.0-branch/docs/tutorials/wiki2/src/authorization/
+<http://github.com/Pylons/pyramid/tree/1.0-branch/docs/tutorials/wiki2/src/authorization/>`_.
 
 Changing ``__init__.py`` For Authorization
 -------------------------------------------

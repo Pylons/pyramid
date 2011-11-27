@@ -39,8 +39,8 @@ We're going to define several :term:`view callable` functions then wire them
 into :app:`Pyramid` using some :term:`view configuration`.
 
 The source code for this tutorial stage can be browsed via
-`http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/views/
-<http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/views/>`_.
+`http://github.com/Pylons/pyramid/tree/1.0-branch/docs/tutorials/wiki/src/views/
+<http://github.com/Pylons/pyramid/tree/1.0-branch/docs/tutorials/wiki/src/views/>`_.
 
 Adding View Functions
 =====================
@@ -266,7 +266,7 @@ Our templates name a single static asset named ``pylons.css``.  We don't need
 to create this file within our package's ``static`` directory because it was
 provided at the time we created the project. This file is a little too long to
 replicate within the body of this guide, however it is available `online
-<http://github.com/Pylons/pyramid/blob/master/docs/tutorials/wiki/src/views/tutorial/static/pylons.css>`_.
+<http://github.com/Pylons/pyramid/blob/1.0-branch/docs/tutorials/wiki/src/views/tutorial/static/pylons.css>`_.
 
 This CSS file will be accessed via
 e.g. ``http://localhost:6543/static/pylons.css`` by virtue of the call to

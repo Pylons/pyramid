@@ -522,8 +522,8 @@ The API that must be implemented by a class that provides
 
 The default context URL generator is available for perusal as the class
 :class:`pyramid.traversal.TraversalContextURL` in the `traversal module
-<http://github.com/Pylons/pyramid/blob/master/pyramid/traversal.py>`_ of the
-:term:`Pylons` GitHub Pyramid repository.
+<http://github.com/Pylons/pyramid/blob/1.0-branch/pyramid/traversal.py>`_ of
+the :term:`Pylons` GitHub Pyramid repository.
 
 .. index::
    single: view mapper

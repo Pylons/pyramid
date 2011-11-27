@@ -11,8 +11,8 @@ facilities for *authorization* and *authentication*.  We'll make use of both
 features to provide security to our application.
 
 The source code for this tutorial stage can be browsed via
-`http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/authorization/
-<http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/authorization/>`_.
+`http://github.com/Pylons/pyramid/tree/1.0-branch/docs/tutorials/wiki/src/authorization/
+<http://github.com/Pylons/pyramid/tree/1.0-branch/docs/tutorials/wiki/src/authorization/>`_.
 
 
 Configuring a ``pyramid`` Authentication Policy
