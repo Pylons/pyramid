@@ -49,7 +49,10 @@ wd = os.getcwd()
 os.chdir(parent)
 os.system('%s setup.py test -q' % sys.executable)
 if rtd:
-    os.system('git submodule update --init')
+    from subprocess import Popen, PIPE
+    p = subprocess.Popen('which git', shell=True, stdout=subprocess.PIPE)
+    git = p.stdout.read().strip()
+    os.system('rm -Rf docs/_themes; {0} submodule update --init'.format(git))
 os.chdir(wd)
 
 for item in os.listdir(parent):
