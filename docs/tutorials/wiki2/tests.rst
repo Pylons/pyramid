@@ -14,8 +14,8 @@ for the ``initialize_sql`` function.
 
 To do so, we'll retain the ``tutorial.tests.ViewTests`` class provided as a
 result of the ``alchemy`` scaffold.  We'll add two test classes: one for the
-``Page`` model named ``PageModelTests``, one for the ``initialize_sql``
-function named ``InitializeSqlTests``.
+``Page`` model named ``PageModelTests``, and one for the ``populate`` script
+named ``Test_populate``.
 
 Testing the Views
 =================

@@ -253,7 +253,7 @@ You will see an error page with a title something like this::
 
 Oh no!  Something isn't working!
 
-This happens because we haven't populated the database with any table
+This happens because we haven't populated the SQL database with any table
 information yet.  We need to use the ``populate_tutorial`` :term:`console
 script` to populate our database before we can see the page render correctly.
 

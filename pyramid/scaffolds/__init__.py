@@ -2,16 +2,12 @@ import binascii
 import os
 
 from pyramid.compat import native_
-from pyramid.compat import text_
 
 from pyramid.scaffolds.template import Template
 
 class PyramidTemplate(Template):
     def pre(self, command, output_dir, vars):
         vars['random_string'] = native_(binascii.hexlify(os.urandom(20)))
-        # placeholder text values
-        vars['one'] = text_('one')
-        vars['two'] = text_('two')
         package_logger = vars['package']
         if package_logger == 'root':
             # Rename the app logger in the rare case a project is named 'root'

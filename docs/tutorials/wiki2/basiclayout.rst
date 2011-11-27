@@ -128,19 +128,20 @@ pattern matches is done by registering a :term:`view configuration`. Our
 application uses the :meth:`pyramid.view.view_config` decorator to map view
 callables to each route, thereby mapping URL patterns to code.
 
-Here is the code in the ``views.py`` file within our package:
+Here is the entirety of code in the ``views.py`` file within our package:
 
    .. literalinclude:: src/basiclayout/tutorial/views.py
       :linenos:
       :language: py
 
-The important part to point out here is the ``@view_config`` decorator.  In
-fact, ``@view_config`` is so important that we're going to ignore the rest of
-the code in the module at this point just to explain it.  The
-``@view_config`` decorator associates the function it decorates with a
-:term:`view configuration`. The view configuration names a ``route_name``
-(``home``), and names a ``renderer``, which is a template which lives in the
-``templates`` subdirectory of the package.
+The important part to point out here is the ``@view_config`` decorator which
+sits atop the ``my_view`` function.  In fact, ``@view_config`` is so
+important that we're going to ignore the rest of the code in the module at
+this point just to explain it.  The ``@view_config`` decorator associates the
+function it decorates with a :term:`view configuration`. The view
+configuration names a ``route_name`` (``home``), and names a ``renderer``,
+which is a template which lives in the ``templates`` subdirectory of the
+package.
 
 As the result of this view configuration, when the pattern associated with
 the view named ``home`` is matched during a request, the function named
@@ -164,9 +165,14 @@ Content Models with ``models.py``
 ---------------------------------
 
 In a SQLAlchemy-based application, a *model* object is an object composed by
-querying the SQL database.  SQLAlchemy is an "object relational mapper" (an
-ORM).  The ``models.py`` file is where the ``alchemy`` scaffold put the
-classes that implement our models.
+querying the SQL database. The ``models.py`` file is where the ``alchemy``
+scaffold put the classes that implement our models.
+
+Here is the complete source for ``models.py``:
+
+   .. literalinclude:: src/basiclayout/tutorial/models.py
+      :linenos:
+      :language: py
 
 Let's take a look. First, we need some imports to support later code.
 
@@ -178,7 +184,7 @@ Let's take a look. First, we need some imports to support later code.
 Next we set up a SQLAlchemy "DBSession" object:
 
    .. literalinclude:: src/basiclayout/tutorial/models.py
-      :lines: 15-16
+      :lines: 16
       :linenos:
       :language: py
 
@@ -202,30 +208,6 @@ within the ``__init__`` function itself.  The ``MyModel`` class also has a
 ``__tablename__`` attribute.  This informs SQLAlchemy which table to use to
 store the data representing instances of this class.
 
-Next we define a function named ``populate`` which adds a single
-model instance into our SQL storage and commits a transaction:
-
-   .. literalinclude:: src/basiclayout/tutorial/models.py
-      :pyobject: populate
-      :linenos:
-      :language: py
-
-The function doesn't do a lot in this case, but it's there to illustrate
-how an application requiring many objects to be set up could work.
-
-Lastly we have a function named ``initialize_sql`` which receives a SQL
-database engine and binds it to our SQLAlchemy DBSession object.  It also
-calls the ``populate`` function, to do initial database population. This
-is the initialization function that is called from __init__.py above.
-
-   .. literalinclude:: src/basiclayout/tutorial/models.py
-      :pyobject: initialize_sql
-      :linenos:
-      :language: py
-
-Here is the complete source for ``models.py``:
-
-   .. literalinclude:: src/basiclayout/tutorial/models.py
-      :linenos:
-      :language: py
+That's about all there is to it to models, views, and initialization code in
+our stock application.
 

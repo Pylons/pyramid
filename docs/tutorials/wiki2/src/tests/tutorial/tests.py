@@ -1,16 +1,20 @@
 import unittest
-
+import transaction
 from pyramid import testing
 
-
 def _initTestingDB():
-    from tutorial.models import DBSession
-    from tutorial.models import Base
     from sqlalchemy import create_engine
-    engine = create_engine('sqlite:///:memory:')
-    DBSession.configure(bind=engine)
-    Base.metadata.bind = engine
+    from tutorial.models import (
+        DBSession,
+        Page,
+        Base
+        )
+    engine = create_engine('sqlite://')
     Base.metadata.create_all(engine)
+    DBSession.configure(bind=engine)
+    with transaction.manager:
+        model = Page('FrontPage', 'This is the front page')
+        DBSession.add(model)
     return DBSession
 
 def _registerRoutes(config):
@@ -38,28 +42,6 @@ class PageModelTests(unittest.TestCase):
         instance = self._makeOne()
         self.assertEqual(instance.name, 'SomeName')
         self.assertEqual(instance.data, 'some data')
-
-class InitializeSqlTests(unittest.TestCase):
-
-    def setUp(self):
-        from tutorial.models import DBSession
-        DBSession.remove()
-
-    def tearDown(self):
-        from tutorial.models import DBSession
-        DBSession.remove()
-
-    def _callFUT(self, engine):
-        from tutorial.models import initialize_sql
-        return initialize_sql(engine)
-
-    def test_it(self):
-        from sqlalchemy import create_engine
-        engine = create_engine('sqlite:///:memory:')
-        self._callFUT(engine)
-        from tutorial.models import DBSession, Page
-        self.assertEqual(DBSession.query(Page).one().data,
-            'This is the front page')
 
 class ViewWikiTests(unittest.TestCase):
     def setUp(self):
@@ -191,10 +173,11 @@ class FunctionalTests(unittest.TestCase):
 
     def setUp(self):
         from tutorial import main
-        settings = { 'sqlalchemy.url': 'sqlite:///:memory:'}
+        settings = { 'sqlalchemy.url': 'sqlite://'}
         app = main({}, **settings)
         from webtest import TestApp
         self.testapp = TestApp(app)
+        _initTestingDB()
 
     def tearDown(self):
         del self.testapp
@@ -263,3 +246,23 @@ class FunctionalTests(unittest.TestCase):
         self.testapp.get(self.editor_login, status=302)
         res = self.testapp.get('/FrontPage', status=200)
         self.assertTrue('FrontPage' in res.body)
+
+class Test_populate(unittest.TestCase):
+    def setUp(self):
+        from tutorial.models import DBSession
+        DBSession.remove()
+
+    def tearDown(self):
+        from tutorial.models import DBSession
+        DBSession.remove()
+
+    def _callFUT(self, settings):
+        from tutorial.scripts.populate import main
+        main(['foo', 'development.ini'], settings)
+
+    def test_it(self):
+        self._callFUT({'sqlalchemy.url':'sqlite://'})
+        from tutorial.models import DBSession, Page
+        self.assertEqual(DBSession.query(Page).one().data,
+            'This is the front page')
+

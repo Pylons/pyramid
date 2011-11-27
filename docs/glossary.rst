@@ -936,3 +936,8 @@ Glossary
      email. See its `documentation
      <https://docs.pylonsproject.org/projects/pyramid_exclog/dev/>`_.
 
+   console script
+     A script written to the ``bin`` (on UNIX, or ``Scripts`` on Windows)
+     directory of a Python installation or virtualenv as the result of
+     running ``setup.py install`` or ``setup.py develop``.
+

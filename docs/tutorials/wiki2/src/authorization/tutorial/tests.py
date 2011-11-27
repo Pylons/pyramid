@@ -1,15 +1,20 @@
 import unittest
-
+import transaction
 from pyramid import testing
 
 def _initTestingDB():
-    from tutorial.models import DBSession
-    from tutorial.models import Base
     from sqlalchemy import create_engine
+    from tutorial.models import (
+        DBSession,
+        Page,
+        Base
+        )
     engine = create_engine('sqlite://')
-    DBSession.configure(bind=engine)
-    Base.metadata.bind = engine
     Base.metadata.create_all(engine)
+    DBSession.configure(bind=engine)
+    with transaction.manager:
+        model = Page('FrontPage', 'This is the front page')
+        DBSession.add(model)
     return DBSession
 
 def _registerRoutes(config):
@@ -20,14 +25,16 @@ def _registerRoutes(config):
 class ViewWikiTests(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
+        self.session = _initTestingDB()
 
     def tearDown(self):
+        self.session.remove()
         testing.tearDown()
 
     def _callFUT(self, request):
         from tutorial.views import view_wiki
         return view_wiki(request)
-        
+
     def test_it(self):
         _registerRoutes(self.config)
         request = testing.DummyRequest()
@@ -40,6 +47,7 @@ class ViewPageTests(unittest.TestCase):
         self.config = testing.setUp()
 
     def tearDown(self):
+        self.session.remove()
         testing.tearDown()
         
     def _callFUT(self, request):
@@ -121,7 +129,8 @@ class EditPageTests(unittest.TestCase):
         self.session.add(page)
         info = self._callFUT(request)
         self.assertEqual(info['page'], page)
-        self.assertEqual(info['save_url'], 'http://example.com/abc/edit_page')
+        self.assertEqual(info['save_url'],
+                         'http://example.com/abc/edit_page')
         
     def test_it_submitted(self):
         from tutorial.models import Page

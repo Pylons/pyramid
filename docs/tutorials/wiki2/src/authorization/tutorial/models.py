@@ -1,17 +1,20 @@
-import transaction
+from pyramid.security import (
+    Allow,
+    Everyone,
+    )
 
-from pyramid.security import Allow
-from pyramid.security import Everyone
+from sqlalchemy import (
+    Column,
+    Integer,
+    Text,
+    )
 
-from sqlalchemy import Column
-from sqlalchemy import Integer
-from sqlalchemy import Text
-
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.declarative import declarative_base
 
-from sqlalchemy.orm import scoped_session
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import (
+    scoped_session,
+    sessionmaker,
+    )
 
 from zope.sqlalchemy import ZopeTransactionExtension
 
@@ -28,20 +31,6 @@ class Page(Base):
     def __init__(self, name, data):
         self.name = name
         self.data = data
-
-def initialize_sql(engine):
-    DBSession.configure(bind=engine)
-    Base.metadata.bind = engine
-    Base.metadata.create_all(engine)
-    try:
-        transaction.begin()
-        session = DBSession()
-        page = Page('FrontPage', 'This is the front page')
-        session.add(page)
-        transaction.commit()
-    except IntegrityError:
-        # already created
-        transaction.abort()
 
 class RootFactory(object):
     __acl__ = [ (Allow, Everyone, 'view'),

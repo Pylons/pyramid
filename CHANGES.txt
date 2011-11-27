@@ -86,6 +86,11 @@ Dependencies
 
 - Pyramid no longer depends on the Paste or PasteScript packages.
 
+Documentation
+-------------
+
+- The SQLAlchemy Wiki tutorial has been updated.  It now uses
+  ``@view_config`` decorators and an explicit database population script.
 
 Scaffolds
 ---------
