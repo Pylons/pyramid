@@ -17,7 +17,7 @@ Features
 - ``bpython`` interpreter compatibility in ``pshell``.  See the "Command-Line
   Pyramid" narrative docs chapter for more information.
 
-- Added ``get_appconfig`` function to ``pyramid.paster`` API.  This function
+- Added ``get_appsettings`` function to ``pyramid.paster`` API.  This function
   returns the settings defined within an ``[app:...]`` section in a
   PasteDeploy ini file.
 
