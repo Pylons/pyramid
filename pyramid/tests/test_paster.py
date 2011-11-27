@@ -70,7 +70,22 @@ class Test_get_appsettings(unittest.TestCase):
         self.assertEqual(appconfig.relative_to, os.getcwd())
         self.assertEqual(result, values)
 
-class TestBootstrap(unittest.TestCase):
+class Test_setup_logging(unittest.TestCase):
+    def _callFUT(self, config_file):
+        from pyramid.paster import setup_logging
+        dummy_cp = DummyConfigParserModule
+        return setup_logging(config_file, self.fileConfig, dummy_cp)
+
+    def test_it(self):
+        config_file, dict = self._callFUT('/abc')
+        self.assertEqual(config_file, '/abc')
+        self.assertEqual(dict['__file__'], '/abc')
+        self.assertEqual(dict['here'], '/')
+
+    def fileConfig(self, config_file, dict):
+        return config_file, dict
+
+class Test_bootstrap(unittest.TestCase):
     def _callFUT(self, config_uri, request=None):
         from pyramid.paster import bootstrap
         return bootstrap(config_uri, request)
@@ -137,4 +152,16 @@ class DummyRequest:
     def __init__(self, environ):
         self.environ = environ
         self.matchdict = {}
+
+class DummyConfigParser(object):
+    def read(self, x):
+        pass
+
+    def has_section(self, name):
+        return True
+
+class DummyConfigParserModule(object):
+    ConfigParser = DummyConfigParser
+
+
 

@@ -22,7 +22,7 @@ import traceback
 
 from paste.deploy import loadapp, loadserver
 
-from pyramid.scripts.common import logging_file_config
+from pyramid.paster import setup_logging
 
 MAXFD = 1024
 
@@ -266,7 +266,7 @@ class PServeCommand(object):
             log_fn = None
         if log_fn:
             log_fn = os.path.join(base, log_fn)
-            logging_file_config(log_fn)
+            setup_logging(log_fn)
 
         server = self.loadserver(server_spec, name=server_name,
                                  relative_to=base, global_conf=vars)
