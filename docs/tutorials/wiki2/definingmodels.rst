@@ -7,8 +7,8 @@ to define a :term:`domain model` constructor representing a wiki page.  We'll
 do this inside our ``models.py`` file.
 
 The source code for this tutorial stage can be browsed at
-`http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/models/
-<http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/models/>`_.
+`http://github.com/Pylons/pyramid/tree/1.1-branch/docs/tutorials/wiki2/src/models/
+<http://github.com/Pylons/pyramid/tree/1.1-branch/docs/tutorials/wiki2/src/models/>`_.
 
 Making Edits to ``models.py``
 -----------------------------

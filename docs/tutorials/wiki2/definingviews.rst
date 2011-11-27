@@ -30,8 +30,8 @@ the request passed to the view would have a ``'one'`` key with the value
 ``'foo'`` and a ``'two'`` key with the value ``'bar'``.
 
 The source code for this tutorial stage can be browsed at
-`http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/views/
-<http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/views/>`_.
+`http://github.com/Pylons/pyramid/tree/1.1-branch/docs/tutorials/wiki2/src/views/
+<http://github.com/Pylons/pyramid/tree/1.1-branch/docs/tutorials/wiki2/src/views/>`_.
 
 Declaring Dependencies in Our ``setup.py`` File
 ===============================================
@@ -258,7 +258,7 @@ Our templates name a single static asset named ``pylons.css``.  We don't need
 to create this file within our package's ``static`` directory because it was
 provided at the time we created the project. This file is a little too long
 to replicate within the body of this guide, however it is available `online
-<http://github.com/Pylons/pyramid/blob/master/docs/tutorials/wiki2/src/views/tutorial/static/pylons.css>`_.
+<http://github.com/Pylons/pyramid/blob/1.1-branch/docs/tutorials/wiki2/src/views/tutorial/static/pylons.css>`_.
 
 This CSS file will be accessed via
 e.g. ``http://localhost:6543/static/pylons.css`` by virtue of the call to

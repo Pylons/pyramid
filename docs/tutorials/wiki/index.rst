@@ -9,10 +9,10 @@ developers with previous :term:`Zope` experience.  When we're done with the
 tutorial, the developer will have created a basic Wiki application with
 authentication.
 
-For cut and paste purposes, the source code for all stages of this
-tutorial can be browsed at
-`http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/
-<http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/>`_.
+For cut and paste purposes, the source code for all stages of this tutorial
+can be browsed at
+`http://github.com/Pylons/pyramid/tree/1.1-branch/docs/tutorials/wiki/src/
+<http://github.com/Pylons/pyramid/tree/1.1-branch/docs/tutorials/wiki/src/>`_.
 
 .. toctree::
    :maxdepth: 2
