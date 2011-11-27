@@ -52,7 +52,7 @@ if rtd:
     from subprocess import Popen, PIPE
     p = Popen('which git', shell=True, stdout=PIPE)
     git = p.stdout.read().strip()
-    os.system('rm -Rf docs/_themes; {0} submodule update --init'.format(git))
+    os.system('{0} submodule update --init; {0} foreach git pull origin master'.format(git))
 os.chdir(wd)
 
 for item in os.listdir(parent):
