@@ -4,7 +4,11 @@ import sys
 import types
 import weakref
 
-from pyramid.compat import string_types
+from pyramid.compat import (
+    integer_types,
+    string_types,
+    )
+
 from pyramid.exceptions import ConfigurationError
 from pyramid.path import package_of
 
@@ -256,7 +260,9 @@ def object_description(object):
     """
     if isinstance(object, string_types):
         return object
-    if isinstance(object, (bool, int, float, long, types.NoneType)):
+    if isinstance(object, integer_types):
+        return object
+    if isinstance(object, (bool, float, type(None))):
         return str(object)
     if isinstance(object, (tuple, set)):
         return shortrepr(object, ')')
