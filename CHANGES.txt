@@ -92,6 +92,8 @@ Documentation
 - The SQLAlchemy Wiki tutorial has been updated.  It now uses
   ``@view_config`` decorators and an explicit database population script.
 
+- Minor updates to the ZODB Wiki tutorial.
+
 Scaffolds
 ---------
 
