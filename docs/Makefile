@@ -23,9 +23,9 @@ help:
 	@echo "  linkcheck to check all external links for integrity"
 
 clean:
-	-rm -rf _build/* _themes
+	-rm -rf _build/*
 
-html: _themes
+html:
 	mkdir -p _build/html _build/doctrees
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) _build/html
 	@echo
@@ -47,7 +47,7 @@ pickle:
 
 web: pickle
 
-htmlhelp: _themes
+htmlhelp:
 	mkdir -p _build/htmlhelp _build/doctrees
 	$(SPHINXBUILD) -b htmlhelp $(ALLSPHINXOPTS) _build/htmlhelp
 	@echo
@@ -84,5 +84,3 @@ epub:
 	@echo
 	@echo "Build finished. The epub file is in _build/epub."
 
-_themes:
-	cd ..; git submodule update --init; cd docs
