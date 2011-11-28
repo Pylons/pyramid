@@ -5,20 +5,25 @@ from zope.interface.interfaces import IInterface
 
 from repoze.lru import lru_cache
 
-from pyramid.interfaces import IContextURL
-from pyramid.interfaces import IRequestFactory
-from pyramid.interfaces import ITraverser
-from pyramid.interfaces import VH_ROOT_KEY
+from pyramid.interfaces import (
+    IContextURL,
+    IRequestFactory,
+    ITraverser,
+    VH_ROOT_KEY,
+    )
 
-from pyramid.compat import PY3
-from pyramid.compat import native_
-from pyramid.compat import text_
-from pyramid.compat import bytes_
-from pyramid.compat import ascii_native_
-from pyramid.compat import text_type
-from pyramid.compat import binary_type
-from pyramid.compat import url_unquote_native
-from pyramid.compat import is_nonstr_iter
+from pyramid.compat import (
+    PY3,
+    native_,
+    text_,
+    bytes_,
+    ascii_native_,
+    text_type,
+    binary_type,
+    url_unquote_native,
+    is_nonstr_iter,
+    )
+
 from pyramid.encode import url_quote
 from pyramid.exceptions import URLDecodeError
 from pyramid.location import lineage

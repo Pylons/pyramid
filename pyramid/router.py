@@ -1,26 +1,37 @@
-from zope.interface import implementer
-from zope.interface import providedBy
+from zope.interface import (
+    implementer,
+    providedBy,
+    )
 
-from pyramid.interfaces import IDebugLogger
-from pyramid.interfaces import IRequest
-from pyramid.interfaces import IRootFactory
-from pyramid.interfaces import IRouteRequest
-from pyramid.interfaces import IRouter
-from pyramid.interfaces import IRequestFactory
-from pyramid.interfaces import IRoutesMapper
-from pyramid.interfaces import ITraverser
-from pyramid.interfaces import IView
-from pyramid.interfaces import IViewClassifier
-from pyramid.interfaces import ITweens
+from pyramid.interfaces import (
+    IDebugLogger,
+    IRequest,
+    IRootFactory,
+    IRouteRequest,
+    IRouter,
+    IRequestFactory,
+    IRoutesMapper,
+    ITraverser,
+    IView,
+    IViewClassifier,
+    ITweens,
+    )
 
-from pyramid.events import ContextFound
-from pyramid.events import NewRequest
-from pyramid.events import NewResponse
+from pyramid.events import (
+    ContextFound,
+    NewRequest,
+    NewResponse,
+    )
+
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.request import Request
 from pyramid.threadlocal import manager
-from pyramid.traversal import DefaultRootFactory
-from pyramid.traversal import ResourceTreeTraverser
+
+from pyramid.traversal import (
+    DefaultRootFactory,
+    ResourceTreeTraverser,
+    )
+
 from pyramid.tweens import excview_tween_factory
 
 @implementer(IRouter)

@@ -3,32 +3,49 @@ import os
 
 from zope.deprecation import deprecated
 
-from zope.interface import implementer
-from zope.interface import Interface
-from zope.interface import alsoProvides
+from zope.interface import (
+    implementer,
+    Interface,
+    alsoProvides,
+    )
 
-from pyramid.interfaces import IRequest
-from pyramid.interfaces import IResponseFactory
-from pyramid.interfaces import ISecuredView
-from pyramid.interfaces import IView
-from pyramid.interfaces import IViewClassifier
-from pyramid.interfaces import ISession
+from pyramid.interfaces import (
+    IRequest,
+    IResponseFactory,
+    ISecuredView,
+    IView,
+    IViewClassifier,
+    ISession,
+    )
 
-from pyramid.compat import PY3
-from pyramid.compat import PYPY
-from pyramid.compat import class_types
+from pyramid.compat import (
+    PY3,
+    PYPY,
+    class_types,
+    )
+
 from pyramid.config import Configurator
 from pyramid.decorator import reify
 from pyramid.httpexceptions import HTTPForbidden
 from pyramid.response import Response
 from pyramid.registry import Registry
-from pyramid.security import Authenticated
-from pyramid.security import Everyone
-from pyramid.security import has_permission
-from pyramid.threadlocal import get_current_registry
-from pyramid.threadlocal import manager
-from pyramid.request import DeprecatedRequestMethodsMixin
-from pyramid.request import CallbackMethodsMixin
+
+from pyramid.security import (
+    Authenticated,
+    Everyone,
+    has_permission,
+    )
+
+from pyramid.threadlocal import (
+    get_current_registry,
+    manager,
+    )
+
+from pyramid.request import (
+    DeprecatedRequestMethodsMixin,
+    CallbackMethodsMixin,
+    )
+
 from pyramid.url import URLMethodsMixin
 
 _marker = object()

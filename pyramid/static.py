@@ -1,23 +1,34 @@
 # -*- coding: utf-8 -*-
 import mimetypes
 import os
-from os.path import normcase
-from os.path import normpath
-from os.path import join
-from os.path import getmtime
-from os.path import getsize
-from os.path import isdir
-from os.path import exists
-from pkg_resources import resource_exists
-from pkg_resources import resource_filename
-from pkg_resources import resource_isdir
+
+from os.path import (
+    normcase,
+    normpath,
+    join,
+    getmtime,
+    getsize,
+    isdir,
+    exists,
+    )
+
+from pkg_resources import (
+    resource_exists,
+    resource_filename,
+    resource_isdir,
+    )
 
 from repoze.lru import lru_cache
 
 from pyramid.asset import resolve_asset_spec
+
 from pyramid.compat import text_
-from pyramid.httpexceptions import HTTPNotFound
-from pyramid.httpexceptions import HTTPMovedPermanently
+
+from pyramid.httpexceptions import (
+    HTTPNotFound,
+    HTTPMovedPermanently,
+    )
+
 from pyramid.path import caller_package
 from pyramid.response import Response
 from pyramid.traversal import traversal_path_info

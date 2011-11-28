@@ -2,11 +2,13 @@ import venusian
 
 from zope.interface import implementer
 
-from pyramid.interfaces import IContextFound
-from pyramid.interfaces import INewRequest
-from pyramid.interfaces import INewResponse
-from pyramid.interfaces import IApplicationCreated
-from pyramid.interfaces import IBeforeRender
+from pyramid.interfaces import (
+    IContextFound,
+    INewRequest,
+    INewResponse,
+    IApplicationCreated,
+    IBeforeRender,
+    )
 
 class subscriber(object):
     """ Decorator activated via a :term:`scan` which treats the

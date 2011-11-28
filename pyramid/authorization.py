@@ -3,11 +3,14 @@ from zope.interface import implementer
 from pyramid.interfaces import IAuthorizationPolicy
 
 from pyramid.location import lineage
-from pyramid.security import ACLAllowed
-from pyramid.security import ACLDenied
-from pyramid.security import Allow
-from pyramid.security import Deny
-from pyramid.security import Everyone
+
+from pyramid.security import (
+    ACLAllowed,
+    ACLDenied,
+    Allow,
+    Deny,
+    Everyone,
+    )
 
 @implementer(IAuthorizationPolicy)
 class ACLAuthorizationPolicy(object):

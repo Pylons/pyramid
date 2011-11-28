@@ -3,13 +3,17 @@ import venusian
 from zope.interface import providedBy
 from zope.deprecation import deprecated
 
-from pyramid.interfaces import IRoutesMapper
-from pyramid.interfaces import IView
-from pyramid.interfaces import IViewClassifier
+from pyramid.interfaces import (
+    IRoutesMapper,
+    IView,
+    IViewClassifier,
+    )
 
 from pyramid.compat import map_
-from pyramid.httpexceptions import HTTPFound
-from pyramid.httpexceptions import default_exceptionresponse_view
+from pyramid.httpexceptions import (
+    HTTPFound,
+    default_exceptionresponse_view,
+    )
 from pyramid.path import caller_package
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry

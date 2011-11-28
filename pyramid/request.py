@@ -7,15 +7,22 @@ from zope.interface.interface import InterfaceClass
 
 from webob import BaseRequest
 
-from pyramid.interfaces import IRequest
-from pyramid.interfaces import IResponse
-from pyramid.interfaces import ISessionFactory
-from pyramid.interfaces import IResponseFactory
+from pyramid.interfaces import (
+    IRequest,
+    IResponse,
+    ISessionFactory,
+    IResponseFactory,
+    )
 
-from pyramid.compat import iterkeys_, itervalues_, iteritems_
-from pyramid.compat import text_
-from pyramid.compat import bytes_
-from pyramid.compat import native_
+from pyramid.compat import (
+    iterkeys_,
+    itervalues_,
+    iteritems_,
+    text_,
+    bytes_,
+    native_,
+    )
+
 from pyramid.decorator import reify
 from pyramid.response import Response
 from pyramid.url import URLMethodsMixin
