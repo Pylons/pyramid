@@ -4,7 +4,7 @@ Pyramid TODOs
 Must-Have
 ---------
 
-- Fix SQLA tutorial to match ZODB tutorial.
+- Change starter scaffold to use URL dispatch?
 
 Nice-to-Have
 ------------
