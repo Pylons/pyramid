@@ -128,18 +128,24 @@ We'll also add a ``logout`` view to our application and provide a link
 to it.  This view will clear the credentials of the logged in user and
 redirect back to the front page.
 
-We'll add a different file (for presentation convenience) to add login
-and logout views.  Add a file named ``login.py`` to your application
-(in the same directory as ``views.py``) with the following content:
+We'll add these views to the existing ``views.py`` file we have in our
+project.  Here's what the ``login`` view callable will look like:
 
-.. literalinclude:: src/authorization/tutorial/login.py
+.. literalinclude:: src/authorization/tutorial/views.py
+   :pyobject: login
    :linenos:
    :language: python
 
-Note that the ``login`` view callable in the ``login.py`` file has *two* view
-configuration decorators.  The order of these decorators is unimportant.
-Each just adds a different :term:`view configuration` for the ``login`` view
-callable.
+Here's what the ``logout`` view callable will look like:
+
+.. literalinclude:: src/authorization/tutorial/views.py
+   :pyobject: logout
+   :linenos:
+   :language: python
+
+Note that the ``login`` view callable has *two* view configuration
+decorators.  The order of these decorators is unimportant.  Each just adds a
+different :term:`view configuration` for the ``login`` view callable.
 
 The first view configuration decorator configures the ``login`` view callable
 so it will be invoked when someone visits ``/login`` (when the context is a
@@ -156,14 +162,18 @@ login form.  Before being allowed to continue on to the add or edit form, he
 will have to provide credentials that give him permission to add or edit via
 this login form.
 
+Note that we're relying on some additional imports within the bodies of these
+views (e.g. ``remember`` and ``forget``).  We'll see a rendering of the
+entire views.py file a little later here to show you where those come from.
+
 Change Existing Views
 ~~~~~~~~~~~~~~~~~~~~~
 
-Then we need to change each of our ``view_page``, ``edit_page`` and
-``add_page`` views in ``views.py`` to pass a "logged in" parameter
-into its template.  We'll add something like this to each view body:
+In order to indicate whether the current user is logged in, we need to change
+each of our ``view_page``, ``edit_page`` and ``add_page`` views in
+``views.py`` to pass a "logged in" parameter into its template.  We'll add
+something like this to each view body:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -174,7 +184,6 @@ We'll then change the return value of each view that has an associated
 ``renderer`` to pass the resulting ``logged_in`` value to the
 template.  For example:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -219,7 +228,7 @@ Add the ``login.pt`` Template
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Add a ``login.pt`` template to your templates directory.  It's
-referred to within the login view we just added to ``login.py``.
+referred to within the login view we just added to ``views.py``.
 
 .. literalinclude:: src/authorization/tutorial/templates/login.pt
    :language: xml

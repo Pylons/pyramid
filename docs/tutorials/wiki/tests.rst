@@ -9,10 +9,9 @@ that it continues to work after some changes are made in the future.
 Test the Models
 ===============
 
-We write tests for the model
-classes and the appmaker.  Changing ``tests.py``, we'll write a separate test
-class for each model class, and we'll write a test class for the
-``appmaker``.
+We write tests for the model classes and the appmaker.  Changing
+``tests.py``, we'll write a separate test class for each model class, and
+we'll write a test class for the ``appmaker``.
 
 To do so, we'll retain the ``tutorial.tests.ViewTests`` class provided as a
 result of the ``zodb`` project generator.  We'll add three test
