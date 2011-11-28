@@ -1,9 +1,11 @@
 from zope.interface import Interface
 
-from pyramid.interfaces import ITraverser
-from pyramid.interfaces import IAuthorizationPolicy
-from pyramid.interfaces import IAuthenticationPolicy
-from pyramid.interfaces import IRendererFactory
+from pyramid.interfaces import (
+    ITraverser,
+    IAuthorizationPolicy,
+    IAuthenticationPolicy,
+    IRendererFactory,
+    )
 
 from pyramid.renderers import RendererHelper
 from pyramid.traversal import traversal_path_info

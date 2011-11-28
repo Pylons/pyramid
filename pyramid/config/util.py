@@ -1,12 +1,18 @@
 import re
 import traceback
 
-from pyramid.compat import string_types
-from pyramid.compat import bytes_
-from pyramid.compat import is_nonstr_iter
+from pyramid.compat import (
+    string_types,
+    bytes_,
+    is_nonstr_iter,
+    )
+
 from pyramid.exceptions import ConfigurationError
-from pyramid.traversal import find_interface
-from pyramid.traversal import traversal_path_info
+
+from pyramid.traversal import (
+    find_interface,
+    traversal_path_info,
+    )
 
 from hashlib import md5
 

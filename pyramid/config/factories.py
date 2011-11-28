@@ -1,9 +1,11 @@
 from pyramid.config.util import action_method
 
-from pyramid.interfaces import IDefaultRootFactory
-from pyramid.interfaces import IRequestFactory
-from pyramid.interfaces import IRootFactory
-from pyramid.interfaces import ISessionFactory
+from pyramid.interfaces import (
+    IDefaultRootFactory,
+    IRequestFactory,
+    IRootFactory,
+    ISessionFactory,
+    )
 
 from pyramid.traversal import DefaultRootFactory
 
