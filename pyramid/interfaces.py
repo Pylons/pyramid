@@ -1,5 +1,7 @@
-from zope.interface import Attribute
-from zope.interface import Interface
+from zope.interface import (
+    Attribute,
+    Interface,
+    )
 
 from pyramid.compat import PY3
 

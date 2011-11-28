@@ -2,13 +2,21 @@ import os
 import sys
 import threading
 
-from zope.interface import implementer
-from zope.interface import Interface
+from zope.interface import (
+    implementer,
+    Interface,
+    )
 
-from pyramid.asset import resolve_asset_spec
-from pyramid.asset import abspath_from_asset_spec
-from pyramid.compat import is_nonstr_iter
-from pyramid.compat import reraise
+from pyramid.asset import (
+    resolve_asset_spec,
+    abspath_from_asset_spec,
+    )
+
+from pyramid.compat import (
+    is_nonstr_iter,
+    reraise,
+    )
+
 from pyramid.interfaces import ITemplateRenderer
 from pyramid.settings import asbool
 from pyramid.util import DottedNameResolver

@@ -6,7 +6,7 @@ from pyramid.compat import configparser
 from pyramid.util import DottedNameResolver
 from pyramid.paster import bootstrap
 
-from pyramid.scripts.common import logging_file_config
+from pyramid.paster import setup_logging
 
 def main(argv=sys.argv, quiet=False):
     command = PShellCommand(argv, quiet)
@@ -85,7 +85,7 @@ class PShellCommand(object):
             return
         config_uri = self.args[0]
         config_file = config_uri.split('#', 1)[0]
-        logging_file_config(config_file)
+        setup_logging(config_file)
         self.pshell_file_config(config_file)
 
         # bootstrap the environ

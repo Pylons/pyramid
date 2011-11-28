@@ -1,11 +1,17 @@
 import os
 
 import zope.deprecation
-from paste.deploy import loadapp
 
+from paste.deploy import (
+    loadapp,
+    appconfig,
+    )
+
+from pyramid.compat import configparser
+from logging.config import fileConfig
 from pyramid.scripting import prepare
-
 from pyramid.scaffolds import PyramidTemplate # bw compat
+
 PyramidTemplate = PyramidTemplate # pyflakes
 
 zope.deprecation.deprecated(
@@ -20,16 +26,52 @@ def get_app(config_uri, name=None, loadapp=loadapp):
     If the ``name`` is None, this will attempt to parse the name from
     the ``config_uri`` string expecting the format ``inifile#name``.
     If no name is found, the name will default to "main"."""
+    path, section = _getpathsec(config_uri, name)
+    config_name = 'config:%s' % path
+    here_dir = os.getcwd()
+    app = loadapp(config_name, name=section, relative_to=here_dir)
+    return app
+
+def get_appsettings(config_uri, name=None, appconfig=appconfig):
+    """ Return a dictionary representing the key/value pairs in an ``app`
+    section within the file represented by ``config_uri``.
+
+    If the ``name`` is None, this will attempt to parse the name from
+    the ``config_uri`` string expecting the format ``inifile#name``.
+    If no name is found, the name will default to "main"."""
+    path, section = _getpathsec(config_uri, name)
+    config_name = 'config:%s' % path
+    here_dir = os.getcwd()
+    return appconfig(config_name, name=section, relative_to=here_dir)
+
+def setup_logging(config_uri, fileConfig=fileConfig,
+                  configparser=configparser):
+    """
+    Set up logging via the logging module's fileConfig function with the
+    filename specified via ``config_uri`` (a string in the form
+    ``filename#sectionname``).
+
+    ConfigParser defaults are specified for the special ``__file__``
+    and ``here`` variables, similar to PasteDeploy config loading.
+    """
+    path, _ = _getpathsec(config_uri, None)
+    parser = configparser.ConfigParser()
+    parser.read([path])
+    if parser.has_section('loggers'):
+        config_file = os.path.abspath(path)
+        return fileConfig(
+            config_file,
+            dict(__file__=config_file, here=os.path.dirname(config_file))
+            )
+
+def _getpathsec(config_uri, name):
     if '#' in config_uri:
         path, section = config_uri.split('#', 1)
     else:
         path, section = config_uri, 'main'
     if name:
         section = name
-    config_name = 'config:%s' % path
-    here_dir = os.getcwd()
-    app = loadapp(config_name, name=section, relative_to=here_dir)
-    return app
+    return path, section
 
 def bootstrap(config_uri, request=None):
     """ Load a WSGI application from the PasteDeploy config file specified

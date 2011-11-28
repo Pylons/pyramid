@@ -1,15 +1,20 @@
 import unittest
-
+import transaction
 from pyramid import testing
 
 def _initTestingDB():
-    from tutorial.models import DBSession
-    from tutorial.models import Base
     from sqlalchemy import create_engine
+    from tutorial.models import (
+        DBSession,
+        Page,
+        Base
+        )
     engine = create_engine('sqlite://')
-    DBSession.configure(bind=engine)
-    Base.metadata.bind = engine
     Base.metadata.create_all(engine)
+    DBSession.configure(bind=engine)
+    with transaction.manager:
+        model = Page('FrontPage', 'This is the front page')
+        DBSession.add(model)
     return DBSession
 
 def _registerRoutes(config):
@@ -20,8 +25,10 @@ def _registerRoutes(config):
 class ViewWikiTests(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
+        self.session = _initTestingDB()
 
     def tearDown(self):
+        self.session.remove()
         testing.tearDown()
 
     def _callFUT(self, request):

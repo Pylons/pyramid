@@ -41,6 +41,8 @@ setup(name='tutorial',
       entry_points = """\
       [paste.app_factory]
       main = tutorial:main
+      [console_scripts]
+      populate_tutorial = tutorial.scripts.populate:main
       """,
       )
 

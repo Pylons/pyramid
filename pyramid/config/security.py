@@ -1,8 +1,10 @@
-from pyramid.interfaces import IAuthorizationPolicy
-from pyramid.interfaces import IAuthenticationPolicy
-from pyramid.interfaces import IDefaultPermission
-from pyramid.interfaces import PHASE1_CONFIG
-from pyramid.interfaces import PHASE2_CONFIG
+from pyramid.interfaces import (
+    IAuthorizationPolicy,
+    IAuthenticationPolicy,
+    IDefaultPermission,
+    PHASE1_CONFIG,
+    PHASE2_CONFIG,
+    )
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.config.util import action_method

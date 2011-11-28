@@ -16,25 +16,44 @@ from pyramid.interfaces import (
     )
 
 from pyramid.asset import resolve_asset_spec
+
 from pyramid.authorization import ACLAuthorizationPolicy
-from pyramid.compat import text_
-from pyramid.compat import reraise
-from pyramid.compat import string_types
-from pyramid.compat import PY3
+
+from pyramid.compat import (
+    text_,
+    reraise,
+    string_types,
+    PY3,
+    )
+
 from pyramid.events import ApplicationCreated
-from pyramid.exceptions import ConfigurationConflictError
-from pyramid.exceptions import ConfigurationError
-from pyramid.exceptions import ConfigurationExecutionError
+
+from pyramid.exceptions import (
+    ConfigurationConflictError,
+    ConfigurationError,
+    ConfigurationExecutionError,
+    )
+
 from pyramid.httpexceptions import default_exceptionresponse_view
-from pyramid.path import caller_package
-from pyramid.path import package_of
+
+from pyramid.path import (
+    caller_package,
+    package_of,
+    )
+
 from pyramid.registry import Registry
+
 from pyramid.router import Router
+
 from pyramid.settings import aslist
+
 from pyramid.threadlocal import manager
-from pyramid.util import DottedNameResolver
-from pyramid.util import WeakOrderedSet
-from pyramid.util import object_description
+
+from pyramid.util import (
+    DottedNameResolver,
+    WeakOrderedSet,
+    object_description,
+    )
 
 from pyramid.config.adapters import AdaptersConfiguratorMixin
 from pyramid.config.assets import AssetsConfiguratorMixin

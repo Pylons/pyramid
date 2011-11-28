@@ -1,18 +1,26 @@
 import re
 from zope.interface import implementer
 
-from pyramid.interfaces import IRoutesMapper
-from pyramid.interfaces import IRoute
+from pyramid.interfaces import (
+    IRoutesMapper,
+    IRoute,
+    )
 
-from pyramid.compat import native_
-from pyramid.compat import bytes_
-from pyramid.compat import text_type
-from pyramid.compat import string_types
-from pyramid.compat import is_nonstr_iter
-from pyramid.compat import url_quote
+from pyramid.compat import (
+    native_,
+    bytes_,
+    text_type,
+    string_types,
+    is_nonstr_iter,
+    url_quote,
+    )
+
 from pyramid.exceptions import URLDecodeError
-from pyramid.traversal import traversal_path_info
-from pyramid.traversal import quote_path_segment
+
+from pyramid.traversal import (
+    traversal_path_info,
+    quote_path_segment,
+    )
 
 _marker = object()
 

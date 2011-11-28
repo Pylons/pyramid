@@ -17,6 +17,14 @@ Features
 - ``bpython`` interpreter compatibility in ``pshell``.  See the "Command-Line
   Pyramid" narrative docs chapter for more information.
 
+- Added ``get_appsettings`` API function to the ``pyramid.paster`` module.
+  This function returns the settings defined within an ``[app:...]`` section
+  in a PasteDeploy ini file.
+
+- Added ``setup_logging`` API function to the ``pyramid.paster`` module.
+  This function sets up Python logging according to the logging configuration
+  in a PasteDeploy ini file.
+
 Bug Fixes
 ---------
 
@@ -60,7 +68,7 @@ Backwards Incompatibilities
   ``paste.httpserver`` server.  Rationale: Rationale: the Paste and
   PasteScript packages do not run under Python 3.
 
-- The ``pshell`` command (nee "paster pshell") no longer accepts a
+- The ``pshell`` command (see "paster pshell") no longer accepts a
   ``--disable-ipython`` command-line argument.  Instead, it accepts a ``-p``
   or ``--python-shell`` argument, which can be any of the values ``python``,
   ``ipython`` or ``bpython``.
@@ -78,6 +86,13 @@ Dependencies
 
 - Pyramid no longer depends on the Paste or PasteScript packages.
 
+Documentation
+-------------
+
+- The SQLAlchemy Wiki tutorial has been updated.  It now uses
+  ``@view_config`` decorators and an explicit database population script.
+
+- Minor updates to the ZODB Wiki tutorial.
 
 Scaffolds
 ---------

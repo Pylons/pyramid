@@ -4,17 +4,24 @@ import os
 
 from repoze.lru import lru_cache
 
-from pyramid.interfaces import IContextURL
-from pyramid.interfaces import IRoutesMapper
-from pyramid.interfaces import IStaticURLInfo
+from pyramid.interfaces import (
+    IContextURL,
+    IRoutesMapper,
+    IStaticURLInfo,
+    )
 
-from pyramid.compat import native_
-from pyramid.compat import text_type
+from pyramid.compat import (
+    native_,
+    text_type,
+    )
 from pyramid.encode import urlencode
 from pyramid.path import caller_package
 from pyramid.threadlocal import get_current_registry
-from pyramid.traversal import TraversalContextURL
-from pyramid.traversal import quote_path_segment
+
+from pyramid.traversal import (
+    TraversalContextURL,
+    quote_path_segment,
+    )
 
 class URLMethodsMixin(object):
     """ Request methods mixin for BaseRequest having to do with URL

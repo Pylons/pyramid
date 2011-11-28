@@ -6,21 +6,32 @@ import threading
 from zope.interface import implementer
 from zope.deprecation import deprecated
 
-from pyramid.interfaces import IChameleonLookup
-from pyramid.interfaces import IChameleonTranslate
-from pyramid.interfaces import IRendererGlobalsFactory
-from pyramid.interfaces import IRendererFactory
-from pyramid.interfaces import IResponseFactory
-from pyramid.interfaces import ITemplateRenderer
-from pyramid.interfaces import IRendererInfo
+from pyramid.interfaces import (
+    IChameleonLookup,
+    IChameleonTranslate,
+    IRendererGlobalsFactory,
+    IRendererFactory,
+    IResponseFactory,
+    ITemplateRenderer,
+    IRendererInfo,
+    )
 
 from pyramid.asset import asset_spec_from_abspath
-from pyramid.compat import string_types
-from pyramid.compat import text_type
+
+from pyramid.compat import (
+    string_types,
+    text_type,
+    )
+
 from pyramid.decorator import reify
+
 from pyramid.events import BeforeRender
-from pyramid.path import caller_package
-from pyramid.path import package_path
+
+from pyramid.path import (
+    caller_package,
+    package_path,
+    )
+
 from pyramid.response import Response
 from pyramid.threadlocal import get_current_registry
 

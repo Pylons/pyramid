@@ -2,34 +2,19 @@
 Defining Views
 ==============
 
-A :term:`view callable` in a :term:`url dispatch` -based :app:`Pyramid`
-application is typically a simple Python function that accepts a single
-parameter named :term:`request`.  A view callable is assumed to return a
-:term:`response` object.
+A :term:`view callable` in a :app:`Pyramid` application is typically a simple
+Python function that accepts a single parameter named :term:`request`.  A
+view callable is assumed to return a :term:`response` object.
 
-.. note::
-
-   A :app:`Pyramid` view can also be defined as callable
-   which accepts *two* arguments: a :term:`context` and a
-   :term:`request`.  You'll see this two-argument pattern used in
-   other :app:`Pyramid` tutorials and applications.  Either calling
-   convention will work in any :app:`Pyramid` application; the
-   calling conventions can be used interchangeably as necessary.  In
-   :term:`url dispatch` based applications, however, the context
-   object is rarely used in the view body itself, so within this
-   tutorial we define views as callables that accept only a request to
-   avoid the visual "noise".  If you do need the ``context`` within a
-   view function that only takes the request as a single argument, you
-   can obtain it via ``request.context``.
-
-The request passed to every view that is called as the result of a route
-match has an attribute named ``matchdict`` that contains the elements placed
-into the URL by the ``pattern`` of a ``route`` statement.  For instance, if a
-call to :meth:`pyramid.config.Configurator.add_route` in ``__init__.py`` had
-the pattern ``{one}/{two}``, and the URL at ``http://example.com/foo/bar``
-was invoked, matching this pattern, the ``matchdict`` dictionary attached to
-the request passed to the view would have a ``'one'`` key with the value
-``'foo'`` and a ``'two'`` key with the value ``'bar'``.
+The request object passed to every view that is called as the result of a
+route match has an attribute named ``matchdict`` that contains the elements
+placed into the URL by the ``pattern`` of a ``route`` statement.  For
+instance, if a call to :meth:`pyramid.config.Configurator.add_route` in
+``__init__.py`` had the pattern ``{one}/{two}``, and the URL at
+``http://example.com/foo/bar`` was invoked, matching this pattern, the
+``matchdict`` dictionary attached to the request passed to the view would
+have a ``'one'`` key with the value ``'foo'`` and a ``'two'`` key with the
+value ``'bar'``.
 
 The source code for this tutorial stage can be browsed at
 `http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/views/
@@ -52,24 +37,56 @@ Our resulting ``setup.py`` should look like so:
    :linenos:
    :language: python
 
-.. note:: After these new dependencies are added, you will need to
-   rerun ``python setup.py develop`` inside the root of the
-   ``tutorial`` package to obtain and register the newly added
-   dependency package.
+Running ``setup.py develop``
+============================
 
-Adding View Functions
-=====================
+Since a new software dependency was added, you will need to rerun ``python
+setup.py develop`` inside the root of the ``tutorial`` package to obtain and
+register the newly added dependency distribution.
 
-We'll get rid of our ``my_view`` view function in our ``views.py`` file.
-It's only an example and isn't relevant to our application.
+Make sure your current working directory is the root of the project (the
+directory in which setup.py lives) and execute the following command.
 
-Then we're going to add four :term:`view callable` functions to our
-``views.py`` module.  One view callable (named ``view_wiki``) will display
-the wiki itself (it will answer on the root URL), another named ``view_page``
-will display an individual page, another named ``add_page`` will allow a page
-to be added, and a final view callable named ``edit_page`` will allow a page
-to be edited.  We'll describe each one briefly and show the resulting
-``views.py`` file afterward.
+On UNIX:
+
+.. code-block:: text
+
+   $ cd tutorial
+   $ ../bin/python setup.py develop
+
+On Windows:
+
+.. code-block:: text
+
+   c:\pyramidtut> cd tutorial
+   c:\pyramidtut\tutorial> ..\Scripts\python setup.py develop
+
+Success executing this command will end with a line to the console something
+like::
+
+   Finished processing dependencies for tutorial==0.0
+
+Changing the ``views.py`` File
+==============================
+
+We're going to edit our ``views.py`` in a rather major way.  The result of
+all of our edits to ``views.py`` will leave it looking like this:
+
+.. literalinclude:: src/views/tutorial/views.py
+   :linenos:
+   :language: python
+
+We've gotten rid of the ``my_view`` view function and its decorator that was
+added when we originally rendered the ``alchemy`` scaffold.  It was only an
+example and isn't relevant to our application.
+
+Then we added four :term:`view callable` functions to our ``views.py``
+module.  One view callable (named ``view_wiki``) will display the wiki itself
+(it will answer on the root URL), another named ``view_page`` will display an
+individual page, another named ``add_page`` will allow a page to be added,
+and a final view callable named ``edit_page`` will allow a page to be edited.
+We'll describe each one briefly and show the resulting ``views.py`` file
+afterward.
 
 .. note::
 
@@ -195,16 +212,6 @@ If the view execution *is* a result of a form submission (if the expression
 attribute of the page object.  It then redirects to the ``view_page`` view
 of the wiki page.
 
-Viewing the Result of all Our Edits to ``views.py``
-===================================================
-
-The result of all of our edits to ``views.py`` will leave it looking
-like this:
-
-.. literalinclude:: src/views/tutorial/views.py
-   :linenos:
-   :language: python
-
 Adding Templates
 ================
 
@@ -270,47 +277,41 @@ subdirectories) and are just referred to by URL or by using the convenience
 method ``static_url``
 e.g. ``request.static_url('{{package}}:static/foo.css')`` within templates.
 
-Mapping Views to URLs in ``__init__.py``
-========================================
+Adding Routes to ``__init__.py``
+================================
 
 The ``__init__.py`` file contains
-:meth:`pyramid.config.Configurator.add_view` calls which serve to map
-routes via :term:`url dispatch` to views.  First, we’ll get rid of the
-existing route created by the template using the name ``'home'``. It’s only an
-example and isn’t relevant to our application.
+:meth:`pyramid.config.Configurator.add_route` calls which serve to add routes
+to our application.  First, we’ll get rid of the existing route created by
+the template using the name ``'home'``. It’s only an example and isn’t
+relevant to our application.
 
 We then need to add four calls to ``add_route``.  Note that the *ordering* of
 these declarations is very important.  ``route`` declarations are matched in
 the order they're found in the ``__init__.py`` file.
 
 #. Add a declaration which maps the pattern ``/`` (signifying the root URL)
-   to the route named ``view_wiki``.
+   to the route named ``view_wiki``.  It maps to our ``view_wiki`` view
+   callable by virtue of the ``@view_config`` attached to the ``view_wiki``
+   view function indicating ``route_name='view_wiki'``.
 
 #. Add a declaration which maps the pattern ``/{pagename}`` to the route named
-   ``view_page``.  This is the regular view for a page.
+   ``view_page``.  This is the regular view for a page.  It maps
+   to our ``view_page`` view callable by virtue of the ``@view_config``
+   attached to the ``view_page`` view function indicating
+   ``route_name='view_page'``.
 
 #. Add a declaration which maps the pattern ``/add_page/{pagename}`` to the
-   route named ``add_page``.  This is the add view for a new page.
+   route named ``add_page``.  This is the add view for a new page.  It maps
+   to our ``add_page`` view callable by virtue of the ``@view_config``
+   attached to the ``add_page`` view function indicating
+   ``route_name='add_page'``.
 
 #. Add a declaration which maps the pattern ``/{pagename}/edit_page`` to the
-   route named ``edit_page``.  This is the edit view for a page.
-
-After we've defined the routes for our application, we can register views
-to handle the processing and rendering that needs to happen when each route is
-requested.
-
-#. Add a declaration which maps the ``view_wiki`` route to the view named
-   ``view_wiki`` in our ``views.py`` file.  This is the :term:`default view`
-   for the wiki.
-
-#. Add a declaration which maps the ``view_page`` route to the view named
-   ``view_page`` in our ``views.py`` file.
-
-#. Add a declaration which maps the ``add_page`` route to the view named
-   ``add_page`` in our ``views.py`` file.
-
-#. Add a declaration which maps the ``edit_page`` route to the view named
-   ``edit_page`` in our ``views.py`` file.
+   route named ``edit_page``.  This is the edit view for a page.  It maps
+   to our ``edit_page`` view callable by virtue of the ``@view_config``
+   attached to the ``edit_page`` view function indicating
+   ``route_name='edit_page'``.
 
 As a result of our edits, the ``__init__.py`` file should look
 something like so:

@@ -1,8 +1,10 @@
-from pyramid.compat import text_type
-from pyramid.compat import binary_type
-from pyramid.compat import is_nonstr_iter
-from pyramid.compat import url_quote as _url_quote
-from pyramid.compat import url_quote_plus as quote_plus # bw compat api (dnr)
+from pyramid.compat import (
+    text_type,
+    binary_type,
+    is_nonstr_iter,
+    url_quote as _url_quote,
+    url_quote_plus as quote_plus, # bw compat api (dnr)
+    )
 
 def url_quote(s, safe=''): # bw compat api
     return _url_quote(s, safe=safe)

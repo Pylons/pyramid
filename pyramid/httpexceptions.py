@@ -128,12 +128,15 @@ from zope.interface import implementer
 
 from webob import html_escape as _html_escape
 
+from pyramid.compat import (
+    class_types,
+    text_type,
+    binary_type,
+    text_,
+    )
+
 from pyramid.interfaces import IExceptionResponse
 from pyramid.response import Response
-from pyramid.compat import class_types
-from pyramid.compat import text_type
-from pyramid.compat import binary_type
-from pyramid.compat import text_
 
 def _no_escape(value):
     if value is None:

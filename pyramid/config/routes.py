@@ -1,16 +1,20 @@
 import warnings
 
-from pyramid.interfaces import IRequest
-from pyramid.interfaces import IRouteRequest
-from pyramid.interfaces import IRoutesMapper
-from pyramid.interfaces import PHASE2_CONFIG
+from pyramid.interfaces import (
+    IRequest,
+    IRouteRequest,
+    IRoutesMapper,
+    PHASE2_CONFIG,
+    )
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.request import route_request_iface
 from pyramid.urldispatch import RoutesMapper
 
-from pyramid.config.util import action_method
-from pyramid.config.util import make_predicates
+from pyramid.config.util import (
+    action_method,
+    make_predicates,
+    )
 
 class RoutesConfiguratorMixin(object):
     @action_method

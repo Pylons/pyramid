@@ -1,14 +1,19 @@
 import warnings
 
-from pyramid.interfaces import IRendererFactory
-from pyramid.interfaces import IRendererGlobalsFactory
-from pyramid.interfaces import PHASE1_CONFIG
+from pyramid.interfaces import (
+    IRendererFactory,
+    IRendererGlobalsFactory,
+    PHASE1_CONFIG,
+    )
 
 from pyramid.config.util import action_method
 
-from pyramid import renderers
-from pyramid import chameleon_text
-from pyramid import chameleon_zpt
+from pyramid import (
+    renderers,
+    chameleon_text,
+    chameleon_zpt,
+    )
+
 from pyramid.mako_templating import renderer_factory as mako_renderer_factory
 
 DEFAULT_RENDERERS = (

@@ -3,13 +3,17 @@ import venusian
 from zope.interface import providedBy
 from zope.deprecation import deprecated
 
-from pyramid.interfaces import IRoutesMapper
-from pyramid.interfaces import IView
-from pyramid.interfaces import IViewClassifier
+from pyramid.interfaces import (
+    IRoutesMapper,
+    IView,
+    IViewClassifier,
+    )
 
 from pyramid.compat import map_
-from pyramid.httpexceptions import HTTPFound
-from pyramid.httpexceptions import default_exceptionresponse_view
+from pyramid.httpexceptions import (
+    HTTPFound,
+    default_exceptionresponse_view,
+    )
 from pyramid.path import caller_package
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
@@ -156,11 +160,12 @@ class view_config(object):
              backwards compatibility purposes, as the name
              :class:`pyramid.view.bfg_view`.
 
-    The following arguments are supported as arguments to
+    The following arguments are supported to
     :class:`pyramid.view.view_config`: ``context``, ``permission``, ``name``,
     ``request_type``, ``route_name``, ``request_method``, ``request_param``,
     ``containment``, ``xhr``, ``accept``, ``header``, ``path_info``,
-    ``custom_predicates``, ``decorator``, ``mapper``, and ``http_cache``.
+    ``custom_predicates``, ``decorator``, ``mapper``, ``http_cache``,
+    and ``match_param``.
 
     The meanings of these arguments are the same as the arguments passed to
     :meth:`pyramid.config.Configurator.add_view`.

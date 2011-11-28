@@ -7,11 +7,14 @@ import os
 
 from zope.interface import implementer
 
-from pyramid.compat import pickle
-from pyramid.compat import PY3
-from pyramid.compat import text_
-from pyramid.compat import bytes_
-from pyramid.compat import native_
+from pyramid.compat import (
+    pickle,
+    PY3,
+    text_,
+    bytes_,
+    native_,
+    )
+
 from pyramid.interfaces import ISession
 from pyramid.util import strings_differ
 

@@ -1,50 +1,67 @@
 import inspect
 import operator
 
-from zope.interface import Interface
-from zope.interface import classProvides
-from zope.interface import implementedBy
-from zope.interface import implementer
+from zope.interface import (
+    Interface,
+    classProvides,
+    implementedBy,
+    implementer,
+    )
+
 from zope.interface.interfaces import IInterface
 
-from pyramid.interfaces import IAuthenticationPolicy
-from pyramid.interfaces import IAuthorizationPolicy
-from pyramid.interfaces import IDebugLogger
-from pyramid.interfaces import IDefaultPermission
-from pyramid.interfaces import IException
-from pyramid.interfaces import IExceptionViewClassifier
-from pyramid.interfaces import IMultiView
-from pyramid.interfaces import IRendererFactory
-from pyramid.interfaces import IRequest
-from pyramid.interfaces import IResponse
-from pyramid.interfaces import IRouteRequest
-from pyramid.interfaces import ISecuredView
-from pyramid.interfaces import IStaticURLInfo
-from pyramid.interfaces import IView
-from pyramid.interfaces import IViewClassifier
-from pyramid.interfaces import IViewMapper
-from pyramid.interfaces import IViewMapperFactory
-from pyramid.interfaces import PHASE1_CONFIG
+from pyramid.interfaces import (
+    IAuthenticationPolicy,
+    IAuthorizationPolicy,
+    IDebugLogger,
+    IDefaultPermission,
+    IException,
+    IExceptionViewClassifier,
+    IMultiView,
+    IRendererFactory,
+    IRequest,
+    IResponse,
+    IRouteRequest,
+    ISecuredView,
+    IStaticURLInfo,
+    IView,
+    IViewClassifier,
+    IViewMapper,
+    IViewMapperFactory,
+    PHASE1_CONFIG,
+    )
 
 from pyramid import renderers
-from pyramid.compat import string_types
-from pyramid.compat import urlparse
-from pyramid.compat import im_func
-from pyramid.compat import url_quote
-from pyramid.exceptions import ConfigurationError
-from pyramid.exceptions import PredicateMismatch
-from pyramid.httpexceptions import HTTPForbidden
-from pyramid.httpexceptions import HTTPNotFound
+
+from pyramid.compat import (
+    string_types,
+    urlparse,
+    im_func,
+    url_quote,
+    )
+
+from pyramid.exceptions import (
+    ConfigurationError,
+    PredicateMismatch,
+    )
+
+from pyramid.httpexceptions import (
+    HTTPForbidden,
+    HTTPNotFound,
+    )
+
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
 from pyramid.view import render_view_to_response
 
-from pyramid.config.util import DEFAULT_PHASH
-from pyramid.config.util import MAX_ORDER
-from pyramid.config.util import action_method
-from pyramid.config.util import as_sorted_tuple
-from pyramid.config.util import make_predicates
+from pyramid.config.util import (
+    DEFAULT_PHASH,
+    MAX_ORDER,
+    action_method,
+    as_sorted_tuple,
+    make_predicates,
+    )
 
 urljoin = urlparse.urljoin
 url_parse = urlparse.urlparse

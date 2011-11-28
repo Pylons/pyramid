@@ -1,9 +1,11 @@
 from zope.interface import providedBy
 
-from pyramid.interfaces import IAuthenticationPolicy
-from pyramid.interfaces import IAuthorizationPolicy
-from pyramid.interfaces import ISecuredView
-from pyramid.interfaces import IViewClassifier
+from pyramid.interfaces import (
+    IAuthenticationPolicy,
+    IAuthorizationPolicy,
+    ISecuredView,
+    IViewClassifier,
+    )
 
 from pyramid.compat import map_
 from pyramid.threadlocal import get_current_registry

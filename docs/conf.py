@@ -141,14 +141,29 @@ if book:
 # -----------------------
 
 # Add and use Pylons theme
+from subprocess import call, Popen, PIPE
+
+p = Popen('which git', shell=True, stdout=PIPE)
+git = p.stdout.read().strip()
+cwd = os.getcwd()
+_themes = os.path.join(cwd, '_themes')
+
+if not os.path.isdir(_themes):
+    call([git, 'clone', 'git://github.com/Pylons/pylons_sphinx_theme.git',
+            '_themes'])
+else:
+    os.chdir(_themes)
+    call([git, 'checkout', 'master'])
+    call([git, 'pull'])
+    os.chdir(cwd)
+
 sys.path.append(os.path.abspath('_themes'))
 html_theme_path = ['_themes']
 html_theme = 'pyramid'
-
-html_theme_options = {
-    'github_url': 'https://github.com/Pylons/pyramid'
-}
-
+html_theme_options = dict(
+    github_url='https://github.com/Pylons/pyramid',
+    in_progress='true'
+    )
 # The style sheet to use for HTML and HTML Help pages. A file of that name
 # must exist either in Sphinx' static/ path, or in one of the custom paths
 # given in html_static_path.
@@ -461,7 +476,7 @@ def resig(app, what, name, obj, options, signature, return_annotation):
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = 'The Pyramid Web Application Development Framework, Version 1.2'
+epub_title = 'The Pyramid Web Application Development Framework, Version 1.3dev'
 epub_author = 'Chris McDonough'
 epub_publisher = 'Agendaless Consulting'
 epub_copyright = '2008-2011'
@@ -478,7 +493,7 @@ epub_scheme = 'ISBN'
 epub_identifier = '0615445675'
 
 # A unique identification for the text.
-epub_uid = 'The Pyramid Web Application Development Framework, Version 1.2'
+epub_uid = 'The Pyramid Web Application Development Framework, Version 1.3dev'
 
 # HTML files that should be inserted before the pages created by sphinx.
 # The format is a list of tuples containing the path and title.

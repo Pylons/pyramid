@@ -2,16 +2,12 @@ import binascii
 import os
 
 from pyramid.compat import native_
-from pyramid.compat import text_
 
 from pyramid.scaffolds.template import Template
 
 class PyramidTemplate(Template):
     def pre(self, command, output_dir, vars):
         vars['random_string'] = native_(binascii.hexlify(os.urandom(20)))
-        # placeholder text values
-        vars['one'] = text_('one')
-        vars['two'] = text_('two')
         package_logger = vars['package']
         if package_logger == 'root':
             # Rename the app logger in the rare case a project is named 'root'
@@ -37,4 +33,11 @@ class ZODBProjectTemplate(PyramidTemplate):
 class AlchemyProjectTemplate(PyramidTemplate):
     _template_dir = 'alchemy'
     summary = 'Pyramid SQLAlchemy project using url dispatch'
-
+    def post(self, command, output_dir, vars): # pragma: no cover
+        val = PyramidTemplate.post(self, command, output_dir, vars)
+        self.out('')
+        self.out('Please run the "populate_%(package)s" script to set up the '
+                 'SQL database before starting the application (e.g. '
+                 '"$myvirtualenv/bin/populate_%(package)s development.ini".)'
+                 % vars)
+        return val

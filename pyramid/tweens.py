@@ -1,6 +1,9 @@
 import sys
-from pyramid.interfaces import IExceptionViewClassifier
-from pyramid.interfaces import IView
+
+from pyramid.interfaces import (
+    IExceptionViewClassifier,
+    IView,
+    )
 
 from zope.interface import providedBy
 

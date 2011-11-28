@@ -15,29 +15,25 @@ Making Edits to ``models.py``
 
 .. note::
 
-  There is nothing automagically special about the filename
-  ``models.py``.  A project may have many models throughout its
-  codebase in arbitrarily-named files.  Files implementing models
-  often have ``model`` in their filenames (or they may live in a
-  Python subpackage of your application package named ``models``) ,
-  but this is only by convention.
+  There is nothing automagically special about the filename ``models.py``.  A
+  project may have many models throughout its codebase in arbitrarily-named
+  files.  Files implementing models often have ``model`` in their filenames
+  (or they may live in a Python subpackage of your application package named
+  ``models``) , but this is only by convention.
 
-The first thing we want to do is remove the stock ``MyModel`` class from the
-generated ``models.py`` file.  The ``MyModel`` class is only a sample and
-we're not going to use it.
-
-Next, we'll remove the :class:`sqlalchemy.Unicode` import and replace it
-with :class:`sqlalchemy.Text`.
+Here's what our ``models.py`` file should look like after this step:
 
 .. literalinclude:: src/models/tutorial/models.py
-   :lines: 5
    :linenos:
    :language: py
 
-Then, we'll add a ``Page`` class.  Because this is a SQLAlchemy
-application, this class should inherit from an instance of
-:class:`sqlalchemy.ext.declarative.declarative_base`.  Declarative
-SQLAlchemy models are easier to use than directly-mapped ones.
+The first thing we've done is to do is remove the stock ``MyModel`` class
+from the generated ``models.py`` file.  The ``MyModel`` class is only a
+sample and we're not going to use it.
+
+Then, we added a ``Page`` class.  Because this is a SQLAlchemy application,
+this class inherits from an instance of
+:class:`sqlalchemy.ext.declarative.declarative_base`.
 
 .. literalinclude:: src/models/tutorial/models.py
    :pyobject: Page
@@ -54,24 +50,18 @@ in the table.  The ``name`` attribute will be a text attribute, each value of
 which needs to be unique within the column.  The ``data`` attribute is a text
 attribute that will hold the body of each page.
 
-We'll also remove our ``populate`` function.  We'll inline the populate step
-into ``initialize_sql``, changing our ``initialize_sql`` function to add a
-FrontPage object to our database at startup time.
+Changing ``scripts/populate.py``
+--------------------------------
 
-.. literalinclude:: src/models/tutorial/models.py
-   :pyobject: initialize_sql
-   :linenos:
-   :language: python
+We haven't looked at the guts of this file yet, but within the ``scripts``
+directory of your ``tutorial`` package is a file named ``populate.py``.  Code
+in this file is executed whenever we run the ``populate_tutorial`` command
+(as we did in the installation step of this tutorial).
 
-Here, we're using a slightly different binding syntax.  It is otherwise
-largely the same as the ``initialize_sql`` in the pcreate-generated
-``models.py``.
-
-Our ``DBSession`` assignment stays the same as the original generated
-``models.py``.
-
-Looking at the Result of all Our Edits to ``models.py``
--------------------------------------------------------
+Since we've changed our model, we need to make changes to our ``populate.py``
+script.  In particular, we'll replace our import of ``MyModel`` with one of
+``Page`` and we'll change the very end of the script to create a ``Page``
+rather than a ``MyModel`` and add it to our ``DBSession``.
 
 The result of all of our edits to ``models.py`` will end up looking
 something like this:
@@ -79,6 +69,53 @@ something like this:
 .. literalinclude:: src/models/tutorial/models.py
    :linenos:
    :language: python
+
+Repopulating the Database
+-------------------------
+
+Because our model has changed, in order to repopulate the database, we need
+to rerun the ``populate_tutorial`` command to pick up the changes you've made
+to both the models.py file and to the populate.py file.  From the root of the
+``tutorial`` project, directory execute the following commands.
+
+On UNIX:
+
+.. code-block:: text
+
+   $ ../bin/populate_tutorial development.ini
+
+On Windows:
+
+.. code-block:: text
+
+   c:\pyramidtut\tutorial> ..\Scripts\populate_tutorial development.ini
+
+Success will look something like this::
+
+  2011-11-27 01:22:45,277 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
+                                PRAGMA table_info("pages")
+  2011-11-27 01:22:45,277 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
+  2011-11-27 01:22:45,277 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
+  CREATE TABLE pages (
+  	id INTEGER NOT NULL, 
+  	name TEXT, 
+  	data TEXT, 
+  	PRIMARY KEY (id), 
+  	UNIQUE (name)
+  )
+
+
+  2011-11-27 01:22:45,278 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
+  2011-11-27 01:22:45,397 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
+                                COMMIT
+  2011-11-27 01:22:45,400 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
+                                BEGIN (implicit)
+  2011-11-27 01:22:45,401 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
+                                INSERT INTO pages (name, data) VALUES (?, ?)
+  2011-11-27 01:22:45,401 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
+                                ('FrontPage', 'This is the front page')
+  2011-11-27 01:22:45,402 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
+                                COMMIT
 
 Viewing the Application in a Browser
 ------------------------------------
