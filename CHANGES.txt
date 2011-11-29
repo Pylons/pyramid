@@ -25,6 +25,9 @@ Features
   This function sets up Python logging according to the logging configuration
   in a PasteDeploy ini file.
 
+- Configuration conflict reporting is reported in a more understandable way
+  ("Line 11 in file..." vs. a repr of a tuple of similar info).
+
 Bug Fixes
 ---------
 

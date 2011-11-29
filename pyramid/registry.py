@@ -166,38 +166,37 @@ class Introspector(object):
             raise KeyError((category_name, discriminator))
         return self._refs.get(intr, [])
 
-    def register(self, introspectable, action_info=''):
-        introspectable.action_info = action_info
-        self.add(introspectable)
-        for category_name, discriminator in introspectable.relations:
-            self.relate((
-                introspectable.category_name, introspectable.discriminator),
-                (category_name, discriminator))
-
-        for category_name, discriminator in introspectable.unrelations:
-            self.unrelate((
-                introspectable.category_name, introspectable.discriminator),
-                (category_name, discriminator))
-
 @implementer(IIntrospectable)
 class Introspectable(dict):
 
-    order = 0 # mutated by introspector.add/introspector.add_intr
-    action_info = '' # mutated by introspector.register
+    order = 0 # mutated by introspector.add
+    action_info = '' # mutated by introspectable.register
 
     def __init__(self, category_name, discriminator, title, type_name):
         self.category_name = category_name
         self.discriminator = discriminator
         self.title = title
         self.type_name = type_name
-        self.relations = []
-        self.unrelations = []
+        self._relations = []
 
     def relate(self, category_name, discriminator):
-        self.relations.append((category_name, discriminator))
+        self._relations.append((True, category_name, discriminator))
 
     def unrelate(self, category_name, discriminator):
-        self.unrelations.append((category_name, discriminator))
+        self._relations.append((False, category_name, discriminator))
+
+    def register(self, introspector, action_info):
+        self.action_info = action_info
+        introspector.add(self)
+        for relate, category_name, discriminator in self._relations:
+            if relate:
+                method = introspector.relate
+            else:
+                method = introspector.unrelate
+            method(
+                (self.category_name, self.discriminator),
+                (category_name, discriminator)
+                )
 
     @property
     def discriminator_hash(self):

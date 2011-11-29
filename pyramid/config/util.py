@@ -1,3 +1,4 @@
+import collections
 import re
 import traceback
 
@@ -19,6 +20,20 @@ from hashlib import md5
 MAX_ORDER = 1 << 30
 DEFAULT_PHASH = md5().hexdigest()
 
+_ActionInfo = collections.namedtuple(
+    'ActionInfo',
+    ('filename', 'lineno', 'function', 'linerepr')
+    )
+
+class ActionInfo(_ActionInfo):
+    # this is a namedtuple subclass for (minor) backwards compat
+    slots = ()
+    def __str__(self):
+        return (
+            'Line %s of file %s in %s: %r' % (
+                self.lineno, self.filename, self.function, self.linerepr)
+            )
+
 def action_method(wrapped):
     """ Wrapper to provide the right conflict info report data when a method
     that calls Configurator.action calls another that does the same"""
@@ -29,9 +44,9 @@ def action_method(wrapped):
         if info is None:
             try:
                 f = traceback.extract_stack(limit=3)
-                info = f[-2]
+                info = ActionInfo(*f[-2])
             except: # pragma: no cover
-                info = ''
+                info = ActionInfo('<unknown>', 0, '<unknown>', '<unknown>')
         self._ainfo.append(info)
         try:
             result = wrapped(self, *arg, **kw)

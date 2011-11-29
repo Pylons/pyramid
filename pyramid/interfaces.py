@@ -903,38 +903,6 @@ class IIntrospector(Interface):
         ``discriminator``). Return the empty sequence if no relations for
         exist."""
 
-    def register(introspectable, action_info=''):
-        """ Register an IIntrospectable with this introspector.  This method
-        is invoked during action execution.  Adds the introspectable and its
-        relations to the introspector.  ``introspectable`` should be an
-        object implementing IIntrospectable.  ``action_info`` should be a
-        string representing the call that registered this introspectable
-        (e.g. with line numbers, etc).  Pseudocode for an implementation of
-        this method:
-
-        .. code-block:: python
-
-            def register(self, introspectable, action_info=''):
-                i = introspectable
-                i.action_info = action_info
-                self.add(introspectable)
-                for category_name, discriminator in i.relations:
-                    self.relate((
-                        i.category_name, i.discriminator),
-                        (category_name, discriminator))
-
-                for category_name, discriminator in i.unrelations:
-                    self.unrelate((
-                        i.category_name, i.discriminator),
-                        (category_name, discriminator))
-
-        The introspectable you wished to be related to or unrelated from must
-        have already been added via
-        :meth:`pyramid.interfaces.IIntrospector.add` (or by this method,
-        which implies an add) before this method is called; a :exc:`KeyError`
-        will result if this is not true.
-        """
-
     def add(intr):
         """ Add the IIntrospectable ``intr`` (use instead of
         :meth:`pyramid.interfaces.IIntrospector.add` when you have a custom
@@ -983,14 +951,6 @@ class IIntrospectable(Interface):
     discriminator = Attribute('introspectable discriminator (within category) '
                               '(must be hashable)')
     discriminator_hash = Attribute('an integer hash of the discriminator')
-    relations = Attribute('A sequence of ``(category_name, discriminator)`` '
-                          'pairs indicating the relations that this '
-                          'introspectable wants to establish when registered '
-                          'with the introspector')
-    unrelations = Attribute('A sequence of ``(category_name, discriminator)`` '
-                            'pairs indicating the relations that this '
-                            'introspectable wants to break when registered '
-                            'with the introspector')
     action_info = Attribute('A string representing the caller that invoked '
                             'the creation of this introspectable (usually '
                             'managed by IIntrospector during registration)')
@@ -1005,6 +965,26 @@ class IIntrospectable(Interface):
         """ Indicate an intent to break the relationship between this
         IIntrospectable with another IIntrospectable (the one associated with
         the ``category_name`` and ``discriminator``) during action execution.
+        """
+
+    def register(introspector, action_info=''):
+        """ Register this IIntrospectable with an introspector.  This method
+        is invoked during action execution.  Adds the introspectable and its
+        relations to the introspector.  ``introspector`` should be an
+        object implementing IIntrospector.  ``action_info`` should be a
+        string representing the call that registered this introspectable
+        (e.g. with line numbers, etc).  Pseudocode for an implementation of
+        this method:
+
+        .. code-block:: python
+
+            def register(self, introspector, action_info):
+                self.action_info = action_info
+                introspector.add(self)
+                for methodname, category_name, discriminator in self._relations:
+                    method = getattr(introspector, methodname)
+                    method((i.category_name, i.discriminator),
+                           (category_name, discriminator))
         """
 
 # configuration phases: a lower phase number means the actions associated

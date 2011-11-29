@@ -87,8 +87,8 @@ that ends something like this:
            Conflicting configuration actions
      For: ('view', None, '', None, <InterfaceClass pyramid.interfaces.IView>,
            None, None, None, None, None, False, None, None, None)
-    ('app.py', 14, '<module>', 'config.add_view(hello_world)')
-    ('app.py', 17, '<module>', 'config.add_view(hello_world)')
+     Line 14 of file app.py in <module>: 'config.add_view(hello_world)'
+     Line 17 of file app.py in <module>: 'config.add_view(hello_world)'
 
 This traceback is trying to tell us:
 
