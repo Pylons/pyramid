@@ -138,11 +138,20 @@ class TweensConfiguratorMixin(object):
             raise ConfigurationError('%s cannot be under MAIN' % name)
 
         registry = self.registry
+        introspectables = []
 
         tweens = registry.queryUtility(ITweens)
         if tweens is None:
             tweens = Tweens()
             registry.registerUtility(tweens, ITweens)
+            ex_intr = self.introspectable('tweens (implicit)',
+                                          ('tween', EXCVIEW, False),
+                                          EXCVIEW, 'implicit tween')
+            ex_intr['factory'] = excview_tween_factory
+            ex_intr['type'] = 'implicit'
+            ex_intr['under'] = None
+            ex_intr['over'] = MAIN
+            introspectables.append(ex_intr)
             tweens.add_implicit(EXCVIEW, excview_tween_factory, over=MAIN)
 
         def register():
@@ -154,13 +163,14 @@ class TweensConfiguratorMixin(object):
         discriminator = ('tween', name, explicit)
         tween_type = explicit and 'explicit' or 'implicit'
 
-        intr = self.introspectable('tweens', discriminator,
-                                   'name', 'tween')
+        intr = self.introspectable('tweens (%s)' % tween_type, discriminator,
+                                   name, '%s tween' % tween_type)
         intr['factory'] = tween_factory
         intr['type'] = tween_type
         intr['under'] = under
         intr['over'] = over
-        self.action(discriminator, register, introspectables=(intr,))
+        introspectables.append(intr)
+        self.action(discriminator, register, introspectables=introspectables)
 
 class CyclicDependencyError(Exception):
     def __init__(self, cycles):
@@ -200,7 +210,7 @@ class Tweens(object):
             self.order += [(u, name) for u in under]
             self.req_under.add(name)
         if over is not None:
-            if not is_nonstr_iter(over): #hasattr(over, '__iter__'):
+            if not is_nonstr_iter(over):
                 over = (over,)
             self.order += [(name, o) for o in over]
             self.req_over.add(name)
