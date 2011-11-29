@@ -88,7 +88,7 @@ that ends something like this:
      For: ('view', None, '', None, <InterfaceClass pyramid.interfaces.IView>,
            None, None, None, None, None, False, None, None, None)
      Line 14 of file app.py in <module>: 'config.add_view(hello_world)'
-     Line 17 of file app.py in <module>: 'config.add_view(hello_world)'
+     Line 17 of file app.py in <module>: 'config.add_view(goodbye_world)'
 
 This traceback is trying to tell us:
 
