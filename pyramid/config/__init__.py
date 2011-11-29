@@ -238,7 +238,7 @@ class Configurator(
     If ``introspector`` is passed, it must be an instance implementing the
     :class:`pyramid.interfaces.IIntrospector` interface.  If no
     ``introspector`` is passed, the default IIntrospector implementation will
-    be used.
+    be used.  This parameter is new in Pyramid 1.3.
     """
     manager = manager # for testing injection
     venusian = venusian # for testing injection
