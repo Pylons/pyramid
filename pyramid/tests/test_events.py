@@ -122,11 +122,10 @@ class ContextFoundEventTests(unittest.TestCase):
 
 class TestSubscriber(unittest.TestCase):
     def setUp(self):
-        registry = DummyRegistry()
-        self.config = testing.setUp(registry=registry)
+        self.config = testing.setUp()
 
     def tearDown(self):
-        self.config.end()
+        testing.tearDown()
 
     def _makeOne(self, *ifaces):
         from pyramid.events import subscriber

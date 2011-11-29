@@ -1,12 +1,12 @@
 import inspect
 import pkg_resources
 import sys
-import types
 import weakref
 
 from pyramid.compat import (
     integer_types,
     string_types,
+    text_,
     )
 
 from pyramid.exceptions import ConfigurationError
@@ -235,20 +235,20 @@ def strings_differ(string1, string2):
     return invalid_bits != 0
 
 def object_description(object):
-    """ Produce a human-consumable string description of ``object``, usually
-    involving a Python dotted name. For example:
+    """ Produce a human-consumable text description of ``object``,
+    usually involving a Python dotted name. For example:
 
     .. code-block:: python
 
        >>> object_description(None)
-       'None'
+       u'None'
        >>> from xml.dom import minidom
        >>> object_description(minidom)
-       'module xml.dom.minidom'
+       u'module xml.dom.minidom'
        >>> object_description(minidom.Attr)
-       'class xml.dom.minidom.Attr'
+       u'class xml.dom.minidom.Attr'
        >>> object_description(minidom.Attr.appendChild)
-       'method appendChild of class xml.dom.minidom.Attr'
+       u'method appendChild of class xml.dom.minidom.Attr'
        >>> 
 
     If this method cannot identify the type of the object, a generic
@@ -259,11 +259,11 @@ def object_description(object):
     (possibly shortened) string representation is returned.
     """
     if isinstance(object, string_types):
-        return object
+        return text_(object)
     if isinstance(object, integer_types):
-        return object
+        return text_(str(object))
     if isinstance(object, (bool, float, type(None))):
-        return str(object)
+        return text_(str(object))
     if isinstance(object, (tuple, set)):
         return shortrepr(object, ')')
     if isinstance(object, list):
@@ -272,32 +272,28 @@ def object_description(object):
         return shortrepr(object, '}')
     module = inspect.getmodule(object)
     if module is None:
-        return 'object %s' % str(object)
+        return text_('object %s' % str(object))
     modulename = module.__name__
     if inspect.ismodule(object):
-        return 'module %s' % modulename
+        return text_('module %s' % modulename)
     if inspect.ismethod(object):
         oself = getattr(object, '__self__', None)
-        if oself is None:
+        if oself is None: # pragma: no cover
             oself = getattr(object, 'im_self', None)
-        return 'method %s of class %s.%s' % (object.__name__, modulename,
-                                             oself.__class__.__name__)
+        return text_('method %s of class %s.%s' %
+                     (object.__name__, modulename,
+                      oself.__class__.__name__))
     
     if inspect.isclass(object):
         dottedname = '%s.%s' % (modulename, object.__name__)
-        return 'class %s' % dottedname
+        return text_('class %s' % dottedname)
     if inspect.isfunction(object):
         dottedname = '%s.%s' % (modulename, object.__name__)
-        return 'function %s' % dottedname
-    if inspect.isbuiltin(object):
-        dottedname = '%s.%s' % (modulename, object.__name__)
-        return 'builtin %s' % dottedname
-    if hasattr(object, '__name__'):
-        return 'object %s' % object.__name__
-    return 'object %s' % str(object)
+        return text_('function %s' % dottedname)
+    return text_('object %s' % str(object))
 
 def shortrepr(object, closer):
     r = str(object)
     if len(r) > 100:
-        r = r[:100] + '... %s' % closer
+        r = r[:100] + ' ... %s' % closer
     return r

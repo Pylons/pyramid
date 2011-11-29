@@ -12,7 +12,6 @@ from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
 from pyramid.interfaces import (
     IDebugLogger,
     IExceptionResponse,
-    IIntrospector,
     )
 
 from pyramid.asset import resolve_asset_spec
@@ -41,7 +40,11 @@ from pyramid.path import (
     package_of,
     )
 
-from pyramid.registry import Registry
+from pyramid.registry import (
+    Introspectable,
+    Introspector,
+    Registry,
+    )
 
 from pyramid.router import Router
 
@@ -69,9 +72,9 @@ from pyramid.config.tweens import TweensConfiguratorMixin
 from pyramid.config.util import action_method
 from pyramid.config.views import ViewsConfiguratorMixin
 from pyramid.config.zca import ZCAConfiguratorMixin
-from pyramid.config.introspection import IntrospectionConfiguratorMixin
 
 empty = text_('')
+_marker = object()
 
 ConfigurationError = ConfigurationError # pyflakes
 
@@ -88,7 +91,6 @@ class Configurator(
     SettingsConfiguratorMixin,
     FactoriesConfiguratorMixin,
     AdaptersConfiguratorMixin,
-    IntrospectionConfiguratorMixin,
     ):
     """
     A Configurator is used to configure a :app:`Pyramid`
@@ -231,8 +233,13 @@ class Configurator(
 
     If ``route_prefix`` is passed, all routes added with
     :meth:`pyramid.config.Configurator.add_route` will have the specified path
-    prepended to their pattern. This parameter is new in Pyramid 1.2."""
+    prepended to their pattern. This parameter is new in Pyramid 1.2.
 
+    If ``introspector`` is passed, it must be an instance implementing the
+    :class:`pyramid.interfaces.IIntrospector` interface.  If no
+    ``introspector`` is passed, the default IIntrospector implementation will
+    be used.
+    """
     manager = manager # for testing injection
     venusian = venusian # for testing injection
     _ainfo = None
@@ -240,6 +247,7 @@ class Configurator(
     includepath = ()
     info = ''
     object_description = staticmethod(object_description)
+    introspectable = Introspectable
 
     def __init__(self,
                  registry=None,
@@ -259,6 +267,7 @@ class Configurator(
                  autocommit=False,
                  exceptionresponse_view=default_exceptionresponse_view,
                  route_prefix=None,
+                 introspector=None,
                  ):
         if package is None:
             package = caller_package()
@@ -286,15 +295,24 @@ class Configurator(
                 session_factory=session_factory,
                 default_view_mapper=default_view_mapper,
                 exceptionresponse_view=exceptionresponse_view,
+                introspector=introspector,
                 )
 
-    def setup_registry(self, settings=None, root_factory=None,
-                       authentication_policy=None, authorization_policy=None,
-                       renderers=None, debug_logger=None,
-                       locale_negotiator=None, request_factory=None,
-                       renderer_globals_factory=None, default_permission=None,
-                       session_factory=None, default_view_mapper=None,
-                       exceptionresponse_view=default_exceptionresponse_view):
+    def setup_registry(self,
+                       settings=None,
+                       root_factory=None,
+                       authentication_policy=None,
+                       authorization_policy=None,
+                       renderers=None,
+                       debug_logger=None,
+                       locale_negotiator=None,
+                       request_factory=None,
+                       renderer_globals_factory=None,
+                       default_permission=None,
+                       session_factory=None,
+                       default_view_mapper=None,
+                       exceptionresponse_view=default_exceptionresponse_view,
+                       introspector=None):
         """ When you pass a non-``None`` ``registry`` argument to the
         :term:`Configurator` constructor, no initial setup is performed
         against the registry.  This is because the registry you pass in may
@@ -314,6 +332,10 @@ class Configurator(
         registry = self.registry
 
         self._fix_registry()
+
+        if introspector is not None:
+            self.introspector = introspector
+
         self._set_settings(settings)
         self._register_response_adapters()
 
@@ -442,23 +464,24 @@ class Configurator(
                                                  info=info, event=event)
             _registry.registerSelfAdapter = registerSelfAdapter
 
-        if not hasattr(_registry, 'introspector'):
-            def _get_introspector(reg):
-                return reg.queryUtility(IIntrospector)
-
-            def _set_introspector(reg, introspector):
-                reg.registerUtility(introspector, IIntrospector)
-
-            def _del_introspector(reg):
-                reg.unregisterUtility(IIntrospector)
-
-            introspector = property(_get_introspector, _set_introspector,
-                                    _del_introspector)
-
-            _registry.__class__.introspector = introspector
-
-
     # API
+            
+    def _get_introspector(self):
+        introspector = getattr(self.registry, 'introspector', _marker)
+        if introspector is _marker:
+            introspector = Introspector()
+            self._set_introspector(introspector)
+        return introspector
+
+    def _set_introspector(self, introspector):
+        self.registry.introspector = introspector
+
+    def _del_introspector(self):
+        del self.registry.introspector
+
+    introspector = property(_get_introspector,
+                            _set_introspector,
+                            _del_introspector)
 
     @property
     def action_info(self):
