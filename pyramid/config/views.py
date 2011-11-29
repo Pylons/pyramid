@@ -1360,7 +1360,11 @@ class ViewsConfiguratorMixin(object):
             self.registry.registerUtility(mapper, IViewMapperFactory)
         # IViewMapperFactory is looked up as the result of view config
         # in phase 3
-        self.action(IViewMapperFactory, register, order=PHASE1_CONFIG)
+        intr = self.introspectable('view mapper', IViewMapperFactory,
+                                   self.object_description(mapper),
+                                   'view mapper')
+        self.action(IViewMapperFactory, register, order=PHASE1_CONFIG,
+                    introspectables=(intr,))
 
     @action_method
     def add_static_view(self, name, path, **kw):

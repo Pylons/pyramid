@@ -370,11 +370,19 @@ class RoutesConfiguratorMixin(object):
         mapper = self.get_routes_mapper()
 
         intr = self.introspectable('routes', name,
-                                   '%s (%s)' % (name, pattern), 'route')
+                                   '%s (pattern: %r)' % (name, pattern),
+                                   'route')
         intr['name'] = name
         intr['pattern'] = pattern
         intr['factory'] = factory
-        intr['predicates'] = predicates
+        intr['xhr'] = xhr
+        intr['request_method'] = request_method
+        intr['path_info'] = path_info
+        intr['request_param'] = request_param
+        intr['header'] = header
+        intr['accept'] = accept
+        intr['traverse'] = traverse
+        intr['custom_predicates'] = custom_predicates
         intr['pregenerator'] = pregenerator
         intr['static'] = static
         intr['use_global_views'] = use_global_views

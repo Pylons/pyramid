@@ -4,10 +4,6 @@ Pyramid TODOs
 Must-Have
 ---------
 
-- Fix SQLA tutorial to match ZODB tutorial.
-
-- Fix SQLA tutorial to match alchemy scaffold.
-
 - Introspection:
 
   * More specific filename/lineno info instead of opaque string (or a way to
@@ -23,6 +19,8 @@ Must-Have
   * usage docs.
 
   * make it possible to disuse introspection?
+
+- Give discriminators a nicer repr for conflict reporting?
 
 Nice-to-Have
 ------------

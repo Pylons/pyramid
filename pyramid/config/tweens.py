@@ -151,7 +151,16 @@ class TweensConfiguratorMixin(object):
             else:
                 tweens.add_implicit(name, tween_factory, under=under, over=over)
 
-        self.action(('tween', name, explicit), register)
+        discriminator = ('tween', name, explicit)
+        tween_type = explicit and 'explicit' or 'implicit'
+
+        intr = self.introspectable('tweens', discriminator,
+                                   'name', 'tween')
+        intr['factory'] = tween_factory
+        intr['type'] = tween_type
+        intr['under'] = under
+        intr['over'] = over
+        self.action(discriminator, register, introspectables=(intr,))
 
 class CyclicDependencyError(Exception):
     def __init__(self, cycles):

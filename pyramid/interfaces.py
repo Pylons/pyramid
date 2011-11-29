@@ -951,9 +951,9 @@ class IIntrospectable(Interface):
     discriminator = Attribute('introspectable discriminator (within category) '
                               '(must be hashable)')
     discriminator_hash = Attribute('an integer hash of the discriminator')
-    action_info = Attribute('A string representing the caller that invoked '
+    action_info = Attribute('An object representing the caller that invoked '
                             'the creation of this introspectable (usually '
-                            'managed by IIntrospector during registration)')
+                            'a sentinel until updated during self.register)')
 
     def relate(category_name, discriminator):
         """ Indicate an intent to relate this IIntrospectable with another
