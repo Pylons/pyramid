@@ -13,6 +13,8 @@ also, by default, performs configuration in two separate phases.  This allows
 you to ignore relative configuration statement ordering in some
 circumstances.
 
+Pyramid also allows you to extend its Configurator with custom directives.
+
 .. index::
    pair: configuration; conflict detection
 
