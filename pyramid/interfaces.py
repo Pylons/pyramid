@@ -897,11 +897,10 @@ class IIntrospector(Interface):
         an error if an introspectable related to the category name and
         discriminator does not exist."""
 
-    def related(category_name, discriminator):
+    def related(intr):
         """ Return a sequence of IIntrospectables related to the
-        IIntrospectable associated with (``category_name``,
-        ``discriminator``). Return the empty sequence if no relations for
-        exist."""
+        IIntrospectable ``intr``. Return the empty sequence if no relations
+        for exist."""
 
     def add(intr):
         """ Add the IIntrospectable ``intr`` (use instead of
@@ -968,14 +967,14 @@ class IIntrospectable(Interface):
         the ``category_name`` and ``discriminator``) during action execution.
         """
 
-    def register(introspector, action_info=''):
+    def register(introspector, action_info):
         """ Register this IIntrospectable with an introspector.  This method
         is invoked during action execution.  Adds the introspectable and its
-        relations to the introspector.  ``introspector`` should be an
-        object implementing IIntrospector.  ``action_info`` should be a
-        string representing the call that registered this introspectable
-        (e.g. with line numbers, etc).  Pseudocode for an implementation of
-        this method:
+        relations to the introspector.  ``introspector`` should be an object
+        implementing IIntrospector.  ``action_info`` should be a object
+        implementing the interface :class:`pyramid.interfaces.IActionInfo`
+        representing the call that registered this introspectable.
+        Pseudocode for an implementation of this method:
 
         .. code-block:: python
 
@@ -995,6 +994,14 @@ class IIntrospectable(Interface):
 
           return hash((self.category_name,) + (self.discriminator,))
         """
+
+class IActionInfo(Interface):
+    filename = Attribute('filename as a string')
+    lineno = Attribute('line number in file as an integer')
+    function = Attribute('a string representing the function or method '
+                         'that was executing')
+    linerepr = Attribute('a string representing the call site '
+                         'which caused the action to be executed')
 
 # configuration phases: a lower phase number means the actions associated
 # with this phase will be executed earlier than those with later phase

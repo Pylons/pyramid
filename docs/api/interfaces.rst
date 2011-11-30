@@ -74,3 +74,5 @@ Other Interfaces
   .. autointerface:: IIntrospector
      :members:
 
+  .. autointerface:: IActionInfo
+     :members:

@@ -43,9 +43,19 @@ class TestRegistry(unittest.TestCase):
         self.assertEqual(registry._settings, 'foo')
 
 class TestIntrospector(unittest.TestCase):
-    def _makeOne(self):
+    def _getTargetClass(slf):
         from pyramid.registry import Introspector
-        return Introspector()
+        return Introspector
+        
+    def _makeOne(self):
+        return self._getTargetClass()()
+
+    def test_conformance(self):
+        from zope.interface.verify import verifyClass
+        from zope.interface.verify import verifyObject
+        from pyramid.interfaces import IIntrospector
+        verifyClass(IIntrospector, self._getTargetClass())
+        verifyObject(IIntrospector, self._makeOne())
 
     def test_add(self):
         inst = self._makeOne()
@@ -240,6 +250,85 @@ class TestIntrospector(unittest.TestCase):
         del inst._categories['category']
         self.assertRaises(KeyError, inst.related, intr)
 
+class TestIntrospectable(unittest.TestCase):
+    def _getTargetClass(slf):
+        from pyramid.registry import Introspectable
+        return Introspectable
+        
+    def _makeOne(self, *arg, **kw):
+        return self._getTargetClass()(*arg, **kw)
+
+    def _makeOnePopulated(self):
+        return self._makeOne('category', 'discrim', 'title', 'type')
+
+    def test_conformance(self):
+        from zope.interface.verify import verifyClass
+        from zope.interface.verify import verifyObject
+        from pyramid.interfaces import IIntrospectable
+        verifyClass(IIntrospectable, self._getTargetClass())
+        verifyObject(IIntrospectable, self._makeOnePopulated())
+
+    def test_relate(self):
+        inst = self._makeOnePopulated()
+        inst.relate('a', 'b')
+        self.assertEqual(inst._relations, [(True, 'a', 'b')])
+
+    def test_unrelate(self):
+        inst = self._makeOnePopulated()
+        inst.unrelate('a', 'b')
+        self.assertEqual(inst._relations, [(False, 'a', 'b')])
+
+    def test_discriminator_hash(self):
+        inst = self._makeOnePopulated()
+        self.assertEqual(inst.discriminator_hash, hash(inst.discriminator))
+
+    def test___hash__(self):
+        inst = self._makeOnePopulated()
+        self.assertEqual(hash(inst),
+                         hash((inst.category_name,) + (inst.discriminator,)))
+
+    def test___repr__(self):
+        inst = self._makeOnePopulated()
+        self.assertEqual(
+            repr(inst),
+            "<Introspectable category 'category', discriminator 'discrim'>")
+
+    def test___nonzero__(self):
+        inst = self._makeOnePopulated()
+        self.assertEqual(inst.__nonzero__(), True)
+
+    def test___bool__(self):
+        inst = self._makeOnePopulated()
+        self.assertEqual(inst.__bool__(), True)
+
+    def test_register(self):
+        introspector = DummyIntrospector()
+        action_info = object()
+        inst = self._makeOnePopulated()
+        inst._relations.append((True, 'category1', 'discrim1'))
+        inst._relations.append((False, 'category2', 'discrim2'))
+        inst.register(introspector, action_info)
+        self.assertEqual(inst.action_info, action_info)
+        self.assertEqual(introspector.intrs, [inst])
+        self.assertEqual(introspector.relations,
+                         [(('category', 'discrim'), ('category1', 'discrim1'))])
+        self.assertEqual(introspector.unrelations,
+                         [(('category', 'discrim'), ('category2', 'discrim2'))])
+
+class DummyIntrospector(object):
+    def __init__(self):
+        self.intrs = []
+        self.relations = []
+        self.unrelations = []
+            
+    def add(self, intr):
+        self.intrs.append(intr)
+
+    def relate(self, *pairs):
+        self.relations.append(pairs)
+
+    def unrelate(self, *pairs):
+        self.unrelations.append(pairs)
 
 class DummyModule:
     __path__ = "foo"

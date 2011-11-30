@@ -170,7 +170,7 @@ class Introspector(object):
 class Introspectable(dict):
 
     order = 0 # mutated by introspector.add
-    action_info = None # mutated by introspectable.register
+    action_info = None # mutated by self.register
 
     def __init__(self, category_name, discriminator, title, type_name):
         self.category_name = category_name
@@ -184,19 +184,6 @@ class Introspectable(dict):
 
     def unrelate(self, category_name, discriminator):
         self._relations.append((False, category_name, discriminator))
-
-    def register(self, introspector, action_info):
-        self.action_info = action_info
-        introspector.add(self)
-        for relate, category_name, discriminator in self._relations:
-            if relate:
-                method = introspector.relate
-            else:
-                method = introspector.unrelate
-            method(
-                (self.category_name, self.discriminator),
-                (category_name, discriminator)
-                )
 
     @property
     def discriminator_hash(self):
@@ -214,5 +201,19 @@ class Introspectable(dict):
         return True
 
     __bool__ = __nonzero__ # py3
+
+    def register(self, introspector, action_info):
+        self.action_info = action_info
+        introspector.add(self)
+        for relate, category_name, discriminator in self._relations:
+            if relate:
+                method = introspector.relate
+            else:
+                method = introspector.unrelate
+            method(
+                (self.category_name, self.discriminator),
+                (category_name, discriminator)
+                )
+
 
 global_registry = Registry('global')
