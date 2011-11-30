@@ -996,12 +996,13 @@ class IIntrospectable(Interface):
         """
 
 class IActionInfo(Interface):
-    filename = Attribute('filename as a string')
-    lineno = Attribute('line number in file as an integer')
-    function = Attribute('a string representing the function or method '
-                         'that was executing')
-    linerepr = Attribute('a string representing the call site '
-                         'which caused the action to be executed')
+    filename = Attribute('filename of action-invoking code as a string')
+    lineno = Attribute('line number in file (as an integer) of action-invoking '
+                       'code')
+    function = Attribute('a string representing the module, function or method '
+                         'that enclosed the line which invoked the action')
+    linerepr = Attribute('a string representing the source code line '
+                         'which invoked the action')
 
 # configuration phases: a lower phase number means the actions associated
 # with this phase will be executed earlier than those with later phase

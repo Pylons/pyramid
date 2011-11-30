@@ -312,6 +312,16 @@ class Test__make_predicates(unittest.TestCase):
         hash2, _, __= self._callFUT(request_method='GET')
         self.assertEqual(hash1, hash2)
 
+class TestActionInfo(unittest.TestCase):
+    def _makeOne(self, filename, lineno, function, linerepr):
+        from pyramid.config.util import ActionInfo
+        return ActionInfo(filename, lineno, function, linerepr)
+
+    def test___str__(self):
+        inst = self._makeOne('filename', 'lineno', 'function', 'linerepr')
+        self.assertEqual(str(inst),
+                         "Line lineno of file filename in function: 'linerepr'")
+
 class DummyCustomPredicate(object):
     def __init__(self):
         self.__text__ = 'custom predicate'

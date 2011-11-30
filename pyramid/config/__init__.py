@@ -69,7 +69,10 @@ from pyramid.config.security import SecurityConfiguratorMixin
 from pyramid.config.settings import SettingsConfiguratorMixin
 from pyramid.config.testing import TestingConfiguratorMixin
 from pyramid.config.tweens import TweensConfiguratorMixin
-from pyramid.config.util import action_method
+from pyramid.config.util import (
+    action_method,
+    ActionInfo,
+    )
 from pyramid.config.views import ViewsConfiguratorMixin
 from pyramid.config.zca import ZCAConfiguratorMixin
 
@@ -491,7 +494,7 @@ class Configurator(
             if self._ainfo:
                 info = self._ainfo[0]
             else:
-                info = ''
+                info = ActionInfo('<unknown>', 0, '<unknown>', '<unknown>')
         return info
 
     def action(self, discriminator, callable=None, args=(), kw=None, order=None,
@@ -918,7 +921,7 @@ class ActionState(object):
         return True
 
     def action(self, discriminator, callable=None, args=(), kw=None, order=None,
-               includepath=(), info='', introspectables=()):
+               includepath=(), info=None, introspectables=()):
         """Add an action with the given discriminator, callable and arguments
         """
         if kw is None:
@@ -976,12 +979,10 @@ class ActionState(object):
           in:
           oops
 
-
         Note that actions executed before the error still have an effect:
 
         >>> output
         [('f', (1,), {}), ('f', (2,), {})]
-
 
         """
 
@@ -992,10 +993,9 @@ class ActionState(object):
                 kw = action['kw']
                 info = action['info']
                 introspectables = action['introspectables']
-                if callable is None:
-                    continue
                 try:
-                    callable(*args, **kw)
+                    if callable is not None:
+                        callable(*args, **kw)
                 except (KeyboardInterrupt, SystemExit): # pragma: no cover
                     raise
                 except:
@@ -1073,7 +1073,7 @@ def resolveConflicts(actions):
     return output
 
 def expand_action(discriminator, callable=None, args=(), kw=None,
-                  includepath=(), info='', order=None, introspectables=()):
+                  includepath=(), info=None, order=None, introspectables=()):
     if kw is None:
         kw = {}
     return dict(
