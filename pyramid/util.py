@@ -7,6 +7,7 @@ from pyramid.compat import (
     integer_types,
     string_types,
     text_,
+    PY3,
     )
 
 from pyramid.exceptions import ConfigurationError
@@ -264,7 +265,12 @@ def object_description(object):
         return text_(str(object))
     if isinstance(object, (bool, float, type(None))):
         return text_(str(object))
-    if isinstance(object, (tuple, set)):
+    if isinstance(object, set):
+        if PY3: # pragma: no cover
+            return shortrepr(object, '}')
+        else:
+            return shortrepr(object, ')')
+    if isinstance(object, tuple):
         return shortrepr(object, ')')
     if isinstance(object, list):
         return shortrepr(object, ']')

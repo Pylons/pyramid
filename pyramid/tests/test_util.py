@@ -279,7 +279,10 @@ class Test_object_description(unittest.TestCase):
         self.assertEqual(self._callFUT(('a', 'b')), "('a', 'b')")
 
     def test_set(self):
-        self.assertEqual(self._callFUT(set(['a'])), "set(['a'])")
+        if PY3:
+            self.assertEqual(self._callFUT(set(['a'])), "{'a'}")
+        else:
+            self.assertEqual(self._callFUT(set(['a'])), "set(['a'])")
 
     def test_list(self):
         self.assertEqual(self._callFUT(['a']), "['a']")
