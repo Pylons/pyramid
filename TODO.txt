@@ -17,8 +17,6 @@ Must-Have
 
   * introspection hiding for directives?
 
-  * usage docs.
-
   * make it possible to disuse introspection?
 
 - Give discriminators a nicer repr for conflict reporting?
