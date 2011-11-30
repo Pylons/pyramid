@@ -103,32 +103,32 @@ class Introspector(object):
         intr = category.get(discriminator, default)
         return intr
 
-    def get_category(self, category_name, sort_fn=None):
-        if sort_fn is None:
-            sort_fn = operator.attrgetter('order')
+    def get_category(self, category_name, sort_key=None):
+        if sort_key is None:
+            sort_key = operator.attrgetter('order')
         category = self._categories[category_name]
         values = category.values()
-        values = sorted(set(values), key=sort_fn)
+        values = sorted(set(values), key=sort_key)
         return [{'introspectable':intr, 'related':self.related(intr)} for
                 intr in values]
 
-    def categories(self):
-        return sorted(self._categories.keys())
-
-    def categorized(self, sort_fn=None):
+    def categorized(self, sort_key=None):
         L = []
         for category_name in self.categories():
-            L.append((category_name, self.get_category(category_name, sort_fn)))
+            L.append((category_name, self.get_category(category_name,sort_key)))
         return L
+
+    def categories(self):
+        return sorted(self._categories.keys())
 
     def remove(self, category_name, discriminator):
         intr = self.get(category_name, discriminator)
         if intr is None:
             return
-        L = self._refs.pop((category_name, discriminator), [])
+        L = self._refs.pop(intr, [])
         for d in L:
             L2 = self._refs[d]
-            L2.remove((category_name, discriminator))
+            L2.remove(intr)
         category = self._categories[intr.category_name]
         del category[intr.discriminator]
         del category[intr.discriminator_hash]
@@ -170,7 +170,7 @@ class Introspector(object):
 class Introspectable(dict):
 
     order = 0 # mutated by introspector.add
-    action_info = '' # mutated by introspectable.register
+    action_info = None # mutated by introspectable.register
 
     def __init__(self, category_name, discriminator, title, type_name):
         self.category_name = category_name

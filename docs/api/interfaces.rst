@@ -68,3 +68,9 @@ Other Interfaces
   .. autointerface:: IResponse
      :members:
 
+  .. autointerface:: IIntrospectable
+     :members:
+
+  .. autointerface:: IIntrospector
+     :members:
+

@@ -42,10 +42,222 @@ class TestRegistry(unittest.TestCase):
         registry.settings = 'foo'
         self.assertEqual(registry._settings, 'foo')
 
+class TestIntrospector(unittest.TestCase):
+    def _makeOne(self):
+        from pyramid.registry import Introspector
+        return Introspector()
+
+    def test_add(self):
+        inst = self._makeOne()
+        intr = DummyIntrospectable()
+        inst.add(intr)
+        self.assertEqual(intr.order, 0)
+        category = {'discriminator':intr, 'discriminator_hash':intr}
+        self.assertEqual(inst._categories, {'category':category})
+
+    def test_get_success(self):
+        inst = self._makeOne()
+        intr = DummyIntrospectable()
+        inst.add(intr)
+        self.assertEqual(inst.get('category', 'discriminator'), intr)
+
+    def test_get_success_byhash(self):
+        inst = self._makeOne()
+        intr = DummyIntrospectable()
+        inst.add(intr)
+        self.assertEqual(inst.get('category', 'discriminator_hash'), intr)
+
+    def test_get_fail(self):
+        inst = self._makeOne()
+        intr = DummyIntrospectable()
+        inst.add(intr)
+        self.assertEqual(inst.get('category', 'wontexist', 'foo'), 'foo')
+
+    def test_get_category(self):
+        inst = self._makeOne()
+        intr = DummyIntrospectable()
+        intr2 = DummyIntrospectable()
+        intr2.discriminator = 'discriminator2'
+        intr2.discriminator_hash = 'discriminator2_hash'
+        inst.add(intr2)
+        inst.add(intr)
+        expected = [
+            {'introspectable':intr2, 'related':[]},
+            {'introspectable':intr,  'related':[]},
+            ]
+        self.assertEqual(inst.get_category('category'), expected)
+
+    def test_get_category_with_sortkey(self):
+        import operator
+        inst = self._makeOne()
+        intr = DummyIntrospectable()
+        intr.foo = 2
+        intr2 = DummyIntrospectable()
+        intr2.discriminator = 'discriminator2'
+        intr2.discriminator_hash = 'discriminator2_hash'
+        intr2.foo = 1
+        inst.add(intr)
+        inst.add(intr2)
+        expected = [
+            {'introspectable':intr2, 'related':[]},
+            {'introspectable':intr,  'related':[]},
+            ]
+        self.assertEqual(
+            inst.get_category('category', operator.attrgetter('foo')),
+                              expected)
+
+    def test_categorized(self):
+        import operator
+        inst = self._makeOne()
+        intr = DummyIntrospectable()
+        intr.foo = 2
+        intr2 = DummyIntrospectable()
+        intr2.discriminator = 'discriminator2'
+        intr2.discriminator_hash = 'discriminator2_hash'
+        intr2.foo = 1
+        inst.add(intr)
+        inst.add(intr2)
+        expected = [('category', [
+            {'introspectable':intr2, 'related':[]},
+            {'introspectable':intr,  'related':[]},
+            ])]
+        self.assertEqual(
+            inst.categorized(operator.attrgetter('foo')), expected)
+
+    def test_categories(self):
+        inst = self._makeOne()
+        inst._categories['a'] = 1
+        inst._categories['b'] = 2
+        self.assertEqual(list(inst.categories()), ['a', 'b'])
+
+    def test_remove(self):
+        inst = self._makeOne()
+        intr = DummyIntrospectable()
+        intr2 = DummyIntrospectable()
+        intr2.category_name = 'category2'
+        intr2.discriminator = 'discriminator2'
+        intr2.discriminator_hash = 'discriminator2_hash'
+        inst.add(intr)
+        inst.add(intr2)
+        inst.relate(('category', 'discriminator'),
+                    ('category2', 'discriminator2'))
+        inst.remove('category', 'discriminator')
+        self.assertEqual(inst._categories,
+                         {'category':
+                              {},
+                          'category2':
+                              {'discriminator2': intr2,
+                               'discriminator2_hash': intr2}
+                         })
+        self.assertEqual(inst._refs.get(intr), None)
+        self.assertEqual(inst._refs[intr2], [])
+
+    def test_remove_fail(self):
+        inst = self._makeOne()
+        self.assertEqual(inst.remove('a', 'b'), None)
+
+    def test_relate(self):
+        inst = self._makeOne()
+        intr = DummyIntrospectable()
+        intr2 = DummyIntrospectable()
+        intr2.category_name = 'category2'
+        intr2.discriminator = 'discriminator2'
+        intr2.discriminator_hash = 'discriminator2_hash'
+        inst.add(intr)
+        inst.add(intr2)
+        inst.relate(('category', 'discriminator'),
+                    ('category2', 'discriminator2'))
+        self.assertEqual(inst._categories,
+                         {'category':
+                              {'discriminator':intr,
+                               'discriminator_hash':intr},
+                          'category2':
+                              {'discriminator2': intr2,
+                               'discriminator2_hash': intr2}
+                         })
+        self.assertEqual(inst._refs[intr], [intr2])
+        self.assertEqual(inst._refs[intr2], [intr])
+
+    def test_relate_fail(self):
+        inst = self._makeOne()
+        intr = DummyIntrospectable()
+        inst.add(intr)
+        self.assertRaises(
+            KeyError,
+            inst.relate,
+            ('category', 'discriminator'),
+            ('category2', 'discriminator2')
+            )
+
+    def test_unrelate(self):
+        inst = self._makeOne()
+        intr = DummyIntrospectable()
+        intr2 = DummyIntrospectable()
+        intr2.category_name = 'category2'
+        intr2.discriminator = 'discriminator2'
+        intr2.discriminator_hash = 'discriminator2_hash'
+        inst.add(intr)
+        inst.add(intr2)
+        inst.relate(('category', 'discriminator'),
+                    ('category2', 'discriminator2'))
+        inst.unrelate(('category', 'discriminator'),
+                    ('category2', 'discriminator2'))
+        self.assertEqual(inst._categories,
+                         {'category':
+                              {'discriminator':intr,
+                               'discriminator_hash':intr},
+                          'category2':
+                              {'discriminator2': intr2,
+                               'discriminator2_hash': intr2}
+                         })
+        self.assertEqual(inst._refs[intr], [])
+        self.assertEqual(inst._refs[intr2], [])
+
+    def test_related(self):
+        inst = self._makeOne()
+        intr = DummyIntrospectable()
+        intr2 = DummyIntrospectable()
+        intr2.category_name = 'category2'
+        intr2.discriminator = 'discriminator2'
+        intr2.discriminator_hash = 'discriminator2_hash'
+        inst.add(intr)
+        inst.add(intr2)
+        inst.relate(('category', 'discriminator'),
+                    ('category2', 'discriminator2'))
+        self.assertEqual(inst.related(intr), [intr2])
+
+    def test_related_fail(self):
+        inst = self._makeOne()
+        intr = DummyIntrospectable()
+        intr2 = DummyIntrospectable()
+        intr2.category_name = 'category2'
+        intr2.discriminator = 'discriminator2'
+        intr2.discriminator_hash = 'discriminator2_hash'
+        inst.add(intr)
+        inst.add(intr2)
+        inst.relate(('category', 'discriminator'),
+                    ('category2', 'discriminator2'))
+        del inst._categories['category']
+        self.assertRaises(KeyError, inst.related, intr)
+
+
 class DummyModule:
     __path__ = "foo"
     __name__ = "dummy"
     __file__ = ''
+
+class DummyIntrospectable(object):
+    category_name = 'category'
+    discriminator = 'discriminator'
+    title = 'title'
+    type_name = 'type'
+    order = None
+    action_info = None
+    discriminator_hash = 'discriminator_hash'
+
+    def __hash__(self):
+        return hash((self.category_name,) + (self.discriminator,))
+
 
 from zope.interface import Interface
 from zope.interface import implementer

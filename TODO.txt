@@ -6,8 +6,9 @@ Must-Have
 
 - Introspection:
 
-  * More specific filename/lineno info instead of opaque string (or a way to
-    parse the opaque string into filename/lineno info).
+  * Narrative docs.
+
+  * Test with pyramid_zcml (wrt action_info / actions.append).
 
   * categorize() return value ordering not right yet.
 

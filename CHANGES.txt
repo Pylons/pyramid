@@ -28,6 +28,12 @@ Features
 - Configuration conflict reporting is reported in a more understandable way
   ("Line 11 in file..." vs. a repr of a tuple of similar info).
 
+- New APIs: ``pyramid.registry.Introspectable``,
+  ``pyramid.config.Configurator.introspector``,
+  ``pyramid.config.Configurator.introspectable``,
+  ``pyramid.registry.Registry.introspector``.  See API docs of related
+  modules for more info.
+
 Bug Fixes
 ---------
 

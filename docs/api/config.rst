@@ -94,16 +94,23 @@
 
      .. automethod:: set_renderer_globals_factory(factory)
 
-     .. attribute:: introspector
-
-        The :term:`introspector` associated with this configuration.
-
      .. attribute:: introspectable
 
         A shortcut attribute which points to the
         :class:`pyramid.registry.Introspectable` class (used during
         directives to provide introspection to actions).
 
+        This attribute is new as of :app:`Pyramid` 1.3.
+
+     .. attribute:: introspector
+
+        The :term:`introspector` related to this configuration.  It is an
+        instance implementing the :class:`pyramid.interfaces.IIntrospector`
+        interface.  If the Configurator constructor was supplied with an
+        ``introspector`` argument, this attribute will be that value.
+        Otherwise, it will be an instance of a default introspector type.
+
+        This attribute is new as of :app:`Pyramid` 1.3.
 
   .. attribute:: global_registries
 
