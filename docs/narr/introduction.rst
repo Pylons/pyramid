@@ -219,7 +219,7 @@ that the Pyramid core doesn't.  Add-on packages already exist which let you
 easily send email, let you use the Jinja2 templating system, let you use
 XML-RPC or JSON-RPC, let you integrate with jQuery Mobile, etc.
 
-Examples: https://docs.pylonsproject.org/docs/pyramid.html#pyramid-add-on-documentation
+Examples: http://docs.pylonsproject.org/docs/pyramid.html#pyramid-add-on-documentation
 
 Class-based and function-based views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -842,7 +842,7 @@ official narrative docs.  In any case, the Pyramid documentation is
 comprehensive.
 
 Example: The rest of this documentation and the cookbook at
-https://docs.pylonsproject.org/projects/pyramid_cookbook/dev/ .
+http://docs.pylonsproject.org/projects/pyramid_cookbook/dev/ .
 
 .. index::
    single: Pylons Project

@@ -926,7 +926,7 @@ Glossary
      database information.  :mod:`pyramid_debugtoolbar` is configured into
      the ``development.ini`` of all applications which use a Pyramid
      :term:`scaffold`.  For more information, see
-     https://docs.pylonsproject.org/projects/pyramid_debugtoolbar/dev/ .
+     http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/dev/ .
 
    scaffold
      A project template that helps users get started writing a Pyramid
@@ -939,5 +939,5 @@ Glossary
      used in production applications, because the logger can be configured to
      log to a file, to UNIX syslog, to the Windows Event Log, or even to
      email. See its `documentation
-     <https://docs.pylonsproject.org/projects/pyramid_exclog/dev/>`_.
+     <http://docs.pylonsproject.org/projects/pyramid_exclog/dev/>`_.
 
