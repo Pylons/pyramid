@@ -993,6 +993,7 @@ class ActionState(object):
                 kw = action['kw']
                 info = action['info']
                 introspectables = action['introspectables']
+
                 try:
                     if callable is not None:
                         callable(*args, **kw)
@@ -1006,6 +1007,7 @@ class ActionState(object):
                                 tb)
                     finally:
                        del t, v, tb
+
                 if introspector is not None:
                     for introspectable in introspectables:
                         introspectable.register(introspector, info)
@@ -1054,17 +1056,18 @@ def resolveConflicts(actions):
         def bypath(action):
             return (action['includepath'], action['order'])
         dups.sort(key=bypath)
-        output.append(dups[0])
-        basepath = dups[0]['includepath']
-        baseinfo = dups[0]['info']
-        discriminator = dups[0]['discriminator']
+        first = dups[0]
+        output.append(first)
+        basepath = first['includepath']
+        baseinfo = first['info']
+        discriminator = first['discriminator']
         for dup in dups[1:]:
             includepath = dup['includepath']
             # Test whether path is a prefix of opath
             if (includepath[:len(basepath)] != basepath # not a prefix
                 or includepath == basepath):
-                L = conflicts.setdefault(discriminator, [baseinfo])
-                L.append(dup['info'])
+                infos = conflicts.setdefault(discriminator, [baseinfo])
+                infos.append(dup['info'])
 
     if conflicts:
         raise ConfigurationConflictError(conflicts)
