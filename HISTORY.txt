@@ -456,7 +456,7 @@ Scaffolds
   package at all; configuration in the ``production.ini`` file which used to
   require its ``error_catcher`` middleware has been removed.  Configuring
   error catching / email sending is now the domain of the ``pyramid_exclog``
-  package (see https://docs.pylonsproject.org/projects/pyramid_exclog/dev/).
+  package (see http://docs.pylonsproject.org/projects/pyramid_exclog/dev/).
 
 Bug Fixes
 ---------
