@@ -25,6 +25,11 @@ class TestPyramidTemplate(unittest.TestCase):
         self.assertEqual(vars['package_logger'], 'notroot')
         self.assertTrue(len(vars['random_string']) == 40)
 
+    def test_pre_site(self):
+        inst = self._makeOne('name')
+        vars = {'package':'site'}
+        self.assertRaises(ValueError, inst.pre, 'command', 'output dir', vars)
+        
     def test_post(self):
         tmpl = self._makeOne('name')
         vars = {'package':'root'}
@@ -33,4 +38,3 @@ class TestPyramidTemplate(unittest.TestCase):
         result = tmpl.post(None, None, vars)
         self.assertEqual(result, None)
         self.assertEqual(L, ['Welcome to Pyramid.  Sorry for the convenience.'])
-

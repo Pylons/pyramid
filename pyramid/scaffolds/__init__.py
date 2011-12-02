@@ -6,6 +6,10 @@ from paste.util.template import paste_script_template_renderer
 class PyramidTemplate(Template):
     def pre(self, command, output_dir, vars):
         vars['random_string'] = os.urandom(20).encode('hex')
+        if vars['package'] == 'site':
+            raise ValueError('Sorry, you may not name your package "site". '
+                             'The package name "site" has a special meaning in '
+                             'Python.  Please name it anything except "site".')
         package_logger = vars['package']
         if package_logger == 'root':
             # Rename the app logger in the rare case a project is named 'root'
