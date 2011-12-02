@@ -48,6 +48,9 @@ Bug Fixes
   argument which contains characters that are unsuitable for URLs.  See
   https://github.com/Pylons/pyramid/issues/349 for more info.
 
+- Prevent a scaffold rendering from being named ``site`` (conflicts with
+  Python internal site.py).
+
 Backwards Incompatibilities
 ---------------------------
 
