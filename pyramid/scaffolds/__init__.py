@@ -7,6 +7,10 @@ from pyramid.scaffolds.template import Template
 
 class PyramidTemplate(Template):
     def pre(self, command, output_dir, vars):
+        if vars['package'] == 'site':
+            raise ValueError('Sorry, you may not name your package "site". '
+                             'The package name "site" has a special meaning in '
+                             'Python.  Please name it anything except "site".')
         vars['random_string'] = native_(binascii.hexlify(os.urandom(20)))
         package_logger = vars['package']
         if package_logger == 'root':
