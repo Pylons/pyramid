@@ -204,6 +204,9 @@ ${body}''')
  </body>
 </html>''')
 
+    json_template_obj = Template('''{"status" : "${status}", "detail" : "${body}"}''')
+    json_body_template_obj = Template('''${detail}''')
+
     ## Set this to True for responses that should have no request body
     empty_body = False
 
@@ -232,10 +235,19 @@ ${body}''')
             html_comment = ''
             comment = self.comment or ''
             accept = environ.get('HTTP_ACCEPT', '')
-            if accept and 'html' in accept or '*/*' in accept:
+
+            if accept and 'application/json' in accept:
+                self.content_type = 'application/json'
+                page_template = self.json_template_obj
+                body_tmpl = self.json_body_template_obj
+                escape = _no_escape
+                br = ''
+
+            elif accept and 'html' in accept or '*/*' in accept:
                 self.content_type = 'text/html'
                 escape = _html_escape
                 page_template = self.html_template_obj
+                body_tmpl = self.body_template_obj
                 br = '<br/>'
                 if comment:
                     html_comment = '<!-- %s -->' % escape(comment)
@@ -243,6 +255,7 @@ ${body}''')
                 self.content_type = 'text/plain'
                 escape = _no_escape
                 page_template = self.plain_template_obj
+                body_tmpl = self.body_template_obj
                 br = '\n'
                 if comment:
                     html_comment = escape(comment)
@@ -253,7 +266,7 @@ ${body}''')
                 'comment': escape(comment),
                 'html_comment':html_comment,
                 }
-            body_tmpl = self.body_template_obj
+
             if WSGIHTTPException.body_template_obj is not body_tmpl:
                 # Custom template; add headers to args
                 for k, v in environ.items():
