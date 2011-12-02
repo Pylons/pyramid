@@ -787,7 +787,7 @@ pyramid.tests.test_config.dummy_include2""",
              'info': 'abc',
              'introspectables': (),
              'kw': {'a': 1},
-             'order': None})])
+             'order': 0})])
 
     def test_action_branching_nonautocommit_without_config_info(self):
         config = self._makeOne(autocommit=False)
@@ -807,7 +807,7 @@ pyramid.tests.test_config.dummy_include2""",
              'info': 'z',
              'introspectables': (),
              'kw': {'a': 1},
-             'order': None})])
+             'order': 0})])
 
     def test_action_branching_nonautocommit_with_introspectables(self):
         config = self._makeOne(autocommit=False)
@@ -1443,7 +1443,7 @@ class TestActionState(unittest.TestCase):
              'info': None,
              'introspectables': (),
              'kw': {'x': 1},
-             'order': None}])
+             'order': 0}])
         c.action(None)
         self.assertEqual(
             c.actions,
@@ -1454,7 +1454,7 @@ class TestActionState(unittest.TestCase):
              'info': None,
              'introspectables': (),
              'kw': {'x': 1},
-             'order': None},
+             'order': 0},
 
              {'args': (),
              'callable': None,
@@ -1463,7 +1463,7 @@ class TestActionState(unittest.TestCase):
              'info': None,
              'introspectables': (),
              'kw': {},
-             'order': None},])
+             'order': 0},])
 
     def test_action_with_includepath(self):
         c = self._makeOne()
@@ -1478,7 +1478,7 @@ class TestActionState(unittest.TestCase):
              'info': None,
              'introspectables': (),
              'kw': {},
-             'order': None}])
+             'order': 0}])
 
     def test_action_with_info(self):
         c = self._makeOne()
@@ -1492,7 +1492,7 @@ class TestActionState(unittest.TestCase):
              'info': 'abc',
              'introspectables': (),
              'kw': {},
-             'order': None}])
+             'order': 0}])
 
     def test_action_with_includepath_and_info(self):
         c = self._makeOne()
@@ -1506,7 +1506,7 @@ class TestActionState(unittest.TestCase):
              'info': 'bleh',
              'introspectables': (),
              'kw': {},
-             'order': None}])
+             'order': 0}])
 
     def test_action_with_order(self):
         c = self._makeOne()
@@ -1537,7 +1537,7 @@ class TestActionState(unittest.TestCase):
              'info': None,
              'introspectables': (intr,),
              'kw': {},
-             'order': None}])
+             'order': 0}])
 
     def test_processSpec(self):
         c = self._makeOne()
@@ -1565,16 +1565,16 @@ class TestActionState(unittest.TestCase):
         c = self._makeOne()
         c.actions = [
             {'discriminator':1, 'callable':f, 'args':(1,), 'kw':{},
-             'order':None, 'includepath':(), 'info':None,
+             'order':0, 'includepath':(), 'info':None,
              'introspectables':()},
             {'discriminator':1, 'callable':f, 'args':(11,), 'kw':{},
-             'includepath':('x',), 'order': None, 'info':None,
+             'includepath':('x',), 'order': 0, 'info':None,
              'introspectables':()},
             {'discriminator':2, 'callable':f, 'args':(2,), 'kw':{},
-             'order':None, 'includepath':(), 'info':None,
+             'order':0, 'includepath':(), 'info':None,
              'introspectables':()},
             {'discriminator':None, 'callable':None, 'args':(), 'kw':{},
-             'order':None, 'includepath':(), 'info':None,
+             'order':0, 'includepath':(), 'info':None,
              'introspectables':()},
             ]
         c.execute_actions()
@@ -1588,7 +1588,7 @@ class TestActionState(unittest.TestCase):
         intr = DummyIntrospectable()
         c.actions = [
             {'discriminator':1, 'callable':f, 'args':(1,), 'kw':{},
-             'order':None, 'includepath':(), 'info':None,
+             'order':0, 'includepath':(), 'info':None,
              'introspectables':(intr,)},
             ]
         introspector = DummyIntrospector()
@@ -1601,7 +1601,7 @@ class TestActionState(unittest.TestCase):
         intr = DummyIntrospectable()
         c.actions = [
             {'discriminator':1, 'callable':None, 'args':(1,), 'kw':{},
-             'order':None, 'includepath':(), 'info':None,
+             'order':0, 'includepath':(), 'info':None,
              'introspectables':(intr,)},
             ]
         introspector = DummyIntrospector()

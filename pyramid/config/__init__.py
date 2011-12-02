@@ -497,7 +497,7 @@ class Configurator(
                 info = ActionInfo('<unknown>', 0, '<unknown>', '<unknown>')
         return info
 
-    def action(self, discriminator, callable=None, args=(), kw=None, order=None,
+    def action(self, discriminator, callable=None, args=(), kw=None, order=0,
                introspectables=()):
         """ Register an action which will be executed when
         :meth:`pyramid.config.Configurator.commit` is called (or executed
@@ -920,7 +920,7 @@ class ActionState(object):
         self._seen_files.add(spec)
         return True
 
-    def action(self, discriminator, callable=None, args=(), kw=None, order=None,
+    def action(self, discriminator, callable=None, args=(), kw=None, order=0,
                includepath=(), info=None, introspectables=()):
         """Add an action with the given discriminator, callable and arguments
         """
@@ -992,7 +992,9 @@ class ActionState(object):
                 args = action['args']
                 kw = action['kw']
                 info = action['info']
-                introspectables = action['introspectables']
+                # we use "get" below in case an action was added via a ZCML
+                # directive that did not know about introspectables
+                introspectables = action.get('introspectables', ())
 
                 try:
                     if callable is not None:
@@ -1037,7 +1039,7 @@ def resolveConflicts(actions):
             # old-style ZCML tuple action
             action = expand_action(*action)
         order = action['order']
-        if order is None:
+        if not order:
             action['order'] = i
         discriminator = action['discriminator']
         if discriminator is None:
@@ -1076,7 +1078,7 @@ def resolveConflicts(actions):
     return output
 
 def expand_action(discriminator, callable=None, args=(), kw=None,
-                  includepath=(), info=None, order=None, introspectables=()):
+                  includepath=(), info=None, order=0, introspectables=()):
     if kw is None:
         kw = {}
     return dict(
