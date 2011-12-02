@@ -71,11 +71,10 @@ named ``hello_world``.
    :linenos:
    :pyobject: hello_world
 
-This function doesn't do anything very difficult.  The function accepts a
-single argument (``request``).  The ``hello_world`` function returns an
+The function accepts a single argument (``request``) and it returns an
 instance of the :class:`pyramid.response.Response` class.  The single
-argument to the class' constructor value is computed from arguments
-matched from the url route.  This value becomes the body of the response.
+argument to the class' constructor is a string computed from parameters
+matched from the URL.  This value becomes the body of the response.
 
 This function is known as a :term:`view callable`.  A view callable
 accepts a single argument, ``request``.  It is expected to return a
@@ -157,7 +156,7 @@ Adding Configuration
    :lines: 10-11
 
 First line above calls the :meth:`pyramid.config.Configurator.add_route`
-method, which registers a :term:`route` to match any url path that begins
+method, which registers a :term:`route` to match any URL path that begins
 with ``/hello/`` followed by a string.
 
 The second line, ``config.add_view(hello_world, route_name='hello')``,
