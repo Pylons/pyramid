@@ -7,6 +7,9 @@ Features
 - ``bpython`` interpreter compatibility in ``pshell``. See the "Command-Line
   Pyramid" narrative docs chapter for more information.
 
+- Prevent a scaffold rendering from being named ``site`` (conflicts with
+  Python internal site.py).
+
 Backward Incompatibilities
 --------------------------
 
