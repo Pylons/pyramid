@@ -219,7 +219,141 @@ passed to it, that a route by this name was already registered by
 configuration error (a view that names a nonexistent route via its
 ``route_name`` parameter will never be called).
 
-``introspectables`` is a sequence of :term:`introspectable` objects.  Using
-``introspectables`` allows you to plug into Pyramid's configuration
-introspection system.
+``introspectables`` is a sequence of :term:`introspectable` objects.  You can
+pass a sequence of introspectables to the
+:meth:`~pyramid.config.Configurator.action` method, which allows you to
+augment Pyramid's configuration introspection system.
+
+.. _introspection:
+
+Configuration Introspection
+---------------------------
+
+.. warning::
+
+   The introspection subsystem is new in Pyramid 1.3.
+
+Pyramid provides a configuration introspection system that can be used by
+debugging tools to provide visibility into the configuration of a running
+application.
+
+All built-in Pyramid directives (such as
+:meth:`pyramid.config.Configurator.add_view` and
+:meth:`pyramid.config.Configurator.add_route`) register a set of
+introspectables when called.  For example, when you register a view via
+``add_view``, the directive registers at least one introspectable: an
+introspectable about the view registration itself, providing human-consumable
+values for the arguments it was passed.  You can later use the introspection
+query system to determine whether a particular view uses a renderer, or
+whether a particular view is limited to a particular request method, or which
+routes a particular view is registered against.  The Pyramid "debug toolbar"
+makes use of the introspection system in various ways to display information
+to Pyramid developers.
+
+Introspection values are set when a sequence of :term:`introspectable`
+objects is passed to the :meth:`~pyramid.config.Configurator.action` method.
+Here's an example of a directive which uses introspectables:
+
+.. code-block:: python
+   :linenos:
+
+   def add_jammyjam(config, value):
+       def register():
+           config.registry.jammyjam = value
+       intr = config.introspectable(category_name='jammyjams', 
+                                    discriminator='jammyjam',
+                                    title='a jammyjam',
+                                    type_name=None)
+       intr['value'] = value
+       config.action('jammyjam', register, introspectables=(intr,))
+
+   if __name__ == '__main__':
+       config = Configurator()
+       config.add_directive('add_jammyjam', add_jammyjam)
+
+If you notice, the above directive uses the ``introspectable`` attribute of a
+Configurator (:attr:`pyramid.config.Configurator.introspectable`) to create
+an introspectable object.  The introspectable object's constructor requires
+at least four arguments: the ``category_name``, the ``discriminator``, the
+``title``, and the ``type_name``.
+
+The ``category_name`` is a string representing the logical category for this
+introspectable.  Usually the category_name is a pluralization of the type of
+object being added via the action.
+
+The ``discriminator`` is a value unique **within the category** (unlike the
+action discriminator, which must be unique within the entire set of actions).
+It is typically a string or tuple representing the values unique to this
+introspectable within the category.  It is used to generate links and as part
+of a relationship-forming target for other introspectables.
+
+The ``title`` is a human-consumable string that can be used by introspection
+system frontends to show a friendly summary of this introspectable.
+
+The ``type_name`` is a value that can be used to subtype this introspectable
+within its category for for sorting and presentation purposes.  It can be any
+value.
+
+An introspectable is also dictionary-like.  It can contain any set of
+key/value pairs, typically related to the arguments passed to its related
+directive.  While the category_name, discriminator, title and type_name are
+*metadata* about the introspectable, the values provided as key/value pairs
+are the actual data provided by the introspectable.  In the above example, we
+set the ``value`` key to the value of the ``value`` argument passed to the
+directive.
+
+Our directive above mutates the introspectable, and passes it in to the
+``action`` method as the first element of a tuple as the value of the
+``introspectable`` keyword argument.  This associates this introspectable
+with the action.  Introspection tools will then display this introspectable
+in their index.
+
+Introspectable Relationships
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Two introspectables may have relationships between each other.
+
+.. code-block:: python
+   :linenos:
+
+   def add_jammyjam(config, value, template):
+       def register():
+           config.registry.jammyjam = (value, template)
+       intr = config.introspectable(category_name='jammyjams', 
+                                    discriminator='jammyjam',
+                                    title='a jammyjam',
+                                    type_name=None)
+       intr['value'] = value
+       tmpl_intr = config.introspectable(category_name='jammyjam templates',
+                                         discriminator=template,
+                                         title=template,
+                                         type_name=None)
+       tmpl_intr['value'] = template
+       intr.relate('jammyjam templates', template)
+       config.action('jammyjam', register, introspectables=(intr, tmpl_intr))
+
+   if __name__ == '__main__':
+       config = Configurator()
+       config.add_directive('add_jammyjam', add_jammyjam)
+
+In the above example, the ``add_jammyjam`` directive registers *two*
+introspectables.  The first is related to the ``value`` passed to the
+directive; the second is related to the ``template`` passed to the directive.
+If you believe a concept within a directive is important enough to have its
+own introspectable, you can cause the same directive to register more than
+one introspectable, registering one introspectable for the "main idea" and
+another for a related concept.
+
+The call to ``intr.relate`` above
+(:meth:`pyramid.interfaces.IIntrospectable.relate`) is passed two arguments:
+a category name and a directive.  The example above effectively indicates
+that the directive wishes to form a relationship between the ``intr``
+introspectable and the ``tmpl_intr`` introspectable; the arguments passed to
+``relate`` are the category name and discriminator of the ``tmpl_intr``
+introspectable.
+
+Introspectable relationships will show up in frontend system renderings of
+introspection values.  For example, if a view registration names a route
+name, the introspectable related to the view callable will show a reference
+to the route it relates to and vice versa.
 
