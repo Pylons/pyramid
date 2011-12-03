@@ -28,6 +28,10 @@ Features
 - Configuration conflict reporting is reported in a more understandable way
   ("Line 11 in file..." vs. a repr of a tuple of similar info).
 
+- An configuration introspection system was added; see the narrative
+  documentation chapter entitled "Pyramid Configuration Introspection" for
+  more information.
+
 - New APIs: ``pyramid.registry.Introspectable``,
   ``pyramid.config.Configurator.introspector``,
   ``pyramid.config.Configurator.introspectable``,
@@ -102,6 +106,11 @@ Documentation
   ``@view_config`` decorators and an explicit database population script.
 
 - Minor updates to the ZODB Wiki tutorial.
+
+- A narrative documentation chapter named "Extending Pyramid Configuration"
+  was added; it describes how to add a new directive, and how use the
+  ``pyramid.config.Configurator.action`` method within custom directives.  It
+  also describes how to add introspectable objects.
 
 Scaffolds
 ---------

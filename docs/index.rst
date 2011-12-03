@@ -88,6 +88,7 @@ Narrative documentation in chapter form explaining how to use
    narr/security
    narr/hybrid
    narr/hooks
+   narr/introspector
    narr/extending
    narr/advconfig
    narr/extconfig

@@ -55,6 +55,7 @@ Narrative Documentation
    narr/security
    narr/hybrid
    narr/hooks
+   narr/introspector
    narr/extending
    narr/advconfig
    narr/extconfig
