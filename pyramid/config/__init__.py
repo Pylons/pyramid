@@ -1033,50 +1033,49 @@ def resolveConflicts(actions):
     # organize actions by discriminators
     unique = {}
     output = []
-    for i in range(len(actions)):
-        action = actions[i]
+    for i, action in enumerate(actions):
         if not isinstance(action, dict):
-            # old-style ZCML tuple action
+            # old-style tuple action
             action = expand_action(*action)
-        order = action['order']
-        if not order:
-            action['order'] = i
+        order = action['order'] or i
         discriminator = action['discriminator']
         if discriminator is None:
             # The discriminator is None, so this action can never
             # conflict. We can add it directly to the result.
-            output.append(action)
+            output.append((order, action))
             continue
+
         L = unique.setdefault(discriminator, [])
-        L.append(action)
+        L.append((order, action))
 
     # Check for conflicts
     conflicts = {}
     for discriminator, dups in unique.items():
         # We need to sort the actions by the paths so that the shortest
         # path with a given prefix comes first:
-        def bypath(action):
-            return (action['includepath'], action['order'])
+        def bypath(tup):
+            return tup[1]['includepath'], tup[0]
         dups.sort(key=bypath)
-        first = dups[0]
-        output.append(first)
-        basepath = first['includepath']
-        baseinfo = first['info']
-        discriminator = first['discriminator']
-        for dup in dups[1:]:
+        order, first = dups[0]
+        output.append(dups[0])
+        basepath, baseinfo, discriminator = (first['includepath'],
+                                             first['info'],
+                                             first['discriminator'])
+
+        for order, dup in dups[1:]:
             includepath = dup['includepath']
             # Test whether path is a prefix of opath
             if (includepath[:len(basepath)] != basepath # not a prefix
                 or includepath == basepath):
-                infos = conflicts.setdefault(discriminator, [baseinfo])
-                infos.append(dup['info'])
+                L = conflicts.setdefault(discriminator, [baseinfo])
+                L.append(dup['info'])
 
     if conflicts:
         raise ConfigurationConflictError(conflicts)
 
-    output.sort(key=operator.itemgetter('order'))
-    return output
-
+    output.sort(key=operator.itemgetter(0))
+    return [ x[1] for x in output ]
+                
 def expand_action(discriminator, callable=None, args=(), kw=None,
                   includepath=(), info=None, order=0, introspectables=()):
     if kw is None:

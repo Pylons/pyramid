@@ -1658,7 +1658,7 @@ class Test_resolveConflicts(unittest.TestCase):
                'kw': {},
                'discriminator': 1,
                'includepath': (),
-               'order': 1},
+               'order': 0},
 
                {'info': None,
                 'args': (3,),
@@ -1667,7 +1667,7 @@ class Test_resolveConflicts(unittest.TestCase):
                 'kw': {},
                 'discriminator': 3,
                 'includepath': ('y',),
-                'order': 5},
+                'order': 0},
 
                 {'info': None,
                  'args': (5,),
@@ -1676,7 +1676,7 @@ class Test_resolveConflicts(unittest.TestCase):
                  'kw': {},
                  'discriminator': None,
                  'includepath': ('y',),
-                 'order': 6},
+                 'order': 0},
 
                  {'info': 'should be last',
                   'args': (4,),
@@ -1719,7 +1719,7 @@ class Test_resolveConflicts(unittest.TestCase):
                'kw': {},
                'discriminator': 1,
                'includepath': (),
-               'order': 1},
+               'order': 0},
 
                {'info': None,
                 'args': (3,),
@@ -1728,7 +1728,7 @@ class Test_resolveConflicts(unittest.TestCase):
                 'kw': {},
                 'discriminator': 3,
                 'includepath': ('y',),
-                'order': 5},
+                'order': 0},
 
                 {'info': None,
                  'args': (5,),
@@ -1737,7 +1737,7 @@ class Test_resolveConflicts(unittest.TestCase):
                  'kw': {},
                  'discriminator': None,
                  'includepath': ('y',),
-                 'order': 6},
+                 'order': 0},
 
                  {'info': 'should be last',
                   'args': (4,),
