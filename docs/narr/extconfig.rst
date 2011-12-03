@@ -6,9 +6,10 @@
 Extending Pyramid Configuration
 ===============================
 
-Pyramid allows you to extend its Configurator with custom directives.  These
-directives can add an :term:`action`, participate in :term:`conflict
-resolution`, and can provide some number of :term:`introspectable` objects.
+Pyramid allows you to extend its Configurator with custom directives.  Custom
+directives can use other directives, they can add a custom :term:`action`,
+they can participate in :term:`conflict resolution`, and they can provide
+some number of :term:`introspectable` objects.
 
 .. index::
    single: add_directive
