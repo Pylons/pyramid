@@ -8,7 +8,9 @@ Must-Have
 
   * Narrative docs.
 
-  * Test with pyramid_zcml (wrt action_info / actions.append).
+  * ActionInfo for ZCML actions (begin/end lineno/cols?)
+
+  * Document ActionInfo.
 
   * categorize() return value ordering not right yet.
 
