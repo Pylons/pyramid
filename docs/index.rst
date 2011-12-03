@@ -65,6 +65,7 @@ Narrative documentation in chapter form explaining how to use
    narr/configuration
    narr/project
    narr/startup
+   narr/router
    narr/urldispatch
    narr/views
    narr/renderers
@@ -87,9 +88,9 @@ Narrative documentation in chapter form explaining how to use
    narr/security
    narr/hybrid
    narr/hooks
-   narr/advconfig
    narr/extending
-   narr/router
+   narr/advconfig
+   narr/extconfig
    narr/threadlocals
    narr/zca
 
