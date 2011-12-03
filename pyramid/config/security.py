@@ -126,8 +126,10 @@ class SecurityConfiguratorMixin(object):
                                    permission,
                                    'default permission')
         intr['value'] = permission
-        perm_intr = self.introspectable('permissions', permission,
-                                        permission, 'permission')
+        perm_intr = self.introspectable('permissions',
+                                        permission,
+                                        permission,
+                                        'permission')
         perm_intr['value'] = permission
         # default permission used during view registration (phase 3)
         self.action(IDefaultPermission, register, order=PHASE1_CONFIG,

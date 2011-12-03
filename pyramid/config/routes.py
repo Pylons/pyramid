@@ -14,6 +14,7 @@ from pyramid.urldispatch import RoutesMapper
 from pyramid.config.util import (
     action_method,
     make_predicates,
+    as_sorted_tuple,
     )
 
 class RoutesConfiguratorMixin(object):
@@ -369,14 +370,17 @@ class RoutesConfiguratorMixin(object):
 
         mapper = self.get_routes_mapper()
 
-        intr = self.introspectable('routes', name,
+        introspectables = []
+
+        intr = self.introspectable('routes',
+                                   name,
                                    '%s (pattern: %r)' % (name, pattern),
                                    'route')
         intr['name'] = name
         intr['pattern'] = pattern
         intr['factory'] = factory
         intr['xhr'] = xhr
-        intr['request_method'] = request_method
+        intr['request_methods'] = as_sorted_tuple(request_method)
         intr['path_info'] = path_info
         intr['request_param'] = request_param
         intr['header'] = header
@@ -386,6 +390,17 @@ class RoutesConfiguratorMixin(object):
         intr['pregenerator'] = pregenerator
         intr['static'] = static
         intr['use_global_views'] = use_global_views
+        introspectables.append(intr)
+
+        if factory:
+            factory_intr = self.introspectable('root factories',
+                                               name,
+                                               self.object_description(factory),
+                                               'root factory')
+            factory_intr['factory'] = factory
+            factory_intr['route_name'] = name
+            factory_intr.relate('routes', name)
+            introspectables.append(factory_intr)
 
         def register_route_request_iface():
             request_iface = self.registry.queryUtility(IRouteRequest, name=name)
@@ -414,7 +429,7 @@ class RoutesConfiguratorMixin(object):
         # But IRouteRequest interfaces must be registered before we begin to
         # process view registrations (in phase 3)
         self.action(('route', name), register_route_request_iface,
-                    order=PHASE2_CONFIG, introspectables=(intr,))
+                    order=PHASE2_CONFIG, introspectables=introspectables)
 
         # deprecated adding views from add_route; must come after
         # route registration for purposes of autocommit ordering

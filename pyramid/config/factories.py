@@ -29,7 +29,8 @@ class FactoriesConfiguratorMixin(object):
             self.registry.registerUtility(factory, IRootFactory)
             self.registry.registerUtility(factory, IDefaultRootFactory) # b/c
 
-        intr = self.introspectable('root factories', None,
+        intr = self.introspectable('root factories',
+                                   None,
                                    self.object_description(factory),
                                    'root factory')
         intr['factory'] = factory

@@ -336,7 +336,7 @@ Two introspectables may have relationships between each other.
        config = Configurator()
        config.add_directive('add_jammyjam', add_jammyjam)
 
-In the above example, the ``add_jammyjam`` directive registers *two*
+In the above example, the ``add_jammyjam`` directive registers two
 introspectables.  The first is related to the ``value`` passed to the
 directive; the second is related to the ``template`` passed to the directive.
 If you believe a concept within a directive is important enough to have its
@@ -352,8 +352,15 @@ introspectable and the ``tmpl_intr`` introspectable; the arguments passed to
 ``relate`` are the category name and discriminator of the ``tmpl_intr``
 introspectable.
 
+Relationships need not be made between two introspectables created by the
+same directive.  Instead, a relationship can be formed between an
+introspectable created in one directive and another introspectable created in
+another by calling ``relate`` on either side with the other directive's
+category name and discriminator.  An error will be raised at configuration
+commit time if you attempt to relate an introspectable with another
+nonexistent introspectable, however.
+
 Introspectable relationships will show up in frontend system renderings of
 introspection values.  For example, if a view registration names a route
 name, the introspectable related to the view callable will show a reference
-to the route it relates to and vice versa.
-
+to the route to which it relates to and vice versa.

@@ -946,14 +946,15 @@ class IIntrospectable(Interface):
     title = Attribute('Text title describing this introspectable')
     type_name = Attribute('Text type name describing this introspectable')
     order = Attribute('integer order in which registered with introspector '
-                      '(managed by introspector, usually')
+                      '(managed by introspector, usually)')
     category_name = Attribute('introspection category name')
     discriminator = Attribute('introspectable discriminator (within category) '
                               '(must be hashable)')
     discriminator_hash = Attribute('an integer hash of the discriminator')
-    action_info = Attribute('An object representing the caller that invoked '
-                            'the creation of this introspectable (usually '
-                            'a sentinel until updated during self.register)')
+    action_info = Attribute('An IActionInfo object representing the caller '
+                            'that invoked the creation of this introspectable '
+                            '(usually a sentinel until updated during '
+                            'self.register)')
 
     def relate(category_name, discriminator):
         """ Indicate an intent to relate this IIntrospectable with another

@@ -146,7 +146,8 @@ class TweensConfiguratorMixin(object):
             registry.registerUtility(tweens, ITweens)
             ex_intr = self.introspectable('tweens (implicit)',
                                           ('tween', EXCVIEW, False),
-                                          EXCVIEW, 'implicit tween')
+                                          EXCVIEW,
+                                          'implicit tween')
             ex_intr['factory'] = excview_tween_factory
             ex_intr['type'] = 'implicit'
             ex_intr['under'] = None
@@ -163,8 +164,10 @@ class TweensConfiguratorMixin(object):
         discriminator = ('tween', name, explicit)
         tween_type = explicit and 'explicit' or 'implicit'
 
-        intr = self.introspectable('tweens (%s)' % tween_type, discriminator,
-                                   name, '%s tween' % tween_type)
+        intr = self.introspectable('tweens (%s)' % tween_type,
+                                   discriminator,
+                                   name,
+                                   '%s tween' % tween_type)
         intr['factory'] = tween_factory
         intr['type'] = tween_type
         intr['under'] = under

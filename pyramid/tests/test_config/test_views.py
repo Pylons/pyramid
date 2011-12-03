@@ -1362,6 +1362,20 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         request = self._makeRequest(config)
         self.assertEqual(view(None, request), 'OK')
 
+    def test_add_view_with_mapper(self):
+        from pyramid.renderers import null_renderer
+        class Mapper(object):
+            def __init__(self, **kw):
+                self.__class__.kw = kw
+            def __call__(self, view):
+                return view
+        config = self._makeOne(autocommit=True)
+        def view(context, request): return 'OK'
+        config.add_view(view=view, mapper=Mapper, renderer=null_renderer)
+        view = self._getViewCallable(config)
+        self.assertEqual(view(None, None), 'OK')
+        self.assertEqual(Mapper.kw['mapper'], Mapper)
+
     def test_derive_view_function(self):
         from pyramid.renderers import null_renderer
         def view(request):

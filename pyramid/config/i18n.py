@@ -40,7 +40,8 @@ class I18NConfiguratorMixin(object):
         """
         def register():
             self._set_locale_negotiator(negotiator)
-        intr = self.introspectable('locale negotiator', None, repr(negotiator),
+        intr = self.introspectable('locale negotiator', None,
+                                   self.object_description(negotiator),
                                    'locale negotiator')
         intr['negotiator'] = negotiator
         self.action(ILocaleNegotiator, register, introspectables=(intr,))

@@ -48,7 +48,8 @@ class RenderingConfiguratorMixin(object):
             name = ''
         def register():
             self.registry.registerUtility(factory, IRendererFactory, name=name)
-        intr = self.introspectable('renderer factories', name,
+        intr = self.introspectable('renderer factories',
+                                   name,
                                    self.object_description(factory),
                                    'renderer factory')
         intr['factory'] = factory
@@ -74,7 +75,9 @@ class RenderingConfiguratorMixin(object):
 
         .. warning::
 
-           This method is deprecated as of Pyramid 1.1.
+           This method is deprecated as of Pyramid 1.1.  Use a BeforeRender
+           event subscriber as documented in the :ref:`hooks_chapter` chapter
+           instead.
 
         .. note::
 

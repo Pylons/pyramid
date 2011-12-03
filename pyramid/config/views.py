@@ -962,7 +962,7 @@ class ViewsConfiguratorMixin(object):
                  context=context,
                  containment=containment,
                  request_param=request_param,
-                 request_method=request_method,
+                 request_methods=request_method,
                  route_name=route_name,
                  attr=attr,
                  xhr=xhr,
@@ -1116,9 +1116,18 @@ class ViewsConfiguratorMixin(object):
                         (IExceptionViewClassifier, request_iface, context),
                         IMultiView, name=name)
 
+        if mapper:
+            mapper_intr = self.introspectable('view mappers',
+                                              discriminator,
+                                              view_desc,
+                                              'view mapper')
+            mapper_intr['mapper'] = mapper
+            mapper_intr.relate('views', discriminator)
+            introspectables.append(mapper_intr)
         if route_name:
             view_intr.relate('routes', route_name) # see add_route
         if renderer is not None and renderer.name and '.' in renderer.name:
+            # it's a template
             tmpl_intr = self.introspectable('templates', discriminator,
                                             renderer.name, 'template')
             tmpl_intr.relate('views', discriminator)
@@ -1360,9 +1369,11 @@ class ViewsConfiguratorMixin(object):
             self.registry.registerUtility(mapper, IViewMapperFactory)
         # IViewMapperFactory is looked up as the result of view config
         # in phase 3
-        intr = self.introspectable('view mapper', IViewMapperFactory,
+        intr = self.introspectable('view mappers',
+                                   IViewMapperFactory,
                                    self.object_description(mapper),
-                                   'view mapper')
+                                   'default view mapper')
+        intr['mapper'] = mapper
         self.action(IViewMapperFactory, register, order=PHASE1_CONFIG,
                     introspectables=(intr,))
 
