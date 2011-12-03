@@ -115,9 +115,9 @@ Here's an example directive which uses the "action" method:
 Fancy, but what does it do?  The action method accepts a number of arguments.
 In the above directive named ``add_jammyjam``, we call
 :meth:`~pyramid.config.Configurator.action` with two arguments: the string
-``jammyjam`` is passed as the first argument, ``discriminator`` and the
-closure function named ``register`` is passed as the second argument,
-named ``callable``.
+``jammyjam`` is passed as the first argument named ``discriminator``, and the
+closure function named ``register`` is passed as the second argument named
+``callable``.
 
 When the :meth:`~pyramid.config.Configurator.action` method is called, it
 appends an action to the list of pending configuration actions.  All pending
