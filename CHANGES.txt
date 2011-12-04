@@ -30,13 +30,13 @@ Features
 
 - An configuration introspection system was added; see the narrative
   documentation chapter entitled "Pyramid Configuration Introspection" for
-  more information.
-
-- New APIs: ``pyramid.registry.Introspectable``,
+  more information.  New APIs: ``pyramid.registry.Introspectable``,
   ``pyramid.config.Configurator.introspector``,
   ``pyramid.config.Configurator.introspectable``,
-  ``pyramid.registry.Registry.introspector``.  See API docs of related
-  modules for more info.
+  ``pyramid.registry.Registry.introspector``.
+
+- Allow extra keyword arguments to be passed to the
+  ``pyramid.config.Configurator.action`` method.
 
 Bug Fixes
 ---------

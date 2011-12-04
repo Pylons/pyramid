@@ -239,9 +239,10 @@ class Configurator(
     prepended to their pattern. This parameter is new in Pyramid 1.2.
 
     If ``introspector`` is passed, it must be an instance implementing the
-    :class:`pyramid.interfaces.IIntrospector` interface.  If no
-    ``introspector`` is passed, the default IIntrospector implementation will
-    be used.  This parameter is new in Pyramid 1.3.
+    attributes and methods of :class:`pyramid.interfaces.IIntrospector`.  If
+    ``introspector`` is not passed (or is passed as ``None``), the default
+    introspector implementation will be used.  This parameter is new in
+    Pyramid 1.3.
     """
     manager = manager # for testing injection
     venusian = venusian # for testing injection
@@ -498,7 +499,7 @@ class Configurator(
         return info
 
     def action(self, discriminator, callable=None, args=(), kw=None, order=0,
-               introspectables=()):
+               introspectables=(), **extra):
         """ Register an action which will be executed when
         :meth:`pyramid.config.Configurator.commit` is called (or executed
         immediately if ``autocommit`` is ``True``).
@@ -511,13 +512,24 @@ class Configurator(
         given, but it can be ``None``, to indicate that the action never
         conflicts.  It must be a hashable value.
 
-        The ``callable`` is a callable object which performs the action.  It
-        is optional.  ``args`` and ``kw`` are tuple and dict objects
-        respectively, which are passed to ``callable`` when this action is
-        executed.
+        The ``callable`` is a callable object which performs the task
+        associated with the action when the action is executed.  It is
+        optional.
 
-        ``order`` is a crude order control mechanism, only rarely used (has
-        no effect when autocommit is ``True``).
+        ``args`` and ``kw`` are tuple and dict objects respectively, which
+        are passed to ``callable`` when this action is executed.  Both are
+        optional.
+
+        ``order`` is a grouping mechanism; an action with a lower order will
+        be executed before an action with a higher order (has no effect when
+        autocommit is ``True``).
+
+        ``introspectables`` is a sequence of :term:`introspectable` objects
+        (or the empty sequence if no introspectable objects are associated
+        with this action).
+
+        ``extra`` provides a facility for inserting extra keys and values
+        into an action dictionary.
         """
         if kw is None:
             kw = {}
@@ -534,16 +546,20 @@ class Configurator(
                     introspectable.register(introspector, action_info)
 
         else:
-            self.action_state.action(
-                discriminator=discriminator,
-                callable=callable,
-                args=args,
-                kw=kw,
-                order=order,
-                info=action_info,
-                includepath=self.includepath,
-                introspectables=introspectables,
+            action = extra
+            action.update(
+                dict(
+                    discriminator=discriminator,
+                    callable=callable,
+                    args=args,
+                    kw=kw,
+                    order=order,
+                    info=action_info,
+                    includepath=self.includepath,
+                    introspectables=introspectables,
+                    )
                 )
+            self.action_state.action(**action)
 
     def _get_action_state(self):
         registry = self.registry
@@ -921,20 +937,23 @@ class ActionState(object):
         return True
 
     def action(self, discriminator, callable=None, args=(), kw=None, order=0,
-               includepath=(), info=None, introspectables=()):
+               includepath=(), info=None, introspectables=(), **extra):
         """Add an action with the given discriminator, callable and arguments
         """
         if kw is None:
             kw = {}
-        action = dict(
-            discriminator=discriminator,
-            callable=callable,
-            args=args,
-            kw=kw,
-            includepath=includepath,
-            info=info,
-            order=order,
-            introspectables=introspectables,
+        action = extra
+        action.update(
+            dict(
+                discriminator=discriminator,
+                callable=callable,
+                args=args,
+                kw=kw,
+                includepath=includepath,
+                info=info,
+                order=order,
+                introspectables=introspectables,
+                )
             )
         self.actions.append(action)
 

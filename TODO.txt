@@ -12,12 +12,6 @@ Must-Have
 
   * ``default view mapper`` category?
 
-  * ActionInfo for ZCML actions (begin/end lineno/cols?)
-
-  * Document ActionInfo.
-
-  * categorize() return value ordering not right yet.
-
   * implement ptweens and proutes based on introspection instead of current
     state of affairs.
 
