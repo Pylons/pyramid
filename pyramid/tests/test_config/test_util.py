@@ -333,9 +333,9 @@ class TestActionInfo(unittest.TestCase):
     def test_ctor(self):
         inst = self._makeOne('filename', 10, 'function', '  linerepr\n\nfoo')
         self.assertEqual(inst.line, 10)
-        self.assertEqual(inst.column, 2)
-        self.assertEqual(inst.eline, 13)
-        self.assertEqual(inst.ecolumn, 3)
+        self.assertEqual(inst.column, None)
+        self.assertEqual(inst.eline, None)
+        self.assertEqual(inst.ecolumn, None)
 
     def test___str__(self):
         inst = self._makeOne('filename', 0, 'function', '   linerepr  ')

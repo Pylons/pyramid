@@ -1004,15 +1004,19 @@ class IActionInfo(Interface):
     """ Class which provides code introspection capability associated with an
     action.  The ParserInfo class used by ZCML implements the same interface."""
     file = Attribute(
-        'filename of action-invoking code as a string')
+        'Filename of action-invoking code as a string')
     line = Attribute(
-        'starting line number in file (as an integer) of action-invoking code')
+        'Starting line number in file (as an integer) of action-invoking code.'
+        'This will be ``None`` if the value could not be determined.')
     column = Attribute(
-        'start column number in file (as an integer) of action-invoking code')
+        'Starting column number in file (as an integer) of action-invoking '
+        'code.  This will be ``None`` if the value could not be determined.')
     eline = Attribute(
-        'ending line number in file (as an integer) of action-invoking code')
+        'Ending line number in file (as an integer) of action-invoking code.'
+        'This will be ``None`` if the value could not be determined.')
     ecolumn = Attribute(
-        'ending column number in file (as an integer) of action-invoking code')
+        'Ending column number in file (as an integer) of action-invoking code.'
+        'This will be ``None`` if the value could not be determined.')
 
     def __str__():
         """ Return a representation of the action information (including

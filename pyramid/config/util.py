@@ -28,18 +28,14 @@ class ActionInfo(object):
     def __init__(self, file, line, function, src):
         line = line or 0
         src = src or ''
-        ssrc = src.strip()
-        column = src.rfind(ssrc)
-        eline = line + len(src.split('\n'))
-        ecolumn = len(src.split('\n')[-1])
         srclines = src.split('\n')
         src = '\n'.join('    %s' % x for x in srclines)
         self._src = src
         self.file = file
         self.line = line
-        self.column = column
-        self.eline = eline
-        self.ecolumn = ecolumn
+        self.column = None
+        self.eline = None
+        self.ecolumn = None
         self.function = function
 
     def __str__(self):
