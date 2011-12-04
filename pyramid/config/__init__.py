@@ -1042,7 +1042,7 @@ def resolveConflicts(actions):
         # executed before actions in a higher order.  Within an order,
         # actions are executed sequentially based on original action ordering
         # ("i").
-        order = action['order'] or i
+        order = action['order'] or 0
         discriminator = action['discriminator']
 
         # "ainfo" is a tuple of (order, i, action) where "order" is a
