@@ -239,14 +239,11 @@ class AssetsConfiguratorMixin(object):
         intr = self.introspectable(
             'asset overrides',
             (package, override_package, path, override_prefix),
-            '%s/%s -> %s/%s' % (package, path, override_package,
-                                override_prefix),
+            '%s -> %s' % (to_override, override_with),
             'asset override',
             )
-        intr['package'] = package
-        intr['override_package'] = package
-        intr['override_prefix'] = override_prefix
-        intr['path'] = path
+        intr['to_override'] = to_override
+        intr['override_with'] = override_with
         self.action(None, register, introspectables=(intr,))
 
     override_resource = override_asset # bw compat

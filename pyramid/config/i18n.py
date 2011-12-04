@@ -93,6 +93,7 @@ class I18NConfiguratorMixin(object):
             intr = self.introspectable('translation directories', directory,
                                        spec, 'translation directory')
             intr['directory'] = directory
+            intr['spec'] = spec
             introspectables.append(intr)
             directories.append(directory)
 
@@ -106,7 +107,6 @@ class I18NConfiguratorMixin(object):
                                                   ITranslationDirectories)
 
                 tdirs.insert(0, directory)
-                # XXX no action?
 
             if directories:
                 # We actually only need an IChameleonTranslate function

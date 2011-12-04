@@ -144,10 +144,11 @@ class TweensConfiguratorMixin(object):
         if tweens is None:
             tweens = Tweens()
             registry.registerUtility(tweens, ITweens)
-            ex_intr = self.introspectable('tweens (implicit)',
+            ex_intr = self.introspectable('tweens',
                                           ('tween', EXCVIEW, False),
                                           EXCVIEW,
                                           'implicit tween')
+            ex_intr['name'] = EXCVIEW
             ex_intr['factory'] = excview_tween_factory
             ex_intr['type'] = 'implicit'
             ex_intr['under'] = None
@@ -164,10 +165,11 @@ class TweensConfiguratorMixin(object):
         discriminator = ('tween', name, explicit)
         tween_type = explicit and 'explicit' or 'implicit'
 
-        intr = self.introspectable('tweens (%s)' % tween_type,
+        intr = self.introspectable('tweens',
                                    discriminator,
                                    name,
                                    '%s tween' % tween_type)
+        intr['name'] = name
         intr['factory'] = tween_factory
         intr['type'] = tween_type
         intr['under'] = under

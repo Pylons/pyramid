@@ -1119,7 +1119,7 @@ class ViewsConfiguratorMixin(object):
         if mapper:
             mapper_intr = self.introspectable('view mappers',
                                               discriminator,
-                                              view_desc,
+                                              'view mapper for %s' % view_desc,
                                               'view mapper')
             mapper_intr['mapper'] = mapper
             mapper_intr.relate('views', discriminator)

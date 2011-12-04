@@ -8,6 +8,10 @@ Must-Have
 
   * Narrative docs.
 
+  * ``default root factory`` category?
+
+  * ``default view mapper`` category?
+
   * ActionInfo for ZCML actions (begin/end lineno/cols?)
 
   * Document ActionInfo.

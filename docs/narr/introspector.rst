@@ -15,6 +15,10 @@ feature is useful for debug toolbars, command-line scripts which show some
 aspect of configuration, and for runtime reporting of startup-time
 configuration settings.
 
+.. warning::
+
+   Introspection is new in Pyramid 1.3.
+
 Using the Introspector
 ----------------------
 
@@ -86,6 +90,12 @@ The important attributes shared by all introspectables are the following:
   often be a singular version of the category name but it can be an arbitrary
   value.
 
+``action_info``
+
+  An object describing the directive call site which caused this
+  introspectable to be registered; contains attributes described in
+  :class:`pyramid.interfaces.IActionInfo`.
+
 Besides having the attributes described above, an introspectable is a
 dictionary-like object.  An introspectable can be queried for data values via
 its ``__getitem__``, ``get``, ``keys``, ``values``, or ``items`` methods.
@@ -107,7 +117,7 @@ introspectables in categories not described here.
 ``subscribers``
 
   Each introspectable in the ``subscribers`` category represents a call to
-  :meth:`pryamid.config.Configurator.add_subscriber` (or the decorator
+  :meth:`pyramid.config.Configurator.add_subscriber` (or the decorator
   equivalent); each will have the following data.
 
   ``subscriber``
@@ -137,8 +147,6 @@ introspectables in categories not described here.
     ``add_response_adapter``.
 
 ``root factories``
-
-  XXX ``default root factory`` category?
 
   Each introspectable in the ``root factories`` category represents a call to
   :meth:`pyramid.config.Configurator.set_root_factory` (or the Configurator
@@ -435,8 +443,6 @@ introspectables in categories not described here.
 
 ``view mapper``
 
-  XXX default view mapper category?
-
   Each introspectable in the ``permissions`` category represents a call to
   :meth:`pyramid.config.Configurator.add_view` that has an explicit
   ``mapper`` argument to *or* a call to
@@ -450,17 +456,69 @@ introspectables in categories not described here.
 
 ``asset overrides``
 
-  XXX
+  Each introspectable in the ``asset overrides`` category represents a call
+  to :meth:`pyramid.config.Configurator.override_asset`; each will have the
+  following data.
+
+  ``to_override``
+
+    The ``to_override`` argument (an asset spec) passed to
+    ``override_asset``.
+
+  ``override_with``
+
+    The ``override_with`` argument (an asset spec) passed to
+    ``override_asset``.
 
 ``translation directories``
 
-  XXX
+  Each introspectable in the ``asset overrides`` category represents an
+  individual element in a ``specs`` argument passed to to
+  :meth:`pyramid.config.Configurator.add_translation_dirs`; each will have
+  the following data.
 
-``tweens (implicit)``
+  ``directory``
 
-  XXX
+    The absolute path of the translation directory.
 
-``tweens (explicit)``
+  ``spec``
 
-  XXX
+    The asset specification passed to ``add_translation_dirs``.
+
+``tweens``
+
+  Each introspectable in the ``tweens`` category represents a call to
+  :meth:`pyramid.config.Configurator.add_tween`; each will have the following
+  data.
+
+  ``name``
+
+    The dotted name to the tween factory as a string (passed as
+    the ``tween_factory`` argument to ``add_tween``).
+
+  ``factory``
+
+    The (resolved) tween factory object.
+
+  ``type``
+
+    ``implict`` or ``explicit`` as a string.
+
+  ``under``
+
+     The ``under`` argument passed to ``add_tween`` (a string).
+
+  ``over``
+
+     The ``over`` argument passed to ``add_tween`` (a string).
+
+Toolbar Introspection
+---------------------
+
+The Pyramid debug toolbar (part of the ``pyramid_debugtoolbar`` package)
+provides a canned view of all registered introspectables and their
+relationships.  It looks something like this:
+
+.. image:: tb_introspector.png
+
 
