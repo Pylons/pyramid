@@ -1073,7 +1073,8 @@ def resolveConflicts(actions):
         # shortest include path.  We break sorting ties using "order", then
         # "i".
         def bypath(ainfo):
-            return ainfo[2]['includepath'], ainfo[0], ainfo[1]
+            path, order, i = ainfo[2]['includepath'], ainfo[0], ainfo[1]
+            return path, order, i
 
         ainfos.sort(key=bypath)
         ainfo, rest = ainfos[0], ainfos[1:]
