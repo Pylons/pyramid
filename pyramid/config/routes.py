@@ -348,6 +348,9 @@ class RoutesConfiguratorMixin(object):
         """
         # these are route predicates; if they do not match, the next route
         # in the routelist will be tried
+        if request_method is not None:
+            request_method = as_sorted_tuple(request_method)
+
         ignored, predicates, ignored = make_predicates(
             xhr=xhr,
             request_method=request_method,
@@ -380,7 +383,7 @@ class RoutesConfiguratorMixin(object):
         intr['pattern'] = pattern
         intr['factory'] = factory
         intr['xhr'] = xhr
-        intr['request_methods'] = as_sorted_tuple(request_method)
+        intr['request_methods'] = request_method
         intr['path_info'] = path_info
         intr['request_param'] = request_param
         intr['header'] = header

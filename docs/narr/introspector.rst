@@ -258,7 +258,8 @@ introspectables in categories not described here.
   ``request_methods``
 
     A sequence of request method names implied by the ``request_method``
-    argument passed to ``add_route``.
+    argument passed to ``add_route`` or the value ``None`` if a
+    ``request_method`` argument was not supplied.
 
   ``path_info``
 
@@ -361,7 +362,8 @@ introspectables in categories not described here.
   ``request_methods``
 
     A sequence of request method names implied by the ``request_method``
-    argument passed to ``add_view``.
+    argument passed to ``add_view`` or the value ``None`` if a
+    ``request_method`` argument was not supplied.
 
   ``route_name``
 
