@@ -97,6 +97,10 @@ class TestIntrospector(unittest.TestCase):
             ]
         self.assertEqual(inst.get_category('category'), expected)
 
+    def test_get_category_returns_default_on_miss(self):
+        inst = self._makeOne()
+        self.assertEqual(inst.get_category('category', '123'), '123')
+
     def test_get_category_with_sortkey(self):
         import operator
         inst = self._makeOne()
@@ -113,7 +117,7 @@ class TestIntrospector(unittest.TestCase):
             {'introspectable':intr,  'related':[]},
             ]
         self.assertEqual(
-            inst.get_category('category', operator.attrgetter('foo')),
+            inst.get_category('category', sort_key=operator.attrgetter('foo')),
                               expected)
 
     def test_categorized(self):
@@ -132,7 +136,7 @@ class TestIntrospector(unittest.TestCase):
             {'introspectable':intr,  'related':[]},
             ])]
         self.assertEqual(
-            inst.categorized(operator.attrgetter('foo')), expected)
+            inst.categorized(sort_key=operator.attrgetter('foo')), expected)
 
     def test_categories(self):
         inst = self._makeOne()

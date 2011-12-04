@@ -103,19 +103,25 @@ class Introspector(object):
         intr = category.get(discriminator, default)
         return intr
 
-    def get_category(self, category_name, sort_key=None):
+    def get_category(self, category_name, default=None, sort_key=None):
         if sort_key is None:
             sort_key = operator.attrgetter('order')
-        category = self._categories[category_name]
+        category = self._categories.get(category_name)
+        if category is None:
+            return default
         values = category.values()
         values = sorted(set(values), key=sort_key)
-        return [{'introspectable':intr, 'related':self.related(intr)} for
-                intr in values]
+        return [
+            {'introspectable':intr,
+             'related':self.related(intr)}
+             for intr in values
+             ]
 
     def categorized(self, sort_key=None):
         L = []
         for category_name in self.categories():
-            L.append((category_name, self.get_category(category_name,sort_key)))
+            L.append((category_name, self.get_category(category_name,
+                                                       sort_key=sort_key)))
         return L
 
     def categories(self):

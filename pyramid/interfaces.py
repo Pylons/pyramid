@@ -865,16 +865,20 @@ class IIntrospector(Interface):
         discriminator (or discriminator hash) ``discriminator``.  If it does
         not exist in the introspector, return the value of ``default`` """
 
-    def get_category(category_name, sort_key=None):
+    def get_category(category_name, default=None, sort_key=None):
         """ Get a sequence of dictionaries in the form
         ``[{'introspectable':IIntrospectable, 'related':[sequence of related
         IIntrospectables]}, ...]`` where each introspectable is part of the
-        category associated with ``category_name`` .  If ``sort_key`` is
-        ``None``, the sequence will be returned in the order the
-        introspectables were added to the introspector.  Otherwise, sort_key
-        should be a function that accepts an IIntrospectable and returns a
-        value from it (ala the ``key`` function of Python's ``sorted``
-        callable)."""
+        category associated with ``category_name`` .
+
+        If the category named ``category_name`` does not exist in the
+        introspector the value passed as ``default`` will be returned.
+
+        If ``sort_key`` is ``None``, the sequence will be returned in the
+        order the introspectables were added to the introspector.  Otherwise,
+        sort_key should be a function that accepts an IIntrospectable and
+        returns a value from it (ala the ``key`` function of Python's
+        ``sorted`` callable)."""
 
     def categories():
         """ Return a sorted sequence of category names known by
