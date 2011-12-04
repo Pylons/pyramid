@@ -1037,44 +1037,65 @@ def resolveConflicts(actions):
         if not isinstance(action, dict):
             # old-style tuple action
             action = expand_action(*action)
+
+        # "order" is an integer grouping. Actions in a lower order will be
+        # executed before actions in a higher order.  Within an order,
+        # actions are executed sequentially based on original action ordering
+        # ("i").
         order = action['order'] or i
         discriminator = action['discriminator']
+
+        # "ainfo" is a tuple of (order, i, action) where "order" is a
+        # user-supplied grouping, "i" is an integer expressing the relative
+        # position of this action in the action list being resolved, and
+        # "action" is an action dictionary.  The purpose of an ainfo is to
+        # associate an "order" and an "i" with a particular action; "order"
+        # and "i" exist for sorting purposes after conflict resolution.
+        ainfo = (order, i, action)
+
         if discriminator is None:
-            # The discriminator is None, so this action can never
-            # conflict. We can add it directly to the result.
-            output.append((order, action))
+            # The discriminator is None, so this action can never conflict.
+            # We can add it directly to the result.
+            output.append(ainfo)
             continue
 
         L = unique.setdefault(discriminator, [])
-        L.append((order, action))
+        L.append(ainfo)
 
     # Check for conflicts
     conflicts = {}
-    for discriminator, dups in unique.items():
-        # We need to sort the actions by the paths so that the shortest
-        # path with a given prefix comes first:
-        def bypath(tup):
-            return tup[1]['includepath'], tup[0]
-        dups.sort(key=bypath)
-        order, first = dups[0]
-        output.append(dups[0])
-        basepath, baseinfo, discriminator = (first['includepath'],
-                                             first['info'],
-                                             first['discriminator'])
 
-        for order, dup in dups[1:]:
-            includepath = dup['includepath']
+    for discriminator, ainfos in unique.items():
+
+        # We use (includepath, order, i) as a sort key because we need to
+        # sort the actions by the paths so that the shortest path with a
+        # given prefix comes first.  The "first" action is the one with the
+        # shortest include path.  We break sorting ties using "order", then
+        # "i".
+        def bypath(ainfo):
+            return ainfo[2]['includepath'], ainfo[0], ainfo[1]
+
+        ainfos.sort(key=bypath)
+        ainfo, rest = ainfos[0], ainfos[1:]
+        output.append(ainfo)
+        _, _, action = ainfo
+        basepath, baseinfo, discriminator = (action['includepath'],
+                                             action['info'],
+                                             action['discriminator'])
+
+        for _, _, action in rest:
+            includepath = action['includepath']
             # Test whether path is a prefix of opath
             if (includepath[:len(basepath)] != basepath # not a prefix
                 or includepath == basepath):
                 L = conflicts.setdefault(discriminator, [baseinfo])
-                L.append(dup['info'])
+                L.append(action['info'])
 
     if conflicts:
         raise ConfigurationConflictError(conflicts)
 
-    output.sort(key=operator.itemgetter(0))
-    return [ x[1] for x in output ]
+    # sort conflict-resolved actions by (order, i) and return them
+    return [ x[2] for x in sorted(output, key=operator.itemgetter(0, 1))]
                 
 def expand_action(discriminator, callable=None, args=(), kw=None,
                   includepath=(), info=None, order=0, introspectables=()):

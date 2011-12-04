@@ -1764,6 +1764,81 @@ class Test_resolveConflicts(unittest.TestCase):
                 ]
             )
 
+    def test_it_with_actions_grouped_by_order(self):
+        from pyramid.tests.test_config import dummyfactory as f
+        from pyramid.config import expand_action
+        result = self._callFUT([
+            expand_action(None, f),
+            expand_action(1, f, (1,), {}, (), 'third', 10),
+            expand_action(1, f, (2,), {}, ('x',), 'fourth', 10),
+            expand_action(1, f, (3,), {}, ('y',), 'fifth', 10),
+            expand_action(2, f, (1,), {}, (), 'sixth', 10),
+            expand_action(3, f, (1,), {}, (), 'seventh', 10),
+            expand_action(5, f, (4,), {}, ('y',), 'eighth', 99999),
+            expand_action(4, f, (3,), {}, (), 'first', 5),
+            expand_action(4, f, (5,), {}, ('y',), 'second', 5),
+            ])
+        self.assertEqual(len(result), 6)
+        # resolved actions should be grouped by (order, i)
+        self.assertEqual(
+            result,
+            [{'info': None,
+              'args': (),
+              'callable': f,
+              'introspectables': (),
+              'kw': {},
+              'discriminator': None,
+              'includepath': (),
+              'order': 0},
+
+              {'info': 'first',
+               'args': (3,),
+               'callable': f,
+               'introspectables': (),
+               'kw': {},
+               'discriminator': 4,
+               'includepath': (),
+               'order': 5},
+
+               {'info': 'third',
+                'args': (1,),
+                'callable': f,
+                'introspectables': (),
+                'kw': {},
+                'discriminator': 1,
+                'includepath': (),
+                'order': 10},
+
+               {'info': 'sixth',
+                'args': (1,),
+                'callable': f,
+                'introspectables': (),
+                'kw': {},
+                'discriminator': 2,
+                'includepath': (),
+                'order': 10},
+
+               {'info': 'seventh',
+                'args': (1,),
+                'callable': f,
+                'introspectables': (),
+                'kw': {},
+                'discriminator': 3,
+                'includepath': (),
+                'order': 10},
+
+                 {'info': 'eighth',
+                  'args': (4,),
+                  'callable': f,
+                  'introspectables': (),
+                  'kw': {},
+                  'discriminator': 5,
+                  'includepath': ('y',),
+                  'order': 99999}
+                  ]
+                  )
+        
+
 class TestGlobalRegistriesIntegration(unittest.TestCase):
     def setUp(self):
         from pyramid.config import global_registries
