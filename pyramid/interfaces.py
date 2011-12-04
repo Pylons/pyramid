@@ -1001,13 +1001,22 @@ class IIntrospectable(Interface):
         """
 
 class IActionInfo(Interface):
-    filename = Attribute('filename of action-invoking code as a string')
-    lineno = Attribute('line number in file (as an integer) of action-invoking '
-                       'code')
-    function = Attribute('a string representing the module, function or method '
-                         'that enclosed the line which invoked the action')
-    linerepr = Attribute('a string representing the source code line '
-                         'which invoked the action')
+    """ Class which provides code introspection capability associated with an
+    action.  The ParserInfo class used by ZCML implements the same interface."""
+    file = Attribute(
+        'filename of action-invoking code as a string')
+    line = Attribute(
+        'starting line number in file (as an integer) of action-invoking code')
+    column = Attribute(
+        'start column number in file (as an integer) of action-invoking code')
+    eline = Attribute(
+        'ending line number in file (as an integer) of action-invoking code')
+    ecolumn = Attribute(
+        'ending column number in file (as an integer) of action-invoking code')
+
+    def __str__():
+        """ Return a representation of the action information (including
+        source code from file, if possible) """
 
 # configuration phases: a lower phase number means the actions associated
 # with this phase will be executed earlier than those with later phase

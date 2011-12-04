@@ -1925,7 +1925,7 @@ def _conflictFunctions(e):
     conflicts = e._conflicts.values()
     for conflict in conflicts:
         for confinst in conflict:
-            yield confinst[2]
+            yield confinst.function
 
 class DummyActionState(object):
     autocommit = False

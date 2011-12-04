@@ -313,14 +313,34 @@ class Test__make_predicates(unittest.TestCase):
         self.assertEqual(hash1, hash2)
 
 class TestActionInfo(unittest.TestCase):
-    def _makeOne(self, filename, lineno, function, linerepr):
+    def _getTargetClass(self):
         from pyramid.config.util import ActionInfo
-        return ActionInfo(filename, lineno, function, linerepr)
+        return ActionInfo
+        
+    def _makeOne(self, filename, lineno, function, linerepr):
+        return self._getTargetClass()(filename, lineno, function, linerepr)
+
+    def test_class_conforms(self):
+        from zope.interface.verify import verifyClass
+        from pyramid.interfaces import IActionInfo
+        verifyClass(IActionInfo, self._getTargetClass())
+
+    def test_instance_conforms(self):
+        from zope.interface.verify import verifyObject
+        from pyramid.interfaces import IActionInfo
+        verifyObject(IActionInfo, self._makeOne('f', 0, 'f', 'f'))
+
+    def test_ctor(self):
+        inst = self._makeOne('filename', 10, 'function', '  linerepr\n\nfoo')
+        self.assertEqual(inst.line, 10)
+        self.assertEqual(inst.column, 2)
+        self.assertEqual(inst.eline, 13)
+        self.assertEqual(inst.ecolumn, 3)
 
     def test___str__(self):
-        inst = self._makeOne('filename', 'lineno', 'function', 'linerepr')
+        inst = self._makeOne('filename', 0, 'function', '   linerepr  ')
         self.assertEqual(str(inst),
-                         "Line lineno of file filename in function: 'linerepr'")
+                         "Line 0 of file filename:\n       linerepr  ")
 
 class DummyCustomPredicate(object):
     def __init__(self):

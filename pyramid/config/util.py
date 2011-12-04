@@ -1,6 +1,9 @@
-import collections
 import re
 import traceback
+
+from zope.interface import implementer
+
+from pyramid.interfaces import IActionInfo
 
 from pyramid.compat import (
     string_types,
@@ -20,19 +23,27 @@ from hashlib import md5
 MAX_ORDER = 1 << 30
 DEFAULT_PHASH = md5().hexdigest()
 
-_ActionInfo = collections.namedtuple(
-    'ActionInfo',
-    ('filename', 'lineno', 'function', 'linerepr')
-    )
+@implementer(IActionInfo)
+class ActionInfo(object):
+    def __init__(self, file, line, function, src):
+        line = line or 0
+        src = src or ''
+        ssrc = src.strip()
+        column = src.rfind(ssrc)
+        eline = line + len(src.split('\n'))
+        ecolumn = len(src.split('\n')[-1])
+        srclines = src.split('\n')
+        src = '\n'.join('    %s' % x for x in srclines)
+        self._src = src
+        self.file = file
+        self.line = line
+        self.column = column
+        self.eline = eline
+        self.ecolumn = ecolumn
+        self.function = function
 
-class ActionInfo(_ActionInfo):
-    # this is a namedtuple subclass for (minor) backwards compat
-    slots = ()
     def __str__(self):
-        return (
-            'Line %s of file %s in %s: %r' % (
-                self.lineno, self.filename, self.function, self.linerepr)
-            )
+        return 'Line %s of file %s:\n%s' % (self.line, self.file, self._src)
 
 def action_method(wrapped):
     """ Wrapper to provide the right conflict info report data when a method
@@ -46,7 +57,7 @@ def action_method(wrapped):
                 f = traceback.extract_stack(limit=3)
                 info = ActionInfo(*f[-2])
             except: # pragma: no cover
-                info = ActionInfo('<unknown>', 0, '<unknown>', '<unknown>')
+                info = ActionInfo(None, 0, '', '')
         self._ainfo.append(info)
         try:
             result = wrapped(self, *arg, **kw)

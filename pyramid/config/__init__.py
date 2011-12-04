@@ -488,13 +488,13 @@ class Configurator(
 
     @property
     def action_info(self):
-        info = self.info # usually a ZCML action if self.info has data
+        info = self.info # usually a ZCML action (ParserInfo) if self.info
         if not info:
             # Try to provide more accurate info for conflict reports
             if self._ainfo:
                 info = self._ainfo[0]
             else:
-                info = ActionInfo('<unknown>', 0, '<unknown>', '<unknown>')
+                info = ActionInfo(None, 0, '', '')
         return info
 
     def action(self, discriminator, callable=None, args=(), kw=None, order=0,
