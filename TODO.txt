@@ -34,6 +34,8 @@ Must-Have
 
 - API for resolving asset specs and dotted names.
 
+- Test KARL.
+
 Nice-to-Have
 ------------
 
