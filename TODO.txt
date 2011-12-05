@@ -19,14 +19,23 @@ Must-Have
 
   * introspection hiding for directives?
 
-- Give discriminators a nicer repr for conflict reporting?
+  * debug toolbar panel for introspection
+
+- Release new pyramid_debugtoolbar package that has introspection panel
+  (already py3 compat released).
+
+- Release new transaction package (trunk is Py3 compat).
+
+- Release new pyramid_tm package (trunk is Py3 compat).
+
+- Release new zope.configuration package (based on chrism-dictactions).
+
+- Release new pyramid_zcml package (depend on dictactions z.config).
 
 Nice-to-Have
 ------------
 
 - Add narrative docs for wsgiapp and wsgiapp2.
-
-- Better "Extending" chapter.
 
 - Flesh out "Paste" narrative docs chapter.
 
@@ -78,8 +87,6 @@ Nice-to-Have
 - Provide a ``has_view`` function.
 
 - Update App engine chapter with less creaky directions.
-
-- Introspection features (whatever is needed by Alan/ptah).
 
 Future
 ------
