@@ -43,7 +43,7 @@ provided to the ``add_route`` method of the route which matched when the view
 was called.  It uses the :meth:`pyramid.interfaces.IIntrospector.get` method
 to return an introspectable in the category ``routes`` with a
 :term:`discriminator` equal to the matched route name.  It then uses the
-returned introspectable to obtain an "pattern" value.
+returned introspectable to obtain a "pattern" value.
 
 The introspectable returned by the query methods of the introspector has
 methods and attributes described by
@@ -59,7 +59,7 @@ Introspectable Objects
 ----------------------
 
 Introspectable objects are returned from query methods of an introspector.
-Each introspectable object implements the attributes and methods the
+Each introspectable object implements the attributes and methods
 documented at :class:`pyramid.interfaces.IIntrospectable`.
 
 The important attributes shared by all introspectables are the following:
@@ -289,11 +289,11 @@ introspectables in categories not described here.
 
     The ``pregenerator`` argument passed to ``add_route``.
 
-  ``pregenerator``
+  ``static``
 
     The ``static`` argument passed to ``add_route``.
 
-  ``pregenerator``
+  ``use_global_views``
 
     The ``use_global_views`` argument passed to ``add_route``.
 
