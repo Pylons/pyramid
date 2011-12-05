@@ -41,7 +41,8 @@ class AlchemyProjectTemplate(PyramidTemplate):
         val = PyramidTemplate.post(self, command, output_dir, vars)
         self.out('')
         self.out('Please run the "populate_%(package)s" script to set up the '
-                 'SQL database before starting the application (e.g. '
+                 'SQL database after installing (but before starting) the '
+                 'application (e.g. '
                  '"$myvirtualenv/bin/populate_%(package)s development.ini".)'
                  % vars)
         return val

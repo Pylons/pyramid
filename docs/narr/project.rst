@@ -46,23 +46,16 @@ each other on a number of axes:
 The included scaffolds are these:
 
 ``starter``
-  URL mapping via :term:`traversal` and no persistence mechanism.
+  URL mapping via :term:`URL dispatch` and no persistence mechanism.
 
 ``zodb``
-  URL mapping via :term:`traversal` and persistence via :term:`ZODB`.
+  URL mapping via :term:`traversal` and persistence via :term:`ZODB`.  *Note
+  that, as of this writing, this scaffold will not run under Python 3, only
+  under Python 2.*
 
 ``alchemy``
   URL mapping via :term:`URL dispatch` and persistence via
   :term:`SQLAlchemy`
-
-.. note::
-
-   Rather than use any of the above scaffolds, Pylons 1 users may feel more
-   comfortable installing the :term:`Akhet` development environment, which
-   provides a scaffold named ``akhet``.  This scaffold configures a Pyramid
-   application in a "Pylons-esque" way, including the use of a :term:`view
-   handler` to map URLs to code (a handler is much like a Pylons
-   "controller").
 
 .. index::
    single: creating a project
@@ -382,7 +375,6 @@ structure:
   |-- MANIFEST.in
   |-- myproject
   |   |-- __init__.py
-  |   |-- resources.py
   |   |-- static
   |   |   |-- favicon.ico
   |   |   |-- logo.png
@@ -682,8 +674,6 @@ The ``myproject`` :term:`package` lives inside the ``MyProject``
    ``main`` function which is used as a entry point for commands such as
    ``pserve``, ``pshell``, ``pviews``, and others.
 
-#. A ``resources.py`` module, which contains :term:`resource` code.
-
 #. A ``templates`` directory, which contains :term:`Chameleon` (or
    other types of) templates.
 
@@ -719,23 +709,23 @@ also informs Python that the directory which contains it is a *package*.
 #. Line 1 imports the :term:`Configurator` class from :mod:`pyramid.config`
    that we use later.
 
-#. Line 2 imports the ``Root`` class from :mod:`myproject.resources` that we
-   use later.
-
-#. Lines 4-10 define a function named ``main`` that returns a :app:`Pyramid`
+#. Lines 3-16 define a function named ``main`` that returns a :app:`Pyramid`
    WSGI application.  This function is meant to be called by the
    :term:`PasteDeploy` framework as a result of running ``pserve``.
 
    Within this function, application configuration is performed.
 
-   Line 7 creates an instance of a :term:`Configurator`.
+   Line 6 creates an instance of a :term:`Configurator`.
 
-   Line 8 registers a static view, which will serve up the files from the
+   Line 7 registers a static view, which will serve up the files from the
    ``mypackage:static`` :term:`asset specification` (the ``static``
    directory of the ``mypackage`` package).
 
+   Line 8 adds a :term:`route` to the configuration.  This route is later
+   used by a view in the ``views`` module.
+
    Line 9 calls ``config.scan()``, which picks up view registrations declared
-   elsewhere in the package (in this case, in the ``view.py`` module).
+   elsewhere in the package (in this case, in the ``views.py`` module).
 
    Line 10 returns a :term:`WSGI` application to the caller of the function
    (Pyramid's pserve).
@@ -755,20 +745,22 @@ and which returns a :term:`response`.
    :language: python
    :linenos:
 
-Lines 4-6 define and register a :term:`view callable` named ``my_view``.  The
+Lines 3-5 define and register a :term:`view callable` named ``my_view``.  The
 function named ``my_view`` is decorated with a ``view_config`` decorator
 (which is processed by the ``config.scan()`` line in our ``__init__.py``).
-The view_config decorator asserts that this view be found when the
-:term:`context` of the request is an instance of the
-:class:`myproject.resources.Root` class.  The view_config decorator also
-names a ``renderer``, which in this case is a template that will be used to
-render the result of the view callable.  This particular view declaration
-points at ``templates/mytemplate.pt``, which is a :term:`asset specification`
-that specifies the ``mytemplate.pt`` file within the ``templates`` directory
-of the ``myproject`` package.  The asset specification could have also been
-specified as ``myproject:templates/mytemplate.pt``; the leading package name
-and colon is optional.  The template file it actually points to is a
-:term:`Chameleon` ZPT template file.
+The view_config decorator asserts that this view be found when a
+:term:`route` named ``home`` is matched.  In our case, because our
+``__init__.py`` maps the route named ``home`` to the URL pattern ``/``, this
+route will match when a visitor visits the root URL.  The view_config
+decorator also names a ``renderer``, which in this case is a template that
+will be used to render the result of the view callable.  This particular view
+declaration points at ``templates/mytemplate.pt``, which is a :term:`asset
+specification` that specifies the ``mytemplate.pt`` file within the
+``templates`` directory of the ``myproject`` package.  The asset
+specification could have also been specified as
+``myproject:templates/mytemplate.pt``; the leading package name and colon is
+optional.  The template file it actually points to is a :term:`Chameleon` ZPT
+template file.
 
 This view callable function is handed a single piece of information: the
 :term:`request`.  The *request* is an instance of the :term:`WebOb`
@@ -778,8 +770,7 @@ This view returns a dictionary.  When this view is invoked, a
 :term:`renderer` converts the dictionary returned by the view into HTML, and
 returns the result as the :term:`response`.  This view is configured to
 invoke a renderer which uses a :term:`Chameleon` ZPT template
-(``mypackage:templates/my_template.pt``, as specified in the ``__init__.py``
-file call to ``add_view``).
+(``templates/my_template.pt``).
 
 See :ref:`views_which_use_a_renderer` for more information about how views,
 renderers, and templates relate and cooperate.
@@ -793,35 +784,6 @@ renderers, and templates relate and cooperate.
    for each template change.  For production applications, you should
    set your project's ``pyramid.reload_templates`` to ``false`` to increase
    the speed at which templates may be rendered.
-
-.. index::
-   single: resources.py
-
-.. _resourcespy_project_section:
-
-``resources.py``
-~~~~~~~~~~~~~~~~
-
-The ``resources.py`` module provides the :term:`resource` data and behavior
-for our application.  Resources are objects which exist to provide site
-structure in applications which use :term:`traversal` to map URLs to code.
-We write a class named ``Root`` that provides the behavior for the root
-resource.
-
-.. literalinclude:: MyProject/myproject/resources.py
-   :language: python
-   :linenos:
-
-#. Lines 1-3 define the Root class.  The Root class is a "root resource
-   factory" function that will be called by the :app:`Pyramid` *Router* for
-   each request when it wants to find the root of the resource tree.
-
-In a "real" application, the Root object would likely not be such a simple
-object.  Instead, it might be an object that could access some persistent
-data store, such as a database.  :app:`Pyramid` doesn't make any assumption
-about which sort of data storage you'll want to use, so the sample
-application uses an instance of :class:`myproject.resources.Root` to
-represent the root.
 
 .. index::
    single: static directory
@@ -904,39 +866,12 @@ named ``views`` instead of within a single ``views.py`` file, you might:
   can be empty, this just tells Python that the ``views`` directory is a
   *package*.
 
-Then change the __init__.py of your myproject project (*not* the
-``__init__.py`` you just created in the ``views`` directory, the one in its
-parent directory).  For example, from something like:
-
-.. code-block:: python
-    :linenos:
-
-    config.add_view('myproject.views.my_view',
-                    renderer='myproject:templates/mytemplate.pt')
-
-To this:
-
-.. code-block:: python
-    :linenos:
-
-    config.add_view('myproject.views.blog.my_view',
-                    renderer='myproject:templates/mytemplate.pt')
-
-You can then continue to add files to the ``views`` directory, and refer to
-view classes or functions within those files via the dotted name passed as
-the first argument to ``add_view``.  For example, if you added a file named
-``anothermodule.py`` to the ``views`` subdirectory, and added a view callable
-named ``my_view`` to it:
-
-.. code-block:: python
-    :linenos:
-
-    config.add_view('myproject.views.anothermodule.my_view',
-                    renderer='myproject:templates/anothertemplate.pt')
-
-This pattern can be used to rearrage code referred to by any Pyramid API
-argument which accepts a :term:`dotted Python name` or direct object
-reference.
+You can then continue to add view callable functions to the ``blog.py``
+module, but you can also add other ``.py`` files which contain view callable
+functions to the ``views`` directory.  As long as you use the
+``@view_config`` directive to register views in conjuction with
+``config.scan()`` they will be picked up automatically when the application
+is restarted.
 
 Using the Interactive Shell
 ---------------------------
@@ -949,13 +884,34 @@ via ``pserve``.  This can be a useful debugging tool.  See
 Using an Alternate WSGI Server
 ------------------------------
 
-The code generated by a :app:`Pyramid` scaffold assumes that you will be
+The code generated by :app:`Pyramid` scaffolding assumes that you will be
 using the ``pserve`` command to start your application while you do
-development.  However, ``pserve`` is by no means the only way to start up and
-serve a :app:`Pyramid` application.  As we saw in :ref:`firstapp_chapter`,
-``pserve`` needn't be invoked at all to run a :app:`Pyramid` application.
-The use of ``pserve`` to run a :app:`Pyramid` application is purely
-conventional based on the output of its scaffold.
+development.  The default rendering of Pyramid scaffolding uses the *wsgiref*
+WSGI server, which is a server that is ill-suited for production usage: its
+main feature is that it works on all platforms and all systems, making it a
+good choice as a default server from the perspective of Pyramid's developers.
+
+To use a server more suitable for production, you have a number of choices.
+Replace the ``use = egg:pyramid#wsgref`` line in your ``production.ini`` with
+one of the following.
+
+``use = egg:Paste#http``
+
+  ``paste.httpserver`` is Windows, UNIX, and Python 2 compatible.  You'll
+  need to ``easy_install Paste`` into your Pyramid virtualenv for this server
+  to work.
+
+``use = egg:pyramid#cherrypy``
+
+  The ``CherryPy`` WSGI server is Windows, UNIX, Python 2, and Python 3
+  compatible.  You'll need to ``easy_install CherryPy`` into your Pyramid
+  virtualenv for this server to work.
+
+``pserve`` is by no means the only way to start up and serve a :app:`Pyramid`
+application.  As we saw in :ref:`firstapp_chapter`, ``pserve`` needn't be
+invoked at all to run a :app:`Pyramid` application.  The use of ``pserve`` to
+run a :app:`Pyramid` application is purely conventional based on the output
+of its scaffold.
 
 Any :term:`WSGI` server is capable of running a :app:`Pyramid` application.
 Some WSGI servers don't require the :term:`PasteDeploy` framework's

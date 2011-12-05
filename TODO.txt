@@ -4,8 +4,6 @@ Pyramid TODOs
 Must-Have
 ---------
 
-- Change starter scaffold to use URL dispatch?
-
 - Introspection:
 
   * Review narrative docs.

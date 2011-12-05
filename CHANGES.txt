@@ -92,7 +92,7 @@ Backwards Incompatibilities
 Dependencies
 ------------
 
-- Pyramid no longer depends on the zope.component package, except as a
+- Pyramid no longer depends on the ``zope.component`` package, except as a
   testing dependency.
 
 - Pyramid now depends on a zope.interface>=3.8.0, WebOb>=1.2dev,
@@ -115,6 +115,10 @@ Documentation
   ``pyramid.config.Configurator.action`` method within custom directives.  It
   also describes how to add introspectable objects.
 
+- A narrative documentation chapter named "Pyramid Configuration
+  Introspection" was added.  It describes how to query the introspection
+  system.
+
 Scaffolds
 ---------
 
@@ -123,4 +127,6 @@ Scaffolds
 
 - The ``routesalchemy`` scaffold has been renamed ``alchemy``, replacing the
   older (traversal-based) ``alchemy`` scaffold (which has been retired).
+
+- The ``starter`` scaffold now uses URL dispatch by default.
 

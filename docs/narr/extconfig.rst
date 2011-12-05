@@ -226,8 +226,8 @@ augment Pyramid's configuration introspection system.
 
 .. _introspection:
 
-Configuration Introspection
----------------------------
+Adding Configuration Introspection
+----------------------------------
 
 .. warning::
 
