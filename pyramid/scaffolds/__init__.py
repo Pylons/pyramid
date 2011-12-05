@@ -40,9 +40,9 @@ class AlchemyProjectTemplate(PyramidTemplate):
     def post(self, command, output_dir, vars): # pragma: no cover
         val = PyramidTemplate.post(self, command, output_dir, vars)
         self.out('')
-        self.out('Please run the "populate_%(package)s" script to set up the '
+        self.out('Please run the "populate_%(project)s" script to set up the '
                  'SQL database after installing (but before starting) the '
                  'application (e.g. '
-                 '"$myvirtualenv/bin/populate_%(package)s development.ini".)'
+                 '"$myvirtualenv/bin/populate_%(project)s development.ini".)'
                  % vars)
         return val
