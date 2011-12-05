@@ -43,7 +43,7 @@ provided to the ``add_route`` method of the route which matched when the view
 was called.  It uses the :meth:`pyramid.interfaces.IIntrospector.get` method
 to return an introspectable in the category ``routes`` with a
 :term:`discriminator` equal to the matched route name.  It then uses the
-returned introspectable to obtain an "pattern" value.
+returned introspectable to obtain a "pattern" value.
 
 The introspectable returned by the query methods of the introspector has
 methods and attributes described by
