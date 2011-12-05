@@ -941,6 +941,42 @@ class ViewsConfiguratorMixin(object):
                 name=renderer, package=self.package,
                 registry = self.registry)
 
+        introspectables = []
+        discriminator = [
+            'view', context, name, request_type, IView, containment,
+            request_param, request_method, route_name, attr,
+            xhr, accept, header, path_info, match_param]
+        discriminator.extend(sorted([hash(x) for x in custom_predicates]))
+        discriminator = tuple(discriminator)
+        if inspect.isclass(view) and attr:
+            view_desc = 'method %r of %s' % (
+                attr, self.object_description(view))
+        else:
+            view_desc = self.object_description(view)
+        view_intr = self.introspectable('views',
+                                        discriminator,
+                                        view_desc,
+                                        'view')
+        view_intr.update(
+            dict(name=name,
+                 context=context,
+                 containment=containment,
+                 request_param=request_param,
+                 request_methods=request_method,
+                 route_name=route_name,
+                 attr=attr,
+                 xhr=xhr,
+                 accept=accept,
+                 header=header,
+                 path_info=path_info,
+                 match_param=match_param,
+                 callable=view,
+                 mapper=mapper,
+                 decorator=decorator,
+                 )
+            )
+        introspectables.append(view_intr)
+
         def register(permission=permission, renderer=renderer):
             request_iface = IRequest
             if route_name is not None:
@@ -982,6 +1018,7 @@ class ViewsConfiguratorMixin(object):
                                   decorator=decorator,
                                   http_cache=http_cache)
             derived_view = deriver(view)
+            view_intr['derived_callable'] = derived_view
 
             registered = self.registry.adapters.registered
 
@@ -1079,13 +1116,33 @@ class ViewsConfiguratorMixin(object):
                         (IExceptionViewClassifier, request_iface, context),
                         IMultiView, name=name)
 
-        discriminator = [
-            'view', context, name, request_type, IView, containment,
-            request_param, request_method, route_name, attr,
-            xhr, accept, header, path_info, match_param]
-        discriminator.extend(sorted([hash(x) for x in custom_predicates]))
-        discriminator = tuple(discriminator)
-        self.action(discriminator, register)
+        if mapper:
+            mapper_intr = self.introspectable('view mappers',
+                                              discriminator,
+                                              'view mapper for %s' % view_desc,
+                                              'view mapper')
+            mapper_intr['mapper'] = mapper
+            mapper_intr.relate('views', discriminator)
+            introspectables.append(mapper_intr)
+        if route_name:
+            view_intr.relate('routes', route_name) # see add_route
+        if renderer is not None and renderer.name and '.' in renderer.name:
+            # it's a template
+            tmpl_intr = self.introspectable('templates', discriminator,
+                                            renderer.name, 'template')
+            tmpl_intr.relate('views', discriminator)
+            tmpl_intr['name'] = renderer.name
+            tmpl_intr['type'] = renderer.type
+            tmpl_intr['renderer'] = renderer
+            tmpl_intr.relate('renderer factories', renderer.type)
+            introspectables.append(tmpl_intr)
+        if permission is not None:
+            perm_intr = self.introspectable('permissions', permission,
+                                            permission, 'permission')
+            perm_intr['value'] = permission
+            perm_intr.relate('views', discriminator)
+            introspectables.append(perm_intr)
+        self.action(discriminator, register, introspectables=introspectables)
 
     def derive_view(self, view, attr=None, renderer=None):
         """
@@ -1312,7 +1369,13 @@ class ViewsConfiguratorMixin(object):
             self.registry.registerUtility(mapper, IViewMapperFactory)
         # IViewMapperFactory is looked up as the result of view config
         # in phase 3
-        self.action(IViewMapperFactory, register, order=PHASE1_CONFIG)
+        intr = self.introspectable('view mappers',
+                                   IViewMapperFactory,
+                                   self.object_description(mapper),
+                                   'default view mapper')
+        intr['mapper'] = mapper
+        self.action(IViewMapperFactory, register, order=PHASE1_CONFIG,
+                    introspectables=(intr,))
 
     @action_method
     def add_static_view(self, name, path, **kw):

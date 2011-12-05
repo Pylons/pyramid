@@ -24,6 +24,12 @@ class PCreateCommand(object):
                       action='append',
                       help=("Add a scaffold to the create process "
                             "(multiple -s args accepted)"))
+    parser.add_option('-t', '--template',
+                      dest='scaffold_name',
+                      action='append',
+                      help=('A backwards compatibility alias for '
+                            '-s/--scaffold.  Add a scaffold to the '
+                            'create process (multiple -t args accepted)'))
     parser.add_option('-l', '--list',
                       dest='list',
                       action='store_true',

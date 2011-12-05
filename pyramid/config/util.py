@@ -1,6 +1,10 @@
 import re
 import traceback
 
+from zope.interface import implementer
+
+from pyramid.interfaces import IActionInfo
+
 from pyramid.compat import (
     string_types,
     bytes_,
@@ -19,6 +23,19 @@ from hashlib import md5
 MAX_ORDER = 1 << 30
 DEFAULT_PHASH = md5().hexdigest()
 
+@implementer(IActionInfo)
+class ActionInfo(object):
+    def __init__(self, file, line, function, src):
+        self.file = file
+        self.line = line
+        self.function = function
+        self.src = src
+
+    def __str__(self):
+        srclines = self.src.split('\n')
+        src = '\n'.join('    %s' % x for x in srclines)
+        return 'Line %s of file %s:\n%s' % (self.line, self.file, src)
+
 def action_method(wrapped):
     """ Wrapper to provide the right conflict info report data when a method
     that calls Configurator.action calls another that does the same"""
@@ -26,12 +43,15 @@ def action_method(wrapped):
         if self._ainfo is None:
             self._ainfo = []
         info = kw.pop('_info', None)
+        if is_nonstr_iter(info) and len(info) == 4:
+            # _info permitted as extract_stack tuple
+            info = ActionInfo(*info)
         if info is None:
             try:
                 f = traceback.extract_stack(limit=3)
-                info = f[-2]
+                info = ActionInfo(*f[-2])
             except: # pragma: no cover
-                info = ''
+                info = ActionInfo(None, 0, '', '')
         self._ainfo.append(info)
         try:
             result = wrapped(self, *arg, **kw)

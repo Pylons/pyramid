@@ -40,12 +40,17 @@ class I18NConfiguratorMixin(object):
         """
         def register():
             self._set_locale_negotiator(negotiator)
-        self.action(ILocaleNegotiator, register)
+        intr = self.introspectable('locale negotiator', None,
+                                   self.object_description(negotiator),
+                                   'locale negotiator')
+        intr['negotiator'] = negotiator
+        self.action(ILocaleNegotiator, register, introspectables=(intr,))
 
     def _set_locale_negotiator(self, negotiator):
         locale_negotiator = self.maybe_dotted(negotiator)
         self.registry.registerUtility(locale_negotiator, ILocaleNegotiator)
 
+    @action_method
     def add_translation_dirs(self, *specs):
         """ Add one or more :term:`translation directory` paths to the
         current configuration state.  The ``specs`` argument is a
@@ -71,8 +76,10 @@ class I18NConfiguratorMixin(object):
         in the order they're provided in the ``*specs`` list argument (items
         earlier in the list trump ones later in the list).
         """
-        for spec in specs[::-1]: # reversed
+        directories = []
+        introspectables = []
 
+        for spec in specs[::-1]: # reversed
             package_name, filename = self._split_spec(spec)
             if package_name is None: # absolute filename
                 directory = filename
@@ -82,25 +89,35 @@ class I18NConfiguratorMixin(object):
                 directory = os.path.join(package_path(package), filename)
 
             if not os.path.isdir(os.path.realpath(directory)):
-                raise ConfigurationError('"%s" is not a directory' % directory)
+                raise ConfigurationError('"%s" is not a directory' %
+                                         directory)
+            intr = self.introspectable('translation directories', directory,
+                                       spec, 'translation directory')
+            intr['directory'] = directory
+            intr['spec'] = spec
+            introspectables.append(intr)
+            directories.append(directory)
 
-            tdirs = self.registry.queryUtility(ITranslationDirectories)
-            if tdirs is None:
-                tdirs = []
-                self.registry.registerUtility(tdirs, ITranslationDirectories)
+        def register():
+            for directory in directories:
 
-            tdirs.insert(0, directory)
-            # XXX no action?
+                tdirs = self.registry.queryUtility(ITranslationDirectories)
+                if tdirs is None:
+                    tdirs = []
+                    self.registry.registerUtility(tdirs,
+                                                  ITranslationDirectories)
 
-        if specs:
+                tdirs.insert(0, directory)
 
-            # We actually only need an IChameleonTranslate function
-            # utility to be registered zero or one times.  We register the
-            # same function once for each added translation directory,
-            # which does too much work, but has the same effect.
+            if directories:
+                # We actually only need an IChameleonTranslate function
+                # utility to be registered zero or one times.  We register the
+                # same function once for each added translation directory,
+                # which does too much work, but has the same effect.
+                ctranslate = ChameleonTranslate(translator)
+                self.registry.registerUtility(ctranslate, IChameleonTranslate)
 
-            ctranslate = ChameleonTranslate(translator)
-            self.registry.registerUtility(ctranslate, IChameleonTranslate)
+        self.action(None, register, introspectables=introspectables)
 
 def translator(msg):
     request = get_current_request()

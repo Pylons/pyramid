@@ -27,7 +27,13 @@ class AdaptersConfiguratorMixin(object):
             iface = (iface,)
         def register():
             self.registry.registerHandler(subscriber, iface)
-        self.action(None, register)
+        intr = self.introspectable('subscribers',
+                                   id(subscriber),
+                                   self.object_description(subscriber),
+                                   'subscriber')
+        intr['subscriber'] = subscriber
+        intr['interfaces'] = iface
+        self.action(None, register, introspectables=(intr,))
         return subscriber
 
     @action_method
@@ -52,7 +58,15 @@ class AdaptersConfiguratorMixin(object):
                 reg.registerSelfAdapter((type_or_iface,), IResponse)
             else:
                 reg.registerAdapter(adapter, (type_or_iface,), IResponse)
-        self.action((IResponse, type_or_iface), register)
+        discriminator = (IResponse, type_or_iface)
+        intr = self.introspectable(
+            'response adapters',
+            discriminator,
+            self.object_description(adapter),
+            'response adapter')
+        intr['adapter'] = adapter
+        intr['type'] = type_or_iface
+        self.action(discriminator, register, introspectables=(intr,))
 
     def _register_response_adapters(self):
         # cope with WebOb response objects that aren't decorated with IResponse

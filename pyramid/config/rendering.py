@@ -48,9 +48,16 @@ class RenderingConfiguratorMixin(object):
             name = ''
         def register():
             self.registry.registerUtility(factory, IRendererFactory, name=name)
+        intr = self.introspectable('renderer factories',
+                                   name,
+                                   self.object_description(factory),
+                                   'renderer factory')
+        intr['factory'] = factory
+        intr['name'] = name
         # we need to register renderers early (in phase 1) because they are
         # used during view configuration (which happens in phase 3)
-        self.action((IRendererFactory, name), register, order=PHASE1_CONFIG)
+        self.action((IRendererFactory, name), register, order=PHASE1_CONFIG,
+                    introspectables=(intr,))
 
     @action_method
     def set_renderer_globals_factory(self, factory, warn=True):
@@ -68,7 +75,9 @@ class RenderingConfiguratorMixin(object):
 
         .. warning::
 
-           This method is deprecated as of Pyramid 1.1.
+           This method is deprecated as of Pyramid 1.1.  Use a BeforeRender
+           event subscriber as documented in the :ref:`hooks_chapter` chapter
+           instead.
 
         .. note::
 
@@ -88,4 +97,8 @@ class RenderingConfiguratorMixin(object):
         factory = self.maybe_dotted(factory)
         def register():
             self.registry.registerUtility(factory, IRendererGlobalsFactory)
+        intr = self.introspectable('renderer globals factory', None,
+                                   self.object_description(factory),
+                                   'renderer globals factory')
+        intr['factory'] = factory
         self.action(IRendererGlobalsFactory, register)

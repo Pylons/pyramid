@@ -1,7 +1,16 @@
+import operator
+
+from zope.interface import implementer
+
 from zope.interface.registry import Components
 
 from pyramid.compat import text_
-from pyramid.interfaces import ISettings
+
+from pyramid.interfaces import (
+    ISettings,
+    IIntrospector,
+    IIntrospectable,
+    )
 
 empty = text_('')
 
@@ -26,6 +35,7 @@ class Registry(Components, dict):
     # for optimization purposes, if no listeners are listening, don't try
     # to notify them
     has_listeners = False
+
     _settings = None
 
     def __nonzero__(self):
@@ -73,5 +83,164 @@ class Registry(Components, dict):
         self._settings = settings
 
     settings = property(_get_settings, _set_settings)
+
+@implementer(IIntrospector)
+class Introspector(object):
+    def __init__(self):
+        self._refs = {}
+        self._categories = {}
+        self._counter = 0
+
+    def add(self, intr):
+        category = self._categories.setdefault(intr.category_name, {})
+        category[intr.discriminator] = intr
+        category[intr.discriminator_hash] = intr
+        intr.order = self._counter
+        self._counter += 1
+
+    def get(self, category_name, discriminator, default=None):
+        category = self._categories.setdefault(category_name, {})
+        intr = category.get(discriminator, default)
+        return intr
+
+    def get_category(self, category_name, default=None, sort_key=None):
+        if sort_key is None:
+            sort_key = operator.attrgetter('order')
+        category = self._categories.get(category_name)
+        if category is None:
+            return default
+        values = category.values()
+        values = sorted(set(values), key=sort_key)
+        return [
+            {'introspectable':intr,
+             'related':self.related(intr)}
+             for intr in values
+             ]
+
+    def categorized(self, sort_key=None):
+        L = []
+        for category_name in self.categories():
+            L.append((category_name, self.get_category(category_name,
+                                                       sort_key=sort_key)))
+        return L
+
+    def categories(self):
+        return sorted(self._categories.keys())
+
+    def remove(self, category_name, discriminator):
+        intr = self.get(category_name, discriminator)
+        if intr is None:
+            return
+        L = self._refs.pop(intr, [])
+        for d in L:
+            L2 = self._refs[d]
+            L2.remove(intr)
+        category = self._categories[intr.category_name]
+        del category[intr.discriminator]
+        del category[intr.discriminator_hash]
+
+    def _get_intrs_by_pairs(self, pairs):
+        introspectables = []
+        for pair in pairs:
+            category_name, discriminator = pair
+            intr = self._categories.get(category_name, {}).get(discriminator)
+            if intr is None:
+                raise KeyError((category_name, discriminator))
+            introspectables.append(intr)
+        return introspectables
+
+    def relate(self, *pairs):
+        introspectables = self._get_intrs_by_pairs(pairs)
+        relatable = ((x,y) for x in introspectables for y in introspectables)
+        for x, y in relatable:
+            L = self._refs.setdefault(x, [])
+            if x is not y and y not in L:
+                L.append(y)
+
+    def unrelate(self, *pairs):
+        introspectables = self._get_intrs_by_pairs(pairs)
+        relatable = ((x,y) for x in introspectables for y in introspectables)
+        for x, y in relatable:
+            L = self._refs.get(x, [])
+            if y in L:
+                L.remove(y)
+
+    def related(self, intr):
+        category_name, discriminator = intr.category_name, intr.discriminator
+        intr = self._categories.get(category_name, {}).get(discriminator)
+        if intr is None:
+            raise KeyError((category_name, discriminator))
+        return self._refs.get(intr, [])
+
+@implementer(IIntrospector)
+class _NoopIntrospector(object):
+    def add(self, intr):
+        pass
+    def get(self, category_name, discriminator, default=None):
+        return default
+    def get_category(self, category_name, default=None, sort_key=None):
+        return default
+    def categorized(self, sort_key=None):
+        return []
+    def categories(self):
+        return []
+    def remove(self, category_name, discriminator):
+        return
+    def relate(self, *pairs):
+        return
+    unrelate = relate
+    def related(self, intr):
+        return []
+
+noop_introspector = _NoopIntrospector()
+
+@implementer(IIntrospectable)
+class Introspectable(dict):
+
+    order = 0 # mutated by introspector.add
+    action_info = None # mutated by self.register
+
+    def __init__(self, category_name, discriminator, title, type_name):
+        self.category_name = category_name
+        self.discriminator = discriminator
+        self.title = title
+        self.type_name = type_name
+        self._relations = []
+
+    def relate(self, category_name, discriminator):
+        self._relations.append((True, category_name, discriminator))
+
+    def unrelate(self, category_name, discriminator):
+        self._relations.append((False, category_name, discriminator))
+
+    @property
+    def discriminator_hash(self):
+        return hash(self.discriminator)
+
+    def __hash__(self):
+        return hash((self.category_name,) + (self.discriminator,))
+
+    def __repr__(self):
+        return '<%s category %r, discriminator %r>' % (self.__class__.__name__,
+                                                       self.category_name,
+                                                       self.discriminator)
+
+    def __nonzero__(self):
+        return True
+
+    __bool__ = __nonzero__ # py3
+
+    def register(self, introspector, action_info):
+        self.action_info = action_info
+        introspector.add(self)
+        for relate, category_name, discriminator in self._relations:
+            if relate:
+                method = introspector.relate
+            else:
+                method = introspector.unrelate
+            method(
+                (self.category_name, self.discriminator),
+                (category_name, discriminator)
+                )
 
 global_registry = Registry('global')

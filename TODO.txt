@@ -6,6 +6,23 @@ Must-Have
 
 - Change starter scaffold to use URL dispatch?
 
+- Introspection:
+
+  * Review narrative docs.
+
+  * ``default root factory`` category?
+
+  * ``default view mapper`` category?
+
+  * get rid of "tweens" category (can't sort properly?)
+
+  * implement ptweens and proutes based on introspection instead of current
+    state of affairs.
+
+  * introspection hiding for directives?
+
+- Give discriminators a nicer repr for conflict reporting?
+
 Nice-to-Have
 ------------
 
