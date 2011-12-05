@@ -289,11 +289,11 @@ introspectables in categories not described here.
 
     The ``pregenerator`` argument passed to ``add_route``.
 
-  ``pregenerator``
+  ``static``
 
     The ``static`` argument passed to ``add_route``.
 
-  ``pregenerator``
+  ``use_global_views``
 
     The ``use_global_views`` argument passed to ``add_route``.
 
