@@ -36,6 +36,9 @@ Must-Have
 
 - Test KARL.
 
+- Fix deployment recipes in cookbook (discourage proxying without changing
+  server).
+
 Nice-to-Have
 ------------
 
