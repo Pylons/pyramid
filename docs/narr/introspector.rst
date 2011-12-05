@@ -59,7 +59,7 @@ Introspectable Objects
 ----------------------
 
 Introspectable objects are returned from query methods of an introspector.
-Each introspectable object implements the attributes and methods the
+Each introspectable object implements the attributes and methods
 documented at :class:`pyramid.interfaces.IIntrospectable`.
 
 The important attributes shared by all introspectables are the following:
