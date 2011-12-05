@@ -94,6 +94,9 @@ Backwards Incompatibilities
   or ``--python-shell`` argument, which can be any of the values ``python``,
   ``ipython`` or ``bpython``.
 
+- Removed the ``pyramid.renderers.renderer_from_name`` function.  It has been
+  deprecated since Pyramid 1.0, and was never an API.
+
 Documentation Enhancements
 --------------------------
 

@@ -340,64 +340,6 @@ class TestChameleonRendererLookup(unittest.TestCase):
         self.assertNotEqual(reg.queryUtility(ITemplateRenderer, name=spec),
                             None)
 
-class TestRendererFromName(unittest.TestCase):
-    def setUp(self):
-        from zope.deprecation import __show__
-        __show__.off()
-        self.config = cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-        from zope.deprecation import __show__
-        __show__.on()
-
-    def _callFUT(self, path, package=None):
-        from pyramid.renderers import renderer_from_name
-        return renderer_from_name(path, package)
-
-    def test_it(self):
-        registry = self.config.registry
-        settings = {}
-        registry.settings = settings
-        from pyramid.interfaces import IRendererFactory
-        import os
-        here = os.path.dirname(os.path.abspath(__file__))
-        fixture = os.path.join(here, 'fixtures/minimal.pt')
-        def factory(info, **kw):
-            return info
-        self.config.registry.registerUtility(
-            factory, IRendererFactory, name='.pt')
-        result = self._callFUT(fixture)
-        self.assertEqual(result.registry, registry)
-        self.assertEqual(result.type, '.pt')
-        self.assertEqual(result.package, None)
-        self.assertEqual(result.name, fixture)
-        self.assertEqual(result.settings, settings)
-
-    def test_it_with_package(self):
-        import pyramid
-        registry = self.config.registry
-        settings = {}
-        registry.settings = settings
-        from pyramid.interfaces import IRendererFactory
-        import os
-        here = os.path.dirname(os.path.abspath(__file__))
-        fixture = os.path.join(here, 'fixtures/minimal.pt')
-        def factory(info, **kw):
-            return info
-        self.config.registry.registerUtility(
-            factory, IRendererFactory, name='.pt')
-        result = self._callFUT(fixture, pyramid)
-        self.assertEqual(result.registry, registry)
-        self.assertEqual(result.type, '.pt')
-        self.assertEqual(result.package, pyramid)
-        self.assertEqual(result.name, fixture)
-        self.assertEqual(result.settings, settings)
-
-    def test_it_no_renderer(self):
-        self.assertRaises(ValueError, self._callFUT, 'foo')
-        
-
 class Test_json_renderer_factory(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
@@ -718,6 +660,49 @@ class TestRendererHelper(unittest.TestCase):
         self.assertEqual(cloned_helper.package, 'package2')
         self.assertEqual(cloned_helper.registry, 'registry2')
         self.assertFalse(helper is cloned_helper)
+
+    def test_renderer_absolute_file(self):
+        registry = self.config.registry
+        settings = {}
+        registry.settings = settings
+        from pyramid.interfaces import IRendererFactory
+        import os
+        here = os.path.dirname(os.path.abspath(__file__))
+        fixture = os.path.join(here, 'fixtures/minimal.pt')
+        def factory(info, **kw):
+            return info
+        self.config.registry.registerUtility(
+            factory, IRendererFactory, name='.pt')
+        result = self._makeOne(fixture).renderer
+        self.assertEqual(result.registry, registry)
+        self.assertEqual(result.type, '.pt')
+        self.assertEqual(result.package, None)
+        self.assertEqual(result.name, fixture)
+        self.assertEqual(result.settings, settings)
+
+    def test_renderer_with_package(self):
+        import pyramid
+        registry = self.config.registry
+        settings = {}
+        registry.settings = settings
+        from pyramid.interfaces import IRendererFactory
+        import os
+        here = os.path.dirname(os.path.abspath(__file__))
+        fixture = os.path.join(here, 'fixtures/minimal.pt')
+        def factory(info, **kw):
+            return info
+        self.config.registry.registerUtility(
+            factory, IRendererFactory, name='.pt')
+        result = self._makeOne(fixture, pyramid).renderer
+        self.assertEqual(result.registry, registry)
+        self.assertEqual(result.type, '.pt')
+        self.assertEqual(result.package, pyramid)
+        self.assertEqual(result.name, fixture)
+        self.assertEqual(result.settings, settings)
+
+    def test_renderer_missing(self):
+        inst = self._makeOne('foo')
+        self.assertRaises(ValueError, getattr, inst, 'renderer')
 
 class TestNullRendererHelper(unittest.TestCase):
     def setUp(self):

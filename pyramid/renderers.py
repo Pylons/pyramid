@@ -4,7 +4,6 @@ import pkg_resources
 import threading
 
 from zope.interface import implementer
-from zope.deprecation import deprecated
 
 from pyramid.interfaces import (
     IChameleonLookup,
@@ -350,16 +349,6 @@ def template_renderer_factory(info, impl, lock=registry_lock):
         finally:
             lock.release()
     return lookup(info)
-
-def renderer_from_name(path, package=None):
-    return RendererHelper(name=path, package=package).renderer
-
-deprecated(
-    'renderer_from_name',
-    'The "pyramid.renderers.renderer_from_name" function was never an API. '
-    'However, its use has been observed "in the wild."  It will disappear in '
-    'the next major release. To replace it, use the '
-    '``pyramid.renderers.get_renderer`` API instead. ')
 
 @implementer(IRendererInfo)
 class RendererHelper(object):
