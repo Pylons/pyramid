@@ -26,20 +26,15 @@ DEFAULT_PHASH = md5().hexdigest()
 @implementer(IActionInfo)
 class ActionInfo(object):
     def __init__(self, file, line, function, src):
-        line = line or 0
-        src = src or ''
-        srclines = src.split('\n')
-        src = '\n'.join('    %s' % x for x in srclines)
-        self._src = src
         self.file = file
         self.line = line
-        self.column = None
-        self.eline = None
-        self.ecolumn = None
         self.function = function
+        self.src = src
 
     def __str__(self):
-        return 'Line %s of file %s:\n%s' % (self.line, self.file, self._src)
+        srclines = self.src.split('\n')
+        src = '\n'.join('    %s' % x for x in srclines)
+        return 'Line %s of file %s:\n%s' % (self.line, self.file, src)
 
 def action_method(wrapped):
     """ Wrapper to provide the right conflict info report data when a method
@@ -48,6 +43,9 @@ def action_method(wrapped):
         if self._ainfo is None:
             self._ainfo = []
         info = kw.pop('_info', None)
+        if is_nonstr_iter(info) and len(info) == 4:
+            # _info permitted as extract_stack tuple
+            info = ActionInfo(*info)
         if info is None:
             try:
                 f = traceback.extract_stack(limit=3)

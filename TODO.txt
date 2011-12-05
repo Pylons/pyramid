@@ -6,11 +6,15 @@ Must-Have
 
 - Introspection:
 
-  * Narrative docs.
+  * Why do translation directories report weird actioninfo?
+
+  * Review narrative docs.
 
   * ``default root factory`` category?
 
   * ``default view mapper`` category?
+
+  * get rid of "tweens" category (can't sort properly?)
 
   * implement ptweens and proutes based on introspection instead of current
     state of affairs.

@@ -1008,15 +1008,6 @@ class IActionInfo(Interface):
     line = Attribute(
         'Starting line number in file (as an integer) of action-invoking code.'
         'This will be ``None`` if the value could not be determined.')
-    column = Attribute(
-        'Starting column number in file (as an integer) of action-invoking '
-        'code.  This will be ``None`` if the value could not be determined.')
-    eline = Attribute(
-        'Ending line number in file (as an integer) of action-invoking code.'
-        'This will be ``None`` if the value could not be determined.')
-    ecolumn = Attribute(
-        'Ending column number in file (as an integer) of action-invoking code.'
-        'This will be ``None`` if the value could not be determined.')
 
     def __str__():
         """ Return a representation of the action information (including

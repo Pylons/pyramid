@@ -243,5 +243,4 @@ class Introspectable(dict):
                 (category_name, discriminator)
                 )
 
-
 global_registry = Registry('global')

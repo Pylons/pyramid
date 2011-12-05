@@ -331,11 +331,11 @@ class TestActionInfo(unittest.TestCase):
         verifyObject(IActionInfo, self._makeOne('f', 0, 'f', 'f'))
 
     def test_ctor(self):
-        inst = self._makeOne('filename', 10, 'function', '  linerepr\n\nfoo')
+        inst = self._makeOne('filename', 10, 'function', 'src')
+        self.assertEqual(inst.file, 'filename')
         self.assertEqual(inst.line, 10)
-        self.assertEqual(inst.column, None)
-        self.assertEqual(inst.eline, None)
-        self.assertEqual(inst.ecolumn, None)
+        self.assertEqual(inst.function, 'function')
+        self.assertEqual(inst.src, 'src')
 
     def test___str__(self):
         inst = self._makeOne('filename', 0, 'function', '   linerepr  ')

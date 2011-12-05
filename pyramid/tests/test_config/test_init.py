@@ -976,7 +976,7 @@ pyramid.tests.test_config.dummy_include2""",
                 conflicts = e._conflicts.values()
                 for conflict in conflicts:
                     for confinst in conflict:
-                        yield confinst[3]
+                        yield confinst.src
             which = list(scanconflicts(why))
             self.assertEqual(len(which), 4)
             self.assertTrue("@view_config(renderer='string')" in which)
