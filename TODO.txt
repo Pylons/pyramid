@@ -6,8 +6,6 @@ Must-Have
 
 - Introspection:
 
-  * Why do translation directories report weird actioninfo?
-
   * Review narrative docs.
 
   * ``default root factory`` category?

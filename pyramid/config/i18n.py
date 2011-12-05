@@ -50,6 +50,7 @@ class I18NConfiguratorMixin(object):
         locale_negotiator = self.maybe_dotted(negotiator)
         self.registry.registerUtility(locale_negotiator, ILocaleNegotiator)
 
+    @action_method
     def add_translation_dirs(self, *specs):
         """ Add one or more :term:`translation directory` paths to the
         current configuration state.  The ``specs`` argument is a
