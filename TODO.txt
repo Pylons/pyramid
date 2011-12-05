@@ -32,6 +32,8 @@ Must-Have
 
 - Release new pyramid_zcml package (depend on dictactions z.config).
 
+- API for resolving asset specs and dotted names.
+
 Nice-to-Have
 ------------
 

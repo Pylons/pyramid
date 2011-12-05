@@ -270,6 +270,8 @@ exposed, and the request is configured to generate urls from the host
    single: IPython
    single: bpython
 
+.. _ipython_or_bpython:
+
 IPython or bpython
 ~~~~~~~~~~~~~~~~~~
 

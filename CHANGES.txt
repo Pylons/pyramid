@@ -28,7 +28,7 @@ Features
 - Configuration conflict reporting is reported in a more understandable way
   ("Line 11 in file..." vs. a repr of a tuple of similar info).
 
-- An configuration introspection system was added; see the narrative
+- A configuration introspection system was added; see the narrative
   documentation chapter entitled "Pyramid Configuration Introspection" for
   more information.  New APIs: ``pyramid.registry.Introspectable``,
   ``pyramid.config.Configurator.introspector``,

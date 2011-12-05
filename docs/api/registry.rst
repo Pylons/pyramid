@@ -44,3 +44,4 @@
    introspection altogether (pass as ``introspector`` to the
    :term:`Configurator` constructor).
 
+   This class is new as of :app:`Pyramid` 1.3.
