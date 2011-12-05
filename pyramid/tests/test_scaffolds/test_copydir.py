@@ -237,11 +237,10 @@ class Test_should_skip_file(unittest.TestCase):
 
     def test_should_skip_bytecompiled_file(self):
         for name in ('afilename.pyc', 'afilename.pyo'):
-            # extension = os.path.splitext(name)[1]
-            # self.assertEqual(
-            #     self._callFUT(name),
-            #     'Skipping %s file ' % extension + '%(filename)s')
-            self.assertRaises(TypeError, self._callFUT, name)
+            extension = os.path.splitext(name)[1]
+            self.assertEqual(
+                self._callFUT(name),
+                'Skipping %s file ' % extension + '%(filename)s')
 
     def test_should_skip_jython_class_file(self):
         self.assertEqual(
