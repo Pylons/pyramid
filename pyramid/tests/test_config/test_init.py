@@ -646,17 +646,17 @@ pyramid.tests.test_config.dummy_include2""",
     def test_introspector_decorator(self):
         inst = self._makeOne()
         default = inst.introspector
-        self.failUnless(hasattr(default, 'add'))
+        self.assertTrue(hasattr(default, 'add'))
         self.assertEqual(inst.introspector, inst.registry.introspector)
         introspector = DummyIntrospector()
         inst.introspector = introspector
         new = inst.introspector
-        self.failUnless(new is introspector)
+        self.assertTrue(new is introspector)
         self.assertEqual(inst.introspector, inst.registry.introspector)
         del inst.introspector
         default = inst.introspector
-        self.failIf(default is new)
-        self.failUnless(hasattr(default, 'add'))
+        self.assertFalse(default is new)
+        self.assertTrue(hasattr(default, 'add'))
 
     def test_make_wsgi_app(self):
         import pyramid.config
