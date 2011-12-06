@@ -31,8 +31,15 @@ Must-Have
 - Fix deployment recipes in cookbook (discourage proxying without changing
   server).
 
+- Fix i18n and extending chapters to mention $venv/bin/python instead of bare
+  "python".
+
 Nice-to-Have
 ------------
+
+- Try "with transaction.manager" in an exception view with SQLA (preempt
+  homina homina response about how to write "to the database" from within in
+  an exception view).
 
 - Add a default-view-config-params decorator that can be applied to a class
   which names defaults for method-based view_config decorator options.
