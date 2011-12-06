@@ -92,6 +92,12 @@ Backwards Incompatibilities
 - Removed the ``pyramid.renderers.renderer_from_name`` function.  It has been
   deprecated since Pyramid 1.0, and was never an API.
 
+- To use ZCML with versions of Pyramid >= 1.3, you will need ``pyramid_zcml``
+  version >= 0.8 and ``zope.configuration`` version >= 3.8.0.  The
+  ``pyramid_zcml`` package version 0.8 is backwards compatible all the way to
+  Pyramid 1.0, so you won't be warned if you have older versions installed
+  and upgrade Pyramid "in-place"; it may simply break instead.
+
 Dependencies
 ------------
 
