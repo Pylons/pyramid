@@ -19,18 +19,16 @@ Must-Have
 
   * introspection hiding for directives?
 
-  * debug toolbar panel for introspection
+  * make debug toolbar panel for introspection look less ugly
 
 - Release new pyramid_debugtoolbar package that has introspection panel
   (already py3 compat released).
-
-- Release new pyramid_tm package (trunk is Py3 compat).
 
 - Release new zope.configuration package (based on chrism-dictactions).
 
 - Release new pyramid_zcml package (depend on dictactions z.config).
 
-- Release new zope.sqlalchemy package.
+- Release new zope.sqlalchemy package (chrism-py3 branch is py3 compat).
 
 - API for resolving asset specs and dotted names.
 
