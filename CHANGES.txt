@@ -1,11 +1,14 @@
-Next Release
-============
+1.2.4 (2011-12-06)
+==================
 
 Features
 --------
 
 - ``bpython`` interpreter compatibility in ``pshell``. See the "Command-Line
   Pyramid" narrative docs chapter for more information.
+
+Bug Fixes
+---------
 
 - Prevent a scaffold rendering from being named ``site`` (conflicts with
   Python internal site.py).
