@@ -24,8 +24,6 @@ Must-Have
 - Release new pyramid_debugtoolbar package that has introspection panel
   (already py3 compat released).
 
-- Release new zope.sqlalchemy package (chrism-py3 branch is py3 compat).
-
 - API for resolving asset specs and dotted names.
 
 - Fix deployment recipes in cookbook (discourage proxying without changing
@@ -38,6 +36,8 @@ Must-Have
 
 Nice-to-Have
 ------------
+
+- CherryPy server testing / exploded from CherryPy itself.
 
 - Try "with transaction.manager" in an exception view with SQLA (preempt
   homina homina response about how to write "to the database" from within in
