@@ -1477,6 +1477,26 @@ class Test_resolveConflicts(unittest.TestCase):
                 ]
             )
 
+    def test_it_with_zopeconfig_380_dict(self):
+        from pyramid.tests.test_config import dummyfactory as f
+        result = self._callFUT([
+            {'discriminator':None, 'callable':f, 'args':(), 'kw':{},
+             'includepath':(), 'info':None, 'order':0},
+            (1, f, (1,), {}, (), 'first'),
+            (1, f, (2,), {}, ('x',), 'second'),
+            (1, f, (3,), {}, ('y',), 'third'),
+            (4, f, (4,), {}, ('y',), 'should be last', 99999),
+            (3, f, (3,), {}, ('y',)),
+            (None, f, (5,), {}, ('y',)),
+            ])
+        self.assertEqual(result,
+                         [(None, f),
+                          (1, f, (1,), {}, (), 'first'),
+                          (3, f, (3,), {}, ('y',)),
+                          (None, f, (5,), {}, ('y',)),
+                          (4, f, (4,), {}, ('y',), 'should be last')])
+        
+
 class TestGlobalRegistriesIntegration(unittest.TestCase):
     def setUp(self):
         from pyramid.config import global_registries

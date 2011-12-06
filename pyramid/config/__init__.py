@@ -969,8 +969,18 @@ def resolveConflicts(actions):
     unique = {}
     output = []
     for i in range(len(actions)):
-        (discriminator, callable, args, kw, includepath, info, order
-         ) = expand_action(*(actions[i]))
+        action = actions[i]
+        if isinstance(action, dict): # z.config 3.8.0+
+            discriminator = action['discriminator']
+            callable = action['callable']
+            args = action['args']
+            kw = action['kw']
+            includepath = action['includepath']
+            info = action['info']
+            order = action['order']
+        else:
+            (discriminator, callable, args, kw, includepath, info, order
+             ) = expand_action(*(actions[i]))
 
         order = order or i
         if discriminator is None:

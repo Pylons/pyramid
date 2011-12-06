@@ -10,6 +10,9 @@ Features
 - Prevent a scaffold rendering from being named ``site`` (conflicts with
   Python internal site.py).
 
+- Forward compatibility for ``pyramid_zcml`` >= 0.8 + ``zope.configuration``
+  >= 3.8.0.
+
 Backward Incompatibilities
 --------------------------
 
