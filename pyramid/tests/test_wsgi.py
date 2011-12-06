@@ -12,6 +12,14 @@ class WSGIAppTests(unittest.TestCase):
         response = decorator(context, request)
         self.assertEqual(response, dummyapp)
 
+    def test_decorator_object_instance(self):
+        context = DummyContext()
+        request = DummyRequest()
+        app = DummyApp()
+        decorator = self._callFUT(app)
+        response = decorator(context, request)
+        self.assertEqual(response, app)
+
 class WSGIApp2Tests(unittest.TestCase):
     def _callFUT(self, app):
         from pyramid.wsgi import wsgiapp2
@@ -84,8 +92,24 @@ class WSGIApp2Tests(unittest.TestCase):
         self.assertEqual(request.environ['PATH_INFO'], '/')
         self.assertEqual(request.environ['SCRIPT_NAME'], '')
 
+    def test_decorator_on_callable_object_instance(self):
+        context = DummyContext()
+        request = DummyRequest()
+        request.subpath = ()
+        request.environ = {'SCRIPT_NAME':'/foo', 'PATH_INFO':'/'}
+        app = DummyApp()
+        decorator = self._callFUT(app)
+        response = decorator(context, request)
+        self.assertEqual(response, app)
+        self.assertEqual(request.environ['PATH_INFO'], '/')
+        self.assertEqual(request.environ['SCRIPT_NAME'], '/foo')
+
 def dummyapp(environ, start_response):
     """ """
+
+class DummyApp(object):
+    def __call__(self, environ, start_response):
+        """ """
 
 class DummyContext:
     pass
