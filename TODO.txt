@@ -24,15 +24,9 @@ Must-Have
 - Release new pyramid_debugtoolbar package that has introspection panel
   (already py3 compat released).
 
-- Release new zope.configuration package (based on chrism-dictactions).
-
-- Release new pyramid_zcml package (depend on dictactions z.config).
-
 - Release new zope.sqlalchemy package (chrism-py3 branch is py3 compat).
 
 - API for resolving asset specs and dotted names.
-
-- Test KARL.
 
 - Fix deployment recipes in cookbook (discourage proxying without changing
   server).
