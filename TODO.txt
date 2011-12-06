@@ -34,6 +34,8 @@ Must-Have
 - Fix i18n and extending chapters to mention $venv/bin/python instead of bare
   "python".
 
+- Implement analogue of "paster request"?
+
 Nice-to-Have
 ------------
 
