@@ -64,6 +64,10 @@ Bug Fixes
 - Prevent a scaffold rendering from being named ``site`` (conflicts with
   Python internal site.py).
 
+- Support for using instances as targets of the ``pyramid.wsgi.wsgiapp`` and
+  ``pryramid.wsgi.wsgiapp2`` functions.
+  See https://github.com/Pylons/pyramid/pull/370 for more info.
+
 Backwards Incompatibilities
 ---------------------------
 
