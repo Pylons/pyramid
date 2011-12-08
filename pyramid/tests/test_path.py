@@ -223,21 +223,21 @@ class TestAssetResolver(unittest.TestCase):
         inst = self._makeOne(None)
         r = inst.resolve(os.path.join(here, 'test_asset.py'))
         self.assertEqual(r.__class__, FSAssetDescriptor)
-        self.failUnless(r.exists())
+        self.assertTrue(r.exists())
 
     def test_resolve_absspec(self):
         from pyramid.path import PkgResourcesAssetDescriptor
         inst = self._makeOne(None)
         r = inst.resolve('pyramid.tests:test_asset.py')
         self.assertEqual(r.__class__, PkgResourcesAssetDescriptor)
-        self.failUnless(r.exists())
+        self.assertTrue(r.exists())
 
     def test_resolve_relspec_with_pkg(self):
         from pyramid.path import PkgResourcesAssetDescriptor
         inst = self._makeOne('pyramid.tests')
         r = inst.resolve('test_asset.py')
         self.assertEqual(r.__class__, PkgResourcesAssetDescriptor)
-        self.failUnless(r.exists())
+        self.assertTrue(r.exists())
 
     def test_resolve_relspec_no_package(self):
         inst = self._makeOne(None)
@@ -249,7 +249,7 @@ class TestAssetResolver(unittest.TestCase):
         inst = self._makeOne(CALLER_PACKAGE)
         r = inst.resolve('test_asset.py')
         self.assertEqual(r.__class__, PkgResourcesAssetDescriptor)
-        self.failUnless(r.exists())
+        self.assertTrue(r.exists())
         
 class TestPkgResourcesAssetDescriptor(unittest.TestCase):
     def _getTargetClass(self):

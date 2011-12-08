@@ -75,7 +75,7 @@ def package_path(package):
     return prefix
 
 class _CALLER_PACKAGE(object):
-    def __repr__(self): # for docs
+    def __repr__(self): # pragma: no cover (for docs)
         return 'pyramid.path.CALLER_PACKAGE'
 
 CALLER_PACKAGE = _CALLER_PACKAGE()
