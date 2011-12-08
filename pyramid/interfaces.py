@@ -1013,6 +1013,44 @@ class IActionInfo(Interface):
         """ Return a representation of the action information (including
         source code from file, if possible) """
 
+class IAssetDescriptor(Interface):
+    """
+    Describes an :term:`asset`.
+    """
+
+    def absspec():
+        """
+        Returns the absolute asset specification for this asset
+        (e.g. ``mypackage:templates/foo.pt``).
+        """
+
+    def abspath():
+        """
+        Returns an absolute path in the filesystem to the asset.
+        """
+
+    def stream():
+        """
+        Returns an input stream for reading asset contents.  Raises an
+        exception if the asset is a directory or does not exist.
+        """
+
+    def isdir():
+        """
+        Returns True if the asset is a directory, otherwise returns False.
+        """
+
+    def listdir():
+        """
+        Returns iterable of filenames of directory contents.  Raises an
+        exception if asset is not a directory.
+        """
+
+    def exists():
+        """
+        Returns True if asset exists, otherwise returns False.
+        """
+
 # configuration phases: a lower phase number means the actions associated
 # with this phase will be executed earlier than those with later phase
 # numbers.  The default phase number is 0, FTR.

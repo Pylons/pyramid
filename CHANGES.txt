@@ -38,6 +38,11 @@ Features
 - Allow extra keyword arguments to be passed to the
   ``pyramid.config.Configurator.action`` method.
 
+- New APIs: ``pyramid.path.AssetResolver`` and
+  ``pyramid.path.DottedNameResolver``.  The former can be used to resolve
+  asset specifications, the latter can be used to resolve dotted names to
+  modules or packages.
+
 Bug Fixes
 ---------
 

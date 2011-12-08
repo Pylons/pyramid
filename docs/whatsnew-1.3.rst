@@ -43,6 +43,12 @@ New APIs were added to support introspection
 Minor Feature Additions
 -----------------------
 
+- New APIs: :class:`pyramid.path.AssetResolver` and
+  :class:`pyramid.path.DottedNameResolver`.  The former can be used to
+  resolve an :term:`asset specification` to an API that can be used to read
+  the asset's data, the latter can be used to resolve a :term:`dotted Python
+  name` to a module or a package.
+
 - A ``mako.directories`` setting is no longer required to use Mako templates
   Rationale: Mako template renderers can be specified using an absolute asset
   spec.  An entire application can be written with such asset specs,

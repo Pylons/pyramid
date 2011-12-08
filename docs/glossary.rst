@@ -977,3 +977,9 @@ Glossary
       a running Pyramid application.  An introspectable is associated with a
       :term:`action` by virtue of the
       :meth:`pyramid.config.Configurator.action` method.
+
+   asset descriptor
+      An instance representing an :term:`asset specification` provided by the
+      :meth:`pyramid.path.AssetResolver.resolve` method.  It supports the
+      methods and attributes documented in
+      :class:`pyramid.interfaces.IAssetDescriptor`.

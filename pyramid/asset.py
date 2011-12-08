@@ -40,3 +40,4 @@ def abspath_from_asset_spec(spec, pname='__main__'):
     if pname is None:
         return filename
     return pkg_resources.resource_filename(pname, filename)
+

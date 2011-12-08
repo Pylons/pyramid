@@ -1,4 +1,7 @@
 import unittest
+import os
+
+here = os.path.abspath(os.path.dirname(__file__))
 
 class Test_resolve_asset_spec(unittest.TestCase):
     def _callFUT(self, spec, package_name='__main__'):
@@ -6,11 +9,8 @@ class Test_resolve_asset_spec(unittest.TestCase):
         return resolve_asset_spec(spec, package_name)
 
     def test_abspath(self):
-        import os
-        here = os.path.dirname(__file__)
-        path = os.path.abspath(here)
-        package_name, filename = self._callFUT(path, 'apackage')
-        self.assertEqual(filename, path)
+        package_name, filename = self._callFUT(here, 'apackage')
+        self.assertEqual(filename, here)
         self.assertEqual(package_name, None)
 
     def test_rel_spec(self):
@@ -57,11 +57,8 @@ class Test_abspath_from_asset_spec(unittest.TestCase):
         self.assertEqual(result, '/abc')
 
     def test_pkgrelative(self):
-        import os
-        here = os.path.dirname(__file__)
-        path = os.path.abspath(here)
         result = self._callFUT('abc', 'pyramid.tests')
-        self.assertEqual(result, os.path.join(path, 'abc'))
+        self.assertEqual(result, os.path.join(here, 'abc'))
 
 class Test_asset_spec_from_abspath(unittest.TestCase):
     def _callFUT(self, abspath, package):
@@ -74,20 +71,16 @@ class Test_asset_spec_from_abspath(unittest.TestCase):
         self.assertEqual(result, 'abspath')
 
     def test_abspath_startswith_package_path(self):
-        import os
-        abspath = os.path.join(os.path.dirname(__file__), 'fixtureapp')
+        abspath = os.path.join(here, 'fixtureapp')
         pkg = DummyPackage('pyramid.tests')
         pkg.__file__ = 'file'
         result = self._callFUT(abspath, pkg)
         self.assertEqual(result, 'pyramid:fixtureapp')
 
     def test_abspath_doesnt_startwith_package_path(self):
-        import os
-        abspath = os.path.dirname(__file__)
         pkg = DummyPackage('pyramid.tests')
-        result = self._callFUT(abspath, pkg)
-        self.assertEqual(result, abspath)
-        
+        result = self._callFUT(here, pkg)
+        self.assertEqual(result, here)
 
 class DummyPackage:
     def __init__(self, name):

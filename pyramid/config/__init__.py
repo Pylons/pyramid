@@ -53,7 +53,6 @@ from pyramid.settings import aslist
 from pyramid.threadlocal import manager
 
 from pyramid.util import (
-    DottedNameResolver,
     WeakOrderedSet,
     object_description,
     )
@@ -75,6 +74,8 @@ from pyramid.config.util import (
     )
 from pyramid.config.views import ViewsConfiguratorMixin
 from pyramid.config.zca import ZCAConfiguratorMixin
+
+from pyramid.path import DottedNameResolver
 
 empty = text_('')
 _marker = object()
