@@ -32,7 +32,8 @@ def asset_spec_from_abspath(abspath, package):
         return '%s:%s' % (package_name(package),
                           relpath.replace(os.path.sep, '/'))
     return abspath
-            
+
+# bw compat only; use pyramid.path.AssetDescriptor.abspath() instead
 def abspath_from_asset_spec(spec, pname='__main__'):
     if pname is None:
         return spec
