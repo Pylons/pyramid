@@ -24,8 +24,6 @@ Must-Have
 - Release new pyramid_debugtoolbar package that has introspection panel
   (already py3 compat released).
 
-- API for resolving asset specs and dotted names.
-
 - Fix deployment recipes in cookbook (discourage proxying without changing
   server).
 
@@ -35,6 +33,8 @@ Must-Have
 - Implement analogue of "paster request"?
 
 - AssetResolver method to guess relative based on caller?
+
+- Review "pyramid.compat" API; trim unnecessary APIs from docs.
 
 Nice-to-Have
 ------------
