@@ -32,9 +32,9 @@ Must-Have
 
 - Implement analogue of "paster request"?
 
-- AssetResolver method to guess relative based on caller?
-
 - Review "pyramid.compat" API; trim unnecessary APIs from docs.
+
+- Figure out a way to not invoke git on install (docs/conf.py).
 
 Nice-to-Have
 ------------
