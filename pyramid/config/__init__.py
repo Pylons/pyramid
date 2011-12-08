@@ -278,8 +278,8 @@ class Configurator(
             package = caller_package()
         name_resolver = DottedNameResolver(package)
         self.name_resolver = name_resolver
-        self.package_name = name_resolver.package_name
-        self.package = name_resolver.package
+        self.package_name = name_resolver.get_package_name()
+        self.package = name_resolver.get_package()
         self.registry = registry
         self.autocommit = autocommit
         self.route_prefix = route_prefix
@@ -339,6 +339,7 @@ class Configurator(
         self._fix_registry()
 
         if introspector is not None:
+            # use nondefault introspector
             self.introspector = introspector
 
         self._set_settings(settings)
@@ -484,9 +485,9 @@ class Configurator(
     def _del_introspector(self):
         del self.registry.introspector
 
-    introspector = property(_get_introspector,
-                            _set_introspector,
-                            _del_introspector)
+    introspector = property(
+        _get_introspector, _set_introspector, _del_introspector
+        )
 
     @property
     def action_info(self):

@@ -170,6 +170,34 @@ class TestPackageName(unittest.TestCase):
         result = self._callFUT(__main__)
         self.assertEqual(result, '__main__')
 
+class TestResolver(unittest.TestCase):
+    def _getTargetClass(self):
+        from pyramid.path import Resolver
+        return Resolver
+
+    def _makeOne(self, package):
+        return self._getTargetClass()(package)
+
+    def test_get_package_caller_package(self):
+        import pyramid.tests
+        from pyramid.path import CALLER_PACKAGE
+        self.assertEqual(self._makeOne(CALLER_PACKAGE).get_package(),
+                         pyramid.tests)
+
+    def test_get_package_name_caller_package(self):
+        from pyramid.path import CALLER_PACKAGE
+        self.assertEqual(self._makeOne(CALLER_PACKAGE).get_package_name(),
+                         'pyramid.tests')
+
+    def test_get_package_string(self):
+        import pyramid.tests
+        self.assertEqual(self._makeOne('pyramid.tests').get_package(),
+                         pyramid.tests)
+
+    def test_get_package_name_string(self):
+        self.assertEqual(self._makeOne('pyramid.tests').get_package_name(),
+                         'pyramid.tests')
+
 class TestAssetResolver(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.path import AssetResolver
@@ -182,14 +210,12 @@ class TestAssetResolver(unittest.TestCase):
         import sys
         tests = sys.modules['pyramid.tests']
         inst = self._makeOne(tests)
-        self.assertEqual(inst.package_name, 'pyramid.tests')
         self.assertEqual(inst.package, tests)
 
     def test_ctor_as_str(self):
         import sys
         tests = sys.modules['pyramid.tests']
         inst = self._makeOne('pyramid.tests')
-        self.assertEqual(inst.package_name, 'pyramid.tests')
         self.assertEqual(inst.package, tests)
 
     def test_resolve_abspath(self):
@@ -216,6 +242,14 @@ class TestAssetResolver(unittest.TestCase):
     def test_resolve_relspec_no_package(self):
         inst = self._makeOne(None)
         self.assertRaises(ValueError, inst.resolve, 'test_asset.py')
+
+    def test_resolve_relspec_caller_package(self):
+        from pyramid.path import PkgResourcesAssetDescriptor
+        from pyramid.path import CALLER_PACKAGE
+        inst = self._makeOne(CALLER_PACKAGE)
+        r = inst.resolve('test_asset.py')
+        self.assertEqual(r.__class__, PkgResourcesAssetDescriptor)
+        self.failUnless(r.exists())
         
 class TestPkgResourcesAssetDescriptor(unittest.TestCase):
     def _getTargetClass(self):
@@ -338,66 +372,66 @@ class TestDottedNameResolver(unittest.TestCase):
     def test_zope_dottedname_style_resolve_builtin(self):
         typ = self._makeOne()
         if PY3: # pragma: no cover
-            result = typ._zope_dottedname_style('builtins.str')
+            result = typ._zope_dottedname_style('builtins.str', None)
         else:
-            result = typ._zope_dottedname_style('__builtin__.str')
+            result = typ._zope_dottedname_style('__builtin__.str', None)
         self.assertEqual(result, str)
 
     def test_zope_dottedname_style_resolve_absolute(self):
         typ = self._makeOne()
         result = typ._zope_dottedname_style(
-            'pyramid.tests.test_path.TestDottedNameResolver')
+            'pyramid.tests.test_path.TestDottedNameResolver', None)
         self.assertEqual(result, self.__class__)
 
     def test_zope_dottedname_style_irrresolveable_absolute(self):
         typ = self._makeOne()
         self.assertRaises(ImportError, typ._zope_dottedname_style,
-            'pyramid.test_path.nonexisting_name')
+            'pyramid.test_path.nonexisting_name', None)
 
     def test__zope_dottedname_style_resolve_relative(self):
         import pyramid.tests
-        typ = self._makeOne(package=pyramid.tests)
+        typ = self._makeOne()
         result = typ._zope_dottedname_style(
-            '.test_path.TestDottedNameResolver')
+            '.test_path.TestDottedNameResolver', pyramid.tests)
         self.assertEqual(result, self.__class__)
 
     def test__zope_dottedname_style_resolve_relative_leading_dots(self):
         import pyramid.tests.test_configuration
-        typ = self._makeOne(package=pyramid.tests)
+        typ = self._makeOne()
         result = typ._zope_dottedname_style(
-            '..tests.test_path.TestDottedNameResolver')
+            '..tests.test_path.TestDottedNameResolver', pyramid.tests)
         self.assertEqual(result, self.__class__)
 
     def test__zope_dottedname_style_resolve_relative_is_dot(self):
         import pyramid.tests
-        typ = self._makeOne(package=pyramid.tests)
-        result = typ._zope_dottedname_style('.')
+        typ = self._makeOne()
+        result = typ._zope_dottedname_style('.', pyramid.tests)
         self.assertEqual(result, pyramid.tests)
 
     def test__zope_dottedname_style_irresolveable_relative_is_dot(self):
         typ = self._makeOne()
-        e = self.config_exc(typ._zope_dottedname_style, '.')
+        e = self.config_exc(typ._zope_dottedname_style, '.', None)
         self.assertEqual(
             e.args[0],
             "relative name '.' irresolveable without package")
 
     def test_zope_dottedname_style_resolve_relative_nocurrentpackage(self):
         typ = self._makeOne()
-        e = self.config_exc(typ._zope_dottedname_style, '.whatever')
+        e = self.config_exc(typ._zope_dottedname_style, '.whatever', None)
         self.assertEqual(
             e.args[0],
             "relative name '.whatever' irresolveable without package")
 
     def test_zope_dottedname_style_irrresolveable_relative(self):
         import pyramid.tests
-        typ = self._makeOne(package=pyramid.tests)
+        typ = self._makeOne()
         self.assertRaises(ImportError, typ._zope_dottedname_style,
-                          '.notexisting')
+                          '.notexisting', pyramid.tests)
 
     def test__zope_dottedname_style_resolveable_relative(self):
         import pyramid
-        typ = self._makeOne(package=pyramid)
-        result = typ._zope_dottedname_style('.tests')
+        typ = self._makeOne()
+        result = typ._zope_dottedname_style('.tests', pyramid)
         from pyramid import tests
         self.assertEqual(result, tests)
 
@@ -405,48 +439,48 @@ class TestDottedNameResolver(unittest.TestCase):
         typ = self._makeOne()
         self.assertRaises(
             ImportError,
-            typ._zope_dottedname_style, 'pyramid.fudge.bar')
+            typ._zope_dottedname_style, 'pyramid.fudge.bar', None)
 
     def test__zope_dottedname_style_resolveable_absolute(self):
         typ = self._makeOne()
         result = typ._zope_dottedname_style(
-            'pyramid.tests.test_path.TestDottedNameResolver')
+            'pyramid.tests.test_path.TestDottedNameResolver', None)
         self.assertEqual(result, self.__class__)
 
     def test__pkg_resources_style_resolve_absolute(self):
         typ = self._makeOne()
         result = typ._pkg_resources_style(
-            'pyramid.tests.test_path:TestDottedNameResolver')
+            'pyramid.tests.test_path:TestDottedNameResolver', None)
         self.assertEqual(result, self.__class__)
 
     def test__pkg_resources_style_irrresolveable_absolute(self):
         typ = self._makeOne()
         self.assertRaises(ImportError, typ._pkg_resources_style,
-            'pyramid.tests:nonexisting')
+            'pyramid.tests:nonexisting', None)
 
     def test__pkg_resources_style_resolve_relative(self):
         import pyramid.tests
-        typ = self._makeOne(package=pyramid.tests)
+        typ = self._makeOne()
         result = typ._pkg_resources_style(
-            '.test_path:TestDottedNameResolver')
+            '.test_path:TestDottedNameResolver', pyramid.tests)
         self.assertEqual(result, self.__class__)
 
     def test__pkg_resources_style_resolve_relative_is_dot(self):
         import pyramid.tests
-        typ = self._makeOne(package=pyramid.tests)
-        result = typ._pkg_resources_style('.')
+        typ = self._makeOne()
+        result = typ._pkg_resources_style('.', pyramid.tests)
         self.assertEqual(result, pyramid.tests)
 
     def test__pkg_resources_style_resolve_relative_nocurrentpackage(self):
         typ = self._makeOne()
         self.assertRaises(ValueError, typ._pkg_resources_style,
-                          '.whatever')
+                          '.whatever', None)
 
     def test__pkg_resources_style_irrresolveable_relative(self):
         import pyramid
-        typ = self._makeOne(package=pyramid)
+        typ = self._makeOne()
         self.assertRaises(ImportError, typ._pkg_resources_style,
-                          ':notexisting')
+                          ':notexisting', pyramid)
 
     def test_resolve_not_a_string(self):
         typ = self._makeOne()
@@ -469,17 +503,27 @@ class TestDottedNameResolver(unittest.TestCase):
         typ = self._makeOne()
         self.assertRaises(ImportError, typ.resolve, 'cant.be.found')
 
+    def test_resolve_caller_package(self):
+        from pyramid.path import CALLER_PACKAGE
+        typ = self._makeOne(CALLER_PACKAGE)
+        self.assertEqual(typ.resolve('.test_path.TestDottedNameResolver'),
+                         self.__class__)
+
+    def test_maybe_resolve_caller_package(self):
+        from pyramid.path import CALLER_PACKAGE
+        typ = self._makeOne(CALLER_PACKAGE)
+        self.assertEqual(typ.maybe_resolve('.test_path.TestDottedNameResolver'),
+                         self.__class__)
+
     def test_ctor_string_module_resolveable(self):
         import pyramid.tests
         typ = self._makeOne('pyramid.tests.test_path')
         self.assertEqual(typ.package, pyramid.tests)
-        self.assertEqual(typ.package_name, 'pyramid.tests')
 
     def test_ctor_string_package_resolveable(self):
         import pyramid.tests
         typ = self._makeOne('pyramid.tests')
         self.assertEqual(typ.package, pyramid.tests)
-        self.assertEqual(typ.package_name, 'pyramid.tests')
 
     def test_ctor_string_irresolveable(self):
         self.assertRaises(ValueError, self._makeOne, 'cant.be.found')
@@ -489,19 +533,15 @@ class TestDottedNameResolver(unittest.TestCase):
         import pyramid.tests.test_path
         typ = self._makeOne(pyramid.tests.test_path)
         self.assertEqual(typ.package, pyramid.tests)
-        self.assertEqual(typ.package_name, 'pyramid.tests')
 
     def test_ctor_package(self):
         import pyramid.tests
         typ = self._makeOne(pyramid.tests)
         self.assertEqual(typ.package, pyramid.tests)
-        self.assertEqual(typ.package_name, 'pyramid.tests')
 
     def test_ctor_None(self):
         typ = self._makeOne(None)
         self.assertEqual(typ.package, None)
-        self.assertEqual(typ.package_name, None)
-
 
 class DummyPkgResource(object):
     pass

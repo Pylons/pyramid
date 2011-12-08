@@ -74,11 +74,16 @@ def package_path(package):
             pass
     return prefix
 
+class _CALLER_PACKAGE(object):
+    def __repr__(self): # for docs
+        return 'pyramid.path.CALLER_PACKAGE'
+
+CALLER_PACKAGE = _CALLER_PACKAGE()
+
 class Resolver(object):
-    def __init__(self, package=None):
-        if package is None:
-            self.package_name = None
-            self.package = None
+    def __init__(self, package=CALLER_PACKAGE):
+        if package in (None, CALLER_PACKAGE):
+            self.package = package
         else:
             if isinstance(package, string_types):
                 try:
@@ -89,7 +94,21 @@ class Resolver(object):
                         )
                 package = sys.modules[package]
             self.package = package_of(package)
-            self.package_name = self.package.__name__
+
+    def get_package_name(self):
+        if self.package is CALLER_PACKAGE:
+            package_name = caller_package().__name__
+        else:
+            package_name = self.package.__name__
+        return package_name
+
+    def get_package(self):
+        if self.package is CALLER_PACKAGE:
+            package = caller_package()
+        else:
+            package = self.package
+        return package
+
 
 class AssetResolver(Resolver):
     """ A class used to resolve an :term:`asset specification` to an
@@ -106,15 +125,24 @@ class AssetResolver(Resolver):
 
     - The value ``None``
 
+    - The constant value :attr:`pyramid.path.CALLER_PACKAGE`.
+
+    The default value is :attr:`pyramid.path.CALLER_PACKAGE`.
+
     The ``package`` is used when a relative asset specification is supplied
     to the :meth:`~pyramid.path.AssetResolver.resolve` method.  An asset
     specification without a colon in it is treated as relative.
 
-    If the value ``None`` is supplied as the package name, the resolver will
+    If the value ``None`` is supplied as the ``package``, the resolver will
     only be able to resolve fully qualified (not relative) asset
     specifications.  Any attempt to resolve a relative asset specification
     when the ``package`` is ``None`` will result in an :exc:`ValueError`
     exception.
+
+    If the value :attr:`pyramid.path.CALLER_PACKAGE` is supplied as the
+    ``package``, the resolver will treat relative asset specifications as
+    relative to the caller of the :meth:`~pyramid.path.AssetResolver.resolve`
+    method.
 
     If a *module* or *module name* (as opposed to a package or package name)
     is supplied as ``package``, its containing package is computed and this
@@ -157,22 +185,25 @@ class AssetResolver(Resolver):
            print resolver.abspath()
            # -> /path/to/myproject/templates/foo.pt
 
-        If the AssetResolver is constructed without a ``package`` argument,
-        and a relative asset specification is passed to ``resolve``, a
-        :exc:`ValueError` exception is raised.
+        If the AssetResolver is constructed without a ``package`` argument of
+        ``None``, and a relative asset specification is passed to
+        ``resolve``, an :exc:`ValueError` exception is raised.
         """
         if os.path.isabs(spec):
             return FSAssetDescriptor(spec)
         path = spec
         if ':' in path:
-            pkg_name, path = spec.split(':', 1)
+            package_name, path = spec.split(':', 1)
         else:
-            pkg_name = self.package_name
-            if pkg_name is None:
+            if self.package is CALLER_PACKAGE:
+                package_name = caller_package().__name__
+            else:
+                package_name = getattr(self.package, '__name__', None)
+            if package_name is None:
                 raise ValueError(
                     'relative spec %r irresolveable without package' % (spec,)
                 )
-        return PkgResourcesAssetDescriptor(pkg_name, path)
+        return PkgResourcesAssetDescriptor(package_name, path)
 
 class DottedNameResolver(Resolver):
     """ A class used to resolve a :term:`dotted Python name` to a package or
@@ -189,15 +220,24 @@ class DottedNameResolver(Resolver):
 
     - The value ``None``
 
+    - The constant value :attr:`pyramid.path.CALLER_PACKAGE`.
+
+    The default value is :attr:`pyramid.path.CALLER_PACKAGE`.
+
     The ``package`` is used when a relative dotted name is supplied to the
     :meth:`~pyramid.path.DottedNameResolver.resolve` method.  A dotted name
     which has a ``.`` (dot) or ``:`` (colon) as its first character is
     treated as relative.
 
-    If the value ``None`` is supplied as the package name, the resolver will
+    If the value ``None`` is supplied as the ``package``, the resolver will
     only be able to resolve fully qualified (not relative) names.  Any
     attempt to resolve a relative name when the ``package`` is ``None`` will
     result in an :exc:`ValueError` exception.
+
+    If the value :attr:`pyramid.path.CALLER_PACKAGE` is supplied as the
+    ``package``, the resolver will treat relative dotted names as relative to
+    the caller of the :meth:`~pyramid.path.DottedNameResolver.resolve`
+    method.
 
     If a *module* or *module name* (as opposed to a package or package name)
     is supplied as ``package``, its containing package is computed and this
@@ -215,11 +255,8 @@ class DottedNameResolver(Resolver):
     passed the string ``xml.dom``, and ``.minidom`` is supplied to the
     :meth:`~pyramid.path.DottedNameResolver.resolve` method, the resulting
     import would be for ``xml.minidom``.
-
-    When a dotted name cannot be resolved, a :exc:`ValueError` error is
-    raised.
     """
-    def resolve(self, name):
+    def resolve(self, dotted):
         """
         This method resolves a dotted name reference to a global Python
         object (an object which can be imported) to the object itself.
@@ -239,52 +276,71 @@ class DottedNameResolver(Resolver):
         mechanism will be chosen, otherwise the ``zope.dottedname``
         resolution mechanism will be chosen.
 
-        If the ``name`` argument passed to this method is not a string, a
+        If the ``dotted`` argument passed to this method is not a string, a
         :exc:`ValueError` will be raised.
+
+        When a dotted name cannot be resolved, a :exc:`ValueError` error is
+        raised.
+
+        Example:
+
+        .. code-block:: python
+
+           r = DottedNameResolver()
+           v = r.resolve('xml') # v is the xml module
+
         """
-        if not isinstance(name, string_types):
-            raise ValueError('%r is not a string' % (name,))
-        return self.maybe_resolve(name)
+        if not isinstance(dotted, string_types):
+            raise ValueError('%r is not a string' % (dotted,))
+        package = self.package
+        if package is CALLER_PACKAGE:
+            package = caller_package()
+        return self._resolve(dotted, package)
 
     def maybe_resolve(self, dotted):
         """
         This method behaves just like
         :meth:`~pyramid.path.DottedNameResolver.resolve`, except if the
-        ``name`` value passed is not a string, it is simply returned.  For
+        ``dotted`` value passed is not a string, it is simply returned.  For
         example:
 
         .. code-block:: python
 
            import xml
            r = DottedNameResolver()
-           v = r.resolve(xml)
+           v = r.maybe_resolve(xml)
            # v is the xml module; no exception raised
         """
         if isinstance(dotted, string_types):
-            if ':' in dotted:
-                return self._pkg_resources_style(dotted)
-            else:
-                return self._zope_dottedname_style(dotted)
+            package = self.package
+            if package is CALLER_PACKAGE:
+                package = caller_package()
+            return self._resolve(dotted, package)
         return dotted
 
+    def _resolve(self, dotted, package):
+        if ':' in dotted:
+            return self._pkg_resources_style(dotted, package)
+        else:
+            return self._zope_dottedname_style(dotted, package)
 
-    def _pkg_resources_style(self, value):
+    def _pkg_resources_style(self, value, package):
         """ package.module:attr style """
         if value.startswith('.') or value.startswith(':'):
-            if not self.package_name:
+            if not package:
                 raise ValueError(
-                    'relative name %r irresolveable without '
-                    'package_name' % (value,))
+                    'relative name %r irresolveable without package' % (value,)
+                    )
             if value in ['.', ':']:
-                value = self.package_name
+                value = package.__name__
             else:
-                value = self.package_name + value
+                value = package.__name__ + value
         return pkg_resources.EntryPoint.parse(
             'x=%s' % value).load(False)
 
-    def _zope_dottedname_style(self, value):
+    def _zope_dottedname_style(self, value, package):
         """ package.module.attr style """
-        module = self.package_name
+        module = getattr(package, '__name__', None) # package may be None
         if not module:
             module = None
         if value == '.':

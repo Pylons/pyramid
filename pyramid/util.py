@@ -8,9 +8,11 @@ from pyramid.compat import (
     PY3,
     )
 
-from pyramid.path import DottedNameResolver # bw compat
+from pyramid.path import DottedNameResolver as _DottedNameResolver
 
-DottedNameResolver = DottedNameResolver # for pyflakes
+class DottedNameResolver(_DottedNameResolver):
+    def __init__(self, package=None): # default to package = None for bw compat
+        return _DottedNameResolver.__init__(self, package)
 
 class WeakOrderedSet(object):
     """ Maintain a set of items.
