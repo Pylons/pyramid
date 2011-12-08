@@ -30,14 +30,14 @@ Must-Have
 - Fix i18n and extending chapters to mention $venv/bin/python instead of bare
   "python".
 
-- Implement analogue of "paster request"?
-
 - Review "pyramid.compat" API; trim unnecessary APIs from docs.
 
 - Figure out a way to not invoke git on install (docs/conf.py).
 
 Nice-to-Have
 ------------
+
+- Implement analogue of "paster request"?
 
 - CherryPy server testing / exploded from CherryPy itself.
 
