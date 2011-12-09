@@ -24,7 +24,7 @@ of Jython and the Python 2.5 version of Google App Engine.  We could not
 easily "straddle" Python 2 and 3 versions and support Python 2 versions older
 than Python 2.6.  You will need Python 2.6 or better to run this version of
 Pyramid.  If you need to use Pyramid on Python 2.5, you should use the most
-recent 1.2.X release fo Pyramid there.
+recent 1.2.X release of Pyramid there.
 
 Though many Pyramid add-ons have releases which are already Python 3
 compatible (in particular ``pyramid_debugtoolbar``, ``pyramid_jinja2``,
@@ -133,7 +133,7 @@ Minor Feature Additions
 - ``bpython`` interpreter compatibility in ``pshell``.  See
   :ref:`ipython_or_bpython` for more information.
 
-- Added :func:`pyramid.paster.get_appsettings`` API function.  This function
+- Added :func:`pyramid.paster.get_appsettings` API function.  This function
   returns the settings defined within an ``[app:...]`` section in a
   PasteDeploy ``ini`` file.
 
