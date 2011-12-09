@@ -227,7 +227,7 @@ augment Pyramid's configuration introspection system.
 Adding Configuration Introspection
 ----------------------------------
 
-.. warning::
+.. note::
 
    The introspection subsystem is new in Pyramid 1.3.
 
