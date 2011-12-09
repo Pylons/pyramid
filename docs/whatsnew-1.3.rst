@@ -133,7 +133,7 @@ Minor Feature Additions
 - ``bpython`` interpreter compatibility in ``pshell``.  See
   :ref:`ipython_or_bpython` for more information.
 
-- Added :func:`pyramid.paster.get_appsettings`` API function.  This function
+- Added :func:`pyramid.paster.get_appsettings` API function.  This function
   returns the settings defined within an ``[app:...]`` section in a
   PasteDeploy ``ini`` file.
 
