@@ -40,7 +40,7 @@ For example:
    from pyramid.config import Configurator
 
    def add_newrequest_subscriber(config, subscriber):
-       config.add_subscriber(subscriber, NewRequest).
+       config.add_subscriber(subscriber, NewRequest)
 
    if __name__ == '__main__':
        config = Configurator()
@@ -68,7 +68,7 @@ code in a package named ``pyramid_subscriberhelpers``:
 .. code-block:: python
    :linenos:
 
-   def includeme(config)
+   def includeme(config):
        config.add_directive('add_newrequest_subscriber',
                             add_newrequest_subscriber)
 
@@ -129,14 +129,13 @@ called (either explicitly or as the result of calling
 :meth:`~pyramid.config.Configurator.make_wsgi_app`), conflicting actions are
 potentially automatically resolved as per
 :ref:`automatic_conflict_resolution`.  If a conflict cannot be automatically
-resolved, a ConfigurationConflictError is raised and application startup is
-prevented.
+resolved, a :exc:`ConfigurationConflictError` is raised and application
+startup is prevented.
 
 In our above example, therefore, if a consumer of our ``add_jammyjam``
 directive did this:
 
 .. code-block:: python
-   :linenos:
 
    config.add_jammyjam('first')
    config.add_jammyjam('second')
@@ -162,7 +161,6 @@ But let's imagine that a consumer of ``add_jammyjam`` used it in such a way
 that no configuration conflicts are generated.
 
 .. code-block:: python
-   :linenos:
 
    config.add_jammyjam('first')
 
