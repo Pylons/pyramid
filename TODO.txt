@@ -27,8 +27,6 @@ Must-Have
 
 - Review "pyramid.compat" API; trim unnecessary APIs from docs.
 
-- Figure out a way to not invoke git on install (docs/conf.py).
-
 Nice-to-Have
 ------------
 
