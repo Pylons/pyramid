@@ -22,9 +22,6 @@ Must-Have
 - Fix deployment recipes in cookbook (discourage proxying without changing
   server).
 
-- Fix i18n and extending chapters to mention $venv/bin/python instead of bare
-  "python".
-
 - Review "pyramid.compat" API; trim unnecessary APIs from docs.
 
 Nice-to-Have
