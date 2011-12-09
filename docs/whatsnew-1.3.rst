@@ -105,7 +105,7 @@ A configuration introspection system was added; see
 :ref:`using_introspection` and :ref:`introspection` for more information on
 using the introspection system as a developer.
 
-The latest release of the pyramid debug toolbar (0.9.6) provides an
+The latest release of the pyramid debug toolbar (0.9.7+) provides an
 "Introspection" panel that exposes introspection information to a Pyramid
 application developer.
 
