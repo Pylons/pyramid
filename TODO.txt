@@ -19,11 +19,6 @@ Must-Have
 
   * introspection hiding for directives?
 
-  * make debug toolbar panel for introspection look less ugly
-
-- Release new pyramid_debugtoolbar package that has introspection panel
-  (already py3 compat released).
-
 - Fix deployment recipes in cookbook (discourage proxying without changing
   server).
 

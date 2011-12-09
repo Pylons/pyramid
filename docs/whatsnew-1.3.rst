@@ -15,9 +15,84 @@ The major feature additions in Pyramid 1.3 follow.
 Python 3 Compatibility
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Pyramid is now Python 3 compatible.  Python 3.2 or better is required.  A new
-:mod:`pyramid.compat` module was added which provides Python 2/3 straddling
-support for Pyramid add-ons and development environments.
+Pyramid is now Python 3 compatible.  Python 3.2 or better is required.
+
+This feature required us to make some compromises.
+
+Pyramid no longer runs on Python 2.5.  This includes the most recent release
+of Jython and the Python 2.5 version of Google App Engine.  We could not
+easily "straddle" Python 2 and 3 versions and support Python 2 versions older
+than Python 2.6.  You will need Python 2.6 or better to run this version of
+Pyramid.  If you need to use Pyramid on Python 2.5, you should use the most
+recent 1.2.X release fo Pyramid there.
+
+Though many Pyramid add-ons have releases which are already Python 3
+compatible (in particular ``pyramid_debugtoolbar``, ``pyramid_jinja2``,
+``pyramid_exclog``, and ``pyramid_tm``), some are still known to work only
+under Python 2.  Likewise, some scaffolding dependencies (particularly ZODB)
+do not yet work under Python
+3.  Please be patient as we gain full ecosystem support for Python 3.  You
+can see more details about ongoing porting efforts at
+https://github.com/Pylons/pyramid/wiki/Python-3-Porting .
+
+The libraries named ``Paste`` and ``PasteScript`` which have been
+dependencies of Pyramid since 1.0+ have not been ported to Python 3, and we
+were unwilling to port and maintain them ourselves.  As a result, we've had
+to make some changes:
+
+- We've replaced the ``paster`` command with Pyramid-specific analogues.
+
+- We've made the default WSGI server the ``wsgiref`` server.
+
+Previously (in Pyramid 1.0, 1.1 and 1.2), you created a Pyramid application
+using ``paster create``, like so::
+
+    $myvenv/bin/paster create -t pyramid_starter foo
+
+You're now instead required to create an application using ``pcreate`` like
+so::
+
+    $myvenv/bin/pcreate -s starter foo
+
+Note that the names of available scaffolds have changed the and flags
+supported by ``pcreate`` are different than those that were supported by
+``paster create``.
+
+Instead of running a Pyramid project created via a scaffold using ``paster
+serve``, as was done in Pyramid <= 1.2.X, you now must use the ``pserve``
+command::
+
+    $myvenv/bin/pserve development.ini
+
+The ``ini`` configuration file format supported by Pyramid has not changed.
+As a result, Python 2-only users can install PasteScript manually and use
+``paster serve`` and ``paster create`` instead if they like.  However, using
+``pserve`` and ``pcreate`` will work under both Python 2 and Python 3.
+
+Analogues of ``paster pshell``, ``paster pviews`` and ``paster ptweens`` also
+exist under the respective console script names ``pshell``, ``pviews``, and
+``ptweens``.
+
+We've replaced use of the Paste http server with the ``wsgiref`` server in
+the scaffolds, so once you create a project from a scaffold, its
+``development.ini`` and ``production.ini`` will have the following line::
+
+    use = egg:pyramid#wsgref
+
+Instead of this (which was the default in older versions)::
+
+    use = egg:Paste#http
+
+Using ``wsgiref`` as the default WSGI server is purely a default to make it
+possible to use the same scaffolding under Python 2 and Python 3; people
+running Pyramid under Python 2 can still manually install ``Paste`` and use
+the Paste httpserver by replacing the former line with the latter.  This is
+actually recommended if you rely on proxying from Apache or Nginx to a
+``pserve`` -invoked application.  **The wsgiref server is not a production
+quality server.** See :ref:`alternate_wsgi_server` for more information.
+
+A new :mod:`pyramid.compat` module was added which provides Python 2/3
+straddling support for Pyramid add-ons and development environments.
 
 Python 3 compatibility required dropping some package dependencies and
 support for older Python versions and platforms.  See the "Backwards
@@ -30,8 +105,9 @@ A configuration introspection system was added; see
 :ref:`using_introspection` and :ref:`introspection` for more information on
 using the introspection system as a developer.
 
-A new release of the pyramid debug toolbar will provide an "Introspection"
-panel that presents introspection information to a developer.
+The latest release of the pyramid debug toolbar (0.9.6) provides an
+"Introspection" panel that exposes introspection information to a Pyramid
+application developer.
 
 New APIs were added to support introspection
 :attr:`pyramid.registry.Introspectable`,
@@ -68,7 +144,7 @@ Minor Feature Additions
 - Configuration conflict reporting is reported in a more understandable way
   ("Line 11 in file..." vs. a repr of a tuple of similar info).
 
-- Allow extra keyword arguments to be passed to the
+- We allow extra keyword arguments to be passed to the
   :meth:`pyramid.config.Configurator.action` method.
 
 Backwards Incompatibilities
@@ -150,6 +226,6 @@ Scaffolding Changes
 - The ``routesalchemy`` scaffold has been renamed ``alchemy``, replacing the
   older (traversal-based) ``alchemy`` scaffold (which has been retired).
 
+- The ``alchemy`` and ``starter`` scaffolds are Python 3 compatible.
+
 - The ``starter`` scaffold now uses URL dispatch by default.
-
-
