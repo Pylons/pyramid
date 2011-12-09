@@ -3561,8 +3561,11 @@ class DummyConfig:
         self.view_args = args
         self.view_kw = kw
 
-    def action(self, discriminator, callable):
+    def action(self, discriminator, callable, introspectables=()):
         callable()
+
+    def introspectable(self, *arg):
+        return {}
 
 from zope.interface import implementer
 from pyramid.interfaces import IMultiView

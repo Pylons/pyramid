@@ -1604,6 +1604,13 @@ class StaticURLInfo(object):
             # url, spec, route_name
             registrations.append((url, spec, route_name))
 
-        config.action(None, callable=register)
+        intr = config.introspectable('static views',
+                                     name,
+                                     'static view for %r' % name,
+                                     'static view')
+        intr['name'] = name
+        intr['spec'] = spec
+
+        config.action(None, callable=register, introspectables=(intr,))
 
 

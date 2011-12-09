@@ -514,6 +514,21 @@ introspectables in categories not described here.
 
      The ``over`` argument passed to ``add_tween`` (a string).
 
+``static views``
+
+  Each introspectable in the ``static views`` category represents a call to
+  :meth:`pyramid.config.Configurator.add_static_view`; each will have the
+  following data.
+
+  ``name``
+
+    The ``name`` argument provided to ``add_static_view``.
+
+  ``spec``
+
+    A normalized version of the ``spec`` argument provided to
+    ``add_static_view``.
+
 Introspection in the Toolbar
 ----------------------------
 
