@@ -22,8 +22,6 @@ Must-Have
 - Fix deployment recipes in cookbook (discourage proxying without changing
   server).
 
-- Review "pyramid.compat" API; trim unnecessary APIs from docs.
-
 Nice-to-Have
 ------------
 
