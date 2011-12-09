@@ -20,12 +20,12 @@ Pyramid is now Python 3 compatible.  Python 3.2 or better is required.
 .. warning::
 
    As of this writing (the release of Pyramid 1.3a1), if you attempt to
-   install a Pyramid scaffold via ``setup.py develop`` on Python 3.2, it may
-   quit with an installation error while trying to install ``Pygments``.  If
-   this happens, please rerun the ``setup.py develop`` command again and it
-   will complete.  We're just as clueless as you are as to why this happens
-   at this point, but hopefully we'll figure it out before Pyramid 1.3 leaves
-   the alpha/beta phase.
+   install a Pyramid project that used ``alchemy`` scaffold via ``setup.py
+   develop`` on Python 3.2, it may quit with an installation error while
+   trying to install ``Pygments``.  If this happens, please rerun the
+   ``setup.py develop`` command again and it will complete.  We're just as
+   clueless as you are as to why this happens at this point, but hopefully
+   we'll figure it out before Pyramid 1.3 leaves the alpha/beta phase.
 
 This feature required us to make some compromises.
 
