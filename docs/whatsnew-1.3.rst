@@ -24,7 +24,7 @@ of Jython and the Python 2.5 version of Google App Engine.  We could not
 easily "straddle" Python 2 and 3 versions and support Python 2 versions older
 than Python 2.6.  You will need Python 2.6 or better to run this version of
 Pyramid.  If you need to use Pyramid on Python 2.5, you should use the most
-recent 1.2.X release fo Pyramid there.
+recent 1.2.X release of Pyramid there.
 
 Though many Pyramid add-ons have releases which are already Python 3
 compatible (in particular ``pyramid_debugtoolbar``, ``pyramid_jinja2``,
@@ -47,14 +47,14 @@ to make some changes:
 Previously (in Pyramid 1.0, 1.1 and 1.2), you created a Pyramid application
 using ``paster create``, like so::
 
-    $myvenv/bin/paster create -t pyramid_starter foo
+    $ myvenv/bin/paster create -t pyramid_starter foo
 
 You're now instead required to create an application using ``pcreate`` like
 so::
 
-    $myvenv/bin/pcreate -s starter foo
+    $ myvenv/bin/pcreate -s starter foo
 
-Note that the names of available scaffolds have changed the and flags
+Note that the names of available scaffolds have changed and the flags
 supported by ``pcreate`` are different than those that were supported by
 ``paster create``.
 
@@ -73,11 +73,11 @@ Analogues of ``paster pshell``, ``paster pviews`` and ``paster ptweens`` also
 exist under the respective console script names ``pshell``, ``pviews``, and
 ``ptweens``.
 
-We've replaced use of the Paste http server with the ``wsgiref`` server in
+We've replaced use of the Paste ``httpserver`` with the ``wsgiref`` server in
 the scaffolds, so once you create a project from a scaffold, its
 ``development.ini`` and ``production.ini`` will have the following line::
 
-    use = egg:pyramid#wsgref
+    use = egg:pyramid#wsgiref
 
 Instead of this (which was the default in older versions)::
 
@@ -86,7 +86,7 @@ Instead of this (which was the default in older versions)::
 Using ``wsgiref`` as the default WSGI server is purely a default to make it
 possible to use the same scaffolding under Python 2 and Python 3; people
 running Pyramid under Python 2 can still manually install ``Paste`` and use
-the Paste httpserver by replacing the former line with the latter.  This is
+the Paste ``httpserver`` by replacing the former line with the latter.  This is
 actually recommended if you rely on proxying from Apache or Nginx to a
 ``pserve`` -invoked application.  **The wsgiref server is not a production
 quality server.** See :ref:`alternate_wsgi_server` for more information.
@@ -133,7 +133,7 @@ Minor Feature Additions
 - ``bpython`` interpreter compatibility in ``pshell``.  See
   :ref:`ipython_or_bpython` for more information.
 
-- Added :func:`pyramid.paster.get_appsettings`` API function.  This function
+- Added :func:`pyramid.paster.get_appsettings` API function.  This function
   returns the settings defined within an ``[app:...]`` section in a
   PasteDeploy ``ini`` file.
 
