@@ -17,14 +17,24 @@ Python 3 Compatibility
 
 Pyramid is now Python 3 compatible.  Python 3.2 or better is required.
 
+.. warning::
+
+   As of this writing (the release of Pyramid 1.3a1), if you attempt to
+   install a Pyramid project that used ``alchemy`` scaffold via ``setup.py
+   develop`` on Python 3.2, it may quit with an installation error while
+   trying to install ``Pygments``.  If this happens, please rerun the
+   ``setup.py develop`` command again and it will complete.  We're just as
+   clueless as you are as to why this happens at this point, but hopefully
+   we'll figure it out before Pyramid 1.3 leaves the alpha/beta phase.
+
 This feature required us to make some compromises.
 
 Pyramid no longer runs on Python 2.5.  This includes the most recent release
 of Jython and the Python 2.5 version of Google App Engine.  We could not
 easily "straddle" Python 2 and 3 versions and support Python 2 versions older
 than Python 2.6.  You will need Python 2.6 or better to run this version of
-Pyramid.  If you need to use Pyramid on Python 2.5, you should use the most
-recent 1.2.X release of Pyramid there.
+Pyramid.  If you need to use Python 2.5, you should use the most recent 1.2.X
+release of Pyramid.
 
 Though many Pyramid add-ons have releases which are already Python 3
 compatible (in particular ``pyramid_debugtoolbar``, ``pyramid_jinja2``,
@@ -105,7 +115,7 @@ A configuration introspection system was added; see
 :ref:`using_introspection` and :ref:`introspection` for more information on
 using the introspection system as a developer.
 
-The latest release of the pyramid debug toolbar (0.9.6) provides an
+The latest release of the pyramid debug toolbar (0.9.7+) provides an
 "Introspection" panel that exposes introspection information to a Pyramid
 application developer.
 
