@@ -191,10 +191,10 @@ class URLMethodsMixin(object):
 
            Calling ``request.route_path('route')`` is the same as calling
            ``request.route_url('route', _app_url=request.script_name)``.
-           :meth:`pyramid.request.Request.route_path` is, in fact, implemented
-           in terms of `:meth:`pyramid.request.Request.route_url` in just this
-           way. As a result, any ``_app_url`` passed within the ``**kw`` values
-           to ``route_path`` will be ignored.
+           :meth:`pyramid.request.Request.route_path` is, in fact,
+           implemented in terms of :meth:`pyramid.request.Request.route_url`
+           in just this way. As a result, any ``_app_url`` passed within the
+           ``**kw`` values to ``route_path`` will be ignored.
         """
         kw['_app_url'] = self.script_name
         return self.route_url(route_name, *elements, **kw)
