@@ -1376,6 +1376,33 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         self.assertEqual(view(None, None), 'OK')
         self.assertEqual(Mapper.kw['mapper'], Mapper)
 
+    def test_add_view_with_view_defaults(self):
+        from pyramid.renderers import null_renderer
+        from pyramid.exceptions import PredicateMismatch
+        from zope.interface import directlyProvides
+        class view(object):
+            __view_defaults__ = {
+                'containment':'pyramid.tests.test_config.IDummy'
+                }
+            def __init__(self, request):
+                pass
+            def __call__(self):
+                return 'OK'
+        config = self._makeOne(autocommit=True)
+        config.add_view(
+            view=view,
+            renderer=null_renderer)
+        wrapper = self._getViewCallable(config)
+        context = DummyContext()
+        directlyProvides(context, IDummy)
+        request = self._makeRequest(config)
+        self.assertEqual(wrapper(context, request), 'OK')
+
+        context = DummyContext()
+        request = self._makeRequest(config)
+        self.assertRaises(PredicateMismatch, wrapper, context, request)
+        
+
     def test_derive_view_function(self):
         from pyramid.renderers import null_renderer
         def view(request):

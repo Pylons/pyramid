@@ -43,13 +43,15 @@ def action_method(wrapped):
         if self._ainfo is None:
             self._ainfo = []
         info = kw.pop('_info', None)
+        # backframes for outer decorators to actionmethods
+        backframes = kw.pop('_backframes', 2) 
         if is_nonstr_iter(info) and len(info) == 4:
             # _info permitted as extract_stack tuple
             info = ActionInfo(*info)
         if info is None:
             try:
                 f = traceback.extract_stack(limit=3)
-                info = ActionInfo(*f[-2])
+                info = ActionInfo(*f[-backframes])
             except: # pragma: no cover
                 info = ActionInfo(None, 0, '', '')
         self._ainfo.append(info)

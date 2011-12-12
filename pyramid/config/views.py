@@ -1,5 +1,6 @@
 import inspect
 import operator
+from functools import wraps
 
 from zope.interface import (
     Interface,
@@ -551,7 +552,22 @@ class MultiView(object):
                 continue
         raise PredicateMismatch(self.name)
 
+def viewdefaults(wrapped):
+    def wrapper(*arg, **kw):
+        defaults = {}
+        if len(arg) > 1:
+            view = arg[1]
+        else:
+            view = kw.get('view')
+        if inspect.isclass(view):
+            defaults = getattr(view, '__view_defaults__', {})
+        defaults.update(kw)
+        defaults['_backframes'] = 3
+        return wrapped(*arg, **defaults)
+    return wraps(wrapped)(wrapper)
+
 class ViewsConfiguratorMixin(object):
+    @viewdefaults
     @action_method
     def add_view(self, view=None, name="", for_=None, permission=None,
                  request_type=None, route_name=None, request_method=None,
