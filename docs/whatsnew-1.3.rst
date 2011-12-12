@@ -178,8 +178,8 @@ Backwards Incompatibilities
   ``paste.httpserver`` server.  ``wsgiref``, unlike the server it replaced
   (``paste.httpserver``) is not a production quality server.  See
   :ref:`alternate_wsgi_server` for information about how to use another WSGI
-  server in production. Rationale: Rationale: the Paste and PasteScript
-  packages do not run under Python 3.
+  server in production. Rationale: the Paste and PasteScript packages do not
+  run under Python 3.
 
 - The ``pshell`` command (see "paster pshell") no longer accepts a
   ``--disable-ipython`` command-line argument.  Instead, it accepts a ``-p``

@@ -16,6 +16,8 @@ how to send log messages to loggers that you've configured.
    a third-party scaffold which does not create these files, the
    configuration information in this chapter will not be applicable.
 
+.. _logging_config:
+
 Logging Configuration
 ---------------------
 
