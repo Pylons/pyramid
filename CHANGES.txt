@@ -1,3 +1,23 @@
+Next release
+============
+
+Features
+--------
+
+- New API: ``pyramid.view.view_defaults``. If you use a class as a view, you
+  can use the new ``view_defaults`` class decorator on the class to provide
+  defaults to the view configuration information used by every
+  ``@view_config`` decorator that decorates a method of that class.  It also
+  works against view configurations involving a class made imperatively.
+
+Documentation
+-------------
+
+- Added documentation to "View Configuration" narrative documentation chapter
+  about ``view_defaults`` class decorator.
+
+- Added API docs for ``view_defaults`` class decorator.
+
 1.3a1 (2011-12-09)
 ==================
 

@@ -223,6 +223,19 @@ class view_config(object):
 
 bfg_view = view_config # bw compat (forever)
 
+class view_defaults(view_config):
+    """ A class :term:`decorator` which, when applied to a class, will
+    provide defaults for all view configurations that use the class.  This
+    decorator accepts all the arguments accepted by
+    :class:`pyramid.config.view_config`, and each has the same meaning.
+
+    See :ref:`view_defaults` for more information.
+    """
+    
+    def __call__(self, wrapped):
+        wrapped.__view_defaults__ = self.__dict__.copy()
+        return wrapped
+
 class AppendSlashNotFoundViewFactory(object):
     """ There can only be one :term:`Not Found view` in any
     :app:`Pyramid` application.  Even if you use
