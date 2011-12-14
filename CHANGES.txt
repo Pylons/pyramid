@@ -10,6 +10,9 @@ Features
   ``@view_config`` decorator that decorates a method of that class.  It also
   works against view configurations involving a class made imperatively.
 
+- Added a backwards compatibility knob to ``pcreate`` to emulate ``paster
+  create`` handling for the ``--list-templates`` option.
+
 Documentation
 -------------
 

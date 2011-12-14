@@ -34,6 +34,11 @@ class PCreateCommand(object):
                       dest='list',
                       action='store_true',
                       help="List all available scaffold names")
+    parser.add_option('--list-templates',
+                      dest='list',
+                      action='store_true',
+                      help=("A backwards compatibility alias for -l/--list.  "
+                            "List all available scaffold names."))
     parser.add_option('--simulate',
                       dest='simulate',
                       action='store_true',
