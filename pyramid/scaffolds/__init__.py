@@ -3,10 +3,20 @@ import os
 
 from pyramid.compat import native_
 
-from pyramid.scaffolds.template import Template
+from pyramid.scaffolds.template import Template # API
 
 class PyramidTemplate(Template):
+    """
+     A class that can be used as a base class for Pyramid scaffolding
+     templates.
+    """
     def pre(self, command, output_dir, vars):
+        """ Overrides :meth:`pyramid.scaffold.template.Template.pre`, adding
+        several variables to the default variables list (including
+        ``random_string``, and ``package_logger``).  It also prevents common
+        misnamings (such as naming a package "site" or naming a package
+        logger "root".
+        """
         if vars['package'] == 'site':
             raise ValueError('Sorry, you may not name your package "site". '
                              'The package name "site" has a special meaning in '
@@ -20,6 +30,9 @@ class PyramidTemplate(Template):
         return Template.pre(self, command, output_dir, vars)
 
     def post(self, command, output_dir, vars): # pragma: no cover
+        """ Overrides :meth:`pyramid.scaffold.template.Template.post`, to
+        print "Welcome to Pyramid.  Sorry for the convenience." after a
+        successful scaffolding rendering."""
         self.out('Welcome to Pyramid.  Sorry for the convenience.')
         return Template.post(self, command, output_dir, vars)
 

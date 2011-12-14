@@ -276,6 +276,10 @@ Documentation Enhancements
 - A narrative documentation chapter named :ref:`using_introspection` was
   added.  It describes how to query the introspection system.
 
+- Added an API docs chapter for :mod:`pyramid.scaffolds`.
+
+- Added a narrative docs chapter named :ref:`scaffolding_chapter`.
+
 Dependency Changes
 ------------------
 

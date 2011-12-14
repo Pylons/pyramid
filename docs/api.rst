@@ -26,6 +26,7 @@ documentation is organized alphabetically by module name.
    api/renderers
    api/request
    api/response
+   api/scaffolds
    api/scripting
    api/security
    api/session

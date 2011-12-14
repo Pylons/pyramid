@@ -5,8 +5,6 @@
 import os
 import sys
 import pkg_resources
-import cgi
-import urllib
 
 from pyramid.compat import (
     input_,

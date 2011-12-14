@@ -93,6 +93,7 @@ Narrative documentation in chapter form explaining how to use
    narr/extending
    narr/advconfig
    narr/extconfig
+   narr/scaffolding
    narr/threadlocals
    narr/zca
 
