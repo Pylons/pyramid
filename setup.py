@@ -95,6 +95,9 @@ setup(name='pyramid',
         ptweens=pyramid.paster:PTweensCommand
         [console_scripts]
         bfg2pyramid = pyramid.fixers.fix_bfg_imports:main
+        [paste.server_runner]
+        wsgiref = pyramid.paster:wsgiref_server_runner
+        cherrypy = pyramid.paster:cherrypy_server_runner
       """
       )
 
