@@ -560,7 +560,7 @@ def viewdefaults(wrapped):
         else:
             view = kw.get('view')
         if inspect.isclass(view):
-            defaults = getattr(view, '__view_defaults__', {})
+            defaults = getattr(view, '__view_defaults__', {}).copy()
         defaults.update(kw)
         defaults['_backframes'] = 3
         return wrapped(*arg, **defaults)

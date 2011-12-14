@@ -570,6 +570,22 @@ class Test_static(unittest.TestCase):
         view = self._makeOne(path, None)
         self.assertEqual(view.docroot, 'fixtures')
 
+class Test_view_defaults(unittest.TestCase):
+    def test_it(self):
+        from pyramid.view import view_defaults
+        @view_defaults(route_name='abc', renderer='def')
+        class Foo(object): pass
+        self.assertEqual(Foo.__view_defaults__['route_name'],'abc')
+        self.assertEqual(Foo.__view_defaults__['renderer'],'def')
+
+    def test_it_single_inheritance_non_overridden(self):
+        from pyramid.view import view_defaults
+        @view_defaults(route_name='abc', renderer='def')
+        class Foo(object): pass
+        class Bar(Foo): pass
+        self.assertEqual(Bar.__view_defaults__['route_name'],'abc')
+        self.assertEqual(Bar.__view_defaults__['renderer'],'def')
+
 class ExceptionResponse(Exception):
     status = '404 Not Found'
     app_iter = ['Not Found']
