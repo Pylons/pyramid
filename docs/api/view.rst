@@ -16,6 +16,9 @@
   .. autoclass:: view_config
      :members:
 
+  .. autoclass:: view_defaults
+     :members:
+
   .. autoclass:: static
      :members:
      :inherited-members:

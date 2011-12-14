@@ -621,6 +621,7 @@ against the ``amethod`` method could be spelled equivalently as the below:
        def amethod(self):
            return Response('hello')
 
+
 .. index::
    single: add_view
 
@@ -656,6 +657,186 @@ more information.
 When you use only :meth:`~pyramid.config.Configurator.add_view` to add view
 configurations, you don't need to issue a :term:`scan` in order for the view
 configuration to take effect.
+
+.. index::
+   single: view_defaults class decorator
+
+.. _view_defaults:
+
+``@view_defaults`` Class Decorator
+----------------------------------
+
+.. note::
+
+   This feature is new in Pyramid 1.3.
+
+If you use a class as a view, you can use the
+:class:`pyramid.view.view_defaults` class decorator on the class to provide
+defaults to the view configuration information used by every ``@view_config``
+decorator that decorates a method of that class.
+
+For instance, if you've got a class that has methods that represent "REST
+actions", all which are mapped to the same route, but different request
+methods, instead of this:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.view import view_config
+   from pyramid.response import Response
+
+   class RESTView(object):
+       def __init__(self, request):
+           self.request = request
+
+       @view_config(route_name='rest', request_method='GET')
+       def get(self):
+           return Response('get')
+
+       @view_config(route_name='rest', request_method='POST')
+       def post(self):
+           return Response('post')
+
+       @view_config(route_name='rest', request_method='DELETE')
+       def delete(self):
+           return Response('delete')
+
+You can do this:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.view import view_defaults
+   from pyramid.view import view_config
+   from pyramid.response import Response
+
+   @view_defaults(route_name='rest')
+   class RESTView(object):
+       def __init__(self, request):
+           self.request = request
+
+       @view_config(request_method='GET')
+       def get(self):
+           return Response('get')
+
+       @view_config(request_method='POST')
+       def post(self):
+           return Response('post')
+
+       @view_config(request_method='DELETE')
+       def delete(self):
+           return Response('delete')
+
+In the above example, we were able to take the ``route_name='rest'`` argument
+out of the call to each individual ``@view_config`` statement, because we
+used a ``@view_defaults`` class decorator to provide the argument as a
+default to each view method it possessed.
+
+Arguments passed to ``@view_config`` will override any default passed to
+``@view_defaults``.
+
+The ``view_defaults`` class decorator can also provide defaults to the
+:meth:`pyramid.config.Configurator.add_view` directive when a decorated class
+is passed to that directive as its ``view`` argument.  For example, instead
+of this:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.response import Response
+   from pyramid.config import Configurator
+
+   class RESTView(object):
+       def __init__(self, request):
+           self.request = request
+
+       def get(self):
+           return Response('get')
+
+       def post(self):
+           return Response('post')
+
+       def delete(self):
+           return Response('delete')
+
+   if __name__ == '__main__':
+       config = Configurator()
+       config.add_route('rest', '/rest')
+       config.add_view(
+           RESTView, route_name='rest', attr='get', request_method='GET')
+       config.add_view(
+           RESTView, route_name='rest', attr='post', request_method='POST')
+       config.add_view(
+           RESTView, route_name='rest', attr='delete', request_method='DELETE')
+
+To reduce the amount of repetion in the ``config.add_view`` statements, we
+can move the ``route_name='rest'`` argument to a ``@view_default`` class
+decorator on the RESTView class:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.view import view_config
+   from pyramid.response import Response
+   from pyramid.config import Configurator
+
+   @view_defaults(route_name='rest')
+   class RESTView(object):
+       def __init__(self, request):
+           self.request = request
+
+       def get(self):
+           return Response('get')
+
+       def post(self):
+           return Response('post')
+
+       def delete(self):
+           return Response('delete')
+
+   if __name__ == '__main__':
+       config = Configurator()
+       config.add_route('rest', '/rest')
+       config.add_view(RESTView, attr='get', request_method='GET')
+       config.add_view(RESTView, attr='post', request_method='POST')
+       config.add_view(RESTView, attr='delete', request_method='DELETE')
+
+:class:`pyramid.view.view_defaults` accepts the same set of arguments that
+:class:`pyramid.view.view_config` does, and they have the same meaning.  Each
+argument passed to ``view_defaults`` provides a default for the view
+configurations of methods of the class it's decorating.
+
+Normal Python inheritance rules apply to defaults added via
+``view_defaults``.  For example:
+
+.. code-block:: python
+   :linenos:
+
+   @view_defaults(route_name='rest')
+   class Foo(object):
+       pass
+
+   class Bar(Foo):
+       pass
+
+The ``Bar`` class above will inherit its view defaults from the arguments
+passed to the ``view_defaults`` decorator of the ``Foo`` class.  To prevent
+this from happening, use a ``view_defaults`` decorator without any arguments
+on the subclass:
+
+.. code-block:: python
+   :linenos:
+
+   @view_defaults(route_name='rest')
+   class Foo(object):
+       pass
+
+   @view_defaults()
+   class Bar(Foo):
+       pass
+
+The ``view_defaults`` decorator only works as a class decorator; using it
+against a function or a method will produce nonsensical results.
 
 .. index::
    single: view security

@@ -126,6 +126,70 @@ New APIs were added to support introspection
 :attr:`pyramid.config.Configurator.introspectable`,
 :attr:`pyramid.registry.Registry.introspector`.
 
+``@view_defaults`` Decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you use a class as a view, you can use the new
+:class:`pyramid.view.view_defaults` class decorator on the class to provide
+defaults to the view configuration information used by every ``@view_config``
+decorator that decorates a method of that class.
+
+For instance, if you've got a class that has methods that represent "REST
+actions", all which are mapped to the same route, but different request
+methods, instead of this:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.view import view_config
+   from pyramid.response import Response
+
+   class RESTView(object):
+       def __init__(self, request):
+           self.request = request
+
+       @view_config(route_name='rest', request_method='GET')
+       def get(self):
+           return Response('get')
+
+       @view_config(route_name='rest', request_method='POST')
+       def post(self):
+           return Response('post')
+
+       @view_config(route_name='rest', request_method='DELETE')
+       def delete(self):
+           return Response('delete')
+
+You can do this:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.view import view_defaults
+   from pyramid.view import view_config
+   from pyramid.response import Response
+
+   @view_defaults(route_name='rest')
+   class RESTView(object):
+       def __init__(self, request):
+           self.request = request
+
+       @view_config(request_method='GET')
+       def get(self):
+           return Response('get')
+
+       @view_config(request_method='POST')
+       def post(self):
+           return Response('post')
+
+       @view_config(request_method='DELETE')
+       def delete(self):
+           return Response('delete')
+
+This also works for imperative view configurations that involve a class.
+
+See :ref:`view_defaults` for more information.
+
 Minor Feature Additions
 -----------------------
 

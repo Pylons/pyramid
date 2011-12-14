@@ -562,7 +562,7 @@ def viewdefaults(wrapped):
         if inspect.isclass(view):
             defaults = getattr(view, '__view_defaults__', {}).copy()
         defaults.update(kw)
-        defaults['_backframes'] = 3
+        defaults['_backframes'] = 3 # for action_method
         return wrapped(*arg, **defaults)
     return wraps(wrapped)(wrapper)
 
