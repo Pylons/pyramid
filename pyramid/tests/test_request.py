@@ -243,15 +243,6 @@ class TestRequest(unittest.TestCase):
         request.body = '{"a":1}'
         self.assertEqual(request.json_body, {'a':1})
 
-    def test_json_body_alternate_charset(self):
-        from pyramid.compat import json
-        request = self._makeOne({'REQUEST_METHOD':'POST'})
-        request.charset = 'latin-1'
-        la = unicode('La Pe\xc3\xb1a', 'utf-8')
-        body = json.dumps({'a':la}, encoding='latin-1')
-        request.body = body
-        self.assertEqual(request.json_body, {'a':la})
-
     def test_json_body_GET_request(self):
         request = self._makeOne({'REQUEST_METHOD':'GET'})
         self.assertRaises(ValueError, getattr, request, 'json_body')
