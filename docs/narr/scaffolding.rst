@@ -111,9 +111,9 @@ defining your scaffold template:
    :linenos:
 
      try: # pyramid 1.0.X
-         # "pyramid.paster_templates" doesn't exist past 1.0.X
-         from pyramid.paster import PyramidTemplate
+         # "pyramid.paster.paste_script..." doesn't exist past 1.0.X
          from pyramid.paster import paste_script_template_renderer
+         from pyramid.paster import PyramidTemplate
      except ImportError:
          try: # pyramid 1.1.X, 1.2.X
              # trying to import "paste_script_template_renderer" fails on 1.3.X
