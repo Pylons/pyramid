@@ -76,8 +76,10 @@ command::
 
 The ``ini`` configuration file format supported by Pyramid has not changed.
 As a result, Python 2-only users can install PasteScript manually and use
-``paster serve`` and ``paster create`` instead if they like.  However, using
-``pserve`` and ``pcreate`` will work under both Python 2 and Python 3.
+``paster serve`` instead if they like.  However, using ``pserve`` will work
+under both Python 2 and Python 3.  ``pcreate`` is required to be used for
+internal Pyramid scaffolding; externally distributed scaffolding may allow
+for both ``pcreate`` and/or ``paster create``.
 
 Analogues of ``paster pshell``, ``paster pviews`` and ``paster ptweens`` also
 exist under the respective console script names ``pshell``, ``pviews``, and
@@ -100,6 +102,10 @@ the Paste ``httpserver`` by replacing the former line with the latter.  This is
 actually recommended if you rely on proxying from Apache or Nginx to a
 ``pserve`` -invoked application.  **The wsgiref server is not a production
 quality server.** See :ref:`alternate_wsgi_server` for more information.
+
+New releases in every older major Pyramid series (1.0.2, 1.1.3, 1.2.5) also
+have the ``egg:pyramid#wsgiref`` entry point, so scaffold-writers can depend
+on it being there even in older major Pyramid versions.
 
 .. warning::
 
