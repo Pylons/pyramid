@@ -158,3 +158,5 @@ Contributors
 - Reed O'Brien, 2011/11/07
 
 - Klee Dienes, 2011/10/30
+
+- Michael Ryabushin, 2011/12/14
