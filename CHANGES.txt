@@ -8,6 +8,12 @@ Features
   documented in the "Command-Line Pyramid" chapter in the section entitled
   "Invoking a Request".
 
+Bug Fixes
+---------
+
+- Normalized exit values and ``-h`` output for all ``p*`` scripts
+  (``pviews``, ``proutes``, etc).
+
 1.3a2 (2011-12-14)
 ==================
 

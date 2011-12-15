@@ -18,7 +18,7 @@ class PRequestCommand(object):
     PasteDeploy (.ini) configuration file for the server and application.
 
     Use "prequest config.ini /path" to request "/path".  Use "prequest
-    config.ini /path --method=post < data" to do a POST with the given
+    --method=POST config.ini /path < data" to do a POST with the given
     request body.
 
     If the path is relative (doesn't begin with "/") it is interpreted as
@@ -28,11 +28,11 @@ class PRequestCommand(object):
     the request's WSGI environment, so your application can distinguish these
     calls from normal requests.
 
-    Note that you can pass options besides the options listed here; any
-    unknown options will be passed to the application in
+    Note that you can pass arguments besides the options listed here; any
+    unknown arguments will be passed to the application in
     "environ['QUERY_STRING']"
     """
-    usage = "usage: %prog config_file path_info [args/options]"
+    usage = "usage: %prog config_uri path_info [args/options]"
     parser = optparse.OptionParser(
         usage=usage,
         description=textwrap.dedent(description)

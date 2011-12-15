@@ -1,36 +1,34 @@
 import optparse
 import sys
+import textwrap
 
 from pyramid.interfaces import IMultiView
 from pyramid.paster import bootstrap
 
 def main(argv=sys.argv, quiet=False):
     command = PViewsCommand(argv, quiet)
-    command.run()
+    return command.run()
 
 class PViewsCommand(object):
-    """Print, for a given URL, the views that might match. Underneath each
+    usage = '%prog config_uri url'
+    description = """\
+    Print, for a given URL, the views that might match. Underneath each
     potentially matching route, list the predicates required. Underneath
     each route+predicate set, print each view that might match and its
     predicates.
 
-    This command accepts two positional arguments:
-
-    ``config_uri`` -- specifies the PasteDeploy config file to use for the
-    interactive shell. The format is ``inifile#name``. If the name is left
-    off, ``main`` will be assumed.
-
-    ``url`` -- specifies the URL that will be used to find matching views.
-
-    Example::
-
-        $ proutes myapp.ini#main url
-
+    This command accepts two positional arguments: "config_uri" specifies the
+    PasteDeploy config file to use for the interactive shell. The format is
+    "inifile#name". If the name is left off, "main" will be assumed.  "url"
+    specifies the path info portion of a URL that will be used to find
+    matching views.  Example: "proutes myapp.ini#main /url"
     """
-    summary = "Print all views in an application that might match a URL"
     stdout = sys.stdout
 
-    parser = optparse.OptionParser()
+    parser = optparse.OptionParser(
+        usage,
+        description=textwrap.dedent(description)
+        )
 
     bootstrap = (bootstrap,) # testing
 
@@ -231,7 +229,7 @@ class PViewsCommand(object):
     def run(self):
         if len(self.args) < 2:
             self.out('Command requires a config file arg and a url arg')
-            return
+            return 2
         config_uri, url = self.args
         if not url.startswith('/'):
             url = '/%s' % url
@@ -256,3 +254,5 @@ class PViewsCommand(object):
             else:
                 self.out("    Not found.")
         self.out('')
+        return 0
+

@@ -16,6 +16,7 @@ import os
 import re
 import subprocess
 import sys
+import textwrap
 import threading
 import time
 import traceback
@@ -28,17 +29,14 @@ MAXFD = 1024
 
 def main(argv=sys.argv, quiet=False):
     command = PServeCommand(argv, quiet=quiet)
-    command.run()
+    return command.run()
 
 class DaemonizeException(Exception):
     pass
 
 class PServeCommand(object):
 
-    usage = 'CONFIG_FILE [start|stop|restart|status] [var=value]'
-    takes_config_file = 1
-    summary = ("Serve the application described in CONFIG_FILE or control "
-               "daemon status"),
+    usage = '%prog config_uri [start|stop|restart|status] [var=value]'
     description = """\
     This command serves a web application that uses a PasteDeploy
     configuration file for the server and application.
@@ -51,7 +49,10 @@ class PServeCommand(object):
     """
     verbose = 1
 
-    parser = optparse.OptionParser()
+    parser = optparse.OptionParser(
+        usage,
+        description=textwrap.dedent(description)
+        )
     parser.add_option(
         '-n', '--app-name',
         dest='app_name',
@@ -158,7 +159,7 @@ class PServeCommand(object):
 
         if not self.args:
             self.out('You must give a config file')
-            return
+            return 2
         app_spec = self.args[0]
         if (len(self.args) > 1
             and self.args[1] in self.possible_subcommands):
@@ -181,7 +182,7 @@ class PServeCommand(object):
         if cmd not in (None, 'start', 'stop', 'restart', 'status'):
             self.out(
                 'Error: must give start|stop|restart (not %s)' % cmd)
-            return
+            return 2
 
         if cmd == 'status' or self.options.show_status:
             return self.show_status()
@@ -244,7 +245,7 @@ class PServeCommand(object):
             except DaemonizeException as ex:
                 if self.verbose > 0:
                     self.out(str(ex))
-                return
+                return 2
 
         if (self.options.monitor_restart
             and not os.environ.get(self._monitor_environ_key)):

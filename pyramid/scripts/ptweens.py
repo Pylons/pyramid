@@ -1,5 +1,6 @@
 import optparse
 import sys
+import textwrap
 
 from pyramid.interfaces import ITweens
 
@@ -9,31 +10,29 @@ from pyramid.paster import bootstrap
 
 def main(argv=sys.argv, quiet=False):
     command = PTweensCommand(argv, quiet)
-    command.run()
+    return command.run()
 
 class PTweensCommand(object):
-    """Print all implicit and explicit :term:`tween` objects used by a
-    Pyramid application.  The handler output includes whether the system is
-    using an explicit tweens ordering (will be true when the
-    ``pyramid.tweens`` setting is used) or an implicit tweens ordering (will
-    be true when the ``pyramid.tweens`` setting is *not* used).
+    usage = '%prog config_uri'
+    description = """\
+    Print all implicit and explicit tween objects used by a Pyramid
+    application.  The handler output includes whether the system is using an
+    explicit tweens ordering (will be true when the "pyramid.tweens"
+    deployment setting is used) or an implicit tweens ordering (will be true
+    when the "pyramid.tweens" deployment setting is *not* used).
 
-    This command accepts one positional argument:
-
-    ``config_uri`` -- specifies the PasteDeploy config file to use for the
-    interactive shell. The format is ``inifile#name``. If the name is left
-    off, ``main`` will be assumed.
-
-    Example::
-
-        $ ptweens myapp.ini#main
+    This command accepts one positional argument named "config_uri" which
+    specifies the PasteDeploy config file to use for the interactive
+    shell. The format is "inifile#name". If the name is left off, "main"
+    will be assumed.  Example: "ptweens myapp.ini#main".
 
     """
-    summary = "Print all tweens related to a Pyramid application"
+    parser = optparse.OptionParser(
+        usage,
+        description=textwrap.dedent(description),
+        )
+
     stdout = sys.stdout
-
-    parser = optparse.OptionParser()
-
     bootstrap = (bootstrap,) # testing
 
     def __init__(self, argv, quiet=False):
@@ -61,7 +60,7 @@ class PTweensCommand(object):
     def run(self):
         if not self.args:
             self.out('Requires a config file argument')
-            return
+            return 2
         config_uri = self.args[0]
         env = self.bootstrap[0](config_uri)
         registry = env['registry']
@@ -86,3 +85,4 @@ class PTweensCommand(object):
                 self.out('Implicit Tween Chain')
                 self.out('')
                 self.show_chain(tweens.implicit())
+        return 0

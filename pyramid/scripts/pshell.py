@@ -1,6 +1,7 @@
 from code import interact
 import optparse
 import sys
+import textwrap
 
 from pyramid.compat import configparser
 from pyramid.util import DottedNameResolver
@@ -10,32 +11,29 @@ from pyramid.paster import setup_logging
 
 def main(argv=sys.argv, quiet=False):
     command = PShellCommand(argv, quiet)
-    command.run()
+    return command.run()
 
 class PShellCommand(object):
-    """Open an interactive shell with a :app:`Pyramid` app loaded.
+    usage = '%prog config_uri'
+    description = """\
+    Open an interactive shell with a Pyramid app loaded.  This command
+    accepts one positional argument named "config_uri" which specifies the
+    PasteDeploy config file to use for the interactive shell. The format is
+    "inifile#name". If the name is left off, the Pyramid default application
+    will be assumed.  Example: "pshell myapp.ini#main"
 
-    This command accepts one positional argument:
-
-    ``config_uri`` -- specifies the PasteDeploy config file to use for the
-    interactive shell. The format is ``inifile#name``. If the name is left
-    off, ``main`` will be assumed.
-
-    Example::
-
-        $ pshell myapp.ini#main
-
-    .. note:: If you do not point the loader directly at the section of the
-              ini file containing your :app:`Pyramid` application, the
-              command will attempt to find the app for you. If you are
-              loading a pipeline that contains more than one :app:`Pyramid`
-              application within it, the loader will use the last one.
-
+    If you do not point the loader directly at the section of the ini file
+    containing your Pyramid application, the command will attempt to
+    find the app for you. If you are loading a pipeline that contains more
+    than one Pyramid application within it, the loader will use the
+    last one.
     """
     bootstrap = (bootstrap,) # for testing
-    summary = "Open an interactive shell with a Pyramid application loaded"
 
-    parser = optparse.OptionParser()
+    parser = optparse.OptionParser(
+        usage,
+        description=textwrap.dedent(description)
+        )
     parser.add_option('-p', '--python-shell',
                       action='store', type='string', dest='python_shell',
                       default='', help='ipython | bpython | python')
@@ -82,7 +80,7 @@ class PShellCommand(object):
     def run(self, shell=None):
         if not self.args:
             self.out('Requires a config file argument')
-            return
+            return 2
         config_uri = self.args[0]
         config_file = config_uri.split('#', 1)[0]
         setup_logging(config_file)

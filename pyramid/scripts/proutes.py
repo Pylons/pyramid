@@ -1,34 +1,34 @@
 import optparse
 import sys
+import textwrap
 
 from pyramid.paster import bootstrap
 
 def main(argv=sys.argv, quiet=False):
     command = PRoutesCommand(argv, quiet)
-    command.run()
+    return command.run()
 
 class PRoutesCommand(object):
-    """Print all URL dispatch routes used by a Pyramid application in the
+    description = """\
+    Print all URL dispatch routes used by a Pyramid application in the
     order in which they are evaluated.  Each route includes the name of the
     route, the pattern of the route, and the view callable which will be
     invoked when the route is matched.
 
-    This command accepts one positional argument:
-
-    ``config_uri`` -- specifies the PasteDeploy config file to use for the
-    interactive shell. The format is ``inifile#name``. If the name is left
-    off, ``main`` will be assumed.
-
-    Example::
-
-        $ proutes myapp.ini#main
+    This command accepts one positional argument named "config_uri".  It
+    specifies the PasteDeploy config file to use for the interactive
+    shell. The format is "inifile#name". If the name is left off, "main"
+    will be assumed.  Example: "proutes myapp.ini".
 
     """
     bootstrap = (bootstrap,)
-    summary = "Print all URL dispatch routes related to a Pyramid application"
     stdout = sys.stdout
+    usage = '%prog config_uri'
 
-    parser = optparse.OptionParser()
+    parser = optparse.OptionParser(
+        usage,
+        description=textwrap.dedent(description)
+        )
 
     def __init__(self, argv, quiet=False):
         self.options, self.args = self.parser.parse_args(argv[1:])
@@ -46,7 +46,7 @@ class PRoutesCommand(object):
     def run(self, quiet=False):
         if not self.args:
             self.out('requires a config file argument')
-            return
+            return 2
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IView
@@ -59,7 +59,7 @@ class PRoutesCommand(object):
             routes = mapper.get_routes()
             fmt = '%-15s %-30s %-25s'
             if not routes:
-                return
+                return 0
             self.out(fmt % ('Name', 'Pattern', 'View'))
             self.out(
                 fmt % ('-'*len('Name'), '-'*len('Pattern'), '-'*len('View')))
@@ -77,4 +77,5 @@ class PRoutesCommand(object):
                         (IViewClassifier, request_iface, Interface),
                         IView, name='', default=None)
                     self.out(fmt % (route.name, pattern, view_callable))
+        return 0
 

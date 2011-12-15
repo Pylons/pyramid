@@ -23,7 +23,7 @@ class TestPServeCommand(unittest.TestCase):
     def test_run_no_args(self):
         inst = self._makeOne()
         result = inst.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 2)
         self.assertEqual(self.out_.getvalue(), 'You must give a config file')
 
     def test_run_stop_daemon_no_such_pid_file(self):
@@ -73,7 +73,7 @@ class Test_main(unittest.TestCase):
 
     def test_it(self):
         result = self._callFUT(['pserve'])
-        self.assertEqual(result, None)
+        self.assertEqual(result, 2)
 
 class TestLazyWriter(unittest.TestCase):
     def _makeOne(self, filename, mode='w'):
