@@ -1,5 +1,5 @@
-Next release (on 1.1 branch)
-============================
+1.1.3 (2011-12-14)
+==================
 
 Features
 --------
@@ -7,7 +7,7 @@ Features
 - Backport the ``egg:pyramid#wsgiref`` and ``egg:pyramid#cherrypy`` server
   runners from the 1.3 branch.  This change is to primarily allow scaffolding
   authors to rely on the wsgiref entry point for projects that are meant to
-  work on both Pyramid 1.1.3 and 1.3.X.
+  work on both Pyramid 1.1.X and 1.3.X.
 
 Documentation
 -------------
