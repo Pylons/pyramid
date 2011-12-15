@@ -82,7 +82,7 @@ class CallbackAuthenticationPolicy(object):
         userid = self.unauthenticated_userid(request)
         if userid is None:
             debug and self._log(
-                'authenticated_userid returned %r; returning %r' % (
+                'unauthenticated_userid returned %r; returning %r' % (
                     userid, effective_principals),
                 'effective_principals',
                 request

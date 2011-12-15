@@ -83,7 +83,7 @@ class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
         self.assertEqual(
             self.messages[0],
             "pyramid.tests.test_authentication.MyAuthenticationPolicy."
-            "effective_principals: authenticated_userid returned None; "
+            "effective_principals: unauthenticated_userid returned None; "
             "returning ['system.Everyone']")
 
     def test_effective_principals_no_callback(self):
