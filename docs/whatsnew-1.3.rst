@@ -101,6 +101,16 @@ actually recommended if you rely on proxying from Apache or Nginx to a
 ``pserve`` -invoked application.  **The wsgiref server is not a production
 quality server.** See :ref:`alternate_wsgi_server` for more information.
 
+.. warning::
+
+   Previously, paste.httpserver "helped" by converting header values that weren't
+   strings to strings. The wsgiref server, on the other hand implements the spec
+   more fully. This specifically may affect you if you are modifying headers on 
+   your response. The following error might be an indicator of this problem:
+   **AssertionError: Header values must be strings, please check the type of
+   the header being returned.** A common case would be returning unicode headers
+   instead of string headers.
+
 A new :mod:`pyramid.compat` module was added which provides Python 2/3
 straddling support for Pyramid add-ons and development environments.
 
