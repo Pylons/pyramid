@@ -81,9 +81,9 @@ under both Python 2 and Python 3.  ``pcreate`` is required to be used for
 internal Pyramid scaffolding; externally distributed scaffolding may allow
 for both ``pcreate`` and/or ``paster create``.
 
-Analogues of ``paster pshell``, ``paster pviews`` and ``paster ptweens`` also
-exist under the respective console script names ``pshell``, ``pviews``, and
-``ptweens``.
+Analogues of ``paster pshell``, ``paster pviews``, ``paster request`` and
+``paster ptweens`` also exist under the respective console script names
+``pshell``, ``pviews``, ``prequest`` and ``ptweens``.
 
 We've replaced use of the Paste ``httpserver`` with the ``wsgiref`` server in
 the scaffolds, so once you create a project from a scaffold, its
@@ -295,6 +295,9 @@ Documentation Enhancements
 - Added an API docs chapter for :mod:`pyramid.scaffolds`.
 
 - Added a narrative docs chapter named :ref:`scaffolding_chapter`.
+
+- Added a description of the ``prequest`` command-line script at
+  :ref:`invoking_a_request`.
 
 Dependency Changes
 ------------------

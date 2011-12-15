@@ -121,7 +121,8 @@ The Interactive Shell
 Once you've installed your program for development using ``setup.py
 develop``, you can use an interactive Python shell to execute expressions in
 a Python environment exactly like the one that will be used when your
-application runs "for real".  To do so, use the ``pshell`` command.
+application runs "for real".  To do so, use the ``pshell`` command line
+utility.
 
 The argument to ``pshell`` follows the format ``config_file#section_name``
 where ``config_file`` is the path to your application's ``.ini`` file and
@@ -311,7 +312,7 @@ For example:
 .. code-block:: text
    :linenos:
 
-   [chrism@thinko MyProject]$ ../bin/proutes development.ini#MyProject
+   [chrism@thinko MyProject]$ ../bin/proutes development.ini
    Name            Pattern                        View
    ----            -------                        ----                     
    home            /                              <function my_view>
@@ -354,7 +355,7 @@ configured without any explicit tweens:
 .. code-block:: text
    :linenos:
 
-   [chrism@thinko pyramid]$ ptweens development.ini 
+   [chrism@thinko pyramid]$ myenv/bin/ptweens development.ini 
    "pyramid.tweens" config value NOT set (implicitly ordered tweens used)
 
    Implicit Tween Chain
@@ -415,6 +416,64 @@ is used:
                     pyramid.tweens.excview_tween_factory
 
 See :ref:`registering_tweens` for more information about tweens.
+
+.. index::
+   single: invoking a request
+   single: prequest
+
+.. _invoking_a_request:
+
+Invoking a Request
+------------------
+
+You can use the ``prequest`` command-line utility to send a request to your
+application and see the response body without starting a server.
+
+There are two required arguments to ``prequest``:
+
+- The config file/section: follows the format ``config_file#section_name``
+  where ``config_file`` is the path to your application's ``.ini`` file and
+  ``section_name`` is the ``app`` section name inside the ``.ini`` file.  The
+  ``section_name`` is optional, it defaults to ``main``.  For example:
+  ``development.ini``.
+
+- The path: this should be the non-url-quoted path element of the URL to the
+  resource you'd like to be rendered on the server.  For example, ``/``.
+
+For example::
+
+   $ bin/prequest development.ini /
+
+This will print the body of the response to the console on which it was
+invoked.
+
+Several options are supported by ``prequest``.  These should precede any
+config file name or URL.
+
+``prequest`` has a ``-d`` (aka ``--display-headers``) option which prints the
+status and headers returned by the server before the output::
+
+   $ bin/prequest -d development.ini /
+
+This will print the status, then the headers, then the body of the response
+to the console.
+
+You can add request header values by using the ``--header`` option::
+
+   $ bin/prequest --header=Host=example.com development.ini /
+
+Headers are added to the WSGI environment by converting them to their
+CGI/WSGI equivalents (e.g. ``Host=example.com`` will insert the ``HTTP_HOST``
+header variable as the value ``example.com``).  Multiple ``--header`` options
+can be supplied.  The special header value ``content-type`` sets the
+``CONTENT_TYPE`` in the WSGI environment.
+
+By default, ``prequest`` sends a ``GET`` request.  You can change this by
+using the ``-m`` (aka ``--method``) option.  ``GET``, ``HEAD``, ``POST`` and
+``DELETE`` are currently supported.  When you use ``POST``, the standard
+input of the ``prequest`` process is used as the ``POST`` body::
+
+   $ bin/prequest -mPOST development.ini / < somefile
 
 .. _writing_a_script:
 

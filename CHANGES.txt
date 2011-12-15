@@ -1,3 +1,13 @@
+Next release
+============
+
+Features
+--------
+
+- Added a ``prequest`` script (along the lines of ``paster request``).  It is
+  documented in the "Command-Line Pyramid" chapter in the section entitled
+  "Invoking a Request".
+
 1.3a2 (2011-12-14)
 ==================
 

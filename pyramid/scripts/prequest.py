@@ -1,16 +1,14 @@
 import optparse
-import os
-import re
 import sys
 import textwrap
 
 from pyramid.compat import url_quote
 from pyramid.request import Request
-from paste.deploy import loadapp
+from pyramid.paster import get_app
 
 def main(argv=sys.argv, quiet=False):
     command = PRequestCommand(argv, quiet)
-    command.run()
+    return command.run()
 
 class PRequestCommand(object):
     description = """\
@@ -47,14 +45,6 @@ class PRequestCommand(object):
         type="string",
         )
     parser.add_option(
-        '-c', '--config-var',
-        dest='config_vars',
-        metavar='NAME:VALUE',
-        action='append',
-        help="Variable to make available in the config for %()s substitution "
-        "(you can use this option multiple times)"
-        )
-    parser.add_option(
         '--header',
         dest='headers',
         metavar='NAME:VALUE',
@@ -71,59 +61,43 @@ class PRequestCommand(object):
     parser.add_option(
         '-m', '--method',
         dest='method',
-        choices=['GET', 'POST'],
+        choices=['GET', 'HEAD', 'POST', 'DELETE'],
         type='choice',
-        help='Request method type (GET or POST)',
+        help='Request method type (GET, POST, DELETE)',
         )
 
-    _scheme_re = re.compile(r'^[a-z][a-z]+:', re.I)
+    get_app = staticmethod(get_app)
+    stdin = sys.stdin
 
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
         self.options, self.args = self.parser.parse_args(argv[1:])
 
-    def out(self, msg, delim='\n'): # pragma: no cover
+    def out(self, msg): # pragma: no cover
         if not self.quiet:
-            sys.stdout.write(msg+delim)
-            sys.stdout.flush()
+            print(msg)
 
     def run(self):
         if not len(self.args) >= 2:
             self.out('You must provide at least two arguments')
-            return
+            return 2
         app_spec = self.args[0]
         path = self.args[1]
         if not path.startswith('/'):
             path = '/' + path 
 
-        vars = {}
-        if self.options.config_vars:
-            for item in self.options.config_vars:
-                if ':' not in item:
-                    raise ValueError(
-                        "Bad option, should be name:value "
-                        ": --config-var=%s" % item)
-                name, value = item.split(':', 1)
-                vars[name] = value
-
         headers = {}
         if self.options.headers:
             for item in self.options.headers:
                 if ':' not in item:
-                    raise ValueError(
-                        "Bad option, should be name:value : --header=%s" % item)
+                    self.out(
+                        "Bad --header=%s option, value must be in the form "
+                        "'name:value'" % item)
+                    return 2
                 name, value = item.split(':', 1)
                 headers[name] = value.strip()
 
-        if not self._scheme_re.search(app_spec):
-            app_spec = 'config:' + app_spec
-
-        if self.options.app_name:
-            if '#' in app_spec:
-                app_spec = app_spec.split('#', 1)[0]
-            app_spec = app_spec + '#' + self.options.app_name
-
-        app = loadapp(app_spec, relative_to=os.getcwd(), global_conf=vars)
+        app = self.get_app(app_spec, self.options.app_name)
         request_method = (self.options.method or 'GET').upper()
 
         qs = []
@@ -156,7 +130,7 @@ class PRequestCommand(object):
             }
 
         if request_method == 'POST':
-            environ['wsgi.input'] = sys.stdin
+            environ['wsgi.input'] = self.stdin
             environ['CONTENT_LENGTH'] = '-1'
 
         for name, value in headers.items():
@@ -172,5 +146,5 @@ class PRequestCommand(object):
             self.out(response.status)
             for name, value in response.headerlist:
                 self.out('%s: %s' % (name, value))
-        self.out(response.body, '')
-
+        self.out(response.ubody)
+        return 0
