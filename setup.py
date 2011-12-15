@@ -98,6 +98,7 @@ setup(name='pyramid',
         proutes = pyramid.scripts.proutes:main
         pviews = pyramid.scripts.pviews:main
         ptweens = pyramid.scripts.ptweens:main
+        prequest = pyramid.scripts.prequest:main
         [paste.server_runner]
         wsgiref = pyramid.scripts.pserve:wsgiref_server_runner
         cherrypy = pyramid.scripts.pserve:cherrypy_server_runner
