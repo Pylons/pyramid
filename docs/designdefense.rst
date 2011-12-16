@@ -1628,8 +1628,8 @@ comments take into account what we've discussed in the
 .. code-block:: python
    :linenos:
 
-   from pyramid.response import Response      # explicit response objects, no TL
-   from paste.httpserver import serve         # explicitly WSGI
+   from pyramid.response import Response         # explicit response, no TL
+   from wsgiref.simple_server import make_server # explicitly WSGI
 
    def hello_world(request):  # accepts a request; no request thread local reqd
        # explicit response object means no response threadlocal
@@ -1640,7 +1640,8 @@ comments take into account what we've discussed in the
        config = Configurator()       # no global application object.
        config.add_view(hello_world)  # explicit non-decorator registration
        app = config.make_wsgi_app()  # explicitly WSGI
-       serve(app, host='0.0.0.0')    # explicitly WSGI
+       server = make_server('0.0.0.0', 8080, app)
+       server.serve_forever()        # explicitly WSGI
 
 Pyramid Doesn't Offer Pluggable Apps
 ------------------------------------
@@ -1736,7 +1737,7 @@ If you can understand this hello world program, you can use Pyramid:
 .. code-block:: python
    :linenos:
 
-   from paste.httpserver import serve
+   from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
    from pyramid.response import Response
 
@@ -1747,7 +1748,8 @@ If you can understand this hello world program, you can use Pyramid:
        config = Configurator()
        config.add_view(hello_world)
        app = config.make_wsgi_app()
-       serve(app)
+       server = make_server('0.0.0.0', 8080, app)
+       server.serve_forever()
 
 Pyramid has ~ 650 pages of documentation (printed), covering topics from the
 very basic to the most advanced.  *Nothing* is left undocumented, quite
