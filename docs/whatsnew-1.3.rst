@@ -299,6 +299,9 @@ Documentation Enhancements
 - Added a description of the ``prequest`` command-line script at
   :ref:`invoking_a_request`.
 
+- Added a section to the "Command-Line Pyramid" chapter named
+  :ref:`making_a_console_script`.
+
 Dependency Changes
 ------------------
 
