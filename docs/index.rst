@@ -109,7 +109,6 @@ applications to various platforms.
    tutorials/wiki2/index.rst
    tutorials/wiki/index.rst
    tutorials/bfg/index.rst
-   tutorials/gae/index.rst
    tutorials/modwsgi/index.rst
 
 Reference Material

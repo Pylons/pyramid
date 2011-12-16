@@ -302,6 +302,12 @@ Documentation Enhancements
 - Added a section to the "Command-Line Pyramid" chapter named
   :ref:`making_a_console_script`.
 
+- Removed the "Running Pyramid on Google App Engine" tutorial from the main
+  docs.  It survives on in the Cookbook
+  (http://docs.pylonsproject.org/projects/pyramid_cookbook/en/latest/gae.html).
+  Rationale: it provides the correct info for the Python 2.5 version of GAE
+  only, and this version of Pyramid does not support Python 2.5.
+
 Dependency Changes
 ------------------
 
