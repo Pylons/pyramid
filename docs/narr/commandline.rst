@@ -793,10 +793,10 @@ top-level directory your ``setup.py`` file will look something like this:
          zip_safe=False,
          install_requires=requires,
          tests_require=requires,
-         test_suite="wiggystatic",
+         test_suite="myproject",
          entry_points = """\
          [paste.app_factory]
-         main = wiggystatic:main
+         main = myproject:main
          """,
          )
 
@@ -848,10 +848,10 @@ The result will be something like:
          zip_safe=False,
          install_requires=requires,
          tests_require=requires,
-         test_suite="wiggystatic",
+         test_suite="myproject",
          entry_points = """\
          [paste.app_factory]
-         main = wiggystatic:main
+         main = myproject:main
          [console_scripts]
          show_settings = myproject.scripts:settings_show
          """,
