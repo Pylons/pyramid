@@ -909,6 +909,13 @@ one of the following.
   compatible.  You'll need to ``easy_install CherryPy`` into your Pyramid
   virtualenv for this server to work.
 
+The servers described above are typically both faster and more secure than
+the default WSGI server used by Pyramid.  Pyramid does not depend on either
+because Paste doesn't run on Python 3 (and Pyramid must) and the CherryPy
+server is not distributed separately from the CherryPy web framework (and it
+would be an awkward dependency to have a web framework rely on another web
+framework for just its server component).
+
 ``pserve`` is by no means the only way to start up and serve a :app:`Pyramid`
 application.  As we saw in :ref:`firstapp_chapter`, ``pserve`` needn't be
 invoked at all to run a :app:`Pyramid` application.  The use of ``pserve`` to
