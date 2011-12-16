@@ -22,8 +22,6 @@ Must-Have
 - Fix deployment recipes in cookbook (discourage proxying without changing
   server).
 
-- Allow prequest path to have query string variables.
-
 Nice-to-Have
 ------------
 

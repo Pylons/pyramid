@@ -2,7 +2,7 @@ import optparse
 import sys
 import textwrap
 
-from pyramid.compat import url_quote
+from pyramid.compat import url_unquote
 from pyramid.request import Request
 from pyramid.paster import get_app
 
@@ -22,15 +22,12 @@ class PRequestCommand(object):
     request body.
 
     If the path is relative (doesn't begin with "/") it is interpreted as
-    relative to "/".
+    relative to "/".  The path passed to this script should be URL-quoted.
+    The path can be succeeded with a query string (e.g. `/path?a=1&=b2').
 
     The variable "environ['paste.command_request']" will be set to "True" in
     the request's WSGI environment, so your application can distinguish these
     calls from normal requests.
-
-    Note that you can pass arguments besides the options listed here; any
-    unknown arguments will be passed to the application in
-    "environ['QUERY_STRING']"
     """
     usage = "usage: %prog config_uri path_info [args/options]"
     parser = optparse.OptionParser(
@@ -84,7 +81,14 @@ class PRequestCommand(object):
         app_spec = self.args[0]
         path = self.args[1]
         if not path.startswith('/'):
-            path = '/' + path 
+            path = '/' + path
+
+        try:
+            path, qs = path.split('?', 1)
+        except ValueError:
+            qs = ''
+
+        path = url_unquote(path)
 
         headers = {}
         if self.options.headers:
@@ -100,20 +104,10 @@ class PRequestCommand(object):
         app = self.get_app(app_spec, self.options.app_name)
         request_method = (self.options.method or 'GET').upper()
 
-        qs = []
-        for item in self.args[2:]:
-            if '=' in item:
-                k, v = item.split('=', 1)
-                item = url_quote(k) + '=' + url_quote(v)
-            else:
-                item = url_quote(item)
-            qs.append(item)
-        qs = '&'.join(qs)
-        
         environ = {
             'REQUEST_METHOD': request_method,
             'SCRIPT_NAME': '',           # may be empty if app is at the root
-            'PATH_INFO': path,             # may be empty if at root of app
+            'PATH_INFO': path,           
             'SERVER_NAME': 'localhost',  # always mandatory
             'SERVER_PORT': '80',         # always mandatory 
             'SERVER_PROTOCOL': 'HTTP/1.0',

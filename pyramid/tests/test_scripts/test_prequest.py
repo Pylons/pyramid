@@ -111,11 +111,11 @@ class TestPRequestCommand(unittest.TestCase):
         self.assertEqual(self._app_name, None)
         self.assertEqual(self._out, ['abc'])
 
-    def test_command_extra_args_used_in_query_string(self):
-        command = self._makeOne(['', 'development.ini', '/', 'a=1%','b=2','c'])
+    def test_command_with_query_string(self):
+        command = self._makeOne(['', 'development.ini', '/abc?a=1&b=2&c'])
         command.run()
-        self.assertEqual(self._environ['QUERY_STRING'], 'a=1%25&b=2&c')
-        self.assertEqual(self._path_info, '/')
+        self.assertEqual(self._environ['QUERY_STRING'], 'a=1&b=2&c')
+        self.assertEqual(self._path_info, '/abc')
         self.assertEqual(self._spec, 'development.ini')
         self.assertEqual(self._app_name, None)
         self.assertEqual(self._out, ['abc'])
