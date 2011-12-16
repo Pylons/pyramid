@@ -283,7 +283,7 @@ For example, on UNIX:
    $ ../bin/pserve development.ini --reload
    Starting subprocess with file monitor
    Starting server in PID 16601.
-   serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
+   Starting HTTP server on http://0.0.0.0:6543
 
 For more detailed information about the startup process, see
 :ref:`startup_chapter`.  For more information about environment variables and
