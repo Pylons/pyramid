@@ -16,13 +16,22 @@ from pyramid.scaffolds import copydir
 fsenc = sys.getfilesystemencoding()
 
 class Template(object):
+    """ Inherit from this base class and override methods to use the Pyramid
+    scaffolding system."""
     copydir = copydir # for testing
     _template_dir = None
 
     def __init__(self, name):
         self.name = name
 
-    def template_renderer(self, content, vars, filename=None):
+    def render_template(self, content, vars, filename=None):
+        """ Return a bytestring representing a templated file based on the
+        input (content) and the variable names defined (vars).  ``filename``
+        is used for exception reporting."""
+        # this method must not be named "template_renderer" fbo of extension
+        # scaffolds that need to work under pyramid 1.2 and 1.3, and which
+        # need to do "template_renderer =
+        # staticmethod(paste_script_template_renderer)"
         content = native_(content, fsenc)
         try:
             return bytes_(
@@ -32,14 +41,20 @@ class Template(object):
             raise
 
     def module_dir(self):
-        """Returns the module directory of this template."""
         mod = sys.modules[self.__class__.__module__]
         return os.path.dirname(mod.__file__)
 
     def template_dir(self):
+        """ Return the template directory of the scaffold.  By default, it
+        returns the value of ``os.path.join(self.module_dir(),
+        self._template_dir)`` (``self.module_dir()`` returns the module in
+        which your subclass has been defined).  If ``self._template_dir`` is
+        a tuple this method just returns the value instead of trying to
+        construct a path.  If _template_dir is a tuple, it should be a
+        2-element tuple: ``(package_name, package_relative_path)``."""
         assert self._template_dir is not None, (
             "Template %r didn't set _template_dir" % self)
-        if isinstance( self._template_dir, tuple):
+        if isinstance(self._template_dir, tuple):
             return self._template_dir
         else:
             return os.path.join(self.module_dir(), self._template_dir)
@@ -78,7 +93,7 @@ class Template(object):
             interactive=command.options.interactive,
             overwrite=command.options.overwrite,
             indent=1,
-            template_renderer=self.template_renderer
+            template_renderer=self.render_template,
             )
 
     def makedirs(self, dir): # pragma: no cover
@@ -89,6 +104,18 @@ class Template(object):
 
     def out(self, msg): # pragma: no cover
         print(msg)
+
+    # hair for exit with usage when paster create is used under 1.3 instead
+    # of pcreate for extension scaffolds which need to support multiple
+    # versions of pyramid; the check_vars method is called by pastescript
+    # only as the result of "paster create"; pyramid doesn't use it.  the
+    # required_templates tuple is required to allow it to get as far as
+    # calling check_vars.
+    required_templates = ()
+    def check_vars(self, vars, other):
+        raise RuntimeError(
+            'Under Pyramid 1.3, you should use the "pcreate" command rather '
+            'than "paster create"')
 
 class TypeMapper(dict):
 

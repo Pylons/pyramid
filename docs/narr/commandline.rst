@@ -121,7 +121,8 @@ The Interactive Shell
 Once you've installed your program for development using ``setup.py
 develop``, you can use an interactive Python shell to execute expressions in
 a Python environment exactly like the one that will be used when your
-application runs "for real".  To do so, use the ``pshell`` command.
+application runs "for real".  To do so, use the ``pshell`` command line
+utility.
 
 The argument to ``pshell`` follows the format ``config_file#section_name``
 where ``config_file`` is the path to your application's ``.ini`` file and
@@ -311,7 +312,7 @@ For example:
 .. code-block:: text
    :linenos:
 
-   [chrism@thinko MyProject]$ ../bin/proutes development.ini#MyProject
+   [chrism@thinko MyProject]$ ../bin/proutes development.ini
    Name            Pattern                        View
    ----            -------                        ----                     
    home            /                              <function my_view>
@@ -354,7 +355,7 @@ configured without any explicit tweens:
 .. code-block:: text
    :linenos:
 
-   [chrism@thinko pyramid]$ ptweens development.ini 
+   [chrism@thinko pyramid]$ myenv/bin/ptweens development.ini 
    "pyramid.tweens" config value NOT set (implicitly ordered tweens used)
 
    Implicit Tween Chain
@@ -415,6 +416,64 @@ is used:
                     pyramid.tweens.excview_tween_factory
 
 See :ref:`registering_tweens` for more information about tweens.
+
+.. index::
+   single: invoking a request
+   single: prequest
+
+.. _invoking_a_request:
+
+Invoking a Request
+------------------
+
+You can use the ``prequest`` command-line utility to send a request to your
+application and see the response body without starting a server.
+
+There are two required arguments to ``prequest``:
+
+- The config file/section: follows the format ``config_file#section_name``
+  where ``config_file`` is the path to your application's ``.ini`` file and
+  ``section_name`` is the ``app`` section name inside the ``.ini`` file.  The
+  ``section_name`` is optional, it defaults to ``main``.  For example:
+  ``development.ini``.
+
+- The path: this should be the non-url-quoted path element of the URL to the
+  resource you'd like to be rendered on the server.  For example, ``/``.
+
+For example::
+
+   $ bin/prequest development.ini /
+
+This will print the body of the response to the console on which it was
+invoked.
+
+Several options are supported by ``prequest``.  These should precede any
+config file name or URL.
+
+``prequest`` has a ``-d`` (aka ``--display-headers``) option which prints the
+status and headers returned by the server before the output::
+
+   $ bin/prequest -d development.ini /
+
+This will print the status, then the headers, then the body of the response
+to the console.
+
+You can add request header values by using the ``--header`` option::
+
+   $ bin/prequest --header=Host=example.com development.ini /
+
+Headers are added to the WSGI environment by converting them to their
+CGI/WSGI equivalents (e.g. ``Host=example.com`` will insert the ``HTTP_HOST``
+header variable as the value ``example.com``).  Multiple ``--header`` options
+can be supplied.  The special header value ``content-type`` sets the
+``CONTENT_TYPE`` in the WSGI environment.
+
+By default, ``prequest`` sends a ``GET`` request.  You can change this by
+using the ``-m`` (aka ``--method``) option.  ``GET``, ``HEAD``, ``POST`` and
+``DELETE`` are currently supported.  When you use ``POST``, the standard
+input of the ``prequest`` process is used as the ``POST`` body::
+
+   $ bin/prequest -mPOST development.ini / < somefile
 
 .. _writing_a_script:
 
@@ -595,3 +654,234 @@ use the following command:
 
    import logging.config
    logging.config.fileConfig('/path/to/my/development.ini')
+
+.. index::
+   single: console script
+
+.. _making_a_console_script:
+
+Making Your Script into a Console Script
+----------------------------------------
+
+A "console script" is :term:`setuptools` terminology for a script that gets
+installed into the ``bin`` directory of a Python :term:`virtualenv` (or
+"base" Python environment) when a :term:`distribution` which houses that
+script is installed.  Because it's installed into the ``bin`` directory of a
+virtualenv when the distribution is installed, it's a convenient way to
+package and distribute functionality that you can call from the command-line.
+It's often more convenient to create a console script than it is to create a
+``.py`` script and instruct people to call it with "the right Python
+interpreter": because it generates a file that lives in ``bin``, when it's
+invoked, it will always use "the right" Python environment, which means it
+will always be invoked in an environment where all the libraries it needs
+(such as Pyramid) are available.
+
+In general, you can make your script into a console script by doing the
+following:
+
+- Use an existing distribution (such as one you've already created via
+  ``pcreate``) or create a new distribution that possesses at least one
+  package or module.  It should, within any module within the distribution,
+  house a callable (usually a function) that takes no arguments and which
+  runs any of the code you wish to run.
+
+- Add a ``[console_scripts]`` section to the ``entry_points`` argument of the
+  distribution which creates a mapping between a script name and a dotted
+  name representing the callable you added to your distribution.
+
+- Run ``setup.py develop``, ``setup.py install``, or ``easy_install`` to get
+  your distribution reinstalled.  When you reinstall your distribution, a
+  file representing the script that you named in the last step will be in the
+  ``bin`` directory of the virtualenv in which you installed the
+  distribution.  It will be executable.  Invoking it from a terminal will
+  execute your callable.
+
+As an example, let's create some code that can be invoked by a console script
+that prints the deployment settings of a Pyramid application.  To do so,
+we'll pretend you have a distribution with a package in it named
+``myproject``.  Within this package, we'll pretend you've added a
+``scripts.py`` module which contains the following code:
+
+.. code-block:: python
+   :linenos:
+
+   # myproject.scripts module
+
+   import optparse
+   import sys
+   import textwrap
+
+   from pyramid.paster import bootstrap
+
+   def settings_show():
+       description = """\
+       Print the deployment settings for a Pyramid application.  Example:
+       'psettings deployment.ini'
+       """
+       usage = "usage: %prog config_uri"
+       parser = optparse.OptionParser(
+           usage=usage,
+           description=textwrap.dedent(description)
+           )
+       parser.add_option(
+           '-o', '--omit',
+           dest='omit',
+           metavar='PREFIX',
+           type='string',
+           action='append',
+           help=("Omit settings which start with PREFIX (you can use this "
+                 "option multiple times)")
+           )
+
+       options, args = parser.parse_args(sys.argv[1:])
+       if not len(args) >= 1:
+           print('You must provide at least one argument')
+           return 2
+       config_uri = args[0]
+       omit = options.omit
+       if omit is None:
+           omit = []
+       env = bootstrap(config_uri)
+       settings, closer = env['registry'].settings, env['closer']
+       try:
+           for k, v in settings.items():
+               if any([k.startswith(x) for x in omit]):
+                   continue
+               print('%-40s     %-20s' % (k, v))
+       finally:
+           closer()
+
+This script uses the Python ``optparse`` module to allow us to make sense out
+of extra arguments passed to the script.  It uses the
+:func:`pyramid.paster.bootstrap` function to get information about the the
+application defined by a config file, and prints the deployment settings
+defined in that config file.
+
+After adding this script to the package, you'll need to tell your
+distribution's ``setup.py`` about its existence.  Within your distribution's
+top-level directory your ``setup.py`` file will look something like this:
+
+.. code-block:: python
+   :linenos:
+
+   import os
+
+   from setuptools import setup, find_packages
+
+   here = os.path.abspath(os.path.dirname(__file__))
+   README = open(os.path.join(here, 'README.txt')).read()
+   CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+
+   requires = ['pyramid', 'pyramid_debugtoolbar']
+
+   setup(name='MyProject',
+         version='0.0',
+         description='My project',
+         long_description=README + '\n\n' +  CHANGES,
+         classifiers=[
+           "Programming Language :: Python",
+           "Framework :: Pylons",
+           "Topic :: Internet :: WWW/HTTP",
+           "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+           ],
+         author='',
+         author_email='',
+         url='',
+         keywords='web pyramid pylons',
+         packages=find_packages(),
+         include_package_data=True,
+         zip_safe=False,
+         install_requires=requires,
+         tests_require=requires,
+         test_suite="wiggystatic",
+         entry_points = """\
+         [paste.app_factory]
+         main = wiggystatic:main
+         """,
+         )
+
+We're going to change the setup.py file to add an ``[console_scripts]``
+section with in the ``entry_points`` string.  Within this section, you should
+specify a ``scriptname = dotted.path.to:yourfunction`` line.  For example::
+
+  [console_scripts]
+  show_settings = myproject.scripts:settings_show
+
+The ``show_settings`` name will be the name of the script that is installed
+into ``bin``.  The colon (``:``) between ``myproject.scripts`` and
+``settings_show`` above indicates that ``myproject.scripts`` is a Python
+module, and ``settings_show`` is the function in that module which contains
+the code you'd like to run as the result of someone invoking the
+``show_settings`` script from their command line.
+
+The result will be something like:
+
+.. code-block:: python
+   :linenos:
+
+   import os
+
+   from setuptools import setup, find_packages
+
+   here = os.path.abspath(os.path.dirname(__file__))
+   README = open(os.path.join(here, 'README.txt')).read()
+   CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+
+   requires = ['pyramid', 'pyramid_debugtoolbar']
+
+   setup(name='MyProject',
+         version='0.0',
+         description='My project',
+         long_description=README + '\n\n' +  CHANGES,
+         classifiers=[
+           "Programming Language :: Python",
+           "Framework :: Pylons",
+           "Topic :: Internet :: WWW/HTTP",
+           "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+           ],
+         author='',
+         author_email='',
+         url='',
+         keywords='web pyramid pylons',
+         packages=find_packages(),
+         include_package_data=True,
+         zip_safe=False,
+         install_requires=requires,
+         tests_require=requires,
+         test_suite="wiggystatic",
+         entry_points = """\
+         [paste.app_factory]
+         main = wiggystatic:main
+         [console_scripts]
+         show_settings = myproject.scripts:settings_show
+         """,
+         )
+
+Once you've done this, invoking ``$somevirtualenv/bin/python setup.py
+develop`` will install a file named ``show_settings`` into the
+``$somevirtualenv/bin`` directory with a small bit of Python code that points
+to your entry point.  It will be executable.  Running it without any
+arguments will print an error and exit.  Running it with a single argument
+that is the path of a config file will print the settings.  Running it with
+an ``--omit=foo`` argument will omit the settings that have keys that start
+with ``foo``.  Running it with two "omit" options (e.g. ``--omit=foo
+--omit=bar``) will omit all settings that have keys that start with either
+``foo`` or ``bar``::
+
+  [chrism@thinko somevenv]$ bin/show_settings development.ini \
+                            --omit=pyramid \
+                            --omit=debugtoolbar
+  debug_routematch                             False               
+  debug_templates                              True                
+  reload_templates                             True                
+  mako.directories                             []                  
+  debug_notfound                               False               
+  default_locale_name                          en                  
+  reload_resources                             False               
+  debug_authorization                          False               
+  reload_assets                                False               
+  prevent_http_cache                           False               
+
+Pyramid's ``pserve``, ``pcreate``, ``pshell``, ``prequest``, ``ptweens`` and
+other ``p*`` scripts are implemented as console scripts.  When you invoke one
+of those, you are using a console script.

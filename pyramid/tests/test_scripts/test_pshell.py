@@ -337,5 +337,5 @@ class Test_main(unittest.TestCase):
 
     def test_it(self):
         result = self._callFUT(['pshell'])
-        self.assertEqual(result, None)
+        self.assertEqual(result, 2)
 

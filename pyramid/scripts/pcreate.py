@@ -13,12 +13,13 @@ _bad_chars_re = re.compile('[^a-zA-Z0-9_]')
 
 def main(argv=sys.argv, quiet=False):
     command = PCreateCommand(argv, quiet)
-    command.run()
+    return command.run()
 
 class PCreateCommand(object):
-    verbosity = 1
-    usage = "usage: %prog [options] distribution_name"
-    parser = optparse.OptionParser(usage)
+    verbosity = 1 # required
+    description = "Render Pyramid scaffolding to an output directory"
+    usage = "usage: %prog [options] output_directory"
+    parser = optparse.OptionParser(usage, description=description)
     parser.add_option('-s', '--scaffold',
                       dest='scaffold_name',
                       action='append',
@@ -34,6 +35,11 @@ class PCreateCommand(object):
                       dest='list',
                       action='store_true',
                       help="List all available scaffold names")
+    parser.add_option('--list-templates',
+                      dest='list',
+                      action='store_true',
+                      help=("A backwards compatibility alias for -l/--list.  "
+                            "List all available scaffold names."))
     parser.add_option('--simulate',
                       dest='simulate',
                       action='store_true',
@@ -57,15 +63,15 @@ class PCreateCommand(object):
             return self.show_scaffolds()
         if not self.options.scaffold_name:
             self.out('You must provide at least one scaffold name')
-            return
+            return 2
         if not self.args:
             self.out('You must provide a project name')
-            return
+            return 2
         available = [x.name for x in self.scaffolds]
         diff = set(self.options.scaffold_name).difference(available)
         if diff:
             self.out('Unavailable scaffolds: %s' % list(diff))
-            return
+            return 2
         return self.render_scaffolds()
 
     def render_scaffolds(self):
@@ -85,7 +91,7 @@ class PCreateCommand(object):
             for scaffold in self.scaffolds:
                 if scaffold.name == scaffold_name:
                     scaffold.run(self, output_dir, vars)
-        return True
+        return 0
 
     def show_scaffolds(self):
         scaffolds = sorted(self.scaffolds, key=lambda x: x.name)
@@ -98,7 +104,7 @@ class PCreateCommand(object):
                     ' '*(max_name-len(scaffold.name)), scaffold.summary))
         else:
             self.out('No scaffolds available')
-        return True
+        return 0
 
     def all_scaffolds(self):
         scaffolds = []

@@ -56,7 +56,7 @@ if not PY3:
         ])
 
 setup(name='pyramid',
-      version='1.4dev',
+      version='1.3a2',
       description=('The Pyramid web application development framework, a '
                    'Pylons project'),
       long_description=README + '\n\n' +  CHANGES,
@@ -98,6 +98,7 @@ setup(name='pyramid',
         proutes = pyramid.scripts.proutes:main
         pviews = pyramid.scripts.pviews:main
         ptweens = pyramid.scripts.ptweens:main
+        prequest = pyramid.scripts.prequest:main
         [paste.server_runner]
         wsgiref = pyramid.scripts.pserve:wsgiref_server_runner
         cherrypy = pyramid.scripts.pserve:cherrypy_server_runner

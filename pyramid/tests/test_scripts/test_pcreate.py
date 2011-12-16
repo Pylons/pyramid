@@ -22,7 +22,7 @@ class TestPCreateCommand(unittest.TestCase):
     def test_run_show_scaffolds_exist(self):
         cmd = self._makeOne('-l')
         result = cmd.run()
-        self.assertEqual(result, True)
+        self.assertEqual(result, 0)
         out = self.out_.getvalue()
         self.assertTrue(out.startswith('Available scaffolds'))
         
@@ -30,14 +30,14 @@ class TestPCreateCommand(unittest.TestCase):
         cmd = self._makeOne('-l')
         cmd.scaffolds = []
         result = cmd.run()
-        self.assertEqual(result, True)
+        self.assertEqual(result, 0)
         out = self.out_.getvalue()
         self.assertTrue(out.startswith('No scaffolds available'))
         
     def test_run_no_scaffold_name(self):
         cmd = self._makeOne()
         result = cmd.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 2)
         out = self.out_.getvalue()
         self.assertTrue(out.startswith(
             'You must provide at least one scaffold name'))
@@ -45,14 +45,14 @@ class TestPCreateCommand(unittest.TestCase):
     def test_no_project_name(self):
         cmd = self._makeOne('-s', 'dummy')
         result = cmd.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 2)
         out = self.out_.getvalue()
         self.assertTrue(out.startswith('You must provide a project name'))
 
     def test_unknown_scaffold_name(self):
         cmd = self._makeOne('-s', 'dummyXX', 'distro')
         result = cmd.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 2)
         out = self.out_.getvalue()
         self.assertTrue(out.startswith('Unavailable scaffolds'))
 
@@ -62,7 +62,7 @@ class TestPCreateCommand(unittest.TestCase):
         scaffold = DummyScaffold('dummy')
         cmd.scaffolds = [scaffold]
         result = cmd.run()
-        self.assertEqual(result, True)
+        self.assertEqual(result, 0)
         self.assertEqual(
             scaffold.output_dir,
             os.path.normpath(os.path.join(os.getcwd(), 'Distro'))
@@ -78,7 +78,7 @@ class TestPCreateCommand(unittest.TestCase):
         scaffold = DummyScaffold('dummy')
         cmd.scaffolds = [scaffold]
         result = cmd.run()
-        self.assertEqual(result, True)
+        self.assertEqual(result, 0)
         self.assertEqual(
             scaffold.output_dir,
             os.path.normpath(os.path.join(os.getcwd(), 'Distro'))
@@ -94,7 +94,7 @@ class TestPCreateCommand(unittest.TestCase):
         scaffold2 = DummyScaffold('dummy2')
         cmd.scaffolds = [scaffold1, scaffold2]
         result = cmd.run()
-        self.assertEqual(result, True)
+        self.assertEqual(result, 0)
         self.assertEqual(
             scaffold1.output_dir,
             os.path.normpath(os.path.join(os.getcwd(), 'Distro'))
@@ -117,7 +117,7 @@ class Test_main(unittest.TestCase):
 
     def test_it(self):
         result = self._callFUT(['pcreate'])
-        self.assertEqual(result, None)
+        self.assertEqual(result, 2)
 
 class DummyScaffold(object):
     def __init__(self, name):

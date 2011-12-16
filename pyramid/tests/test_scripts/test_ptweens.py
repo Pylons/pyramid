@@ -18,7 +18,7 @@ class TestPTweensCommand(unittest.TestCase):
         L = []
         command.out = L.append
         result = command.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 0)
         self.assertEqual(L, [])
 
     def test_command_implicit_tweens_only(self):
@@ -28,7 +28,7 @@ class TestPTweensCommand(unittest.TestCase):
         L = []
         command.out = L.append
         result = command.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 0)
         self.assertEqual(
            L[0],
            '"pyramid.tweens" config value NOT set (implicitly ordered tweens '
@@ -41,7 +41,7 @@ class TestPTweensCommand(unittest.TestCase):
         L = []
         command.out = L.append
         result = command.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 0)
         self.assertEqual(
            L[0],
            '"pyramid.tweens" config value set (explicitly ordered tweens used)')
@@ -58,4 +58,4 @@ class Test_main(unittest.TestCase):
 
     def test_it(self):
         result = self._callFUT(['ptweens'])
-        self.assertEqual(result, None)
+        self.assertEqual(result, 2)

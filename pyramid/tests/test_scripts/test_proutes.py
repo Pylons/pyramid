@@ -19,7 +19,7 @@ class TestPRoutesCommand(unittest.TestCase):
         L = []
         command.out = L.append
         result = command.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 0)
         self.assertEqual(L, [])
 
     def test_no_mapper(self):
@@ -28,7 +28,7 @@ class TestPRoutesCommand(unittest.TestCase):
         L = []
         command.out = L.append
         result = command.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 0)
         self.assertEqual(L, [])
 
     def test_single_route_no_route_registered(self):
@@ -39,7 +39,7 @@ class TestPRoutesCommand(unittest.TestCase):
         L = []
         command.out = L.append
         result = command.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
         self.assertEqual(L[-1].split(), ['a', '/a', '<unknown>'])
 
@@ -51,7 +51,7 @@ class TestPRoutesCommand(unittest.TestCase):
         L = []
         command.out = L.append
         result = command.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
         self.assertEqual(L[-1].split(), ['a', '/a', '<unknown>'])
 
@@ -72,7 +72,7 @@ class TestPRoutesCommand(unittest.TestCase):
         command.out = L.append
         command.bootstrap = (dummy.DummyBootstrap(registry=registry),)
         result = command.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
         self.assertEqual(L[-1].split()[:3], ['a', '/a', 'None'])
 
@@ -98,7 +98,7 @@ class TestPRoutesCommand(unittest.TestCase):
         command.out = L.append
         command.bootstrap = (dummy.DummyBootstrap(registry=registry),)
         result = command.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
         self.assertEqual(L[-1].split()[:4], ['a', '/a', '<function', 'view'])
         
@@ -127,7 +127,7 @@ class TestPRoutesCommand(unittest.TestCase):
         command.out = L.append
         command.bootstrap = (dummy.DummyBootstrap(registry=registry),)
         result = command.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
         self.assertEqual(L[-1].split()[:3], ['a', '/a', '<unknown>'])
 
@@ -146,5 +146,5 @@ class Test_main(unittest.TestCase):
 
     def test_it(self):
         result = self._callFUT(['proutes'])
-        self.assertEqual(result, None)
+        self.assertEqual(result, 2)
 
