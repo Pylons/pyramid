@@ -4,9 +4,13 @@ Pyramid TODOs
 Must-Have
 ---------
 
-- Introspection:
+- Fix deployment recipes in cookbook (discourage proxying without changing
+  server).
 
-  * Review narrative docs.
+Nice-to-Have
+------------
+
+- Introspection:
 
   * ``default root factory`` category?
 
@@ -21,13 +25,6 @@ Must-Have
 
 - Fix deployment recipes in cookbook (discourage proxying without changing
   server).
-
-- Allow prequest path to have query string variables.
-
-Nice-to-Have
-------------
-
-- Implement analogue of "paster request"?
 
 - CherryPy server testing / exploded from CherryPy itself.
 
