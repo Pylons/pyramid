@@ -119,7 +119,7 @@ Here's some sample code that implements a minimal forbidden view:
 .. code-block:: python
    :linenos:
 
-   from pyramid.views import view_config
+   from pyramid.view import view_config
    from pyramid.response import Response
 
    def forbidden_view(request):
