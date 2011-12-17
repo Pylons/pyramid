@@ -23,9 +23,6 @@ Nice-to-Have
 
   * introspection hiding for directives?
 
-- Fix deployment recipes in cookbook (discourage proxying without changing
-  server).
-
 - CherryPy server testing / exploded from CherryPy itself.
 
 - Try "with transaction.manager" in an exception view with SQLA (preempt
