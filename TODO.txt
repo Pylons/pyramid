@@ -10,6 +10,11 @@ Must-Have
 Nice-to-Have
 ------------
 
+- Modify the urldispatch chapter examples to assume a scan rather than
+  ``add_view``.
+
+- Decorator for append_slash_notfound_view_factory?
+
 - Introspection:
 
   * ``default root factory`` category?
