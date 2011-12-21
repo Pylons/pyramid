@@ -56,7 +56,7 @@ if not PY3:
         ])
 
 setup(name='pyramid',
-      version='1.3a2',
+      version='1.3a3',
       description=('The Pyramid web application development framework, a '
                    'Pylons project'),
       long_description=README + '\n\n' +  CHANGES,
