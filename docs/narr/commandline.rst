@@ -670,9 +670,9 @@ script is installed.  Because it's installed into the ``bin`` directory of a
 virtualenv when the distribution is installed, it's a convenient way to
 package and distribute functionality that you can call from the command-line.
 It's often more convenient to create a console script than it is to create a
-``.py`` script and instruct people to call it with "the right Python
-interpreter": because it generates a file that lives in ``bin``, when it's
-invoked, it will always use "the right" Python environment, which means it
+``.py`` script and instruct people to call it with the "right" Python
+interpreter.  A console script generates a file that lives in ``bin``, and when it's
+invoked it will always use the "right" Python environment, which means it
 will always be invoked in an environment where all the libraries it needs
 (such as Pyramid) are available.
 
