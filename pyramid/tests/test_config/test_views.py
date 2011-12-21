@@ -115,6 +115,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         self.assertEqual(wrapper.__module__, view.__module__)
         self.assertEqual(wrapper.__name__, view.__name__)
         self.assertEqual(wrapper.__doc__, view.__doc__)
+        self.assertEqual(wrapper.__discriminator__(None, None)[0], 'view')
 
     def test_add_view_view_callable_dottedname(self):
         from pyramid.renderers import null_renderer
@@ -874,6 +875,41 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         request.method = 'POST'
         request.params = {'param':'1'}
         self.assertEqual(wrapper(ctx, request), 'view8')
+
+    def test_add_view_multiview___discriminator__(self):
+        from pyramid.renderers import null_renderer
+        from zope.interface import Interface
+        class IFoo(Interface):
+            pass
+        class IBar(Interface):
+            pass
+        @implementer(IFoo)
+        class Foo(object):
+            pass
+        @implementer(IBar)
+        class Bar(object):
+            pass
+        foo = Foo()
+        bar = Bar()
+            
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IMultiView
+        view = lambda *arg: 'OK'
+        view.__phash__ = 'abc'
+        config = self._makeOne(autocommit=True)
+        config.registry.registerAdapter(
+            view, (IViewClassifier, IRequest, Interface), IView, name='')
+        config.add_view(view=view, renderer=null_renderer,
+                        containment=IFoo)
+        config.add_view(view=view, renderer=null_renderer,
+                        containment=IBar)
+        wrapper = self._getViewCallable(config)
+        self.assertTrue(IMultiView.providedBy(wrapper))
+        request = self._makeRequest(config)
+        self.assertEqual(wrapper.__discriminator__(foo, request)[5], IFoo)
+        self.assertEqual(wrapper.__discriminator__(bar, request)[5], IBar)
 
     def test_add_view_with_template_renderer(self):
         from pyramid.tests import test_config

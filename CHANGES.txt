@@ -8,6 +8,11 @@ Features
   documented in the "Command-Line Pyramid" chapter in the section entitled
   "Invoking a Request".
 
+- Add undocumented ``__discriminator__`` API to derived view callables.
+  e.g. ``adapters.lookup(...).__discriminator__(context, request)``.  It will
+  be used by superdynamic systems that require the discriminator to be used
+  for introspection after manual view lookup.
+
 Bug Fixes
 ---------
 

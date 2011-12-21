@@ -492,6 +492,15 @@ class MultiView(object):
         self.views = []
         self.accepts = []
 
+    def __discriminator__(self, context, request):
+        # used by introspection systems like so:
+        # view = adapters.lookup(....)
+        # view.__discriminator__(context, request) -> view's discriminator
+        # so that superdynamic systems can feed the discriminator to
+        # the introspection system to get info about it
+        view = self.match(context, request)
+        return view.__discriminator__(context, request)
+
     def add(self, view, order, accept=None, phash=None):
         if phash is not None:
             for i, (s, v, h) in enumerate(list(self.views)):
@@ -1034,6 +1043,10 @@ class ViewsConfiguratorMixin(object):
                                   decorator=decorator,
                                   http_cache=http_cache)
             derived_view = deriver(view)
+            derived_view.__discriminator__ = lambda *arg: discriminator
+            # __discriminator__ is used by superdynamic systems
+            # that require it for introspection after manual view lookup;
+            # see also MultiView.__discriminator__
             view_intr['derived_callable'] = derived_view
 
             registered = self.registry.adapters.registered
