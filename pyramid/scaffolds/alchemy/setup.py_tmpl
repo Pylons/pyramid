@@ -16,13 +16,13 @@ requires = [
     'zope.sqlalchemy',
     ]
 
-if sys.version_info[:3] < (2,5,0):
+if sys.version_info[:3] < (2, 5, 0):
     requires.append('pysqlite')
 
 setup(name='{{project}}',
       version='0.0',
       description='{{project}}',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
         "Programming Language :: Python",
         "Framework :: Pylons",
@@ -37,12 +37,11 @@ setup(name='{{project}}',
       include_package_data=True,
       zip_safe=False,
       test_suite='{{package}}',
-      install_requires = requires,
-      entry_points = """\
+      install_requires=requires,
+      entry_points="""\
       [paste.app_factory]
       main = {{package}}:main
       [console_scripts]
       populate_{{project}} = {{package}}.scripts.populate:main
       """,
       )
-
