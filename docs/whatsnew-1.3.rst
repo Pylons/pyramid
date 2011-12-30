@@ -206,6 +206,16 @@ This also works for imperative view configurations that involve a class.
 
 See :ref:`view_defaults` for more information.
 
+Extending a Request without Subclassing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is now possible to extend a :class:`pyramid.request.Request` object
+with property descriptors without having to create a subclass via
+:meth:`pyramid.request.Request.set_property`. New properties may be
+reified, effectively caching the value for the lifetime of the instance.
+Common use-cases for this would be to get a database connection for the
+request or identify the current user.
+
 Minor Feature Additions
 -----------------------
 

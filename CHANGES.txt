@@ -1,3 +1,15 @@
+Unreleased
+==========
+
+Features
+--------
+
+- New API: ``pyramid.request.Request.set_property``. Add lazy property
+  descriptors to a request without changing the request factory. New
+  properties may be reified, effectively caching the value for the lifetime
+  of the instance. Common use-cases for this would be to  get a database
+  connection for the request or identify the current user.
+
 1.3a3 (2011-12-21)
 ==================
 
