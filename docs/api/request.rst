@@ -8,6 +8,10 @@
 .. autoclass:: Request
    :members:
    :inherited-members:
+   :exclude-members: add_response_callback, add_finished_callback,
+                     route_url, route_path, current_route_url,
+                     current_route_path, static_url, static_path,
+                     model_url, resource_url, set_property
 
    .. attribute:: context
 
@@ -203,6 +207,57 @@
        body.  If the request body is not well-formed JSON, or there is no
        body associated with this request, this property will raise an
        exception.  See also :ref:`request_json_body`.
+
+   .. method:: set_property(func, name=None, reify=False)
+
+       .. versionadded:: 1.3
+
+       Add a callable or a property descriptor to the request instance.
+
+       Properties, unlike attributes, are lazily evaluated by executing
+       an underlying callable when accessed. They can be useful for
+       adding features to an object without any cost if those features
+       go unused.
+
+       A property may also be reified via the
+       :class:`pyramid.decorator.reify` decorator by setting
+       ``reify=True``, allowing the result of the evaluation to be
+       cached. Thus the value of the property is only computed once for
+       the lifetime of the object.
+
+       ``func`` can either be a callable that accepts the request as
+       its single positional parameter, or it can be a property
+       descriptor.
+
+       If the ``func`` is a property descriptor a ``ValueError`` will
+       be raised if ``name`` is ``None`` or ``reify`` is ``True``.
+
+       If ``name`` is None, the name of the property will be computed
+       from the name of the ``func``.
+
+       .. code-block:: python
+          :linenos:
+
+          def _connect(request):
+              conn = request.registry.dbsession()
+              def cleanup(_):
+                  conn.close()
+              request.add_finished_callback(cleanup)
+              return conn
+
+          @subscriber(NewRequest)
+          def new_request(event):
+              request = event.request
+              request.set_property(_connect, 'db', reify=True)
+
+       The subscriber doesn't actually connect to the database, it just
+       provides the API which, when accessed via ``request.db``, will
+       create the connection. Thanks to reify, only one connection is
+       made per-request even if ``request.db`` is accessed many times.
+
+       This pattern provides a way to augment the ``request`` object
+       without having to subclass it, which can be useful for extension
+       authors.
 
 .. note::
 
