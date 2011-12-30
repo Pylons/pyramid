@@ -1,6 +1,114 @@
 import unittest
 from pyramid.compat import PY3
 
+class Test_InstancePropertyMixin(unittest.TestCase):
+    def _makeOne(self):
+        cls = self._targetClass()
+        class Foo(cls):
+            pass
+        return Foo()
+
+    def _targetClass(self):
+        from pyramid.util import InstancePropertyMixin
+        return InstancePropertyMixin
+
+    def test_callable(self):
+        def worker(obj):
+            return obj.bar
+        foo = self._makeOne()
+        foo.set_property(worker)
+        foo.bar = 1
+        self.assertEqual(1, foo.worker)
+        foo.bar = 2
+        self.assertEqual(2, foo.worker)
+
+    def test_callable_with_name(self):
+        def worker(obj):
+            return obj.bar
+        foo = self._makeOne()
+        foo.set_property(worker, name='x')
+        foo.bar = 1
+        self.assertEqual(1, foo.x)
+        foo.bar = 2
+        self.assertEqual(2, foo.x)
+
+    def test_callable_with_reify(self):
+        def worker(obj):
+            return obj.bar
+        foo = self._makeOne()
+        foo.set_property(worker, reify=True)
+        foo.bar = 1
+        self.assertEqual(1, foo.worker)
+        foo.bar = 2
+        self.assertEqual(1, foo.worker)
+
+    def test_callable_with_name_reify(self):
+        def worker(obj):
+            return obj.bar
+        foo = self._makeOne()
+        foo.set_property(worker, name='x')
+        foo.set_property(worker, name='y', reify=True)
+        foo.bar = 1
+        self.assertEqual(1, foo.y)
+        self.assertEqual(1, foo.x)
+        foo.bar = 2
+        self.assertEqual(2, foo.x)
+        self.assertEqual(1, foo.y)
+
+    def test_property_without_name(self):
+        def worker(obj): pass
+        foo = self._makeOne()
+        self.assertRaises(ValueError, foo.set_property, property(worker))
+
+    def test_property_with_name(self):
+        def worker(obj):
+            return obj.bar
+        foo = self._makeOne()
+        foo.set_property(property(worker), name='x')
+        foo.bar = 1
+        self.assertEqual(1, foo.x)
+        foo.bar = 2
+        self.assertEqual(2, foo.x)
+
+    def test_property_with_reify(self):
+        def worker(obj): pass
+        foo = self._makeOne()
+        self.assertRaises(ValueError, foo.set_property,
+                          property(worker), name='x', reify=True)
+
+    def test_override_property(self):
+        def worker(obj): pass
+        foo = self._makeOne()
+        foo.set_property(worker, name='x')
+        def doit():
+            foo.x = 1
+        self.assertRaises(AttributeError, doit)
+
+    def test_override_reify(self):
+        def worker(obj): pass
+        foo = self._makeOne()
+        foo.set_property(worker, name='x', reify=True)
+        foo.x = 1
+        self.assertEqual(1, foo.x)
+        foo.x = 2
+        self.assertEqual(2, foo.x)
+
+    def test_reset_property(self):
+        foo = self._makeOne()
+        foo.set_property(lambda _: 1, name='x')
+        self.assertEqual(1, foo.x)
+        foo.set_property(lambda _: 2, name='x')
+        self.assertEqual(2, foo.x)
+
+    def test_reset_reify(self):
+        """ This is questionable behavior, but may as well get notified
+        if it changes."""
+        foo = self._makeOne()
+        foo.set_property(lambda _: 1, name='x', reify=True)
+        self.assertEqual(1, foo.x)
+        foo.set_property(lambda _: 2, name='x', reify=True)
+        self.assertEqual(1, foo.x)
+
 class Test_WeakOrderedSet(unittest.TestCase):
     def _makeOne(self):
         from pyramid.config import WeakOrderedSet
