@@ -7,6 +7,13 @@ Must-Have
 - Fix deployment recipes in cookbook (discourage proxying without changing
   server).
 
+- Use waitress instead of wsgiref.
+
+- pyramid.config.util.ActionInfo.__str__ potentially returns Unicode under
+  Py2, fix.
+
+- Tests for view names/route patterns that contain Unicode.
+
 Nice-to-Have
 ------------
 
