@@ -133,8 +133,8 @@ Here's a high-level time-ordered overview of what happens when you press
    far as ``pserve`` is concerned, it is "just another WSGI application".
 
 #. ``pserve`` starts the WSGI *server* defined within the ``[server:main]``
-   section.  In our case, this is the ``egg:pyramid#wsgiref`` server (``use =
-   egg:pyramid#wsgiref``), and it will listen on all interfaces (``host =
+   section.  In our case, this is the Waitress server (``use =
+   egg:waitress#main``), and it will listen on all interfaces (``host =
    0.0.0.0``), on port number 6543 (``port = 6543``).  The server code itself
    is what prints ``serving on 0.0.0.0:6543 view at http://127.0.0.1:6543``.
    The server serves the application, and the application is running, waiting

@@ -14,6 +14,7 @@ requires = [
     'pyramid_tm',
     'pyramid_debugtoolbar',
     'zope.sqlalchemy',
+    'waitress',
     'docutils',
     'WebTest', # add this
     ]

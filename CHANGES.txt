@@ -10,6 +10,8 @@ Features
   of the instance. Common use-cases for this would be to  get a database
   connection for the request or identify the current user.
 
+- Use the ``waitress`` WSGI server instead of ``wsgiref`` in scaffolding.
+
 1.3a3 (2011-12-21)
 ==================
 

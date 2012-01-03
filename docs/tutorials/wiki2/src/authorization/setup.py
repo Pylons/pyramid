@@ -15,6 +15,7 @@ requires = [
     'pyramid_debugtoolbar',
     'zope.sqlalchemy',
     'docutils',
+    'waitress',
     ]
 
 if sys.version_info[:3] < (2,5,0):

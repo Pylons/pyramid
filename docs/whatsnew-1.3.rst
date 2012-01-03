@@ -52,7 +52,7 @@ to make some changes:
 
 - We've replaced the ``paster`` command with Pyramid-specific analogues.
 
-- We've made the default WSGI server the ``wsgiref`` server.
+- We've made the default WSGI server the ``waitress`` server.
 
 Previously (in Pyramid 1.0, 1.1 and 1.2), you created a Pyramid application
 using ``paster create``, like so::
@@ -85,37 +85,25 @@ Analogues of ``paster pshell``, ``paster pviews``, ``paster request`` and
 ``paster ptweens`` also exist under the respective console script names
 ``pshell``, ``pviews``, ``prequest`` and ``ptweens``.
 
-We've replaced use of the Paste ``httpserver`` with the ``wsgiref`` server in
+We've replaced use of the Paste ``httpserver`` with the ``waitress`` server in
 the scaffolds, so once you create a project from a scaffold, its
 ``development.ini`` and ``production.ini`` will have the following line::
 
-    use = egg:pyramid#wsgiref
+    use = egg:waitress#main
 
 Instead of this (which was the default in older versions)::
 
     use = egg:Paste#http
 
-Using ``wsgiref`` as the default WSGI server is purely a default to make it
-possible to use the same scaffolding under Python 2 and Python 3; people
-running Pyramid under Python 2 can still manually install ``Paste`` and use
-the Paste ``httpserver`` by replacing the former line with the latter.  This is
-actually recommended if you rely on proxying from Apache or Nginx to a
-``pserve`` -invoked application.  **The wsgiref server is not a production
-quality server.** See :ref:`alternate_wsgi_server` for more information.
-
-New releases in every older major Pyramid series (1.0.2, 1.1.3, 1.2.5) also
-have the ``egg:pyramid#wsgiref`` entry point, so scaffold-writers can depend
-on it being there even in older major Pyramid versions.
-
 .. warning::
 
-   Previously, paste.httpserver "helped" by converting header values that weren't
-   strings to strings. The wsgiref server, on the other hand implements the spec
-   more fully. This specifically may affect you if you are modifying headers on 
-   your response. The following error might be an indicator of this problem:
-   **AssertionError: Header values must be strings, please check the type of
-   the header being returned.** A common case would be returning unicode headers
-   instead of string headers.
+   Previously, paste.httpserver "helped" by converting header values that
+   weren't strings to strings. The ``waitress`` server, on the other hand
+   implements the spec more fully. This specifically may affect you if you
+   are modifying headers on your response. The following error might be an
+   indicator of this problem: **AssertionError: Header values must be
+   strings, please check the type of the header being returned.** A common
+   case would be returning unicode headers instead of string headers.
 
 A new :mod:`pyramid.compat` module was added which provides Python 2/3
 straddling support for Pyramid add-ons and development environments.
@@ -264,12 +252,9 @@ Backwards Incompatibilities
   Python 3.
 
 - The default WSGI server run as the result of ``pserve`` from newly rendered
-  scaffolding is now the ``wsgiref`` WSGI server instead of the
-  ``paste.httpserver`` server.  ``wsgiref``, unlike the server it replaced
-  (``paste.httpserver``) is not a production quality server.  See
-  :ref:`alternate_wsgi_server` for information about how to use another WSGI
-  server in production. Rationale: the Paste and PasteScript packages do not
-  run under Python 3.
+  scaffolding is now the ``waitress`` WSGI server instead of the
+  ``paste.httpserver`` server.  Rationale: the Paste and PasteScript packages
+  do not run under Python 3.
 
 - The ``pshell`` command (see "paster pshell") no longer accepts a
   ``--disable-ipython`` command-line argument.  Instead, it accepts a ``-p``
