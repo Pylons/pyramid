@@ -269,6 +269,8 @@ class TestCompileRoute(unittest.TestCase):
         self.assertEqual(matcher('/foo/baz/biz/buz/bar/everything/else/here'),
                          {'baz':'baz', 'buz':'buz',
                           'traverse':('everything', 'else', 'here')})
+        self.assertEqual(matcher('/foo/baz/biz/buz/bareverything/else/here'),
+                         None)
         self.assertEqual(matcher('foo/baz/biz/buz/bar'), None)
         self.assertEqual(generator(
             {'baz':1, 'buz':2, 'traverse':'/a/b'}), '/foo/1/biz/2/bar/a/b')
@@ -365,6 +367,9 @@ class TestCompileRouteFunctional(unittest.TestCase):
         self.matches('zzz/{x}*traverse', '/zzz/abc', {'x':'abc', 'traverse':()})
         self.matches('zzz/{x}*traverse', '/zzz/abc/def/g',
                      {'x':'abc', 'traverse':('def', 'g')})
+        self.matches('zzz/abc*traverse', '/zzz/abc', {'traverse':()})
+        self.matches('zzz/abc*traverse', '/zzz/abc/def/g',
+                     {'traverse':('def', 'g')})
         self.matches('*traverse', '/zzz/abc', {'traverse':('zzz', 'abc')})
         self.matches('*traverse', '/zzz/ abc', {'traverse':('zzz', ' abc')})
         #'/La%20Pe%C3%B1a'

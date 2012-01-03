@@ -118,6 +118,7 @@ def _compile_route(route):
     rpat.append(re.escape(prefix))
     gen.append(prefix)
 
+    s = None
     while pat:
         name = pat.pop()
         name = name[1:-1]
@@ -134,7 +135,10 @@ def _compile_route(route):
             gen.append(s)
 
     if star:
-        rpat.append('(?P<%s>.*?)' % star)
+        if route.endswith('/') or not s:
+            rpat.append('(?P<%s>.*?)' % star)
+        else:
+            rpat.append('(?P<%s>(?:\/.*?)?)' % star)
         gen.append('%%(%s)s' % star)
 
     pattern = ''.join(rpat) + '$'
