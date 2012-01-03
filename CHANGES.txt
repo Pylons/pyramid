@@ -12,6 +12,21 @@ Features
 
 - Use the ``waitress`` WSGI server instead of ``wsgiref`` in scaffolding.
 
+Bug Fixes
+---------
+
+- The documentation of ``pyramid.events.subscriber`` indicated that using it
+  as a decorator with no arguments like this::
+
+    @subscriber()
+    def somefunc(event):
+        pass
+
+  Would register ``somefunc`` to receive all events sent via the registry,
+  but this was untrue.  Instead, it would receive no events at all.  This has
+  now been fixed and the code matches the documentation.  See also
+  https://github.com/Pylons/pyramid/issues/386
+
 1.3a3 (2011-12-21)
 ==================
 

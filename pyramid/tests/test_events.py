@@ -155,6 +155,16 @@ class TestSubscriber(unittest.TestCase):
         dec.register(scanner, None, foo)
         self.assertEqual(config.subscribed, [(foo, IFoo), (foo, IBar)])
 
+    def test_register_none_means_all(self):
+        from zope.interface import Interface
+        dec = self._makeOne()
+        def foo(): pass
+        config = DummyConfigurator()
+        scanner = Dummy()
+        scanner.config = config
+        dec.register(scanner, None, foo)
+        self.assertEqual(config.subscribed, [(foo, Interface)])
+
     def test_register_objectevent(self):
         from zope.interface import Interface
         class IFoo(Interface): pass

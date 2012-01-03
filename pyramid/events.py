@@ -1,6 +1,9 @@
 import venusian
 
-from zope.interface import implementer
+from zope.interface import (
+    implementer,
+    Interface
+    )
 
 from pyramid.interfaces import (
     IContextFound,
@@ -26,7 +29,7 @@ class subscriber(object):
        def mysubscriber(event):
            event.request.foo = 1
 
-    More than one event type can be passed as a construtor argument.  The
+    More than one event type can be passed as a constructor argument.  The
     decorated subscriber will be called for each event type.
 
     .. code-block:: python
@@ -66,7 +69,7 @@ class subscriber(object):
 
     def register(self, scanner, name, wrapped):
         config = scanner.config
-        for iface in self.ifaces:
+        for iface in self.ifaces or (Interface,):
             config.add_subscriber(wrapped, iface)
 
     def __call__(self, wrapped):
