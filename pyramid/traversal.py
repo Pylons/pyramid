@@ -16,12 +16,12 @@ from pyramid.compat import (
     PY3,
     native_,
     text_,
-    bytes_,
     ascii_native_,
     text_type,
     binary_type,
-    url_unquote_native,
     is_nonstr_iter,
+    decode_path_info,
+    unquote_bytes_to_wsgi,
     )
 
 from pyramid.encode import url_quote
@@ -429,33 +429,44 @@ def virtual_root(resource, request):
 
 def traversal_path(path):
     """ Variant of :func:`pyramid.traversal.traversal_path_info` suitable for
-    decoding paths that are URL-encoded."""
-    path = ascii_native_(path)
-    path = url_unquote_native(path, 'latin-1', 'strict')
+    decoding paths that are URL-encoded.
+
+    If this function is passed a Unicode object instead of a sequence of
+    bytes as ``path``, that Unicode object *must* directly encodeable to
+    ASCII.  For example, u'/foo' will work but u'/<unprintable unicode>' (a
+    Unicode object with characters that cannot be encoded to ascii) will
+    not. A :exc:`UnicodeEncodeError` will be raised if the Unicode cannot be
+    encoded directly to ASCII.
+    """
+    # we unquote this path exactly like a PEP 3333 server would
+    if isinstance(path, text_type):
+        path = path.encode('ascii')
+    path = unquote_bytes_to_wsgi(path) # result will be a native string
     return traversal_path_info(path)
 
-@lru_cache(1000)
 def traversal_path_info(path):
-    """ Given a ``PATH_INFO`` environ value (slash-separated path segments),
-    return a tuple representing that path which can be used to traverse a
-    resource tree.
+    """ Given``path``, return a tuple representing that path which can be
+    used to traverse a resource tree.  ``path`` is assumed to be an
+    already-URL-decoded ``str`` type as if it had come to us from an upstream
+    WSGI server as the ``PATH_INFO`` environment variable.
 
-    ``PATH_INFO`` is assumed to already be URL-decoded.  It is encoded to
-    bytes using the Latin-1 encoding; the resulting set of bytes is
-    subsequently decoded to text using the UTF-8 encoding; a
-    :exc:`pyramid.exc.URLDecodeError` is raised if a the URL cannot be
-    decoded.
+    The ``path`` is first decoded to from its WSGI representation to Unicode;
+    it is decoded differently depending on platform:
 
-    The ``PATH_INFO`` is split on slashes, creating a list of segments.  Each
-    segment subsequently decoded into Unicode.  If a segment name is empty or
-    if it is ``.``, it is ignored.  If a segment name is ``..``, the previous
-    segment is deleted, and the ``..`` is ignored.
+    - On Python 2, ``path`` is decoded to Unicode from bytes using the UTF-8
+      decoding directly; a :exc:`pyramid.exc.URLDecodeError` is raised if a the
+      URL cannot be decoded.
 
-    If this function is passed a Unicode object instead of a string, that
-    Unicode object *must* directly encodeable to ASCII.  For example, u'/foo'
-    will work but u'/<unprintable unicode>' (a Unicode object with characters
-    that cannot be encoded to ascii) will not. A :exc:`UnicodeError` will be
-    raised if the Unicode cannot be encoded directly to ASCII.
+    - On Python 3, as per the WSGI spec, ``path`` is first encoded to bytes
+      using the Latin-1 encoding; the resulting set of bytes is subsequently
+      decoded to text using the UTF-8 encoding; a
+      :exc:`pyramid.exc.URLDecodeError` is raised if a the URL cannot be
+      decoded.
+
+    The ``path`` is split on slashes, creating a list of segments.  If a
+    segment name is empty or if it is ``.``, it is ignored.  If a segment
+    name is ``..``, the previous segment is deleted, and the ``..`` is
+    ignored.
 
     Examples:
 
@@ -504,9 +515,15 @@ def traversal_path_info(path):
       applications in :app:`Pyramid`.
     """
     try:
-        path = bytes_(path, 'latin-1').decode('utf-8')
+        path = decode_path_info(path)
     except UnicodeDecodeError as e:
         raise URLDecodeError(e.encoding, e.object, e.start, e.end, e.reason)
+    return split_path_info(path)
+
+@lru_cache(1000)
+def split_path_info(path):
+    # suitable for splitting an already-unquoted-already-decoded path_info
+    # string
     path = path.strip('/')
     clean = []
     for segment in path.split('/'):
@@ -622,23 +639,28 @@ class ResourceTreeTraverser(object):
             path = matchdict.get('traverse', '/') or '/'
             if is_nonstr_iter(path):
                 # this is a *traverse stararg (not a {traverse})
-                path = '/'.join([quote_path_segment(x) for x in path]) or '/'
+                # routing has already decoded these elements, so we just
+                # need to join them
+                path = '/'.join(path) or '/'
 
             subpath = matchdict.get('subpath', ())
             if not is_nonstr_iter(subpath):
                 # this is not a *subpath stararg (just a {subpath})
-                subpath = traversal_path_info(subpath)
+                # routing has already decoded this string, so we just need
+                # to split it
+                subpath = split_path_info(subpath)
 
         else:
             # this request did not match a route
             subpath = ()
             try:
-                path = environ['PATH_INFO'] or '/'
+                path = decode_path_info(environ['PATH_INFO'] or '/')
             except KeyError:
                 path = '/'
 
         if VH_ROOT_KEY in environ:
-            vroot_path = environ[VH_ROOT_KEY]
+            # HTTP_X_VHM_ROOT
+            vroot_path = decode_path_info(environ[VH_ROOT_KEY]) 
             vroot_tuple = traversal_path_info(vroot_path)
             vpath = vroot_path + path
             vroot_idx = len(vroot_tuple) -1

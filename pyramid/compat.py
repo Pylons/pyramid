@@ -213,3 +213,21 @@ except ImportError: # pragma: no cover
 import json
 
     
+if PY3: # pragma: no cover
+    # see PEP 3333 for why we encode WSGI PATH_INFO to latin-1 before
+    # decoding it to utf-8
+    def decode_path_info(path):
+        return path.encode('latin-1').decode('utf-8')
+else:
+    def decode_path_info(path):
+        return path.decode('utf-8')
+
+if PY3: # pragma: no cover
+    # see PEP 3333 for why we decode the path to latin-1 
+    from urllib.parse import unquote_to_bytes
+    def unquote_bytes_to_wsgi(bytestring):
+        return unquote_to_bytes(bytestring).decode('latin-1')
+else:
+    from urlparse import unquote as unquote_to_bytes
+    def unquote_bytes_to_wsgi(bytestring):
+        return unquote_to_bytes(bytestring)
