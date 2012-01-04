@@ -18,8 +18,9 @@ from pyramid.compat import (
 from pyramid.exceptions import URLDecodeError
 
 from pyramid.traversal import (
-    traversal_path_info,
     quote_path_segment,
+    decode_path_info,
+    split_path_info,
     )
 
 _marker = object()
@@ -70,9 +71,11 @@ class RoutesMapper(object):
         environ = request.environ
         try:
             # empty if mounted under a path in mod_wsgi, for example
-            path = environ['PATH_INFO'] or '/' 
+            path = decode_path_info(environ['PATH_INFO'] or '/')
         except KeyError:
             path = '/'
+        except UnicodeDecodeError as e:
+            raise URLDecodeError(e.encoding, e.object, e.start, e.end, e.reason)
 
         for route in self.routelist:
             match = route.match(path)
@@ -147,17 +150,9 @@ def _compile_route(route):
         d = {}
         for k, v in m.groupdict().items():
             if k == star:
-                d[k] = traversal_path_info(v)
+                d[k] = split_path_info(v)
             else:
-                try:
-                    val = bytes_(v).decode('utf-8', 'strict')
-                    d[k] = val
-                except UnicodeDecodeError as e:
-                    raise URLDecodeError(
-                        e.encoding, e.object, e.start, e.end, e.reason
-                        )
-                        
-                        
+                d[k] = v
         return d
                     
 

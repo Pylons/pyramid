@@ -444,11 +444,12 @@ def traversal_path(path):
     path = unquote_bytes_to_wsgi(path) # result will be a native string
     return traversal_path_info(path)
 
+@lru_cache(1000)
 def traversal_path_info(path):
     """ Given``path``, return a tuple representing that path which can be
     used to traverse a resource tree.  ``path`` is assumed to be an
     already-URL-decoded ``str`` type as if it had come to us from an upstream
-    WSGI server as the ``PATH_INFO`` environment variable.
+    WSGI server as the ``PATH_INFO`` environ variable.
 
     The ``path`` is first decoded to from its WSGI representation to Unicode;
     it is decoded differently depending on platform:
@@ -457,9 +458,9 @@ def traversal_path_info(path):
       decoding directly; a :exc:`pyramid.exc.URLDecodeError` is raised if a the
       URL cannot be decoded.
 
-    - On Python 3, as per the WSGI spec, ``path`` is first encoded to bytes
-      using the Latin-1 encoding; the resulting set of bytes is subsequently
-      decoded to text using the UTF-8 encoding; a
+    - On Python 3, as per the PEP 3333 spec, ``path`` is first encoded to
+      bytes using the Latin-1 encoding; the resulting set of bytes is
+      subsequently decoded to text using the UTF-8 encoding; a
       :exc:`pyramid.exc.URLDecodeError` is raised if a the URL cannot be
       decoded.
 
@@ -654,9 +655,13 @@ class ResourceTreeTraverser(object):
             # this request did not match a route
             subpath = ()
             try:
+                # empty if mounted under a path in mod_wsgi, for example
                 path = decode_path_info(environ['PATH_INFO'] or '/')
             except KeyError:
                 path = '/'
+            except UnicodeDecodeError as e:
+                raise URLDecodeError(e.encoding, e.object, e.start, e.end,
+                                     e.reason)
 
         if VH_ROOT_KEY in environ:
             # HTTP_X_VHM_ROOT
