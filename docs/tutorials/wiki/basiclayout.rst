@@ -10,7 +10,7 @@ The source code for this tutorial stage can be browsed via
 `http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/basiclayout/
 <http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/basiclayout/>`_.
 
-Appplication Configuration with ``__init__.py``
+Application Configuration with ``__init__.py``
 ------------------------------------------------
 
 A directory on disk can be turned into a Python :term:`package` by containing
