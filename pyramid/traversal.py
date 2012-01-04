@@ -622,7 +622,7 @@ class ResourceTreeTraverser(object):
             path = matchdict.get('traverse', '/') or '/'
             if is_nonstr_iter(path):
                 # this is a *traverse stararg (not a {traverse})
-                path = '/'.join([quote_path_segment(x) for x in path]) or '/'
+                path = '/'.join([x for x in path]) or '/'
 
             subpath = matchdict.get('subpath', ())
             if not is_nonstr_iter(subpath):
