@@ -14,7 +14,6 @@ from pyramid.compat import (
     string_types,
     binary_type,
     is_nonstr_iter,
-    url_quote,
     )
 
 from pyramid.exceptions import URLDecodeError
@@ -200,7 +199,7 @@ def _compile_route(route):
     def generator(dict):
         newdict = {}
         for k, v in dict.items():
-            if PY3:
+            if PY3: # pragma: no cover
                 if v.__class__ is binary_type:
                     # url_quote below needs a native string, not bytes on Py3
                     v = v.decode('utf-8')
