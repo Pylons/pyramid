@@ -1,5 +1,5 @@
-Next release
-============
+1.2.6 (2012-01-05)
+==================
 
 - Literal portions of route patterns were not URL-quoted when ``route_url``
   or ``route_path`` was used to generate a URL or path.
