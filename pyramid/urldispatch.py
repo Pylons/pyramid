@@ -111,7 +111,13 @@ def _compile_route(route):
     # want to accept bytestrings with high-order characters in them here as
     # we have no idea what the encoding represents.
     if route.__class__ is not text_type:
-        route = text_(route, 'ascii') 
+        try:
+            route = text_(route, 'ascii')
+        except UnicodeDecodeError:
+            raise ValueError(
+                'The pattern value passed to add_route must be '
+                'either a Unicode string or a plain string without '
+                'any non-ASCII characters (you provided %r).' % route)
 
     if old_route_re.search(route) and not route_re.search(route):
         route = old_route_re.sub(update_pattern, route)
@@ -202,13 +208,20 @@ def _compile_route(route):
                 if v.__class__ is text_type:
                     # url_quote below needs bytes, not unicode on Py2
                     v = v.encode('utf-8')
-            if k == remainder and is_nonstr_iter(v):
-                v = '/'.join([quote_path_segment(x) for x in v]) # native
-            elif k != remainder:
+
+            if k == remainder:
+                # a stararg argument
+                if is_nonstr_iter(v):
+                    v = '/'.join([quote_path_segment(x) for x in v]) # native
+                else:
+                    if v.__class__ not in string_types:
+                        v = str(v)
+                    v = quote_path_segment(v, safe='/')
+            else:
                 if v.__class__ not in string_types:
                     v = str(v)
                 # v may be bytes (py2) or native string (py3)
-                v = url_quote(v, safe='') # defaults to utf8 encoding on py3
+                v = quote_path_segment(v)
 
             # at this point, the value will be a native string
             newdict[k] = v

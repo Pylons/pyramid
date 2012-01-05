@@ -365,6 +365,30 @@ class TestCompileRoute(unittest.TestCase):
         # should be a native string
         self.assertEqual(type(result), str)
 
+    def test_highorder_pattern_utf8(self):
+        pattern = b'/La Pe\xc3\xb1a/{city}'
+        self.assertRaises(ValueError, self._callFUT, pattern)
+
+    def test_generate_with_string_remainder_and_unicode_replacement(self):
+        pattern = text_(b'/abc*remainder', 'utf-8')
+        _, generator = self._callFUT(pattern)
+        result = generator(
+            {'remainder': text_(b'/Qu\xc3\xa9bec/La Pe\xc3\xb1a', 'utf-8')}
+            )
+        self.assertEqual(result, '/abc/Qu%C3%A9bec/La%20Pe%C3%B1a')
+        # should be a native string
+        self.assertEqual(type(result), str)
+
+    def test_generate_with_string_remainder_and_nonstring_replacement(self):
+        pattern = text_(b'/abc/*remainder', 'utf-8')
+        _, generator = self._callFUT(pattern)
+        result = generator(
+            {'remainder': None}
+            )
+        self.assertEqual(result, '/abc/None')
+        # should be a native string
+        self.assertEqual(type(result), str)
+
 class TestCompileRouteFunctional(unittest.TestCase):
     def matches(self, pattern, path, expected):
         from pyramid.urldispatch import _compile_route
