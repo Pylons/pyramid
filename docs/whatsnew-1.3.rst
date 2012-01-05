@@ -271,6 +271,30 @@ Backwards Incompatibilities
   and upgrade Pyramid itself "in-place"; it may simply break instead
   (particularly if you use ZCML's ``includeOverrides`` directive).
 
+- String values passed to ``route_url`` or ``route_path`` that are meant to
+  replace "remainder" matches will now be URL-quoted except for embedded
+  slashes. For example::
+
+     config.add_route('remain', '/foo*remainder')
+     request.route_path('remain', remainder='abc / def')
+     # -> '/foo/abc%20/%20def'
+
+  Previously string values passed as remainder replacements were tacked on
+  untouched, without any URL-quoting.  But this doesn't really work logically
+  if the value passed is Unicode (raw unicode cannot be placed in a URL or in
+  a path) and it is inconsistent with the rest of the URL generation
+  machinery if the value is a string (it won't be quoted unless by the
+  caller).
+
+  Some folks will have been relying on the older behavior to tack on query
+  string elements and anchor portions of the URL; sorry, you'll need to
+  change your code to use the ``_query`` and/or ``_anchor`` arguments to
+  ``route_path`` or ``route_url`` to do this now.
+
+- If you pass a bytestring that contains non-ASCII characters to
+  ``add_route`` as a pattern, it will now fail at startup time.  Use Unicode
+  instead.
+
 Documentation Enhancements
 --------------------------
 
