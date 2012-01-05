@@ -148,6 +148,26 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         self.assertEqual(result['virtual_root'], policy.root)
         self.assertEqual(result['virtual_root_path'], ())
 
+    def test_call_with_pathinfo_highorder(self):
+        foo = DummyContext(None, unicode('Qu\xc3\xa9bec', 'utf-8'))
+        root = DummyContext(foo, 'root')
+        policy = self._makeOne(root)
+        path_info = '/Qu\xc3\xa9bec'
+        environ = self._getEnviron(PATH_INFO=path_info)
+        request = DummyRequest(environ)
+        result = policy(request)
+        self.assertEqual(result['context'], foo)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], ())
+        self.assertEqual(
+            result['traversed'],
+            (unicode('Qu\xc3\xa9bec', 'utf-8'),)
+            )
+        self.assertEqual(result['root'], policy.root)
+        self.assertEqual(result['virtual_root'], policy.root)
+        self.assertEqual(result['virtual_root_path'], ())
+
+
     def test_call_pathel_with_no_getitem(self):
         policy = self._makeOne(None)
         environ = self._getEnviron(PATH_INFO='/foo/bar')
@@ -305,6 +325,30 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         self.assertEqual(result['root'], policy.root)
         self.assertEqual(result['virtual_root'], policy.root)
         self.assertEqual(result['virtual_root_path'], ())
+
+    def test_call_with_vh_root_highorder(self):
+        bar = DummyContext(None, 'bar')
+        foo = DummyContext(bar, unicode('Qu\xc3\xa9bec', 'utf-8'))
+        root = DummyContext(foo, 'root')
+        policy = self._makeOne(root)
+        vhm_root = '/Qu\xc3\xa9bec'
+        environ = self._getEnviron(HTTP_X_VHM_ROOT=vhm_root,
+                                   PATH_INFO='/bar')
+        request = DummyRequest(environ)
+        result = policy(request)
+        self.assertEqual(result['context'], bar)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], ())
+        self.assertEqual(
+            result['traversed'],
+            (unicode('Qu\xc3\xa9bec', 'utf-8'), u'bar')
+            )
+        self.assertEqual(result['root'], policy.root)
+        self.assertEqual(result['virtual_root'], foo)
+        self.assertEqual(
+            result['virtual_root_path'],
+            (unicode('Qu\xc3\xa9bec', 'utf-8'),)
+            )
 
     def test_non_utf8_path_segment_unicode_path_segments_fails(self):
         foo = DummyContext()

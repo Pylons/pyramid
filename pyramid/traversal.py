@@ -419,9 +419,11 @@ def traversal_path(path):
     raised if the Unicode cannot be encoded directly to ASCII.
     """
     if isinstance(path, unicode):
+        # must not possess characters outside ascii
         path = path.encode('ascii')
-    path = urllib.unquote(path)
-    return traversal_path_info(path)
+    # we unquote this path exactly like a PEP 3333 server would
+    path = urllib.unquote(path) # result will be a native string
+    return traversal_path_info(path) # result will be a tuple of unicode
 
 @lru_cache(1000)
 def traversal_path_info(path):
@@ -493,6 +495,12 @@ def traversal_path_info(path):
         path = path.decode('utf-8')
     except UnicodeDecodeError, e:
         raise URLDecodeError(e.encoding, e.object, e.start, e.end, e.reason)
+    return split_path_info(path)
+
+@lru_cache(1000)
+def split_path_info(path):
+    # suitable for splitting an already-unquoted-already-decoded (unicode)
+    # path value
     path = path.strip('/')
     clean = []
     for segment in path.split('/'):
@@ -581,25 +589,34 @@ class ResourceTreeTraverser(object):
             path = matchdict.get('traverse', '/') or '/'
             if hasattr(path, '__iter__'):
                 # this is a *traverse stararg (not a {traverse})
-                path = '/'.join([quote_path_segment(x) for x in path]) or '/'
+                # routing has already decoded these elements, so we just
+                # need to join them
+                path = '/'.join(path) or '/'
 
             subpath = matchdict.get('subpath', ())
             if not hasattr(subpath, '__iter__'):
                 # this is not a *subpath stararg (just a {subpath})
-                subpath = traversal_path_info(subpath)
+                # routing has already decoded this string, so we just need
+                # to split it
+                subpath = split_path_info(subpath)
 
         else:
             # this request did not match a route
             subpath = ()
             try:
-                path = environ['PATH_INFO'] or '/'
+                # empty if mounted under a path in mod_wsgi, for example
+                path = (environ['PATH_INFO'] or '/').decode('utf-8')
             except KeyError:
                 path = '/'
+            except UnicodeDecodeError, e:
+                raise URLDecodeError(e.encoding, e.object, e.start, e.end,
+                                     e.reason)
 
         if VH_ROOT_KEY in environ:
-            vroot_path = environ[VH_ROOT_KEY]
-            vroot_tuple = traversal_path_info(vroot_path)
-            vpath = vroot_path + path
+            # HTTP_X_VHM_ROOT
+            vroot_path = environ[VH_ROOT_KEY].decode('utf-8')
+            vroot_tuple = split_path_info(vroot_path)
+            vpath = vroot_path + path # both will (must) be unicode or asciistr
             vroot_idx = len(vroot_tuple) -1
         else:
             vroot_tuple = ()
@@ -619,7 +636,7 @@ class ResourceTreeTraverser(object):
             # and this hurts readability; apologies
             i = 0
             view_selector = self.VIEW_SELECTOR
-            vpath_tuple = traversal_path_info(vpath)
+            vpath_tuple = split_path_info(vpath)
             for segment in vpath_tuple:
                 if segment[:2] == view_selector:
                     return {'context':ob,

@@ -227,6 +227,21 @@ class Test__make_predicates(unittest.TestCase):
         self.assertEqual(info, {'match':
                                 {'a':'a', 'b':'b', 'traverse':('1', 'a', 'b')}})
 
+    def test_traverse_matches_with_highorder_chars(self):
+        order, predicates, phash = self._callFUT(
+            traverse=unicode('/La Pe\xc3\xb1a/{x}', 'utf-8'))
+        self.assertEqual(len(predicates), 1)
+        pred = predicates[0]
+        info = {'match':{'x':unicode('Qu\xc3\xa9bec', 'utf-8')}}
+        request = DummyRequest()
+        result = pred(info, request)
+        self.assertEqual(result, True)
+        self.assertEqual(
+            info['match']['traverse'],
+            (unicode('La Pe\xc3\xb1a', 'utf-8'),
+             unicode('Qu\xc3\xa9bec', 'utf-8'))
+             )
+
     def test_custom_predicates_can_affect_traversal(self):
         def custom(info, request):
             m = info['match']

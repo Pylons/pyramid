@@ -6,7 +6,8 @@ from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.interfaces import IRendererFactory
 
 from pyramid.renderers import RendererHelper
-from pyramid.traversal import traversal_path_info
+
+from pyramid.traversal import split_path_info
 
 from pyramid.config.util import action_method
 
@@ -64,9 +65,9 @@ class TestingConfiguratorMixin(object):
                 self.context = context
 
             def __call__(self, request):
-                path = request.environ['PATH_INFO']
+                path = request.environ['PATH_INFO'].decode('utf-8')
                 ob = resources[path]
-                traversed = traversal_path_info(path)
+                traversed = split_path_info(path)
                 return {'context':ob, 'view_name':'','subpath':(),
                         'traversed':traversed, 'virtual_root':ob,
                         'virtual_root_path':(), 'root':ob}
