@@ -1,10 +1,13 @@
 import unittest
 
 from pyramid.testing import cleanUp
-from pyramid.compat import text_
-from pyramid.compat import native_
-from pyramid.compat import text_type
-from pyramid.compat import url_quote
+from pyramid.compat import (
+    text_,
+    native_,
+    text_type,
+    url_quote,
+    PY3,
+    )
 
 class TraversalPathTests(unittest.TestCase):
     def _callFUT(self, path):
@@ -127,6 +130,28 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
         self.assertEqual(result['traversed'], ())
+        self.assertEqual(result['root'], policy.root)
+        self.assertEqual(result['virtual_root'], policy.root)
+        self.assertEqual(result['virtual_root_path'], ())
+
+    def test_call_with_pathinfo_highorder(self):
+        foo = DummyContext(None, text_(b'Qu\xc3\xa9bec', 'utf-8'))
+        root = DummyContext(foo, 'root')
+        policy = self._makeOne(root)
+        if PY3:
+            path_info = b'/Qu\xc3\xa9bec'.encode('latin-1')
+        else:
+            path_info = b'/Qu\xc3\xa9bec'
+        environ = self._getEnviron(PATH_INFO=path_info)
+        request = DummyRequest(environ)
+        result = policy(request)
+        self.assertEqual(result['context'], foo)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], ())
+        self.assertEqual(
+            result['traversed'],
+            (text_(b'Qu\xc3\xa9bec', 'utf-8'),)
+            )
         self.assertEqual(result['root'], policy.root)
         self.assertEqual(result['virtual_root'], policy.root)
         self.assertEqual(result['virtual_root_path'], ())
@@ -294,6 +319,33 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         self.assertEqual(result['root'], policy.root)
         self.assertEqual(result['virtual_root'], policy.root)
         self.assertEqual(result['virtual_root_path'], ())
+
+    def test_call_with_vh_root_highorder(self):
+        bar = DummyContext(None, 'bar')
+        foo = DummyContext(bar, text_(b'Qu\xc3\xa9bec', 'utf-8'))
+        root = DummyContext(foo, 'root')
+        policy = self._makeOne(root)
+        if PY3:
+            vhm_root = b'/Qu\xc3\xa9bec'.encode('latin-1')
+        else:
+            vhm_root = b'/Qu\xc3\xa9bec'
+        environ = self._getEnviron(HTTP_X_VHM_ROOT=vhm_root,
+                                   PATH_INFO='/bar')
+        request = DummyRequest(environ)
+        result = policy(request)
+        self.assertEqual(result['context'], bar)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], ())
+        self.assertEqual(
+            result['traversed'],
+            (text_(b'Qu\xc3\xa9bec', 'utf-8'), u'bar')
+            )
+        self.assertEqual(result['root'], policy.root)
+        self.assertEqual(result['virtual_root'], foo)
+        self.assertEqual(
+            result['virtual_root_path'],
+            (text_(b'Qu\xc3\xa9bec', 'utf-8'),)
+            )
 
     def test_non_utf8_path_segment_unicode_path_segments_fails(self):
         from pyramid.exceptions import URLDecodeError

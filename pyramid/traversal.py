@@ -667,8 +667,8 @@ class ResourceTreeTraverser(object):
         if VH_ROOT_KEY in environ:
             # HTTP_X_VHM_ROOT
             vroot_path = decode_path_info(environ[VH_ROOT_KEY]) 
-            vroot_tuple = traversal_path_info(vroot_path)
-            vpath = vroot_path + path
+            vroot_tuple = split_path_info(vroot_path)
+            vpath = vroot_path + path # both will (must) be unicode or asciistr
             vroot_idx = len(vroot_tuple) -1
         else:
             vroot_tuple = ()
@@ -688,7 +688,7 @@ class ResourceTreeTraverser(object):
             # and this hurts readability; apologies
             i = 0
             view_selector = self.VIEW_SELECTOR
-            vpath_tuple = traversal_path_info(vpath)
+            vpath_tuple = split_path_info(vpath)
             for segment in vpath_tuple:
                 if segment[:2] == view_selector:
                     return {'context':ob,

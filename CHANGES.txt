@@ -45,6 +45,14 @@ Bug Fixes
   URLDecodeError if there were any high-order characters in the traversal
   pattern or in the matched dynamic segments.
 
+- Using a dynamic segment named ``traverse`` in a route pattern like this::
+
+    config.add_route('trav_route', 'traversal/{traverse:.*}')
+
+  Would cause a ``UnicodeDecodeError`` when the route was matched and the
+  matched portion of the URL contained any high-order characters.  See also
+  https://github.com/Pylons/pyramid/issues/385 .
+
 Backwards Incompatibilities
 ---------------------------
 
