@@ -1,7 +1,9 @@
 import unittest
 from pyramid import testing
-from pyramid.compat import text_
-from pyramid.compat import native_
+from pyramid.compat import (
+    text_,
+    PY3,
+    )
 
 class TestRoute(unittest.TestCase):
     def _getTargetClass(self):
@@ -118,7 +120,11 @@ class RoutesMapperTests(unittest.TestCase):
     def test___call__pathinfo_cant_be_decoded(self):
         from pyramid.exceptions import URLDecodeError
         mapper = self._makeOne()
-        request = self._getRequest(PATH_INFO=b'\xff\xfe\xe6\x00')
+        if PY3:
+            path_info = b'\xff\xfe\xe6\x00'.decode('latin-1')
+        else:
+            path_info = b'\xff\xfe\xe6\x00'
+        request = self._getRequest(PATH_INFO=path_info)
         self.assertRaises(URLDecodeError, mapper, request)
 
     def test___call__route_matches(self):
