@@ -139,7 +139,7 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         root = DummyContext(foo, 'root')
         policy = self._makeOne(root)
         if PY3:
-            path_info = b'/Qu\xc3\xa9bec'.encode('latin-1')
+            path_info = b'/Qu\xc3\xa9bec'.decode('latin-1')
         else:
             path_info = b'/Qu\xc3\xa9bec'
         environ = self._getEnviron(PATH_INFO=path_info)
@@ -326,7 +326,7 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         root = DummyContext(foo, 'root')
         policy = self._makeOne(root)
         if PY3:
-            vhm_root = b'/Qu\xc3\xa9bec'.encode('latin-1')
+            vhm_root = b'/Qu\xc3\xa9bec'.decode('latin-1')
         else:
             vhm_root = b'/Qu\xc3\xa9bec'
         environ = self._getEnviron(HTTP_X_VHM_ROOT=vhm_root,
@@ -338,7 +338,7 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         self.assertEqual(result['subpath'], ())
         self.assertEqual(
             result['traversed'],
-            (text_(b'Qu\xc3\xa9bec', 'utf-8'), u'bar')
+            (text_(b'Qu\xc3\xa9bec', 'utf-8'), text_('bar'))
             )
         self.assertEqual(result['root'], policy.root)
         self.assertEqual(result['virtual_root'], foo)
