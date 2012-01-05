@@ -145,7 +145,7 @@ package.
 
 As the result of this view configuration, when the pattern associated with
 the view named ``home`` is matched during a request, the function named
-``my_view`` will be executed.  The the function named ``my_view`` returns a
+``my_view`` will be executed.  The function named ``my_view`` returns a
 dictionary; the renderer will use the ``templates/mytemplate.pt`` template to
 create a response based on the values in the dictionary.
 

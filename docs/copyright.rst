@@ -59,7 +59,7 @@ Contributors:
   Merickel, Eric Ongerth, Niall O'Higgins, Christoph Zwerschke, John
   Anderson, Atsushi Odagiri, Kirk Strauser, JD Navarro, Joe Dallago,
   Savoir-Faire Linux, Łukasz Fidosz, Christopher Lambacher, Claus Conrad,
-  Chris Beelby, Phil Jenvey and a number of people with only psuedonyms on
+  Chris Beelby, Phil Jenvey and a number of people with only pseudonyms on
   GitHub.
 
 Cover Designer:
