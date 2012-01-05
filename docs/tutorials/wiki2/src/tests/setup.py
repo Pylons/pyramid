@@ -1,5 +1,4 @@
 import os
-import sys
 
 from setuptools import setup, find_packages
 
@@ -18,9 +17,6 @@ requires = [
     'docutils',
     'WebTest', # add this
     ]
-
-if sys.version_info[:3] < (2,5,0):
-    requires.append('pysqlite')
 
 setup(name='tutorial',
       version='0.0',
