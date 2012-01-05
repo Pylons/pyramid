@@ -120,7 +120,7 @@ class RoutesMapperTests(unittest.TestCase):
     def test___call__pathinfo_cant_be_decoded(self):
         from pyramid.exceptions import URLDecodeError
         mapper = self._makeOne()
-        if PY3:
+        if PY3: # pragma: no cover
             path_info = b'\xff\xfe\xe6\x00'.decode('latin-1')
         else:
             path_info = b'\xff\xfe\xe6\x00'
