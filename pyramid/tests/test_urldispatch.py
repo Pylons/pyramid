@@ -292,12 +292,6 @@ class TestCompileRoute(unittest.TestCase):
         self.assertEqual(matcher('foo/baz/biz/buz/bar'), None)
         self.assertEqual(generator({'baz':1, 'buz':2}), '/foo/1/biz/2/bar')
 
-    def test_url_decode_error(self):
-        from pyramid.exceptions import URLDecodeError
-        matcher, generator = self._callFUT('/:foo')
-        self.assertRaises(URLDecodeError, matcher,
-                          native_(b'/\xff\xfe\x8b\x00'))
-    
     def test_custom_regex(self):
         matcher, generator = self._callFUT('foo/{baz}/biz/{buz:[^/\.]+}.{bar}')
         self.assertEqual(matcher('/foo/baz/biz/buz.bar'),
@@ -328,7 +322,8 @@ class TestCompileRoute(unittest.TestCase):
         self.assertEqual(generator({'buz':2001}), '/2001')
 
     def test_custom_regex_with_embedded_squigglies3(self):
-        matcher, generator = self._callFUT('/{buz:(\d{2}|\d{4})-[a-zA-Z]{3,4}-\d{2}}')
+        matcher, generator = self._callFUT(
+            '/{buz:(\d{2}|\d{4})-[a-zA-Z]{3,4}-\d{2}}')
         self.assertEqual(matcher('/2001-Nov-15'), {'buz':'2001-Nov-15'})
         self.assertEqual(matcher('/99-June-10'), {'buz':'99-June-10'})
         self.assertEqual(matcher('/2-Nov-15'), None)
@@ -336,6 +331,39 @@ class TestCompileRoute(unittest.TestCase):
         self.assertEqual(matcher('/2001-No-15'), None)
         self.assertEqual(generator({'buz':'2001-Nov-15'}), '/2001-Nov-15')
         self.assertEqual(generator({'buz':'99-June-10'}), '/99-June-10')
+
+    def test_pattern_with_high_order_literal(self):
+        pattern = text_(b'/La Pe\xc3\xb1a/{x}', 'utf-8')
+        matcher, generator = self._callFUT(pattern)
+        self.assertEqual(matcher(text_(b'/La Pe\xc3\xb1a/x', 'utf-8')),
+                         {'x':'x'})
+        self.assertEqual(generator({'x':'1'}), '/La%20Pe%C3%B1a/1')
+
+    def test_pattern_generate_with_high_order_dynamic(self):
+        pattern = '/{x}'
+        _, generator = self._callFUT(pattern)
+        self.assertEqual(
+            generator({'x':text_(b'La Pe\xc3\xb1a', 'utf-8')}),
+            '/La%20Pe%C3%B1a')
+
+    def test_docs_sample_generate(self):
+        # sample from urldispatch.rst
+        pattern = text_(b'/La Pe\xc3\xb1a/{city}', 'utf-8')
+        _, generator = self._callFUT(pattern)
+        self.assertEqual(
+            generator({'city':text_(b'Qu\xc3\xa9bec', 'utf-8')}),
+            '/La%20Pe%C3%B1a/Qu%C3%A9bec')
+
+    def test_generate_with_mixedtype_values(self):
+        pattern = '/{city}/{state}'
+        _, generator = self._callFUT(pattern)
+        result = generator(
+            {'city': text_(b'Qu\xc3\xa9bec', 'utf-8'),
+             'state': b'La Pe\xc3\xb1a'}
+            )
+        self.assertEqual(result, '/Qu%C3%A9bec/La%20Pe%C3%B1a')
+        # should be a native string
+        self.assertEqual(type(result), str)
 
 class TestCompileRouteFunctional(unittest.TestCase):
     def matches(self, pattern, path, expected):
@@ -368,11 +396,11 @@ class TestCompileRouteFunctional(unittest.TestCase):
         self.matches('*traverse', '/zzz/abc', {'traverse':('zzz', 'abc')})
         self.matches('*traverse', '/zzz/ abc', {'traverse':('zzz', ' abc')})
         #'/La%20Pe%C3%B1a'
-        self.matches('{x}', native_(b'/La Pe\xc3\xb1a'),
-                     {'x':text_(b'La Pe\xf1a')})
+        self.matches('{x}', text_(b'/La Pe\xc3\xb1a', 'utf-8'),
+                     {'x':text_(b'La Pe\xc3\xb1a', 'utf-8')})
         # '/La%20Pe%C3%B1a/x'
-        self.matches('*traverse', native_(b'/La Pe\xc3\xb1a/x'),
-                     {'traverse':(text_(b'La Pe\xf1a'), 'x')})
+        self.matches('*traverse', text_(b'/La Pe\xc3\xb1a/x'),
+                     {'traverse':(text_(b'La Pe\xc3\xb1a'), 'x')})
         self.matches('/foo/{id}.html', '/foo/bar.html', {'id':'bar'})
         self.matches('/{num:[0-9]+}/*traverse', '/555/abc/def',
                      {'num':'555', 'traverse':('abc', 'def')})
@@ -394,11 +422,12 @@ class TestCompileRouteFunctional(unittest.TestCase):
         self.matches('*traverse', '/zzz/abc', {'traverse':('zzz', 'abc')})
         self.matches('*traverse', '/zzz/ abc', {'traverse':('zzz', ' abc')})
         #'/La%20Pe%C3%B1a'
-        self.matches(':x', native_(b'/La Pe\xc3\xb1a'),
-                     {'x':text_(b'La Pe\xf1a')})
+        # pattern, path, expected
+        self.matches(':x', text_(b'/La Pe\xc3\xb1a', 'utf-8'),
+                     {'x':text_(b'La Pe\xc3\xb1a', 'utf-8')})
         # '/La%20Pe%C3%B1a/x'
-        self.matches('*traverse', native_(b'/La Pe\xc3\xb1a/x'),
-                     {'traverse':(text_(b'La Pe\xf1a'), 'x')})
+        self.matches('*traverse', text_(b'/La Pe\xc3\xb1a/x', 'utf-8'),
+                     {'traverse':(text_(b'La Pe\xc3\xb1a', 'utf-8'), 'x')})
         self.matches('/foo/:id.html', '/foo/bar.html', {'id':'bar'})
         self.matches('/foo/:id_html', '/foo/bar_html', {'id_html':'bar_html'})
         self.matches('zzz/:_', '/zzz/abc', {'_':'abc'})
