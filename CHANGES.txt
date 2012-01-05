@@ -28,7 +28,7 @@ Bug Fixes
   https://github.com/Pylons/pyramid/issues/386
 
 - Literal portions of route patterns were not URL-quoted when ``route_url``
-  or ``route_path`` was used.
+  or ``route_path`` was used to generate a URL or path.
 
 - The result of ``route_path`` or ``route_url`` might have been ``unicode``
   or ``str`` depending on the input.  It is now guaranteed to always be
@@ -50,8 +50,15 @@ Bug Fixes
     config.add_route('trav_route', 'traversal/{traverse:.*}')
 
   Would cause a ``UnicodeDecodeError`` when the route was matched and the
-  matched portion of the URL contained any high-order characters.  See also
+  matched portion of the URL contained any high-order characters.  See
   https://github.com/Pylons/pyramid/issues/385 .
+
+- When using a ``*traverse`` stararg in a route pattern, a URL that matched
+  that possessed a ``@@`` in its name (signifying a view name) would be
+  inappropriately quoted by the traversal machinery during traversal,
+  resulting in the view not being found properly. See
+  https://github.com/Pylons/pyramid/issues/382 and
+  https://github.com/Pylons/pyramid/issues/375 .
 
 Backwards Incompatibilities
 ---------------------------
