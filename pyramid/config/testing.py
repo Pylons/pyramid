@@ -8,7 +8,11 @@ from pyramid.interfaces import (
     )
 
 from pyramid.renderers import RendererHelper
-from pyramid.traversal import traversal_path_info
+
+from pyramid.traversal import (
+    decode_path_info,
+    split_path_info,
+    )
 
 from pyramid.config.util import action_method
 
@@ -66,9 +70,9 @@ class TestingConfiguratorMixin(object):
                 self.context = context
 
             def __call__(self, request):
-                path = request.environ['PATH_INFO']
+                path = decode_path_info(request.environ['PATH_INFO'])
                 ob = resources[path]
-                traversed = traversal_path_info(path)
+                traversed = split_path_info(path)
                 return {'context':ob, 'view_name':'','subpath':(),
                         'traversed':traversed, 'virtual_root':ob,
                         'virtual_root_path':(), 'root':ob}

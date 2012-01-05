@@ -438,11 +438,12 @@ def traversal_path(path):
     not. A :exc:`UnicodeEncodeError` will be raised if the Unicode cannot be
     encoded directly to ASCII.
     """
-    # we unquote this path exactly like a PEP 3333 server would
     if isinstance(path, text_type):
+        # must not possess characters outside ascii
         path = path.encode('ascii')
+    # we unquote this path exactly like a PEP 3333 server would
     path = unquote_bytes_to_wsgi(path) # result will be a native string
-    return traversal_path_info(path)
+    return traversal_path_info(path) # result will be a tuple of unicode
 
 @lru_cache(1000)
 def traversal_path_info(path):
@@ -516,15 +517,15 @@ def traversal_path_info(path):
       applications in :app:`Pyramid`.
     """
     try:
-        path = decode_path_info(path)
+        path = decode_path_info(path) # result will be Unicode
     except UnicodeDecodeError as e:
         raise URLDecodeError(e.encoding, e.object, e.start, e.end, e.reason)
-    return split_path_info(path)
+    return split_path_info(path) # result will be tuple of Unicode
 
 @lru_cache(1000)
 def split_path_info(path):
-    # suitable for splitting an already-unquoted-already-decoded path_info
-    # string
+    # suitable for splitting an already-unquoted-already-decoded (unicode)
+    # path value
     path = path.strip('/')
     clean = []
     for segment in path.split('/'):
