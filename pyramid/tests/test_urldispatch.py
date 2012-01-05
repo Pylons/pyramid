@@ -113,6 +113,12 @@ class RoutesMapperTests(unittest.TestCase):
         self.assertEqual(mapper.routelist[0].pattern,
                          'archives/:action/:article2')
 
+    def test___call__pathinfo_cant_be_decoded(self):
+        from pyramid.exceptions import URLDecodeError
+        mapper = self._makeOne()
+        request = self._getRequest(PATH_INFO='\xff\xfe\xe6\x00')
+        self.assertRaises(URLDecodeError, mapper, request)
+
     def test___call__route_matches(self):
         mapper = self._makeOne()
         mapper.connect('foo', 'archives/:action/:article')
