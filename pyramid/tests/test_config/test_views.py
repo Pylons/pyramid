@@ -5,7 +5,10 @@ from pyramid.tests.test_config import IDummy
 
 from pyramid.tests.test_config import dummy_view
 
-from pyramid.compat import im_func
+from pyramid.compat import (
+    im_func,
+    text_,
+    )
 from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import ConfigurationExecutionError
 from pyramid.exceptions import ConfigurationConflictError
@@ -141,6 +144,25 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         config.add_view(view=view, renderer=null_renderer)
         wrapper = self._getViewCallable(config)
+        result = wrapper(None, None)
+        self.assertEqual(result, 'OK')
+
+    def test_add_view_with_name(self):
+        from pyramid.renderers import null_renderer
+        view = lambda *arg: 'OK'
+        config = self._makeOne(autocommit=True)
+        config.add_view(view=view, name='abc', renderer=null_renderer)
+        wrapper = self._getViewCallable(config, name='abc')
+        result = wrapper(None, None)
+        self.assertEqual(result, 'OK')
+
+    def test_add_view_with_name_unicode(self):
+        from pyramid.renderers import null_renderer
+        view = lambda *arg: 'OK'
+        config = self._makeOne(autocommit=True)
+        name = text_(b'La Pe\xc3\xb1a', 'utf-8')
+        config.add_view(view=view, name=name, renderer=null_renderer)
+        wrapper = self._getViewCallable(config, name=name)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
 
