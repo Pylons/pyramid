@@ -1433,11 +1433,47 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         directlyProvides(context, IDummy)
         request = self._makeRequest(config)
         self.assertEqual(wrapper(context, request), 'OK')
-
         context = DummyContext()
         request = self._makeRequest(config)
         self.assertRaises(PredicateMismatch, wrapper, context, request)
         
+    def test_add_view_with_view_config_and_view_defaults_doesnt_conflict(self):
+        from pyramid.renderers import null_renderer
+        class view(object):
+            __view_defaults__ = {
+                'containment':'pyramid.tests.test_config.IDummy'
+                }
+        class view2(object):
+            __view_defaults__ = {
+                'containment':'pyramid.tests.test_config.IFactory'
+                }
+        config = self._makeOne(autocommit=False)
+        config.add_view(
+            view=view,
+            renderer=null_renderer)
+        config.add_view(
+            view=view2,
+            renderer=null_renderer)
+        config.commit() # does not raise
+
+    def test_add_view_with_view_config_and_view_defaults_conflicts(self):
+        from pyramid.renderers import null_renderer
+        class view(object):
+            __view_defaults__ = {
+                'containment':'pyramid.tests.test_config.IDummy'
+                }
+        class view2(object):
+            __view_defaults__ = {
+                'containment':'pyramid.tests.test_config.IDummy'
+                }
+        config = self._makeOne(autocommit=False)
+        config.add_view(
+            view=view,
+            renderer=null_renderer)
+        config.add_view(
+            view=view2,
+            renderer=null_renderer)
+        self.assertRaises(ConfigurationConflictError, config.commit)
 
     def test_derive_view_function(self):
         from pyramid.renderers import null_renderer
