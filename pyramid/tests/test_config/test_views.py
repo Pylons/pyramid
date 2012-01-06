@@ -1283,7 +1283,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config.add_view(view=view, path_info='/foo', renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
-        request.path_info = '/foo'
+        request.upath_info = text_(b'/foo')
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_with_path_info_nomatch(self):
@@ -1292,7 +1292,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config.add_view(view=view, path_info='/foo')
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
-        request.path_info = '/'
+        request.upath_info = text_('/')
         self._assertNotFound(wrapper, None, request)
 
     def test_add_view_with_custom_predicates_match(self):

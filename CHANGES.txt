@@ -8,6 +8,14 @@ Bug Fixes
   more than one view relied on the defaults being different for configuration
   conflict resolution.  See https://github.com/Pylons/pyramid/issues/394.
 
+Backwards Incompatibilities
+---------------------------
+
+- The ``path_info`` route and view predicates now match against
+  ``request.upath_info`` (Unicode) rather than ``request.path_info``
+  (indeterminate value based on Python 3 vs. Python 2).  This has to be done
+  to normalize matching on Python 2 and Python 3.
+
 1.3a4 (2012-01-05)
 ==================
 

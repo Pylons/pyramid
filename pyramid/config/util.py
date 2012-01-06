@@ -145,7 +145,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         except re.error as why:
             raise ConfigurationError(why.args[0])
         def path_info_predicate(context, request):
-            return path_info_val.match(request.path_info) is not None
+            return path_info_val.match(request.upath_info) is not None
         text = "path_info = %s"
         path_info_predicate.__text__ = text % path_info
         weights.append(1 << 3)
