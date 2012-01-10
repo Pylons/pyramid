@@ -133,6 +133,15 @@ def render_view(context, request, name='', secure=True):
         return None
     return ''.join(iterable)
 
+class _default(object):
+    def __nonzero__(self):
+        return False
+    __bool__ = __nonzero__
+    def __repr__(self): # pragma: no cover
+        return '(default)'
+
+default = _default()
+
 class view_config(object):
     """ A function, class or method :term:`decorator` which allows a
     developer to create view registrations nearer to a :term:`view
@@ -168,39 +177,29 @@ class view_config(object):
     and ``match_param``.
 
     The meanings of these arguments are the same as the arguments passed to
-    :meth:`pyramid.config.Configurator.add_view`.
+    :meth:`pyramid.config.Configurator.add_view`.  If any argument is left
+    out, its default will be the equivalent ``add_view`` default.
 
     See :ref:`mapping_views_using_a_decorator_section` for details about
     using :class:`view_config`.
 
     """
     venusian = venusian # for testing injection
-    def __init__(self, name='', request_type=None, for_=None, permission=None,
-                 route_name=None, request_method=None, request_param=None,
-                 containment=None, attr=None, renderer=None, wrapper=None,
-                 xhr=False, accept=None, header=None, path_info=None,
-                 custom_predicates=(), context=None, decorator=None,
-                 mapper=None, http_cache=None, match_param=None):
-        self.name = name
-        self.request_type = request_type
-        self.context = context or for_
-        self.permission = permission
-        self.route_name = route_name
-        self.request_method = request_method
-        self.request_param = request_param
-        self.containment = containment
-        self.attr = attr
-        self.renderer = renderer
-        self.wrapper = wrapper
-        self.xhr = xhr
-        self.accept = accept
-        self.header = header
-        self.path_info = path_info
-        self.custom_predicates = custom_predicates
-        self.decorator = decorator
-        self.mapper = mapper
-        self.http_cache = http_cache
-        self.match_param = match_param
+    def __init__(self, name=default, request_type=default, for_=default,
+                 permission=default, route_name=default,
+                 request_method=default, request_param=default,
+                 containment=default, attr=default, renderer=default,
+                 wrapper=default, xhr=default, accept=default,
+                 header=default, path_info=default,
+                 custom_predicates=default, context=default,
+                 decorator=default, mapper=default, http_cache=default,
+                 match_param=default):
+        L = locals()
+        if (context is not default) or (for_ is not default):
+            L['context'] = context or for_
+        for k, v in L.items():
+            if k not in ('self', 'L') and v is not default:
+                setattr(self, k, v)
 
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
@@ -215,7 +214,7 @@ class view_config(object):
             # if the decorator was attached to a method in a class, or
             # otherwise executed at class scope, we need to set an
             # 'attr' into the settings if one isn't already in there
-            if settings['attr'] is None:
+            if settings.get('attr') is None:
                 settings['attr'] = wrapped.__name__
 
         settings['_info'] = info.codeinfo # fbo "action_method"

@@ -54,9 +54,8 @@ The script imports the :class:`~pyramid.config.Configurator` class from the
 
 Like many other Python web frameworks, :app:`Pyramid` uses the :term:`WSGI`
 protocol to connect an application and a web server together.  The
-:mod:`paste.httpserver` server is used in this example as a WSGI server for
-convenience, as the ``paste`` package is a dependency of :app:`Pyramid`
-itself.
+:mod:`wsgiref` server is used in this example as a WSGI server for
+convenience, as it is shipped within the Python standard library.
 
 The script also imports the :class:`pyramid.response.Response` class for
 later use.  An instance of this class will be used to create a web response.
@@ -205,14 +204,17 @@ WSGI Application Serving
    :lines: 13
 
 Finally, we actually serve the application to requestors by starting up a
-WSGI server.  We happen to use the :func:`paste.httpserver.serve` WSGI server
-runner, passing it the ``app`` object (a :term:`router`) as the application
-we wish to serve.  We also pass in an argument ``host='0.0.0.0'``, meaning
-"listen on all TCP interfaces."  By default, the HTTP server listens
-only on the ``127.0.0.1`` interface, which is problematic if you're running
-the server on a remote system and you wish to access it with a web browser
-from a local system.  We don't specify a TCP port number to listen on; this
-means we want to use the default TCP port, which is 8080.
+WSGI server.  We happen to use the :mod:`wsgiref` ``make_server`` server
+maker for this purpose.  We pass in as the first argument ``'0.0.0.0'``,
+which means "listen on all TCP interfaces."  By default, the HTTP server
+listens only on the ``127.0.0.1`` interface, which is problematic if you're
+running the server on a remote system and you wish to access it with a web
+browser from a local system.  We also specify a TCP port number to listen on,
+which is 8080, passing it as the second argument.  The final argument ios ,
+passing it the ``app`` object (a :term:`router`), which is the the
+application we wish to serve.  Finally, we call the server's
+``serve_forever`` method, which starts the main loop in which it will wait
+for requests from the outside world.
 
 When this line is invoked, it causes the server to start listening on TCP
 port 8080.  The server will serve requests forever, or at least until we stop

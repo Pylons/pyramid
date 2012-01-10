@@ -267,6 +267,24 @@ class TestRequest(unittest.TestCase):
         request = self._makeOne({'REQUEST_METHOD':'GET'})
         self.assertRaises(ValueError, getattr, request, 'json_body')
 
+    def test_set_property(self):
+        request = self._makeOne({})
+        opts = [2, 1]
+        def connect(obj):
+            return opts.pop()
+        request.set_property(connect, name='db')
+        self.assertEqual(1, request.db)
+        self.assertEqual(2, request.db)
+
+    def test_set_property_reify(self):
+        request = self._makeOne({})
+        opts = [2, 1]
+        def connect(obj):
+            return opts.pop()
+        request.set_property(connect, name='db', reify=True)
+        self.assertEqual(1, request.db)
+        self.assertEqual(1, request.db)
+
 class TestRequestDeprecatedMethods(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()

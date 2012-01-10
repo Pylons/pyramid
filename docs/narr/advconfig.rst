@@ -27,7 +27,7 @@ configured imperatively:
 .. code-block:: python
    :linenos:
 
-   from paste.httpserver import serve
+   from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
    from pyramid.response import Response
 
@@ -38,7 +38,8 @@ configured imperatively:
        config = Configurator()
        config.add_view(hello_world)
        app = config.make_wsgi_app()
-       serve(app, host='0.0.0.0')
+       server = make_server('0.0.0.0', 8080, app)
+       server.serve_forever()
 
 When you start this application, all will be OK.  However, what happens if we
 try to add another view to the configuration with the same set of
@@ -47,7 +48,7 @@ try to add another view to the configuration with the same set of
 .. code-block:: python
    :linenos:
 
-   from paste.httpserver import serve
+   from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
    from pyramid.response import Response
 
@@ -66,7 +67,8 @@ try to add another view to the configuration with the same set of
        config.add_view(goodbye_world, name='hello')
 
        app = config.make_wsgi_app()
-       serve(app, host='0.0.0.0')
+       server = make_server('0.0.0.0', 8080, app)
+       server.serve_forever()
 
 The application now has two conflicting view configuration statements.  When
 we try to start it again, it won't start.  Instead, we'll receive a traceback
@@ -170,7 +172,7 @@ application that generates conflicts:
 .. code-block:: python
    :linenos:
 
-   from paste.httpserver import serve
+   from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
    from pyramid.response import Response
 
@@ -189,7 +191,8 @@ application that generates conflicts:
        config.add_view(goodbye_world, name='hello')
 
        app = config.make_wsgi_app()
-       serve(app, host='0.0.0.0')
+       server = make_server('0.0.0.0', 8080, app)
+       server.serve_forever()
 
 We can prevent the two ``add_view`` calls from conflicting by issuing a call
 to :meth:`~pyramid.config.Configurator.commit` between them:
@@ -197,7 +200,7 @@ to :meth:`~pyramid.config.Configurator.commit` between them:
 .. code-block:: python
    :linenos:
 
-   from paste.httpserver import serve
+   from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
    from pyramid.response import Response
 
@@ -218,7 +221,8 @@ to :meth:`~pyramid.config.Configurator.commit` between them:
        config.add_view(goodbye_world, name='hello')
 
        app = config.make_wsgi_app()
-       serve(app, host='0.0.0.0')
+       server = make_server('0.0.0.0', 8080, app)
+       server.serve_forever()
 
 In the above example we've issued a call to
 :meth:`~pyramid.config.Configurator.commit` between the two ``add_view``

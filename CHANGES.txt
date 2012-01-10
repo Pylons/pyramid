@@ -1,5 +1,112 @@
-Next release
-============
+1.3a5 (2012-01-09)
+==================
+
+Bug Fixes
+---------
+
+- The ``pyramid.view.view_defaults`` decorator did not work properly when
+  more than one view relied on the defaults being different for configuration
+  conflict resolution.  See https://github.com/Pylons/pyramid/issues/394.
+
+Backwards Incompatibilities
+---------------------------
+
+- The ``path_info`` route and view predicates now match against
+  ``request.upath_info`` (Unicode) rather than ``request.path_info``
+  (indeterminate value based on Python 3 vs. Python 2).  This has to be done
+  to normalize matching on Python 2 and Python 3.
+
+1.3a4 (2012-01-05)
+==================
+
+Features
+--------
+
+- New API: ``pyramid.request.Request.set_property``. Add lazy property
+  descriptors to a request without changing the request factory. New
+  properties may be reified, effectively caching the value for the lifetime
+  of the instance. Common use-cases for this would be to  get a database
+  connection for the request or identify the current user.
+
+- Use the ``waitress`` WSGI server instead of ``wsgiref`` in scaffolding.
+
+Bug Fixes
+---------
+
+- The documentation of ``pyramid.events.subscriber`` indicated that using it
+  as a decorator with no arguments like this::
+
+    @subscriber()
+    def somefunc(event):
+        pass
+
+  Would register ``somefunc`` to receive all events sent via the registry,
+  but this was untrue.  Instead, it would receive no events at all.  This has
+  now been fixed and the code matches the documentation.  See also
+  https://github.com/Pylons/pyramid/issues/386
+
+- Literal portions of route patterns were not URL-quoted when ``route_url``
+  or ``route_path`` was used to generate a URL or path.
+
+- The result of ``route_path`` or ``route_url`` might have been ``unicode``
+  or ``str`` depending on the input.  It is now guaranteed to always be
+  ``str``.
+
+- URL matching when the pattern contained non-ASCII characters in literal
+  parts was indeterminate.  Now the pattern supplied to ``add_route`` is
+  assumed to be either: a ``unicode`` value, or a ``str`` value that contains
+  only ASCII characters.  If you now want to match the path info from a URL
+  that contains high order characters, you can pass the Unicode
+  representation of the decoded path portion in the pattern.
+
+- When using a ``traverse=`` route predicate, traversal would fail with a
+  URLDecodeError if there were any high-order characters in the traversal
+  pattern or in the matched dynamic segments.
+
+- Using a dynamic segment named ``traverse`` in a route pattern like this::
+
+    config.add_route('trav_route', 'traversal/{traverse:.*}')
+
+  Would cause a ``UnicodeDecodeError`` when the route was matched and the
+  matched portion of the URL contained any high-order characters.  See
+  https://github.com/Pylons/pyramid/issues/385 .
+
+- When using a ``*traverse`` stararg in a route pattern, a URL that matched
+  that possessed a ``@@`` in its name (signifying a view name) would be
+  inappropriately quoted by the traversal machinery during traversal,
+  resulting in the view not being found properly. See
+  https://github.com/Pylons/pyramid/issues/382 and
+  https://github.com/Pylons/pyramid/issues/375 .
+
+Backwards Incompatibilities
+---------------------------
+
+- String values passed to ``route_url`` or ``route_path`` that are meant to
+  replace "remainder" matches will now be URL-quoted except for embedded
+  slashes. For example::
+
+     config.add_route('remain', '/foo*remainder')
+     request.route_path('remain', remainder='abc / def')
+     # -> '/foo/abc%20/%20def'
+
+  Previously string values passed as remainder replacements were tacked on
+  untouched, without any URL-quoting.  But this doesn't really work logically
+  if the value passed is Unicode (raw unicode cannot be placed in a URL or in
+  a path) and it is inconsistent with the rest of the URL generation
+  machinery if the value is a string (it won't be quoted unless by the
+  caller).
+
+  Some folks will have been relying on the older behavior to tack on query
+  string elements and anchor portions of the URL; sorry, you'll need to
+  change your code to use the ``_query`` and/or ``_anchor`` arguments to
+  ``route_path`` or ``route_url`` to do this now.
+
+- If you pass a bytestring that contains non-ASCII characters to
+  ``add_route`` as a pattern, it will now fail at startup time.  Use Unicode
+  instead.
+
+1.3a3 (2011-12-21)
+==================
 
 Features
 --------
@@ -7,6 +114,11 @@ Features
 - Added a ``prequest`` script (along the lines of ``paster request``).  It is
   documented in the "Command-Line Pyramid" chapter in the section entitled
   "Invoking a Request".
+
+- Add undocumented ``__discriminator__`` API to derived view callables.
+  e.g. ``adapters.lookup(...).__discriminator__(context, request)``.  It will
+  be used by superdynamic systems that require the discriminator to be used
+  for introspection after manual view lookup.
 
 Bug Fixes
 ---------
@@ -19,6 +131,12 @@ Documentation
 
 - Added a section named "Making Your Script into a Console Script" in the
   "Command-Line Pyramid" chapter.
+
+- Removed the "Running Pyramid on Google App Engine" tutorial from the main
+  docs.  It survives on in the Cookbook
+  (http://docs.pylonsproject.org/projects/pyramid_cookbook/en/latest/gae.html).
+  Rationale: it provides the correct info for the Python 2.5 version of GAE
+  only, and this version of Pyramid does not support Python 2.5.
 
 1.3a2 (2011-12-14)
 ==================

@@ -812,7 +812,7 @@ performed, enabling you to set up the utility in advance:
 .. code-block:: python
    :linenos:
 
-   from paste.httpserver import serve
+   from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
    from mypackage.interfaces import IMyUtility
 
@@ -831,7 +831,8 @@ performed, enabling you to set up the utility in advance:
        config.registry.registerUtility(UtilityImplementation())
        config.scan()
        app = config.make_wsgi_app()
-       serve(app, host='0.0.0.0')
+       server = make_server('0.0.0.0', 8080, app)
+       server.serve_forever()
 
 For full details, please read the `Venusian documentation
 <http://docs.repoze.org/venusian>`_.

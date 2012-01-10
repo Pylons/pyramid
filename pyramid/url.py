@@ -67,7 +67,7 @@ class URLMethodsMixin(object):
         encoded to UTF-8.  The resulting strings are joined with slashes
         and rendered into the URL.  If a string is passed as a
         ``*remainder`` replacement value, it is tacked on to the URL
-        untouched.
+        after being URL-quoted-except-for-embedded-slashes.
 
         If a keyword argument ``_query`` is present, it will be used to
         compose a query string that will be tacked on to the end of the

@@ -4,9 +4,25 @@ Pyramid TODOs
 Must-Have
 ---------
 
-- Introspection:
+- Fix deployment recipes in cookbook (discourage proxying without changing
+  server).
 
-  * Review narrative docs.
+- Use waitress instead of wsgiref.
+
+- pyramid.config.util.ActionInfo.__str__ potentially returns Unicode under
+  Py2, fix.
+
+- Tests for view names/route patterns that contain Unicode.
+
+Nice-to-Have
+------------
+
+- Modify the urldispatch chapter examples to assume a scan rather than
+  ``add_view``.
+
+- Decorator for append_slash_notfound_view_factory?
+
+- Introspection:
 
   * ``default root factory`` category?
 
@@ -24,8 +40,6 @@ Must-Have
 
 Nice-to-Have
 ------------
-
-- Implement analogue of "paster request"?
 
 - CherryPy server testing / exploded from CherryPy itself.
 

@@ -20,5 +20,5 @@
    as a view renderer argument, Pyramid avoids converting the view callable
    result into a Response object.  This is useful if you want to reuse the
    view configuration and lookup machinery outside the context of its use by
-   the Pyramid router (e.g. the package named ``pyramid_rpc`` does this).
+   the Pyramid router.
 

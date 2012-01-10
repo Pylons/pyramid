@@ -2,6 +2,7 @@ import unittest
 
 from pyramid.tests.test_config import dummyfactory
 from pyramid.tests.test_config import DummyContext
+from pyramid.compat import text_
 
 class RoutesConfiguratorMixinTests(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
@@ -107,10 +108,36 @@ class RoutesConfiguratorMixinTests(unittest.TestCase):
         route = self._assertRoute(config, 'name', 'path', 1)
         predicate = route.predicates[0]
         request = self._makeRequest(config)
-        request.path_info = '/foo'
+        request.upath_info = '/foo'
         self.assertEqual(predicate(None, request), True)
         request = self._makeRequest(config)
-        request.path_info = '/'
+        request.upath_info = '/'
+        self.assertEqual(predicate(None, request), False)
+
+    def test_add_route_with_path_info_highorder(self):
+        config = self._makeOne(autocommit=True)
+        config.add_route('name', 'path',
+                         path_info=text_(b'/La Pe\xc3\xb1a', 'utf-8'))
+        route = self._assertRoute(config, 'name', 'path', 1)
+        predicate = route.predicates[0]
+        request = self._makeRequest(config)
+        request.upath_info = text_(b'/La Pe\xc3\xb1a', 'utf-8')
+        self.assertEqual(predicate(None, request), True)
+        request = self._makeRequest(config)
+        request.upath_info = text_('/')
+        self.assertEqual(predicate(None, request), False)
+
+    def test_add_route_with_path_info_regex(self):
+        config = self._makeOne(autocommit=True)
+        config.add_route('name', 'path',
+                         path_info=text_(br'/La Pe\w*', 'utf-8'))
+        route = self._assertRoute(config, 'name', 'path', 1)
+        predicate = route.predicates[0]
+        request = self._makeRequest(config)
+        request.upath_info = text_(b'/La Pe\xc3\xb1a', 'utf-8')
+        self.assertEqual(predicate(None, request), True)
+        request = self._makeRequest(config)
+        request.upath_info = text_('/')
         self.assertEqual(predicate(None, request), False)
 
     def test_add_route_with_request_param(self):

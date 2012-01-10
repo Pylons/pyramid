@@ -9,7 +9,7 @@ pyramid.debug_templates = false
 pyramid.default_locale_name = en
 
 [server:main]
-use = egg:pyramid#wsgiref
+use = egg:waitress#main
 host = 0.0.0.0
 port = 6543
 

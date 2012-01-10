@@ -17,7 +17,7 @@ a Pyramid application that doesn't use PasteDeploy in
 :ref:`firstapp_chapter`.  However, all Pyramid scaffolds render PasteDeploy
 configuration files, to provide new developers with a standardized way of
 setting deployment values, and to provide new users with a standardized way
-of starting, stopping, and debugging an application.  
+of starting, stopping, and debugging an application.
 
 This chapter is not a replacement for documentation about PasteDeploy; it
 only contextualizes the use of PasteDeploy within Pyramid.  For detailed

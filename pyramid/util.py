@@ -14,6 +14,89 @@ class DottedNameResolver(_DottedNameResolver):
     def __init__(self, package=None): # default to package = None for bw compat
         return _DottedNameResolver.__init__(self, package)
 
+class InstancePropertyMixin(object):
+    """ Mixin that will allow an instance to add properties at
+    run-time as if they had been defined via @property or @reify
+    on the class itself.
+    """
+
+    def set_property(self, func, name=None, reify=False):
+        """ Add a callable or a property descriptor to the instance.
+
+        Properties, unlike attributes, are lazily evaluated by executing
+        an underlying callable when accessed. They can be useful for
+        adding features to an object without any cost if those features
+        go unused.
+
+        A property may also be reified via the
+        :class:`pyramid.decorator.reify` decorator by setting
+        ``reify=True``, allowing the result of the evaluation to be
+        cached. Thus the value of the property is only computed once for
+        the lifetime of the object.
+
+        ``func`` can either be a callable that accepts the instance as
+        its single positional parameter, or it can be a property
+        descriptor.
+
+        If the ``func`` is a property descriptor, the ``name`` parameter
+        must be supplied or a ``ValueError`` will be raised. Also note
+        that a property descriptor cannot be reified, so ``reify`` must
+        be ``False``.
+
+        If ``name`` is None, the name of the property will be computed
+        from the name of the ``func``.
+
+        .. code-block:: python
+           :linenos:
+
+           class Foo(InstancePropertyMixin):
+               _x = 1
+
+           def _get_x(self):
+               return _x
+
+           def _set_x(self, value):
+               self._x = value
+
+           foo = Foo()
+           foo.set_property(property(_get_x, _set_x), name='x')
+           foo.set_property(_get_x, name='y', reify=True)
+
+           >>> foo.x
+           1
+           >>> foo.y
+           1
+           >>> foo.x = 5
+           >>> foo.x
+           5
+           >>> foo.y # notice y keeps the original value
+           1
+        """
+
+        is_property = isinstance(func, property)
+        if is_property:
+            fn = func
+            if name is None:
+                raise ValueError('must specify "name" for a property')
+            if reify:
+                raise ValueError('cannot reify a property')
+        elif name is not None:
+            fn = lambda this: func(this)
+            fn.__name__ = name
+            fn.__doc__ = func.__doc__
+        else:
+            name = func.__name__
+            fn = func
+        if reify:
+            import pyramid.decorator
+            fn = pyramid.decorator.reify(fn)
+        elif not is_property:
+            fn = property(fn)
+        attrs = { name: fn }
+        parent = self.__class__
+        cls = type(parent.__name__, (parent, object), attrs)
+        self.__class__ = cls
+
 class WeakOrderedSet(object):
     """ Maintain a set of items.
 
