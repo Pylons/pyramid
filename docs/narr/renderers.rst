@@ -177,8 +177,8 @@ using the API of the ``request.response`` attribute.  See
 .. index::
    pair: renderer; JSON
 
-``json``: JSON Renderer
-~~~~~~~~~~~~~~~~~~~~~~~
+JSON Renderer
+~~~~~~~~~~~~~
 
 The ``json`` renderer renders view callable results to :term:`JSON`.  It
 passes the return value through the ``json.dumps`` standard library function,
@@ -207,7 +207,10 @@ representing the JSON serialization of the return value:
    '{"content": "Hello!"}'
 
 The return value needn't be a dictionary, but the return value must contain
-values serializable by :func:`json.dumps`.
+values serializable by :func:`json.dumps`. Extra arguments can be passed
+to :func:`json.dumps` by overriding the default renderer. See
+:class:`pyramid.renderers.JSON` and
+:ref:`_adding_and_overriding_renderers` for more information.
 
 You can configure a view to use the JSON renderer by naming ``json`` as the
 ``renderer`` argument of a view configuration, e.g. by using
@@ -220,7 +223,6 @@ You can configure a view to use the JSON renderer by naming ``json`` as the
                     name='hello',
                     context='myproject.resources.Hello',
                     renderer='json')
-
 
 Views which use the JSON renderer can vary non-body response attributes by
 using the api of the ``request.response`` attribute.  See

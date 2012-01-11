@@ -11,6 +11,8 @@
 
 .. autofunction:: render_to_response
 
+.. autoclass:: JSON
+
 .. autoclass:: JSONP
 
 .. attribute:: null_renderer
