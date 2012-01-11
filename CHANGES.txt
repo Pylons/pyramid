@@ -1,3 +1,14 @@
+Unreleased
+==========
+
+Features
+--------
+
+- New API: ``pyramid.config.Configurator.set_request_property``. Add lazy
+  property descriptors to a request without changing the request factory.
+  This method provides conflict detection and is the suggested way to add
+  properties to a request.
+
 1.3a5 (2012-01-09)
 ==================
 
@@ -25,7 +36,7 @@ Features
 - New API: ``pyramid.request.Request.set_property``. Add lazy property
   descriptors to a request without changing the request factory. New
   properties may be reified, effectively caching the value for the lifetime
-  of the instance. Common use-cases for this would be to  get a database
+  of the instance. Common use-cases for this would be to get a database
   connection for the request or identify the current user.
 
 - Use the ``waitress`` WSGI server instead of ``wsgiref`` in scaffolding.

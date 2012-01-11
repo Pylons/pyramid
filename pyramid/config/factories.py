@@ -72,6 +72,10 @@ class FactoriesConfiguratorMixin(object):
         :class:`pyramid.request.Request` class (particularly
         ``__call__``, and ``blank``).
 
+        See :meth:`pyramid.config.Configurator.set_request_property`
+        for a less intrusive way to extend the request objects with
+        custom properties.
+
         .. note::
 
            Using the ``request_factory`` argument to the
