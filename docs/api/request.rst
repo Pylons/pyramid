@@ -208,9 +208,7 @@
        body associated with this request, this property will raise an
        exception.  See also :ref:`request_json_body`.
 
-   .. method:: set_property(func, name=None, reify=False)
-
-       .. versionadded:: 1.3
+   .. method:: set_property(callable, name=None, reify=False)
 
        Add a callable or a property descriptor to the request instance.
 
@@ -225,15 +223,15 @@
        cached. Thus the value of the property is only computed once for
        the lifetime of the object.
 
-       ``func`` can either be a callable that accepts the request as
+       ``callable`` can either be a callable that accepts the request as
        its single positional parameter, or it can be a property
        descriptor.
 
-       If the ``func`` is a property descriptor a ``ValueError`` will
-       be raised if ``name`` is ``None`` or ``reify`` is ``True``.
+       If the ``callable`` is a property descriptor a ``ValueError``
+       will be raised if ``name`` is ``None`` or ``reify`` is ``True``.
 
        If ``name`` is None, the name of the property will be computed
-       from the name of the ``func``.
+       from the name of the ``callable``.
 
        .. code-block:: python
           :linenos:
@@ -258,6 +256,8 @@
        This pattern provides a way to augment the ``request`` object
        without having to subclass it, which can be useful for extension
        authors.
+
+       .. versionadded:: 1.3
 
 .. note::
 

@@ -20,7 +20,7 @@ class InstancePropertyMixin(object):
     on the class itself.
     """
 
-    def set_property(self, func, name=None, reify=False):
+    def set_property(self, callable, name=None, reify=False):
         """ Add a callable or a property descriptor to the instance.
 
         Properties, unlike attributes, are lazily evaluated by executing
@@ -34,17 +34,18 @@ class InstancePropertyMixin(object):
         cached. Thus the value of the property is only computed once for
         the lifetime of the object.
 
-        ``func`` can either be a callable that accepts the instance as
+        ``callable`` can either be a callable that accepts the instance
+        as
         its single positional parameter, or it can be a property
         descriptor.
 
-        If the ``func`` is a property descriptor, the ``name`` parameter
-        must be supplied or a ``ValueError`` will be raised. Also note
-        that a property descriptor cannot be reified, so ``reify`` must
-        be ``False``.
+        If the ``callable`` is a property descriptor, the ``name``
+        parameter must be supplied or a ``ValueError`` will be raised.
+        Also note that a property descriptor cannot be reified, so
+        ``reify`` must be ``False``.
 
         If ``name`` is None, the name of the property will be computed
-        from the name of the ``func``.
+        from the name of the ``callable``.
 
         .. code-block:: python
            :linenos:
@@ -73,20 +74,20 @@ class InstancePropertyMixin(object):
            1
         """
 
-        is_property = isinstance(func, property)
+        is_property = isinstance(callable, property)
         if is_property:
-            fn = func
+            fn = callable
             if name is None:
                 raise ValueError('must specify "name" for a property')
             if reify:
                 raise ValueError('cannot reify a property')
         elif name is not None:
-            fn = lambda this: func(this)
+            fn = lambda this: callable(this)
             fn.__name__ = name
-            fn.__doc__ = func.__doc__
+            fn.__doc__ = callable.__doc__
         else:
-            name = func.__name__
-            fn = func
+            name = callable.__name__
+            fn = callable
         if reify:
             import pyramid.decorator
             fn = pyramid.decorator.reify(fn)
@@ -234,7 +235,7 @@ def object_description(object):
         return text_('method %s of class %s.%s' %
                      (object.__name__, modulename,
                       oself.__class__.__name__))
-    
+
     if inspect.isclass(object):
         dottedname = '%s.%s' % (modulename, object.__name__)
         return text_('class %s' % dottedname)

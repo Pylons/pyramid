@@ -2,7 +2,9 @@ from pyramid.config.util import action_method
 
 from pyramid.interfaces import (
     IDefaultRootFactory,
+    INewRequest,
     IRequestFactory,
+    IRequestProperties,
     IRootFactory,
     ISessionFactory,
     )
@@ -70,6 +72,10 @@ class FactoriesConfiguratorMixin(object):
         :class:`pyramid.request.Request` class (particularly
         ``__call__``, and ``blank``).
 
+        See :meth:`pyramid.config.Configurator.set_request_property`
+        for a less intrusive way to extend the request objects with
+        custom properties.
+
         .. note::
 
            Using the ``request_factory`` argument to the
@@ -85,3 +91,58 @@ class FactoriesConfiguratorMixin(object):
         intr['factory'] = factory
         self.action(IRequestFactory, register, introspectables=(intr,))
 
+    @action_method
+    def set_request_property(self, callable, name=None, reify=False):
+        """ Add a property to the request object.
+
+        ``callable`` can either be a callable that accepts the request
+        as its single positional parameter, or it can be a property
+        descriptor. It may also be a :term:`dotted Python name` which
+        refers to either a callable or a property descriptor.
+
+        If the ``callable`` is a property descriptor a ``ValueError``
+        will be raised if ``name`` is ``None`` or ``reify`` is ``True``.
+
+        If ``name`` is None, the name of the property will be computed
+        from the name of the ``callable``.
+
+        See :meth:`pyramid.request.Request.set_property` for more
+        information on its usage.
+
+        This is the recommended method for extending the request object
+        and should be used in favor of providing a custom request
+        factory via
+        :meth:`pyramid.config.Configurator.set_request_factory`.
+
+        .. versionadded:: 1.3
+        """
+        callable = self.maybe_dotted(callable)
+
+        if name is None:
+            name = callable.__name__
+
+        def register():
+            plist = self.registry.queryUtility(IRequestProperties)
+
+            if plist is None:
+                plist = []
+                self.registry.registerUtility(plist, IRequestProperties)
+                self.registry.registerHandler(_set_request_properties,
+                                              (INewRequest,))
+
+            plist.append((name, callable, reify))
+
+        intr = self.introspectable('request properties', name,
+                                   self.object_description(callable),
+                                   'request property')
+        intr['callable'] = callable
+        intr['reify'] = reify
+        self.action(('request properties', name), register,
+                    introspectables=(intr,))
+
+def _set_request_properties(event):
+    request = event.request
+    plist = request.registry.queryUtility(IRequestProperties)
+    for prop in plist:
+        name, callable, reify = prop
+        request.set_property(callable, name=name, reify=reify)
