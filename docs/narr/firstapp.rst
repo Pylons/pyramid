@@ -220,11 +220,10 @@ which means "listen on all TCP interfaces."  By default, the HTTP server
 listens only on the ``127.0.0.1`` interface, which is problematic if you're
 running the server on a remote system and you wish to access it with a web
 browser from a local system.  We also specify a TCP port number to listen on,
-which is 8080, passing it as the second argument.  The final argument ios ,
-passing it the ``app`` object (a :term:`router`), which is the the
-application we wish to serve.  Finally, we call the server's
-``serve_forever`` method, which starts the main loop in which it will wait
-for requests from the outside world.
+which is 8080, passing it as the second argument.  The final argument is the
+``app`` object (a :term:`router`), which is the the application we wish to
+serve.  Finally, we call the server's ``serve_forever`` method, which starts
+the main loop in which it will wait for requests from the outside world.
 
 When this line is invoked, it causes the server to start listening on TCP
 port 8080.  The server will serve requests forever, or at least until we stop
