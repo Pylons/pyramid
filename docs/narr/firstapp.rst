@@ -42,6 +42,12 @@ server will simply serve up the text "Hello world!".  If your application is
 running on your local system, using ``http://localhost:8080/hello/world``
 in a browser will show this result.
 
+Each time you visit a URL served by the application in a browser, a logging
+line will be emitted to the console displaying the hostname, the date, the
+request method and path, and some additional information.  This output is
+done by the wsgiref server we've used to serve this application.  It logs an
+"access log" in Apache combined logging format to the console.
+
 Press ``Ctrl-C`` (or ``Ctrl-Break`` on Windows) to stop the application.
 
 Now that we have a rudimentary understanding of what the application does,
