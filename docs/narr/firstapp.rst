@@ -226,8 +226,8 @@ for requests from the outside world.
 
 When this line is invoked, it causes the server to start listening on TCP
 port 8080.  The server will serve requests forever, or at least until we stop
-it by killing the process which runs it (usually by pressing ``Ctrl-C`` in
-the terminal we used to start it).
+it by killing the process which runs it (usually by pressing ``Ctrl-C``
+or ``Ctrl-Break`` in the terminal we used to start it).
 
 Conclusion
 ~~~~~~~~~~
