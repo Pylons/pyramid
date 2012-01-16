@@ -112,6 +112,22 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         response = inst(context, request)
         self.assertTrue(b'<html>static</html>' in response.body)
 
+    def test_resource_is_file_with_wsgi_file_wrapper(self):
+        from pyramid.static import _BLOCK_SIZE
+        inst = self._makeOne('pyramid.tests:fixtures/static')
+        request = self._makeRequest({'PATH_INFO':'/index.html'})
+        class _Wrapper(object):
+            def __init__(self, file, block_size=None):
+                self.file = file
+                self.block_size = block_size
+        request.environ['wsgi.file_wrapper'] = _Wrapper
+        context = DummyContext()
+        response = inst(context, request)
+        app_iter = response.app_iter
+        self.assertTrue(isinstance(app_iter, _Wrapper))
+        self.assertTrue(b'<html>static</html>' in app_iter.file.read())
+        self.assertEqual(app_iter.block_size, _BLOCK_SIZE)
+
     def test_resource_is_file_with_cache_max_age(self):
         inst = self._makeOne('pyramid.tests:fixtures/static', cache_max_age=600)
         request = self._makeRequest({'PATH_INFO':'/index.html'})
