@@ -68,7 +68,7 @@ class _FileResponse(Response):
         if 'wsgi.file_wrapper' in environ:
             app_iter = environ['wsgi.file_wrapper'](f, _BLOCK_SIZE)
         else:
-            app_iter = _FileIter(open(path, 'rb'))
+            app_iter = _FileIter(open(path, 'rb'), _BLOCK_SIZE)
         self.app_iter = app_iter
         # assignment of content_length must come after assignment of app_iter
         self.content_length = content_length
@@ -76,13 +76,20 @@ class _FileResponse(Response):
             self.cache_expires = cache_max_age
 
 class _FileIter(object):
-    block_size = _BLOCK_SIZE
-
-    def __init__(self, file):
+    def __init__(self, file, block_size):
         self.file = file
+        self.block_size = block_size
 
     def __iter__(self):
-        return iter(lambda: self.file.read(self.block_size), b'')
+        return self
+
+    def next(self):
+        val = self.file.read(self.block_size)
+        if not val:
+            raise StopIteration
+        return val
+
+    __next__ = next # py3
 
     def close(self):
         self.file.close()
