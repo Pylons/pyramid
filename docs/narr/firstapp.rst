@@ -22,13 +22,21 @@ Here's one of the very simplest :app:`Pyramid` applications:
 
 When this code is inserted into a Python script named ``helloworld.py`` and
 executed by a Python interpreter which has the :app:`Pyramid` software
-installed, an HTTP server is started on TCP port 8080:
+installed, an HTTP server is started on TCP port 8080.
+
+On UNIX:
 
 .. code-block:: text
 
-   $ python helloworld.py
-   serving on 0.0.0.0:8080 view at http://127.0.0.1:8080
+   $ /path/to/your/virtualenv/bin/python helloworld.py
 
+On Windows:
+
+.. code-block:: text
+
+   C:\> \path\to\your\virtualenv\Scripts\python helloworld.py
+
+This command will not return and nothing will be printed to the console.
 When port 8080 is visited by a browser on the URL ``/hello/world``, the
 server will simply serve up the text "Hello world!"
 
