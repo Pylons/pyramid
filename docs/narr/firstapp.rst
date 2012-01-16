@@ -34,7 +34,7 @@ On Windows:
 
 .. code-block:: text
 
-   C:\> \path\to\your\virtualenv\Scripts\python helloworld.py
+   C:\> \path\to\your\virtualenv\Scripts\python.exe helloworld.py
 
 This command will not return and nothing will be printed to the console.
 When port 8080 is visited by a browser on the URL ``/hello/world``, the
