@@ -38,7 +38,9 @@ On Windows:
 
 This command will not return and nothing will be printed to the console.
 When port 8080 is visited by a browser on the URL ``/hello/world``, the
-server will simply serve up the text "Hello world!"
+server will simply serve up the text "Hello world!".  If your application is
+running on your local system, using ``http://localhost:8080/hello/world``
+in a browser will show this result.
 
 Press ``Ctrl-C`` (or ``Ctrl-Break`` on Windows) to stop the application.
 
