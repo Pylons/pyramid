@@ -40,7 +40,7 @@ This command will not return and nothing will be printed to the console.
 When port 8080 is visited by a browser on the URL ``/hello/world``, the
 server will simply serve up the text "Hello world!"
 
-Press ``Ctrl-C`` to stop the application.
+Press ``Ctrl-C`` (or ``Ctrl-Break`` on Windows) to stop the application.
 
 Now that we have a rudimentary understanding of what the application does,
 let's examine it piece-by-piece.
