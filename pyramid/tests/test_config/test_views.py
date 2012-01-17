@@ -634,6 +634,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config.add_view(view=view2, accept='text/html', renderer=null_renderer)
         config.add_view(view=view3, accept='text/html', renderer=null_renderer)
         wrapper = self._getViewCallable(config)
+        self.assertEqual(len(wrapper.media_views['text/html']), 1)
         self.assertEqual(wrapper(None, None), 'OK')
         request = DummyRequest()
         request.accept = DummyAccept('text/html', 'text/html')
@@ -1978,18 +1979,15 @@ class TestMultiView(unittest.TestCase):
         self.assertEqual(mv.views, [(99, 'view2', None), (100, 'view', None)])
         mv.add('view3', 100, 'text/html')
         self.assertEqual(mv.media_views['text/html'], [(100, 'view3', None)])
-        mv.add('view4', 99, 'text/html')
+        mv.add('view4', 99, 'text/html', 'abc')
         self.assertEqual(mv.media_views['text/html'],
-                         [(99, 'view4', None), (100, 'view3', None)])
-        mv.add('view5', 100, 'text/html')
-        self.assertEqual(mv.media_views['text/html'],
-                         [(99, 'view4', None), (100, 'view5', None)])
-        mv.add('view6', 100, 'text/xml')
-        self.assertEqual(mv.media_views['text/xml'], [(100, 'view6', None)])
+                         [(99, 'view4', 'abc'), (100, 'view3', None)])
+        mv.add('view5', 100, 'text/xml')
+        self.assertEqual(mv.media_views['text/xml'], [(100, 'view5', None)])
         self.assertEqual(set(mv.accepts), set(['text/xml', 'text/html']))
         self.assertEqual(mv.views, [(99, 'view2', None), (100, 'view', None)])
-        mv.add('view7', 98, 'text/*')
-        self.assertEqual(mv.views, [(98, 'view7', None),
+        mv.add('view6', 98, 'text/*')
+        self.assertEqual(mv.views, [(98, 'view6', None),
                                     (99, 'view2', None),
                                     (100, 'view', None)])
 
@@ -2005,6 +2003,14 @@ class TestMultiView(unittest.TestCase):
         mv.add('view', 100, phash='abc')
         self.assertEqual(mv.views, [(100, 'view', 'abc'),
                                     (100, 'view', 'def')])
+
+    def test_add_with_phash_override_accept(self):
+        mv = self._makeOne()
+        mv.add('view2', 100, accept='text/html', phash='abc')
+        mv.add('view3', 100, accept='text/html', phash='abc')
+        mv.add('view4', 99, accept='text/html', phash='def')
+        self.assertEqual(mv.media_views['text/html'],
+                         [(99, 'view4', 'def'), (100, 'view3', 'abc')])
 
     def test_multiple_with_functions_as_views(self):
         # this failed on py3 at one point, because functions aren't orderable

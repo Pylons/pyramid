@@ -514,7 +514,7 @@ class MultiView(object):
         else:
             subset = self.media_views.setdefault(accept, [])
             for i, (s, v, h) in enumerate(list(subset)):
-                if phash == h and order == s:
+                if phash == h:
                     subset[i] = (order, view, phash)
                     return
             else:
