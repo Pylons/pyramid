@@ -983,3 +983,15 @@ Glossary
       :meth:`pyramid.path.AssetResolver.resolve` method.  It supports the
       methods and attributes documented in
       :class:`pyramid.interfaces.IAssetDescriptor`.
+
+   Waitress
+      A :term:`WSGI` server that runs on UNIX and Windows under Python 2.6+
+      and Python 3.2+.  Projects generated via Pyramid scaffolding use
+      Waitress as a WGSI server.  See
+      http://docs.pylonsproject.org/projects/waitress/en/latest/ for detailed
+      information.
+
+   Green Unicorn
+      Aka ``gunicorn``, a fast :term:`WSGI` server that runs on UNIX under
+      Python 2.5+ (although at the time of this writing does not support
+      Python 3).  See http://gunicorn.org/ for detailed information.
