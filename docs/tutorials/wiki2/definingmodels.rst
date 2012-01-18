@@ -63,10 +63,10 @@ script.  In particular, we'll replace our import of ``MyModel`` with one of
 ``Page`` and we'll change the very end of the script to create a ``Page``
 rather than a ``MyModel`` and add it to our ``DBSession``.
 
-The result of all of our edits to ``models.py`` will end up looking
+The result of all of our edits to ``populate.py`` will end up looking
 something like this:
 
-.. literalinclude:: src/models/tutorial/models.py
+.. literalinclude:: src/models/tutorial/scripts/populate.py
    :linenos:
    :language: python
 
