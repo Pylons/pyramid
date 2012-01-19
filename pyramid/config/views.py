@@ -513,8 +513,13 @@ class MultiView(object):
             self.views.sort(key=operator.itemgetter(0))
         else:
             subset = self.media_views.setdefault(accept, [])
-            subset.append((order, view, phash))
-            subset.sort()
+            for i, (s, v, h) in enumerate(list(subset)):
+                if phash == h:
+                    subset[i] = (order, view, phash)
+                    return
+            else:
+                subset.append((order, view, phash))
+                subset.sort()
             accepts = set(self.accepts)
             accepts.add(accept)
             self.accepts = list(accepts) # dedupe
