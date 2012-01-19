@@ -1474,6 +1474,40 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         context = DummyContext()
         request = self._makeRequest(config)
         self.assertRaises(PredicateMismatch, wrapper, context, request)
+
+    def test_add_view_with_view_defaults_viewname_is_dottedname_kwarg(self):
+        from pyramid.renderers import null_renderer
+        from pyramid.exceptions import PredicateMismatch
+        from zope.interface import directlyProvides
+        config = self._makeOne(autocommit=True)
+        config.add_view(
+            view='pyramid.tests.test_config.test_views.DummyViewDefaultsClass',
+            renderer=null_renderer)
+        wrapper = self._getViewCallable(config)
+        context = DummyContext()
+        directlyProvides(context, IDummy)
+        request = self._makeRequest(config)
+        self.assertEqual(wrapper(context, request), 'OK')
+        context = DummyContext()
+        request = self._makeRequest(config)
+        self.assertRaises(PredicateMismatch, wrapper, context, request)
+
+    def test_add_view_with_view_defaults_viewname_is_dottedname_nonkwarg(self):
+        from pyramid.renderers import null_renderer
+        from pyramid.exceptions import PredicateMismatch
+        from zope.interface import directlyProvides
+        config = self._makeOne(autocommit=True)
+        config.add_view(
+            'pyramid.tests.test_config.test_views.DummyViewDefaultsClass',
+            renderer=null_renderer)
+        wrapper = self._getViewCallable(config)
+        context = DummyContext()
+        directlyProvides(context, IDummy)
+        request = self._makeRequest(config)
+        self.assertEqual(wrapper(context, request), 'OK')
+        context = DummyContext()
+        request = self._makeRequest(config)
+        self.assertRaises(PredicateMismatch, wrapper, context, request)
         
     def test_add_view_with_view_config_and_view_defaults_doesnt_conflict(self):
         from pyramid.renderers import null_renderer
@@ -3745,3 +3779,12 @@ class DummyStaticURLInfo:
 
     def add(self, config, name, spec, **kw):
         self.added.append((config, name, spec, kw))
+
+class DummyViewDefaultsClass(object):
+    __view_defaults__ = {
+        'containment':'pyramid.tests.test_config.IDummy'
+        }
+    def __init__(self, request):
+        pass
+    def __call__(self):
+        return 'OK'

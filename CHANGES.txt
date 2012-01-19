@@ -21,6 +21,11 @@ Bug Fixes
   a different view that had the same predicate arguments.  See
   https://github.com/Pylons/pyramid/pull/404 for more information.
 
+- When using a dotted name for a ``view`` argument to
+  ``Configurator.add_view`` that pointed to a class with a ``view_defaults``
+  decorator, the view defaults would not be applied.  See
+  https://github.com/Pylons/pyramid/issues/396 .
+
 1.3a5 (2012-01-09)
 ==================
 
