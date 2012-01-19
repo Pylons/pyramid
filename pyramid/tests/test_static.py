@@ -1,5 +1,6 @@
 import datetime
 import unittest
+import io
 
 # 5 years from now (more or less)
 fiveyrsfuture = datetime.datetime.utcnow() + datetime.timedelta(5*365)
@@ -111,6 +112,22 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         context = DummyContext()
         response = inst(context, request)
         self.assertTrue(b'<html>static</html>' in response.body)
+
+    def test_resource_is_file_with_wsgi_file_wrapper(self):
+        from pyramid.static import _BLOCK_SIZE
+        inst = self._makeOne('pyramid.tests:fixtures/static')
+        request = self._makeRequest({'PATH_INFO':'/index.html'})
+        class _Wrapper(object):
+            def __init__(self, file, block_size=None):
+                self.file = file
+                self.block_size = block_size
+        request.environ['wsgi.file_wrapper'] = _Wrapper
+        context = DummyContext()
+        response = inst(context, request)
+        app_iter = response.app_iter
+        self.assertTrue(isinstance(app_iter, _Wrapper))
+        self.assertTrue(b'<html>static</html>' in app_iter.file.read())
+        self.assertEqual(app_iter.block_size, _BLOCK_SIZE)
 
     def test_resource_is_file_with_cache_max_age(self):
         inst = self._makeOne('pyramid.tests:fixtures/static', cache_max_age=600)
@@ -365,6 +382,32 @@ class Test_patch_mimetypes(unittest.TestCase):
         module = DummyMimetypes()
         result = self._callFUT(module)
         self.assertEqual(result, False)
+
+class Test_FileIter(unittest.TestCase):
+    def _makeOne(self, file, block_size):
+        from pyramid.static import _FileIter
+        return _FileIter(file, block_size)
+
+    def test___iter__(self):
+        f = io.BytesIO(b'abc')
+        inst = self._makeOne(f, 1)
+        self.assertEqual(inst.__iter__(), inst)
+
+    def test_iteration(self):
+        data = b'abcdef'
+        f = io.BytesIO(b'abcdef')
+        inst = self._makeOne(f, 1)
+        r = b''
+        for x in inst:
+            self.assertEqual(len(x), 1)
+            r+=x
+        self.assertEqual(r, data)
+
+    def test_close(self):
+        f = io.BytesIO(b'abc')
+        inst = self._makeOne(f, 1)
+        inst.close()
+        self.assertTrue(f.closed)
 
 class DummyContext:
     pass

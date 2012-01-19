@@ -198,11 +198,16 @@ Extending a Request without Subclassing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It is now possible to extend a :class:`pyramid.request.Request` object
-with property descriptors without having to create a subclass via
-:meth:`pyramid.request.Request.set_property`. New properties may be
-reified, effectively caching the value for the lifetime of the instance.
-Common use-cases for this would be to get a database connection for the
-request or identify the current user.
+with property descriptors without having to create a custom request factory.
+The new method :meth:`pyramid.config.Configurator.set_request_property`
+provides an entry point for addons to register properties which will be
+added to each request. New properties may be reified, effectively caching
+the return value for the lifetime of the instance. Common use-cases for this
+would be to get a database connection for the request or identify the current
+user. The new method :meth:`pyramid.request.Request.set_property` has been
+added, as well, but the configurator method should be preferred as it
+provides conflict detection and consistency in the lifetime of the
+properties.
 
 Minor Feature Additions
 -----------------------

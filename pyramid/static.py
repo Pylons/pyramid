@@ -47,11 +47,13 @@ def init_mimetypes(mimetypes):
 # has been applied on the Python 2 trunk).
 init_mimetypes(mimetypes)
 
+_BLOCK_SIZE = 4096 * 64 # 256K
+
 class _FileResponse(Response):
     """
     Serves a static filelike object.
     """
-    def __init__(self, path, cache_max_age):
+    def __init__(self, path, cache_max_age, request):
         super(_FileResponse, self).__init__(conditional_response=True)
         self.last_modified = getmtime(path)
         content_type, content_encoding = mimetypes.guess_type(path,
@@ -61,32 +63,31 @@ class _FileResponse(Response):
         self.content_type = content_type
         self.content_encoding = content_encoding
         content_length = getsize(path)
-        self.app_iter = _FileIter(open(path, 'rb'), content_length)
+        f = open(path, 'rb')
+        environ = request.environ
+        if 'wsgi.file_wrapper' in environ:
+            app_iter = environ['wsgi.file_wrapper'](f, _BLOCK_SIZE)
+        else:
+            app_iter = _FileIter(open(path, 'rb'), _BLOCK_SIZE)
+        self.app_iter = app_iter
         # assignment of content_length must come after assignment of app_iter
         self.content_length = content_length
         if cache_max_age is not None:
             self.cache_expires = cache_max_age
 
 class _FileIter(object):
-    block_size = 4096 * 64 # (256K)
-
-    def __init__(self, file, size=None):
+    def __init__(self, file, block_size):
         self.file = file
-        self.size = size
+        self.block_size = block_size
 
     def __iter__(self):
         return self
 
     def next(self):
-        chunk_size = self.block_size
-        if self.size is not None:
-            if chunk_size > self.size:
-                chunk_size = self.size
-            self.size -= chunk_size
-        data = self.file.read(chunk_size)
-        if not data:
+        val = self.file.read(self.block_size)
+        if not val:
             raise StopIteration
-        return data
+        return val
 
     __next__ = next # py3
 
@@ -186,7 +187,7 @@ class static_view(object):
             if not exists(filepath):
                 return HTTPNotFound(request.url)
 
-        return _FileResponse(filepath ,self.cache_max_age)
+        return _FileResponse(filepath ,self.cache_max_age, request)
 
     def add_slash_redirect(self, request):
         url = request.path_url + '/'

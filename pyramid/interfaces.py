@@ -511,6 +511,10 @@ class IRequestHandler(Interface):
 
 IRequest.combined = IRequest # for exception view lookups
 
+class IRequestProperties(Interface):
+    """ Marker interface for storing a list of request properties which
+    will be added to the request object."""
+
 class IRouteRequest(Interface):
     """ *internal only* interface used as in a utility lookup to find
     route-specific interfaces.  Not an API."""
