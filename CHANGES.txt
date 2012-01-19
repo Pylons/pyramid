@@ -14,6 +14,13 @@ Features
   http://www.python.org/dev/peps/pep-0333/#optional-platform-specific-file-handling)
   when one is provided by the web server.
 
+Bug Fixes
+---------
+
+- Views registered with an ``accept`` could not be overridden correctly with
+  a different view that had the same predicate arguments.  See
+  https://github.com/Pylons/pyramid/pull/404 for more information.
+
 1.3a5 (2012-01-09)
 ==================
 
