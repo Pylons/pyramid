@@ -3333,6 +3333,18 @@ class TestStaticURLInfo(unittest.TestCase):
         result = inst.generate('package:path/', request)
         self.assertEqual(result, 'http://example.com/foo/')
 
+    def test_generate_quoting(self):
+        config = testing.setUp()
+        try:
+            config.add_static_view('images', path='mypkg:templates')
+            inst = self._makeOne()
+            request = testing.DummyRequest()
+            request.registry = config.registry
+            result = inst.generate('mypkg:templates/foo%2Fbar', request)
+            self.assertEqual(result, 'http://example.com/images/foo%252Fbar')
+        finally:
+            testing.tearDown()
+
     def test_generate_route_url(self):
         inst = self._makeOne()
         registrations = [(None, 'package:path/', '__viewname/')]
@@ -3344,19 +3356,6 @@ class TestStaticURLInfo(unittest.TestCase):
         request = self._makeRequest()
         request.route_url = route_url
         result = inst.generate('package:path/abc', request, a=1)
-        self.assertEqual(result, 'url')
-
-    def test_generate_url_quoted_local(self):
-        inst = self._makeOne()
-        registrations = [(None, 'package:path/', '__viewname/')]
-        inst._get_registrations = lambda *x: registrations
-        def route_url(n, **kw):
-            self.assertEqual(n, '__viewname/')
-            self.assertEqual(kw, {'subpath':'abc%20def', 'a':1})
-            return 'url'
-        request = self._makeRequest()
-        request.route_url = route_url
-        result = inst.generate('package:path/abc def', request, a=1)
         self.assertEqual(result, 'url')
 
     def test_generate_url_quoted_remote(self):
