@@ -623,12 +623,9 @@ class TestViewsConfigurationMixin(unittest.TestCase):
 
     def test_add_views_with_accept_multiview_replaces_existing(self):
         from pyramid.renderers import null_renderer
-        def view(context, request):
-            return 'OK'
-        def view2(context, request):
-            return 'OK2'
-        def view3(context, request):
-            return 'OK3'
+        def view(context, request): return 'OK'
+        def view2(context, request): return 'OK2'
+        def view3(context, request): return 'OK3'
         config = self._makeOne(autocommit=True)
         config.add_view(view=view, renderer=null_renderer)
         config.add_view(view=view2, accept='text/html', renderer=null_renderer)
