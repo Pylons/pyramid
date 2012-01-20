@@ -667,7 +667,7 @@ def _turn_sigterm_into_systemexit(): # pragma: no cover
         raise SystemExit
     signal.signal(signal.SIGTERM, handle_term)
 
-def install_reloader(poll_interval=1, extra_files=[]): # pragma: no cover
+def install_reloader(poll_interval=1, extra_files=None): # pragma: no cover
     """
     Install the reloading monitor.
 
@@ -677,6 +677,8 @@ def install_reloader(poll_interval=1, extra_files=[]): # pragma: no cover
     which causes the whole application to shut-down (rudely).
     """
     mon = Monitor(poll_interval=poll_interval)
+    if extra_files is None:
+        extra_files = []
     mon.extra_files.extend(extra_files)
     t = threading.Thread(target=mon.periodic_reload)
     t.setDaemon(True)
