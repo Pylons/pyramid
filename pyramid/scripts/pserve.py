@@ -173,7 +173,7 @@ class PServeCommand(object):
             if os.environ.get(self._reloader_environ_key):
                 if self.verbose > 1:
                     self.out('Running reloading file monitor')
-                install_reloader(int(self.options.reload_interval))
+                install_reloader(int(self.options.reload_interval), [app_spec])
                 # if self.requires_config_file:
                 #     watch_file(self.args[0])
             else:
@@ -667,7 +667,7 @@ def _turn_sigterm_into_systemexit(): # pragma: no cover
         raise SystemExit
     signal.signal(signal.SIGTERM, handle_term)
 
-def install_reloader(poll_interval=1): # pragma: no cover
+def install_reloader(poll_interval=1, extra_files=[]): # pragma: no cover
     """
     Install the reloading monitor.
 
@@ -677,6 +677,7 @@ def install_reloader(poll_interval=1): # pragma: no cover
     which causes the whole application to shut-down (rudely).
     """
     mon = Monitor(poll_interval=poll_interval)
+    mon.extra_files.extend(extra_files)
     t = threading.Thread(target=mon.periodic_reload)
     t.setDaemon(True)
     t.start()
