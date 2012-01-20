@@ -26,6 +26,9 @@ Bug Fixes
   decorator, the view defaults would not be applied.  See
   https://github.com/Pylons/pyramid/issues/396 .
 
+- Static URL paths were URL-quoted twice.  See
+  https://github.com/Pylons/pyramid/issues/407 .
+
 1.3a5 (2012-01-09)
 ==================
 
