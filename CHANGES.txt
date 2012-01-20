@@ -1,11 +1,21 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
 - Static URL paths were URL-quoted twice.  See
   https://github.com/Pylons/pyramid/issues/407 .
 
+- Views registered with an ``accept`` could not be overridden correctly with
+  a different view that had the same predicate arguments.  See
+  https://github.com/Pylons/pyramid/pull/404 for more information.
+
 1.2.6 (2012-01-05)
 ==================
+
+Bug Fixes
+---------
 
 - Literal portions of route patterns were not URL-quoted when ``route_url``
   or ``route_path`` was used to generate a URL or path.
@@ -69,6 +79,9 @@ Backwards Incompatibilities
 
 1.2.5 (2011-12-14)
 ==================
+
+Features
+--------
 
 - Backport the ``egg:pyramid#wsgiref`` and ``egg:pyramid#cherrypy`` server
   runners from the 1.3 branch.  This change is to primarily allow scaffolding
