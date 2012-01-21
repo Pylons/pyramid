@@ -9,6 +9,9 @@ Bug Fixes
   changed.  See https://github.com/Pylons/pyramid/issues/377 and
   https://github.com/Pylons/pyramid/pull/411
 
+- The ``prequest`` script would fail when used against URLs which did not
+  return HTML or text.  See https://github.com/Pylons/pyramid/issues/381
+
 1.3a6 (2012-01-20)
 ==================
 

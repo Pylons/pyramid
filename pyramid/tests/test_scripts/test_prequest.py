@@ -5,9 +5,10 @@ class TestPRequestCommand(unittest.TestCase):
         from pyramid.scripts.prequest import PRequestCommand
         return PRequestCommand
 
-    def _makeOne(self, argv):
+    def _makeOne(self, argv, headers=None):
         cmd = self._getTargetClass()(argv)
         cmd.get_app = self.get_app
+        self._headers = headers or []
         self._out = []
         cmd.out = self.out
         return cmd
@@ -18,7 +19,7 @@ class TestPRequestCommand(unittest.TestCase):
         def helloworld(environ, start_request):
             self._environ = environ
             self._path_info = environ['PATH_INFO']
-            start_request('200 OK', [])
+            start_request('200 OK', self._headers)
             return [b'abc']
         return helloworld
 
@@ -130,6 +131,15 @@ class TestPRequestCommand(unittest.TestCase):
         self.assertEqual(
             self._out,
             ['200 OK', 'Content-Type: text/html; charset=UTF-8', 'abc'])
+
+    def test_command_response_has_no_charset(self):
+        command = self._makeOne(['', '--method=GET', 'development.ini', '/'],
+                                headers=[('Content-Type', 'image/jpeg')])
+        command.run()
+        self.assertEqual(self._path_info, '/')
+        self.assertEqual(self._spec, 'development.ini')
+        self.assertEqual(self._app_name, None)
+        self.assertEqual(self._out, [b'abc'])
 
 class Test_main(unittest.TestCase):
     def _callFUT(self, argv):
