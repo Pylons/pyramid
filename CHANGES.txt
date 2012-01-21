@@ -5,7 +5,7 @@ Bug Fixes
 ---------
 
 - The process will now restart when ``pserve`` is used with the ``--reload``
-  flag when the ``development.ini`` file (any any other .ini file in use) is
+  flag when the ``development.ini`` file (or any other .ini file in use) is
   changed.  See https://github.com/Pylons/pyramid/issues/377 and
   https://github.com/Pylons/pyramid/pull/411
 
