@@ -72,6 +72,8 @@
 
      .. automethod:: set_request_factory
 
+     .. automethod:: set_request_property
+
      .. automethod:: set_root_factory
 
      .. automethod:: set_view_mapper
