@@ -712,6 +712,11 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(action['callable'], None)
         self.assertEqual(action['args'], test_config)
 
+    def test_include_with_module_defaults_to_includeme_missing(self):
+        from pyramid.exceptions import ConfigurationError
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError, config.include, 'pyramid.tests')
+
     def test_include_with_route_prefix(self):
         root_config = self._makeOne(autocommit=True)
         def dummy_subapp(config):

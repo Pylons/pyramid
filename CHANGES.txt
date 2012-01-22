@@ -1,6 +1,12 @@
 Next release
 ============
 
+Features
+--------
+
+- More informative error message when a ``config.include`` cannot find an
+  ``includeme``.  See https://github.com/Pylons/pyramid/pull/392.
+
 Bug Fixes
 ---------
 
