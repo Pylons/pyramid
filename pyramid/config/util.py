@@ -291,3 +291,11 @@ def as_sorted_tuple(val):
     val = tuple(sorted(val))
     return val
 
+def join_route_patterns(left_pattern=None, right_pattern=None):
+    """ Utility for joining route-patterns. Used to combine nested
+    route-prefixes, and mount route-patterns under route-prefixes."""
+    if left_pattern and right_pattern:
+        return left_pattern.rstrip('/') + '/' + right_pattern.lstrip('/')
+    else:
+        return left_pattern + right_pattern
+

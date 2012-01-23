@@ -15,6 +15,7 @@ from pyramid.config.util import (
     action_method,
     make_predicates,
     as_sorted_tuple,
+    join_route_patterns,
     )
 
 class RoutesConfiguratorMixin(object):
@@ -368,8 +369,19 @@ class RoutesConfiguratorMixin(object):
         if pattern is None:
             raise ConfigurationError('"pattern" argument may not be None')
 
-        if self.route_prefix:
-            pattern = self.route_prefix.rstrip('/') + '/' + pattern.lstrip('/')
+        # allow_empty_pattern: default to False for bw compatibility re
+        # behaviour where mounting an empty pattern under a prefix would
+        # result in a slash being appended implicitly - Issue #406
+        allow_empty_pattern = self.registry.settings.get(
+                                    'pyramid.allow_empty_pattern', False)
+        if not allow_empty_pattern and not pattern:
+            pattern = '/'
+
+        route_prefix = self.route_prefix
+        if route_prefix is None:
+            route_prefix = ''
+
+        pattern = join_route_patterns(route_prefix, pattern)
 
         mapper = self.get_routes_mapper()
 

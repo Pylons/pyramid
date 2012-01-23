@@ -71,6 +71,7 @@ from pyramid.config.tweens import TweensConfiguratorMixin
 from pyramid.config.util import (
     action_method,
     ActionInfo,
+    join_route_patterns,
     )
 from pyramid.config.views import ViewsConfiguratorMixin
 from pyramid.config.zca import ZCAConfiguratorMixin
@@ -680,7 +681,124 @@ class Configurator(
         because the ``route_prefix`` argument will be prepended to the
         pattern.
 
+        It is also possible to use ``config.include`` with a
+        ``route_prefix`` to mount callables that themselves mount
+        callables under a prefix:
+
+        .. code-block::
+            :linenos
+
+            from pyramid.config import Configurator
+
+            def includeme(config):
+                config.include('myproject.sub_routes', route_prefix='/users')
+
+            def sub_routes(config):
+                config.add_route('show_users', '/show')
+
+            def main(global_config, **settings):
+                config = Configurator()
+                config.include('myproject', route_prefix='/locale')
+
         The ``route_prefix`` parameter is new as of Pyramid 1.2.
+
+        When ``route_prefix`` is used to mount an empty route pattern, the
+        default behaviour is to coerce the empty route to ``/``.
+
+        You may specifically configure your application to allow empty
+        routes to be mounted under route-prefixes with the
+        ``pyramid.allow_empty_pattern`` setting. This enables a more
+        explicit route configuration behaviour, and can be helpful for
+        projects that use non-slash-appended-routes, or a mix of
+        slash-appended and non-slash-appended route styles.
+
+        In the following code the ``users`` module defines two routes, and
+        in this case we decide to mount them under ``/my_users``:
+
+        .. code-block:: python
+
+            # users/__init__.py
+
+            def includeme(config):
+                config.add_route('show_users', '')
+                config.add_route('user_page', '/{id}')
+
+            # __init__.py
+
+            from pyramid.config import Configurator
+
+            def main(global_config, **settings):
+                config = Configurator(settings=settings)
+                config.include('myproject.users', route_prefix='/my_users')
+
+        Note that by default (``allow_empty_pattern=False``), the empty route
+        is coerced to a ``/`` and the following routes are created:
+
+        .. code-block:: none
+
+            /my_users/
+            /my_users/{id}
+
+        By setting ``pyramid.allow_empty_pattern=True``, for example
+        via ``Configurator.settings``:
+
+        .. code-block:: none
+
+            def main(global_config, **settings):
+                config = Configurator(settings=settings)
+                config.add_settings({'pyramid.allow_empty_pattern': True})
+
+        or in your application's .ini files:
+
+        .. code-block: none
+
+            [app:main]
+            # ..
+            pyramid.allow_empty_pattern = true
+
+        then the following routes are instead produced - note that there is
+        no ``/`` appended to ``/my_users``:
+
+        .. code-block:: none
+
+            /my_users
+            /my_users/{id}
+
+       To be clear; when you set ``pyramid.allow_empty_pattern=True`` you
+       may still explicitly configure a slash-appended-route. For example,
+       by modifying the routes of the above ``users`` module like so:
+
+        .. code-block:: none
+
+                config.add_route('show_users', '/')
+                config.add_route('user_page', '/{id}/')
+
+        you have configured the following routes:
+
+        .. code-block:: none
+
+            /my_users/
+            /my_users/{id}/
+
+        .. Note::
+
+            If you enable ``pyramid.allow_empty_pattern`` in an existing
+            project, you should be sure that you are *not* relying on the
+            default behaviour of ``route_prefix`` to convert
+            empty-routes to ``/``.
+
+            Instead, if you require an empty-route to be mounted under
+            ``/prefix`` as ``/prefix/``, then you should explicitly
+            configure that route's pattern as ``/``.
+
+            It's interesting to note that a ``route_prefix`` of ``/prefix/``
+            would mount an empty-route as ``/prefix/``; in effect you would
+            be explicitly configuring the default behaviour in your
+            application's route design.
+
+        The ``pyramid.allow_empty_pattern`` setting is new as of Pyramid
+        1.X.
+
         """
         # """ <-- emacs
 
@@ -693,11 +811,8 @@ class Configurator(
         if old_route_prefix is None:
             old_route_prefix = ''
 
-        route_prefix = '%s/%s' % (
-            old_route_prefix.rstrip('/'),
-            route_prefix.lstrip('/')
-            )
-        route_prefix = route_prefix.strip('/')
+        route_prefix = join_route_patterns(old_route_prefix, route_prefix)
+
         if not route_prefix:
             route_prefix = None
 
