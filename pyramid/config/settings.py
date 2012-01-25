@@ -117,11 +117,6 @@ class Settings(dict):
                                              config_prevent_http_cache)
         eff_prevent_http_cache = asbool(eget('PYRAMID_PREVENT_HTTP_CACHE',
                                              config_prevent_http_cache))
-        allow_empty_pattern = self.get('allow_empty_pattern', '')
-        allow_empty_pattern = self.get('pyramid.allow_empty_pattern',
-                                                allow_empty_pattern)
-        eff_allow_empty_pattern = asbool(eget('PYRAMID_ALLOW_EMPTY_PATTERN',
-                                                    allow_empty_pattern))
 
         update = {
             'debug_authorization': eff_debug_all or eff_debug_auth,
@@ -143,7 +138,6 @@ class Settings(dict):
             'pyramid.reload_assets':eff_reload_all or eff_reload_assets,
             'pyramid.default_locale_name':eff_locale_name,
             'pyramid.prevent_http_cache':eff_prevent_http_cache,
-            'pyramid.allow_empty_pattern':eff_allow_empty_pattern,
             }
 
         self.update(update)
