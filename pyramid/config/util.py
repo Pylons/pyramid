@@ -291,11 +291,17 @@ def as_sorted_tuple(val):
     val = tuple(sorted(val))
     return val
 
-def join_route_patterns(left_pattern=None, right_pattern=None):
-    """ Utility for joining route-patterns. Used to combine nested
-    route-prefixes, and mount route-patterns under route-prefixes."""
-    if left_pattern and right_pattern:
-        return left_pattern.rstrip('/') + '/' + right_pattern.lstrip('/')
-    else:
-        return left_pattern + right_pattern
+def join_route_patterns(*args):
+    """ Utility for joining patterns in a consistent way. Accepts any number
+    of  string arguments and joins them from left-to-right. Used to join
+    route-patterns, route-prefixes, and route-suffixes. Remit is
+    specifically limited to the validity of the join-point. """
+    patterns = list(args)
+    l = patterns.pop(0)
+    for r in patterns:
+        if l and r:
+            l = l.rstrip('/') + '/' + r.lstrip('/')
+        else:
+            l = l + r
+    return l
 
