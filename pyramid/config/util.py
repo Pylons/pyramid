@@ -293,8 +293,7 @@ def as_sorted_tuple(val):
 
 def join_route_patterns(*args):
     """ Utility for joining patterns in a consistent way. Accepts any number
-    of  string arguments and joins them from left-to-right. Used to join
-    route-patterns, route-prefixes, and route-suffixes. Remit is
+    of  string arguments and joins them from left-to-right. Remit is
     specifically limited to the validity of the join-point. """
     patterns = list(args)
     l = patterns.pop(0)
