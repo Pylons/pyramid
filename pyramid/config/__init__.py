@@ -106,7 +106,8 @@ class Configurator(
     ``authorization_policy``, ``renderers``, ``debug_logger``,
     ``locale_negotiator``, ``request_factory``, ``renderer_globals_factory``,
     ``default_permission``, ``session_factory``, ``default_view_mapper``,
-    ``autocommit``, ``exceptionresponse_view`` and ``route_prefix``.
+    ``autocommit``, ``exceptionresponse_view``, ``route_prefix``, and
+    ``route_suffix``.
 
     If the ``registry`` argument is passed as a non-``None`` value, it must
     be an instance of the :class:`pyramid.registry.Registry` class
@@ -240,6 +241,11 @@ class Configurator(
     :meth:`pyramid.config.Configurator.add_route` will have the specified path
     prepended to their pattern. This parameter is new in Pyramid 1.2.
 
+    If ``route_suffix`` is passed, all routes added with
+    :meth:`pyramid.config.Configurator.add_route` will have the specified path
+    appended to their pattern. The ``route_suffix`` parameter is new in
+    Pyramid X.X.
+
     If ``introspector`` is passed, it must be an instance implementing the
     attributes and methods of :class:`pyramid.interfaces.IIntrospector`.  If
     ``introspector`` is not passed (or is passed as ``None``), the default
@@ -273,6 +279,7 @@ class Configurator(
                  autocommit=False,
                  exceptionresponse_view=default_exceptionresponse_view,
                  route_prefix=None,
+                 route_suffix=None,
                  introspector=None,
                  ):
         if package is None:
@@ -284,6 +291,7 @@ class Configurator(
         self.registry = registry
         self.autocommit = autocommit
         self.route_prefix = route_prefix
+        self.route_suffix = route_suffix
         if registry is None:
             registry = Registry(self.package_name)
             self.registry = registry
@@ -590,7 +598,7 @@ class Configurator(
         self.action_state.execute_actions(introspector=self.introspector)
         self.action_state = ActionState() # old actions have been processed
 
-    def include(self, callable, route_prefix=None):
+    def include(self, callable, route_prefix=None, route_suffix=None):
         """Include a configuration callables, to support imperative
         application extensibility.
 
@@ -681,123 +689,50 @@ class Configurator(
         because the ``route_prefix`` argument will be prepended to the
         pattern.
 
-        It is also possible to use ``config.include`` with a
-        ``route_prefix`` to mount callables that themselves mount
-        callables under a prefix:
-
-        .. code-block::
-            :linenos
-
-            from pyramid.config import Configurator
-
-            def includeme(config):
-                config.include('myproject.sub_routes', route_prefix='/users')
-
-            def sub_routes(config):
-                config.add_route('show_users', '/show')
-
-            def main(global_config, **settings):
-                config = Configurator()
-                config.include('myproject', route_prefix='/locale')
-
         The ``route_prefix`` parameter is new as of Pyramid 1.2.
 
-        When ``route_prefix`` is used to mount an empty route pattern, the
-        default behaviour is to coerce the empty route to ``/``.
+        Route-prefixes and route-suffixes have special relevance to
+        implementers and authors of third-party modules, and offer
+        configuration of either slash-appended or non-slash-appended
+        route-styles regardless of how the third-party module's routes were
+        designed.
 
-        You may specifically configure your application to allow empty
-        routes to be mounted under route-prefixes with the
-        ``pyramid.allow_empty_pattern`` setting. This enables a more
-        explicit route configuration behaviour, and can be helpful for
-        projects that use non-slash-appended-routes, or a mix of
-        slash-appended and non-slash-appended route styles.
+        Route-prefixes ending with no slash (i.e. ``/prefix``) would result
+        in empty routes being mounted as ``/prefix``, whereas route-prefixes
+        ending with a slash (i.e. ``/prefix/``) would result in empty routes
+        being mounted as ``/prefix/``. This differs from previous behaviour
+        where all prefixed empty routes where converted to a ``/``.
 
-        In the following code the ``users`` module defines two routes, and
-        in this case we decide to mount them under ``/my_users``:
+        Because route-prefixes and route-suffixes have this special
+        configurative behaviour, implementers are able to mount any route in
+        a consistent way that suits their application design.
 
-        .. code-block:: python
+        This ``route_prefix`` behaviour is new as of Pyramid 1.X.
 
-            # users/__init__.py
+        The ``route_suffix`` parameter is the complement to ``route_prefix``
+        in controlling how trailing-slashes should be handled for mounted
+        routes.
 
-            def includeme(config):
-                config.add_route('show_users', '')
-                config.add_route('user_page', '/{id}')
+        Supplying ``route_suffix`` with an empty string makes all mounted
+        routes *non-slash-appended*, whereas supplying a ``/`` enforces
+        *slash-appended routes*. If ``route_suffix`` is not supplied, the
+        included module's routes not modified.
 
-            # __init__.py
+        When one module (callable) includes another sub-module, any
+        ``route_suffix`` and ``route_prefix`` parameters used to mount the
+        *sub-module* may not influence the final routes's slash-style,
+        because it is the top-level implementation that has ultimate control
+        of the final route-style.
 
-            from pyramid.config import Configurator
+        However, the goal of ``route_prefix`` was to allow any route
+        within any callable or module  to be mounted, and so it is quite
+        conceivable that the routes being mounted can function independently
+        of any particular implementation. In this case any ``route_prefix``
+        and ``route_suffix`` used to mount the sub-module would be
+        meaningful when the module is implemented independently, and
+        therefore *is* the top-level module.
 
-            def main(global_config, **settings):
-                config = Configurator(settings=settings)
-                config.include('myproject.users', route_prefix='/my_users')
-
-        Note that by default (``allow_empty_pattern=False``), the empty route
-        is coerced to a ``/`` and the following routes are created:
-
-        .. code-block:: none
-
-            /my_users/
-            /my_users/{id}
-
-        By setting ``pyramid.allow_empty_pattern=True``, for example
-        via ``Configurator.settings``:
-
-        .. code-block:: none
-
-            def main(global_config, **settings):
-                config = Configurator(settings=settings)
-                config.add_settings({'pyramid.allow_empty_pattern': True})
-
-        or in your application's .ini files:
-
-        .. code-block: none
-
-            [app:main]
-            # ..
-            pyramid.allow_empty_pattern = true
-
-        then the following routes are instead produced - note that there is
-        no ``/`` appended to ``/my_users``:
-
-        .. code-block:: none
-
-            /my_users
-            /my_users/{id}
-
-       To be clear; when you set ``pyramid.allow_empty_pattern=True`` you
-       may still explicitly configure a slash-appended-route. For example,
-       by modifying the routes of the above ``users`` module like so:
-
-        .. code-block:: none
-
-                config.add_route('show_users', '/')
-                config.add_route('user_page', '/{id}/')
-
-        you have configured the following routes:
-
-        .. code-block:: none
-
-            /my_users/
-            /my_users/{id}/
-
-        .. Note::
-
-            If you enable ``pyramid.allow_empty_pattern`` in an existing
-            project, you should be sure that you are *not* relying on the
-            default behaviour of ``route_prefix`` to convert
-            empty-routes to ``/``.
-
-            Instead, if you require an empty-route to be mounted under
-            ``/prefix`` as ``/prefix/``, then you should explicitly
-            configure that route's pattern as ``/``.
-
-            It's interesting to note that a ``route_prefix`` of ``/prefix/``
-            would mount an empty-route as ``/prefix/``; in effect you would
-            be explicitly configuring the default behaviour in your
-            application's route design.
-
-        The ``pyramid.allow_empty_pattern`` setting is new as of Pyramid
-        1.X.
+        The ``route_suffix`` parameter is new as of Pyramid 1.X.
 
         """
         # """ <-- emacs
@@ -807,14 +742,25 @@ class Configurator(
         if route_prefix is None:
             route_prefix = ''
 
+        if route_suffix is None:
+            route_suffix = ''
+
         old_route_prefix = self.route_prefix
         if old_route_prefix is None:
             old_route_prefix = ''
 
+        old_route_suffix = self.route_suffix
+        if old_route_suffix is None:
+            old_route_suffix = ''
+
         route_prefix = join_route_patterns(old_route_prefix, route_prefix)
+        route_suffix = join_route_patterns(route_suffix, old_route_suffix)
 
         if not route_prefix:
             route_prefix = None
+
+        if not route_suffix:
+            route_suffix = None
 
         c = self.maybe_dotted(callable)
         module = inspect.getmodule(c)
@@ -829,6 +775,7 @@ class Configurator(
                 package=package_of(module),
                 autocommit=self.autocommit,
                 route_prefix=route_prefix,
+                route_suffix=route_suffix,
                 )
             configurator.basepath = os.path.dirname(sourcefile)
             configurator.includepath = self.includepath + (spec,)
@@ -889,7 +836,8 @@ class Configurator(
             registry=context.registry,
             package=context.package,
             autocommit=context.autocommit,
-            route_prefix=context.route_prefix
+            route_prefix=context.route_prefix,
+            route_suffix=context.route_suffix,
             )
         configurator.basepath = context.basepath
         configurator.includepath = context.includepath
@@ -907,6 +855,7 @@ class Configurator(
             package=package,
             autocommit=self.autocommit,
             route_prefix=self.route_prefix,
+            route_suffix=self.route_suffix,
             )
         configurator.basepath = self.basepath
         configurator.includepath = self.includepath

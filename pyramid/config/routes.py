@@ -369,19 +369,22 @@ class RoutesConfiguratorMixin(object):
         if pattern is None:
             raise ConfigurationError('"pattern" argument may not be None')
 
-        # allow_empty_pattern: default to False for bw compatibility re
-        # behaviour where mounting an empty pattern under a prefix would
-        # result in a slash being appended implicitly - Issue #406
-        allow_empty_pattern = self.registry.settings.get(
-                                    'pyramid.allow_empty_pattern', False)
-        if not allow_empty_pattern and not pattern:
-            pattern = '/'
-
+        # None and empty-string have route-config meaning;
         route_prefix = self.route_prefix
+        route_suffix = self.route_suffix
+
+        if not route_prefix is None and not route_prefix.endswith('/'):
+            pattern = pattern.lstrip('/')
+
+        if not route_suffix is None and not route_suffix.startswith('/'):
+            pattern = pattern.rstrip('/')
+
         if route_prefix is None:
             route_prefix = ''
+        if route_suffix is None:
+            route_suffix = ''
 
-        pattern = join_route_patterns(route_prefix, pattern)
+        pattern = join_route_patterns(route_prefix, pattern, route_suffix)
 
         mapper = self.get_routes_mapper()
 
