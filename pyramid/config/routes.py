@@ -15,7 +15,7 @@ from pyramid.config.util import (
     action_method,
     make_predicates,
     as_sorted_tuple,
-    join_route_patterns,
+    route_pattern_list,
     )
 
 class RoutesConfiguratorMixin(object):
@@ -369,22 +369,17 @@ class RoutesConfiguratorMixin(object):
         if pattern is None:
             raise ConfigurationError('"pattern" argument may not be None')
 
-        # None and empty-string have route-config meaning;
-        route_prefix = self.route_prefix
-        route_suffix = self.route_suffix
+        route_prefix = list(self.route_prefix or [])
+        route_suffix = list(self.route_suffix or [])
+        route_suffix.reverse()
+        pattern_list = route_pattern_list(route_prefix + [pattern] + route_suffix)
+        pattern = str(pattern_list)
 
-        if not route_prefix is None and not route_prefix.endswith('/'):
-            pattern = pattern.lstrip('/')
-
-        if not route_suffix is None and not route_suffix.startswith('/'):
-            pattern = pattern.rstrip('/')
-
-        if route_prefix is None:
-            route_prefix = ''
-        if route_suffix is None:
-            route_suffix = ''
-
-        pattern = join_route_patterns(route_prefix, pattern, route_suffix)
+        if len(route_prefix):
+            if route_prefix[0].endswith('/'):
+                pattern = pattern.rstrip('/') + '/'
+            else:
+                pattern = pattern.rstrip('/')
 
         mapper = self.get_routes_mapper()
 

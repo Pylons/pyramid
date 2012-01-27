@@ -71,7 +71,6 @@ from pyramid.config.tweens import TweensConfiguratorMixin
 from pyramid.config.util import (
     action_method,
     ActionInfo,
-    join_route_patterns,
     )
 from pyramid.config.views import ViewsConfiguratorMixin
 from pyramid.config.zca import ZCAConfiguratorMixin
@@ -691,46 +690,24 @@ class Configurator(
 
         The ``route_prefix`` parameter is new as of Pyramid 1.2.
 
-        Route-prefixes and route-suffixes have special relevance to
-        implementers and authors of third-party modules, and offer
-        configuration of either slash-appended or non-slash-appended
-        route-styles regardless of how the third-party module's routes were
-        designed.
+        When the ``route_prefix`` parameter is provided to the outer-most
+        ``include`` it has a special configurative property. If
+        ``route_prefix`` ends with a ``/`` then the route will end with a
+        ``/``. If the ``route_prefix`` does not end with a ``/`` then the
+        route created will also not end with a ``/``. In this way
+        implementers may mount existing callables or third-party modules
+        with a slash-appended-style that matches the rest of their
+        application.
 
-        Route-prefixes ending with no slash (i.e. ``/prefix``) would result
-        in empty routes being mounted as ``/prefix``, whereas route-prefixes
-        ending with a slash (i.e. ``/prefix/``) would result in empty routes
-        being mounted as ``/prefix/``. This differs from previous behaviour
-        where all prefixed empty routes where converted to a ``/``.
+        The above configurative behaviour of ``route_prefix`` is new as of
+        Pyramid 1.X.
 
-        Because route-prefixes and route-suffixes have this special
-        configurative behaviour, implementers are able to mount any route in
-        a consistent way that suits their application design.
-
-        This ``route_prefix`` behaviour is new as of Pyramid 1.X.
-
-        The ``route_suffix`` parameter is the complement to ``route_prefix``
-        in controlling how trailing-slashes should be handled for mounted
-        routes.
-
-        Supplying ``route_suffix`` with an empty string makes all mounted
-        routes *non-slash-appended*, whereas supplying a ``/`` enforces
-        *slash-appended routes*. If ``route_suffix`` is not supplied, the
-        included module's routes not modified.
-
-        When one module (callable) includes another sub-module, any
-        ``route_suffix`` and ``route_prefix`` parameters used to mount the
-        *sub-module* may not influence the final routes's slash-style,
-        because it is the top-level implementation that has ultimate control
-        of the final route-style.
-
-        However, the goal of ``route_prefix`` was to allow any route
-        within any callable or module  to be mounted, and so it is quite
-        conceivable that the routes being mounted can function independently
-        of any particular implementation. In this case any ``route_prefix``
-        and ``route_suffix`` used to mount the sub-module would be
-        meaningful when the module is implemented independently, and
-        therefore *is* the top-level module.
+        The ``route_suffix`` parameter complements ``route_prefix``,
+        allowing a suffix to be appended to included routes. However
+        ``route_suffix`` does not have the same configurative property as
+        ``route_prefix``, since ``route_prefix`` ultimately decides whether
+        the mounted routes (including the suffix) will be slash-appended or
+        not.
 
         The ``route_suffix`` parameter is new as of Pyramid 1.X.
 
@@ -739,28 +716,13 @@ class Configurator(
 
         action_state = self.action_state
 
-        if route_prefix is None:
-            route_prefix = ''
+        route_prefix_list = self.route_prefix or []
+        if not route_prefix is None:
+            route_prefix_list.append(route_prefix)
 
-        if route_suffix is None:
-            route_suffix = ''
-
-        old_route_prefix = self.route_prefix
-        if old_route_prefix is None:
-            old_route_prefix = ''
-
-        old_route_suffix = self.route_suffix
-        if old_route_suffix is None:
-            old_route_suffix = ''
-
-        route_prefix = join_route_patterns(old_route_prefix, route_prefix)
-        route_suffix = join_route_patterns(route_suffix, old_route_suffix)
-
-        if not route_prefix:
-            route_prefix = None
-
-        if not route_suffix:
-            route_suffix = None
+        route_suffix_list = self.route_suffix or []
+        if not route_suffix is None:
+            route_suffix_list.append(route_suffix)
 
         c = self.maybe_dotted(callable)
         module = inspect.getmodule(c)
@@ -774,8 +736,8 @@ class Configurator(
                 registry=self.registry,
                 package=package_of(module),
                 autocommit=self.autocommit,
-                route_prefix=route_prefix,
-                route_suffix=route_suffix,
+                route_prefix=route_prefix_list,
+                route_suffix=route_suffix_list,
                 )
             configurator.basepath = os.path.dirname(sourcefile)
             configurator.includepath = self.includepath + (spec,)

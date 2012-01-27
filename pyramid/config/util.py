@@ -291,16 +291,15 @@ def as_sorted_tuple(val):
     val = tuple(sorted(val))
     return val
 
-def join_route_patterns(*args):
-    """ Utility for joining patterns in a consistent way. Accepts any number
-    of  string arguments and joins them from left-to-right. Remit is
-    specifically limited to the validity of the join-point. """
-    patterns = list(args)
-    l = patterns.pop(0)
-    for r in patterns:
-        if l and r:
-            l = l.rstrip('/') + '/' + r.lstrip('/')
-        else:
-            l = l + r
-    return l
+class route_pattern_list(list):
+    """ Utility: extends Python ``list`` to simplify operations with
+    route-patterns. """
 
+    def __str__(self):
+        l = ''
+        for r in self:
+            if l and r:
+                l = '%s/%s' % (l.rstrip('/'), r.lstrip('/'))
+            else:
+                    l = l + r
+        return l
