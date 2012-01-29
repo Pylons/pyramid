@@ -567,17 +567,18 @@ class MultiView(object):
         raise PredicateMismatch(self.name)
 
 def viewdefaults(wrapped):
-    def wrapper(*arg, **kw):
+    def wrapper(self, *arg, **kw):
         defaults = {}
-        if len(arg) > 1:
-            view = arg[1]
+        if arg:
+            view = arg[0]
         else:
             view = kw.get('view')
+        view = self.maybe_dotted(view)
         if inspect.isclass(view):
             defaults = getattr(view, '__view_defaults__', {}).copy()
         defaults.update(kw)
         defaults['_backframes'] = 3 # for action_method
-        return wrapped(*arg, **defaults)
+        return wrapped(self, *arg, **defaults)
     return wraps(wrapped)(wrapper)
 
 class ViewsConfiguratorMixin(object):
@@ -1544,11 +1545,12 @@ class StaticURLInfo(object):
             registry = get_current_registry()
         for (url, spec, route_name) in self._get_registrations(registry):
             if path.startswith(spec):
-                subpath = url_quote(path[len(spec):])
+                subpath = path[len(spec):]
                 if url is None:
                     kw['subpath'] = subpath
                     return request.route_url(route_name, **kw)
                 else:
+                    subpath = url_quote(subpath)
                     return urljoin(url, subpath)
 
         raise ValueError('No static URL definition matching %s' % path)

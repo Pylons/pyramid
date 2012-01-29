@@ -704,7 +704,13 @@ class Configurator(
         c = self.maybe_dotted(callable)
         module = inspect.getmodule(c)
         if module is c:
-            c = getattr(module, 'includeme')
+            try:
+                c = getattr(module, 'includeme')
+            except AttributeError:
+                raise ConfigurationError(
+                    "module %r has no attribute 'includeme'" % (module.__name__)
+                    )
+                                                       
         spec = module.__name__ + ':' + c.__name__
         sourcefile = inspect.getsourcefile(c)
 

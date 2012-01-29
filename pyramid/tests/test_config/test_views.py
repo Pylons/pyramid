@@ -1474,6 +1474,40 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         context = DummyContext()
         request = self._makeRequest(config)
         self.assertRaises(PredicateMismatch, wrapper, context, request)
+
+    def test_add_view_with_view_defaults_viewname_is_dottedname_kwarg(self):
+        from pyramid.renderers import null_renderer
+        from pyramid.exceptions import PredicateMismatch
+        from zope.interface import directlyProvides
+        config = self._makeOne(autocommit=True)
+        config.add_view(
+            view='pyramid.tests.test_config.test_views.DummyViewDefaultsClass',
+            renderer=null_renderer)
+        wrapper = self._getViewCallable(config)
+        context = DummyContext()
+        directlyProvides(context, IDummy)
+        request = self._makeRequest(config)
+        self.assertEqual(wrapper(context, request), 'OK')
+        context = DummyContext()
+        request = self._makeRequest(config)
+        self.assertRaises(PredicateMismatch, wrapper, context, request)
+
+    def test_add_view_with_view_defaults_viewname_is_dottedname_nonkwarg(self):
+        from pyramid.renderers import null_renderer
+        from pyramid.exceptions import PredicateMismatch
+        from zope.interface import directlyProvides
+        config = self._makeOne(autocommit=True)
+        config.add_view(
+            'pyramid.tests.test_config.test_views.DummyViewDefaultsClass',
+            renderer=null_renderer)
+        wrapper = self._getViewCallable(config)
+        context = DummyContext()
+        directlyProvides(context, IDummy)
+        request = self._makeRequest(config)
+        self.assertEqual(wrapper(context, request), 'OK')
+        context = DummyContext()
+        request = self._makeRequest(config)
+        self.assertRaises(PredicateMismatch, wrapper, context, request)
         
     def test_add_view_with_view_config_and_view_defaults_doesnt_conflict(self):
         from pyramid.renderers import null_renderer
@@ -3508,6 +3542,18 @@ class TestStaticURLInfo(unittest.TestCase):
         result = inst.generate('package:path/', request)
         self.assertEqual(result, 'http://example.com/foo/')
 
+    def test_generate_quoting(self):
+        config = testing.setUp()
+        try:
+            config.add_static_view('images', path='mypkg:templates')
+            inst = self._makeOne()
+            request = testing.DummyRequest()
+            request.registry = config.registry
+            result = inst.generate('mypkg:templates/foo%2Fbar', request)
+            self.assertEqual(result, 'http://example.com/images/foo%252Fbar')
+        finally:
+            testing.tearDown()
+
     def test_generate_route_url(self):
         inst = self._makeOne()
         registrations = [(None, 'package:path/', '__viewname/')]
@@ -3521,13 +3567,13 @@ class TestStaticURLInfo(unittest.TestCase):
         result = inst.generate('package:path/abc', request, a=1)
         self.assertEqual(result, 'url')
 
-    def test_generate_url_quoted_local(self):
+    def test_generate_url_unquoted_local(self):
         inst = self._makeOne()
         registrations = [(None, 'package:path/', '__viewname/')]
         inst._get_registrations = lambda *x: registrations
         def route_url(n, **kw):
             self.assertEqual(n, '__viewname/')
-            self.assertEqual(kw, {'subpath':'abc%20def', 'a':1})
+            self.assertEqual(kw, {'subpath':'abc def', 'a':1})
             return 'url'
         request = self._makeRequest()
         request.route_url = route_url
@@ -3745,3 +3791,12 @@ class DummyStaticURLInfo:
 
     def add(self, config, name, spec, **kw):
         self.added.append((config, name, spec, kw))
+
+class DummyViewDefaultsClass(object):
+    __view_defaults__ = {
+        'containment':'pyramid.tests.test_config.IDummy'
+        }
+    def __init__(self, request):
+        pass
+    def __call__(self):
+        return 'OK'

@@ -140,5 +140,8 @@ class PRequestCommand(object):
             self.out(response.status)
             for name, value in response.headerlist:
                 self.out('%s: %s' % (name, value))
-        self.out(response.ubody)
+        if response.charset:
+            self.out(response.ubody)
+        else:
+            self.out(response.body)
         return 0
