@@ -132,14 +132,14 @@ We'll add these views to the existing ``views.py`` file we have in our
 project.  Here's what the ``login`` view callable will look like:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :pyobject: login
+   :lines: 83-111
    :linenos:
    :language: python
 
 Here's what the ``logout`` view callable will look like:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :pyobject: logout
+   :lines: 113-117
    :linenos:
    :language: python
 
