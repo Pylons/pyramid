@@ -233,7 +233,7 @@ provided within :mod:`pyramid.httpexceptions`.
 How Pyramid Uses HTTP Exceptions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-HTTP exceptions are meant to be used directly by application application
+HTTP exceptions are meant to be used directly by application
 developers.  However, Pyramid itself will raise two HTTP exceptions at
 various points during normal operations:
 :exc:`pyramid.httpexceptions.HTTPNotFound` and
