@@ -597,7 +597,7 @@ content management systems and document management systems.  Traversal also lend
 systems that require very granular security ("Bob can edit *this* document"
 as opposed to "Bob can edit documents").
 
-Example: :ref:`much_ado_about_traversal_chapter`.
+Example: :ref:`hello_traversal_chapter` and :ref:`much_ado_about_traversal_chapter`.
 
 Tweens
 ~~~~~~
