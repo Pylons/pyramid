@@ -71,6 +71,7 @@ from pyramid.config.tweens import TweensConfiguratorMixin
 from pyramid.config.util import (
     action_method,
     ActionInfo,
+    route_pattern_list,
     )
 from pyramid.config.views import ViewsConfiguratorMixin
 from pyramid.config.zca import ZCAConfiguratorMixin
@@ -716,13 +717,14 @@ class Configurator(
 
         action_state = self.action_state
 
-        route_prefix_list = self.route_prefix or []
         if not route_prefix is None:
-            route_prefix_list.append(route_prefix)
-
-        route_suffix_list = self.route_suffix or []
+            route_prefix = route_pattern_list(
+                (self.route_prefix or []) + [route_prefix]
+                )
         if not route_suffix is None:
-            route_suffix_list.append(route_suffix)
+            route_suffix = route_pattern_list(
+                [route_suffix] + (self.route_suffix or [])
+                )
 
         c = self.maybe_dotted(callable)
         module = inspect.getmodule(c)
@@ -736,8 +738,8 @@ class Configurator(
                 registry=self.registry,
                 package=package_of(module),
                 autocommit=self.autocommit,
-                route_prefix=route_prefix_list,
-                route_suffix=route_suffix_list,
+                route_prefix=route_prefix,
+                route_suffix=route_suffix,
                 )
             configurator.basepath = os.path.dirname(sourcefile)
             configurator.includepath = self.includepath + (spec,)
