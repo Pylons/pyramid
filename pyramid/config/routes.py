@@ -369,11 +369,11 @@ class RoutesConfiguratorMixin(object):
         if pattern is None:
             raise ConfigurationError('"pattern" argument may not be None')
 
-        route_prefix = list(self.route_prefix or [])
-        route_suffix = list(self.route_suffix or [])
-        route_suffix.reverse()
-        pattern_list = route_pattern_list(route_prefix + [pattern] + route_suffix)
-        pattern = str(pattern_list)
+        route_prefix = self.route_prefix or []
+        route_suffix = self.route_suffix or []
+
+        pattern = route_pattern_list(route_prefix + [pattern] + route_suffix)
+        pattern = str(pattern)
 
         if len(route_prefix):
             if route_prefix[0].endswith('/'):
