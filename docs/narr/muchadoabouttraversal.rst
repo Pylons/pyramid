@@ -4,6 +4,8 @@
 Much Ado About Traversal
 ========================
 
+(Or, why you should care about it)
+
 .. note::
 
    This chapter was adapted, with permission, from a blog post by `Rob
