@@ -1,5 +1,25 @@
-Unreleased
-==========
+Next release
+============
+
+Features
+--------
+
+- More informative error message when a ``config.include`` cannot find an
+  ``includeme``.  See https://github.com/Pylons/pyramid/pull/392.
+
+Bug Fixes
+---------
+
+- The process will now restart when ``pserve`` is used with the ``--reload``
+  flag when the ``development.ini`` file (or any other .ini file in use) is
+  changed.  See https://github.com/Pylons/pyramid/issues/377 and
+  https://github.com/Pylons/pyramid/pull/411
+
+- The ``prequest`` script would fail when used against URLs which did not
+  return HTML or text.  See https://github.com/Pylons/pyramid/issues/381
+
+1.3a6 (2012-01-20)
+==================
 
 Features
 --------
@@ -20,6 +40,14 @@ Bug Fixes
 - Views registered with an ``accept`` could not be overridden correctly with
   a different view that had the same predicate arguments.  See
   https://github.com/Pylons/pyramid/pull/404 for more information.
+
+- When using a dotted name for a ``view`` argument to
+  ``Configurator.add_view`` that pointed to a class with a ``view_defaults``
+  decorator, the view defaults would not be applied.  See
+  https://github.com/Pylons/pyramid/issues/396 .
+
+- Static URL paths were URL-quoted twice.  See
+  https://github.com/Pylons/pyramid/issues/407 .
 
 1.3a5 (2012-01-09)
 ==================

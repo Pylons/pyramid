@@ -17,9 +17,9 @@ def main(global_config, **settings):
     authn_policy = AuthTktAuthenticationPolicy(secret='sosecret',
                                                callback=groupfinder)
     authz_policy = ACLAuthorizationPolicy()
-    config = Configurator(root_factory=root_factory, settings=settings,
-                          authentication_policy=authn_policy,
-                          authorization_policy=authz_policy)
+    config = Configurator(root_factory=root_factory, settings=settings)
+    config.set_authentication_policy(authn_policy)
+    config.set_authorization_policy(authz_policy)
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.scan()
     return config.make_wsgi_app()

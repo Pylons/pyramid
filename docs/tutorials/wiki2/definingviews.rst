@@ -104,7 +104,7 @@ when a request is made to the root URL of our wiki.  It always redirects to
 a URL which represents the path to our "FrontPage".
 
 .. literalinclude:: src/views/tutorial/views.py
-   :pyobject: view_wiki
+   :lines: 18-21
    :linenos:
    :language: python
 
@@ -126,7 +126,7 @@ HTML anchor for each *WikiWord* reference in the rendered HTML using a
 compiled regular expression.
 
 .. literalinclude:: src/views/tutorial/views.py
-   :pyobject: view_page
+   :lines: 23-44
    :linenos:
    :language: python
 
@@ -161,7 +161,7 @@ The ``matchdict`` attribute of the request passed to the ``add_page`` view
 will have the values we need to construct URLs and find model objects.
 
 .. literalinclude:: src/views/tutorial/views.py
-   :pyobject: add_page
+   :lines: 46-58
    :linenos:
    :language: python
 
@@ -197,7 +197,7 @@ request passed to the ``edit_page`` view will have a ``'pagename'`` key
 matching the name of the page the user wants to edit.
 
 .. literalinclude:: src/views/tutorial/views.py
-   :pyobject: edit_page
+   :lines: 60-73
    :linenos:
    :language: python
 

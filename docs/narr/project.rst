@@ -118,11 +118,11 @@ your application, or install your application for deployment or development.
 
 A ``.ini`` file named ``development.ini`` will be created in the project
 directory.  You will use this ``.ini`` file to configure a server, to run
-your application, and to debug your application.  It sports configuration
+your application, and to debug your application.  It contains configuration
 that enables an interactive debugger and settings optimized for development.
 
 Another ``.ini`` file named ``production.ini`` will also be created in the
-project directory.  It sports configuration that disables any interactive
+project directory.  It contains configuration that disables any interactive
 debugger (to prevent inappropriate access and disclosure), and turns off a
 number of debugging settings.  You can use this file to put your application
 into production.
@@ -709,7 +709,7 @@ also informs Python that the directory which contains it is a *package*.
 #. Line 1 imports the :term:`Configurator` class from :mod:`pyramid.config`
    that we use later.
 
-#. Lines 3-16 define a function named ``main`` that returns a :app:`Pyramid`
+#. Lines 3-10 define a function named ``main`` that returns a :app:`Pyramid`
    WSGI application.  This function is meant to be called by the
    :term:`PasteDeploy` framework as a result of running ``pserve``.
 
