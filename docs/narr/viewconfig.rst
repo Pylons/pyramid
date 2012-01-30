@@ -280,8 +280,8 @@ configured view.
   *This is an advanced feature, not often used by "civilians"*.
 
 ``request_method``
-  This value can be one of the strings ``GET``, ``POST``, ``PUT``,
-  ``DELETE``, or ``HEAD`` representing an HTTP ``REQUEST_METHOD``.  A view
+  This value can be a string (typically ``"GET"``, ``"POST"``, ``"PUT"``,
+  ``"DELETE"``, or ``"HEAD"``) representing an HTTP ``REQUEST_METHOD``.  A view
   declaration with this argument ensures that the view will only be called
   when the request's ``method`` attribute (aka the ``REQUEST_METHOD`` of the
   WSGI environment) string matches the supplied value.

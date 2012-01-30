@@ -83,6 +83,7 @@ Narrative documentation in chapter form explaining how to use
    narr/vhosting
    narr/testing
    narr/resources
+   narr/hellotraversal
    narr/muchadoabouttraversal
    narr/traversal
    narr/security
@@ -152,7 +153,8 @@ application.  Check this application out via:
 
 `virginia <https://github.com/Pylons/virginia>`_ is a very simple dynamic
 file rendering application.  It is willing to render structured text
-documents, HTML documents, and images from a filesystem directory.  An
+documents, HTML documents, and images from a filesystem directory.
+It's also a good example of :term:`traversal`. An
 earlier version of this application runs the `repoze.org
 <http://repoze.org>`_ website.  Check this application out via:
 

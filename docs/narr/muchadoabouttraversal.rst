@@ -4,6 +4,8 @@
 Much Ado About Traversal
 ========================
 
+(Or, why you should care about it)
+
 .. note::
 
    This chapter was adapted, with permission, from a blog post by `Rob
@@ -15,7 +17,7 @@ Traversal is an alternative to :term:`URL dispatch` which allows
 
 .. note::
    
-   Ex-Zope users whom are already familiar with traversal and view lookup
+   Ex-Zope users who are already familiar with traversal and view lookup
    conceptually may want to skip directly to the :ref:`traversal_chapter`
    chapter, which discusses technical details.  This chapter is mostly aimed
    at people who have previous :term:`Pylons` experience or experience in

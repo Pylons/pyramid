@@ -3,6 +3,13 @@
 Traversal
 =========
 
+This chapter explains the technical details of how traversal works in
+Pyramid.
+
+For a quick example, see :doc:`hellotraversal`.
+
+For more about *why* you might use traversal, see :doc:`muchadoabouttraversal`.
+
 A :term:`traversal` uses the URL (Universal Resource Locator) to find a
 :term:`resource` located in a :term:`resource tree`, which is a set of
 nested dictionary-like objects.  Traversal is done by using each segment
