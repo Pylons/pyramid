@@ -18,6 +18,11 @@ Bug Fixes
 - The ``prequest`` script would fail when used against URLs which did not
   return HTML or text.  See https://github.com/Pylons/pyramid/issues/381
 
+Documentation
+-------------
+
+- Add a traversal hello world example to the narrative docs.
+
 1.3a6 (2012-01-20)
 ==================
 
