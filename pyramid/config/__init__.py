@@ -71,7 +71,7 @@ from pyramid.config.tweens import TweensConfiguratorMixin
 from pyramid.config.util import (
     action_method,
     ActionInfo,
-    route_pattern_list,
+    route_pattern,
     )
 from pyramid.config.views import ViewsConfiguratorMixin
 from pyramid.config.zca import ZCAConfiguratorMixin
@@ -692,23 +692,21 @@ class Configurator(
         The ``route_prefix`` parameter is new as of Pyramid 1.2.
 
         When the ``route_prefix`` parameter is provided to the outer-most
-        ``include`` it has a special configurative property. If
-        ``route_prefix`` ends with a ``/`` then the route will end with a
-        ``/``. If the ``route_prefix`` does not end with a ``/`` then the
-        route created will also not end with a ``/``. In this way
-        implementers may mount existing callables or third-party modules
-        with a slash-appended-style that matches the rest of their
-        application.
+        ``include`` it has a special configurative property. If ``route_prefix``
+        ends with a ``/`` then the route will end with a ``/``. If the
+        ``route_prefix`` does not end with a ``/`` then the route created will
+        also not end with a ``/``. In this way implementers may mount existing
+        callables or third-party modules with a slash-appended-style that
+        matches the rest of their application.
 
         The above configurative behaviour of ``route_prefix`` is new as of
         Pyramid 1.X.
 
-        The ``route_suffix`` parameter complements ``route_prefix``,
-        allowing a suffix to be appended to included routes. However
-        ``route_suffix`` does not have the same configurative property as
-        ``route_prefix``, since ``route_prefix`` ultimately decides whether
-        the mounted routes (including the suffix) will be slash-appended or
-        not.
+        The ``route_suffix`` parameter complements ``route_prefix``, allowing a
+        suffix to be appended to included routes. However ``route_suffix`` does
+        not have the same configurative property as ``route_prefix``, since
+        ``route_prefix`` ultimately decides whether the mounted routes
+        (including the suffix) will be slash-appended or not.
 
         The ``route_suffix`` parameter is new as of Pyramid 1.X.
 
@@ -718,11 +716,11 @@ class Configurator(
         action_state = self.action_state
 
         if not route_prefix is None:
-            route_prefix = route_pattern_list(
+            route_prefix = route_pattern(
                 (self.route_prefix or []) + [route_prefix]
                 )
         if not route_suffix is None:
-            route_suffix = route_pattern_list(
+            route_suffix = route_pattern(
                 [route_suffix] + (self.route_suffix or [])
                 )
 
