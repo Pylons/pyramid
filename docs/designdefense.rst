@@ -219,7 +219,7 @@ is this:
 Using such wrappers, we strive to always hide the ZCA API from application
 developers.  Application developers should just never know about the ZCA API:
 they should call a Python function with some object germane to the domain as
-an argument, and it should returns a result.  A corollary that follows is
+an argument, and it should return a result.  A corollary that follows is
 that any reader of an application that has been written using :app:`Pyramid`
 needn't understand the ZCA API either.
 
