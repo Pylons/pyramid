@@ -15,7 +15,9 @@ The major feature additions in Pyramid 1.3 follow.
 Python 3 Compatibility
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Pyramid is now Python 3 compatible.  Python 3.2 or better is required.
+In addition to running on Python 2 (version 2.6 or 2.7 required), Pyramid is
+now Python 3 compatible.  For Python 3 compatibility, Python 3.2 or better
+is required.
 
 .. warning::
 
