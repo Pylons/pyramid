@@ -341,7 +341,7 @@ The above pattern will match these URLs, generating the following matchdicts:
 .. code-block:: text
 
    foo/1/2/           -> {'baz':u'1', 'bar':u'2', 'fizzle':()}
-   foo/abc/def/a/b/c  -> {'baz':u'abc', 'bar':u'def', 'fizzle': u'a/b/c')}
+   foo/abc/def/a/b/c  -> {'baz':u'abc', 'bar':u'def', 'fizzle': u'a/b/c'}
 
 This occurs because the default regular expression for a marker is ``[^/]+``
 which will match everything up to the first ``/``, while ``{fizzle:.*}`` will
