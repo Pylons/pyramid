@@ -7,6 +7,9 @@ Features
 - More informative error message when a ``config.include`` cannot find an
   ``includeme``.  See https://github.com/Pylons/pyramid/pull/392.
 
+- Internal: catch unhashable discriminators early (raise an error instead of
+  allowing them to find their way into resolveConflicts).
+
 Bug Fixes
 ---------
 

@@ -533,6 +533,10 @@ class Configurator(
         ``extra`` provides a facility for inserting extra keys and values
         into an action dictionary.
         """
+        # catch nonhashable discriminators here; most unit tests use
+        # autocommit=False, which won't catch unhashable discriminators
+        assert hash(discriminator) 
+
         if kw is None:
             kw = {}
 
