@@ -4,6 +4,17 @@ Next release
 - Internal: catch unhashable discriminators early (raise an error instead of
   allowing them to find their way into resolveConflicts).
 
+- The `match_param` view predicate now accepts a string or a tuple.
+  This replaces the broken behavior of accepting a dict. See
+  https://github.com/Pylons/pyramid/issues/425 for more information.
+
+Backwards Incompatibilities
+---------------------------
+
+- The `match_param` view predicate no longer accepts a dict. This will
+  have no negative affect because the implementation was broken for
+  dict-based arguments.
+
 1.2.7 (2012-01-20)
 ==================
 

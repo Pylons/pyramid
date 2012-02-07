@@ -793,18 +793,18 @@ class ViewsConfiguratorMixin(object):
 
           .. note:: This feature is new as of :app:`Pyramid` 1.2.
 
-          This param may be either a single string of the format "key=value"
-          or a dict of key/value pairs.
+          This value can be a string of the format "key=value" or a tuple
+          containing one or more of these strings.
 
           A view declaration with this argument ensures that the view will
           only be called when the :term:`request` has key/value pairs in its
           :term:`matchdict` that equal those supplied in the predicate.
           e.g. ``match_param="action=edit" would require the ``action``
-          parameter in the :term:`matchdict` match the right hande side of
+          parameter in the :term:`matchdict` match the right hand side of
           the expression (``edit``) for the view to "match" the current
           request.
 
-          If the ``match_param`` is a dict, every key/value pair must match
+          If the ``match_param`` is a tuple, every key/value pair must match
           for the predicate to pass.
 
         containment
