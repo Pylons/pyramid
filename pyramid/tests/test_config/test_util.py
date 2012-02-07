@@ -328,6 +328,16 @@ class Test__make_predicates(unittest.TestCase):
         hash2, _, __= self._callFUT(request_method='GET')
         self.assertEqual(hash1, hash2)
 
+    def test_match_param_hashable(self):
+        # https://github.com/Pylons/pyramid/issues/425
+        import pyramid.testing
+        def view(request): pass
+        config = pyramid.testing.setUp(autocommit=False)
+        config.add_route('foo', '/foo/{bar}')
+        config.add_view(view, route_name='foo', match_param='bar=barf')
+        config.add_view(view, route_name='foo', match_param={'bar': 'baz'})
+        config.commit()
+
 class TestActionInfo(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.config.util import ActionInfo
