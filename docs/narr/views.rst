@@ -30,7 +30,7 @@ View Callables
 
 View callables are, at the risk of sounding obvious, callable Python
 objects. Specifically, view callables can be functions, classes, or instances
-that implement an ``__call__`` method (making the instance callable).
+that implement a ``__call__`` method (making the instance callable).
 
 View callables must, at a minimum, accept a single argument named
 ``request``.  This argument represents a :app:`Pyramid` :term:`Request`
