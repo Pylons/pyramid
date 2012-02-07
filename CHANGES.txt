@@ -1,3 +1,9 @@
+Next release
+============
+
+- Internal: catch unhashable discriminators early (raise an error instead of
+  allowing them to find their way into resolveConflicts).
+
 1.2.7 (2012-01-20)
 ==================
 

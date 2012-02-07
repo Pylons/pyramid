@@ -432,6 +432,10 @@ class Configurator(
         ``order`` is a crude order control mechanism, only rarely used (has
         no effect when autocommit is ``True``).
         """
+        # catch nonhashable discriminators here; most unit tests use
+        # autocommit=False, which won't catch unhashable discriminators
+        assert hash(discriminator) 
+
         if kw is None:
             kw = {}
 
