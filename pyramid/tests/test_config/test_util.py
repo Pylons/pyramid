@@ -281,7 +281,7 @@ class Test__make_predicates(unittest.TestCase):
         self.assertEqual(predicates[5].__text__, 'accept = accept')
         self.assertEqual(predicates[6].__text__, 'containment = containment')
         self.assertEqual(predicates[7].__text__, 'request_type = request_type')
-        self.assertEqual(predicates[8].__text__, "match_param {'foo': 'bar'}")
+        self.assertEqual(predicates[8].__text__, "match_param ['foo=bar']")
         self.assertEqual(predicates[9].__text__, 'custom predicate')
         self.assertEqual(predicates[10].__text__, 'classmethod predicate')
         self.assertEqual(predicates[11].__text__, '<unknown custom predicate>')
@@ -299,13 +299,13 @@ class Test__make_predicates(unittest.TestCase):
         self.assertFalse(predicates[0](Dummy(), request))
 
     def test_match_param_from_dict(self):
-        _, predicates, _ = self._callFUT(match_param={'foo':'bar','baz':'bum'})
+        _, predicates, _ = self._callFUT(match_param=('foo=bar','baz=bum'))
         request = DummyRequest()
         request.matchdict = {'foo':'bar', 'baz':'bum'}
         self.assertTrue(predicates[0](Dummy(), request))
 
     def test_match_param_from_dict_fails(self):
-        _, predicates, _ = self._callFUT(match_param={'foo':'bar','baz':'bum'})
+        _, predicates, _ = self._callFUT(match_param=('foo=bar','baz=bum'))
         request = DummyRequest()
         request.matchdict = {'foo':'bar', 'baz':'foo'}
         self.assertFalse(predicates[0](Dummy(), request))
@@ -333,9 +333,9 @@ class Test__make_predicates(unittest.TestCase):
         import pyramid.testing
         def view(request): pass
         config = pyramid.testing.setUp(autocommit=False)
-        config.add_route('foo', '/foo/{bar}')
-        config.add_view(view, route_name='foo', match_param='bar=barf')
-        config.add_view(view, route_name='foo', match_param={'bar': 'baz'})
+        config.add_route('foo', '/foo/{a}/{b}')
+        config.add_view(view, route_name='foo', match_param='a=bar')
+        config.add_view(view, route_name='foo', match_param=('a=bar', 'b=baz'))
         config.commit()
 
 class TestActionInfo(unittest.TestCase):
