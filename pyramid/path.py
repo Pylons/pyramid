@@ -165,7 +165,7 @@ class AssetResolver(Resolver):
         """
         Resolve the asset spec named as ``spec`` to an object that has the
         attributes and methods described in
-        `pyramid.interfaces.IAssetDescriptor`.
+        :class:`pyramid.interfaces.IAssetDescriptor`.
 
         If ``spec`` is an absolute filename
         (e.g. ``/path/to/myproject/templates/foo.pt``) or an absolute asset
