@@ -317,6 +317,10 @@ Backwards Incompatibilities
   (indeterminate value based on Python 3 vs. Python 2).  This has to be done
   to normalize matching on Python 2 and Python 3.
 
+- The ``match_param`` view predicate no longer accepts a dict. This will have
+  no negative affect because the implementation was broken for dict-based
+  arguments.
+
 Documentation Enhancements
 --------------------------
 
