@@ -851,7 +851,8 @@ class Configurator(
         return self.manager.pop()
 
     # this is *not* an action method (uses caller_package)
-    def scan(self, package=None, categories=None, onerror=None, **kw):
+    def scan(self, package=None, categories=None, onerror=None, ignore=None,
+             **kw):
         """Scan a Python package and any of its subpackages for objects
         marked with :term:`configuration decoration` such as
         :class:`pyramid.view.view_config`.  Any decorated object found will
@@ -879,6 +880,20 @@ class Configurator(
         :term:`Venusian` documentation for more information about ``onerror``
         callbacks.
 
+        The ``ignore`` argument, if provided, should be a Venusian ``ignore``
+        value.  Providing an ``ignore`` argument allows the scan to ignore
+        particular modules, packages, or global objects during a scan.
+        ``ignore`` can be a string or a callable, or a list containing
+        strings or callables.  The simplest usage of ``ignore`` is to provide
+        a module or package by providing a full path to its dotted name.  For
+        example: ``config.scan(ignore='my.module.subpackage')`` would ignore
+        the ``my.module.subpackage`` package during a scan, which would
+        prevent the subpackage and any of its submodules from being imported
+        and scanned.  See the :term:`Venusian` documentation for more
+        information about the ``ignore`` argument.
+
+        .. note:: the ``ignore`` argument is new in Pyramid 1.3.
+        
         To perform a ``scan``, Pyramid creates a Venusian ``Scanner`` object.
         The ``kw`` argument represents a set of keyword arguments to pass to
         the Venusian ``Scanner`` object's constructor.  See the
@@ -900,7 +915,9 @@ class Configurator(
         ctorkw.update(kw)
 
         scanner = self.venusian.Scanner(**ctorkw)
-        scanner.scan(package, categories=categories, onerror=onerror)
+        
+        scanner.scan(package, categories=categories, onerror=onerror,
+                     ignore=ignore)
 
     def make_wsgi_app(self):
         """ Commits any pending configuration statements, sends a

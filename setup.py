@@ -37,7 +37,7 @@ install_requires=[
     'repoze.lru >= 0.4', # py3 compat
     'zope.interface >= 3.8.0',  # has zope.interface.registry
     'zope.deprecation >= 3.5.0', # py3 compat
-    'venusian >= 1.0a1', # ``onerror``
+    'venusian >= 1.0a3', # ``ignore``
     'translationstring >= 0.4', # py3 compat
     'PasteDeploy >= 1.5.0', # py3 compat
     ]

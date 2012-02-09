@@ -1,3 +1,21 @@
+Next release
+============
+
+Features
+--------
+
+- The ``scan`` method of a ``Configurator`` can be passed an ``ignore``
+  argument, which can be a string, a callable, or a list consisting of
+  strings and/or callables.  This feature allows submodules, subpackages, and
+  global objects from being scanned.  See
+  http://readthedocs.org/docs/venusian/en/latest/#ignore-scan-argument for
+  more information about how to use the ``ignore`` argument to ``scan``.
+
+Dependencies
+------------
+
+- Depend on ``venusian`` >= 1.0a3 to provide scan ``ignore`` support.
+
 1.3a7 (2012-02-07)
 ==================
 
