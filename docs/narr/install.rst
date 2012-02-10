@@ -101,6 +101,19 @@ Once these steps are performed, the Python interpreter will be
 invokable via ``$HOME/opt/Python-2.6.4/bin/python`` from a shell
 prompt.
 
+.. warning::
+
+   Python's Unicode support defaults to narrow build while most distributions
+   tend to use wide build for system-provided python binaries. Compiled
+   extensions between narrow and wide builds are mutually incompatible.
+
+   Python supports narrow and unicode builds starting with version 2.2
+   and up to 3.2. The corresponding option and background are detailed in
+   `PEP-261 <http://www.python.org/dev/peps/pep-0261/>`_. It was changed in
+   in Python version 3.3 to support more flexible internal Unicode
+   representation. For more information refer to `PEP-393
+   <http://www.python.org/dev/peps/pep-0393/>`_.
+
 .. index::
    pair: install; Python (from package, Windows)
 
@@ -297,7 +310,7 @@ Installing :app:`Pyramid` on a Windows System
 
    .. code-block:: text
 
-      c:\> c:\Python26\Scripts\virtualenv --no-site-packages env
+      c:\> c:\Python26\Scripts\virtualenv env
 
 #. Switch to the ``env`` directory:
 
