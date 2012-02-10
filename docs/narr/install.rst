@@ -310,7 +310,7 @@ Installing :app:`Pyramid` on a Windows System
 
    .. code-block:: text
 
-      c:\> c:\Python26\Scripts\virtualenv --no-site-packages env
+      c:\> c:\Python26\Scripts\virtualenv env
 
 #. Switch to the ``env`` directory:
 
