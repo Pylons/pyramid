@@ -606,19 +606,21 @@ Assuming that you have a route configured in your application like so:
    config.add_route('verify', '/verify/{code}')
 
 You need to inform the Pyramid environment that the WSGI application is
-handling requests from a certain base. For example, we want to mount our
-application at `example.com/prefix` and the generated URLs should use HTTPS.
-This can be done by mutating the request object:
+handling requests from a certain base. For example, we want to simulate
+mounting our application at `https://example.com/prefix`, to ensure that
+the generated URLs are correct for our deployment. This can be done by
+either mutating the resulting request object, or more simply by constructing
+the desired request and passing it into :func:`~pyramid.paster.bootstrap`:
 
 .. code-block:: python
 
    from pyramid.paster import bootstrap
-   env = bootstrap('/path/to/my/development.ini#another')
-   env['request'].host = 'example.com'
-   env['request'].scheme = 'https'
-   env['request'].script_name = '/prefix'
+   from pyramid.request import Request
+
+   request = Request.blank('/', base_url='https://example.com/prefix')
+   env = bootstrap('/path/to/my/development.ini#another', request=request)
    print env['request'].application_url
-   # will print 'https://example.com/prefix/another/url'
+   # will print 'https://example.com/prefix'
 
 Now you can readily use Pyramid's APIs for generating URLs:
 
@@ -630,8 +632,8 @@ Now you can readily use Pyramid's APIs for generating URLs:
 Cleanup
 ~~~~~~~
 
-When your scripting logic finishes, it's good manners (but not required) to
-call the ``closer`` callback:
+When your scripting logic finishes, it's good manners to call the ``closer``
+callback:
 
 .. code-block:: python
 
