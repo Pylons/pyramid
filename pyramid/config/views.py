@@ -343,9 +343,10 @@ class ViewDeriver(object):
             result = view(context, request)
             response = registry.queryAdapterOrSelf(result, IResponse)
             if response is None:
+                view_name = '.'.join((view.__module__,view.__name__))
                 raise ValueError(
-                    'Could not convert view return value "%s" into a '
-                    'response object' % (result,))
+                    'Could not convert %s return value "%s" into a '
+                    'response object' % (view_name,result,))
             return response
 
         return viewresult_to_response
