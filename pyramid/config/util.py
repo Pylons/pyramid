@@ -6,7 +6,6 @@ from zope.interface import implementer
 from pyramid.interfaces import IActionInfo
 
 from pyramid.compat import (
-    string_types,
     bytes_,
     is_nonstr_iter,
     )
@@ -44,7 +43,7 @@ def action_method(wrapped):
             self._ainfo = []
         info = kw.pop('_info', None)
         # backframes for outer decorators to actionmethods
-        backframes = kw.pop('_backframes', 2) 
+        backframes = kw.pop('_backframes', 2)
         if is_nonstr_iter(info) and len(info) == 4:
             # _info permitted as extract_stack tuple
             info = ActionInfo(*info)
@@ -132,7 +131,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         request_method = sorted(request_method)
         def request_method_predicate(context, request):
             return request.method in request_method
-        text = "request method = %s" % repr(request_method)
+        text = "request method = %r" % request_method
         request_method_predicate.__text__ = text
         weights.append(1 << 2)
         predicates.append(request_method_predicate)

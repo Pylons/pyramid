@@ -55,6 +55,7 @@ from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
 from pyramid.view import render_view_to_response
+from pyramid.util import object_description
 
 from pyramid.config.util import (
     DEFAULT_PHASH,
@@ -66,6 +67,12 @@ from pyramid.config.util import (
 
 urljoin = urlparse.urljoin
 url_parse = urlparse.urlparse
+
+def view_description(view):
+    try:
+        return view.__text__
+    except AttributeError:
+        return object_description(view)
 
 def wraps_view(wrapper):
     def inner(self, view):
@@ -99,7 +106,7 @@ def preserve_view_attrs(view, wrapper):
     # "wrapped view"
     for attr in ('__permitted__', '__call_permissive__', '__permission__',
                  '__predicated__', '__predicates__', '__accept__',
-                 '__order__'):
+                 '__order__', '__text__'):
         try:
             setattr(wrapper, attr, getattr(view, attr))
         except AttributeError:
@@ -343,9 +350,19 @@ class ViewDeriver(object):
             result = view(context, request)
             response = registry.queryAdapterOrSelf(result, IResponse)
             if response is None:
-                raise ValueError(
-                    'Could not convert view return value "%s" into a '
-                    'response object' % (result,))
+                if result is None:
+                    append = (' You may have forgotten to return a value from '
+                              'the view callable.')
+                elif isinstance(result, dict):
+                    append = (' You may have forgotten to define a renderer in '
+                              'the view configuration.')
+                else:
+                    append = ''
+                msg = ('Could not convert return value of the view callable %s '
+                      'into a response object. '
+                      'The value returned was %r.' + append)
+                    
+                raise ValueError(msg % (view_description(view), result))
             return response
 
         return viewresult_to_response
@@ -376,6 +393,8 @@ class DefaultViewMapper(object):
             mapped_view = self.map_class_requestonly(view)
         else:
             mapped_view = self.map_class_native(view)
+        mapped_view.__text__ = 'method %s of %s' % (
+            self.attr or '__call__', object_description(view))
         return mapped_view
 
     def map_nonclass(self, view):
@@ -388,6 +407,11 @@ class DefaultViewMapper(object):
             mapped_view = self.map_nonclass_requestonly(view)
         elif self.attr:
             mapped_view = self.map_nonclass_attr(view)
+        if self.attr is not None:
+            mapped_view.__text__ = 'attr %s of %s' % (
+                self.attr, object_description(view))
+        else:
+            mapped_view.__text__ = object_description(view)
         return mapped_view
 
     def map_class_requestonly(self, view):

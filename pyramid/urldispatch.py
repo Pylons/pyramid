@@ -14,13 +14,13 @@ from pyramid.compat import (
     string_types,
     binary_type,
     is_nonstr_iter,
+    decode_path_info,
     )
 
 from pyramid.exceptions import URLDecodeError
 
 from pyramid.traversal import (
     quote_path_segment,
-    decode_path_info,
     split_path_info,
     )
 
