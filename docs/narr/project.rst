@@ -336,6 +336,7 @@ when your system contacts Pyramid:
 .. code-block:: ini
 
    [app:main]
+   # .. other settings ...
    debugtoolbar.hosts = 192.168.1.1
 
 For more information about what the debug toolbar allows you to do, see `the
