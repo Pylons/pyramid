@@ -17,6 +17,12 @@ Features
   The error message now contains information about the view callable itself
   as well as the result of calling it.
 
+- Better error message when a .pyc-only module is ``config.include`` -ed.
+  This is not permitted due to error reporting requirements, and a better
+  error message is shown when it is attempted.  Previously it would fail with
+  something like "AttributeError: 'NoneType' object has no attribute
+  'rfind'".
+
 Dependencies
 ------------
 

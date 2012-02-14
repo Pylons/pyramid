@@ -253,6 +253,7 @@ class Configurator(
     info = ''
     object_description = staticmethod(object_description)
     introspectable = Introspectable
+    inspect = inspect
 
     def __init__(self,
                  registry=None,
@@ -706,7 +707,7 @@ class Configurator(
             route_prefix = None
 
         c = self.maybe_dotted(callable)
-        module = inspect.getmodule(c)
+        module = self.inspect.getmodule(c)
         if module is c:
             try:
                 c = getattr(module, 'includeme')
@@ -716,7 +717,13 @@ class Configurator(
                     )
                                                        
         spec = module.__name__ + ':' + c.__name__
-        sourcefile = inspect.getsourcefile(c)
+        sourcefile = self.inspect.getsourcefile(c)
+
+        if sourcefile is None:
+            raise ConfigurationError(
+                'No source file for module %r (.py file must exist, '
+                'refusing to use orphan .pyc or .pyo file).' % module.__name__)
+            
 
         if action_state.processSpec(spec):
             configurator = self.__class__(
