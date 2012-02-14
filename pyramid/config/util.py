@@ -6,7 +6,6 @@ from zope.interface import implementer
 from pyramid.interfaces import IActionInfo
 
 from pyramid.compat import (
-    string_types,
     bytes_,
     is_nonstr_iter,
     )

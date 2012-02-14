@@ -11,6 +11,12 @@ Features
   http://readthedocs.org/docs/venusian/en/latest/#ignore-scan-argument for
   more information about how to use the ``ignore`` argument to ``scan``.
 
+- Better error messages when a view callable returns a value that cannot be
+  converted to a response (for example, when a view callable returns a
+  dictionary without a renderer defined, or doesn't return any value at all).
+  The error message now contains information about the view callable itself
+  as well as the result of calling it.
+
 Dependencies
 ------------
 

@@ -2282,6 +2282,113 @@ class TestViewDeriver(unittest.TestCase):
         self.config.registry.registerUtility(policy, IAuthenticationPolicy)
         self.config.registry.registerUtility(policy, IAuthorizationPolicy)
 
+    def test_function_returns_non_adaptable(self):
+        def view(request):
+            return None
+        deriver = self._makeOne()
+        result = deriver(view)
+        self.assertFalse(result is view)
+        try:
+            result(None, None)
+        except ValueError as e:
+            self.assertEqual(
+                e.args[0], 
+                'Could not convert return value of the view callable function '
+                'pyramid.tests.test_config.test_views.view into a response '
+                'object. The value returned was None. You may have forgotten '
+                'to return a value from the view callable.'
+                )
+        else: # pragma: no cover
+            raise AssertionError
+
+    def test_function_returns_non_adaptable_dict(self):
+        def view(request):
+            return {'a':1}
+        deriver = self._makeOne()
+        result = deriver(view)
+        self.assertFalse(result is view)
+        try:
+            result(None, None)
+        except ValueError as e:
+            self.assertEqual(
+                e.args[0], 
+                "Could not convert return value of the view callable function "
+                "pyramid.tests.test_config.test_views.view into a response "
+                "object. The value returned was {'a': 1}. You may have "
+                "forgotten to define a renderer in the view configuration."
+                )
+        else: # pragma: no cover
+            raise AssertionError
+        
+    def test_instance_returns_non_adaptable(self):
+        class AView(object):
+            def __call__(self, request):
+                return None
+        view = AView()
+        deriver = self._makeOne()
+        result = deriver(view)
+        self.assertFalse(result is view)
+        try:
+            result(None, None)
+        except ValueError as e:
+            msg = e.args[0]
+            self.assertTrue(msg.startswith(
+                'Could not convert return value of the view callable object '
+                '<pyramid.tests.test_config.test_views.AView object at'))
+            self.assertTrue(msg.endswith(
+                '> into a response object. The value returned was None. You '
+                'may have forgotten to return a value from the view callable.'))
+        else: # pragma: no cover
+            raise AssertionError
+
+    def test_requestonly_default_method_returns_non_adaptable(self):
+        request = DummyRequest()
+        class AView(object):
+            def __init__(self, request):
+                pass
+            def __call__(self):
+                return None
+        deriver = self._makeOne()
+        result = deriver(AView)
+        self.assertFalse(result is AView)
+        try:
+            result(None, request)
+        except ValueError as e:
+            self.assertEqual(
+                e.args[0], 
+                'Could not convert return value of the view callable '
+                'method __call__ of '
+                'class pyramid.tests.test_config.test_views.AView into a '
+                'response object. The value returned was None. You may have '
+                'forgotten to return a value from the view callable.'
+                )
+        else: # pragma: no cover
+            raise AssertionError
+
+    def test_requestonly_nondefault_method_returns_non_adaptable(self):
+        request = DummyRequest()
+        class AView(object):
+            def __init__(self, request):
+                pass
+            def theviewmethod(self):
+                return None
+        deriver = self._makeOne(attr='theviewmethod')
+        result = deriver(AView)
+        self.assertFalse(result is AView)
+        try:
+            result(None, request)
+        except ValueError as e:
+            self.assertEqual(
+                e.args[0], 
+                'Could not convert return value of the view callable '
+                'method theviewmethod of '
+                'class pyramid.tests.test_config.test_views.AView into a '
+                'response object. The value returned was None. You may have '
+                'forgotten to return a value from the view callable.'
+                )
+        else: # pragma: no cover
+            raise AssertionError
+        
     def test_requestonly_function(self):
         response = DummyResponse()
         def view(request):
@@ -3688,6 +3795,24 @@ class TestStaticURLInfo(unittest.TestCase):
         inst.add(config, 'view', 'anotherpackage:path', cache_max_age=1,
                  view_attr='attr')
         self.assertEqual(config.view_kw['attr'], 'attr')
+
+class Test_view_description(unittest.TestCase):
+    def _callFUT(self, view):
+        from pyramid.config.views import view_description
+        return view_description(view)
+    
+    def test_with_text(self):
+        def view(): pass
+        view.__text__ = 'some text'
+        result = self._callFUT(view)
+        self.assertEqual(result, 'some text')
+        
+    def test_without_text(self):
+        def view(): pass
+        result = self._callFUT(view)
+        self.assertEqual(result, 
+                         'function pyramid.tests.test_config.test_views.view')
+        
 
 class DummyRegistry:
     pass
