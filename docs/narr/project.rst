@@ -341,7 +341,7 @@ when your system contacts Pyramid:
 
 For more information about what the debug toolbar allows you to do, see `the
 documentation for pyramid_debugtoolbar
-<http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/dev/>`_.
+<http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest/>`_.
 
 The debug toolbar will not be shown (and all debugging will be turned off)
 when you use the ``production.ini`` file instead of the ``development.ini``
