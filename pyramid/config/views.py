@@ -344,8 +344,8 @@ class ViewDeriver(object):
             response = registry.queryAdapterOrSelf(result, IResponse)
             if response is None:
                 raise ValueError(
-                    'Could not convert view return value "%s" into a '
-                    'response object' % (result,))
+                    'Could not convert %r return value "%s" into a '
+                    'response object' % (view,result,))
             return response
 
         return viewresult_to_response
