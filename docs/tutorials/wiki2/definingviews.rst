@@ -126,7 +126,7 @@ HTML anchor for each *WikiWord* reference in the rendered HTML using a
 compiled regular expression.
 
 .. literalinclude:: src/views/tutorial/views.py
-   :lines: 23-44
+   :lines: 23-43
    :linenos:
    :language: python
 
@@ -161,7 +161,7 @@ The ``matchdict`` attribute of the request passed to the ``add_page`` view
 will have the values we need to construct URLs and find model objects.
 
 .. literalinclude:: src/views/tutorial/views.py
-   :lines: 46-58
+   :lines: 45-56
    :linenos:
    :language: python
 
@@ -184,7 +184,7 @@ If the view execution *is* a result of a form submission (if the expression
 ``'form.submitted' in request.params`` is ``True``), we scrape the page body
 from the form data, create a Page object with this page body and the name
 taken from ``matchdict['pagename']``, and save it into the database using
-``session.add``.  We then redirect back to the ``view_page`` view for the
+``DBSession.add``.  We then redirect back to the ``view_page`` view for the
 newly created page.
 
 The ``edit_page`` view function
@@ -197,7 +197,7 @@ request passed to the ``edit_page`` view will have a ``'pagename'`` key
 matching the name of the page the user wants to edit.
 
 .. literalinclude:: src/views/tutorial/views.py
-   :lines: 60-73
+   :lines: 58-70
    :linenos:
    :language: python
 

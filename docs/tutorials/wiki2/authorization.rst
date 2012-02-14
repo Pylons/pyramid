@@ -159,14 +159,14 @@ logged in user and redirect back to the front page.
 The ``login`` view callable will look something like this:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 90-116
+   :lines: 87-113
    :linenos:
    :language: python
 
 The ``logout`` view callable will look something like this:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 118-122
+   :lines: 115-119
    :linenos:
    :language: python
 

@@ -23,6 +23,12 @@ Features
   something like "AttributeError: 'NoneType' object has no attribute
   'rfind'".
 
+Documentation
+-------------
+
+- Don't create a ``session`` instance in SQLA Wiki tutorial, use raw
+  ``DBSession`` instead (this is more common in real SQLA apps).
+
 Dependencies
 ------------
 
