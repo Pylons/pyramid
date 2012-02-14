@@ -6,7 +6,6 @@ from zope.interface import implementer
 from pyramid.interfaces import IActionInfo
 
 from pyramid.compat import (
-    string_types,
     bytes_,
     is_nonstr_iter,
     )
@@ -221,19 +220,21 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         h.update(bytes_('request_type:%r' % hash(request_type)))
 
     if match_param is not None:
-        if isinstance(match_param, string_types):
-            match_param, match_param_val = match_param.split('=', 1)
-            match_param = {match_param: match_param_val}
-        text = "match_param %s" % match_param
+        if not is_nonstr_iter(match_param):
+            match_param = (match_param,)
+        match_param = sorted(match_param)
+        text = "match_param %s" % repr(match_param)
+        reqs = [p.split('=', 1) for p in match_param]
         def match_param_predicate(context, request):
-            for k, v in match_param.items():
+            for k, v in reqs:
                 if request.matchdict.get(k) != v:
                     return False
             return True
         match_param_predicate.__text__ = text
         weights.append(1 << 9)
         predicates.append(match_param_predicate)
-        h.update(bytes_('match_param:%r' % match_param))
+        for p in match_param:
+            h.update(bytes_('match_param:%r' % p))
 
     if custom:
         for num, predicate in enumerate(custom):

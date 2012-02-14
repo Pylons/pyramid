@@ -76,3 +76,6 @@ Other Interfaces
 
   .. autointerface:: IActionInfo
      :members:
+
+  .. autointerface:: IAssetDescriptor
+     :members:

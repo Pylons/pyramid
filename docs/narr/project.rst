@@ -98,7 +98,7 @@ Or on Windows:
 
 .. code-block:: text
 
-   $ Scripts\pcreate alchemy MyProject
+   $ Scripts\pcreate -s alchemy MyProject
 
 Here's sample output from a run of ``pcreate`` on UNIX for a project we name
 ``MyProject``:

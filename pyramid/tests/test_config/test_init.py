@@ -929,6 +929,28 @@ pyramid.tests.test_config.dummy_include2""",
         result = render_view_to_response(ctx, req, 'pod_notinit')
         self.assertEqual(result, None)
 
+    def test_scan_integration_with_ignore(self):
+        from zope.interface import alsoProvides
+        from pyramid.interfaces import IRequest
+        from pyramid.view import render_view_to_response
+        import pyramid.tests.test_config.pkgs.scannable as package
+        config = self._makeOne(autocommit=True)
+        config.scan(package, 
+                    ignore='pyramid.tests.test_config.pkgs.scannable.another')
+
+        ctx = DummyContext()
+        req = DummyRequest()
+        alsoProvides(req, IRequest)
+        req.registry = config.registry
+
+        req.method = 'GET'
+        result = render_view_to_response(ctx, req, '')
+        self.assertEqual(result, 'grokked')
+
+        # ignored
+        v = render_view_to_response(ctx, req, 'another_stacked_class2')
+        self.assertEqual(v, None)
+        
     def test_scan_integration_dottedname_package(self):
         from zope.interface import alsoProvides
         from pyramid.interfaces import IRequest

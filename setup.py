@@ -37,7 +37,7 @@ install_requires=[
     'repoze.lru >= 0.4', # py3 compat
     'zope.interface >= 3.8.0',  # has zope.interface.registry
     'zope.deprecation >= 3.5.0', # py3 compat
-    'venusian >= 1.0a1', # ``onerror``
+    'venusian >= 1.0a3', # ``ignore``
     'translationstring >= 0.4', # py3 compat
     'PasteDeploy >= 1.5.0', # py3 compat
     ]
@@ -56,7 +56,7 @@ if not PY3:
         ])
 
 setup(name='pyramid',
-      version='1.3a6',
+      version='1.3a7',
       description=('The Pyramid web application development framework, a '
                    'Pylons project'),
       long_description=README + '\n\n' +  CHANGES,

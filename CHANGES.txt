@@ -4,8 +4,39 @@ Next release
 Features
 --------
 
+- The ``scan`` method of a ``Configurator`` can be passed an ``ignore``
+  argument, which can be a string, a callable, or a list consisting of
+  strings and/or callables.  This feature allows submodules, subpackages, and
+  global objects from being scanned.  See
+  http://readthedocs.org/docs/venusian/en/latest/#ignore-scan-argument for
+  more information about how to use the ``ignore`` argument to ``scan``.
+
+- Better error messages when a view callable returns a value that cannot be
+  converted to a response (for example, when a view callable returns a
+  dictionary without a renderer defined, or doesn't return any value at all).
+  The error message now contains information about the view callable itself
+  as well as the result of calling it.
+
+Dependencies
+------------
+
+- Depend on ``venusian`` >= 1.0a3 to provide scan ``ignore`` support.
+
+1.3a7 (2012-02-07)
+==================
+
+Features
+--------
+
 - More informative error message when a ``config.include`` cannot find an
   ``includeme``.  See https://github.com/Pylons/pyramid/pull/392.
+
+- Internal: catch unhashable discriminators early (raise an error instead of
+  allowing them to find their way into resolveConflicts).
+
+- The `match_param` view predicate now accepts a string or a tuple.
+  This replaces the broken behavior of accepting a dict. See
+  https://github.com/Pylons/pyramid/issues/425 for more information.
 
 Bug Fixes
 ---------
@@ -17,6 +48,13 @@ Bug Fixes
 
 - The ``prequest`` script would fail when used against URLs which did not
   return HTML or text.  See https://github.com/Pylons/pyramid/issues/381
+
+Backwards Incompatibilities
+---------------------------
+
+- The `match_param` view predicate no longer accepts a dict. This will
+  have no negative affect because the implementation was broken for
+  dict-based arguments.
 
 Documentation
 -------------

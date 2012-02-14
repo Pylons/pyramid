@@ -15,7 +15,9 @@ The major feature additions in Pyramid 1.3 follow.
 Python 3 Compatibility
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Pyramid is now Python 3 compatible.  Python 3.2 or better is required.
+In addition to running on Python 2 (version 2.6 or 2.7 required), Pyramid is
+now Python 3 compatible.  For Python 3 compatibility, Python 3.2 or better
+is required.
 
 .. warning::
 
@@ -250,6 +252,13 @@ Minor Feature Additions
   http://www.python.org/dev/peps/pep-0333/#optional-platform-specific-file-handling)
   when one is provided by the web server.
 
+- The :meth:`pyramid.config.Configurator.scan` method can be passed an
+  ``ignore`` argument, which can be a string, a callable, or a list
+  consisting of strings and/or callables.  This feature allows submodules,
+  subpackages, and global objects from being scanned.  See
+  http://readthedocs.org/docs/venusian/en/latest/#ignore-scan-argument for
+  more information about how to use the ``ignore`` argument to ``scan``.
+
 Backwards Incompatibilities
 ---------------------------
 
@@ -314,6 +323,10 @@ Backwards Incompatibilities
   ``request.upath_info`` (Unicode) rather than ``request.path_info``
   (indeterminate value based on Python 3 vs. Python 2).  This has to be done
   to normalize matching on Python 2 and Python 3.
+
+- The ``match_param`` view predicate no longer accepts a dict. This will have
+  no negative affect because the implementation was broken for dict-based
+  arguments.
 
 Documentation Enhancements
 --------------------------
