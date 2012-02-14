@@ -72,6 +72,7 @@ def view_description(view):
     try:
         return view.__text__
     except AttributeError:
+        # custom view mappers might not add __text__
         return object_description(view)
 
 def wraps_view(wrapper):
