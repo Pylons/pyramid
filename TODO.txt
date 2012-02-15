@@ -15,9 +15,6 @@ Must-Have
 Nice-to-Have
 ------------
 
-- Replace all mentions of zope.interface.implements with
-  zope.interface.implementer.
-
 - Put includes in development.ini on separate lines and fix project.rst to
   tell people to comment out only the debugtoolbar include when they want to
   disable.

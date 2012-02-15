@@ -606,24 +606,24 @@ adapter to the more complex IResponse interface:
 If you want to implement your own Response object instead of using the
 :class:`pyramid.response.Response` object in any capacity at all, you'll have
 to make sure the object implements every attribute and method outlined in
-:class:`pyramid.interfaces.IResponse` and you'll have to ensure that it's
-marked up with ``zope.interface.implements(IResponse)``:
+:class:`pyramid.interfaces.IResponse` and you'll have to ensure that it uses
+``zope.interface.implementer(IResponse)`` as a class decoratoror.
 
 .. code-block:: python
    :linenos:
 
    from pyramid.interfaces import IResponse
-   from zope.interface import implements
+   from zope.interface import implementer
 
+   @implementer(IResponse)
    class MyResponse(object):
-       implements(IResponse)
        # ... an implementation of every method and attribute 
        # documented in IResponse should follow ...
 
 When an alternate response object implementation is returned by a view
 callable, if that object asserts that it implements
 :class:`~pyramid.interfaces.IResponse` (via
-``zope.interface.implements(IResponse)``) , an adapter needn't be registered
+``zope.interface.implementer(IResponse)``) , an adapter needn't be registered
 for the object; Pyramid will use it directly.
 
 An IResponse adapter for ``webob.Response`` (as opposed to
@@ -812,13 +812,14 @@ performed, enabling you to set up the utility in advance:
 .. code-block:: python
    :linenos:
 
+   from zope.interface import implementer
+
    from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
    from mypackage.interfaces import IMyUtility
 
+   @implementer(IMyUtility)
    class UtilityImplementation:
-
-       implements(IMyUtility)
 
        def __init__(self):
           self.registrations = {}

@@ -540,14 +540,14 @@ declares that the blog entry implements an :term:`interface`.
    :linenos:
 
    import datetime
-   from zope.interface import implements
+   from zope.interface import implementer
    from zope.interface import Interface
 
    class IBlogEntry(Interface):
        pass
 
+   @implementer(IBlogEntry)
    class BlogEntry(object):
-       implements(IBlogEntry)
        def __init__(self, title, body, author):
            self.title = title
            self.body = body
@@ -556,15 +556,15 @@ declares that the blog entry implements an :term:`interface`.
 
 This resource consists of two things: the class which defines the resource
 constructor as the class ``BlogEntry``, and an :term:`interface` attached to
-the class via an ``implements`` statement at class scope using the
-``IBlogEntry`` interface as its sole argument.
+the class via an ``implementer`` class decorator using the ``IBlogEntry``
+interface as its sole argument.
 
 The interface object used must be an instance of a class that inherits from
 :class:`zope.interface.Interface`.
 
 A resource class may implement zero or more interfaces.  You specify that a
 resource implements an interface by using the
-:func:`zope.interface.implements` function at class scope.  The above
+:func:`zope.interface.implementer` function as a class decorator.  The above
 ``BlogEntry`` resource implements the ``IBlogEntry`` interface.
 
 You can also specify that a particular resource *instance* provides an
