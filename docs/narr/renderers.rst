@@ -156,7 +156,6 @@ dictionary:
 .. code-block:: python
    :linenos:
 
-   from pyramid.response import Response
    from pyramid.view import view_config
 
    @view_config(renderer='string')
@@ -193,7 +192,6 @@ render the returned dictionary to a JSON serialization:
 .. code-block:: python
    :linenos:
 
-   from pyramid.response import Response
    from pyramid.view import view_config
 
    @view_config(renderer='json')
