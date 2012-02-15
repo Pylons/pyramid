@@ -1,15 +1,6 @@
 Pyramid TODOs
 =============
 
-Must-Have
----------
-
-- Fix deployment recipes in cookbook (discourage proxying without changing
-  server).
-
-- pyramid.config.util.ActionInfo.__str__ potentially returns Unicode under
-  Py2, fix.
-
 Nice-to-Have
 ------------
 
@@ -25,7 +16,7 @@ Nice-to-Have
 - Modify the urldispatch chapter examples to assume a scan rather than
   ``add_view``.
 
-- Decorator for append_slash_notfound_view_factory?
+- Decorator for append_slash_notfound_view_factory.
 
 - Introspection:
 
