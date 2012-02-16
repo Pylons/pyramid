@@ -259,6 +259,30 @@ Minor Feature Additions
   http://readthedocs.org/docs/venusian/en/latest/#ignore-scan-argument for
   more information about how to use the ``ignore`` argument to ``scan``.
 
+- Add :meth:`pyramid.config.Configurator.set_traverser` API method.  See
+  :ref:`changing_the_traverser` for more information.  This is not a new
+  feature, it just provides an API for adding a traverser without needing to
+  use the ZCA API.
+
+- The :meth:`pyramid.config.Configurator.scan` method can now be passed an
+  ``ignore`` argument, which can be a string, a callable, or a list
+  consisting of strings and/or callables.  This feature allows submodules,
+  subpackages, and global objects from being scanned.  See
+  http://readthedocs.org/docs/venusian/en/latest/#ignore-scan-argument for
+  more information about how to use the ``ignore`` argument to ``scan``.
+
+- Better error messages when a view callable returns a value that cannot be
+  converted to a response (for example, when a view callable returns a
+  dictionary without a renderer defined, or doesn't return any value at all).
+  The error message now contains information about the view callable itself
+  as well as the result of calling it.
+
+- Better error message when a .pyc-only module is ``config.include`` -ed.
+  This is not permitted due to error reporting requirements, and a better
+  error message is shown when it is attempted.  Previously it would fail with
+  something like "AttributeError: 'NoneType' object has no attribute
+  'rfind'".
+
 Backwards Incompatibilities
 ---------------------------
 
@@ -374,6 +398,8 @@ Dependency Changes
 
 - Pyramid no longer depends on the ``Paste`` or ``PasteScript`` packages.
   These packages are not Python 3 compatible.
+
+- Depend on ``venusian`` >= 1.0a3 to provide scan ``ignore`` support.
 
 Scaffolding Changes
 -------------------
