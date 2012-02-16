@@ -406,11 +406,10 @@ via configuration.
 .. code-block:: python
    :linenos:
 
-   from pyramid.interfaces import ITraverser
-   from zope.interface import Interface
+   from pyramid.config import Configurator
    from myapp.traversal import Traverser
-
-   config.registry.registerAdapter(Traverser, (Interface,), ITraverser)
+   config = Configurator()
+   config.set_traverser(Traverser)
 
 In the example above, ``myapp.traversal.Traverser`` is assumed to be a class
 that implements the following interface:
@@ -456,12 +455,11 @@ used.  Otherwise, the default traverser would be used.  For example:
 .. code-block:: python
    :linenos:
 
-   from pyramid.interfaces import ITraverser
-   from zope.interface import Interface
    from myapp.traversal import Traverser
    from myapp.resources import MyRoot
-
-   config.registry.registerAdapter(Traverser, (MyRoot,), ITraverser)
+   from pyramid.config import Configurator
+   config = Configurator()
+   config.set_traverser(Traverser, MyRoot)
 
 If the above stanza was added to a Pyramid ``__init__.py`` file's ``main``
 function, :app:`Pyramid` would use the ``myapp.traversal.Traverser`` only

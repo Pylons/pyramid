@@ -529,6 +529,21 @@ introspectables in categories not described here.
     A normalized version of the ``spec`` argument provided to
     ``add_static_view``.
 
+``traversers``
+
+  Each introspectable in the ``traversers`` category represents a call to
+  :meth:`pyramid.config.Configurator.add_traverser`; each will have the
+  following data.
+
+  ``iface``
+
+    The (resolved) interface or class object that represents the return value
+    of a root factory that this traverser will be used for.
+
+  ``factory``
+
+    The (resolved) traverser class.
+
 Introspection in the Toolbar
 ----------------------------
 

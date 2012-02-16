@@ -23,6 +23,11 @@ Features
   something like "AttributeError: 'NoneType' object has no attribute
   'rfind'".
 
+- Add ``pyramid.config.Configurator.set_traverser`` API method.  See the
+  Hooks narrative documentation section entitled "Changing the Traverser" for
+  more information.  This is not a new feature, it just provides an API for
+  adding a traverser without needing to use the ZCA API.
+
 Documentation
 -------------
 

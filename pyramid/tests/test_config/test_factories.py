@@ -129,6 +129,46 @@ class TestFactoriesMixin(unittest.TestCase):
         self.assertEqual(callables, [('foo', foo, False),
                                      ('bar', foo, True)])
 
+    def test_set_traverser_dotted_names(self):
+        from pyramid.interfaces import ITraverser
+        config = self._makeOne(autocommit=True)
+        config.set_traverser(
+            'pyramid.tests.test_config.test_factories.DummyTraverser',
+            'pyramid.tests.test_config.test_factories.DummyIface')
+        iface = DummyIface()
+        traverser = config.registry.getAdapter(iface, ITraverser)
+        self.assertEqual(traverser.__class__, DummyTraverser)
+        self.assertEqual(traverser.root, iface)
+
+    def test_set_traverser_default_iface_means_Interface(self):
+        from pyramid.interfaces import ITraverser
+        config = self._makeOne(autocommit=True)
+        config.set_traverser(DummyTraverser)
+        traverser = config.registry.getAdapter(None, ITraverser)
+        self.assertEqual(traverser.__class__, DummyTraverser)
+
+    def test_set_traverser_nondefault_iface(self):
+        from pyramid.interfaces import ITraverser
+        config = self._makeOne(autocommit=True)
+        config.set_traverser(DummyTraverser, DummyIface)
+        iface = DummyIface()
+        traverser = config.registry.getAdapter(iface, ITraverser)
+        self.assertEqual(traverser.__class__, DummyTraverser)
+        self.assertEqual(traverser.root, iface)
+        
+    def test_set_traverser_introspectables(self):
+        config = self._makeOne()
+        config.set_traverser(DummyTraverser, DummyIface)
+        actions = config.action_state.actions
+        self.assertEqual(len(actions), 1)
+        intrs  = actions[0]['introspectables']
+        self.assertEqual(len(intrs), 1)
+        intr = intrs[0]
+        self.assertEqual(intr.type_name, 'traverser')
+        self.assertEqual(intr.discriminator, ('traverser', DummyIface))
+        self.assertEqual(intr.category_name, 'traversers')
+        self.assertEqual(intr.title, 'traverser for %r' % DummyIface)
+
 class DummyRequest(object):
     callables = None
 
@@ -139,3 +179,10 @@ class DummyRequest(object):
         if self.callables is None:
             self.callables = []
         self.callables.append((name, callable, reify))
+
+class DummyTraverser(object):
+    def __init__(self, root):
+        self.root = root
+
+class DummyIface(object):
+    pass
