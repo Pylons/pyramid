@@ -341,7 +341,7 @@ template are ``renderer_name`` (the string used in the ``renderer`` attribute
 of the directive), ``renderer_info`` (an object containing renderer-related
 information), ``context`` (the context resource of the view used to render
 the template), and ``request`` (the request passed to the view used to render
-the template).  ``request`` is also available as ``r`` in Pyramid 1.3+.
+the template).  ``request`` is also available as ``req`` in Pyramid 1.3+.
 
 Here's an example view configuration which uses a Chameleon ZPT renderer:
 

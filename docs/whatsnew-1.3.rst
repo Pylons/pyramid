@@ -284,9 +284,12 @@ Minor Feature Additions
   something like "AttributeError: 'NoneType' object has no attribute
   'rfind'".
 
-- The system value ``r`` is now supplied to renderers as an alias for
+- The system value ``req`` is now supplied to renderers as an alias for
   ``request``.  This means that you can now, for example, in a template, do
-  ``r.route_url(...)`` instead of ``request.route_url(...)``.
+  ``req.route_url(...)`` instead of ``request.route_url(...)``.  This is
+  purely a change to reduce the amount of typing required to use request
+  methods and attributes from within templates.  The value ``request`` is
+  still available too, this is just an alternative.
 
 Backwards Incompatibilities
 ---------------------------

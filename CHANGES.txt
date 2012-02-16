@@ -28,11 +28,12 @@ Features
   more information.  This is not a new feature, it just provides an API for
   adding a traverser without needing to use the ZCA API.
 
-- The system value ``r`` is now supplied to renderers as an alias for
+- The system value ``req`` is now supplied to renderers as an alias for
   ``request``.  This means that you can now, for example, in a template, do
-  ``r.route_url(...)`` instead of ``request.route_url(...)``.  This is purely
-  a change to reduce the amount of typing required to reference request
-  methods from within templates.
+  ``req.route_url(...)`` instead of ``request.route_url(...)``.  This is
+  purely a change to reduce the amount of typing required to use request
+  methods and attributes from within templates.  The value ``request`` is
+  still available too, this is just an alternative.
 
 Documentation
 -------------
