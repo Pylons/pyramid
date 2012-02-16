@@ -34,8 +34,8 @@ setup(name='{{project}}',
       include_package_data=True,
       zip_safe=False,
       test_suite='{{package}}',
-      install_requires = requires,
-      entry_points = """\
+      install_requires=requires,
+      entry_points="""\
       [paste.app_factory]
       main = {{package}}:main
       [console_scripts]
