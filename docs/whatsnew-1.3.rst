@@ -54,7 +54,8 @@ to make some changes:
 
 - We've replaced the ``paster`` command with Pyramid-specific analogues.
 
-- We've made the default WSGI server the ``waitress`` server.
+- We've made the default WSGI server used by Pyramid scaffolding the
+  :term:`waitress` server.
 
 Previously (in Pyramid 1.0, 1.1 and 1.2), you created a Pyramid application
 using ``paster create``, like so::
@@ -282,6 +283,10 @@ Minor Feature Additions
   error message is shown when it is attempted.  Previously it would fail with
   something like "AttributeError: 'NoneType' object has no attribute
   'rfind'".
+
+- The system value ``r`` is now supplied to renderers as an alias for
+  ``request``.  This means that you can now, for example, in a template, do
+  ``r.route_url(...)`` instead of ``request.route_url(...)``.
 
 Backwards Incompatibilities
 ---------------------------

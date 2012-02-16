@@ -333,15 +333,15 @@ dictionary, an error will be raised.
 
 Before passing keywords to the template, the keyword arguments derived from
 the dictionary returned by the view are augmented.  The callable object --
-whatever object was used to define the view -- will be automatically
-inserted into the set of keyword arguments passed to the template as the
-``view`` keyword.  If the view callable was a class, the ``view`` keyword
-will be an instance of that class.  Also inserted into the keywords passed to
-the template are ``renderer_name`` (the string used in the ``renderer``
-attribute of the directive), ``renderer_info`` (an object containing
-renderer-related information), ``context`` (the context resource of the view
-used to render the template), and ``request`` (the request passed to the view
-used to render the template).
+whatever object was used to define the view -- will be automatically inserted
+into the set of keyword arguments passed to the template as the ``view``
+keyword.  If the view callable was a class, the ``view`` keyword will be an
+instance of that class.  Also inserted into the keywords passed to the
+template are ``renderer_name`` (the string used in the ``renderer`` attribute
+of the directive), ``renderer_info`` (an object containing renderer-related
+information), ``context`` (the context resource of the view used to render
+the template), and ``request`` (the request passed to the view used to render
+the template).  ``request`` is also available as ``r`` in Pyramid 1.3+.
 
 Here's an example view configuration which uses a Chameleon ZPT renderer:
 
