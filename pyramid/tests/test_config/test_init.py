@@ -739,6 +739,26 @@ pyramid.tests.test_config.dummy_include2""",
 
         root_config.include(dummy_subapp, route_prefix='nested')
 
+    def test_include_with_missing_source_file(self):
+        from pyramid.exceptions import ConfigurationError
+        import inspect
+        config = self._makeOne()
+        class DummyInspect(object):
+            def getmodule(self, c):
+                return inspect.getmodule(c)
+            def getsourcefile(self, c):
+                return None
+        config.inspect = DummyInspect()
+        try:
+            config.include('pyramid.tests.test_config.dummy_include')
+        except ConfigurationError as e:
+            self.assertEqual(
+                e.args[0], 
+                "No source file for module 'pyramid.tests.test_config' (.py "
+                "file must exist, refusing to use orphan .pyc or .pyo file).")
+        else: # pragma: no cover
+            raise AssertionError
+
     def test_with_context(self):
         config = self._makeOne()
         context = DummyZCMLContext()

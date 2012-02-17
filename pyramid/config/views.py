@@ -72,6 +72,7 @@ def view_description(view):
     try:
         return view.__text__
     except AttributeError:
+        # custom view mappers might not add __text__
         return object_description(view)
 
 def wraps_view(wrapper):
@@ -407,11 +408,15 @@ class DefaultViewMapper(object):
             mapped_view = self.map_nonclass_requestonly(view)
         elif self.attr:
             mapped_view = self.map_nonclass_attr(view)
-        if self.attr is not None:
-            mapped_view.__text__ = 'attr %s of %s' % (
-                self.attr, object_description(view))
-        else:
-            mapped_view.__text__ = object_description(view)
+        if inspect.isroutine(mapped_view):
+            # we potentially mutate an unwrapped view here if it's a function;
+            # we do this to avoid function call overhead of injecting another
+            # wrapper
+            if self.attr is not None:
+                mapped_view.__text__ = 'attr %s of %s' % (
+                    self.attr, object_description(view))
+            else:
+                mapped_view.__text__ = object_description(view)
         return mapped_view
 
     def map_class_requestonly(self, view):

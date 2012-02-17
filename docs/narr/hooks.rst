@@ -406,11 +406,10 @@ via configuration.
 .. code-block:: python
    :linenos:
 
-   from pyramid.interfaces import ITraverser
-   from zope.interface import Interface
+   from pyramid.config import Configurator
    from myapp.traversal import Traverser
-
-   config.registry.registerAdapter(Traverser, (Interface,), ITraverser)
+   config = Configurator()
+   config.set_traverser(Traverser)
 
 In the example above, ``myapp.traversal.Traverser`` is assumed to be a class
 that implements the following interface:
@@ -456,12 +455,11 @@ used.  Otherwise, the default traverser would be used.  For example:
 .. code-block:: python
    :linenos:
 
-   from pyramid.interfaces import ITraverser
-   from zope.interface import Interface
    from myapp.traversal import Traverser
    from myapp.resources import MyRoot
-
-   config.registry.registerAdapter(Traverser, (MyRoot,), ITraverser)
+   from pyramid.config import Configurator
+   config = Configurator()
+   config.set_traverser(Traverser, MyRoot)
 
 If the above stanza was added to a Pyramid ``__init__.py`` file's ``main``
 function, :app:`Pyramid` would use the ``myapp.traversal.Traverser`` only
@@ -481,57 +479,54 @@ When you add a traverser as described in :ref:`changing_the_traverser`, it's
 often convenient to continue to use the
 :meth:`pyramid.request.Request.resource_url` API.  However, since the way
 traversal is done will have been modified, the URLs it generates by default
-may be incorrect.
+may be incorrect when used against resources derived from your custom
+traverser.
 
 If you've added a traverser, you can change how
 :meth:`~pyramid.request.Request.resource_url` generates a URL for a specific
-type of resource by adding a registerAdapter call for
-:class:`pyramid.interfaces.IContextURL` to your application:
+type of resource by adding a call to
+:meth:`pyramid.config.add_resource_url_adapter`.
+
+For example:
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.interfaces import ITraverser
-   from zope.interface import Interface
-   from myapp.traversal import URLGenerator
+   from myapp.traversal import ResourceURLAdapter
    from myapp.resources import MyRoot
 
-   config.registry.registerAdapter(URLGenerator, (MyRoot, Interface),
-                                   IContextURL)
+   config.add_resource_url_adapter(ResourceURLAdapter, resource_iface=MyRoot)
 
-In the above example, the ``myapp.traversal.URLGenerator`` class will be used
-to provide services to :meth:`~pyramid.request.Request.resource_url` any time
-the :term:`context` passed to ``resource_url`` is of class
-``myapp.resources.MyRoot``.  The second argument in the ``(MyRoot,
-Interface)`` tuple represents the type of interface that must be possessed by
-the :term:`request` (in this case, any interface, represented by
-``zope.interface.Interface``).
+In the above example, the ``myapp.traversal.ResourceURLAdapter`` class will
+be used to provide services to :meth:`~pyramid.request.Request.resource_url`
+any time the :term:`resource` passed to ``resource_url`` is of the class
+``myapp.resources.MyRoot``.  The ``resource_iface`` argument ``MyRoot``
+represents the type of interface that must be possessed by the resource for
+this resource url factory to be found.  If the ``resource_iface`` argument is
+omitted, this resource url adapter will be used for *all* resources.
 
-The API that must be implemented by a class that provides
-:class:`~pyramid.interfaces.IContextURL` is as follows:
+The API that must be implemented by your a class that provides
+:class:`~pyramid.interfaces.IResourceURL` is as follows:
 
 .. code-block:: python
   :linenos:
 
-  from zope.interface import Interface
-
-  class IContextURL(Interface):
-      """ An adapter which deals with URLs related to a context.
+  class MyResourceURL(object):
+      """ An adapter which provides the virtual and physical paths of a
+          resource
       """
-      def __init__(self, context, request):
-          """ Accept the context and request """
-
-      def virtual_root(self):
-          """ Return the virtual root object related to a request and the
-          current context"""
-
-      def __call__(self):
-          """ Return a URL that points to the context """
+      def __init__(self, resource, request):
+          """ Accept the resource and request and set self.physical_path and 
+          self.virtual_path"""
+          self.virtual_path =  some_function_of(resource, request)
+          self.physical_path =  some_other_function_of(resource, request)
 
 The default context URL generator is available for perusal as the class
-:class:`pyramid.traversal.TraversalContextURL` in the `traversal module
+:class:`pyramid.traversal.ResourceURL` in the `traversal module
 <http://github.com/Pylons/pyramid/blob/master/pyramid/traversal.py>`_ of the
 :term:`Pylons` GitHub Pyramid repository.
+
+See :meth:`pyramid.config.add_resource_url_adapter` for more information.
 
 .. index::
    single: IResponse
@@ -606,24 +601,24 @@ adapter to the more complex IResponse interface:
 If you want to implement your own Response object instead of using the
 :class:`pyramid.response.Response` object in any capacity at all, you'll have
 to make sure the object implements every attribute and method outlined in
-:class:`pyramid.interfaces.IResponse` and you'll have to ensure that it's
-marked up with ``zope.interface.implements(IResponse)``:
+:class:`pyramid.interfaces.IResponse` and you'll have to ensure that it uses
+``zope.interface.implementer(IResponse)`` as a class decoratoror.
 
 .. code-block:: python
    :linenos:
 
    from pyramid.interfaces import IResponse
-   from zope.interface import implements
+   from zope.interface import implementer
 
+   @implementer(IResponse)
    class MyResponse(object):
-       implements(IResponse)
        # ... an implementation of every method and attribute 
        # documented in IResponse should follow ...
 
 When an alternate response object implementation is returned by a view
 callable, if that object asserts that it implements
 :class:`~pyramid.interfaces.IResponse` (via
-``zope.interface.implements(IResponse)``) , an adapter needn't be registered
+``zope.interface.implementer(IResponse)``) , an adapter needn't be registered
 for the object; Pyramid will use it directly.
 
 An IResponse adapter for ``webob.Response`` (as opposed to
@@ -812,13 +807,14 @@ performed, enabling you to set up the utility in advance:
 .. code-block:: python
    :linenos:
 
+   from zope.interface import implementer
+
    from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
    from mypackage.interfaces import IMyUtility
 
+   @implementer(IMyUtility)
    class UtilityImplementation:
-
-       implements(IMyUtility)
 
        def __init__(self):
           self.registrations = {}

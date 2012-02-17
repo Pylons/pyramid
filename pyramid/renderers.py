@@ -390,7 +390,8 @@ class RendererHelper(object):
                   'renderer_name':self.name, # b/c
                   'renderer_info':self,
                   'context':context,
-                  'request':request
+                  'request':request,
+                  'req':request,
                   }
         return self.render_to_response(response, system, request=request)
 
@@ -403,6 +404,7 @@ class RendererHelper(object):
                 'renderer_info':self,
                 'context':getattr(request, 'context', None),
                 'request':request,
+                'req':request,
                 }
 
         system_values = BeforeRender(system_values, value)

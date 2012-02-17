@@ -183,6 +183,8 @@
 
    .. automethod:: resource_url
 
+   .. automethod:: resource_path
+
    .. attribute::  response_*
 
       In Pyramid 1.0, you could set attributes on a

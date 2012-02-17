@@ -94,6 +94,8 @@
 
      .. automethod:: set_notfound_view
 
+     .. automethod:: add_traverser
+
      .. automethod:: set_renderer_globals_factory(factory)
 
      .. attribute:: introspectable

@@ -1,5 +1,6 @@
 import binascii
 import os
+import sys
 
 from pyramid.compat import native_
 
@@ -52,10 +53,14 @@ class AlchemyProjectTemplate(PyramidTemplate):
     summary = 'Pyramid SQLAlchemy project using url dispatch'
     def post(self, command, output_dir, vars): # pragma: no cover
         val = PyramidTemplate.post(self, command, output_dir, vars)
+        vars = vars.copy()
+        vars['output_dir'] = output_dir
+        vars['pybin'] = os.path.join(sys.exec_prefix, 'bin')
         self.out('')
         self.out('Please run the "populate_%(project)s" script to set up the '
-                 'SQL database after installing (but before starting) the '
-                 'application (e.g. '
-                 '"$myvirtualenv/bin/populate_%(project)s development.ini".)'
+                 'SQL database after\ninstalling (but before starting) the '
+                 'application.\n\n For example:\n\ncd %(output_dir)s\n'
+                 '%(pybin)s/python setup.py develop\n'
+                 '%(pybin)s/populate_%(project)s development.ini'
                  % vars)
         return val

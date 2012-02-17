@@ -54,7 +54,8 @@ to make some changes:
 
 - We've replaced the ``paster`` command with Pyramid-specific analogues.
 
-- We've made the default WSGI server the ``waitress`` server.
+- We've made the default WSGI server used by Pyramid scaffolding the
+  :term:`waitress` server.
 
 Previously (in Pyramid 1.0, 1.1 and 1.2), you created a Pyramid application
 using ``paster create``, like so::
@@ -259,6 +260,74 @@ Minor Feature Additions
   http://readthedocs.org/docs/venusian/en/latest/#ignore-scan-argument for
   more information about how to use the ``ignore`` argument to ``scan``.
 
+- Add :meth:`pyramid.config.Configurator.add_traverser` API method.  See
+  :ref:`changing_the_traverser` for more information.  This is not a new
+  feature, it just provides an API for adding a traverser without needing to
+  use the ZCA API.
+
+- Add :meth:`pyramid.config.Configurator.add_resource_url_adapter` API
+  method.  See :ref:`changing_resource_url` for more information.  This is
+  not a new feature, it just provides an API for adding a resource url
+  adapter without needing to use the ZCA API.
+
+- The :meth:`pyramid.config.Configurator.scan` method can now be passed an
+  ``ignore`` argument, which can be a string, a callable, or a list
+  consisting of strings and/or callables.  This feature allows submodules,
+  subpackages, and global objects from being scanned.  See
+  http://readthedocs.org/docs/venusian/en/latest/#ignore-scan-argument for
+  more information about how to use the ``ignore`` argument to ``scan``.
+
+- Better error messages when a view callable returns a value that cannot be
+  converted to a response (for example, when a view callable returns a
+  dictionary without a renderer defined, or doesn't return any value at all).
+  The error message now contains information about the view callable itself
+  as well as the result of calling it.
+
+- Better error message when a .pyc-only module is ``config.include`` -ed.
+  This is not permitted due to error reporting requirements, and a better
+  error message is shown when it is attempted.  Previously it would fail with
+  something like "AttributeError: 'NoneType' object has no attribute
+  'rfind'".
+
+- The system value ``req`` is now supplied to renderers as an alias for
+  ``request``.  This means that you can now, for example, in a template, do
+  ``req.route_url(...)`` instead of ``request.route_url(...)``.  This is
+  purely a change to reduce the amount of typing required to use request
+  methods and attributes from within templates.  The value ``request`` is
+  still available too, this is just an alternative.
+
+- A new interface was added: :class:`pyramid.interfaces.IResourceURL`.  An
+  adapter implementing its interface can be used to override resource URL
+  generation when :meth:`pyramid.request.Request.resource_url` is called.
+  This interface replaces the now-deprecated
+  ``pyramid.interfaces.IContextURL`` interface.
+
+- The dictionary passed to a resource's ``__resource_url__`` method (see
+  :ref:`overriding_resource_url_generation`) now contains an ``app_url`` key,
+  representing the application URL generated during
+  :meth:`pyramid.request.Request.resource_url`.  It represents a potentially
+  customized URL prefix, containing potentially custom scheme, host and port
+  information passed by the user to ``request.resource_url``.  It should be
+  used instead of ``request.application_url`` where necessary.
+
+- The :meth:`pyramid.request.Request.resource_url` API now accepts these
+  arguments: ``app_url``, ``scheme``, ``host``, and ``port``.  The app_url
+  argument can be used to replace the URL prefix wholesale during url
+  generation.  The ``scheme``, ``host``, and ``port`` arguments can be used
+  to replace the respective default values of ``request.application_url``
+  partially.
+
+- A new API named :meth:`pyramid.request.Request.resource_path` now exists.
+  It works like :meth:`pyramid.request.Request.resource_url`` but produces a
+  relative URL rather than an absolute one.
+
+- The :meth:`pyramid.request.Request.route_url` API now accepts these
+  arguments: ``_app_url``, ``_scheme``, ``_host``, and ``_port``.  The
+  ``_app_url`` argument can be used to replace the URL prefix wholesale
+  during url generation.  The ``_scheme``, ``_host``, and ``_port`` arguments
+  can be used to replace the respective default values of
+  ``request.application_url`` partially.
+
 Backwards Incompatibilities
 ---------------------------
 
@@ -295,9 +364,10 @@ Backwards Incompatibilities
   and upgrade Pyramid itself "in-place"; it may simply break instead
   (particularly if you use ZCML's ``includeOverrides`` directive).
 
-- String values passed to ``route_url`` or ``route_path`` that are meant to
-  replace "remainder" matches will now be URL-quoted except for embedded
-  slashes. For example::
+- String values passed to :meth:`Pyramid.request.Request.route_url` or
+  :meth:`Pyramid.request.Request.route_path` that are meant to replace
+  "remainder" matches will now be URL-quoted except for embedded slashes. For
+  example::
 
      config.add_route('remain', '/foo*remainder')
      request.route_path('remain', remainder='abc / def')
@@ -316,8 +386,8 @@ Backwards Incompatibilities
   ``route_path`` or ``route_url`` to do this now.
 
 - If you pass a bytestring that contains non-ASCII characters to
-  ``add_route`` as a pattern, it will now fail at startup time.  Use Unicode
-  instead.
+  :meth:`pyramid.config.Configurator.add_route` as a pattern, it will now
+  fail at startup time.  Use Unicode instead.
 
 - The ``path_info`` route and view predicates now match against
   ``request.upath_info`` (Unicode) rather than ``request.path_info``
@@ -327,6 +397,22 @@ Backwards Incompatibilities
 - The ``match_param`` view predicate no longer accepts a dict. This will have
   no negative affect because the implementation was broken for dict-based
   arguments.
+
+- The ``pyramid.interfaces.IContextURL`` interface has been deprecated.
+  People have been instructed to use this to register a resource url adapter
+  in the "Hooks" chapter to use to influence
+  :meth:`pyramid.request.Request.resource_url` URL generation for resources
+  found via custom traversers since Pyramid 1.0.
+
+  The interface still exists and registering an adapter using it as
+  documented in older versions still works, but this interface will be
+  removed from the software after a few major Pyramid releases.  You should
+  replace it with an equivalent :class:`pyramid.interfaces.IResourceURL`
+  adapter, registered using the new
+  :meth:`pyramid.config.Configurator.add_resource_url_adapter` API.  A
+  deprecation warning is now emitted when a
+  ``pyramid.interfaces.IContextURL`` adapter is found when
+  :meth:`pyramid.request.Request.resource_url` is called.
 
 Documentation Enhancements
 --------------------------
@@ -374,6 +460,8 @@ Dependency Changes
 
 - Pyramid no longer depends on the ``Paste`` or ``PasteScript`` packages.
   These packages are not Python 3 compatible.
+
+- Depend on ``venusian`` >= 1.0a3 to provide scan ``ignore`` support.
 
 Scaffolding Changes
 -------------------

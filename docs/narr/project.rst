@@ -322,9 +322,26 @@ image again.
 
 .. image:: project-debug.png
 
+If you don't see the debug toolbar image on the right hand top of the page,
+it means you're browsing from a system that does not have debugging access.
+By default, for security reasons, only a browser originating from
+``localhost`` (``127.0.0.1``) can see the debug toolbar.  To allow your
+browser on a remote system to access the server, add the a line within the
+``[app:main]`` section of the ``development.ini`` file in the form
+``debugtoolbar.hosts = X.X.X.X``.  For example, if your Pyramid application
+is running on a remote system, and you're browsing from a host with the IP
+address ``192.168.1.1``, you'd add something like this to enable the toolbar
+when your system contacts Pyramid:
+
+.. code-block:: ini
+
+   [app:main]
+   # .. other settings ...
+   debugtoolbar.hosts = 192.168.1.1
+
 For more information about what the debug toolbar allows you to do, see `the
 documentation for pyramid_debugtoolbar
-<http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/dev/>`_.
+<http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest/>`_.
 
 The debug toolbar will not be shown (and all debugging will be turned off)
 when you use the ``production.ini`` file instead of the ``development.ini``

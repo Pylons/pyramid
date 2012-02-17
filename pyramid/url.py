@@ -1,31 +1,86 @@
 """ Utility functions for dealing with URLs in pyramid """
 
 import os
+import warnings
 
 from repoze.lru import lru_cache
 
 from pyramid.interfaces import (
-    IContextURL,
+    IResourceURL,
     IRoutesMapper,
     IStaticURLInfo,
     )
 
 from pyramid.compat import (
     native_,
+    bytes_,
     text_type,
+    url_quote,
     )
 from pyramid.encode import urlencode
 from pyramid.path import caller_package
 from pyramid.threadlocal import get_current_registry
 
 from pyramid.traversal import (
-    TraversalContextURL,
+    ResourceURL,
     quote_path_segment,
     )
+
+PATH_SAFE = '/:@&+$,' # from webob
 
 class URLMethodsMixin(object):
     """ Request methods mixin for BaseRequest having to do with URL
     generation """
+
+    def partial_application_url(self, scheme=None, host=None, port=None):
+        """
+        Construct the URL defined by request.application_url, replacing any
+        of the default scheme, host, or port portions with user-supplied
+        variants.
+
+        If ``scheme`` is passed as ``https``, and the ``port`` is *not*
+        passed, the ``port`` value is assumed to ``443``.  Likewise, if
+        ``scheme`` is passed as ``http`` and ``port`` is not passed, the
+        ``port`` value is assumed to be ``80``.
+        """
+        e = self.environ
+        if scheme is None:
+            scheme = e['wsgi.url_scheme']
+        else:
+            if scheme == 'https':
+                if port is None:
+                    port = '443'
+            if scheme == 'http':
+                if port is None:
+                    port = '80'
+        url = scheme + '://'
+        if port is not None:
+            port = str(port)
+        if host is None:
+            host = e.get('HTTP_HOST')
+        if host is None:
+            host = e['SERVER_NAME']
+        if port is None:
+            if ':' in host:
+                host, port = host.split(':', 1)
+            else:
+                port = e['SERVER_PORT']
+        else:
+            if ':' in host:
+                host, _ = host.split(':', 1)
+        if scheme == 'https':
+            if port == '443':
+                port = None
+        elif scheme == 'http':
+            if port == '80':
+                port = None
+        url += host
+        if port:
+            url += ':%s' % port
+
+        url_encoding = getattr(self, 'url_encoding', 'utf-8') # webob 1.2b3+
+        bscript_name = bytes_(self.script_name, url_encoding)
+        return url + url_quote(bscript_name, PATH_SAFE)
 
     def route_url(self, route_name, *elements, **kw):
         """Generates a fully qualified URL for a named :app:`Pyramid`
@@ -105,6 +160,20 @@ class URLMethodsMixin(object):
         element will always follow the query element,
         e.g. ``http://example.com?foo=1#bar``.
 
+        If any of the keyword arguments ``_scheme``, ``_host``, or ``_port``
+        is passed and is non-``None``, the provided value will replace the
+        named portion in the generated URL.  For example, if you pass
+        ``_host='foo.com'``, and the URL that would have been generated
+        without the host replacement is ``http://example.com/a``, the result
+        will be ``https://foo.com/a``.
+        
+        Note that if ``_scheme`` is passed as ``https``, and ``_port`` is not
+        passed, the ``_port`` value is assumed to have been passed as
+        ``443``.  Likewise, if ``_scheme`` is passed as ``http`` and
+        ``_port`` is not passed, the ``_port`` value is assumed to have been
+        passed as ``80``. To avoid this behavior, always explicitly pass
+        ``_port`` whenever you pass ``_scheme``.
+
         If a keyword ``_app_url`` is present, it will be used as the
         protocol/hostname/port/leading path prefix of the generated URL.
         For example, using an ``_app_url`` of
@@ -115,6 +184,10 @@ class URLMethodsMixin(object):
         ``_app_url`` is not specified, the result of
         ``request.application_url`` will be used as the prefix (the
         default).
+
+        If both ``_app_url`` and any of ``_scheme``, ``_host``, or ``_port``
+        are passed, ``_app_url`` takes precedence and any values passed for
+        ``_scheme``, ``_host``, and ``_port`` will be ignored.
 
         This function raises a :exc:`KeyError` if the URL cannot be
         generated due to missing replacement names.  Extra replacement
@@ -140,6 +213,9 @@ class URLMethodsMixin(object):
         anchor = ''
         qs = ''
         app_url = None
+        host = None
+        scheme = None
+        port = None
 
         if '_query' in kw:
             qs = '?' + urlencode(kw.pop('_query'), doseq=True)
@@ -152,6 +228,21 @@ class URLMethodsMixin(object):
         if '_app_url' in kw:
             app_url = kw.pop('_app_url')
 
+        if '_host' in kw:
+            host = kw.pop('_host')
+
+        if '_scheme' in kw:
+            scheme = kw.pop('_scheme')
+
+        if '_port' in kw:
+            port = kw.pop('_port')
+
+        if app_url is None:
+            if (scheme is not None or host is not None or port is not None):
+                app_url = self.partial_application_url(scheme, host, port)
+            else:
+                app_url = self.application_url
+
         path = route.generate(kw) # raises KeyError if generate fails
 
         if elements:
@@ -160,12 +251,6 @@ class URLMethodsMixin(object):
                 suffix = '/' + suffix
         else:
             suffix = ''
-
-        if app_url is None:
-            # we only defer lookup of application_url until here because
-            # it's somewhat expensive; we won't need to do it if we've
-            # been passed _app_url
-            app_url = self.application_url
 
         return app_url + path + suffix + qs + anchor
 
@@ -206,7 +291,7 @@ class URLMethodsMixin(object):
         :term:`resource` object based on the ``wsgi.url_scheme``,
         ``HTTP_HOST`` or ``SERVER_NAME`` in the request, plus any
         ``SCRIPT_NAME``.  The overall result of this method is always a
-        UTF-8 encoded string (never Unicode).
+        UTF-8 encoded string.
 
         Examples::
 
@@ -225,6 +310,10 @@ class URLMethodsMixin(object):
             request.resource_url(resource, 'a.html', anchor='abc') =>
 
                                        http://example.com/a.html#abc
+
+            request.resource_url(resource, app_url='') =>
+
+                                       /
 
         Any positional arguments passed in as ``elements`` must be strings
         Unicode objects, or integer objects.  These will be joined by slashes
@@ -275,6 +364,38 @@ class URLMethodsMixin(object):
         will always follow the query element,
         e.g. ``http://example.com?foo=1#bar``.
 
+        If any of the keyword arguments ``scheme``, ``host``, or ``port`` is
+        passed and is non-``None``, the provided value will replace the named
+        portion in the generated URL.  For example, if you pass
+        ``host='foo.com'``, and the URL that would have been generated
+        without the host replacement is ``http://example.com/a``, the result
+        will be ``https://foo.com/a``.
+        
+        If ``scheme`` is passed as ``https``, and an explicit ``port`` is not
+        passed, the ``port`` value is assumed to have been passed as ``443``.
+        Likewise, if ``scheme`` is passed as ``http`` and ``port`` is not
+        passed, the ``port`` value is assumed to have been passed as
+        ``80``. To avoid this behavior, always explicitly pass ``port``
+        whenever you pass ``scheme``.
+
+        If a keyword argument ``app_url`` is passed and is not ``None``, it
+        should be a string that will be used as the port/hostname/initial
+        path portion of the generated URL instead of the default request
+        application URL.  For example, if ``app_url='http://foo'``, then the
+        resulting url of a resource that has a path of ``/baz/bar`` will be
+        ``http://foo/baz/bar``.  If you want to generate completely relative
+        URLs with no leading scheme, host, port, or initial path, you can
+        pass ``app_url=''`.  Passing ``app_url=''` when the resource path is
+        ``/baz/bar`` will return ``/baz/bar``.
+
+        .. note::
+
+           ``app_url`` is new as of Pyramid 1.3.
+
+        If ``app_url`` is passed and any of ``scheme``, ``port``, or ``host``
+        are also passed, ``app_url`` will take precedence and the values
+        passed for ``scheme``, ``host``, and/or ``port`` will be ignored.
+
         If the ``resource`` passed in has a ``__resource_url__`` method, it
         will be used to generate the URL (scheme, host, port, path) that for
         the base resource which is operated upon by this function.  See also
@@ -305,10 +426,69 @@ class URLMethodsMixin(object):
         except AttributeError:
             reg = get_current_registry() # b/c
 
-        context_url = reg.queryMultiAdapter((resource, self), IContextURL)
-        if context_url is None:
-            context_url = TraversalContextURL(resource, self)
-        resource_url = context_url()
+        url_adapter = reg.queryMultiAdapter((resource, self), IResourceURL)
+        if url_adapter is None:
+            url_adapter = ResourceURL(resource, self)
+
+        virtual_path = getattr(url_adapter, 'virtual_path', None)
+
+        if virtual_path is None:
+            # old-style IContextURL adapter (Pyramid 1.2 and previous)
+            warnings.warn(
+                'Pyramid is using an IContextURL adapter to generate a '
+                'resource URL; any "app_url", "host", "port", or "scheme" '
+                'arguments passed to resource_url are being ignored.  To '
+                'avoid this behavior, as of Pyramid 1.3, register an '
+                'IResourceURL adapter instead of an IContextURL '
+                'adapter for the resource type(s).  IContextURL adapters '
+                'will be ignored in a later major release of Pyramid.',
+                DeprecationWarning,
+                2)
+
+            resource_url = url_adapter()
+
+        else:
+            # newer-style IResourceURL adapter (Pyramid 1.3 and after)
+            app_url = None
+            scheme = None
+            host = None
+            port = None
+
+            if 'app_url' in kw:
+                app_url = kw['app_url']
+
+            if 'scheme' in kw:
+                scheme = kw['scheme']
+
+            if 'host' in kw:
+                host = kw['host']
+
+            if 'port' in kw:
+                port = kw['port']
+
+            if app_url is None:
+                if scheme or host or port:
+                    app_url = self.partial_application_url(scheme, host, port)
+                else:
+                    app_url = self.application_url
+
+            resource_url = None
+            local_url = getattr(resource, '__resource_url__', None)
+
+            if local_url is not None:
+                # the resource handles its own url generation
+                d = dict(
+                    virtual_path = virtual_path,
+                    physical_path = url_adapter.physical_path,
+                    app_url = app_url,
+                    )
+                # allow __resource_url__ to punt by returning None
+                resource_url = local_url(self, d)
+
+            if resource_url is None:
+                # the resource did not handle its own url generation or the
+                # __resource_url__ function returned None
+                resource_url = app_url + virtual_path
 
         qs = ''
         anchor = ''
@@ -330,6 +510,31 @@ class URLMethodsMixin(object):
         return resource_url + suffix + qs + anchor
 
     model_url = resource_url # b/w compat forever
+
+    def resource_path(self, resource, *elements, **kw):
+        """
+        Generates a path (aka a 'relative URL', a URL minus the host, scheme,
+        and port) for a :term:`resource`.
+
+        This function accepts the same argument as
+        :meth:`pyramid.request.Request.resource_url` and performs the same
+        duty.  It just omits the host, port, and scheme information in the
+        return value; only the script_name, path, query parameters, and
+        anchor data are present in the returned string.
+
+        .. note::
+
+           Calling ``request.resource_path(resource)`` is the same as calling
+           ``request.resource_path(resource, app_url=request.script_name)``.
+           :meth:`pyramid.request.Request.resource_path` is, in fact,
+           implemented in terms of
+           :meth:`pyramid.request.Request.resource_url` in just this way. As
+           a result, any ``app_url`` passed within the ``**kw`` values to
+           ``route_path`` will be ignored.  ``scheme``, ``host``, and
+           ``port`` are also ignored.
+        """
+        kw['app_url'] = self.script_name
+        return self.resource_url(resource, *elements, **kw)
 
     def static_url(self, path, **kw):
         """

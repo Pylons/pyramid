@@ -484,7 +484,8 @@ class TestRendererHelper(unittest.TestCase):
                            'renderer_name': 'loo.foo',
                            'request': request,
                            'context': 'context',
-                           'view': 'view'}
+                           'view': 'view',
+                           'req': request,}
                          )
 
     def test_render_explicit_registry(self):
@@ -517,7 +518,8 @@ class TestRendererHelper(unittest.TestCase):
                   'context':context,
                   'renderer_name':'loo.foo',
                   'view':None,
-                  'renderer_info':helper
+                  'renderer_info':helper,
+                  'req':request,
                   }
         self.assertEqual(result[0], 'values')
         self.assertEqual(result[1], system)
