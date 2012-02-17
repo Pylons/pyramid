@@ -260,16 +260,21 @@ Minor Feature Additions
   http://readthedocs.org/docs/venusian/en/latest/#ignore-scan-argument for
   more information about how to use the ``ignore`` argument to ``scan``.
 
-- Add :meth:`pyramid.config.Configurator.set_traverser` API method.  See
+- Add :meth:`pyramid.config.Configurator.add_traverser` API method.  See
   :ref:`changing_the_traverser` for more information.  This is not a new
   feature, it just provides an API for adding a traverser without needing to
   use the ZCA API.
+
+- Add :meth:`pyramid.config.Configurator.add_resource_url_adapter` API
+  method.  See :ref:`changing_resource_url` for more information.  This is
+  not a new feature, it just provides an API for adding a resource url
+  adapter without needing to use the ZCA API.
 
 - The :meth:`pyramid.config.Configurator.scan` method can now be passed an
   ``ignore`` argument, which can be a string, a callable, or a list
   consisting of strings and/or callables.  This feature allows submodules,
   subpackages, and global objects from being scanned.  See
-  http://readthedocs.org/docs/venusian/en/latest/#ignore-scan-argument for
+   http://readthedocs.org/docs/venusian/en/latest/#ignore-scan-argument for
   more information about how to use the ``ignore`` argument to ``scan``.
 
 - Better error messages when a view callable returns a value that cannot be
@@ -290,6 +295,38 @@ Minor Feature Additions
   purely a change to reduce the amount of typing required to use request
   methods and attributes from within templates.  The value ``request`` is
   still available too, this is just an alternative.
+
+- A new interface was added: :class:`pyramid.interfaces.IResourceURL`.  An
+  adapter implementing its interface can be used to override resource URL
+  generation when :meth:`pyramid.request.Request.resource_url` is called.
+  This interface replaces the now-deprecated
+  ``pyramid.interfaces.IContextURL`` interface.
+
+- The dictionary passed to a resource's ``__resource_url__`` method (see
+  :ref:`overriding_resource_url_generation`) now contains an ``app_url`` key,
+  representing the application URL generated during
+  :meth:`pyramid.request.Request.resource_url`.  It represents a potentially
+  customized URL prefix, containing potentially custom scheme, host and port
+  information passed by the user to ``request.resource_url``.  It should be
+  used instead of ``request.application_url`` where necessary.
+
+- The :meth:`pyramid.request.Request.resource_url` API now accepts these
+  arguments: ``app_url``, ``scheme``, ``host``, and ``port``.  The app_url
+  argument can be used to replace the URL prefix wholesale during url
+  generation.  The ``scheme``, ``host``, and ``port`` arguments can be used
+  to replace the respective default values of ``request.application_url``
+  partially.
+
+- A new API named :meth:`pyramid.request.Request.resource_path` now exists.
+  It works like :meth:`pyramid.request.Request.resource_url`` but produces a
+  relative URL rather than an absolute one.
+
+- The :meth:`pyramid.request.Request.route_url` API now accepts these
+  arguments: ``_app_url``, ``_scheme``, ``_host``, and ``_port``.  The
+  ``_app_url`` argument can be used to replace the URL prefix wholesale
+  during url generation.  The ``_scheme``, ``_host``, and ``_port`` arguments
+  can be used to replace the respective default values of
+  ``request.application_url`` partially.
 
 Backwards Incompatibilities
 ---------------------------
@@ -359,6 +396,21 @@ Backwards Incompatibilities
 - The ``match_param`` view predicate no longer accepts a dict. This will have
   no negative affect because the implementation was broken for dict-based
   arguments.
+
+- The ``pyramid.interfaces.IContextURL`` interface has been deprecated.
+  People have been instructed to use this to register a resource url adapter
+  in the "Hooks" chapter to use to influence
+  :meth:`pyramid.request.Request.resource_url` URL generation for resources
+  found via custom traversers since Pyramid 1.0.
+
+  The interface still exists and registering such an adapter still works, but
+  this interface will be removed from the software after a few major Pyramid
+  releases.  You should replace it with an equivalent
+  :class:`pyramid.interfaces.IResourceURL` adapter, registered using the new
+  :meth:`pyramid.config.Configurator.add_resource_url_adapter` API.  A
+  deprecation warning is now emitted when a
+  ``pyramid.interfaces.IContextURL`` adapter is found when
+  :meth:`pyramid.request.Request.resource_url` is called.
 
 Documentation Enhancements
 --------------------------

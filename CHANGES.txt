@@ -23,10 +23,16 @@ Features
   something like "AttributeError: 'NoneType' object has no attribute
   'rfind'".
 
-- Add ``pyramid.config.Configurator.set_traverser`` API method.  See the
+- Add ``pyramid.config.Configurator.add_traverser`` API method.  See the
   Hooks narrative documentation section entitled "Changing the Traverser" for
   more information.  This is not a new feature, it just provides an API for
   adding a traverser without needing to use the ZCA API.
+
+- Add ``pyramid.config.Configurator.add_resource_url_adapter`` API method.
+  See the Hooks narrative documentation section entitled "Changing How
+  pyramid.request.Request.resource_url Generates a URL" for more information.
+  This is not a new feature, it just provides an API for adding a resource
+  url adapter without needing to use the ZCA API.
 
 - The system value ``req`` is now supplied to renderers as an alias for
   ``request``.  This means that you can now, for example, in a template, do
@@ -34,6 +40,52 @@ Features
   purely a change to reduce the amount of typing required to use request
   methods and attributes from within templates.  The value ``request`` is
   still available too, this is just an alternative.
+
+- A new interface was added: ``pyramid.interfaces.IResourceURL``.  An adapter
+  implementing its interface can be used to override resource URL generation
+  when ``request.resource_url`` is called.  This interface replaces the
+  now-deprecated ``pyramid.interfaces.IContextURL`` interface.
+
+- The dictionary passed to a resource's ``__resource_url__`` method (see
+  "Overriding Resource URL Generation" in the "Resources" chapter) now
+  contains an ``app_url`` key, representing the application URL generated
+  during ``request.resource_url``.  It represents a potentially customized
+  URL prefix, containing potentially custom scheme, host and port information
+  passed by the user to ``request.resource_url``.  It should be used instead
+  of ``request.application_url`` where necessary.
+
+- The ``request.resource_url`` API now accepts these arguments: ``app_url``,
+  ``scheme``, ``host``, and ``port``.  The app_url argument can be used to
+  replace the URL prefix wholesale during url generation.  The ``scheme``,
+  ``host``, and ``port`` arguments can be used to replace the respective
+  default values of ``request.application_url`` partially.
+
+- A new API named ``request.resource_path`` now exists.  It works like
+  ``request.resource_url`` but produces a relative URL rather than an
+  absolute one.
+
+- The ``request.route_url`` API now accepts these arguments: ``_app_url``,
+  ``_scheme``, ``_host``, and ``_port``.  The ``_app_url`` argument can be
+  used to replace the URL prefix wholesale during url generation.  The
+  ``_scheme``, ``_host``, and ``_port`` arguments can be used to replace the
+  respective default values of ``request.application_url`` partially.
+
+Backwards Incompatibilities
+---------------------------
+
+- The ``pyramid.interfaces.IContextURL`` interface has been deprecated.
+  People have been instructed to use this to register a resource url adapter
+  in the "Hooks" chapter to use to influence ``request.resource_url`` URL
+  generation for resources found via custom traversers since Pyramid 1.0.
+
+  The interface still exists and registering such an adapter still works, but
+  this interface will be removed from the software after a few major Pyramid
+  releases.  You should replace it with an equivalent
+  ``pyramid.interfaces.IResourceURL`` adapter, registered using the new
+  ``pyramid.config.Configurator.add_resource_url_adapter`` API.  A
+  deprecation warning is now emitted when a
+  ``pyramid.interfaces.IContextURL`` adapter is found when
+  ``request.resource_url`` is called.
 
 Documentation
 -------------

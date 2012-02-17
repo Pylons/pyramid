@@ -731,15 +731,54 @@ class IRoutesMapper(Interface):
         ``match`` key will be the matchdict or ``None`` if no route
         matched.  Static routes will not be considered for matching.  """
 
-class IContextURL(Interface):
+class IResourceURL(Interface):
+    virtual_path = Attribute('The virtual url path of the resource.')
+    physical_path = Attribute('The physical url path of the resource.')
+
+class IContextURL(IResourceURL):
     """ An adapter which deals with URLs related to a context.
+
+    ..warning::
+
+      This interface is deprecated as of Pyramid 1.3 with the introduction of
+      IResourceURL.
     """
+    # this class subclasses IResourceURL because request.resource_url looks
+    # for IResourceURL via queryAdapter.  queryAdapter will find a deprecated
+    # IContextURL registration if no registration for IResourceURL exists.
+    # In reality, however, IContextURL objects were never required to have
+    # the virtual_path or physical_path attributes spelled in IResourceURL.
+    # The inheritance relationship is purely to benefit adapter lookup,
+    # not to imply an inheritance relationship of interface attributes
+    # and methods.
+    #
+    # Mechanics:
+    #
+    # class Fudge(object):
+    #     def __init__(self, one, two):
+    #         print one, two
+    # class Another(object):
+    #     def __init__(self, one, two):
+    #         print one, two
+    # ob = object()
+    # r.registerAdapter(Fudge, (Interface, Interface), IContextURL)
+    # print r.queryMultiAdapter((ob, ob), IResourceURL)
+    # r.registerAdapter(Another, (Interface, Interface), IResourceURL)
+    # print r.queryMultiAdapter((ob, ob), IResourceURL)
+    #
+    # prints
+    #
+    # <object object at 0x7fa678f3e2a0> <object object at 0x7fa678f3e2a0>
+    # <__main__.Fudge object at 0x1cda890>
+    # <object object at 0x7fa678f3e2a0> <object object at 0x7fa678f3e2a0>
+    # <__main__.Another object at 0x1cda850>
+    
     def virtual_root():
         """ Return the virtual root related to a request and the
         current context"""
 
     def __call__():
-        """ Return a URL that points to the context """
+        """ Return a URL that points to the context. """
 
 class IPackageOverrides(Interface):
     """ Utility for pkg_resources overrides """

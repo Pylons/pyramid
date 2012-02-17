@@ -79,3 +79,7 @@ Other Interfaces
 
   .. autointerface:: IAssetDescriptor
      :members:
+
+  .. autointerface:: IResourceURL
+     :members:
+
