@@ -7,8 +7,6 @@ Nice-to-Have
 - Fix renderers chapter to better document system values passed to template
   renderers.
 
-- Add set_resource_url_generator method.
-
 - Put includes in development.ini on separate lines and fix project.rst to
   tell people to comment out only the debugtoolbar include when they want to
   disable.
