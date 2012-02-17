@@ -160,13 +160,18 @@ class URLMethodsMixin(object):
         element will always follow the query element,
         e.g. ``http://example.com?foo=1#bar``.
 
-        If any of ``_scheme``, ``_host``, or ``_port`` is passed and is
-        non-``None``, the provided value will replace the named portion in
-        the generated URL.  If ``_scheme`` is passed as ``https``, and
+        If any of the keyword arguments ``_scheme``, ``_host``, or ``_port``
+        is passed and is non-``None``, the provided value will replace the
+        named portion in the generated URL.  For example, if you pass
+        ``_host='foo.com'``, and the URL that would have been generated
+        without the host replacement is ``http://example.com/a``, the result
+        will be ``https://foo.com/a``.
+        
+        Note that if ``_scheme`` is passed as ``https``, and ``_port`` is not
+        passed, the ``_port`` value is assumed to have been passed as
+        ``443``.  Likewise, if ``_scheme`` is passed as ``http`` and
         ``_port`` is not passed, the ``_port`` value is assumed to have been
-        passed as ``443``.  Likewise, if ``_scheme`` is passed as ``http``
-        and ``_port`` is not passed, the ``_port`` value is assumed to have
-        been passed as ``80``. To avoid this behavior, always explicitly pass
+        passed as ``80``. To avoid this behavior, always explicitly pass
         ``_port`` whenever you pass ``_scheme``.
 
         If a keyword ``_app_url`` is present, it will be used as the
@@ -362,9 +367,9 @@ class URLMethodsMixin(object):
         If any of the keyword arguments ``scheme``, ``host``, or ``port`` is
         passed and is non-``None``, the provided value will replace the named
         portion in the generated URL.  For example, if you pass
-        ``scheme='https'``, and the URL that would be generated without the
-        scheme replacement is ``http://foo.com``, the result will be
-        ``https://foo.com``.
+        ``host='foo.com'``, and the URL that would have been generated
+        without the host replacement is ``http://example.com/a``, the result
+        will be ``https://foo.com/a``.
         
         If ``scheme`` is passed as ``https``, and an explicit ``port`` is not
         passed, the ``port`` value is assumed to have been passed as ``443``.
