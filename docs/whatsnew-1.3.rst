@@ -364,9 +364,10 @@ Backwards Incompatibilities
   and upgrade Pyramid itself "in-place"; it may simply break instead
   (particularly if you use ZCML's ``includeOverrides`` directive).
 
-- String values passed to ``route_url`` or ``route_path`` that are meant to
-  replace "remainder" matches will now be URL-quoted except for embedded
-  slashes. For example::
+- String values passed to :meth:`Pyramid.request.Request.route_url` or
+  :meth:`Pyramid.request.Request.route_path` that are meant to replace
+  "remainder" matches will now be URL-quoted except for embedded slashes. For
+  example::
 
      config.add_route('remain', '/foo*remainder')
      request.route_path('remain', remainder='abc / def')
@@ -385,8 +386,8 @@ Backwards Incompatibilities
   ``route_path`` or ``route_url`` to do this now.
 
 - If you pass a bytestring that contains non-ASCII characters to
-  ``add_route`` as a pattern, it will now fail at startup time.  Use Unicode
-  instead.
+  :meth:`pyramid.config.Configurator.add_route` as a pattern, it will now
+  fail at startup time.  Use Unicode instead.
 
 - The ``path_info`` route and view predicates now match against
   ``request.upath_info`` (Unicode) rather than ``request.path_info``
@@ -403,10 +404,11 @@ Backwards Incompatibilities
   :meth:`pyramid.request.Request.resource_url` URL generation for resources
   found via custom traversers since Pyramid 1.0.
 
-  The interface still exists and registering such an adapter still works, but
-  this interface will be removed from the software after a few major Pyramid
-  releases.  You should replace it with an equivalent
-  :class:`pyramid.interfaces.IResourceURL` adapter, registered using the new
+  The interface still exists and registering an adapter using it as
+  documented in older versions still works, but this interface will be
+  removed from the software after a few major Pyramid releases.  You should
+  replace it with an equivalent :class:`pyramid.interfaces.IResourceURL`
+  adapter, registered using the new
   :meth:`pyramid.config.Configurator.add_resource_url_adapter` API.  A
   deprecation warning is now emitted when a
   ``pyramid.interfaces.IContextURL`` adapter is found when
