@@ -798,7 +798,7 @@ class ResourceURL(object):
         app_url = self.request.application_url # never ends in a slash
         return app_url + self.virtual_path
 
-TraversalContextURL = ResourceURL # bw compat as of 1.3
+TraversalContextURL = ResourceURL # deprecated as of 1.3
 
 deprecated(
     'TraversalContextURL',
@@ -808,7 +808,6 @@ deprecated(
     'a class that implements "pyramid.interfaces.IResourceURL" instead.'
     'See the "What\'s new In Pyramid 1.3" document for a further description.'
     )
-
 
 @lru_cache(1000)
 def _join_path_tuple(tuple):
