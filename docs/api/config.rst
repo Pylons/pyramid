@@ -7,56 +7,27 @@
 
   .. autoclass:: Configurator
 
-     .. attribute:: registry
-
-        The :term:`application registry` which holds the configuration
-        associated with this configurator.
-
-     .. automethod:: begin
-
-     .. automethod:: end
-
-     .. automethod:: hook_zca
-
-     .. automethod:: unhook_zca
-
-     .. automethod:: get_settings
-
-     .. automethod:: commit
-
-     .. automethod:: action
-
-     .. automethod:: include
-
-     .. automethod:: add_directive
-
-     .. automethod:: with_package
-
-     .. automethod:: maybe_dotted
-
-     .. automethod:: absolute_asset_spec
-
-     .. automethod:: setup_registry
-
-     .. automethod:: add_renderer
-
-     .. automethod:: add_response_adapter
-
      .. automethod:: add_route
-
-     .. automethod:: add_static_view(name, path, cache_max_age=3600, permission=NO_PERMISSION_REQUIRED)
-
-     .. automethod:: add_settings
-
-     .. automethod:: add_subscriber
-
-     .. automethod:: add_translation_dirs
 
      .. automethod:: add_view
 
+     .. automethod:: add_static_view(name, path, cache_max_age=3600, permission=NO_PERMISSION_REQUIRED)
+
+     .. automethod:: add_renderer
+
+     .. automethod:: add_subscriber
+
+     .. automethod:: add_response_adapter
+
+     .. automethod:: add_settings
+
+     .. automethod:: add_translation_dirs
+
      .. automethod:: add_tween
 
-     .. automethod:: derive_view
+     .. automethod:: add_traverser
+
+     .. automethod:: add_resource_url_adapter
 
      .. automethod:: make_wsgi_app()
 
@@ -94,9 +65,35 @@
 
      .. automethod:: set_notfound_view
 
-     .. automethod:: add_traverser
-
      .. automethod:: set_renderer_globals_factory(factory)
+
+     .. automethod:: begin
+
+     .. automethod:: end
+
+     .. automethod:: hook_zca
+
+     .. automethod:: unhook_zca
+
+     .. automethod:: get_settings
+
+     .. automethod:: commit
+
+     .. automethod:: action
+
+     .. automethod:: include
+
+     .. automethod:: add_directive
+
+     .. automethod:: with_package
+
+     .. automethod:: maybe_dotted
+
+     .. automethod:: absolute_asset_spec
+
+     .. automethod:: setup_registry
+
+     .. automethod:: derive_view
 
      .. attribute:: introspectable
 
@@ -104,7 +101,9 @@
         :class:`pyramid.registry.Introspectable` class (used during
         directives to provide introspection to actions).
 
-        This attribute is new as of :app:`Pyramid` 1.3.
+        .. note::
+
+           This attribute is new as of :app:`Pyramid` 1.3.
 
      .. attribute:: introspector
 
@@ -114,7 +113,14 @@
         ``introspector`` argument, this attribute will be that value.
         Otherwise, it will be an instance of a default introspector type.
 
-        This attribute is new as of :app:`Pyramid` 1.3.
+        .. note::
+
+           This attribute is new as of :app:`Pyramid` 1.3.
+
+     .. attribute:: registry
+
+        The :term:`application registry` which holds the configuration
+        associated with this configurator.
 
   .. attribute:: global_registries
 
