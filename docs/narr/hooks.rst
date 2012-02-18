@@ -145,10 +145,10 @@ Here's some sample code that implements a minimal forbidden view:
 Changing the Request Factory
 ----------------------------
 
-Whenever :app:`Pyramid` handles a :term:`WSGI` request, it creates a
-:term:`request` object based on the WSGI environment it has been passed.  By
-default, an instance of the :class:`pyramid.request.Request` class is created
-to represent the request object.
+Whenever :app:`Pyramid` handles a request from a :term:`WSGI` server, it
+creates a :term:`request` object based on the WSGI environment it has been
+passed.  By default, an instance of the :class:`pyramid.request.Request`
+class is created to represent the request object.
 
 The class (aka "factory") that :app:`Pyramid` uses to create a request object
 instance can be changed by passing a ``request_factory`` argument to the
@@ -236,11 +236,11 @@ Adding Renderer Globals (Deprecated)
    is documented in :ref:`beforerender_event`.
 
 Whenever :app:`Pyramid` handles a request to perform a rendering (after a
-view with a ``renderer=`` configuration attribute is invoked, or when any
-of the methods beginning with ``render`` within the :mod:`pyramid.renderers`
+view with a ``renderer=`` configuration attribute is invoked, or when any of
+the methods beginning with ``render`` within the :mod:`pyramid.renderers`
 module are called), *renderer globals* can be injected into the *system*
 values sent to the renderer.  By default, no renderer globals are injected,
-and the "bare" system values (such as ``request``, ``context``, and
+and the "bare" system values (such as ``request``, ``context``, ``view``, and
 ``renderer_name``) are the only values present in the system dictionary
 passed to every renderer.
 
@@ -447,7 +447,7 @@ that implements the following interface:
 
 More than one traversal algorithm can be active at the same time.  For
 instance, if your :term:`root factory` returns more than one type of object
-conditionally, you could claim that an alternate traverser adapter is ``for``
+conditionally, you could claim that an alternate traverser adapter is "for"
 only one particular class or interface.  When the root factory returned an
 object that implemented that class or interface, a custom traverser would be
 used.  Otherwise, the default traverser would be used.  For example:
