@@ -27,7 +27,8 @@ class TestURLMethodsMixin(unittest.TestCase):
         return request
 
     def _registerContextURL(self, reg):
-        from pyramid.interfaces import IContextURL
+        with warnings.catch_warnings(record=True):
+            from pyramid.interfaces import IContextURL
         from zope.interface import Interface
         class DummyContextURL(object):
             def __init__(self, context, request):

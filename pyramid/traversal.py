@@ -1,5 +1,7 @@
 import warnings
 
+from zope.deprecation import deprecated
+
 from zope.interface import implementer
 from zope.interface.interfaces import IInterface
 
@@ -795,6 +797,16 @@ class ResourceURL(object):
         return app_url + self.virtual_path
 
 TraversalContextURL = ResourceURL # bw compat as of 1.3
+
+deprecated(
+    'TraversalContextURL',
+    'As of Pyramid 1.3 the, "pyramid.traversal.TraversalContextURL" class is '
+    'scheduled to be removed.   Use the '
+    '"pyramid.config.Configurator.add_resource_url_adapter" method to register'
+    'a class that implements "pyramid.interfaces.IResourceURL" instead.'
+    'See the "What\'s new In Pyramid 1.3" document for a further description.'
+    )
+
 
 @lru_cache(1000)
 def _join_path_tuple(tuple):
