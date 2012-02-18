@@ -786,8 +786,8 @@ deprecated(
     'IContextURL',
     'As of Pyramid 1.3 the, "pyramid.interfaces.IContextURL" interface is '
     'scheduled to be removed.   Use the '
-    '"pyramid.config.Configurator.add_resource_url_adapter" method to register'
-    'a class that implements "pyramid.interfaces.IResourceURL" instead.'
+    '"pyramid.config.Configurator.add_resource_url_adapter" method to register '
+    'a class that implements "pyramid.interfaces.IResourceURL" instead. '
     'See the "What\'s new In Pyramid 1.3" document for a further description.'
     )
 

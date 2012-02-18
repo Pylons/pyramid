@@ -756,9 +756,9 @@ class ResourceURL(object):
         self.virtual_path = virtual_path    # IResourceURL attr
         self.physical_path = physical_path  # IResourceURL attr
 
-        # bw compat
+        # bw compat for IContextURL methods
         self.resource = resource
-        self.context = resource # bw compat alias for IContextURL compat
+        self.context = resource
         self.request = request
 
     # IContextURL method (deprecated in 1.3)
@@ -804,8 +804,8 @@ deprecated(
     'TraversalContextURL',
     'As of Pyramid 1.3 the, "pyramid.traversal.TraversalContextURL" class is '
     'scheduled to be removed.   Use the '
-    '"pyramid.config.Configurator.add_resource_url_adapter" method to register'
-    'a class that implements "pyramid.interfaces.IResourceURL" instead.'
+    '"pyramid.config.Configurator.add_resource_url_adapter" method to register '
+    'a class that implements "pyramid.interfaces.IResourceURL" instead. '
     'See the "What\'s new In Pyramid 1.3" document for a further description.'
     )
 
