@@ -878,6 +878,7 @@ class ResourceURLTests(unittest.TestCase):
         reg.registerAdapter(traverser, (Interface,), ITraverser)
 
     def test_class_conforms_to_IContextURL(self):
+        # bw compat
         from zope.interface.verify import verifyClass
         verifyClass(IContextURL, self._getTargetClass())
 
@@ -975,6 +976,45 @@ class ResourceURLTests(unittest.TestCase):
         result = context_url()
         self.assertEqual(result, 'http://example.com:5432/one/two/')
 
+    def test_call_empty_names_not_ignored(self):
+        bar = DummyContext()
+        empty = DummyContext(bar)
+        root = DummyContext(empty)
+        root.__parent__ = None
+        root.__name__ = None
+        empty.__parent__ = root
+        empty.__name__ = ''
+        bar.__parent__ = empty
+        bar.__name__ = 'bar'
+        request = DummyRequest()
+        context_url = self._makeOne(bar, request)
+        result = context_url()
+        self.assertEqual(result, 'http://example.com:5432//bar/')
+
+    def test_call_local_url_returns_None(self):
+        resource = DummyContext()
+        def resource_url(request, info):
+            self.assertEqual(info['virtual_path'], '/')
+            self.assertEqual(info['physical_path'], '/')
+            return None
+        resource.__resource_url__ = resource_url
+        request = DummyRequest()
+        context_url = self._makeOne(resource, request)
+        result = context_url()
+        self.assertEqual(result, 'http://example.com:5432/')
+        
+    def test_call_local_url_returns_url(self):
+        resource = DummyContext()
+        def resource_url(request, info):
+            self.assertEqual(info['virtual_path'], '/')
+            self.assertEqual(info['physical_path'], '/')
+            return 'abc'
+        resource.__resource_url__ = resource_url
+        request = DummyRequest()
+        context_url = self._makeOne(resource, request)
+        result = context_url()
+        self.assertEqual(result, 'abc')
+
     def test_virtual_root_no_virtual_root_path(self):
         root = DummyContext()
         root.__name__ = None
@@ -1006,45 +1046,6 @@ class ResourceURLTests(unittest.TestCase):
         context_url = self._makeOne(context, request)
         self.assertEqual(context_url.virtual_root(), traversed_to)
         self.assertEqual(context.request.environ['PATH_INFO'], '/one')
-
-    def test_empty_names_not_ignored(self):
-        bar = DummyContext()
-        empty = DummyContext(bar)
-        root = DummyContext(empty)
-        root.__parent__ = None
-        root.__name__ = None
-        empty.__parent__ = root
-        empty.__name__ = ''
-        bar.__parent__ = empty
-        bar.__name__ = 'bar'
-        request = DummyRequest()
-        context_url = self._makeOne(bar, request)
-        result = context_url()
-        self.assertEqual(result, 'http://example.com:5432//bar/')
-
-    def test_local_url_returns_None(self):
-        resource = DummyContext()
-        def resource_url(request, info):
-            self.assertEqual(info['virtual_path'], '/')
-            self.assertEqual(info['physical_path'], '/')
-            return None
-        resource.__resource_url__ = resource_url
-        request = DummyRequest()
-        context_url = self._makeOne(resource, request)
-        result = context_url()
-        self.assertEqual(result, 'http://example.com:5432/')
-        
-    def test_local_url_returns_url(self):
-        resource = DummyContext()
-        def resource_url(request, info):
-            self.assertEqual(info['virtual_path'], '/')
-            self.assertEqual(info['physical_path'], '/')
-            return 'abc'
-        resource.__resource_url__ = resource_url
-        request = DummyRequest()
-        context_url = self._makeOne(resource, request)
-        result = context_url()
-        self.assertEqual(result, 'abc')
 
     def test_IResourceURL_attributes_with_vroot(self):
         from pyramid.interfaces import VH_ROOT_KEY
