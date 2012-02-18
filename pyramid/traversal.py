@@ -753,8 +753,10 @@ class ResourceURL(object):
             if physical_path.startswith(vroot_path):
                 virtual_path = physical_path[len(vroot_path):]
 
-        self.virtual_path = virtual_path
-        self.physical_path = physical_path
+        self.virtual_path = virtual_path    # IResourceURL attr
+        self.physical_path = physical_path  # IResourceURL attr
+
+        # bw compat
         self.resource = resource
         self.context = resource # bw compat alias for IContextURL compat
         self.request = request
