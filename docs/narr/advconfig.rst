@@ -122,9 +122,10 @@ configuration or configuration that results from the execution of a
 Manually Resolving Conflicts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There are a number of ways to manually resolve conflicts: the "right" way, by
-strategically using :meth:`pyramid.config.Configurator.commit`, or by using
-an "autocommitting" configurator.
+There are a number of ways to manually resolve conflicts: by changing
+registrations to not conflict, by strategically using
+:meth:`pyramid.config.Configurator.commit`, or by using an "autocommitting"
+configurator.
 
 The Right Thing
 +++++++++++++++
@@ -294,9 +295,18 @@ These are the methods of the configurator which provide conflict detection:
 :meth:`~pyramid.config.Configurator.add_route`,
 :meth:`~pyramid.config.Configurator.add_renderer`,
 :meth:`~pyramid.config.Configurator.set_request_factory`,
+:meth:`~pyramid.config.Configurator.set_session_factory`,
+:meth:`~pyramid.config.Configurator.set_request_property`,
+:meth:`~pyramid.config.Configurator.set_root_factory`,
+:meth:`~pyramid.config.Configurator.set_view_mapper`,
+:meth:`~pyramid.config.Configurator.set_authentication_policy`,
+:meth:`~pyramid.config.Configurator.set_authorization_policy`,
 :meth:`~pyramid.config.Configurator.set_renderer_globals_factory`,
-:meth:`~pyramid.config.Configurator.set_locale_negotiator` and
-:meth:`~pyramid.config.Configurator.set_default_permission`.
+:meth:`~pyramid.config.Configurator.set_locale_negotiator`,
+:meth:`~pyramid.config.Configurator.set_default_permission`,
+:meth:`~pyramid.config.Configurator.add_traverser`,
+:meth:`~pyramid.config.Configurator.add_resource_url_adapter`,
+and :meth:`~pyramid.config.Configurator.add_response_adapter`.
 
 :meth:`~pyramid.config.Configurator.add_static_view` also indirectly
 provides conflict detection, because it's implemented in terms of the
