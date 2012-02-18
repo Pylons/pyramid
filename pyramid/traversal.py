@@ -9,11 +9,14 @@ from repoze.lru import lru_cache
 
 from pyramid.interfaces import (
     IResourceURL,
-    IContextURL,
     IRequestFactory,
     ITraverser,
     VH_ROOT_KEY,
     )
+
+with warnings.catch_warnings():
+    warnings.filterwarnings('ignore')
+    from pyramid.interfaces import IContextURL
 
 from pyramid.compat import (
     PY3,
