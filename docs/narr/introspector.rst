@@ -540,9 +540,29 @@ introspectables in categories not described here.
     The (resolved) interface or class object that represents the return value
     of a root factory that this traverser will be used for.
 
-  ``factory``
+  ``adapter``
 
     The (resolved) traverser class.
+
+``resource url adapters``
+
+  Each introspectable in the ``resource url adapters`` category represents a
+  call to :meth:`pyramid.config.Configurator.add_resource_url_adapter`; each
+  will have the following data.
+
+  ``adapter``
+
+    The (resolved) resource URL adapter class.
+
+  ``resource_iface``
+
+    The (resolved) interface or class object that represents the resource
+    interface that this url adapter is registered for.
+
+  ``request_iface``
+
+    The (resolved) interface or class object that represents the request
+    interface that this url adapter is registered for.
 
 Introspection in the Toolbar
 ----------------------------
