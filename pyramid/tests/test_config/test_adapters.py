@@ -160,7 +160,6 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         config.add_resource_url_adapter(
             'pyramid.tests.test_config.test_adapters.DummyResourceURL',
             'pyramid.tests.test_config.test_adapters.DummyIface',
-            'pyramid.tests.test_config.test_adapters.DummyIface',
             )
         iface = DummyIface()
         adapter = config.registry.getMultiAdapter((iface, iface), 
@@ -169,7 +168,7 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(adapter.resource, iface)
         self.assertEqual(adapter.request, iface)
 
-    def test_add_resource_url_default_interfaces_mean_Interface(self):
+    def test_add_resource_url_default_resource_iface_means_Interface(self):
         from pyramid.interfaces import IResourceURL
         config = self._makeOne(autocommit=True)
         config.add_resource_url_adapter(DummyResourceURL)
@@ -180,12 +179,11 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(adapter.resource, iface)
         self.assertEqual(adapter.request, iface)
 
-    def test_add_resource_url_nodefault_interfaces(self):
+    def test_add_resource_url_nodefault_resource_iface(self):
         from zope.interface import Interface
         from pyramid.interfaces import IResourceURL
         config = self._makeOne(autocommit=True)
-        config.add_resource_url_adapter(DummyResourceURL, DummyIface, 
-                                        DummyIface)
+        config.add_resource_url_adapter(DummyResourceURL, DummyIface)
         iface = DummyIface()
         adapter = config.registry.getMultiAdapter((iface, iface), 
                                                     IResourceURL)
@@ -208,18 +206,15 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         intr = intrs[0]
         self.assertEqual(intr.type_name, 'resource url adapter')
         self.assertEqual(intr.discriminator, 
-                         ('resource url adapter', DummyIface, None))
+                         ('resource url adapter', DummyIface))
         self.assertEqual(intr.category_name, 'resource url adapters')
         self.assertEqual(
             intr.title,
             "resource url adapter for resource iface "
-            "<class 'pyramid.tests.test_config.test_adapters.DummyIface'>, "
-            "request_iface None"
+            "<class 'pyramid.tests.test_config.test_adapters.DummyIface'>"
             )
         self.assertEqual(intr['adapter'], DummyResourceURL)
         self.assertEqual(intr['resource_iface'], DummyIface)
-        self.assertEqual(intr['request_iface'], None)
-        
 
 class DummyTraverser(object):
     def __init__(self, root):
