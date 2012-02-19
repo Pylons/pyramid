@@ -150,8 +150,7 @@ class AdaptersConfiguratorMixin(object):
         self.action(discriminator, register, introspectables=(intr,))
 
     @action_method
-    def add_resource_url_adapter(self, adapter, resource_iface=None, 
-                                 request_iface=None):
+    def add_resource_url_adapter(self, adapter, resource_iface=None):
         """
         When you add a traverser as described in
         :ref:`changing_the_traverser`, it's convenient to continue to use the
@@ -175,13 +174,7 @@ class AdaptersConfiguratorMixin(object):
         the resource should possess for this url adapter to be used when
         :meth:`pyramid.request.Request.resource_url` looks up a resource url
         adapter.  If ``resource_iface`` is not passed, or it is passed as
-        ``None``, the adapter will be used for every type of resource.
-
-        The ``request_iface`` argument represents a class or interface that
-        the request should possess for this url adapter to be used when
-        :meth:`pyramid.request.Request.resource_url` looks up a resource url
-        adapter.  If ``request_iface`` is not epassed, or it is passed as
-        ``None``, the adapter will be used for every type of request.
+        ``None``, the url adapter will be used for every type of resource.
 
         See :ref:`changing_resource_url` for more information.
 
@@ -191,29 +184,23 @@ class AdaptersConfiguratorMixin(object):
         """
         adapter = self.maybe_dotted(adapter)
         resource_iface = self.maybe_dotted(resource_iface)
-        request_iface = self.maybe_dotted(request_iface)
-        def register(resource_iface=resource_iface,
-                     request_iface=request_iface):
+        def register(resource_iface=resource_iface):
             if resource_iface is None:
                 resource_iface = Interface
-            if request_iface is None:
-                request_iface = Interface
             self.registry.registerAdapter(
                 adapter, 
-                (resource_iface, request_iface),
+                (resource_iface, Interface),
                 IResourceURL,
                 )
-        discriminator = ('resource url adapter', resource_iface, request_iface)
+        discriminator = ('resource url adapter', resource_iface)
         intr = self.introspectable(
             'resource url adapters', 
             discriminator,
-            'resource url adapter for resource iface %r, request_iface %r' % (
-                resource_iface, request_iface),
+            'resource url adapter for resource iface %r' % resource_iface,
             'resource url adapter',
             )
         intr['adapter'] = adapter
         intr['resource_iface'] = resource_iface
-        intr['request_iface'] = request_iface
         self.action(discriminator, register, introspectables=(intr,))
 
         
