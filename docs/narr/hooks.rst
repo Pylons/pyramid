@@ -495,7 +495,7 @@ For example:
    from myapp.traversal import ResourceURLAdapter
    from myapp.resources import MyRoot
 
-   config.add_resource_url_adapter(ResourceURLAdapter, resource_iface=MyRoot)
+   config.add_resource_url_adapter(ResourceURLAdapter, MyRoot)
 
 In the above example, the ``myapp.traversal.ResourceURLAdapter`` class will
 be used to provide services to :meth:`~pyramid.request.Request.resource_url`
