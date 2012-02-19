@@ -4,12 +4,21 @@ Pyramid TODOs
 Nice-to-Have
 ------------
 
+- Create a "mako_renderer_factory_factory" that provides searches in settings
+  for "mako."-prefixed keys but allows other prefixes to be used to create
+  different factories that don't use the global mako settings.  This would be
+  useful for the debug toolbar, which can currently be sabotaged by someone
+  using custom mako configuration settings.
+
+- Add docs about upgrading between Pyramid versions (e.g. how to see
+  deprecation warnings).
+
 - Fix renderers chapter to better document system values passed to template
   renderers.
 
-- Put includes in development.ini on separate lines and fix project.rst to
-  tell people to comment out only the debugtoolbar include when they want to
-  disable.
+- Put includes in development.ini within scaffolding and tutorials on
+  separate lines and fix project.rst to tell people to comment out only the
+  debugtoolbar include when they want to disable.
 
 - Modify view mapper narrative docs to not use pyramid_handlers.
 
@@ -20,23 +29,25 @@ Nice-to-Have
 
 - Introspection:
 
-  * ``default root factory`` category?
+  * ``default root factory`` category (prevent folks from needing to searh
+    "root factories" category)?
 
-  * ``default view mapper`` category?
+  * ``default view mapper`` category (prevent folks from needing to search
+    "view mappers" category)?
 
   * get rid of "tweens" category (can't sort properly?)
 
-  * implement ptweens and proutes based on introspection instead of current
-    state of affairs.
-
-  * introspection hiding for directives?
+  * Introspection hiding for directives for purposes of omitting toolbar
+    registrations.  Maybe toolbar can just use a null introspector?
 
 - Fix deployment recipes in cookbook (discourage proxying without changing
   server).
 
 - Try "with transaction.manager" in an exception view with SQLA (preempt
   homina homina response about how to write "to the database" from within in
-  an exception view).
+  an exception view).  Note: tried this and couldn't formulate the right
+  situation where the database could not be written to within an exception
+  view (but didn't try exhaustively).
 
 - Add narrative docs for wsgiapp and wsgiapp2.
 
@@ -44,7 +55,8 @@ Nice-to-Have
 
 - Basic WSGI documentation (pipeline / app / server).
 
-- Change docs about creating a venusian decorator to not use ZCA.
+- Change docs about creating a venusian decorator to not use ZCA (use
+  configurator methods instead).
 
 - Try to better explain the relationship between a renderer and a template in
   the templates chapter and elsewhere.  Scan the documentation for reference
@@ -112,6 +124,8 @@ Future
   in 1.2).
 
 - 1.5: Remove ``pyramid.requests.DeprecatedRequestMethodsMixin``.
+
+- 1.6: Remove IContextURL and TraversalContextURL.
 
 Probably Bad Ideas
 ------------------
