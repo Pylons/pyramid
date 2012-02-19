@@ -105,6 +105,15 @@ Dependencies
 
 - Depend on ``venusian`` >= 1.0a3 to provide scan ``ignore`` support.
 
+Internal
+--------
+
+- Create a "MakoRendererFactoryHelper" that provides customizable settings
+  key prefixes.  Allows settings prefixes other than "mako." to be used to
+  create different factories that don't use the global mako settings.  This
+  will be useful for the debug toolbar, which can currently be sabotaged by
+  someone using custom mako configuration settings.
+
 1.3a7 (2012-02-07)
 ==================
 

@@ -4,12 +4,6 @@ Pyramid TODOs
 Nice-to-Have
 ------------
 
-- Create a "mako_renderer_factory_factory" that provides searches in settings
-  for "mako."-prefixed keys but allows other prefixes to be used to create
-  different factories that don't use the global mako settings.  This would be
-  useful for the debug toolbar, which can currently be sabotaged by someone
-  using custom mako configuration settings.
-
 - Add docs about upgrading between Pyramid versions (e.g. how to see
   deprecation warnings).
 
