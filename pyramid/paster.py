@@ -33,7 +33,7 @@ def get_app(config_uri, name=None, loadapp=loadapp):
     return app
 
 def get_appsettings(config_uri, name=None, appconfig=appconfig):
-    """ Return a dictionary representing the key/value pairs in an ``app`
+    """ Return a dictionary representing the key/value pairs in an ``app``
     section within the file represented by ``config_uri``.
 
     If the ``name`` is None, this will attempt to parse the name from
