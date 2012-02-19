@@ -65,58 +65,79 @@ class PkgResourceTemplateLookup(TemplateLookup):
 
 registry_lock = threading.Lock() 
 
-def renderer_factory(info):
-    path = info.name
-    registry = info.registry
-    settings = info.settings
-    lookup = registry.queryUtility(IMakoLookup)
-    if lookup is None:
-        reload_templates = settings.get('reload_templates', False)
-        directories = settings.get('mako.directories', [])
-        module_directory = settings.get('mako.module_directory', None)
-        input_encoding = settings.get('mako.input_encoding', 'utf-8')
-        error_handler = settings.get('mako.error_handler', None)
-        default_filters = settings.get('mako.default_filters', 'h')
-        imports = settings.get('mako.imports', None)
-        strict_undefined = settings.get('mako.strict_undefined', 'false')
-        preprocessor = settings.get('mako.preprocessor', None)
-        if not is_nonstr_iter(directories):
-            directories = list(filter(None, directories.splitlines()))
-        directories = [ abspath_from_asset_spec(d) for d in directories ]
-        if module_directory is not None:
-            module_directory = abspath_from_asset_spec(module_directory)
-        if error_handler is not None:
-            dotted = DottedNameResolver(info.package)
-            error_handler = dotted.maybe_resolve(error_handler)
-        if default_filters is not None:
-            if not is_nonstr_iter(default_filters):
-                default_filters = list(filter(
-                    None, default_filters.splitlines()))
-        if imports is not None:
-            if not is_nonstr_iter(imports):
-                imports = list(filter(None, imports.splitlines()))
-        strict_undefined = asbool(strict_undefined)
-        if preprocessor is not None:
-            dotted = DottedNameResolver(info.package)
-            preprocessor = dotted.maybe_resolve(preprocessor)
-            
-        
-        lookup = PkgResourceTemplateLookup(directories=directories,
-                                           module_directory=module_directory,
-                                           input_encoding=input_encoding,
-                                           error_handler=error_handler,
-                                           default_filters=default_filters,
-                                           imports=imports,
-                                           filesystem_checks=reload_templates,
-                                           strict_undefined=strict_undefined,
-                                           preprocessor=preprocessor)
-        registry_lock.acquire()
-        try:
-            registry.registerUtility(lookup, IMakoLookup)
-        finally:
-            registry_lock.release()
-            
-    return MakoLookupTemplateRenderer(path, lookup)
+class MakoRendererFactoryHelper(object):
+    def __init__(self, settings_prefix=None):
+        self.settings_prefix = settings_prefix
+
+    def __call__(self, info):
+        path = info.name
+        registry = info.registry
+        settings = info.settings
+        settings_prefix = self.settings_prefix
+
+        if settings_prefix is None:
+            settings_prefix = info.type +'.'
+
+        lookup = registry.queryUtility(IMakoLookup, name=settings_prefix)
+
+        def sget(name, default=None):
+            return settings.get(settings_prefix + name, default)
+
+        if lookup is None:
+            reload_templates = settings.get('pyramid.reload_templates', None)
+            if reload_templates is None:
+                reload_templates = settings.get('reload_templates', False)
+            reload_templates = asbool(reload_templates)
+            directories = sget('directories', [])
+            module_directory = sget('module_directory', None)
+            input_encoding = sget('input_encoding', 'utf-8')
+            error_handler = sget('error_handler', None)
+            default_filters = sget('default_filters', 'h')
+            imports = sget('imports', None)
+            strict_undefined = asbool(sget('strict_undefined', False))
+            preprocessor = sget('preprocessor', None)
+            if not is_nonstr_iter(directories):
+                directories = list(filter(None, directories.splitlines()))
+            directories = [ abspath_from_asset_spec(d) for d in directories ]
+            if module_directory is not None:
+                module_directory = abspath_from_asset_spec(module_directory)
+            if error_handler is not None:
+                dotted = DottedNameResolver(info.package)
+                error_handler = dotted.maybe_resolve(error_handler)
+            if default_filters is not None:
+                if not is_nonstr_iter(default_filters):
+                    default_filters = list(filter(
+                        None, default_filters.splitlines()))
+            if imports is not None:
+                if not is_nonstr_iter(imports):
+                    imports = list(filter(None, imports.splitlines()))
+            if preprocessor is not None:
+                dotted = DottedNameResolver(info.package)
+                preprocessor = dotted.maybe_resolve(preprocessor)
+
+
+            lookup = PkgResourceTemplateLookup(
+                directories=directories,
+                module_directory=module_directory,
+                input_encoding=input_encoding,
+                error_handler=error_handler,
+                default_filters=default_filters,
+                imports=imports,
+                filesystem_checks=reload_templates,
+                strict_undefined=strict_undefined,
+                preprocessor=preprocessor
+                )
+
+            registry_lock.acquire()
+            try:
+                registry.registerUtility(lookup, IMakoLookup, 
+                                         name=settings_prefix)
+            finally:
+                registry_lock.release()
+
+        return MakoLookupTemplateRenderer(path, lookup)
+
+renderer_factory = MakoRendererFactoryHelper('mako.')
 
 class MakoRenderingException(Exception):
     def __init__(self, text):

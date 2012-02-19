@@ -32,7 +32,7 @@
       <div class="bottom">
         <div id="left" class="align-right">
           <h2>Search documentation</h2>
-          <form method="get" action="http://docs.pylonsproject.org/projects/pyramid/current/search.html">
+          <form method="get" action="http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/search.html">
                 <input type="text" id="q" name="q" value="" />
                 <input type="submit" id="x" value="Go" />
             </form>

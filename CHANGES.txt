@@ -1,5 +1,5 @@
-Next release
-============
+1.3a8 (2012-02-19)
+==================
 
 Features
 --------
@@ -93,10 +93,26 @@ Documentation
 - Don't create a ``session`` instance in SQLA Wiki tutorial, use raw
   ``DBSession`` instead (this is more common in real SQLA apps).
 
+Scaffolding
+-----------
+
+- Put ``pyramid.includes`` targets within ini files in scaffolds on separate
+  lines in order to be able to tell people to comment out only the
+  ``pyramid_debugtoolbar`` line when they want to disable the toolbar.
+
 Dependencies
 ------------
 
 - Depend on ``venusian`` >= 1.0a3 to provide scan ``ignore`` support.
+
+Internal
+--------
+
+- Create a "MakoRendererFactoryHelper" that provides customizable settings
+  key prefixes.  Allows settings prefixes other than "mako." to be used to
+  create different factories that don't use the global mako settings.  This
+  will be useful for the debug toolbar, which can currently be sabotaged by
+  someone using custom mako configuration settings.
 
 1.3a7 (2012-02-07)
 ==================

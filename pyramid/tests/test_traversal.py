@@ -1,6 +1,8 @@
 import unittest
+import warnings
 
 from pyramid.testing import cleanUp
+
 from pyramid.compat import (
     text_,
     native_,
@@ -8,6 +10,11 @@ from pyramid.compat import (
     url_quote,
     PY3,
     )
+
+with warnings.catch_warnings(record=True) as w:
+    warnings.filterwarnings('always')
+    from pyramid.interfaces import IContextURL
+    assert(len(w) == 1)
 
 class TraversalPathTests(unittest.TestCase):
     def _callFUT(self, path):
@@ -452,9 +459,8 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         self.assertEqual(result['virtual_root_path'], ())
 
     def test_call_with_environ(self):
-        import warnings
-        warnings.filterwarnings('ignore')
-        try:
+        with warnings.catch_warnings(record=True) as w:
+            warnings.filterwarnings('always')
             policy = self._makeOne(None)
             environ = self._getEnviron()
             result = policy(environ)
@@ -465,8 +471,7 @@ class ResourceTreeTraverserTests(unittest.TestCase):
             self.assertEqual(result['root'], policy.root)
             self.assertEqual(result['virtual_root'], policy.root)
             self.assertEqual(result['virtual_root_path'], ())
-        finally:
-            warnings.resetwarnings()
+            self.assertEqual(len(w), 1)
 
 class FindInterfaceTests(unittest.TestCase):
     def _callFUT(self, context, iface):
@@ -857,13 +862,13 @@ class QuotePathSegmentTests(unittest.TestCase):
         result = self._callFUT(s)
         self.assertEqual(result, 'abc')
 
-class TraversalContextURLTests(unittest.TestCase):
+class ResourceURLTests(unittest.TestCase):
     def _makeOne(self, context, url):
         return self._getTargetClass()(context, url)
 
     def _getTargetClass(self):
-        from pyramid.traversal import TraversalContextURL
-        return TraversalContextURL
+        from pyramid.traversal import ResourceURL
+        return ResourceURL
 
     def _registerTraverser(self, traverser):
         from pyramid.threadlocal import get_current_registry
@@ -873,17 +878,23 @@ class TraversalContextURLTests(unittest.TestCase):
         reg.registerAdapter(traverser, (Interface,), ITraverser)
 
     def test_class_conforms_to_IContextURL(self):
+        # bw compat
         from zope.interface.verify import verifyClass
-        from pyramid.interfaces import IContextURL
         verifyClass(IContextURL, self._getTargetClass())
 
     def test_instance_conforms_to_IContextURL(self):
         from zope.interface.verify import verifyObject
-        from pyramid.interfaces import IContextURL
         context = DummyContext()
         request = DummyRequest()
         verifyObject(IContextURL, self._makeOne(context, request))
 
+    def test_instance_conforms_to_IResourceURL(self):
+        from pyramid.interfaces import IResourceURL
+        from zope.interface.verify import verifyObject
+        context = DummyContext()
+        request = DummyRequest()
+        verifyObject(IResourceURL, self._makeOne(context, request))
+        
     def test_call_withlineage(self):
         baz = DummyContext()
         bar = DummyContext(baz)
@@ -965,6 +976,45 @@ class TraversalContextURLTests(unittest.TestCase):
         result = context_url()
         self.assertEqual(result, 'http://example.com:5432/one/two/')
 
+    def test_call_empty_names_not_ignored(self):
+        bar = DummyContext()
+        empty = DummyContext(bar)
+        root = DummyContext(empty)
+        root.__parent__ = None
+        root.__name__ = None
+        empty.__parent__ = root
+        empty.__name__ = ''
+        bar.__parent__ = empty
+        bar.__name__ = 'bar'
+        request = DummyRequest()
+        context_url = self._makeOne(bar, request)
+        result = context_url()
+        self.assertEqual(result, 'http://example.com:5432//bar/')
+
+    def test_call_local_url_returns_None(self):
+        resource = DummyContext()
+        def resource_url(request, info):
+            self.assertEqual(info['virtual_path'], '/')
+            self.assertEqual(info['physical_path'], '/')
+            return None
+        resource.__resource_url__ = resource_url
+        request = DummyRequest()
+        context_url = self._makeOne(resource, request)
+        result = context_url()
+        self.assertEqual(result, 'http://example.com:5432/')
+        
+    def test_call_local_url_returns_url(self):
+        resource = DummyContext()
+        def resource_url(request, info):
+            self.assertEqual(info['virtual_path'], '/')
+            self.assertEqual(info['physical_path'], '/')
+            return 'abc'
+        resource.__resource_url__ = resource_url
+        request = DummyRequest()
+        context_url = self._makeOne(resource, request)
+        result = context_url()
+        self.assertEqual(result, 'abc')
+
     def test_virtual_root_no_virtual_root_path(self):
         root = DummyContext()
         root.__name__ = None
@@ -997,45 +1047,39 @@ class TraversalContextURLTests(unittest.TestCase):
         self.assertEqual(context_url.virtual_root(), traversed_to)
         self.assertEqual(context.request.environ['PATH_INFO'], '/one')
 
-    def test_empty_names_not_ignored(self):
-        bar = DummyContext()
-        empty = DummyContext(bar)
-        root = DummyContext(empty)
+    def test_IResourceURL_attributes_with_vroot(self):
+        from pyramid.interfaces import VH_ROOT_KEY
+        root = DummyContext()
         root.__parent__ = None
         root.__name__ = None
-        empty.__parent__ = root
-        empty.__name__ = ''
-        bar.__parent__ = empty
-        bar.__name__ = 'bar'
-        request = DummyRequest()
-        context_url = self._makeOne(bar, request)
-        result = context_url()
-        self.assertEqual(result, 'http://example.com:5432//bar/')
+        one = DummyContext()
+        one.__parent__ = root
+        one.__name__ = 'one'
+        two = DummyContext()
+        two.__parent__ = one
+        two.__name__ = 'two'
+        environ = {VH_ROOT_KEY:'/one'}
+        request = DummyRequest(environ)
+        context_url = self._makeOne(two, request)
+        self.assertEqual(context_url.physical_path, '/one/two/')
+        self.assertEqual(context_url.virtual_path, '/two/')
 
-    def test_local_url_returns_None(self):
-        resource = DummyContext()
-        def resource_url(request, info):
-            self.assertEqual(info['virtual_path'], '/')
-            self.assertEqual(info['physical_path'], '/')
-            return None
-        resource.__resource_url__ = resource_url
-        request = DummyRequest()
-        context_url = self._makeOne(resource, request)
-        result = context_url()
-        self.assertEqual(result, 'http://example.com:5432/')
+    def test_IResourceURL_attributes_no_vroot(self):
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = None
+        one = DummyContext()
+        one.__parent__ = root
+        one.__name__ = 'one'
+        two = DummyContext()
+        two.__parent__ = one
+        two.__name__ = 'two'
+        environ = {}
+        request = DummyRequest(environ)
+        context_url = self._makeOne(two, request)
+        self.assertEqual(context_url.physical_path, '/one/two/')
+        self.assertEqual(context_url.virtual_path, '/one/two/')
         
-    def test_local_url_returns_url(self):
-        resource = DummyContext()
-        def resource_url(request, info):
-            self.assertEqual(info['virtual_path'], '/')
-            self.assertEqual(info['physical_path'], '/')
-            return 'abc'
-        resource.__resource_url__ = resource_url
-        request = DummyRequest()
-        context_url = self._makeOne(resource, request)
-        result = context_url()
-        self.assertEqual(result, 'abc')
-
 class TestVirtualRoot(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -1048,7 +1092,6 @@ class TestVirtualRoot(unittest.TestCase):
         return virtual_root(resource, request)
 
     def test_registered(self):
-        from pyramid.interfaces import IContextURL
         from zope.interface import Interface
         request = _makeRequest()
         request.registry.registerAdapter(DummyContextURL, (Interface,Interface),
