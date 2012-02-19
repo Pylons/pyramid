@@ -348,26 +348,47 @@ when you use the ``production.ini`` file instead of the ``development.ini``
 ini file to run the application.
 
 You can also turn the debug toolbar off by editing ``development.ini`` and
-commenting out the line ``pyramid.includes = pyramid_debugtoolbar``.  For
-example, instead of:
+commenting out a line.  For example, instead of:
 
 .. code-block:: ini
    :linenos:
 
    [app:main]
    ...
-   pyramid.includes = pyramid_debugtoolbar
+   pyramid.includes =
+       pyramid_debugtoolbar
 
-Put a hash mark in front of the ``pyramid.includes`` line:
+Put a hash mark at the beginning of the ``pyramid_debugtoolbar`` line:
 
 .. code-block:: ini
    :linenos:
 
    [app:main]
    ...
-   #pyramid.includes = pyramid_debugtoolbar
+   pyramid.includes =
+   #    pyramid_debugtoolbar
 
 Then restart the application to see that the toolbar has been turned off.
+
+Note that if you comment out the ``pryamid_debugtoolbar`` line, the ``#``
+*must* be in the first column.  If you put the hash mark anywhere except the
+first column instead, for example like this:
+
+.. code-block:: ini
+   :linenos:
+
+   [app:main]
+   ...
+   pyramid.includes =
+       #pyramid_debugtoolbar
+
+When you attempt to restart the application with a section like the abvoe
+you'll receive an error that ends something like this, and the application
+will not start:
+
+.. code-block:: text
+
+   ImportError: No module named #pyramid_debugtoolbar
 
 .. index::
    single: project structure

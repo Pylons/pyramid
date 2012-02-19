@@ -93,6 +93,13 @@ Documentation
 - Don't create a ``session`` instance in SQLA Wiki tutorial, use raw
   ``DBSession`` instead (this is more common in real SQLA apps).
 
+Scaffolding
+-----------
+
+- Put ``pyramid.includes`` targets within ini files in scaffolds on separate
+  lines in order to be able to tell people to comment out only the
+  ``pyramid_debugtoolbar`` line when they want to disable the toolbar.
+
 Dependencies
 ------------
 

@@ -16,10 +16,6 @@ Nice-to-Have
 - Fix renderers chapter to better document system values passed to template
   renderers.
 
-- Put includes in development.ini within scaffolding and tutorials on
-  separate lines and fix project.rst to tell people to comment out only the
-  debugtoolbar include when they want to disable.
-
 - Modify view mapper narrative docs to not use pyramid_handlers.
 
 - Modify the urldispatch chapter examples to assume a scan rather than
