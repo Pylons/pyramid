@@ -15,6 +15,12 @@ Nice-to-Have
 - Modify the urldispatch chapter examples to assume a scan rather than
   ``add_view``.
 
+- Context manager for creating a new configurator (replacing
+  ``with_package``).  E.g.::
+
+    with config.partial(package='bar') as c:
+        c.add_view(...)
+
 - Decorator for append_slash_notfound_view_factory.
 
 - Introspection:
