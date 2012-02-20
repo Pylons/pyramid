@@ -128,7 +128,6 @@ application developer.
 
 New APIs were added to support introspection
 :attr:`pyramid.registry.Introspectable`,
-:attr:`pyramid.registry.noop_introspector`, 
 :attr:`pyramid.config.Configurator.introspector`,
 :attr:`pyramid.config.Configurator.introspectable`,
 :attr:`pyramid.registry.Registry.introspector`.
