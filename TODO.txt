@@ -27,9 +27,6 @@ Nice-to-Have
 
   * get rid of "tweens" category (can't sort properly?)
 
-  * Introspection hiding for directives for purposes of omitting toolbar
-    registrations.  Maybe toolbar can just use a null introspector?
-
 - Fix deployment recipes in cookbook (discourage proxying without changing
   server).
 
