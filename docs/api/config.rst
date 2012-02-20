@@ -112,9 +112,7 @@
 
         The :term:`introspector` related to this configuration.  It is an
         instance implementing the :class:`pyramid.interfaces.IIntrospector`
-        interface.  If the Configurator constructor was supplied with an
-        ``introspector`` argument, this attribute will be that value.
-        Otherwise, it will be an instance of a default introspector type.
+        interface.
 
         .. note::
 
