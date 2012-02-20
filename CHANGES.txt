@@ -19,7 +19,7 @@ Backwards Incompatibilities
 - Remove ``pyramid.config.Configurator.with_context`` class method.  It was
   never an API, it is only used by ``pyramid_zcml`` and its functionality has
   been moved to that package's latest release.  This means that you'll need
-  to use the latest release of ``pyramid_zcml`` (0.9.2+) with this release of
+  to use the 0.9.2 or later release of ``pyramid_zcml`` with this release of
   Pyramid.
 
 - The ``introspector`` argument to the ``pyramid.config.Configurator``
