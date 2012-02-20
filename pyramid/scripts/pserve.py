@@ -14,6 +14,7 @@ import logging
 import optparse
 import os
 import re
+import signal
 import subprocess
 import sys
 import textwrap
@@ -450,7 +451,11 @@ class PServeCommand(object):
         for j in range(10):
             if not live_pidfile(pid_file):
                 break
-            import signal
+            os.kill(pid, signal.SIGINT)
+            time.sleep(1)
+        for j in range(10):
+            if not live_pidfile(pid_file):
+                break
             os.kill(pid, signal.SIGTERM)
             time.sleep(1)
         else:
