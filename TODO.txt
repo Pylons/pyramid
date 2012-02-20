@@ -21,6 +21,11 @@ Nice-to-Have
     with config.partial(package='bar') as c:
         c.add_view(...)
 
+  or::
+
+    with config.partial(introspection=False) as c:
+        c.add_view(..)
+
 - Decorator for append_slash_notfound_view_factory.
 
 - Introspection:
