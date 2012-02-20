@@ -76,18 +76,18 @@
      .. automethod:: action
      .. automethod:: add_directive
      .. automethod:: with_package
+     .. automethod:: derive_view
 
    :methodcategory:`Utility Methods`
 
      .. automethod:: absolute_asset_spec
-     .. automethod:: derive_view
      .. automethod:: maybe_dotted
-     .. automethod:: setup_registry
 
    :methodcategory:`ZCA-Related APIs`
 
      .. automethod:: hook_zca
      .. automethod:: unhook_zca
+     .. automethod:: setup_registry
 
    :methodcategory:`Testing Helper APIs`
 
