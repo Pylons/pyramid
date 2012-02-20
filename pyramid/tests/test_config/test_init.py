@@ -228,11 +228,9 @@ class ConfiguratorTests(unittest.TestCase):
                                      request_iface=IRequest)
         self.assertTrue(view.__wraps__ is exceptionresponse_view)
 
-    def test_ctor_with_introspector(self):
-        introspector = DummyIntrospector()
-        config = self._makeOne(introspector=introspector)
-        self.assertEqual(config.introspector, introspector)
-        self.assertEqual(config.registry.introspector, introspector)
+    def test_ctor_with_introspection(self):
+        config = self._makeOne(introspection=False)
+        self.assertEqual(config.introspection, False)
 
     def test_with_package_module(self):
         from pyramid.tests.test_config import test_init
@@ -648,7 +646,7 @@ pyramid.tests.test_config.dummy_include2""",
         default = inst.introspector
         self.assertTrue(hasattr(default, 'add'))
         self.assertEqual(inst.introspector, inst.registry.introspector)
-        introspector = DummyIntrospector()
+        introspector = object()
         inst.introspector = introspector
         new = inst.introspector
         self.assertTrue(new is introspector)
@@ -758,25 +756,6 @@ pyramid.tests.test_config.dummy_include2""",
                 "file must exist, refusing to use orphan .pyc or .pyo file).")
         else: # pragma: no cover
             raise AssertionError
-
-    def test_with_context(self):
-        config = self._makeOne()
-        context = DummyZCMLContext()
-        context.basepath = 'basepath'
-        context.includepath = ('spec',)
-        context.package = 'pyramid'
-        context.autocommit = True
-        context.registry = 'abc'
-        context.route_prefix = 'buz'
-        context.info = 'info'
-        newconfig = config.with_context(context)
-        self.assertEqual(newconfig.package_name, 'pyramid')
-        self.assertEqual(newconfig.autocommit, True)
-        self.assertEqual(newconfig.registry, 'abc')
-        self.assertEqual(newconfig.route_prefix, 'buz')
-        self.assertEqual(newconfig.basepath, 'basepath')
-        self.assertEqual(newconfig.includepath, ('spec',))
-        self.assertEqual(newconfig.info, 'info')
 
     def test_action_branching_kw_is_None(self):
         config = self._makeOne(autocommit=True)
@@ -1638,7 +1617,7 @@ class TestActionState(unittest.TestCase):
              'order':0, 'includepath':(), 'info':None,
              'introspectables':(intr,)},
             ]
-        introspector = DummyIntrospector()
+        introspector = object()
         c.execute_actions(introspector=introspector)
         self.assertEqual(output,  [((1,), {})])
         self.assertEqual(intr.registered, [(introspector, None)])
@@ -1651,7 +1630,7 @@ class TestActionState(unittest.TestCase):
              'order':0, 'includepath':(), 'info':None,
              'introspectables':(intr,)},
             ]
-        introspector = DummyIntrospector()
+        introspector = object()
         c.execute_actions(introspector=introspector)
         self.assertEqual(intr.registered, [(introspector, None)])
 
@@ -1981,21 +1960,6 @@ class DummyActionState(object):
         self.actions = []
     def action(self, *arg, **kw):
         self.actions.append((arg, kw))
-
-class DummyZCMLContext(object):
-    package = None
-    registry = None
-    autocommit = False
-    route_prefix = None
-    basepath = None
-    includepath = ()
-    info = ''
-    
-class DummyIntrospector(object):
-    def __init__(self):
-        self.intrs = []
-    def add(self, intr):
-        self.intrs.append(intr)
 
 class DummyIntrospectable(object):
     def __init__(self):

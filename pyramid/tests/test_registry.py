@@ -254,52 +254,6 @@ class TestIntrospector(unittest.TestCase):
         del inst._categories['category']
         self.assertRaises(KeyError, inst.related, intr)
 
-class Test_noop_introspector(unittest.TestCase):
-    def _makeOne(self):
-        from pyramid.registry import noop_introspector
-        return noop_introspector
-
-    def test_conformance(self):
-        from zope.interface.verify import verifyObject
-        from pyramid.interfaces import IIntrospector
-        verifyObject(IIntrospector, self._makeOne())
-
-    def test_add(self):
-        inst = self._makeOne()
-        self.assertEqual(inst.add('a'), None)
-
-    def test_get(self):
-        inst = self._makeOne()
-        self.assertEqual(inst.get('category', 'd', default='123'), '123')
-
-    def test_get_category(self):
-        inst = self._makeOne()
-        self.assertEqual(inst.get_category('category', default='123'), '123')
-        
-    def test_categorized(self):
-        inst = self._makeOne()
-        self.assertEqual(inst.categorized(), [])
-
-    def test_categories(self):
-        inst = self._makeOne()
-        self.assertEqual(inst.categories(), [])
-        
-    def test_remove(self):
-        inst = self._makeOne()
-        self.assertEqual(inst.remove('cat', 'discrim'), None)
-
-    def test_relate(self):
-        inst = self._makeOne()
-        self.assertEqual(inst.relate(), None)
-
-    def test_unrelate(self):
-        inst = self._makeOne()
-        self.assertEqual(inst.unrelate(), None)
-
-    def test_related(self):
-        inst = self._makeOne()
-        self.assertEqual(inst.related('a'), [])
-
 class TestIntrospectable(unittest.TestCase):
     def _getTargetClass(slf):
         from pyramid.registry import Introspectable

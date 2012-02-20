@@ -1,3 +1,32 @@
+Next release
+============
+
+Features
+--------
+
+- Add an ``introspection`` boolean to the Configurator constructor.  If this
+  is ``True``, actions registered using the Configurator will be registered
+  with the introspector.  If it is ``False``, they won't.  The default is
+  ``True``.  Setting it to ``False`` during action processing will prevent
+  introspection for any following registration statements, and setting it to
+  ``True`` will start them up again.  This addition is to service a
+  requirement that the debug toolbar's own views and methods not show up in
+  the introspector.
+
+Backwards Incompatibilities
+---------------------------
+
+- Remove ``pyramid.config.Configurator.with_context`` class method.  It was
+  never an API, it is only used by ``pyramid_zcml`` and its functionality has
+  been moved to that package's latest release.  This means that you'll need
+  to use the latest release of ``pyramid_zcml`` with this release of Pyramid.
+
+- The ``introspector`` argument to the ``pyramid.config.Configurator``
+  constructor API has been removed.  It has been replaced by the boolean
+  ``introspection`` flag.
+
+- The ``pyramid.registry.noop_introspector`` API object has been removed.
+
 1.3a8 (2012-02-19)
 ==================
 

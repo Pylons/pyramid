@@ -38,10 +38,3 @@
 
    This class is new as of :app:`Pyramid` 1.3.
 
-.. class:: noop_introspector
-
-   An introspector which throws away all registrations, useful for disabling
-   introspection altogether (pass as ``introspector`` to the
-   :term:`Configurator` constructor).
-
-   This class is new as of :app:`Pyramid` 1.3.
