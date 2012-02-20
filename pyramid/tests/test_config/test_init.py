@@ -774,6 +774,13 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(intr.registered[0][0], config.introspector)
         self.assertEqual(intr.registered[0][1].__class__, ActionInfo)
 
+    def test_action_autocommit_with_introspectables_introspection_off(self):
+        config = self._makeOne(autocommit=True)
+        config.introspection = False
+        intr = DummyIntrospectable()
+        config.action('discrim', introspectables=(intr,))
+        self.assertEqual(len(intr.registered), 0)
+        
     def test_action_branching_nonautocommit_with_config_info(self):
         config = self._makeOne(autocommit=False)
         config.info = 'abc'
@@ -825,6 +832,19 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(
             state.actions[0][1]['introspectables'], (intr,))
 
+    def test_action_nonautocommit_with_introspectables_introspection_off(self):
+        config = self._makeOne(autocommit=False)
+        config.info = ''
+        config._ainfo = []
+        config.introspection = False
+        state = DummyActionState()
+        config.action_state = state
+        state.autocommit = False
+        intr = DummyIntrospectable()
+        config.action('discrim', introspectables=(intr,))
+        self.assertEqual(
+            state.actions[0][1]['introspectables'], ())
+        
     def test_scan_integration(self):
         from zope.interface import alsoProvides
         from pyramid.interfaces import IRequest
