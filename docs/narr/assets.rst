@@ -374,7 +374,7 @@ do so, do things "by hand".  First define the view callable.
 
    def favicon_view(request):
        here = os.path.dirname(__file__)
-       icon = open(os.path.join(here, 'static', 'favicon.ico'))
+       icon = open(os.path.join(here, 'static', 'favicon.ico'), 'rb')
        return Response(content_type='image/x-icon', app_iter=icon)
 
 The above bit of code within ``favicon_view`` computes "here", which is a
