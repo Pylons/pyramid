@@ -71,6 +71,7 @@ from pyramid.config.tweens import TweensConfiguratorMixin
 from pyramid.config.util import (
     action_method,
     ActionInfo,
+    route_pattern,
     )
 from pyramid.config.views import ViewsConfiguratorMixin
 from pyramid.config.zca import ZCAConfiguratorMixin
@@ -105,7 +106,8 @@ class Configurator(
     ``authorization_policy``, ``renderers``, ``debug_logger``,
     ``locale_negotiator``, ``request_factory``, ``renderer_globals_factory``,
     ``default_permission``, ``session_factory``, ``default_view_mapper``,
-    ``autocommit``, ``exceptionresponse_view`` and ``route_prefix``.
+    ``autocommit``, ``exceptionresponse_view``, ``route_prefix``, and
+    ``route_suffix``.
 
     If the ``registry`` argument is passed as a non-``None`` value, it must
     be an instance of the :class:`pyramid.registry.Registry` class
@@ -239,6 +241,11 @@ class Configurator(
     :meth:`pyramid.config.Configurator.add_route` will have the specified path
     prepended to their pattern. This parameter is new in Pyramid 1.2.
 
+    If ``route_suffix`` is passed, all routes added with
+    :meth:`pyramid.config.Configurator.add_route` will have the specified path
+    appended to their pattern. The ``route_suffix`` parameter is new in
+    Pyramid X.X.
+
     If ``introspector`` is passed, it must be an instance implementing the
     attributes and methods of :class:`pyramid.interfaces.IIntrospector`.  If
     ``introspector`` is not passed (or is passed as ``None``), the default
@@ -273,6 +280,7 @@ class Configurator(
                  autocommit=False,
                  exceptionresponse_view=default_exceptionresponse_view,
                  route_prefix=None,
+                 route_suffix=None,
                  introspector=None,
                  ):
         if package is None:
@@ -284,6 +292,7 @@ class Configurator(
         self.registry = registry
         self.autocommit = autocommit
         self.route_prefix = route_prefix
+        self.route_suffix = route_suffix
         if registry is None:
             registry = Registry(self.package_name)
             self.registry = registry
@@ -594,7 +603,7 @@ class Configurator(
         self.action_state.execute_actions(introspector=self.introspector)
         self.action_state = ActionState() # old actions have been processed
 
-    def include(self, callable, route_prefix=None):
+    def include(self, callable, route_prefix=None, route_suffix=None):
         """Include a configuration callables, to support imperative
         application extensibility.
 
@@ -686,25 +695,39 @@ class Configurator(
         pattern.
 
         The ``route_prefix`` parameter is new as of Pyramid 1.2.
+
+        When the ``route_prefix`` parameter is provided to the outer-most
+        ``include`` it has a special configurative property. If ``route_prefix``
+        ends with a ``/`` then the route will end with a ``/``. If the
+        ``route_prefix`` does not end with a ``/`` then the route created will
+        also not end with a ``/``. In this way implementers may mount existing
+        callables or third-party modules with a slash-appended-style that
+        matches the rest of their application.
+
+        The above configurative behaviour of ``route_prefix`` is new as of
+        Pyramid 1.X.
+
+        The ``route_suffix`` parameter complements ``route_prefix``, allowing a
+        suffix to be appended to included routes. However ``route_suffix`` does
+        not have the same configurative property as ``route_prefix``, since
+        ``route_prefix`` ultimately decides whether the mounted routes
+        (including the suffix) will be slash-appended or not.
+
+        The ``route_suffix`` parameter is new as of Pyramid 1.X.
+
         """
         # """ <-- emacs
 
         action_state = self.action_state
 
-        if route_prefix is None:
-            route_prefix = ''
-
-        old_route_prefix = self.route_prefix
-        if old_route_prefix is None:
-            old_route_prefix = ''
-
-        route_prefix = '%s/%s' % (
-            old_route_prefix.rstrip('/'),
-            route_prefix.lstrip('/')
-            )
-        route_prefix = route_prefix.strip('/')
-        if not route_prefix:
-            route_prefix = None
+        if not route_prefix is None:
+            route_prefix = route_pattern(
+                (self.route_prefix or []) + [route_prefix]
+                )
+        if not route_suffix is None:
+            route_suffix = route_pattern(
+                [route_suffix] + (self.route_suffix or [])
+                )
 
         c = self.maybe_dotted(callable)
         module = self.inspect.getmodule(c)
@@ -731,6 +754,7 @@ class Configurator(
                 package=package_of(module),
                 autocommit=self.autocommit,
                 route_prefix=route_prefix,
+                route_suffix=route_suffix,
                 )
             configurator.basepath = os.path.dirname(sourcefile)
             configurator.includepath = self.includepath + (spec,)
@@ -791,7 +815,8 @@ class Configurator(
             registry=context.registry,
             package=context.package,
             autocommit=context.autocommit,
-            route_prefix=context.route_prefix
+            route_prefix=context.route_prefix,
+            route_suffix=context.route_suffix,
             )
         configurator.basepath = context.basepath
         configurator.includepath = context.includepath
@@ -809,6 +834,7 @@ class Configurator(
             package=package,
             autocommit=self.autocommit,
             route_prefix=self.route_prefix,
+            route_suffix=self.route_suffix,
             )
         configurator.basepath = self.basepath
         configurator.includepath = self.includepath

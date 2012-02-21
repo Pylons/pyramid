@@ -292,3 +292,29 @@ def as_sorted_tuple(val):
     val = tuple(sorted(val))
     return val
 
+class route_pattern(list):
+    """ Utility: centralise route-pattern operations.
+
+    If ``match_slash_style`` is ``True`` then the slash-style of the first-item
+    determines the slash-style of the route-pattern; if the first-item is
+    slash-appended then the route-pattern will be slash-appended, otherwise the
+    route-pattern will be non-slash-appended. """
+
+    def __init__(self, *args):
+        super(route_pattern, self).__init__(*args)
+        self.match_slash_style = False
+
+    def __str__(self):
+        l = None
+        for r in self:
+            if l is not None and self.match_slash_style:
+                r = r.rstrip('/')
+                if l.endswith('/'):
+                    r = '%s/' % r
+            if l is None:
+                l = ''
+            if l and r:
+                l = '%s/%s' % (l.rstrip('/'), r.lstrip('/'))
+            else:
+                    l = l + r
+        return l
