@@ -128,6 +128,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         self.assertTrue(isinstance(app_iter, _Wrapper))
         self.assertTrue(b'<html>static</html>' in app_iter.file.read())
         self.assertEqual(app_iter.block_size, _BLOCK_SIZE)
+        app_iter.file.close()
 
     def test_resource_is_file_with_cache_max_age(self):
         inst = self._makeOne('pyramid.tests:fixtures/static', cache_max_age=600)
