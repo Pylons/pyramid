@@ -68,7 +68,7 @@ class _FileResponse(Response):
         if 'wsgi.file_wrapper' in environ:
             app_iter = environ['wsgi.file_wrapper'](f, _BLOCK_SIZE)
         else:
-            app_iter = _FileIter(open(path, 'rb'), _BLOCK_SIZE)
+            app_iter = _FileIter(f, _BLOCK_SIZE)
         self.app_iter = app_iter
         # assignment of content_length must come after assignment of app_iter
         self.content_length = content_length

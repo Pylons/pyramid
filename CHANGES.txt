@@ -28,6 +28,12 @@ Backwards Incompatibilities
 
 - The ``pyramid.registry.noop_introspector`` API object has been removed.
 
+Bug Fixes
+---------
+
+- The static file response object used by ``config.add_static_view`` opened
+  the static file twice, when it only needed to open it once.
+
 1.3a8 (2012-02-19)
 ==================
 
