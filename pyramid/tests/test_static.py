@@ -185,6 +185,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.content_type, 'application/x-tar')
         self.assertEqual(response.content_encoding, 'gzip')
+        response.app_iter.close()
 
     def test_resource_no_content_encoding(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
@@ -194,6 +195,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.content_type, 'text/html')
         self.assertEqual(response.content_encoding, None)
+        response.app_iter.close()
 
 class Test_static_view_use_subpath_True(unittest.TestCase):
     def _getTargetClass(self):

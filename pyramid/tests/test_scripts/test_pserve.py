@@ -87,6 +87,7 @@ class TestLazyWriter(unittest.TestCase):
             inst = self._makeOne(filename)
             fp = inst.open()
             self.assertEqual(fp.name, filename)
+            fp.close()
         finally:
             os.remove(filename)
         
@@ -122,6 +123,7 @@ class TestLazyWriter(unittest.TestCase):
             inst.flush()
             fp = inst.fileobj
             self.assertEqual(fp.name, filename)
+            fp.close()
         finally:
             os.remove(filename)
 
