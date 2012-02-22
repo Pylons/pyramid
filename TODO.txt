@@ -1,12 +1,6 @@
 Pyramid TODOs
 =============
 
-Must-Have
----------
-
-- Fix scaffolds and tutorials to use notfound_view_config rather than
-  view_config.
-
 Nice-to-Have
 ------------
 
