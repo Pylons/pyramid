@@ -1414,7 +1414,8 @@ class ViewsConfiguratorMixin(object):
             decorator=decorator,
             mapper=mapper,
             match_param=match_param,
-            route_name=route_name
+            route_name=route_name,
+            permission=NO_PERMISSION_REQUIRED,
             )
         if append_slash:
             view = self._derive_view(view, attr=attr, renderer=renderer)

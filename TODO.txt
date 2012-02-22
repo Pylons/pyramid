@@ -7,8 +7,6 @@ Must-Have
 - Fix scaffolds and tutorials to use notfound_view_config rather than
   view_config.
 
-- Add __no_permission_required__ to see notfound views.
-
 Nice-to-Have
 ------------
 
