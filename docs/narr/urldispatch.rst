@@ -772,40 +772,92 @@ ignored when ``static`` is ``True``.
 Redirecting to Slash-Appended Routes
 ------------------------------------
 
-For behavior like Django's ``APPEND_SLASH=True``, use the
-:func:`~pyramid.view.append_slash_notfound_view` view as the :term:`Not Found
-view` in your application.  Defining this view as the :term:`Not Found view`
-is a way to automatically redirect requests where the URL lacks a trailing
-slash, but requires one to match the proper route.  When configured, along
-with at least one other route in your application, this view will be invoked
-if the value of ``PATH_INFO`` does not already end in a slash, and if the
-value of ``PATH_INFO`` *plus* a slash matches any route's pattern.  In this
-case it does an HTTP redirect to the slash-appended ``PATH_INFO``.
+For behavior like Django's ``APPEND_SLASH=True``, use the ``append_slash``
+argument to :meth:`pyramid.config.Configurator.add_notfound_view` or the
+equivalent ``append_slash`` argument to the
+:class:`pyramid.view.notfound_view_config` decorator.
 
-Let's use an example, because this behavior is a bit magical. If the
-``append_slash_notfound_view`` is configured in your application and your
-route configuration looks like so:
+Adding ``append_slash=True`` is a way to automatically redirect requests
+where the URL lacks a trailing slash, but requires one to match the proper
+route.  When configured, along with at least one other route in your
+application, this view will be invoked if the value of ``PATH_INFO`` does not
+already end in a slash, and if the value of ``PATH_INFO`` *plus* a slash
+matches any route's pattern.  In this case it does an HTTP redirect to the
+slash-appended ``PATH_INFO``.
+
+To configure the slash-appending not found view in your application, change
+the application's startup configuration, adding the following stanza:
 
 .. code-block:: python
    :linenos:
 
-   config.add_route('noslash', 'no_slash')
-   config.add_route('hasslash', 'has_slash/')
+Let's use an example.  If the following routes are configured in your
+application:
 
-   config.add_view('myproject.views.no_slash', route_name='noslash')
-   config.add_view('myproject.views.has_slash', route_name='hasslash')
+.. code-block:: python
+   :linenos:
+
+   from pyramid.httpexceptions import HTTPNotFound
+
+   def notfound(request):
+       return HTTPNotFound('Not found, bro.')
+
+   def no_slash(request):
+       return Response('No slash')
+
+   def has_slash(request):
+       return Response('Has slash')
+
+   def main(g, **settings):
+       config = Configurator()
+       config.add_route('noslash', 'no_slash')
+       config.add_route('hasslash', 'has_slash/')
+       config.add_view(no_slash, route_name='noslash')
+       config.add_view(has_slash, route_name='hasslash')
+       config.add_notfound_view(notfound, append_slash=True)
+
+If a request enters the application with the ``PATH_INFO`` value of
+``/no_slash``, the first route will match and the browser will show "No
+slash".  However, if a request enters the application with the ``PATH_INFO``
+value of ``/no_slash/``, *no* route will match, and the slash-appending not
+found view will not find a matching route with an appended slash.  As a
+result, the ``notfound`` view will be called and it will return a "Not found,
+bro." body.
 
 If a request enters the application with the ``PATH_INFO`` value of
 ``/has_slash/``, the second route will match.  If a request enters the
 application with the ``PATH_INFO`` value of ``/has_slash``, a route *will* be
 found by the slash-appending not found view.  An HTTP redirect to
-``/has_slash/`` will be returned to the user's browser.
+``/has_slash/`` will be returned to the user's browser.  As a result, the
+``notfound`` view will never actually be called.
 
-If a request enters the application with the ``PATH_INFO`` value of
-``/no_slash``, the first route will match.  However, if a request enters the
-application with the ``PATH_INFO`` value of ``/no_slash/``, *no* route will
-match, and the slash-appending not found view will *not* find a matching
-route with an appended slash.
+The following application uses the :class:`pyramid.view.notfound_view_config`
+and :class:`pyramid.view.view_config` decorators and a :term:`scan` to do
+exactly the same job:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.httpexceptions import HTTPNotFound
+   from pyramid.view import notfound_view_config, view_config
+
+   @notfound_view_config(append_slash=True)
+   def notfound(request):
+       return HTTPNotFound('Not found, bro.')
+
+   @view_config(route_name='noslash')
+   def no_slash(request):
+       return Response('No slash')
+
+   @view_config(route_name='hasslash')
+   def has_slash(request):
+       return Response('Has slash')
+
+   def main(g, **settings):
+       config = Configurator()
+       config.add_route('noslash', 'no_slash')
+       config.add_route('hasslash', 'has_slash/')
+       config.scan()
 
 .. warning::
 
@@ -814,53 +866,8 @@ route with an appended slash.
    request into a ``GET``, losing any ``POST`` data in the original
    request.
 
-To configure the slash-appending not found view in your application, change
-the application's startup configuration, adding the following stanza:
-
-.. code-block:: python
-   :linenos:
-
-   config.add_view('pyramid.view.append_slash_notfound_view',
-                   context='pyramid.httpexceptions.HTTPNotFound')
-
-See :ref:`view_module` and :ref:`changing_the_notfound_view` for more
-information about the slash-appending not found view and for a more general
-description of how to configure a not found view.
-
-Custom Not Found View With Slash Appended Routes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-There can only be one :term:`Not Found view` in any :app:`Pyramid`
-application.  Even if you use :func:`~pyramid.view.append_slash_notfound_view`
-as the Not Found view, :app:`Pyramid` still must generate a ``404 Not Found``
-response when it cannot redirect to a slash-appended URL; this not found
-response will be visible to site users.
-
-If you don't care what this 404 response looks like, and only you need
-redirections to slash-appended route URLs, you may use the
-:func:`~pyramid.view.append_slash_notfound_view` object as the Not Found view
-as described above.  However, if you wish to use a *custom* notfound view
-callable when a URL cannot be redirected to a slash-appended URL, you may
-wish to use an instance of the
-:class:`~pyramid.view.AppendSlashNotFoundViewFactory` class as the Not Found
-view, supplying a :term:`view callable` to be used as the custom notfound
-view as the first argument to its constructor.  For instance:
-
-.. code-block:: python
-     :linenos:
-
-     from pyramid.httpexceptions import HTTPNotFound
-     from pyramid.view import AppendSlashNotFoundViewFactory
-
-     def notfound_view(context, request):
-         return HTTPNotFound('It aint there, stop trying!')
-
-     custom_append_slash = AppendSlashNotFoundViewFactory(notfound_view)
-     config.add_view(custom_append_slash, context=HTTPNotFound)
-
-The ``notfound_view`` supplied must adhere to the two-argument view callable
-calling convention of ``(context, request)`` (``context`` will be the
-exception object).
+See :ref:`view_module` and :ref:`changing_the_notfound_view` for for a more
+general description of how to configure a view and/or a not found view.
 
 .. index::
    pair: debugging; route matching

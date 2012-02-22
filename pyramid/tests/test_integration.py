@@ -357,6 +357,23 @@ class TestViewDecoratorApp(IntegrationBase, unittest.TestCase):
         res = self.testapp.get('/second', status=200)
         self.assertTrue(b'OK2' in res.body)
 
+class TestNotFoundView(IntegrationBase, unittest.TestCase):
+    package = 'pyramid.tests.pkgs.notfoundview'
+
+    def test_it(self):
+        res = self.testapp.get('/wontbefound', status=200)
+        self.assertTrue(b'generic_notfound' in res.body)
+        res = self.testapp.get('/bar', status=302)
+        self.assertEqual(res.location, 'http://localhost/bar/')
+        res = self.testapp.get('/bar/', status=200)
+        self.assertTrue(b'OK bar' in res.body)
+        res = self.testapp.get('/foo', status=302)
+        self.assertEqual(res.location, 'http://localhost/foo/')
+        res = self.testapp.get('/foo/', status=200)
+        self.assertTrue(b'OK foo2' in res.body)
+        res = self.testapp.get('/baz', status=200)
+        self.assertTrue(b'baz_notfound' in res.body)
+        
 class TestViewPermissionBug(IntegrationBase, unittest.TestCase):
     # view_execution_permitted bug as reported by Shane at http://lists.repoze.org/pipermail/repoze-dev/2010-October/003603.html
     package = 'pyramid.tests.pkgs.permbugapp'

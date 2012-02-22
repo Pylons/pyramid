@@ -19,11 +19,11 @@
   .. autoclass:: view_defaults
      :members:
 
+  .. autoclass:: notfound_view_config
+     :members:
+
   .. autoclass:: static
      :members:
      :inherited-members:
 
-  .. autofunction:: append_slash_notfound_view(context, request)
-
-  .. autoclass:: AppendSlashNotFoundViewFactory
 

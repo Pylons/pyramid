@@ -1682,14 +1682,14 @@ class TestViewsConfigurationMixin(unittest.TestCase):
 
 
 
-    def test_set_notfound_view(self):
+    def test_add_notfound_view(self):
         from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
         from pyramid.httpexceptions import HTTPNotFound
         config = self._makeOne(autocommit=True)
         view = lambda *arg: arg
-        config.set_notfound_view(view, renderer=null_renderer)
+        config.add_notfound_view(view, renderer=null_renderer)
         request = self._makeRequest(config)
         view = self._getViewCallable(config,
                                      ctx_iface=implementedBy(HTTPNotFound),
@@ -1697,30 +1697,33 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         result = view(None, request)
         self.assertEqual(result, (None, request))
 
-    def test_set_notfound_view_request_has_context(self):
+    def test_add_notfound_view_append_slash(self):
+        from pyramid.response import Response
         from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
         from pyramid.httpexceptions import HTTPNotFound
         config = self._makeOne(autocommit=True)
-        view = lambda *arg: arg
-        config.set_notfound_view(view, renderer=null_renderer)
+        config.add_route('foo', '/foo/')
+        def view(request): return Response('OK')
+        config.add_notfound_view(view, renderer=null_renderer,append_slash=True)
         request = self._makeRequest(config)
-        request.context = 'abc'
+        request.environ['PATH_INFO'] = '/foo'
+        request.query_string = 'a=1&b=2'
+        request.path = '/scriptname/foo'
         view = self._getViewCallable(config,
                                      ctx_iface=implementedBy(HTTPNotFound),
                                      request_iface=IRequest)
         result = view(None, request)
-        self.assertEqual(result, ('abc', request))
-
-    @testing.skip_on('java')
-    def test_set_notfound_view_with_renderer(self):
+        self.assertEqual(result.location, '/scriptname/foo/?a=1&b=2')
+        
+    def test_add_notfound_view_with_renderer(self):
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
         from pyramid.httpexceptions import HTTPNotFound
         config = self._makeOne(autocommit=True)
         view = lambda *arg: {}
-        config.set_notfound_view(
+        config.add_notfound_view(
             view,
             renderer='pyramid.tests.test_config:files/minimal.pt')
         config.begin()
@@ -1734,8 +1737,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             config.end()
         self.assertTrue(b'div' in result.body)
 
-    @testing.skip_on('java')
-    def test_set_forbidden_view_with_renderer(self):
+    def test_add_forbidden_view_with_renderer(self):
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
         from pyramid.httpexceptions import HTTPForbidden

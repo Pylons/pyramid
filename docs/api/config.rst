@@ -24,8 +24,7 @@
     .. automethod:: add_route
     .. automethod:: add_static_view(name, path, cache_max_age=3600, permission=NO_PERMISSION_REQUIRED)
     .. automethod:: add_view
-    .. automethod:: set_forbidden_view
-    .. automethod:: set_notfound_view
+    .. automethod:: add_notfound_view
 
   :methodcategory:`Adding an Event Subscriber`
 

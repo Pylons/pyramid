@@ -13,6 +13,17 @@ Features
   requirement that the debug toolbar's own views and methods not show up in
   the introspector.
 
+- New API: ``pyramid.config.Configurator.add_notfound_view``.  This is a
+  wrapper for ``pyramid.Config.configurator.add_view`` which provides easy
+  append_slash support.  It should be preferred over calling ``add_view``
+  directly with ``context=HTTPNotFound`` as was previously recommended.
+
+- New API: ``pyramid.view.notfound_view_config``.  This is a decorator
+  constructor like ``pyramid.view.view_config`` that calls
+  ``pyramid.config.Configurator.add_notfound_view`` when scanned.  It should
+  be preferred over using ``pyramid.view.view_config`` with
+  ``context=HTTPNotFound`` as was previously recommended.
+
 Backwards Incompatibilities
 ---------------------------
 
@@ -28,11 +39,52 @@ Backwards Incompatibilities
 
 - The ``pyramid.registry.noop_introspector`` API object has been removed.
 
+- The older deprecated ``set_notfound_view`` Configurator method is now an
+  alias for the new ``add_notfound_view`` Configurator method.  This has the
+  following impact: the ``context`` sent to views with a ``(context,
+  request)`` call signature registered via the deprecated
+  ``add_notfound_view``/``set_notfound_view`` will now be the HTTPNotFound
+  exception object instead of the actual resource context found.  Use
+  ``request.context`` to get the actual resource context.  It's also
+  recommended to disuse ``set_notfound_view`` in favor of
+  ``add_notfound_view``, despite the aliasing.
+
+Deprecations
+------------
+
+- The API documentation for ``pyramid.view.append_slash_notfound_view`` and
+  ``pyramid.view.AppendSlashNotFoundViewFactory`` was removed.  These names
+  still exist and are still importable, but they are no longer APIs.  Use
+  ``pyramid.config.Configurator.add_notfound_view(append_slash=True)`` or
+  ``pyramid.view.notfound_view_config(append_slash=True)`` to get the same
+  behavior.
+
+- The ``set_forbidden_view`` method of the Configurator was removed from the
+  documentation.  It has been deprecated since Pyramid 1.1.
+
 Bug Fixes
 ---------
 
 - The static file response object used by ``config.add_static_view`` opened
   the static file twice, when it only needed to open it once.
+
+- The AppendSlashNotFoundViewFactory used request.path to match routes.  This
+  was wrong because request.path contains the script name, and this would
+  cause it to fail in circumstances where the script name was not empty.  It
+  should have used request.path_info, and now does.
+
+Documentation
+-------------
+
+- Updated the "Registering a Not Found View" section of the "Hooks" chapter,
+  replacing explanations of registering a view using ``add_view`` or
+  ``view_config`` with ones using ``add_notfound_view`` or
+  ``notfound_view_config``.
+
+- Updated the "Redirecting to Slash-Appended Routes" section of the "URL
+  Dispatch" chapter, replacing explanations of registering a view using
+  ``add_view`` or ``view_config`` with ones using ``add_notfound_view`` or
+  ``notfound_view_config``
 
 1.3a8 (2012-02-19)
 ==================

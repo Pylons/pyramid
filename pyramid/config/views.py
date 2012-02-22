@@ -54,7 +54,12 @@ from pyramid.httpexceptions import (
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
-from pyramid.view import render_view_to_response
+
+from pyramid.view import (
+    render_view_to_response,
+    AppendSlashNotFoundViewFactory,
+    )
+
 from pyramid.util import object_description
 
 from pyramid.config.util import (
@@ -1353,10 +1358,6 @@ class ViewsConfiguratorMixin(object):
         The ``wrapper`` argument should be the name of another view
         which will wrap this view when rendered (see the ``add_view``
         method's ``wrapper`` argument for a description)."""
-        if isinstance(renderer, string_types):
-            renderer = renderers.RendererHelper(
-                name=renderer, package=self.package,
-                registry = self.registry)
         view = self._derive_view(view, attr=attr, renderer=renderer)
         def bwcompat_view(context, request):
             context = getattr(request, 'context', None)
@@ -1365,46 +1366,66 @@ class ViewsConfiguratorMixin(object):
                              wrapper=wrapper, renderer=renderer)
 
     @action_method
-    def set_notfound_view(self, view=None, attr=None, renderer=None,
-                          wrapper=None):
-        """ Add a default not found view to the current configuration
-        state.
+    def add_notfound_view(
+            self, view=None, attr=None, renderer=None,  wrapper=None,
+            route_name=None, request_type=None, request_method=None, 
+            request_param=None, containment=None, xhr=None, accept=None,
+            header=None, path_info=None,  custom_predicates=(), decorator=None,
+            mapper=None, match_param=None, append_slash=False):
+        """ Add a default notfound view to the current configuration state.
+        The view will be called when a view cannot otherwise be found for the
+        set of circumstances implied by the predicates provided.  The
+        simplest example is:
 
-        .. warning::
+          .. code-block:: python
 
-           This method has been deprecated in :app:`Pyramid` 1.0.  *Do not use
-           it for new development; it should only be used to support older code
-           bases which depend upon it.* See :ref:`changing_the_notfound_view` to
-           see how a not found view should be registered in new projects.
+           config.add_notfound_view(someview)
 
-        The ``view`` argument should be a :term:`view callable` or a
-        :term:`dotted Python name` which refers to a view callable.
+        All arguments except ``append_slash`` have the same meaning as
+        :meth:`pyramid.config.Configurator.add_view` and each predicate
+        argument restricts the set of circumstances under which this notfound
+        view will be invoked.
 
-        The ``attr`` argument should be the attribute of the view
-        callable used to retrieve the response (see the ``add_view``
-        method's ``attr`` argument for a description).
+        If ``append_slash`` is ``True``, when this notfound view is invoked,
+        and the current path info does not end in a slash, the notfound logic
+        will attempt to find a :term:`route` that matches the request's path
+        info suffixed with a slash.  If such a route exists, Pyramid will
+        issue a redirect to the URL implied by the route; if it does not,
+        Pyramid will return the result of the view callable provided as
+        ``view``, as normal.
 
-        The ``renderer`` argument should be the name of (or path to) a
-        :term:`renderer` used to generate a response for this view
-        (see the
-        :meth:`pyramid.config.Configurator.add_view`
-        method's ``renderer`` argument for information about how a
-        configurator relates to a renderer).
+        .. note::
 
-        The ``wrapper`` argument should be the name of another view
-        which will wrap this view when rendered (see the ``add_view``
-        method's ``wrapper`` argument for a description).
+           This method is new as of Pyramid 1.3.
         """
-        if isinstance(renderer, string_types):
-            renderer = renderers.RendererHelper(
-                name=renderer, package=self.package,
-                registry=self.registry)
-        view = self._derive_view(view, attr=attr, renderer=renderer)
-        def bwcompat_view(context, request):
-            context = getattr(request, 'context', None)
-            return view(context, request)
-        return self.add_view(bwcompat_view, context=HTTPNotFound,
-                             wrapper=wrapper, renderer=renderer)
+        settings = dict(
+            view=view,
+            context=HTTPNotFound,
+            wrapper=wrapper,
+            request_type=request_type,
+            request_method=request_method,
+            request_param=request_param,
+            containment=containment,
+            xhr=xhr,
+            accept=accept,
+            header=header, 
+            path_info=path_info,
+            custom_predicates=custom_predicates,
+            decorator=decorator,
+            mapper=mapper,
+            match_param=match_param,
+            route_name=route_name
+            )
+        if append_slash:
+            view = self._derive_view(view, attr=attr, renderer=renderer)
+            view = AppendSlashNotFoundViewFactory(view)
+            settings['view'] = view
+        else:
+            settings['attr'] = attr
+            settings['renderer'] = renderer
+        return self.add_view(**settings)
+
+    set_notfound_view = add_notfound_view # deprecated sorta-bw-compat alias
 
     @action_method
     def set_view_mapper(self, mapper):

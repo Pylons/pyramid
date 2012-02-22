@@ -1,8 +1,16 @@
 Pyramid TODOs
 =============
 
+Must-Have
+---------
+
+- Fix scaffolds and tutorials to use notfound_view_config rather than
+  view_config.
+
 Nice-to-Have
 ------------
+
+- Add forbidden_view_config?
 
 - Add docs about upgrading between Pyramid versions (e.g. how to see
   deprecation warnings).
@@ -25,8 +33,6 @@ Nice-to-Have
 
     with config.partial(introspection=False) as c:
         c.add_view(..)
-
-- Decorator for append_slash_notfound_view_factory.
 
 - Introspection:
 

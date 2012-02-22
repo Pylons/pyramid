@@ -19,24 +19,66 @@ found view`, which is a :term:`view callable`. A default notfound view
 exists.  The default not found view can be overridden through application
 configuration.
 
-The :term:`not found view` callable is a view callable like any other.  The
-:term:`view configuration` which causes it to be a "not found" view consists
-only of naming the :exc:`pyramid.httpexceptions.HTTPNotFound` class as the
-``context`` of the view configuration.
-
 If your application uses :term:`imperative configuration`, you can replace
-the Not Found view by using the :meth:`pyramid.config.Configurator.add_view`
-method to register an "exception view":
+the Not Found view by using the
+:meth:`pyramid.config.Configurator.add_notfound_view` method:
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.httpexceptions import HTTPNotFound
-   from helloworld.views import notfound_view
-   config.add_view(notfound_view, context=HTTPNotFound)
+   from helloworld.views import notfound
+   config.add_notfound_view(notfound)
 
-Replace ``helloworld.views.notfound_view`` with a reference to the
-:term:`view callable` you want to use to represent the Not Found view.
+Replace ``helloworld.views.notfound`` with a reference to the :term:`view
+callable` you want to use to represent the Not Found view.  The :term:`not
+found view` callable is a view callable like any other.
+
+If your application instead uses :class:`pyramid.view.view_config` decorators
+and a :term:`scan`, you can replace the Not Found view by using the
+:class:`pyramid.view.notfound_view_config` decorator:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.view import notfound_view_config
+
+   notfound_view_config()
+   def notfound(request):
+       return Response('Not Found, dude', status='404 Not Found')
+
+   def main(globals, **settings):
+      config = Configurator()
+      config.scan()
+
+This does exactly what the imperative example above showed.
+
+Your application can define *multiple* not found views if necessary.  Both
+:meth:`pyramid.config.Configurator.add_notfound_view` and
+:class:`pyramid.view.notfound_view_config` take most of the same arguments as
+:class:`pyramid.config.Configurator.add_view` and
+:class:`pyramid.view.view_config`, respectively.  This means that not found
+views can carry predicates limiting their applicability.  For example:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.view import notfound_view_config
+
+   notfound_view_config(request_method='GET')
+   def notfound_get(request):
+       return Response('Not Found during GET, dude', status='404 Not Found')
+
+   notfound_view_config(request_method='POST')
+   def notfound_post(request):
+       return Response('Not Found during POST, dude', status='404 Not Found')
+
+   def main(globals, **settings):
+      config = Configurator()
+      config.scan()
+
+The ``notfound_get`` view will be called when a view could not be found and
+the request method was ``GET``.  The ``notfound_post`` view will be called
+when a view could not be found and the request method was ``POST``.
 
 Like any other view, the notfound view must accept at least a ``request``
 parameter, or both ``context`` and ``request``.  The ``request`` is the
@@ -45,6 +87,11 @@ used in the call signature) will be the instance of the
 :exc:`~pyramid.httpexceptions.HTTPNotFound` exception that caused the view to
 be called.
 
+Both :meth:`pyramid.config.Configurator.add_notfound_view` and
+:class:`pyramid.view.notfound_view_config` can be used to automatically
+redirect requests to slash-appended routes. See
+:ref:`redirecting_to_slash_appended_routes` for examples.
+
 Here's some sample code that implements a minimal NotFound view callable:
 
 .. code-block:: python
@@ -52,7 +99,7 @@ Here's some sample code that implements a minimal NotFound view callable:
 
    from pyramid.httpexceptions import HTTPNotFound
 
-   def notfound_view(request):
+   def notfound(request):
        return HTTPNotFound()
 
 .. note::
@@ -65,6 +112,14 @@ Here's some sample code that implements a minimal NotFound view callable:
    error was raised.  This message will be different when the
    ``pyramid.debug_notfound`` environment setting is true than it is when it
    is false.
+
+.. note::
+
+   Both :meth:`pyramid.config.Configurator.add_notfound_view` and
+   :class:`pyramid.view.notfound_view_config` are new as of Pyramid 1.3.
+   Older Pyramid documentation instructed users to use ``add_view`` instead,
+   with a ``context`` of ``HTTPNotFound``.  This still works; the convenience
+   method and decorator are just wrappers around this functionality.
 
 .. warning::
 

@@ -103,7 +103,7 @@ Likewise for an :term:`HTTP exception` response:
 .. code-block:: python
    :linenos:
 
-   from pyramid.httpexceptions import HTTPNotFound
+   from pyramid.httpexceptions import HTTPFound
    from pyramid.view import view_config
 
    @view_config(renderer='json')

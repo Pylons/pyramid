@@ -204,7 +204,8 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
 
     if containment is not None:
         def containment_predicate(context, request):
-            return find_interface(context, containment) is not None
+            ctx = getattr(request, 'context', context)
+            return find_interface(ctx, containment) is not None
         containment_predicate.__text__ = "containment = %s" % containment
         weights.append(1 << 7)
         predicates.append(containment_predicate)
