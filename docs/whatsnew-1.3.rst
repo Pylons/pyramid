@@ -211,6 +211,22 @@ added, as well, but the configurator method should be preferred as it
 provides conflict detection and consistency in the lifetime of the
 properties.
 
+Not Found View Helpers
+~~~~~~~~~~~~~~~~~~~~~~
+
+- New API: :meth:`pyramid.config.Configurator.add_notfound_view`.  This is a
+  wrapper for :meth:`pyramid.Config.configurator.add_view` which provides
+  support for an "append_slash" feature as well as doing the right thing when
+  it comes to permissions (a not found view should always be public).  It
+  should be preferred over calling ``add_view`` directly with
+  ``context=HTTPNotFound`` as was previously recommended.
+
+- New API: :class:`pyramid.view.notfound_view_config``.  This is a decorator
+  constructor like :class:`pyramid.view.view_config` that calls
+  :meth:`pyramid.config.Configurator.add_notfound_view` when scanned.  It
+  should be preferred over using ``pyramid.view.view_config`` with
+  ``context=HTTPNotFound`` as was previously recommended.
+
 Minor Feature Additions
 -----------------------
 
@@ -408,6 +424,35 @@ Backwards Incompatibilities
   ``pyramid.interfaces.IContextURL`` adapter is found when
   :meth:`pyramid.request.Request.resource_url` is called.
 
+- Remove ``pyramid.config.Configurator.with_context`` class method.  It was
+  never an API, it is only used by ``pyramid_zcml`` and its functionality has
+  been moved to that package's latest release.  This means that you'll need
+  to use the 0.9.2 or later release of ``pyramid_zcml`` with this release of
+  Pyramid.
+
+- The older deprecated ``set_notfound_view`` Configurator method is now an
+  alias for the new :meth:`pyramid.config.Configurator.add_notfound_view`
+  method.  This has the following impact: the ``context`` sent to views with
+  a ``(context, request)`` call signature registered via the deprecated
+  ``add_notfound_view`` / ``set_notfound_view`` will now be the HTTPNotFound
+  exception object instead of the actual resource context found.  Use
+  ``request.context`` to get the actual resource context.  It's also
+  recommended to disuse ``set_notfound_view`` in favor of
+  ``add_notfound_view``, despite the aliasing.
+
+Deprecations
+------------
+
+- The API documentation for ``pyramid.view.append_slash_notfound_view`` and
+  ``pyramid.view.AppendSlashNotFoundViewFactory`` was removed.  These names
+  still exist and are still importable, but they are no longer APIs.  Use
+  ``pyramid.config.Configurator.add_notfound_view(append_slash=True)`` or
+  ``pyramid.view.notfound_view_config(append_slash=True)`` to get the same
+  behavior.
+
+- The ``set_forbidden_view`` method of the Configurator was removed from the
+  documentation.  It has been deprecated since Pyramid 1.1.
+
 Documentation Enhancements
 --------------------------
 
@@ -439,6 +484,14 @@ Documentation Enhancements
   (http://docs.pylonsproject.org/projects/pyramid_cookbook/en/latest/gae.html).
   Rationale: it provides the correct info for the Python 2.5 version of GAE
   only, and this version of Pyramid does not support Python 2.5.
+
+- Updated the :ref:`changing_the_notfound_view` section, replacing
+  explanations of registering a view using ``add_view`` or ``view_config``
+  with ones using ``add_notfound_view`` or ``notfound_view_config``.
+
+- Updated the :ref:`redirecting_to_slash_appended_routes` section, replacing
+  explanations of registering a view using ``add_view`` or ``view_config``
+  with ones using ``add_notfound_view`` or ``notfound_view_config``
 
 Dependency Changes
 ------------------
