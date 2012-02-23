@@ -354,6 +354,10 @@ Minor Feature Additions
   can be used to replace the respective default values of
   ``request.application_url`` partially.
 
+- New APIs: :class:`pyramid.response.FileResponse` and
+  :class:`pyramid.response.FileIter`, for usage in views that must serve
+  files "manually".
+
 Backwards Incompatibilities
 ---------------------------
 

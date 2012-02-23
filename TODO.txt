@@ -4,9 +4,6 @@ Pyramid TODOs
 Nice-to-Have
 ------------
 
-- Expose _FileIter and _FileResponse somehow fbo of
-  manual-static-view-creators.
-
 - Add docs about upgrading between Pyramid versions (e.g. how to see
   deprecation warnings).
 
