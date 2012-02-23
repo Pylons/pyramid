@@ -1,5 +1,5 @@
-Next release
-============
+1.3a9 (2012-02-22)
+==================
 
 Features
 --------
@@ -35,6 +35,10 @@ Features
   ``pyramid.config.Configurator.add_forbidden_view`` when scanned.  It should
   be preferred over using ``pyramid.view.view_config`` with
   ``context=HTTPForbidden`` as was previously recommended.
+
+- New APIs: ``pyramid.response.FileResponse`` and
+  ``pyramid.response.FileIter``, for usage in views that must serve files
+  "manually".
 
 Backwards Incompatibilities
 ---------------------------

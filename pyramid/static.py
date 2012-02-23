@@ -6,8 +6,6 @@ from os.path import (
     normcase,
     normpath,
     join,
-    getmtime,
-    getsize,
     isdir,
     exists,
     )
@@ -30,7 +28,7 @@ from pyramid.httpexceptions import (
     )
 
 from pyramid.path import caller_package
-from pyramid.response import Response
+from pyramid.response import FileResponse
 from pyramid.traversal import traversal_path_info
 
 slash = text_('/')
@@ -46,53 +44,6 @@ def init_mimetypes(mimetypes):
 # that seems to effect Python 2.6, Python 2.6.1, and 2.6.2 (a fix
 # has been applied on the Python 2 trunk).
 init_mimetypes(mimetypes)
-
-_BLOCK_SIZE = 4096 * 64 # 256K
-
-class _FileResponse(Response):
-    """
-    Serves a static filelike object.
-    """
-    def __init__(self, path, cache_max_age, request):
-        super(_FileResponse, self).__init__(conditional_response=True)
-        self.last_modified = getmtime(path)
-        content_type, content_encoding = mimetypes.guess_type(path,
-                                                              strict=False)
-        if content_type is None:
-            content_type = 'application/octet-stream'
-        self.content_type = content_type
-        self.content_encoding = content_encoding
-        content_length = getsize(path)
-        f = open(path, 'rb')
-        environ = request.environ
-        if 'wsgi.file_wrapper' in environ:
-            app_iter = environ['wsgi.file_wrapper'](f, _BLOCK_SIZE)
-        else:
-            app_iter = _FileIter(f, _BLOCK_SIZE)
-        self.app_iter = app_iter
-        # assignment of content_length must come after assignment of app_iter
-        self.content_length = content_length
-        if cache_max_age is not None:
-            self.cache_expires = cache_max_age
-
-class _FileIter(object):
-    def __init__(self, file, block_size):
-        self.file = file
-        self.block_size = block_size
-
-    def __iter__(self):
-        return self
-
-    def next(self):
-        val = self.file.read(self.block_size)
-        if not val:
-            raise StopIteration
-        return val
-
-    __next__ = next # py3
-
-    def close(self):
-        self.file.close()
 
 class static_view(object):
     """ An instance of this class is a callable which can act as a
@@ -187,7 +138,7 @@ class static_view(object):
             if not exists(filepath):
                 return HTTPNotFound(request.url)
 
-        return _FileResponse(filepath ,self.cache_max_age, request)
+        return FileResponse(filepath, request, self.cache_max_age)
 
     def add_slash_redirect(self, request):
         url = request.path_url + '/'

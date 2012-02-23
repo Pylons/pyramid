@@ -1,3 +1,5 @@
+import io
+import os
 import unittest
 from pyramid import testing
 
@@ -15,6 +17,51 @@ class TestResponse(unittest.TestCase):
         from pyramid.interfaces import IResponse
         inst = self._getTargetClass()()
         self.assertTrue(IResponse.providedBy(inst))
+
+class TestFileResponse(unittest.TestCase):
+    def _makeOne(self, file, **kw):
+        from pyramid.response import FileResponse
+        return FileResponse(file, **kw)
+
+    def _getPath(self):
+        here = os.path.dirname(__file__)
+        return os.path.join(here, 'fixtures', 'minimal.txt')
+
+    def test_with_content_type(self):
+        path = self._getPath()
+        r = self._makeOne(path, content_type='image/jpeg')
+        self.assertEqual(r.content_type, 'image/jpeg')
+
+    def test_without_content_type(self):
+        path = self._getPath()
+        r = self._makeOne(path)
+        self.assertEqual(r.content_type, 'text/plain')
+
+class TestFileIter(unittest.TestCase):
+    def _makeOne(self, file, block_size):
+        from pyramid.response import FileIter
+        return FileIter(file, block_size)
+
+    def test___iter__(self):
+        f = io.BytesIO(b'abc')
+        inst = self._makeOne(f, 1)
+        self.assertEqual(inst.__iter__(), inst)
+
+    def test_iteration(self):
+        data = b'abcdef'
+        f = io.BytesIO(b'abcdef')
+        inst = self._makeOne(f, 1)
+        r = b''
+        for x in inst:
+            self.assertEqual(len(x), 1)
+            r+=x
+        self.assertEqual(r, data)
+
+    def test_close(self):
+        f = io.BytesIO(b'abc')
+        inst = self._makeOne(f, 1)
+        inst.close()
+        self.assertTrue(f.closed)
 
 class Dummy(object):
     pass
