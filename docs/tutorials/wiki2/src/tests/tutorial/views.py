@@ -4,10 +4,12 @@ from docutils.core import publish_parts
 from pyramid.httpexceptions import (
     HTTPFound,
     HTTPNotFound,
-    HTTPForbidden,
     )
 
-from pyramid.view import view_config
+from pyramid.view import (
+    view_config,
+    forbidden_view_config,
+    )
 
 from pyramid.security import (
     remember,
@@ -88,7 +90,7 @@ def edit_page(request):
         )
 
 @view_config(route_name='login', renderer='templates/login.pt')
-@view_config(context=HTTPForbidden, renderer='templates/login.pt')
+@forbidden_view_config(renderer='templates/login.pt')
 def login(request):
     login_url = request.route_url('login')
     referrer = request.url

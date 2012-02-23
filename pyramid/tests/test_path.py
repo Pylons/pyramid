@@ -283,7 +283,8 @@ class TestPkgResourcesAssetDescriptor(unittest.TestCase):
         inst = self._makeOne()
         inst.pkg_resources = DummyPkgResource()
         inst.pkg_resources.resource_stream = lambda x, y: '%s:%s' % (x, y)
-        self.assertEqual(inst.stream(),
+        s = inst.stream()
+        self.assertEqual(s,
                          '%s:%s' % ('pyramid.tests', 'test_asset.py'))
 
     def test_isdir(self):
@@ -337,7 +338,9 @@ class TestFSAssetDescriptor(unittest.TestCase):
 
     def test_stream(self):
         inst = self._makeOne()
-        val = inst.stream().read()
+        s = inst.stream()
+        val = s.read()
+        s.close()
         self.assertTrue(b'asset' in val)
 
     def test_isdir_False(self):

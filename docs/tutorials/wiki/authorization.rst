@@ -132,14 +132,14 @@ We'll add these views to the existing ``views.py`` file we have in our
 project.  Here's what the ``login`` view callable will look like:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 83-111
+   :lines: 86-113
    :linenos:
    :language: python
 
 Here's what the ``logout`` view callable will look like:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 113-117
+   :lines: 115-119
    :linenos:
    :language: python
 
@@ -149,18 +149,18 @@ different :term:`view configuration` for the ``login`` view callable.
 
 The first view configuration decorator configures the ``login`` view callable
 so it will be invoked when someone visits ``/login`` (when the context is a
-Wiki and the view name is ``login``).  The second decorator (with context of
-``pyramid.httpexceptions.HTTPForbidden``) specifies a :term:`forbidden view`.
-This configures our login view to be presented to the user when
-:app:`Pyramid` detects that a view invocation can not be authorized.  Because
-we've configured a forbidden view, the ``login`` view callable will be
-invoked whenever one of our users tries to execute a view callable that they
-are not allowed to invoke as determined by the :term:`authorization policy`
-in use.  In our application, for example, this means that if a user has not
-logged in, and he tries to add or edit a Wiki page, he will be shown the
-login form.  Before being allowed to continue on to the add or edit form, he
-will have to provide credentials that give him permission to add or edit via
-this login form.
+Wiki and the view name is ``login``).  The second decorator, named
+``forbidden_view_config`` specifies a :term:`forbidden view`.  This
+configures our login view to be presented to the user when :app:`Pyramid`
+detects that a view invocation can not be authorized.  Because we've
+configured a forbidden view, the ``login`` view callable will be invoked
+whenever one of our users tries to execute a view callable that they are not
+allowed to invoke as determined by the :term:`authorization policy` in use.
+In our application, for example, this means that if a user has not logged in,
+and he tries to add or edit a Wiki page, he will be shown the login form.
+Before being allowed to continue on to the add or edit form, he will have to
+provide credentials that give him permission to add or edit via this login
+form.
 
 Note that we're relying on some additional imports within the bodies of these
 views (e.g. ``remember`` and ``forget``).  We'll see a rendering of the

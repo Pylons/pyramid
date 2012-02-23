@@ -159,33 +159,35 @@ logged in user and redirect back to the front page.
 The ``login`` view callable will look something like this:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 87-113
+   :lines: 89-115
    :linenos:
    :language: python
 
 The ``logout`` view callable will look something like this:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 115-119
+   :lines: 117-121
    :linenos:
    :language: python
 
-The ``login`` view callable is decorated with two ``@view_config``
-decorators, one which associates it with the ``login`` route, the other which
-associates it with the ``HTTPForbidden`` context.  The one which associates
-it with the ``login`` route makes it visible when we visit ``/login``.  The
-one which associates it with the ``HTTPForbidden`` context makes it the
-:term:`forbidden view`.  The forbidden view is displayed whenever Pyramid or
-your application raises an HTTPForbidden exception.  In this case, we'll be
-relying on the forbidden view to show the login form whenver someone attempts
-to execute an action which they're not yet authorized to perform.
+The ``login`` view callable is decorated with two decorators, a
+``@view_config`` decorators, which associates it with the ``login`` route,
+the other a ``@forbidden_view_config`` decorator which turns it in to an
+:term:`exception view` when Pyramid raises a
+:class:`pyramid.httpexceptions.HTTPForbidden` exception.  The one which
+associates it with the ``login`` route makes it visible when we visit
+``/login``.  The other one makes it a :term:`forbidden view`.  The forbidden
+view is displayed whenever Pyramid or your application raises an
+HTTPForbidden exception.  In this case, we'll be relying on the forbidden
+view to show the login form whenver someone attempts to execute an action
+which they're not yet authorized to perform.
 
 The ``logout`` view callable is decorated with a ``@view_config`` decorator
 which associates it with the ``logout`` route.  This makes it visible when we
 visit ``/login``.
 
 We'll need to import some stuff to service the needs of these two functions:
-the ``HTTPForbidden`` exception, a number of values from the
+the ``pyramid.view.forbidden_view_config`` class, a number of values from the
 ``pyramid.security`` module, and a value from our newly added
 ``tutorial.security`` package.
 

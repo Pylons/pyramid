@@ -4,6 +4,9 @@ Pyramid TODOs
 Nice-to-Have
 ------------
 
+- Expose _FileIter and _FileResponse somehow fbo of
+  manual-static-view-creators.
+
 - Add docs about upgrading between Pyramid versions (e.g. how to see
   deprecation warnings).
 
@@ -15,7 +18,16 @@ Nice-to-Have
 - Modify the urldispatch chapter examples to assume a scan rather than
   ``add_view``.
 
-- Decorator for append_slash_notfound_view_factory.
+- Context manager for creating a new configurator (replacing
+  ``with_package``).  E.g.::
+
+    with config.partial(package='bar') as c:
+        c.add_view(...)
+
+  or::
+
+    with config.partial(introspection=False) as c:
+        c.add_view(..)
 
 - Introspection:
 
@@ -26,9 +38,6 @@ Nice-to-Have
     "view mappers" category)?
 
   * get rid of "tweens" category (can't sort properly?)
-
-  * Introspection hiding for directives for purposes of omitting toolbar
-    registrations.  Maybe toolbar can just use a null introspector?
 
 - Fix deployment recipes in cookbook (discourage proxying without changing
   server).

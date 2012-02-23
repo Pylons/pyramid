@@ -581,6 +581,11 @@ class LazyWriter(object):
                 self.lock.release()
         return self.fileobj
 
+    def __del__(self):
+        fileobj = self.fileobj
+        if fileobj is not None:
+            fileobj.close()
+
     def write(self, text):
         fileobj = self.open()
         fileobj.write(text)

@@ -24,8 +24,8 @@
     .. automethod:: add_route
     .. automethod:: add_static_view(name, path, cache_max_age=3600, permission=NO_PERMISSION_REQUIRED)
     .. automethod:: add_view
-    .. automethod:: set_forbidden_view
-    .. automethod:: set_notfound_view
+    .. automethod:: add_notfound_view
+    .. automethod:: add_forbidden_view
 
   :methodcategory:`Adding an Event Subscriber`
 
@@ -76,18 +76,18 @@
      .. automethod:: action
      .. automethod:: add_directive
      .. automethod:: with_package
+     .. automethod:: derive_view
 
    :methodcategory:`Utility Methods`
 
      .. automethod:: absolute_asset_spec
-     .. automethod:: derive_view
      .. automethod:: maybe_dotted
-     .. automethod:: setup_registry
 
    :methodcategory:`ZCA-Related APIs`
 
      .. automethod:: hook_zca
      .. automethod:: unhook_zca
+     .. automethod:: setup_registry
 
    :methodcategory:`Testing Helper APIs`
 
@@ -112,9 +112,7 @@
 
         The :term:`introspector` related to this configuration.  It is an
         instance implementing the :class:`pyramid.interfaces.IIntrospector`
-        interface.  If the Configurator constructor was supplied with an
-        ``introspector`` argument, this attribute will be that value.
-        Otherwise, it will be an instance of a default introspector type.
+        interface.
 
         .. note::
 

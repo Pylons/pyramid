@@ -172,28 +172,6 @@ class Introspector(object):
             raise KeyError((category_name, discriminator))
         return self._refs.get(intr, [])
 
-@implementer(IIntrospector)
-class _NoopIntrospector(object):
-    def add(self, intr):
-        pass
-    def get(self, category_name, discriminator, default=None):
-        return default
-    def get_category(self, category_name, default=None, sort_key=None):
-        return default
-    def categorized(self, sort_key=None):
-        return []
-    def categories(self):
-        return []
-    def remove(self, category_name, discriminator):
-        return
-    def relate(self, *pairs):
-        return
-    unrelate = relate
-    def related(self, intr):
-        return []
-
-noop_introspector = _NoopIntrospector()
-
 @implementer(IIntrospectable)
 class Introspectable(dict):
 
