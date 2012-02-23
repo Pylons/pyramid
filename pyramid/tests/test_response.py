@@ -63,22 +63,27 @@ class TestFileIter(unittest.TestCase):
         inst.close()
         self.assertTrue(f.closed)
 
-class Dummy(object):
-    pass
+class Test_patch_mimetypes(unittest.TestCase):
+    def _callFUT(self, module):
+        from pyramid.response import init_mimetypes
+        return init_mimetypes(module)
 
-class DummyConfigurator(object):
-    def __init__(self):
-        self.adapters = []
+    def test_has_init(self):
+        class DummyMimetypes(object):
+            def init(self):
+                self.initted = True
+        module = DummyMimetypes()
+        result = self._callFUT(module)
+        self.assertEqual(result, True)
+        self.assertEqual(module.initted, True)
+        
+    def test_missing_init(self):
+        class DummyMimetypes(object):
+            pass
+        module = DummyMimetypes()
+        result = self._callFUT(module)
+        self.assertEqual(result, False)
 
-    def add_response_adapter(self, wrapped, type_or_iface):
-        self.adapters.append((wrapped, type_or_iface))
-
-class DummyVenusian(object):
-    def __init__(self):
-        self.attached = []
-
-    def attach(self, wrapped, fn, category=None):
-        self.attached.append((wrapped, fn, category))
 
 class TestResponseAdapter(unittest.TestCase):
     def setUp(self):
@@ -125,3 +130,22 @@ class TestResponseAdapter(unittest.TestCase):
         dec(foo)
         self.assertEqual(dummy_venusian.attached,
                          [(foo, dec.register, 'pyramid')])
+
+class Dummy(object):
+    pass
+
+class DummyConfigurator(object):
+    def __init__(self):
+        self.adapters = []
+
+    def add_response_adapter(self, wrapped, type_or_iface):
+        self.adapters.append((wrapped, type_or_iface))
+
+class DummyVenusian(object):
+    def __init__(self):
+        self.attached = []
+
+    def attach(self, wrapped, fn, category=None):
+        self.attached.append((wrapped, fn, category))
+
+        
