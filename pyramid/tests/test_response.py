@@ -1,4 +1,5 @@
 import io
+import os
 import unittest
 from pyramid import testing
 
@@ -16,6 +17,25 @@ class TestResponse(unittest.TestCase):
         from pyramid.interfaces import IResponse
         inst = self._getTargetClass()()
         self.assertTrue(IResponse.providedBy(inst))
+
+class TestFileResponse(unittest.TestCase):
+    def _makeOne(self, file, **kw):
+        from pyramid.response import FileResponse
+        return FileResponse(file, **kw)
+
+    def _getPath(self):
+        here = os.path.dirname(__file__)
+        return os.path.join(here, 'fixtures', 'minimal.txt')
+
+    def test_with_content_type(self):
+        path = self._getPath()
+        r = self._makeOne(path, content_type='image/jpeg')
+        self.assertEqual(r.content_type, 'image/jpeg')
+
+    def test_without_content_type(self):
+        path = self._getPath()
+        r = self._makeOne(path)
+        self.assertEqual(r.content_type, 'text/plain')
 
 class TestFileIter(unittest.TestCase):
     def _makeOne(self, file, block_size):
