@@ -15,14 +15,26 @@ Features
 
 - New API: ``pyramid.config.Configurator.add_notfound_view``.  This is a
   wrapper for ``pyramid.Config.configurator.add_view`` which provides easy
-  append_slash support.  It should be preferred over calling ``add_view``
-  directly with ``context=HTTPNotFound`` as was previously recommended.
+  append_slash support and does the right thing about permissions.  It should
+  be preferred over calling ``add_view`` directly with
+  ``context=HTTPNotFound`` as was previously recommended.
 
 - New API: ``pyramid.view.notfound_view_config``.  This is a decorator
   constructor like ``pyramid.view.view_config`` that calls
   ``pyramid.config.Configurator.add_notfound_view`` when scanned.  It should
   be preferred over using ``pyramid.view.view_config`` with
   ``context=HTTPNotFound`` as was previously recommended.
+
+- New API: ``pyramid.config.Configurator.add_forbidden_view``.  This is a
+  wrapper for ``pyramid.Config.configurator.add_view`` which does the right
+  thing about permissions.  It should be preferred over calling ``add_view``
+  directly with ``context=HTTPForbidden`` as was previously recommended.
+
+- New API: ``pyramid.view.forbidden_view_config``.  This is a decorator
+  constructor like ``pyramid.view.view_config`` that calls
+  ``pyramid.config.Configurator.add_forbidden_view`` when scanned.  It should
+  be preferred over using ``pyramid.view.view_config`` with
+  ``context=HTTPForbidden`` as was previously recommended.
 
 Backwards Incompatibilities
 ---------------------------
@@ -40,14 +52,16 @@ Backwards Incompatibilities
 - The ``pyramid.registry.noop_introspector`` API object has been removed.
 
 - The older deprecated ``set_notfound_view`` Configurator method is now an
-  alias for the new ``add_notfound_view`` Configurator method.  This has the
-  following impact: the ``context`` sent to views with a ``(context,
-  request)`` call signature registered via the deprecated
-  ``add_notfound_view``/``set_notfound_view`` will now be the HTTPNotFound
-  exception object instead of the actual resource context found.  Use
+  alias for the new ``add_notfound_view`` Configurator method.  Likewise, the
+  older deprecated ``set_forbidden_view`` is now an alias for the new
+  ``add_forbidden_view``. This has the following impact: the ``context`` sent
+  to views with a ``(context, request)`` call signature registered via the
+  ``set_notfound_view`` or ``set_forbidden_view`` will now be an exception
+  object instead of the actual resource context found.  Use
   ``request.context`` to get the actual resource context.  It's also
   recommended to disuse ``set_notfound_view`` in favor of
-  ``add_notfound_view``, despite the aliasing.
+  ``add_notfound_view``, and disuse ``set_forbidden_view`` in favor of
+  ``add_forbidden_view`` despite the aliasing.
 
 Deprecations
 ------------
@@ -59,8 +73,9 @@ Deprecations
   ``pyramid.view.notfound_view_config(append_slash=True)`` to get the same
   behavior.
 
-- The ``set_forbidden_view`` method of the Configurator was removed from the
-  documentation.  It has been deprecated since Pyramid 1.1.
+- The ``set_forbidden_view`` and ``set_notfound_view`` methods of the
+  Configurator were removed from the documentation.  They have been
+  deprecated since Pyramid 1.1.
 
 Bug Fixes
 ---------
@@ -76,15 +91,23 @@ Bug Fixes
 Documentation
 -------------
 
-- Updated the "Registering a Not Found View" section of the "Hooks" chapter,
+- Updated the "Creating a Not Found View" section of the "Hooks" chapter,
   replacing explanations of registering a view using ``add_view`` or
   ``view_config`` with ones using ``add_notfound_view`` or
   ``notfound_view_config``.
+
+- Updated the "Creating a Not Forbidden View" section of the "Hooks" chapter,
+  replacing explanations of registering a view using ``add_view`` or
+  ``view_config`` with ones using ``add_forbidden_view`` or
+  ``forbidden_view_config``.
 
 - Updated the "Redirecting to Slash-Appended Routes" section of the "URL
   Dispatch" chapter, replacing explanations of registering a view using
   ``add_view`` or ``view_config`` with ones using ``add_notfound_view`` or
   ``notfound_view_config``
+
+- Updated all tutorials to use ``pyramid.view.forbidden_view_config`` rather
+  than ``pyramid.view.view_config`` with an HTTPForbidden context.
 
 1.3a8 (2012-02-19)
 ==================

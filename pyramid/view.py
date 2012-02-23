@@ -391,6 +391,71 @@ class notfound_view_config(object):
         settings['_info'] = info.codeinfo # fbo "action_method"
         return wrapped
 
+class forbidden_view_config(object):
+    """
+
+    An analogue of :class:`pyramid.view.view_config` which registers a
+    :term:`forbidden view`.
+
+    The forbidden_view_config constructor accepts most of the same arguments
+    as the constructor of :class:`pyramid.view.view_config`.  It can be used
+    in the same places, and behaves in largely the same way, except it always
+    registers a forbidden exception view instead of a "normal" view.
+
+    Example:
+
+    .. code-block:: python
+
+        from pyramid.view import forbidden_view_config
+        from pyramid.response import Response
+          
+        forbidden_view_config()
+        def notfound(request):
+            return Response('You are not allowed', status='401 Unauthorized')
+
+    All have the same meaning as :meth:`pyramid.view.view_config` and each
+    predicate argument restricts the set of circumstances under which this
+    notfound view will be invoked.
+
+    See :ref:`changing_the_forbidden_view` for detailed usage information.
+
+    .. note::
+
+       This class is new as of Pyramid 1.3.
+    """
+
+    venusian = venusian
+
+    def __init__(self, request_type=default, request_method=default,
+                 route_name=default, request_param=default, attr=default,
+                 renderer=default, containment=default, wrapper=default, 
+                 xhr=default, accept=default, header=default,
+                 path_info=default,  custom_predicates=default, 
+                 decorator=default, mapper=default, match_param=default):
+        L = locals()
+        for k, v in L.items():
+            if k not in ('self', 'L') and v is not default:
+                self.__dict__[k] = v
+
+    def __call__(self, wrapped):
+        settings = self.__dict__.copy()
+
+        def callback(context, name, ob):
+            config = context.config.with_package(info.module)
+            config.add_forbidden_view(view=ob, **settings)
+
+        info = self.venusian.attach(wrapped, callback, category='pyramid')
+
+        if info.scope == 'class':
+            # if the decorator was attached to a method in a class, or
+            # otherwise executed at class scope, we need to set an
+            # 'attr' into the settings if one isn't already in there
+            if settings.get('attr') is None:
+                settings['attr'] = wrapped.__name__
+
+        settings['_info'] = info.codeinfo # fbo "action_method"
+        return wrapped
+    
 def is_response(ob):
     """ Return ``True`` if ``ob`` implements the interface implied by
     :ref:`the_response`. ``False`` if not.

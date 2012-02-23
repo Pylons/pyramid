@@ -145,22 +145,39 @@ the view which generates it can be overridden as necessary.
 
 The :term:`forbidden view` callable is a view callable like any other.  The
 :term:`view configuration` which causes it to be a "forbidden" view consists
-only of naming the :exc:`pyramid.httpexceptions.HTTPForbidden` class as the
-``context`` of the view configuration.
+of using the meth:`pyramid.config.Configurator.add_forbidden_view` API or the
+:class:`pyramid.view.forbidden_view_config` decorator.
 
-You can replace the forbidden view by using the
-:meth:`pyramid.config.Configurator.add_view` method to register an "exception
-view":
+For example, you can add a forbidden view by using the
+:meth:`pyramid.config.Configurator.add_forbidden_view` method to register a
+forbidden view:
 
 .. code-block:: python
    :linenos:
 
    from helloworld.views import forbidden_view
    from pyramid.httpexceptions import HTTPForbidden
-   config.add_view(forbidden_view, context=HTTPForbidden)
+   config.add_forbidden_view(forbidden_view)
 
 Replace ``helloworld.views.forbidden_view`` with a reference to the Python
 :term:`view callable` you want to use to represent the Forbidden view.
+
+If instead you prefer to use decorators and a :term:`scan`, you can use the
+:class:`pyramid.view.forbidden_view_config` decorator to mark a view callable
+as a forbidden view:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.view import forbidden_view_config
+
+   forbidden_view_config()
+   def forbidden(request):
+       return Response('forbidden')
+
+   def main(globals, **settings):
+      config = Configurator()
+      config.scan()
 
 Like any other view, the forbidden view must accept at least a ``request``
 parameter, or both ``context`` and ``request``.  The ``context`` (available

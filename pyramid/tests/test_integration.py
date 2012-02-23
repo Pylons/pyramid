@@ -373,6 +373,15 @@ class TestNotFoundView(IntegrationBase, unittest.TestCase):
         self.assertTrue(b'OK foo2' in res.body)
         res = self.testapp.get('/baz', status=200)
         self.assertTrue(b'baz_notfound' in res.body)
+
+class TestForbiddenView(IntegrationBase, unittest.TestCase):
+    package = 'pyramid.tests.pkgs.forbiddenview'
+
+    def test_it(self):
+        res = self.testapp.get('/foo', status=200)
+        self.assertTrue(b'foo_forbidden' in res.body)
+        res = self.testapp.get('/bar', status=200)
+        self.assertTrue(b'generic_forbidden' in res.body)
         
 class TestViewPermissionBug(IntegrationBase, unittest.TestCase):
     # view_execution_permitted bug as reported by Shane at http://lists.repoze.org/pipermail/repoze-dev/2010-October/003603.html

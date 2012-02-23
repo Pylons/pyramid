@@ -1649,38 +1649,20 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         self.assertEqual(info.added,
                          [(config, 'static', static_path, {})])
     
-    def test_set_forbidden_view(self):
+    def test_add_forbidden_view(self):
         from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
         from pyramid.httpexceptions import HTTPForbidden
         config = self._makeOne(autocommit=True)
         view = lambda *arg: 'OK'
-        config.set_forbidden_view(view, renderer=null_renderer)
+        config.add_forbidden_view(view, renderer=null_renderer)
         request = self._makeRequest(config)
         view = self._getViewCallable(config,
                                      ctx_iface=implementedBy(HTTPForbidden),
                                      request_iface=IRequest)
         result = view(None, request)
         self.assertEqual(result, 'OK')
-
-    def test_set_forbidden_view_request_has_context(self):
-        from pyramid.renderers import null_renderer
-        from zope.interface import implementedBy
-        from pyramid.interfaces import IRequest
-        from pyramid.httpexceptions import HTTPForbidden
-        config = self._makeOne(autocommit=True)
-        view = lambda *arg: arg
-        config.set_forbidden_view(view, renderer=null_renderer)
-        request = self._makeRequest(config)
-        request.context = 'abc'
-        view = self._getViewCallable(config,
-                                     ctx_iface=implementedBy(HTTPForbidden),
-                                     request_iface=IRequest)
-        result = view(None, request)
-        self.assertEqual(result, ('abc', request))
-
-
 
     def test_add_notfound_view(self):
         from pyramid.renderers import null_renderer
@@ -1743,7 +1725,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.httpexceptions import HTTPForbidden
         config = self._makeOne(autocommit=True)
         view = lambda *arg: {}
-        config.set_forbidden_view(
+        config.add_forbidden_view(
             view,
             renderer='pyramid.tests.test_config:files/minimal.pt')
         config.begin()

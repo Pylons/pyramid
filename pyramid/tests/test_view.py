@@ -94,6 +94,48 @@ class Test_notfound_view_config(BaseTest, unittest.TestCase):
         self.assertEqual(settings[0]['attr'], 'view')
         self.assertEqual(settings[0]['_info'], 'codeinfo')
 
+class Test_forbidden_view_config(BaseTest, unittest.TestCase):
+    def _makeOne(self, **kw):
+        from pyramid.view import forbidden_view_config
+        return forbidden_view_config(**kw)
+
+    def test_ctor(self):
+        inst = self._makeOne(attr='attr', path_info='path_info')
+        self.assertEqual(inst.__dict__,
+                         {'attr':'attr', 'path_info':'path_info'})
+
+    def test_it_function(self):
+        def view(request): pass
+        decorator = self._makeOne(attr='attr', renderer='renderer')
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        wrapped = decorator(view)
+        self.assertTrue(wrapped is view)
+        config = call_venusian(venusian)
+        settings = config.settings
+        self.assertEqual(
+            settings, 
+            [{'attr': 'attr', 'venusian': venusian, 
+              'renderer': 'renderer', '_info': 'codeinfo', 'view': None}]
+            )
+
+    def test_it_class(self):
+        decorator = self._makeOne()
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        decorator.venusian.info.scope = 'class'
+        class view(object): pass
+        wrapped = decorator(view)
+        self.assertTrue(wrapped is view)
+        config = call_venusian(venusian)
+        settings = config.settings
+        self.assertEqual(len(settings), 1)
+        self.assertEqual(len(settings[0]), 4)
+        self.assertEqual(settings[0]['venusian'], venusian)
+        self.assertEqual(settings[0]['view'], None) # comes from call_venusian
+        self.assertEqual(settings[0]['attr'], 'view')
+        self.assertEqual(settings[0]['_info'], 'codeinfo')
+        
 class RenderViewToResponseTests(BaseTest, unittest.TestCase):
     def _callFUT(self, *arg, **kw):
         from pyramid.view import render_view_to_response
@@ -716,7 +758,7 @@ class DummyConfig(object):
     def add_view(self, **kw):
         self.settings.append(kw)
 
-    add_notfound_view = add_view
+    add_notfound_view = add_forbidden_view = add_view
 
     def with_package(self, pkg):
         self.pkg = pkg
