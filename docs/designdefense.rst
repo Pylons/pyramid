@@ -1386,7 +1386,7 @@ predictability.
   actually the best-case circumstance for double-imports; if a module only
   mutates itself and its contents at import time, if it is imported twice,
   that's OK, because each decorator invocation will always be mutating an
-  independent copy of the object its attached to, not a shared resource like
+  independent copy of the object it's attached to, not a shared resource like
   a registry in another module.  This has the effect that
   double-registrations will never be performed.
 
@@ -1727,7 +1727,7 @@ reads something like this:
 
 (Paraphrased from a real email, actually.)
 
-Let's take this criticism point-by point.
+Let's take this criticism point-by-point.
 
 Too Complex
 +++++++++++
