@@ -379,13 +379,12 @@ do so, do things "by hand".  First define the view callable.
 
 The above bit of code within ``favicon_view`` computes "here", which is a
 path relative to the Python file in which the function is defined.  It then
-uses the Python ``open`` function to obtain a file handle to a file within
-"here" named ``static``, and returns a :class:`pyramid.response.FileResponse`
-using the file path as the response's ``path`` argument and the request as
-the response's ``request`` argument.  :class:`pyramid.response.FileResponse`
-will serve the file as quickly as possible when it's used this way.  It makes
-sure to set the right content length and content_type too based on the file
-extension of the file you pass.
+creates a :class:`pyramid.response.FileResponse` using the file path as the
+response's ``path`` argument and the request as the response's ``request``
+argument.  :class:`pyramid.response.FileResponse` will serve the file as
+quickly as possible when it's used this way.  It makes sure to set the right
+content length and content_type too based on the file extension of the file
+you pass.
 
 You might register such a view via configuration as a view callable that
 should be called as the result of a traversal:
