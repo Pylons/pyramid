@@ -8,8 +8,10 @@ import unittest
 from pyramid.wsgi import wsgiapp
 from pyramid.view import view_config
 from pyramid.static import static_view
-from pyramid.compat import text_
-from pyramid.compat import url_quote
+from pyramid.compat import (
+    text_,
+    url_quote,
+    )
 
 from zope.interface import Interface
 
@@ -616,7 +618,7 @@ def read_(filename):
         return val
     
 def _assertBody(body, filename):
-    if defaultlocale is None:
+    if defaultlocale is None: # pragma: no cover
         # If system locale does not have an encoding then default to utf-8
         filename = filename.encode('utf-8')
     assert(body.replace(b'\r', b'') == read_(filename))

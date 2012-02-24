@@ -1,7 +1,9 @@
 import unittest
 from pyramid import testing
-from pyramid.compat import text_
-from pyramid.compat import bytes_
+from pyramid.compat import (
+    text_,
+    bytes_,
+    )
 
 class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
     def setUp(self):

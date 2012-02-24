@@ -1,7 +1,9 @@
 import unittest
 
-from pyramid.compat import bytes_
-from pyramid.compat import text_
+from pyramid.compat import (
+    bytes_,
+    text_,
+    )
 
 class Test_exception_response(unittest.TestCase):
     def _callFUT(self, *arg, **kw):
