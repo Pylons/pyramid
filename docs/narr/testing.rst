@@ -303,12 +303,12 @@ In :app:`Pyramid`, a *unit test* typically relies on "mock" or "dummy"
 implementations to give the code under test only enough context to run.
 
 "Integration testing" implies another sort of testing.  In the context of a
-:app:`Pyramid`, integration test, the test logic tests the functionality of
+:app:`Pyramid` integration test, the test logic tests the functionality of
 some code *and* its integration with the rest of the :app:`Pyramid`
 framework.
 
 In :app:`Pyramid` applications that are plugins to Pyramid, you can create an
-integration test by including it's ``includeme`` function via
+integration test by including its ``includeme`` function via
 :meth:`pyramid.config.Configurator.include` in the test's setup code.  This
 causes the entire :app:`Pyramid` environment to be set up and torn down as if
 your application was running "for real".  This is a heavy-hammer way of
@@ -372,7 +372,7 @@ Creating Functional Tests
 Functional tests test your literal application.
 
 The below test assumes that your application's package name is ``myapp``, and
-that there is view that returns an HTML body when the root URL is invoked.
+that there is a view that returns an HTML body when the root URL is invoked.
 It further assumes that you've added a ``tests_require`` dependency on the
 ``WebTest`` package within your ``setup.py`` file.  :term:`WebTest` is a
 functional testing package written by Ian Bicking.

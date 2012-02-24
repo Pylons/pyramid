@@ -900,7 +900,7 @@ When a non-``None`` ``http_cache`` argument is passed to a view
 configuration, Pyramid will set ``Expires`` and ``Cache-Control`` response
 headers in the resulting response, causing browsers to cache the response
 data for some time.  See ``http_cache`` in :ref:`nonpredicate_view_args` for
-the its allowable values and what they mean.
+the allowable values and what they mean.
 
 Sometimes it's undesirable to have these headers set as the result of
 returning a response from a view, even though you'd like to decorate the view
