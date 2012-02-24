@@ -330,7 +330,8 @@ class Request(BaseRequest, DeprecatedRequestMethodsMixin, URLMethodsMixin,
 
     @reify
     def tmpl_context(self):
-        """ Template context (for Pylons apps) """
+        # docs-deprecated template context for Pylons-like apps; do not
+        # remove.
         return TemplateContext()
 
     @reify
