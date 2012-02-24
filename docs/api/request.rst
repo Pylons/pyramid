@@ -145,10 +145,6 @@
      ``request.session`` attribute will cause a
      :class:`pyramid.exceptions.ConfigurationError` to be raised.
 
-   .. attribute:: tmpl_context
-
-     The template context for Pylons-style applications.
-
    .. attribute:: matchdict
 
       If a :term:`route` has matched during this request, this attribute will
