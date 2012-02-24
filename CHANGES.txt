@@ -1,3 +1,13 @@
+Next release
+============
+
+Bug Fixes
+---------
+
+- ``pyramid.config.Configurator.with_package`` didn't work if the
+  Configurator was an old-style ``pyramid.configuration.Configurator``
+  instance.
+
 1.3a9 (2012-02-22)
 ==================
 

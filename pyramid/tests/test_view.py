@@ -3,8 +3,10 @@ import sys
 
 from zope.interface import implementer
 
-from pyramid.testing import setUp
-from pyramid.testing import tearDown
+from pyramid.testing import (
+    setUp,
+    tearDown,
+    )
 
 class BaseTest(object):
     def setUp(self):

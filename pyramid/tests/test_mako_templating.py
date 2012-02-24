@@ -2,8 +2,10 @@
 
 import unittest
 from pyramid import testing
-from pyramid.compat import text_
-from pyramid.compat import text_type
+from pyramid.compat import (
+    text_,
+    text_type,
+    )
 
 class Base(object):
     def setUp(self):

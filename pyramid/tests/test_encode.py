@@ -1,6 +1,8 @@
 import unittest
-from pyramid.compat import text_
-from pyramid.compat import native_
+from pyramid.compat import (
+    text_,
+    native_,
+    )
 
 class UrlEncodeTests(unittest.TestCase):
     def _callFUT(self, query, doseq=False):

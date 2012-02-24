@@ -29,6 +29,7 @@ class Configurator(BaseConfigurator):
                  session_factory=None,
                  autocommit=True,
                  route_prefix=None,
+                 introspection=True,
                  ):
         if package is None:
             package = caller_package()
@@ -49,6 +50,7 @@ class Configurator(BaseConfigurator):
             session_factory=session_factory,
             autocommit=autocommit,
             route_prefix=route_prefix,
+            introspection=introspection,
             )
             
 deprecated(

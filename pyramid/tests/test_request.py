@@ -1,11 +1,15 @@
 import unittest
 from pyramid import testing
 
-from pyramid.compat import PY3
-from pyramid.compat import text_
-from pyramid.compat import bytes_
-from pyramid.compat import native_
-from pyramid.compat import iteritems_, iterkeys_, itervalues_
+from pyramid.compat import (
+    PY3,
+    text_,
+    bytes_,
+    native_,
+    iteritems_,
+    iterkeys_,
+    itervalues_,
+    )
 
 class TestRequest(unittest.TestCase):
     def setUp(self):
