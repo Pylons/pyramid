@@ -72,13 +72,13 @@ Return Values
 
     The ACE "action" (the first element in an ACE e.g. ``(Allow, Everyone,
     'read')`` that means allow access.  A sequence of ACEs makes up an
-    ACL.  It is a string, and it's actual value is "Allow".
+    ACL.  It is a string, and its actual value is "Allow".
 
 .. attribute:: Deny
 
     The ACE "action" (the first element in an ACE e.g. ``(Deny,
     'george', 'read')`` that means deny access.  A sequence of ACEs
-    makes up an ACL.  It is a string, and it's actual value is "Deny".
+    makes up an ACL.  It is a string, and its actual value is "Deny".
 
 .. autoclass:: ACLDenied
    :members:
