@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import locale
 import os
 import unittest
 
@@ -14,6 +15,8 @@ from zope.interface import Interface
 
 # 5 years from now (more or less)
 fiveyrsfuture = datetime.datetime.utcnow() + datetime.timedelta(5*365)
+
+defaultlocale = locale.getdefaultlocale()[1]
 
 class INothing(Interface):
     pass
@@ -76,23 +79,25 @@ class TestStaticAppBase(IntegrationBase):
         res = self.testapp.get('/static/.hiddenfile', status=200)
         _assertBody(res.body, os.path.join(here, 'fixtures/static/.hiddenfile'))
 
-    def test_highchars_in_pathelement(self):
-        url = url_quote('/static/héhé/index.html')
-        res = self.testapp.get(url, status=200)
-        _assertBody(
-            res.body,
-            os.path.join(here,
-                         text_('fixtures/static/héhé/index.html', 'utf-8'))
-            )
+    if defaultlocale is not None:
+        # These tests are expected to fail on LANG=C systems
+        def test_highchars_in_pathelement(self):
+            url = url_quote('/static/héhé/index.html')
+            res = self.testapp.get(url, status=200)
+            _assertBody(
+                res.body,
+                os.path.join(here,
+                             text_('fixtures/static/héhé/index.html', 'utf-8'))
+                )
 
-    def test_highchars_in_filename(self):
-        url = url_quote('/static/héhé.html')
-        res = self.testapp.get(url, status=200)
-        _assertBody(
-            res.body,
-            os.path.join(here,
-                         text_('fixtures/static/héhé.html', 'utf-8'))
-            )
+        def test_highchars_in_filename(self):
+            url = url_quote('/static/héhé.html')
+            res = self.testapp.get(url, status=200)
+            _assertBody(
+                res.body,
+                os.path.join(here,
+                             text_('fixtures/static/héhé.html', 'utf-8'))
+                )
 
     def test_not_modified(self):
         self.testapp.extra_environ = {
@@ -611,5 +616,8 @@ def read_(filename):
         return val
     
 def _assertBody(body, filename):
+    if defaultlocale is None:
+        # If system locale does not have an encoding then default to utf-8
+        filename = filename.encode('utf-8')
     assert(body.replace(b'\r', b'') == read_(filename))
 
