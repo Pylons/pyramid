@@ -8,6 +8,19 @@ Bug Fixes
   Configurator was an old-style ``pyramid.configuration.Configurator``
   instance.
 
+- Pyramid authorization policies did not show up in the introspector.
+
+Deprecations
+------------
+
+- All references to the ``tmpl_context`` request variable were removed from
+  the docs.  Its existence in Pyramid is confusing for people who were never
+  Pylons users.  It was added as a porting convenience for Pylons users in
+  Pyramid 1.0, but it never caught on because the Pyramid rendering system is
+  a lot different than Pylons' was, and alternate ways exist to do what it
+  was designed to offer in Pylons.  It will continue to exist "forever" but
+  it will not be recommended or mentioned in the docs.
+
 1.3a9 (2012-02-22)
 ==================
 

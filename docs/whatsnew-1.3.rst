@@ -476,6 +476,14 @@ Deprecations
   Configurator were removed from the documentation.  They have been
   deprecated since Pyramid 1.1.
 
+- All references to the ``tmpl_context`` request variable were removed from
+  the docs.  Its existence in Pyramid is confusing for people who were never
+  Pylons users.  It was added as a porting convenience for Pylons users in
+  Pyramid 1.0, but it never caught on because the Pyramid rendering system is
+  a lot different than Pylons' was, and alternate ways exist to do what it
+  was designed to offer in Pylons.  It will continue to exist "forever" but
+  it will not be recommended or mentioned in the docs.
+
 Documentation Enhancements
 --------------------------
 
