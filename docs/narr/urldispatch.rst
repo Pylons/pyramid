@@ -785,12 +785,6 @@ already end in a slash, and if the value of ``PATH_INFO`` *plus* a slash
 matches any route's pattern.  In this case it does an HTTP redirect to the
 slash-appended ``PATH_INFO``.
 
-To configure the slash-appending not found view in your application, change
-the application's startup configuration, adding the following stanza:
-
-.. code-block:: python
-   :linenos:
-
 Let's use an example.  If the following routes are configured in your
 application:
 
