@@ -776,7 +776,7 @@ as keyword arguments.
            def wrapper(context, request):
                matchdict = request.matchdict.copy()
                matchdict.pop('action', None)
-               inst = view()
+               inst = view(request)
                meth = getattr(inst, attr)
                return meth(**matchdict)
            return wrapper
