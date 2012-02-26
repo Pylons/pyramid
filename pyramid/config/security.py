@@ -73,7 +73,8 @@ class SecurityConfiguratorMixin(object):
         intr['policy'] = policy
         # authorization policy used by view config (phase 3) and
         # authentication policy (phase 2)
-        self.action(IAuthorizationPolicy, register, order=PHASE1_CONFIG)
+        self.action(IAuthorizationPolicy, register, order=PHASE1_CONFIG,
+                    introspectables=(intr,))
         self.action(None, ensure)
 
     def _set_authorization_policy(self, policy):

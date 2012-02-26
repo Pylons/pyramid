@@ -8,6 +8,8 @@ Bug Fixes
   Configurator was an old-style ``pyramid.configuration.Configurator``
   instance.
 
+- Pyramid authorization policies did not show up in the introspector.
+
 Deprecations
 ------------
 
