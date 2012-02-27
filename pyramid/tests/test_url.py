@@ -625,7 +625,7 @@ class TestURLMethodsMixin(unittest.TestCase):
             'HTTP_HOST':'example.com:80',
             }
         request = self._makeOne(environ)
-        result = request.partial_application_url()
+        result = request._partial_application_url()
         self.assertEqual(result, 'http://example.com')
 
     def test_partial_application_url_with_http_host_default_port_https(self):
@@ -634,7 +634,7 @@ class TestURLMethodsMixin(unittest.TestCase):
             'HTTP_HOST':'example.com:443',
             }
         request = self._makeOne(environ)
-        result = request.partial_application_url()
+        result = request._partial_application_url()
         self.assertEqual(result, 'https://example.com')
 
     def test_partial_application_url_with_http_host_nondefault_port_http(self):
@@ -643,7 +643,7 @@ class TestURLMethodsMixin(unittest.TestCase):
             'HTTP_HOST':'example.com:8080',
             }
         request = self._makeOne(environ)
-        result = request.partial_application_url()
+        result = request._partial_application_url()
         self.assertEqual(result, 'http://example.com:8080')
 
     def test_partial_application_url_with_http_host_nondefault_port_https(self):
@@ -652,7 +652,7 @@ class TestURLMethodsMixin(unittest.TestCase):
             'HTTP_HOST':'example.com:4443',
             }
         request = self._makeOne(environ)
-        result = request.partial_application_url()
+        result = request._partial_application_url()
         self.assertEqual(result, 'https://example.com:4443')
 
     def test_partial_application_url_with_http_host_no_colon(self):
@@ -662,7 +662,7 @@ class TestURLMethodsMixin(unittest.TestCase):
             'SERVER_PORT':'80',
             }
         request = self._makeOne(environ)
-        result = request.partial_application_url()
+        result = request._partial_application_url()
         self.assertEqual(result, 'http://example.com')
 
     def test_partial_application_url_no_http_host(self):
@@ -672,7 +672,7 @@ class TestURLMethodsMixin(unittest.TestCase):
             'SERVER_PORT':'80',
             }
         request = self._makeOne(environ)
-        result = request.partial_application_url()
+        result = request._partial_application_url()
         self.assertEqual(result, 'http://example.com')
         
     def test_partial_application_replace_port(self):
@@ -682,7 +682,7 @@ class TestURLMethodsMixin(unittest.TestCase):
             'SERVER_PORT':'80',
             }
         request = self._makeOne(environ)
-        result = request.partial_application_url(port=8080)
+        result = request._partial_application_url(port=8080)
         self.assertEqual(result, 'http://example.com:8080')
 
     def test_partial_application_replace_scheme_https_special_case(self):
@@ -692,7 +692,7 @@ class TestURLMethodsMixin(unittest.TestCase):
             'SERVER_PORT':'80',
             }
         request = self._makeOne(environ)
-        result = request.partial_application_url(scheme='https')
+        result = request._partial_application_url(scheme='https')
         self.assertEqual(result, 'https://example.com')
 
     def test_partial_application_replace_scheme_https_special_case_avoid(self):
@@ -702,7 +702,7 @@ class TestURLMethodsMixin(unittest.TestCase):
             'SERVER_PORT':'80',
             }
         request = self._makeOne(environ)
-        result = request.partial_application_url(scheme='https', port='8080')
+        result = request._partial_application_url(scheme='https', port='8080')
         self.assertEqual(result, 'https://example.com:8080')
 
     def test_partial_application_replace_scheme_http_special_case(self):
@@ -712,7 +712,7 @@ class TestURLMethodsMixin(unittest.TestCase):
             'SERVER_PORT':'8080',
             }
         request = self._makeOne(environ)
-        result = request.partial_application_url(scheme='http')
+        result = request._partial_application_url(scheme='http')
         self.assertEqual(result, 'http://example.com')
 
     def test_partial_application_replace_scheme_http_special_case_avoid(self):
@@ -722,7 +722,7 @@ class TestURLMethodsMixin(unittest.TestCase):
             'SERVER_PORT':'8000',
             }
         request = self._makeOne(environ)
-        result = request.partial_application_url(scheme='http', port='8080')
+        result = request._partial_application_url(scheme='http', port='8080')
         self.assertEqual(result, 'http://example.com:8080')
         
     def test_partial_application_replace_host_no_port(self):
@@ -732,7 +732,7 @@ class TestURLMethodsMixin(unittest.TestCase):
             'SERVER_PORT':'80',
             }
         request = self._makeOne(environ)
-        result = request.partial_application_url(host='someotherhost.com')
+        result = request._partial_application_url(host='someotherhost.com')
         self.assertEqual(result, 'http://someotherhost.com')
 
     def test_partial_application_replace_host_with_port(self):
@@ -742,7 +742,7 @@ class TestURLMethodsMixin(unittest.TestCase):
             'SERVER_PORT':'8000',
             }
         request = self._makeOne(environ)
-        result = request.partial_application_url(host='someotherhost.com:8080')
+        result = request._partial_application_url(host='someotherhost.com:8080')
         self.assertEqual(result, 'http://someotherhost.com:8080')
 
     def test_partial_application_replace_host_and_port(self):
@@ -752,8 +752,8 @@ class TestURLMethodsMixin(unittest.TestCase):
             'SERVER_PORT':'80',
             }
         request = self._makeOne(environ)
-        result = request.partial_application_url(host='someotherhost.com:8080',
-                                                 port='8000')
+        result = request._partial_application_url(host='someotherhost.com:8080',
+                                                  port='8000')
         self.assertEqual(result, 'http://someotherhost.com:8000')
 
     def test_partial_application_replace_host_port_and_scheme(self):
@@ -763,7 +763,7 @@ class TestURLMethodsMixin(unittest.TestCase):
             'SERVER_PORT':'80',
             }
         request = self._makeOne(environ)
-        result = request.partial_application_url(
+        result = request._partial_application_url(
             host='someotherhost.com:8080',
             port='8000',
             scheme='https',
@@ -778,7 +778,7 @@ class TestURLMethodsMixin(unittest.TestCase):
             }
         request = self._makeOne(environ)
         request.script_name = '/abc'
-        result = request.partial_application_url()
+        result = request._partial_application_url()
         self.assertEqual(result, 'http://example.com:8000/abc') 
         
 class Test_route_url(unittest.TestCase):
