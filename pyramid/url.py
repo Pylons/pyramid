@@ -32,7 +32,7 @@ class URLMethodsMixin(object):
     """ Request methods mixin for BaseRequest having to do with URL
     generation """
 
-    def partial_application_url(self, scheme=None, host=None, port=None):
+    def _partial_application_url(self, scheme=None, host=None, port=None):
         """
         Construct the URL defined by request.application_url, replacing any
         of the default scheme, host, or port portions with user-supplied
@@ -239,7 +239,7 @@ class URLMethodsMixin(object):
 
         if app_url is None:
             if (scheme is not None or host is not None or port is not None):
-                app_url = self.partial_application_url(scheme, host, port)
+                app_url = self._partial_application_url(scheme, host, port)
             else:
                 app_url = self.application_url
 
@@ -468,7 +468,7 @@ class URLMethodsMixin(object):
 
             if app_url is None:
                 if scheme or host or port:
-                    app_url = self.partial_application_url(scheme, host, port)
+                    app_url = self._partial_application_url(scheme, host, port)
                 else:
                     app_url = self.application_url
 
