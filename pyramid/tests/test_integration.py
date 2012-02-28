@@ -11,7 +11,6 @@ from pyramid.static import static_view
 from pyramid.compat import (
     text_,
     url_quote,
-    WIN,
     )
 
 from zope.interface import Interface
@@ -623,5 +622,7 @@ def _assertBody(body, filename):
     body = body.replace(b'\\r', b'')
     body = body.replace(b'\\n', b'')
     data = read_(filename)
+    data = data.replace(b'\\r', b'')
+    data = data.replace(b'\\n', b'')
     assert(body == data)
 
