@@ -408,16 +408,16 @@ class TestPackageOverrides(unittest.TestCase):
         po.overrides= overrides
         self.assertEqual(po.get_filename('whatever'), None)
         
-    # def test_get_stream(self):
-    #     import os
-    #     overrides = [ DummyOverride(None), DummyOverride(
-    #         ('pyramid.tests.test_config', 'test_assets.py'))]
-    #     package = DummyPackage('package')
-    #     po = self._makeOne(package)
-    #     po.overrides= overrides
-    #     here = os.path.dirname(os.path.abspath(__file__))
-    #     with po.get_stream('whatever') as stream:
-    #         _assertBody(stream.read(), os.path.join(here, 'test_assets.py'))
+    def test_get_stream(self):
+        import os
+        overrides = [ DummyOverride(None), DummyOverride(
+            ('pyramid.tests.test_config', 'test_assets.py'))]
+        package = DummyPackage('package')
+        po = self._makeOne(package)
+        po.overrides= overrides
+        here = os.path.dirname(os.path.abspath(__file__))
+        with po.get_stream('whatever') as stream:
+            _assertBody(stream.read(), os.path.join(here, 'test_assets.py'))
         
     def test_get_stream_file_doesnt_exist(self):
         overrides = [ DummyOverride(None), DummyOverride(
