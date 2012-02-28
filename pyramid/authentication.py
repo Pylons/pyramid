@@ -369,6 +369,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
                  path="/",
                  http_only=False,
                  wild_domain=True,
+                 sibling_domains=False,
                  debug=False,
                  ):
         self.cookie = AuthTktCookieHelper(
@@ -382,6 +383,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
             http_only=http_only,
             path=path,
             wild_domain=wild_domain,
+            sibling_domains=sibling_domains
             )
         self.callback = callback
         self.debug = debug
