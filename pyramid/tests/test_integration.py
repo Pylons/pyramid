@@ -619,10 +619,10 @@ def _assertBody(body, filename):
         # If system locale does not have an encoding then default to utf-8
         filename = filename.encode('utf-8')
     # strip both \n and \r for windows
-    body = body.replace(b'\\r', b'')
-    body = body.replace(b'\\n', b'')
+    body = body.replace(b'\r', b'')
+    body = body.replace(b'\n', b'')
     data = read_(filename)
-    data = data.replace(b'\\r', b'')
-    data = data.replace(b'\\n', b'')
+    data = data.replace(b'\r', b'')
+    data = data.replace(b'\n', b'')
     assert(body == data)
 
