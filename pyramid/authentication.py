@@ -556,7 +556,8 @@ class AuthTktCookieHelper(object):
     
     def __init__(self, secret, cookie_name='auth_tkt', secure=False,
                  include_ip=False, timeout=None, reissue_time=None,
-                 max_age=None, http_only=False, path="/", wild_domain=True):
+                 max_age=None, http_only=False, path="/", wild_domain=True,
+                 sibling_domains=False):
         self.secret = secret
         self.cookie_name = cookie_name
         self.include_ip = include_ip
@@ -567,7 +568,7 @@ class AuthTktCookieHelper(object):
         self.http_only = http_only
         self.path = path
         self.wild_domain = wild_domain
-
+        self.sibling_domains = sibling_domains
         static_flags = []
         if self.secure:
             static_flags.append('; Secure')
@@ -590,7 +591,7 @@ class AuthTktCookieHelper(object):
             max_age = ''
 
         cur_domain = environ.get('HTTP_HOST', environ.get('SERVER_NAME'))
-
+        
         # While Chrome, IE, and Firefox can cope, Opera (at least) cannot
         # cope with a port number in the cookie domain when the URL it
         # receives the cookie from does not also have that port number in it
@@ -602,7 +603,7 @@ class AuthTktCookieHelper(object):
         # https://github.com/Pylons/pyramid/issues/131
         if ':' in cur_domain:
             cur_domain = cur_domain.split(':', 1)[0]
-
+        
         cookies = [
             ('Set-Cookie', '%s="%s"; Path=%s%s%s' % (
             self.cookie_name, value, self.path, max_age, self.static_flags)),
@@ -616,7 +617,17 @@ class AuthTktCookieHelper(object):
             cookies.append(('Set-Cookie', '%s="%s"; Path=%s; Domain=%s%s%s' % (
                 self.cookie_name, value, self.path, wild_domain, max_age,
                 self.static_flags)))
-
+                
+        # Sibling domains only have an affect if the current domain
+        # is a subdomain such as x.foo.com
+        if self.sibling_domains and len(cur_domain.split('.')) > 2:
+            # Replace cur_domain's sub-domain with a dot.
+            # eg x.foo.com becomes .foo.com
+            wild_siblings = '.' + cur_domain.split('.', 1)[1]
+            cookies.append(('Set-Cookie', '%s="%s"; Path=%s; Domain=%s%s%s' % (
+                self.cookie_name, value, self.path, wild_siblings, max_age,
+                self.static_flags)))
+        
         return cookies
 
     def identify(self, request):
