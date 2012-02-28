@@ -988,7 +988,7 @@ class DummyStaticURLInfo:
         return self.result
     
 def makeabs(*elements):
-    if WIN:
+    if WIN: # pragma: no cover
         return r'c:\\' + os.path.sep.join(elements)
     else:
         return os.path.sep + os.path.sep.join(elements)

@@ -2,9 +2,9 @@ import platform
 import sys
 import types
 
-if platform.system() == 'Windows':
+if platform.system() == 'Windows': # pragma: no cover
     WIN = True
-else:
+else: # pragma: no cover
     WIN = False
 
 try: # pragma: no cover
