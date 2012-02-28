@@ -814,6 +814,17 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertTrue(result[1][1].endswith('; Path=/; Domain=localhost'))
         self.assertTrue(result[1][1].startswith('auth_tkt='))
 
+    def test_remember_sibling_domains_enabled(self):
+        helper = self._makeOne('secret', sibling_domains=True)
+        environ = {'wsgi.version': (1,0)}
+        environ['REMOTE_ADDR'] = '1.1.1.1'
+        environ['SERVER_NAME'] = 'subdomain.localhost.localdomain'
+        request = DummyRequest(environ, cookie=None)
+        result = helper.remember(request, 'other')
+        self.assertEqual(len(result), 4)
+        self.assertEqual(result[3][0], 'Set-Cookie')
+        self.assertIn('Domain=.localhost.localdomain', result[3][1])
+    
     def test_remember_domain_has_port(self):
         helper = self._makeOne('secret', wild_domain=False)
         request = self._makeRequest()
