@@ -109,6 +109,7 @@ class TestLazyWriter(unittest.TestCase):
         try:
             inst = self._makeOne(filename)
             inst.writelines('hello')
+            inst.close()
         finally:
             with open(filename) as f:
                 data = f.read()
