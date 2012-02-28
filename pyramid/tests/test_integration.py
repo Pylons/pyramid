@@ -11,6 +11,7 @@ from pyramid.static import static_view
 from pyramid.compat import (
     text_,
     url_quote,
+    WIN,
     )
 
 from zope.interface import Interface
@@ -240,9 +241,8 @@ class TestStaticPermApp(IntegrationBase, unittest.TestCase):
     root_factory = 'pyramid.tests.pkgs.staticpermapp:RootFactory'
     def test_allowed(self):
         result = self.testapp.get('/allowed/index.html', status=200)
-        self.assertEqual(
-            result.body.replace(b'\r', b''),
-            read_(os.path.join(here, 'fixtures/static/index.html')))
+        _assertBody(result.body,
+                    os.path.join(here, 'fixtures/static/index.html'))
 
     def test_denied_via_acl_global_root_factory(self):
         self.testapp.extra_environ = {'REMOTE_USER':'bob'}
@@ -251,9 +251,8 @@ class TestStaticPermApp(IntegrationBase, unittest.TestCase):
     def test_allowed_via_acl_global_root_factory(self):
         self.testapp.extra_environ = {'REMOTE_USER':'fred'}
         result = self.testapp.get('/protected/index.html', status=200)
-        self.assertEqual(
-            result.body.replace(b'\r', b''),
-            read_(os.path.join(here, 'fixtures/static/index.html')))
+        _assertBody(result.body, 
+                    os.path.join(here, 'fixtures/static/index.html'))
 
     def test_denied_via_acl_local_root_factory(self):
         self.testapp.extra_environ = {'REMOTE_USER':'fred'}
@@ -262,9 +261,8 @@ class TestStaticPermApp(IntegrationBase, unittest.TestCase):
     def test_allowed_via_acl_local_root_factory(self):
         self.testapp.extra_environ = {'REMOTE_USER':'bob'}
         result = self.testapp.get('/factory_protected/index.html', status=200)
-        self.assertEqual(
-            result.body.replace(b'\r', b''),
-            read_(os.path.join(here, 'fixtures/static/index.html')))
+        _assertBody(result.body,
+                    os.path.join(here, 'fixtures/static/index.html'))
 
 class TestCCBug(IntegrationBase, unittest.TestCase):
     # "unordered" as reported in IRC by author of
@@ -613,7 +611,7 @@ def httpdate(ts):
     return ts.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
 def read_(filename):
-    with open(filename, 'r') as fp:
+    with open(filename, 'rb') as fp:
         val = fp.read()
         return val
     
@@ -621,5 +619,9 @@ def _assertBody(body, filename):
     if defaultlocale is None: # pragma: no cover
         # If system locale does not have an encoding then default to utf-8
         filename = filename.encode('utf-8')
-    assert(body.replace(b'\r', b'') == read_(filename))
+    # strip both \n and \r for windows
+    body = body.replace(b'\\r', b'')
+    body = body.replace(b'\\n', b'')
+    data = read_(filename)
+    assert(body == data)
 
