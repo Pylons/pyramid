@@ -613,7 +613,7 @@ def httpdate(ts):
     return ts.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
 def read_(filename):
-    with open(filename, 'rb') as fp:
+    with open(filename, 'r') as fp:
         val = fp.read()
         return val
     

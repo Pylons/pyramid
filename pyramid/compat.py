@@ -1,5 +1,11 @@
+import platform
 import sys
 import types
+
+if platform.system() == 'Windows':
+    WIN = True
+else:
+    WIN = False
 
 try: # pragma: no cover
     import __pypy__
