@@ -1617,7 +1617,9 @@ class StaticURLInfo(object):
             registry = get_current_registry()
         for (url, spec, route_name) in self._get_registrations(registry):
             if path.startswith(spec):
-                subpath = path[len(spec):].replace('\\', '/') # windows
+                subpath = path[len(spec):]
+                if WIN: # pragma: no cover
+                    subpath = subpath.replace('\\', '/') # windows
                 if url is None:
                     kw['subpath'] = subpath
                     return request.route_url(route_name, **kw)
