@@ -87,8 +87,8 @@ class TestLazyWriter(unittest.TestCase):
             inst = self._makeOne(filename)
             fp = inst.open()
             self.assertEqual(fp.name, filename)
-            fp.close()
         finally:
+            fp.close()
             os.remove(filename)
         
     def test_write(self):
@@ -97,11 +97,11 @@ class TestLazyWriter(unittest.TestCase):
         try:
             inst = self._makeOne(filename)
             inst.write('hello')
-            inst.close()
         finally:
             with open(filename) as f:
                 data = f.read()
                 self.assertEqual(data, 'hello')
+            inst.close()
             os.remove(filename)
 
     def test_writeline(self):
@@ -110,11 +110,11 @@ class TestLazyWriter(unittest.TestCase):
         try:
             inst = self._makeOne(filename)
             inst.writelines('hello')
-            inst.close()
         finally:
             with open(filename) as f:
                 data = f.read()
                 self.assertEqual(data, 'hello')
+            inst.close()
             os.remove(filename)
 
     def test_flush(self):
@@ -125,8 +125,8 @@ class TestLazyWriter(unittest.TestCase):
             inst.flush()
             fp = inst.fileobj
             self.assertEqual(fp.name, filename)
-            fp.close()
         finally:
+            fp.close()
             os.remove(filename)
 
 class Test__methodwrapper(unittest.TestCase):
