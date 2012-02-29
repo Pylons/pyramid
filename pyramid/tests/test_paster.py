@@ -1,3 +1,4 @@
+import os
 import unittest
 
 class Test_get_app(unittest.TestCase):
@@ -6,7 +7,6 @@ class Test_get_app(unittest.TestCase):
         return get_app(config_file, section_name, loadapp)
 
     def test_it(self):
-        import os
         app = DummyApp()
         loadapp = DummyLoadWSGI(app)
         result = self._callFUT('/foo/bar/myapp.ini', 'myapp', loadapp)
@@ -16,7 +16,6 @@ class Test_get_app(unittest.TestCase):
         self.assertEqual(result, app)
 
     def test_it_with_hash(self):
-        import os
         app = DummyApp()
         loadapp = DummyLoadWSGI(app)
         result = self._callFUT('/foo/bar/myapp.ini#myapp', None, loadapp)
@@ -26,7 +25,6 @@ class Test_get_app(unittest.TestCase):
         self.assertEqual(result, app)
 
     def test_it_with_hash_and_name_override(self):
-        import os
         app = DummyApp()
         loadapp = DummyLoadWSGI(app)
         result = self._callFUT('/foo/bar/myapp.ini#myapp', 'yourapp', loadapp)
@@ -41,7 +39,6 @@ class Test_get_appsettings(unittest.TestCase):
         return get_appsettings(config_file, section_name, appconfig)
 
     def test_it(self):
-        import os
         values = {'a':1}
         appconfig = DummyLoadWSGI(values)
         result = self._callFUT('/foo/bar/myapp.ini', 'myapp', appconfig)
@@ -51,7 +48,6 @@ class Test_get_appsettings(unittest.TestCase):
         self.assertEqual(result, values)
 
     def test_it_with_hash(self):
-        import os
         values = {'a':1}
         appconfig = DummyLoadWSGI(values)
         result = self._callFUT('/foo/bar/myapp.ini#myapp', None, appconfig)
@@ -61,7 +57,6 @@ class Test_get_appsettings(unittest.TestCase):
         self.assertEqual(result, values)
 
     def test_it_with_hash_and_name_override(self):
-        import os
         values = {'a':1}
         appconfig = DummyLoadWSGI(values)
         result = self._callFUT('/foo/bar/myapp.ini#myapp', 'yourapp', appconfig)
@@ -78,9 +73,10 @@ class Test_setup_logging(unittest.TestCase):
 
     def test_it(self):
         config_file, dict = self._callFUT('/abc')
-        self.assertEqual(config_file, '/abc')
-        self.assertEqual(dict['__file__'], '/abc')
-        self.assertEqual(dict['here'], '/')
+        # os.path.abspath is a sop to Windows
+        self.assertEqual(config_file, os.path.abspath('/abc'))
+        self.assertEqual(dict['__file__'], os.path.abspath('/abc'))
+        self.assertEqual(dict['here'], os.path.abspath('/'))
 
     def fileConfig(self, config_file, dict):
         return config_file, dict

@@ -1,3 +1,4 @@
+import os
 import unittest
 import warnings
 
@@ -8,6 +9,7 @@ from pyramid.testing import (
 from pyramid.compat import (
     text_,
     native_,
+    WIN,
     )
 
 class TestURLMethodsMixin(unittest.TestCase):
@@ -516,7 +518,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         abspath = makeabs('static', 'foo.css')
         result = request.static_url(abspath)
         self.assertEqual(result, 'abc')
-        self.assertEqual(info.args, ('/static/foo.css', request, {}))
+        self.assertEqual(info.args, (makeabs('static', 'foo.css'), request, {}))
         request = self._makeOne()
 
     def test_static_url_found_rel(self):
@@ -576,7 +578,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         abspath = makeabs('static', 'foo.css')
         result = request.static_path(abspath)
         self.assertEqual(result, 'abc')
-        self.assertEqual(info.args, ('/static/foo.css', request,
+        self.assertEqual(info.args, (makeabs('static', 'foo.css'), request,
                                      {'_app_url':'/foo'})
                          )
 
@@ -986,5 +988,7 @@ class DummyStaticURLInfo:
         return self.result
     
 def makeabs(*elements):
-    import os
-    return os.path.sep + os.path.sep.join(elements)
+    if WIN: # pragma: no cover
+        return r'c:\\' + os.path.sep.join(elements)
+    else:
+        return os.path.sep + os.path.sep.join(elements)

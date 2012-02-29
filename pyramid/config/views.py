@@ -1,5 +1,6 @@
 import inspect
 import operator
+import os
 from functools import wraps
 
 from zope.interface import (
@@ -39,6 +40,7 @@ from pyramid.compat import (
     urlparse,
     im_func,
     url_quote,
+    WIN,
     )
 
 from pyramid.exceptions import (
@@ -1526,8 +1528,8 @@ class ViewsConfiguratorMixin(object):
         some URL is visited; :meth:`pyramid.request.Request.static_url`
         generates a URL to that asset.
 
-        The ``name`` argument to ``add_static_view`` is usually a :term:`view
-        name`.  When this is the case, the
+        The ``name`` argument to ``add_static_view`` is usually a simple URL
+        prefix (e.g. ``'images'``).  When this is the case, the
         :meth:`pyramid.request.Request.static_url` API will generate a URL
         which points to a Pyramid view, which will serve up a set of assets
         that live in the package itself. For example:
@@ -1586,7 +1588,6 @@ class ViewsConfiguratorMixin(object):
         if info is None:
             info = StaticURLInfo()
             self.registry.registerUtility(info, IStaticURLInfo)
-
         info.add(self, name, spec, **kw)
 
 def isexception(o):
@@ -1617,6 +1618,8 @@ class StaticURLInfo(object):
         for (url, spec, route_name) in self._get_registrations(registry):
             if path.startswith(spec):
                 subpath = path[len(spec):]
+                if WIN: # pragma: no cover
+                    subpath = subpath.replace('\\', '/') # windows
                 if url is None:
                     kw['subpath'] = subpath
                     return request.route_url(route_name, **kw)
@@ -1632,8 +1635,12 @@ class StaticURLInfo(object):
         # appending a slash here if the spec doesn't have one is
         # required for proper prefix matching done in ``generate``
         # (``subpath = path[len(spec):]``).
-        if not spec.endswith('/'):
-            spec = spec + '/'
+        if os.path.isabs(spec):
+            sep = os.sep
+        else:
+            sep = '/'
+        if not spec.endswith(sep):
+            spec = spec + sep
 
         # we also make sure the name ends with a slash, purely as a
         # convenience: a name that is a url is required to end in a

@@ -1,3 +1,4 @@
+import os
 import unittest
 
 class Test_logging_file_config(unittest.TestCase):
@@ -8,9 +9,10 @@ class Test_logging_file_config(unittest.TestCase):
 
     def test_it(self):
         config_file, dict = self._callFUT('/abc')
-        self.assertEqual(config_file, '/abc')
-        self.assertEqual(dict['__file__'], '/abc')
-        self.assertEqual(dict['here'], '/')
+        # use of os.path.abspath here is a sop to Windows
+        self.assertEqual(config_file, os.path.abspath('/abc'))
+        self.assertEqual(dict['__file__'], os.path.abspath('/abc'))
+        self.assertEqual(dict['here'], os.path.abspath('/'))
 
     def fileConfig(self, config_file, dict):
         return config_file, dict
