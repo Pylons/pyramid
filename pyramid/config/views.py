@@ -1,5 +1,6 @@
 import inspect
 import operator
+import os
 from functools import wraps
 
 from zope.interface import (
@@ -1587,11 +1588,6 @@ class ViewsConfiguratorMixin(object):
         if info is None:
             info = StaticURLInfo()
             self.registry.registerUtility(info, IStaticURLInfo)
-        if WIN: # pragma: no cover
-            # replace all backslashes with fwd ones; staticurlinfo expects
-            # forward-slash-based paths
-            spec.replace('\\', '/') 
-
         info.add(self, name, spec, **kw)
 
 def isexception(o):
@@ -1621,7 +1617,7 @@ class StaticURLInfo(object):
             registry = get_current_registry()
         for (url, spec, route_name) in self._get_registrations(registry):
             if path.startswith(spec):
-                subpath = path[len(spec):]
+                subpath = path[len(spec):].replace('\\', '/') # windows
                 if url is None:
                     kw['subpath'] = subpath
                     return request.route_url(route_name, **kw)
@@ -1637,8 +1633,12 @@ class StaticURLInfo(object):
         # appending a slash here if the spec doesn't have one is
         # required for proper prefix matching done in ``generate``
         # (``subpath = path[len(spec):]``).
-        if not spec.endswith('/'):
-            spec = spec + '/'
+        if os.path.isabs(spec):
+            sep = os.sep
+        else:
+            sep = '/'
+        if not spec.endswith(sep):
+            spec = spec + sep
 
         # we also make sure the name ends with a slash, purely as a
         # convenience: a name that is a url is required to end in a
