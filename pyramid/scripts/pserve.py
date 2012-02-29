@@ -9,6 +9,7 @@
 # lib/site.py
 
 import atexit
+import ctypes
 import errno
 import logging
 import optparse
@@ -23,9 +24,22 @@ import traceback
 
 from paste.deploy import loadapp, loadserver
 
+from pyramid.compat import WIN
+
 from pyramid.paster import setup_logging
 
 MAXFD = 1024
+
+if WIN and not hasattr(os, 'kill'): # pragma: no cover
+    # py 2.6 on windows
+    def kill(pid, sig=None):
+        """kill function for Win32"""
+        # signal is ignored
+        kernel32 = ctypes.windll.kernel32
+        handle = kernel32.OpenProcess(1, 0, pid)
+        return (0 != kernel32.TerminateProcess(handle, 0))
+else:
+    kill = os.kill
 
 def main(argv=sys.argv, quiet=False):
     command = PServeCommand(argv, quiet=quiet)
@@ -451,7 +465,7 @@ class PServeCommand(object):
             if not live_pidfile(pid_file):
                 break
             import signal
-            os.kill(pid, signal.SIGTERM)
+            kill(pid, signal.SIGTERM)
             time.sleep(1)
         else:
             self.out("failed to kill web process %s" % pid)
@@ -505,11 +519,10 @@ class PServeCommand(object):
                         raise
                     return 1
             finally:
-                if (proc is not None
-                    and hasattr(os, 'kill')):
+                if proc is not None:
                     import signal
                     try:
-                        os.kill(proc.pid, signal.SIGTERM)
+                        kill(proc.pid, signal.SIGTERM)
                     except (OSError, IOError):
                         pass
 
@@ -611,7 +624,7 @@ def live_pidfile(pidfile): # pragma: no cover
     pid = read_pidfile(pidfile)
     if pid:
         try:
-            os.kill(int(pid), 0)
+            kill(int(pid), 0)
             return pid
         except OSError as e:
             if e.errno == errno.EPERM:
