@@ -39,6 +39,7 @@ from pyramid.compat import (
     urlparse,
     im_func,
     url_quote,
+    WIN,
     )
 
 from pyramid.exceptions import (
@@ -1526,8 +1527,8 @@ class ViewsConfiguratorMixin(object):
         some URL is visited; :meth:`pyramid.request.Request.static_url`
         generates a URL to that asset.
 
-        The ``name`` argument to ``add_static_view`` is usually a :term:`view
-        name`.  When this is the case, the
+        The ``name`` argument to ``add_static_view`` is usually a simple URL
+        prefix (e.g. ``'images'``).  When this is the case, the
         :meth:`pyramid.request.Request.static_url` API will generate a URL
         which points to a Pyramid view, which will serve up a set of assets
         that live in the package itself. For example:
@@ -1586,6 +1587,10 @@ class ViewsConfiguratorMixin(object):
         if info is None:
             info = StaticURLInfo()
             self.registry.registerUtility(info, IStaticURLInfo)
+        if WIN: # pragma: no cover
+            # replace all backslashes with fwd ones; staticurlinfo expects
+            # forward-slash-based paths
+            spec.replace('\\', '/') 
 
         info.add(self, name, spec, **kw)
 
