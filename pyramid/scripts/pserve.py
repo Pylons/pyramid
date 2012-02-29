@@ -34,10 +34,11 @@ if WIN and not hasattr(os, 'kill'): # pragma: no cover
     # py 2.6 on windows
     def kill(pid, sig=None):
         """kill function for Win32"""
-        # signal is ignored
+        # signal is ignored, semibogus raise message
         kernel32 = ctypes.windll.kernel32
         handle = kernel32.OpenProcess(1, 0, pid)
-        return (0 != kernel32.TerminateProcess(handle, 0))
+        if (0 == kernel32.TerminateProcess(handle, 0)):
+            raise OSError('No such process %s' % pid)
 else:
     kill = os.kill
 
