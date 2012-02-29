@@ -9,6 +9,13 @@ Bug Fixes
   the documentation as an API method was a mistake, and it has been renamed
   to something private.
 
+- When a static view was registered using an absolute filesystem path on
+  Windows, the ``request.static_url`` function did not work to generate URLs
+  to its resources.  Symptom: "No static URL definition matching
+  c:\foo\bar\baz".
+
+- Make all tests pass on Windows XP.
+
 - Bug in ACL authentication checking on Python 3: the ``permits`` and
   ``principals_allowed_by_permission`` method of
   ``pyramid.authorization.ACLAuthenticationPolicy`` could return an
