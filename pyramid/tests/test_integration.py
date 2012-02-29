@@ -140,7 +140,7 @@ class TestStaticAppBase(IntegrationBase):
     def test_range_tilend(self):
         self.testapp.extra_environ = {'HTTP_RANGE':'bytes=-5'}
         res = self.testapp.get('/static/index.html', status=206)
-        self.assertEqual(res.body, b'tml>\n')
+        self.assertEqual(res.body, b'html>')
 
     def test_range_notbytes(self):
         self.testapp.extra_environ = {'HTTP_RANGE':'kHz=-5'}
