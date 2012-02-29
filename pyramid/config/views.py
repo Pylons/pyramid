@@ -1635,7 +1635,7 @@ class StaticURLInfo(object):
         # appending a slash here if the spec doesn't have one is
         # required for proper prefix matching done in ``generate``
         # (``subpath = path[len(spec):]``).
-        if os.path.isabs(spec):
+        if os.path.isabs(spec): # FBO windows
             sep = os.sep
         else:
             sep = '/'
