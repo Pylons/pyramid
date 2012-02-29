@@ -1,5 +1,6 @@
 import unittest
 import os
+import tempfile
 
 class TestPServeCommand(unittest.TestCase):
     def setUp(self):
@@ -41,19 +42,14 @@ class TestPServeCommand(unittest.TestCase):
             self.out_.getvalue(),'Not a valid PID file in %s' % path)
 
     def test_run_stop_daemon_invalid_pid_in_file(self):
-        import tempfile
-        tmp = tempfile.NamedTemporaryFile()
-        tmp.write(b'9999999')
-        tmp.flush()
-        tmpname = tmp.name
-        inst = self._makeOne('--stop-daemon', '--pid-file=%s' % tmpname)
+        fn = tempfile.mktemp()
+        with open(fn, 'wb') as tmp:
+            tmp.write(b'9999999')
+        tmp.close()
+        inst = self._makeOne('--stop-daemon', '--pid-file=%s' % fn)
         inst.run()
-        try:
-            tmp.close()
-        except:
-            pass
         self.assertEqual(self.out_.getvalue(),
-                         'PID in %s is not valid (deleting)' % tmpname)
+                         'PID in %s is not valid (deleting)' % fn)
 
     def test_parse_vars_good(self):
         vars = ['a=1', 'b=2']
@@ -81,7 +77,6 @@ class TestLazyWriter(unittest.TestCase):
         return LazyWriter(filename, mode)
 
     def test_open(self):
-        import tempfile
         filename = tempfile.mktemp()
         try:
             inst = self._makeOne(filename)
@@ -92,7 +87,6 @@ class TestLazyWriter(unittest.TestCase):
             os.remove(filename)
         
     def test_write(self):
-        import tempfile
         filename = tempfile.mktemp()
         try:
             inst = self._makeOne(filename)
@@ -105,7 +99,6 @@ class TestLazyWriter(unittest.TestCase):
             os.remove(filename)
 
     def test_writeline(self):
-        import tempfile
         filename = tempfile.mktemp()
         try:
             inst = self._makeOne(filename)
@@ -118,7 +111,6 @@ class TestLazyWriter(unittest.TestCase):
             os.remove(filename)
 
     def test_flush(self):
-        import tempfile
         filename = tempfile.mktemp()
         try:
             inst = self._makeOne(filename)
