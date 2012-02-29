@@ -3,6 +3,7 @@
 import datetime
 import locale
 import os
+import platform
 import unittest
 
 from pyramid.wsgi import wsgiapp
@@ -81,8 +82,10 @@ class TestStaticAppBase(IntegrationBase):
         res = self.testapp.get('/static/.hiddenfile', status=200)
         _assertBody(res.body, os.path.join(here, 'fixtures/static/.hiddenfile'))
 
-    if defaultlocale is not None:
-        # These tests are expected to fail on LANG=C systems
+    if defaultlocale is not None and platform.system() == 'Linux':
+        # These tests are expected to fail on LANG=C systems due to decode
+        # errors and on non-Linux systems due to git highchar handling
+        # vagaries
         def test_highchars_in_pathelement(self):
             url = url_quote('/static/héhé/index.html')
             res = self.testapp.get(url, status=200)
