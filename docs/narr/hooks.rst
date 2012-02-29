@@ -42,7 +42,7 @@ and a :term:`scan`, you can replace the Not Found view by using the
 
    from pyramid.view import notfound_view_config
 
-   notfound_view_config()
+   @notfound_view_config()
    def notfound(request):
        return Response('Not Found, dude', status='404 Not Found')
 
@@ -64,11 +64,11 @@ views can carry predicates limiting their applicability.  For example:
 
    from pyramid.view import notfound_view_config
 
-   notfound_view_config(request_method='GET')
+   @notfound_view_config(request_method='GET')
    def notfound_get(request):
        return Response('Not Found during GET, dude', status='404 Not Found')
 
-   notfound_view_config(request_method='POST')
+   @notfound_view_config(request_method='POST')
    def notfound_post(request):
        return Response('Not Found during POST, dude', status='404 Not Found')
 
