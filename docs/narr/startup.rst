@@ -102,10 +102,9 @@ Here's a high-level time-ordered overview of what happens when you press
    the meanings of these keys.
 
 #. The ``main`` function first constructs a
-   :class:`~pyramid.config.Configurator` instance, passing a root resource
-   factory (constructor) to it as its ``root_factory`` argument, and
-   ``settings`` dictionary captured via the ``**settings`` kwarg as its
-   ``settings`` argument.
+   :class:`~pyramid.config.Configurator` instance, passing the ``settings``
+   dictionary captured via the ``**settings`` kwarg as its ``settings``
+   argument.
 
    The ``settings`` dictionary contains all the options in the ``[app:main]``
    section of our .ini file except the ``use`` option (which is internal to
