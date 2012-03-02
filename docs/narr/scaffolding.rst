@@ -123,7 +123,7 @@ defining your scaffold template:
              paste_script_template_renderer = None
              from pyramid.scaffolds import PyramidTemplate
 
-     class CoolExtensionTemplateTemplate(PyramidTemplate):
+     class CoolExtensionTemplate(PyramidTemplate):
          _template_dir = 'coolextension_scaffold'
          summary = 'My cool extension'
          template_renderer = staticmethod(paste_script_template_renderer)

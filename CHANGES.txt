@@ -28,20 +28,7 @@ Bug Fixes
   Pyramid 1.3a1.
 
   This bug was due to the presence of an ``__iter__`` attribute on strings
-  under Python 3 which is not present under strings in Python 2.  I've been
-  assured by multiple Python cognoscenti that this difference in behavior
-  between Python 2 and Python 3 makes complete sense.  Iterating over a
-  string character by character is of course something everyone wants to do
-  as often as possible and it would just be too darn slow to need to call a
-  method in order to turn a string into a list.  Announcing that a string is
-  iterable by adding an ``__iter__`` to it simply canonizes its amazing,
-  speedy usefulness!  So lest you think that Python 3's addition of an
-  ``__iter__`` to strings was a useless, pointless, harmful,
-  developer-hostile change, you're clearly mistaken, and quite possibly
-  brain-damaged.  I feel for you.  It's clearly much better to have a bug
-  that goes uncaught for nine alphas and one beta and almost leads to a
-  latent security hole that might have led to indiscriminate data
-  disclosure.
+  under Python 3 which is not present under strings in Python 2.
 
 1.3b1 (2012-02-26)
 ==================
