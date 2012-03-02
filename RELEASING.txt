@@ -1,17 +1,22 @@
 Releasing Pyramid
 =================
 
-- git pull
+- Do any necessary branch merges (e.g. master to branch, branch to master).
+
+- On release branch:
+
+  $ git pull
 
 - Do platform test via tox:
 
-  $ tox
+  $ tox -r
 
-- Make sure statement coverage is at 100%::
+  Make sure statement coverage is at 100%::
 
-  $ python setup.py nosetests --with-coverage
+- Run Windows tests for Python 2.6, 2.7, and 3.2 if feasible.
 
-- Make sure all scaffold tests pass:
+- Make sure all scaffold tests pass (Py 2.6, 2.7, 3.2 and pypy on UNIX; this
+  doesn't work on Windows):
 
   $ python pyramid/scaffolds/tests.py
 
@@ -37,11 +42,12 @@ Releasing Pyramid
 - Make sure PyPI long description renders (requires ``collective.dist``
   installed into your Python)::
 
-  $ python setup.py check --restructuredtext
+  $ python setup.py check -r
 
 - Create a release tag.
 
-- Release to PyPI::
+- Make sure your system Python has ``setuptools-git`` installed and release to
+  PyPI::
 
   $ python setup.py sdist register upload
 
