@@ -421,15 +421,14 @@ parameter: ``request``.  For example:
 .. code-block:: python
    :linenos:
 
-   import transaction
+   import logging
 
-   def commit_callback(request):
-       '''commit or abort the transaction associated with request'''
-       if request.exception is not None:
-           transaction.abort()
-       else:
-           transaction.commit()
-   request.add_finished_callback(commit_callback)
+   log = logging.getLogger(__name__)
+
+   def log_callback(request):
+       """Log information at the end of request"""
+       log.debug('Request is finished.')
+   request.add_finished_callback(log_callback)
 
 Finished callbacks are called in the order they're added
 (first-to-most-recently-added).  Finished callbacks (unlike a
@@ -446,12 +445,6 @@ performed to the ``request`` provided to a finished callback will have no
 meaningful effect, because response processing will have already occurred,
 and the request's scope will expire almost immediately after all finished
 callbacks have been processed.
-
-It is often necessary to tell whether an exception occurred within
-:term:`view callable` code from within a finished callback: in such a case,
-the :attr:`request.exception` attribute of the request when it enters a
-response callback will be an exception object instead of its default value of
-``None``.
 
 Errors raised by finished callbacks are not handled specially.  They
 will be propagated to the caller of the :app:`Pyramid` router
