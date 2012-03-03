@@ -15,83 +15,72 @@ The major feature additions in Pyramid 1.3 follow.
 Python 3 Compatibility
 ~~~~~~~~~~~~~~~~~~~~~~
 
-In addition to running on Python 2 (version 2.6 or 2.7 required), Pyramid is
-now Python 3 compatible.  For Python 3 compatibility, Python 3.2 or better
-is required.
+Pyramid continues to run on Python 2, but Pyramid is now also Python 3
+compatible.  To use Pyramid under Python 3, Python 3.2 or better is required.
 
-.. warning::
+Many Pyramid add-ons are already Python 3 compatible.  For example,
+``pyramid_debugtoolbar``, ``pyramid_jinja2``, ``pyramid_exclog``, and
+``pyramid_tm`` are all Python 3-ready.  But some are still known to work only
+under Python 2.  Also, some scaffolding dependencies (particularly ZODB) do
+not yet work under Python 3.
 
-   As of this writing (the release of Pyramid 1.3b2), if you attempt to
-   install a Pyramid project that used the ``alchemy`` scaffold via
-   ``setup.py develop`` on Python 3.2, it will quit with an installation
-   error while trying to install ``Pygments``.  If this happens, please just
-   rerun the ``setup.py develop`` command again, and it will complete
-   successfully.  This is due to a minor bug in SQLAlchemy 0.7.5 under Python
-   3, and will be fixed in a later SQLAlchemy release.  Keep an eye on
-   http://www.sqlalchemy.org/trac/ticket/2421
+Python 3 compatibility also required dropping some package dependencies and
+support for older Python versions and platforms.  See the "Backwards
+Incompatibilities" section below for more information.
 
-This feature required us to make some compromises.
-
-Pyramid no longer runs on Python 2.5.  This includes the most recent release
-of Jython and the Python 2.5 version of Google App Engine.  We could not
-easily "straddle" Python 2 and 3 versions and support Python 2 versions older
-than Python 2.6.  You will need Python 2.6 or better to run this version of
-Pyramid.  If you need to use Python 2.5, you should use the most recent 1.2.X
-release of Pyramid.
-
-Though many Pyramid add-ons have releases which are already Python 3
-compatible (in particular ``pyramid_debugtoolbar``, ``pyramid_jinja2``,
-``pyramid_exclog``, and ``pyramid_tm``), some are still known to work only
-under Python 2.  Likewise, some scaffolding dependencies (particularly ZODB)
-do not yet work under Python
-3.  Please be patient as we gain full ecosystem support for Python 3.  You
-can see more details about ongoing porting efforts at
+Please be patient as we gain full ecosystem support for Python 3.  You can
+see more details about ongoing porting efforts at
 https://github.com/Pylons/pyramid/wiki/Python-3-Porting .
 
-The libraries named ``Paste`` and ``PasteScript`` which have been
-dependencies of Pyramid since 1.0+ have not been ported to Python 3, and we
-were unwilling to port and maintain them ourselves.  As a result, we've had
-to make some changes:
+The ``paster`` Command Has Been Replaced
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- We've replaced the ``paster`` command with Pyramid-specific analogues.
-
-- We've made the default WSGI server used by Pyramid scaffolding the
-  :term:`waitress` server.
+We've replaced the ``paster`` command with Pyramid-specific analogues.  Why?
+The libraries that supported the ``paster`` command named ``Paste`` and
+``PasteScript`` do not run under Python 3, and we were unwilling to port and
+maintain them ourselves.  As a result, we've had to make some changes.
 
 Previously (in Pyramid 1.0, 1.1 and 1.2), you created a Pyramid application
 using ``paster create``, like so::
 
     $ myvenv/bin/paster create -t pyramid_starter foo
 
-You're now instead required to create an application using ``pcreate`` like
-so::
+In 1.3, you're now instead required to create an application using
+``pcreate`` like so::
 
     $ myvenv/bin/pcreate -s starter foo
 
-Note that the names of available scaffolds have changed and the flags
-supported by ``pcreate`` are different than those that were supported by
+``pcreate`` is required to be used for internal Pyramid scaffolding;
+externally distributed scaffolding may allow for both ``pcreate`` and/or
 ``paster create``.
 
-Instead of running a Pyramid project created via a scaffold using ``paster
-serve``, as was done in Pyramid <= 1.2.X, you now must use the ``pserve``
-command::
+In previous Pyramid versions, you ran a Pyramid application like so::
 
-    $myvenv/bin/pserve development.ini
+    $ myvenv/bin/paster serve development.ini
+
+Instead, you now must use the ``pserve`` command in 1.3::
+
+    $ myvenv/bin/pserve development.ini
 
 The ``ini`` configuration file format supported by Pyramid has not changed.
 As a result, Python 2-only users can install PasteScript manually and use
 ``paster serve`` instead if they like.  However, using ``pserve`` will work
-under both Python 2 and Python 3.  ``pcreate`` is required to be used for
-internal Pyramid scaffolding; externally distributed scaffolding may allow
-for both ``pcreate`` and/or ``paster create``.
+under both Python 2 and Python 3.
 
 Analogues of ``paster pshell``, ``paster pviews``, ``paster request`` and
 ``paster ptweens`` also exist under the respective console script names
 ``pshell``, ``pviews``, ``prequest`` and ``ptweens``.
 
-We've replaced use of the Paste ``httpserver`` with the ``waitress`` server in
-the scaffolds, so once you create a project from a scaffold, its
-``development.ini`` and ``production.ini`` will have the following line::
+``paste.httpserver`` replaced by ``waitress`` in Scaffolds
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Because the ``paste.httpserver`` server we used previously in scaffolds is
+not Python 3 compatible, we've made the default WSGI server used by Pyramid
+scaffolding the :term:`waitress` server.  The waitress server is both Python
+2 and Python 3 compatible.
+
+Once you create a project from a scaffold, its ``development.ini`` and
+``production.ini`` will have the following line::
 
     use = egg:waitress#main
 
@@ -99,22 +88,22 @@ Instead of this (which was the default in older versions)::
 
     use = egg:Paste#http
 
-.. warning::
+.. note::
 
-   Previously, paste.httpserver "helped" by converting header values that
-   weren't strings to strings. The ``waitress`` server, on the other hand
-   implements the spec more fully. This specifically may affect you if you
-   are modifying headers on your response. The following error might be an
-   indicator of this problem: **AssertionError: Header values must be
-   strings, please check the type of the header being returned.** A common
-   case would be returning unicode headers instead of string headers.
+  ``paste.httpserver`` "helped" by converting header values that were Unicode
+  into strings, which was a feature that subverted the :term:`WSGI`
+  specification. The ``waitress`` server, on the other hand implements the
+  WSGI spec more fully. This specifically may affect you if you are modifying
+  headers on your responses. The following error might be an indicator of
+  this problem: **AssertionError: Header values must be strings, please check
+  the type of the header being returned.** A common case would be returning
+  Unicode headers instead of string headers.
+
+Compatibility Helper Library
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A new :mod:`pyramid.compat` module was added which provides Python 2/3
 straddling support for Pyramid add-ons and development environments.
-
-Python 3 compatibility required dropping some package dependencies and
-support for older Python versions and platforms.  See the "Backwards
-Incompatibilities" section below for more information.
 
 Introspection
 ~~~~~~~~~~~~~
@@ -362,8 +351,17 @@ Minor Feature Additions
 Backwards Incompatibilities
 ---------------------------
 
-- Pyramid no longer runs on Python 2.5 (which includes the most recent
-  release of Jython and the Python 2.5 version of GAE as of this writing).
+- Pyramid no longer runs on Python 2.5.  This includes the most recent
+  release of Jython and the Python 2.5 version of Google App Engine.
+
+  The reason?  We could not easily "straddle" Python 2 and 3 versions and
+  support Python 2 versions older than Python 2.6.  You will need Python 2.6
+  or better to run this version of Pyramid.  If you need to use Python 2.5,
+  you should use the most recent 1.2.X release of Pyramid.
+
+- The names of available scaffolds have changed and the flags supported by
+  ``pcreate`` are different than those that were supported by ``paster
+  create``.  For example, ``pyramid_alchemy`` is now just ``alchemy``.
 
 - The ``paster`` command is no longer the documented way to create projects,
   start the server, or run debugging commands.  To create projects from
@@ -484,6 +482,18 @@ Deprecations
   a lot different than Pylons' was, and alternate ways exist to do what it
   was designed to offer in Pylons.  It will continue to exist "forever" but
   it will not be recommended or mentioned in the docs.
+
+Known Issues
+------------
+
+- As of this writing (the release of Pyramid 1.3b2), if you attempt to
+  install a Pyramid project that used the ``alchemy`` scaffold via ``setup.py
+  develop`` on Python 3.2, it will quit with an installation error while
+  trying to install ``Pygments``.  If this happens, please just rerun the
+  ``setup.py develop`` command again, and it will complete successfully.
+  This is due to a minor bug in SQLAlchemy 0.7.5 under Python 3, and will be
+  fixed in a later SQLAlchemy release.  Keep an eye on
+  http://www.sqlalchemy.org/trac/ticket/2421
 
 Documentation Enhancements
 --------------------------
