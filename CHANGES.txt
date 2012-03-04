@@ -12,7 +12,7 @@ Bug Fixes
 - When a static view was registered using an absolute filesystem path on
   Windows, the ``request.static_url`` function did not work to generate URLs
   to its resources.  Symptom: "No static URL definition matching
-  c:\foo\bar\baz".
+  c:\\foo\\bar\\baz".
 
 - Make all tests pass on Windows XP.
 
