@@ -37,8 +37,8 @@ Front Matter
    copyright.rst
    conventions.rst
 
-"What's New" Documents
-======================
+What's New
+==========
 
 .. toctree::
    :maxdepth: 1
@@ -100,9 +100,9 @@ Narrative documentation in chapter form explaining how to use
 Tutorials
 =========
 
-Detailed tutorials explaining how to use :app:`Pyramid` to build
-various types of applications and how to deploy :app:`Pyramid`
-applications to various platforms.
+Tutorials explaining how to use :app:`Pyramid` to build various types of
+applications, and how to deploy :app:`Pyramid` applications to various
+platforms.
 
 .. toctree::
    :maxdepth: 2
@@ -112,26 +112,26 @@ applications to various platforms.
    tutorials/bfg/index.rst
    tutorials/modwsgi/index.rst
 
-Reference Material
+API Documentation
 ==================
 
-Reference material includes documentation for every :app:`Pyramid` API.
+Documentation for every :app:`Pyramid` API.
 
 .. toctree::
    :maxdepth: 2
 
    api
 
-Detailed Change History
-=======================
+Change History
+==============
 
 .. toctree::
    :maxdepth: 1
 
    changes
 
-Design Documentation
-====================
+Design Documents
+================
 
 .. toctree::
    :maxdepth: 1
@@ -172,31 +172,11 @@ Check this application out of version control via:
 
   git clone git://github.com/Pylons/shootout.git
 
-Older Sample Applications (repoze.bfg)
-======================================
-
-.. note::
-
-   These applications are for an older version of :app:`Pyramid`, which was
-   named :mod:`repoze.bfg`.  They won't work unmodified under Pyramid, but
-   might provide useful clues.
-
-`bfgsite <http://svn.repoze.org/bfgsite/trunk>`_ is the software which
-runs the `bfg.repoze.org <http://bfg.repoze.org>`_ website.  It
-demonstrates integration with Trac, and includes several
-mini-applications such as a pastebin and tutorial engine.  Check a
-buildout for this application out of Subversion via:
-
-.. code-block:: text
-
-  svn co http://svn.repoze.org/buildouts/bfgsite/ bfgsite_buildout
-
-`KARL <http://karlproject.org>`_ is a moderately-sized application
-(roughly 70K lines of Python code) built on top of :mod:`repoze.bfg`
-and other Repoze software.  It is an open source web system for
-collaboration, organizational intranets, and knowledge management, It
-provides facilities for wikis, calendars, manuals, searching, tagging,
-commenting, and file uploads.  See the `KARL site
+`KARL <http://karlproject.org>`_ is a moderately-sized application (roughly
+80K lines of Python code) built on top of :app:`Pyramid`.  It is an open
+source web system for collaboration, organizational intranets, and knowledge
+management, It provides facilities for wikis, calendars, manuals, searching,
+tagging, commenting, and file uploads.  See the `KARL site
 <http://karlproject.org>`_ for download and installation details.
 
 Support and Development
