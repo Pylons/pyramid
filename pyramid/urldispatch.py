@@ -93,7 +93,7 @@ class RoutesMapper(object):
 old_route_re = re.compile(r'(\:[_a-zA-Z]\w*)')
 star_at_end = re.compile(r'\*\w*$')
 
-# The torturous nature of the regex named ``route_re`` below is due to the
+# The tortuous nature of the regex named ``route_re`` below is due to the
 # fact that we need to support at least one level of "inner" squigglies
 # inside the expr of a {name:expr} pattern.  This regex used to be just
 # (\{[a-zA-Z][^\}]*\}) but that choked when supplied with e.g. {foo:\d{4}}.
@@ -106,7 +106,7 @@ def update_pattern(matchobj):
 def _compile_route(route):
     # This function really wants to consume Unicode patterns natively, but if
     # someone passes us a bytestring, we allow it by converting it to Unicode
-    # using the ASCII decoding.  We decode it using ASCII because we dont
+    # using the ASCII decoding.  We decode it using ASCII because we don't
     # want to accept bytestrings with high-order characters in them here as
     # we have no idea what the encoding represents.
     if route.__class__ is not text_type:
@@ -175,7 +175,7 @@ def _compile_route(route):
         # This function really wants to consume Unicode patterns natively,
         # but if someone passes us a bytestring, we allow it by converting it
         # to Unicode using the ASCII decoding.  We decode it using ASCII
-        # because we dont want to accept bytestrings with high-order
+        # because we don't want to accept bytestrings with high-order
         # characters in them here as we have no idea what the encoding
         # represents.
         if path.__class__ is not text_type:
