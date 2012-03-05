@@ -474,7 +474,7 @@ via configuration.
    from pyramid.config import Configurator
    from myapp.traversal import Traverser
    config = Configurator()
-   config.set_traverser(Traverser)
+   config.add_traverser(Traverser)
 
 In the example above, ``myapp.traversal.Traverser`` is assumed to be a class
 that implements the following interface:
@@ -524,7 +524,7 @@ used.  Otherwise, the default traverser would be used.  For example:
    from myapp.resources import MyRoot
    from pyramid.config import Configurator
    config = Configurator()
-   config.set_traverser(Traverser, MyRoot)
+   config.add_traverser(Traverser, MyRoot)
 
 If the above stanza was added to a Pyramid ``__init__.py`` file's ``main``
 function, :app:`Pyramid` would use the ``myapp.traversal.Traverser`` only
