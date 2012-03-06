@@ -515,7 +515,7 @@ class DummyTemplateRenderer(object):
             if myval != v:
                 raise AssertionError(
                     '\nasserted value for %s: %r\nactual value: %r' % (
-                    v, k, myval))
+                    k, v, myval))
         return True
 
 class DummyResource:
