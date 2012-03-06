@@ -143,14 +143,14 @@ class ViewDeriver(object):
                                             self.text_wrapped_view(view))))))))))
     @wraps_view
     def text_wrapped_view(self, view):
-        # wraps the view and adds __text__ attribute
-        # intended for instancemethods
-        if hasattr(view, '__text__'):
-            return view
-        def text_wrapper(context, request):
-            return view(context, request)
-        text_wrapper.__text__ = ''
-        return text_wrapper
+        if inspect.ismethod(view):
+            if hasattr(view, '__text__'):
+                return view
+            def text_wrapper(context, request):
+                return view(context, request)
+            text_wrapper.__text__ = ''
+            return text_wrapper
+        return view
 
     @wraps_view
     def mapped_view(self, view):
