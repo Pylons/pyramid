@@ -260,11 +260,11 @@ Here's a few views defined as methods of a class instead:
            self.request = request
 
        @view_config(route_name='view_one')
-       def view_one(self, request):
+       def view_one(self):
            return Response('one')
 
        @view_config(route_name='view_two')
-       def view_two(self, request):
+       def view_two(self):
            return Response('two')
 
 See also :ref:`view_config_placement`.
