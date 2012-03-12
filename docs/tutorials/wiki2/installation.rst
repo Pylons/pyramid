@@ -215,6 +215,8 @@ If successful, you will see output something like this::
 
 Looks like our package doesn't quite have 100% test coverage.
 
+.. _wiki2-start-the-application:
+
 Starting the Application
 ========================
 
