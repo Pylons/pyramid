@@ -48,20 +48,6 @@ class TestSettingsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(settings['a'], 1)
 
 class TestSettings(unittest.TestCase):
-    def setUp(self):
-        self.warnings = []
-        import warnings
-        warnings.old_showwarning = warnings.showwarning
-        warnings.showwarning = self._showwarning
-
-    def tearDown(self):
-        del self.warnings
-        import warnings
-        warnings.showwarning = warnings.old_showwarning
-
-    def _showwarning(self, message, category, filename, lineno, file=None,
-                     line=None):
-        self.warnings.append(message)
         
     def _getTargetClass(self):
         from pyramid.config.settings import Settings
@@ -74,14 +60,20 @@ class TestSettings(unittest.TestCase):
         return klass(d, _environ_=environ)
 
     def test_getattr_success(self):
-        settings = self._makeOne({'reload_templates':False})
-        self.assertEqual(settings.reload_templates, False)
-        self.assertEqual(len(self.warnings), 1)
+        import warnings
+        with warnings.catch_warnings(record=True) as w:
+            warnings.filterwarnings('always')
+            settings = self._makeOne({'reload_templates':False})
+            self.assertEqual(settings.reload_templates, False)
+            self.assertEqual(len(w), 1)
 
     def test_getattr_fail(self):
-        settings = self._makeOne({})
-        self.assertRaises(AttributeError, settings.__getattr__, 'wontexist')
-        self.assertEqual(len(self.warnings), 0)
+        import warnings
+        with warnings.catch_warnings(record=True) as w:
+            warnings.filterwarnings('always')
+            settings = self._makeOne({})
+            self.assertRaises(AttributeError, settings.__getattr__, 'wontexist')
+            self.assertEqual(len(w), 0)
 
     def test_getattr_raises_attribute_error(self):
         settings = self._makeOne()
