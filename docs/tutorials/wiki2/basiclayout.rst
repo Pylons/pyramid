@@ -41,9 +41,7 @@ the ``main`` function we've defined in our ``__init__.py``:
 
 When you invoke the ``pserve development.ini`` command, the ``main`` function
 above is executed.  It accepts some settings and returns a :term:`WSGI`
-application.  You can read :ref:`startup_chapter` for details about *how*
-this function is found and called when you run ``pserve``, but for purposes
-of brevity, we'll elide the details here.
+application.  (See :ref:`startup_chapter` for more about ``pserve``.)
 
 The main function first creates a SQLAlchemy database engine using
 ``engine_from_config`` from the ``sqlalchemy.`` prefixed settings in the
@@ -134,24 +132,21 @@ Here is the entirety of code in the ``views.py`` file within our package:
       :linenos:
       :language: py
 
-The important part to point out here is the ``@view_config`` decorator which
-sits atop the ``my_view`` function.  In fact, ``@view_config`` is so
-important that we're going to ignore the rest of the code in the module at
-this point just to explain it.  The ``@view_config`` decorator associates the
-function it decorates with a :term:`view configuration`. The view
-configuration names a ``route_name`` (``home``), and names a ``renderer``,
-which is a template which lives in the ``templates`` subdirectory of the
-package.
+The important part here is that the ``@view_config`` decorator associates the
+function it decorates (``my_view``) with a :term:`view configuration`, 
+consisting of:
 
-As the result of this view configuration, when the pattern associated with
-the view named ``home`` is matched during a request, the function named
-``my_view`` will be executed.  The function named ``my_view`` returns a
-dictionary; the renderer will use the ``templates/mytemplate.pt`` template to
-create a response based on the values in the dictionary.
+   * a ``route_name`` (``home``)
+   * a ``renderer``, which is a template from the ``templates`` subdirectory 
+     of the package.
 
-Note that the decorated function named ``my_view`` accepts a single argument
-named ``request``.  This is the standard call signature for a Pyramid
-:term:`view callable`.
+When the pattern associated with the ``home`` view is matched during a request,
+``my_view()`` will be executed.  ``my_view()`` returns a dictionary; the 
+renderer will use the ``templates/mytemplate.pt`` template to create a response
+based on the values in the dictionary.
+
+Note that ``my_view()`` accepts a single argument named ``request``.  This is
+the standard call signature for a Pyramid :term:`view callable`.
 
 Remember in our ``__init__.py`` when we executed the
 :meth:`pyramid.config.Configurator.scan` method, e.g. ``config.scan()``?  The
