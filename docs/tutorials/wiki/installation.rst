@@ -228,6 +228,8 @@ Looks like the code in the ``zodb`` scaffold for ZODB projects is
 missing some test coverage, particularly in the file named
 ``models.py``.
 
+.. _wiki-start-the-application:
+
 Start the Application
 =====================
 
