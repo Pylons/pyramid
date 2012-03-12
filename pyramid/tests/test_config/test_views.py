@@ -218,6 +218,14 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
 
+    def test_add_view_as_instancemethod(self):
+        from pyramid.renderers import null_renderer
+        class View:
+            def index(self, context, request): pass
+        view = View()
+        config=self._makeOne(autocommit=True)
+        config.add_view(view=view.index, renderer=null_renderer)
+
     def test_add_view_as_instance_requestonly(self):
         from pyramid.renderers import null_renderer
         class AView:
