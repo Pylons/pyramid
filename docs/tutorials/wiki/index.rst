@@ -18,6 +18,7 @@ tutorial can be browsed at
    :maxdepth: 2
 
    background
+   design
    installation
    basiclayout
    definingmodels
