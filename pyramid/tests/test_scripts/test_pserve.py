@@ -74,6 +74,8 @@ class TestPServeCommand(unittest.TestCase):
             'Cannot remove PID file: (Some OSError - unlink)',
             'Stale PID removed']
         self._assert_pid_file_not_removed(msg=''.join(msg))
+        with open(self.pid_file) as f:
+            self.assertEqual(f.read(), '')
 
     def test_remove_pid_file_stale_pid_write_exception(self):
         inst = self._makeOneWithPidFile(os.getpid())
@@ -84,6 +86,8 @@ class TestPServeCommand(unittest.TestCase):
             'Stale PID left in file: %s ' % (self.pid_file),
             '(Some OSError - open)']
         self._assert_pid_file_not_removed(msg=''.join(msg))
+        with open(self.pid_file) as f:
+            self.assertEqual(int(f.read()), os.getpid())
 
     def test_record_pid_verbose(self):
         self._assert_record_pid(verbosity=2, msg='Writing PID %d to %s')
