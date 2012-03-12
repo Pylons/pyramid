@@ -1,3 +1,4 @@
+import atexit
 import __builtin__
 import os
 import tempfile
@@ -97,7 +98,6 @@ class TestPServeCommand(unittest.TestCase):
 
     def _remove_pid_unlink_exception(self, inst):
         old_unlink = os.unlink
-
         def fake_unlink(filename):
             raise OSError('Some OSError - unlink')
 
@@ -109,12 +109,11 @@ class TestPServeCommand(unittest.TestCase):
 
     def _remove_pid_unlink_and_write_exceptions(self, inst):
         old_unlink = os.unlink
-        old_open = __builtin__.open
-
         def fake_unlink(filename):
             raise OSError('Some OSError - unlink')
 
         run_already = []
+        old_open = __builtin__.open
         def fake_open(*args):
             if not run_already:
                 run_already.append(True)
@@ -139,11 +138,21 @@ class TestPServeCommand(unittest.TestCase):
         self.assertEqual(self.out_.getvalue(), msg)
 
     def _assert_record_pid(self, verbosity, msg):
+        old_atexit = atexit.register
+        def fake_atexit(*args):
+            pass
+
         self.pid_file = tempfile.mktemp()
         pid = os.getpid()
         inst = self._makeOne()
         inst.verbose = verbosity
-        inst.record_pid(self.pid_file)
+
+        try:
+            atexit.register = fake_atexit
+            inst.record_pid(self.pid_file)
+        finally:
+            atexit.register = old_atexit
+
         msg = msg % (pid, self.pid_file) if msg else ''
         self.assertEqual(self.out_.getvalue(), msg)
         with open(self.pid_file) as f:
