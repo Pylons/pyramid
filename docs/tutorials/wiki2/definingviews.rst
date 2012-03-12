@@ -323,7 +323,8 @@ something like so:
 Viewing the Application in a Browser
 ====================================
 
-We can finally examine our application in a browser.  The views we'll try are
+We can finally examine our application in a browser (See
+:ref:`wiki2-start-the-application`).  The views we'll try are
 as follows:
 
 - Visiting ``http://localhost:6543`` in a browser invokes the
