@@ -632,7 +632,7 @@ class DummySession(dict):
         return storage
 
     def new_csrf_token(self):
-        token = 'csrft'
+        token = '0123456789012345678901234567890123456789'
         self['_csrft_'] = token
         return token
 
