@@ -139,7 +139,19 @@ class ViewDeriver(object):
                             self.http_cached_view(
                                 self.decorated_view(
                                     self.rendered_view(
-                                        self.mapped_view(view)))))))))
+                                        self.mapped_view(
+                                            self.text_wrapped_view(
+                                                view))))))))))
+
+    @wraps_view
+    def text_wrapped_view(self, view):
+        # if the method is an instance method, we need to wrap it in order
+        # to be able to assign a __text__ value to it later.  see #461.
+        if inspect.ismethod(view):
+            def text_wrapper(context, request):
+                return view(context, request)
+            return text_wrapper
+        return view
 
     @wraps_view
     def mapped_view(self, view):
