@@ -1,4 +1,5 @@
 import unittest
+import warnings
 
 import os
 
@@ -545,39 +546,33 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(utility, pyramid.tests.test_config)
 
     def test_setup_registry_renderer_globals_factory(self):
-        import warnings
-        warnings.filterwarnings('ignore')
-        try:
-            from pyramid.registry import Registry
-            from pyramid.interfaces import IRendererGlobalsFactory
-            reg = Registry()
-            config = self._makeOne(reg)
-            factory = object()
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IRendererGlobalsFactory
+        reg = Registry()
+        config = self._makeOne(reg)
+        factory = object()
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore')
             config.setup_registry(renderer_globals_factory=factory)
-            self.assertEqual(reg.queryUtility(IRendererGlobalsFactory), None)
-            config.commit()
-            utility = reg.getUtility(IRendererGlobalsFactory)
-            self.assertEqual(utility, factory)
-        finally:
-            warnings.resetwarnings()
+        self.assertEqual(reg.queryUtility(IRendererGlobalsFactory), None)
+        config.commit()
+        utility = reg.getUtility(IRendererGlobalsFactory)
+        self.assertEqual(utility, factory)
 
     def test_setup_registry_renderer_globals_factory_dottedname(self):
-        import warnings
-        warnings.filterwarnings('ignore')
-        try:
-            from pyramid.registry import Registry
-            from pyramid.interfaces import IRendererGlobalsFactory
-            reg = Registry()
-            config = self._makeOne(reg)
-            import pyramid.tests.test_config
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IRendererGlobalsFactory
+        reg = Registry()
+        config = self._makeOne(reg)
+        import pyramid.tests.test_config
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore')
             config.setup_registry(
                 renderer_globals_factory='pyramid.tests.test_config')
-            self.assertEqual(reg.queryUtility(IRendererGlobalsFactory), None)
-            config.commit()
-            utility = reg.getUtility(IRendererGlobalsFactory)
-            self.assertEqual(utility, pyramid.tests.test_config)
-        finally:
-            warnings.resetwarnings()
+        self.assertEqual(reg.queryUtility(IRendererGlobalsFactory), None)
+        config.commit()
+        utility = reg.getUtility(IRendererGlobalsFactory)
+        self.assertEqual(utility, pyramid.tests.test_config)
 
     def test_setup_registry_alternate_renderers(self):
         from pyramid.registry import Registry
@@ -1182,13 +1177,14 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertTrue(getattr(foo_meth, im_func) is foo)
 
 class TestConfiguratorDeprecatedFeatures(unittest.TestCase):
+
     def setUp(self):
-        import warnings
+        self.warnings = warnings.catch_warnings()
+        self.warnings.__enter__()
         warnings.filterwarnings('ignore')
 
     def tearDown(self):
-        import warnings
-        warnings.resetwarnings()
+        self.warnings.__exit__(None, None, None)
 
     def _makeOne(self, *arg, **kw):
         from pyramid.config import Configurator
