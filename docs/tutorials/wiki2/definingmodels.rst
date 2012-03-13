@@ -67,12 +67,15 @@ script.  In particular, we'll replace our import of ``MyModel`` with one of
 ``Page`` and we'll change the very end of the script to create a ``Page``
 rather than a ``MyModel`` and add it to our ``DBSession``.
 
-The result of all of our edits to ``populate.py`` will end up looking
-something like this:
+Open ``tutorial/tutorial/scripts/populate.py`` and edit it to look like the 
+following:
 
 .. literalinclude:: src/models/tutorial/scripts/populate.py
    :linenos:
    :language: python
+   :emphasize-lines: 14,34
+
+(Only the highlighted lines need to be changed.)
 
 Repopulating the Database
 -------------------------
