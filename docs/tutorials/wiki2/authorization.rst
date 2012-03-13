@@ -118,6 +118,7 @@ your application's ``__init__.py`` will look like this:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :linenos:
+   :emphasize-lines: 2-3,7,16-18,20-22,25-26
    :language: python
 
 Adding an authentication policy callback
@@ -280,46 +281,56 @@ class="app-welcome align-right">`` div:
    </span>
 
 Seeing Our Changes To ``views.py`` and our Templates
-----------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Our ``views.py`` module will look something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :linenos:
+   :emphasize-lines: 11,14-18,56,59,71,74,89-115,117-121
    :language: python
+
+(Only the highlighted lines need to be added.)
 
 Our ``edit.pt`` template will look something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.pt
+   :emphasize-lines: 41-43
    :language: xml
+
+(Only the highlighted lines need to be added.)
 
 Our ``view.pt`` template will look something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/view.pt
+   :emphasize-lines: 41-43
    :language: xml
+
+(Only the highlighted lines need to be added.)
 
 Viewing the Application in a Browser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We can finally examine our application in a browser.  The views we'll
-try are as follows:
+We can finally examine our application in a browser (See
+:ref:`wiki2-start-the-application`).  Launch a browser and visit
+each of the following URLs, check that the result is as expected:
 
-- Visiting ``http://localhost:6543/`` in a browser invokes the
+- ``http://localhost:6543/`` invokes the
   ``view_wiki`` view.  This always redirects to the ``view_page`` view
   of the FrontPage page object.  It is executable by any user.
 
-- Visiting ``http://localhost:6543/FrontPage`` in a browser invokes
+- ``http://localhost:6543/FrontPage`` invokes
   the ``view_page`` view of the FrontPage page object.
 
-- Visiting ``http://localhost:6543/FrontPage/edit_page`` in a browser
+- ``http://localhost:6543/edit_page/FrontPage``
   invokes the edit view for the FrontPage object.  It is executable by
   only the ``editor`` user.  If a different user (or the anonymous
   user) invokes it, a login form will be displayed.  Supplying the
   credentials with the username ``editor``, password ``editor`` will
   display the edit page form.
 
-- Visiting ``http://localhost:6543/add_page/SomePageName`` in a
-  browser invokes the add view for a page.  It is executable by only
+- ``http://localhost:6543/add_page/SomePageName``
+  invokes the add view for a page.  It is executable by only
   the ``editor`` user.  If a different user (or the anonymous user)
   invokes it, a login form will be displayed.  Supplying the
   credentials with the username ``editor``, password ``editor`` will
