@@ -16,8 +16,10 @@ Application Configuration with ``__init__.py``
 A directory on disk can be turned into a Python :term:`package` by containing
 an ``__init__.py`` file.  Even if empty, this marks a directory as a Python
 package.  We use ``__init__.py`` both as a marker indicating the directory
-it's contained within is a package, and to contain configuration code.  Our
-``__init__.py`` file will look like this:
+it's contained within is a package, and to contain configuration code.
+
+Open ``tutorial/tutorial/__init__.py``.  It should already contain
+the following:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :linenos:
@@ -41,9 +43,7 @@ the ``main`` function we've defined in our ``__init__.py``:
 
 When you invoke the ``pserve development.ini`` command, the ``main`` function
 above is executed.  It accepts some settings and returns a :term:`WSGI`
-application.  You can read :ref:`startup_chapter` for details about *how*
-this function is found and called when you run ``pserve``, but for purposes
-of brevity, we'll elide the details here.
+application.  (See :ref:`startup_chapter` for more about ``pserve``.)
 
 The main function first creates a SQLAlchemy database engine using
 ``engine_from_config`` from the ``sqlalchemy.`` prefixed settings in the
@@ -128,30 +128,27 @@ pattern matches is done by registering a :term:`view configuration`. Our
 application uses the :meth:`pyramid.view.view_config` decorator to map view
 callables to each route, thereby mapping URL patterns to code.
 
-Here is the entirety of code in the ``views.py`` file within our package:
+Open ``tutorial/tutorial/views.py``.  It should already contain the following:
 
    .. literalinclude:: src/basiclayout/tutorial/views.py
       :linenos:
       :language: py
 
-The important part to point out here is the ``@view_config`` decorator which
-sits atop the ``my_view`` function.  In fact, ``@view_config`` is so
-important that we're going to ignore the rest of the code in the module at
-this point just to explain it.  The ``@view_config`` decorator associates the
-function it decorates with a :term:`view configuration`. The view
-configuration names a ``route_name`` (``home``), and names a ``renderer``,
-which is a template which lives in the ``templates`` subdirectory of the
-package.
+The important part here is that the ``@view_config`` decorator associates the
+function it decorates (``my_view``) with a :term:`view configuration`, 
+consisting of:
 
-As the result of this view configuration, when the pattern associated with
-the view named ``home`` is matched during a request, the function named
-``my_view`` will be executed.  The function named ``my_view`` returns a
-dictionary; the renderer will use the ``templates/mytemplate.pt`` template to
-create a response based on the values in the dictionary.
+   * a ``route_name`` (``home``)
+   * a ``renderer``, which is a template from the ``templates`` subdirectory 
+     of the package.
 
-Note that the decorated function named ``my_view`` accepts a single argument
-named ``request``.  This is the standard call signature for a Pyramid
-:term:`view callable`.
+When the pattern associated with the ``home`` view is matched during a request,
+``my_view()`` will be executed.  ``my_view()`` returns a dictionary; the 
+renderer will use the ``templates/mytemplate.pt`` template to create a response
+based on the values in the dictionary.
+
+Note that ``my_view()`` accepts a single argument named ``request``.  This is
+the standard call signature for a Pyramid :term:`view callable`.
 
 Remember in our ``__init__.py`` when we executed the
 :meth:`pyramid.config.Configurator.scan` method, e.g. ``config.scan()``?  The
@@ -168,13 +165,13 @@ In a SQLAlchemy-based application, a *model* object is an object composed by
 querying the SQL database. The ``models.py`` file is where the ``alchemy``
 scaffold put the classes that implement our models.
 
-Here is the complete source for ``models.py``:
+Open ``tutorial/tutorial/models.py``.  It should already contain the following:
 
    .. literalinclude:: src/basiclayout/tutorial/models.py
       :linenos:
       :language: py
 
-Let's take a look. First, we need some imports to support later code.
+Let's examine this in detail. First, we need some imports to support later code:
 
    .. literalinclude:: src/basiclayout/tutorial/models.py
       :end-before: DBSession

@@ -21,11 +21,15 @@ Making Edits to ``models.py``
   (or they may live in a Python subpackage of your application package named
   ``models``) , but this is only by convention.
 
-Here's what our ``models.py`` file should look like after this step:
+Open ``tutorial/tutorial/models.py`` file and edit it to look like the 
+following:
 
 .. literalinclude:: src/models/tutorial/models.py
    :linenos:
    :language: py
+   :emphasize-lines: 19-21,24,26,28
+
+(The highlighted lines are the ones that need to be changed.)
 
 The first thing we've done is to do is remove the stock ``MyModel`` class
 from the generated ``models.py`` file.  The ``MyModel`` class is only a
@@ -122,7 +126,8 @@ Viewing the Application in a Browser
 
 We can't.  At this point, our system is in a "non-runnable" state; we'll need
 to change view-related files in the next chapter to be able to start the
-application successfully.  If you try to start the application, you'll wind
+application successfully.  If you try to start the application (See
+:ref:`wiki2-start-the-application`), you'll wind
 up with a Python traceback on your console that ends with this exception:
 
 .. code-block:: text
