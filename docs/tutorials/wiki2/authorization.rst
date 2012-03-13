@@ -189,7 +189,13 @@ visit ``/login``.
 We'll need to import some stuff to service the needs of these two functions:
 the ``pyramid.view.forbidden_view_config`` class, a number of values from the
 ``pyramid.security`` module, and a value from our newly added
-``tutorial.security`` package.
+``tutorial.security`` package.  Add the following import statements to the
+head of the ``views.py`` file:
+
+.. literalinclude:: src/authorization/tutorial/views.py
+   :lines: 9-18,24-25
+   :linenos:
+   :language: python
 
 Changing Existing Views
 -----------------------
