@@ -3,7 +3,7 @@ use = egg:{{project}}
 
 ###
 # pyramid debugging
-# http://docs.pylonsproject.org/projects/pyramid/en/1.2-branch/narr/environment.html
+# {{settings_url}}
 ###
 
 pyramid.reload_templates = true
@@ -17,7 +17,7 @@ pyramid.includes =
 
 ###
 # debugtoolbar settings
-# http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest/#settings
+# {{debugtoolbar_url}}
 ###
 
 # By default, the toolbar only appears for clients from IP addresses
@@ -31,7 +31,7 @@ port = 6543
 
 ###
 # logging configuration
-# http://docs.pylonsproject.org/projects/pyramid/en/1.2-branch/narr/logging.html
+# {{logging_url}}
 ###
 
 [loggers]

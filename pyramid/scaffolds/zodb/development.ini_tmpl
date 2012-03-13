@@ -1,6 +1,11 @@
 [app:main]
 use = egg:{{project}}
 
+###
+# pyramid debugging
+# {{settings_url}}
+###
+
 pyramid.reload_templates = true
 pyramid.debug_authorization = false
 pyramid.debug_notfound = false
@@ -15,12 +20,24 @@ pyramid.includes =
 tm.attempts = 3
 zodbconn.uri = file://%(here)s/Data.fs?connection_cache_size=20000
 
+###
+# debugtoolbar settings
+# {{debugtoolbar_url}}
+###
+
+# By default, the toolbar only appears for clients from IP addresses
+# '127.0.0.1' and '::1'.
+# debugtoolbar.hosts = 127.0.0.1 ::1
+
 [server:main]
 use = egg:waitress#main
 host = 0.0.0.0
 port = 6543
 
-# Begin logging configuration
+###
+# logging configuration
+# {{logging_url}}
+###
 
 [loggers]
 keys = root, {{package_logger}}
@@ -48,5 +65,3 @@ formatter = generic
 
 [formatter_generic]
 format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
-
-# End logging configuration
