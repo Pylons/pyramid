@@ -8,19 +8,25 @@ import time as time_mod
 
 from zope.interface import implementer
 
-from pyramid.compat import long
-from pyramid.compat import text_type
-from pyramid.compat import binary_type
-from pyramid.compat import url_unquote
-from pyramid.compat import url_quote
-from pyramid.compat import bytes_
-from pyramid.compat import ascii_native_
+from pyramid.compat import (
+    long,
+    text_type,
+    binary_type,
+    url_unquote,
+    url_quote,
+    bytes_,
+    ascii_native_,
+    )
 
-from pyramid.interfaces import IAuthenticationPolicy
-from pyramid.interfaces import IDebugLogger
+from pyramid.interfaces import (
+    IAuthenticationPolicy,
+    IDebugLogger,
+    )
 
-from pyramid.security import Authenticated
-from pyramid.security import Everyone
+from pyramid.security import (
+    Authenticated,
+    Everyone,
+    )
 
 from pyramid.util import strings_differ
 
@@ -76,7 +82,7 @@ class CallbackAuthenticationPolicy(object):
         userid = self.unauthenticated_userid(request)
         if userid is None:
             debug and self._log(
-                'authenticated_userid returned %r; returning %r' % (
+                'unauthenticated_userid returned %r; returning %r' % (
                     userid, effective_principals),
                 'effective_principals',
                 request

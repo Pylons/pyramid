@@ -16,7 +16,7 @@ Treatment of Account
 Contributor will not allow anyone other than the Contributor to use his or
 her username or source repository login to submit code to a Pylons Project
 source repository. Should Contributor become aware of any such use,
-Contributor will immediately by notifying Agendaless Consulting.
+Contributor will immediately notify Agendaless Consulting.
 Notification must be performed by sending an email to
 webmaster@agendaless.com.  Until such notice is received, Contributor will be
 presumed to have taken all actions made through Contributor's account. If the
@@ -158,3 +158,11 @@ Contributors
 - Reed O'Brien, 2011/11/07
 
 - Klee Dienes, 2011/10/30
+
+- Michael Ryabushin, 2011/12/14
+
+- Mike Orr, 2012/02/14
+
+- Paul M. Winkler, 2012/02/22
+
+- Martijn Pieters, 2012/03/02

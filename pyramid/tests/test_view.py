@@ -3,8 +3,10 @@ import sys
 
 from zope.interface import implementer
 
-from pyramid.testing import setUp
-from pyramid.testing import tearDown
+from pyramid.testing import (
+    setUp,
+    tearDown,
+    )
 
 class BaseTest(object):
     def setUp(self):
@@ -48,8 +50,94 @@ class BaseTest(object):
         context = DummyContext()
         directlyProvides(context, IContext)
         return context
-        
 
+class Test_notfound_view_config(BaseTest, unittest.TestCase):
+    def _makeOne(self, **kw):
+        from pyramid.view import notfound_view_config
+        return notfound_view_config(**kw)
+
+    def test_ctor(self):
+        inst = self._makeOne(attr='attr', path_info='path_info', 
+                             append_slash=True)
+        self.assertEqual(inst.__dict__,
+                         {'attr':'attr', 'path_info':'path_info',
+                          'append_slash':True})
+
+    def test_it_function(self):
+        def view(request): pass
+        decorator = self._makeOne(attr='attr', renderer='renderer',
+                                  append_slash=True)
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        wrapped = decorator(view)
+        self.assertTrue(wrapped is view)
+        config = call_venusian(venusian)
+        settings = config.settings
+        self.assertEqual(
+            settings, 
+            [{'attr': 'attr', 'venusian': venusian, 'append_slash': True, 
+              'renderer': 'renderer', '_info': 'codeinfo', 'view': None}]
+            )
+
+    def test_it_class(self):
+        decorator = self._makeOne()
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        decorator.venusian.info.scope = 'class'
+        class view(object): pass
+        wrapped = decorator(view)
+        self.assertTrue(wrapped is view)
+        config = call_venusian(venusian)
+        settings = config.settings
+        self.assertEqual(len(settings), 1)
+        self.assertEqual(len(settings[0]), 5)
+        self.assertEqual(settings[0]['venusian'], venusian)
+        self.assertEqual(settings[0]['view'], None) # comes from call_venusian
+        self.assertEqual(settings[0]['attr'], 'view')
+        self.assertEqual(settings[0]['_info'], 'codeinfo')
+
+class Test_forbidden_view_config(BaseTest, unittest.TestCase):
+    def _makeOne(self, **kw):
+        from pyramid.view import forbidden_view_config
+        return forbidden_view_config(**kw)
+
+    def test_ctor(self):
+        inst = self._makeOne(attr='attr', path_info='path_info')
+        self.assertEqual(inst.__dict__,
+                         {'attr':'attr', 'path_info':'path_info'})
+
+    def test_it_function(self):
+        def view(request): pass
+        decorator = self._makeOne(attr='attr', renderer='renderer')
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        wrapped = decorator(view)
+        self.assertTrue(wrapped is view)
+        config = call_venusian(venusian)
+        settings = config.settings
+        self.assertEqual(
+            settings, 
+            [{'attr': 'attr', 'venusian': venusian, 
+              'renderer': 'renderer', '_info': 'codeinfo', 'view': None}]
+            )
+
+    def test_it_class(self):
+        decorator = self._makeOne()
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        decorator.venusian.info.scope = 'class'
+        class view(object): pass
+        wrapped = decorator(view)
+        self.assertTrue(wrapped is view)
+        config = call_venusian(venusian)
+        settings = config.settings
+        self.assertEqual(len(settings), 1)
+        self.assertEqual(len(settings[0]), 4)
+        self.assertEqual(settings[0]['venusian'], venusian)
+        self.assertEqual(settings[0]['view'], None) # comes from call_venusian
+        self.assertEqual(settings[0]['attr'], 'view')
+        self.assertEqual(settings[0]['_info'], 'codeinfo')
+        
 class RenderViewToResponseTests(BaseTest, unittest.TestCase):
     def _callFUT(self, *arg, **kw):
         from pyramid.view import render_view_to_response
@@ -260,10 +348,7 @@ class TestViewConfigDecorator(unittest.TestCase):
 
     def test_create_defaults(self):
         decorator = self._makeOne()
-        self.assertEqual(decorator.name, '')
-        self.assertEqual(decorator.request_type, None)
-        self.assertEqual(decorator.context, None)
-        self.assertEqual(decorator.permission, None)
+        self.assertEqual(decorator.__dict__, {})
 
     def test_create_context_trumps_for(self):
         decorator = self._makeOne(context='123', for_='456')
@@ -274,9 +359,11 @@ class TestViewConfigDecorator(unittest.TestCase):
         self.assertEqual(decorator.context, '456')
         
     def test_create_nondefaults(self):
-        decorator = self._makeOne(name=None, request_type=None, for_=None,
-                                  permission='foo', mapper='mapper',
-                                  decorator='decorator', match_param='match_param')
+        decorator = self._makeOne(
+            name=None, request_type=None, for_=None,
+            permission='foo', mapper='mapper',
+            decorator='decorator', match_param='match_param'
+            )
         self.assertEqual(decorator.name, None)
         self.assertEqual(decorator.request_type, None)
         self.assertEqual(decorator.context, None)
@@ -295,9 +382,11 @@ class TestViewConfigDecorator(unittest.TestCase):
         config = call_venusian(venusian)
         settings = config.settings
         self.assertEqual(len(settings), 1)
-        self.assertEqual(settings[0]['permission'], None)
-        self.assertEqual(settings[0]['context'], None)
-        self.assertEqual(settings[0]['request_type'], None)
+        self.assertEqual(len(settings), 1)
+        self.assertEqual(len(settings[0]), 3)
+        self.assertEqual(settings[0]['venusian'], venusian)
+        self.assertEqual(settings[0]['view'], None) # comes from call_venusian
+        self.assertEqual(settings[0]['_info'], 'codeinfo')
 
     def test_call_class(self):
         decorator = self._makeOne()
@@ -310,10 +399,11 @@ class TestViewConfigDecorator(unittest.TestCase):
         config = call_venusian(venusian)
         settings = config.settings
         self.assertEqual(len(settings), 1)
-        self.assertEqual(settings[0]['permission'], None)
-        self.assertEqual(settings[0]['context'], None)
-        self.assertEqual(settings[0]['request_type'], None)
+        self.assertEqual(len(settings[0]), 4)
+        self.assertEqual(settings[0]['venusian'], venusian)
+        self.assertEqual(settings[0]['view'], None) # comes from call_venusian
         self.assertEqual(settings[0]['attr'], 'foo')
+        self.assertEqual(settings[0]['_info'], 'codeinfo')
 
     def test_call_class_attr_already_set(self):
         decorator = self._makeOne(attr='abc')
@@ -326,10 +416,11 @@ class TestViewConfigDecorator(unittest.TestCase):
         config = call_venusian(venusian)
         settings = config.settings
         self.assertEqual(len(settings), 1)
-        self.assertEqual(settings[0]['permission'], None)
-        self.assertEqual(settings[0]['context'], None)
-        self.assertEqual(settings[0]['request_type'], None)
+        self.assertEqual(len(settings[0]), 4)
+        self.assertEqual(settings[0]['venusian'], venusian)
+        self.assertEqual(settings[0]['view'], None) # comes from call_venusian
         self.assertEqual(settings[0]['attr'], 'abc')
+        self.assertEqual(settings[0]['_info'], 'codeinfo')
 
     def test_stacking(self):
         decorator1 = self._makeOne(name='1')
@@ -570,6 +661,39 @@ class Test_static(unittest.TestCase):
         view = self._makeOne(path, None)
         self.assertEqual(view.docroot, 'fixtures')
 
+class Test_view_defaults(unittest.TestCase):
+    def test_it(self):
+        from pyramid.view import view_defaults
+        @view_defaults(route_name='abc', renderer='def')
+        class Foo(object): pass
+        self.assertEqual(Foo.__view_defaults__['route_name'],'abc')
+        self.assertEqual(Foo.__view_defaults__['renderer'],'def')
+
+    def test_it_inheritance_not_overridden(self):
+        from pyramid.view import view_defaults
+        @view_defaults(route_name='abc', renderer='def')
+        class Foo(object): pass
+        class Bar(Foo): pass
+        self.assertEqual(Bar.__view_defaults__['route_name'],'abc')
+        self.assertEqual(Bar.__view_defaults__['renderer'],'def')
+
+    def test_it_inheritance_overriden(self):
+        from pyramid.view import view_defaults
+        @view_defaults(route_name='abc', renderer='def')
+        class Foo(object): pass
+        @view_defaults(route_name='ghi')
+        class Bar(Foo): pass
+        self.assertEqual(Bar.__view_defaults__['route_name'],'ghi')
+        self.assertFalse('renderer' in Bar.__view_defaults__)
+
+    def test_it_inheritance_overriden_empty(self):
+        from pyramid.view import view_defaults
+        @view_defaults(route_name='abc', renderer='def')
+        class Foo(object): pass
+        @view_defaults()
+        class Bar(Foo): pass
+        self.assertEqual(Bar.__view_defaults__, {})
+
 class ExceptionResponse(Exception):
     status = '404 Not Found'
     app_iter = ['Not Found']
@@ -635,6 +759,8 @@ class DummyConfig(object):
 
     def add_view(self, **kw):
         self.settings.append(kw)
+
+    add_notfound_view = add_forbidden_view = add_view
 
     def with_package(self, pkg):
         self.pkg = pkg

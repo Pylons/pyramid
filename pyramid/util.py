@@ -1,149 +1,102 @@
-import pkg_resources
-import sys
+import inspect
 import weakref
 
-from pyramid.compat import string_types
-from pyramid.exceptions import ConfigurationError
-from pyramid.path import package_of
+from pyramid.compat import (
+    integer_types,
+    string_types,
+    text_,
+    PY3,
+    )
 
-class DottedNameResolver(object):
-    """ This class resolves dotted name references to 'global' Python
-    objects (objects which can be imported) to those objects.
+from pyramid.path import DottedNameResolver as _DottedNameResolver
 
-    Two dotted name styles are supported during deserialization:
+class DottedNameResolver(_DottedNameResolver):
+    def __init__(self, package=None): # default to package = None for bw compat
+        return _DottedNameResolver.__init__(self, package)
 
-    - ``pkg_resources``-style dotted names where non-module attributes
-      of a package are separated from the rest of the path using a ':'
-      e.g. ``package.module:attr``.
-
-    - ``zope.dottedname``-style dotted names where non-module
-      attributes of a package are separated from the rest of the path
-      using a '.' e.g. ``package.module.attr``.
-
-    These styles can be used interchangeably.  If the serialization
-    contains a ``:`` (colon), the ``pkg_resources`` resolution
-    mechanism will be chosen, otherwise the ``zope.dottedname``
-    resolution mechanism will be chosen.
-
-    The constructor accepts a single argument named ``package`` which
-    should be a one of:
-
-    - a Python module or package object
-
-    - A fully qualified (not relative) dotted name to a module or package
-
-    - The value ``None``
-
-    The ``package`` is used when relative dotted names are supplied to
-    the resolver's ``resolve`` and ``maybe_resolve`` methods.  A
-    dotted name which has a ``.`` (dot) or ``:`` (colon) as its first
-    character is treated as relative.
-
-    If the value ``None`` is supplied as the package name, the
-    resolver will only be able to resolve fully qualified (not
-    relative) names.  Any attempt to resolve a relative name when the
-    ``package`` is ``None`` will result in an
-    :exc:`pyramid.config.ConfigurationError` exception.
-
-    If a *module* or *module name* (as opposed to a package or package
-    name) is supplied as ``package``, its containing package is
-    computed and this package used to derive the package name (all
-    names are resolved relative to packages, never to modules).  For
-    example, if the ``package`` argument to this type was passed the
-    string ``xml.dom.expatbuilder``, and ``.mindom`` is supplied to
-    the ``resolve`` method, the resulting import would be for
-    ``xml.minidom``, because ``xml.dom.expatbuilder`` is a module
-    object, not a package object.
-
-    If a *package* or *package name* (as opposed to a module or module
-    name) is supplied as ``package``, this package will be used to
-    relative compute dotted names.  For example, if the ``package``
-    argument to this type was passed the string ``xml.dom``, and
-    ``.minidom`` is supplied to the ``resolve`` method, the resulting
-    import would be for ``xml.minidom``.
-
-    When a dotted name cannot be resolved, a
-    :class:`pyramid.exceptions.ConfigurationError` error is raised.
+class InstancePropertyMixin(object):
+    """ Mixin that will allow an instance to add properties at
+    run-time as if they had been defined via @property or @reify
+    on the class itself.
     """
-    def __init__(self, package):
-        if package is None:
-            self.package_name = None
-            self.package = None
+
+    def set_property(self, callable, name=None, reify=False):
+        """ Add a callable or a property descriptor to the instance.
+
+        Properties, unlike attributes, are lazily evaluated by executing
+        an underlying callable when accessed. They can be useful for
+        adding features to an object without any cost if those features
+        go unused.
+
+        A property may also be reified via the
+        :class:`pyramid.decorator.reify` decorator by setting
+        ``reify=True``, allowing the result of the evaluation to be
+        cached. Thus the value of the property is only computed once for
+        the lifetime of the object.
+
+        ``callable`` can either be a callable that accepts the instance
+        as
+        its single positional parameter, or it can be a property
+        descriptor.
+
+        If the ``callable`` is a property descriptor, the ``name``
+        parameter must be supplied or a ``ValueError`` will be raised.
+        Also note that a property descriptor cannot be reified, so
+        ``reify`` must be ``False``.
+
+        If ``name`` is None, the name of the property will be computed
+        from the name of the ``callable``.
+
+        .. code-block:: python
+           :linenos:
+
+           class Foo(InstancePropertyMixin):
+               _x = 1
+
+           def _get_x(self):
+               return _x
+
+           def _set_x(self, value):
+               self._x = value
+
+           foo = Foo()
+           foo.set_property(property(_get_x, _set_x), name='x')
+           foo.set_property(_get_x, name='y', reify=True)
+
+           >>> foo.x
+           1
+           >>> foo.y
+           1
+           >>> foo.x = 5
+           >>> foo.x
+           5
+           >>> foo.y # notice y keeps the original value
+           1
+        """
+
+        is_property = isinstance(callable, property)
+        if is_property:
+            fn = callable
+            if name is None:
+                raise ValueError('must specify "name" for a property')
+            if reify:
+                raise ValueError('cannot reify a property')
+        elif name is not None:
+            fn = lambda this: callable(this)
+            fn.__name__ = name
+            fn.__doc__ = callable.__doc__
         else:
-            if isinstance(package, string_types):
-                try:
-                    __import__(package)
-                except ImportError:
-                    raise ConfigurationError(
-                        'The dotted name %r cannot be imported' % (package,))
-                package = sys.modules[package]
-            self.package = package_of(package)
-            self.package_name = self.package.__name__
-
-    def _pkg_resources_style(self, value):
-        """ package.module:attr style """
-        if value.startswith('.') or value.startswith(':'):
-            if not self.package_name:
-                raise ConfigurationError(
-                    'relative name %r irresolveable without '
-                    'package_name' % (value,))
-            if value in ['.', ':']:
-                value = self.package_name
-            else:
-                value = self.package_name + value
-        return pkg_resources.EntryPoint.parse(
-            'x=%s' % value).load(False)
-
-    def _zope_dottedname_style(self, value):
-        """ package.module.attr style """
-        module = self.package_name
-        if not module:
-            module = None
-        if value == '.':
-            if module is None:
-                raise ConfigurationError(
-                    'relative name %r irresolveable without package' % (value,)
-                )
-            name = module.split('.')
-        else:
-            name = value.split('.')
-            if not name[0]:
-                if module is None:
-                    raise ConfigurationError(
-                        'relative name %r irresolveable without '
-                        'package' % (value,)
-                        )
-                module = module.split('.')
-                name.pop(0)
-                while not name[0]:
-                    module.pop()
-                    name.pop(0)
-                name = module + name
-
-        used = name.pop(0)
-        found = __import__(used)
-        for n in name:
-            used += '.' + n
-            try:
-                found = getattr(found, n)
-            except AttributeError:
-                __import__(used)
-                found = getattr(found, n) # pragma: no cover
-
-        return found
-
-    def resolve(self, dotted):
-        if not isinstance(dotted, string_types):
-            raise ConfigurationError('%r is not a string' % (dotted,))
-        return self.maybe_resolve(dotted)
-
-    def maybe_resolve(self, dotted):
-        if isinstance(dotted, string_types):
-            if ':' in dotted:
-                return self._pkg_resources_style(dotted)
-            else:
-                return self._zope_dottedname_style(dotted)
-        return dotted
+            name = callable.__name__
+            fn = callable
+        if reify:
+            import pyramid.decorator
+            fn = pyramid.decorator.reify(fn)
+        elif not is_property:
+            fn = property(fn)
+        attrs = { name: fn }
+        parent = self.__class__
+        cls = type(parent.__name__, (parent, object), attrs)
+        self.__class__ = cls
 
 class WeakOrderedSet(object):
     """ Maintain a set of items.
@@ -228,3 +181,71 @@ def strings_differ(string1, string2):
 
     return invalid_bits != 0
 
+def object_description(object):
+    """ Produce a human-consumable text description of ``object``,
+    usually involving a Python dotted name. For example:
+
+    .. code-block:: python
+
+       >>> object_description(None)
+       u'None'
+       >>> from xml.dom import minidom
+       >>> object_description(minidom)
+       u'module xml.dom.minidom'
+       >>> object_description(minidom.Attr)
+       u'class xml.dom.minidom.Attr'
+       >>> object_description(minidom.Attr.appendChild)
+       u'method appendChild of class xml.dom.minidom.Attr'
+       >>> 
+
+    If this method cannot identify the type of the object, a generic
+    description ala ``object <object.__name__>`` will be returned.
+
+    If the object passed is already a string, it is simply returned.  If it
+    is a boolean, an integer, a list, a tuple, a set, or ``None``, a
+    (possibly shortened) string representation is returned.
+    """
+    if isinstance(object, string_types):
+        return text_(object)
+    if isinstance(object, integer_types):
+        return text_(str(object))
+    if isinstance(object, (bool, float, type(None))):
+        return text_(str(object))
+    if isinstance(object, set):
+        if PY3: # pragma: no cover
+            return shortrepr(object, '}')
+        else:
+            return shortrepr(object, ')')
+    if isinstance(object, tuple):
+        return shortrepr(object, ')')
+    if isinstance(object, list):
+        return shortrepr(object, ']')
+    if isinstance(object, dict):
+        return shortrepr(object, '}')
+    module = inspect.getmodule(object)
+    if module is None:
+        return text_('object %s' % str(object))
+    modulename = module.__name__
+    if inspect.ismodule(object):
+        return text_('module %s' % modulename)
+    if inspect.ismethod(object):
+        oself = getattr(object, '__self__', None)
+        if oself is None: # pragma: no cover
+            oself = getattr(object, 'im_self', None)
+        return text_('method %s of class %s.%s' %
+                     (object.__name__, modulename,
+                      oself.__class__.__name__))
+
+    if inspect.isclass(object):
+        dottedname = '%s.%s' % (modulename, object.__name__)
+        return text_('class %s' % dottedname)
+    if inspect.isfunction(object):
+        dottedname = '%s.%s' % (modulename, object.__name__)
+        return text_('function %s' % dottedname)
+    return text_('object %s' % str(object))
+
+def shortrepr(object, closer):
+    r = str(object)
+    if len(r) > 100:
+        r = r[:100] + ' ... %s' % closer
+    return r

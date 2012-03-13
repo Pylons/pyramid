@@ -9,6 +9,11 @@
    :members:
    :inherited-members:
 
+.. autoclass:: FileResponse
+   :members:
+
+.. autoclass:: FileIter
+
 Functions
 ~~~~~~~~~
 

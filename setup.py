@@ -17,10 +17,16 @@ import sys
 
 from setuptools import setup, find_packages
 
-if sys.version_info[:2] < (2, 6):
-    raise RuntimeError('Requires Python 2.6 or better')
+py_version = sys.version_info[:2]
 
-PY3 = sys.version_info[0] == 3
+PY3 = py_version[0] == 3
+
+if PY3:
+    if py_version < (3, 2):
+        raise RuntimeError('On Python 3, Pyramid requires Python 3.2 or better')
+else:
+    if py_version < (2, 6):
+        raise RuntimeError('On Python 2, Pyramid requires Python 2.6 or better')
 
 here = os.path.abspath(os.path.dirname(__file__))
 try:
@@ -37,7 +43,7 @@ install_requires=[
     'repoze.lru >= 0.4', # py3 compat
     'zope.interface >= 3.8.0',  # has zope.interface.registry
     'zope.deprecation >= 3.5.0', # py3 compat
-    'venusian >= 1.0a1', # ``onerror``
+    'venusian >= 1.0a3', # ``ignore``
     'translationstring >= 0.4', # py3 compat
     'PasteDeploy >= 1.5.0', # py3 compat
     ]
@@ -56,7 +62,7 @@ if not PY3:
         ])
 
 setup(name='pyramid',
-      version='1.3dev',
+      version='1.3b2',
       description=('The Pyramid web application development framework, a '
                    'Pylons project'),
       long_description=README + '\n\n' +  CHANGES,
@@ -67,6 +73,8 @@ setup(name='pyramid',
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.2",
+        "Programming Language :: Python :: Implementation :: CPython",
+        "Programming Language :: Python :: Implementation :: PyPy",
         "Framework :: Pylons",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI",
@@ -74,7 +82,7 @@ setup(name='pyramid',
         ],
       keywords='web wsgi pylons pyramid',
       author="Chris McDonough, Agendaless Consulting",
-      author_email="pylons-devel@googlegroups.com",
+      author_email="pylons-discuss@googlegroups.com",
       url="http://pylonsproject.org",
       license="BSD-derived (http://www.repoze.org/LICENSE.txt)",
       packages=find_packages(),
@@ -96,6 +104,7 @@ setup(name='pyramid',
         proutes = pyramid.scripts.proutes:main
         pviews = pyramid.scripts.pviews:main
         ptweens = pyramid.scripts.ptweens:main
+        prequest = pyramid.scripts.prequest:main
         [paste.server_runner]
         wsgiref = pyramid.scripts.pserve:wsgiref_server_runner
         cherrypy = pyramid.scripts.pserve:cherrypy_server_runner

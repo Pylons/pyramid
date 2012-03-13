@@ -231,7 +231,7 @@ class TestPViewsCommand(unittest.TestCase):
         command._find_view = lambda arg1, arg2: None
         command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
         self.assertEqual(L[3], '    Not found.')
 
@@ -244,7 +244,7 @@ class TestPViewsCommand(unittest.TestCase):
         command._find_view = lambda arg1, arg2: None
         command.args = ('/foo/bar/myapp.ini#myapp', 'a')
         result = command.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
         self.assertEqual(L[3], '    Not found.')
 
@@ -258,7 +258,7 @@ class TestPViewsCommand(unittest.TestCase):
         command._find_view = lambda arg1, arg2: view
         command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
         self.assertEqual(L[3], '    context: context')
         self.assertEqual(L[4], '    view name: a')
@@ -276,7 +276,7 @@ class TestPViewsCommand(unittest.TestCase):
         command._find_view = lambda arg1, arg2: view
         command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
         self.assertEqual(L[3], '    context: context')
         self.assertEqual(L[4], '    view name: a')
@@ -294,7 +294,7 @@ class TestPViewsCommand(unittest.TestCase):
         command._find_view = lambda arg1, arg2: view
         command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
         self.assertEqual(L[3], '    context: context')
         self.assertEqual(L[4], '    view name: a')
@@ -315,7 +315,7 @@ class TestPViewsCommand(unittest.TestCase):
         command._find_view = lambda arg1, arg2: view
         command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
         self.assertEqual(L[3], '    context: context')
         self.assertEqual(L[4], '    view name: a')
@@ -335,7 +335,7 @@ class TestPViewsCommand(unittest.TestCase):
         command._find_view = lambda arg1, arg2: view
         command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
         self.assertEqual(L[3], '    context: context')
         self.assertEqual(L[4], '    view name: a')
@@ -363,7 +363,7 @@ class TestPViewsCommand(unittest.TestCase):
         command._find_view = lambda arg1, arg2: multiview2
         command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
         self.assertEqual(L[3], '    context: context')
         self.assertEqual(L[4], '    view name: a')
@@ -386,7 +386,7 @@ class TestPViewsCommand(unittest.TestCase):
         command._find_view = lambda arg1, arg2: view
         command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
         self.assertEqual(L[3], '    context: context')
         self.assertEqual(L[4], '    view name: a')
@@ -412,7 +412,7 @@ class TestPViewsCommand(unittest.TestCase):
         command._find_view = lambda arg1, arg2: multiview
         command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
         self.assertEqual(L[3], '    context: context')
         self.assertEqual(L[4], '    view name: a')
@@ -433,7 +433,7 @@ class TestPViewsCommand(unittest.TestCase):
         command._find_view = lambda arg1, arg2: multiview
         command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
         self.assertEqual(L[3], '    context: context')
         self.assertEqual(L[4], '    view name: a')
@@ -457,7 +457,7 @@ class TestPViewsCommand(unittest.TestCase):
         command._find_view = lambda arg1, arg2: multiview
         command.args = ('/foo/bar/myapp.ini#myapp', '/a')
         result = command.run()
-        self.assertEqual(result, None)
+        self.assertEqual(result, 0)
         self.assertEqual(L[1], 'URL = /a')
         self.assertEqual(L[3], '    context: context')
         self.assertEqual(L[4], '    view name: a')
@@ -472,4 +472,4 @@ class Test_main(unittest.TestCase):
 
     def test_it(self):
         result = self._callFUT(['pviews'])
-        self.assertEqual(result, None)
+        self.assertEqual(result, 2)

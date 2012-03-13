@@ -20,7 +20,7 @@ run :app:`Pyramid`.
 
 :app:`Pyramid` is known to run on all popular UNIX-like systems such as
 Linux, MacOS X, and FreeBSD as well as on Windows platforms.  It is also
-known to run on Google's App Engine, and :term:`PyPy` (1.6+).
+known to run on :term:`PyPy` (1.6+).
 
 :app:`Pyramid` installation does not require the compilation of any
 C code, so you need only a Python interpreter that meets the
@@ -314,15 +314,6 @@ Installing :app:`Pyramid` on a Windows System
    .. code-block:: text
 
       c:\env> Scripts\easy_install pyramid
-
-.. index::
-   single: installing on Google App Engine
-
-Installing :app:`Pyramid` on Google App Engine
--------------------------------------------------
-
-:ref:`appengine_tutorial` documents the steps required to install a
-:app:`Pyramid` application on Google App Engine.
 
 What Gets Installed
 -------------------

@@ -40,13 +40,6 @@ Preparation, UNIX
 
       $ bin/easy_install pyramid
 
-#. Use ``easy_install`` to install various packages from PyPI.
-
-   .. code-block:: text
-
-      $ bin/easy_install docutils nose coverage zope.sqlalchemy \
-                SQLAlchemy pyramid_tm
-
 Preparation, Windows
 --------------------
 
@@ -68,14 +61,6 @@ Preparation, Windows
    .. code-block:: text
 
       c:\pyramidtut> Scripts\easy_install pyramid
-
-#. Use ``easy_install`` to install various packages from PyPI.
-
-   .. code-block:: text
-
-      c:\pyramidtut> Scripts\easy_install docutils \
-               nose coverage zope.sqlalchemy SQLAlchemy pyramid_tm
-
 
 .. _sql_making_a_project:
 
@@ -108,6 +93,13 @@ On Windows:
    startup problems, try putting both the virtualenv and the project
    into directories that do not contain spaces in their paths.
 
+Success executing this command will end with a line to the console something
+like::
+
+   Please run the "populate_tutorial" script to set up the SQL 
+   database before starting the application (e.g. 
+   "$myvirtualenv/bin/populate_tutorial development.ini".)
+
 Installing the Project in "Development Mode"
 ============================================
 
@@ -131,6 +123,11 @@ On Windows:
    c:\pyramidtut> cd tutorial
    c:\pyramidtut\tutorial> ..\Scripts\python setup.py develop
 
+Success executing this command will end with a line to the console something
+like::
+
+   Finished processing dependencies for tutorial==0.0
+
 .. _sql_running_tests:
 
 Running the Tests
@@ -150,6 +147,14 @@ On Windows:
 .. code-block:: text
 
    c:\pyramidtut\tutorial> ..\Scripts\python setup.py test -q
+
+For a successful test run, you should see output like this::
+
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 0.094s
+ 
+  OK
 
 Exposing Test Coverage Information
 ==================================
@@ -191,8 +196,26 @@ On Windows:
    c:\pyramidtut\tutorial> ..\Scripts\nosetests --cover-package=tutorial ^
          --cover-erase --with-coverage
 
-Looks like our package's ``models`` module doesn't quite have 100%
-test coverage.
+If successful, you will see output something like this::
+
+  .
+  Name               Stmts   Miss  Cover   Missing
+  ------------------------------------------------
+  tutorial              11      7    36%   9-15
+  tutorial.models       17      0   100%   
+  tutorial.scripts       0      0   100%   
+  tutorial.tests        24      0   100%   
+  tutorial.views         6      0   100%   
+  ------------------------------------------------
+  TOTAL                 58      7    88%   
+  ----------------------------------------------------------------------
+  Ran 1 test in 0.459s
+
+  OK
+
+Looks like our package doesn't quite have 100% test coverage.
+
+.. _wiki2-start-the-application:
 
 Starting the Application
 ========================
@@ -211,11 +234,96 @@ On Windows:
 
    c:\pyramidtut\tutorial> ..\Scripts\pserve development.ini --reload
 
-Visit the Application in a Browser
-==================================
+If successful, you will see something like this on your console::
 
-In a browser, visit ``http://localhost:6543/``.  You will see the
-generated application's default page.
+  Starting subprocess with file monitor
+  Starting server in PID 8966.
+  Starting HTTP server on http://0.0.0.0:6543
+
+This means the server is ready to accept requests.
+
+Populating the Database
+=======================
+
+In a web browser, visit ``http://localhost:6543/``. 
+
+You will see an error page with a title something like this::
+
+  sqlalchemy.exc.OperationalError
+
+  OperationalError: (OperationalError) no such table: models ...
+
+Oh no!  Something isn't working!
+
+This happens because we haven't populated the SQL database with any table
+information yet.  We need to use the ``populate_tutorial`` :term:`console
+script` to populate our database before we can see the page render correctly.
+
+Stop the running Pyramid application by pressing ``ctrl-C`` in the console.
+Make sure you're still in the ``tutorial`` directory (the directory with a
+``development.ini`` in it) and type the following command:
+
+On UNIX:
+
+.. code-block:: text
+
+   $ ../bin/populate_tutorial development.ini
+
+On Windows:
+
+.. code-block:: text
+
+   c:\pyramidtut\tutorial> ..\Scripts\populate_tutorial development.ini
+
+The output to your console should be something like this::
+
+  2011-11-26 14:42:25,012 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
+                                PRAGMA table_info("models")
+  2011-11-26 14:42:25,013 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
+  2011-11-26 14:42:25,013 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
+  CREATE TABLE models (
+  	id INTEGER NOT NULL, 
+  	name VARCHAR(255), 
+  	value INTEGER, 
+  	PRIMARY KEY (id), 
+  	UNIQUE (name)
+  )
+  2011-11-26 14:42:25,013 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
+  2011-11-26 14:42:25,135 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
+                                COMMIT
+  2011-11-26 14:42:25,137 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
+                                BEGIN (implicit)
+  2011-11-26 14:42:25,138 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
+                                INSERT INTO models (name, value) VALUES (?, ?)
+  2011-11-26 14:42:25,139 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
+                                (u'one', 1)
+  2011-11-26 14:42:25,140 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
+                                COMMIT
+
+Success!  You should now have a ``tutorial.db`` file in your current working
+directory.  This will be a SQLite database with a single table defined in it
+(``models``).
+
+Starting the Application (Again)
+================================
+
+Start the application again.
+
+On UNIX:
+
+.. code-block:: text
+
+   $ ../bin/pserve development.ini --reload
+
+On Windows:
+
+.. code-block:: text
+
+   c:\pyramidtut\tutorial> ..\Scripts\pserve development.ini --reload
+
+At this point, when you visit ``http://localhost:6543/`` in your web browser,
+you will no longer see an error; instead you will see the generated
+application's default page.
 
 One thing you'll notice is the "debug toolbar" icon on right hand side of the
 page.  You can read more about the purpose of the icon at

@@ -1,9 +1,16 @@
+import os
 import unittest
+import warnings
 
-from pyramid.testing import setUp
-from pyramid.testing import tearDown
-from pyramid.compat import text_
-from pyramid.compat import native_
+from pyramid.testing import (
+    setUp,
+    tearDown,
+    )
+from pyramid.compat import (
+    text_,
+    native_,
+    WIN,
+    )
 
 class TestURLMethodsMixin(unittest.TestCase):
     def setUp(self):
@@ -12,16 +19,22 @@ class TestURLMethodsMixin(unittest.TestCase):
     def tearDown(self):
         tearDown()
         
-    def _makeOne(self):
+    def _makeOne(self, environ=None):
         from pyramid.url import URLMethodsMixin
+        if environ is None:
+            environ = {}
         class Request(URLMethodsMixin):
             application_url = 'http://example.com:5432'
-        request = Request()
+            script_name = ''
+            def __init__(self, environ):
+                self.environ = environ
+        request = Request(environ)
         request.registry = self.config.registry
         return request
 
     def _registerContextURL(self, reg):
-        from pyramid.interfaces import IContextURL
+        with warnings.catch_warnings(record=True):
+            from pyramid.interfaces import IContextURL
         from zope.interface import Interface
         class DummyContextURL(object):
             def __init__(self, context, request):
@@ -31,114 +44,124 @@ class TestURLMethodsMixin(unittest.TestCase):
         reg.registerAdapter(DummyContextURL, (Interface, Interface),
                             IContextURL)
 
+    def _registerResourceURL(self, reg):
+        from pyramid.interfaces import IResourceURL
+        from zope.interface import Interface
+        class DummyResourceURL(object):
+            def __init__(self, context, request):
+                self.physical_path = '/context/'
+                self.virtual_path = '/context/'
+        reg.registerAdapter(DummyResourceURL, (Interface, Interface),
+                            IResourceURL)
+
     def test_resource_url_root_default(self):
         request = self._makeOne()
-        self._registerContextURL(request.registry)
+        self._registerResourceURL(request.registry)
         root = DummyContext()
         result = request.resource_url(root)
-        self.assertEqual(result, 'http://example.com/context/')
+        self.assertEqual(result, 'http://example.com:5432/context/')
 
     def test_resource_url_extra_args(self):
         request = self._makeOne()
-        self._registerContextURL(request.registry)
+        self._registerResourceURL(request.registry)
         context = DummyContext()
         result = request.resource_url(context, 'this/theotherthing', 'that')
         self.assertEqual(
             result,
-            'http://example.com/context/this%2Ftheotherthing/that')
+            'http://example.com:5432/context/this%2Ftheotherthing/that')
 
     def test_resource_url_unicode_in_element_names(self):
         request = self._makeOne()
-        self._registerContextURL(request.registry)
+        self._registerResourceURL(request.registry)
         uc = text_(b'La Pe\xc3\xb1a', 'utf-8')
         context = DummyContext()
         result = request.resource_url(context, uc)
         self.assertEqual(result,
-                     'http://example.com/context/La%20Pe%C3%B1a')
+                     'http://example.com:5432/context/La%20Pe%C3%B1a')
 
     def test_resource_url_at_sign_in_element_names(self):
         request = self._makeOne()
-        self._registerContextURL(request.registry)
+        self._registerResourceURL(request.registry)
         context = DummyContext()
         result = request.resource_url(context, '@@myview')
         self.assertEqual(result,
-                     'http://example.com/context/@@myview')
+                     'http://example.com:5432/context/@@myview')
 
     def test_resource_url_element_names_url_quoted(self):
         request = self._makeOne()
-        self._registerContextURL(request.registry)
+        self._registerResourceURL(request.registry)
         context = DummyContext()
         result = request.resource_url(context, 'a b c')
-        self.assertEqual(result, 'http://example.com/context/a%20b%20c')
+        self.assertEqual(result, 'http://example.com:5432/context/a%20b%20c')
 
     def test_resource_url_with_query_dict(self):
         request = self._makeOne()
-        self._registerContextURL(request.registry)
+        self._registerResourceURL(request.registry)
         context = DummyContext()
         uc = text_(b'La Pe\xc3\xb1a', 'utf-8')
         result = request.resource_url(context, 'a', query={'a':uc})
         self.assertEqual(result,
-                         'http://example.com/context/a?a=La+Pe%C3%B1a')
+                         'http://example.com:5432/context/a?a=La+Pe%C3%B1a')
 
     def test_resource_url_with_query_seq(self):
         request = self._makeOne()
-        self._registerContextURL(request.registry)
+        self._registerResourceURL(request.registry)
         context = DummyContext()
         uc = text_(b'La Pe\xc3\xb1a', 'utf-8')
         result = request.resource_url(context, 'a', query=[('a', 'hi there'),
                                                            ('b', uc)])
         self.assertEqual(result,
-                     'http://example.com/context/a?a=hi+there&b=La+Pe%C3%B1a')
+            'http://example.com:5432/context/a?a=hi+there&b=La+Pe%C3%B1a')
 
     def test_resource_url_anchor_is_after_root_when_no_elements(self):
         request = self._makeOne()
-        self._registerContextURL(request.registry)
+        self._registerResourceURL(request.registry)
         context = DummyContext()
         result = request.resource_url(context, anchor='a')
         self.assertEqual(result,
-                         'http://example.com/context/#a')
+                         'http://example.com:5432/context/#a')
 
     def test_resource_url_anchor_is_after_elements_when_no_qs(self):
         request = self._makeOne()
-        self._registerContextURL(request.registry)
+        self._registerResourceURL(request.registry)
         context = DummyContext()
         result = request.resource_url(context, 'a', anchor='b')
         self.assertEqual(result,
-                         'http://example.com/context/a#b')
+                         'http://example.com:5432/context/a#b')
 
     def test_resource_url_anchor_is_after_qs_when_qs_is_present(self):
         request = self._makeOne()
-        self._registerContextURL(request.registry)
+        self._registerResourceURL(request.registry)
         context = DummyContext()
         result = request.resource_url(context, 'a', 
                                       query={'b':'c'}, anchor='d')
         self.assertEqual(result,
-                         'http://example.com/context/a?b=c#d')
+                         'http://example.com:5432/context/a?b=c#d')
 
     def test_resource_url_anchor_is_encoded_utf8_if_unicode(self):
         request = self._makeOne()
-        self._registerContextURL(request.registry)
+        self._registerResourceURL(request.registry)
         context = DummyContext()
         uc = text_(b'La Pe\xc3\xb1a', 'utf-8') 
         result = request.resource_url(context, anchor=uc)
         self.assertEqual(
             result,
             native_(
-                text_(b'http://example.com/context/#La Pe\xc3\xb1a',
+                text_(b'http://example.com:5432/context/#La Pe\xc3\xb1a',
                       'utf-8'),
                 'utf-8')
             )
 
     def test_resource_url_anchor_is_not_urlencoded(self):
         request = self._makeOne()
-        self._registerContextURL(request.registry)
+        self._registerResourceURL(request.registry)
         context = DummyContext()
         result = request.resource_url(context, anchor=' /#')
         self.assertEqual(result,
-                         'http://example.com/context/# /#')
+                         'http://example.com:5432/context/# /#')
 
-    def test_resource_url_no_IContextURL_registered(self):
-        # falls back to TraversalContextURL
+    def test_resource_url_no_IResourceURL_registered(self):
+        # falls back to ResourceURL
         root = DummyContext()
         root.__name__ = ''
         root.__parent__ = None
@@ -149,12 +172,98 @@ class TestURLMethodsMixin(unittest.TestCase):
 
     def test_resource_url_no_registry_on_request(self):
         request = self._makeOne()
-        self._registerContextURL(request.registry)
+        self._registerResourceURL(request.registry)
         del request.registry
         root = DummyContext()
         result = request.resource_url(root)
-        self.assertEqual(result, 'http://example.com/context/')
+        self.assertEqual(result, 'http://example.com:5432/context/')
 
+    def test_resource_url_finds_IContextURL(self):
+        request = self._makeOne()
+        self._registerContextURL(request.registry)
+        root = DummyContext()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            result = request.resource_url(root)
+            self.assertEqual(len(w), 1)
+        self.assertEqual(result, 'http://example.com/context/')
+        
+    def test_resource_url_with_app_url(self):
+        request = self._makeOne()
+        self._registerResourceURL(request.registry)
+        root = DummyContext()
+        result = request.resource_url(root, app_url='http://somewhere.com')
+        self.assertEqual(result, 'http://somewhere.com/context/')
+
+    def test_resource_url_with_scheme(self):
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_PORT':'8080',
+            'SERVER_NAME':'example.com',
+            }
+        request = self._makeOne(environ)
+        self._registerResourceURL(request.registry)
+        root = DummyContext()
+        result = request.resource_url(root, scheme='https')
+        self.assertEqual(result, 'https://example.com/context/')
+
+    def test_resource_url_with_host(self):
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_PORT':'8080',
+            'SERVER_NAME':'example.com',
+            }
+        request = self._makeOne(environ)
+        self._registerResourceURL(request.registry)
+        root = DummyContext()
+        result = request.resource_url(root, host='someotherhost.com')
+        self.assertEqual(result, 'http://someotherhost.com:8080/context/')
+
+    def test_resource_url_with_port(self):
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_PORT':'8080',
+            'SERVER_NAME':'example.com',
+            }
+        request = self._makeOne(environ)
+        self._registerResourceURL(request.registry)
+        root = DummyContext()
+        result = request.resource_url(root, port='8181')
+        self.assertEqual(result, 'http://example.com:8181/context/')
+
+    def test_resource_url_with_local_url(self):
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_PORT':'8080',
+            'SERVER_NAME':'example.com',
+            }
+        request = self._makeOne(environ)
+        self._registerResourceURL(request.registry)
+        root = DummyContext()
+        def resource_url(req, info):
+            self.assertEqual(req, request)
+            self.assertEqual(info['virtual_path'], '/context/')
+            self.assertEqual(info['physical_path'], '/context/')
+            self.assertEqual(info['app_url'], 'http://example.com:5432')
+            return 'http://example.com/contextabc/'
+        root.__resource_url__ = resource_url
+        result = request.resource_url(root)
+        self.assertEqual(result, 'http://example.com/contextabc/')
+        
+    def test_resource_path(self):
+        request = self._makeOne()
+        self._registerResourceURL(request.registry)
+        root = DummyContext()
+        result = request.resource_path(root)
+        self.assertEqual(result, '/context/')
+
+    def test_resource_path_kwarg(self):
+        request = self._makeOne()
+        self._registerResourceURL(request.registry)
+        root = DummyContext()
+        result = request.resource_path(root, anchor='abc')
+        self.assertEqual(result, '/context/#abc')
+        
     def test_route_url_with_elements(self):
         from pyramid.interfaces import IRoutesMapper
         request = self._makeOne()
@@ -234,6 +343,47 @@ class TestURLMethodsMixin(unittest.TestCase):
         self.assertEqual(result,
                          'http://example2.com/1/2/3')
 
+    def test_route_url_with_host(self):
+        from pyramid.interfaces import IRoutesMapper
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_PORT':'5432',
+            }
+        request = self._makeOne(environ)
+        mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = request.route_url('flub', _host='someotherhost.com')
+        self.assertEqual(result,
+                         'http://someotherhost.com:5432/1/2/3')
+
+    def test_route_url_with_port(self):
+        from pyramid.interfaces import IRoutesMapper
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_PORT':'5432',
+            'SERVER_NAME':'example.com',
+            }
+        request = self._makeOne(environ)
+        mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = request.route_url('flub', _port='8080')
+        self.assertEqual(result,
+                         'http://example.com:8080/1/2/3')
+
+    def test_route_url_with_scheme(self):
+        from pyramid.interfaces import IRoutesMapper
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_PORT':'5432',
+            'SERVER_NAME':'example.com',
+            }
+        request = self._makeOne(environ)
+        mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = request.route_url('flub', _scheme='https')
+        self.assertEqual(result,
+                         'https://example.com/1/2/3')
+        
     def test_route_url_generation_error(self):
         from pyramid.interfaces import IRoutesMapper
         request = self._makeOne()
@@ -368,7 +518,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         abspath = makeabs('static', 'foo.css')
         result = request.static_url(abspath)
         self.assertEqual(result, 'abc')
-        self.assertEqual(info.args, ('/static/foo.css', request, {}))
+        self.assertEqual(info.args, (makeabs('static', 'foo.css'), request, {}))
         request = self._makeOne()
 
     def test_static_url_found_rel(self):
@@ -428,7 +578,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         abspath = makeabs('static', 'foo.css')
         result = request.static_path(abspath)
         self.assertEqual(result, 'abc')
-        self.assertEqual(info.args, ('/static/foo.css', request,
+        self.assertEqual(info.args, (makeabs('static', 'foo.css'), request,
                                      {'_app_url':'/foo'})
                          )
 
@@ -471,6 +621,168 @@ class TestURLMethodsMixin(unittest.TestCase):
                           {'_app_url':'/foo'})
                          )
 
+    def test_partial_application_url_with_http_host_default_port_http(self):
+        environ = {
+            'wsgi.url_scheme':'http',
+            'HTTP_HOST':'example.com:80',
+            }
+        request = self._makeOne(environ)
+        result = request._partial_application_url()
+        self.assertEqual(result, 'http://example.com')
+
+    def test_partial_application_url_with_http_host_default_port_https(self):
+        environ = {
+            'wsgi.url_scheme':'https',
+            'HTTP_HOST':'example.com:443',
+            }
+        request = self._makeOne(environ)
+        result = request._partial_application_url()
+        self.assertEqual(result, 'https://example.com')
+
+    def test_partial_application_url_with_http_host_nondefault_port_http(self):
+        environ = {
+            'wsgi.url_scheme':'http',
+            'HTTP_HOST':'example.com:8080',
+            }
+        request = self._makeOne(environ)
+        result = request._partial_application_url()
+        self.assertEqual(result, 'http://example.com:8080')
+
+    def test_partial_application_url_with_http_host_nondefault_port_https(self):
+        environ = {
+            'wsgi.url_scheme':'https',
+            'HTTP_HOST':'example.com:4443',
+            }
+        request = self._makeOne(environ)
+        result = request._partial_application_url()
+        self.assertEqual(result, 'https://example.com:4443')
+
+    def test_partial_application_url_with_http_host_no_colon(self):
+        environ = {
+            'wsgi.url_scheme':'http',
+            'HTTP_HOST':'example.com',
+            'SERVER_PORT':'80',
+            }
+        request = self._makeOne(environ)
+        result = request._partial_application_url()
+        self.assertEqual(result, 'http://example.com')
+
+    def test_partial_application_url_no_http_host(self):
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_NAME':'example.com',
+            'SERVER_PORT':'80',
+            }
+        request = self._makeOne(environ)
+        result = request._partial_application_url()
+        self.assertEqual(result, 'http://example.com')
+        
+    def test_partial_application_replace_port(self):
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_NAME':'example.com',
+            'SERVER_PORT':'80',
+            }
+        request = self._makeOne(environ)
+        result = request._partial_application_url(port=8080)
+        self.assertEqual(result, 'http://example.com:8080')
+
+    def test_partial_application_replace_scheme_https_special_case(self):
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_NAME':'example.com',
+            'SERVER_PORT':'80',
+            }
+        request = self._makeOne(environ)
+        result = request._partial_application_url(scheme='https')
+        self.assertEqual(result, 'https://example.com')
+
+    def test_partial_application_replace_scheme_https_special_case_avoid(self):
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_NAME':'example.com',
+            'SERVER_PORT':'80',
+            }
+        request = self._makeOne(environ)
+        result = request._partial_application_url(scheme='https', port='8080')
+        self.assertEqual(result, 'https://example.com:8080')
+
+    def test_partial_application_replace_scheme_http_special_case(self):
+        environ = {
+            'wsgi.url_scheme':'https',
+            'SERVER_NAME':'example.com',
+            'SERVER_PORT':'8080',
+            }
+        request = self._makeOne(environ)
+        result = request._partial_application_url(scheme='http')
+        self.assertEqual(result, 'http://example.com')
+
+    def test_partial_application_replace_scheme_http_special_case_avoid(self):
+        environ = {
+            'wsgi.url_scheme':'https',
+            'SERVER_NAME':'example.com',
+            'SERVER_PORT':'8000',
+            }
+        request = self._makeOne(environ)
+        result = request._partial_application_url(scheme='http', port='8080')
+        self.assertEqual(result, 'http://example.com:8080')
+        
+    def test_partial_application_replace_host_no_port(self):
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_NAME':'example.com',
+            'SERVER_PORT':'80',
+            }
+        request = self._makeOne(environ)
+        result = request._partial_application_url(host='someotherhost.com')
+        self.assertEqual(result, 'http://someotherhost.com')
+
+    def test_partial_application_replace_host_with_port(self):
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_NAME':'example.com',
+            'SERVER_PORT':'8000',
+            }
+        request = self._makeOne(environ)
+        result = request._partial_application_url(host='someotherhost.com:8080')
+        self.assertEqual(result, 'http://someotherhost.com:8080')
+
+    def test_partial_application_replace_host_and_port(self):
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_NAME':'example.com',
+            'SERVER_PORT':'80',
+            }
+        request = self._makeOne(environ)
+        result = request._partial_application_url(host='someotherhost.com:8080',
+                                                  port='8000')
+        self.assertEqual(result, 'http://someotherhost.com:8000')
+
+    def test_partial_application_replace_host_port_and_scheme(self):
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_NAME':'example.com',
+            'SERVER_PORT':'80',
+            }
+        request = self._makeOne(environ)
+        result = request._partial_application_url(
+            host='someotherhost.com:8080',
+            port='8000',
+            scheme='https',
+            )
+        self.assertEqual(result, 'https://someotherhost.com:8000')
+        
+    def test_partial_application_url_with_custom_script_name(self):
+        environ = {
+            'wsgi.url_scheme':'http',
+            'SERVER_NAME':'example.com',
+            'SERVER_PORT':'8000',
+            }
+        request = self._makeOne(environ)
+        request.script_name = '/abc'
+        result = request._partial_application_url()
+        self.assertEqual(result, 'http://example.com:8000/abc') 
+        
 class Test_route_url(unittest.TestCase):
     def _callFUT(self, route_name, request, *elements, **kw):
         from pyramid.url import route_url
@@ -676,5 +988,7 @@ class DummyStaticURLInfo:
         return self.result
     
 def makeabs(*elements):
-    import os
-    return os.path.sep + os.path.sep.join(elements)
+    if WIN: # pragma: no cover
+        return r'c:\\' + os.path.sep.join(elements)
+    else:
+        return os.path.sep + os.path.sep.join(elements)

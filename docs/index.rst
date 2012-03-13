@@ -19,10 +19,9 @@ When saved to ``helloworld.py``, the above application can be run via:
 
    $ easy_install pyramid
    $ python helloworld.py
-   serving on 0.0.0.0:8080 view at http://127.0.0.1:8080
 
-And when you visit ``http://localhost:8080/hello/world`` in a browser, you
-will see the text ``Hello, world!``.
+When you visit ``http://localhost:8080/hello/world`` in a browser, you will
+see the text ``Hello, world!``.
 
 See :ref:`firstapp_chapter` for a full explanation of how this application
 works. Read the :ref:`html_narrative_documentation` to understand how
@@ -38,12 +37,13 @@ Front Matter
    copyright.rst
    conventions.rst
 
-"What's New" Documents
-======================
+What's New
+==========
 
 .. toctree::
    :maxdepth: 1
 
+   whatsnew-1.3
    whatsnew-1.2
    whatsnew-1.1
    whatsnew-1.0
@@ -65,6 +65,7 @@ Narrative documentation in chapter form explaining how to use
    narr/configuration
    narr/project
    narr/startup
+   narr/router
    narr/urldispatch
    narr/views
    narr/renderers
@@ -82,23 +83,26 @@ Narrative documentation in chapter form explaining how to use
    narr/vhosting
    narr/testing
    narr/resources
+   narr/hellotraversal
    narr/muchadoabouttraversal
    narr/traversal
    narr/security
    narr/hybrid
    narr/hooks
-   narr/advconfig
+   narr/introspector
    narr/extending
-   narr/router
+   narr/advconfig
+   narr/extconfig
+   narr/scaffolding
    narr/threadlocals
    narr/zca
 
 Tutorials
 =========
 
-Detailed tutorials explaining how to use :app:`Pyramid` to build
-various types of applications and how to deploy :app:`Pyramid`
-applications to various platforms.
+Tutorials explaining how to use :app:`Pyramid` to build various types of
+applications, and how to deploy :app:`Pyramid` applications to various
+platforms.
 
 .. toctree::
    :maxdepth: 2
@@ -106,29 +110,28 @@ applications to various platforms.
    tutorials/wiki2/index.rst
    tutorials/wiki/index.rst
    tutorials/bfg/index.rst
-   tutorials/gae/index.rst
    tutorials/modwsgi/index.rst
 
-Reference Material
+API Documentation
 ==================
 
-Reference material includes documentation for every :app:`Pyramid` API.
+Documentation for every :app:`Pyramid` API.
 
 .. toctree::
    :maxdepth: 2
 
    api
 
-Detailed Change History
-=======================
+Change History
+==============
 
 .. toctree::
    :maxdepth: 1
 
    changes
 
-Design Documentation
-====================
+Design Documents
+================
 
 .. toctree::
    :maxdepth: 1
@@ -150,7 +153,8 @@ application.  Check this application out via:
 
 `virginia <https://github.com/Pylons/virginia>`_ is a very simple dynamic
 file rendering application.  It is willing to render structured text
-documents, HTML documents, and images from a filesystem directory.  An
+documents, HTML documents, and images from a filesystem directory.
+It's also a good example of :term:`traversal`. An
 earlier version of this application runs the `repoze.org
 <http://repoze.org>`_ website.  Check this application out via:
 
@@ -168,31 +172,11 @@ Check this application out of version control via:
 
   git clone git://github.com/Pylons/shootout.git
 
-Older Sample Applications (repoze.bfg)
-======================================
-
-.. note::
-
-   These applications are for an older version of :app:`Pyramid`, which was
-   named :mod:`repoze.bfg`.  They won't work unmodified under Pyramid, but
-   might provide useful clues.
-
-`bfgsite <http://svn.repoze.org/bfgsite/trunk>`_ is the software which
-runs the `bfg.repoze.org <http://bfg.repoze.org>`_ website.  It
-demonstrates integration with Trac, and includes several
-mini-applications such as a pastebin and tutorial engine.  Check a
-buildout for this application out of Subversion via:
-
-.. code-block:: text
-
-  svn co http://svn.repoze.org/buildouts/bfgsite/ bfgsite_buildout
-
-`KARL <http://karlproject.org>`_ is a moderately-sized application
-(roughly 70K lines of Python code) built on top of :mod:`repoze.bfg`
-and other Repoze software.  It is an open source web system for
-collaboration, organizational intranets, and knowledge management, It
-provides facilities for wikis, calendars, manuals, searching, tagging,
-commenting, and file uploads.  See the `KARL site
+`KARL <http://karlproject.org>`_ is a moderately-sized application (roughly
+80K lines of Python code) built on top of :app:`Pyramid`.  It is an open
+source web system for collaboration, organizational intranets, and knowledge
+management, It provides facilities for wikis, calendars, manuals, searching,
+tagging, commenting, and file uploads.  See the `KARL site
 <http://karlproject.org>`_ for download and installation details.
 
 Support and Development
@@ -205,8 +189,8 @@ To report bugs, use the `issue tracker
 <http://github.com/Pylons/pyramid/issues>`_.
 
 If you've got questions that aren't answered by this documentation,
-contact the `Pylons-devel maillist
-<http://groups.google.com/group/pylons-devel>`_ or join the `#pyramid
+contact the `Pylons-discuss maillist
+<http://groups.google.com/group/pylons-discuss>`_ or join the `#pyramid
 IRC channel <irc://irc.freenode.net/#pyramid>`_.
 
 Browse and check out tagged and trunk versions of :app:`Pyramid` via

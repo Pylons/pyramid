@@ -3,6 +3,13 @@
 Traversal
 =========
 
+This chapter explains the technical details of how traversal works in
+Pyramid.
+
+For a quick example, see :doc:`hellotraversal`.
+
+For more about *why* you might use traversal, see :doc:`muchadoabouttraversal`.
+
 A :term:`traversal` uses the URL (Universal Resource Locator) to find a
 :term:`resource` located in a :term:`resource tree`, which is a set of
 nested dictionary-like objects.  Traversal is done by using each segment
@@ -481,20 +488,21 @@ you must create an interface and mark up your resource classes or instances
 with interface declarations that refer to this interface.
 
 To attach an interface to a resource *class*, you define the interface and
-use the :func:`zope.interface.implements` function to associate the interface
-with the class.
+use the :func:`zope.interface.implementer` class decorator to associate the
+interface with the class.
 
 .. code-block:: python
    :linenos:
 
    from zope.interface import Interface
-   from zope.interface import implements
+   from zope.interface import implementer
 
    class IHello(Interface):
        """ A marker interface """
 
+   @implementer(IHello)
    class Hello(object):
-       implements(IHello)
+       pass
 
 To attach an interface to a resource *instance*, you define the interface and
 use the :func:`zope.interface.alsoProvides` function to associate the

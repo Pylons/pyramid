@@ -1,5 +1,11 @@
+import platform
 import sys
 import types
+
+if platform.system() == 'Windows': # pragma: no cover
+    WIN = True
+else: # pragma: no cover
+    WIN = False
 
 try: # pragma: no cover
     import __pypy__
@@ -33,7 +39,7 @@ else:
 
 def text_(s, encoding='latin-1', errors='strict'):
     """ If ``s`` is an instance of ``binary_type``, return
-    ``s.encode(encoding, errors)``, otherwise return ``s``"""
+    ``s.decode(encoding, errors)``, otherwise return ``s``"""
     if isinstance(s, binary_type):
         return s.decode(encoding, errors)
     return s # pragma: no cover
@@ -41,7 +47,7 @@ def text_(s, encoding='latin-1', errors='strict'):
 def bytes_(s, encoding='latin-1', errors='strict'):
     """ If ``s`` is an instance of ``text_type``, return
     ``s.encode(encoding, errors)``, otherwise return ``s``"""
-    if isinstance(s, text_type):
+    if isinstance(s, text_type): # pragma: no cover
         return s.encode(encoding, errors)
     return s
 
@@ -105,10 +111,10 @@ else:
     from urllib import unquote as url_unquote
     from urllib import urlencode as url_encode
     from urllib2 import urlopen as url_open
-    def url_unquote_text(v, encoding='utf-8', errors='replace'):
+    def url_unquote_text(v, encoding='utf-8', errors='replace'): # pragma: no cover
         v = url_unquote(v)
         return v.decode(encoding, errors)
-    def url_unquote_native(v, encoding='utf-8', errors='replace'):
+    def url_unquote_native(v, encoding='utf-8', errors='replace'): # pragma: no cover
         return native_(url_unquote_text(v, encoding, errors))
         
 
@@ -213,3 +219,21 @@ except ImportError: # pragma: no cover
 import json
 
     
+if PY3: # pragma: no cover
+    # see PEP 3333 for why we encode WSGI PATH_INFO to latin-1 before
+    # decoding it to utf-8
+    def decode_path_info(path):
+        return path.encode('latin-1').decode('utf-8')
+else:
+    def decode_path_info(path):
+        return path.decode('utf-8')
+
+if PY3: # pragma: no cover
+    # see PEP 3333 for why we decode the path to latin-1 
+    from urllib.parse import unquote_to_bytes
+    def unquote_bytes_to_wsgi(bytestring):
+        return unquote_to_bytes(bytestring).decode('latin-1')
+else:
+    from urlparse import unquote as unquote_to_bytes
+    def unquote_bytes_to_wsgi(bytestring):
+        return unquote_to_bytes(bytestring)

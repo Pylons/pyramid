@@ -1,4 +1,5 @@
 import unittest
+from pyramid.compat import text_
 
 class Test__make_predicates(unittest.TestCase):
     def _callFUT(self, **kw):
@@ -227,6 +228,21 @@ class Test__make_predicates(unittest.TestCase):
         self.assertEqual(info, {'match':
                                 {'a':'a', 'b':'b', 'traverse':('1', 'a', 'b')}})
 
+    def test_traverse_matches_with_highorder_chars(self):
+        order, predicates, phash = self._callFUT(
+            traverse=text_(b'/La Pe\xc3\xb1a/{x}', 'utf-8'))
+        self.assertEqual(len(predicates), 1)
+        pred = predicates[0]
+        info = {'match':{'x':text_(b'Qu\xc3\xa9bec', 'utf-8')}}
+        request = DummyRequest()
+        result = pred(info, request)
+        self.assertEqual(result, True)
+        self.assertEqual(
+            info['match']['traverse'],
+            (text_(b'La Pe\xc3\xb1a', 'utf-8'),
+             text_(b'Qu\xc3\xa9bec', 'utf-8'))
+             )
+
     def test_custom_predicates_can_affect_traversal(self):
         def custom(info, request):
             m = info['match']
@@ -265,7 +281,7 @@ class Test__make_predicates(unittest.TestCase):
         self.assertEqual(predicates[5].__text__, 'accept = accept')
         self.assertEqual(predicates[6].__text__, 'containment = containment')
         self.assertEqual(predicates[7].__text__, 'request_type = request_type')
-        self.assertEqual(predicates[8].__text__, "match_param {'foo': 'bar'}")
+        self.assertEqual(predicates[8].__text__, "match_param ['foo=bar']")
         self.assertEqual(predicates[9].__text__, 'custom predicate')
         self.assertEqual(predicates[10].__text__, 'classmethod predicate')
         self.assertEqual(predicates[11].__text__, '<unknown custom predicate>')
@@ -283,13 +299,13 @@ class Test__make_predicates(unittest.TestCase):
         self.assertFalse(predicates[0](Dummy(), request))
 
     def test_match_param_from_dict(self):
-        _, predicates, _ = self._callFUT(match_param={'foo':'bar','baz':'bum'})
+        _, predicates, _ = self._callFUT(match_param=('foo=bar','baz=bum'))
         request = DummyRequest()
         request.matchdict = {'foo':'bar', 'baz':'bum'}
         self.assertTrue(predicates[0](Dummy(), request))
 
     def test_match_param_from_dict_fails(self):
-        _, predicates, _ = self._callFUT(match_param={'foo':'bar','baz':'bum'})
+        _, predicates, _ = self._callFUT(match_param=('foo=bar','baz=bum'))
         request = DummyRequest()
         request.matchdict = {'foo':'bar', 'baz':'foo'}
         self.assertFalse(predicates[0](Dummy(), request))
@@ -311,6 +327,46 @@ class Test__make_predicates(unittest.TestCase):
         hash1, _, __= self._callFUT(request_method=('GET',))
         hash2, _, __= self._callFUT(request_method='GET')
         self.assertEqual(hash1, hash2)
+
+    def test_match_param_hashable(self):
+        # https://github.com/Pylons/pyramid/issues/425
+        import pyramid.testing
+        def view(request): pass
+        config = pyramid.testing.setUp(autocommit=False)
+        config.add_route('foo', '/foo/{a}/{b}')
+        config.add_view(view, route_name='foo', match_param='a=bar')
+        config.add_view(view, route_name='foo', match_param=('a=bar', 'b=baz'))
+        config.commit()
+
+class TestActionInfo(unittest.TestCase):
+    def _getTargetClass(self):
+        from pyramid.config.util import ActionInfo
+        return ActionInfo
+        
+    def _makeOne(self, filename, lineno, function, linerepr):
+        return self._getTargetClass()(filename, lineno, function, linerepr)
+
+    def test_class_conforms(self):
+        from zope.interface.verify import verifyClass
+        from pyramid.interfaces import IActionInfo
+        verifyClass(IActionInfo, self._getTargetClass())
+
+    def test_instance_conforms(self):
+        from zope.interface.verify import verifyObject
+        from pyramid.interfaces import IActionInfo
+        verifyObject(IActionInfo, self._makeOne('f', 0, 'f', 'f'))
+
+    def test_ctor(self):
+        inst = self._makeOne('filename', 10, 'function', 'src')
+        self.assertEqual(inst.file, 'filename')
+        self.assertEqual(inst.line, 10)
+        self.assertEqual(inst.function, 'function')
+        self.assertEqual(inst.src, 'src')
+
+    def test___str__(self):
+        inst = self._makeOne('filename', 0, 'function', '   linerepr  ')
+        self.assertEqual(str(inst),
+                         "Line 0 of file filename:\n       linerepr  ")
 
 class DummyCustomPredicate(object):
     def __init__(self):

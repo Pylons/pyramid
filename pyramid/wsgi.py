@@ -31,7 +31,11 @@ def wsgiapp(wrapped):
     """
     def decorator(context, request):
         return request.get_response(wrapped)
-    return wraps(wrapped)(decorator)
+
+    # Support case where wrapped is a callable object instance
+    if getattr(wrapped, '__name__', None):
+        return wraps(wrapped)(decorator)
+    return wraps(wrapped, ('__module__', '__doc__'))(decorator)
 
 def wsgiapp2(wrapped):
     """ Decorator to turn a WSGI application into a :app:`Pyramid`
@@ -67,4 +71,8 @@ def wsgiapp2(wrapped):
 
     def decorator(context, request):
         return call_app_with_subpath_as_path_info(request, wrapped)
-    return wraps(wrapped)(decorator)
+
+    # Support case where wrapped is a callable object instance
+    if getattr(wrapped, '__name__', None):
+        return wraps(wrapped)(decorator)
+    return wraps(wrapped, ('__module__', '__doc__'))(decorator)

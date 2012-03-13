@@ -1,11 +1,15 @@
 import unittest
 from pyramid import testing
 
-from pyramid.compat import PY3
-from pyramid.compat import text_
-from pyramid.compat import bytes_
-from pyramid.compat import native_
-from pyramid.compat import iteritems_, iterkeys_, itervalues_
+from pyramid.compat import (
+    PY3,
+    text_,
+    bytes_,
+    native_,
+    iteritems_,
+    iterkeys_,
+    itervalues_,
+    )
 
 class TestRequest(unittest.TestCase):
     def setUp(self):
@@ -21,17 +25,16 @@ class TestRequest(unittest.TestCase):
         from pyramid.request import Request
         return Request
 
-    def _registerContextURL(self):
-        from pyramid.interfaces import IContextURL
+    def _registerResourceURL(self):
+        from pyramid.interfaces import IResourceURL
         from zope.interface import Interface
-        class DummyContextURL(object):
+        class DummyResourceURL(object):
             def __init__(self, context, request):
-                pass
-            def __call__(self):
-                return 'http://example.com/context/'
+                self.physical_path = '/context/'
+                self.virtual_path = '/context/'
         self.config.registry.registerAdapter(
-            DummyContextURL, (Interface, Interface),
-            IContextURL)
+            DummyResourceURL, (Interface, Interface),
+            IResourceURL)
 
     def test_charset_defaults_to_utf8(self):
         r = self._makeOne({'PATH_INFO':'/'})
@@ -151,8 +154,14 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(inst.finished_callbacks, [])
 
     def test_resource_url(self):
-        self._registerContextURL()
-        inst = self._makeOne({})
+        self._registerResourceURL()
+        environ = {
+            'PATH_INFO':'/',
+            'SERVER_NAME':'example.com',
+            'SERVER_PORT':'80',
+            'wsgi.url_scheme':'http',
+            }
+        inst = self._makeOne(environ)
         root = DummyContext()
         result = inst.resource_url(root)
         self.assertEqual(result, 'http://example.com/context/')
@@ -266,6 +275,24 @@ class TestRequest(unittest.TestCase):
     def test_json_body_GET_request(self):
         request = self._makeOne({'REQUEST_METHOD':'GET'})
         self.assertRaises(ValueError, getattr, request, 'json_body')
+
+    def test_set_property(self):
+        request = self._makeOne({})
+        opts = [2, 1]
+        def connect(obj):
+            return opts.pop()
+        request.set_property(connect, name='db')
+        self.assertEqual(1, request.db)
+        self.assertEqual(2, request.db)
+
+    def test_set_property_reify(self):
+        request = self._makeOne({})
+        opts = [2, 1]
+        def connect(obj):
+            return opts.pop()
+        request.set_property(connect, name='db', reify=True)
+        self.assertEqual(1, request.db)
+        self.assertEqual(1, request.db)
 
 class TestRequestDeprecatedMethods(unittest.TestCase):
     def setUp(self):

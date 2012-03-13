@@ -190,7 +190,9 @@ def fix_zcml(path):
         for file in files:
             if file.endswith('.zcml'):
                 absfile = os.path.join(root, file)
-                text = open(absfile, 'rb').read()
+                f = open(absfile, 'rb')
+                text = f.read()
+                f.close()
                 newt = NS.sub('xmlns="http://pylonshq.com/pyramid"', text)
                 newt = INCLUDE_ATTR.sub('pyramid_zcml', newt)
                 newt = ATTR.sub(replace, newt)
@@ -199,7 +201,6 @@ def fix_zcml(path):
                     newf.write(newt)
                     newf.flush()
                     newf.close()
-                text.close()
                 
         for dir in dirs:
             if dir.startswith('.'):

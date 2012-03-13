@@ -4,23 +4,33 @@ import pkg_resources
 import threading
 
 from zope.interface import implementer
-from zope.deprecation import deprecated
 
-from pyramid.interfaces import IChameleonLookup
-from pyramid.interfaces import IChameleonTranslate
-from pyramid.interfaces import IRendererGlobalsFactory
-from pyramid.interfaces import IRendererFactory
-from pyramid.interfaces import IResponseFactory
-from pyramid.interfaces import ITemplateRenderer
-from pyramid.interfaces import IRendererInfo
+from pyramid.interfaces import (
+    IChameleonLookup,
+    IChameleonTranslate,
+    IRendererGlobalsFactory,
+    IRendererFactory,
+    IResponseFactory,
+    ITemplateRenderer,
+    IRendererInfo,
+    )
 
 from pyramid.asset import asset_spec_from_abspath
-from pyramid.compat import string_types
-from pyramid.compat import text_type
+
+from pyramid.compat import (
+    string_types,
+    text_type,
+    )
+
 from pyramid.decorator import reify
+
 from pyramid.events import BeforeRender
-from pyramid.path import caller_package
-from pyramid.path import package_path
+
+from pyramid.path import (
+    caller_package,
+    package_path,
+    )
+
 from pyramid.response import Response
 from pyramid.threadlocal import get_current_registry
 
@@ -340,16 +350,6 @@ def template_renderer_factory(info, impl, lock=registry_lock):
             lock.release()
     return lookup(info)
 
-def renderer_from_name(path, package=None):
-    return RendererHelper(name=path, package=package).renderer
-
-deprecated(
-    'renderer_from_name',
-    'The "pyramid.renderers.renderer_from_name" function was never an API. '
-    'However, its use has been observed "in the wild."  It will disappear in '
-    'the next major release. To replace it, use the '
-    '``pyramid.renderers.get_renderer`` API instead. ')
-
 @implementer(IRendererInfo)
 class RendererHelper(object):
     def __init__(self, name=None, package=None, registry=None):
@@ -390,7 +390,8 @@ class RendererHelper(object):
                   'renderer_name':self.name, # b/c
                   'renderer_info':self,
                   'context':context,
-                  'request':request
+                  'request':request,
+                  'req':request,
                   }
         return self.render_to_response(response, system, request=request)
 
@@ -403,6 +404,7 @@ class RendererHelper(object):
                 'renderer_info':self,
                 'context':getattr(request, 'context', None),
                 'request':request,
+                'req':request,
                 }
 
         system_values = BeforeRender(system_values, value)

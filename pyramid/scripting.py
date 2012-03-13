@@ -1,8 +1,12 @@
 from pyramid.config import global_registries
 from pyramid.exceptions import ConfigurationError
 from pyramid.request import Request
-from pyramid.interfaces import IRequestFactory
-from pyramid.interfaces import IRootFactory
+
+from pyramid.interfaces import (
+    IRequestFactory,
+    IRootFactory,
+    )
+
 from pyramid.threadlocal import manager as threadlocal_manager
 from pyramid.traversal import DefaultRootFactory
 

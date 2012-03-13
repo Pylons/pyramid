@@ -7,34 +7,34 @@ class TestTemplate(unittest.TestCase):
         from pyramid.scaffolds.template import Template
         return Template(name)
 
-    def test_template_renderer_success(self):
+    def test_render_template_success(self):
         inst = self._makeOne()
-        result = inst.template_renderer('{{a}} {{b}}', {'a':'1', 'b':'2'})
+        result = inst.render_template('{{a}} {{b}}', {'a':'1', 'b':'2'})
         self.assertEqual(result, bytes_('1 2'))
         
-    def test_template_renderer_expr_failure(self):
+    def test_render_template_expr_failure(self):
         inst = self._makeOne()
-        self.assertRaises(AttributeError, inst.template_renderer,
+        self.assertRaises(AttributeError, inst.render_template,
                           '{{a.foo}}', {'a':'1', 'b':'2'})
 
-    def test_template_renderer_expr_success(self):
+    def test_render_template_expr_success(self):
         inst = self._makeOne()
-        result = inst.template_renderer('{{a.lower()}}', {'a':'A'})
+        result = inst.render_template('{{a.lower()}}', {'a':'A'})
         self.assertEqual(result, b'a')
 
-    def test_template_renderer_expr_success_via_pipe(self):
+    def test_render_template_expr_success_via_pipe(self):
         inst = self._makeOne()
-        result = inst.template_renderer('{{b|c|a.lower()}}', {'a':'A'})
+        result = inst.render_template('{{b|c|a.lower()}}', {'a':'A'})
         self.assertEqual(result, b'a')
 
-    def test_template_renderer_expr_success_via_pipe2(self):
+    def test_render_template_expr_success_via_pipe2(self):
         inst = self._makeOne()
-        result = inst.template_renderer('{{b|a.lower()|c}}', {'a':'A'})
+        result = inst.render_template('{{b|a.lower()|c}}', {'a':'A'})
         self.assertEqual(result, b'a')
 
-    def test_template_renderer_expr_value_is_None(self):
+    def test_render_template_expr_value_is_None(self):
         inst = self._makeOne()
-        result = inst.template_renderer('{{a}}', {'a':None})
+        result = inst.render_template('{{a}}', {'a':None})
         self.assertEqual(result, b'')
 
     def test_module_dir(self):
@@ -83,7 +83,7 @@ class TestTemplate(unittest.TestCase):
         self.assertEqual(copydir.output_dir, 'output dir')
         self.assertEqual(copydir.vars, {'a':1})
         self.assertEqual(copydir.kw,
-                         {'template_renderer':inst.template_renderer,
+                         {'template_renderer':inst.render_template,
                           'indent':1,
                           'verbosity':1,
                           'simulate':False,
@@ -116,6 +116,10 @@ class TestTemplate(unittest.TestCase):
         command = DummyCommand()
         inst.run(command, 'output dir', {'a':1})
         self.assertEqual(L, ['output dir'])
+
+    def test_check_vars(self):
+        inst = self._makeOne()
+        self.assertRaises(RuntimeError, inst.check_vars, 'one', 'two')
 
 class DummyCopydir(object):
     def copy_dir(self, template_dir, output_dir, vars, **kw):

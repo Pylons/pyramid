@@ -73,16 +73,15 @@ to enable an authorization policy.
 Enabling an Authorization Policy Imperatively
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Passing an ``authorization_policy`` argument to the constructor of the
-:class:`~pyramid.config.Configurator` class enables an
-authorization policy.
+Use the :meth:`~pyramid.config.Configurator.set_authorization_policy` method
+of the :class:`~pyramid.config.Configurator` to enable an authorization
+policy.
 
-You must also enable an :term:`authentication policy` in order to
-enable the authorization policy.  This is because authorization, in
-general, depends upon authentication.  Use the
-``authentication_policy`` argument to the
-:class:`~pyramid.config.Configurator` class during
-application setup to specify an authentication policy.
+You must also enable an :term:`authentication policy` in order to enable the
+authorization policy.  This is because authorization, in general, depends
+upon authentication.  Use the
+:meth:`~pyramid.config.Configurator.set_authentication_policy` and method
+during application setup to specify the authentication policy.
 
 For example:
 
@@ -95,13 +94,14 @@ For example:
    from pyramid.authorization import ACLAuthorizationPolicy
    authentication_policy = AuthTktAuthenticationPolicy('seekrit')
    authorization_policy = ACLAuthorizationPolicy()
-   config = Configurator(authentication_policy=authentication_policy,
-                         authorization_policy=authorization_policy)
+   config = Configurator()
+   config.set_authentication_policy(authentication_policy)
+   config.set_authorization_policy(authorization_policy)
 
 .. note:: the ``authentication_policy`` and ``authorization_policy``
-   arguments may also be passed to the Configurator as :term:`dotted
-   Python name` values, each representing the dotted name path to a
-   suitable implementation global defined at Python module scope.
+   arguments may also be passed to their respective methods mentioned above
+   as :term:`dotted Python name` values, each representing the dotted name
+   path to a suitable implementation global defined at Python module scope.
 
 The above configuration enables a policy which compares the value of an "auth
 ticket" cookie passed in the request's environment which contains a reference
@@ -110,9 +110,9 @@ to a single :term:`principal` against the principals present in any
 :term:`view`.
 
 While it is possible to mix and match different authentication and
-authorization policies, it is an error to pass an authentication
-policy without the authorization policy or vice versa to a
-:term:`Configurator` constructor.
+authorization policies, it is an error to configure a Pyramid application
+with an authentication policy but without the authorization policy or vice
+versa.  If you do this, you'll receive an error at application startup time.
 
 See also the :mod:`pyramid.authorization` and
 :mod:`pyramid.authentication` modules for alternate implementations
@@ -188,13 +188,8 @@ In support of making it easier to configure applications which are
 the permission string to all view registrations which don't otherwise
 name a ``permission`` argument.
 
-These APIs are in support of configuring a default permission for an
-application:
-
-- The ``default_permission`` constructor argument to the
-  :mod:`~pyramid.config.Configurator` constructor.
-
-- The :meth:`pyramid.config.Configurator.set_default_permission` method.
+The :meth:`pyramid.config.Configurator.set_default_permission` method
+supports configuring a default permission for an application.
 
 When a default permission is registered:
 
@@ -605,8 +600,8 @@ that implements the following interface:
            current user on subsequent requests. """
 
 After you do so, you can pass an instance of such a class into the
-:class:`~pyramid.config.Configurator` class at configuration
-time as ``authentication_policy`` to use it.
+:class:`~pyramid.config.Configurator.set_authentication_policy` method
+configuration time to use it.
 
 .. index::
    single: authorization policy (creating)
@@ -616,18 +611,16 @@ time as ``authentication_policy`` to use it.
 Creating Your Own Authorization Policy
 --------------------------------------
 
-An authorization policy is a policy that allows or denies access after
-a user has been authenticated.  By default, :app:`Pyramid` will use
-the :class:`pyramid.authorization.ACLAuthorizationPolicy` if an
-authentication policy is activated and an authorization policy isn't
-otherwise specified.
+An authorization policy is a policy that allows or denies access after a user
+has been authenticated.  Most :app:`Pyramid` applications will use the
+default :class:`pyramid.authorization.ACLAuthorizationPolicy`.
 
-In some cases, it's useful to be able to use a different
+However, in some cases, it's useful to be able to use a different
 authorization policy than the default
-:class:`~pyramid.authorization.ACLAuthorizationPolicy`.  For
-example, it might be desirable to construct an alternate authorization
-policy which allows the application to use an authorization mechanism
-that does not involve :term:`ACL` objects.
+:class:`~pyramid.authorization.ACLAuthorizationPolicy`.  For example, it
+might be desirable to construct an alternate authorization policy which
+allows the application to use an authorization mechanism that does not
+involve :term:`ACL` objects.
 
 :app:`Pyramid` ships with only a single default authorization
 policy, so you'll need to create your own if you'd like to use a
@@ -655,5 +648,5 @@ following interface:
             used."""
 
 After you do so, you can pass an instance of such a class into the
-:class:`~pyramid.config.Configurator` class at configuration
-time as ``authorization_policy`` to use it.
+:class:`~pyramid.config.Configurator.set_authorization_policy` method at
+configuration time to use it.

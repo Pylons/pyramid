@@ -3,8 +3,10 @@ import pkg_resources
 
 from pyramid.compat import string_types
 
-from pyramid.path import package_path
-from pyramid.path import package_name
+from pyramid.path import (
+    package_path,
+    package_name,
+    )
 
 def resolve_asset_spec(spec, pname='__main__'):
     if pname and not isinstance(pname, string_types):
@@ -30,7 +32,8 @@ def asset_spec_from_abspath(abspath, package):
         return '%s:%s' % (package_name(package),
                           relpath.replace(os.path.sep, '/'))
     return abspath
-            
+
+# bw compat only; use pyramid.path.AssetDescriptor.abspath() instead
 def abspath_from_asset_spec(spec, pname='__main__'):
     if pname is None:
         return spec
@@ -38,3 +41,4 @@ def abspath_from_asset_spec(spec, pname='__main__'):
     if pname is None:
         return filename
     return pkg_resources.resource_filename(pname, filename)
+

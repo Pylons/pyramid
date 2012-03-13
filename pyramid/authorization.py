@@ -3,11 +3,16 @@ from zope.interface import implementer
 from pyramid.interfaces import IAuthorizationPolicy
 
 from pyramid.location import lineage
-from pyramid.security import ACLAllowed
-from pyramid.security import ACLDenied
-from pyramid.security import Allow
-from pyramid.security import Deny
-from pyramid.security import Everyone
+
+from pyramid.compat import is_nonstr_iter
+
+from pyramid.security import (
+    ACLAllowed,
+    ACLDenied,
+    Allow,
+    Deny,
+    Everyone,
+    )
 
 @implementer(IAuthorizationPolicy)
 class ACLAuthorizationPolicy(object):
@@ -78,7 +83,7 @@ class ACLAuthorizationPolicy(object):
             for ace in acl:
                 ace_action, ace_principal, ace_permissions = ace
                 if ace_principal in principals:
-                    if not hasattr(ace_permissions, '__iter__'):
+                    if not is_nonstr_iter(ace_permissions):
                         ace_permissions = [ace_permissions]
                     if permission in ace_permissions:
                         if ace_action == Allow:
@@ -115,7 +120,7 @@ class ACLAuthorizationPolicy(object):
             denied_here = set()
             
             for ace_action, ace_principal, ace_permissions in acl:
-                if not hasattr(ace_permissions, '__iter__'):
+                if not is_nonstr_iter(ace_permissions):
                     ace_permissions = [ace_permissions]
                 if (ace_action == Allow) and (permission in ace_permissions):
                     if not ace_principal in denied_here:

@@ -1,16 +1,21 @@
 import warnings
 
-from pyramid.interfaces import IRequest
-from pyramid.interfaces import IRouteRequest
-from pyramid.interfaces import IRoutesMapper
-from pyramid.interfaces import PHASE2_CONFIG
+from pyramid.interfaces import (
+    IRequest,
+    IRouteRequest,
+    IRoutesMapper,
+    PHASE2_CONFIG,
+    )
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.request import route_request_iface
 from pyramid.urldispatch import RoutesMapper
 
-from pyramid.config.util import action_method
-from pyramid.config.util import make_predicates
+from pyramid.config.util import (
+    action_method,
+    make_predicates,
+    as_sorted_tuple,
+    )
 
 class RoutesConfiguratorMixin(object):
     @action_method
@@ -343,6 +348,9 @@ class RoutesConfiguratorMixin(object):
         """
         # these are route predicates; if they do not match, the next route
         # in the routelist will be tried
+        if request_method is not None:
+            request_method = as_sorted_tuple(request_method)
+
         ignored, predicates, ignored = make_predicates(
             xhr=xhr,
             request_method=request_method,
@@ -365,6 +373,38 @@ class RoutesConfiguratorMixin(object):
 
         mapper = self.get_routes_mapper()
 
+        introspectables = []
+
+        intr = self.introspectable('routes',
+                                   name,
+                                   '%s (pattern: %r)' % (name, pattern),
+                                   'route')
+        intr['name'] = name
+        intr['pattern'] = pattern
+        intr['factory'] = factory
+        intr['xhr'] = xhr
+        intr['request_methods'] = request_method
+        intr['path_info'] = path_info
+        intr['request_param'] = request_param
+        intr['header'] = header
+        intr['accept'] = accept
+        intr['traverse'] = traverse
+        intr['custom_predicates'] = custom_predicates
+        intr['pregenerator'] = pregenerator
+        intr['static'] = static
+        intr['use_global_views'] = use_global_views
+        introspectables.append(intr)
+
+        if factory:
+            factory_intr = self.introspectable('root factories',
+                                               name,
+                                               self.object_description(factory),
+                                               'root factory')
+            factory_intr['factory'] = factory
+            factory_intr['route_name'] = name
+            factory_intr.relate('routes', name)
+            introspectables.append(factory_intr)
+
         def register_route_request_iface():
             request_iface = self.registry.queryUtility(IRouteRequest, name=name)
             if request_iface is None:
@@ -377,9 +417,12 @@ class RoutesConfiguratorMixin(object):
                     request_iface, IRouteRequest, name=name)
 
         def register_connect():
-            return mapper.connect(name, pattern, factory, predicates=predicates,
-                                  pregenerator=pregenerator, static=static)
-
+            route = mapper.connect(
+                name, pattern, factory, predicates=predicates,
+                pregenerator=pregenerator, static=static
+                )
+            intr['object'] = route
+            return route
 
         # We have to connect routes in the order they were provided;
         # we can't use a phase to do that, because when the actions are
@@ -389,7 +432,7 @@ class RoutesConfiguratorMixin(object):
         # But IRouteRequest interfaces must be registered before we begin to
         # process view registrations (in phase 3)
         self.action(('route', name), register_route_request_iface,
-                    order=PHASE2_CONFIG)
+                    order=PHASE2_CONFIG, introspectables=introspectables)
 
         # deprecated adding views from add_route; must come after
         # route registration for purposes of autocommit ordering

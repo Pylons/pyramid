@@ -219,7 +219,7 @@ that the Pyramid core doesn't.  Add-on packages already exist which let you
 easily send email, let you use the Jinja2 templating system, let you use
 XML-RPC or JSON-RPC, let you integrate with jQuery Mobile, etc.
 
-Examples: https://docs.pylonsproject.org/docs/pyramid.html#pyramid-add-on-documentation
+Examples: http://docs.pylonsproject.org/docs/pyramid.html#pyramid-add-on-documentation
 
 Class-based and function-based views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -260,11 +260,11 @@ Here's a few views defined as methods of a class instead:
            self.request = request
 
        @view_config(route_name='view_one')
-       def view_one(request):
+       def view_one(self):
            return Response('one')
 
        @view_config(route_name='view_two')
-       def view_two(request):
+       def view_two(self):
            return Response('two')
 
 See also :ref:`view_config_placement`.
@@ -597,7 +597,7 @@ content management systems and document management systems.  Traversal also lend
 systems that require very granular security ("Bob can edit *this* document"
 as opposed to "Bob can edit documents").
 
-Example: :ref:`much_ado_about_traversal_chapter`.
+Example: :ref:`hello_traversal_chapter` and :ref:`much_ado_about_traversal_chapter`.
 
 Tweens
 ~~~~~~
@@ -842,7 +842,7 @@ official narrative docs.  In any case, the Pyramid documentation is
 comprehensive.
 
 Example: The rest of this documentation and the cookbook at
-https://docs.pylonsproject.org/projects/pyramid_cookbook/dev/ .
+http://docs.pylonsproject.org/projects/pyramid_cookbook/dev/ .
 
 .. index::
    single: Pylons Project

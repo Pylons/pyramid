@@ -31,6 +31,8 @@ Narrative Documentation
    narr/configuration
    narr/firstapp
    narr/project
+   narr/startup
+   narr/router
    narr/urldispatch
    narr/views
    narr/renderers
@@ -53,9 +55,10 @@ Narrative Documentation
    narr/security
    narr/hybrid
    narr/hooks
-   narr/advconfig
+   narr/introspector
    narr/extending
-   narr/startup
+   narr/advconfig
+   narr/extconfig
    narr/threadlocals
    narr/zca
 
@@ -70,7 +73,6 @@ Tutorials
    tutorials/wiki/index.rst
    tutorials/wiki2/index.rst
    tutorials/bfg/index.rst
-   tutorials/gae/index.rst
    tutorials/modwsgi/index.rst
 
 .. _api_reference:

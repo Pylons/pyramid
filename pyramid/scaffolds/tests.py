@@ -39,6 +39,10 @@ class TemplateTest(object):
             os.chdir('Dingle')
             py = os.path.join(self.directory, 'bin', 'python')
             subprocess.check_call([py, 'setup.py', 'install'])
+            if tmpl_name == 'alchemy':
+                populate = os.path.join(self.directory, 'bin',
+                                        'populate_Dingle')
+                subprocess.check_call([populate, 'development.ini'])
             subprocess.check_call([py, 'setup.py', 'test'])
             pserve = os.path.join(self.directory, 'bin', 'pserve')
             for ininame, hastoolbar in (('development.ini', True),

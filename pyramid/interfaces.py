@@ -1,5 +1,9 @@
-from zope.interface import Attribute
-from zope.interface import Interface
+from zope.deprecation import deprecated
+
+from zope.interface import (
+    Attribute,
+    Interface,
+    )
 
 from pyramid.compat import PY3
 
@@ -509,6 +513,10 @@ class IRequestHandler(Interface):
 
 IRequest.combined = IRequest # for exception view lookups
 
+class IRequestProperties(Interface):
+    """ Marker interface for storing a list of request properties which
+    will be added to the request object."""
+
 class IRouteRequest(Interface):
     """ *internal only* interface used as in a utility lookup to find
     route-specific interfaces.  Not an API."""
@@ -725,15 +733,63 @@ class IRoutesMapper(Interface):
         ``match`` key will be the matchdict or ``None`` if no route
         matched.  Static routes will not be considered for matching.  """
 
-class IContextURL(Interface):
+class IResourceURL(Interface):
+    virtual_path = Attribute('The virtual url path of the resource.')
+    physical_path = Attribute('The physical url path of the resource.')
+
+class IContextURL(IResourceURL):
     """ An adapter which deals with URLs related to a context.
+
+    ..warning::
+
+      This interface is deprecated as of Pyramid 1.3 with the introduction of
+      IResourceURL.
     """
+    # this class subclasses IResourceURL because request.resource_url looks
+    # for IResourceURL via queryAdapter.  queryAdapter will find a deprecated
+    # IContextURL registration if no registration for IResourceURL exists.
+    # In reality, however, IContextURL objects were never required to have
+    # the virtual_path or physical_path attributes spelled in IResourceURL.
+    # The inheritance relationship is purely to benefit adapter lookup,
+    # not to imply an inheritance relationship of interface attributes
+    # and methods.
+    #
+    # Mechanics:
+    #
+    # class Fudge(object):
+    #     def __init__(self, one, two):
+    #         print one, two
+    # class Another(object):
+    #     def __init__(self, one, two):
+    #         print one, two
+    # ob = object()
+    # r.registerAdapter(Fudge, (Interface, Interface), IContextURL)
+    # print r.queryMultiAdapter((ob, ob), IResourceURL)
+    # r.registerAdapter(Another, (Interface, Interface), IResourceURL)
+    # print r.queryMultiAdapter((ob, ob), IResourceURL)
+    #
+    # prints
+    #
+    # <object object at 0x7fa678f3e2a0> <object object at 0x7fa678f3e2a0>
+    # <__main__.Fudge object at 0x1cda890>
+    # <object object at 0x7fa678f3e2a0> <object object at 0x7fa678f3e2a0>
+    # <__main__.Another object at 0x1cda850>
+    
     def virtual_root():
         """ Return the virtual root related to a request and the
         current context"""
 
     def __call__():
-        """ Return a URL that points to the context """
+        """ Return a URL that points to the context. """
+
+deprecated(
+    'IContextURL',
+    'As of Pyramid 1.3 the, "pyramid.interfaces.IContextURL" interface is '
+    'scheduled to be removed.   Use the '
+    '"pyramid.config.Configurator.add_resource_url_adapter" method to register '
+    'a class that implements "pyramid.interfaces.IResourceURL" instead. '
+    'See the "What\'s new In Pyramid 1.3" document for a further description.'
+    )
 
 class IPackageOverrides(Interface):
     """ Utility for pkg_resources overrides """
@@ -857,9 +913,202 @@ class IRendererInfo(Interface):
                          'to the current application')
 
 
+class IIntrospector(Interface):
+    def get(category_name, discriminator, default=None):
+        """ Get the IIntrospectable related to the category_name and the
+        discriminator (or discriminator hash) ``discriminator``.  If it does
+        not exist in the introspector, return the value of ``default`` """
+
+    def get_category(category_name, default=None, sort_key=None):
+        """ Get a sequence of dictionaries in the form
+        ``[{'introspectable':IIntrospectable, 'related':[sequence of related
+        IIntrospectables]}, ...]`` where each introspectable is part of the
+        category associated with ``category_name`` .
+
+        If the category named ``category_name`` does not exist in the
+        introspector the value passed as ``default`` will be returned.
+
+        If ``sort_key`` is ``None``, the sequence will be returned in the
+        order the introspectables were added to the introspector.  Otherwise,
+        sort_key should be a function that accepts an IIntrospectable and
+        returns a value from it (ala the ``key`` function of Python's
+        ``sorted`` callable)."""
+
+    def categories():
+        """ Return a sorted sequence of category names known by
+         this introspector """
+
+    def categorized(sort_key=None):
+        """ Get a sequence of tuples in the form ``[(category_name,
+        [{'introspectable':IIntrospectable, 'related':[sequence of related
+        IIntrospectables]}, ...])]`` representing all known
+        introspectables.  If ``sort_key`` is ``None``, each introspectables
+        sequence will be returned in the order the introspectables were added
+        to the introspector.  Otherwise, sort_key should be a function that
+        accepts an IIntrospectable and returns a value from it (ala the
+        ``key`` function of Python's ``sorted`` callable)."""
+
+    def remove(category_name, discriminator):
+        """ Remove the IIntrospectable related to ``category_name`` and
+        ``discriminator`` from the introspector, and fix up any relations
+        that the introspectable participates in. This method will not raise
+        an error if an introspectable related to the category name and
+        discriminator does not exist."""
+
+    def related(intr):
+        """ Return a sequence of IIntrospectables related to the
+        IIntrospectable ``intr``. Return the empty sequence if no relations
+        for exist."""
+
+    def add(intr):
+        """ Add the IIntrospectable ``intr`` (use instead of
+        :meth:`pyramid.interfaces.IIntrospector.add` when you have a custom
+        IIntrospectable). Replaces any existing introspectable registered
+        using the same category/discriminator.
+
+        This method is not typically called directly, instead it's called
+        indirectly by :meth:`pyramid.interfaces.IIntrospector.register`"""
+
+    def relate(*pairs):
+        """ Given any number of of ``(category_name, discriminator)`` pairs
+        passed as positional arguments, relate the associated introspectables
+        to each other. The introspectable related to each pair must have
+        already been added via ``.add`` or ``.add_intr``; a :exc:`KeyError`
+        will result if this is not true.  An error will not be raised if any
+        pair has already been associated with another.
+
+        This method is not typically called directly, instead it's called
+        indirectly by :meth:`pyramid.interfaces.IIntrospector.register`
+        """
+
+    def unrelate(*pairs):
+        """ Given any number of of ``(category_name, discriminator)`` pairs
+        passed as positional arguments, unrelate the associated introspectables
+        from each other. The introspectable related to each pair must have
+        already been added via ``.add`` or ``.add_intr``; a :exc:`KeyError`
+        will result if this is not true.  An error will not be raised if any
+        pair is not already related to another.
+
+        This method is not typically called directly, instead it's called
+        indirectly by :meth:`pyramid.interfaces.IIntrospector.register`
+        """
+
+
+class IIntrospectable(Interface):
+    """ An introspectable object used for configuration introspection.  In
+    addition to the methods below, objects which implement this interface
+    must also implement all the methods of Python's
+    ``collections.MutableMapping`` (the "dictionary interface"), and must be
+    hashable."""
+
+    title = Attribute('Text title describing this introspectable')
+    type_name = Attribute('Text type name describing this introspectable')
+    order = Attribute('integer order in which registered with introspector '
+                      '(managed by introspector, usually)')
+    category_name = Attribute('introspection category name')
+    discriminator = Attribute('introspectable discriminator (within category) '
+                              '(must be hashable)')
+    discriminator_hash = Attribute('an integer hash of the discriminator')
+    action_info = Attribute('An IActionInfo object representing the caller '
+                            'that invoked the creation of this introspectable '
+                            '(usually a sentinel until updated during '
+                            'self.register)')
+
+    def relate(category_name, discriminator):
+        """ Indicate an intent to relate this IIntrospectable with another
+        IIntrospectable (the one associated with the ``category_name`` and
+        ``discriminator``) during action execution.
+        """
+
+    def unrelate(category_name, discriminator):
+        """ Indicate an intent to break the relationship between this
+        IIntrospectable with another IIntrospectable (the one associated with
+        the ``category_name`` and ``discriminator``) during action execution.
+        """
+
+    def register(introspector, action_info):
+        """ Register this IIntrospectable with an introspector.  This method
+        is invoked during action execution.  Adds the introspectable and its
+        relations to the introspector.  ``introspector`` should be an object
+        implementing IIntrospector.  ``action_info`` should be a object
+        implementing the interface :class:`pyramid.interfaces.IActionInfo`
+        representing the call that registered this introspectable.
+        Pseudocode for an implementation of this method:
+
+        .. code-block:: python
+
+            def register(self, introspector, action_info):
+                self.action_info = action_info
+                introspector.add(self)
+                for methodname, category_name, discriminator in self._relations:
+                    method = getattr(introspector, methodname)
+                    method((i.category_name, i.discriminator),
+                           (category_name, discriminator))
+        """
+
+    def __hash__():
+
+        """ Introspectables must be hashable.  The typical implementation of
+        an introsepectable's __hash__ is::
+
+          return hash((self.category_name,) + (self.discriminator,))
+        """
+
+class IActionInfo(Interface):
+    """ Class which provides code introspection capability associated with an
+    action.  The ParserInfo class used by ZCML implements the same interface."""
+    file = Attribute(
+        'Filename of action-invoking code as a string')
+    line = Attribute(
+        'Starting line number in file (as an integer) of action-invoking code.'
+        'This will be ``None`` if the value could not be determined.')
+
+    def __str__():
+        """ Return a representation of the action information (including
+        source code from file, if possible) """
+
+class IAssetDescriptor(Interface):
+    """
+    Describes an :term:`asset`.
+    """
+
+    def absspec():
+        """
+        Returns the absolute asset specification for this asset
+        (e.g. ``mypackage:templates/foo.pt``).
+        """
+
+    def abspath():
+        """
+        Returns an absolute path in the filesystem to the asset.
+        """
+
+    def stream():
+        """
+        Returns an input stream for reading asset contents.  Raises an
+        exception if the asset is a directory or does not exist.
+        """
+
+    def isdir():
+        """
+        Returns True if the asset is a directory, otherwise returns False.
+        """
+
+    def listdir():
+        """
+        Returns iterable of filenames of directory contents.  Raises an
+        exception if asset is not a directory.
+        """
+
+    def exists():
+        """
+        Returns True if asset exists, otherwise returns False.
+        """
+
 # configuration phases: a lower phase number means the actions associated
 # with this phase will be executed earlier than those with later phase
 # numbers.  The default phase number is 0, FTR.
 
 PHASE1_CONFIG = -20
 PHASE2_CONFIG = -10
+

@@ -1,53 +1,86 @@
 import inspect
 import operator
+import os
+from functools import wraps
 
-from zope.interface import Interface
-from zope.interface import classProvides
-from zope.interface import implementedBy
-from zope.interface import implementer
+from zope.interface import (
+    Interface,
+    classProvides,
+    implementedBy,
+    implementer,
+    )
+
 from zope.interface.interfaces import IInterface
 
-from pyramid.interfaces import IAuthenticationPolicy
-from pyramid.interfaces import IAuthorizationPolicy
-from pyramid.interfaces import IDebugLogger
-from pyramid.interfaces import IDefaultPermission
-from pyramid.interfaces import IException
-from pyramid.interfaces import IExceptionViewClassifier
-from pyramid.interfaces import IMultiView
-from pyramid.interfaces import IRendererFactory
-from pyramid.interfaces import IRequest
-from pyramid.interfaces import IResponse
-from pyramid.interfaces import IRouteRequest
-from pyramid.interfaces import ISecuredView
-from pyramid.interfaces import IStaticURLInfo
-from pyramid.interfaces import IView
-from pyramid.interfaces import IViewClassifier
-from pyramid.interfaces import IViewMapper
-from pyramid.interfaces import IViewMapperFactory
-from pyramid.interfaces import PHASE1_CONFIG
+from pyramid.interfaces import (
+    IAuthenticationPolicy,
+    IAuthorizationPolicy,
+    IDebugLogger,
+    IDefaultPermission,
+    IException,
+    IExceptionViewClassifier,
+    IMultiView,
+    IRendererFactory,
+    IRequest,
+    IResponse,
+    IRouteRequest,
+    ISecuredView,
+    IStaticURLInfo,
+    IView,
+    IViewClassifier,
+    IViewMapper,
+    IViewMapperFactory,
+    PHASE1_CONFIG,
+    )
 
 from pyramid import renderers
-from pyramid.compat import string_types
-from pyramid.compat import urlparse
-from pyramid.compat import im_func
-from pyramid.compat import url_quote
-from pyramid.exceptions import ConfigurationError
-from pyramid.exceptions import PredicateMismatch
-from pyramid.httpexceptions import HTTPForbidden
-from pyramid.httpexceptions import HTTPNotFound
+
+from pyramid.compat import (
+    string_types,
+    urlparse,
+    im_func,
+    url_quote,
+    WIN,
+    )
+
+from pyramid.exceptions import (
+    ConfigurationError,
+    PredicateMismatch,
+    )
+
+from pyramid.httpexceptions import (
+    HTTPForbidden,
+    HTTPNotFound,
+    )
+
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
-from pyramid.view import render_view_to_response
 
-from pyramid.config.util import DEFAULT_PHASH
-from pyramid.config.util import MAX_ORDER
-from pyramid.config.util import action_method
-from pyramid.config.util import as_sorted_tuple
-from pyramid.config.util import make_predicates
+from pyramid.view import (
+    render_view_to_response,
+    AppendSlashNotFoundViewFactory,
+    )
+
+from pyramid.util import object_description
+
+from pyramid.config.util import (
+    DEFAULT_PHASH,
+    MAX_ORDER,
+    action_method,
+    as_sorted_tuple,
+    make_predicates,
+    )
 
 urljoin = urlparse.urljoin
 url_parse = urlparse.urlparse
+
+def view_description(view):
+    try:
+        return view.__text__
+    except AttributeError:
+        # custom view mappers might not add __text__
+        return object_description(view)
 
 def wraps_view(wrapper):
     def inner(self, view):
@@ -81,7 +114,7 @@ def preserve_view_attrs(view, wrapper):
     # "wrapped view"
     for attr in ('__permitted__', '__call_permissive__', '__permission__',
                  '__predicated__', '__predicates__', '__accept__',
-                 '__order__'):
+                 '__order__', '__text__'):
         try:
             setattr(wrapper, attr, getattr(view, attr))
         except AttributeError:
@@ -106,7 +139,19 @@ class ViewDeriver(object):
                             self.http_cached_view(
                                 self.decorated_view(
                                     self.rendered_view(
-                                        self.mapped_view(view)))))))))
+                                        self.mapped_view(
+                                            self.text_wrapped_view(
+                                                view))))))))))
+
+    @wraps_view
+    def text_wrapped_view(self, view):
+        # if the method is an instance method, we need to wrap it in order
+        # to be able to assign a __text__ value to it later.  see #461.
+        if inspect.ismethod(view):
+            def text_wrapper(context, request):
+                return view(context, request)
+            return text_wrapper
+        return view
 
     @wraps_view
     def mapped_view(self, view):
@@ -325,9 +370,19 @@ class ViewDeriver(object):
             result = view(context, request)
             response = registry.queryAdapterOrSelf(result, IResponse)
             if response is None:
-                raise ValueError(
-                    'Could not convert view return value "%s" into a '
-                    'response object' % (result,))
+                if result is None:
+                    append = (' You may have forgotten to return a value from '
+                              'the view callable.')
+                elif isinstance(result, dict):
+                    append = (' You may have forgotten to define a renderer in '
+                              'the view configuration.')
+                else:
+                    append = ''
+                msg = ('Could not convert return value of the view callable %s '
+                      'into a response object. '
+                      'The value returned was %r.' + append)
+                    
+                raise ValueError(msg % (view_description(view), result))
             return response
 
         return viewresult_to_response
@@ -358,6 +413,8 @@ class DefaultViewMapper(object):
             mapped_view = self.map_class_requestonly(view)
         else:
             mapped_view = self.map_class_native(view)
+        mapped_view.__text__ = 'method %s of %s' % (
+            self.attr or '__call__', object_description(view))
         return mapped_view
 
     def map_nonclass(self, view):
@@ -370,6 +427,15 @@ class DefaultViewMapper(object):
             mapped_view = self.map_nonclass_requestonly(view)
         elif self.attr:
             mapped_view = self.map_nonclass_attr(view)
+        if inspect.isroutine(mapped_view):
+            # we potentially mutate an unwrapped view here if it's a function;
+            # we do this to avoid function call overhead of injecting another
+            # wrapper
+            if self.attr is not None:
+                mapped_view.__text__ = 'attr %s of %s' % (
+                    self.attr, object_description(view))
+            else:
+                mapped_view.__text__ = object_description(view)
         return mapped_view
 
     def map_class_requestonly(self, view):
@@ -474,6 +540,15 @@ class MultiView(object):
         self.views = []
         self.accepts = []
 
+    def __discriminator__(self, context, request):
+        # used by introspection systems like so:
+        # view = adapters.lookup(....)
+        # view.__discriminator__(context, request) -> view's discriminator
+        # so that superdynamic systems can feed the discriminator to
+        # the introspection system to get info about it
+        view = self.match(context, request)
+        return view.__discriminator__(context, request)
+
     def add(self, view, order, accept=None, phash=None):
         if phash is not None:
             for i, (s, v, h) in enumerate(list(self.views)):
@@ -486,8 +561,13 @@ class MultiView(object):
             self.views.sort(key=operator.itemgetter(0))
         else:
             subset = self.media_views.setdefault(accept, [])
-            subset.append((order, view, phash))
-            subset.sort()
+            for i, (s, v, h) in enumerate(list(subset)):
+                if phash == h:
+                    subset[i] = (order, view, phash)
+                    return
+            else:
+                subset.append((order, view, phash))
+                subset.sort()
             accepts = set(self.accepts)
             accepts.add(accept)
             self.accepts = list(accepts) # dedupe
@@ -534,7 +614,23 @@ class MultiView(object):
                 continue
         raise PredicateMismatch(self.name)
 
+def viewdefaults(wrapped):
+    def wrapper(self, *arg, **kw):
+        defaults = {}
+        if arg:
+            view = arg[0]
+        else:
+            view = kw.get('view')
+        view = self.maybe_dotted(view)
+        if inspect.isclass(view):
+            defaults = getattr(view, '__view_defaults__', {}).copy()
+        defaults.update(kw)
+        defaults['_backframes'] = 3 # for action_method
+        return wrapped(self, *arg, **defaults)
+    return wraps(wrapped)(wrapper)
+
 class ViewsConfiguratorMixin(object):
+    @viewdefaults
     @action_method
     def add_view(self, view=None, name="", for_=None, permission=None,
                  request_type=None, route_name=None, request_method=None,
@@ -795,18 +891,18 @@ class ViewsConfiguratorMixin(object):
 
           .. note:: This feature is new as of :app:`Pyramid` 1.2.
 
-          This param may be either a single string of the format "key=value"
-          or a dict of key/value pairs.
+          This value can be a string of the format "key=value" or a tuple
+          containing one or more of these strings.
 
           A view declaration with this argument ensures that the view will
           only be called when the :term:`request` has key/value pairs in its
           :term:`matchdict` that equal those supplied in the predicate.
           e.g. ``match_param="action=edit" would require the ``action``
-          parameter in the :term:`matchdict` match the right hande side of
+          parameter in the :term:`matchdict` match the right hand side of
           the expression (``edit``) for the view to "match" the current
           request.
 
-          If the ``match_param`` is a dict, every key/value pair must match
+          If the ``match_param`` is a tuple, every key/value pair must match
           for the predicate to pass.
 
         containment
@@ -924,6 +1020,42 @@ class ViewsConfiguratorMixin(object):
                 name=renderer, package=self.package,
                 registry = self.registry)
 
+        introspectables = []
+        discriminator = [
+            'view', context, name, request_type, IView, containment,
+            request_param, request_method, route_name, attr,
+            xhr, accept, header, path_info, match_param]
+        discriminator.extend(sorted([hash(x) for x in custom_predicates]))
+        discriminator = tuple(discriminator)
+        if inspect.isclass(view) and attr:
+            view_desc = 'method %r of %s' % (
+                attr, self.object_description(view))
+        else:
+            view_desc = self.object_description(view)
+        view_intr = self.introspectable('views',
+                                        discriminator,
+                                        view_desc,
+                                        'view')
+        view_intr.update(
+            dict(name=name,
+                 context=context,
+                 containment=containment,
+                 request_param=request_param,
+                 request_methods=request_method,
+                 route_name=route_name,
+                 attr=attr,
+                 xhr=xhr,
+                 accept=accept,
+                 header=header,
+                 path_info=path_info,
+                 match_param=match_param,
+                 callable=view,
+                 mapper=mapper,
+                 decorator=decorator,
+                 )
+            )
+        introspectables.append(view_intr)
+
         def register(permission=permission, renderer=renderer):
             request_iface = IRequest
             if route_name is not None:
@@ -965,6 +1097,11 @@ class ViewsConfiguratorMixin(object):
                                   decorator=decorator,
                                   http_cache=http_cache)
             derived_view = deriver(view)
+            derived_view.__discriminator__ = lambda *arg: discriminator
+            # __discriminator__ is used by superdynamic systems
+            # that require it for introspection after manual view lookup;
+            # see also MultiView.__discriminator__
+            view_intr['derived_callable'] = derived_view
 
             registered = self.registry.adapters.registered
 
@@ -1062,13 +1199,33 @@ class ViewsConfiguratorMixin(object):
                         (IExceptionViewClassifier, request_iface, context),
                         IMultiView, name=name)
 
-        discriminator = [
-            'view', context, name, request_type, IView, containment,
-            request_param, request_method, route_name, attr,
-            xhr, accept, header, path_info, match_param]
-        discriminator.extend(sorted([hash(x) for x in custom_predicates]))
-        discriminator = tuple(discriminator)
-        self.action(discriminator, register)
+        if mapper:
+            mapper_intr = self.introspectable('view mappers',
+                                              discriminator,
+                                              'view mapper for %s' % view_desc,
+                                              'view mapper')
+            mapper_intr['mapper'] = mapper
+            mapper_intr.relate('views', discriminator)
+            introspectables.append(mapper_intr)
+        if route_name:
+            view_intr.relate('routes', route_name) # see add_route
+        if renderer is not None and renderer.name and '.' in renderer.name:
+            # it's a template
+            tmpl_intr = self.introspectable('templates', discriminator,
+                                            renderer.name, 'template')
+            tmpl_intr.relate('views', discriminator)
+            tmpl_intr['name'] = renderer.name
+            tmpl_intr['type'] = renderer.type
+            tmpl_intr['renderer'] = renderer
+            tmpl_intr.relate('renderer factories', renderer.type)
+            introspectables.append(tmpl_intr)
+        if permission is not None:
+            perm_intr = self.introspectable('permissions', permission,
+                                            permission, 'permission')
+            perm_intr['value'] = permission
+            perm_intr.relate('views', discriminator)
+            introspectables.append(perm_intr)
+        self.action(discriminator, register, introspectables=introspectables)
 
     def derive_view(self, view, attr=None, renderer=None):
         """
@@ -1186,87 +1343,124 @@ class ViewsConfiguratorMixin(object):
         return deriver(view)
 
     @action_method
-    def set_forbidden_view(self, view=None, attr=None, renderer=None,
-                           wrapper=None):
-        """ Add a default forbidden view to the current configuration
-        state.
+    def add_forbidden_view(
+            self, view=None, attr=None, renderer=None,  wrapper=None,
+            route_name=None, request_type=None, request_method=None, 
+            request_param=None, containment=None, xhr=None, accept=None,
+            header=None, path_info=None,  custom_predicates=(), decorator=None,
+            mapper=None, match_param=None):
+        """ Add a forbidden view to the current configuration state.  The
+        view will be called when Pyramid or application code raises a
+        :exc:`pyramid.httpexceptions.HTTPForbidden` exception and the set of
+        circumstances implied by the predicates provided are matched.  The
+        simplest example is:
 
-        .. warning::
+          .. code-block:: python
 
-           This method has been deprecated in :app:`Pyramid` 1.0.  *Do not use
-           it for new development; it should only be used to support older code
-           bases which depend upon it.* See :ref:`changing_the_forbidden_view`
-           to see how a forbidden view should be registered in new projects.
+            def forbidden(request):
+                return Response('Forbidden', status='403 Forbidden')
 
-        The ``view`` argument should be a :term:`view callable` or a
-        :term:`dotted Python name` which refers to a view callable.
+            config.add_forbidden_view(forbidden)
 
-        The ``attr`` argument should be the attribute of the view
-        callable used to retrieve the response (see the ``add_view``
-        method's ``attr`` argument for a description).
+        All arguments have the same meaning as
+        :meth:`pyramid.config.Configurator.add_view` and each predicate
+        argument restricts the set of circumstances under which this notfound
+        view will be invoked.
 
-        The ``renderer`` argument should be the name of (or path to) a
-        :term:`renderer` used to generate a response for this view
-        (see the
-        :meth:`pyramid.config.Configurator.add_view`
-        method's ``renderer`` argument for information about how a
-        configurator relates to a renderer).
+        .. note::
 
-        The ``wrapper`` argument should be the name of another view
-        which will wrap this view when rendered (see the ``add_view``
-        method's ``wrapper`` argument for a description)."""
-        if isinstance(renderer, string_types):
-            renderer = renderers.RendererHelper(
-                name=renderer, package=self.package,
-                registry = self.registry)
-        view = self._derive_view(view, attr=attr, renderer=renderer)
-        def bwcompat_view(context, request):
-            context = getattr(request, 'context', None)
-            return view(context, request)
-        return self.add_view(bwcompat_view, context=HTTPForbidden,
-                             wrapper=wrapper, renderer=renderer)
-
-    @action_method
-    def set_notfound_view(self, view=None, attr=None, renderer=None,
-                          wrapper=None):
-        """ Add a default not found view to the current configuration
-        state.
-
-        .. warning::
-
-           This method has been deprecated in :app:`Pyramid` 1.0.  *Do not use
-           it for new development; it should only be used to support older code
-           bases which depend upon it.* See :ref:`changing_the_notfound_view` to
-           see how a not found view should be registered in new projects.
-
-        The ``view`` argument should be a :term:`view callable` or a
-        :term:`dotted Python name` which refers to a view callable.
-
-        The ``attr`` argument should be the attribute of the view
-        callable used to retrieve the response (see the ``add_view``
-        method's ``attr`` argument for a description).
-
-        The ``renderer`` argument should be the name of (or path to) a
-        :term:`renderer` used to generate a response for this view
-        (see the
-        :meth:`pyramid.config.Configurator.add_view`
-        method's ``renderer`` argument for information about how a
-        configurator relates to a renderer).
-
-        The ``wrapper`` argument should be the name of another view
-        which will wrap this view when rendered (see the ``add_view``
-        method's ``wrapper`` argument for a description).
+           This method is new as of Pyramid 1.3.
         """
-        if isinstance(renderer, string_types):
-            renderer = renderers.RendererHelper(
-                name=renderer, package=self.package,
-                registry=self.registry)
-        view = self._derive_view(view, attr=attr, renderer=renderer)
-        def bwcompat_view(context, request):
-            context = getattr(request, 'context', None)
-            return view(context, request)
-        return self.add_view(bwcompat_view, context=HTTPNotFound,
-                             wrapper=wrapper, renderer=renderer)
+        settings = dict(
+            view=view,
+            context=HTTPForbidden,
+            wrapper=wrapper,
+            request_type=request_type,
+            request_method=request_method,
+            request_param=request_param,
+            containment=containment,
+            xhr=xhr,
+            accept=accept,
+            header=header, 
+            path_info=path_info,
+            custom_predicates=custom_predicates,
+            decorator=decorator,
+            mapper=mapper,
+            match_param=match_param,
+            route_name=route_name,
+            permission=NO_PERMISSION_REQUIRED,
+            attr=attr,
+            renderer=renderer,
+            )
+        return self.add_view(**settings)
+
+    set_forbidden_view = add_forbidden_view # deprecated sorta-bw-compat alias
+    
+    @action_method
+    def add_notfound_view(
+            self, view=None, attr=None, renderer=None,  wrapper=None,
+            route_name=None, request_type=None, request_method=None, 
+            request_param=None, containment=None, xhr=None, accept=None,
+            header=None, path_info=None,  custom_predicates=(), decorator=None,
+            mapper=None, match_param=None, append_slash=False):
+        """ Add a default notfound view to the current configuration state.
+        The view will be called when Pyramid or application code raises an
+        :exc:`pyramid.httpexceptions.HTTPForbidden` exception (e.g. when a
+        view cannot be found for the request).  The simplest example is:
+
+          .. code-block:: python
+
+            def notfound(request):
+                return Response('Not Found', status='404 Not Found')
+
+            config.add_notfound_view(notfound)
+
+        All arguments except ``append_slash`` have the same meaning as
+        :meth:`pyramid.config.Configurator.add_view` and each predicate
+        argument restricts the set of circumstances under which this notfound
+        view will be invoked.
+
+        If ``append_slash`` is ``True``, when this notfound view is invoked,
+        and the current path info does not end in a slash, the notfound logic
+        will attempt to find a :term:`route` that matches the request's path
+        info suffixed with a slash.  If such a route exists, Pyramid will
+        issue a redirect to the URL implied by the route; if it does not,
+        Pyramid will return the result of the view callable provided as
+        ``view``, as normal.
+
+        .. note::
+
+           This method is new as of Pyramid 1.3.
+        """
+        settings = dict(
+            view=view,
+            context=HTTPNotFound,
+            wrapper=wrapper,
+            request_type=request_type,
+            request_method=request_method,
+            request_param=request_param,
+            containment=containment,
+            xhr=xhr,
+            accept=accept,
+            header=header, 
+            path_info=path_info,
+            custom_predicates=custom_predicates,
+            decorator=decorator,
+            mapper=mapper,
+            match_param=match_param,
+            route_name=route_name,
+            permission=NO_PERMISSION_REQUIRED,
+            )
+        if append_slash:
+            view = self._derive_view(view, attr=attr, renderer=renderer)
+            view = AppendSlashNotFoundViewFactory(view)
+            settings['view'] = view
+        else:
+            settings['attr'] = attr
+            settings['renderer'] = renderer
+        return self.add_view(**settings)
+
+    set_notfound_view = add_notfound_view # deprecated sorta-bw-compat alias
 
     @action_method
     def set_view_mapper(self, mapper):
@@ -1295,7 +1489,13 @@ class ViewsConfiguratorMixin(object):
             self.registry.registerUtility(mapper, IViewMapperFactory)
         # IViewMapperFactory is looked up as the result of view config
         # in phase 3
-        self.action(IViewMapperFactory, register, order=PHASE1_CONFIG)
+        intr = self.introspectable('view mappers',
+                                   IViewMapperFactory,
+                                   self.object_description(mapper),
+                                   'default view mapper')
+        intr['mapper'] = mapper
+        self.action(IViewMapperFactory, register, order=PHASE1_CONFIG,
+                    introspectables=(intr,))
 
     @action_method
     def add_static_view(self, name, path, **kw):
@@ -1340,8 +1540,8 @@ class ViewsConfiguratorMixin(object):
         some URL is visited; :meth:`pyramid.request.Request.static_url`
         generates a URL to that asset.
 
-        The ``name`` argument to ``add_static_view`` is usually a :term:`view
-        name`.  When this is the case, the
+        The ``name`` argument to ``add_static_view`` is usually a simple URL
+        prefix (e.g. ``'images'``).  When this is the case, the
         :meth:`pyramid.request.Request.static_url` API will generate a URL
         which points to a Pyramid view, which will serve up a set of assets
         that live in the package itself. For example:
@@ -1400,7 +1600,6 @@ class ViewsConfiguratorMixin(object):
         if info is None:
             info = StaticURLInfo()
             self.registry.registerUtility(info, IStaticURLInfo)
-
         info.add(self, name, spec, **kw)
 
 def isexception(o):
@@ -1430,11 +1629,14 @@ class StaticURLInfo(object):
             registry = get_current_registry()
         for (url, spec, route_name) in self._get_registrations(registry):
             if path.startswith(spec):
-                subpath = url_quote(path[len(spec):])
+                subpath = path[len(spec):]
+                if WIN: # pragma: no cover
+                    subpath = subpath.replace('\\', '/') # windows
                 if url is None:
                     kw['subpath'] = subpath
                     return request.route_url(route_name, **kw)
                 else:
+                    subpath = url_quote(subpath)
                     return urljoin(url, subpath)
 
         raise ValueError('No static URL definition matching %s' % path)
@@ -1445,8 +1647,12 @@ class StaticURLInfo(object):
         # appending a slash here if the spec doesn't have one is
         # required for proper prefix matching done in ``generate``
         # (``subpath = path[len(spec):]``).
-        if not spec.endswith('/'):
-            spec = spec + '/'
+        if os.path.isabs(spec): # FBO windows
+            sep = os.sep
+        else:
+            sep = '/'
+        if not spec.endswith(sep):
+            spec = spec + sep
 
         # we also make sure the name ends with a slash, purely as a
         # convenience: a name that is a url is required to end in a
@@ -1524,6 +1730,13 @@ class StaticURLInfo(object):
             # url, spec, route_name
             registrations.append((url, spec, route_name))
 
-        config.action(None, callable=register)
+        intr = config.introspectable('static views',
+                                     name,
+                                     'static view for %r' % name,
+                                     'static view')
+        intr['name'] = name
+        intr['spec'] = spec
+
+        config.action(None, callable=register, introspectables=(intr,))
 
 

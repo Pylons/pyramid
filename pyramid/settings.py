@@ -26,6 +26,8 @@ deprecated(
     'the ``settings`` attribute of the registry available from the request '
     '(``request.registry.settings``)).')
 
+truthy = frozenset(('t', 'true', 'y', 'yes', 'on', '1'))
+
 def asbool(s):
     """ Return the boolean value ``True`` if the case-lowered value of string
     input ``s`` is any of ``t``, ``true``, ``y``, ``on``, or ``1``, otherwise
@@ -34,10 +36,10 @@ def asbool(s):
     or ``False``, return it."""
     if s is None:
         return False
-    if s in (True, False):
+    if isinstance(s, bool):
         return s
     s = str(s).strip()
-    return s.lower() in ('t', 'true', 'y', 'yes', 'on', '1')
+    return s.lower() in truthy
 
 def aslist_cronly(value):
     if isinstance(value, string_types):

@@ -4,27 +4,22 @@
 Adding Authorization
 ====================
 
-Our application currently allows anyone with access to the server to
-view, edit, and add pages to our wiki.  For purposes of demonstration
-we'll change our application to allow only people whom possess a
-specific username (`editor`) to add and edit wiki pages but we'll
-continue allowing anyone with access to the server to view pages.
-:app:`Pyramid` provides facilities for :term:`authorization` and
-:term:`authentication`.  We'll make use of both features to provide security
-to our application.
+:app:`Pyramid` provides facilities for :term:`authentication` and
+:term:`authorization`.  We'll make use of both features to provide security
+to our application.  Our application currently allows anyone with access to
+the server to view, edit, and add pages to our wiki.  We'll change our
+application to allow only people whom possess a specific username (`editor`)
+to add and edit wiki pages but we'll continue allowing anyone with access to
+the server to view pages.
 
-We will add an :term:`authentication policy` and an
-:term:`authorization policy` to our :term:`application
-registry`, add a ``security.py`` module, create a :term:`root factory`
-with an :term:`ACL`, and add :term:`permission` declarations to
-the ``edit_page`` and ``add_page`` views.
-
-Then we will add ``login`` and ``logout`` views, and modify the
-existing views to make them return a ``logged_in`` flag to the
-renderer.
-
-Finally, we will add a ``login.pt`` template and change the existing
-``view.pt`` and ``edit.pt`` to show a "Logout" link when not logged in.
+To do so, we'll add an :term:`authentication policy` and an
+:term:`authorization policy`.  We'll also add a ``security.py`` module,
+create a :term:`root factory` with an :term:`ACL`, and add :term:`permission`
+declarations to the ``edit_page`` and ``add_page`` views.  Then we'll add
+``login`` and ``logout`` views, and modify the existing views to make them
+return a ``logged_in`` flag to the renderer.  Finally, we will add a
+``login.pt`` template and change the existing ``view.pt`` and ``edit.pt`` to
+show a "Logout" link when not logged in.
 
 The source code for this tutorial stage can be browsed at
 `http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/authorization/
@@ -54,7 +49,7 @@ inside our ``models.py`` file.  Add the following statements to your
 ``models.py`` file:
 
 .. literalinclude:: src/authorization/tutorial/models.py
-   :lines: 3-4,45-50
+   :lines: 1-4,35-39
    :linenos:
    :language: python
 
@@ -92,14 +87,14 @@ We'll change our ``__init__.py`` file to enable an
 declarative security checking. We need to import the new policies:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 2-3,8
+   :lines: 2-3,7
    :linenos:
    :language: python
 
 Then, we'll add those policies to the configuration:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 15-21
+   :lines: 16-22
    :linenos:
    :language: python
 
@@ -111,49 +106,12 @@ represented by this policy: it is required.  The ``callback`` is a
 ``groupfinder`` function in the current directory's ``security.py`` file.  We
 haven't added that module yet, but we're about to.
 
-We'll also change ``__init__.py``, adding a call to
-:meth:`pyramid.config.Configurator.add_view` that points at our ``login``
-:term:`view callable`.  This is also known as a :term:`forbidden view`:
-
-.. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 25,41-43
-   :linenos:
-   :language: python
-
-A forbidden view configures our newly created login view to show up when
-:app:`Pyramid` detects that a view invocation can not be authorized.
-
-A ``logout`` :term:`view callable` will allow users to log out later:
-
-.. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 26,34
-   :linenos:
-   :language: python
-
-We'll also add ``permission`` arguments with the value ``edit`` to the
-``edit_page`` and ``add_page`` views.  This indicates that the view
-callables which these views reference cannot be invoked without the
-authenticated user possessing the ``edit`` permission with respect to the
-current context.
-
-.. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 37-40
-   :linenos:
-   :language: python
-
-Adding these ``permission`` arguments causes Pyramid to make the
-assertion that only users who possess the effective ``edit`` permission at
-the time of the request may invoke those two views.  We've granted the
-``group:editors`` principal the ``edit`` permission at the root model via its
-ACL, so only the a user whom is a member of the group named ``group:editors``
-will able to invoke the views associated with the ``add_page`` or
-``edit_page`` routes.
-
 Viewing Your Changes
 ~~~~~~~~~~~~~~~~~~~~
 
-When we're done configuring a root factory, adding an authorization policy,
-and adding views, your application's ``__init__.py`` will look like this:
+When we're done configuring a root factory, adding a authentication and
+authorization policies, and adding routes for ``/login`` and ``/logout``,
+your application's ``__init__.py`` will look like this:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :linenos:
@@ -191,30 +149,56 @@ views, the ``editor`` user should be able to add and edit pages.
 Adding Login and Logout Views
 -----------------------------
 
-We'll add a ``login`` view callable which renders a login form and
-processes the post from the login form, checking credentials.
+To our ``views.py`` we'll add a ``login`` view callable which renders a login
+form and processes the post from the login form, checking credentials.
 
 We'll also add a ``logout`` view callable to our application and
 provide a link to it.  This view will clear the credentials of the
 logged in user and redirect back to the front page.
 
-We'll add a different file (for presentation convenience) to add login
-and the logout view callables.  Add a file named ``login.py`` to your
-application (in the same directory as ``views.py``) with the following
-content:
+The ``login`` view callable will look something like this:
 
-.. literalinclude:: src/authorization/tutorial/login.py
+.. literalinclude:: src/authorization/tutorial/views.py
+   :lines: 89-115
    :linenos:
    :language: python
+
+The ``logout`` view callable will look something like this:
+
+.. literalinclude:: src/authorization/tutorial/views.py
+   :lines: 117-121
+   :linenos:
+   :language: python
+
+The ``login`` view callable is decorated with two decorators, a
+``@view_config`` decorators, which associates it with the ``login`` route,
+the other a ``@forbidden_view_config`` decorator which turns it in to an
+:term:`exception view` when Pyramid raises a
+:class:`pyramid.httpexceptions.HTTPForbidden` exception.  The one which
+associates it with the ``login`` route makes it visible when we visit
+``/login``.  The other one makes it a :term:`forbidden view`.  The forbidden
+view is displayed whenever Pyramid or your application raises an
+HTTPForbidden exception.  In this case, we'll be relying on the forbidden
+view to show the login form whenver someone attempts to execute an action
+which they're not yet authorized to perform.
+
+The ``logout`` view callable is decorated with a ``@view_config`` decorator
+which associates it with the ``logout`` route.  This makes it visible when we
+visit ``/login``.
+
+We'll need to import some stuff to service the needs of these two functions:
+the ``pyramid.view.forbidden_view_config`` class, a number of values from the
+``pyramid.security`` module, and a value from our newly added
+``tutorial.security`` package.
 
 Changing Existing Views
 -----------------------
 
 Then we need to change each of our ``view_page``, ``edit_page`` and
-``add_page`` views in ``views.py`` to pass a "logged in" parameter to its
-template.  We'll add something like this to each view body:
+``add_page`` view callables in ``views.py``.  Within each of these views,
+we'll need to pass a "logged in" parameter to its template.  We'll add
+something like this to each view body:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -224,7 +208,6 @@ template.  We'll add something like this to each view body:
 We'll then change the return value of these views to pass the `resulting
 `logged_in`` value to the template, e.g.:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -232,6 +215,28 @@ We'll then change the return value of these views to pass the `resulting
                content = content,
                logged_in = logged_in,
                edit_url = edit_url)
+
+We'll also need to add a ``permission`` value to the ``@view_config``
+decorator for each of the ``add_page`` and ``edit_page`` view callables.  For
+each, we'll add ``permission='edit'``, for example:
+
+.. code-block:: python
+   :linenos:
+
+   @view_config(route_name='edit_page', renderer='templates/edit.pt',
+                permission='edit')
+
+See the ``permission='edit'`` we added there?  This indicates that the view
+callables which these views reference cannot be invoked without the
+authenticated user possessing the ``edit`` permission with respect to the
+current :term:`context`.
+
+Adding these ``permission`` arguments causes Pyramid to make the assertion
+that only users who possess the effective ``edit`` permission at the time of
+the request may invoke those two views.  We've granted the ``group:editors``
+principal the ``edit`` permission at the root model via its ACL, so only the
+a user whom is a member of the group named ``group:editors`` will able to
+invoke the views associated with the ``add_page`` or ``edit_page`` routes.
 
 Adding the ``login.pt`` Template
 --------------------------------

@@ -1,5 +1,7 @@
-from pyramid.httpexceptions import HTTPNotFound
-from pyramid.httpexceptions import HTTPForbidden
+from pyramid.httpexceptions import (
+    HTTPNotFound,
+    HTTPForbidden,
+    )
 
 NotFound = HTTPNotFound # bw compat
 Forbidden = HTTPForbidden # bw compat

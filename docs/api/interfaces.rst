@@ -68,3 +68,18 @@ Other Interfaces
   .. autointerface:: IResponse
      :members:
 
+  .. autointerface:: IIntrospectable
+     :members:
+
+  .. autointerface:: IIntrospector
+     :members:
+
+  .. autointerface:: IActionInfo
+     :members:
+
+  .. autointerface:: IAssetDescriptor
+     :members:
+
+  .. autointerface:: IResourceURL
+     :members:
+

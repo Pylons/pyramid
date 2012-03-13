@@ -24,11 +24,11 @@ The Startup Process
 -------------------
 
 The easiest and best-documented way to start and serve a :app:`Pyramid`
-application is to use the ``pserve`` command against a
-:term:`PasteDeploy` ``.ini`` file.  This uses the ``.ini`` file to infer
-settings and starts a server listening on a port.  For the purposes of this
-discussion, we'll assume that you are using this command to run your
-:app:`Pyramid` application.
+application is to use the ``pserve`` command against a :term:`PasteDeploy`
+``.ini`` file.  This uses the ``.ini`` file to infer settings and starts a
+server listening on a port.  For the purposes of this discussion, we'll
+assume that you are using this command to run your :app:`Pyramid`
+application.
 
 Here's a high-level time-ordered overview of what happens when you press
 ``return`` after running ``pserve development.ini``.
@@ -56,11 +56,12 @@ Here's a high-level time-ordered overview of what happens when you press
 
 #. The framework finds all :mod:`logging` related configuration in the
    ``.ini`` file and uses it to configure the Python standard library logging
-   system for this application.
+   system for this application.  See :ref:`logging_config` for more
+   information.
 
-#. The application's *constructor* (named by the entry point reference or
+#. The application's *constructor* named by the entry point reference or
    dotted Python name on the ``use=`` line of the section representing your
-   :app:`Pyramid` application) is passed the key/value parameters mentioned
+   :app:`Pyramid` application is passed the key/value parameters mentioned
    within the section in which it's defined.  The constructor is meant to
    return a :term:`router` instance, which is a :term:`WSGI` application.
 
@@ -77,13 +78,13 @@ Here's a high-level time-ordered overview of what happens when you press
    Note that the constructor function accepts a ``global_config`` argument,
    which is a dictionary of key/value pairs mentioned in the ``[DEFAULT]``
    section of an ``.ini`` file (if `[DEFAULT]
-   <http://docs.pylonsproject.org/projects/pyramid/dev/narr/paste.html
-   #defaults-section-of-a-pastedeploy-ini-file>`__ is present).  It also
-   accepts a ``**settings`` argument, which collects another set of arbitrary
-   key/value pairs.  The arbitrary key/value pairs received by this function
-   in ``**settings`` will be composed of all the key/value pairs that are
-   present in the ``[app:main]`` section (except for the ``use=`` setting)
-   when this function is called by when you run ``pserve``.
+   <http://docs.pylonsproject.org/projects/pyramid/dev/narr/paste.html#defaults-section-of-a-pastedeploy-ini-file>`__
+   is present).  It also accepts a ``**settings`` argument, which collects
+   another set of arbitrary key/value pairs.  The arbitrary key/value pairs
+   received by this function in ``**settings`` will be composed of all the
+   key/value pairs that are present in the ``[app:main]`` section (except for
+   the ``use=`` setting) when this function is called by when you run
+   ``pserve``.
 
    Our generated ``development.ini`` file looks like so:
 
@@ -97,17 +98,13 @@ Here's a high-level time-ordered overview of what happens when you press
    will receive the key/value pairs ``{'pyramid.reload_templates':'true',
    'pyramid.debug_authorization':'false', 'pyramid.debug_notfound':'false',
    'pyramid.debug_routematch':'false', 'pyramid.debug_templates':'true',
-   'pyramid.default_locale_name':'en'}``.
+   'pyramid.default_locale_name':'en'}``.  See :ref:`environment_chapter` for
+   the meanings of these keys.
 
 #. The ``main`` function first constructs a
-   :class:`~pyramid.config.Configurator` instance, passing a root resource
-   factory (constructor) to it as its ``root_factory`` argument, and
-   ``settings`` dictionary captured via the ``**settings`` kwarg as its
-   ``settings`` argument.
-
-   The root resource factory is invoked on every request to retrieve the
-   application's root resource.  It is not called during startup, only when a
-   request is handled.
+   :class:`~pyramid.config.Configurator` instance, passing the ``settings``
+   dictionary captured via the ``**settings`` kwarg as its ``settings``
+   argument.
 
    The ``settings`` dictionary contains all the options in the ``[app:main]``
    section of our .ini file except the ``use`` option (which is internal to
@@ -135,8 +132,8 @@ Here's a high-level time-ordered overview of what happens when you press
    far as ``pserve`` is concerned, it is "just another WSGI application".
 
 #. ``pserve`` starts the WSGI *server* defined within the ``[server:main]``
-   section.  In our case, this is the ``egg:pyramid#wsgiref`` server (``use =
-   egg:pyramid#wsgiref``), and it will listen on all interfaces (``host =
+   section.  In our case, this is the Waitress server (``use =
+   egg:waitress#main``), and it will listen on all interfaces (``host =
    0.0.0.0``), on port number 6543 (``port = 6543``).  The server code itself
    is what prints ``serving on 0.0.0.0:6543 view at http://127.0.0.1:6543``.
    The server serves the application, and the application is running, waiting

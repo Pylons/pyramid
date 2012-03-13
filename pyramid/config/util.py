@@ -1,17 +1,39 @@
 import re
 import traceback
 
-from pyramid.compat import string_types
-from pyramid.compat import bytes_
-from pyramid.compat import is_nonstr_iter
+from zope.interface import implementer
+
+from pyramid.interfaces import IActionInfo
+
+from pyramid.compat import (
+    bytes_,
+    is_nonstr_iter,
+    )
+
 from pyramid.exceptions import ConfigurationError
-from pyramid.traversal import find_interface
-from pyramid.traversal import traversal_path_info
+
+from pyramid.traversal import (
+    find_interface,
+    traversal_path,
+    )
 
 from hashlib import md5
 
 MAX_ORDER = 1 << 30
 DEFAULT_PHASH = md5().hexdigest()
+
+@implementer(IActionInfo)
+class ActionInfo(object):
+    def __init__(self, file, line, function, src):
+        self.file = file
+        self.line = line
+        self.function = function
+        self.src = src
+
+    def __str__(self):
+        srclines = self.src.split('\n')
+        src = '\n'.join('    %s' % x for x in srclines)
+        return 'Line %s of file %s:\n%s' % (self.line, self.file, src)
 
 def action_method(wrapped):
     """ Wrapper to provide the right conflict info report data when a method
@@ -20,12 +42,17 @@ def action_method(wrapped):
         if self._ainfo is None:
             self._ainfo = []
         info = kw.pop('_info', None)
+        # backframes for outer decorators to actionmethods
+        backframes = kw.pop('_backframes', 2)
+        if is_nonstr_iter(info) and len(info) == 4:
+            # _info permitted as extract_stack tuple
+            info = ActionInfo(*info)
         if info is None:
             try:
                 f = traceback.extract_stack(limit=3)
-                info = f[-2]
+                info = ActionInfo(*f[-backframes])
             except: # pragma: no cover
-                info = ''
+                info = ActionInfo(None, 0, '', '')
         self._ainfo.append(info)
         try:
             result = wrapped(self, *arg, **kw)
@@ -104,7 +131,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         request_method = sorted(request_method)
         def request_method_predicate(context, request):
             return request.method in request_method
-        text = "request method = %s" % repr(request_method)
+        text = "request method = %r" % request_method
         request_method_predicate.__text__ = text
         weights.append(1 << 2)
         predicates.append(request_method_predicate)
@@ -117,7 +144,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         except re.error as why:
             raise ConfigurationError(why.args[0])
         def path_info_predicate(context, request):
-            return path_info_val.match(request.path_info) is not None
+            return path_info_val.match(request.upath_info) is not None
         text = "path_info = %s"
         path_info_predicate.__text__ = text % path_info
         weights.append(1 << 3)
@@ -177,7 +204,8 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
 
     if containment is not None:
         def containment_predicate(context, request):
-            return find_interface(context, containment) is not None
+            ctx = getattr(request, 'context', context)
+            return find_interface(ctx, containment) is not None
         containment_predicate.__text__ = "containment = %s" % containment
         weights.append(1 << 7)
         predicates.append(containment_predicate)
@@ -193,19 +221,21 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         h.update(bytes_('request_type:%r' % hash(request_type)))
 
     if match_param is not None:
-        if isinstance(match_param, string_types):
-            match_param, match_param_val = match_param.split('=', 1)
-            match_param = {match_param: match_param_val}
-        text = "match_param %s" % match_param
+        if not is_nonstr_iter(match_param):
+            match_param = (match_param,)
+        match_param = sorted(match_param)
+        text = "match_param %s" % repr(match_param)
+        reqs = [p.split('=', 1) for p in match_param]
         def match_param_predicate(context, request):
-            for k, v in match_param.items():
+            for k, v in reqs:
                 if request.matchdict.get(k) != v:
                     return False
             return True
         match_param_predicate.__text__ = text
         weights.append(1 << 9)
         predicates.append(match_param_predicate)
-        h.update(bytes_('match_param:%r' % match_param))
+        for p in match_param:
+            h.update(bytes_('match_param:%r' % p))
 
     if custom:
         for num, predicate in enumerate(custom):
@@ -240,8 +270,8 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
             if 'traverse' in context:
                 return True
             m = context['match']
-            tvalue = tgenerate(m)
-            m['traverse'] = traversal_path_info(tvalue)
+            tvalue = tgenerate(m) # tvalue will be urlquoted string
+            m['traverse'] = traversal_path(tvalue) # will be seq of unicode
             return True
         # This isn't actually a predicate, it's just a infodict
         # modifier that injects ``traverse`` into the matchdict.  As a

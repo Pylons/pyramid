@@ -19,24 +19,66 @@ found view`, which is a :term:`view callable`. A default notfound view
 exists.  The default not found view can be overridden through application
 configuration.
 
-The :term:`not found view` callable is a view callable like any other.  The
-:term:`view configuration` which causes it to be a "not found" view consists
-only of naming the :exc:`pyramid.httpexceptions.HTTPNotFound` class as the
-``context`` of the view configuration.
-
 If your application uses :term:`imperative configuration`, you can replace
-the Not Found view by using the :meth:`pyramid.config.Configurator.add_view`
-method to register an "exception view":
+the Not Found view by using the
+:meth:`pyramid.config.Configurator.add_notfound_view` method:
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.httpexceptions import HTTPNotFound
-   from helloworld.views import notfound_view
-   config.add_view(notfound_view, context=HTTPNotFound)
+   from helloworld.views import notfound
+   config.add_notfound_view(notfound)
 
-Replace ``helloworld.views.notfound_view`` with a reference to the
-:term:`view callable` you want to use to represent the Not Found view.
+Replace ``helloworld.views.notfound`` with a reference to the :term:`view
+callable` you want to use to represent the Not Found view.  The :term:`not
+found view` callable is a view callable like any other.
+
+If your application instead uses :class:`pyramid.view.view_config` decorators
+and a :term:`scan`, you can replace the Not Found view by using the
+:class:`pyramid.view.notfound_view_config` decorator:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.view import notfound_view_config
+
+   @notfound_view_config()
+   def notfound(request):
+       return Response('Not Found, dude', status='404 Not Found')
+
+   def main(globals, **settings):
+      config = Configurator()
+      config.scan()
+
+This does exactly what the imperative example above showed.
+
+Your application can define *multiple* not found views if necessary.  Both
+:meth:`pyramid.config.Configurator.add_notfound_view` and
+:class:`pyramid.view.notfound_view_config` take most of the same arguments as
+:class:`pyramid.config.Configurator.add_view` and
+:class:`pyramid.view.view_config`, respectively.  This means that not found
+views can carry predicates limiting their applicability.  For example:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.view import notfound_view_config
+
+   @notfound_view_config(request_method='GET')
+   def notfound_get(request):
+       return Response('Not Found during GET, dude', status='404 Not Found')
+
+   @notfound_view_config(request_method='POST')
+   def notfound_post(request):
+       return Response('Not Found during POST, dude', status='404 Not Found')
+
+   def main(globals, **settings):
+      config = Configurator()
+      config.scan()
+
+The ``notfound_get`` view will be called when a view could not be found and
+the request method was ``GET``.  The ``notfound_post`` view will be called
+when a view could not be found and the request method was ``POST``.
 
 Like any other view, the notfound view must accept at least a ``request``
 parameter, or both ``context`` and ``request``.  The ``request`` is the
@@ -45,6 +87,11 @@ used in the call signature) will be the instance of the
 :exc:`~pyramid.httpexceptions.HTTPNotFound` exception that caused the view to
 be called.
 
+Both :meth:`pyramid.config.Configurator.add_notfound_view` and
+:class:`pyramid.view.notfound_view_config` can be used to automatically
+redirect requests to slash-appended routes. See
+:ref:`redirecting_to_slash_appended_routes` for examples.
+
 Here's some sample code that implements a minimal NotFound view callable:
 
 .. code-block:: python
@@ -52,7 +99,7 @@ Here's some sample code that implements a minimal NotFound view callable:
 
    from pyramid.httpexceptions import HTTPNotFound
 
-   def notfound_view(request):
+   def notfound(request):
        return HTTPNotFound()
 
 .. note::
@@ -65,6 +112,14 @@ Here's some sample code that implements a minimal NotFound view callable:
    error was raised.  This message will be different when the
    ``pyramid.debug_notfound`` environment setting is true than it is when it
    is false.
+
+.. note::
+
+   Both :meth:`pyramid.config.Configurator.add_notfound_view` and
+   :class:`pyramid.view.notfound_view_config` are new as of Pyramid 1.3.
+   Older Pyramid documentation instructed users to use ``add_view`` instead,
+   with a ``context`` of ``HTTPNotFound``.  This still works; the convenience
+   method and decorator are just wrappers around this functionality.
 
 .. warning::
 
@@ -90,22 +145,39 @@ the view which generates it can be overridden as necessary.
 
 The :term:`forbidden view` callable is a view callable like any other.  The
 :term:`view configuration` which causes it to be a "forbidden" view consists
-only of naming the :exc:`pyramid.httpexceptions.HTTPForbidden` class as the
-``context`` of the view configuration.
+of using the meth:`pyramid.config.Configurator.add_forbidden_view` API or the
+:class:`pyramid.view.forbidden_view_config` decorator.
 
-You can replace the forbidden view by using the
-:meth:`pyramid.config.Configurator.add_view` method to register an "exception
-view":
+For example, you can add a forbidden view by using the
+:meth:`pyramid.config.Configurator.add_forbidden_view` method to register a
+forbidden view:
 
 .. code-block:: python
    :linenos:
 
    from helloworld.views import forbidden_view
    from pyramid.httpexceptions import HTTPForbidden
-   config.add_view(forbidden_view, context=HTTPForbidden)
+   config.add_forbidden_view(forbidden_view)
 
 Replace ``helloworld.views.forbidden_view`` with a reference to the Python
 :term:`view callable` you want to use to represent the Forbidden view.
+
+If instead you prefer to use decorators and a :term:`scan`, you can use the
+:class:`pyramid.view.forbidden_view_config` decorator to mark a view callable
+as a forbidden view:
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.view import forbidden_view_config
+
+   forbidden_view_config()
+   def forbidden(request):
+       return Response('forbidden')
+
+   def main(globals, **settings):
+      config = Configurator()
+      config.scan()
 
 Like any other view, the forbidden view must accept at least a ``request``
 parameter, or both ``context`` and ``request``.  The ``context`` (available
@@ -119,7 +191,7 @@ Here's some sample code that implements a minimal forbidden view:
 .. code-block:: python
    :linenos:
 
-   from pyramid.views import view_config
+   from pyramid.view import view_config
    from pyramid.response import Response
 
    def forbidden_view(request):
@@ -145,10 +217,10 @@ Here's some sample code that implements a minimal forbidden view:
 Changing the Request Factory
 ----------------------------
 
-Whenever :app:`Pyramid` handles a :term:`WSGI` request, it creates a
-:term:`request` object based on the WSGI environment it has been passed.  By
-default, an instance of the :class:`pyramid.request.Request` class is created
-to represent the request object.
+Whenever :app:`Pyramid` handles a request from a :term:`WSGI` server, it
+creates a :term:`request` object based on the WSGI environment it has been
+passed.  By default, an instance of the :class:`pyramid.request.Request`
+class is created to represent the request object.
 
 The class (aka "factory") that :app:`Pyramid` uses to create a request object
 instance can be changed by passing a ``request_factory`` argument to the
@@ -236,11 +308,11 @@ Adding Renderer Globals (Deprecated)
    is documented in :ref:`beforerender_event`.
 
 Whenever :app:`Pyramid` handles a request to perform a rendering (after a
-view with a ``renderer=`` configuration attribute is invoked, or when any
-of the methods beginning with ``render`` within the :mod:`pyramid.renderers`
+view with a ``renderer=`` configuration attribute is invoked, or when any of
+the methods beginning with ``render`` within the :mod:`pyramid.renderers`
 module are called), *renderer globals* can be injected into the *system*
 values sent to the renderer.  By default, no renderer globals are injected,
-and the "bare" system values (such as ``request``, ``context``, and
+and the "bare" system values (such as ``request``, ``context``, ``view``, and
 ``renderer_name``) are the only values present in the system dictionary
 passed to every renderer.
 
@@ -349,15 +421,14 @@ parameter: ``request``.  For example:
 .. code-block:: python
    :linenos:
 
-   import transaction
+   import logging
 
-   def commit_callback(request):
-       '''commit or abort the transaction associated with request'''
-       if request.exception is not None:
-           transaction.abort()
-       else:
-           transaction.commit()
-   request.add_finished_callback(commit_callback)
+   log = logging.getLogger(__name__)
+
+   def log_callback(request):
+       """Log information at the end of request"""
+       log.debug('Request is finished.')
+   request.add_finished_callback(log_callback)
 
 Finished callbacks are called in the order they're added
 (first-to-most-recently-added).  Finished callbacks (unlike a
@@ -374,12 +445,6 @@ performed to the ``request`` provided to a finished callback will have no
 meaningful effect, because response processing will have already occurred,
 and the request's scope will expire almost immediately after all finished
 callbacks have been processed.
-
-It is often necessary to tell whether an exception occurred within
-:term:`view callable` code from within a finished callback: in such a case,
-the :attr:`request.exception` attribute of the request when it enters a
-response callback will be an exception object instead of its default value of
-``None``.
 
 Errors raised by finished callbacks are not handled specially.  They
 will be propagated to the caller of the :app:`Pyramid` router
@@ -406,11 +471,10 @@ via configuration.
 .. code-block:: python
    :linenos:
 
-   from pyramid.interfaces import ITraverser
-   from zope.interface import Interface
+   from pyramid.config import Configurator
    from myapp.traversal import Traverser
-
-   config.registry.registerAdapter(Traverser, (Interface,), ITraverser)
+   config = Configurator()
+   config.add_traverser(Traverser)
 
 In the example above, ``myapp.traversal.Traverser`` is assumed to be a class
 that implements the following interface:
@@ -448,7 +512,7 @@ that implements the following interface:
 
 More than one traversal algorithm can be active at the same time.  For
 instance, if your :term:`root factory` returns more than one type of object
-conditionally, you could claim that an alternate traverser adapter is ``for``
+conditionally, you could claim that an alternate traverser adapter is "for"
 only one particular class or interface.  When the root factory returned an
 object that implemented that class or interface, a custom traverser would be
 used.  Otherwise, the default traverser would be used.  For example:
@@ -456,12 +520,11 @@ used.  Otherwise, the default traverser would be used.  For example:
 .. code-block:: python
    :linenos:
 
-   from pyramid.interfaces import ITraverser
-   from zope.interface import Interface
    from myapp.traversal import Traverser
    from myapp.resources import MyRoot
-
-   config.registry.registerAdapter(Traverser, (MyRoot,), ITraverser)
+   from pyramid.config import Configurator
+   config = Configurator()
+   config.add_traverser(Traverser, MyRoot)
 
 If the above stanza was added to a Pyramid ``__init__.py`` file's ``main``
 function, :app:`Pyramid` would use the ``myapp.traversal.Traverser`` only
@@ -481,57 +544,54 @@ When you add a traverser as described in :ref:`changing_the_traverser`, it's
 often convenient to continue to use the
 :meth:`pyramid.request.Request.resource_url` API.  However, since the way
 traversal is done will have been modified, the URLs it generates by default
-may be incorrect.
+may be incorrect when used against resources derived from your custom
+traverser.
 
 If you've added a traverser, you can change how
 :meth:`~pyramid.request.Request.resource_url` generates a URL for a specific
-type of resource by adding a registerAdapter call for
-:class:`pyramid.interfaces.IContextURL` to your application:
+type of resource by adding a call to
+:meth:`pyramid.config.add_resource_url_adapter`.
+
+For example:
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.interfaces import ITraverser
-   from zope.interface import Interface
-   from myapp.traversal import URLGenerator
+   from myapp.traversal import ResourceURLAdapter
    from myapp.resources import MyRoot
 
-   config.registry.registerAdapter(URLGenerator, (MyRoot, Interface),
-                                   IContextURL)
+   config.add_resource_url_adapter(ResourceURLAdapter, MyRoot)
 
-In the above example, the ``myapp.traversal.URLGenerator`` class will be used
-to provide services to :meth:`~pyramid.request.Request.resource_url` any time
-the :term:`context` passed to ``resource_url`` is of class
-``myapp.resources.MyRoot``.  The second argument in the ``(MyRoot,
-Interface)`` tuple represents the type of interface that must be possessed by
-the :term:`request` (in this case, any interface, represented by
-``zope.interface.Interface``).
+In the above example, the ``myapp.traversal.ResourceURLAdapter`` class will
+be used to provide services to :meth:`~pyramid.request.Request.resource_url`
+any time the :term:`resource` passed to ``resource_url`` is of the class
+``myapp.resources.MyRoot``.  The ``resource_iface`` argument ``MyRoot``
+represents the type of interface that must be possessed by the resource for
+this resource url factory to be found.  If the ``resource_iface`` argument is
+omitted, this resource url adapter will be used for *all* resources.
 
-The API that must be implemented by a class that provides
-:class:`~pyramid.interfaces.IContextURL` is as follows:
+The API that must be implemented by your a class that provides
+:class:`~pyramid.interfaces.IResourceURL` is as follows:
 
 .. code-block:: python
   :linenos:
 
-  from zope.interface import Interface
-
-  class IContextURL(Interface):
-      """ An adapter which deals with URLs related to a context.
+  class MyResourceURL(object):
+      """ An adapter which provides the virtual and physical paths of a
+          resource
       """
-      def __init__(self, context, request):
-          """ Accept the context and request """
-
-      def virtual_root(self):
-          """ Return the virtual root object related to a request and the
-          current context"""
-
-      def __call__(self):
-          """ Return a URL that points to the context """
+      def __init__(self, resource, request):
+          """ Accept the resource and request and set self.physical_path and 
+          self.virtual_path"""
+          self.virtual_path =  some_function_of(resource, request)
+          self.physical_path =  some_other_function_of(resource, request)
 
 The default context URL generator is available for perusal as the class
-:class:`pyramid.traversal.TraversalContextURL` in the `traversal module
+:class:`pyramid.traversal.ResourceURL` in the `traversal module
 <http://github.com/Pylons/pyramid/blob/master/pyramid/traversal.py>`_ of the
 :term:`Pylons` GitHub Pyramid repository.
+
+See :meth:`pyramid.config.add_resource_url_adapter` for more information.
 
 .. index::
    single: IResponse
@@ -606,24 +666,24 @@ adapter to the more complex IResponse interface:
 If you want to implement your own Response object instead of using the
 :class:`pyramid.response.Response` object in any capacity at all, you'll have
 to make sure the object implements every attribute and method outlined in
-:class:`pyramid.interfaces.IResponse` and you'll have to ensure that it's
-marked up with ``zope.interface.implements(IResponse)``:
+:class:`pyramid.interfaces.IResponse` and you'll have to ensure that it uses
+``zope.interface.implementer(IResponse)`` as a class decoratoror.
 
 .. code-block:: python
    :linenos:
 
    from pyramid.interfaces import IResponse
-   from zope.interface import implements
+   from zope.interface import implementer
 
+   @implementer(IResponse)
    class MyResponse(object):
-       implements(IResponse)
        # ... an implementation of every method and attribute 
        # documented in IResponse should follow ...
 
 When an alternate response object implementation is returned by a view
 callable, if that object asserts that it implements
 :class:`~pyramid.interfaces.IResponse` (via
-``zope.interface.implements(IResponse)``) , an adapter needn't be registered
+``zope.interface.implementer(IResponse)``) , an adapter needn't be registered
 for the object; Pyramid will use it directly.
 
 An IResponse adapter for ``webob.Response`` (as opposed to
@@ -709,7 +769,7 @@ as keyword arguments.
            def wrapper(context, request):
                matchdict = request.matchdict.copy()
                matchdict.pop('action', None)
-               inst = view()
+               inst = view(request)
                meth = getattr(inst, attr)
                return meth(**matchdict)
            return wrapper
@@ -812,13 +872,14 @@ performed, enabling you to set up the utility in advance:
 .. code-block:: python
    :linenos:
 
-   from paste.httpserver import serve
+   from zope.interface import implementer
+
+   from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
    from mypackage.interfaces import IMyUtility
 
+   @implementer(IMyUtility)
    class UtilityImplementation:
-
-       implements(IMyUtility)
 
        def __init__(self):
           self.registrations = {}
@@ -831,7 +892,8 @@ performed, enabling you to set up the utility in advance:
        config.registry.registerUtility(UtilityImplementation())
        config.scan()
        app = config.make_wsgi_app()
-       serve(app, host='0.0.0.0')
+       server = make_server('0.0.0.0', 8080, app)
+       server.serve_forever()
 
 For full details, please read the `Venusian documentation
 <http://docs.repoze.org/venusian>`_.

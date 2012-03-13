@@ -1,19 +1,25 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import locale
 import os
+import platform
 import unittest
 
 from pyramid.wsgi import wsgiapp
 from pyramid.view import view_config
 from pyramid.static import static_view
-from pyramid.compat import text_
-from pyramid.compat import url_quote
+from pyramid.compat import (
+    text_,
+    url_quote,
+    )
 
 from zope.interface import Interface
 
 # 5 years from now (more or less)
 fiveyrsfuture = datetime.datetime.utcnow() + datetime.timedelta(5*365)
+
+defaultlocale = locale.getdefaultlocale()[1]
 
 class INothing(Interface):
     pass
@@ -76,23 +82,27 @@ class TestStaticAppBase(IntegrationBase):
         res = self.testapp.get('/static/.hiddenfile', status=200)
         _assertBody(res.body, os.path.join(here, 'fixtures/static/.hiddenfile'))
 
-    def test_highchars_in_pathelement(self):
-        url = url_quote('/static/héhé/index.html')
-        res = self.testapp.get(url, status=200)
-        _assertBody(
-            res.body,
-            os.path.join(here,
-                         text_('fixtures/static/héhé/index.html', 'utf-8'))
-            )
+    if defaultlocale is not None and platform.system() == 'Linux':
+        # These tests are expected to fail on LANG=C systems due to decode
+        # errors and on non-Linux systems due to git highchar handling
+        # vagaries
+        def test_highchars_in_pathelement(self):
+            url = url_quote('/static/héhé/index.html')
+            res = self.testapp.get(url, status=200)
+            _assertBody(
+                res.body,
+                os.path.join(here,
+                             text_('fixtures/static/héhé/index.html', 'utf-8'))
+                )
 
-    def test_highchars_in_filename(self):
-        url = url_quote('/static/héhé.html')
-        res = self.testapp.get(url, status=200)
-        _assertBody(
-            res.body,
-            os.path.join(here,
-                         text_('fixtures/static/héhé.html', 'utf-8'))
-            )
+        def test_highchars_in_filename(self):
+            url = url_quote('/static/héhé.html')
+            res = self.testapp.get(url, status=200)
+            _assertBody(
+                res.body,
+                os.path.join(here,
+                             text_('fixtures/static/héhé.html', 'utf-8'))
+                )
 
     def test_not_modified(self):
         self.testapp.extra_environ = {
@@ -133,7 +143,7 @@ class TestStaticAppBase(IntegrationBase):
     def test_range_tilend(self):
         self.testapp.extra_environ = {'HTTP_RANGE':'bytes=-5'}
         res = self.testapp.get('/static/index.html', status=206)
-        self.assertEqual(res.body, b'tml>\n')
+        self.assertEqual(res.body, b'html>')
 
     def test_range_notbytes(self):
         self.testapp.extra_environ = {'HTTP_RANGE':'kHz=-5'}
@@ -233,9 +243,8 @@ class TestStaticPermApp(IntegrationBase, unittest.TestCase):
     root_factory = 'pyramid.tests.pkgs.staticpermapp:RootFactory'
     def test_allowed(self):
         result = self.testapp.get('/allowed/index.html', status=200)
-        self.assertEqual(
-            result.body.replace(b'\r', b''),
-            read_(os.path.join(here, 'fixtures/static/index.html')))
+        _assertBody(result.body,
+                    os.path.join(here, 'fixtures/static/index.html'))
 
     def test_denied_via_acl_global_root_factory(self):
         self.testapp.extra_environ = {'REMOTE_USER':'bob'}
@@ -244,9 +253,8 @@ class TestStaticPermApp(IntegrationBase, unittest.TestCase):
     def test_allowed_via_acl_global_root_factory(self):
         self.testapp.extra_environ = {'REMOTE_USER':'fred'}
         result = self.testapp.get('/protected/index.html', status=200)
-        self.assertEqual(
-            result.body.replace(b'\r', b''),
-            read_(os.path.join(here, 'fixtures/static/index.html')))
+        _assertBody(result.body, 
+                    os.path.join(here, 'fixtures/static/index.html'))
 
     def test_denied_via_acl_local_root_factory(self):
         self.testapp.extra_environ = {'REMOTE_USER':'fred'}
@@ -255,9 +263,8 @@ class TestStaticPermApp(IntegrationBase, unittest.TestCase):
     def test_allowed_via_acl_local_root_factory(self):
         self.testapp.extra_environ = {'REMOTE_USER':'bob'}
         result = self.testapp.get('/factory_protected/index.html', status=200)
-        self.assertEqual(
-            result.body.replace(b'\r', b''),
-            read_(os.path.join(here, 'fixtures/static/index.html')))
+        _assertBody(result.body,
+                    os.path.join(here, 'fixtures/static/index.html'))
 
 class TestCCBug(IntegrationBase, unittest.TestCase):
     # "unordered" as reported in IRC by author of
@@ -357,6 +364,32 @@ class TestViewDecoratorApp(IntegrationBase, unittest.TestCase):
         res = self.testapp.get('/second', status=200)
         self.assertTrue(b'OK2' in res.body)
 
+class TestNotFoundView(IntegrationBase, unittest.TestCase):
+    package = 'pyramid.tests.pkgs.notfoundview'
+
+    def test_it(self):
+        res = self.testapp.get('/wontbefound', status=200)
+        self.assertTrue(b'generic_notfound' in res.body)
+        res = self.testapp.get('/bar', status=302)
+        self.assertEqual(res.location, 'http://localhost/bar/')
+        res = self.testapp.get('/bar/', status=200)
+        self.assertTrue(b'OK bar' in res.body)
+        res = self.testapp.get('/foo', status=302)
+        self.assertEqual(res.location, 'http://localhost/foo/')
+        res = self.testapp.get('/foo/', status=200)
+        self.assertTrue(b'OK foo2' in res.body)
+        res = self.testapp.get('/baz', status=200)
+        self.assertTrue(b'baz_notfound' in res.body)
+
+class TestForbiddenView(IntegrationBase, unittest.TestCase):
+    package = 'pyramid.tests.pkgs.forbiddenview'
+
+    def test_it(self):
+        res = self.testapp.get('/foo', status=200)
+        self.assertTrue(b'foo_forbidden' in res.body)
+        res = self.testapp.get('/bar', status=200)
+        self.assertTrue(b'generic_forbidden' in res.body)
+        
 class TestViewPermissionBug(IntegrationBase, unittest.TestCase):
     # view_execution_permitted bug as reported by Shane at http://lists.repoze.org/pipermail/repoze-dev/2010-October/003603.html
     package = 'pyramid.tests.pkgs.permbugapp'
@@ -585,5 +618,14 @@ def read_(filename):
         return val
     
 def _assertBody(body, filename):
-    assert(body.replace(b'\r', b'') == read_(filename))
+    if defaultlocale is None: # pragma: no cover
+        # If system locale does not have an encoding then default to utf-8
+        filename = filename.encode('utf-8')
+    # strip both \n and \r for windows
+    body = body.replace(b'\r', b'')
+    body = body.replace(b'\n', b'')
+    data = read_(filename)
+    data = data.replace(b'\r', b'')
+    data = data.replace(b'\n', b'')
+    assert(body == data)
 

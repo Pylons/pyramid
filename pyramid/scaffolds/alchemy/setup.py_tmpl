@@ -1,5 +1,4 @@
 import os
-import sys
 
 from setuptools import setup, find_packages
 
@@ -14,10 +13,8 @@ requires = [
     'pyramid_tm',
     'pyramid_debugtoolbar',
     'zope.sqlalchemy',
+    'waitress',
     ]
-
-if sys.version_info[:3] < (2,5,0):
-    requires.append('pysqlite')
 
 setup(name='{{project}}',
       version='0.0',
@@ -37,8 +34,8 @@ setup(name='{{project}}',
       include_package_data=True,
       zip_safe=False,
       test_suite='{{package}}',
-      install_requires = requires,
-      entry_points = """\
+      install_requires=requires,
+      entry_points="""\
       [paste.app_factory]
       main = {{package}}:main
       [console_scripts]

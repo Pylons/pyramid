@@ -36,7 +36,7 @@ applications, configured imperatively:
 .. code-block:: python
    :linenos:
 
-   from paste.httpserver import serve
+   from wsgiref.simple_server import make_server
    from pyramid.config import Configurator
    from pyramid.response import Response
 
@@ -47,7 +47,8 @@ applications, configured imperatively:
        config = Configurator()
        config.add_view(hello_world)
        app = config.make_wsgi_app()
-       serve(app, host='0.0.0.0')
+       server = make_server('0.0.0.0', 8080, app)
+       server.serve_forever()
 
 We won't talk much about what this application does yet.  Just note that the
 "configuration' statements take place underneath the ``if __name__ ==
@@ -105,7 +106,8 @@ in a package and its subpackages.  For example:
    .. code-block:: python
       :linenos:
 
-      from paste.httpserver import serve
+      from wsgiref.simple_server import make_server
+      from pyramid.config import Configurator
       from pyramid.response import Response
       from pyramid.view import view_config
      
@@ -118,7 +120,8 @@ in a package and its subpackages.  For example:
           config = Configurator()
           config.scan()
           app = config.make_wsgi_app()
-          serve(app, host='0.0.0.0')
+          server = make_server('0.0.0.0', 8080, app)
+          server.serve_forever()
 
 The scanning machinery imports each module and subpackage in a package or
 module recursively, looking for special attributes attached to objects

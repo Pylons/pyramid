@@ -88,7 +88,8 @@ View the Application in a Browser
 
 We can't.  At this point, our system is in a "non-runnable" state; we'll need
 to change view-related files in the next chapter to be able to start the
-application successfully.  If you try to start the application, you'll wind
+application successfully.  If you try to start the application (See
+:ref:`wiki-start-the-application`), you'll wind
 up with a Python traceback on your console that ends with this exception:
 
 .. code-block:: text

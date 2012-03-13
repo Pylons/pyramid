@@ -3,13 +3,22 @@ import venusian
 from zope.interface import providedBy
 from zope.deprecation import deprecated
 
-from pyramid.interfaces import IRoutesMapper
-from pyramid.interfaces import IView
-from pyramid.interfaces import IViewClassifier
+from pyramid.interfaces import (
+    IRoutesMapper,
+    IView,
+    IViewClassifier,
+    )
 
-from pyramid.compat import map_
-from pyramid.httpexceptions import HTTPFound
-from pyramid.httpexceptions import default_exceptionresponse_view
+from pyramid.compat import (
+    map_,
+    decode_path_info,
+    )
+
+from pyramid.httpexceptions import (
+    HTTPFound,
+    default_exceptionresponse_view,
+    )
+
 from pyramid.path import caller_package
 from pyramid.static import static_view
 from pyramid.threadlocal import get_current_registry
@@ -129,6 +138,15 @@ def render_view(context, request, name='', secure=True):
         return None
     return ''.join(iterable)
 
+class _default(object):
+    def __nonzero__(self):
+        return False
+    __bool__ = __nonzero__
+    def __repr__(self): # pragma: no cover
+        return '(default)'
+
+default = _default()
+
 class view_config(object):
     """ A function, class or method :term:`decorator` which allows a
     developer to create view registrations nearer to a :term:`view
@@ -156,46 +174,37 @@ class view_config(object):
              backwards compatibility purposes, as the name
              :class:`pyramid.view.bfg_view`.
 
-    The following arguments are supported as arguments to
+    The following arguments are supported to
     :class:`pyramid.view.view_config`: ``context``, ``permission``, ``name``,
     ``request_type``, ``route_name``, ``request_method``, ``request_param``,
     ``containment``, ``xhr``, ``accept``, ``header``, ``path_info``,
-    ``custom_predicates``, ``decorator``, ``mapper``, and ``http_cache``.
+    ``custom_predicates``, ``decorator``, ``mapper``, ``http_cache``,
+    and ``match_param``.
 
     The meanings of these arguments are the same as the arguments passed to
-    :meth:`pyramid.config.Configurator.add_view`.
+    :meth:`pyramid.config.Configurator.add_view`.  If any argument is left
+    out, its default will be the equivalent ``add_view`` default.
 
     See :ref:`mapping_views_using_a_decorator_section` for details about
     using :class:`view_config`.
 
     """
     venusian = venusian # for testing injection
-    def __init__(self, name='', request_type=None, for_=None, permission=None,
-                 route_name=None, request_method=None, request_param=None,
-                 containment=None, attr=None, renderer=None, wrapper=None,
-                 xhr=False, accept=None, header=None, path_info=None,
-                 custom_predicates=(), context=None, decorator=None,
-                 mapper=None, http_cache=None, match_param=None):
-        self.name = name
-        self.request_type = request_type
-        self.context = context or for_
-        self.permission = permission
-        self.route_name = route_name
-        self.request_method = request_method
-        self.request_param = request_param
-        self.containment = containment
-        self.attr = attr
-        self.renderer = renderer
-        self.wrapper = wrapper
-        self.xhr = xhr
-        self.accept = accept
-        self.header = header
-        self.path_info = path_info
-        self.custom_predicates = custom_predicates
-        self.decorator = decorator
-        self.mapper = mapper
-        self.http_cache = http_cache
-        self.match_param = match_param
+    def __init__(self, name=default, request_type=default, for_=default,
+                 permission=default, route_name=default,
+                 request_method=default, request_param=default,
+                 containment=default, attr=default, renderer=default,
+                 wrapper=default, xhr=default, accept=default,
+                 header=default, path_info=default,
+                 custom_predicates=default, context=default,
+                 decorator=default, mapper=default, http_cache=default,
+                 match_param=default):
+        L = locals()
+        if (context is not default) or (for_ is not default):
+            L['context'] = context or for_
+        for k, v in L.items():
+            if k not in ('self', 'L') and v is not default:
+                setattr(self, k, v)
 
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
@@ -210,13 +219,26 @@ class view_config(object):
             # if the decorator was attached to a method in a class, or
             # otherwise executed at class scope, we need to set an
             # 'attr' into the settings if one isn't already in there
-            if settings['attr'] is None:
+            if settings.get('attr') is None:
                 settings['attr'] = wrapped.__name__
 
         settings['_info'] = info.codeinfo # fbo "action_method"
         return wrapped
 
 bfg_view = view_config # bw compat (forever)
+
+class view_defaults(view_config):
+    """ A class :term:`decorator` which, when applied to a class, will
+    provide defaults for all view configurations that use the class.  This
+    decorator accepts all the arguments accepted by
+    :class:`pyramid.config.view_config`, and each has the same meaning.
+
+    See :ref:`view_defaults` for more information.
+    """
+    
+    def __call__(self, wrapped):
+        wrapped.__view_defaults__ = self.__dict__.copy()
+        return wrapped
 
 class AppendSlashNotFoundViewFactory(object):
     """ There can only be one :term:`Not Found view` in any
@@ -257,11 +279,7 @@ class AppendSlashNotFoundViewFactory(object):
         self.notfound_view = notfound_view
 
     def __call__(self, context, request):
-        if not isinstance(context, Exception):
-            # backwards compat for an append_notslash_view registered via
-            # config.set_notfound_view instead of as a proper exception view
-            context = getattr(request, 'exception', None) or context
-        path = request.path
+        path = decode_path_info(request.environ['PATH_INFO'] or '/')
         registry = request.registry
         mapper = registry.queryUtility(IRoutesMapper)
         if mapper is not None and not path.endswith('/'):
@@ -270,8 +288,8 @@ class AppendSlashNotFoundViewFactory(object):
                 if route.match(slashpath) is not None:
                     qs = request.query_string
                     if qs:
-                        slashpath += '?' + qs
-                    return HTTPFound(location=slashpath)
+                        qs = '?' + qs
+                    return HTTPFound(location=request.path+'/'+qs)
         return self.notfound_view(context, request)
 
 append_slash_notfound_view = AppendSlashNotFoundViewFactory()
@@ -299,6 +317,145 @@ See also :ref:`changing_the_notfound_view`.
 
 """
 
+class notfound_view_config(object):
+    """
+
+    An analogue of :class:`pyramid.view.view_config` which registers a
+    :term:`not found view`.
+
+    The notfound_view_config constructor accepts most of the same arguments
+    as the constructor of :class:`pyramid.view.view_config`.  It can be used
+    in the same places, and behaves in largely the same way, except it always
+    registers a not found exception view instead of a "normal" view.
+
+    Example:
+
+    .. code-block:: python
+
+        from pyramid.view import notfound_view_config
+        from pyramid.response import Response
+          
+        notfound_view_config()
+        def notfound(request):
+            return Response('Not found, dude!', status='404 Not Found')
+
+    All arguments except ``append_slash`` have the same meaning as
+    :meth:`pyramid.view.view_config` and each predicate
+    argument restricts the set of circumstances under which this notfound
+    view will be invoked.
+
+    If ``append_slash`` is ``True``, when the notfound view is invoked, and
+    the current path info does not end in a slash, the notfound logic will
+    attempt to find a :term:`route` that matches the request's path info
+    suffixed with a slash.  If such a route exists, Pyramid will issue a
+    redirect to the URL implied by the route; if it does not, Pyramid will
+    return the result of the view callable provided as ``view``, as normal.
+
+    See :ref:`changing_the_notfound_view` for detailed usage information.
+
+    .. note::
+
+       This class is new as of Pyramid 1.3.
+    """
+
+    venusian = venusian
+
+    def __init__(self, request_type=default, request_method=default,
+                 route_name=default, request_param=default, attr=default,
+                 renderer=default, containment=default, wrapper=default, 
+                 xhr=default, accept=default, header=default,
+                 path_info=default,  custom_predicates=default, 
+                 decorator=default, mapper=default, match_param=default, 
+                 append_slash=False):
+        L = locals()
+        for k, v in L.items():
+            if k not in ('self', 'L') and v is not default:
+                self.__dict__[k] = v
+
+    def __call__(self, wrapped):
+        settings = self.__dict__.copy()
+
+        def callback(context, name, ob):
+            config = context.config.with_package(info.module)
+            config.add_notfound_view(view=ob, **settings)
+
+        info = self.venusian.attach(wrapped, callback, category='pyramid')
+
+        if info.scope == 'class':
+            # if the decorator was attached to a method in a class, or
+            # otherwise executed at class scope, we need to set an
+            # 'attr' into the settings if one isn't already in there
+            if settings.get('attr') is None:
+                settings['attr'] = wrapped.__name__
+
+        settings['_info'] = info.codeinfo # fbo "action_method"
+        return wrapped
+
+class forbidden_view_config(object):
+    """
+
+    An analogue of :class:`pyramid.view.view_config` which registers a
+    :term:`forbidden view`.
+
+    The forbidden_view_config constructor accepts most of the same arguments
+    as the constructor of :class:`pyramid.view.view_config`.  It can be used
+    in the same places, and behaves in largely the same way, except it always
+    registers a forbidden exception view instead of a "normal" view.
+
+    Example:
+
+    .. code-block:: python
+
+        from pyramid.view import forbidden_view_config
+        from pyramid.response import Response
+          
+        forbidden_view_config()
+        def notfound(request):
+            return Response('You are not allowed', status='401 Unauthorized')
+
+    All have the same meaning as :meth:`pyramid.view.view_config` and each
+    predicate argument restricts the set of circumstances under which this
+    notfound view will be invoked.
+
+    See :ref:`changing_the_forbidden_view` for detailed usage information.
+
+    .. note::
+
+       This class is new as of Pyramid 1.3.
+    """
+
+    venusian = venusian
+
+    def __init__(self, request_type=default, request_method=default,
+                 route_name=default, request_param=default, attr=default,
+                 renderer=default, containment=default, wrapper=default, 
+                 xhr=default, accept=default, header=default,
+                 path_info=default,  custom_predicates=default, 
+                 decorator=default, mapper=default, match_param=default):
+        L = locals()
+        for k, v in L.items():
+            if k not in ('self', 'L') and v is not default:
+                self.__dict__[k] = v
+
+    def __call__(self, wrapped):
+        settings = self.__dict__.copy()
+
+        def callback(context, name, ob):
+            config = context.config.with_package(info.module)
+            config.add_forbidden_view(view=ob, **settings)
+
+        info = self.venusian.attach(wrapped, callback, category='pyramid')
+
+        if info.scope == 'class':
+            # if the decorator was attached to a method in a class, or
+            # otherwise executed at class scope, we need to set an
+            # 'attr' into the settings if one isn't already in there
+            if settings.get('attr') is None:
+                settings['attr'] = wrapped.__name__
+
+        settings['_info'] = info.codeinfo # fbo "action_method"
+        return wrapped
+    
 def is_response(ob):
     """ Return ``True`` if ``ob`` implements the interface implied by
     :ref:`the_response`. ``False`` if not.

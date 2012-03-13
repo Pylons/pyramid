@@ -12,8 +12,8 @@ pyramid.debug_notfound = false
 pyramid.debug_routematch = false
 pyramid.debug_templates = true
 pyramid.default_locale_name = en
-
-pyramid.includes = pyramid_debugtoolbar
+pyramid.includes = 
+    pyramid_debugtoolbar
 
 ###
 # debugtoolbar settings
@@ -25,7 +25,7 @@ pyramid.includes = pyramid_debugtoolbar
 # debugtoolbar.hosts = 127.0.0.1 ::1
 
 [server:main]
-use = egg:pyramid#wsgiref
+use = egg:waitress#main
 host = 0.0.0.0
 port = 6543
 

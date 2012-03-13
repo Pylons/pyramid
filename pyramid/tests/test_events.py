@@ -122,11 +122,10 @@ class ContextFoundEventTests(unittest.TestCase):
 
 class TestSubscriber(unittest.TestCase):
     def setUp(self):
-        registry = DummyRegistry()
-        self.config = testing.setUp(registry=registry)
+        self.config = testing.setUp()
 
     def tearDown(self):
-        self.config.end()
+        testing.tearDown()
 
     def _makeOne(self, *ifaces):
         from pyramid.events import subscriber
@@ -155,6 +154,16 @@ class TestSubscriber(unittest.TestCase):
         scanner.config = config
         dec.register(scanner, None, foo)
         self.assertEqual(config.subscribed, [(foo, IFoo), (foo, IBar)])
+
+    def test_register_none_means_all(self):
+        from zope.interface import Interface
+        dec = self._makeOne()
+        def foo(): pass
+        config = DummyConfigurator()
+        scanner = Dummy()
+        scanner.config = config
+        dec.register(scanner, None, foo)
+        self.assertEqual(config.subscribed, [(foo, Interface)])
 
     def test_register_objectevent(self):
         from zope.interface import Interface

@@ -1,24 +1,35 @@
 import warnings
 
+from zope.deprecation import deprecated
+
 from zope.interface import implementer
 from zope.interface.interfaces import IInterface
 
 from repoze.lru import lru_cache
 
-from pyramid.interfaces import IContextURL
-from pyramid.interfaces import IRequestFactory
-from pyramid.interfaces import ITraverser
-from pyramid.interfaces import VH_ROOT_KEY
+from pyramid.interfaces import (
+    IResourceURL,
+    IRequestFactory,
+    ITraverser,
+    VH_ROOT_KEY,
+    )
 
-from pyramid.compat import PY3
-from pyramid.compat import native_
-from pyramid.compat import text_
-from pyramid.compat import bytes_
-from pyramid.compat import ascii_native_
-from pyramid.compat import text_type
-from pyramid.compat import binary_type
-from pyramid.compat import url_unquote_native
-from pyramid.compat import is_nonstr_iter
+with warnings.catch_warnings():
+    warnings.filterwarnings('ignore')
+    from pyramid.interfaces import IContextURL
+
+from pyramid.compat import (
+    PY3,
+    native_,
+    text_,
+    ascii_native_,
+    text_type,
+    binary_type,
+    is_nonstr_iter,
+    decode_path_info,
+    unquote_bytes_to_wsgi,
+    )
+
 from pyramid.encode import url_quote
 from pyramid.exceptions import URLDecodeError
 from pyramid.location import lineage
@@ -424,33 +435,46 @@ def virtual_root(resource, request):
 
 def traversal_path(path):
     """ Variant of :func:`pyramid.traversal.traversal_path_info` suitable for
-    decoding paths that are URL-encoded."""
-    path = ascii_native_(path)
-    path = url_unquote_native(path, 'latin-1', 'strict')
-    return traversal_path_info(path)
+    decoding paths that are URL-encoded.
+
+    If this function is passed a Unicode object instead of a sequence of
+    bytes as ``path``, that Unicode object *must* directly encodeable to
+    ASCII.  For example, u'/foo' will work but u'/<unprintable unicode>' (a
+    Unicode object with characters that cannot be encoded to ascii) will
+    not. A :exc:`UnicodeEncodeError` will be raised if the Unicode cannot be
+    encoded directly to ASCII.
+    """
+    if isinstance(path, text_type):
+        # must not possess characters outside ascii
+        path = path.encode('ascii')
+    # we unquote this path exactly like a PEP 3333 server would
+    path = unquote_bytes_to_wsgi(path) # result will be a native string
+    return traversal_path_info(path) # result will be a tuple of unicode
 
 @lru_cache(1000)
 def traversal_path_info(path):
-    """ Given a ``PATH_INFO`` environ value (slash-separated path segments),
-    return a tuple representing that path which can be used to traverse a
-    resource tree.
+    """ Given``path``, return a tuple representing that path which can be
+    used to traverse a resource tree.  ``path`` is assumed to be an
+    already-URL-decoded ``str`` type as if it had come to us from an upstream
+    WSGI server as the ``PATH_INFO`` environ variable.
 
-    ``PATH_INFO`` is assumed to already be URL-decoded.  It is encoded to
-    bytes using the Latin-1 encoding; the resulting set of bytes is
-    subsequently decoded to text using the UTF-8 encoding; a
-    :exc:`pyramid.exc.URLDecodeError` is raised if a the URL cannot be
-    decoded.
+    The ``path`` is first decoded to from its WSGI representation to Unicode;
+    it is decoded differently depending on platform:
 
-    The ``PATH_INFO`` is split on slashes, creating a list of segments.  Each
-    segment subsequently decoded into Unicode.  If a segment name is empty or
-    if it is ``.``, it is ignored.  If a segment name is ``..``, the previous
-    segment is deleted, and the ``..`` is ignored.
+    - On Python 2, ``path`` is decoded to Unicode from bytes using the UTF-8
+      decoding directly; a :exc:`pyramid.exc.URLDecodeError` is raised if a the
+      URL cannot be decoded.
 
-    If this function is passed a Unicode object instead of a string, that
-    Unicode object *must* directly encodeable to ASCII.  For example, u'/foo'
-    will work but u'/<unprintable unicode>' (a Unicode object with characters
-    that cannot be encoded to ascii) will not. A :exc:`UnicodeError` will be
-    raised if the Unicode cannot be encoded directly to ASCII.
+    - On Python 3, as per the PEP 3333 spec, ``path`` is first encoded to
+      bytes using the Latin-1 encoding; the resulting set of bytes is
+      subsequently decoded to text using the UTF-8 encoding; a
+      :exc:`pyramid.exc.URLDecodeError` is raised if a the URL cannot be
+      decoded.
+
+    The ``path`` is split on slashes, creating a list of segments.  If a
+    segment name is empty or if it is ``.``, it is ignored.  If a segment
+    name is ``..``, the previous segment is deleted, and the ``..`` is
+    ignored.
 
     Examples:
 
@@ -499,9 +523,15 @@ def traversal_path_info(path):
       applications in :app:`Pyramid`.
     """
     try:
-        path = bytes_(path, 'latin-1').decode('utf-8')
+        path = decode_path_info(path) # result will be Unicode
     except UnicodeDecodeError as e:
         raise URLDecodeError(e.encoding, e.object, e.start, e.end, e.reason)
+    return split_path_info(path) # result will be tuple of Unicode
+
+@lru_cache(1000)
+def split_path_info(path):
+    # suitable for splitting an already-unquoted-already-decoded (unicode)
+    # path value
     path = path.strip('/')
     clean = []
     for segment in path.split('/'):
@@ -617,25 +647,34 @@ class ResourceTreeTraverser(object):
             path = matchdict.get('traverse', '/') or '/'
             if is_nonstr_iter(path):
                 # this is a *traverse stararg (not a {traverse})
-                path = '/'.join([quote_path_segment(x) for x in path]) or '/'
+                # routing has already decoded these elements, so we just
+                # need to join them
+                path = '/'.join(path) or '/'
 
             subpath = matchdict.get('subpath', ())
             if not is_nonstr_iter(subpath):
                 # this is not a *subpath stararg (just a {subpath})
-                subpath = traversal_path_info(subpath)
+                # routing has already decoded this string, so we just need
+                # to split it
+                subpath = split_path_info(subpath)
 
         else:
             # this request did not match a route
             subpath = ()
             try:
-                path = environ['PATH_INFO'] or '/'
+                # empty if mounted under a path in mod_wsgi, for example
+                path = decode_path_info(environ['PATH_INFO'] or '/')
             except KeyError:
                 path = '/'
+            except UnicodeDecodeError as e:
+                raise URLDecodeError(e.encoding, e.object, e.start, e.end,
+                                     e.reason)
 
         if VH_ROOT_KEY in environ:
-            vroot_path = environ[VH_ROOT_KEY]
-            vroot_tuple = traversal_path_info(vroot_path)
-            vpath = vroot_path + path
+            # HTTP_X_VHM_ROOT
+            vroot_path = decode_path_info(environ[VH_ROOT_KEY]) 
+            vroot_tuple = split_path_info(vroot_path)
+            vpath = vroot_path + path # both will (must) be unicode or asciistr
             vroot_idx = len(vroot_tuple) -1
         else:
             vroot_tuple = ()
@@ -655,7 +694,7 @@ class ResourceTreeTraverser(object):
             # and this hurts readability; apologies
             i = 0
             view_selector = self.VIEW_SELECTOR
-            vpath_tuple = traversal_path_info(vpath)
+            vpath_tuple = split_path_info(vpath)
             for segment in vpath_tuple:
                 if segment[:2] == view_selector:
                     return {'context':ob,
@@ -697,17 +736,35 @@ class ResourceTreeTraverser(object):
 
 ModelGraphTraverser = ResourceTreeTraverser # b/w compat, not API, used in wild
 
-@implementer(IContextURL)
-class TraversalContextURL(object):
-    """ The IContextURL adapter used to generate URLs for a resource in a
-    resource tree"""
-
+@implementer(IResourceURL, IContextURL)
+class ResourceURL(object):
     vroot_varname = VH_ROOT_KEY
 
-    def __init__(self, context, request):
-        self.context = context
+    def __init__(self, resource, request):
+        physical_path = resource_path(resource)
+        if physical_path != '/':
+            physical_path = physical_path + '/'
+
+        virtual_path = physical_path
+
+        environ = request.environ
+        vroot_path = environ.get(self.vroot_varname)
+
+        # if the physical path starts with the virtual root path, trim it out
+        # of the virtual path
+        if vroot_path is not None:
+            if physical_path.startswith(vroot_path):
+                virtual_path = physical_path[len(vroot_path):]
+
+        self.virtual_path = virtual_path    # IResourceURL attr
+        self.physical_path = physical_path  # IResourceURL attr
+
+        # bw compat for IContextURL methods
+        self.resource = resource
+        self.context = resource
         self.request = request
 
+    # IContextURL method (deprecated in 1.3)
     def virtual_root(self):
         environ = self.request.environ
         vroot_varname = self.vroot_varname
@@ -720,6 +777,7 @@ class TraversalContextURL(object):
         except AttributeError:
             return find_root(self.context)
 
+    # IContextURL method (deprecated in 1.3)
     def __call__(self):
         """ Generate a URL based on the :term:`lineage` of a :term:`resource`
         object that is ``self.context``.  If any resource in the context
@@ -729,35 +787,30 @@ class TraversalContextURL(object):
         'virtual root path': the path of the URL generated by this will be
         left-stripped of this virtual root path value.
         """
-        resource = self.context
-        physical_path = resource_path(resource)
-        if physical_path != '/':
-            physical_path = physical_path + '/'
-        virtual_path = physical_path
-
-        request = self.request
-        environ = request.environ
-        vroot_varname = self.vroot_varname
-        vroot_path = environ.get(vroot_varname)
-
-        # if the physical path starts with the virtual root path, trim it out
-        # of the virtual path
-        if vroot_path is not None:
-            if physical_path.startswith(vroot_path):
-                virtual_path = physical_path[len(vroot_path):]
-
-        local_url = getattr(resource, '__resource_url__', None)
+        local_url = getattr(self.context, '__resource_url__', None)
         if local_url is not None:
-            result = local_url(request,
-                               {'virtual_path':virtual_path,
-                                'physical_path':physical_path},
-                               )
+            result = local_url(
+                self.request,
+                {'virtual_path':self.virtual_path,
+                 'physical_path':self.physical_path},
+                )
             if result is not None:
                 # allow it to punt by returning ``None``
                 return result
 
-        app_url = request.application_url # never ends in a slash
-        return app_url + virtual_path
+        app_url = self.request.application_url # never ends in a slash
+        return app_url + self.virtual_path
+
+TraversalContextURL = ResourceURL # deprecated as of 1.3
+
+deprecated(
+    'TraversalContextURL',
+    'As of Pyramid 1.3 the, "pyramid.traversal.TraversalContextURL" class is '
+    'scheduled to be removed.   Use the '
+    '"pyramid.config.Configurator.add_resource_url_adapter" method to register '
+    'a class that implements "pyramid.interfaces.IResourceURL" instead. '
+    'See the "What\'s new In Pyramid 1.3" document for a further description.'
+    )
 
 @lru_cache(1000)
 def _join_path_tuple(tuple):

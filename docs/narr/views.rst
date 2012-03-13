@@ -30,7 +30,7 @@ View Callables
 
 View callables are, at the risk of sounding obvious, callable Python
 objects. Specifically, view callables can be functions, classes, or instances
-that implement an ``__call__`` method (making the instance callable).
+that implement a ``__call__`` method (making the instance callable).
 
 View callables must, at a minimum, accept a single argument named
 ``request``.  This argument represents a :app:`Pyramid` :term:`Request`
@@ -178,7 +178,7 @@ HTTP Exceptions
 
 All classes documented in the :mod:`pyramid.httpexceptions` module documented
 as inheriting from the :class:`pryamid.httpexceptions.HTTPException` are
-:term:`http exception` objects.  An instances of an HTTP exception object may
+:term:`http exception` objects.  Instances of an HTTP exception object may
 either be *returned* or *raised* from within view code.  In either case
 (return or raise) the instance will be used as as the view's response.
 
@@ -233,7 +233,7 @@ provided within :mod:`pyramid.httpexceptions`.
 How Pyramid Uses HTTP Exceptions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-HTTP exceptions are meant to be used directly by application application
+HTTP exceptions are meant to be used directly by application
 developers.  However, Pyramid itself will raise two HTTP exceptions at
 various points during normal operations:
 :exc:`pyramid.httpexceptions.HTTPNotFound` and

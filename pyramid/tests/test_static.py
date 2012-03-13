@@ -112,6 +112,23 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         response = inst(context, request)
         self.assertTrue(b'<html>static</html>' in response.body)
 
+    def test_resource_is_file_with_wsgi_file_wrapper(self):
+        from pyramid.response import _BLOCK_SIZE
+        inst = self._makeOne('pyramid.tests:fixtures/static')
+        request = self._makeRequest({'PATH_INFO':'/index.html'})
+        class _Wrapper(object):
+            def __init__(self, file, block_size=None):
+                self.file = file
+                self.block_size = block_size
+        request.environ['wsgi.file_wrapper'] = _Wrapper
+        context = DummyContext()
+        response = inst(context, request)
+        app_iter = response.app_iter
+        self.assertTrue(isinstance(app_iter, _Wrapper))
+        self.assertTrue(b'<html>static</html>' in app_iter.file.read())
+        self.assertEqual(app_iter.block_size, _BLOCK_SIZE)
+        app_iter.file.close()
+
     def test_resource_is_file_with_cache_max_age(self):
         inst = self._makeOne('pyramid.tests:fixtures/static', cache_max_age=600)
         request = self._makeRequest({'PATH_INFO':'/index.html'})
@@ -168,6 +185,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.content_type, 'application/x-tar')
         self.assertEqual(response.content_encoding, 'gzip')
+        response.app_iter.close()
 
     def test_resource_no_content_encoding(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
@@ -177,6 +195,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.content_type, 'text/html')
         self.assertEqual(response.content_encoding, None)
+        response.app_iter.close()
 
 class Test_static_view_use_subpath_True(unittest.TestCase):
     def _getTargetClass(self):
@@ -344,27 +363,6 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         context = DummyContext()
         response = inst(context, request)
         self.assertEqual(response.status, '404 Not Found')
-
-class Test_patch_mimetypes(unittest.TestCase):
-    def _callFUT(self, module):
-        from pyramid.static import init_mimetypes
-        return init_mimetypes(module)
-
-    def test_has_init(self):
-        class DummyMimetypes(object):
-            def init(self):
-                self.initted = True
-        module = DummyMimetypes()
-        result = self._callFUT(module)
-        self.assertEqual(result, True)
-        self.assertEqual(module.initted, True)
-        
-    def test_missing_init(self):
-        class DummyMimetypes(object):
-            pass
-        module = DummyMimetypes()
-        result = self._callFUT(module)
-        self.assertEqual(result, False)
 
 class DummyContext:
     pass

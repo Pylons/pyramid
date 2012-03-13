@@ -1,5 +1,6 @@
 import inspect
 import logging
+import operator
 import os
 import sys
 import types
@@ -8,28 +9,53 @@ import venusian
 
 from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
 
-from pyramid.interfaces import IDebugLogger
-from pyramid.interfaces import IExceptionResponse
+from pyramid.interfaces import (
+    IDebugLogger,
+    IExceptionResponse,
+    )
 
 from pyramid.asset import resolve_asset_spec
+
 from pyramid.authorization import ACLAuthorizationPolicy
-from pyramid.compat import text_
-from pyramid.compat import reraise
-from pyramid.compat import string_types
-from pyramid.compat import PY3
+
+from pyramid.compat import (
+    text_,
+    reraise,
+    string_types,
+    PY3,
+    )
+
 from pyramid.events import ApplicationCreated
-from pyramid.exceptions import ConfigurationConflictError
-from pyramid.exceptions import ConfigurationError
-from pyramid.exceptions import ConfigurationExecutionError
+
+from pyramid.exceptions import (
+    ConfigurationConflictError,
+    ConfigurationError,
+    ConfigurationExecutionError,
+    )
+
 from pyramid.httpexceptions import default_exceptionresponse_view
-from pyramid.path import caller_package
-from pyramid.path import package_of
-from pyramid.registry import Registry
+
+from pyramid.path import (
+    caller_package,
+    package_of,
+    )
+
+from pyramid.registry import (
+    Introspectable,
+    Introspector,
+    Registry,
+    )
+
 from pyramid.router import Router
+
 from pyramid.settings import aslist
+
 from pyramid.threadlocal import manager
-from pyramid.util import DottedNameResolver
-from pyramid.util import WeakOrderedSet
+
+from pyramid.util import (
+    WeakOrderedSet,
+    object_description,
+    )
 
 from pyramid.config.adapters import AdaptersConfiguratorMixin
 from pyramid.config.assets import AssetsConfiguratorMixin
@@ -42,11 +68,17 @@ from pyramid.config.security import SecurityConfiguratorMixin
 from pyramid.config.settings import SettingsConfiguratorMixin
 from pyramid.config.testing import TestingConfiguratorMixin
 from pyramid.config.tweens import TweensConfiguratorMixin
-from pyramid.config.util import action_method
+from pyramid.config.util import (
+    action_method,
+    ActionInfo,
+    )
 from pyramid.config.views import ViewsConfiguratorMixin
 from pyramid.config.zca import ZCAConfiguratorMixin
 
+from pyramid.path import DottedNameResolver
+
 empty = text_('')
+_marker = object()
 
 ConfigurationError = ConfigurationError # pyflakes
 
@@ -205,14 +237,23 @@ class Configurator(
 
     If ``route_prefix`` is passed, all routes added with
     :meth:`pyramid.config.Configurator.add_route` will have the specified path
-    prepended to their pattern. This parameter is new in Pyramid 1.2."""
+    prepended to their pattern. This parameter is new in Pyramid 1.2.
 
+    If ``introspection`` is passed, it must be a boolean value.  If it's
+    ``True``, introspection values during actions will be kept for for use
+    for tools like the debug toolbar.  If it's ``False``, introspection
+    values provided by registrations will be ignored.  By default, it is
+    ``True``.  This parameter is new as of Pyramid 1.3.
+    """
     manager = manager # for testing injection
     venusian = venusian # for testing injection
     _ainfo = None
     basepath = None
     includepath = ()
     info = ''
+    object_description = staticmethod(object_description)
+    introspectable = Introspectable
+    inspect = inspect
 
     def __init__(self,
                  registry=None,
@@ -232,16 +273,18 @@ class Configurator(
                  autocommit=False,
                  exceptionresponse_view=default_exceptionresponse_view,
                  route_prefix=None,
+                 introspection=True,
                  ):
         if package is None:
             package = caller_package()
         name_resolver = DottedNameResolver(package)
         self.name_resolver = name_resolver
-        self.package_name = name_resolver.package_name
-        self.package = name_resolver.package
+        self.package_name = name_resolver.get_package_name()
+        self.package = name_resolver.get_package()
         self.registry = registry
         self.autocommit = autocommit
         self.route_prefix = route_prefix
+        self.introspection = introspection
         if registry is None:
             registry = Registry(self.package_name)
             self.registry = registry
@@ -261,13 +304,21 @@ class Configurator(
                 exceptionresponse_view=exceptionresponse_view,
                 )
 
-    def setup_registry(self, settings=None, root_factory=None,
-                       authentication_policy=None, authorization_policy=None,
-                       renderers=None, debug_logger=None,
-                       locale_negotiator=None, request_factory=None,
-                       renderer_globals_factory=None, default_permission=None,
-                       session_factory=None, default_view_mapper=None,
-                       exceptionresponse_view=default_exceptionresponse_view):
+    def setup_registry(self,
+                       settings=None,
+                       root_factory=None,
+                       authentication_policy=None,
+                       authorization_policy=None,
+                       renderers=None,
+                       debug_logger=None,
+                       locale_negotiator=None,
+                       request_factory=None,
+                       renderer_globals_factory=None,
+                       default_permission=None,
+                       session_factory=None,
+                       default_view_mapper=None,
+                       exceptionresponse_view=default_exceptionresponse_view,
+                       ):
         """ When you pass a non-``None`` ``registry`` argument to the
         :term:`Configurator` constructor, no initial setup is performed
         against the registry.  This is because the registry you pass in may
@@ -287,6 +338,7 @@ class Configurator(
         registry = self.registry
 
         self._fix_registry()
+
         self._set_settings(settings)
         self._register_response_adapters()
 
@@ -416,8 +468,37 @@ class Configurator(
             _registry.registerSelfAdapter = registerSelfAdapter
 
     # API
+            
+    def _get_introspector(self):
+        introspector = getattr(self.registry, 'introspector', _marker)
+        if introspector is _marker:
+            introspector = Introspector()
+            self._set_introspector(introspector)
+        return introspector
 
-    def action(self, discriminator, callable=None, args=(), kw=None, order=0):
+    def _set_introspector(self, introspector):
+        self.registry.introspector = introspector
+
+    def _del_introspector(self):
+        del self.registry.introspector
+
+    introspector = property(
+        _get_introspector, _set_introspector, _del_introspector
+        )
+
+    @property
+    def action_info(self):
+        info = self.info # usually a ZCML action (ParserInfo) if self.info
+        if not info:
+            # Try to provide more accurate info for conflict reports
+            if self._ainfo:
+                info = self._ainfo[0]
+            else:
+                info = ActionInfo(None, 0, '', '')
+        return info
+
+    def action(self, discriminator, callable=None, args=(), kw=None, order=0,
+               introspectables=(), **extra):
         """ Register an action which will be executed when
         :meth:`pyramid.config.Configurator.commit` is called (or executed
         immediately if ``autocommit`` is ``True``).
@@ -430,40 +511,62 @@ class Configurator(
         given, but it can be ``None``, to indicate that the action never
         conflicts.  It must be a hashable value.
 
-        The ``callable`` is a callable object which performs the action.  It
-        is optional.  ``args`` and ``kw`` are tuple and dict objects
-        respectively, which are passed to ``callable`` when this action is
-        executed.
+        The ``callable`` is a callable object which performs the task
+        associated with the action when the action is executed.  It is
+        optional.
 
-        ``order`` is a crude order control mechanism, only rarely used (has
-        no effect when autocommit is ``True``).
+        ``args`` and ``kw`` are tuple and dict objects respectively, which
+        are passed to ``callable`` when this action is executed.  Both are
+        optional.
+
+        ``order`` is a grouping mechanism; an action with a lower order will
+        be executed before an action with a higher order (has no effect when
+        autocommit is ``True``).
+
+        ``introspectables`` is a sequence of :term:`introspectable` objects
+        (or the empty sequence if no introspectable objects are associated
+        with this action).  If this configurator's ``introspection``
+        attribute is ``False``, these introspectables will be ignored.
+
+        ``extra`` provides a facility for inserting extra keys and values
+        into an action dictionary.
         """
+        # catch nonhashable discriminators here; most unit tests use
+        # autocommit=False, which won't catch unhashable discriminators
+        assert hash(discriminator) 
+
         if kw is None:
             kw = {}
 
         autocommit = self.autocommit
+        action_info = self.action_info
+
+        if not self.introspection:
+            # if we're not introspecting, ignore any introspectables passed
+            # to us
+            introspectables = ()
 
         if autocommit:
             if callable is not None:
                 callable(*args, **kw)
+            for introspectable in introspectables:
+                introspectable.register(self.introspector, action_info)
 
         else:
-            info = self.info # usually a ZCML action if self.info has data
-            if not info:
-                # Try to provide more accurate info for conflict reports
-                if self._ainfo:
-                    info = self._ainfo[0]
-                else:
-                    info = ''
-            self.action_state.action(
-                discriminator,
-                callable,
-                args,
-                kw,
-                order,
-                info=info,
-                includepath=self.includepath,
+            action = extra
+            action.update(
+                dict(
+                    discriminator=discriminator,
+                    callable=callable,
+                    args=args,
+                    kw=kw,
+                    order=order,
+                    info=action_info,
+                    includepath=self.includepath,
+                    introspectables=introspectables,
+                    )
                 )
+            self.action_state.action(**action)
 
     def _get_action_state(self):
         registry = self.registry
@@ -488,7 +591,7 @@ class Configurator(
         of this error will be information about the source of the conflict,
         usually including file names and line numbers of the cause of the
         configuration conflicts."""
-        self.action_state.execute_actions()
+        self.action_state.execute_actions(introspector=self.introspector)
         self.action_state = ActionState() # old actions have been processed
 
     def include(self, callable, route_prefix=None):
@@ -604,11 +707,23 @@ class Configurator(
             route_prefix = None
 
         c = self.maybe_dotted(callable)
-        module = inspect.getmodule(c)
+        module = self.inspect.getmodule(c)
         if module is c:
-            c = getattr(module, 'includeme')
+            try:
+                c = getattr(module, 'includeme')
+            except AttributeError:
+                raise ConfigurationError(
+                    "module %r has no attribute 'includeme'" % (module.__name__)
+                    )
+                                                       
         spec = module.__name__ + ':' + c.__name__
-        sourcefile = inspect.getsourcefile(c)
+        sourcefile = self.inspect.getsourcefile(c)
+
+        if sourcefile is None:
+            raise ConfigurationError(
+                'No source file for module %r (.py file must exist, '
+                'refusing to use orphan .pyc or .pyo file).' % module.__name__)
+            
 
         if action_state.processSpec(spec):
             configurator = self.__class__(
@@ -667,22 +782,6 @@ class Configurator(
             m = types.MethodType(c, self, self.__class__)
         return m
 
-    @classmethod
-    def with_context(cls, context):
-        """A classmethod used by ``pyramid_zcml`` directives to obtain a
-        configurator with 'the right' context.  Returns a new Configurator
-        instance."""
-        configurator = cls(
-            registry=context.registry,
-            package=context.package,
-            autocommit=context.autocommit,
-            route_prefix=context.route_prefix
-            )
-        configurator.basepath = context.basepath
-        configurator.includepath = context.includepath
-        configurator.info = context.info
-        return configurator
-
     def with_package(self, package):
         """ Return a new Configurator instance with the same registry
         as this configurator using the package supplied as the
@@ -694,6 +793,7 @@ class Configurator(
             package=package,
             autocommit=self.autocommit,
             route_prefix=self.route_prefix,
+            introspection=self.introspection,
             )
         configurator.basepath = self.basepath
         configurator.includepath = self.includepath
@@ -743,7 +843,8 @@ class Configurator(
         return self.manager.pop()
 
     # this is *not* an action method (uses caller_package)
-    def scan(self, package=None, categories=None, onerror=None, **kw):
+    def scan(self, package=None, categories=None, onerror=None, ignore=None,
+             **kw):
         """Scan a Python package and any of its subpackages for objects
         marked with :term:`configuration decoration` such as
         :class:`pyramid.view.view_config`.  Any decorated object found will
@@ -771,6 +872,20 @@ class Configurator(
         :term:`Venusian` documentation for more information about ``onerror``
         callbacks.
 
+        The ``ignore`` argument, if provided, should be a Venusian ``ignore``
+        value.  Providing an ``ignore`` argument allows the scan to ignore
+        particular modules, packages, or global objects during a scan.
+        ``ignore`` can be a string or a callable, or a list containing
+        strings or callables.  The simplest usage of ``ignore`` is to provide
+        a module or package by providing a full path to its dotted name.  For
+        example: ``config.scan(ignore='my.module.subpackage')`` would ignore
+        the ``my.module.subpackage`` package during a scan, which would
+        prevent the subpackage and any of its submodules from being imported
+        and scanned.  See the :term:`Venusian` documentation for more
+        information about the ``ignore`` argument.
+
+        .. note:: the ``ignore`` argument is new in Pyramid 1.3.
+        
         To perform a ``scan``, Pyramid creates a Venusian ``Scanner`` object.
         The ``kw`` argument represents a set of keyword arguments to pass to
         the Venusian ``Scanner`` object's constructor.  See the
@@ -792,7 +907,9 @@ class Configurator(
         ctorkw.update(kw)
 
         scanner = self.venusian.Scanner(**ctorkw)
-        scanner.scan(package, categories=categories, onerror=onerror)
+        
+        scanner.scan(package, categories=categories, onerror=onerror,
+                     ignore=ignore)
 
     def make_wsgi_app(self):
         """ Commits any pending configuration statements, sends a
@@ -841,22 +958,27 @@ class ActionState(object):
         return True
 
     def action(self, discriminator, callable=None, args=(), kw=None, order=0,
-               includepath=(), info=''):
+               includepath=(), info=None, introspectables=(), **extra):
         """Add an action with the given discriminator, callable and arguments
         """
-        # NB: note that the ordering and composition of the action tuple should
-        # not change without first ensuring that ``pyramid_zcml`` appends
-        # similarly-composed actions to our .actions variable (as silly as
-        # the composition and ordering is).
         if kw is None:
             kw = {}
-        action = (discriminator, callable, args, kw, includepath, info, order)
-        # remove trailing false items
-        while (len(action) > 2) and not action[-1]:
-            action = action[:-1]
+        action = extra
+        action.update(
+            dict(
+                discriminator=discriminator,
+                callable=callable,
+                args=args,
+                kw=kw,
+                includepath=includepath,
+                info=info,
+                order=order,
+                introspectables=introspectables,
+                )
+            )
         self.actions.append(action)
 
-    def execute_actions(self, clear=True):
+    def execute_actions(self, clear=True, introspector=None):
         """Execute the configuration actions
 
         This calls the action callables after resolving conflicts
@@ -897,21 +1019,26 @@ class ActionState(object):
           in:
           oops
 
-
         Note that actions executed before the error still have an effect:
 
         >>> output
         [('f', (1,), {}), ('f', (2,), {})]
 
-
         """
+
         try:
             for action in resolveConflicts(self.actions):
-                _, callable, args, kw, _, info, _ = expand_action(*action)
-                if callable is None:
-                    continue
+                callable = action['callable']
+                args = action['args']
+                kw = action['kw']
+                info = action['info']
+                # we use "get" below in case an action was added via a ZCML
+                # directive that did not know about introspectables
+                introspectables = action.get('introspectables', ())
+
                 try:
-                    callable(*args, **kw)
+                    if callable is not None:
+                        callable(*args, **kw)
                 except (KeyboardInterrupt, SystemExit): # pragma: no cover
                     raise
                 except:
@@ -922,6 +1049,11 @@ class ActionState(object):
                                 tb)
                     finally:
                        del t, v, tb
+
+                if introspector is not None:
+                    for introspectable in introspectables:
+                        introspectable.register(introspector, info)
+                
         finally:
             if clear:
                 del self.actions[:]
@@ -931,120 +1063,95 @@ def resolveConflicts(actions):
     """Resolve conflicting actions
 
     Given an actions list, identify and try to resolve conflicting actions.
-    Actions conflict if they have the same non-null discriminator.
+    Actions conflict if they have the same non-None discriminator.
     Conflicting actions can be resolved if the include path of one of
     the actions is a prefix of the includepaths of the other
     conflicting actions and is unequal to the include paths in the
     other conflicting actions.
-
-    Here are some examples to illustrate how this works:
-
-    >>> from zope.configmachine.tests.directives import f
-    >>> from pprint import PrettyPrinter
-    >>> pprint=PrettyPrinter(width=60).pprint
-    >>> pprint(resolveConflicts([
-    ...    (None, f),
-    ...    (1, f, (1,), {}, (), 'first'),
-    ...    (1, f, (2,), {}, ('x',), 'second'),
-    ...    (1, f, (3,), {}, ('y',), 'third'),
-    ...    (4, f, (4,), {}, ('y',), 'should be last', 99999),
-    ...    (3, f, (3,), {}, ('y',)),
-    ...    (None, f, (5,), {}, ('y',)),
-    ... ]))
-    [(None, f),
-     (1, f, (1,), {}, (), 'first'),
-     (3, f, (3,), {}, ('y',)),
-     (None, f, (5,), {}, ('y',)),
-     (4, f, (4,), {}, ('y',), 'should be last')]
-
-    >>> try:
-    ...     v = resolveConflicts([
-    ...        (None, f),
-    ...        (1, f, (2,), {}, ('x',), 'eek'),
-    ...        (1, f, (3,), {}, ('y',), 'ack'),
-    ...        (4, f, (4,), {}, ('y',)),
-    ...        (3, f, (3,), {}, ('y',)),
-    ...        (None, f, (5,), {}, ('y',)),
-    ...     ])
-    ... except ConfigurationConflictError, v:
-    ...    pass
-    >>> print v
-    Conflicting configuration actions
-      For: 1
-        eek
-        ack
-
     """
 
     # organize actions by discriminators
     unique = {}
     output = []
-    for i in range(len(actions)):
-        (discriminator, callable, args, kw, includepath, info, order
-         ) = expand_action(*(actions[i]))
+    for i, action in enumerate(actions):
+        if not isinstance(action, dict):
+            # old-style tuple action
+            action = expand_action(*action)
 
-        order = order or i
+        # "order" is an integer grouping. Actions in a lower order will be
+        # executed before actions in a higher order.  Within an order,
+        # actions are executed sequentially based on original action ordering
+        # ("i").
+        order = action['order'] or 0
+        discriminator = action['discriminator']
+
+        # "ainfo" is a tuple of (order, i, action) where "order" is a
+        # user-supplied grouping, "i" is an integer expressing the relative
+        # position of this action in the action list being resolved, and
+        # "action" is an action dictionary.  The purpose of an ainfo is to
+        # associate an "order" and an "i" with a particular action; "order"
+        # and "i" exist for sorting purposes after conflict resolution.
+        ainfo = (order, i, action)
+
         if discriminator is None:
-            # The discriminator is None, so this directive can
-            # never conflict. We can add it directly to the
-            # configuration actions.
-            output.append(
-                (order, discriminator, callable, args, kw, includepath, info)
-                )
+            # The discriminator is None, so this action can never conflict.
+            # We can add it directly to the result.
+            output.append(ainfo)
             continue
 
-
-        a = unique.setdefault(discriminator, [])
-        a.append(
-            (includepath, order, callable, args, kw, info)
-            )
+        L = unique.setdefault(discriminator, [])
+        L.append(ainfo)
 
     # Check for conflicts
     conflicts = {}
-    for discriminator, dups in unique.items():
 
-        # We need to sort the actions by the paths so that the shortest
-        # path with a given prefix comes first:
-        def allbutfunc(stupid):
-            # f me with a shovel, py3 cant cope with sorting when the
-            # callable function is in the list
-            return stupid[0:2] + stupid[3:]
-        dups.sort(key=allbutfunc)
-        (basepath, i, callable, args, kw, baseinfo) = dups[0]
-        output.append(
-            (i, discriminator, callable, args, kw, basepath, baseinfo)
-            )
-        for includepath, i, callable, args, kw, info in dups[1:]:
+    for discriminator, ainfos in unique.items():
+
+        # We use (includepath, order, i) as a sort key because we need to
+        # sort the actions by the paths so that the shortest path with a
+        # given prefix comes first.  The "first" action is the one with the
+        # shortest include path.  We break sorting ties using "order", then
+        # "i".
+        def bypath(ainfo):
+            path, order, i = ainfo[2]['includepath'], ainfo[0], ainfo[1]
+            return path, order, i
+
+        ainfos.sort(key=bypath)
+        ainfo, rest = ainfos[0], ainfos[1:]
+        output.append(ainfo)
+        _, _, action = ainfo
+        basepath, baseinfo, discriminator = (action['includepath'],
+                                             action['info'],
+                                             action['discriminator'])
+
+        for _, _, action in rest:
+            includepath = action['includepath']
             # Test whether path is a prefix of opath
             if (includepath[:len(basepath)] != basepath # not a prefix
-                or
-                (includepath == basepath)
-                ):
-                if discriminator not in conflicts:
-                    conflicts[discriminator] = [baseinfo]
-                conflicts[discriminator].append(info)
-
+                or includepath == basepath):
+                L = conflicts.setdefault(discriminator, [baseinfo])
+                L.append(action['info'])
 
     if conflicts:
         raise ConfigurationConflictError(conflicts)
 
-    # Now put the output back in the original order, and return it:
-    output.sort()
-    r = []
-    for o in output:
-        action = o[1:]
-        while len(action) > 2 and not action[-1]:
-            action = action[:-1]
-        r.append(action)
-
-    return r
-
-# this function is licensed under the ZPL (stolen from Zope)
+    # sort conflict-resolved actions by (order, i) and return them
+    return [ x[2] for x in sorted(output, key=operator.itemgetter(0, 1))]
+                
 def expand_action(discriminator, callable=None, args=(), kw=None,
-                   includepath=(), info='', order=0):
+                  includepath=(), info=None, order=0, introspectables=()):
     if kw is None:
         kw = {}
-    return (discriminator, callable, args, kw, includepath, info, order)
+    return dict(
+        discriminator=discriminator,
+        callable=callable,
+        args=args,
+        kw=kw,
+        includepath=includepath,
+        info=info,
+        order=order,
+        introspectables=introspectables,
+        )
 
 global_registries = WeakOrderedSet()
 

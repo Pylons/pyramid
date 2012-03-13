@@ -7,18 +7,26 @@ from zope.interface.interface import InterfaceClass
 
 from webob import BaseRequest
 
-from pyramid.interfaces import IRequest
-from pyramid.interfaces import IResponse
-from pyramid.interfaces import ISessionFactory
-from pyramid.interfaces import IResponseFactory
+from pyramid.interfaces import (
+    IRequest,
+    IResponse,
+    ISessionFactory,
+    IResponseFactory,
+    )
 
-from pyramid.compat import iterkeys_, itervalues_, iteritems_
-from pyramid.compat import text_
-from pyramid.compat import bytes_
-from pyramid.compat import native_
+from pyramid.compat import (
+    iterkeys_,
+    itervalues_,
+    iteritems_,
+    text_,
+    bytes_,
+    native_,
+    )
+
 from pyramid.decorator import reify
 from pyramid.response import Response
 from pyramid.url import URLMethodsMixin
+from pyramid.util import InstancePropertyMixin
 
 class TemplateContext(object):
     pass
@@ -294,7 +302,7 @@ class CallbackMethodsMixin(object):
 
 @implementer(IRequest)
 class Request(BaseRequest, DeprecatedRequestMethodsMixin, URLMethodsMixin,
-              CallbackMethodsMixin):
+              CallbackMethodsMixin, InstancePropertyMixin):
     """
     A subclass of the :term:`WebOb` Request class.  An instance of
     this class is created by the :term:`router` and is provided to a
@@ -322,7 +330,8 @@ class Request(BaseRequest, DeprecatedRequestMethodsMixin, URLMethodsMixin,
 
     @reify
     def tmpl_context(self):
-        """ Template context (for Pylons apps) """
+        # docs-deprecated template context for Pylons-like apps; do not
+        # remove.
         return TemplateContext()
 
     @reify

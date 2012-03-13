@@ -9,74 +9,67 @@
 Request Processing
 ==================
 
-Once a :app:`Pyramid` application is up and running, it is ready to
-accept requests and return responses.
+Once a :app:`Pyramid` application is up and running, it is ready to accept
+requests and return responses.  What happens from the time a :term:`WSGI`
+request enters a :app:`Pyramid` application through to the point that
+:app:`Pyramid` hands off a response back to WSGI for upstream processing?
 
-What happens from the time a :term:`WSGI` request enters a
-:app:`Pyramid` application through to the point that
-:app:`Pyramid` hands off a response back to WSGI for upstream
-processing?
+#. A user initiates a request from his browser to the hostname and port
+   number of the WSGI server used by the :app:`Pyramid` application.
 
-#. A user initiates a request from his browser to the hostname and
-   port number of the WSGI server used by the :app:`Pyramid`
-   application.
-
-#. The WSGI server used by the :app:`Pyramid` application passes
-   the WSGI environment to the ``__call__`` method of the
-   :app:`Pyramid` :term:`router` object.
+#. The WSGI server used by the :app:`Pyramid` application passes the WSGI
+   environment to the ``__call__`` method of the :app:`Pyramid`
+   :term:`router` object.
 
 #. A :term:`request` object is created based on the WSGI environment.
 
-#. The :term:`application registry` and the :term:`request` object
-   created in the last step are pushed on to the :term:`thread local`
-   stack that :app:`Pyramid` uses to allow the functions named
+#. The :term:`application registry` and the :term:`request` object created in
+   the last step are pushed on to the :term:`thread local` stack that
+   :app:`Pyramid` uses to allow the functions named
    :func:`~pyramid.threadlocal.get_current_request` and
    :func:`~pyramid.threadlocal.get_current_registry` to work.
 
 #. A :class:`~pyramid.events.NewRequest` :term:`event` is sent to any
    subscribers.
 
-#. If any :term:`route` has been defined within application
-   configuration, the :app:`Pyramid` :term:`router` calls a
-   :term:`URL dispatch` "route mapper."  The job of the mapper is to
-   examine the request to determine whether any user-defined
-   :term:`route` matches the current WSGI environment.  The
-   :term:`router` passes the request as an argument to the mapper.
+#. If any :term:`route` has been defined within application configuration,
+   the :app:`Pyramid` :term:`router` calls a :term:`URL dispatch` "route
+   mapper."  The job of the mapper is to examine the request to determine
+   whether any user-defined :term:`route` matches the current WSGI
+   environment.  The :term:`router` passes the request as an argument to the
+   mapper.
 
-#. If any route matches, the request is mutated; a ``matchdict`` and
-   ``matched_route`` attributes are added to the request object; the
-   former contains a dictionary representing the matched dynamic
-   elements of the request's ``PATH_INFO`` value, the latter contains
-   the :class:`~pyramid.interfaces.IRoute` object representing the
-   route which matched.  The root object associated with the route
-   found is also generated: if the :term:`route configuration` which
-   matched has an associated a ``factory`` argument, this factory is
-   used to generate the root object, otherwise a default :term:`root
-   factory` is used.
+#. If any route matches, the route mapper adds attributes to the request:
+   ``matchdict`` and ``matched_route`` attributes are added to the request
+   object.  The former contains a dictionary representing the matched dynamic
+   elements of the request's ``PATH_INFO`` value, the latter contains the
+   :class:`~pyramid.interfaces.IRoute` object representing the route which
+   matched.  The root object associated with the route found is also
+   generated: if the :term:`route configuration` which matched has an
+   associated a ``factory`` argument, this factory is used to generate the
+   root object, otherwise a default :term:`root factory` is used.
 
-#. If a route match was *not* found, and a ``root_factory`` argument
-   was passed to the :term:`Configurator` constructor, that callable
-   is used to generate the root object.  If the ``root_factory``
-   argument passed to the Configurator constructor was ``None``, a
-   default root factory is used to generate a root object.
+#. If a route match was *not* found, and a ``root_factory`` argument was
+   passed to the :term:`Configurator` constructor, that callable is used to
+   generate the root object.  If the ``root_factory`` argument passed to the
+   Configurator constructor was ``None``, a default root factory is used to
+   generate a root object.
 
-#. The :app:`Pyramid` router calls a "traverser" function with the
-   root object and the request.  The traverser function attempts to
-   traverse the root object (using any existing ``__getitem__`` on the
-   root object and subobjects) to find a :term:`context`.  If the root
-   object has no ``__getitem__`` method, the root itself is assumed to
-   be the context.  The exact traversal algorithm is described in
-   :ref:`traversal_chapter`. The traverser function returns a
-   dictionary, which contains a :term:`context` and a :term:`view
-   name` as well as other ancillary information.
+#. The :app:`Pyramid` router calls a "traverser" function with the root
+   object and the request.  The traverser function attempts to traverse the
+   root object (using any existing ``__getitem__`` on the root object and
+   subobjects) to find a :term:`context`.  If the root object has no
+   ``__getitem__`` method, the root itself is assumed to be the context.  The
+   exact traversal algorithm is described in :ref:`traversal_chapter`. The
+   traverser function returns a dictionary, which contains a :term:`context`
+   and a :term:`view name` as well as other ancillary information.
 
-#. The request is decorated with various names returned from the
-   traverser (such as ``context``, ``view_name``, and so forth), so
-   they can be accessed via e.g. ``request.context`` within
-   :term:`view` code.
+#. The request is decorated with various names returned from the traverser
+   (such as ``context``, ``view_name``, and so forth), so they can be
+   accessed via e.g. ``request.context`` within :term:`view` code.
 
-#. A :class:`~pyramid.events.ContextFound` :term:`event` is
-   sent to any subscribers.
+#. A :class:`~pyramid.events.ContextFound` :term:`event` is sent to any
+   subscribers.
 
 #. :app:`Pyramid` looks up a :term:`view` callable using the context, the
    request, and the view name.  If a view callable doesn't exist for this
@@ -86,20 +79,17 @@ processing?
    :class:`~pyramid.httpexceptions.HTTPNotFound` exception, which is meant to
    be caught by a surrounding :term:`exception view`.
 
-#. If a view callable was found, :app:`Pyramid` attempts to call
-   the view function.
+#. If a view callable was found, :app:`Pyramid` attempts to call it.  If an
+   :term:`authorization policy` is in use, and the view configuration is
+   protected by a :term:`permission`, :app:`Pyramid` determines whether the
+   view callable being asked for can be executed by the requesting user based
+   on credential information in the request and security information attached
+   to the context.  If the view execution is allowed, :app:`Pyramid` calls
+   the view callable to obtain a response.  If view execution is forbidden,
+   :app:`Pyramid` raises a :class:`~pyramid.httpexceptions.HTTPForbidden`
+   exception.
 
-#. If an :term:`authorization policy` is in use, and the view was protected
-   by a :term:`permission`, :app:`Pyramid` passes the context, the request,
-   and the view_name to a function which determines whether the view being
-   asked for can be executed by the requesting user, based on credential
-   information in the request and security information attached to the
-   context.  If it returns ``True``, :app:`Pyramid` calls the view callable
-   to obtain a response.  If it returns ``False``, it raises a
-   :class:`~pyramid.httpexceptions.HTTPForbidden` exception, which is meant
-   to be called by a surrounding :term:`exception view`.
-
-#. If any exception was raised within a :term:`root factory`, by
+#. If any exception is raised within a :term:`root factory`, by
    :term:`traversal`, by a :term:`view callable` or by :app:`Pyramid` itself
    (such as when it raises :class:`~pyramid.httpexceptions.HTTPNotFound` or
    :class:`~pyramid.httpexceptions.HTTPForbidden`), the router catches the
@@ -128,9 +118,8 @@ processing?
 
 .. image:: router.png
 
-This is a very high-level overview that leaves out various details.
-For more detail about subsystems invoked by the :app:`Pyramid` router
-such as traversal, URL dispatch, views, and event processing, see
-:ref:`urldispatch_chapter`, :ref:`views_chapter`, and
-:ref:`events_chapter`.
+This is a very high-level overview that leaves out various details.  For more
+detail about subsystems invoked by the :app:`Pyramid` router such as
+traversal, URL dispatch, views, and event processing, see
+:ref:`urldispatch_chapter`, :ref:`views_chapter`, and :ref:`events_chapter`.
 

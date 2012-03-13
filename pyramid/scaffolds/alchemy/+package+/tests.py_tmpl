@@ -17,7 +17,7 @@ class TestMyView(unittest.TestCase):
         DBSession.configure(bind=engine)
         Base.metadata.create_all(engine)
         with transaction.manager:
-            model = MyModel(name={{repr(one)}}, value=55)
+            model = MyModel(name='one', value=55)
             DBSession.add(model)
 
     def tearDown(self):

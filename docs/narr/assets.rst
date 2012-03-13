@@ -370,19 +370,21 @@ do so, do things "by hand".  First define the view callable.
    :linenos:
 
    import os
-   from pyramid.response import Response
+   from pyramid.response import FileResponse
 
    def favicon_view(request):
        here = os.path.dirname(__file__)
-       icon = open(os.path.join(here, 'static', 'favicon.ico'))
-       return Response(content_type='image/x-icon', app_iter=icon)
+       icon = os.path.join(here, 'static', 'favicon.ico')
+       return FileResponse(icon, request=request)
 
 The above bit of code within ``favicon_view`` computes "here", which is a
 path relative to the Python file in which the function is defined.  It then
-uses the Python ``open`` function to obtain a file handle to a file within
-"here" named ``static``, and returns a response using the open the file
-handle as the response's ``app_iter``.  It makes sure to set the right
-content_type too.
+creates a :class:`pyramid.response.FileResponse` using the file path as the
+response's ``path`` argument and the request as the response's ``request``
+argument.  :class:`pyramid.response.FileResponse` will serve the file as
+quickly as possible when it's used this way.  It makes sure to set the right
+content length and content_type too based on the file extension of the file
+you pass.
 
 You might register such a view via configuration as a view callable that
 should be called as the result of a traversal:

@@ -9,6 +9,7 @@
 # lib/site.py
 
 import atexit
+import ctypes
 import errno
 import logging
 import optparse
@@ -16,29 +17,41 @@ import os
 import re
 import subprocess
 import sys
+import textwrap
 import threading
 import time
 import traceback
 
 from paste.deploy import loadapp, loadserver
 
-from pyramid.scripts.common import logging_file_config
+from pyramid.compat import WIN
+
+from pyramid.paster import setup_logging
 
 MAXFD = 1024
 
+if WIN and not hasattr(os, 'kill'): # pragma: no cover
+    # py 2.6 on windows
+    def kill(pid, sig=None):
+        """kill function for Win32"""
+        # signal is ignored, semibogus raise message
+        kernel32 = ctypes.windll.kernel32
+        handle = kernel32.OpenProcess(1, 0, pid)
+        if (0 == kernel32.TerminateProcess(handle, 0)):
+            raise OSError('No such process %s' % pid)
+else:
+    kill = os.kill
+
 def main(argv=sys.argv, quiet=False):
     command = PServeCommand(argv, quiet=quiet)
-    command.run()
+    return command.run()
 
 class DaemonizeException(Exception):
     pass
 
 class PServeCommand(object):
 
-    usage = 'CONFIG_FILE [start|stop|restart|status] [var=value]'
-    takes_config_file = 1
-    summary = ("Serve the application described in CONFIG_FILE or control "
-               "daemon status"),
+    usage = '%prog config_uri [start|stop|restart|status] [var=value]'
     description = """\
     This command serves a web application that uses a PasteDeploy
     configuration file for the server and application.
@@ -51,7 +64,10 @@ class PServeCommand(object):
     """
     verbose = 1
 
-    parser = optparse.OptionParser()
+    parser = optparse.OptionParser(
+        usage,
+        description=textwrap.dedent(description)
+        )
     parser.add_option(
         '-n', '--app-name',
         dest='app_name',
@@ -158,7 +174,7 @@ class PServeCommand(object):
 
         if not self.args:
             self.out('You must give a config file')
-            return
+            return 2
         app_spec = self.args[0]
         if (len(self.args) > 1
             and self.args[1] in self.possible_subcommands):
@@ -172,7 +188,7 @@ class PServeCommand(object):
             if os.environ.get(self._reloader_environ_key):
                 if self.verbose > 1:
                     self.out('Running reloading file monitor')
-                install_reloader(int(self.options.reload_interval))
+                install_reloader(int(self.options.reload_interval), [app_spec])
                 # if self.requires_config_file:
                 #     watch_file(self.args[0])
             else:
@@ -181,7 +197,7 @@ class PServeCommand(object):
         if cmd not in (None, 'start', 'stop', 'restart', 'status'):
             self.out(
                 'Error: must give start|stop|restart (not %s)' % cmd)
-            return
+            return 2
 
         if cmd == 'status' or self.options.show_status:
             return self.show_status()
@@ -244,7 +260,7 @@ class PServeCommand(object):
             except DaemonizeException as ex:
                 if self.verbose > 0:
                     self.out(str(ex))
-                return
+                return 2
 
         if (self.options.monitor_restart
             and not os.environ.get(self._monitor_environ_key)):
@@ -266,7 +282,7 @@ class PServeCommand(object):
             log_fn = None
         if log_fn:
             log_fn = os.path.join(base, log_fn)
-            logging_file_config(log_fn)
+            setup_logging(log_fn)
 
         server = self.loadserver(server_spec, name=server_name,
                                  relative_to=base, global_conf=vars)
@@ -287,7 +303,7 @@ class PServeCommand(object):
                 if self.verbose > 1:
                     raise
                 if str(e):
-                    msg = ' '+str(e)
+                    msg = ' ' + str(e)
                 else:
                     msg = ''
                 self.out('Exiting%s (-v to see traceback)' % msg)
@@ -380,8 +396,7 @@ class PServeCommand(object):
         os.dup2(0, 1)  # standard output (1)
         os.dup2(0, 2)  # standard error (2)
 
-    def _remove_pid_file(self, written_pid, filename,
-                         verbosity): # pragma: no cover
+    def _remove_pid_file(self, written_pid, filename, verbosity):
         current_pid = os.getpid()
         if written_pid != current_pid:
             # A forked process must be exiting, not the process that
@@ -389,17 +404,16 @@ class PServeCommand(object):
             return
         if not os.path.exists(filename):
             return
-        f = open(filename)
-        content = f.read().strip()
-        f.close()
+        with open(filename) as f:
+            content = f.read().strip()
         try:
             pid_in_file = int(content)
         except ValueError:
             pass
         else:
             if pid_in_file != current_pid:
-                self.out("PID file %s contains %s, not expected PID %s" % (
-                    filename, pid_in_file, current_pid))
+                msg = "PID file %s contains %s, not expected PID %s"
+                self.out(msg % (filename, pid_in_file, current_pid))
                 return
         if verbosity > 0:
             self.out("Removing PID file %s" % filename)
@@ -408,24 +422,22 @@ class PServeCommand(object):
             return
         except OSError as e:
             # Record, but don't give traceback
-            self.out("Cannot remove PID file: %s" % e)
+            self.out("Cannot remove PID file: (%s)" % e)
         # well, at least lets not leave the invalid PID around...
         try:
-            f = open(filename, 'w')
-            f.write('')
-            f.close()
+            with open(filename, 'w') as f:
+                f.write('')
         except OSError as e:
-            self.out('Stale PID left in file: %s (%e)' % (filename, e))
+            self.out('Stale PID left in file: %s (%s)' % (filename, e))
         else:
             self.out('Stale PID removed')
 
-    def record_pid(self, pid_file): # pragma: no cover
+    def record_pid(self, pid_file):
         pid = os.getpid()
         if self.verbose > 1:
             self.out('Writing PID %s to %s' % (pid, pid_file))
-        f = open(pid_file, 'w')
-        f.write(str(pid))
-        f.close()
+        with open(pid_file, 'w') as f:
+            f.write(str(pid))
         atexit.register(self._remove_pid_file, pid, pid_file, self.verbose)
 
     def stop_daemon(self): # pragma: no cover
@@ -450,7 +462,7 @@ class PServeCommand(object):
             if not live_pidfile(pid_file):
                 break
             import signal
-            os.kill(pid, signal.SIGTERM)
+            kill(pid, signal.SIGTERM)
             time.sleep(1)
         else:
             self.out("failed to kill web process %s" % pid)
@@ -504,11 +516,10 @@ class PServeCommand(object):
                         raise
                     return 1
             finally:
-                if (proc is not None
-                    and hasattr(os, 'kill')):
+                if proc is not None:
                     import signal
                     try:
-                        os.kill(proc.pid, signal.SIGTERM)
+                        kill(proc.pid, signal.SIGTERM)
                     except (OSError, IOError):
                         pass
 
@@ -518,7 +529,7 @@ class PServeCommand(object):
                 if exit_code != 3:
                     return exit_code
             if self.verbose > 0:
-                self.out('%s %s %s' % ('-'*20, 'Restarting', '-'*20))
+                self.out('%s %s %s' % ('-' * 20, 'Restarting', '-' * 20))
 
     def change_user_group(self, user, group): # pragma: no cover
         if not user and not group:
@@ -580,6 +591,14 @@ class LazyWriter(object):
                 self.lock.release()
         return self.fileobj
 
+    def close(self):
+        fileobj = self.fileobj
+        if fileobj is not None:
+            fileobj.close()
+
+    def __del__(self):
+        self.close()
+
     def write(self, text):
         fileobj = self.open()
         fileobj.write(text)
@@ -602,7 +621,7 @@ def live_pidfile(pidfile): # pragma: no cover
     pid = read_pidfile(pidfile)
     if pid:
         try:
-            os.kill(int(pid), 0)
+            kill(int(pid), 0)
             return pid
         except OSError as e:
             if e.errno == errno.EPERM:
@@ -666,7 +685,7 @@ def _turn_sigterm_into_systemexit(): # pragma: no cover
         raise SystemExit
     signal.signal(signal.SIGTERM, handle_term)
 
-def install_reloader(poll_interval=1): # pragma: no cover
+def install_reloader(poll_interval=1, extra_files=None): # pragma: no cover
     """
     Install the reloading monitor.
 
@@ -676,6 +695,9 @@ def install_reloader(poll_interval=1): # pragma: no cover
     which causes the whole application to shut-down (rudely).
     """
     mon = Monitor(poll_interval=poll_interval)
+    if extra_files is None:
+        extra_files = []
+    mon.extra_files.extend(extra_files)
     t = threading.Thread(target=mon.periodic_reload)
     t.setDaemon(True)
     t.start()
@@ -769,7 +791,7 @@ class Monitor(object): # pragma: no cover
 
     def periodic_reload(self):
         while True:
-            if not self.check_reload(): 
+            if not self.check_reload():
                 self._exit()
                 break
             time.sleep(self.poll_interval)
@@ -939,7 +961,7 @@ def cherrypy_server_runner(
     try:
         protocol = is_ssl and 'https' or 'http'
         if host == '0.0.0.0':
-            print('serving on 0.0.0.0:%s view at %s://127.0.0.1:%s' % 
+            print('serving on 0.0.0.0:%s view at %s://127.0.0.1:%s' %
                   (port, protocol, port))
         else:
             print('serving on %s://%s:%s' % (protocol, host, port))

@@ -2,12 +2,19 @@ from zope.interface import implementer
 
 from pyramid.interfaces import ITweens
 
-from pyramid.compat import string_types
-from pyramid.compat import is_nonstr_iter
-from pyramid.compat import string_types
+from pyramid.compat import (
+    string_types,
+    is_nonstr_iter,
+    )
+
 from pyramid.exceptions import ConfigurationError
-from pyramid.tweens import excview_tween_factory
-from pyramid.tweens import MAIN, INGRESS, EXCVIEW
+
+from pyramid.tweens import (
+    excview_tween_factory,
+    MAIN,
+    INGRESS,
+    EXCVIEW,
+    )
 
 from pyramid.config.util import action_method
 
@@ -131,11 +138,22 @@ class TweensConfiguratorMixin(object):
             raise ConfigurationError('%s cannot be under MAIN' % name)
 
         registry = self.registry
+        introspectables = []
 
         tweens = registry.queryUtility(ITweens)
         if tweens is None:
             tweens = Tweens()
             registry.registerUtility(tweens, ITweens)
+            ex_intr = self.introspectable('tweens',
+                                          ('tween', EXCVIEW, False),
+                                          EXCVIEW,
+                                          'implicit tween')
+            ex_intr['name'] = EXCVIEW
+            ex_intr['factory'] = excview_tween_factory
+            ex_intr['type'] = 'implicit'
+            ex_intr['under'] = None
+            ex_intr['over'] = MAIN
+            introspectables.append(ex_intr)
             tweens.add_implicit(EXCVIEW, excview_tween_factory, over=MAIN)
 
         def register():
@@ -144,7 +162,20 @@ class TweensConfiguratorMixin(object):
             else:
                 tweens.add_implicit(name, tween_factory, under=under, over=over)
 
-        self.action(('tween', name, explicit), register)
+        discriminator = ('tween', name, explicit)
+        tween_type = explicit and 'explicit' or 'implicit'
+
+        intr = self.introspectable('tweens',
+                                   discriminator,
+                                   name,
+                                   '%s tween' % tween_type)
+        intr['name'] = name
+        intr['factory'] = tween_factory
+        intr['type'] = tween_type
+        intr['under'] = under
+        intr['over'] = over
+        introspectables.append(intr)
+        self.action(discriminator, register, introspectables=introspectables)
 
 class CyclicDependencyError(Exception):
     def __init__(self, cycles):
@@ -184,7 +215,7 @@ class Tweens(object):
             self.order += [(u, name) for u in under]
             self.req_under.add(name)
         if over is not None:
-            if not is_nonstr_iter(over): #hasattr(over, '__iter__'):
+            if not is_nonstr_iter(over):
                 over = (over,)
             self.order += [(name, o) for o in over]
             self.req_over.add(name)

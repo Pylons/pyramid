@@ -39,20 +39,6 @@ LaTeXTranslator.depart_inline = nothing
 
 book = os.environ.get('BOOK')
 
-# If your extensions are in another directory, add it here. If the directory
-# is relative to the documentation root, use os.path.abspath to make it
-# absolute, like shown here.
-parent = os.path.dirname(os.path.dirname(__file__))
-sys.path.append(os.path.abspath(parent))
-wd = os.getcwd()
-os.chdir(parent)
-os.system('%s setup.py test -q' % sys.executable)
-os.chdir(wd)
-
-for item in os.listdir(parent):
-    if item.endswith('.egg'):
-        sys.path.append(os.path.join(parent, item))
-
 # General configuration
 # ---------------------
 
@@ -94,7 +80,8 @@ copyright = '%s, Agendaless Consulting' % datetime.datetime.now().year
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '1.3dev'
+version = '1.3b2'
+
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -141,14 +128,42 @@ if book:
 # -----------------------
 
 # Add and use Pylons theme
-sys.path.append(os.path.abspath('_themes'))
+if 'sphinx-build' in ' '.join(sys.argv): # protect against dumb importers
+    from subprocess import call, Popen, PIPE
+
+    p = Popen('which git', shell=True, stdout=PIPE)
+    git = p.stdout.read().strip()
+    cwd = os.getcwd()
+    _themes = os.path.join(cwd, '_themes')
+
+    if not os.path.isdir(_themes):
+        call([git, 'clone', 'git://github.com/Pylons/pylons_sphinx_theme.git',
+                '_themes'])
+    else:
+        os.chdir(_themes)
+        call([git, 'checkout', 'master'])
+        call([git, 'pull'])
+        os.chdir(cwd)
+
+    sys.path.append(os.path.abspath('_themes'))
+
+    parent = os.path.dirname(os.path.dirname(__file__))
+    sys.path.append(os.path.abspath(parent))
+    wd = os.getcwd()
+    os.chdir(parent)
+    os.system('%s setup.py test -q' % sys.executable)
+    os.chdir(wd)
+
+    for item in os.listdir(parent):
+        if item.endswith('.egg'):
+            sys.path.append(os.path.join(parent, item))
+
 html_theme_path = ['_themes']
 html_theme = 'pyramid'
-
-html_theme_options = {
-    'github_url': 'https://github.com/Pylons/pyramid'
-}
-
+html_theme_options = dict(
+    github_url='https://github.com/Pylons/pyramid',
+#    in_progress='true'
+    )
 # The style sheet to use for HTML and HTML Help pages. A file of that name
 # must exist either in Sphinx' static/ path, or in one of the custom paths
 # given in html_static_path.
@@ -461,7 +476,7 @@ def resig(app, what, name, obj, options, signature, return_annotation):
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = 'The Pyramid Web Application Development Framework, Version 1.2'
+epub_title = 'The Pyramid Web Application Development Framework, Version 1.3'
 epub_author = 'Chris McDonough'
 epub_publisher = 'Agendaless Consulting'
 epub_copyright = '2008-2011'
@@ -478,7 +493,7 @@ epub_scheme = 'ISBN'
 epub_identifier = '0615445675'
 
 # A unique identification for the text.
-epub_uid = 'The Pyramid Web Application Development Framework, Version 1.2'
+epub_uid = 'The Pyramid Web Application Development Framework, Version 1.3'
 
 # HTML files that should be inserted before the pages created by sphinx.
 # The format is a list of tuples containing the path and title.

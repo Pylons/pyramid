@@ -8,6 +8,10 @@
 .. autoclass:: Request
    :members:
    :inherited-members:
+   :exclude-members: add_response_callback, add_finished_callback,
+                     route_url, route_path, current_route_url,
+                     current_route_path, static_url, static_path,
+                     model_url, resource_url, set_property
 
    .. attribute:: context
 
@@ -141,10 +145,6 @@
      ``request.session`` attribute will cause a
      :class:`pyramid.exceptions.ConfigurationError` to be raised.
 
-   .. attribute:: tmpl_context
-
-     The template context for Pylons-style applications.
-
    .. attribute:: matchdict
 
       If a :term:`route` has matched during this request, this attribute will
@@ -179,6 +179,8 @@
 
    .. automethod:: resource_url
 
+   .. automethod:: resource_path
+
    .. attribute::  response_*
 
       In Pyramid 1.0, you could set attributes on a
@@ -203,6 +205,57 @@
        body.  If the request body is not well-formed JSON, or there is no
        body associated with this request, this property will raise an
        exception.  See also :ref:`request_json_body`.
+
+   .. method:: set_property(callable, name=None, reify=False)
+
+       Add a callable or a property descriptor to the request instance.
+
+       Properties, unlike attributes, are lazily evaluated by executing
+       an underlying callable when accessed. They can be useful for
+       adding features to an object without any cost if those features
+       go unused.
+
+       A property may also be reified via the
+       :class:`pyramid.decorator.reify` decorator by setting
+       ``reify=True``, allowing the result of the evaluation to be
+       cached. Thus the value of the property is only computed once for
+       the lifetime of the object.
+
+       ``callable`` can either be a callable that accepts the request as
+       its single positional parameter, or it can be a property
+       descriptor.
+
+       If the ``callable`` is a property descriptor a ``ValueError``
+       will be raised if ``name`` is ``None`` or ``reify`` is ``True``.
+
+       If ``name`` is None, the name of the property will be computed
+       from the name of the ``callable``.
+
+       .. code-block:: python
+          :linenos:
+
+          def _connect(request):
+              conn = request.registry.dbsession()
+              def cleanup(_):
+                  conn.close()
+              request.add_finished_callback(cleanup)
+              return conn
+
+          @subscriber(NewRequest)
+          def new_request(event):
+              request = event.request
+              request.set_property(_connect, 'db', reify=True)
+
+       The subscriber doesn't actually connect to the database, it just
+       provides the API which, when accessed via ``request.db``, will
+       create the connection. Thanks to reify, only one connection is
+       made per-request even if ``request.db`` is accessed many times.
+
+       This pattern provides a way to augment the ``request`` object
+       without having to subclass it, which can be useful for extension
+       authors.
+
+       .. versionadded:: 1.3
 
 .. note::
 
