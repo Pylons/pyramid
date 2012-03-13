@@ -301,8 +301,8 @@ subdirectories) and are just referred to by URL.
 Viewing the Application in a Browser
 ====================================
 
-We can finally examine our application in a
-browser.  The views we'll try are as follows:
+We can finally examine our application in a browser (See
+:ref:`wiki-start-the-application`).  The views we'll try are as follows:
 
 - Visiting ``http://localhost:6543/`` in a browser invokes the ``view_wiki``
   view.  This always redirects to the ``view_page`` view of the ``FrontPage``
