@@ -16,8 +16,10 @@ Application Configuration with ``__init__.py``
 A directory on disk can be turned into a Python :term:`package` by containing
 an ``__init__.py`` file.  Even if empty, this marks a directory as a Python
 package.  We use ``__init__.py`` both as a marker indicating the directory
-it's contained within is a package, and to contain configuration code.  Our
-``__init__.py`` file will look like this:
+it's contained within is a package, and to contain configuration code.
+
+Open the ``tutorial/tutorial/__init__.py`` file.  It should already contain
+the following:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
       :linenos:
