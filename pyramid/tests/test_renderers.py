@@ -10,7 +10,7 @@ class TestTemplateRendererFactory(unittest.TestCase):
 
     def tearDown(self):
         cleanUp()
-        
+
     def _callFUT(self, info, impl):
         from pyramid.renderers import template_renderer_factory
         return template_renderer_factory(info, impl)
@@ -344,9 +344,17 @@ class Test_json_renderer_factory(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
 
+        class Custom(object):
+            def __init__(self):
+                self.foo = [1,2,3]
+            def __json__(self):
+                return {'list_length':len(self.foo),
+                        'list': self.foo,}
+        self.custom_object = Custom()
+
     def tearDown(self):
         testing.tearDown()
-        
+
     def _callFUT(self, name):
         from pyramid.renderers import json_renderer_factory
         return json_renderer_factory(name)
@@ -368,6 +376,19 @@ class Test_json_renderer_factory(unittest.TestCase):
         renderer = self._callFUT(None)
         renderer({'a':1}, {'request':request})
         self.assertEqual(request.response.content_type, 'text/mishmash')
+
+    def test_with_custom_object(self):
+        request = testing.DummyRequest()
+        renderer = self._callFUT(None)
+        renderer(self.custom_object, {'request':request})
+        self.assertEqual(request.response.content_type, 'application/json')
+
+    def test_with_custom_object_list(self):
+        request = testing.DummyRequest()
+        renderer = self._callFUT(None)
+        renderer({'objects':[self.custom_object, self.custom_object]},
+                 {'request':request})
+        self.assertEqual(request.response.content_type, 'application/json')
 
 class Test_string_renderer_factory(unittest.TestCase):
     def _callFUT(self, name):

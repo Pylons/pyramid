@@ -207,7 +207,34 @@ representing the JSON serialization of the return value:
    '{"content": "Hello!"}'
 
 The return value needn't be a dictionary, but the return value must contain
-values serializable by :func:`json.dumps`.
+values serializable by :func:`json.dumps`. If you wish to use a custom
+object in your return value you can define a :func:`__json__` method on your
+object. You can use this to create a serializable version of your object:
+
+.. code-block:: python
+   :linenos:
+
+   class MyObject(object):
+       def __init__(self):
+           self.timestamp = datetime.now()
+           self.items = [1,2,3]
+
+       def __json__(self):
+           return {'timestamp':self.timestamp.strftime('%Y-%m-%d'),
+                   'item_count':len(self.items),
+                   'items':self.items}
+
+   @view_config(renderer='json')
+   def my_object(request):
+       return MyObject()
+
+Here the body of the response returned by such a view will be a string
+representing the result of your :func:`__json__` method being called.
+
+.. code-block:: python
+   :linenos:
+
+   '{"timestamp": "1900-01-01", "item_count": 3, "items": [1,2,3]}'
 
 You can configure a view to use the JSON renderer by naming ``json`` as the
 ``renderer`` argument of a view configuration, e.g. by using
