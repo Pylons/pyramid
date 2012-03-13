@@ -12,14 +12,19 @@ application to allow only people whom possess a specific username (`editor`)
 to add and edit wiki pages but we'll continue allowing anyone with access to
 the server to view pages.
 
-To do so, we'll add an :term:`authentication policy` and an
-:term:`authorization policy`.  We'll also add a ``security.py`` module,
-create a :term:`root factory` with an :term:`ACL`, and add :term:`permission`
-declarations to the ``edit_page`` and ``add_page`` views.  Then we'll add
-``login`` and ``logout`` views, and modify the existing views to make them
-return a ``logged_in`` flag to the renderer.  Finally, we will add a
-``login.pt`` template and change the existing ``view.pt`` and ``edit.pt`` to
-show a "Logout" link when not logged in.
+We will do the following steps:
+
+* Add a :term:`root factory` with an :term:`ACL` (``models.py``).
+* Add an :term:`authentication policy` and an :term:`authorization policy`
+  (``__init__.py``).
+* Add an authentication policy callback (new ``security.py`` module).
+* Add :term:`permission` declarations to the ``edit_page`` and ``add_page``
+  views (``views.py``).
+* Add ``login`` and ``logout`` views (``views.py``).
+* Make the existing views return a ``logged_in`` flag to the renderer (``views.py``).
+* Add a login template (new ``login.pt``).
+* Add a "Logout" link to be shown when logged in and viewing or editing a page
+  (``view.pt``, ``edit.pt``).
 
 The source code for this tutorial stage can be browsed at
 `http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/authorization/
@@ -98,7 +103,7 @@ Then, we'll add those policies to the configuration:
    :linenos:
    :language: python
 
-Note that that the
+Note that the
 :class:`pyramid.authentication.AuthTktAuthenticationPolicy` constructor
 accepts two arguments: ``secret`` and ``callback``.  ``secret`` is a string
 representing an encryption key used by the "authentication ticket" machinery
@@ -248,7 +253,7 @@ Adding the ``login.pt`` Template
 --------------------------------
 
 Add a ``login.pt`` template to your templates directory.  It's
-referred to within the login view we just added to ``login.py``.
+referred to within the login view we just added to ``views.py``.
 
 .. literalinclude:: src/authorization/tutorial/templates/login.pt
    :language: xml
