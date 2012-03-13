@@ -18,7 +18,7 @@ an ``__init__.py`` file.  Even if empty, this marks a directory as a Python
 package.  We use ``__init__.py`` both as a marker indicating the directory
 it's contained within is a package, and to contain configuration code.
 
-Open the ``tutorial/tutorial/__init__.py`` file.  It should already contain
+Open ``tutorial/tutorial/__init__.py``.  It should already contain
 the following:
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
@@ -128,7 +128,7 @@ pattern matches is done by registering a :term:`view configuration`. Our
 application uses the :meth:`pyramid.view.view_config` decorator to map view
 callables to each route, thereby mapping URL patterns to code.
 
-Here is the entirety of code in the ``views.py`` file within our package:
+Open ``tutorial/tutorial/views.py``.  It should already contain the following:
 
    .. literalinclude:: src/basiclayout/tutorial/views.py
       :linenos:
@@ -165,13 +165,13 @@ In a SQLAlchemy-based application, a *model* object is an object composed by
 querying the SQL database. The ``models.py`` file is where the ``alchemy``
 scaffold put the classes that implement our models.
 
-Here is the complete source for ``models.py``:
+Open ``tutorial/tutorial/models.py``.  It should already contain the following:
 
    .. literalinclude:: src/basiclayout/tutorial/models.py
       :linenos:
       :language: py
 
-Let's take a look. First, we need some imports to support later code.
+Let's examine this in detail. First, we need some imports to support later code:
 
    .. literalinclude:: src/basiclayout/tutorial/models.py
       :end-before: DBSession
