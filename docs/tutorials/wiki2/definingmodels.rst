@@ -54,48 +54,48 @@ in the table.  The ``name`` attribute will be a text attribute, each value of
 which needs to be unique within the column.  The ``data`` attribute is a text
 attribute that will hold the body of each page.
 
-Changing ``scripts/populate.py``
---------------------------------
+Changing ``scripts/initializedb.py``
+------------------------------------
 
 We haven't looked at the guts of this file yet, but within the ``scripts``
-directory of your ``tutorial`` package is a file named ``populate.py``.  Code
-in this file is executed whenever we run the ``populate_tutorial`` command
+directory of your ``tutorial`` package is a file named ``initializedb.py``.  Code
+in this file is executed whenever we run the ``initialize_tutorial_db`` command
 (as we did in the installation step of this tutorial).
 
-Since we've changed our model, we need to make changes to our ``populate.py``
+Since we've changed our model, we need to make changes to our ``initializedb.py``
 script.  In particular, we'll replace our import of ``MyModel`` with one of
 ``Page`` and we'll change the very end of the script to create a ``Page``
 rather than a ``MyModel`` and add it to our ``DBSession``.
 
-Open ``tutorial/tutorial/scripts/populate.py`` and edit it to look like the 
+Open ``tutorial/tutorial/scripts/initializedb.py`` and edit it to look like the 
 following:
 
-.. literalinclude:: src/models/tutorial/scripts/populate.py
+.. literalinclude:: src/models/tutorial/scripts/initializedb.py
    :linenos:
    :language: python
    :emphasize-lines: 14,34
 
 (Only the highlighted lines need to be changed.)
 
-Repopulating the Database
--------------------------
+Reinitializing the Database
+---------------------------
 
-Because our model has changed, in order to repopulate the database, we need
-to rerun the ``populate_tutorial`` command to pick up the changes you've made
-to both the models.py file and to the populate.py file.  From the root of the
+Because our model has changed, in order to reinitialize the database, we need
+to rerun the ``initialize_tutorial_db`` command to pick up the changes you've made
+to both the models.py file and to the initializedb.py file.  From the root of the
 ``tutorial`` project, directory execute the following commands.
 
 On UNIX:
 
 .. code-block:: text
 
-   $ ../bin/populate_tutorial development.ini
+   $ ../bin/initialize_tutorial_db development.ini
 
 On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut\tutorial> ..\Scripts\populate_tutorial development.ini
+   c:\pyramidtut\tutorial> ..\Scripts\initialize_tutorial_db development.ini
 
 Success will look something like this::
 
