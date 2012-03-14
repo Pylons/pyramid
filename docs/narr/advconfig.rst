@@ -227,7 +227,7 @@ to :meth:`~pyramid.config.Configurator.commit` between them:
 
 In the above example we've issued a call to
 :meth:`~pyramid.config.Configurator.commit` between the two ``add_view``
-calls.  :meth:`~pyramid.config.Configurator.commit` will cause any pending
+calls.  :meth:`~pyramid.config.Configurator.commit` will execute any pending
 configuration statements.
 
 Calling :meth:`~pyramid.config.Configurator.commit` is safe at any time.  It
