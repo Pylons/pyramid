@@ -21,7 +21,7 @@ def usage(argv):
           '(example: "%s development.ini")' % (cmd, cmd)) 
     sys.exit(1)
 
-def main(argv=sys.argv, settings=None):
+def main(argv=sys.argv):
     if len(argv) != 2:
         usage(argv)
     config_uri = argv[1]
