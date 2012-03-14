@@ -1,6 +1,11 @@
 [app:main]
 use = egg:{{project}}
 
+###
+# pyramid debugging
+# {{settings_url}}
+###
+
 pyramid.reload_templates = false
 pyramid.debug_authorization = false
 pyramid.debug_notfound = false
@@ -19,7 +24,10 @@ use = egg:waitress#main
 host = 0.0.0.0
 port = 6543
 
-# Begin logging configuration
+###
+# logging configuration
+# {{logging_url}}
+###
 
 [loggers]
 keys = root, {{package_logger}}
@@ -47,5 +55,3 @@ formatter = generic
 
 [formatter_generic]
 format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
-
-# End logging configuration
