@@ -38,9 +38,7 @@ Open ``tutorial/setup.py`` and edit it to look like the following:
    :language: python
    :emphasize-lines: 17
 
-(Only the highlighted line needs to be changed.)
-
-(Only the highlighted line needs to be added)
+(Only the highlighted line needs to be added.)
 
 Running ``setup.py develop``
 ============================
