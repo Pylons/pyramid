@@ -13,9 +13,8 @@ We write a test class for the model class ``Page`` and another test class
 for the ``initialize_sql`` function.
 
 To do so, we'll retain the ``tutorial.tests.ViewTests`` class provided as a
-result of the ``alchemy`` scaffold.  We'll add two test classes: one for the
-``Page`` model named ``PageModelTests``, and one for the ``populate`` script
-named ``Test_populate``.
+result of the ``alchemy`` scaffold.  We'll add a test class named
+``PageModelTests`` for the ``Page`` model.
 
 Testing the Views
 =================
@@ -33,18 +32,6 @@ We test the whole application, covering security aspects that are not
 tested in the unit tests, like logging in, logging out, checking that
 the ``viewer`` user cannot add or edit pages, but the ``editor`` user
 can, and so on.
-
-We must first modify ``main()`` in ``scripts/populate.py``, adding an
-optional ``settings`` argument so we can pass in a URI to a
-memory-resident database instead of our disk-based database we've
-populated; this allows us to run our tests with a clean database each
-time.  Replace ``main()`` with this version which adds an argument and
-then uses it if set, and creates a ``Model`` for testing:
-
-.. literalinclude:: src/tests/tutorial/scripts/populate.py
-   :lines: 24-36
-   :linenos:
-   :language: python
 
 Viewing the results of all our edits to ``tests.py``
 ====================================================

@@ -96,9 +96,9 @@ On Windows:
 Success executing this command will end with a line to the console something
 like::
 
-   Please run the "populate_tutorial" script to set up the SQL 
+   Please run the "initialize_tutorial_db" script to set up the SQL 
    database before starting the application (e.g. 
-   "$myvirtualenv/bin/populate_tutorial development.ini".)
+   "$myvirtualenv/bin/initialize_tutorial_db development.ini".)
 
 Installing the Project in "Development Mode"
 ============================================
@@ -242,8 +242,8 @@ If successful, you will see something like this on your console::
 
 This means the server is ready to accept requests.
 
-Populating the Database
-=======================
+Initializing the Database
+=========================
 
 In a web browser, visit ``http://localhost:6543/``. 
 
@@ -255,9 +255,9 @@ You will see an error page with a title something like this::
 
 Oh no!  Something isn't working!
 
-This happens because we haven't populated the SQL database with any table
-information yet.  We need to use the ``populate_tutorial`` :term:`console
-script` to populate our database before we can see the page render correctly.
+This happens because we haven't initialized the SQL database with any table
+information yet.  We need to use the ``initialize_tutorial_db`` :term:`console
+script` to initialize our database before we can see the page render correctly.
 
 Stop the running Pyramid application by pressing ``ctrl-C`` in the console.
 Make sure you're still in the ``tutorial`` directory (the directory with a
@@ -267,13 +267,13 @@ On UNIX:
 
 .. code-block:: text
 
-   $ ../bin/populate_tutorial development.ini
+   $ ../bin/initialize_tutorial_db development.ini
 
 On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut\tutorial> ..\Scripts\populate_tutorial development.ini
+   c:\pyramidtut\tutorial> ..\Scripts\initialize_tutorial_db development.ini
 
 The output to your console should be something like this::
 

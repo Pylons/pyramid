@@ -246,23 +246,3 @@ class FunctionalTests(unittest.TestCase):
         self.testapp.get(self.editor_login, status=302)
         res = self.testapp.get('/FrontPage', status=200)
         self.assertTrue('FrontPage' in res.body)
-
-class Test_populate(unittest.TestCase):
-    def setUp(self):
-        from tutorial.models import DBSession
-        DBSession.remove()
-
-    def tearDown(self):
-        from tutorial.models import DBSession
-        DBSession.remove()
-
-    def _callFUT(self, settings):
-        from tutorial.scripts.populate import main
-        main(['foo', 'development.ini'], settings)
-
-    def test_it(self):
-        self._callFUT({'sqlalchemy.url':'sqlite://'})
-        from tutorial.models import DBSession, Page
-        self.assertEqual(DBSession.query(Page).one().data,
-            'This is the front page')
-

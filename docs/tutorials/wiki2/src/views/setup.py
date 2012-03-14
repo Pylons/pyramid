@@ -40,7 +40,7 @@ setup(name='tutorial',
       [paste.app_factory]
       main = tutorial:main
       [console_scripts]
-      populate_tutorial = tutorial.scripts.populate:main
+      initialize_tutorial_db = tutorial.scripts.initializedb:main
       """,
       )
 
