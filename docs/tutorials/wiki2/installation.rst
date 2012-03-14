@@ -93,13 +93,6 @@ On Windows:
    startup problems, try putting both the virtualenv and the project
    into directories that do not contain spaces in their paths.
 
-Success executing this command will end with a line to the console something
-like::
-
-   Please run the "initialize_tutorial_db" script to set up the SQL 
-   database before starting the application (e.g. 
-   "$myvirtualenv/bin/initialize_tutorial_db development.ini".)
-
 Installing the Project in "Development Mode"
 ============================================
 
@@ -215,53 +208,14 @@ If successful, you will see output something like this::
 
 Looks like our package doesn't quite have 100% test coverage.
 
-.. _wiki2-start-the-application:
-
-Starting the Application
-========================
-
-Start the application.
-
-On UNIX:
-
-.. code-block:: text
-
-   $ ../bin/pserve development.ini --reload
-
-On Windows:
-
-.. code-block:: text
-
-   c:\pyramidtut\tutorial> ..\Scripts\pserve development.ini --reload
-
-If successful, you will see something like this on your console::
-
-  Starting subprocess with file monitor
-  Starting server in PID 8966.
-  Starting HTTP server on http://0.0.0.0:6543
-
-This means the server is ready to accept requests.
-
 Initializing the Database
 =========================
 
-In a web browser, visit ``http://localhost:6543/``. 
+We need to use the ``initialize_tutorial_db`` :term:`console
+script` to initialize our database.
 
-You will see an error page with a title something like this::
-
-  sqlalchemy.exc.OperationalError
-
-  OperationalError: (OperationalError) no such table: models ...
-
-Oh no!  Something isn't working!
-
-This happens because we haven't initialized the SQL database with any table
-information yet.  We need to use the ``initialize_tutorial_db`` :term:`console
-script` to initialize our database before we can see the page render correctly.
-
-Stop the running Pyramid application by pressing ``ctrl-C`` in the console.
-Make sure you're still in the ``tutorial`` directory (the directory with a
-``development.ini`` in it) and type the following command:
+Type the following command, make sure you are still in the ``tutorial``
+directory (the directory with a ``development.ini`` in it):
 
 On UNIX:
 
@@ -304,10 +258,12 @@ Success!  You should now have a ``tutorial.db`` file in your current working
 directory.  This will be a SQLite database with a single table defined in it
 (``models``).
 
-Starting the Application (Again)
-================================
+.. _wiki2-start-the-application:
 
-Start the application again.
+Starting the Application
+========================
+
+Start the application.
 
 On UNIX:
 
@@ -321,9 +277,16 @@ On Windows:
 
    c:\pyramidtut\tutorial> ..\Scripts\pserve development.ini --reload
 
+If successful, you will see something like this on your console::
+
+  Starting subprocess with file monitor
+  Starting server in PID 8966.
+  Starting HTTP server on http://0.0.0.0:6543
+
+This means the server is ready to accept requests.
+
 At this point, when you visit ``http://localhost:6543/`` in your web browser,
-you will no longer see an error; instead you will see the generated
-application's default page.
+you will see the generated application's default page.
 
 One thing you'll notice is the "debug toolbar" icon on right hand side of the
 page.  You can read more about the purpose of the icon at
