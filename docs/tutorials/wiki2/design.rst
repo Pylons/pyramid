@@ -65,63 +65,63 @@ Security
 Summary
 -------
 
-The URL, context, actions, template and permission associated to each view are
+The URL, actions, template and permission associated to each view are
 listed in the following table:
 
-+----------------------+-------------+-----------------+-----------------------+------------+------------+
-| URL                  |  View       |  Context        |  Action               |  Template  | Permission |
-|                      |             |                 |                       |            |            |
-+======================+=============+=================+=======================+============+============+
-| /                    |  view_wiki  |  Wiki           |  Redirect to          |            |            |
-|                      |             |                 |  /FrontPage           |            |            |
-+----------------------+-------------+-----------------+-----------------------+------------+------------+
-| /PageName            |  view_page  |  Page           |  Display existing     |  view.pt   |  view      |
-|                      |  [1]_       |                 |  page [2]_            |            |            |
-|                      |             |                 |                       |            |            |
-|                      |             |                 |                       |            |            |
-|                      |             |                 |                       |            |            |
-+----------------------+-------------+-----------------+-----------------------+------------+------------+
-| /edit_page/PageName  |  edit_page  |  Page           |  Display edit form    |  edit.pt   |  edit      |
-|                      |             |                 |  with existing        |            |            |
-|                      |             |                 |  content.             |            |            |
-|                      |             |                 |                       |            |            |
-|                      |             |                 |  If the form was      |            |            |
-|                      |             |                 |  submitted, redirect  |            |            |
-|                      |             |                 |  to /PageName         |            |            |
-+----------------------+-------------+-----------------+-----------------------+------------+------------+
-| /add_page/PageName   |  add_page   |  Wiki           |  Create the page      |  edit.pt   |  edit      |
-|                      |             |                 |  *PageName* in        |            |            |
-|                      |             |                 |  storage,  display    |            |            |
-|                      |             |                 |  the edit form        |            |            |
-|                      |             |                 |  without content.     |            |            |
-|                      |             |                 |                       |            |            |
-|                      |             |                 |  If the form was      |            |            |
-|                      |             |                 |  submitted,           |            |            |
-|                      |             |                 |  redirect to          |            |            |
-|                      |             |                 |  /PageName            |            |            |
-+----------------------+-------------+-----------------+-----------------------+------------+------------+
-| /login               |  login      |  Wiki,          |  Display login form.  |  login.pt  |            |
-|                      |             |  Forbidden [3]_ |                       |            |            |
-|                      |             |                 |  If the form was      |            |            |
-|                      |             |                 |  submitted,           |            |            |
-|                      |             |                 |  authenticate.        |            |            |
-|                      |             |                 |                       |            |            |
-|                      |             |                 |  - If authentication  |            |            |
-|                      |             |                 |    successful,        |            |            |
-|                      |             |                 |    redirect to the    |            |            |
-|                      |             |                 |    page that we       |            |            |
-|                      |             |                 |    came from.         |            |            |
-|                      |             |                 |                       |            |            |
-|                      |             |                 |  - If authentication  |            |            |
-|                      |             |                 |    fails, display     |            |            |
-|                      |             |                 |    login form with    |            |            |
-|                      |             |                 |    "login failed"     |            |            |
-|                      |             |                 |    message.           |            |            |
-|                      |             |                 |                       |            |            |
-+----------------------+-------------+-----------------+-----------------------+------------+------------+
-| /logout              |  logout     |  Wiki           |  Redirect to          |            |            |
-|                      |             |                 |  /FrontPage           |            |            |
-+----------------------+-------------+-----------------+-----------------------+------------+------------+
++----------------------+-----------------------+-------------+------------+------------+
+| URL                  |  Action               |  View       |  Template  | Permission |
+|                      |                       |             |            |            |
++======================+=======================+=============+============+============+
+| /                    |  Redirect to          |  view_wiki  |            |            |
+|                      |  /FrontPage           |             |            |            |
++----------------------+-----------------------+-------------+------------+------------+
+| /PageName            |  Display existing     |  view_page  |  view.pt   |  view      |
+|                      |  page [2]_            |  [1]_       |            |            |
+|                      |                       |             |            |            |
+|                      |                       |             |            |            |
+|                      |                       |             |            |            |
++----------------------+-----------------------+-------------+------------+------------+
+| /edit_page/PageName  |  Display edit form    |  edit_page  |  edit.pt   |  edit      |
+|                      |  with existing        |             |            |            |
+|                      |  content.             |             |            |            |
+|                      |                       |             |            |            |
+|                      |  If the form was      |             |            |            |
+|                      |  submitted, redirect  |             |            |            |
+|                      |  to /PageName         |             |            |            |
++----------------------+-----------------------+-------------+------------+------------+
+| /add_page/PageName   |  Create the page      |  add_page   |  edit.pt   |  edit      |
+|                      |  *PageName* in        |             |            |            |
+|                      |  storage,  display    |             |            |            |
+|                      |  the edit form        |             |            |            |
+|                      |  without content.     |             |            |            |
+|                      |                       |             |            |            |
+|                      |  If the form was      |             |            |            |
+|                      |  submitted,           |             |            |            |
+|                      |  redirect to          |             |            |            |
+|                      |  /PageName            |             |            |            |
++----------------------+-----------------------+-------------+------------+------------+
+| /login               |  Display login form.  |  login      |  login.pt  |            |
+|                      |                       |             |            |            |
+|                      |  If the form was      |             |            |            |
+|                      |  submitted,           |             |            |            |
+|                      |  authenticate.        |             |            |            |
+|                      |                       |             |            |            |
+|                      |  - If authentication  |             |            |            |
+|                      |    successful,        |             |            |            |
+|                      |    redirect to the    |             |            |            |
+|                      |    page that we       |             |            |            |
+|                      |    came from.         |             |            |            |
+|                      |                       |             |            |            |
+|                      |  - If authentication  |             |            |            |
+|                      |    fails, display     |             |            |            |
+|                      |    login form with    |             |            |            |
+|                      |    "login failed"     |             |            |            |
+|                      |    message.           |             |            |            |
+|                      |                       |             |            |            |
++----------------------+-----------------------+-------------+------------+------------+
+| /logout              |  Redirect to          |  logout     |            |            |
+|                      |  /FrontPage           |             |            |            |
++----------------------+-----------------------+-------------+------------+------------+
 
 .. [1] This is the default view for a Page context
        when there is no view name.
