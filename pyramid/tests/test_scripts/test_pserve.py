@@ -204,6 +204,29 @@ class TestPServeCommand(unittest.TestCase):
         inst = self._makeOne('development.ini')
         self.assertRaises(ValueError, inst.parse_vars, vars)
 
+class Test_read_pidfile(unittest.TestCase):
+    def _callFUT(self, filename):
+        from pyramid.scripts.pserve import read_pidfile
+        return read_pidfile(filename)
+
+    def test_read_pidfile(self):
+        filename = tempfile.mktemp()
+        try:
+            with open(filename, 'w') as f:
+                f.write('12345')
+            result = self._callFUT(filename)
+            self.assertEqual(result, 12345)
+        finally:
+            os.remove(filename)
+
+    def test_read_pidfile_no_pid_file(self):
+        result = self._callFUT('some unknown path')
+        self.assertEqual(result, None)
+
+    def test_read_pidfile_not_a_number(self):
+        result = self._callFUT(__file__)
+        self.assertEqual(result, None)
+
 class Test_main(unittest.TestCase):
     def _callFUT(self, argv):
         from pyramid.scripts.pserve import main
