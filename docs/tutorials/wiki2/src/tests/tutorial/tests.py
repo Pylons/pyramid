@@ -190,7 +190,7 @@ class FunctionalTests(unittest.TestCase):
 
     def test_FrontPage(self):
         res = self.testapp.get('/FrontPage', status=200)
-        self.assertTrue('FrontPage' in res.body)
+        self.assertTrue(b'FrontPage' in res.body)
 
     def test_unexisting_page(self):
         self.testapp.get('/SomePage', status=404)
@@ -201,68 +201,48 @@ class FunctionalTests(unittest.TestCase):
 
     def test_failed_log_in(self):
         res = self.testapp.get(self.viewer_wrong_login, status=200)
-        self.assertTrue('login' in res.body)
+        self.assertTrue(b'login' in res.body)
 
     def test_logout_link_present_when_logged_in(self):
         self.testapp.get(self.viewer_login, status=302)
         res = self.testapp.get('/FrontPage', status=200)
-        self.assertTrue('Logout' in res.body)
+        self.assertTrue(b'Logout' in res.body)
 
     def test_logout_link_not_present_after_logged_out(self):
         self.testapp.get(self.viewer_login, status=302)
         self.testapp.get('/FrontPage', status=200)
         res = self.testapp.get('/logout', status=302)
-        self.assertTrue('Logout' not in res.body)
+        self.assertTrue(b'Logout' not in res.body)
 
     def test_anonymous_user_cannot_edit(self):
         res = self.testapp.get('/FrontPage/edit_page', status=200)
-        self.assertTrue('Login' in res.body)
+        self.assertTrue(b'Login' in res.body)
 
     def test_anonymous_user_cannot_add(self):
         res = self.testapp.get('/add_page/NewPage', status=200)
-        self.assertTrue('Login' in res.body)
+        self.assertTrue(b'Login' in res.body)
 
     def test_viewer_user_cannot_edit(self):
         self.testapp.get(self.viewer_login, status=302)
         res = self.testapp.get('/FrontPage/edit_page', status=200)
-        self.assertTrue('Login' in res.body)
+        self.assertTrue(b'Login' in res.body)
 
     def test_viewer_user_cannot_add(self):
         self.testapp.get(self.viewer_login, status=302)
         res = self.testapp.get('/add_page/NewPage', status=200)
-        self.assertTrue('Login' in res.body)
+        self.assertTrue(b'Login' in res.body)
 
     def test_editors_member_user_can_edit(self):
         self.testapp.get(self.editor_login, status=302)
         res = self.testapp.get('/FrontPage/edit_page', status=200)
-        self.assertTrue('Editing' in res.body)
+        self.assertTrue(b'Editing' in res.body)
 
     def test_editors_member_user_can_add(self):
         self.testapp.get(self.editor_login, status=302)
         res = self.testapp.get('/add_page/NewPage', status=200)
-        self.assertTrue('Editing' in res.body)
+        self.assertTrue(b'Editing' in res.body)
 
     def test_editors_member_user_can_view(self):
         self.testapp.get(self.editor_login, status=302)
         res = self.testapp.get('/FrontPage', status=200)
-        self.assertTrue('FrontPage' in res.body)
-
-class Test_populate(unittest.TestCase):
-    def setUp(self):
-        from tutorial.models import DBSession
-        DBSession.remove()
-
-    def tearDown(self):
-        from tutorial.models import DBSession
-        DBSession.remove()
-
-    def _callFUT(self, settings):
-        from tutorial.scripts.populate import main
-        main(['foo', 'development.ini'], settings)
-
-    def test_it(self):
-        self._callFUT({'sqlalchemy.url':'sqlite://'})
-        from tutorial.models import DBSession, Page
-        self.assertEqual(DBSession.query(Page).one().data,
-            'This is the front page')
-
+        self.assertTrue(b'FrontPage' in res.body)

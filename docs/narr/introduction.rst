@@ -347,7 +347,7 @@ You can do this:
 When this view callable is called by Pyramid, the ``{'a':1}`` dictionary will
 be rendered to a response on your behalf.  The string passed as ``renderer=``
 above is an :term:`asset specification`.  It is in the form
-``packagename:directoryname/filename.ext``.  In this case, it names the
+``packagename:directoryname/filename.ext``.  In this case, it refers to the
 ``mytemplate.pt`` file in the ``templates`` directory within the ``myapp``
 Python package.  Asset specifications are omnipresent in Pyramid: see
 :ref:`intro_asset_specs` for more information.

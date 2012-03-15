@@ -303,7 +303,7 @@ class PServeCommand(object):
                 if self.verbose > 1:
                     raise
                 if str(e):
-                    msg = ' '+str(e)
+                    msg = ' ' + str(e)
                 else:
                     msg = ''
                 self.out('Exiting%s (-v to see traceback)' % msg)
@@ -396,8 +396,7 @@ class PServeCommand(object):
         os.dup2(0, 1)  # standard output (1)
         os.dup2(0, 2)  # standard error (2)
 
-    def _remove_pid_file(self, written_pid, filename,
-                         verbosity): # pragma: no cover
+    def _remove_pid_file(self, written_pid, filename, verbosity):
         current_pid = os.getpid()
         if written_pid != current_pid:
             # A forked process must be exiting, not the process that
@@ -405,17 +404,16 @@ class PServeCommand(object):
             return
         if not os.path.exists(filename):
             return
-        f = open(filename)
-        content = f.read().strip()
-        f.close()
+        with open(filename) as f:
+            content = f.read().strip()
         try:
             pid_in_file = int(content)
         except ValueError:
             pass
         else:
             if pid_in_file != current_pid:
-                self.out("PID file %s contains %s, not expected PID %s" % (
-                    filename, pid_in_file, current_pid))
+                msg = "PID file %s contains %s, not expected PID %s"
+                self.out(msg % (filename, pid_in_file, current_pid))
                 return
         if verbosity > 0:
             self.out("Removing PID file %s" % filename)
@@ -424,24 +422,22 @@ class PServeCommand(object):
             return
         except OSError as e:
             # Record, but don't give traceback
-            self.out("Cannot remove PID file: %s" % e)
+            self.out("Cannot remove PID file: (%s)" % e)
         # well, at least lets not leave the invalid PID around...
         try:
-            f = open(filename, 'w')
-            f.write('')
-            f.close()
+            with open(filename, 'w') as f:
+                f.write('')
         except OSError as e:
-            self.out('Stale PID left in file: %s (%e)' % (filename, e))
+            self.out('Stale PID left in file: %s (%s)' % (filename, e))
         else:
             self.out('Stale PID removed')
 
-    def record_pid(self, pid_file): # pragma: no cover
+    def record_pid(self, pid_file):
         pid = os.getpid()
         if self.verbose > 1:
             self.out('Writing PID %s to %s' % (pid, pid_file))
-        f = open(pid_file, 'w')
-        f.write(str(pid))
-        f.close()
+        with open(pid_file, 'w') as f:
+            f.write(str(pid))
         atexit.register(self._remove_pid_file, pid, pid_file, self.verbose)
 
     def stop_daemon(self): # pragma: no cover
@@ -533,7 +529,7 @@ class PServeCommand(object):
                 if exit_code != 3:
                     return exit_code
             if self.verbose > 0:
-                self.out('%s %s %s' % ('-'*20, 'Restarting', '-'*20))
+                self.out('%s %s %s' % ('-' * 20, 'Restarting', '-' * 20))
 
     def change_user_group(self, user, group): # pragma: no cover
         if not user and not group:
@@ -632,12 +628,11 @@ def live_pidfile(pidfile): # pragma: no cover
                 return pid
     return None
 
-def read_pidfile(filename): # pragma: no cover
+def read_pidfile(filename):
     if os.path.exists(filename):
         try:
-            f = open(filename)
-            content = f.read()
-            f.close()
+            with open(filename) as f:
+                content = f.read()
             return int(content.strip())
         except (ValueError, IOError):
             return None
@@ -795,7 +790,7 @@ class Monitor(object): # pragma: no cover
 
     def periodic_reload(self):
         while True:
-            if not self.check_reload(): 
+            if not self.check_reload():
                 self._exit()
                 break
             time.sleep(self.poll_interval)
@@ -965,7 +960,7 @@ def cherrypy_server_runner(
     try:
         protocol = is_ssl and 'https' or 'http'
         if host == '0.0.0.0':
-            print('serving on 0.0.0.0:%s view at %s://127.0.0.1:%s' % 
+            print('serving on 0.0.0.0:%s view at %s://127.0.0.1:%s' %
                   (port, protocol, port))
         else:
             print('serving on %s://%s:%s' % (protocol, host, port))
