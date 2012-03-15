@@ -497,15 +497,9 @@ exists, and its value is ``true``, :term:`Chameleon` and :term:`Mako`
 template changes will not require an application restart to be detected.  See
 :ref:`reload_templates_section` for more information.
 
-The ``pyramid.debug_templates`` setting in the ``[app:main]`` section is a
-:app:`Pyramid` -specific setting which is passed into the framework.  If it
-exists, and its value is ``true``, :term:`Chameleon` template exceptions will
-contain more detailed and helpful information about the error than when this
-value is ``false``.  See :ref:`debug_templates_section` for more information.
-
-.. warning:: The ``pyramid.reload_templates`` and ``pyramid.debug_templates``
-   options should be turned off for production applications, as template
-   rendering is slowed when either is turned on.
+.. warning:: The ``pyramid.reload_templates`` option should be turned off for
+   production applications, as template rendering is slowed when it is turned
+   on.
 
 The ``pyramid.includes`` setting in the ``[app:main]`` section tells Pyramid
 to "include" configuration from another package.  In this case, the line
