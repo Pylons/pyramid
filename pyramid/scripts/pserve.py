@@ -628,12 +628,11 @@ def live_pidfile(pidfile): # pragma: no cover
                 return pid
     return None
 
-def read_pidfile(filename): # pragma: no cover
+def read_pidfile(filename):
     if os.path.exists(filename):
         try:
-            f = open(filename)
-            content = f.read()
-            f.close()
+            with open(filename) as f:
+                content = f.read()
             return int(content.strip())
         except (ValueError, IOError):
             return None
