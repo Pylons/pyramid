@@ -1173,6 +1173,26 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         request.params = {'abc':''}
         self._assertNotFound(wrapper, None, request)
 
+    def test_add_view_with_request_param_multi_true(self):
+        from pyramid.renderers import null_renderer
+        view = lambda *arg: 'OK'
+        config = self._makeOne(autocommit=True)
+        config.add_view(view=view, request_param=('abc=123', 'foo'),
+                        renderer=null_renderer)
+        wrapper = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        request.params = {'abc':'123', 'foo':''}
+        self.assertEqual(wrapper(None, request), 'OK')
+
+    def test_add_view_with_request_param_multi_false(self):
+        view = lambda *arg: 'OK'
+        config = self._makeOne(autocommit=True)
+        config.add_view(view=view, request_param=('abc=123', 'foo'))
+        wrapper = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        request.params = {'abc':''}
+        self._assertNotFound(wrapper, None, request)
+
     def test_add_view_with_xhr_true(self):
         from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
