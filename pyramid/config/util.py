@@ -152,22 +152,8 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         h.update(bytes_('path_info:%r' % path_info))
 
     if request_param is not None:
-        request_param_val = None
-        if '=' in request_param:
-            request_param, request_param_val = request_param.split('=', 1)
-        if request_param_val is None:
-            text = "request_param %s" % request_param
-        else:
-            text = "request_param %s = %s" % (request_param, request_param_val)
-        def request_param_predicate(context, request):
-            if request_param_val is None:
-                return request_param in request.params
-            return request.params.get(request_param) == request_param_val
-        request_param_predicate.__text__ = text
-        weights.append(1 << 4)
-        predicates.append(request_param_predicate)
-        h.update(
-            bytes_('request_param:%r=%r' % (request_param, request_param_val)))
+        make_param_predicates("request", request_param, 'params',
+                              weights, 4, predicates, h)
 
     if header is not None:
         header_name = header
@@ -221,7 +207,8 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         h.update(bytes_('request_type:%r' % hash(request_type)))
 
     if match_param is not None:
-        make_param_predicates("match", match_param, weights, predicates, h)
+        make_param_predicates("match", match_param, 'matchdict',
+                              weights, 9, predicates, h)
 
     if custom:
         for num, predicate in enumerate(custom):
@@ -274,19 +261,30 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
     return order, predicates, phash
 
 
-def make_param_predicates(param_type, param, weights, predicates, hash):
+def make_param_predicates(param_type, param, params_attr,
+                          weights, weight, predicates, hash):
     if not is_nonstr_iter(param):
         param = (param,)
     param = sorted(param)
-    text = "%s_param %s" % (param_type, repr(param))
-    reqs = [p.split('=', 1) for p in param]
+    text = "%s_param %r" % (param_type, param)
+    reqs = []
+    for p in param:
+        pair = p.split('=', 1)
+        if len(pair) == 1:
+            pair = pair+[None]
+        reqs.append(pair)
+    if len(reqs) == 1 and reqs[0][1] is None:
+        text = "%s_param %s" % (param_type, param[0])
     def param_predicate(context, request):
+        params = getattr(request, params_attr)
         for k, v in reqs:
-            if request.matchdict.get(k) != v:
+            if v is None:
+                return k in params
+            if params.get(k) != v:
                 return False
         return True
     param_predicate.__text__ = text
-    weights.append(1 << 9)
+    weights.append(1 << weight)
     predicates.append(param_predicate)
     for p in param:
         hash.update(bytes_('%s_param:%r' % (param_type, p)))
