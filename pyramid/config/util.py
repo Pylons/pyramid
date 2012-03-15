@@ -221,21 +221,7 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
         h.update(bytes_('request_type:%r' % hash(request_type)))
 
     if match_param is not None:
-        if not is_nonstr_iter(match_param):
-            match_param = (match_param,)
-        match_param = sorted(match_param)
-        text = "match_param %s" % repr(match_param)
-        reqs = [p.split('=', 1) for p in match_param]
-        def match_param_predicate(context, request):
-            for k, v in reqs:
-                if request.matchdict.get(k) != v:
-                    return False
-            return True
-        match_param_predicate.__text__ = text
-        weights.append(1 << 9)
-        predicates.append(match_param_predicate)
-        for p in match_param:
-            h.update(bytes_('match_param:%r' % p))
+        make_param_predicates("match", match_param, weights, predicates, h)
 
     if custom:
         for num, predicate in enumerate(custom):
@@ -286,6 +272,25 @@ def make_predicates(xhr=None, request_method=None, path_info=None,
     order = (MAX_ORDER - score) / (len(predicates) + 1)
     phash = h.hexdigest()
     return order, predicates, phash
+
+
+def make_param_predicates(param_type, param, weights, predicates, hash):
+    if not is_nonstr_iter(param):
+        param = (param,)
+    param = sorted(param)
+    text = "%s_param %s" % (param_type, repr(param))
+    reqs = [p.split('=', 1) for p in param]
+    def param_predicate(context, request):
+        for k, v in reqs:
+            if request.matchdict.get(k) != v:
+                return False
+        return True
+    param_predicate.__text__ = text
+    weights.append(1 << 9)
+    predicates.append(param_predicate)
+    for p in param:
+        hash.update(bytes_('%s_param:%r' % (param_type, p)))
+
 
 def as_sorted_tuple(val):
     if not is_nonstr_iter(val):
