@@ -22,6 +22,11 @@ Scaffolds
 - The ``alchemy`` scaffold initialization script is now called
   ``initialize_<projectname>_db`` instead of ``populate_<projectname>``.
 
+Documentation
+-------------
+
+- Wiki tutorials improved due to collaboration at PyCon US 2012 sprints.
+
 1.3b2 (2012-03-02)
 ==================
 
