@@ -4,31 +4,30 @@ Adding Tests
 
 We will now add tests for the models and the views and a few functional
 tests in the ``tests.py``.  Tests ensure that an application works, and
-that it continues to work after some changes are made in the future.
+that it continues to work after changes are made in the future.
 
 Testing the Models
 ==================
 
-We write a test class for the model class ``Page`` and another test class
-for the ``initialize_sql`` function.
-
-To do so, we'll retain the ``tutorial.tests.ViewTests`` class provided as a
-result of the ``alchemy`` scaffold.  We'll add a test class named
-``PageModelTests`` for the ``Page`` model.
+To test the model class ``Page`` we'll add a new ``PageModelTests``
+class to our ``tests.py`` file that was generated as part of the
+``alchemy`` scaffold.
 
 Testing the Views
 =================
 
-We'll modify our ``tests.py`` file, adding tests for each view function we
-added above.  As a result, we'll *delete* the ``ViewTests`` test in the file,
-and add four other test classes: ``ViewWikiTests``, ``ViewPageTests``,
-``AddPageTests``, and ``EditPageTests``.  These test the ``view_wiki``,
-``view_page``, ``add_page``, and ``edit_page`` views respectively.
+We'll modify our ``tests.py`` file, adding tests for each view
+function we added above.  As a result, we'll *delete* the
+``ViewTests`` class that the ``alchemy`` scaffold provided, and add
+four other test classes: ``ViewWikiTests``, ``ViewPageTests``,
+``AddPageTests``, and ``EditPageTests``.  These test the
+``view_wiki``, ``view_page``, ``add_page``, and ``edit_page`` views
+respectively.
 
 Functional tests
 ================
 
-We test the whole application, covering security aspects that are not
+We'll test the whole application, covering security aspects that are not
 tested in the unit tests, like logging in, logging out, checking that
 the ``viewer`` user cannot add or edit pages, but the ``editor`` user
 can, and so on.
@@ -36,8 +35,7 @@ can, and so on.
 Viewing the results of all our edits to ``tests.py``
 ====================================================
 
-Once we're done with the ``tests.py`` module, it will look a lot like the
-below:
+Once we're done with the ``tests.py`` module, it will look a lot like:
 
 .. literalinclude:: src/tests/tutorial/tests.py
    :linenos:
@@ -55,6 +53,7 @@ Change the ``requires`` list in ``setup.py`` to include ``WebTest``.
    :linenos:
    :language: python
    :lines: 9-20
+   :emphasize-lines: 19
 
 After we've added a dependency on WebTest in ``setup.py``, we need to rerun
 ``setup.py develop`` to get WebTest installed into our virtualenv.  Assuming
@@ -88,12 +87,12 @@ On Windows:
 
    c:\pyramidtut\tutorial> ..\Scripts\python setup.py test -q
 
-The expected result looks something like:
+The expected result ends something like:
 
 .. code-block:: text
 
    ......................
    ----------------------------------------------------------------------
-   Ran 22 tests in 2.700s
+   Ran 21 tests in 2.700s
 
    OK

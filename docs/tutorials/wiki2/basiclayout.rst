@@ -74,7 +74,7 @@ dictionary of settings parsed from the ``.ini`` file, which contains
 deployment-related values such as ``pyramid.reload_templates``,
 ``db_string``, etc.
 
-``'main`` now calls :meth:`pyramid.config.Configurator.add_static_view` with
+``main`` now calls :meth:`pyramid.config.Configurator.add_static_view` with
 two arguments: ``static`` (the name), and ``static`` (the path):
 
    .. literalinclude:: src/basiclayout/tutorial/__init__.py
@@ -123,10 +123,11 @@ Finally, ``main`` is finished configuring things, so it uses the
 View Declarations via ``views.py``
 ----------------------------------
 
-Mapping a :term:`route` to code that will be executed when that route's
-pattern matches is done by registering a :term:`view configuration`. Our
-application uses the :meth:`pyramid.view.view_config` decorator to map view
-callables to each route, thereby mapping URL patterns to code.
+Mapping a :term:`route` to code that will be executed when a match for
+the route's pattern occurs is done by registering a :term:`view
+configuration`. Our application uses the
+:meth:`pyramid.view.view_config` decorator to map view callables to
+each route, thereby mapping URL patterns to code.
 
 Open ``tutorial/tutorial/views.py``.  It should already contain the following:
 
@@ -151,7 +152,7 @@ Note that ``my_view()`` accepts a single argument named ``request``.  This is
 the standard call signature for a Pyramid :term:`view callable`.
 
 Remember in our ``__init__.py`` when we executed the
-:meth:`pyramid.config.Configurator.scan` method, e.g. ``config.scan()``?  The
+:meth:`pyramid.config.Configurator.scan` method, i.e. ``config.scan()``?  The
 purpose of calling the scan method was to find and process this
 ``@view_config`` decorator in order to create a view configuration within our
 application.  Without being processed by ``scan``, the decorator effectively
@@ -199,7 +200,7 @@ To give a simple example of a  model class, we define one named ``MyModel``:
       :linenos:
       :language: py
 
-Our sample model has an ``__init__`` that takes a two arguments (``name``,
+Our example model has an ``__init__`` that takes a two arguments (``name``,
 and ``value``).  It stores these values as ``self.name`` and ``self.value``
 within the ``__init__`` function itself.  The ``MyModel`` class also has a
 ``__tablename__`` attribute.  This informs SQLAlchemy which table to use to
