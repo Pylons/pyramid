@@ -7,8 +7,8 @@ they provide a good orientation for the high-level patterns common to most
 :term:`traversal` -based :app:`Pyramid` (and :term:`ZODB` based) projects.
 
 The source code for this tutorial stage can be browsed via
-`http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/basiclayout/
-<http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/basiclayout/>`_.
+`http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki/src/basiclayout/
+<http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki/src/basiclayout/>`_.
 
 Application Configuration with ``__init__.py``
 ------------------------------------------------

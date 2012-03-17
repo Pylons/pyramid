@@ -27,8 +27,8 @@ We will do the following steps:
   (``view.pt``, ``edit.pt``).
 
 The source code for this tutorial stage can be browsed at
-`http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/authorization/
-<http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/authorization/>`_.
+`http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki2/src/authorization/
+<http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki2/src/authorization/>`_.
 
 Adding A Root Factory
 ~~~~~~~~~~~~~~~~~~~~~

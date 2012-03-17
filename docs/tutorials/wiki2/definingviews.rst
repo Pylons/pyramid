@@ -17,8 +17,8 @@ have a ``'one'`` key with the value ``'foo'`` and a ``'two'`` key with the
 value ``'bar'``.
 
 The source code for this tutorial stage can be browsed at
-`http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/views/
-<http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki2/src/views/>`_.
+`http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki2/src/views/
+<http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki2/src/views/>`_.
 
 Declaring Dependencies in Our ``setup.py`` File
 ===============================================
