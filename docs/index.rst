@@ -175,7 +175,7 @@ Check this application out of version control via:
 `KARL <http://karlproject.org>`_ is a moderately-sized application (roughly
 80K lines of Python code) built on top of :app:`Pyramid`.  It is an open
 source web system for collaboration, organizational intranets, and knowledge
-management, It provides facilities for wikis, calendars, manuals, searching,
+management. It provides facilities for wikis, calendars, manuals, searching,
 tagging, commenting, and file uploads.  See the `KARL site
 <http://karlproject.org>`_ for download and installation details.
 
