@@ -370,7 +370,7 @@ Put a hash mark at the beginning of the ``pyramid_debugtoolbar`` line:
 
 Then restart the application to see that the toolbar has been turned off.
 
-Note that if you comment out the ``pryamid_debugtoolbar`` line, the ``#``
+Note that if you comment out the ``pyramid_debugtoolbar`` line, the ``#``
 *must* be in the first column.  If you put the hash mark anywhere except the
 first column instead, for example like this:
 
