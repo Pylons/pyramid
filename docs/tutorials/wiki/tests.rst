@@ -6,6 +6,10 @@ We will now add tests for the models and the views and a few functional
 tests in the ``tests.py``.  Tests ensure that an application works, and
 that it continues to work after some changes are made in the future.
 
+The source code for this tutorial stage can be browsed via
+`http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki/src/tests/
+<http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki/src/tests/>`_.
+
 Test the Models
 ===============
 
