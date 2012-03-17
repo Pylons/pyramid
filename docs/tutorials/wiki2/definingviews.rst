@@ -157,17 +157,19 @@ that ``view_page()`` returns a dictionary (as opposed to a :term:`response`
 object) is a cue to :app:`Pyramid` that it should try to use a :term:`renderer`
 associated with the view configuration to render a template.  In our case,
 the template which will be rendered will be the ``templates/view.pt``
-template, as per the configuration put into effect in ``__init__.py``.
+template, as indicated in the ``@view_config`` decorator that is applied to
+``view_page()``.
 
 The ``add_page`` view function
 ------------------------------
 
-``add_page()`` is invoked when a user clicks on a *WikiWord* which isn't yet
-represented as a page in the system.  The ``check`` function
-within the ``view_page`` view generates URLs to this view.  It also acts as a
-handler for the form that is generated when we want to add a page object.
-The ``matchdict`` attribute of the request passed to the ``add_page()`` view
-will have the values we need to construct URLs and find model objects.
+``add_page()`` is invoked when a user clicks on a *WikiWord* which
+isn't yet represented as a page in the system.  The ``check`` function
+within the ``view_page`` view generates URLs to this view.
+``add_page()`` also acts as a handler for the form that is generated
+when we want to add a page object.  The ``matchdict`` attribute of the
+request passed to the ``add_page()`` view will have the values we need
+to construct URLs and find model objects.
 
 .. literalinclude:: src/views/tutorial/views.py
    :lines: 45-56
@@ -179,17 +181,17 @@ the page we'd like to add.  If our add view is invoked via,
 e.g. ``http://localhost:6543/add_page/SomeName``, the value for
 ``'pagename'`` in the ``matchdict`` will be ``'SomeName'``.
 
-If the view execution is *not* a result of a form submission (if the
+If the view execution is *not* a result of a form submission (i.e. the
 expression ``'form.submitted' in request.params`` is ``False``), the view
 callable renders a template.  To do so, it generates a "save url" which the
 template uses as the form post URL during rendering.  We're lazy here, so
-we're trying to use the same template (``templates/edit.pt``) for the add
-view as well as the page edit view, so we create a dummy Page object in order
-to satisfy the edit form's desire to have *some* page object exposed as
-``page``, and :app:`Pyramid` will render the template associated with this
-view to a response.
+we're going to use the same template (``templates/edit.pt``) for the add
+view as well as the page edit view. To do so we create a dummy Page object
+in order to satisfy the edit form's desire to have *some* page object
+exposed as ``page``. :app:`Pyramid` will render the template associated
+with this view to a response.
 
-If the view execution *is* a result of a form submission (if the expression
+If the view execution *is* a result of a form submission (i.e. the expression
 ``'form.submitted' in request.params`` is ``True``), we scrape the page body
 from the form data, create a Page object with this page body and the name
 taken from ``matchdict['pagename']``, and save it into the database using
@@ -210,12 +212,12 @@ matching the name of the page the user wants to edit.
    :linenos:
    :language: python
 
-If the view execution is *not* a result of a form submission (if the
+If the view execution is *not* a result of a form submission (i.e. the
 expression ``'form.submitted' in request.params`` is ``False``), the view
 simply renders the edit form, passing the page object and a ``save_url``
 which will be used as the action of the generated form.
 
-If the view execution *is* a result of a form submission (if the expression
+If the view execution *is* a result of a form submission (i.e. the expression
 ``'form.submitted' in request.params`` is ``True``), the view grabs the
 ``body`` element of the request parameters and sets it as the ``data``
 attribute of the page object.  It then redirects to the ``view_page`` view
@@ -231,11 +233,12 @@ The views we've added all reference a :term:`template`.  Each template is a
 The ``view.pt`` Template
 ------------------------
 
-The ``view.pt`` template is used for viewing a single wiki page.  It is used
-by the ``view_page`` view function.  It should have a div that is "structure
-replaced" with the ``content`` value provided by the view.  It should also
-have a link on the rendered page that points at the "edit" URL (the URL which
-invokes the ``edit_page`` view for the page being viewed).
+The ``view.pt`` template is used for viewing a single wiki page.  It
+is used by the ``view_page`` view function.  It should have a ``div``
+that is "structure replaced" with the ``content`` value provided by
+the view.  It should also have a link on the rendered page that points
+at the "edit" URL (the URL which invokes the ``edit_page`` view for
+the page being viewed).
 
 Once we're done with the ``view.pt`` template, it will look a lot like the
 below:
@@ -323,11 +326,14 @@ the order they're found in the ``__init__.py`` file.
    ``route_name='edit_page'``.
 
 As a result of our edits, the ``__init__.py`` file should look
-something like so:
+something like:
 
 .. literalinclude:: src/views/tutorial/__init__.py
    :linenos:
    :language: python
+   :emphasize-lines: 13-16
+
+(The highlighted lines are the ones that need to be added or edited.)
 
 Viewing the Application in a Browser
 ====================================

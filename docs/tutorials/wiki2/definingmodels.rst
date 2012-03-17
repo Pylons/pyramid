@@ -57,7 +57,7 @@ attribute that will hold the body of each page.
 Changing ``scripts/initializedb.py``
 ------------------------------------
 
-We haven't looked at the guts of this file yet, but within the ``scripts``
+We haven't looked at the details of this file yet, but within the ``scripts``
 directory of your ``tutorial`` package is a file named ``initializedb.py``.  Code
 in this file is executed whenever we run the ``initialize_tutorial_db`` command
 (as we did in the installation step of this tutorial).
