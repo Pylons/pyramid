@@ -7,6 +7,11 @@ Bug Fixes
 - ``config.add_view(<aninstancemethod>)`` raised AttributeError involving
   ``__text__``.  See https://github.com/Pylons/pyramid/issues/461
 
+- Remove references to do-nothing ``pyramid.debug_templates`` setting in all
+  Pyramid-provided ``.ini`` files.  This setting previously told Chameleon to
+  render better exceptions; now Chameleon always renders nice exceptions
+  regardless of the value of this setting.
+
 Scaffolds
 ---------
 
