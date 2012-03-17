@@ -64,10 +64,12 @@ to a context is interpreted specially by :app:`Pyramid` as an access control
 list during view callable execution.  See :ref:`assigning_acls` for more
 information about what an :term:`ACL` represents.
 
-.. note:: Although we don't use the functionality here, the ``factory`` used
-   to create route contexts may differ per-route as opposed to globally.  See
-   the ``factory`` argument to
-   :meth:`pyramid.config.Configurator.add_route` for more info.
+.. note::
+
+    Although we don't use the functionality here, the ``factory`` used
+    to create route contexts may differ per-route as opposed to globally.  See
+    the ``factory`` argument to
+    :meth:`pyramid.config.Configurator.add_route` for more info.
 
 We'll pass the ``RootFactory`` we created in the step above in as the
 ``root_factory`` argument to a :term:`Configurator`.
