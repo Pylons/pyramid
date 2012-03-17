@@ -141,7 +141,7 @@ On Windows:
 
    c:\pyramidtut\tutorial> ..\Scripts\python setup.py test -q
 
-For a successful test run, you should see output like this::
+For a successful test run, you should see output that ends like this::
 
   .
   ----------------------------------------------------------------------
