@@ -48,7 +48,9 @@ install_requires=[
     'PasteDeploy >= 1.5.0', # py3 compat
     ]
 
-tests_require = install_requires + [
+tests_require = [
+    'nose',
+    'coverage',
     'WebTest >= 1.3.1', # py3 compat
     'virtualenv',
     ]
@@ -89,6 +91,9 @@ setup(name='pyramid',
       include_package_data=True,
       zip_safe=False,
       install_requires = install_requires,
+      extras_require = {
+          'testing':tests_require,
+          },
       tests_require = tests_require,
       test_suite="pyramid.tests",
       entry_points = """\
