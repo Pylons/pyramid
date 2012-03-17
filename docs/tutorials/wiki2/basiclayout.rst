@@ -186,6 +186,15 @@ Next we set up a SQLAlchemy "DBSession" object:
       :linenos:
       :language: py
 
+``scoped_session`` and ``sessionmaker`` are standard SQLAlchemy helpers.
+``scoped_session`` allows us to access our database connection globally.
+``sessionmaker`` creates a database session object.  We pass to
+``sessionmaker`` the ``extension=ZopeTransactionExtension()`` extension
+option in order to allow the system to automatically manage datbase
+transactions.  With ``ZopeTransactionExtension`` activated, our application
+will automatically issue a transaction commit after every request unless an
+exception is raised, in which case the transaction will be aborted.
+
 We also need to create a declarative ``Base`` object to use as a
 base class for our model:
 
