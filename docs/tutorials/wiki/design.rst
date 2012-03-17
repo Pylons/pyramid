@@ -43,13 +43,19 @@ will handle the login and logout tasks related to security.
 Security
 --------
 
+We'll eventually be adding security to our application.  The components we'll
+use to do this are below.
+
 - USERS, a dictionary mapping users names to their
   corresponding passwords.
+
 - GROUPS, a dictionary mapping user names to a 
   list of groups they belong to.
+
 - *groupfinder*, an *authorization callback* that looks up
   USERS and GROUPS.  It will be provided in a new
   *security.py* file.
+
 - An :term:`ACL` is attached to the root resource.  Each
   row below details an :term:`ACE`:
 
@@ -61,7 +67,8 @@ Security
   | Allow    | group:editors  | Edit           |
   +----------+----------------+----------------+
 
-- Permission declarations for the views.
+- Permission declarations are added to the views to assert the security
+  policies as each request is handled.
 
 
 Summary
