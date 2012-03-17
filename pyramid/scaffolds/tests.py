@@ -41,7 +41,7 @@ class TemplateTest(object):
             subprocess.check_call([py, 'setup.py', 'install'])
             if tmpl_name == 'alchemy':
                 populate = os.path.join(self.directory, 'bin',
-                                        'populate_Dingle')
+                                        'initialize_Dingle_db')
                 subprocess.check_call([populate, 'development.ini'])
             subprocess.check_call([py, 'setup.py', 'test'])
             pserve = os.path.join(self.directory, 'bin', 'pserve')
