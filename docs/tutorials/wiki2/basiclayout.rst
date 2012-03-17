@@ -202,6 +202,9 @@ base class for our model:
       :lines: 17
       :language: py
 
+Our model classes will inherit from this ``Base`` class so they can be
+associated with our particular database connection.
+
 To give a simple example of a  model class, we define one named ``MyModel``:
 
    .. literalinclude:: src/basiclayout/tutorial/models.py
