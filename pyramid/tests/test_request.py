@@ -546,6 +546,18 @@ class Test_call_app_with_subpath_as_path_info(unittest.TestCase):
         self.assertEqual(request.environ['SCRIPT_NAME'], '/' + encoded)
         self.assertEqual(request.environ['PATH_INFO'], '/' + encoded)
 
+    def test_it_removes_bfg_routes_info(self):
+        request = DummyRequest({})
+        request.environ['bfg.routes.route'] = True
+        request.environ['bfg.routes.matchdict'] = True
+        response = self._callFUT(request, 'app')
+        self.assertTrue(request.copied)
+        self.assertEqual(response, 'app')
+        self.assertEqual(request.environ['SCRIPT_NAME'], '')
+        self.assertEqual(request.environ['PATH_INFO'], '/')
+        self.assertFalse('bfg.routes.route' in request.environ)
+        self.assertFalse('bfg.routes.matchdict' in request.environ)
+        
 class DummyRequest:
     def __init__(self, environ=None):
         if environ is None:

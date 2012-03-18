@@ -453,4 +453,14 @@ def call_app_with_subpath_as_path_info(request, app):
     new_request = request.copy()
     new_request.environ['SCRIPT_NAME'] = new_script_name
     new_request.environ['PATH_INFO'] = new_path_info
+
+    # In case downstream WSGI app is a Pyramid app, hack around existence of
+    # these envars until we can safely remove them (see router.py); in any
+    # case, even if these get removed, it might be better to not copy the
+    # existing environ but to create a new one instead.
+    if 'bfg.routes.route' in new_request.environ:
+        del new_request.environ['bfg.routes.route']
+    if 'bfg.routes.matchdict' in new_request.environ:
+        del new_request.environ['bfg.routes.matchdict']
+
     return new_request.get_response(app)
