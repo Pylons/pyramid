@@ -370,7 +370,7 @@ Put a hash mark at the beginning of the ``pyramid_debugtoolbar`` line:
 
 Then restart the application to see that the toolbar has been turned off.
 
-Note that if you comment out the ``pryamid_debugtoolbar`` line, the ``#``
+Note that if you comment out the ``pyramid_debugtoolbar`` line, the ``#``
 *must* be in the first column.  If you put the hash mark anywhere except the
 first column instead, for example like this:
 
@@ -750,8 +750,8 @@ also informs Python that the directory which contains it is a *package*.
    Line 6 creates an instance of a :term:`Configurator`.
 
    Line 7 registers a static view, which will serve up the files from the
-   ``mypackage:static`` :term:`asset specification` (the ``static``
-   directory of the ``mypackage`` package).
+   ``myproject:static`` :term:`asset specification` (the ``static``
+   directory of the ``myproject`` package).
 
    Line 8 adds a :term:`route` to the configuration.  This route is later
    used by a view in the ``views`` module.
@@ -888,7 +888,7 @@ If your project package name was ``myproject`` and you wanted to arrange all
 your views in a Python subpackage within the ``myproject`` :term:`package`
 named ``views`` instead of within a single ``views.py`` file, you might:
 
-- Create a ``views`` directory inside your ``mypackage`` package directory
+- Create a ``views`` directory inside your ``myproject`` package directory
   (the same directory which holds ``views.py``).
 
 - *Move* the existing ``views.py`` file to a file inside the new ``views``
@@ -908,10 +908,10 @@ is restarted.
 Using the Interactive Shell
 ---------------------------
 
-It is possible to use a Python interpreter prompt loaded with a similar
-configuration as would be loaded if you were running your Pyramid application
-via ``pserve``.  This can be a useful debugging tool.  See
-:ref:`interactive_shell` for more details.
+It is possible to use the ``pshell`` command to load a Python interpreter
+prompt with a similar configuration as would be loaded if you were running
+your Pyramid application via ``pserve``.  This can be a useful debugging tool.
+See :ref:`interactive_shell` for more details.
 
 What Is This ``pserve`` Thing
 -----------------------------
