@@ -908,7 +908,7 @@ is restarted.
 Using the Interactive Shell
 ---------------------------
 
-It is possible to use a Python interpreter prompt loaded with a similar
+It is possible to use the ``pshell`` command to load a Python interpreter prompt with a similar
 configuration as would be loaded if you were running your Pyramid application
 via ``pserve``.  This can be a useful debugging tool.  See
 :ref:`interactive_shell` for more details.
