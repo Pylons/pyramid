@@ -750,8 +750,8 @@ also informs Python that the directory which contains it is a *package*.
    Line 6 creates an instance of a :term:`Configurator`.
 
    Line 7 registers a static view, which will serve up the files from the
-   ``mypackage:static`` :term:`asset specification` (the ``static``
-   directory of the ``mypackage`` package).
+   ``myproject:static`` :term:`asset specification` (the ``static``
+   directory of the ``myproject`` package).
 
    Line 8 adds a :term:`route` to the configuration.  This route is later
    used by a view in the ``views`` module.
