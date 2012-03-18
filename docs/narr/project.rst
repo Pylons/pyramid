@@ -888,7 +888,7 @@ If your project package name was ``myproject`` and you wanted to arrange all
 your views in a Python subpackage within the ``myproject`` :term:`package`
 named ``views`` instead of within a single ``views.py`` file, you might:
 
-- Create a ``views`` directory inside your ``mypackage`` package directory
+- Create a ``views`` directory inside your ``myproject`` package directory
   (the same directory which holds ``views.py``).
 
 - *Move* the existing ``views.py`` file to a file inside the new ``views``
