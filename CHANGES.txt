@@ -4,9 +4,12 @@ Next release
 Bug Fixes
 ---------
 
-- When ``pyramid.wsgi.wsgiapp2`` calls the downstream WSGI app, the
-  app's environ will no longer have (deprecated and potentially misleading)
-  ``bfg.routes.matchdict`` or ``bfg.routes.route`` keys in it.
+- When ``pyramid.wsgi.wsgiapp2`` calls the downstream WSGI app, the app's
+  environ will no longer have (deprecated and potentially misleading)
+  ``bfg.routes.matchdict`` or ``bfg.routes.route`` keys in it.  A symptom of
+  this bug would be a ``wsgiapp2``-wrapped Pyramid app finding the wrong view
+  because it mistakenly detects that a route was matched when, in fact, it
+  was not.
 
 1.3b3 (2012-03-17)
 ==================
