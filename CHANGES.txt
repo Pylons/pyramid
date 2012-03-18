@@ -4,6 +4,16 @@ Next release
 Bug Fixes
 ---------
 
+- When ``pyramid.wsgi.wsgiapp2`` calls the downstream WSGI app, the
+  app's environ will no longer have (deprecated and potentially misleading)
+  ``bfg.routes.matchdict`` or ``bfg.routes.route`` keys in it.
+
+1.3b3 (2012-03-17)
+==================
+
+Bug Fixes
+---------
+
 - ``config.add_view(<aninstancemethod>)`` raised AttributeError involving
   ``__text__``.  See https://github.com/Pylons/pyramid/issues/461
 
