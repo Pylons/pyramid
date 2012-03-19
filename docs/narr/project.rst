@@ -336,7 +336,7 @@ For example, on UNIX:
    $ ../bin/pserve development.ini --reload
    Starting subprocess with file monitor
    Starting server in PID 16601.
-   Starting HTTP server on http://0.0.0.0:6543
+   serving on http://0.0.0.0:6543
 
 Now if you make a change to any of your project's ``.py`` files or ``.ini``
 files, you'll see the server restart automatically:
@@ -346,7 +346,7 @@ files, you'll see the server restart automatically:
    development.ini changed; reloading...
    -------------------- Restarting --------------------
    Starting server in PID 16602.
-   Starting HTTP server on http://0.0.0.0:6543
+   serving on http://0.0.0.0:6543
 
 Changes to template files (such as ``.pt`` or ``.mak`` files) won't cause the
 server to restart.  Changes to template files don't require a server restart
