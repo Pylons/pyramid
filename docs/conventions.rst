@@ -50,9 +50,30 @@ Code and configuration file blocks are presented in the following style:
      def foo(abc):
          pass
 
-When a command that should be typed on one line is too long to fit on
-a page, the backslash ``\`` is used to indicate that the following
-printed line should actually be part of the command:
+Example blocks representing UNIX shell commands are prefixed with a ``$``
+character, e.g.:
+
+  .. code-block:: text
+
+     $ ../bin/nosetests
+
+Example blocks representing Windows ``cmd.exe`` commands are prefixed with a
+drive letter and/or a directory name, e.g.:
+
+  .. code-block:: text
+
+     c:\examples> ..\Scripts\nosetests
+
+Sometimes, when it's unknown which directory is current, Windows ``cmd.exe``
+example block commands are prefixed only with a ``>`` character, e.g.:
+
+  .. code-block:: text
+
+     > ..\Scripts\nosetests
+
+When a command that should be typed on one line is too long to fit on a page,
+the backslash ``\`` is used to indicate that the following printed line
+should actually be part of the command:
 
   .. code-block:: text
 

@@ -68,10 +68,13 @@ Creating the Project
 
 In :ref:`installing_chapter`, you created a virtual Python environment via
 the ``virtualenv`` command.  To start a :app:`Pyramid` :term:`project`, use
-the ``pcreate`` command installed within the virtualenv.  In
-:ref:`installing_chapter` we called the virtualenv directory ``env``; the
-following command assumes that our current working directory is that
-directory.  We'll choose the ``starter`` scaffold for this purpose.
+the ``pcreate`` command installed within the virtualenv.  We'll choose the
+``starter`` scaffold for this purpose.  When we invoke ``pcreate``, it will
+create a directory that represents our project.
+
+In :ref:`installing_chapter` we called the virtualenv directory ``env``; the
+following commands assume that our current working directory is the ``env``
+directory.
 
 On UNIX:
 
@@ -131,6 +134,17 @@ The ``MyProject`` project directory contains an additional subdirectory named
 ``myproject`` (note the case difference) representing a Python
 :term:`package` which holds very simple :app:`Pyramid` sample code.  This is
 where you'll edit your application's Python code and templates.
+
+We created this project within an ``env`` virtualenv directory.  However,
+note that this is not mandatory.  The project directory can go more or less
+anywhere on your filesystem.  You don't need to put it in a special "web
+server" directory, and you don't need to put it within a virtualenv
+directory.  The author uses Linux mainly, and tends to put project
+directories which he creates within his ``~/projects`` directory.  On
+Windows, it's a good idea to put project directories within a directory that
+contains no space characters, so it's wise to *avoid* a path that contains
+i.e. ``My Documents``.  As a result, the author, when he uses Windows, just
+puts his projects in ``C:\\projects``.
 
 .. warning:: 
 
