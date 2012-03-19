@@ -114,10 +114,10 @@ Here's sample output from a run of ``pcreate`` on UNIX for a project we name
    # ... more output ...
    Running /Users/chrism/projects/pyramid/bin/python setup.py egg_info
 
-As a result of invoking the ``pcreate`` command, a project is created in a
-directory named ``MyProject``.  That directory is a :term:`project`
-directory.  The ``setup.py`` file in that directory can be used to distribute
-your application, or install your application for deployment or development.
+As a result of invoking the ``pcreate`` command, a directory named
+``MyProject`` is created.  That directory is a :term:`project` directory.
+The ``setup.py`` file in that directory can be used to distribute your
+application, or install your application for deployment or development.
 
 A ``.ini`` file named ``development.ini`` will be created in the project
 directory.  You will use this ``.ini`` file to configure a server, to run
@@ -306,7 +306,8 @@ sidetracked trying to set up a nondefault server for hours without actually
 starting to do any development.  One of the nice things about Python web
 servers is that they're largely interchangeable, so if your application works
 under the default server, it will almost certainly work under any other
-server in production if you choose to use a different one.
+server in production if you eventually choose to use a different one.  Don't
+worry about it right now.
 
 You can change the port on which the server runs on by changing the
 ``development.ini`` file.  For example, you can change the ``port = 6543``
