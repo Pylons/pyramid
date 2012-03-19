@@ -1028,4 +1028,5 @@ details.
 Another good production alternative is :term:`Green Unicorn` (aka
 ``gunicorn``).  It's faster than Waitress and slightly easier to configure
 than mod_wsgi, although it depends, in its default configuration, on having a
-buffering HTTP proxy in front of it.
+buffering HTTP proxy in front of it.  It does not, as of this writing, work
+on Windows.
