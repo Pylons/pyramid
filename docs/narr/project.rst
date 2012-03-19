@@ -83,7 +83,7 @@ Or on Windows:
 
 .. code-block:: text
 
-   $ Scripts\pcreate -s starter MyProject
+   > Scripts\pcreate -s starter MyProject
 
 The above command uses the ``pcreate`` command to create a project with the
 ``starter`` scaffold.  To use a different scaffold, such as
@@ -98,7 +98,7 @@ Or on Windows:
 
 .. code-block:: text
 
-   $ Scripts\pcreate -s alchemy MyProject
+   > Scripts\pcreate -s alchemy MyProject
 
 Here's sample output from a run of ``pcreate`` on UNIX for a project we name
 ``MyProject``:
@@ -132,6 +132,14 @@ The ``MyProject`` project directory contains an additional subdirectory named
 :term:`package` which holds very simple :app:`Pyramid` sample code.  This is
 where you'll edit your application's Python code and templates.
 
+.. warning:: 
+
+   You’ll need to avoid using ``pcreate`` to create a project with the same
+   as a Python standard library component. In particular, this means you
+   should avoid using names the names ``site`` or ``test``, both of which
+   conflict with Python standard library packages.  You should also avoid
+   using the name ``pyramid``, which will conflict with Pyramid itself.
+
 .. index::
    single: setup.py develop
    single: development install
@@ -161,8 +169,8 @@ Or on Windows:
 
 .. code-block:: text
 
-   $ cd MyProject
-   $ ..\Scripts\python.exe setup.py develop
+   > cd MyProject
+   > ..\Scripts\python.exe setup.py develop
 
 Elided output from a run of this command on UNIX is shown below:
 
@@ -200,7 +208,7 @@ Or on Windows:
 
 .. code-block:: text
 
-   $ ..\Scripts\python.exe setup.py test -q
+   > ..\Scripts\python.exe setup.py test -q
 
 Here's sample output from a test run on UNIX:
 
@@ -256,7 +264,7 @@ On Windows:
 
 .. code-block:: text
 
-   $ ..\Scripts\pserve development.ini
+   > ..\Scripts\pserve development.ini
 
 Here's sample output from a run of ``pserve`` on UNIX:
 
