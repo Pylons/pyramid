@@ -292,6 +292,37 @@ By default, :app:`Pyramid` applications generated from a scaffold
 will listen on TCP port 6543.  You can shut down a server started this way by
 pressing ``Ctrl-C``.
 
+The default server used to run your Pyramid application when a project is
+created from a scaffold is named :term:`Waitress`.  This server is what
+prints the ``serving on...`` line when you run ``pserve``.  It's a good idea
+to use this server during development, because it's very simple.  It can also
+be used for light production.  Setting your application up under a different
+server is not advised until you've done some development work under the
+default server, particularly if you're not yet experienced with Python web
+development.  Python web server setup can be complex, and you should get some
+confidence that your application works in a default environment before trying
+to optimize it or make it "more like production".  It's awfully easy to get
+sidetracked trying to set up a nondefault server for hours without actually
+starting to do any development.  One of the nice things about Python web
+servers is that they're largely interchangeable, so if your application works
+under the default server, it will almost certainly work under any other
+server in production if you choose to use a different one.
+
+You can change the port on which the server runs on by changing the
+``development.ini`` file.  For example, you can change the ``port = 6543``
+line in the ``development.ini`` file's ``[server:main]`` section to ``port =
+8080`` to run the server on port 8080 instead of port 6543.
+
+For more detailed information about the startup process, see
+:ref:`startup_chapter`.  For more information about environment variables and
+configuration file settings that influence startup and runtime behavior, see
+:ref:`environment_chapter`.
+
+.. _reloading_code:
+
+Reloading Code
+~~~~~~~~~~~~~~
+
 During development, it's often useful to run ``pserve`` using its
 ``--reload`` option.  When ``--reload`` is passed to ``pserve``, changes to
 any Python module your project uses will cause the server to restart.  This
@@ -306,11 +337,6 @@ For example, on UNIX:
    Starting subprocess with file monitor
    Starting server in PID 16601.
    Starting HTTP server on http://0.0.0.0:6543
-
-For more detailed information about the startup process, see
-:ref:`startup_chapter`.  For more information about environment variables and
-configuration file settings that influence startup and runtime behavior, see
-:ref:`environment_chapter`.
 
 .. index::
    single: WSGI
