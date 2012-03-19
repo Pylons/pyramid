@@ -338,6 +338,22 @@ For example, on UNIX:
    Starting server in PID 16601.
    Starting HTTP server on http://0.0.0.0:6543
 
+Now if you make a change to any of your project's ``.py`` files or ``.ini``
+files, you'll see the server restart automatically:
+
+.. code-block:: text
+
+   development.ini changed; reloading...
+   -------------------- Restarting --------------------
+   Starting server in PID 16602.
+   Starting HTTP server on http://0.0.0.0:6543
+
+Changes to template files (such as ``.pt`` or ``.mak`` files) won't cause the
+server to restart.  Changes to template files don't require a server restart
+as long as the ``pyramid.reload_templates`` setting in the
+``development.ini`` file is ``true``.  Changes made to template files when
+this setting is true will take effect immediately without a server restart.
+
 .. index::
    single: WSGI
 
