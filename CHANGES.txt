@@ -11,6 +11,11 @@ Bug Fixes
   because it mistakenly detects that a route was matched when, in fact, it
   was not.
 
+- The fix for issue https://github.com/Pylons/pyramid/issues/461 (which made
+  it possible for instance methods to be used as view callables) introduced a
+  backwards incompatibility when methods that declared only a request
+  argument were used.  See https://github.com/Pylons/pyramid/issues/503
+
 1.3b3 (2012-03-17)
 ==================
 
