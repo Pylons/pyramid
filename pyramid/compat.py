@@ -1,3 +1,4 @@
+import inspect
 import platform
 import sys
 import types
@@ -185,8 +186,10 @@ else:
     
 if PY3: # pragma: no cover
     im_func = '__func__'
+    im_self = '__self__'
 else:
     im_func = 'im_func'
+    im_self = 'im_self'
 
 try: # pragma: no cover
     import configparser
@@ -237,3 +240,7 @@ else:
     from urlparse import unquote as unquote_to_bytes
     def unquote_bytes_to_wsgi(bytestring):
         return unquote_to_bytes(bytestring)
+
+def is_bound_method(ob):
+    return inspect.ismethod(ob) and getattr(ob, im_self, None) is not None
+
