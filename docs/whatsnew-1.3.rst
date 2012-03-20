@@ -21,18 +21,19 @@ Pyramid continues to run on Python 2, but Pyramid is now also Python 3
 compatible.  To use Pyramid under Python 3, Python 3.2 or better is required.
 
 Many Pyramid add-ons are already Python 3 compatible.  For example,
-``pyramid_debugtoolbar``, ``pyramid_jinja2``, ``pyramid_exclog``, and
-``pyramid_tm`` are all Python 3-ready.  But some are still known to work only
-under Python 2.  Also, some scaffolding dependencies (particularly ZODB) do
-not yet work under Python 3.
-
-Python 3 compatibility also required dropping some package dependencies and
-support for older Python versions and platforms.  See the "Backwards
-Incompatibilities" section below for more information.
+``pyramid_debugtoolbar``, ``pyramid_jinja2``, ``pyramid_exclog``,
+``pyramid_tm``, ``pyramid_mailer``, and ``pyramid_handlers`` are all Python
+3-ready.  But other add-ons are known to work only under Python 2.  Also,
+some scaffolding dependencies (particularly ZODB) do not yet work under
+Python 3.
 
 Please be patient as we gain full ecosystem support for Python 3.  You can
 see more details about ongoing porting efforts at
 https://github.com/Pylons/pyramid/wiki/Python-3-Porting .
+
+Python 3 compatibility required dropping some package dependencies and
+support for older Python versions and platforms.  See the "Backwards
+Incompatibilities" section below for more information.
 
 The ``paster`` Command Has Been Replaced
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
