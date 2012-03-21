@@ -253,16 +253,26 @@ System Values Used During Rendering
 
 When a template is rendered using
 :func:`~pyramid.renderers.render_to_response` or
-:func:`~pyramid.renderers.render`, the renderer representing the
-template will be provided with a number of *system* values.  These
-values are provided in a dictionary to the renderer and include:
-
-``context``
-  The current :app:`Pyramid` context if ``request`` was provided as
-  a keyword argument, or ``None``.
+:func:`~pyramid.renderers.render`, or a ``renderer=`` argument to view
+configuration (see :ref:`templates_used_as_renderers`), the renderer
+representing the template will be provided with a number of *system* values.
+These values are provided to the template:
 
 ``request``
-  The request provided as a keyword argument.
+  The value provided as the ``request`` keyword argument to
+  ``render_to_response`` or ``render`` *or* the request object passed to the
+  view when the ``renderer=`` argument to view configuration is being used to
+  render the template.
+
+``req``
+  An alias for ``request``.
+
+``context``
+  The current :app:`Pyramid` :term:`context` if ``request`` was provided as a
+  keyword argument to ``render_to_response`` or ``render``, or ``None`` if
+  the ``request`` keyword argument was not provided.  This value will always
+  be provided if the template is rendered as the result of a ``renderer=``
+  argument to view configuration being used.
 
 ``renderer_name``
   The renderer name used to perform the rendering,
@@ -270,17 +280,24 @@ values are provided in a dictionary to the renderer and include:
 
 ``renderer_info`` 
   An object implementing the :class:`pyramid.interfaces.IRendererInfo`
-  interface.  Basically, an object with the following attributes:
-  ``name``, ``package`` and ``type``.
+  interface.  Basically, an object with the following attributes: ``name``,
+  ``package`` and ``type``.
 
-You can define more values which will be passed to every template
-executed as a result of rendering by defining :term:`renderer
-globals`.
+``view``
+  The view callable object that was used to render this template.  If the
+  view callable is a method of a class-based view, this will be an instance
+  of the class that the method was defined on.  If the view callable is a
+  function or instance, it will be that function or instance.  Note that this
+  value will only be automatically present when a template is rendered as a
+  result of a ``renderer=`` argument; it will be ``None`` when the
+  ``render_to_response`` or ``render`` APIs are used.
+
+You can define more values which will be passed to every template executed as
+a result of rendering by defining :term:`renderer globals`.
 
 What any particular renderer does with these system values is up to the
-renderer itself, but most template renderers, including Chameleon and
-Mako renderers, make these names available as top-level template
-variables.
+renderer itself, but most template renderers, including Chameleon and Mako
+renderers, make these names available as top-level template variables.
 
 .. index::
    pair: renderer; templates
