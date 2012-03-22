@@ -112,6 +112,7 @@ class PRequestCommand(object):
             'SERVER_PORT': '80',         # always mandatory 
             'SERVER_PROTOCOL': 'HTTP/1.0',
             'CONTENT_TYPE': 'text/plain',
+            'REMOTE_ADDR':'127.0.0.1',
             'wsgi.run_once': True,
             'wsgi.multithread': False,
             'wsgi.multiprocess': False,

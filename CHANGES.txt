@@ -1,3 +1,13 @@
+Next release
+============
+
+Bug Fixes
+---------
+
+- Add ``REMOTE_ADDR`` to the ``prequest`` WSGI environ dict for benefit of
+  the debug toolbar, which effectively requires it to be present to work
+  properly.
+
 1.3 (2012-03-21)
 ================
 
