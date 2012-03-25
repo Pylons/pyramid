@@ -2342,7 +2342,7 @@ class TestViewDeriver(unittest.TestCase):
             msg = e.args[0]
             self.assertTrue(msg.startswith(
                 'Could not convert return value of the view callable object '
-                '<pyramid.tests.test_config.test_views.AView object at'))
+                '<pyramid.tests.test_config.test_views.'))
             self.assertTrue(msg.endswith(
                 '> into a response object. The value returned was None. You '
                 'may have forgotten to return a value from the view callable.'))
