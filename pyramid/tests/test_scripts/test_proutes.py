@@ -100,7 +100,8 @@ class TestPRoutesCommand(unittest.TestCase):
         result = command.run()
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
-        self.assertEqual(L[-1].split()[:4], ['a', '/a', '<function', 'view'])
+        compare_to = L[-1].split()[:3]
+        self.assertEqual(compare_to, ['a', '/a', '<function'])
         
     def test_single_route_one_view_registered_with_factory(self):
         from zope.interface import Interface
