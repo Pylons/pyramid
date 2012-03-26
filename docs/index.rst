@@ -122,6 +122,14 @@ Documentation for every :app:`Pyramid` API.
 
    api
 
+Quick reference
+===============
+
+.. toctree::
+   :maxdepth: 1
+
+   quickref
+
 Change History
 ==============
 
