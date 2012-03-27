@@ -8,6 +8,16 @@ Bug Fixes
   the debug toolbar, which effectively requires it to be present to work
   properly.
 
+- When an asset specification was used as a Mako ``renderer=`` argument and a
+  ``mako.modules_directory`` was specified, Pyramid would fail to render the
+  template and instead would raise an error when attempting to write the file
+  to the modules directory.  Example symptom: ``WindowsError: [Error 267] The
+  directory name is invalid:
+  'c:\\docume~1\\chrism\\locals~1\\temp\\tmp9jtjix\\pyramid.tests:fixtures'``.
+  We now replace the colon in the Mako module filename with a dollar sign, so
+  it can work on Windows. See https://github.com/Pylons/pyramid/issues/512
+  for more information.
+
 1.3 (2012-03-21)
 ================
 
