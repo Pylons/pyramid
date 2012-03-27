@@ -35,7 +35,6 @@ class PkgResourceTemplateLookup(TemplateLookup):
         # Don't adjust asset spec names
         isabs = os.path.isabs(uri)
         if (not isabs) and (':' in uri):
-            # fbo asset specs on windows: cant have colons in filename
             return uri
         return TemplateLookup.adjust_uri(self, uri, relativeto)
 
@@ -50,7 +49,11 @@ class PkgResourceTemplateLookup(TemplateLookup):
         """
         isabs = os.path.isabs(uri)
         if (not isabs) and (':' in uri):
-            adjusted = uri.replace(':', '_')
+            # Windows can't cope with colons in filenames, so we replace the
+            # colon with a dollar sign in the filename mako uses to actually
+            # store the generated python code in the mako module_directory or
+            # in the temporary location of mako's modules
+            adjusted = uri.replace(':', '$')
             try:
                 if self.filesystem_checks:
                     return self._check(adjusted, self._collection[adjusted])
