@@ -33,7 +33,8 @@ class PkgResourceTemplateLookup(TemplateLookup):
         """Called from within a Mako template, avoids adjusting the
         uri if it looks like an asset specification"""
         # Don't adjust asset spec names
-        if ':' in uri:
+        isabs = os.path.isabs(uri)
+        if (not isabs) and (':' in uri):
             return uri
         return TemplateLookup.adjust_uri(self, uri, relativeto)
 
@@ -48,16 +49,21 @@ class PkgResourceTemplateLookup(TemplateLookup):
         """
         isabs = os.path.isabs(uri)
         if (not isabs) and (':' in uri):
+            # Windows can't cope with colons in filenames, so we replace the
+            # colon with a dollar sign in the filename mako uses to actually
+            # store the generated python code in the mako module_directory or
+            # in the temporary location of mako's modules
+            adjusted = uri.replace(':', '$')
             try:
                 if self.filesystem_checks:
-                    return self._check(uri, self._collection[uri])
+                    return self._check(adjusted, self._collection[adjusted])
                 else:
-                    return self._collection[uri]
+                    return self._collection[adjusted]
             except KeyError:
                 pname, path = resolve_asset_spec(uri)
                 srcfile = abspath_from_asset_spec(path, pname)
                 if os.path.isfile(srcfile):
-                    return self._load(srcfile, uri)
+                    return self._load(srcfile, adjusted)
                 raise exceptions.TopLevelLookupException(
                     "Can not locate template for uri %r" % uri)
         return TemplateLookup.get_template(self, uri)
