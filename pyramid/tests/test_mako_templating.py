@@ -1,7 +1,11 @@
 ## come on python gimme some of that sweet, sweet -*- coding: utf-8 -*-
 
+import shutil
+import tempfile
 import unittest
+
 from pyramid import testing
+
 from pyramid.compat import (
     text_,
     text_type,
@@ -466,6 +470,15 @@ class TestPkgResourceTemplateLookup(unittest.TestCase):
         result = inst.get_template('pyramid.tests:fixtures/helloworld.mak')
         self.assertFalse(result is None)
 
+    def test_get_template_asset_spec_with_module_dir(self):
+        tmpdir = tempfile.mkdtemp()
+        try:
+            inst = self._makeOne(module_directory=tmpdir)
+            result = inst.get_template('pyramid.tests:fixtures/helloworld.mak')
+            self.assertFalse(result is None)
+        finally:
+            shutil.rmtree(tmpdir, ignore_errors=True)
+        
     def test_get_template_asset_spec_missing(self):
         from mako.exceptions import TopLevelLookupException
         fixturedir = self.get_fixturedir()
