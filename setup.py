@@ -39,13 +39,14 @@ install_requires=[
     'setuptools',
     'Chameleon >= 1.2.3',
     'Mako >= 0.3.6', # strict_undefined
-    'WebOb >= 1.2dev', # response.text / py3 compat
+#    'WebOb >= 1.2dev', # response.text / py3 compat
     'repoze.lru >= 0.4', # py3 compat
     'zope.interface >= 3.8.0',  # has zope.interface.registry
     'zope.deprecation >= 3.5.0', # py3 compat
     'venusian >= 1.0a3', # ``ignore``
     'translationstring >= 0.4', # py3 compat
     'PasteDeploy >= 1.5.0', # py3 compat
+    'publicsuffix',
     ]
 
 tests_require = install_requires + [

@@ -6,6 +6,7 @@ import datetime
 import re
 import time as time_mod
 
+from publicsuffix import PublicSuffixList
 from zope.interface import implementer
 
 from pyramid.compat import (
@@ -571,6 +572,8 @@ class AuthTktCookieHelper(object):
         self.path = path
         self.wild_domain = wild_domain
         self.sibling_domains = sibling_domains
+        self.public_suffix_list = PublicSuffixList()
+        
         static_flags = []
         if self.secure:
             static_flags.append('; Secure')
@@ -619,17 +622,27 @@ class AuthTktCookieHelper(object):
             cookies.append(('Set-Cookie', '%s="%s"; Path=%s; Domain=%s%s%s' % (
                 self.cookie_name, value, self.path, wild_domain, max_age,
                 self.static_flags)))
-                
+        
         # Sibling domains only have an affect if the current domain
         # is a subdomain such as x.foo.com
-        if self.sibling_domains and len(cur_domain.split('.')) > 2:
+        if self.sibling_domains:
+            ps = self.public_suffix_list.get_public_suffix(cur_domain)
+            # retrieve the portion of the the domain before the public suffix
+            wild_siblings = cur_domain[:-len(ps)]
+            # only the first label can be removed to set the cookie
+            labels = wild_siblings.split('.')
+            if labels:
+                # remove the first label
+                # eg x.y.foo.com -> y.foo.com
+                wild_siblings = '.'.join(labels[1:]) + ps
+                
             # Replace cur_domain's sub-domain with a dot.
-            # eg x.foo.com becomes .foo.com
-            wild_siblings = '.' + cur_domain.split('.', 1)[1]
+            # eg x.y.foo.com becomes .y.foo.com
+            wild_siblings = '.' + wild_siblings
             cookies.append(('Set-Cookie', '%s="%s"; Path=%s; Domain=%s%s%s' % (
                 self.cookie_name, value, self.path, wild_siblings, max_age,
                 self.static_flags)))
-        
+                
         return cookies
 
     def identify(self, request):
