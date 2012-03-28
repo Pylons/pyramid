@@ -152,7 +152,7 @@ def json_renderer_factory(info):
             ct = response.content_type
             if ct == response.default_content_type:
                 response.content_type = 'application/json'
-        return json.dumps(value)
+        return json.dumps(value, cls=GenericJSONEncoder)
     return _render
 
 def string_renderer_factory(info):
@@ -501,11 +501,21 @@ class NullRendererHelper(RendererHelper):
 
     def render(self, value, system_values, request=None):
         return value
-    
+
     def render_to_response(self, value, system_values, request=None):
         return value
 
     def clone(self, name=None, package=None, registry=None):
         return self
-    
+
+class GenericJSONEncoder(json.JSONEncoder):
+    """ Generic JSON renderer that helps the default json renderer factory
+    easily deal with custom objects by checking the objects for a __json__
+    method that defines how to encode the custom object."""
+    def default(self, obj):
+        if hasattr(obj, '__json__') and callable(obj.__json__):
+            return obj.__json__()
+        else:
+            return JSONEncoder.default(self, obj)
+
 null_renderer = NullRendererHelper()
