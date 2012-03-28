@@ -212,6 +212,13 @@ to :func:`json.dumps` by overriding the default renderer. See
 :class:`pyramid.renderers.JSON` and
 :ref:`_adding_and_overriding_renderers` for more information.
 
+Custom objects can be easily serialized by defining a :func:`__json__` method
+on the object. This method should return values serializable by
+:func:`json_dumps`. By defining this method and using a :term:`JSON`
+renderer the :class:`pyramid.renderers.ObjectJSONEncoder` class will be used
+for encoding your object. If you later define your own custom encoder it will
+override :class:`pyramid.renderers.ObjectJSONEncoder`.
+
 You can configure a view to use the JSON renderer by naming ``json`` as the
 ``renderer`` argument of a view configuration, e.g. by using
 :meth:`~pyramid.config.Configurator.add_view`:

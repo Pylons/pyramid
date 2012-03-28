@@ -157,6 +157,25 @@ def string_renderer_factory(info):
         return value
     return _render
 
+class ObjectJSONEncoder(json.JSONEncoder):
+    """ Encoder that is used by :class:`pyramid.renderers.JSON` and
+    :class:`pyramid.renderers.JSONP`.
+    
+    This encoder will look for a :meth:`__json__` method on an object
+    and use the return value when encoding the object to json
+    using :meth:`json_dumps`.
+
+    This class will be used only when you set a JSON or JSONP
+    renderer and you do not define your own custom encoder class.
+
+    .. note:: This feature is new in Pyramid 1.3.
+    """
+
+    def default(self, obj):
+        if hasattr(obj, '__json__') and callable(obj.__json__):
+            return obj.__json__()
+        return json.JSONEncoder.default(self, obj)
+
 class JSON(object):
     """ Renderer that returns a JSON-encoded string.
 
@@ -213,6 +232,8 @@ class JSON(object):
         """ Convert a Python object to a JSON string.
 
         By default, this uses the :func:`json.dumps` from the stdlib."""
+        if not self.kw.get('cls'):
+            self.kw['cls'] = ObjectJSONEncoder
         return json.dumps(value, **self.kw)
 
 json_renderer_factory = JSON() # bw compat

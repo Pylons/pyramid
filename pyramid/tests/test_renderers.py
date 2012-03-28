@@ -382,6 +382,18 @@ class TestJSON(unittest.TestCase):
         result = renderer({'a':now}, {})
         self.assertEqual(result, '{"a": "%s"}' % now.isoformat())
 
+    def test_with_object_encoder(self):
+        class MyObject(object):
+            def __init__(self, x):
+                self.x = x
+            def __json__(self):
+                return {'x': self.x}
+
+        objects = [MyObject(1), MyObject(2)]
+        renderer = self._makeOne()(None)
+        result = renderer(objects, {})
+        self.assertEqual(result, '[{"x": 1}, {"x": 2}]')
+
 class Test_string_renderer_factory(unittest.TestCase):
     def _callFUT(self, name):
         from pyramid.renderers import string_renderer_factory
