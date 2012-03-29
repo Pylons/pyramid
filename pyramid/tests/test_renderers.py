@@ -340,34 +340,65 @@ class TestChameleonRendererLookup(unittest.TestCase):
         self.assertNotEqual(reg.queryUtility(ITemplateRenderer, name=spec),
                             None)
 
-class Test_json_renderer_factory(unittest.TestCase):
+class TestJSON(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
 
     def tearDown(self):
         testing.tearDown()
-        
-    def _callFUT(self, name):
-        from pyramid.renderers import json_renderer_factory
-        return json_renderer_factory(name)
+
+    def _makeOne(self, **kw):
+        from pyramid.renderers import JSON
+        return JSON(**kw)
 
     def test_it(self):
-        renderer = self._callFUT(None)
+        renderer = self._makeOne()(None)
         result = renderer({'a':1}, {})
         self.assertEqual(result, '{"a": 1}')
 
     def test_with_request_content_type_notset(self):
         request = testing.DummyRequest()
-        renderer = self._callFUT(None)
+        renderer = self._makeOne()(None)
         renderer({'a':1}, {'request':request})
         self.assertEqual(request.response.content_type, 'application/json')
 
     def test_with_request_content_type_set(self):
         request = testing.DummyRequest()
         request.response.content_type = 'text/mishmash'
-        renderer = self._callFUT(None)
+        renderer = self._makeOne()(None)
         renderer({'a':1}, {'request':request})
         self.assertEqual(request.response.content_type, 'text/mishmash')
+
+    def test_with_custom_encoder(self):
+        from datetime import datetime
+        from json import JSONEncoder
+        class MyEncoder(JSONEncoder):
+            def default(self, obj):
+                return obj.isoformat()
+        now = datetime.utcnow()
+        renderer = self._makeOne(cls=MyEncoder)(None)
+        result = renderer({'a':now}, {})
+        self.assertEqual(result, '{"a": "%s"}' % now.isoformat())
+
+    def test_with_object_encoder(self):
+        class MyObject(object):
+            def __init__(self, x):
+                self.x = x
+            def __json__(self):
+                return {'x': self.x}
+
+        objects = [MyObject(1), MyObject(2)]
+        renderer = self._makeOne()(None)
+        result = renderer(objects, {})
+        self.assertEqual(result, '[{"x": 1}, {"x": 2}]')
+
+    def test_with_object_encoder_no___json__(self):
+        class MyObject(object):
+            def __init__(self, x):
+                self.x = x
+        objects = [MyObject(1), MyObject(2)]
+        renderer = self._makeOne()(None)
+        self.assertRaises(TypeError, renderer, objects, {})
 
 class Test_string_renderer_factory(unittest.TestCase):
     def _callFUT(self, name):

@@ -144,17 +144,6 @@ def get_renderer(renderer_name, package=None):
 
 # concrete renderer factory implementations (also API)
 
-def json_renderer_factory(info):
-    def _render(value, system):
-        request = system.get('request')
-        if request is not None:
-            response = request.response
-            ct = response.content_type
-            if ct == response.default_content_type:
-                response.content_type = 'application/json'
-        return json.dumps(value)
-    return _render
-
 def string_renderer_factory(info):
     def _render(value, system):
         if not isinstance(value, string_types):
@@ -168,7 +157,101 @@ def string_renderer_factory(info):
         return value
     return _render
 
-class JSONP(object):
+class ObjectJSONEncoder(json.JSONEncoder):
+    """ The default JSON object encoder (a subclass of json.Encoder) used by
+    :class:`pyramid.renderers.JSON` and :class:`pyramid.renderers.JSONP`.  It
+    is used when an object returned from a view and presented to a JSON-based
+    renderer is not a builtin Python type otherwise serializable to JSON.
+    
+    This ``json.Encoder`` subclass overrides the ``json.Encoder.default``
+    method.  The overridden method looks for a ``__json__`` attribute on the
+    object it is passed.  If it's found, the encoder will assume it's
+    callable, and will call it with no arguments to obtain a value.  The
+    overridden ``default`` method will then return that value (which must be
+    a JSON-serializable basic Python type).
+
+    If the object passed to the overridden ``default`` method has no
+    ``__json__`` attribute, the ``json.JSONEncoder.default`` method is called
+    with the object that it was passed (which will end up raising a
+    :exc:`TypeError`, as it would with any other unserializable type).
+
+    This class will be used only when you set a JSON or JSONP
+    renderer and you do not define your own custom encoder class.
+
+    .. note:: This feature is new in Pyramid 1.4.
+    """
+
+    def default(self, obj):
+        if hasattr(obj, '__json__'):
+            return obj.__json__()
+        return json.JSONEncoder.default(self, obj)
+
+class JSON(object):
+    """ Renderer that returns a JSON-encoded string.
+
+    Configure a custom JSON renderer using the
+    :meth:`pyramid.config.Configurator.add_renderer` API at application
+    startup time:
+
+    .. code-block:: python
+
+       from pyramid.config import Configurator
+
+       config = Configurator()
+       config.add_renderer('myjson', JSON(indent=4, cls=MyJSONEncoder))
+
+    Once this renderer is registered via
+    :meth:`~pyramid.config.Configurator.add_renderer` as above, you can use
+    ``myjson`` as the ``renderer=`` parameter to ``@view_config`` or
+    :meth:`pyramid.config.Configurator.add_view``:
+
+    .. code-block:: python
+
+       from pyramid.view import view_config
+
+       @view_config(renderer='myjson')
+       def myview(request):
+           return {'greeting':'Hello world'}
+
+    .. note::
+
+       This feature is new in Pyramid 1.4. Prior to 1.4 there was
+       no public API for supplying options to the underlying
+       :func:`json.dumps` without defining a custom renderer.
+
+    """
+
+    def __init__(self, **kw):
+        """ Any keyword arguments will be forwarded to
+        :func:`json.dumps`.
+        """
+        self.kw = kw
+
+    def __call__(self, info):
+        """ Returns a plain JSON-encoded string with content-type
+        ``application/json``. The content-type may be overridden by
+        setting ``request.response.content_type``."""
+        def _render(value, system):
+            request = system.get('request')
+            if request is not None:
+                response = request.response
+                ct = response.content_type
+                if ct == response.default_content_type:
+                    response.content_type = 'application/json'
+            return self.value_to_json(value)
+        return _render
+
+    def value_to_json(self, value):
+        """ Convert a Python object to a JSON string.
+
+        By default, this uses the :func:`json.dumps` from the stdlib."""
+        if not self.kw.get('cls'):
+            self.kw['cls'] = ObjectJSONEncoder
+        return json.dumps(value, **self.kw)
+
+json_renderer_factory = JSON() # bw compat
+
+class JSONP(JSON):
     """ `JSONP <http://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper
     which implements a hybrid json/jsonp renderer.  JSONP is useful for
     making cross-domain AJAX requests.
@@ -183,6 +266,20 @@ class JSONP(object):
 
        config = Configurator()
        config.add_renderer('jsonp', JSONP(param_name='callback'))
+
+    The class also accepts arbitrary keyword arguments; all keyword arguments
+    except ``param_name`` are passed to the ``json.dumps`` function as
+    keyword arguments:
+
+    .. code-block:: python
+
+       from pyramid.config import Configurator
+
+       config = Configurator()
+       config.add_renderer('jsonp', JSONP(param_name='callback', indent=4))
+    
+    .. note:: The ability of this class to accept a ``**kw`` in its
+       constructor is new as of Pyramid 1.4.
 
     Once this renderer is registered via
     :meth:`~pyramid.config.Configurator.add_renderer` as above, you can use
@@ -210,9 +307,10 @@ class JSONP(object):
 
     See also: :ref:`jsonp_renderer`.
     """
-    
-    def __init__(self, param_name='callback'):
+
+    def __init__(self, param_name='callback', **kw):
         self.param_name = param_name
+        JSON.__init__(self, **kw)
 
     def __call__(self, info):
         """ Returns JSONP-encoded string with content-type
@@ -221,7 +319,7 @@ class JSONP(object):
         plain-JSON encoded string with content-type ``application/json``"""
         def _render(value, system):
             request = system['request']
-            val =  json.dumps(value)
+            val = self.value_to_json(value)
             callback = request.GET.get(self.param_name)
             if callback is None:
                 ct = 'application/json'

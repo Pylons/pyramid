@@ -11,7 +11,11 @@
 
 .. autofunction:: render_to_response
 
+.. autoclass:: JSON
+
 .. autoclass:: JSONP
+
+.. autoclass:: ObjectJSONEncoder
 
 .. attribute:: null_renderer
 
