@@ -374,9 +374,7 @@ class TestJSON(unittest.TestCase):
         from json import JSONEncoder
         class MyEncoder(JSONEncoder):
             def default(self, obj):
-                if isinstance(obj, datetime):
-                    return obj.isoformat()
-                return super(JSONEncoder, self).default(obj)
+                return obj.isoformat()
         now = datetime.utcnow()
         renderer = self._makeOne(cls=MyEncoder)(None)
         result = renderer({'a':now}, {})
@@ -393,6 +391,14 @@ class TestJSON(unittest.TestCase):
         renderer = self._makeOne()(None)
         result = renderer(objects, {})
         self.assertEqual(result, '[{"x": 1}, {"x": 2}]')
+
+    def test_with_object_encoder_no___json__(self):
+        class MyObject(object):
+            def __init__(self, x):
+                self.x = x
+        objects = [MyObject(1), MyObject(2)]
+        renderer = self._makeOne()(None)
+        self.assertRaises(TypeError, renderer, objects, {})
 
 class Test_string_renderer_factory(unittest.TestCase):
     def _callFUT(self, name):

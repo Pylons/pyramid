@@ -1,22 +1,13 @@
 Next release
 ============
 
-Bug Fixes
----------
+Features
+--------
 
-- Add ``REMOTE_ADDR`` to the ``prequest`` WSGI environ dict for benefit of
-  the debug toolbar, which effectively requires it to be present to work
-  properly.
-
-- When an asset specification was used as a Mako ``renderer=`` argument and a
-  ``mako.modules_directory`` was specified, Pyramid would fail to render the
-  template and instead would raise an error when attempting to write the file
-  to the modules directory.  Example symptom: ``WindowsError: [Error 267] The
-  directory name is invalid:
-  'c:\\docume~1\\chrism\\locals~1\\temp\\tmp9jtjix\\pyramid.tests:fixtures'``.
-  We now replace the colon in the Mako module filename with a dollar sign, so
-  it can work on Windows. See https://github.com/Pylons/pyramid/issues/512
-  for more information.
+- Custom objects can be made easily JSON-serializable in Pyramid by defining
+  a ``__json__`` method on the object's class. This method should return
+  values natively serializable by ``json.dumps`` (such as ints, lists,
+  dictionaries, strings, and so forth).
 
 1.3 (2012-03-21)
 ================

@@ -207,17 +207,13 @@ representing the JSON serialization of the return value:
    '{"content": "Hello!"}'
 
 The return value needn't be a dictionary, but the return value must contain
-values serializable by :func:`json.dumps`. Extra arguments can be passed
-to :func:`json.dumps` by overriding the default renderer. See
-:class:`pyramid.renderers.JSON` and
-:ref:`_adding_and_overriding_renderers` for more information.
+values serializable by ``json.dumps``.
 
-Custom objects can be easily serialized by defining a :func:`__json__` method
-on the object. This method should return values serializable by
-:func:`json_dumps`. By defining this method and using a :term:`JSON`
-renderer the :class:`pyramid.renderers.ObjectJSONEncoder` class will be used
-for encoding your object. If you later define your own custom encoder it will
-override :class:`pyramid.renderers.ObjectJSONEncoder`.
+.. note::
+
+   Extra arguments can be passed to ``json.dumps`` by overriding the default
+   ``json`` renderer. See :class:`pyramid.renderers.JSON` and
+   :ref:`adding_and_overriding_renderers` for more information.
 
 You can configure a view to use the JSON renderer by naming ``json`` as the
 ``renderer`` argument of a view configuration, e.g. by using
@@ -235,13 +231,57 @@ Views which use the JSON renderer can vary non-body response attributes by
 using the api of the ``request.response`` attribute.  See
 :ref:`request_response_attr`.
 
+.. _json_serializing_custom_objects:
+
+Serializing Custom Objects
+++++++++++++++++++++++++++
+
+Custom objects can be made easily JSON-serializable in Pyramid by defining a
+``__json__`` method on the object's class. This method should return values
+natively serializable by ``json.dumps`` (such as ints, lists, dictionaries,
+strings, and so forth).
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.view import view_config
+
+   class MyObject(object):
+       def __init__(self, x):
+           self.x = x
+
+       def __json__(self):
+           return {'x':self.x}
+
+   @view_config(renderer='json')
+   def objects(request):
+       return [MyObject(1), MyObject(2)]
+
+   # the JSON value returned by ``objects`` will be:
+   #    [{"x": 1}, {"x": 2}]
+
+.. note::
+
+   Honoring the ``__json__`` method of custom objects is a feature new in
+   Pyramid 1.4.
+
+.. warning::
+
+   The machinery which performs the ``__json__`` method-calling magic is in
+   the :class:`pyramid.renderers.ObjectJSONEncoder` class.  This class will
+   be used for encoding any non-basic Python object when you use the default
+   ```json`` or ``jsonp`` renderers.  But if you later define your own custom
+   JSON renderer and pass it a "cls" argument signifying a different encoder,
+   the encoder you pass will override Pyramid's use of
+   :class:`pyramid.renderers.ObjectJSONEncoder`.
+
 .. index::
    pair: renderer; JSONP
 
 .. _jsonp_renderer:
 
 JSONP Renderer
---------------
+~~~~~~~~~~~~~~
 
 .. note:: This feature is new in Pyramid 1.1.
 
@@ -305,6 +345,10 @@ The string ``callback=?`` above in the the ``url`` param to the JQuery
 ``getAjax`` function indicates to jQuery that the query should be made as
 a JSONP request; the ``callback`` parameter will be automatically filled
 in for you and used.
+
+The same custom-object serialization scheme defined used for a "normal" JSON
+renderer in :ref:`json_serializing_custom_objects` can be used when passing
+values to a JSONP renderer too.
 
 .. index::
    pair: renderer; chameleon
