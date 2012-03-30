@@ -865,7 +865,8 @@ class ViewsConfiguratorMixin(object):
           declaration with this argument ensures that the view will only be
           called when the request's ``method`` attribute (aka the
           ``REQUEST_METHOD`` of the WSGI environment) string matches a
-          supplied value.
+          supplied value.  Note that use of ``GET`` also implies that the
+          view will respond to ``HEAD`` as of Pyramid 1.4.
 
           .. note:: The ability to pass a tuple of items as
                    ``request_method`` is new as of Pyramid 1.2.  Previous
@@ -996,6 +997,9 @@ class ViewsConfiguratorMixin(object):
 
         if request_method is not None:
             request_method = as_sorted_tuple(request_method)
+            if 'GET' in request_method and 'HEAD' not in request_method:
+                # GET implies HEAD too
+                request_method = as_sorted_tuple(request_method + ('HEAD',))
 
         order, predicates, phash = make_predicates(xhr=xhr,
             request_method=request_method, path_info=path_info,

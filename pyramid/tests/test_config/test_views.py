@@ -1146,6 +1146,16 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         request.method = 'GET'
         self._assertNotFound(wrapper, None, request)
 
+    def test_add_view_with_request_method_get_implies_head(self):
+        from pyramid.renderers import null_renderer
+        view = lambda *arg: 'OK'
+        config = self._makeOne(autocommit=True)
+        config.add_view(view=view, request_method='GET', renderer=null_renderer)
+        wrapper = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        request.method = 'HEAD'
+        self.assertEqual(wrapper(None, request), 'OK')
+        
     def test_add_view_with_request_param_noval_true(self):
         from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
