@@ -139,3 +139,6 @@ Probably Bad Ideas
 
 - Have ``remember`` and ``forget`` actually set headers on the response using
   a response callback (and return the empty list)?
+
+- http://pythonguy.wordpress.com/2011/06/22/dynamic-variables-revisited/
+  instead of thread locals
