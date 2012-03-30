@@ -276,11 +276,13 @@ class ViewDeriver(object):
         if not predicates:
             return view
         def predicate_wrapper(context, request):
-            if all((predicate(context, request) for predicate in predicates)):
-                return view(context, request)
-            view_name = getattr(view, '__name__', view)
-            raise PredicateMismatch(
-                'predicate mismatch for view %s' % view_name)
+            for predicate in predicates:
+                if not predicate(context, request):
+                    view_name = getattr(view, '__name__', view)
+                    raise PredicateMismatch(
+                         'predicate mismatch for view %s (%s)' % (
+                         view_name, predicate.__text__))
+            return view(context, request)        
         def checker(context, request):
             return all((predicate(context, request) for predicate in
                         predicates))
