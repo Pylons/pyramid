@@ -291,7 +291,7 @@ Our ``views.py`` module will look something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :linenos:
-   :emphasize-lines: 11,14-18,56,59,71,74,89-115,117-121
+   :emphasize-lines: 11,14-18,56,59,71,74,86,89-115,117-121
    :language: python
 
 (Only the highlighted lines need to be added.)
