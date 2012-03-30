@@ -100,7 +100,7 @@ def effective_principals(request):
 
     policy = reg.queryUtility(IAuthenticationPolicy)
     if policy is None:
-        return []
+        return [Everyone]
     return policy.effective_principals(request)
 
 def principals_allowed_by_permission(context, permission):

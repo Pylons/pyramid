@@ -18,6 +18,11 @@ Bug Fixes
   it can work on Windows. See https://github.com/Pylons/pyramid/issues/512
   for more information.
 
+- When no authentication policy was configured, a call to
+  ``pyramid.security.effective_principals`` would unconditionally return the
+  empty list.  This was incorrect, it should have unconditionally returned
+  ``[Everyone]``, and now does.
+
 1.3 (2012-03-21)
 ================
 

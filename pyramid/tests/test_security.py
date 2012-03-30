@@ -266,9 +266,10 @@ class TestEffectivePrincipals(unittest.TestCase):
         return effective_principals(request)
 
     def test_no_authentication_policy(self):
+        from pyramid.security import Everyone
         request = _makeRequest()
         result = self._callFUT(request)
-        self.assertEqual(result, [])
+        self.assertEqual(result, [Everyone])
 
     def test_with_authentication_policy(self):
         request = _makeRequest()
