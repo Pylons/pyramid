@@ -204,79 +204,64 @@ head of the ``views.py`` file:
    :linenos:
    :language: python
 
-Changing Existing Views
-~~~~~~~~~~~~~~~~~~~~~~~
+Add permission declarations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Add permision declarations
---------------------------
-
-Then we need to change each of our ``view_page``, ``edit_page`` and
-``add_page`` view callables in ``views.py``.  Within each of these views,
-we'll need to pass a "logged in" parameter to its template.  We'll add
-something like this to each view body:
+Add a ``permission='edit'`` parameter to the ``@view_config``
+decorator for ``add_page()`` and ``edit_page()``, for example:
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.security import authenticated_userid
-   logged_in = authenticated_userid(request)
-
-Return a logged_in flag to the renderer
----------------------------------------
-
-We'll then change the return value of these views to pass the resulting
-``logged_in`` value to the template, e.g.:
-
-.. code-block:: python
-   :linenos:
-
-   return dict(page = page,
-               content = content,
-               logged_in = logged_in,
-               edit_url = edit_url)
-
-We'll also need to add a ``permission`` value to the ``@view_config``
-decorator for each of the ``add_page`` and ``edit_page`` view callables.  For
-each, we'll add ``permission='edit'``, for example:
-
-.. code-block:: python
-   :linenos:
-
-   @view_config(route_name='edit_page', renderer='templates/edit.pt',
+   @view_config(route_name='add_page', renderer='templates/edit.pt',
                 permission='edit')
 
-See the ``permission='edit'`` we added there?  This indicates that the view
-callables which these views reference cannot be invoked without the
-authenticated user possessing the ``edit`` permission with respect to the
-current :term:`context`.
-
-Adding these ``permission`` arguments causes Pyramid to make the
-assertion that only users who possess the effective ``edit``
+The result is that only users who possess the ``edit``
 permission at the time of the request may invoke those two views.
+
 We've granted the ``group:editors`` :term:`principal` the ``edit``
 permission in the :term:`root factory` via its ACL, so only a user who
 is a member of the group named ``group:editors`` will be able to
 invoke the views associated with the ``add_page`` or ``edit_page``
 routes.
 
+Return a logged_in flag to the renderer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Change the return value of the ``view_page``,
+``edit_page`` and  ``add_page`` view callables in ``views.py``
+to pass a ``logged_in`` value to the template, e.g.:
+
+.. code-block:: python
+   :linenos:
+
+   return dict(page = page,
+               content = content,
+               logged_in = authenticated_userid(request),
+               edit_url = edit_url)
+
 Adding the ``login.pt`` Template
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Add a ``login.pt`` template to your templates directory.  It's
-referred to within the login view we just added to ``views.py``.
+Create ``tutorial/tutorial/templates/login.pt`` with the following
+content:
 
 .. literalinclude:: src/authorization/tutorial/templates/login.pt
    :language: xml
 
+The above template is referred to within the login view we just
+added to ``views.py``.
+
 Add a "Logout" link when logged in
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We'll also need to change our ``edit.pt`` and ``view.pt`` templates to
+We'll change our ``edit.pt`` and ``view.pt`` templates to
 display a "Logout" link if someone is logged in.  This link will
 invoke the logout view.
 
-To do so we'll add this to both templates within the ``<div id="right"
-class="app-welcome align-right">`` div:
+Open ``tutorial/tutorial/templates/edit.pt`` and
+``tutorial/tutorial/templates/view.pt``  and add this within the
+``<div id="right" class="app-welcome align-right">`` div:
 
 .. code-block:: xml
 
