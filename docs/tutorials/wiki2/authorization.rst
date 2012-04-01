@@ -132,24 +132,27 @@ following content:
    :language: python
 
 ``groupfinder()`` is an :term:`authentication policy`
-"callback"; it is a function that accepts a userid and a request.  If
-the userid exists in the system, the callback will return a sequence
-of group identifiers (or an empty sequence if the user isn't a member
-of any groups).  If the userid *does not* exist in the system, the
-callback will return ``None``.  In a production system, user and group
-data will most often come from a database, but here we use "dummy"
-data to represent user and groups sources. Note that the ``editor``
-user is a member of the ``group:editors`` group in our dummy group
-data (the ``GROUPS`` data structure).
+"callback"; it is a function that accepts a userid and a request and
+returns one of these values:
+
+- If the userid exists in the system, the callback will return a
+  sequence of group identifiers (or an empty sequence if the user
+  isn't a member of any groups).
+- If the userid *does not* exist in the system, the callback will
+  return ``None``.
 
 We've given the ``editor`` user membership to the ``group:editors`` by
-mapping him to this group in the ``GROUPS`` data structure (``GROUPS =
-{'editor':['group:editors']}``).  Since the ``groupfinder`` function
+mapping him to this group in the ``GROUPS`` data structure above.
+Since the ``groupfinder`` function
 consults the ``GROUPS`` data structure, this will mean that, as a
 result of the ACL attached to the :term:`context` object returned by
 the root factory, and the permission associated with the ``add_page``
 and ``edit_page`` views, the ``editor`` user should be able to add and
 edit pages.
+
+In a production system, user and group
+data will most often come from a database, but here we use "dummy"
+data to represent user and groups sources.
 
 Add routes for /login and /logout
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -194,7 +197,7 @@ one makes it a :term:`forbidden view`.  The forbidden view is
 displayed whenever Pyramid or your application raises an
 :class:`pyramid.httpexceptions.HTTPForbidden` exception.  In this
 case, we'll be relying on the forbidden view to show the login form
-whenver someone attempts to execute an action which they're not yet
+whenever someone attempts to execute an action which they're not yet
 authorized to perform.
 
 The ``logout`` view callable is decorated with a ``@view_config`` decorator
@@ -305,7 +308,8 @@ is ``None``, such as when a user is not authenticated.
 Seeing Our Changes
 ~~~~~~~~~~~~~~~~~~
 
-Our ``__init__.py`` module will look something like this when we're done:
+Our ``tutorial/tutorial/__init__.py`` will look something like this
+when we're done:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :linenos:
@@ -314,7 +318,8 @@ Our ``__init__.py`` module will look something like this when we're done:
 
 (Only the highlighted lines need to be added.)
 
-Our ``views.py`` module will look something like this when we're done:
+Our ``tutorial/tutorial/views.py`` will look something like this
+when we're done:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :linenos:
@@ -323,7 +328,8 @@ Our ``views.py`` module will look something like this when we're done:
 
 (Only the highlighted lines need to be added.)
 
-Our ``edit.pt`` template will look something like this when we're done:
+Our ``tutorial/tutorial/templates/edit.pt`` template will look
+something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.pt
    :emphasize-lines: 41-43
@@ -331,7 +337,8 @@ Our ``edit.pt`` template will look something like this when we're done:
 
 (Only the highlighted lines need to be added.)
 
-Our ``view.pt`` template will look something like this when we're done:
+Our ``tutorial/tutorial/templates/view.pt`` template will look
+something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/view.pt
    :emphasize-lines: 41-43
