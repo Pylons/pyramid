@@ -572,6 +572,16 @@ No matter which view calling convention is used, the view code always has
 access to the context via ``request.context``.
 
 .. index::
+   single: Passing in configuration variables
+
+.. _passing_in_config_variables:
+
+Passing Configuration Variables to a View
+-----------------------------------------
+For information on passing a variable from the configuration .ini files to a
+view, see :ref:`deployment_settings`.
+
+.. index::
    single: Pylons-style controller dispatch
 
 Pylons-1.0-Style "Controller" Dispatch
