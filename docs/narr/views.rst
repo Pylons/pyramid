@@ -578,7 +578,10 @@ access to the context via ``request.context``.
 
 Passing Configuration Variables to a View
 -----------------------------------------
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9834f2a0d95126001d32c34b4f2bec2b980df55e
 For information on passing a variable from the configuration .ini files to a
 view, see :ref:`deployment_settings`.
 
