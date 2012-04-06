@@ -40,6 +40,9 @@ The source code for this tutorial stage can be browsed at
 `http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki2/src/authorization/
 <http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki2/src/authorization/>`_.
 
+Access Control
+--------------
+
 Add users and groups
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -180,6 +183,9 @@ permission at the time of the request may invoke those two views.
 We are done with the changes needed to control access.  The
 changes that follow will add the login and logout feature.
 
+Login, Logout
+-------------
+
 Add routes for /login and /logout
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Go back to ``tutorial/tutorial/__init__.py`` and add these two
@@ -303,7 +309,7 @@ the logout view.  The above element will not be included if ``logged_in``
 is ``None``, such as when a user is not authenticated.
 
 Seeing Our Changes
-~~~~~~~~~~~~~~~~~~
+------------------
 
 Our ``tutorial/tutorial/__init__.py`` will look something like this
 when we're done:
@@ -344,7 +350,7 @@ something like this when we're done:
 (Only the highlighted lines need to be added.)
 
 Viewing the Application in a Browser
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------
 
 We can finally examine our application in a browser (See
 :ref:`wiki2-start-the-application`).  Launch a browser and visit

@@ -87,7 +87,7 @@ listed in the following table:
 |                      |                       |             |            |            |
 |                      |                       |             |            |            |
 +----------------------+-----------------------+-------------+------------+------------+
-| /edit_page/PageName  |  Display edit form    |  edit_page  |  edit.pt   |  edit      |
+| /PageName/edit_page  |  Display edit form    |  edit_page  |  edit.pt   |  edit      |
 |                      |  with existing        |             |            |            |
 |                      |  content.             |             |            |            |
 |                      |                       |             |            |            |
