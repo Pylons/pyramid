@@ -2,30 +2,44 @@
 Adding Authorization
 ====================
 
-Our application currently allows anyone with access to the server to view,
-edit, and add pages to our wiki.  For purposes of demonstration we'll change
-our application to allow people who are members of a *group* named
-``group:editors`` to add and edit wiki pages but we'll continue allowing
-anyone with access to the server to view pages.  :app:`Pyramid` provides
-facilities for :term:`authorization` and :term:`authentication`.  We'll make
-use of both features to provide security to our application.
+:app:`Pyramid` provides facilities for :term:`authentication` and
+:term:`authorization`.  We'll make use of both features to provide security
+to our application.  Our application currently allows anyone with access to
+the server to view, edit, and add pages to our wiki.  We'll change that
+to allow only people who are members of a *group* named ``group:editors``
+to add and edit wiki pages but we'll continue allowing
+anyone with access to the server to view pages.
 
-We will add an :term:`authentication policy` and an
-:term:`authorization policy` to our :term:`application
-registry`, add a ``security.py`` module and give our :term:`root`
-resource an :term:`ACL`.
+We will also add a login page and a logout link on all the
+pages.  The login page will be shown when a user is denied
+access to any of the views that require a permission, instead of
+a default "403 Forbidden" page.
 
-Then we will add ``login`` and ``logout`` views, and modify the
-existing views to make them return a ``logged_in`` flag to the
-renderer and add :term:`permission` declarations to their ``view_config``
-decorators.
+We will implement the access control with the following steps:
 
-Finally, we will add a ``login.pt`` template and change the existing
-``view.pt`` and ``edit.pt`` to show a "Logout" link when not logged in.
+* Add users and groups (``security.py``, a new module).
+* Add an :term:`ACL` (``models.py`` and
+  ``__init__.py``).
+* Add an :term:`authentication policy` and an :term:`authorization policy`
+  (``__init__.py``).
+* Add :term:`permission` declarations to the ``edit_page`` and ``add_page``
+  views (``views.py``).
+
+Then we will add the login and logout feature:
+
+* Add routes for /login and /logout (``__init__.py``).
+* Add ``login`` and ``logout`` views (``views.py``).
+* Add a login template (``login.pt``).
+* Make the existing views return a ``logged_in`` flag to the renderer (``views.py``).
+* Add a "Logout" link to be shown when logged in and viewing or editing a page
+  (``view.pt``, ``edit.pt``).
 
 The source code for this tutorial stage can be browsed via
 `http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki/src/authorization/
 <http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki/src/authorization/>`_.
+
+Access Control
+--------------
 
 Add Authentication and Authorization Policies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -60,8 +74,8 @@ look like so:
    :linenos:
    :language: python
 
-Add ``security.py``
-~~~~~~~~~~~~~~~~~~~
+Add users and groups
+~~~~~~~~~~~~~~~~~~~~
 
 Add a ``security.py`` module within your package (in the same
 directory as ``__init__.py``, ``views.py``, etc.) with the following
@@ -81,8 +95,8 @@ from a database, but here we use "dummy" data to represent user and groups
 sources. Note that the ``editor`` user is a member of the ``group:editors``
 group in our dummy group data (the ``GROUPS`` data structure).
 
-Give Our Root Resource an ACL
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Add an ACL
+~~~~~~~~~~
 
 We need to give our root resource object an :term:`ACL`.  This ACL will be
 sufficient to provide enough information to the :app:`Pyramid` security
@@ -166,8 +180,8 @@ Note that we're relying on some additional imports within the bodies of these
 views (e.g. ``remember`` and ``forget``).  We'll see a rendering of the
 entire views.py file a little later here to show you where those come from.
 
-Change Existing Views
-~~~~~~~~~~~~~~~~~~~~~
+Return a logged_in flag to the renderer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In order to indicate whether the current user is logged in, we need to change
 each of our ``view_page``, ``edit_page`` and ``add_page`` views in
@@ -192,8 +206,8 @@ template.  For example:
                logged_in = logged_in,
                edit_url = edit_url)
 
-Add ``permission`` Declarations to our ``view_config`` Decorators
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Add permission declarations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To protect each of our views with a particular permission, we need to pass a
 ``permission`` argument to each of our :class:`pyramid.view.view_config`
@@ -224,6 +238,9 @@ decorators.  To do so, within ``views.py``:
   function consults the ``GROUPS`` data structure.  This means
   that the ``editor`` user can add and edit pages.
 
+Login, Logout
+-------------
+
 Add the ``login.pt`` Template
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -233,7 +250,7 @@ referred to within the login view we just added to ``views.py``.
 .. literalinclude:: src/authorization/tutorial/templates/login.pt
    :language: xml
 
-Change ``view.pt`` and ``edit.pt``
+Add a "Logout" link when logged in
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We'll also need to change our ``edit.pt`` and ``view.pt`` templates to
@@ -249,8 +266,8 @@ class="app-welcome align-right">`` div:
       <a href="${request.application_url}/logout">Logout</a>
    </span>
 
-See Our Changes To ``views.py`` and our Templates
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Seeing Our Changes
+------------------
 
 Our ``views.py`` module will look something like this when we're done:
 
@@ -270,36 +287,39 @@ Our ``view.pt`` template will look something like this when we're done:
    :linenos:
    :language: xml
 
-View the Application in a Browser
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We can finally examine our application in a browser.  The views we'll try are
-as follows:
+Viewing the Application in a Browser
+------------------------------------
 
-- Visiting ``http://localhost:6543/`` in a browser invokes the ``view_wiki``
-  view.  This always redirects to the ``view_page`` view of the ``FrontPage``
-  page resource.  It is executable by any user.
+We can finally examine our application in a browser (See
+:ref:`wiki-start-the-application`).  Launch a browser and visit
+each of the following URLs, check that the result is as expected:
 
-- Visiting ``http://localhost:6543/FrontPage/`` in a browser invokes the
-  ``view_page`` view of the ``FrontPage`` Page resource.  This is because
+- ``http://localhost:6543/`` invokes the
+  ``view_wiki`` view.  This always redirects to the ``view_page`` view
+  of the ``FrontPage`` Page resource.  It is executable by any user.
+
+- ``http://localhost:6543/FrontPage`` invokes
+  the ``view_page`` view of the ``FrontPage`` Page resource. This is because
   it's the :term:`default view` (a view without a ``name``) for ``Page``
   resources.  It is executable by any user.
 
-- Visiting ``http://localhost:6543/FrontPage/edit_page`` in a browser invokes
-  the edit view for the ``FrontPage`` Page resource.  It is executable by
-  only the ``editor`` user.  If a different user (or the anonymous user)
-  invokes it, a login form will be displayed.  Supplying the credentials with
-  the username ``editor``, password ``editor`` will show the edit page form
-  being displayed.
+- ``http://localhost:6543/FrontPage/edit_page``
+  invokes the edit view for the FrontPage object.  It is executable by
+  only the ``editor`` user.  If a different user (or the anonymous
+  user) invokes it, a login form will be displayed.  Supplying the
+  credentials with the username ``editor``, password ``editor`` will
+  display the edit page form.
 
-- Visiting ``http://localhost:6543/add_page/SomePageName`` in a
-  browser invokes the add view for a page.  It is executable by only
+- ``http://localhost:6543/add_page/SomePageName``
+  invokes the add view for a page.  It is executable by only
   the ``editor`` user.  If a different user (or the anonymous user)
   invokes it, a login form will be displayed.  Supplying the
   credentials with the username ``editor``, password ``editor`` will
-  show the edit page form being displayed.
+  display the edit page form.
 
-- After logging in (as a result of hitting an edit or add page and
-  submitting the login form with the ``editor`` credentials), we'll see
-  a Logout link in the upper right hand corner.  When we click it,
-  we're logged out, and redirected back to the front page.
+- After logging in (as a result of hitting an edit or add page
+  and submitting the login form with the ``editor``
+  credentials), we'll see a Logout link in the upper right hand
+  corner.  When we click it, we're logged out, and redirected
+  back to the front page.

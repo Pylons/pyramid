@@ -8,9 +8,9 @@ Adding Authorization
 :term:`authorization`.  We'll make use of both features to provide security
 to our application.  Our application currently allows anyone with access to
 the server to view, edit, and add pages to our wiki.  We'll change that
-to allow only people who possess a specific username (`editor`)
-to add and edit wiki pages but we'll continue allowing anyone with access to
-the server to view pages.
+to allow only people who are members of a *group* named ``group:editors``
+to add and edit wiki pages but we'll continue allowing
+anyone with access to the server to view pages.
 
 We will also add a login page and a logout link on all the
 pages.  The login page will be shown when a user is denied
@@ -196,8 +196,8 @@ routes:
    :linenos:
    :language: python
 
-Adding Login and Logout Views
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Add Login and Logout Views
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To our ``views.py`` we'll add a ``login`` view callable which renders a login
 form and processes the post from the login form, checking credentials.
@@ -245,8 +245,8 @@ authorized to perform.
 which associates it with the ``logout`` route.  This makes it match when we
 visit ``/logout``.
 
-Adding the ``login.pt`` Template
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Add the ``login.pt`` Template
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Create ``tutorial/tutorial/templates/login.pt`` with the following
 content:
