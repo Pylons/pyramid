@@ -8,23 +8,31 @@ Adding Authorization
 :term:`authorization`.  We'll make use of both features to provide security
 to our application.  Our application currently allows anyone with access to
 the server to view, edit, and add pages to our wiki.  We'll change that
-to allow only people who possess a specific username (`editor`)
-to add and edit wiki pages but we'll continue allowing anyone with access to
-the server to view pages.
+to allow only people who are members of a *group* named ``group:editors``
+to add and edit wiki pages but we'll continue allowing
+anyone with access to the server to view pages.
 
-We will do the following steps:
+We will also add a login page and a logout link on all the
+pages.  The login page will be shown when a user is denied
+access to any of the views that require a permission, instead of
+a default "403 Forbidden" page.
 
-* Add a :term:`root factory` with an :term:`ACL` (``models.py``,
+We will implement the access control with the following steps:
+
+* Add users and groups (``security.py``, a new module).
+* Add an :term:`ACL` (``models.py`` and
   ``__init__.py``).
 * Add an :term:`authentication policy` and an :term:`authorization policy`
   (``__init__.py``).
-* Add an authentication policy callback (new ``security.py`` module).
-* Add routes for /login and /logout (``__init__.py``).
-* Add ``login`` and ``logout`` views (``views.py``).
 * Add :term:`permission` declarations to the ``edit_page`` and ``add_page``
   views (``views.py``).
+
+Then we will add the login and logout feature:
+
+* Add routes for /login and /logout (``__init__.py``).
+* Add ``login`` and ``logout`` views (``views.py``).
+* Add a login template (``login.pt``).
 * Make the existing views return a ``logged_in`` flag to the renderer (``views.py``).
-* Add a login template (new ``login.pt``).
 * Add a "Logout" link to be shown when logged in and viewing or editing a page
   (``view.pt``, ``edit.pt``).
 
@@ -32,8 +40,40 @@ The source code for this tutorial stage can be browsed at
 `http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki2/src/authorization/
 <http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki2/src/authorization/>`_.
 
-Adding A Root Factory
-~~~~~~~~~~~~~~~~~~~~~
+Access Control
+--------------
+
+Add users and groups
+~~~~~~~~~~~~~~~~~~~~
+
+Create a new ``tutorial/tutorial/security.py`` module with the
+following content:
+
+.. literalinclude:: src/authorization/tutorial/security.py
+   :linenos:
+   :language: python
+
+The ``groupfinder`` function accepts a userid and a request and
+returns one of these values:
+
+- If the userid exists in the system, it will return a
+  sequence of group identifiers (or an empty sequence if the user
+  isn't a member of any groups).
+- If the userid *does not* exist in the system, it will
+  return ``None``.
+
+For example, ``groupfinder('editor', request )`` returns ['group:editor'],
+``groupfinder('viewer', request)`` returns [], and ``groupfinder('admin', request)``
+returns ``None``.  We will use ``groupfinder()`` as an :term:`authentication policy`
+"callback" that will provide the :term:`principal` or principals
+for a user.
+
+In a production system, user and group
+data will most often come from a database, but here we use "dummy"
+data to represent user and groups sources.
+
+Add an ACL
+~~~~~~~~~~
 
 Open ``tutorial/tutorial/models.py`` and add the following import
 statement at the head:
@@ -50,13 +90,22 @@ Add the following class definition:
    :linenos:
    :language: python
 
-The ``RootFactory`` class is a :term:`root factory` that will be used by
-:app:`Pyramid` to construct the :term:`context` of each request to
-our application.  The context is attached to the request
-object passed to our view callables as the ``context`` attribute,
-and will be decorated with security declarations.   By using a custom
-root factory to generate our contexts, we can use the
-declarative security features of :app:`Pyramid`.
+We import :data:`~pyramid.security.Allow`, an action that
+means that permission is allowed:, and
+:data:`~pyramid.security.Everyone`, a special :term:`principal`
+that is associated to all requests.  Both are used in the
+:term:`ACE` entries that make up the ACL.
+
+The ACL is a list that needs to be named `__acl__` and be an
+attribute of a class.  We define an :term:`ACL` with two
+:term:`ACE` entries: the first entry allows any user the `view`
+permission.  The second entry allows the ``group:editors``
+principal  the `edit` permission.
+
+The ``RootFactory`` class that contains the ACL is a :term:`root factory`.
+We need to associate it to our :app:`Pyramid` application, so the ACL is
+provided to each view in the :term:`context` of the request, as
+the ``context`` attribute.
 
 Open ``tutorial/tutorial/__init__.py`` and add a ``root_factory``
 parameter to our :term:`Configurator` constructor, that points to
@@ -70,13 +119,9 @@ the class we created above:
 
 (Only the highlighted line needs to be added.)
 
-The context object generated by our root factory will possess an ``__acl__``
-attribute that allows :data:`pyramid.security.Everyone` (a special principal)
-to view all pages, while allowing only a :term:`principal` named
-``group:editors`` to edit and add pages.  The ``__acl__`` attribute attached
-to a context is interpreted specially by :app:`Pyramid` as an access control
-list during view callable execution.  See :ref:`assigning_acls` for more
-information about what an :term:`ACL` represents.
+We are now providing the ACL to the application.  See
+:ref:`assigning_acls` for more information about what an
+:term:`ACL` represents.
 
 .. note::
 
@@ -85,17 +130,10 @@ information about what an :term:`ACL` represents.
     the ``factory`` argument to
     :meth:`pyramid.config.Configurator.add_route` for more info.
 
-Add an Authorization Policy and an Authentication Policy
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Add Authentication and Authorization Policies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For any :app:`Pyramid` application to perform authorization, we need to add a
-``security.py`` module (we'll do that shortly) and we'll need to change our
-``__init__.py`` file to add an :term:`authentication policy` and an
-:term:`authorization policy` which uses the ``security.py`` file for a
-*callback*.
-
-We'll enable an ``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy``
-to implement declarative security checking. Open ``tutorial/__init__.py`` and
+Open ``tutorial/__init__.py`` and
 add these import statements:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
@@ -113,110 +151,16 @@ Now add those policies to the configuration:
 
 (Only the highlighted lines need to be added.)
 
+We are enabling an ``AuthTktAuthenticationPolicy``, it is based in an auth
+ticket that may be included in the request,  and an ``ACLAuthorizationPolicy``
+that uses an ACL to determine the allow or deny outcome for a view.
+
 Note that the
 :class:`pyramid.authentication.AuthTktAuthenticationPolicy` constructor
 accepts two arguments: ``secret`` and ``callback``.  ``secret`` is a string
 representing an encryption key used by the "authentication ticket" machinery
-represented by this policy: it is required.  The ``callback`` is a
-``groupfinder`` function in the current directory's ``security.py`` file.  We
-haven't added that module yet, but we're about to.
-
-Adding an authentication policy callback
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Create a new ``tutorial/tutorial/security.py`` module with the
-following content:
-
-.. literalinclude:: src/authorization/tutorial/security.py
-   :linenos:
-   :language: python
-
-``groupfinder()`` is an :term:`authentication policy`
-"callback"; it is a function that accepts a userid and a request and
-returns one of these values:
-
-- If the userid exists in the system, the callback will return a
-  sequence of group identifiers (or an empty sequence if the user
-  isn't a member of any groups).
-- If the userid *does not* exist in the system, the callback will
-  return ``None``.
-
-We've given the ``editor`` user membership to the ``group:editors`` by
-mapping him to this group in the ``GROUPS`` data structure above.
-Since the ``groupfinder`` function
-consults the ``GROUPS`` data structure, this will mean that, as a
-result of the ACL attached to the :term:`context` object returned by
-the root factory, and the permission associated with the ``add_page``
-and ``edit_page`` views, the ``editor`` user should be able to add and
-edit pages.
-
-In a production system, user and group
-data will most often come from a database, but here we use "dummy"
-data to represent user and groups sources.
-
-Add routes for /login and /logout
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Go back to ``tutorial/tutorial/__init__.py`` and add these two
-routes:
-
-.. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 25-26
-   :linenos:
-   :language: python
-
-Adding Login and Logout Views
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To our ``views.py`` we'll add a ``login`` view callable which renders a login
-form and processes the post from the login form, checking credentials.
-
-We'll also add a ``logout`` view callable to our application and
-provide a link to it.  This view will clear the credentials of the
-logged in user and redirect back to the front page.
-
-The ``login`` view callable will look something like this:
-
-.. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 89-115
-   :linenos:
-   :language: python
-
-The ``logout`` view callable will look something like this:
-
-.. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 117-121
-   :linenos:
-   :language: python
-
-The ``login`` view callable is decorated with two decorators, a
-``@view_config`` decorator, which associates it with the ``login``
-route, and a ``@forbidden_view_config`` decorator which turns it in to
-an :term:`exception view`.  The one which associates it with the
-``login`` route makes it visible when we visit ``/login``.  The other
-one makes it a :term:`forbidden view`.  The forbidden view is
-displayed whenever Pyramid or your application raises an
-:class:`pyramid.httpexceptions.HTTPForbidden` exception.  In this
-case, we'll be relying on the forbidden view to show the login form
-whenever someone attempts to execute an action which they're not yet
-authorized to perform.
-
-The ``logout`` view callable is decorated with a ``@view_config`` decorator
-which associates it with the ``logout`` route.  This makes it visible when we
-visit ``/logout``.
-
-We'll need to import some stuff to service the needs of these two functions:
-the ``pyramid.view.forbidden_view_config`` class, a number of values from the
-``pyramid.security`` module, and a value from our newly added
-``tutorial.security`` package.  Add the following import statements to the
-head of ``tutorial/tutorial/views.py``:
-
-.. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 9-18,24-25
-   :linenos:
-   :emphasize-lines: 3,7-8,12
-   :language: python
-
-(Only the highlighted lines need to be added.)
+represented by this policy: it is required.  The ``callback`` is the
+``groupfinder()`` function that we created before.
 
 Add permission declarations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -236,47 +180,90 @@ decorator for ``add_page()`` and ``edit_page()``, for example:
 The result is that only users who possess the ``edit``
 permission at the time of the request may invoke those two views.
 
-We've granted the ``group:editors`` :term:`principal` the ``edit``
-permission in the :term:`root factory` via its ACL, so only a user who
-is a member of the group named ``group:editors`` will be able to
-invoke the views associated with the ``add_page`` or ``edit_page``
-routes.
-
-Return a logged_in flag to the renderer
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Add the following import statement to the head of
-``tutorial/tutorial/views.py``:
+Add a ``permission='view'`` parameter to the ``@view_config``
+decorator for ``view_wiki()`` and ``view_page()``, like this:
 
 .. code-block:: python
    :linenos:
+   :emphasize-lines: 2
 
-   from pyramid.security import (
-        authenticated_userid,
-        )
-
-
-Add a  ``logged_in`` parameter to the return value of
-``view_page()``, ``edit_page()`` and  ``add_page()``,
-like this:
-
-.. code-block:: python
-   :linenos:
-   :emphasize-lines: 3
-
-   return dict(page = page,
-               content = content,
-               logged_in = authenticated_userid(request),
-               edit_url = edit_url)
+   @view_config(route_name='view_page', renderer='templates/view.pt',
+                permission='view')
 
 (Only the highlighted line needs to be added.)
 
-:meth:`~pyramid.security.authenticated_userid()` will return None
-if the user is not authenticated, or some user id it the user
-is authenticated.
+This allows anyone to invoke these two views.
 
-Adding the ``login.pt`` Template
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+We are done with the changes needed to control access.  The
+changes that follow will add the login and logout feature.
+
+Login, Logout
+-------------
+
+Add routes for /login and /logout
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Go back to ``tutorial/tutorial/__init__.py`` and add these two
+routes:
+
+.. literalinclude:: src/authorization/tutorial/__init__.py
+   :lines: 25-26
+   :linenos:
+   :language: python
+
+Add Login and Logout Views
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We'll add a ``login`` view which renders a login form and processes
+the post from the login form, checking credentials.
+
+We'll also add a ``logout`` view callable to our application and
+provide a link to it.  This view will clear the credentials of the
+logged in user and redirect back to the front page.
+
+Add the following import statements to the
+head of ``tutorial/tutorial/views.py``:
+
+.. literalinclude:: src/authorization/tutorial/views.py
+   :lines: 9-16,18,24-25
+   :linenos:
+   :emphasize-lines: 3,6-9,11
+   :language: python
+
+(Only the highlighted lines need to be added.)
+
+:meth:`~pyramid.view.forbidden_view_config` will be used
+to customize the default 403 Forbidden page.
+:meth:`~pyramid.security.remember` and
+:meth:`~pyramid.security.forget` help to create and
+expire an auth ticket cookie.
+
+Now add the ``login`` and ``logout`` views:
+
+.. literalinclude:: src/authorization/tutorial/views.py
+   :lines: 91-123
+   :linenos:
+   :language: python
+
+``login()`` is decorated with two decorators:
+
+- a ``@view_config`` decorator which associates it with the
+  ``login`` route and makes it visible when we visit ``/login``,
+- a ``@forbidden_view_config`` decorator which turns it into
+  an :term:`forbidden view`. ``login()`` will be invoked
+  when a users tries to execute a view callable that
+  they are not allowed to.  For example, if a user has not logged in
+  and tries to add or edit a Wiki page, he will be shown the
+  login form before being allowed to continue on.
+
+The order of these two :term:`view configuration` decorators
+is unimportant.
+
+``logout()`` is decorated with a ``@view_config`` decorator
+which associates it with the ``logout`` route.  It will be
+invoked when we visit ``/logout``.
+
+Add the ``login.pt`` Template
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Create ``tutorial/tutorial/templates/login.pt`` with the following
 content:
@@ -286,6 +273,39 @@ content:
 
 The above template is referred to within the login view we just
 added to ``views.py``.
+
+Return a logged_in flag to the renderer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Add the following line to the import at the head of
+``tutorial/tutorial/views.py``:
+
+.. literalinclude:: src/authorization/tutorial/views.py
+   :lines: 14-18
+   :linenos:
+   :emphasize-lines: 4
+   :language: python
+
+(Only the highlighted line needs to be added.)
+
+Add a  ``logged_in`` parameter to the return value of
+``view_page()``, ``edit_page()`` and  ``add_page()``,
+like this:
+
+.. code-block:: python
+   :linenos:
+   :emphasize-lines: 4
+
+   return dict(page = page,
+               content = content,
+               edit_url = edit_url,
+               logged_in = authenticated_userid(request))
+
+(Only the highlighted line needs to be added.)
+
+:meth:`~pyramid.security.authenticated_userid()` will return None
+if the user is not authenticated, or some user id it the user
+is authenticated.
 
 Add a "Logout" link when logged in
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -306,7 +326,7 @@ the logout view.  The above element will not be included if ``logged_in``
 is ``None``, such as when a user is not authenticated.
 
 Seeing Our Changes
-~~~~~~~~~~~~~~~~~~
+------------------
 
 Our ``tutorial/tutorial/__init__.py`` will look something like this
 when we're done:
@@ -318,12 +338,22 @@ when we're done:
 
 (Only the highlighted lines need to be added.)
 
+Our ``tutorial/tutorial/models.py`` will look something like this
+when we're done:
+
+.. literalinclude:: src/authorization/tutorial/models.py
+   :linenos:
+   :emphasize-lines: 1-4,35-39
+   :language: python
+
+(Only the highlighted lines need to be added.)
+
 Our ``tutorial/tutorial/views.py`` will look something like this
 when we're done:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :linenos:
-   :emphasize-lines: 11,14-18,56,59,71,74,86,89-115,117-121
+   :emphasize-lines: 11,14-18,31,37,58,61,73,76,88,91-117,119-123
    :language: python
 
 (Only the highlighted lines need to be added.)
@@ -332,6 +362,7 @@ Our ``tutorial/tutorial/templates/edit.pt`` template will look
 something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.pt
+   :linenos:
    :emphasize-lines: 41-43
    :language: xml
 
@@ -341,13 +372,14 @@ Our ``tutorial/tutorial/templates/view.pt`` template will look
 something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/view.pt
+   :linenos:
    :emphasize-lines: 41-43
    :language: xml
 
 (Only the highlighted lines need to be added.)
 
 Viewing the Application in a Browser
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------
 
 We can finally examine our application in a browser (See
 :ref:`wiki2-start-the-application`).  Launch a browser and visit
