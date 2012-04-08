@@ -130,8 +130,8 @@ We are now providing the ACL to the application.  See
     the ``factory`` argument to
     :meth:`pyramid.config.Configurator.add_route` for more info.
 
-Add an Authentication Policy and an Authorization Policy
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Add Authentication and Authorization Policies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Open ``tutorial/__init__.py`` and
 add these import statements:

@@ -27,7 +27,6 @@ We will implement the access control with the following steps:
 
 Then we will add the login and logout feature:
 
-* Add routes for /login and /logout (``__init__.py``).
 * Add ``login`` and ``logout`` views (``views.py``).
 * Add a login template (``login.pt``).
 * Make the existing views return a ``logged_in`` flag to the renderer (``views.py``).
@@ -40,39 +39,6 @@ The source code for this tutorial stage can be browsed via
 
 Access Control
 --------------
-
-Add Authentication and Authorization Policies
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-We'll change our package's ``__init__.py`` file to enable an
-``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy`` to enable
-declarative security checking. We need to import the new policies:
-
-.. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 4-5,8
-   :linenos:
-   :language: python
-
-Then, we'll add those policies to the configuration:
-
-.. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 17-22
-   :linenos:
-   :language: python
-
-Note that the creation of an ``AuthTktAuthenticationPolicy`` requires two
-arguments: ``secret`` and ``callback``.  ``secret`` is a string representing
-an encryption key used by the "authentication ticket" machinery represented
-by this policy: it is required.  The ``callback`` is a reference to a
-``groupfinder`` function in the ``tutorial`` package's ``security.py`` file.
-We haven't added that module yet, but we're about to.
-
-When you're done, your ``__init__.py`` will
-look like so:
-
-.. literalinclude:: src/authorization/tutorial/__init__.py
-   :linenos:
-   :language: python
 
 Add users and groups
 ~~~~~~~~~~~~~~~~~~~~
@@ -132,6 +98,74 @@ Our resulting ``models.py`` file will now look like so:
    :linenos:
    :language: python
 
+Add Authentication and Authorization Policies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We'll change our package's ``__init__.py`` file to enable an
+``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy`` to enable
+declarative security checking. We need to import the new policies:
+
+.. literalinclude:: src/authorization/tutorial/__init__.py
+   :lines: 4-5,8
+   :linenos:
+   :language: python
+
+Then, we'll add those policies to the configuration:
+
+.. literalinclude:: src/authorization/tutorial/__init__.py
+   :lines: 17-22
+   :linenos:
+   :language: python
+
+Note that the creation of an ``AuthTktAuthenticationPolicy`` requires two
+arguments: ``secret`` and ``callback``.  ``secret`` is a string representing
+an encryption key used by the "authentication ticket" machinery represented
+by this policy: it is required.  The ``callback`` is a reference to a
+``groupfinder`` function in the ``tutorial`` package's ``security.py`` file.
+We haven't added that module yet, but we're about to.
+
+When you're done, your ``__init__.py`` will
+look like so:
+
+.. literalinclude:: src/authorization/tutorial/__init__.py
+   :linenos:
+   :language: python
+
+Add permission declarations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To protect each of our views with a particular permission, we need to pass a
+``permission`` argument to each of our :class:`pyramid.view.view_config`
+decorators.  To do so, within ``views.py``:
+
+- We add ``permission='view'`` to the decorator attached to the
+  ``view_wiki`` and ``view_page`` view functions. This makes the
+  assertion that only users who possess the ``view`` permission
+  against the context resource at the time of the request may
+  invoke these views.  We've granted
+  :data:`pyramid.security.Everyone` the view permission at the
+  root model via its ACL, so everyone will be able to invoke the
+  ``view_wiki`` and ``view_page`` views.
+
+- We add ``permission='edit'`` to the decorator attached to the
+  ``add_page`` and ``edit_page`` view functions.  This makes the
+  assertion that only users who possess the effective ``edit``
+  permission against the context resource at the time of the
+  request may invoke these views.  We've granted the
+  ``group:editors`` principal the ``edit`` permission at the
+  root model via its ACL, so only a user whom is a member of
+  the group named ``group:editors`` will able to invoke the
+  ``add_page`` or  ``edit_page`` views.  We've likewise given
+  the ``editor`` user membership to this group via the
+  ``security.py`` file by mapping him to the ``group:editors``
+  group in the ``GROUPS`` data structure (``GROUPS
+  = {'editor':['group:editors']}``); the ``groupfinder``
+  function consults the ``GROUPS`` data structure.  This means
+  that the ``editor`` user can add and edit pages.
+
+Login, Logout
+-------------
+
 Add Login and Logout Views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -180,6 +214,15 @@ Note that we're relying on some additional imports within the bodies of these
 views (e.g. ``remember`` and ``forget``).  We'll see a rendering of the
 entire views.py file a little later here to show you where those come from.
 
+Add the ``login.pt`` Template
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Add a ``login.pt`` template to your templates directory.  It's
+referred to within the login view we just added to ``views.py``.
+
+.. literalinclude:: src/authorization/tutorial/templates/login.pt
+   :language: xml
+
 Return a logged_in flag to the renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -205,50 +248,6 @@ template.  For example:
                content = content,
                logged_in = logged_in,
                edit_url = edit_url)
-
-Add permission declarations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To protect each of our views with a particular permission, we need to pass a
-``permission`` argument to each of our :class:`pyramid.view.view_config`
-decorators.  To do so, within ``views.py``:
-
-- We add ``permission='view'`` to the decorator attached to the
-  ``view_wiki`` and ``view_page`` view functions. This makes the
-  assertion that only users who possess the ``view`` permission
-  against the context resource at the time of the request may
-  invoke these views.  We've granted
-  :data:`pyramid.security.Everyone` the view permission at the
-  root model via its ACL, so everyone will be able to invoke the
-  ``view_wiki`` and ``view_page`` views.
-
-- We add ``permission='edit'`` to the decorator attached to the
-  ``add_page`` and ``edit_page`` view functions.  This makes the
-  assertion that only users who possess the effective ``edit``
-  permission against the context resource at the time of the
-  request may invoke these views.  We've granted the
-  ``group:editors`` principal the ``edit`` permission at the
-  root model via its ACL, so only a user whom is a member of
-  the group named ``group:editors`` will able to invoke the
-  ``add_page`` or  ``edit_page`` views.  We've likewise given
-  the ``editor`` user membership to this group via the
-  ``security.py`` file by mapping him to the ``group:editors``
-  group in the ``GROUPS`` data structure (``GROUPS
-  = {'editor':['group:editors']}``); the ``groupfinder``
-  function consults the ``GROUPS`` data structure.  This means
-  that the ``editor`` user can add and edit pages.
-
-Login, Logout
--------------
-
-Add the ``login.pt`` Template
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Add a ``login.pt`` template to your templates directory.  It's
-referred to within the login view we just added to ``views.py``.
-
-.. literalinclude:: src/authorization/tutorial/templates/login.pt
-   :language: xml
 
 Add a "Logout" link when logged in
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
