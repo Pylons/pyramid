@@ -104,7 +104,7 @@ principal  the `edit` permission.
 
 The ``RootFactory`` class that contains the ACL is a :term:`root factory`.
 We need to associate it to our :app:`Pyramid` application, so the ACL is
-provided to each view as the :term:`context` of each request, as
+provided to each view in the :term:`context` of the request, as
 the ``context`` attribute.
 
 Open ``tutorial/tutorial/__init__.py`` and add a ``root_factory``
@@ -317,6 +317,16 @@ when we're done:
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :linenos:
    :emphasize-lines: 2-3,7,16-18,20-22,25-26
+   :language: python
+
+(Only the highlighted lines need to be added.)
+
+Our ``tutorial/tutorial/models.py`` will look something like this
+when we're done:
+
+.. literalinclude:: src/authorization/tutorial/models.py
+   :linenos:
+   :emphasize-lines: 1-4,35-39
    :language: python
 
 (Only the highlighted lines need to be added.)

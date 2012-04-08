@@ -18,8 +18,7 @@ a default "403 Forbidden" page.
 We will implement the access control with the following steps:
 
 * Add users and groups (``security.py``, a new module).
-* Add an :term:`ACL` (``models.py`` and
-  ``__init__.py``).
+* Add an :term:`ACL` (``models.py``).
 * Add an :term:`authentication policy` and an :term:`authorization policy`
   (``__init__.py``).
 * Add :term:`permission` declarations to the ``edit_page`` and ``add_page``
@@ -43,60 +42,76 @@ Access Control
 Add users and groups
 ~~~~~~~~~~~~~~~~~~~~
 
-Add a ``security.py`` module within your package (in the same
-directory as ``__init__.py``, ``views.py``, etc.) with the following
-content:
+Create a new ``tutorial/tutorial/security.py`` module with the
+following content:
 
 .. literalinclude:: src/authorization/tutorial/security.py
    :linenos:
    :language: python
 
-The ``groupfinder`` function defined here is an :term:`authentication policy`
-"callback"; it is a callable that accepts a userid and a request.  If the
-userid exists in the system, the callback will return a sequence of group
-identifiers (or an empty sequence if the user isn't a member of any groups).
-If the userid *does not* exist in the system, the callback will return
-``None``.  In a production system, user and group data will most often come
-from a database, but here we use "dummy" data to represent user and groups
-sources. Note that the ``editor`` user is a member of the ``group:editors``
-group in our dummy group data (the ``GROUPS`` data structure).
+The ``groupfinder`` function accepts a userid and a request and
+returns one of these values:
+
+- If the userid exists in the system, it will return a
+  sequence of group identifiers (or an empty sequence if the user
+  isn't a member of any groups).
+- If the userid *does not* exist in the system, it will
+  return ``None``.
+
+For example, ``groupfinder('editor', request )`` returns ['group:editor'],
+``groupfinder('viewer', request)`` returns [], and ``groupfinder('admin', request)``
+returns ``None``.  We will use ``groupfinder()`` as an :term:`authentication policy`
+"callback" that will provide the :term:`principal` or principals
+for a user.
+
+In a production system, user and group
+data will most often come from a database, but here we use "dummy"
+data to represent user and groups sources.
 
 Add an ACL
 ~~~~~~~~~~
 
-We need to give our root resource object an :term:`ACL`.  This ACL will be
-sufficient to provide enough information to the :app:`Pyramid` security
-machinery to challenge a user who doesn't have appropriate credentials when
-he attempts to invoke the ``add_page`` or ``edit_page`` views.
+Open ``tutorial/tutorial/models.py`` and add the following import
+statements at the head:
 
-We need to perform some imports at module scope in our ``models.py`` file:
-
-.. code-block:: python
+.. literalinclude:: src/authorization/tutorial/models.py
+   :lines: 4-5
    :linenos:
+   :language: python
 
-   from pyramid.security import Allow
-   from pyramid.security import Everyone
+Add the following lines at class scope to the ``Wiki`` class:
 
-Our root resource object is a ``Wiki`` instance.  We'll add the following
-line at class scope to our ``Wiki`` class:
-
-.. code-block:: python
+.. literalinclude:: src/authorization/tutorial/models.py
+   :lines: 7-11
    :linenos:
+   :emphasize-lines: 4-5
+   :language: python
 
-   __acl__ = [ (Allow, Everyone, 'view'),
-               (Allow, 'group:editors', 'edit') ]
+We import :data:`~pyramid.security.Allow`, an action that
+means that permission is allowed:, and
+:data:`~pyramid.security.Everyone`, a special :term:`principal`
+that is associated to all requests.  Both are used in the
+:term:`ACE` entries that make up the ACL.
+
+The ACL is a list that needs to be named `__acl__` and be an
+attribute of a class.  We define an :term:`ACL` with two
+:term:`ACE` entries: the first entry allows any user the `view`
+permission.  The second entry allows the ``group:editors``
+principal  the `edit` permission.
+
+The ``Wiki`` class that contains the ACL is the :term:`resource`
+constructor for the :term:`root` resource, which is
+a ``Wiki`` instance.  The ACL is
+provided to each view in the :term:`context` of the request, as
+the ``context`` attribute.
 
 It's only happenstance that we're assigning this ACL at class scope.  An ACL
 can be attached to an object *instance* too; this is how "row level security"
 can be achieved in :app:`Pyramid` applications.  We actually only need *one*
 ACL for the entire system, however, because our security requirements are
-simple, so this feature is not demonstrated.
-
-Our resulting ``models.py`` file will now look like so:
-
-.. literalinclude:: src/authorization/tutorial/models.py
-   :linenos:
-   :language: python
+simple, so this feature is not demonstrated.  See
+:ref:`assigning_acls` for more information about what an
+:term:`ACL` represents.
 
 Add Authentication and Authorization Policies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -268,22 +283,32 @@ class="app-welcome align-right">`` div:
 Seeing Our Changes
 ------------------
 
+Our ``models.py`` file will look like this:
+
+.. literalinclude:: src/authorization/tutorial/models.py
+   :linenos:
+   :emphasize-lines: 4-5,10-11
+   :language: python
+
 Our ``views.py`` module will look something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :linenos:
+   :emphasize-lines: 8,11-15,23,28,49,53,70,74,84,86-119
    :language: python
 
 Our ``edit.pt`` template will look something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.pt
    :linenos:
+   :emphasize-lines: 41-43
    :language: xml
 
 Our ``view.pt`` template will look something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/view.pt
    :linenos:
+   :emphasize-lines: 41-43
    :language: xml
 
 
