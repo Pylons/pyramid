@@ -9,9 +9,9 @@ from pyramid.view import (
     )
 
 from pyramid.security import (
-    authenticated_userid,
     remember,
     forget,
+    authenticated_userid,
     )
 
 from .security import USERS
@@ -20,12 +20,13 @@ from .models import Page
 # regular expression used to find WikiWords
 wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
 
-@view_config(context='.models.Wiki', permission='view')
+@view_config(context='.models.Wiki',
+             permission='view')
 def view_wiki(context, request):
     return HTTPFound(location=request.resource_url(context, 'FrontPage'))
 
-@view_config(context='.models.Page',
-             renderer='templates/view.pt', permission='view')
+@view_config(context='.models.Page', renderer='templates/view.pt',
+             permission='view')
 def view_page(context, request):
     wiki = context.__parent__
 
@@ -43,10 +44,8 @@ def view_page(context, request):
     content = wikiwords.sub(check, content)
     edit_url = request.resource_url(context, 'edit_page')
 
-    logged_in = authenticated_userid(request)
-
     return dict(page = context, content = content, edit_url = edit_url,
-                logged_in = logged_in)
+                logged_in = authenticated_userid(request))
 
 @view_config(name='add_page', context='.models.Wiki',
              renderer='templates/edit.pt',
@@ -65,9 +64,8 @@ def add_page(context, request):
     page.__name__ = name
     page.__parent__ = context
 
-    logged_in = authenticated_userid(request)
-
-    return dict(page = page, save_url = save_url, logged_in = logged_in)
+    return dict(page = page, save_url = save_url,
+                logged_in = authenticated_userid(request))
 
 @view_config(name='edit_page', context='.models.Page',
              renderer='templates/edit.pt',
@@ -77,11 +75,9 @@ def edit_page(context, request):
         context.data = request.params['body']
         return HTTPFound(location = request.resource_url(context))
 
-    logged_in = authenticated_userid(request)
-
     return dict(page = context,
                 save_url = request.resource_url(context, 'edit_page'),
-                logged_in = logged_in)
+                logged_in = authenticated_userid(request))
 
 @view_config(context='.models.Wiki', name='login',
              renderer='templates/login.pt')
