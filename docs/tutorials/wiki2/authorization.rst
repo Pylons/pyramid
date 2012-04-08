@@ -160,7 +160,7 @@ Note that the
 accepts two arguments: ``secret`` and ``callback``.  ``secret`` is a string
 representing an encryption key used by the "authentication ticket" machinery
 represented by this policy: it is required.  The ``callback`` is the
-``groupfinder()`` function the we created before.
+``groupfinder()`` function that we created before.
 
 Add permission declarations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -179,6 +179,20 @@ decorator for ``add_page()`` and ``edit_page()``, for example:
 
 The result is that only users who possess the ``edit``
 permission at the time of the request may invoke those two views.
+
+Add a ``permission='view'`` parameter to the ``@view_config``
+decorator for ``view_wiki()`` and ``view_page()``, like this:
+
+.. code-block:: python
+   :linenos:
+   :emphasize-lines: 2
+
+   @view_config(route_name='view_page', renderer='templates/view.pt',
+                permission='view')
+
+(Only the highlighted line needs to be added.)
+
+This allows anyone to invoke these two views.
 
 We are done with the changes needed to control access.  The
 changes that follow will add the login and logout feature.
@@ -336,7 +350,7 @@ when we're done:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :linenos:
-   :emphasize-lines: 11,14-18,56,59,71,74,86,89-115,117-121
+   :emphasize-lines: 11,14-18,31,37,58,61,73,76,88,91-117,119-123
    :language: python
 
 (Only the highlighted lines need to be added.)

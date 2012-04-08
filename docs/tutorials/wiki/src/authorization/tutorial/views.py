@@ -20,12 +20,13 @@ from .models import Page
 # regular expression used to find WikiWords
 wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
 
-@view_config(context='.models.Wiki', permission='view')
+@view_config(context='.models.Wiki',
+             permission='view')
 def view_wiki(context, request):
     return HTTPFound(location=request.resource_url(context, 'FrontPage'))
 
-@view_config(context='.models.Page',
-             renderer='templates/view.pt', permission='view')
+@view_config(context='.models.Page', renderer='templates/view.pt',
+             permission='view')
 def view_page(context, request):
     wiki = context.__parent__
 

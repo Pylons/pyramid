@@ -116,67 +116,69 @@ simple, so this feature is not demonstrated.  See
 Add Authentication and Authorization Policies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We'll change our package's ``__init__.py`` file to enable an
-``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy`` to enable
-declarative security checking. We need to import the new policies:
+Open ``tutorial/__init__.py`` and
+add these import statements:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :lines: 4-5,8
    :linenos:
    :language: python
 
-Then, we'll add those policies to the configuration:
+Now add those policies to the configuration:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :lines: 17-22
    :linenos:
+   :emphasize-lines: 1-3,5-6
    :language: python
 
-Note that the creation of an ``AuthTktAuthenticationPolicy`` requires two
-arguments: ``secret`` and ``callback``.  ``secret`` is a string representing
-an encryption key used by the "authentication ticket" machinery represented
-by this policy: it is required.  The ``callback`` is a reference to a
-``groupfinder`` function in the ``tutorial`` package's ``security.py`` file.
-We haven't added that module yet, but we're about to.
+(Only the highlighted lines need to be added.)
 
-When you're done, your ``__init__.py`` will
-look like so:
+We are enabling an ``AuthTktAuthenticationPolicy``, it is based in an auth
+ticket that may be included in the request,  and an ``ACLAuthorizationPolicy``
+that uses an ACL to determine the allow or deny outcome for a view.
 
-.. literalinclude:: src/authorization/tutorial/__init__.py
-   :linenos:
-   :language: python
+Note that the
+:class:`pyramid.authentication.AuthTktAuthenticationPolicy` constructor
+accepts two arguments: ``secret`` and ``callback``.  ``secret`` is a string
+representing an encryption key used by the "authentication ticket" machinery
+represented by this policy: it is required.  The ``callback`` is the
+``groupfinder()`` function that we created before.
 
 Add permission declarations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To protect each of our views with a particular permission, we need to pass a
-``permission`` argument to each of our :class:`pyramid.view.view_config`
-decorators.  To do so, within ``views.py``:
+Add a ``permission='edit'`` parameter to the ``@view_config``
+decorator for ``add_page()`` and ``edit_page()``, for example:
 
-- We add ``permission='view'`` to the decorator attached to the
-  ``view_wiki`` and ``view_page`` view functions. This makes the
-  assertion that only users who possess the ``view`` permission
-  against the context resource at the time of the request may
-  invoke these views.  We've granted
-  :data:`pyramid.security.Everyone` the view permission at the
-  root model via its ACL, so everyone will be able to invoke the
-  ``view_wiki`` and ``view_page`` views.
+.. code-block:: python
+   :linenos:
+   :emphasize-lines: 2
 
-- We add ``permission='edit'`` to the decorator attached to the
-  ``add_page`` and ``edit_page`` view functions.  This makes the
-  assertion that only users who possess the effective ``edit``
-  permission against the context resource at the time of the
-  request may invoke these views.  We've granted the
-  ``group:editors`` principal the ``edit`` permission at the
-  root model via its ACL, so only a user whom is a member of
-  the group named ``group:editors`` will able to invoke the
-  ``add_page`` or  ``edit_page`` views.  We've likewise given
-  the ``editor`` user membership to this group via the
-  ``security.py`` file by mapping him to the ``group:editors``
-  group in the ``GROUPS`` data structure (``GROUPS
-  = {'editor':['group:editors']}``); the ``groupfinder``
-  function consults the ``GROUPS`` data structure.  This means
-  that the ``editor`` user can add and edit pages.
+   @view_config(route_name='add_page', renderer='templates/edit.pt',
+                permission='edit')
+
+(Only the highlighted line needs to be added.)
+
+The result is that only users who possess the ``edit``
+permission at the time of the request may invoke those two views.
+
+Add a ``permission='view'`` parameter to the ``@view_config``
+decorator for ``view_wiki()`` and ``view_page()``, like this:
+
+.. code-block:: python
+   :linenos:
+   :emphasize-lines: 2
+
+   @view_config(route_name='view_page', renderer='templates/view.pt',
+                permission='view')
+
+(Only the highlighted line needs to be added.)
+
+This allows anyone to invoke these two views.
+
+We are done with the changes needed to control access.  The
+changes that follow will add the login and logout feature.
 
 Login, Logout
 -------------
@@ -283,6 +285,14 @@ class="app-welcome align-right">`` div:
 Seeing Our Changes
 ------------------
 
+When you're done, your ``__init__.py`` will
+look like so:
+
+.. literalinclude:: src/authorization/tutorial/__init__.py
+   :linenos:
+   :emphasize-lines: 4-5,8,17-19,21-22
+   :language: python
+
 Our ``models.py`` file will look like this:
 
 .. literalinclude:: src/authorization/tutorial/models.py
@@ -294,7 +304,7 @@ Our ``views.py`` module will look something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :linenos:
-   :emphasize-lines: 8,11-15,23,28,49,53,70,74,84,86-119
+   :emphasize-lines: 8,11-15,24,29,50,54,71,75,85,87-120
    :language: python
 
 Our ``edit.pt`` template will look something like this when we're done:
