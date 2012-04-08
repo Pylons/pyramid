@@ -213,8 +213,8 @@ routes:
 Add Login and Logout Views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To our ``views.py`` we'll add a ``login`` view callable which renders a login
-form and processes the post from the login form, checking credentials.
+We'll add a ``login`` view which renders a login form and processes
+the post from the login form, checking credentials.
 
 We'll also add a ``logout`` view callable to our application and
 provide a link to it.  This view will clear the credentials of the
@@ -240,24 +240,27 @@ expire an auth ticket cookie.
 Now add the ``login`` and ``logout`` views:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 89-121
+   :lines: 91-123
    :linenos:
    :language: python
 
-``login()`` is decorated with two decorators, a
-``@view_config`` decorator, which associates it with the ``login``
-route and makes it visible when we visit ``/login``,
-and a ``@forbidden_view_config`` decorator which turns it into
-an :term:`forbidden view`.  The forbidden view is
-displayed whenever Pyramid or your application raises an
-:class:`pyramid.httpexceptions.HTTPForbidden` exception.  In this
-case we'll show the login form whenever someone attempts
-to execute an action which they're not yet
-authorized to perform.
+``login()`` is decorated with two decorators:
+
+- a ``@view_config`` decorator which associates it with the
+  ``login`` route and makes it visible when we visit ``/login``,
+- a ``@forbidden_view_config`` decorator which turns it into
+  an :term:`forbidden view`. ``login()`` will be invoked
+  when a users tries to execute a view callable that
+  they are not allowed to.  For example, if a user has not logged in
+  and tries to add or edit a Wiki page, he will be shown the
+  login form before being allowed to continue on.
+
+The order of these two :term:`view configuration` decorators
+is unimportant.
 
 ``logout()`` is decorated with a ``@view_config`` decorator
-which associates it with the ``logout`` route.  This makes it match when we
-visit ``/logout``.
+which associates it with the ``logout`` route.  It will be
+invoked when we visit ``/logout``.
 
 Add the ``login.pt`` Template
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -291,12 +294,12 @@ like this:
 
 .. code-block:: python
    :linenos:
-   :emphasize-lines: 3
+   :emphasize-lines: 4
 
    return dict(page = page,
                content = content,
-               logged_in = authenticated_userid(request),
-               edit_url = edit_url)
+               edit_url = edit_url,
+               logged_in = authenticated_userid(request))
 
 (Only the highlighted line needs to be added.)
 

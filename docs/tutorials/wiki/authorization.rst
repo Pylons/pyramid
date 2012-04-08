@@ -189,98 +189,114 @@ Add Login and Logout Views
 We'll add a ``login`` view which renders a login form and processes
 the post from the login form, checking credentials.
 
-We'll also add a ``logout`` view to our application and provide a link
-to it.  This view will clear the credentials of the logged in user and
-redirect back to the front page.
+We'll also add a ``logout`` view to our application and
+provide a link to it.  This view will clear the credentials of the
+logged in user and redirect back to the front page.
 
-We'll add these views to the existing ``views.py`` file we have in our
-project.  Here's what the ``login`` view callable will look like:
+Add the following import statements to the
+head of ``tutorial/tutorial/views.py``:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 86-113
+   :lines: 6-13,15-17
+   :linenos:
+   :emphasize-lines: 3,6-9,11
+   :language: python
+
+(Only the highlighted lines need to be added.)
+
+:meth:`~pyramid.view.forbidden_view_config` will be used
+to customize the default 403 Forbidden page.
+:meth:`~pyramid.security.remember` and
+:meth:`~pyramid.security.forget` help to create and
+expire an auth ticket cookie.
+
+Now add the ``login`` and ``logout`` views:
+
+.. literalinclude:: src/authorization/tutorial/views.py
+   :lines: 87-120
    :linenos:
    :language: python
 
-Here's what the ``logout`` view callable will look like:
+``login()`` is decorated with two decorators:
 
-.. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 115-119
-   :linenos:
-   :language: python
+- a ``@view_config`` decorator which associates it with the
+  ``login`` route and makes it visible when we visit ``/login``,
+- a ``@forbidden_view_config`` decorator which turns it into
+  an :term:`forbidden view`. ``login()`` will be invoked
+  when a users tries to execute a view callable that
+  they are not allowed to.  For example, if a user has not logged in
+  and tries to add or edit a Wiki page, he will be shown the
+  login form before being allowed to continue on.
 
-Note that the ``login`` view callable has *two* view configuration
-decorators.  The order of these decorators is unimportant.  Each just adds a
-different :term:`view configuration` for the ``login`` view callable.
+The order of these two :term:`view configuration` decorators
+is unimportant.
 
-The first view configuration decorator configures the ``login`` view callable
-so it will be invoked when someone visits ``/login`` (when the context is a
-Wiki and the view name is ``login``).  The second decorator, named
-``forbidden_view_config`` specifies a :term:`forbidden view`.  This
-configures our login view to be presented to the user when :app:`Pyramid`
-detects that a view invocation can not be authorized.  Because we've
-configured a forbidden view, the ``login`` view callable will be invoked
-whenever one of our users tries to execute a view callable that they are not
-allowed to invoke as determined by the :term:`authorization policy` in use.
-In our application, for example, this means that if a user has not logged in,
-and he tries to add or edit a Wiki page, he will be shown the login form.
-Before being allowed to continue on to the add or edit form, he will have to
-provide credentials that give him permission to add or edit via this login
-form.
-
-Note that we're relying on some additional imports within the bodies of these
-views (e.g. ``remember`` and ``forget``).  We'll see a rendering of the
-entire views.py file a little later here to show you where those come from.
+``logout()`` is decorated with a ``@view_config`` decorator
+which associates it with the ``logout`` route.  It will be
+invoked when we visit ``/logout``.
 
 Add the ``login.pt`` Template
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Add a ``login.pt`` template to your templates directory.  It's
-referred to within the login view we just added to ``views.py``.
+Create ``tutorial/tutorial/templates/login.pt`` with the following
+content:
 
 .. literalinclude:: src/authorization/tutorial/templates/login.pt
    :language: xml
 
+The above template is referred to within the login view we just
+added to ``views.py``.
+
 Return a logged_in flag to the renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In order to indicate whether the current user is logged in, we need to change
-each of our ``view_page``, ``edit_page`` and ``add_page`` views in
-``views.py`` to pass a "logged in" parameter into its template.  We'll add
-something like this to each view body:
+Add the following line to the import at the head of
+``tutorial/tutorial/views.py``:
+
+.. literalinclude:: src/authorization/tutorial/views.py
+   :lines: 11-15
+   :linenos:
+   :emphasize-lines: 4
+   :language: python
+
+(Only the highlighted line needs to be added.)
+
+Add a  ``logged_in`` parameter to the return value of
+``view_page()``, ``edit_page()`` and  ``add_page()``,
+like this:
 
 .. code-block:: python
    :linenos:
+   :emphasize-lines: 4
 
-   from pyramid.security import authenticated_userid
-   logged_in = authenticated_userid(request)
-
-We'll then change the return value of each view that has an associated
-``renderer`` to pass the resulting ``logged_in`` value to the
-template.  For example:
-
-.. code-block:: python
-   :linenos:
-
-   return dict(page = context,
+   return dict(page = page,
                content = content,
-               logged_in = logged_in,
-               edit_url = edit_url)
+               edit_url = edit_url,
+               logged_in = authenticated_userid(request))
+
+(Only the highlighted line needs to be added.)
+
+:meth:`~pyramid.security.authenticated_userid()` will return None
+if the user is not authenticated, or some user id it the user
+is authenticated.
 
 Add a "Logout" link when logged in
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We'll also need to change our ``edit.pt`` and ``view.pt`` templates to
-display a "Logout" link if someone is logged in.  This link will
-invoke the logout view.
-
-To do so we'll add this to both templates within the ``<div id="right"
-class="app-welcome align-right">`` div:
+Open ``tutorial/tutorial/templates/edit.pt`` and
+``tutorial/tutorial/templates/view.pt``  and add this within the
+``<div id="right" class="app-welcome align-right">`` div:
 
 .. code-block:: xml
 
    <span tal:condition="logged_in">
       <a href="${request.application_url}/logout">Logout</a>
    </span>
+
+The attribute ``tal:condition="logged_in"`` will make the element be
+included when ``logged_in`` is any user id. The link will invoke
+the logout view.  The above element will not be included if ``logged_in``
+is ``None``, such as when a user is not authenticated.
 
 Seeing Our Changes
 ------------------
@@ -304,7 +320,7 @@ Our ``views.py`` module will look something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :linenos:
-   :emphasize-lines: 8,11-15,24,29,50,54,71,75,85,87-120
+   :emphasize-lines: 8,11-15,17,24,29,48,52,68,72,80,82-120
    :language: python
 
 Our ``edit.pt`` template will look something like this when we're done:
