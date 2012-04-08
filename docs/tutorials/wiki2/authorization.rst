@@ -8,9 +8,9 @@ Adding Authorization
 :term:`authorization`.  We'll make use of both features to provide security
 to our application.  Our application currently allows anyone with access to
 the server to view, edit, and add pages to our wiki.  We'll change that
-to allow only people who possess a specific username (`editor`)
-to add and edit wiki pages but we'll continue allowing anyone with access to
-the server to view pages.
+to allow only people who are members of a *group* named ``group:editors``
+to add and edit wiki pages but we'll continue allowing
+anyone with access to the server to view pages.
 
 We will also add a login page and a logout link on all the
 pages.  The login page will be shown when a user is denied
@@ -104,7 +104,7 @@ principal  the `edit` permission.
 
 The ``RootFactory`` class that contains the ACL is a :term:`root factory`.
 We need to associate it to our :app:`Pyramid` application, so the ACL is
-provided to each view as the :term:`context` of each request, as
+provided to each view in the :term:`context` of the request, as
 the ``context`` attribute.
 
 Open ``tutorial/tutorial/__init__.py`` and add a ``root_factory``
@@ -130,8 +130,8 @@ We are now providing the ACL to the application.  See
     the ``factory`` argument to
     :meth:`pyramid.config.Configurator.add_route` for more info.
 
-Add an Authentication Policy and an Authorization Policy
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Add Authentication and Authorization Policies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Open ``tutorial/__init__.py`` and
 add these import statements:
@@ -160,7 +160,7 @@ Note that the
 accepts two arguments: ``secret`` and ``callback``.  ``secret`` is a string
 representing an encryption key used by the "authentication ticket" machinery
 represented by this policy: it is required.  The ``callback`` is the
-``groupfinder()`` function the we created before.
+``groupfinder()`` function that we created before.
 
 Add permission declarations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -180,6 +180,20 @@ decorator for ``add_page()`` and ``edit_page()``, for example:
 The result is that only users who possess the ``edit``
 permission at the time of the request may invoke those two views.
 
+Add a ``permission='view'`` parameter to the ``@view_config``
+decorator for ``view_wiki()`` and ``view_page()``, like this:
+
+.. code-block:: python
+   :linenos:
+   :emphasize-lines: 2
+
+   @view_config(route_name='view_page', renderer='templates/view.pt',
+                permission='view')
+
+(Only the highlighted line needs to be added.)
+
+This allows anyone to invoke these two views.
+
 We are done with the changes needed to control access.  The
 changes that follow will add the login and logout feature.
 
@@ -196,11 +210,11 @@ routes:
    :linenos:
    :language: python
 
-Adding Login and Logout Views
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Add Login and Logout Views
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To our ``views.py`` we'll add a ``login`` view callable which renders a login
-form and processes the post from the login form, checking credentials.
+We'll add a ``login`` view which renders a login form and processes
+the post from the login form, checking credentials.
 
 We'll also add a ``logout`` view callable to our application and
 provide a link to it.  This view will clear the credentials of the
@@ -226,27 +240,30 @@ expire an auth ticket cookie.
 Now add the ``login`` and ``logout`` views:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 89-121
+   :lines: 91-123
    :linenos:
    :language: python
 
-``login()`` is decorated with two decorators, a
-``@view_config`` decorator, which associates it with the ``login``
-route and makes it visible when we visit ``/login``,
-and a ``@forbidden_view_config`` decorator which turns it into
-an :term:`forbidden view`.  The forbidden view is
-displayed whenever Pyramid or your application raises an
-:class:`pyramid.httpexceptions.HTTPForbidden` exception.  In this
-case we'll show the login form whenever someone attempts
-to execute an action which they're not yet
-authorized to perform.
+``login()`` is decorated with two decorators:
+
+- a ``@view_config`` decorator which associates it with the
+  ``login`` route and makes it visible when we visit ``/login``,
+- a ``@forbidden_view_config`` decorator which turns it into
+  an :term:`forbidden view`. ``login()`` will be invoked
+  when a users tries to execute a view callable that
+  they are not allowed to.  For example, if a user has not logged in
+  and tries to add or edit a Wiki page, he will be shown the
+  login form before being allowed to continue on.
+
+The order of these two :term:`view configuration` decorators
+is unimportant.
 
 ``logout()`` is decorated with a ``@view_config`` decorator
-which associates it with the ``logout`` route.  This makes it match when we
-visit ``/logout``.
+which associates it with the ``logout`` route.  It will be
+invoked when we visit ``/logout``.
 
-Adding the ``login.pt`` Template
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Add the ``login.pt`` Template
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Create ``tutorial/tutorial/templates/login.pt`` with the following
 content:
@@ -277,12 +294,12 @@ like this:
 
 .. code-block:: python
    :linenos:
-   :emphasize-lines: 3
+   :emphasize-lines: 4
 
    return dict(page = page,
                content = content,
-               logged_in = authenticated_userid(request),
-               edit_url = edit_url)
+               edit_url = edit_url,
+               logged_in = authenticated_userid(request))
 
 (Only the highlighted line needs to be added.)
 
@@ -321,12 +338,22 @@ when we're done:
 
 (Only the highlighted lines need to be added.)
 
+Our ``tutorial/tutorial/models.py`` will look something like this
+when we're done:
+
+.. literalinclude:: src/authorization/tutorial/models.py
+   :linenos:
+   :emphasize-lines: 1-4,35-39
+   :language: python
+
+(Only the highlighted lines need to be added.)
+
 Our ``tutorial/tutorial/views.py`` will look something like this
 when we're done:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :linenos:
-   :emphasize-lines: 11,14-18,56,59,71,74,86,89-115,117-121
+   :emphasize-lines: 11,14-18,31,37,58,61,73,76,88,91-117,119-123
    :language: python
 
 (Only the highlighted lines need to be added.)
@@ -335,6 +362,7 @@ Our ``tutorial/tutorial/templates/edit.pt`` template will look
 something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.pt
+   :linenos:
    :emphasize-lines: 41-43
    :language: xml
 
@@ -344,6 +372,7 @@ Our ``tutorial/tutorial/templates/view.pt`` template will look
 something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/view.pt
+   :linenos:
    :emphasize-lines: 41-43
    :language: xml
 

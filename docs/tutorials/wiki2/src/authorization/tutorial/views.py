@@ -27,12 +27,14 @@ from .security import USERS
 # regular expression used to find WikiWords
 wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
 
-@view_config(route_name='view_wiki')
+@view_config(route_name='view_wiki',
+             permission='view')
 def view_wiki(request):
     return HTTPFound(location = request.route_url('view_page',
                                                   pagename='FrontPage'))
 
-@view_config(route_name='view_page', renderer='templates/view.pt')
+@view_config(route_name='view_page', renderer='templates/view.pt',
+             permission='view')
 def view_page(request):
     pagename = request.matchdict['pagename']
     page = DBSession.query(Page).filter_by(name=pagename).first()
