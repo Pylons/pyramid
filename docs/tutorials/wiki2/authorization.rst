@@ -362,6 +362,7 @@ Our ``tutorial/tutorial/templates/edit.pt`` template will look
 something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.pt
+   :linenos:
    :emphasize-lines: 41-43
    :language: xml
 
@@ -371,6 +372,7 @@ Our ``tutorial/tutorial/templates/view.pt`` template will look
 something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/view.pt
+   :linenos:
    :emphasize-lines: 41-43
    :language: xml
 

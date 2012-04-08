@@ -32,7 +32,7 @@ Then we will add the login and logout feature:
 * Add a "Logout" link to be shown when logged in and viewing or editing a page
   (``view.pt``, ``edit.pt``).
 
-The source code for this tutorial stage can be browsed via
+The source code for this tutorial stage can be browsed at
 `http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki/src/authorization/
 <http://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki/src/authorization/>`_.
 
@@ -72,17 +72,17 @@ Add an ACL
 ~~~~~~~~~~
 
 Open ``tutorial/tutorial/models.py`` and add the following import
-statements at the head:
+statement at the head:
 
 .. literalinclude:: src/authorization/tutorial/models.py
-   :lines: 4-5
+   :lines: 4-7
    :linenos:
    :language: python
 
-Add the following lines at class scope to the ``Wiki`` class:
+Add the following lines to the ``Wiki`` class:
 
 .. literalinclude:: src/authorization/tutorial/models.py
-   :lines: 7-11
+   :lines: 9-13
    :linenos:
    :emphasize-lines: 4-5
    :language: python
@@ -189,7 +189,7 @@ Add Login and Logout Views
 We'll add a ``login`` view which renders a login form and processes
 the post from the login form, checking credentials.
 
-We'll also add a ``logout`` view to our application and
+We'll also add a ``logout`` view callable to our application and
 provide a link to it.  This view will clear the credentials of the
 logged in user and redirect back to the front page.
 
@@ -301,42 +301,55 @@ is ``None``, such as when a user is not authenticated.
 Seeing Our Changes
 ------------------
 
-When you're done, your ``__init__.py`` will
-look like so:
+Our ``tutorial/tutorial/__init__.py`` will look something like this
+when we're done:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
    :linenos:
    :emphasize-lines: 4-5,8,17-19,21-22
    :language: python
 
-Our ``models.py`` file will look like this:
+(Only the highlighted lines need to be added.)
+
+Our ``tutorial/tutorial/models.py`` will look something like this
+when we're done:
 
 .. literalinclude:: src/authorization/tutorial/models.py
    :linenos:
-   :emphasize-lines: 4-5,10-11
+   :emphasize-lines: 4-7,12-13
    :language: python
 
-Our ``views.py`` module will look something like this when we're done:
+(Only the highlighted lines need to be added.)
+
+Our ``tutorial/tutorial/views.py`` will look something like this
+when we're done:
 
 .. literalinclude:: src/authorization/tutorial/views.py
    :linenos:
    :emphasize-lines: 8,11-15,17,24,29,48,52,68,72,80,82-120
    :language: python
 
-Our ``edit.pt`` template will look something like this when we're done:
+(Only the highlighted lines need to be added.)
+
+Our ``tutorial/tutorial/templates/edit.pt`` template will look
+something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.pt
    :linenos:
    :emphasize-lines: 41-43
    :language: xml
 
-Our ``view.pt`` template will look something like this when we're done:
+(Only the highlighted lines need to be added.)
+
+Our ``tutorial/tutorial/templates/view.pt`` template will look
+something like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/view.pt
    :linenos:
    :emphasize-lines: 41-43
    :language: xml
 
+(Only the highlighted lines need to be added.)
 
 Viewing the Application in a Browser
 ------------------------------------
