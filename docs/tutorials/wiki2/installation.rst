@@ -211,7 +211,7 @@ Looks like our package doesn't quite have 100% test coverage.
 Initializing the Database
 =========================
 
-We need to use the ``initialize_tutorial_db`` :term:`console
+We need to use the ``populate_tutorial`` :term:`console
 script` to initialize our database.
 
 Type the following command, make sure you are still in the ``tutorial``
@@ -221,13 +221,13 @@ On UNIX:
 
 .. code-block:: text
 
-   $ ../bin/initialize_tutorial_db development.ini
+   $ ../bin/populate_tutorial development.ini
 
 On Windows:
 
 .. code-block:: text
 
-   c:\pyramidtut\tutorial> ..\Scripts\initialize_tutorial_db development.ini
+   c:\pyramidtut\tutorial> ..\Scripts\populate_tutorial development.ini
 
 The output to your console should be something like this::
 
