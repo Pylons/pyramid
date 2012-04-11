@@ -111,8 +111,8 @@ class Test_InstancePropertyMixin(unittest.TestCase):
 
     def test__make_property(self):
         from pyramid.decorator import reify
-        foo = self._makeOne()
-        name, fn = foo._make_property(lambda x: 1, name='x', reify=True)
+        cls = self._getTargetClass()
+        name, fn = cls._make_property(lambda x: 1, name='x', reify=True)
         self.assertEqual(name, 'x')
         self.assertTrue(isinstance(fn, reify))
 

@@ -20,7 +20,8 @@ class InstancePropertyMixin(object):
     on the class itself.
     """
 
-    def _make_property(self, callable, name=None, reify=False):
+    @classmethod
+    def _make_property(cls, callable, name=None, reify=False):
         """ Convert a callable into one suitable for adding to the
         instance. This will return a 2-tuple containing the computed
         (name, property) pair.
