@@ -73,7 +73,7 @@ class TestFactoriesMixin(unittest.TestCase):
         callable = lambda x: None
         config.set_request_property(callable, name='foo')
         plist = config.registry.getUtility(IRequestProperties)
-        self.assertEqual(plist, [('foo', callable, False)])
+        self.assertEqual(set(p[0] for p in plist), set(['foo']))
 
     def test_set_request_property_with_unnamed_callable(self):
         from pyramid.interfaces import IRequestProperties
@@ -81,7 +81,7 @@ class TestFactoriesMixin(unittest.TestCase):
         def foo(self): pass
         config.set_request_property(foo, reify=True)
         plist = config.registry.getUtility(IRequestProperties)
-        self.assertEqual(plist, [('foo', foo, True)])
+        self.assertEqual(set(p[0] for p in plist), set(['foo']))
 
     def test_set_request_property_with_property(self):
         from pyramid.interfaces import IRequestProperties
@@ -89,7 +89,7 @@ class TestFactoriesMixin(unittest.TestCase):
         callable = property(lambda x: None)
         config.set_request_property(callable, name='foo')
         plist = config.registry.getUtility(IRequestProperties)
-        self.assertEqual(plist, [('foo', callable, False)])
+        self.assertEqual(set(p[0] for p in plist), set(['foo']))
 
     def test_set_multiple_request_properties(self):
         from pyramid.interfaces import IRequestProperties
@@ -100,8 +100,7 @@ class TestFactoriesMixin(unittest.TestCase):
         config.set_request_property(bar, name='bar')
         config.commit()
         plist = config.registry.getUtility(IRequestProperties)
-        self.assertEqual(plist, [('foo', foo, True),
-                                 ('bar', bar, False)])
+        self.assertEqual(set(p[0] for p in plist), set(['foo', 'bar']))
 
     def test_set_multiple_request_properties_conflict(self):
         from pyramid.exceptions import ConfigurationConflictError
@@ -125,20 +124,19 @@ class TestFactoriesMixin(unittest.TestCase):
             request = DummyRequest(config.registry)
         event = Event()
         config.registry.notify(event)
-        callables = event.request.callables
-        self.assertEqual(callables, [('foo', foo, False),
-                                     ('bar', foo, True)])
+        plist = event.request.plist
+        self.assertEqual(set(p[0] for p in plist), set(['foo', 'bar']))
 
 
         
 class DummyRequest(object):
-    callables = None
+    plist = None
 
     def __init__(self, registry):
         self.registry = registry
 
-    def set_property(self, callable, name, reify):
-        if self.callables is None:
-            self.callables = []
-        self.callables.append((name, callable, reify))
+    def _set_properties(self, properties):
+        if self.plist is None:
+            self.plist = []
+        self.plist.extend(properties)
 

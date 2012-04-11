@@ -3,12 +3,12 @@ from pyramid.compat import PY3
 
 class Test_InstancePropertyMixin(unittest.TestCase):
     def _makeOne(self):
-        cls = self._targetClass()
+        cls = self._getTargetClass()
         class Foo(cls):
             pass
         return Foo()
 
-    def _targetClass(self):
+    def _getTargetClass(self):
         from pyramid.util import InstancePropertyMixin
         return InstancePropertyMixin
 
@@ -108,6 +108,29 @@ class Test_InstancePropertyMixin(unittest.TestCase):
         self.assertEqual(1, foo.x)
         foo.set_property(lambda _: 2, name='x', reify=True)
         self.assertEqual(1, foo.x)
+
+    def test__make_property(self):
+        from pyramid.decorator import reify
+        cls = self._getTargetClass()
+        name, fn = cls._make_property(lambda x: 1, name='x', reify=True)
+        self.assertEqual(name, 'x')
+        self.assertTrue(isinstance(fn, reify))
+
+    def test__set_properties_with_iterable(self):
+        foo = self._makeOne()
+        x = foo._make_property(lambda _: 1, name='x', reify=True)
+        y = foo._make_property(lambda _: 2, name='y')
+        foo._set_properties([x, y])
+        self.assertEqual(1, foo.x)
+        self.assertEqual(2, foo.y)
+
+    def test__set_properties_with_dict(self):
+        foo = self._makeOne()
+        x_name, x_fn = foo._make_property(lambda _: 1, name='x', reify=True)
+        y_name, y_fn = foo._make_property(lambda _: 2, name='y')
+        foo._set_properties({x_name: x_fn, y_name: y_fn})
+        self.assertEqual(1, foo.x)
+        self.assertEqual(2, foo.y)
 
 class Test_WeakOrderedSet(unittest.TestCase):
     def _makeOne(self):
