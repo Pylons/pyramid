@@ -26,3 +26,6 @@ Features
   ``@view_config(request_method=('GET', 'HEAD', 'POST')``.  This is because
   HEAD is a variant of GET that omits the body, and WebOb has special support
   to return an empty body when a HEAD is used.
+
+- ``config.set_request_properties`` now causes less code to be executed at
+  request construction time.
