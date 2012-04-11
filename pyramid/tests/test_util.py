@@ -3,12 +3,12 @@ from pyramid.compat import PY3
 
 class Test_InstancePropertyMixin(unittest.TestCase):
     def _makeOne(self):
-        cls = self._targetClass()
+        cls = self._getTargetClass()
         class Foo(cls):
             pass
         return Foo()
 
-    def _targetClass(self):
+    def _getTargetClass(self):
         from pyramid.util import InstancePropertyMixin
         return InstancePropertyMixin
 

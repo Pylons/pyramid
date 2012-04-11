@@ -10,6 +10,7 @@ from pyramid.interfaces import (
     )
 
 from pyramid.traversal import DefaultRootFactory
+from pyramid.util import InstancePropertyMixin
 
 class FactoriesConfiguratorMixin(object):
     @action_method
@@ -118,8 +119,8 @@ class FactoriesConfiguratorMixin(object):
         """
         callable = self.maybe_dotted(callable)
 
-        if name is None:
-            name = callable.__name__
+        name, callable = InstancePropertyMixin._make_property(
+            callable, name=name, reify=reify)
 
         def register():
             plist = self.registry.queryUtility(IRequestProperties)
@@ -130,7 +131,7 @@ class FactoriesConfiguratorMixin(object):
                 self.registry.registerHandler(_set_request_properties,
                                               (INewRequest,))
 
-            plist.append((name, callable, reify))
+            plist.append((name, callable))
 
         intr = self.introspectable('request properties', name,
                                    self.object_description(callable),
@@ -143,6 +144,4 @@ class FactoriesConfiguratorMixin(object):
 def _set_request_properties(event):
     request = event.request
     plist = request.registry.queryUtility(IRequestProperties)
-    for prop in plist:
-        name, callable, reify = prop
-        request.set_property(callable, name=name, reify=reify)
+    request._set_properties(plist)
