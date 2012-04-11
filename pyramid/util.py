@@ -20,6 +20,60 @@ class InstancePropertyMixin(object):
     on the class itself.
     """
 
+    @classmethod
+    def _make_property(cls, callable, name=None, reify=False):
+        """ Convert a callable into one suitable for adding to the
+        instance. This will return a 2-tuple containing the computed
+        (name, property) pair.
+        """
+
+        is_property = isinstance(callable, property)
+        if is_property:
+            fn = callable
+            if name is None:
+                raise ValueError('must specify "name" for a property')
+            if reify:
+                raise ValueError('cannot reify a property')
+        elif name is not None:
+            fn = lambda this: callable(this)
+            fn.__name__ = name
+            fn.__doc__ = callable.__doc__
+        else:
+            name = callable.__name__
+            fn = callable
+        if reify:
+            import pyramid.decorator # avoid circular import
+            fn = pyramid.decorator.reify(fn)
+        elif not is_property:
+            fn = property(fn)
+
+        return name, fn
+
+    def _set_properties(self, properties):
+        """ Create several properties on the instance at once.
+
+        This is a more efficient version of
+        :meth:`pyramid.util.InstancePropertyMixin.set_property` which
+        can accept multiple ``(name, property)`` pairs generated via
+        :meth:`pyramid.util.InstancePropertyMixin._make_property`.
+
+        ``attrs`` is a sequence of 2-tuples *or* a data structure with
+        an ``.items()`` method which returns a sequence of 2-tuples
+        (presumably a dictionary). It will be used used to add several
+        properties to the instance in a manner that is more efficient
+        than simply calling ``set_property`` repeatedly.
+        """
+
+        if hasattr(properties, 'items'):
+            attrs = properties.items()
+        else:
+            attrs = properties
+        attrs = dict(properties)
+
+        parent = self.__class__
+        cls = type(parent.__name__, (parent, object), attrs)
+        self.__class__ = cls
+
     def set_property(self, callable, name=None, reify=False):
         """ Add a callable or a property descriptor to the instance.
 
@@ -31,12 +85,11 @@ class InstancePropertyMixin(object):
         A property may also be reified via the
         :class:`pyramid.decorator.reify` decorator by setting
         ``reify=True``, allowing the result of the evaluation to be
-        cached. Thus the value of the property is only computed once for
-        the lifetime of the object.
+        cached. Using this method, the value of the property is only
+        computed once for the lifetime of the object.
 
         ``callable`` can either be a callable that accepts the instance
-        as
-        its single positional parameter, or it can be a property
+        as its single positional parameter, or it can be a property
         descriptor.
 
         If the ``callable`` is a property descriptor, the ``name``
@@ -73,30 +126,8 @@ class InstancePropertyMixin(object):
            >>> foo.y # notice y keeps the original value
            1
         """
-
-        is_property = isinstance(callable, property)
-        if is_property:
-            fn = callable
-            if name is None:
-                raise ValueError('must specify "name" for a property')
-            if reify:
-                raise ValueError('cannot reify a property')
-        elif name is not None:
-            fn = lambda this: callable(this)
-            fn.__name__ = name
-            fn.__doc__ = callable.__doc__
-        else:
-            name = callable.__name__
-            fn = callable
-        if reify:
-            import pyramid.decorator
-            fn = pyramid.decorator.reify(fn)
-        elif not is_property:
-            fn = property(fn)
-        attrs = { name: fn }
-        parent = self.__class__
-        cls = type(parent.__name__, (parent, object), attrs)
-        self.__class__ = cls
+        prop = self._make_property(callable, name=name, reify=reify)
+        self._set_properties([prop])
 
 class WeakOrderedSet(object):
     """ Maintain a set of items.
