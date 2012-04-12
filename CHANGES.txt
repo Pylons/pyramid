@@ -27,5 +27,5 @@ Features
   HEAD is a variant of GET that omits the body, and WebOb has special support
   to return an empty body when a HEAD is used.
 
-- ``config.set_request_properties`` now causes less code to be executed at
+- ``config.set_request_property`` now causes less code to be executed at
   request construction time.
