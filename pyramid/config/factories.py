@@ -188,7 +188,8 @@ class FactoriesConfiguratorMixin(object):
 
         This method has been replaced by
         :meth:`pyramid.config.Configurator.set_request_method` in
-        version 1.4, more details can be found there.
+        version :app:`Pyramid` version 1.4, more details can be found
+        there.
 
         .. versionadded:: 1.3
         """
