@@ -229,14 +229,9 @@ this:
 Adding Templates
 ================
 
-Most view callables we've added expected to be rendered via a
-:term:`template`.  The default templating systems in :app:`Pyramid` are
-:term:`Chameleon` and :term:`Mako`.  Chameleon is a variant of :term:`ZPT`,
-which is an XML-based templating language.  Mako is a non-XML-based
-templating language.  Because we had to pick one, we chose Chameleon for this
-tutorial.
-
-The templates we create will live in the ``templates`` directory of our
+The ``view_page``, ``add_page`` and ``edit_page`` views that we've added
+reference a :term:`template`.  Each template is a :term:`Chameleon` :term:`ZPT`
+template.  These templates will live in the ``templates`` directory of our
 tutorial package.  Chameleon templates must have a ``.pt`` extension to be
 recognized as such.
 

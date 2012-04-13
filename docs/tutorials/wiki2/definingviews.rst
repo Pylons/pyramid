@@ -226,10 +226,11 @@ of the wiki page.
 Adding Templates
 ================
 
-The views we've added all reference a :term:`template`.  Each template is a
-:term:`Chameleon` :term:`ZPT` template.  These templates will live in the
-``templates`` directory of our tutorial package.  Chameleon templates
-must have a ``.pt`` extension to be recognized as such.
+The ``view_page``, ``add_page`` and ``edit_page`` views that we've added
+reference a :term:`template`.  Each template is a :term:`Chameleon` :term:`ZPT`
+template.  These templates will live in the ``templates`` directory of our
+tutorial package.  Chameleon templates must have a ``.pt`` extension to be
+recognized as such.
 
 The ``view.pt`` Template
 ------------------------
