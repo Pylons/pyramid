@@ -186,7 +186,7 @@ class FactoriesConfiguratorMixin(object):
     def set_request_property(self, callable, name=None, reify=False):
         """ Add a property to the request object.
 
-        This method has been superceded by
+        This method has been replaced by
         :meth:`pyramid.config.Configurator.set_request_method` in
         version 1.4, more details can be found there.
 
