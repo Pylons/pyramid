@@ -1,5 +1,6 @@
 from zope.interface import implementer
 
+from pyramid.compat import iteritems_
 from pyramid.config.util import action_method
 
 from pyramid.interfaces import (
@@ -98,8 +99,8 @@ class FactoriesConfiguratorMixin(object):
     def set_request_method(self,
                            callable=None,
                            name=None,
-                           property=None,
-                           reify=None):
+                           property=False,
+                           reify=False):
         """ Add a property or method to the request object.
 
         When adding a method to the request, ``callable`` may be any
@@ -156,7 +157,7 @@ class FactoriesConfiguratorMixin(object):
                                               (INewRequest,))
 
             plist = exts.descriptors if property else exts.methods
-            plist.append((name, callable))
+            plist[name] = callable
 
         if callable is None:
             self.action(('request extensions', name), None)
@@ -195,12 +196,12 @@ class FactoriesConfiguratorMixin(object):
 @implementer(IRequestExtensions)
 class _RequestExtensions(object):
     def __init__(self):
-        self.descriptors = []
-        self.methods = []
+        self.descriptors = {}
+        self.methods = {}
 
 def _set_request_extensions(event):
     request = event.request
     exts = request.registry.queryUtility(IRequestExtensions)
-    for name, method in exts.methods:
+    for name, method in iteritems_(exts.methods):
         setattr(request, name, method)
     request._set_properties(exts.descriptors)
