@@ -447,7 +447,7 @@ first column instead, for example like this:
    pyramid.includes =
        #pyramid_debugtoolbar
 
-When you attempt to restart the application with a section like the abvoe
+When you attempt to restart the application with a section like the above
 you'll receive an error that ends something like this, and the application
 will not start:
 
