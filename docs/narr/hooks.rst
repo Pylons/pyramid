@@ -145,7 +145,7 @@ the view which generates it can be overridden as necessary.
 
 The :term:`forbidden view` callable is a view callable like any other.  The
 :term:`view configuration` which causes it to be a "forbidden" view consists
-of using the meth:`pyramid.config.Configurator.add_forbidden_view` API or the
+of using the :meth:`pyramid.config.Configurator.add_forbidden_view` API or the
 :class:`pyramid.view.forbidden_view_config` decorator.
 
 For example, you can add a forbidden view by using the
@@ -171,7 +171,7 @@ as a forbidden view:
 
    from pyramid.view import forbidden_view_config
 
-   forbidden_view_config()
+   @forbidden_view_config()
    def forbidden(request):
        return Response('forbidden')
 
@@ -625,7 +625,7 @@ converts the arbitrary return value into something that implements
 :class:`~pyramid.interfaces.IResponse`.
 
 For example, if you'd like to allow view callables to return bare string
-objects (without requiring a a :term:`renderer` to convert a string to a
+objects (without requiring a :term:`renderer` to convert a string to a
 response object), you can register an adapter which converts the string to a
 Response:
 
