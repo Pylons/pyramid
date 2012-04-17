@@ -4,7 +4,6 @@ import pkg_resources
 import threading
 
 from zope.interface import implementer
-from zope.interface.registry import Components
 
 from pyramid.interfaces import (
     IChameleonLookup,
@@ -228,13 +227,6 @@ class JSON(object):
         self._default = kw.pop('default', None)
 
         self.kw = kw
-        self.encoders = Components()
-
-        self._register_default_encoders()
-
-    def _register_default_encoders(self):
-        import datetime
-        self.add_encoder(lambda o: o.isoformat(), datetime.datetime)
 
     def __call__(self, info):
         """ Returns a plain JSON-encoded string with content-type
@@ -250,25 +242,6 @@ class JSON(object):
             return self.dumps(value)
         return _render
 
-    def add_encoder(self, encoder, type_or_iface):
-        """ When an object of type (or interface) ``type_or_iface``
-        fails to automatically encode using the default encoder, the
-        renderer will use the encoder ``encoder`` to convert it into a
-        string.
-
-        .. code-block:: python
-
-           class Foo(object):
-               x = 5
-
-           def foo_encoder(obj):
-               return str(obj.x)
-
-           renderer = JSON(indent=4)
-           renderer.add_encoder(foo_encoder, foo)
-        """
-        self.encoders.registerUtility(encoder, type_or_iface)
-
     def default_encode(self, obj):
         """ Encode a custom Python object to a JSON string.
 
@@ -278,10 +251,6 @@ class JSON(object):
         ``TypeError`` when an object cannot be serialized."""
         if hasattr(obj, '__json__'):
             return obj.__json__()
-
-        encoder = self.encoders.queryUtility(obj)
-        if encoder is not None:
-            return encoder(obj)
 
         if self._default is not None:
             return self._default(obj)
