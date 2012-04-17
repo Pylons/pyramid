@@ -305,24 +305,25 @@ Viewing the Application in a Browser
 ====================================
 
 We can finally examine our application in a browser (See
-:ref:`wiki-start-the-application`).  The views we'll try are as follows:
+:ref:`wiki-start-the-application`).  Launch a browser and visit
+each of the following URLs, check that the result is as expected:
 
-- Visiting ``http://localhost:6543/`` in a browser invokes the ``view_wiki``
+- ``http://localhost:6543/`` invokes the ``view_wiki``
   view.  This always redirects to the ``view_page`` view of the ``FrontPage``
   Page resource.
 
-- Visiting ``http://localhost:6543/FrontPage/`` in a browser invokes
+- ``http://localhost:6543/FrontPage/`` invokes
   the ``view_page`` view of the front page resource.  This is
-  because it's the *default view* (a view without a ``name``) for Page
+  because it's the :term:`default view` (a view without a ``name``) for Page
   resources.
 
-- Visiting ``http://localhost:6543/FrontPage/edit_page`` in a browser
+- ``http://localhost:6543/FrontPage/edit_page``
   invokes the edit view for the ``FrontPage`` Page resource.
 
-- Visiting ``http://localhost:6543/add_page/SomePageName`` in a
-  browser invokes the add view for a Page.
+- ``http://localhost:6543/add_page/SomePageName``
+  invokes the add view for a Page.
 
 - To generate an error, visit ``http://localhost:6543/add_page`` which
-  will generate an ``IndexError`` for the expression
-  ``request.subpath[0]``.  You'll see an interactive traceback
+  will generate an ``IndexErrorr: tuple index out of range`` error.
+  You'll see an interactive traceback
   facility provided by :term:`pyramid_debugtoolbar`.

@@ -350,25 +350,24 @@ Viewing the Application in a Browser
 ====================================
 
 We can finally examine our application in a browser (See
-:ref:`wiki2-start-the-application`).  The views we'll try are
-as follows:
+:ref:`wiki2-start-the-application`).  Launch a browser and visit
+each of the following URLs, check that the result is as expected:
 
-- Visiting ``http://localhost:6543`` in a browser invokes the
+- ``http://localhost:6543`` in a browser invokes the
   ``view_wiki`` view.  This always redirects to the ``view_page`` view
   of the FrontPage page object.
 
-- Visiting ``http://localhost:6543/FrontPage`` in a browser invokes
+- ``http://localhost:6543/FrontPage`` in a browser invokes
   the ``view_page`` view of the front page page object.
 
-- Visiting ``http://localhost:6543/FrontPage/edit_page`` in a browser
+- ``http://localhost:6543/FrontPage/edit_page`` in a browser
   invokes the edit view for the front page object.
 
-- Visiting ``http://localhost:6543/add_page/SomePageName`` in a
+- ``http://localhost:6543/add_page/SomePageName`` in a
   browser invokes the add view for a page.
 
-Try generating an error within the body of a view by adding code to
-the top of it that generates an exception (e.g. ``raise
-Exception('Forced Exception')``).  Then visit the error-raising view
-in a browser.  You should see an interactive exception handler in the
-browser which allows you to examine values in a post-mortem mode.
+- To generate an error, visit ``http://localhost:6543/add_page`` which
+  will generate a ``NoResultFound: No row was found for one()`` error.
+  You'll see an interactive traceback facility provided 
+  by :term:`pyramid_debugtoolbar`.
 
