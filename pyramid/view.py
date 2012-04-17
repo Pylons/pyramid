@@ -335,7 +335,7 @@ class notfound_view_config(object):
         from pyramid.view import notfound_view_config
         from pyramid.response import Response
           
-        notfound_view_config()
+        @notfound_view_config()
         def notfound(request):
             return Response('Not found, dude!', status='404 Not Found')
 
@@ -409,7 +409,7 @@ class forbidden_view_config(object):
         from pyramid.view import forbidden_view_config
         from pyramid.response import Response
           
-        forbidden_view_config()
+        @forbidden_view_config()
         def notfound(request):
             return Response('You are not allowed', status='401 Unauthorized')
 
