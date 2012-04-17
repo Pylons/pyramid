@@ -4,6 +4,7 @@ import pkg_resources
 import threading
 
 from zope.interface import implementer
+from zope.interface.registry import Components
 
 from pyramid.interfaces import (
     IChameleonLookup,
@@ -190,7 +191,7 @@ class JSON(object):
     """ Renderer that returns a JSON-encoded string.
 
     Configure a custom JSON renderer using the
-    :meth:`pyramid.config.Configurator.add_renderer` API at application
+    :meth:`~pyramid.config.Configurator.add_renderer` API at application
     startup time:
 
     .. code-block:: python
@@ -198,12 +199,11 @@ class JSON(object):
        from pyramid.config import Configurator
 
        config = Configurator()
-       config.add_renderer('myjson', JSON(indent=4, cls=MyJSONEncoder))
+       config.add_renderer('myjson', JSON(indent=4))
 
-    Once this renderer is registered via
-    :meth:`~pyramid.config.Configurator.add_renderer` as above, you can use
+    Once this renderer is registered as above, you can use
     ``myjson`` as the ``renderer=`` parameter to ``@view_config`` or
-    :meth:`pyramid.config.Configurator.add_view``:
+    :meth:`~pyramid.config.Configurator.add_view``:
 
     .. code-block:: python
 
@@ -222,10 +222,19 @@ class JSON(object):
     """
 
     def __init__(self, **kw):
-        """ Any keyword arguments will be forwarded to
-        :func:`json.dumps`.
-        """
+        """ Any keyword arguments will be passed to the encoder
+        within :meth:`~pyramid.renderers.JSON.dumps`."""
+        # we wrap the default with our own
+        self._default = kw.pop('default', None)
+
         self.kw = kw
+        self.encoders = Components()
+
+        self._register_default_encoders()
+
+    def _register_default_encoders(self):
+        import datetime
+        self.add_encoder(lambda o: o.isoformat(), datetime.datetime)
 
     def __call__(self, info):
         """ Returns a plain JSON-encoded string with content-type
@@ -238,16 +247,51 @@ class JSON(object):
                 ct = response.content_type
                 if ct == response.default_content_type:
                     response.content_type = 'application/json'
-            return self.value_to_json(value)
+            return self.dumps(value)
         return _render
 
-    def value_to_json(self, value):
-        """ Convert a Python object to a JSON string.
+    def add_encoder(self, encoder, type_or_iface):
+        """ When an object of type (or interface) ``type_or_iface``
+        fails to automatically encode using the default encoder, the
+        renderer will use the encoder ``encoder`` to convert it into a
+        string.
+
+        .. code-block:: python
+
+           class Foo(object):
+               x = 5
+
+           def foo_encoder(obj):
+               return str(obj.x)
+
+           renderer = JSON(indent=4)
+           renderer.add_encoder(foo_encoder, foo)
+        """
+        self.encoders.registerUtility(encoder, type_or_iface)
+
+    def default_encode(self, obj):
+        """ Encode a custom Python object to a JSON string.
+
+        This should be used by subclasses that have overridden
+        :meth:`~pyramid.renderers.JSON.dumps` in order to encode objects
+        that are not otherwise serializable. This should raise a
+        ``TypeError`` when an object cannot be serialized."""
+        if hasattr(obj, '__json__'):
+            return obj.__json__()
+
+        encoder = self.encoders.queryUtility(obj)
+        if encoder is not None:
+            return encoder(obj)
+
+        if self._default is not None:
+            return self._default(obj)
+        raise TypeError(repr(obj) + ' is not JSON serializable')
+
+    def dumps(self, obj):
+        """ Encode a Python object to a JSON string.
 
         By default, this uses the :func:`json.dumps` from the stdlib."""
-        if not self.kw.get('cls'):
-            self.kw['cls'] = ObjectJSONEncoder
-        return json.dumps(value, **self.kw)
+        return json.dumps(obj, default=self.default_encode, **self.kw)
 
 json_renderer_factory = JSON() # bw compat
 
