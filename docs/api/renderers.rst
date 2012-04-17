@@ -15,8 +15,6 @@
 
 .. autoclass:: JSONP
 
-.. autoclass:: ObjectJSONEncoder
-
 .. attribute:: null_renderer
 
    An object that can be used in advanced integration cases as input to the
