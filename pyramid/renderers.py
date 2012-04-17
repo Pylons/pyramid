@@ -157,35 +157,6 @@ def string_renderer_factory(info):
         return value
     return _render
 
-class ObjectJSONEncoder(json.JSONEncoder):
-    """ The default JSON object encoder (a subclass of json.Encoder) used by
-    :class:`pyramid.renderers.JSON` and :class:`pyramid.renderers.JSONP`.  It
-    is used when an object returned from a view and presented to a JSON-based
-    renderer is not a builtin Python type otherwise serializable to JSON.
-    
-    This ``json.Encoder`` subclass overrides the ``json.Encoder.default``
-    method.  The overridden method looks for a ``__json__`` attribute on the
-    object it is passed.  If it's found, the encoder will assume it's
-    callable, and will call it with no arguments to obtain a value.  The
-    overridden ``default`` method will then return that value (which must be
-    a JSON-serializable basic Python type).
-
-    If the object passed to the overridden ``default`` method has no
-    ``__json__`` attribute, the ``json.JSONEncoder.default`` method is called
-    with the object that it was passed (which will end up raising a
-    :exc:`TypeError`, as it would with any other unserializable type).
-
-    This class will be used only when you set a JSON or JSONP
-    renderer and you do not define your own custom encoder class.
-
-    .. note:: This feature is new in Pyramid 1.4.
-    """
-
-    def default(self, obj):
-        if hasattr(obj, '__json__'):
-            return obj.__json__()
-        return json.JSONEncoder.default(self, obj)
-
 class JSON(object):
     """ Renderer that returns a JSON-encoded string.
 
@@ -332,7 +303,7 @@ class JSONP(JSON):
         plain-JSON encoded string with content-type ``application/json``"""
         def _render(value, system):
             request = system['request']
-            val = self.value_to_json(value)
+            val = self.dumps(value)
             callback = request.GET.get(self.param_name)
             if callback is None:
                 ct = 'application/json'

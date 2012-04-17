@@ -371,12 +371,10 @@ class TestJSON(unittest.TestCase):
 
     def test_with_custom_encoder(self):
         from datetime import datetime
-        from json import JSONEncoder
-        class MyEncoder(JSONEncoder):
-            def default(self, obj):
-                return obj.isoformat()
+        def default(obj):
+            return obj.isoformat()
         now = datetime.utcnow()
-        renderer = self._makeOne(cls=MyEncoder)(None)
+        renderer = self._makeOne(default=default)(None)
         result = renderer({'a':now}, {})
         self.assertEqual(result, '{"a": "%s"}' % now.isoformat())
 
