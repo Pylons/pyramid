@@ -229,59 +229,62 @@ this:
 Adding Templates
 ================
 
-Most view callables we've added expected to be rendered via a
-:term:`template`.  The default templating systems in :app:`Pyramid` are
-:term:`Chameleon` and :term:`Mako`.  Chameleon is a variant of :term:`ZPT`,
-which is an XML-based templating language.  Mako is a non-XML-based
-templating language.  Because we had to pick one, we chose Chameleon for this
-tutorial.
-
-The templates we create will live in the ``templates`` directory of our
+The ``view_page``, ``add_page`` and ``edit_page`` views that we've added
+reference a :term:`template`.  Each template is a :term:`Chameleon` :term:`ZPT`
+template.  These templates will live in the ``templates`` directory of our
 tutorial package.  Chameleon templates must have a ``.pt`` extension to be
 recognized as such.
 
 The ``view.pt`` Template
 ------------------------
 
-The ``view.pt`` template is used for viewing a single Page.  It is used by
-the ``view_page`` view function.  It should have a div that is "structure
-replaced" with the ``content`` value provided by the view.  It should also
-have a link on the rendered page that points at the "edit" URL (the URL which
-invokes the ``edit_page`` view for the page being viewed).
-
-Once we're done with the ``view.pt`` template, it will look a lot like
-the below:
+Create ``tutorial/tutorial/templates/view.pt`` and add the following
+content:
 
 .. literalinclude:: src/views/tutorial/templates/view.pt
+   :linenos:
    :language: xml
 
-.. note::
+This template is used by ``view_page()`` for displaying a single
+wiki page. It includes:
 
-   The names available for our use in a template are always those that
-   are present in the dictionary returned by the view callable.  But our
-   templates make use of a ``request`` object that none of our tutorial views
-   return in their dictionary.  This value appears as if "by magic".
-   However, ``request`` is one of several names that are available "by
-   default" in a template when a template renderer is used.  See
-   :ref:`chameleon_template_renderers` for more information about other names
-   that are available by default in a template when a template is used as a
-   renderer.
+- A ``div`` element that is replaced with the ``content``
+  value provided by the view (rows 45-47).  ``content``
+  contains HTML, so the ``structure`` keyword is used
+  to prevent escaping it (i.e. changing ">" to &gt;, etc.)
+- A link that points
+  at the "edit" URL which invokes the ``edit_page`` view for
+  the page being viewed (rows 49-51).
 
 The ``edit.pt`` Template
 ------------------------
 
-The ``edit.pt`` template is used for adding and editing a Page.  It is used
-by the ``add_page`` and ``edit_page`` view functions.  It should display a
-page containing a form that POSTs back to the "save_url" argument supplied by
-the view.  The form should have a "body" textarea field (the page data), and
-a submit button that has the name "form.submitted".  The textarea in the form
-should be filled with any existing page data when it is rendered.
-
-Once we're done with the ``edit.pt`` template, it will look a lot like the
-below:
+Create ``tutorial/tutorial/templates/edit.pt`` and add the following
+content:
 
 .. literalinclude:: src/views/tutorial/templates/edit.pt
+   :linenos:
    :language: xml
+
+This template is used by ``add_page()`` and ``edit_page()`` for adding
+and editing a wiki page.  It displays
+a page containing a form that includes:
+
+- A 10 row by 60 column ``textarea`` field named ``body`` that is filled
+  with any existing page data when it is rendered (rows 46-47).
+- A submit button that has the name ``form.submitted`` (row 48).
+
+The form POSTs back to the "save_url" argument supplied
+by the view (row 45).  The view will use the ``body`` and
+``form.submitted`` values.
+
+.. note:: Our templates use a ``request`` object that
+   none of our tutorial views return in their dictionary.
+   ``request`` is one of several
+   names that are available "by default" in a template when a template
+   renderer is used.  See :ref:`chameleon_template_renderers` for
+   information about other names that are available by default
+   when a Chameleon template is used as a renderer.
 
 Static Assets
 -------------
@@ -302,24 +305,25 @@ Viewing the Application in a Browser
 ====================================
 
 We can finally examine our application in a browser (See
-:ref:`wiki-start-the-application`).  The views we'll try are as follows:
+:ref:`wiki-start-the-application`).  Launch a browser and visit
+each of the following URLs, check that the result is as expected:
 
-- Visiting ``http://localhost:6543/`` in a browser invokes the ``view_wiki``
+- ``http://localhost:6543/`` invokes the ``view_wiki``
   view.  This always redirects to the ``view_page`` view of the ``FrontPage``
   Page resource.
 
-- Visiting ``http://localhost:6543/FrontPage/`` in a browser invokes
+- ``http://localhost:6543/FrontPage/`` invokes
   the ``view_page`` view of the front page resource.  This is
-  because it's the *default view* (a view without a ``name``) for Page
+  because it's the :term:`default view` (a view without a ``name``) for Page
   resources.
 
-- Visiting ``http://localhost:6543/FrontPage/edit_page`` in a browser
+- ``http://localhost:6543/FrontPage/edit_page``
   invokes the edit view for the ``FrontPage`` Page resource.
 
-- Visiting ``http://localhost:6543/add_page/SomePageName`` in a
-  browser invokes the add view for a Page.
+- ``http://localhost:6543/add_page/SomePageName``
+  invokes the add view for a Page.
 
 - To generate an error, visit ``http://localhost:6543/add_page`` which
-  will generate an ``IndexError`` for the expression
-  ``request.subpath[0]``.  You'll see an interactive traceback
+  will generate an ``IndexErrorr: tuple index out of range`` error.
+  You'll see an interactive traceback
   facility provided by :term:`pyramid_debugtoolbar`.
