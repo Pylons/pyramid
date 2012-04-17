@@ -189,14 +189,20 @@ class JSON(object):
        no public API for supplying options to the underlying
        :func:`json.dumps` without defining a custom renderer.
 
+    You can pass a ``default`` argument to this class' constructor (which
+    should be a function) to customize what happens when it attempts to
+    serialize types unrecognized by the base ``json`` module.  See
+    :ref:`json_serializing_custom_objects` for more information.
     """
 
     def __init__(self, **kw):
-        """ Any keyword arguments will be passed to the encoder
-        within :meth:`~pyramid.renderers.JSON.dumps`."""
-        # we wrap the default with our own
+        """ Any keyword arguments will be passed to the ``json.dumps``
+        function.  A notable exception is the keyword argument ``default``,
+        which is wrapped in a function that sniffs for ``__json__``
+        attributes before it is passed along to ``json.dumps``"""
+        # we wrap the default callback with our own to get __json__ attr
+        # sniffing
         self._default = kw.pop('default', None)
-
         self.kw = kw
 
     def __call__(self, info):
@@ -210,35 +216,29 @@ class JSON(object):
                 ct = response.content_type
                 if ct == response.default_content_type:
                     response.content_type = 'application/json'
-            return self.dumps(value)
+            return self._dumps(value)
         return _render
 
-    def default_encode(self, obj):
-        """ Encode a custom Python object to a JSON string.
-
-        This should be used by subclasses that have overridden
-        :meth:`~pyramid.renderers.JSON.dumps` in order to encode objects
-        that are not otherwise serializable. This should raise a
-        ``TypeError`` when an object cannot be serialized."""
+    def _default_encode(self, obj):
         if hasattr(obj, '__json__'):
             return obj.__json__()
 
         if self._default is not None:
             return self._default(obj)
-        raise TypeError(repr(obj) + ' is not JSON serializable')
+        raise TypeError('%r is not JSON serializable' % (obj,))
 
-    def dumps(self, obj):
+    def _dumps(self, obj):
         """ Encode a Python object to a JSON string.
 
         By default, this uses the :func:`json.dumps` from the stdlib."""
-        return json.dumps(obj, default=self.default_encode, **self.kw)
+        return json.dumps(obj, default=self._default_encode, **self.kw)
 
 json_renderer_factory = JSON() # bw compat
 
 class JSONP(JSON):
     """ `JSONP <http://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper
     which implements a hybrid json/jsonp renderer.  JSONP is useful for
-    making cross-domain AJAX requests.
+    making cross-domain AJAX requests.  
 
     Configure a JSONP renderer using the
     :meth:`pyramid.config.Configurator.add_renderer` API at application
@@ -251,9 +251,9 @@ class JSONP(JSON):
        config = Configurator()
        config.add_renderer('jsonp', JSONP(param_name='callback'))
 
-    The class also accepts arbitrary keyword arguments; all keyword arguments
-    except ``param_name`` are passed to the ``json.dumps`` function as
-    keyword arguments:
+    The class' constructor also accepts arbitrary keyword arguments.  All
+    keyword arguments except ``param_name`` are passed to the ``json.dumps``
+    function as its keyword arguments.
 
     .. code-block:: python
 
@@ -264,6 +264,10 @@ class JSONP(JSON):
     
     .. note:: The ability of this class to accept a ``**kw`` in its
        constructor is new as of Pyramid 1.4.
+
+    The arguments passed to this class' constructor mean the same thing as
+    the arguments passed to :class:`pyramid.renderers.JSON` (including
+    ``default``).
 
     Once this renderer is registered via
     :meth:`~pyramid.config.Configurator.add_renderer` as above, you can use
@@ -303,7 +307,7 @@ class JSONP(JSON):
         plain-JSON encoded string with content-type ``application/json``"""
         def _render(value, system):
             request = system['request']
-            val = self.dumps(value)
+            val = self._dumps(value)
             callback = request.GET.get(self.param_name)
             if callback is None:
                 ct = 'application/json'

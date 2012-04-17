@@ -177,6 +177,8 @@ using the API of the ``request.response`` attribute.  See
 .. index::
    pair: renderer; JSON
 
+.. _json_renderer:
+
 JSON Renderer
 ~~~~~~~~~~~~~
 
@@ -260,17 +262,34 @@ strings, and so forth).
    # the JSON value returned by ``objects`` will be:
    #    [{"x": 1}, {"x": 2}]
 
-If you don't own the objects being serialized, it's difficult to add a custom
-``__json__`` method to the object. In this case, a callback can be supplied
-to the renderer which is invoked when other options have failed.
+If you aren't the author of the objects being serialized, it won't be
+possible (or at least not reasonable) to add a custom ``__json__`` method to
+to their classes in order to influence serialization.  If the object passed
+to the renderer is not a serializable type, and has no ``__json__`` method,
+usually a :exc:`TypeError` will be raised during serialization.  You can
+change this behavior by creating a JSON renderer with a "default" function
+which tries to "sniff" at the object, and returns a valid serialization (a
+string) or raises a TypeError if it can't determine what to do with the
+object.  A short example follows:
 
 .. code-block:: python
    :linenos:
 
+   from pyramid.renderers import JSON
+
    def default(obj):
        if isinstance(obj, datetime.datetime):
            return obj.isoformat()
-       raise TypeError
+       raise TypeError('%r is not serializable % (obj,))
+
+   json_renderer = JSON(default=default)
+
+   # then during configuration ....
+   config = Configurator()
+   config.add_renderer('json', json_renderer)
+
+See :class:`pyramid.renderers.JSON` and
+:ref:`adding_and_overriding_renderers` for more information.
 
 .. note::
 
