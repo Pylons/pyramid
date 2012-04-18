@@ -49,19 +49,22 @@ install_requires=[
     ]
 
 tests_require = [
+    'nose',
+    'coverage',
     'WebTest >= 1.3.1', # py3 compat
     'virtualenv',
     ]
 
 if not PY3:
     tests_require.extend([
-        'Sphinx',
-        'docutils',
-        'repoze.sphinx.autointerface',
         'zope.component>=3.11.0',
         ])
 
-testing_extras = tests_require + ['nose', 'coverage']
+docs_extras = [
+    'Sphinx',
+    'docutils',
+    'repoze.sphinx.autointerface',
+    ]
 
 setup(name='pyramid',
       version='1.4dev',
@@ -92,7 +95,8 @@ setup(name='pyramid',
       zip_safe=False,
       install_requires = install_requires,
       extras_require = {
-          'testing':testing_extras,
+          'testing':tests_require,
+          'docs':docs_extras,
           },
       tests_require = tests_require,
       test_suite="pyramid.tests",
