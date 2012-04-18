@@ -229,7 +229,7 @@ class JSON(object):
                return obj.x
 
            renderer = JSON(indent=4)
-           renderer.adapt(Foo, foo_adapter)
+           renderer.add_adapter(Foo, foo_adapter)
         """
         self.components.registerAdapter(adapter, (type_or_iface,),
                                         IJSONAdapter)
