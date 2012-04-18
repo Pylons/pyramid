@@ -9,7 +9,6 @@ Bug Fixes
   return the empty list.  This was incorrect, it should have unconditionally
   returned ``[Everyone]``, and now does.
 
-
 Features
 --------
 
