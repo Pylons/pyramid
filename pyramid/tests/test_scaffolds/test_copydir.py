@@ -170,9 +170,11 @@ class Test_makedirs(unittest.TestCase):
 
     def test_makedirs_parent_dir(self):
         import shutil
-        target = "/tmp/nonexistent_dir/nonexistent_subdir"
+        import tempfile
+        tmpdir = tempfile.mkdtemp()
+        target = os.path.join(tmpdir, 'nonexistent_subdir')
         self._callFUT(target, 2, None)
-        shutil.rmtree("/tmp/nonexistent_dir")
+        shutil.rmtree(tmpdir)
 
 class Test_support_functions(unittest.TestCase):
 
