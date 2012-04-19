@@ -59,11 +59,11 @@ Here's a high-level time-ordered overview of what happens when you press
    system for this application.  See :ref:`logging_config` for more
    information.
 
-#. The application's *constructor* named by the entry point reference or
-   dotted Python name on the ``use=`` line of the section representing your
-   :app:`Pyramid` application is passed the key/value parameters mentioned
-   within the section in which it's defined.  The constructor is meant to
-   return a :term:`router` instance, which is a :term:`WSGI` application.
+#. The application's *constructor* named by the entry point reference on the
+   ``use=`` line of the section representing your :app:`Pyramid` application
+   is passed the key/value parameters mentioned within the section in which
+   it's defined.  The constructor is meant to return a :term:`router`
+   instance, which is a :term:`WSGI` application.
 
    For :app:`Pyramid` applications, the constructor will be a function named
    ``main`` in the ``__init__.py`` file within the :term:`package` in which
