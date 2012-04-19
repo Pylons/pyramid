@@ -8,7 +8,7 @@ Getting Started
 
 - $venv/bin/python setup.py develop
 
-- $venv/bin/populate_{{project}} development.ini
+- $venv/bin/initialize_{{project}}_db development.ini
 
 - $venv/bin/pserve development.ini
 
