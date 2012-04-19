@@ -42,8 +42,8 @@ Here's a high-level time-ordered overview of what happens when you press
    ``[pipeline:main]``, or ``[composite:main]`` in the ``.ini`` file.  This
    section represents the configuration of a :term:`WSGI` application that
    will be served.  If you're using a simple application (e.g.
-   ``[app:main]``), the application :term:`entry point` or :term:`dotted
-   Python name` will be named on the ``use=`` line within the section's
+   ``[app:main]``), the application's ``paste.app_factory`` :term:`entry
+   point` will be named on the ``use=`` line within the section's
    configuration.  If, instead of a simple application, you're using a WSGI
    :term:`pipeline` (e.g. a ``[pipeline:main]`` section), the application
    named on the "last" element will refer to your :app:`Pyramid` application.
