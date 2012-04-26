@@ -254,7 +254,7 @@ The output to your console should be something like this::
   2011-11-26 14:42:25,140 INFO  [sqlalchemy.engine.base.Engine][MainThread] 
                                 COMMIT
 
-Success!  You should now have a ``tutorial.db`` file in your current working
+Success!  You should now have a ``tutorial.sqlite`` file in your current working
 directory.  This will be a SQLite database with a single table defined in it
 (``models``).
 
