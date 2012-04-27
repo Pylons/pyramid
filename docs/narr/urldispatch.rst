@@ -547,7 +547,7 @@ add to your application:
 
    config.add_route('idea', 'ideas/{idea}')
    config.add_route('user', 'users/{user}')
-   config.add_route('tag', 'tags/{tags}')
+   config.add_route('tag', 'tags/{tag}')
 
    config.add_view('mypackage.views.idea_view', route_name='idea')
    config.add_view('mypackage.views.user_view', route_name='user')
