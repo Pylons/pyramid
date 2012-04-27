@@ -4,6 +4,7 @@ from pyramid.request import Request
 
 from pyramid.interfaces import (
     IRequestFactory,
+    IRequestProperties,
     IRootFactory,
     )
 
@@ -105,4 +106,9 @@ def _make_request(path, registry=None):
     request_factory = registry.queryUtility(IRequestFactory, default=Request)
     request = request_factory.blank(path)
     request.registry = registry
+
+    plist = registry.queryUtility(IRequestProperties, [])
+    for name, callable, reify in plist:
+        request.set_property(callable, name=name, reify=reify)
+
     return request

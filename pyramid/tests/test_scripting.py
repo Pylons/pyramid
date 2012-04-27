@@ -1,5 +1,11 @@
 import unittest
 
+from pyramid.interfaces import (
+    IRequestFactory,
+    IRequestProperties,
+    IRootFactory,
+    )
+
 class Test_get_root(unittest.TestCase):
     def _callFUT(self, app, request=None):
         from pyramid.scripting import get_root
@@ -111,6 +117,12 @@ class Test__make_request(unittest.TestCase):
         finally:
             global_registries.empty()
 
+    def test_request_gets_custom_properties(self):
+        plist = [('my_custom_property', 'callable', False)]
+        registry = DummyRegistry(DummyFactory, plist)
+        request = self._callFUT('/', registry)
+        self.assertEqual(request.plist, plist)
+
 class Dummy:
     pass
 
@@ -127,11 +139,15 @@ class DummyFactory(object):
         self.kw = kw
 
 class DummyRegistry(object):
-    def __init__(self, factory=None):
-        self.factory = factory
+    def __init__(self, factory=None, properties=None):
+        self.utilities = {
+            IRequestFactory: factory,
+            IRootFactory: factory,
+            IRequestProperties: properties,
+            }
 
     def queryUtility(self, iface, default=None):
-        return self.factory or default
+        return self.utilities[iface] or default
 
 dummy_registry = DummyRegistry(DummyFactory)
 
@@ -148,14 +164,17 @@ class DummyThreadLocalManager:
     def __init__(self):
         self.pushed = []
         self.popped = []
-        
+
     def push(self, item):
         self.pushed.append(item)
 
     def pop(self):
         self.popped.append(True)
-        
+
 class DummyRequest:
     def __init__(self, environ):
         self.environ = environ
-        
+        self.plist = []
+
+    def set_property(self, callable, name=None, reify=False):
+        self.plist.append((name, callable, reify))
