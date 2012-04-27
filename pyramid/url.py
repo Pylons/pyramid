@@ -218,7 +218,9 @@ class URLMethodsMixin(object):
         port = None
 
         if '_query' in kw:
-            qs = '?' + urlencode(kw.pop('_query'), doseq=True)
+            query = kw.pop('_query')
+            if query:
+                qs = '?' + urlencode(query, doseq=True)
 
         if '_anchor' in kw:
             anchor = kw.pop('_anchor')
@@ -494,7 +496,9 @@ class URLMethodsMixin(object):
         anchor = ''
 
         if 'query' in kw:
-            qs = '?' + urlencode(kw['query'], doseq=True)
+            query = kw['query']
+            if query:
+                qs = '?' + urlencode(query, doseq=True)
 
         if 'anchor' in kw:
             anchor = kw['anchor']
