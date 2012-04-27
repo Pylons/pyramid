@@ -101,17 +101,17 @@ class static_view(object):
         path = _secure_path(path_tuple)
 
         if path is None:
-            return HTTPNotFound('Out of bounds: %s' % request.url)
+            raise HTTPNotFound('Out of bounds: %s' % request.url)
 
         if self.package_name: # package resource
 
             resource_path ='%s/%s' % (self.docroot.rstrip('/'), path)
             if resource_isdir(self.package_name, resource_path):
                 if not request.path_url.endswith('/'):
-                    return self.add_slash_redirect(request)
+                    self.add_slash_redirect(request)
                 resource_path = '%s/%s' % (resource_path.rstrip('/'),self.index)
             if not resource_exists(self.package_name, resource_path):
-                return HTTPNotFound(request.url)
+                raise HTTPNotFound(request.url)
             filepath = resource_filename(self.package_name, resource_path)
 
         else: # filesystem file
@@ -120,10 +120,10 @@ class static_view(object):
             filepath = normcase(normpath(join(self.norm_docroot, path)))
             if isdir(filepath):
                 if not request.path_url.endswith('/'):
-                    return self.add_slash_redirect(request)
+                    self.add_slash_redirect(request)
                 filepath = join(filepath, self.index)
             if not exists(filepath):
-                return HTTPNotFound(request.url)
+                raise HTTPNotFound(request.url)
 
         return FileResponse(filepath, request, self.cache_max_age)
 
@@ -132,7 +132,7 @@ class static_view(object):
         qs = request.query_string
         if qs:
             url = url + '?' + qs
-        return HTTPMovedPermanently(url)
+        raise HTTPMovedPermanently(url)
 
 _seps = set(['/', os.sep])
 def _contains_slash(item):
