@@ -20,7 +20,7 @@ Features
 - As of this release, the ``request_method`` predicate, when used, will also
   imply that ``HEAD`` is implied when you use ``GET``.  For example, using
   ``@view_config(request_method='GET')`` is equivalent to using
-  ``@view_config(request_method='HEAD')``.  Using
+  ``@view_config(request_method=('GET', 'HEAD'))``.  Using
   ``@view_config(request_method=('GET', 'POST')`` is equivalent to using
   ``@view_config(request_method=('GET', 'HEAD', 'POST')``.  This is because
   HEAD is a variant of GET that omits the body, and WebOb has special support
