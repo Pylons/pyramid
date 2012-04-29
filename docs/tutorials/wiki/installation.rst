@@ -131,7 +131,7 @@ Make a Project
 ==============
 
 Your next step is to create a project.  :app:`Pyramid` supplies a variety of
-scaffolds to generate sample projects.  For this tutorial, we will use the
+:term:`scaffolds` to generate sample projects.  For this tutorial, we will use the
 :term:`ZODB` -oriented scaffold named ``zodb``.
 
 The below instructions assume your current working directory is the
