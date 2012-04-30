@@ -67,10 +67,10 @@ Preparation, Windows
 Making a Project
 ================
 
-Your next step is to create a project.  :app:`Pyramid` supplies a
-variety of scaffolds to generate sample projects.  We will use the
-``alchemy`` scaffold, which generates an application
-that uses :term:`SQLAlchemy` and :term:`URL dispatch`.
+Your next step is to create a project.  For this tutorial, we will use the
+:term:`scaffold` named ``alchemy``, which generates an application
+that uses :term:`SQLAlchemy` and :term:`URL dispatch`.  :app:`Pyramid`
+supplies a variety of scaffolds to generate sample projects.
 
 The below instructions assume your current working directory is the
 "virtualenv" named "pyramidtut".
