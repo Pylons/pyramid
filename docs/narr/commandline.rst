@@ -460,7 +460,7 @@ to the console.
 
 You can add request header values by using the ``--header`` option::
 
-   $ bin/prequest --header=Host=example.com development.ini /
+   $ bin/prequest --header=Host:example.com development.ini /
 
 Headers are added to the WSGI environment by converting them to their
 CGI/WSGI equivalents (e.g. ``Host=example.com`` will insert the ``HTTP_HOST``
