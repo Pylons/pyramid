@@ -718,7 +718,7 @@ we'll pretend you have a distribution with a package in it named
    def settings_show():
        description = """\
        Print the deployment settings for a Pyramid application.  Example:
-       'psettings deployment.ini'
+       'show_settings deployment.ini'
        """
        usage = "usage: %prog config_uri"
        parser = optparse.OptionParser(
