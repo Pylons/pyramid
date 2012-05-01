@@ -922,9 +922,9 @@ Glossary
      http://docs.pylonsproject.org/projects/pyramid_debugtoolbar/dev/ .
 
    scaffold
-     A project template that helps users get started writing a Pyramid
-     application quickly.  Scaffolds are usually used via the ``pcreate``
-     command.
+     A project template that generates some of the major parts of a Pyramid
+     application and helps users to quickly get started writing larger
+     applications.  Scaffolds are usually used via the ``pcreate`` command.
 
    pyramid_exclog
      A package which logs Pyramid application exception (error) information
