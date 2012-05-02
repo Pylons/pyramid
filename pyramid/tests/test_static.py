@@ -38,11 +38,17 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':''})
         context = DummyContext()
-        response = inst(context, request)
-        response.prepare(request.environ)
-        self.assertEqual(response.status, '301 Moved Permanently')
-        self.assertTrue(b'http://example.com:6543/' in response.body)
-        
+        from pyramid.httpexceptions import HTTPMovedPermanently
+        try:
+            response = inst(context, request)
+        except HTTPMovedPermanently as e:
+            self.assertEqual(e.code, 301)
+            self.assertTrue(b'http://example.com:6543/' in e.location)
+        else:
+            response.prepare(request.environ)
+            self.assertEqual(response.status, '301 Moved Permanently')
+            self.assertTrue(b'http://example.com:6543/' in response.body)
+
     def test_path_info_slash_means_index_html(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest()
@@ -258,11 +264,17 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         request = self._makeRequest({'PATH_INFO':''})
         request.subpath = ()
         context = DummyContext()
-        response = inst(context, request)
-        response.prepare(request.environ)
-        self.assertEqual(response.status, '301 Moved Permanently')
-        self.assertTrue(b'http://example.com:6543/' in response.body)
-        
+        from pyramid.httpexceptions import HTTPMovedPermanently
+        try:
+            response = inst(context, request)
+        except HTTPMovedPermanently as e:
+            self.assertEqual(e.code, 301)
+            self.assertTrue(b'http://example.com:6543/' in e.location)
+        else:
+            response.prepare(request.environ)
+            self.assertEqual(response.status, '301 Moved Permanently')
+            self.assertTrue(b'http://example.com:6543/' in response.body)
+
     def test_path_info_slash_means_index_html(self):
         inst = self._makeOne('pyramid.tests:fixtures/static')
         request = self._makeRequest()
